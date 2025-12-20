@@ -22,21 +22,38 @@ namespace internal {
 // Implement the notifier methods
 XAudio2_Device_Notifier g_notifier;
 
-XAudio2_Device_Notifier::XAudio2_Device_Notifier() : registered(0), pEnumerator(nullptr) { 
-    InitializeCriticalSection(&lock); 
+XAudio2_Device_Notifier::XAudio2_Device_Notifier() : _cRef(1), _pEnumerator(nullptr), instance_count(0) { 
+    for (int i = 0; i < MAX_INSTANCES; i++) {
+        instances[i] = nullptr;
+    }
 }
 
 XAudio2_Device_Notifier::~XAudio2_Device_Notifier() { 
-    DeleteCriticalSection(&lock); 
+    if (_pEnumerator) {
+        _pEnumerator->UnregisterEndpointNotificationCallback(this);
+        _pEnumerator->Release();
+        _pEnumerator = nullptr;
+    }
 }
 
-ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::AddRef() { return 1; }
-ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::Release() { return 1; }
+// IUnknown methods - for global static object, we don't delete on Release
+ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::AddRef() { 
+    return InterlockedIncrement(&_cRef);
+}
+
+ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::Release() { 
+    ULONG ulRef = InterlockedDecrement(&_cRef);
+    // Note: We DON'T delete this because it's a global static object
+    // The Microsoft example shows delete for heap-allocated objects
+    return ulRef;
+}
 
 HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::QueryInterface(REFIID riid, VOID** ppvInterface) {
     if (IID_IUnknown == riid) {
+        AddRef();
         *ppvInterface = (IUnknown*)this;
     } else if (__uuidof(IMMNotificationClient) == riid) {
+        AddRef();
         *ppvInterface = (IMMNotificationClient*)this;
     } else {
         *ppvInterface = NULL;
@@ -47,72 +64,98 @@ HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::QueryInterface(REFIID riid, V
 
 HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDefaultDeviceChanged(EDataFlow flow, ERole, LPCWSTR pwstrDeviceId) {
     if (flow == eRender) {
-        EnterCriticalSection(&lock);
         last_device = pwstrDeviceId ? pwstrDeviceId : L"";
-        for (auto instance : instances) {
+        
+        // Completely lock-free: just read the count and iterate
+        // We might miss an instance that's being added/removed, but that's okay
+        LONG count = instance_count;
+        for (int i = 0; i < count && i < MAX_INSTANCES; i++) {
+            XAudio2_Output* instance = instances[i];
             if (instance) {
-                instance->device_change();
+                instance->signal_device_change();
             }
         }
-        LeaveCriticalSection(&lock);
-        log("XAudio2: Default audio device changed\n");
+        
+        // Only log if we have active instances to avoid UI issues during shutdown
+        if (count > 0) {
+            log("XAudio2: Default audio device changed\n");
+        }
     }
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceAdded(LPCWSTR) { return S_OK; }
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceAdded(LPCWSTR) { 
+    return S_OK; 
+}
 
 HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceRemoved(LPCWSTR pwstrDeviceId) {
-    EnterCriticalSection(&lock);
-    log("XAudio2: Audio device removed\n");
-    for (auto instance : instances) {
-        if (instance) {
-            instance->device_change();
+    LONG count = instance_count;
+    
+    // Only log and signal if we have active instances
+    if (count > 0) {
+        log("XAudio2: Audio device removed\n");
+        
+        for (int i = 0; i < count && i < MAX_INSTANCES; i++) {
+            XAudio2_Output* instance = instances[i];
+            if (instance) {
+                instance->signal_device_change();
+            }
         }
     }
-    LeaveCriticalSection(&lock);
+    
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) { return S_OK; }
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) { return S_OK; }
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) { 
+    return S_OK; 
+}
+
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) { 
+    return S_OK; 
+}
 
 void XAudio2_Device_Notifier::do_register(XAudio2_Output* p_instance) {
-    EnterCriticalSection(&lock);
-    
-    if (InterlockedIncrement(&registered) == 1) {
-        HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
-                                      __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator);
-        if (SUCCEEDED(hr) && pEnumerator) {
-            pEnumerator->RegisterEndpointNotificationCallback(this);
-            log("XAudio2: Registered for device notifications\n");
+    // Check if already registered
+    for (int i = 0; i < MAX_INSTANCES; i++) {
+        if (instances[i] == p_instance) {
+            log("XAudio2: Instance already registered, skipping\n");
+            return;
         }
     }
-
-    instances.push_back(p_instance);
-    LeaveCriticalSection(&lock);
+    
+    // Find first empty slot
+    for (int i = 0; i < MAX_INSTANCES; i++) {
+        if (instances[i] == nullptr) {
+            instances[i] = p_instance;
+            LONG new_count = InterlockedIncrement(&instance_count);
+            log("XAudio2: Registered instance (total: %d)\n", new_count);
+            
+            // Register enumerator on first instance
+            if (new_count == 1 && !_pEnumerator) {
+                HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
+                                              __uuidof(IMMDeviceEnumerator), (void**)&_pEnumerator);
+                if (SUCCEEDED(hr) && _pEnumerator) {
+                    _pEnumerator->RegisterEndpointNotificationCallback(this);
+                    log("XAudio2: Registered for device notifications\n");
+                }
+            }
+            return;
+        }
+    }
+    wxLogError(_("XAudio2: Too many audio instances (max %d)"), MAX_INSTANCES);
 }
 
 void XAudio2_Device_Notifier::do_unregister(XAudio2_Output* p_instance) {
-    EnterCriticalSection(&lock);
-    
-    for (auto it = instances.begin(); it != instances.end(); ) {
-        if (*it == p_instance) {
-            it = instances.erase(it);
-        } else {
-            ++it;
+    // Find and remove the instance
+    for (int i = 0; i < MAX_INSTANCES; i++) {
+        if (instances[i] == p_instance) {
+            instances[i] = nullptr;
+            LONG new_count = InterlockedDecrement(&instance_count);
+            log("XAudio2: Unregistered instance (remaining: %d)\n", new_count);
+            return;
         }
     }
-
-    if (InterlockedDecrement(&registered) == 0) {
-        if (pEnumerator) {
-            pEnumerator->UnregisterEndpointNotificationCallback(this);
-            pEnumerator->Release();
-            pEnumerator = nullptr;
-        }
-    }
-    
-    LeaveCriticalSection(&lock);
+    log("XAudio2: Warning - tried to unregister instance that wasn't registered\n");
 }
 
 namespace {

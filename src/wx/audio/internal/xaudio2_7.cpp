@@ -38,7 +38,7 @@ public:
     void setThrottle(unsigned short throttle_) override;
 
     // XAudio2_Output interface for device change
-    void device_change() override;
+    void signal_device_change() override;
 
 private:
     void close();
@@ -54,6 +54,9 @@ private:
     int currentBuffer = 0;
     int soundBufferLen = 0;
     volatile bool device_changed = false;
+    volatile bool is_destructing = false;
+    DWORD device_change_time = 0;  // Time when device change was detected
+    int reinit_attempts = 0;       // Track reinitialization attempts
 
     IXAudio2* xaud = nullptr;
     IXAudio2MasteringVoice* mVoice = nullptr;
@@ -237,24 +240,37 @@ XAudio2_7_Output::XAudio2_7_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
 }
 
 XAudio2_7_Output::~XAudio2_7_Output() {
+    // Mark as destructing FIRST to prevent callbacks from accessing this object
+    is_destructing = true;
+    
     // Unregister from device notifications
     g_notifier.do_unregister(this);
     
     close();
 }
 
-void XAudio2_7_Output::device_change() {
-    device_changed = true;
-    log("XAudio2: Device change notified, will reinitialize\n");
+void XAudio2_7_Output::signal_device_change() {
+    // Reset the timer every time we get a callback
+    // This way we only act after Windows stops sending callbacks
+    if (!is_destructing) {
+        device_changed = true;
+        device_change_time = GetTickCount();
+        // Don't increment reinit_attempts here - wait for the storm of callbacks to pass
+        log("XAudio2: Device change signaled (timer reset)\n");
+    }
 }
 
 void XAudio2_7_Output::close() {
     initialized = false;
+    playing = false;
 
+    // Stop and destroy voices - but flush buffers first to reduce hang risk
     if (sVoice) {
-        if (playing) {
-            sVoice->Stop(0);
+        // Don't call Stop() if device changed - voice might already be stopped
+        if (!device_changed) {
+            sVoice->Stop(0, XAUDIO2_COMMIT_NOW);
         }
+        sVoice->FlushSourceBuffers();
         sVoice->DestroyVoice();
         sVoice = nullptr;
     }
@@ -269,13 +285,19 @@ void XAudio2_7_Output::close() {
         mVoice = nullptr;
     }
 
+    // Safe to delete callback after voices are destroyed
     delete notify;
     notify = nullptr;
 }
 
 bool XAudio2_7_Output::init(long sampleRate) {
-    if (failed || initialized)
+    if (failed)
         return false;
+        
+    if (initialized) {
+        log("XAudio2: Warning - init() called while already initialized\n");
+        return true;  // Already initialized
+    }
 
     if (!xaud) {
         wxLogError(_("XAudio2 instance not available!"));
@@ -358,17 +380,49 @@ bool XAudio2_7_Output::init(long sampleRate) {
 }
 
 void XAudio2_7_Output::write(uint16_t* finalWave, int) {
-    if (!initialized || failed)
+    if (failed)
+        return;
+
+    // If device changed, wait for Windows callbacks to stop, then reinitialize
+    if (device_changed) {
+        if (!initialized) {
+            return;
+        }
+        
+        DWORD elapsed = GetTickCount() - device_change_time;
+        
+        // Wait 200ms after the LAST callback to ensure device is fully transitioned
+        if (elapsed < 200) {
+            return;  // Still getting callbacks or too soon after last one
+        }
+        
+        // Only try once after callbacks stop
+        if (reinit_attempts == 0) {
+            reinit_attempts = 1;
+            log("XAudio2: %dms since last device callback, attempting reinitialization\n", elapsed);
+            
+            // Close old device - this may take time as XAudio2 cleans up
+            close();
+            
+            // Small delay to let XAudio2 finish cleanup
+            Sleep(50);
+            
+            if (init(freq)) {
+                log("XAudio2: Device reinitialized successfully\n");
+                device_changed = false;
+                reinit_attempts = 0;
+            } else {
+                log("XAudio2: Reinitialization failed, marking driver as failed\n");
+                failed = true;
+            }
+        }
+        return;
+    }
+    
+    if (!initialized)
         return;
 
     while (true) {
-        if (device_changed) {
-            log("XAudio2: Reinitializing due to device change\n");
-            close();
-            if (!init(freq))
-                return;
-        }
-
         sVoice->GetState(&vState);
         if (vState.BuffersQueued > bufferCount) {
             wxLogWarning(_("XAudio2: Too many buffers queued, resetting"));
@@ -386,8 +440,16 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
             break;
         } else {
             if (!coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
-                if (WaitForSingleObject(notify->hBufferEndEvent, 10000) == WAIT_TIMEOUT) {
-                    device_changed = true;
+                DWORD wait_result = WaitForSingleObject(notify->hBufferEndEvent, 200);
+                if (wait_result == WAIT_TIMEOUT) {
+                    // Timeout likely means device is gone or unresponsive
+                    if (!device_changed) {
+                        device_changed = true;
+                        device_change_time = GetTickCount();
+                        reinit_attempts = 0;
+                        log("XAudio2: Device appears unresponsive (timeout)\n");
+                    }
+                    return;
                 }
             } else {
                 return;
@@ -404,7 +466,11 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
     HRESULT submit_hr = sVoice->SubmitSourceBuffer(&newBuf);
     if (FAILED(submit_hr)) {
         wxLogError(_("XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"), submit_hr);
-        device_changed = true;
+        if (!device_changed) {
+            device_changed = true;
+            device_change_time = GetTickCount();
+            reinit_attempts = 0;
+        }
         return;
     }
 
