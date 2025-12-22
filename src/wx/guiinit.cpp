@@ -2116,6 +2116,8 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
         cv->SetValidator(wxBoolEnValidator(&o));                      \
         benval = wxStaticCast(cv->GetValidator(), wxBoolEnValidator); \
         static wxBoolEnHandler _ben;                                  \
+        _ben.controls.clear();                                        \
+        _ben.reverse.clear();                                         \
         ben = &_ben;                                                  \
         wx##wt##BoolEnHandlerConnect(cv, wxID_ANY, _ben);             \
     } while (0)
