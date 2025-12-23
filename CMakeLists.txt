@@ -33,6 +33,14 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
+set(MSYS OFF)
+if(NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
+    set(MSYS ON)
+    # Clear env vars from Windows native dev environments that can break the build.
+    unset(ENV{LIB})
+    unset(ENV{INCLUDE})
+endif()
+
 option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
 
 set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads gettext-libintl wxwidgets nanosvg)
@@ -167,11 +175,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build Type" FORCE)
 elseif(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|Debug|RelWithDebInfo|MinSizeRel)$")
     message(FATAL_ERROR "Invalid CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE}', must be one of: 'Release', 'Debug', 'RelWithDebInfo' or 'MinSizeRel'")
-endif()
-
-set(MSYS OFF)
-if(NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
-    set(MSYS ON)
 endif()
 
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
