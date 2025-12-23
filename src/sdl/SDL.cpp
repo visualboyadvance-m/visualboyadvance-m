@@ -905,21 +905,34 @@ void sdlWriteBackupStateExchange(int from, int to, int backup)
 
 void sdlWriteBattery()
 {
-    char buffer[2048];
+    char savPath[2048];
+    char srmPath[2048];
+
     char *gameDir = sdlGetFilePath(filename);
     char *gameFile = sdlGetFilename(filename);
 
-    if (batteryDir)
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", batteryDir, kFileSep, gameFile);
-    else if (access(gameDir, W_OK) == 0)
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", gameDir, kFileSep, gameFile);
-    else
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
+    const char* baseDir = nullptr;
 
-    bool result = emulator.emuWriteBattery(buffer);
+    if (batteryDir)
+        baseDir = batteryDir;
+    else if (access(gameDir, W_OK) == 0)
+        baseDir = gameDir;
+    else
+        baseDir = homeDataDir;
+
+    snprintf(savPath, sizeof(savPath), "%s%c%s.sav", baseDir, kFileSep, gameFile);
+    snprintf(srmPath, sizeof(srmPath), "%s%c%s.srm", baseDir, kFileSep, gameFile);
+
+    const char* finalPath = savPath;
+
+    if (access(savPath, F_OK) != 0 && access(srmPath, F_OK) == 0) {
+        finalPath = srmPath;
+    }
+
+    bool result = emulator.emuWriteBattery(finalPath);
 
     if (result)
-        systemMessage(0, "Wrote battery '%s'", buffer);
+        systemMessage(0, "Wrote battery '%s'", finalPath);
 
     freeSafe(gameFile);
     freeSafe(gameDir);
@@ -927,21 +940,34 @@ void sdlWriteBattery()
 
 void sdlReadBattery()
 {
-    char buffer[2048];
+    char savPath[2048];
+    char srmPath[2048];
+
     char *gameDir = sdlGetFilePath(filename);
     char *gameFile = sdlGetFilename(filename);
 
-    if (batteryDir)
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", batteryDir, kFileSep, gameFile);
-    else if (access(gameDir, W_OK) == 0)
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", gameDir, kFileSep, gameFile);
-    else
-        snprintf(buffer, sizeof(buffer), "%s%c%s.sav", homeDataDir, kFileSep, gameFile);
+    const char* baseDir = nullptr;
 
-    bool result = emulator.emuReadBattery(buffer);
+    if (batteryDir)
+        baseDir = batteryDir;
+    else if (access(gameDir, W_OK) == 0)
+        baseDir = gameDir;
+    else
+        baseDir = homeDataDir;
+
+    snprintf(savPath, sizeof(savPath), "%s%c%s.sav", baseDir, kFileSep, gameFile);
+    snprintf(srmPath, sizeof(srmPath), "%s%c%s.srm", baseDir, kFileSep, gameFile);
+
+    const char* finalPath = savPath;
+
+    if (access(savPath, F_OK) != 0 && access(srmPath, F_OK) == 0) {
+        finalPath = srmPath;
+    }
+
+    bool result = emulator.emuReadBattery(finalPath);
 
     if (result)
-        systemMessage(0, "Loaded battery '%s'", buffer);
+        systemMessage(0, "Loaded battery '%s'", finalPath);
 
     freeSafe(gameFile);
     freeSafe(gameDir);

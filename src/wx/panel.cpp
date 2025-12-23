@@ -773,8 +773,20 @@ void GameArea::LoadGame(const wxString& name)
         }
 
 #endif
-        bname.append(wxT(".sav"));
-        wxFileName bat(batdir, bname);
+        wxString base = bname;
+
+        wxString savName = base + wxT(".sav");
+        wxString srmName = base + wxT(".srm");
+
+        wxFileName bat;
+
+        if (wxFileExists(wxFileName(batdir, savName).GetFullPath())) {
+            bat.Assign(batdir, savName);
+        } else if (wxFileExists(wxFileName(batdir, srmName).GetFullPath())) {
+            bat.Assign(batdir, srmName);
+        } else {
+            bat.Assign(batdir, savName);
+        }
 
         if (emusys->emuReadBattery(UTF8(bat.GetFullPath()))) {
             wxString msg;
@@ -1129,8 +1141,21 @@ void GameArea::SaveBattery()
     }
 
 #endif
-    bname.append(wxT(".sav"));
-    wxFileName bat(batdir, bname);
+    wxString base = bname;
+
+    wxString savName = base + wxT(".sav");
+    wxString srmName = base + wxT(".srm");
+
+    wxFileName bat;
+
+    if (wxFileExists(wxFileName(batdir, savName).GetFullPath())) {
+        bat.Assign(batdir, savName);
+    } else if (wxFileExists(wxFileName(batdir, srmName).GetFullPath())) {
+        bat.Assign(batdir, srmName);
+    } else {
+        bat.Assign(batdir, savName);
+    }
+
     bat.Mkdir(0777, wxPATH_MKDIR_FULL);
     wxString fn = bat.GetFullPath();
 
