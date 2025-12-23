@@ -365,6 +365,10 @@ function(configure_wx_target target)
         _add_link_libraries(sharpyuv)
     endif()
 
+    if(MSYS)
+        _add_link_libraries(lzma)
+    endif()
+
     # OpenGL.
     if(ENABLE_OPENGL)
         _add_link_libraries(${OPENGL_LIBRARIES})
