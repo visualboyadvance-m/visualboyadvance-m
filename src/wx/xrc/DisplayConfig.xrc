@@ -108,6 +108,19 @@
                         <growablecols>1</growablecols>
                         <object class="sizeritem">
                           <flag>wxALIGN_CENTRE_VERTICAL</flag>
+                          <object class="wxStaticText" name="PluginDirLab">
+                            <label>Plugin filter dir:</label>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxEXPAND</flag>
+                          <object class="wxDirPickerCtrl" name="PluginDir">
+                            <message>Select plugin directory</message>
+                            <style>wxDIRP_USE_TEXTCTRL|wxDIRP_DIR_MUST_EXIST</style>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALIGN_CENTRE_VERTICAL</flag>
                           <object class="wxStaticText">
                             <label>Display filter:</label>
                           </object>
@@ -145,7 +158,7 @@
                         <object class="sizeritem">
                           <flag>wxALIGN_CENTRE_VERTICAL</flag>
                           <object class="wxStaticText" name="PluginLab">
-                            <label>Plugin:</label>
+                            <label>Filter plugin:</label>
                           </object>
                         </object>
                         <object class="sizeritem">

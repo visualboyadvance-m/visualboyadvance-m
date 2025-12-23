@@ -228,11 +228,11 @@ long GetSampleRate() {
 
 // Draw Unicode text on raw pixel buffer using wxWidgets
 void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
-                int buffer_width, int buffer_height, double scale) {
+                int buffer_width, int buffer_height, double scale, int color_depth) {
     if (text.empty()) return;
 
     // Determine bytes per pixel based on color depth
-    int bpp = systemColorDepth >> 3;  // 16->2, 24->3, 32->4
+    int bpp = color_depth >> 3;  // 16->2, 24->3, 32->4
 
     // Scale font size with filter scale
     // Use 11pt base size at native resolution - sweet spot for threshold-based anti-aliasing removal
@@ -347,14 +347,14 @@ void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
             // Use threshold of 100 (~39%) - balances crispness with capturing thin strokes (like 'e' bar)
             if (r > 100) {
                 // Render as pure red for sharp, pixel-perfect text
-                if (systemColorDepth == 16) {
+                if (color_depth == 16) {
                     uint16_t* pixel = (uint16_t*)bufPtr;
                     *pixel = (0x1f << systemRedShift);  // Pure red in 16-bit
-                } else if (systemColorDepth == 24) {
+                } else if (color_depth == 24) {
                     bufPtr[0] = 0;
                     bufPtr[1] = 0;
                     bufPtr[2] = 255;  // Pure red in 24-bit BGR
-                } else if (systemColorDepth == 32) {
+                } else if (color_depth == 32) {
                     uint32_t* pixel = (uint32_t*)bufPtr;
                     *pixel = (0xff << systemRedShift);  // Pure red in 32-bit
                 }
@@ -386,9 +386,10 @@ GameArea::GameArea()
       pointer_blanked(false),
       mouse_active_time(0),
       render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
-                        config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
-                        config::OptionID::kDispStretch, config::OptionID::kPrefVsync,
-                        config::OptionID::kSDLRenderer, config::OptionID::kBitDepth},
+                        config::OptionID::kDispFilterPlugin, config::OptionID::kDispRenderMethod,
+                        config::OptionID::kDispIFB, config::OptionID::kDispStretch,
+                        config::OptionID::kPrefVsync, config::OptionID::kSDLRenderer,
+                        config::OptionID::kBitDepth},
                        std::bind(&GameArea::ResetPanel, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
@@ -1471,8 +1472,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
         }
     }
 
-    if (!emusys)
+    if (!emusys) {
+        // No game loaded, can't create panel
         return;
+    }
 
     if (schedule_audio_restart_) {
         soundShutdown();
@@ -1750,33 +1753,91 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
       nthreads(0),
       rpi_(NULL) {
     memset(delta, 0xff, sizeof(delta));
+    memset(&rpi_info_, 0, sizeof(rpi_info_));
 
     if (OPTION(kDispFilter) == config::Filter::kPlugin) {
-        rpi_ = widgets::MaybeLoadFilterPlugin(OPTION(kDispFilterPlugin),
-                                              &filter_plugin_);
-        if (rpi_) {
-            rpi_->Flags &= ~RPI_565_SUPP;
+        const wxString& pluginPath = OPTION(kDispFilterPlugin);
+        bool loaded = false;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        rpi_proxy::RpiProxyClient::Log("DrawingPanelBase: constructor, pluginPath=%ls", pluginPath.wc_str());
+#endif
 
-            if (rpi_->Flags & RPI_888_SUPP) {
-                rpi_->Flags &= ~RPI_555_SUPP;
-                // FIXME: should this be 32 or 24?  No docs or sample source
-                systemColorDepth = 32;
-            } else if (rpi_->Flags & RPI_555_SUPP) {
-                rpi_->Flags &= ~RPI_888_SUPP;
-                systemColorDepth = 16;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Check if this is a 32-bit plugin that needs the proxy
+        bool needsProxy = widgets::PluginNeedsProxy(pluginPath);
+        rpi_proxy::RpiProxyClient::Log("DrawingPanelBase: needsProxy=%d", needsProxy ? 1 : 0);
+        if (needsProxy) {
+            rpi_proxy_client_ = rpi_proxy::RpiProxyClient::GetSharedInstance();
+            rpi_proxy::RpiProxyClient::Log("DrawingPanelBase: Got shared proxy instance: %p", rpi_proxy_client_);
+            if (widgets::MaybeLoadFilterPluginViaProxy(pluginPath,
+                    rpi_proxy_client_, &rpi_info_)) {
+                rpi_ = &rpi_info_;
+                using_rpi_proxy_ = true;
+                loaded = true;
+                rpi_proxy::RpiProxyClient::Log("DrawingPanelBase: Plugin loaded via proxy: %s (Flags=0x%X)", rpi_info_.Name, rpi_info_.Flags);
             } else {
-                rpi_->Flags &= ~RPI_888_SUPP;
-                rpi_->Flags &= ~RPI_555_SUPP;
-                systemColorDepth = 8;
+                rpi_proxy::RpiProxyClient::Log("DrawingPanelBase: MaybeLoadFilterPluginViaProxy failed");
+                rpi_proxy_client_ = nullptr;
             }
+        }
+#endif
 
-            if (!rpi_->Output) {
-                // note that in actual kega fusion plugins, rpi_->Output is
-                // unused (as is rpi_->Handle)
-                rpi_->Output =
-                    (RENDPLUG_Output)filter_plugin_.GetSymbol("RenderPluginOutput");
+        // Try direct loading if proxy wasn't used or failed
+        if (!loaded) {
+            rpi_ = widgets::MaybeLoadFilterPlugin(pluginPath, &filter_plugin_);
+            if (rpi_) {
+                loaded = true;
             }
-            scale *= (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+        }
+
+        if (loaded && rpi_) {
+            // Select the best color format the plugin supports
+            // Prefer 888 (32-bit), then 555 (16-bit), then 565 (16-bit)
+            // We prefer 555 over 565 because it's more common and simpler.
+            bool using_rgb565 = false;
+            if (rpi_->Flags & RPI_888_SUPP) {
+                rpi_->Flags &= ~(RPI_555_SUPP | RPI_565_SUPP);
+                panel_color_depth_ = 32;
+                systemColorDepth = 32;  // Core needs this to output correct format
+                rpi_bpp_ = 4;
+            } else if (rpi_->Flags & RPI_555_SUPP) {
+                rpi_->Flags &= ~(RPI_565_SUPP | RPI_888_SUPP);
+                panel_color_depth_ = 16;
+                systemColorDepth = 16;  // Core needs this to output correct format
+                rpi_bpp_ = 2;
+            } else if (rpi_->Flags & RPI_565_SUPP) {
+                rpi_->Flags &= ~(RPI_555_SUPP | RPI_888_SUPP);
+                panel_color_depth_ = 16;
+                systemColorDepth = 16;  // Core needs this to output correct format
+                rpi_bpp_ = 2;
+                using_rgb565 = true;
+            } else {
+                // No supported color format - this shouldn't happen
+                panel_color_depth_ = 32;
+                systemColorDepth = 32;  // Core needs this to output correct format
+                rpi_bpp_ = 4;
+            }
+            // Store for color shift configuration later
+            rpi_using_rgb565_ = using_rgb565;
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            // For proxy mode, Output is handled by the proxy client
+            if (!using_rpi_proxy_)
+#endif
+            {
+                if (!rpi_->Output) {
+                    // note that in actual kega fusion plugins, rpi_->Output is
+                    // unused (as is rpi_->Handle)
+                    rpi_->Output =
+                        (RENDPLUG_Output)filter_plugin_.GetSymbol("RenderPluginOutput");
+                }
+            }
+            uint32_t pluginScale = (rpi_->Flags & RPI_OUT_SCLMSK) >> RPI_OUT_SCLSH;
+            // Ensure scale is at least 1 before multiplying
+            if (scale < 1.0) {
+                scale = 1.0;
+            }
+            scale *= pluginScale;
         } else {
             // This is going to delete the object. Do nothing more here.
             OPTION(kDispFilterPlugin) = wxEmptyString;
@@ -1788,11 +1849,12 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
 
-        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+        panel_color_depth_ = (OPTION(kBitDepth) + 1) << 3;
+        systemColorDepth = panel_color_depth_;  // Core needs this to output correct format
     }
 
-    // Intialize color tables
-    if (systemColorDepth == 24) {
+    // Intialize color tables based on panel's color depth
+    if (panel_color_depth_ == 24) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 3;
         systemGreenShift = 11;
@@ -1804,7 +1866,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         systemBlueShift = 11;
         RGB_LOW_BITS_MASK = 0x01010100;
 #endif
-    } else if (systemColorDepth == 32) {
+    } else if (panel_color_depth_ == 32) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 3;
         systemGreenShift = 11;
@@ -1817,11 +1879,20 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         RGB_LOW_BITS_MASK = 0x01010100;
 #endif
     } else {
-        // plugins expect RGB in native byte order
-        systemRedShift = 10;
-        systemGreenShift = 5;
-        systemBlueShift = 0;
-        RGB_LOW_BITS_MASK = 0x0421;
+        // 16-bit mode: RGB555 or RGB565
+        if (rpi_ && rpi_using_rgb565_) {
+            // RGB565: 5 bits red, 6 bits green, 5 bits blue
+            systemRedShift = 11;
+            systemGreenShift = 5;
+            systemBlueShift = 0;
+            RGB_LOW_BITS_MASK = 0x0821;  // Low bit of each component (R:bit 11, G:bit 5, B:bit 0)
+        } else {
+            // RGB555: 5 bits each for red, green, blue
+            systemRedShift = 10;
+            systemGreenShift = 5;
+            systemBlueShift = 0;
+            RGB_LOW_BITS_MASK = 0x0421;
+        }
     }
 }
 
@@ -1842,9 +1913,16 @@ void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
     (void)ev; // unused params
     wxPaintDC dc(GetWindow());
 
+    static int paint_count = 0;
+    if (paint_count < 20) {
+        wxLogDebug("PaintEv called (count=%d, todraw=%p)", paint_count, todraw);
+        paint_count++;
+    }
+
     if (!todraw) {
         // since this is set for custom background, not drawing anything
         // will cause garbage to be displayed, so draw a black area
+        wxLogDebug("PaintEv: todraw is NULL, drawing black background");
         draw_black_background(GetWindow());
         return;
     }
@@ -1893,6 +1971,7 @@ public:
     wxMutex lock_;
     wxCondition sig_;
     wxSemaphore* done_;
+    wxSemaphore* ready_;  // Posted when thread is ready to receive work signals
 
     // Set these params before running
     int nthreads_;
@@ -1901,8 +1980,14 @@ public:
     int height_;
     double scale_;
     const RENDER_PLUGIN_INFO* rpi_;
+    int rpi_bpp_ = 4;  // Bytes per pixel for RPI plugin (default 32-bit = 4)
+    int panel_color_depth_ = 32;  // Panel's color depth (independent from global systemColorDepth)
     uint8_t* dst_;
     uint8_t* delta_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    rpi_proxy::RpiProxyClient* rpi_proxy_client_ = nullptr;
+    bool proxy_thread_started_ = false;
+#endif
 
     // set this param every round
     // if NULL, end thread
@@ -1915,27 +2000,41 @@ public:
     size_t dst2_size_;
 
     ExitCode Entry() override {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Start the proxy thread for this filter thread
+        if (rpi_proxy_client_ && OPTION(kDispFilter) == config::Filter::kPlugin) {
+            rpi_proxy_client_->StartThread(static_cast<uint32_t>(threadno_));
+            proxy_thread_started_ = true;
+        }
+#endif
+
         // Pre-compute all constants once at thread start (not per-frame)
         const int height_real = height_;
         const int procy = height_ * threadno_ / nthreads_;
         height_ = height_ * (threadno_ + 1) / nthreads_ - procy;
 
         // Cache depth format flags for fast branching
-        const bool is_8bit = out_8;
-        const bool is_16bit = out_16;
-        const bool is_24bit = out_24;
+        // Use panel_color_depth_ instead of systemColorDepth to avoid race conditions
+        const bool is_8bit = (panel_color_depth_ == 8);
+        const bool is_16bit = (panel_color_depth_ == 16);
+        const bool is_24bit = (panel_color_depth_ == 24);
         const bool is_32bit = !is_8bit && !is_16bit && !is_24bit;
 
         // Pre-compute strides using integer math where possible
-        const int inbpp = systemColorDepth >> 3;
-        const int inrb = is_8bit ? 4 : is_16bit ? 2 : is_24bit ? 0 : 1;
+        // For plugin filters, use the cached rpi_bpp_ to avoid global state issues
+        // For non-plugin filters, use panel_color_depth_ (not systemColorDepth) to avoid race conditions
+        const bool using_plugin = (rpi_ != nullptr);
+        const int inbpp = using_plugin ? rpi_bpp_ : (panel_color_depth_ >> 3);
+        // Calculate inrb based on actual bpp for plugins to avoid global state issues
+        const int inrb = using_plugin ? ((rpi_bpp_ == 1) ? 4 : (rpi_bpp_ == 2) ? 2 : (rpi_bpp_ == 3) ? 0 : 1)
+                                      : (is_8bit ? 4 : is_16bit ? 2 : is_24bit ? 0 : 1);
         const int instride = (width_ + inrb) * inbpp;
 
         // For 32bpp conversion: filters need left+right borders of 1 each
         const int total_width32 = width_ + 2;  // left border + image + right border
         const int instride32 = total_width32 * 4;
 
-        const int outbpp = systemColorDepth >> 3;
+        const int outbpp = using_plugin ? rpi_bpp_ : (panel_color_depth_ >> 3);
         // Use integer scale calculation (scale_ is typically 2, 3, 4, etc.)
         const int scale_int = static_cast<int>(scale_);
         const int outstride = (width_ + inrb) * outbpp * scale_int;
@@ -1978,11 +2077,21 @@ public:
         const int scaled_border_dest = inrb * scale_int;
 
         // Lock mutex before waiting on condition (required for wxCondition::Wait)
-        if (nthreads_ > 1)
+        if (nthreads_ > 1) {
             lock_.Lock();
+            // Signal that this thread is ready to receive work signals
+            ready_->Post();
+        }
 
         while (nthreads_ == 1 || sig_.Wait() == wxCOND_NO_ERROR) {
             if (!src_) {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+                // Stop the proxy thread when this filter thread is terminating
+                if (proxy_thread_started_) {
+                    rpi_proxy_client_->StopThread(static_cast<uint32_t>(threadno_));
+                    proxy_thread_started_ = false;
+                }
+#endif
                 lock_.Unlock();
                 return 0;
             }
@@ -2009,8 +2118,12 @@ public:
             if (is_32bit) {
                 // Direct 32bpp path - no conversion needed
                 ApplyFilterOptimized(instride, outstride, filter_option);
+            } else if (filter_option == config::Filter::kPlugin) {
+                // Plugin filters handle their own format - pass data directly without conversion
+                // Plugins with RPI_OUT_565 flag expect 16-bit data, not 32-bit converted data
+                ApplyFilterOptimized(instride, outstride, filter_option);
             } else {
-                // Non-32bpp: convert to 32bpp, apply filter, convert back
+                // Non-32bpp with built-in filter: convert to 32bpp, apply filter, convert back
                 // Save current shift values (set for original depth)
                 const int saved_red_shift = systemRedShift;
                 const int saved_green_shift = systemGreenShift;
@@ -2114,7 +2227,41 @@ public:
                 const int dst_offset = scaled_width * scale_int;
                 uint8_t* filter_dst = reinterpret_cast<uint8_t*>(dst2_ + dst_offset);
 
-                ApplyFilter32(filter_src, instride32, delta_, filter_dst, outstride32, width_, height_);
+                if (filter_option == config::Filter::kPlugin) {
+                    // Plugin filter - use proxy or direct plugin call
+                    // This path uses internal 32-bit buffers (src2_, dst2_) which have
+                    // no side borders, only top border rows. The borders are handled
+                    // during conversion back to original format.
+                    RENDER_PLUGIN_OUTP outdesc;
+                    outdesc.Size = sizeof(outdesc);
+                    outdesc.Flags = rpi_->Flags;
+                    outdesc.SrcPtr = filter_src;
+                    outdesc.SrcPitch = instride32;
+                    outdesc.SrcW = width_;
+                    outdesc.SrcH = height_;
+                    outdesc.DstPtr = filter_dst;
+                    // dst2_ is tightly packed (no side borders), so DstPitch = data width
+                    const int data_bytes_per_row32 = scaled_width * 4;
+                    outdesc.DstPitch = data_bytes_per_row32;
+                    outdesc.DstW = scaled_width;
+                    outdesc.DstH = static_cast<int>(height_ * scale_);
+                    outdesc.OutW = outdesc.DstW;
+                    outdesc.OutH = outdesc.DstH;
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+                    if (rpi_proxy_client_) {
+                        // Pass outstride32 as actualDstPitch for consistency
+                        // (they're equal since dst2_ has no side borders)
+                        rpi_proxy_client_->ApplyFilter(&outdesc, static_cast<uint32_t>(threadno_), outstride32);
+                    } else
+#endif
+                    {
+                        rpi_->Output(&outdesc);
+                    }
+                } else {
+                    // Built-in filter
+                    ApplyFilter32(filter_src, instride32, delta_, filter_dst, outstride32, width_, height_);
+                }
 
                 // Convert 32bpp output back to original depth
                 const uint32_t* dst32 = dst2_ + dst_offset;
@@ -2186,6 +2333,14 @@ public:
             done_->Post();
         }
 
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Stop the proxy thread when this filter thread is done
+        if (proxy_thread_started_) {
+            rpi_proxy_client_->StopThread(static_cast<uint32_t>(threadno_));
+            proxy_thread_started_ = false;
+        }
+#endif
+
         return 0;
     }
 
@@ -2230,15 +2385,44 @@ private:
             RENDER_PLUGIN_OUTP outdesc;
             outdesc.Size = sizeof(outdesc);
             outdesc.Flags = rpi_->Flags;
-            outdesc.SrcPtr = src_;
-            outdesc.SrcPitch = instride;
+            // src_ points to the start of the row (including left border pixel).
+            // Skip the left border pixel (1 pixel = rpi_bpp_ bytes) to point to first data pixel.
+            // Use the cached rpi_bpp_ instead of systemColorDepth >> 3 to avoid global state issues.
+            const int bpp = rpi_bpp_;
+            outdesc.SrcPtr = src_ + bpp;  // Skip left border pixel
+            // Compute the correct instride for plugin mode based on rpi_bpp_.
+            // The precomputed instride may be wrong if systemColorDepth was different when Entry() started.
+            // For RPI plugins: inrb = 1 (32-bit) or 2 (16-bit) based on bytes per pixel.
+            const int plugin_inrb = (bpp == 4) ? 1 : 2;
+            const int plugin_instride = (width_ + plugin_inrb) * bpp;
+            outdesc.SrcPitch = plugin_instride;
             outdesc.SrcW = width_;
             outdesc.SrcH = height_;
-            outdesc.DstPtr = dst_;
-            outdesc.DstPitch = outstride;
+            // Plugin output data doesn't include borders.
+            // The dst_ buffer has borders, so we need to offset by left border size.
+            // Left border bytes = (outstride - data_bytes) / 2
+            const int scale_int = static_cast<int>(scale_);
+            const int data_bytes_per_row = width_ * bpp * scale_int;
+            const int left_border_bytes = (outstride - data_bytes_per_row) / 2;
+            outdesc.DstPtr = dst_ + left_border_bytes;  // Skip left border in output
+            // Use DstW * bpp as pitch (no border padding) because many plugins don't respect
+            // DstPitch and write sequentially based on DstW. The proxy handles stride conversion.
+            outdesc.DstPitch = data_bytes_per_row;  // DstW * bytes_per_pixel
             outdesc.DstW = static_cast<int>(width_ * scale_);
             outdesc.DstH = static_cast<int>(height_ * scale_);
-            rpi_->Output(&outdesc);
+            outdesc.OutW = outdesc.DstW;
+            outdesc.OutH = outdesc.DstH;
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            if (rpi_proxy_client_) {
+                // Use the proxy client to apply the filter
+                // Pass outstride as actualDstPitch so proxy can handle stride conversion
+                rpi_proxy_client_->ApplyFilter(&outdesc, static_cast<uint32_t>(threadno_), outstride);
+            } else
+#endif
+            {
+                rpi_->Output(&outdesc);
+            }
         } else {
             ApplyFilter32(src_, instride, delta_, dst_, outstride, width_, height_);
         }
@@ -2250,9 +2434,16 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = systemColorDepth >> 3;
-    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outbpp = panel_color_depth_ >> 3;
+    int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
+
+    static int drawarea_count = 0;
+    if (drawarea_count < 20) {
+        wxLogDebug("DrawArea called (count=%d, data=%p, pixbuf2=%p)",
+            drawarea_count, data, pixbuf2);
+        drawarea_count++;
+    }
 
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
@@ -2308,6 +2499,11 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
 
             // go ahead and start the threads up, though
@@ -2321,9 +2517,20 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+                    threads[i].rpi_bpp_ = rpi_bpp_;
+                    threads[i].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+                    threads[i].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
                     threads[i].done_ = &filt_done;
+                    threads[i].ready_ = &filt_ready;
                     threads[i].Create();
                     threads[i].Run();
+                }
+                // Wait for all threads to signal they're ready before returning
+                // This prevents lost signals on the next frame
+                for (int i = 0; i < nthreads; i++) {
+                    filt_ready.Wait();
                 }
             }
         } else if (nthreads == 1) {
@@ -2336,6 +2543,11 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
         } else {
             for (int i = 0; i < nthreads; i++) {
@@ -2353,7 +2565,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
                 // outbpp and inrb already declared in outer scope
-                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int instride = (width + inrb) * (panel_color_depth_ >> 3);
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -2404,8 +2616,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             // At scale=1.0 (native GBA/GB res): (4, 4) instead of (10, 20)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
-            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText, scaled_width, scaled_height, scale);
+            drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                x, y, statText, scaled_width, scaled_height, scale, panel_color_depth_);
         }
 
         if (!panel->osdtext.empty()) {
@@ -2414,8 +2626,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
-                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
+                drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale, panel_color_depth_);
             } else
                 panel->osdtext.clear();
         }
@@ -2553,6 +2765,17 @@ DrawingPanelBase::~DrawingPanelBase()
 
         delete[] threads;
     }
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    // Unload plugin from proxy client if we were using it
+    if (using_rpi_proxy_ && rpi_proxy_client_) {
+        rpi_proxy::RpiProxyClient::Log("~DrawingPanelBase: Unloading plugin from proxy");
+        rpi_proxy_client_->UnloadPlugin();
+        using_rpi_proxy_ = false;
+        rpi_proxy_client_ = nullptr;
+    }
+    rpi_proxy::RpiProxyClient::Log("~DrawingPanelBase: Done");
+#endif
 
     disableKeyboardBackgroundInput();
 }
@@ -2918,9 +3141,9 @@ void SDLDrawingPanel::DrawArea()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
 
-    if ((renderername == wxString("direct3d")) && (systemColorDepth == 32)) {
+    if ((renderername == wxString("direct3d")) && (panel_color_depth_ == 32)) {
         todraw_argb = (uint32_t *)(todraw + srcPitch);
-            
+
         for (int i = 0; i < (height * scale); i++) {
             for (int j = 0; j < (width * scale); j++) {
                 todraw_argb[j + (i * (srcPitch / 4))] = 0xFF000000 | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF) << 16) | (todraw_argb[j + (i * (srcPitch / 4))] & 0xFF00) | ((todraw_argb[j + (i * (srcPitch / 4))] & 0xFF0000) >> 16);
@@ -2929,7 +3152,7 @@ void SDLDrawingPanel::DrawArea()
 
         if (texture != NULL)
             SDL_UpdateTexture(texture, NULL, todraw_argb, srcPitch);
-    } else if ((renderername == wxString("direct3d")) && (systemColorDepth == 16)) {
+    } else if ((renderername == wxString("direct3d")) && (panel_color_depth_ == 16)) {
         todraw_rgb565 = (uint16_t *)(todraw + srcPitch);
 
         for (int i = 0; i < (height * scale); i++) {
@@ -2960,8 +3183,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = systemColorDepth >> 3;
-    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outbpp = panel_color_depth_ >> 3;
+    int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing (up to 6)
@@ -3018,6 +3241,11 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
 
             // go ahead and start the threads up, though
@@ -3031,9 +3259,19 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+                    threads[i].rpi_bpp_ = rpi_bpp_;
+                    threads[i].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+                    threads[i].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
                     threads[i].done_ = &filt_done;
+                    threads[i].ready_ = &filt_ready;
                     threads[i].Create();
                     threads[i].Run();
+                }
+                // Wait for all threads to signal they're ready before returning
+                for (int i = 0; i < nthreads; i++) {
+                    filt_ready.Wait();
                 }
             }
         } else if (nthreads == 1) {
@@ -3046,6 +3284,11 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
         } else {
             for (int i = 0; i < nthreads; i++) {
@@ -3062,7 +3305,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             // to the boundary rows. This eliminates visual artifacts at thread
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int instride = (width + inrb) * (panel_color_depth_ >> 3);
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -3110,8 +3353,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             // At scale=1.0 (native GBA/GB res): (4, 4) instead of (10, 20)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
-            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText, scaled_width, scaled_height, scale);
+            drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                x, y, statText, scaled_width, scaled_height, scale, panel_color_depth_);
         }
 
         if (!panel->osdtext.empty()) {
@@ -3120,8 +3363,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
-                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
+                drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale, panel_color_depth_);
             } else
                 panel->osdtext.clear();
         }
@@ -3509,28 +3752,33 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
     (void)dc; // unused params
     SetContext();
     RefreshGL();
-            
+
     if (!did_init)
         DrawingPanelInit();
-            
+
     if (todraw) {
-        int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+        // Calculate inrb based on panel's color depth, not global systemColorDepth
+        int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
         int rowlen = std::ceil((width + inrb) * scale);
         glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
 #if wxBYTE_ORDER == wxBIG_ENDIAN
-                
+
                 // FIXME: is this necessary?
-        if (out_16)
+        if (panel_color_depth_ == 16)
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-                
+
 #endif
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, (int)std::ceil(width * scale), (int)std::ceil(height * scale),
-                     0, tex_fmt, todraw + (int)std::ceil(rowlen * (systemColorDepth >> 3)));
-                
+        int tex_width = (int)std::ceil(width * scale);
+        int tex_height = (int)std::ceil(height * scale);
+        int offset = (int)std::ceil(rowlen * (panel_color_depth_ >> 3));
+        uint8_t* tex_ptr = todraw + offset;
+        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, tex_width, tex_height,
+                     0, tex_fmt, tex_ptr);
+
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
-            
+
     SwapBuffers();
 }
         
@@ -4025,7 +4273,8 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     device->EndScene();
 
     // Present the frame
-    device->Present(NULL, NULL, NULL, NULL);
+    HRESULT present_hr = device->Present(NULL, NULL, NULL, NULL);
+    (void)present_hr;
 }
 #endif
         
@@ -4353,8 +4602,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
-    int outbpp = systemColorDepth >> 3;
-    int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+    int outbpp = panel_color_depth_ >> 3;
+    int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing (up to 6)
@@ -4411,6 +4660,11 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
 
             // go ahead and start the threads up, though
@@ -4424,9 +4678,19 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+                    threads[i].rpi_bpp_ = rpi_bpp_;
+                    threads[i].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+                    threads[i].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
                     threads[i].done_ = &filt_done;
+                    threads[i].ready_ = &filt_ready;
                     threads[i].Create();
                     threads[i].Run();
+                }
+                // Wait for all threads to signal they're ready before returning
+                for (int i = 0; i < nthreads; i++) {
+                    filt_ready.Wait();
                 }
             }
         } else if (nthreads == 1) {
@@ -4439,6 +4703,11 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].rpi_bpp_ = rpi_bpp_;
+            threads[0].panel_color_depth_ = panel_color_depth_;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            threads[0].rpi_proxy_client_ = rpi_proxy_client_;
+#endif
             threads[0].Entry();
         } else {
             for (int i = 0; i < nthreads; i++) {
@@ -4455,7 +4724,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             // to the boundary rows. This eliminates visual artifacts at thread
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                int instride = (width + inrb) * (systemColorDepth >> 3);
+                int instride = (width + inrb) * (panel_color_depth_ >> 3);
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -4503,8 +4772,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             // At scale=1.0 (native GBA/GB res): (4, 4) instead of (10, 20)
             int x = (int)std::ceil(4 * scale);
             int y = (int)std::ceil(4 * scale);
-            drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                x, y, statText, scaled_width, scaled_height, scale);
+            drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                x, y, statText, scaled_width, scaled_height, scale, panel_color_depth_);
         }
 
         if (!panel->osdtext.empty()) {
@@ -4513,8 +4782,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
                 int y = scaled_height - (int)std::ceil(44 * scale);
-                drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
-                    x, y, panel->osdtext, scaled_width, scaled_height, scale);
+                drawTextWx(todraw + outstride * (panel_color_depth_ != 24), outstride,
+                    x, y, panel->osdtext, scaled_width, scaled_height, scale, panel_color_depth_);
             } else
                 panel->osdtext.clear();
         }

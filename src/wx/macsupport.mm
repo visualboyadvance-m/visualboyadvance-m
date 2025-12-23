@@ -330,18 +330,18 @@ void MetalDrawingPanel::DrawArea()
         if (!did_init)
             DrawingPanelInit();
 
-        int inrb = (systemColorDepth == 8) ? 4 : (systemColorDepth == 16) ? 2 : (systemColorDepth == 24) ? 0 : 1;
-        if (systemColorDepth == 8) {
+        int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
+        if (panel_color_depth_ == 8) {
             srcPitch = std::ceil((width + inrb) * scale * 1);
-        } else if (systemColorDepth == 16) {
+        } else if (panel_color_depth_ == 16) {
             srcPitch = std::ceil((width + inrb) * scale * 2);
-        } else if (systemColorDepth == 24) {
+        } else if (panel_color_depth_ == 24) {
             srcPitch = std::ceil(width * scale * 3);
         } else {
             srcPitch = std::ceil((width + inrb) * scale * 4);
         }
 
-        if (systemColorDepth == 8) {
+        if (panel_color_depth_ == 8) {
             // Idiomatic Metal: pre-allocate and reuse conversion buffer
             size_t required_size = (width * scale) * (height * scale) * sizeof(uint32_t);
             if (_conversion_buffer_size < required_size) {
@@ -384,7 +384,7 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
             }
             _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
-        } else if (systemColorDepth == 16) {
+        } else if (panel_color_depth_ == 16) {
             // Idiomatic Metal: pre-allocate and reuse conversion buffer
             size_t required_size = (width * scale) * (height * scale) * sizeof(uint32_t);
             if (_conversion_buffer_size < required_size) {
@@ -428,7 +428,7 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
             }
             _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
-        } else if (systemColorDepth == 24) {
+        } else if (panel_color_depth_ == 24) {
             // Idiomatic Metal: pre-allocate and reuse conversion buffer
             size_t required_size = (width * scale) * (height * scale) * 4; // RGBA
             if (_conversion_buffer_size < required_size) {

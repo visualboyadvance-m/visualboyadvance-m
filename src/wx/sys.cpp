@@ -105,6 +105,15 @@ void systemDrawScreen()
     mf->UpdateViewers();
     // FIXME: Sm60FPS crap and sondBufferLow crap
     GameArea* ga = mf->GetPanel();
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    static int draw_count_rpi = 0;
+    draw_count_rpi++;
+    if (draw_count_rpi <= 200 || draw_count_rpi % 60 == 0) {
+        rpi_proxy::RpiProxyClient::Log("systemDrawScreen: frames=%d ga=%p ga->panel=%p (count=%d)", frames, ga, ga ? ga->panel : nullptr, draw_count_rpi);
+    }
+#endif
+
 #ifndef NO_FFMPEG
 
     if (ga)
@@ -112,8 +121,24 @@ void systemDrawScreen()
 
 #endif
 
-    if (ga && ga->panel)
+    if (ga && ga->panel) {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        static int draw_area_count = 0;
+        draw_area_count++;
+        if (draw_area_count <= 200 || draw_area_count % 60 == 0) {
+            rpi_proxy::RpiProxyClient::Log("systemDrawScreen: calling DrawArea (draw_area_count=%d)", draw_area_count);
+        }
+#endif
         ga->panel->DrawArea(&g_pix);
+    } else {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        static int no_draw_count = 0;
+        no_draw_count++;
+        if (no_draw_count <= 50 || no_draw_count % 60 == 0) {
+            rpi_proxy::RpiProxyClient::Log("systemDrawScreen: NOT calling DrawArea (ga=%p panel=%p count=%d)", ga, ga ? ga->panel : nullptr, no_draw_count);
+        }
+#endif
+    }
 }
 
 // record a game "movie"
@@ -459,6 +484,14 @@ uint32_t systemReadJoypad(int joy)
 
 void systemShowSpeed(int speed)
 {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    static int showspeed_count = 0;
+    showspeed_count++;
+    if (showspeed_count <= 100 || showspeed_count % 10 == 0) {
+        rpi_proxy::RpiProxyClient::Log("systemShowSpeed: speed=%d frames=%d (count=%d)", speed, frames, showspeed_count);
+    }
+#endif
+
     MainFrame* f = wxGetApp().frame;
     wxString s;
     s.Printf(_("%d %% (%d, %d fps)"), speed, systemFrameSkip, frames * speed / 100);

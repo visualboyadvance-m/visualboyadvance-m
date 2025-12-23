@@ -1,6 +1,8 @@
 #ifndef VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
+#include <wx/filepicker.h>
+
 #include "wx/dialogs/base-dialog.h"
 #include "wx/config/option-observer.h"
 
@@ -36,8 +38,11 @@ private:
     // Stops handling the plugin options.
     void StopPluginHandler();
 
-    // Update the plugin display.
+    // Update the plugin display when filter changes.
     void UpdatePlugin(wxCommandEvent& event);
+
+    // Update the filter when plugin selection changes.
+    void OnPluginSelected(wxCommandEvent& event);
 
     // Displays the new filter name on the screen.
     void OnFilterChanged(config::Option* option);
@@ -59,6 +64,11 @@ private:
     // Update SDL options visibility based on output module selection.
     void UpdateSDLOptionsVisibility(wxCommandEvent& event);
 
+    // Handler for plugin directory change.
+    void OnPluginDirChanged(wxFileDirPickerEvent& event);
+
+    wxControl* plugin_dir_label_;
+    wxDirPickerCtrl* plugin_dir_picker_;
     wxControl* plugin_label_;
     wxChoice* plugin_selector_;
     wxChoice* filter_selector_;

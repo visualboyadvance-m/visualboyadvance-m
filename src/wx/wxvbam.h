@@ -73,6 +73,7 @@ public:
     // wxApp implementation.
     bool OnInit() final;
     int OnRun() final;
+    int OnExit() final;
     bool OnCmdLineHelp(wxCmdLineParser&) final;
     bool OnCmdLineError(wxCmdLineParser&) final;
     void OnInitCmdLine(wxCmdLineParser&) final;
@@ -599,6 +600,8 @@ void systemScreenMessage(const wxString& msg);
 #include "wx/rpi.h"
 #include <wx/dynlib.h>
 
+#include "wx/widgets/render-plugin.h"
+
 class FilterThread;
 
 class DrawingPanelBase {
@@ -625,8 +628,17 @@ protected:
     FilterThread* threads;
     int nthreads;
     wxSemaphore filt_done;
+    wxSemaphore filt_ready;  // Posted by threads when they're ready to receive work
     wxDynamicLibrary filter_plugin_;
     RENDER_PLUGIN_INFO* rpi_; // also flag indicating plugin loaded
+    RENDER_PLUGIN_INFO rpi_info_; // storage for plugin info when using proxy
+    bool rpi_using_rgb565_ = false; // true if plugin uses RGB565 format
+    int rpi_bpp_ = 4; // bytes per pixel for RPI plugin (4 for 32-bit, 2 for 16-bit)
+    int panel_color_depth_ = 16; // Color depth for this panel (may differ from global systemColorDepth)
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    rpi_proxy::RpiProxyClient* rpi_proxy_client_ = nullptr;  // Points to shared instance
+    bool using_rpi_proxy_ = false;
+#endif
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
 };

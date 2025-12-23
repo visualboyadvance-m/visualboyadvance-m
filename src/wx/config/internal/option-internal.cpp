@@ -154,6 +154,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool sdl_pixel_art = false;
         Filter filter = Filter::kNone;
         wxString filter_plugin = wxEmptyString;
+        wxString plugin_dir = wxEmptyString;
         Interframe interframe = Interframe::kNone;
         bool keep_on_top = false;
         int32_t max_threads = 0;
@@ -283,6 +284,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispSDLPixelArt, &g_owned_opts.sdl_pixel_art),
         Option(OptionID::kDispFilter, &g_owned_opts.filter),
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
+        Option(OptionID::kDispPluginDir, &g_owned_opts.plugin_dir),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
         Option(OptionID::kBitDepth, &g_owned_opts.bitdepth, 0, 3),
         Option(OptionID::kDispKeepOnTop, &g_owned_opts.keep_on_top),
@@ -429,6 +431,7 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/SDLPixelArt", "SDLPixelArt", _("Use the SDL pixel art filter with an SDL renderer")},
     OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
     OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
+    OptionData{"Display/PluginDir", "", _("Directory containing RPI filter plugins")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
     OptionData{"Display/BitDepth", "BitDepth", _("Bit depth")},
     OptionData{"Display/KeepOnTop", "KeepOnTop", _("Keep window on top")},

@@ -13,6 +13,9 @@
 
 #include "core/base/check.h"
 #include "wx/config/option-proxy.h"
+#ifdef VBAM_RPI_PROXY_SUPPORT
+#include "wx/rpi-proxy/RpiProxyClient.h"
+#endif
 
 namespace config {
 
@@ -382,6 +385,10 @@ bool Option::SetString(const wxString& value) {
     VBAM_CHECK(is_string());
     const wxString old_value = GetString();
     *nonstd::get<wxString*>(value_) = value;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    rpi_proxy::RpiProxyClient::Log("Option::SetString: config_name=%s old_value='%s' new_value='%s' changed=%d",
+        config_name().utf8_str().data(), old_value.utf8_str().data(), value.utf8_str().data(), old_value != value ? 1 : 0);
+#endif
     if (old_value != value) {
         CallObservers();
     }
@@ -393,6 +400,10 @@ bool Option::SetFilter(const Filter& value) {
     VBAM_CHECK(value < Filter::kLast);
     const Filter old_value = GetFilter();
     *nonstd::get<Filter*>(value_) = value;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    rpi_proxy::RpiProxyClient::Log("Option::SetFilter: config_name=%s old_value=%d new_value=%d changed=%d",
+        config_name().utf8_str().data(), (int)old_value, (int)value, old_value != value ? 1 : 0);
+#endif
     if (old_value != value) {
         CallObservers();
     }

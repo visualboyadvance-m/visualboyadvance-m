@@ -57,6 +57,9 @@
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/widgets/utils.h"
+#ifdef VBAM_RPI_PROXY_SUPPORT
+#include "wx/rpi-proxy/RpiProxyClient.h"
+#endif
 
 #if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
@@ -379,6 +382,10 @@ wxvbamApp::wxvbamApp()
 
 const wxString wxvbamApp::GetPluginsDir()
 {
+    const wxString& config_dir = OPTION(kDispPluginDir);
+    if (!config_dir.empty()) {
+        return config_dir;
+    }
     return wxStandardPaths::Get().GetPluginsDir();
 }
 
@@ -786,6 +793,17 @@ int wxvbamApp::OnRun()
     {
         return wxApp::OnRun();
     }
+}
+
+int wxvbamApp::OnExit()
+{
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    // Release the shared RPI proxy instance after all windows are destroyed.
+    // This ensures the panel's filter threads have finished cleanup before
+    // the proxy is destroyed.
+    rpi_proxy::RpiProxyClient::ReleaseSharedInstance();
+#endif
+    return wxApp::OnExit();
 }
 
 // called on --help

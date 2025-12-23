@@ -390,7 +390,21 @@ endfunction()
 # Sub-projects.
 add_subdirectory(test)
 add_subdirectory(config)
+
+# RPI proxy for 32-bit plugin support from 64-bit builds (Windows only)
+# Must be before widgets so VBAM_HAS_RPI_PROXY is set for widget library compilation
+if(WIN32)
+    add_subdirectory(rpi-proxy)
+endif()
+
 add_subdirectory(widgets)
+
+# Add RPI proxy support compile definition to widgets library if proxy is available
+# This enables the proxy functions in render-plugin.cpp
+if(VBAM_HAS_RPI_PROXY)
+    target_link_libraries(vbam-wx-widgets PUBLIC vbam-rpi-proxy)
+    target_compile_definitions(vbam-wx-widgets PUBLIC VBAM_RPI_PROXY_SUPPORT)
+endif()
 
 set(VBAM_ICON visualboyadvance-m.icns)
 set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
@@ -528,9 +542,38 @@ if(WIN32)
         wxvbam.rc
         wxvbam_translations.rc
     )
+
+    # Explicitly tell resource compiler to embed RPI host when proxy is available
+    # Use COMPILE_FLAGS to directly pass /D to rc.exe
+    if(VBAM_HAS_RPI_PROXY)
+        if(MSVC)
+            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS "/DVBAM_EMBED_RPI_HOST")
+        else()
+            # For MinGW windres
+            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS "-DVBAM_EMBED_RPI_HOST")
+        endif()
+        message(STATUS "Resource compiler will embed RPI host (VBAM_EMBED_RPI_HOST defined)")
+    endif()
     if(NOT COMPILE_ONLY)
         target_link_libraries(visualboyadvance-m
             dxguid dsound wsock32 ws2_32 imm32 version winmm)
+
+        # RPI proxy support for 32-bit plugin loading from 64-bit builds
+        if(VBAM_HAS_RPI_PROXY)
+            message(STATUS "RPI Proxy enabled - Host exe path: ${RPI_HOST_EXE_PATH}")
+            # Explicitly add compile definition (PUBLIC from vbam-wx-widgets may not propagate for OBJECT libraries)
+            target_compile_definitions(visualboyadvance-m PRIVATE VBAM_RPI_PROXY_SUPPORT)
+            # Ensure the 32-bit host is built before the main exe (needed for resource embedding)
+            if(TARGET vbam-rpi-host-build)
+                add_dependencies(visualboyadvance-m vbam-rpi-host-build)
+            endif()
+            # Force resource recompilation when host exe changes
+            if(RPI_HOST_EXE_PATH)
+                set_property(SOURCE wxvbam.rc APPEND PROPERTY OBJECT_DEPENDS "${RPI_HOST_EXE_PATH}")
+            else()
+                message(WARNING "RPI_HOST_EXE_PATH is not set - resource dependency not configured")
+            endif()
+        endif()
 
         # Force a re-link when the manifest file is modified.
         set_target_properties(visualboyadvance-m
