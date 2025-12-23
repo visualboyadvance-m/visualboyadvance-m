@@ -208,11 +208,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_LIB_DIR "${wxWidgets_LIB_DIR}" CACHE INTERNAL "wxWidgets library directory" FORCE)
 endif()
 
-# Workaround of static liblzma not being found on MSYS2.
+# Workaround for wx trying to link dynamic lzma MSYS2.
 if(VBAM_STATIC AND MSYS)
     unset(cleaned_up_wx_libs)
     foreach(lib ${wxWidgets_LIBRARIES})
-        if(lib STREQUAL "-llzma")
+        if(lib MATCHES "lzma")
             set(lib "liblzma.a")
         endif()
 
@@ -363,10 +363,6 @@ function(configure_wx_target target)
 
     if(APPLE AND NOT NIX)
         _add_link_libraries(sharpyuv)
-    endif()
-
-    if(MSYS)
-        _add_link_libraries(lzma)
     endif()
 
     # OpenGL.
