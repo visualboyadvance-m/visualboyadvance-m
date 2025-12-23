@@ -76,9 +76,9 @@ endif()
 
 if(VBAM_STATIC)
     if(APPLE)
-        add_link_options(-static-libstdc++)
+        add_link_options($<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
     else()
-        add_link_options(-static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread)
+        add_link_options(-static-libgcc $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> -Wl,-Bstatic -lstdc++ -lpthread)
     endif()
 endif()
 
