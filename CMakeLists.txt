@@ -18,8 +18,10 @@ if(WIN32)
     include(RemoveStrawberryPerlFromPATH)
 
     find_program(POWERSHELL
-        NAMES powershell.exe pwsh.exe
-        HINTS "/Windows/System32/WindowsPowerShell/v1.0"
+        NAMES pwsh.exe powershell.exe
+        HINTS
+            "/Program Files/PowerShell/7"
+            "/Windows/System32/WindowsPowerShell/v1.0"
         REQUIRED)
 else()
     find_program(POWERSHELL pwsh)
