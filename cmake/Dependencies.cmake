@@ -91,6 +91,17 @@ if(ENABLE_FFMPEG)
 
             add_link_options("-Wl,--allow-multiple-definition")
             add_link_options("-Wl,--error-limit=0")
+
+            # Create a wrapper script to suppress linker warnings but show output on error
+            file(WRITE "${CMAKE_BINARY_DIR}/link_wrapper.ps1" [=[
+$output = & $args[0] $args[1..($args.Length-1)] 2>&1 | Out-String
+$exitCode = $LASTEXITCODE
+if ($exitCode -ne 0) {
+    Write-Host $output
+}
+exit $exitCode
+]=])
+            set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "\"${POWERSHELL}\" -NoProfile -ExecutionPolicy Bypass -File \"${CMAKE_BINARY_DIR}/link_wrapper.ps1\"")
         endif()
     endif()
 else()
