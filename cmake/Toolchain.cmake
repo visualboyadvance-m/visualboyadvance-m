@@ -12,8 +12,9 @@ if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTO_SUPPORTED)
 
-    # MINGW64 does not support LTO yet.
-    if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # MSYS2 toolchains and MinGW do not currently support LTO.
+    if(MSYS2 OR CMAKE_CXX_COMPILER MATCHES "[Mm][Ss][Yy][Ss]"
+            OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
         set(LTO_SUPPORTED FALSE)
     endif()
 

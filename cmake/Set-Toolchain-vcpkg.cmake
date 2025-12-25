@@ -68,6 +68,15 @@ if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
     endif()
 endif()
 
+if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x64-mingw")
+    find_program(make_path NAME mingw32-make.exe)
+
+    if(NOT make_path)
+        # Assume MSYS2 MinGW32 toolchain.
+        set(ENV{PATH} "C:/msys64/clang64/bin;$ENV{PATH}")
+    endif()
+endif()
+
 function(vcpkg_seconds)
     if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
         execute_process(
@@ -666,6 +675,13 @@ function(vcpkg_set_toolchain)
     endif()
 
     set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE FILEPATH "vcpkg toolchain" FORCE)
+
+    set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/" CACHE STRING "vcpkg prefix path" FORCE)
+
+    # These may be set in an MSYS2 environment and interfere with finding packages.
+    unset(ENV{PKG_CONFIG_PATH})
+    unset(ENV{PKG_CONFIG_SYSTEM_LIBRARY_PATH})
+    unset(ENV{PKG_CONFIG_SYSTEM_INCLUDE_PATH})
 endfunction()
 
 vcpkg_set_toolchain()

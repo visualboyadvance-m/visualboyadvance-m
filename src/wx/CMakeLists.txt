@@ -209,7 +209,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
 endif()
 
 # Workaround for wx trying to link dynamic lzma MSYS2.
-if(VBAM_STATIC AND MSYS)
+if(VBAM_STATIC AND MSYS2)
     unset(cleaned_up_wx_libs)
     foreach(lib ${wxWidgets_LIBRARIES})
         if(lib MATCHES "lzma")
@@ -470,7 +470,7 @@ endif()
 
 # adjust link command when making a static binary for gcc
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND VBAM_STATIC)
-    if(MSYS)
+    if(MSYS2)
         add_custom_command(
             TARGET visualboyadvance-m PRE_LINK
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/msys-link-static.cmake

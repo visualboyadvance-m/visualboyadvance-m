@@ -35,9 +35,9 @@ if(TAG_RELEASE)
     include(MakeReleaseCommitAndTag)
 endif()
 
-set(MSYS OFF)
+set(MSYS2 OFF CACHE BOOL "Building in an MSYS2 environment" FORCE)
 if(NOT "$ENV{MSYSTEM_PREFIX}" STREQUAL "")
-    set(MSYS ON)
+    set(MSYS2 ON CACHE BOOL "Building in an MSYS2 environment" FORCE)
     # Clear env vars from Windows native dev environments that can break the build.
     unset(ENV{LIB})
     unset(ENV{INCLUDE})

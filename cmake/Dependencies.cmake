@@ -1,3 +1,5 @@
+include(VbamFunctions)
+
 if(TRANSLATIONS_ONLY)
     return()
 endif()
@@ -77,15 +79,18 @@ if(ENABLE_FFMPEG)
             list(APPEND FFMPEG_LDFLAGS -lbz2 -ltiff "SHELL:-framework DiskArbitration" -lfreetype -lfontconfig -llzma -lxml2 -lharfbuzz -lcrypto -lssl)
         endif()
     elseif(WIN32)
-        set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid)
-        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS})
+        set(WIN32_MEDIA_FOUNDATION_LIBS dxva2 evr mf mfplat mfplay mfreadwrite mfuuid amstrmid strmiids)
+        list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ${WIN32_MEDIA_FOUNDATION_LIBS} dwrite msimg32 ntdll crypt32 ole32 idn2)
 
-        if(MSYS AND VBAM_STATIC)
-            foreach(lib tiff jbig lzma)
+        if(MSYS2 AND VBAM_STATIC AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+            foreach(lib tiff jbig lzma aom gsm jxl jxl_cms jxl_threads hwy lcms2 mp3lame lc3 opencore-amrnb opencore-amrwb opus openjp2 rav1e speex theora SvtAv1Enc vorbis vorbisenc vpx webp webpmux sharpyuv xvidcore va vpl dav1d zvbi rsvg-2 gdk_pixbuf-2.0 cairo cairo-gobject pixman-1 soxr xml2 modplug gme gnutls bluray srt rtmp ssh shaderc shaderc_combined SPIRV-Tools-opt SPIRV-Tools glib-2.0 gmodule-2.0 gobject-2.0 gio-2.0 brotlicommon brotlienc brotlidec ogg png tasn1 nettle gmp pango-1.0 pangocairo-1.0 pangowin32-1.0 pangoft2-1.0 fontconfig fribidi harfbuzz graphite2 freetype thai datrie mincore zstd crypto hogweed glslang unistring ffi pcre2-8 va_win32 z)
                 cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${lib}.a")
 
                 list(APPEND FFMPEG_LIBRARIES "${lib}")
             endforeach()
+
+            add_link_options("-Wl,--allow-multiple-definition")
+            add_link_options("-Wl,--error-limit=0")
         endif()
     endif()
 else()

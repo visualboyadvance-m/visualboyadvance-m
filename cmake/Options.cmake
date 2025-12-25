@@ -27,7 +27,7 @@ endif()
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
     set(VBAM_STATIC_DEFAULT ON)
-elseif(MINGW OR MSYS)
+elseif(MINGW OR MSYS2)
     # Default to static builds on MinGW and all MSYS2 envs.
     set(VBAM_STATIC_DEFAULT ON)
 endif()
@@ -149,7 +149,7 @@ if(NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
     find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
 
     # check versions, but only if pkgconfig is available
-    if(FFmpeg_FOUND AND PKG_CONFIG_FOUND AND NOT CMAKE_TOOLCHAIN_FILE MATCHES vcpkg)
+    if(FFmpeg_FOUND AND PKG_CONFIG_FOUND)
         foreach(component ${FFMPEG_COMPONENT_VERSIONS})
             string(REPLACE ">=" ";" parts ${component})
             list(GET parts 0 name)
