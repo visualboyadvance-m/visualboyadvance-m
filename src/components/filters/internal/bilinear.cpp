@@ -5,6 +5,100 @@
  **/
 
 #include "core/base/system.h"
+#include "simd_common.h"
+
+// ============================================================================
+// SSE2 Implementations
+// ============================================================================
+
+#ifdef USE_SSE2
+
+// Bilinear32: 2x scale with bilinear interpolation using SSE2
+// Operates directly on packed ARGB pixels using byte-wise averaging
+static void Bilinear32_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
+                             uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
+    for (int y = 0; y < height; y++) {
+        uint32_t *src0 = reinterpret_cast<uint32_t*>(srcPtr + y * srcPitch);
+        uint32_t *src1 = (y + 1 < height) ?
+            reinterpret_cast<uint32_t*>(srcPtr + (y + 1) * srcPitch) : src0;
+        uint32_t *dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
+        uint32_t *dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
+
+        int x = 0;
+        // Process 4 source pixels at a time, output 8 destination pixels
+        for (; x + 4 <= width; x += 4) {
+            // Load 4 pixels from current row and next row
+            __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src0[x]));
+            __m128i c = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src1[x]));
+
+            // Load shifted pixels (for right neighbors)
+            __m128i b, d;
+            if (x + 5 <= width) {
+                b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src0[x + 1]));
+                d = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src1[x + 1]));
+            } else {
+                // Edge handling: shift and replicate last pixel
+                b = _mm_srli_si128(a, 4);
+                b = _mm_or_si128(b, _mm_slli_si128(_mm_shuffle_epi32(a, _MM_SHUFFLE(3, 3, 3, 3)), 12));
+                d = _mm_srli_si128(c, 4);
+                d = _mm_or_si128(d, _mm_slli_si128(_mm_shuffle_epi32(c, _MM_SHUFFLE(3, 3, 3, 3)), 12));
+            }
+
+            // Compute interpolations using byte-wise averaging
+            // Upper right: (a + b) / 2
+            __m128i ab = _mm_avg_epu8(a, b);
+            // Lower left: (a + c) / 2
+            __m128i ac = _mm_avg_epu8(a, c);
+            // Lower right: (a + b + c + d) / 4 = avg(avg(a,b), avg(c,d))
+            __m128i cd = _mm_avg_epu8(c, d);
+            __m128i abcd = _mm_avg_epu8(ab, cd);
+
+            // Interleave results for output
+            // Row 0: [a0 ab0 a1 ab1 a2 ab2 a3 ab3]
+            __m128i row0_lo = _mm_unpacklo_epi32(a, ab);   // [a0 ab0 a1 ab1]
+            __m128i row0_hi = _mm_unpackhi_epi32(a, ab);   // [a2 ab2 a3 ab3]
+
+            // Row 1: [ac0 abcd0 ac1 abcd1 ac2 abcd2 ac3 abcd3]
+            __m128i row1_lo = _mm_unpacklo_epi32(ac, abcd);
+            __m128i row1_hi = _mm_unpackhi_epi32(ac, abcd);
+
+            // Store row 0
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), row0_lo);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 4]), row0_hi);
+
+            // Store row 1
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), row1_lo);
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 4]), row1_hi);
+        }
+
+        // Scalar tail
+        for (; x < width; x++) {
+            uint32_t a_px = src0[x];
+            uint32_t b_px = (x + 1 < width) ? src0[x + 1] : a_px;
+            uint32_t c_px = src1[x];
+            uint32_t d_px = (x + 1 < width) ? src1[x + 1] : c_px;
+
+            // Use byte-wise averaging (matches _mm_avg_epu8 behavior)
+            auto avg2 = [](uint32_t p1, uint32_t p2) -> uint32_t {
+                uint32_t rb = ((p1 & 0xFF00FF) + (p2 & 0xFF00FF) + 0x010001) >> 1;
+                uint32_t g  = ((p1 & 0x00FF00) + (p2 & 0x00FF00) + 0x000100) >> 1;
+                return (rb & 0xFF00FF) | (g & 0x00FF00);
+            };
+
+            uint32_t ab = avg2(a_px, b_px);
+            uint32_t ac = avg2(a_px, c_px);
+            uint32_t cd = avg2(c_px, d_px);
+            uint32_t abcd = avg2(ab, cd);
+
+            dst0[x * 2] = a_px;
+            dst0[x * 2 + 1] = ab;
+            dst1[x * 2] = ac;
+            dst1[x * 2 + 1] = abcd;
+        }
+    }
+}
+
+#endif  // USE_SSE2
 
 #define RGB(r,g,b) ((r)>>3) << systemRedShift |\
   ((g) >> 3) << systemGreenShift |\
@@ -236,6 +330,9 @@ void BilinearPlus(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
 void Bilinear32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
+#ifdef USE_SSE2
+  Bilinear32_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+#else
   uint8_t row_cur[3*322];
   uint8_t row_next[3*322];
   uint8_t *rgb_row_cur = row_cur;
@@ -316,6 +413,7 @@ void Bilinear32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     to = (uint32_t *)((uint8_t *)to_orig + (dstPitch << 1));
     to_odd = (uint32_t *)((uint8_t *)to + dstPitch);
   }
+#endif
 }
 
 void BilinearPlus32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,

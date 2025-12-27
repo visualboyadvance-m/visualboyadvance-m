@@ -37,9 +37,117 @@
 
 #include <cstdint>
 
+#include "simd_common.h"
+
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
+
+// ============================================================================
+// SSE2 Implementations
+// ============================================================================
+
+#ifdef USE_SSE2
+
+// Scale2x algorithm: Edge-detection based scaling
+// For each pixel, compare with neighbors and select based on edge patterns
+static void internal_scale2x_32_sse2_single(uint32_t* dst,
+                                             const uint32_t* src0,  // row above
+                                             const uint32_t* src1,  // current row
+                                             const uint32_t* src2,  // row below
+                                             unsigned count) {
+    // First pixel (special case - no left neighbor)
+    dst[0] = src1[0];
+    if (src1[1] == src0[0] && src2[0] != src0[0])
+        dst[1] = src0[0];
+    else
+        dst[1] = src1[0];
+
+    ++src0; ++src1; ++src2;
+    dst += 2;
+    count -= 2;
+
+    // Central pixels - vectorized
+    unsigned vecCount = count / 4;
+    for (unsigned i = 0; i < vecCount; i++) {
+        // Load current 4 pixels
+        __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1));
+
+        // Load left-shifted (prev pixels): [src1[-1], src1[0], src1[1], src1[2]]
+        __m128i prev_part = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1 - 1));
+        __m128i prev = prev_part;
+
+        // Load right-shifted (next pixels): [src1[1], src1[2], src1[3], src1[4]]
+        __m128i next = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1 + 1));
+
+        // Load top and bottom
+        __m128i top = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src0));
+        __m128i bot = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src2));
+
+        // Condition: top != bottom && left != right
+        __m128i top_ne_bot = _mm_andnot_si128(_mm_cmpeq_epi32(top, bot),
+                                               _mm_set1_epi32(-1));
+        __m128i prev_ne_next = _mm_andnot_si128(_mm_cmpeq_epi32(prev, next),
+                                                 _mm_set1_epi32(-1));
+        __m128i condition = _mm_and_si128(top_ne_bot, prev_ne_next);
+
+        // Left output: if (left == top) ? top : current
+        __m128i prev_eq_top = _mm_cmpeq_epi32(prev, top);
+        __m128i left_select = _mm_and_si128(condition, prev_eq_top);
+        __m128i left_out = _mm_or_si128(_mm_and_si128(left_select, top),
+                                         _mm_andnot_si128(left_select, curr));
+
+        // Right output: if (right == top) ? top : current
+        __m128i next_eq_top = _mm_cmpeq_epi32(next, top);
+        __m128i right_select = _mm_and_si128(condition, next_eq_top);
+        __m128i right_out = _mm_or_si128(_mm_and_si128(right_select, top),
+                                          _mm_andnot_si128(right_select, curr));
+
+        // Interleave left and right outputs
+        __m128i out_lo = _mm_unpacklo_epi32(left_out, right_out);
+        __m128i out_hi = _mm_unpackhi_epi32(left_out, right_out);
+
+        // Store 8 output pixels
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(dst), out_lo);
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(dst + 4), out_hi);
+
+        src0 += 4; src1 += 4; src2 += 4;
+        dst += 8;
+    }
+
+    // Remaining central pixels (scalar)
+    count -= vecCount * 4;
+    while (count > 0) {
+        if (src0[0] != src2[0] && src1[-1] != src1[1]) {
+            dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
+            dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
+        } else {
+            dst[0] = src1[0];
+            dst[1] = src1[0];
+        }
+        ++src0; ++src1; ++src2;
+        dst += 2;
+        --count;
+    }
+
+    // Last pixel (special case - no right neighbor)
+    if (src1[-1] == src0[0] && src2[0] != src0[0])
+        dst[0] = src0[0];
+    else
+        dst[0] = src1[0];
+    dst[1] = src1[0];
+}
+
+static void internal_scale2x_32_sse2(uint32_t* dst0, uint32_t* dst1,
+                                      const uint32_t* src0,
+                                      const uint32_t* src1,
+                                      const uint32_t* src2,
+                                      unsigned count) {
+    internal_scale2x_32_sse2_single(dst0, src0, src1, src2, count);
+    internal_scale2x_32_sse2_single(dst1, src2, src1, src0, count);
+}
+
+#endif  // USE_SSE2
 
 static void internal_scale2x_16_def(uint16_t *dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   /* first pixel */
@@ -963,7 +1071,27 @@ void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
   uint32_t *src0 = (uint32_t *)srcPtr;
   uint32_t *src1 = src0 + (srcPitch >> 2);
   uint32_t *src2 = src1 + (srcPitch >> 2);
-#ifdef MMX
+
+#ifdef USE_SSE2
+  // SSE2 path (64-bit builds and SSE2-capable 32-bit)
+  internal_scale2x_32_sse2(dst0, dst1, src0, src0, src1, width);
+
+  int count = height;
+  count -= 2;
+  while(count) {
+    dst0 += dstPitch >> 1;
+    dst1 += dstPitch >> 1;
+    internal_scale2x_32_sse2(dst0, dst1, src0, src1, src2, width);
+    src0 = src1;
+    src1 = src2;
+    src2 += srcPitch >> 2;
+    --count;
+  }
+  dst0 += dstPitch >> 1;
+  dst1 += dstPitch >> 1;
+  internal_scale2x_32_sse2(dst0, dst1, src0, src1, src1, width);
+
+#elif defined(MMX)
   if(cpu_mmx) {
     internal_scale2x_32_mmx(dst0, dst1, src0, src0, src1, width);
 
@@ -983,7 +1111,6 @@ void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dst1 += dstPitch >> 1;
     internal_scale2x_32_mmx(dst0, dst1, src0, src1, src1, width);
   } else {
-#endif
     internal_scale2x_32_def(dst0, src0, src0, src1, width);
     internal_scale2x_32_def(dst1, src1, src0, src0, width);
 
@@ -1004,7 +1131,29 @@ void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dst1 += dstPitch >> 1;
     internal_scale2x_32_def(dst0, src0, src1, src1, width);
     internal_scale2x_32_def(dst1, src1, src1, src0, width);
-#ifdef MMX
   }
+
+#else
+  // Scalar fallback
+  internal_scale2x_32_def(dst0, src0, src0, src1, width);
+  internal_scale2x_32_def(dst1, src1, src0, src0, width);
+
+  int count = height;
+
+  count -= 2;
+  while(count) {
+    dst0 += dstPitch >> 1;
+    dst1 += dstPitch >> 1;
+    internal_scale2x_32_def(dst0, src0, src1, src2, width);
+    internal_scale2x_32_def(dst1, src2, src1, src0, width);
+    src0 = src1;
+    src1 = src2;
+    src2 += srcPitch >> 2;
+    --count;
+  }
+  dst0 += dstPitch >> 1;
+  dst1 += dstPitch >> 1;
+  internal_scale2x_32_def(dst0, src0, src1, src1, width);
+  internal_scale2x_32_def(dst1, src1, src1, src0, width);
 #endif
 }
