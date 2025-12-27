@@ -1881,8 +1881,12 @@ void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread {
 public:
+    // Two-phase execution: Filter first, then IFB after all filters complete
+    enum class Phase { Filter, IFB };
+
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_),
-                     src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0) {}
+                     src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0),
+                     phase_(Phase::Filter) {}
 
     ~FilterThread() {
         // Free pre-allocated conversion buffers
@@ -1907,6 +1911,9 @@ public:
     // set this param every round
     // if NULL, end thread
     uint8_t* src_;
+
+    // Two-phase execution mode
+    Phase phase_;
 
     // Pre-allocated conversion buffers (reused across frames)
     uint32_t* src2_;
@@ -1983,19 +1990,44 @@ public:
 
         while (nthreads_ == 1 || sig_.Wait() == wxCOND_NO_ERROR) {
             if (!src_) {
-                lock_.Unlock();
+                if (nthreads_ > 1)
+                    lock_.Unlock();
                 return 0;
             }
 
+            // Handle two-phase execution
+            if (phase_ == Phase::IFB) {
+                // Phase 2: Apply IFB to filtered output using per-region buffers
+                const config::Interframe ifb_option = OPTION(kDispIFB);
+                if (ifb_option != config::Interframe::kNone) {
+                    // src_ points to frame start (set by DrawArea before signaling)
+                    // Skip the 1-row top border to point to actual image data
+                    // IFB functions use starty to offset both source AND history buffers
+                    uint8_t* ifb_src = src_ + instride;  // Skip top border row
+                    if (ifb_option == config::Interframe::kSmart) {
+                        InterframeManager::Instance().ApplySmartIBRegion(
+                            ifb_src, instride, width_, procy, height_,
+                            systemColorDepth, threadno_);
+                    } else if (ifb_option == config::Interframe::kMotionBlur) {
+                        InterframeManager::Instance().ApplyMotionBlurRegion(
+                            ifb_src, instride, width_, procy, height_,
+                            systemColorDepth, threadno_);
+                    }
+                }
+
+                if (nthreads_ == 1)
+                    return 0;
+
+                done_->Post();
+                continue;
+            }
+
+            // Phase 1: Apply filter only
             // Advance source pointer to this thread's band
             src_ += src_offset;
 
-            // Cache filter options for this frame (avoid repeated lookups)
-            const config::Interframe ifb_option = OPTION(kDispIFB);
+            // Cache filter option for this frame
             const config::Filter filter_option = OPTION(kDispFilter);
-
-            // Apply interframe blending filter
-            ApplyInterframeOptimized(instride, procy, ifb_option, is_8bit, is_16bit, is_24bit);
 
             if (filter_option == config::Filter::kNone) {
                 if (nthreads_ == 1)
@@ -2009,6 +2041,24 @@ public:
             if (is_32bit) {
                 // Direct 32bpp path - no conversion needed
                 ApplyFilterOptimized(instride, outstride, filter_option);
+
+                // For single-threaded mode, apply IFB immediately after filter
+                // (can't call Entry() twice as it corrupts delta_/dst_)
+                if (nthreads_ == 1) {
+                    const config::Interframe ifb_option = OPTION(kDispIFB);
+                    if (ifb_option != config::Interframe::kNone) {
+                        // src_ already points to the filtered output
+                        if (ifb_option == config::Interframe::kSmart) {
+                            InterframeManager::Instance().ApplySmartIBRegion(
+                                src_, instride, width_, procy, height_,
+                                systemColorDepth, threadno_);
+                        } else if (ifb_option == config::Interframe::kMotionBlur) {
+                            InterframeManager::Instance().ApplyMotionBlurRegion(
+                                src_, instride, width_, procy, height_,
+                                systemColorDepth, threadno_);
+                        }
+                    }
+                }
             } else {
                 // Non-32bpp: convert to 32bpp, apply filter, convert back
                 // Save current shift values (set for original depth)
@@ -2177,6 +2227,24 @@ public:
                 systemGreenShift = saved_green_shift;
                 systemBlueShift = saved_blue_shift;
                 RGB_LOW_BITS_MASK = saved_rgb_low_bits_mask;
+
+                // For single-threaded mode, apply IFB immediately after filter
+                // (can't call Entry() twice as it corrupts delta_/dst_)
+                if (nthreads_ == 1) {
+                    const config::Interframe ifb_option = OPTION(kDispIFB);
+                    if (ifb_option != config::Interframe::kNone) {
+                        // src_ points to the source data for IFB
+                        if (ifb_option == config::Interframe::kSmart) {
+                            InterframeManager::Instance().ApplySmartIBRegion(
+                                src_, instride, width_, procy, height_,
+                                systemColorDepth, threadno_);
+                        } else if (ifb_option == config::Interframe::kMotionBlur) {
+                            InterframeManager::Instance().ApplyMotionBlurRegion(
+                                src_, instride, width_, procy, height_,
+                                systemColorDepth, threadno_);
+                        }
+                    }
+                }
             }
 
             if (nthreads_ == 1) {
@@ -2190,39 +2258,6 @@ public:
     }
 
 private:
-    // Optimized interframe blending filter with cached options
-    void ApplyInterframeOptimized(int instride, int procy, config::Interframe ifb_option,
-                                   bool is_8bit, bool is_16bit, bool is_24bit) {
-        switch (ifb_option) {
-            case config::Interframe::kNone:
-                break;
-            case config::Interframe::kSmart:
-                if (is_8bit) {
-                    SmartIB8(src_, instride, width_, procy, height_);
-                } else if (is_16bit) {
-                    SmartIB(src_, instride, width_, procy, height_);
-                } else if (is_24bit) {
-                    SmartIB24(src_, instride, width_, procy, height_);
-                } else {
-                    SmartIB32(src_, instride, width_, procy, height_);
-                }
-                break;
-            case config::Interframe::kMotionBlur:
-                if (is_8bit) {
-                    MotionBlurIB8(src_, instride, width_, procy, height_);
-                } else if (is_16bit) {
-                    MotionBlurIB(src_, instride, width_, procy, height_);
-                } else if (is_24bit) {
-                    MotionBlurIB24(src_, instride, width_, procy, height_);
-                } else {
-                    MotionBlurIB32(src_, instride, width_, procy, height_);
-                }
-                break;
-            case config::Interframe::kLast:
-                VBAM_NOTREACHED();
-        }
-    }
-
     // Optimized filter application with cached option
     void ApplyFilterOptimized(int instride, int outstride, config::Filter filter_option) {
         if (filter_option == config::Filter::kPlugin) {
@@ -2277,6 +2312,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // Use multiple threads for filter processing (up to 6)
     const int max_threads = GetMaxFilterThreads();
 
+    // Compute stride for InterframeManager initialization
+    int instride = (width + inrb) * (systemColorDepth >> 3);
+
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
     if (OPTION(kDispFilter) != config::Filter::kNone ||
@@ -2297,6 +2335,12 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
             nthreads = max_threads;
             threads = new FilterThread[nthreads];
+
+            // Initialize InterframeManager for per-region IFB processing (only if IFB enabled)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                InterframeManager::Instance().Init(width, height, instride, nthreads);
+            }
+
             // first time around, no threading in order to avoid
             // static initializer conflicts
             threads[0].threadno_ = 0;
@@ -2308,7 +2352,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
 
             // go ahead and start the threads up, though
             if (nthreads > 1) {
@@ -2322,6 +2368,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
+                    threads[i].phase_ = FilterThread::Phase::Filter;
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -2336,9 +2383,13 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
         } else {
+            // Phase 1: Run filter threads
             for (int i = 0; i < nthreads; i++) {
+                threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
                 threads[i].src_ = *data;
                 threads[i].sig_.Signal();
@@ -2353,7 +2404,6 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
                 // outbpp and inrb already declared in outer scope
-                int instride = (width + inrb) * (systemColorDepth >> 3);
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -2381,6 +2431,20 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
+            }
+
+            // Phase 2: Run IFB threads (after all filters complete)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
             }
         }
     }
@@ -2967,6 +3031,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     // Use multiple threads for filter processing (up to 6)
     const int max_threads = GetMaxFilterThreads();
 
+    // Compute stride for InterframeManager initialization
+    int instride = (width + inrb) * (systemColorDepth >> 3);
+
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
 
@@ -3007,6 +3074,12 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
             nthreads = max_threads;
             threads = new FilterThread[nthreads];
+
+            // Initialize InterframeManager for per-region IFB processing (only if IFB enabled)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                InterframeManager::Instance().Init(width, height, instride, nthreads);
+            }
+
             // first time around, no threading in order to avoid
             // static initializer conflicts
             threads[0].threadno_ = 0;
@@ -3018,7 +3091,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
 
             // go ahead and start the threads up, though
             if (nthreads > 1) {
@@ -3032,6 +3107,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
+                    threads[i].phase_ = FilterThread::Phase::Filter;
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -3046,9 +3122,13 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
         } else {
+            // Phase 1: Run filter threads
             for (int i = 0; i < nthreads; i++) {
+                threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
                 threads[i].src_ = *data;
                 threads[i].sig_.Signal();
@@ -3062,7 +3142,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             // to the boundary rows. This eliminates visual artifacts at thread
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                int instride = (width + inrb) * (systemColorDepth >> 3);
+                // instride already declared in outer scope
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -3087,6 +3167,20 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
+            }
+
+            // Phase 2: Run IFB threads (after all filters complete)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
             }
         }
     }
@@ -3126,11 +3220,11 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 panel->osdtext.clear();
         }
     }
-            
+
     // Draw the current frame
     DrawArea();
 }
-        
+
 BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanel(parent, _width, _height)
 {
@@ -4360,6 +4454,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     // Use multiple threads for filter processing (up to 6)
     const int max_threads = GetMaxFilterThreads();
 
+    // Compute stride for InterframeManager initialization
+    int instride = (width + inrb) * (systemColorDepth >> 3);
+
     if (!pixbuf2) {
         int allocstride = outstride, alloch = height;
 
@@ -4400,6 +4497,12 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
             nthreads = max_threads;
             threads = new FilterThread[nthreads];
+
+            // Initialize InterframeManager for per-region IFB processing (only if IFB enabled)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                InterframeManager::Instance().Init(width, height, instride, nthreads);
+            }
+
             // first time around, no threading in order to avoid
             // static initializer conflicts
             threads[0].threadno_ = 0;
@@ -4411,7 +4514,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
 
             // go ahead and start the threads up, though
             if (nthreads > 1) {
@@ -4425,6 +4530,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
                     threads[i].done_ = &filt_done;
+                    threads[i].phase_ = FilterThread::Phase::Filter;
                     threads[i].Create();
                     threads[i].Run();
                 }
@@ -4439,9 +4545,13 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+            threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].Entry();
+            // IFB is handled inside Entry() for single-threaded mode
         } else {
+            // Phase 1: Run filter threads
             for (int i = 0; i < nthreads; i++) {
+                threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
                 threads[i].src_ = *data;
                 threads[i].sig_.Signal();
@@ -4455,7 +4565,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             // to the boundary rows. This eliminates visual artifacts at thread
             // boundaries that occur because filters read neighboring pixels.
             if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                int instride = (width + inrb) * (systemColorDepth >> 3);
+                // instride already declared in outer scope
                 int outstride_local = std::ceil((width + inrb) * outbpp * scale);
 
                 // For each seam between threads, re-process a few rows
@@ -4480,6 +4590,20 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
+            }
+
+            // Phase 2: Run IFB threads (after all filters complete)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
             }
         }
     }
@@ -4523,7 +4647,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     // Draw the current frame
     DrawArea();
 }
-        
+
 void MetalDrawingPanel::PaintEv(wxPaintEvent& ev)
 {
     // FIXME: implement
