@@ -1881,12 +1881,12 @@ void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread {
 public:
-    // Two-phase execution: Filter first, then IFB after all filters complete
-    enum class Phase { Filter, IFB };
+    // Two-phase execution: IFB first (on source), then Filter after
+    enum class Phase { IFB, Filter };
 
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_),
                      src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0),
-                     phase_(Phase::Filter) {}
+                     phase_(Phase::IFB) {}
 
     ~FilterThread() {
         // Free pre-allocated conversion buffers
@@ -1997,7 +1997,7 @@ public:
 
             // Handle two-phase execution
             if (phase_ == Phase::IFB) {
-                // Phase 2: Apply IFB to filtered output using per-region buffers
+                // Phase 1: Apply IFB to source frame before filtering
                 const config::Interframe ifb_option = OPTION(kDispIFB);
                 if (ifb_option != config::Interframe::kNone) {
                     // src_ points to frame start (set by DrawArea before signaling)
@@ -2022,9 +2022,28 @@ public:
                 continue;
             }
 
-            // Phase 1: Apply filter only
+            // Phase 2: Apply filter to IFB-processed source
             // Advance source pointer to this thread's band
             src_ += src_offset;
+
+            // For single-threaded mode, apply IFB before filter
+            // (multi-threaded mode handles this in separate phase)
+            if (nthreads_ == 1) {
+                const config::Interframe ifb_option = OPTION(kDispIFB);
+                if (ifb_option != config::Interframe::kNone) {
+                    // src_ already points to this thread's band (after src_offset)
+                    // IFB operates on source at native resolution before scaling
+                    if (ifb_option == config::Interframe::kSmart) {
+                        InterframeManager::Instance().ApplySmartIBRegion(
+                            src_, instride, width_, procy, height_,
+                            systemColorDepth, threadno_);
+                    } else if (ifb_option == config::Interframe::kMotionBlur) {
+                        InterframeManager::Instance().ApplyMotionBlurRegion(
+                            src_, instride, width_, procy, height_,
+                            systemColorDepth, threadno_);
+                    }
+                }
+            }
 
             // Cache filter option for this frame
             const config::Filter filter_option = OPTION(kDispFilter);
@@ -2041,24 +2060,6 @@ public:
             if (is_32bit) {
                 // Direct 32bpp path - no conversion needed
                 ApplyFilterOptimized(instride, outstride, filter_option);
-
-                // For single-threaded mode, apply IFB immediately after filter
-                // (can't call Entry() twice as it corrupts delta_/dst_)
-                if (nthreads_ == 1) {
-                    const config::Interframe ifb_option = OPTION(kDispIFB);
-                    if (ifb_option != config::Interframe::kNone) {
-                        // src_ already points to the filtered output
-                        if (ifb_option == config::Interframe::kSmart) {
-                            InterframeManager::Instance().ApplySmartIBRegion(
-                                src_, instride, width_, procy, height_,
-                                systemColorDepth, threadno_);
-                        } else if (ifb_option == config::Interframe::kMotionBlur) {
-                            InterframeManager::Instance().ApplyMotionBlurRegion(
-                                src_, instride, width_, procy, height_,
-                                systemColorDepth, threadno_);
-                        }
-                    }
-                }
             } else {
                 // Non-32bpp: convert to 32bpp, apply filter, convert back
                 // Save current shift values (set for original depth)
@@ -2227,24 +2228,6 @@ public:
                 systemGreenShift = saved_green_shift;
                 systemBlueShift = saved_blue_shift;
                 RGB_LOW_BITS_MASK = saved_rgb_low_bits_mask;
-
-                // For single-threaded mode, apply IFB immediately after filter
-                // (can't call Entry() twice as it corrupts delta_/dst_)
-                if (nthreads_ == 1) {
-                    const config::Interframe ifb_option = OPTION(kDispIFB);
-                    if (ifb_option != config::Interframe::kNone) {
-                        // src_ points to the source data for IFB
-                        if (ifb_option == config::Interframe::kSmart) {
-                            InterframeManager::Instance().ApplySmartIBRegion(
-                                src_, instride, width_, procy, height_,
-                                systemColorDepth, threadno_);
-                        } else if (ifb_option == config::Interframe::kMotionBlur) {
-                            InterframeManager::Instance().ApplyMotionBlurRegion(
-                                src_, instride, width_, procy, height_,
-                                systemColorDepth, threadno_);
-                        }
-                    }
-                }
             }
 
             if (nthreads_ == 1) {
@@ -2387,7 +2370,21 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].Entry();
             // IFB is handled inside Entry() for single-threaded mode
         } else {
-            // Phase 1: Run filter threads
+            // Phase 1: Run IFB threads first (before filters)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
+
+            // Phase 2: Run filter threads (on IFB-processed source)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
@@ -2431,20 +2428,6 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
-            }
-
-            // Phase 2: Run IFB threads (after all filters complete)
-            if (OPTION(kDispIFB) != config::Interframe::kNone) {
-                for (int i = 0; i < nthreads; i++) {
-                    threads[i].phase_ = FilterThread::Phase::IFB;
-                    threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
-                    threads[i].sig_.Signal();
-                    threads[i].lock_.Unlock();
-                }
-
-                for (int i = 0; i < nthreads; i++)
-                    filt_done.Wait();
             }
         }
     }
@@ -3126,7 +3109,21 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].Entry();
             // IFB is handled inside Entry() for single-threaded mode
         } else {
-            // Phase 1: Run filter threads
+            // Phase 1: Run IFB threads first (before filters)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
+
+            // Phase 2: Run filter threads (on IFB-processed source)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
@@ -3167,20 +3164,6 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
-            }
-
-            // Phase 2: Run IFB threads (after all filters complete)
-            if (OPTION(kDispIFB) != config::Interframe::kNone) {
-                for (int i = 0; i < nthreads; i++) {
-                    threads[i].phase_ = FilterThread::Phase::IFB;
-                    threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
-                    threads[i].sig_.Signal();
-                    threads[i].lock_.Unlock();
-                }
-
-                for (int i = 0; i < nthreads; i++)
-                    filt_done.Wait();
             }
         }
     }
@@ -4549,7 +4532,21 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].Entry();
             // IFB is handled inside Entry() for single-threaded mode
         } else {
-            // Phase 1: Run filter threads
+            // Phase 1: Run IFB threads first (before filters)
+            if (OPTION(kDispIFB) != config::Interframe::kNone) {
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::IFB;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = *data;
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
+
+            // Phase 2: Run filter threads (on IFB-processed source)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
@@ -4590,20 +4587,6 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
                     ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
                 }
-            }
-
-            // Phase 2: Run IFB threads (after all filters complete)
-            if (OPTION(kDispIFB) != config::Interframe::kNone) {
-                for (int i = 0; i < nthreads; i++) {
-                    threads[i].phase_ = FilterThread::Phase::IFB;
-                    threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
-                    threads[i].sig_.Signal();
-                    threads[i].lock_.Unlock();
-                }
-
-                for (int i = 0; i < nthreads; i++)
-                    filt_done.Wait();
             }
         }
     }
