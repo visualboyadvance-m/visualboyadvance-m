@@ -33,7 +33,7 @@ if(ENABLE_ASM_SCALERS)
         internal/hq/asm/macros.mac
     )
     if(ENABLE_MMX)
-        set(SRC_FILTERS ${SRC_FILTERS} internal/2xSaImmx.asm)
+        target_sources(vbam-components-filters PRIVATE internal/2xSaImmx.asm)
     endif()
 else()
     target_sources(vbam-components-filters

@@ -10,7 +10,8 @@
 #include <vector>
 
 // SIMD headers
-#if defined(__SSE2__) || (defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2))
+// Don't use SSE2 on WINXP builds (32-bit) - target older CPUs with only SSE/MMX
+#if !defined(WINXP) && (defined(__SSE2__) || (defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)))
 #define USE_SSE2
 #include <emmintrin.h>
 #endif
@@ -20,8 +21,12 @@
 #include <xmmintrin.h>
 #endif
 
-#ifdef MMX
-extern "C" bool cpu_mmx;
+// MMX intrinsics for 32-bit builds (when SSE2 not available)
+// Uses compiler's built-in __MMX__ define (set by -mmmx flag), NOT the legacy
+// MMX define used by 2xSaI which requires NASM assembly
+#if defined(__MMX__) && !defined(USE_SSE2)
+#define USE_MMX
+#include <mmintrin.h>
 #endif
 
 extern uint32_t qRGB_COLOR_MASK[2];
@@ -425,7 +430,7 @@ static void SmartIB16_SSE2(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, 
 // MMX Implementations (32-bit) - With threshold-based comparison
 // ============================================================================
 
-#ifdef MMX
+#ifdef USE_MMX
 
 // Forward declarations of scalar implementations
 static void SmartIB16_Scalar(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, uint8_t* frm3Ptr,
@@ -590,7 +595,7 @@ static void MotionBlurIB32_MMX(uint8_t* srcPtr, uint8_t* histPtr,
     MotionBlurIB32_Scalar(srcPtr, histPtr, srcPitch, width, starty, height);
 }
 
-#endif  // MMX
+#endif  // USE_MMX
 
 // ============================================================================
 // Scalar Implementations (fallback)
@@ -936,12 +941,8 @@ void InterframeManager::ApplySmartIBRegion(uint8_t* srcPtr, uint32_t srcPitch,
         case 32:
 #ifdef USE_SSE2
             SmartIB32_SSE2(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-#elif defined(MMX)
-            if (cpu_mmx) {
-                SmartIB32_MMX(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-            } else {
-                SmartIB32_Scalar(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-            }
+#elif defined(USE_MMX)
+            SmartIB32_MMX(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
 #else
             SmartIB32_Scalar(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
 #endif
@@ -950,12 +951,8 @@ void InterframeManager::ApplySmartIBRegion(uint8_t* srcPtr, uint32_t srcPitch,
         case 16:
 #ifdef USE_SSE2
             SmartIB16_SSE2(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-#elif defined(MMX)
-            if (cpu_mmx) {
-                SmartIB_MMX(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-            } else {
-                SmartIB16_Scalar(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
-            }
+#elif defined(USE_MMX)
+            SmartIB_MMX(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
 #else
             SmartIB16_Scalar(srcPtr, hist1, hist2, hist3, srcPitch, width, starty, height);
 #endif
@@ -989,12 +986,8 @@ void InterframeManager::ApplyMotionBlurRegion(uint8_t* srcPtr, uint32_t srcPitch
         case 32:
 #ifdef USE_SSE2
             MotionBlurIB32_SSE2(srcPtr, hist, srcPitch, width, starty, height);
-#elif defined(MMX)
-            if (cpu_mmx) {
-                MotionBlurIB32_MMX(srcPtr, hist, srcPitch, width, starty, height);
-            } else {
-                MotionBlurIB32_Scalar(srcPtr, hist, srcPitch, width, starty, height);
-            }
+#elif defined(USE_MMX)
+            MotionBlurIB32_MMX(srcPtr, hist, srcPitch, width, starty, height);
 #else
             MotionBlurIB32_Scalar(srcPtr, hist, srcPitch, width, starty, height);
 #endif
@@ -1003,12 +996,8 @@ void InterframeManager::ApplyMotionBlurRegion(uint8_t* srcPtr, uint32_t srcPitch
         case 16:
 #ifdef USE_SSE2
             MotionBlurIB16_SSE2(srcPtr, hist, srcPitch, width, starty, height);
-#elif defined(MMX)
-            if (cpu_mmx) {
-                MotionBlurIB_MMX(srcPtr, hist, srcPitch, width, starty, height);
-            } else {
-                MotionBlurIB16_Scalar(srcPtr, hist, srcPitch, width, starty, height);
-            }
+#elif defined(USE_MMX)
+            MotionBlurIB_MMX(srcPtr, hist, srcPitch, width, starty, height);
 #else
             MotionBlurIB16_Scalar(srcPtr, hist, srcPitch, width, starty, height);
 #endif

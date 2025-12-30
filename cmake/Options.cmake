@@ -110,7 +110,12 @@ if(DISABLE_OPENGL)
    set(CMAKE_CXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
 endif()
 
-option(ENABLE_ASM "Enable x86 ASM related options" OFF)
+set(enable_asm_default OFF)
+if(WIN32 AND X86_32 AND UPSTREAM_RELEASE)
+   set(enable_asm_default ON)
+endif()
+
+option(ENABLE_ASM "Enable x86 ASM related options" ${enable_asm_default})
 
 # The ARM ASM core seems to be very buggy, see #98 and #54. Default to it being
 # OFF for the time being, until it is either fixed or replaced.

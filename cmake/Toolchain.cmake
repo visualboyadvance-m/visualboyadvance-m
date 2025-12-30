@@ -122,5 +122,5 @@ if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
 endif()
 
 if(ASM_ENABLED)
-    string(REGEX REPLACE "<FLAGS>" "-I${CMAKE_SOURCE_DIR}/src/filters/hq/asm/ -O1 -w-orphan-labels" CMAKE_ASM_NASM_COMPILE_OBJECT ${CMAKE_ASM_NASM_COMPILE_OBJECT})
+    string(REGEX REPLACE "<FLAGS>" "-I${CMAKE_SOURCE_DIR}/src/components/filters/internal/hq/asm/ -O1 -w-orphan-labels" CMAKE_ASM_NASM_COMPILE_OBJECT ${CMAKE_ASM_NASM_COMPILE_OBJECT})
 endif()
