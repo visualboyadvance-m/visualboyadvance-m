@@ -2395,40 +2395,6 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
-
-            // Smooth seams between thread regions by re-applying the filter
-            // to the boundary rows. This eliminates visual artifacts at thread
-            // boundaries that occur because filters read neighboring pixels.
-            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                // outbpp and inrb already declared in outer scope
-                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
-
-                // For each seam between threads, re-process a few rows
-                // The seam rows in the source are at: height * i / nthreads
-                for (int i = 1; i < nthreads; i++) {
-                    int seam_row = height * i / nthreads;
-                    // Process 5 rows above and 5 rows below the seam (10 total)
-                    // to give the filter enough context for smooth blending
-                    int start_row = std::max(0, seam_row - 5);
-                    int end_row = std::min(height, seam_row + 5);
-                    int seam_height = end_row - start_row;
-
-                    if (seam_height <= 0) continue;
-
-                    // Calculate source and destination pointers for this seam region
-                    // Source needs 1 row of border above, so start from start_row
-                    uint8_t* seam_src = *data + instride * start_row;
-                    // Destination position accounts for scale and the 1-row top border
-                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
-                    uint8_t* seam_delta = delta + instride * start_row;
-
-                    // Apply the filter to this seam region
-                    // The filter functions expect the src pointer to already be advanced past border
-                    seam_src += instride;  // Skip the top border row
-
-                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
-                }
-            }
         }
     }
 
@@ -3134,37 +3100,6 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
-
-            // Smooth seams between thread regions by re-applying the filter
-            // to the boundary rows. This eliminates visual artifacts at thread
-            // boundaries that occur because filters read neighboring pixels.
-            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                // instride already declared in outer scope
-                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
-
-                // For each seam between threads, re-process a few rows
-                // The seam rows in the source are at: height * i / nthreads
-                for (int i = 1; i < nthreads; i++) {
-                    int seam_row = height * i / nthreads;
-                    // Process 5 rows above and 5 rows below the seam (10 total)
-                    // to give the filter enough context for smooth blending
-                    int start_row = std::max(0, seam_row - 5);
-                    int end_row = std::min(height, seam_row + 5);
-                    int seam_height = end_row - start_row;
-
-                    if (seam_height <= 0) continue;
-
-                    // Calculate source and destination pointers for this seam region
-                    uint8_t* seam_src = *data + instride * start_row;
-                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
-                    uint8_t* seam_delta = delta + instride * start_row;
-
-                    // Apply the filter to this seam region
-                    seam_src += instride;  // Skip the top border row
-
-                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
-                }
-            }
         }
     }
 
@@ -4557,37 +4492,6 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
-
-            // Smooth seams between thread regions by re-applying the filter
-            // to the boundary rows. This eliminates visual artifacts at thread
-            // boundaries that occur because filters read neighboring pixels.
-            if (nthreads > 1 && OPTION(kDispFilter) != config::Filter::kNone) {
-                // instride already declared in outer scope
-                int outstride_local = std::ceil((width + inrb) * outbpp * scale);
-
-                // For each seam between threads, re-process a few rows
-                // The seam rows in the source are at: height * i / nthreads
-                for (int i = 1; i < nthreads; i++) {
-                    int seam_row = height * i / nthreads;
-                    // Process 5 rows above and 5 rows below the seam (10 total)
-                    // to give the filter enough context for smooth blending
-                    int start_row = std::max(0, seam_row - 5);
-                    int end_row = std::min(height, seam_row + 5);
-                    int seam_height = end_row - start_row;
-
-                    if (seam_height <= 0) continue;
-
-                    // Calculate source and destination pointers for this seam region
-                    uint8_t* seam_src = *data + instride * start_row;
-                    uint8_t* seam_dst = todraw + (int)std::ceil(outstride_local * (start_row + 1) * scale);
-                    uint8_t* seam_delta = delta + instride * start_row;
-
-                    // Apply the filter to this seam region
-                    seam_src += instride;  // Skip the top border row
-
-                    ApplyFilter32(seam_src, instride, seam_delta, seam_dst, outstride_local, width, seam_height);
-                }
-            }
         }
     }
 

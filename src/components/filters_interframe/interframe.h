@@ -70,9 +70,9 @@ private:
     void CleanupInternal();
 
     struct RegionState {
-        std::unique_ptr<uint8_t[]> frm1;  // 1 frame ago
-        std::unique_ptr<uint8_t[]> frm2;  // 2 frames ago
-        std::unique_ptr<uint8_t[]> frm3;  // 3 frames ago
+        std::unique_ptr<uint8_t[]> frame1_;  // 1 frame ago
+        std::unique_ptr<uint8_t[]> frame2_;  // 2 frames ago
+        std::unique_ptr<uint8_t[]> frame3_;  // 3 frames ago
     };
 
     std::vector<RegionState> regions_;

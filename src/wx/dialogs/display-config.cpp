@@ -625,7 +625,7 @@ void DisplayConfig::OnInterframeChanged(config::Option* option) {
     const config::Interframe interframe = option->GetInterframe();
 
     systemScreenMessage(wxString::Format(
-        _("Using interframe blending: %s"),
+        _("interframe blend: %s"),
         interframe_selector_->GetString(static_cast<size_t>(interframe))));
 }
 
