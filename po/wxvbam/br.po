@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 18:00+0000\n"
+"POT-Creation-Date: 2025-12-30 19:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Irriep Nala Novram <per.morvan.bzh29@gmail.com>, 2017,2019\n"
 "Language-Team: Breton (http://app.transifex.com/bgk/vba-m/language/br/)\n"
@@ -22,7 +22,7 @@ msgstr ""
 #: audio/internal/sdl.cpp:191 audio/internal/sdl.cpp:209
 #: audio/internal/sdl.cpp:340 audio/internal/sdl.cpp:351
 #: audio/internal/sdl.cpp:371 audio/internal/faudio.cpp:512
-#: audio/internal/xaudio2.cpp:604
+#: audio/internal/xaudio2.cpp:612
 msgid "Default device"
 msgstr "Trobarzhell dre-ziouer"
 
@@ -102,7 +102,7 @@ msgstr ""
 msgid "Confirm import"
 msgstr "Kadarnaat an emporzhiañ"
 
-#: cmdevents.cpp:519 panel.cpp:672
+#: cmdevents.cpp:519 panel.cpp:781
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Bateri karget %s"
@@ -185,7 +185,7 @@ msgstr "Fazi en ur gargañ ar restr snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Skrivet e-barzh ar c'hoari %s"
 
-#: cmdevents.cpp:721 panel.cpp:1031
+#: cmdevents.cpp:721 panel.cpp:1141
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Fazi en ur skrivañ e-barzh ar bateri %s"
@@ -399,7 +399,7 @@ msgstr ""
 
 #: dialogs/display-config.cpp:628
 #, c-format
-msgid "Using interframe blending: %s"
+msgid "interframe blend: %s"
 msgstr ""
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
@@ -645,7 +645,7 @@ msgstr "Diuzit ur restr kodoù truchañ"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Kodoù evit truchañ VBA  (*.clt)|*.clt|Kodoùevit truchañ CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:284 panel.cpp:729
+#: guiinit.cpp:284 panel.cpp:839
 msgid "Loaded cheats"
 msgstr "Kodoù evit truchañ karget"
 
@@ -718,23 +718,23 @@ msgstr "Elfenn al lañser %s nann-talvoudus; o tiverkañ"
 msgid "JoyBus host invalid; disabling"
 msgstr "Ostiz JoyBus nann-dalvoudus; o titalvoudekaat"
 
-#: guiinit.cpp:2301
+#: guiinit.cpp:2303
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:2307
+#: guiinit.cpp:2309
 msgid "Description"
 msgstr "Deskrivadur"
 
-#: guiinit.cpp:2360 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2362 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Chomlec'h"
 
-#: guiinit.cpp:2361
+#: guiinit.cpp:2363
 msgid "Old Value"
 msgstr "Talvoudegezh kozh"
 
-#: guiinit.cpp:2362
+#: guiinit.cpp:2364
 msgid "New Value"
 msgstr "Talvoudegezh nevez"
 
@@ -761,45 +761,45 @@ msgstr ""
 msgid "Unknown option %s with value %s"
 msgstr ""
 
-#: panel.cpp:373
+#: panel.cpp:463
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s n'eo ket ur restr ROM reizh"
 
-#: panel.cpp:374 panel.cpp:435 panel.cpp:521
+#: panel.cpp:464 panel.cpp:525 panel.cpp:611
 msgid "Problem loading file"
 msgstr "Kudenn en ur gargañ ar restr"
 
-#: panel.cpp:434
+#: panel.cpp:524
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Divarrek da gargañ Game Boy ROM %s"
 
-#: panel.cpp:459 panel.cpp:583 panel.cpp:1370
+#: panel.cpp:549 panel.cpp:692 panel.cpp:1480
 msgid "Could not initialize the sound driver!"
 msgstr ""
 
-#: panel.cpp:470
+#: panel.cpp:560
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr ""
 
-#: panel.cpp:497 panel.cpp:596
+#: panel.cpp:587 panel.cpp:705
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Diposupl da gargañ BIOS %s"
 
-#: panel.cpp:520
+#: panel.cpp:610
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Divarrek da gargañ Game Boy Advance ROM %s"
 
-#: panel.cpp:766
+#: panel.cpp:876
 msgid " player "
 msgstr "c'hoarier"
 
-#: panel.cpp:814
+#: panel.cpp:924
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -808,11 +808,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:815 panel.cpp:836 wxvbam.cpp:1248
+#: panel.cpp:925 panel.cpp:946 wxvbam.cpp:1248
 msgid "Directory Error"
 msgstr ""
 
-#: panel.cpp:835
+#: panel.cpp:945
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -821,284 +821,284 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:979
+#: panel.cpp:1089
 #, c-format
 msgid "Loaded state %s"
 msgstr "Stad karget %s"
 
-#: panel.cpp:979
+#: panel.cpp:1089
 #, c-format
 msgid "Error loading state %s"
 msgstr "Fazi en ur gargañ ar stad %s"
 
-#: panel.cpp:1003
+#: panel.cpp:1113
 #, c-format
 msgid "Saved state %s"
 msgstr "Stad enrollet %s"
 
-#: panel.cpp:1003
+#: panel.cpp:1113
 #, c-format
 msgid "Error saving state %s"
 msgstr "Fazi en ur enrollañ ar stad %s"
 
-#: panel.cpp:1203
+#: panel.cpp:1313
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr ""
 
-#: panel.cpp:1241
+#: panel.cpp:1351
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr ""
 
-#: panel.cpp:1246
+#: panel.cpp:1356
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1254
+#: panel.cpp:1364
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1258
+#: panel.cpp:1368
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr ""
 
-#: panel.cpp:1345
+#: panel.cpp:1455
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr ""
 
-#: panel.cpp:1391
+#: panel.cpp:1501
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:1530
+#: panel.cpp:1640
 msgid "No memory for rewinding"
 msgstr "Memor ebet evit punañ"
 
-#: panel.cpp:1540
+#: panel.cpp:1650
 msgid "Error writing rewind state"
 msgstr "Fazi en ur skrivañ stad ar punadur"
 
-#: panel.cpp:2647
+#: panel.cpp:2660
 msgid "Failed to set wayland display"
 msgstr ""
 
-#: panel.cpp:2675
+#: panel.cpp:2688
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:2686
+#: panel.cpp:2699
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:2695
+#: panel.cpp:2708
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:2708
+#: panel.cpp:2721
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:2717
+#: panel.cpp:2730
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:2730 panel.cpp:2769
+#: panel.cpp:2743 panel.cpp:2782
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:2740 panel.cpp:2797
+#: panel.cpp:2753 panel.cpp:2810
 msgid "Renderer creating failed, using default renderer"
 msgstr ""
 
-#: panel.cpp:2741
+#: panel.cpp:2754
 #, c-format
 msgid "SDL Error: %s"
 msgstr ""
 
-#: panel.cpp:2748 panel.cpp:2803
+#: panel.cpp:2761 panel.cpp:2816
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:2754
+#: panel.cpp:2767
 msgid "Failed to set vsync for SDL renderer"
 msgstr ""
 
-#: panel.cpp:2758 panel.cpp:2792
+#: panel.cpp:2771 panel.cpp:2805
 #, c-format
 msgid "SDL renderer: %s"
 msgstr ""
 
-#: panel.cpp:2777
+#: panel.cpp:2790
 msgid "SDL renderer: default"
 msgstr ""
 
-#: panel.cpp:3372
+#: panel.cpp:3414
 msgid "Enabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3374
+#: panel.cpp:3416
 msgid "Disabling EGL VSync."
 msgstr ""
 
-#: panel.cpp:3381
+#: panel.cpp:3423
 msgid "Enabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3383
+#: panel.cpp:3425
 msgid "Disabling GLX VSync."
 msgstr ""
 
-#: panel.cpp:3401
+#: panel.cpp:3443
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3410
+#: panel.cpp:3452
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr ""
 
-#: panel.cpp:3419
+#: panel.cpp:3461
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr ""
 
-#: panel.cpp:3426
+#: panel.cpp:3468
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr ""
 
-#: panel.cpp:3429
+#: panel.cpp:3471
 msgid "No support for WGL_EXT_swap_control"
 msgstr ""
 
-#: panel.cpp:3438
+#: panel.cpp:3480
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr ""
 
-#: panel.cpp:3444
+#: panel.cpp:3486
 msgid "No VSYNC available on this platform"
 msgstr ""
 
-#: panel.cpp:3540
+#: panel.cpp:3582
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr ""
 
-#: panel.cpp:3544
+#: panel.cpp:3586
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:3553
+#: panel.cpp:3595
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:3556
+#: panel.cpp:3598
 msgid "Using Direct3D 9"
 msgstr ""
 
-#: panel.cpp:3563
+#: panel.cpp:3605
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3587
+#: panel.cpp:3629
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr ""
 
-#: panel.cpp:3603
+#: panel.cpp:3645
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr ""
 
-#: panel.cpp:3627
+#: panel.cpp:3669
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3632
+#: panel.cpp:3674
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:3665
+#: panel.cpp:3707
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:3687
+#: panel.cpp:3729
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3719
+#: panel.cpp:3761
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:3726
+#: panel.cpp:3768
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr ""
 
-#: panel.cpp:3738
+#: panel.cpp:3780
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3743
+#: panel.cpp:3785
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:3810
+#: panel.cpp:3849
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:3822
+#: panel.cpp:3861
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4013
+#: panel.cpp:4052
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:4016
+#: panel.cpp:4055
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:4019
+#: panel.cpp:4058
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:4022
+#: panel.cpp:4061
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:4027
+#: panel.cpp:4066
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:4039 panel.cpp:4068
+#: panel.cpp:4078 panel.cpp:4107
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Divarrek da gregiñ da enrollañ da %s (%s)"
 
-#: panel.cpp:4096
+#: panel.cpp:4135
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr ""
 
-#: panel.cpp:4102
+#: panel.cpp:4141
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Fazi gant an enrolladur an aodio (%s); oc'h arsav"
 
-#: panel.cpp:4112
+#: panel.cpp:4151
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Fazi en ur enrollañ ar video (%s); oc'h arsav"
 
-#: panel.cpp:4303
+#: panel.cpp:4342
 #, c-format
 msgid "Volume: %d %%"
 msgstr ""
@@ -2192,19 +2192,19 @@ msgstr ""
 msgid "FAudio: Creating source voice failed!"
 msgstr ""
 
-#: audio/internal/xaudio2.cpp:46 audio/internal/xaudio2.cpp:598
+#: audio/internal/xaudio2.cpp:54 audio/internal/xaudio2.cpp:606
 msgid "XAudio2: Enumerating devices failed!"
 msgstr ""
 
-#: audio/internal/xaudio2.cpp:301 audio/internal/xaudio2.cpp:591
+#: audio/internal/xaudio2.cpp:309 audio/internal/xaudio2.cpp:599
 msgid "The XAudio2 interface failed to initialize!"
 msgstr ""
 
-#: audio/internal/xaudio2.cpp:327
+#: audio/internal/xaudio2.cpp:335
 msgid "XAudio2: Creating mastering voice failed!"
 msgstr ""
 
-#: audio/internal/xaudio2.cpp:336
+#: audio/internal/xaudio2.cpp:344
 msgid "XAudio2: Creating source voice failed!"
 msgstr ""
 
