@@ -431,7 +431,7 @@ msgstr "Usando o filtro dos pixels: %s"
 #: dialogs/display-config.cpp:628
 #, c-format
 msgid "interframe blend: %s"
-msgstr ""
+msgstr "Mistura dos interframes: %s"
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
