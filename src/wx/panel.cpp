@@ -1078,7 +1078,7 @@ bool GameArea::LoadState(const wxFileName& fname)
         // forget old save writes
         systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
         // no point in blending after abrupt change
-        InterframeCleanup();
+        InterframeClear();
         // frame rate calc should probably reset as well
         was_paused = true;
         // save state had a screen frame, so draw it

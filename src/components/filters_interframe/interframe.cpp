@@ -79,6 +79,27 @@ void InterframeManager::Cleanup() {
     CleanupInternal();
 }
 
+void InterframeManager::Clear() {
+    std::lock_guard<std::mutex> lock(init_mutex_);
+
+    if (!initialized_) {
+        return;
+    }
+
+    // Zero out all frame buffers without reallocating
+    for (auto& region : regions_) {
+        if (region.frame1_) {
+            memset(region.frame1_.get(), 0, buffer_size_);
+        }
+        if (region.frame2_) {
+            memset(region.frame2_.get(), 0, buffer_size_);
+        }
+        if (region.frame3_) {
+            memset(region.frame3_.get(), 0, buffer_size_);
+        }
+    }
+}
+
 void InterframeManager::CleanupInternal() {
     // Caller must hold init_mutex_
     regions_.clear();
@@ -1035,6 +1056,22 @@ void InterframeCleanup() {
 
     // Also cleanup the manager
     InterframeManager::Instance().Cleanup();
+}
+
+void InterframeClear() {
+    // Clear legacy buffers (used by SDL/libretro ports)
+    if (frm1) {
+        memset(frm1, 0, 322 * 242 * 4);
+    }
+    if (frm2 && frm2 != frm1) {
+        memset(frm2, 0, 322 * 242 * 4);
+    }
+    if (frm3 && frm3 != frm1 && frm3 != frm2) {
+        memset(frm3, 0, 322 * 242 * 4);
+    }
+
+    // Clear manager buffers
+    InterframeManager::Instance().Clear();
 }
 
 // Legacy SmartIB functions

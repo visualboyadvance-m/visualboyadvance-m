@@ -34,6 +34,9 @@ public:
     /// Free all buffers and reset state
     void Cleanup();
 
+    /// Clear existing buffers for reuse
+    void Clear();
+
     /// Apply Smart IFB to a specific region.
     /// Each region has independent frame history - no synchronization needed.
     /// @param srcPtr Source/destination buffer (modified in-place)
@@ -92,6 +95,9 @@ void InterframeFilterInit();
 
 /// Call to reset frame history (e.g., when starting a new game)
 void InterframeCleanup();
+
+/// Clear frame history buffers without deallocating
+void InterframeClear();
 
 // Smart Interframe Blending - all are MMX/SSE2-accelerated if available
 void SmartIB(uint8_t* srcPtr, uint32_t srcPitch, int width, int starty, int height);
