@@ -848,6 +848,8 @@ void soundReadGame(gzFile in, int version)
 {
     // Prepare APU and default state
     reset_apu();
+    pcm[0].pcm.init();
+    pcm[1].pcm.init();
     gb_apu->save_state(&state.apu);
 
     if (version > SAVE_GAME_VERSION_9)
@@ -877,6 +879,8 @@ void soundReadGame(const uint8_t*& in)
 {
     // Prepare APU and default state
     reset_apu();
+    pcm[0].pcm.init();
+    pcm[1].pcm.init();
     gb_apu->save_state(&state.apu);
 
     utilReadDataMem(in, gba_state);
