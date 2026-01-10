@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <thread>
+#include <utility>
+#include <vector>
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
@@ -124,6 +126,16 @@ int GetMaxFilterThreads() {
     return static_cast<int>(std::min(hw_threads, 8u));
 }
 
+// Filter context radius - max rows above/below a source row that filters examine
+// 2xSaI family needs 2, most others need 1, some need 0
+constexpr int kFilterContextRadius = 2;
+
+// Extra rows for seam processing margin
+constexpr int kSeamMarginRows = 1;
+
+// Total source rows to process for each seam band (above + below seam)
+constexpr int kSeamBandSourceRows = (kFilterContextRadius + kSeamMarginRows) * 2;
+
 // Apply the currently selected 32-bit filter to the image region.
 // This is the core filter dispatch function used by both threaded rendering
 // and seam smoothing. Plugin filters are not supported here.
@@ -199,6 +211,238 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
         case config::Filter::kNone:
         case config::Filter::kLast:
             break;
+    }
+}
+
+// Re-process a band around a seam with full source context to eliminate artifacts.
+// This is called after all filter threads complete to fix the visible seams at
+// thread boundaries caused by filters not having access to neighboring filtered pixels.
+//
+// src: full source buffer (pointing to actual image data, after top border row)
+// dst: full destination buffer (pointing to actual output, after top border rows)
+// bandStart, bandEnd: source row range to process (pre-calculated, may be merged)
+// All other params are for the full image, not a slice.
+void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
+                     int width, int fullHeight, int bandStart, int bandEnd, int scale) {
+    const int bandHeight = bandEnd - bandStart;
+    if (bandHeight <= 0) return;
+
+    const bool is_8bit = (systemColorDepth == 8);
+    const bool is_16bit = (systemColorDepth == 16);
+    const bool is_24bit = (systemColorDepth == 24);
+    const bool is_32bit = !is_8bit && !is_16bit && !is_24bit;
+
+    const int outBandHeight = bandHeight * scale;
+    const int outRowBytes = width * 4 * scale;
+
+    // Allocate temp buffer for band output (always 32bpp internally)
+    std::vector<uint8_t> tempBuf(outRowBytes * outBandHeight);
+
+    if (is_32bit) {
+        // Direct 32bpp path - no conversion needed
+        uint8_t* bandSrc = src + srcPitch * bandStart;
+
+        ApplyFilter32(bandSrc, srcPitch, nullptr, tempBuf.data(), outRowBytes,
+                      width, bandHeight);
+
+        // Copy result to destination (skip context rows at edges)
+        const int skipRows = kFilterContextRadius * scale;
+        const int copyRows = outBandHeight - 2 * skipRows;
+        const int dstStartY = (bandStart + kFilterContextRadius) * scale;
+
+        if (copyRows > 0) {
+            uint8_t* dstRow = dst + dstPitch * dstStartY;
+            const uint8_t* srcRow = tempBuf.data() + outRowBytes * skipRows;
+
+            for (int y = 0; y < copyRows; y++) {
+                memcpy(dstRow, srcRow, width * 4 * scale);
+                dstRow += dstPitch;
+                srcRow += outRowBytes;
+            }
+        }
+    } else {
+        // Non-32bpp: convert band to 32bpp, apply filter, convert back
+        // Save current color shift values
+        const int saved_red_shift = systemRedShift;
+        const int saved_green_shift = systemGreenShift;
+        const int saved_blue_shift = systemBlueShift;
+        const int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
+
+        // Set shift values for 32bpp format that filters expect
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+        systemRedShift = 19;
+        systemGreenShift = 11;
+        systemBlueShift = 3;
+        RGB_LOW_BITS_MASK = 0x00010101;
+#else
+        systemRedShift = 27;
+        systemGreenShift = 19;
+        systemBlueShift = 11;
+        RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+
+        // Calculate source buffer parameters
+        const int inbpp = systemColorDepth >> 3;
+        const int inrb = is_8bit ? 4 : is_16bit ? 2 : 0;
+
+        // For 32bpp conversion: filters need left+right borders of 1 each
+        const int total_width32 = width + 2;
+        const int instride32 = total_width32 * 4;
+
+        // Allocate 32bpp conversion buffers
+        std::vector<uint32_t> src32((total_width32) * (bandHeight + 3));
+
+        // Convert source band to 32bpp
+        int pos = total_width32;  // Start at row 1 (skip row 0 for top border)
+        uint8_t* bandSrcRow = src + srcPitch * bandStart;
+
+        if (is_8bit) {
+            for (int y = 0; y < bandHeight; y++) {
+                const int left_border_pos = pos++;
+                for (int x = 0; x < width; x++) {
+                    const uint8_t src_val = bandSrcRow[x];
+                    const uint8_t r3 = (src_val >> 5) & 0x7;
+                    const uint8_t g3 = (src_val >> 2) & 0x7;
+                    const uint8_t b2 = src_val & 0x3;
+                    const uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
+                    const uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
+                    const uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                    src32[pos++] = b8 | (g8 << 8) | (r8 << 16);
+#else
+                    src32[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
+#endif
+                }
+                src32[left_border_pos] = src32[left_border_pos + 1];
+                src32[pos] = src32[pos - 1];
+                pos++;
+                bandSrcRow += srcPitch;
+            }
+        } else if (is_16bit) {
+            for (int y = 0; y < bandHeight; y++) {
+                const uint16_t* src16 = reinterpret_cast<const uint16_t*>(bandSrcRow);
+                const int left_border_pos = pos++;
+                for (int x = 0; x < width; x++) {
+                    const uint16_t src_val = src16[x];
+                    const uint8_t r5 = (src_val >> 10) & 0x1f;
+                    const uint8_t g5 = (src_val >> 5) & 0x1f;
+                    const uint8_t b5 = src_val & 0x1f;
+                    const uint8_t r8 = (r5 << 3) | (r5 >> 2);
+                    const uint8_t g8 = (g5 << 3) | (g5 >> 2);
+                    const uint8_t b8 = (b5 << 3) | (b5 >> 2);
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                    src32[pos++] = b8 | (g8 << 8) | (r8 << 16);
+#else
+                    src32[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
+#endif
+                }
+                src32[left_border_pos] = src32[left_border_pos + 1];
+                src32[pos] = src32[pos - 1];
+                pos++;
+                bandSrcRow += srcPitch;
+            }
+        } else {  // is_24bit
+            for (int y = 0; y < bandHeight; y++) {
+                const int left_border_pos = pos++;
+                for (int x = 0; x < width; x++) {
+                    const int src_pos = x * 3;
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                    src32[pos++] = bandSrcRow[src_pos] | (bandSrcRow[src_pos+1] << 8) | (bandSrcRow[src_pos+2] << 16);
+#else
+                    src32[pos++] = (bandSrcRow[src_pos] << 24) | (bandSrcRow[src_pos+1] << 16) | (bandSrcRow[src_pos+2] << 8);
+#endif
+                }
+                src32[left_border_pos] = src32[left_border_pos + 1];
+                src32[pos] = src32[pos - 1];
+                pos++;
+                bandSrcRow += srcPitch;
+            }
+        }
+
+        // Fill top border row by duplicating row 1
+        memcpy(src32.data(), src32.data() + total_width32, total_width32 * sizeof(uint32_t));
+
+        // Fill bottom 2 extra rows by duplicating the last image row
+        const int last_row_offset = total_width32 * bandHeight;
+        memcpy(src32.data() + last_row_offset + total_width32, src32.data() + last_row_offset, total_width32 * sizeof(uint32_t));
+        memcpy(src32.data() + last_row_offset + total_width32 * 2, src32.data() + last_row_offset, total_width32 * sizeof(uint32_t));
+
+        // Point to first image pixel (skip top row + left border)
+        uint8_t* filter_src = reinterpret_cast<uint8_t*>(src32.data() + total_width32 + 1);
+
+        // Apply filter
+        ApplyFilter32(filter_src, instride32, nullptr, tempBuf.data(), outRowBytes,
+                      width, bandHeight);
+
+        // Convert 32bpp output back to original depth and copy to destination
+        const int skipRows = kFilterContextRadius * scale;
+        const int copyRows = outBandHeight - 2 * skipRows;
+        const int dstStartY = (bandStart + kFilterContextRadius) * scale;
+        const int scaled_width = width * scale;
+        const int scaled_border = inrb * scale;
+
+        if (copyRows > 0) {
+            const uint32_t* src32_row = reinterpret_cast<const uint32_t*>(tempBuf.data() + outRowBytes * skipRows);
+
+            if (is_8bit) {
+                uint8_t* dstRow = dst + dstPitch * dstStartY;
+                for (int y = 0; y < copyRows; y++) {
+                    for (int x = 0; x < scaled_width; x++) {
+                        const uint32_t color = src32_row[x];
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                        const uint8_t r8 = (color >> 16) & 0xff;
+                        const uint8_t g8 = (color >> 8) & 0xff;
+                        const uint8_t b8 = color & 0xff;
+#else
+                        const uint8_t r8 = (color >> 24) & 0xff;
+                        const uint8_t g8 = (color >> 16) & 0xff;
+                        const uint8_t b8 = (color >> 8) & 0xff;
+#endif
+                        dstRow[x] = ((r8 >> 5) << 5) | ((g8 >> 5) << 2) | (b8 >> 6);
+                    }
+                    dstRow += dstPitch;
+                    src32_row += scaled_width;
+                }
+            } else if (is_16bit) {
+                uint16_t* dstRow = reinterpret_cast<uint16_t*>(dst + dstPitch * dstStartY);
+                const int dst16Pitch = dstPitch / 2;
+                for (int y = 0; y < copyRows; y++) {
+                    for (int x = 0; x < scaled_width; x++) {
+                        const uint32_t color = src32_row[x];
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                        const uint8_t r8 = (color >> 16) & 0xff;
+                        const uint8_t g8 = (color >> 8) & 0xff;
+                        const uint8_t b8 = color & 0xff;
+#else
+                        const uint8_t r8 = (color >> 24) & 0xff;
+                        const uint8_t g8 = (color >> 16) & 0xff;
+                        const uint8_t b8 = (color >> 8) & 0xff;
+#endif
+                        dstRow[x] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
+                    }
+                    dstRow += dst16Pitch;
+                    src32_row += scaled_width;
+                }
+            } else {  // is_24bit
+                uint8_t* dstRow = dst + dstPitch * dstStartY;
+                for (int y = 0; y < copyRows; y++) {
+                    for (int x = 0; x < scaled_width; x++) {
+                        const uint8_t* src_pixel = reinterpret_cast<const uint8_t*>(&src32_row[x]);
+                        dstRow[x * 3] = src_pixel[0];
+                        dstRow[x * 3 + 1] = src_pixel[1];
+                        dstRow[x * 3 + 2] = src_pixel[2];
+                    }
+                    dstRow += dstPitch;
+                    src32_row += scaled_width;
+                }
+            }
+        }
+
+        // Restore original shift values
+        systemRedShift = saved_red_shift;
+        systemGreenShift = saved_green_shift;
+        systemBlueShift = saved_blue_shift;
+        RGB_LOW_BITS_MASK = saved_rgb_low_bits_mask;
     }
 }
 
@@ -1881,12 +2125,13 @@ void DrawingPanelBase::EraseBackground(wxEraseEvent& ev)
 //   interface, I will allow them to be threaded at user's discretion.
 class FilterThread : public wxThread {
 public:
-    // Two-phase execution: IFB first (on source), then Filter after
-    enum class Phase { IFB, Filter };
+    // Three-phase execution: IFB first, then Filter, then optional SeamFix
+    enum class Phase { IFB, Filter, SeamFix };
 
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_),
                      src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0),
-                     phase_(Phase::IFB) {}
+                     phase_(Phase::IFB), seamBandStart_(-1), seamBandEnd_(-1),
+                     seamSrc_(nullptr), seamDst_(nullptr) {}
 
     ~FilterThread() {
         // Free pre-allocated conversion buffers
@@ -1912,8 +2157,15 @@ public:
     // if NULL, end thread
     uint8_t* src_;
 
-    // Two-phase execution mode
+    // Execution phase
     Phase phase_;
+
+    // Seam fix parameters (set when phase_ == SeamFix)
+    // -1 means no seam work assigned to this thread
+    int seamBandStart_;
+    int seamBandEnd_;
+    uint8_t* seamSrc_;  // Source base for seam processing
+    uint8_t* seamDst_;  // Dest base for seam processing
 
     // Pre-allocated conversion buffers (reused across frames)
     uint32_t* src2_;
@@ -2017,6 +2269,20 @@ public:
 
                 if (nthreads_ == 1)
                     return 0;
+
+                done_->Post();
+                continue;
+            }
+
+            // Phase 3: SeamFix - re-process seam bands with full context
+            if (phase_ == Phase::SeamFix) {
+                // Check if this thread has seam work assigned
+                if (seamBandStart_ >= 0 && seamBandEnd_ > seamBandStart_) {
+                    // seamSrc_ points to image row 0 (after border)
+                    // seamDst_ points to output row 0 (after border)
+                    ProcessSeamBand(seamSrc_, instride, seamDst_, outstride,
+                                    width_, height_real, seamBandStart_, seamBandEnd_, scale_int);
+                }
 
                 done_->Post();
                 continue;
@@ -2395,6 +2661,57 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Fix seams between thread regions by re-processing bands around boundaries
+            // This runs in parallel using the existing filter threads
+            // Only runs here (not on first frame when threads are just starting)
+            if (OPTION(kDispFilter) != config::Filter::kNone &&
+                OPTION(kDispFilter) != config::Filter::kPlugin) {
+                // Collect seam positions and merge overlapping bands
+                std::vector<std::pair<int, int>> seamBands;  // (startY, endY) in source coords
+
+                for (int i = 1; i < nthreads; i++) {
+                    int seamY = height * i / nthreads;
+                    int bandStart = std::max(0, seamY - kFilterContextRadius - kSeamMarginRows);
+                    int bandEnd = std::min(height, seamY + kFilterContextRadius + kSeamMarginRows);
+
+                    // Merge with previous band if overlapping
+                    if (!seamBands.empty() && bandStart <= seamBands.back().second) {
+                        seamBands.back().second = std::max(seamBands.back().second, bandEnd);
+                    } else {
+                        seamBands.push_back({bandStart, bandEnd});
+                    }
+                }
+
+                // Assign seam bands to threads and run in parallel
+                const int scale_int = static_cast<int>(scale);
+                // Source base: skip 1 border row
+                uint8_t* src_base = *data + instride;
+                // Dest base: skip 1*scale border rows
+                uint8_t* dst_base = todraw + outstride * scale_int;
+
+                const int numBands = static_cast<int>(seamBands.size());
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::SeamFix;
+                    // Assign band to thread (some threads may have no work)
+                    if (i < numBands) {
+                        threads[i].seamBandStart_ = seamBands[i].first;
+                        threads[i].seamBandEnd_ = seamBands[i].second;
+                    } else {
+                        threads[i].seamBandStart_ = -1;  // No work for this thread
+                        threads[i].seamBandEnd_ = -1;
+                    }
+                    threads[i].seamSrc_ = src_base;
+                    threads[i].seamDst_ = dst_base;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = src_base;  // Keep src_ non-null to avoid thread exit
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
         }
     }
 
@@ -3100,6 +3417,57 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Fix seams between thread regions by re-processing bands around boundaries
+            // This runs in parallel using the existing filter threads
+            // Only runs here (not on first frame when threads are just starting)
+            if (OPTION(kDispFilter) != config::Filter::kNone &&
+                OPTION(kDispFilter) != config::Filter::kPlugin) {
+                // Collect seam positions and merge overlapping bands
+                std::vector<std::pair<int, int>> seamBands;  // (startY, endY) in source coords
+
+                for (int i = 1; i < nthreads; i++) {
+                    int seamY = height * i / nthreads;
+                    int bandStart = std::max(0, seamY - kFilterContextRadius - kSeamMarginRows);
+                    int bandEnd = std::min(height, seamY + kFilterContextRadius + kSeamMarginRows);
+
+                    // Merge with previous band if overlapping
+                    if (!seamBands.empty() && bandStart <= seamBands.back().second) {
+                        seamBands.back().second = std::max(seamBands.back().second, bandEnd);
+                    } else {
+                        seamBands.push_back({bandStart, bandEnd});
+                    }
+                }
+
+                // Assign seam bands to threads and run in parallel
+                const int scale_int = static_cast<int>(scale);
+                // Source base: skip 1 border row
+                uint8_t* src_base = *data + instride;
+                // Dest base: skip 1*scale border rows
+                uint8_t* dst_base = todraw + outstride * scale_int;
+
+                const int numBands = static_cast<int>(seamBands.size());
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::SeamFix;
+                    // Assign band to thread (some threads may have no work)
+                    if (i < numBands) {
+                        threads[i].seamBandStart_ = seamBands[i].first;
+                        threads[i].seamBandEnd_ = seamBands[i].second;
+                    } else {
+                        threads[i].seamBandStart_ = -1;  // No work for this thread
+                        threads[i].seamBandEnd_ = -1;
+                    }
+                    threads[i].seamSrc_ = src_base;
+                    threads[i].seamDst_ = dst_base;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = src_base;  // Keep src_ non-null to avoid thread exit
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
         }
     }
 
@@ -4492,6 +4860,57 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
             for (int i = 0; i < nthreads; i++)
                 filt_done.Wait();
+
+            // Fix seams between thread regions by re-processing bands around boundaries
+            // This runs in parallel using the existing filter threads
+            // Only runs here (not on first frame when threads are just starting)
+            if (OPTION(kDispFilter) != config::Filter::kNone &&
+                OPTION(kDispFilter) != config::Filter::kPlugin) {
+                // Collect seam positions and merge overlapping bands
+                std::vector<std::pair<int, int>> seamBands;  // (startY, endY) in source coords
+
+                for (int i = 1; i < nthreads; i++) {
+                    int seamY = height * i / nthreads;
+                    int bandStart = std::max(0, seamY - kFilterContextRadius - kSeamMarginRows);
+                    int bandEnd = std::min(height, seamY + kFilterContextRadius + kSeamMarginRows);
+
+                    // Merge with previous band if overlapping
+                    if (!seamBands.empty() && bandStart <= seamBands.back().second) {
+                        seamBands.back().second = std::max(seamBands.back().second, bandEnd);
+                    } else {
+                        seamBands.push_back({bandStart, bandEnd});
+                    }
+                }
+
+                // Assign seam bands to threads and run in parallel
+                const int scale_int = static_cast<int>(scale);
+                // Source base: skip 1 border row
+                uint8_t* src_base = *data + instride;
+                // Dest base: skip 1*scale border rows
+                uint8_t* dst_base = todraw + outstride * scale_int;
+
+                const int numBands = static_cast<int>(seamBands.size());
+                for (int i = 0; i < nthreads; i++) {
+                    threads[i].phase_ = FilterThread::Phase::SeamFix;
+                    // Assign band to thread (some threads may have no work)
+                    if (i < numBands) {
+                        threads[i].seamBandStart_ = seamBands[i].first;
+                        threads[i].seamBandEnd_ = seamBands[i].second;
+                    } else {
+                        threads[i].seamBandStart_ = -1;  // No work for this thread
+                        threads[i].seamBandEnd_ = -1;
+                    }
+                    threads[i].seamSrc_ = src_base;
+                    threads[i].seamDst_ = dst_base;
+                    threads[i].lock_.Lock();
+                    threads[i].src_ = src_base;  // Keep src_ non-null to avoid thread exit
+                    threads[i].sig_.Signal();
+                    threads[i].lock_.Unlock();
+                }
+
+                for (int i = 0; i < nthreads; i++)
+                    filt_done.Wait();
+            }
         }
     }
 
