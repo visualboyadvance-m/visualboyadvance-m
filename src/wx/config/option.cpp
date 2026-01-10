@@ -567,7 +567,7 @@ size_t Option::GetEnumMax() const {
 void Option::NextFilter() {
     VBAM_CHECK(is_filter());
     const int old_value = static_cast<int>(GetFilter());
-    // Skip kPlugin during cycling - cycle through kNone to kXbrz6x only
+    // Skip kPlugin during cycling - cycle through kNone to kXbrz9x only
     const int max_filter = static_cast<int>(Filter::kPlugin);
     const int new_value = (old_value + 1) % max_filter;
     SetFilter(static_cast<Filter>(new_value));

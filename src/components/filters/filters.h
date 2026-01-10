@@ -68,5 +68,6 @@ void xbrz3x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t ds
 void xbrz4x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz5x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz6x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
+void xbrz9x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 
 #endif  // VBAM_COMPONENTS_FILTERS_FILTERS_H_

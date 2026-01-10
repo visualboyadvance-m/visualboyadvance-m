@@ -117,27 +117,18 @@
                           <object class="wxChoice" name="Filter">
                             <content>
                               <item>None</item>
-                              <item translate="0">2xSaI</item>
                               <item>Super 2xSaI</item>
                               <item>Super Eagle</item>
                               <item>Pixelate</item>
                               <item>Advance MAME Scale 2x</item>
-                              <item>Bilinear</item>
                               <item>Bilinear Plus</item>
                               <item>Scanlines</item>
                               <item>TV Mode</item>
-                              <item translate="0">HQ 2x</item>
-                              <item translate="0">LQ 2x</item>
-                              <item>Simple 2x</item>
-                              <item>Simple 3x</item>
-                              <item translate="0">HQ 3x</item>
-                              <item>Simple 4x</item>
                               <item translate="0">HQ 4x</item>
+                              <item translate="0">LQ 2x</item>
+                              <item>Simple 4x</item>
                               <item translate="0">xBRZ 2x</item>
-                              <item translate="0">xBRZ 3x</item>
-                              <item translate="0">xBRZ 4x</item>
-                              <item translate="0">xBRZ 5x</item>
-                              <item translate="0">xBRZ 6x</item>
+                              <item translate="0">xBRZ 9x</item>
                               <item>Plugin</item>
                             </content>
                           </object>

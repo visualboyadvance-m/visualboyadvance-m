@@ -507,9 +507,10 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
   uint16_t *bP;
   uint16_t *xP;
   uint32_t inc_bP;
+  bool hasDelta = (deltaPtr != nullptr);
 
 #ifdef MMX
-  if (cpu_mmx) {
+  if (cpu_mmx && hasDelta) {
     for (; height; height--) {
       _2xSaISuperEagleLine (srcPtr, deltaPtr, srcPitch, width,
                             dstPtr, dstPitch);
@@ -526,7 +527,7 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
     for (; height; height--) {
       bP = (uint16_t *) srcPtr;
-      xP = (uint16_t *) deltaPtr;
+      xP = hasDelta ? (uint16_t *) deltaPtr : nullptr;
       dP = dstPtr;
       
       for (uint32_t finish = width; finish; finish -= inc_bP) {
@@ -638,16 +639,16 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         *((uint32_t *) dP) = product1a;
         *((uint32_t *) (dP + dstPitch)) = product2a;
-        *xP = (uint16_t)color5;
+        if (xP) *xP = (uint16_t)color5;
 
         bP += inc_bP;
-        xP += inc_bP;
+        if (xP) xP += inc_bP;
         dP += sizeof (uint32_t);
       }                 // end of for ( finish= width etc..)
 
       srcPtr += srcPitch;
       dstPtr += dstPitch << 1;
-      deltaPtr += srcPitch;
+      if (hasDelta) deltaPtr += srcPitch;
     }                   // endof: for (height; height; height--)
   }
 }
@@ -659,6 +660,7 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
   uint32_t *bP;
   uint32_t *xP;
   uint32_t inc_bP;
+  bool hasDelta = (deltaPtr != nullptr);
 
   inc_bP = 1;
 
@@ -666,7 +668,7 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
   for (; height; height--) {
     bP = (uint32_t *) srcPtr;
-    xP = (uint32_t *) deltaPtr;
+    xP = hasDelta ? (uint32_t *) deltaPtr : nullptr;
     dP = (uint32_t *)dstPtr;
     
     for (uint32_t finish = width; finish; finish -= inc_bP) {
@@ -774,16 +776,16 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
       *(dP+1) = product1b;
       *(dP + (dstPitch >> 2)) = product2a;
       *(dP + (dstPitch >> 2) +1) = product2b;
-      *xP = color5;
+      if (xP) *xP = color5;
 
       bP += inc_bP;
-      xP += inc_bP;
+      if (xP) xP += inc_bP;
       dP += 2;
     }                 // end of for ( finish= width etc..)
 
     srcPtr += srcPitch;
     dstPtr += dstPitch << 1;
-    deltaPtr += srcPitch;
+    if (hasDelta) deltaPtr += srcPitch;
   }                   // endof: for (height; height; height--)
 }
 

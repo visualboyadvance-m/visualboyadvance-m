@@ -84,32 +84,21 @@ double GetFilterScale() {
     switch (OPTION(kDispFilter)) {
         case config::Filter::kNone:
             return 1.0;
-        case config::Filter::k2xsai:
         case config::Filter::kSuper2xsai:
         case config::Filter::kSupereagle:
         case config::Filter::kPixelate:
         case config::Filter::kAdvmame:
-        case config::Filter::kBilinear:
         case config::Filter::kBilinearplus:
         case config::Filter::kScanlines:
         case config::Filter::kTvmode:
-        case config::Filter::kSimple2x:
         case config::Filter::kLQ2x:
-        case config::Filter::kHQ2x:
         case config::Filter::kXbrz2x:
             return 2.0;
-        case config::Filter::kXbrz3x:
-        case config::Filter::kSimple3x:
-        case config::Filter::kHQ3x:
-            return 3.0;
         case config::Filter::kSimple4x:
         case config::Filter::kHQ4x:
-        case config::Filter::kXbrz4x:
             return 4.0;
-        case config::Filter::kXbrz5x:
-            return 5.0;
-        case config::Filter::kXbrz6x:
-            return 6.0;
+        case config::Filter::kXbrz9x:
+            return 9.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
             VBAM_NOTREACHED_RETURN(1.0);
@@ -142,9 +131,6 @@ constexpr int kSeamBandSourceRows = (kFilterContextRadius + kSeamMarginRows) * 2
 void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
                    int outstride, int width, int height) {
     switch (OPTION(kDispFilter)) {
-        case config::Filter::k2xsai:
-            _2xSaI32(src, instride, delta, dst, outstride, width, height);
-            break;
         case config::Filter::kSuper2xsai:
             Super2xSaI32(src, instride, delta, dst, outstride, width, height);
             break;
@@ -156,9 +142,6 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
             break;
         case config::Filter::kAdvmame:
             AdMame2x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kBilinear:
-            Bilinear32(src, instride, delta, dst, outstride, width, height);
             break;
         case config::Filter::kBilinearplus:
             BilinearPlus32(src, instride, delta, dst, outstride, width, height);
@@ -172,20 +155,8 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
         case config::Filter::kLQ2x:
             lq2x32(src, instride, delta, dst, outstride, width, height);
             break;
-        case config::Filter::kSimple2x:
-            Simple2x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kSimple3x:
-            Simple3x32(src, instride, delta, dst, outstride, width, height);
-            break;
         case config::Filter::kSimple4x:
             Simple4x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kHQ2x:
-            hq2x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kHQ3x:
-            hq3x32_32(src, instride, delta, dst, outstride, width, height);
             break;
         case config::Filter::kHQ4x:
             hq4x32_32(src, instride, delta, dst, outstride, width, height);
@@ -193,17 +164,8 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
         case config::Filter::kXbrz2x:
             xbrz2x32(src, instride, delta, dst, outstride, width, height);
             break;
-        case config::Filter::kXbrz3x:
-            xbrz3x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kXbrz4x:
-            xbrz4x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kXbrz5x:
-            xbrz5x32(src, instride, delta, dst, outstride, width, height);
-            break;
-        case config::Filter::kXbrz6x:
-            xbrz6x32(src, instride, delta, dst, outstride, width, height);
+        case config::Filter::kXbrz9x:
+            xbrz9x32(src, instride, delta, dst, outstride, width, height);
             break;
         case config::Filter::kPlugin:
             // Plugin filters require RENDER_PLUGIN_INFO, not supported here

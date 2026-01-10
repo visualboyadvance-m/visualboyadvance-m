@@ -23,27 +23,18 @@ namespace config {
 // Values for kDispFilter.
 enum class Filter {
     kNone,
-    k2xsai,
     kSuper2xsai,
     kSupereagle,
     kPixelate,
     kAdvmame,
-    kBilinear,
     kBilinearplus,
     kScanlines,
     kTvmode,
-    kHQ2x,
-    kLQ2x,
-    kSimple2x,
-    kSimple3x,
-    kHQ3x,
-    kSimple4x,
     kHQ4x,
+    kLQ2x,
+    kSimple4x,
     kXbrz2x,
-    kXbrz3x,
-    kXbrz4x,
-    kXbrz5x,
-    kXbrz6x,
+    kXbrz9x,
     kPlugin,  // This must always be last.
 
     // Do not add anything under here.
