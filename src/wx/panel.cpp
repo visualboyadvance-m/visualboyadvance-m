@@ -2743,7 +2743,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 // Position near bottom of screen, scaled with filter
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
-                int y = scaled_height - (int)std::ceil(44 * scale);
+                int osd_offset = (panel->game_type() == IMAGE_GB) ? 106 : 64;
+                int y = scaled_height - (int)std::ceil(osd_offset * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
                     x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
@@ -3499,7 +3500,8 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 // Position near bottom of screen, scaled with filter
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
-                int y = scaled_height - (int)std::ceil(44 * scale);
+                int osd_offset = (panel->game_type() == IMAGE_GB) ? 106 : 64;
+                int y = scaled_height - (int)std::ceil(osd_offset * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
                     x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
@@ -4942,7 +4944,8 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 // Position near bottom of screen, scaled with filter
                 // At scale=1.0 (native res): positioned to allow 3 lines of text
                 int x = (int)std::ceil(4 * scale);
-                int y = scaled_height - (int)std::ceil(44 * scale);
+                int osd_offset = (panel->game_type() == IMAGE_GB) ? 106 : 64;
+                int y = scaled_height - (int)std::ceil(osd_offset * scale);
                 drawTextWx(todraw + outstride * (systemColorDepth != 24), outstride,
                     x, y, panel->osdtext, scaled_width, scaled_height, scale);
             } else
