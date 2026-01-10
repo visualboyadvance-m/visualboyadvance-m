@@ -1010,10 +1010,12 @@ if(UPSTREAM_RELEASE AND WIN32)
     # rewrite backslashes to slashes, needed for msys osslsigncode
     string(REGEX REPLACE "\\\\" "/" home "${home}")
 
-    set(cert "${home}/.codesign/windows_comodo.pkcs12")
-    file(STRINGS "${home}/.codesign/windows_comodo.pkcs12.password" cert_password)
+    set(cert               "${home}/.codesign/windows_comodo.pkcs12")
+    set(cert_password_file "${home}/.codesign/windows_comodo.pkcs12.password")
 
-    if(EXISTS "${cert}" AND cert_password)
+    if(EXISTS "${cert}" AND EXISTS "${cert_password_file}")
+        file(STRINGS "${cert_password_file}" cert_password)
+
         find_program(OSSLSIGNCODE_PROGRAM osslsigncode)
         find_program(SIGNTOOL_PROGRAM     signtool)
 
