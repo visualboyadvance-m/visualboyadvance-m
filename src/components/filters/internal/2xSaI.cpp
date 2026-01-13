@@ -232,33 +232,53 @@ static inline uint32_t Q_INTERPOLATE(uint32_t A, uint32_t B, uint32_t C, uint32_
 #define RED_MASK555 0x7C007C00
 #define GREEN_MASK555 0x03E003E0
 
+// Helper functions for safe pixel access with boundary clamping
+static inline int ClampX(int x, int width) {
+    return (x < 0) ? 0 : (x >= width) ? width - 1 : x;
+}
+
+static inline int ClampY(int y, int height) {
+    return (y < 0) ? 0 : (y >= height) ? height - 1 : y;
+}
+
+// Safe 16-bit pixel access
+static inline uint16_t GetPixel16(const uint16_t* src, int srcPitch16, int x, int y, int width, int height) {
+    x = ClampX(x, width);
+    y = ClampY(y, height);
+    return src[y * srcPitch16 + x];
+}
+
+// Safe 32-bit pixel access
+static inline uint32_t GetPixel32(const uint32_t* src, int srcPitch32, int x, int y, int width, int height) {
+    x = ClampX(x, width);
+    y = ClampY(y, height);
+    return src[y * srcPitch32 + x];
+}
+
 void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
                  [[maybe_unused]] uint8_t *deltaPtr, uint8_t *dstPtr, uint32_t dstPitch,
                  int width, int height)
 {
-  uint16_t *bP;
   uint8_t  *dP;
-  uint32_t inc_bP;
   uint32_t Nextline = srcPitch >> 1;
 #ifdef MMX
   if (cpu_mmx) {
-    for (; height; height--) {
-      _2xSaISuper2xSaILine (srcPtr, deltaPtr, srcPitch, width,
-                            dstPtr, dstPitch);
-      srcPtr += srcPitch;
-      dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
+    for (int row = 0; row < height; row++) {
+      _2xSaISuper2xSaILine (srcPtr + row * srcPitch, deltaPtr + row * srcPitch,
+                            srcPitch, width, dstPtr + row * dstPitch * 2, dstPitch);
     }
   } else
 #endif
     {
-      inc_bP = 1;
 
-      for (; height; height--) {
-        bP = (uint16_t *) srcPtr;
-        dP = (uint8_t *) dstPtr;
+      const uint16_t* src = reinterpret_cast<const uint16_t*>(srcPtr);
+      int srcPitch16 = static_cast<int>(Nextline);
+      int originalHeight = height;
 
-        for (uint32_t finish = width; finish; finish -= inc_bP) {
+      for (int y = 0; y < originalHeight; y++) {
+        dP = dstPtr + y * (dstPitch << 1);
+
+        for (int x = 0; x < width; x++) {
           uint32_t color4, color5, color6;
           uint32_t color1, color2, color3;
           uint32_t colorA0, colorA1, colorA2, colorA3,
@@ -270,25 +290,25 @@ void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
           //                                         1  2  3 S1
           //                                           A1 A2
 
-          colorB0 = *(bP - Nextline - 1);
-          colorB1 = *(bP - Nextline);
-          colorB2 = *(bP - Nextline + 1);
-          colorB3 = *(bP - Nextline + 2);
+          colorB0 = GetPixel16(src, srcPitch16, x - 1, y - 1, width, originalHeight);
+          colorB1 = GetPixel16(src, srcPitch16, x,     y - 1, width, originalHeight);
+          colorB2 = GetPixel16(src, srcPitch16, x + 1, y - 1, width, originalHeight);
+          colorB3 = GetPixel16(src, srcPitch16, x + 2, y - 1, width, originalHeight);
 
-          color4 = *(bP - 1);
-          color5 = *(bP);
-          color6 = *(bP + 1);
-          colorS2 = *(bP + 2);
+          color4 = GetPixel16(src, srcPitch16, x - 1, y, width, originalHeight);
+          color5 = GetPixel16(src, srcPitch16, x,     y, width, originalHeight);
+          color6 = GetPixel16(src, srcPitch16, x + 1, y, width, originalHeight);
+          colorS2 = GetPixel16(src, srcPitch16, x + 2, y, width, originalHeight);
 
-          color1 = *(bP + Nextline - 1);
-          color2 = *(bP + Nextline);
-          color3 = *(bP + Nextline + 1);
-          colorS1 = *(bP + Nextline + 2);
+          color1 = GetPixel16(src, srcPitch16, x - 1, y + 1, width, originalHeight);
+          color2 = GetPixel16(src, srcPitch16, x,     y + 1, width, originalHeight);
+          color3 = GetPixel16(src, srcPitch16, x + 1, y + 1, width, originalHeight);
+          colorS1 = GetPixel16(src, srcPitch16, x + 2, y + 1, width, originalHeight);
 
-          colorA0 = *(bP + Nextline + Nextline - 1);
-          colorA1 = *(bP + Nextline + Nextline);
-          colorA2 = *(bP + Nextline + Nextline + 1);
-          colorA3 = *(bP + Nextline + Nextline + 2);
+          colorA0 = GetPixel16(src, srcPitch16, x - 1, y + 2, width, originalHeight);
+          colorA1 = GetPixel16(src, srcPitch16, x,     y + 2, width, originalHeight);
+          colorA2 = GetPixel16(src, srcPitch16, x + 1, y + 2, width, originalHeight);
+          colorA3 = GetPixel16(src, srcPitch16, x + 2, y + 2, width, originalHeight);
 
           //--------------------------------------
           if (color2 == color6 && color5 != color3) {
@@ -365,14 +385,9 @@ void Super2xSaI (uint8_t *srcPtr, uint32_t srcPitch,
           *((uint32_t *) dP) = product1a;
           *((uint32_t *) (dP + dstPitch)) = product2a;
 
-          bP += inc_bP;
           dP += sizeof (uint32_t);
-        }                       // end of for ( finish= width etc..)
-
-        srcPtr   += srcPitch;
-        dstPtr   += dstPitch << 1;
-        deltaPtr += srcPitch;
-      }                 // endof: for (; height; height--)
+        }                       // end of for ( x < width )
+      }                 // endof: for (y < originalHeight)
     }
 }
 
@@ -380,17 +395,16 @@ void Super2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch,
                    uint8_t * /* deltaPtr */, uint8_t *dstPtr, uint32_t dstPitch,
                    int width, int height)
 {
-  uint32_t *bP;
   uint32_t *dP;
-  uint32_t inc_bP;
   uint32_t Nextline = srcPitch >> 2;
-  inc_bP = 1;
 
-  for (; height; height--) {
-    bP = (uint32_t *) srcPtr;
-    dP = (uint32_t *) dstPtr;
+  const uint32_t* src = reinterpret_cast<const uint32_t*>(srcPtr);
+  int srcPitch32 = static_cast<int>(Nextline);
 
-    for (uint32_t finish = width; finish; finish -= inc_bP) {
+  for (int y = 0; y < height; y++) {
+    dP = reinterpret_cast<uint32_t*>(dstPtr + y * (dstPitch << 1));
+
+    for (int x = 0; x < width; x++) {
       uint32_t color4, color5, color6;
       uint32_t color1, color2, color3;
       uint32_t colorA0, colorA1, colorA2, colorA3,
@@ -402,25 +416,25 @@ void Super2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch,
       //                                         1  2  3 S1
       //                                           A1 A2
 
-      colorB0 = *(bP - Nextline - 1);
-      colorB1 = *(bP - Nextline);
-      colorB2 = *(bP - Nextline + 1);
-      colorB3 = *(bP - Nextline + 2);
+      colorB0 = GetPixel32(src, srcPitch32, x - 1, y - 1, width, height);
+      colorB1 = GetPixel32(src, srcPitch32, x,     y - 1, width, height);
+      colorB2 = GetPixel32(src, srcPitch32, x + 1, y - 1, width, height);
+      colorB3 = GetPixel32(src, srcPitch32, x + 2, y - 1, width, height);
 
-      color4 = *(bP - 1);
-      color5 = *(bP);
-      color6 = *(bP + 1);
-      colorS2 = *(bP + 2);
+      color4 = GetPixel32(src, srcPitch32, x - 1, y, width, height);
+      color5 = GetPixel32(src, srcPitch32, x,     y, width, height);
+      color6 = GetPixel32(src, srcPitch32, x + 1, y, width, height);
+      colorS2 = GetPixel32(src, srcPitch32, x + 2, y, width, height);
 
-      color1 = *(bP + Nextline - 1);
-      color2 = *(bP + Nextline);
-      color3 = *(bP + Nextline + 1);
-      colorS1 = *(bP + Nextline + 2);
+      color1 = GetPixel32(src, srcPitch32, x - 1, y + 1, width, height);
+      color2 = GetPixel32(src, srcPitch32, x,     y + 1, width, height);
+      color3 = GetPixel32(src, srcPitch32, x + 1, y + 1, width, height);
+      colorS1 = GetPixel32(src, srcPitch32, x + 2, y + 1, width, height);
 
-      colorA0 = *(bP + Nextline + Nextline - 1);
-      colorA1 = *(bP + Nextline + Nextline);
-      colorA2 = *(bP + Nextline + Nextline + 1);
-      colorA3 = *(bP + Nextline + Nextline + 2);
+      colorA0 = GetPixel32(src, srcPitch32, x - 1, y + 2, width, height);
+      colorA1 = GetPixel32(src, srcPitch32, x,     y + 2, width, height);
+      colorA2 = GetPixel32(src, srcPitch32, x + 1, y + 2, width, height);
+      colorA3 = GetPixel32(src, srcPitch32, x + 2, y + 2, width, height);
 
       //--------------------------------------
       if (color2 == color6 && color5 != color3) {
@@ -490,71 +504,57 @@ void Super2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch,
       *(dP + (dstPitch >> 2)) = product2a;
       *(dP + (dstPitch >> 2) + 1) = product2b;
 
-      bP += inc_bP;
       dP += 2;
-    }                       // end of for ( finish= width etc..)
-
-    srcPtr   += srcPitch;
-    dstPtr   += dstPitch << 1;
-    //        deltaPtr += srcPitch;
-  }                 // endof: for (; height; height--)
+    }                       // end of for ( x < width )
+  }                 // endof: for (y < height)
 }
 
 void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
                  uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
   uint8_t  *dP;
-  uint16_t *bP;
   uint16_t *xP;
-  uint32_t inc_bP;
   bool hasDelta = (deltaPtr != nullptr);
 
 #ifdef MMX
   if (cpu_mmx && hasDelta) {
-    for (; height; height--) {
-      _2xSaISuperEagleLine (srcPtr, deltaPtr, srcPitch, width,
-                            dstPtr, dstPitch);
-      srcPtr += srcPitch;
-      dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
+    for (int row = 0; row < height; row++) {
+      _2xSaISuperEagleLine (srcPtr + row * srcPitch, deltaPtr + row * srcPitch,
+                            srcPitch, width, dstPtr + row * dstPitch * 2, dstPitch);
     }
   } else
 #endif
   {
-    inc_bP = 1;
-
     uint32_t Nextline = srcPitch >> 1;
+    const uint16_t* src = reinterpret_cast<const uint16_t*>(srcPtr);
+    int srcPitch16 = static_cast<int>(Nextline);
 
-    for (; height; height--) {
-      bP = (uint16_t *) srcPtr;
-      xP = hasDelta ? (uint16_t *) deltaPtr : nullptr;
-      dP = dstPtr;
-      
-      for (uint32_t finish = width; finish; finish -= inc_bP) {
+    for (int y = 0; y < height; y++) {
+      xP = hasDelta ? reinterpret_cast<uint16_t*>(deltaPtr + y * srcPitch) : nullptr;
+      dP = dstPtr + y * (dstPitch << 1);
+
+      for (int x = 0; x < width; x++) {
         uint32_t color4, color5, color6;
         uint32_t color1, color2, color3;
         uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
         uint32_t product1a, product1b, product2a, product2b;
 
-        // Calculate current pixel position relative to width
-        uint32_t currentPos = width - finish;
+        // Safe boundary-clamped pixel access
+        colorB1 = GetPixel16(src, srcPitch16, x,     y - 1, width, height);
+        colorB2 = GetPixel16(src, srcPitch16, x + 1, y - 1, width, height);
 
-        // Safe boundary checks
-        colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
-        colorB2 = (height > 0 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP - Nextline + 1) : colorB1;
+        color4 = GetPixel16(src, srcPitch16, x - 1, y, width, height);
+        color5 = GetPixel16(src, srcPitch16, x,     y, width, height);
+        color6 = GetPixel16(src, srcPitch16, x + 1, y, width, height);
+        colorS2 = GetPixel16(src, srcPitch16, x + 2, y, width, height);
 
-        color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
-        color5 = *(bP);
-        color6 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + 1) : color5;
-        colorS2 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + 2) : color6;
+        color1 = GetPixel16(src, srcPitch16, x - 1, y + 1, width, height);
+        color2 = GetPixel16(src, srcPitch16, x,     y + 1, width, height);
+        color3 = GetPixel16(src, srcPitch16, x + 1, y + 1, width, height);
+        colorS1 = GetPixel16(src, srcPitch16, x + 2, y + 1, width, height);
 
-        color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
-        color2 = *(bP + Nextline);
-        color3 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + 1) : color2;
-        colorS1 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + Nextline + 2) : color3;
-
-        colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
-        colorA2 = (height > 1 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + Nextline + 1) : colorA1;
+        colorA1 = GetPixel16(src, srcPitch16, x,     y + 2, width, height);
+        colorA2 = GetPixel16(src, srcPitch16, x + 1, y + 2, width, height);
 
         // --------------------------------------
         if (color2 == color6 && color5 != color3) {
@@ -639,17 +639,11 @@ void SuperEagle (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
 
         *((uint32_t *) dP) = product1a;
         *((uint32_t *) (dP + dstPitch)) = product2a;
-        if (xP) *xP = (uint16_t)color5;
+        if (xP) { *xP = (uint16_t)color5; xP++; }
 
-        bP += inc_bP;
-        if (xP) xP += inc_bP;
         dP += sizeof (uint32_t);
-      }                 // end of for ( finish= width etc..)
-
-      srcPtr += srcPitch;
-      dstPtr += dstPitch << 1;
-      if (hasDelta) deltaPtr += srcPitch;
-    }                   // endof: for (height; height; height--)
+      }                 // end of for ( x < width )
+    }                   // endof: for (y < height)
   }
 }
 
@@ -657,45 +651,39 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
                    uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
   uint32_t  *dP;
-  uint32_t *bP;
   uint32_t *xP;
-  uint32_t inc_bP;
   bool hasDelta = (deltaPtr != nullptr);
 
-  inc_bP = 1;
-
   uint32_t Nextline = srcPitch >> 2;
+  const uint32_t* src = reinterpret_cast<const uint32_t*>(srcPtr);
+  int srcPitch32 = static_cast<int>(Nextline);
 
-  for (; height; height--) {
-    bP = (uint32_t *) srcPtr;
-    xP = hasDelta ? (uint32_t *) deltaPtr : nullptr;
-    dP = (uint32_t *)dstPtr;
-    
-    for (uint32_t finish = width; finish; finish -= inc_bP) {
+  for (int y = 0; y < height; y++) {
+    xP = hasDelta ? reinterpret_cast<uint32_t*>(deltaPtr + y * srcPitch) : nullptr;
+    dP = reinterpret_cast<uint32_t*>(dstPtr + y * (dstPitch << 1));
+
+    for (int x = 0; x < width; x++) {
       uint32_t color4, color5, color6;
       uint32_t color1, color2, color3;
       uint32_t colorA1, colorA2, colorB1, colorB2, colorS1, colorS2;
       uint32_t product1a, product1b, product2a, product2b;
 
-      // Calculate current pixel position relative to width
-      uint32_t currentPos = width - finish;
+      // Safe boundary-clamped pixel access
+      colorB1 = GetPixel32(src, srcPitch32, x,     y - 1, width, height);
+      colorB2 = GetPixel32(src, srcPitch32, x + 1, y - 1, width, height);
 
-      // Safe boundary checks
-      colorB1 = (height > 0) ? *(bP - Nextline) : *(bP);
-      colorB2 = (height > 0 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP - Nextline + 1) : colorB1;
+      color4 = GetPixel32(src, srcPitch32, x - 1, y, width, height);
+      color5 = GetPixel32(src, srcPitch32, x,     y, width, height);
+      color6 = GetPixel32(src, srcPitch32, x + 1, y, width, height);
+      colorS2 = GetPixel32(src, srcPitch32, x + 2, y, width, height);
 
-      color4 = (currentPos > 0) ? *(bP - 1) : *(bP);
-      color5 = *(bP);
-      color6 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + 1) : color5;
-      colorS2 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + 2) : color6;
+      color1 = GetPixel32(src, srcPitch32, x - 1, y + 1, width, height);
+      color2 = GetPixel32(src, srcPitch32, x,     y + 1, width, height);
+      color3 = GetPixel32(src, srcPitch32, x + 1, y + 1, width, height);
+      colorS1 = GetPixel32(src, srcPitch32, x + 2, y + 1, width, height);
 
-      color1 = (currentPos > 0) ? *(bP + Nextline - 1) : *(bP + Nextline);
-      color2 = *(bP + Nextline);
-      color3 = (currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + 1) : color2;
-      colorS1 = (currentPos < static_cast<uint32_t>(width - 2)) ? *(bP + Nextline + 2) : color3;
-
-      colorA1 = (height > 1) ? *(bP + Nextline + Nextline) : color2;
-      colorA2 = (height > 1 && currentPos < static_cast<uint32_t>(width - 1)) ? *(bP + Nextline + Nextline + 1) : colorA1;
+      colorA1 = GetPixel32(src, srcPitch32, x,     y + 2, width, height);
+      colorA2 = GetPixel32(src, srcPitch32, x + 1, y + 2, width, height);
 
       // --------------------------------------
       // 32-bit mode uses INTERPOLATE for LCD filter compatibility
@@ -776,46 +764,35 @@ void SuperEagle32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *deltaPtr,
       *(dP+1) = product1b;
       *(dP + (dstPitch >> 2)) = product2a;
       *(dP + (dstPitch >> 2) +1) = product2b;
-      if (xP) *xP = color5;
+      if (xP) { *xP = color5; xP++; }
 
-      bP += inc_bP;
-      if (xP) xP += inc_bP;
       dP += 2;
-    }                 // end of for ( finish= width etc..)
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    if (hasDelta) deltaPtr += srcPitch;
-  }                   // endof: for (height; height; height--)
+    }                 // end of for ( x < width )
+  }                   // endof: for (y < height)
 }
 
 void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, [[maybe_unused]] uint8_t *deltaPtr,
              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
   uint8_t  *dP;
-  uint16_t *bP;
-  uint32_t inc_bP;
 
 #ifdef MMX
   if (cpu_mmx) {
-    for (; height; height -= 1) {
-      _2xSaILine (srcPtr, deltaPtr, srcPitch, width, dstPtr, dstPitch);
-      srcPtr += srcPitch;
-      dstPtr += dstPitch * 2;
-      deltaPtr += srcPitch;
+    for (int row = 0; row < height; row++) {
+      _2xSaILine (srcPtr + row * srcPitch, deltaPtr + row * srcPitch,
+                  srcPitch, width, dstPtr + row * dstPitch * 2, dstPitch);
     }
   } else
 #endif
   {
-    inc_bP = 1;
-
     uint32_t Nextline = srcPitch >> 1;
+    const uint16_t* src = reinterpret_cast<const uint16_t*>(srcPtr);
+    int srcPitch16 = static_cast<int>(Nextline);
 
-    for (; height; height--) {
-      bP = (uint16_t *) srcPtr;
-      dP = dstPtr;
+    for (int y = 0; y < height; y++) {
+      dP = dstPtr + y * (dstPitch << 1);
 
-      for (uint32_t finish = width; finish; finish -= inc_bP) {
+      for (int x = 0; x < width; x++) {
 
         uint32_t colorA, colorB;
         uint32_t colorC, colorD,
@@ -830,25 +807,25 @@ void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, [[maybe_unused]] uint8_t *delta
         //                                       G|A B|K
         //                                       H|C D|L
         //                                       M|N O|P
-        colorI = *(bP - Nextline - 1);
-        colorE = *(bP - Nextline);
-        colorF = *(bP - Nextline + 1);
-        colorJ = *(bP - Nextline + 2);
+        colorI = GetPixel16(src, srcPitch16, x - 1, y - 1, width, height);
+        colorE = GetPixel16(src, srcPitch16, x,     y - 1, width, height);
+        colorF = GetPixel16(src, srcPitch16, x + 1, y - 1, width, height);
+        colorJ = GetPixel16(src, srcPitch16, x + 2, y - 1, width, height);
 
-        colorG = *(bP - 1);
-        colorA = *(bP);
-        colorB = *(bP + 1);
-        colorK = *(bP + 2);
+        colorG = GetPixel16(src, srcPitch16, x - 1, y, width, height);
+        colorA = GetPixel16(src, srcPitch16, x,     y, width, height);
+        colorB = GetPixel16(src, srcPitch16, x + 1, y, width, height);
+        colorK = GetPixel16(src, srcPitch16, x + 2, y, width, height);
 
-        colorH = *(bP + Nextline - 1);
-        colorC = *(bP + Nextline);
-        colorD = *(bP + Nextline + 1);
-        colorL = *(bP + Nextline + 2);
+        colorH = GetPixel16(src, srcPitch16, x - 1, y + 1, width, height);
+        colorC = GetPixel16(src, srcPitch16, x,     y + 1, width, height);
+        colorD = GetPixel16(src, srcPitch16, x + 1, y + 1, width, height);
+        colorL = GetPixel16(src, srcPitch16, x + 2, y + 1, width, height);
 
-        colorM = *(bP + Nextline + Nextline - 1);
-        colorN = *(bP + Nextline + Nextline);
-        colorO = *(bP + Nextline + Nextline + 1);
-        colorP = *(bP + Nextline + Nextline + 2);
+        colorM = GetPixel16(src, srcPitch16, x - 1, y + 2, width, height);
+        colorN = GetPixel16(src, srcPitch16, x,     y + 2, width, height);
+        colorO = GetPixel16(src, srcPitch16, x + 1, y + 2, width, height);
+        colorP = GetPixel16(src, srcPitch16, x + 2, y + 2, width, height);
 
         if ((colorA == colorD) && (colorB != colorC)) {
           if (((colorA == colorE) && (colorB == colorL)) ||
@@ -952,14 +929,9 @@ void _2xSaI (uint8_t *srcPtr, uint32_t srcPitch, [[maybe_unused]] uint8_t *delta
         *((int32_t *) dP) = product;
         *((uint32_t *) (dP + dstPitch)) = product1;
 
-        bP += inc_bP;
         dP += sizeof (uint32_t);
-      }                 // end of for ( finish= width etc..)
-
-      srcPtr += srcPitch;
-      dstPtr += dstPitch << 1;
-      deltaPtr += srcPitch;
-    }                   // endof: for (height; height; height--)
+      }                 // end of for ( x < width )
+    }                   // endof: for (y < height)
   }
 }
 
@@ -967,16 +939,15 @@ void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
   uint32_t  *dP;
-  uint32_t *bP;
-  uint32_t inc_bP = 1;
 
   uint32_t Nextline = srcPitch >> 2;
+  const uint32_t* src = reinterpret_cast<const uint32_t*>(srcPtr);
+  int srcPitch32 = static_cast<int>(Nextline);
 
-  for (; height; height--) {
-    bP = (uint32_t *) srcPtr;
-    dP = (uint32_t *) dstPtr;
+  for (int y = 0; y < height; y++) {
+    dP = reinterpret_cast<uint32_t*>(dstPtr + y * (dstPitch << 1));
 
-    for (uint32_t finish = width; finish; finish -= inc_bP) {
+    for (int x = 0; x < width; x++) {
       uint32_t colorA, colorB;
       uint32_t colorC, colorD,
         colorE, colorF, colorG, colorH,
@@ -990,25 +961,25 @@ void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
       //                                       G|A B|K
       //                                       H|C D|L
       //                                       M|N O|P
-      colorI = *(bP - Nextline - 1);
-      colorE = *(bP - Nextline);
-      colorF = *(bP - Nextline + 1);
-      colorJ = *(bP - Nextline + 2);
+      colorI = GetPixel32(src, srcPitch32, x - 1, y - 1, width, height);
+      colorE = GetPixel32(src, srcPitch32, x,     y - 1, width, height);
+      colorF = GetPixel32(src, srcPitch32, x + 1, y - 1, width, height);
+      colorJ = GetPixel32(src, srcPitch32, x + 2, y - 1, width, height);
 
-      colorG = *(bP - 1);
-      colorA = *(bP);
-      colorB = *(bP + 1);
-      colorK = *(bP + 2);
+      colorG = GetPixel32(src, srcPitch32, x - 1, y, width, height);
+      colorA = GetPixel32(src, srcPitch32, x,     y, width, height);
+      colorB = GetPixel32(src, srcPitch32, x + 1, y, width, height);
+      colorK = GetPixel32(src, srcPitch32, x + 2, y, width, height);
 
-      colorH = *(bP + Nextline - 1);
-      colorC = *(bP + Nextline);
-      colorD = *(bP + Nextline + 1);
-      colorL = *(bP + Nextline + 2);
+      colorH = GetPixel32(src, srcPitch32, x - 1, y + 1, width, height);
+      colorC = GetPixel32(src, srcPitch32, x,     y + 1, width, height);
+      colorD = GetPixel32(src, srcPitch32, x + 1, y + 1, width, height);
+      colorL = GetPixel32(src, srcPitch32, x + 2, y + 1, width, height);
 
-      colorM = *(bP + Nextline + Nextline - 1);
-      colorN = *(bP + Nextline + Nextline);
-      colorO = *(bP + Nextline + Nextline + 1);
-      colorP = *(bP + Nextline + Nextline + 2);
+      colorM = GetPixel32(src, srcPitch32, x - 1, y + 2, width, height);
+      colorN = GetPixel32(src, srcPitch32, x,     y + 2, width, height);
+      colorO = GetPixel32(src, srcPitch32, x + 1, y + 2, width, height);
+      colorP = GetPixel32(src, srcPitch32, x + 2, y + 2, width, height);
 
       if ((colorA == colorD) && (colorB != colorC)) {
         if (((colorA == colorE) && (colorB == colorL)) ||
@@ -1106,14 +1077,9 @@ void _2xSaI32 (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
       *(dP + (dstPitch >> 2)) = product1;
       *(dP + (dstPitch >> 2) + 1) = product2;
 
-      bP += inc_bP;
       dP += 2;
-    }                 // end of for ( finish= width etc..)
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    //    deltaPtr += srcPitch;
-  }                   // endof: for (height; height; height--)
+    }                 // end of for ( x < width )
+  }                   // endof: for (y < height)
 }
 
 static uint32_t Bilinear (uint32_t A, uint32_t B, uint32_t x)
@@ -1165,7 +1131,6 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
                   uint32_t dstWidth, uint32_t dstHeight, int width, int height)
 {
   uint8_t  *dP;
-  uint16_t *bP;
 
   uint32_t w;
   uint32_t h;
@@ -1175,6 +1140,8 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
   uint32_t wfinish;
 
   uint32_t Nextline = srcPitch >> 1;
+  const uint16_t* src = reinterpret_cast<const uint16_t*>(srcPtr);
+  int srcPitch16 = static_cast<int>(Nextline);
 
   wfinish = (width - 1) << 16;  // convert to fixed point
   dw = wfinish / (dstWidth - 1);
@@ -1185,7 +1152,7 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     uint32_t y1, y2;
 
     y1 = h & 0xffff;    // fraction part of fixed point
-    bP = (uint16_t *) (srcPtr + ((h >> 16) * srcPitch));
+    int srcY = static_cast<int>(h >> 16);
     dP = dstPtr;
     y2 = 0x10000 - y1;
 
@@ -1196,21 +1163,23 @@ void Scale_2xSaI (uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
       uint32_t E, F, G, H;
       uint32_t I, J, K, L;
       uint32_t x1, x2, a1, f1, f2;
-      uint32_t position, product1 = 0;
+      uint32_t product1 = 0;
 
-      position = w >> 16;
-      A = bP[position]; // current pixel
-      B = bP[position + 1];     // next pixel
-      C = bP[position + Nextline];
-      D = bP[position + Nextline + 1];
-      E = bP[position - Nextline];
-      F = bP[position - Nextline + 1];
-      G = bP[position - 1];
-      H = bP[position + Nextline - 1];
-      I = bP[position + 2];
-      J = bP[position + Nextline + 2];
-      K = bP[position + Nextline + Nextline];
-      L = bP[position + Nextline + Nextline + 1];
+      int srcX = static_cast<int>(w >> 16);
+
+      // Safe boundary-clamped pixel access
+      A = GetPixel16(src, srcPitch16, srcX,     srcY,     width, height);
+      B = GetPixel16(src, srcPitch16, srcX + 1, srcY,     width, height);
+      C = GetPixel16(src, srcPitch16, srcX,     srcY + 1, width, height);
+      D = GetPixel16(src, srcPitch16, srcX + 1, srcY + 1, width, height);
+      E = GetPixel16(src, srcPitch16, srcX,     srcY - 1, width, height);
+      F = GetPixel16(src, srcPitch16, srcX + 1, srcY - 1, width, height);
+      G = GetPixel16(src, srcPitch16, srcX - 1, srcY,     width, height);
+      H = GetPixel16(src, srcPitch16, srcX - 1, srcY + 1, width, height);
+      I = GetPixel16(src, srcPitch16, srcX + 2, srcY,     width, height);
+      J = GetPixel16(src, srcPitch16, srcX + 2, srcY + 1, width, height);
+      K = GetPixel16(src, srcPitch16, srcX,     srcY + 2, width, height);
+      L = GetPixel16(src, srcPitch16, srcX + 1, srcY + 2, width, height);
 
       x1 = w & 0xffff;  // fraction part of fixed point
       x2 = 0x10000 - x1;
