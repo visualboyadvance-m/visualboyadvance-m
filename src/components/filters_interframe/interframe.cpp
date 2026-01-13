@@ -333,28 +333,27 @@ static void SmartIB32_SSE2(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, 
             // Save current to frm3 (oldest buffer gets newest frame)
             _mm_storeu_si128(reinterpret_cast<__m128i*>(&frm3[x]), src0);
 
-            // Smart IB logic with simplified oscillation detection:
+            // Smart IB logic: Only blend pixels that CHANGED from previous frame
+            // AND show oscillation pattern (similar to older frames).
+            // This prevents static pixels from being incorrectly blended when
+            // adjacent scrolling content happens to match history.
             //
-            // Blend if pixel changed from previous frame AND is similar to any
-            // older frame (indicating oscillation/flickering):
-            //   changed = (src0 ~!= src1)  - current differs from previous
-            //   oscillates = (src0 ~== src2) || (src0 ~== src3) ||
-            //                (src1 ~== src2) || (src1 ~== src3)
-            //   blend = changed && oscillates
+            // changed = (src0 ~!= src1)  - current differs from previous
+            // oscillates = (src0 ~== src2) || (src0 ~== src3)
+            // blend = changed && oscillates
 
+            // First check if pixel changed from previous frame
+            __m128i changed = ColorsDifferent32_SSE2(src0, src1, threshold);
+
+            // Check oscillation: current similar to 2 or 3 frames ago (A->B->A pattern)
             __m128i similar_0_2 = ColorsSimilar32_SSE2(src0, src2, threshold);
             __m128i similar_0_3 = ColorsSimilar32_SSE2(src0, src3, threshold);
-            __m128i similar_1_2 = ColorsSimilar32_SSE2(src1, src2, threshold);
-            __m128i similar_1_3 = ColorsSimilar32_SSE2(src1, src3, threshold);
-
-            // oscillates = any similarity to older frames at same position
-            __m128i osc1 = _mm_or_si128(similar_0_2, similar_0_3);
-            __m128i osc2 = _mm_or_si128(similar_1_2, similar_1_3);
-            __m128i oscillates = _mm_or_si128(osc1, osc2);
+            __m128i oscillates = _mm_or_si128(similar_0_2, similar_0_3);
 
             // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            if (x >= 3 && x + 7 <= sPitch) {
+            // ONLY if pixel changed - prevents static edge artifacts
+            // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+            if (x >= 2 && x + 6 <= sPitch) {
                 __m128i neighbor_osc = _mm_setzero_si128();
 
                 // Check ±1 pixel offsets
@@ -373,23 +372,15 @@ static void SmartIB32_SSE2(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, 
                     _mm_or_si128(ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm3[x-2])), threshold),
                                  ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm3[x+2])), threshold)));
 
-                // Check ±3 pixel offsets
-                neighbor_osc = _mm_or_si128(neighbor_osc,
-                    _mm_or_si128(ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm2[x-3])), threshold),
-                                 ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm2[x+3])), threshold)));
-                neighbor_osc = _mm_or_si128(neighbor_osc,
-                    _mm_or_si128(ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm3[x-3])), threshold),
-                                 ColorsSimilar32_SSE2(src0, _mm_loadu_si128(reinterpret_cast<const __m128i*>(&frm3[x+3])), threshold)));
-
-                oscillates = _mm_or_si128(oscillates, neighbor_osc);
+                // Neighbor oscillation only counts if pixel changed
+                oscillates = _mm_or_si128(oscillates, _mm_and_si128(changed, neighbor_osc));
             }
 
-            // blend = oscillates (blend any pixel showing oscillation pattern)
-            // Removing "changed" requirement for more consistent blending
-            __m128i blend_mask = oscillates;
+            // blend = changed && oscillates
+            // Only blend pixels that actually changed AND show oscillation
+            __m128i blend_mask = _mm_and_si128(changed, oscillates);
 
             // Calculate blended value: average current and previous frame
-            // Using 2-frame average preserves scroll motion better than 4-frame
             __m128i src0_masked = _mm_and_si128(src0, colorMask);
             __m128i src1_masked = _mm_and_si128(src1, colorMask);
             __m128i blended = _mm_add_epi32(_mm_srli_epi32(src0_masked, 1),
@@ -403,30 +394,34 @@ static void SmartIB32_SSE2(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, 
         }
 #endif
 
-        // Scalar tail (with neighbor-aware oscillation detection for scrolling)
+        // Scalar tail
         for (; x < sPitch; x++) {
             uint32_t color = src[x];
 
-            // Check oscillation at current position
-            bool oscillates = ColorsSimilar32(color, frm2[x], kColorThreshold) ||
-                              ColorsSimilar32(color, frm3[x], kColorThreshold) ||
-                              ColorsSimilar32(frm1[x], frm2[x], kColorThreshold) ||
-                              ColorsSimilar32(frm1[x], frm3[x], kColorThreshold);
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent32(color, frm1[x], kColorThreshold);
 
-            // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            if (!oscillates && x >= 3 && x < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    oscillates = ColorsSimilar32(color, frm2[x-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm2[x+offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm3[x-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm3[x+offset], kColorThreshold);
+            // Only consider oscillation if pixel actually changed
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar32(color, frm2[x], kColorThreshold) ||
+                             ColorsSimilar32(color, frm3[x], kColorThreshold);
+
+                // Also check neighbors in history (for scrolling content)
+                // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+                if (!oscillates && x >= 2 && x < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        oscillates = ColorsSimilar32(color, frm2[x-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm2[x+offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm3[x-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm3[x+offset], kColorThreshold);
+                    }
                 }
             }
 
             frm3[x] = color;
             if (oscillates) {
-                // 2-frame average preserves scroll motion better
                 src[x] = ((color & 0xFEFEFE) >> 1) + ((frm1[x] & 0xFEFEFE) >> 1);
             }
         }
@@ -484,6 +479,13 @@ static inline __m64 MMX_ColorsSimilar32(__m64 a, __m64 b, __m64 threshold, __m64
     return _mm_cmpeq_pi32(exceeds, zero);
 }
 
+// MMX helper: check if two 32-bit colors are different (any RGB byte exceeds threshold)
+static inline __m64 MMX_ColorsDifferent32(__m64 a, __m64 b, __m64 threshold, __m64 alphaMask) {
+    __m64 similar = MMX_ColorsSimilar32(a, b, threshold, alphaMask);
+    __m64 ones = _mm_set1_pi32(-1);
+    return _mm_xor_si64(similar, ones);  // NOT similar = different
+}
+
 static void SmartIB32_MMX(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, uint8_t* frm3Ptr,
                           uint32_t srcPitch, int width, int starty, int height) {
     (void)width;
@@ -512,47 +514,41 @@ static void SmartIB32_MMX(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, u
             // Save current to frm3 (oldest buffer gets newest frame)
             *reinterpret_cast<__m64*>(&frm3[x]) = src0;
 
-            // Check oscillation: similar to any older frame
+            // First check if pixel changed from previous frame
+            __m64 changed = MMX_ColorsDifferent32(src0, src1, threshold, alphaMask);
+
+            // Check oscillation: current similar to 2 or 3 frames ago (A->B->A pattern)
             __m64 similar_0_2 = MMX_ColorsSimilar32(src0, src2, threshold, alphaMask);
             __m64 similar_0_3 = MMX_ColorsSimilar32(src0, src3, threshold, alphaMask);
-            __m64 similar_1_2 = MMX_ColorsSimilar32(src1, src2, threshold, alphaMask);
-            __m64 similar_1_3 = MMX_ColorsSimilar32(src1, src3, threshold, alphaMask);
+            __m64 oscillates = _mm_or_si64(similar_0_2, similar_0_3);
 
-            // oscillates = any similarity to older frames
-            __m64 oscillates = _mm_or_si64(_mm_or_si64(similar_0_2, similar_0_3),
-                                           _mm_or_si64(similar_1_2, similar_1_3));
+            // Check neighbors for scrolling content (±1, ±2)
+            // ONLY if pixel changed - prevents static edge artifacts
+            if (x >= 2 && x + 4 <= sPitch) {
+                __m64 neighbor_osc = _mm_setzero_si64();
 
-            // Check neighbors for scrolling content (±1, ±2, ±3)
-            if (x >= 3 && x + 5 <= sPitch) {
                 // ±1 pixel offsets
-                __m64 n1 = _mm_or_si64(
+                neighbor_osc = _mm_or_si64(neighbor_osc, _mm_or_si64(
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x-1]), threshold, alphaMask),
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x+1]), threshold, alphaMask));
-                n1 = _mm_or_si64(n1, _mm_or_si64(
+                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x+1]), threshold, alphaMask)));
+                neighbor_osc = _mm_or_si64(neighbor_osc, _mm_or_si64(
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x-1]), threshold, alphaMask),
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x+1]), threshold, alphaMask)));
 
                 // ±2 pixel offsets
-                __m64 n2 = _mm_or_si64(
+                neighbor_osc = _mm_or_si64(neighbor_osc, _mm_or_si64(
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x-2]), threshold, alphaMask),
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x+2]), threshold, alphaMask));
-                n2 = _mm_or_si64(n2, _mm_or_si64(
+                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x+2]), threshold, alphaMask)));
+                neighbor_osc = _mm_or_si64(neighbor_osc, _mm_or_si64(
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x-2]), threshold, alphaMask),
                     MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x+2]), threshold, alphaMask)));
 
-                // ±3 pixel offsets
-                __m64 n3 = _mm_or_si64(
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x-3]), threshold, alphaMask),
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm2[x+3]), threshold, alphaMask));
-                n3 = _mm_or_si64(n3, _mm_or_si64(
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x-3]), threshold, alphaMask),
-                    MMX_ColorsSimilar32(src0, *reinterpret_cast<const __m64*>(&frm3[x+3]), threshold, alphaMask)));
-
-                oscillates = _mm_or_si64(oscillates, _mm_or_si64(n1, _mm_or_si64(n2, n3)));
+                // Neighbor oscillation only counts if pixel changed
+                oscillates = _mm_or_si64(oscillates, _mm_and_si64(changed, neighbor_osc));
             }
 
-            // blend_mask = oscillates
-            __m64 blend_mask = oscillates;
+            // blend = changed && oscillates
+            __m64 blend_mask = _mm_and_si64(changed, oscillates);
 
             // Calculate blended value: (src0 + src1) / 2
             __m64 src0_masked = _mm_and_si64(src0, colorMask);
@@ -571,17 +567,23 @@ static void SmartIB32_MMX(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, u
         for (; x < sPitch; x++) {
             uint32_t color = src[x];
 
-            bool oscillates = ColorsSimilar32(color, frm2[x], kColorThreshold) ||
-                              ColorsSimilar32(color, frm3[x], kColorThreshold) ||
-                              ColorsSimilar32(frm1[x], frm2[x], kColorThreshold) ||
-                              ColorsSimilar32(frm1[x], frm3[x], kColorThreshold);
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent32(color, frm1[x], kColorThreshold);
 
-            if (!oscillates && x >= 3 && x < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    oscillates = ColorsSimilar32(color, frm2[x-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm2[x+offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm3[x-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, frm3[x+offset], kColorThreshold);
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar32(color, frm2[x], kColorThreshold) ||
+                             ColorsSimilar32(color, frm3[x], kColorThreshold);
+
+                // Check neighbors for scrolling content (±1, ±2)
+                if (!oscillates && x >= 2 && x < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        oscillates = ColorsSimilar32(color, frm2[x-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm2[x+offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm3[x-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, frm3[x+offset], kColorThreshold);
+                    }
                 }
             }
 
@@ -638,20 +640,25 @@ static void SmartIB32_Scalar(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr
         for (int i = 0; i < sPitch; i++) {
             uint32_t color = src0[pos];
 
-            // Blend if pixel shows oscillation pattern (similar to any older frame)
-            bool oscillates = ColorsSimilar32(color, src2[pos], kColorThreshold) ||
-                              ColorsSimilar32(color, src3[pos], kColorThreshold) ||
-                              ColorsSimilar32(src1[pos], src2[pos], kColorThreshold) ||
-                              ColorsSimilar32(src1[pos], src3[pos], kColorThreshold);
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent32(color, src1[pos], kColorThreshold);
 
-            // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            if (!oscillates && i >= 3 && i < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    oscillates = ColorsSimilar32(color, src2[pos-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, src2[pos+offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, src3[pos-offset], kColorThreshold) ||
-                                 ColorsSimilar32(color, src3[pos+offset], kColorThreshold);
+            // Only consider oscillation if pixel actually changed
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar32(color, src2[pos], kColorThreshold) ||
+                             ColorsSimilar32(color, src3[pos], kColorThreshold);
+
+                // Also check neighbors in history (for scrolling content)
+                // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+                if (!oscillates && i >= 2 && i < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        oscillates = ColorsSimilar32(color, src2[pos-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, src2[pos+offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, src3[pos-offset], kColorThreshold) ||
+                                     ColorsSimilar32(color, src3[pos+offset], kColorThreshold);
+                    }
                 }
             }
 
@@ -684,20 +691,25 @@ static void SmartIB16_Scalar(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr
         for (int i = 0; i < sPitch; i++) {
             uint16_t color = src0[pos];
 
-            // Blend if pixel shows oscillation pattern (similar to any older frame)
-            bool oscillates = ColorsSimilar16(color, src2[pos], kColorThreshold16) ||
-                              ColorsSimilar16(color, src3[pos], kColorThreshold16) ||
-                              ColorsSimilar16(src1[pos], src2[pos], kColorThreshold16) ||
-                              ColorsSimilar16(src1[pos], src3[pos], kColorThreshold16);
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent16(color, src1[pos], kColorThreshold16);
 
-            // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            if (!oscillates && i >= 3 && i < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    oscillates = ColorsSimilar16(color, src2[pos-offset], kColorThreshold16) ||
-                                 ColorsSimilar16(color, src2[pos+offset], kColorThreshold16) ||
-                                 ColorsSimilar16(color, src3[pos-offset], kColorThreshold16) ||
-                                 ColorsSimilar16(color, src3[pos+offset], kColorThreshold16);
+            // Only consider oscillation if pixel actually changed
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar16(color, src2[pos], kColorThreshold16) ||
+                             ColorsSimilar16(color, src3[pos], kColorThreshold16);
+
+                // Also check neighbors in history (for scrolling content)
+                // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+                if (!oscillates && i >= 2 && i < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        oscillates = ColorsSimilar16(color, src2[pos-offset], kColorThreshold16) ||
+                                     ColorsSimilar16(color, src2[pos+offset], kColorThreshold16) ||
+                                     ColorsSimilar16(color, src3[pos-offset], kColorThreshold16) ||
+                                     ColorsSimilar16(color, src3[pos+offset], kColorThreshold16);
+                    }
                 }
             }
 
@@ -729,30 +741,34 @@ static void SmartIB24_Scalar(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr
             uint8_t g0 = src0[pos + 1];
             uint8_t b0 = src0[pos + 2];
 
-            // Blend if pixel shows oscillation pattern (similar to any older frame)
-            bool oscillates = ColorsSimilar24(r0, g0, b0,
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent24(r0, g0, b0,
+                                              src1[pos], src1[pos + 1], src1[pos + 2], kColorThreshold24);
+
+            // Only consider oscillation if pixel actually changed
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar24(r0, g0, b0,
                                               src2[pos], src2[pos + 1], src2[pos + 2], kColorThreshold24) ||
-                              ColorsSimilar24(r0, g0, b0,
-                                              src3[pos], src3[pos + 1], src3[pos + 2], kColorThreshold24) ||
-                              ColorsSimilar24(src1[pos], src1[pos + 1], src1[pos + 2],
-                                              src2[pos], src2[pos + 1], src2[pos + 2], kColorThreshold24) ||
-                              ColorsSimilar24(src1[pos], src1[pos + 1], src1[pos + 2],
+                             ColorsSimilar24(r0, g0, b0,
                                               src3[pos], src3[pos + 1], src3[pos + 2], kColorThreshold24);
 
-            // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            // Each pixel is 3 bytes, so offset by 3*n
-            if (!oscillates && i >= 3 && i < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    int byteOffset = offset * 3;
-                    oscillates = ColorsSimilar24(r0, g0, b0,
-                                    src2[pos-byteOffset], src2[pos-byteOffset+1], src2[pos-byteOffset+2], kColorThreshold24) ||
-                                 ColorsSimilar24(r0, g0, b0,
-                                    src2[pos+byteOffset], src2[pos+byteOffset+1], src2[pos+byteOffset+2], kColorThreshold24) ||
-                                 ColorsSimilar24(r0, g0, b0,
-                                    src3[pos-byteOffset], src3[pos-byteOffset+1], src3[pos-byteOffset+2], kColorThreshold24) ||
-                                 ColorsSimilar24(r0, g0, b0,
-                                    src3[pos+byteOffset], src3[pos+byteOffset+1], src3[pos+byteOffset+2], kColorThreshold24);
+                // Also check neighbors in history (for scrolling content)
+                // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+                // Each pixel is 3 bytes, so offset by 3*n
+                if (!oscillates && i >= 2 && i < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        int byteOffset = offset * 3;
+                        oscillates = ColorsSimilar24(r0, g0, b0,
+                                        src2[pos-byteOffset], src2[pos-byteOffset+1], src2[pos-byteOffset+2], kColorThreshold24) ||
+                                     ColorsSimilar24(r0, g0, b0,
+                                        src2[pos+byteOffset], src2[pos+byteOffset+1], src2[pos+byteOffset+2], kColorThreshold24) ||
+                                     ColorsSimilar24(r0, g0, b0,
+                                        src3[pos-byteOffset], src3[pos-byteOffset+1], src3[pos-byteOffset+2], kColorThreshold24) ||
+                                     ColorsSimilar24(r0, g0, b0,
+                                        src3[pos+byteOffset], src3[pos+byteOffset+1], src3[pos+byteOffset+2], kColorThreshold24);
+                    }
                 }
             }
 
@@ -804,24 +820,29 @@ static void SmartIB8_Scalar(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr,
             uint16_t c2 = PaletteToRGB555(src2[pos]);
             uint16_t c3 = PaletteToRGB555(src3[pos]);
 
-            // Blend if pixel shows oscillation pattern (similar to any older frame)
-            bool oscillates = ColorsSimilar16(c0, c2, kColorThreshold16) ||
-                              ColorsSimilar16(c0, c3, kColorThreshold16) ||
-                              ColorsSimilar16(c1, c2, kColorThreshold16) ||
-                              ColorsSimilar16(c1, c3, kColorThreshold16);
+            // First check if pixel changed from previous frame
+            bool changed = ColorsDifferent16(c0, c1, kColorThreshold16);
 
-            // Also check neighbors in history (for scrolling content)
-            // Check ±1, ±2, ±3 pixels to handle various scroll speeds
-            if (!oscillates && i >= 3 && i < sPitch - 3) {
-                for (int offset = 1; offset <= 3 && !oscillates; offset++) {
-                    uint16_t c2_left = PaletteToRGB555(src2[pos-offset]);
-                    uint16_t c2_right = PaletteToRGB555(src2[pos+offset]);
-                    uint16_t c3_left = PaletteToRGB555(src3[pos-offset]);
-                    uint16_t c3_right = PaletteToRGB555(src3[pos+offset]);
-                    oscillates = ColorsSimilar16(c0, c2_left, kColorThreshold16) ||
-                                 ColorsSimilar16(c0, c2_right, kColorThreshold16) ||
-                                 ColorsSimilar16(c0, c3_left, kColorThreshold16) ||
-                                 ColorsSimilar16(c0, c3_right, kColorThreshold16);
+            // Only consider oscillation if pixel actually changed
+            bool oscillates = false;
+            if (changed) {
+                // Check oscillation at current position (A->B->A pattern)
+                oscillates = ColorsSimilar16(c0, c2, kColorThreshold16) ||
+                             ColorsSimilar16(c0, c3, kColorThreshold16);
+
+                // Also check neighbors in history (for scrolling content)
+                // Check ±1, ±2 pixels (reduced from ±3 for better precision)
+                if (!oscillates && i >= 2 && i < sPitch - 2) {
+                    for (int offset = 1; offset <= 2 && !oscillates; offset++) {
+                        uint16_t c2_left = PaletteToRGB555(src2[pos-offset]);
+                        uint16_t c2_right = PaletteToRGB555(src2[pos+offset]);
+                        uint16_t c3_left = PaletteToRGB555(src3[pos-offset]);
+                        uint16_t c3_right = PaletteToRGB555(src3[pos+offset]);
+                        oscillates = ColorsSimilar16(c0, c2_left, kColorThreshold16) ||
+                                     ColorsSimilar16(c0, c2_right, kColorThreshold16) ||
+                                     ColorsSimilar16(c0, c3_left, kColorThreshold16) ||
+                                     ColorsSimilar16(c0, c3_right, kColorThreshold16);
+                    }
                 }
             }
 
