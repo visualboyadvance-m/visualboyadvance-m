@@ -34,6 +34,7 @@ enum class Filter {
     kLQ2x,
     kSimple4x,
     kXbrz2x,
+    kXbrz5x,
     kXbrz9x,
     kPlugin,  // This must always be last.
 
