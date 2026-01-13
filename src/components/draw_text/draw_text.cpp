@@ -80,6 +80,14 @@ void drawText(uint8_t* screen, int pitch, int x, int y,
         }
     } break;
     case 24: {
+        // 24-bit pixel format based on systemRedShift values:
+        // Little-endian: systemRedShift=3 (red at low bits) -> RGB byte order
+        // Big-endian: systemRedShift=27 (red at high bits) -> RGB byte order
+        // Both use RGB byte order: [0]=R, [1]=G, [2]=B
+        const int redByte = 0;
+        const int greenByte = 1;
+        const int blueByte = 2;
+
         while (*string) {
             char c = *string++;
             uint8_t* scr = screen;
@@ -92,17 +100,17 @@ void drawText(uint8_t* screen, int pitch, int x, int y,
 
                     if (trans) {
                         if (on) {
-                            uint32_t color = (0x1f) << systemRedShift;
-                            *s = ((color & 255) >> 1) + (*s >> 1);
-                            *(s + 1) = (((color >> 8) & 255) >> 1) + (*(s + 1) >> 1);
-                            *(s + 2) = (((color >> 16) & 255) >> 1) + (*(s + 2) >> 1);
+                            // Red text with transparency (0x1F << 3 = 0xF8 for 8-bit)
+                            s[redByte] = 0x7C + (s[redByte] >> 1);
+                            s[greenByte] = (s[greenByte] >> 1);
+                            s[blueByte] = (s[blueByte] >> 1);
                         }
                     } else {
                         if (on) {
-                            uint32_t color = (0x1f) << systemRedShift;
-                            *s = (color & 255);
-                            *(s + 1) = (color >> 8) & 255;
-                            *(s + 2) = (color >> 16) & 255;
+                            // Solid red text (0x1F << 3 = 0xF8 for 8-bit)
+                            s[redByte] = 0xF8;
+                            s[greenByte] = 0;
+                            s[blueByte] = 0;
                         }
                     }
                 }

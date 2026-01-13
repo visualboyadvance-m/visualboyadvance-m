@@ -564,13 +564,20 @@ void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
             // Use threshold of 100 (~39%) - balances crispness with capturing thin strokes (like 'e' bar)
             if (r > 100) {
                 // Render as pure red for sharp, pixel-perfect text
-                if (systemColorDepth == 16) {
+                if (systemColorDepth == 8) {
+                    // 8-bit RGB332 format: bits 7-5=R, 4-2=G, 1-0=B
+                    // Pure red = 0xE0 (all red bits set, green/blue zero)
+                    *bufPtr = 0xE0;
+                } else if (systemColorDepth == 16) {
                     uint16_t* pixel = (uint16_t*)bufPtr;
-                    *pixel = (0x1f << systemRedShift);  // Pure red in 16-bit
+                    // 16-bit RGB555 format: bits 14-10=R, 9-5=G, 4-0=B
+                    // Pure red = 0x7C00 (all red bits set, green/blue zero)
+                    *pixel = 0x7C00;
                 } else if (systemColorDepth == 24) {
-                    bufPtr[0] = 0;
-                    bufPtr[1] = 0;
-                    bufPtr[2] = 255;  // Pure red in 24-bit BGR
+                    // 24-bit RGB format (systemRedShift=3 means red at low byte)
+                    bufPtr[0] = 255;  // Red
+                    bufPtr[1] = 0;    // Green
+                    bufPtr[2] = 0;    // Blue
                 } else if (systemColorDepth == 32) {
                     uint32_t* pixel = (uint32_t*)bufPtr;
                     *pixel = (0xff << systemRedShift);  // Pure red in 32-bit
