@@ -1961,7 +1961,7 @@ int CPULoadRomData(const char* data, int size)
         return 0;
     }
 
-    g_pix = (uint8_t*)calloc(1, 4 * 240 * 160);
+    g_pix = (uint8_t*)calloc(1, 4 * 241 * 162);
     if (g_pix == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "PIX");
@@ -4252,7 +4252,9 @@ void CPULoop(int ticks)
                     } else {
                         if (frameCount >= framesToSkip) {
                             (*renderLine)();
-                            switch (systemColorDepth) {
+                            // Defensive checks: skip rendering if g_pix is NULL or VCOUNT is out of range
+                            // This can happen during panel transitions or if state is corrupted
+                            if (g_pix && VCOUNT < 160) switch (systemColorDepth) {
                             case 8: {
 #ifdef __LIBRETRO__
                                 uint8_t* dest = (uint8_t*)g_pix + 240 * VCOUNT;
@@ -4378,26 +4380,8 @@ void CPULoop(int ticks)
 #else
                                 uint32_t* dest = (uint32_t*)g_pix + 241 * (VCOUNT + 1);
 #endif
-                                for (int x = 0; x < 240;) {
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
-                                    *dest++ = systemColorMap32[g_lineMix[x++] & 0xFFFF];
+                                for (int x = 0; x < 240; x++) {
+                                    *dest++ = systemColorMap32[g_lineMix[x] & 0xFFFF];
                                 }
                             } break;
                             }

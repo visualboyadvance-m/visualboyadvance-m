@@ -1519,7 +1519,9 @@ void MainFrame::StartModal()
     // pointer when dialog popped up
     // it will auto-hide again once game resumes
     panel->ShowPointer();
-    //panel->Pause();
+    // Pause emulation during modal dialogs to prevent race conditions
+    // when display settings change and the panel is recreated
+    panel->Pause();
     ++dialog_opened;
 }
 

@@ -186,6 +186,7 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
 // All other params are for the full image, not a slice.
 void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                      int width, int fullHeight, int bandStart, int bandEnd, int scale) {
+    (void)fullHeight;  // Reserved for future use
     const int bandHeight = bandEnd - bandStart;
     if (bandHeight <= 0) return;
 
@@ -242,10 +243,6 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
         systemBlueShift = 11;
         RGB_LOW_BITS_MASK = 0x01010100;
 #endif
-
-        // Calculate source buffer parameters
-        const int inbpp = systemColorDepth >> 3;
-        const int inrb = is_8bit ? 4 : is_16bit ? 2 : 0;
 
         // For 32bpp conversion: filters need left+right borders of 1 each
         const int total_width32 = width + 2;
@@ -341,7 +338,6 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
         const int copyRows = outBandHeight - 2 * skipRows;
         const int dstStartY = (bandStart + kFilterContextRadius) * scale;
         const int scaled_width = width * scale;
-        const int scaled_border = inrb * scale;
 
         if (copyRows > 0) {
             const uint32_t* src32_row = reinterpret_cast<const uint32_t*>(tempBuf.data() + outRowBytes * skipRows);
@@ -595,7 +591,7 @@ GameArea::GameArea()
                         config::OptionID::kDispRenderMethod, config::OptionID::kDispIFB,
                         config::OptionID::kDispStretch, config::OptionID::kPrefVsync,
                         config::OptionID::kSDLRenderer, config::OptionID::kBitDepth},
-                       std::bind(&GameArea::ResetPanel, this)),
+                       std::bind(&GameArea::SchedulePanelReset, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
                           std::bind(&GameArea::OnGBBorderChanged, this, std::placeholders::_1)),
@@ -1440,9 +1436,39 @@ void GameArea::AdjustSize(bool force)
 
 void GameArea::ResetPanel() {
     if (panel) {
+        // Pause emulation while panel is being reset to prevent crashes
+        // from accessing invalid panel state during the transition.
+        // Note: We force paused=true directly because Pause() skips pausing
+        // when link mode is enabled, but we MUST pause for panel reset.
+        bool was_running = !paused;
+        if (was_running) {
+            paused = was_paused = true;
+            UnsuspendScreenSaver();
+            wxGetApp().emulated_gamepad()->Reset();
+            if (loaded != IMAGE_UNKNOWN)
+                soundPause();
+        }
+
+        // Stop filter threads SYNCHRONOUSLY before cleaning up InterframeManager.
+        // This is critical because Destroy() defers destruction, and we need to
+        // ensure threads aren't accessing InterframeManager when it's cleaned up.
+        panel->StopFilterThreads();
+        InterframeCleanup();
+
         panel->Destroy();
         panel = NULL;
+
+        // Mark that we need to resume after panel is recreated
+        if (was_running)
+            pending_resume_after_panel_ = true;
     }
+}
+
+void GameArea::SchedulePanelReset() {
+    // Set flag to defer panel reset until start of next OnIdle.
+    // This avoids resetting the panel while CPULoop is in the middle of rendering,
+    // which would cause crashes due to invalid g_pix or panel state.
+    pending_panel_reset_ = true;
 }
 
 void GameArea::ShowFullScreen(bool full)
@@ -1680,6 +1706,47 @@ void GameArea::OnIdle(wxIdleEvent& event)
     if (!emusys)
         return;
 
+    // Handle deferred panel reset (set by option observer callbacks).
+    // This must be done at the start of OnIdle, BEFORE running emulation,
+    // to avoid resetting the panel while CPULoop is in progress.
+    if (pending_panel_reset_) {
+        pending_panel_reset_ = false;
+        ResetPanel();
+        // After reset, panel is NULL and will be recreated below.
+        // Request more idle events to trigger panel creation.
+        event.RequestMore();
+        return;
+    }
+
+    // Always keep systemColorDepth in sync with the bit depth option
+    // to prevent crashes during settings transitions
+    int newColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    if (newColorDepth != systemColorDepth) {
+        systemColorDepth = newColorDepth;
+        // Update color shift values for new depth
+        if (systemColorDepth == 24 || systemColorDepth == 32) {
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+            systemRedShift = 3;
+            systemGreenShift = 11;
+            systemBlueShift = 19;
+            RGB_LOW_BITS_MASK = 0x00010101;
+#else
+            systemRedShift = 27;
+            systemGreenShift = 19;
+            systemBlueShift = 11;
+            RGB_LOW_BITS_MASK = 0x01010100;
+#endif
+        } else {
+            // 8-bit or 16-bit
+            systemRedShift = 10;
+            systemGreenShift = 5;
+            systemBlueShift = 0;
+            RGB_LOW_BITS_MASK = 0x0421;
+        }
+        // Note: hq2x_init/Init_2xSaI/UpdateLcdFilter will be called when panel
+        // is created/recreated via DrawingPanelInit()
+    }
+
     if (schedule_audio_restart_) {
         soundShutdown();
         if (!soundInit()) {
@@ -1798,9 +1865,27 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // generate system color maps (after output module init)
         UpdateLcdFilter();
+
+        // Return here to let the panel fully initialize before running emulation.
+        // The next OnIdle will start emulation.
+        event.RequestMore();
+        return;
     }
 
-    if (!paused) {
+    // Resume emulation if we paused for a panel reset and the panel is now ready
+    if (pending_resume_after_panel_ && panel) {
+        pending_resume_after_panel_ = false;
+        Resume();
+    }
+
+    if (!paused && panel) {
+        // Defensive check: ensure g_pix is valid before running emulation
+        extern uint8_t* g_pix;
+        if (!g_pix) {
+            wxLogDebug(wxT("g_pix is NULL, skipping emulation frame"));
+            return;
+        }
+
         HidePointer();
         HideMenuBar();
         event.RequestMore();
@@ -2500,25 +2585,25 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
-    if (!pixbuf2) {
-        int allocstride = outstride, alloch = height;
+    // Only allocate pixbuf2 when filters are used
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (!pixbuf2) {
+            int allocstride = outstride, alloch = height;
 
-        // gb may write borders, so allocate enough for them
-        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
-            alloch = GameArea::SGBHeight;
+            // gb may write borders, so allocate enough for them
+            if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+                allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
+                alloch = GameArea::SGBHeight;
+            }
+
+            pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
         }
-
-        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
-    }
-
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        todraw = *data;
-        // *data is assigned below, after old buf has been processed
-        pixbuf1 = pixbuf2;
-        pixbuf2 = todraw;
-    } else
         todraw = pixbuf2;
+    } else {
+        // No filter: use g_pix directly, don't allocate or swap buffers
+        todraw = *data;
+    }
 
     // Use multiple threads for filter processing (up to 6)
     const int max_threads = GetMaxFilterThreads();
@@ -2677,10 +2762,10 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         }
     }
 
-    // swap buffers now that src has been processed
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        *data = pixbuf1;
-    }
+    // Note: We do NOT modify *data (which is g_pix) here.
+    // g_pix must always point to the emulator's allocated buffer.
+    // Modifying it would cause the panel destructor to free the wrong buffer,
+    // leaving g_pix as a dangling pointer after panel reset.
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
@@ -2721,8 +2806,19 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     else {
         DrawingPanelBase* panel = wxGetApp().frame->GetPanel()->panel;
         if (panel) {
-            wxClientDC dc(panel->GetWindow());
-            panel->DrawArea(dc);
+            wxWindow* win = panel->GetWindow();
+#ifdef __WXMSW__
+            // Verify window handle is valid before creating DC
+            // This prevents crashes if the panel is being destroyed
+            HWND hwnd = win ? win->GetHWND() : nullptr;
+            if (!hwnd || !::IsWindow(hwnd)) {
+                return;
+            }
+#endif
+            if (win) {
+                wxClientDC dc(win);
+                panel->DrawArea(dc);
+            }
         }
     }
 
@@ -2824,16 +2920,11 @@ void DrawingPanelBase::OnSize(wxSizeEvent& ev)
     ev.Skip();
 }
 
-DrawingPanelBase::~DrawingPanelBase()
+void DrawingPanelBase::StopFilterThreads()
 {
-    // pixbuf1 freed by emulator
-    if (pixbuf1 != pixbuf2 && pixbuf2)
-    {
-        free(pixbuf2);
-        pixbuf2 = NULL;
-    }
-    InterframeCleanup();
-
+    // Stop all filter threads and free thread array
+    // This must be called before InterframeCleanup() to prevent threads
+    // from accessing InterframeManager after it's been cleaned up
     if (nthreads) {
         if (nthreads > 1)
             for (int i = 0; i < nthreads; i++) {
@@ -2845,8 +2936,29 @@ DrawingPanelBase::~DrawingPanelBase()
             }
 
         delete[] threads;
+        threads = nullptr;
+        nthreads = 0;
+    }
+}
+
+DrawingPanelBase::~DrawingPanelBase()
+{
+    // Stop filter threads if not already stopped
+    StopFilterThreads();
+
+    // Now safe to free buffers - threads are stopped
+    // pixbuf1 is expected to be g_pix (emulator's buffer) or a previous
+    // value of pixbuf2 - either way, we don't free it here.
+    // pixbuf2 may be our allocated filter output buffer, OR it may point
+    // to g_pix when no filters are used. Only free if it's our buffer.
+    extern uint8_t* g_pix;
+    if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
+    {
+        free(pixbuf2);
+        pixbuf2 = NULL;
     }
 
+    InterframeCleanup();
     disableKeyboardBackgroundInput();
 }
 
@@ -3263,25 +3375,25 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (systemColorDepth >> 3);
 
-    if (!pixbuf2) {
-        int allocstride = outstride, alloch = height;
+    // Only allocate pixbuf2 when filters are used
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (!pixbuf2) {
+            int allocstride = outstride, alloch = height;
 
-        // gb may write borders, so allocate enough for them
-        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
-            alloch = GameArea::SGBHeight;
+            // gb may write borders, so allocate enough for them
+            if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+                allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
+                alloch = GameArea::SGBHeight;
+            }
+
+            pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
         }
-
-        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
-    }
-
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        todraw = *data;
-        // *data is assigned below, after old buf has been processed
-        pixbuf1 = pixbuf2;
-        pixbuf2 = todraw;
-    } else
         todraw = pixbuf2;
+    } else {
+        // No filter: use g_pix directly, don't allocate or swap buffers
+        todraw = *data;
+    }
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
@@ -3434,10 +3546,10 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
         }
     }
 
-    // swap buffers now that src has been processed
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        *data = pixbuf1;
-    }
+    // Note: We do NOT modify *data (which is g_pix) here.
+    // g_pix must always point to the emulator's allocated buffer.
+    // Modifying it would cause the panel destructor to free the wrong buffer,
+    // leaving g_pix as a dangling pointer after panel reset.
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now
@@ -3619,8 +3731,48 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 #ifdef __WXMSW__
 #include <GL/gl.h>
 #include <GL/glext.h>
+
+// Cached GL context to avoid AMD driver crash on context deletion
+// We cache one context and try to reuse it with new canvases
+static wxGLContext* g_cachedGLContext = nullptr;
+
+// Try to reuse cached context with a new canvas
+// Returns the reused context if successful, nullptr otherwise
+static wxGLContext* TryReuseCachedGLContext(wxGLCanvas* canvas)
+{
+    if (!g_cachedGLContext)
+        return nullptr;
+
+    // Try to make the cached context current on the new canvas
+    // This will succeed if the pixel formats are compatible
+    if (canvas->SetCurrent(*g_cachedGLContext)) {
+        wxGLContext* reused = g_cachedGLContext;
+        g_cachedGLContext = nullptr;
+        return reused;
+    }
+
+    // Pixel format incompatible - can't reuse
+    // Leave cached context for potential future reuse or leak it
+    return nullptr;
+}
+
+// Cache context for reuse instead of deleting it
+// This avoids AMD driver crashes during context deletion
+static void CacheGLContext(wxGLContext* ctx)
+{
+    if (!ctx)
+        return;
+
+    // Release context from current thread
+    wglMakeCurrent(NULL, NULL);
+
+    // If we already have a cached context, we have to leak the old one
+    // (deleting it could crash on AMD drivers)
+    // This should be rare - typically only one context at a time
+    g_cachedGLContext = ctx;
+}
 #endif
-        
+
 // This is supposed to be the default, but DOUBLEBUFFER doesn't seem to be
 // turned on by default for wxGTK.
 static int glopts[] = {
@@ -3629,6 +3781,15 @@ static int glopts[] = {
 
 bool GLDrawingPanel::SetContext()
 {
+#ifdef __WXMSW__
+    // On Windows, verify the window handle is still valid before GL operations.
+    // This prevents crashes in GL drivers when the window is being destroyed.
+    HWND hwnd = GetHWND();
+    if (!hwnd || !::IsWindow(hwnd)) {
+        return false;
+    }
+#endif
+
 #ifndef wxGL_IMPLICIT_CONTEXT
     // Check if the current context is valid
     if (!ctx
@@ -3637,14 +3798,22 @@ bool GLDrawingPanel::SetContext()
 #endif
         )
     {
-        // Delete the old context
-        if (ctx) {
-            delete ctx;
-            ctx = NULL;
+        // Cache the old context on Windows (deleting can crash AMD drivers)
+#ifdef __WXMSW__
+        CacheGLContext(ctx);
+#else
+        delete ctx;
+#endif
+        ctx = NULL;
+
+        // Try to reuse cached context first (Windows only)
+#ifdef __WXMSW__
+        ctx = TryReuseCachedGLContext(this);
+#endif
+        // Create a new context if we couldn't reuse one
+        if (!ctx) {
+            ctx = new wxGLContext(this);
         }
-                
-        // Create a new context
-        ctx = new wxGLContext(this);
         DrawingPanelInit();
     }
     return wxGLCanvas::SetCurrent(*ctx);
@@ -3664,17 +3833,42 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
         
 GLDrawingPanel::~GLDrawingPanel()
 {
-    // this should be automatically deleted w/ context
-    // it's also unsafe if panel no longer displayed
-    if (did_init)
-    {
-        SetContext();
+    // Skip GL cleanup entirely on Windows when caching context
+    // The resources will be reused or cleaned up when the context is eventually deleted
+#ifdef __WXMSW__
+    #ifndef wxGL_IMPLICIT_CONTEXT
+    // Cache context on Windows for reuse (deleting can crash AMD drivers)
+    // Skip glDeleteLists/glDeleteTextures as they may cause heap corruption
+    // when the window is being destroyed
+    CacheGLContext(ctx);
+    ctx = nullptr;  // Prevent base class from trying to use it
+    #endif
+#else
+    // Clean up GL resources if we have a valid context
+    // Don't call SetContext() here as it might try to recreate the context
+    // on a half-destroyed window, causing driver crashes
+#ifndef wxGL_IMPLICIT_CONTEXT
+    if (did_init && ctx) {
+        // Try to make the context current for cleanup, but don't recreate it
+#if wxCHECK_VERSION(3, 1, 0)
+        if (ctx->IsOK()) {
+#endif
+            if (wxGLCanvas::SetCurrent(*ctx)) {
+                glDeleteLists(vlist, 1);
+                glDeleteTextures(1, &texid);
+            }
+#if wxCHECK_VERSION(3, 1, 0)
+        }
+#endif
+    }
+    delete ctx;
+#else
+    // With implicit context, just try to clean up if initialized
+    if (did_init) {
         glDeleteLists(vlist, 1);
         glDeleteTextures(1, &texid);
     }
-            
-#ifndef wxGL_IMPLICIT_CONTEXT
-    delete ctx;
+#endif
 #endif
 }
         
@@ -4707,25 +4901,25 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (systemColorDepth >> 3);
 
-    if (!pixbuf2) {
-        int allocstride = outstride, alloch = height;
+    // Only allocate pixbuf2 when filters are used
+    if (OPTION(kDispFilter) != config::Filter::kNone ||
+        OPTION(kDispIFB) != config::Interframe::kNone) {
+        if (!pixbuf2) {
+            int allocstride = outstride, alloch = height;
 
-        // gb may write borders, so allocate enough for them
-        if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
-            allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
-            alloch = GameArea::SGBHeight;
+            // gb may write borders, so allocate enough for them
+            if (width == GameArea::GBWidth && height == GameArea::GBHeight) {
+                allocstride = std::ceil((GameArea::SGBWidth + inrb) * outbpp * scale);
+                alloch = GameArea::SGBHeight;
+            }
+
+            pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
         }
-
-        pixbuf2 = (uint8_t*)calloc(allocstride, std::ceil((alloch + 2) * scale));
-    }
-
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        todraw = *data;
-        // *data is assigned below, after old buf has been processed
-        pixbuf1 = pixbuf2;
-        pixbuf2 = todraw;
-    } else
         todraw = pixbuf2;
+    } else {
+        // No filter: use g_pix directly, don't allocate or swap buffers
+        todraw = *data;
+    }
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
@@ -4878,10 +5072,10 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
         }
     }
 
-    // swap buffers now that src has been processed
-    if (OPTION(kDispFilter) == config::Filter::kNone) {
-        *data = pixbuf1;
-    }
+    // Note: We do NOT modify *data (which is g_pix) here.
+    // g_pix must always point to the emulator's allocated buffer.
+    // Modifying it would cause the panel destructor to free the wrong buffer,
+    // leaving g_pix as a dangling pointer after panel reset.
 
     // draw OSD text old-style (directly into output buffer), if needed
     // new style flickers too much, so we'll stick to this for now

@@ -581,6 +581,13 @@ private:
     void OnVolumeChanged(config::Option* option);
 
     bool schedule_audio_restart_ = false;
+    bool pending_resume_after_panel_ = false;
+    bool pending_panel_reset_ = false;  // Deferred panel reset to avoid mid-frame crashes
+
+    // Schedule a panel reset to occur at the start of the next OnIdle
+    // This is used instead of calling ResetPanel directly from observers
+    // to avoid resetting the panel while emulation is in progress
+    void SchedulePanelReset();
 
     const config::OptionsObserver render_observer_;
     const config::OptionsObserver scale_observer_;
@@ -606,6 +613,9 @@ public:
     DrawingPanelBase(int _width, int _height);
     ~DrawingPanelBase();
     void DrawArea(uint8_t** pixels);
+    // Synchronously stop filter threads - call before Destroy() to ensure
+    // threads are stopped before InterframeManager is cleaned up
+    void StopFilterThreads();
 
     virtual void PaintEv(wxPaintEvent& ev);
     virtual void EraseBackground(wxEraseEvent& ev);

@@ -953,6 +953,12 @@ void InterframeManager::ApplySmartIBRegion(uint8_t* srcPtr, uint32_t srcPitch,
         return;
     }
 
+    // Validate that the pitch matches what we were initialized with to prevent buffer overflow
+    // This can happen if color depth changes and InterframeManager hasn't been reinitialized
+    if (static_cast<int>(srcPitch) != pitch_) {
+        return;
+    }
+
     RegionState& region = regions_[regionId];
     uint8_t* hist1 = region.frame1_.get();
     uint8_t* hist2 = region.frame2_.get();
@@ -997,6 +1003,12 @@ void InterframeManager::ApplyMotionBlurRegion(uint8_t* srcPtr, uint32_t srcPitch
                                                int width, int starty, int height,
                                                int colorDepth, int regionId) {
     if (!initialized_ || regionId < 0 || regionId >= static_cast<int>(regions_.size())) {
+        return;
+    }
+
+    // Validate that the pitch matches what we were initialized with to prevent buffer overflow
+    // This can happen if color depth changes and InterframeManager hasn't been reinitialized
+    if (static_cast<int>(srcPitch) != pitch_) {
         return;
     }
 
