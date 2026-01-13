@@ -2362,6 +2362,14 @@ public:
             const config::Filter filter_option = OPTION(kDispFilter);
 
             if (filter_option == config::Filter::kNone) {
+                // No filter, but IFB might be enabled (already applied above).
+                // We need to copy the (possibly IFB-modified) source to destination.
+                // src_ points to this thread's band in the source buffer.
+                // dest points to this thread's band in the destination buffer.
+                for (int y = 0; y < height_; y++) {
+                    memcpy(dest + y * outstride, src_ + y * instride, width_ * outbpp);
+                }
+
                 if (nthreads_ == 1)
                     return 0;
 
