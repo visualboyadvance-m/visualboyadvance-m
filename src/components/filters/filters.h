@@ -70,4 +70,10 @@ void xbrz5x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t ds
 void xbrz6x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 void xbrz9x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
 
+// ScaleFX filters - CPU port of the ScaleFX GLSL shader
+void scalefx_init(int srcWidth, int srcHeight);
+void scalefx_cleanup();
+void scalefx3x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
+void scalefx9x32(uint8_t* src, uint32_t spitch, uint8_t*, uint8_t* dst, uint32_t dstp, int w, int h);
+
 #endif  // VBAM_COMPONENTS_FILTERS_FILTERS_H_

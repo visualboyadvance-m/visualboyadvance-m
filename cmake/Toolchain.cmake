@@ -8,6 +8,10 @@ include(CheckCXXCompilerFlag)
 include(ProcessorCount)
 ProcessorCount(num_cpus)
 
+if(ENABLE_LTO AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(ENABLE_LTO OFF)
+endif()
+
 if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTO_SUPPORTED)

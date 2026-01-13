@@ -187,6 +187,7 @@ static void internal_scale2x_16_def(uint16_t *dst, const uint16_t* src0, const u
   dst[1] = src1[0];
 }
 
+#if !defined(USE_SSE2)
 static void internal_scale2x_32_def(uint32_t* dst,
                                     const uint32_t* src0,
                                     const uint32_t* src1,
@@ -229,6 +230,7 @@ static void internal_scale2x_32_def(uint32_t* dst,
     dst[0] = src1[0];
   dst[1] = src1[0];
 }
+#endif  // !USE_SSE2
 
 #ifdef MMX
 static void internal_scale2x_16_mmx_single(uint16_t* dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {

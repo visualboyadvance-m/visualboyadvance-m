@@ -130,6 +130,8 @@
                               <item translate="0">xBRZ 2x</item>
                               <item translate="0">xBRZ 5x</item>
                               <item translate="0">xBRZ 9x</item>
+                              <item translate="0">ScaleFX 3x</item>
+                              <item translate="0">ScaleFX 9x</item>
                               <item>Plugin</item>
                             </content>
                           </object>

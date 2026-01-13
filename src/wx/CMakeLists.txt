@@ -462,6 +462,7 @@ if(NOT COMPILE_ONLY)
         vbam-components-filters-agb
         vbam-components-filters-cgb
         vbam-components-filters-interframe
+        vbam-components-filters-scalefx
         vbam-components-user-config
         vbam-wx-config
         vbam-wx-widgets

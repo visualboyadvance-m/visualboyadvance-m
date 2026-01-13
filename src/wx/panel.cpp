@@ -41,6 +41,7 @@
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_cgb/filters_cgb.h"
 #include "components/filters_interframe/interframe.h"
+#include "components/filters_scalefx/scalefx.h"
 #include "core/base/check.h"
 #include "core/base/file_util.h"
 #include "core/base/image_util.h"
@@ -100,7 +101,10 @@ double GetFilterScale() {
         case config::Filter::kXbrz5x:
             return 5.0;
         case config::Filter::kXbrz9x:
+        case config::Filter::kScaleFX9x:
             return 9.0;
+        case config::Filter::kScaleFX3x:
+            return 3.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
             VBAM_NOTREACHED_RETURN(1.0);
@@ -171,6 +175,12 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
             break;
         case config::Filter::kXbrz9x:
             xbrz9x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kScaleFX3x:
+            scalefx3x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kScaleFX9x:
+            scalefx9x32(src, instride, delta, dst, outstride, width, height);
             break;
         case config::Filter::kPlugin:
             // Plugin filters require RENDER_PLUGIN_INFO, not supported here

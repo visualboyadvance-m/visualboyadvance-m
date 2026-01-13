@@ -46,6 +46,8 @@ static const std::array<wxString, kNbFilters> kFilterStrings = {
     "xbrz2x",
     "xbrz5x",
     "xbrz9x",
+    "scalefx3x",
+    "scalefx9x",
     "plugin",
 };
 

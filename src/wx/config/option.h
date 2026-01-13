@@ -36,6 +36,8 @@ enum class Filter {
     kXbrz2x,
     kXbrz5x,
     kXbrz9x,
+    kScaleFX3x,
+    kScaleFX9x,
     kPlugin,  // This must always be last.
 
     // Do not add anything under here.
