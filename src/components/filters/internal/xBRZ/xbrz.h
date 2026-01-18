@@ -47,7 +47,7 @@ enum class ColorFormat //from high bits -> low bits, 8 bit per channel
     ARGB_UNBUFFERED, //like ARGB, but without the one-time buffer creation overhead (ca. 100 - 300 ms) at the expense of a slightly slower scaling time
 };
 
-const int SCALE_FACTOR_MAX = 9;
+const int SCALE_FACTOR_MAX = 6;
 
 /*
 -> map source (srcWidth * srcHeight) to target (scale * width x scale * height) image, optionally processing a half-open slice of rows [yFirst, yLast) only

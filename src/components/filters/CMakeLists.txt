@@ -16,6 +16,8 @@ target_sources(vbam-components-filters
     internal/xBRZ/xbrz.h
     internal/xBRZ/xbrz_config.h
     internal/xBRZ/xbrz_tools.h
+    internal/xBRZ/xbrz9x.cpp
+    internal/xBRZ/xbrz9x.h
     internal/xbrzfilter.cpp
 
     PUBLIC
