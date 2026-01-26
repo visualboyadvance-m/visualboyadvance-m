@@ -343,7 +343,7 @@ function(configure_wx_target target)
     if(ENABLE_FAUDIO)
         _add_compile_definitions(VBAM_ENABLE_FAUDIO)
 
-        if(APPLE)
+        if(APPLE AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
             _add_link_libraries(FAudio)
         else()
             if(VBAM_STATIC)
@@ -368,7 +368,7 @@ function(configure_wx_target target)
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
-    if(APPLE AND NOT NIX)
+    if(APPLE AND NOT NIX AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         _add_link_libraries(sharpyuv)
     endif()
 
@@ -554,17 +554,13 @@ if(WIN32)
 endif()
 
 if(APPLE)
-    target_sources(visualboyadvance-m PRIVATE
-        macsupport.mm
-    )
+    target_sources(visualboyadvance-m PRIVATE macsupport.mm)
 
-    if(NOT COMPILE_ONLY)
-        target_link_libraries(visualboyadvance-m
-          tiff)
+    if(NOT COMPILE_ONLY AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+        target_link_libraries(visualboyadvance-m tiff)
 
         if(NOT NIX)
-            target_link_libraries(visualboyadvance-m
-              zstd deflate)
+            target_link_libraries(visualboyadvance-m zstd deflate)
         endif()
     endif()
 endif()
