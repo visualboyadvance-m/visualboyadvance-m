@@ -26,7 +26,7 @@
 
 // since the ALC typedefs are broken on Mac:
 
-#ifdef __WXMAC__
+#if defined(__WXMAC__) && !defined(VCPKG)
 typedef ALCcontext*(ALC_APIENTRY* LPALCCREATECONTEXT)(ALCdevice* device, const ALCint* attrlist);
 typedef ALCboolean(ALC_APIENTRY* LPALCMAKECONTEXTCURRENT)(ALCcontext* context);
 typedef void(ALC_APIENTRY* LPALCDESTROYCONTEXT)(ALCcontext* context);

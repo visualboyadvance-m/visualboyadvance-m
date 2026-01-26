@@ -212,6 +212,10 @@ find_package(OpenAL QUIET)
 
 set(OPENAL_DEFAULT ${OpenAL_FOUND})
 
+if(APPLE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+   set(OPENAL_DEFAULT OFF)
+endif()
+
 if(MINGW AND X86)
     # OpenAL-Soft uses avrt.dll which is not available on Windows XP.
     set(OPENAL_DEFAULT OFF)

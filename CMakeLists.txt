@@ -100,6 +100,10 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    add_compile_definitions(-DVCPKG)
+endif() 
+
 if(APPLE)
     include(CheckLanguage)
     include(MetalShaderSupport)
