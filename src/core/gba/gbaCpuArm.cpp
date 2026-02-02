@@ -1063,7 +1063,7 @@ static void count(uint32_t opcode, int cond_res)
 #ifndef SETCOND_MULL
 #define SETCOND_MULL                                    \
     N_FLAG = (reg[dest].I & 0x80000000) ? true : false; \
-    Z_FLAG = reg[dest].I || reg[acc].I ? false : true;
+    Z_FLAG = (reg[dest].I | reg[acc].I) ? false : true;
 #endif
 
 #ifndef ALU_FINISH
