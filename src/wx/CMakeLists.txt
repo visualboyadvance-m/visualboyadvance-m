@@ -598,6 +598,12 @@ endif()
 
 configure_wx_target(visualboyadvance-m)
 
+# Workaround for wxWidgets 3.3 + MSVC Debug build linker issue with wxFormatString::Validate
+# This is a known issue where the symbol is defined in both wxbase33ud.lib and user code
+if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT COMPILE_ONLY)
+    target_link_options(visualboyadvance-m PRIVATE /FORCE:MULTIPLE)
+endif()
+
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
 if(NOT WIN32 AND NOT APPLE)
