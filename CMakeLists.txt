@@ -102,6 +102,9 @@ project(VBA-M C CXX)
 
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     add_compile_definitions(-DVCPKG)
+    if(MSVC)
+        set(CMAKE_CXX_FLAGS "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
+    endif()
 endif() 
 
 if(APPLE)
