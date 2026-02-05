@@ -951,9 +951,9 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
 endif()
 
 if(NOT WIN32 AND NOT APPLE)
-    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
-    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.metainfo.xml DESTINATION ${CMAKE_INSTALL_PREFIX}/share/metainfo)
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor)
+    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.desktop      DESTINATION share/applications)
+    install(FILES     ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.metainfo.xml DESTINATION share/metainfo)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/icons/sizes/                    DESTINATION share/icons/hicolor)
 endif()
 
 # Update the gettext pot source.

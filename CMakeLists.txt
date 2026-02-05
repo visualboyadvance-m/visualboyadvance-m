@@ -240,7 +240,7 @@ if(NOT VBAM_VERSION)
 endif()
 
 # Enable internationalization
-set(LOCALEDIR ${CMAKE_INSTALL_PREFIX}/share/locale)
+set(LOCALEDIR share/locale)
 
 if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(third_party/include/nonstd)
