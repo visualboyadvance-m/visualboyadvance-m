@@ -84,10 +84,14 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
 
     configure_wx_target(vbam-wx-config-tests)
 
-    # Workaround for wxWidgets 3.3 + MSVC Debug build linker issue with wxFormatString::Validate
-    # This is a known issue where the symbol is defined in both wxbase33ud.lib and user code
-    if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_options(vbam-wx-config-tests PRIVATE /FORCE:MULTIPLE)
+    # Workaround for wxWidgets 3.3 Debug build linker issue with wxFormatString::Validate
+    # This is a known issue where the symbol is defined in both the wxWidgets library and user code
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        if(MSVC)
+            target_link_options(vbam-wx-config-tests PRIVATE /FORCE:MULTIPLE)
+        elseif(MINGW OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+            target_link_options(vbam-wx-config-tests PRIVATE -Wl,--allow-multiple-definition)
+        endif()
     endif()
 
     if (NOT CMAKE_CROSSCOMPILING)

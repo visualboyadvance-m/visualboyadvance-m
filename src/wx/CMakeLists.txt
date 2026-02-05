@@ -598,10 +598,14 @@ endif()
 
 configure_wx_target(visualboyadvance-m)
 
-# Workaround for wxWidgets 3.3 + MSVC Debug build linker issue with wxFormatString::Validate
-# This is a known issue where the symbol is defined in both wxbase33ud.lib and user code
-if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT COMPILE_ONLY)
-    target_link_options(visualboyadvance-m PRIVATE /FORCE:MULTIPLE)
+# Workaround for wxWidgets 3.3 Debug build linker issue with wxFormatString::Validate
+# This is a known issue where the symbol is defined in both the wxWidgets library and user code
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT COMPILE_ONLY)
+    if(MSVC)
+        target_link_options(visualboyadvance-m PRIVATE /FORCE:MULTIPLE)
+    elseif(MINGW OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+        target_link_options(visualboyadvance-m PRIVATE -Wl,--allow-multiple-definition)
+    endif()
 endif()
 
 # we make some direct gtk/gdk calls on linux and such
