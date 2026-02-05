@@ -271,7 +271,7 @@ static const std::unordered_map<unsigned, int> kKeyMap = {
     #include "x11keymap.h"
 };
 
-int wxCharCodeXToWX(unsigned long keySym)
+int wxCharCodeXToWX_vbam(unsigned long keySym)
 {
     int id;
     switch (keySym)
@@ -460,7 +460,7 @@ int wxCharCodeXToWX(unsigned long keySym)
 
 int wxUnicodeCharXToWX(unsigned long keySym)
 {
-    int id = wxCharCodeXToWX(keySym);
+    int id = wxCharCodeXToWX_vbam(keySym);
 
     /* first check for Latin-1 characters (1:1 mapping) */
     if (id != WXK_NONE)
