@@ -297,6 +297,7 @@ struct Scaler9x : public ColorGradient
         alphaGrad<1, 4>(out.template ref<scale - 2, 2>(), col);
         alphaGrad<1, 4>(out.template ref<scale - 3, 4>(), col);
         alphaGrad<1, 4>(out.template ref<scale - 4, 6>(), col);
+        alphaGrad<1, 4>(out.template ref<scale - 5, 8>(), col); //5th step for odd scale (no 3/4 since col 9 is out of bounds)
 
         alphaGrad<3, 4>(out.template ref<scale - 1, 1>(), col);
         alphaGrad<3, 4>(out.template ref<scale - 2, 3>(), col);
@@ -320,6 +321,8 @@ struct Scaler9x : public ColorGradient
         out.template ref<scale - 3, 6>() = col;
         out.template ref<scale - 3, 7>() = col;
         out.template ref<scale - 3, 8>() = col;
+
+        out.template ref<scale - 4, 8>() = col;
     }
 
     template <class OutputMatrix>
@@ -329,6 +332,7 @@ struct Scaler9x : public ColorGradient
         alphaGrad<1, 4>(out.template ref<2, scale - 2>(), col);
         alphaGrad<1, 4>(out.template ref<4, scale - 3>(), col);
         alphaGrad<1, 4>(out.template ref<6, scale - 4>(), col);
+        alphaGrad<1, 4>(out.template ref<8, scale - 5>(), col); //5th step for odd scale
 
         alphaGrad<3, 4>(out.template ref<1, scale - 1>(), col);
         alphaGrad<3, 4>(out.template ref<3, scale - 2>(), col);
@@ -352,6 +356,8 @@ struct Scaler9x : public ColorGradient
         out.template ref<6, scale - 3>() = col;
         out.template ref<7, scale - 3>() = col;
         out.template ref<8, scale - 3>() = col;
+
+        out.template ref<8, scale - 4>() = col;
     }
 
     template <class OutputMatrix>
@@ -371,6 +377,8 @@ struct Scaler9x : public ColorGradient
         alphaGrad<3, 4>(out.template ref<scale - 2, 3>(), col);
         alphaGrad<3, 4>(out.template ref<scale - 3, 5>(), col);
 
+        alphaGrad<2, 3>(out.template ref<5, 5>(), col); //center blend to connect steep and shallow (like Scaler5x)
+
         out.template ref<2, scale - 1>() = col;
         out.template ref<3, scale - 1>() = col;
         out.template ref<4, scale - 1>() = col;
@@ -384,6 +392,8 @@ struct Scaler9x : public ColorGradient
         out.template ref<6, scale - 2>() = col;
         out.template ref<7, scale - 2>() = col;
         out.template ref<8, scale - 2>() = col;
+
+        out.template ref<6, scale - 3>() = col; //close gap between steep and shallow
 
         out.template ref<scale - 1, 2>() = col;
         out.template ref<scale - 1, 3>() = col;
@@ -403,16 +413,24 @@ struct Scaler9x : public ColorGradient
     template <class OutputMatrix>
     static void blendLineDiagonal(uint32_t col, OutputMatrix& out)
     {
-        alphaGrad<1, 2>(out.template ref<scale - 1, scale / 2    >(), col);
-        alphaGrad<1, 2>(out.template ref<scale - 2, scale / 2 + 1>(), col);
-        alphaGrad<1, 2>(out.template ref<scale - 3, scale / 2 + 2>(), col);
-        alphaGrad<1, 2>(out.template ref<scale - 4, scale / 2 + 3>(), col);
+        //odd scale: use 1/8 for diagonal trace to avoid conflicts with other rotations (like Scaler5x)
+        alphaGrad<1, 8>(out.template ref<scale - 1, scale / 2    >(), col); //[8, 4]
+        alphaGrad<1, 8>(out.template ref<scale - 2, scale / 2 + 1>(), col); //[7, 5]
+        alphaGrad<1, 8>(out.template ref<scale - 3, scale / 2 + 2>(), col); //[6, 6]
+        alphaGrad<1, 8>(out.template ref<scale - 4, scale / 2 + 3>(), col); //[5, 7]
+        alphaGrad<1, 8>(out.template ref<scale - 5, scale / 2 + 4>(), col); //[4, 8]
 
-        out.template ref<scale - 2, scale - 1>() = col;
-        out.template ref<scale - 1, scale - 1>() = col;
-        out.template ref<scale - 1, scale - 2>() = col;
-        out.template ref<scale - 1, scale - 3>() = col;
-        out.template ref<scale - 3, scale - 1>() = col;
+        alphaGrad<7, 8>(out.template ref<scale - 1, scale / 2 + 1>(), col); //[8, 5]
+        alphaGrad<7, 8>(out.template ref<scale - 2, scale / 2 + 2>(), col); //[7, 6]
+        alphaGrad<7, 8>(out.template ref<scale - 3, scale / 2 + 3>(), col); //[6, 7]
+        alphaGrad<7, 8>(out.template ref<scale - 4, scale / 2 + 4>(), col); //[5, 8]
+
+        out.template ref<scale - 1, scale - 1>() = col; //[8, 8]
+        out.template ref<scale - 1, scale - 2>() = col; //[8, 7]
+        out.template ref<scale - 1, scale - 3>() = col; //[8, 6]
+        out.template ref<scale - 2, scale - 1>() = col; //[7, 8]
+        out.template ref<scale - 2, scale - 2>() = col; //[7, 7]
+        out.template ref<scale - 3, scale - 1>() = col; //[6, 8]
     }
 
     template <class OutputMatrix>
