@@ -67,6 +67,27 @@
 static GtkWidget* g_main_window = nullptr;
 static GtkWidget* g_menubar_widget = nullptr;
 static void ForceMenubarMnemonicsVisible(GtkWidget* menubar_widget);
+static bool g_menus_opened_for_gdk = false;
+
+// Custom GDK event handler that intercepts delete-event while menus are open.
+// When a GTK popup menu is active, wxWidgets' delete-event signal handler
+// doesn't close the window. We dismiss the menus before letting GTK process
+// the DELETE event so that wxWidgets' close handling works normally.
+static void vbam_gdk_event_handler(GdkEvent* event, gpointer data) {
+    (void)data;
+
+    if (event->type == GDK_DELETE && g_menus_opened_for_gdk) {
+        // Dismiss menus before processing the delete event
+        if (g_menubar_widget) {
+            gtk_grab_remove(g_menubar_widget);
+            GtkMenuShell* menu_shell = GTK_MENU_SHELL(g_menubar_widget);
+            gtk_menu_shell_deselect(menu_shell);
+            gtk_menu_shell_cancel(menu_shell);
+        }
+    }
+
+    gtk_main_do_event(event);
+}
 
 #endif
 
@@ -762,6 +783,7 @@ bool wxvbamApp::OnInit() {
             if (toplevel && GTK_IS_WINDOW(toplevel)) {
                 g_main_window = toplevel;
                 gtk_window_set_mnemonics_visible(GTK_WINDOW(toplevel), TRUE);
+                gdk_event_handler_set(vbam_gdk_event_handler, nullptr, nullptr);
             }
             ForceMenubarMnemonicsVisible(menubar_widget);
         }
@@ -1491,6 +1513,9 @@ void MainFrame::MenuPopped(wxMenuEvent& evt) {
 
 void MainFrame::SetMenusOpened(bool state) {
     menus_opened = state;
+#ifdef __WXGTK__
+    g_menus_opened_for_gdk = state;
+#endif
 #if defined(__WXMSW__)
     // On Windows, opening the menubar will stop the app, but DirectSound will
     // loop, so we pause audio here.
