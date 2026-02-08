@@ -325,6 +325,14 @@ void SoundConfig::OnAudioApiChanged(wxCommandEvent& event, config::AudioApi audi
         audio_device_selector_->SetSelection(0);
     }
 
+#ifdef ONLY_DEFAULT_AUDIO_DEVICE
+    if (audio_api == config::AudioApi::kSDL) {
+        audio_device_selector_->Enable(false);
+    } else {
+        audio_device_selector_->Enable(true);
+    }
+#endif
+
 #if defined(VBAM_ENABLE_XAUDIO2) && defined(VBAM_ENABLE_FAUDIO)
     upmix_checkbox_->Enable(audio_api == config::AudioApi::kXAudio2 ||
                             audio_api == config::AudioApi::kFAudio);

@@ -46,6 +46,10 @@
 #define S_ISDIR(mode)  (((mode) & _S_IFMT) == _S_IFDIR)
 #endif
 
+#else
+
+#include <unistd.h>
+
 #endif // _WIN32
 
 #ifndef __GNUC__

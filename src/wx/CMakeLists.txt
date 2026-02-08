@@ -449,6 +449,11 @@ else()
     target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
 endif()
 
+# Setting an SDL audio device by name segfaults on FreeBSD.
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    target_compile_definitions(visualboyadvance-m PRIVATE ONLY_DEFAULT_AUDIO_DEVICE)
+endif()
+
 if(ENABLE_OPENAL)
     find_package(OpenAL REQUIRED)
 

@@ -191,7 +191,9 @@ freebsd_installdeps() {
 
     check sudo pkg update
 
-    pkgs="llvm-devel cmake ccache nasm ffmpeg gettext-tools gettext pkgconf sdl3 wx31-gtk3 iconv zip ninja"
+    wx_pkg=$(pkg search wx | grep gtk3 | grep '^wx' | sed -E 's/-[0-9].*//' | sort -Vr | head -1)
+
+    pkgs="llvm-devel cmake ccache nasm ffmpeg openal-soft gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
 

@@ -193,13 +193,13 @@ bool SDLAudio::init(long sampleRate) {
     } else {
         sound_stream = SDL_OpenAudioDeviceStream(sdl_devices[current_device], &audio, NULL, NULL);
     }
+#endif
 
     if(sound_stream == NULL) {
         return false;
     }
-        
+
     sound_device = SDL_GetAudioStreamDevice(sound_stream);
-#endif
 #else
 #ifdef ONLY_DEFAULT_AUDIO_DEVICE
     sound_device = SDL_OpenAudioDevice(NULL, 0, &audio, NULL, 0);
