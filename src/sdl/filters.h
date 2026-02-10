@@ -47,7 +47,6 @@ enum Filter {
     kStretch4x,
     khq4x,
     xbrz4x,
-    xbrz5x,
     xbrz6x,
     kInvalidFilter
 };

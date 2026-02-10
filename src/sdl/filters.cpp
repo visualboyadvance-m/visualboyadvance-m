@@ -525,7 +525,6 @@ const FilterDesc Filters[] = {{"Stretch 1x", 1, sdlStretch1x, sdlStretch1x, sdlS
                               {"Stretch 4x", 4, sdlStretch4x, sdlStretch4x, sdlStretch4x, sdlStretch4x},
                               {"hq4x", 4, 0, hq4x16, 0, hq4x32_32},
                               {"xbrz4x", 4, 0, 0, 0, xbrz4x32},
-                              {"xbrz5x", 5, 0, 0, 0, xbrz5x32},
                               {"xbrz6x", 6, 0, 0, 0, xbrz6x32}};
 
 int getFilterEnlargeFactor(const int f) {

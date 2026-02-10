@@ -98,8 +98,8 @@ double GetFilterScale() {
         case config::Filter::kSimple4x:
         case config::Filter::kHQ4x:
             return 4.0;
-        case config::Filter::kXbrz5x:
-            return 5.0;
+        case config::Filter::kXbrz6x:
+            return 6.0;
         case config::Filter::kXbrz9x:
         case config::Filter::kScaleFX9x:
             return 9.0;
@@ -170,8 +170,8 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
         case config::Filter::kXbrz2x:
             xbrz2x32(src, instride, delta, dst, outstride, width, height);
             break;
-        case config::Filter::kXbrz5x:
-            xbrz5x32(src, instride, delta, dst, outstride, width, height);
+        case config::Filter::kXbrz6x:
+            xbrz6x32(src, instride, delta, dst, outstride, width, height);
             break;
         case config::Filter::kXbrz9x:
             xbrz9x32(src, instride, delta, dst, outstride, width, height);

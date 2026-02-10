@@ -34,7 +34,7 @@ enum class Filter {
     kLQ2x,
     kSimple4x,
     kXbrz2x,
-    kXbrz5x,
+    kXbrz6x,
     kXbrz9x,
     kScaleFX3x,
     kScaleFX9x,
