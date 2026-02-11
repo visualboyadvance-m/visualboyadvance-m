@@ -87,6 +87,9 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 int emulating = 0;
 
+static uint8_t* serializationBuffer = nullptr;
+static const size_t serializationBufferSize = 2 * 1024 * 1024; // 2MB buffer
+
 struct CoreOptions coreOptions;
 
 #ifdef VBAM_ENABLE_DEBUGGER
@@ -1098,6 +1101,11 @@ static void gb_init(void)
 
 void retro_deinit(void)
 {
+    if (serializationBuffer) {
+        free(serializationBuffer);
+        serializationBuffer = nullptr;
+    }
+    
     emulating = 0;
     if (core)
         core->emuCleanUp();
@@ -1758,9 +1766,14 @@ size_t retro_serialize_size(void)
 {
     if (!core)
         return 0;
+    if (!serializationBuffer) {
+        serializationBuffer = (uint8_t*)malloc(serializationBufferSize);
+        if (!serializationBuffer) {
+            return 0;
+        }
+    }
     if (enable_variable_serialization_size) {
-        uint8_t data[2 * 1024 * 1024]; // just big enough
-        serialize_size = core->emuWriteState((uint8_t*)data);
+        serialize_size = core->emuWriteState(serializationBuffer);
     }
     return serialize_size;
 }
