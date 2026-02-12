@@ -138,16 +138,15 @@ static void MotionBlurIB32_SSE2(uint8_t* srcPtr, uint8_t* histPtr,
             __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
             __m128i prev = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&hist[x]));
 
-            // Save current to history before blending
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&hist[x]), curr);
-
-            // Blend: (current & mask) >> 1 + (prev & mask) >> 1
+            // Exponential decay: blend = (current + prev) / 2
             __m128i curr_masked = _mm_and_si128(curr, colorMask);
             __m128i prev_masked = _mm_and_si128(prev, colorMask);
             __m128i curr_half = _mm_srli_epi32(curr_masked, 1);
             __m128i prev_half = _mm_srli_epi32(prev_masked, 1);
             __m128i blended = _mm_add_epi32(curr_half, prev_half);
 
+            // Save blended result to history (creates exponential decay)
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&hist[x]), blended);
             _mm_storeu_si128(reinterpret_cast<__m128i*>(&src[x]), blended);
         }
 
@@ -155,8 +154,10 @@ static void MotionBlurIB32_SSE2(uint8_t* srcPtr, uint8_t* histPtr,
         for (; x < sPitch; x++) {
             uint32_t color = src[x];
             uint32_t hist_color = hist[x];
-            hist[x] = color;
-            src[x] = ((color & 0xFEFEFE) >> 1) + ((hist_color & 0xFEFEFE) >> 1);
+            // Exponential decay: blend current with accumulated history
+            uint32_t blended = ((color & 0xFEFEFE) >> 1) + ((hist_color & 0xFEFEFE) >> 1);
+            hist[x] = blended;  // Save blended result (accumulates decay)
+            src[x] = blended;
         }
 
         src += sPitch;
@@ -184,22 +185,25 @@ static void MotionBlurIB16_SSE2(uint8_t* srcPtr, uint8_t* histPtr,
             __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
             __m128i prev = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&hist[x]));
 
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&hist[x]), curr);
-
+            // Exponential decay: blend = (current + prev) / 2
             __m128i curr_masked = _mm_and_si128(curr, mask);
             __m128i prev_masked = _mm_and_si128(prev, mask);
             __m128i curr_half = _mm_srli_epi16(curr_masked, 1);
             __m128i prev_half = _mm_srli_epi16(prev_masked, 1);
             __m128i blended = _mm_add_epi16(curr_half, prev_half);
 
+            // Save blended result to history (creates exponential decay)
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(&hist[x]), blended);
             _mm_storeu_si128(reinterpret_cast<__m128i*>(&src[x]), blended);
         }
 
         for (; x < sPitch; x++) {
             uint16_t color = src[x];
             uint16_t hist_color = hist[x];
-            hist[x] = color;
-            src[x] = ((color & colorMask) >> 1) + ((hist_color & colorMask) >> 1);
+            // Exponential decay: blend current with accumulated history
+            uint16_t blended = ((color & colorMask) >> 1) + ((hist_color & colorMask) >> 1);
+            hist[x] = blended;  // Save blended result (accumulates decay)
+            src[x] = blended;
         }
 
         src += sPitch;
@@ -610,12 +614,94 @@ static void SmartIB_MMX(uint8_t* srcPtr, uint8_t* frm1Ptr, uint8_t* frm2Ptr, uin
 
 static void MotionBlurIB_MMX(uint8_t* srcPtr, uint8_t* histPtr,
                               uint32_t srcPitch, int width, int starty, int height) {
-    MotionBlurIB16_Scalar(srcPtr, histPtr, srcPitch, width, starty, height);
+    (void)width;
+    // Use constant mask for RGB555
+    const uint16_t colorMask = 0x7BDE;
+    const __m64 mask = _mm_set1_pi16(colorMask);
+
+    uint16_t* src = reinterpret_cast<uint16_t*>(srcPtr) + starty * (srcPitch / 2);
+    uint16_t* hist = reinterpret_cast<uint16_t*>(histPtr) + starty * (srcPitch / 2);
+
+    int sPitch = srcPitch >> 1;
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        // Process 4 pixels at a time with MMX (64-bit = 4 x 16-bit)
+        for (; x + 4 <= sPitch; x += 4) {
+            __m64 curr = *reinterpret_cast<const __m64*>(&src[x]);
+            __m64 prev = *reinterpret_cast<const __m64*>(&hist[x]);
+
+            // Exponential decay: blend = (current + prev) / 2
+            __m64 curr_masked = _mm_and_si64(curr, mask);
+            __m64 prev_masked = _mm_and_si64(prev, mask);
+            __m64 curr_half = _mm_srli_pi16(curr_masked, 1);
+            __m64 prev_half = _mm_srli_pi16(prev_masked, 1);
+            __m64 blended = _mm_add_pi16(curr_half, prev_half);
+
+            // Save blended result to history (creates exponential decay)
+            *reinterpret_cast<__m64*>(&hist[x]) = blended;
+            *reinterpret_cast<__m64*>(&src[x]) = blended;
+        }
+
+        // Scalar tail
+        for (; x < sPitch; x++) {
+            uint16_t color = src[x];
+            uint16_t hist_color = hist[x];
+            uint16_t blended = ((color & colorMask) >> 1) + ((hist_color & colorMask) >> 1);
+            hist[x] = blended;
+            src[x] = blended;
+        }
+
+        src += sPitch;
+        hist += sPitch;
+    }
+
+    _mm_empty();  // Clear MMX state
 }
 
 static void MotionBlurIB32_MMX(uint8_t* srcPtr, uint8_t* histPtr,
                                 uint32_t srcPitch, int width, int starty, int height) {
-    MotionBlurIB32_Scalar(srcPtr, histPtr, srcPitch, width, starty, height);
+    (void)width;
+    const __m64 colorMask = _mm_set1_pi32(0x00FEFEFE);
+
+    uint32_t* src = reinterpret_cast<uint32_t*>(srcPtr) + starty * (srcPitch / 4);
+    uint32_t* hist = reinterpret_cast<uint32_t*>(histPtr) + starty * (srcPitch / 4);
+
+    int sPitch = srcPitch >> 2;
+
+    for (int y = 0; y < height; y++) {
+        int x = 0;
+        // Process 2 pixels at a time with MMX (64-bit = 2 x 32-bit)
+        for (; x + 2 <= sPitch; x += 2) {
+            __m64 curr = *reinterpret_cast<const __m64*>(&src[x]);
+            __m64 prev = *reinterpret_cast<const __m64*>(&hist[x]);
+
+            // Exponential decay: blend = (current + prev) / 2
+            __m64 curr_masked = _mm_and_si64(curr, colorMask);
+            __m64 prev_masked = _mm_and_si64(prev, colorMask);
+            __m64 curr_half = _mm_srli_pi32(curr_masked, 1);
+            __m64 prev_half = _mm_srli_pi32(prev_masked, 1);
+            __m64 blended = _mm_add_pi32(curr_half, prev_half);
+
+            // Save blended result to history (creates exponential decay)
+            *reinterpret_cast<__m64*>(&hist[x]) = blended;
+            *reinterpret_cast<__m64*>(&src[x]) = blended;
+        }
+
+        // Scalar tail
+        for (; x < sPitch; x++) {
+            uint32_t color = src[x];
+            uint32_t hist_color = hist[x];
+            uint32_t blended = ((color & 0xFEFEFE) >> 1) + ((hist_color & 0xFEFEFE) >> 1);
+            hist[x] = blended;
+            src[x] = blended;
+        }
+
+        src += sPitch;
+        hist += sPitch;
+    }
+
+    _mm_empty();  // Clear MMX state
 }
 
 #endif  // USE_MMX
@@ -871,8 +957,10 @@ static void MotionBlurIB32_Scalar(uint8_t* srcPtr, uint8_t* histPtr,
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < sPitch; i++) {
             uint32_t color = src0[pos];
-            src0[pos] = (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1));
-            src1[pos] = color;
+            // Exponential decay: blend current with accumulated history
+            uint32_t blended = (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1));
+            src1[pos] = blended;  // Save blended result (accumulates decay)
+            src0[pos] = blended;
             pos++;
         }
     }
@@ -894,8 +982,10 @@ static void MotionBlurIB16_Scalar(uint8_t* srcPtr, uint8_t* histPtr,
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < sPitch; i++) {
             uint16_t color = src0[pos];
-            src0[pos] = (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1));
-            src1[pos] = color;
+            // Exponential decay: blend current with accumulated history
+            uint16_t blended = (((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1));
+            src1[pos] = blended;  // Save blended result (accumulates decay)
+            src0[pos] = blended;
             pos++;
         }
     }
@@ -918,13 +1008,19 @@ static void MotionBlurIB24_Scalar(uint8_t* srcPtr, uint8_t* histPtr,
             uint8_t color2 = src0[pos + 1];
             uint8_t color3 = src0[pos + 2];
 
-            src0[pos] = ((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1);
-            src0[pos + 1] = ((color2 & colorMask) >> 1) + ((src1[pos + 1] & colorMask) >> 1);
-            src0[pos + 2] = ((color3 & colorMask) >> 1) + ((src1[pos + 2] & colorMask) >> 1);
+            // Exponential decay: blend current with accumulated history
+            uint8_t blended_r = ((color & colorMask) >> 1) + ((src1[pos] & colorMask) >> 1);
+            uint8_t blended_g = ((color2 & colorMask) >> 1) + ((src1[pos + 1] & colorMask) >> 1);
+            uint8_t blended_b = ((color3 & colorMask) >> 1) + ((src1[pos + 2] & colorMask) >> 1);
 
-            src1[pos] = color;
-            src1[pos + 1] = color2;
-            src1[pos + 2] = color3;
+            // Save blended result (accumulates decay)
+            src1[pos] = blended_r;
+            src1[pos + 1] = blended_g;
+            src1[pos + 2] = blended_b;
+
+            src0[pos] = blended_r;
+            src0[pos + 1] = blended_g;
+            src0[pos + 2] = blended_b;
             pos += 3;
         }
     }
@@ -952,12 +1048,15 @@ static void MotionBlurIB8_Scalar(uint8_t* srcPtr, uint8_t* histPtr,
                                   ? 0x7fff
                                   : ((src1[pos] & 0xe0) << 7) | ((src1[pos] & 0x1c) << 5) |
                                         ((src1[pos] & 0x3) << 3);
-            uint16_t color_dst = ((color & colorMask) >> 1) + ((color2 & colorMask) >> 1);
+            // Exponential decay: blend current with accumulated history
+            uint16_t blended_rgb = ((color & colorMask) >> 1) + ((color2 & colorMask) >> 1);
 
-            src0[pos] = static_cast<uint8_t>(((color_dst >> 7) & 0xe0) |
-                                              ((color_dst >> 5) & 0x1c) | ((color_dst >> 3) & 0x3));
-            src1[pos] = static_cast<uint8_t>(((color >> 7) & 0xe0) | ((color >> 5) & 0x1c) |
-                                              ((color >> 3) & 0x3));
+            uint8_t blended_pal = static_cast<uint8_t>(((blended_rgb >> 7) & 0xe0) |
+                                              ((blended_rgb >> 5) & 0x1c) | ((blended_rgb >> 3) & 0x3));
+
+            // Save blended result (accumulates decay)
+            src1[pos] = blended_pal;
+            src0[pos] = blended_pal;
             pos++;
         }
     }
