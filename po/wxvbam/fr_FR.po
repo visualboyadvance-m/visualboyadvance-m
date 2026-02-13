@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Alexis Anstett <arkaniste54@gmail.com>, 2020
-# Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024
+# Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024,2026
 # Benjamin Siskoo <siskoo@tradu-france.com>, 2018
 # Eequiis Vásquez, 2025
 # Eequiis Vásquez, 2025
@@ -22,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-10 22:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Thibault <thibaultbruneliere@gmail.com>, 2019\n"
+"Last-Translator: Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024,2026\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,17 +40,17 @@ msgstr "Périphérique par défaut"
 
 #: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "Impossible d'obtenir le périphérique CoreAudio"
 
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Échec de l'allocation du tampon %d CoreAudio : erreur %d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "Échec du démarrage de la file d'attente CoreAudio : erreur %d"
 
 #: cmdevents.cpp:63 wxvbam.cpp:726
 msgid "Could not create main window"
@@ -301,12 +301,12 @@ msgstr "En attente de GDB..."
 #: cmdevents.cpp:2282
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Filtre : %s"
 
 #: cmdevents.cpp:2290
 #, c-format
 msgid "Interframe Blending: %s"
-msgstr ""
+msgstr "Mélange intertrame : %s"
 
 #: cmdevents.cpp:2339
 msgid ""
@@ -385,7 +385,7 @@ msgstr "Valeur de zoom par défaut invalide"
 
 #: dialogs/display-config.cpp:476
 msgid "Invalid color correction profile"
-msgstr ""
+msgstr "Profil de correction des couleurs non valide"
 
 #: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
 #: xrc/DisplayConfig.xrc:156 xrc/DisplayConfig.xrc:386
@@ -412,7 +412,7 @@ msgstr "Utilisation du filtre pixel : %s"
 #: dialogs/display-config.cpp:628
 #, c-format
 msgid "interframe blend: %s"
-msgstr ""
+msgstr "Fondu intertrame : %s"
 
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
@@ -818,11 +818,11 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Impossible de créer le répertoire Sauvegardes Natives :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
 #: panel.cpp:1131 panel.cpp:1152 wxvbam.cpp:1248
 msgid "Directory Error"
-msgstr ""
+msgstr "Erreur de Répertoire"
 
 #: panel.cpp:1151
 #, c-format
@@ -831,7 +831,7 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Impossible de créer le répertoire Sauegardes de l'Emulateur  :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
 #: panel.cpp:1295
 #, c-format
@@ -884,7 +884,7 @@ msgstr "Cartouche Game Boy Advance invalide"
 
 #: panel.cpp:1707
 msgid "Metal is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Le métal n'est pas disponible, le réglage par défaut est OpenGL."
 
 #: panel.cpp:1846
 msgid "No memory for rewinding"
@@ -924,12 +924,12 @@ msgstr "Échec de la création d'une fênêtre SDL"
 
 #: panel.cpp:3033 panel.cpp:3090
 msgid "Renderer creating failed, using default renderer"
-msgstr ""
+msgstr "Échec de la création du moteur de rendu, utilisation du moteur de rendu par défaut"
 
 #: panel.cpp:3034
 #, c-format
 msgid "SDL Error: %s"
-msgstr ""
+msgstr "Erreur SDL : %s"
 
 #: panel.cpp:3041 panel.cpp:3096
 msgid "Failed to create SDL renderer"
@@ -937,16 +937,16 @@ msgstr "Échec de la création du mùoteur de rendu SDL"
 
 #: panel.cpp:3047
 msgid "Failed to set vsync for SDL renderer"
-msgstr ""
+msgstr "Échec de la configuration de vsync pour le rendu SDL"
 
 #: panel.cpp:3051 panel.cpp:3085
 #, c-format
 msgid "SDL renderer: %s"
-msgstr ""
+msgstr "Rendu SDL :%s"
 
 #: panel.cpp:3070
 msgid "SDL renderer: default"
-msgstr ""
+msgstr "Rendu SDL : par défaut"
 
 #: panel.cpp:3746
 msgid "Enabling EGL VSync."
@@ -994,81 +994,81 @@ msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
 #: panel.cpp:3914
 msgid "Using Direct3D 9Ex (dynamically loaded)"
-msgstr ""
+msgstr "Utilisation de Direct3D 9Ex (chargé dynamiquement)"
 
 #: panel.cpp:3918
 msgid "Failed to load d3d9.dll"
-msgstr ""
+msgstr "Échec du chargement de d3d9.dll"
 
 #: panel.cpp:3927
 msgid "Failed to create Direct3D 9 interface"
-msgstr ""
+msgstr "Échec de la création de l'interface Direct3D 9"
 
 #: panel.cpp:3930
 msgid "Using Direct3D 9"
-msgstr ""
+msgstr "Utilisation de Direct3D 9"
 
 #: panel.cpp:3937
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr ""
+msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur : 0x%08X"
 
 #: panel.cpp:3961
 msgid "FlipEx not supported, falling back to Discard swap effect"
-msgstr ""
+msgstr "FlipEx non pris en charge, retour à l'effet Discard swap"
 
 #: panel.cpp:3977
 msgid "Hardware vertex processing not available, falling back to software"
-msgstr ""
+msgstr "Traitement matériel des sommets indisponible, retour au traitement logiciel"
 
 #: panel.cpp:4001
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Échec de la création du périphérique Direct3D : 0x%08X"
 
 #: panel.cpp:4006
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
-msgstr ""
+msgstr "Périphérique Direct3D 9 %scréé avec succès (SwapEffect :%s )"
 
 #: panel.cpp:4039
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DXDrawingPanel initialisé :%d x %d(échelle : %f)"
 
 #: panel.cpp:4061
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr ""
+msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur pour la réinitialisation : 0x%08X"
 
 #: panel.cpp:4093
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
-msgstr ""
+msgstr "Tentative de réinitialisation du périphérique Direct3D (SwapEffect :%s )"
 
 #: panel.cpp:4100
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
-msgstr ""
+msgstr "Réinitialisation avec FlipEx échouée, nouvelle tentative avec effet d'échange Discard"
 
 #: panel.cpp:4112
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Échec de la réinitialisation du périphérique Direct3D : 0x%08X"
 
 #: panel.cpp:4117
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
-msgstr ""
+msgstr "Réinitialisation du périphérique Direct3D réussie (effet d'échange final :%s )"
 
 #: panel.cpp:4181
 #, c-format
 msgid "Failed to create texture: 0x%08X"
-msgstr ""
+msgstr "Échec de la création de la texture : 0x%08X"
 
 #: panel.cpp:4193
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "Échec du verrouillage de la texture : 0x%08X"
 
 #: panel.cpp:4384
 msgid "Memory allocation error"
@@ -1264,7 +1264,7 @@ msgstr "Erreur de configuration / d'assemblage : impossible de trouver le fichie
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
-msgstr "Configuration intégrée enregistrée sur %s.\nPour passer outre, tout enlever sauf le·s nœud·s de racine modifié·s. D'abord trouver le nœud racine au nom correct dans tous les fichiers .xrc ou .xrs dans le chemin de recherche suivant les chemins d'accès intégrés :"
+msgstr "A écrit la configuration intégrée dans %s.\nPour remplacer, supprimez tout sauf les nœud(s) racine modifiés. Le premier nœud racine trouvé avec le nom correct dans les fichiers .xrc ou .xrs du chemin de recherche suivant remplace la configuration intégrée :"
 
 #: wxvbam.cpp:906
 msgid "Configuration is read from, in order:"
@@ -1312,7 +1312,7 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Impossible de créer le répertoire :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:446
@@ -1422,7 +1422,7 @@ msgstr "Utilise le filtre bilinéaire avec le rendu 3D"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:420
 msgid "Use the SDL pixel art filter with an SDL renderer"
-msgstr ""
+msgstr "Utilisez le filtre pixel art SDL avec un moteur de rendu SDL."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:421
 msgid "Full-screen filter to apply"
@@ -1466,7 +1466,7 @@ msgstr "Moteur de rendu SDL"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Color correction profile"
-msgstr ""
+msgstr "Profil de correction des couleurs"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -1519,7 +1519,7 @@ msgstr "Répertoire pour la recherche de fichiers ROM Game Boy Color"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
 msgid "Color lightness factor"
-msgstr ""
+msgstr "Facteur de luminosité des couleurs"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
 msgid "BIOS file to use, if enabled"
@@ -1559,7 +1559,7 @@ msgstr "Type de cable pour le Link"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
 msgid "Color darkness factor"
-msgstr ""
+msgstr "Facteur d'obscurité des couleurs"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Automatically load last saved state"
@@ -1921,59 +1921,59 @@ msgstr "Arrêt Défilement"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:30
 msgid "Num Space"
-msgstr "Espace (Num)"
+msgstr "Num Espace"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:31
 msgid "Num Tab"
-msgstr "Tab (Num)"
+msgstr "Num Tab"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:32
 msgid "Num Enter"
-msgstr "Entrée (Num)"
+msgstr "Num Entrée"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:33
 msgid "Num Home"
-msgstr "Début (Num)"
+msgstr "Num Début"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:34
 msgid "Num left"
-msgstr "Gauche (Num)"
+msgstr "Num Gauche"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:35
 msgid "Num Up"
-msgstr "Haut (Num)"
+msgstr "Num Haut"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:36
 msgid "Num Right"
-msgstr "Droite (Num)"
+msgstr "Num Droite"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:37
 msgid "Num Down"
-msgstr "Bas (Num)"
+msgstr "Num Bas"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:38
 msgid "Num PageUp"
-msgstr "Page précédente (Num)"
+msgstr "Num Page précédente"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:39
 msgid "Num PageDown"
-msgstr "Page suivante (Num)"
+msgstr "Num Page suivante"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:40
 msgid "Num End"
-msgstr "Fin (Num)"
+msgstr "Num Fin"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:41
 msgid "Num Begin"
-msgstr "Début (Num)"
+msgstr "Num Début"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:42
 msgid "Num Insert"
-msgstr "Inserer (Num)"
+msgstr "Num Insérer "
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:43
 msgid "Num Delete"
-msgstr "Effacer (Num)"
+msgstr "Num Supprimer"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:44
 msgid "Num ="
@@ -2033,11 +2033,11 @@ msgstr "Lecture/Pause"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:114
 msgid "LAlt+"
-msgstr ""
+msgstr "LAlt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:116
 msgid "RAlt+"
-msgstr ""
+msgstr "RAlt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:118
 msgid "Alt+"
@@ -2046,17 +2046,17 @@ msgstr "Alt+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:127
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:141
 msgid "LCtrl+"
-msgstr ""
+msgstr "LCtrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:130
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
 msgid "RCtrl+"
-msgstr ""
+msgstr "RCtrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
 msgid "Cmd+"
-msgstr ""
+msgstr "Cmd+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
@@ -2065,11 +2065,11 @@ msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
-msgstr ""
+msgstr "LShift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:151
 msgid "RShift+"
-msgstr ""
+msgstr "RShift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:153
 msgid "Shift+"
@@ -2077,11 +2077,11 @@ msgstr "Maj+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:162
 msgid "LMeta+"
-msgstr ""
+msgstr "LMeta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:164
 msgid "RMeta+"
-msgstr ""
+msgstr "RMeta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:166
 msgid "Meta+"
@@ -2129,20 +2129,20 @@ msgstr "%s : Direction %d Est"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:514
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:521
 msgid "Key"
@@ -2291,7 +2291,7 @@ msgstr "Erreur de partage mémoire"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2713
 msgid "5 or more GBAs not supported."
-msgstr "Impossible de supporter plus que 4 GBA."
+msgstr "5 GBA ou plus non pris en charge."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2751
@@ -2534,7 +2534,7 @@ msgstr "Enregistrements"
 msgid ""
 "Use %s in paths for the system name (GameBoy Advance, GameBoy Color, Super "
 "GameBoy, or GameBoy)."
-msgstr ""
+msgstr "Utilisez %sdans les chemins d'accès pour le nom du système (GameBoy Advance, GameBoy Color, Super GameBoy ou GameBoy)."
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
@@ -2593,7 +2593,7 @@ msgstr "Moteur de rendu SDL"
 
 #: xrc/DisplayConfig.xrc:83
 msgid "SDL Pixel Art Filter"
-msgstr ""
+msgstr "Filtre SDL Pixel Art"
 
 #: xrc/DisplayConfig.xrc:97
 msgid "Filters"
@@ -2677,35 +2677,35 @@ msgstr "32"
 
 #: xrc/DisplayConfig.xrc:198
 msgid "Color Correction"
-msgstr ""
+msgstr "Correction des couleurs"
 
 #: xrc/DisplayConfig.xrc:207
 msgid "Profile:"
-msgstr ""
+msgstr "Profil :"
 
 #: xrc/DisplayConfig.xrc:241
 msgid "GBA Darken:"
-msgstr ""
+msgstr "GBA Assombrie :"
 
 #: xrc/DisplayConfig.xrc:260
 msgid "Lighter"
-msgstr ""
+msgstr "Plus léger"
 
 #: xrc/DisplayConfig.xrc:271
 msgid "Very Dark"
-msgstr ""
+msgstr "Très foncé"
 
 #: xrc/DisplayConfig.xrc:282
 msgid "GBC Lighten:"
-msgstr ""
+msgstr "GBC Eclaircie :"
 
 #: xrc/DisplayConfig.xrc:301
 msgid "Darker"
-msgstr ""
+msgstr "Plus foncé"
 
 #: xrc/DisplayConfig.xrc:312
 msgid "Very Light"
-msgstr ""
+msgstr "Très léger"
 
 #: xrc/DisplayConfig.xrc:329
 msgid "Frame Skip"
@@ -3504,7 +3504,7 @@ msgstr "Utiliser l'emplacement de sauvegarde d'état précédent"
 
 #: xrc/MainMenu.xrc:158 xrc/MainMenu.xrc:170
 msgid "&Battery file..."
-msgstr "Fichier de sauvegarde (&b)..."
+msgstr "Fichier &Batterie..."
 
 #: xrc/MainMenu.xrc:161
 msgid "Game Shark &code file..."
@@ -3560,7 +3560,7 @@ msgstr "Démarrer la lecture de l'en&registrement..."
 
 #: xrc/MainMenu.xrc:207
 msgid "Stop playing m&ovie"
-msgstr "Arrêter la lecture d'enregistrement (&o)"
+msgstr "Arrêter la lecture du F&ilm"
 
 #: xrc/MainMenu.xrc:209
 msgid "&Play"
@@ -3809,7 +3809,7 @@ msgstr "Filtre &LCD"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy Colorizer Hack [requires restart]"
-msgstr ""
+msgstr "&Hack Game Boy Colorizer [nécessite un redémarrage]"
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -3825,7 +3825,7 @@ msgstr "&Sauvegarder les sorties d'impression en tant que captures d'écran"
 
 #: xrc/MainMenu.xrc:538
 msgid "&Use Game Boy BIOS file [requires restart]"
-msgstr ""
+msgstr "&Utiliser le fichier BIOS Game Boy [nécessite un redémarrage]"
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4025,23 +4025,23 @@ msgstr "Grec"
 
 #: xrc/MainMenu.xrc:769
 msgid "English [US]"
-msgstr ""
+msgstr "Anglais [États-Unis]"
 
 #: xrc/MainMenu.xrc:773
 msgid "Spanish [Latin American]"
-msgstr ""
+msgstr "Espagnol [Amérique latine]"
 
 #: xrc/MainMenu.xrc:777
 msgid "Spanish [Colombia]"
-msgstr ""
+msgstr "Espagnol [Colombie]"
 
 #: xrc/MainMenu.xrc:781
 msgid "Spanish [Peru]"
-msgstr ""
+msgstr "Espagnol [Pérou]"
 
 #: xrc/MainMenu.xrc:785
 msgid "Spanish [United States]"
-msgstr ""
+msgstr "Espagnol [États-Unis]"
 
 #: xrc/MainMenu.xrc:789
 msgid "Spanish"
@@ -4049,11 +4049,11 @@ msgstr "Espagnol"
 
 #: xrc/MainMenu.xrc:793
 msgid "French [France]"
-msgstr ""
+msgstr "Français [France]"
 
 #: xrc/MainMenu.xrc:797
 msgid "French"
-msgstr "Français (traduction désuette)"
+msgstr "Français"
 
 #: xrc/MainMenu.xrc:801
 msgid "Galician"
@@ -4061,11 +4061,11 @@ msgstr "Galicien"
 
 #: xrc/MainMenu.xrc:805
 msgid "Hebrew [Israel]"
-msgstr ""
+msgstr "Hébreu [Israël]"
 
 #: xrc/MainMenu.xrc:809
 msgid "Hungarian [Hungary]"
-msgstr ""
+msgstr "Hongrois [Hongrie]"
 
 #: xrc/MainMenu.xrc:813
 msgid "Hungarian"
@@ -4085,7 +4085,7 @@ msgstr "Japonais"
 
 #: xrc/MainMenu.xrc:829
 msgid "Korean [Korea]"
-msgstr ""
+msgstr "Coréen [Corée]"
 
 #: xrc/MainMenu.xrc:833
 msgid "Korean"
@@ -4093,7 +4093,7 @@ msgstr "Coréen"
 
 #: xrc/MainMenu.xrc:837
 msgid "Malay [Malaysia]"
-msgstr ""
+msgstr "Malais [Malaisie]"
 
 #: xrc/MainMenu.xrc:841
 msgid "Norwegian"
@@ -4105,7 +4105,7 @@ msgstr "Néerlandais"
 
 #: xrc/MainMenu.xrc:849
 msgid "Polish [Poland]"
-msgstr ""
+msgstr "Polonais [Pologne]"
 
 #: xrc/MainMenu.xrc:853
 msgid "Polish"
@@ -4113,15 +4113,15 @@ msgstr "Polonais"
 
 #: xrc/MainMenu.xrc:857
 msgid "Portuguese [Brazil]"
-msgstr ""
+msgstr "Portugais [Brésil]"
 
 #: xrc/MainMenu.xrc:861
 msgid "Portuguese [Portugal]"
-msgstr ""
+msgstr "Portugais [Portugal]"
 
 #: xrc/MainMenu.xrc:865
 msgid "Russian [Russia]"
-msgstr ""
+msgstr "Russe [Russie]"
 
 #: xrc/MainMenu.xrc:869
 msgid "Swedish"
@@ -4137,11 +4137,11 @@ msgstr "Ukrainien"
 
 #: xrc/MainMenu.xrc:881
 msgid "Urdu [Pakistan]"
-msgstr ""
+msgstr "Ourdou [Pakistan]"
 
 #: xrc/MainMenu.xrc:885
 msgid "Chinese [China]"
-msgstr ""
+msgstr "Chinois [Chine]"
 
 #: xrc/MainMenu.xrc:889
 msgid "&Use external translations"
