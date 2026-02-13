@@ -24,26 +24,25 @@ using namespace xbrz;
 namespace
 {
 
+// byteAdvance helper - advance pointer by N bytes
+// (removed from xBRZ 1.9, re-implemented here for xbrz9x)
+template <class Ptr>
+inline Ptr byteAdvance(Ptr ptr, int bytes) {
+    return reinterpret_cast<Ptr>(reinterpret_cast<char*>(ptr) + bytes);
+}
+
+// fillBlock helper - fills a rectangular block with a single color
+// (removed from xBRZ 1.9 xbrz_tools.h, re-implemented here for xbrz9x)
+inline void fillBlock(uint32_t* trg, int pitch, uint32_t col, int blockWidth, int blockHeight)
+{
+    for (int y = 0; y < blockHeight; ++y, trg = byteAdvance(trg, pitch))
+        std::fill(trg, trg + blockWidth, col);
+}
+
+
 // ============================================================================
 // Basic infrastructure from xBRZ
 // ============================================================================
-
-inline double fastSqrt(double n)
-{
-#if (defined(__GNUC__) || defined(__clang__)) && (defined(__x86_64__) || defined(__i386__))
-    __asm__ ("fsqrt" : "+t" (n));
-    return n;
-#elif defined(_MSC_VER) && defined(_M_IX86)
-    __asm {
-        fld n
-        fsqrt
-    }
-#elif defined(_MSC_VER)
-    return sqrt(n);
-#else
-    return std::sqrt(n);
-#endif
-}
 
 #ifdef _MSC_VER
     #define FORCE_INLINE __forceinline
@@ -57,7 +56,7 @@ template <class T> inline
 T square(T value) { return value * value; }
 
 inline
-double distYCbCr(uint32_t pix1, uint32_t pix2, double lumaWeight)
+double distYCbCr(uint32_t pix1, uint32_t pix2, double /*testAttribute*/)
 {
     const int r_diff = static_cast<int>(getRed  (pix1)) - getRed  (pix2);
     const int g_diff = static_cast<int>(getGreen(pix1)) - getGreen(pix2);
@@ -74,7 +73,7 @@ double distYCbCr(uint32_t pix1, uint32_t pix2, double lumaWeight)
     const double c_b = scale_b * (b_diff - y);
     const double c_r = scale_r * (r_diff - y);
 
-    return fastSqrt(square(lumaWeight * y) + square(c_b) + square(c_r));
+    return std::sqrt(square(y) + square(c_b) + square(c_r));
 }
 
 // ============================================================================
@@ -201,7 +200,7 @@ BlendResult preProcessCorners(const Kernel_4x4& ker, const ScalerCfg& cfg)
         return result;
 
     auto dist = [&](uint32_t pix1, uint32_t pix2) {
-        return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight);
+        return ColorDistance::dist(pix1, pix2, cfg.testAttribute);
     };
 
     double jg = dist(ker.i, ker.f) + dist(ker.f, ker.c) + dist(ker.n, ker.k) + dist(ker.k, ker.h) + cfg.centerDirectionBias * dist(ker.j, ker.g);
@@ -453,20 +452,20 @@ struct Scaler9x : public ColorGradient
 
 struct ColorDistanceRGB
 {
-    static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
+    static double dist(uint32_t pix1, uint32_t pix2, double testAttribute)
     {
-        return distYCbCr(pix1, pix2, luminanceWeight);
+        return distYCbCr(pix1, pix2, testAttribute);
     }
 };
 
 struct ColorDistanceARGB
 {
-    static double dist(uint32_t pix1, uint32_t pix2, double luminanceWeight)
+    static double dist(uint32_t pix1, uint32_t pix2, double testAttribute)
     {
         const double a1 = getAlpha(pix1) / 255.0;
         const double a2 = getAlpha(pix2) / 255.0;
 
-        const double d = distYCbCr(pix1, pix2, luminanceWeight);
+        const double d = distYCbCr(pix1, pix2, testAttribute);
         if (a1 < a2)
             return a1 * d + 255 * (a2 - a1);
         else
@@ -521,10 +520,10 @@ void blendPixel(const Kernel_3x3& ker,
     if (getBottomR(blend) >= BLEND_NORMAL)
     {
         auto eq = [&](uint32_t pix1, uint32_t pix2) {
-            return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight) < cfg.equalColorTolerance;
+            return ColorDistance::dist(pix1, pix2, cfg.testAttribute) < cfg.equalColorTolerance;
         };
         auto dist = [&](uint32_t pix1, uint32_t pix2) {
-            return ColorDistance::dist(pix1, pix2, cfg.luminanceWeight);
+            return ColorDistance::dist(pix1, pix2, cfg.testAttribute);
         };
 
         const bool doLineBlend = [&]() -> bool
