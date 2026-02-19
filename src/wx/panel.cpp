@@ -4367,7 +4367,10 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     if (!todraw) {
         // Clear screen if no data to draw
         device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-        device->Present(NULL, NULL, NULL, NULL);
+        if (using_d3d9ex)
+            ((IDirect3DDevice9Ex*)device)->PresentEx(NULL, NULL, NULL, NULL, NULL);
+        else
+            device->Present(NULL, NULL, NULL, NULL);
         return;
     }
 
@@ -4593,7 +4596,12 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
     device->EndScene();
 
     // Present the frame
-    device->Present(NULL, NULL, NULL, NULL);
+    if (using_d3d9ex)
+        ((IDirect3DDevice9Ex*)device)->PresentEx(NULL, NULL, NULL, NULL, NULL);
+    else
+        device->Present(NULL, NULL, NULL, NULL);
+}
+#endif
 }
 #endif
         
