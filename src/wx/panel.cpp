@@ -4602,8 +4602,6 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
         device->Present(NULL, NULL, NULL, NULL);
 }
 #endif
-}
-#endif
         
 #ifndef NO_FFMPEG
 static const wxString media_err(recording::MediaRet ret)
