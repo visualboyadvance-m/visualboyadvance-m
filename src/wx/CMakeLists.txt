@@ -1151,7 +1151,7 @@ if(APPLE)
     set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
     set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
-    if(GUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+    if(BUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
             COMMAND bash ${CMAKE_SOURCE_DIR}/tools/macOS/third_party_libs_tool ./visualboyadvance-m.app
@@ -1193,26 +1193,28 @@ if(APPLE AND UPSTREAM_RELEASE)
         endif()
     endif()
 
+    # Sign bundled dylibs individually before signing the app bundle.
+    # codesign --deep does not sign loose .dylib files, only .framework bundles,
+    # so dylibs in Contents/Frameworks must be signed explicitly at build time.
+    # This must run before signing the app bundle itself.
+    if(BUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            VERBATIM COMMAND sh -c [=[
+                find ./visualboyadvance-m.app/Contents/Frameworks -name "*.dylib" \
+                    -exec codesign --sign "Developer ID Application" --options runtime --timestamp --force '{}' ';' || :
+            ]=]
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+
     add_custom_command(
         TARGET visualboyadvance-m
         POST_BUILD
         VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --options runtime --timestamp --force --deep ./visualboyadvance-m.app || :]=]
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-
-    if(EXISTS ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks)
-        # Sign frameworks individually, like Xcode.
-        file(GLOB frameworks ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Frameworks/*)
-        foreach(framework ${frameworks})
-            message(STATUS "Signing framework: " ${framework})
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                VERBATIM COMMAND sh -c "codesign --sign 'Developer ID Application' --options runtime --timestamp --force --deep ${framework} || :"
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endforeach()
-    endif()
 
     # Zip, notarize, staple to the .app and zip again
 
