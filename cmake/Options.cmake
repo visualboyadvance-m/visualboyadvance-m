@@ -196,6 +196,16 @@ option(ENABLE_GBA_LOGGING "Enable extended GBA logging" ON)
 
 option(UPSTREAM_RELEASE "do some optimizations and release automation tasks" OFF)
 
+if(APPLE)
+    set(bundle_dylibs_default OFF)
+
+    if(UPSTREAM_RELEASE)
+        set(bundle_dylibs_default ON)
+    endif()
+
+    option(BUNDLE_DYLIBS "Bundle dylibs into .app" ${bundle_dylibs_default})
+endif()
+
 if(WIN32)
     option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON)
 

@@ -35,15 +35,16 @@ public:
     virtual ~GLDrawingPanel();
 
 protected:
-    void DrawArea(wxWindowDC& dc);
-    void OnSize(wxSizeEvent& ev);
+    void DrawArea(wxWindowDC& dc) override;
+    void PaintEv(wxPaintEvent& ev) override;
+    void OnSize(wxSizeEvent& ev) override;
     void AdjustViewport();
     void RefreshGL();
 #ifndef wxGL_IMPLICIT_CONTEXT
     wxGLContext* ctx = NULL;
 #endif
     bool SetContext();
-    void DrawingPanelInit();
+    void DrawingPanelInit() override;
     GLuint texid, vlist;
     int texsize;
 };

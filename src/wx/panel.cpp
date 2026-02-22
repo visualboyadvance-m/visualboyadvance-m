@@ -4072,6 +4072,20 @@ void GLDrawingPanel::RefreshGL()
     glBindTexture(GL_TEXTURE_2D, texid);
 }
         
+void GLDrawingPanel::PaintEv(wxPaintEvent& ev)
+{
+    (void)ev;
+    // Never use wx DC drawing on the NSOpenGLView during paint events.
+    // On macOS, any wx DC drawing call (DrawRectangle etc.) on an NSOpenGLView
+    // triggers EnsureIsValid() -> wxOSXLockFocus() -> lockFocusIfCanDraw()
+    // -> [NSView setNeedsDisplay:YES], causing an infinite repaint loop.
+    // DrawArea already handles the !todraw case with glClear, so always
+    // go through OpenGL here instead of the base class draw_black_background path.
+    // The wxPaintDC is created to acknowledge the paint event but never drawn with.
+    wxPaintDC dc(GetWindow());
+    DrawArea(dc);
+}
+
 void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 {
     (void)dc; // unused params

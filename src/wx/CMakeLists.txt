@@ -1144,16 +1144,12 @@ if(UPSTREAM_RELEASE AND WIN32)
     endif()
 endif()
 
+# Bundle dylibs and relink them for releasing .app, but only in Release mode, also install translations into the .app.
 if(APPLE)
-    # this should set ROM file types correctly
+    # This should set ROM file types correctly.
     set(MACOSX_BUNDLE_ICON_FILE ${VBAM_ICON})
     set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
     set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-
-    # bundle dylibs and relink them for releasing .app
-    # also install translations into the .app
-    # but only in Release mode
-    option(BUNDLE_DYLIBS "Bundle dylibs into .app" OFF)
 
     if(GUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
@@ -1184,10 +1180,6 @@ if(APPLE)
 endif()
 
 if(APPLE AND UPSTREAM_RELEASE)
-#    if(WX_MAC_PATCHED)
-#        target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND)
-#    endif()
-
     if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         find_program(STRIP_PROGRAM strip)
 
