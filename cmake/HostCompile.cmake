@@ -20,12 +20,17 @@ function(host_compile src dst_cmd)
             )
         else()
             set(dst ${dst_cmd})
+            set(cc cc)
+
+            if(APPLE)
+                set(cc /usr/bin/clang)
+            endif()
 
             # Assume: cc foo.c -o foo # will work on most hosts
             add_custom_command(
                 OUTPUT ${dst}
                 DEPENDS ${src}
-                COMMAND cc ${src} -o ${dst} ${link_flags}
+                COMMAND ${cc} ${src} -o ${dst} ${link_flags}
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
         endif()

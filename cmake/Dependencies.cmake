@@ -79,11 +79,7 @@ if(ENABLE_FFMPEG)
             list(APPEND FFMPEG_LDFLAGS "SHELL:-framework VideoToolbox")
 
             if(NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-                list(APPEND FFMPEG_LDFLAGS -ltiff -lfreetype -lfontconfig -llzma -lharfbuzz -lbz2 "SHELL:-framework DiskArbitration" -lxml2)
-            endif()
-
-            if(NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-                list(APPEND FFMPEG_LDFLAGS -lcrypto -lssl)
+                list(APPEND FFMPEG_LDFLAGS -ltiff -llzma -lbz2 "SHELL:-framework DiskArbitration")
             endif()
         else()
             list(APPEND FFMPEG_LDFLAGS "SHELL:-framework VideoToolbox")

@@ -9,6 +9,14 @@ export TAR="${TAR:-tar --force-local}"
 export CURL="${CURL:-curl --insecure}"
 export PERL_MAKE="${PERL_MAKE:-make}"
 
+if [ -z "$DASH" ]; then
+    if command -v dash >/dev/null; then
+        DASH=dash
+    else
+        DASH=/bin/sh
+    fi
+fi
+
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
 
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
@@ -107,96 +115,40 @@ export BUILD_ENV
 
 ORIG_PATH=$PATH
 
-PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz 7zip"
+#PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz 7zip"
 
 DISTS=$DISTS'
-    bzip2           ftp://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz                                           lib/libbz2.a
-    xz              https://tukaani.org/xz/xz-5.8.1.tar.gz                                                      lib/liblzma.a
-    7zip            https://7-zip.org/a/7z2501-src.tar.xz                                                       bin/7z
-    autoconf        https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz                                       bin/autoconf
-    autoconf-archive http://gnu.askapache.com/autoconf-archive/autoconf-archive-2024.10.16.tar.xz               share/aclocal/ax_check_gl.m4
-    automake        https://ftp.gnu.org/gnu/automake/automake-1.18.tar.xz                                       bin/automake
-    libtool         https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz                                        bin/libtool
+    xz              https://tukaani.org/xz/xz-5.8.2.tar.gz                                                      lib/liblzma.a
     libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz                                   lib/libiconv.a
-    zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.5.tar.gz                           lib/libz.a
-    openssl         https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz     lib/libssl.a
+    zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.3.3.tar.gz                           lib/libz.a
     libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.xz                              lib/libunistring.a
-    libpsl          https://github.com/rockdaboot/libpsl/archive/refs/heads/master.zip                          lib/libpsl.a
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
-    curl            https://github.com/curl/curl/releases/download/curl-8_16_0/curl-8.16.0.tar.bz2              lib/libcurl.a
-    cmake           https://github.com/Kitware/CMake/releases/download/v4.2.0/cmake-4.2.0.tar.gz                bin/cmake
-    libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.24/libdeflate-1.24.tar.gz       lib/libdeflate.a
-    hiredis         https://github.com/redis/hiredis/archive/refs/tags/v1.3.0.tar.gz                            lib/libhiredis.a
-    ccache          https://github.com/ccache/ccache/releases/download/v4.12.1/ccache-4.12.1.tar.xz             bin/ccache
-    m4              http://ftp.gnu.org/gnu/m4/m4-1.4.20.tar.xz                                                  bin/m4
-    xorg-macros     https://xorg.freedesktop.org/releases/individual/util/util-macros-1.20.2.tar.xz             share/pkgconfig/xorg-macros.pc
-    help2man        https://ftp.gnu.org/gnu/help2man/help2man-1.49.3.tar.xz                                     bin/help2man
-    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-0.26.tar.xz                                      lib/libintl.a
-    getopt          http://frodo.looijaard.name/system/files/software/getopt/getopt-1.1.6.tar.gz                bin/getopt
-    gsed            http://ftp.gnu.org/gnu/sed/sed-4.9.tar.xz                                                   bin/sed
-    bison           https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz                                            bin/bison
-    texinfo         http://mirrors.ocf.berkeley.edu/gnu/texinfo/texinfo-7.2.tar.gz                              bin/makeinfo
-    flex            https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz                   bin/flex
-    gperf           http://ftp.gnu.org/pub/gnu/gperf/gperf-3.3.tar.gz                                           bin/gperf
-    libicu          https://github.com/unicode-org/icu/releases/download/release-78.1rc/icu4c-78.1rc-sources.tgz lib/libicud*t*.a
-    pkgconf         https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.5.1.tar.gz                   bin/pkgconf
-    nasm            https://github.com/netwide-assembler/nasm/archive/refs/tags/nasm-3.01.tar.gz                bin/nasm
-    pcre            https://downloads.sourceforge.net/project/pcre/pcre/8.45/pcre-8.45.tar.bz2                  lib/libpcre.a
-    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.46/pcre2-10.46.tar.bz2     lib/libpcre2-posix.a
+    libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz       lib/libdeflate.a
+    gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-1.0.tar.xz                                       lib/libintl.a
+    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2     lib/libpcre2-posix.a
     libffi          https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz               lib/libffi.a
-    c2man           https://github.com/fribidi/c2man/archive/577ed4095383ef5284225d45709e6b5f0598a064.tar.gz    bin/c2man
+    expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_4/expat-2.7.4.tar.xz           lib/libexpat.a
     libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.1/libxml2-v2.15.1.tar.bz2            lib/libxml2.a
-    libxslt         https://gitlab.gnome.org/GNOME/libxslt/-/archive/v1.1.43/libxslt-v1.1.43.tar.bz2            lib/libxslt.a
-    XML-NamespaceSupport https://cpan.metacpan.org/authors/id/P/PE/PERIGRIN/XML-NamespaceSupport-1.12.tar.gz    perl5/lib/perl5/XML/NamespaceSupport.pm
-    XML-SAX-Base    https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-Base-1.09.tar.gz                   perl5/lib/perl5/XML/SAX/Base.pm
-    XML-SAX         https://cpan.metacpan.org/authors/id/G/GR/GRANTM/XML-SAX-1.02.tar.gz                        perl5/lib/perl5/XML/SAX.pm
-    docbook2x       https://downloads.sourceforge.net/docbook2x/docbook2X-0.8.8.tar.gz  bin/docbook2man
-    expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_3/expat-2.7.3.tar.xz           lib/libexpat.a
-    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.50/libpng-1.6.50.tar.xz           lib/libpng.a
-    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.2.tar.gz                         lib/libjpeg.a
+    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.55/libpng-1.6.55.tar.xz          lib/libpng.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.3.tar.gz                         lib/libjpeg.a
     libtiff         https://download.osgeo.org/libtiff/tiff-4.7.1.tar.xz                                        lib/libtiff.a
-#    libcroco        http://ftp.gnome.org/pub/gnome/sources/libcroco/0.6/libcroco-0.6.13.tar.xz                  lib/libcroco-0.6.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
-    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-1/freetype-VER-2-14-1.tar.bz2                  lib/libfreetype.a
-    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.17.1/fontconfig-2.17.1.tar.bz2 lib/libfontconfig.a
-    libgd           https://github.com/libgd/libgd/archive//abaaa9fa6805fc93bcab0efac874da5bfb59fc01.tar.gz     lib/libgd.a
-    dejavu          http://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.tar.bz2      share/fonts/dejavu/DejaVuSansMono.ttf
-    liberation      https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz   share/fonts/liberation/LiberationMono-Regular.ttf
-    urw             https://github.com/ArtifexSoftware/urw-base35-fonts/archive/refs/tags/20200910.tar.gz                 share/fonts/urw/URWBookman-Light.ttf
-    graphviz        https://gitlab.com/graphviz/graphviz/-/archive/14.0.1/graphviz-14.0.1.tar.bz2               bin/dot_static
-    docbook4.2      http://www.docbook.org/xml/4.2/docbook-xml-4.2.zip                                                    share/xml/docbook/schema/dtd/4.2/catalog.xml
-    docbook4.1.2    http://www.docbook.org/xml/4.1.2/docbkx412.zip                                                        share/xml/docbook/schema/dtd/4.1.2/catalog.xml
-    docbook4.3      http://www.docbook.org/xml/4.3/docbook-xml-4.3.zip                                                    share/xml/docbook/schema/dtd/4.3/catalog.xml
-    docbook4.4      http://www.docbook.org/xml/4.4/docbook-xml-4.4.zip                                                    share/xml/docbook/schema/dtd/4.4/catalog.xml
-    docbook4.5      http://www.docbook.org/xml/4.5/docbook-xml-4.5.zip                                                    share/xml/docbook/schema/dtd/4.5/catalog.xml
-    docbook5.0.1    http://www.docbook.org/xml/5.0.1/docbook-5.0.1.zip                                                    share/xml/docbook/schema/dtd/5.0.1/catalog.xml
-    docbook5.1      https://docbook.org/xml/5.1/docbook-v5.1-os.zip                                                       share/xml/docbook/schema/dtd/5.0.1/catalog.xml
-    docbook-xsl     https://downloads.sourceforge.net/project/docbook/docbook-xsl/1.79.1/docbook-xsl-1.79.1.tar.bz2       share/xml/docbook/stylesheet/docbook-xsl/catalog.xml
-    docbook-xsl-ns  https://downloads.sourceforge.net/project/docbook/docbook-xsl-ns/1.79.1/docbook-xsl-ns-1.79.1.tar.bz2 share/xml/docbook/stylesheet/docbook-xsl-ns/catalog.xml
-    xmlto           https://releases.pagure.org/xmlto/xmlto-0.0.29.tar.bz2                                      bin/xmlto
-    python2         https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tar.xz                               bin/python
-    python3         https://www.python.org/ftp/python/3.14.0/Python-3.14.0.tar.xz                               bin/python3
-    swig            https://sourceforge.net/projects/swig/files/swig/swig-4.3.1/swig-4.3.1.tar.gz/download      bin/swig
-    XML-Parser      https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz                      perl5/man/man3/XML*Parser.3*
-    intltool        https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz                bin/intltoolize
-    ninja           https://github.com/ninja-build/ninja/archive/v1.13.2.tar.gz                                 bin/ninja
+    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-1/freetype-VER-2-14-1.tar.bz2 lib/libfreetype.a
+    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.17.1/fontconfig-2.17.1.tar.bz2   lib/libfontconfig.a
     glib            https://download.gnome.org/sources/glib/2.9/glib-2.9.6.tar.xz                               lib/libglib-2.0.a
-    libgpg-error    https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.56.tar.bz2                         lib/libgpg-error.a
-    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.2.tar.bz2                             lib/libgcrypt.a
+    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.2.28/SDL3-3.2.28.tar.gz       lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/25.12.tar.gz                            lib/libFAudio.a
-    flac            https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.5.0.tar.xz                             lib/libFLAC.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/12.1.0/harfbuzz-12.1.0.tar.xz        lib/libharfbuzz.a
-    shared-mime-info https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/2.4/shared-mime-info-2.4.tar.bz2  bin/update-mime-database
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.0/SDL3-3.4.0.tar.gz         lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.02.tar.gz                            lib/libFAudio.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/12.3.2/harfbuzz-12.3.2.tar.xz        lib/libharfbuzz.a
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz                             lib/libmspack.a
     giflib          https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
-    fmt             https://github.com/fmtlib/fmt/releases/download/12.0.0/fmt-12.0.0.zip                       lib/libfmt.a
+    fmt             https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip                       lib/libfmt.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.tar.xz                                                lib/libavformat.a
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz                                              lib/libavformat.a
 '
 
 BUILD_FFMPEG=1
@@ -255,7 +207,6 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     flex            autoreconf
     pkgconf         autoreconf_noargs
     libffi          autoreconf
-    libgd           cmake
     libpng          autoreconf
     python2         autoreconf
     python3         autoreconf
@@ -264,6 +215,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     libvorbis       autoreconf
     libgpg-error    autoreconf
     libmspack       autoreconf
+    libuuid         autoreconf
     libwebp         cmake
     wxwidgets       cmake
 "
@@ -276,6 +228,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     getopt          sed -i.bak 's/\\\$(LDFLAGS)\\(.*\\)\$/\\1 \$(LDFLAGS)/' Makefile;
     libpsl          rm -rf list; git clone --depth 1 https://github.com/publicsuffix/list; sed -E -i.bak -e '/subdir[(].tools.[)]/d' meson.build
     libicu          cd source;
+    libmspack       cd libmspack;
     gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4;
     expat           sed -i.bak '/doc\\/Makefile/d' configure.ac; \
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
@@ -321,13 +274,12 @@ DIST_POST_BUILD="$DIST_POST_BUILD
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     ccache      cmake -G Ninja $CMAKE_INSTALL_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -S .. -B .
-    zlib-ng        ./configure --prefix=/usr --static --zlib-compat
-    openssl     ./config no-shared no-unit-test --prefix=/usr --openssldir=/etc/ssl
-    cmake       ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
+    zlib-ng     $DASH ./configure --prefix=/usr --static --zlib-compat
+    openssl     $DASH ./config no-shared no-unit-test --prefix=/usr --openssldir=/etc/ssl
+    cmake       $DASH ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
-    libvpx      ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
-    libmspack   cd libmspack && \"\$BUILD_ROOT/root/bin/aclocal\" &&  \"\$BUILD_ROOT/root/bin/autoheader\" -I. && \"\$BUILD_ROOT/root/bin/libtoolize\" && \"\$BUILD_ROOT/root/bin/automake\" --add-missing && \"\$BUILD_ROOT/root/bin/autoreconf\" && ./configure --enable-static --disable-shared --prefix=/usr
-    ffmpeg      ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --enable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --enable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --enable-libx264 --enable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --enable-openssl --disable-securetransport --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
+    libvpx      $DASH ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
+    ffmpeg      $DASH ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --disable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --disable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --enable-libx264 --enable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --disable-securetransport --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
@@ -363,7 +315,6 @@ DIST_FLAGS="$DIST_FLAGS
     libwebp     remove_arch_flags_from_build_ninja
     libpng      no_autotools_cross_options
     docbook2x   no_autotools_cross_options
-    libuuid     no_autotools_cross_options
     python3     no_autotools_cross_options
 "
 
@@ -379,7 +330,7 @@ DIST_ARGS="$DIST_ARGS
     pcre        --enable-utf --enable-unicode-properties --enable-pcre16 --enable-pcre32 --enable-jit
     pcre2       --enable-utf8 --enable-pcre2-8 --enable-pcre2-16 --enable-pcre2-32 --enable-unicode-properties --enable-pcregrep-libz --enable-pcregrep-libbz2 --enable-jit
     libxslt     --without-python --without-crypto
-    fontconfig  -Dbaseconfig-dir=/etc/fonts -Diconv=enabled -Dxml-backend=libxml2 -Ddoc=disabled
+    fontconfig  -Dbaseconfig-dir=/etc/fonts -Diconv=enabled -Dxml-backend=libxml2 -Ddoc=disabled -Dtests=disabled -Dtools=disabled
     libgd       -DBUILD_SHARED_LIBS=FALSE -DBUILD_STATIC_LIBS=TRUE
     graphviz    --disable-ltdl --without-x --disable-swig CFLAGS=\"-include \$PWD/declspec.h \$CFLAGS\" CC=\"\$CXX\"
     python2     --with-ensurepip=install --with-system-expat
@@ -390,8 +341,8 @@ DIST_ARGS="$DIST_ARGS
     snappy      -DSNAPPY_BUILD_TESTS=OFF -DSNAPPY_BUILD_BENCHMARKS=OFF
     libjpeg-turbo -DWITH_JPEG8=ON -DWITH_SIMD=OFF
     libtiff     --disable-lzma --disable-webp
-    freetype    -Dharfbuzz=disabled
-    harfbuzz    -Dcairo=disabled -Dicu=disabled
+    harfbuzz    -Dcairo=disabled -Dicu=disabled -Dglib=disabled -Dgobject=disabled -Dtests=disabled -Ddocs=disabled -Dutilities=disabled
+    freetype    -Dharfbuzz=disabled -Dbrotli=disabled -Dtests=disabled
     graphite2   -DGRAPHITE2_NFILEFACE=ON -DGRAPHITE2_TESTS=OFF -DGRAPHITE2_DOCS=OFF
     flac        --disable-ogg
     libsoxr     -DWITH_OPENMP=NO
@@ -401,7 +352,7 @@ DIST_ARGS="$DIST_ARGS
     libbluray   --disable-bdjava-jar --disable-examples
     libopencore-amrnb   --disable-compile-c
     vidstab     -DUSE_OMP=NO
-    sdl3        -DSDL_CAMERA=OFF
+    sdl3        -DSDL_CAMERA=OFF -DSDL_TESTS=OFF
     libx264     --enable-static --enable-pic
     libwebp     -DCMAKE_EXE_LINKER_FLAGS=\"-lutil\"
     libx265     -DHIGH_BIT_DEPTH=ON -DENABLE_ASSEMBLY=OFF -DENABLE_CLI=OFF
@@ -855,10 +806,12 @@ mac_install_core_deps() {
         error 'Please install Mac Homebrew: [35mhttps://brew.sh/[0m'
     fi
 
-    "$BREW_PREFIX"/bin/brew install -q m4 perl perl-xml-parser meson ninja pyenv cmake ccache gnu-getopt flex swig
+    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext
 
-    ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt' | head -1)" "$BUILD_ROOT/root/bin/getopt"
-    ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'     | head -1)" "$BUILD_ROOT/root/bin/m4"
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt'  | head -1)" "$BUILD_ROOT/root/bin/getopt"
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'      | head -1)" "$BUILD_ROOT/root/bin/m4"
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/pkgconf    -path '*/bin/pkgconf' | head -1)" "$BUILD_ROOT/root/bin/pkgconf"
+    ln -sf "$(find "$BREW_PREFIX"/Cellar/pkgconf    -path '*/bin/pkgconf' | head -1)" "$BUILD_ROOT/root/bin/pkg-config"
 
     export PATH=$(pyenv root)/shims:$PATH
 
@@ -1207,7 +1160,13 @@ unpack_dist() {
             bzip2 -dc "$dist_file" | $TAR $@ -xf -
             ;;
         *.zip)
-            7z x "$dist_file"
+            if command -v 7z >/dev/null 2>&1; then
+                7z x "$dist_file" >/dev/null
+            elif command -v 7zz >/dev/null 2>&1; then
+                7zz x "$dist_file" >/dev/null
+            else
+                unzip -q "$dist_file"
+            fi
             ;;
     esac
 
@@ -1477,6 +1436,10 @@ build_dist() {
     dist_patch "$current_dist"
     dist_pre_build "$current_dist"
 
+    ORIG_CPP=$CPP
+    ORIG_CC=$CC
+    ORIG_CXX=$CXX
+    ORIG_ARCHFLAGS=$ARCHFLAGS
     ORIG_CPPFLAGS=$CPPFLAGS
     ORIG_CFLAGS=$CFLAGS
     ORIG_CXXFLAGS=$CXXFLAGS
@@ -1500,9 +1463,18 @@ build_dist() {
     if dist_flags "$current_dist" no_sdk_paths_in_flags; then
         local xcode_path=$(xcode-select -p)
         CPPFLAGS=$(   echo "$CPPFLAGS"    | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
+        CFLAGS=$(     echo "$CFLAGS"      | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
         CXXFLAGS=$(   echo "$CXXFLAGS"    | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
+        OBJCFLAGS=$(  echo "$OBJCFLAGS"   | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
         OBJCXXFLAGS=$(echo "$OBJCXXFLAGS" | sed -E "s,-isystem (/Library/Developer|${xcode_path})[^ ]*,,g")
         LDFLAGS=$(    echo "$LDFLAGS"     | sed -E "s,-[LF](/Library/Developer|${xcode_path})[^ ]*,,g")
+    fi
+
+    if dist_flags "$current_dist" no_target_for_compilers; then
+        CPP=$(   echo "$CPP"    | sed -E "s,-target [^ ]*,,g")
+        CC=$(    echo "$CC"     | sed -E "s,-target [^ ]*,,g")
+        CXX=$(   echo "$CXX"    | sed -E "s,-target [^ ]*,,g")
+        ARCHFLAGS=
     fi
 
     configure_override=$(dist_configure_override "$current_dist")
@@ -1520,6 +1492,45 @@ build_dist() {
             mkdir -p build
             cd build
 
+            case "$CONFIGURE_REQUIRED_ARGS" in
+                *--host*)
+                    host_cpu=$(echo "$CONFIGURE_REQUIRED_ARGS" | sed -En 's/.*--host=([^-]+).*/\1/p')
+                    host_system=$(echo "$CONFIGURE_REQUIRED_ARGS" | sed -En 's/.*--host=[^-]+-([^-]+).*/\1/p')
+
+                    case "$host_cpu" in
+                        *arm64*|*ARM64*|*aarch64*|*AARCH64*)
+                            host_cpu=aarch64
+                            ;;
+                    esac
+
+                    case "$host_system" in
+                        *apple*|*APPLE*|*darwin*|*DARWIN*|*mac*|*MAC*)
+                            host_system=darwin
+                            ;;
+                        *mingw*|*MINGW*|*win*|*WIN*|*msvc*|*MSVC*)
+                            host_system=windows
+                            ;;
+                        *)
+                            host_system=linux
+                            ;;
+                    esac
+
+                    cat <<EOF > cross_def.txt
+[host_machine]
+endian = 'little'
+cpu = '$host_cpu'
+cpu_family = '$host_cpu'
+system = '$host_system'
+[properties]
+sys_root = '$BUILD_ROOT/root'
+[binaries]
+pkg-config = '$BUILD_ROOT/root/bin/pkg-config'
+pkgconf = '$BUILD_ROOT/root/bin/pkgconf'
+EOF
+                    extra_dist_args="$extra_dist_args --cross-file=./cross_def.txt"
+                    ;;
+            esac
+
             if [ -n "$configure_override" ]; then
                 eval "set -- $extra_dist_args"
                 echo_eval_run "$configure_override $@"
@@ -1530,18 +1541,22 @@ build_dist() {
             dist_post_configure "$current_dist"
             run_ninja
 
-            if [ -z "$install_override" ]; then
-                rm -rf destdir
-                mkdir destdir
+            if ! dist_flags "$current_dist" no_install; then
+                if [ -z "$install_override" ]; then
+                    rm -rf destdir
+                    mkdir destdir
 
-                echo_eval_run 'DESTDIR="$PWD/destdir" ninja '"$(dist_make_install_args "$current_dist")"' install || :'
+                    if ! dist_flags "$current_dist" no_install; then
+                        echo_eval_run 'DESTDIR="$PWD/destdir" ninja '"$(dist_make_install_args "$current_dist")"' install || :'
 
-                install_dist "$current_dist"
-            else
-                echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                        install_dist "$current_dist"
+                    fi
+                else
+                    echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                fi
+
+                check_install_artifact "$current_dist"
             fi
-
-            check_install_artifact "$current_dist"
         elif [ "$config_type" = autoconf -o "$config_type" = autoreconf -o "$config_type" = autoreconf_noargs ] || [ -z "$config_type" -a \( -f configure -o -f Configure -o -f configure.ac -o -f configure.in -o -f Makefile.am \) ]; then
             # workaround a sometimes autoconf bug
             touch config.rpath
@@ -1625,7 +1640,12 @@ build_dist() {
                         done
                     fi
 
-                    echo_run $configure "$@"
+                    # Run bash configure scripts with bash.
+                    if grep -Eq '\[\[.*\]\]' "$configure"; then
+                        echo_run bash $configure "$@"
+                    else
+                        echo_run $DASH $configure "$@"
+                    fi
                 fi
             fi
 
@@ -1633,19 +1653,21 @@ build_dist() {
             eval "set -- $(dist_make_args "$current_dist")"
             echo_run $MAKE -j$NUM_CPUS "$@"
 
-            if [ -z "$install_override" ]; then
-                rm -rf destdir
-                mkdir destdir
+            if ! dist_flags "$current_dist" no_install; then
+                if [ -z "$install_override" ]; then
+                    rm -rf destdir
+                    mkdir destdir
 
-                eval "set -- $(dist_make_install_args "$current_dist")"
+                    eval "set -- $(dist_make_install_args "$current_dist")"
 
-                make_install "$@"
-                install_dist "$current_dist"
-            else
-                echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                    make_install "$@"
+                    install_dist "$current_dist"
+                else
+                    echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                fi
+
+                check_install_artifact "$current_dist"
             fi
-
-            check_install_artifact "$current_dist"
         elif [ "$config_type" = cmake ] || [ "$config_type" = cmakeninja ] || [ -f CMakeLists.txt ]; then
             if ! command -v ninja >/dev/null; then
                 error "configure type 'cmakeninja' requested but ninja is not available yet";
@@ -1683,22 +1705,24 @@ build_dist() {
             dist_post_configure "$current_dist"
             run_ninja
 
-            if [ -z "$install_override" ]; then
-                rm -rf destdir
-                mkdir destdir
+            if ! dist_flags "$current_dist" no_install; then
+                if [ -z "$install_override" ]; then
+                    rm -rf destdir
+                    mkdir destdir
 
-                eval "set -- $(dist_make_install_args "$current_dist")"
+                    eval "set -- $(dist_make_install_args "$current_dist")"
 
-                export DESTDIR="$PWD/destdir"
-                echo_run ninja install "$@"
-                unset DESTDIR
+                    export DESTDIR="$PWD/destdir"
+                    echo_run ninja install "$@"
+                    unset DESTDIR
 
-                install_dist "$current_dist"
-            else
-                echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                    install_dist "$current_dist"
+                else
+                    echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
+                fi
+
+                check_install_artifact "$current_dist"
             fi
-
-            check_install_artifact "$current_dist"
         elif [ "$config_type" = python ] || [ -z "$config_type" -a -f setup.py ]; then
             if [ -z "$install_override" ]; then
                 set --
@@ -1759,25 +1783,31 @@ build_dist() {
 
             echo_run $MAKE -j$NUM_CPUS "$@"
 
-            if [ -z "$install_override" ]; then
-                eval "set -- $(dist_make_install_args "$current_dist")"
+            if ! dist_flags "$current_dist" no_install; then
+                if [ -z "$install_override" ]; then
+                    eval "set -- $(dist_make_install_args "$current_dist")"
 
-                make_install "$@"
+                    make_install "$@"
 
-                # some bare makefiles just have no DESTDIR mechanism of any sort
-                if [ -d destdir ]; then
-                    install_dist "$current_dist"
+                    # some bare makefiles just have no DESTDIR mechanism of any sort
+                    if [ -d destdir ]; then
+                        install_dist "$current_dist"
+                    fi
+                else
+                    echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
                 fi
-            else
-                echo_eval_run "$install_override $(dist_make_install_args "$current_dist")"
-            fi
 
-            check_install_artifact "$current_dist"
+                check_install_artifact "$current_dist"
+            fi
         else
             die "don't know how to build [1;35m$current_dist[0m, please define a BUILD_OVERRIDE"
         fi
     fi
 
+    export CPP="$ORIG_CPP"
+    export CC="$ORIG_CC"
+    export CXX="$ORIG_CXX"
+    export ARCHFLAGS="$ORIG_ARCHFLAGS"
     export CPPFLAGS="$ORIG_CPPFLAGS"
     export CFLAGS="$ORIG_CFLAGS"
     export CXXFLAGS="$ORIG_CXXFLAGS"
@@ -1905,10 +1935,15 @@ install_dist() {
         f=$(normalize_relative_path "$f")
         [ -n "$f" ] || continue
 
-        # We never want shared libs on macOS.
         case "$f" in
+            # We never want shared libs on macOS.
             *.dylib)
                 continue
+                ;;
+            */bin/*)
+                if ! dist_flags "$current_dist" no_install_bin; then
+                    putsln "$f" >> "$file_list"
+                fi
                 ;;
             *)
                 putsln "$f" >> "$file_list"
@@ -2347,11 +2382,11 @@ dist_flags() {
         flag=$1
         shift
 
-        case "$dist_flags" in
-            *${flag}*)
+        for dist_flag in $dist_flags; do
+            if [ "$dist_flag" = "$flag" ]; then
                 return 0
-                ;;
-        esac
+            fi
+        done
         return 1
     done
 }

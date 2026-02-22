@@ -11,50 +11,64 @@ target_bits=64
 target_build_arch=
 
 if [ "$(uname -m)" = arm64 ]; then
-    export APPLE_SILICON=1
+    arm64_host=1
     target_cpu=ARM64
 else
+    intel_host=1
     target_cpu=x86_64
 fi
 
 case "$1" in
     -[Ii][Nn][Tt][Ee][Ll])
         intel_target=1
+        target_cpu=x86_64
         shift
         ;;
     -[Ii][Nn][Tt][Ee][Ll]64)
         intel_target=1
+        target_cpu=x86_64
         shift
         ;;
     -[Xx]86_64)
         intel_target=1
+        target_cpu=x86_64
         shift
         ;;
     -64)
+        intel_target=1
+        target_cpu=x86_64
         shift
         ;;
-    -[Aa][Rr][Mm]64)
+    -[Aa][Rr][Mm]64|-[Aa][Aa][Rr][Cc][Hh]64)
+        arm64_target=1
+        target_cpu=ARM64
         shift
         ;;
     -32)
+        intel_target=1
         target_build_arch=-m32
         target_cpu=i386
         shift
         ;;
 esac
 
+if [ -n "$intel_host" ] && [ -z "$intel_target" ] && [ -z "$arm64_target" ]; then
+    intel_target=1
+elif [ -n "$arm64_host" ] && [ -z "$arm64_target" ] && [ -z "$intel_target" ]; then
+    arm64_target=1
+fi
+
 # Intel builds target 10.10 (Yosemite.)
 export MACOSX_DEPLOYMENT_TARGET=10.10
 
-if [ -n "$APPLE_SILICON" ]; then
-    if [ -n "$intel_target" ]; then
-        target_build_arch="-target x86_64-apple-macos${MACOSX_DEPLOYMENT_TARGET}"
-        target_cpu=x86_64
-    else
-        export MACOSX_DEPLOYMENT_TARGET=11.0 # Big Sur
-    fi
-elif [ "$target_cpu" = x86_64 ]; then
+if [ -n "$intel_target" ]; then
     target_build_arch="-target x86_64-apple-macos${MACOSX_DEPLOYMENT_TARGET}"
+else
+    export MACOSX_DEPLOYMENT_TARGET=11.0 # Big Sur
+
+    if [ -n "$intel_host" ]; then
+        target_build_arch="-target aarch64-apple-macos${MACOSX_DEPLOYMENT_TARGET}"
+    fi
 fi
 
 # Need to use Xcode 9 for 32 bit builds on Mojave and newer.
@@ -107,7 +121,7 @@ best_llvm_path=$(
 # Fallback to XCode version.
 [ -z "$best_llvm_path" ] && best_llvm_path=/usr
 
-if [ -n "$APPLE_SILICON" ] && [ -z "$intel_target" ]; then
+if [ -n "$arm64_target" ]; then
     case "$best_llvm_path" in
         /nix/store/*) # Nix
             rt_lib=$(find /nix/store -maxdepth 1 -type d -name '*-compiler-rt-libc-*[0-9]' | while read -r d; do echo $d $(echo $d | sed -E 's/.*-([0-9.]+)$/\1/'); done | sort -V -k 2 | tail -n 1 | awk '{ print $1 }')/lib/libclang_rt.osx.a
@@ -127,7 +141,7 @@ export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_D
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH="$best_llvm_path/bin:$BREW_PREFIX/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="$best_llvm_path/bin:$BREW_PREFIX/bin:$BREW_PREFIX/opt/gettext/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 export CC="$clang_path/bin/clang $target_build_arch"
 export CPP="$clang_path/bin/clang -E $target_build_arch"
@@ -136,7 +150,7 @@ export ARCHFLAGS="$target_build_arch"
 export CPPFLAGS="-DICONV_CONST="
 export CFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=incompatible-function-pointer-types -fpermissive -Wno-error=unguarded-availability"
 export CXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include/c++/v1 -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include"
-export OBJCXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability"
+export OBJCXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include/c++/v1 -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include"
 export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\"\$BUILD_ROOT/root/stow/libuuid/include\""
@@ -148,11 +162,18 @@ export BUILD_ENV
 
 export TAR=tar
 
+if [ -f /bin/dash ]; then
+    export DASH=/bin/dash
+fi
+
 if [ "$target_cpu" = i386 ]; then
     export CONFIGURE_REQUIRED_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
-elif [ -n "$intel_target" ]; then
-    export CONFIGURE_REQUIRED_ARGS='--host=x86_64-apple-darwin --build=arm64-apple-darwin'
+elif [ -n "$arm64_host" ] && [ -n "$intel_target" ]; then
+    export CONFIGURE_REQUIRED_ARGS='--host=x86_64-apple-darwin --build=aarch64-apple-darwin'
     export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+elif [ -n "$intel_host" ] && [ -n "$arm64_target" ]; then
+    export CONFIGURE_REQUIRED_ARGS='--host=aarch64-apple-darwin --build=x86_64-apple-darwin'
+    export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64"
 fi
 
 . "$(dirname "$0")/../builder/core.sh"
@@ -161,19 +182,11 @@ fi
 BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
 export BUILD_ENV
 
-for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libsecret m4 ninja python2 shared-mime-info swig; do
+for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libgpg-error libsecret m4 ninja openssl python2 shared-mime-info swig xorg-macros flac; do
     table_line_remove DISTS $dist
 done
 
 table_line_replace DIST_PREFIX libuuid /usr/stow/libuuid
-
-if [ "$target_cpu" = i386 ]; then
-    table_line_replace DIST_CONFIGURE_OVERRIDES openssl './Configure darwin-i386-cc no-shared --prefix=/usr --openssldir=/etc/ssl'
-elif [ "$target_cpu" = ARM64 ]; then
-    table_line_replace DIST_CONFIGURE_OVERRIDES openssl "./Configure darwin64-arm64-cc no-shared --prefix=/usr --openssldir=/etc/ssl"
-else
-    table_line_replace DIST_CONFIGURE_OVERRIDES openssl "./Configure darwin64-${target_cpu}-cc no-shared --prefix=/usr --openssldir=/etc/ssl"
-fi
 
 stdint_h=
 
@@ -185,16 +198,7 @@ else
     die "Can't find macOS SDK 'stdint.h'"
 fi
 
-table_line_append DIST_EXTRA_CFLAGS libogg    "-include $stdint_h"
-
-table_line_append DIST_EXTRA_CFLAGS libvorbis "-include $stdint_h"
-
-table_line_append DIST_EXTRA_CFLAGS libtheora "-include $stdint_h"
-
 table_line_append DIST_EXTRA_CFLAGS ffmpeg    "-include $stdint_h"
-
-# -Wl,-no_compact_unwind must be passed in LDFLAGS to openssl
-table_line_append DIST_MAKE_ARGS openssl "LDFLAGS=\"\$LDFLAGS\""
 
 # these are only applicable for cross-compiling to 32 bits
 if [ "$target_cpu" = i386 ]; then
@@ -209,30 +213,26 @@ if [ "$target_cpu" = i386 ]; then
     table_line_append DIST_ARGS libicu '--host= --build='
 fi
 
-table_line_replace DIST_CONFIGURE_TYPES libmodplug autoreconf
-table_line_append  DIST_PRE_BUILD       libmodplug " \
-    sed -i.bak '/-mmacosx-version-min=/d' configure.ac; \
-    sed -i.bak 's/-lstdc++/-lc++/g' libmodplug.pc.in; \
-"
-
-table_line_append DIST_PRE_BUILD libzmq "sed -i.bak 's/-lstdc++/-lc++/g' src/libzmq.pc.in"
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
 
 # For a 10.7 target:
 #table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
 
-table_line_append DIST_ARGS libmodplug "CC=clang++ CXX=clang++"
-
-table_line_append DIST_PRE_BUILD libvpx " \
-    sed -E -i.bak 's/(-mmacosx-version-min=)[[:digit:].]+/\1'\$MACOSX_DEPLOYMENT_TARGET'/g' build/make/configure.sh; \
-"
-
 table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extra-ldflags='-framework CoreText'"
 
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
-if [ -n "$APPLE_SILICON" ] && [ "$target_cpu" != ARM64 ]; then
+if [ -n "$arm64_host" ] && [ -z "$arm64_target" ]; then
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
+fi
+
+# Set up cross-compile for ARM64 on Intel.
+if [ -n "$arm64_target" ] && [ -z "$arm64_host" ]; then
+    table_line_remove DIST_FLAGS               libpng
+
+    table_line_append DIST_FLAGS               gettext       no_install_bin
+
+    table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg        "--enable-cross-compile --arch=aarch64"
 fi
 
 builder "$@"

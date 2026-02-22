@@ -723,6 +723,31 @@ if(CMAKE_HOST_WIN32 AND CMAKE_CROSSCOMPILING)
     set(WXRC ${CMAKE_SOURCE_DIR}/win32-deps/wxrc/wxrc.exe)
 endif()
 
+if(APPLE AND CMAKE_CROSSCOMPILING)
+    find_program(HOMEBREW_EXECUTABLE brew)
+
+    if(HOMEBREW_EXECUTABLE)
+        if(NOT "$ENV{HOMEBREW_PREFIX}" STREQUAL "")
+            set(MAC_HOMEBREW_PREFIX $ENV{HOMEBREW_PREFIX})
+        else()
+            execute_process(COMMAND ${HOMEBREW_EXECUTABLE} --prefix
+                            OUTPUT_VARIABLE MAC_HOMEBREW_PREFIX
+                            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        endif()
+
+        file(GLOB MAC_HOMEBREW_WXWIDGETS_DIR "${MAC_HOMEBREW_PREFIX}/Cellar/wxwidgets/*")
+        if(MAC_HOMEBREW_WXWIDGETS_DIR)
+            list(SORT MAC_HOMEBREW_WXWIDGETS_DIR)
+            list(REVERSE MAC_HOMEBREW_WXWIDGETS_DIR)
+            list(GET MAC_HOMEBREW_WXWIDGETS_DIR 0 MAC_HOMEBREW_WXWIDGETS_PREFIX)
+        endif()
+
+        if(EXISTS "${MAC_HOMEBREW_WXWIDGETS_PREFIX}/bin/wxrc")
+            set(WXRC "${MAC_HOMEBREW_WXWIDGETS_PREFIX}/bin/wxrc")
+        endif()
+    endif()
+endif()
+
 # Configure wxrc.
 if(WXRC AND NOT CMAKE_HOST_WIN32)
     separate_arguments(WXRC UNIX_COMMAND ${WXRC})
