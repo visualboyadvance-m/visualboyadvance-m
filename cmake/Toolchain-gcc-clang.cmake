@@ -65,7 +65,7 @@ else()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    add_compile_options(-Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-error -Wno-error=unguarded-availability-new)
+    add_compile_options(-Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-elaborated-enum-base -Wno-availability -Wno-nan-infinity-disabled -Wno-unknown-warning-option -Wno-unguarded-availability-new -Wno-error)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-feliminate-unused-debug-types)
 endif()
