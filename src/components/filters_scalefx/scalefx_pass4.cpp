@@ -15,8 +15,8 @@ namespace scalefx {
 
 // Subpixel offset table (maps index to pixel offset)
 // Index: 0=E, 1=D, 2=D0, 3=F, 4=F0, 5=B, 6=B0, 7=H, 8=H0
-static const int g_offset_x[9] = { 0, -1, -2,  1,  2,  0,  0,  0,  0 };
-static const int g_offset_y[9] = { 0,  0,  0,  0,  0, -1, -2,  1,  2 };
+[[maybe_unused]] static const int g_offset_x[9] = { 0, -1, -2,  1,  2,  0,  0,  0,  0 };
+[[maybe_unused]] static const int g_offset_y[9] = { 0,  0,  0,  0,  0, -1, -2,  1,  2 };
 
 // Unpack Pass 3 data to corner and mid indices using integer math
 // Pass 3 packs as: (crn + 9*mid) / 80
@@ -28,7 +28,7 @@ static inline void UnpackPass3(float packed, int& crn, int& mid) {
 }
 
 // Get pixel with boundary clamping
-static inline uint32_t GetPixel(const uint8_t* src, int srcPitch, int width, int height, int x, int y) {
+[[maybe_unused]] static inline uint32_t GetPixel(const uint8_t* src, int srcPitch, int width, int height, int x, int y) {
     x = (x < 0) ? 0 : (x >= width) ? width - 1 : x;
     y = (y < 0) ? 0 : (y >= height) ? height - 1 : y;
     const uint32_t* row = reinterpret_cast<const uint32_t*>(src + y * srcPitch);
@@ -36,7 +36,7 @@ static inline uint32_t GetPixel(const uint8_t* src, int srcPitch, int width, int
 }
 
 // Get Pass3 data at position
-static inline void GetPass3Data(const float* pass3, int width, int height, int px, int py,
+[[maybe_unused]] static inline void GetPass3Data(const float* pass3, int width, int height, int px, int py,
                                  float& e0, float& e1, float& e2, float& e3) {
     px = (px < 0) ? 0 : (px >= width) ? width - 1 : px;
     py = (py < 0) ? 0 : (py >= height) ? height - 1 : py;
@@ -48,7 +48,7 @@ static inline void GetPass3Data(const float* pass3, int width, int height, int p
 }
 
 // Fast pixel fetch with pre-clamped coordinates (no boundary check needed for interior)
-static inline uint32_t GetPixelFast(const uint32_t* srcRow, int x, int width) {
+[[maybe_unused]] static inline uint32_t GetPixelFast(const uint32_t* srcRow, int x, int width) {
     return srcRow[(x < 0) ? 0 : (x >= width) ? width - 1 : x];
 }
 

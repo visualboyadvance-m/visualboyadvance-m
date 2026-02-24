@@ -172,42 +172,42 @@ void Pass3(const float* pass2, float* dst, int width, int height, int sfx_scn) {
             Float4 crn, mid;
 
             // Corner x (top-left)
-            crn.x = (lvl1x && Eo.x || lvl3x_0 && Eo.y || lvl4x_0 && Do.x || lvl6x_0 && Fo.y) ? 5.0f :
-                    (lvl1x || lvl3x_1 && !Eo.w || lvl4x_1 && !Bo.x || lvl6x_1 && !Ho.w) ? 1.0f :
+            crn.x = ((lvl1x && Eo.x) || (lvl3x_0 && Eo.y) || (lvl4x_0 && Do.x) || (lvl6x_0 && Fo.y)) ? 5.0f :
+                    (lvl1x || (lvl3x_1 && !Eo.w) || (lvl4x_1 && !Bo.x) || (lvl6x_1 && !Ho.w)) ? 1.0f :
                     lvl3x_0 ? 3.0f : lvl3x_1 ? 7.0f : lvl4x_0 ? 2.0f : lvl4x_1 ? 6.0f : lvl6x_0 ? 4.0f : lvl6x_1 ? 8.0f : 0.0f;
 
             // Corner y (top-right)
-            crn.y = (lvl1y && Eo.y || lvl3y_0 && Eo.x || lvl4y_0 && Fo.y || lvl6y_0 && Do.x) ? 5.0f :
-                    (lvl1y || lvl3y_1 && !Eo.z || lvl4y_1 && !Bo.y || lvl6y_1 && !Ho.z) ? 3.0f :
+            crn.y = ((lvl1y && Eo.y) || (lvl3y_0 && Eo.x) || (lvl4y_0 && Fo.y) || (lvl6y_0 && Do.x)) ? 5.0f :
+                    (lvl1y || (lvl3y_1 && !Eo.z) || (lvl4y_1 && !Bo.y) || (lvl6y_1 && !Ho.z)) ? 3.0f :
                     lvl3y_0 ? 1.0f : lvl3y_1 ? 7.0f : lvl4y_0 ? 4.0f : lvl4y_1 ? 6.0f : lvl6y_0 ? 2.0f : lvl6y_1 ? 8.0f : 0.0f;
 
             // Corner z (bottom-right)
-            crn.z = (lvl1z && Eo.z || lvl3z_0 && Eo.w || lvl4z_0 && Fo.z || lvl6z_0 && Do.w) ? 7.0f :
-                    (lvl1z || lvl3z_1 && !Eo.y || lvl4z_1 && !Ho.z || lvl6z_1 && !Bo.y) ? 3.0f :
+            crn.z = ((lvl1z && Eo.z) || (lvl3z_0 && Eo.w) || (lvl4z_0 && Fo.z) || (lvl6z_0 && Do.w)) ? 7.0f :
+                    (lvl1z || (lvl3z_1 && !Eo.y) || (lvl4z_1 && !Ho.z) || (lvl6z_1 && !Bo.y)) ? 3.0f :
                     lvl3z_0 ? 1.0f : lvl3z_1 ? 5.0f : lvl4z_0 ? 4.0f : lvl4z_1 ? 8.0f : lvl6z_0 ? 2.0f : lvl6z_1 ? 6.0f : 0.0f;
 
             // Corner w (bottom-left)
-            crn.w = (lvl1w && Eo.w || lvl3w_0 && Eo.z || lvl4w_0 && Do.w || lvl6w_0 && Fo.z) ? 7.0f :
-                    (lvl1w || lvl3w_1 && !Eo.x || lvl4w_1 && !Ho.w || lvl6w_1 && !Bo.x) ? 1.0f :
+            crn.w = ((lvl1w && Eo.w) || (lvl3w_0 && Eo.z) || (lvl4w_0 && Do.w) || (lvl6w_0 && Fo.z)) ? 7.0f :
+                    (lvl1w || (lvl3w_1 && !Eo.x) || (lvl4w_1 && !Ho.w) || (lvl6w_1 && !Bo.x)) ? 1.0f :
                     lvl3w_0 ? 3.0f : lvl3w_1 ? 5.0f : lvl4w_0 ? 2.0f : lvl4w_1 ? 8.0f : lvl6w_0 ? 4.0f : lvl6w_1 ? 6.0f : 0.0f;
 
             // Mid x (top)
-            mid.x = (lvl2x_0 && Eo.x || lvl2x_1 && Eo.y || lvl5x_0 && Do.x || lvl5x_1 && Fo.y) ? 5.0f :
+            mid.x = ((lvl2x_0 && Eo.x) || (lvl2x_1 && Eo.y) || (lvl5x_0 && Do.x) || (lvl5x_1 && Fo.y)) ? 5.0f :
                     lvl2x_0 ? 1.0f : lvl2x_1 ? 3.0f : lvl5x_0 ? 2.0f : lvl5x_1 ? 4.0f :
                     (Ec.x && Dc.z && Ec.y && Fc.w) ? (Eo.x ? (Eo.y ? 5.0f : 3.0f) : 1.0f) : 0.0f;
 
             // Mid y (right)
-            mid.y = (lvl2y_0 && !Eo.y || lvl2y_1 && !Eo.z || lvl5y_0 && !Bo.y || lvl5y_1 && !Ho.z) ? 3.0f :
+            mid.y = ((lvl2y_0 && !Eo.y) || (lvl2y_1 && !Eo.z) || (lvl5y_0 && !Bo.y) || (lvl5y_1 && !Ho.z)) ? 3.0f :
                     lvl2y_0 ? 5.0f : lvl2y_1 ? 7.0f : lvl5y_0 ? 6.0f : lvl5y_1 ? 8.0f :
                     (Ec.y && Bc.w && Ec.z && Hc.x) ? (!Eo.y ? (!Eo.z ? 3.0f : 7.0f) : 5.0f) : 0.0f;
 
             // Mid z (bottom)
-            mid.z = (lvl2z_0 && Eo.w || lvl2z_1 && Eo.z || lvl5z_0 && Do.w || lvl5z_1 && Fo.z) ? 7.0f :
+            mid.z = ((lvl2z_0 && Eo.w) || (lvl2z_1 && Eo.z) || (lvl5z_0 && Do.w) || (lvl5z_1 && Fo.z)) ? 7.0f :
                     lvl2z_0 ? 1.0f : lvl2z_1 ? 3.0f : lvl5z_0 ? 2.0f : lvl5z_1 ? 4.0f :
                     (Ec.z && Fc.x && Ec.w && Dc.y) ? (Eo.z ? (Eo.w ? 7.0f : 1.0f) : 3.0f) : 0.0f;
 
             // Mid w (left)
-            mid.w = (lvl2w_0 && !Eo.x || lvl2w_1 && !Eo.w || lvl5w_0 && !Bo.x || lvl5w_1 && !Ho.w) ? 1.0f :
+            mid.w = ((lvl2w_0 && !Eo.x) || (lvl2w_1 && !Eo.w) || (lvl5w_0 && !Bo.x) || (lvl5w_1 && !Ho.w)) ? 1.0f :
                     lvl2w_0 ? 5.0f : lvl2w_1 ? 7.0f : lvl5w_0 ? 6.0f : lvl5w_1 ? 8.0f :
                     (Ec.w && Hc.y && Ec.x && Bc.z) ? (!Eo.w ? (!Eo.x ? 1.0f : 5.0f) : 7.0f) : 0.0f;
 

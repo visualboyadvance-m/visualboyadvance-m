@@ -114,10 +114,10 @@ void Pass2(const float* pass0, const float* pass1, float* dst, int width, int he
                 // jD_wxyz = {jD[3], jD[0], jD[1], jD[2]}
                 // jD_zwxy = {jD[2], jD[3], jD[0], jD[1]}
                 Bool4 result;
-                result.x = GE(jD[0], 0.0f) && (LEQ(jD[1], 0.0f) && LEQ(jD[3], 0.0f) || GE(jD[0] + jD[2], jD[1] + jD[3]));
-                result.y = GE(jD[1], 0.0f) && (LEQ(jD[2], 0.0f) && LEQ(jD[0], 0.0f) || GE(jD[1] + jD[3], jD[2] + jD[0]));
-                result.z = GE(jD[2], 0.0f) && (LEQ(jD[3], 0.0f) && LEQ(jD[1], 0.0f) || GE(jD[2] + jD[0], jD[3] + jD[1]));
-                result.w = GE(jD[3], 0.0f) && (LEQ(jD[0], 0.0f) && LEQ(jD[2], 0.0f) || GE(jD[3] + jD[1], jD[0] + jD[2]));
+                result.x = GE(jD[0], 0.0f) && ((LEQ(jD[1], 0.0f) && LEQ(jD[3], 0.0f)) || GE(jD[0] + jD[2], jD[1] + jD[3]));
+                result.y = GE(jD[1], 0.0f) && ((LEQ(jD[2], 0.0f) && LEQ(jD[0], 0.0f)) || GE(jD[1] + jD[3], jD[2] + jD[0]));
+                result.z = GE(jD[2], 0.0f) && ((LEQ(jD[3], 0.0f) && LEQ(jD[1], 0.0f)) || GE(jD[2] + jD[0], jD[3] + jD[1]));
+                result.w = GE(jD[3], 0.0f) && ((LEQ(jD[0], 0.0f) && LEQ(jD[2], 0.0f)) || GE(jD[3] + jD[1], jD[0] + jD[2]));
                 return result;
             };
 

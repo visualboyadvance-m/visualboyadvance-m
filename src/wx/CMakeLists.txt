@@ -439,6 +439,10 @@ endif()
 if(APPLE)
 # Needed for CoreAudio.
     target_compile_options(visualboyadvance-m PRIVATE -Wno-error=elaborated-enum-base)
+# NSURLHandle.h in the Xcode SDK has a deprecated method missing a return type annotation;
+# suppress the warning for all Objective-C/C++ translation units.
+    target_compile_options(visualboyadvance-m PRIVATE
+        $<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-Wno-missing-method-return-type>)
 endif()
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})

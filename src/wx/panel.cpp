@@ -129,7 +129,7 @@ constexpr int kFilterContextRadius = 2;
 constexpr int kSeamMarginRows = 1;
 
 // Total source rows to process for each seam band (above + below seam)
-constexpr int kSeamBandSourceRows = (kFilterContextRadius + kSeamMarginRows) * 2;
+[[maybe_unused]] constexpr int kSeamBandSourceRows = (kFilterContextRadius + kSeamMarginRows) * 2;
 
 // Apply the currently selected 32-bit filter to the image region.
 // This is the core filter dispatch function used by both threaded rendering
@@ -2198,9 +2198,9 @@ public:
     enum class Phase { IFB, Filter, SeamFix };
 
     FilterThread() : wxThread(wxTHREAD_JOINABLE), lock_(), sig_(lock_),
-                     src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0),
                      phase_(Phase::IFB), seamBandStart_(-1), seamBandEnd_(-1),
-                     seamSrc_(nullptr), seamDst_(nullptr) {}
+                     seamSrc_(nullptr), seamDst_(nullptr),
+                     src2_(nullptr), dst2_(nullptr), src2_size_(0), dst2_size_(0) {}
 
     ~FilterThread() {
         // Free pre-allocated conversion buffers
