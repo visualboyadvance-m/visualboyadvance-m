@@ -1,6 +1,6 @@
 add_library(ghc-filesystem INTERFACE)
 
-target_include_directories(ghc-filesystem INTERFACE
+target_include_directories(ghc-filesystem SYSTEM INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
