@@ -100,10 +100,27 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
 
+if(APPLE)
+    enable_language(OBJC)
+    enable_language(OBJCXX)
+    # Suppress "dylib was built for newer macOS version than being linked" and
+    # other ld warnings that fire when linking against Homebrew libraries.
+    # Apple's linker has no per-warning suppression for these diagnostics.
+    add_link_options(-Wl,-w)
+endif()
+
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     add_compile_definitions(-DVCPKG)
     if(MSVC)
-        set(CMAKE_CXX_FLAGS "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
+        set(CMAKE_C_FLAGS      "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS    "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
+        set(CMAKE_OBJC_FLAGS   "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJC_FLAGS}")
+        set(CMAKE_OBJCXX_FLAGS "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJCXX_FLAGS}")
+    else()
+        set(CMAKE_C_FLAGS      "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_C_FLAGS}")
+        set(CMAKE_CXX_FLAGS    "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
+        set(CMAKE_OBJC_FLAGS   "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJC_FLAGS}")
+        set(CMAKE_OBJCXX_FLAGS "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJCXX_FLAGS}")
     endif()
 endif() 
 

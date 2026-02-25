@@ -138,7 +138,7 @@ DISTS=$DISTS'
     glib            https://download.gnome.org/sources/glib/2.9/glib-2.9.6.tar.xz                               lib/libglib-2.0.a
     libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.0.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.0/SDL3-3.4.0.tar.gz         lib/libSDL3.a
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.2/SDL3-3.4.2.tar.gz         lib/libSDL3.a
     faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.02.tar.gz                            lib/libFAudio.a
     harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/12.3.2/harfbuzz-12.3.2.tar.xz        lib/libharfbuzz.a
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz                             lib/libmspack.a

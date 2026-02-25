@@ -394,6 +394,15 @@ function(configure_wx_target target)
 
 endfunction()
 
+# Handle errors from system headers on macOS.
+if(APPLE)
+    add_compile_options(
+        $<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-Wno-missing-method-return-type>
+        $<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-Wno-availability>
+        $<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-Wno-unguarded-availability-new>
+    )
+endif()
+
 # Sub-projects.
 add_subdirectory(test)
 add_subdirectory(config)
@@ -437,12 +446,8 @@ if(APPLE AND NOT COMPILE_ONLY)
 endif()
 
 if(APPLE)
-# Needed for CoreAudio.
-    target_compile_options(visualboyadvance-m PRIVATE -Wno-error=elaborated-enum-base)
-# NSURLHandle.h in the Xcode SDK has a deprecated method missing a return type annotation;
-# suppress the warning for all Objective-C/C++ translation units.
-    target_compile_options(visualboyadvance-m PRIVATE
-        $<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-Wno-missing-method-return-type>)
+    set_source_files_properties(audio/internal/coreaudio.cpp PROPERTIES
+        COMPILE_OPTIONS "-Wno-elaborated-enum-base;-Wno-availability")
 endif()
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
