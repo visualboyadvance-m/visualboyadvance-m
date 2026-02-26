@@ -12,6 +12,51 @@
 #define elfReadMemory(addr) \
     READ32LE((&map[(addr) >> 24].address[(addr)&map[(addr) >> 24].mask]))
 
+// Global bounds tracking for ELF file data validation
+static uint8_t* g_elfFileStart = NULL;
+static uint8_t* g_elfFileEnd = NULL;
+
+// Helper function to check if a pointer is within valid ELF file bounds
+static inline bool elfIsValidPtr(uint8_t* ptr, size_t size) {
+    if (g_elfFileStart == NULL || g_elfFileEnd == NULL)
+        return true; // Bounds checking not initialized yet
+    if (ptr+0 < g_elfFileStart || ptr+size >= g_elfFileEnd)
+        return false;
+    return true;
+}
+
+// Forward declarations for read functions
+uint32_t elfRead4Bytes(uint8_t*);
+uint16_t elfRead2Bytes(uint8_t*);
+
+// Safe read wrappers with automatic bounds checking
+static inline bool elfSafeRead4Bytes(uint8_t* data, uint32_t* out) {
+    if (!elfIsValidPtr(data, 4)) {
+        fprintf(stderr, "Error: 4-byte read out of bounds\n");
+        return false;
+    }
+    *out = elfRead4Bytes(data);
+    return true;
+}
+
+static inline bool elfSafeRead2Bytes(uint8_t* data, uint16_t* out) {
+    if (!elfIsValidPtr(data, 2)) {
+        fprintf(stderr, "Error: 2-byte read out of bounds\n");
+        return false;
+    }
+    *out = elfRead2Bytes(data);
+    return true;
+}
+
+static inline bool elfSafeRead1Byte(uint8_t* data, uint8_t* out) {
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: 1-byte read out of bounds\n");
+        return false;
+    }
+    *out = *data;
+    return true;
+}
+
 #define DW_TAG_array_type 0x01
 #define DW_TAG_enumeration_type 0x04
 #define DW_TAG_formal_parameter 0x05
@@ -235,9 +280,6 @@ ELFfde** elfFdes = NULL;
 int elfFdeCount = 0;
 
 CompileUnit* elfCurrentUnit = NULL;
-
-uint32_t elfRead4Bytes(uint8_t*);
-uint16_t elfRead2Bytes(uint8_t*);
 
 CompileUnit* elfGetCompileUnit(uint32_t addr)
 {
@@ -499,9 +541,22 @@ bool elfGetSymbolAddress(const char* sym, uint32_t* addr, uint32_t* size, int* t
 
 ELFfde* elfGetFde(uint32_t address)
 {
+    if (elfFdes == NULL || elfFdeCount == 0) {
+        return NULL;
+    }
+    
+    // Validate address is reasonable (within GBA address space)
+    if (address < 0x08000000 && address >= 0x10000000) {
+        fprintf(stderr, "Warning: FDE lookup for suspicious address: 0x%08x\n", address);
+    }
+    
     if (elfFdes) {
         int i;
         for (i = 0; i < elfFdeCount; i++) {
+            if (elfFdes[i] == NULL) {
+                fprintf(stderr, "Warning: NULL FDE at index %d\n", i);
+                continue;
+            }
             if (address >= elfFdes[i]->address && address < elfFdes[i]->end) {
                 return elfFdes[i];
             }
@@ -514,13 +569,37 @@ ELFfde* elfGetFde(uint32_t address)
 void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len,
     uint32_t pc)
 {
+    if (state == NULL) {
+        fprintf(stderr, "Error: NULL state in CFA execution\n");
+        return;
+    }
+    
+    if (data == NULL || len == 0) {
+        fprintf(stderr, "Error: Invalid CFA instruction data\n");
+        return;
+    }
+    
+    if (!elfIsValidPtr(data, len)) {
+        fprintf(stderr, "Error: CFA instruction data out of bounds\n");
+        return;
+    }
+    
     uint8_t* end = data + len;
     int _bytes;
     int _reg;
     ELFFrameStateRegisters* fs;
+    
+    static const int MAX_INSTRUCTIONS = 10000; // Prevent infinite loops
+    int instruction_count = 0;
 
-    while (data < end && state->pc < pc) {
+    while (data < end && state->pc < pc && instruction_count < MAX_INSTRUCTIONS) {
+        if (!elfIsValidPtr(data, 1)) {
+            fprintf(stderr, "Error: CFA instruction pointer out of bounds\n");
+            break;
+        }
+        
         uint8_t op = *data++;
+        instruction_count++;
 
         switch (op >> 6) {
         case DW_CFA_advance_loc:
@@ -528,14 +607,23 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
             break;
         case DW_CFA_offset:
             _reg = op & 0x3f;
+            if (_reg >= 16) {
+                fprintf(stderr, "Error: CFA register index %d out of range\n", _reg);
+                return;
+            }
             state->registers.regs[_reg].mode = REG_OFFSET;
             state->registers.regs[_reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &_bytes);
             data += _bytes;
             break;
         case DW_CFA_restore:
+            _reg = op & 0x3f;
+            if (_reg >= 16) {
+                fprintf(stderr, "Error: CFA register index %d out of range\n", _reg);
+                return;
+            }
             // we don't care much about the other possible settings,
             // so just setting to unset is enough for now
-            state->registers.regs[op & 0x3f].mode = REG_NOT_SET;
+            state->registers.regs[_reg].mode = REG_NOT_SET;
             break;
         case 0:
             switch (op & 0x3f) {
@@ -555,6 +643,10 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
             case DW_CFA_offset_extended:
                 _reg = elfReadLEB128(data, &_bytes);
                 data += _bytes;
+                if (_reg >= 16) {
+                    fprintf(stderr, "Error: CFA register index %d out of range\n", _reg);
+                    return;
+                }
                 state->registers.regs[_reg].mode = REG_OFFSET;
                 state->registers.regs[_reg].offset = state->dataAlign * (int32_t)elfReadLEB128(data, &_bytes);
                 data += _bytes;
@@ -564,11 +656,19 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
             case DW_CFA_same_value:
                 _reg = elfReadLEB128(data, &_bytes);
                 data += _bytes;
+                if (_reg >= 16) {
+                    fprintf(stderr, "Error: CFA register index %d out of range\n", _reg);
+                    return;
+                }
                 state->registers.regs[_reg].mode = REG_NOT_SET;
                 break;
             case DW_CFA_register:
                 _reg = elfReadLEB128(data, &_bytes);
                 data += _bytes;
+                if (_reg >= 16) {
+                    fprintf(stderr, "Error: CFA register index %d out of range\n", _reg);
+                    return;
+                }
                 state->registers.regs[_reg].mode = REG_REGISTER;
                 state->registers.regs[_reg].reg = elfReadLEB128(data, &_bytes);
                 data += _bytes;
@@ -615,11 +715,36 @@ void elfExecuteCFAInstructions(ELFFrameState* state, uint8_t* data, uint32_t len
             return;
         }
     }
+    
+    if (instruction_count >= MAX_INSTRUCTIONS) {
+        fprintf(stderr, "Warning: CFA instruction limit reached, possible infinite loop\n");
+    }
 }
 
 ELFFrameState* elfGetFrameState(ELFfde* fde, uint32_t address)
 {
+    if (fde == NULL) {
+        fprintf(stderr, "Error: NULL FDE in elfGetFrameState\n");
+        return NULL;
+    }
+    
+    if (fde->cie == NULL) {
+        fprintf(stderr, "Error: NULL CIE in FDE\n");
+        return NULL;
+    }
+    
+    // Validate address is within FDE range
+    if (address < fde->address || address >= fde->end) {
+        fprintf(stderr, "Warning: Address 0x%08x outside FDE range [0x%08x, 0x%08x)\n",
+                       address, fde->address, fde->end);
+    }
+    
     ELFFrameState* state = (ELFFrameState*)calloc(1, sizeof(ELFFrameState));
+    if (state == NULL) {
+        fprintf(stderr, "Error: Failed to allocate frame state\n");
+        return NULL;
+    }
+    
     state->pc = fde->address;
     state->dataAlign = fde->cie->dataAlign;
     state->codeAlign = fde->cie->codeAlign;
@@ -645,6 +770,12 @@ void elfPrintCallChain(uint32_t address)
     reg_pair newRegs[15];
 
     memcpy(&regs[0], &reg[0], sizeof(reg_pair) * 15);
+    
+    // Validate initial address
+    if (address == 0) {
+        printf("Error: NULL address in call chain\n");
+        return;
+    }
 
     while (count < 20) {
         const char* addr = elfGetAddressSymbol(address);
@@ -713,6 +844,20 @@ uint32_t elfDecodeLocation(Function* f, ELFBlock* o, LocationType* type, uint32_
     uint32_t framebase = 0;
     if (f && f->frameBase) {
         ELFBlock* b = f->frameBase;
+        
+        // Validate frame base block
+        if (b->data == NULL || b->length == 0) {
+            fprintf(stderr, "Error: Invalid frame base block\n");
+            *type = LOCATION_memory;
+            return 0;
+        }
+        
+        if (!elfIsValidPtr(b->data, b->length)) {
+            fprintf(stderr, "Error: Frame base data out of bounds\n");
+            *type = LOCATION_memory;
+            return 0;
+        }
+        
         switch (*b->data) {
         case DW_OP_reg0:
         case DW_OP_reg1:
@@ -741,9 +886,28 @@ uint32_t elfDecodeLocation(Function* f, ELFBlock* o, LocationType* type, uint32_
     ELFBlock* loc = o;
     uint32_t location = 0;
     int _bytes = 0;
+    
     if (loc) {
+        // Validate location block
+        if (loc->data == NULL) {
+            fprintf(stderr, "Error: NULL location data\n");
+            *type = LOCATION_memory;
+            return 0;
+        }
+        
+        if (!elfIsValidPtr(loc->data, loc->length)) {
+            fprintf(stderr, "Error: Location data out of bounds\n");
+            *type = LOCATION_memory;
+            return 0;
+        }
+        
         switch (*loc->data) {
         case DW_OP_addr:
+            if (loc->length < 5) {
+                fprintf(stderr, "Error: DW_OP_addr block too small\n");
+                *type = LOCATION_memory;
+                return 0;
+            }
             location = elfRead4Bytes(loc->data + 1);
             *type = LOCATION_memory;
             break;
@@ -771,6 +935,11 @@ uint32_t elfDecodeLocation(Function* f, ELFBlock* o, LocationType* type, uint32_
             *type = LOCATION_register;
             break;
         case DW_OP_fbreg: {
+            if (loc->length < 2) {
+                fprintf(stderr, "Error: DW_OP_fbreg block too small\n");
+                *type = LOCATION_memory;
+                return 0;
+            }
             int bytes;
             int32_t off = elfReadSignedLEB128(loc->data + 1, &bytes);
             location = framebase + off;
@@ -809,11 +978,27 @@ uint16_t elfRead2Bytes(uint8_t* data)
 
 char* elfReadString(uint8_t* data, int* bytesRead)
 {
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: String read out of bounds\n");
+        *bytesRead = 0;
+        return NULL;
+    }
     if (*data == 0) {
         *bytesRead = 1;
         return NULL;
     }
-    *bytesRead = (int)strlen((char*)data) + 1;
+    // Scan for null terminator within bounds (max 4KB for safety)
+    uint8_t* ptr = data;
+    int maxLen = 4096;
+    while (maxLen-- > 0 && elfIsValidPtr(ptr, 1) && *ptr != 0) {
+        ptr++;
+    }
+    if (!elfIsValidPtr(ptr, 1) || *ptr != 0) {
+        fprintf(stderr, "Error: Unterminated or too long string in ELF data\n");
+        *bytesRead = 0;
+        return NULL;
+    }
+    *bytesRead = (int)(ptr - data) + 1;
     return (char*)data;
 }
 
@@ -829,6 +1014,12 @@ int32_t elfReadSignedLEB128(uint8_t* data, int* bytesRead)
         count++;
         result |= (byte & 0x7f) << shift;
         shift += 7;
+        // Prevent infinite loop on malformed data - LEB128 should not exceed 5 bytes for 32-bit values
+        if (count > 5) {
+            fprintf(stderr, "Error: Invalid LEB128 encoding (too many bytes)\n");
+            *bytesRead = count;
+            return 0;
+        }
     } while (byte & 0x80);
     if ((shift < 32) && (byte & 0x40))
         result |= -(1 << shift);
@@ -847,6 +1038,12 @@ uint32_t elfReadLEB128(uint8_t* data, int* bytesRead)
         count++;
         result |= (byte & 0x7f) << shift;
         shift += 7;
+        // Prevent infinite loop on malformed data - LEB128 should not exceed 5 bytes for 32-bit values
+        if (count > 5) {
+            fprintf(stderr, "Error: Invalid LEB128 encoding (too many bytes)\n");
+            *bytesRead = count;
+            return 0;
+        }
     } while (byte & 0x80);
     *bytesRead = count;
     return result;
@@ -854,18 +1051,44 @@ uint32_t elfReadLEB128(uint8_t* data, int* bytesRead)
 
 uint8_t* elfReadSection(uint8_t* data, ELFSectionHeader* sh)
 {
-    return data + READ32LE(&sh->offset);
+    uint32_t offset = READ32LE(&sh->offset);
+    uint32_t size = READ32LE(&sh->size);
+    
+    // Validate section is within file bounds
+    if (!elfIsValidPtr(data + offset, size)) {
+        fprintf(stderr, "Error: Section at offset %u with size %u is out of bounds\n", offset, size);
+        return NULL;
+    }
+    
+    return data + offset;
 }
 
 ELFSectionHeader* elfGetSectionByName(const char* name)
 {
     if (elfSectionHeadersStringTable == NULL)
         return NULL;
+    
+    if (name == NULL || strlen(name) == 0)
+        return NULL;
 
     for (int i = 0; i < elfSectionHeadersCount; i++) {
-        if (strcmp(name,
-                &elfSectionHeadersStringTable[READ32LE(&elfSectionHeaders[i]->name)])
-            == 0) {
+        uint32_t nameOffset = READ32LE(&elfSectionHeaders[i]->name);
+        
+        // Validate name offset is reasonable (max 64KB string table)
+        if (nameOffset > 65536) {
+            fprintf(stderr, "Warning: Section name offset too large: %u\n", nameOffset);
+            continue;
+        }
+        
+        const char* sectionName = &elfSectionHeadersStringTable[nameOffset];
+        
+        // Validate section name pointer is within bounds
+        if (!elfIsValidPtr((uint8_t*)sectionName, 1)) {
+            fprintf(stderr, "Warning: Section name pointer out of bounds\n");
+            continue;
+        }
+        
+        if (strcmp(name, sectionName) == 0) {
             return elfSectionHeaders[i];
         }
     }
@@ -874,14 +1097,33 @@ ELFSectionHeader* elfGetSectionByName(const char* name)
 
 ELFSectionHeader* elfGetSectionByNumber(int number)
 {
+    if (number < 0) {
+        fprintf(stderr, "Error: Negative section number: %d\n", number);
+        return NULL;
+    }
+    
     if (number < elfSectionHeadersCount) {
         return elfSectionHeaders[number];
     }
+    
+    fprintf(stderr, "Error: Section number %d exceeds count %d\n", number, elfSectionHeadersCount);
     return NULL;
 }
 
 CompileUnit* elfGetCompileUnitForData(uint8_t* data)
 {
+    // Validate data pointer is within file bounds
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: Data pointer out of bounds in compile unit lookup\n");
+        return NULL;
+    }
+    
+    // Check if elfDebugInfo is initialized
+    if (elfDebugInfo == NULL || elfDebugInfo->infodata == NULL) {
+        fprintf(stderr, "Error: Debug info not initialized\n");
+        return NULL;
+    }
+    
     uint8_t* end = elfCurrentUnit->top + 4 + elfCurrentUnit->length;
 
     if (data >= elfCurrentUnit->top && data < end)
@@ -898,47 +1140,104 @@ CompileUnit* elfGetCompileUnitForData(uint8_t* data)
         unit = unit->next;
     }
 
-    printf("Error: cannot find reference to compile unit at offset %08x\n",
+    fprintf(stderr, "Error: cannot find reference to compile unit at offset %08x\n",
         (int)(data - elfDebugInfo->infodata));
-    exit(-1);
+    return NULL; // Return NULL instead of exiting
 }
 
 uint8_t* elfReadAttribute(uint8_t* data, ELFAttr* attr)
 {
     int bytes;
     int form = attr->form;
+    int indirectCount = 0;
 start:
+    // Prevent infinite indirect loops on malformed data
+    if (indirectCount++ > 10) {
+        fprintf(stderr, "Error: Too many indirect form redirections\n");
+        return data;
+    }
+    
+    // Basic bounds check using global file bounds
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: Attribute read out of bounds\n");
+        return data;
+    }
+    
     switch (form) {
     case DW_FORM_addr:
+        if (!elfIsValidPtr(data, 4)) {
+            fprintf(stderr, "Error: DW_FORM_addr read out of bounds\n");
+            return data;
+        }
         attr->value = elfRead4Bytes(data);
         data += 4;
         break;
     case DW_FORM_data2:
+        if (!elfIsValidPtr(data, 2)) {
+            fprintf(stderr, "Error: DW_FORM_data2 read out of bounds\n");
+            return data;
+        }
         attr->value = elfRead2Bytes(data);
         data += 2;
         break;
     case DW_FORM_data4:
+        if (!elfIsValidPtr(data, 4)) {
+            fprintf(stderr, "Error: DW_FORM_data4 read out of bounds\n");
+            return data;
+        }
         attr->value = elfRead4Bytes(data);
         data += 4;
         break;
     case DW_FORM_string:
         attr->string = (char*)data;
-        data += strlen(attr->string) + 1;
+        // Find null terminator within bounds
+        while (elfIsValidPtr(data, 1) && *data != 0) {
+            data++;
+        }
+        if (!elfIsValidPtr(data, 1)) {
+            fprintf(stderr, "Error: Unterminated string in DW_FORM_string\n");
+            return data;
+        }
+        data++; // Skip null terminator
         break;
     case DW_FORM_strp:
+        if (!elfIsValidPtr(data, 4)) {
+            fprintf(stderr, "Error: DW_FORM_strp read out of bounds\n");
+            return data;
+        }
         attr->string = elfDebugStrings + elfRead4Bytes(data);
         data += 4;
         break;
     case DW_FORM_block:
         attr->block = (ELFBlock*)malloc(sizeof(ELFBlock));
+        if (attr->block == NULL) {
+            fprintf(stderr, "Error: Failed to allocate memory for block\n");
+            return data;
+        }
         attr->block->length = elfReadLEB128(data, &bytes);
         data += bytes;
+        if (!elfIsValidPtr(data, attr->block->length)) {
+            fprintf(stderr, "Error: DW_FORM_block data exceeds bounds\n");
+            free(attr->block);
+            attr->block = NULL;
+            return data;
+        }
         attr->block->data = data;
         data += attr->block->length;
         break;
     case DW_FORM_block1:
         attr->block = (ELFBlock*)malloc(sizeof(ELFBlock));
+        if (attr->block == NULL) {
+            fprintf(stderr, "Error: Failed to allocate memory for block1\n");
+            return data;
+        }
         attr->block->length = *data++;
+        if (!elfIsValidPtr(data, attr->block->length)) {
+            fprintf(stderr, "Error: DW_FORM_block1 data exceeds bounds\n");
+            free(attr->block);
+            attr->block = NULL;
+            return data;
+        }
         attr->block->data = data;
         data += attr->block->length;
         break;
@@ -957,10 +1256,18 @@ start:
         data += bytes;
         break;
     case DW_FORM_ref_addr:
+        if (!elfIsValidPtr(data, 4)) {
+            fprintf(stderr, "Error: DW_FORM_ref_addr read out of bounds\n");
+            return data;
+        }
         attr->value = (uint32_t)((elfDebugInfo->infodata + elfRead4Bytes(data)) - elfGetCompileUnitForData(data)->top);
         data += 4;
         break;
     case DW_FORM_ref4:
+        if (!elfIsValidPtr(data, 4)) {
+            fprintf(stderr, "Error: DW_FORM_ref4 read out of bounds\n");
+            return data;
+        }
         attr->value = elfRead4Bytes(data);
         data += 4;
         break;
@@ -981,6 +1288,13 @@ start:
 
 ELFAbbrev* elfGetAbbrev(ELFAbbrev** table, uint32_t number)
 {
+    // Validate abbreviation number is reasonable
+    if (number == 0 || number > 1000000) {
+        if (number != 0) // 0 is used as terminator, so don't warn
+            fprintf(stderr, "Warning: Suspicious abbreviation number: %u\n", number);
+        return NULL;
+    }
+    
     int hash = number % 121;
 
     ELFAbbrev* abbrev = table[hash];
@@ -1016,6 +1330,12 @@ ELFAbbrev** elfReadAbbrevs(uint8_t* data, uint32_t offset)
         data += bytes;
 
         while (name) {
+            // Limit attributes per abbreviation to 1000 to prevent excessive memory use
+            if (abbrev->numAttrs >= 1000) {
+                fprintf(stderr, "Too many attributes in abbreviation (max 1000)\n");
+                break;
+            }
+            
             if ((abbrev->numAttrs % 4) == 0) {
                 abbrev->attrs = (ELFAttr*)realloc(abbrev->attrs,
                     (abbrev->numAttrs + 4) * sizeof(ELFAttr));
@@ -1036,8 +1356,11 @@ ELFAbbrev** elfReadAbbrevs(uint8_t* data, uint32_t offset)
         number = elfReadLEB128(data, &bytes);
         data += bytes;
 
-        if (elfGetAbbrev(abbrevs, number) != NULL)
+        if (elfGetAbbrev(abbrevs, number) != NULL) {
+            // Duplicate abbreviation number detected - this could indicate corruption
+            fprintf(stderr, "Warning: Duplicate abbreviation number %u detected\n", number);
             break;
+        }
     }
 
     return abbrevs;
@@ -1052,16 +1375,51 @@ void elfParseCFA(uint8_t* top)
     }
 
     uint8_t* data = elfReadSection(top, h);
+    if (data == NULL) {
+        fprintf(stderr, "Failed to read debug frame section\n");
+        return;
+    }
 
     uint8_t* topOffset = data;
+    
+    uint32_t size = READ32LE(&h->size);
+    // Sanity check: frame data should not exceed 10MB
+    if (size > 10 * 1024 * 1024) {
+        fprintf(stderr, "Debug frame section too large: %u bytes\n", size);
+        return;
+    }
 
-    uint8_t* end = data + READ32LE(&h->size);
+    uint8_t* end = data + size;
+    if (!elfIsValidPtr(end, 0)) {
+        fprintf(stderr, "Debug frame section exceeds file bounds\n");
+        return;
+    }
 
     ELFcie* cies = NULL;
+    int cieCount = 0;
+    const int MAX_CIES = 10000;
+    const int MAX_FDES = 100000;
 
     while (data < end) {
+        if (!elfIsValidPtr(data, 8)) {
+            fprintf(stderr, "CFA entry header out of bounds\n");
+            break;
+        }
+        
         uint32_t offset = (uint32_t)(data - topOffset);
         uint32_t len = elfRead4Bytes(data);
+        
+        // Validate length is reasonable
+        if (len > 1024 * 1024) {
+            fprintf(stderr, "CFA entry too large: %u bytes\n", len);
+            break;
+        }
+        
+        // Ensure we won't read past end
+        if (data + 4 + len > end) {
+            fprintf(stderr, "CFA entry extends beyond section\n");
+            break;
+        }
         data += 4;
 
         uint8_t* dataEnd = data + len;
@@ -1070,6 +1428,13 @@ void elfParseCFA(uint8_t* top)
         data += 4;
 
         if (id == 0xffffffff) {
+            // Limit number of CIEs
+            if (cieCount >= MAX_CIES) {
+                fprintf(stderr, "Too many CIEs in debug frame (max %d)\n", MAX_CIES);
+                break;
+            }
+            cieCount++;
+            
             // skip version
             (*data)++;
 
@@ -1102,6 +1467,12 @@ void elfParseCFA(uint8_t* top)
             cie->data = data;
             cie->dataLen = (uint32_t)(dataEnd - data);
         } else {
+            // Limit number of FDEs
+            if (elfFdeCount >= MAX_FDES) {
+                fprintf(stderr, "Too many FDEs in debug frame (max %d)\n", MAX_FDES);
+                break;
+            }
+            
             ELFfde* fde = (ELFfde*)calloc(1, sizeof(ELFfde));
 
             ELFcie* cie = cies;
@@ -1141,9 +1512,37 @@ void elfParseCFA(uint8_t* top)
 
 void elfAddLine(LineInfo* l, uint32_t a, int file, int line, int* max)
 {
+    // Validate file index
+    if (file < 1 || file > l->fileCount) {
+        fprintf(stderr, "Invalid file index %d (max %d)\n", file, l->fileCount);
+        return;
+    }
+    
+    // Prevent excessive line table growth (max 1 million lines)
+    if (l->number >= 1000000) {
+        fprintf(stderr, "Line table too large, ignoring additional entries\n");
+        return;
+    }
+    
     if (l->number == *max) {
-        *max += 1000;
-        l->lines = (LineInfoItem*)realloc(l->lines, *max * sizeof(LineInfoItem));
+        int newMax = *max + 1000;
+        // Cap maximum at 1 million lines
+        if (newMax > 1000000) newMax = 1000000;
+        
+        // Check for multiplication overflow
+        size_t itemSize = sizeof(LineInfoItem);
+        if (newMax > 0 && SIZE_MAX / itemSize < (size_t)newMax) {
+            fprintf(stderr, "Error: Line info allocation would overflow\n");
+            return;
+        }
+        
+        LineInfoItem* newLines = (LineInfoItem*)realloc(l->lines, newMax * itemSize);
+        if (newLines == NULL) {
+            fprintf(stderr, "Failed to allocate memory for line info\n");
+            return;
+        }
+        l->lines = newLines;
+        *max = newMax;
     }
     LineInfoItem* li = &l->lines[l->number];
     li->file = l->files[file - 1];
@@ -1165,10 +1564,46 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
     l->lines = (LineInfoItem*)malloc(1000 * sizeof(LineInfoItem));
 
     uint8_t* data = elfReadSection(top, h);
+    if (data == NULL) {
+        fprintf(stderr, "Failed to read line info section\n");
+        free(l->lines);
+        free(l);
+        unit->lineInfoTable = NULL;
+        return;
+    }
+    
+    // Validate unit->lineInfo offset
+    if (!elfIsValidPtr(data + unit->lineInfo, 4)) {
+        fprintf(stderr, "Line info offset out of bounds\n");
+        free(l->lines);
+        free(l);
+        unit->lineInfoTable = NULL;
+        return;
+    }
+    
     data += unit->lineInfo;
     uint32_t totalLen = elfRead4Bytes(data);
+    
+    // Sanity check: line info should not exceed 10MB
+    if (totalLen > 10 * 1024 * 1024) {
+        fprintf(stderr, "Line info section too large: %u bytes\n", totalLen);
+        free(l->lines);
+        free(l);
+        unit->lineInfoTable = NULL;
+        return;
+    }
+    
     data += 4;
     uint8_t* end = data + totalLen;
+    
+    // Validate end pointer
+    if (!elfIsValidPtr(end, 0)) {
+        fprintf(stderr, "Line info section exceeds file bounds\n");
+        free(l->lines);
+        free(l);
+        unit->lineInfoTable = NULL;
+        return;
+    }
     //  uint16_t version = elfRead2Bytes(data);
     data += 2;
     //  uint32_t offset = elfRead4Bytes(data);
@@ -1178,6 +1613,16 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
     int lineBase = (int8_t)*data++;
     int lineRange = *data++;
     int opcodeBase = *data++;
+    
+    // Validate opcodeBase to prevent huge allocation
+    if (opcodeBase < 0 || opcodeBase > 256) {
+        fprintf(stderr, "Invalid opcodeBase: %d\n", opcodeBase);
+        free(l->lines);
+        free(l);
+        unit->lineInfoTable = NULL;
+        return;
+    }
+    
     uint8_t* stdOpLen = (uint8_t*)malloc(opcodeBase * sizeof(uint8_t));
     stdOpLen[0] = 1;
     int i;
@@ -1197,7 +1642,15 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
     int index = 0;
     l->files = (char**)malloc(sizeof(char*) * count);
 
+    // Maximum 10000 files to prevent excessive memory allocation
+    const int MAX_FILES = 10000;
+    
     while ((s = elfReadString(data, &bytes)) != NULL) {
+        if (index >= MAX_FILES) {
+            fprintf(stderr, "Too many files in line info (max %d)\n", MAX_FILES);
+            break;
+        }
+        
         l->files[index++] = s;
 
         data += bytes;
@@ -1213,6 +1666,7 @@ void elfParseLineInfo(CompileUnit* unit, uint8_t* top)
         //    fprintf(stderr, "File is %s\n", s);
         if (index == count) {
             count += 4;
+            if (count > MAX_FILES) count = MAX_FILES;
             l->files = (char**)realloc(l->files, sizeof(char*) * count);
         }
     }
@@ -1303,16 +1757,24 @@ uint8_t* elfSkipData(uint8_t* data, ELFAbbrev* abbrev, ELFAbbrev** abbrevs)
 
     if (abbrev->hasChildren) {
         int nesting = 1;
-        while (nesting) {
+        int depth = 0;
+        const int MAX_NESTING = 100; // Prevent excessive stack depth
+        
+        while (nesting && depth < MAX_NESTING) {
             uint32_t abbrevNum = elfReadLEB128(data, &bytes);
             data += bytes;
 
             if (!abbrevNum) {
                 nesting--;
+                depth--;
                 continue;
             }
 
             abbrev = elfGetAbbrev(abbrevs, abbrevNum);
+            if (abbrev == NULL) {
+                fprintf(stderr, "Invalid abbreviation number in skip\n");
+                break;
+            }
 
             for (i = 0; i < abbrev->numAttrs; i++) {
                 data = elfReadAttribute(data, &abbrev->attrs[i]);
@@ -1322,7 +1784,12 @@ uint8_t* elfSkipData(uint8_t* data, ELFAbbrev* abbrev, ELFAbbrev** abbrevs)
 
             if (abbrev->hasChildren) {
                 nesting++;
+                depth++;
             }
+        }
+        
+        if (depth >= MAX_NESTING) {
+            fprintf(stderr, "Maximum nesting depth exceeded in skip\n");
         }
     }
     return data;
@@ -1422,6 +1889,13 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
 
                 switch (abbr->tag) {
                 case DW_TAG_member: {
+                    // Limit maximum struct members to 10000 to prevent huge allocations
+                    if (index >= 10000) {
+                        fprintf(stderr, "Struct has too many members (max 10000)\n");
+                        data = elfSkipData(data, abbr, unit->abbrevs);
+                        break;
+                    }
+                    
                     if ((index % 4) == 0)
                         s->members = (Member*)realloc(s->members,
                             sizeof(Member) * (index + 4));
@@ -1656,11 +2130,23 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
             int bytes;
             uint32_t num = elfReadLEB128(data, &bytes);
             data += bytes;
+            const int MAX_ENUM_MEMBERS = 100000;
+            
             while (num) {
                 ELFAbbrev* abbr = elfGetAbbrev(unit->abbrevs, num);
+                if (abbr == NULL) {
+                    fprintf(stderr, "Invalid abbreviation in enum\n");
+                    break;
+                }
 
                 switch (abbr->tag) {
                 case DW_TAG_enumerator: {
+                    if (count >= MAX_ENUM_MEMBERS) {
+                        fprintf(stderr, "Too many enum members (max %d)\n", MAX_ENUM_MEMBERS);
+                        data = elfSkipData(data, abbr, unit->abbrevs);
+                        break;
+                    }
+                    
                     count++;
                     e->members = (EnumMember*)realloc(e->members,
                         count * sizeof(EnumMember));
@@ -1780,13 +2266,26 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
             data += bytes;
             int index = 0;
             int maxBounds = 0;
+            const int MAX_ARRAY_DIMENSIONS = 10; // Reasonable limit for array dimensions
+            
             while (num) {
                 ELFAbbrev* abbr = elfGetAbbrev(unit->abbrevs, num);
+                if (abbr == NULL) {
+                    fprintf(stderr, "Invalid abbreviation in array\n");
+                    break;
+                }
 
                 switch (abbr->tag) {
                 case DW_TAG_subrange_type: {
+                    if (index >= MAX_ARRAY_DIMENSIONS) {
+                        fprintf(stderr, "Too many array dimensions (max %d)\n", MAX_ARRAY_DIMENSIONS);
+                        data = elfSkipData(data, abbr, unit->abbrevs);
+                        break;
+                    }
+                    
                     if (maxBounds == index) {
                         maxBounds += 4;
+                        if (maxBounds > MAX_ARRAY_DIMENSIONS) maxBounds = MAX_ARRAY_DIMENSIONS;
                         array->bounds = (int*)realloc(array->bounds,
                             sizeof(int) * maxBounds);
                     }
@@ -1831,6 +2330,15 @@ void elfParseType(uint8_t* data, uint32_t offset, ELFAbbrev* abbrev, CompileUnit
 
 Type* elfParseType(CompileUnit* unit, uint32_t offset)
 {
+    // Prevent parsing the same type recursively (circular reference)
+    static int parseDepth = 0;
+    const int MAX_TYPE_DEPTH = 50;
+    
+    if (parseDepth >= MAX_TYPE_DEPTH) {
+        fprintf(stderr, "Error: Maximum type parsing depth exceeded (circular reference?)\n");
+        return NULL;
+    }
+    
     Type* _t = unit->types;
 
     while (_t) {
@@ -1845,21 +2353,52 @@ Type* elfParseType(CompileUnit* unit, uint32_t offset)
         elfAddType(t, unit, 0);
         return t;
     }
+    
+    // Validate offset is within compile unit bounds
+    if (offset > unit->length) {
+        fprintf(stderr, "Error: Type offset %u exceeds compile unit length %u\n", offset, unit->length);
+        return NULL;
+    }
+    
     uint8_t* data = unit->top + offset;
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: Type data at offset %u is out of bounds\n", offset);
+        return NULL;
+    }
+    
     int bytes;
     int abbrevNum = elfReadLEB128(data, &bytes);
     data += bytes;
     Type* type = NULL;
 
     ELFAbbrev* abbrev = elfGetAbbrev(unit->abbrevs, abbrevNum);
+    if (abbrev == NULL) {
+        fprintf(stderr, "Error: Invalid abbreviation %d for type\n", abbrevNum);
+        return NULL;
+    }
 
+    parseDepth++;
     elfParseType(data, offset, abbrev, unit, &type);
+    parseDepth--;
+    
     return type;
 }
 
 void elfGetObjectAttributes(CompileUnit* unit, uint32_t offset, Object* o)
 {
+    // Validate offset is within compile unit
+    if (offset > unit->length) {
+        fprintf(stderr, "Error: Object attribute offset %u exceeds unit length %u\n", offset, unit->length);
+        return;
+    }
+    
     uint8_t* data = unit->top + offset;
+    
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: Object attribute data out of bounds\n");
+        return;
+    }
+    
     int bytes;
     uint32_t abbrevNum = elfReadLEB128(data, &bytes);
     data += bytes;
@@ -1869,6 +2408,10 @@ void elfGetObjectAttributes(CompileUnit* unit, uint32_t offset, Object* o)
     }
 
     ELFAbbrev* abbrev = elfGetAbbrev(unit->abbrevs, abbrevNum);
+    if (abbrev == NULL) {
+        fprintf(stderr, "Error: Invalid abbreviation in object attributes\n");
+        return;
+    }
 
     for (int i = 0; i < abbrev->numAttrs; i++) {
         ELFAttr* attr = &abbrev->attrs[i];
@@ -1991,17 +2534,24 @@ uint8_t* elfParseBlock(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
 
     if (abbrev->hasChildren) {
         int nesting = 1;
+        int depth = 0;
+        const int MAX_BLOCK_NESTING = 50;
 
-        while (nesting) {
+        while (nesting && depth < MAX_BLOCK_NESTING) {
             uint32_t abbrevNum = elfReadLEB128(data, &bytes);
             data += bytes;
 
             if (!abbrevNum) {
                 nesting--;
+                depth--;
                 continue;
             }
 
             abbrev = elfGetAbbrev(unit->abbrevs, abbrevNum);
+            if (abbrev == NULL) {
+                fprintf(stderr, "Invalid abbreviation in block\n");
+                break;
+            }
 
             switch (abbrev->tag) {
             CASE_TYPE_TAG: // types only parsed when used
@@ -2044,6 +2594,15 @@ uint8_t* elfParseBlock(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
                 data = elfSkipData(data, abbrev, unit->abbrevs);
             } break;
             }
+            
+            if (abbrev->hasChildren) {
+                nesting++;
+                depth++;
+            }
+        }
+        
+        if (depth >= MAX_BLOCK_NESTING) {
+            fprintf(stderr, "Maximum block nesting depth exceeded\n");
         }
     }
     return data;
@@ -2051,7 +2610,19 @@ uint8_t* elfParseBlock(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
 
 void elfGetFunctionAttributes(CompileUnit* unit, uint32_t offset, Function* func)
 {
+    // Validate offset is within compile unit
+    if (offset > unit->length) {
+        fprintf(stderr, "Error: Function attribute offset %u exceeds unit length %u\n", offset, unit->length);
+        return;
+    }
+    
     uint8_t* data = unit->top + offset;
+    
+    if (!elfIsValidPtr(data, 1)) {
+        fprintf(stderr, "Error: Function attribute data out of bounds\n");
+        return;
+    }
+    
     int bytes;
     uint32_t abbrevNum = elfReadLEB128(data, &bytes);
     data += bytes;
@@ -2061,6 +2632,10 @@ void elfGetFunctionAttributes(CompileUnit* unit, uint32_t offset, Function* func
     }
 
     ELFAbbrev* abbrev = elfGetAbbrev(unit->abbrevs, abbrevNum);
+    if (abbrev == NULL) {
+        fprintf(stderr, "Error: Invalid abbreviation in function attributes\n");
+        return;
+    }
 
     for (int i = 0; i < abbrev->numAttrs; i++) {
         ELFAttr* attr = &abbrev->attrs[i];
@@ -2213,19 +2788,26 @@ uint8_t* elfParseFunction(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
 
     if (abbrev->hasChildren) {
         int nesting = 1;
+        int depth = 0;
+        const int MAX_FUNCTION_NESTING = 50;
         Object* lastParam = NULL;
         Object* lastVar = NULL;
 
-        while (nesting) {
+        while (nesting && depth < MAX_FUNCTION_NESTING) {
             uint32_t abbrevNum = elfReadLEB128(data, &bytes);
             data += bytes;
 
             if (!abbrevNum) {
                 nesting--;
+                depth--;
                 continue;
             }
 
             abbrev = elfGetAbbrev(unit->abbrevs, abbrevNum);
+            if (abbrev == NULL) {
+                fprintf(stderr, "Invalid abbreviation in function\n");
+                break;
+            }
 
             switch (abbrev->tag) {
             CASE_TYPE_TAG: // no need to parse types. only parsed when used
@@ -2273,14 +2855,20 @@ uint8_t* elfParseFunction(uint8_t* data, ELFAbbrev* abbrev, CompileUnit* unit,
                         free(abbrev->attrs[i].block);
                 }
 
-                if (abbrev->hasChildren)
+                if (abbrev->hasChildren) {
                     nesting++;
+                    depth++;
+                }
             } break;
             default: {
                 fprintf(stderr, "Unknown function TAG %02x\n", abbrev->tag);
                 data = elfSkipData(data, abbrev, unit->abbrevs);
             } break;
             }
+        }
+        
+        if (depth >= MAX_FUNCTION_NESTING) {
+            fprintf(stderr, "Maximum function nesting depth exceeded\n");
         }
     }
     return data;
@@ -2377,8 +2965,27 @@ CompileUnit* elfParseCompUnit(uint8_t* data, uint8_t* abbrevData)
 {
     int bytes;
     uint8_t* top = data;
+    
+    // Validate we can read the header
+    if (!elfIsValidPtr(data, 11)) {
+        fprintf(stderr, "Compile unit header out of bounds\n");
+        return NULL;
+    }
 
     uint32_t length = elfRead4Bytes(data);
+    
+    // Sanity check: compile unit should not exceed 100MB
+    if (length > 100 * 1024 * 1024) {
+        fprintf(stderr, "Compile unit too large: %u bytes\n", length);
+        return NULL;
+    }
+    
+    // Validate the unit data is within bounds
+    if (!elfIsValidPtr(data + 4, length)) {
+        fprintf(stderr, "Compile unit extends beyond file bounds\n");
+        return NULL;
+    }
+    
     data += 4;
 
     uint16_t version = elfRead2Bytes(data);
@@ -2400,11 +3007,30 @@ CompileUnit* elfParseCompUnit(uint8_t* data, uint8_t* abbrevData)
     }
 
     ELFAbbrev** abbrevs = elfReadAbbrevs(abbrevData, offset);
+    if (abbrevs == NULL) {
+        fprintf(stderr, "Failed to read abbreviations\n");
+        return NULL;
+    }
 
     uint32_t abbrevNum = elfReadLEB128(data, &bytes);
     data += bytes;
 
     ELFAbbrev* abbrev = elfGetAbbrev(abbrevs, abbrevNum);
+    if (abbrev == NULL) {
+        fprintf(stderr, "Invalid abbreviation number %u\n", abbrevNum);
+        // Clean up abbreviations
+        for (int i = 0; i < 121; i++) {
+            ELFAbbrev* ab = abbrevs[i];
+            while (ab) {
+                free(ab->attrs);
+                ELFAbbrev* next = ab->next;
+                free(ab);
+                ab = next;
+            }
+        }
+        free(abbrevs);
+        return NULL;
+    }
 
     CompileUnit* unit = (CompileUnit*)calloc(1, sizeof(CompileUnit));
     unit->top = top;
@@ -2464,15 +3090,44 @@ void elfParseAranges(uint8_t* data)
     }
 
     data = elfReadSection(data, sh);
-    uint8_t* end = data + READ32LE(&sh->size);
+    if (data == NULL) {
+        fprintf(stderr, "Failed to read aranges section\n");
+        return;
+    }
+    
+    uint32_t size = READ32LE(&sh->size);
+    // Sanity check: aranges section should not exceed 1MB
+    if (size > 1024 * 1024) {
+        fprintf(stderr, "Aranges section too large: %u bytes\n", size);
+        return;
+    }
+    
+    uint8_t* end = data + size;
+    if (!elfIsValidPtr(end, 0)) {
+        fprintf(stderr, "Aranges section exceeds file bounds\n");
+        return;
+    }
 
     int max = 4;
     ARanges* ranges = (ARanges*)calloc(4, sizeof(ARanges));
 
     int index = 0;
+    const int MAX_ARANGES = 10000;
 
-    while (data < end) {
+    while (data < end && index < MAX_ARANGES) {
+        if (!elfIsValidPtr(data, 20)) {
+            fprintf(stderr, "Arange entry extends beyond section\n");
+            break;
+        }
+        
         uint32_t _len = elfRead4Bytes(data);
+        
+        // Validate length is reasonable (max 1MB per entry)
+        if (_len > 1024 * 1024 || _len < 20) {
+            fprintf(stderr, "Invalid arange entry length: %u\n", _len);
+            break;
+        }
+        
         data += 4;
         //    uint16_t version = elfRead2Bytes(data);
         data += 2;
@@ -2482,17 +3137,37 @@ void elfParseAranges(uint8_t* data)
         //    uint8_t segSize = *data++;
         data += 2; // remove if uncommenting above
         data += 4;
-        ranges[index].count = (_len - 20) / 8;
+        
+        uint32_t rangeCount = (_len - 20) / 8;
+        // Sanity check: max 100000 ranges per entry
+        if (rangeCount > 100000) {
+            fprintf(stderr, "Too many ranges in arange entry: %u\n", rangeCount);
+            break;
+        }
+        
+        ranges[index].count = rangeCount;
         ranges[index].offset = offset;
-        ranges[index].ranges = (ARange*)calloc((_len - 20) / 8, sizeof(ARange));
+        ranges[index].ranges = (ARange*)calloc(rangeCount, sizeof(ARange));
         int i = 0;
-        while (true) {
+        while (i < (int)rangeCount) {
+            if (!elfIsValidPtr(data, 8)) {
+                fprintf(stderr, "Range data extends beyond bounds\n");
+                break;
+            }
+            
             uint32_t addr = elfRead4Bytes(data);
             data += 4;
             uint32_t len = elfRead4Bytes(data);
             data += 4;
             if (addr == 0 && len == 0)
                 break;
+                
+            // Validate address range doesn't overflow
+            if (len > 0 && addr > UINT32_MAX - len) {
+                fprintf(stderr, "Address range overflow detected\n");
+                break;
+            }
+            
             ranges[index].ranges[i].lowPC = addr;
             ranges[index].ranges[i].highPC = addr + len;
             i++;
@@ -2510,13 +3185,40 @@ void elfParseAranges(uint8_t* data)
 void elfReadSymtab(uint8_t* data)
 {
     ELFSectionHeader* sh = elfGetSectionByName(".symtab");
+    if (sh == NULL) {
+        fprintf(stderr, "No symbol table found\n");
+        return;
+    }
+    
     int table = READ32LE(&sh->link);
+    
+    // Validate link index
+    if (table >= elfSectionHeadersCount) {
+        fprintf(stderr, "Invalid string table index in symtab: %d\n", table);
+        return;
+    }
 
     char* strtable = (char*)elfReadSection(data, elfGetSectionByNumber(table));
+    if (strtable == NULL) {
+        fprintf(stderr, "Failed to read symbol string table\n");
+        return;
+    }
 
     ELFSymbol* symtab = (ELFSymbol*)elfReadSection(data, sh);
+    if (symtab == NULL) {
+        fprintf(stderr, "Failed to read symbol table\n");
+        return;
+    }
 
-    int count = READ32LE(&sh->size) / sizeof(ELFSymbol);
+    uint32_t size = READ32LE(&sh->size);
+    int count = size / sizeof(ELFSymbol);
+    
+    // Sanity check: max 1 million symbols
+    if (count > 1000000) {
+        fprintf(stderr, "Symbol table too large: %d symbols\n", count);
+        return;
+    }
+    
     elfSymbolsCount = 0;
 
     elfSymbols = (Symbol*)malloc(sizeof(Symbol) * count);
@@ -2565,14 +3267,26 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     if (READ32LE(&eh->e_entry) == 0x2000000)
         coreOptions.cpuIsMultiBoot = true;
 
+    // Validate program header offset and count
+    uint32_t phoff = READ32LE(&eh->e_phoff);
+    uint16_t phentsize = READ16LE(&eh->e_phentsize);
+    if (phoff > data_size || phentsize < sizeof(ELFProgramHeader)) {
+        fprintf(stderr, "Error: Invalid program header offset or size\n");
+        return false;
+    }
+    if (count > 0 && (phoff + (uint64_t)count * phentsize > data_size)) {
+        fprintf(stderr, "Error: Program headers extend beyond file size\n");
+        return false;
+    }
+
     // read program headers... should probably move this code down
-    uint8_t* p = data + READ32LE(&eh->e_phoff);
+    uint8_t* p = data + phoff;
     size = 0;
     for (_i = 0; _i < count; _i++) {
         ELFProgramHeader* ph = (ELFProgramHeader*)p;
         p += sizeof(ELFProgramHeader);
-        if (READ16LE(&eh->e_phentsize) != sizeof(ELFProgramHeader)) {
-            p += READ16LE(&eh->e_phentsize) - sizeof(ELFProgramHeader);
+        if (phentsize != sizeof(ELFProgramHeader)) {
+            p += phentsize - sizeof(ELFProgramHeader);
         }
 
         //    printf("PH %d %08x %08x %08x %08x %08x %08x %08x %08x\n",
@@ -2608,14 +3322,35 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     // these must be pre-declared or clang barfs on the goto statement
     ELFSectionHeader** sh = NULL;
     char* stringTable     = NULL;
+    uint32_t shoff = 0;
+    uint16_t shentsize = 0;
+    uint16_t shstrndx = 0;
 
     // read section headers (if string table is good)
     if (READ16LE(&eh->e_shstrndx) == 0)
         goto end;
 
-    p = data + READ32LE(&eh->e_shoff);
-
+    shoff = READ32LE(&eh->e_shoff);
+    shentsize = READ16LE(&eh->e_shentsize);
     count = READ16LE(&eh->e_shnum);
+    
+    // Validate section header offset and count
+    if (shoff > data_size || shentsize < sizeof(ELFSectionHeader)) {
+        fprintf(stderr, "Error: Invalid section header offset or size\n");
+        goto end;
+    }
+    if (count > 0 && (shoff + (uint64_t)count * (uint64_t)shentsize > data_size)) {
+        fprintf(stderr, "Error: Section headers extend beyond file size\n");
+        goto end;
+    }
+    
+    // Additional sanity check: reasonable section count (prevent huge allocations)
+    if (count > 10000) {
+        fprintf(stderr, "Error: Unreasonable section header count: %d\n", count);
+        goto end;
+    }
+
+    p = data + shoff;
 
     sh = (ELFSectionHeader**)
         malloc(sizeof(ELFSectionHeader*) * count);
@@ -2623,11 +3358,23 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
     for (_i = 0; _i < count; _i++) {
         sh[_i] = (ELFSectionHeader*)p;
         p += sizeof(ELFSectionHeader);
-        if (READ16LE(&eh->e_shentsize) != sizeof(ELFSectionHeader))
-            p += READ16LE(&eh->e_shentsize) - sizeof(ELFSectionHeader);
+        if (shentsize != sizeof(ELFSectionHeader))
+            p += shentsize - sizeof(ELFSectionHeader);
+    }
+    
+    shstrndx = READ16LE(&eh->e_shstrndx);
+    if (shstrndx >= count) {
+        fprintf(stderr, "Error: Invalid string table section index: %d\n", shstrndx);
+        free(sh);
+        goto end;
     }
 	
-	stringTable = (char*)elfReadSection(data, sh[READ16LE(&eh->e_shstrndx)]);
+	stringTable = (char*)elfReadSection(data, sh[shstrndx]);
+	if (stringTable == NULL) {
+        fprintf(stderr, "Error: Failed to read section header string table\n");
+        free(sh);
+        goto end;
+    }
 
     elfSectionHeaders            = sh;
     elfSectionHeadersStringTable = stringTable;
@@ -2639,18 +3386,38 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
         //   sh[_i]->flags, sh[_i]->addr, sh[_i]->offset, sh[_i]->size,
         //   sh[_i]->link, sh[_i]->info);
         if (READ32LE(&sh[_i]->flags) & 2) { // load section
+            uint32_t sect_addr = READ32LE(&sh[_i]->addr);
+            uint32_t sect_offset = READ32LE(&sh[_i]->offset);
+            uint32_t sect_size = READ32LE(&sh[_i]->size);
+            
+            // Validate section data is within file bounds
+            if (sect_offset > data_size || sect_size > data_size || 
+                sect_offset + sect_size > data_size) {
+                fprintf(stderr, "Warning: Section %d data exceeds file bounds, skipping\n", _i);
+                continue;
+            }
+            
             if (coreOptions.cpuIsMultiBoot) {
-                if (READ32LE(&sh[_i]->addr) >= 0x2000000 && READ32LE(&sh[_i]->addr) <= 0x203ffff) {
-                    memcpy(&g_workRAM[READ32LE(&sh[_i]->addr) & 0x3ffff], data + READ32LE(&sh[_i]->offset),
-                        READ32LE(&sh[_i]->size));
-                    size += READ32LE(&sh[_i]->size);
+                if (sect_addr >= 0x2000000 && sect_addr <= 0x203ffff) {
+                    uint32_t dest_offset = sect_addr & 0x3ffff;
+                    // Validate destination bounds
+                    if (dest_offset + sect_size > SIZE_WRAM) {
+                        fprintf(stderr, "Warning: Section would overflow WRAM, truncating\n");
+                        sect_size = SIZE_WRAM - dest_offset;
+                    }
+                    memcpy(&g_workRAM[dest_offset], data + sect_offset, sect_size);
+                    size += sect_size;
                 }
             } else {
-                if (READ32LE(&sh[_i]->addr) >= 0x8000000 && READ32LE(&sh[_i]->addr) <= 0x9ffffff) {
-                    memcpy(&g_rom[READ32LE(&sh[_i]->addr) & 0x1ffffff],
-                        data + READ32LE(&sh[_i]->offset),
-                        READ32LE(&sh[_i]->size));
-                    size += READ32LE(&sh[_i]->size);
+                if (sect_addr >= 0x8000000 && sect_addr <= 0x9ffffff) {
+                    uint32_t dest_offset = sect_addr & 0x1ffffff;
+                    // Validate destination bounds
+                    if (dest_offset + sect_size > SIZE_ROM) {
+                        fprintf(stderr, "Warning: Section would overflow ROM, truncating\n");
+                        sect_size = SIZE_ROM - dest_offset;
+                    }
+                    memcpy(&g_rom[dest_offset], data + sect_offset, sect_size);
+                    size += sect_size;
                 }
             }
         }
@@ -2673,28 +3440,64 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
 
         elfDebugInfo = (DebugInfo*)calloc(1, sizeof(DebugInfo));
         uint8_t* abbrevdata = elfReadSection(data, h);
+        if (abbrevdata == NULL) {
+            fprintf(stderr, "Error: Failed to read abbreviation section\n");
+            free(elfDebugInfo);
+            elfDebugInfo = NULL;
+            goto end;
+        }
 
         h = elfGetSectionByName(".debug_str");
 
         if (h == NULL)
             elfDebugStrings = NULL;
-        else
+        else {
             elfDebugStrings = (char*)elfReadSection(data, h);
+            if (elfDebugStrings == NULL) {
+                fprintf(stderr, "Warning: Failed to read debug strings section\n");
+            }
+        }
 
         uint8_t* debugdata = elfReadSection(data, dbgHeader);
+        if (debugdata == NULL) {
+            fprintf(stderr, "Error: Failed to read debug info section\n");
+            free(elfDebugInfo);
+            elfDebugInfo = NULL;
+            goto end;
+        }
 
         elfDebugInfo->debugdata = data;
         elfDebugInfo->infodata = debugdata;
 
         uint32_t total = READ32LE(&dbgHeader->size);
         uint8_t* end = debugdata + total;
+        
+        // Validate debug data end pointer
+        if (!elfIsValidPtr(end, 0)) {
+            fprintf(stderr, "Error: Debug data section exceeds file bounds\n");
+            free(elfDebugInfo);
+            elfDebugInfo = NULL;
+            goto end;
+        }
+        
         uint8_t* ddata = debugdata;
 
         CompileUnit* last = NULL;
         CompileUnit* unit = NULL;
 
         while (ddata < end) {
+            // Ensure we can read at least the length field (4 bytes)
+            if (!elfIsValidPtr(ddata, 4)) {
+                fprintf(stderr, "Error: Compile unit header out of bounds\n");
+                break;
+            }
+            
             unit = elfParseCompUnit(ddata, abbrevdata);
+            if (unit == NULL) {
+                fprintf(stderr, "Warning: Failed to parse compile unit\n");
+                break;
+            }
+            
             unit->offset = (uint32_t)(ddata - debugdata);
             elfParseLineInfo(unit, data);
             if (last == NULL)
@@ -2702,6 +3505,13 @@ bool elfReadProgram(ELFHeader* eh, uint8_t* data, unsigned long data_size, int& 
             else
                 last->next = unit;
             last = unit;
+            
+            // Validate we can advance by the unit length
+            if (unit->length > (uint32_t)(end - ddata - 4)) {
+                fprintf(stderr, "Error: Compile unit length exceeds remaining data\n");
+                break;
+            }
+            
             ddata += 4 + unit->length;
         }
         elfParseAranges(data);
@@ -2734,23 +3544,73 @@ bool elfRead(const char* name, int& siz, FILE* f)
 {
     fseek(f, 0, SEEK_END);
     unsigned long size = ftell(f);
+    
+    // Sanity check: ELF file should not exceed 256MB
+    if (size > 256 * 1024 * 1024) {
+        fprintf(stderr, "ELF file too large: %lu bytes\n", size);
+        return false;
+    }
+    
+    // Minimum ELF header size
+    if (size < sizeof(ELFHeader)) {
+        fprintf(stderr, "File too small to be valid ELF\n");
+        return false;
+    }
+    
     elfFileData = (uint8_t*)malloc(size);
+    if (elfFileData == NULL) {
+        fprintf(stderr, "Failed to allocate memory for ELF file\n");
+        return false;
+    }
+    
     fseek(f, 0, SEEK_SET);
     int res = (int)fread(elfFileData, 1, size, f);
     fclose(f);
 
-    if (res < 0) {
+    if (res < 0 || (unsigned long)res != size) {
+        fprintf(stderr, "Failed to read ELF file completely\n");
         free(elfFileData);
         elfFileData = NULL;
+        g_elfFileStart = NULL;
+        g_elfFileEnd = NULL;
         return false;
     }
+    
+    // Initialize global file bounds for validation
+    g_elfFileStart = elfFileData;
+    g_elfFileEnd = elfFileData + size;
 
     ELFHeader* header = (ELFHeader*)elfFileData;
 
-    if (READ32LE(&header->magic) != 0x464C457F || READ16LE(&header->e_machine) != 40 || header->clazz != 1) {
-        systemMessage(0, N_("Not a valid ELF file %s"), name);
+    // Validate ELF magic number (0x7F 'E' 'L' 'F')
+    uint32_t magic = READ32LE(&header->magic);
+    if (magic != 0x464C457F) {
+        systemMessage(0, N_("Not a valid ELF file %s (bad magic: 0x%08x)"), name, magic);
         free(elfFileData);
         elfFileData = NULL;
+        g_elfFileStart = NULL;
+        g_elfFileEnd = NULL;
+        return false;
+    }
+    
+    // Validate ELF class (32-bit)
+    if (header->clazz != 1) {
+        systemMessage(0, N_("Not a 32-bit ELF file %s (class: %d)"), name, header->clazz);
+        free(elfFileData);
+        elfFileData = NULL;
+        g_elfFileStart = NULL;
+        g_elfFileEnd = NULL;
+        return false;
+    }
+    
+    // Validate ELF machine type (ARM)
+    uint16_t machine = READ16LE(&header->e_machine);
+    if (machine != 40) {
+        systemMessage(0, N_("Not an ARM ELF file %s (machine: %d)"), name, machine);
+        free(elfFileData);
+        elfFileData = NULL;
+        g_elfFileStart = NULL;
+        g_elfFileEnd = NULL;
         return false;
     }
 
@@ -2931,4 +3791,8 @@ void elfCleanUp()
         free(elfFileData);
         elfFileData = NULL;
     }
+    
+    // Clear global file bounds
+    g_elfFileStart = NULL;
+    g_elfFileEnd = NULL;
 }
