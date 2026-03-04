@@ -2,6 +2,155 @@ if(TRANSLATIONS_ONLY)
     return()
 endif()
 
+# On Windows, if cl.exe is not already in the PATH but Visual Studio is installed,
+# automatically load the VS build environment for the host architecture.
+# Skip this when running inside an MSYS2 shell (MinGW/UCRT64/etc.).
+if(WIN32 AND "$ENV{MSYSTEM}" STREQUAL "")
+    find_program(VBAM_CL_EXE_CHECK NAME cl.exe HINTS ENV PATH)
+
+    if(NOT VBAM_CL_EXE_CHECK)
+        # Locate vswhere.exe, which ships with VS 2017+ installer.
+        # $ENV{ProgramFiles(x86)} is not valid CMake syntax; use cmd to expand it.
+        execute_process(
+            COMMAND cmd /c "echo %ProgramFiles(x86)%"
+            OUTPUT_VARIABLE VBAM_PROG_FILES_X86
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+
+        find_program(VBAM_VSWHERE
+            NAME vswhere.exe
+            HINTS "${VBAM_PROG_FILES_X86}/Microsoft Visual Studio/Installer"
+            NO_DEFAULT_PATH
+        )
+
+        unset(VBAM_PROG_FILES_X86)
+
+        unset(VBAM_VS_INSTALL_PATH)
+
+        if(VBAM_VSWHERE)
+            execute_process(
+                COMMAND "${VBAM_VSWHERE}" -latest -property installationPath
+                OUTPUT_VARIABLE VBAM_VS_INSTALL_PATH
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET
+            )
+        endif()
+
+        unset(VBAM_VSWHERE CACHE)
+
+        # Fallback: check registry for VS 2015.
+        if(NOT VBAM_VS_INSTALL_PATH)
+            get_filename_component(VBAM_VS2015_INSTALLDIR
+                "[HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0;InstallDir]"
+                ABSOLUTE CACHE
+            )
+
+            if(VBAM_VS2015_INSTALLDIR AND EXISTS "${VBAM_VS2015_INSTALLDIR}")
+                # InstallDir is the IDE directory; go up three levels to reach the install root.
+                get_filename_component(VBAM_VS_INSTALL_PATH "${VBAM_VS2015_INSTALLDIR}/../../.." ABSOLUTE)
+            endif()
+
+            unset(VBAM_VS2015_INSTALLDIR CACHE)
+        endif()
+
+        if(VBAM_VS_INSTALL_PATH)
+            # VS 2017+: vcvarsall.bat lives under VC/Auxiliary/Build/.
+            set(VBAM_VCVARSALL "${VBAM_VS_INSTALL_PATH}/VC/Auxiliary/Build/vcvarsall.bat")
+
+            # VS 2015 and earlier: vcvarsall.bat lives directly under VC/.
+            if(NOT EXISTS "${VBAM_VCVARSALL}")
+                set(VBAM_VCVARSALL "${VBAM_VS_INSTALL_PATH}/VC/vcvarsall.bat")
+            endif()
+
+            if(EXISTS "${VBAM_VCVARSALL}")
+                # Select the native host architecture for the VS toolchain.
+                if("$ENV{PROCESSOR_ARCHITECTURE}" STREQUAL "AMD64"
+                        OR DEFINED ENV{PROCESSOR_ARCHITEW6432})
+                    set(VBAM_VS_ARCH x64)
+                elseif("$ENV{PROCESSOR_ARCHITECTURE}" STREQUAL "ARM64")
+                    set(VBAM_VS_ARCH arm64)
+                else()
+                    set(VBAM_VS_ARCH x86)
+                endif()
+
+                message(STATUS "Loading Visual Studio ${VBAM_VS_ARCH} environment from: ${VBAM_VCVARSALL}")
+
+                # Write a temporary batch file so cmd quoting is unambiguous.
+                set(VBAM_VS_ENV_SCRIPT "${CMAKE_BINARY_DIR}/vbam_vs_env.bat")
+                file(WRITE "${VBAM_VS_ENV_SCRIPT}"
+                    "@echo off\r\ncall \"${VBAM_VCVARSALL}\" ${VBAM_VS_ARCH}\r\nset\r\n"
+                )
+
+                execute_process(
+                    COMMAND cmd /c "${VBAM_VS_ENV_SCRIPT}"
+                    OUTPUT_VARIABLE VBAM_VS_ENV
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    RESULT_VARIABLE VBAM_VS_ENV_RESULT
+                    ERROR_QUIET
+                )
+
+                file(REMOVE "${VBAM_VS_ENV_SCRIPT}")
+                unset(VBAM_VS_ENV_SCRIPT)
+
+                if(VBAM_VS_ENV_RESULT EQUAL 0 AND VBAM_VS_ENV)
+                    # Save the original PATH so tools like git are not lost when
+                    # vcvarsall.bat replaces it with VS-only directories.
+                    set(VBAM_ORIGINAL_PATH "$ENV{PATH}")
+
+                    # Write to a temp file and use file(STRINGS) to parse line-by-line.
+                    # This avoids the CMake list-separator bug: PATH, LIB, INCLUDE, etc.
+                    # all contain semicolons in their values, which string(REPLACE) would
+                    # turn into CMake list separators and shred the values.
+                    set(VBAM_VS_ENV_FILE "${CMAKE_BINARY_DIR}/vbam_vs_env_output.txt")
+                    file(WRITE "${VBAM_VS_ENV_FILE}" "${VBAM_VS_ENV}")
+                    unset(VBAM_VS_ENV)
+
+                    file(STRINGS "${VBAM_VS_ENV_FILE}" VBAM_VS_ENV_LINES)
+                    file(REMOVE "${VBAM_VS_ENV_FILE}")
+                    unset(VBAM_VS_ENV_FILE)
+
+                    foreach(line IN LISTS VBAM_VS_ENV_LINES)
+                        if(line MATCHES "^([^=]+)=(.*)")
+                            set(ENV{${CMAKE_MATCH_1}} "${CMAKE_MATCH_2}")
+                        endif()
+                    endforeach()
+
+                    unset(VBAM_VS_ENV_LINES)
+
+                    # Save VS-only tool paths (before restoring original PATH) so
+                    # the build-time wrapper can prepend them to PATH for tools
+                    # like dumpbin that vcpkg post-build scripts depend on.
+                    set(VBAM_VS_TOOL_PATHS "$ENV{PATH}" CACHE STRING "" FORCE)
+
+                    # Append the original PATH so pre-existing tools remain reachable.
+                    set(ENV{PATH} "$ENV{PATH};${VBAM_ORIGINAL_PATH}")
+                    unset(VBAM_ORIGINAL_PATH)
+
+                    message(STATUS "Visual Studio environment loaded successfully.")
+
+                    # Cache INCLUDE and LIB so CMakeLists.txt can embed them as
+                    # explicit compile/link flags. The build step (ninja) runs in a
+                    # separate process that does not inherit cmake's environment.
+                    set(VBAM_VS_INCLUDE_DIRS $ENV{INCLUDE} CACHE STRING "" FORCE)
+                    set(VBAM_VS_LIB_DIRS     $ENV{LIB}     CACHE STRING "" FORCE)
+                else()
+                    message(WARNING "Failed to load Visual Studio environment (exit code: ${VBAM_VS_ENV_RESULT}).")
+                endif()
+
+                unset(VBAM_VS_ENV)
+                unset(VBAM_VS_ENV_RESULT)
+                unset(VBAM_VS_ARCH)
+            endif()
+
+            unset(VBAM_VCVARSALL)
+            unset(VBAM_VS_INSTALL_PATH)
+        endif()
+    endif()
+
+    unset(VBAM_CL_EXE_CHECK CACHE)
+endif()
+
 if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     if(NOT WIN32)
         return()

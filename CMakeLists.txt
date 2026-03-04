@@ -122,7 +122,70 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         set(CMAKE_OBJC_FLAGS   "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJC_FLAGS}")
         set(CMAKE_OBJCXX_FLAGS "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJCXX_FLAGS}")
     endif()
-endif() 
+endif()
+
+# When VS environment was auto-loaded by Set-Toolchain-vcpkg.cmake, embed the
+# MSVC standard include and lib paths as explicit flags. ninja runs in a separate
+# process that does not inherit cmake's environment, so INCLUDE/LIB would be unset.
+if(MSVC AND DEFINED VBAM_VS_INCLUDE_DIRS)
+    foreach(inc_dir ${VBAM_VS_INCLUDE_DIRS})
+        string(APPEND VBAM_MSVC_INC_FLAGS " /I\"${inc_dir}\"")
+    endforeach()
+    set(CMAKE_C_FLAGS   "${VBAM_MSVC_INC_FLAGS} ${CMAKE_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${VBAM_MSVC_INC_FLAGS} ${CMAKE_CXX_FLAGS}")
+    # RC compilation uses cmcldeps which runs cl.exe for dependency scanning;
+    # it needs the same include paths.
+    set(CMAKE_RC_FLAGS  "${VBAM_MSVC_INC_FLAGS} ${CMAKE_RC_FLAGS}")
+    unset(VBAM_MSVC_INC_FLAGS)
+endif()
+
+if(MSVC AND DEFINED VBAM_VS_LIB_DIRS)
+    foreach(lib_dir ${VBAM_VS_LIB_DIRS})
+        string(APPEND VBAM_MSVC_LIB_FLAGS " /LIBPATH:\"${lib_dir}\"")
+    endforeach()
+    set(CMAKE_EXE_LINKER_FLAGS    "${VBAM_MSVC_LIB_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${VBAM_MSVC_LIB_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${VBAM_MSVC_LIB_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS}")
+    unset(VBAM_MSVC_LIB_FLAGS)
+endif()
+
+# When VS environment was auto-loaded, generate wrappers that prepend VS tool
+# paths (containing dumpbin, etc.) to PATH at build time.  vcpkg's applocal.ps1
+# post-build script needs dumpbin, but neither ninja nor the powershell process
+# it spawns inherit cmake's configure-time environment.
+if(MSVC AND DEFINED VBAM_VS_TOOL_PATHS)
+    # VBAM_VS_TOOL_PATHS is stored as a CMake list (semicolons become separators);
+    # string(JOIN) reconstitutes the semicolon-separated Windows PATH string.
+    string(JOIN ";" VBAM_VS_TOOL_PATHS_STR ${VBAM_VS_TOOL_PATHS})
+
+    # Wrap the build tool (ninja) so cmake --build gets VS tools in PATH.
+    if(NOT CMAKE_GENERATOR MATCHES "Visual Studio")
+        if(NOT DEFINED VBAM_REAL_NINJA)
+            set(VBAM_REAL_NINJA "${CMAKE_MAKE_PROGRAM}" CACHE FILEPATH "" FORCE)
+        endif()
+        file(TO_NATIVE_PATH "${VBAM_REAL_NINJA}" VBAM_NINJA_NATIVE)
+        set(VBAM_BUILD_WRAPPER "${CMAKE_BINARY_DIR}/vbam_build.cmd")
+        file(WRITE "${VBAM_BUILD_WRAPPER}"
+            "@echo off\r\nset \"PATH=${VBAM_VS_TOOL_PATHS_STR};%PATH%\"\r\n\"${VBAM_NINJA_NATIVE}\" %*\r\n"
+        )
+        set(CMAKE_MAKE_PROGRAM "${VBAM_BUILD_WRAPPER}" CACHE FILEPATH "" FORCE)
+        unset(VBAM_NINJA_NATIVE)
+    endif()
+
+    # Override vcpkg's powershell path with a wrapper that prepends VS tool paths.
+    # vcpkg's z_vcpkg_set_powershell_path() skips setup when Z_VCPKG_POWERSHELL_PATH
+    # is already defined, so pre-defining it here makes every applocal.ps1 invocation
+    # run with dumpbin available — even when ninja is called directly.
+    file(TO_NATIVE_PATH "${POWERSHELL}" VBAM_PS_NATIVE)
+    set(VBAM_PS_WRAPPER "${CMAKE_BINARY_DIR}/vbam_powershell.cmd")
+    file(WRITE "${VBAM_PS_WRAPPER}"
+        "@echo off\r\nset \"PATH=${VBAM_VS_TOOL_PATHS_STR};%PATH%\"\r\n\"${VBAM_PS_NATIVE}\" %*\r\n"
+    )
+    set(Z_VCPKG_POWERSHELL_PATH "${VBAM_PS_WRAPPER}" CACHE INTERNAL "" FORCE)
+
+    unset(VBAM_VS_TOOL_PATHS_STR)
+    unset(VBAM_PS_NATIVE)
+endif()
 
 if(APPLE)
     include(CheckLanguage)
