@@ -24,6 +24,21 @@ target_sources(vbam-components-filters
     filters.h
 )
 
+# xBRZ is third-party code; suppress compiler warnings.
+if(MSVC)
+    set_source_files_properties(
+        internal/xBRZ/xbrz.cpp
+        internal/xBRZ/xbrz9x.cpp
+        PROPERTIES COMPILE_FLAGS "/wd5051"
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    set_source_files_properties(
+        internal/xBRZ/xbrz.cpp
+        internal/xBRZ/xbrz9x.cpp
+        PROPERTIES COMPILE_FLAGS "-Wno-unused-function"
+    )
+endif()
+
 if(ENABLE_ASM_SCALERS)
     target_sources(vbam-components-filters
         PRIVATE

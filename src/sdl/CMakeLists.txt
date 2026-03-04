@@ -33,6 +33,15 @@ target_sources(vbam
 
 target_compile_definitions(vbam PRIVATE YY_NO_INPUT)
 
+# These are pre-generated bison/flex files; suppress warnings on MSVC.
+if(MSVC)
+    set_source_files_properties(
+        expr.cpp
+        expr-lex.cpp
+        PROPERTIES COMPILE_FLAGS "/wd4702 /wd4244 /wd4267 /wd4003"
+    )
+endif()
+
 if(MSVC)
     # We should probably use an external library for this.
     target_sources(vbam

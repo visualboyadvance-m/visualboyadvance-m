@@ -481,7 +481,7 @@ const char* FindConfigFile(const char *name)
 	char *home = getenv("USERPROFILE");
 #endif
 	if (home != NULL) {
-		snprintf(path, "%s%c%s", home, kFileSep, name);
+		snprintf(path, sizeof(path), "%s%c%s", home, kFileSep, name);
 		if (FileExists(path))
 		{
 			return path;
