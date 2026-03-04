@@ -1,5 +1,6 @@
-# Set the runtime library properly.
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE INTERNAL "")
+# Link the C++ and VS runtimes statically (/MT for release, /MTd for debug).
+# FORCE overrides the vcpkg toolchain, which sets this based on VCPKG_CRT_LINKAGE.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE STRING "" FORCE)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # MSVC-specific flags (not supported by clang-cl).
@@ -47,7 +48,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase" CACHE STRING "" FORCE)
     endif()
 else()
-    add_compile_options(/MT /Oi /Gy)
+    add_compile_options(/Oi /Gy)
     add_link_options(/OPT:REF /OPT:ICF)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "ProgramDatabase" CACHE STRING "" FORCE)
 
