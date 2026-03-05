@@ -1916,6 +1916,11 @@ int CPULoadRomData(const char* data, int size)
 
         if (ident == 'M') {
             g_rom2 = (uint8_t *)malloc(SIZE_ROM * 4);
+            if (g_rom2 == NULL) {
+                systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"), "ROM2");
+                CPUCleanUp();
+                return 0;
+            }
             memcpy(g_rom2, data, size);
             romSize = 0x01000000;
 
