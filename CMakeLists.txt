@@ -80,7 +80,7 @@ if(GIT_FOUND AND WIN32)
     if(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND NOT EXISTS "${CMAKE_SOURCE_DIR}/win32-deps/mingw-xaudio/include")
         set(SUBMODULE_MANUAL_UPDATE TRUE)
         execute_process(
-            COMMAND "${GIT_EXECUTABLE}" submodule update --init --remote --recursive
+            COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive -- win32-deps
             RESULT_VARIABLE SUBMODULE_UPDATE_STATUS
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
