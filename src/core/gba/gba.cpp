@@ -1558,6 +1558,22 @@ void CPUCleanUp()
     }
 #endif
 
+#if defined(VBAM_ENABLE_DEBUGGER)
+    // Free debugger map buffers. These are allocated in SetMapMasks() 
+    // and must be freed here before the rest of the emulator state 
+	// is torn down to prevent leaking on reset and rom change.
+    for (int i = 0; i < 16; i++) {
+        if (map[i].breakPoints != NULL) {
+            free(map[i].breakPoints);
+            map[i].breakPoints = NULL;
+        }
+        if (map[i].trace != NULL) {
+            free(map[i].trace);
+            map[i].trace = NULL;
+        }
+    }
+#endif  // defined(VBAM_ENABLE_DEBUGGER)
+
     if (g_rom != NULL) {
         free(g_rom);
         g_rom = NULL;
@@ -1635,22 +1651,31 @@ void SetMapMasks()
 #ifdef VBAM_ENABLE_DEBUGGER
     for (int i = 0; i < 16; i++) {
         map[i].size = map[i].mask + 1;
-        map[i].trace = NULL;
-        map[i].breakPoints = NULL;
 
-        if ((map[i].size >> 1) > 0) {
-            map[i].breakPoints = (uint8_t*)calloc(map[i].size >> 1, sizeof(uint8_t));
+        const size_t bpSize = map[i].size >> 1;
+        const size_t trSize = map[i].size >> 3;
+
+        if (bpSize > 0) {
             if (map[i].breakPoints == NULL) {
-                systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "TRACE");
+                map[i].breakPoints = (uint8_t*)calloc(bpSize, sizeof(uint8_t));
+                if (map[i].breakPoints == NULL) {
+                    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                        "BREAKPOINTS");
+                }
+            } else {
+                memset(map[i].breakPoints, 0, bpSize * sizeof(uint8_t));
             }
         }
 
-        if ((map[i].size >> 3) > 0) {
-            map[i].trace = (uint8_t*)calloc(map[i].size >> 3, sizeof(uint8_t));
+        if (trSize > 0) {
             if (map[i].trace == NULL) {
-                systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
-                    "TRACE");
+                map[i].trace = (uint8_t*)calloc(trSize, sizeof(uint8_t));
+                if (map[i].trace == NULL) {
+                    systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+                        "TRACE");
+                }
+            } else {
+                memset(map[i].trace, 0, trSize * sizeof(uint8_t));
             }
         }
     }
