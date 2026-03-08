@@ -867,7 +867,7 @@ void GameArea::LoadGame(const wxString& name)
 
             flashSetSize(fsz);
             // Set save type from override; fallback to detection if set to Auto (0)
-            ovSaveType = cfg->Read(wxT("coreOptions.saveType"), coreOptions.cpuSaveType);
+            ovSaveType = cfg->Read(wxT("saveType"), coreOptions.cpuSaveType);
 
             if (ovSaveType < 0 || ovSaveType > 5)
                 ovSaveType = 0;

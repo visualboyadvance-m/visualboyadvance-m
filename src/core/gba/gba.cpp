@@ -3790,6 +3790,7 @@ void SetSaveType(int st)
         cpuFlashEnabled = false;
         cpuEEPROMEnabled = true;
         cpuEEPROMSensorEnabled = false;
+        cpuSaveGameFunc = flashSaveDecide; // to insure we're not still in F/SRAM mode when starting the next rom		
         break;
     case GBA_SAVE_SRAM:
         cpuSramEnabled = true;
@@ -3810,6 +3811,7 @@ void SetSaveType(int st)
         cpuFlashEnabled = false;
         cpuEEPROMEnabled = true;
         cpuEEPROMSensorEnabled = true;
+        cpuSaveGameFunc = flashSaveDecide; // to insure we're not still in F/SRAM mode when starting the next rom		
         break;
     case GBA_SAVE_NONE:
         cpuSramEnabled = false;
