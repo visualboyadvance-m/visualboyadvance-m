@@ -67,7 +67,7 @@ if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
    endif()
 endif()
 
-find_package(PkgConfig)
+find_package(PkgConfig QUIET)
 
 # Add support for Homebrew, MacPorts and Fink on macOS
 option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)

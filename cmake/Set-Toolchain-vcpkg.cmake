@@ -226,28 +226,6 @@ if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x64-mingw")
     endif()
 endif()
 
-function(vcpkg_seconds)
-    if(CMAKE_HOST_SYSTEM MATCHES Windows OR ((NOT DEFINED CMAKE_HOST_SYSTEM) AND WIN32))
-        execute_process(
-            COMMAND cmd /c echo %TIME:~0,8%
-            OUTPUT_VARIABLE time
-        )
-    else()
-        execute_process(
-            COMMAND date +%H:%M:%S
-            OUTPUT_VARIABLE time
-        )
-    endif()
-
-    string(SUBSTRING "${time}" 0 2 hours)
-    string(SUBSTRING "${time}" 3 2 minutes)
-    string(SUBSTRING "${time}" 6 2 secs)
-
-    math(EXPR seconds "(${hours} * 60 * 60) + (${minutes} * 60) + ${secs}")
-
-    set(seconds ${seconds} PARENT_SCOPE)
-endfunction()
-
 function(vcpkg_check_git_status git_status)
     # The VS vcpkg component cannot be written to without elevation.
     if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "Visual Studio")
@@ -255,59 +233,9 @@ function(vcpkg_check_git_status git_status)
     endif()
 endfunction()
 
-function(vcpkg_get_first_upgrade vcpkg_exe)
-    # First get the list of upgraded ports.
-    execute_process(
-        COMMAND ${vcpkg_exe} upgrade
-        OUTPUT_VARIABLE upgradable
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
 
-    string(REGEX REPLACE "\r?\n" ";" upgrade_lines "${upgradable}")
 
-    unset(first_upgrade)
-
-    foreach(line ${upgrade_lines})
-        if(line MATCHES "^  [* ] [^ ]*:")
-            string(REGEX REPLACE "^  [* ] ([^[]+).*" "\\1" pkg     ${line})
-            string(REGEX REPLACE "^[^:]+:(.+)$"      "\\1" triplet ${line})
-
-            if(triplet STREQUAL "${VCPKG_TARGET_TRIPLET}")
-                # Prefer upgrading zlib before anything else.
-                if(NOT first_upgrade OR pkg MATCHES zlib)
-                    set(first_upgrade ${pkg})
-                endif()
-            endif()
-        endif()
-    endforeach()
-
-    if(DEFINED first_upgrade)
-        set(first_upgrade ${first_upgrade} PARENT_SCOPE)
-    endif()
-endfunction()
-
-function(vcpkg_deps_fixup vcpkg_exe)
-    # Get installed list.
-    execute_process(
-        COMMAND ${vcpkg_exe} list
-        OUTPUT_VARIABLE pkg_list
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-
-    # If libvorbis is NOT installed but libogg is, remove libvorbis recursively.
-    if(pkg_list MATCHES libogg AND (NOT pkg_list MATCHES libvorbis))
-        execute_process(
-            COMMAND ${vcpkg_exe} remove --recurse libogg:${VCPKG_TARGET_TRIPLET}
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
-    endif()
-endfunction()
-
-function(vcpkg_is_installed vcpkg_exe pkg_name pkg_ver pkg_triplet powershell outvar)
+function(vcpkg_is_installed pkg_name pkg_ver pkg_triplet powershell outvar)
     set(${outvar} FALSE PARENT_SCOPE)
 
     unset(CMAKE_MATCH_1)
@@ -421,7 +349,7 @@ function(download_package pkg pkgs_dir)
     message(STATUS "done.")
 endfunction()
 
-function(zip_is_installed vcpkg_exe zip outvar)
+function(zip_is_installed zip outvar)
     if(NOT zip MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
         return()
     endif()
@@ -429,7 +357,7 @@ function(zip_is_installed vcpkg_exe zip outvar)
     set(pkg_version ${CMAKE_MATCH_2})
     set(pkg_triplet ${CMAKE_MATCH_3})
 
-    vcpkg_is_installed(${vcpkg_exe} ${pkg_name} ${pkg_version} ${pkg_triplet} ${POWERSHELL} pkg_installed)
+    vcpkg_is_installed(${pkg_name} ${pkg_version} ${pkg_triplet} ${POWERSHELL} pkg_installed)
 
     set(${outvar} ${pkg_installed} PARENT_SCOPE)
 endfunction()
@@ -441,7 +369,7 @@ function(cleanup_binary_packages)
     unset(VCPKG_INSTALLED_COUNT CACHE)
 endfunction()
 
-function(get_binary_packages vcpkg_exe)
+function(get_binary_packages)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
     get_triplet_package_list(${VCPKG_TARGET_TRIPLET})
@@ -472,7 +400,7 @@ function(get_binary_packages vcpkg_exe)
     endif()
 
     foreach(pkg ${binary_packages})
-        zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
+        zip_is_installed(${pkg} pkg_installed)
 
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
@@ -544,7 +472,7 @@ function(get_binary_packages vcpkg_exe)
                 list(FIND installed_host_deps "${pkg}" found_idx)
 
                 if(found_idx EQUAL -1)
-                    zip_is_installed(${vcpkg_exe} ${pkg} pkg_installed)
+                    zip_is_installed(${pkg} pkg_installed)
 
                     if(NOT pkg_installed)
                         download_package("${pkg}" "${bin_pkgs_dir}")
@@ -575,34 +503,21 @@ function(get_binary_packages vcpkg_exe)
     set(binary_packages_installed TRUE PARENT_SCOPE)
 endfunction()
 
-function(vcpkg_remove_optional_deps vcpkg_exe)
-    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
-    math(EXPR optionals_list_last "${optionals_list_len} - 1")
-
-    unset(deps)
-
-    foreach(i RANGE 0 ${optionals_list_last} 2)
-        list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
-
-        list(APPEND deps ${dep}:${VCPKG_TARGET_TRIPLET})
-    endforeach()
-
-    execute_process(
-        COMMAND ${vcpkg_exe} remove --recurse ${deps}
-        WORKING_DIRECTORY ${VCPKG_ROOT}
-    )
-endfunction()
 
 function(vcpkg_set_toolchain)
-    get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+    if(NOT DEFINED VCPKG_BINARY_PACKAGES)
+        set(VCPKG_BINARY_PACKAGES TRUE)
+    endif()
 
-    if(NOT DEFINED POWERSHELL)
+    if(NOT DEFINED POWERSHELL AND VCPKG_BINARY_PACKAGES)
         message(FATAL_ERROR "Powershell is required to use vcpkg binaries.")
     endif()
+
     if(NOT DEFINED ENV{VCPKG_ROOT})
+        get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
 
         if(WIN32)
-            if(DEFINED ENV{CI} OR EXISTS /vcpkg)
+            if(EXISTS /vcpkg)
                 set(VCPKG_ROOT /vcpkg)
             elseif(EXISTS c:/vcpkg)
                 set(VCPKG_ROOT c:/vcpkg)
@@ -659,7 +574,6 @@ function(vcpkg_set_toolchain)
 
         vcpkg_check_git_status(${git_status})
     else()
-        # this is the case when we cache vcpkg/installed with the appveyor build cache
         if(NOT EXISTS ${VCPKG_ROOT}/.git)
             set(git_commands
                 "git init"
@@ -728,87 +642,55 @@ function(vcpkg_set_toolchain)
         endif()
     endif()
 
-    foreach(pkg ${VCPKG_DEPS})
-        list(APPEND VCPKG_DEPS_QUALIFIED ${pkg}:${VCPKG_TARGET_TRIPLET})
-
-        if(VCPKG_TARGET_TRIPLET STREQUAL "x86-mingw-static")
-            list(APPEND VCPKG_DEPS_QUALIFIED libsamplerate:x86-mingw-static)
-        endif()
-    endforeach()
-
     if(WIN32)
-        set(vcpkg_exe "${VCPKG_ROOT}/vcpkg.exe")
+        set(VCPKG_PROGRAM_EXECUTABLE "${VCPKG_ROOT}/vcpkg.exe" CACHE FILEPATH "vcpkg executable" FORCE)
     else()
-        set(vcpkg_exe "${VCPKG_ROOT}/vcpkg")
+        set(VCPKG_PROGRAM_EXECUTABLE "${VCPKG_ROOT}/vcpkg" CACHE FILEPATH "vcpkg executable" FORCE)
     endif()
 
     if (NOT (NO_VCPKG_UPDATES OR (NOT VCPKG_BINARY_PACKAGES)))
-        get_binary_packages(${vcpkg_exe})
+        get_binary_packages()
     endif()
 
-    if(NOT binary_packages_installed)
-        # Get number of seconds since midnight (might be wrong if am/pm is in effect on Windows.)
-        vcpkg_seconds()
-        set(began ${seconds})
-
-        # Limit total installation time to 20 minutes to not overrun CI time limit.
-        math(EXPR time_limit "${began} + (20 * 60)")
-
-        vcpkg_deps_fixup("${vcpkg_exe}")
-
+    if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES))
         # Install core deps.
         execute_process(
-            COMMAND ${vcpkg_exe} --triplet ${VCPKG_TARGET_TRIPLET} install ${pkg}
+            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${VCPKG_DEPS}
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 
-        # If ports have been updated, and there is time, rebuild cache one at a time to not overrun the CI time limit.
-        vcpkg_seconds()
+        # Upgrade any outdated ports.
+        execute_process(
+            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} upgrade --no-dry-run
+            WORKING_DIRECTORY ${VCPKG_ROOT}
+        )
 
-        if(seconds LESS time_limit)
-            vcpkg_get_first_upgrade(${vcpkg_exe})
-
-            if(DEFINED first_upgrade)
-                # If we have to upgrade zlib, remove optional deps first so that
-                # the build doesn't overrun the CI time limit.
-                if(first_upgrade STREQUAL "zlib")
-                    vcpkg_remove_optional_deps(${vcpkg_exe})
-                endif()
-
-                execute_process(
-                    COMMAND ${vcpkg_exe} upgrade --no-dry-run "${first_upgrade}:${VCPKG_TARGET_TRIPLET}"
-                    WORKING_DIRECTORY ${VCPKG_ROOT}
-                )
-            endif()
-        endif()
-
-        # Install optional deps, within time limit.
+        # Install optional deps.
         list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
         math(EXPR optionals_list_last "${optionals_list_len} - 1")
+
+        unset(optional_deps)
 
         foreach(i RANGE 0 ${optionals_list_last} 2)
             list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
 
             math(EXPR var_idx "${i} + 1")
-
             list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
-            set(val "${${var}}")
 
-            vcpkg_seconds()
-
-            if("${val}" OR (seconds LESS time_limit AND ("${val}" OR "${val}" STREQUAL "")))
-                set(dep_qualified "${dep}:${VCPKG_TARGET_TRIPLET}")
-
-                execute_process(
-                    COMMAND --triplet ${VCPKG_TARGET_TRIPLET} ${vcpkg_exe} install ${dep}
-                    WORKING_DIRECTORY ${VCPKG_ROOT}
-                )
-
+            if(NOT DEFINED ${var} OR ${var})
+                list(APPEND optional_deps ${dep})
                 set(${var} ON)
             else()
                 set(${var} OFF)
             endif()
         endforeach()
+
+        if(optional_deps)
+            execute_process(
+                COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${optional_deps}
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        endif()
     endif()
 
     if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES x64 AND CMAKE_GENERATOR MATCHES "Visual Studio")
@@ -823,9 +705,8 @@ function(vcpkg_set_toolchain)
         endif()
     endif()
 
-    set(CMAKE_TOOLCHAIN_FILE ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake CACHE FILEPATH "vcpkg toolchain" FORCE)
-
-    set(CMAKE_PREFIX_PATH "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/" CACHE STRING "vcpkg prefix path" FORCE)
+    set(CMAKE_TOOLCHAIN_FILE    "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"        CACHE FILEPATH  "vcpkg toolchain"       FORCE)
+    set(CMAKE_PREFIX_PATH       "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/"      CACHE STRING    "vcpkg prefix path"     FORCE)
 
     # These may be set in an MSYS2 environment and interfere with finding packages.
     unset(ENV{PKG_CONFIG_PATH})
