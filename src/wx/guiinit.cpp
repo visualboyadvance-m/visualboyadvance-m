@@ -2273,9 +2273,10 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
             // Also initialize LinkConfig since it shares ben/benval
             {
                 wxDialog* d2 = LoadXRCDialog("LinkConfig");
-                getlab("LinkTimeoutLab");
+                lab = SafeXRCCTRL<wxControl>(d2, "LinkTimeoutLab");
                 addbe(lab);
-                getsc("LinkTimeout", gopts.link_timeout);
+                sc = SafeXRCCTRL<wxSpinCtrl>(d2, "LinkTimeout");
+                sc->SetValidator(wxGenericValidator(&gopts.link_timeout));
                 addbe(sc);
                 d2->Fit();
                 dialogs_initialized_.insert("LinkConfig");

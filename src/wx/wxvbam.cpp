@@ -1530,8 +1530,11 @@ void MainFrame::SetMenusOpened(bool state) {
 // uses dialog_opened as a nesting counter
 int MainFrame::ShowModal(wxDialog* dlg)
 {
+    if (!dlg) {
+        wxLogError(_("Failed to load dialog"));
+        return wxID_CANCEL;
+    }
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
-    CheckPointer(dlg);
     StartModal();
     int ret = dlg->ShowModal();
     StopModal();
