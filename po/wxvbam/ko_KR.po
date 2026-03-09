@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-10 22:00+0000\n"
+"POT-Creation-Date: 2026-03-09 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: JS OH, 2026\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -45,7 +45,7 @@ msgstr "CoreAudio 버퍼를 할당하는 데 실패했습니다."
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "CoreAudio 대기열(큐)을 시작하는 데 실패했습니다: 오류 발생"
 
-#: cmdevents.cpp:63 wxvbam.cpp:726
+#: cmdevents.cpp:63 wxvbam.cpp:747
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
@@ -107,7 +107,7 @@ msgstr "배터리 파일을 가져오면 저장된 게임이 모두 지워집니
 msgid "Confirm import"
 msgstr "가져오기 확인"
 
-#: cmdevents.cpp:519 panel.cpp:987
+#: cmdevents.cpp:519 panel.cpp:1005
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s를 로드한 배터리"
@@ -190,7 +190,7 @@ msgstr "로드중 %s 스넵샷 파일 에러"
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:721 panel.cpp:1347
+#: cmdevents.cpp:721 panel.cpp:1365
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
@@ -381,7 +381,7 @@ msgid "Invalid color correction profile"
 msgstr "잘못된 색상 보정 프로필입니다."
 
 #: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
-#: xrc/DisplayConfig.xrc:156 xrc/DisplayConfig.xrc:386
+#: xrc/DisplayConfig.xrc:159 xrc/DisplayConfig.xrc:389
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
@@ -393,7 +393,7 @@ msgid "No usable rpi plugins found in %s"
 msgstr "%s에서 사용가능한 rpi 플러그인을 찾을 수 없음"
 
 #: dialogs/display-config.cpp:614 dialogs/display-config.cpp:693
-#: xrc/DisplayConfig.xrc:132
+#: xrc/DisplayConfig.xrc:135
 msgid "Plugin"
 msgstr "플러그인"
 
@@ -650,7 +650,7 @@ msgstr "치트파일 선택"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 치트 목록 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
-#: guiinit.cpp:284 panel.cpp:1045
+#: guiinit.cpp:284 panel.cpp:1063
 msgid "Loaded cheats"
 msgstr "치트 불러오기"
 
@@ -723,23 +723,23 @@ msgstr "무효한 %s메뉴 항목 ; 제거합니다."
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화합니다."
 
-#: guiinit.cpp:2303
+#: guiinit.cpp:2304
 msgid "Code"
 msgstr "코드"
 
-#: guiinit.cpp:2309
+#: guiinit.cpp:2310
 msgid "Description"
 msgstr "서술"
 
-#: guiinit.cpp:2362 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2363 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: guiinit.cpp:2363
+#: guiinit.cpp:2364
 msgid "Old Value"
 msgstr "오래된 값"
 
-#: guiinit.cpp:2364
+#: guiinit.cpp:2365
 msgid "New Value"
 msgstr "새로운 값"
 
@@ -766,45 +766,45 @@ msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 msgid "Unknown option %s with value %s"
 msgstr "값이 %s 알 수 없는 옵션 %s"
 
-#: panel.cpp:669
+#: panel.cpp:687
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 파일은 유효한 ROM파일이 아닙니다."
 
-#: panel.cpp:670 panel.cpp:731 panel.cpp:817
+#: panel.cpp:688 panel.cpp:749 panel.cpp:835
 msgid "Problem loading file"
 msgstr "파일을 불러올 수 없습니다."
 
-#: panel.cpp:730
+#: panel.cpp:748
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "%s 게임보이 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:755 panel.cpp:898 panel.cpp:1686
+#: panel.cpp:773 panel.cpp:916 panel.cpp:1775
 msgid "Could not initialize the sound driver!"
 msgstr "사운드 드라이버를 초기화할 수 없습니다!"
 
-#: panel.cpp:766
+#: panel.cpp:784
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스 파일을 사용할 수 없으므로 게임보이 바이오스 파일을 비활성화합니다."
 
-#: panel.cpp:793 panel.cpp:911
+#: panel.cpp:811 panel.cpp:929
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "%s BIOS를 불러올 수 없습니다."
 
-#: panel.cpp:816
+#: panel.cpp:834
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임보이 어드밴스 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:1082
+#: panel.cpp:1100
 msgid " player "
 msgstr "플레이어"
 
-#: panel.cpp:1130
+#: panel.cpp:1148
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -813,11 +813,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1131 panel.cpp:1152 wxvbam.cpp:1248
+#: panel.cpp:1149 panel.cpp:1170 wxvbam.cpp:1270
 msgid "Directory Error"
 msgstr "디렉터리 오류"
 
-#: panel.cpp:1151
+#: panel.cpp:1169
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -826,284 +826,284 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1295
+#: panel.cpp:1313
 #, c-format
 msgid "Loaded state %s"
 msgstr "상태 %s 불러옴"
 
-#: panel.cpp:1295
+#: panel.cpp:1313
 #, c-format
 msgid "Error loading state %s"
 msgstr "상태 %s 불러오기 오류"
 
-#: panel.cpp:1319
+#: panel.cpp:1337
 #, c-format
 msgid "Saved state %s"
 msgstr "상태 %s 저장함"
 
-#: panel.cpp:1319
+#: panel.cpp:1337
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: panel.cpp:1519
+#: panel.cpp:1567
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음; 다른 것을 찾고 있음"
 
-#: panel.cpp:1557
+#: panel.cpp:1605
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음"
 
-#: panel.cpp:1562
+#: panel.cpp:1610
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "유효한 모드: %d x %d - %d @ %d"
 
-#: panel.cpp:1570
+#: panel.cpp:1618
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "선택 모드 %d x %d - %d @ %d"
 
-#: panel.cpp:1574
+#: panel.cpp:1622
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "모드를 %d x %d - %d @ %d로 변경하지 못했음"
 
-#: panel.cpp:1661
+#: panel.cpp:1709
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "유효한 게임보이 어드밴스 카트리지가 아님"
 
-#: panel.cpp:1707
+#: panel.cpp:1796
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:1846
+#: panel.cpp:1953
 msgid "No memory for rewinding"
 msgstr "되감기할 메모리가 없습니다."
 
-#: panel.cpp:1856
+#: panel.cpp:1963
 msgid "Error writing rewind state"
 msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
-#: panel.cpp:2940
+#: panel.cpp:3082
 msgid "Failed to set wayland display"
 msgstr "Wayland 디스플레이 설정에 실패함"
 
-#: panel.cpp:2968
+#: panel.cpp:3110
 msgid "Failed to initialize SDL video subsystem"
 msgstr "SDL 비디오 하위 시스템 초기화 실패함"
 
-#: panel.cpp:2979
+#: panel.cpp:3121
 msgid "Failed to initialize SDL video"
 msgstr "SDL 비디오 초기화 실패함"
 
-#: panel.cpp:2988
+#: panel.cpp:3130
 msgid "Failed to set wayland surface"
 msgstr "Wayland 표면 설정 실패함"
 
-#: panel.cpp:3001
+#: panel.cpp:3143
 msgid "Failed to set parent window"
 msgstr "부모 창 설정 실패함"
 
-#: panel.cpp:3010
+#: panel.cpp:3152
 msgid "Failed to set OpenGL properties"
 msgstr "OpenGL 속성 설정 설패함"
 
-#: panel.cpp:3023 panel.cpp:3062
+#: panel.cpp:3165 panel.cpp:3204
 msgid "Failed to create SDL window"
 msgstr "SDL 창 생성 실패함"
 
-#: panel.cpp:3033 panel.cpp:3090
+#: panel.cpp:3175 panel.cpp:3232
 msgid "Renderer creating failed, using default renderer"
 msgstr "렌더러 생성에 실패하여 기본 렌더러를 사용합니다."
 
-#: panel.cpp:3034
+#: panel.cpp:3176
 #, c-format
 msgid "SDL Error: %s"
 msgstr "SDL 오류: "
 
-#: panel.cpp:3041 panel.cpp:3096
+#: panel.cpp:3183 panel.cpp:3238
 msgid "Failed to create SDL renderer"
 msgstr "SDL 렌더러 생성 실패함"
 
-#: panel.cpp:3047
+#: panel.cpp:3189
 msgid "Failed to set vsync for SDL renderer"
 msgstr ""
 
-#: panel.cpp:3051 panel.cpp:3085
+#: panel.cpp:3193 panel.cpp:3227
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL 렌더러:"
 
-#: panel.cpp:3070
+#: panel.cpp:3212
 msgid "SDL renderer: default"
 msgstr "SDL 렌더러: 기본"
 
-#: panel.cpp:3746
+#: panel.cpp:3970
 msgid "Enabling EGL VSync."
 msgstr "EGL 수직동기화 활성화"
 
-#: panel.cpp:3748
+#: panel.cpp:3972
 msgid "Disabling EGL VSync."
 msgstr "EGL 수직동기화 비활성화"
 
-#: panel.cpp:3755
+#: panel.cpp:3979
 msgid "Enabling GLX VSync."
 msgstr "GLX 수직동기화 활성화"
 
-#: panel.cpp:3757
+#: panel.cpp:3981
 msgid "Disabling GLX VSync."
 msgstr "GLX 수직동기화 비활성화"
 
-#: panel.cpp:3775
+#: panel.cpp:3999
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:3784
+#: panel.cpp:4008
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI 설정 실패"
 
-#: panel.cpp:3793
+#: panel.cpp:4017
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA 설정 실패"
 
-#: panel.cpp:3800
+#: panel.cpp:4024
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT은 지원하지 않습니다."
 
-#: panel.cpp:3803
+#: panel.cpp:4027
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control은 지원하지 않습니다."
 
-#: panel.cpp:3812
+#: panel.cpp:4036
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:3818
+#: panel.cpp:4042
 msgid "No VSYNC available on this platform"
 msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
-#: panel.cpp:3914
+#: panel.cpp:4152
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr ""
 
-#: panel.cpp:3918
+#: panel.cpp:4156
 msgid "Failed to load d3d9.dll"
 msgstr "d3d9.dll 파일을 불러오는 데 실패했습니다."
 
-#: panel.cpp:3927
+#: panel.cpp:4165
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Direct3D 9 인터페이스 생성에 실패했습니다."
 
-#: panel.cpp:3930
+#: panel.cpp:4168
 msgid "Using Direct3D 9"
 msgstr "Direct3D 9를 사용합니다."
 
-#: panel.cpp:3937
+#: panel.cpp:4175
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "어댑터 디스플레이 모드를 가져오는 데 실패했습니다: 0x"
 
-#: panel.cpp:3961
+#: panel.cpp:4199
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx가 지원되지 않아 Discard 스왑 효과로 전환합니다."
 
-#: panel.cpp:3977
+#: panel.cpp:4215
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "하드웨어 버텍스 처리를 사용할 수 없어 소프트웨어 방식으로 전환합니다."
 
-#: panel.cpp:4001
+#: panel.cpp:4239
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4006
+#: panel.cpp:4244
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:4039
+#: panel.cpp:4277
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:4061
+#: panel.cpp:4299
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4093
+#: panel.cpp:4331
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:4100
+#: panel.cpp:4338
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr ""
 
-#: panel.cpp:4112
+#: panel.cpp:4350
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4117
+#: panel.cpp:4355
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:4181
+#: panel.cpp:4422
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4193
+#: panel.cpp:4434
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4384
+#: panel.cpp:4628
 msgid "Memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:4387
+#: panel.cpp:4631
 msgid "Error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:4390
+#: panel.cpp:4634
 msgid "Error writing to output file"
 msgstr "출력 파일에 쓰는 중 오류"
 
-#: panel.cpp:4393
+#: panel.cpp:4637
 msgid "Can't guess output format from file name"
 msgstr "파일 이름으로 출력 형식을 추측할 수 없음"
 
-#: panel.cpp:4398
+#: panel.cpp:4642
 msgid "Programming error; aborting!"
 msgstr "프로그래밍 오류; 중단합니다!"
 
-#: panel.cpp:4410 panel.cpp:4439
+#: panel.cpp:4654 panel.cpp:4683
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 
-#: panel.cpp:4467
+#: panel.cpp:4711
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "오디오 / 비디오 녹음 중 오류 (%s); 중단 중"
 
-#: panel.cpp:4473
+#: panel.cpp:4717
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:4483
+#: panel.cpp:4727
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:4674
+#: panel.cpp:4918
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"
@@ -1207,76 +1207,76 @@ msgstr "파랑:"
 msgid "Unable to load dialog %s from resources"
 msgstr "리소스로부터 대화 %s을 불러올 수 없습니다."
 
-#: wxvbam.cpp:543 wxvbam.cpp:560
+#: wxvbam.cpp:564 wxvbam.cpp:581
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "제공된 구성 파일이 잘못되었습니다: %s"
 
-#: wxvbam.cpp:825
+#: wxvbam.cpp:847
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: wxvbam.cpp:828
+#: wxvbam.cpp:850
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
-#: wxvbam.cpp:831
+#: wxvbam.cpp:853
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
-#: wxvbam.cpp:834
+#: wxvbam.cpp:856
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작합니다."
 
-#: wxvbam.cpp:837
+#: wxvbam.cpp:859
 msgid "Set a configuration file"
 msgstr "구성 설정 파일을 설정합니다."
 
-#: wxvbam.cpp:841
+#: wxvbam.cpp:863
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: wxvbam.cpp:848
+#: wxvbam.cpp:870
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료"
 
-#: wxvbam.cpp:851
+#: wxvbam.cpp:873
 msgid "ROM file"
 msgstr "ROM 파일"
 
-#: wxvbam.cpp:853
+#: wxvbam.cpp:875
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:884
+#: wxvbam.cpp:906
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "구성 / 빌드 오류: 기본 제공 xrc를 찾을 수 없음"
 
-#: wxvbam.cpp:892
+#: wxvbam.cpp:914
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "기본 구성을 %s로 작성했습니다.\n재정의하려면 변경된 루트 노드를 제외한 모든 노드를 제거하세요. 다음 검색 경로에서 .xrc 또는 .xrs 파일에서 올바른 이름의 루트 노드를 처음 발견하면 기본값이 재정의됩니다:"
 
-#: wxvbam.cpp:906
+#: wxvbam.cpp:928
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: wxvbam.cpp:920
+#: wxvbam.cpp:942
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "기본 제공 오버라이드 파일을 %s로 작성했습니다.\n재정의하려면 변경된 섹션을 제외한 모든 섹션을 삭제합니다. 검색 경로에서 처음 찾은 섹션이 사용됩니다:"
 
-#: wxvbam.cpp:926
+#: wxvbam.cpp:948
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:941
+#: wxvbam.cpp:963
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1284,27 +1284,31 @@ msgid ""
 "\n"
 msgstr "사용자 인터페이스에서 설정이 변경되면, 명령 줄에서 선택된 옵션이 저장됩니다. \n\n플래그 옵션에서, true와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:949
+#: wxvbam.cpp:971
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
-#: wxvbam.cpp:961
+#: wxvbam.cpp:983
 msgid "Configuration file not found."
 msgstr "설정 파일을 찾을 수 없습니다."
 
-#: wxvbam.cpp:992
+#: wxvbam.cpp:1014
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
-#: wxvbam.cpp:1247
+#: wxvbam.cpp:1269
 #, c-format
 msgid ""
 "Could not create directory:\n"
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
+msgstr ""
+
+#: wxvbam.cpp:1534
+msgid "Failed to load dialog"
 msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
@@ -1392,7 +1396,7 @@ msgid "Auto B"
 msgstr "자동 B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:323
+#: xrc/DisplayConfig.xrc:326
 msgid "Speed"
 msgstr "속도"
 
@@ -1409,194 +1413,194 @@ msgstr "게임샤크"
 msgid "Joypad %zu %s"
 msgstr "조이패드 %zu %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:419
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
 msgid "Use bilinear filter with 3d renderer"
 msgstr "3d 렌더러와 함께 이중선형 필터 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:420
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
 msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:421
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
 msgid "Full-screen filter to apply"
 msgstr "적용할 전체화면 필터"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:425
 msgid "Filter plugin library"
 msgstr "필터 플러그인 라이브러리"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:426
 msgid "Interframe blending function"
 msgstr "인터프레임 블렌딩 기능"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:427
 msgid "Bit depth"
 msgstr "비트 심도"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:425
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:428
 msgid "Keep window on top"
 msgstr "창을 맨 위에 유지"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:427
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:430
 msgid "Maximum number of threads to run filters in"
 msgstr "필터를 실행할 최대 스레드 수"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:429
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "렌더링 방법; 지원되지 않는 경우 간단한 방법 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:430
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Default scale factor"
 msgstr "기본 스케일 팩터"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:431
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
 msgid "Retain aspect ratio when resizing"
 msgstr "크기 조정 시 화면비 유지"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
 msgid "SDL renderer"
 msgstr "SDL 렌더러"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Color correction profile"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "활성화된 경우, 게임보이에서 사용할 바이오스 파일"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
 msgid "Enable DX Colorization Hacks"
 msgstr "DX 색상화 해킹 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
 msgid "Apply LCD filter, if enabled"
 msgstr "활성화된 경우, LCD 필터 적용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "활성화된 경우, 게임보이 컬러에 사용할 바이오스 파일"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "기본 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "첫 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "두 번째 사용자 팔레트, 8개의 쉼표로 구분된 4자리 16진수 정수 (rgb555) 입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:453
 msgid "Automatically gather a full page before printing"
 msgstr "출력하기 전에 자동으로 전체 페이지 수집"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "-print 접미사를 사용하여 출력물을 화면 캡처로 자동 저장"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
 msgid "Directory to look for ROM files"
 msgstr "ROM 파일을 찾을 디렉토리"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:458
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "게임보이 컬러 롬 파일을 찾을 디렉토리"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
 msgid "Color lightness factor"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
 msgid "BIOS file to use, if enabled"
 msgstr "활성화된 경우, 사용할 BIOS 파일"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
 msgid "Enable link at boot"
 msgstr "부팅 시 링크 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:474
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:477
 msgid "Enable faster network protocol by default"
 msgstr "기본적으로 더 빠른 네트워크 프로토콜 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:476
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:479
 msgid "Default network link client host"
 msgstr "기본 네트워크 링크 클라이언트 호스트"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:477
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:480
 msgid "Default network link server IP to bind"
 msgstr "바인딩할 기본 네트워크 링크 서버 IP"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:478
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
 msgid "Default network link port (server and client)"
 msgstr "기본 네트워크 링크 포트 (서버 및 클라이언트)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:479
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
 msgid "Default network protocol"
 msgstr "기본 네트워크 프로토콜"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:480
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
 msgid "Link timeout (ms)"
 msgstr "링크 시간 초과 (ms)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
 msgid "Link cable type"
 msgstr "링크 케이블 유형"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Color darkness factor"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
 msgid "Automatically load last saved state"
 msgstr "마지막으로 저장된 상태를 자동으로 불러오기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "게임 저장 파일을 저장할 디렉터리 (상대 경로는 ROM에 상대적이며 공백은 구성 디렉토리임)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Freeze recent load list"
 msgstr "최근 불러오기 목록 고정"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
 msgstr "A / V 및 게임 녹화를 저장할 디렉토리 (상대 경로는 롬을 기준으로 함)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "되감기 스냅샷 사이의 초 수( 비활성화하려면 0)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:498
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "스크린샷을 저장할 디렉토리 (상대 경로는 ROM에 상대적임)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "저장된 상태 파일을 저장할 디렉토리 (상대 경로는 BatteryDir에 상대적임)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:503
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid "Enable status bar"
 msgstr "상태 표시줄 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:507
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "INI 파일 버전 (수정 금지)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1604,275 +1608,275 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "조이패드/<n>/<button> 매개변수에는 조이패드 #<n> 버튼 <button>에 매핑되는 쉼표로 구분된 키 이름 목록이 포함되어 있습니다. 버튼은 위쪽, 아래쪽, 왼쪽, 오른쪽, A, B, L, R, 선택, 시작, 모션위쪽, 모션아래쪽, 모션왼쪽, 모션오른쪽, 자동A, 자동B, 속도, 캡쳐, GS 중 하나입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:513
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "연사 토글 주기, 프레임 단위 (1/60 초)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "The number of the stick to use in single-player mode"
 msgstr "싱글 플레이어 모드에서 사용할 스틱의 수"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
 msgid "Whether to enable SDL GameController mode"
 msgstr "SDL 게임컨트롤러 모드를 활성화할지 여부"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:523
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "매개변수 키보드/<cmd>에는 쉼표로 구분된 키 이름 목록이 포함되어 있습니다 (예: Alt-Shift-F1). 이름이 지정된 키를 누르면 명령 <cmd>가 실행됩니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
 msgid "Enable AGB debug print"
 msgstr "AGB 디버그 출력 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Auto skip frames"
 msgstr "프레임 자동 건너뛰기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "발견 시 IPS / UPS / IPF 패치 적용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
 msgid "Automatically save and load cheat list"
 msgstr "치트 목록 자동 저장 및 불러오기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "슈퍼 게임보이 게임에서 테두리 자동 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
 msgid "Always enable border"
 msgstr "항상 테두리 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
 msgid "Screen capture file format"
 msgstr "화면 캡처 파일 형식"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
 msgid "Enable cheats"
 msgstr "치트 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:542
 msgid "Disable on-screen status messages"
 msgstr "화면 상태 메시지 비활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
 msgid "Type of system to emulate"
 msgstr "에뮬레이션할 시스템 유형"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "플래시 크기 0 = 64 KB 1 = 128 KB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "프레임 건너뛰기입니다. 값은 0-9 또는 -1이며 시간에 따라 자동으로 건너뜁니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "The palette to use"
 msgstr "사용할 팔레트"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "Enable printer emulation"
 msgstr "프린터 에뮬레이션 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
 msgid "Break into GDB after loading the game."
 msgstr "게임을 불러온 후 GDB에 개입합니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid "Port to connect GDB to"
 msgstr "GDB를 연결할 포트"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
 msgid "Number of players in network"
 msgstr "네트워크의 플레이어 수"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "최대 스케일 팩터 (0 = 제한 없음)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid "Pause game when main window loses focus"
 msgstr "기본 창에서 포커스를 잃으면 게임 일시 중지"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "RTC 활성화 (vba-over.ini 재정의는 rtcEnabled임"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
 msgid "Native save (\"battery\") hardware type"
 msgstr "기본 저장 (\"배터리\") 하드웨어 유형"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Show speed indicator"
 msgstr "속도 표시기 표시"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
 msgid "Skip BIOS initialization"
 msgstr "BIOS 초기화 건너뛰기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Do not overwrite cheat list when loading state"
 msgstr "상태를 불러올 때 치트 목록을 덮어쓰지 않음"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "상태를 불러올 때 기본 (배터리) 저장을 덮어쓰지 않음"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "가속 시에도 게임 속도 조절 (0-450%, 0 = 스로틀 없음)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "속도 향상 키의 스로틀 설정 (0-3000%, 0 = 스로틀 없음)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "속도 향상으로 건너뛸 프레임 수 (속도 향상 스로틀 대신)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
 msgid "Use frame skip for speedup throttle"
 msgstr "스로틀 속도 향상을 위해 프레임 건너뛰기 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
 msgid "Mute sound during speedup"
 msgstr "속도 향상 중 소리 음소거"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "게임보이에 지정된 바이오스 파일 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Use the specified BIOS file"
 msgstr "지정된 BIOS 파일 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "게임보이 컬러에 지정된 바이오스 파일 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Wait for vertical sync"
 msgstr "수직 동기화 대기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
 msgid "Enter fullscreen mode at startup"
 msgstr "시작 시 전체 화면 모드 시작"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:585
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
 msgid "Window maximized"
 msgstr "창 최대화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Window height at startup"
 msgstr "시작 시 창 높이"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
 msgid "Window width at startup"
 msgstr "시작 시 창 너비"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "Window axis X position at startup"
 msgstr "시작 시 창 축 X 위치"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
 msgid "Window axis Y position at startup"
 msgstr "시작 시 창 축 Y 위치"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:593
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
 msgid "Capture key events while on background"
 msgstr "백그라운드에서 주요 이벤트 캡처"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid "Capture joy events while on background"
 msgstr "백그라운드에서 조이 이벤트 캡처"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "Hide menu bar when mouse is inactive"
 msgstr "마우스가 비활성 상태일 때 메뉴 표시줄 숨기기"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
 msgid "Suspend screensaver when game is running"
 msgstr "게임이 실행 중일 때 화면 보호기 일시 중지"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "사운드 API; 지원되지 않는 경우 기본 API 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "선택한 드라이버에 대해 선택한 오디오 장치의 장치 ID"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Number of sound buffers"
 msgstr "사운드 버퍼 수"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
 msgid "Bit mask of sound channels to enable"
 msgstr "활성화할 사운드 채널의 비트 마스크"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "게임보이 어드밴스 사운드 필터링 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "Game Boy Advance sound interpolation"
 msgstr "게임보이 어드밴스 사운드 보간"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
 msgid "Game Boy sound declicking"
 msgstr "게임보이 사운드 감소"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:609
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
 msgid "Game Boy echo effect (%)"
 msgstr "게임보이 에코 효과 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
 msgid "Enable Game Boy sound effects"
 msgstr "게임보이 사운드 효과 활성화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
 msgid "Game Boy stereo effect (%)"
 msgstr "게임보이 스테레오 효과 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "Game Boy surround sound effect (%)"
 msgstr "게임보이 서라운드 사운드 효과 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
 msgid "Sound sample rate (kHz)"
 msgstr "사운드 샘플링 속도 (kHz)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
 msgid "Use DirectSound hardware acceleration"
 msgstr "DirectSound 하드웨어 가속 사용"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
 msgid "Upmix stereo to surround"
 msgstr "스테레오를 서라운드로 업믹스"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
 msgid "Sound volume (%)"
 msgstr "사운드 볼륨 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
 msgid "Language"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
 msgid "External translations"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:693
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:713
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:734
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:755
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:775
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:795
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:696
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:716
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:737
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:758
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:778
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:798
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "옵션 %s 에 대한 잘못된 값 %s; 유효한 값은 %s"
@@ -2628,119 +2632,119 @@ msgstr "TV 모드"
 msgid "Simple 4x"
 msgstr "단순 4배율"
 
-#: xrc/DisplayConfig.xrc:139
+#: xrc/DisplayConfig.xrc:142
 msgid "Plugin:"
 msgstr "플러그인:"
 
-#: xrc/DisplayConfig.xrc:149
+#: xrc/DisplayConfig.xrc:152
 msgid "Interframe blending:"
 msgstr "프레임 간 블렌딩:"
 
-#: xrc/DisplayConfig.xrc:157
+#: xrc/DisplayConfig.xrc:160
 msgid "Smart"
 msgstr "스마트"
 
-#: xrc/DisplayConfig.xrc:158
+#: xrc/DisplayConfig.xrc:161
 msgid "Motion Blur"
 msgstr "모션 블러"
 
-#: xrc/DisplayConfig.xrc:170
+#: xrc/DisplayConfig.xrc:173
 msgid "Bit Depth"
 msgstr "비트 심도"
 
-#: xrc/DisplayConfig.xrc:179
+#: xrc/DisplayConfig.xrc:182
 msgid "Bit Depth:"
 msgstr "비트 심도:"
 
-#: xrc/DisplayConfig.xrc:187
+#: xrc/DisplayConfig.xrc:190
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:188
+#: xrc/DisplayConfig.xrc:191
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:189
+#: xrc/DisplayConfig.xrc:192
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:190
+#: xrc/DisplayConfig.xrc:193
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:201
 msgid "Color Correction"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:210
 msgid "Profile:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:241
+#: xrc/DisplayConfig.xrc:244
 msgid "GBA Darken:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:260
+#: xrc/DisplayConfig.xrc:263
 msgid "Lighter"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:271
+#: xrc/DisplayConfig.xrc:274
 msgid "Very Dark"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:282
+#: xrc/DisplayConfig.xrc:285
 msgid "GBC Lighten:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:301
+#: xrc/DisplayConfig.xrc:304
 msgid "Darker"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:312
+#: xrc/DisplayConfig.xrc:315
 msgid "Very Light"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:329
+#: xrc/DisplayConfig.xrc:332
 msgid "Frame Skip"
 msgstr "프레임 생략"
 
-#: xrc/DisplayConfig.xrc:347
+#: xrc/DisplayConfig.xrc:350
 msgid "&Number of frames to skip:"
 msgstr "건너뛸 프레임 수 (&N):"
 
-#: xrc/DisplayConfig.xrc:371
+#: xrc/DisplayConfig.xrc:374
 msgid "On-Screen Display"
 msgstr "화면에 표시"
 
-#: xrc/DisplayConfig.xrc:378
+#: xrc/DisplayConfig.xrc:381
 msgid "Speed indicator:"
 msgstr "속도 표시기:"
 
-#: xrc/DisplayConfig.xrc:387
+#: xrc/DisplayConfig.xrc:390
 msgid "Percentage"
 msgstr "백분율 표기"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:391
 msgid "Detailed"
 msgstr "상세 표기"
 
-#: xrc/DisplayConfig.xrc:396
+#: xrc/DisplayConfig.xrc:399
 msgid "Zoom"
 msgstr "화면 배율"
 
-#: xrc/DisplayConfig.xrc:406
+#: xrc/DisplayConfig.xrc:409
 msgid "Default magnification:"
 msgstr "기본 배율:"
 
-#: xrc/DisplayConfig.xrc:424
+#: xrc/DisplayConfig.xrc:427
 msgid "Maximum magnification factor:"
 msgstr "최대 배율 계수:"
 
-#: xrc/DisplayConfig.xrc:425
+#: xrc/DisplayConfig.xrc:428
 msgid "0 = no maximum"
 msgstr "0 = 최대치 없음"
 
-#: xrc/DisplayConfig.xrc:432
+#: xrc/DisplayConfig.xrc:435
 msgid "0 = no limit"
 msgstr "0 = 제한 없음"
 

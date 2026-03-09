@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-10 22:00+0000\n"
+"POT-Creation-Date: 2026-03-09 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024,2026\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -52,7 +52,7 @@ msgstr "Échec de l'allocation du tampon %d CoreAudio : erreur %d"
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Échec du démarrage de la file d'attente CoreAudio : erreur %d"
 
-#: cmdevents.cpp:63 wxvbam.cpp:726
+#: cmdevents.cpp:63 wxvbam.cpp:747
 msgid "Could not create main window"
 msgstr "Impossible de créer la fenêtre principale"
 
@@ -114,7 +114,7 @@ msgstr "Importer un fichier de sauvegarde va effacer toute sauvegarde existante 
 msgid "Confirm import"
 msgstr "Confirmer l'importation"
 
-#: cmdevents.cpp:519 panel.cpp:987
+#: cmdevents.cpp:519 panel.cpp:1005
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Sauvegarde chargée %s"
@@ -197,7 +197,7 @@ msgstr "Erreur de chargement du fichier de sauvegarde instantanée %s"
 msgid "Wrote battery %s"
 msgstr "Sauvegarde exportée %s"
 
-#: cmdevents.cpp:721 panel.cpp:1347
+#: cmdevents.cpp:721 panel.cpp:1365
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Erreur d'export de la sauvegarde %s"
@@ -388,7 +388,7 @@ msgid "Invalid color correction profile"
 msgstr "Profil de correction des couleurs non valide"
 
 #: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
-#: xrc/DisplayConfig.xrc:156 xrc/DisplayConfig.xrc:386
+#: xrc/DisplayConfig.xrc:159 xrc/DisplayConfig.xrc:389
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
@@ -400,7 +400,7 @@ msgid "No usable rpi plugins found in %s"
 msgstr "Aucun plugin RPI utilisable n'a été trouvé dans %s"
 
 #: dialogs/display-config.cpp:614 dialogs/display-config.cpp:693
-#: xrc/DisplayConfig.xrc:132
+#: xrc/DisplayConfig.xrc:135
 msgid "Plugin"
 msgstr "Plugin"
 
@@ -657,7 +657,7 @@ msgstr "Sélectionner un fichier de code de triche"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Listes de codes de triche VBA (*.clt)|*.clt|Listes de codes de triche CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:284 panel.cpp:1045
+#: guiinit.cpp:284 panel.cpp:1063
 msgid "Loaded cheats"
 msgstr "Codes de triche chargés"
 
@@ -730,23 +730,23 @@ msgstr "Item du menu invalide %s; suppression"
 msgid "JoyBus host invalid; disabling"
 msgstr "Hôte JoyBus invalide ; désactivation"
 
-#: guiinit.cpp:2303
+#: guiinit.cpp:2304
 msgid "Code"
 msgstr "Code"
 
-#: guiinit.cpp:2309
+#: guiinit.cpp:2310
 msgid "Description"
 msgstr "Description"
 
-#: guiinit.cpp:2362 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2363 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adresse"
 
-#: guiinit.cpp:2363
+#: guiinit.cpp:2364
 msgid "Old Value"
 msgstr "Ancienne valeur"
 
-#: guiinit.cpp:2364
+#: guiinit.cpp:2365
 msgid "New Value"
 msgstr "Nouvelle valeur"
 
@@ -773,45 +773,45 @@ msgstr "Valeur \"%s\" invalide pour l'option %s"
 msgid "Unknown option %s with value %s"
 msgstr "Option %s inconnue, avec la valeur \"%s\""
 
-#: panel.cpp:669
+#: panel.cpp:687
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s n'est pas un fichier ROM valide"
 
-#: panel.cpp:670 panel.cpp:731 panel.cpp:817
+#: panel.cpp:688 panel.cpp:749 panel.cpp:835
 msgid "Problem loading file"
 msgstr "Problème de chargement du fichier"
 
-#: panel.cpp:730
+#: panel.cpp:748
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossible de lancer la ROM Game Boy %s"
 
-#: panel.cpp:755 panel.cpp:898 panel.cpp:1686
+#: panel.cpp:773 panel.cpp:916 panel.cpp:1775
 msgid "Could not initialize the sound driver!"
 msgstr "Impossible d'initialiser le pilote de son !"
 
-#: panel.cpp:766
+#: panel.cpp:784
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Impossible d'utiliser le fichier de BIOS Game Boy si le Hack de Colorisation est activé. Désactivation du fichier de BIOS Game Boy."
 
-#: panel.cpp:793 panel.cpp:911
+#: panel.cpp:811 panel.cpp:929
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Impossible de charger le BIOS %s"
 
-#: panel.cpp:816
+#: panel.cpp:834
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Impossible de lancer la ROM Game Boy Advance %s"
 
-#: panel.cpp:1082
+#: panel.cpp:1100
 msgid " player "
 msgstr "joueur"
 
-#: panel.cpp:1130
+#: panel.cpp:1148
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -820,11 +820,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Impossible de créer le répertoire Sauvegardes Natives :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
-#: panel.cpp:1131 panel.cpp:1152 wxvbam.cpp:1248
+#: panel.cpp:1149 panel.cpp:1170 wxvbam.cpp:1270
 msgid "Directory Error"
 msgstr "Erreur de Répertoire"
 
-#: panel.cpp:1151
+#: panel.cpp:1169
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -833,284 +833,284 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Impossible de créer le répertoire Sauegardes de l'Emulateur  :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
-#: panel.cpp:1295
+#: panel.cpp:1313
 #, c-format
 msgid "Loaded state %s"
 msgstr "Sauvegarde instantanée chargée %s"
 
-#: panel.cpp:1295
+#: panel.cpp:1313
 #, c-format
 msgid "Error loading state %s"
 msgstr "Erreur de chargement de la sauvegarde instantanée %s"
 
-#: panel.cpp:1319
+#: panel.cpp:1337
 #, c-format
 msgid "Saved state %s"
 msgstr "Sauvegarde instantanée enregistrée %s"
 
-#: panel.cpp:1319
+#: panel.cpp:1337
 #, c-format
 msgid "Error saving state %s"
 msgstr "Erreur d'enregistrement de la sauvegarde instantanée %s"
 
-#: panel.cpp:1519
+#: panel.cpp:1567
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Mode plein écran %dx%d-%d@%d non supporté ; recherche d'un autre mode"
 
-#: panel.cpp:1557
+#: panel.cpp:1605
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Mode plein écran %dx%d-%d@%d non supporté"
 
-#: panel.cpp:1562
+#: panel.cpp:1610
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Mode valide : %dx%d-%d@%d"
 
-#: panel.cpp:1570
+#: panel.cpp:1618
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Mode d'affichage sélectionné %dx%d-%d@%d"
 
-#: panel.cpp:1574
+#: panel.cpp:1622
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Impossible de changer de mode d'affichage pour %dx%d-%d@%d"
 
-#: panel.cpp:1661
+#: panel.cpp:1709
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Cartouche Game Boy Advance invalide"
 
-#: panel.cpp:1707
+#: panel.cpp:1796
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Le métal n'est pas disponible, le réglage par défaut est OpenGL."
 
-#: panel.cpp:1846
+#: panel.cpp:1953
 msgid "No memory for rewinding"
 msgstr "Pas de mémoire pour le rembobinage"
 
-#: panel.cpp:1856
+#: panel.cpp:1963
 msgid "Error writing rewind state"
 msgstr "Erreur d'écriture pour le rembobinage"
 
-#: panel.cpp:2940
+#: panel.cpp:3082
 msgid "Failed to set wayland display"
 msgstr "Échec du paramétrage d'affichage Wayland"
 
-#: panel.cpp:2968
+#: panel.cpp:3110
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Échec de l'initialition du sous-systèmes SDL video"
 
-#: panel.cpp:2979
+#: panel.cpp:3121
 msgid "Failed to initialize SDL video"
 msgstr "Échec de l'initialition de SDL video"
 
-#: panel.cpp:2988
+#: panel.cpp:3130
 msgid "Failed to set wayland surface"
 msgstr "Échec du paramétrage de Wayland surface"
 
-#: panel.cpp:3001
+#: panel.cpp:3143
 msgid "Failed to set parent window"
 msgstr "Échec du paramétrage de la fenêtre parente"
 
-#: panel.cpp:3010
+#: panel.cpp:3152
 msgid "Failed to set OpenGL properties"
 msgstr "Échec du paramétrage des proriétés d'OpenGL"
 
-#: panel.cpp:3023 panel.cpp:3062
+#: panel.cpp:3165 panel.cpp:3204
 msgid "Failed to create SDL window"
 msgstr "Échec de la création d'une fênêtre SDL"
 
-#: panel.cpp:3033 panel.cpp:3090
+#: panel.cpp:3175 panel.cpp:3232
 msgid "Renderer creating failed, using default renderer"
 msgstr "Échec de la création du moteur de rendu, utilisation du moteur de rendu par défaut"
 
-#: panel.cpp:3034
+#: panel.cpp:3176
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Erreur SDL : %s"
 
-#: panel.cpp:3041 panel.cpp:3096
+#: panel.cpp:3183 panel.cpp:3238
 msgid "Failed to create SDL renderer"
 msgstr "Échec de la création du mùoteur de rendu SDL"
 
-#: panel.cpp:3047
+#: panel.cpp:3189
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Échec de la configuration de vsync pour le rendu SDL"
 
-#: panel.cpp:3051 panel.cpp:3085
+#: panel.cpp:3193 panel.cpp:3227
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "Rendu SDL :%s"
 
-#: panel.cpp:3070
+#: panel.cpp:3212
 msgid "SDL renderer: default"
 msgstr "Rendu SDL : par défaut"
 
-#: panel.cpp:3746
+#: panel.cpp:3970
 msgid "Enabling EGL VSync."
 msgstr "Activation de la VSync EGL."
 
-#: panel.cpp:3748
+#: panel.cpp:3972
 msgid "Disabling EGL VSync."
 msgstr "Désactivation de la VSync EGL."
 
-#: panel.cpp:3755
+#: panel.cpp:3979
 msgid "Enabling GLX VSync."
 msgstr "Activation de la VSync GLX."
 
-#: panel.cpp:3757
+#: panel.cpp:3981
 msgid "Disabling GLX VSync."
 msgstr "Désactivation de la VSync GLX."
 
-#: panel.cpp:3775
+#: panel.cpp:3999
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Échec du paramétrage du glXSwapIntervalEXT"
 
-#: panel.cpp:3784
+#: panel.cpp:4008
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Échec du paramétrage du glXSwapIntervalSGI"
 
-#: panel.cpp:3793
+#: panel.cpp:4017
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Échec du paramétrage du glXSwapIntervalMESA"
 
-#: panel.cpp:3800
+#: panel.cpp:4024
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT non supporté"
 
-#: panel.cpp:3803
+#: panel.cpp:4027
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control non supporté"
 
-#: panel.cpp:3812
+#: panel.cpp:4036
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Échec du paramétrage de wglSwapIntervalEXT"
 
-#: panel.cpp:3818
+#: panel.cpp:4042
 msgid "No VSYNC available on this platform"
 msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
-#: panel.cpp:3914
+#: panel.cpp:4152
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Utilisation de Direct3D 9Ex (chargé dynamiquement)"
 
-#: panel.cpp:3918
+#: panel.cpp:4156
 msgid "Failed to load d3d9.dll"
 msgstr "Échec du chargement de d3d9.dll"
 
-#: panel.cpp:3927
+#: panel.cpp:4165
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Échec de la création de l'interface Direct3D 9"
 
-#: panel.cpp:3930
+#: panel.cpp:4168
 msgid "Using Direct3D 9"
 msgstr "Utilisation de Direct3D 9"
 
-#: panel.cpp:3937
+#: panel.cpp:4175
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur : 0x%08X"
 
-#: panel.cpp:3961
+#: panel.cpp:4199
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx non pris en charge, retour à l'effet Discard swap"
 
-#: panel.cpp:3977
+#: panel.cpp:4215
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Traitement matériel des sommets indisponible, retour au traitement logiciel"
 
-#: panel.cpp:4001
+#: panel.cpp:4239
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Échec de la création du périphérique Direct3D : 0x%08X"
 
-#: panel.cpp:4006
+#: panel.cpp:4244
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Périphérique Direct3D 9 %scréé avec succès (SwapEffect :%s )"
 
-#: panel.cpp:4039
+#: panel.cpp:4277
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DXDrawingPanel initialisé :%d x %d(échelle : %f)"
 
-#: panel.cpp:4061
+#: panel.cpp:4299
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur pour la réinitialisation : 0x%08X"
 
-#: panel.cpp:4093
+#: panel.cpp:4331
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Tentative de réinitialisation du périphérique Direct3D (SwapEffect :%s )"
 
-#: panel.cpp:4100
+#: panel.cpp:4338
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "Réinitialisation avec FlipEx échouée, nouvelle tentative avec effet d'échange Discard"
 
-#: panel.cpp:4112
+#: panel.cpp:4350
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Échec de la réinitialisation du périphérique Direct3D : 0x%08X"
 
-#: panel.cpp:4117
+#: panel.cpp:4355
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Réinitialisation du périphérique Direct3D réussie (effet d'échange final :%s )"
 
-#: panel.cpp:4181
+#: panel.cpp:4422
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Échec de la création de la texture : 0x%08X"
 
-#: panel.cpp:4193
+#: panel.cpp:4434
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Échec du verrouillage de la texture : 0x%08X"
 
-#: panel.cpp:4384
+#: panel.cpp:4628
 msgid "Memory allocation error"
 msgstr "Erreur d'allocation mémoire"
 
-#: panel.cpp:4387
+#: panel.cpp:4631
 msgid "Error initializing codec"
 msgstr "Erreur d'initialisation du codec"
 
-#: panel.cpp:4390
+#: panel.cpp:4634
 msgid "Error writing to output file"
 msgstr "Erreur d'écriture du fichier de sortie"
 
-#: panel.cpp:4393
+#: panel.cpp:4637
 msgid "Can't guess output format from file name"
 msgstr "Impossible de déduire le format de sortie à partir du nom de fichier"
 
-#: panel.cpp:4398
+#: panel.cpp:4642
 msgid "Programming error; aborting!"
 msgstr "Erreur de programmation ; annulation !"
 
-#: panel.cpp:4410 panel.cpp:4439
+#: panel.cpp:4654 panel.cpp:4683
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossible de commencer l'enregistrement de %s (%s)"
 
-#: panel.cpp:4467
+#: panel.cpp:4711
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio/vidéo (%s); annulation"
 
-#: panel.cpp:4473
+#: panel.cpp:4717
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio (%s) ; annulation"
 
-#: panel.cpp:4483
+#: panel.cpp:4727
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement vidéo (%s) ; annulation"
 
-#: panel.cpp:4674
+#: panel.cpp:4918
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume : %d %%"
@@ -1214,76 +1214,76 @@ msgstr "Bleu :"
 msgid "Unable to load dialog %s from resources"
 msgstr "Impossible de charger le dialogue %s depuis les ressources"
 
-#: wxvbam.cpp:543 wxvbam.cpp:560
+#: wxvbam.cpp:564 wxvbam.cpp:581
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Fichier de configuration invalide : %s"
 
-#: wxvbam.cpp:825
+#: wxvbam.cpp:847
 msgid "Save built-in XRC file and exit"
 msgstr "Sauvegarder le fichier XRC intégré et quitter"
 
-#: wxvbam.cpp:828
+#: wxvbam.cpp:850
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Sauvegarder le fichier vba-over.ini intégré et quitter"
 
-#: wxvbam.cpp:831
+#: wxvbam.cpp:853
 msgid "Print configuration path and exit"
 msgstr "Afficher le chemin de configuration et quitter"
 
-#: wxvbam.cpp:834
+#: wxvbam.cpp:856
 msgid "Start in full-screen mode"
 msgstr "Démarrer en mode plein écran"
 
-#: wxvbam.cpp:837
+#: wxvbam.cpp:859
 msgid "Set a configuration file"
 msgstr "Choisir un fichier de configuration"
 
-#: wxvbam.cpp:841
+#: wxvbam.cpp:863
 msgid "Delete shared link state first, if it exists"
 msgstr "Supprimer l'objet de mémoire partagé, s'il existe"
 
-#: wxvbam.cpp:848
+#: wxvbam.cpp:870
 msgid "List all settable options and exit"
 msgstr "Lister toutes les options configurables et quitter"
 
-#: wxvbam.cpp:851
+#: wxvbam.cpp:873
 msgid "ROM file"
 msgstr "Fichier ROM"
 
-#: wxvbam.cpp:853
+#: wxvbam.cpp:875
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:884
+#: wxvbam.cpp:906
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Erreur de configuration / d'assemblage : impossible de trouver le fichier xrc intégré"
 
-#: wxvbam.cpp:892
+#: wxvbam.cpp:914
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "A écrit la configuration intégrée dans %s.\nPour remplacer, supprimez tout sauf les nœud(s) racine modifiés. Le premier nœud racine trouvé avec le nom correct dans les fichiers .xrc ou .xrs du chemin de recherche suivant remplace la configuration intégrée :"
 
-#: wxvbam.cpp:906
+#: wxvbam.cpp:928
 msgid "Configuration is read from, in order:"
 msgstr "La configuration est lue depuis, dans l'ordre :"
 
-#: wxvbam.cpp:920
+#: wxvbam.cpp:942
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Override intégré enregistré sur %s\nPour passer outre, tout supprimer sauf la section changée. La première section trouvée est utilisée depuis le chemin de recherche :"
 
-#: wxvbam.cpp:926
+#: wxvbam.cpp:948
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tintégré"
 
-#: wxvbam.cpp:941
+#: wxvbam.cpp:963
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1291,21 +1291,21 @@ msgid ""
 "\n"
 msgstr "Les options définies depuis la ligne de commande sont sauvegardées si des changements de configuration sont faits dans l'interface utilisateur.\n\nPour les options flag, vrai et faux sont spécifiés comme 1 et 0, respectivement.\n\n"
 
-#: wxvbam.cpp:949
+#: wxvbam.cpp:971
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Les commandes disponibles pour les options Keyboard/* sont :\n\n"
 
-#: wxvbam.cpp:961
+#: wxvbam.cpp:983
 msgid "Configuration file not found."
 msgstr "Fichier de configuration introuvable."
 
-#: wxvbam.cpp:992
+#: wxvbam.cpp:1014
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Mauvaise option de configuration ou plusieurs fichiers ROM fournis :\n"
 
-#: wxvbam.cpp:1247
+#: wxvbam.cpp:1269
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1313,6 +1313,10 @@ msgid ""
 "\n"
 "Please check your configured path in Options > Directories."
 msgstr "Impossible de créer le répertoire :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
+
+#: wxvbam.cpp:1534
+msgid "Failed to load dialog"
+msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:446
@@ -1399,7 +1403,7 @@ msgid "Auto B"
 msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:323
+#: xrc/DisplayConfig.xrc:326
 msgid "Speed"
 msgstr "Vitesse"
 
@@ -1416,194 +1420,194 @@ msgstr "GameShark"
 msgid "Joypad %zu %s"
 msgstr "Manette %zu %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:419
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
 msgid "Use bilinear filter with 3d renderer"
 msgstr "Utilise le filtre bilinéaire avec le rendu 3D"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:420
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
 msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr "Utilisez le filtre pixel art SDL avec un moteur de rendu SDL."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:421
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
 msgid "Full-screen filter to apply"
 msgstr "Filtre Plein Écran à appliquer"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:425
 msgid "Filter plugin library"
 msgstr "Bibliothèque du plugin Filtre"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:426
 msgid "Interframe blending function"
 msgstr "Filtre de fusion inter-image"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:427
 msgid "Bit depth"
 msgstr "Profondeur de Bits"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:425
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:428
 msgid "Keep window on top"
 msgstr "Garder la fenêtre sur le dessus"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:427
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:430
 msgid "Maximum number of threads to run filters in"
 msgstr "Nombre maximum de threads pour les filtres "
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:429
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "Méthode de rendu ; si non supporté, la méthode simple sera utilisée"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:430
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Default scale factor"
 msgstr "Facteur d'échelle par défaut"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:431
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
 msgid "Retain aspect ratio when resizing"
 msgstr "Conserver les propotions lors du redimensionnement"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
 msgid "SDL renderer"
 msgstr "Moteur de rendu SDL"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Color correction profile"
 msgstr "Profil de correction des couleurs"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "Fichier BIOS Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
 msgid "Enable DX Colorization Hacks"
 msgstr "Activer les hacks de colorisation DX"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
 msgid "Apply LCD filter, if enabled"
 msgstr "Appliquer le filtre LCD, si est activé"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "Fichier BIOS Game Boy Color, si activé"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "La palette par défaut, sous forme de 8 entiers hexadécimaux à 4 chiffres séparés par des virgules (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "La première palette utilisateur, sous forme de 8 entiers hexadécimaux à 4 chiffres séparés par des virgules (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "La deuxième palette utilisateur, sous la forme de 8 entiers hexadécimaux à 4 chiffres séparés par des virgules (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:453
 msgid "Automatically gather a full page before printing"
 msgstr "Rassembler automatiquement une page entière avant l'impression"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "Enregistrer automatiquement les impressions en tant que captures d'écran avec le suffixe -print."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
 msgid "Directory to look for ROM files"
 msgstr "Répertoire pour la recherche de fichiers ROM"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:458
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "Répertoire pour la recherche de fichiers ROM Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
 msgid "Color lightness factor"
 msgstr "Facteur de luminosité des couleurs"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
 msgid "BIOS file to use, if enabled"
 msgstr "Fichier BIOS à utiliser, si activé"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
 msgid "Enable link at boot"
 msgstr "Activer le link au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:474
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:477
 msgid "Enable faster network protocol by default"
 msgstr "Activez le protocole réseau le plus rapide par défaut"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:476
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:479
 msgid "Default network link client host"
 msgstr "Lien réseau par défaut du client hôte"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:477
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:480
 msgid "Default network link server IP to bind"
 msgstr "IP du serveur de lien réseau par défaut à définir"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:478
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
 msgid "Default network link port (server and client)"
 msgstr "Port de liaison réseau par défaut (serveur et client)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:479
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
 msgid "Default network protocol"
 msgstr "Protocole réseau par défaut"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:480
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
 msgid "Link timeout (ms)"
 msgstr "Délai de liaison (ms)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
 msgid "Link cable type"
 msgstr "Type de cable pour le Link"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Color darkness factor"
 msgstr "Facteur d'obscurité des couleurs"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
 msgid "Automatically load last saved state"
 msgstr "Chargement automatique du dernier état sauvegardé"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "Répertoire pour stocker les fichiers de sauvegarde du jeu (les chemins relatifs sont relatifs à la ROM ; blank est le répertoire de configuration)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Freeze recent load list"
 msgstr "Geler la liste des chargements récents"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
 msgstr "Répertoire pour stocker les enregistrements A/V et les rediffusions (les chemins relatifs sont relatifs à la ROM)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "Nombre de secondes entre les captures d'écran de rembobinage (0 pour désactiver)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:498
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "Répertoire pour stocker les captures d'écran (les chemins relatifs sont relatifs à la ROM)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "Répertoire pour stocker les fichiers de sauvegardé d'état (les chemins relatifs sont relatifs à BatteryDir)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:503
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid "Enable status bar"
 msgstr "Activer la barre d'état"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:507
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "Version du fichier INI (NE PAS MODIFIER)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1611,275 +1615,275 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "Le paramètre Joypad/<n>/<button> contient une liste de noms de touches séparés par une virgule qui désignent le bouton <button> de la manette #<n>. Le bouton peut être Haut, Bas, Gauche, Droite, A, B, L, R, Select, Start, Mouvement vers le Haut, Mouvement vers le Bas, Mouvement vers la Gauche, Mouvement vers la Droite, Auto A, Auto B, Vitesse, Capture d'écran, GameShark"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:513
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "Délai d'activation de l'autofire, en images (1/60 s)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "The number of the stick to use in single-player mode"
 msgstr "La manette à utiliser en mode un joueur"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
 msgid "Whether to enable SDL GameController mode"
 msgstr "Activer ou non le mode GameController SDL"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:523
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "Le paramètre Clavier/<cmd> contient une liste de noms de touches séparés par une virgule (e.g. ALT+MAJ+F1). Quand la touche est appuyée, la commande <cmd> est exécutée."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
 msgid "Enable AGB debug print"
 msgstr "Activer l'impression de débogage de l'AGB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Auto skip frames"
 msgstr "Saut automatique d'images"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "Appliquer les correctifs IPS/UPS/IPF s'ils sont trouvés"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
 msgid "Automatically save and load cheat list"
 msgstr "Sauvegarde et chargement automatiques de la liste des codes de triches"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "Activation automatique de la bordure pour les jeux Super Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
 msgid "Always enable border"
 msgstr "Toujours activer la bordure"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
 msgid "Screen capture file format"
 msgstr "Format de fichier de capture d'écran"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
 msgid "Enable cheats"
 msgstr "Activer les codes de triches"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:542
 msgid "Disable on-screen status messages"
 msgstr "Désactiver les messages d'état à l'écran"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
 msgid "Type of system to emulate"
 msgstr "Type de système à émuler"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Taille de la mémoire Flash 0 = 64KO 1 = 128KO"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "Sauter des images. Les valeurs sont 0-9 ou -1 pour sauter automatiquement en fonction de l'affichage."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "The palette to use"
 msgstr "La palette à utiliser"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "Enable printer emulation"
 msgstr "Activer l'émulation de l'imprimante"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
 msgid "Break into GDB after loading the game."
 msgstr "Entrer dans GDB après avoir chargé le jeu."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid "Port to connect GDB to"
 msgstr "Port à utiliser pour la connexion GDB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
 msgid "Number of players in network"
 msgstr "Nombre de joueurs en ligne"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "Facteur d'échelle maximal (0 = aucune limite)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid "Pause game when main window loses focus"
 msgstr "Pause du jeu lorsque la fenêtre principale perd le focus"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "Activer le RTC (réécrire vba-over.ini est rtcEnabled)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
 msgid "Native save (\"battery\") hardware type"
 msgstr "Type de matériel de sauvegarde natif (\"batterie\")"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Show speed indicator"
 msgstr "Afficher l'indicateur de vitesse"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
 msgid "Skip BIOS initialization"
 msgstr "Passer l'initialisation du BIOS"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Do not overwrite cheat list when loading state"
 msgstr "Ne pas écraser la liste des cheats lors du chargement de l'état."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "Ne pas écraser la sauvegarde native (batterie) lors du chargement de l'état"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "Vitesse du jeu, même en cas d'accélération (0-450%, 0 = pas d'accélération)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "Régler l'accélération pour la touche d'accélération (0-3000%, 0 = pas d'accélération)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "Nombre d'images à sauter avec le speedup (au lieu de l'accélérateur de speedup)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
 msgid "Use frame skip for speedup throttle"
 msgstr "Utiliser le saut de trame pour accélérer l'accélérateur."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
 msgid "Mute sound during speedup"
 msgstr "Couper le son lors de l'accélération"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "Utiliser le fichier BIOS spécifié pour la Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Use the specified BIOS file"
 msgstr "Utiliser le fichier BIOS spécifié"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "Utiliser le fichier BIOS spécifié pour la Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Wait for vertical sync"
 msgstr "Attendre la synchronisation verticale"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
 msgid "Enter fullscreen mode at startup"
 msgstr "Entrer en mode plein écran au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:585
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
 msgid "Window maximized"
 msgstr "Fenêtre maximisée"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Window height at startup"
 msgstr "Hauteur de la fenêtre au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
 msgid "Window width at startup"
 msgstr "Largeur de la fenêtre au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "Window axis X position at startup"
 msgstr "Position X de l'axe de la fenêtre au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
 msgid "Window axis Y position at startup"
 msgstr "Position Y de l'axe de la fenêtre au démarrage"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:593
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
 msgid "Capture key events while on background"
 msgstr "Capturez les évènements clés en arrière-plan"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid "Capture joy events while on background"
 msgstr "Capture des évènements du joystick en arrière-plan"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "Hide menu bar when mouse is inactive"
 msgstr "Masquer la barre de menu lorsque la souris est inactive"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
 msgid "Suspend screensaver when game is running"
 msgstr "Désactiver l'économiseur d'écran quand un jeu tourne"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "API Son ; si elle n'est pas prise en charge, l'API par défaut sera utilisée."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "Device ID du périphérique audio choisi pour le pilote choisi"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Number of sound buffers"
 msgstr "Nombre de tampons sonores"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
 msgid "Bit mask of sound channels to enable"
 msgstr "Masque de bits des canaux sonores à activer"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "Filtrage du son de la Game Boy Advance (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "Game Boy Advance sound interpolation"
 msgstr "Interpolation du son de la Game Boy Advance"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
 msgid "Game Boy sound declicking"
 msgstr "Déclicage du son Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:609
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
 msgid "Game Boy echo effect (%)"
 msgstr "Effet écho de la Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
 msgid "Enable Game Boy sound effects"
 msgstr "Activer les effets sonores de la Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
 msgid "Game Boy stereo effect (%)"
 msgstr "Effet stéréo pour la Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "Game Boy surround sound effect (%)"
 msgstr "Effet de son surround pour la Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
 msgid "Sound sample rate (kHz)"
 msgstr "Fréquence d'échantillonnage du son (kHz)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
 msgid "Use DirectSound hardware acceleration"
 msgstr "Activer l'accélération matérielle DirectSound"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
 msgid "Upmix stereo to surround"
 msgstr "Remixage stéréo vers surround"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
 msgid "Sound volume (%)"
 msgstr "Volume du Son (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
 msgid "Language"
 msgstr "Langue"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
 msgid "External translations"
 msgstr "Traductions externes"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:693
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:713
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:734
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:755
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:775
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:795
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:696
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:716
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:737
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:758
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:778
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:798
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Valeur invalide %s pour l'option %s ; les valeurs valides sont %s"
@@ -2635,119 +2639,119 @@ msgstr "Mode TV"
 msgid "Simple 4x"
 msgstr "Simple 4x"
 
-#: xrc/DisplayConfig.xrc:139
+#: xrc/DisplayConfig.xrc:142
 msgid "Plugin:"
 msgstr "Plugin :"
 
-#: xrc/DisplayConfig.xrc:149
+#: xrc/DisplayConfig.xrc:152
 msgid "Interframe blending:"
 msgstr "Filtre de fusion inter-image :"
 
-#: xrc/DisplayConfig.xrc:157
+#: xrc/DisplayConfig.xrc:160
 msgid "Smart"
 msgstr "Intelligent"
 
-#: xrc/DisplayConfig.xrc:158
+#: xrc/DisplayConfig.xrc:161
 msgid "Motion Blur"
 msgstr "Flou de mouvement"
 
-#: xrc/DisplayConfig.xrc:170
+#: xrc/DisplayConfig.xrc:173
 msgid "Bit Depth"
 msgstr "Profondeur de Bits"
 
-#: xrc/DisplayConfig.xrc:179
+#: xrc/DisplayConfig.xrc:182
 msgid "Bit Depth:"
 msgstr "Profondeur de Bits"
 
-#: xrc/DisplayConfig.xrc:187
+#: xrc/DisplayConfig.xrc:190
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:188
+#: xrc/DisplayConfig.xrc:191
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:189
+#: xrc/DisplayConfig.xrc:192
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:190
+#: xrc/DisplayConfig.xrc:193
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:198
+#: xrc/DisplayConfig.xrc:201
 msgid "Color Correction"
 msgstr "Correction des couleurs"
 
-#: xrc/DisplayConfig.xrc:207
+#: xrc/DisplayConfig.xrc:210
 msgid "Profile:"
 msgstr "Profil :"
 
-#: xrc/DisplayConfig.xrc:241
+#: xrc/DisplayConfig.xrc:244
 msgid "GBA Darken:"
 msgstr "GBA Assombrie :"
 
-#: xrc/DisplayConfig.xrc:260
+#: xrc/DisplayConfig.xrc:263
 msgid "Lighter"
 msgstr "Plus léger"
 
-#: xrc/DisplayConfig.xrc:271
+#: xrc/DisplayConfig.xrc:274
 msgid "Very Dark"
 msgstr "Très foncé"
 
-#: xrc/DisplayConfig.xrc:282
+#: xrc/DisplayConfig.xrc:285
 msgid "GBC Lighten:"
 msgstr "GBC Eclaircie :"
 
-#: xrc/DisplayConfig.xrc:301
+#: xrc/DisplayConfig.xrc:304
 msgid "Darker"
 msgstr "Plus foncé"
 
-#: xrc/DisplayConfig.xrc:312
+#: xrc/DisplayConfig.xrc:315
 msgid "Very Light"
 msgstr "Très léger"
 
-#: xrc/DisplayConfig.xrc:329
+#: xrc/DisplayConfig.xrc:332
 msgid "Frame Skip"
 msgstr "Saut d'image"
 
-#: xrc/DisplayConfig.xrc:347
+#: xrc/DisplayConfig.xrc:350
 msgid "&Number of frames to skip:"
 msgstr "&Nombre d'images à passer :"
 
-#: xrc/DisplayConfig.xrc:371
+#: xrc/DisplayConfig.xrc:374
 msgid "On-Screen Display"
 msgstr "Affichage sur l'écran"
 
-#: xrc/DisplayConfig.xrc:378
+#: xrc/DisplayConfig.xrc:381
 msgid "Speed indicator:"
 msgstr "Indicateur de vitesse :"
 
-#: xrc/DisplayConfig.xrc:387
+#: xrc/DisplayConfig.xrc:390
 msgid "Percentage"
 msgstr "Pourcentage"
 
-#: xrc/DisplayConfig.xrc:388
+#: xrc/DisplayConfig.xrc:391
 msgid "Detailed"
 msgstr "Détaillé"
 
-#: xrc/DisplayConfig.xrc:396
+#: xrc/DisplayConfig.xrc:399
 msgid "Zoom"
 msgstr "Zoom"
 
-#: xrc/DisplayConfig.xrc:406
+#: xrc/DisplayConfig.xrc:409
 msgid "Default magnification:"
 msgstr "Zoom par défaut :"
 
-#: xrc/DisplayConfig.xrc:424
+#: xrc/DisplayConfig.xrc:427
 msgid "Maximum magnification factor:"
 msgstr "Zoom maximum :"
 
-#: xrc/DisplayConfig.xrc:425
+#: xrc/DisplayConfig.xrc:428
 msgid "0 = no maximum"
 msgstr "0 = pas de maximum"
 
-#: xrc/DisplayConfig.xrc:432
+#: xrc/DisplayConfig.xrc:435
 msgid "0 = no limit"
 msgstr "0 = aucune limite"
 
