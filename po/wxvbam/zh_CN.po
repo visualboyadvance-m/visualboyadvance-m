@@ -1320,7 +1320,7 @@ msgstr "无法创建目录：\n%s\n\n请检查您在“选项”>“目录”中
 
 #: wxvbam.cpp:1534
 msgid "Failed to load dialog"
-msgstr ""
+msgstr "加载对话框失败"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:446
