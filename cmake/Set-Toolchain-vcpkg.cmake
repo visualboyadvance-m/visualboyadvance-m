@@ -324,7 +324,7 @@ function(get_triplet_package_list triplet)
     endif()
 
     file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
         STATUS pkg_list_status
     )
     list(GET pkg_list_status 1 pkg_list_error)
