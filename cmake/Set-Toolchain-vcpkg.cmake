@@ -226,6 +226,13 @@ if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x64-mingw")
     endif()
 endif()
 
+# Detect MSVC toolkit version for binary package URL path.
+# v143 = VS 2022 (VCToolsVersion env var starts with 14.3).
+set(VBAM_VCPKG_TOOLKIT_SUBDIR "")
+if("$ENV{VCToolsVersion}" MATCHES "^14\\.[34]")
+    set(VBAM_VCPKG_TOOLKIT_SUBDIR "v143/")
+endif()
+
 function(vcpkg_check_git_status git_status)
     # The VS vcpkg component cannot be written to without elevation.
     if(NOT git_status EQUAL 0 AND NOT VCPKG_ROOT MATCHES "Visual Studio")
@@ -317,7 +324,7 @@ function(get_triplet_package_list triplet)
     endif()
 
     file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${triplet}/" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
         STATUS pkg_list_status
     )
     list(GET pkg_list_status 1 pkg_list_error)
@@ -325,6 +332,7 @@ function(get_triplet_package_list triplet)
 
     if(NOT pkg_list_status EQUAL 0)
         message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
+        file(REMOVE "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
         return()
     endif()
 endfunction()
@@ -332,10 +340,10 @@ endfunction()
 function(download_package pkg pkgs_dir)
     string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
 
-    message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg} ...")
+    message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${pkg_triplet}/${pkg} ...")
 
     file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_triplet}/${pkg}" "${pkgs_dir}/${pkg}"
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${pkg_triplet}/${pkg}" "${pkgs_dir}/${pkg}"
         STATUS pkg_download_status
     )
     list(GET pkg_download_status 1 pkg_download_error)
@@ -380,11 +388,16 @@ function(get_binary_packages)
     endif()
 
     file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_TARGET_TRIPLET}.html" raw_html)
-    string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links ${raw_html})
+    string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links "${raw_html}")
     foreach(link ${links})
-        string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${link})
+        string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg "${link}")
         list(APPEND binary_packages ${pkg})
     endforeach()
+
+    if(NOT binary_packages)
+        message(STATUS "No binary packages found for triplet '${VCPKG_TARGET_TRIPLET}', falling back to building ports.")
+        return()
+    endif()
 
     set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
     include(FetchContent)
@@ -458,7 +471,7 @@ function(get_binary_packages)
                 get_triplet_package_list(${host_dep_triplet})
 
                 file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_dep_triplet}.html" raw_html)
-                string(REGEX MATCHALL "<a href=\"${host_dep_name}_[^\"]+[.]zip\"" links ${raw_html})
+                string(REGEX MATCHALL "<a href=\"${host_dep_name}_[^\"]+[.]zip\"" links "${raw_html}")
 
                 list(LENGTH links links_count)
 
