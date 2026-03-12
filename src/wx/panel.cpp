@@ -16,9 +16,6 @@
     #include <X11/Xlib.h>
     #define Status int
     #include <gdk/gdkx.h>
-    #ifdef HAVE_WAYLAND_SUPPORT
-    #include <gdk/gdkwayland.h>
-    #endif //HAVE_WAYLAND_SUPPORT
     #include <gtk/gtk.h>
     // For Wayland EGL.
     #ifdef HAVE_EGL
@@ -72,6 +69,10 @@
 #include "wx/wayland.h"
 #include "wx/widgets/render-plugin.h"
 #include "wx/widgets/user-input-event.h"
+
+#if defined(__WXGTK__) && defined(HAVE_WAYLAND_SUPPORT)
+    #include <gdk/gdkwayland.h>
+#endif //HAVE_WAYLAND_SUPPORT
 
 #ifdef __WXMSW__
 #include <windows.h>
