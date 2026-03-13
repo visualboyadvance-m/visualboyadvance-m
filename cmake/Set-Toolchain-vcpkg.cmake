@@ -323,8 +323,13 @@ function(get_triplet_package_list triplet)
         return()
     endif()
 
+    set(pkg_dir "${triplet}")
+    if(triplet STREQUAL VCPKG_TARGET_TRIPLET)
+        set(pkg_dir "${triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
+    endif()
+
     file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
         STATUS pkg_list_status
     )
     list(GET pkg_list_status 1 pkg_list_error)
@@ -342,8 +347,13 @@ function(download_package pkg pkgs_dir)
 
     message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${pkg_triplet}/${pkg} ...")
 
+    set(pkg_dir "${pkg_triplet}")
+    if(pkg_triplet STREQUAL VCPKG_TARGET_TRIPLET)
+        set(pkg_dir "${pkg_triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
+    endif()
+
     file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${pkg_triplet}/${pkg}" "${pkgs_dir}/${pkg}"
+        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg}" "${pkgs_dir}/${pkg}"
         STATUS pkg_download_status
     )
     list(GET pkg_download_status 1 pkg_download_error)
