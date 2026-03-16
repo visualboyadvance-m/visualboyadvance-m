@@ -528,6 +528,8 @@ endfunction()
 
 
 function(vcpkg_set_toolchain)
+    get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
+
     if(NOT DEFINED VCPKG_BINARY_PACKAGES)
         set(VCPKG_BINARY_PACKAGES TRUE)
     endif()
@@ -537,8 +539,6 @@ function(vcpkg_set_toolchain)
     endif()
 
     if(NOT DEFINED ENV{VCPKG_ROOT})
-        get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
-
         if(WIN32)
             if(EXISTS /vcpkg)
                 set(VCPKG_ROOT /vcpkg)
