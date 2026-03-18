@@ -345,12 +345,12 @@ endfunction()
 function(download_package pkg pkgs_dir)
     string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
 
-    message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${VBAM_VCPKG_TOOLKIT_SUBDIR}${pkg_triplet}/${pkg} ...")
-
     set(pkg_dir "${pkg_triplet}")
     if(pkg_triplet STREQUAL VCPKG_TARGET_TRIPLET)
         set(pkg_dir "${pkg_triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
     endif()
+
+    message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg} ...")
 
     file(
         DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg}" "${pkgs_dir}/${pkg}"
