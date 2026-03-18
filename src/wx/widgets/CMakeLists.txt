@@ -13,6 +13,7 @@ target_sources(vbam-wx-widgets
     keep-on-top-styler.cpp
     keyboard-input-handler.cpp
     option-validator.cpp
+    pulse-action-dialog.cpp
     render-plugin.cpp
     user-input-ctrl.cpp
     user-input-event.cpp
@@ -31,6 +32,7 @@ target_sources(vbam-wx-widgets
     keep-on-top-styler.h
     keyboard-input-handler.h
     option-validator.h
+    pulse-action-dialog.h
     render-plugin.h
     user-input-ctrl.h
     user-input-event.h

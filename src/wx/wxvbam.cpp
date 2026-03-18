@@ -23,7 +23,6 @@
 #include <wx/fs_mem.h>
 #include <wx/menu.h>
 #include <wx/mstream.h>
-#include <wx/progdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/regex.h>
 #include <wx/spinctrl.h>

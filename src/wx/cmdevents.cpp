@@ -3,7 +3,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/ffile.h>
 #include <wx/numdlg.h>
-#include <wx/progdlg.h>
+#include "wx/widgets/pulse-action-dialog.h"
 #include <wx/regex.h>
 #include <wx/sstream.h>
 #include <wx/url.h>
@@ -1952,25 +1952,18 @@ void MainFrame::GDBBreak()
                 msg.Printf(_("Waiting for connection on port %d"), gopts.gdb_port);
             }
 
-            wxProgressDialog dlg(_("Waiting for GDB..."), msg, 100, this,
-                wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
             bool connected = false;
-
-            while (dlg.Pulse()) {
+            widgets::PulseActionDialog dlg(this, _("Waiting for GDB..."), msg,
+                [&](wxString&) {
 #ifndef __WXMSW__
-
-                if (!gopts.gdb_port)
-                    connected = debugWaitPty();
-                else
+                    if (!gopts.gdb_port)
+                        connected = debugWaitPty();
+                    else
 #endif
-                    connected = debugWaitSocket();
-
-                if (connected)
-                    break;
-
-                // sleep a bit more in case of infinite loop
-                wxMilliSleep(10);
-            }
+                        connected = debugWaitSocket();
+                    return !connected;
+                });
+            dlg.ShowModal();
 
             if (connected) {
                 remotePort = gopts.gdb_port;

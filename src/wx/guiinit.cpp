@@ -24,7 +24,7 @@
 #include <wx/filepicker.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
-#include <wx/progdlg.h>
+#include "wx/widgets/pulse-action-dialog.h"
 #include <wx/radiobut.h>
 #include <wx/scrolwin.h>
 #include <wx/slider.h>
@@ -167,19 +167,17 @@ public:
 
         // Display a progress dialog while the connection is establishing
         if (state == LINK_NEEDS_UPDATE) {
-            wxProgressDialog pdlg(title, connmsg,
-                100, dlg, wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_ELAPSED_TIME);
-
-            while (state == LINK_NEEDS_UPDATE) {
-                // Ask the core for updates
-                char message[length];
-                state = ConnectLinkUpdate(message, length);
-                connmsg = wxString(message, wxConvLibc);
-
-                // Does the user want to abort?
-                if (!pdlg.Pulse(connmsg)) {
-                    state = LINK_ABORT;
-                }
+            widgets::PulseActionDialog pdlg(dlg, title, connmsg,
+                [&](wxString& msg) {
+                    char message[length];
+                    state = ConnectLinkUpdate(message, length);
+                    connmsg = wxString(message, wxConvLibc);
+                    msg = connmsg;
+                    return state == LINK_NEEDS_UPDATE;
+                });
+            pdlg.ShowModal();
+            if (pdlg.WasCancelled()) {
+                state = LINK_ABORT;
             }
         }
 
