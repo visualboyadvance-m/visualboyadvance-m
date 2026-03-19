@@ -125,6 +125,9 @@ BaseDialog::BaseDialog(wxWindow* parent, const wxString& xrc_file)
             for (wxWindowList::iterator it = children.begin(); it != children.end(); ++it) {
                 wxWindow* child = *it;
                 if (wxNotebook* notebook = wxDynamicCast(child, wxNotebook)) {
+                    // Fix the notebook itself so the tab bar scroll arrows
+                    // don't have a black background.
+                    notebook->SetBackgroundColour(*wxWHITE);
                     for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
                         wxWindow* page = notebook->GetPage(i);
                         if (page) {
