@@ -485,8 +485,11 @@ function(get_binary_packages)
 
                 list(LENGTH links links_count)
 
-                if(NOT links_count EQUAL 1)
+                if(links_count GREATER 1)
                     message(STATUS "Multiple host dependencies found for '${host_dep_name}' for triplet '${host_dep_triplet}', aborting.")
+                    return()
+                elseif(links_count EQUAL 0)
+                    message(STATUS "No host dependencies found for '${host_dep_name}' for triplet '${host_dep_triplet}', aborting.")
                     return()
                 endif()
 
