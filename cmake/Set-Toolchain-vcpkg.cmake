@@ -478,6 +478,14 @@ function(get_binary_packages)
                 set(host_dep_name    ${CMAKE_MATCH_1})
                 set(host_dep_triplet ${CMAKE_MATCH_2})
 
+                set(pkg_installed FALSE)
+                vcpkg_is_installed(${host_dep_name} 0 ${host_dep_triplet} ${POWERSHELL} pkg_installed)
+
+                if(pkg_installed)
+                    list(APPEND installed_host_deps "${host_dep_name}_0_${host_dep_triplet}.zip") 
+                    continue()
+                endif()
+
                 get_triplet_package_list(${host_dep_triplet})
 
                 file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_dep_triplet}.html" raw_html)
@@ -498,18 +506,14 @@ function(get_binary_packages)
                 list(FIND installed_host_deps "${pkg}" found_idx)
 
                 if(found_idx EQUAL -1)
-                    zip_is_installed(${pkg} pkg_installed)
+                    download_package("${pkg}" "${bin_pkgs_dir}")
 
-                    if(NOT pkg_installed)
-                        download_package("${pkg}" "${bin_pkgs_dir}")
-
-                        if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
-                            message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
-                            return()
-                        endif()
-                    else()
-                        list(APPEND installed_host_deps "${pkg}")
+                    if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
+                        message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
+                        return()
                     endif()
+
+                    list(APPEND installed_host_deps "${pkg}")
                 endif()
             endforeach()
         endwhile()
