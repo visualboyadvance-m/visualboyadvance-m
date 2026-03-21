@@ -49,7 +49,6 @@ set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads gettext-libintl wxwidgets na
 
 set(VCPKG_DEPS_OPTIONAL
     "sdl3[vulkan]"      ENABLE_SDL3
-    "sdl2[samplerate]"  ENABLE_SDL2
     openal-soft         ENABLE_OPENAL
     "ffmpeg[x264,x265]" ENABLE_FFMPEG
     faudio              ENABLE_FAUDIO

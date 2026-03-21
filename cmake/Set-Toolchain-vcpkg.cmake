@@ -390,25 +390,82 @@ endfunction()
 function(get_binary_packages)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
+    # Build the list of wanted port names from VCPKG_DEPS and VCPKG_DEPS_OPTIONAL.
+    set(wanted_ports "")
+
+    # Add core dependencies (strip [features] to get bare port names).
+    foreach(dep ${VCPKG_DEPS})
+        string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
+        list(APPEND wanted_ports "${port_name}")
+    endforeach()
+
+    # Add optional dependencies unless explicitly turned off.
+    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
+    if(optionals_list_len GREATER 0)
+        math(EXPR optionals_list_last "${optionals_list_len} - 1")
+
+        foreach(i RANGE 0 ${optionals_list_last} 2)
+            list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
+            math(EXPR var_idx "${i} + 1")
+            list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
+
+            if(NOT DEFINED ${var} OR ${var})
+                string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
+                list(APPEND wanted_ports "${port_name}")
+            endif()
+        endforeach()
+    endif()
+
+    if(NOT wanted_ports)
+        message(STATUS "No packages to install.")
+        return()
+    endif()
+
+    # Download the package listing for the target triplet.
     get_triplet_package_list(${VCPKG_TARGET_TRIPLET})
 
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_TARGET_TRIPLET}.html")
-        message(STATUS "Failed to download binary package list found for triplet '${VCPKG_TARGET_TRIPLET}', aborting.")
+        message(STATUS "Failed to download binary package list for triplet '${VCPKG_TARGET_TRIPLET}'.")
         return()
     endif()
 
     file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_TARGET_TRIPLET}.html" raw_html)
     string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links "${raw_html}")
+    set(all_packages "")
     foreach(link ${links})
         string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg "${link}")
-        list(APPEND binary_packages ${pkg})
+        list(APPEND all_packages ${pkg})
     endforeach()
 
-    if(NOT binary_packages)
-        message(STATUS "No binary packages found for triplet '${VCPKG_TARGET_TRIPLET}', falling back to building ports.")
+    if(NOT all_packages)
+        message(STATUS "No binary packages available for triplet '${VCPKG_TARGET_TRIPLET}'.")
         return()
     endif()
 
+    # Match wanted ports against available binary packages.
+    # Skip ports with no binary package instead of aborting.
+    set(binary_packages "")
+    set(all_ports_found TRUE)
+    foreach(port ${wanted_ports})
+        set(found FALSE)
+        foreach(pkg ${all_packages})
+            if(pkg MATCHES "^${port}_")
+                list(APPEND binary_packages "${pkg}")
+                set(found TRUE)
+                break()
+            endif()
+        endforeach()
+        if(NOT found)
+            message(STATUS "No binary package found for port '${port}', will build from source.")
+            set(all_ports_found FALSE)
+        endif()
+    endforeach()
+
+    if(NOT binary_packages)
+        return()
+    endif()
+
+    # Fetch vcpkg-binpkg tool.
     set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
     include(FetchContent)
     FetchContent_Declare(
@@ -416,15 +473,14 @@ function(get_binary_packages)
         URL "https://github.com/rkitover/vcpkg-binpkg-prototype/archive/refs/heads/master.zip"
         SOURCE_DIR ${vcpkg_binpkg_dir}
     )
-
     FetchContent_GetProperties(vcpkg_binpkg)
     if(NOT vcpkg_binpkg_POPULATED)
         FetchContent_MakeAvailable(vcpkg_binpkg)
     endif()
 
+    # Filter out already-installed packages.
     foreach(pkg ${binary_packages})
         zip_is_installed(${pkg} pkg_installed)
-
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
         endif()
@@ -436,88 +492,115 @@ function(get_binary_packages)
 
         foreach(pkg ${to_install})
             download_package("${pkg}" "${bin_pkgs_dir}")
-
             if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
-                message(STATUS "Failed to download package '${pkg}', aborting.")
-                return()
+                message(STATUS "Failed to download package '${pkg}', will build from source.")
+                set(all_ports_found FALSE)
             endif()
         endforeach()
 
-        unset(installed_host_deps)
-
+        # Install any missing dependencies not in the wanted list.
+        # Use progress_made to terminate: if no new deps are downloaded
+        # in an iteration, stop (remaining gaps handled by source install).
         while(TRUE)
-#                       -command "import-module ($env:USERPROFILE + '/source/repos/vcpkg-binpkg-prototype/vcpkg-binpkg.psm1'); vcpkg-listmissing ."
             execute_process(
                 COMMAND ${POWERSHELL}
                     -executionpolicy bypass -noprofile
                     -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-listmissing ."
                 WORKING_DIRECTORY ${bin_pkgs_dir}
-                OUTPUT_VARIABLE host_deps
-                RESULT_VARIABLE host_deps_status
+                OUTPUT_VARIABLE missing_deps
+                RESULT_VARIABLE missing_deps_status
             )
 
-            if(NOT host_deps_status EQUAL 0)
-                message(STATUS "Failed to calculate host dependencies: ${host_deps_status}")
-                return()
-            endif()
-
-            string(REGEX REPLACE "\r?\n"   ";" host_deps "${host_deps}")
-            string(REGEX REPLACE " *;+ *$" ""  host_deps "${host_deps}")
-
-            list(LENGTH host_deps           host_deps_count)
-            list(LENGTH installed_host_deps installed_host_deps_count)
-
-            if(host_deps_count EQUAL installed_host_deps_count)
+            if(NOT missing_deps_status EQUAL 0)
+                message(STATUS "Failed to determine missing dependencies, will build remaining from source.")
+                set(all_ports_found FALSE)
                 break()
             endif()
 
-            foreach(host_dep ${host_deps})
-                if(NOT host_dep MATCHES "^([^:]+):([^:]+)\$")
+            string(REGEX REPLACE "\r?\n"   ";" missing_deps "${missing_deps}")
+            string(REGEX REPLACE " *;+ *$" ""  missing_deps "${missing_deps}")
+            list(FILTER missing_deps EXCLUDE REGEX "^$")
+
+            if(NOT missing_deps)
+                break()
+            endif()
+
+            set(progress_made FALSE)
+
+            foreach(dep ${missing_deps})
+                if(NOT dep MATCHES "^([^:]+):([^:]+)\$")
                     continue()
                 endif()
-                set(host_dep_name    ${CMAKE_MATCH_1})
-                set(host_dep_triplet ${CMAKE_MATCH_2})
+                set(dep_name    ${CMAKE_MATCH_1})
+                set(dep_triplet ${CMAKE_MATCH_2})
 
                 set(pkg_installed FALSE)
-                vcpkg_is_installed(${host_dep_name} 0 ${host_dep_triplet} ${POWERSHELL} pkg_installed)
+                vcpkg_is_installed(${dep_name} 0 ${dep_triplet} ${POWERSHELL} pkg_installed)
 
                 if(pkg_installed)
-                    list(APPEND installed_host_deps "${host_dep_name}_0_${host_dep_triplet}.zip") 
                     continue()
                 endif()
 
-                get_triplet_package_list(${host_dep_triplet})
+                get_triplet_package_list(${dep_triplet})
 
-                file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_dep_triplet}.html" raw_html)
-                string(REGEX MATCHALL "<a href=\"${host_dep_name}_[^\"]+[.]zip\"" links "${raw_html}")
+                if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${dep_triplet}.html")
+                    message(STATUS "No package list for triplet '${dep_triplet}', cannot resolve missing dependency '${dep_name}'.")
+                    set(all_ports_found FALSE)
+                    continue()
+                endif()
+
+                file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${dep_triplet}.html" raw_html)
+                string(REGEX MATCHALL "<a href=\"${dep_name}_[^\"]+[.]zip\"" links "${raw_html}")
 
                 list(LENGTH links links_count)
 
-                if(links_count GREATER 1)
-                    message(STATUS "Multiple host dependencies found for '${host_dep_name}' for triplet '${host_dep_triplet}', aborting.")
-                    return()
-                elseif(links_count EQUAL 0)
-                    message(STATUS "No host dependencies found for '${host_dep_name}' for triplet '${host_dep_triplet}', aborting.")
-                    return()
+                if(NOT links_count EQUAL 1)
+                    if(links_count GREATER 1)
+                        message(STATUS "Multiple packages found for missing dependency '${dep_name}' for triplet '${dep_triplet}', skipping.")
+                    else()
+                        message(STATUS "No package found for missing dependency '${dep_name}' for triplet '${dep_triplet}', will build from source.")
+                    endif()
+                    set(all_ports_found FALSE)
+                    continue()
                 endif()
 
                 string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
 
-                list(FIND installed_host_deps "${pkg}" found_idx)
+                # Skip if already downloaded.
+                if(EXISTS "${bin_pkgs_dir}/${pkg}")
+                    continue()
+                endif()
 
-                if(found_idx EQUAL -1)
-                    download_package("${pkg}" "${bin_pkgs_dir}")
+                download_package("${pkg}" "${bin_pkgs_dir}")
 
-                    if(NOT EXISTS "${bin_pkgs_dir}/${pkg}")
-                        message(STATUS "Failed to download host dependency package '${pkg}', aborting.")
-                        return()
-                    endif()
-
-                    list(APPEND installed_host_deps "${pkg}")
+                if(EXISTS "${bin_pkgs_dir}/${pkg}")
+                    set(progress_made TRUE)
+                else()
+                    message(STATUS "Failed to download missing dependency '${pkg}', will build from source.")
+                    set(all_ports_found FALSE)
                 endif()
             endforeach()
+
+            if(NOT progress_made)
+                break()
+            endif()
         endwhile()
 
+        # Log any packages that will be skipped due to incomplete dependencies.
+        execute_process(
+            COMMAND ${POWERSHELL}
+                -executionpolicy bypass -noprofile
+                -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-pruneincomplete ."
+            WORKING_DIRECTORY ${bin_pkgs_dir}
+            OUTPUT_VARIABLE incomplete_pkgs
+        )
+        if(incomplete_pkgs)
+            string(STRIP "${incomplete_pkgs}" incomplete_pkgs)
+            message(STATUS "Binary packages: skipping (incomplete dependencies): ${incomplete_pkgs}")
+            set(all_ports_found FALSE)
+        endif()
+
+        # Install packages, skipping any with incomplete dependencies.
         execute_process(
             COMMAND ${POWERSHELL}
                 -executionpolicy bypass -noprofile
@@ -530,7 +613,9 @@ function(get_binary_packages)
 
     cleanup_binary_packages()
 
-    set(binary_packages_installed TRUE PARENT_SCOPE)
+    if(all_ports_found)
+        set(binary_packages_installed TRUE PARENT_SCOPE)
+    endif()
 endfunction()
 
 
