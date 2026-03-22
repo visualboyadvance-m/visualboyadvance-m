@@ -626,6 +626,10 @@ function(vcpkg_set_toolchain)
         set(VCPKG_BINARY_PACKAGES TRUE)
     endif()
 
+    if(NOT DEFINED VCPKG_SOURCE_PACKAGES)
+        set(VCPKG_SOURCE_PACKAGES TRUE)
+    endif()
+
     if(NOT DEFINED POWERSHELL AND VCPKG_BINARY_PACKAGES)
         message(FATAL_ERROR "Powershell is required to use vcpkg binaries.")
     endif()
@@ -767,7 +771,7 @@ function(vcpkg_set_toolchain)
         get_binary_packages()
     endif()
 
-    if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES))
+    if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES) AND VCPKG_SOURCE_PACKAGES)
         # Install core deps.
         execute_process(
             COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${VCPKG_DEPS}
