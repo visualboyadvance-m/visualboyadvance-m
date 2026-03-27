@@ -774,13 +774,13 @@ function(vcpkg_set_toolchain)
     if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES) AND VCPKG_SOURCE_PACKAGES)
         # Install core deps.
         execute_process(
-            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${VCPKG_DEPS}
+            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${VCPKG_DEPS} --allow-unsupported --recurse --keep-going
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 
         # Upgrade any outdated ports.
         execute_process(
-            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} upgrade --no-dry-run
+            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} upgrade --no-dry-run --allow-unsupported --keep-going
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 
