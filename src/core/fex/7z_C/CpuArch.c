@@ -7,6 +7,7 @@ Igor Pavlov : Public domain */
 
 #include "CpuArch.h"
 
+#undef MY_CPU_X86_OR_AMD64
 #ifdef MY_CPU_X86_OR_AMD64
 
 #undef NEED_CHECK_FOR_CPUID
@@ -859,7 +860,7 @@ BoolInt CPU_IsSupported_AES (void) { return APPLE_CRYPTO_SUPPORT_VAL; }
 
 #if defined(__GLIBC__) && (__GLIBC__ * 100 + __GLIBC_MINOR__ >= 216)
   #define Z7_GETAUXV_AVAILABLE
-#else
+#elif !defined(__QNXNTO__)
 // #pragma message("=== is not NEW GLIBC === ")
   #if defined __has_include
   #if __has_include (<sys/auxv.h>)
