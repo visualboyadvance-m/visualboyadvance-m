@@ -372,6 +372,24 @@ void __cdecl terminate(void)
     )
     # Explicitly link the release C++ STL and vcruntime import libraries.
     # In Debug builds the auto-linked variants may get excluded above.
+    if (${_lr_machine} STREQUAL ARM64)
+    target_link_libraries(vbam_libretro PRIVATE
+        ${_lr_msvcrt_lib}
+        libucrt.lib
+        msvcprt.lib
+        legacy_stdio_definitions.lib
+        libconcrt.lib
+    )
+    else()
+    if (${_lr_machine} STREQUAL ARM)
+    target_link_libraries(vbam_libretro PRIVATE
+        ${_lr_msvcrt_lib}
+        libucrt.lib
+        msvcprt.lib
+        legacy_stdio_definitions.lib
+        libconcrt.lib
+    )
+    else()
     target_link_libraries(vbam_libretro PRIVATE
         ${_lr_msvcrt_lib}
         msvcrt.lib
@@ -379,6 +397,8 @@ void __cdecl terminate(void)
         legacy_stdio_definitions.lib
         libconcrt.lib
     )
+    endif()
+    endif()
 
     unset(_lr_machine)
     unset(_lr_msvcrt_def)
