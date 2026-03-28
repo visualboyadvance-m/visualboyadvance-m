@@ -4147,12 +4147,12 @@ typedef HRESULT(WINAPI* LPFND3D12GetDebugInterface)(REFIID riid, void** ppvDebug
 
 DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
-    , fence_event(NULL)
     , fence_value(0)
+    , fence_event(NULL)
     , frame_index(0)
     , rtv_descriptor_size(0)
-    , texture_height(0)
     , texture_width(0)
+    , texture_height(0)
 {
     HRESULT hr;
     BOOL using_warp = false;
