@@ -98,7 +98,10 @@ if(ENABLE_FFMPEG)
             endforeach()
 
             add_link_options("-Wl,--allow-multiple-definition")
-            add_link_options("-Wl,--error-limit=0")
+
+            if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+                add_link_options("-Wl,--error-limit=0")
+            endif()
 
             # Create a wrapper script to suppress linker warnings but show output on error
             file(WRITE "${CMAKE_BINARY_DIR}/link_wrapper.ps1" [=[

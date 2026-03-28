@@ -2,6 +2,8 @@ if(NOT ENABLE_SDL)
     return()
 endif()
 
+add_compile_definitions(${VBAM_FRONTEND_DEFINITIONS})
+
 # Define the vbam executable (or object library in COMPILE_ONLY mode).
 if(COMPILE_ONLY)
     add_library(vbam OBJECT)

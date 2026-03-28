@@ -5145,7 +5145,7 @@ bool gbApplyPatch(const char* patchName) {
 
 unsigned int gbWriteSaveState(uint8_t* data)
 {
-	uint8_t* orig = data;
+	const uint8_t* orig = data;
 
     utilWriteIntMem(data, GBSAVE_GAME_VERSION);
 
@@ -5180,8 +5180,8 @@ unsigned int gbWriteSaveState(uint8_t* data)
     utilWriteMem(data, &gbMemory[0x8000], 0x8000);
 
     if (g_gbCartData.HasRam()) {
-        utilWriteIntMem(data, g_gbCartData.ram_size());
-        utilWriteMem(data, gbRam, g_gbCartData.ram_size());
+        utilWriteIntMem(data, static_cast<int>(g_gbCartData.ram_size()));
+        utilWriteMem(data, gbRam, static_cast<unsigned>(g_gbCartData.ram_size()));
     }
 
     if (gbCgbMode) {
@@ -5208,7 +5208,7 @@ unsigned int gbWriteSaveState(uint8_t* data)
     utilWriteIntMem(data, gbScreenOn);
     utilWriteIntMem(data, 0x12345678); // end marker
 
-	return (ptrdiff_t)data - (ptrdiff_t)orig;
+	return static_cast<unsigned int>(data - orig);
 }
 
 bool gbReadSaveState(const uint8_t* data)
@@ -5238,7 +5238,7 @@ bool gbReadSaveState(const uint8_t* data)
     ub = utilReadIntMem(data) ? true : false;
     ib = utilReadIntMem(data) ? true : false;
 
-    if ((ub != coreOptions.useBios) && (ib)) {
+    if ((ub != (coreOptions.useBios != 0)) && (ib)) {
         if (coreOptions.useBios)
             systemMessage(MSG_SAVE_GAME_NOT_USING_BIOS,
                 N_("Save game is not using the BIOS files"));
@@ -5307,7 +5307,7 @@ bool gbReadSaveState(const uint8_t* data)
     utilReadMem(&gbMemory[0x8000], data, 0x8000);
 
     if (g_gbCartData.HasRam()) {
-        int cartRamSize = g_gbCartData.ram_size();
+        int cartRamSize = static_cast<int>(g_gbCartData.ram_size());
         int ramSize = utilReadIntMem(data);
         utilReadMem(gbRam, data, std::min(cartRamSize, ramSize)); //read
         /*if (ramSize > cartRamSize)
@@ -5423,7 +5423,7 @@ bool gbReadSaveState(const uint8_t* data)
     gbTimerOnChange = (utilReadIntMem(data) ? true : false);
     gbHardware = utilReadIntMem(data);
     gbBlackScreen = (utilReadIntMem(data) ? true : false);
-    oldRegister_WY = utilReadIntMem(data);
+    oldRegister_WY = static_cast<uint8_t>(utilReadIntMem(data));
     gbWindowLine = utilReadIntMem(data);
     inUseRegister_WY = utilReadIntMem(data);
     gbScreenOn = (utilReadIntMem(data) ? true : false);

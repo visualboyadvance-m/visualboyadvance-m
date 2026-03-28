@@ -37,7 +37,7 @@ if(NOT HTTPS)
 endif()
 
 if(ENABLE_GBA_LOGGING)
-    add_compile_definitions(GBA_LOGGING )
+    list(APPEND VBAM_FRONTEND_DEFINITIONS GBA_LOGGING)
 endif()
 
 if(ENABLE_MMX)
@@ -51,7 +51,7 @@ endif()
 
 # The debugger is enabled by default
 if(ENABLE_DEBUGGER)
-    add_compile_definitions(VBAM_ENABLE_DEBUGGER)
+    list(APPEND VBAM_FRONTEND_DEFINITIONS VBAM_ENABLE_DEBUGGER)
 endif()
 
 # The ASM core is disabled by default because we don't know on which platform we are
@@ -67,7 +67,8 @@ include_directories(
 )
 
 # C defines
-add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SDL USE_OPENGL SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+add_compile_definitions(HAVE_NETINET_IN_H HAVE_ARPA_INET_H HAVE_ZLIB_H FINAL_VERSION SYSCONF_INSTALL_DIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+list(APPEND VBAM_FRONTEND_DEFINITIONS SDL USE_OPENGL)
 add_compile_definitions(PKGDATADIR="${CMAKE_INSTALL_FULL_DATADIR}/vbam")
 add_compile_definitions(__STDC_FORMAT_MACROS)
 add_compile_definitions(LOCALEDIR="${LOCALEDIR}")

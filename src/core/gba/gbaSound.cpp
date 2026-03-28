@@ -341,8 +341,8 @@ static void end_frame(blip_time_t time)
 #ifdef __LIBRETRO__
 void flush_samples(Multi_Buffer* buffer)
 {
-    size_t numSamples = buffer->samples_avail();
-    if ((numSamples * 2) > sizeof(soundFinalWave)) {
+    long numSamples = buffer->samples_avail();
+    if ((static_cast<size_t>(numSamples) * 2) > sizeof(soundFinalWave)) {
         // when there is more than 1-frame worth of samples, we
         // split it so as not to overflow our buffer.
         // Flush samples 2048 samples at a time
@@ -354,12 +354,12 @@ void flush_samples(Multi_Buffer* buffer)
         if (numSamples) {
             // flush remaining samples
             buffer->read_samples((blip_sample_t*)soundFinalWave, numSamples);
-            soundDriver->write(soundFinalWave, numSamples);
+            soundDriver->write(soundFinalWave, static_cast<int>(numSamples));
         }
     } else {
         buffer->read_samples((blip_sample_t*)soundFinalWave, numSamples);
-        soundDriver->write(soundFinalWave, numSamples);
-        systemOnWriteDataToSoundBuffer(soundFinalWave, numSamples);
+        soundDriver->write(soundFinalWave, static_cast<int>(numSamples));
+        systemOnWriteDataToSoundBuffer(soundFinalWave, static_cast<int>(numSamples));
     }
 }
 #else

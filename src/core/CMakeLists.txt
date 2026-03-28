@@ -1,3 +1,5 @@
+add_compile_definitions(${VBAM_FRONTEND_DEFINITIONS})
+
 add_subdirectory(apu)
 add_subdirectory(base)
 add_subdirectory(fex)

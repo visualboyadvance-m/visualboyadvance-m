@@ -324,6 +324,52 @@ endif()
 # Enable internationalization
 set(LOCALEDIR share/locale)
 
+# Set up the zip compressor program (used for release zips and translations).
+if(NOT ZIP_PROGRAM)
+    find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
+    if(WIN32 AND NOT ZIP_PROGRAM)
+        if(NOT DEFINED POWERSHELL)
+            message(FATAL_ERROR "Powershell is required for zip file support when the `zip` program is not available.")
+        endif()
+
+        # Build zip.exe from zip.ps1 using ps12exe
+        set(ZIP_EXE_DIR "${CMAKE_BINARY_DIR}/zip-bin")
+        set(ZIP_EXE "${ZIP_EXE_DIR}/zip.exe")
+        set(PS12EXE_DIR "${CMAKE_SOURCE_DIR}/third_party/ps12exe")
+
+        if(NOT EXISTS "${ZIP_EXE}")
+            file(MAKE_DIRECTORY "${ZIP_EXE_DIR}")
+
+            execute_process(
+                COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
+                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -noConsole:$false -architecture 'x86' -localize 'en' -skipVersionCheck:$true"
+                RESULT_VARIABLE PS12EXE_BUILD_RESULT
+            )
+
+            if(NOT PS12EXE_BUILD_RESULT EQUAL 0)
+                message(FATAL_ERROR "Failed to build zip.exe with ps12exe. The zip program is required for building.")
+            endif()
+        endif()
+
+        set(ZIP_PROGRAM "${ZIP_EXE}")
+    endif()
+    if(ZIP_PROGRAM)
+        set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
+    else()
+        message(FATAL_ERROR "The zip compressor program is required for building.")
+    endif()
+endif()
+
+# When ZIP_PROGRAM is cached, ENV{PATH} must be set every time.
+if(ZIP_PROGRAM)
+    get_filename_component(ZIP_PROGRAM_DIR ${ZIP_PROGRAM} DIRECTORY)
+    if(WIN32)
+        set(ENV{PATH} "${ZIP_PROGRAM_DIR};$ENV{PATH}")
+    else()
+        set(ENV{PATH} "${ZIP_PROGRAM_DIR}:$ENV{PATH}")
+    endif()
+endif()
+
 if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(third_party/include/nonstd)
     add_subdirectory(third_party/include/stb)
@@ -340,6 +386,7 @@ if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(src/core)
     add_subdirectory(src/components)
     add_subdirectory(src/sdl)
+    add_subdirectory(src/libretro)
 endif()
 
 add_subdirectory(src/wx)
