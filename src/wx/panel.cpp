@@ -4147,13 +4147,12 @@ typedef HRESULT(WINAPI* LPFND3D12GetDebugInterface)(REFIID riid, void** ppvDebug
 
 DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
+    , fence_event(NULL)
     , fence_value(0)
     , frame_index(0)
     , texture_width(0)
     , texture_height(0)
     , rtv_descriptor_size(0)
-    , fence_value(0)
-    , fence_event(NULL)
 {
     HRESULT hr;
     BOOL using_warp = false;
@@ -4172,7 +4171,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
 	LPFND3D12CreateDevice CREATEDEVICE = reinterpret_cast<LPFND3D12CreateDevice>(reinterpret_cast<void*>(GetProcAddress(hD3D12, "D3D12CreateDevice")));
     LPFND3D12SerializeRootSignature D3D12SERIALIZEROOTSIGNATURE = reinterpret_cast<LPFND3D12SerializeRootSignature>(reinterpret_cast<void*>(GetProcAddress(hD3D12, "D3D12SerializeRootSignature")));
     LPFND3DCompile D3DCOMPILE = reinterpret_cast<LPFND3DCompile>(reinterpret_cast<void*>(GetProcAddress(hD3DCompiler, "D3DCompile")));
-    LPFNCreateDXGIFactory1 CREATEFACTORY = reinterpret_cast<LPFNCreateDXGIFactory1>(reinterpret_cast<void*>((GetProcAddress(hDXGI, "CreateDXGIFactory1")));
+    LPFNCreateDXGIFactory1 CREATEFACTORY = reinterpret_cast<LPFNCreateDXGIFactory1>(reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateDXGIFactory1")));
 
 #if defined(_DEBUG)
     // Enable the D3D12 debug layer in debug builds
