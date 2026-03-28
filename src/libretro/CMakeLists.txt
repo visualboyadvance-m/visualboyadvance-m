@@ -146,10 +146,12 @@ if(MSVC)
     target_compile_definitions(vbam_libretro PRIVATE _NO_CRT_STDIO_INLINE)
 
     # Determine machine type for lib.exe.
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "X64|x86_64")
         set(_lr_machine X64)
     elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
         set(_lr_machine ARM64)
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM|armv7")
+        set(_lr_machine ARM)
     else()
         set(_lr_machine X86)
     endif()
@@ -228,12 +230,14 @@ if(MSVC)
 /* --- stdio bridge --------------------------------------------------- */
 
 /* msvcrt.dll exports __iob_func; UCRT renamed it to __acrt_iob_func. */
+#if !defined(_M_ARM) && !defined(_M_ARM64)
 extern __declspec(dllimport) FILE* __iob_func(void);
 
 FILE* __cdecl __acrt_iob_func(unsigned index)
 {
     return __iob_func() + index;
 }
+#endif
 
 /* UCRT's __stdio_common_vsprintf_s: used by the CRT startup error path.
  * Forward to msvcrt.dll's _vsnprintf + manual truncation.
@@ -354,7 +358,7 @@ void __cdecl terminate(void)
     add_library(vbam_libretro_msvcrt_shim OBJECT "${_lr_shim_src}")
     set_target_properties(vbam_libretro_msvcrt_shim PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
-        INTERPROCEDURAL_OPTIMIZATION OFF
+        INTERPROCEDURAL_OPTIMIZATION ON
     )
 
     target_link_libraries(vbam_libretro PRIVATE vbam_libretro_msvcrt_shim)
@@ -363,24 +367,17 @@ void __cdecl terminate(void)
     # provides C functions.  /FORCE:MULTIPLE resolves the duplicate atexit
     # between the VC toolchain's MSVCRT.lib startup code and our lib.
     target_link_options(vbam_libretro PRIVATE
-        /NODEFAULTLIB:ucrt.lib
-        /NODEFAULTLIB:libucrt.lib
-        /NODEFAULTLIB:ucrtd.lib
-        /NODEFAULTLIB:libucrtd.lib
-        /NODEFAULTLIB:LIBCMT
-        /NODEFAULTLIB:LIBCMTd
-        /NODEFAULTLIB:MSVCRTd.lib
-        /NODEFAULTLIB:libcpmtd.lib
-        /NODEFAULTLIB:vcruntimed.lib
-        /NODEFAULTLIB:msvcprtd.lib
         /FORCE:MULTIPLE
+        /LTCG
     )
     # Explicitly link the release C++ STL and vcruntime import libraries.
     # In Debug builds the auto-linked variants may get excluded above.
     target_link_libraries(vbam_libretro PRIVATE
-        "${_lr_msvcrt_lib}"
+        ${_lr_msvcrt_lib}
+        msvcrt.lib
         msvcprt.lib
-        vcruntime.lib
+        legacy_stdio_definitions.lib
+        libconcrt.lib
     )
 
     unset(_lr_machine)
@@ -389,7 +386,7 @@ void __cdecl terminate(void)
     unset(_lr_shim_src)
 
 elseif(MINGW)
-    # Link the libretro core against msvcrt.dll on all MSYS2 environments.
+    # Link the libretro core against msvcrt.dll on alld/ MSYS2 environments.
     # MINGW64 already defaults to msvcrt, but UCRT64 and CLANG64 default
     # to ucrtbase.dll.  Using -nodefaultlibs prevents the toolchain from
     # adding its default CRT; we then explicitly link msvcrt and the
