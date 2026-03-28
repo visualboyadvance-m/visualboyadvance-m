@@ -1017,132 +1017,132 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:4165
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
-msgstr ""
+msgstr "Falhou em carregar as DLLs D3D12 ou D3DCompiler"
 
 #: panel.cpp:4191
 msgid "Failed to get D3D12 function pointers"
-msgstr ""
+msgstr "Falhou em obter os ponteiros da função D3D12"
 
 #: panel.cpp:4196
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a fábrica do DXGI: 0x%08X"
 
 #: panel.cpp:4210
 msgid "No hardware adapter found, falling back to WARP"
-msgstr ""
+msgstr "Nenhum adaptador de hardware foi achado, voltando pro WARP"
 
 #: panel.cpp:4217
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar o dispositivo D3D12: 0x%08X"
 
 #: panel.cpp:4218
 #, c-format
 msgid "D3D12 device created (%s)"
-msgstr ""
+msgstr "Dispositivo D3D12 criado (%s)"
 
 #: panel.cpp:4225
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a fila de comando: 0x%08X"
 
 #: panel.cpp:4246
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a cadeia de troca: 0x%08X"
 
 #: panel.cpp:4252
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
-msgstr ""
+msgstr "Falhou em obter o IDXGISwapChain3: 0x%08X"
 
 #: panel.cpp:4261
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a pilha do RTV: 0x%08X"
 
 #: panel.cpp:4270
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a pilha do SRV: 0x%08X"
 
 #: panel.cpp:4277
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
-msgstr ""
+msgstr "Falhou em obter de volta o buffer %u: 0x%08X"
 
 #: panel.cpp:4285
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar o alocador de comando: 0x%08X"
 
 #: panel.cpp:4290
 #, c-format
 msgid "Failed to create command list: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a lista de comandos: 0x%08X"
 
 #: panel.cpp:4329
 #, c-format
 msgid "Failed to serialize root signature: %s"
-msgstr ""
+msgstr "Falhou em serializar a assinatura raiz: %s"
 
 #: panel.cpp:4336
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a assinatura raiz: 0x%08X"
 
 #: panel.cpp:4350
 #, c-format
 msgid "VS compile failed: %s"
-msgstr ""
+msgstr "A compilação do VS falhou: %s"
 
 #: panel.cpp:4358
 #, c-format
 msgid "PS compile failed: %s"
-msgstr ""
+msgstr "A compilação do PS falhou: %s"
 
 #: panel.cpp:4387
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar o PSO: 0x%08X"
 
 #: panel.cpp:4407
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar o buffer do vértice: 0x%08X"
 
 #: panel.cpp:4416
 #, c-format
 msgid "Failed to create fence: 0x%08X"
-msgstr ""
+msgstr "Falhou em criar a cerca: 0x%08X"
 
 #: panel.cpp:4419
 msgid "Failed to create fence event"
-msgstr ""
+msgstr "Falhou em criar o evento da cerca"
 
 #: panel.cpp:4421
 msgid "D3D12 pipeline fully initialized"
-msgstr ""
+msgstr "Pipeline do D3D12 totalmente inicializado"
 
 #: panel.cpp:4451
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DX12DrawingPanel inicializado: %dx%d (escala: %f)"
 
 #: panel.cpp:4473
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
-msgstr ""
+msgstr "Os Buffers do Redimensionamento falharam: 0x%08X"
 
 #: panel.cpp:4484
 #, c-format
 msgid "Swap chain resized to %dx%d"
-msgstr ""
+msgstr "A cadeia de troca foi redimensionada pra %dx%d"
 
 #: panel.cpp:4725
 msgid "Texture upload failed"
-msgstr ""
+msgstr "O upload da textura falhou"
 
 #: panel.cpp:4853
 msgid "Using Direct3D 9Ex (dynamically loaded)"
