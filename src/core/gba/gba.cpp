@@ -678,7 +678,7 @@ void CPUUpdateRenderBuffers(bool force)
 
 unsigned int CPUWriteState(uint8_t* data)
 {
-    uint8_t* orig = data;
+    const uint8_t* orig = data;
 
     utilWriteIntMem(data, SAVE_GAME_VERSION);
     utilWriteMem(data, &g_rom[0xa0], 16);
@@ -719,7 +719,7 @@ unsigned int CPUWriteState(uint8_t* data)
         }
     }
 
-    return (ptrdiff_t)data - (ptrdiff_t)orig;
+    return static_cast<unsigned int>(data - orig);
 }
 
 bool CPUReadState(const uint8_t* data)

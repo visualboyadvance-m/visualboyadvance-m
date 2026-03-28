@@ -2,6 +2,8 @@ if(NOT TRANSLATIONS_ONLY AND NOT ENABLE_WX)
     return()
 endif()
 
+add_compile_definitions(${VBAM_FRONTEND_DEFINITIONS})
+
 # Do not use this file directly.  Always use the top level CMakeLists.txt file
 include(VbamFunctions)
 

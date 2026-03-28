@@ -340,6 +340,7 @@ if(NOT TRANSLATIONS_ONLY)
     add_subdirectory(src/core)
     add_subdirectory(src/components)
     add_subdirectory(src/sdl)
+    add_subdirectory(src/libretro)
 endif()
 
 add_subdirectory(src/wx)

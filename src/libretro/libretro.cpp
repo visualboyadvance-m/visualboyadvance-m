@@ -583,7 +583,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->geometry.base_height = systemHeight;
    info->geometry.max_width = maxWidth;
    info->geometry.max_height = maxHeight;
-   info->geometry.aspect_ratio = aspect;
+   info->geometry.aspect_ratio = static_cast<float>(aspect);
    info->timing.fps = FRAMERATE;
    info->timing.sample_rate = SAMPLERATE;
 }
@@ -657,130 +657,130 @@ void retro_init(void)
 
 static const char *gbGetCartridgeType(void)
 {
-    const char *type = "Unknown";
+    const char *cart_type = "Unknown";
 
     switch (g_gbCartData.mapper_flag()) {
     case 0x00:
-        type = "ROM";
+        cart_type = "ROM";
         break;
     case 0x01:
-        type = "ROM+MBC1";
+        cart_type = "ROM+MBC1";
         break;
     case 0x02:
-        type = "ROM+MBC1+RAM";
+        cart_type = "ROM+MBC1+RAM";
         break;
     case 0x03:
-        type = "ROM+MBC1+RAM+BATTERY";
+        cart_type = "ROM+MBC1+RAM+BATTERY";
         break;
     case 0x05:
-        type = "ROM+MBC2";
+        cart_type = "ROM+MBC2";
         break;
     case 0x06:
-        type = "ROM+MBC2+BATTERY";
+        cart_type = "ROM+MBC2+BATTERY";
         break;
     case 0x0b:
-        type = "ROM+MMM01";
+        cart_type = "ROM+MMM01";
         break;
     case 0x0c:
-        type = "ROM+MMM01+RAM";
+        cart_type = "ROM+MMM01+RAM";
         break;
     case 0x0d:
-        type = "ROM+MMM01+RAM+BATTERY";
+        cart_type = "ROM+MMM01+RAM+BATTERY";
         break;
     case 0x0f:
-        type = "ROM+MBC3+TIMER+BATTERY";
+        cart_type = "ROM+MBC3+TIMER+BATTERY";
         break;
     case 0x10:
-        type = "ROM+MBC3+TIMER+RAM+BATTERY";
+        cart_type = "ROM+MBC3+TIMER+RAM+BATTERY";
         break;
     case 0x11:
-        type = "ROM+MBC3";
+        cart_type = "ROM+MBC3";
         break;
     case 0x12:
-        type = "ROM+MBC3+RAM";
+        cart_type = "ROM+MBC3+RAM";
         break;
     case 0x13:
-        type = "ROM+MBC3+RAM+BATTERY";
+        cart_type = "ROM+MBC3+RAM+BATTERY";
         break;
     case 0x19:
-        type = "ROM+MBC5";
+        cart_type = "ROM+MBC5";
         break;
     case 0x1a:
-        type = "ROM+MBC5+RAM";
+        cart_type = "ROM+MBC5+RAM";
         break;
     case 0x1b:
-        type = "ROM+MBC5+RAM+BATTERY";
+        cart_type = "ROM+MBC5+RAM+BATTERY";
         break;
     case 0x1c:
-        type = "ROM+MBC5+RUMBLE";
+        cart_type = "ROM+MBC5+RUMBLE";
         break;
     case 0x1d:
-        type = "ROM+MBC5+RUMBLE+RAM";
+        cart_type = "ROM+MBC5+RUMBLE+RAM";
         break;
     case 0x1e:
-        type = "ROM+MBC5+RUMBLE+RAM+BATTERY";
+        cart_type = "ROM+MBC5+RUMBLE+RAM+BATTERY";
         break;
     case 0x22:
-        type = "ROM+MBC7+BATTERY";
+        cart_type = "ROM+MBC7+BATTERY";
         break;
     case 0x55:
-        type = "GameGenie";
+        cart_type = "GameGenie";
         break;
     case 0x56:
-        type = "GameShark V3.0";
+        cart_type = "GameShark V3.0";
         break;
     case 0xfc:
-        type = "ROM+POCKET CAMERA";
+        cart_type = "ROM+POCKET CAMERA";
         break;
     case 0xfd:
-        type = "ROM+BANDAI TAMA5";
+        cart_type = "ROM+BANDAI TAMA5";
         break;
     case 0xfe:
-        type = "ROM+HuC-3";
+        cart_type = "ROM+HuC-3";
         break;
     case 0xff:
-        type = "ROM+HuC-1";
+        cart_type = "ROM+HuC-1";
         break;
     }
 
-    return (type);
+    return (cart_type);
 }
 
 static const char *gbGetSaveRamSize(void)
 {
-    const char *type = "Unknown";
+    const char *ram_size = "Unknown";
 
     switch (g_gbCartData.ram_size()) {
     case 0:
-        type = "None";
+        ram_size = "None";
         break;
     case k256B:
-        type = "256B";
+        ram_size = "256B";
         break;
     case k512B:
-        type = "512B";
+        ram_size = "512B";
         break;
     case k2KiB:
-        type = "2K";
+        ram_size = "2K";
         break;
     case k8KiB:
-        type = "8K";
+        ram_size = "8K";
         break;
     case k32KiB:
-        type = "32K";
+        ram_size = "32K";
         break;
     case k64KiB:
-        type = "64K";
+        ram_size = "64K";
         break;
     case k128KiB:
-        type = "128K";
+        ram_size = "128K";
         break;
     default:
-        type = "Unknown";
+        ram_size = "Unknown";
         break;
     }
 
-    return (type);
+    return (ram_size);
 }
 
 typedef struct {
@@ -1014,7 +1014,7 @@ static void gba_init(void)
     log("Loading VBA-M Core (GBA)...\n");
 
     load_image_preferences();
-    soundSetSampleRate(SAMPLERATE);
+    soundSetSampleRate(static_cast<long>(SAMPLERATE));
 
     if (option_useBios) {
         snprintf(biosfile, sizeof(biosfile), "%s%c%s", retro_system_directory, SLASH, "gba_bios.bin");
@@ -1074,7 +1074,7 @@ static void gb_init(void)
         gbBorderColumnSkip = gbBorderRowSkip = 0;
     }
 
-    gbSoundSetSampleRate(SAMPLERATE);
+    gbSoundSetSampleRate(static_cast<long>(SAMPLERATE));
     gbSoundSetDeclicking(1);
 
     gbReset(); // also resets sound;
@@ -1392,7 +1392,7 @@ static void update_variables_gba() {
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        soundFiltering = atof(var.value) * 0.1f;
+        soundFiltering = static_cast<float>(atof(var.value) * 0.1);
     }
 
     var.key = "vbam_forceRTCenable";
@@ -1406,7 +1406,7 @@ static void update_variables_gba() {
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-        sensorDarknessLevel = atoi(var.value);
+        sensorDarknessLevel = static_cast<uint8_t>(atoi(var.value));
         systemUpdateSolarSensor(sensorDarknessLevel);
     }
 
@@ -1776,13 +1776,11 @@ bool retro_serialize(void* data, size_t size)
     return false;
 }
 
-bool retro_unserialize(const void* data, size_t size)
+bool retro_unserialize(const void* data, [[maybe_unused]] size_t size)
 {
     if (!core)
         return false;
-    //if (size == serialize_size)
-        return core->emuReadState((uint8_t*)data);
-    return false;
+    return core->emuReadState((uint8_t*)data);
 }
 
 void retro_cheat_reset(void)
@@ -1800,7 +1798,7 @@ void retro_cheat_reset(void)
     ((code[cursor] >= 'A') && (code[cursor] <= 'F')) || \
     (code[cursor] == '-') \
 
-void retro_cheat_set(unsigned index, bool enabled, const char* code)
+void retro_cheat_set(unsigned index, [[maybe_unused]] bool enabled, const char* code)
 {
     // 2018-11-30 - retrowertz
     // added support GB/GBC multiline 6/9 digit Game Genie codes and Game Shark
@@ -1808,7 +1806,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
     char name[128] = {0};
     unsigned cursor = 0;
     char *codeLine = NULL;
-    int codeLineSize = strlen(code) + 5;
+    size_t codeLineSize = strlen(code) + 5;
     int codePos = 0;
     int i = 0;
 
@@ -1816,7 +1814,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char* code)
     snprintf(name, sizeof(name), "cheat_%d", index);
     for (cursor = 0;; cursor++) {
         if (ISHEXDEC) {
-            codeLine[codePos++] = toupper(code[cursor]);
+            codeLine[codePos++] = static_cast<char>(toupper(code[cursor]));
         } else {
             switch (type) {
             case IMAGE_GB:
@@ -1897,7 +1895,7 @@ bool retro_load_game(const struct retro_game_info *game)
    soundInit();
 
    if (type == IMAGE_GBA) {
-      romSize = CPULoadRomData((const char*)game->data, game->size);
+      romSize = CPULoadRomData((const char*)game->data, static_cast<int>(game->size));
 
       if (!romSize)
          return false;
@@ -1952,7 +1950,7 @@ bool retro_load_game(const struct retro_game_info *game)
       if (!gbLoadRomData((const char *)game->data, game->size))
          return false;
 
-      romSize = game->size;
+      romSize = static_cast<int>(game->size);
 
       core = &GBSystem;
 
@@ -2136,7 +2134,7 @@ static void systemUpdateSolarSensor(int v)
     default: break;
     }
 
-    sensorDarkness = 0xE8 - value;
+    sensorDarkness = static_cast<uint8_t>(0xE8 - value);
 }
 
 bool systemReadJoypads(void)

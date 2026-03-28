@@ -31,7 +31,7 @@
 
 static int clockTicks;
 
-static INSN_REGPARM void thumbUnknownInsn(uint32_t opcode)
+static INSN_REGPARM void thumbUnknownInsn([[maybe_unused]] uint32_t opcode)
 {
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_UNDEFINED)
@@ -1826,7 +1826,7 @@ static INSN_REGPARM void thumbE0(uint32_t opcode)
     busPrefetchCount = 0;
 }
 
-static INSN_REGPARM void thumbE8(uint32_t opcode)
+static INSN_REGPARM void thumbE8([[maybe_unused]] uint32_t opcode)
 {
 #ifdef GBA_LOGGING
     // TODO: This is (erroneously) used by some Wii U VC ROMs. We should have a configuration
