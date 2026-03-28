@@ -206,7 +206,8 @@ if(APPLE)
 endif()
 
 if(WIN32)
-    option(ENABLE_DIRECT3D "Enable Direct3D rendering for the wxWidgets port" ON)
+    option(ENABLE_DIRECT3D "Enable Direct3D 9 rendering for the wxWidgets port" ON)
+    option(ENABLE_DIRECT3D12 "Enable Direct3D 12 rendering for the wxWidgets port" ON)
 
     set(XAUDIO2_DEFAULT ON)
     if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))

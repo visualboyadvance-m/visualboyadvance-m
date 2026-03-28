@@ -67,8 +67,13 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "simple",
     "opengl",
     "sdl_video",
+#if defined(__WXMSW__)
+#if defined(__WXMSW__) && !defined(NO_D3D)
+    "direct3d12",
+#endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
     "direct3d",
+#endif
 #elif defined(__WXMAC__)
     "quartz2d",
 #ifndef NO_METAL
@@ -154,9 +159,12 @@ std::array<Option, kNbOptions>& Option::All() {
 
 #if defined(__WXMAC__) && !defined(NO_METAL)
         RenderMethod render_method = RenderMethod::kMetal;
+#elif defined(__WXMSW__) && !defined(WINDOWSXP) && !defined(NO_D3D12)
+        RenderMethod render_method = RenderMethod::kDirect3d12;
+#elif defined(__WXMSW__) && !defined(NO_D3D)
+        RenderMethod render_method = RenderMethod::kDirect3d;
 #else
 #if defined(NO_OGL)
-        //RenderMethod render_method = RenderMethod::kSimple;
         RenderMethod render_method = RenderMethod::kSDL;
 #else
         RenderMethod render_method = RenderMethod::kOpenGL;
@@ -233,13 +241,15 @@ std::array<Option, kNbOptions>& Option::All() {
         bool allow_joystick_background_input = true;
 
         /// Sound
-#if defined(__WXMAC__)
+#if defined(__WXMAC__) && !defined(NO_COREAUDIO_DEFAULT)
         AudioApi audio_api = AudioApi::kCoreAudio;
-#elif defined(VBAM_ENABLE_FAUDIO)
+#elif defined(__WXMSW__) && !defined(NO_DIRECTAUDIO_DEFAULT)
+		AudioApi audio_api = AudioApi::kDirectSound;
+#elif defined(VBAM_ENABLE_FAUDIO) && !defined(NO_FAUDIO_DEFAULT)
         AudioApi audio_api = AudioApi::kFAudio;
-#elif defined(VBAM_ENABLE_XAUDIO2)
+#elif defined(VBAM_ENABLE_XAUDIO2) && !defined(NO_XAUDIO2_DEFAULT)
         AudioApi audio_api = AudioApi::kXAudio2;
-#elif defined(VBAM_ENABLE_OPENAL)
+#elif defined(VBAM_ENABLE_OPENAL) && !defined(NO_OPENAL_DEFAULT)
         AudioApi audio_api = AudioApi::kOpenAL;
 #else
         AudioApi audio_api = AudioApi::kSDL;

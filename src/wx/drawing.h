@@ -103,6 +103,57 @@ private:
 };
 #endif
 
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+#include <d3d12.h>
+#include <dxgi1_4.h>
+#include <d3dcompiler.h>
+#include <wrl/client.h>
+
+static const UINT FRAME_COUNT = 2; // Double-buffering
+
+using Microsoft::WRL::ComPtr;
+
+class DX12DrawingPanel : public DrawingPanel {
+public:
+    DX12DrawingPanel(wxWindow* parent, int _width, int _height);
+    virtual ~DX12DrawingPanel();
+    
+protected:
+    void DrawArea(wxWindowDC&);
+    void DrawingPanelInit();
+    void OnSize(wxSizeEvent& ev);
+    
+private:
+    void WaitForGPU();
+    bool ResizeSwapChain();
+
+    ComPtr<ID3D12Device>                device;
+    ComPtr<ID3D12CommandQueue>          command_queue;
+    ComPtr<IDXGISwapChain3>             swap_chain;
+    ComPtr<ID3D12DescriptorHeap>        rtv_heap;
+    ComPtr<ID3D12DescriptorHeap>        srv_heap;
+    ComPtr<ID3D12Resource>              render_targets[FRAME_COUNT];
+    ComPtr<ID3D12CommandAllocator>      command_allocator;
+    ComPtr<ID3D12GraphicsCommandList>   command_list;
+    ComPtr<ID3D12RootSignature>         root_signature;
+    ComPtr<ID3D12PipelineState>         pipeline_state;
+    ComPtr<ID3D12Resource>              vertex_buffer;
+    D3D12_VERTEX_BUFFER_VIEW            vertex_buffer_view;
+    ComPtr<ID3D12Resource>              texture;
+    ComPtr<ID3D12Resource>              upload_heap;   // staging, kept alive per-frame
+    ComPtr<ID3D12Fence>                 fence;
+    UINT64                              fence_value;
+    HANDLE                              fence_event;
+    UINT                                frame_index;
+    UINT                                rtv_descriptor_size;
+    int                                 texture_width;
+    int                                 texture_height;
+    HMODULE                             hD3DCompiler;
+    HMODULE                             hD3D12;
+	HMODULE                             hDXGI;
+};
+#endif
+
 #if defined(__WXMAC__)
 #ifndef NO_METAL
 #ifdef __OBJC__

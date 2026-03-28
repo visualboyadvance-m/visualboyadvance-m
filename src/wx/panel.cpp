@@ -1812,6 +1812,11 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 panel = new DXDrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+            case config::RenderMethod::kDirect3d12:
+                panel = new DX12DrawingPanel(this, basic_width, basic_height);
+                break;
+#endif
             case config::RenderMethod::kLast:
                 VBAM_NOTREACHED();
                 return;
@@ -4117,10 +4122,706 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
 }
         
 #endif // GL support
-        
+
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+#define DIRECT3D_VERSION 0x0c00
+// Simple HLSL shaders embedded as strings
+static const char* g_VertexShaderSrc = R"(
+    struct VSIn  { float4 pos : POSITION; float2 uv : TEXCOORD0; };
+    struct VSOut { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
+    VSOut main(VSIn input) { VSOut o; o.pos = input.pos; o.uv = input.uv; return o; }
+)";
+
+static const char* g_PixelShaderSrc = R"(
+    Texture2D    tex : register(t0);
+    SamplerState smp : register(s0);
+    struct PSIn { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; };
+    float4 main(PSIn input) : SV_TARGET { return tex.Sample(smp, input.uv); }
+)";
+
+typedef HRESULT(WINAPI* LPFND3DCompile)(LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSourceName, const D3D_SHADER_MACRO* pDefines, ID3DInclude* pInclude, LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1, UINT Flags2, ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs);
+typedef HRESULT(WINAPI* LPFND3D12SerializeRootSignature)(const D3D12_ROOT_SIGNATURE_DESC* pRootSignature, D3D_ROOT_SIGNATURE_VERSION Version, ID3DBlob** ppBlob, ID3DBlob** ppErrorBlob);
+typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID riid, void** ppFactory);
+typedef HRESULT(WINAPI* LPFND3D12CreateDevice)(IUnknown* pAdapter, D3D_FEATURE_LEVEL MinimumFeatureLevel, REFIID riid, void** ppDevice);
+typedef HRESULT(WINAPI* LPFND3D12GetDebugInterface)(REFIID riid, void** ppvDebug);
+
+DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
+    : DrawingPanel(parent, _width, _height)
+    , texture_width(0)
+    , texture_height(0)
+    , frame_index(0)
+    , rtv_descriptor_size(0)
+    , fence_value(0)
+    , fence_event(NULL)
+{
+    HRESULT hr;
+    BOOL using_warp = false;
+
+    hD3DCompiler = LoadLibrary(TEXT("d3dcompiler_47.dll"));
+    hD3D12 = LoadLibrary(TEXT("d3d12.dll"));
+	hDXGI = LoadLibrary(TEXT("dxgi.dll"));
+
+	if (hD3DCompiler == NULL || hD3D12 == NULL || hDXGI == NULL) {
+        wxLogError(_("Failed to load D3D12 or D3DCompiler DLLs"));
+        return;
+    }
+
+    // --- 1. DXGI Factory & Adapter ---
+    ComPtr<IDXGIFactory4> factory;
+	LPFND3D12CreateDevice CREATEDEVICE = reinterpret_cast<LPFND3D12CreateDevice>(GetProcAddress(hD3D12, "D3D12CreateDevice"));
+    LPFND3D12SerializeRootSignature D3D12SERIALIZEROOTSIGNATURE = reinterpret_cast<LPFND3D12SerializeRootSignature>(GetProcAddress(hD3D12, "D3D12SerializeRootSignature"));
+    LPFND3DCompile D3DCOMPILE = reinterpret_cast<LPFND3DCompile>(GetProcAddress(hD3DCompiler, "D3DCompile"));
+    LPFNCreateDXGIFactory1 CREATEFACTORY = reinterpret_cast<LPFNCreateDXGIFactory1>(GetProcAddress(hDXGI, "CreateDXGIFactory1"));
+
+#if defined(_DEBUG)
+    // Enable the D3D12 debug layer in debug builds
+    {
+        ComPtr<ID3D12Debug> debug_controller;
+        LPFND3D12GetDebugInterface GETDEBUGINTERFACE = reinterpret_cast<LPFND3D12GetDebugInterface>(GetProcAddress(hD3D12, "D3D12GetDebugInterface"));
+
+        if (GETDEBUGINTERFACE) {
+            if (SUCCEEDED(GETDEBUGINTERFACE(IID_PPV_ARGS(&debug_controller)))) {
+                debug_controller->EnableDebugLayer();
+            }
+        }
+    }
+#endif
+
+	if (CREATEFACTORY == nullptr || CREATEDEVICE == nullptr || D3DCOMPILE == nullptr || D3D12SERIALIZEROOTSIGNATURE == nullptr) {
+        wxLogError(_("Failed to get D3D12 function pointers"));
+        return;
+    }
+
+    hr = CREATEFACTORY(IID_PPV_ARGS(&factory));
+    if (FAILED(hr)) { wxLogError(_("Failed to create DXGI factory: 0x%08X"), hr); return; }
+
+    // Try hardware adapter first; fall back to WARP software renderer
+    ComPtr<IDXGIAdapter1> adapter;
+    for (UINT i = 0; factory->EnumAdapters1(i, &adapter) != DXGI_ERROR_NOT_FOUND; ++i) {
+        DXGI_ADAPTER_DESC1 desc;
+        adapter->GetDesc1(&desc);
+        if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
+
+        hr = CREATEDEVICE(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr);
+        if (SUCCEEDED(hr)) break;
+        adapter = nullptr;
+    }
+    if (!adapter) {
+        wxLogDebug(_("No hardware adapter found, falling back to WARP"));
+        factory->EnumWarpAdapter(IID_PPV_ARGS(&adapter));
+        using_warp = true;
+    }
+
+    // --- 2. D3D12 Device ---
+    hr = CREATEDEVICE(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));
+    if (FAILED(hr)) { wxLogError(_("Failed to create D3D12 device: 0x%08X"), hr); return; }
+    wxLogDebug(_("D3D12 device created (%s)"), using_warp ? wxT("WARP") : wxT("hardware"));
+
+    // --- 3. Command Queue ---
+    D3D12_COMMAND_QUEUE_DESC queue_desc = {};
+    queue_desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    queue_desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    hr = device->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&command_queue));
+    if (FAILED(hr)) { wxLogError(_("Failed to create command queue: 0x%08X"), hr); return; }
+
+    // --- 4. Swap Chain ---
+    wxSize win_size = GetClientSize();
+    DXGI_SWAP_CHAIN_DESC1 sc_desc = {};
+    sc_desc.BufferCount = FRAME_COUNT;
+    sc_desc.Width = (UINT)win_size.GetWidth();
+    sc_desc.Height = (UINT)win_size.GetHeight();
+    sc_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    sc_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    sc_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // D3D12 requires FLIP_*
+    sc_desc.SampleDesc.Count = 1;
+    sc_desc.Flags = OPTION(kPrefVsync) ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+    ComPtr<IDXGISwapChain1> sc1;
+    hr = factory->CreateSwapChainForHwnd(
+        command_queue.Get(),
+        (HWND)GetHandle(),
+        &sc_desc,
+        nullptr, nullptr,
+        &sc1);
+    if (FAILED(hr)) { wxLogError(_("Failed to create swap chain: 0x%08X"), hr); return; }
+
+    // Disable Alt+Enter fullscreen toggle (handled by the emulator itself)
+    factory->MakeWindowAssociation((HWND)GetHandle(), DXGI_MWA_NO_ALT_ENTER);
+
+    hr = sc1.As(&swap_chain);
+    if (FAILED(hr)) { wxLogError(_("Failed to get IDXGISwapChain3: 0x%08X"), hr); return; }
+    frame_index = swap_chain->GetCurrentBackBufferIndex();
+
+    // --- 5. RTV Descriptor Heap ---
+    D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {};
+    rtv_heap_desc.NumDescriptors = FRAME_COUNT;
+    rtv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    rtv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    hr = device->CreateDescriptorHeap(&rtv_heap_desc, IID_PPV_ARGS(&rtv_heap));
+    if (FAILED(hr)) { wxLogError(_("Failed to create RTV heap: 0x%08X"), hr); return; }
+    rtv_descriptor_size = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+    // --- 6. SRV Descriptor Heap (for texture) ---
+    D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {};
+    srv_heap_desc.NumDescriptors = 1;
+    srv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    srv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    hr = device->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&srv_heap));
+    if (FAILED(hr)) { wxLogError(_("Failed to create SRV heap: 0x%08X"), hr); return; }
+
+    // --- 7. Create RTVs for each back buffer ---
+    {
+        D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+        for (UINT i = 0; i < FRAME_COUNT; i++) {
+            hr = swap_chain->GetBuffer(i, IID_PPV_ARGS(&render_targets[i]));
+            if (FAILED(hr)) { wxLogError(_("Failed to get back buffer %u: 0x%08X"), i, hr); return; }
+            device->CreateRenderTargetView(render_targets[i].Get(), nullptr, rtv_handle);
+            rtv_handle.ptr += rtv_descriptor_size;
+        }
+    }
+
+    // --- 8. Command Allocator & Command List ---
+    hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&command_allocator));
+    if (FAILED(hr)) { wxLogError(_("Failed to create command allocator: 0x%08X"), hr); return; }
+
+    hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
+        command_allocator.Get(), nullptr,
+        IID_PPV_ARGS(&command_list));
+    if (FAILED(hr)) { wxLogError(_("Failed to create command list: 0x%08X"), hr); return; }
+    command_list->Close(); // Close immediately; re-opened each frame
+
+    // --- 9. Root Signature (1 descriptor table: SRV + Sampler inline) ---
+    {
+        D3D12_DESCRIPTOR_RANGE srv_range = {};
+        srv_range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+        srv_range.NumDescriptors = 1;
+        srv_range.BaseShaderRegister = 0;
+        srv_range.RegisterSpace = 0;
+        srv_range.OffsetInDescriptorsFromTableStart = 0;
+
+        D3D12_ROOT_PARAMETER root_param = {};
+        root_param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+        root_param.DescriptorTable.NumDescriptorRanges = 1;
+        root_param.DescriptorTable.pDescriptorRanges = &srv_range;
+        root_param.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+        D3D12_STATIC_SAMPLER_DESC sampler = {};
+        sampler.Filter = OPTION(kDispBilinear) ? D3D12_FILTER_MIN_MAG_MIP_LINEAR
+            : D3D12_FILTER_MIN_MAG_MIP_POINT;
+        sampler.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+        sampler.ShaderRegister = 0;
+        sampler.RegisterSpace = 0;
+        sampler.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+        D3D12_ROOT_SIGNATURE_DESC rs_desc = {};
+        rs_desc.NumParameters = 1;
+        rs_desc.pParameters = &root_param;
+        rs_desc.NumStaticSamplers = 1;
+        rs_desc.pStaticSamplers = &sampler;
+        rs_desc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+        ComPtr<ID3DBlob> signature_blob, error_blob;
+        hr = D3D12SERIALIZEROOTSIGNATURE(&rs_desc, D3D_ROOT_SIGNATURE_VERSION_1,
+            &signature_blob, &error_blob);
+        if (FAILED(hr)) {
+            wxLogError(_("Failed to serialize root signature: %s"),
+                error_blob ? wxString(static_cast<char*>(error_blob->GetBufferPointer())) : wxT("unknown"));
+            return;
+        }
+        hr = device->CreateRootSignature(0,
+            signature_blob->GetBufferPointer(), signature_blob->GetBufferSize(),
+            IID_PPV_ARGS(&root_signature));
+        if (FAILED(hr)) { wxLogError(_("Failed to create root signature: 0x%08X"), hr); return; }
+    }
+
+    // --- 10. Compile Shaders & Build PSO ---
+    {
+        ComPtr<ID3DBlob> vs_blob, ps_blob, error_blob;
+        UINT compile_flags = 0;
+#if defined(_DEBUG)
+        compile_flags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+        hr = D3DCOMPILE(g_VertexShaderSrc, strlen(g_VertexShaderSrc),
+            nullptr, nullptr, nullptr, "main", "vs_5_0",
+            compile_flags, 0, &vs_blob, &error_blob);
+        if (FAILED(hr)) {
+            wxLogError(_("VS compile failed: %s"),
+                error_blob ? wxString(static_cast<char*>(error_blob->GetBufferPointer())) : wxT("unknown"));
+            return;
+        }
+        hr = D3DCOMPILE(g_PixelShaderSrc, strlen(g_PixelShaderSrc),
+            nullptr, nullptr, nullptr, "main", "ps_5_0",
+            compile_flags, 0, &ps_blob, &error_blob);
+        if (FAILED(hr)) {
+            wxLogError(_("PS compile failed: %s"),
+                error_blob ? wxString(static_cast<char*>(error_blob->GetBufferPointer())) : wxT("unknown"));
+            return;
+        }
+
+        D3D12_INPUT_ELEMENT_DESC input_layout[] = {
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 16, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        };
+
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC pso_desc = {};
+        pso_desc.pRootSignature = root_signature.Get();
+        pso_desc.VS = { vs_blob->GetBufferPointer(), vs_blob->GetBufferSize() };
+        pso_desc.PS = { ps_blob->GetBufferPointer(), ps_blob->GetBufferSize() };
+        pso_desc.InputLayout = { input_layout, _countof(input_layout) };
+        pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+        pso_desc.NumRenderTargets = 1;
+        pso_desc.RTVFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;
+        pso_desc.SampleDesc.Count = 1;
+        // Default blend / rasterizer / depth-stencil are fine for a simple 2D blit
+        pso_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+        pso_desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+        pso_desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+        pso_desc.RasterizerState.DepthClipEnable = TRUE;
+        pso_desc.DepthStencilState.DepthEnable = FALSE;
+        pso_desc.DepthStencilState.StencilEnable = FALSE;
+        pso_desc.SampleMask = UINT_MAX;
+
+        hr = device->CreateGraphicsPipelineState(&pso_desc, IID_PPV_ARGS(&pipeline_state));
+        if (FAILED(hr)) { wxLogError(_("Failed to create PSO: 0x%08X"), hr); return; }
+    }
+
+    // --- 11. Vertex Buffer (screen-space quad, updated each frame) ---
+    {
+        // 4 vertices × (float4 pos + float2 uv) = 4 × 24 bytes
+        const UINT vb_size = 4 * sizeof(float) * 6;
+        D3D12_HEAP_PROPERTIES heap_props = {};
+        heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+        D3D12_RESOURCE_DESC res_desc = {};
+        res_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        res_desc.Width = vb_size;
+        res_desc.Height = 1;
+        res_desc.DepthOrArraySize = 1;
+        res_desc.MipLevels = 1;
+        res_desc.SampleDesc.Count = 1;
+        res_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        hr = device->CreateCommittedResource(&heap_props, D3D12_HEAP_FLAG_NONE,
+            &res_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr, IID_PPV_ARGS(&vertex_buffer));
+        if (FAILED(hr)) { wxLogError(_("Failed to create vertex buffer: 0x%08X"), hr); return; }
+
+        vertex_buffer_view.BufferLocation = vertex_buffer->GetGPUVirtualAddress();
+        vertex_buffer_view.StrideInBytes = sizeof(float) * 6; // xyzw + uv
+        vertex_buffer_view.SizeInBytes = vb_size;
+    }
+
+    // --- 12. Fence for CPU/GPU synchronization ---
+    hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+    if (FAILED(hr)) { wxLogError(_("Failed to create fence: 0x%08X"), hr); return; }
+    fence_value = 1;
+    fence_event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    if (!fence_event) { wxLogError(_("Failed to create fence event")); return; }
+
+    wxLogDebug(_("D3D12 pipeline fully initialized"));
+}
+
+DX12DrawingPanel::~DX12DrawingPanel()
+{
+    WaitForGPU(); // Drain the GPU before releasing any resources
+
+    if (fence_event) { CloseHandle(fence_event); fence_event = NULL; }
+    // All ComPtr members release automatically
+}
+
+// Helper: signal fence and wait for the GPU to reach it
+void DX12DrawingPanel::WaitForGPU()
+{
+    if (!command_queue || !fence || !fence_event) return;
+    command_queue->Signal(fence.Get(), fence_value);
+    fence->SetEventOnCompletion(fence_value, fence_event);
+    WaitForSingleObject(fence_event, INFINITE);
+    ++fence_value;
+}
+
+void DX12DrawingPanel::DrawingPanelInit()
+{
+    DrawingPanelBase::DrawingPanelInit();
+
+    if (!device) return;
+
+    texture_width = (int)std::ceil(width * scale);
+    texture_height = (int)std::ceil(height * scale);
+
+    wxLogDebug(_("DX12DrawingPanel initialized: %dx%d (scale: %f)"),
+        texture_width, texture_height, scale);
+}
+
+bool DX12DrawingPanel::ResizeSwapChain()
+{
+    if (!swap_chain || !device) return false;
+
+    WaitForGPU();
+
+    // Release back-buffer references before resize
+    for (UINT i = 0; i < FRAME_COUNT; i++)
+        render_targets[i].Reset();
+
+    wxSize client_size = GetClientSize();
+    UINT flags = OPTION(kPrefVsync) ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+    HRESULT hr = swap_chain->ResizeBuffers(FRAME_COUNT,
+        (UINT)client_size.GetWidth(),
+        (UINT)client_size.GetHeight(),
+        DXGI_FORMAT_B8G8R8A8_UNORM,
+        flags);
+    if (FAILED(hr)) { wxLogError(_("ResizeBuffers failed: 0x%08X"), hr); return false; }
+
+    // Rebuild RTVs
+    D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+    for (UINT i = 0; i < FRAME_COUNT; i++) {
+        swap_chain->GetBuffer(i, IID_PPV_ARGS(&render_targets[i]));
+        device->CreateRenderTargetView(render_targets[i].Get(), nullptr, rtv_handle);
+        rtv_handle.ptr += rtv_descriptor_size;
+    }
+
+    frame_index = swap_chain->GetCurrentBackBufferIndex();
+    wxLogDebug(_("Swap chain resized to %dx%d"), client_size.GetWidth(), client_size.GetHeight());
+    return true;
+}
+
+void DX12DrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (device) ResizeSwapChain();
+    ev.Skip();
+}
+
+// Helper: upload pixel data to a D3D12 texture via an upload heap
+static ComPtr<ID3D12Resource> UploadTexture(
+    ID3D12Device* device,
+    ID3D12GraphicsCommandList* cmd_list,
+    ComPtr<ID3D12Resource>& upload_heap, // kept alive until GPU finishes
+    DXGI_FORMAT                format,
+    UINT                       tex_w,
+    UINT                       tex_h,
+    const void* src_pixels,
+    UINT                       src_row_bytes)
+{
+    // --- Destination texture (DEFAULT heap) ---
+    D3D12_HEAP_PROPERTIES default_heap = {};
+    default_heap.Type = D3D12_HEAP_TYPE_DEFAULT;
+
+    D3D12_RESOURCE_DESC tex_desc = {};
+    tex_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    tex_desc.Width = tex_w;
+    tex_desc.Height = tex_h;
+    tex_desc.DepthOrArraySize = 1;
+    tex_desc.MipLevels = 1;
+    tex_desc.Format = format;
+    tex_desc.SampleDesc.Count = 1;
+    tex_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+    ComPtr<ID3D12Resource> tex;
+    HRESULT hr = device->CreateCommittedResource(
+        &default_heap, D3D12_HEAP_FLAG_NONE,
+        &tex_desc, D3D12_RESOURCE_STATE_COPY_DEST,
+        nullptr, IID_PPV_ARGS(&tex));
+    if (FAILED(hr)) return nullptr;
+
+    // --- Upload heap sized for this subresource ---
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
+    UINT num_rows;
+    UINT64 row_size_bytes, total_bytes;
+    device->GetCopyableFootprints(&tex_desc, 0, 1, 0,
+        &footprint, &num_rows, &row_size_bytes, &total_bytes);
+
+    D3D12_HEAP_PROPERTIES upload_heap_props = {};
+    upload_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+    D3D12_RESOURCE_DESC upload_desc = {};
+    upload_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    upload_desc.Width = total_bytes;
+    upload_desc.Height = 1;
+    upload_desc.DepthOrArraySize = 1;
+    upload_desc.MipLevels = 1;
+    upload_desc.SampleDesc.Count = 1;
+    upload_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+    hr = device->CreateCommittedResource(
+        &upload_heap_props, D3D12_HEAP_FLAG_NONE,
+        &upload_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr, IID_PPV_ARGS(&upload_heap));
+    if (FAILED(hr)) return nullptr;
+
+    // --- Map upload heap and copy row by row ---
+    uint8_t* mapped = nullptr;
+    upload_heap->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
+    for (UINT row = 0; row < (UINT)tex_h; ++row) {
+        memcpy(mapped + row * footprint.Footprint.RowPitch,
+            static_cast<const uint8_t*>(src_pixels) + row * src_row_bytes,
+            src_row_bytes);
+    }
+    upload_heap->Unmap(0, nullptr);
+
+    // --- Copy command ---
+    D3D12_TEXTURE_COPY_LOCATION src_loc = {};
+    src_loc.pResource = upload_heap.Get();
+    src_loc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+    src_loc.PlacedFootprint = footprint;
+
+    D3D12_TEXTURE_COPY_LOCATION dst_loc = {};
+    dst_loc.pResource = tex.Get();
+    dst_loc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+    dst_loc.SubresourceIndex = 0;
+
+    cmd_list->CopyTextureRegion(&dst_loc, 0, 0, 0, &src_loc, nullptr);
+
+    // Transition to shader-readable state
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = tex.Get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    cmd_list->ResourceBarrier(1, &barrier);
+
+    return tex;
+}
+
+void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    (void)dc;
+
+    if (!device || !command_queue || !swap_chain) return;
+    if (!did_init) DrawingPanelInit();
+
+    // --- Reset command allocator / list for this frame ---
+    command_allocator->Reset();
+    command_list->Reset(command_allocator.Get(), pipeline_state.Get());
+
+    // --- Transition back buffer: PRESENT → RENDER TARGET ---
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = render_targets[frame_index].Get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    command_list->ResourceBarrier(1, &barrier);
+
+    // --- RTV handle for current back buffer ---
+    D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+    rtv_handle.ptr += (SIZE_T)frame_index * rtv_descriptor_size;
+
+    const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    command_list->ClearRenderTargetView(rtv_handle, clear_color, 0, nullptr);
+    command_list->OMSetRenderTargets(1, &rtv_handle, FALSE, nullptr);
+
+    if (!todraw) {
+        // No frame data — just clear and present
+        goto present;
+    }
+
+    // =====================================================================
+    //  Pixel conversion to a 32-bit RGBA staging buffer
+    //  (mirrors the D3D9 per-format pixel copy, but always targets RGBA8)
+    // =====================================================================
+    {
+        int scaled_width = (int)std::ceil(width * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+
+        // Allocate a staging buffer (RGBA8, 4 bytes/pixel)
+        std::vector<uint8_t> rgba(scaled_width * scaled_height * 4);
+        uint8_t* dst_pixels = rgba.data();
+
+        // Border sizes (same logic as original)
+        int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+        int scaled_border = (int)std::ceil(inrb * scale);
+
+        int src_pitch;
+        if (out_8)  src_pitch = (scaled_width + scaled_border);
+        else if (out_16) src_pitch = (scaled_width + scaled_border) * 2;
+        else if (out_24) src_pitch = scaled_width * 3;
+        else             src_pitch = (scaled_width + scaled_border) * 4;
+
+        uint8_t* src = todraw;
+
+        if (out_8) {
+            src += src_pitch; // skip top border row
+            for (int y = 0; y < scaled_height; y++) {
+                uint8_t* sr = src;
+                uint8_t* dr = dst_pixels + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; x++, sr++) {
+                    uint8_t p = *sr;
+                    if (p == 0xff) {
+                        dr[0] = dr[1] = dr[2] = 0xff;
+                    } else {
+                        dr[0] = (p & 0x3) << 6;        // R
+                        dr[1] = ((p >> 2) & 0x7) << 5; // G
+                        dr[2] = ((p >> 5) & 0x7) << 5; // B
+                    }
+                    dr[3] = 0xff;
+                    dr += 4;
+                }
+                src += src_pitch;
+            }
+        }
+        else if (out_16) {
+            uint16_t* src16 = (uint16_t*)src + src_pitch / 2; // skip top border
+            for (int y = 0; y < scaled_height; y++) {
+                uint16_t* sr = src16;
+                uint8_t* dr = dst_pixels + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; x++, sr++) {
+                    uint16_t p = *sr;
+                    if ((p == 0xffff) || (p == 0x7fff)) {
+                        dr[0] = dr[1] = dr[2] = 0xff;
+                    } else {
+                        uint8_t r5 = (p >> systemRedShift) & 0x1f;
+                        uint8_t g5 = (p >> systemGreenShift) & 0x1f;
+                        uint8_t b5 = (p >> systemBlueShift) & 0x1f;
+                        // Expand to 8-bit
+                        dr[0] = (r5 << 3) | (r5 >> 2); // R
+                        dr[1] = (g5 << 3) | (g5 >> 2); // G
+                        dr[2] = (b5 << 3) | (b5 >> 2); // B
+                    }
+                    dr[3] = 0xff;
+                    dr += 4;
+                }
+                src16 += src_pitch / 2;
+            }
+        }
+        else if (out_24) {
+            src += scaled_width * 3; // skip top border row
+            for (int y = 0; y < scaled_height; y++) {
+                uint8_t* sr = src;
+                uint8_t* dr = dst_pixels + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; x++) {
+                    dr[0] = sr[0]; // R
+                    dr[1] = sr[1]; // G
+                    dr[2] = sr[2]; // B
+                    dr[3] = 0xff;
+                    sr += 3; dr += 4;
+                }
+                src += src_pitch;
+            }
+        }
+        else {
+            // 32-bit BGRA → RGBA
+            src += src_pitch; // skip top border row
+            for (int y = 0; y < scaled_height; y++) {
+                uint8_t* sr = src;
+                uint8_t* dr = dst_pixels + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; x++) {
+                    dr[0] = sr[2]; // R ← B
+                    dr[1] = sr[1]; // G
+                    dr[2] = sr[0]; // B ← R
+                    dr[3] = sr[3]; // A
+                    sr += 4; dr += 4;
+                }
+                src += src_pitch;
+            }
+        }
+
+        // Upload texture (upload_heap kept alive via member until WaitForGPU)
+        texture = UploadTexture(device.Get(), command_list.Get(),
+            upload_heap,
+            DXGI_FORMAT_B8G8R8A8_UNORM,
+            (UINT)scaled_width, (UINT)scaled_height,
+            dst_pixels, (UINT)scaled_width * 4);
+        if (!texture) { wxLogError(_("Texture upload failed")); goto present; }
+
+        // Create / refresh SRV
+        D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+        srv_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+        srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+        srv_desc.Texture2D.MipLevels = 1;
+        device->CreateShaderResourceView(texture.Get(), &srv_desc,
+            srv_heap->GetCPUDescriptorHandleForHeapStart());
+
+        // ---- Set pipeline state & root signature ----
+        command_list->SetGraphicsRootSignature(root_signature.Get());
+        command_list->SetPipelineState(pipeline_state.Get());
+
+        ID3D12DescriptorHeap* heaps[] = { srv_heap.Get() };
+        command_list->SetDescriptorHeaps(1, heaps);
+        command_list->SetGraphicsRootDescriptorTable(0,
+            srv_heap->GetGPUDescriptorHandleForHeapStart());
+
+        // ---- Viewport & scissor ----
+        wxSize client_size = GetClientSize();
+        float win_w = (float)client_size.GetWidth();
+        float win_h = (float)client_size.GetHeight();
+
+        D3D12_VIEWPORT vp = { 0.0f, 0.0f, win_w, win_h, 0.0f, 1.0f };
+        D3D12_RECT     scissor = { 0, 0, (LONG)win_w, (LONG)win_h };
+        command_list->RSSetViewports(1, &vp);
+        command_list->RSSetScissorRects(1, &scissor);
+
+        // ---- Calculate letterbox / stretch geometry ----
+        float render_w = win_w, render_h = win_h;
+        float off_x = 0.0f, off_y = 0.0f;
+
+        if (OPTION(kDispStretch)) {
+            float tex_aspect = (float)scaled_width / (float)scaled_height;
+            float win_aspect = win_w / win_h;
+            if (win_aspect > tex_aspect) {
+                render_h = win_h;
+                render_w = win_h * tex_aspect;
+                off_x = (win_w - render_w) / 2.0f;
+            }
+            else {
+                render_w = win_w;
+                render_h = win_w / tex_aspect;
+                off_y = (win_h - render_h) / 2.0f;
+            }
+        }
+
+        // Convert pixel coords to NDC [-1, +1]
+        auto toNDC_X = [&](float px) { return  (px / win_w) * 2.0f - 1.0f; };
+        auto toNDC_Y = [&](float py) { return -((py / win_h) * 2.0f - 1.0f); };
+
+        float x0 = toNDC_X(off_x), y0 = toNDC_Y(off_y);
+        float x1 = toNDC_X(off_x + render_w), y1 = toNDC_Y(off_y + render_h);
+
+        // xyzw (w=1), uv  — two triangles as a strip
+        struct Vertex { float x, y, z, w, u, v; };
+        Vertex verts[4] = {
+            { x0, y0, 0.0f, 1.0f,  0.0f, 0.0f },  // TL
+            { x1, y0, 0.0f, 1.0f,  1.0f, 0.0f },  // TR
+            { x0, y1, 0.0f, 1.0f,  0.0f, 1.0f },  // BL
+            { x1, y1, 0.0f, 1.0f,  1.0f, 1.0f },  // BR
+        };
+
+        // Copy vertices to upload VB
+        void* vb_mapped = nullptr;
+        vertex_buffer->Map(0, nullptr, &vb_mapped);
+        memcpy(vb_mapped, verts, sizeof(verts));
+        vertex_buffer->Unmap(0, nullptr);
+
+        command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        command_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
+        command_list->DrawInstanced(4, 1, 0, 0);
+    }
+
+present:
+    // Transition back buffer: RENDER TARGET → PRESENT
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+    command_list->ResourceBarrier(1, &barrier);
+
+    command_list->Close();
+
+    ID3D12CommandList* lists[] = { command_list.Get() };
+    command_queue->ExecuteCommandLists(1, lists);
+
+    UINT present_flags = (!OPTION(kPrefVsync)) ? DXGI_PRESENT_ALLOW_TEARING : 0;
+    swap_chain->Present(OPTION(kPrefVsync) ? 1 : 0, present_flags);
+
+    WaitForGPU(); // Simple per-frame sync; could be optimised with double-buffered fences
+    frame_index = swap_chain->GetCurrentBackBufferIndex();
+}
+#endif
+
 #if defined(__WXMSW__) && !defined(NO_D3D)
+#undef  DIRECT3D_VERSION
 #define DIRECT3D_VERSION 0x0900
 #include <d3d9.h> // main include file
+
 typedef HRESULT (WINAPI *LPDIRECT3DCREATE9EX)(UINT, IDirect3D9Ex**);
 
 DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
@@ -4141,7 +4842,7 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     if (hD3D9) {
         // Attempt to get the function address
         LPDIRECT3DCREATE9EX Direct3DCreate9ExPtr =
-            reinterpret_cast<LPDIRECT3DCREATE9EX>(reinterpret_cast<void*>(GetProcAddress(hD3D9, "Direct3DCreate9Ex")));
+             reinterpret_cast<LPDIRECT3DCREATE9EX>(reinterpret_cast<void*>(GetProcAddress(hD3D9, "Direct3DCreate9Ex")));
 
         if (Direct3DCreate9ExPtr) {
             // Function found: try to create D3D9Ex
@@ -4390,6 +5091,7 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
 
     // Determine texture format based on output format
     D3DFORMAT tex_format;
+
     if (out_16) {
         tex_format = D3DFMT_R5G6B5;
     } else {

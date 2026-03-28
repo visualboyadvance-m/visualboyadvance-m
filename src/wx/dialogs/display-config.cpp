@@ -408,6 +408,14 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild("OutputDirect3D")->Hide();
 #endif
 
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+    // Enable the Direct3D option on Windows.
+    render_method = GetValidatedChild("OutputDirect3D12");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d12));
+#else
+    GetValidatedChild("OutputDirect3D12")->Hide();
+#endif
+
     sdlrenderer_label_ = GetValidatedChild<wxControl>("SDLRendererLab");
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());

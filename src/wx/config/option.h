@@ -61,8 +61,13 @@ enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
     kSDL,
+#if defined(__WXMSW__)
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+    kDirect3d12,
+#endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
     kDirect3d,
+#endif
 #elif defined(__WXMAC__)
     kQuartz2d,
 #ifndef NO_METAL

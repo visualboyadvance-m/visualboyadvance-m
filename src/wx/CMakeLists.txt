@@ -365,6 +365,12 @@ function(configure_wx_target target)
         _add_link_libraries(d3d9)
     endif()
 
+    if(NOT ENABLE_DIRECT3D12)
+        _add_compile_definitions(NO_D3D12)
+    else()
+        _add_link_libraries(d3d12)
+    endif()
+
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
