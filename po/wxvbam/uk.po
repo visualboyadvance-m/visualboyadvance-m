@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-09 16:00+0000\n"
+"POT-Creation-Date: 2026-03-28 07:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -41,7 +41,7 @@ msgstr "Не вдалося призначити буфер Core Audio %d: по�
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
-#: cmdevents.cpp:63 wxvbam.cpp:747
+#: cmdevents.cpp:63 wxvbam.cpp:746
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -283,43 +283,43 @@ msgstr "Очікування з'єднання з %s."
 msgid "Waiting for connection on port %d"
 msgstr "Очікування з'єднання на порті %d."
 
-#: cmdevents.cpp:1955
+#: cmdevents.cpp:1956
 msgid "Waiting for GDB..."
 msgstr "Очікування GDB..."
 
-#: cmdevents.cpp:2282
+#: cmdevents.cpp:2275
 #, c-format
 msgid "Filter: %s"
 msgstr "Фільтр: %s."
 
-#: cmdevents.cpp:2290
+#: cmdevents.cpp:2283
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr "Міжкадрове накладання: %s."
 
-#: cmdevents.cpp:2339
+#: cmdevents.cpp:2332
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "Видалити конфігурацію?"
 
-#: cmdevents.cpp:2340
+#: cmdevents.cpp:2333
 msgid "FACTORY RESET"
 msgstr "Відновити заводські налаштування"
 
-#: cmdevents.cpp:2375
+#: cmdevents.cpp:2368
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "Емулятор Nintendo Game Boy / Color / Advance."
 
-#: cmdevents.cpp:2376
+#: cmdevents.cpp:2369
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2025"
 
-#: cmdevents.cpp:2378
+#: cmdevents.cpp:2371
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -335,15 +335,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "Програма - безкоштовне програмне забезпечення: можна розповсюджувати\nїї та / або змінювати за умовами Загальної Публічної Ліцензії GNU,\nопублікованої Фондом Безкоштовного Програмного Забезпечення, чи\nверсії 2 Ліцензії, чи (на твій вибір) будь-якої пізнішої версії.\nПрограму розповсюджено з надією на користь, але БЕЗ ГАРАНТІЙ;\nнавіть без неявної гарантії ПРИДАТНОСТІ ДО ПРОДАЖУ\nЧИ ОСОБЛИВОЇ МЕТИ. Докладно в Загальній Публічній Ліцензії GNU.\n\nТи отримаєш копію Загальної Публічної Ліцензії GNU\nразом із програмою, чи за посиланням.\nhttp://gnu.org/licenses"
 
-#: cmdevents.cpp:2558
+#: cmdevents.cpp:2551
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку."
 
-#: cmdevents.cpp:2624
+#: cmdevents.cpp:2617
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "LAN-з'єднання активне. Вимкни режим з'єднання для роз'єднання."
 
-#: cmdevents.cpp:2630
+#: cmdevents.cpp:2623
 msgid "Network is not supported in local mode."
 msgstr "Мережа непідтримувана в локальному режимі."
 
@@ -372,33 +372,33 @@ msgstr "Огляд"
 msgid "Invalid value for Default magnification."
 msgstr "Недійсне значення типового збільшення."
 
-#: dialogs/display-config.cpp:476
+#: dialogs/display-config.cpp:484
 msgid "Invalid color correction profile"
 msgstr "Недійсний профіль виправлення кольору."
 
-#: dialogs/display-config.cpp:547 xrc/DisplayConfig.xrc:119
-#: xrc/DisplayConfig.xrc:159 xrc/DisplayConfig.xrc:389
+#: dialogs/display-config.cpp:555 xrc/DisplayConfig.xrc:124
+#: xrc/DisplayConfig.xrc:164 xrc/DisplayConfig.xrc:394
 #: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
 #: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
 msgid "None"
 msgstr "Не вказано"
 
-#: dialogs/display-config.cpp:577
+#: dialogs/display-config.cpp:585
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Не знайдено придатних rpi-плаґінів у %s."
 
-#: dialogs/display-config.cpp:614 dialogs/display-config.cpp:693
-#: xrc/DisplayConfig.xrc:135
+#: dialogs/display-config.cpp:622 dialogs/display-config.cpp:701
+#: xrc/DisplayConfig.xrc:140
 msgid "Plugin"
 msgstr "Плаґін"
 
-#: dialogs/display-config.cpp:621
+#: dialogs/display-config.cpp:629
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Використання піксельного фільтра: %s."
 
-#: dialogs/display-config.cpp:628
+#: dialogs/display-config.cpp:636
 #, c-format
 msgid "interframe blend: %s"
 msgstr "міжкадрове накладання: %s."
@@ -632,110 +632,110 @@ msgstr "Очікування з'єднання..."
 msgid "Connecting to %s\n"
 msgstr "З'єднання з %s\n"
 
-#: guiinit.cpp:194
+#: guiinit.cpp:192
 msgid ""
 "Error occurred.\n"
 "Please try again."
 msgstr "Помилка.\nСпробуй знову."
 
-#: guiinit.cpp:261 guiinit.cpp:317
+#: guiinit.cpp:259 guiinit.cpp:315
 msgid "Select cheat file"
 msgstr "Вибір чітів"
 
-#: guiinit.cpp:262
+#: guiinit.cpp:260
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Visual Boy Advance-чіти|*.clt|CHT-чіти|*.cht"
 
-#: guiinit.cpp:284 panel.cpp:1063
+#: guiinit.cpp:282 panel.cpp:1063
 msgid "Loaded cheats"
 msgstr "Завантажено чіти."
 
-#: guiinit.cpp:318
+#: guiinit.cpp:316
 msgid "VBA cheat lists (*.clt)|*.clt"
 msgstr "Visual Boy Advance-чіти|*.clt"
 
-#: guiinit.cpp:339
+#: guiinit.cpp:337
 msgid "Saved cheats"
 msgstr "Збережено чіти."
 
-#: guiinit.cpp:365 guiinit.cpp:384
+#: guiinit.cpp:363 guiinit.cpp:382
 msgid "Restore old values?"
 msgstr "Відновити старі значення?"
 
-#: guiinit.cpp:366 guiinit.cpp:385
+#: guiinit.cpp:364 guiinit.cpp:383
 msgid "Removing cheats"
 msgstr "Вилучення чітів."
 
-#: guiinit.cpp:779
+#: guiinit.cpp:777
 msgid "Generic Code"
 msgstr "Загальний код"
 
-#: guiinit.cpp:862 guiinit.cpp:1112
+#: guiinit.cpp:860 guiinit.cpp:1110
 msgid "Number cannot be empty"
 msgstr "Число не може бути порожнім."
 
-#: guiinit.cpp:912
+#: guiinit.cpp:910
 msgid "Search produced no results"
 msgstr "Не знайдено результатів."
 
-#: guiinit.cpp:1075
+#: guiinit.cpp:1073
 msgid "8-bit "
 msgstr "8 біт "
 
-#: guiinit.cpp:1079
+#: guiinit.cpp:1077
 msgid "16-bit "
 msgstr "16 біт "
 
-#: guiinit.cpp:1083
+#: guiinit.cpp:1081
 msgid "32-bit "
 msgstr "32 біт "
 
-#: guiinit.cpp:1089
+#: guiinit.cpp:1087
 msgid "Signed decimal"
 msgstr "Знакове десяткове"
 
-#: guiinit.cpp:1093
+#: guiinit.cpp:1091
 msgid "Unsigned decimal"
 msgstr "Беззнакове десяткове"
 
-#: guiinit.cpp:1097
+#: guiinit.cpp:1095
 msgid "Unsigned hexadecimal"
 msgstr "Беззнакове шістнадцяткове"
 
-#: guiinit.cpp:1674
+#: guiinit.cpp:1672
 msgid "Main icon not found"
 msgstr "Головну піктограму не знайдено."
 
-#: guiinit.cpp:1692
+#: guiinit.cpp:1690
 msgid "Main display panel not found"
 msgstr "Головну панель дисплея не знайдено."
 
-#: guiinit.cpp:2002
+#: guiinit.cpp:2000
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Вилучено недійсний пункт меню %s."
 
-#: guiinit.cpp:2045
+#: guiinit.cpp:2043
 msgid "JoyBus host invalid; disabling"
 msgstr "Вимкнено недійсний хост Joy Bus."
 
-#: guiinit.cpp:2304
+#: guiinit.cpp:2302
 msgid "Code"
 msgstr "Код"
 
-#: guiinit.cpp:2310
+#: guiinit.cpp:2308
 msgid "Description"
 msgstr "Опис"
 
-#: guiinit.cpp:2363 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2361 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Адреса"
 
-#: guiinit.cpp:2364
+#: guiinit.cpp:2362
 msgid "Old Value"
 msgstr "Старе значення"
 
-#: guiinit.cpp:2365
+#: guiinit.cpp:2363
 msgid "New Value"
 msgstr "Нове значення"
 
@@ -809,7 +809,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог рідних збережень:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:1149 panel.cpp:1170 wxvbam.cpp:1270
+#: panel.cpp:1149 panel.cpp:1170 wxvbam.cpp:1269
 msgid "Directory Error"
 msgstr "Помилка каталогу."
 
@@ -875,231 +875,360 @@ msgstr "Недійсний Game Boy Advance-картридж."
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Metal недоступний, використано типову Open GL."
 
-#: panel.cpp:1953
+#: panel.cpp:1958
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:1963
+#: panel.cpp:1968
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:3082
+#: panel.cpp:3087
 msgid "Failed to set wayland display"
 msgstr "Не вдалося встановити Wayland-відображення."
 
-#: panel.cpp:3110
+#: panel.cpp:3115
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Не вдалося визначити підсистему SDL-відео."
 
-#: panel.cpp:3121
+#: panel.cpp:3126
 msgid "Failed to initialize SDL video"
 msgstr "Не вдалося визначити SDL-відео."
 
-#: panel.cpp:3130
+#: panel.cpp:3135
 msgid "Failed to set wayland surface"
 msgstr "Не вдалося встановити Wayland-поверхню."
 
-#: panel.cpp:3143
+#: panel.cpp:3148
 msgid "Failed to set parent window"
 msgstr "Не вдалося встановити головне вікно."
 
-#: panel.cpp:3152
+#: panel.cpp:3157
 msgid "Failed to set OpenGL properties"
 msgstr "Не вдалося встановити властивості Open GL."
 
-#: panel.cpp:3165 panel.cpp:3204
+#: panel.cpp:3170 panel.cpp:3209
 msgid "Failed to create SDL window"
 msgstr "Не вдалося створити SDL-вікно."
 
-#: panel.cpp:3175 panel.cpp:3232
+#: panel.cpp:3180 panel.cpp:3237
 msgid "Renderer creating failed, using default renderer"
 msgstr "Не вдалося створити опрацьовувач, використано типовий."
 
-#: panel.cpp:3176
+#: panel.cpp:3181
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Помилка SDL: %s."
 
-#: panel.cpp:3183 panel.cpp:3238
+#: panel.cpp:3188 panel.cpp:3243
 msgid "Failed to create SDL renderer"
 msgstr "Не вдалося створити SDL-опрацьовувач."
 
-#: panel.cpp:3189
+#: panel.cpp:3194
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Не вдалося встановити вертикальну синхронізацію для SDL-опрацьовувача."
 
-#: panel.cpp:3193 panel.cpp:3227
+#: panel.cpp:3198 panel.cpp:3232
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL-опрацьовувач: %s"
 
-#: panel.cpp:3212
+#: panel.cpp:3217
 msgid "SDL renderer: default"
 msgstr "SDL-опрацьовувач: типово"
 
-#: panel.cpp:3970
+#: panel.cpp:3975
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:3972
+#: panel.cpp:3977
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:3979
+#: panel.cpp:3984
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:3981
+#: panel.cpp:3986
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:3999
+#: panel.cpp:4004
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:4008
+#: panel.cpp:4013
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:4017
+#: panel.cpp:4022
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:4024
+#: panel.cpp:4029
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:4027
+#: panel.cpp:4032
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:4036
+#: panel.cpp:4041
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:4042
+#: panel.cpp:4047
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:4152
+#: panel.cpp:4165
+msgid "Failed to load D3D12 or D3DCompiler DLLs"
+msgstr ""
+
+#: panel.cpp:4191
+msgid "Failed to get D3D12 function pointers"
+msgstr ""
+
+#: panel.cpp:4196
+#, c-format
+msgid "Failed to create DXGI factory: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4210
+msgid "No hardware adapter found, falling back to WARP"
+msgstr ""
+
+#: panel.cpp:4217
+#, c-format
+msgid "Failed to create D3D12 device: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4218
+#, c-format
+msgid "D3D12 device created (%s)"
+msgstr ""
+
+#: panel.cpp:4225
+#, c-format
+msgid "Failed to create command queue: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4246
+#, c-format
+msgid "Failed to create swap chain: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4252
+#, c-format
+msgid "Failed to get IDXGISwapChain3: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4261
+#, c-format
+msgid "Failed to create RTV heap: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4270
+#, c-format
+msgid "Failed to create SRV heap: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4277
+#, c-format
+msgid "Failed to get back buffer %u: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4285
+#, c-format
+msgid "Failed to create command allocator: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4290
+#, c-format
+msgid "Failed to create command list: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4329
+#, c-format
+msgid "Failed to serialize root signature: %s"
+msgstr ""
+
+#: panel.cpp:4336
+#, c-format
+msgid "Failed to create root signature: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4350
+#, c-format
+msgid "VS compile failed: %s"
+msgstr ""
+
+#: panel.cpp:4358
+#, c-format
+msgid "PS compile failed: %s"
+msgstr ""
+
+#: panel.cpp:4387
+#, c-format
+msgid "Failed to create PSO: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4407
+#, c-format
+msgid "Failed to create vertex buffer: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4416
+#, c-format
+msgid "Failed to create fence: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4419
+msgid "Failed to create fence event"
+msgstr ""
+
+#: panel.cpp:4421
+msgid "D3D12 pipeline fully initialized"
+msgstr ""
+
+#: panel.cpp:4451
+#, c-format
+msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
+msgstr ""
+
+#: panel.cpp:4473
+#, c-format
+msgid "ResizeBuffers failed: 0x%08X"
+msgstr ""
+
+#: panel.cpp:4484
+#, c-format
+msgid "Swap chain resized to %dx%d"
+msgstr ""
+
+#: panel.cpp:4725
+msgid "Texture upload failed"
+msgstr ""
+
+#: panel.cpp:4853
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Використання Direct 3D 9 Ex (динамічне завантаження)"
 
-#: panel.cpp:4156
+#: panel.cpp:4857
 msgid "Failed to load d3d9.dll"
 msgstr "Не вдалося завантажити d3d9.dll."
 
-#: panel.cpp:4165
+#: panel.cpp:4866
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Не вдалося створити інтерфейс Direct 3D 9."
 
-#: panel.cpp:4168
+#: panel.cpp:4869
 msgid "Using Direct3D 9"
 msgstr "Використання Direct 3D 9"
 
-#: panel.cpp:4175
+#: panel.cpp:4876
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
 
-#: panel.cpp:4199
+#: panel.cpp:4900
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "Flip Ex не підтримується, повернення скасування ефекту обміну."
 
-#: panel.cpp:4215
+#: panel.cpp:4916
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Апаратне опрацювання вершин недоступне, повернення програмного."
 
-#: panel.cpp:4239
+#: panel.cpp:4940
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Не вдалося створити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:4244
+#: panel.cpp:4945
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Direct 3D 9 %s-пристрій успішно створено (ефект обміну: %s)."
 
-#: panel.cpp:4277
+#: panel.cpp:4978
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX Drawing Panel визначено: %d * %d (масштаб: %f)."
 
-#: panel.cpp:4299
+#: panel.cpp:5000
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
-#: panel.cpp:4331
+#: panel.cpp:5032
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Спроба відновлення налаштувань Direct 3D-пристрою (ефект обміну: %s)."
 
-#: panel.cpp:4338
+#: panel.cpp:5039
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "Не вдалося перезавантажити Flip Ex, повторення скасування ефекту обміну."
 
-#: panel.cpp:4350
+#: panel.cpp:5051
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Не вдалося перезавантажити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:4355
+#: panel.cpp:5056
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Direct 3D-пристрій успішно перезавантажено (кінцевий ефект обміну: %s)."
 
-#: panel.cpp:4422
+#: panel.cpp:5124
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Не вдалося створити текстуру: 0x%08X."
 
-#: panel.cpp:4434
+#: panel.cpp:5136
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Не вдалося заблокувати текстуру: 0x%08X."
 
-#: panel.cpp:4628
+#: panel.cpp:5330
 msgid "Memory allocation error"
 msgstr "Помилка розподілу пам'яті."
 
-#: panel.cpp:4631
+#: panel.cpp:5333
 msgid "Error initializing codec"
 msgstr "Помилка визначення кодека."
 
-#: panel.cpp:4634
+#: panel.cpp:5336
 msgid "Error writing to output file"
 msgstr "Помилка запису до кінцевого файлу."
 
-#: panel.cpp:4637
+#: panel.cpp:5339
 msgid "Can't guess output format from file name"
 msgstr "Неможливо визначити кінцевий формат імені файлу."
 
-#: panel.cpp:4642
+#: panel.cpp:5344
 msgid "Programming error; aborting!"
 msgstr "Програмна помилка; перервано!"
 
-#: panel.cpp:4654 panel.cpp:4683
+#: panel.cpp:5356 panel.cpp:5385
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:4711
+#: panel.cpp:5413
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:4717
+#: panel.cpp:5419
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:4727
+#: panel.cpp:5429
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:4918
+#: panel.cpp:5620
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
@@ -1203,76 +1332,76 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:564 wxvbam.cpp:581
+#: wxvbam.cpp:563 wxvbam.cpp:580
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:847
+#: wxvbam.cpp:846
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:850
+#: wxvbam.cpp:849
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:853
+#: wxvbam.cpp:852
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:856
+#: wxvbam.cpp:855
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:859
+#: wxvbam.cpp:858
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:863
+#: wxvbam.cpp:862
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:870
+#: wxvbam.cpp:869
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:873
+#: wxvbam.cpp:872
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:875
+#: wxvbam.cpp:874
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:906
+#: wxvbam.cpp:905
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:914
+#: wxvbam.cpp:913
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:928
+#: wxvbam.cpp:927
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:942
+#: wxvbam.cpp:941
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:948
+#: wxvbam.cpp:947
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:963
+#: wxvbam.cpp:962
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1280,21 +1409,21 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:971
+#: wxvbam.cpp:970
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:983
+#: wxvbam.cpp:982
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:1014
+#: wxvbam.cpp:1013
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: wxvbam.cpp:1269
+#: wxvbam.cpp:1268
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1303,7 +1432,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: wxvbam.cpp:1534
+#: wxvbam.cpp:1533
 msgid "Failed to load dialog"
 msgstr "Не вдалося завантажити вікно."
 
@@ -1392,7 +1521,7 @@ msgid "Auto B"
 msgstr "B-Turbo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:326
+#: xrc/DisplayConfig.xrc:331
 msgid "Speed"
 msgstr "Швидкість"
 
@@ -1409,194 +1538,194 @@ msgstr "Game Shark"
 msgid "Joypad %zu %s"
 msgstr "Джойстик %zu %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:422
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
 msgid "Use bilinear filter with 3d renderer"
 msgstr "Використовувати білінійний фільтр із 3D-опрацьовувачем"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:423
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
 msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr "Використовувати SDL-фільтр піксельної графіки із SDL-опрацьовувачем"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:424
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
 msgid "Full-screen filter to apply"
 msgstr "Повноекранний фільтр для встановлення"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:425
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
 msgid "Filter plugin library"
 msgstr "Бібліотека плаґінів фільтрів"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:426
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
 msgid "Interframe blending function"
 msgstr "Функція міжкадрового накладання"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:427
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
 msgid "Bit depth"
 msgstr "Бітова глибина"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:428
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
 msgid "Keep window on top"
 msgstr "Зберігати вікно над усіма вікнами"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:430
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
 msgid "Maximum number of threads to run filters in"
 msgstr "Максимальна кількість потоків для запуску фільтрів"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:432
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "Спосіб опрацювання; при непідтримці буде використано простий спосіб"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:433
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:443
 msgid "Default scale factor"
 msgstr "Типовий коефіцієнт масштабу"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:434
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
 msgid "Retain aspect ratio when resizing"
 msgstr "Зберігати співвідношення сторін при зміні розміру"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:435
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:445
 msgid "SDL renderer"
 msgstr "SDL-опрацьовувач"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:436
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:446
 msgid "Color correction profile"
 msgstr "Профіль виправлення кольору"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "BIOS для використання Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
 msgid "Enable DX Colorization Hacks"
 msgstr "Увімкнути DX-хаки кольоризації"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:451
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:476
 msgid "Apply LCD filter, if enabled"
 msgstr "Встановити LCD-фільтр"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "BIOS для використання Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:454
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "Типова палітра, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:447
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "1-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:460
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "2-а палітра користувача, 8 розділених комами 4-значних шістнадцяткових цілих чисел (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:453
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
 msgid "Automatically gather a full page before printing"
 msgstr "Автоматично збирати повну сторінку перед друком"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:465
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "Автоматично зберігати роздруківки захопленнями екрана з суфіксом -print"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:467
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
 msgid "Directory to look for ROM files"
 msgstr "Каталог пошуку ROM"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:458
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:468
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "Каталог пошуку Game Boy Color ROM"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:459
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
 msgid "Color lightness factor"
 msgstr "Коефіцієнт освітлення кольору"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:462
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
 msgid "BIOS file to use, if enabled"
 msgstr "BIOS для використання"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:472
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
 msgid "Enable link at boot"
 msgstr "Увімкнути з'єднання при завантаженні"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:477
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Enable faster network protocol by default"
 msgstr "Увімкнути швидший мережевий протокол типово"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:479
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
 msgid "Default network link client host"
 msgstr "Типовий хост клієнта мережевого з'єднання"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:480
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
 msgid "Default network link server IP to bind"
 msgstr "Типова IP-адреса сервера мережевого з'єднання для призначення"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:481
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
 msgid "Default network link port (server and client)"
 msgstr "Типовий порт мережевого з'єднання (сервер і клієнт)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
 msgid "Default network protocol"
 msgstr "Типовий мережевий протокол"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
 msgid "Link timeout (ms)"
 msgstr "Час очікування з'єднання (мсек)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Link cable type"
 msgstr "Тип кабелю з'єднання"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
 msgid "Color darkness factor"
 msgstr "Коефіцієнт затемнення кольору"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:490
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
 msgid "Automatically load last saved state"
 msgstr "Автоматично завантажувати останній збережений стан"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:492
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
 msgid ""
 "Directory to store game save files (relative paths are relative to ROM; "
 "blank is config dir)"
 msgstr "Каталог зберігання збережень гри (відносні шляхи до ROM; порожнє - каталог конфігурації)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid "Freeze recent load list"
 msgstr "Зупинити перелік останніх завантажень"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid ""
 "Directory to store A / V and game recordings (relative paths are relative to"
 " ROM)"
 msgstr "Каталог зберігання аудіо / відео та записів ігор (відносні шляхи до ROM)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:509
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "Кількість секунд між перемотуванням знімків назад (0: вимкнути)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:501
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid "Directory to store screenshots (relative paths are relative to ROM)"
 msgstr "Каталог зберігання екранних кадрів (відносні шляхи до ROM)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
 msgid ""
 "Directory to store saved state files (relative paths are relative to "
 "BatteryDir)"
 msgstr "Каталог зберігання станів збереження (відносні шляхи до каталогу батареї)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
 msgid "Enable status bar"
 msgstr "Увімкнути панель стану"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:507
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "Версія INI (не змінювати)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:521
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -1604,275 +1733,275 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "Параметр Joypad/<n>/<button> містить розділений комами перелік імен кнопок, призначених для джойстика #<n> кнопка <button>. Кнопки: ↑, ↓, ←, →, A, B, L, R, Select, Start, Motion Up, Motion Down, Motion Left, Motion Right, Autofire A, Autofire B, Speed, Capture, Game Shark."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "Період перемикання турбо в кадрах (1 / 60 сек)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
 msgid "The number of the stick to use in single-player mode"
 msgstr "Номер важеля для використання в одиничному режимі"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
 msgid "Whether to enable SDL GameController mode"
 msgstr "Увімкнення режиму SDL Game Controller."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:523
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "Параметр Keyboard/<cmd> містить розділений комами перелік імен кнопок (наприклад, Alt + Shift + F1). При натисканні вказаної кнопки буде виконано команду <cmd>."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
 msgid "Enable AGB debug print"
 msgstr "Увімкнути налагоджувальний AGB-друк"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:529
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
 msgid "Auto skip frames"
 msgstr "Автопропуск кадрів"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "Встановити знайдені IPS / UPS / IPF-латки"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
 msgid "Automatically save and load cheat list"
 msgstr "Автоматично зберігати та завантажувати перелік чітів"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "Автоматично вмикати межу для ігор Super Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "Always enable border"
 msgstr "Завжди вмикати межу"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:540
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
 msgid "Screen capture file format"
 msgstr "Формат файлу захоплення екрана"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
 msgid "Enable cheats"
 msgstr "Увімкнути чіти"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:542
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid "Disable on-screen status messages"
 msgstr "Вимкнути екранні повідомлення стану"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
 msgid "Type of system to emulate"
 msgstr "Тип системи для емуляції"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Флеш-розмір (0: 64 Кбайт; 1: 128 Кбайт)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "Пропуск кадрів. Значення 0-9 або -1 для автоматичного пропуску залежно від часу."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid "The palette to use"
 msgstr "Палітра для використання"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
 msgid "Enable printer emulation"
 msgstr "Увімкнути емуляцію принтера"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
 msgid "Break into GDB after loading the game."
 msgstr "Переривання в GDB після завантаження гри."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Port to connect GDB to"
 msgstr "Порт з'єднання GDB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "Number of players in network"
 msgstr "Кількість гравців у мережі"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "Максимальний коефіцієнт масштабу (0: без обмежень)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "Pause game when main window loses focus"
 msgstr "Призупинити гру при втраті виділення головного вікна"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "Увімкнути RTC (vba-over.ini замінено rtcEnabled)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
 msgid "Native save (\"battery\") hardware type"
 msgstr "Тип апаратного забезпечення (\"батарея\") рідного збереження"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Show speed indicator"
 msgstr "Показати вказівник швидкості"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:563
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:573
 msgid "Skip BIOS initialization"
 msgstr "Пропустити визначення BIOS"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
 msgid "Do not overwrite cheat list when loading state"
 msgstr "Не перезаписувати перелік чітів при завантаженні стану"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "Не перезаписувати рідні збереження (батарея) при завантаженні стану"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:582
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "Кількість кадрів для пропуску з прискоренням (замість прискорення)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
 msgid "Use frame skip for speedup throttle"
 msgstr "Використовувати пропуск кадрів для прискорення"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Mute sound during speedup"
 msgstr "Притлумити звук упродовж прискорення"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "Використовувати вказаний BIOS для Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "Use the specified BIOS file"
 msgstr "Використовувати вказаний BIOS"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:593
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "Використовувати вказаний BIOS для Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:594
 msgid "Wait for vertical sync"
 msgstr "Чекати вертикальну синхронізацію"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:587
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
 msgid "Enter fullscreen mode at startup"
 msgstr "Перейти до повного екрана при запуску"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid "Window maximized"
 msgstr "Вікно розгорнуто"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "Window height at startup"
 msgstr "Висота вікна при запуску"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:600
 msgid "Window width at startup"
 msgstr "Ширина вікна при запуску"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
 msgid "Window axis X position at startup"
 msgstr "Положення осі X вікна при запуску"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
 msgid "Window axis Y position at startup"
 msgstr "Положення осі Y вікна при запуску"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Capture key events while on background"
 msgstr "Захоплювати ключові події на фоні"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
 msgid "Capture joy events while on background"
 msgstr "Захоплювати радісні події на фоні"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:609
 msgid "Hide menu bar when mouse is inactive"
 msgstr "Приховати панель меню при неактивній миші"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
 msgid "Suspend screensaver when game is running"
 msgstr "Призупинити заставку при запущеній грі"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "Звуковий API; при непідтримці буде використано типовий API"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "ID вибраного аудіопристрою для вибраного драйвера"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
 msgid "Number of sound buffers"
 msgstr "Кількість звукових буферів"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
 msgid "Bit mask of sound channels to enable"
 msgstr "Бітова маска звукових каналів для увімкнення"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "Фільтрація звуку Game Boy Advance (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
 msgid "Game Boy Advance sound interpolation"
 msgstr "Інтерполяція звуку Game Boy Advance"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
 msgid "Game Boy sound declicking"
 msgstr "Без клацання звуку Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:622
 msgid "Game Boy echo effect (%)"
 msgstr "Луна Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
 msgid "Enable Game Boy sound effects"
 msgstr "Увімкнути звукові ефекти Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
 msgid "Game Boy stereo effect (%)"
 msgstr "Стерео Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:625
 msgid "Game Boy surround sound effect (%)"
 msgstr "Об'ємний звук Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
 msgid "Sound sample rate (kHz)"
 msgstr "Частота дискретизації аудіо (кГц)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:627
 msgid "Use DirectSound hardware acceleration"
 msgstr "Використовувати апаратне прискорення Direct Sound"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:628
 msgid "Upmix stereo to surround"
 msgstr "Зводити стерео для об'ємного звуку"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:629
 msgid "Sound volume (%)"
 msgstr "Гучність звуку (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:630
 msgid "Language"
 msgstr "Мова"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
 msgid "External translations"
 msgstr "Зовнішні переклади"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:696
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:716
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:737
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:758
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:778
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:798
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:706
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:726
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:747
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:768
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:788
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:808
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Недійсне значення %s для опції %s; дійсні значення: %s."
@@ -2580,167 +2709,167 @@ msgstr "Кінцевий модуль"
 msgid "Simple"
 msgstr "Simple"
 
-#: xrc/DisplayConfig.xrc:74
+#: xrc/DisplayConfig.xrc:79
 msgid "SDL Renderer:"
 msgstr "SDL-опрацьовувач:"
 
-#: xrc/DisplayConfig.xrc:83
+#: xrc/DisplayConfig.xrc:88
 msgid "SDL Pixel Art Filter"
 msgstr "SDL-фільтр піксельної графіки"
 
-#: xrc/DisplayConfig.xrc:97
+#: xrc/DisplayConfig.xrc:102
 msgid "Filters"
 msgstr "Фільтри"
 
-#: xrc/DisplayConfig.xrc:112
+#: xrc/DisplayConfig.xrc:117
 msgid "Display filter:"
 msgstr "Фільтр відображення:"
 
-#: xrc/DisplayConfig.xrc:120
+#: xrc/DisplayConfig.xrc:125
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: xrc/DisplayConfig.xrc:121
+#: xrc/DisplayConfig.xrc:126
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: xrc/DisplayConfig.xrc:122
+#: xrc/DisplayConfig.xrc:127
 msgid "Pixelate"
 msgstr "Pixelate"
 
-#: xrc/DisplayConfig.xrc:123
+#: xrc/DisplayConfig.xrc:128
 msgid "Advance MAME Scale 2x"
 msgstr "Advance MAME Scale 2x"
 
-#: xrc/DisplayConfig.xrc:124
+#: xrc/DisplayConfig.xrc:129
 msgid "Bilinear Plus"
 msgstr "Bilinear Plus"
 
-#: xrc/DisplayConfig.xrc:125
+#: xrc/DisplayConfig.xrc:130
 msgid "Scanlines"
 msgstr "Scanlines"
 
-#: xrc/DisplayConfig.xrc:126
+#: xrc/DisplayConfig.xrc:131
 msgid "TV Mode"
 msgstr "TV Mode"
 
-#: xrc/DisplayConfig.xrc:129
+#: xrc/DisplayConfig.xrc:134
 msgid "Simple 4x"
 msgstr "Simple 4x"
 
-#: xrc/DisplayConfig.xrc:142
+#: xrc/DisplayConfig.xrc:147
 msgid "Plugin:"
 msgstr "Плаґін:"
 
-#: xrc/DisplayConfig.xrc:152
+#: xrc/DisplayConfig.xrc:157
 msgid "Interframe blending:"
 msgstr "Міжкадрове накладання:"
 
-#: xrc/DisplayConfig.xrc:160
+#: xrc/DisplayConfig.xrc:165
 msgid "Smart"
 msgstr "Розумне"
 
-#: xrc/DisplayConfig.xrc:161
+#: xrc/DisplayConfig.xrc:166
 msgid "Motion Blur"
 msgstr "Міжкадрове розмиття"
 
-#: xrc/DisplayConfig.xrc:173
+#: xrc/DisplayConfig.xrc:178
 msgid "Bit Depth"
 msgstr "Бітова глибина"
 
-#: xrc/DisplayConfig.xrc:182
+#: xrc/DisplayConfig.xrc:187
 msgid "Bit Depth:"
 msgstr "Бітова глибина:"
 
-#: xrc/DisplayConfig.xrc:190
+#: xrc/DisplayConfig.xrc:195
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:191
+#: xrc/DisplayConfig.xrc:196
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:192
+#: xrc/DisplayConfig.xrc:197
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:193
+#: xrc/DisplayConfig.xrc:198
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:201
+#: xrc/DisplayConfig.xrc:206
 msgid "Color Correction"
 msgstr "Виправлення кольору"
 
-#: xrc/DisplayConfig.xrc:210
+#: xrc/DisplayConfig.xrc:215
 msgid "Profile:"
 msgstr "Профіль:"
 
-#: xrc/DisplayConfig.xrc:244
+#: xrc/DisplayConfig.xrc:249
 msgid "GBA Darken:"
 msgstr "Затемнення Game Boy Advance: "
 
-#: xrc/DisplayConfig.xrc:263
+#: xrc/DisplayConfig.xrc:268
 msgid "Lighter"
 msgstr "Світліше"
 
-#: xrc/DisplayConfig.xrc:274
+#: xrc/DisplayConfig.xrc:279
 msgid "Very Dark"
 msgstr "Дуже темно"
 
-#: xrc/DisplayConfig.xrc:285
+#: xrc/DisplayConfig.xrc:290
 msgid "GBC Lighten:"
 msgstr "Освітлення Game Boy Color: "
 
-#: xrc/DisplayConfig.xrc:304
+#: xrc/DisplayConfig.xrc:309
 msgid "Darker"
 msgstr "Темніше"
 
-#: xrc/DisplayConfig.xrc:315
+#: xrc/DisplayConfig.xrc:320
 msgid "Very Light"
 msgstr "Дуже світло"
 
-#: xrc/DisplayConfig.xrc:332
+#: xrc/DisplayConfig.xrc:337
 msgid "Frame Skip"
 msgstr "Пропуск кадрів"
 
-#: xrc/DisplayConfig.xrc:350
+#: xrc/DisplayConfig.xrc:355
 msgid "&Number of frames to skip:"
 msgstr "&Кількість кадрів для пропуску:"
 
-#: xrc/DisplayConfig.xrc:374
+#: xrc/DisplayConfig.xrc:379
 msgid "On-Screen Display"
 msgstr "Екранне відображення"
 
-#: xrc/DisplayConfig.xrc:381
+#: xrc/DisplayConfig.xrc:386
 msgid "Speed indicator:"
 msgstr "Указівник швидкості:"
 
-#: xrc/DisplayConfig.xrc:390
+#: xrc/DisplayConfig.xrc:395
 msgid "Percentage"
 msgstr "Проценти"
 
-#: xrc/DisplayConfig.xrc:391
+#: xrc/DisplayConfig.xrc:396
 msgid "Detailed"
 msgstr "Докладний"
 
-#: xrc/DisplayConfig.xrc:399
+#: xrc/DisplayConfig.xrc:404
 msgid "Zoom"
 msgstr "Масштабувати"
 
-#: xrc/DisplayConfig.xrc:409
+#: xrc/DisplayConfig.xrc:414
 msgid "Default magnification:"
 msgstr "Типове збільшення:"
 
-#: xrc/DisplayConfig.xrc:427
+#: xrc/DisplayConfig.xrc:432
 msgid "Maximum magnification factor:"
 msgstr "Максимальний коефіцієнт збільшення:"
 
-#: xrc/DisplayConfig.xrc:428
+#: xrc/DisplayConfig.xrc:433
 msgid "0 = no maximum"
 msgstr "0: не максимум"
 
-#: xrc/DisplayConfig.xrc:435
+#: xrc/DisplayConfig.xrc:440
 msgid "0 = no limit"
 msgstr "0: без обмежень"
 
