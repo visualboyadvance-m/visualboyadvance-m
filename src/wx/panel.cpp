@@ -4147,9 +4147,10 @@ typedef HRESULT(WINAPI* LPFND3D12GetDebugInterface)(REFIID riid, void** ppvDebug
 
 DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
+    , fence_value(0)
+    , frame_index(0)
     , texture_width(0)
     , texture_height(0)
-    , frame_index(0)
     , rtv_descriptor_size(0)
     , fence_value(0)
     , fence_event(NULL)
@@ -4168,10 +4169,10 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
 
     // --- 1. DXGI Factory & Adapter ---
     ComPtr<IDXGIFactory4> factory;
-	LPFND3D12CreateDevice CREATEDEVICE = reinterpret_cast<LPFND3D12CreateDevice>(GetProcAddress(hD3D12, "D3D12CreateDevice"));
-    LPFND3D12SerializeRootSignature D3D12SERIALIZEROOTSIGNATURE = reinterpret_cast<LPFND3D12SerializeRootSignature>(GetProcAddress(hD3D12, "D3D12SerializeRootSignature"));
-    LPFND3DCompile D3DCOMPILE = reinterpret_cast<LPFND3DCompile>(GetProcAddress(hD3DCompiler, "D3DCompile"));
-    LPFNCreateDXGIFactory1 CREATEFACTORY = reinterpret_cast<LPFNCreateDXGIFactory1>(GetProcAddress(hDXGI, "CreateDXGIFactory1"));
+	LPFND3D12CreateDevice CREATEDEVICE = reinterpret_cast<LPFND3D12CreateDevice>(reinterpret_cast<void*>(GetProcAddress(hD3D12, "D3D12CreateDevice")));
+    LPFND3D12SerializeRootSignature D3D12SERIALIZEROOTSIGNATURE = reinterpret_cast<LPFND3D12SerializeRootSignature>(reinterpret_cast<void*>(GetProcAddress(hD3D12, "D3D12SerializeRootSignature")));
+    LPFND3DCompile D3DCOMPILE = reinterpret_cast<LPFND3DCompile>(reinterpret_cast<void*>(GetProcAddress(hD3DCompiler, "D3DCompile")));
+    LPFNCreateDXGIFactory1 CREATEFACTORY = reinterpret_cast<LPFNCreateDXGIFactory1>(reinterpret_cast<void*>((GetProcAddress(hDXGI, "CreateDXGIFactory1")));
 
 #if defined(_DEBUG)
     // Enable the D3D12 debug layer in debug builds
@@ -4202,7 +4203,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
         adapter->GetDesc1(&desc);
         if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
 
-        hr = CREATEDEVICE(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr);
+        hr = CREATEDEVICE(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_ID3D12Device, nullptr);
         if (SUCCEEDED(hr)) break;
         adapter = nullptr;
     }
