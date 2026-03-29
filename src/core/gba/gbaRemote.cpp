@@ -44,8 +44,10 @@
 #include <sstream>
 
 #include "core/gba/gba.h"
+#include "core/gba/gbaCpu.h"
 #include "core/gba/gbaElf.h"
 #include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaInline.h"
 #include "core/gba/gbaRemote.h"
 #include "core/gba/internal/gbaBreakpoint.h"
 
@@ -643,7 +645,39 @@ void debuggerEditRegister(int n, char** args)
             }
             return;
         }
-        reg[r].I = val;
+        if (r == 16) {
+            bool savedArmState = armState;
+            reg[r].I = val;
+            CPUUpdateFlags();
+            if (armState != savedArmState) {
+                if (armState) {
+                    reg[15].I &= 0xFFFFFFFC;
+                    armNextPC = reg[15].I;
+                    reg[15].I += 4;
+                    ARM_PREFETCH;
+                } else {
+                    reg[15].I &= 0xFFFFFFFE;
+                    armNextPC = reg[15].I;
+                    reg[15].I += 2;
+                    THUMB_PREFETCH;
+                }
+            }
+        } else {
+            reg[r].I = val;
+            if (r == 15) {
+                if (armState) {
+                    reg[15].I = val & 0xFFFFFFFC;
+                    armNextPC = reg[15].I;
+                    reg[15].I += 4;
+                    ARM_PREFETCH;
+                } else {
+                    reg[15].I = val & 0xFFFFFFFE;
+                    armNextPC = reg[15].I;
+                    reg[15].I += 2;
+                    THUMB_PREFETCH;
+                }
+            }
+        }
         {
             snprintf(monbuf, sizeof(monbuf), "R%02d=%08X\n", r, val);
             monprintf(monbuf);
@@ -4079,7 +4113,7 @@ void remoteWriteRegister(char* p)
 
     sscanf(p, "%x=", &r);
 
-    if(r < 0 || r > 15)
+    if(r < 0 || r > 16)
     {
         remotePutPacket("E 00");
         return;
@@ -4114,13 +4148,38 @@ void remoteWriteRegister(char* p)
     v = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 
     //  monprintf("Write register %d=%08x\n", r, v);
-    reg[r].I = v;
-    if (r == 15) {
-        armNextPC = v;
-        if (armState)
-            reg[15].I = v + 4;
-        else
-            reg[15].I = v + 2;
+    if (r == 16) {
+        bool savedArmState = armState;
+        reg[r].I = v;
+        CPUUpdateFlags();
+        if (armState != savedArmState) {
+            if (armState) {
+                reg[15].I &= 0xFFFFFFFC;
+                armNextPC = reg[15].I;
+                reg[15].I += 4;
+                ARM_PREFETCH;
+            } else {
+                reg[15].I &= 0xFFFFFFFE;
+                armNextPC = reg[15].I;
+                reg[15].I += 2;
+                THUMB_PREFETCH;
+            }
+        }
+    } else {
+        reg[r].I = v;
+        if (r == 15) {
+            if (armState) {
+                reg[15].I = v & 0xFFFFFFFC;
+                armNextPC = reg[15].I;
+                reg[15].I += 4;
+                ARM_PREFETCH;
+            } else {
+                reg[15].I = v & 0xFFFFFFFE;
+                armNextPC = reg[15].I;
+                reg[15].I += 2;
+                THUMB_PREFETCH;
+            }
+        }
     }
     remotePutPacket("OK");
 }

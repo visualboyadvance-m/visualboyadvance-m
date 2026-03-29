@@ -1359,12 +1359,17 @@ static INSN_REGPARM void arm120(uint32_t opcode)
         if (opcode & 0x00080000)
             newValue = (newValue & 0x00FFFFFF) | (value & 0xFF000000);
         newValue |= 0x10;
+        bool savedArmState = armState;
+        uint32_t savedMode = reg[16].I & 0x1F;
         CPUSwitchMode(newValue & 0x1F, false);
         reg[16].I = newValue;
         CPUUpdateFlags();
         if (!armState) { // this should not be allowed, but it seems to work
             THUMB_PREFETCH;
             reg[15].I = armNextPC + 2;
+        } else if (!savedArmState || (newValue & 0x1F) != savedMode) {
+            // mode changed, flush pipeline
+            ARM_PREFETCH;
         }
     } else {
         armUnknownInsn(opcode);
@@ -1415,12 +1420,17 @@ static INSN_REGPARM void arm320(uint32_t opcode)
 
         newValue |= 0x10;
 
+        bool savedArmState = armState;
+        uint32_t savedMode = reg[16].I & 0x1F;
         CPUSwitchMode(newValue & 0x1F, false);
         reg[16].I = newValue;
         CPUUpdateFlags();
         if (!armState) { // this should not be allowed, but it seems to work
             THUMB_PREFETCH;
             reg[15].I = armNextPC + 2;
+        } else if (!savedArmState || (newValue & 0x1F) != savedMode) {
+            // mode changed, flush pipeline
+            ARM_PREFETCH;
         }
     } else {
         armUnknownInsn(opcode);
