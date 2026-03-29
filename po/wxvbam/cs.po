@@ -6,6 +6,7 @@
 # Appukonrad <appukonrad@gmail.com>, 2012
 # Sanky <gsanky+transifex@gmail.com>, 2012
 # Jan Prudil <homulianlp@gmail.com>, 2015
+# J Nezbeda, 2026
 # Patrik Jager <patrikusp@gmail.com>, 2018
 # Zbyněk Schwarz <zbynek.schwarz@gmail.com>, 2015
 msgid ""
@@ -14,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-03-28 07:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Patrik Jager <patrikusp@gmail.com>, 2018\n"
+"Last-Translator: J Nezbeda, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/bgk/vba-m/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -166,7 +167,7 @@ msgstr ""
 
 #: cmdevents.cpp:654
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
-msgstr ""
+msgstr "Game Boy snímek (*.gbs)|*.gbs"
 
 #: cmdevents.cpp:666
 msgid ""
@@ -200,7 +201,7 @@ msgstr "EEPROM uložení nelze exportovat"
 
 #: cmdevents.cpp:736
 msgid "Game Shark Snapshot (*.sps)|*.sps"
-msgstr ""
+msgstr "Game Shark snímek (*.sps)|*.sps"
 
 #: cmdevents.cpp:753
 msgid "Exported from Visual Boy Advance-M"
@@ -214,7 +215,7 @@ msgstr "Soubor snímku %s uložen"
 #: cmdevents.cpp:767
 #, c-format
 msgid "Error saving snapshot file %s"
-msgstr "Chyba  ukládání snapshot souboru %s"
+msgstr "Chyba ukládání souboru snímku %s"
 
 #: cmdevents.cpp:783 cmdevents.cpp:864 cmdevents.cpp:937 cmdevents.cpp:1009
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:588 viewers.cpp:808
@@ -245,7 +246,7 @@ msgstr "Vybrat uložení"
 
 #: cmdevents.cpp:1387 cmdevents.cpp:1483
 msgid "Visual Boy Advance saved game files|*.sgm"
-msgstr ""
+msgstr "Visual Boy Advance uložené hry|*.sgm"
 
 #: cmdevents.cpp:1516 cmdevents.cpp:1526 cmdevents.cpp:1537
 #, c-format
@@ -274,7 +275,7 @@ msgstr "Port kde očekávat připojení:"
 
 #: cmdevents.cpp:1893
 msgid "GDB Connection"
-msgstr "GDB Připojení"
+msgstr "GDB připojení"
 
 #: cmdevents.cpp:1945
 #, c-format
@@ -293,7 +294,7 @@ msgstr "Čekání na GDB..."
 #: cmdevents.cpp:2275
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Filtr: %s"
 
 #: cmdevents.cpp:2283
 #, c-format
@@ -305,22 +306,22 @@ msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
-msgstr ""
+msgstr "VAŠE KONFIGURACE BUDE SMAZÁNA!\n\nJste si jist/á?"
 
 #: cmdevents.cpp:2333
 msgid "FACTORY RESET"
-msgstr ""
+msgstr "TOVÁRNÍ RESETOVÁNÍ"
 
 #: cmdevents.cpp:2368
 msgid "Nintendo Game Boy / Color / Advance emulator."
-msgstr ""
+msgstr "Emulátor Nintendo Game Boy/Color/Advance"
 
 #: cmdevents.cpp:2369
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr ""
+msgstr "Všechna práva vyhrazena (C) 1999-2003 Forgotten\nVšechna práva vyhrazena (C) 2004-2006 Vývojový tým VBA\nVšechna práva vyhrazena (C) 2007-2020 Vývojový tým VBA-M"
 
 #: cmdevents.cpp:2371
 msgid ""
@@ -369,7 +370,7 @@ msgstr ""
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
-msgstr ""
+msgstr "Procházet"
 
 #: dialogs/display-config.cpp:109
 msgid "Invalid value for Default magnification."
@@ -409,7 +410,7 @@ msgstr ""
 #: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
 #: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
 msgid "(None)"
-msgstr ""
+msgstr "(Nic)"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
 msgid "Unknown"
@@ -417,7 +418,7 @@ msgstr "Neznámý"
 
 #: dialogs/game-maker.cpp:235
 msgid "Invalid"
-msgstr ""
+msgstr "Neplatný"
 
 #: dialogs/gb-rom-info.cpp:22
 msgid "No mapper"
@@ -565,31 +566,31 @@ msgstr ""
 
 #: extra-translations.cpp:13
 msgid "&Apply"
-msgstr ""
+msgstr "&Aplikovat"
 
 #: extra-translations.cpp:14
 msgid "Artists"
-msgstr ""
+msgstr "Umělci"
 
 #: extra-translations.cpp:15
 msgid "Cancel"
-msgstr ""
+msgstr "Zrušit"
 
 #: extra-translations.cpp:16
 msgid "Close"
-msgstr ""
+msgstr "Zavřít"
 
 #: extra-translations.cpp:17
 msgid "Developers"
-msgstr ""
+msgstr "Vývojáři"
 
 #: extra-translations.cpp:18
 msgid "License"
-msgstr ""
+msgstr "Licence"
 
 #: extra-translations.cpp:19
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: gfxviewers.cpp:1247
 msgid "Select output file and type"
@@ -695,15 +696,15 @@ msgstr "32-bitové"
 
 #: guiinit.cpp:1087
 msgid "Signed decimal"
-msgstr ""
+msgstr "Desetinné číslo"
 
 #: guiinit.cpp:1091
 msgid "Unsigned decimal"
-msgstr ""
+msgstr "Kladné desetinné číslo"
 
 #: guiinit.cpp:1095
 msgid "Unsigned hexadecimal"
-msgstr ""
+msgstr "Kladné hexadecimální číslo"
 
 #: guiinit.cpp:1672
 msgid "Main icon not found"
@@ -720,7 +721,7 @@ msgstr "Neplatná položka nabídky %s; odstraňování"
 
 #: guiinit.cpp:2043
 msgid "JoyBus host invalid; disabling"
-msgstr "Neplatný hostitel JoyBus; probíhá vypínání"
+msgstr "Neplatný hostitel JoyBus; probíhá zakazování"
 
 #: guiinit.cpp:2302
 msgid "Code"
@@ -758,12 +759,12 @@ msgstr "Neplatné svázání klávesy %s k %s"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:523
 #, c-format
 msgid "Invalid value %s for option %s"
-msgstr ""
+msgstr "Neplatná hodnota %s pro volbu %s"
 
 #: opts.cpp:506
 #, c-format
 msgid "Unknown option %s with value %s"
-msgstr ""
+msgstr "Neznámá volba %s s hodnotou %s"
 
 #: panel.cpp:687
 #, c-format
@@ -781,7 +782,7 @@ msgstr "Nelze načíst Game Boy ROM %s"
 
 #: panel.cpp:773 panel.cpp:916 panel.cpp:1775
 msgid "Could not initialize the sound driver!"
-msgstr ""
+msgstr "Nelze použít zvukový ovladač!"
 
 #: panel.cpp:784
 msgid ""
@@ -814,7 +815,7 @@ msgstr ""
 
 #: panel.cpp:1149 panel.cpp:1170 wxvbam.cpp:1269
 msgid "Directory Error"
-msgstr ""
+msgstr "Chyba adresáře"
 
 #: panel.cpp:1169
 #, c-format
@@ -896,15 +897,15 @@ msgstr ""
 
 #: panel.cpp:3126
 msgid "Failed to initialize SDL video"
-msgstr ""
+msgstr "Nelze použít SDL video"
 
 #: panel.cpp:3135
 msgid "Failed to set wayland surface"
-msgstr ""
+msgstr "Nepodařilo se nastavit wayland povrch "
 
 #: panel.cpp:3148
 msgid "Failed to set parent window"
-msgstr ""
+msgstr "Nepodařilo se nastavit rodičovské okno"
 
 #: panel.cpp:3157
 msgid "Failed to set OpenGL properties"
