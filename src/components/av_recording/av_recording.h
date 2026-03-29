@@ -16,6 +16,11 @@ extern "C" {
 #define UINT64_C(c) (c ## ULL)
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4244)
+#endif
+
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/avassert.h>
@@ -26,6 +31,10 @@ extern "C" {
 #include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 #include <libswresample/swresample.h>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 }
 
 #include <vector>
