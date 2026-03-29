@@ -358,8 +358,14 @@ void __cdecl terminate(void)
     add_library(vbam_libretro_msvcrt_shim OBJECT "${_lr_shim_src}")
     set_target_properties(vbam_libretro_msvcrt_shim PROPERTIES
         MSVC_RUNTIME_LIBRARY "MultiThreadedDLL"
-        INTERPROCEDURAL_OPTIMIZATION ON
     )
+    # /GL is incompatible with /ZI in Debug builds.
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set_target_properties(vbam_libretro_msvcrt_shim PROPERTIES
+            INTERPROCEDURAL_OPTIMIZATION OFF
+        )
+        target_compile_options(vbam_libretro_msvcrt_shim PRIVATE /GL-)
+    endif()
 
     target_link_libraries(vbam_libretro PRIVATE vbam_libretro_msvcrt_shim)
 
