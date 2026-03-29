@@ -145,13 +145,13 @@ if(MSVC)
     # msvcrt.dll import library instead.
     target_compile_definitions(vbam_libretro PRIVATE _NO_CRT_STDIO_INLINE)
 
-    # Determine machine type for lib.exe.
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "X64|x86_64")
-        set(_lr_machine X64)
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|aarch64")
+    # Determine machine type for lib.exe (uses vars from Architecture.cmake).
+    if(ARM64)
         set(_lr_machine ARM64)
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "ARM|armv7")
+    elseif(ARM32)
         set(_lr_machine ARM)
+    elseif(X86_64)
+        set(_lr_machine X64)
     else()
         set(_lr_machine X86)
     endif()
@@ -229,15 +229,15 @@ if(MSVC)
 
 /* --- stdio bridge --------------------------------------------------- */
 
-/* msvcrt.dll exports __iob_func; UCRT renamed it to __acrt_iob_func. */
-#if !defined(_M_ARM) && !defined(_M_ARM64)
-extern __declspec(dllimport) FILE* __iob_func(void);
+/* msvcrt.dll exports the _iob array (stdin/stdout/stderr).
+ * UCRT renamed the accessor to __acrt_iob_func.  Use the data export
+ * directly since __iob_func may not be present on all Windows versions. */
+extern __declspec(dllimport) FILE _iob[];
 
 FILE* __cdecl __acrt_iob_func(unsigned index)
 {
-    return __iob_func() + index;
+    return &_iob[index];
 }
-#endif
 
 /* UCRT's __stdio_common_vsprintf_s: used by the CRT startup error path.
  * Forward to msvcrt.dll's _vsnprintf + manual truncation.
