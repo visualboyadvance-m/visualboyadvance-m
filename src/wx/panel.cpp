@@ -2553,7 +2553,7 @@ public:
                             const uint8_t g8 = (color >> 16) & 0xff;
                             const uint8_t b8 = (color >> 8) & 0xff;
 #endif
-                            dest16[pos++] = (r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
+                            dest16[pos++] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
                         }
                         pos += scaled_border_dest;
                     }
