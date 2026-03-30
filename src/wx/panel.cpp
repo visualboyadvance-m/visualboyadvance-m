@@ -2464,9 +2464,9 @@ public:
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
                             const uint16_t src_val = src16[src_pos++];
-                            const uint8_t r5 = (src_val >> saved_red_shift) & 0x1f;
-                            const uint8_t g5 = (src_val >> saved_green_shift) & 0x1f;
-                            const uint8_t b5 = (src_val >> saved_blue_shift) & 0x1f;
+                            const uint8_t r5 = (src_val >> 10) & 0x1f;
+                            const uint8_t g5 = (src_val >> 5) & 0x1f;
+                            const uint8_t b5 = src_val & 0x1f;
                             const uint8_t r8 = (r5 << 3) | (r5 >> 2);
                             const uint8_t g8 = (g5 << 3) | (g5 >> 2);
                             const uint8_t b8 = (b5 << 3) | (b5 >> 2);
@@ -2553,7 +2553,7 @@ public:
                             const uint8_t g8 = (color >> 16) & 0xff;
                             const uint8_t b8 = (color >> 8) & 0xff;
 #endif
-                            dest16[pos++] = ((r8 >> 3) << saved_red_shift) | ((g8 >> 3) << saved_green_shift) | ((b8 >> 3) << saved_blue_shift);
+                            dest16[pos++] = (r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
                         }
                         pos += scaled_border_dest;
                     }
@@ -4157,6 +4157,14 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     HRESULT hr;
     BOOL using_warp = false;
 
+    memset(delta, 0xff, sizeof(delta));
+
+    // Match what SDL/GL/Metal constructors do:
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+
     hD3DCompiler = LoadLibrary(TEXT("d3dcompiler_47.dll"));
     hD3D12 = LoadLibrary(TEXT("d3d12.dll"));
 	hDXGI = LoadLibrary(TEXT("dxgi.dll"));
@@ -4837,6 +4845,14 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
     // Try to create Direct3D 9Ex interface (Vista+) via dynamic loading
     // This is required to support Windows XP, which doesn't export Direct3DCreate9Ex
     HMODULE hD3D9 = LoadLibrary(TEXT("d3d9.dll"));
+
+    memset(delta, 0xff, sizeof(delta));
+
+    // Match what SDL/GL/Metal constructors do:
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
 
     if (hD3D9) {
         // Attempt to get the function address
