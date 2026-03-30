@@ -172,12 +172,18 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_INCLUDE_DIRS "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/wx-${wx_version_major_minor}" CACHE INTERNAL "wxWidgets include directories" FORCE)
 endif()
 
-# Workaround for wx trying to link dynamic lzma MSYS2.
+# Workaround for wx trying to link dynamic lzma on MSYS2.
+# Also extract -L flags into link_directories() to avoid Windows path
+# colon mangling when arguments are passed on the command line (test
+# targets don't use response files).
 if(VBAM_STATIC AND MSYS2)
     unset(cleaned_up_wx_libs)
     foreach(lib ${wxWidgets_LIBRARIES})
         if(lib MATCHES "lzma")
             set(lib "liblzma.a")
+        elseif(lib MATCHES "^-L(.+)")
+            link_directories("${CMAKE_MATCH_1}")
+            continue()
         endif()
 
         list(APPEND cleaned_up_wx_libs "${lib}")

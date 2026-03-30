@@ -91,11 +91,38 @@ if(ENABLE_FFMPEG)
         list(APPEND FFMPEG_LIBRARIES secur32 bcrypt ncrypt ${WIN32_MEDIA_FOUNDATION_LIBS} dwrite msimg32 ntdll crypt32 ole32)
 
         if(MSYS2 AND VBAM_STATIC AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-            foreach(lib tiff jbig lzma aom gsm jxl jxl_cms jxl_threads hwy lcms2 mp3lame lc3 opencore-amrnb opencore-amrwb opus openjp2 rav1e speex theora SvtAv1Enc vorbis vorbisenc vpx webp webpmux sharpyuv xvidcore va vpl dav1d zvbi rsvg-2 gdk_pixbuf-2.0 cairo cairo-gobject pixman-1 soxr xml2 modplug gme gnutls bluray srt rtmp ssh shaderc shaderc_combined SPIRV-Tools-opt SPIRV-Tools glib-2.0 gmodule-2.0 gobject-2.0 gio-2.0 brotlicommon brotlienc brotlidec ogg png tasn1 nettle gmp pango-1.0 pangocairo-1.0 pangowin32-1.0 pangoft2-1.0 fontconfig fribidi harfbuzz graphite2 freetype thai datrie mincore zstd crypto hogweed glslang unistring ffi pcre2-8 va_win32 idn2 z)
+            # Use --start-group/--end-group to handle circular dependencies
+            # between the many transitive static libraries.
+            list(APPEND FFMPEG_LIBRARIES "-Wl,--start-group")
+
+            # gomp (OpenMP) is only available with GCC, not Clang.
+            if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+                set(_msys2_omp_lib gomp)
+            else()
+                set(_msys2_omp_lib omp)
+            endif()
+
+            foreach(lib tiff jbig lzma aom gsm jxl jxl_cms jxl_threads hwy lcms2 mp3lame lc3 opencore-amrnb opencore-amrwb opus openjp2 rav1e speex theora SvtAv1Enc vorbis vorbisenc vpx webp webpmux sharpyuv xvidcore va vpl dav1d zvbi rsvg-2 gdk_pixbuf-2.0 cairo cairo-gobject pixman-1 soxr ${_msys2_omp_lib} xml2 modplug gme gnutls bluray srt rtmp ssh shaderc shaderc_combined SPIRV-Tools-opt SPIRV-Tools glib-2.0 gmodule-2.0 gobject-2.0 gio-2.0 brotlicommon brotlienc brotlidec ogg png tasn1 nettle gmp pango-1.0 pangocairo-1.0 pangowin32-1.0 pangoft2-1.0 fontconfig fribidi harfbuzz graphite2 freetype thai datrie mincore zstd crypto hogweed glslang unistring ffi pcre2-8 va_win32 idn2 ntdll z)
                 cygpath(lib "$ENV{MSYSTEM_PREFIX}/lib/lib${lib}.a")
 
                 list(APPEND FFMPEG_LIBRARIES "${lib}")
             endforeach()
+
+            # UCRT64's ffmpeg static archives were compiled with
+            # __declspec(dllimport) for transitive deps like cairo/glib/hwy.
+            # The __imp_* references can only be resolved by DLL import libs.
+            # lld (CLANG64) doesn't need this and treats it as an error.
+            if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+                foreach(lib cairo glib-2.0 gobject-2.0 gio-2.0 hwy)
+                    set(_dll_a "$ENV{MSYSTEM_PREFIX}/lib/lib${lib}.dll.a")
+                    if(EXISTS "${_dll_a}")
+                        cygpath(_dll_a "${_dll_a}")
+                        list(APPEND FFMPEG_LIBRARIES "${_dll_a}")
+                    endif()
+                endforeach()
+            endif()
+
+            list(APPEND FFMPEG_LIBRARIES "-Wl,--end-group")
 
             add_link_options("-Wl,--allow-multiple-definition")
 
