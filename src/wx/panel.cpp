@@ -295,33 +295,24 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
         } else if (is_16bit) {
             for (int y = 0; y < bandHeight; y++) {
                 const uint16_t* src16 = reinterpret_cast<const uint16_t*>(bandSrcRow);
-                const int left_border_pos = pos;
-                pos++; // Reserve space for left border
-
+                const int left_border_pos = pos++;
                 for (int x = 0; x < width; x++) {
-                    const uint16_t val = src16[x];
-                            
-                    // Standard RGB555 extraction (Most common 16-bit format)
-                    // If your lines are still blue, try changing these shifts to 11, 5, 0 (RGB565)
-                    uint8_t r = (val >> 10) & 0x1F;
-                    uint8_t g = (val >> 5) & 0x1F;
-                    uint8_t b = val & 0x1F;
-
-                    // Expand 5-bit to 8-bit
-                    r = (r << 3) | (r >> 2);
-                    g = (g << 3) | (g >> 2);
-                    b = (b << 3) | (b >> 2);
-
-                    // FORCE Little Endian XRGB (0x00RRGGBB) for the filter
-                    // This bypasses the wxBYTE_ORDER macro to see if it's the culprit
-                    src32[pos++] = (uint32_t)b | ((uint32_t)g << 8) | ((uint32_t)r << 16);
+                    const uint16_t src_val = src16[x];
+                    const uint8_t r5 = (src_val >> 10) & 0x1f;
+                    const uint8_t g5 = (src_val >> 5) & 0x1f;
+                    const uint8_t b5 = src_val & 0x1f;
+                    const uint8_t r8 = (r5 << 3) | (r5 >> 2);
+                    const uint8_t g8 = (g5 << 3) | (g5 >> 2);
+                    const uint8_t b8 = (b5 << 3) | (b5 >> 2);
+#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                    src32[pos++] = b8 | (g8 << 8) | (r8 << 16);
+#else
+                    src32[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
+#endif
                 }
-
-                // Fill Borders
                 src32[left_border_pos] = src32[left_border_pos + 1];
                 src32[pos] = src32[pos - 1];
                 pos++;
-
                 bandSrcRow += srcPitch;
             }
         } else {  // is_24bit
