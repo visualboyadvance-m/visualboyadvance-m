@@ -298,9 +298,9 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                 const int left_border_pos = pos++;
                 for (int x = 0; x < width; x++) {
                     const uint16_t src_val = src16[x];
-                    const uint8_t r5 = (src_val >> 10) & 0x1f;
-                    const uint8_t g5 = (src_val >> 5) & 0x1f;
-                    const uint8_t b5 = src_val & 0x1f;
+                    const uint8_t r5 = (src_val >> saved_red_shift) & 0x1f;
+                    const uint8_t g5 = (src_val >> saved_green_shift) & 0x1f;
+                    const uint8_t b5 = (src_val >> saved_blue_shift) & 0x1f;
                     const uint8_t r8 = (r5 << 3) | (r5 >> 2);
                     const uint8_t g8 = (g5 << 3) | (g5 >> 2);
                     const uint8_t b8 = (b5 << 3) | (b5 >> 2);
@@ -2464,9 +2464,9 @@ public:
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
                             const uint16_t src_val = src16[src_pos++];
-                            const uint8_t r5 = (src_val >> 10) & 0x1f;
-                            const uint8_t g5 = (src_val >> 5) & 0x1f;
-                            const uint8_t b5 = src_val & 0x1f;
+                            const uint8_t r5 = (src_val >> saved_red_shift) & 0x1f;
+                            const uint8_t g5 = (src_val >> saved_green_shift) & 0x1f;
+                            const uint8_t b5 = (src_val >> saved_blue_shift) & 0x1f;
                             const uint8_t r8 = (r5 << 3) | (r5 >> 2);
                             const uint8_t g8 = (g5 << 3) | (g5 >> 2);
                             const uint8_t b8 = (b5 << 3) | (b5 >> 2);
@@ -2553,7 +2553,7 @@ public:
                             const uint8_t g8 = (color >> 16) & 0xff;
                             const uint8_t b8 = (color >> 8) & 0xff;
 #endif
-                            dest16[pos++] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
+                            dest16[pos++] = ((r8 >> 3) << saved_red_shift) | ((g8 >> 3) << saved_green_shift) | ((b8 >> 3) << saved_blue_shift);
                         }
                         pos += scaled_border_dest;
                     }
@@ -4650,9 +4650,9 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                     if (p == 0xff) {
                         dr[0] = dr[1] = dr[2] = 0xff;
                     } else {
-                        dr[0] = (p & 0x3) << 6;        // R
+                        dr[0] = (p & 0x3) << 6;        // R ← B
                         dr[1] = ((p >> 2) & 0x7) << 5; // G
-                        dr[2] = ((p >> 5) & 0x7) << 5; // B
+                        dr[2] = ((p >> 5) & 0x7) << 5; // B ← R
                     }
                     dr[3] = 0xff;
                     dr += 4;
@@ -4667,16 +4667,15 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
                 for (int x = 0; x < scaled_width; x++, sr++) {
                     uint16_t p = *sr;
-                    if ((p == 0xffff) || (p == 0x7fff)) {
+                    if ((p & 0x7ffff) == 0x7fff) {
                         dr[0] = dr[1] = dr[2] = 0xff;
                     } else {
-                        uint8_t r5 = (p >> systemRedShift) & 0x1f;
-                        uint8_t g5 = (p >> systemGreenShift) & 0x1f;
-                        uint8_t b5 = (p >> systemBlueShift) & 0x1f;
-                        // Expand to 8-bit
-                        dr[0] = (r5 << 3) | (r5 >> 2); // R
-                        dr[1] = (g5 << 3) | (g5 >> 2); // G
-                        dr[2] = (b5 << 3) | (b5 >> 2); // B
+                        uint8_t r5 = (uint8_t)((p >> systemRedShift) & 0x1f);
+                        uint8_t g5 = (uint8_t)((p >> systemGreenShift) & 0x1f);
+                        uint8_t b5 = (uint8_t)((p >> systemBlueShift) & 0x1f);
+                        dr[0] = (b5 << 3) | (b5 >> 2);
+                        dr[1] = (g5 << 3) | (g5 >> 2);
+                        dr[2] = (r5 << 3) | (r5 >> 2);
                     }
                     dr[3] = 0xff;
                     dr += 4;
@@ -4690,9 +4689,9 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                 uint8_t* sr = src;
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
                 for (int x = 0; x < scaled_width; x++) {
-                    dr[0] = sr[0]; // R
+                    dr[0] = sr[2]; // R ← B
                     dr[1] = sr[1]; // G
-                    dr[2] = sr[2]; // B
+                    dr[2] = sr[0]; // B ← R
                     dr[3] = 0xff;
                     sr += 3; dr += 4;
                 }
