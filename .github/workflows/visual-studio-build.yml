@@ -49,7 +49,7 @@ jobs:
 
       - name: Configure
         run: >-
-          cmake -B build -G ${{ matrix.cmake_generator }} -DBUILD_TESTING=OFF -DCOMPILE_ONLY=TRUE -DUPSTREAM_RELEASE=FALSE -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+          cmake -B build -G ${{ matrix.cmake_generator }} -DBUILD_TESTING=OFF -DUPSTREAM_RELEASE=FALSE -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
 
       - name: Build
         run: cmake --build build
