@@ -4675,7 +4675,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
                 for (int x = 0; x < scaled_width; x++, sr++) {
                     uint16_t p = *sr;
-                    if ((p & 0x7ffff) == 0x7fff) {
+                    if ((p & 0x7fff) == 0x7fff) {
                         dr[0] = dr[1] = dr[2] = 0xff;
                     } else {
                         uint8_t r5 = (uint8_t)((p >> systemRedShift) & 0x1f);
