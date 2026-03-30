@@ -4669,26 +4669,38 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
             }
         }
         else if (out_16) {
-            uint16_t* src16 = (uint16_t*)src + src_pitch / 2; // skip top border
+            // Skip top border and cast to 16-bit source data (typically RGB555)
+            uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
+
             for (int y = 0; y < scaled_height; y++) {
                 uint16_t* sr = src16;
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
+
                 for (int x = 0; x < scaled_width; x++, sr++) {
                     uint16_t p = *sr;
+
+                    // Handle transparency/white key: map 0x7FFF (High-bit 0, RGB 31,31,31) to solid white
                     if ((p & 0x7fff) == 0x7fff) {
                         dr[0] = dr[1] = dr[2] = 0xff;
-                    } else {
-                        uint8_t r5 = (uint8_t)((p >> systemRedShift) & 0x1f);
-                        uint8_t g5 = (uint8_t)((p >> systemGreenShift) & 0x1f);
-                        uint8_t b5 = (uint8_t)((p >> systemBlueShift) & 0x1f);
+                    }
+                    else {
+                        // Hardcoded 5-5-5 shifts (10/5/0) to avoid race conditions with 
+                        // global 'systemRedShift' overrides during filter transitions.
+                        uint8_t r5 = (p >> 10) & 0x1f;
+                        uint8_t g5 = (p >> 5) & 0x1f;
+                        uint8_t b5 = p & 0x1f;
+
+                        // Expand 5-bit to 8-bit (XRGB/BGRA layout) via bit-duplication
+                        // (e.g., 11111 -> 11111111) for full color range intensity.
+                        // dr[0]=Blue, dr[1]=Green, dr[2]=Red
                         dr[0] = (b5 << 3) | (b5 >> 2);
                         dr[1] = (g5 << 3) | (g5 >> 2);
                         dr[2] = (r5 << 3) | (r5 >> 2);
                     }
-                    dr[3] = 0xff;
+                    dr[3] = 0xff; // Set Alpha channel to fully opaque
                     dr += 4;
                 }
-                src16 += src_pitch / 2;
+                src16 += src_pitch / 2; // Advance source pointer by pitch (adjusted for uint16_t)
             }
         }
         else if (out_24) {
@@ -4840,6 +4852,13 @@ DXDrawingPanel::DXDrawingPanel(wxWindow* parent, int _width, int _height)
         , texture_height(0)
         , using_d3d9ex(false)
 {
+    memset(delta, 0xff, sizeof(delta));
+
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone) {
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+
     HRESULT hr = E_FAIL; // Initialize hr to a failure value
 
     // Try to create Direct3D 9Ex interface (Vista+) via dynamic loading
@@ -5195,25 +5214,32 @@ void DXDrawingPanel::DrawArea(wxWindowDC& dc)
             src += src_pitch;
             dst += locked_rect.Pitch;
         }
-    } else if (out_16) {
-        // Convert 16-bit data from system format (1-5-5-5) to D3D R5G6B5
-        // Skip 1 row of top border (pitch in bytes so divide by 2)
+    }
+    else if (out_16) {
+        // Convert 16-bit RGB555 (R=14:10, G=9:5, B=4:0) to D3D R5G6B5.
+        // Fixed shifts (10/5/0) are used here to bypass 'systemRedShift' globals.
+        // This prevents a race condition where filter threads might temporarily
+        // update those globals to 32-bit values (19/11/3) during the conversion.
         uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
         for (int y = 0; y < scaled_height; y++) {
             uint16_t* src_row = src16;
             uint16_t* dst_row = (uint16_t*)dst;
             for (int x = 0; x < scaled_width; x++, src_row++) {
-                // Extract RGB components using system shifts (5 bits each)
                 uint16_t pixel = *src_row;
-                uint8_t r5 = ((pixel >> systemRedShift) & 0x1f);
-                uint8_t g5 = ((pixel >> systemGreenShift) & 0x1f);
-                uint8_t b5 = ((pixel >> systemBlueShift) & 0x1f);
-                // Expand 5-bit green to 6-bit by duplicating the MSB
+                // Extract 5-bit Red from bits 14-10
+                uint8_t r5 = (pixel >> 10) & 0x1f;
+                // Extract 5-bit Green from bits 9-5
+                uint8_t g5 = (pixel >> 5) & 0x1f;
+                // Extract 5-bit Blue from bits 4-0
+                uint8_t b5 = (pixel >> 0) & 0x1f;
+                // Upscale 5-bit Green to 6-bit by bit-duplication (11111 -> 111111)
                 uint8_t g6 = (g5 << 1) | (g5 >> 4);
-                // Pack into D3D R5G6B5 format: RRRRRGGGGGGBBBBB
+                // Pack into D3D-native R5G6B5 format: RRRRRGGGGGGBBBBB
                 *dst_row++ = (r5 << 11) | (g6 << 5) | b5;
             }
-            src16 += src_pitch / 2; // Move to next row including border (pitch in bytes, divide by 2 for uint16_t)
+            // Advance source pointer by pitch (adjusted for uint16_t size)
+            src16 += src_pitch / 2;
+            // Advance destination pointer by the D3D surface's stride
             dst += locked_rect.Pitch;
         }
     } else if (out_24) {
