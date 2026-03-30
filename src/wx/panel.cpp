@@ -3693,9 +3693,9 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
 
         for (int y = 0; y < std::ceil(height * scale); y++) {
             for (int x = 0; x < std::ceil(width * scale); x++, src++) {
-                *dst++ = ((*src >> systemRedShift) & 0x1f) << 3;
-                *dst++ = ((*src >> systemGreenShift) & 0x1f) << 3;
-                *dst++ = ((*src >> systemBlueShift) & 0x1f) << 3;
+                *dst++ = ((*src >> 10) & 0x1f) << 3;
+                *dst++ = ((*src >> 5) & 0x1f) << 3;
+                *dst++ = (*src & 0x1f) << 3;
             }
 
             src += (int)std::ceil(inrb * scale); // skip rhs border (scaled)
