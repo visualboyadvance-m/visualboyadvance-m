@@ -116,9 +116,9 @@ void gbcfilter_update_colors(bool lcd) {
         for (int i = 0x0; i < 0x10000; i++) {
             // GB/GBC uses BGR555 format: 0BBBBBGGGGGRRRRR
             // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
-            systemColorMap16[i] = ((i & 0x1f) << systemRedShift) |
-                (((i & 0x3e0) >> 5) << systemGreenShift) |
-                (((i & 0x7c00) >> 10) << systemBlueShift);
+            systemColorMap16[i] = ((i & 0x1f) << 10) |  // R
+                (((i & 0x3e0) >> 5) << 5) |  // G
+                (((i & 0x7c00) >> 10) << 0);   // B
         }
         if (lcd)
             gbcfilter_pal(systemColorMap16, 0x10000);
@@ -249,9 +249,12 @@ void gbcfilter_pal(uint16_t* buf, int count)
     while (count--) {
         uint16_t pix = *buf;
 
-        uint8_t original_r_val_5bit = (uint8_t)((pix >> systemRedShift) & 0x1f);
-        uint8_t original_g_val_5bit = (uint8_t)((pix >> systemGreenShift) & 0x1f);
-        uint8_t original_b_val_5bit = (uint8_t)((pix >> systemBlueShift) & 0x1f);
+        // Hardcode RGB555 shifts (10/5/0) - systemRedShift etc. may be
+        // temporarily overridden to 32-bit values (19/11/3) by filter
+        // threads running concurrently, which would corrupt the palette.
+        uint8_t original_r_val_5bit = (pix >> 10) & 0x1f;
+        uint8_t original_g_val_5bit = (pix >> 5) & 0x1f;
+        uint8_t original_b_val_5bit = (pix >> 0) & 0x1f;
 
         // Normalize to 0.0-1.0 for calculations
         float r = (float)original_r_val_5bit / 31.0f;
@@ -295,9 +298,9 @@ void gbcfilter_pal(uint16_t* buf, int count)
         if (final_green > 31) final_green = 31;
         if (final_blue > 31) final_blue = 31;
 
-        *buf++ = (final_red << systemRedShift) |
-            (final_green << systemGreenShift) |
-            (final_blue << systemBlueShift);
+        *buf++ = (final_red   << 10) |
+                 (final_green <<  5) |
+                  final_blue;
     }
 }
 
