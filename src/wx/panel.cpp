@@ -640,6 +640,11 @@ GameArea::GameArea()
 
     hq2x_init(32);
     Init_2xSaI(32);
+
+    // Bind once here - panel creation happens repeatedly on filter changes,
+    // and binding inside that block accumulates duplicate handlers, causing
+    // OnSize to fire N times after N filter changes.
+    this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
 }
 
 void GameArea::LoadGame(const wxString& name)
@@ -1477,7 +1482,27 @@ void GameArea::ResetPanel() {
         panel->StopFilterThreads();
         InterframeCleanup();
 
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        // D3D panels must be destroyed synchronously. Their destructors release
+        // the D3D device/swap chain. If we use wx's deferred Destroy(), those
+        // resources stay alive until the wx event loop processes the deferred
+        // delete - and D3D/DXGI will block the new panel's device/swap chain
+        // creation until the old ones are fully released, causing a noticeable
+        // stall when reinitialising after a filter change.
+        // We must delete via the correctly-typed pointer so the right destructor
+        // chain runs - DrawingPanelBase's destructor is not virtual.
+        if (auto* dx12 = dynamic_cast<DX12DrawingPanel*>(panel)) {
+            delete dx12;
+        } else
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+        if (auto* dx9 = dynamic_cast<DXDrawingPanel*>(panel)) {
+            delete dx9;
+        } else
+#endif
+        {
         panel->Destroy();
+        }
         panel = NULL;
 
         // Mark that we need to resume after panel is recreated
@@ -1830,10 +1855,6 @@ void GameArea::OnIdle(wxIdleEvent& event)
         w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
         w->Bind(wxEVT_PAINT, &GameArea::PaintEv, this);
         w->Bind(wxEVT_ERASE_BACKGROUND, &GameArea::EraseBackground, this);
-
-        // set userdata so we know it's the panel and not the frame being resized
-        // the userdata is freed on disconnect/destruction
-        this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
 
         // We need to check if the buttons stayed pressed when focus the panel.
         w->Bind(wxEVT_KILL_FOCUS, &GameArea::OnKillFocus, this);
@@ -4397,7 +4418,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
 
     // --- 11. Vertex Buffer (screen-space quad, updated each frame) ---
     {
-        // 4 vertices × (float4 pos + float2 uv) = 4 × 24 bytes
+        // 4 vertices x (float4 pos + float2 uv) = 4 x 24 bytes
         const UINT vb_size = 4 * sizeof(float) * 6;
         D3D12_HEAP_PROPERTIES heap_props = {};
         heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
@@ -4602,7 +4623,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
     command_allocator->Reset();
     command_list->Reset(command_allocator.Get(), pipeline_state.Get());
 
-    // --- Transition back buffer: PRESENT → RENDER TARGET ---
+    // --- Transition back buffer: PRESENT -> RENDER TARGET ---
     D3D12_RESOURCE_BARRIER barrier = {};
     barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
     barrier.Transition.pResource = render_targets[frame_index].Get();
@@ -4620,7 +4641,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
     command_list->OMSetRenderTargets(1, &rtv_handle, FALSE, nullptr);
 
     if (!todraw) {
-        // No frame data — just clear and present
+        // No frame data - just clear and present
         goto present;
     }
 
@@ -4658,9 +4679,9 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                     if (p == 0xff) {
                         dr[0] = dr[1] = dr[2] = 0xff;
                     } else {
-                        dr[0] = (p & 0x3) << 6;        // R ← B
+                        dr[0] = (p & 0x3) << 6;        // R <- B
                         dr[1] = ((p >> 2) & 0x7) << 5; // G
-                        dr[2] = ((p >> 5) & 0x7) << 5; // B ← R
+                        dr[2] = ((p >> 5) & 0x7) << 5; // B <- R
                     }
                     dr[3] = 0xff;
                     dr += 4;
@@ -4709,9 +4730,9 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                 uint8_t* sr = src;
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
                 for (int x = 0; x < scaled_width; x++) {
-                    dr[0] = sr[2]; // R ← B
+                    dr[0] = sr[2]; // R <- B
                     dr[1] = sr[1]; // G
-                    dr[2] = sr[0]; // B ← R
+                    dr[2] = sr[0]; // B <- R
                     dr[3] = 0xff;
                     sr += 3; dr += 4;
                 }
@@ -4719,15 +4740,15 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
             }
         }
         else {
-            // 32-bit BGRA → RGBA
+            // 32-bit BGRA -> RGBA
             src += src_pitch; // skip top border row
             for (int y = 0; y < scaled_height; y++) {
                 uint8_t* sr = src;
                 uint8_t* dr = dst_pixels + y * scaled_width * 4;
                 for (int x = 0; x < scaled_width; x++) {
-                    dr[0] = sr[2]; // R ← B
+                    dr[0] = sr[2]; // R <- B
                     dr[1] = sr[1]; // G
-                    dr[2] = sr[0]; // B ← R
+                    dr[2] = sr[0]; // B <- R
                     dr[3] = sr[3]; // A
                     sr += 4; dr += 4;
                 }
@@ -4797,7 +4818,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
         float x0 = toNDC_X(off_x), y0 = toNDC_Y(off_y);
         float x1 = toNDC_X(off_x + render_w), y1 = toNDC_Y(off_y + render_h);
 
-        // xyzw (w=1), uv  — two triangles as a strip
+        // xyzw (w=1), uv  - two triangles as a strip
         struct Vertex { float x, y, z, w, u, v; };
         Vertex verts[4] = {
             { x0, y0, 0.0f, 1.0f,  0.0f, 0.0f },  // TL
@@ -4818,7 +4839,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
     }
 
 present:
-    // Transition back buffer: RENDER TARGET → PRESENT
+    // Transition back buffer: RENDER TARGET -> PRESENT
     barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
     barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
     command_list->ResourceBarrier(1, &barrier);
