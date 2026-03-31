@@ -209,7 +209,7 @@ XAudio2_9_Output::XAudio2_9_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
 XAudio2_9_Output::~XAudio2_9_Output() {
     is_destructing = true;
     // Unregister from device notifications
-    g_notifier.do_unregister(this);
+    g_notifier.do_unregister(this, true);
     close();
 }
 

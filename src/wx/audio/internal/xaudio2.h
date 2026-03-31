@@ -56,7 +56,7 @@ public:
     HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) override;
 
     void do_register(XAudio2_Output* p_instance);
-    void do_unregister(XAudio2_Output* p_instance);
+    void do_unregister(XAudio2_Output* p_instance, bool is_destructing = false);
 };
 
 // Global notifier instance declaration
