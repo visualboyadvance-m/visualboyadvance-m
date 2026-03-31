@@ -12,25 +12,32 @@
 namespace audio {
 namespace internal {
 
-// XAudio2_Output interface for device change notifications
+// XAudio2_Output interface for device change notifications.
+// signal_device_change() is called from the MMDevice notification thread and
+// must only set an atomic flag - no wx calls, no locking, no allocation.
 class XAudio2_Output {
 public:
-    // Signal that device has changed (sets flag only, safe to call from callback)
     virtual void signal_device_change() = 0;
     virtual ~XAudio2_Output() = default;
 };
 
-// Device Notifier for hotplug support
+// Device Notifier for hotplug support.
+// Callbacks fire on the MMDevice COM notification thread, which is NOT the wx
+// main thread. No wx API calls are permitted inside any callback.
 class XAudio2_Device_Notifier : public IMMNotificationClient {
     LONG _cRef;
     IMMDeviceEnumerator* _pEnumerator;
     std::wstring last_device;
-    
-    // Simple array for lock-free access - we'll accept potential race conditions
-    // since missing one callback isn't critical (we'll get the next one)
+
     static const int MAX_INSTANCES = 8;
     XAudio2_Output* instances[MAX_INSTANCES];
     volatile LONG instance_count;
+
+    // Protects instances[] and instance_count for register/unregister.
+    // The notification callbacks only read instance_count and instances[],
+    // which is safe because do_unregister nulls the slot before decrementing
+    // the count, so a concurrent callback iteration at worst skips a null.
+    CRITICAL_SECTION instances_cs;
 
 public:
     XAudio2_Device_Notifier();
@@ -41,7 +48,7 @@ public:
     ULONG STDMETHODCALLTYPE Release() override;
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, VOID** ppvInterface) override;
 
-    // IMMNotificationClient methods
+    // IMMNotificationClient methods - all called on the COM notification thread
     HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDeviceId) override;
     HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId) override;
     HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId) override;

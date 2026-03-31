@@ -26,7 +26,6 @@
 #pragma GCC diagnostic pop
 #endif
 #endif
-
 // Include for log() function
 #include "core/base/system.h"
 
@@ -36,29 +35,30 @@ namespace internal {
 // Implement the notifier methods
 XAudio2_Device_Notifier g_notifier;
 
-XAudio2_Device_Notifier::XAudio2_Device_Notifier() : _cRef(1), _pEnumerator(nullptr), instance_count(0) { 
+XAudio2_Device_Notifier::XAudio2_Device_Notifier() : _cRef(1), _pEnumerator(nullptr), instance_count(0) {
     for (int i = 0; i < MAX_INSTANCES; i++) {
         instances[i] = nullptr;
     }
+    InitializeCriticalSection(&instances_cs);
 }
 
-XAudio2_Device_Notifier::~XAudio2_Device_Notifier() { 
+XAudio2_Device_Notifier::~XAudio2_Device_Notifier() {
     if (_pEnumerator) {
         _pEnumerator->UnregisterEndpointNotificationCallback(this);
         _pEnumerator->Release();
         _pEnumerator = nullptr;
     }
+    DeleteCriticalSection(&instances_cs);
 }
 
 // IUnknown methods - for global static object, we don't delete on Release
-ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::AddRef() { 
+ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::AddRef() {
     return InterlockedIncrement(&_cRef);
 }
 
-ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::Release() { 
+ULONG STDMETHODCALLTYPE XAudio2_Device_Notifier::Release() {
     ULONG ulRef = InterlockedDecrement(&_cRef);
-    // Note: We DON'T delete this because it's a global static object
-    // The Microsoft example shows delete for heap-allocated objects
+    // Do not delete - this is a global static object.
     return ulRef;
 }
 
@@ -77,74 +77,73 @@ HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::QueryInterface(REFIID riid, V
 }
 
 HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDefaultDeviceChanged(EDataFlow flow, ERole, LPCWSTR pwstrDeviceId) {
+    // Called on the MMDevice notification thread - no wx calls permitted here.
     if (flow == eRender) {
         last_device = pwstrDeviceId ? pwstrDeviceId : L"";
-        
-        // Completely lock-free: just read the count and iterate
-        // We might miss an instance that's being added/removed, but that's okay
+
+        // Read count and iterate. Slots may be null if an instance is being
+        // unregistered concurrently; null check handles that safely.
         LONG count = instance_count;
-        for (int i = 0; i < count && i < MAX_INSTANCES; i++) {
+        for (int i = 0; i < MAX_INSTANCES && count > 0; i++) {
             XAudio2_Output* instance = instances[i];
             if (instance) {
                 instance->signal_device_change();
+                count--;
             }
-        }
-        
-        // Only log if we have active instances to avoid UI issues during shutdown
-        if (count > 0) {
-            log("XAudio2: Default audio device changed\n");
         }
     }
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceAdded(LPCWSTR) { 
-    return S_OK; 
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceAdded(LPCWSTR) {
+    return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceRemoved(LPCWSTR pwstrDeviceId) {
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceRemoved(LPCWSTR) {
+    // Called on the MMDevice notification thread - no wx calls permitted here.
     LONG count = instance_count;
-    
-    // Only log and signal if we have active instances
-    if (count > 0) {
-        log("XAudio2: Audio device removed\n");
-        
-        for (int i = 0; i < count && i < MAX_INSTANCES; i++) {
-            XAudio2_Output* instance = instances[i];
-            if (instance) {
-                instance->signal_device_change();
-            }
+    for (int i = 0; i < MAX_INSTANCES && count > 0; i++) {
+        XAudio2_Output* instance = instances[i];
+        if (instance) {
+            instance->signal_device_change();
+            count--;
         }
     }
-    
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) { 
-    return S_OK; 
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnDeviceStateChanged(LPCWSTR, DWORD) {
+    return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) { 
-    return S_OK; 
+HRESULT STDMETHODCALLTYPE XAudio2_Device_Notifier::OnPropertyValueChanged(LPCWSTR, const PROPERTYKEY) {
+    return S_OK;
 }
 
 void XAudio2_Device_Notifier::do_register(XAudio2_Output* p_instance) {
-    // Check if already registered
+    EnterCriticalSection(&instances_cs);
+
+    // Check if already registered.
     for (int i = 0; i < MAX_INSTANCES; i++) {
         if (instances[i] == p_instance) {
+            LeaveCriticalSection(&instances_cs);
             log("XAudio2: Instance already registered, skipping\n");
             return;
         }
     }
-    
-    // Find first empty slot
+
+    // Find first empty slot and assign before incrementing count, so a
+    // concurrent callback iteration won't see a non-null slot with stale data.
     for (int i = 0; i < MAX_INSTANCES; i++) {
         if (instances[i] == nullptr) {
             instances[i] = p_instance;
             LONG new_count = InterlockedIncrement(&instance_count);
+            LeaveCriticalSection(&instances_cs);
+
             log("XAudio2: Registered instance (total: %d)\n", new_count);
-            
-            // Register enumerator on first instance
+
+            // Register enumerator on first instance. Done outside the lock
+            // since CoCreateInstance can be slow and we already hold the slot.
             if (new_count == 1 && !_pEnumerator) {
                 HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER,
                                               __uuidof(IMMDeviceEnumerator), (void**)&_pEnumerator);
@@ -156,20 +155,33 @@ void XAudio2_Device_Notifier::do_register(XAudio2_Output* p_instance) {
             return;
         }
     }
+
+    LeaveCriticalSection(&instances_cs);
     wxLogError(_("XAudio2: Too many audio instances (max %d)"), MAX_INSTANCES);
 }
 
 void XAudio2_Device_Notifier::do_unregister(XAudio2_Output* p_instance) {
-    // Find and remove the instance
+    EnterCriticalSection(&instances_cs);
+
+    // Find and remove the instance.
     for (int i = 0; i < MAX_INSTANCES; i++) {
         if (instances[i] == p_instance) {
+            // Null the slot before decrementing so concurrent callback
+            // iterations see the slot as empty rather than dangling.
             instances[i] = nullptr;
             LONG new_count = InterlockedDecrement(&instance_count);
-            log("XAudio2: Unregistered instance (remaining: %d)\n", new_count);
+            LeaveCriticalSection(&instances_cs);
+            // Use wxLogDebug rather than log() - do_unregister is called from
+            // the destructor during teardown when the status bar may already be
+            // partially destroyed, and log() routes through systemScreenMessage
+            // which calls PopStatusText and asserts.
+            wxLogDebug(_("XAudio2: Unregistered instance (remaining: %d)"), new_count);
             return;
         }
     }
-    log("XAudio2: Warning - tried to unregister instance that wasn't registered\n");
+
+    LeaveCriticalSection(&instances_cs);
+    wxLogDebug(_("XAudio2: Warning - tried to unregister instance that wasn't registered"));
 }
 
 namespace {
@@ -185,10 +197,10 @@ struct XAudio2Context {
     XAudio2Version version = XAudio2Version::None;
     HMODULE hXAudio2 = nullptr;
     IXAudio2* xaudio2 = nullptr;
-    
+
     // For XAudio 2.7 COM
     bool comInitialized = false;
-    
+
     ~XAudio2Context() {
         if (xaudio2) {
             xaudio2->Release();
@@ -203,7 +215,7 @@ struct XAudio2Context {
             comInitialized = false;
         }
     }
-    
+
     bool Initialize() {
         // Try XAudio 2.9 first (Windows 10+)
         hXAudio2 = LoadLibraryExW(L"XAudio2_9.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
@@ -221,7 +233,7 @@ struct XAudio2Context {
             FreeLibrary(hXAudio2);
             hXAudio2 = nullptr;
         }
-        
+
         // Try XAudio 2.8 next (Windows 8)
         hXAudio2 = LoadLibraryExW(L"XAudio2_8.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (hXAudio2) {
@@ -238,7 +250,7 @@ struct XAudio2Context {
             FreeLibrary(hXAudio2);
             hXAudio2 = nullptr;
         }
-        
+
         // Fall back to XAudio 2.7 (Windows 7)
         hXAudio2 = LoadLibraryExW(L"XAudio2_7.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (hXAudio2) {
@@ -249,11 +261,11 @@ struct XAudio2Context {
                 return false;
             }
             comInitialized = (hr == S_OK);
-            
+
             // Use COM to create XAudio2 2.7 instance
             static const CLSID CLSID_XAudio2_7 = {0x5a508685, 0xa254, 0x4fba, {0x9b, 0x82, 0x9a, 0x24, 0xb0, 0x03, 0x06, 0xaf}};
             static const IID IID_IXAudio2_7 = {0x8bcf1f58, 0x9fe7, 0x4583, {0x8a, 0xc6, 0xe2, 0xad, 0xc4, 0x65, 0xc8, 0xbb}};
-            
+
             hr = CoCreateInstance(CLSID_XAudio2_7, NULL, CLSCTX_INPROC_SERVER, IID_IXAudio2_7, (void**)&xaudio2);
             if (SUCCEEDED(hr) && xaudio2) {
                 // XAudio 2.7 REQUIRES Initialize() call!
@@ -270,11 +282,11 @@ struct XAudio2Context {
             } else {
                 wxLogError(_("XAudio2: Failed to create XAudio2 2.7"));
             }
-            
+
             FreeLibrary(hXAudio2);
             hXAudio2 = nullptr;
         }
-        
+
         wxLogError(_("XAudio2: Could not load XAudio2_9.dll, XAudio2_8.dll, or XAudio2_7.dll!"));
         return false;
     }
@@ -289,7 +301,7 @@ std::vector<AudioDevice> GetXAudio2Devices() {
         return {};
     }
 
-    // For XAudio2 2.7, use the 2.7-specific device enumeration
+    // For XAudio2 2.7, use the 2.7-specific device enumeration.
     if (g_xaudio2_context.version == XAudio2Version::XAudio2_7) {
         try {
             return GetXAudio2_7_Devices(g_xaudio2_context.xaudio2);
@@ -298,7 +310,6 @@ std::vector<AudioDevice> GetXAudio2Devices() {
             return {};
         }
     } else {
-        // Both XAudio2 2.8 and 2.9 can use the same device enumeration logic
         return GetXAudio2_9_Devices(g_xaudio2_context.xaudio2);
     }
 }
@@ -311,7 +322,7 @@ std::unique_ptr<SoundDriver> CreateXAudio2Driver() {
     switch (g_xaudio2_context.version) {
     case XAudio2Version::XAudio2_9:
     case XAudio2Version::XAudio2_8:
-        // XAudio2 2.8 and 2.9 are compatible - use the same driver
+        // XAudio2 2.8 and 2.9 are compatible - use the same driver.
         return CreateXAudio2_9_Driver(g_xaudio2_context.xaudio2);
     case XAudio2Version::XAudio2_7:
         return CreateXAudio2_7_Driver(g_xaudio2_context.xaudio2);

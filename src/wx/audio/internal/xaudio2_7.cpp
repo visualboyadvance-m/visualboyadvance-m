@@ -17,7 +17,10 @@
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaSound.h"
 #include "wx/config/option-proxy.h"
+
+#include <wx/app.h>
 
 namespace audio {
 namespace internal {
@@ -55,8 +58,7 @@ private:
     int soundBufferLen = 0;
     volatile bool device_changed = false;
     volatile bool is_destructing = false;
-    DWORD device_change_time = 0;  // Time when device change was detected
-    int reinit_attempts = 0;       // Track reinitialization attempts
+    bool reinit_posted = false;
 
     IXAudio2* xaud = nullptr;
     IXAudio2MasteringVoice* mVoice = nullptr;
@@ -250,13 +252,11 @@ XAudio2_7_Output::~XAudio2_7_Output() {
 }
 
 void XAudio2_7_Output::signal_device_change() {
-    // Reset the timer every time we get a callback
-    // This way we only act after Windows stops sending callbacks
+    // Called from the MMDevice notification thread - only set the atomic flag.
+    // The actual reinit is handled on the main thread via write() detecting
+    // the flag and posting a wx event.
     if (!is_destructing) {
         device_changed = true;
-        device_change_time = GetTickCount();
-        // Don't increment reinit_attempts here - wait for the storm of callbacks to pass
-        log("XAudio2: Device change signaled (timer reset)\n");
     }
 }
 
@@ -383,41 +383,21 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
     if (failed)
         return;
 
-    // If device changed, wait for Windows callbacks to stop, then reinitialize
-    if (device_changed) {
-        if (!initialized) {
-            return;
-        }
-        
-        DWORD elapsed = GetTickCount() - device_change_time;
-        
-        // Wait 200ms after the LAST callback to ensure device is fully transitioned
-        if (elapsed < 200) {
-            return;  // Still getting callbacks or too soon after last one
-        }
-        
-        // Only try once after callbacks stop
-        if (reinit_attempts == 0) {
-            reinit_attempts = 1;
-            log("XAudio2: %dms since last device callback, attempting reinitialization\n", elapsed);
-            
-            // Close old device - this may take time as XAudio2 cleans up
-            close();
-            
-            // Small delay to let XAudio2 finish cleanup
-            Sleep(50);
-            
-            if (init(freq)) {
-                log("XAudio2: Device reinitialized successfully\n");
-                device_changed = false;
-                reinit_attempts = 0;
-            } else {
-                log("XAudio2: Reinitialization failed, marking driver as failed\n");
-                failed = true;
+    // If device changed, wait for Windows callbacks to stop, then schedule
+    // reinitialization on the wx main thread.
+    if (device_changed && !reinit_posted) {
+        log("XAudio2: Device change detected, scheduling reinitialization\n");
+        device_changed = false;
+        reinit_posted = true;
+        wxTheApp->CallAfter([]() {
+            soundShutdown();
+            if (!soundInit()) {
+                wxLogError(_("XAudio2: Failed to reinitialize audio after device change"));
             }
-        }
+        });
         return;
     }
+    device_changed = false;
     
     if (!initialized)
         return;
@@ -445,8 +425,6 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
                     // Timeout likely means device is gone or unresponsive
                     if (!device_changed) {
                         device_changed = true;
-                        device_change_time = GetTickCount();
-                        reinit_attempts = 0;
                         log("XAudio2: Device appears unresponsive (timeout)\n");
                     }
                     return;
@@ -466,11 +444,7 @@ void XAudio2_7_Output::write(uint16_t* finalWave, int) {
     HRESULT submit_hr = sVoice->SubmitSourceBuffer(&newBuf);
     if (FAILED(submit_hr)) {
         wxLogError(_("XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"), submit_hr);
-        if (!device_changed) {
-            device_changed = true;
-            device_change_time = GetTickCount();
-            reinit_attempts = 0;
-        }
+        device_changed = true;
         return;
     }
 
