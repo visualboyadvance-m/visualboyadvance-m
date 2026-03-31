@@ -244,9 +244,8 @@ XAudio2_7_Output::XAudio2_7_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
 XAudio2_7_Output::~XAudio2_7_Output() {
     // Mark as destructing FIRST to prevent callbacks from accessing this object
     is_destructing = true;
-    
     // Unregister from device notifications
-    g_notifier.do_unregister(this);
+    g_notifier.do_unregister(this, true);
     
     close();
 }

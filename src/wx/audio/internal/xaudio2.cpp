@@ -160,7 +160,7 @@ void XAudio2_Device_Notifier::do_register(XAudio2_Output* p_instance) {
     wxLogError(_("XAudio2: Too many audio instances (max %d)"), MAX_INSTANCES);
 }
 
-void XAudio2_Device_Notifier::do_unregister(XAudio2_Output* p_instance) {
+void XAudio2_Device_Notifier::do_unregister(XAudio2_Output* p_instance, bool is_destructing) {
     EnterCriticalSection(&instances_cs);
 
     // Find and remove the instance.
@@ -171,17 +171,18 @@ void XAudio2_Device_Notifier::do_unregister(XAudio2_Output* p_instance) {
             instances[i] = nullptr;
             LONG new_count = InterlockedDecrement(&instance_count);
             LeaveCriticalSection(&instances_cs);
-            // Use wxLogDebug rather than log() - do_unregister is called from
-            // the destructor during teardown when the status bar may already be
-            // partially destroyed, and log() routes through systemScreenMessage
-            // which calls PopStatusText and asserts.
-            wxLogDebug(_("XAudio2: Unregistered instance (remaining: %d)"), new_count);
+            // Skip log() during destruction - the frame and status bar may
+            // already be partially torn down, causing PopStatusText to assert.
+            if (!is_destructing)
+                log("XAudio2: Unregistered instance (remaining: %d)\n", new_count);
+            (void)new_count;
             return;
         }
     }
 
     LeaveCriticalSection(&instances_cs);
-    wxLogDebug(_("XAudio2: Warning - tried to unregister instance that wasn't registered"));
+    if (!is_destructing)
+        log("XAudio2: Warning - tried to unregister instance that wasn't registered\n");
 }
 
 namespace {
