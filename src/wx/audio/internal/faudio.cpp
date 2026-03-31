@@ -279,84 +279,54 @@ bool FAudio_Output::init(long sampleRate) {
         bool matrixAvailable = true;
 
         switch (dd.OutputFormat.Format.nChannels) {
-            case 4:  // 4.0
-                     // Speaker \ Left Source           Right Source
-                /*Front L*/ matrix[0] = 1.0000f;
-                matrix[1] = 0.0000f;
-                /*Front R*/ matrix[2] = 0.0000f;
-                matrix[3] = 1.0000f;
-                /*Back  L*/ matrix[4] = 1.0000f;
-                matrix[5] = 0.0000f;
-                /*Back  R*/ matrix[6] = 0.0000f;
-                matrix[7] = 1.0000f;
+            case 4:  // 4.0 (Quad) - Normalize by sqrt(2)
+                     // Speaker \\ Left Source           Right Source
+                /*Front L*/ matrix[0] = 0.7071f; matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.7071f;
+                /*Back  L*/ matrix[4] = 0.7071f; matrix[5] = 0.0000f;
+                /*Back  R*/ matrix[6] = 0.0000f; matrix[7] = 0.7071f;
                 break;
 
-            case 5:  // 5.0
-                     // Speaker \ Left Source           Right Source
-                /*Front L*/ matrix[0] = 1.0000f;
-                matrix[1] = 0.0000f;
-                /*Front R*/ matrix[2] = 0.0000f;
-                matrix[3] = 1.0000f;
-                /*Front C*/ matrix[4] = 0.7071f;
-                matrix[5] = 0.7071f;
-                /*Side  L*/ matrix[6] = 1.0000f;
-                matrix[7] = 0.0000f;
-                /*Side  R*/ matrix[8] = 0.0000f;
-                matrix[9] = 1.0000f;
+            case 5:  // 5.0 - Normalize by sqrt(2.5)
+                     // Speaker \\ Left Source           Right Source
+                /*Front L*/ matrix[0] = 0.6325f; matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.6325f;
+                /*Front C*/ matrix[4] = 0.4472f; matrix[5] = 0.4472f;
+                /*Side  L*/ matrix[6] = 0.6325f; matrix[7] = 0.0000f;
+                /*Side  R*/ matrix[8] = 0.0000f; matrix[9] = 0.6325f;
                 break;
 
-            case 6:  // 5.1
-                     // Speaker \ Left Source           Right Source
-                /*Front L*/ matrix[0] = 1.0000f;
-                matrix[1] = 0.0000f;
-                /*Front R*/ matrix[2] = 0.0000f;
-                matrix[3] = 1.0000f;
-                /*Front C*/ matrix[4] = 0.7071f;
-                matrix[5] = 0.7071f;
-                /*LFE    */ matrix[6] = 0.0000f;
-                matrix[7] = 0.0000f;
-                /*Side  L*/ matrix[8] = 1.0000f;
-                matrix[9] = 0.0000f;
-                /*Side  R*/ matrix[10] = 0.0000f;
-                matrix[11] = 1.0000f;
+            case 6:  // 5.1 - Normalize by sqrt(3.0)
+                     // Speaker \\ Left Source           Right Source
+                /*Front L*/ matrix[0] = 0.5774f; matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5774f;
+                /*Front C*/ matrix[4] = 0.4082f; matrix[5] = 0.4082f;
+                /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+                /*Side  L*/ matrix[8] = 0.5774f; matrix[9] = 0.0000f;
+                /*Side  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5774f;
                 break;
 
-            case 7:  // 6.1
-                     // Speaker \ Left Source           Right Source
-                /*Front L*/ matrix[0] = 1.0000f;
-                matrix[1] = 0.0000f;
-                /*Front R*/ matrix[2] = 0.0000f;
-                matrix[3] = 1.0000f;
-                /*Front C*/ matrix[4] = 0.7071f;
-                matrix[5] = 0.7071f;
-                /*LFE    */ matrix[6] = 0.0000f;
-                matrix[7] = 0.0000f;
-                /*Side  L*/ matrix[8] = 1.0000f;
-                matrix[9] = 0.0000f;
-                /*Side  R*/ matrix[10] = 0.0000f;
-                matrix[11] = 1.0000f;
-                /*Back  C*/ matrix[12] = 0.7071f;
-                matrix[13] = 0.7071f;
+            case 7:  // 6.1 - Normalize by sqrt(3.5)
+                     // Speaker \\ Left Source           Right Source
+                /*Front L*/ matrix[0] = 0.5345f; matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5345f;
+                /*Front C*/ matrix[4] = 0.3780f; matrix[5] = 0.3780f;
+                /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+                /*Side  L*/ matrix[8] = 0.5345f; matrix[9] = 0.0000f;
+                /*Side  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5345f;
+                /*Back  C*/ matrix[12] = 0.3780f; matrix[13] = 0.3780f;
                 break;
 
-            case 8:  // 7.1
-                     // Speaker \ Left Source           Right Source
-                /*Front L*/ matrix[0] = 1.0000f;
-                matrix[1] = 0.0000f;
-                /*Front R*/ matrix[2] = 0.0000f;
-                matrix[3] = 1.0000f;
-                /*Front C*/ matrix[4] = 0.7071f;
-                matrix[5] = 0.7071f;
-                /*LFE    */ matrix[6] = 0.0000f;
-                matrix[7] = 0.0000f;
-                /*Back  L*/ matrix[8] = 1.0000f;
-                matrix[9] = 0.0000f;
-                /*Back  R*/ matrix[10] = 0.0000f;
-                matrix[11] = 1.0000f;
-                /*Side  L*/ matrix[12] = 1.0000f;
-                matrix[13] = 0.0000f;
-                /*Side  R*/ matrix[14] = 0.0000f;
-                matrix[15] = 1.0000f;
+            case 8:  // 7.1 - Normalize by sqrt(4.0)
+                     // Speaker \\ Left Source           Right Source
+                /*Front L*/ matrix[0] = 0.5000f; matrix[1] = 0.0000f;
+                /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5000f;
+                /*Front C*/ matrix[4] = 0.3536f; matrix[5] = 0.3536f;
+                /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+                /*Back  L*/ matrix[8] = 0.5000f; matrix[9] = 0.0000f;
+                /*Back  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5000f;
+                /*Side  L*/ matrix[12] = 0.5000f; matrix[13] = 0.0000f;
+                /*Side  R*/ matrix[14] = 0.0000f; matrix[15] = 0.5000f;
                 break;
 
             default:
