@@ -21,7 +21,10 @@
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
 #include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaSound.h"
 #include "wx/config/option-proxy.h"
+
+#include <wx/app.h>
 
 // Windows 10 SDK headers
 #include <xaudio2.h>
@@ -61,8 +64,7 @@ private:
     int soundBufferLen = 0;
     volatile bool device_changed = false;
     volatile bool is_destructing = false;
-    DWORD device_change_time = 0;
-    int reinit_attempts = 0;
+    bool reinit_posted = false;
 
     IXAudio2* xaud = nullptr;
     IXAudio2MasteringVoice* mVoice = nullptr;
@@ -212,10 +214,11 @@ XAudio2_9_Output::~XAudio2_9_Output() {
 }
 
 void XAudio2_9_Output::signal_device_change() {
+    // Called from the MMDevice notification thread - only set the atomic flag.
+    // The actual reinit is handled on the main thread via write() detecting
+    // the flag and posting a wx event.
     if (!is_destructing) {
         device_changed = true;
-        device_change_time = GetTickCount();
-        log("XAudio2: Device change signaled (timer reset)\n");
     }
 }
 
@@ -332,35 +335,19 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
     if (failed)
         return;
 
-    if (device_changed) {
-        if (!initialized) {
-            return;
-        }
-        
-        DWORD elapsed = GetTickCount() - device_change_time;
-        
-        if (elapsed < 200) {
-            return;
-        }
-        
-        if (reinit_attempts == 0) {
-            reinit_attempts = 1;
-            log("XAudio2: %dms since last device callback, attempting reinitialization\n", elapsed);
-            
-            close();
-            Sleep(50);
-            
-            if (init(freq)) {
-                log("XAudio2: Device reinitialized successfully\n");
-                device_changed = false;
-                reinit_attempts = 0;
-            } else {
-                log("XAudio2: Reinitialization failed, marking driver as failed\n");
-                failed = true;
+    if (device_changed && !reinit_posted) {
+        log("XAudio2: Device change detected, scheduling reinitialization\n");
+        device_changed = false;
+        reinit_posted = true;
+        wxTheApp->CallAfter([]() {
+            soundShutdown();
+            if (!soundInit()) {
+                wxLogError(_("XAudio2: Failed to reinitialize audio after device change"));
             }
-        }
+        });
         return;
     }
+    device_changed = false;
     
     if (!initialized)
         return;
@@ -387,8 +374,6 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
                 if (wait_result == WAIT_TIMEOUT) {
                     if (!device_changed) {
                         device_changed = true;
-                        device_change_time = GetTickCount();
-                        reinit_attempts = 0;
                         log("XAudio2: Device appears unresponsive (timeout)\n");
                     }
                     return;
@@ -408,11 +393,7 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
     HRESULT submit_hr = sVoice->SubmitSourceBuffer(&newBuf);
     if (FAILED(submit_hr)) {
         wxLogError(_("XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"), submit_hr);
-        if (!device_changed) {
-            device_changed = true;
-            device_change_time = GetTickCount();
-            reinit_attempts = 0;
-        }
+        device_changed = true;
         return;
     }
 

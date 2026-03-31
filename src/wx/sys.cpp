@@ -1180,17 +1180,28 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
 
 void systemScreenMessage(const wxString& msg)
 {
+    // During teardown the main loop stops running before the frame and its
+    // children are destroyed. Accessing the panel or status bar at that point
+    // is unsafe - just skip the OSD entirely.
+    if (!wxGetApp().IsMainLoopRunning())
+        return;
+
     if (wxGetApp().frame && wxGetApp().frame->IsShown()) {
         wxPuts(UTF8(msg)); // show **something** on terminal
         MainFrame* f = wxGetApp().frame;
         GameArea* panel = f->GetPanel();
 
-        if (!panel->osdtext.empty())
-            f->PopStatusText();
+        if (panel && f->GetStatusBar()) {
+            if (!panel->osdtext.empty())
+                f->PopStatusText();
 
-        f->PushStatusText(msg);
-        panel->osdtext = msg;
-        panel->osdtime = systemGetClock();
+            f->PushStatusText(msg);
+        }
+
+        if (panel) {
+            panel->osdtext = msg;
+            panel->osdtime = systemGetClock();
+        }
     }
 }
 
