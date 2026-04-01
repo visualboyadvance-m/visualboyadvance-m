@@ -573,7 +573,9 @@ endif()
 if(ENABLE_XAUDIO2)
     target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2.cpp)
     target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2_7.cpp)
-    target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2_9.cpp)
+    if(MSVC)
+        target_sources(visualboyadvance-m PRIVATE audio/internal/xaudio2_9.cpp)
+    endif()
 endif()
 
 # FAudio.

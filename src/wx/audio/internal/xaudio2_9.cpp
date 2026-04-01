@@ -1,22 +1,25 @@
+#if !defined(__WXMSW__)
+#error "This file should only be included on Windows"
+#endif
+
 #if !defined(VBAM_ENABLE_XAUDIO2)
 #error "This file should only be compiled if XAudio2 is enabled"
 #endif
-
-#include "wx/audio/internal/xaudio2.h"
-
-#include "xaudio2_9.h"
 
 #include <cstdio>
 #include <string>
 #include <vector>
 
-// MMDevice API
-#include <mmdeviceapi.h>
-#include <functiondiscoverykeys_devpkey.h>
-
 #include <wx/arrstr.h>
 #include <wx/log.h>
 #include <wx/translation.h>
+#include <wx/app.h>
+
+#include "wx/audio/internal/xaudio2.h"
+
+// MMDevice API
+#include <mmdeviceapi.h>
+#include <functiondiscoverykeys_devpkey.h>
 
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
@@ -24,7 +27,7 @@
 #include "core/gba/gbaSound.h"
 #include "wx/config/option-proxy.h"
 
-#include <wx/app.h>
+#include "xaudio2_9.h"
 
 // Windows 10 SDK headers
 #include <xaudio2.h>
@@ -85,7 +88,7 @@ public:
         assert(hBufferEndEvent != NULL);
     }
 
-    ~XAudio2_BufferNotify() {
+    virtual ~XAudio2_BufferNotify() {
         CloseHandle(hBufferEndEvent);
         hBufferEndEvent = NULL;
     }

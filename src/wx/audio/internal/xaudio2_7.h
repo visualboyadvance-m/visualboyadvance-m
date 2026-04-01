@@ -1,6 +1,15 @@
 #ifndef WX_AUDIO_INTERNAL_XAUDIO2_7_H_
 #define WX_AUDIO_INTERNAL_XAUDIO2_7_H_
 
+#if !defined(__WXMSW__)
+#error "This file should only be included on Windows"
+#endif
+
+#if !defined(VBAM_ENABLE_XAUDIO2)
+#error "This file should only be compiled if XAudio2 is enabled"
+#endif
+
+
 #include "core/base/sound_driver.h"
 #include "wx/audio/audio.h"
 #include <memory>
