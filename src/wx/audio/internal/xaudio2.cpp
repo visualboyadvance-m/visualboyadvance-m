@@ -1,15 +1,23 @@
+#if !defined(__WXMSW__)
+#error "This file should only be included on Windows"
+#endif
+
 #if !defined(VBAM_ENABLE_XAUDIO2)
 #error "This file should only be compiled if XAudio2 is enabled"
 #endif
 
-#include "wx/audio/internal/xaudio2.h"
-#include "wx/audio/internal/xaudio2_7.h"
-#include "wx/audio/internal/xaudio2_9.h"
-
-#include <windows.h>
 #include <wx/log.h>
 #include <wx/translation.h>
 
+#include "wx/audio/internal/xaudio2.h"
+#include "wx/audio/internal/xaudio2_7.h"
+// XAudio2 2.8/2.9 are only available on MSVC builds (Windows 8+).
+// MinGW/XP builds use only XAudio2 2.7 via the DirectX SDK redistributable.
+#ifdef _MSC_VER
+#include "wx/audio/internal/xaudio2_9.h"
+#endif
+
+#include <windows.h>
 #include <mmdeviceapi.h>
 #include <objbase.h>
 
@@ -190,8 +198,10 @@ namespace {
 enum class XAudio2Version {
     None,
     XAudio2_7,
+#ifdef _MSC_VER
     XAudio2_8,
     XAudio2_9
+#endif
 };
 
 struct XAudio2Context {
@@ -218,6 +228,7 @@ struct XAudio2Context {
     }
 
     bool Initialize() {
+#ifdef _MSC_VER
         // Try XAudio 2.9 first (Windows 10+)
         hXAudio2 = LoadLibraryExW(L"XAudio2_9.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (hXAudio2) {
@@ -251,8 +262,9 @@ struct XAudio2Context {
             FreeLibrary(hXAudio2);
             hXAudio2 = nullptr;
         }
+#endif  // _MSC_VER
 
-        // Fall back to XAudio 2.7 (Windows 7)
+        // Fall back to XAudio 2.7 (Windows Vista/7, or MinGW builds)
         hXAudio2 = LoadLibraryExW(L"XAudio2_7.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         if (hXAudio2) {
             HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -310,9 +322,13 @@ std::vector<AudioDevice> GetXAudio2Devices() {
             wxLogError(_("XAudio2: Failed to enumerate devices for XAudio2 2.7"));
             return {};
         }
-    } else {
-        return GetXAudio2_9_Devices(g_xaudio2_context.xaudio2);
     }
+#ifdef _MSC_VER
+        // Both XAudio2 2.8 and 2.9 can use the same device enumeration logic.
+        return GetXAudio2_9_Devices(g_xaudio2_context.xaudio2);
+#else
+    return {};
+#endif
 }
 
 std::unique_ptr<SoundDriver> CreateXAudio2Driver() {
@@ -321,10 +337,12 @@ std::unique_ptr<SoundDriver> CreateXAudio2Driver() {
     }
 
     switch (g_xaudio2_context.version) {
+#ifdef _MSC_VER
     case XAudio2Version::XAudio2_9:
     case XAudio2Version::XAudio2_8:
         // XAudio2 2.8 and 2.9 are compatible - use the same driver.
         return CreateXAudio2_9_Driver(g_xaudio2_context.xaudio2);
+#endif
     case XAudio2Version::XAudio2_7:
         return CreateXAudio2_7_Driver(g_xaudio2_context.xaudio2);
     default:
