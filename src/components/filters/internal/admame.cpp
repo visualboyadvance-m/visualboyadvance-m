@@ -615,6 +615,7 @@ static void internal_scale2x_16_mmx_single(uint16_t* dst, const uint16_t* src0, 
 #endif
 }
 
+#if !defined(USE_SSE2)
 static void internal_scale2x_32_mmx_single(uint32_t* dst, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   /* always do the first and last run */
   count -= 2*2;
@@ -995,6 +996,7 @@ label1:
   }
 #endif
 }
+#endif  // !USE_SSE2
 
 static void internal_scale2x_16_mmx(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   //	assert( count >= 2*4 );
@@ -1002,11 +1004,13 @@ static void internal_scale2x_16_mmx(uint16_t* dst0, uint16_t* dst1, const uint16
   internal_scale2x_16_mmx_single(dst1, src2, src1, src0, count);
 }
 
+#if !defined(USE_SSE2)
 static void internal_scale2x_32_mmx(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   //	assert( count >= 2*2 );
   internal_scale2x_32_mmx_single(dst0, src0, src1, src2, count);
   internal_scale2x_32_mmx_single(dst1, src2, src1, src0, count);
 }
+#endif  // !USE_SSE2
 #endif
 
 void AdMame2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,

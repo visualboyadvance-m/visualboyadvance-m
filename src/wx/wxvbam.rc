@@ -31,6 +31,14 @@ WINSPARKLE_DLL_RC RCDATA WINSPARKLE_DLL_PATH
 
 #endif /* NO_ONLINEUPDATES */
 
+// 32-bit RPI host for loading 32-bit filter plugins from 64-bit builds
+// VBAM_EMBED_RPI_HOST is defined by CMake when the proxy is available
+#ifdef VBAM_EMBED_RPI_HOST
+#include "rpi-proxy/rpi-host-rc.h"
+#include "rpi-host-path.h"
+RPI_HOST_EXE_RC RCDATA RPI_HOST_EXE_PATH
+#endif /* VBAM_EMBED_RPI_HOST */
+
 CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "visualboyadvance-m.manifest"
 
 VS_VERSION_INFO VERSIONINFO

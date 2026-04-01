@@ -26,20 +26,47 @@ RENDER_PLUGIN_INFO* MaybeLoadFilterPlugin(const wxString& path, wxDynamicLibrary
         return NULL;
     }
 
-    // TODO: Should this be < RPI_VERISON?
-    if ((plugin_info->Flags & 0xff) != RPI_VERSION) {
+    // Accept both RPI version 1 and version 2 plugins
+    unsigned int pluginVersion = plugin_info->Flags & 0xff;
+    if (pluginVersion != 1 && pluginVersion != 2) {
         filter_plugin->Unload();
         return NULL;
     }
 
-    // RPI_565_SUPP is not supported, although it would be possible and it
-    // would make Cairo more efficient
-    if ((plugin_info->Flags & (RPI_555_SUPP | RPI_888_SUPP)) == 0) {
-        filter_plugin->Unload();
-        return NULL;
+    // Accept 555, 565, or 888 color formats
+    // Version 1 plugins may not set color format flags - assume 565 support for compatibility
+    if ((plugin_info->Flags & (RPI_555_SUPP | RPI_565_SUPP | RPI_888_SUPP)) == 0) {
+        if (pluginVersion == 1) {
+            // Version 1 plugins without color flags - assume 565 support (common for GBA)
+            plugin_info->Flags |= RPI_565_SUPP;
+        } else {
+            filter_plugin->Unload();
+            return NULL;
+        }
     }
 
     return plugin_info;
 }
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+
+bool PluginNeedsProxy(const wxString& path) {
+    return rpi_proxy::RpiProxyClient::NeedsProxy(path);
+}
+
+bool MaybeLoadFilterPluginViaProxy(const wxString& path,
+    rpi_proxy::RpiProxyClient* proxy_client,
+    RENDER_PLUGIN_INFO* info_out) {
+    VBAM_CHECK(proxy_client);
+    VBAM_CHECK(info_out);
+
+    if (!proxy_client->LoadPlugin(path, info_out)) {
+        return false;
+    }
+
+    return true;
+}
+
+#endif  // VBAM_RPI_PROXY_SUPPORT
 
 }  // namespace widgets

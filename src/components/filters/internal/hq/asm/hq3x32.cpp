@@ -1,4 +1,6 @@
+#ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#endif
 
 #include <stdint.h>
 
@@ -97,8 +99,8 @@ static inline void convert32bpp_16bpp(unsigned char *pIn, unsigned int width)
   {
     unsigned int p4 = ((unsigned int)pIn[i+2] << 16) | (unsigned int) (pIn[i+1] << 8) | pIn[i+0];
     unsigned short p2 = ((p4 >> 8)&0xF800) | ((p4 >> 5)&0x07E0) | ((p4 >> 3)&0x001F);
-    pIn[i/2] = (p2 >> 0);
-    pIn[i/2+1] = (p2 >> 8);
+    pIn[i/2] = (unsigned char)(p2 >> 0);
+    pIn[i/2+1] = (unsigned char)(p2 >> 8);
   }
 }
 

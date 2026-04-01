@@ -11,6 +11,7 @@ enum class OptionID {
     kDispSDLPixelArt,
     kDispFilter,
     kDispFilterPlugin,
+    kDispPluginDir,
     kDispIFB,
     kBitDepth,
     kDispKeepOnTop,
