@@ -6063,7 +6063,7 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
 #elif defined(__WXMAC__)
     if (!CreateSurfaceMACOS()){ return; }
 #elif defined(__WXGTK__)
-    if (!CreateSurfaceUNIC()) { return; }
+    if (!CreateSurfaceUNIX()) { return; }
 #else
 #error "Must be GTK, macOS or Windows"
 #endif
@@ -6134,7 +6134,7 @@ bool VKDrawingPanel::CreateInstance()
     extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
 #elif defined(__WXGTK__)
     extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-    extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 #endif
 
     VkInstanceCreateInfo ci{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
@@ -6206,8 +6206,8 @@ bool VKDrawingPanel::CreateSurfaceXLIB(Window win)
 // ─── CreateSurface ────────────────────────────────────────────────────────────
 bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface *wayland_surface, struct wl_display *wayland_display)
 {
-    VkMacOSSurfaceCreateInfoMVK ci{};
-    ci.sType     = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_MVK;
+    VkWaylandSurfaceCreateInfoKHR ci{};
+    ci.sType     = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
     ci.display   = wayland_display;
     ci.surface   = wayland_surface;
 
