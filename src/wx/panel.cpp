@@ -6230,11 +6230,11 @@ bool VKDrawingPanel::CreateSurfaceUNIX()
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
         wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
-        CreateSurfaceWAYLAND(wayland_surface, wayland_display);
-    } else {
-        xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
-        CreateSurfaceXLIB(xid);
+        return CreateSurfaceWAYLAND(wayland_surface, wayland_display);
     }
+    
+    xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+    return CreateSurfaceXLIB(xid);
 }
 #endif
 
