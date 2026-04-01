@@ -80,6 +80,9 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "metal",
 #endif
 #endif
+#ifndef NO_VULKAN
+    "vulkan",
+#endif
 };
 
 // These MUST follow the same order as the definitions of the enum.
