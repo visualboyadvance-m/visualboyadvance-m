@@ -7,7 +7,16 @@
 #include <vector>
 
 // Include XAudio2 2.9 header
+// XAudio2 2.9 requires _WIN32_WINNT >= 0x0602 (Windows 8) or later.
+#if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0602
+#pragma push_macro("_WIN32_WINNT")
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0602
 #include <xaudio2.h>
+#pragma pop_macro("_WIN32_WINNT")
+#else
+#include <xaudio2.h>
+#endif
 
 namespace audio {
 namespace internal {
