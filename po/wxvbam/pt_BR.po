@@ -1269,150 +1269,150 @@ msgstr "Volume: %d %%"
 
 #: panel.cpp:6084
 msgid "Vulkan device created successfully"
-msgstr ""
+msgstr "Dispositivo Vulkan criado com sucesso"
 
 #: panel.cpp:6151
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
-msgstr ""
+msgstr "Falhou em criar a instância do Vulkan: %d"
 
 #: panel.cpp:6154
 msgid "Vulkan instance created"
-msgstr ""
+msgstr "Instância do Vulkan criada"
 
 #: panel.cpp:6169 panel.cpp:6184 panel.cpp:6200 panel.cpp:6216
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
-msgstr ""
+msgstr "Falhou em criar o dispositivo Win32 do Vulkan: %d"
 
 #: panel.cpp:6247
 msgid "No Vulkan physical devices found"
-msgstr ""
+msgstr "Nenhum dispositivo físico do Vulkan foi achado"
 
 #: panel.cpp:6300
 #, c-format
 msgid "Selected Vulkan device: %s"
-msgstr ""
+msgstr "Dispositivo Vulkan selecionado: %s"
 
 #: panel.cpp:6304
 msgid "No suitable Vulkan physical device found"
-msgstr ""
+msgstr "Nenhum dispositivo físico adequado do Vulkan foi achado"
 
 #: panel.cpp:6338
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
-msgstr ""
+msgstr "Falhou em criar o dispositivo lógico do Vulkan: %d"
 
 #: panel.cpp:6433
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
-msgstr ""
+msgstr "Falhou em criar a troca de cadeia do Vulkan: %d"
 
 #: panel.cpp:6446
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s"
-msgstr ""
+msgstr "Cadeia de troca criada: %ux%u, %u imagens, vsync=%s"
 
 #: panel.cpp:6488
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
-msgstr ""
+msgstr "Falhou em criar a visualização de imagem da cadeia de troca %zu: %d"
 
 #: panel.cpp:6535
 #, c-format
 msgid "Failed to create render pass: %d"
-msgstr ""
+msgstr "Falhou em criar o passe da renderização: %d"
 
 #: panel.cpp:6557
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
-msgstr ""
+msgstr "Falhou em criar o framebuffer %zu: %d"
 
 #: panel.cpp:6580
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
-msgstr ""
+msgstr "Falhou em criar o esquema do conjunto de descritores: %d"
 
 #: panel.cpp:6604
 msgid "Failed to create shader modules"
-msgstr ""
+msgstr "Falhou em criar os módulos do shader"
 
 #: panel.cpp:6675
 #, c-format
 msgid "Failed to create pipeline layout: %d"
-msgstr ""
+msgstr "Falhou em criar o esquema do pipeline: %d"
 
 #: panel.cpp:6702
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
-msgstr ""
+msgstr "Falhou em criar o pipeline gráfico: %d"
 
 #: panel.cpp:6718
 #, c-format
 msgid "Failed to create command pool: %d"
-msgstr ""
+msgstr "Falhou em criar o agrupamento dos comandos: %d"
 
 #: panel.cpp:6736
 #, c-format
 msgid "Failed to allocate command buffers: %d"
-msgstr ""
+msgstr "Falhou em alocar os buffers de comando: %d"
 
 #: panel.cpp:6756
 #, c-format
 msgid "Failed to create sync objects for frame %d"
-msgstr ""
+msgstr "Falhou em criar os objetos de sincronização pro frame %d"
 
 #: panel.cpp:6778
 #, c-format
 msgid "Failed to create descriptor pool: %d"
-msgstr ""
+msgstr "Falhou em criar o agrupamento dos descritores: %d"
 
 #: panel.cpp:6790
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
-msgstr ""
+msgstr "Falhou em alocar o agrupamento dos descritores: %d"
 
 #: panel.cpp:6830
 #, c-format
 msgid "Failed to create texture image: %d"
-msgstr ""
+msgstr "Falhou em criar a imagem da textura: %d"
 
 #: panel.cpp:6845
 msgid "Failed to allocate texture memory"
-msgstr ""
+msgstr "Falhou em alocar a memória das texturas"
 
 #: panel.cpp:6862
 #, c-format
 msgid "Failed to create texture image view: %d"
-msgstr ""
+msgstr "Falhou em criar a visualização da imagem da textura: %d"
 
 #: panel.cpp:6881
 #, c-format
 msgid "Failed to create texture sampler: %d"
-msgstr ""
+msgstr "Falhou em criar o coletor de amostra das texturas: %d"
 
 #: panel.cpp:6918
 msgid "Failed to create staging buffer"
-msgstr ""
+msgstr "Falhou em criar o buffer de testes"
 
 #: panel.cpp:6933
 msgid "Failed to allocate staging memory"
-msgstr ""
+msgstr "Falhou em alocar a memória dos testes"
 
 #: panel.cpp:6995
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
-msgstr ""
+msgstr "VKDrawingPanel inicializado: %ux%u (escala: %f)"
 
 #: panel.cpp:7039
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
-msgstr ""
+msgstr "Falhou em adquirir a imagem da cadeia de troca: %d"
 
 #: panel.cpp:7327
 #, c-format
 msgid "Failed to present swapchain image: %d"
-msgstr ""
+msgstr "Falhou em apresentar a imagem da cadeia de troca: %d"
 
 #: sys.cpp:211 sys.cpp:272
 msgid "No game in progress to record"
