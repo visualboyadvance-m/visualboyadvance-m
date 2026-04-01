@@ -99,6 +99,15 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
+find_package(Vulkan QUIET)
+
+option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
+
+if(NOT ENABLE_VULKAN)
+   set(CMAKE_C_FLAGS      "-DNO_VULKAN ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS    "-DNO_VULKAN ${CMAKE_CXX_FLAGS}")
+endif()
+
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS      "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
    set(CMAKE_CXX_FLAGS    "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")

@@ -416,6 +416,14 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     GetValidatedChild("OutputDirect3D12")->Hide();
 #endif
 
+#ifndef NO_VULKAN
+    // Enable the Direct3D option on Windows.
+    render_method = GetValidatedChild("OutputVulkan");
+    render_method->SetValidator(RenderValidator(config::RenderMethod::kVulkan));
+#else
+    GetValidatedChild("OutputVulkan")->Hide();
+#endif
+
     sdlrenderer_label_ = GetValidatedChild<wxControl>("SDLRendererLab");
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());

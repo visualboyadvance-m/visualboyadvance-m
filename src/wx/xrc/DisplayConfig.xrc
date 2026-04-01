@@ -54,6 +54,11 @@
                           </object>
                         </object>
                         <object class="sizeritem">
+                          <object class="wxRadioButton" name="OutputVulkan">
+                            <label translate="0">Vulkan</label>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
                           <object class="wxRadioButton" name="OutputDirect3D12">
                             <label translate="0">Direct3D 12</label>
                           </object>

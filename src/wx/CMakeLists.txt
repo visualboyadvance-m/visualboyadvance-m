@@ -337,6 +337,10 @@ function(configure_wx_target target)
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
+    if(ENABLE_VULKAN)
+        _add_link_libraries(vulkan)
+    endif()
+
     if(APPLE AND NOT NIX AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         _add_link_libraries(sharpyuv)
     endif()
@@ -420,6 +424,10 @@ if(APPLE)
 endif()
 
 target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
+
+if(ENABLE_VULKAN)
+    target_include_directories(visualboyadvance-m PRIVATE ${Vulkan_INCLUDE_DIRS})
+endif()
 
 if(ENABLE_SDL3)
     target_include_directories(visualboyadvance-m PRIVATE ${SDL3_INCLUDE_DIRS})

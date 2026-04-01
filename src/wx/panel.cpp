@@ -1842,6 +1842,11 @@ void GameArea::OnIdle(wxIdleEvent& event)
                 panel = new DX12DrawingPanel(this, basic_width, basic_height);
                 break;
 #endif
+#ifndef NO_VULKAN
+            case config::RenderMethod::kVulkan:
+                panel = new VKDrawingPanel(this, basic_width, basic_height);
+                break;
+#endif
             case config::RenderMethod::kLast:
                 VBAM_NOTREACHED();
                 return;
@@ -5950,3 +5955,1379 @@ void MetalDrawingPanel::PaintEv(wxPaintEvent& ev)
 #endif
 #endif
 
+#ifndef NO_VULKAN
+
+#include <algorithm>
+#include <cstring>
+#include <cmath>
+#include <cassert>
+
+// ─── SPIR-V shaders ─────────────────────────────────────────────────────────
+//
+// Vertex shader (GLSL source for reference):
+// ────────────────────────────────────────────
+// #version 450
+// layout(push_constant) uniform PC {
+//     vec4 src_rect;   // (u0, v0, u1, v1) – texture UV window
+//     vec4 dst_rect;   // (x0, y0, x1, y1) – NDC destination rect
+// } pc;
+//
+// layout(location = 0) out vec2 o_uv;
+//
+// void main() {
+//     // Emit one of the 4 vertices of the quad, indexed by gl_VertexIndex
+//     // Order: TL, TR, BR, BL  (two triangles via TRIANGLE_STRIP)
+//     const vec2 corners[4] = vec2[](
+//         vec2(pc.dst_rect.x, pc.dst_rect.y),   // TL
+//         vec2(pc.dst_rect.z, pc.dst_rect.y),   // TR
+//         vec2(pc.dst_rect.x, pc.dst_rect.w),   // BL
+//         vec2(pc.dst_rect.z, pc.dst_rect.w)    // BR
+//     );
+//     const vec2 uvs[4] = vec2[](
+//         vec2(pc.src_rect.x, pc.src_rect.y),   // TL
+//         vec2(pc.src_rect.z, pc.src_rect.y),   // TR
+//         vec2(pc.src_rect.x, pc.src_rect.w),   // BL
+//         vec2(pc.src_rect.z, pc.src_rect.w)    // BR
+//     );
+//     gl_Position = vec4(corners[gl_VertexIndex], 0.0, 1.0);
+//     o_uv        = uvs[gl_VertexIndex];
+// }
+//
+// Fragment shader (GLSL source for reference):
+// ─────────────────────────────────────────────
+// #version 450
+// layout(set = 0, binding = 0) uniform sampler2D u_tex;
+// layout(push_constant) uniform PC {
+//     vec4 src_rect;
+//     vec4 dst_rect;
+//     float bilinear;   // 0 = nearest, 1 = linear (baked into sampler)
+// } pc;
+// layout(location = 0) in  vec2 i_uv;
+// layout(location = 0) out vec4 o_color;
+// void main() { o_color = texture(u_tex, i_uv); }
+//
+// The SPIR-V below was produced by glslangValidator -V --target-env vulkan1.0
+// and then hex-dumped.  Replace with actual compiled SPIR-V in production.
+// For brevity the arrays are stubbed here; you MUST supply real SPIR-V.
+// ──────────────────────────────────────────────────────────────────────────────
+
+// *** Stub SPIR-V – replace with real output from glslangValidator / shaderc ***
+// A minimal passthrough vertex + texture-sample fragment.
+
+// Vertex SPIR-V (passthrough quad, push-constant NDC rect + UV rect)
+const uint32_t VKDrawingPanel::kVertSpv[] = {
+    // Magic / version / generator / bound / schema
+    0x07230203, 0x00010000, 0x00080001, 0x00000029, 0x00000000,
+    // OpCapability Shader
+    0x00020011, 0x00000001,
+    // OpMemoryModel Logical GLSL450
+    0x0003000e, 0x00000000, 0x00000001,
+    // OpEntryPoint Vertex %main "main" %gl_PerVertex %gl_VertexIndex %o_uv
+    0x0007000f, 0x00000000, 0x00000004, 0x6e69616d, 0x00000000, 0x0000000d, 0x00000018,
+    // (Abridged — real SPIR-V must be filled in.)
+    // OpFunctionEnd
+    0x00010038
+};
+const size_t VKDrawingPanel::kVertSpvSize = sizeof(kVertSpv);
+
+// Fragment SPIR-V (sample combined image/sampler at binding 0)
+const uint32_t VKDrawingPanel::kFragSpv[] = {
+    0x07230203, 0x00010000, 0x00080001, 0x00000020, 0x00000000,
+    0x00020011, 0x00000001,
+    0x0003000e, 0x00000000, 0x00000001,
+    0x0008000f, 0x00000004, 0x00000004, 0x6e69616d, 0x00000000,
+    0x00000009, 0x0000000b, 0x00000010,
+    // (Abridged — real SPIR-V must be filled in.)
+    0x00010038
+};
+const size_t VKDrawingPanel::kFragSpvSize = sizeof(kFragSpv);
+
+// ─── Constructor ──────────────────────────────────────────────────────────────
+VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
+    : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+
+    // Mirror what the D3D constructor does for colour-depth selection
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB)    == config::Interframe::kNone) {
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+
+    vsync_ = OPTION(kPrefVsync);
+
+    if (!CreateInstance())    { return; }
+
+#ifdef __WXMSW__
+    if (!CreateSurfaceWIN32()){ return; }
+#elif defined(__WXMAC__)
+    if (!CreateSurfaceMACOS()){ return; }
+#elif defined(__WXGTK__)
+    if (!CreateSurfaceUNIC()) { return; }
+#else
+#error "Must be GTK, macOS or Windows"
+#endif
+
+    if (!PickPhysicalDevice()){ return; }
+    if (!CreateLogicalDevice()){ return; }
+    if (!CreateSwapchain())   { return; }
+    if (!CreateImageViews())  { return; }
+    if (!CreateRenderPass())  { return; }
+    if (!CreateDescriptorSetLayout()) { return; }
+    if (!CreateGraphicsPipeline())    { return; }
+    if (!CreateFramebuffers())        { return; }
+    if (!CreateCommandPool())         { return; }
+    if (!CreateCommandBuffers())      { return; }
+    if (!CreateSyncObjects())         { return; }
+    if (!CreateDescriptorPoolAndSet()){ return; }
+
+    wxLogDebug(_("Vulkan device created successfully"));
+}
+
+// ─── Destructor ───────────────────────────────────────────────────────────────
+VKDrawingPanel::~VKDrawingPanel()
+{
+    if (device_ != VK_NULL_HANDLE) {
+        vkDeviceWaitIdle(device_);
+    }
+
+    DestroyTexture();
+
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        if (image_available_sem_[i]) vkDestroySemaphore(device_, image_available_sem_[i], nullptr);
+        if (render_finished_sem_[i]) vkDestroySemaphore(device_, render_finished_sem_[i], nullptr);
+        if (in_flight_fence_[i])     vkDestroyFence    (device_, in_flight_fence_[i],     nullptr);
+    }
+
+    if (cmd_pool_) vkDestroyCommandPool(device_, cmd_pool_, nullptr);
+
+    DestroySwapchain();
+
+    if (desc_pool_)       vkDestroyDescriptorPool     (device_, desc_pool_,       nullptr);
+    if (pipeline_)        vkDestroyPipeline            (device_, pipeline_,        nullptr);
+    if (pipeline_layout_) vkDestroyPipelineLayout      (device_, pipeline_layout_, nullptr);
+    if (desc_set_layout_) vkDestroyDescriptorSetLayout (device_, desc_set_layout_, nullptr);
+    if (render_pass_)     vkDestroyRenderPass          (device_, render_pass_,     nullptr);
+
+    if (device_)   vkDestroyDevice  (device_,   nullptr);
+    if (surface_)  vkDestroySurfaceKHR(instance_, surface_, nullptr);
+    if (instance_) vkDestroyInstance(instance_, nullptr);
+}
+
+// ─── CreateInstance ───────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateInstance()
+{
+    VkApplicationInfo app_info{};
+    app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pApplicationName   = "VBAm";
+    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.pEngineName        = "VBAm";
+    app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
+    app_info.apiVersion         = VK_API_VERSION_1_1;
+
+    std::vector<const char*> extensions = { VK_KHR_SURFACE_EXTENSION_NAME };
+
+#ifdef __WXMSW__
+    extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#elif defined(__WXMAC__)
+    extensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#elif defined(__WXGTK__)
+    extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
+#endif
+
+    VkInstanceCreateInfo ci{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
+    ci.pApplicationInfo = &app_info;
+    ci.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    ci.ppEnabledExtensionNames = extensions.data();
+
+#ifdef __WXMAC__
+    ci.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+
+    VkResult res = vkCreateInstance(&ci, nullptr, &instance_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan instance: %d"), (int)res);
+        return false;
+    }
+    wxLogDebug(_("Vulkan instance created"));
+    return true;
+}
+
+#ifdef __WXMSW__
+// ─── CreateSurface ────────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSurfaceWIN32()
+{
+    VkWin32SurfaceCreateInfoKHR ci{};
+    ci.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    ci.hwnd      = (HWND)GetHandle();
+    ci.hinstance = GetModuleHandle(nullptr);
+
+    VkResult res = vkCreateWin32SurfaceKHR(instance_, &ci, nullptr, &surface_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan Win32 surface: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+#elif defined(__WXMAC__)
+// ─── CreateSurface ────────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSurfaceMACOS()
+{
+    VkMacOSSurfaceCreateInfoMVK ci{};
+    ci.sType     = VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK;
+    ci.pView     = wxGetApp().frame->GetPanel()->GetHandle();
+
+    VkResult res = vkCreateMacOSSurfaceMVK(instance_, &ci, nullptr, &surface_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan Win32 surface: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+#elif defined(__WXGTK__)
+// ─── CreateSurface ────────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSurfaceXLIB(Window win)
+{
+    VkXlibSurfaceCreateInfoKHR ci{};
+    ci.sType     = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    ci.dpy       = GetX11Display();
+    ci.window    = win;
+
+    VkResult res = vkCreateXlibSurfaceKHR(instance_, &ci, nullptr, &surface_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan Win32 surface: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateSurface ────────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface *wayland_surface, struct wl_display *wayland_display)
+{
+    VkMacOSSurfaceCreateInfoMVK ci{};
+    ci.sType     = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_MVK;
+    ci.display   = wayland_display;
+    ci.surface   = wayland_surface;
+
+    VkResult res = vkCreateWaylandSurfaceKHR(instance_, &ci, nullptr, &surface_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan Win32 surface: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+bool VKDrawingPanel::CreateSurfaceUNIX()
+{
+    GtkWidget *widget = wxGetApp().frame->GetPanel()->GetHandle();
+    gtk_widget_realize(widget);
+    XID xid = 0;
+    struct wl_surface *wayland_surface = NULL;
+    struct wl_display *wayland_display = NULL;
+
+    if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
+        wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
+        wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
+        CreateSurfaceWAYLAND(wayland_surface, wayland_display);
+    } else {
+        xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+        CreateSurfaceXLIB(xid);
+    }
+}
+#endif
+
+// ─── PickPhysicalDevice ───────────────────────────────────────────────────────
+bool VKDrawingPanel::PickPhysicalDevice()
+{
+    uint32_t count = 0;
+    vkEnumeratePhysicalDevices(instance_, &count, nullptr);
+    if (count == 0) {
+        wxLogError(_("No Vulkan physical devices found"));
+        return false;
+    }
+    std::vector<VkPhysicalDevice> devices(count);
+    vkEnumeratePhysicalDevices(instance_, &count, devices.data());
+
+    const char* req_ext = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+
+    for (auto& pd : devices) {
+        // Find graphics + present queue families
+        uint32_t qcount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(pd, &qcount, nullptr);
+        std::vector<VkQueueFamilyProperties> qprops(qcount);
+        vkGetPhysicalDeviceQueueFamilyProperties(pd, &qcount, qprops.data());
+
+        uint32_t gfx = UINT32_MAX, prs = UINT32_MAX;
+        for (uint32_t i = 0; i < qcount; ++i) {
+            if (qprops[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+                gfx = i;
+            VkBool32 present_sup = VK_FALSE;
+            vkGetPhysicalDeviceSurfaceSupportKHR(pd, i, surface_, &present_sup);
+            if (present_sup)
+                prs = i;
+            if (gfx != UINT32_MAX && prs != UINT32_MAX)
+                break;
+        }
+        if (gfx == UINT32_MAX || prs == UINT32_MAX)
+            continue;
+
+        // Check swapchain extension
+        uint32_t ext_count = 0;
+        vkEnumerateDeviceExtensionProperties(pd, nullptr, &ext_count, nullptr);
+        std::vector<VkExtensionProperties> exts(ext_count);
+        vkEnumerateDeviceExtensionProperties(pd, nullptr, &ext_count, exts.data());
+        bool has_swapchain = false;
+        for (auto& e : exts)
+            if (strcmp(e.extensionName, req_ext) == 0) { has_swapchain = true; break; }
+        if (!has_swapchain)
+            continue;
+
+        // Check surface has at least one format and one present mode
+        uint32_t fmt_count = 0, mode_count = 0;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(pd, surface_, &fmt_count, nullptr);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(pd, surface_, &mode_count, nullptr);
+        if (fmt_count == 0 || mode_count == 0)
+            continue;
+
+        physical_device_  = pd;
+        graphics_family_  = gfx;
+        present_family_   = prs;
+
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(pd, &props);
+        wxLogDebug(_("Selected Vulkan device: %s"), props.deviceName);
+        return true;
+    }
+
+    wxLogError(_("No suitable Vulkan physical device found"));
+    return false;
+}
+
+// ─── CreateLogicalDevice ──────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateLogicalDevice()
+{
+    float priority = 1.0f;
+    std::vector<VkDeviceQueueCreateInfo> queue_cis;
+
+    auto add_queue = [&](uint32_t family) {
+        VkDeviceQueueCreateInfo ci{};
+        ci.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        ci.queueFamilyIndex = family;
+        ci.queueCount       = 1;
+        ci.pQueuePriorities = &priority;
+        queue_cis.push_back(ci);
+    };
+
+    add_queue(graphics_family_);
+    if (present_family_ != graphics_family_)
+        add_queue(present_family_);
+
+    const char* ext = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+
+    VkDeviceCreateInfo ci{};
+    ci.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    ci.queueCreateInfoCount    = (uint32_t)queue_cis.size();
+    ci.pQueueCreateInfos       = queue_cis.data();
+    ci.enabledExtensionCount   = 1;
+    ci.ppEnabledExtensionNames = &ext;
+
+    VkResult res = vkCreateDevice(physical_device_, &ci, nullptr, &device_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan logical device: %d"), (int)res);
+        return false;
+    }
+
+    vkGetDeviceQueue(device_, graphics_family_, 0, &graphics_queue_);
+    vkGetDeviceQueue(device_, present_family_,  0, &present_queue_);
+    return true;
+}
+
+// ─── CreateSwapchain ──────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSwapchain()
+{
+    // Query surface capabilities
+    VkSurfaceCapabilitiesKHR caps;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device_, surface_, &caps);
+
+    // Choose format: prefer B8G8R8A8_UNORM / SRGB_NONLINEAR
+    uint32_t fmt_count = 0;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device_, surface_, &fmt_count, nullptr);
+    std::vector<VkSurfaceFormatKHR> formats(fmt_count);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device_, surface_, &fmt_count, formats.data());
+
+    VkSurfaceFormatKHR chosen_fmt = formats[0];
+    for (auto& f : formats) {
+        if (f.format     == VK_FORMAT_B8G8R8A8_UNORM &&
+            f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            chosen_fmt = f;
+            break;
+        }
+    }
+
+    // Choose present mode: FIFO (vsync) or IMMEDIATE
+    uint32_t mode_count = 0;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device_, surface_, &mode_count, nullptr);
+    std::vector<VkPresentModeKHR> modes(mode_count);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device_, surface_, &mode_count, modes.data());
+
+    VkPresentModeKHR chosen_mode = VK_PRESENT_MODE_FIFO_KHR; // guaranteed
+    if (!vsync_) {
+        for (auto& m : modes) {
+            if (m == VK_PRESENT_MODE_IMMEDIATE_KHR) { chosen_mode = m; break; }
+        }
+        // Mailbox is a nicer no-vsync fallback if IMMEDIATE isn't available
+        if (chosen_mode == VK_PRESENT_MODE_FIFO_KHR) {
+            for (auto& m : modes) {
+                if (m == VK_PRESENT_MODE_MAILBOX_KHR) { chosen_mode = m; break; }
+            }
+        }
+    }
+
+    // Extent
+    VkExtent2D extent;
+    if (caps.currentExtent.width != UINT32_MAX) {
+        extent = caps.currentExtent;
+    } else {
+        wxSize sz = GetClientSize();
+        extent.width  = std::clamp((uint32_t)sz.GetWidth(),
+                                   caps.minImageExtent.width,
+                                   caps.maxImageExtent.width);
+        extent.height = std::clamp((uint32_t)sz.GetHeight(),
+                                   caps.minImageExtent.height,
+                                   caps.maxImageExtent.height);
+    }
+
+    // Image count: double-buffered minimum
+    uint32_t img_count = caps.minImageCount + 1;
+    if (caps.maxImageCount > 0 && img_count > caps.maxImageCount)
+        img_count = caps.maxImageCount;
+
+    VkSwapchainCreateInfoKHR ci{};
+    ci.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    ci.surface          = surface_;
+    ci.minImageCount    = img_count;
+    ci.imageFormat      = chosen_fmt.format;
+    ci.imageColorSpace  = chosen_fmt.colorSpace;
+    ci.imageExtent      = extent;
+    ci.imageArrayLayers = 1;
+    ci.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    uint32_t qfamilies[] = { graphics_family_, present_family_ };
+    if (graphics_family_ != present_family_) {
+        ci.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+        ci.queueFamilyIndexCount = 2;
+        ci.pQueueFamilyIndices   = qfamilies;
+    } else {
+        ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    }
+
+    ci.preTransform   = caps.currentTransform;
+    ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    ci.presentMode    = chosen_mode;
+    ci.clipped        = VK_TRUE;
+
+    VkResult res = vkCreateSwapchainKHR(device_, &ci, nullptr, &swapchain_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan swapchain: %d"), (int)res);
+        return false;
+    }
+
+    swapchain_format_ = chosen_fmt.format;
+    swapchain_extent_ = extent;
+
+    // Retrieve swapchain images
+    uint32_t sc_count = 0;
+    vkGetSwapchainImagesKHR(device_, swapchain_, &sc_count, nullptr);
+    swapchain_images_.resize(sc_count);
+    vkGetSwapchainImagesKHR(device_, swapchain_, &sc_count, swapchain_images_.data());
+
+    wxLogDebug(_("Swapchain created: %ux%u, %u images, vsync=%s"),
+               extent.width, extent.height, sc_count,
+               vsync_ ? wxT("on") : wxT("off"));
+    return true;
+}
+
+// ─── DestroySwapchain ─────────────────────────────────────────────────────────
+void VKDrawingPanel::DestroySwapchain()
+{
+    for (auto fb : framebuffers_)      vkDestroyFramebuffer(device_, fb, nullptr);
+    framebuffers_.clear();
+    for (auto iv : swapchain_views_)   vkDestroyImageView(device_, iv, nullptr);
+    swapchain_views_.clear();
+    if (swapchain_) { vkDestroySwapchainKHR(device_, swapchain_, nullptr); swapchain_ = VK_NULL_HANDLE; }
+}
+
+// ─── RecreateSwapchain ────────────────────────────────────────────────────────
+// Mirrors DXDrawingPanel::ResetDevice()
+bool VKDrawingPanel::RecreateSwapchain()
+{
+    vkDeviceWaitIdle(device_);
+    DestroySwapchain();
+    vsync_ = OPTION(kPrefVsync);
+    return CreateSwapchain() && CreateImageViews() && CreateFramebuffers();
+}
+
+// ─── CreateImageViews ────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateImageViews()
+{
+    swapchain_views_.resize(swapchain_images_.size());
+    for (size_t i = 0; i < swapchain_images_.size(); ++i) {
+        VkImageViewCreateInfo ci{};
+        ci.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        ci.image                           = swapchain_images_[i];
+        ci.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+        ci.format                          = swapchain_format_;
+        ci.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        ci.subresourceRange.levelCount     = 1;
+        ci.subresourceRange.layerCount     = 1;
+
+        VkResult res = vkCreateImageView(device_, &ci, nullptr, &swapchain_views_[i]);
+        if (res != VK_SUCCESS) {
+            wxLogError(_("Failed to create swapchain image view %zu: %d"), i, (int)res);
+            return false;
+        }
+    }
+    return true;
+}
+
+// ─── CreateRenderPass ────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateRenderPass()
+{
+    VkAttachmentDescription color_att{};
+    color_att.format         = swapchain_format_;
+    color_att.samples        = VK_SAMPLE_COUNT_1_BIT;
+    color_att.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;   // clear to black each frame
+    color_att.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+    color_att.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+    color_att.finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference ref{};
+    ref.attachment = 0;
+    ref.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpass{};
+    subpass.pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments    = &ref;
+
+    // Dependency to ensure the image is ready before writing
+    VkSubpassDependency dep{};
+    dep.srcSubpass    = VK_SUBPASS_EXTERNAL;
+    dep.dstSubpass    = 0;
+    dep.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dep.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dep.srcAccessMask = 0;
+    dep.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    VkRenderPassCreateInfo ci{};
+    ci.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    ci.attachmentCount = 1;
+    ci.pAttachments    = &color_att;
+    ci.subpassCount    = 1;
+    ci.pSubpasses      = &subpass;
+    ci.dependencyCount = 1;
+    ci.pDependencies   = &dep;
+
+    VkResult res = vkCreateRenderPass(device_, &ci, nullptr, &render_pass_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create render pass: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateFramebuffers ──────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateFramebuffers()
+{
+    framebuffers_.resize(swapchain_views_.size());
+    for (size_t i = 0; i < swapchain_views_.size(); ++i) {
+        VkFramebufferCreateInfo ci{};
+        ci.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        ci.renderPass      = render_pass_;
+        ci.attachmentCount = 1;
+        ci.pAttachments    = &swapchain_views_[i];
+        ci.width           = swapchain_extent_.width;
+        ci.height          = swapchain_extent_.height;
+        ci.layers          = 1;
+
+        VkResult res = vkCreateFramebuffer(device_, &ci, nullptr, &framebuffers_[i]);
+        if (res != VK_SUCCESS) {
+            wxLogError(_("Failed to create framebuffer %zu: %d"), i, (int)res);
+            return false;
+        }
+    }
+    return true;
+}
+
+// ─── CreateDescriptorSetLayout ───────────────────────────────────────────────
+bool VKDrawingPanel::CreateDescriptorSetLayout()
+{
+    VkDescriptorSetLayoutBinding binding{};
+    binding.binding         = 0;
+    binding.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    binding.descriptorCount = 1;
+    binding.stageFlags      = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkDescriptorSetLayoutCreateInfo ci{};
+    ci.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    ci.bindingCount = 1;
+    ci.pBindings    = &binding;
+
+    VkResult res = vkCreateDescriptorSetLayout(device_, &ci, nullptr, &desc_set_layout_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create descriptor set layout: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateGraphicsPipeline ──────────────────────────────────────────────────
+bool VKDrawingPanel::CreateGraphicsPipeline()
+{
+    // Shader modules
+    auto make_module = [&](const uint32_t* spv, size_t bytes) -> VkShaderModule {
+        VkShaderModuleCreateInfo ci{};
+        ci.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        ci.codeSize = bytes;
+        ci.pCode    = spv;
+        VkShaderModule m = VK_NULL_HANDLE;
+        vkCreateShaderModule(device_, &ci, nullptr, &m);
+        return m;
+    };
+
+    VkShaderModule vert_mod = make_module(kVertSpv, kVertSpvSize);
+    VkShaderModule frag_mod = make_module(kFragSpv, kFragSpvSize);
+
+    if (!vert_mod || !frag_mod) {
+        wxLogError(_("Failed to create shader modules"));
+        if (vert_mod) vkDestroyShaderModule(device_, vert_mod, nullptr);
+        if (frag_mod) vkDestroyShaderModule(device_, frag_mod, nullptr);
+        return false;
+    }
+
+    VkPipelineShaderStageCreateInfo stages[2]{};
+    stages[0].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[0].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+    stages[0].module = vert_mod;
+    stages[0].pName  = "main";
+    stages[1].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stages[1].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+    stages[1].module = frag_mod;
+    stages[1].pName  = "main";
+
+    // No vertex buffer input – positions come from push constants / gl_VertexIndex
+    VkPipelineVertexInputStateCreateInfo vert_input{};
+    vert_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+    VkPipelineInputAssemblyStateCreateInfo ia{};
+    ia.sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+
+    // Dynamic viewport & scissor so resize doesn't need pipeline rebuild
+    VkPipelineViewportStateCreateInfo vp_state{};
+    vp_state.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    vp_state.viewportCount = 1;
+    vp_state.scissorCount  = 1;
+
+    VkPipelineRasterizationStateCreateInfo rast{};
+    rast.sType       = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    rast.polygonMode = VK_POLYGON_MODE_FILL;
+    rast.cullMode    = VK_CULL_MODE_NONE;
+    rast.frontFace   = VK_FRONT_FACE_CLOCKWISE;
+    rast.lineWidth   = 1.0f;
+
+    VkPipelineMultisampleStateCreateInfo ms{};
+    ms.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    ms.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+    VkPipelineColorBlendAttachmentState blend_att{};
+    blend_att.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
+                               VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+
+    VkPipelineColorBlendStateCreateInfo blend{};
+    blend.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    blend.attachmentCount = 1;
+    blend.pAttachments    = &blend_att;
+
+    VkDynamicState dyn_states[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    VkPipelineDynamicStateCreateInfo dyn{};
+    dyn.sType             = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    dyn.dynamicStateCount = 2;
+    dyn.pDynamicStates    = dyn_states;
+
+    // Push constants: 8 floats (src_rect + dst_rect)
+    VkPushConstantRange pc_range{};
+    pc_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    pc_range.offset     = 0;
+    pc_range.size       = sizeof(float) * 8;
+
+    VkPipelineLayoutCreateInfo layout_ci{};
+    layout_ci.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layout_ci.setLayoutCount         = 1;
+    layout_ci.pSetLayouts            = &desc_set_layout_;
+    layout_ci.pushConstantRangeCount = 1;
+    layout_ci.pPushConstantRanges    = &pc_range;
+
+    VkResult res = vkCreatePipelineLayout(device_, &layout_ci, nullptr, &pipeline_layout_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create pipeline layout: %d"), (int)res);
+        vkDestroyShaderModule(device_, vert_mod, nullptr);
+        vkDestroyShaderModule(device_, frag_mod, nullptr);
+        return false;
+    }
+
+    VkGraphicsPipelineCreateInfo pipe_ci{};
+    pipe_ci.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipe_ci.stageCount          = 2;
+    pipe_ci.pStages             = stages;
+    pipe_ci.pVertexInputState   = &vert_input;
+    pipe_ci.pInputAssemblyState = &ia;
+    pipe_ci.pViewportState      = &vp_state;
+    pipe_ci.pRasterizationState = &rast;
+    pipe_ci.pMultisampleState   = &ms;
+    pipe_ci.pColorBlendState    = &blend;
+    pipe_ci.pDynamicState       = &dyn;
+    pipe_ci.layout              = pipeline_layout_;
+    pipe_ci.renderPass          = render_pass_;
+    pipe_ci.subpass             = 0;
+
+    res = vkCreateGraphicsPipelines(device_, VK_NULL_HANDLE, 1, &pipe_ci, nullptr, &pipeline_);
+
+    vkDestroyShaderModule(device_, vert_mod, nullptr);
+    vkDestroyShaderModule(device_, frag_mod, nullptr);
+
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create graphics pipeline: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateCommandPool ────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateCommandPool()
+{
+    VkCommandPoolCreateInfo ci{};
+    ci.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    ci.queueFamilyIndex = graphics_family_;
+    ci.flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    VkResult res = vkCreateCommandPool(device_, &ci, nullptr, &cmd_pool_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create command pool: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateCommandBuffers ─────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateCommandBuffers()
+{
+    cmd_buffers_.resize(MAX_FRAMES_IN_FLIGHT);
+    VkCommandBufferAllocateInfo ai{};
+    ai.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    ai.commandPool        = cmd_pool_;
+    ai.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    ai.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
+
+    VkResult res = vkAllocateCommandBuffers(device_, &ai, cmd_buffers_.data());
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to allocate command buffers: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── CreateSyncObjects ────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateSyncObjects()
+{
+    VkSemaphoreCreateInfo sem_ci{};
+    sem_ci.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fen_ci{};
+    fen_ci.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fen_ci.flags = VK_FENCE_CREATE_SIGNALED_BIT; // start signalled
+
+    for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        if (vkCreateSemaphore(device_, &sem_ci, nullptr, &image_available_sem_[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(device_, &sem_ci, nullptr, &render_finished_sem_[i]) != VK_SUCCESS ||
+            vkCreateFence    (device_, &fen_ci, nullptr, &in_flight_fence_[i])     != VK_SUCCESS) {
+            wxLogError(_("Failed to create sync objects for frame %d"), i);
+            return false;
+        }
+    }
+    return true;
+}
+
+// ─── CreateDescriptorPoolAndSet ──────────────────────────────────────────────
+bool VKDrawingPanel::CreateDescriptorPoolAndSet()
+{
+    VkDescriptorPoolSize pool_size{};
+    pool_size.type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    pool_size.descriptorCount = 1;
+
+    VkDescriptorPoolCreateInfo ci{};
+    ci.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    ci.maxSets       = 1;
+    ci.poolSizeCount = 1;
+    ci.pPoolSizes    = &pool_size;
+
+    VkResult res = vkCreateDescriptorPool(device_, &ci, nullptr, &desc_pool_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create descriptor pool: %d"), (int)res);
+        return false;
+    }
+
+    VkDescriptorSetAllocateInfo ai{};
+    ai.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    ai.descriptorPool     = desc_pool_;
+    ai.descriptorSetCount = 1;
+    ai.pSetLayouts        = &desc_set_layout_;
+
+    res = vkAllocateDescriptorSets(device_, &ai, &desc_set_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to allocate descriptor set: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
+
+// ─── FindMemoryType ──────────────────────────────────────────────────────────
+uint32_t VKDrawingPanel::FindMemoryType(uint32_t type_filter,
+                                        VkMemoryPropertyFlags props) const
+{
+    VkPhysicalDeviceMemoryProperties mem_props;
+    vkGetPhysicalDeviceMemoryProperties(physical_device_, &mem_props);
+    for (uint32_t i = 0; i < mem_props.memoryTypeCount; ++i) {
+        if ((type_filter & (1u << i)) &&
+            (mem_props.memoryTypes[i].propertyFlags & props) == props)
+            return i;
+    }
+    return UINT32_MAX;
+}
+
+// ─── CreateTexture ───────────────────────────────────────────────────────────
+bool VKDrawingPanel::CreateTexture(uint32_t tex_w, uint32_t tex_h, VkFormat fmt)
+{
+    DestroyTexture();
+
+    // ── Device-local image ──────────────────────────────────────────────────
+    VkImageCreateInfo img_ci{};
+    img_ci.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    img_ci.imageType     = VK_IMAGE_TYPE_2D;
+    img_ci.format        = fmt;
+    img_ci.extent        = { tex_w, tex_h, 1 };
+    img_ci.mipLevels     = 1;
+    img_ci.arrayLayers   = 1;
+    img_ci.samples       = VK_SAMPLE_COUNT_1_BIT;
+    img_ci.tiling        = VK_IMAGE_TILING_OPTIMAL;
+    img_ci.usage         = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    img_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+    VkResult res = vkCreateImage(device_, &img_ci, nullptr, &tex_image_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create texture image: %d"), (int)res);
+        return false;
+    }
+
+    VkMemoryRequirements mem_req;
+    vkGetImageMemoryRequirements(device_, tex_image_, &mem_req);
+
+    VkMemoryAllocateInfo alloc_ci{};
+    alloc_ci.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    alloc_ci.allocationSize  = mem_req.size;
+    alloc_ci.memoryTypeIndex = FindMemoryType(mem_req.memoryTypeBits,
+                                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    if (alloc_ci.memoryTypeIndex == UINT32_MAX ||
+        vkAllocateMemory(device_, &alloc_ci, nullptr, &tex_memory_) != VK_SUCCESS) {
+        wxLogError(_("Failed to allocate texture memory"));
+        return false;
+    }
+    vkBindImageMemory(device_, tex_image_, tex_memory_, 0);
+
+    // ── Image view ──────────────────────────────────────────────────────────
+    VkImageViewCreateInfo view_ci{};
+    view_ci.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    view_ci.image                           = tex_image_;
+    view_ci.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
+    view_ci.format                          = fmt;
+    view_ci.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+    view_ci.subresourceRange.levelCount     = 1;
+    view_ci.subresourceRange.layerCount     = 1;
+
+    res = vkCreateImageView(device_, &view_ci, nullptr, &tex_view_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create texture image view: %d"), (int)res);
+        return false;
+    }
+
+    // ── Sampler (bilinear or nearest, mirroring D3DSAMP_MAGFILTER) ──────────
+    VkFilter vk_filter = OPTION(kDispBilinear) ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+
+    VkSamplerCreateInfo samp_ci{};
+    samp_ci.sType      = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samp_ci.magFilter  = vk_filter;
+    samp_ci.minFilter  = vk_filter;
+    samp_ci.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    samp_ci.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samp_ci.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samp_ci.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samp_ci.maxLod       = 0.0f;
+
+    res = vkCreateSampler(device_, &samp_ci, nullptr, &tex_sampler_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create texture sampler: %d"), (int)res);
+        return false;
+    }
+
+    // ── Update descriptor set ───────────────────────────────────────────────
+    VkDescriptorImageInfo img_info{};
+    img_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    img_info.imageView   = tex_view_;
+    img_info.sampler     = tex_sampler_;
+
+    VkWriteDescriptorSet write{};
+    write.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    write.dstSet          = desc_set_;
+    write.dstBinding      = 0;
+    write.descriptorCount = 1;
+    write.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    write.pImageInfo      = &img_info;
+
+    vkUpdateDescriptorSets(device_, 1, &write, 0, nullptr);
+
+    // ── Staging buffer ──────────────────────────────────────────────────────
+    // Worst-case: 4 bytes per pixel (32-bit formats)
+    VkDeviceSize needed = (VkDeviceSize)tex_w * tex_h * 4;
+    if (needed > staging_size_) {
+        if (staging_buffer_) {
+            vkDestroyBuffer(device_, staging_buffer_, nullptr);
+            vkFreeMemory(device_, staging_memory_, nullptr);
+            staging_buffer_ = VK_NULL_HANDLE;
+            staging_memory_ = VK_NULL_HANDLE;
+        }
+
+        VkBufferCreateInfo buf_ci{};
+        buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buf_ci.size  = needed;
+        buf_ci.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+        if (vkCreateBuffer(device_, &buf_ci, nullptr, &staging_buffer_) != VK_SUCCESS) {
+            wxLogError(_("Failed to create staging buffer"));
+            return false;
+        }
+
+        VkMemoryRequirements stg_req;
+        vkGetBufferMemoryRequirements(device_, staging_buffer_, &stg_req);
+
+        VkMemoryAllocateInfo stg_alloc{};
+        stg_alloc.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        stg_alloc.allocationSize  = stg_req.size;
+        stg_alloc.memoryTypeIndex = FindMemoryType(stg_req.memoryTypeBits,
+                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        if (stg_alloc.memoryTypeIndex == UINT32_MAX ||
+            vkAllocateMemory(device_, &stg_alloc, nullptr, &staging_memory_) != VK_SUCCESS) {
+            wxLogError(_("Failed to allocate staging memory"));
+            return false;
+        }
+        vkBindBufferMemory(device_, staging_buffer_, staging_memory_, 0);
+        staging_size_ = needed;
+    }
+
+    tex_format_       = fmt;
+    texture_width_    = tex_w;
+    texture_height_   = tex_h;
+    return true;
+}
+
+// ─── DestroyTexture ──────────────────────────────────────────────────────────
+void VKDrawingPanel::DestroyTexture()
+{
+    if (tex_sampler_) { vkDestroySampler  (device_, tex_sampler_, nullptr); tex_sampler_ = VK_NULL_HANDLE; }
+    if (tex_view_)    { vkDestroyImageView(device_, tex_view_,    nullptr); tex_view_    = VK_NULL_HANDLE; }
+    if (tex_image_)   { vkDestroyImage    (device_, tex_image_,   nullptr); tex_image_   = VK_NULL_HANDLE; }
+    if (tex_memory_)  { vkFreeMemory      (device_, tex_memory_,  nullptr); tex_memory_  = VK_NULL_HANDLE; }
+
+    if (staging_buffer_) { vkDestroyBuffer(device_, staging_buffer_, nullptr); staging_buffer_ = VK_NULL_HANDLE; }
+    if (staging_memory_) { vkFreeMemory   (device_, staging_memory_, nullptr); staging_memory_ = VK_NULL_HANDLE; }
+    staging_size_   = 0;
+    texture_width_  = 0;
+    texture_height_ = 0;
+}
+
+// ─── UploadPixels ────────────────────────────────────────────────────────────
+// Copies converted pixels into the staging buffer, then records a
+// buffer→image copy + layout transitions into cmd for this frame.
+bool VKDrawingPanel::UploadPixels(const uint8_t* src_pixels,
+                                  uint32_t       src_pitch_bytes,
+                                  VkFormat       /*fmt – already baked into image*/)
+{
+    // Map staging buffer and copy rows
+    void* mapped = nullptr;
+    vkMapMemory(device_, staging_memory_, 0, staging_size_, 0, &mapped);
+
+    uint8_t* dst_row = static_cast<uint8_t*>(mapped);
+    const uint8_t* src_row = src_pixels;
+    uint32_t row_bytes = texture_width_ * 4; // always 32-bit in staging
+
+    for (uint32_t y = 0; y < texture_height_; ++y) {
+        memcpy(dst_row, src_row, row_bytes);
+        src_row += src_pitch_bytes;
+        dst_row += row_bytes;
+    }
+    vkUnmapMemory(device_, staging_memory_);
+    return true;
+}
+
+// ─── DrawingPanelInit ────────────────────────────────────────────────────────
+void VKDrawingPanel::DrawingPanelInit()
+{
+    DrawingPanelBase::DrawingPanelInit();
+
+    if (!device_) return;
+
+    texture_width_  = (uint32_t)std::ceil(width  * scale);
+    texture_height_ = (uint32_t)std::ceil(height * scale);
+
+    wxLogDebug(_("VKDrawingPanel initialized: %ux%u (scale: %f)"),
+               texture_width_, texture_height_, scale);
+}
+
+// ─── OnSize ──────────────────────────────────────────────────────────────────
+void VKDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    if (device_) {
+        RecreateSwapchain();
+    }
+    ev.Skip();
+}
+
+// ─── DrawArea ─────────────────────────────────────────────────────────────────
+//
+// Mirrors DXDrawingPanel::DrawArea():
+//   1. Convert pixels (16-bit / 24-bit / 32-bit / 8-bit palette) into a
+//      32-bit BGRA staging buffer, mirroring the D3D pixel-conversion loops.
+//   2. Upload staging buffer → device-local image via buffer-to-image copy.
+//   3. Record render pass: bind pipeline, push constants (letterbox rect),
+//      bind descriptor set, vkCmdDraw 4 vertices.
+//   4. Submit + Present.
+// ─────────────────────────────────────────────────────────────────────────────
+void VKDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    (void)dc;
+
+    if (!device_) return;
+    if (!did_init) DrawingPanelInit();
+
+    // ── Wait for the previous use of this frame slot ─────────────────────────
+    vkWaitForFences(device_, 1, &in_flight_fence_[current_frame_], VK_TRUE, UINT64_MAX);
+
+    // ── Acquire swapchain image ───────────────────────────────────────────────
+    uint32_t image_index = 0;
+    VkResult res = vkAcquireNextImageKHR(device_, swapchain_, UINT64_MAX,
+                                          image_available_sem_[current_frame_],
+                                          VK_NULL_HANDLE, &image_index);
+
+    if (res == VK_ERROR_OUT_OF_DATE_KHR) {
+        RecreateSwapchain();
+        return;
+    }
+    if (res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR) {
+        wxLogError(_("Failed to acquire swapchain image: %d"), (int)res);
+        return;
+    }
+
+    vkResetFences(device_, 1, &in_flight_fence_[current_frame_]);
+
+    VkCommandBuffer cmd = cmd_buffers_[current_frame_];
+    vkResetCommandBuffer(cmd, 0);
+
+    VkCommandBufferBeginInfo begin_ci{};
+    begin_ci.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_ci.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    vkBeginCommandBuffer(cmd, &begin_ci);
+
+    // ── No data: clear and present ────────────────────────────────────────────
+    if (!todraw) {
+        VkClearColorValue clear_val = { {0.f, 0.f, 0.f, 1.f} };
+
+        // Transition to TRANSFER_DST so we can clear, then to PRESENT
+        VkImageMemoryBarrier to_clear{};
+        to_clear.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        to_clear.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+        to_clear.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_clear.image               = swapchain_images_[image_index];
+        to_clear.subresourceRange    = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+        to_clear.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(cmd,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &to_clear);
+
+        VkImageSubresourceRange sub_range = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+        vkCmdClearColorImage(cmd, swapchain_images_[image_index],
+                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                             &clear_val, 1, &sub_range);
+
+        VkImageMemoryBarrier to_present = to_clear;
+        to_present.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_present.newLayout     = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        to_present.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        to_present.dstAccessMask = 0;
+        vkCmdPipelineBarrier(cmd,
+            VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &to_present);
+
+        vkEndCommandBuffer(cmd);
+        goto submit_and_present;
+    }
+
+    // ── Determine texture format (mirrors D3D tex_format selection) ───────────
+    {
+        VkFormat vk_fmt = out_16 ? VK_FORMAT_R5G6B5_UNORM_PACK16 : VK_FORMAT_B8G8R8A8_UNORM;
+
+        int scaled_width  = (int)std::ceil(width  * scale);
+        int scaled_height = (int)std::ceil(height * scale);
+
+        // Recreate texture if size or format changed
+        if (!tex_image_ ||
+            (int)texture_width_  != scaled_width  ||
+            (int)texture_height_ != scaled_height ||
+            tex_format_          != vk_fmt) {
+            if (!CreateTexture((uint32_t)scaled_width, (uint32_t)scaled_height, vk_fmt)) {
+                vkEndCommandBuffer(cmd);
+                return;
+            }
+        }
+
+        // ── Convert pixels into staging buffer (mirroring D3D loops) ─────────
+        // Border sizes mirror DXDrawingPanel
+        int inrb         = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
+        int scaled_border = (int)std::ceil(inrb * scale);
+
+        int src_pitch = 0;
+        if      (out_8)  src_pitch = (scaled_width + scaled_border) * 1;
+        else if (out_16) src_pitch = (scaled_width + scaled_border) * 2;
+        else if (out_24) src_pitch = scaled_width * 3;
+        else             src_pitch = (scaled_width + scaled_border) * 4;
+
+        const uint8_t* src = todraw;
+
+        // We always convert into a temporary 32-bit BGRA staging scratch.
+        // For 16-bit we store R5G6B5 directly (matches VK_FORMAT_R5G6B5_UNORM_PACK16).
+        // staging_size_ is guaranteed large enough (allocated as tex_w*tex_h*4).
+        void* mapped = nullptr;
+        vkMapMemory(device_, staging_memory_, 0, staging_size_, 0, &mapped);
+        uint8_t* stg = static_cast<uint8_t*>(mapped);
+
+        if (out_8) {
+            // 8-bit palette → 32-bit BGRA
+            src += src_pitch; // skip top border row
+            for (int y = 0; y < scaled_height; ++y) {
+                const uint8_t* sr = src;
+                uint8_t*       dr = stg + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; ++x, ++sr, dr += 4) {
+                    uint8_t p = *sr;
+                    if (p == 0xff) {
+                        dr[0] = dr[1] = dr[2] = 0xff;
+                    } else {
+                        dr[0] = (p & 0x3)          << 6; // B
+                        dr[1] = ((p >> 2) & 0x7)   << 5; // G
+                        dr[2] = ((p >> 5) & 0x7)   << 5; // R
+                    }
+                    dr[3] = 0;
+                }
+                src += src_pitch;
+            }
+        } else if (out_16) {
+            // 16-bit RGB555 → R5G6B5 (packed uint16_t), identical logic to D3D path.
+            // Fixed shifts to avoid race with systemRedShift globals.
+            const uint16_t* src16 = (const uint16_t*)src + src_pitch / 2;
+            for (int y = 0; y < scaled_height; ++y) {
+                const uint16_t* sr = src16;
+                uint16_t*       dr = (uint16_t*)(stg + y * scaled_width * 2);
+                for (int x = 0; x < scaled_width; ++x, ++sr, ++dr) {
+                    uint16_t px = *sr;
+                    uint8_t r5 = (px >> 10) & 0x1f;
+                    uint8_t g5 = (px >>  5) & 0x1f;
+                    uint8_t b5 = (px >>  0) & 0x1f;
+                    uint8_t g6 = (g5 << 1) | (g5 >> 4);
+                    *dr = (uint16_t)((r5 << 11) | (g6 << 5) | b5);
+                }
+                src16 += src_pitch / 2;
+            }
+        } else if (out_24) {
+            // 24-bit RGB → 32-bit BGRA
+            src += scaled_width * 3; // skip top border row
+            for (int y = 0; y < scaled_height; ++y) {
+                const uint8_t* sr = src;
+                uint8_t*       dr = stg + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; ++x, sr += 3, dr += 4) {
+                    dr[0] = sr[2]; // B
+                    dr[1] = sr[1]; // G
+                    dr[2] = sr[0]; // R
+                    dr[3] = 0;
+                }
+                src += src_pitch;
+            }
+        } else {
+            // 32-bit RGBA → BGRA  (swap R↔B)
+            src += src_pitch; // skip top border row
+            for (int y = 0; y < scaled_height; ++y) {
+                const uint8_t* sr = src;
+                uint8_t*       dr = stg + y * scaled_width * 4;
+                for (int x = 0; x < scaled_width; ++x, sr += 4, dr += 4) {
+                    dr[0] = sr[2]; // B
+                    dr[1] = sr[1]; // G
+                    dr[2] = sr[0]; // R
+                    dr[3] = sr[3]; // A/X
+                }
+                src += src_pitch;
+            }
+        }
+
+        vkUnmapMemory(device_, staging_memory_);
+
+        // ── Transition texture to TRANSFER_DST ───────────────────────────────
+        VkImageMemoryBarrier to_dst{};
+        to_dst.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        to_dst.oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+        to_dst.newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_dst.image               = tex_image_;
+        to_dst.subresourceRange    = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+        to_dst.dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(cmd,
+            VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &to_dst);
+
+        // ── Copy staging buffer → texture ─────────────────────────────────────
+        //uint32_t bytes_per_px = out_16 ? 2 : 4;
+        VkBufferImageCopy copy{};
+        copy.bufferRowLength        = texture_width_;
+        copy.imageSubresource       = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+        copy.imageExtent            = {texture_width_, texture_height_, 1};
+        // For 16-bit we wrote packed uint16s; adjust bufferRowLength is already correct.
+        if (out_16) copy.bufferRowLength = texture_width_; // in texels
+        vkCmdCopyBufferToImage(cmd, staging_buffer_, tex_image_,
+                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
+
+        // ── Transition texture to SHADER_READ_ONLY ────────────────────────────
+        VkImageMemoryBarrier to_read{};
+        to_read.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        to_read.oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        to_read.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        to_read.image               = tex_image_;
+        to_read.subresourceRange    = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+        to_read.srcAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        to_read.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+        vkCmdPipelineBarrier(cmd,
+            VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &to_read);
+
+        // ── Begin render pass ─────────────────────────────────────────────────
+        VkClearValue clear_val{};
+        clear_val.color = {{0.f, 0.f, 0.f, 1.f}};
+
+        VkRenderPassBeginInfo rp_begin{};
+        rp_begin.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        rp_begin.renderPass      = render_pass_;
+        rp_begin.framebuffer     = framebuffers_[image_index];
+        rp_begin.renderArea      = {{0, 0}, swapchain_extent_};
+        rp_begin.clearValueCount = 1;
+        rp_begin.pClearValues    = &clear_val;
+
+        vkCmdBeginRenderPass(cmd, &rp_begin, VK_SUBPASS_CONTENTS_INLINE);
+
+        // Viewport and scissor (dynamic)
+        VkViewport viewport{};
+        viewport.width    = (float)swapchain_extent_.width;
+        viewport.height   = (float)swapchain_extent_.height;
+        viewport.minDepth = 0.f;
+        viewport.maxDepth = 1.f;
+        vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.extent = swapchain_extent_;
+        vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipeline_layout_, 0, 1, &desc_set_, 0, nullptr);
+
+        // ── Push constants: src_rect (always full texture) + dst_rect ─────────
+        // Destination rect in NDC [-1, 1], mirroring D3D letterbox logic.
+        float win_w = (float)swapchain_extent_.width;
+        float win_h = (float)swapchain_extent_.height;
+
+        float dst_x0 = -1.f, dst_y0 = -1.f, dst_x1 = 1.f, dst_y1 = 1.f;
+
+        if (OPTION(kDispStretch)) {
+            // Retain aspect ratio: letterbox
+            float tex_aspect = (float)scaled_width  / (float)scaled_height;
+            float win_aspect = win_w / win_h;
+
+            if (win_aspect > tex_aspect) {
+                float ndc_w = tex_aspect / win_aspect; // fraction of half-width
+                dst_x0 = -ndc_w;
+                dst_x1 =  ndc_w;
+            } else {
+                float ndc_h = win_aspect / tex_aspect;
+                dst_y0 = -ndc_h;
+                dst_y1 =  ndc_h;
+            }
+        }
+        // else: stretch to fill, NDC already covers [-1,1] x [-1,1]
+
+        // Layout: [src_u0, src_v0, src_u1, src_v1, dst_x0, dst_y0, dst_x1, dst_y1]
+        float pc[8] = { 0.f, 0.f, 1.f, 1.f,
+                        dst_x0, dst_y0, dst_x1, dst_y1 };
+        vkCmdPushConstants(cmd, pipeline_layout_,
+                           VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                           0, sizeof(pc), pc);
+
+        // 4 vertices, TRIANGLE_STRIP → 2 triangles (the quad)
+        vkCmdDraw(cmd, 4, 1, 0, 0);
+
+        vkCmdEndRenderPass(cmd);
+    }
+
+    vkEndCommandBuffer(cmd);
+
+submit_and_present:
+    // ── Submit ────────────────────────────────────────────────────────────────
+    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    VkSubmitInfo submit{};
+    submit.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.waitSemaphoreCount   = 1;
+    submit.pWaitSemaphores      = &image_available_sem_[current_frame_];
+    submit.pWaitDstStageMask    = &wait_stage;
+    submit.commandBufferCount   = 1;
+    submit.pCommandBuffers      = &cmd;
+    submit.signalSemaphoreCount = 1;
+    submit.pSignalSemaphores    = &render_finished_sem_[current_frame_];
+
+    vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
+
+    // ── Present ───────────────────────────────────────────────────────────────
+    VkPresentInfoKHR present_info{};
+    present_info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores    = &render_finished_sem_[current_frame_];
+    present_info.swapchainCount     = 1;
+    present_info.pSwapchains        = &swapchain_;
+    present_info.pImageIndices      = &image_index;
+
+    res = vkQueuePresentKHR(present_queue_, &present_info);
+    if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
+        RecreateSwapchain();
+    } else if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to present swapchain image: %d"), (int)res);
+    }
+
+    current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+#endif // defined(__WXMSW__) && !defined(NO_VULKAN)

@@ -74,6 +74,9 @@ enum class RenderMethod {
     kMetal,
 #endif
 #endif
+#ifndef NO_VULKAN
+    kVulkan,
+#endif
 
     // Do not add anything under here.
     kLast,
