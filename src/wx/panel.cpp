@@ -6120,7 +6120,7 @@ bool VKDrawingPanel::CreateInstance()
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pEngineName        = "VBAm";
     app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion         = VK_API_VERSION_1_0;
+    app_info.apiVersion         = VK_API_VERSION_1_1;
  
     std::vector<const char*> extensions = { VK_KHR_SURFACE_EXTENSION_NAME };
  
