@@ -7178,7 +7178,7 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
                         dr[1] = ((p >> 2) & 0x7) << 5;
                         dr[2] = ((p >> 5) & 0x7) << 5;
                     }
-                    dr[3] = 0;
+                    dr[3] = 0xFF;
                 }
                 src += src_pitch;
             }
@@ -7206,7 +7206,7 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
                     dr[0] = sr[2];
                     dr[1] = sr[1];
                     dr[2] = sr[0];
-                    dr[3] = 0;
+                    dr[3] = 0xFF;
                 }
                 src += src_pitch;
             }
