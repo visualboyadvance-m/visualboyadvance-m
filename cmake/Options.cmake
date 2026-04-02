@@ -102,6 +102,7 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 find_package(Vulkan QUIET)
 
 option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
+option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
 if(NOT ENABLE_VULKAN)
    set(CMAKE_C_FLAGS      "-DNO_VULKAN ${CMAKE_C_FLAGS}")

@@ -243,7 +243,7 @@ public:
 #if defined(__WXMSW__)
 #include <vulkan/vulkan_win32.h>
 #elif defined(__WXMAC__)
-#include <vulkan/vulkan_macos.h>
+#include <vulkan/vulkan_metal.h>
 #elif defined(__WXGTK__)
 #include <vulkan/vulkan_wayland.h>
 #include <vulkan/vulkan_xlib.h>
