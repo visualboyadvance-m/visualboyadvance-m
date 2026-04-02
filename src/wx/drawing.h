@@ -369,7 +369,9 @@ private:
     uint32_t texture_width_  = 0;
     uint32_t texture_height_ = 0;
     bool     vsync_          = false;
- 
+    bool     have_wayland_surface_ = false;
+    bool     have_xlib_surface_ = false;
+
     // Shader SPIR-V (compiled inline via glslang or supplied pre-compiled).
     // Stored as static constexpr uint32_t arrays at the bottom of the .cpp.
     static const uint32_t kVertSpv[];
