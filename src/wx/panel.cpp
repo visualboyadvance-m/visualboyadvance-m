@@ -6134,7 +6134,7 @@ bool VKDrawingPanel::CreateInstance()
 
     // Modern MoltenVK exposes VK_EXT_metal_surface (via the portability
     // enumeration layer).  The old VK_MVK_macos_surface is deprecated and
-    // absent on Apple Silicon / MoltenVK ≥ 1.2.
+    // absent on Apple Silicon / MoltenVK > 1.2.
     extensions.push_back(VK_EXT_METAL_SURFACE_EXTENSION_NAME);
 
     auto has_ext = [&](const char* name) {
@@ -6234,7 +6234,7 @@ bool VKDrawingPanel::CreateSurfaceMACOS()
 {
     // wxWidgets on macOS: GetHandle() returns the NSView*.
     // MoltenVK will create (or reuse) a CAMetalLayer backing it automatically.
-    void* ns_view = VKBEnsureMetalLayer(wxGetApp().frame->GetPanel()->GetHandle());   // 'this' is the VKDrawingPanel
+    void* ns_view = VKBEnsureMetalLayer(GetHandle());   // 'this' is the VKDrawingPanel
     if (!ns_view) {
         wxLogError(_("Failed to obtain NSView handle for Vulkan surface"));
         return false;
@@ -6304,7 +6304,7 @@ bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface* wayland_surface,
 bool VKDrawingPanel::CreateSurfaceUNIX()
 {
     // 'this' is a wxWindow subclass; GetHandle() returns the GtkWidget*.
-    GtkWidget* widget = static_cast<GtkWidget*>(wxGetApp().frame->GetHandle());
+    GtkWidget* widget = static_cast<GtkWidget*>(GetHandle());
     gtk_widget_realize(widget);
  
     GdkWindow*  gdk_win = gtk_widget_get_window(widget);
@@ -6324,9 +6324,7 @@ bool VKDrawingPanel::CreateSurfaceUNIX()
             return false;
         }
         return CreateSurfaceWAYLAND(wl_surf, wl_dpy);
-    }
- 
-    if (have_xlib_surface_) {
+    } else if (have_xlib_surface_) {
         XID xid = GDK_WINDOW_XID(gdk_win);
         return CreateSurfaceXLIB(xid);
     }
