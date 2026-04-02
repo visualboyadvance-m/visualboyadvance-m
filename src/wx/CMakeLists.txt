@@ -322,6 +322,11 @@ function(configure_wx_target target)
         endif()
     endif()
 
+    # Vukan.
+    if(NOT ENABLE_VULKAN)
+        _add_compile_definitions(NO_VULKAN)
+    endif()
+
     # Direct3D.
     if(NOT ENABLE_DIRECT3D)
         _add_compile_definitions(NO_D3D)
