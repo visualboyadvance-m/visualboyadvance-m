@@ -149,8 +149,8 @@ DISTS=$DISTS'
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz                                              lib/libavformat.a
-    MoltenVK        https://github.com/KhronosGroup/MoltenVK/archive/refs/tags/v1.4.1.tar.gz     include/vulkan/vulkan.h
-    MoltenVKLib     https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar           lib/libMoltenVK.a
+    VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.348.tar.gz            include/vulkan/vulkan.h
+    MoltenVK        https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar        lib/libMoltenVK.a
 '
 
 BUILD_FFMPEG=1
@@ -220,7 +220,6 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     libuuid         autoreconf
     libwebp         cmake
     wxwidgets       cmake
-    MoltenVK        cmake
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -273,7 +272,6 @@ DIST_POST_BUILD="$DIST_POST_BUILD
                     touch \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\"; \
                     sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
     ffmpeg          sed -i.bak 's/-lX11/ /g' \$BUILD_ROOT/root/lib/pkgconfig/libavutil.pc
-    MoltenVK        cp -Rf ${HOME}/.cache/CPM/vulkan-headers/*/Vulkan-Headers/include/* $BUILD_ROOT/root/include/
 "
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
@@ -284,7 +282,8 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      $DASH ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
     ffmpeg      $DASH ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --disable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --disable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --enable-libx264 --enable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --disable-securetransport --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
-    MoltenVKLib echo Prebuilt static MoltenVK
+    VulkanHeaders   echo Copy Vulkan headers
+    MoltenVK        echo Copy prebuilt static MoltenVK
 "
 
 DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
@@ -311,7 +310,8 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
     dejavu         install_fonts
     liberation     install_fonts
     urw            install_fonts
-    MoltenVKLib    cp -f MoltenVK/static/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a $BUILD_ROOT/root/lib
+    VulkanHeaders  cp -Rf include/* $BUILD_ROOT/root/include/
+    MoltenVK       cp -f MoltenVK/static/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a $BUILD_ROOT/root/lib/
 "
 
 DIST_FLAGS="$DIST_FLAGS

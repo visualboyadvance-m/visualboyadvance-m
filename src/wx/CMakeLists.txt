@@ -154,14 +154,11 @@ if(APPLE)
     find_library(IOSURFACE IOSurface)
 endif()
 
-if(WIN32)
-    find_library(VULKAN vulkan-1)
-else()
-    find_library(VULKAN vulkan)
+# Vulkan::Vulkan imported target (set by find_package in Options.cmake) covers
+# both SDK-path (VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader) installs.
 
-    if(APPLE AND ENABLE_MOLTENVK)
-        find_library(MOLTENVK MoltenVK)
-    endif()
+if(APPLE)
+    find_library(MOLTENVK MoltenVK)
 endif()
 
 set(ENABLE_OPENGL TRUE)
@@ -358,7 +355,7 @@ function(configure_wx_target target)
         if(APPLE AND ENABLE_MOLTENVK)
             _add_link_libraries(${MOLTENVK})
         else()
-            _add_link_libraries(${VULKAN})
+            _add_link_libraries(Vulkan::Vulkan)
         endif()
     endif()
 

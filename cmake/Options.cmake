@@ -99,9 +99,23 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
+# Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
+# Both produce the Vulkan::Vulkan imported target used downstream.
 find_package(Vulkan QUIET)
 
 option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
+
+# Catch stale cache or explicit -DENABLE_VULKAN=ON without the SDK present.
+if(ENABLE_VULKAN AND NOT Vulkan_FOUND)
+    message(WARNING
+        "ENABLE_VULKAN=ON but Vulkan was not found. "
+        "For an SDK install, set the VULKAN_SDK environment variable. "
+        "For vcpkg, ensure the vulkan-headers and vulkan-loader ports are "
+        "installed for your triplet. Disabling Vulkan."
+    )
+    set(ENABLE_VULKAN OFF CACHE BOOL "Enable Vulkan" FORCE)
+endif()
+
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
 if(ENABLE_SDL3)
