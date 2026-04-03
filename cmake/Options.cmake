@@ -104,13 +104,6 @@ find_package(Vulkan QUIET)
 option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
-if(ENABLE_VULKAN)
-   set(VULKAN ON)
-else()
-   set(CMAKE_C_FLAGS      "-DNO_VULKAN ${CMAKE_C_FLAGS}")
-   set(CMAKE_CXX_FLAGS    "-DNO_VULKAN ${CMAKE_CXX_FLAGS}")
-endif()
-
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS      "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
    set(CMAKE_CXX_FLAGS    "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")

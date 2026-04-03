@@ -153,6 +153,13 @@ if(APPLE)
     find_library(METALKIT MetalKit)
 endif()
 
+if(WIN32)
+    find_library(VULKAN vulkan-1)
+else()
+    find_library(VULKAN vulkan)
+    find_library(MOLTENVK MoltenVK)
+endif()
+
 set(ENABLE_OPENGL TRUE)
 find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
 
@@ -345,9 +352,9 @@ function(configure_wx_target target)
 
     if(ENABLE_VULKAN)
         if(APPLE AND ENABLE_MOLTENVK)
-              _add_link_libraries(MoltenVK)
+            _add_link_libraries(${MOLTENVK})
         else()
-              _add_link_libraries(vulkan)
+            _add_link_libraries(${VULKAN})
         endif()
     endif()
 
