@@ -149,6 +149,7 @@ DISTS=$DISTS'
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz                                              lib/libavformat.a
+    MoltenVK        https://github.com/KhronosGroup/MoltenVK/archive/refs/tags/v1.4.1.tar.gz     lib/libMoltenVK.a
 '
 
 BUILD_FFMPEG=1
@@ -185,6 +186,7 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
+    MoltenVK        https://gist.githubusercontent.com/andyvand/5067efec3d605b71757c1350d4d1af4b/raw/8392fac2db0a0e68548e570c097e43ffca2c5fb0/MoltenVK-1.4.1-static-patch.diff
     libx265         https://gist.githubusercontent.com/andyvand/9f9770878c63b6307f0b5384b01967da/raw/738672b9dd3a76c44b2368853f9c862366720416/libx265_cmake_fix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
@@ -218,6 +220,7 @@ DIST_CONFIGURE_TYPES="$DIST_CONFIGURE_TYPES
     libuuid         autoreconf
     libwebp         cmake
     wxwidgets       cmake
+    MoltenVK        cmake
 "
 
 DIST_RELOCATION_TYPES="$DIST_RELOCATION_TYPES
@@ -270,6 +273,7 @@ DIST_POST_BUILD="$DIST_POST_BUILD
                     touch \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\"; \
                     sed -i.bak \"s|/usr/share/fonts|\$BUILD_ROOT/root/share/fonts|g\" \"\$BUILD_ROOT/root/etc/fonts/fonts.conf\";
     ffmpeg          sed -i.bak 's/-lX11/ /g' \$BUILD_ROOT/root/lib/pkgconfig/libavutil.pc
+    MoltenVK        cp -Rf ${HOME}/.cache/CPM/vulkan-headers/*/Vulkan-Headers/include/* $BUILD_ROOT/root/include/ && cp -f MoltenVKShaderConverter/MoltenVKShaderConverter/libMoltenVK_ShaderConverter.a $BUILD_ROOT/root/lib && cp -f Common/libMoltenVK_Common.a $BUILD_ROOT/root/lib && cp -f _deps/spirv-tools-build/source/libSPIRV-Tools.a $BUILD_ROOT/root/lib && cp -f _deps/spirv-cross-build/libspirv-cross-core.a $BUILD_ROOT/root/lib && cp -f _deps/spirv-cross-build/libspirv-cross-glsl.a $BUILD_ROOT/root/lib && cp -f _deps/spirv-cross-build/libspirv-cross-msl.a $BUILD_ROOT/root/lib && cp -f _deps/spirv-cross-build/libspirv-cross-reflect.a $BUILD_ROOT/root/lib
 "
 
 DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
@@ -2882,7 +2886,7 @@ build_project() {
     # Release build.
     puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
     cd release
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
+    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
     run_ninja
     dist_post_build project
     cd ..
@@ -2890,7 +2894,7 @@ build_project() {
     # Debug build.
 #    puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
 #    cd debug
-#    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -G Ninja $@
+#    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON -G Ninja $@
 #    run_ninja
 #    dist_post_build project
 #    cd ..
