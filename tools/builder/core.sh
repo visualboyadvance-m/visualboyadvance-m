@@ -145,7 +145,7 @@ DISTS=$DISTS'
     giflib          https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
     fmt             https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip                       lib/libfmt.a
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxWidgets-3.3.1.tar.bz2     lib/libwx_baseu-3.*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.2/wxWidgets-3.3.2.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
     ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz                                              lib/libavformat.a
