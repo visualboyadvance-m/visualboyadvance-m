@@ -54,6 +54,10 @@ set(VCPKG_DEPS_OPTIONAL
     faudio              ENABLE_FAUDIO
 )
 
+if(NOT APPLE)
+    list(APPEND VCPKG_DEPS vulkan)
+endif()
+
 include(Set-Toolchain-vcpkg)
 
 # Use ccache if available and not already enabled on the command line.
