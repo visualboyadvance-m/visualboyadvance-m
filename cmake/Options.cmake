@@ -101,19 +101,23 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream.
-find_package(Vulkan QUIET)
+if(NOT WINXP)
+    find_package(Vulkan)
 
-option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
+    option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
 
-# Catch stale cache or explicit -DENABLE_VULKAN=ON without the SDK present.
-if(ENABLE_VULKAN AND NOT Vulkan_FOUND)
-    message(WARNING
-        "ENABLE_VULKAN=ON but Vulkan was not found. "
-        "For an SDK install, set the VULKAN_SDK environment variable. "
-        "For vcpkg, ensure the vulkan-headers and vulkan-loader ports are "
-        "installed for your triplet. Disabling Vulkan."
-    )
-    set(ENABLE_VULKAN OFF CACHE BOOL "Enable Vulkan" FORCE)
+    # Catch stale cache or explicit -DENABLE_VULKAN=ON without the SDK present.
+    if(ENABLE_VULKAN AND NOT Vulkan_FOUND)
+        message(WARNING
+            "ENABLE_VULKAN=ON but Vulkan was not found. "
+            "For an SDK install, set the VULKAN_SDK environment variable. "
+            "For vcpkg, ensure the vulkan-headers and vulkan-loader ports are "
+            "installed for your triplet. Disabling Vulkan."
+        )
+        set(ENABLE_VULKAN OFF CACHE BOOL "Enable Vulkan" FORCE)
+    endif()
+else()
+    set(ENABLE_VULKAN OFF)
 endif()
 
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
