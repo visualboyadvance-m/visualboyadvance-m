@@ -1844,7 +1844,16 @@ void GameArea::OnIdle(wxIdleEvent& event)
 #endif
 #ifndef NO_VULKAN
             case config::RenderMethod::kVulkan:
-                panel = new VKDrawingPanel(this, basic_width, basic_height);
+#ifdef __WXMAC__
+                if (is_macosx_1012_or_newer()) {
+#endif
+                    panel = new VKDrawingPanel(this, basic_width, basic_height);
+#ifdef __WXMAC__
+                } else {
+                    panel = new GLDrawingPanel(this, basic_width, basic_height);
+                    wxLogInfo(_("Vulkan is unavailable, defaulting to OpenGL"));
+                }
+#endif
                 break;
 #endif
             case config::RenderMethod::kLast:
