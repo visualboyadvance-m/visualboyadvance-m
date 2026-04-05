@@ -99,6 +99,10 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
+if(APPLE)
+    set(ENABLE_GENERIC_FILE_DIALOGS ON)
+endif()
+
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream.
 if(NOT WINXP)
