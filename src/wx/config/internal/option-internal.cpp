@@ -68,7 +68,7 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "opengl",
     "sdl_video",
 #if defined(__WXMSW__)
-#if defined(__WXMSW__) && !defined(NO_D3D)
+#if defined(__WXMSW__) && !defined(NO_D3D12)
     "direct3d12",
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
