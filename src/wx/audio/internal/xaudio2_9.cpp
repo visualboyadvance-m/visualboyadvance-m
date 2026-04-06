@@ -112,11 +112,13 @@ bool XAudio2_9_Output::SetupStereoUpmix() {
         return true; // Upmix not enabled
     }
 
-    // For XAudio2 2.9, we need to get the channel mask from the mastering voice
-    XAUDIO2_VOICE_DETAILS voiceDetails;
-    mVoice->GetVoiceDetails(&voiceDetails);
-    
-    UINT32 outputChannels = voiceDetails.InputChannels;
+    // GetChannelMask returns the actual hardware speaker configuration bitmask
+    DWORD channelMask = 0;
+    mVoice->GetChannelMask(&channelMask);
+
+    UINT32 outputChannels = 0;
+    for (DWORD mask = channelMask; mask; mask >>= 1)
+        outputChannels += (mask & 1);
     
     // Only setup upmix if we have more than 2 channels
     if (outputChannels <= 2) {
