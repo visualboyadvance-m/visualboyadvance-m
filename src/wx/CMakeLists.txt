@@ -1183,7 +1183,7 @@ if(APPLE)
 
     add_custom_command(
         TARGET visualboyadvance-m POST_BUILD
-	COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleIdentifier         -string "com.visualboyadvance-m.visualboyadvance-m"
+        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleIdentifier         -string "com.visualboyadvance-m.visualboyadvance-m"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${ver}"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${ver}"
         COMMAND plutil -convert xml1 ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist
