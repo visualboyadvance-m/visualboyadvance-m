@@ -157,10 +157,6 @@ endif()
 # Vulkan::Vulkan imported target (set by find_package in Options.cmake) covers
 # both SDK-path (VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader) installs.
 
-if(APPLE)
-    find_library(MOLTENVK MoltenVK)
-endif()
-
 set(ENABLE_OPENGL TRUE)
 find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
 
