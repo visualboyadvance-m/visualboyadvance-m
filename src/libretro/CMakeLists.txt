@@ -422,23 +422,18 @@ elseif(MINGW)
     # Version script for symbol visibility (GNU ld only).
     # lld (used by CLANG64) doesn't support --version-script on PE/COFF.
     if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        # Copy link.T into the build dir and use a relative path to avoid
-        # Windows drive-letter colons which GNU ld misparses.
-        configure_file(
+        # Copy link.T into the build dir and use the path
+        file(COPY_FILE
             ${CMAKE_CURRENT_SOURCE_DIR}/link.T
             ${CMAKE_CURRENT_BINARY_DIR}/link.T
-            COPYONLY
         )
-        file(RELATIVE_PATH _lr_link_script
-            ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/link.T)
         target_link_options(vbam_libretro PRIVATE
-            -Wl,--version-script=${_lr_link_script}
+            -Wl,--version-script=${CMAKE_CURRENT_BINARY_DIR}/link.T
             -Wl,--no-undefined
         )
         set_target_properties(vbam_libretro PROPERTIES
             LINK_DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/link.T
         )
-        unset(_lr_link_script)
     endif()
 
     # Static C++ runtime (avoids extra DLL dependencies).
