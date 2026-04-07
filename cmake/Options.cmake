@@ -122,6 +122,18 @@ endif()
 
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
+if(APPLE)
+   find_library(MOLTENVK MoltenVK)
+   if (NOT MOLTENVK-NOTFOUND)
+       include(CheckIncludeFile)
+       check_include_file(vulkan/vulkan.h HAVE_VULKAN_H)
+       if (HAVE_VULKAN_H)
+          set(ENABLE_VULKAN ON)
+          set(ENABLE_MOLTENVK ON)
+       endif()
+   endif()
+endif()
+
 if(ENABLE_SDL3)
    set(CMAKE_C_FLAGS      "-DENABLE_SDL3 ${CMAKE_C_FLAGS}")
    set(CMAKE_CXX_FLAGS    "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
