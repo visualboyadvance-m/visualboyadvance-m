@@ -192,6 +192,7 @@ typedef struct
 } AAPLVertex;
 
 bool is_macosx_1012_or_newer();
+bool is_macosx_11_or_newer();
 
 class MetalDrawingPanel : public DrawingPanel {
 public:

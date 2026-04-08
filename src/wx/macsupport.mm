@@ -32,6 +32,16 @@ bool is_macosx_1012_or_newer()
     return false;
 }
 
+bool is_macosx_11_or_newer()
+{
+    // macOS 11.0 version check
+    if (NSAppKitVersionNumber >= 2022) {
+        return true;
+    }
+
+    return false;
+}
+
 MetalDrawingPanel::~MetalDrawingPanel()
 {
     if (did_init)

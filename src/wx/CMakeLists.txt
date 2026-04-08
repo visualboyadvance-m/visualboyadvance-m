@@ -349,7 +349,7 @@ function(configure_wx_target target)
 
     if(ENABLE_VULKAN)
         if(APPLE AND ENABLE_MOLTENVK)
-            _add_link_libraries(${MOLTENVK})
+            _add_link_libraries($<LINK_LIBRARY:WEAK_LIBRARY,${MOLTENVK}>)
         else()
             _add_link_libraries(Vulkan::Vulkan)
         endif()

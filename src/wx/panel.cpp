@@ -1845,7 +1845,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
 #ifndef NO_VULKAN
             case config::RenderMethod::kVulkan:
 #ifdef __WXMAC__
-                if (is_macosx_1012_or_newer()) {
+                if (is_macosx_11_or_newer()) {
 #endif
                     panel = new VKDrawingPanel(this, basic_width, basic_height);
 #ifdef __WXMAC__
