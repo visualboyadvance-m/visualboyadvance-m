@@ -1181,9 +1181,8 @@ if(APPLE)
         TARGET visualboyadvance-m POST_BUILD
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleIdentifier         -string "com.visualboyadvance-m.visualboyadvance-m"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist NSHumanReadableCopyright   -string "Copyright © 1999-2003 Forgotten, copyright © 2004-2006 VBA development team, copyright © 2007-2020 VBA-M development team"
-        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleName               -string "visualboyadvance-m"
-        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleName               -string "visualboyadvance-m"
-        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleGetInfoString      -string "visualboyadvance-m ${ver}"
+        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleName               -string "VisualBoyAdvance-M"
+        COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleGetInfoString      -string "VisualBoyAdvance-M ${ver}"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleVersion            -string "${ver}"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleShortVersionString -string "${ver}"
         COMMAND defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist CFBundleLongVersionString -string "${ver}"
