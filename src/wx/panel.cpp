@@ -16,7 +16,6 @@
     #include <X11/Xlib.h>
     #define Status int
     #include <gdk/gdkx.h>
-    #include <gdk/gdkwayland.h>
     #include <gtk/gtk.h>
     // For Wayland EGL.
     #ifdef HAVE_EGL
@@ -70,6 +69,10 @@
 #include "wx/wayland.h"
 #include "wx/widgets/render-plugin.h"
 #include "wx/widgets/user-input-event.h"
+
+#if defined(__WXGTK__) && defined(HAVE_WAYLAND_SUPPORT)
+    #include <gdk/gdkwayland.h>
+#endif //HAVE_WAYLAND_SUPPORT
 
 #ifdef __WXMSW__
 #include <windows.h>
@@ -3113,7 +3116,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     struct wl_surface *wayland_surface = NULL;
     struct wl_display *wayland_display = NULL;
 
-#ifdef ENABLE_SDL3
+#if defined(ENABLE_SDL3) && defined(HAVE_WAYLAND_SUPPORT)
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
         wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
@@ -3125,16 +3128,20 @@ void SDLDrawingPanel::DrawingPanelInit()
     } else {
 #endif
         xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
-#ifdef ENABLE_SDL3
+#if defined(ENABLE_SDL3) && defined(HAVE_WAYLAND_SUPPORT)
     }
 #endif
 
 #ifdef ENABLE_SDL3
+#ifdef HAVE_WAYLAND_SUPPORT
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland");
     } else {
         SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
     }
+#else
+    SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
+#endif
 #else
     SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");
 #endif
@@ -3165,6 +3172,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 
 #ifdef ENABLE_SDL3
 #ifdef __WXGTK__
+#ifdef HAVE_WAYLAND_SUPPORT
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, wayland_surface) == false) {
             wxLogError(_("Failed to set wayland surface"));
@@ -3172,6 +3180,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         }
     } else {
         if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
+#else
+        if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
+#endif
 #elif defined(__WXMAC__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
 #elif defined(__WXMSW__)
@@ -3184,7 +3195,7 @@ void SDLDrawingPanel::DrawingPanelInit()
             return;
         }
 
-#ifdef __WXGTK__
+#if defined(__WXGTK__) && defined(HAVE_WAYLAND_SUPPORT)
     }
 #endif
 
