@@ -4,10 +4,6 @@ endif()
 
 add_compile_definitions(${VBAM_FRONTEND_DEFINITIONS})
 
-if(NO_WAYLAND)
-    add_compile_definitions(NO_WAYLAND)
-endif()
-
 # Do not use this file directly.  Always use the top level CMakeLists.txt file
 include(VbamFunctions)
 
@@ -274,6 +270,11 @@ function(configure_wx_target target)
     # Generic file dialogs
     if (ENABLE_GENERIC_FILE_DIALOGS)
         _add_compile_definitions(USE_GENERIC_FILE_DIALOGS)
+    endif()
+
+    # Force disable Wayland
+    if(NO_WAYLAND)
+        _add_compile_definitions(NO_WAYLAND)
     endif()
 
     # No Metal
