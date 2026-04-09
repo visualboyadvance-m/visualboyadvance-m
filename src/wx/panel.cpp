@@ -2052,11 +2052,15 @@ void GameArea::OnUserInput(widgets::UserInputEvent& event) {
 #if defined(__WXGTK__) && defined(HAVE_X11) && !defined(HAVE_XSS)
         // Tell X11 to turn off the screensaver/screen-blank if a button was
         // was pressed. This shouldn't be necessary.
+#ifndef NO_WAYLAND
         if (!wxGetApp().UsingWayland()) {
+#endif
             auto display = GetX11Display();
             XResetScreenSaver(display);
             XFlush(display);
+#ifndef NO_WAYLAND
         }
+#endif
 #endif
     }
 }
@@ -2871,9 +2875,11 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // next, draw the frame (queue a PaintEv) Refresh must be used under
     // Wayland or nothing is drawn.
+#ifndef NO_WAYLAND
     if (wxGetApp().UsingWayland())
         GetWindow()->Refresh();
     else {
+#endif
         DrawingPanelBase* panel = wxGetApp().frame->GetPanel()->panel;
         if (panel) {
             wxWindow* win = panel->GetWindow();
@@ -2890,7 +2896,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 panel->DrawArea(dc);
             }
         }
+#ifndef NO_WAYLAND
     }
+#endif
 
     // finally, draw on-screen text using wx method, if possible
     // this method flickers too much right now
@@ -3110,6 +3118,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     GtkWidget *widget = wxGetApp().frame->GetPanel()->GetHandle();
     gtk_widget_realize(widget);
     XID xid = 0;
+#ifndef NO_WAYLAND
     struct wl_surface *wayland_surface = NULL;
     struct wl_display *wayland_display = NULL;
 
@@ -3124,7 +3133,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         }
     } else {
 #endif
+#endif
         xid = GDK_WINDOW_XID(gtk_widget_get_window(widget));
+#ifndef NO_WAYLAND
 #ifdef ENABLE_SDL3
     }
 #endif
@@ -3138,6 +3149,9 @@ void SDLDrawingPanel::DrawingPanelInit()
 #else
     SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");
 #endif
+#endif
+#else
+    SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
 #endif
 
     DrawingPanel::DrawingPanelInit();
@@ -3165,12 +3179,14 @@ void SDLDrawingPanel::DrawingPanelInit()
 
 #ifdef ENABLE_SDL3
 #ifdef __WXGTK__
+#ifndef NO_WAYLAND
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, wayland_surface) == false) {
             wxLogError(_("Failed to set wayland surface"));
             return;
         }
     } else {
+#endif
         if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
 #elif defined(__WXMAC__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
@@ -3185,7 +3201,9 @@ void SDLDrawingPanel::DrawingPanelInit()
         }
 
 #ifdef __WXGTK__
+#ifndef NO_WAYLAND
     }
+#endif
 #endif
 
     if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
@@ -4003,6 +4021,7 @@ void GLDrawingPanel::DrawingPanelInit()
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // non-portable vsync code
+#ifndef NO_WAYLAND
 #if defined(__WXGTK__)
     if (IsWayland()) {
 #ifdef HAVE_EGL
@@ -4015,6 +4034,7 @@ void GLDrawingPanel::DrawingPanelInit()
 #endif
     }
     else {
+#endif
         if (OPTION(kPrefVsync))
             wxLogDebug(_("Enabling GLX VSync."));
         else
@@ -4056,7 +4076,9 @@ void GLDrawingPanel::DrawingPanelInit()
             else
                 wxLogError(_("Failed to set glXSwapIntervalMESA"));
         }
+#ifndef NO_WAYLAND
     }
+#endif
 #elif defined(__WXMSW__)
     typedef const char* (*wglext)();
     wglext wglGetExtensionsStringEXT = reinterpret_cast<wglext>(reinterpret_cast<void*>(wglGetProcAddress("wglGetExtensionsStringEXT")));
@@ -4086,10 +4108,12 @@ void GLDrawingPanel::DrawingPanelInit()
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
     AdjustViewport();
-            
+
+#ifndef NO_WAYLAND
     // Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
     if (IsWayland())
         MoveWaylandSubsurface(this);
+#endif
 
     ev.Skip();
 }
@@ -5652,7 +5676,11 @@ void GameArea::SuspendScreenSaver() {
     if (xscreensaver_suspended || !gopts.suspend_screensaver)
         return;
     // suspend screensaver
+#ifndef NO_WAYLAND
     if (emulating && !wxGetApp().UsingWayland()) {
+#else
+    if (emulating) {
+#endif
         auto display = GetX11Display();
         XScreenSaverSuspend(display, true);
         xscreensaver_suspended = true;
@@ -6278,7 +6306,12 @@ bool VKDrawingPanel::CreateInstance()
             return false;
         };
  
+#ifndef NO_WAYLAND
         bool have_wayland = has_ext(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+#else
+        bool have_wayland = false;
+#endif
+
         bool have_xlib    = has_ext(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
  
         if (!have_wayland && !have_xlib) {
@@ -6291,7 +6324,10 @@ bool VKDrawingPanel::CreateInstance()
         have_wayland_surface_ = have_wayland;
         have_xlib_surface_    = have_xlib;
  
+#ifndef NO_WAYLAND
         if (have_wayland) extensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
+#endif
+
         if (have_xlib)    extensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
     }
 #endif
@@ -6383,6 +6419,7 @@ bool VKDrawingPanel::CreateSurfaceXLIB(Window win)
     return true;
 }
  
+#ifndef NO_WAYLAND
 // ─── CreateSurface (Wayland) ──────────────────────────────────────────────────
 // FIX: Error message previously said "Win32 surface" (copy-paste).
 bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface* wayland_surface,
@@ -6400,6 +6437,7 @@ bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface* wayland_surface,
     }
     return true;
 }
+#endif
  
 // ─── CreateSurfaceUNIX ────────────────────────────────────────────────────────
 // FIX 1: Was calling wxGetApp().frame->GetPanel() (a sibling widget) instead
@@ -6425,6 +6463,7 @@ bool VKDrawingPanel::CreateSurfaceUNIX()
     // Flush so the compositor has processed all pending wl_surface commits.
     gdk_display_flush(gdk_dpy);
  
+#ifndef NO_WAYLAND
     if (have_wayland_surface_ && GDK_IS_WAYLAND_WINDOW(gdk_win)) {
         struct wl_display* wl_dpy =
             gdk_wayland_display_get_wl_display(gdk_dpy);
@@ -6437,9 +6476,12 @@ bool VKDrawingPanel::CreateSurfaceUNIX()
         }
         return CreateSurfaceWAYLAND(wl_surf, wl_dpy);
     } else if (have_xlib_surface_) {
+#endif
         XID xid = GDK_WINDOW_XID(gdk_win);
         return CreateSurfaceXLIB(xid);
+#ifndef NO_WAYLAND
     }
+#endif
  
     // have_wayland_surface_ and have_xlib_surface_ were both false — already
     // caught in CreateInstance(), but be defensive.

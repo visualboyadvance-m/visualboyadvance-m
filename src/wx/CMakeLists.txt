@@ -4,6 +4,10 @@ endif()
 
 add_compile_definitions(${VBAM_FRONTEND_DEFINITIONS})
 
+if(NO_WAYLAND)
+    add_compile_definitions(NO_WAYLAND)
+endif()
+
 # Do not use this file directly.  Always use the top level CMakeLists.txt file
 include(VbamFunctions)
 

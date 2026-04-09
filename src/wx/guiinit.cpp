@@ -1760,7 +1760,7 @@ bool MainFrame::BindControls()
 #if defined(__WXMAC__) || defined(__WXGTK__)
 
             if (cmd_item.cmd_id == XRCID("AllowKeyboardBackgroundInput")
-#if defined(__WXGTK__)
+#if defined(__WXGTK__) && !defined(NO_WAYLAND)
                 && IsWayland()
 #endif
                ) {
@@ -2013,8 +2013,10 @@ bool MainFrame::BindControls()
 #if !defined(HAVE_XSS)
         suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
 #else
+#ifndef NO_WAYLAND
         if (wxGetApp().UsingWayland())
             suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
+#endif
 #endif // !HAVE_XSS
     }
 

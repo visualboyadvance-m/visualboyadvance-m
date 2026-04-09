@@ -1,6 +1,7 @@
 option(BUILD_TESTING "Build testing" ON)
 option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 option(COMPILE_ONLY "Compile source files only, skip linking executables" OFF)
+option(NO_WAYLAND "Force Wayland disabled" OFF)
 
 # Detect CI environment or allow explicit setting
 if(DEFINED ENV{CI} OR DEFINED ENV{GITHUB_ACTIONS} OR DEFINED ENV{GITLAB_CI})

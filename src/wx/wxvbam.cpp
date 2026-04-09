@@ -52,7 +52,11 @@
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
 #include "wx/config/strutils.h"
+
+#ifndef NO_WAYLAND
 #include "wx/wayland.h"
+#endif
+
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/widgets/utils.h"
@@ -237,6 +241,7 @@ int main(int argc, char** argv) {
     // Launch under xwayland on Wayland if EGL is not available.
 #if defined(__WXGTK3__) && !defined(HAVE_WAYLAND_EGL)
     wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
+#ifndef NO_WAYLAND
     wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
 
     if (xdg_session_type == "wayland" || wayland_display.Contains("wayland")) {
@@ -246,9 +251,11 @@ int main(int argc, char** argv) {
             wxSetEnv("GDK_BACKEND", "x11");
         }
     }
+#endif
 #else
 #ifdef __WXGTK__
     wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
+#ifndef NO_WAYLAND
     wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
 
     if (xdg_session_type == "wayland" || wayland_display.Contains("wayland")) {
@@ -264,6 +271,7 @@ int main(int argc, char** argv) {
             wxSetEnv("GDK_BACKEND", "x11");
         }
     }
+#endif
 #endif
 #endif
 
@@ -369,7 +377,9 @@ wxvbamApp::wxvbamApp()
     : wxApp(),
       pending_fullscreen(false),
       frame(NULL),
+#ifndef NO_WAYLAND
       using_wayland(false),
+#endif
       emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
       sdl_poller_(this),
       keyboard_input_handler_(this) {
@@ -463,7 +473,9 @@ int language = wxLANGUAGE_DEFAULT;
 wxLocale *wxvbam_locale = NULL;
 
 bool wxvbamApp::OnInit() {
+#ifndef NO_WAYLAND
     using_wayland = IsWayland();
+#endif
 
 #if ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)
     // SetAppearance is available in wxWidgets 3.3+

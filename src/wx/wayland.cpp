@@ -1,3 +1,5 @@
+#ifndef NO_WAYLAND
+
 #include "wx/wayland.h"
 
 #ifdef HAVE_WAYLAND_SUPPORT
@@ -42,4 +44,6 @@ void MoveWaylandSubsurface(wxGLCanvasEGL* win)
         wl_subsurface_set_position(win->*private_ptr, x, y);
     }
 }
+#endif
+
 #endif
