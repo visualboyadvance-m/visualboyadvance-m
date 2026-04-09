@@ -3150,8 +3150,6 @@ void SDLDrawingPanel::DrawingPanelInit()
     SDL_SetHint(SDL_HINT_VIDEODRIVER, "x11");
 #endif
 #endif
-#else
-    SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
 #endif
 
     DrawingPanel::DrawingPanelInit();
@@ -4021,8 +4019,8 @@ void GLDrawingPanel::DrawingPanelInit()
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
     // non-portable vsync code
-#ifndef NO_WAYLAND
 #if defined(__WXGTK__)
+#ifndef NO_WAYLAND
     if (IsWayland()) {
 #ifdef HAVE_EGL
         if (OPTION(kPrefVsync))
