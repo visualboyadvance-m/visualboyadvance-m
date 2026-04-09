@@ -116,6 +116,7 @@ void gbafilter_update_colors(bool lcd) {
         for (int i = 0x0; i < 0x10000; i++) {
             // GBA uses BGR555 format: 0BBBBBGGGGGRRRRR
             // Red: bits 0-4, Green: bits 5-9, Blue: bits 10-14
+            // Always output RGB555 (the LCD filter assumes this layout)
             systemColorMap16[i] = ((i & 0x1f) << 10) |  // R
                 (((i & 0x3e0) >> 5) << 5) |  // G
                 (((i & 0x7c00) >> 10) << 0);   // B

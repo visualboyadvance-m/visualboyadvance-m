@@ -1,7 +1,10 @@
 #include "wx/wxvbam.h"
 
 #include <wx/aboutdlg.h>
+#include <wx/dir.h>
+#include <wx/dynlib.h>
 #include <wx/ffile.h>
+#include <wx/filename.h>
 #include <wx/numdlg.h>
 #include "wx/widgets/pulse-action-dialog.h"
 #include <wx/regex.h>
@@ -11,6 +14,8 @@
 #include <wx/msgdlg.h>
 
 #include "components/filters_interframe/interframe.h"
+#include "wx/rpi.h"
+#include "wx/widgets/render-plugin.h"
 #include "core/base/check.h"
 #include "core/base/version.h"
 #include "core/gb/gb.h"
@@ -2258,7 +2263,11 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     }
 
     const uint32_t bitdepth = OPTION(kBitDepth);
-    systemColorDepth = (int)((bitdepth + 1) << 3);
+    // Don't override systemColorDepth if a plugin filter is active
+    // Plugin filters have specific color depth requirements
+    if (OPTION(kDispFilter) != config::Filter::kPlugin) {
+        systemColorDepth = (int)((bitdepth + 1) << 3);
+    }
 
     const int frame_skip = OPTION(kPrefFrameSkip);
     if (frame_skip != -1) {
@@ -2268,11 +2277,79 @@ EVT_HANDLER_MASK(DisplayConfigure, "Display options...", CMDEN_NREC_ANY)
     update_opts();
 }
 
+// Helper function to get list of valid plugin paths.
+// Uses the app-level cache (pre-populated on startup via CallAfter).
+// If not yet enumerated, triggers enumeration now.
+static wxArrayString GetValidPluginPaths() {
+    wxvbamApp& app = wxGetApp();
+    if (!app.ArePluginsEnumerated()) {
+        app.EnumeratePlugins();
+    }
+    return app.GetValidPlugins();
+}
+
 EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
 {
-    OPTION(kDispFilter).Next();
+    const config::Filter current_filter = OPTION(kDispFilter);
+    const wxString current_plugin = OPTION(kDispFilterPlugin);
     wxString msg;
-    msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+
+    if (current_filter == config::Filter::kPlugin) {
+        // Currently on a plugin - cycle to next plugin or wrap to kNone
+        wxArrayString plugins = GetValidPluginPaths();
+
+        if (plugins.empty()) {
+            // No plugins available, go to None
+            OPTION(kDispFilter) = config::Filter::kNone;
+            OPTION(kDispFilterPlugin) = wxEmptyString;
+            msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+        } else {
+            // Find current plugin index
+            int current_index = plugins.Index(current_plugin);
+            if (current_index == wxNOT_FOUND) {
+                current_index = -1;  // Will become 0 after increment
+            }
+
+            int next_index = current_index + 1;
+            if (next_index >= static_cast<int>(plugins.size())) {
+                // Wrapped past last plugin, go to None
+                OPTION(kDispFilter) = config::Filter::kNone;
+                OPTION(kDispFilterPlugin) = wxEmptyString;
+                msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+            } else {
+                // Go to next plugin
+                OPTION(kDispFilterPlugin) = plugins[next_index];
+                wxFileName fn(plugins[next_index]);
+                msg.Printf(_("Filter: Plugin (%s)"), fn.GetName());
+            }
+        }
+    } else {
+        // Not on plugin - cycle through built-in filters
+        const int old_value = static_cast<int>(current_filter);
+        const int max_builtin = static_cast<int>(config::Filter::kPlugin);
+        int new_value = old_value + 1;
+
+        if (new_value >= max_builtin) {
+            // Reached kPlugin - check if plugins are available
+            wxArrayString plugins = GetValidPluginPaths();
+            if (!plugins.empty()) {
+                // Switch to first plugin
+                OPTION(kDispFilter) = config::Filter::kPlugin;
+                OPTION(kDispFilterPlugin) = plugins[0];
+                wxFileName fn(plugins[0]);
+                msg.Printf(_("Filter: Plugin (%s)"), fn.GetName());
+            } else {
+                // No plugins, wrap to None
+                OPTION(kDispFilter) = config::Filter::kNone;
+                msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+            }
+        } else {
+            // Normal filter cycling
+            OPTION(kDispFilter) = static_cast<config::Filter>(new_value);
+            msg.Printf(_("Filter: %s"), config::Option::ByID(config::OptionID::kDispFilter)->GetEnumString());
+        }
+    }
+
     systemScreenMessage(msg);
 }
 

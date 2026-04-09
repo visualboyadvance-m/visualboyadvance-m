@@ -1,10 +1,14 @@
 #include "wx/dialogs/display-config.h"
 
+#include <memory>
+#include <vector>
+
 #include <wx/arrstr.h>
 #include <wx/choice.h>
 #include <wx/clntdata.h>
 #include <wx/dir.h>
 #include <wx/dynlib.h>
+#include <wx/filepicker.h>
 #include <wx/log.h>
 #include <wx/object.h>
 #include <wx/radiobut.h>
@@ -31,6 +35,10 @@
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/render-plugin.h"
 #include "wx/wxvbam.h"
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+#include "wx/rpi-proxy/RpiProxyClient.h"
+#endif
 
 #ifdef ENABLE_SDL3
 #include <SDL3/SDL.h>
@@ -304,7 +312,25 @@ private:
                 plugin_selector->GetClientObject(
                     plugin_selector->GetSelection()))
                 ->GetData();
-        return option()->SetString(selected_window_plugin);
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        rpi_proxy::RpiProxyClient::Log("PluginSelectorValidator::WriteToOption: selected_window_plugin='%s' current_option='%s'",
+            selected_window_plugin.utf8_str().data(), option()->GetString().utf8_str().data());
+#endif
+        bool result = option()->SetString(selected_window_plugin);
+
+        // Also set the filter type to Plugin when a plugin is selected
+        if (!selected_window_plugin.empty()) {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            config::Filter old_filter = OPTION(kDispFilter);
+            rpi_proxy::RpiProxyClient::Log("PluginSelectorValidator::WriteToOption: Setting kDispFilter to Plugin (current=%d)", (int)old_filter);
+#endif
+            OPTION(kDispFilter) = config::Filter::kPlugin;
+#ifdef VBAM_RPI_PROXY_SUPPORT
+            config::Filter new_filter = OPTION(kDispFilter);
+            rpi_proxy::RpiProxyClient::Log("PluginSelectorValidator::WriteToOption: AFTER setting kDispFilter (new=%d)", (int)new_filter);
+#endif
+        }
+        return result;
     }
 };
 
@@ -506,12 +532,25 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());
-    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this,
-                           GetId());
+    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
 
     // These are filled and/or hidden at dialog load time.
+    plugin_dir_label_ = GetValidatedChild<wxControl>("PluginDirLab");
+    plugin_dir_picker_ = GetValidatedChild<wxDirPickerCtrl>("PluginDir");
     plugin_label_ = GetValidatedChild<wxControl>("PluginLab");
     plugin_selector_ = GetValidatedChild<wxChoice>("Plugin");
+    plugin_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::OnPluginSelected, this);
+
+    // Set initial plugin directory from config
+    const wxString& config_plugin_dir = OPTION(kDispPluginDir);
+    if (!config_plugin_dir.empty()) {
+        plugin_dir_picker_->SetPath(config_plugin_dir);
+    } else {
+        plugin_dir_picker_->SetPath(wxGetApp().GetPluginsDir());
+    }
+
+    // Bind event to reload plugins when directory changes
+    plugin_dir_picker_->Bind(wxEVT_DIRPICKER_CHANGED, &DisplayConfig::OnPluginDirChanged, this);
 
     interframe_selector_ = GetValidatedChild<wxChoice>("IFB");
     interframe_selector_->SetValidator(InterframeValidator());
@@ -526,22 +565,42 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
     wxCommandEvent dummy_event;
 
     if (event.IsShown()) {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Log state of shared proxy instance before enumeration
+        rpi_proxy::RpiProxyClient* shared = rpi_proxy::RpiProxyClient::GetSharedInstance();
+        rpi_proxy::RpiProxyClient::Log("OnDialogShowEvent: DIALOG OPENING - shared proxy=%p, is_loaded=%d, active_threads=%u",
+            shared, shared->IsLoaded() ? 1 : 0, shared->GetActiveThreadCount());
+#endif
         PopulatePluginOptions();
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Log state of shared proxy instance after enumeration
+        rpi_proxy::RpiProxyClient* shared_after = rpi_proxy::RpiProxyClient::GetSharedInstance();
+        rpi_proxy::RpiProxyClient::Log("OnDialogShowEvent: AFTER PopulatePluginOptions - shared proxy=%p, is_loaded=%d, active_threads=%u",
+            shared_after, shared_after->IsLoaded() ? 1 : 0, shared_after->GetActiveThreadCount());
+#endif
 
         // Set initial SDL options visibility based on current selection
         wxRadioButton* sdl_button = wxDynamicCast(GetValidatedChild("OutputSDL"), wxRadioButton);
         if (sdl_button && sdl_button->GetValue()) {
             ShowSDLOptions();
+            // Only fill renderer list when SDL output is selected
+            // FillRendererList calls SDL_Init which can corrupt OpenGL rendering
+            FillRendererList(dummy_event);
         } else {
             HideSDLOptions();
         }
+
+        Fit();
     } else {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        // Log state of shared proxy instance when dialog closes
+        rpi_proxy::RpiProxyClient* shared = rpi_proxy::RpiProxyClient::GetSharedInstance();
+        rpi_proxy::RpiProxyClient::Log("OnDialogShowEvent: DIALOG CLOSING - shared proxy=%p, is_loaded=%d, active_threads=%u",
+            shared, shared->IsLoaded() ? 1 : 0, shared->GetActiveThreadCount());
+#endif
         StopPluginHandler();
     }
-
-    FillRendererList(dummy_event);
-
-    Fit();
 
     // Let the event propagate.
     event.Skip();
@@ -551,6 +610,7 @@ void DisplayConfig::PopulatePluginOptions() {
     // Populate the plugin values, if any.
     wxArrayString plugins;
     const wxString plugin_path = wxGetApp().GetPluginsDir();
+
     wxDir::GetAllFiles(plugin_path, &plugins, "*.rpi",
                        wxDIR_FILES | wxDIR_DIRS);
 
@@ -565,25 +625,61 @@ void DisplayConfig::PopulatePluginOptions() {
     const wxString selected_plugin = OPTION(kDispFilterPlugin);
     bool is_plugin_selected = false;
 
-    for (const wxString& plugin : plugins) {
-        wxDynamicLibrary dyn_lib(plugin, wxDL_VERBATIM | wxDL_NOW);
+    // Maps plugin path -> name for all valid plugins (direct + proxy)
+    struct PluginEntry {
+        wxString path;
+        wxString name;
+    };
+    std::vector<PluginEntry> valid_entries;
 
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    // Collect 32-bit plugins that need proxy validation
+    std::vector<wxString> proxy_paths;
+#endif
+
+    for (const wxString& plugin : plugins) {
+        // First try direct loading (works for same-architecture plugins)
         wxDynamicLibrary filter_plugin;
         const RENDER_PLUGIN_INFO* plugin_info =
             widgets::MaybeLoadFilterPlugin(plugin, &filter_plugin);
-        if (!plugin_info) {
+        if (plugin_info) {
+            valid_entries.push_back({plugin, wxString(plugin_info->Name, wxConvUTF8)});
             continue;
         }
 
-        wxFileName file_name(plugin);
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        if (widgets::PluginNeedsProxy(plugin)) {
+            proxy_paths.push_back(plugin);
+        }
+#endif
+    }
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    // Batch validate all 32-bit plugins in a single IPC round trip
+    if (!proxy_paths.empty()) {
+        rpi_proxy::RpiProxyClient::Log("PopulatePluginOptions: Batch enumerating %zu proxy plugins",
+            proxy_paths.size());
+        rpi_proxy::RpiProxyClient enumeration_proxy;
+        auto results = enumeration_proxy.EnumeratePlugins(proxy_paths);
+        for (const auto& r : results) {
+            if (r.valid) {
+                valid_entries.push_back({r.path, r.name});
+            }
+        }
+        rpi_proxy::RpiProxyClient::Log("PopulatePluginOptions: Enumeration complete");
+        rpi_proxy::RpiProxyClient::ResetApplyFilterLogCount();
+    }
+#endif
+
+    for (const auto& entry : valid_entries) {
+        wxFileName file_name(entry.path);
         file_name.MakeRelativeTo(plugin_path);
 
         const int added_index = plugin_selector_->Append(
-            file_name.GetName() + ": " +
-                wxString(plugin_info->Name, wxConvUTF8),
-            new wxStringClientData(plugin));
+            file_name.GetName() + ": " + entry.name,
+            new wxStringClientData(entry.path));
 
-        if (plugin == selected_plugin) {
+        if (entry.path == selected_plugin) {
             plugin_selector_->SetSelection(added_index);
             is_plugin_selected = true;
         }
@@ -612,8 +708,23 @@ void DisplayConfig::StopPluginHandler() {
 void DisplayConfig::UpdatePlugin(wxCommandEvent& event) {
     const bool is_plugin = (static_cast<config::Filter>(event.GetSelection()) ==
                             config::Filter::kPlugin);
-    plugin_label_->Enable(is_plugin);
-    plugin_selector_->Enable(is_plugin);
+
+    // Reset plugin selector to "None" when a built-in filter is selected
+    // This only affects the UI; config is written by validators on dialog close
+    if (!is_plugin) {
+        plugin_selector_->SetSelection(0);  // 0 = "None" in GUI
+    }
+
+    // Let the event propagate.
+    event.Skip();
+}
+
+void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
+    // When a plugin is selected, automatically set Filter to "Plugin"
+    // Check if selection is not "None" (index 0)
+    if (plugin_selector_->GetSelection() > 0) {
+        filter_selector_->SetSelection(static_cast<int>(config::Filter::kPlugin));
+    }
 
     // Let the event propagate.
     event.Skip();
@@ -683,6 +794,7 @@ void DisplayConfig::FillRendererList(wxCommandEvent& event) {
 }
 
 void DisplayConfig::HidePluginOptions() {
+    // Plugin directory picker is always visible so users can set the path
     plugin_label_->Hide();
     plugin_selector_->Hide();
 
@@ -701,6 +813,7 @@ void DisplayConfig::HidePluginOptions() {
 }
 
 void DisplayConfig::ShowPluginOptions() {
+    // Plugin directory picker is always visible
     plugin_label_->Show();
     plugin_selector_->Show();
 
@@ -708,6 +821,22 @@ void DisplayConfig::ShowPluginOptions() {
     if (filter_selector_->GetCount() != config::kNbFilters) {
         filter_selector_->Append(_("Plugin"));
     }
+}
+
+void DisplayConfig::OnPluginDirChanged(wxFileDirPickerEvent& event) {
+    const wxString& new_path = event.GetPath();
+
+    // Save the new path to config
+    OPTION(kDispPluginDir) = new_path;
+
+    // Invalidate the app-level plugin cache so hotkey cycling picks up the new dir
+    wxGetApp().InvalidatePluginCache();
+
+    // Reload the plugin list
+    PopulatePluginOptions();
+
+    // Let the event propagate.
+    event.Skip();
 }
 
 void DisplayConfig::HideSDLOptions() {

@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <iostream>
 
+#include <wx/arrstr.h>
+
 #include <wx/log.h>
 #include <wx/propdlg.h>
 #include <wx/datetime.h>
@@ -73,6 +75,7 @@ public:
     // wxApp implementation.
     bool OnInit() final;
     int OnRun() final;
+    int OnExit() final;
     bool OnCmdLineHelp(wxCmdLineParser&) final;
     bool OnCmdLineError(wxCmdLineParser&) final;
     void OnInitCmdLine(wxCmdLineParser&) final;
@@ -98,6 +101,12 @@ public:
     wxString GetConfigurationPath();
     const wxString GetPluginsDir();
     wxString GetAbsolutePath(wxString path);
+
+    // Plugin enumeration cache - pre-populated on startup for fast hotkey cycling
+    void EnumeratePlugins();
+    const wxArrayString& GetValidPlugins() const { return valid_plugins_; }
+    bool ArePluginsEnumerated() const { return plugins_enumerated_; }
+    void InvalidatePluginCache() { plugins_enumerated_ = false; valid_plugins_.clear(); }
     // name of a file to load at earliest opportunity
     wxString pending_load;
     // list of options to set after config file loaded
@@ -158,6 +167,10 @@ private:
 
     // Main configuration file.
     wxFileName config_file_;
+
+    // Plugin enumeration cache
+    wxArrayString valid_plugins_;
+    bool plugins_enumerated_ = false;
 };
 
 DECLARE_APP(wxvbamApp);
@@ -606,6 +619,8 @@ void systemScreenMessage(const wxString& msg);
 #include "wx/rpi.h"
 #include <wx/dynlib.h>
 
+#include "wx/widgets/render-plugin.h"
+
 class FilterThread;
 
 class DrawingPanelBase {
@@ -635,8 +650,18 @@ protected:
     FilterThread* threads;
     int nthreads;
     wxSemaphore filt_done;
+    wxSemaphore filt_ready;  // Posted by threads when they're ready to receive work
     wxDynamicLibrary filter_plugin_;
     RENDER_PLUGIN_INFO* rpi_; // also flag indicating plugin loaded
+    RENDER_PLUGIN_INFO rpi_info_; // storage for plugin info when using proxy
+    bool rpi_using_rgb565_ = false; // true if plugin uses RGB565 format
+    bool rpi_is_mt_ = false; // true if plugin is multi-threaded (name contains " MT")
+    int rpi_bpp_ = 4; // bytes per pixel for RPI plugin (4 for 32-bit, 2 for 16-bit)
+    int panel_color_depth_ = 16; // Color depth for this panel (may differ from global systemColorDepth)
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    rpi_proxy::RpiProxyClient* rpi_proxy_client_ = nullptr;  // Points to shared instance
+    bool using_rpi_proxy_ = false;
+#endif
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
 };

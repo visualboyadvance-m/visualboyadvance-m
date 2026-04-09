@@ -60,6 +60,12 @@
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
 #include "wx/widgets/utils.h"
+#include <wx/dir.h>
+#include <wx/dynlib.h>
+#include "wx/widgets/render-plugin.h"
+#ifdef VBAM_RPI_PROXY_SUPPORT
+#include "wx/rpi-proxy/RpiProxyClient.h"
+#endif
 
 #if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
@@ -409,7 +415,66 @@ wxvbamApp::wxvbamApp()
 
 const wxString wxvbamApp::GetPluginsDir()
 {
+    const wxString& config_dir = OPTION(kDispPluginDir);
+    if (!config_dir.empty()) {
+        return config_dir;
+    }
     return wxStandardPaths::Get().GetPluginsDir();
+}
+
+void wxvbamApp::EnumeratePlugins() {
+    if (plugins_enumerated_) {
+        return;
+    }
+
+    valid_plugins_.clear();
+    wxArrayString all_plugins;
+    const wxString plugin_path = GetPluginsDir();
+
+    wxDir::GetAllFiles(plugin_path, &all_plugins, "*.rpi",
+                       wxDIR_FILES | wxDIR_DIRS);
+
+    if (all_plugins.empty()) {
+        plugins_enumerated_ = true;
+        return;
+    }
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    std::vector<wxString> proxy_paths;
+#endif
+
+    for (const wxString& plugin : all_plugins) {
+#ifdef VBAM_RPI_PROXY_SUPPORT
+        if (widgets::PluginNeedsProxy(plugin)) {
+            proxy_paths.push_back(plugin);
+            continue;
+        }
+#endif
+
+        // For same-architecture plugins, check the DLL has the required export
+        // WITHOUT calling RenderPluginGetInfo(). Calling getInfo() would modify
+        // the plugin's shared static RENDER_PLUGIN_INFO, corrupting the Flags
+        // that the rendering panel has already configured.
+        wxDynamicLibrary filter_plugin;
+        if (filter_plugin.Load(plugin, wxDL_VERBATIM | wxDL_NOW | wxDL_QUIET) &&
+            filter_plugin.HasSymbol("RenderPluginGetInfo")) {
+            valid_plugins_.Add(plugin);
+        }
+    }
+
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    if (!proxy_paths.empty()) {
+        rpi_proxy::RpiProxyClient enumeration_proxy;
+        auto results = enumeration_proxy.EnumeratePlugins(proxy_paths);
+        for (const auto& r : results) {
+            if (r.valid) {
+                valid_plugins_.Add(r.path);
+            }
+        }
+    }
+#endif
+
+    plugins_enumerated_ = true;
 }
 
 wxString wxvbamApp::GetConfigurationPath() {
@@ -805,6 +870,11 @@ bool wxvbamApp::OnInit() {
 #ifndef NO_ONLINEUPDATES
     initAutoupdater();
 #endif
+
+    // Pre-enumerate plugins so hotkey cycling and display config are instant.
+    // Use CallAfter so the main window paints first.
+    CallAfter([this] { EnumeratePlugins(); });
+
     return true;
 }
 
@@ -819,6 +889,17 @@ int wxvbamApp::OnRun()
     {
         return wxApp::OnRun();
     }
+}
+
+int wxvbamApp::OnExit()
+{
+#ifdef VBAM_RPI_PROXY_SUPPORT
+    // Release the shared RPI proxy instance after all windows are destroyed.
+    // This ensures the panel's filter threads have finished cleanup before
+    // the proxy is destroyed.
+    rpi_proxy::RpiProxyClient::ReleaseSharedInstance();
+#endif
+    return wxApp::OnExit();
 }
 
 // called on --help
