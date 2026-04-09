@@ -86,6 +86,10 @@ JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bind
     GetValidatedChild<wxCheckBox>("SDLGameControllerMode")
         ->SetValue(OPTION(kSDLGameControllerMode));
 
+    GetValidatedChild("AutofireThrottle")
+        ->SetValidator(
+            widgets::OptionIntValidator(config::OptionID::kJoyAutofireThrottle));
+
     for (const config::GameJoy& joypad : config::kAllGameJoys) {
         wxWindow* panel = GetValidatedChild(wxString::Format("joy%zu", joypad.ux_index()));
         panel->SetClientObject(new GameJoyClientData(joypad));
