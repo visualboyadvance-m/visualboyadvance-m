@@ -16,7 +16,11 @@
     #include <X11/Xlib.h>
     #define Status int
     #include <gdk/gdkx.h>
+
+#ifndef NO_WAYLAND
     #include <gdk/gdkwayland.h>
+#endif
+
     #include <gtk/gtk.h>
     // For Wayland EGL.
     #ifdef HAVE_EGL
@@ -67,7 +71,11 @@
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/drawing.h"
+
+#ifndef NO_WAYLAND
 #include "wx/wayland.h"
+#endif
+
 #include "wx/widgets/render-plugin.h"
 #include "wx/widgets/user-input-event.h"
 
