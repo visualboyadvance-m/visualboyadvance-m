@@ -432,10 +432,8 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
 {
     if (!isRecording) return MRET_OK;
     // fill and encode frame variables
-    int got_packet = 0, ret = 0;
+    int ret = 0;
     ScopedAVPacket pkt;
-    pkt->data = NULL;
-    pkt->size = 0;
     // fill frame with current pic
     ret = av_image_fill_arrays(frameIn->data, frameIn->linesize,
                                (uint8_t *)vid + tbord * (linesize + pixsize * rbord),
@@ -447,18 +445,17 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
               frameOut->linesize);
     // set valid pts for frame
     frameOut->pts = npts++;
-    // finally, encode frame
-    got_packet = avcodec_receive_packet(enc, pkt.get());
+    // encode frame: send first, then drain all available packets
     ret = avcodec_send_frame(enc, frameOut);
     if (ret < 0) return MRET_ERR_RECORDING;
-    if (!got_packet)
+    while (avcodec_receive_packet(enc, pkt.get()) == 0)
     {
         // rescale output packet timestamp values from codec
         // to stream timebase
         av_packet_rescale_ts(pkt.get(), enc->time_base, st->time_base);
         pkt->stream_index = st->index;
-        //log_packet(oc, pkt.get());
         ret = av_interleaved_write_frame(oc, pkt.get());
+        av_packet_unref(pkt.get());
         if (ret < 0) return MRET_ERR_RECORDING;
     }
     return MRET_OK;
@@ -466,11 +463,29 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint8_t *vid)
 
 void recording::MediaRecorder::Stop(bool initSuccess)
 {
-    if (oc)
+    if (oc && initSuccess)
     {
-        // write the trailer; must be called before av_codec_close()
-        if (initSuccess) // only call av_write_trailer() if initialization went ok
-            av_write_trailer(oc);
+        // Flush encoders before writing trailer
+        if (enc && !audioOnlyRecording)
+        {
+            // Signal end-of-stream and drain all buffered video packets
+            avcodec_send_frame(enc, NULL);
+            ScopedAVPacket flush_pkt;
+            while (avcodec_receive_packet(enc, flush_pkt.get()) == 0)
+            {
+                if (st)
+                {
+                    av_packet_rescale_ts(flush_pkt.get(), enc->time_base, st->time_base);
+                    flush_pkt->stream_index = st->index;
+                    av_interleaved_write_frame(oc, flush_pkt.get());
+                }
+                av_packet_unref(flush_pkt.get());
+            }
+        }
+        // Flush audio encoder
+        flush_frames();
+        // write the trailer; must be called after encoders are drained
+        av_write_trailer(oc);
     }
     isRecording = false;
     if (sws)
@@ -507,7 +522,6 @@ void recording::MediaRecorder::Stop(bool initSuccess)
     npts = 0;
     if (oc)
     {
-        flush_frames();
         // close the output file
         if (!(fmt->flags & AVFMT_NOFILE))
         {
@@ -695,10 +709,15 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
 // "X frames left in the queue on closing"
 void recording::MediaRecorder::flush_frames()
 {
+    if (!aenc || !ast || !oc) return;
+    // Signal end-of-stream and drain all buffered audio packets
+    avcodec_send_frame(aenc, NULL);
     ScopedAVPacket pkt;
-    pkt->data = NULL;
-    pkt->size = 0;
-    // flush last audio frames
-    while (avcodec_receive_packet(aenc, pkt.get()) >= 0)
-        avcodec_send_frame(aenc, NULL);
+    while (avcodec_receive_packet(aenc, pkt.get()) == 0)
+    {
+        av_packet_rescale_ts(pkt.get(), aenc->time_base, ast->time_base);
+        pkt->stream_index = ast->index;
+        av_interleaved_write_frame(oc, pkt.get());
+        av_packet_unref(pkt.get());
+    }
 }
