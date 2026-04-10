@@ -284,7 +284,7 @@ void OpenPreferences(const char *name)
 void ValidateConfig()
 {
 	if (gbEmulatorType > 5)
-		gbEmulatorType = 1;
+		gbEmulatorType = 0;
 	if (gbPaletteOption > 2)
 		gbPaletteOption = 0;
 	if (frameSkip < 0 || frameSkip > 9)
