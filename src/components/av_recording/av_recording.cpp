@@ -37,8 +37,9 @@ const supportedCodecs audioSupported[] = {
 
 const supportedCodecs videoSupported[] = {
     { AV_CODEC_ID_MPEG4, "AVI (Audio Video Interleaved)", "avi" },
-    { AV_CODEC_ID_MPEG4, "raw MPEG-4 video", "m4v" },
-    { AV_CODEC_ID_FLV1, "FLV (Flash Video)", "flv" }
+    { AV_CODEC_ID_MPEG4, "MPEG-4 video",                 "m4v" },
+    { AV_CODEC_ID_H264,  "H.264 video",                  "mp4" },
+    { AV_CODEC_ID_FLV1,  "FLV (Flash Video)",            "flv" }
 };
 
 std::vector<char *> recording::getSupVidNames()
@@ -131,35 +132,47 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
 #endif
     aenc->bit_rate = 128000; // mp3
     aenc->sample_rate = sampleRate;
-    // this might be useful to check if the codec suports the
-    // sample rate, but it is not strictly needed for now
+    // Find the closest supported sample rate. Some codecs (e.g. MP3 in FLV)
+    // only accept specific rates (44100/22050/11025). If the emulator is
+    // running at 48000 Hz, fall back to the nearest rate the codec accepts
+    // rather than failing outright.
     bool isSupported = false;
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
     if (acodec->supported_samplerates)
     {
+        int bestRate = 0;
+        int bestDiff = INT_MAX;
         for (int i = 0; acodec->supported_samplerates[i]; ++i)
         {
-            if (acodec->supported_samplerates[i] == sampleRate)
+            int r = acodec->supported_samplerates[i];
+            if (r == sampleRate) { isSupported = true; break; }
+            int diff = abs(r - sampleRate);
+            if (diff < bestDiff) { bestDiff = diff; bestRate = r; }
+        }
+        if (!isSupported && bestRate) aenc->sample_rate = bestRate;
+        else if (!isSupported) return MRET_ERR_NOCODEC;
+    }
 #else
     const int *supported_samplerates = NULL;
     int num_supported_samplerates = 0;
     if (acodec) {
         avcodec_get_supported_config(aenc, acodec, AV_CODEC_CONFIG_SAMPLE_RATE, 0,
                                      (const void **) &supported_samplerates, &num_supported_samplerates);
+        int bestRate = 0;
+        int bestDiff = INT_MAX;
         for (int i = 0; i < num_supported_samplerates; i++)
         {
-            if (supported_samplerates[i] == sampleRate)
-#endif
-            {
-                isSupported = true;
-                break;
-            }
+            int r = supported_samplerates[i];
+            if (r == sampleRate) { isSupported = true; break; }
+            int diff = abs(r - sampleRate);
+            if (diff < bestDiff) { bestDiff = diff; bestRate = r; }
+        }
+        if (!isSupported && num_supported_samplerates)
+        {
+            if (bestRate) aenc->sample_rate = bestRate;
+            else return MRET_ERR_NOCODEC;
         }
     }
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
-    if (!isSupported && acodec->supported_samplerates) return MRET_ERR_NOCODEC;
-#else
-    if (!isSupported && num_supported_samplerates) return MRET_ERR_NOCODEC;
 #endif
 #if LIBAVCODEC_VERSION_MAJOR >= 60
     av_channel_layout_from_mask(&(aenc->ch_layout), AV_CH_LAYOUT_STEREO);
@@ -228,7 +241,7 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
     av_opt_set_int       (swr, "in_channel_count",  2,                 0);
     av_opt_set_int       (swr, "out_channel_count", 2,                 0);
 #endif
-    av_opt_set_int       (swr, "in_sample_rate",    aenc->sample_rate, 0);
+    av_opt_set_int       (swr, "in_sample_rate",    sampleRate,        0);
     av_opt_set_sample_fmt(swr, "in_sample_fmt",     IN_SOUND_FORMAT,   0);
     av_opt_set_int       (swr, "out_sample_rate",   aenc->sample_rate, 0);
     av_opt_set_sample_fmt(swr, "out_sample_fmt",    aenc->sample_fmt,  0);
@@ -306,15 +319,74 @@ recording::MediaRet recording::MediaRecorder::setup_video_stream(int width, int 
     st->id = oc->nb_streams - 1;
     st->time_base = { 1, STREAM_FRAME_RATE };
     // video codec
-    vcodec = avcodec_find_encoder(fmt->video_codec);
+    // Look up the codec ID from the videoSupported table by matching the
+    // output filename extension. This overrides fmt->video_codec which may
+    // resolve to a different codec for some extensions on some FFmpeg builds
+    // (e.g. .m4v -> AV_CODEC_ID_H264 instead of AV_CODEC_ID_MPEG4).
+    AVCodecID resolvedCodecId = fmt->video_codec;
+    if (oc->url)
+    {
+        const char *dot = strrchr(oc->url, '.');
+        if (dot)
+        {
+            const char *ext = dot + 1;
+            for (auto&& sc : videoSupported)
+            {
+                // exts field may be comma-separated (e.g. "aac,adts")
+                const char *p = sc.exts;
+                while (p && *p)
+                {
+                    const char *comma = strchr(p, ',');
+                    size_t len = comma ? (size_t)(comma - p) : strlen(p);
+                    if (strlen(ext) == len)
+                    {
+                        bool match = true;
+                        for (size_t i = 0; i < len; i++)
+                        {
+                            if ((ext[i] | 0x20) != p[i])
+                            {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if (match)
+                        {
+                            resolvedCodecId = sc.codecId;
+                            goto codec_found;
+                        }
+                    }
+                    p = comma ? comma + 1 : NULL;
+                }
+            }
+            codec_found:;
+        }
+    }
+    vcodec = (resolvedCodecId == AV_CODEC_ID_H264)
+           ? avcodec_find_encoder_by_name("libx264")
+           : avcodec_find_encoder(resolvedCodecId);
+    if (!vcodec && resolvedCodecId == AV_CODEC_ID_H264)
+    {
+        void *iter = NULL;
+        const AVCodec *c;
+        while ((c = av_codec_iterate(&iter)))
+        {
+            if (!av_codec_is_encoder(c)) continue;
+            if (c->id != AV_CODEC_ID_H264) continue;
+            if (c->capabilities & AV_CODEC_CAP_HARDWARE) continue;
+            vcodec = c;
+            break;
+        }
+    }
+    if (!vcodec) vcodec = avcodec_find_encoder(resolvedCodecId);
     if (!vcodec) return MRET_ERR_FMTGUESS;
     // codec context
     enc = avcodec_alloc_context3(vcodec);
-    enc->codec_id = fmt->video_codec;
+    enc->codec_id = resolvedCodecId;
     enc->bit_rate = 400000; // arbitrary
     enc->width = width;
     enc->height = height;
     enc->time_base = st->time_base;
+    enc->framerate = { STREAM_FRAME_RATE, 1 };
     enc->gop_size = 12;
     enc->pix_fmt = STREAM_PIXEL_FORMAT;
     if (oc->oformat->flags & AVFMT_GLOBALHEADER)
@@ -499,10 +571,10 @@ void recording::MediaRecorder::Stop(bool initSuccess)
     }
     if (enc)
     {
-        avcodec_free_context(&enc);
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
         avcodec_close(enc);
 #endif
+        avcodec_free_context(&enc);
         enc = NULL;
     }
     if (vcodec)
@@ -666,10 +738,9 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
         return MRET_ERR_RECORDING;
     }
 
-    int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, c->sample_rate) + audioframeTmp->nb_samples, c->sample_rate, c->sample_rate, AV_ROUND_UP);
-    av_assert0(dst_nb_samples == audioframeTmp->nb_samples);
+    int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, sampleRate) + audioframeTmp->nb_samples, c->sample_rate, sampleRate, AV_ROUND_UP);
 
-    if (swr_convert(swr, audioframe->data, audioframe->nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
+    if (swr_convert(swr, audioframe->data, dst_nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
     {
         return MRET_ERR_RECORDING;
     }
