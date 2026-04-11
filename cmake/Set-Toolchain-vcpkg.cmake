@@ -634,7 +634,7 @@ function(vcpkg_set_toolchain)
         message(FATAL_ERROR "Powershell is required to use vcpkg binaries.")
     endif()
 
-    if(NOT DEFINED ENV{VCPKG_ROOT})
+    if(NOT DEFINED ENV{VCPKG_ROOT} OR ENV{VCPKG_ROOT} MATCHES " *")
         if(WIN32)
             if(EXISTS /vcpkg)
                 set(VCPKG_ROOT /vcpkg)
