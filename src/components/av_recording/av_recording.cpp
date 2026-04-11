@@ -37,8 +37,8 @@ const supportedCodecs audioSupported[] = {
 
 const supportedCodecs videoSupported[] = {
     { AV_CODEC_ID_MPEG4, "AVI (Audio Video Interleaved)", "avi" },
-    { AV_CODEC_ID_MPEG4, "MPEG-4 video",                 "m4v" },
-    { AV_CODEC_ID_H264,  "H.264 video",                  "mp4" },
+    { AV_CODEC_ID_H264,  "iTunes H.264 (m4v)",           "m4v" },
+    { AV_CODEC_ID_H264,  "MPEG-4 H.264 (mp4)",           "mp4" },
     { AV_CODEC_ID_FLV1,  "FLV (Flash Video)",            "flv" }
 };
 
@@ -740,7 +740,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
 
     int64_t dst_nb_samples = av_rescale_rnd(swr_get_delay(swr, sampleRate) + audioframeTmp->nb_samples, c->sample_rate, sampleRate, AV_ROUND_UP);
 
-    if (swr_convert(swr, audioframe->data, dst_nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
+    if (swr_convert(swr, audioframe->data, (int)dst_nb_samples, (const uint8_t **)audioframeTmp->data, audioframeTmp->nb_samples) < 0)
     {
         return MRET_ERR_RECORDING;
     }
