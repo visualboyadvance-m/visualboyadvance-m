@@ -2110,7 +2110,7 @@ static wxString gbaGetOverrideId() {
     }
     if (valid)
         return wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
-    uint32_t romcrc = (uint32_t)crc32(0, g_rom, (uInt)gbaGetRomSize());
+    uint32_t romcrc = crc32(0L, g_rom, gbaGetRomSize());
     return wxString::Format(wxT("CRC_%08X"), romcrc);
 }
 

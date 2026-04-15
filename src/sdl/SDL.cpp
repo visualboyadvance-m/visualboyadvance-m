@@ -683,7 +683,7 @@ static void sdlApplyPerImagePreferences()
     } else
         fprintf(stdout, "Reading vba-over.ini\n");
 
-    char buffer[14];
+    char buffer[15];
     buffer[0] = '[';
     buffer[1] = g_rom[0xac];
     buffer[2] = g_rom[0xad];
@@ -697,7 +697,7 @@ static void sdlApplyPerImagePreferences()
         if (buffer[i] < 0x21 || buffer[i] > 0x7e) { validCode = false; break; }
     }
     if (!validCode) {
-        uint32_t romcrc = (uint32_t)crc32(0, g_rom, (uInt)gbaGetRomSize());
+        uint32_t romcrc = crc32(0L, g_rom, gbaGetRomSize());
         snprintf(buffer, sizeof(buffer), "[CRC_%08X]", romcrc);
     }
 
