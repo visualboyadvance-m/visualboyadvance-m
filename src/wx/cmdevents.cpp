@@ -2098,6 +2098,22 @@ EVT_HANDLER(SetSize6x, "6x")
     OPTION(kDispScale) = 6;
 }
 
+
+// Returns a valid override key for the loaded GBA ROM.
+// Uses the 4-char game code if all bytes are printable ASCII,
+// otherwise falls back to "CRC_XXXXXXXX" using zlib crc32.
+static wxString gbaGetOverrideId() {
+    bool valid = true;
+    for (int i = 0; i < 4; i++) {
+        uint8_t c = g_rom[0xac + i];
+        if (c < 0x21 || c > 0x7e) { valid = false; break; }
+    }
+    if (valid)
+        return wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
+    uint32_t romcrc = (uint32_t)crc32(0, g_rom, (uInt)gbaGetRomSize());
+    return wxString::Format(wxT("CRC_%08X"), romcrc);
+}
+
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 {
     wxDialog* dlg = GetXRCDialog("GameBoyAdvanceConfig");
@@ -2109,7 +2125,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
              *ovmir = XRCCTRL(*dlg, "OvMirroring", wxChoice);
 
     if (panel->game_type() == IMAGE_GBA) {
-        wxString s = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
+        wxString s = gbaGetOverrideId();
         XRCCTRL(*dlg, "GameCode", wxControl)
             ->SetLabel(s);
         cmt = wxString((const char*)&g_rom[0xa0], wxConvLibc, 12);
@@ -2146,7 +2162,7 @@ EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 
     if (panel->game_type() == IMAGE_GBA) {
         agbPrintEnable(OPTION(kPrefAgbPrint));
-        wxString s = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
+        wxString s = gbaGetOverrideId();
         wxFileConfig* cfg = wxGetApp().overrides_.get();
         bool chg;
 

@@ -655,6 +655,21 @@ GameArea::GameArea()
     this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
 }
 
+// Returns a valid override key for the loaded GBA ROM.
+// Uses the 4-char game code if all bytes are printable ASCII,
+// otherwise falls back to "CRC_XXXXXXXX" using zlib crc32.
+static wxString gbaGetOverrideId() {
+    bool valid = true;
+    for (int i = 0; i < 4; i++) {
+        uint8_t c = g_rom[0xac + i];
+        if (c < 0x21 || c > 0x7e) { valid = false; break; }
+    }
+    if (valid)
+        return wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
+    uint32_t romcrc = (uint32_t)crc32(0, g_rom, (uInt)gbaGetRomSize());
+    return wxString::Format(wxT("CRC_%08X"), romcrc);
+}
+
 void GameArea::LoadGame(const wxString& name)
 {
     rom_scene_rls = "-";
@@ -862,8 +877,9 @@ void GameArea::LoadGame(const wxString& name)
             gbaUpdateRomSize(size);
         }
 
+
         wxFileConfig* cfg = wxGetApp().overrides_.get();
-        wxString id = wxString((const char*)&g_rom[0xac], wxConvLibc, 4);
+        wxString id = gbaGetOverrideId();
 
         // Check for game-specific overrides based on ROM ID
         if (cfg->HasGroup(id)) {
