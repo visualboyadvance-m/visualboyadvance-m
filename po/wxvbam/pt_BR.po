@@ -1524,12 +1524,12 @@ msgstr "Erro ao abrir o pseudo tty: %s"
 #: sys.cpp:1418
 #, c-format
 msgid "Invalid GDB server port %d"
-msgstr ""
+msgstr "Porta inválida do servidor GDB %d"
 
 #: sys.cpp:1431
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
-msgstr ""
+msgstr "Erro ao configurar o soquete do servidor GDB na porta %d"
 
 #: viewers.cpp:596
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
