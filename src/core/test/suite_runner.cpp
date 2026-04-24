@@ -89,11 +89,11 @@ int emulating = 0;
 // ---- GBA joypad bits (what systemReadJoypad returns in active-high) --------
 static constexpr uint32_t KEY_A      = 1u << 0;
 static constexpr uint32_t KEY_B      = 1u << 1;
-static constexpr uint32_t KEY_SELECT = 1u << 2;
-static constexpr uint32_t KEY_START  = 1u << 3;
-static constexpr uint32_t KEY_RIGHT  = 1u << 4;
-static constexpr uint32_t KEY_LEFT   = 1u << 5;
-static constexpr uint32_t KEY_UP     = 1u << 6;
+//static constexpr uint32_t KEY_SELECT = 1u << 2;
+//static constexpr uint32_t KEY_START  = 1u << 3;
+//static constexpr uint32_t KEY_RIGHT  = 1u << 4;
+//static constexpr uint32_t KEY_LEFT   = 1u << 5;
+//static constexpr uint32_t KEY_UP     = 1u << 6;
 static constexpr uint32_t KEY_DOWN   = 1u << 7;
 
 // ---- Memory helpers --------------------------------------------------------
