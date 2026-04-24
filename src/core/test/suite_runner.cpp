@@ -288,6 +288,20 @@ static bool frame_equal(const uint8_t* a, const uint8_t* b) {
     return std::memcmp(a, b, kFrameBytes) == 0;
 }
 
+// Cheap FNV-ish checksum so we can distinguish "actual and expected rendered
+// to the same image" (a real PASS) from "both snapshots captured the same
+// unmodified frame" (a bogus PASS that would mean the harness never got the
+// renderer to paint anything).
+static uint64_t frame_hash(const uint8_t* p) {
+    uint64_t h = 0xcbf29ce484222325ull;
+    for (size_t i = 0; i < kFrameBytes; i += 16) {
+        h ^= (uint64_t)p[i] | ((uint64_t)p[i + 4] << 16) |
+             ((uint64_t)p[i + 8] << 32) | ((uint64_t)p[i + 12] << 48);
+        h *= 0x100000001b3ull;
+    }
+    return h;
+}
+
 struct VideoStats {
     uint32_t passes = 0;
     uint32_t total  = 0;
@@ -319,10 +333,12 @@ static VideoStats drive_video_suite(int n_tests) {
 
         copy_framebuffer(expected.data());
 
+        uint64_t ha = frame_hash(actual.data());
+        uint64_t he = frame_hash(expected.data());
         bool pass = frame_equal(actual.data(), expected.data());
         if (pass) {
             ++s.passes;
-            fprintf(stderr, " PASS\n");
+            fprintf(stderr, " PASS (hash=%016llx)\n", (unsigned long long)ha);
         } else {
             // Count how many pixels differ, for the log.
             size_t diff = 0;
@@ -331,7 +347,9 @@ static VideoStats drive_video_suite(int n_tests) {
                     actual[k+2] != expected[k+2] || actual[k+3] != expected[k+3])
                     ++diff;
             }
-            fprintf(stderr, " FAIL (%zu pixels differ)\n", diff);
+            fprintf(stderr,
+                    " FAIL (%zu pixels differ, hA=%016llx hE=%016llx)\n",
+                    diff, (unsigned long long)ha, (unsigned long long)he);
         }
 
         // Exit show() back to the viewer.
