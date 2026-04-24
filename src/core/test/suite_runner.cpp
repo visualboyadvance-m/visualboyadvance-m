@@ -274,14 +274,21 @@ static constexpr int kGbaPixH = 160;
 static constexpr size_t kFrameBytes = 4 * kGbaPixW * kGbaPixH;
 
 static void copy_framebuffer(uint8_t* dst) {
-    // g_pix stride is 4 bytes per pixel; copy the visible 240×160 region.
-    // The pix buffer VBA-M allocates has +1 col/row of padding on some
-    // builds, so step by the native visible row size.
+    // VBA-M's 32-bit-depth g_pix layout (non-libretro build) is a 241×162
+    // uint32 grid with one leading padding row and one trailing padding
+    // column — see `uint32_t* dest = g_pix + 241 * (VCOUNT + 1)` in gba.cpp.
+    // We copy the visible 240×160 region row-by-row, skipping the leading
+    // padding row and the trailing-column padding byte.
     if (!g_pix) {
         std::memset(dst, 0, kFrameBytes);
         return;
     }
-    std::memcpy(dst, g_pix, kFrameBytes);
+    const uint32_t* src_rows = (const uint32_t*)g_pix + 241 /* skip pad row */;
+    uint8_t* out = dst;
+    for (int y = 0; y < kGbaPixH; ++y) {
+        std::memcpy(out, src_rows + 241 * y, 4 * kGbaPixW);
+        out += 4 * kGbaPixW;
+    }
 }
 
 static bool frame_equal(const uint8_t* a, const uint8_t* b) {
@@ -417,6 +424,23 @@ int main(int argc, char** argv) {
     soundInit();
     CPUReset();
     emulating = 1;
+
+    // Initialize the BGR555 → RGBA8888 lookup table so the renderer can
+    // actually write meaningful pixels into g_pix. (Without this every
+    // pixel resolves to systemColorMap32[...] == 0 and the video-suite
+    // comparator trivially reports every test as matching.)
+    systemColorDepth = 32;
+    systemRedShift   = 3;   // 5-bit R → byte 0 (bits 3..7)
+    systemGreenShift = 11;  // byte 1
+    systemBlueShift  = 19;  // byte 2
+    for (int i = 0; i < 0x10000; ++i) {
+        const uint32_t r5 = (uint32_t)(i & 0x1F);
+        const uint32_t g5 = (uint32_t)((i >> 5) & 0x1F);
+        const uint32_t b5 = (uint32_t)((i >> 10) & 0x1F);
+        systemColorMap32[i] =
+            (r5 << systemRedShift) | (g5 << systemGreenShift) |
+            (b5 << systemBlueShift) | 0xFF000000u /* opaque alpha */;
+    }
 
     // Let the ROM boot past crt0 + splash (no input).
     run_frames(180, 0);

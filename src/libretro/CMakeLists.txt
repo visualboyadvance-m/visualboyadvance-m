@@ -26,6 +26,7 @@ add_library(vbam_libretro SHARED
     ${VBAM_SRC_DIR}/core/base/internal/file_util_internal.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_common.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_libretro.cpp
+    ${VBAM_SRC_DIR}/core/base/file_util_libretro.cpp
 
     # APU
     ${VBAM_SRC_DIR}/core/apu/Gb_Oscs.cpp
@@ -36,6 +37,7 @@ add_library(vbam_libretro SHARED
     ${VBAM_SRC_DIR}/core/apu/Gb_Apu.cpp
 
     # GBA
+    ${VBAM_SRC_DIR}/core/gba/gbaMgbaLog.cpp
     ${VBAM_SRC_DIR}/core/gba/gba.cpp
     ${VBAM_SRC_DIR}/core/gba/gbaCheats.cpp
     ${VBAM_SRC_DIR}/core/gba/gbaCheatSearch.cpp
