@@ -3041,6 +3041,7 @@ int armExecute()
         if (clockTicks == 0)
             clockTicks = 1 + codeTicksAccessSeq32(oldArmNextPC);
         cpuTotalTicks += clockTicks;
+        cpuAbsCycle   += clockTicks;
 
     } while (cpuTotalTicks < cpuNextEvent && armState && !holdState && !SWITicks && !debugger);
 

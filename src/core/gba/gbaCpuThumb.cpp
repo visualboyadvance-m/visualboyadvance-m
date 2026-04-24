@@ -2094,6 +2094,7 @@ int thumbExecute()
         if (clockTicks == 0)
             clockTicks = codeTicksAccessSeq16(oldArmNextPC) + 1;
         cpuTotalTicks += clockTicks;
+        cpuAbsCycle   += clockTicks;
 
     } while (cpuTotalTicks < cpuNextEvent && !armState && !holdState && !SWITicks && !debugger);
     return 1;

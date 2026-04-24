@@ -90,6 +90,19 @@ bool cpuEEPROMSensorEnabled = false;
 uint32_t cpuPrefetch[2];
 
 int cpuTotalTicks = 0;
+// Monotonically-increasing absolute cycle count across the whole run.
+// Unlike cpuTotalTicks (which is reset to 0 at each dispatch boundary),
+// cpuAbsCycle accumulates forever. This gives live-read code, the
+// scheduler, and the new timer-model a single wall-clock source so
+// cycles between a "force-dispatch" TMxCNT_H write and the subsequent
+// live read aren't lost. Updated wherever cpuTotalTicks is.
+int64_t cpuAbsCycle = 0;
+// For each timer, the absolute cycle at which start(0→1) on TMxCNT_H last
+// happened, plus the reload value latched into the counter at that moment.
+// Live-reads compute counter = (reloadAtEnable + cycles_since_enable) mod
+// 0x10000 against these. Unset (and irrelevant) when the timer is off.
+int64_t timerEnableAbsCycle[4] = {0, 0, 0, 0};
+uint16_t timerReloadAtEnable[4] = {0, 0, 0, 0};
 #ifdef PROFILING
 int profilingTicks = 0;
 int profilingTicksReload = 0;
@@ -3468,6 +3481,13 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM0CNT_H:
         timer0Value = value;
+        // Snapshot the absolute cycle at the write moment so the later
+        // applyTimer() can anchor the timer's counter to it without losing
+        // the cycles consumed between the write and the dispatch boundary.
+        if (!timer0On && (value & 0x80)) {
+            timerEnableAbsCycle[0] = cpuAbsCycle;
+            timerReloadAtEnable[0] = DowncastU16(timer0Reload);
+        }
         timerOnOffDelay |= 1;
         cpuNextEvent = cpuTotalTicks;
         break;
@@ -3477,6 +3497,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM1CNT_H:
         timer1Value = value;
+        if (!timer1On && (value & 0x80)) {
+            timerEnableAbsCycle[1] = cpuAbsCycle;
+            timerReloadAtEnable[1] = DowncastU16(timer1Reload);
+        }
         timerOnOffDelay |= 2;
         cpuNextEvent = cpuTotalTicks;
         break;
@@ -3485,6 +3509,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM2CNT_H:
         timer2Value = value;
+        if (!timer2On && (value & 0x80)) {
+            timerEnableAbsCycle[2] = cpuAbsCycle;
+            timerReloadAtEnable[2] = DowncastU16(timer2Reload);
+        }
         timerOnOffDelay |= 4;
         cpuNextEvent = cpuTotalTicks;
         break;
@@ -3493,6 +3521,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM3CNT_H:
         timer3Value = value;
+        if (!timer3On && (value & 0x80)) {
+            timerEnableAbsCycle[3] = cpuAbsCycle;
+            timerReloadAtEnable[3] = DowncastU16(timer3Reload);
+        }
         timerOnOffDelay |= 8;
         cpuNextEvent = cpuTotalTicks;
         break;
@@ -3941,6 +3973,7 @@ void CPUReset()
     rtcReset();
     gbaMgbaLog::Reset();
     gbaScheduler::Reset();
+    cpuAbsCycle = 0;
     // clean registers
     memset(&reg[0], 0, sizeof(reg));
     // clean OAM
@@ -4245,6 +4278,7 @@ void CPULoop(int ticks)
             clockTicks = CPUUpdateTicks();
 
         cpuTotalTicks += clockTicks;
+        cpuAbsCycle   += clockTicks;
 
         if (rtcIsEnabled())
             rtcUpdateTime(cpuTotalTicks);

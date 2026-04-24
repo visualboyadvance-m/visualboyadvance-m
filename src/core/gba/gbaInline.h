@@ -43,6 +43,13 @@ extern bool timer3On;
 extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
+extern int64_t cpuAbsCycle;
+extern int64_t timerEnableAbsCycle[4];
+extern uint16_t timerReloadAtEnable[4];
+extern int timer0Reload;
+extern int timer1Reload;
+extern int timer2Reload;
+extern int timer3Reload;
 
 extern uint32_t cpuDmaBusValue;
 
@@ -346,21 +353,36 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             case IO_REG_SOUND4CNT_H: value &= 0x40FF; break;
             }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
-                // Live timer-counter read: TM0D_now = TM0D_atDispatch + elapsed.
-                // Since timer0Ticks = (0x10000 - TM0D_atDispatch) << prescale,
-                // and elapsed = cpuTotalTicks >> prescale, the derivation gives
-                // value = 0x10000 - ((timer0Ticks - cpuTotalTicks) >> prescale),
-                // truncated to 16 bits. The previous formula used 0xFFFF which
-                // underflows at cpuTotalTicks=0 (fresh reload) — producing
-                // 0xFFFFFFFF instead of 0.
+                // Live timer-counter read using absolute cycles with precise
+                // reload-register semantics. The counter cycles with period
+                // (0x10000 - reloadAtEnable) until the first overflow, then
+                // with period (0x10000 - reloadNow) thereafter — matching real
+                // HW's "reload register is latched on overflow" behavior.
+                // The 2-cycle startup delay compensates for the write-handler
+                // snapshot happening at instruction START (real HW commits the
+                // store mid-pipeline).
+                auto liveTimerRead = [&](int n, uint32_t reloadNow, int prescale) -> uint16_t {
+                    int64_t elapsed = cpuAbsCycle - timerEnableAbsCycle[n] - 2;
+                    if (elapsed < 0) elapsed = 0;
+                    uint32_t r0 = timerReloadAtEnable[n];
+                    int64_t cyclesToFirstOverflow = (int64_t)(0x10000u - r0) << prescale;
+                    if (elapsed < cyclesToFirstOverflow) {
+                        return (uint16_t)(r0 + (uint32_t)(elapsed >> prescale));
+                    }
+                    int64_t post = elapsed - cyclesToFirstOverflow;
+                    int64_t period = (int64_t)(0x10000u - reloadNow) << prescale;
+                    if (period <= 0) period = (int64_t)0x10000 << prescale;
+                    post %= period;
+                    return (uint16_t)(reloadNow + (uint32_t)(post >> prescale));
+                };
                 if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On)
-                    value = (uint16_t)(0x10000u - ((timer0Ticks - cpuTotalTicks) >> timer0ClockReload));
+                    value = liveTimerRead(0, (uint16_t)timer0Reload, timer0ClockReload);
                 else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
-                    value = (uint16_t)(0x10000u - ((timer1Ticks - cpuTotalTicks) >> timer1ClockReload));
+                    value = liveTimerRead(1, (uint16_t)timer1Reload, timer1ClockReload);
                 else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
-                    value = (uint16_t)(0x10000u - ((timer2Ticks - cpuTotalTicks) >> timer2ClockReload));
+                    value = liveTimerRead(2, (uint16_t)timer2Reload, timer2ClockReload);
                 else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
-                    value = (uint16_t)(0x10000u - ((timer3Ticks - cpuTotalTicks) >> timer3ClockReload));
+                    value = liveTimerRead(3, (uint16_t)timer3Reload, timer3ClockReload);
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
             value = 0;
