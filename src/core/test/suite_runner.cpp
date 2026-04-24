@@ -286,6 +286,13 @@ static constexpr int kGbaPixW = 240;
 static constexpr int kGbaPixH = 160;
 static constexpr size_t kFrameBytes = 4 * kGbaPixW * kGbaPixH;
 
+// The video-suite show() loop draws an "Actual" / "Expected" label sprite at
+// OAM[0] with OBJ_Y(148). That sprite's text differs between the two views
+// but is NOT part of the test's rendering. Exclude the label strip from the
+// pixel compare by only considering rows 0..kLabelTopY-1.
+static constexpr int kLabelTopY = 148;
+static constexpr size_t kCompareBytes = 4 * kGbaPixW * kLabelTopY;
+
 static void copy_framebuffer(uint8_t* dst) {
     // VBA-M's 32-bit-depth g_pix layout (non-libretro build) is a 241×162
     // uint32 grid with one leading padding row and one trailing padding
@@ -305,16 +312,17 @@ static void copy_framebuffer(uint8_t* dst) {
 }
 
 static bool frame_equal(const uint8_t* a, const uint8_t* b) {
-    return std::memcmp(a, b, kFrameBytes) == 0;
+    // Only compare the visible test area above the Actual/Expected label.
+    return std::memcmp(a, b, kCompareBytes) == 0;
 }
 
 // Cheap FNV-ish checksum so we can distinguish "actual and expected rendered
 // to the same image" (a real PASS) from "both snapshots captured the same
 // unmodified frame" (a bogus PASS that would mean the harness never got the
-// renderer to paint anything).
+// renderer to paint anything). Hashes the same region frame_equal compares.
 static uint64_t frame_hash(const uint8_t* p) {
     uint64_t h = 0xcbf29ce484222325ull;
-    for (size_t i = 0; i < kFrameBytes; i += 16) {
+    for (size_t i = 0; i < kCompareBytes; i += 16) {
         h ^= (uint64_t)p[i] | ((uint64_t)p[i + 4] << 16) |
              ((uint64_t)p[i + 8] << 32) | ((uint64_t)p[i + 12] << 48);
         h *= 0x100000001b3ull;
@@ -342,18 +350,23 @@ static VideoStats drive_video_suite(int n_tests) {
     std::vector<uint8_t> expected(kFrameBytes, 0);
 
     for (int t = 0; t < n_tests; ++t) {
-        // Forcefully return to main menu from wherever we are.
-        press_button(KEY_B, 2); run_frames(6, 0);
-        press_button(KEY_B, 2); run_frames(6, 0);
+        // Force-exit whatever we're in until suiteId reads back as -1
+        // (main-menu state). Pressing B from the main menu is a no-op, so
+        // looping up to 4 times is safe and deterministic.
+        for (int k = 0; k < 4; ++k) {
+            if (active_suite_id() < 0) break;
+            press_button(KEY_B, 2);
+            run_frames(10, 0);
+        }
 
-        // Enter the video suite. The outer loop already selected it via
-        // DOWN presses before calling us, so DOWN is not needed here; we
-        // just press A to enter runSuite() → viewer.
-        press_button(KEY_A, 2); run_frames(10, 0);
+        // Enter the video suite (already selected from outer loop nav).
+        press_button(KEY_A, 2);
+        run_frames(20, 0);
 
         // Advance the viewer's testIndex to `t` by pressing DOWN t times.
         for (int k = 0; k < t; ++k) {
-            press_button(KEY_DOWN, 2); run_frames(6, 0);
+            press_button(KEY_DOWN, 2);
+            run_frames(10, 0);
         }
 
         fprintf(stderr, "    video[%d/%d] (suiteId=%d)...",
@@ -378,9 +391,9 @@ static VideoStats drive_video_suite(int n_tests) {
             ++s.passes;
             fprintf(stderr, " PASS (hash=%016llx)\n", (unsigned long long)ha);
         } else {
-            // Count how many pixels differ, for the log.
+            // Count how many pixels differ in the compared (non-label) area.
             size_t diff = 0;
-            for (size_t k = 0; k < kFrameBytes; k += 4) {
+            for (size_t k = 0; k < kCompareBytes; k += 4) {
                 if (actual[k] != expected[k] || actual[k+1] != expected[k+1] ||
                     actual[k+2] != expected[k+2] || actual[k+3] != expected[k+3])
                     ++diff;
