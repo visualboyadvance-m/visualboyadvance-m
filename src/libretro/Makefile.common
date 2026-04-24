@@ -43,6 +43,7 @@ SOURCES_CXX += \
 	$(CORE_DIR)/core/apu/Gb_Apu.cpp
 
 SOURCES_CXX += \
+	$(CORE_DIR)/core/gba/gbaMgbaLog.cpp \
 	$(CORE_DIR)/core/gba/gba.cpp \
 	$(CORE_DIR)/core/gba/gbaCheats.cpp \
 	$(CORE_DIR)/core/gba/gbaCheatSearch.cpp \
