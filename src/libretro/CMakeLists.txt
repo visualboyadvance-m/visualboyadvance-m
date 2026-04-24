@@ -37,6 +37,7 @@ add_library(vbam_libretro SHARED
     ${VBAM_SRC_DIR}/core/apu/Gb_Apu.cpp
 
     # GBA
+    ${VBAM_SRC_DIR}/core/gba/gbaScheduler.cpp
     ${VBAM_SRC_DIR}/core/gba/gbaMgbaLog.cpp
     ${VBAM_SRC_DIR}/core/gba/gba.cpp
     ${VBAM_SRC_DIR}/core/gba/gbaCheats.cpp
