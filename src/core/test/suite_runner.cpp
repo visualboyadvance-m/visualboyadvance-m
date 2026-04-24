@@ -144,7 +144,11 @@ static int32_t mem_read_i32(uint32_t addr) {
 
 // Backwards-compat wrappers used by the rest of the runner.
 static uint32_t iwram_read32(uint32_t addr)   { return mem_read32(addr); }
+
+#if 0
 static int32_t  iwram_read_i32(uint32_t addr) { return mem_read_i32(addr); }
+#endif
+
 static uint32_t rom_read32(uint32_t addr)     { return mem_read32(addr); }
 
 // ---- Suite table -----------------------------------------------------------
@@ -258,10 +262,13 @@ static int32_t active_suite_id() {
     if (!g_active_info_addr) return -2;
     return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 7);
 }
+
+#if 0
 static int32_t active_test_id() {
     if (!g_active_info_addr) return -2;
     return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 6);
 }
+#endif
 
 // ---- Video-suite driver ----------------------------------------------------
 //
