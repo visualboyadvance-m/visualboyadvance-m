@@ -331,38 +331,42 @@ static VideoStats drive_video_suite(int n_tests) {
     VideoStats s;
     s.total = (uint32_t)n_tests;
 
-    // On entry: the outer loop has just pressed A from the main menu, which
-    // normally puts us in the viewer of suite 13 (video). But the viewer
-    // immediately accepts key input, and the tail end of the same A hold
-    // sometimes triggers show(testIndex=0) — depending on how many frames
-    // were already consumed. To normalize, press B once: if we are in
-    // show() we exit to the viewer; if we are already in the viewer we'd
-    // exit back to the main menu, which we detect below via `active_suite_id()`
-    // and recover from with another A press.
-    press_button(KEY_B, 4);
-    run_frames(8, 0);
-    if (active_suite_id() != 13) {
-        // The B kicked us back to the main menu. Re-enter the video suite.
-        press_button(KEY_A, 4);
-        run_frames(8, 0);
-    }
+    // Robust navigation strategy: always walk from the main menu to the
+    // target video test. We press B twice to make sure we're at the main
+    // menu (one B exits show(), another exits the viewer — superfluous Bs
+    // at the main menu are harmless). Then we press A to enter the video
+    // suite viewer, then DOWN `t` times to select the target test, then A
+    // to enter its show(). This avoids state drift between iterations.
 
     std::vector<uint8_t> actual(kFrameBytes, 0);
     std::vector<uint8_t> expected(kFrameBytes, 0);
 
     for (int t = 0; t < n_tests; ++t) {
+        // Forcefully return to main menu from wherever we are.
+        press_button(KEY_B, 2); run_frames(6, 0);
+        press_button(KEY_B, 2); run_frames(6, 0);
+
+        // Enter the video suite. The outer loop already selected it via
+        // DOWN presses before calling us, so DOWN is not needed here; we
+        // just press A to enter runSuite() → viewer.
+        press_button(KEY_A, 2); run_frames(10, 0);
+
+        // Advance the viewer's testIndex to `t` by pressing DOWN t times.
+        for (int k = 0; k < t; ++k) {
+            press_button(KEY_DOWN, 2); run_frames(6, 0);
+        }
+
         fprintf(stderr, "    video[%d/%d] (suiteId=%d)...",
                 t + 1, n_tests, active_suite_id());
 
         // Enter this test's show() — renders the "actual" image first.
-        press_button(KEY_A, 4);
-        run_frames(30, 0); // let the renderer settle
+        press_button(KEY_A, 2);
+        run_frames(30, 0);
 
         copy_framebuffer(actual.data());
 
-        // Toggle to the "expected" (software-drawn reference) image. The
-        // show() loop uses A or RIGHT for that transition.
-        press_button(KEY_A, 4);
+        // Toggle to the "expected" (software-drawn reference) image.
+        press_button(KEY_A, 2);
         run_frames(30, 0);
 
         copy_framebuffer(expected.data());
@@ -386,21 +390,8 @@ static VideoStats drive_video_suite(int n_tests) {
                     diff, (unsigned long long)ha, (unsigned long long)he);
         }
 
-        // Exit show() back to the viewer. Keep the B pulse short so the
-        // viewer doesn't also see it as a "leave suite" press.
-        press_button(KEY_B, 2);
-        run_frames(4, 0);
-        // If the B press leaked into the viewer and kicked us back to the
-        // main menu, re-enter the video suite before advancing.
-        if (active_suite_id() != 13 && t + 1 < n_tests) {
-            press_button(KEY_A, 4);
-            run_frames(8, 0);
-        }
-        // Advance to next test in the viewer (UP/DOWN cycles testIndex).
-        if (t + 1 < n_tests) {
-            press_button(KEY_DOWN, 4);
-            run_frames(4, 0);
-        }
+        // Next iteration starts from main menu navigation, so no explicit
+        // exit-from-show is needed — the leading B presses handle it.
     }
     return s;
 }
