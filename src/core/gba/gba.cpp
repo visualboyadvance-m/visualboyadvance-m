@@ -3517,9 +3517,18 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
 
 #ifndef NO_LINK
-    case COMM_SIODATA8:
-        UPDATE_REG(COMM_SIODATA8, value);
+    case COMM_SIODATA8: {
+        // Shared register:
+        //   Normal-8 mode — data to be transmitted (R/W).
+        //   UART mode     — received data FIFO slot (R only; CPU writes
+        //                   are ignored, which is what mGBA's SIODATA8
+        //                   register-R/W test expects).
+        const uint16_t siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
+        const uint32_t sio_mode = (siocnt >> 12) & 0x3u;
+        if (sio_mode != 3) /* not UART */
+            UPDATE_REG(COMM_SIODATA8, value);
         break;
+    }
 #endif
 
     case IO_REG_KEYINPUT:

@@ -781,6 +781,22 @@ void StartGPLink(uint16_t value)
     // them here prevents writes from leaving stale 1s in those positions
     // (which mGBA's SIO register R/W tests detect).
     value &= 0xC1FFu;
+    // Per-mode masking of data-line bits 0..3:
+    //   * Normal-8 / Normal-32 mode (SIOCNT bits 12-13 = 00 or 01 with
+    //     RCNT[15:14] = 00): SC/SI are CPU-controlled, but SD (bit 1) and
+    //     SO (bit 3) are driven by the SIO hardware and read back as 0.
+    //   * JOY-bus mode (RCNT[15:14] = 11): SC (bit 0) and SD (bit 1) are
+    //     hardware-driven, read back as 0.
+    //   * Multiplayer, UART, and GP modes preserve all four data bits.
+    const uint32_t rcnt_mode = (value >> 14) & 0x3u;
+    if (rcnt_mode == 0) {
+        const uint16_t siocnt  = READ16LE(&g_ioMem[COMM_SIOCNT]);
+        const uint32_t sio_mode = (siocnt >> 12) & 0x3u;
+        if (sio_mode == 0 || sio_mode == 1)
+            value &= ~0x000Au; // clear bits 1 (SD) and 3 (SO)
+    } else if (rcnt_mode == 3) {
+        value &= ~0x0003u;     // clear bits 0 (SC) and 1 (SD)
+    }
     UPDATE_REG(COMM_RCNT, value);
 
     if (!value)
