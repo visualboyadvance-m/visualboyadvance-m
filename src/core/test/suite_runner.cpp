@@ -229,16 +229,15 @@ static void press_button(uint32_t mask, int hold_frames = 6) {
 static uint32_t g_active_info_addr = 0;
 
 static bool locate_active_info() {
-    // Search the first 2 KiB for the 'Info' ASCII tag followed by 3 int32s
-    // whose initial state we expect to be -1.
-    for (uint32_t off = 0; off < 0x800; off += 4) {
-        uint32_t tag = iwram_read32(0x03000000u + off);
-        if (tag == 0x6f666e49u /* 'Info' little-endian */) {
-            g_active_info_addr = 0x03000000u + off;
-            return true;
-        }
-    }
-    return false;
+    // `activeTestInfo` is at a fixed IWRAM address in suite.gba (found via
+    // `arm-none-eabi-nm suite.elf`). Hardcoding avoids false positives from
+    // any other 'Info' ASCII strings that might live in IWRAM — for example
+    // the 'I','n','f','o' characters embedded in some message text. The
+    // former IWRAM scan returned a bogus address for test 2+ of the video
+    // suite because it matched such a copy instead of the struct itself.
+    g_active_info_addr = 0x030000ac;
+    uint32_t tag = iwram_read32(g_active_info_addr);
+    return tag == 0x6f666e49u;
 }
 
 static int32_t active_suite_id() {
@@ -318,24 +317,38 @@ static VideoStats drive_video_suite(int n_tests) {
     VideoStats s;
     s.total = (uint32_t)n_tests;
 
-    // At this point we're in the main menu with "video" selected; the press
-    // of A happens in the outer loop just before this helper runs. When we
-    // return the caller also does a press-B to exit to main menu.
+    // On entry: the outer loop has just pressed A from the main menu, which
+    // normally puts us in the viewer of suite 13 (video). But the viewer
+    // immediately accepts key input, and the tail end of the same A hold
+    // sometimes triggers show(testIndex=0) — depending on how many frames
+    // were already consumed. To normalize, press B once: if we are in
+    // show() we exit to the viewer; if we are already in the viewer we'd
+    // exit back to the main menu, which we detect below via `active_suite_id()`
+    // and recover from with another A press.
+    press_button(KEY_B, 4);
+    run_frames(8, 0);
+    if (active_suite_id() != 13) {
+        // The B kicked us back to the main menu. Re-enter the video suite.
+        press_button(KEY_A, 4);
+        run_frames(8, 0);
+    }
+
     std::vector<uint8_t> actual(kFrameBytes, 0);
     std::vector<uint8_t> expected(kFrameBytes, 0);
 
     for (int t = 0; t < n_tests; ++t) {
-        fprintf(stderr, "    video[%d/%d]...", t + 1, n_tests);
+        fprintf(stderr, "    video[%d/%d] (suiteId=%d)...",
+                t + 1, n_tests, active_suite_id());
 
         // Enter this test's show() — renders the "actual" image first.
-        press_button(KEY_A, 8);
+        press_button(KEY_A, 4);
         run_frames(30, 0); // let the renderer settle
 
         copy_framebuffer(actual.data());
 
         // Toggle to the "expected" (software-drawn reference) image. The
         // show() loop uses A or RIGHT for that transition.
-        press_button(KEY_A, 8);
+        press_button(KEY_A, 4);
         run_frames(30, 0);
 
         copy_framebuffer(expected.data());
@@ -359,11 +372,20 @@ static VideoStats drive_video_suite(int n_tests) {
                     diff, (unsigned long long)ha, (unsigned long long)he);
         }
 
-        // Exit show() back to the viewer.
-        press_button(KEY_B, 8);
+        // Exit show() back to the viewer. Keep the B pulse short so the
+        // viewer doesn't also see it as a "leave suite" press.
+        press_button(KEY_B, 2);
+        run_frames(4, 0);
+        // If the B press leaked into the viewer and kicked us back to the
+        // main menu, re-enter the video suite before advancing.
+        if (active_suite_id() != 13 && t + 1 < n_tests) {
+            press_button(KEY_A, 4);
+            run_frames(8, 0);
+        }
         // Advance to next test in the viewer (UP/DOWN cycles testIndex).
         if (t + 1 < n_tests) {
-            press_button(KEY_DOWN, 6);
+            press_button(KEY_DOWN, 4);
+            run_frames(4, 0);
         }
     }
     return s;
