@@ -53,6 +53,7 @@ target_sources(vbam-core
     gba/gbaMode5.cpp
     gba/gbaPrint.cpp
     gba/gbaRtc.cpp
+    gba/gbaScheduler.cpp
     gba/gbaSound.cpp
     gba/internal/gbaBios.cpp
     gba/internal/gbaBios.h
@@ -89,6 +90,7 @@ target_sources(vbam-core
     gba/gbaMgbaLog.h
     gba/gbaPrint.h
     gba/gbaRtc.h
+    gba/gbaScheduler.h
     gba/gbaSound.h
 )
 

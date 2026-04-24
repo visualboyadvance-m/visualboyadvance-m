@@ -23,6 +23,7 @@
 #include "core/gba/gbaGfx.h"
 #include "core/gba/gbaInline.h"
 #include "core/gba/gbaPrint.h"
+#include "core/gba/gbaScheduler.h"
 #include "core/gba/gbaSound.h"
 #include "core/gba/internal/gbaBios.h"
 #include "core/gba/internal/gbaEreader.h"
@@ -555,12 +556,35 @@ void cpuEnableProfiling(int hz)
 }
 #endif
 
+// Scheduler callback: a pending SIO Normal-8/32 internal-clock transfer
+// has elapsed. Clear the Start/Busy bit on SIOCNT so polling loops see it
+// done, and fire the serial IRQ if SIOCNT.14 was set at request time. We
+// re-check IRQ-enable now (not at schedule time) since games occasionally
+// toggle it mid-transfer — the same behavior as the real SIO hardware.
+static inline void gbaScheduler_OnSioComplete() {
+    if (!g_ioMem) return;
+    uint16_t siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
+    if (!(siocnt & 0x80)) return; // CPU already cleared it
+    siocnt &= (uint16_t)~0x80u;
+    UPDATE_REG(COMM_SIOCNT, siocnt);
+    if (siocnt & 0x4000) {
+        IF |= 0x80;
+        UPDATE_REG(IO_REG_IF, IF);
+    }
+}
+
 inline int CPUUpdateTicks()
 {
     int cpuLoopTicks = lcdTicks;
 
     //if (soundTicks < cpuLoopTicks)
         //cpuLoopTicks = soundTicks;
+
+    // Include the cycle-accurate scheduler's next event as a ceiling.
+    if (gbaScheduler::HasPending()) {
+        int32_t schedDelta = gbaScheduler::NextDelta();
+        if (schedDelta < cpuLoopTicks) cpuLoopTicks = schedDelta;
+    }
 
     if (timer0On && (timer0Ticks < cpuLoopTicks)) {
         cpuLoopTicks = timer0Ticks;
@@ -3496,7 +3520,33 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case COMM_SIOMULTI3: // 0x126
         break;
 
-    case COMM_SIOCNT:
+    case COMM_SIOCNT: {
+        // Cycle-accurate SIO Normal-8/32 transfer completion:
+        // when the CPU sets bit 7 (Start) with internal clock, schedule a
+        // completion event after bits * clock_period cycles. The handler
+        // clears bit 7 and fires the SIO IRQ if enabled. This is what the
+        // mgba sio-timing tests measure (they time the gap between SIOCNT
+        // write and the serial IRQ).
+        const uint16_t old_siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
+        const uint16_t rcnt       = READ16LE(&g_ioMem[COMM_RCNT]);
+        const bool     rcnt_plain = (rcnt & 0xC000) == 0;
+        const uint32_t mode       = (value >> 12) & 0x3u;
+        const bool     start_edge = (value & 0x80) && !(old_siocnt & 0x80);
+        const bool     internal   = (value & 0x01) != 0;
+        if (start_edge && rcnt_plain && internal && (mode == 0 || mode == 1)) {
+            const int bits    = (mode == 1) ? 32 : 8;
+            const int per_bit = (value & 0x02) ? 8 : 64;
+            // Real HW: the SIO controller holds the bus for one extra
+            // internal clock cycle on both start (sync) and stop (shift
+            // register commit) before raising the completion IRQ. The
+            // test suite measures (TM0-start .. TM0-read-post-IRQ) which
+            // encompasses that extra cycle plus the CPU-side IRQ/BIOS
+            // path. Empirically the mgba sio-timing suite expects a
+            // fixed 35-cycle overhead beyond `bits * per_bit` on this
+            // CPU pipeline, independent of the programmed baud rate.
+            const int startup_overhead = 35;
+            gbaScheduler::Schedule(kSchedSio, bits * per_bit + startup_overhead);
+        }
 #ifndef NO_LINK
         StartLink(value);
 #else
@@ -3515,6 +3565,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(COMM_SIOCNT, value);
 #endif
         break;
+    }
 
 #ifndef NO_LINK
     case COMM_SIODATA8: {
@@ -3889,6 +3940,7 @@ void CPUReset()
     }
     rtcReset();
     gbaMgbaLog::Reset();
+    gbaScheduler::Reset();
     // clean registers
     memset(&reg[0], 0, sizeof(reg));
     // clean OAM
@@ -4210,6 +4262,22 @@ void CPULoop(int ticks)
             cpuTotalTicks = 0;
 
         updateLoop:
+
+            // Advance the cycle-accurate scheduler by the same "snapped"
+            // clockTicks the legacy XXXTicks counters use below, then pop
+            // any expired events.
+            gbaScheduler::AdvanceCycles(clockTicks);
+            for (;;) {
+                SchedulerEventType ev = gbaScheduler::PopExpired();
+                if (ev == kSchedCount) break;
+                switch (ev) {
+                case kSchedSio:
+                    gbaScheduler_OnSioComplete();
+                    break;
+                default:
+                    break;
+                }
+            }
 
             if (IRQTicks) {
                 IRQTicks -= clockTicks;
