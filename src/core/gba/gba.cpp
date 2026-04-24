@@ -3300,8 +3300,11 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(IO_REG_DMA0SAD_L, DM0SAD_L);
         break;
     case IO_REG_DMA0SAD_H:
-        DM0SAD_H = value & 0x07FF;
-        UPDATE_REG(IO_REG_DMA0SAD_H, DM0SAD_H);
+        // Keep the full 16-bit value; the mask to 27 bits happens at DMA
+        // start in dma0Source below (and we flag out-of-range writes so
+        // the transfer yields 0 instead of aliasing into a valid region).
+        DM0SAD_H = value;
+        UPDATE_REG(IO_REG_DMA0SAD_H, DM0SAD_H & 0x07FFu);
         break;
     case IO_REG_DMA0DAD_L:
         DM0DAD_L = value;

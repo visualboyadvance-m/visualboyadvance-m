@@ -138,9 +138,11 @@ static uint32_t mem_read32(uint32_t addr) {
     }
 }
 
+#if 0
 static int32_t mem_read_i32(uint32_t addr) {
     return (int32_t)mem_read32(addr);
 }
+#endif
 
 // Backwards-compat wrappers used by the rest of the runner.
 static uint32_t iwram_read32(uint32_t addr)   { return mem_read32(addr); }
