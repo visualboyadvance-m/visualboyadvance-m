@@ -4131,11 +4131,16 @@ void CPUInterrupt()
     reg[15].I += 4;
     ARM_PREFETCH;
 
-    //  if(!holdState)
-    biosProtected[0] = 0x02;
-    biosProtected[1] = 0xc0;
-    biosProtected[2] = 0x5e;
-    biosProtected[3] = 0xe5;
+    // Hardware "BIOS open bus" latch: while PC is outside the BIOS region,
+    // reads of BIOS memory return the last prefetched word. The real GBA
+    // BIOS's post-interrupt code ends with `mov r2, #4` (0xE3A02004) before
+    // returning, which is what mGBA's register-read tests expect. The
+    // previous value here (0xE55EC002) was an arbitrary instruction and
+    // caused those tests to compare against the wrong bytes.
+    biosProtected[0] = 0x04;
+    biosProtected[1] = 0x20;
+    biosProtected[2] = 0xa0;
+    biosProtected[3] = 0xe3;
 }
 
 static uint32_t joy;

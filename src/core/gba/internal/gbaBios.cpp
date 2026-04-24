@@ -269,14 +269,26 @@ void BIOS_CpuSet()
 
     int count = cnt & 0x1FFFFF;
 
+    // BIOS CpuSet pre-aligns source/destination the same way the real
+    // BIOS does (`bic rX, rX, #3` for 32-bit; `#1` for 16-bit). Hardware
+    // exception: the SRAM region (0x0E.../0x0F...) sits on an 8-bit bus
+    // where each byte address returns a distinct value, so we skip the
+    // source-alignment there — matches mGBA's SRAM / SRAM-mirror tests.
+    // The SRAM mirror at 0x0F000000 is valid on hardware, so we extend
+    // the open-bus threshold past it.
+    const uint32_t kSourceOpenBus = 0x0FFFFFFF;
+    const uint8_t src_region = source >> 24;
+    const uint8_t dst_region = dest >> 24;
+    const bool src_is_sram = (src_region == 0x0E) || (src_region == 0x0F);
+    const bool dst_is_sram = (dst_region == 0x0E) || (dst_region == 0x0F);
+
     // 32-bit ?
     if ((cnt >> 26) & 1) {
-        // needed for 32-bit mode!
-        source &= 0xFFFFFFFC;
-        dest &= 0xFFFFFFFC;
+        if (!src_is_sram) source &= 0xFFFFFFFC;
+        if (!dst_is_sram) dest &= 0xFFFFFFFC;
         // fill ?
         if ((cnt >> 24) & 1) {
-            uint32_t value = (source > 0x0EFFFFFF ? 0x1CAD1CAD : CPUReadMemory(source));
+            uint32_t value = (source > kSourceOpenBus ? 0x1CAD1CAD : CPUReadMemory(source));
             while (count) {
                 CPUWriteMemory(dest, value);
                 dest += 4;
@@ -285,16 +297,22 @@ void BIOS_CpuSet()
         } else {
             // copy
             while (count) {
-                CPUWriteMemory(dest, (source > 0x0EFFFFFF ? 0x1CAD1CAD : CPUReadMemory(source)));
+                CPUWriteMemory(dest, (source > kSourceOpenBus ? 0x1CAD1CAD : CPUReadMemory(source)));
                 source += 4;
                 dest += 4;
                 count--;
             }
         }
     } else {
+        // Real BIOS CpuSet's 16-bit path does NOT pre-align source/dest
+        // (it just uses `ldrh`/`strh` which on ARM7TDMI produce a ROR'd
+        // halfword read and a low-halfword store). Our CPUReadHalfWord
+        // already models the ROR, and CPUWriteHalfWord handles region
+        // quirks — so we pass addresses through unmodified.
+        (void)src_is_sram; (void)dst_is_sram;
         // 16-bit fill?
         if ((cnt >> 24) & 1) {
-            uint16_t value = (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source)));
+            uint16_t value = (source > kSourceOpenBus ? 0x1CAD : DowncastU16(CPUReadHalfWord(source)));
             while (count) {
                 CPUWriteHalfWord(dest, value);
                 dest += 2;
@@ -303,7 +321,7 @@ void BIOS_CpuSet()
         } else {
             // copy
             while (count) {
-                CPUWriteHalfWord(dest, (source > 0x0EFFFFFF ? 0x1CAD : DowncastU16(CPUReadHalfWord(source))));
+                CPUWriteHalfWord(dest, (source > kSourceOpenBus ? 0x1CAD : DowncastU16(CPUReadHalfWord(source))));
                 source += 2;
                 dest += 2;
                 count--;
@@ -328,17 +346,25 @@ void BIOS_CpuFastSet()
     if (((source & 0xe000000) == 0) || ((source + (((cnt << 11) >> 9) & 0x1fffff)) & 0xe000000) == 0)
         return;
 
-    // needed for 32-bit mode!
-    source &= 0xFFFFFFFC;
-    dest &= 0xFFFFFFFC;
+    const uint8_t src_region = source >> 24;
+    const uint8_t dst_region = dest >> 24;
+    const bool src_is_sram = (src_region == 0x0E) || (src_region == 0x0F);
+    const bool dst_is_sram = (dst_region == 0x0E) || (dst_region == 0x0F);
+
+    // Source/destination alignment is the real BIOS's `bic r?, r?, #3`,
+    // except for the 8-bit-bus SRAM region where each byte address
+    // yields a distinct read/write slot (see BIOS_CpuSet above).
+    if (!src_is_sram) source &= 0xFFFFFFFC;
+    if (!dst_is_sram) dest &= 0xFFFFFFFC;
 
     int count = cnt & 0x1FFFFF;
+    const uint32_t kSourceOpenBus = 0x0FFFFFFF;
 
     // fill?
     if ((cnt >> 24) & 1) {
         while (count > 0) {
             // BIOS always transfers 32 bytes at a time
-            uint32_t value = (source > 0x0EFFFFFF ? 0xBAFFFFFB : CPUReadMemory(source));
+            uint32_t value = (source > kSourceOpenBus ? 0xBAFFFFFB : CPUReadMemory(source));
             for (int i = 0; i < 8; i++) {
                 CPUWriteMemory(dest, value);
                 dest += 4;
@@ -350,7 +376,7 @@ void BIOS_CpuFastSet()
         while (count > 0) {
             // BIOS always transfers 32 bytes at a time
             for (int i = 0; i < 8; i++) {
-                CPUWriteMemory(dest, (source > 0x0EFFFFFF ? 0xBAFFFFFB : CPUReadMemory(source)));
+                CPUWriteMemory(dest, (source > kSourceOpenBus ? 0xBAFFFFFB : CPUReadMemory(source)));
                 source += 4;
                 dest += 4;
             }
