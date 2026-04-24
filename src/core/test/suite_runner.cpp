@@ -240,13 +240,27 @@ static bool locate_active_info() {
     return tag == 0x6f666e49u;
 }
 
+// The `ActiveInfo` struct in the test ROM (see suite-master/include/common.h)
+// is 8 bytes, not 16 as an earlier draft of this runner assumed:
+//   +0 char magic[4];       // 'Info'
+//   +4 uint16_t subtestId;
+//   +6 uint8_t  testId;
+//   +7 uint8_t  suiteId;
+// Reading suiteId as a 32-bit little-endian word at +4 conflates it with
+// subtestId/testId and produces garbage like 0x0DFFFFFF (confirmed under
+// LLDB: IWRAM[0xb0..0xb3] = FF FF FF 0D when suiteId == 13).
+static uint8_t iwram_read_u8(uint32_t addr) {
+    if (!g_internalRAM) return 0;
+    return g_internalRAM[(addr - 0x03000000u) & 0x7FFFu];
+}
+
 static int32_t active_suite_id() {
     if (!g_active_info_addr) return -2;
-    return iwram_read_i32(g_active_info_addr + 4);
+    return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 7);
 }
 static int32_t active_test_id() {
     if (!g_active_info_addr) return -2;
-    return iwram_read_i32(g_active_info_addr + 8);
+    return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 6);
 }
 
 // ---- Video-suite driver ----------------------------------------------------
