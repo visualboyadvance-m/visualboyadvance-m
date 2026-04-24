@@ -96,30 +96,56 @@ static constexpr uint32_t KEY_LEFT   = 1u << 5;
 static constexpr uint32_t KEY_UP     = 1u << 6;
 static constexpr uint32_t KEY_DOWN   = 1u << 7;
 
-// ---- IWRAM helpers ---------------------------------------------------------
+// ---- Memory helpers --------------------------------------------------------
 //
-// IWRAM is mapped at 0x03000000..0x03007FFF. g_internalRAM points at the first
-// byte, so IWRAM offset N = g_internalRAM[N - 0x03000000].
+// These are GBA-address-space safe: they dispatch on the top nibble of the
+// address and return 0 for any region the runner doesn't need to read. This
+// keeps the harness from segfaulting when a TestSuite struct's `.passes`
+// pointer lives in ROM (the video suite does this — both pointers aim at a
+// `constZero` in .rodata). Previously the blanket "subtract 0x03000000"
+// deref produced a wild out-of-bounds into g_internalRAM for those reads
+// and LLDB trapped in iwram_read32.
 
-static uint32_t iwram_read32(uint32_t addr) {
-    uint32_t off = addr - 0x03000000u;
-    return (uint32_t)g_internalRAM[off] |
-           ((uint32_t)g_internalRAM[off + 1] << 8) |
-           ((uint32_t)g_internalRAM[off + 2] << 16) |
-           ((uint32_t)g_internalRAM[off + 3] << 24);
+static uint32_t mem_read32(uint32_t addr) {
+    switch (addr >> 24) {
+    case 0x02: { // EWRAM
+        uint32_t off = (addr - 0x02000000u) & 0x3FFFFu;
+        if (!g_workRAM) return 0;
+        return (uint32_t)g_workRAM[off] |
+               ((uint32_t)g_workRAM[off + 1] << 8) |
+               ((uint32_t)g_workRAM[off + 2] << 16) |
+               ((uint32_t)g_workRAM[off + 3] << 24);
+    }
+    case 0x03: { // IWRAM
+        uint32_t off = (addr - 0x03000000u) & 0x7FFFu;
+        if (!g_internalRAM) return 0;
+        return (uint32_t)g_internalRAM[off] |
+               ((uint32_t)g_internalRAM[off + 1] << 8) |
+               ((uint32_t)g_internalRAM[off + 2] << 16) |
+               ((uint32_t)g_internalRAM[off + 3] << 24);
+    }
+    case 0x08: case 0x09: case 0x0A: case 0x0B:
+    case 0x0C: case 0x0D: { // ROM mirrors
+        uint32_t off = (addr - 0x08000000u) & 0x01FFFFFFu;
+        if (!g_rom) return 0;
+        return (uint32_t)g_rom[off] |
+               ((uint32_t)g_rom[off + 1] << 8) |
+               ((uint32_t)g_rom[off + 2] << 16) |
+               ((uint32_t)g_rom[off + 3] << 24);
+    }
+    default:
+        return 0;
+    }
 }
 
-static int32_t iwram_read_i32(uint32_t addr) {
-    return (int32_t)iwram_read32(addr);
+static int32_t mem_read_i32(uint32_t addr) {
+    return (int32_t)mem_read32(addr);
 }
 
-static uint32_t rom_read32(uint32_t addr) {
-    uint32_t off = addr - 0x08000000u;
-    return (uint32_t)g_rom[off] |
-           ((uint32_t)g_rom[off + 1] << 8) |
-           ((uint32_t)g_rom[off + 2] << 16) |
-           ((uint32_t)g_rom[off + 3] << 24);
-}
+// Backwards-compat wrappers used by the rest of the runner.
+static uint32_t iwram_read32(uint32_t addr)   { return mem_read32(addr); }
+static int32_t  iwram_read_i32(uint32_t addr) { return mem_read_i32(addr); }
+static uint32_t rom_read32(uint32_t addr)     { return mem_read32(addr); }
 
 // ---- Suite table -----------------------------------------------------------
 //
@@ -224,6 +250,100 @@ static int32_t active_test_id() {
     return iwram_read_i32(g_active_info_addr + 8);
 }
 
+// ---- Video-suite driver ----------------------------------------------------
+//
+// The video suite has no `run()` callback — each test is inherently visual:
+// `expected(refresh)` manually paints an image into VRAM, `actual(refresh)`
+// asks the GBA graphics hardware to paint the same thing, and the human user
+// is supposed to toggle between the two via A/LEFT/RIGHT and compare them by
+// eye. To produce a PASS/FAIL automatically we:
+//
+//   1. Enter the video suite (the runSuite viewer for it).
+//   2. For each of the 7 tests:
+//      a. Press A to enter that test's show() loop (renders "actual" first).
+//      b. Let the renderer run a few frames and snapshot g_pix → `actual`.
+//      c. Press A to toggle to "expected", snapshot → `expected`.
+//      d. Press B to exit show().
+//      e. Press DOWN to advance to the next test in the viewer.
+//   3. Compare actual vs expected per test; count differing pixels.
+//
+// `passes` is the number of tests where every pixel matched exactly.
+
+static constexpr int kGbaPixW = 240;
+static constexpr int kGbaPixH = 160;
+static constexpr size_t kFrameBytes = 4 * kGbaPixW * kGbaPixH;
+
+static void copy_framebuffer(uint8_t* dst) {
+    // g_pix stride is 4 bytes per pixel; copy the visible 240×160 region.
+    // The pix buffer VBA-M allocates has +1 col/row of padding on some
+    // builds, so step by the native visible row size.
+    if (!g_pix) {
+        std::memset(dst, 0, kFrameBytes);
+        return;
+    }
+    std::memcpy(dst, g_pix, kFrameBytes);
+}
+
+static bool frame_equal(const uint8_t* a, const uint8_t* b) {
+    return std::memcmp(a, b, kFrameBytes) == 0;
+}
+
+struct VideoStats {
+    uint32_t passes = 0;
+    uint32_t total  = 0;
+};
+
+static VideoStats drive_video_suite(int n_tests) {
+    VideoStats s;
+    s.total = (uint32_t)n_tests;
+
+    // At this point we're in the main menu with "video" selected; the press
+    // of A happens in the outer loop just before this helper runs. When we
+    // return the caller also does a press-B to exit to main menu.
+    std::vector<uint8_t> actual(kFrameBytes, 0);
+    std::vector<uint8_t> expected(kFrameBytes, 0);
+
+    for (int t = 0; t < n_tests; ++t) {
+        fprintf(stderr, "    video[%d/%d]...", t + 1, n_tests);
+
+        // Enter this test's show() — renders the "actual" image first.
+        press_button(KEY_A, 8);
+        run_frames(30, 0); // let the renderer settle
+
+        copy_framebuffer(actual.data());
+
+        // Toggle to the "expected" (software-drawn reference) image. The
+        // show() loop uses A or RIGHT for that transition.
+        press_button(KEY_A, 8);
+        run_frames(30, 0);
+
+        copy_framebuffer(expected.data());
+
+        bool pass = frame_equal(actual.data(), expected.data());
+        if (pass) {
+            ++s.passes;
+            fprintf(stderr, " PASS\n");
+        } else {
+            // Count how many pixels differ, for the log.
+            size_t diff = 0;
+            for (size_t k = 0; k < kFrameBytes; k += 4) {
+                if (actual[k] != expected[k] || actual[k+1] != expected[k+1] ||
+                    actual[k+2] != expected[k+2] || actual[k+3] != expected[k+3])
+                    ++diff;
+            }
+            fprintf(stderr, " FAIL (%zu pixels differ)\n", diff);
+        }
+
+        // Exit show() back to the viewer.
+        press_button(KEY_B, 8);
+        // Advance to next test in the viewer (UP/DOWN cycles testIndex).
+        if (t + 1 < n_tests) {
+            press_button(KEY_DOWN, 6);
+        }
+    }
+    return s;
+}
+
 // ---- SRAM log dump ---------------------------------------------------------
 
 static void dump_sram_log(FILE* out) {
@@ -303,6 +423,12 @@ int main(int argc, char** argv) {
                 counters[i].n_tests);
     }
 
+    // Per-suite (passes, total) overrides used for suites whose counters
+    // don't live in IWRAM (video) — we compute them via pixel comparison.
+    uint32_t override_passes[kNumSuites] = {0};
+    uint32_t override_total [kNumSuites] = {0};
+    bool     have_override  [kNumSuites] = {false};
+
     // Drive the test UI: press A to enter each suite, wait for completion,
     // press B to return, press DOWN to advance selection.
     for (int i = 0; i < kNumSuites; ++i) {
@@ -310,6 +436,23 @@ int main(int argc, char** argv) {
                 i + 1, kNumSuites, kSuites[i].name);
 
         press_button(KEY_A, 8);
+
+        // The video suite has `run == NULL` — its counters point into ROM
+        // at `constZero`, so we can't poll them. Drive it specially by
+        // iterating each test's show() loop and pixel-comparing.
+        const bool is_video = (counters[i].passes_addr >> 24) != 0x03;
+        if (is_video) {
+            VideoStats vs = drive_video_suite((int)counters[i].n_tests);
+            override_passes[i] = vs.passes;
+            override_total[i]  = vs.total;
+            have_override[i]   = true;
+            fprintf(stderr, "    %s: %u / %u\n",
+                    kSuites[i].name, vs.passes, vs.total);
+            // Exit the suite viewer back to main menu.
+            press_button(KEY_B, 8);
+            if (i + 1 < kNumSuites) press_button(KEY_DOWN, 6);
+            continue;
+        }
 
         // Wait for suite->run() to start (activeTestInfo.suiteId becomes >= 0
         // once runSuite() executes).
@@ -351,8 +494,14 @@ int main(int argc, char** argv) {
     puts("\n================ suite.gba results ================");
     uint32_t grand_pass = 0, grand_total = 0;
     for (int i = 0; i < kNumSuites; ++i) {
-        uint32_t p = iwram_read32(counters[i].passes_addr);
-        uint32_t t = iwram_read32(counters[i].total_addr);
+        uint32_t p, t;
+        if (have_override[i]) {
+            p = override_passes[i];
+            t = override_total[i];
+        } else {
+            p = iwram_read32(counters[i].passes_addr);
+            t = iwram_read32(counters[i].total_addr);
+        }
         grand_pass += p;
         grand_total += t;
         printf("  %-14s  %5u / %-5u  (%s)\n",
@@ -361,6 +510,7 @@ int main(int argc, char** argv) {
     }
     printf("  %-14s  %5u / %-5u\n", "TOTAL", grand_pass, grand_total);
     puts("===================================================\n");
+    fflush(stdout);
 
     // Dump the suite's own SRAM log.
     dump_sram_log(stdout);
