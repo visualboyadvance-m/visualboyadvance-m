@@ -346,14 +346,21 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             case IO_REG_SOUND4CNT_H: value &= 0x40FF; break;
             }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
+                // Live timer-counter read: TM0D_now = TM0D_atDispatch + elapsed.
+                // Since timer0Ticks = (0x10000 - TM0D_atDispatch) << prescale,
+                // and elapsed = cpuTotalTicks >> prescale, the derivation gives
+                // value = 0x10000 - ((timer0Ticks - cpuTotalTicks) >> prescale),
+                // truncated to 16 bits. The previous formula used 0xFFFF which
+                // underflows at cpuTotalTicks=0 (fresh reload) — producing
+                // 0xFFFFFFFF instead of 0.
                 if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On)
-                    value = 0xFFFF - ((timer0Ticks - cpuTotalTicks) >> timer0ClockReload);
+                    value = (uint16_t)(0x10000u - ((timer0Ticks - cpuTotalTicks) >> timer0ClockReload));
                 else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
-                    value = 0xFFFF - ((timer1Ticks - cpuTotalTicks) >> timer1ClockReload);
+                    value = (uint16_t)(0x10000u - ((timer1Ticks - cpuTotalTicks) >> timer1ClockReload));
                 else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
-                    value = 0xFFFF - ((timer2Ticks - cpuTotalTicks) >> timer2ClockReload);
+                    value = (uint16_t)(0x10000u - ((timer2Ticks - cpuTotalTicks) >> timer2ClockReload));
                 else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
-                    value = 0xFFFF - ((timer3Ticks - cpuTotalTicks) >> timer3ClockReload);
+                    value = (uint16_t)(0x10000u - ((timer3Ticks - cpuTotalTicks) >> timer3ClockReload));
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
             value = 0;
