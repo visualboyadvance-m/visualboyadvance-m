@@ -216,20 +216,12 @@ void mode5RenderLineAll()
     if (coreOptions.layerEnable & 0x2000) {
         uint8_t v0 = WIN0V >> 8;
         uint8_t v1 = WIN0V & 255;
-        inWindow0 = ((v0 == v1) && (v0 >= 0xe8));
-        if (v1 >= v0)
-            inWindow0 |= (VCOUNT >= v0 && VCOUNT < v1);
-        else
-            inWindow0 |= (VCOUNT >= v0 || VCOUNT < v1);
+        inWindow0 = ((v0 == v1) && (v0 >= 0xe8)) || winYActive0;
     }
     if (coreOptions.layerEnable & 0x4000) {
         uint8_t v0 = WIN1V >> 8;
         uint8_t v1 = WIN1V & 255;
-        inWindow1 = ((v0 == v1) && (v0 >= 0xe8));
-        if (v1 >= v0)
-            inWindow1 |= (VCOUNT >= v0 && VCOUNT < v1);
-        else
-            inWindow1 |= (VCOUNT >= v0 || VCOUNT < v1);
+        inWindow1 = ((v0 == v1) && (v0 >= 0xe8)) || winYActive1;
     }
 
     uint8_t inWin0Mask = WININ & 0xFF;

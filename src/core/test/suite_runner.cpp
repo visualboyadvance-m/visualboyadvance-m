@@ -265,12 +265,10 @@ static int32_t active_suite_id() {
     return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 7);
 }
 
-#if 0
 static int32_t active_test_id() {
     if (!g_active_info_addr) return -2;
     return (int32_t)(int8_t)iwram_read_u8(g_active_info_addr + 6);
 }
-#endif
 
 // ---- Video-suite driver ----------------------------------------------------
 //
@@ -301,6 +299,21 @@ static constexpr size_t kFrameBytes = 4 * kGbaPixW * kGbaPixH;
 // pixel compare by only considering rows 0..kLabelTopY-1.
 static constexpr int kLabelTopY = 148;
 static constexpr size_t kCompareBytes = 4 * kGbaPixW * kLabelTopY;
+
+// Write a 240x160 framebuffer as a PPM file for inspection. Only used when
+// VIDEO_DUMP_DIR env var is set.
+static void dump_frame_ppm(const uint8_t* px, const char* path) {
+    FILE* f = fopen(path, "wb");
+    if (!f) return;
+    fprintf(f, "P6\n%d %d\n255\n", kGbaPixW, kGbaPixH);
+    for (int y = 0; y < kGbaPixH; ++y) {
+        for (int x = 0; x < kGbaPixW; ++x) {
+            const uint8_t* p = px + 4 * (y * kGbaPixW + x);
+            fputc(p[0], f); fputc(p[1], f); fputc(p[2], f);
+        }
+    }
+    fclose(f);
+}
 
 static void copy_framebuffer(uint8_t* dst) {
     // VBA-M's 32-bit-depth g_pix layout (non-libretro build) is a 241×162
@@ -358,7 +371,11 @@ static VideoStats drive_video_suite(int n_tests) {
     std::vector<uint8_t> actual(kFrameBytes, 0);
     std::vector<uint8_t> expected(kFrameBytes, 0);
 
+    const bool trace = getenv("VIDEO_NAV_TRACE") != nullptr;
+
     for (int t = 0; t < n_tests; ++t) {
+        if (trace) fprintf(stderr, "[t=%d] entry suiteId=%d testId=%d\n",
+                           t, active_suite_id(), active_test_id());
         // Force-exit whatever we're in until suiteId reads back as -1
         // (main-menu state). Pressing B from the main menu is a no-op, so
         // looping up to 4 times is safe and deterministic.
@@ -366,17 +383,23 @@ static VideoStats drive_video_suite(int n_tests) {
             if (active_suite_id() < 0) break;
             press_button(KEY_B, 2);
             run_frames(10, 0);
+            if (trace) fprintf(stderr, "  B#%d suiteId=%d testId=%d\n",
+                               k, active_suite_id(), active_test_id());
         }
 
         // Enter the video suite (already selected from outer loop nav).
         press_button(KEY_A, 2);
         run_frames(20, 0);
+        if (trace) fprintf(stderr, "  after A(enter suite) suiteId=%d testId=%d\n",
+                           active_suite_id(), active_test_id());
 
         // Advance the viewer's testIndex to `t` by pressing DOWN t times.
         for (int k = 0; k < t; ++k) {
             press_button(KEY_DOWN, 2);
             run_frames(10, 0);
         }
+        if (trace) fprintf(stderr, "  after DOWN*%d suiteId=%d testId=%d\n",
+                           t, active_suite_id(), active_test_id());
 
         fprintf(stderr, "    video[%d/%d] (suiteId=%d)...",
                 t + 1, n_tests, active_suite_id());
@@ -384,14 +407,26 @@ static VideoStats drive_video_suite(int n_tests) {
         // Enter this test's show() — renders the "actual" image first.
         press_button(KEY_A, 2);
         run_frames(30, 0);
+        if (trace) fprintf(stderr, "\n  after A(enter show) suiteId=%d testId=%d\n",
+                           active_suite_id(), active_test_id());
 
         copy_framebuffer(actual.data());
+        if (const char* d = getenv("VIDEO_DUMP_DIR")) {
+            char p[512]; snprintf(p, sizeof(p), "%s/v%d_actual.ppm", d, t + 1);
+            dump_frame_ppm(actual.data(), p);
+        }
 
         // Toggle to the "expected" (software-drawn reference) image.
         press_button(KEY_A, 2);
         run_frames(30, 0);
+        if (trace) fprintf(stderr, "  after A(toggle) suiteId=%d testId=%d\n",
+                           active_suite_id(), active_test_id());
 
         copy_framebuffer(expected.data());
+        if (const char* d = getenv("VIDEO_DUMP_DIR")) {
+            char p[512]; snprintf(p, sizeof(p), "%s/v%d_expected.ppm", d, t + 1);
+            dump_frame_ppm(expected.data(), p);
+        }
 
         uint64_t ha = frame_hash(actual.data());
         uint64_t he = frame_hash(expected.data());

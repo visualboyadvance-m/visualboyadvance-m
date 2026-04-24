@@ -61,6 +61,8 @@ extern uint8_t* g_ioMem;
 extern uint16_t DISPCNT;
 extern uint16_t DISPSTAT;
 extern uint16_t VCOUNT;
+extern bool winYActive0;
+extern bool winYActive1;
 extern uint16_t BG0CNT;
 extern uint16_t BG1CNT;
 extern uint16_t BG2CNT;
