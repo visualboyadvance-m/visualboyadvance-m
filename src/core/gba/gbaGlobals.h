@@ -56,6 +56,11 @@ extern uint8_t* g_paletteRAM;
 extern uint8_t* g_vram;
 extern uint8_t* g_pix;
 extern uint8_t* g_oam;
+// OAM snapshot used by the sprite renderer. Refreshed at the start of each
+// scanline's HBlank so that CPU writes to OAM during HBlank (e.g. via VCOUNT
+// or HBlank IRQ handlers) only become visible to the renderer on the
+// scanline AFTER the next one — matching real-HW sprite-prefetch behavior.
+extern uint8_t* g_oamShadow;
 extern uint8_t* g_ioMem;
 
 extern uint16_t DISPCNT;

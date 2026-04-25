@@ -786,7 +786,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
     int m = 0;
     gfxClearArray(lineOBJ);
     if (coreOptions.layerEnable & 0x1000) {
-        uint16_t* sprites = (uint16_t*)g_oam;
+        uint16_t* sprites = (uint16_t*)g_oamShadow;
         uint16_t* spritePalette = &((uint16_t*)g_paletteRAM)[256];
         int mosaicY = ((MOSAIC & 0xF000) >> 12) + 1;
         int mosaicX = ((MOSAIC & 0xF00) >> 8) + 1;
@@ -795,9 +795,6 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
             uint16_t a1 = READ16LE(sprites++);
             uint16_t a2 = READ16LE(sprites++);
             sprites++;
-            if (getenv("SPRITE_TRACE") && VCOUNT == 63 && x == 1 && a0 != 0)
-                fprintf(stderr, "VCOUNT=%u OAM[1] a0=%04x a1=%04x a2=%04x sx=%d\n",
-                        VCOUNT, a0, a1, a2, a1 & 0x1FF);
 
             lineOBJpixleft[x] = lineOBJpix;
 
@@ -886,7 +883,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
                             lineOBJpix -= 8;
                             // int t2 = t - (fieldY >> 1);
                             int rot = (a1 >> 9) & 0x1F;
-                            uint16_t* OAM = (uint16_t*)g_oam;
+                            uint16_t* OAM = (uint16_t*)g_oamShadow;
                             int dx = READ16LE(&OAM[3 + (rot << 4)]);
                             if (dx & 0x8000)
                                 dx |= 0xFFFF8000;
@@ -1306,7 +1303,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
 {
     gfxClearArray(lineOBJWin);
     if ((coreOptions.layerEnable & 0x9000) == 0x9000) {
-        uint16_t* sprites = (uint16_t*)g_oam;
+        uint16_t* sprites = (uint16_t*)g_oamShadow;
         // uint16_t *spritePalette = &((uint16_t *)g_paletteRAM)[256];
         for (int x = 0; x < 128; x++) {
             int lineOBJpix = lineOBJpixleft[x];
@@ -1367,7 +1364,7 @@ static inline void gfxDrawOBJWin(uint32_t* lineOBJWin)
                         lineOBJpix -= 8;
                         // int t2 = t - (fieldY >> 1);
                         int rot = (a1 >> 9) & 0x1F;
-                        uint16_t* OAM = (uint16_t*)g_oam;
+                        uint16_t* OAM = (uint16_t*)g_oamShadow;
                         int dx = READ16LE(&OAM[3 + (rot << 4)]);
                         if (dx & 0x8000)
                             dx |= 0xFFFF8000;

@@ -37,6 +37,7 @@ uint8_t* g_paletteRAM = 0;
 uint8_t* g_vram = 0;
 uint8_t* g_pix = 0;
 uint8_t* g_oam = 0;
+uint8_t* g_oamShadow = 0;
 uint8_t* g_ioMem = 0;
 
 uint16_t DISPCNT = 0x0080;

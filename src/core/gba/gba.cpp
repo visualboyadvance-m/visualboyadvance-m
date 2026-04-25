@@ -1696,6 +1696,11 @@ void CPUCleanUp()
         g_oam = NULL;
     }
 
+    if (g_oamShadow != NULL) {
+        free(g_oamShadow);
+        g_oamShadow = NULL;
+    }
+
     if (g_ioMem != NULL) {
         free(g_ioMem);
         g_ioMem = NULL;
@@ -1958,6 +1963,13 @@ int CPULoadRom(const char* szFile)
         CPUCleanUp();
         return 0;
     }
+    g_oamShadow = (uint8_t*)calloc(1, SIZE_OAM);
+    if (g_oamShadow == NULL) {
+        systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+            "OAM shadow");
+        CPUCleanUp();
+        return 0;
+    }
 
     g_pix = (uint8_t*)calloc(1, 4 * 241 * 162);
     if (g_pix == NULL) {
@@ -2064,6 +2076,13 @@ int CPULoadRomData(const char* data, int size)
     if (g_oam == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "OAM");
+        CPUCleanUp();
+        return 0;
+    }
+    g_oamShadow = (uint8_t*)calloc(1, SIZE_OAM);
+    if (g_oamShadow == NULL) {
+        systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
+            "OAM shadow");
         CPUCleanUp();
         return 0;
     }
@@ -4612,6 +4631,15 @@ void CPULoop(int ticks)
                             }
                         }
                         // entering H-Blank
+                        // Snapshot OAM into the shadow used by the next
+                        // scanline's sprite renderer. Real HW pre-fetches
+                        // sprite data here, BEFORE any HBlank/VCount IRQ
+                        // handler can write OAM — so writes during this
+                        // HBlank only become visible on the scanline AFTER
+                        // the next one. (mgba "OAM Update Delay" test.)
+                        if (g_oamShadow && g_oam) {
+                            std::memcpy(g_oamShadow, g_oam, SIZE_OAM);
+                        }
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         lcdTicks += 224;
