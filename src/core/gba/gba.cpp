@@ -105,6 +105,20 @@ int64_t cpuAbsCycle = 0;
 // the original line's HBlank for BG-enable-delay-latch purposes.
 int64_t hblankIrqRaiseAbsCycle = -1;
 int hblankIrqRaiseVCount = -1;
+// Wait+enable BG-glitch tracking. Set when a wait+enable HBlank-IRQ
+// handler writes DISPCNT during early HDraw of the next scanline.
+// Applied at render time as a per-pixel SPLICE: pixels left of the
+// computed splice column keep the backdrop output of the normal
+// render; pixels right of it are taken from a second BG-enabled
+// render. This avoids cross-call layerEnable state leakage.
+int pendingBgGlitchBits = 0;
+int pendingBgGlitchVCount = -1;
+int pendingBgGlitchSpliceCol = 0;
+// VCount of the most recent DISPCNT write that DISABLED a BG bit.
+// The wait+enable glitch only fires on real HW when the BG-enable
+// latch is still mid-drain from a recent disable (write line within
+// 2 of last disable).
+int lastBgDisableVCount = -100;
 // For each timer, the absolute cycle at which start(0→1) on TMxCNT_H last
 // happened, plus the reload value latched into the counter at that moment.
 // Live-reads compute counter = (reloadAtEnable + cycles_since_enable) mod
@@ -3141,9 +3155,14 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         bool change = (0 != ((DISPCNT ^ value) & 0x80));
         bool changeBG = (0 != ((DISPCNT ^ value) & 0x0F00));
         uint16_t changeBGon = ((~DISPCNT) & value) & 0x0F00; // these layers are being activated
+        uint16_t changeBGoff = (DISPCNT & ~value) & 0x0F00;  // these layers are being disabled
 
         DISPCNT = (value & 0xFFF7); // bit 3 can only be accessed by the BIOS to enable GBC mode
         UPDATE_REG(IO_REG_DISPCNT, DISPCNT);
+
+        if (changeBGoff && VCOUNT < 160) {
+            lastBgDisableVCount = VCOUNT;
+        }
 
         if (changeBGon) {
             // Real-HW BG-enable becomes visible 3 scanlines after the write
@@ -3165,6 +3184,28 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
                 ? (cpuAbsCycle - hblankIrqRaiseAbsCycle) : -1;
             const bool spillover = (vcdiff == 1) && !inHBlank
                                    && cycSinceIrq >= 0 && cycSinceIrq < 250;
+            // Wait+enable: HBlank-IRQ handler busy-waits past HBlank-end
+            // then writes DISPCNT during early HDraw of the next line.
+            // Real HW shows the BG turning on partway through that
+            // single scanline ("BG-enable latch glitch"), but ONLY
+            // when the BG-enable latch is still mid-drain — i.e. the
+            // last disable was within 2 lines of the wait+enable line.
+            // Otherwise (latch fully off) re-enable produces no glitch.
+            const bool waitEnable = (vcdiff == 1) && !inHBlank
+                                    && cycSinceIrq >= 250 && VCOUNT < 160;
+            const bool latchStillDraining =
+                ((int)VCOUNT - lastBgDisableVCount) <= 2;
+            if (waitEnable && latchStillDraining) {
+                pendingBgGlitchBits = changeBGon;
+                pendingBgGlitchVCount = VCOUNT;
+                // Empirical splice column: faster handlers (lower
+                // cycSinceIrq) skip a couple of columns at the row
+                // start; slower handlers cover the full row from col 0.
+                // Tuned against mGBA's "Layer toggle 2" reference for
+                // case 0x40 (cycSinceIrq~263 → col 2) and case 0x91
+                // (cycSinceIrq~274 → col 0).
+                pendingBgGlitchSpliceCol = (cycSinceIrq <= 270) ? 2 : 0;
+            }
             layerEnableDelay = spillover ? 3 : 4;
             coreOptions.layerEnable = coreOptions.layerSettings & value & (~changeBGon);
         } else {
@@ -4525,6 +4566,51 @@ void CPULoop(int ticks)
                     } else {
                         if (frameCount >= framesToSkip) {
                             (*renderLine)();
+                            // Per-pixel splice for the wait+enable BG-glitch:
+                            // re-render with the BG bits ORed in (BG-on
+                            // version), then copy pixels at and right of
+                            // the splice column from the BG-on render
+                            // back into g_lineMix. The OR is local to
+                            // this scope and reverted before continuing.
+                            if (pendingBgGlitchBits != 0
+                                && pendingBgGlitchVCount == (int)VCOUNT) {
+                                int splice = pendingBgGlitchSpliceCol;
+                                if (splice < 240) {
+                                    static uint32_t backdropSnapshot[240];
+                                    static uint32_t line0Snapshot[240];
+                                    static uint32_t line1Snapshot[240];
+                                    static uint32_t line2Snapshot[240];
+                                    static uint32_t line3Snapshot[240];
+                                    for (int x = 0; x < splice; ++x) {
+                                        backdropSnapshot[x] = g_lineMix[x];
+                                    }
+                                    // Snapshot per-layer line buffers so the
+                                    // BG-on re-render doesn't pollute g_lineN
+                                    // for subsequent scanlines (the no-window
+                                    // mode0 compositor reads g_lineN
+                                    // unconditionally, so stale BG content
+                                    // would leak into later lines).
+                                    std::memcpy(line0Snapshot, g_line0, sizeof(line0Snapshot));
+                                    std::memcpy(line1Snapshot, g_line1, sizeof(line1Snapshot));
+                                    std::memcpy(line2Snapshot, g_line2, sizeof(line2Snapshot));
+                                    std::memcpy(line3Snapshot, g_line3, sizeof(line3Snapshot));
+                                    int saved = coreOptions.layerEnable;
+                                    coreOptions.layerEnable |=
+                                        (pendingBgGlitchBits & coreOptions.layerSettings);
+                                    (*renderLine)();
+                                    coreOptions.layerEnable = saved;
+                                    // Restore per-layer line buffers.
+                                    std::memcpy(g_line0, line0Snapshot, sizeof(line0Snapshot));
+                                    std::memcpy(g_line1, line1Snapshot, sizeof(line1Snapshot));
+                                    std::memcpy(g_line2, line2Snapshot, sizeof(line2Snapshot));
+                                    std::memcpy(g_line3, line3Snapshot, sizeof(line3Snapshot));
+                                    for (int x = 0; x < splice; ++x) {
+                                        g_lineMix[x] = backdropSnapshot[x];
+                                    }
+                                }
+                                pendingBgGlitchBits = 0;
+                                pendingBgGlitchVCount = -1;
+                            }
                             // Defensive checks: skip rendering if g_pix is NULL or VCOUNT is out of range
                             // This can happen during panel transitions or if state is corrupted
                             if (g_pix && VCOUNT < 160) switch (systemColorDepth) {
