@@ -1607,8 +1607,12 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     WRITEBACK1;                                                                  \
     STORE_DATA;                                                                  \
     WRITEBACK2;                                                                  \
-    clockTicks = 2 + dataTicksAccess##SIZE(address)                              \
-        + codeTicksAccess32(armNextPC);
+    {                                                                            \
+        bool _strPrefetchActive = busPrefetch;                                   \
+        clockTicks = 2 + dataTicksAccess##SIZE(address)                          \
+            + codeTicksAccess32(armNextPC);                                      \
+        if (_strPrefetchActive) clockTicks += 1;                                 \
+    }
 #define LDR(CALC_OFFSET, CALC_ADDRESS, LOAD_DATA, WRITEBACK, SIZE) \
     LDRSTR_INIT(CALC_OFFSET, CALC_ADDRESS);                        \
     LOAD_DATA;                                                     \
