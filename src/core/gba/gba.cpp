@@ -4577,19 +4577,19 @@ void CPULoop(int ticks)
                                 int splice = pendingBgGlitchSpliceCol;
                                 if (splice < 240) {
                                     static uint32_t backdropSnapshot[240];
+                                    static uint32_t prevLineRender[240];
                                     static uint32_t line0Snapshot[240];
                                     static uint32_t line1Snapshot[240];
                                     static uint32_t line2Snapshot[240];
                                     static uint32_t line3Snapshot[240];
+                                    // Snapshot backdrop pixels and per-layer
+                                    // line buffers (the no-window mode0
+                                    // compositor reads g_lineN
+                                    // unconditionally so stale BG would
+                                    // leak across scanlines).
                                     for (int x = 0; x < splice; ++x) {
                                         backdropSnapshot[x] = g_lineMix[x];
                                     }
-                                    // Snapshot per-layer line buffers so the
-                                    // BG-on re-render doesn't pollute g_lineN
-                                    // for subsequent scanlines (the no-window
-                                    // mode0 compositor reads g_lineN
-                                    // unconditionally, so stale BG content
-                                    // would leak into later lines).
                                     std::memcpy(line0Snapshot, g_line0, sizeof(line0Snapshot));
                                     std::memcpy(line1Snapshot, g_line1, sizeof(line1Snapshot));
                                     std::memcpy(line2Snapshot, g_line2, sizeof(line2Snapshot));
@@ -4597,15 +4597,41 @@ void CPULoop(int ticks)
                                     int saved = coreOptions.layerEnable;
                                     coreOptions.layerEnable |=
                                         (pendingBgGlitchBits & coreOptions.layerSettings);
+                                    // First render at VCOUNT-1: real HW uses
+                                    // the PREVIOUS line's prefetched tile
+                                    // data for the first incomplete tile of
+                                    // the wait+enable scanline.
+                                    uint16_t savedVCount = VCOUNT;
+                                    VCOUNT = (savedVCount > 0) ? (savedVCount - 1) : 0;
+                                    (*renderLine)();
+                                    std::memcpy(prevLineRender, g_lineMix, sizeof(prevLineRender));
+                                    // Second render at the actual VCOUNT:
+                                    // subsequent tiles after the first one
+                                    // use this scanline's tile data.
+                                    VCOUNT = savedVCount;
                                     (*renderLine)();
                                     coreOptions.layerEnable = saved;
-                                    // Restore per-layer line buffers.
+                                    // Restore per-layer line buffers so
+                                    // stale BG doesn't leak to next lines.
                                     std::memcpy(g_line0, line0Snapshot, sizeof(line0Snapshot));
                                     std::memcpy(g_line1, line1Snapshot, sizeof(line1Snapshot));
                                     std::memcpy(g_line2, line2Snapshot, sizeof(line2Snapshot));
                                     std::memcpy(g_line3, line3Snapshot, sizeof(line3Snapshot));
+                                    // Restore backdrop pixels left of splice
+                                    // and copy "previous line" tile data
+                                    // for cols [splice, 8) (the first
+                                    // partial tile). g_lineMix already has
+                                    // current-line content for cols 8+.
                                     for (int x = 0; x < splice; ++x) {
                                         g_lineMix[x] = backdropSnapshot[x];
+                                    }
+                                    // Real-HW BG fetch when re-enabled mid-
+                                    // row starts at PIXEL 0 of the tile at
+                                    // the splice column, so prev-line data
+                                    // copied into [splice, 8) is taken from
+                                    // prevLineRender[0..(7-splice)].
+                                    for (int x = splice; x < 8 && x < 240; ++x) {
+                                        g_lineMix[x] = prevLineRender[x - splice];
                                     }
                                 }
                                 pendingBgGlitchBits = 0;
