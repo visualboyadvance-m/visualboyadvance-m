@@ -795,6 +795,9 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
             uint16_t a1 = READ16LE(sprites++);
             uint16_t a2 = READ16LE(sprites++);
             sprites++;
+            if (getenv("SPRITE_TRACE") && VCOUNT == 63 && x == 1 && a0 != 0)
+                fprintf(stderr, "VCOUNT=%u OAM[1] a0=%04x a1=%04x a2=%04x sx=%d\n",
+                        VCOUNT, a0, a1, a2, a1 & 0x1FF);
 
             lineOBJpixleft[x] = lineOBJpix;
 
