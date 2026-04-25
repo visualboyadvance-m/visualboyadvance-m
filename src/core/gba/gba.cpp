@@ -97,6 +97,14 @@ int cpuTotalTicks = 0;
 // cycles between a "force-dispatch" TMxCNT_H write and the subsequent
 // live read aren't lost. Updated wherever cpuTotalTicks is.
 int64_t cpuAbsCycle = 0;
+// Absolute cycle at the start of the most recent HBlank-IRQ flag raise
+// (i.e. when DISPSTAT bit 1 was set during a scanline). Used by the
+// DISPCNT write handler to detect "spillover" cases where the HBlank
+// IRQ handler ran past the end of HBlank into HDraw of the next line —
+// in that case the write should be treated as if it had happened during
+// the original line's HBlank for BG-enable-delay-latch purposes.
+int64_t hblankIrqRaiseAbsCycle = -1;
+int hblankIrqRaiseVCount = -1;
 // For each timer, the absolute cycle at which start(0→1) on TMxCNT_H last
 // happened, plus the reload value latched into the counter at that moment.
 // Live-reads compute counter = (reloadAtEnable + cycles_since_enable) mod
@@ -3138,7 +3146,26 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(IO_REG_DISPCNT, DISPCNT);
 
         if (changeBGon) {
-            layerEnableDelay = 4;
+            // Real-HW BG-enable becomes visible 3 scanlines after the write
+            // (delay=4 in our decrement-each-VCount model = visible at
+            // write_line+3). When the write happens during an HBlank-IRQ
+            // handler that started in HBlank of line N but spilled into
+            // early HDraw of line N+1 (so vcdiff==1 and cycSinceIrq is
+            // close to the HBlank-period length), real HW would have
+            // latched the write while still on line N — compensate by
+            // using delay=3 so visibility lands at N+3 instead of N+4.
+            // Wait+enable handlers (which busy-wait on the HBlank flag
+            // before writing) take longer post-IRQ-raise (~260+ cycles),
+            // so the threshold of 250 separates them from genuine
+            // spillover (~243 cycles).
+            const bool inHBlank = (DISPSTAT & 2) != 0;
+            const int vcdiff = (hblankIrqRaiseVCount >= 0)
+                ? (VCOUNT - hblankIrqRaiseVCount) : -1;
+            const int64_t cycSinceIrq = (hblankIrqRaiseAbsCycle >= 0)
+                ? (cpuAbsCycle - hblankIrqRaiseAbsCycle) : -1;
+            const bool spillover = (vcdiff == 1) && !inHBlank
+                                   && cycSinceIrq >= 0 && cycSinceIrq < 250;
+            layerEnableDelay = spillover ? 3 : 4;
             coreOptions.layerEnable = coreOptions.layerSettings & value & (~changeBGon);
         } else {
             coreOptions.layerEnable = coreOptions.layerSettings & value;
@@ -4390,6 +4417,8 @@ void CPULoop(int ticks)
                         if (DISPSTAT & 16) {
                             IF |= 2;
                             UPDATE_REG(IO_REG_IF, IF);
+                            hblankIrqRaiseAbsCycle = cpuAbsCycle;
+                            hblankIrqRaiseVCount = VCOUNT;
                         }
                     }
 
@@ -4647,6 +4676,8 @@ void CPULoop(int ticks)
                         if (DISPSTAT & 16) {
                             IF |= 2;
                             UPDATE_REG(IO_REG_IF, IF);
+                            hblankIrqRaiseAbsCycle = cpuAbsCycle;
+                            hblankIrqRaiseVCount = VCOUNT;
                         }
                         if (VCOUNT == 159) {
                             g_count++;
