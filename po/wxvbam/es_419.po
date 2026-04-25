@@ -20,6 +20,7 @@
 # Rene Moreira, 2025
 # Sebastián Castro Saldarriaga, 2023
 # Timoteo Traiber Minnaard, 2024
+# Uriel Sánchez, 2026
 # Yeferson Galviz, 2023
 # yocsan Cañderón <yecoyocsan@gmail.com>, 2021
 msgid ""
@@ -28,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-23 18:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: bryan rivera, 2026\n"
+"Last-Translator: Uriel Sánchez, 2026\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -312,7 +313,7 @@ msgstr "Filter: %s"
 #: cmdevents.cpp:2339 cmdevents.cpp:2356
 #, c-format
 msgid "Filter: Plugin (%s)"
-msgstr ""
+msgstr "Filtro: Plugin (1%s)"
 
 #: cmdevents.cpp:2376
 #, c-format
@@ -899,7 +900,7 @@ msgstr "Metal is unavailable, defaulting to OpenGL"
 
 #: panel.cpp:1904
 msgid "Vulkan is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Vulkan no esta disponible, desde ahora se usará OpenGL por defecto"
 
 #: panel.cpp:2043
 msgid "No memory for rewinding"
