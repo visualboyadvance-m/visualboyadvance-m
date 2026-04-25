@@ -1479,9 +1479,11 @@ static INSN_REGPARM void thumb98(uint32_t opcode)
     uint8_t regist = (opcode >> 8) & 7;
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
+    bool prefetchActive = busPrefetch;
     uint32_t address = reg[13].I + ((opcode & 255) << 2);
     reg[regist].I = CPUReadMemoryQuick(address);
     clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    if (prefetchActive) clockTicks -= 1;
 }
 
 // PC/stack-related ///////////////////////////////////////////////////////
