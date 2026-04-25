@@ -2001,39 +2001,49 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
 
 // STM/LDM ////////////////////////////////////////////////////////////////
 
-#define STM_REG(bit, num)                                    \
-    if (opcode & (1U << (bit))) {                            \
-        CPUWriteMemory(address, reg[(num)].I);               \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define STM_REG(bit, num)                                                  \
+    if (opcode & (1U << (bit))) {                                          \
+        uint32_t _stmAddr = address;                                       \
+        CPUWriteMemory(_stmAddr, reg[(num)].I);                            \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else if ((_stmAddr >> 24) != ((_stmAddr - 4) >> 24)) {           \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_stmAddr);              \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
-#define STMW_REG(bit, num)                                   \
-    if (opcode & (1U << (bit))) {                            \
-        CPUWriteMemory(address, reg[(num)].I);               \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        reg[base].I = temp;                                  \
-        count++;                                             \
-        address += 4;                                        \
+#define STMW_REG(bit, num)                                                 \
+    if (opcode & (1U << (bit))) {                                          \
+        uint32_t _stmAddr = address;                                       \
+        CPUWriteMemory(_stmAddr, reg[(num)].I);                            \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else if ((_stmAddr >> 24) != ((_stmAddr - 4) >> 24)) {           \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_stmAddr);              \
+        }                                                                  \
+        reg[base].I = temp;                                                \
+        count++;                                                           \
+        address += 4;                                                      \
     }
-#define LDM_REG(bit, num)                                    \
-    if (opcode & (1U << (bit))) {                            \
-        reg[(num)].I = CPUReadMemory(address);               \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define LDM_REG(bit, num)                                                  \
+    if (opcode & (1U << (bit))) {                                          \
+        uint32_t _ldmAddr = address;                                       \
+        reg[(num)].I = CPUReadMemory(_ldmAddr);                            \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
+        } else if ((_ldmAddr >> 24) != ((_ldmAddr - 4) >> 24)) {           \
+            /* crossing memory region: access becomes non-sequential */    \
+            clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_ldmAddr);              \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
 #define STM_LOW(STORE_REG) \
     STORE_REG(0, 0);       \
@@ -2073,26 +2083,32 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
         STORE_REG(13, 13);                    \
         STORE_REG(14, 14);                    \
     }
-#define STM_PC                                               \
-    if (opcode & (1U << 15)) {                               \
-        CPUWriteMemory(address, reg[15].I + 4);              \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
+#define STM_PC                                                             \
+    if (opcode & (1U << 15)) {                                             \
+        uint32_t _stmPCAddr = address;                                     \
+        CPUWriteMemory(_stmPCAddr, reg[15].I + 4);                         \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_stmPCAddr);               \
+        } else if ((_stmPCAddr >> 24) != ((_stmPCAddr - 4) >> 24)) {       \
+            clockTicks += 1 + dataTicksAccess32(_stmPCAddr);               \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_stmPCAddr);            \
+        }                                                                  \
+        count++;                                                           \
     }
-#define STMW_PC                                              \
-    if (opcode & (1U << 15)) {                               \
-        CPUWriteMemory(address, reg[15].I + 4);              \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        reg[base].I = temp;                                  \
-        count++;                                             \
+#define STMW_PC                                                            \
+    if (opcode & (1U << 15)) {                                             \
+        uint32_t _stmPCAddr = address;                                     \
+        CPUWriteMemory(_stmPCAddr, reg[15].I + 4);                         \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_stmPCAddr);               \
+        } else if ((_stmPCAddr >> 24) != ((_stmPCAddr - 4) >> 24)) {       \
+            clockTicks += 1 + dataTicksAccess32(_stmPCAddr);               \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_stmPCAddr);            \
+        }                                                                  \
+        reg[base].I = temp;                                                \
+        count++;                                                           \
     }
 #define LDM_LOW    \
     LDM_REG(0, 0); \
@@ -2140,23 +2156,26 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
     STM_LOW(STMW_REG);  \
     STM_HIGH(STMW_REG); \
     STMW_PC;
-#define LDM_ALL                                              \
-    LDM_LOW;                                                 \
-    LDM_HIGH;                                                \
-    if (opcode & (1U << 15)) {                               \
-        reg[15].I = CPUReadMemory(address);                  \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-    }                                                        \
-    if (opcode & (1U << 15)) {                               \
-        armNextPC = reg[15].I;                               \
-        reg[15].I += 4;                                      \
-        ARM_PREFETCH;                                        \
-        clockTicks += 1 + codeTicksAccessSeq32(armNextPC);   \
+#define LDM_ALL                                                            \
+    LDM_LOW;                                                               \
+    LDM_HIGH;                                                              \
+    if (opcode & (1U << 15)) {                                             \
+        uint32_t _ldmPCAddr = address;                                     \
+        reg[15].I = CPUReadMemory(_ldmPCAddr);                             \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
+        } else if ((_ldmPCAddr >> 24) != ((_ldmPCAddr - 4) >> 24)) {       \
+            clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_ldmPCAddr);            \
+        }                                                                  \
+        count++;                                                           \
+    }                                                                      \
+    if (opcode & (1U << 15)) {                                             \
+        armNextPC = reg[15].I;                                             \
+        reg[15].I += 4;                                                    \
+        ARM_PREFETCH;                                                      \
+        clockTicks += 1 + codeTicksAccessSeq32(armNextPC);                 \
     }
 #define STM_ALL_2        \
     STM_LOW(STM_REG);    \
@@ -2166,19 +2185,22 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
     STM_LOW(STMW_REG);    \
     STM_HIGH_2(STMW_REG); \
     STMW_PC;
-#define LDM_ALL_2                                            \
-    LDM_LOW;                                                 \
-    if (opcode & (1U << 15)) {                               \
-        LDM_HIGH;                                            \
-        reg[15].I = CPUReadMemory(address);                  \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-    } else {                                                 \
-        LDM_HIGH_2;                                          \
+#define LDM_ALL_2                                                          \
+    LDM_LOW;                                                               \
+    if (opcode & (1U << 15)) {                                             \
+        LDM_HIGH;                                                          \
+        uint32_t _ldmPCAddr = address;                                     \
+        reg[15].I = CPUReadMemory(_ldmPCAddr);                             \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
+        } else if ((_ldmPCAddr >> 24) != ((_ldmPCAddr - 4) >> 24)) {       \
+            clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_ldmPCAddr);            \
+        }                                                                  \
+        count++;                                                           \
+    } else {                                                               \
+        LDM_HIGH_2;                                                        \
     }
 #define LDM_ALL_2B                                         \
     if (opcode & (1U << 15)) {                             \

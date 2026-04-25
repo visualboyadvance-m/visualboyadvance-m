@@ -1517,28 +1517,34 @@ static INSN_REGPARM void thumbB0(uint32_t opcode)
 
 // Push and pop ///////////////////////////////////////////////////////////
 
-#define PUSH_REG(val, r)                                     \
-    if (opcode & (val)) {                                    \
-        CPUWriteMemory(address, reg[(r)].I);                 \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define PUSH_REG(val, r)                                                   \
+    if (opcode & (val)) {                                                  \
+        uint32_t _pushAddr = address;                                      \
+        CPUWriteMemory(_pushAddr, reg[(r)].I);                             \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_pushAddr);                \
+        } else if ((_pushAddr >> 24) != ((_pushAddr - 4) >> 24)) {         \
+            clockTicks += 1 + dataTicksAccess32(_pushAddr);                \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_pushAddr);             \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
 
-#define POP_REG(val, r)                                      \
-    if (opcode & (val)) {                                    \
-        reg[(r)].I = CPUReadMemory(address);                 \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define POP_REG(val, r)                                                    \
+    if (opcode & (val)) {                                                  \
+        uint32_t _popAddr = address;                                       \
+        reg[(r)].I = CPUReadMemory(_popAddr);                              \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_popAddr);                 \
+        } else if ((_popAddr >> 24) != ((_popAddr - 4) >> 24)) {           \
+            clockTicks += 1 + dataTicksAccess32(_popAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_popAddr);              \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
 
 // PUSH {Rlist}
@@ -1618,13 +1624,18 @@ static INSN_REGPARM void thumbBD(uint32_t opcode)
     POP_REG(32, 5);
     POP_REG(64, 6);
     POP_REG(128, 7);
-    reg[15].I = (CPUReadMemory(address) & 0xFFFFFFFE);
-    if (!count) {
-        clockTicks += 1 + dataTicksAccess32(address);
-    } else {
-        clockTicks += 1 + dataTicksAccessSeq32(address);
+    {
+        uint32_t _popPCAddr = address;
+        reg[15].I = (CPUReadMemory(_popPCAddr) & 0xFFFFFFFE);
+        if (!count) {
+            clockTicks += 1 + dataTicksAccess32(_popPCAddr);
+        } else if ((_popPCAddr >> 24) != ((_popPCAddr - 4) >> 24)) {
+            clockTicks += 1 + dataTicksAccess32(_popPCAddr);
+        } else {
+            clockTicks += 1 + dataTicksAccessSeq32(_popPCAddr);
+        }
+        count++;
     }
-    count++;
     armNextPC = reg[15].I;
     reg[15].I += 2;
     reg[13].I = temp;
@@ -1635,29 +1646,35 @@ static INSN_REGPARM void thumbBD(uint32_t opcode)
 
 // Load/store multiple ////////////////////////////////////////////////////
 
-#define THUMB_STM_REG(val, r, b)                             \
-    if (opcode & (val)) {                                    \
-        CPUWriteMemory(address, reg[(r)].I);                 \
-        reg[(b)].I = temp;                                   \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define THUMB_STM_REG(val, r, b)                                           \
+    if (opcode & (val)) {                                                  \
+        uint32_t _stmAddr = address;                                       \
+        CPUWriteMemory(_stmAddr, reg[(r)].I);                              \
+        reg[(b)].I = temp;                                                 \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else if ((_stmAddr >> 24) != ((_stmAddr - 4) >> 24)) {           \
+            clockTicks += 1 + dataTicksAccess32(_stmAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_stmAddr);              \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
 
-#define THUMB_LDM_REG(val, r)                                \
-    if (opcode & (val)) {                                    \
-        reg[(r)].I = CPUReadMemory(address);                 \
-        if (!count) {                                        \
-            clockTicks += 1 + dataTicksAccess32(address);    \
-        } else {                                             \
-            clockTicks += 1 + dataTicksAccessSeq32(address); \
-        }                                                    \
-        count++;                                             \
-        address += 4;                                        \
+#define THUMB_LDM_REG(val, r)                                              \
+    if (opcode & (val)) {                                                  \
+        uint32_t _ldmAddr = address;                                       \
+        reg[(r)].I = CPUReadMemory(_ldmAddr);                              \
+        if (!count) {                                                      \
+            clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
+        } else if ((_ldmAddr >> 24) != ((_ldmAddr - 4) >> 24)) {           \
+            clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
+        } else {                                                           \
+            clockTicks += 1 + dataTicksAccessSeq32(_ldmAddr);              \
+        }                                                                  \
+        count++;                                                           \
+        address += 4;                                                      \
     }
 
 // STM R0~7!, {Rlist}

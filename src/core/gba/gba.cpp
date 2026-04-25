@@ -5015,6 +5015,11 @@ void CPULoop(int ticks)
                 cpuDmaTicksToUpdate -= clockTicks;
                 if (cpuDmaTicksToUpdate < 0)
                     cpuDmaTicksToUpdate = 0;
+                // Advance the absolute cycle counter so live-read accessors
+                // (timers, etc.) see the DMA's elapsed time. Without this,
+                // a CPU read of a live timer right after a DMA returns the
+                // counter as if the DMA had taken zero time.
+                cpuAbsCycle += clockTicks;
                 goto updateLoop;
             }
 
