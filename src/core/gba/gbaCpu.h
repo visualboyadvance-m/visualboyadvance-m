@@ -176,7 +176,7 @@ inline int codeTicksAccess32(uint32_t address) // ARM NON SEQ
                 return 0;
             }
             busPrefetchCount = ((busPrefetchCount & 0xFF) >> 1) | (busPrefetchCount & 0xFFFFFF00);
-            return memoryWaitSeq32[addr] - 1; // NOTE: was memoryWaitSeq[]
+            return memoryWaitSeq32[addr] - 2; // NOTE: was memoryWaitSeq[]
         } else {
             busPrefetchCount = 0;
             return memoryWait32[addr];
