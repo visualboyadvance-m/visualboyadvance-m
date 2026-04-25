@@ -1148,7 +1148,8 @@ static INSN_REGPARM void thumb43_1(uint32_t opcode)
         clockTicks += 2;
     else
         clockTicks += 3;
-    busPrefetchCount = (busPrefetchCount << clockTicks) | (0xFF >> (8 - clockTicks));
+    if (busPrefetchEnable)
+        busPrefetchCount = (busPrefetchCount << clockTicks) | (0xFF >> (8 - clockTicks));
     clockTicks += codeTicksAccess16(armNextPC) + 1;
     Z_FLAG = reg[dest].I ? false : true;
     N_FLAG = reg[dest].I & 0x80000000 ? true : false;

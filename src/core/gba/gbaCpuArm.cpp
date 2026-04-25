@@ -1286,8 +1286,9 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
         clockTicks += 2;                                               \
     else                                                               \
         clockTicks += 3;                                               \
-    if (busPrefetchCount == 0)                                         \
-        busPrefetchCount = ((busPrefetchCount + 1) << clockTicks) - 1; \
+    if (busPrefetchEnable && busPrefetchCount == 0)                    \
+        busPrefetchCount = ((busPrefetchCount + 1)                     \
+            << (clockTicks + CYCLES - 1)) - 1;                         \
     clockTicks += CYCLES + 1 + codeTicksAccess32(armNextPC);
 
 #define OP_MUL \
