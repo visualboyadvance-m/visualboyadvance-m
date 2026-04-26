@@ -2998,6 +2998,10 @@ void CPUCheckDMA(int reason, int dmamask)
             if (!(DM0CNT_H & 0x0200) || (reason == 0)) {
                 DM0CNT_H &= 0x7FFF;
                 UPDATE_REG(IO_REG_DMA0CTL, DM0CNT_H);
+            } else {
+                // Repeat-mode auto-restart: reload count from the
+                // shadow (live MMIO register), per real hardware.
+                dma0Count = DM0CNT_L;
             }
         }
     }
@@ -3066,6 +3070,12 @@ void CPUCheckDMA(int reason, int dmamask)
             if (!(DM1CNT_H & 0x0200) || (reason == 0)) {
                 DM1CNT_H &= 0x7FFF;
                 UPDATE_REG(IO_REG_DMA1CTL, DM1CNT_H);
+            } else if (reason != 3) {
+                // Repeat-mode auto-restart: reload count from the
+                // shadow (live MMIO register), per real hardware.
+                // Skip for sound-FIFO DMAs (reason == 3) which use
+                // a fixed count of 4 regardless of CNT_L.
+                dma1Count = DM1CNT_L;
             }
         }
     }
@@ -3135,6 +3145,12 @@ void CPUCheckDMA(int reason, int dmamask)
             if (!(DM2CNT_H & 0x0200) || (reason == 0)) {
                 DM2CNT_H &= 0x7FFF;
                 UPDATE_REG(IO_REG_DMA2CTL, DM2CNT_H);
+            } else if (reason != 3) {
+                // Repeat-mode auto-restart: reload count from the
+                // shadow (live MMIO register), per real hardware.
+                // Skip for sound-FIFO DMAs (reason == 3) which use
+                // a fixed count of 4 regardless of CNT_L.
+                dma2Count = DM2CNT_L;
             }
         }
     }
@@ -3191,6 +3207,10 @@ void CPUCheckDMA(int reason, int dmamask)
             if (!(DM3CNT_H & 0x0200) || (reason == 0)) {
                 DM3CNT_H &= 0x7FFF;
                 UPDATE_REG(IO_REG_DMA3CTL, DM3CNT_H);
+            } else {
+                // Repeat-mode auto-restart: reload count from the
+                // shadow (live MMIO register), per real hardware.
+                dma3Count = DM3CNT_L;
             }
         }
     }
