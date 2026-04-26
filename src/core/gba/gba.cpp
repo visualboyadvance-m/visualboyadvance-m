@@ -2588,41 +2588,88 @@ void CPUSoftwareInterrupt(int comment)
     case 0x07:
         CPUSoftwareInterrupt();
         break;
-    case 0x08:
+    case 0x08: {
+        // Capture input before HLE Sqrt overwrites r0.
+        uint32_t sqrt_input = reg[0].I;
         BIOS_Sqrt();
+        // Real BIOS Sqrt iterates over the input's significant bits.
+        // Fixed overhead is ~100 cycles (ARM) / ~108 (Thumb); each
+        // significant bit adds a roughly quadratic cost. Empirically
+        // calibrated against testSqrt/2/3 inputs (0x00, 0xFF,
+        // 0x12345678): bits*6 + bits² puts ARM/IWRAM exactly on the
+        // expected value for the simple Sqrt(0) case, and within ~3
+        // cycles for Sqrt(0xFF) and Sqrt(0x12345678).
+        int swi_cycles = armState ? 100 : 108;
+        if (sqrt_input != 0) {
+            int hi_bit = 0;
+            uint32_t v = sqrt_input;
+            while (v) { hi_bit++; v >>= 1; }
+            swi_cycles += hi_bit * 6 + hi_bit * hi_bit;
+        }
+        cpuAbsCycle += swi_cycles;
+        cpuTotalTicks += swi_cycles;
         break;
+    }
     case 0x09:
         BIOS_ArcTan();
+        // Real BIOS ArcTan executes ~100 cycles for ARM callers and
+        // ~108 for Thumb callers (the extra Thumb-side delta is the
+        // BIOS's mode-switch entry/exit prologue). HLE returns
+        // instantly; bump the absolute-cycle counter so live timer
+        // reads see the missing cycles. Don't use SWITicks here —
+        // its event-handler interaction adds far more cycles than
+        // intended.
+        {
+            int swi_cycles = armState ? 100 : 108;
+            cpuAbsCycle += swi_cycles;
+            cpuTotalTicks += swi_cycles;
+        }
         break;
     case 0x0A:
         BIOS_ArcTan2();
+        // Real BIOS ArcTan2 calls Div+ArcTan internally.
+        {
+            int swi_cycles = armState ? 142 : 150;
+            cpuAbsCycle += swi_cycles;
+            cpuTotalTicks += swi_cycles;
+        }
         break;
     case 0x0B: {
+        // CpuSet (HLE). Bump cpuAbsCycle/cpuTotalTicks directly so live
+        // timer reads see the missing cycles. The legacy SWITicks-based
+        // path stalled the CPU loop in a way that drifted by an order of
+        // magnitude vs real BIOS — see project_dma_cycle_rework.md.
         int len = (reg[2].I & 0x1FFFFF) >> 1;
+        int swi_cycles = 0;
         if (!(((reg[0].I & 0xe000000) == 0) || ((reg[0].I + len) & 0xe000000) == 0)) {
             if ((reg[2].I >> 24) & 1) {
                 if ((reg[2].I >> 26) & 1)
-                    SWITicks = (7 + memoryWait32[(reg[1].I >> 24) & 0xF]) * (len >> 1);
+                    swi_cycles = (7 + memoryWait32[(reg[1].I >> 24) & 0xF]) * (len >> 1);
                 else
-                    SWITicks = (8 + memoryWait[(reg[1].I >> 24) & 0xF]) * (len);
+                    swi_cycles = (8 + memoryWait[(reg[1].I >> 24) & 0xF]) * (len);
             } else {
                 if ((reg[2].I >> 26) & 1)
-                    SWITicks = (10 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF]) * (len >> 1);
+                    swi_cycles = (10 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF]) * (len >> 1);
                 else
-                    SWITicks = (11 + memoryWait[(reg[0].I >> 24) & 0xF] + memoryWait[(reg[1].I >> 24) & 0xF]) * len;
+                    swi_cycles = (11 + memoryWait[(reg[0].I >> 24) & 0xF] + memoryWait[(reg[1].I >> 24) & 0xF]) * len;
             }
         }
+        cpuAbsCycle += swi_cycles;
+        cpuTotalTicks += swi_cycles;
     }
         BIOS_CpuSet();
         break;
     case 0x0C: {
         int len = (reg[2].I & 0x1FFFFF) >> 5;
+        int swi_cycles = 0;
         if (!(((reg[0].I & 0xe000000) == 0) || ((reg[0].I + len) & 0xe000000) == 0)) {
             if ((reg[2].I >> 24) & 1)
-                SWITicks = (6 + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 1)) * len;
+                swi_cycles = (6 + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 1)) * len;
             else
-                SWITicks = (9 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[0].I >> 24) & 0xF] + memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 2)) * len;
+                swi_cycles = (9 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[0].I >> 24) & 0xF] + memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 2)) * len;
         }
+        cpuAbsCycle += swi_cycles;
+        cpuTotalTicks += swi_cycles;
     }
         BIOS_CpuFastSet();
         break;

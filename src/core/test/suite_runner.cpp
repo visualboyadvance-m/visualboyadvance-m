@@ -13,6 +13,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
