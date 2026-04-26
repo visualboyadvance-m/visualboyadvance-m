@@ -3098,6 +3098,69 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                  && srcCart && sc == 1) {
             attrib += 1;
         }
+        // Trivial dst-only-cart DMA (sc==1) with prefetch enabled and
+        // default-N: real HW adds 1 cycle for the cart-bus turnaround
+        // when prefetcher is busy queuing reads.
+        else if (busPrefetchEnable && pcRegion >= 0x08
+                 && dstCart && !srcCart && sc == 1
+                 && memoryWait[8] == 4) {
+            attrib += 1;
+        }
+        // Trivial dst-only-cart DMA without prefetch:
+        //   .N. (slow N): real HW saves 1 cycle (the slow N hides the
+        //                 first-access overhead in calibration)
+        //   ..S (fast S): real HW spends 1 extra cycle (the first
+        //                 transfer's S becomes the bottleneck)
+        // The two effects cancel for .NS, so apply both deltas
+        // independently.
+        else if (!busPrefetchEnable && pcRegion >= 0x08
+                 && dstCart && !srcCart && sc == 1) {
+            int delta = 0;
+            if (memoryWait[8] != 4) delta -= 1;
+            if (memoryWaitSeq[8] != 2) delta += 1;
+            attrib += delta;
+            if (attrib < 0) attrib = 0;
+        }
+        // Short cart-bus DMAs (sc>1) with only-N or only-S WAITCNT
+        // change: the N/S asymmetry costs ~(sc-1) cycles per direction.
+        // .N. only → real adds (sc-1); ..S only → real saves (sc-1).
+        // Skip when the prefetch ARM partial-hide already absorbed
+        // the .S effect (busPrefetchEnable && armState && fast-S).
+        bool armPartialHideActive =
+            (busPrefetchEnable && pcRegion >= 0x08 && armState
+             && memoryWaitSeq[8] <= 1 && memoryWait[8] >= 4
+             && (srcCart || dstCart) && sc > 1);
+        if (!armPartialHideActive
+            && (srcCart || dstCart) && sc > 1 && pcRegion >= 0x08) {
+            bool nChanged = (memoryWait[8] != 4);
+            bool sChanged = (memoryWaitSeq[8] != 2);
+            int delta = 0;
+            if (nChanged && !sChanged) delta = (sc - 1);
+            else if (sChanged && !nChanged) delta = -(sc - 1);
+            // For "to ROM" only-cart (dst-only) without prefetch: the
+            // delta is one less because the dst-bus turnaround already
+            // costs ~1 cycle that real HW absorbs differently.
+            if (delta != 0 && !busPrefetchEnable
+                && dstCart && !srcCart) {
+                if (delta > 0) delta -= 1;
+                else delta += 1;
+            }
+            // "to ROM" with prefetch and default WAITCNT: real HW
+            // adds 1 cycle for the cart-bus turnaround.
+            if (delta == 0 && busPrefetchEnable
+                && dstCart && !srcCart
+                && !nChanged && !sChanged) {
+                delta = 1;
+            }
+            // ARM mode, P+N+S all set, cart-source DMA: +1 cycle
+            // (the prefetch-restart penalty after the DMA completes).
+            if (delta == 0 && busPrefetchEnable && armState
+                && nChanged && sChanged && srcCart) {
+                delta = 1;
+            }
+            attrib += delta;
+            if (attrib < 0) attrib = 0;
+        }
         cpuAbsCycle += attrib;
     }
     cpuDmaRunning = false;
