@@ -2608,6 +2608,10 @@ void CPUSoftwareInterrupt(int comment)
         } else {
             base = armState ? 71 : 79;
             if (pcRegion == 2) base -= armState ? 2 : 4;
+            else if (pcRegion >= 0x08) {
+                if (memoryWait[8] != 4) base -= armState ? 1 : 2;
+                if (!armState && memoryWaitSeq[8] != 2) base -= 2;
+            }
         }
         int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
         cpuAbsCycle += swi_cycles;
@@ -2640,6 +2644,10 @@ void CPUSoftwareInterrupt(int comment)
         } else {
             base = armState ? 71 : 79;
             if (pcRegion == 2) base -= armState ? 2 : 4;
+            else if (pcRegion >= 0x08) {
+                if (memoryWait[8] != 4) base -= armState ? 1 : 2;
+                if (!armState && memoryWaitSeq[8] != 2) base -= 2;
+            }
         }
         int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
         cpuAbsCycle += swi_cycles;
@@ -2656,6 +2664,10 @@ void CPUSoftwareInterrupt(int comment)
         } else {
             swi_cycles = armState ? 100 : 108;
             if (pcRegion == 2) swi_cycles -= armState ? 2 : 4;
+            else if (pcRegion >= 0x08) {
+                if (memoryWait[8] != 4) swi_cycles -= armState ? 1 : 2;
+                if (!armState && memoryWaitSeq[8] != 2) swi_cycles -= 2;
+            }
         }
         if (sqrt_input != 0) {
             int hi_bit = 0;
@@ -2678,6 +2690,14 @@ void CPUSoftwareInterrupt(int comment)
             } else {
                 swi_cycles = armState ? 100 : 108;
                 if (pcRegion == 2) swi_cycles -= armState ? 2 : 4;
+                else if (pcRegion >= 0x08) {
+                    // ROM caller: WAITCNT changes shift the
+                    // calibration-vs-test cycle gap by 1 per affected
+                    // bit. ARM is sensitive only to N; Thumb to both
+                    // N and S.
+                    if (memoryWait[8] != 4) swi_cycles -= armState ? 1 : 2;
+                    if (!armState && memoryWaitSeq[8] != 2) swi_cycles -= 2;
+                }
             }
             cpuAbsCycle += swi_cycles;
             cpuTotalTicks += swi_cycles;
