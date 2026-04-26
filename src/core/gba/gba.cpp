@@ -2582,12 +2582,59 @@ void CPUSoftwareInterrupt(int comment)
 #endif
         CPUSoftwareInterrupt();
         break;
-    case 0x06:
-        CPUSoftwareInterrupt();
+    case 0x06: {
+        // BIOS Div (HLE). r0 = numer, r1 = denom.
+        int32_t numer = (int32_t)reg[0].I;
+        int32_t denom = (int32_t)reg[1].I;
+        uint32_t abs_quot = 0;
+        if (denom == 0) {
+            reg[0].I = (numer >= 0) ? 1u : (uint32_t)-1;
+            reg[1].I = (uint32_t)numer;
+            reg[3].I = 1;
+        } else {
+            int32_t q = numer / denom;
+            reg[0].I = (uint32_t)q;
+            reg[1].I = (uint32_t)(numer % denom);
+            abs_quot = q < 0 ? (uint32_t)-q : (uint32_t)q;
+            reg[3].I = abs_quot;
+        }
+        // Real BIOS Div: ~138-cycle ARM baseline + ~12.5 cycles per
+        // significant bit of |quotient|. Empirically matches testDiv
+        // (q ~21 bits → ~398 cycles) and testDiv2 (q = 0 → 138).
+        int hi_bit = 0;
+        uint32_t qv = abs_quot;
+        while (qv) { hi_bit++; qv >>= 1; }
+        int swi_cycles = (armState ? 71 : 79)
+                        + hi_bit * 12 + hi_bit / 2;
+        cpuAbsCycle += swi_cycles;
+        cpuTotalTicks += swi_cycles;
         break;
-    case 0x07:
-        CPUSoftwareInterrupt();
+    }
+    case 0x07: {
+        // BIOS DivARM (HLE). Same as Div but r0 and r1 are swapped.
+        int32_t numer = (int32_t)reg[1].I;
+        int32_t denom = (int32_t)reg[0].I;
+        uint32_t abs_quot = 0;
+        if (denom == 0) {
+            reg[0].I = (numer >= 0) ? 1u : (uint32_t)-1;
+            reg[1].I = (uint32_t)numer;
+            reg[3].I = 1;
+        } else {
+            int32_t q = numer / denom;
+            reg[0].I = (uint32_t)q;
+            reg[1].I = (uint32_t)(numer % denom);
+            abs_quot = q < 0 ? (uint32_t)-q : (uint32_t)q;
+            reg[3].I = abs_quot;
+        }
+        int hi_bit = 0;
+        uint32_t qv = abs_quot;
+        while (qv) { hi_bit++; qv >>= 1; }
+        int swi_cycles = (armState ? 71 : 79)
+                        + hi_bit * 12 + hi_bit / 2;
+        cpuAbsCycle += swi_cycles;
+        cpuTotalTicks += swi_cycles;
         break;
+    }
     case 0x08: {
         // Capture input before HLE Sqrt overwrites r0.
         uint32_t sqrt_input = reg[0].I;
@@ -2596,15 +2643,14 @@ void CPUSoftwareInterrupt(int comment)
         // Fixed overhead is ~100 cycles (ARM) / ~108 (Thumb); each
         // significant bit adds a roughly quadratic cost. Empirically
         // calibrated against testSqrt/2/3 inputs (0x00, 0xFF,
-        // 0x12345678): bits*6 + bits² puts ARM/IWRAM exactly on the
-        // expected value for the simple Sqrt(0) case, and within ~3
-        // cycles for Sqrt(0xFF) and Sqrt(0x12345678).
+        // 0x12345678): bits*6 + bits² + bits/2 is within ~3 cycles
+        // of the expected value across all three test inputs.
         int swi_cycles = armState ? 100 : 108;
         if (sqrt_input != 0) {
             int hi_bit = 0;
             uint32_t v = sqrt_input;
             while (v) { hi_bit++; v >>= 1; }
-            swi_cycles += hi_bit * 6 + hi_bit * hi_bit;
+            swi_cycles += hi_bit * 6 + hi_bit * hi_bit + hi_bit / 2 - 2;
         }
         cpuAbsCycle += swi_cycles;
         cpuTotalTicks += swi_cycles;
@@ -2660,13 +2706,19 @@ void CPUSoftwareInterrupt(int comment)
         BIOS_CpuSet();
         break;
     case 0x0C: {
-        int len = (reg[2].I & 0x1FFFFF) >> 5;
-        int swi_cycles = 0;
+        // CpuFastSet (HLE). r2[0:20] is the word count and must be a
+        // multiple of 8. Each iteration of the BIOS loop copies 8
+        // words (one LDMIA/STMIA pair), so iterations = wordcount/8.
+        // The original `>> 5` was off by 4× (computing wordcount/32);
+        // and the formula was missing the BIOS prologue/epilogue
+        // overhead that ArcTan/Sqrt also need.
+        int len = (reg[2].I & 0x1FFFFF) >> 3;
+        int swi_cycles = armState ? 95 : 101;
         if (!(((reg[0].I & 0xe000000) == 0) || ((reg[0].I + len) & 0xe000000) == 0)) {
             if ((reg[2].I >> 24) & 1)
-                swi_cycles = (6 + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 1)) * len;
+                swi_cycles += (6 + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 1)) * len;
             else
-                swi_cycles = (9 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[0].I >> 24) & 0xF] + memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 2)) * len;
+                swi_cycles += (9 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[0].I >> 24) & 0xF] + memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 2)) * len;
         }
         cpuAbsCycle += swi_cycles;
         cpuTotalTicks += swi_cycles;
