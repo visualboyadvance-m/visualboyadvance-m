@@ -2891,17 +2891,56 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
 
     int totalTicks = 0;
 
+    // Real-HW DMA cycle model (refined from GBATEK against mGBA suite.gba):
+    //   1st transfer: 1N source read + 1S destination write (the dest bus is
+    //                 typically internal memory and benefits from S-burst).
+    //   subsequent  : same as 1st when source is cartridge ROM (the ROM bus
+    //                 restarts on each transfer), 1S+1S otherwise.
+    //   plus a 4-cycle channel start-up latency *only* when the transfer
+    //   touches the cartridge bus (ROM 0x08-0x0D or SRAM 0x0E). Internal-
+    //   memory transfers happen in the bus-quiet window of the trigger STR
+    //   and add no overhead.
+    // The previous "+6" overhead with `(1+seq)+(1+seq)` per transfer
+    // overcounted short internal-memory DMAs and undercounted ROM bursts.
+    int startup = 0;
+    int sm_clamped = sm & 15;
+    int dm_clamped = dm & 15;
+    bool srcCart = (sm_clamped >= 0x08);
+    bool dstCart = (dm_clamped >= 0x08);
+    if (srcCart || dstCart)
+        startup = 4;
+
+    // DMA from cartridge ROM doesn't benefit from sequential-burst access
+    // because the ROM bus restarts on each transfer (DMA isn't pipelined the
+    // way CPU reads are with the prefetch unit). Use N for every read.
+    // Destination still benefits from S-burst since the destination bus is
+    // typically a fast internal-memory write path.
     if (transfer32) {
-        sw = 1 + memoryWaitSeq32[sm & 15];
-        dw = 1 + memoryWaitSeq32[dm & 15];
-        totalTicks = (sw + dw) * (sc - 1) + 6 + memoryWait32[sm & 15] + memoryWaitSeq32[dm & 15];
+        int srcStep = srcCart ? memoryWait32[sm_clamped] : memoryWaitSeq32[sm_clamped];
+        sw = srcStep;
+        dw = memoryWaitSeq32[dm_clamped];
+        totalTicks = startup + memoryWait32[sm_clamped] + memoryWaitSeq32[dm_clamped]
+                       + (sc - 1) * (sw + dw);
     } else {
-        sw = 1 + memoryWaitSeq[sm & 15];
-        dw = 1 + memoryWaitSeq[dm & 15];
-        totalTicks = (sw + dw) * (sc - 1) + 6 + memoryWait[sm & 15] + memoryWaitSeq[dm & 15];
+        int srcStep = srcCart ? memoryWait[sm_clamped] : memoryWaitSeq[sm_clamped];
+        sw = srcStep;
+        dw = memoryWaitSeq[dm_clamped];
+        totalTicks = startup + memoryWait[sm_clamped] + memoryWaitSeq[dm_clamped]
+                       + (sc - 1) * (sw + dw);
     }
 
     cpuDmaTicksToUpdate += totalTicks;
+    // Real-HW: when the trigger instruction was fetching from cartridge ROM,
+    // the CPU pipeline is busy on the same bus the DMA holds, so the DMA's
+    // cycles must be attributed to the timer immediately so the very next
+    // instruction's live timer/IO read sees the bus-held cycles. When the
+    // trigger is in internal memory (IWRAM/EWRAM/BIOS), real HW absorbs the
+    // DMA inside the pipeline gap that already exists and the timer doesn't
+    // observe the stall — leave cpuAbsCycle alone in that case.
+    int pcRegion = (armNextPC >> 24) & 15;
+    if (pcRegion >= 0x08) {
+        cpuAbsCycle += totalTicks;
+    }
     cpuDmaRunning = false;
 }
 
@@ -5015,11 +5054,12 @@ void CPULoop(int ticks)
                 cpuDmaTicksToUpdate -= clockTicks;
                 if (cpuDmaTicksToUpdate < 0)
                     cpuDmaTicksToUpdate = 0;
-                // Advance the absolute cycle counter so live-read accessors
-                // (timers, etc.) see the DMA's elapsed time. Without this,
-                // a CPU read of a live timer right after a DMA returns the
-                // counter as if the DMA had taken zero time.
-                cpuAbsCycle += clockTicks;
+                // Note: cpuAbsCycle is advanced at doDMA() time (when the
+                // trigger PC is in cartridge ROM) so the next CPU instruction
+                // sees the DMA's elapsed time. When the trigger PC is in
+                // internal memory, real HW absorbs the DMA into the pipeline
+                // gap and the timer doesn't see it — so we deliberately don't
+                // catch up cpuAbsCycle here either.
                 goto updateLoop;
             }
 
