@@ -1267,7 +1267,9 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
 // OP: OP_MUL, OP_MLA etc.
 // SETCOND: SETCOND_NONE, SETCOND_MUL, or SETCOND_MULL
 // CYCLES: base cycle count (1, 2, or 3)
-#define MUL_INSN(OP, SETCOND, CYCLES)                                  \
+// IS_SIGNED: 1 for MUL/MLA/SMULL/SMLAL (Booth signed flip),
+//            0 for UMULL/UMLAL (always treat rs as unsigned)
+#define MUL_INSN(OP, SETCOND, CYCLES, IS_SIGNED)                       \
     int mult = (opcode & 0x0F);                                        \
     uint32_t rs = reg[(opcode >> 8) & 0x0F].I;                         \
     int acc = (opcode >> 12) & 0x0F; /* or destLo */                   \
@@ -1276,7 +1278,7 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
     uint32_t mull_c_flag = 0; maybe_unused(mull_c_flag);               \
     OP;                                                                \
     SETCOND;                                                           \
-    if ((int32_t)rs < 0)                                               \
+    if (IS_SIGNED && (int32_t)rs < 0)                                  \
         rs = ~rs;                                                      \
     if ((rs & 0xFFFFFF00) == 0)                                        \
         clockTicks += 0;                                               \
@@ -1323,34 +1325,34 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
     mull_c_flag = arm7_mull_c_flag(reg[mult].I, rs, true);
 
 // MUL Rd, Rm, Rs
-static INSN_REGPARM void arm009(uint32_t opcode) { MUL_INSN(OP_MUL, SETCOND_NONE, 1); }
+static INSN_REGPARM void arm009(uint32_t opcode) { MUL_INSN(OP_MUL, SETCOND_NONE, 1, 1); }
 // MULS Rd, Rm, Rs
-static INSN_REGPARM void arm019(uint32_t opcode) { MUL_INSN(OP_MUL, SETCOND_MUL, 1); }
+static INSN_REGPARM void arm019(uint32_t opcode) { MUL_INSN(OP_MUL, SETCOND_MUL, 1, 1); }
 
 // MLA Rd, Rm, Rs, Rn
-static INSN_REGPARM void arm029(uint32_t opcode) { MUL_INSN(OP_MLA, SETCOND_NONE, 2); }
+static INSN_REGPARM void arm029(uint32_t opcode) { MUL_INSN(OP_MLA, SETCOND_NONE, 2, 1); }
 // MLAS Rd, Rm, Rs, Rn
-static INSN_REGPARM void arm039(uint32_t opcode) { MUL_INSN(OP_MLA, SETCOND_MUL, 2); }
+static INSN_REGPARM void arm039(uint32_t opcode) { MUL_INSN(OP_MLA, SETCOND_MUL, 2, 1); }
 
 // UMULL RdLo, RdHi, Rn, Rs
-static INSN_REGPARM void arm089(uint32_t opcode) { MUL_INSN(OP_UMULL, SETCOND_NONE, 2); }
+static INSN_REGPARM void arm089(uint32_t opcode) { MUL_INSN(OP_UMULL, SETCOND_NONE, 2, 0); }
 // UMULLS RdLo, RdHi, Rn, Rs
-static INSN_REGPARM void arm099(uint32_t opcode) { MUL_INSN(OP_UMULL, SETCOND_MULL, 2); }
+static INSN_REGPARM void arm099(uint32_t opcode) { MUL_INSN(OP_UMULL, SETCOND_MULL, 2, 0); }
 
 // UMLAL RdLo, RdHi, Rn, Rs
-static INSN_REGPARM void arm0A9(uint32_t opcode) { MUL_INSN(OP_UMLAL, SETCOND_NONE, 3); }
+static INSN_REGPARM void arm0A9(uint32_t opcode) { MUL_INSN(OP_UMLAL, SETCOND_NONE, 3, 0); }
 // UMLALS RdLo, RdHi, Rn, Rs
-static INSN_REGPARM void arm0B9(uint32_t opcode) { MUL_INSN(OP_UMLAL, SETCOND_MULL, 3); }
+static INSN_REGPARM void arm0B9(uint32_t opcode) { MUL_INSN(OP_UMLAL, SETCOND_MULL, 3, 0); }
 
 // SMULL RdLo, RdHi, Rm, Rs
-static INSN_REGPARM void arm0C9(uint32_t opcode) { MUL_INSN(OP_SMULL, SETCOND_NONE, 2); }
+static INSN_REGPARM void arm0C9(uint32_t opcode) { MUL_INSN(OP_SMULL, SETCOND_NONE, 2, 1); }
 // SMULLS RdLo, RdHi, Rm, Rs
-static INSN_REGPARM void arm0D9(uint32_t opcode) { MUL_INSN(OP_SMULL, SETCOND_MULL, 2); }
+static INSN_REGPARM void arm0D9(uint32_t opcode) { MUL_INSN(OP_SMULL, SETCOND_MULL, 2, 1); }
 
 // SMLAL RdLo, RdHi, Rm, Rs
-static INSN_REGPARM void arm0E9(uint32_t opcode) { MUL_INSN(OP_SMLAL, SETCOND_NONE, 3); }
+static INSN_REGPARM void arm0E9(uint32_t opcode) { MUL_INSN(OP_SMLAL, SETCOND_NONE, 3, 1); }
 // SMLALS RdLo, RdHi, Rm, Rs
-static INSN_REGPARM void arm0F9(uint32_t opcode) { MUL_INSN(OP_SMLAL, SETCOND_MULL, 3); }
+static INSN_REGPARM void arm0F9(uint32_t opcode) { MUL_INSN(OP_SMLAL, SETCOND_MULL, 3, 1); }
 
 // Misc instructions //////////////////////////////////////////////////////
 

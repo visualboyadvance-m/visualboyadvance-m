@@ -2598,14 +2598,18 @@ void CPUSoftwareInterrupt(int comment)
             abs_quot = q < 0 ? (uint32_t)-q : (uint32_t)q;
             reg[3].I = abs_quot;
         }
-        // Real BIOS Div: ~138-cycle ARM baseline + ~12.5 cycles per
-        // significant bit of |quotient|. Empirically matches testDiv
-        // (q ~21 bits → ~398 cycles) and testDiv2 (q = 0 → 138).
         int hi_bit = 0;
         uint32_t qv = abs_quot;
         while (qv) { hi_bit++; qv >>= 1; }
-        int swi_cycles = (armState ? 71 : 79)
-                        + hi_bit * 12 + hi_bit / 2;
+        int pcRegion = (armNextPC >> 24) & 15;
+        int base;
+        if (pcRegion == 3) {
+            base = 67;
+        } else {
+            base = armState ? 71 : 79;
+            if (pcRegion == 2) base -= armState ? 2 : 4;
+        }
+        int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
         cpuAbsCycle += swi_cycles;
         cpuTotalTicks += swi_cycles;
         break;
@@ -2629,28 +2633,36 @@ void CPUSoftwareInterrupt(int comment)
         int hi_bit = 0;
         uint32_t qv = abs_quot;
         while (qv) { hi_bit++; qv >>= 1; }
-        int swi_cycles = (armState ? 71 : 79)
-                        + hi_bit * 12 + hi_bit / 2;
+        int pcRegion = (armNextPC >> 24) & 15;
+        int base;
+        if (pcRegion == 3) {
+            base = 67;
+        } else {
+            base = armState ? 71 : 79;
+            if (pcRegion == 2) base -= armState ? 2 : 4;
+        }
+        int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
         cpuAbsCycle += swi_cycles;
         cpuTotalTicks += swi_cycles;
         break;
     }
     case 0x08: {
-        // Capture input before HLE Sqrt overwrites r0.
         uint32_t sqrt_input = reg[0].I;
         BIOS_Sqrt();
-        // Real BIOS Sqrt iterates over the input's significant bits.
-        // Fixed overhead is ~100 cycles (ARM) / ~108 (Thumb); each
-        // significant bit adds a roughly quadratic cost. Empirically
-        // calibrated against testSqrt/2/3 inputs (0x00, 0xFF,
-        // 0x12345678): bits*6 + bits² + bits/2 is within ~3 cycles
-        // of the expected value across all three test inputs.
-        int swi_cycles = armState ? 100 : 108;
+        int pcRegion = (armNextPC >> 24) & 15;
+        int swi_cycles;
+        if (pcRegion == 3) {
+            swi_cycles = 96;
+        } else {
+            swi_cycles = armState ? 100 : 108;
+            if (pcRegion == 2) swi_cycles -= armState ? 2 : 4;
+        }
         if (sqrt_input != 0) {
             int hi_bit = 0;
             uint32_t v = sqrt_input;
             while (v) { hi_bit++; v >>= 1; }
-            swi_cycles += hi_bit * 6 + hi_bit * hi_bit + hi_bit / 2 - 2;
+            swi_cycles += hi_bit * 6 + hi_bit * hi_bit + hi_bit / 2 - 1
+                        + (hi_bit >= 16 ? 3 : 0);
         }
         cpuAbsCycle += swi_cycles;
         cpuTotalTicks += swi_cycles;
@@ -2658,15 +2670,15 @@ void CPUSoftwareInterrupt(int comment)
     }
     case 0x09:
         BIOS_ArcTan();
-        // Real BIOS ArcTan executes ~100 cycles for ARM callers and
-        // ~108 for Thumb callers (the extra Thumb-side delta is the
-        // BIOS's mode-switch entry/exit prologue). HLE returns
-        // instantly; bump the absolute-cycle counter so live timer
-        // reads see the missing cycles. Don't use SWITicks here —
-        // its event-handler interaction adds far more cycles than
-        // intended.
         {
-            int swi_cycles = armState ? 100 : 108;
+            int pcRegion = (armNextPC >> 24) & 15;
+            int swi_cycles;
+            if (pcRegion == 3) {
+                swi_cycles = 96;
+            } else {
+                swi_cycles = armState ? 100 : 108;
+                if (pcRegion == 2) swi_cycles -= armState ? 2 : 4;
+            }
             cpuAbsCycle += swi_cycles;
             cpuTotalTicks += swi_cycles;
         }
@@ -2681,10 +2693,6 @@ void CPUSoftwareInterrupt(int comment)
         }
         break;
     case 0x0B: {
-        // CpuSet (HLE). Bump cpuAbsCycle/cpuTotalTicks directly so live
-        // timer reads see the missing cycles. The legacy SWITicks-based
-        // path stalled the CPU loop in a way that drifted by an order of
-        // magnitude vs real BIOS — see project_dma_cycle_rework.md.
         int len = (reg[2].I & 0x1FFFFF) >> 1;
         int swi_cycles = 0;
         if (!(((reg[0].I & 0xe000000) == 0) || ((reg[0].I + len) & 0xe000000) == 0)) {
@@ -3001,31 +3009,45 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     //   and add no overhead.
     // The previous "+6" overhead with `(1+seq)+(1+seq)` per transfer
     // overcounted short internal-memory DMAs and undercounted ROM bursts.
-    int startup = 0;
     int sm_clamped = sm & 15;
     int dm_clamped = dm & 15;
     bool srcCart = (sm_clamped >= 0x08);
     bool dstCart = (dm_clamped >= 0x08);
-    if (srcCart || dstCart)
-        startup = 4;
+    // Channel start-up latency. Both internal and cartridge DMAs have
+    // a base 4-cycle setup overhead; cartridge transfers don't add
+    // anything extra to this.
+    int startup = 4;
 
     // DMA from cartridge ROM doesn't benefit from sequential-burst access
     // because the ROM bus restarts on each transfer (DMA isn't pipelined the
     // way CPU reads are with the prefetch unit). Use N for every read.
     // Destination still benefits from S-burst since the destination bus is
     // typically a fast internal-memory write path.
+    // Each transfer is two bus accesses (read + write). For internal
+    // memory both halves have 0 wait but each still consumes 1 cycle
+    // — so add a 2-cycle base per extra transfer in that case. The
+    // cartridge ROM bus restarts on each transfer (DMA isn't pipelined
+    // the way CPU reads are with the prefetch unit), so cartridge
+    // sources use N for every read.
+    int per_extra_base = (srcCart || dstCart) ? 0 : 2;
+    int dstCartExtra = (dstCart && !srcCart) ? 2 : 0;
+    bool dstCartNonly = (dstCart && !srcCart);
     if (transfer32) {
         int srcStep = srcCart ? memoryWait32[sm_clamped] : memoryWaitSeq32[sm_clamped];
+        int dstStep = dstCartNonly ? memoryWait32[dm_clamped] : memoryWaitSeq32[dm_clamped];
         sw = srcStep;
-        dw = memoryWaitSeq32[dm_clamped];
+        dw = dstStep;
         totalTicks = startup + memoryWait32[sm_clamped] + memoryWaitSeq32[dm_clamped]
-                       + (sc - 1) * (sw + dw);
+                       + (sc - 1) * (sw + dw + per_extra_base)
+                       + dstCartExtra;
     } else {
         int srcStep = srcCart ? memoryWait[sm_clamped] : memoryWaitSeq[sm_clamped];
+        int dstStep = dstCartNonly ? memoryWait[dm_clamped] : memoryWaitSeq[dm_clamped];
         sw = srcStep;
-        dw = memoryWaitSeq[dm_clamped];
+        dw = dstStep;
         totalTicks = startup + memoryWait[sm_clamped] + memoryWaitSeq[dm_clamped]
-                       + (sc - 1) * (sw + dw);
+                       + (sc - 1) * (sw + dw + per_extra_base)
+                       + dstCartExtra;
     }
 
     cpuDmaTicksToUpdate += totalTicks;
@@ -3037,7 +3059,12 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     // DMA inside the pipeline gap that already exists and the timer doesn't
     // observe the stall — leave cpuAbsCycle alone in that case.
     int pcRegion = (armNextPC >> 24) & 15;
-    if (pcRegion >= 0x08) {
+    // Attribute DMA cycles to cpuAbsCycle when the trigger PC is in
+    // cartridge ROM (>=0x08) or in EWRAM (region 2). EWRAM has the
+    // same 2-cycle wait state as the cartridge bus and the prefetch
+    // unit can't hide DMA cycles from the timer in that region.
+    // Only IWRAM (region 3) absorbs DMA in the natural pipeline gap.
+    if (pcRegion >= 0x08 || pcRegion == REGION_EWRAM) {
         cpuAbsCycle += totalTicks;
     }
     cpuDmaRunning = false;
