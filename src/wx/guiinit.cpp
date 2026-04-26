@@ -2066,6 +2066,7 @@ bool MainFrame::BindControls()
     panel->SetFrameTitle();
     // All OK; activate idle loop
     panel->SetExtraStyle(panel->GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
+    SetExtraStyle(GetExtraStyle() | wxWS_EX_PROCESS_IDLE);
 
     // Re-adjust size now to nudge some sense into Widgets.
     panel->AdjustSize(false);

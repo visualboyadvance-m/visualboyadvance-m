@@ -1224,6 +1224,14 @@ EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
 END_EVENT_TABLE()
 
 bool MainFrame::PreloadOneDialog() {
+    // Don't parse XRC while the user has a dialog open: it would freeze input
+    // for the duration of the parse and contend with the active dialog.
+    for (wxWindow* win : wxTopLevelWindows) {
+        if (wxDynamicCast(win, wxDialog) && win->IsShown()) {
+            return false;
+        }
+    }
+
     // Populate the queue on first call. LoadDialog() is a no-op for dialogs
     // already in dialogs_initialized_, so we just list every entry point;
     // sub-dialogs (LinkConfig, CheatEdit, CheatAdd) are brought in by their
