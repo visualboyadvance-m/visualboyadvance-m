@@ -3928,7 +3928,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             timerReloadAtEnable[0] = DowncastU16(timer0Reload);
             // Clear stale "recent IRQ" window from a prior test/handler;
             // the first IRQ from this newly-enabled timer should use the
-            // standard 7-cycle delivery, not the fast 3-cycle path.
+            // standard 8-cycle delivery, not the fast 3-cycle path.
             IRQRecentTicks = 0;
         }
         timerOnOffDelay |= 1;
