@@ -58,18 +58,25 @@ void BIOS_ArcTan()
     }
 #endif
 
-    int32_t i = reg[0].I;
-    int32_t a = -((i * i) >> 14);
-    int32_t b = ((0xA9 * a) >> 14) + 0x390;
-    b = ((b * a) >> 14) + 0x91C;
-    b = ((b * a) >> 14) + 0xFB6;
-    b = ((b * a) >> 14) + 0x16AA;
-    b = ((b * a) >> 14) + 0x2081;
-    b = ((b * a) >> 14) + 0x3651;
-    b = ((b * a) >> 14) + 0xA2F9;
-    reg[0].I = (i * b) >> 16;
-    reg[1].I = a;
-    reg[3].I = b;
+    // Use uint32_t for the multiply to get defined 2's-complement wraparound
+    // (matching the real ARM7 32-bit `mul` low-word). Plain `int32_t * int32_t`
+    // here is signed-overflow UB for inputs like 0xC000 (49152² > INT32_MAX),
+    // which `-O3` is allowed to "optimize" into wrong values — that's why the
+    // release build was failing 24 ArcTan edge-case tests while debug passed.
+    // Cast back to int32_t before the `>> 14` so the shift is arithmetic
+    // (matching ARM `asr`, which is what the real BIOS uses).
+    int32_t i = (int32_t)reg[0].I;
+    int32_t a = -((int32_t)((uint32_t)i * (uint32_t)i) >> 14);
+    int32_t b = ((int32_t)((uint32_t)0xA9 * (uint32_t)a) >> 14) + 0x390;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0x91C;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0xFB6;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0x16AA;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0x2081;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0x3651;
+    b = ((int32_t)((uint32_t)b * (uint32_t)a) >> 14) + 0xA2F9;
+    reg[0].I = (uint32_t)((int32_t)((uint32_t)i * (uint32_t)b) >> 16);
+    reg[1].I = (uint32_t)a;
+    reg[3].I = (uint32_t)b;
 
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_SWI) {
