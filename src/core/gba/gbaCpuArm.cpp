@@ -1278,8 +1278,10 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
     uint32_t mull_c_flag = 0; maybe_unused(mull_c_flag);               \
     OP;                                                                \
     SETCOND;                                                           \
-    if (IS_SIGNED && (int32_t)rs < 0)                                  \
-        rs = ~rs;                                                      \
+    if constexpr (IS_SIGNED != 0) {                                    \
+        if ((int32_t)rs < 0)                                           \
+            rs = ~rs;                                                  \
+    }                                                                  \
     if ((rs & 0xFFFFFF00) == 0)                                        \
         clockTicks += 0;                                               \
     else if ((rs & 0xFFFF0000) == 0)                                   \
@@ -1525,7 +1527,6 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     if (LIKELY((opcode & 0x0FFFFFF0) == 0x012FFF10)) {
         int base = opcode & 0x0F;
         busPrefetchCount = 0;
-        bool wasArm = armState;
         armState = reg[base].I & 1 ? false : true;
         if (armState) {
             reg[15].I = reg[base].I & 0xFFFFFFFC;
@@ -1536,14 +1537,11 @@ static INSN_REGPARM void arm121(uint32_t opcode)
                 + codeTicksAccessSeq32(armNextPC)
                 + codeTicksAccess32(armNextPC);
         } else {
-            // Mode switch ARM→Thumb: pipeline flush takes 2 I cycles,
-            // not 3. Real HW absorbs one cycle into the mode switch.
-            int iCycles = wasArm ? 2 : 3;
             reg[15].I = reg[base].I & 0xFFFFFFFE;
             armNextPC = reg[15].I;
             reg[15].I += 2;
             THUMB_PREFETCH;
-            clockTicks = iCycles + codeTicksAccessSeq16(armNextPC)
+            clockTicks = 3 + codeTicksAccessSeq16(armNextPC)
                 + codeTicksAccessSeq16(armNextPC)
                 + codeTicksAccess16(armNextPC);
         }
