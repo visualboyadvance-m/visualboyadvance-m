@@ -49,7 +49,9 @@ extern int SWITicks;
 extern uint32_t mastercode;
 extern bool busPrefetch;
 extern bool busPrefetchEnable;
-extern uint32_t busPrefetchCount;
+extern uint32_t busPrefetchCount;     // legacy bitmask (kept for save/restore)
+extern int busPrefetchHalfwords;       // 0..8 halfwords ready in cart prefetch FIFO
+extern int busPrefetchAccum;           // cycles accumulated toward next halfword
 extern int cpuNextEvent;
 extern bool holdState;
 extern uint32_t cpuPrefetch[2];

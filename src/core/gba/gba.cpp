@@ -68,6 +68,13 @@ int layerEnableDelay = 0;
 bool busPrefetch = false;
 bool busPrefetchEnable = false;
 uint32_t busPrefetchCount = 0;
+// Per-cycle bus-state simulator: explicit halfword FIFO replacing the
+// legacy bitmask interpretation. busPrefetchHalfwords counts halfwords
+// available in the prefetcher's 8-deep FIFO. busPrefetchAccum tracks
+// fractional progress toward the next halfword fill (advances during
+// non-cart accesses while busPrefetch is true).
+int busPrefetchHalfwords = 0;
+int busPrefetchAccum = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
 bool cpuDmaRunning = false;
