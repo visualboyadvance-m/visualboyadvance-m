@@ -362,9 +362,17 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 // snapshot happening at instruction START (real HW commits the
                 // store mid-pipeline).
                 auto liveTimerRead = [&](int n, uint32_t reloadNow, int prescale) -> uint16_t {
-                    int64_t elapsed = cpuAbsCycle - timerEnableAbsCycle[n] - 2;
-                    if (elapsed < 0) elapsed = 0;
                     uint32_t r0 = timerReloadAtEnable[n];
+                    // Standard offset is -2 (compensates for write-handler
+                    // snapshot at instruction START). For reload=0xFFFF
+                    // (period=1), the very first overflow happens during
+                    // the same dispatch boundary as the read; real HW
+                    // latches the new reload register before the read can
+                    // sample, but our model lags by one cycle. Use -3 in
+                    // that boundary case only.
+                    int64_t offset = (r0 == 0xFFFF && reloadNow != r0) ? 3 : 2;
+                    int64_t elapsed = cpuAbsCycle - timerEnableAbsCycle[n] - offset;
+                    if (elapsed < 0) elapsed = 0;
                     int64_t cyclesToFirstOverflow = (int64_t)(0x10000u - r0) << prescale;
                     if (elapsed < cyclesToFirstOverflow) {
                         return (uint16_t)(r0 + (uint32_t)(elapsed >> prescale));

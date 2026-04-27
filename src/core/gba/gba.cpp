@@ -5185,7 +5185,15 @@ void CPULoop(int ticks)
                             UPDATE_REG(IO_REG_IF, IF);
                         }
                     }
-                    TM0D = 0xFFFF - DowncastU16(timer0Ticks >> timer0ClockReload);
+                    // Period-1 special case: real HW counter is always
+                    // 0xFFFF when reload=0xFFFF & prescale=0 because the
+                    // reload latches every cycle. Our `0xFFFF - X` formula
+                    // gives 0xFFFE in that case (off by one).
+                    if (timer0Reload == 0xFFFF && timer0ClockReload == 0) {
+                        TM0D = 0xFFFF;
+                    } else {
+                        TM0D = 0xFFFF - DowncastU16(timer0Ticks >> timer0ClockReload);
+                    }
                     UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
                 }
 
@@ -5215,7 +5223,11 @@ void CPULoop(int ticks)
                                 UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
-                        TM1D = 0xFFFF - DowncastU16(timer1Ticks >> timer1ClockReload);
+                        if (timer1Reload == 0xFFFF && timer1ClockReload == 0) {
+                            TM1D = 0xFFFF;
+                        } else {
+                            TM1D = 0xFFFF - DowncastU16(timer1Ticks >> timer1ClockReload);
+                        }
                         UPDATE_REG(IO_REG_TM1CNT_L, TM1D);
                     }
                 }
@@ -5244,7 +5256,11 @@ void CPULoop(int ticks)
                                 UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
-                        TM2D = 0xFFFF - DowncastU16(timer2Ticks >> timer2ClockReload);
+                        if (timer2Reload == 0xFFFF && timer2ClockReload == 0) {
+                            TM2D = 0xFFFF;
+                        } else {
+                            TM2D = 0xFFFF - DowncastU16(timer2Ticks >> timer2ClockReload);
+                        }
                         UPDATE_REG(IO_REG_TM2CNT_L, TM2D);
                     }
                 }
@@ -5271,7 +5287,11 @@ void CPULoop(int ticks)
                                 UPDATE_REG(IO_REG_IF, IF);
                             }
                         }
-                        TM3D = 0xFFFF - DowncastU16(timer3Ticks >> timer3ClockReload);
+                        if (timer3Reload == 0xFFFF && timer3ClockReload == 0) {
+                            TM3D = 0xFFFF;
+                        } else {
+                            TM3D = 0xFFFF - DowncastU16(timer3Ticks >> timer3ClockReload);
+                        }
                         UPDATE_REG(IO_REG_TM3CNT_L, TM3D);
                     }
                 }
