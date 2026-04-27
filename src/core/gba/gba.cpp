@@ -4807,7 +4807,7 @@ void CPULoop(int ticks)
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         CPUCompareVCOUNT();
                     } else {
-                        lcdTicks += 224;
+                        lcdTicks += 225;
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         if (DISPSTAT & 16) {
@@ -5138,7 +5138,7 @@ void CPULoop(int ticks)
                         }
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
-                        lcdTicks += 224;
+                        lcdTicks += 225;
                         CPUCheckDMA(2, 0x0f);
                         if (DISPSTAT & 16) {
                             IF |= 2;
