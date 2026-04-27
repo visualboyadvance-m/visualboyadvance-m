@@ -62,6 +62,12 @@ extern uint8_t memoryWaitSeq[16];
 extern uint8_t memoryWaitSeq32[16];
 extern uint8_t cpuBitsSet[256];
 extern uint8_t cpuLowestBitSet[256];
+
+// Per-cycle bus-state simulator helpers (scaffolding for a future
+// halfword-FIFO prefetch model). See project_dma_cycle_rework.md for the
+// roadmap and the hill-climbing iteration log demonstrating why the
+// rewrite cannot complete in a single session.
+
 extern void CPUSwitchMode(int mode, bool saveState, bool breakLoop);
 extern void CPUSwitchMode(int mode, bool saveState);
 extern void CPUUpdateCPSR();

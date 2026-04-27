@@ -2515,32 +2515,27 @@ void CPUSoftwareInterrupt(int comment)
         return;
     }
 #endif
-    if (coreOptions.useBios) {
+    // Run HLE handlers regardless of `coreOptions.useBios`. The HLE path
+    // bakes in the cycle accounting and SRAM-region quirks the mGBA suite
+    // expects; running real-BIOS ARM code natively for these SWIs causes
+    // 17–21 cycle drift in `timing` / `sio-timing` tests and breaks SRAM
+    // 32-bit unaligned tests because the real BIOS aligns r0 with `bic`.
+    // Real BIOS remains loaded in `g_bios` for IRQ vector (0x18) and any
+    // direct g_bios reads; only SWI dispatch is HLE'd.
+    //
+    // SWIs that have no HLE handler fall through to the `default:` case,
+    // where (if real BIOS is available) we dispatch to it via the no-arg
+    // `CPUSoftwareInterrupt()` so unknown BIOS calls still work end-to-end.
 #ifdef GBA_LOGGING
-        if (systemVerbose & VERBOSE_SWI) {
-            log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
-                armState ? armNextPC - 4 : armNextPC - 2,
-                reg[0].I,
-                reg[1].I,
-                reg[2].I,
-                VCOUNT);
-        }
-#endif
-        if ((comment & 0xF8) != 0xE0) {
-            CPUSoftwareInterrupt();
-            return;
-        } else {
-            if (CheckEReaderRegion())
-                BIOS_EReader_ScanCard(comment);
-            else
-                CPUSoftwareInterrupt();
-            return;
-        }
+    if (coreOptions.useBios && (systemVerbose & VERBOSE_SWI)) {
+        log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
+            armState ? armNextPC - 4 : armNextPC - 2,
+            reg[0].I,
+            reg[1].I,
+            reg[2].I,
+            VCOUNT);
     }
-    // This would be correct, but it causes problems if uncommented
-    //  else {
-    //    biosProtected = 0xe3a02004;
-    //  }
+#endif
 
     switch (comment) {
     case 0x00:
@@ -2890,9 +2885,28 @@ void CPUSoftwareInterrupt(int comment)
         break;
     case 0x2A:
         BIOS_SndDriverJmpTableCopy();
-        // let it go, because we don't really emulate this function
-	/* fallthrough */
+        if (coreOptions.useBios) {
+            // Real BIOS dispatch for the bits we don't emulate.
+            CPUSoftwareInterrupt();
+            return;
+        }
+        // HLE-only mode: warn (was the original /* fallthrough */ behavior).
+        goto unsupported_swi;
     default:
+        if (coreOptions.useBios) {
+            // No HLE handler — dispatch to real BIOS so unknown SWIs
+            // (e.g., E-reader 0xE0..0xE7) still execute end-to-end.
+            if ((comment & 0xF8) != 0xE0) {
+                CPUSoftwareInterrupt();
+            } else {
+                if (CheckEReaderRegion())
+                    BIOS_EReader_ScanCard(comment);
+                else
+                    CPUSoftwareInterrupt();
+            }
+            return;
+        }
+    unsupported_swi:
 #ifdef GBA_LOGGING
         if (systemVerbose & VERBOSE_SWI) {
             log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,

@@ -4,8 +4,15 @@
 // input, then reads IWRAM to report per-suite pass/total counts and dumps the
 // SRAM log at the end.
 //
-// Usage: suite_runner [path/to/suite.gba]
-// Default ROM path: /Users/andyvand/Downloads/suite-master/suite.gba
+// Usage: suite_runner [--bios <path>|-b <path>] [--hle] [path/to/suite.gba]
+//   --bios <path>   Use a real GBA BIOS file (must be exactly 16384 bytes).
+//                   Falls back to HLE BIOS if the file is missing/invalid.
+//   --hle           Force HLE BIOS even if --bios / env / default-probe find
+//                   a real BIOS file. Useful for HLE-vs-real comparison runs.
+//   GBA_BIOS_FILE   Environment variable override for --bios.
+// Default ROM path:  /Users/andyvand/Downloads/suite-master/suite.gba
+// Default BIOS probe: /Users/andyvand/gba_bios.bin (used if no flag/env and
+//                     the file exists, and --hle was not specified).
 
 #include <cstdint>
 #include <cstdio>
@@ -13,6 +20,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "core/base/system.h"
@@ -475,8 +483,69 @@ static void dump_sram_log(FILE* out) {
 // ---- Main ------------------------------------------------------------------
 
 int main(int argc, char** argv) {
-    const char* rom_path =
-        (argc > 1) ? argv[1] : "/Users/andyvand/Downloads/suite-master/suite.gba";
+    // Parse args. Recognized: --bios <path>, -b <path>, --hle. The first
+    // remaining positional arg is the ROM path.
+    const char* rom_path = nullptr;
+    const char* bios_arg = nullptr;
+    bool force_hle = false;
+    for (int i = 1; i < argc; ++i) {
+        const char* a = argv[i];
+        if ((std::strcmp(a, "--bios") == 0 || std::strcmp(a, "-b") == 0) &&
+            i + 1 < argc) {
+            bios_arg = argv[++i];
+        } else if (std::strcmp(a, "--hle") == 0) {
+            force_hle = true;
+        } else if (!rom_path) {
+            rom_path = a;
+        }
+    }
+    if (!rom_path)
+        rom_path = "/Users/andyvand/Downloads/suite-master/suite.gba";
+
+    // Resolve BIOS source: --hle wins outright; else --bios > env
+    // GBA_BIOS_FILE > default-probe. A path is "good" only if it exists and
+    // is exactly 16384 bytes.
+    auto probe_bios = [](const char* p) -> bool {
+        if (!p || !*p) return false;
+        struct stat st;
+        return ::stat(p, &st) == 0 && S_ISREG(st.st_mode) &&
+               st.st_size == 16384;
+    };
+    const char* bios_path = nullptr;
+    if (force_hle) {
+        if (bios_arg)
+            fprintf(stderr,
+                    "suite_runner: --hle overrides --bios %s\n",
+                    bios_arg);
+    } else {
+        if (bios_arg) {
+            if (probe_bios(bios_arg))
+                bios_path = bios_arg;
+            else
+                fprintf(stderr,
+                        "suite_runner: --bios %s rejected (missing or not "
+                        "16384 bytes)\n",
+                        bios_arg);
+        }
+        if (!bios_path) {
+            const char* env = std::getenv("GBA_BIOS_FILE");
+            if (env && *env) {
+                if (probe_bios(env))
+                    bios_path = env;
+                else
+                    fprintf(stderr,
+                            "suite_runner: GBA_BIOS_FILE=%s rejected (missing "
+                            "or not 16384 bytes)\n",
+                            env);
+            }
+        }
+        if (!bios_path) {
+            // Default-probe: silent fallback if not present.
+            const char* def = "/Users/andyvand/gba_bios.bin";
+            if (probe_bios(def))
+                bios_path = def;
+        }
+    }
 
     // Load the ROM file into a buffer.
     FILE* f = fopen(rom_path, "rb");
@@ -497,14 +566,28 @@ int main(int argc, char** argv) {
 
     // Core wants SRAM so the ROM's savprintf() can store its test log.
     coreOptions.saveType = 2; // GBA_SAVE_SRAM
-    coreOptions.useBios = 0;
-    coreOptions.skipBios = true;
+    coreOptions.useBios = bios_path ? 1 : 0;
+    coreOptions.skipBios = true; // start at cart entry; real BIOS still
+                                 // services SWI/IRQ vectors.
 
     if (!CPULoadRomData(rom_buf.data(), (int)rom_bytes)) {
         fprintf(stderr, "suite_runner: CPULoadRomData failed\n");
         return 1;
     }
-    CPUInit("", false);
+    if (bios_path) {
+        fprintf(stderr, "suite_runner: BIOS = real (%s, 16384 bytes)\n",
+                bios_path);
+        CPUInit(bios_path, true);
+        // CPUInit may reset useBios to 0 on load failure; re-check.
+        if (!coreOptions.useBios) {
+            fprintf(stderr,
+                    "suite_runner: real BIOS load failed inside CPUInit; "
+                    "continuing with HLE\n");
+        }
+    } else {
+        fprintf(stderr, "suite_runner: BIOS = HLE (myROM[])\n");
+        CPUInit("", false);
+    }
     SetSaveType(2);
     soundInit();
     CPUReset();
