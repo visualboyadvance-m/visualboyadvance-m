@@ -58,6 +58,10 @@ bool debugger = false;
 
 int SWITicks = 0;
 int IRQTicks = 0;
+// "Recent IRQ" window: counts down after CPUInterrupt fires. While > 0,
+// the next IRQ delivery uses a shorter delay (real HW: back-to-back
+// IRQs in tight handler loops have minimal inter-IRQ latency).
+int IRQRecentTicks = 0;
 
 uint32_t mastercode = 0;
 int layerEnableDelay = 0;
@@ -4753,6 +4757,11 @@ void CPULoop(int ticks)
                 if (IRQTicks < 0)
                     IRQTicks = 0;
             }
+            if (IRQRecentTicks) {
+                IRQRecentTicks -= clockTicks;
+                if (IRQRecentTicks < 0)
+                    IRQRecentTicks = 0;
+            }
 
             lcdTicks -= clockTicks;
 
@@ -5363,11 +5372,22 @@ void CPULoop(int ticks)
                             holdState = false;
                             stopState = false;
                             holdType = 0;
+                            // Mark a "recent IRQ" window: if another IRQ
+                            // becomes pending again soon (e.g., period-1
+                            // timer or other rapid source), use a shorter
+                            // delivery delay to match real HW's tight
+                            // handler-chain timing. Only set when the IRQ
+                            // we just delivered was a timer (bits 3-6 of
+                            // IF) — non-timer IRQs (HBlank/VBlank/etc)
+                            // shouldn't trigger fast-path delivery.
+                            if (IF & 0x78) {
+                                IRQRecentTicks = 130;
+                            }
                         }
                     } else {
                         if (!holdState) {
                             intState = true;
-                            IRQTicks = 7;
+                            IRQTicks = (IRQRecentTicks > 0) ? 3 : 7;
                             if (cpuNextEvent > IRQTicks)
                                 cpuNextEvent = IRQTicks;
                         } else {
