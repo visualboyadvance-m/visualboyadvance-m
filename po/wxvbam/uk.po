@@ -1490,12 +1490,12 @@ msgstr "Помилка відкриття псевдо-tty: %s."
 #: sys.cpp:1418
 #, c-format
 msgid "Invalid GDB server port %d"
-msgstr ""
+msgstr "Недійсний порт GDB-сервера %d."
 
 #: sys.cpp:1431
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
-msgstr ""
+msgstr "Помилка налаштування сокета GDB-сервера на порт %d."
 
 #: viewers.cpp:596
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
