@@ -620,7 +620,7 @@ static inline void gbaScheduler_OnSioComplete() {
     if (!g_ioMem) return;
     uint16_t siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
     if (!(siocnt & 0x80)) return; // CPU already cleared it
-    siocnt &= (uint16_t)~0x80u;
+    siocnt = static_cast<uint16_t>(siocnt & ~0x80u);
     UPDATE_REG(COMM_SIOCNT, siocnt);
     if (siocnt & 0x4000) {
         IF |= 0x80;
@@ -3926,6 +3926,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         if (!timer0On && (value & 0x80)) {
             timerEnableAbsCycle[0] = cpuAbsCycle;
             timerReloadAtEnable[0] = DowncastU16(timer0Reload);
+            // Clear stale "recent IRQ" window from a prior test/handler;
+            // the first IRQ from this newly-enabled timer should use the
+            // standard 7-cycle delivery, not the fast 3-cycle path.
+            IRQRecentTicks = 0;
         }
         timerOnOffDelay |= 1;
         cpuNextEvent = cpuTotalTicks;
@@ -3939,6 +3943,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         if (!timer1On && (value & 0x80)) {
             timerEnableAbsCycle[1] = cpuAbsCycle;
             timerReloadAtEnable[1] = DowncastU16(timer1Reload);
+            IRQRecentTicks = 0;
         }
         timerOnOffDelay |= 2;
         cpuNextEvent = cpuTotalTicks;
@@ -3951,6 +3956,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         if (!timer2On && (value & 0x80)) {
             timerEnableAbsCycle[2] = cpuAbsCycle;
             timerReloadAtEnable[2] = DowncastU16(timer2Reload);
+            IRQRecentTicks = 0;
         }
         timerOnOffDelay |= 4;
         cpuNextEvent = cpuTotalTicks;
@@ -3963,6 +3969,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         if (!timer3On && (value & 0x80)) {
             timerEnableAbsCycle[3] = cpuAbsCycle;
             timerReloadAtEnable[3] = DowncastU16(timer3Reload);
+            IRQRecentTicks = 0;
         }
         timerOnOffDelay |= 8;
         cpuNextEvent = cpuTotalTicks;
@@ -5387,7 +5394,7 @@ void CPULoop(int ticks)
                     } else {
                         if (!holdState) {
                             intState = true;
-                            IRQTicks = (IRQRecentTicks > 0) ? 3 : 7;
+                            IRQTicks = (IRQRecentTicks > 0) ? 3 : 8;
                             if (cpuNextEvent > IRQTicks)
                                 cpuNextEvent = IRQTicks;
                         } else {
