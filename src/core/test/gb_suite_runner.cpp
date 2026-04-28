@@ -447,6 +447,20 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         BC.W = 0x0014;
         DE.W = 0x0000;
         HL.W = 0xC060;
+    } else if (rom_path.find("/boot_regs-A.gb") != std::string::npos) {
+        // AGB / AGS / SP boot ROM: A=$11, F=$00, B=$01, C=$00,
+        // D=$00, E=$08, H=$00, L=$7C.
+        AF.W = 0x1100;
+        BC.W = 0x0100;
+        DE.W = 0x0008;
+        HL.W = 0x007C;
+    } else if (rom_path.find("/boot_regs-cgb.gb") != std::string::npos) {
+        // CGB boot ROM: A=$11, F=$80, B=$00, C=$00, D=$00, E=$08,
+        // H=$00, L=$7C.
+        AF.W = 0x1180;
+        BC.W = 0x0000;
+        DE.W = 0x0008;
+        HL.W = 0x007C;
     }
 
     if (g_verbose) {
