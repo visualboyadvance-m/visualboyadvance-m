@@ -44,6 +44,7 @@ extern int timer3Ticks;
 extern int timer3ClockReload;
 extern int cpuTotalTicks;
 extern int64_t cpuAbsCycle;
+extern int64_t lcdNextEventAbsCycle;
 extern int64_t timerEnableAbsCycle[4];
 extern uint16_t timerReloadAtEnable[4];
 extern int timer0Reload;
@@ -391,6 +392,16 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                     value = liveTimerRead(2, (uint16_t)timer2Reload, timer2ClockReload);
                 else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
                     value = liveTimerRead(3, (uint16_t)timer3Reload, timer3ClockReload);
+            }
+            // Sub-cycle DISPSTAT alignment: the dispatch loop only flips
+            // DISPSTAT.HBlank at event boundaries, but a poll-loop read
+            // mid-dispatch can land *after* the actual scanline crossing.
+            // If cpuAbsCycle has passed the scheduled flip, return the
+            // post-flip value so polling loops detect the bit at the
+            // exact cycle real HW would.
+            if ((address & 0x3fe) == IO_REG_DISPSTAT
+                && cpuAbsCycle >= lcdNextEventAbsCycle) {
+                value ^= 2;
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
             value = 0;

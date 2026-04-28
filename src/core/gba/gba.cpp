@@ -116,6 +116,13 @@ int64_t cpuAbsCycle = 0;
 // the original line's HBlank for BG-enable-delay-latch purposes.
 int64_t hblankIrqRaiseAbsCycle = -1;
 int hblankIrqRaiseVCount = -1;
+// Sub-cycle DISPSTAT alignment: cpuAbsCycle at which the next lcdTicks
+// transition is scheduled. When a DISPSTAT read happens after this
+// boundary but before the dispatch loop has processed the event, the
+// live read returns the post-transition value (HBlank flip / VCOUNT
+// advance) so polling loops detect the bit flip at the exact cycle
+// real HW would. Updated whenever lcdTicks is set/added.
+int64_t lcdNextEventAbsCycle = 0;
 // Wait+enable BG-glitch tracking. Set when a wait+enable HBlank-IRQ
 // handler writes DISPCNT during early HDraw of the next scanline.
 // Applied at render time as a per-pixel SPLICE: pixels left of the
@@ -4584,6 +4591,7 @@ void CPUReset()
     biosProtected[3] = 0xe1;
 
     lcdTicks = (coreOptions.useBios && !coreOptions.skipBios) ? 1008 : 208;
+    lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
     timer0On = false;
     timer0Ticks = 0;
     timer0Reload = 0;
@@ -4792,6 +4800,7 @@ void CPULoop(int ticks)
             }
 
             lcdTicks -= clockTicks;
+            lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
 
             soundTicks += clockTicks;
 
@@ -5198,6 +5207,9 @@ void CPULoop(int ticks)
                         }
                     }
                 }
+                // Re-anchor the sub-cycle DISPSTAT-read deadline now that
+                // lcdTicks has been advanced into the next phase.
+                lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
             }
 
             // we shouldn't be doing sound in stop state, but we loose synchronization
