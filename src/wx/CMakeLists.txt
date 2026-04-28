@@ -571,10 +571,12 @@ if(WIN32)
     # Use COMPILE_FLAGS to directly pass /D to rc.exe
     if(VBAM_HAS_RPI_PROXY)
         if(MSVC)
-            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS "/DVBAM_EMBED_RPI_HOST")
+            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS
+                "/DVBAM_EMBED_RPI_HOST /I\"${RPI_HOST_PATH_H_DIR}\"")
         else()
             # For MinGW windres
-            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS "-DVBAM_EMBED_RPI_HOST")
+            set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS
+                "-DVBAM_EMBED_RPI_HOST --include-dir=\"${RPI_HOST_PATH_H_DIR}\"")
         endif()
         message(STATUS "Resource compiler will embed RPI host (VBAM_EMBED_RPI_HOST defined)")
     endif()

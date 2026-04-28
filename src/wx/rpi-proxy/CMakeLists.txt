@@ -210,16 +210,17 @@ cmake --install . --config ${RPI_HOST_BUILD_TYPE}
         # Export RPI_HOST_EXE_PATH to parent scope for resource dependency tracking
         set(RPI_HOST_EXE_PATH "${RPI_HOST_EXE_PATH}" PARENT_SCOPE)
 
-        # Generate the resource include path header
-        # Place in src/wx so the resource compiler can find it
+        # Generate the resource include path header in the build tree; the
+        # parent (src/wx) adds this directory to wxvbam.rc's include path.
         file(TO_NATIVE_PATH "${RPI_HOST_EXE_PATH}" RPI_HOST_EXE_NATIVE_PATH)
         string(REPLACE "\\" "/" RPI_HOST_EXE_RC_PATH "${RPI_HOST_EXE_NATIVE_PATH}")
 
         configure_file(
             ${CMAKE_CURRENT_SOURCE_DIR}/rpi-host-path.h.in
-            ${CMAKE_SOURCE_DIR}/src/wx/rpi-host-path.h
+            ${CMAKE_CURRENT_BINARY_DIR}/rpi-host-path.h
             @ONLY
         )
+        set(RPI_HOST_PATH_H_DIR "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)
     else()
         message(STATUS "RPI Host exe not found - 32-bit plugin support disabled")
         message(STATUS "To enable: build vbam-rpi-host.exe with 32-bit toolchain")
