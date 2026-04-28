@@ -609,6 +609,15 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         out.verdict = Verdict::Fail;
         done = true;
     }
+    if (!done && age) {
+        // AGE-suite tests that didn't print "TEST PASSED!" (the
+        // -0x20-shifted "4%34 0!33%$" tile sequence) are image-based
+        // pass/fail visual checks; without a framebuffer hash database
+        // we can't determine PASS, so classify as FAIL.
+        out.detail = "timeout-fail: [age] no TEST PASSED/FAILED marker";
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
     if (!done && gambatte) {
         // Gambatte tests have a deterministic expected register A; if
         // we never matched, that's a FAIL.
@@ -617,6 +626,46 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
                       "timeout-fail: [gambatte] got A=%d, expected %d",
                       (int)AF.B.B1, gambatte_a);
         out.detail = buf;
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+    if (!done) {
+        // Generic timeout fallback: anything that ran the full
+        // kMaxFrames budget without producing a recognized
+        // PASS/FAIL marker is classified as FAIL with whatever
+        // screen / serial context we captured. This covers
+        // image-based tests (acid2, mealybug, gbmicrotest, etc.)
+        // where we have no automatic pass detector — they would
+        // otherwise stay TIMEOUT, but for the harness's purposes
+        // a non-PASS result is a FAIL.
+        std::string scr_now = read_screen_text();
+        std::string snippet;
+        for (size_t p = 0; p < scr_now.size(); ) {
+            size_t e = scr_now.find('\n', p);
+            if (e == std::string::npos) e = scr_now.size();
+            std::string line(scr_now, p, e - p);
+            while (!line.empty() && line.back() == ' ') line.pop_back();
+            size_t s = 0;
+            while (s < line.size() && line[s] == ' ') ++s;
+            if (s < line.size()) {
+                snippet.assign(line, s, line.size() - s);
+                if (snippet.size() > 32) snippet.resize(32);
+                break;
+            }
+            p = e + 1;
+        }
+        out.detail = "timeout-fail: ";
+        if (!snippet.empty()) {
+            out.detail.append("[screen] ");
+            out.detail.append(snippet);
+        } else if (!g_serial_log.empty()) {
+            char buf[64];
+            std::snprintf(buf, sizeof(buf), "(serial=%zu bytes)",
+                          g_serial_log.size());
+            out.detail.append(buf);
+        } else {
+            out.detail.append("no output");
+        }
         out.verdict = Verdict::Fail;
         done = true;
     }
