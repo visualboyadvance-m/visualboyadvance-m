@@ -19,3 +19,12 @@ if(APPLE)
     target_link_libraries(suite_runner PRIVATE
         "-framework CoreFoundation" iconv)
 endif()
+
+# gb_suite_runner: headless driver for Blargg's Game Boy / Game Boy Color
+# test ROMs. Captures pass/fail via the GB serial port (SB/SC).
+add_executable(gb_suite_runner gb_suite_runner.cpp)
+target_link_libraries(gb_suite_runner PRIVATE vbam-core)
+if(APPLE)
+    target_link_libraries(gb_suite_runner PRIVATE
+        "-framework CoreFoundation" iconv)
+endif()
