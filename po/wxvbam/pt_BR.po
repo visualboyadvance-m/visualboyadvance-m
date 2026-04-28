@@ -43,7 +43,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 18:00+0000\n"
+"POT-Creation-Date: 2026-04-28 07:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
@@ -119,246 +119,246 @@ msgstr "Selecionar o arquivo do Código Dot"
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "Código Dot do e-Reader (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:505 cmdevents.cpp:709
+#: cmdevents.cpp:505 cmdevents.cpp:711
 msgid "Select battery file"
 msgstr "Selecionar o arquivo de bateria"
 
-#: cmdevents.cpp:506 cmdevents.cpp:710
+#: cmdevents.cpp:506 cmdevents.cpp:712
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Arquivo da bateria (*.sav)|*.sav| Save do flash (*.dat)|*.dat"
 
 #: cmdevents.cpp:517
 msgid ""
-"Importing a battery file will erase any saved games (permanently after the "
-"next write). Do you want to continue?"
-msgstr "Importar um arquivo de bateria apagará quaisquer jogos salvos (permanentemente após a próxima gravação). Você quer continuar?"
+"Importing a battery file will overwrite the current .sav file and reset the "
+"current running game. Do you want to continue?"
+msgstr ""
 
-#: cmdevents.cpp:518 cmdevents.cpp:549 cmdevents.cpp:672
+#: cmdevents.cpp:518 cmdevents.cpp:551 cmdevents.cpp:674
 msgid "Confirm import"
 msgstr "Confirmar a importação"
 
-#: cmdevents.cpp:524 panel.cpp:1046
+#: cmdevents.cpp:525 panel.cpp:1046
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Bateria carregada %s"
 
-#: cmdevents.cpp:526
+#: cmdevents.cpp:527
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Erro ao carregar a bateria %s"
 
-#: cmdevents.cpp:535
+#: cmdevents.cpp:537
 msgid "Select code file"
 msgstr "Selecionar o arquivo do código"
 
-#: cmdevents.cpp:536
+#: cmdevents.cpp:538
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Arquivo do Código do Game Shark (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:536
+#: cmdevents.cpp:538
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr "Arquivo do Código do Game Shark (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:548
+#: cmdevents.cpp:550
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr "Importar um arquivo do código substituirá quaisquer trapaças carregadas. Você quer continuar?"
 
-#: cmdevents.cpp:565
+#: cmdevents.cpp:567
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Não pôde abrir o arquivo %s"
 
-#: cmdevents.cpp:575
+#: cmdevents.cpp:577
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Arquivo do código não suportado %s"
 
-#: cmdevents.cpp:645
+#: cmdevents.cpp:647
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Carregou o arquivo do código %s"
 
-#: cmdevents.cpp:647
+#: cmdevents.cpp:649
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Erro ao carregar o arquivo do código %s"
 
-#: cmdevents.cpp:658 cmdevents.cpp:740
+#: cmdevents.cpp:660 cmdevents.cpp:742
 msgid "Select snapshot file"
 msgstr "Selecionar o arquivo do snapshot"
 
-#: cmdevents.cpp:659
+#: cmdevents.cpp:661
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr "Snapshots do Game Shark & PAC (*.sps;*.xps)|*.sps;*.xps|Snapshots do Game Shark SP (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:659
+#: cmdevents.cpp:661
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr "Snapshot do Game Boy (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:671
+#: cmdevents.cpp:673
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "Importar um arquivo do snapshot apagará quaisquer jogos salvos (permanentemente após a próxima gravação). Você quer continuar?"
 
-#: cmdevents.cpp:696
+#: cmdevents.cpp:698
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Carregou o arquivo do snapshot %s"
 
-#: cmdevents.cpp:698
+#: cmdevents.cpp:700
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Erro ao carregar o arquivo do snapshot %s"
 
-#: cmdevents.cpp:724
+#: cmdevents.cpp:726
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Gravou a bateria em %s"
 
-#: cmdevents.cpp:726 panel.cpp:1406
+#: cmdevents.cpp:728 panel.cpp:1406
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Erro ao gravar a bateria %s"
 
-#: cmdevents.cpp:734
+#: cmdevents.cpp:736
 msgid "EEPROM saves cannot be exported"
 msgstr "Os saves do EEPROM não podem ser exportados"
 
-#: cmdevents.cpp:741
+#: cmdevents.cpp:743
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr "Snapshot do Game Shark (*.sps)|*.sps"
 
-#: cmdevents.cpp:758
+#: cmdevents.cpp:760
 msgid "Exported from Visual Boy Advance-M"
 msgstr "Exportado do Visual Boy Advance-M"
 
-#: cmdevents.cpp:770
+#: cmdevents.cpp:772
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Arquivo do snapshot salvo %s"
 
-#: cmdevents.cpp:772
+#: cmdevents.cpp:774
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Erro ao salvar o arquivo do snapshot %s"
 
-#: cmdevents.cpp:788 cmdevents.cpp:869 cmdevents.cpp:942 cmdevents.cpp:1014
+#: cmdevents.cpp:790 cmdevents.cpp:871 cmdevents.cpp:944 cmdevents.cpp:1016
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:598 viewers.cpp:819
 #: viewsupt.cpp:1198
 msgid "Select output file"
 msgstr "Selecionar o arquivo de saída"
 
-#: cmdevents.cpp:789 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1199
+#: cmdevents.cpp:791 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1199
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Imagens PNG|*.png|Imagens BMP|*.bmp"
 
-#: cmdevents.cpp:816 sys.cpp:587
+#: cmdevents.cpp:818 sys.cpp:587
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Gravou o snapshot em %s"
 
-#: cmdevents.cpp:837 cmdevents.cpp:910 cmdevents.cpp:982 cmdevents.cpp:1051
+#: cmdevents.cpp:839 cmdevents.cpp:912 cmdevents.cpp:984 cmdevents.cpp:1053
 msgid " files ("
 msgstr " arquivos ("
 
-#: cmdevents.cpp:1084
+#: cmdevents.cpp:1086
 msgid "Select file"
 msgstr "Selecionar arquivo"
 
-#: cmdevents.cpp:1391 cmdevents.cpp:1487
+#: cmdevents.cpp:1393 cmdevents.cpp:1489
 msgid "Select state file"
 msgstr "Selecionar o arquivo do state"
 
-#: cmdevents.cpp:1392 cmdevents.cpp:1488
+#: cmdevents.cpp:1394 cmdevents.cpp:1490
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Arquivos dos jogos salvos do Visual Boy Advance|*.sgm"
 
-#: cmdevents.cpp:1521 cmdevents.cpp:1531 cmdevents.cpp:1542
+#: cmdevents.cpp:1523 cmdevents.cpp:1533 cmdevents.cpp:1544
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Slot do estado atual #%d"
 
-#: cmdevents.cpp:1605
+#: cmdevents.cpp:1607
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr "Não pode usar o Hack Colorizador quando o arquivo da BIOS do Game Boy estiver ativado."
 
-#: cmdevents.cpp:1816
+#: cmdevents.cpp:1818
 msgid "Sound enabled"
 msgstr "Som ativado"
 
-#: cmdevents.cpp:1816
+#: cmdevents.cpp:1818
 msgid "Sound disabled"
 msgstr "Som desativado"
 
-#: cmdevents.cpp:1895
+#: cmdevents.cpp:1897
 msgid "Set to 0 for pseudo tty"
 msgstr "Definir como 0 pro pseudo tty"
 
-#: cmdevents.cpp:1897
+#: cmdevents.cpp:1899
 msgid "Port to wait for connection:"
 msgstr "Esperar a conexão na porta:"
 
-#: cmdevents.cpp:1898
+#: cmdevents.cpp:1900
 msgid "GDB Connection"
 msgstr "Conexão do GDB"
 
-#: cmdevents.cpp:1950
+#: cmdevents.cpp:1952
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Esperando pela conexão em %s"
 
-#: cmdevents.cpp:1957
+#: cmdevents.cpp:1959
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Esperando pela conexão na porta %d"
 
-#: cmdevents.cpp:1961
+#: cmdevents.cpp:1963
 msgid "Waiting for GDB..."
 msgstr "Esperando pelo GDB..."
 
-#: cmdevents.cpp:2321 cmdevents.cpp:2334 cmdevents.cpp:2360 cmdevents.cpp:2365
+#: cmdevents.cpp:2323 cmdevents.cpp:2336 cmdevents.cpp:2362 cmdevents.cpp:2367
 #, c-format
 msgid "Filter: %s"
 msgstr "Filtro: %s"
 
-#: cmdevents.cpp:2339 cmdevents.cpp:2356
+#: cmdevents.cpp:2341 cmdevents.cpp:2358
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr "Filtro: Plugin (%s)"
 
-#: cmdevents.cpp:2376
+#: cmdevents.cpp:2378
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr "Mistura dos interframes: %s"
 
-#: cmdevents.cpp:2425
+#: cmdevents.cpp:2427
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "SUA CONFIGURAÇÃO SERÁ APAGADA!\n\nVocê tem certeza?"
 
-#: cmdevents.cpp:2426
+#: cmdevents.cpp:2428
 msgid "FACTORY RESET"
 msgstr "RESET DE FÁBRICA"
 
-#: cmdevents.cpp:2461
+#: cmdevents.cpp:2463
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "Emulador do Nintendo Game Boy / Color / Advance."
 
-#: cmdevents.cpp:2462
+#: cmdevents.cpp:2464
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 Time de desenvolvimento do VBA\nCopyright (C) 2007-2022 Time de desenvolvimento do VBA-M"
 
-#: cmdevents.cpp:2464
+#: cmdevents.cpp:2466
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -374,15 +374,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "Este programa é um software livre: você pode redistribuí-lo e/ou modificá-lo\nsob os termos da Licença Pública Geral do GNU conforme publicado pela\nFree Software Foundation, seja a versão 2 da Licença ou\n(sua opção) qualquer versão posterior.\n\nEste programa é distribuído na esperança de que ele será útil mas SEM QUALQUER\nGARANTIA; mesmo sem a garantia implícita de COMERCIALIZAÇÃO OU\nADEQUAÇÃO PRA UM PROPÓSITO PARTICULAR. Veja a\nLicença Pública Geral do GNU pra mais detalhes.\n\nVocê deve ter recebido uma cópia da Licença Pública Geral do GNU junto\ncom este programa. Se não recebeu veja http://www.gnu.org/licenses."
 
-#: cmdevents.cpp:2644
+#: cmdevents.cpp:2646
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "Não pode usar a BIOS do Game Boy quando o Hack Colorizador estiver ativado."
 
-#: cmdevents.cpp:2710
+#: cmdevents.cpp:2712
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "O link da LAN já está ativo. Desative o modo link pra desconectar."
 
-#: cmdevents.cpp:2716
+#: cmdevents.cpp:2718
 msgid "Network is not supported in local mode."
 msgstr "A rede não é suportada no modo local."
 
@@ -758,23 +758,23 @@ msgstr "Item do menu inválido %s; removendo"
 msgid "JoyBus host invalid; disabling"
 msgstr "Hospedeiro JoyBus inválido; desativando"
 
-#: guiinit.cpp:2304
+#: guiinit.cpp:2305
 msgid "Code"
 msgstr "Código"
 
-#: guiinit.cpp:2310
+#: guiinit.cpp:2311
 msgid "Description"
 msgstr "Descrição"
 
-#: guiinit.cpp:2363 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2364 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Endereço"
 
-#: guiinit.cpp:2364
+#: guiinit.cpp:2365
 msgid "Old Value"
 msgstr "Valor Antigo"
 
-#: guiinit.cpp:2365
+#: guiinit.cpp:2366
 msgid "New Value"
 msgstr "Valor Novo"
 
@@ -848,7 +848,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório de Salvamentos Nativos:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1404
+#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1412
 msgid "Directory Error"
 msgstr "Erro do Diretório"
 
@@ -1651,7 +1651,7 @@ msgstr "Arquivo de configuração não encontrado."
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Opção ruim da configuração ou múltiplos arquivos de ROMs dados:\n"
 
-#: wxvbam.cpp:1403
+#: wxvbam.cpp:1411
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1660,7 +1660,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: wxvbam.cpp:1668
+#: wxvbam.cpp:1676
 msgid "Failed to load dialog"
 msgstr "Falhou em carregar o diálogo"
 
@@ -2674,85 +2674,85 @@ msgstr "Erro, link já conectado"
 msgid "Unable to find link driver"
 msgstr "Incapaz de achar o driver do link"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:738
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:768
 msgid "Link connection does not need updates."
 msgstr "A conexão do link não precisa de atualizações."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:877
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:941
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1595
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2932
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:927
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:991
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1645
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2982
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Jogador %d desconectado."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:981
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1021
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1061
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1704
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1031
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1071
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1111
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1754
 msgid "Server disconnected."
 msgstr "O servidor desconectou."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1152
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1183
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1728
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1760
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1202
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1233
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1778
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1810
 msgid "Network error."
 msgstr "Erro da rede."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1160
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1736
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1210
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1786
 #, c-format
 msgid "Player %d connected"
 msgstr "Jogador %d conectado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1174
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1750
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1224
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1800
 msgid "All players connected"
 msgstr "Todos os jogadores conectados"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1195
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1772
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1245
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1822
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "Conectado como #%d, esperando %d jogadores se juntarem"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1204
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1781
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1254
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1831
 msgid "All players joined."
 msgstr "Todos os jogadores entraram."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1697
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1747
 msgid "Server timed out."
 msgstr "O tempo do servidor se esgotou."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2655
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2676
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2705
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
 msgid "Error creating file mapping"
 msgstr "Erro ao criar o mapeamento do arquivo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2666
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2716
 msgid "Error mapping file"
 msgstr "Erro ao mapear o arquivo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2713
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2763
 msgid "5 or more GBAs not supported."
 msgstr "5 ou mais GBAs não suportados."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2751
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2782
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2801
 msgid "Error opening event"
 msgstr "Erro ao abrir o evento"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2851
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2901
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Link perdido; reinicializar pra reconectar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2858
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2908
 msgid "Lost link; reconnected"
 msgstr "Link perdido; reconectado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2979
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3029
 msgid "Unknown slave timed out; resetting comm"
 msgstr "O tempo do escravo desconhecido se esgotou; resetando a comunicação"
 
