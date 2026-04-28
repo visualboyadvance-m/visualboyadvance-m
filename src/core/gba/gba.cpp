@@ -4800,7 +4800,11 @@ void CPULoop(int ticks)
             }
 
             lcdTicks -= clockTicks;
-            lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
+            // NB: lcdNextEventAbsCycle is updated *only* by adding the phase
+            // length below (not via cpuAbsCycle + lcdTicks), so it tracks the
+            // exact cycle a phase boundary fires — immune to dispatch
+            // overshoot. Live DISPSTAT reads compare against this exact
+            // boundary for sub-instruction precision.
 
             soundTicks += clockTicks;
 
@@ -4809,6 +4813,7 @@ void CPULoop(int ticks)
                     // if in V-Blank mode, keep computing...
                     if (DISPSTAT & 2) {
                         lcdTicks += 1008;
+                        lcdNextEventAbsCycle += 1008;
                         VCOUNT++;
                         UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         gfxUpdateWindowY();
@@ -4817,6 +4822,7 @@ void CPULoop(int ticks)
                         CPUCompareVCOUNT();
                     } else {
                         lcdTicks += 225;
+                        lcdNextEventAbsCycle += 225;
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         if (DISPSTAT & 16) {
@@ -4889,6 +4895,7 @@ void CPULoop(int ticks)
                         gfxUpdateWindowY();
 
                         lcdTicks += 1008;
+                        lcdNextEventAbsCycle += 1008;
                         DISPSTAT &= 0xFFFD;
                         if (VCOUNT == 160) {
                             P1 = 0x03FF ^ (joy & 0x3FF);
@@ -5148,6 +5155,7 @@ void CPULoop(int ticks)
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         lcdTicks += 225;
+                        lcdNextEventAbsCycle += 225;
                         CPUCheckDMA(2, 0x0f);
                         if (DISPSTAT & 16) {
                             IF |= 2;
@@ -5207,9 +5215,6 @@ void CPULoop(int ticks)
                         }
                     }
                 }
-                // Re-anchor the sub-cycle DISPSTAT-read deadline now that
-                // lcdTicks has been advanced into the next phase.
-                lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
             }
 
             // we shouldn't be doing sound in stop state, but we loose synchronization

@@ -396,11 +396,14 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             // Sub-cycle DISPSTAT alignment: the dispatch loop only flips
             // DISPSTAT.HBlank at event boundaries, but a poll-loop read
             // mid-dispatch can land *after* the actual scanline crossing.
-            // If cpuAbsCycle has passed the scheduled flip, return the
-            // post-flip value so polling loops detect the bit at the
-            // exact cycle real HW would.
+            // The Thumb LDRH/ARM LDRH memory access happens ~1 cycle into
+            // the instruction (after address calculation), so the effective
+            // access cycle is cpuAbsCycle + 1 (cpuAbsCycle holds the start-
+            // of-instruction value during execute). If that access cycle is
+            // past the scheduled flip, return the post-flip value so polling
+            // loops detect the bit at the exact cycle real HW would.
             if ((address & 0x3fe) == IO_REG_DISPSTAT
-                && cpuAbsCycle >= lcdNextEventAbsCycle) {
+                && cpuAbsCycle + 1 >= lcdNextEventAbsCycle) {
                 value ^= 2;
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
