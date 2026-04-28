@@ -223,47 +223,61 @@ mapperMBC2 gbDataMBC2 = {
     1 // ROM bank
 };
 
-// MBC2 ROM write registers
+// MBC2 ROM write registers.
+// Per Pan Docs: writes anywhere in $0000-$3FFF dispatch on bit 8 of
+// the address (NOT the upper bits) — bit 8 == 0 enables/disables RAM,
+// bit 8 == 1 selects the ROM bank. Writes to $4000-$7FFF have no
+// MBC2 effect.
 void mapperMBC2ROM(uint16_t address, uint8_t value)
 {
-    switch (address & 0x6000) {
-    case 0x0000: // RAM enable
-        if (!(address & 0x0100)) {
-            gbDataMBC2.mapperRAMEnable = (value & 0x0f) == 0x0a;
+    if (address >= 0x4000)
+        return;
+
+    if (address & 0x0100) {
+        // ROM bank select (bit 8 == 1, anywhere in $0000-$3FFF)
+        value &= 0x0f;
+
+        if (value == 0)
+            value = 1;
+        if (gbDataMBC2.mapperROMBank != value) {
+            gbDataMBC2.mapperROMBank = value;
+
+            int tmpAddress = value << 14;
+
+            tmpAddress &= g_gbCartData.rom_mask();
+
+            gbMemoryMap[0x04] = &gbRom[tmpAddress];
+            gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+            gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+            gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
         }
-        break;
-    case 0x2000: // ROM bank select
-        if (address & 0x0100) {
-            value &= 0x0f;
-
-            if (value == 0)
-                value = 1;
-            if (gbDataMBC2.mapperROMBank != value) {
-                gbDataMBC2.mapperROMBank = value;
-
-                int tmpAddress = value << 14;
-
-                tmpAddress &= g_gbCartData.rom_mask();
-
-                gbMemoryMap[0x04] = &gbRom[tmpAddress];
-                gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-                gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-                gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-            }
-        }
-        break;
+    } else {
+        // RAM enable (bit 8 == 0, anywhere in $0000-$3FFF)
+        gbDataMBC2.mapperRAMEnable = (value & 0x0f) == 0x0a;
     }
 }
 
-// MBC2 RAM write
+// MBC2 RAM write.
+// MBC2 has 512 × 4-bit internal RAM at $A000-$A1FF, mirrored every
+// 512 bytes through $BFFF. Only the LOW 4 bits of the value matter;
+// reads return the stored nibble in the low 4 bits and $F in the
+// upper 4 bits (we encode this on write so reads through the
+// gbMemoryMap return the masked byte directly).
 void mapperMBC2RAM(uint16_t address, uint8_t value)
 {
-    if (gbDataMBC2.mapperRAMEnable) {
-        if (g_gbCartData.HasRam() && address < 0xa200) {
-            gbMemoryMap[address >> 12][address & 0x0fff] = value;
-            systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
-        }
-    }
+    if (!gbDataMBC2.mapperRAMEnable)
+        return;
+    if (!g_gbCartData.HasRam())
+        return;
+    if (address < 0xa000 || address > 0xbfff)
+        return;
+
+    // Mirror $A000-$BFFF down to the canonical 512-byte block at
+    // $A000-$A1FF.
+    uint16_t canonical = (uint16_t)(0xa000 | (address & 0x01ff));
+    uint8_t  store     = (uint8_t)(0xf0 | (value & 0x0f));
+    gbMemoryMap[canonical >> 12][canonical & 0x0fff] = store;
+    systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
 }
 
 void memoryUpdateMapMBC2()
