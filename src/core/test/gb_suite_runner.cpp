@@ -161,15 +161,20 @@ static char read_bg_char(int col, int row) {
     return '.';
 }
 
-// Read the visible 20×18 region of the BG tile map and concatenate into a
-// single string with rows separated by '\n'. Used to detect Blargg's
-// screen-only result text (cgb_sound, dmg_sound, oam_bug, mem_timing-2,
-// halt_bug, interrupt_time).
+// Read the entire 32×32 BG tile map and concatenate into a single string
+// with rows separated by '\n'. We read the full map (not just the visible
+// 20×18 area) because Blargg's wave-channel tests scroll their output
+// continuously — the result line ("Passed" / "Failed") often sits on a
+// row that's outside the current SCY-scrolled viewport, so a 20×18 read
+// would miss it and the runner would time out.
+//
+// Used to detect Blargg's screen-only result text (cgb_sound, dmg_sound,
+// oam_bug, mem_timing-2, halt_bug, interrupt_time).
 static std::string read_screen_text() {
     std::string out;
-    out.reserve(20 * 19);
-    for (int row = 0; row < 18; ++row) {
-        for (int col = 0; col < 20; ++col)
+    out.reserve(33 * 32);
+    for (int row = 0; row < 32; ++row) {
+        for (int col = 0; col < 32; ++col)
             out.push_back(read_bg_char(col, row));
         out.push_back('\n');
     }
