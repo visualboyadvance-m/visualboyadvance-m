@@ -514,16 +514,18 @@ EVT_HANDLER_MASK(ImportBatteryFile, "Import battery file...", CMDEN_GB | CMDEN_G
         return;
 
     wxString fn = dlg.GetPath();
-    ret = wxMessageBox(_("Importing a battery file will erase any saved games (permanently after the next write). Do you want to continue?"),
+    ret = wxMessageBox(_("Importing a battery file will overwrite the current .sav file and reset the current running game. Do you want to continue?"),
         _("Confirm import"), wxYES_NO | wxICON_EXCLAMATION);
 
     if (ret == wxYES) {
         wxString msg;
 
-        if (panel->emusys->emuReadBattery(UTF8(fn)))
+        if (panel->emusys->emuReadBattery(UTF8(fn))) {
+            panel->emusys->emuReset();
             msg.Printf(_("Loaded battery %s"), fn.wc_str());
-        else
+        } else {
             msg.Printf(_("Error loading battery %s"), fn.wc_str());
+        }
 
         systemScreenMessage(msg);
     }
