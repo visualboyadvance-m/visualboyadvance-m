@@ -703,7 +703,27 @@ void DisplayConfig::OnFilterChanged(config::Option* option) {
     // will eventually reset if it can't actually use the plugin.
     wxString filter_name;
     if (is_plugin) {
-        filter_name = _("Plugin");
+        const int plugin_sel = plugin_selector_->GetSelection();
+        if (plugin_sel > 0) {
+            // Selector entries are formatted as "<filename>: <plugin name>";
+            // prefer the plugin name, falling back to the whole entry.
+            const wxString entry_text = plugin_selector_->GetString(plugin_sel);
+            const size_t sep = entry_text.find(wxT(": "));
+            if (sep != wxString::npos) {
+                filter_name = entry_text.substr(sep + 2);
+            } else {
+                filter_name = entry_text;
+            }
+        } else {
+            // Selector isn't populated yet (dialog never shown). Fall back to
+            // the file name from the configured plugin path.
+            const wxString plugin_path = OPTION(kDispFilterPlugin);
+            if (!plugin_path.empty()) {
+                filter_name = wxFileName(plugin_path).GetName();
+            } else {
+                filter_name = _("Plugin");
+            }
+        }
     } else {
         filter_name =
             filter_selector_->GetString(static_cast<size_t>(option_filter));
