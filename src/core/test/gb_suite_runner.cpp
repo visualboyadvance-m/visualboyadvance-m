@@ -296,6 +296,18 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
     bool done = false;
     int last_screen_change_frame = 0;
     std::string prev_screen;
+    auto extract_match_line = [](const std::string& screen, size_t pos)
+        -> std::string {
+        size_t end = screen.find('\n', pos);
+        if (end == std::string::npos) end = screen.size();
+        size_t start = pos;
+        while (start > 0 && screen[start - 1] != '\n') --start;
+        while (start < pos && screen[start] == ' ') ++start;
+        std::string line = "[screen] ";
+        line.append(screen, start, end - start);
+        while (!line.empty() && line.back() == ' ') line.pop_back();
+        return line;
+    };
     for (int i = 0; i < kMaxFrames && !done; ++i) {
         GBSystem.emuMain(kFrameTicks);
         out.frames_run = i + 1;
@@ -313,54 +325,68 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
                 continue;
             }
 
-            // 2) Screen-text detection (cgb_sound, dmg_sound, oam_bug,
-            //    mem_timing-2, halt_bug, interrupt_time). The test ROMs
-            //    write the result line to the BG tile map and then sit in
-            //    a halt loop. We poll once the screen has stabilized for
-            //    a few checks (no further changes for ~16 frames).
+            // 2) Screen-text detection. Two strategies:
+            //    a) "stable screen" — the test sits in a halt loop after
+            //       writing its result. Wait 16 frames of no change, then
+            //       scan for "Passed"/"Failed".
+            //    b) "actively-updating screen" — wave-channel quirk tests
+            //       (cgb_sound/dmg_sound 10/12) keep redrawing wave RAM,
+            //       so the screen never stabilizes. Scan for "Passed"/
+            //       "Failed" eagerly even on changes — these tests append
+            //       the result line at the end of their output, so once
+            //       it appears we exit immediately.
             std::string screen = read_screen_text();
             if (screen != prev_screen) {
                 last_screen_change_frame = i;
                 prev_screen = screen;
             }
-            if (i - last_screen_change_frame >= 16) {
-                // Look for "Passed" / "Failed" in the screen text.
-                size_t p_pass = screen.find("Passed");
-                size_t p_fail = screen.find("Failed");
-                if (p_pass != std::string::npos) {
-                    size_t end = screen.find('\n', p_pass);
-                    if (end == std::string::npos) end = screen.size();
-                    out.detail.assign("[screen] ");
-                    // Trim leading spaces.
-                    size_t start = p_pass;
-                    while (start > 0 && screen[start - 1] != '\n') --start;
-                    while (start < p_pass && screen[start] == ' ') ++start;
-                    out.detail.append(screen, start, end - start);
-                    // Strip trailing spaces.
-                    while (!out.detail.empty() && out.detail.back() == ' ')
-                        out.detail.pop_back();
-                    out.verdict = Verdict::Pass;
-                    done = true;
-                } else if (p_fail != std::string::npos) {
-                    size_t end = screen.find('\n', p_fail);
-                    if (end == std::string::npos) end = screen.size();
-                    size_t start = p_fail;
-                    while (start > 0 && screen[start - 1] != '\n') --start;
-                    while (start < p_fail && screen[start] == ' ') ++start;
-                    out.detail.assign("[screen] ");
-                    out.detail.append(screen, start, end - start);
-                    while (!out.detail.empty() && out.detail.back() == ' ')
-                        out.detail.pop_back();
-                    out.verdict = Verdict::Fail;
-                    done = true;
-                }
+            bool screen_stable = (i - last_screen_change_frame >= 16);
+            // Always check for "Passed"/"Failed" — eager exit avoids the
+            // timeout on tests that keep redrawing their output buffer.
+            size_t p_pass = screen.find("Passed");
+            size_t p_fail = screen.find("Failed");
+            if (p_pass != std::string::npos) {
+                out.detail = extract_match_line(screen, p_pass);
+                out.verdict = Verdict::Pass;
+                done = true;
+            } else if (p_fail != std::string::npos && screen_stable) {
+                // Be more conservative on "Failed" — only trust it if the
+                // screen has stabilized, since some tests display partial
+                // failure indicators mid-run.
+                out.detail = extract_match_line(screen, p_fail);
+                out.verdict = Verdict::Fail;
+                done = true;
+            } else if (p_fail != std::string::npos) {
+                // Saw "Failed" on an unstable screen — keep waiting in case
+                // a later "Passed" supersedes it (rare). If the test runs
+                // out of frames with only "Failed" visible, we fall back
+                // to FAIL via the timeout path below.
             }
         }
     }
 
     if (!done) {
-        // Timeout. Surface whatever serial log or screen text we have so the
-        // user can see where the ROM got stuck.
+        // Timeout. If the screen has a "Failed" anywhere, treat as FAIL —
+        // some wave-channel tests keep redrawing their output buffer so
+        // we never reached the stable-screen path. Otherwise surface
+        // whatever serial / screen text we have.
+        std::string final_screen = read_screen_text();
+        size_t p_fail = final_screen.find("Failed");
+        if (p_fail != std::string::npos) {
+            out.detail = "timeout-fail: ";
+            size_t end = final_screen.find('\n', p_fail);
+            if (end == std::string::npos) end = final_screen.size();
+            size_t s = p_fail;
+            while (s > 0 && final_screen[s - 1] != '\n') --s;
+            while (s < p_fail && final_screen[s] == ' ') ++s;
+            out.detail.append(final_screen, s, end - s);
+            while (!out.detail.empty() && out.detail.back() == ' ')
+                out.detail.pop_back();
+            out.verdict = Verdict::Fail;
+            done = true;
+        }
+    }
+    if (!done) {
         if (!g_serial_log.empty()) {
             size_t pos = 0;
             while (pos < g_serial_log.size() && g_serial_log[pos] == '\n')
