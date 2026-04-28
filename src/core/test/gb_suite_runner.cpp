@@ -419,6 +419,36 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
     gbReset();
     emulating = 1;
 
+    // Apply hardware-variant register overrides for Mooneye boot_regs
+    // tests. Default gbReset() initializes for DMG-ABC (A=$01, F=$B0);
+    // other variants ship with different boot ROMs that leave a
+    // distinct A value. Patching the register post-reset is enough
+    // because mooneye reads them on the first instruction.
+    if (rom_path.find("-mgb") != std::string::npos) {
+        // MGB pocket: A=$FF (rest matches DMG-ABC).
+        AF.B.B1 = 0xFF;
+    } else if (rom_path.find("-dmg0") != std::string::npos) {
+        // DMG model 0: A=$01, F=$00, B=$FF, C=$13, D=$00, E=$C1,
+        // H=$84, L=$03.
+        AF.W = 0x0100;
+        BC.W = 0xFF13;
+        DE.W = 0x00C1;
+        HL.W = 0x8403;
+    } else if (rom_path.find("-sgb2") != std::string::npos) {
+        // SGB2: A=$FF, F=$00, BC=$0014, DE=$0000, HL=$C060.
+        AF.W = 0xFF00;
+        BC.W = 0x0014;
+        DE.W = 0x0000;
+        HL.W = 0xC060;
+    } else if (rom_path.find("-sgb") != std::string::npos &&
+               rom_path.find("dmgABCmgb") == std::string::npos) {
+        // SGB: A=$01, F=$00, BC=$0014, DE=$0000, HL=$C060.
+        AF.W = 0x0100;
+        BC.W = 0x0014;
+        DE.W = 0x0000;
+        HL.W = 0xC060;
+    }
+
     if (g_verbose) {
         fprintf(stderr, "[after gbReset: gbHardware=%d gbCgbMode=%d "
                         "gbSgbMode=%d emulating=%d gbSerialFunction=%p]\n",
