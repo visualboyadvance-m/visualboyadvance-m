@@ -260,9 +260,8 @@ void mapperMBC2ROM(uint16_t address, uint8_t value)
 // MBC2 RAM write.
 // MBC2 has 512 × 4-bit internal RAM at $A000-$A1FF, mirrored every
 // 512 bytes through $BFFF. Only the LOW 4 bits of the value matter;
-// reads return the stored nibble in the low 4 bits and $F in the
-// upper 4 bits (we encode this on write so reads through the
-// gbMemoryMap return the masked byte directly).
+// the canonical byte is stored as `0xF0 | (value & 0x0F)` so reads
+// through `mapperMBC2ReadRAM` return $Fn directly.
 void mapperMBC2RAM(uint16_t address, uint8_t value)
 {
     if (!gbDataMBC2.mapperRAMEnable)
@@ -272,12 +271,26 @@ void mapperMBC2RAM(uint16_t address, uint8_t value)
     if (address < 0xa000 || address > 0xbfff)
         return;
 
-    // Mirror $A000-$BFFF down to the canonical 512-byte block at
-    // $A000-$A1FF.
-    uint16_t canonical = (uint16_t)(0xa000 | (address & 0x01ff));
-    uint8_t  store     = (uint8_t)(0xf0 | (value & 0x0f));
-    gbMemoryMap[canonical >> 12][canonical & 0x0fff] = store;
+    uint16_t offset = (uint16_t)(address & 0x01ff);
+    gbMemoryMap[0x0a][offset] = (uint8_t)(0xf0 | (value & 0x0f));
     systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
+}
+
+// MBC2 RAM read.
+// Real DMG with RAM-enable cleared returns $FF for any read in the
+// $A000-$BFFF range. With RAM enabled, reads return the canonical
+// 512-byte block at $A000-$A1FF mirrored every 512 bytes. The default
+// read path (`address <= 0xa000 + ram_mask`) caps at $A1FF for the
+// 512-byte ram_mask, so we need a custom hook to return the mirrored
+// value across the full $A000-$BFFF range.
+uint8_t mapperMBC2ReadRAM(uint16_t address)
+{
+    if (!gbDataMBC2.mapperRAMEnable)
+        return 0xff;
+    if (address < 0xa000 || address > 0xbfff)
+        return 0xff;
+    uint16_t offset = (uint16_t)(address & 0x01ff);
+    return gbMemoryMap[0x0a][offset];
 }
 
 void memoryUpdateMapMBC2()

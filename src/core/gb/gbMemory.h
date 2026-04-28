@@ -170,6 +170,7 @@ void mapperMBC1RAM(uint16_t, uint8_t);
 uint8_t mapperMBC1ReadRAM(uint16_t);
 void mapperMBC2ROM(uint16_t, uint8_t);
 void mapperMBC2RAM(uint16_t, uint8_t);
+uint8_t mapperMBC2ReadRAM(uint16_t);
 void mapperMBC3ROM(uint16_t, uint8_t);
 void mapperMBC3RAM(uint16_t, uint8_t);
 uint8_t mapperMBC3ReadRAM(uint16_t);

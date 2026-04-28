@@ -363,6 +363,7 @@ bool gbInitializeRom(size_t romSize) {
         case gbCartData::MapperType::kMbc2:
             g_mapper = mapperMBC2ROM;
             g_mapperRAM = mapperMBC2RAM;
+            g_mapperReadRAM = mapperMBC2ReadRAM;
             break;
         case gbCartData::MapperType::kMmm01:
             g_mapper = mapperMMM01ROM;
@@ -431,12 +432,16 @@ bool gbInitializeRom(size_t romSize) {
 
     const size_t ramSize = g_gbCartData.ram_size();
     if (g_gbCartData.HasRam()) {
-        // Always allocate 4 KiB to prevent access issues down the line.
-        gbRam = (uint8_t*)malloc(std::max(k4KiB, ramSize));
+        // gbMemoryMap[0x0a] / [0x0b] cover $A000-$AFFF and $B000-$BFFF
+        // (8 KiB total), and several mappers (notably MBC2 with its
+        // 512-byte internal RAM) point both slots into the same gbRam
+        // buffer. Allocate at least 8 KiB so neither slot reads past
+        // the buffer end.
+        gbRam = (uint8_t*)malloc(std::max(k8KiB, ramSize));
         if (gbRam == NULL) {
             return false;
         }
-        memset(gbRam, gbRamFill, ramSize);
+        memset(gbRam, gbRamFill, std::max(k8KiB, ramSize));
     }
 
     gbSgbInit();
@@ -2228,13 +2233,19 @@ uint8_t gbReadMemory(uint16_t address)
         }
 #endif
 
+        // If a mapper provides a custom read hook, defer entirely to it
+        // (MBC2 needs this so it can mirror its 512-byte buffer across
+        // the full $A000-$BFFF range; the simple ram_mask cap below
+        // would short-circuit those reads to $FF). Other mappers'
+        // hooks already handle the mask themselves.
+        if (g_mapperReadRAM) {
+            return g_mapperReadRAM(address);
+        }
+
         // for the 2kb ram limit (fixes crash in shawu's story
         // but now its sram test fails, as the it expects 8kb and not 2kb...
         // So use the 'genericflashcard' option to fix it).
         if (address <= (0xa000 + g_gbCartData.ram_mask())) {
-            if (g_mapperReadRAM) {
-                return g_mapperReadRAM(address);
-            }
             return gbMemoryMap[address >> 12][address & 0x0fff];
         }
         return 0xff;
@@ -3282,7 +3293,15 @@ void gbReset()
 
     if (gbRam) {
         gbMemoryMap[0x0a] = &gbRam[0x0000];
-        gbMemoryMap[0x0b] = &gbRam[0x1000];
+        // MBC2 has 512 bytes of internal RAM mirrored across $A000-$BFFF.
+        // We mirror within gbMemoryMap[0x0a]'s 4 KiB on every write, and
+        // point $B000-$BFFF at the SAME 4 KiB block so reads from there
+        // see the same mirrored data. Other mappers keep the standard
+        // 4 KiB-per-slot layout.
+        if (g_gbCartData.mapper_type() == gbCartData::MapperType::kMbc2)
+            gbMemoryMap[0x0b] = &gbRam[0x0000];
+        else
+            gbMemoryMap[0x0b] = &gbRam[0x1000];
     }
 
     gbSoundReset();
