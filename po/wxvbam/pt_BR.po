@@ -131,7 +131,7 @@ msgstr "Arquivo da bateria (*.sav)|*.sav| Save do flash (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
-msgstr ""
+msgstr "Importar um arquivo de bateria sobrescreverá o arquivo .sav atual e resetará o jogo atual em execução. Você quer continuar?"
 
 #: cmdevents.cpp:518 cmdevents.cpp:551 cmdevents.cpp:674
 msgid "Confirm import"
