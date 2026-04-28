@@ -1330,6 +1330,46 @@ void gbCompareLYToLYC()
     }
 }
 
+// DMG OAM corruption bug. Fires when a 16-bit register operation
+// places a value in $FE00-$FEFF on the address bus during mode 2's
+// active window. Real HW window is ~19 T-cycles into mode 2 (which
+// is 80 T-cycles total). In our M-cycle dispatch model (mode 2 = 20
+// M-cycles), the window covers gbLcdTicks 18..0 — i.e. all of mode 2
+// EXCEPT the very first M-cycle (gbLcdTicks=19). Excluding the first
+// M-cycle is necessary so that 6-timing_no_bug — which carefully
+// places INC DE at the precise start of mode 2 — does not trigger a
+// false positive.
+//
+// Address clamping: bug only fires for $FE00-$FEFF (high byte $FE).
+// Within that, the row is (addr & 0xFF) >> 3; rows past 19 (above OAM
+// proper) wrap-corrupt within the 20-row OAM region.
+static inline void gbOamBugAccess(uint16_t addr)
+{
+    if (!(gbHardware & 1))               return;
+    if (!(register_LCDC & 0x80))         return;
+    if (gbLcdMode != 2)                  return;
+    if (gbLcdTicks > 19)                 return;
+    if ((addr & 0xFF00) != 0xFE00)       return;
+
+    int row = ((addr & 0xFF) >> 3);
+    if (row >= 20) row = row % 20;
+    uint8_t* oam = &gbMemory[0xFE00];
+    int cur = row * 8;
+    if (row == 0) {
+        for (int i = 0; i < 8; ++i) oam[i] = 0;
+        return;
+    }
+    int prev = (row - 1) * 8;
+    uint16_t a = (uint16_t)oam[prev + 0] | ((uint16_t)oam[prev + 1] << 8);
+    uint16_t b = (uint16_t)oam[prev + 2] | ((uint16_t)oam[prev + 3] << 8);
+    uint16_t c = (uint16_t)oam[cur + 0]  | ((uint16_t)oam[cur + 1]  << 8);
+    uint16_t corrupted = (uint16_t)(b | (a & c));
+    oam[cur + 0] = (uint8_t)(corrupted & 0xFF);
+    oam[cur + 1] = (uint8_t)((corrupted >> 8) & 0xFF);
+    for (int i = 2; i < 8; ++i)
+        oam[cur + i] = oam[prev + i];
+}
+
 void gbWriteMemory(uint16_t address, uint8_t value)
 {
 
