@@ -127,6 +127,13 @@ int emulating = 0;
 static std::string g_serial_log;
 static bool g_verbose = false;
 static bool g_dump_screen = false;
+
+// Optional boot-ROM blobs: pre-loaded once at startup via --bios /
+// --dmg-bios. When set, the corresponding ROM mode runs the real boot
+// ROM before jumping to user code, which sets up the precise hardware
+// state mooneye's boot_div / boot_hwio tests verify.
+static std::vector<uint8_t> g_dmg_bios;     // 256 bytes
+static std::vector<uint8_t> g_cgb_bios;     // 2304 bytes
 static uint8_t serial_capture(uint8_t b) {
     g_serial_log.push_back((char)b);
     if (g_verbose) {
@@ -274,7 +281,7 @@ static uint32_t pick_emulator_type(const std::string& rom_path) {
     //      boot_regs-A.gb        → GBA (treat as CGB)
     //      boot_regs-cgb.gb      → CGB
     if (ends_with_(rom_path, "-S.gb"))      return 2;        // SGB
-    if (ends_with_(rom_path, "-A.gb"))      return 1;        // AGB → CGB mode
+    if (ends_with_(rom_path, "-A.gb"))      return 4;        // AGB / SP
     if (ends_with_(rom_path, "-C.gb"))      return 1;        // CGB
     if (rom_path.find("-dmg")  != std::string::npos &&
         ends_with_(rom_path, ".gb"))        return 3;        // DMG variants
@@ -415,6 +422,29 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
     if (g_verbose) {
         fprintf(stderr, "[loaded ROM '%s', hardware type after load=%d]\n",
                 rom_path.c_str(), gbHardware);
+    }
+
+    // Optionally apply a real boot ROM. gbLoadRom allocates `g_bios`
+    // as a 2304-byte buffer; we memcpy the right blob in based on the
+    // detected hardware. coreOptions.useBios + !skipBios in gbReset()
+    // does the actual gbMemory→bios swap-in for $0000-$00FF (DMG) or
+    // $0000-$08FF (CGB). `inBios` is a global that persists across
+    // gbReset() calls — explicitly clear it so a previous BIOS-mode
+    // test that exited with inBios set true (e.g., timed out before
+    // reaching the $FF50 disable write) doesn't leak into a follow-up
+    // ROM that should run BIOS-less.
+    extern bool inBios;
+    inBios = false;
+    coreOptions.useBios  = false;
+    coreOptions.skipBios = false;
+    if (g_bios != nullptr) {
+        if ((gbHardware & 2) && !g_cgb_bios.empty()) {
+            std::memcpy(g_bios, g_cgb_bios.data(), g_cgb_bios.size());
+            coreOptions.useBios = true;
+        } else if ((gbHardware & 1) && !g_dmg_bios.empty()) {
+            std::memcpy(g_bios, g_dmg_bios.data(), g_dmg_bios.size());
+            coreOptions.useBios = true;
+        }
     }
 
     // Sound init (uses the NullSoundDriver), reset, then run frames until a
@@ -828,8 +858,28 @@ static std::string trim_prefix(const std::string& s, const std::string& prefix) 
 
 // ---- Main ------------------------------------------------------------------
 
+// Slurp a binary file into a vector. Returns true on success and the
+// vector ends with the file contents; on failure the vector is left
+// empty. Uses C stdio so we don't drag in <fstream>.
+static bool slurp_file(const char* path, std::vector<uint8_t>& out) {
+    out.clear();
+    FILE* f = std::fopen(path, "rb");
+    if (!f) return false;
+    if (std::fseek(f, 0, SEEK_END) != 0) { std::fclose(f); return false; }
+    long n = std::ftell(f);
+    if (n < 0) { std::fclose(f); return false; }
+    if (std::fseek(f, 0, SEEK_SET) != 0) { std::fclose(f); return false; }
+    out.resize((size_t)n);
+    size_t got = std::fread(out.data(), 1, (size_t)n, f);
+    std::fclose(f);
+    if (got != (size_t)n) { out.clear(); return false; }
+    return true;
+}
+
 int main(int argc, char** argv) {
     const char* roms_path = nullptr;
+    const char* dmg_bios_path = nullptr;
+    const char* cgb_bios_path = nullptr;
     for (int i = 1; i < argc; ++i) {
         const char* a = argv[i];
         if (std::strcmp(a, "--mode") == 0 && i + 1 < argc) {
@@ -838,8 +888,43 @@ int main(int argc, char** argv) {
             g_verbose = true;
         } else if (std::strcmp(a, "--dump-screen") == 0) {
             g_dump_screen = true;
+        } else if ((std::strcmp(a, "--bios") == 0 ||
+                    std::strcmp(a, "--cgb-bios") == 0) && i + 1 < argc) {
+            cgb_bios_path = argv[++i];
+        } else if (std::strcmp(a, "--dmg-bios") == 0 && i + 1 < argc) {
+            dmg_bios_path = argv[++i];
         } else if (!roms_path) {
             roms_path = a;
+        }
+    }
+
+    // Load any BIOS blobs requested. CGB BIOS = 2304 bytes; DMG = 256.
+    if (cgb_bios_path) {
+        if (!slurp_file(cgb_bios_path, g_cgb_bios) ||
+            g_cgb_bios.size() != 2304) {
+            fprintf(stderr,
+                    "gb_suite_runner: CGB BIOS at '%s' missing or wrong "
+                    "size (expected 2304, got %zu) — running without\n",
+                    cgb_bios_path, g_cgb_bios.size());
+            g_cgb_bios.clear();
+        } else {
+            fprintf(stderr,
+                    "gb_suite_runner: loaded CGB BIOS (%zu bytes) from %s\n",
+                    g_cgb_bios.size(), cgb_bios_path);
+        }
+    }
+    if (dmg_bios_path) {
+        if (!slurp_file(dmg_bios_path, g_dmg_bios) ||
+            g_dmg_bios.size() != 256) {
+            fprintf(stderr,
+                    "gb_suite_runner: DMG BIOS at '%s' missing or wrong "
+                    "size (expected 256, got %zu) — running without\n",
+                    dmg_bios_path, g_dmg_bios.size());
+            g_dmg_bios.clear();
+        } else {
+            fprintf(stderr,
+                    "gb_suite_runner: loaded DMG BIOS (%zu bytes) from %s\n",
+                    g_dmg_bios.size(), dmg_bios_path);
         }
     }
     if (!roms_path)
