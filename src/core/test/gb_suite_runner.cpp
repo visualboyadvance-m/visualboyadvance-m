@@ -261,6 +261,10 @@ static uint32_t pick_emulator_type(const std::string& rom_path) {
     if (rom_path.find("dmg_sound")     != std::string::npos) return 3;  // DMG
     if (rom_path.find("oam_bug")       != std::string::npos) return 3;  // DMG
 
+    // SameBoy's same-suite tests are CGB-specific (test CGB-only PPU/
+    // APU edge cases), even though the ROM is a .gb file.
+    if (rom_path.find("same-suite")    != std::string::npos) return 1;  // CGB
+
     // 2) Mooneye-style filename suffix (-dmg*, -cgb*, -S, -A, -C).
     //    The suffix appears just before the ".gb" / ".gbc" extension.
     //    Examples:
@@ -462,6 +466,7 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         DE.W = 0x0008;
         HL.W = 0x007C;
     }
+
 
     if (g_verbose) {
         fprintf(stderr, "[after gbReset: gbHardware=%d gbCgbMode=%d "

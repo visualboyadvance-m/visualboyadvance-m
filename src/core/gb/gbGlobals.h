@@ -5,6 +5,12 @@
 
 extern uint8_t* g_bios;
 
+// Internal timer state (gb.cpp). Exposed for the headless test
+// runner so it can patch DIV/internal-timer values to match the
+// boot-ROM exit state expected by Mooneye's boot_div tests.
+extern int gbDivTicks;
+extern int gbInternalTimer;
+
 extern uint8_t* gbRom;
 extern uint8_t* gbRam;
 extern uint8_t* gbVram;

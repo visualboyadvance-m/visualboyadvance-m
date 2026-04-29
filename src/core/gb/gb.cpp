@@ -1264,10 +1264,29 @@ bool gbIsGameboyRom(char* file)
     return false;
 }
 
+// Forward declaration — gbReadMemory is defined further down.
+uint8_t gbReadMemory(uint16_t address);
+
 void gbCopyMemory(uint16_t d, uint16_t s, int count)
 {
     while (count) {
-        gbMemoryMap[d >> 12][d & 0x0fff] = gbMemoryMap[s >> 12][s & 0x0fff];
+        uint8_t v;
+        // Source reads from cart RAM ($A000-$BFFF) must go through
+        // the MBC, since several mappers (MBC1/MBC2 with RAM disabled,
+        // MBC2 with mirroring, etc.) return values that differ from
+        // the raw gbMemoryMap-backed buffer.
+        if (s >= 0xa000 && s < 0xc000) {
+            v = gbReadMemory(s);
+        } else if (s >= 0xe000 && s < 0xfe00) {
+            // Echo RAM mirror: $E000-$FDFF mirrors WRAM at $C000-$DDFF.
+            // gbMemoryMap[0xe]/[0xf] aren't pointed at WRAM, so mask
+            // off bit 13 to address the real WRAM bytes.
+            uint16_t real = (uint16_t)(s & ~0x2000);
+            v = gbMemoryMap[real >> 12][real & 0x0fff];
+        } else {
+            v = gbMemoryMap[s >> 12][s & 0x0fff];
+        }
+        gbMemoryMap[d >> 12][d & 0x0fff] = v;
         s++;
         d++;
         count--;
@@ -2436,7 +2455,12 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x01:
             return gbMemory[0xff01];
         case 0x02:
-            return (gbMemory[0xff02]);
+            // SC (serial control): bits 2-6 read as 1 (open-bus). On
+            // CGB also bit 1 is the shift-clock-speed bit; on DMG
+            // bit 1 is unused (reads 1). Bits 0,7 are real control bits.
+            if (gbCgbMode || (gbHardware & 2))
+                return (uint8_t)(0x7c | (gbMemory[0xff02] & 0x83));
+            return (uint8_t)(0x7e | (gbMemory[0xff02] & 0x81));
         case 0x03:
             log("Undocumented Memory register read %04x PC=%04x\n",
                 address,
@@ -2575,6 +2599,24 @@ uint8_t gbReadMemory(uint16_t address)
         case 0xff:
             return register_IE;
         }
+        // The genuinely-unused HW IO addresses on DMG/CGB read back as
+        // $FF (open-bus high). Without this, falling through to
+        // gbMemoryMap returns whatever was last written, which fails
+        // mooneye's bits/unused_hwio tests. Targeted ranges only —
+        // the broader catch-all from $FF00-$FF7F broke 0x47/0x48/0x49
+        // (BGP/OBP0/OBP1) and other writable-but-not-switched regs.
+        const uint8_t lo = address & 0xff;
+        if (lo == 0x03 ||                          // unused (between SC and DIV)
+            (lo >= 0x08 && lo <= 0x0e) ||          // unused
+            lo == 0x15 ||                          // unused (between NR12 and NR13)
+            lo == 0x1f ||                          // unused
+            (lo >= 0x27 && lo <= 0x2f) ||          // unused
+            (lo >= 0x4c && lo <= 0x4e && !gbCgbMode) ||
+            (lo >= 0x57 && lo <= 0x67) ||          // unused
+            (lo >= 0x6c && lo <= 0x6f) ||          // unused
+            lo == 0x71 ||                          // unused
+            (lo >= 0x78 && lo <= 0x7f))            // unused
+            return 0xff;
     }
     // OAM not accessible during mode 2 & 3.
     if (((address >= 0xfe00) && (address < 0xfea0)) && ((((gbLcdMode | gbLcdModeDelayed) & 2) && (!(gbSpeed && (gbHardware & 0x2) && !(gbLcdModeDelayed & 2) && (gbLcdMode == 2)))) || (gbSpeed && (gbHardware & 0x2) && (gbLcdModeDelayed == 0) && (gbLcdTicksDelayed == (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299])))))
@@ -5111,16 +5153,44 @@ void gbEmulate(int ticksToStop)
                     gbIntBreak = 0;
                 }
 
-                if (register_IF & register_IE & 1)
-                    gbVblank_interrupt();
-                else if (register_IF & register_IE & 2)
-                    gbLcd_interrupt();
-                else if (register_IF & register_IE & 4)
-                    gbTimer_interrupt();
-                else if (register_IF & register_IE & 8)
-                    gbSerial_interrupt();
-                else if (register_IF & register_IE & 16)
-                    gbJoypad_interrupt();
+                // Real DMG/CGB interrupt dispatch:
+                //   1. Push PC.high to [SP-1], SP--
+                //   2. Push PC.low to [SP-1], SP--
+                //   3. Read IE *now* (the high-byte push above may have
+                //      written to the IE register at $FFFF, changing
+                //      which interrupts are armed) and pick the vector
+                //      from the highest-priority armed bit.
+                // Mooneye's interrupts/ie_push test exercises exactly
+                // this corner case by setting SP=$FFFF before the
+                // interrupt fires. We previously routed each interrupt
+                // through a dedicated function that cleared IF then
+                // pushed; that didn't see the post-push IE.
+                gbCheatWrite(false);
+                gbWriteMemory(--SP.W, PC.B.B1);
+                gbWriteMemory(--SP.W, PC.B.B0);
+
+                uint8_t armed = register_IE & register_IF & 0x1f;
+                if (armed & 1) {
+                    register_IF &= 0xfe;
+                    PC.W = 0x40;
+                } else if (armed & 2) {
+                    register_IF &= 0xfd;
+                    PC.W = 0x48;
+                } else if (armed & 4) {
+                    register_IF &= 0xfb;
+                    PC.W = 0x50;
+                } else if (armed & 8) {
+                    register_IF &= 0xf7;
+                    PC.W = 0x58;
+                } else if (armed & 16) {
+                    register_IF &= 0xef;
+                    PC.W = 0x60;
+                } else {
+                    // No bit armed (the push cancelled our interrupt) —
+                    // dispatch to vector $0000 per real HW.
+                    PC.W = 0x0000;
+                }
+                gbMemory[0xff0f] = register_IF;
             }
 
             IFF &= ~0x81;
