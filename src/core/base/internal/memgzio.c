@@ -734,7 +734,7 @@ z_off_t ZEXPORT memgzseek(gzFile file, z_off_t off, int whence)
         // this is inefficient, but the best I can do without actually reading
         // the above code
         while (off > 0) {
-                int r = memgzread(file, buf, off > 80 ? 80 : off);
+                int r = memgzread(file, buf, off > 80 ? 80 : (unsigned)off);
                 if (r <= 0)
                         return -1;
                 off -= r;
