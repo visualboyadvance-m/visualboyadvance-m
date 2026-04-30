@@ -40,11 +40,41 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      # Cmake build
+      # Ensure Docker is available — CMake's auto-fetch path runs the
+      # official `devkitpro/devkitarm` image to build mGBA's suite.gba
+      # from source. macOS GHA runners do NOT ship Docker; we install
+      # Colima (a Docker-compatible VM runtime that doesn't require
+      # the licensed Docker Desktop) via Homebrew, which is itself
+      # preinstalled on the runner.
+      - if: matrix.build_options == 'default'
+        name: Ensure Docker is installed
+        run: |
+          set -e
+          if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+            echo "docker already installed: $(docker --version)"
+          else
+            brew install docker docker-compose colima
+            colima start
+            # The docker CLI from brew expects DOCKER_HOST pointing at
+            # colima's socket; export for subsequent steps.
+            echo "DOCKER_HOST=unix://$HOME/.colima/default/docker.sock" >> "$GITHUB_ENV"
+          fi
+          docker pull devkitpro/devkitarm
+
+      # Cmake build. The default-options matrix turns on
+      # VBAM_FETCH_TEST_ROMS — CMake clones Blargg gb-test-roms and
+      # mGBA's suite source from upstream, then builds suite.gba via
+      # the official `devkitpro/devkitarm` Docker image (same path
+      # mGBA's own docker-build.sh uses). If Docker isn't available
+      # on this runner the gba.suite test gracefully skips; gb.blargg
+      # always works since gb-test-roms ships prebuilt .gb files.
       - if: matrix.build_options != 'libretro'
         name: Configure CMake
         run: >-
-          nix-shell --command 'cmake -B build -G Ninja ${{ matrix.cmake_build }} -DENABLE_LTO=OFF ${{ matrix.cmake_options }}'
+          nix-shell --command 'cmake -B build -G Ninja
+          ${{ matrix.cmake_build }} -DENABLE_LTO=OFF
+          ${{ matrix.cmake_options }}
+          ${{ matrix.build_options == 'default' && '-DVBAM_FETCH_TEST_ROMS=ON' || '' }}'
       - if: matrix.build_options != 'libretro'
         name: Build
         run: >-

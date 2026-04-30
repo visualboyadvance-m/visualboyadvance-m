@@ -54,11 +54,40 @@ jobs:
       - name: Install xvfb
         run: sudo apt -y install xvfb
 
-      # CMake build
+      # Ensure Docker is available — CMake's auto-fetch path runs the
+      # official `devkitpro/devkitarm` image to build mGBA's suite.gba
+      # from source. Ubuntu GHA runners almost always have Docker
+      # pre-installed; this step is a no-op when it's already present
+      # and only installs from the official Docker apt repo otherwise.
+      - if: matrix.build_options == 'default'
+        name: Ensure Docker is installed
+        run: |
+          set -e
+          if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
+            echo "docker already installed: $(docker --version)"
+          else
+            curl -fsSL https://get.docker.com | sudo sh
+          fi
+          # Pre-pull the toolchain image to avoid timing-out during
+          # configure (it's ~700 MB on first pull).
+          sudo docker pull devkitpro/devkitarm
+
+      # CMake build. The default-options matrix turns on
+      # VBAM_FETCH_TEST_ROMS — CMake clones Blargg gb-test-roms and
+      # mGBA's suite source from upstream, then builds suite.gba
+      # using the official `devkitpro/devkitarm` Docker image (same
+      # invocation mGBA's own docker-build.sh uses). Ubuntu GHA
+      # runners ship Docker pre-installed, so this works without
+      # extra setup; if Docker is missing the gba.suite test skips
+      # gracefully and gb.blargg still runs (its ROMs are prebuilt).
       - if: matrix.build_options != 'libretro'
         name: Configure CMake
         run: >-
-          cmake -B build -G Ninja ${{ matrix.cmake_compiler }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
+          cmake -B build -G Ninja
+          ${{ matrix.cmake_compiler }}
+          ${{ matrix.cmake_build }}
+          ${{ matrix.cmake_options }}
+          ${{ matrix.build_options == 'default' && '-DVBAM_FETCH_TEST_ROMS=ON' || '' }}
       - if: matrix.build_options != 'libretro'
         name: Build
         run: ninja -C build
