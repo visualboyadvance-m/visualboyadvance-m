@@ -1884,6 +1884,47 @@ EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB | CMDEN_GBA)
     TileViewer();
 }
 
+#ifdef VBAM_ENABLE_LUA
+#include "wx/lua/lua_console.h"
+#include "wx/lua/lua_editor.h"
+#include "wx/lua/lua_engine.h"
+
+EVT_HANDLER(LuaRunScript, "Run Lua script...")
+{
+    wxFileDialog dlg(this, _("Run Lua script"), "", "",
+        _("Lua scripts (*.lua)|*.lua|All files|*"),
+        wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (dlg.ShowModal() != wxID_OK)
+        return;
+    auto* console = vbam::wx::LuaConsoleEnsure(this);
+    console->Show();
+    vbam::wx::LuaConsoleHookLog();
+    if (!vbam::wx::LuaInstance().LoadFile(std::string(dlg.GetPath().mb_str())))
+        wxLogError(_("Lua script failed to load — see console"));
+}
+
+EVT_HANDLER(LuaStopScript, "Stop Lua script")
+{
+    vbam::wx::LuaInstance().Stop();
+    if (auto* c = vbam::wx::LuaConsoleIfAny())
+        c->Append("[lua] script stopped");
+}
+
+EVT_HANDLER(LuaConsole, "Show Lua console")
+{
+    auto* console = vbam::wx::LuaConsoleEnsure(this);
+    vbam::wx::LuaConsoleHookLog();
+    console->Show(!console->IsShown());
+}
+
+EVT_HANDLER(LuaEditor, "Show Lua editor")
+{
+    auto* editor = vbam::wx::LuaEditorEnsure(this);
+    editor->Show(!editor->IsShown());
+    if (editor->IsShown()) editor->Raise();
+}
+#endif  // VBAM_ENABLE_LUA
+
 #if defined(VBAM_ENABLE_DEBUGGER)
 extern int remotePort;
 

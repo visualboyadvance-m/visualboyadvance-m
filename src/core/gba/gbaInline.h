@@ -5,6 +5,7 @@
 #include <type_traits>
 
 #include "core/base/port.h"
+#include "core/base/script_hooks.h"
 #include "core/base/system.h"
 #include "core/gba/gbaCpu.h"
 #include "core/gba/gbaEeprom.h"
@@ -159,6 +160,8 @@ static inline void CPUWriteBackup(uint32_t address, uint8_t value) {
 
 static inline uint32_t CPUReadMemory(uint32_t address)
 {
+    if (g_vbam_script_has_read_hooks && g_vbam_script_mem_read)
+        g_vbam_script_mem_read(address, 4, 0);
 #ifdef VBAM_ENABLE_DEBUGGER
     memoryMap* m = &map[address >> 24];
     if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
@@ -306,6 +309,8 @@ static inline uint32_t CPUReadMemory(uint32_t address)
 
 static inline uint32_t CPUReadHalfWord(uint32_t address)
 {
+    if (g_vbam_script_has_read_hooks && g_vbam_script_mem_read)
+        g_vbam_script_mem_read(address, 2, 0);
 #ifdef VBAM_ENABLE_DEBUGGER
     memoryMap* m = &map[address >> 24];
     if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
@@ -516,6 +521,8 @@ static inline int32_t CPUReadHalfWordSigned(uint32_t address)
 
 static inline uint8_t CPUReadByte(uint32_t address)
 {
+    if (g_vbam_script_has_read_hooks && g_vbam_script_mem_read)
+        g_vbam_script_mem_read(address, 1, 0);
 #ifdef VBAM_ENABLE_DEBUGGER
     memoryMap* m = &map[address >> 24];
     if (m->breakPoints && BreakReadCheck(m->breakPoints, address & m->mask)) {
@@ -615,6 +622,8 @@ static inline uint8_t CPUReadByte(uint32_t address)
 
 static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 {
+    if (g_vbam_script_has_write_hooks && g_vbam_script_mem_write)
+        g_vbam_script_mem_write(address, 4, value);
 #ifdef GBA_LOGGING
     if (address & 3) {
         if (systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
@@ -732,6 +741,8 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
 
 static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 {
+    if (g_vbam_script_has_write_hooks && g_vbam_script_mem_write)
+        g_vbam_script_mem_write(address, 2, value);
 #ifdef GBA_LOGGING
     if (address & 1) {
         if (systemVerbose & VERBOSE_UNALIGNED_MEMORY) {
@@ -857,6 +868,8 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
 
 static inline void CPUWriteByte(uint32_t address, uint8_t b)
 {
+    if (g_vbam_script_has_write_hooks && g_vbam_script_mem_write)
+        g_vbam_script_mem_write(address, 1, b);
 #ifdef VBAM_ENABLE_DEBUGGER
     memoryMap* m = &map[address >> 24];
     if (m->breakPoints && BreakWriteCheck(m->breakPoints, address & m->mask)) {

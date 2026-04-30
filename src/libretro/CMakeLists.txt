@@ -26,7 +26,7 @@ add_library(vbam_libretro SHARED
     ${VBAM_SRC_DIR}/core/base/internal/file_util_internal.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_common.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_libretro.cpp
-    ${VBAM_SRC_DIR}/core/base/file_util_libretro.cpp
+    ${VBAM_SRC_DIR}/core/base/script_hooks.cpp
 
     # APU
     ${VBAM_SRC_DIR}/core/apu/Gb_Oscs.cpp

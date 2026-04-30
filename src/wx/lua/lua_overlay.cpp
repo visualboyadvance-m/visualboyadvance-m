@@ -1,0 +1,321 @@
+// LuaEngine::RenderOverlay — composite the queued gui.text/box/line/
+// pixel ops into the framebuffer.
+//
+// Called from systemDrawScreen() after the script has run for the
+// frame and before the panel blits g_pix to the visible area, so the
+// overlay always lands on top of whatever the emulated game drew. We
+// write directly into g_pix using the active pixel format (16-bit
+// RGB565 or 32-bit packed) so every backend (Quartz, Metal, GL,
+// D3D, …) shows the same overlay without per-renderer glue.
+//
+// Color space: gui.* takes an FCEUX-style 0xRRGGBBAA color (alpha = 0
+// is transparent / no draw). We blend onto the destination using
+// straight alpha — fast enough at GBA resolution that there's no
+// reason to skip frames.
+
+#include "wx/lua/lua_engine.h"
+
+#include <algorithm>
+#include <cstdint>
+#include <cstring>
+#include <string>
+
+namespace vbam {
+namespace wx {
+
+namespace {
+
+// 5x7 ASCII bitmap font for printable characters (0x20–0x7E). Each
+// glyph is encoded as 7 bytes; bit N (LSB) of byte R is "pixel at
+// (col=N, row=R) is set". Public-domain font derived from the
+// classic xterm 5x8 / spleen 5x8 baseline — ~96 glyphs * 7 bytes =
+// 672 bytes, embedded so the binary doesn't need a font file at
+// runtime.
+constexpr int kGlyphW   = 5;
+constexpr int kGlyphH   = 7;
+constexpr int kGlyphAdv = 6;  // 5 + 1 px gap between characters
+
+const uint8_t kFont5x7[96][7] = {
+    /*   */ {0x00,0x00,0x00,0x00,0x00,0x00,0x00},
+    /* ! */ {0x04,0x04,0x04,0x04,0x00,0x00,0x04},
+    /* " */ {0x0a,0x0a,0x00,0x00,0x00,0x00,0x00},
+    /* # */ {0x0a,0x0a,0x1f,0x0a,0x1f,0x0a,0x0a},
+    /* $ */ {0x04,0x0f,0x14,0x0e,0x05,0x1e,0x04},
+    /* % */ {0x19,0x19,0x02,0x04,0x08,0x13,0x13},
+    /* & */ {0x08,0x14,0x14,0x08,0x15,0x12,0x0d},
+    /* ' */ {0x04,0x04,0x00,0x00,0x00,0x00,0x00},
+    /* ( */ {0x02,0x04,0x08,0x08,0x08,0x04,0x02},
+    /* ) */ {0x08,0x04,0x02,0x02,0x02,0x04,0x08},
+    /* * */ {0x00,0x04,0x15,0x0e,0x15,0x04,0x00},
+    /* + */ {0x00,0x04,0x04,0x1f,0x04,0x04,0x00},
+    /* , */ {0x00,0x00,0x00,0x00,0x00,0x04,0x08},
+    /* - */ {0x00,0x00,0x00,0x1f,0x00,0x00,0x00},
+    /* . */ {0x00,0x00,0x00,0x00,0x00,0x00,0x04},
+    /* / */ {0x00,0x01,0x02,0x04,0x08,0x10,0x00},
+    /* 0 */ {0x0e,0x11,0x13,0x15,0x19,0x11,0x0e},
+    /* 1 */ {0x04,0x0c,0x04,0x04,0x04,0x04,0x0e},
+    /* 2 */ {0x0e,0x11,0x01,0x06,0x08,0x10,0x1f},
+    /* 3 */ {0x1f,0x01,0x02,0x06,0x01,0x11,0x0e},
+    /* 4 */ {0x02,0x06,0x0a,0x12,0x1f,0x02,0x02},
+    /* 5 */ {0x1f,0x10,0x1e,0x01,0x01,0x11,0x0e},
+    /* 6 */ {0x06,0x08,0x10,0x1e,0x11,0x11,0x0e},
+    /* 7 */ {0x1f,0x01,0x02,0x04,0x08,0x08,0x08},
+    /* 8 */ {0x0e,0x11,0x11,0x0e,0x11,0x11,0x0e},
+    /* 9 */ {0x0e,0x11,0x11,0x0f,0x01,0x02,0x0c},
+    /* : */ {0x00,0x00,0x04,0x00,0x04,0x00,0x00},
+    /* ; */ {0x00,0x00,0x04,0x00,0x04,0x04,0x08},
+    /* < */ {0x02,0x04,0x08,0x10,0x08,0x04,0x02},
+    /* = */ {0x00,0x00,0x1f,0x00,0x1f,0x00,0x00},
+    /* > */ {0x08,0x04,0x02,0x01,0x02,0x04,0x08},
+    /* ? */ {0x0e,0x11,0x01,0x02,0x04,0x00,0x04},
+    /* @ */ {0x0e,0x11,0x17,0x15,0x17,0x10,0x0e},
+    /* A */ {0x0e,0x11,0x11,0x1f,0x11,0x11,0x11},
+    /* B */ {0x1e,0x11,0x11,0x1e,0x11,0x11,0x1e},
+    /* C */ {0x0e,0x11,0x10,0x10,0x10,0x11,0x0e},
+    /* D */ {0x1e,0x11,0x11,0x11,0x11,0x11,0x1e},
+    /* E */ {0x1f,0x10,0x10,0x1e,0x10,0x10,0x1f},
+    /* F */ {0x1f,0x10,0x10,0x1e,0x10,0x10,0x10},
+    /* G */ {0x0e,0x11,0x10,0x17,0x11,0x11,0x0e},
+    /* H */ {0x11,0x11,0x11,0x1f,0x11,0x11,0x11},
+    /* I */ {0x0e,0x04,0x04,0x04,0x04,0x04,0x0e},
+    /* J */ {0x07,0x02,0x02,0x02,0x02,0x12,0x0c},
+    /* K */ {0x11,0x12,0x14,0x18,0x14,0x12,0x11},
+    /* L */ {0x10,0x10,0x10,0x10,0x10,0x10,0x1f},
+    /* M */ {0x11,0x1b,0x15,0x15,0x11,0x11,0x11},
+    /* N */ {0x11,0x11,0x19,0x15,0x13,0x11,0x11},
+    /* O */ {0x0e,0x11,0x11,0x11,0x11,0x11,0x0e},
+    /* P */ {0x1e,0x11,0x11,0x1e,0x10,0x10,0x10},
+    /* Q */ {0x0e,0x11,0x11,0x11,0x15,0x12,0x0d},
+    /* R */ {0x1e,0x11,0x11,0x1e,0x14,0x12,0x11},
+    /* S */ {0x0f,0x10,0x10,0x0e,0x01,0x01,0x1e},
+    /* T */ {0x1f,0x04,0x04,0x04,0x04,0x04,0x04},
+    /* U */ {0x11,0x11,0x11,0x11,0x11,0x11,0x0e},
+    /* V */ {0x11,0x11,0x11,0x11,0x11,0x0a,0x04},
+    /* W */ {0x11,0x11,0x11,0x15,0x15,0x15,0x0a},
+    /* X */ {0x11,0x11,0x0a,0x04,0x0a,0x11,0x11},
+    /* Y */ {0x11,0x11,0x11,0x0a,0x04,0x04,0x04},
+    /* Z */ {0x1f,0x01,0x02,0x04,0x08,0x10,0x1f},
+    /* [ */ {0x0e,0x08,0x08,0x08,0x08,0x08,0x0e},
+    /* \ */ {0x00,0x10,0x08,0x04,0x02,0x01,0x00},
+    /* ] */ {0x0e,0x02,0x02,0x02,0x02,0x02,0x0e},
+    /* ^ */ {0x04,0x0a,0x11,0x00,0x00,0x00,0x00},
+    /* _ */ {0x00,0x00,0x00,0x00,0x00,0x00,0x1f},
+    /* ` */ {0x08,0x04,0x00,0x00,0x00,0x00,0x00},
+    /* a */ {0x00,0x00,0x0e,0x01,0x0f,0x11,0x0f},
+    /* b */ {0x10,0x10,0x16,0x19,0x11,0x11,0x1e},
+    /* c */ {0x00,0x00,0x0e,0x10,0x10,0x11,0x0e},
+    /* d */ {0x01,0x01,0x0d,0x13,0x11,0x11,0x0f},
+    /* e */ {0x00,0x00,0x0e,0x11,0x1f,0x10,0x0e},
+    /* f */ {0x06,0x09,0x08,0x1c,0x08,0x08,0x08},
+    /* g */ {0x00,0x0f,0x11,0x11,0x0f,0x01,0x0e},
+    /* h */ {0x10,0x10,0x16,0x19,0x11,0x11,0x11},
+    /* i */ {0x04,0x00,0x0c,0x04,0x04,0x04,0x0e},
+    /* j */ {0x02,0x00,0x06,0x02,0x02,0x12,0x0c},
+    /* k */ {0x10,0x10,0x12,0x14,0x18,0x14,0x12},
+    /* l */ {0x0c,0x04,0x04,0x04,0x04,0x04,0x0e},
+    /* m */ {0x00,0x00,0x1a,0x15,0x15,0x11,0x11},
+    /* n */ {0x00,0x00,0x16,0x19,0x11,0x11,0x11},
+    /* o */ {0x00,0x00,0x0e,0x11,0x11,0x11,0x0e},
+    /* p */ {0x00,0x1e,0x11,0x11,0x1e,0x10,0x10},
+    /* q */ {0x00,0x0d,0x13,0x11,0x0f,0x01,0x01},
+    /* r */ {0x00,0x00,0x16,0x19,0x10,0x10,0x10},
+    /* s */ {0x00,0x00,0x0f,0x10,0x0e,0x01,0x1e},
+    /* t */ {0x08,0x08,0x1c,0x08,0x08,0x09,0x06},
+    /* u */ {0x00,0x00,0x11,0x11,0x11,0x13,0x0d},
+    /* v */ {0x00,0x00,0x11,0x11,0x11,0x0a,0x04},
+    /* w */ {0x00,0x00,0x11,0x11,0x15,0x15,0x0a},
+    /* x */ {0x00,0x00,0x11,0x0a,0x04,0x0a,0x11},
+    /* y */ {0x00,0x11,0x11,0x11,0x0f,0x01,0x0e},
+    /* z */ {0x00,0x00,0x1f,0x02,0x04,0x08,0x1f},
+    /* { */ {0x02,0x04,0x04,0x08,0x04,0x04,0x02},
+    /* | */ {0x04,0x04,0x04,0x04,0x04,0x04,0x04},
+    /* } */ {0x08,0x04,0x04,0x02,0x04,0x04,0x08},
+    /* ~ */ {0x09,0x15,0x12,0x00,0x00,0x00,0x00},
+};
+
+struct PixelFormat {
+    int bpp;        // 16 or 32
+    int r_shift, g_shift, b_shift;
+    uint32_t r_max, g_max, b_max;  // channel bit-mask before shifting
+};
+
+inline uint32_t PackPixel(const PixelFormat& fmt, uint8_t r, uint8_t g, uint8_t b) {
+    if (fmt.bpp == 16) {
+        // 16-bit (RGB565 by default — VBA-M's filter init also uses
+        // 5/5/5 patterns; fmt.{rgb}_max captures whichever is in use).
+        const uint32_t r5 = (r >> 3) & fmt.r_max;
+        const uint32_t g5 = (g >> 3) & fmt.g_max;
+        const uint32_t b5 = (b >> 3) & fmt.b_max;
+        return (r5 << fmt.r_shift) | (g5 << fmt.g_shift) | (b5 << fmt.b_shift);
+    }
+    // 32-bit: VBA-M's panel encodes channels with the bottom 3 bits
+    // doubled (see filters_agb.cpp:150-155 — `(r8>>3)<<rShift` plus
+    // `(r8&7)<<(rShift-3)`). Replicating that here keeps the overlay
+    // colors visually consistent with the emulated frame.
+    const int rs = fmt.r_shift;
+    const int gs = fmt.g_shift;
+    const int bs = fmt.b_shift;
+    uint32_t v = 0;
+    v |= ((r >> 3) & 0x1f) << rs;
+    if (rs >= 3) v |= (r & 0x07) << (rs - 3);
+    v |= ((g >> 3) & 0x1f) << gs;
+    if (gs >= 3) v |= (g & 0x07) << (gs - 3);
+    v |= ((b >> 3) & 0x1f) << bs;
+    if (bs >= 3) v |= (b & 0x07) << (bs - 3);
+    return v;
+}
+
+inline void UnpackPixel(const PixelFormat& fmt, uint32_t pix,
+                        uint8_t& r, uint8_t& g, uint8_t& b) {
+    if (fmt.bpp == 16) {
+        const uint32_t r5 = (pix >> fmt.r_shift) & fmt.r_max;
+        const uint32_t g5 = (pix >> fmt.g_shift) & fmt.g_max;
+        const uint32_t b5 = (pix >> fmt.b_shift) & fmt.b_max;
+        r = (uint8_t)((r5 << 3) | (r5 >> 2));
+        g = (uint8_t)((g5 << 3) | (g5 >> 2));
+        b = (uint8_t)((b5 << 3) | (b5 >> 2));
+        return;
+    }
+    const uint32_t r5 = (pix >> fmt.r_shift) & 0x1f;
+    const uint32_t g5 = (pix >> fmt.g_shift) & 0x1f;
+    const uint32_t b5 = (pix >> fmt.b_shift) & 0x1f;
+    r = (uint8_t)((r5 << 3) | (r5 >> 2));
+    g = (uint8_t)((g5 << 3) | (g5 >> 2));
+    b = (uint8_t)((b5 << 3) | (b5 >> 2));
+}
+
+inline void Blend(uint8_t& dst, uint8_t src, uint8_t a) {
+    // dst = src * a + dst * (1 - a), with a ∈ [0, 255].
+    dst = (uint8_t)((src * a + dst * (255 - a) + 127) / 255);
+}
+
+inline void PutPixel(uint8_t* pix, int pitch_bytes, int x, int y, int w, int h,
+                     uint32_t color, const PixelFormat& fmt) {
+    if (x < 0 || y < 0 || x >= w || y >= h) return;
+    const uint8_t a = color & 0xff;
+    if (a == 0) return;  // fully transparent — skip
+    const uint8_t r = (color >> 24) & 0xff;
+    const uint8_t g = (color >> 16) & 0xff;
+    const uint8_t b = (color >> 8)  & 0xff;
+    uint8_t* row = pix + y * pitch_bytes + x * (fmt.bpp / 8);
+    if (a == 255) {
+        const uint32_t pk = PackPixel(fmt, r, g, b);
+        if (fmt.bpp == 16) {
+            *reinterpret_cast<uint16_t*>(row) = (uint16_t)pk;
+        } else {
+            *reinterpret_cast<uint32_t*>(row) = pk;
+        }
+        return;
+    }
+    // Alpha-blend.
+    uint32_t cur;
+    if (fmt.bpp == 16) cur = *reinterpret_cast<uint16_t*>(row);
+    else               cur = *reinterpret_cast<uint32_t*>(row);
+    uint8_t cr, cg, cb;
+    UnpackPixel(fmt, cur, cr, cg, cb);
+    Blend(cr, r, a);
+    Blend(cg, g, a);
+    Blend(cb, b, a);
+    const uint32_t pk = PackPixel(fmt, cr, cg, cb);
+    if (fmt.bpp == 16) *reinterpret_cast<uint16_t*>(row) = (uint16_t)pk;
+    else               *reinterpret_cast<uint32_t*>(row) = pk;
+}
+
+void DrawLine(uint8_t* pix, int pitch, int x1, int y1, int x2, int y2,
+              int w, int h, uint32_t color, const PixelFormat& fmt) {
+    int dx = std::abs(x2 - x1), dy = std::abs(y2 - y1);
+    int sx = x1 < x2 ? 1 : -1, sy = y1 < y2 ? 1 : -1;
+    int err = dx - dy;
+    while (true) {
+        PutPixel(pix, pitch, x1, y1, w, h, color, fmt);
+        if (x1 == x2 && y1 == y2) break;
+        int e2 = err * 2;
+        if (e2 > -dy) { err -= dy; x1 += sx; }
+        if (e2 <  dx) { err += dx; y1 += sy; }
+    }
+}
+
+void DrawGlyph(uint8_t* pix, int pitch, int x, int y, char ch,
+               int w, int h, uint32_t fg, uint32_t bg,
+               const PixelFormat& fmt) {
+    if (ch < 0x20 || ch > 0x7e) ch = '?';
+    const uint8_t* g = kFont5x7[(uint8_t)ch - 0x20];
+    for (int row = 0; row < kGlyphH; ++row) {
+        for (int col = 0; col < kGlyphW; ++col) {
+            const bool on = (g[row] >> (kGlyphW - 1 - col)) & 1;
+            if (on) {
+                PutPixel(pix, pitch, x + col, y + row, w, h, fg, fmt);
+            } else if ((bg & 0xff) != 0) {
+                PutPixel(pix, pitch, x + col, y + row, w, h, bg, fmt);
+            }
+        }
+    }
+}
+
+void DrawText(uint8_t* pix, int pitch, int x, int y, const std::string& s,
+              int w, int h, uint32_t fg, uint32_t bg, const PixelFormat& fmt) {
+    int cx = x;
+    for (char c : s) {
+        if (c == '\n') { y += kGlyphH + 1; cx = x; continue; }
+        DrawGlyph(pix, pitch, cx, y, c, w, h, fg, bg, fmt);
+        cx += kGlyphAdv;
+    }
+}
+
+}  // namespace
+
+void LuaEngine::RenderOverlay(uint8_t* pix, int width, int height,
+                              int pitch_bytes, int bpp,
+                              int r_shift, int g_shift, int b_shift) {
+    if (!pix || (bpp != 16 && bpp != 32)) return;
+
+    PixelFormat fmt{bpp, r_shift, g_shift, b_shift,
+                    /*r_max=*/0x1fu, /*g_max=*/0x3fu, /*b_max=*/0x1fu};
+    if (bpp == 16) {
+        // Default RGB565 — but VBA-M sometimes runs in BGR565 / 555.
+        // The shift values uniquely identify it; here we just assume
+        // the channel masks are 5/6/5 with the green channel widened
+        // when its shift is +5 from the red one.
+        if (r_shift == 11 && g_shift == 5 && b_shift == 0) {
+            fmt.r_max = fmt.b_max = 0x1f;
+            fmt.g_max = 0x3f;
+        } else {
+            fmt.r_max = fmt.g_max = fmt.b_max = 0x1f;
+        }
+    }
+
+    // Boxes (filled then outlined, so the outline lands on top).
+    for (const auto& b : Gui().boxes) {
+        const int x0 = std::max(0, b.x);
+        const int y0 = std::max(0, b.y);
+        const int x1 = std::min(width,  b.x + b.w);
+        const int y1 = std::min(height, b.y + b.h);
+        if ((b.fill & 0xff) != 0) {
+            for (int y = y0; y < y1; ++y)
+                for (int x = x0; x < x1; ++x)
+                    PutPixel(pix, pitch_bytes, x, y, width, height, b.fill, fmt);
+        }
+        if ((b.outline & 0xff) != 0 && b.w > 0 && b.h > 0) {
+            for (int x = b.x; x < b.x + b.w; ++x) {
+                PutPixel(pix, pitch_bytes, x, b.y,           width, height, b.outline, fmt);
+                PutPixel(pix, pitch_bytes, x, b.y + b.h - 1, width, height, b.outline, fmt);
+            }
+            for (int y = b.y; y < b.y + b.h; ++y) {
+                PutPixel(pix, pitch_bytes, b.x,           y, width, height, b.outline, fmt);
+                PutPixel(pix, pitch_bytes, b.x + b.w - 1, y, width, height, b.outline, fmt);
+            }
+        }
+    }
+    // Lines, pixels, then text on top.
+    for (const auto& l : Gui().lines)
+        DrawLine(pix, pitch_bytes, l.x1, l.y1, l.x2, l.y2,
+                 width, height, l.color, fmt);
+    for (const auto& p : Gui().pixels)
+        PutPixel(pix, pitch_bytes, p.x, p.y, width, height, p.color, fmt);
+    for (const auto& t : Gui().texts)
+        DrawText(pix, pitch_bytes, t.x, t.y, t.s, width, height,
+                 t.fg, t.bg, fmt);
+}
+
+}  // namespace wx
+}  // namespace vbam

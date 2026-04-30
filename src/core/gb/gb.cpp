@@ -10,6 +10,7 @@
 
 #include "core/base/check.h"
 #include "core/base/file_util.h"
+#include "core/base/script_hooks.h"
 #include "core/base/message.h"
 #include "core/base/sizes.h"
 #include "core/base/system.h"
@@ -1396,6 +1397,10 @@ static inline void gbOamBugAccess(uint16_t addr)
 
 void gbWriteMemory(uint16_t address, uint8_t value)
 {
+    // Lua memory.registerwrite hooks. Pre-write the value Lua sees is
+    // the new one; the write itself proceeds as normal afterward.
+    if (g_vbam_script_has_write_hooks && g_vbam_script_mem_write)
+        g_vbam_script_mem_write(address, 1, value);
 
     if (address < 0x8000) {
 #ifndef FINAL_VERSION
@@ -2224,6 +2229,15 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
 uint8_t gbReadMemory(uint16_t address)
 {
+    // Lua memory.registerread hook. We dispatch with value=0 because
+    // gbReadMemory has many early-return paths and hoisting the hook
+    // to the end is invasive; scripts that want the actual byte can
+    // call memory.readbyte() inside the hook (won't re-fire because
+    // the engine flips a guard while a hook is running). FCEUX's spec
+    // already says "value (if available)".
+    if (g_vbam_script_has_read_hooks && g_vbam_script_mem_read)
+        g_vbam_script_mem_read(address, 1, 0);
+
     if (gbCheatMap[address])
         return gbCheatRead(address);
 

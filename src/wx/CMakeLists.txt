@@ -158,8 +158,17 @@ endif()
 # both SDK-path (VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader) installs.
 
 set(ENABLE_OPENGL TRUE)
-find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
+# `stc` (wxStyledTextCtrl, the Scintilla wrapper) is requested as an
+# optional component for the Lua editor's syntax highlighting. It's
+# part of every standard wxWidgets install but some minimal builds
+# omit it; the editor falls back to a plain wxTextCtrl in that case
+# (see src/wx/lua/lua_editor.cpp).
+find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl stc ${wx_find_extra})
+set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
 
+if(NOT wxWidgets_FOUND)
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
+endif()
 if(NOT wxWidgets_FOUND)
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
     set(ENABLE_OPENGL FALSE)
@@ -482,6 +491,33 @@ target_sources(visualboyadvance-m PRIVATE
     "${CMAKE_SOURCE_DIR}/src/core/base/sdl_motion.h")
 if(ENABLE_SDL3)
     target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_SDL3)
+endif()
+
+# Lua 5.4 scripting (FCEUX-compatible API). The Lua engine + bindings
+# live under src/wx/lua/ and link against the static `vbam-lua` lib
+# built from upstream Lua 5.4 sources (see cmake/Lua.cmake).
+if(ENABLE_LUA AND TARGET vbam-lua)
+    target_sources(visualboyadvance-m PRIVATE
+        lua/lua_engine.cpp
+        lua/lua_engine.h
+        lua/lua_api_emu.cpp
+        lua/lua_api_memory.cpp
+        lua/lua_api_joypad.cpp
+        lua/lua_api_gui.cpp
+        lua/lua_api_savestate.cpp
+        lua/lua_api_rom.cpp
+        lua/lua_api_bit.cpp
+        lua/lua_console.cpp
+        lua/lua_console.h
+        lua/lua_editor.cpp
+        lua/lua_editor.h
+        lua/lua_overlay.cpp
+    )
+    target_link_libraries(visualboyadvance-m vbam-lua)
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_LUA)
+    if(VBAM_HAVE_WXSTC)
+        target_compile_definitions(visualboyadvance-m PRIVATE VBAM_HAVE_WXSTC)
+    endif()
 endif()
 
 # Setting an SDL audio device by name segfaults on FreeBSD.

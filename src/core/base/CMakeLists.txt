@@ -32,6 +32,7 @@ target_sources(vbam-core-base
     internal/memgzio.c
     internal/memgzio.h
     patch.cpp
+    script_hooks.cpp
     version.cpp
 
     PUBLIC
@@ -43,6 +44,7 @@ target_sources(vbam-core-base
     patch.h
     port.h
     ringbuffer.h
+    script_hooks.h
     sizes.h
     sound_driver.h
     system.h

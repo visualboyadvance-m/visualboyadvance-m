@@ -625,6 +625,23 @@
       <object class="wxMenuItem" name="MemoryViewer">
         <label>M_emory Viewer...</label>
       </object>
+      <object class="separator"/>
+      <object class="wxMenu" name="LuaMenu">
+        <label>L_ua scripting</label>
+        <object class="wxMenuItem" name="LuaRunScript">
+          <label>_Run script...</label>
+        </object>
+        <object class="wxMenuItem" name="LuaStopScript">
+          <label>_Stop script</label>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="LuaConsole">
+          <label>Show _console</label>
+        </object>
+        <object class="wxMenuItem" name="LuaEditor">
+          <label>Show _editor</label>
+        </object>
+      </object>
       <object class="wxMenuItem" name="OAMViewer">
         <label>_OAM Viewer...</label>
       </object>

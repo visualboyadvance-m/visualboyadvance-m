@@ -22,6 +22,13 @@
 #include "wx/config/option-proxy.h"
 #include "wx/wxvbam.h"
 
+#ifdef VBAM_ENABLE_LUA
+#include "wx/lua/lua_engine.h"
+namespace vbam { namespace wx { namespace lua_internal {
+extern int g_frame_count;
+}}}
+#endif
+
 // SDL gamepad accelerometer/gyro → GBA tilt-sensor bridge. Frontends
 // register a connected pad via wxGetApp().sdl_motion()->Attach(pad)
 // in the joystick-open code path; from there it auto-shadows the
@@ -127,9 +134,42 @@ void systemDrawScreen()
 
 #endif
 
+#ifdef VBAM_ENABLE_LUA
+    // FCEUX-style per-frame Lua hooks. The order is:
+    //   1) Drop last frame's gui.* overlay queue.
+    //   2) Resume the script's main coroutine — this is what makes
+    //      `emu.frameadvance()` actually yield one frame per call.
+    //   3) Run registerbefore() callbacks. Both the resumed body and
+    //      the registerbefore handlers can push gui.* ops; they end
+    //      up on the same queue.
+    //   4) Render the queued gui ops on top of the framebuffer
+    //      (further down, just before DrawArea).
+    //   5) After DrawArea blits, run registerafter() callbacks.
+    if (vbam::wx::LuaInstance().IsLoaded()) {
+        vbam::wx::LuaInstance().ClearGui();
+        vbam::wx::lua_internal::g_frame_count++;
+        vbam::wx::LuaInstance().ResumeScriptCoroutine();
+        vbam::wx::LuaInstance().DispatchBeforeFrame();
+
+        // Compose the gui.* overlay into g_pix so every backend
+        // (Quartz, GL, Metal, D3D, …) shows the same overlay.
+        const int width  = gbRom ? 160 : 240;
+        const int height = gbRom ? 144 : 160;
+        const int pitch  = (gbRom ? 161 : 241) * (systemColorDepth / 8);
+        vbam::wx::LuaInstance().RenderOverlay(
+            g_pix, width, height, pitch,
+            systemColorDepth, systemRedShift, systemGreenShift, systemBlueShift);
+    }
+#endif
+
     if (ga && ga->panel) {
         ga->panel->DrawArea(&g_pix);
     }
+
+#ifdef VBAM_ENABLE_LUA
+    if (vbam::wx::LuaInstance().IsLoaded())
+        vbam::wx::LuaInstance().DispatchAfterFrame();
+#endif
 }
 
 // record a game "movie"
@@ -407,6 +447,18 @@ uint32_t systemReadJoypad(int joy)
     // disallow opposite directionals simultaneously
     ret &= ~((ret & (KEYM_LEFT | KEYM_DOWN | KEYM_MOTION_DOWN | KEYM_MOTION_RIGHT)) >> 1);
     ret &= REALKEY_MASK;
+
+#ifdef VBAM_ENABLE_LUA
+    // joypad.set() override. The script's mask is in FCEUX bit
+    // positions (A=0..L=9); KEYM_* bits in this frontend match those
+    // positions, so the OR-substitute below directly slots in the
+    // requested buttons (still subject to REALKEY_MASK gating above).
+    if (vbam::wx::LuaInstance().IsLoaded()) {
+        uint32_t lua_mask = 0;
+        if (vbam::wx::LuaInstance().GetJoypadOverride(joy, &lua_mask))
+            ret = lua_mask & REALKEY_MASK;
+    }
+#endif
 
     if (game_recording) {
         uint32_t rret = ret & ~(KEYM_SPEED | KEYM_CAPTURE);
