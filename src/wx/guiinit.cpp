@@ -1952,6 +1952,15 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
+        // Game Boy system-type radio menu — see kPrefEmulatorType
+        // numbering in option-internal.cpp (0=Auto, 1=GBC, 2=SGB,
+        // 3=DMG, 4=GBA, 5=SGB2). Drives `gbEmulatorType` directly.
+        MenuOptionIntRadioValue("GBSystemAuto", OPTION(kPrefEmulatorType), 0);
+        MenuOptionIntRadioValue("GBSystemGBC",  OPTION(kPrefEmulatorType), 1);
+        MenuOptionIntRadioValue("GBSystemSGB",  OPTION(kPrefEmulatorType), 2);
+        MenuOptionIntRadioValue("GBSystemDMG",  OPTION(kPrefEmulatorType), 3);
+        MenuOptionIntRadioValue("GBSystemGBA",  OPTION(kPrefEmulatorType), 4);
+        MenuOptionIntRadioValue("GBSystemSGB2", OPTION(kPrefEmulatorType), 5);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
         MenuOptionIntRadioValue("LinkType2Wireless", gopts.gba_link_type, 2);
         MenuOptionIntRadioValue("LinkType3GameCube", gopts.gba_link_type, 3);

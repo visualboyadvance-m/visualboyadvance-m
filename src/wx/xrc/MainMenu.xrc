@@ -513,6 +513,34 @@
           <label>Configure...</label>
         </object>
         <object class="separator"/>
+        <object class="wxMenu" name="GBSystemMenu">
+          <label>S_ystem</label>
+          <object class="wxMenuItem" name="GBSystemAuto">
+            <label>_Automatic</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="GBSystemDMG">
+            <label>Game Boy (_DMG)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="GBSystemSGB">
+            <label>Super Game Boy (_SGB)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="GBSystemSGB2">
+            <label>Super Game Boy _2 (SGB2)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="GBSystemGBC">
+            <label>Game Boy _Color (GBC)</label>
+            <radio>1</radio>
+          </object>
+          <object class="wxMenuItem" name="GBSystemGBA">
+            <label>Game Boy _Advance (GBA)</label>
+            <radio>1</radio>
+          </object>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="GBLcdFilter">
           <label>_LCD Filter</label>
           <checkable>1</checkable>
