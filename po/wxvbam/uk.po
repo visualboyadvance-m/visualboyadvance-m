@@ -97,7 +97,7 @@ msgstr "Батарея|*.sav|Флеш-збереження|*.dat"
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
-msgstr ""
+msgstr "Перезаписати поточний .sav-файл імпортом батареї (гру буде перезавантажено)?"
 
 #: cmdevents.cpp:518 cmdevents.cpp:551 cmdevents.cpp:674
 msgid "Confirm import"
