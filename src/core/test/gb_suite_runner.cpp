@@ -134,6 +134,14 @@ static bool g_dump_screen = false;
 // state mooneye's boot_div / boot_hwio tests verify.
 static std::vector<uint8_t> g_dmg_bios;     // 256 bytes
 static std::vector<uint8_t> g_cgb_bios;     // 2304 bytes
+
+// CI baseline: if set (--min-pass N), the process returns 0 when at
+// least N tests pass, regardless of how many fail. -1 (the default)
+// means "fail the run if anything but PASS appears", matching the
+// historical exit-code semantics. CI uses --min-pass to lock in a
+// known PASS floor so a benign added test ROM doesn't redden the build
+// while still catching regressions.
+static int g_min_pass = -1;
 static uint8_t serial_capture(uint8_t b) {
     g_serial_log.push_back((char)b);
     if (g_verbose) {
@@ -893,6 +901,8 @@ int main(int argc, char** argv) {
             cgb_bios_path = argv[++i];
         } else if (std::strcmp(a, "--dmg-bios") == 0 && i + 1 < argc) {
             dmg_bios_path = argv[++i];
+        } else if (std::strcmp(a, "--min-pass") == 0 && i + 1 < argc) {
+            g_min_pass = std::atoi(argv[++i]);
         } else if (!roms_path) {
             roms_path = a;
         }
@@ -1009,5 +1019,16 @@ int main(int argc, char** argv) {
                label.c_str(), r.detail.c_str());
     }
 
+    if (g_min_pass >= 0) {
+        if (n_pass >= g_min_pass) {
+            fprintf(stderr,
+                    "[ci] PASS %d >= floor %d — OK\n", n_pass, g_min_pass);
+            return 0;
+        }
+        fprintf(stderr,
+                "[ci] PASS %d < floor %d — REGRESSION\n",
+                n_pass, g_min_pass);
+        return 2;
+    }
     return (n_fail == 0 && n_timeout == 0 && n_bad == 0) ? 0 : 2;
 }

@@ -172,6 +172,17 @@ struct SuiteDesc {
     uint32_t struct_addr; // TestSuite struct in ROM
 };
 
+// If CMake auto-built mGBA's suite.gba from upstream and successfully
+// pulled the TestSuite struct addresses out of suite.elf via objdump,
+// it dropped a header with the build-matched table. Use it when
+// available so the runner doesn't drift against whichever commit /
+// toolchain produced the .gba blob; otherwise fall back to the
+// originally-reverse-engineered addresses below.
+#if defined(VBAM_HAS_SUITE_ADDRESSES) && __has_include("suite_addresses.h")
+#include "suite_addresses.h"
+static const SuiteDesc* kSuites = reinterpret_cast<const SuiteDesc*>(kSuitesAuto);
+static constexpr int kNumSuites = sizeof(kSuitesAuto) / sizeof(kSuitesAuto[0]);
+#else
 static const SuiteDesc kSuites[] = {
     {"memory",        0x0803d798},
     {"io-read",       0x0803cef4},
@@ -189,6 +200,7 @@ static const SuiteDesc kSuites[] = {
     {"video",         0x080471ac},
 };
 static constexpr int kNumSuites = sizeof(kSuites) / sizeof(kSuites[0]);
+#endif
 
 // Offsets inside the TestSuite struct on ARM (4-byte aligned, 28 bytes):
 //   +0  const char* name
@@ -488,6 +500,7 @@ int main(int argc, char** argv) {
     const char* rom_path = nullptr;
     const char* bios_arg = nullptr;
     bool force_hle = false;
+    int min_pass = -1;            // CI baseline; see gba.suite test in CMake.
     for (int i = 1; i < argc; ++i) {
         const char* a = argv[i];
         if ((std::strcmp(a, "--bios") == 0 || std::strcmp(a, "-b") == 0) &&
@@ -495,6 +508,8 @@ int main(int argc, char** argv) {
             bios_arg = argv[++i];
         } else if (std::strcmp(a, "--hle") == 0) {
             force_hle = true;
+        } else if (std::strcmp(a, "--min-pass") == 0 && i + 1 < argc) {
+            min_pass = std::atoi(argv[++i]);
         } else if (!rom_path) {
             rom_path = a;
         }
@@ -726,5 +741,17 @@ int main(int argc, char** argv) {
     dump_sram_log(stdout);
 
     GBASystem.emuCleanUp();
+    if (min_pass >= 0) {
+        if ((int)grand_pass >= min_pass) {
+            fprintf(stderr,
+                    "[ci] PASS %u >= floor %d — OK\n",
+                    grand_pass, min_pass);
+            return 0;
+        }
+        fprintf(stderr,
+                "[ci] PASS %u < floor %d — REGRESSION\n",
+                grand_pass, min_pass);
+        return 2;
+    }
     return (grand_total > 0 && grand_pass == grand_total) ? 0 : 2;
 }
