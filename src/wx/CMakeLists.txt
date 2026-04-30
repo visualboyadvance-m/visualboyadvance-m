@@ -518,6 +518,41 @@ if(ENABLE_LUA AND TARGET vbam-lua)
     if(VBAM_HAVE_WXSTC)
         target_compile_definitions(visualboyadvance-m PRIVATE VBAM_HAVE_WXSTC)
     endif()
+
+    # Standalone smoke-test driver: builds the engine + every binding
+    # without the wx GUI and runs a Lua test script. Used by ctest.
+    if(BUILD_TESTING)
+        add_executable(lua_test_runner
+            lua/test/lua_test_runner.cpp
+            lua/lua_engine.cpp
+            lua/lua_api_emu.cpp
+            lua/lua_api_memory.cpp
+            lua/lua_api_joypad.cpp
+            lua/lua_api_gui.cpp
+            lua/lua_api_savestate.cpp
+            lua/lua_api_rom.cpp
+            lua/lua_api_bit.cpp
+            lua/lua_overlay.cpp
+        )
+        # vcpkg's prefix path can leak a system Lua 5.4.x header that
+        # mismatches our vendored 5.4.7 (different luaL_openlibs ABI).
+        # Force the vendored Lua source dir to the front of the
+        # include search path so we get headers consistent with the
+        # vbam-lua static library we're linking against.
+        get_target_property(_vbam_lua_inc vbam-lua INTERFACE_INCLUDE_DIRECTORIES)
+        target_include_directories(lua_test_runner BEFORE PRIVATE
+            "${_vbam_lua_inc}"
+            "${CMAKE_SOURCE_DIR}/src")
+        target_link_libraries(lua_test_runner PRIVATE
+            vbam-core vbam-core-fake vbam-lua)
+        if(APPLE)
+            target_link_libraries(lua_test_runner PRIVATE
+                "-framework CoreFoundation" iconv)
+        endif()
+        add_test(NAME wx.lua.api
+                 COMMAND lua_test_runner
+                     "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")
+    endif()
 endif()
 
 # Setting an SDL audio device by name segfaults on FreeBSD.
