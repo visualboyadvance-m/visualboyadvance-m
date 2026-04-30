@@ -1572,7 +1572,16 @@ EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
 EVT_HANDLER_MASK(CheatsList, "List cheats...", CMDEN_GB | CMDEN_GBA)
 {
     wxDialog* dlg = GetXRCDialog("CheatList");
-    ShowModal(dlg);
+    fprintf(stderr, "[cheats-list] dlg=%p IsShown=%d IsBeingDeleted=%d ReturnCode=%d cmd_enable=0x%x dialog_opened=%d\n",
+            (void*)dlg,
+            dlg ? (int)dlg->IsShown() : -1,
+            dlg ? (int)dlg->IsBeingDeleted() : -1,
+            dlg ? dlg->GetReturnCode() : -1,
+            cmd_enable, dialog_opened);
+    fflush(stderr);
+    int rv = ShowModal(dlg);
+    fprintf(stderr, "[cheats-list] ShowModal returned %d\n", rv);
+    fflush(stderr);
 }
 
 EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB | CMDEN_GBA)
@@ -2694,46 +2703,6 @@ EVT_HANDLER(BootRomGBC, "Use the specified BIOS file for GBC")
 {
     GetMenuOptionConfig("BootRomGBC", config::OptionID::kPrefUseBiosGBC);
 }
-
-// Game Boy system-type radio menu (mGBA-style "GB Model" quick switch).
-// kPrefEmulatorType values: 0=Auto, 1=GBC, 2=SGB, 3=DMG, 4=GBA, 5=SGB2.
-// The choice takes effect on the next ROM load; if a Game Boy ROM is
-// currently running we trigger a soft reset so the new mode is
-// applied immediately, matching mGBA's behavior.
-#define GB_SYSTEM_CHOICE(value)                              \
-    do {                                                     \
-        OPTION(kPrefEmulatorType) = (value);                 \
-        if (panel && panel->emusys                           \
-            && (cmd_enable & CMDEN_GB)) {                    \
-            panel->emusys->emuReset();                       \
-        }                                                    \
-    } while (0)
-
-EVT_HANDLER(GBSystemAuto, "Game Boy system: auto-detect")
-{
-    GB_SYSTEM_CHOICE(0);
-}
-EVT_HANDLER(GBSystemGBC, "Game Boy system: Game Boy Color")
-{
-    GB_SYSTEM_CHOICE(1);
-}
-EVT_HANDLER(GBSystemSGB, "Game Boy system: Super Game Boy")
-{
-    GB_SYSTEM_CHOICE(2);
-}
-EVT_HANDLER(GBSystemDMG, "Game Boy system: original Game Boy (DMG)")
-{
-    GB_SYSTEM_CHOICE(3);
-}
-EVT_HANDLER(GBSystemGBA, "Game Boy system: Game Boy Advance compatibility mode")
-{
-    GB_SYSTEM_CHOICE(4);
-}
-EVT_HANDLER(GBSystemSGB2, "Game Boy system: Super Game Boy 2")
-{
-    GB_SYSTEM_CHOICE(5);
-}
-#undef GB_SYSTEM_CHOICE
 
 EVT_HANDLER(VSync, "Wait for vertical sync")
 {

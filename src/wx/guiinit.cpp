@@ -1125,8 +1125,16 @@ public:
                 bank = 1;
 
             for (int i = 0; i < (1 << size); i++) {
-                addr_s.Printf(wxT("%02X%02X%02X%02X"), bank, val & 0xff,
-                    addr & 0xff, addr >> 8);
+                // wxString::Printf validates that each argument's type
+                // matches the format specifier exactly. `%02X` wants
+                // `unsigned int`; `bank`/`addr` are `long` (64-bit on
+                // arm64) so we have to narrow them, otherwise the
+                // strict-format assert dismisses the dialog.
+                addr_s.Printf(wxT("%02X%02X%02X%02X"),
+                              static_cast<unsigned int>(bank),
+                              static_cast<unsigned int>(val & 0xff),
+                              static_cast<unsigned int>(addr & 0xff),
+                              static_cast<unsigned int>(addr >> 8));
                 gbAddGsCheat(addr_s.utf8_str(), ca_desc.utf8_str());
                 val >>= 8;
                 addr++;
@@ -1232,27 +1240,31 @@ public:
         if (fmt != CFVFMT_SD && size != BITS_32)
             val &= size == BITS_8 ? 0xff : 0xffff;
 
+        // wxString::Printf strict-format checking expects an exact
+        // type match: `%u`/`%X` want `unsigned int`, `%d` wants `int`.
+        // `val` is `int32_t`, so cast to the type the specifier
+        // requires.
         switch (fmt) {
         case CFVFMT_SD:
-            s.Printf(wxT("%d"), val);
+            s.Printf(wxT("%d"), static_cast<int>(val));
             break;
 
         case CFVFMT_UD:
-            s.Printf(wxT("%u"), val);
+            s.Printf(wxT("%u"), static_cast<unsigned int>(val));
             break;
 
         case CFVFMT_UH:
             switch (size) {
             case BITS_8:
-                s.Printf(wxT("%02X"), val);
+                s.Printf(wxT("%02X"), static_cast<unsigned int>(val));
                 break;
 
             case BITS_16:
-                s.Printf(wxT("%04X"), val);
+                s.Printf(wxT("%04X"), static_cast<unsigned int>(val));
                 break;
 
             case BITS_32:
-                s.Printf(wxT("%08X"), val);
+                s.Printf(wxT("%08X"), static_cast<unsigned int>(val));
                 break;
             }
         }
@@ -1277,15 +1289,15 @@ public:
                     val = (int32_t)(int16_t)val;
                 }
 
-                val_s.Printf(wxT("%d"), val);
+                val_s.Printf(wxT("%d"), static_cast<int>(val));
                 break;
 
             case CFVFMT_UD:
-                val_s.Printf(wxT("%u"), val);
+                val_s.Printf(wxT("%u"), static_cast<unsigned int>(val));
                 break;
 
             case CFVFMT_UH:
-                val_s.Printf(wxT("%x"), val);
+                val_s.Printf(wxT("%x"), static_cast<unsigned int>(val));
                 break;
             }
 
@@ -1414,9 +1426,12 @@ wxString CheatListCtrl::OnGetItemText(long item, long column) const
             } else
                 addr += off;
 
-            s.Printf(wxT("%02X:%04X"), bank, addr);
+            s.Printf(wxT("%02X:%04X"),
+                     static_cast<unsigned int>(bank),
+                     static_cast<unsigned int>(addr));
         } else
-            s.Printf(wxT("%08X"), block->offset + off);
+            s.Printf(wxT("%08X"),
+                     static_cast<unsigned int>(block->offset + off));
 
         break;
 
@@ -1960,15 +1975,6 @@ bool MainFrame::BindControls()
         MenuOptionIntMask("JoypadAutoholdStart", autohold, KEYM_START);
         MenuOptionBool("EmulatorSpeedupToggle", turbo);
         MenuOptionIntRadioValue("LinkType0Nothing", gopts.gba_link_type, 0);
-        // Game Boy system-type radio menu — see kPrefEmulatorType
-        // numbering in option-internal.cpp (0=Auto, 1=GBC, 2=SGB,
-        // 3=DMG, 4=GBA, 5=SGB2). Drives `gbEmulatorType` directly.
-        MenuOptionIntRadioValue("GBSystemAuto", OPTION(kPrefEmulatorType), 0);
-        MenuOptionIntRadioValue("GBSystemGBC",  OPTION(kPrefEmulatorType), 1);
-        MenuOptionIntRadioValue("GBSystemSGB",  OPTION(kPrefEmulatorType), 2);
-        MenuOptionIntRadioValue("GBSystemDMG",  OPTION(kPrefEmulatorType), 3);
-        MenuOptionIntRadioValue("GBSystemGBA",  OPTION(kPrefEmulatorType), 4);
-        MenuOptionIntRadioValue("GBSystemSGB2", OPTION(kPrefEmulatorType), 5);
         MenuOptionIntRadioValue("LinkType1Cable", gopts.gba_link_type, 1);
         MenuOptionIntRadioValue("LinkType2Wireless", gopts.gba_link_type, 2);
         MenuOptionIntRadioValue("LinkType3GameCube", gopts.gba_link_type, 3);
