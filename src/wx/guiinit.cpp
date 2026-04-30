@@ -1151,6 +1151,14 @@ public:
             addr_s.append(_s);
             cheatsAddCheatCode(addr_s.utf8_str(), ca_desc.utf8_str());
         }
+
+        // CheatFind_t doesn't share CheatList_t's `dirty` pointer, so
+        // cheats added via the cheat-search dialog otherwise never set
+        // panel->cheats_dirty and UnloadGame()'s auto-save block (see
+        // panel.cpp's `kPrefAutoSaveLoadCheatList && cheats_dirty`
+        // guard) would silently skip them.
+        if (GameArea* p = wxGetApp().frame->GetPanel())
+            p->cheats_dirty = true;
     }
 
     void SetValVal(wxTextCtrl* tc)
