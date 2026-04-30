@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-28 07:00+0000\n"
+"POT-Creation-Date: 2026-04-30 15:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Кирилл kirillovich, 2025\n"
 "Language-Team: Russian (Russia) (http://app.transifex.com/bgk/vba-m/language/ru_RU/)\n"
@@ -239,7 +239,7 @@ msgstr "Выбрать файл вывода"
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG-изображения|*.png|BMP-изображения|*.bmp"
 
-#: cmdevents.cpp:818 sys.cpp:587
+#: cmdevents.cpp:818 sys.cpp:653
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Записан файл снапшота %s"
@@ -277,70 +277,82 @@ msgstr "Звук включен"
 msgid "Sound disabled"
 msgstr "Звук выключен"
 
-#: cmdevents.cpp:1897
+#: cmdevents.cpp:1894
+msgid "Run Lua script"
+msgstr ""
+
+#: cmdevents.cpp:1895
+msgid "Lua scripts (*.lua)|*.lua|All files|*"
+msgstr ""
+
+#: cmdevents.cpp:1903
+msgid "Lua script failed to load — see console"
+msgstr ""
+
+#: cmdevents.cpp:1938
 msgid "Set to 0 for pseudo tty"
 msgstr "Установить 0 для псевдотерминала TTY"
 
-#: cmdevents.cpp:1899
+#: cmdevents.cpp:1940
 msgid "Port to wait for connection:"
 msgstr "Порт для ожидания подключения:"
 
-#: cmdevents.cpp:1900
+#: cmdevents.cpp:1941
 msgid "GDB Connection"
 msgstr "GDB подключение"
 
-#: cmdevents.cpp:1952
+#: cmdevents.cpp:1993
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Ожидание подключения к %s"
 
-#: cmdevents.cpp:1959
+#: cmdevents.cpp:2000
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Ожидание подключения на порту %d"
 
-#: cmdevents.cpp:1963
+#: cmdevents.cpp:2004
 msgid "Waiting for GDB..."
 msgstr "Ожидание ответа от GDB..."
 
-#: cmdevents.cpp:2323 cmdevents.cpp:2336 cmdevents.cpp:2362 cmdevents.cpp:2367
+#: cmdevents.cpp:2364 cmdevents.cpp:2377 cmdevents.cpp:2403 cmdevents.cpp:2408
 #, c-format
 msgid "Filter: %s"
 msgstr ""
 
-#: cmdevents.cpp:2341 cmdevents.cpp:2358
+#: cmdevents.cpp:2382 cmdevents.cpp:2399
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr ""
 
-#: cmdevents.cpp:2378
+#: cmdevents.cpp:2419
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr ""
 
-#: cmdevents.cpp:2427
+#: cmdevents.cpp:2468
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr ""
 
-#: cmdevents.cpp:2428
+#: cmdevents.cpp:2469
 msgid "FACTORY RESET"
 msgstr "Сброс до заводских настроек"
 
-#: cmdevents.cpp:2463
+#: cmdevents.cpp:2504
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr ""
 
-#: cmdevents.cpp:2464
+#: cmdevents.cpp:2505
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Копирайт (C) 1999-2003 Forgotten\nКопирайт  (C) 2004-2006 команда разработки VBA \nКопирайт  (C) 2007-2020 команда разработки VBA-M"
 
-#: cmdevents.cpp:2466
+#: cmdevents.cpp:2507
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -356,15 +368,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr ""
 
-#: cmdevents.cpp:2646
+#: cmdevents.cpp:2687
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr ""
 
-#: cmdevents.cpp:2712
+#: cmdevents.cpp:2753
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr ""
 
-#: cmdevents.cpp:2718
+#: cmdevents.cpp:2759
 msgid "Network is not supported in local mode."
 msgstr "Сеть не поддерживается в локальном режиме."
 
@@ -409,17 +421,17 @@ msgstr "Нет"
 msgid "No usable rpi plugins found in %s"
 msgstr "Не найдено подходящих rpi-плагинов в %s"
 
-#: dialogs/display-config.cpp:706 dialogs/display-config.cpp:787
+#: dialogs/display-config.cpp:724 dialogs/display-config.cpp:807
 #: xrc/DisplayConfig.xrc:158
 msgid "Plugin"
 msgstr "Плагин"
 
-#: dialogs/display-config.cpp:713
+#: dialogs/display-config.cpp:733
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr ""
 
-#: dialogs/display-config.cpp:720
+#: dialogs/display-config.cpp:740
 #, c-format
 msgid "interframe blend: %s"
 msgstr ""
@@ -1438,77 +1450,77 @@ msgstr ""
 msgid "Failed to present swapchain image: %d"
 msgstr ""
 
-#: sys.cpp:213 sys.cpp:274
+#: sys.cpp:267 sys.cpp:328
 msgid "No game in progress to record"
 msgstr "Для записи нужна запущенная игра"
 
-#: sys.cpp:231
+#: sys.cpp:285
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "Невозможно открыть файл вывода %s"
 
-#: sys.cpp:238 sys.cpp:258 sys.cpp:408
+#: sys.cpp:292 sys.cpp:312 sys.cpp:474
 msgid "Error writing game recording"
 msgstr "Ошибка записи игры"
 
-#: sys.cpp:279
+#: sys.cpp:333
 msgid "Cannot play game recording while recording"
 msgstr "Невозможно проиграть запись игры во время записывания"
 
-#: sys.cpp:294
+#: sys.cpp:348
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "Невозможно открыть файл записи игры %s"
 
-#: sys.cpp:303 sys.cpp:313
+#: sys.cpp:357 sys.cpp:367
 msgid "Error reading game recording"
 msgstr "Ошибка чтения записи игры"
 
-#: sys.cpp:423 sys.cpp:442
+#: sys.cpp:489 sys.cpp:508
 msgid "Playback ended"
 msgstr "Воспроизведение закончено"
 
-#: sys.cpp:466
+#: sys.cpp:532
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr ""
 
-#: sys.cpp:907 xrc/GBPrinter.xrc:65
+#: sys.cpp:994 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "&Отменить"
 
-#: sys.cpp:941
+#: sys.cpp:1028
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "Файлы изображений (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:950
+#: sys.cpp:1037
 msgid "Save printer image to"
 msgstr "Сохранение распечатки в файл"
 
-#: sys.cpp:967 sys.cpp:1151
+#: sys.cpp:1054 sys.cpp:1238
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "Вывод принтера записан в %s"
 
-#: sys.cpp:972 sys.cpp:1043
+#: sys.cpp:1059 sys.cpp:1130
 msgid "&Close"
 msgstr "&Закрыть"
 
-#: sys.cpp:1038
+#: sys.cpp:1125
 msgid "Printed"
 msgstr "Распечатано"
 
-#: sys.cpp:1324
+#: sys.cpp:1411
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "Ошибка открытия псевдотерминала TTY: %s"
 
-#: sys.cpp:1418
+#: sys.cpp:1505
 #, c-format
 msgid "Invalid GDB server port %d"
 msgstr ""
 
-#: sys.cpp:1431
+#: sys.cpp:1518
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
 msgstr ""
@@ -4363,227 +4375,247 @@ msgstr "Просмотр карты"
 msgid "M&emory Viewer..."
 msgstr "Просмотр памяти"
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:630
+msgid "L&ua scripting"
+msgstr ""
+
+#: xrc/MainMenu.xrc:632
+msgid "&Run script..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:635
+msgid "&Stop script"
+msgstr ""
+
+#: xrc/MainMenu.xrc:639
+msgid "Show &console"
+msgstr ""
+
+#: xrc/MainMenu.xrc:642
+msgid "Show &editor"
+msgstr ""
+
+#: xrc/MainMenu.xrc:646
 msgid "&OAM Viewer..."
 msgstr "Просмотр OAM"
 
-#: xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:649
 msgid "&Palette Viewer..."
 msgstr "Просмотр палитры"
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:652
 msgid "&Tile Viewer..."
 msgstr "Просмотр тайла"
 
-#: xrc/MainMenu.xrc:640
+#: xrc/MainMenu.xrc:657
 msgid "Show all video layers"
 msgstr "Показать все слои видео"
 
-#: xrc/MainMenu.xrc:683
+#: xrc/MainMenu.xrc:700
 msgid "&View Layers"
 msgstr "Просмотреть слои"
 
-#: xrc/MainMenu.xrc:687
+#: xrc/MainMenu.xrc:704
 msgid "Channel &1"
 msgstr "Канал 1"
 
-#: xrc/MainMenu.xrc:692
+#: xrc/MainMenu.xrc:709
 msgid "Channel &2"
 msgstr "Канал 2"
 
-#: xrc/MainMenu.xrc:697
+#: xrc/MainMenu.xrc:714
 msgid "Channel &3"
 msgstr "Канал 3"
 
-#: xrc/MainMenu.xrc:702
+#: xrc/MainMenu.xrc:719
 msgid "Channel &4"
 msgstr "Канал 4"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:724
 msgid "Direct Sound &A"
 msgstr "Direct Sound &A"
 
-#: xrc/MainMenu.xrc:712
+#: xrc/MainMenu.xrc:729
 msgid "Direct Sound &B"
 msgstr "Direct Sound &B"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:733
 msgid "&Sound Channels"
 msgstr "Звуковые каналы"
 
-#: xrc/MainMenu.xrc:720
+#: xrc/MainMenu.xrc:737
 msgid "&Help"
 msgstr "Помощь"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:739
 msgid "Report &Bugs"
 msgstr "Сообщить об ошибке"
 
-#: xrc/MainMenu.xrc:725
+#: xrc/MainMenu.xrc:742
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr ""
 
-#: xrc/MainMenu.xrc:728
+#: xrc/MainMenu.xrc:745
 msgid "Translations"
 msgstr "Переводы"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:753
 msgid "Check for updates"
 msgstr "Проверить обновления"
 
-#: xrc/MainMenu.xrc:739
+#: xrc/MainMenu.xrc:756
 msgid "&Factory Reset..."
 msgstr "&Сброс к настройкам по умолчанию..."
 
-#: xrc/MainMenu.xrc:743
+#: xrc/MainMenu.xrc:760
 msgid "&About..."
 msgstr "&О программе..."
 
-#: xrc/MainMenu.xrc:747
+#: xrc/MainMenu.xrc:764
 msgid "&Languages"
 msgstr ""
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:766
 msgid "Default Language"
 msgstr ""
 
-#: xrc/MainMenu.xrc:753
+#: xrc/MainMenu.xrc:770
 msgid "Bulgarian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:757
+#: xrc/MainMenu.xrc:774
 msgid "Breton"
 msgstr ""
 
-#: xrc/MainMenu.xrc:761
+#: xrc/MainMenu.xrc:778
 msgid "Czech"
 msgstr ""
 
-#: xrc/MainMenu.xrc:765
+#: xrc/MainMenu.xrc:782
 msgid "Greek"
 msgstr ""
 
-#: xrc/MainMenu.xrc:769
+#: xrc/MainMenu.xrc:786
 msgid "English [US]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:790
 msgid "Spanish [Latin American]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:777
+#: xrc/MainMenu.xrc:794
 msgid "Spanish [Colombia]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:781
+#: xrc/MainMenu.xrc:798
 msgid "Spanish [Peru]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:802
 msgid "Spanish [United States]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:789
+#: xrc/MainMenu.xrc:806
 msgid "Spanish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:793
+#: xrc/MainMenu.xrc:810
 msgid "French [France]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:797
+#: xrc/MainMenu.xrc:814
 msgid "French"
 msgstr ""
 
-#: xrc/MainMenu.xrc:801
+#: xrc/MainMenu.xrc:818
 msgid "Galician"
 msgstr ""
 
-#: xrc/MainMenu.xrc:805
+#: xrc/MainMenu.xrc:822
 msgid "Hebrew [Israel]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:809
+#: xrc/MainMenu.xrc:826
 msgid "Hungarian [Hungary]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:813
+#: xrc/MainMenu.xrc:830
 msgid "Hungarian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:817
+#: xrc/MainMenu.xrc:834
 msgid "Indonesian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:821
+#: xrc/MainMenu.xrc:838
 msgid "Italian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:825
+#: xrc/MainMenu.xrc:842
 msgid "Japanese"
 msgstr ""
 
-#: xrc/MainMenu.xrc:829
+#: xrc/MainMenu.xrc:846
 msgid "Korean [Korea]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:833
+#: xrc/MainMenu.xrc:850
 msgid "Korean"
 msgstr ""
 
-#: xrc/MainMenu.xrc:837
+#: xrc/MainMenu.xrc:854
 msgid "Malay [Malaysia]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:841
+#: xrc/MainMenu.xrc:858
 msgid "Norwegian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:845
+#: xrc/MainMenu.xrc:862
 msgid "Dutch"
 msgstr ""
 
-#: xrc/MainMenu.xrc:849
+#: xrc/MainMenu.xrc:866
 msgid "Polish [Poland]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:853
+#: xrc/MainMenu.xrc:870
 msgid "Polish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:857
+#: xrc/MainMenu.xrc:874
 msgid "Portuguese [Brazil]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:878
 msgid "Portuguese [Portugal]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:865
+#: xrc/MainMenu.xrc:882
 msgid "Russian [Russia]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:869
+#: xrc/MainMenu.xrc:886
 msgid "Swedish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:873
+#: xrc/MainMenu.xrc:890
 msgid "Turkish"
 msgstr ""
 
-#: xrc/MainMenu.xrc:877
+#: xrc/MainMenu.xrc:894
 msgid "Ukrainian"
 msgstr ""
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:898
 msgid "Urdu [Pakistan]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:885
+#: xrc/MainMenu.xrc:902
 msgid "Chinese [China]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:889
+#: xrc/MainMenu.xrc:906
 msgid "&Use external translations"
 msgstr ""
 

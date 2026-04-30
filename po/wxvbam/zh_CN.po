@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-28 07:00+0000\n"
+"POT-Creation-Date: 2026-04-30 15:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -238,7 +238,7 @@ msgstr "选择输出文件"
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: cmdevents.cpp:818 sys.cpp:587
+#: cmdevents.cpp:818 sys.cpp:653
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
@@ -276,70 +276,82 @@ msgstr "声音已启用"
 msgid "Sound disabled"
 msgstr "声音已禁用"
 
-#: cmdevents.cpp:1897
+#: cmdevents.cpp:1894
+msgid "Run Lua script"
+msgstr ""
+
+#: cmdevents.cpp:1895
+msgid "Lua scripts (*.lua)|*.lua|All files|*"
+msgstr ""
+
+#: cmdevents.cpp:1903
+msgid "Lua script failed to load — see console"
+msgstr ""
+
+#: cmdevents.cpp:1938
 msgid "Set to 0 for pseudo tty"
 msgstr "把伪 tty 设置成 0"
 
-#: cmdevents.cpp:1899
+#: cmdevents.cpp:1940
 msgid "Port to wait for connection:"
 msgstr "准备连接的端口："
 
-#: cmdevents.cpp:1900
+#: cmdevents.cpp:1941
 msgid "GDB Connection"
 msgstr "GDB 连接"
 
-#: cmdevents.cpp:1952
+#: cmdevents.cpp:1993
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "等待连接到 %s"
 
-#: cmdevents.cpp:1959
+#: cmdevents.cpp:2000
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "等待连接到端口 %d"
 
-#: cmdevents.cpp:1963
+#: cmdevents.cpp:2004
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: cmdevents.cpp:2323 cmdevents.cpp:2336 cmdevents.cpp:2362 cmdevents.cpp:2367
+#: cmdevents.cpp:2364 cmdevents.cpp:2377 cmdevents.cpp:2403 cmdevents.cpp:2408
 #, c-format
 msgid "Filter: %s"
 msgstr "滤镜: %s"
 
-#: cmdevents.cpp:2341 cmdevents.cpp:2358
+#: cmdevents.cpp:2382 cmdevents.cpp:2399
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr ""
 
-#: cmdevents.cpp:2378
+#: cmdevents.cpp:2419
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr "帧间混合: %s"
 
-#: cmdevents.cpp:2427
+#: cmdevents.cpp:2468
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "你的配置将被删除！\n\n是否确定？"
 
-#: cmdevents.cpp:2428
+#: cmdevents.cpp:2469
 msgid "FACTORY RESET"
 msgstr "恢复默认"
 
-#: cmdevents.cpp:2463
+#: cmdevents.cpp:2504
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
-#: cmdevents.cpp:2464
+#: cmdevents.cpp:2505
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
 
-#: cmdevents.cpp:2466
+#: cmdevents.cpp:2507
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -355,15 +367,15 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:2646
+#: cmdevents.cpp:2687
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "启用色彩修改时无法使用 GB BIOS。"
 
-#: cmdevents.cpp:2712
+#: cmdevents.cpp:2753
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "局域网联机已激活，禁用联机模式即可断开联网。"
 
-#: cmdevents.cpp:2718
+#: cmdevents.cpp:2759
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
@@ -408,17 +420,17 @@ msgstr "无"
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用 rpi 插件"
 
-#: dialogs/display-config.cpp:706 dialogs/display-config.cpp:787
+#: dialogs/display-config.cpp:724 dialogs/display-config.cpp:807
 #: xrc/DisplayConfig.xrc:158
 msgid "Plugin"
 msgstr "插件"
 
-#: dialogs/display-config.cpp:713
+#: dialogs/display-config.cpp:733
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "正在使用像素滤镜: %s"
 
-#: dialogs/display-config.cpp:720
+#: dialogs/display-config.cpp:740
 #, c-format
 msgid "interframe blend: %s"
 msgstr "帧间混合: %s"
@@ -1437,77 +1449,77 @@ msgstr ""
 msgid "Failed to present swapchain image: %d"
 msgstr ""
 
-#: sys.cpp:213 sys.cpp:274
+#: sys.cpp:267 sys.cpp:328
 msgid "No game in progress to record"
 msgstr "没有游戏在进行录制"
 
-#: sys.cpp:231
+#: sys.cpp:285
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "无法打开输出文件 %s"
 
-#: sys.cpp:238 sys.cpp:258 sys.cpp:408
+#: sys.cpp:292 sys.cpp:312 sys.cpp:474
 msgid "Error writing game recording"
 msgstr "回写游戏录像错误"
 
-#: sys.cpp:279
+#: sys.cpp:333
 msgid "Cannot play game recording while recording"
 msgstr "在录制时无法播放游戏录像"
 
-#: sys.cpp:294
+#: sys.cpp:348
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "无法打开录像文件 %s"
 
-#: sys.cpp:303 sys.cpp:313
+#: sys.cpp:357 sys.cpp:367
 msgid "Error reading game recording"
 msgstr "读取游戏录像错误"
 
-#: sys.cpp:423 sys.cpp:442
+#: sys.cpp:489 sys.cpp:508
 msgid "Playback ended"
 msgstr "回放已结束"
 
-#: sys.cpp:466
+#: sys.cpp:532
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d fps)"
 
-#: sys.cpp:907 xrc/GBPrinter.xrc:65
+#: sys.cpp:994 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "丢弃(&D)"
 
-#: sys.cpp:941
+#: sys.cpp:1028
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "图像文件 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:950
+#: sys.cpp:1037
 msgid "Save printer image to"
 msgstr "保存打印图像到"
 
-#: sys.cpp:967 sys.cpp:1151
+#: sys.cpp:1054 sys.cpp:1238
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "写入打印输出到 %s"
 
-#: sys.cpp:972 sys.cpp:1043
+#: sys.cpp:1059 sys.cpp:1130
 msgid "&Close"
 msgstr "关闭(&C)"
 
-#: sys.cpp:1038
+#: sys.cpp:1125
 msgid "Printed"
 msgstr "已打印"
 
-#: sys.cpp:1324
+#: sys.cpp:1411
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "打开伪 tty 错误: %s"
 
-#: sys.cpp:1418
+#: sys.cpp:1505
 #, c-format
 msgid "Invalid GDB server port %d"
 msgstr ""
 
-#: sys.cpp:1431
+#: sys.cpp:1518
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
 msgstr ""
@@ -4362,227 +4374,247 @@ msgstr "图层查看器(&M)..."
 msgid "M&emory Viewer..."
 msgstr "内存查看器(&E)..."
 
-#: xrc/MainMenu.xrc:629
+#: xrc/MainMenu.xrc:630
+msgid "L&ua scripting"
+msgstr ""
+
+#: xrc/MainMenu.xrc:632
+msgid "&Run script..."
+msgstr ""
+
+#: xrc/MainMenu.xrc:635
+msgid "&Stop script"
+msgstr ""
+
+#: xrc/MainMenu.xrc:639
+msgid "Show &console"
+msgstr ""
+
+#: xrc/MainMenu.xrc:642
+msgid "Show &editor"
+msgstr ""
+
+#: xrc/MainMenu.xrc:646
 msgid "&OAM Viewer..."
 msgstr "OAM 查看器(&O)..."
 
-#: xrc/MainMenu.xrc:632
+#: xrc/MainMenu.xrc:649
 msgid "&Palette Viewer..."
 msgstr "调色板查看器(&P)..."
 
-#: xrc/MainMenu.xrc:635
+#: xrc/MainMenu.xrc:652
 msgid "&Tile Viewer..."
 msgstr "碎片查看器(&T)..."
 
-#: xrc/MainMenu.xrc:640
+#: xrc/MainMenu.xrc:657
 msgid "Show all video layers"
 msgstr "显示所有视频图层"
 
-#: xrc/MainMenu.xrc:683
+#: xrc/MainMenu.xrc:700
 msgid "&View Layers"
 msgstr "查看图层(&V)"
 
-#: xrc/MainMenu.xrc:687
+#: xrc/MainMenu.xrc:704
 msgid "Channel &1"
 msgstr "通道 1(&1)"
 
-#: xrc/MainMenu.xrc:692
+#: xrc/MainMenu.xrc:709
 msgid "Channel &2"
 msgstr "通道 2(&2)"
 
-#: xrc/MainMenu.xrc:697
+#: xrc/MainMenu.xrc:714
 msgid "Channel &3"
 msgstr "通道 3(&3)"
 
-#: xrc/MainMenu.xrc:702
+#: xrc/MainMenu.xrc:719
 msgid "Channel &4"
 msgstr "通道 4(&4)"
 
-#: xrc/MainMenu.xrc:707
+#: xrc/MainMenu.xrc:724
 msgid "Direct Sound &A"
 msgstr "Direct Sound A(&A)"
 
-#: xrc/MainMenu.xrc:712
+#: xrc/MainMenu.xrc:729
 msgid "Direct Sound &B"
 msgstr "Direct Sound B(&B)"
 
-#: xrc/MainMenu.xrc:716
+#: xrc/MainMenu.xrc:733
 msgid "&Sound Channels"
 msgstr "声道(&S)"
 
-#: xrc/MainMenu.xrc:720
+#: xrc/MainMenu.xrc:737
 msgid "&Help"
 msgstr "帮助(&H)"
 
-#: xrc/MainMenu.xrc:722
+#: xrc/MainMenu.xrc:739
 msgid "Report &Bugs"
 msgstr "反馈"
 
-#: xrc/MainMenu.xrc:725
+#: xrc/MainMenu.xrc:742
 msgid "Visual Boy Advance-M Support &Forum"
 msgstr "VBA-M 支持与论坛(&F)"
 
-#: xrc/MainMenu.xrc:728
+#: xrc/MainMenu.xrc:745
 msgid "Translations"
 msgstr "翻译"
 
-#: xrc/MainMenu.xrc:736
+#: xrc/MainMenu.xrc:753
 msgid "Check for updates"
 msgstr "检查更新"
 
-#: xrc/MainMenu.xrc:739
+#: xrc/MainMenu.xrc:756
 msgid "&Factory Reset..."
 msgstr "恢复默认设置"
 
-#: xrc/MainMenu.xrc:743
+#: xrc/MainMenu.xrc:760
 msgid "&About..."
 msgstr "关于(&A)..."
 
-#: xrc/MainMenu.xrc:747
+#: xrc/MainMenu.xrc:764
 msgid "&Languages"
 msgstr "语言(&L)"
 
-#: xrc/MainMenu.xrc:749
+#: xrc/MainMenu.xrc:766
 msgid "Default Language"
 msgstr "默认语言"
 
-#: xrc/MainMenu.xrc:753
+#: xrc/MainMenu.xrc:770
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: xrc/MainMenu.xrc:757
+#: xrc/MainMenu.xrc:774
 msgid "Breton"
 msgstr "布列塔尼语"
 
-#: xrc/MainMenu.xrc:761
+#: xrc/MainMenu.xrc:778
 msgid "Czech"
 msgstr "捷克语"
 
-#: xrc/MainMenu.xrc:765
+#: xrc/MainMenu.xrc:782
 msgid "Greek"
 msgstr "希腊语"
 
-#: xrc/MainMenu.xrc:769
+#: xrc/MainMenu.xrc:786
 msgid "English [US]"
 msgstr "英语 [美国]"
 
-#: xrc/MainMenu.xrc:773
+#: xrc/MainMenu.xrc:790
 msgid "Spanish [Latin American]"
 msgstr "西班牙语 [拉丁美洲]"
 
-#: xrc/MainMenu.xrc:777
+#: xrc/MainMenu.xrc:794
 msgid "Spanish [Colombia]"
 msgstr "西班牙语 [哥伦比亚]"
 
-#: xrc/MainMenu.xrc:781
+#: xrc/MainMenu.xrc:798
 msgid "Spanish [Peru]"
 msgstr "西班牙语 [秘鲁]"
 
-#: xrc/MainMenu.xrc:785
+#: xrc/MainMenu.xrc:802
 msgid "Spanish [United States]"
 msgstr "西班牙语 [美国]"
 
-#: xrc/MainMenu.xrc:789
+#: xrc/MainMenu.xrc:806
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: xrc/MainMenu.xrc:793
+#: xrc/MainMenu.xrc:810
 msgid "French [France]"
 msgstr "法语 [法国]"
 
-#: xrc/MainMenu.xrc:797
+#: xrc/MainMenu.xrc:814
 msgid "French"
 msgstr "法语"
 
-#: xrc/MainMenu.xrc:801
+#: xrc/MainMenu.xrc:818
 msgid "Galician"
 msgstr "加利西亚语"
 
-#: xrc/MainMenu.xrc:805
+#: xrc/MainMenu.xrc:822
 msgid "Hebrew [Israel]"
 msgstr "希伯来语 [以色列]"
 
-#: xrc/MainMenu.xrc:809
+#: xrc/MainMenu.xrc:826
 msgid "Hungarian [Hungary]"
 msgstr "匈牙利语 [匈牙利]"
 
-#: xrc/MainMenu.xrc:813
+#: xrc/MainMenu.xrc:830
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: xrc/MainMenu.xrc:817
+#: xrc/MainMenu.xrc:834
 msgid "Indonesian"
 msgstr "印度尼西亚语"
 
-#: xrc/MainMenu.xrc:821
+#: xrc/MainMenu.xrc:838
 msgid "Italian"
 msgstr "意大利语"
 
-#: xrc/MainMenu.xrc:825
+#: xrc/MainMenu.xrc:842
 msgid "Japanese"
 msgstr "日语"
 
-#: xrc/MainMenu.xrc:829
+#: xrc/MainMenu.xrc:846
 msgid "Korean [Korea]"
 msgstr "韩语 [韩国]"
 
-#: xrc/MainMenu.xrc:833
+#: xrc/MainMenu.xrc:850
 msgid "Korean"
 msgstr "韩语"
 
-#: xrc/MainMenu.xrc:837
+#: xrc/MainMenu.xrc:854
 msgid "Malay [Malaysia]"
 msgstr "马来语 [马来西亚]"
 
-#: xrc/MainMenu.xrc:841
+#: xrc/MainMenu.xrc:858
 msgid "Norwegian"
 msgstr "挪威语"
 
-#: xrc/MainMenu.xrc:845
+#: xrc/MainMenu.xrc:862
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: xrc/MainMenu.xrc:849
+#: xrc/MainMenu.xrc:866
 msgid "Polish [Poland]"
 msgstr "波兰语 [波兰]"
 
-#: xrc/MainMenu.xrc:853
+#: xrc/MainMenu.xrc:870
 msgid "Polish"
 msgstr "波兰语"
 
-#: xrc/MainMenu.xrc:857
+#: xrc/MainMenu.xrc:874
 msgid "Portuguese [Brazil]"
 msgstr "葡萄牙语 [巴西]"
 
-#: xrc/MainMenu.xrc:861
+#: xrc/MainMenu.xrc:878
 msgid "Portuguese [Portugal]"
 msgstr "葡萄牙语 [葡萄牙]"
 
-#: xrc/MainMenu.xrc:865
+#: xrc/MainMenu.xrc:882
 msgid "Russian [Russia]"
 msgstr "俄语 [俄罗斯]"
 
-#: xrc/MainMenu.xrc:869
+#: xrc/MainMenu.xrc:886
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: xrc/MainMenu.xrc:873
+#: xrc/MainMenu.xrc:890
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: xrc/MainMenu.xrc:877
+#: xrc/MainMenu.xrc:894
 msgid "Ukrainian"
 msgstr "乌克兰语"
 
-#: xrc/MainMenu.xrc:881
+#: xrc/MainMenu.xrc:898
 msgid "Urdu [Pakistan]"
 msgstr "乌尔都语 [巴基斯坦]"
 
-#: xrc/MainMenu.xrc:885
+#: xrc/MainMenu.xrc:902
 msgid "Chinese [China]"
 msgstr "中文 [中国]"
 
-#: xrc/MainMenu.xrc:889
+#: xrc/MainMenu.xrc:906
 msgid "&Use external translations"
 msgstr "使用外部翻译(&U)"
 
