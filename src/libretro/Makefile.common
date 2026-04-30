@@ -65,7 +65,7 @@ SOURCES_CXX += \
 	$(CORE_DIR)/core/gba/gbaSound.cpp \
 	$(CORE_DIR)/core/gba/internal/gbaBios.cpp \
 	$(CORE_DIR)/core/gba/internal/gbaEreader.cpp \
-	$(CORE_DIR)/core/gba/internal/gbaSram.cpp \
+	$(CORE_DIR)/core/gba/internal/gbaSram.cpp
 
 SOURCES_CXX += \
 	$(CORE_DIR)/core/gb/gb.cpp \

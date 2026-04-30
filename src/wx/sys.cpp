@@ -12,6 +12,7 @@
 #endif
 
 #include "core/base/image_util.h"
+#include "core/base/sdl_motion.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
@@ -20,6 +21,19 @@
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
 #include "wx/wxvbam.h"
+
+// SDL gamepad accelerometer/gyro → GBA tilt-sensor bridge. Frontends
+// register a connected pad via wxGetApp().sdl_motion()->Attach(pad)
+// in the joystick-open code path; from there it auto-shadows the
+// existing kb/joypad-button tilt mapping below as long as the pad
+// reports a usable accel or gyro sensor.
+namespace {
+vbam::core::SdlMotion& MotionInstance() {
+    static vbam::core::SdlMotion s_motion;
+    return s_motion;
+}
+}  // namespace
+vbam::core::SdlMotion* SystemSdlMotion() { return &MotionInstance(); }
 
 // These should probably be in vbamcore
 int systemVerbose;
@@ -670,6 +684,15 @@ void systemUpdateSolarSensor()
 
 void systemUpdateMotionSensor()
 {
+    // First poll the SDL gamepad motion sensor (if any). When the
+    // user's controller has a usable accelerometer/gyro, its readouts
+    // *replace* the keyboard/button tilt accumulation below — the
+    // legacy KEYM_MOTION_* path is still kept as the fallback when no
+    // sensor pad is attached.
+    auto* motion = SystemSdlMotion();
+    motion->Poll();
+    const bool sensor_active = motion->IsActive();
+
     for (int i = 0; i < 4; i++) {
         const uint32_t joy_value = wxGetApp().emulated_gamepad()->GetJoypad(i);
 
@@ -678,6 +701,18 @@ void systemUpdateMotionSensor()
 
         if (!sensory[i])
             sensory[i] = 2047;
+
+        if (sensor_active) {
+            // Just slot the sensor-derived values in; skip the rest of
+            // the keyboard-tilt loop body for this pad slot. Z is fed
+            // from the gyro yaw rate (matching WarioWare Twisted's
+            // real cart) — the existing /10 divide in
+            // systemGetSensorZ keeps the on-cart range correct.
+            sensorx[i] = motion->TiltX();
+            sensory[i] = motion->TiltY();
+            sensorz[i] = motion->GyroZ() * 10;
+            continue;
+        }
 
         if (joy_value & KEYM_MOTION_LEFT) {
             sunBars--;

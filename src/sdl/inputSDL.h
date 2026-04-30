@@ -131,6 +131,12 @@ int inputGetSensorX();
 int inputGetSensorY();
 
 /**
+ * Get the motion sensor Z (gyro yaw rate) value, if a sensor-capable
+ * SDL gamepad is attached. Returns 0 otherwise.
+ */
+int inputGetSensorZ();
+
+/**
  * Set which joypad configuration use when the core doesn't ask for a specific
  * @param pad Default pad
  */

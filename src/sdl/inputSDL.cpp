@@ -21,7 +21,24 @@
 
 #include <cstdlib>
 
+#include "core/base/sdl_motion.h"
+
 #define SDLBUTTONS_NUM 14
+
+// Single SDL gamepad attached for accel/gyro (independent of the
+// raw-joystick handles used for button input). Only the first
+// sensor-capable controller found at init time is used.
+namespace {
+vbam::core::SdlMotion& sdl_motion_instance() {
+    static vbam::core::SdlMotion s_motion;
+    return s_motion;
+}
+#ifdef ENABLE_SDL3
+SDL_Gamepad* g_motion_pad = nullptr;
+#else
+SDL_GameController* g_motion_pad = nullptr;
+#endif
+}  // namespace
 
 static void sdlUpdateKey(uint32_t key, bool down);
 static void sdlUpdateJoyButton(int which, int button, bool pressed);
@@ -499,6 +516,64 @@ void inputInitJoysticks()
         SDL_JoystickEventState(SDL_ENABLE);
 #endif
     }
+
+    // Scan once for the first SDL-recognized gamepad with a usable
+    // motion sensor and hand it to the shared SdlMotion module. Any
+    // other connected pads keep using the existing raw-joystick path
+    // for button input — the motion pad is opened in addition to (not
+    // instead of) the raw joystick handle so the two don't fight.
+    SDL_InitSubSystem(
+#ifdef ENABLE_SDL3
+        SDL_INIT_GAMEPAD | SDL_INIT_SENSOR
+#else
+        SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR
+#endif
+    );
+#ifdef ENABLE_SDL3
+    {
+        int npads = 0;
+        SDL_JoystickID *pads = SDL_GetGamepads(&npads);
+        for (int i = 0; i < npads; ++i) {
+            SDL_Gamepad* gp = SDL_OpenGamepad(pads[i]);
+            if (!gp) continue;
+            if (SDL_GamepadHasSensor(gp, SDL_SENSOR_ACCEL) ||
+                SDL_GamepadHasSensor(gp, SDL_SENSOR_GYRO)) {
+                g_motion_pad = gp;
+                sdl_motion_instance().Attach(static_cast<void*>(gp));
+                break;
+            }
+            SDL_CloseGamepad(gp);
+        }
+    }
+#else
+    for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+        if (!SDL_IsGameController(i)) continue;
+        SDL_GameController* gp = SDL_GameControllerOpen(i);
+        if (!gp) continue;
+        if (SDL_GameControllerHasSensor(gp, SDL_SENSOR_ACCEL) ||
+            SDL_GameControllerHasSensor(gp, SDL_SENSOR_GYRO)) {
+            g_motion_pad = gp;
+            sdl_motion_instance().Attach(static_cast<void*>(gp));
+            break;
+        }
+        SDL_GameControllerClose(gp);
+    }
+#endif
+}
+
+// Closes any motion-sensor pad opened by inputInitJoysticks. Frontends
+// don't currently call this on shutdown, but leaving the symbol here
+// in case the SDL CLI grows a clean-shutdown path.
+void inputShutdownMotionSensor() {
+    sdl_motion_instance().Detach();
+    if (g_motion_pad) {
+#ifdef ENABLE_SDL3
+        SDL_CloseGamepad(g_motion_pad);
+#else
+        SDL_GameControllerClose(g_motion_pad);
+#endif
+        g_motion_pad = nullptr;
+    }
 }
 
 void inputProcessSDLEvent(const SDL_Event& event)
@@ -623,8 +698,22 @@ uint32_t inputReadJoypad(int which)
     return res;
 }
 
+// Sensor-derived Z (gyro yaw rate) when an SDL motion pad is active.
+// Stored separately so inputGetSensorZ() — added below — can return
+// it without disturbing the kb-button-driven X/Y fallback.
+static int sensorZ = 0;
+
 void inputUpdateMotionSensor()
 {
+    auto& motion = sdl_motion_instance();
+    if (motion.IsActive()) {
+        motion.Poll();
+        sensorX = motion.TiltX();
+        sensorY = motion.TiltY();
+        sensorZ = motion.GyroZ();
+        return;
+    }
+
     if (sdlMotionButtons[KEY_LEFT]) {
         sensorX += 3;
         if (sensorX > 2197)
@@ -678,6 +767,11 @@ int inputGetSensorX()
 int inputGetSensorY()
 {
     return sensorY;
+}
+
+int inputGetSensorZ()
+{
+    return sensorZ;
 }
 
 void inputSetDefaultJoypad(EPad pad)

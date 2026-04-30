@@ -49,6 +49,15 @@ static retro_set_rumble_state_t rumble_cb;
 static retro_audio_sample_t audio_cb;
 retro_audio_sample_batch_t audio_batch_cb;
 
+// Optional libretro sensor interface — the host (RetroArch) hands us
+// accel/gyro from the active controller (SDL+hidapi on desktop,
+// platform sensor on mobile) when available. We probe for it on
+// init; if missing, the analog-stick → tilt mapping below stays in
+// charge and `g_sensor.get_sensor_input` won't be called.
+static retro_sensor_interface g_sensor = { nullptr, nullptr };
+static bool g_sensor_active = false;
+static int g_sensor_port = 0;
+
 static char retro_system_directory[2048];
 static char biosfile[4096];
 static bool can_dupe = false;
@@ -647,6 +656,29 @@ void retro_init(void)
       rumble_cb = rumble.set_rumble_state;
    else
       rumble_cb = NULL;
+
+   // Probe for the host sensor interface — RetroArch hands us
+   // accel/gyro from the active gamepad (SDL+hidapi on desktop, the
+   // device's IMU on mobile). Enable accel + gyro on port 0; if
+   // either fails, g_sensor_active stays false and we fall back to
+   // the analog-stick mapping further down.
+   g_sensor_active = false;
+   g_sensor.set_sensor_state = nullptr;
+   g_sensor.get_sensor_input = nullptr;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE, &g_sensor) &&
+       g_sensor.set_sensor_state && g_sensor.get_sensor_input) {
+      const float kSensorRate = 60.0f;
+      bool ok_a = g_sensor.set_sensor_state(g_sensor_port,
+          RETRO_SENSOR_ACCELEROMETER_ENABLE, kSensorRate);
+      bool ok_g = g_sensor.set_sensor_state(g_sensor_port,
+          RETRO_SENSOR_GYROSCOPE_ENABLE, kSensorRate);
+      g_sensor_active = ok_a || ok_g;
+      if (g_sensor_active && log_cb) {
+         log_cb(RETRO_LOG_INFO,
+             "vbam: sensor interface acquired (accel=%s, gyro=%s)\n",
+             ok_a ? "yes" : "no", ok_g ? "yes" : "no");
+      }
+   }
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
    {
@@ -2190,6 +2222,46 @@ void systemUpdateMotionSensor(void)
 
     if (!sensor_tilt[1])
         sensor_tilt[1] = tilt_center;
+
+    // Prefer the host sensor interface (RetroArch's hidapi/SDL/IMU
+    // bridge) when available — that's what real motion-aware games
+    // expect. Falls through to the analog-stick mapping below if the
+    // host doesn't have a sensor on this port or returned 0 for both
+    // accel and gyro (controller without an IMU).
+    if (g_sensor_active && g_sensor.get_sensor_input) {
+        const float ax = g_sensor.get_sensor_input(g_sensor_port,
+            RETRO_SENSOR_ACCELEROMETER_X);
+        const float ay = g_sensor.get_sensor_input(g_sensor_port,
+            RETRO_SENSOR_ACCELEROMETER_Y);
+        const float gz = g_sensor.get_sensor_input(g_sensor_port,
+            RETRO_SENSOR_GYROSCOPE_Y);
+        // Same scaling used in core/base/sdl_motion.cpp so the feel
+        // is consistent across frontends:
+        //   1 g of gravity along X/Y → ±150 GBA tilt units
+        //   1 rad/s of yaw          → ~68.75 GBA gyro units
+        const float kAccelToTilt = 150.0f / 9.80665f;
+        const float kGyroToZ     = 1800.0f /
+            (1500.0f * 3.14159265f / 180.0f);
+
+        if (ax != 0.0f || ay != 0.0f) {
+            int tx = static_cast<int>(-ax * kAccelToTilt) + tilt_center;
+            int ty = static_cast<int>(-ay * kAccelToTilt) + tilt_center;
+            sensor_tilt[0] = (tx > tilt_max) ? tilt_max
+                           : (tx < tilt_min) ? tilt_min : tx;
+            sensor_tilt[1] = (ty > tilt_max) ? tilt_max
+                           : (ty < tilt_min) ? tilt_min : ty;
+        }
+        if (gz != 0.0f) {
+            int g = static_cast<int>(gz * kGyroToZ);
+            sensor_gyro = (g > gyro_thresh) ? gyro_thresh
+                        : (g < -gyro_thresh) ? -gyro_thresh : g;
+        }
+        // If the host returned exactly 0 for everything, drop through
+        // to the analog-stick mapping so a sensor-less controller is
+        // still usable.
+        if (ax != 0.0f || ay != 0.0f || gz != 0.0f)
+            return;
+    }
 
     sensor_tilt[0] = (-analog_x) + tilt_center;
     if (sensor_tilt[0] > tilt_max)

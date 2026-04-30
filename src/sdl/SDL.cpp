@@ -2909,7 +2909,10 @@ int systemGetSensorY()
 
 int systemGetSensorZ()
 {
-    return 0;
+    // /10 to match the systemGetSensorZ contract used elsewhere in
+    // the core (see gbaRtc.cpp / gbaInline.h reads); the inputSDL
+    // value is in raw GBA gyro units (±1800).
+    return inputGetSensorZ() / 10;
 }
 
 uint8_t systemGetSensorDarkness()

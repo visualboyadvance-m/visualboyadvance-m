@@ -12,12 +12,17 @@
 #endif
 
 #include "core/base/check.h"
+#include "core/base/sdl_motion.h"
 #include "wx/config/option-id.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
+
+// Defined in src/wx/sys.cpp; pulls the global SdlMotion the
+// systemUpdateMotionSensor() loop reads from.
+extern vbam::core::SdlMotion* SystemSdlMotion();
 
 namespace widgets {
 
@@ -164,12 +169,31 @@ JoyState::JoyState(bool enable_game_controller, int sdl_index) : wx_joystick_(sd
 #else
     joystick_id_ = SDL_GetJoystickID(sdl_joystick_);
 #endif
+
+    // If this is a controller (not a raw joystick) and it has a
+    // motion sensor, hand it to the global SdlMotion so the GBA
+    // tilt-sensor reads from it. Only one pad supplies motion data
+    // at a time — re-attaching with each new pad replaces any prior
+    // attachment, matching how players usually expect the "active"
+    // controller to drive tilt-aware games.
+    if (game_controller_) {
+        if (auto* m = SystemSdlMotion())
+            m->Attach(static_cast<void*>(game_controller_));
+    }
 }
 
 JoyState::~JoyState() {
     // Nothing to do if this object is not initialized.
     if (!sdl_joystick_)
         return;
+
+    // If this pad was the active motion-sensor source, detach it so
+    // closing the SDL handle below doesn't leave SdlMotion holding a
+    // dangling pointer.
+    if (game_controller_) {
+        if (auto* m = SystemSdlMotion())
+            m->Detach();
+    }
 
 #ifndef ENABLE_SDL3
     if (game_controller_) {
