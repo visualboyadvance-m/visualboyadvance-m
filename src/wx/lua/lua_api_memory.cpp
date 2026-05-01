@@ -51,17 +51,17 @@ uint8_t ReadByte(uint32_t a) {
 }
 uint16_t ReadWord(uint32_t a) {
     if (IsGameBoy()) {
-        return static_cast<uint16_t>(gbReadMemory(a)) |
-               (static_cast<uint16_t>(gbReadMemory(a + 1)) << 8);
+        return static_cast<uint16_t>(gbReadMemory(static_cast<uint16_t>(a))) |
+               (static_cast<uint16_t>(gbReadMemory(static_cast<uint16_t>(a + 1))) << 8);
     }
     return static_cast<uint16_t>(CPUReadHalfWord(a));
 }
 uint32_t ReadDword(uint32_t a) {
     if (IsGameBoy()) {
-        return static_cast<uint32_t>(gbReadMemory(a))         |
-              (static_cast<uint32_t>(gbReadMemory(a + 1)) << 8) |
-              (static_cast<uint32_t>(gbReadMemory(a + 2)) << 16)|
-              (static_cast<uint32_t>(gbReadMemory(a + 3)) << 24);
+        return static_cast<uint32_t>(gbReadMemory(static_cast<uint16_t>(a)))         |
+              (static_cast<uint32_t>(gbReadMemory(static_cast<uint16_t>(a + 1))) << 8) |
+              (static_cast<uint32_t>(gbReadMemory(static_cast<uint16_t>(a + 2))) << 16)|
+              (static_cast<uint32_t>(gbReadMemory(static_cast<uint16_t>(a + 3))) << 24);
     }
     return CPUReadMemory(a);
 }
@@ -71,18 +71,18 @@ void WriteByte(uint32_t a, uint8_t v) {
 }
 void WriteWord(uint32_t a, uint16_t v) {
     if (IsGameBoy()) {
-        gbWriteMemory(a, v & 0xff);
-        gbWriteMemory(a + 1, (v >> 8) & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a), v & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a + 1), (v >> 8) & 0xff);
         return;
     }
     CPUWriteHalfWord(a, v);
 }
 void WriteDword(uint32_t a, uint32_t v) {
     if (IsGameBoy()) {
-        gbWriteMemory(a,     (v      ) & 0xff);
-        gbWriteMemory(a + 1, (v >>  8) & 0xff);
-        gbWriteMemory(a + 2, (v >> 16) & 0xff);
-        gbWriteMemory(a + 3, (v >> 24) & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a),     (v      ) & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a + 1), (v >>  8) & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a + 2), (v >> 16) & 0xff);
+        gbWriteMemory(static_cast<uint16_t>(a + 3), (v >> 24) & 0xff);
         return;
     }
     CPUWriteMemory(a, v);
