@@ -176,7 +176,16 @@ void Gba_Pcm::update(int dac)
 
 void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
 {
-    if (which_timer == timer && enabled) {
+    // Real HW gates the FIFO drain on the master sound enable bit
+    // (NR52/SOUNDCNT_X bit 7), not the per-channel chA/chB enable
+    // bits in SOUNDCNT_H. The chA/chB bits only gate the *mixer
+    // output* — the DMA-refill plumbing keeps running as long as the
+    // master is on. Reference: NBA's APU::OnTimerOverflow gates only
+    // on master_enable. directaudiotest writes SOUNDCNT_X but never
+    // sets the SOUNDCNT_H chA enable bit, so with the old per-channel
+    // gate the timer-overflow event was dropped before DMA could
+    // request a refill.
+    if (which_timer == timer && (g_ioMem[NR52] & 0x80)) {
         // 2025-11-24 - negativeExponent
         // Timer overflow: consume 1 FIFO sample and update PCM
         // This ensures that DMA refill is triggered after the FIFO drops to ≤16,
@@ -187,7 +196,11 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
         count--;
         dac = fifo[readIndex];
         readIndex = (readIndex + 1) & 31;
-        pcm.update(dac);
+        // Only feed the mixer when the per-channel SOUNDCNT_H enable
+        // bit is set — that's what those bits actually mean on hardware.
+        if (enabled) {
+            pcm.update(dac);
+        }
 
         if (count <= 16) {
             // Need to fill FIFO

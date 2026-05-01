@@ -3117,21 +3117,32 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     }
 
     cpuDmaTicksToUpdate += totalTicks;
-    // Real-HW: when the trigger instruction was fetching from cartridge ROM,
-    // the CPU pipeline is busy on the same bus the DMA holds, so the DMA's
-    // cycles must be attributed to the timer immediately so the very next
-    // instruction's live timer/IO read sees the bus-held cycles. When the
-    // trigger is in internal memory (IWRAM/EWRAM/BIOS), real HW absorbs the
-    // DMA inside the pipeline gap that already exists and the timer doesn't
-    // observe the stall — leave cpuAbsCycle alone in that case.
+    // Cycle attribution to cpuAbsCycle (so subsequent live timer/IO
+    // reads see the DMA stall):
+    //
+    // - Cart-bus-trigger PC (>=0x08) and EWRAM (region 2): attribute
+    //   the full DMA cost. The CPU pipeline is busy on the same bus
+    //   the DMA holds, so the stall is visible to the next timer
+    //   read. Cart-bus-specific prefetch / wait-state adjustments
+    //   apply (the if/else if chain below).
+    //
+    // - IWRAM/BIOS-trigger PC for *non-FIFO* DMA: real HW absorbs
+    //   the DMA inside the pipeline gap, so the timer doesn't observe
+    //   the stall. Leave cpuAbsCycle alone — the gba.suite DMA
+    //   subtests (Short/Trivial DMA × ARM/Thumb × IWRAM) confirm
+    //   this exemption is correct for memory DMA.
+    //
+    // - IWRAM/BIOS-trigger PC for FIFO DMA (`isFIFO`): real HW does
+    //   stall the CPU because the timer-clocked DMA holds the bus
+    //   regardless of where the trigger fetched from. Reference:
+    //   directaudiotest measurement loop in IWRAM — without
+    //   attributing FIFO-DMA cycles here, the sound-DMA fires that
+    //   NBA observes don't show up in our timer reads.
     int pcRegion = (armNextPC >> 24) & 15;
-    // Attribute DMA cycles to cpuAbsCycle when the trigger PC is in
-    // cartridge ROM (>=0x08) or in EWRAM (region 2). EWRAM has the
-    // same 2-cycle wait state as the cartridge bus and the prefetch
-    // unit can't hide DMA cycles from the timer in that region.
-    // Only IWRAM (region 3) absorbs DMA in the natural pipeline gap.
+    int attrib = totalTicks;
+    const bool gateOpen =
+        (pcRegion >= 0x08 || pcRegion == REGION_EWRAM) || isFIFO;
     if (pcRegion >= 0x08 || pcRegion == REGION_EWRAM) {
-        int attrib = totalTicks;
         // When prefetch is enabled and the DMA is small (sc==1) and
         // strictly internal (no cart bus on either side), real HW can
         // hide the channel start-up latency behind the in-flight
@@ -3227,6 +3238,8 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             attrib += delta;
             if (attrib < 0) attrib = 0;
         }
+    }
+    if (gateOpen) {
         cpuAbsCycle += attrib;
     }
     cpuDmaRunning = false;
