@@ -46,6 +46,17 @@
 #include <string>
 #include <vector>
 
+// On Windows, <windows.h> defines LoadString as a macro that expands to
+// LoadStringW or LoadStringA. wx headers transitively include <windows.h>,
+// so any TU that includes a wx header before this one would otherwise
+// see our LuaEngine::LoadString rewritten to LuaEngine::LoadStringW,
+// while lua_engine.cpp (which includes this header first) compiles the
+// definition as LoadString -> link error. Undefine the macro before
+// the class so the method name is consistent across all callers.
+#ifdef LoadString
+#  undef LoadString
+#endif
+
 struct lua_State;
 
 namespace vbam {

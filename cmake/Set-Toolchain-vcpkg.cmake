@@ -443,8 +443,14 @@ function(get_binary_packages)
     endif()
 
     # Match wanted ports against available binary packages.
-    # Skip ports with no binary package instead of aborting.
+    # Skip ports with no binary package instead of aborting; record
+    # which ones missed so the caller can install just those from
+    # source rather than re-running vcpkg install on the whole dep
+    # set (which can cascade into rebuilding already-binary-installed
+    # ports when their port-tree versions differ from the binary
+    # cache versions).
     set(binary_packages "")
+    set(missing_ports "")
     set(all_ports_found TRUE)
     foreach(port ${wanted_ports})
         set(found FALSE)
@@ -457,9 +463,13 @@ function(get_binary_packages)
         endforeach()
         if(NOT found)
             message(STATUS "No binary package found for port '${port}', will build from source.")
+            list(APPEND missing_ports "${port}")
             set(all_ports_found FALSE)
         endif()
     endforeach()
+
+    # Expose missing ports to the caller for surgical source-installs.
+    set(VCPKG_MISSING_PORTS "${missing_ports}" PARENT_SCOPE)
 
     if(NOT binary_packages)
         return()
@@ -772,17 +782,42 @@ function(vcpkg_set_toolchain)
     endif()
 
     if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES) AND VCPKG_SOURCE_PACKAGES)
-        # Install core deps.
+        # If get_binary_packages exposed a list of missing ports, install
+        # only those from source. Running `vcpkg install ${VCPKG_DEPS}`
+        # over the entire dep set would re-resolve every port against
+        # the current local port tree and rebuild ports we already
+        # binary-installed if their port-tree versions don't match the
+        # binary-cache versions (the cascading rebuild). Restricting
+        # the install to ports actually missing from the binary cache
+        # keeps the others as they are. Same idea for the upgrade step:
+        # skip it when we have already-installed binaries we don't want
+        # touched.
+        if(DEFINED VCPKG_MISSING_PORTS AND VCPKG_MISSING_PORTS)
+            message(STATUS "Source-installing missing ports only: ${VCPKG_MISSING_PORTS}")
+            set(_install_targets ${VCPKG_MISSING_PORTS})
+            set(_skip_upgrade TRUE)
+        else()
+            set(_install_targets ${VCPKG_DEPS})
+            set(_skip_upgrade FALSE)
+        endif()
+
+        # Install core deps (or just the missing ones).
         execute_process(
-            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${VCPKG_DEPS} --allow-unsupported --recurse --keep-going
+            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${_install_targets} --allow-unsupported --recurse --keep-going
             WORKING_DIRECTORY ${VCPKG_ROOT}
         )
 
-        # Upgrade any outdated ports.
-        execute_process(
-            COMMAND ${VCPKG_PROGRAM_EXECUTABLE} upgrade --no-dry-run --allow-unsupported --keep-going
-            WORKING_DIRECTORY ${VCPKG_ROOT}
-        )
+        # Upgrade any outdated ports - but only when we did a full
+        # source install. A surgical install of just the missing
+        # ports must not be followed by `vcpkg upgrade` because that
+        # walks the whole installed set and would rebuild ports we
+        # were trying to keep.
+        if(NOT _skip_upgrade)
+            execute_process(
+                COMMAND ${VCPKG_PROGRAM_EXECUTABLE} upgrade --no-dry-run --allow-unsupported --keep-going
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+        endif()
 
         # Install optional deps.
         list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)

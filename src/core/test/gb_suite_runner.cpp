@@ -39,10 +39,7 @@
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <filesystem>
 
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
@@ -815,24 +812,27 @@ static bool ends_with_ci(const std::string& s, const char* suffix) {
 }
 
 static void collect_roms(const std::string& path, std::vector<std::string>& out) {
-    struct stat st;
-    if (::stat(path.c_str(), &st) != 0) return;
-    if (S_ISREG(st.st_mode)) {
+    namespace fs = std::filesystem;
+    std::error_code ec;
+    auto status = fs::status(path, ec);
+    if (ec) return;
+    if (fs::is_regular_file(status)) {
         if (ends_with_ci(path, ".gb") || ends_with_ci(path, ".gbc"))
             out.push_back(path);
         return;
     }
-    if (!S_ISDIR(st.st_mode)) return;
+    if (!fs::is_directory(status)) return;
 
-    DIR* d = ::opendir(path.c_str());
-    if (!d) return;
-    struct dirent* e;
+    // Sorted directory entries so test runs are deterministic across
+    // platforms (POSIX readdir order varies; Windows FindFirst/Next is
+    // alphabetical, and so is our explicit sort here).
     std::vector<std::string> entries;
-    while ((e = ::readdir(d)) != nullptr) {
-        if (e->d_name[0] == '.') continue;
-        entries.push_back(e->d_name);
+    for (const auto& entry : fs::directory_iterator(path, ec)) {
+        if (ec) return;
+        const std::string name = entry.path().filename().string();
+        if (!name.empty() && name.front() == '.') continue;
+        entries.push_back(name);
     }
-    ::closedir(d);
     std::sort(entries.begin(), entries.end());
 
     for (const std::string& name : entries) {

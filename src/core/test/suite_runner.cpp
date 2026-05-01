@@ -20,8 +20,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <filesystem>
 
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
@@ -522,9 +521,11 @@ int main(int argc, char** argv) {
     // is exactly 16384 bytes.
     auto probe_bios = [](const char* p) -> bool {
         if (!p || !*p) return false;
-        struct stat st;
-        return ::stat(p, &st) == 0 && S_ISREG(st.st_mode) &&
-               st.st_size == 16384;
+        std::error_code ec;
+        const auto path = std::filesystem::path(p);
+        return std::filesystem::is_regular_file(path, ec) &&
+               std::filesystem::file_size(path, ec) == 16384 &&
+               !ec;
     };
     const char* bios_path = nullptr;
     if (force_hle) {
