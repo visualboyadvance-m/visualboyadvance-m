@@ -364,15 +364,21 @@ _vbam_resolve_test_path(VBAM_TEST_GB_DMG_BIOS VBAM_TEST_GB_DMG_BIOS
 # them in lockstep with any improvement so a regression actually fails
 # CI. They can be overridden with -DVBAM_TEST_GBA_MIN_PASS=… etc.
 if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
-    # 6399 reflects the GBATEK-correct scanline = 1008 + 224 = 1232,
-    # with the misc-edge "Hblank" sub-test recovered via asymmetric
-    # +1-cycle bus-arbitration latency on consecutive Halt-waked HBlank
-    # IRQs (g_lastHaltWakeHblankIrqCycle in gba.cpp). misc-edge "Flip
-    # 2" remains as the only sub-test gap vs the prior 6400 baseline
-    # — that one is HDraw-period polling-loop alignment drift inherent
-    # to our ARM/Thumb prefetch model and cannot be fixed without the
-    # cycle-precision rewrite documented in project_dma_cycle_rework.md.
-    set(VBAM_TEST_GBA_MIN_PASS 6399 CACHE STRING
+    # 6400 with the GBATEK-correct scanline = 1008 + 224 = 1232. Two
+    # misc-edge sub-tests (Hblank, Flip 2) that previously passed only
+    # because of a non-spec 1232→1233 hack are now recovered without
+    # changing scanline timing:
+    #   1) Hblank — asymmetric +1-cycle bus-arbitration latency on
+    #      consecutive Halt-waked HBlank IRQs
+    #      (g_lastHaltWakeHblankIrqCycle in gba.cpp).
+    #   2) Flip 2 — direction-asymmetric DISPSTAT-live-read lookahead
+    #      to compensate for the polling-loop iteration alignment our
+    #      sub-cycle ARM7TDMI cycle model can't reproduce exactly
+    #      (gbaInline.h's IO_REG_DISPSTAT path).
+    # Plus a separate fix: lcdNextEventAbsCycle is re-anchored per CPU
+    # iteration so SWI cycle bumps don't accumulate it ahead of the
+    # actual next-transition cycle.
+    set(VBAM_TEST_GBA_MIN_PASS 6400 CACHE STRING
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
