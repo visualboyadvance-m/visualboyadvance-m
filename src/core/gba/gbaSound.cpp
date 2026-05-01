@@ -85,6 +85,29 @@ public:
     uint8_t fifo[32];
     int dac;
 
+    // FIFO model:
+    //   - 7-word ring buffer (the main FIFO storage).
+    //   - 1-word (4-byte / 4-sample) playing buffer fed one word at
+    //     a time from the ring.
+    //   - At each timer overflow:
+    //       (1) If main_words <= 3, request a DMA refill. One DMA
+    //           per overflow.
+    //       (2) If the playing buffer is empty and the ring has data,
+    //           move one word from ring to playing.
+    //       (3) Output one sample from the playing buffer.
+    //   - If both ring and playing are empty, the last sample is held.
+    //   - CPU writes advance the write pointer by one word regardless
+    //     of write size (8/16/32-bit). Sub-word writes leave stale ring
+    //     data in the unwritten byte lanes.
+    //   - Ring overflow resets the ring to empty.
+    //
+    // main_words (0..7) tracks ring word count; playing_samples (0..4)
+    // tracks the playing buffer. The byte-level `count` is preserved
+    // for save-state compatibility. Invariant:
+    //   count == main_words*4 + playing_samples.
+    int main_words;
+    int playing_samples;
+
 private:
     int timer;
     bool enabled;
@@ -176,42 +199,48 @@ void Gba_Pcm::update(int dac)
 
 void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
 {
-    // Real HW gates the FIFO drain on the master sound enable bit
-    // (NR52/SOUNDCNT_X bit 7), not the per-channel chA/chB enable
-    // bits in SOUNDCNT_H. The chA/chB bits only gate the *mixer
-    // output* — the DMA-refill plumbing keeps running as long as the
-    // master is on. Reference: NBA's APU::OnTimerOverflow gates only
-    // on master_enable. directaudiotest writes SOUNDCNT_X but never
-    // sets the SOUNDCNT_H chA enable bit, so with the old per-channel
-    // gate the timer-overflow event was dropped before DMA could
-    // request a refill.
-    if (which_timer == timer && (g_ioMem[NR52] & 0x80)) {
-        // 2025-11-24 - negativeExponent
-        // Timer overflow: consume 1 FIFO sample and update PCM
-        // This ensures that DMA refill is triggered after the FIFO drops to ≤16,
-        // matching original DMA behavior. Zero-fill occurs only if FIFO remains
-        // low after DMA. Preserves Mother 3 and Summon Night 2 timing-sensitive fixes.
+    if (which_timer != timer) return;
 
-        // Read next sample from FIFO
+    // FIFO drain + DMA refill is gated by master sound enable
+    // (NR52/SOUNDCNT_X bit 7), not by the per-channel chA/chB
+    // enable bits in SOUNDCNT_H. The chA/chB bits gate the mixer
+    // output below — they fold the FIFO latch into the stereo
+    // output — but the DMA-refill plumbing keeps running as long
+    // as master is on.
+    if (!(g_ioMem[NR52] & 0x80)) return;
+
+    // Step 1: request a DMA refill if main ring has >=4 empty words.
+    // Hardware fires at most one DMA per overflow.
+    if (main_words <= 3) {
+        CPUCheckDMA(3, which ? 4 : 2);
+        // Fallback: if no DMA is configured to service this FIFO and
+        // both ring and playing are empty, write 16 bytes of silence
+        // so `count` stays consistent with the visible FIFO state.
+        if (main_words == 0 && playing_samples == 0) {
+            const int io_reg = which ? FIFOB_L : FIFOA_L;
+            for (int n = 8; n--;) {
+                soundEvent16(io_reg, (uint16_t)0);
+                soundEvent16(io_reg + 2, (uint16_t)0);
+            }
+        }
+    }
+
+    // Step 2: refill playing buffer from ring if playing is empty.
+    if (playing_samples == 0 && main_words > 0) {
+        playing_samples = 4;
+        main_words--;
+    }
+
+    // Step 3: consume one sample from playing buffer. Only feed the
+    // mixer when the per-channel SOUNDCNT_H enable bit is set —
+    // that's what those bits actually mean on hardware.
+    if (playing_samples > 0) {
         count--;
         dac = fifo[readIndex];
         readIndex = (readIndex + 1) & 31;
-        // Only feed the mixer when the per-channel SOUNDCNT_H enable
-        // bit is set — that's what those bits actually mean on hardware.
+        playing_samples--;
         if (enabled) {
             pcm.update(dac);
-        }
-
-        if (count <= 16) {
-            // Need to fill FIFO
-            CPUCheckDMA(3, which ? 4 : 2);
-            if (count <= 16) {
-                const int io_reg = which ? FIFOB_L : FIFOA_L;
-                for (int n = 4; n--;) {
-                    soundEvent16(io_reg,     0);
-                    soundEvent16(io_reg + 2, 0);
-                }
-            }
         }
     }
 }
@@ -226,6 +255,8 @@ void Gba_Pcm_Fifo::write_control(int data)
         writeIndex = 0;
         readIndex = 0;
         count = 0;
+        main_words = 0;
+        playing_samples = 0;
         dac = 0;
         memset(fifo, 0, sizeof fifo);
     }
@@ -236,10 +267,39 @@ void Gba_Pcm_Fifo::write_control(int data)
 
 void Gba_Pcm_Fifo::write_fifo(int data)
 {
+    // Hardware: writes go into the main ring buffer at the current word
+    // position. Each write (regardless of size) advances the write
+    // pointer by ONE WORD on hardware. VBA-M's IO routing splits 32-bit
+    // writes into two halfword writes, each landing here with 2 bytes
+    // of data; this naturally produces a 4-byte advance per 32-bit DMA
+    // transfer (the typical case). For sub-word CPU writes that don't
+    // come in matched halfword pairs, hardware would leave stale bytes
+    // in the unwritten lanes - but typical audio code uses 32-bit DMA
+    // exclusively, so we don't emulate that detail.
     fifo[writeIndex] = data & 0xFF;
     fifo[writeIndex + 1] = static_cast<uint8_t>(data >> 8);
     count += 2;
     writeIndex = (writeIndex + 2) & 31;
+
+    // Hardware constraint: the ring is 7 words (28 bytes) plus the
+    // separate playing buffer (4 bytes) = 32 bytes total capacity.
+    // Writes pile bytes into the main ring; main_words is the count
+    // of (possibly-partial) word slots occupied by the new data.
+    int target_main_bytes = count - playing_samples;
+    if (target_main_bytes < 0) target_main_bytes = 0;
+    int new_main_words = (target_main_bytes + 3) / 4;  // ceil to whole words
+
+    if (new_main_words > 7) {
+        // Hardware: ring overflow resets the FIFO to empty.
+        writeIndex = 0;
+        readIndex = 0;
+        count = 0;
+        main_words = 0;
+        playing_samples = 0;
+        memset(fifo, 0, sizeof fifo);
+    } else {
+        main_words = new_main_words;
+    }
 }
 
 static void apply_control()
@@ -269,6 +329,35 @@ void soundEvent8(uint32_t address, uint8_t data)
 {
     int gb_addr = gba_to_gb_sound(address);
     if (gb_addr) {
+        // SOUNDCNT_X (NR52) bit 7 = master sound enable. On a 1→0
+        // transition, real HW disables and resets all sound state:
+        // the two FIFOs, the four PSG channels, and the SOUNDCNT_L
+        // mix register all clear. The PSG side is owned by gb_apu
+        // and gets the NR52 write below (writing 0 to the power bit
+        // kills the PSG channels at the gb_apu level). We mirror
+        // the FIFO reset and the SOUNDCNT_L zeroing here.
+        if (address == NR52) {
+            const bool old_me = (g_ioMem[NR52] & 0x80) != 0;
+            const bool new_me = (data & 0x80) != 0;
+            if (old_me && !new_me) {
+                for (int i = 0; i < 2; ++i) {
+                    pcm[i].count = 0;
+                    pcm[i].readIndex = 0;
+                    pcm[i].writeIndex = 0;
+                    pcm[i].main_words = 0;
+                    pcm[i].playing_samples = 0;
+                    pcm[i].dac = 0;
+                    memset(pcm[i].fifo, 0, sizeof pcm[i].fifo);
+                }
+                // Zero SOUNDCNT_L (NR50/NR51 = DMG channel volumes
+                // and channel-to-output mapping).
+                g_ioMem[NR50] = 0;
+                g_ioMem[NR51] = 0;
+                gb_apu->write_register(soundTicks, 0xFF24, 0);
+                gb_apu->write_register(soundTicks, 0xFF25, 0);
+            }
+        }
+
         g_ioMem[address] = data;
         gb_apu->write_register(soundTicks, gb_addr, data);
 
@@ -505,6 +594,25 @@ float soundGetVolume()
 void soundSetEnable(int channels)
 {
     soundEnableFlag = channels;
+
+    // Recompute main_words / playing_samples from loaded `count` (these
+    // aren't saved in the state). Conservative split: assume playing
+    // buffer is full first, rest in main ring.
+    for (int i = 0; i < 2; ++i) {
+        int c = pcm[i].count;
+        if (c < 0) c = 0;
+        if (c > 32) c = 32;
+        if (c >= 4) {
+            pcm[i].playing_samples = 4;
+            int rem = c - 4;
+            pcm[i].main_words = (rem + 3) / 4;
+            if (pcm[i].main_words > 7) pcm[i].main_words = 7;
+        } else {
+            pcm[i].playing_samples = c;
+            pcm[i].main_words = 0;
+        }
+    }
+
     apply_muting();
 }
 
@@ -873,6 +981,25 @@ void soundReadGame(gzFile in, int version)
     gb_apu->load_state(state.apu);
     write_SGCNT0_H(READ16LE(&g_ioMem[SGCNT0_H]) & 0x770F);
 
+
+    // Recompute main_words / playing_samples from loaded `count` (these
+    // aren't saved in the state). Conservative split: assume playing
+    // buffer is full first, rest in main ring.
+    for (int i = 0; i < 2; ++i) {
+        int c = pcm[i].count;
+        if (c < 0) c = 0;
+        if (c > 32) c = 32;
+        if (c >= 4) {
+            pcm[i].playing_samples = 4;
+            int rem = c - 4;
+            pcm[i].main_words = (rem + 3) / 4;
+            if (pcm[i].main_words > 7) pcm[i].main_words = 7;
+        } else {
+            pcm[i].playing_samples = c;
+            pcm[i].main_words = 0;
+        }
+    }
+
     apply_muting();
 }
 #endif // !__LIBRETRO__
@@ -900,6 +1027,25 @@ void soundReadGame(const uint8_t*& in)
 
     gb_apu->load_state(state.apu);
     write_SGCNT0_H(READ16LE(&g_ioMem[SGCNT0_H]) & 0x770F);
+
+
+    // Recompute main_words / playing_samples from loaded `count` (these
+    // aren't saved in the state). Conservative split: assume playing
+    // buffer is full first, rest in main ring.
+    for (int i = 0; i < 2; ++i) {
+        int c = pcm[i].count;
+        if (c < 0) c = 0;
+        if (c > 32) c = 32;
+        if (c >= 4) {
+            pcm[i].playing_samples = 4;
+            int rem = c - 4;
+            pcm[i].main_words = (rem + 3) / 4;
+            if (pcm[i].main_words > 7) pcm[i].main_words = 7;
+        } else {
+            pcm[i].playing_samples = c;
+            pcm[i].main_words = 0;
+        }
+    }
 
     apply_muting();
 }
