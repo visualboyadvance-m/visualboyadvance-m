@@ -431,6 +431,28 @@ void soundTimerOverflow(int timer)
     pcm[1].timer_overflowed(timer);
 }
 
+uint8_t soundReadNR52()
+{
+    // NR52 / SOUNDCNT_X read composes:
+    //   bit 7    = master sound enable (R/W; tracked in g_ioMem[NR52])
+    //   bits 4-6 = 0 (unused)
+    //   bits 0-3 = R-only PSG channel-ON flags, set by hardware while
+    //              channels are producing sound, cleared when length
+    //              counters expire. Games commonly poll these to
+    //              wait for sound effects to finish.
+    //
+    // Gb_Apu's read_register builds the bits-0-3 field from the live
+    // `enabled` flag of each oscillator (square1, square2, wave,
+    // noise) when the GB-side address 0xFF26 is read. Combine that
+    // with our master_enable bit so the caller sees a fully-correct
+    // SOUNDCNT_X value.
+    if (!gb_apu)
+        return g_ioMem[NR52];
+    const uint8_t apu_status = gb_apu->read_register(soundTicks, 0xFF26);
+    const uint8_t master = g_ioMem[NR52] & 0x80;
+    return (uint8_t)((apu_status & 0x0F) | master);
+}
+
 static void end_frame(blip_time_t time)
 {
     pcm[0].pcm.end_frame(time);

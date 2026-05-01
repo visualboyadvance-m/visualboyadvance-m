@@ -69,6 +69,14 @@ void soundEvent16(uint32_t addr, uint16_t data); // TODO: error-prone to overloa
 // Notifies emulator that a timer has overflowed
 void soundTimerOverflow(int which);
 
+// Reads NR52/SOUNDCNT_X (address 0x84) returning the current PSG
+// channel-ON status from the APU in bits 0-3 plus the master enable
+// bit in bit 7. Bits 4-6 read as 0. Use this instead of reading
+// g_ioMem[NR52] directly when implementing CPU reads of 0x04000084,
+// since those status bits are auto-updated by hardware as PSG
+// channels start/stop and are commonly polled by games.
+uint8_t soundReadNR52();
+
 // Notifies emulator that PCM rate may have changed
 void interp_rate();
 

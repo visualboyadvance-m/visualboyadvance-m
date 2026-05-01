@@ -206,6 +206,14 @@ static inline uint32_t CPUReadMemory(uint32_t address)
             } else {
                 value = READ16LE(((uint16_t*)&g_ioMem[address & 0x3fc]));
             }
+            // SOUNDCNT_X (NR52) sits in the low halfword of address
+            // 0x04000084. A 32-bit read at 0x04000084 covers NR52
+            // (low halfword) plus 2 bytes of unused space (high
+            // halfword). Compose the live channel-ON status into the
+            // low byte; high byte/halfword are unused/zero.
+            if ((address & 0x3fc) == IO_REG_SOUNDCNT_X) {
+                value = (value & 0xFFFF0000u) | (uint32_t)soundReadNR52();
+            }
         } else
             goto unreadable;
         break;
@@ -357,6 +365,11 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             case IO_REG_SOUND3CNT_X: value &= 0x4000; break;
             case IO_REG_SOUND4CNT_L: value &= 0xFF00; break;
             case IO_REG_SOUND4CNT_H: value &= 0x40FF; break;
+            case IO_REG_SOUNDCNT_X:
+                // Compose the live PSG channel-ON status into bits 0-3
+                // of the low byte; high byte (0x85) is unused/zero.
+                value = (uint32_t)soundReadNR52();
+                break;
             }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
                 // Live timer-counter read using absolute cycles with precise
@@ -582,8 +595,14 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case REGION_IWRAM:
         return g_internalRAM[address & 0x7fff];
     case REGION_IO:
-        if ((address < 0x4000400) && ioReadable[address & 0x3ff])
+        if ((address < 0x4000400) && ioReadable[address & 0x3ff]) {
+            // SOUNDCNT_X (NR52, 0x04000084): bits 0-3 are R-only PSG
+            // channel-ON flags maintained by the APU (not by writes
+            // to NR52). Compose the live status here.
+            if ((address & 0x3ff) == 0x84)
+                return soundReadNR52();
             return g_ioMem[address & 0x3ff];
+        }
         else
             goto unreadable;
     case REGION_PRAM:
