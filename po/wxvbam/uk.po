@@ -263,15 +263,15 @@ msgstr "Звук вимкнено."
 
 #: cmdevents.cpp:1894
 msgid "Run Lua script"
-msgstr ""
+msgstr "Запуск Lua-сценарію"
 
 #: cmdevents.cpp:1895
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Lua-сценарії|*.lua|Усі файли|*"
 
 #: cmdevents.cpp:1903
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "Не вдалося завантажити Lua-сценарій - докладно в консолі."
 
 #: cmdevents.cpp:1938
 msgid "Set to 0 for pseudo tty"
@@ -4361,23 +4361,23 @@ msgstr "Переглядач &пам'яті..."
 
 #: xrc/MainMenu.xrc:630
 msgid "L&ua scripting"
-msgstr ""
+msgstr "Створення Lua-сценаріїв"
 
 #: xrc/MainMenu.xrc:632
 msgid "&Run script..."
-msgstr ""
+msgstr "За&пустити Lua-сценарій..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&Stop script"
-msgstr ""
+msgstr "&Зупинити Lua-сценарій"
 
 #: xrc/MainMenu.xrc:639
 msgid "Show &console"
-msgstr ""
+msgstr "Показати &консоль"
 
 #: xrc/MainMenu.xrc:642
 msgid "Show &editor"
-msgstr ""
+msgstr "Показати &редактор"
 
 #: xrc/MainMenu.xrc:646
 msgid "&OAM Viewer..."
@@ -4673,7 +4673,7 @@ msgstr "Розпочати мережеве з'єднання"
 
 #: xrc/NetLink.xrc:13
 msgid "WARNING: Link will likely not work over the internet or LAN."
-msgstr "УВАГА: посилання, ймовірно, не працюватиме через Інтернет або локальну мережу."
+msgstr "УВАГА: посилання, ймовірно, не працюватиме в Інтернет або локальній мережі."
 
 #: xrc/NetLink.xrc:38
 msgid "Server"
