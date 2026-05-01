@@ -105,6 +105,8 @@ int holdType = 0;
 // carried in from earlier tests, normal gameplay halts, or the gap
 // between frames — counts as a fresh sequence and resets to +0.
 static int64_t g_lastHaltWakeHblankIrqCycle = INT64_MIN / 2;
+// Cycle of the most recent live DISPSTAT read — see gbaInline.h.
+int64_t g_lastDispstatPollCycle = INT64_MIN / 2;
 bool cpuSramEnabled = true;
 bool cpuFlashEnabled = true;
 bool cpuEEPROMEnabled = true;
@@ -4597,6 +4599,7 @@ void CPUReset()
     holdState = false;
     holdType = 0;
     g_lastHaltWakeHblankIrqCycle = INT64_MIN / 2;
+    g_lastDispstatPollCycle      = INT64_MIN / 2;
 
     biosProtected[0] = 0x00;
     biosProtected[1] = 0xf0;
@@ -4853,11 +4856,14 @@ void CPULoop(int ticks)
             }
 
             lcdTicks -= clockTicks;
-            // NB: lcdNextEventAbsCycle is updated *only* by adding the phase
-            // length below (not via cpuAbsCycle + lcdTicks), so it tracks the
-            // exact cycle a phase boundary fires — immune to dispatch
-            // overshoot. Live DISPSTAT reads compare against this exact
-            // boundary for sub-instruction precision.
+            // Re-anchor lcdNextEventAbsCycle to track the actual cycle of
+            // the next phase boundary. The phase-length increments below
+            // (+1008 / +224) keep lcdNextEventAbsCycle in step at the
+            // moment of each transition, but SWI handlers (gba.cpp:2640+)
+            // bump cpuAbsCycle by `swi_cycles` without decrementing
+            // lcdTicks — so cpuAbsCycle and (lcdNextEventAbsCycle) drift
+            // by the SWI cycles each time. Re-anchoring per iteration
+            // keeps the live DISPSTAT-poll detector cycle-precise.
 
             soundTicks += clockTicks;
 
@@ -5278,6 +5284,12 @@ void CPULoop(int ticks)
                     }
                 }
             }
+            // Anchor lcdNextEventAbsCycle to (cpuAbsCycle + lcdTicks) every
+            // iteration so SWI cycle bumps don't drift it ahead of the
+            // actual next-transition cycle. Without this, the live
+            // DISPSTAT-poll detector in gbaInline.h compares against a
+            // stale boundary and never pre-flips.
+            lcdNextEventAbsCycle = cpuAbsCycle + lcdTicks;
 
             // we shouldn't be doing sound in stop state, but we loose synchronization
             // if sound is disabled, so in stop state, soundTick will just produce
