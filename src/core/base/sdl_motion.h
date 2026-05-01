@@ -55,6 +55,8 @@ public:
     SdlMotion(const SdlMotion&)            = delete;
     SdlMotion& operator=(const SdlMotion&) = delete;
 
+    static SdlMotion& Instance();
+
     // Attach an opened gamepad. Pass an `SDL_GameController*` (SDL2)
     // or `SDL_Gamepad*` (SDL3) — accepted as an opaque void* so the
     // header doesn't pull in SDL. If the pad has accel and/or gyro

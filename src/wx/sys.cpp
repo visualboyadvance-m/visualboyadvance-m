@@ -5,12 +5,6 @@
 #include <wx/print.h>
 #include <wx/printdlg.h>
 
-#ifdef ENABLE_SDL3
-#include <SDL3/SDL.h>
-#else
-#include <SDL.h>
-#endif
-
 #include "core/base/image_util.h"
 #include "core/base/sdl_motion.h"
 #include "core/gb/gbGlobals.h"
@@ -28,19 +22,6 @@ namespace vbam { namespace wx { namespace lua_internal {
 extern int g_frame_count;
 }}}
 #endif
-
-// SDL gamepad accelerometer/gyro → GBA tilt-sensor bridge. Frontends
-// register a connected pad via wxGetApp().sdl_motion()->Attach(pad)
-// in the joystick-open code path; from there it auto-shadows the
-// existing kb/joypad-button tilt mapping below as long as the pad
-// reports a usable accel or gyro sensor.
-namespace {
-vbam::core::SdlMotion& MotionInstance() {
-    static vbam::core::SdlMotion s_motion;
-    return s_motion;
-}
-}  // namespace
-vbam::core::SdlMotion* SystemSdlMotion() { return &MotionInstance(); }
 
 // These should probably be in vbamcore
 int systemVerbose;
@@ -741,9 +722,9 @@ void systemUpdateMotionSensor()
     // *replace* the keyboard/button tilt accumulation below — the
     // legacy KEYM_MOTION_* path is still kept as the fallback when no
     // sensor pad is attached.
-    auto* motion = SystemSdlMotion();
-    motion->Poll();
-    const bool sensor_active = motion->IsActive();
+    auto& motion = vbam::core::SdlMotion::Instance();
+    motion.Poll();
+    const bool sensor_active = motion.IsActive();
 
     for (int i = 0; i < 4; i++) {
         const uint32_t joy_value = wxGetApp().emulated_gamepad()->GetJoypad(i);
@@ -760,9 +741,9 @@ void systemUpdateMotionSensor()
             // from the gyro yaw rate (matching WarioWare Twisted's
             // real cart) — the existing /10 divide in
             // systemGetSensorZ keeps the on-cart range correct.
-            sensorx[i] = motion->TiltX();
-            sensory[i] = motion->TiltY();
-            sensorz[i] = motion->GyroZ() * 10;
+            sensorx[i] = motion.TiltX();
+            sensory[i] = motion.TiltY();
+            sensorz[i] = motion.GyroZ() * 10;
             continue;
         }
 

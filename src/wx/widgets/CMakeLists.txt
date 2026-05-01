@@ -42,7 +42,7 @@ target_sources(vbam-wx-widgets
     wxmisc.h
 )
 
-target_link_libraries(vbam-wx-widgets PUBLIC vbam-wx-config)
+target_link_libraries(vbam-wx-widgets PUBLIC vbam-wx-config vbam-sdl-motion)
 configure_wx_target(vbam-wx-widgets)
 
 if(BUILD_TESTING AND NOT COMPILE_ONLY)

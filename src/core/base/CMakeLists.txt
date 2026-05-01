@@ -63,4 +63,14 @@ target_link_libraries(vbam-core-base
     PUBLIC ${ZLIB_LIBRARY}
 )
 
+add_library(vbam-sdl-motion STATIC)
+target_sources(vbam-sdl-motion
+    PRIVATE
+    sdl_motion.cpp
+
+    PUBLIC
+    sdl_motion.h
+)
+target_link_libraries(vbam-sdl-motion PUBLIC ${VBAM_SDL_LIBS})
+
 add_subdirectory(test)

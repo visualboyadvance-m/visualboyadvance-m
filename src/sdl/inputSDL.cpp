@@ -29,10 +29,6 @@
 // raw-joystick handles used for button input). Only the first
 // sensor-capable controller found at init time is used.
 namespace {
-vbam::core::SdlMotion& sdl_motion_instance() {
-    static vbam::core::SdlMotion s_motion;
-    return s_motion;
-}
 #ifdef ENABLE_SDL3
 SDL_Gamepad* g_motion_pad = nullptr;
 #else
@@ -539,7 +535,7 @@ void inputInitJoysticks()
             if (SDL_GamepadHasSensor(gp, SDL_SENSOR_ACCEL) ||
                 SDL_GamepadHasSensor(gp, SDL_SENSOR_GYRO)) {
                 g_motion_pad = gp;
-                sdl_motion_instance().Attach(static_cast<void*>(gp));
+                vbam::core::SdlMotion::Instance().Attach(static_cast<void*>(gp));
                 break;
             }
             SDL_CloseGamepad(gp);
@@ -553,7 +549,7 @@ void inputInitJoysticks()
         if (SDL_GameControllerHasSensor(gp, SDL_SENSOR_ACCEL) ||
             SDL_GameControllerHasSensor(gp, SDL_SENSOR_GYRO)) {
             g_motion_pad = gp;
-            sdl_motion_instance().Attach(static_cast<void*>(gp));
+            vbam::core::SdlMotion::Instance().Attach(static_cast<void*>(gp));
             break;
         }
         SDL_GameControllerClose(gp);
@@ -565,7 +561,7 @@ void inputInitJoysticks()
 // don't currently call this on shutdown, but leaving the symbol here
 // in case the SDL CLI grows a clean-shutdown path.
 void inputShutdownMotionSensor() {
-    sdl_motion_instance().Detach();
+    vbam::core::SdlMotion::Instance().Detach();
     if (g_motion_pad) {
 #ifdef ENABLE_SDL3
         SDL_CloseGamepad(g_motion_pad);
@@ -705,7 +701,7 @@ static int sensorZ = 0;
 
 void inputUpdateMotionSensor()
 {
-    auto& motion = sdl_motion_instance();
+    auto& motion = vbam::core::SdlMotion::Instance();
     if (motion.IsActive()) {
         motion.Poll();
         sensorX = motion.TiltX();

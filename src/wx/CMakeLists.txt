@@ -483,12 +483,6 @@ else()
     target_include_directories(visualboyadvance-m PRIVATE ${SDL2_INCLUDE_DIRS})
 endif()
 
-# SDL gamepad motion-sensor → GBA tilt-sensor bridge. Lives under
-# core/base/ so the sdl frontend can share it, but compiled into the
-# wx executable since core/base itself doesn't depend on SDL.
-target_sources(visualboyadvance-m PRIVATE
-    "${CMAKE_SOURCE_DIR}/src/core/base/sdl_motion.cpp"
-    "${CMAKE_SOURCE_DIR}/src/core/base/sdl_motion.h")
 if(ENABLE_SDL3)
     target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_SDL3)
 endif()

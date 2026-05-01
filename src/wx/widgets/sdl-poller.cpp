@@ -20,10 +20,6 @@
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
 
-// Defined in src/wx/sys.cpp; pulls the global SdlMotion the
-// systemUpdateMotionSensor() loop reads from.
-extern vbam::core::SdlMotion* SystemSdlMotion();
-
 namespace widgets {
 
 namespace {
@@ -177,8 +173,7 @@ JoyState::JoyState(bool enable_game_controller, int sdl_index) : wx_joystick_(sd
     // attachment, matching how players usually expect the "active"
     // controller to drive tilt-aware games.
     if (game_controller_) {
-        if (auto* m = SystemSdlMotion())
-            m->Attach(static_cast<void*>(game_controller_));
+        vbam::core::SdlMotion::Instance().Attach(static_cast<void*>(game_controller_));
     }
 }
 
@@ -191,8 +186,7 @@ JoyState::~JoyState() {
     // closing the SDL handle below doesn't leave SdlMotion holding a
     // dangling pointer.
     if (game_controller_) {
-        if (auto* m = SystemSdlMotion())
-            m->Detach();
+        vbam::core::SdlMotion::Instance().Detach();
     }
 
 #ifndef ENABLE_SDL3

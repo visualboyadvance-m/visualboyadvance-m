@@ -163,10 +163,12 @@ bool IsSpace(int ch)
 // isalpha, so we implement the replacement. Shall work for Unicode too.
 // If chars are signed, conversion from char to int could generate negative
 // values, resulting in undefined behavior in standard function.
-bool IsAlpha(int ch)
-{
-  return((ch>='A' && ch<='Z') || (ch>='a' && ch<='z'));
-}
+namespace {
+    bool IsAlpha(int ch)
+    {
+        return((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'));
+    }
+}  // anonymous namespace
 
 
 

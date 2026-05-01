@@ -31,9 +31,6 @@ target_sources(vbam
     inputSDL.cpp
     inputSDL.h
     SDL.cpp
-    # SDL gamepad motion-sensor → GBA tilt-sensor bridge.
-    ${CMAKE_SOURCE_DIR}/src/core/base/sdl_motion.cpp
-    ${CMAKE_SOURCE_DIR}/src/core/base/sdl_motion.h
 )
 if(ENABLE_SDL3)
     target_compile_definitions(vbam PRIVATE ENABLE_SDL3)
@@ -74,9 +71,9 @@ else()
 endif()
 
 if(COMPILE_ONLY)
-    target_link_libraries(vbam PUBLIC nonstd-lib)
+    target_link_libraries(vbam PUBLIC nonstd-lib vbam-sdl-motion)
 else()
-    target_link_libraries(vbam nonstd-lib)
+    target_link_libraries(vbam nonstd-lib vbam-sdl-motion)
 endif()
 
 if(NOT COMPILE_ONLY)

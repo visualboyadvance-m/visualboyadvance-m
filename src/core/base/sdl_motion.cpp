@@ -108,6 +108,11 @@ SdlMotion::~SdlMotion() {
     delete impl_;
 }
 
+SdlMotion& SdlMotion::Instance() {
+    static SdlMotion s_instance;
+    return s_instance;
+}
+
 bool SdlMotion::Attach(void* sdl_gamepad) {
     if (!impl_) return false;
     if (impl_->pad == sdl_gamepad) return impl_->has_accel || impl_->has_gyro;
