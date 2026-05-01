@@ -53,7 +53,7 @@ elseif(UNIX)
     target_compile_definitions(vbam-lua PUBLIC LUA_USE_LINUX)
     target_link_libraries(vbam-lua PUBLIC dl m)
 elseif(WIN32)
-    target_compile_definitions(vbam-lua PUBLIC LUA_USE_WINDOWS)
+    target_compile_definitions(vbam-lua PRIVATE LUA_USE_WINDOWS)
 endif()
 
 # Lua's source is C89-style and emits a fair bit of "unused parameter"

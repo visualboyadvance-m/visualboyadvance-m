@@ -1,9 +1,7 @@
 #ifndef VBAM_WX_LUA_LUA_INTERNAL_H_
 #define VBAM_WX_LUA_LUA_INTERNAL_H_
 
-extern "C" {
-#include <lua.h>
-}
+struct lua_State;
 
 namespace vbam {
 namespace wx {
