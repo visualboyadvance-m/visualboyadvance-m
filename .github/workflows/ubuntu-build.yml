@@ -45,8 +45,9 @@ jobs:
       - name: Install Dependencies
         run: |
           echo 'Dpkg::Options { "--force-confdef"; "--force-confold"; }' | sudo tee -a /etc/apt/apt.conf.d/local
-          do-release-upgrade -d -f DistUpgradeViewNonInteractive
           sudo apt update
+          sudo apt -y upgrade
+          sudo do-release-upgrade -d -f DistUpgradeViewNonInteractive
           sudo apt -y install libsdl3-dev
           bash installdeps
           if [ "${{ matrix.build_compiler }}" = clang ]; then
