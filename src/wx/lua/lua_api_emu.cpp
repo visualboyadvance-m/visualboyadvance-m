@@ -19,6 +19,7 @@
 // behaves like a coroutine even though we don't use lua coroutines.
 
 #include "wx/lua/lua_engine.h"
+#include "wx/lua/lua_internal.h"
 
 extern "C" {
 #include <lauxlib.h>
@@ -60,12 +61,7 @@ std::string g_rom_name;
 
 namespace {
 
-LuaEngine* EngineFromState(lua_State* L) {
-    lua_getfield(L, LUA_REGISTRYINDEX, "vbam.engineptr");
-    auto* e = static_cast<LuaEngine*>(lua_touserdata(L, -1));
-    lua_pop(L, 1);
-    return e;
-}
+using lua_internal::EngineFromState;
 
 int l_frameadvance(lua_State* L) {
     // emu.frameadvance() is a coroutine yield point. The host loop

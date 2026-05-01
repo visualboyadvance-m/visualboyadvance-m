@@ -22,9 +22,12 @@ extern "C" {
 }
 
 #include "core/base/script_hooks.h"
+#include "wx/lua/lua_internal.h"
 
 namespace vbam {
 namespace wx {
+
+using lua_internal::kEnginePtr;
 
 // Forward decls for the FCEUX-style API binding installers. Each lives
 // in its own .cpp under src/wx/lua/ to keep this file manageable.
@@ -48,7 +51,6 @@ constexpr const char* kRegLoadAfter  = "vbam.loadafter";
 constexpr const char* kRegMemRead  = "vbam.memread";
 constexpr const char* kRegMemWrite = "vbam.memwrite";
 constexpr const char* kRegMemExec  = "vbam.memexec";
-constexpr const char* kEnginePtr   = "vbam.engineptr";
 
 }  // namespace
 
@@ -113,8 +115,10 @@ void CallRegistryList(LuaEngine* engine, lua_State* L, const char* key, int narg
     lua_pop(L, 1 + nargs);  // pop list table + original args
 }
 
-// Find this LuaEngine* given any lua_State* — it's stuffed in the
-// registry at script-load time.
+}  // namespace
+
+namespace lua_internal {
+
 LuaEngine* EngineFromState(lua_State* L) {
     lua_getfield(L, LUA_REGISTRYINDEX, kEnginePtr);
     auto* e = static_cast<LuaEngine*>(lua_touserdata(L, -1));
@@ -122,7 +126,7 @@ LuaEngine* EngineFromState(lua_State* L) {
     return e;
 }
 
-}  // namespace
+}  // namespace lua_internal
 
 // ----------------------------------------------------------------------------
 // LuaEngine

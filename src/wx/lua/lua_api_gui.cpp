@@ -11,6 +11,7 @@
 // 0xRRGGBBAA hex or strings like "white" / "#ffaa00ff".
 
 #include "wx/lua/lua_engine.h"
+#include "wx/lua/lua_internal.h"
 
 extern "C" {
 #include <lauxlib.h>
@@ -25,12 +26,7 @@ namespace wx {
 
 namespace {
 
-LuaEngine* EngineFromState(lua_State* L) {
-    lua_getfield(L, LUA_REGISTRYINDEX, "vbam.engineptr");
-    auto* e = static_cast<LuaEngine*>(lua_touserdata(L, -1));
-    lua_pop(L, 1);
-    return e;
-}
+using lua_internal::EngineFromState;
 
 uint32_t ParseColor(lua_State* L, int idx, uint32_t def) {
     if (lua_isnoneornil(L, idx)) return def;

@@ -494,6 +494,7 @@ if(ENABLE_LUA AND TARGET vbam-lua)
     target_sources(visualboyadvance-m PRIVATE
         lua/lua_engine.cpp
         lua/lua_engine.h
+        lua/lua_internal.h
         lua/lua_api_emu.cpp
         lua/lua_api_memory.cpp
         lua/lua_api_joypad.cpp

@@ -14,6 +14,7 @@
 // Lua-driven save matches what the user sees in the UI.
 
 #include "wx/lua/lua_engine.h"
+#include "wx/lua/lua_internal.h"
 
 extern "C" {
 #include <lauxlib.h>
@@ -41,12 +42,7 @@ namespace wx {
 
 namespace {
 
-LuaEngine* EngineFromState(lua_State* L) {
-    lua_getfield(L, LUA_REGISTRYINDEX, "vbam.engineptr");
-    auto* e = static_cast<LuaEngine*>(lua_touserdata(L, -1));
-    lua_pop(L, 1);
-    return e;
-}
+using lua_internal::EngineFromState;
 
 std::string SlotPath(const std::string& slot) {
     // If the caller passed a digit slot (0..9), expand to the wx
