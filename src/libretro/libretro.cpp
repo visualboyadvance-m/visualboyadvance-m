@@ -667,7 +667,7 @@ void retro_init(void)
    g_sensor.get_sensor_input = nullptr;
    if (environ_cb(RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE, &g_sensor) &&
        g_sensor.set_sensor_state && g_sensor.get_sensor_input) {
-      const float kSensorRate = 60.0f;
+      const unsigned kSensorRate = 60;
       bool ok_a = g_sensor.set_sensor_state(g_sensor_port,
           RETRO_SENSOR_ACCELEROMETER_ENABLE, kSensorRate);
       bool ok_g = g_sensor.set_sensor_state(g_sensor_port,
