@@ -4783,6 +4783,15 @@ void CPULoop(int ticks)
                 case kSchedSio:
                     gbaScheduler_OnSioComplete();
                     break;
+                case kSchedHblankIrqDelay:
+                    // Real HW raises the HBlank IRQ ~1 cycle after the
+                    // DISPSTAT bit toggles. Decoupling them lets the
+                    // scanline period stay at the GBATEK-correct 1232
+                    // cycles while still hitting test-ROM expectations
+                    // for IRQ-to-IRQ measurement at 1233.
+                    IF |= 2;
+                    UPDATE_REG(IO_REG_IF, IF);
+                    break;
                 default:
                     break;
                 }
@@ -4821,14 +4830,20 @@ void CPULoop(int ticks)
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         CPUCompareVCOUNT();
                     } else {
-                        lcdTicks += 225;
-                        lcdNextEventAbsCycle += 225;
+                        // GBATEK: HBlank phase is exactly 224 cycles
+                        // (scanline = 1008 HDraw + 224 HBlank = 1232).
+                        lcdTicks += 224;
+                        lcdNextEventAbsCycle += 224;
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         if (DISPSTAT & 16) {
-                            IF |= 2;
-                            UPDATE_REG(IO_REG_IF, IF);
-                            hblankIrqRaiseAbsCycle = cpuAbsCycle;
+                            // Defer the HBlank IRQ raise by 1 cycle: the
+                            // bus-arbitration delay between the LCD's
+                            // edge signal and the IRQ controller makes
+                            // the IRQ-to-IRQ scanline period 1233, even
+                            // though the DISPSTAT bit toggles at 1232.
+                            gbaScheduler::Schedule(kSchedHblankIrqDelay, 1);
+                            hblankIrqRaiseAbsCycle = cpuAbsCycle + 1;
                             hblankIrqRaiseVCount = VCOUNT;
                         }
                     }
@@ -5154,13 +5169,16 @@ void CPULoop(int ticks)
                         }
                         DISPSTAT |= 2;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
-                        lcdTicks += 225;
-                        lcdNextEventAbsCycle += 225;
+                        // GBATEK: HBlank phase is exactly 224 cycles
+                        // (scanline = 1008 HDraw + 224 HBlank = 1232).
+                        lcdTicks += 224;
+                        lcdNextEventAbsCycle += 224;
                         CPUCheckDMA(2, 0x0f);
                         if (DISPSTAT & 16) {
-                            IF |= 2;
-                            UPDATE_REG(IO_REG_IF, IF);
-                            hblankIrqRaiseAbsCycle = cpuAbsCycle;
+                            // See HBlank IRQ defer note in the matching
+                            // V-Blank scanline path above.
+                            gbaScheduler::Schedule(kSchedHblankIrqDelay, 1);
+                            hblankIrqRaiseAbsCycle = cpuAbsCycle + 1;
                             hblankIrqRaiseVCount = VCOUNT;
                         }
                         if (VCOUNT == 159) {

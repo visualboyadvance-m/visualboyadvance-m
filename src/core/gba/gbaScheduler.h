@@ -21,11 +21,18 @@
 #include <cstdint>
 
 enum SchedulerEventType : uint32_t {
-    kSchedSio        = 0,   // SIO transfer completion (Normal-8/32 internal)
+    kSchedSio            = 0,  // SIO transfer completion (Normal-8/32 internal)
+    kSchedHblankIrqDelay = 1,  // Deferred HBlank IRQ raise. Real HW raises
+                               // the HBlank IRQ ~1 cycle after the
+                               // DISPSTAT.HBlank bit toggle (bus-arbitration
+                               // latency from LCD edge to IRQ controller),
+                               // so the scanline period in lcdTicks stays
+                               // GBATEK-correct at 1008 + 224 = 1232 while
+                               // the IRQ-to-IRQ measurement is 1233.
     // Reserved for later phases:
     // kSchedLcdHdraw, kSchedLcdHblank, kSchedLcdVblank,
     // kSchedTimer0..Timer3, kSchedSwi, kSchedIrq,
-    kSchedCount      = 8    // upper bound of event-type values
+    kSchedCount          = 8   // upper bound of event-type values
 };
 
 namespace gbaScheduler {

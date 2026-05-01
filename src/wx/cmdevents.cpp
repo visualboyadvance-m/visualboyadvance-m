@@ -1572,10 +1572,7 @@ EVT_HANDLER_MASK(Rewind, "Rewind", CMDEN_REWIND)
 EVT_HANDLER_MASK(CheatsList, "List cheats...", CMDEN_GB | CMDEN_GBA)
 {
     wxDialog* dlg = GetXRCDialog("CheatList");
-    if (!dlg) return;
-    int rv = dlg->ShowModal();
-    fprintf(stderr, "[cheat-probe] direct dlg->ShowModal -> %d\n", rv);
-    fflush(stderr);
+    ShowModal(dlg);
 }
 
 EVT_HANDLER_MASK(CheatsSearch, "Create cheat...", CMDEN_GB | CMDEN_GBA)
