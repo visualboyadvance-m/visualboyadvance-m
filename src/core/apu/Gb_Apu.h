@@ -134,6 +134,7 @@ class Gb_Apu
         // large objects after everything else
         Gb_Osc::Good_Synth good_synth;
         Gb_Osc::Med_Synth med_synth;
+        Gb_Osc::Noise_Synth noise_synth;
 
         void reset_lengths();
         void reset_regs();

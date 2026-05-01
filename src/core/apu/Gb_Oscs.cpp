@@ -509,7 +509,14 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 			amp    = -amp;
 		}
 
-		update_amp( time, amp );
+		// update_amp via noise_synth (matches LFSR transition path below)
+		output->set_modified();
+		int amp_delta = amp - last_amp;
+		if ( amp_delta )
+		{
+			last_amp = amp;
+			noise_synth->offset( time, amp_delta, output );
+		}
 	}
 
 	// Run timer and calculate time of next LFSR clock
@@ -555,7 +562,7 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 				{
 					bits |= ~mask;
 					delta = -delta;
-					med_synth->offset_inline( time, delta, out );
+					noise_synth->offset_inline( time, delta, out );
 				}
 				time += per;
 			}

@@ -26,6 +26,7 @@ void Gb_Apu::treble_eq( blip_eq_t const& eq )
 {
 	good_synth.treble_eq( eq );
 	med_synth .treble_eq( eq );
+	noise_synth.treble_eq( eq );
 }
 
 inline int Gb_Apu::calc_output( int osc ) const
@@ -63,6 +64,7 @@ void Gb_Apu::synth_volume( int iv )
 	double v = volume_ * 0.60 / osc_count / 15 /*steps*/ / 8 /*master vol range*/ * iv;
 	good_synth.volume( v );
 	med_synth .volume( v );
+	noise_synth.volume( v );
 }
 
 void Gb_Apu::apply_volume()
@@ -184,6 +186,7 @@ Gb_Apu::Gb_Apu()
 		o.outputs [3] = 0;
 		o.good_synth  = &good_synth;
 		o.med_synth   = &med_synth;
+		o.noise_synth = &noise_synth;
 	}
 
 	reduce_clicks_ = false;

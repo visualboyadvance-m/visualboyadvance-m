@@ -40,8 +40,10 @@ class Gb_Osc
         int last_amp;            // current amplitude in Blip_Buffer
         typedef Blip_Synth<blip_good_quality, 1> Good_Synth;
         typedef Blip_Synth<blip_med_quality, 1> Med_Synth;
+        typedef Blip_Synth_Fast<1> Noise_Synth;
         Good_Synth const *good_synth;
         Med_Synth const *med_synth;
+        Noise_Synth const *noise_synth;
 
         int delay;      // clocks until frequency timer expires
         int length_ctr; // length counter

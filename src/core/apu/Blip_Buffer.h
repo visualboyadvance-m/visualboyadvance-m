@@ -304,6 +304,61 @@ template <int quality, int range> class Blip_Synth
 #endif
 };
 
+// Sample-and-hold variant of Blip_Synth: each delta is added at one
+// sample boundary, no bandlimit kernel, no phase interpolation. Aliases
+// content above Nyquist instead of filtering it. Use for channels whose
+// content already aliases on hardware (e.g. LFSR noise).
+template <int range> class Blip_Synth_Fast
+{
+        public:
+        // Sets overall volume of waveform
+        void volume(double v)
+        {
+                impl.volume_unit(v * (1.0 / (range < 0 ? -range : range)));
+        }
+
+        // No-op; sample-and-hold has no treble filter
+        void treble_eq(blip_eq_t const &) {}
+
+        // Gets/sets Blip_Buffer used for output
+        Blip_Buffer *output() const
+        {
+                return impl.buf;
+        }
+        void output(Blip_Buffer *b)
+        {
+                impl.buf = b;
+                impl.last_amp = 0;
+        }
+
+        // Low-level interface
+
+        // Adds an amplitude transition of specified delta, optionally into specified buffer
+        // rather than the one set with output(). Delta can be positive or negative.
+        // The actual change in amplitude is delta * (volume / range)
+        void offset(blip_time_t, int delta, Blip_Buffer *) const;
+        void offset(blip_time_t t, int delta) const
+        {
+                offset(t, delta, impl.buf);
+        }
+
+        // Works directly in terms of fractional output samples. Contact author for more info.
+        void offset_resampled(blip_resampled_time_t, int delta, Blip_Buffer *) const;
+
+        // Same as offset(), except code is inlined for higher performance
+        void offset_inline(blip_time_t t, int delta, Blip_Buffer *buf) const
+        {
+                offset_resampled(t * buf->factor_ + buf->offset_, delta, buf);
+        }
+        void offset_inline(blip_time_t t, int delta) const
+        {
+                offset_resampled(t * impl.buf->factor_ + impl.buf->offset_, delta, impl.buf);
+        }
+
+        private:
+        Blip_Synth_Fast_ impl;
+};
+
 // Low-pass equalization parameters
 class blip_eq_t
 {
@@ -613,6 +668,28 @@ inline
         int delta = amp - impl.last_amp;
         impl.last_amp = amp;
         offset_resampled(t * impl.buf->factor_ + impl.buf->offset_, delta, impl.buf);
+}
+
+
+template <int range>
+inline void Blip_Synth_Fast<range>::offset_resampled(blip_resampled_time_t time, int delta,
+                                                     Blip_Buffer *blip_buf) const
+{
+        // If this assertion fails, it means that an attempt was made to add a delta
+        // at a negative time or past the end of the buffer.
+        assert((blip_long)(time >> BLIP_BUFFER_ACCURACY) < blip_buf->buffer_size_);
+
+        delta *= impl.delta_factor;
+        blip_long *BLIP_RESTRICT buf = blip_buf->buffer_ + (time >> BLIP_BUFFER_ACCURACY);
+
+        // Snap delta to sample boundary; no phase interpolation.
+        buf[0] += delta;
+}
+
+template <int range>
+inline void Blip_Synth_Fast<range>::offset(blip_time_t t, int delta, Blip_Buffer *buf) const
+{
+        offset_resampled(t * buf->factor_ + buf->offset_, delta, buf);
 }
 
 inline blip_eq_t::blip_eq_t(double t)
