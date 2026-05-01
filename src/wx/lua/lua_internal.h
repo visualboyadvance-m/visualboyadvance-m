@@ -1,7 +1,9 @@
 #ifndef VBAM_WX_LUA_LUA_INTERNAL_H_
 #define VBAM_WX_LUA_LUA_INTERNAL_H_
 
+extern "C" {
 #include <lua.h>
+}
 
 namespace vbam {
 namespace wx {
