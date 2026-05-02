@@ -106,9 +106,13 @@ void BIOS_ArcTan2()
         if (x == 0) {
             res = ((y >> 16) & 0x8000) + 0x4000;
         } else {
-            if ((abs(x) > abs(y)) || ((abs(x) == abs(y)) && (!((x < 0) && (y < 0))))) {
-                reg[1].I = x;
-                reg[0].I = y << 14;
+            // Use uint32_t for abs() to avoid UB on INT32_MIN, and cast
+            // shifts to uint32_t to avoid signed-overflow UB (ARM lsl wraps).
+            uint32_t ax = (uint32_t)(x < 0 ? -x : x);
+            uint32_t ay = (uint32_t)(y < 0 ? -y : y);
+            if ((ax > ay) || ((ax == ay) && (!((x < 0) && (y < 0))))) {
+                reg[1].I = (uint32_t)x;
+                reg[0].I = (uint32_t)((int32_t)((uint32_t)y << 14));
                 BIOS_Div();
                 BIOS_ArcTan();
                 if (x < 0)
@@ -116,7 +120,7 @@ void BIOS_ArcTan2()
                 else
                     res = (((y >> 16) & 0x8000) << 1) + reg[0].I;
             } else {
-                reg[0].I = x << 14;
+                reg[0].I = (uint32_t)((int32_t)((uint32_t)x << 14));
                 BIOS_Div();
                 BIOS_ArcTan();
                 res = (0x4000 + ((y >> 16) & 0x8000)) - reg[0].I;
@@ -513,14 +517,23 @@ void BIOS_Div()
     }
 #endif
 
-    int number = reg[0].I;
-    int denom = reg[1].I;
-
-    if (denom != 0) {
-        reg[0].I = number / denom;
-        reg[1].I = number % denom;
-        int32_t temp = (int32_t)reg[0].I;
-        reg[3].I = temp < 0 ? (uint32_t)-temp : (uint32_t)temp;
+    int32_t numer = (int32_t)reg[0].I;
+    int32_t denom = (int32_t)reg[1].I;
+    if (denom == 0) {
+        // Real BIOS hangs for |numer| > 1; HLE approximation to avoid infinite loop.
+        reg[0].I = (numer >= 0) ? 1u : (uint32_t)-1;
+        reg[1].I = (uint32_t)numer;
+        reg[3].I = 1;
+    } else if (denom == -1 && numer == INT32_MIN) {
+        // abs(INT32_MIN) overflows; BIOS RSB wraps to INT32_MIN. Match that.
+        reg[0].I = (uint32_t)INT32_MIN;
+        reg[1].I = 0;
+        reg[3].I = (uint32_t)INT32_MIN;
+    } else {
+        div_t result = div(numer, denom);
+        reg[0].I = (uint32_t)result.quot;
+        reg[1].I = (uint32_t)result.rem;
+        reg[3].I = (uint32_t)abs(result.quot);
     }
 #ifdef GBA_LOGGING
     if (systemVerbose & VERBOSE_SWI) {

@@ -2610,21 +2610,27 @@ void CPUSoftwareInterrupt(int comment)
         CPUSoftwareInterrupt();
         break;
     case 0x06: {
-        // BIOS Div (HLE). r0 = numer, r1 = denom.
+        // BIOS Div (HLE). r0 = numer, r1 = denom -> r0 = quot, r1 = rem, r3 = abs(quot)
         int32_t numer = (int32_t)reg[0].I;
         int32_t denom = (int32_t)reg[1].I;
-        uint32_t abs_quot = 0;
+        uint32_t abs_quot;
         if (denom == 0) {
+            // Real BIOS hangs for |numer| > 1; HLE approximation to avoid infinite loop.
             reg[0].I = (numer >= 0) ? 1u : (uint32_t)-1;
             reg[1].I = (uint32_t)numer;
-            reg[3].I = 1;
+            abs_quot = 1;
+        } else if (denom == -1 && numer == INT32_MIN) {
+            // abs(INT32_MIN) overflows; BIOS RSB wraps to INT32_MIN. Match that.
+            reg[0].I = (uint32_t)INT32_MIN;
+            reg[1].I = 0;
+            abs_quot = (uint32_t)INT32_MIN;
         } else {
-            int32_t q = numer / denom;
-            reg[0].I = (uint32_t)q;
-            reg[1].I = (uint32_t)(numer % denom);
-            abs_quot = q < 0 ? (uint32_t)-q : (uint32_t)q;
-            reg[3].I = abs_quot;
+            div_t result = div(numer, denom);
+            reg[0].I = (uint32_t)result.quot;
+            reg[1].I = (uint32_t)result.rem;
+            abs_quot = (uint32_t)abs(result.quot);
         }
+            reg[3].I = abs_quot;
         int hi_bit = 0;
         uint32_t qv = abs_quot;
         while (qv) { hi_bit++; qv >>= 1; }
@@ -2649,18 +2655,22 @@ void CPUSoftwareInterrupt(int comment)
         // BIOS DivARM (HLE). Same as Div but r0 and r1 are swapped.
         int32_t numer = (int32_t)reg[1].I;
         int32_t denom = (int32_t)reg[0].I;
-        uint32_t abs_quot = 0;
+        uint32_t abs_quot;
         if (denom == 0) {
             reg[0].I = (numer >= 0) ? 1u : (uint32_t)-1;
             reg[1].I = (uint32_t)numer;
-            reg[3].I = 1;
+            abs_quot = 1;
+        } else if (denom == -1 && numer == INT32_MIN) {
+            reg[0].I = (uint32_t)INT32_MIN;
+            reg[1].I = 0;
+            abs_quot = (uint32_t)INT32_MIN;
         } else {
-            int32_t q = numer / denom;
-            reg[0].I = (uint32_t)q;
-            reg[1].I = (uint32_t)(numer % denom);
-            abs_quot = q < 0 ? (uint32_t)-q : (uint32_t)q;
-            reg[3].I = abs_quot;
+            div_t result = div(numer, denom);
+            reg[0].I = (uint32_t)result.quot;
+            reg[1].I = (uint32_t)result.rem;
+            abs_quot = (uint32_t)abs(result.quot);
         }
+            reg[3].I = abs_quot;
         int hi_bit = 0;
         uint32_t qv = abs_quot;
         while (qv) { hi_bit++; qv >>= 1; }
