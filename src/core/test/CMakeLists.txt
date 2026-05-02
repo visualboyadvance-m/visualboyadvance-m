@@ -397,9 +397,13 @@ if(VBAM_TEST_GBA_ROM AND EXISTS "${VBAM_TEST_GBA_ROM}")
     list(APPEND _gba_args "${VBAM_TEST_GBA_ROM}")
     add_test(NAME gba.suite
              COMMAND suite_runner ${_gba_args})
+    # 1800s (30 min) accommodates Ubuntu/clang/debug CI runners with
+    # sanitizers enabled — the suite's ~8M memory accesses make it
+    # significantly slower under ASAN/UBSAN. Mac/clang/debug runs in
+    # under 5s, so this is purely a CI safety margin.
     set_tests_properties(gba.suite PROPERTIES
         LABELS "gba;accuracy"
-        TIMEOUT 600)
+        TIMEOUT 1800)
     message(STATUS "vbam-core test: gba.suite enabled "
         "(rom=${VBAM_TEST_GBA_ROM} floor=${VBAM_TEST_GBA_MIN_PASS})")
 else()
