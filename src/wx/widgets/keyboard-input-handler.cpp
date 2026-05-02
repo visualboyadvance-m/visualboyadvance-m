@@ -511,14 +511,6 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
-    for (size_t i = 0; i < event_data.size(); ++i) {
-        const auto& d = event_data[i];
-        if (d.input.is_keyboard()) {
-            const auto& kb = d.input.keyboard_input();
-        } else {
-        }
-    }
-
     // Synchronous joypad-state update (always). The sink filters non-
     // game commands internally — see comment in the constructor for
     // wxvbamApp where the sink is wired. This path is focus-independent
@@ -641,14 +633,6 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
 
     for (const auto& data : event_data) {
         active_mod_inputs_.erase(data.input.keyboard_input());
-    }
-
-    for (size_t i = 0; i < event_data.size(); ++i) {
-        const auto& d = event_data[i];
-        if (d.input.is_keyboard()) {
-            const auto& kb = d.input.keyboard_input();
-        } else {
-        }
     }
 
     // Synchronous joypad-state update (always). The sink filters non-
