@@ -46,6 +46,7 @@ jobs:
         run: |
           echo 'Dpkg::Options { "--force-confdef"; "--force-confold"; }' | sudo tee -a /etc/apt/apt.conf.d/local
           sudo apt update
+          sudo apt -y remove firefox
           sudo apt -y upgrade
           sudo do-release-upgrade -d -f DistUpgradeViewNonInteractive
           sudo apt -y install libsdl3-dev
