@@ -368,28 +368,6 @@ uint32_t WxModifierToExtended(wxKeyModifier wx_mod,
     return result;
 }
 
-// Trace helper: format a set of modifiers as a comma-separated string.
-wxString FmtMods(const std::unordered_set<wxKeyModifier>& mods) {
-    wxString s = "{";
-    bool first = true;
-    for (const wxKeyModifier m : mods) {
-        if (!first) s += ",";
-        first = false;
-        switch (m) {
-            case wxMOD_ALT: s += "ALT"; break;
-            case wxMOD_CONTROL: s += "CTRL"; break;
-            case wxMOD_SHIFT: s += "SHIFT"; break;
-            case wxMOD_META: s += "META"; break;
-#ifdef __WXMAC__
-            case wxMOD_RAW_CONTROL: s += "RAWCTRL"; break;
-#endif
-            default: s += wxString::Format("0x%x", (unsigned)m); break;
-        }
-    }
-    s += "}";
-    return s;
-}
-
 }  // namespace
 
 KeyboardInputHandler::KeyboardInputHandler(EventHandlerProvider* const handler_provider,
@@ -447,23 +425,6 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         if (event_mods.find(mod) == event_mods.end()) {
             to_remove.push_back(mod);
         }
-    }
-
-    if (!to_remove.empty()) {
-        wxString rm_str = "{";
-        bool first = true;
-        for (const wxKeyModifier m : to_remove) {
-            if (!first) rm_str += ",";
-            first = false;
-            switch (m) {
-                case wxMOD_ALT: rm_str += "ALT"; break;
-                case wxMOD_CONTROL: rm_str += "CTRL"; break;
-                case wxMOD_SHIFT: rm_str += "SHIFT"; break;
-                case wxMOD_META: rm_str += "META"; break;
-                default: rm_str += wxString::Format("0x%x", (unsigned)m); break;
-            }
-        }
-        rm_str += "}";
     }
 
     // If any modifiers were released while we weren't getting events (e.g., during
