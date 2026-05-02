@@ -2083,9 +2083,27 @@ static Display* GetX11Display() {
 #endif  // __WXGTK__
 
 void GameArea::OnUserInput(widgets::UserInputEvent& event) {
+    // Keyboard inputs are mutated synchronously via the sync_sink wired
+    // in wxvbamApp's constructor before this queued event fires.
+    // Re-running OnInputPressed/Released here for keyboard would race
+    // with sync_sink: if focus changes between a press and its release,
+    // the press queued to the panel re-runs OnInputPressed AFTER
+    // sync_sink already released, but the release event went to a
+    // different (now-focused) handler that doesn't bind
+    // VBAM_EVT_USER_INPUT, so nothing clears the bit. Joystick inputs
+    // do NOT go through sync_sink (only the SDL poller queue path), so
+    // we still need to mutate state for those here.
     bool emulated_key_pressed = false;
+    const config::Bindings* const bindings = wxGetApp().bindings();
     for (const auto& event_data : event.data()) {
-        if (event_data.pressed) {
+        if (event_data.input.is_keyboard()) {
+            // Already handled by sync_sink; just check if it's
+            // game-bound for the wakeup/screensaver logic below.
+            const auto command = bindings->CommandForInput(event_data.input);
+            if (command && command->is_game()) {
+                emulated_key_pressed = true;
+            }
+        } else if (event_data.pressed) {
             if (wxGetApp().emulated_gamepad()->OnInputPressed(event_data.input)) {
                 emulated_key_pressed = true;
             }

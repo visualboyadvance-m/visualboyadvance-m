@@ -388,6 +388,24 @@ void KeyboardInputHandler::ProcessKeyEvent(wxKeyEvent& event) {
     // to update joypad state regardless of focus. The focus check is
     // applied later in OnKeyDown/OnKeyUp, gating only the wxQueueEvent
     // path.
+    //
+    // Skip events with no key code. The Windows background-input thread
+    // (background-input.cpp) iterates all VKs from 0x08 to 0xFF and
+    // synthesizes a wxKeyEvent for every state change. The VK_LCONTROL/
+    // VK_RCONTROL/VK_LSHIFT/VK_RSHIFT/VK_LMENU/VK_RMENU codes aren't in
+    // its kSpecialKeys table, so VKToWX returns WXK_NONE for them and
+    // Windows reports both VK_CONTROL AND VK_LCONTROL (or RCONTROL)
+    // pressed simultaneously when Ctrl is held. The result was a second
+    // KEY_DOWN with m_keyCode=WXK_NONE and no modifier flags set,
+    // which the OnKeyDown event_mods sync misread as "the user just
+    // released the modifier" and erased it from active_mods_. The
+    // user's later real release then found nothing to release, so
+    // sync_sink wasn't called and the joypad bit stayed set — a stuck
+    // button. These spurious events carry no information so just drop
+    // them.
+    if (event.GetKeyCode() == WXK_NONE) {
+        return;
+    }
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
         OnKeyDown(event);
     } else if (event.GetEventType() == wxEVT_KEY_UP) {
