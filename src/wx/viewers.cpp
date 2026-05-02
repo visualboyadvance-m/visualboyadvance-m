@@ -1,4 +1,3 @@
-
 // these are all the viewer dialogs except for the ones with graphical areas
 // they can be instantiated multiple times
 
@@ -486,6 +485,20 @@ public:
                 wxString s;
                 s.Printf(wxT("%04X"), _reg);
                 val->SetLabel(s);
+
+                // When auto-update is enabled, the next UpdateViewers
+                // tick (driven by systemDrawScreen — every emulated
+                // frame) calls Update() which re-reads the current
+                // value of the IO register and resets every checkbox
+                // to match. That happens before the user can click
+                // Apply, wiping their edit. Commit the change here so
+                // the bit toggle takes effect immediately and survives
+                // the next refresh. When auto-update is off, keep the
+                // legacy preview-then-Apply flow.
+                if (auto_update) {
+                    wxCommandEvent dummy;
+                    Apply(dummy);
+                }
                 return;
             }
 

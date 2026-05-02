@@ -1,5 +1,7 @@
 #include "wx/viewsupt.h"
 
+#include <wx/dcbuffer.h>
+
 #include "wx/config/option-proxy.h"
 #include "wx/config/user-input.h"
 #include "wx/wxvbam.h"
@@ -304,6 +306,11 @@ void MemView::Refit()
     if (!didinit) {
         disp.Create(this, wxID_ANY, wxPoint(0, 0), wxDefaultSize,
             wxBORDER_NONE | wxWANTS_CHARS | wxTAB_TRAVERSAL);
+        // Skip wx's default background-erase before EVT_PAINT. Our paint
+        // handler uses wxBufferedPaintDC and clears the back-buffer
+        // itself, so the foreground-erase wx does first would just be a
+        // visible flash before our buffered draw replaces it.
+        disp.SetBackgroundStyle(wxBG_STYLE_PAINT);
         disp.Connect(wxEVT_PAINT, wxPaintEventHandler(MemView::RepaintEv),
             NULL, this);
         disp.Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MemView::MouseEvent),
@@ -341,6 +348,12 @@ void MemView::Refit()
 
 void MemView::MouseEvent(wxMouseEvent& ev)
 {
+    // Take focus on left-down so subsequent keyboard navigation reaches
+    // this MemView's KeyEvent handler. ShowCaret() no longer takes focus
+    // implicitly — see the note there.
+    if (ev.GetEventType() == wxEVT_LEFT_DOWN)
+        disp.SetFocus();
+
     if (ev.GetEventType() == wxEVT_MOTION && !ev.LeftIsDown())
         return;
 
@@ -412,7 +425,15 @@ void MemView::ShowCaret()
     while (!caret->IsVisible())
         caret->Show();
 
-    disp.SetFocus();
+    // Note: previously this called `disp.SetFocus()` here. That made the
+    // mem viewer steal focus from other dialogs every time it Refilled,
+    // which under auto-update fires every frame — making it hard to e.g.
+    // click Apply on the IO Viewer or uncheck a checkbox elsewhere. The
+    // caret can be positioned and shown without owning focus; the actual
+    // user-interaction paths (mouse click on disp, keyboard navigation
+    // inside disp) explicitly call disp.SetFocus() at their entry points
+    // so clicking into the mem view still gives it focus the way it did
+    // before.
 }
 
 void MemView::KeyEvent(widgets::UserInputEvent& ev)
@@ -638,15 +659,27 @@ void MemView::RefillNeeded()
 void MemView::Refill()
 {
     MoveSB();
-    wxClientDC dc(&disp);
+    // Use wxBufferedDC so the dc.Clear() + DrawText sequence happens
+    // off-screen on a memory bitmap, then is blitted to the window in a
+    // single operation when the wxBufferedDC destructor runs. Without
+    // buffering, auto-update (running every frame) caused visible
+    // flicker — the user would see the cleared background between
+    // Clear() and the DrawText loop completing.
+    wxClientDC clientDc(&disp);
+    wxBufferedDC dc(&clientDc);
+    dc.SetBackground(wxBrush(disp.GetBackgroundColour()));
     dc.Clear();
+    dc.SetBackgroundMode(wxSOLID);
     Refill(dc);
     ShowCaret();
 }
 
 void MemView::Repaint()
 {
-    wxClientDC dc(&disp);
+    wxClientDC clientDc(&disp);
+    wxBufferedDC dc(&clientDc);
+    dc.SetBackground(wxBrush(disp.GetBackgroundColour()));
+    dc.Clear();
     dc.SetBackgroundMode(wxSOLID);
     Refill(dc);
 }
@@ -654,7 +687,13 @@ void MemView::Repaint()
 void MemView::RepaintEv(wxPaintEvent& ev)
 {
     (void)ev; // unused params
-    wxPaintDC dc(&disp);
+    // wxBufferedPaintDC is the correct buffered pair for wxPaintDC inside
+    // an EVT_PAINT handler. With wxBG_STYLE_PAINT set on disp, wx skips
+    // the default background-erase, so the buffered draw is the only
+    // pixel update the user sees — no flash of erased background.
+    wxBufferedPaintDC dc(&disp);
+    dc.SetBackground(wxBrush(disp.GetBackgroundColour()));
+    dc.Clear();
     dc.SetBackgroundMode(wxSOLID);
     Refill(dc);
     ShowCaret();
