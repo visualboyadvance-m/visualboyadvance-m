@@ -5279,6 +5279,16 @@ void CPULoop(int ticks)
                             }
                             capturePrevious = capture;
 
+                            // Refresh g_ioMem[NR52] before the wx
+                            // Memory/IO Viewers read it during
+                            // UpdateViewers (call site #3 of
+                            // soundReadNR52 — see gbaSound.cpp).
+                            // Without this, viewers lag by a frame
+                            // because psoundTickfn's refresh runs
+                            // AFTER systemDrawScreen at the bottom of
+                            // GBAEmulate.
+                            (void)soundReadNR52();
+
                             if (frameCount >= framesToSkip) {
                                 systemDrawScreen();
                                 frameCount = 0;

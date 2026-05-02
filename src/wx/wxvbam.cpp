@@ -401,8 +401,9 @@ wxvbamApp::wxvbamApp()
       //       hotkeys/menu shortcuts when the window is unfocused —
       //       matching the legacy MFC build's behavior.
       // The async UserInputEvent path is preserved by
-      // KeyboardInputHandler::DispatchEventData for hotkey/menu/
-      // MemView/config consumers, but is now gated on focus.
+      // KeyboardInputHandler for hotkey/menu/
+      // MemView/config consumers. Hotkey-shortcut firing in
+      // FilterEvent's UserInputEvent branch is focus-gated below.
       // EmulatedGamepad::OnInputPressed/Released filter non-game
       // commands internally, so passing every key here is safe.
       keyboard_input_handler_(
@@ -416,7 +417,16 @@ wxvbamApp::wxvbamApp()
           }) {
     Bind(wxEVT_ACTIVATE_APP, [this](wxActivateEvent& event) {
         if (!event.GetActive()) {
+            // App is deactivating. Clear keyboard tracking AND joypad
+            // state together — keeping them in sync. If we cleared
+            // only the keyboard handler, a key press tracked before
+            // deactivation would be released via background-input
+            // after deactivation against an empty active_keys_, the
+            // release would generate no event_data, and joypads_ bits
+            // for that key would remain stuck. Resetting both ensures
+            // the user gets a clean slate when they alt-tab back.
             keyboard_input_handler_.Reset();
+            emulated_gamepad_.Reset();
         }
 #ifdef __WXGTK__
         else {
@@ -2777,6 +2787,19 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     }
 
     if (!frame->CanProcessShortcuts()) {
+        return wxEventFilter::Event_Skip;
+    }
+
+    // Don't fire hotkey/menu shortcuts when the app is unfocused, even
+    // if the user has the "Allow keyboard background input" option on.
+    // The background-input feature is for joypad controls only — that
+    // path runs through KeyboardInputHandler's synchronous sink which
+    // updates EmulatedGamepad directly, bypassing this branch entirely.
+    // wxWindow::FindFocus() returns null iff no widget in this app has
+    // focus (same check BackgroundInput uses to gate event injection).
+    // Matches the legacy MFC build's behavior of routing only joypad-
+    // mapped controls to an inactive window.
+    if (!wxWindow::FindFocus()) {
         return wxEventFilter::Event_Skip;
     }
 

@@ -4,7 +4,6 @@
 #include "wx/widgets/user-input-event.h"
 
 #include <wx/log.h>
-#include <wx/window.h>
 
 namespace widgets {
 
@@ -514,18 +513,21 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
 
     // Synchronous joypad-state update (always). The sink filters non-
     // game commands internally — see comment in the constructor for
-    // wxvbamApp where the sink is wired.
+    // wxvbamApp where the sink is wired. This path is focus-independent
+    // and is what makes joypad input work both in foreground and (with
+    // the background-input option enabled) in background.
     for (const auto& data : event_data) {
         sync_sink_(data.input, data.pressed);
     }
-    // Async UserInputEvent for hotkeys/MemView/config — gated on focus
-    // so background-input only carries joypad controls, not hotkeys.
-    // FindFocus() returning null = no widget in this app has focus =
-    // app is in the background.
-    if (wxWindow::FindFocus()) {
-        if (wxEvtHandler* const target = handler_provider_->event_handler()) {
-            wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
-        }
+    // Async UserInputEvent for the rest of the consumer chain
+    // (GameArea::OnUserInput, MemView, hotkey-config dialog, and the
+    // shortcut-matching branch of wxApp::FilterEvent). The focus gate
+    // for "no hotkeys when unfocused" lives at the FilterEvent
+    // shortcut-matching site, not here — the handler itself stays
+    // focus-oblivious so unit tests can exercise it without setting up
+    // window focus.
+    if (wxEvtHandler* const target = handler_provider_->event_handler()) {
+        wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
     }
 }
 
@@ -632,15 +634,14 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
     }
 
     // Synchronous joypad-state update (always). The sink filters non-
-    // game commands internally.
+    // game commands internally. See OnKeyDown for the rationale on why
+    // this happens unconditionally and why the focus gate lives at the
+    // FilterEvent shortcut-matching site rather than here.
     for (const auto& data : event_data) {
         sync_sink_(data.input, data.pressed);
     }
-    // Async UserInputEvent for hotkeys/MemView/config — gated on focus.
-    if (wxWindow::FindFocus()) {
-        if (wxEvtHandler* const target = handler_provider_->event_handler()) {
-            wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
-        }
+    if (wxEvtHandler* const target = handler_provider_->event_handler()) {
+        wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
     }
 }
 

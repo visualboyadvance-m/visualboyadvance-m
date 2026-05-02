@@ -164,9 +164,9 @@ void SdlMotion::Poll() {
             float ay = (std::fabs(a[2]) > dz) ? a[2] : 0.f;
 
             // Scale m/s² → GBA tilt units, applying user sensitivity.
-            int x = static_cast<int>(-ax * kAccelToTilt * impl_->tilt_scale)
+            int x = static_cast<int>(ax * kAccelToTilt * impl_->tilt_scale)
                     + kTiltCenter;
-            int y = static_cast<int>(-ay * kAccelToTilt * impl_->tilt_scale)
+            int y = static_cast<int>(ay * kAccelToTilt * impl_->tilt_scale)
                     + kTiltCenter;
             impl_->tilt_x = std::clamp(x, kTiltMin, kTiltMax);
             impl_->tilt_y = std::clamp(y, kTiltMin, kTiltMax);

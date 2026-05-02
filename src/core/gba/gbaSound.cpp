@@ -361,8 +361,27 @@ void soundEvent8(uint32_t address, uint8_t data)
         g_ioMem[address] = data;
         gb_apu->write_register(soundTicks, gb_addr, data);
 
-        if (address == NR52)
+        if (address == NR52) {
             apply_control();
+            // Game writes to NR52 mask out bits 0-3 (they are R-only),
+            // which would leave g_ioMem[NR52] showing those bits as 0
+            // until the next CPU read or psoundTickfn refresh repopulates
+            // them. Tools that inspect raw memory (Memory Viewer, IO
+            // Viewer's direct g_ioMem fetch, save-state analysis, lua
+            // mem_read) would briefly see stale zeros. Real HW
+            // continuously reflects channel-on state regardless of
+            // writes — refilling bits 0-3 here matches that and means
+            // any subsequent debug read sees the live status.
+            //
+            // Calling soundReadNR52() does the (apu_status | master)
+            // compose and writeback in one place — this is the same
+            // helper used by the CPU read hook, by gba.cpp's pre-
+            // systemDrawScreen refresh, and by psoundTickfn's end-of-
+            // frame refresh. Keep them all going through this single
+            // function so future edits to the compose logic land in one
+            // place.
+            (void)soundReadNR52();
+        }
     }
 
     // TODO: what about byte writes to SGCNT0_H etc.?
@@ -433,24 +452,51 @@ void soundTimerOverflow(int timer)
 
 uint8_t soundReadNR52()
 {
-    // NR52 / SOUNDCNT_X read composes:
-    //   bit 7    = master sound enable (R/W; tracked in g_ioMem[NR52])
-    //   bits 4-6 = 0 (unused)
-    //   bits 0-3 = R-only PSG channel-ON flags, set by hardware while
-    //              channels are producing sound, cleared when length
-    //              counters expire. Games commonly poll these to
-    //              wait for sound effects to finish.
+    // SOUNDCNT_X (NR52) compose-and-writeback helper. This is the
+    // single source of truth for what bits 0-3 of NR52 should hold;
+    // every other path that needs g_ioMem[NR52] to reflect the live
+    // PSG channel-on status calls this function. Currently four call
+    // sites:
     //
-    // Gb_Apu's read_register builds the bits-0-3 field from the live
-    // `enabled` flag of each oscillator (square1, square2, wave,
-    // noise) when the GB-side address 0xFF26 is read. Combine that
-    // with our master_enable bit so the caller sees a fully-correct
-    // SOUNDCNT_X value.
+    //   1. Game-side CPU reads of 0x04000084. Routed through
+    //      CPUReadByte/HalfWord/Memory in gbaInline.h, which call this
+    //      and use the returned value.
+    //   2. Game-side CPU writes to NR52 (soundEvent8). Bits 0-3 are
+    //      masked off by the write path (they are R-only), which would
+    //      leave g_ioMem[NR52] showing zeros there. Calling this after
+    //      the write refills them so subsequent debug reads of g_ioMem
+    //      see the live status.
+    //   3. Right before systemDrawScreen() in gba.cpp's CPULoop, so the
+    //      wx Memory Viewer / IO Viewer (which read g_ioMem directly
+    //      via CPUReadMemoryQuick / direct array indexing, bypassing
+    //      the read hook) see this frame's state, not last frame's.
+    //   4. psoundTickfn at end-of-frame, so any tool that polls between
+    //      frames sees fresh state even if no other refresh fired.
+    //
+    // Composition:
+    //   bit 7    = master sound enable (R/W; tracked in g_ioMem[NR52])
+    //   bits 4-6 = 0 (unused on real HW)
+    //   bits 0-3 = R-only PSG channel-ON flags. On real HW these are
+    //              continuously driven by the APU's per-channel
+    //              `enabled` signal — set when a channel is triggered,
+    //              cleared when its length counter expires (envelope
+    //              ending does NOT clear). Gb_Apu::read_register at
+    //              GB-side address 0xFF26 builds this nibble from the
+    //              live `enabled` flag of square1, square2, wave, and
+    //              noise.
+    //
+    // Side effect: this function also writes the composed value back
+    // into g_ioMem[NR52]. That's how the four call sites above can
+    // share state — each call brings g_ioMem in sync with APU truth.
+    // Real HW's bits 0-3 are combinational rather than stored, so this
+    // writeback is consistent with HW behavior, not a workaround.
     if (!gb_apu)
         return g_ioMem[NR52];
     const uint8_t apu_status = gb_apu->read_register(soundTicks, 0xFF26);
     const uint8_t master = g_ioMem[NR52] & 0x80;
-    return (uint8_t)((apu_status & 0x0F) | master);
+    const uint8_t composed = (uint8_t)((apu_status & 0x0F) | master);
+    g_ioMem[NR52] = composed;
+    return composed;
 }
 
 static void end_frame(blip_time_t time)
@@ -531,6 +577,13 @@ static void apply_filtering()
 void psoundTickfn()
 {
     if (gb_apu && stereo_buffer) {
+        // End-of-frame refresh of g_ioMem[NR52] (call site #4 of
+        // soundReadNR52 — see that function for why this is done).
+        // Must come before end_frame: end_frame resets gb_apu's
+        // internal time origin, after which read_register(soundTicks)
+        // would fire its `time >= last_time` assertion.
+        (void)soundReadNR52();
+
         // Run sound hardware to present
         end_frame(soundTicks);
 
