@@ -3,8 +3,6 @@
 #include "wx/config/user-input.h"
 #include "wx/widgets/user-input-event.h"
 
-#include <wx/log.h>
-
 namespace widgets {
 
 namespace {
@@ -370,6 +368,28 @@ uint32_t WxModifierToExtended(wxKeyModifier wx_mod,
     return result;
 }
 
+// Trace helper: format a set of modifiers as a comma-separated string.
+wxString FmtMods(const std::unordered_set<wxKeyModifier>& mods) {
+    wxString s = "{";
+    bool first = true;
+    for (const wxKeyModifier m : mods) {
+        if (!first) s += ",";
+        first = false;
+        switch (m) {
+            case wxMOD_ALT: s += "ALT"; break;
+            case wxMOD_CONTROL: s += "CTRL"; break;
+            case wxMOD_SHIFT: s += "SHIFT"; break;
+            case wxMOD_META: s += "META"; break;
+#ifdef __WXMAC__
+            case wxMOD_RAW_CONTROL: s += "RAWCTRL"; break;
+#endif
+            default: s += wxString::Format("0x%x", (unsigned)m); break;
+        }
+    }
+    s += "}";
+    return s;
+}
+
 }  // namespace
 
 KeyboardInputHandler::KeyboardInputHandler(EventHandlerProvider* const handler_provider,
@@ -388,24 +408,6 @@ void KeyboardInputHandler::ProcessKeyEvent(wxKeyEvent& event) {
     // to update joypad state regardless of focus. The focus check is
     // applied later in OnKeyDown/OnKeyUp, gating only the wxQueueEvent
     // path.
-    //
-    // Skip events with no key code. The Windows background-input thread
-    // (background-input.cpp) iterates all VKs from 0x08 to 0xFF and
-    // synthesizes a wxKeyEvent for every state change. The VK_LCONTROL/
-    // VK_RCONTROL/VK_LSHIFT/VK_RSHIFT/VK_LMENU/VK_RMENU codes aren't in
-    // its kSpecialKeys table, so VKToWX returns WXK_NONE for them and
-    // Windows reports both VK_CONTROL AND VK_LCONTROL (or RCONTROL)
-    // pressed simultaneously when Ctrl is held. The result was a second
-    // KEY_DOWN with m_keyCode=WXK_NONE and no modifier flags set,
-    // which the OnKeyDown event_mods sync misread as "the user just
-    // released the modifier" and erased it from active_mods_. The
-    // user's later real release then found nothing to release, so
-    // sync_sink wasn't called and the joypad bit stayed set — a stuck
-    // button. These spurious events carry no information so just drop
-    // them.
-    if (event.GetKeyCode() == WXK_NONE) {
-        return;
-    }
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
         OnKeyDown(event);
     } else if (event.GetEventType() == wxEVT_KEY_UP) {
@@ -427,6 +429,7 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
     const wxKeyCode key = FilterKeyCode(event);
     const std::unordered_set<wxKeyModifier> mods = GetModifiers(event);
 
+
     // Sync active_mods_ with what wxWidgets reports in this event.
     // This handles cases where modifier key releases were missed (e.g., focus loss).
     // Check which modifiers the event says are currently held
@@ -444,6 +447,23 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         if (event_mods.find(mod) == event_mods.end()) {
             to_remove.push_back(mod);
         }
+    }
+
+    if (!to_remove.empty()) {
+        wxString rm_str = "{";
+        bool first = true;
+        for (const wxKeyModifier m : to_remove) {
+            if (!first) rm_str += ",";
+            first = false;
+            switch (m) {
+                case wxMOD_ALT: rm_str += "ALT"; break;
+                case wxMOD_CONTROL: rm_str += "CTRL"; break;
+                case wxMOD_SHIFT: rm_str += "SHIFT"; break;
+                case wxMOD_META: rm_str += "META"; break;
+                default: rm_str += wxString::Format("0x%x", (unsigned)m); break;
+            }
+        }
+        rm_str += "}";
     }
 
     // If any modifiers were released while we weren't getting events (e.g., during
@@ -496,6 +516,7 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
+
     if (key_pressed == WXK_NONE && mod_pressed == wxMOD_NONE) {
         // No new keys or mods were pressed.
         return;
@@ -529,6 +550,14 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
+    for (size_t i = 0; i < event_data.size(); ++i) {
+        const auto& d = event_data[i];
+        if (d.input.is_keyboard()) {
+            const auto& kb = d.input.keyboard_input();
+        } else {
+        }
+    }
+
     // Synchronous joypad-state update (always). The sink filters non-
     // game commands internally — see comment in the constructor for
     // wxvbamApp where the sink is wired. This path is focus-independent
@@ -557,6 +586,7 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
     const std::unordered_set<wxKeyModifier> mods = GetModifiers(event);
     const wxKeyModifier previous_mods = GetModifiersFromSet(active_mods_);
 
+
     wxKeyCode key_released = WXK_NONE;
     if (key != WXK_NONE) {
         auto iter = active_keys_.find(key);
@@ -580,6 +610,7 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
             }
         }
     }
+
 
     if (key_released == WXK_NONE && mod_released == wxMOD_NONE) {
         // No keys or mods were released.
@@ -649,6 +680,14 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
 
     for (const auto& data : event_data) {
         active_mod_inputs_.erase(data.input.keyboard_input());
+    }
+
+    for (size_t i = 0; i < event_data.size(); ++i) {
+        const auto& d = event_data[i];
+        if (d.input.is_keyboard()) {
+            const auto& kb = d.input.keyboard_input();
+        } else {
+        }
     }
 
     // Synchronous joypad-state update (always). The sink filters non-

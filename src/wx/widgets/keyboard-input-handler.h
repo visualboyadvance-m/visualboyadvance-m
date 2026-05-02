@@ -26,7 +26,7 @@ public:
     //     blocking the wx event queue (during emuMain) still update
     //     joypad state in time for the next frame.
     //   - Press/release pairs split across focus changes (e.g., user
-    //     mouses over a tooltip mid-press) don't drop the release —
+    //     mouses over a tooltip mid-press) don't drop the release â€”
     //     the sync path doesn't depend on the focused window.
     // The sink should be lightweight and non-reentrant; it is invoked
     // on the main wx thread under FilterEvent context.

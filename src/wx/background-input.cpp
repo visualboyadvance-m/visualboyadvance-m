@@ -535,21 +535,59 @@ wxThread::ExitCode BackgroundInput::Setup()
     return NO_ERROR;
 }
 
+// Returns true if our process owns the foreground window. Used in place
+// of wxWindow::FindFocus() in this thread because FindFocus calls
+// ::GetFocus() which is per-thread on Windows; from this background
+// thread it always returns NULL, making the bg-input thread think the
+// app was unfocused and synthesize keyboard events while the user was
+// actively playing — which broke modifier tracking and made hotkeys
+// like Shift+F1 fire as F1 alone (because synthetic events have
+// m_shiftDown=false even when Shift is genuinely held).
+#if defined(__WXMSW__)
+static bool AppIsForeground()
+{
+    HWND fg = ::GetForegroundWindow();
+    if (!fg) return false;
+    DWORD pid = 0;
+    ::GetWindowThreadProcessId(fg, &pid);
+    return pid == ::GetCurrentProcessId();
+}
+#endif
+
 wxThread::ExitCode BackgroundInput::CheckKeyboard()
 {
+#if defined(__WXMSW__)
+    if (AppIsForeground()) {
+        // if our app is the foreground app, do nothing
+        return NO_ERROR;
+    }
+#else
     if (wxWindow::FindFocus()) {
         // if the app has focus, do nothing
         return NO_ERROR;
     }
+#endif
 #if defined(__WXMSW__)
     for (int i = 0x08; i < 0xFF; ++i) {
         SHORT bits = GetAsyncKeyState(i);
         if (bits == previousState[i]) continue;
         wchar_t uc = 0;
         int xKeySym = VKToWX(i, 0, &uc);
+        // Skip keys that don't map to a wx key code. Windows reports both
+        // the generic VK (VK_CONTROL/VK_SHIFT/VK_MENU) AND the L/R variants
+        // (VK_LCONTROL/VK_RCONTROL/VK_LSHIFT/VK_RSHIFT/VK_LMENU/VK_RMENU)
+        // as pressed when a modifier is held; only the generic VKs are in
+        // kSpecialKeys so the L/R variants produce WXK_NONE here. Queueing
+        // a wxKeyEvent for them is meaningless and previously caused the
+        // keyboard input handler to think the user had released the
+        // modifier, leaving joypad buttons stuck.
+        if (xKeySym == WXK_NONE) {
+            previousState[i] = bits;
+            continue;
+        }
         // virtual key "i" is pressed
         if ((bits & 0x8000) && (previousState[i] & 0x8000) == 0) {
-            if (handler && !wxWindow::FindFocus()) {
+            if (handler && !AppIsForeground()) {
                 wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_DOWN);
                 event->m_keyCode = xKeySym;
                 handler->QueueEvent(event);
@@ -557,7 +595,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
         }
         // virtual key "i" is released
         else if (((bits & 0x8000) == 0) && (previousState[i] & 0x8000)) {
-            if (handler && !wxWindow::FindFocus()) {
+            if (handler && !AppIsForeground()) {
                 wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_UP);
                 event->m_keyCode = xKeySym;
                 handler->QueueEvent(event);

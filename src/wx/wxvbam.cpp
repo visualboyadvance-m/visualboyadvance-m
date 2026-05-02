@@ -380,6 +380,21 @@ static void tack_full_path(wxString& s, const wxString& app = wxEmptyString)
         s += wxT("\n\t") + full_config_path[i] + app;
 }
 
+// Tracks whether our application is the foreground/active app, updated
+// from wxEVT_ACTIVATE_APP. Used to gate hotkey/menu shortcut firing in
+// FilterEvent below when "Allow keyboard background input" is on, so
+// background-input synthetic events update joypad state but don't fire
+// shortcuts. wxWindow::FindFocus() is unreliable on Windows: clicking
+// an empty spot on the taskbar doesn't fire WM_KILLFOCUS on our HWND,
+// so FindFocus still returns the previously-focused widget even though
+// we're no longer the foreground app — letting hotkeys leak through.
+// wxEVT_ACTIVATE_APP is the canonical "is our app foreground" signal.
+// File-static rather than a wxvbamApp member so this single .cpp drops
+// in without a matching header change.
+namespace {
+bool g_app_is_active = true;
+}  // namespace
+
 wxvbamApp::wxvbamApp()
     : wxApp(),
       pending_fullscreen(false),
@@ -416,6 +431,7 @@ wxvbamApp::wxvbamApp()
               }
           }) {
     Bind(wxEVT_ACTIVATE_APP, [this](wxActivateEvent& event) {
+        g_app_is_active = event.GetActive();
         if (!event.GetActive()) {
             // App is deactivating. Clear keyboard tracking AND joypad
             // state together — keeping them in sync. If we cleared
@@ -2790,16 +2806,20 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         return wxEventFilter::Event_Skip;
     }
 
-    // Don't fire hotkey/menu shortcuts when the app is unfocused, even
-    // if the user has the "Allow keyboard background input" option on.
-    // The background-input feature is for joypad controls only — that
-    // path runs through KeyboardInputHandler's synchronous sink which
-    // updates EmulatedGamepad directly, bypassing this branch entirely.
-    // wxWindow::FindFocus() returns null iff no widget in this app has
-    // focus (same check BackgroundInput uses to gate event injection).
-    // Matches the legacy MFC build's behavior of routing only joypad-
-    // mapped controls to an inactive window.
-    if (!wxWindow::FindFocus()) {
+    // Don't fire hotkey/menu shortcuts when the app is not the foreground
+    // app, even if the user has "Allow keyboard background input" on. The
+    // background-input feature is for joypad controls only — that path
+    // runs through KeyboardInputHandler's synchronous sink which updates
+    // EmulatedGamepad directly, bypassing this branch entirely. We use
+    // g_app_is_active (tracked via wxEVT_ACTIVATE_APP) rather than
+    // wxWindow::FindFocus() because on Windows, FindFocus continues to
+    // report the last-focused widget when the user clicks an empty spot
+    // on the taskbar — our HWND never gets WM_KILLFOCUS, so FindFocus
+    // would let hotkeys leak through. ACTIVATE_APP is the canonical
+    // "we're/we're not the foreground app" signal. Matches the legacy
+    // MFC build's behavior of routing only joypad-mapped controls to an
+    // inactive window.
+    if (!g_app_is_active) {
         return wxEventFilter::Event_Skip;
     }
 
