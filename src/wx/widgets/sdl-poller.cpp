@@ -373,7 +373,14 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
           [this](config::Option* option) { ReconnectControllers(option->GetBool()); }) {
     VBAM_CHECK(handler_provider);
 
-    wxTimer::Start(50);
+    // Poll SDL controller events at ~5ms intervals (200Hz). The
+    // previous value was 50ms (20Hz), which lost up to ~3 frames
+    // of input latency on a 60fps target. The wxTimer interval is
+    // a soft minimum (the OS may schedule slightly later), but the
+    // average latency from a controller button press to a queued
+    // UserInputEvent is now ~2.5ms instead of ~25ms — well below
+    // the per-frame budget.
+    wxTimer::Start(5);
 #ifndef ENABLE_SDL3
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);

@@ -389,7 +389,31 @@ wxvbamApp::wxvbamApp()
 #endif
       emulated_gamepad_(std::bind(&wxvbamApp::bindings, this)),
       sdl_poller_(this),
-      keyboard_input_handler_(this) {
+      // KeyboardInputHandler's sync sink updates joypad state directly
+      // for every key event, bypassing the wxQueueEvent path. This:
+      //   (a) eliminates the focus-routing bug where a press and
+      //       release queued for different focused windows could
+      //       split, leaving a key visibly stuck;
+      //   (b) reduces input latency (no waiting for queued
+      //       UserInputEvent dispatch after emuMain returns);
+      //   (c) lets the background-input feature route ONLY joypad-
+      //       mapped keys to the emulator while NOT firing
+      //       hotkeys/menu shortcuts when the window is unfocused —
+      //       matching the legacy MFC build's behavior.
+      // The async UserInputEvent path is preserved by
+      // KeyboardInputHandler::DispatchEventData for hotkey/menu/
+      // MemView/config consumers, but is now gated on focus.
+      // EmulatedGamepad::OnInputPressed/Released filter non-game
+      // commands internally, so passing every key here is safe.
+      keyboard_input_handler_(
+          this,
+          [this](const config::UserInput& input, bool pressed) {
+              if (pressed) {
+                  emulated_gamepad_.OnInputPressed(input);
+              } else {
+                  emulated_gamepad_.OnInputReleased(input);
+              }
+          }) {
     Bind(wxEVT_ACTIVATE_APP, [this](wxActivateEvent& event) {
         if (!event.GetActive()) {
             keyboard_input_handler_.Reset();

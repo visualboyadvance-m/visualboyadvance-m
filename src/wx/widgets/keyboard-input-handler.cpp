@@ -4,6 +4,7 @@
 #include "wx/widgets/user-input-event.h"
 
 #include <wx/log.h>
+#include <wx/window.h>
 
 namespace widgets {
 
@@ -372,19 +373,22 @@ uint32_t WxModifierToExtended(wxKeyModifier wx_mod,
 
 }  // namespace
 
-KeyboardInputHandler::KeyboardInputHandler(EventHandlerProvider* const handler_provider)
-    : handler_provider_(handler_provider) {
+KeyboardInputHandler::KeyboardInputHandler(EventHandlerProvider* const handler_provider,
+                                           InputSink sync_sink)
+    : handler_provider_(handler_provider), sync_sink_(std::move(sync_sink)) {
     VBAM_CHECK(handler_provider_);
+    VBAM_CHECK(sync_sink_);
 }
 
 KeyboardInputHandler::~KeyboardInputHandler() = default;
 
 void KeyboardInputHandler::ProcessKeyEvent(wxKeyEvent& event) {
-    if (!handler_provider_->event_handler()) {
-        // No event handler to send the event to.
-        return;
-    }
-
+    // Note: we no longer early-return when event_handler() is null.
+    // The async-event handler may be null when the app is unfocused
+    // (background-input case), but the synchronous sink still needs
+    // to update joypad state regardless of focus. The focus check is
+    // applied later in OnKeyDown/OnKeyUp, gating only the wxQueueEvent
+    // path.
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
         OnKeyDown(event);
     } else if (event.GetEventType() == wxEVT_KEY_UP) {
@@ -508,7 +512,21 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
         }
     }
 
-    wxQueueEvent(handler_provider_->event_handler(), new UserInputEvent(std::move(event_data)));
+    // Synchronous joypad-state update (always). The sink filters non-
+    // game commands internally — see comment in the constructor for
+    // wxvbamApp where the sink is wired.
+    for (const auto& data : event_data) {
+        sync_sink_(data.input, data.pressed);
+    }
+    // Async UserInputEvent for hotkeys/MemView/config — gated on focus
+    // so background-input only carries joypad controls, not hotkeys.
+    // FindFocus() returning null = no widget in this app has focus =
+    // app is in the background.
+    if (wxWindow::FindFocus()) {
+        if (wxEvtHandler* const target = handler_provider_->event_handler()) {
+            wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
+        }
+    }
 }
 
 void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
@@ -613,7 +631,17 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
         active_mod_inputs_.erase(data.input.keyboard_input());
     }
 
-    wxQueueEvent(handler_provider_->event_handler(), new UserInputEvent(std::move(event_data)));
+    // Synchronous joypad-state update (always). The sink filters non-
+    // game commands internally.
+    for (const auto& data : event_data) {
+        sync_sink_(data.input, data.pressed);
+    }
+    // Async UserInputEvent for hotkeys/MemView/config — gated on focus.
+    if (wxWindow::FindFocus()) {
+        if (wxEvtHandler* const target = handler_provider_->event_handler()) {
+            wxQueueEvent(target, new UserInputEvent(std::move(event_data)));
+        }
+    }
 }
 
 }  // namespace widgets

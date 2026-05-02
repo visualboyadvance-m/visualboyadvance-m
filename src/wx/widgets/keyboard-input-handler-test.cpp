@@ -20,7 +20,12 @@ class KeyboardInputHandlerTest : public WidgetsTest,
                                  public wxEvtHandler,
                                  public EventHandlerProvider {
 public:
-    KeyboardInputHandlerTest() : handler_(this) {
+    KeyboardInputHandlerTest()
+        : handler_(this,
+                   // Tests exercise the async UserInputEvent path; the
+                   // sync sink is a no-op here. (Production code wires
+                   // it to EmulatedGamepad in wxvbamApp's constructor.)
+                   [](const config::UserInput&, bool) {}) {
         Bind(VBAM_EVT_USER_INPUT, &KeyboardInputHandlerTest::OnUserInputEvent, this);
     }
 
