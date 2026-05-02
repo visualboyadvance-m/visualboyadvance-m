@@ -1738,15 +1738,6 @@ void MainFrame::StopModal()
 
     if (!IsPaused())
         panel->Resume();
-
-    // Restore keyboard focus to the game panel after the modal closes.
-    // Without this, focus remains on the (now-hidden) dialog or the
-    // main frame, so subsequent key events route through wxApp's
-    // FilterEvent but the keyboard_input_handler can't see them as
-    // game input — keyboard appears to "stop working" after the first
-    // dialog interaction. Mirrors the pattern in OnActivate() and the
-    // post-Resume() / post-LoadGame() SetFocus calls.
-    if (panel) panel->SetFocus();
 }
 
 #ifndef NO_LINK
