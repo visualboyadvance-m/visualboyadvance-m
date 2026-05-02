@@ -2548,6 +2548,8 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.AddDeveloper(wxT("retro-wertz"));
     ai.AddDeveloper(wxT("denisfa"));
     ai.AddDeveloper(wxT("orbea"));
+    ai.AddDeveloper(wxT("andyvand"));
+    ai.AddDeveloper(wxT("mGBA"));
     ai.AddDeveloper(wxT("Orig. VBA team"));
     ai.AddDeveloper(wxT("... many contributors who send us patches/PRs"));
     wxAboutBox(ai);
