@@ -224,6 +224,128 @@ static SuiteCounters read_suite_counters(uint32_t struct_addr) {
     return c;
 }
 
+// ---- Dynamic suite-struct discovery ---------------------------------------
+//
+// The hardcoded `kSuites[]` addresses above were captured against one
+// specific build of suite.gba. Different upstream commits (or different
+// toolchains) relink the suite ELF at different addresses, so the numbers
+// silently go stale — `read_suite_counters` then returns garbage at
+// struct+20/+24, the `is_video` heuristic at the top of the run loop
+// (`(passes_addr >> 24) != 0x03`) misclassifies every suite as video, the
+// wrong navigation path runs, and the runner ends up looping on the memory
+// suite forever (the Ubuntu CI 30-min timeout).
+//
+// Fix: walk the loaded ROM at runtime looking for a 28-byte block that
+// matches the TestSuite struct layout. Anchor on the suite-name string
+// (each suite has a distinct one-word name in ROM). We require the
+// neighbouring fields to look right too — function pointers in ROM, a
+// small nTests, passes/total in IWRAM (or in ROM for the video suite,
+// whose counters point at a constant zero in .rodata).
+//
+// The order returned matches the upstream main.c `suites[]` array, so
+// pressing DOWN N times from the top of the menu still lands on suite
+// index N (which the run loop relies on).
+
+// Match the *display* names that the suite stores in TestSuite.name (these
+// are what `strings suite.gba` shows). The order must match kSuites[] above
+// — that's the order pressing DOWN walks through.
+static const char* const kCanonicalSuiteNames[] = {
+    "Memory tests",
+    "I/O read tests",
+    "Timing tests",
+    "Timer count-up tests",
+    "Timer IRQ tests",
+    "Shifter tests",
+    "Carry tests",
+    "Multiply long tests",
+    "BIOS math tests",
+    "DMA tests",
+    "SIO register R/W tests",
+    "SIO timing tests",
+    "Misc. edge case tests",
+    "Video tests"
+};
+static constexpr int kCanonicalNumSuites =
+    sizeof(kCanonicalSuiteNames) / sizeof(kCanonicalSuiteNames[0]);
+
+namespace {
+struct DiscoveredSuite {
+    const char* name = nullptr;
+    uint32_t struct_addr = 0;
+};
+
+// Read 4 bytes from a ROM file offset (g_rom is little-endian).
+static inline uint32_t rom_off_read32(uint32_t off) {
+    return (uint32_t)g_rom[off]
+         | ((uint32_t)g_rom[off + 1] << 8)
+         | ((uint32_t)g_rom[off + 2] << 16)
+         | ((uint32_t)g_rom[off + 3] << 24);
+}
+
+// One pass over ROM. For every 4-byte-aligned offset, treat the word as a
+// candidate `name` field and check whether the surrounding 28 bytes look
+// like a valid TestSuite struct. The first plausible struct per suite name
+// wins; later matches (e.g. an unrelated string ref pointing at the same
+// name) are dropped because we already filled that slot.
+static std::vector<DiscoveredSuite> discover_suites_in_rom() {
+    std::vector<DiscoveredSuite> found(kCanonicalNumSuites);
+    if (!g_rom) return found;
+    const uint32_t romSize = (uint32_t)gbaGetRomSize();
+    if (romSize < 32) return found;
+
+    for (uint32_t off = 0; off + 28 <= romSize; off += 4) {
+        // Field +0: ROM pointer to the suite name.
+        uint32_t w0 = rom_off_read32(off);
+        uint8_t w0_top = (uint8_t)(w0 >> 24);
+        if (w0_top < 0x08 || w0_top > 0x0D) continue;
+        uint32_t name_off = (w0 - 0x08000000u) & 0x01FFFFFFu;
+        if (name_off >= romSize) continue;
+
+        int slot = -1;
+        for (int k = 0; k < kCanonicalNumSuites; ++k) {
+            const char* n = kCanonicalSuiteNames[k];
+            size_t nlen = std::strlen(n);
+            if (name_off + nlen + 1 > romSize) continue;
+            // Compare including trailing NUL so we don't match e.g. "timing"
+            // against the start of "timings" or "timing-stuff".
+            if (std::memcmp(g_rom + name_off, n, nlen + 1) == 0) {
+                slot = k;
+                break;
+            }
+        }
+        if (slot < 0) continue;
+        if (found[slot].struct_addr) continue; // first hit wins
+
+        // Field +4: run() pointer. ROM (Thumb-bit ignored) or NULL (video).
+        uint32_t w_run = rom_off_read32(off + 4);
+        if (w_run != 0) {
+            uint8_t t = (uint8_t)(w_run >> 24);
+            if (t < 0x08 || t > 0x0D) continue;
+        }
+        // Field +16: nTests. Suites are well under 4096 cases each.
+        uint32_t nTests = rom_off_read32(off + 16);
+        if (nTests == 0 || nTests > 4096) continue;
+        // Field +20: passes pointer. IWRAM (0x03) for normal suites; ROM
+        // (constZero in .rodata) for the video suite.
+        uint32_t pAddr = rom_off_read32(off + 20);
+        uint8_t pt = (uint8_t)(pAddr >> 24);
+        bool pIWRAM = (pt == 0x03);
+        bool pROM   = (pt >= 0x08 && pt <= 0x0D);
+        if (!pIWRAM && !pROM) continue;
+        // Field +24: total pointer. Same constraints as passes.
+        uint32_t tAddr = rom_off_read32(off + 24);
+        uint8_t tt = (uint8_t)(tAddr >> 24);
+        bool tIWRAM = (tt == 0x03);
+        bool tROM   = (tt >= 0x08 && tt <= 0x0D);
+        if (!tIWRAM && !tROM) continue;
+
+        found[slot].name = kCanonicalSuiteNames[slot];
+        found[slot].struct_addr = 0x08000000u + off;
+    }
+    return found;
+}
+} // namespace
+
 // ---- Emulation driver ------------------------------------------------------
 
 static constexpr int TICKS_PER_FRAME = 280896;
@@ -638,13 +760,42 @@ int main(int argc, char** argv) {
                 g_active_info_addr);
     }
 
+    // Resolve TestSuite struct addresses. Prefer dynamic discovery (which
+    // walks the loaded ROM and matches the canonical suite-name list against
+    // candidate TestSuite struct shapes) over the hardcoded `kSuites[]`
+    // table, because the latter goes stale every time upstream relinks
+    // suite.gba. Per-slot fallback to the hardcoded value if discovery
+    // missed a particular suite.
+    struct ResolvedSuite { const char* name; uint32_t struct_addr; };
+    ResolvedSuite resolved[kNumSuites];
+    int discovered_count = 0;
+    {
+        auto discovered = discover_suites_in_rom();
+        // kCanonicalSuiteNames must enumerate the same suites in the same
+        // order as kSuites for the indices to agree.
+        for (int i = 0; i < kNumSuites; ++i) {
+            if (discovered[i].struct_addr) {
+                resolved[i].name = discovered[i].name;
+                resolved[i].struct_addr = discovered[i].struct_addr;
+                ++discovered_count;
+            } else {
+                resolved[i].name = kSuites[i].name;
+                resolved[i].struct_addr = kSuites[i].struct_addr;
+            }
+        }
+        fprintf(stderr,
+                "suite_runner: discovered %d/%d TestSuite addresses in ROM "
+                "(remaining slots use hardcoded fallback)\n",
+                discovered_count, kNumSuites);
+    }
+
     // Cache the per-suite pass/total pointers from ROM now (they never move).
     SuiteCounters counters[kNumSuites];
     for (int i = 0; i < kNumSuites; ++i) {
-        counters[i] = read_suite_counters(kSuites[i].struct_addr);
+        counters[i] = read_suite_counters(resolved[i].struct_addr);
         fprintf(stderr,
                 "suite_runner: %-14s  struct=%08x passes=%08x total=%08x nTests=%u\n",
-                kSuites[i].name, kSuites[i].struct_addr,
+                resolved[i].name, resolved[i].struct_addr,
                 counters[i].passes_addr, counters[i].total_addr,
                 counters[i].n_tests);
     }
@@ -659,7 +810,7 @@ int main(int argc, char** argv) {
     // press B to return, press DOWN to advance selection.
     for (int i = 0; i < kNumSuites; ++i) {
         fprintf(stderr, "\n[%d/%d] running %s...\n",
-                i + 1, kNumSuites, kSuites[i].name);
+                i + 1, kNumSuites, resolved[i].name);
 
         press_button(KEY_A, 8);
 
@@ -673,7 +824,7 @@ int main(int argc, char** argv) {
             override_total[i]  = vs.total;
             have_override[i]   = true;
             fprintf(stderr, "    %s: %u / %u\n",
-                    kSuites[i].name, vs.passes, vs.total);
+                    resolved[i].name, vs.passes, vs.total);
             // Exit the suite viewer back to main menu.
             press_button(KEY_B, 8);
             if (i + 1 < kNumSuites) press_button(KEY_DOWN, 6);
@@ -706,10 +857,21 @@ int main(int argc, char** argv) {
 
         uint32_t passes = iwram_read32(counters[i].passes_addr);
         uint32_t total  = iwram_read32(counters[i].total_addr);
-        fprintf(stderr, "    %s: %u / %u\n", kSuites[i].name, passes, total);
+        fprintf(stderr, "    %s: %u / %u\n", resolved[i].name, passes, total);
 
-        // Return to main menu.
+        // Return to main menu. After a polled suite finishes, the ROM is
+        // sitting at the per-suite results screen; one B-press takes us
+        // back to the suite list. Wait until activeTestInfo.suiteId
+        // resets to -1 so we know we're actually on the menu before
+        // pressing DOWN — without this, on slow paths the DOWN press
+        // arrives while the suite is still tearing down and gets
+        // consumed by something else, leaving the cursor unchanged.
         press_button(KEY_B, 6);
+        int back_wait = 0;
+        while (active_suite_id() >= 0 && back_wait < 60) {
+            run_frames(1, 0);
+            ++back_wait;
+        }
         // Move selection to next suite.
         if (i + 1 < kNumSuites) {
             press_button(KEY_DOWN, 6);
@@ -731,7 +893,7 @@ int main(int argc, char** argv) {
         grand_pass += p;
         grand_total += t;
         printf("  %-14s  %5u / %-5u  (%s)\n",
-               kSuites[i].name, p, t,
+               resolved[i].name, p, t,
                (t > 0 && p == t) ? "PASS" : "FAIL");
     }
     printf("  %-14s  %5u / %-5u\n", "TOTAL", grand_pass, grand_total);
