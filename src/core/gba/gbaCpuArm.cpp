@@ -1614,8 +1614,8 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     WRITEBACK2;                                                                  \
     {                                                                            \
         bool _strPrefetchActive = busPrefetch;                                   \
-        clockTicks = 2 + dataTicksAccess##SIZE(address)                          \
-            + codeTicksAccess32(armNextPC);                                      \
+        int _strDataTicks = dataTicksAccess##SIZE(address);                      \
+        clockTicks = 2 + _strDataTicks + codeTicksAccess32(armNextPC);           \
         if (_strPrefetchActive) clockTicks += 1;                                 \
     }
 #define LDR(CALC_OFFSET, CALC_ADDRESS, LOAD_DATA, WRITEBACK, SIZE) \
@@ -1633,8 +1633,10 @@ static INSN_REGPARM void arm121(uint32_t opcode)
         clockTicks += 2 + dataTicksAccessSeq32(address)            \
             + dataTicksAccessSeq32(address);                       \
     }                                                              \
-    clockTicks += 3 + dataTicksAccess##SIZE(address)               \
-        + codeTicksAccess32(armNextPC);
+    {                                                              \
+        int _ldrDataTicks = dataTicksAccess##SIZE(address);        \
+        clockTicks += 3 + _ldrDataTicks + codeTicksAccess32(armNextPC); \
+    }
 #define STR_POSTDEC(CALC_OFFSET, STORE_DATA, SIZE) \
     STR(CALC_OFFSET, ADDRESS_POST, STORE_DATA, WRITEBACK_NONE, WRITEBACK_POSTDEC, SIZE)
 #define STR_POSTINC(CALC_OFFSET, STORE_DATA, SIZE) \
