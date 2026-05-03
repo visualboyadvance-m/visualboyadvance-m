@@ -788,7 +788,7 @@ static inline void gfxDrawSprites(uint32_t* lineOBJ)
         uint16_t* sprites = (uint16_t*)g_oamShadow;
         uint16_t* spritePalette = &((uint16_t*)g_paletteRAM)[256];
         int mosaicY = ((MOSAIC & 0xF000) >> 12) + 1;
-        int mosaicX = ((MOSAIC & 0xF00) >> 8) + 1;
+        //int mosaicX = ((MOSAIC & 0xF00) >> 8) + 1;// no longer used
         for (int x = 0; x < 128; x++) {
             uint16_t a0 = READ16LE(sprites++);
             uint16_t a1 = READ16LE(sprites++);

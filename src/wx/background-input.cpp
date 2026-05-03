@@ -16,6 +16,8 @@
 
 #include <unordered_map>
 
+#include "wx/wxvbam.h"
+
 #undef  NO_ERROR
 #define NO_ERROR  (wxThread::ExitCode)0
 
@@ -554,6 +556,38 @@ static bool AppIsForeground()
 }
 #endif
 
+// Returns true if emulation is currently paused. Used to skip queueing
+// synthesized key events from this thread while paused. Without this
+// gate, events synthesized during a pause sit in the wx event queue and
+// dispatch on the main thread AFTER GameArea::Resume() flips paused to
+// false — at which point sync_sink_ (in wxvbamApp's KeyboardInputHandler
+// wiring) observes paused==false and writes to joypads_, causing buttons
+// to register on the very first frame after unpause for keys the user
+// never pressed in our window. The symptom is most visible with modifier
+// keys (Ctrl/Alt/Shift) because users typically hold modifiers across
+// the pause/resume boundary while doing host-OS shortcuts; non-modifier
+// keys self-cancel because both DOWN and UP usually queue and dispatch
+// while still paused.
+//
+// Reads MainFrame::IsPaused() rather than GameArea::paused because the
+// latter is protected and we don't want to add a getter just for this.
+// MainFrame::IsPaused returns (paused && !pause_next) || dialog_opened,
+// which covers menu/hotkey-pause and any open dialog. The one case it
+// does NOT cover is a single-frame step via NextFrame (paused=true AND
+// pause_next=true → IsPaused returns false), but that state lives for
+// only one frame (~16ms) and the chance of a bg-input poll synthesizing
+// an event in exactly that window AND the event mattering on resume is
+// negligible. The check is racy by design (no lock; bool read from
+// another thread). The race window collapses from ~10ms+ (queue dwell
+// time before the main loop drains it) to microseconds (the gap
+// between reading paused and calling QueueEvent), which is below the
+// granularity of any user pause/resume action. The sync_sink-side
+// check in wxvbamApp's lambda remains as a second-line defense.
+static bool IsEmuPaused()
+{
+    return wxGetApp().frame && wxGetApp().frame->IsPaused();
+}
+
 wxThread::ExitCode BackgroundInput::CheckKeyboard()
 {
 #if defined(__WXMSW__)
@@ -567,6 +601,17 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
         return NO_ERROR;
     }
 #endif
+    // Skip the entire poll-and-synthesize pass while paused. Returning
+    // here without updating previousState is intentional: when emulation
+    // resumes, the next poll sees current hardware state vs. whatever
+    // previousState was when we last ran (i.e., before pause), and any
+    // keys held continuously across the pause register as fresh DOWN
+    // transitions — which is exactly what we want, because Pause()
+    // calls emulated_gamepad_.Reset() and the user expects the joypad
+    // state on resume to reflect what they're actually holding now.
+    if (IsEmuPaused()) {
+        return NO_ERROR;
+    }
 #if defined(__WXMSW__)
     for (int i = 0x08; i < 0xFF; ++i) {
         SHORT bits = GetAsyncKeyState(i);
