@@ -1,7 +1,6 @@
 option(BUILD_TESTING "Build testing" ON)
 option(BUILD_SHARED_LIBS "Build dynamic libraries" OFF)
 option(COMPILE_ONLY "Compile source files only, skip linking executables" OFF)
-option(NO_WAYLAND "Force Wayland disabled" OFF)
 
 # Detect CI environment or allow explicit setting
 if(DEFINED ENV{CI} OR DEFINED ENV{GITHUB_ACTIONS} OR DEFINED ENV{GITLAB_CI})
@@ -22,6 +21,19 @@ set(ENABLE_SDL_DEFAULT ${BUILD_DEFAULT})
 
 if(WIN32 OR APPLE)
     set(ENABLE_SDL_DEFAULT OFF)
+endif()
+
+if(NOT WIN32 AND NOT APPLE)
+    include(CheckIncludeFile)
+    check_include_file("gdk/gdkwayland.h" HAVE_GDK_WAYLAND)
+
+    if(HAVE_GDK_WAYLAND)
+        set(no_wayland_default OFF)
+    else()
+        set(no_wayland_default ON)
+    endif()
+
+    option(NO_WAYLAND "Force Wayland disabled" ${no_wayland_default})
 endif()
 
 # Static linking
