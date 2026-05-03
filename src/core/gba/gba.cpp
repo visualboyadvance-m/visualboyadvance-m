@@ -202,15 +202,6 @@ uint32_t dma2Source = 0;
 uint32_t dma2Dest = 0;
 uint32_t dma3Source = 0;
 uint32_t dma3Dest = 0;
-// Tracks whether the most recent write to DMA0SAD set source bits beyond
-// the channel's 27-bit allowed range (i.e. address >= 0x08000000, which
-// covers ROM and SRAM regions). DMA0 is restricted to internal memory;
-// when an out-of-range source is configured, real HW silently masks the
-// high bits but 32-bit reads driven by that channel return open-bus 0
-// instead of the masked physical-memory contents. Halfword reads still
-// hit the masked address (different bus path). Cleared on the next
-// DMA0SAD write that lands within the allowed range.
-bool dma0SourceOOB = false;
 // Counts latched at the moment DMAxCTL is written with the enable bit set.
 // GBA hardware latches source, destination, *and* count when a transfer is
 // scheduled, so later writes to DMAxCNT_L from an IRQ handler do not affect
@@ -3018,12 +3009,13 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             // Channel 0 with original source out of allowed 27-bit range:
             // 32-bit reads return open-bus 0 instead of the masked
             // physical-memory contents.
-            const bool ch0Oob32 = (ch == 0) && dma0SourceOOB;
+            const bool ch0Oob32 = (ch == 0) && (s >= 0x08000000);
             while (c != 0) {
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
-                uint32_t value = ch0Oob32 ? 0u : CPUReadMemory(s);
+                uint32_t value = CPUReadMemory(s);
+                if (ch0Oob32) value = 0u;
                 cpuDmaLatchData[ch] = value;
                 cpuDmaBusValue = value;
                 CPUWriteMemory(d & 0xFFFFFFFC, value);
@@ -3051,11 +3043,13 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 c--;
             }
         } else {
+            const bool ch0Oob16 = (ch == 0) && (dma0Source >= 0x08000000);
             while (c != 0) {
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
                 uint32_t value = CPUReadHalfWord(s);
+                if (ch0Oob16) value = 0u;
                 cpuDmaLatchData[ch] = value * 0x00010001;
                 cpuDmaBusValue = value * 0x00010001;
                 CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
@@ -3836,10 +3830,6 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(IO_REG_DMA0SAD_L, DM0SAD_L);
         break;
     case IO_REG_DMA0SAD_H:
-        // DMA0 source register is 27-bit; track whether bits beyond 0x07FF
-        // were written so 32-bit reads can return open-bus 0 (matches
-        // real-HW DMA0 channel restriction to internal memory).
-        dma0SourceOOB = (value & 0x07FF) != value;
         DM0SAD_H = value & 0x07FF;
         UPDATE_REG(IO_REG_DMA0SAD_H, DM0SAD_H);
         break;

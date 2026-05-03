@@ -1320,7 +1320,7 @@ static INSN_REGPARM void thumb48(uint32_t opcode)
     uint32_t address = (reg[15].I & 0xFFFFFFFC) + ((opcode & 0xFF) << 2);
     reg[regist].I = CPUReadMemoryQuick(address);
     busPrefetchCount = 0;
-    clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess32(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // STR Rd, [Rs, Rn]
@@ -1330,7 +1330,7 @@ static INSN_REGPARM void thumb50(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     CPUWriteMemory(address, reg[opcode & 7].I);
-    clockTicks = dataTicksAccess32(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess32(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // STRH Rd, [Rs, Rn]
@@ -1340,7 +1340,7 @@ static INSN_REGPARM void thumb52(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     CPUWriteHalfWord(address, reg[opcode & 7].W.W0);
-    clockTicks = dataTicksAccess16(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess16(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // STRB Rd, [Rs, Rn]
@@ -1350,7 +1350,7 @@ static INSN_REGPARM void thumb54(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     CPUWriteByte(address, reg[opcode & 7].B.B0);
-    clockTicks = dataTicksAccess16(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess16(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // LDSB Rd, [Rs, Rn]
@@ -1360,7 +1360,7 @@ static INSN_REGPARM void thumb56(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     reg[opcode & 7].I = (int8_t)CPUReadByte(address);
-    clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess16(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // LDR Rd, [Rs, Rn]
@@ -1370,7 +1370,7 @@ static INSN_REGPARM void thumb58(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     reg[opcode & 7].I = CPUReadMemory(address);
-    clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess32(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // LDRH Rd, [Rs, Rn]
@@ -1380,7 +1380,7 @@ static INSN_REGPARM void thumb5A(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     reg[opcode & 7].I = CPUReadHalfWord(address);
-    clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess32(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // LDRB Rd, [Rs, Rn]
@@ -1390,7 +1390,7 @@ static INSN_REGPARM void thumb5C(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     reg[opcode & 7].I = CPUReadByte(address);
-    clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess16(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // LDSH Rd, [Rs, Rn]
@@ -1400,7 +1400,7 @@ static INSN_REGPARM void thumb5E(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + reg[(opcode >> 6) & 7].I;
     reg[opcode & 7].I = CPUReadHalfWordSigned(address);
-    clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess16(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // STR Rd, [Rs, #Imm]
@@ -1410,7 +1410,7 @@ static INSN_REGPARM void thumb60(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31) << 2);
     CPUWriteMemory(address, reg[opcode & 7].I);
-    clockTicks = dataTicksAccess32(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess32(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // LDR Rd, [Rs, #Imm]
@@ -1420,7 +1420,7 @@ static INSN_REGPARM void thumb68(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31) << 2);
     reg[opcode & 7].I = CPUReadMemory(address);
-    clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess32(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // STRB Rd, [Rs, #Imm]
@@ -1430,7 +1430,7 @@ static INSN_REGPARM void thumb70(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31));
     CPUWriteByte(address, reg[opcode & 7].B.B0);
-    clockTicks = dataTicksAccess16(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess16(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // LDRB Rd, [Rs, #Imm]
@@ -1440,7 +1440,7 @@ static INSN_REGPARM void thumb78(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31));
     reg[opcode & 7].I = CPUReadByte(address);
-    clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess16(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // STRH Rd, [Rs, #Imm]
@@ -1450,7 +1450,7 @@ static INSN_REGPARM void thumb80(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31) << 1);
     CPUWriteHalfWord(address, reg[opcode & 7].W.W0);
-    clockTicks = dataTicksAccess16(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess16(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // LDRH Rd, [Rs, #Imm]
@@ -1460,7 +1460,7 @@ static INSN_REGPARM void thumb88(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[(opcode >> 3) & 7].I + (((opcode >> 6) & 31) << 1);
     reg[opcode & 7].I = CPUReadHalfWord(address);
-    clockTicks = 3 + dataTicksAccess16(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess16(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
 }
 
 // STR R0~R7, [SP, #Imm]
@@ -1471,7 +1471,7 @@ static INSN_REGPARM void thumb90(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     uint32_t address = reg[13].I + ((opcode & 255) << 2);
     CPUWriteMemory(address, reg[regist].I);
-    clockTicks = dataTicksAccess32(address) + codeTicksAccess16(armNextPC) + 2;
+    { int _dt = dataTicksAccess32(address); clockTicks = _dt + codeTicksAccess16(armNextPC) + 2; }
 }
 
 // LDR R0~R7, [SP, #Imm]
@@ -1483,7 +1483,7 @@ static INSN_REGPARM void thumb98(uint32_t opcode)
     bool prefetchActive = busPrefetch;
     uint32_t address = reg[13].I + ((opcode & 255) << 2);
     reg[regist].I = CPUReadMemoryQuick(address);
-    clockTicks = 3 + dataTicksAccess32(address) + codeTicksAccess16(armNextPC);
+    { int _dt = dataTicksAccess32(address); clockTicks = 3 + _dt + codeTicksAccess16(armNextPC); }
     if (prefetchActive) clockTicks -= 1;
 }
 
