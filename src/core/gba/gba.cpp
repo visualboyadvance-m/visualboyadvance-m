@@ -3006,16 +3006,11 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 c--;
             }
         } else {
-            // Channel 0 with original source out of allowed 27-bit range:
-            // 32-bit reads return open-bus 0 instead of the masked
-            // physical-memory contents.
-            const bool ch0Oob32 = (ch == 0) && (s >= 0x08000000);
             while (c != 0) {
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
                 uint32_t value = CPUReadMemory(s);
-                if (ch0Oob32) value = 0u;
                 cpuDmaLatchData[ch] = value;
                 cpuDmaBusValue = value;
                 CPUWriteMemory(d & 0xFFFFFFFC, value);
@@ -3043,13 +3038,11 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
                 c--;
             }
         } else {
-            const bool ch0Oob16 = (ch == 0) && (dma0Source >= 0x08000000);
             while (c != 0) {
                 bool srcInROM = ((s >> 24) >= REGION_ROM0) && ((s >> 24) < REGION_SRAM);
                 bool dstInROM = ((d >> 24) >= REGION_ROM0) && ((d >> 24) < REGION_SRAM);
 
                 uint32_t value = CPUReadHalfWord(s);
-                if (ch0Oob16) value = 0u;
                 cpuDmaLatchData[ch] = value * 0x00010001;
                 cpuDmaBusValue = value * 0x00010001;
                 CPUWriteHalfWord(d & 0xFFFFFFFE, DowncastU16(value));
