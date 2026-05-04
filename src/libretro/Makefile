@@ -318,7 +318,10 @@ else ifeq ($(platform), ngc)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	ENDIANNESS_DEFINES += -DMSB_FIRST -DWORDS_BIGENDIAN=1
 	PLATFORM_DEFINES += -DGEKKO -DHW_DOL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__
-	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+	# Force int32_t/uint32_t to (un)signed int rather than long. Both must be
+	# kept in sync: newer libstdc++ (devkitPPC GCC 16+) references __UINT32_TYPE__
+	# in bits/atomic_wait.h, so leaving it undefined breaks the build.
+	PLATFORM_DEFINES += -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=int -D__UINT32_TYPE__=unsigned
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 
@@ -330,7 +333,7 @@ else ifeq ($(platform), wii)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	ENDIANNESS_DEFINES += -DMSB_FIRST -DWORDS_BIGENDIAN=1
 	PLATFORM_DEFINES += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__
-	PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+	PLATFORM_DEFINES += -U__INT32_TYPE__ -U__UINT32_TYPE__ -D__INT32_TYPE__=int -D__UINT32_TYPE__=unsigned
 	STATIC_LINKING=1
 	TILED_RENDERING=1
 

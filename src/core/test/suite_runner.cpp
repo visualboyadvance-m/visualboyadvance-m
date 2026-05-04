@@ -201,6 +201,59 @@ static const SuiteDesc kSuites[] = {
 static constexpr int kNumSuites = sizeof(kSuites) / sizeof(kSuites[0]);
 #endif
 
+// Execution order: short names looked up in kSuites/resolved[] at runtime.
+// Distinct from menu order because some suites have side effects that
+// pollute later ones:
+//   - memory must run AFTER dma. The Memory test writes through the OAM
+//     mirror at 0x07000400+ and never restores it; subsequent DMA tests
+//     that read OAM see corrupt values and fail.
+// Comment any reorder so the reason survives. Names must match kSuites[].
+static const char* const kExecutionOrderNames[] = {
+    "dma",            // must run before memory (memory pollutes OAM mirror)
+    "memory",
+    "io-read",
+    "timing",
+    "timers",
+    "timer-irq",
+    "shifter",
+    "carry",
+    "multiply-long",
+    "bios-math",
+    "sio-read",
+    "sio-timing",
+    "misc-edge",
+    "video",
+};
+static constexpr int kExecutionOrderN =
+    sizeof(kExecutionOrderNames) / sizeof(kExecutionOrderNames[0]);
+
+// Canonical short names indexed in the same order as kSuites[] / kSuitesAuto[].
+// Used for the execution-order lookup so it works regardless of whether
+// kSuites is the hardcoded short-name table (#else branch above) or the
+// auto-generated kSuitesAuto (which carries the LONG display names like
+// "Memory tests", "DMA tests"). Without this table the auto path would
+// silently fall back to ROM-menu order because every short-name match
+// would fail.
+static const char* const kCanonicalShortNames[] = {
+    "memory",        // 0
+    "io-read",       // 1
+    "timing",        // 2
+    "timers",        // 3
+    "timer-irq",     // 4
+    "shifter",       // 5
+    "carry",         // 6
+    "multiply-long", // 7
+    "bios-math",     // 8
+    "dma",           // 9
+    "sio-read",      // 10
+    "sio-timing",    // 11
+    "misc-edge",     // 12
+    "video",         // 13
+};
+static_assert(sizeof(kCanonicalShortNames) / sizeof(kCanonicalShortNames[0])
+              == 14,
+              "kCanonicalShortNames must have 14 entries to match kSuites");
+
 // Offsets inside the TestSuite struct on ARM (4-byte aligned, 28 bytes):
 //   +0  const char* name
 //   +4  void (*run)(void)
@@ -598,12 +651,16 @@ static VideoStats drive_video_suite(int n_tests) {
 // ---- SRAM log dump ---------------------------------------------------------
 
 static void dump_sram_log(FILE* out) {
-    // VBA-M stores both SRAM and Flash save data in flashSaveMemory.
+    // VBA-M stores both SRAM and Flash save data in flashSaveMemory, which
+    // is initialized to 0xFF (flash erase pattern) at boot. The suite uses
+    // SRAM mode, and savprintf() in suite.gba caps writes at 0x8000 (real
+    // GBA SRAM is 32KB). Reading past 0x8000 dumps the unwritten 0xFF
+    // region, which prints as `���` UTF-8 invalid-byte garbage. Trim both
+    // 0x00 (zero-init under HLE / post-bzero) and 0xFF (flash-init).
     uint8_t* sram = flashSaveMemory;
-    int sram_size = 0x10000;
-    // Find a reasonable end point by looking for the last non-zero byte.
-    int end = sram_size - 1;
-    while (end > 0 && sram[end] == 0) --end;
+    static constexpr int kSramSize = 0x8000;
+    int end = kSramSize - 1;
+    while (end > 0 && (sram[end] == 0x00 || sram[end] == 0xFF)) --end;
     if (end <= 0) {
         fputs("---- SRAM log dump: empty ----\n", out);
         return;
@@ -806,11 +863,76 @@ int main(int argc, char** argv) {
     uint32_t override_total [kNumSuites] = {0};
     bool     have_override  [kNumSuites] = {false};
 
-    // Drive the test UI: press A to enter each suite, wait for completion,
-    // press B to return, press DOWN to advance selection.
-    for (int i = 0; i < kNumSuites; ++i) {
-        fprintf(stderr, "\n[%d/%d] running %s...\n",
-                i + 1, kNumSuites, resolved[i].name);
+    // Build the actual execution order: indices into resolved[]/counters[]
+    // looked up from kExecutionOrderNames[]. A name not present in the
+    // resolved table (because the auto-discovered header didn't include
+    // it) gets skipped — the suite would have no struct address to drive
+    // anyway. Suites in resolved[] that aren't named in the execution
+    // list get appended at the end so we never silently drop a suite.
+    int order[kNumSuites];
+    int order_n = 0;
+    {
+        bool used[kNumSuites] = {false};
+        for (int k = 0; k < kExecutionOrderN && order_n < kNumSuites; ++k) {
+            for (int i = 0; i < kNumSuites; ++i) {
+                // Match against kCanonicalShortNames[i] — guaranteed to be
+                // the short name regardless of whether kSuites is the
+                // hardcoded table (also short) or kSuitesAuto (long
+                // display names like "DMA tests"). kExecutionOrderNames is
+                // keyed on the short form. Fall back to kSuites[i].name
+                // only if i is somehow out of range, which it isn't given
+                // the static_assert above.
+                const char* canon =
+                    (i < (int)(sizeof(kCanonicalShortNames) /
+                               sizeof(kCanonicalShortNames[0])))
+                        ? kCanonicalShortNames[i]
+                        : kSuites[i].name;
+                if (!used[i] && canon &&
+                    std::strcmp(canon, kExecutionOrderNames[k]) == 0) {
+                    order[order_n++] = i;
+                    used[i] = true;
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < kNumSuites; ++i) {
+            if (!used[i]) {
+                order[order_n++] = i;
+                const char* canon =
+                    (i < (int)(sizeof(kCanonicalShortNames) /
+                               sizeof(kCanonicalShortNames[0])))
+                        ? kCanonicalShortNames[i]
+                        : (kSuites[i].name ? kSuites[i].name : "(unnamed)");
+                fprintf(stderr,
+                        "suite_runner: %s not in kExecutionOrderNames, "
+                        "appending at end\n",
+                        canon);
+            }
+        }
+    }
+
+    // Drive the test UI in execution order, not menu order. Menu cursor
+    // starts at index 0; we navigate to each target by pressing DOWN
+    // (target - cursor + N) mod N times. The suite menu wraps (main.c
+    // does `suiteIndex %= nSuites`) so DOWN-only navigation reaches any
+    // index regardless of starting position.
+    // Allow the show-mode probe to run from a fresh-boot state by
+    // skipping the suite-level loop. Set VBAM_PROBE_ONLY=1 to mimic the
+    // user-reported flow: open ROM, navigate to misc-edge, run, press A
+    // on H-blank bit start, observe.
+    bool probe_only = std::getenv("VBAM_PROBE_ONLY") != nullptr;
+    int cursor = 0;
+    for (int o = 0; o < order_n && !probe_only; ++o) {
+        int i = order[o];
+
+        int steps = ((i - cursor) % kNumSuites + kNumSuites) % kNumSuites;
+        for (int s = 0; s < steps; ++s) {
+            press_button(KEY_DOWN, 6);
+        }
+        cursor = i;
+
+        fprintf(stderr, "\n[%d/%d] running %s (menu pos %d)...\n",
+                o + 1, order_n, resolved[i].name, i);
 
         press_button(KEY_A, 8);
 
@@ -827,7 +949,6 @@ int main(int argc, char** argv) {
                     resolved[i].name, vs.passes, vs.total);
             // Exit the suite viewer back to main menu.
             press_button(KEY_B, 8);
-            if (i + 1 < kNumSuites) press_button(KEY_DOWN, 6);
             continue;
         }
 
@@ -862,19 +983,15 @@ int main(int argc, char** argv) {
         // Return to main menu. After a polled suite finishes, the ROM is
         // sitting at the per-suite results screen; one B-press takes us
         // back to the suite list. Wait until activeTestInfo.suiteId
-        // resets to -1 so we know we're actually on the menu before
-        // pressing DOWN — without this, on slow paths the DOWN press
-        // arrives while the suite is still tearing down and gets
-        // consumed by something else, leaving the cursor unchanged.
+        // resets to -1 so the cursor is stable before the next iteration
+        // navigates to its target — without this, on slow paths the
+        // navigation presses arrive while the suite is still tearing
+        // down and get consumed by something else.
         press_button(KEY_B, 6);
         int back_wait = 0;
         while (active_suite_id() >= 0 && back_wait < 60) {
             run_frames(1, 0);
             ++back_wait;
-        }
-        // Move selection to next suite.
-        if (i + 1 < kNumSuites) {
-            press_button(KEY_DOWN, 6);
         }
     }
 
