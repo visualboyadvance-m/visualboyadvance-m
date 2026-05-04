@@ -24,16 +24,57 @@ if(WIN32 OR APPLE)
 endif()
 
 if(NOT WIN32 AND NOT APPLE)
-    include(CheckIncludeFile)
-    check_include_file("gdk/gdkwayland.h" HAVE_GDK_WAYLAND)
+    # Detect whether the installed GDK supports Wayland.
+    #
+    # We try, in order:
+    #   1. pkg-config gdk-wayland-3.0 -- the canonical probe on modern GTK.
+    #      libgtk-3-dev and equivalents ship gdk-wayland-3.0.pc whenever
+    #      Wayland support is built in.
+    #   2. check_include_file("gdk/gdkwayland.h"), but with GTK's include
+    #      paths pulled in via pkg-config gtk+-3.0 first. This catches GDK
+    #      installs that ship the header but no separate .pc file.
+    set(_have_gdk_wayland OFF)
 
-    if(HAVE_GDK_WAYLAND)
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(GDK_WAYLAND_PC QUIET gdk-wayland-3.0)
+        if(GDK_WAYLAND_PC_FOUND)
+            set(_have_gdk_wayland ON)
+        endif()
+    endif()
+
+    if(NOT _have_gdk_wayland)
+        # Fallback for systems without gdk-wayland-3.0.pc: probe for the
+        # header directly, but make sure GTK's include paths are visible to
+        # the probe so it can actually find /usr/include/gtk-3.0/gdk/...
+        if(PkgConfig_FOUND)
+            pkg_check_modules(GTK3_PC QUIET gtk+-3.0)
+        endif()
+
+        include(CheckIncludeFile)
+        set(_saved_required_includes "${CMAKE_REQUIRED_INCLUDES}")
+        if(GTK3_PC_INCLUDE_DIRS)
+            list(APPEND CMAKE_REQUIRED_INCLUDES ${GTK3_PC_INCLUDE_DIRS})
+        endif()
+        check_include_file("gdk/gdkwayland.h" _have_gdkwayland_header)
+        set(CMAKE_REQUIRED_INCLUDES "${_saved_required_includes}")
+
+        if(_have_gdkwayland_header)
+            set(_have_gdk_wayland ON)
+        endif()
+    endif()
+
+    if(_have_gdk_wayland)
         set(no_wayland_default OFF)
     else()
         set(no_wayland_default ON)
     endif()
 
     option(NO_WAYLAND "Force Wayland disabled" ${no_wayland_default})
+
+    unset(_have_gdk_wayland)
+    unset(_have_gdkwayland_header CACHE)
+    unset(_saved_required_includes)
 endif()
 
 # Static linking

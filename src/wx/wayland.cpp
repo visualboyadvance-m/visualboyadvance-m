@@ -1,16 +1,13 @@
-#ifndef NO_WAYLAND
-
 #include "wx/wayland.h"
 
 #ifdef HAVE_WAYLAND_SUPPORT
-
 #include <gdk/gdkwayland.h>
 
-bool IsWayland() { return GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default()); }
+bool IsWayland() {
+    return GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default());
+}
+#endif // HAVE_WAYLAND_SUPPORT
 
-#endif
-
-// Temporary hack to backport 800d6ed69b from wxWidgets until 3.2.2 is released.
 #ifdef WAYLAND_MOVE_SUBSURFACE_BACKPORT
 #include <wayland-egl.h>
 #include <wx/glcanvas.h>
@@ -44,6 +41,4 @@ void MoveWaylandSubsurface(wxGLCanvasEGL* win)
         wl_subsurface_set_position(win->*private_ptr, x, y);
     }
 }
-#endif
-
-#endif
+#endif // WAYLAND_MOVE_SUBSURFACE_BACKPORT
