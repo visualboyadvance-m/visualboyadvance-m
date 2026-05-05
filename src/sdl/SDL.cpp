@@ -1069,8 +1069,9 @@ void sdlInitVideo()
     int flags;
     int screenWidth;
     int screenHeight;
-    int window_width, window_height, render_width, render_height;
+    int render_width, render_height;
 #ifdef ENABLE_SDL3
+    int window_width, window_height;
     SDL_RendererLogicalPresentation representation;
     bool makes_sense = false;
 #else
