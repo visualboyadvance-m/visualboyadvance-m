@@ -4994,7 +4994,7 @@ void CPULoop(int ticks)
                     // Unified IRQ delivery + halt-wake. Replaces the legacy
                     // intState/IRQTicks state machine and the end-of-CPULoop
                     // delivery block. (See full design comment below.)
-                    bool was_halted = holdState;
+                    [[maybe_unused]] bool was_halted = holdState;
                     holdState = false;
                     stopState = false;
                     holdType  = 0;
