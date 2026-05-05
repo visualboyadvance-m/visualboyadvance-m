@@ -44,6 +44,18 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # APT-level retries for individual .deb downloads. Acquire::Retries
+          # makes apt re-fetch each failed package up to N times before
+          # giving up; the http/https timeouts cap how long a single stalled
+          # connection can block. Every apt invocation in the job picks
+          # this up automatically — including the ones inside installdeps.
+          sudo tee /etc/apt/apt.conf.d/80-vbam-retries >/dev/null <<'EOF'
+          Acquire::Retries "5";
+          Acquire::Retries::Delay "true";
+          Acquire::http::Timeout "30";
+          Acquire::https::Timeout "30";
+          EOF
+
           # Prefer SDL3 from official Ubuntu repos. SDL3 first landed in
           # Ubuntu 25.04 (plucky); 24.04 LTS (noble) won't ever have it
           # in main, so fall back to the hrzhu/sdl3-backport PPA there.
@@ -115,4 +127,3 @@ jobs:
       - if: matrix.build_options == 'default'
         name: Run tests
         run: cd build && xvfb-run ctest -j --output-on-failure
-        

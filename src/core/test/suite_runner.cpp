@@ -650,24 +650,79 @@ static VideoStats drive_video_suite(int n_tests) {
 
 // ---- SRAM log dump ---------------------------------------------------------
 
-static void dump_sram_log(FILE* out) {
-    // VBA-M stores both SRAM and Flash save data in flashSaveMemory, which
-    // is initialized to 0xFF (flash erase pattern) at boot. The suite uses
-    // SRAM mode, and savprintf() in suite.gba caps writes at 0x8000 (real
-    // GBA SRAM is 32KB). Reading past 0x8000 dumps the unwritten 0xFF
-    // region, which prints as `���` UTF-8 invalid-byte garbage. Trim both
-    // 0x00 (zero-init under HLE / post-bzero) and 0xFF (flash-init).
-    uint8_t* sram = flashSaveMemory;
+// SRAM log dump mode. The suite ROM's savprintf() writes printable ASCII
+// into flashSaveMemory, but only into the regions a given test actually
+// touched — gaps remain at 0xFF (flash-erase) and sometimes 0x00 (zero
+// init). Naively fwriting the whole buffer streams those non-UTF-8 bytes
+// into the CI log, where they render as `���` garbage. We always strip
+// non-printable bytes first; the modes below control how much of the
+// remaining ASCII we emit.
+enum class SramDumpMode {
+    kFull,           // Every printable line (verbose; for local debugging).
+    kFailuresOnly,   // Only lines containing "FAIL" — keeps CI logs short.
+    kNone,           // Skip entirely.
+};
+
+static void dump_sram_log(FILE* out, SramDumpMode mode) {
+    if (mode == SramDumpMode::kNone) return;
+
+    // Recover the printable text from flashSaveMemory. Keep ASCII printable
+    // (0x20–0x7E) plus newline and tab; drop everything else (0x00 / 0xFF
+    // init/erase patterns and any other control bytes that would render
+    // as invalid UTF-8 in the CI log). This makes the output safe to
+    // print regardless of which SRAM regions the suite happened to touch.
     static constexpr int kSramSize = 0x8000;
-    int end = kSramSize - 1;
-    while (end > 0 && (sram[end] == 0x00 || sram[end] == 0xFF)) --end;
-    if (end <= 0) {
-        fputs("---- SRAM log dump: empty ----\n", out);
+    const uint8_t* sram = flashSaveMemory;
+    std::string text;
+    text.reserve(kSramSize);
+    for (int i = 0; i < kSramSize; ++i) {
+        uint8_t c = sram[i];
+        if (c == '\n' || c == '\t' || (c >= 0x20 && c <= 0x7E)) {
+            text.push_back(static_cast<char>(c));
+        }
+    }
+    // Strip trailing whitespace so we don't emit a tail of blank lines.
+    while (!text.empty() &&
+           (text.back() == '\n' || text.back() == '\t' || text.back() == ' ')) {
+        text.pop_back();
+    }
+    if (text.empty()) {
+        fputs("---- SRAM log: empty ----\n", out);
         return;
     }
-    fputs("---- SRAM log dump ----\n", out);
-    fwrite(sram, 1, end + 1, out);
-    fputs("\n---- end SRAM log ----\n", out);
+
+    if (mode == SramDumpMode::kFull) {
+        fputs("---- SRAM log ----\n", out);
+        fputs(text.c_str(), out);
+        fputc('\n', out);
+        fputs("---- end SRAM log ----\n", out);
+        return;
+    }
+
+    // kFailuresOnly: emit just the lines that look like a failed sub-test.
+    // mGBA-suite's savprintf output uses "FAIL" as its failure marker;
+    // matching it case-sensitively keeps "PASS" lines out without dragging
+    // in unrelated prose. If the upstream suite ROM ever changes its
+    // marker, widen the predicate here.
+    fputs("---- failed sub-tests ----\n", out);
+    size_t shown = 0;
+    size_t pos = 0;
+    while (pos < text.size()) {
+        size_t nl = text.find('\n', pos);
+        size_t line_end = (nl == std::string::npos) ? text.size() : nl;
+        std::string line = text.substr(pos, line_end - pos);
+        if (line.find("FAIL") != std::string::npos) {
+            fputs(line.c_str(), out);
+            fputc('\n', out);
+            ++shown;
+        }
+        if (nl == std::string::npos) break;
+        pos = nl + 1;
+    }
+    if (shown == 0) {
+        fputs("(no FAIL lines in SRAM log)\n", out);
+    }
+    fputs("---- end failed sub-tests ----\n", out);
 }
 
 // ---- Main ------------------------------------------------------------------
@@ -1017,8 +1072,20 @@ int main(int argc, char** argv) {
     puts("===================================================\n");
     fflush(stdout);
 
-    // Dump the suite's own SRAM log.
-    dump_sram_log(stdout);
+    // Dump the suite's own SRAM log. In CI mode (a min_pass floor was
+    // supplied via --min-pass) we emit only the failed sub-test lines so
+    // a passing run still surfaces useful diagnostics without flooding
+    // the log with the binary tail of the SRAM buffer. Without a floor
+    // the runner is being invoked manually, so emit the full filtered
+    // log. Set VBAM_SRAM_DUMP=full / =failures / =none to override.
+    SramDumpMode dump_mode =
+        (min_pass >= 0) ? SramDumpMode::kFailuresOnly : SramDumpMode::kFull;
+    if (const char* m = std::getenv("VBAM_SRAM_DUMP")) {
+        if (std::strcmp(m, "full") == 0)         dump_mode = SramDumpMode::kFull;
+        else if (std::strcmp(m, "failures") == 0) dump_mode = SramDumpMode::kFailuresOnly;
+        else if (std::strcmp(m, "none") == 0)     dump_mode = SramDumpMode::kNone;
+    }
+    dump_sram_log(stdout, dump_mode);
 
     GBASystem.emuCleanUp();
     if (min_pass >= 0) {
