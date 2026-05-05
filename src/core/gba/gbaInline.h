@@ -21,20 +21,56 @@
 
 extern const uint32_t objTilesAddress[3];
 
-// HBLANK_TRACE: ad-hoc instrumentation gated at compile time. Default OFF
-// -- every `vbam_dbg_trace(...)` call site in gba.cpp / gbaInline.h
-// expands to `((void)0)` and is eliminated by the optimizer, so there is
-// zero runtime cost in normal builds.
+// =====================================================================
+// VBAM_HB_TRACE: ad-hoc cycle-level instrumentation. Default OFF -- every
+// trace call site expands to a sizeof()-only expression and is eliminated
+// by the optimizer, so there is zero runtime cost in normal builds.
 //
-// To enable: define VBAM_HB_TRACE (uncomment the line below, or pass
-// -DVBAM_HB_TRACE to the compiler). Output then goes to stderr on
-// Linux/macOS or to OutputDebugStringA (VS Output window) on Windows.
-// See the matching comment block in gba.cpp for the per-tag schema.
+// To enable at compile time: define VBAM_HB_TRACE (uncomment the line
+// below, or pass -DVBAM_HB_TRACE to the compiler). Three INDEPENDENT
+// runtime gates then become available, each toggled by its own env var
+// (Linux/macOS only; Windows always emits all enabled categories to
+// OutputDebugStringA when compiled with VBAM_HB_TRACE):
+//
+//   VBAM_TRACE_HB=1   -- HBlank/timer/halt events:
+//                          hb-raise, tm0-read, halt
+//   VBAM_TRACE_IRQ=1  -- IRQ machinery and IO-reg writes:
+//                          sched-irq, cancel-irq, dispatch-irq,
+//                          ie-write, if-write, ime-write
+//   VBAM_TRACE_SIO=1  -- Serial IO (Normal8/Normal32) cycle accounting:
+//                          sio-cnt-write, sio-sched, sio-complete
+//
+// Back-compat: VBAM_HB_TRACE=1 (the old single env var) still works and
+// is treated as "VBAM_TRACE_HB=1 VBAM_TRACE_IRQ=1" -- the original two
+// categories the macro was named for. Setting any per-category env var
+// supersedes the legacy one for that category. See gba.cpp for the
+// per-tag extra-bits schema.
 //
 // #define VBAM_HB_TRACE
 #ifdef VBAM_HB_TRACE
-void vbam_dbg_trace(const char* tag, long long cyc, int extra);
+
+// Trace category. Each call site picks the category whose data it
+// represents; runtime env-var gating routes the line to stderr or
+// suppresses it without touching the compile-time switch.
+enum VbamTraceCat {
+    VBAM_CAT_HB  = 0,
+    VBAM_CAT_IRQ = 1,
+    VBAM_CAT_SIO = 2,
+};
+
+void vbam_dbg_trace(int cat, const char* tag, long long cyc, int extra);
+
+// Per-category convenience wrappers. Prefer these at call sites; they
+// document intent and make grep-by-category cheap.
+#define vbam_hb_trace(tag, cyc, extra) \
+    vbam_dbg_trace(VBAM_CAT_HB,  (tag), (cyc), (extra))
+#define vbam_irq_trace(tag, cyc, extra) \
+    vbam_dbg_trace(VBAM_CAT_IRQ, (tag), (cyc), (extra))
+#define vbam_sio_trace(tag, cyc, extra) \
+    vbam_dbg_trace(VBAM_CAT_SIO, (tag), (cyc), (extra))
+
 #else
+
 // When trace is OFF, expand to an expression that references each argument
 // in an UNEVALUATED context (sizeof) so the compiler considers them "used"
 // without actually computing them at runtime. Without this, callers that
@@ -42,9 +78,15 @@ void vbam_dbg_trace(const char* tag, long long cyc, int extra);
 // -Werror=unused-but-set-variable on builds compiled without
 // VBAM_HB_TRACE defined. The C++ standard guarantees sizeof's operand is
 // not evaluated, so this is zero-cost.
-#define vbam_dbg_trace(tag, cyc, extra) \
+#define vbam_hb_trace(tag, cyc, extra) \
     ((void)sizeof((tag)), (void)sizeof((cyc)), (void)sizeof((extra)))
+#define vbam_irq_trace(tag, cyc, extra) \
+    ((void)sizeof((tag)), (void)sizeof((cyc)), (void)sizeof((extra)))
+#define vbam_sio_trace(tag, cyc, extra) \
+    ((void)sizeof((tag)), (void)sizeof((cyc)), (void)sizeof((extra)))
+
 #endif
+// =====================================================================
 
 extern bool stopState;
 extern bool holdState;
@@ -436,7 +478,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 };
                 if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On) {
                     value = liveTimerRead(0, (uint16_t)timer0Reload, timer0ClockReload);
-                    vbam_dbg_trace("tm0-read", cpuAbsCycle,
+                    vbam_hb_trace("tm0-read", cpuAbsCycle,
                                    (int)(value & 0xFFFF));
                 } else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
                     value = liveTimerRead(1, (uint16_t)timer1Reload, timer1ClockReload);

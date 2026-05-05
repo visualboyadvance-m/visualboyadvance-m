@@ -54,50 +54,115 @@
 #endif
 
 // =====================================================================
-// HBLANK_TRACE -- ad-hoc instrumentation. Toggle is the VBAM_HB_TRACE
-// macro defined (or not) in gbaInline.h. When undefined (the default),
-// every call site expands to ((void)0) via the macro stub in
-// gbaInline.h and the function below is not compiled at all -- zero
-// runtime cost.
+// VBAM_HB_TRACE -- ad-hoc cycle-level instrumentation. Toggle is the
+// VBAM_HB_TRACE macro defined (or not) in gbaInline.h. When undefined
+// (the default), every call site expands to a sizeof()-only expression
+// via the macros in gbaInline.h and the function below is not compiled
+// at all -- zero runtime cost.
 //
-// When VBAM_HB_TRACE IS defined: emits one [HB] line per event we care
-// about during the H-blank IRQ sequence (and adjacent IRQ machinery):
-//   [HB] hb-raise       -- kSchedHblankIrqDelay event fires; IF |= 2
-//   [HB] sched-irq      -- CPUTestIRQ schedules kSchedIrq
-//   [HB] cancel-irq     -- CPUTestIRQ cancels kSchedIrq (ack cleared IF&IE)
-//   [HB] dispatch-irq   -- kSchedIrq event fires (delivered or bailed)
-//   [HB] halt           -- SWI 0x02 invocation; sets holdState
-//   [HB] ie-write / if-write / ime-write -- IO register mutations
-//   [HB] tm0-read       -- the test ROM samples REG_TM0CNT_L (in gbaInline.h)
-// On Linux/macOS the line goes to stderr; further runtime gating via
-// the VBAM_HB_TRACE env var (set to "1" to enable, "0" or unset to
-// suppress) so a single trace-enabled build can still run normally.
-// On Windows the line goes to OutputDebugStringA -> Visual Studio's
-// Output window. No env var gate on Windows -- if you compiled with
-// VBAM_HB_TRACE, you wanted the trace output.
+// When VBAM_HB_TRACE IS defined: emits one line per traced event, with
+// three independent categories selected at the call site:
+//
+//   HB  events (vbam_hb_trace):
+//     [HB] hb-raise       -- kSchedHblankIrqDelay event fires; IF |= 2
+//     [HB] tm0-read       -- the test ROM samples REG_TM0CNT_L
+//     [HB] halt           -- SWI 0x02 invocation; sets holdState
+//
+//   IRQ events (vbam_irq_trace):
+//     [IRQ] sched-irq     -- CPUTestIRQ schedules kSchedIrq
+//     [IRQ] cancel-irq    -- CPUTestIRQ cancels kSchedIrq (IF&IE cleared)
+//     [IRQ] dispatch-irq  -- kSchedIrq event fires (delivered or bailed)
+//     [IRQ] ie-write / if-write / ime-write -- IO register mutations
+//
+//   SIO events (vbam_sio_trace):
+//     [SIO] sio-cnt-write -- SIOCNT write seen at IO-reg dispatcher.
+//                            extra = value | (start_edge<<16)
+//                                           | (cycle_accurate_path<<17)
+//     [SIO] sio-sched     -- kSchedSio scheduled. extra = delay
+//     [SIO] sio-complete  -- gbaScheduler_OnSioComplete fires.
+//                            extra = siocnt | (will_fire_irq<<16)
+//
+// On Linux/macOS each line goes to stderr; per-category runtime gating
+// via the env vars VBAM_TRACE_HB / VBAM_TRACE_IRQ / VBAM_TRACE_SIO (set
+// to "1" to enable). Back-compat: setting VBAM_HB_TRACE=1 enables the
+// HB and IRQ categories (the original two the macro was named for); a
+// per-category var, if set, supersedes the legacy var for that category
+// only. So you can run e.g. `VBAM_TRACE_SIO=1 ./suite_runner ...` to
+// see only SIO events without HB or IRQ noise.
+//
+// On Windows every category emits unconditionally to OutputDebugStringA
+// when compiled with VBAM_HB_TRACE -- there is no env-var gating layer
+// because the typical Windows debugging workflow is to filter the VS
+// Output window by tag prefix instead.
 // =====================================================================
 #ifdef VBAM_HB_TRACE
 #  ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>
-void vbam_dbg_trace(const char* tag, long long cyc, int extra) {
-    char buf[128];
-    std::snprintf(buf, sizeof(buf), "[HB] %s cyc=%lld extra=0x%X\n",
-                  tag, cyc, extra);
+void vbam_dbg_trace(int cat, const char* tag, long long cyc, int extra) {
+    const char* prefix = (cat == VBAM_CAT_IRQ) ? "[IRQ]"
+                       : (cat == VBAM_CAT_SIO) ? "[SIO]"
+                       :                         "[HB]";
+    char buf[160];
+    std::snprintf(buf, sizeof(buf), "%s %s cyc=%lld extra=0x%X\n",
+                  prefix, tag, cyc, extra);
     OutputDebugStringA(buf);
 }
 #  else
-static bool vbam_dbg_trace_enabled() {
-    static int cached = -1;
-    if (cached < 0) {
-        const char* e = std::getenv("VBAM_HB_TRACE");
-        cached = (e && *e && *e != '0') ? 1 : 0;
+// Per-category runtime gate. Cached on first call. Returns 1 if the
+// category should emit, 0 otherwise. Reads:
+//   * VBAM_TRACE_HB  / VBAM_TRACE_IRQ / VBAM_TRACE_SIO -- new per-cat
+//   * VBAM_HB_TRACE                                    -- legacy alias
+//                                                         enabling HB+IRQ
+// A per-category var, if set to a non-empty non-"0" value, is the
+// authoritative answer for that category (even if the legacy var is
+// also set). If the per-category var is unset, fall back to the legacy
+// var for HB and IRQ only; SIO has no legacy alias.
+static int vbam_dbg_trace_cat_enabled(int cat) {
+    static int cached_hb  = -1;
+    static int cached_irq = -1;
+    static int cached_sio = -1;
+    int* slot;
+    const char* per_cat_var;
+    bool legacy_applies;
+    switch (cat) {
+        case VBAM_CAT_IRQ:
+            slot = &cached_irq;
+            per_cat_var = "VBAM_TRACE_IRQ";
+            legacy_applies = true;
+            break;
+        case VBAM_CAT_SIO:
+            slot = &cached_sio;
+            per_cat_var = "VBAM_TRACE_SIO";
+            legacy_applies = false;
+            break;
+        case VBAM_CAT_HB:
+        default:
+            slot = &cached_hb;
+            per_cat_var = "VBAM_TRACE_HB";
+            legacy_applies = true;
+            break;
     }
-    return cached != 0;
+    if (*slot < 0) {
+        const char* e = std::getenv(per_cat_var);
+        if (e && *e && *e != '0') {
+            *slot = 1;
+        } else if (legacy_applies) {
+            const char* legacy = std::getenv("VBAM_HB_TRACE");
+            *slot = (legacy && *legacy && *legacy != '0') ? 1 : 0;
+        } else {
+            *slot = 0;
+        }
+    }
+    return *slot;
 }
-void vbam_dbg_trace(const char* tag, long long cyc, int extra) {
-    if (!vbam_dbg_trace_enabled()) return;
-    std::fprintf(stderr, "[HB] %s cyc=%lld extra=0x%X\n", tag, cyc, extra);
+void vbam_dbg_trace(int cat, const char* tag, long long cyc, int extra) {
+    if (!vbam_dbg_trace_cat_enabled(cat)) return;
+    const char* prefix = (cat == VBAM_CAT_IRQ) ? "[IRQ]"
+                       : (cat == VBAM_CAT_SIO) ? "[SIO]"
+                       :                         "[HB]";
+    std::fprintf(stderr, "%s %s cyc=%lld extra=0x%X\n",
+                 prefix, tag, cyc, extra);
 }
 #  endif
 #endif
@@ -673,87 +738,59 @@ void cpuEnableProfiling(int hz)
 }
 #endif
 
-// CPUTestIRQ: re-evaluate whether an IRQ is currently pending and (re)arm
-// the kSchedIrq scheduler event accordingly. Call from any site that
-// mutates IF, IE, or IME -- IO-register writes, timer overflows, DMA
-// completions, the deferred HBlank IRQ raise, etc.
+// CPUTestIRQ -- re-evaluate whether an IRQ is currently pending and
+// (re)arm the kSchedIrq scheduler event. Call from any site that
+// mutates IF, IE, or IME.
 //
-// The `software_unmask` flag distinguishes WHY the IRQ is becoming
-// deliverable. Two regimes:
+// Three latency regimes, tuned empirically to vbam's CPU instruction
+// cycle accounting (which differs from mgba's by ~28 cycles through
+// the IRQ-vector + BIOS-IntrWait-return path -- see the SIO `+35`
+// comment for details). Using mgba's single-constant model directly
+// would shift every IRQ-driven measurement by 28 cycles, breaking
+// SIO/Video/r76 misc-edge calibration; we keep vbam's tiered model
+// until the underlying CPU cycle accounting is reworked.
 //
-//   * Hardware-source path (software_unmask=false, the default): an IRQ
-//     bit transitioned 0->1 in IF because real hardware raised it
-//     (HBlank phase boundary, timer overflow, DMA end, etc.). Real
-//     ARM7TDMI applies the full ~7-cycle pipeline-fill delay between
-//     IF-bit set and IRQ-vector entry. Schedule at +8 cycles (or +3
-//     inside the IRQRecentTicks window for cascaded handler chains).
+//   * Halt-wake (holdState=true, IME and armIrqEnable set): delay = 0.
+//     Matches the legacy `holdState=false; CPUInterrupt()` end-of-
+//     CPULoop accounting. SIO timing tests, r76 misc-edge re-entry,
+//     and IntrWait-driven panel viewers all depend on this 0-cycle
+//     wake.
 //
-//   * Software-unmask path (software_unmask=true): IF bit was already
-//     set, but IE or IME just got written in a way that newly exposes
-//     it. The pipeline-fill stage of IRQ delivery doesn't apply here --
-//     the IRQ source has been pending for some time and the bus has
-//     long since settled. Real HW delivers in ~1 cycle on this path.
-//     Schedule at +1 cycle.
+//   * Software-unmask (software_unmask=true, holdState=false):
+//     delay = 1. IF was already set; IE/IME write newly exposes it.
+//     Required by misc-edge "H-blank bit start" Hblank sub-test on
+//     re-entry (a stale IF.HBlank must ack BEFORE the test's
+//     subsequent Halt() runs).
 //
-// The distinction matters for the misc-edge "H-blank bit start" Hblank
-// sub-test on re-entry: when the user enters the sub-test panel with a
-// stale IF.HBlank already pending from a prior pass, the test does
-// REG_IE = IRQ_HBLANK; REG_IME = 1; Halt() in tight succession. With
-// the +8 hardware-source delay, kSchedIrq fires AFTER Halt SWI, the CPU
-// halts briefly, then wakes -- producing a calibration sample at an
-// "early-wake" cycle and a measured Hblank cycle count of ~0x358 (about
-// half a scanline) instead of the expected 0x4D1. The +1 software-
-// unmask delay fires the IRQ BEFORE Halt SWI runs, the IRQ handler
-// acks IF.HBlank, then Halt #1 enters with a clean (IF & IE) state and
-// waits for a real HBlank IRQ -- matching what the test expects.
+//   * Hardware-source (default): delay = 8 normally, 3 inside the
+//     IRQRecentTicks > 0 window (cascaded handler chains within ~130
+//     cycles of a prior IRQ). The +8 is one cycle longer than mgba's
+//     GBA_IRQ_DELAY=7 because vbam's CPUInterrupt charges one fewer
+//     cycle than mgba's ARMRaiseIRQ.
 //
-// Semantics summary:
-//   * (IF & IE) == 0      -> cancel any pending kSchedIrq.
-//   * (IF & IE) != 0 and
-//     no kSchedIrq pending -> schedule one. Delay = 1 (software_unmask),
-//                             3 (cascaded), or 8 (default).
-//   * (IF & IE) != 0 and
-//     kSchedIrq pending    -> leave it alone, UNLESS this is a
-//                             software_unmask call and the existing
-//                             schedule is at >+1 -- in which case
-//                             reschedule at +1 (the minimal-fix
-//                             behavior: a software unmask supersedes
-//                             a longer-delay schedule).
-//
-// Note: IME is intentionally NOT consulted in CPUTestIRQ for the
-// schedule decision. The kSchedIrq dispatch handler is what gates
-// delivery on IME and CPSR.I -- but the wake-from-halt fires
-// unconditionally on (IF & IE), matching real silicon.
+// Note: IME is NOT consulted for the schedule decision -- it gates
+// DELIVERY at kSchedIrq dispatch time, but a pending IRQ should still
+// wake from halt unconditionally on (IF & IE) per GBATEK and mgba.
 static inline void CPUTestIRQ(bool software_unmask = false)
 {
     if (!(IF & IE)) {
         if (gbaScheduler::IsScheduled(kSchedIrq)) {
-            vbam_dbg_trace("cancel-irq", cpuAbsCycle,
+            vbam_irq_trace("cancel-irq", cpuAbsCycle,
                            (int)(IF | (IE << 16)));
         }
         gbaScheduler::Cancel(kSchedIrq);
         return;
     }
     int delay;
-    if ((software_unmask || holdState) && (IME & 1) && armIrqEnable) {
-        // Two cases use the +1 (fast) delivery path:
-        //   (a) software_unmask: IE/IME write while IRQs enabled exposed
-        //       a pending IF bit. No bus pipeline-fill needed -- the IRQ
-        //       source has been pending and the bus has long since
-        //       settled. Real HW delivers in ~1 cycle.
-        //   (b) holdState: the CPU is halted (Halt/IntrWait SWI). Real
-        //       silicon's wake-from-halt latency is ~1 cycle, NOT the
-        //       7-8 cycle pipeline-fill delay that applies to a running
-        //       core. The legacy `else { CPUInterrupt(); holdState=false }`
-        //       branch in the pre-rework code captured this as a 0-cycle
-        //       wake; matching it as +1 keeps spin-loop alignment in
-        //       handlers like the misc-edge "H-blank bit start" panel
-        //       and the video "Layer toggle 2" test, both of which
-        //       sample REG_DISPCNT/REG_DISPSTAT relative to scanline-
-        //       boundary cycles inside the IRQ handler.
+    if (holdState && (IME & 1) && armIrqEnable) {
+        // Halt-wake: 0 cycles. Supersede any pending longer-delay
+        // schedule -- the wake-from-halt is the minimum-latency path.
+        delay = 0;
+        gbaScheduler::Cancel(kSchedIrq);
+    } else if (software_unmask && (IME & 1) && armIrqEnable) {
+        // Software-unmask: 1 cycle. Supersede any pending longer-delay
+        // schedule (re-arming the unmask path is intentional).
         delay = 1;
-        // If a previous (slower) schedule already exists, supersede it
-        // -- the wake-from-halt / unmask path is the correct latency.
         gbaScheduler::Cancel(kSchedIrq);
     } else {
         if (gbaScheduler::IsScheduled(kSchedIrq))
@@ -764,7 +801,7 @@ static inline void CPUTestIRQ(bool software_unmask = false)
     int when = cpuTotalTicks + delay;
     if (cpuNextEvent > when)
         cpuNextEvent = when;
-    vbam_dbg_trace("sched-irq", cpuAbsCycle,
+    vbam_irq_trace("sched-irq", cpuAbsCycle,
                    (delay & 0xF) |
                    ((IF & 0xFFFF) << 4) |
                    ((IRQRecentTicks > 0 ? 1 : 0) << 20) |
@@ -783,6 +820,20 @@ static inline void gbaScheduler_OnSioComplete() {
     if (!g_ioMem) return;
     uint16_t siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
     if (!(siocnt & 0x80)) return; // CPU already cleared it
+    // [SIO] sio-complete extra layout:
+    //   bits  0..15 : siocnt (with the original 0x80 Start bit still set,
+    //                 so the trace shows the state the handler saw)
+    //   bit   16    : will_fire_irq -- bit 14 of SIOCNT was set, so the
+    //                 IRQ raise below WILL execute
+    // Emitted before the bit-7 clear and the IF bit set; pairs with
+    // [SIO] sio-cnt-write / sio-sched and the subsequent [IRQ] sched-irq
+    // -> [IRQ] dispatch-irq sequence to bisect cycle accounting.
+    {
+        const bool will_fire_irq = (siocnt & 0x4000) != 0;
+        vbam_sio_trace("sio-complete", cpuAbsCycle,
+                       (int)((siocnt & 0xFFFF) |
+                             ((will_fire_irq ? 1 : 0) << 16)));
+    }
     siocnt = static_cast<uint16_t>(siocnt & ~0x80u);
     UPDATE_REG(COMM_SIOCNT, siocnt);
     if (siocnt & 0x4000) {
@@ -2723,7 +2774,7 @@ void CPUSoftwareInterrupt(int comment)
                 VCOUNT);
         }
 #endif
-        vbam_dbg_trace("halt", cpuAbsCycle,
+        vbam_hb_trace("halt", cpuAbsCycle,
                        (int)((IF & 0xFFFF) | ((IE & 0xFFFF) << 16)));
         holdState = true;
         holdType = -1;
@@ -4226,19 +4277,58 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         const bool     internal   = (value & 0x01) != 0;
         const bool cycle_accurate_path =
             start_edge && rcnt_plain && internal && (mode == 0 || mode == 1);
+        // [SIO] sio-cnt-write extra layout:
+        //   bits  0..15 : raw value written (low 16 bits of `value`)
+        //   bit   16    : start_edge -- bit-7 0->1 transition this write
+        //   bit   17    : cycle_accurate_path -- kSchedSio will be used
+        // Emitted unconditionally (every SIOCNT write), so traces show
+        // both the kSchedSio path and the legacy/StartLink path.
+        vbam_sio_trace("sio-cnt-write", cpuAbsCycle,
+                       (int)((value & 0xFFFF) |
+                             ((start_edge          ? 1 : 0) << 16) |
+                             ((cycle_accurate_path ? 1 : 0) << 17)));
         if (cycle_accurate_path) {
             const int bits    = (mode == 1) ? 32 : 8;
             const int per_bit = (value & 0x02) ? 8 : 64;
-            // Real HW: the SIO controller holds the bus for one extra
-            // internal clock cycle on both start (sync) and stop (shift
-            // register commit) before raising the completion IRQ. The
-            // test suite measures (TM0-start .. TM0-read-post-IRQ) which
-            // encompasses that extra cycle plus the CPU-side IRQ/BIOS
-            // path. Empirically the mgba sio-timing suite expects a
-            // fixed 35-cycle overhead beyond `bits * per_bit` on this
-            // CPU pipeline, independent of the programmed baud rate.
-            const int startup_overhead = 35;
-            gbaScheduler::Schedule(kSchedSio, bits * per_bit + startup_overhead);
+            // SIO scheduling has TWO components combined:
+            //   - bits * per_bit  : pure serial-clock time. Matches mgba's
+            //                       GBASIOTransferCycles (src/gba/sio.c)
+            //                       and NBA's bus/io.cpp table value
+            //                       (512/64/2048/256 for the four modes).
+            //                       This part is hardware-spec-derived.
+            //   - + 28            : empirical compensation for the local
+            //                       CPU instruction cycle accounting being
+            //                       ~28 cycles SHORTER than mgba's through
+            //                       the IRQ-vector-entry + BIOS-IntrWait-
+            //                       return path. mgba's BIOS+handler path
+            //                       takes ~114 cycles between IRQ-vector
+            //                       entry and the test ROM's TM0 stop
+            //                       write; ours takes ~86. The 28-cycle
+            //                       gap is in CPUInterrupt() / ARM
+            //                       exception entry cycle counts. Until
+            //                       those are reworked to match mgba, the
+            //                       SIO scheduler eats the difference
+            //                       here so the test ROM's 633-cycle
+            //                       expectation lands.
+            //   - + 7             : ARM exception-entry pipeline-fill delay
+            //                       (matches mgba's GBA_IRQ_DELAY=7).
+            //                       Folded into the SIO schedule rather
+            //                       than the kSchedIrq path because the
+            //                       halt-wake path uses delay=0 to match
+            //                       the legacy end-of-CPULoop instant-
+            //                       CPUInterrupt accounting (see
+            //                       CPUTestIRQ comments).
+            //
+            // 28 + 7 = 35: the historical "startup_overhead" constant. Now
+            // documented as the sum of two distinct (and known-imperfect)
+            // compensations rather than a single mystery value.
+            const int sio_delay = bits * per_bit + 35;
+            // [SIO] sio-sched extra = the absolute scheduled delay in
+            // cycles, so the trace can be diffed against [SIO]
+            // sio-complete (cyc) and against the CPU's own
+            // [HB] tm0-read post-IRQ to bisect where any drift creeps in.
+            vbam_sio_trace("sio-sched", cpuAbsCycle, sio_delay);
+            gbaScheduler::Schedule(kSchedSio, sio_delay);
         }
 #ifndef NO_LINK
         StartLink(value);
@@ -4353,14 +4443,14 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case IO_REG_IE:
         IE = value & 0x3FFF;
         UPDATE_REG(IO_REG_IE, IE);
-        vbam_dbg_trace("ie-write", cpuAbsCycle,
+        vbam_irq_trace("ie-write", cpuAbsCycle,
                        (int)((IE & 0xFFFF) | ((IF & 0xFFFF) << 16)));
         CPUTestIRQ(/*software_unmask=*/true);
         break;
     case IO_REG_IF:
         IF ^= (value & IF);
         UPDATE_REG(IO_REG_IF, IF);
-        vbam_dbg_trace("if-write", cpuAbsCycle,
+        vbam_irq_trace("if-write", cpuAbsCycle,
                        (int)((value & 0xFFFF) | ((IF & 0xFFFF) << 16)));
         // IF write only ever CLEARS bits (it's an ack) -- can never make
         // a new IRQ deliverable, so software_unmask=false. Will only
@@ -4410,7 +4500,7 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case IO_REG_IME:
         IME = value & 1;
         UPDATE_REG(IO_REG_IME, IME);
-        vbam_dbg_trace("ime-write", cpuAbsCycle,
+        vbam_irq_trace("ime-write", cpuAbsCycle,
                        (int)(((int)IME & 1) |
                              ((IF & 0xFFFF) << 8) |
                              ((IE & 0xFF) << 24)));
@@ -4998,7 +5088,7 @@ void CPULoop(int ticks)
                     // after DISPSTAT.HBlank bit toggle.
                     IF |= 2;
                     UPDATE_REG(IO_REG_IF, IF);
-                    vbam_dbg_trace("hb-raise", cpuAbsCycle,
+                    vbam_hb_trace("hb-raise", cpuAbsCycle,
                                    (int)((IF & 0xFFFF) | ((IE & 0xFFFF) << 16)));
                     CPUTestIRQ();
                     break;
@@ -5032,7 +5122,7 @@ void CPULoop(int ticks)
                     //   0 = delivered, 1 = no IF&IE, 2 = no IME, 3 = no armIrqEnable
                     // Inlined into the trace call so there's no named local
                     // that could trip -Werror=unused-but-set-variable.
-                    vbam_dbg_trace("dispatch-irq", cpuAbsCycle,
+                    vbam_irq_trace("dispatch-irq", cpuAbsCycle,
                                    ((deliver ? 0
                                      : !(IF & IE) ? 1
                                      : !(IME & 1) ? 2
