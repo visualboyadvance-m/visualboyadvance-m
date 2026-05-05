@@ -3722,7 +3722,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     if (SDL_WasInit(SDL_INIT_VIDEO) == false) {
         if (SDL_Init(SDL_INIT_VIDEO) == false) {
 #else
-    if (SDL_WasInit(SDL_INIT_VIDEO) < 0) {
+    if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 #endif
             wxLogError(_("Failed to initialize SDL video"));
@@ -6929,7 +6929,8 @@ bool VKDrawingPanel::CreateInstance()
     }
 #endif
  
-    VkInstanceCreateInfo ci{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
+    VkInstanceCreateInfo ci{};
+    ci.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     ci.pApplicationInfo        = &app_info;
     ci.enabledExtensionCount   = static_cast<uint32_t>(extensions.size());
     ci.ppEnabledExtensionNames = extensions.data();

@@ -188,7 +188,7 @@ bool SoundSDL::init(long sampleRate) {
     }
 
 #ifndef ENABLE_SDL3
-    if (SDL_WasInit(SDL_INIT_AUDIO) < 0)
+    if (SDL_WasInit(SDL_INIT_AUDIO) == 0)
 #else
     if (SDL_WasInit(SDL_INIT_AUDIO) == false)
 #endif
