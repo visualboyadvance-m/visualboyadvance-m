@@ -44,13 +44,19 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          echo 'Dpkg::Options { "--force-confdef"; "--force-confold"; }' | sudo tee -a /etc/apt/apt.conf.d/local
-          sudo apt update
-          sudo apt -y remove firefox
-          sudo apt -y upgrade
-          sudo rm -f /var/run/reboot-required* /run/reboot-required*
-          sudo do-release-upgrade -d -f DistUpgradeViewNonInteractive
-          sudo apt -y install libsdl3-dev
+          # Prefer SDL3 from official Ubuntu repos. SDL3 first landed in
+          # Ubuntu 25.04 (plucky); 24.04 LTS (noble) won't ever have it
+          # in main, so fall back to the hrzhu/sdl3-backport PPA there.
+          # Once we move to a runner that ships SDL3 natively (e.g.
+          # ubuntu-26.04 LTS once it's available), the probe succeeds
+          # and the PPA branch becomes a no-op.
+          if apt-cache show libsdl3-dev >/dev/null 2>&1; then
+            echo "::notice::libsdl3-dev available from official sources; skipping PPA"
+          else
+            echo "::notice::libsdl3-dev not in official sources; adding hrzhu/sdl3-backport PPA"
+            sudo add-apt-repository -y ppa:hrzhu/sdl3-backport
+            sudo apt-get update
+          fi
           bash installdeps
           if [ "${{ matrix.build_compiler }}" = clang ]; then
             sudo apt -y install clang
@@ -109,3 +115,4 @@ jobs:
       - if: matrix.build_options == 'default'
         name: Run tests
         run: cd build && xvfb-run ctest -j --output-on-failure
+        
