@@ -62,13 +62,13 @@ jobs:
           # Once we move to a runner that ships SDL3 natively (e.g.
           # ubuntu-26.04 LTS once it's available), the probe succeeds
           # and the PPA branch becomes a no-op.
-          if apt-cache show libsdl3-dev >/dev/null 2>&1; then
-            echo "::notice::libsdl3-dev available from official sources; skipping PPA"
-          else
-            echo "::notice::libsdl3-dev not in official sources; adding hrzhu/sdl3-backport PPA"
-            sudo add-apt-repository -y ppa:hrzhu/sdl3-backport
-            sudo apt-get update
-          fi
+          #if apt-cache show libsdl3-dev >/dev/null 2>&1; then
+          #  echo "::notice::libsdl3-dev available from official sources; skipping PPA"
+          #else
+          #  echo "::notice::libsdl3-dev not in official sources; adding hrzhu/sdl3-backport PPA"
+          #  sudo add-apt-repository -y ppa:hrzhu/sdl3-backport
+          #  sudo apt-get update
+          #fi
           bash installdeps
           if [ "${{ matrix.build_compiler }}" = clang ]; then
             sudo apt -y install clang
