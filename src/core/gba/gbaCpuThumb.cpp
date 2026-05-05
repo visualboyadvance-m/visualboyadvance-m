@@ -746,8 +746,16 @@ static INSN_REGPARM void thumbBreakpoint(uint32_t opcode)
 #ifndef ROR_RD_RS
 #define ROR_RD_RS                                                         \
     {                                                                     \
-        C_FLAG = (reg[dest].I >> (value - 1)) & 1 ? true : false;         \
-        value = ((reg[dest].I << (32 - value)) | (reg[dest].I >> value)); \
+        /* Real ARM ROR-by-Rs uses only the low 5 bits of Rs for the     \
+           rotation amount. Mask before the (32 - rot) and rot-shift     \
+           expressions so neither becomes UB on 32-bit types. The only   \
+           Thumb caller (thumb41_3) pre-masks `value` to 0..31 and       \
+           handles the value==0 case separately, so this is defensive    \
+           parity with the ARM-side ROR_BY_REG fix in gbaCpuArm.cpp      \
+           rather than a behavior change. */                             \
+        unsigned int rot = value & 0x1F;                                  \
+        C_FLAG = (reg[dest].I >> (rot - 1)) & 1 ? true : false;           \
+        value = ((reg[dest].I << (32 - rot)) | (reg[dest].I >> rot));     \
     }
 #endif
 #ifndef NEG_RD_RS

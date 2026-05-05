@@ -850,9 +850,19 @@ static void count(uint32_t opcode, int cond_res)
     unsigned int shift = reg[(opcode >> 8) & 15].B.B0;   \
     uint32_t rm = reg[opcode & 0x0F].I;                  \
     if (LIKELY(shift & 0x1F)) {                          \
+        /* Real ARM ROR-by-Rs uses only the low 5 bits   \
+           of Rs for the rotation amount. Reduce shift   \
+           here so the (32 - shift) subtraction never    \
+           underflows and the v >> shift never becomes   \
+           shift-by-32+ -- both of which are UB on 32-bit \
+           types and were caught by UBSan in the misc-   \
+           edge timing tests. The C output bit is taken  \
+           from the rotated-out bit, which on real HW is \
+           bit (Rs[4:0]-1) of Rm. */                     \
+        unsigned int rot = shift & 0x1F;                 \
         uint32_t v = rm;                                 \
-        C_OUT = (v >> (shift - 1)) & 1 ? true : false;   \
-        value = ((v << (32 - shift)) | (v >> shift));    \
+        C_OUT = (v >> (rot - 1)) & 1 ? true : false;     \
+        value = ((v << (32 - rot)) | (v >> rot));        \
     } else {                                             \
         value = rm;                                      \
         if (shift)                                       \
@@ -1220,8 +1230,8 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
 
 // ARM7TDMI publishes a deterministic (but not spec-documented) C flag
 // after UMULL/SMULL/UMLAL/SMLAL. The value arises from the carry path
-// inside the Booth multiplier, but the observable rule — derived by
-// exhaustively matching mGBA's 72 multiply-long test expectations —
+// inside the Booth multiplier, but the observable rule -- derived by
+// exhaustively matching mGBA's 72 multiply-long test expectations --
 // simplifies to the following closed form:
 //
 //   - If the cycle count `m` is 1 (Rs upper bytes are uniform for the
@@ -1231,12 +1241,12 @@ DEFINE_ALU_INSN_C(1F, 3F, MVNS, YES)
 //     the Booth encoder's sign interaction on the final iteration.
 //   - For UMULL/UMLAL with m > 1:
 //       * Rs == 0xFFFFFFFF: C = Rn[30] (special because the product's
-//         high word is (Rn − 1) in this case, shifting the relevant
+//         high word is (Rn - 1) in this case, shifting the relevant
 //         Booth carry bit down by one).
 //       * otherwise: C = Rn[31].
 //
 // The rule was validated against all 72 expected CPSRs in mGBA's
-// suite-master/src/multiply-long.c — see /tmp/booth_probe2.cpp history
+// suite-master/src/multiply-long.c -- see /tmp/booth_probe2.cpp history
 // for the empirical derivation.
 
 static inline int arm7_mull_m_cycles(uint32_t rs, bool sign_ext) {

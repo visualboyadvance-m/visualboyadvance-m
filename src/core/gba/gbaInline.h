@@ -21,6 +21,23 @@
 
 extern const uint32_t objTilesAddress[3];
 
+// HBLANK_TRACE: ad-hoc instrumentation gated at compile time. Default OFF
+// -- every `vbam_dbg_trace(...)` call site in gba.cpp / gbaInline.h
+// expands to `((void)0)` and is eliminated by the optimizer, so there is
+// zero runtime cost in normal builds.
+//
+// To enable: define VBAM_HB_TRACE (uncomment the line below, or pass
+// -DVBAM_HB_TRACE to the compiler). Output then goes to stderr on
+// Linux/macOS or to OutputDebugStringA (VS Output window) on Windows.
+// See the matching comment block in gba.cpp for the per-tag schema.
+//
+// #define VBAM_HB_TRACE
+#ifdef VBAM_HB_TRACE
+void vbam_dbg_trace(const char* tag, long long cyc, int extra);
+#else
+#define vbam_dbg_trace(tag, cyc, extra) ((void)0)
+#endif
+
 extern bool stopState;
 extern bool holdState;
 extern int holdType;
@@ -255,7 +272,14 @@ static inline uint32_t CPUReadMemory(uint32_t address)
     case REGION_SRAM:
     case REGION_SRAMEX:
         if (isSaveGame()) {
-            value = CPUReadBackup(address) * 0x01010101;
+            // Byte-broadcast: a 32-bit SRAM read returns the same byte in
+            // all four lanes. The cast to uint32_t is required for defined
+            // behavior -- without it, CPUReadBackup's uint8_t result is
+            // promoted to int and multiplying by 0x01010101 (16843009)
+            // overflows signed int for byte values >= 128. UBSan caught
+            // this; some MSVC codegen handles the overflow differently
+            // from GCC, which contributes to host-platform test divergence.
+            value = (uint32_t)CPUReadBackup(address) * 0x01010101u;
             break;
         }
 #ifdef GBA_LOGGING
@@ -375,7 +399,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 // Live timer-counter read using absolute cycles with precise
                 // reload-register semantics. The counter cycles with period
                 // (0x10000 - reloadAtEnable) until the first overflow, then
-                // with period (0x10000 - reloadNow) thereafter — matching real
+                // with period (0x10000 - reloadNow) thereafter -- matching real
                 // HW's "reload register is latched on overflow" behavior.
                 // The 2-cycle startup delay compensates for the write-handler
                 // snapshot happening at instruction START (real HW commits the
@@ -402,9 +426,11 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                     post %= period;
                     return (uint16_t)(reloadNow + (uint32_t)(post >> prescale));
                 };
-                if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On)
+                if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On) {
                     value = liveTimerRead(0, (uint16_t)timer0Reload, timer0ClockReload);
-                else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
+                    vbam_dbg_trace("tm0-read", cpuAbsCycle,
+                                   (int)(value & 0xFFFF));
+                } else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
                     value = liveTimerRead(1, (uint16_t)timer1Reload, timer1ClockReload);
                 else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
                     value = liveTimerRead(2, (uint16_t)timer2Reload, timer2ClockReload);
@@ -439,13 +465,13 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             // polling-loop iteration off (1004 vs ~1012, 228 vs ~221).
             // A direction-asymmetric pre-flip lookahead recovers the
             // alignment without shifting the underlying scanline:
-            //   HBlank=0 currently → about to flip ON (HDraw → HBlank
+            //   HBlank=0 currently -> about to flip ON (HDraw -> HBlank
             //                       transition, end of HDraw period):
             //                       +8 cycle lookahead, detect ~1 iter
             //                       earlier so HDraw measure shrinks.
-            //   HBlank=1 currently → about to flip OFF (HBlank → HDraw
+            //   HBlank=1 currently -> about to flip OFF (HBlank -> HDraw
             //                       transition, end of HBlank period):
-            //                       −6 cycle lookahead, detect ~1 iter
+            //                       -6 cycle lookahead, detect ~1 iter
             //                       later so HBlank measure grows.
             if ((address & 0x3fe) == IO_REG_DISPSTAT) {
                 const int64_t bias = (value & 2) ? -6 : 8;

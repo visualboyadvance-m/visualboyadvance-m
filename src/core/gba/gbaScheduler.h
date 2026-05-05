@@ -29,9 +29,27 @@ enum SchedulerEventType : uint32_t {
                                // so the scanline period in lcdTicks stays
                                // GBATEK-correct at 1008 + 224 = 1232 while
                                // the IRQ-to-IRQ measurement is 1233.
+    kSchedIrq            = 2,  // ARM IRQ delivery (and halt-wake). Scheduled
+                               // by CPUTestIRQ() whenever (IF & IE) becomes
+                               // non-zero, with a delay matching real-hw
+                               // ARM7TDMI exception entry: 8 cycles for a
+                               // first-IRQ entry (bus-latency + pipeline
+                               // fill), 3 cycles for a cascaded IRQ entry
+                               // (handler returned with another IF bit
+                               // already deliverable; bus-latency stage
+                               // already paid for the prior IRQ -- the
+                               // IRQRecentTicks countdown captures this
+                               // window for ~130 cycles). The dispatch
+                               // handler clears holdState UNCONDITIONALLY
+                               // (halt-wake is gated only on (IF & IE)
+                               // per GBATEK) and then, if IME and CPSR.I
+                               // permit, calls CPUInterrupt() to enter
+                               // the vector. Replaces the legacy
+                               // intState/IRQTicks state machine and the
+                               // end-of-CPULoop IRQ-delivery block.
     // Reserved for later phases:
     // kSchedLcdHdraw, kSchedLcdHblank, kSchedLcdVblank,
-    // kSchedTimer0..Timer3, kSchedSwi, kSchedIrq,
+    // kSchedTimer0..Timer3, kSchedSwi,
     kSchedCount          = 8   // upper bound of event-type values
 };
 
@@ -52,6 +70,12 @@ void Schedule(SchedulerEventType type, int32_t fromNow);
 
 // Cancel any pending event of the given type. No-op if none pending.
 void Cancel(SchedulerEventType type);
+
+// True if an event of this specific type is pending. Companion to
+// HasPending() (which is the any-type variant) and Cancel(type). Useful
+// for "schedule unless already scheduled" callers that don't want a
+// re-Schedule() to push the firing time back.
+bool IsScheduled(SchedulerEventType type);
 
 // True if at least one event is pending.
 bool HasPending();

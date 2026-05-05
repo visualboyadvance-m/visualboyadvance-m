@@ -46,6 +46,11 @@ void Cancel(SchedulerEventType type) {
     g_slots[type].active = false;
 }
 
+bool IsScheduled(SchedulerEventType type) {
+    if ((uint32_t)type >= (uint32_t)kSchedCount) return false;
+    return g_slots[type].active;
+}
+
 bool HasPending() {
     for (uint32_t i = 0; i < kSchedCount; ++i) {
         if (g_slots[i].active) return true;
