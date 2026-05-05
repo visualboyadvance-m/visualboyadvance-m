@@ -4224,7 +4224,9 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         const uint32_t mode       = (value >> 12) & 0x3u;
         const bool     start_edge = (value & 0x80) && !(old_siocnt & 0x80);
         const bool     internal   = (value & 0x01) != 0;
-        if (start_edge && rcnt_plain && internal && (mode == 0 || mode == 1)) {
+        const bool cycle_accurate_path =
+            start_edge && rcnt_plain && internal && (mode == 0 || mode == 1);
+        if (cycle_accurate_path) {
             const int bits    = (mode == 1) ? 32 : 8;
             const int per_bit = (value & 0x02) ? 8 : 64;
             // Real HW: the SIO controller holds the bus for one extra
@@ -4246,7 +4248,17 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 
         if (value & 0x80) {
             value &= 0xff7f;
-            if (value & 1 && (value & 0x4000)) {
+            // Only run the legacy "fire IRQ now" path when the cycle-
+            // accurate kSchedSio path is NOT handling this transfer.
+            // The cycle-accurate path covers Normal8/Normal32 with
+            // internal clock and plain RCNT; everything else (Multi,
+            // UART, external clock, GP/JOY RCNT modes) falls through
+            // to here. Without this guard, both paths run for
+            // Normal8/32 and the legacy IRQ raise dominates -- every
+            // SIO timing measurement comes back as a fixed ~94 cycles
+            // (just the SWI/handler dispatch latency) regardless of
+            // the programmed bit rate.
+            if (!cycle_accurate_path && (value & 1) && (value & 0x4000)) {
                 UPDATE_REG(COMM_SIOCNT, 0xFF);
                 IF |= 0x80;
                 UPDATE_REG(IO_REG_IF, IF);
@@ -4994,28 +5006,37 @@ void CPULoop(int ticks)
                     // Unified IRQ delivery + halt-wake. Replaces the legacy
                     // intState/IRQTicks state machine and the end-of-CPULoop
                     // delivery block. (See full design comment below.)
+                    //
+                    // was_halted is captured BEFORE the holdState clear below
+                    // so the trace can show whether this dispatch was waking
+                    // the CPU from halt or running with it already alive.
+                    // [[maybe_unused]] is belt-and-suspenders: the macro stub
+                    // for vbam_dbg_trace already references its arguments in
+                    // an unevaluated sizeof context (see gbaInline.h), so the
+                    // attribute is technically redundant, but keeps the
+                    // build robust against future macro refactors.
                     [[maybe_unused]] bool was_halted = holdState;
                     holdState = false;
                     stopState = false;
                     holdType  = 0;
-                    int outcome;  // 0=delivered, 1=no IF&IE, 2=no IME, 3=no armIrqEnable
-                    if (!(IF & IE)) {
-                        outcome = 1;
-                    } else if (!(IME & 1)) {
-                        outcome = 2;
-                    } else if (!armIrqEnable) {
-                        outcome = 3;
-                    } else {
+                    bool deliver = (IF & IE) && (IME & 1) && armIrqEnable;
+                    if (deliver) {
                         CPUInterrupt();
                         if (IF & 0x78) {
                             IRQRecentTicks = 130;
                         }
                         if (SWITicks)
                             SWITicks = 0;
-                        outcome = 0;
                     }
+                    // outcome encoding (low 4 bits of trace `extra`):
+                    //   0 = delivered, 1 = no IF&IE, 2 = no IME, 3 = no armIrqEnable
+                    // Inlined into the trace call so there's no named local
+                    // that could trip -Werror=unused-but-set-variable.
                     vbam_dbg_trace("dispatch-irq", cpuAbsCycle,
-                                   (outcome & 0xF) |
+                                   ((deliver ? 0
+                                     : !(IF & IE) ? 1
+                                     : !(IME & 1) ? 2
+                                     : 3) & 0xF) |
                                    ((was_halted ? 1 : 0) << 4) |
                                    ((IF & 0xFFFF) << 8) |
                                    (((int)IME & 1) << 24) |

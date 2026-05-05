@@ -35,7 +35,15 @@ extern const uint32_t objTilesAddress[3];
 #ifdef VBAM_HB_TRACE
 void vbam_dbg_trace(const char* tag, long long cyc, int extra);
 #else
-#define vbam_dbg_trace(tag, cyc, extra) ((void)0)
+// When trace is OFF, expand to an expression that references each argument
+// in an UNEVALUATED context (sizeof) so the compiler considers them "used"
+// without actually computing them at runtime. Without this, callers that
+// pre-compute trace-only values trip -Werror=unused-variable /
+// -Werror=unused-but-set-variable on builds compiled without
+// VBAM_HB_TRACE defined. The C++ standard guarantees sizeof's operand is
+// not evaluated, so this is zero-cost.
+#define vbam_dbg_trace(tag, cyc, extra) \
+    ((void)sizeof((tag)), (void)sizeof((cyc)), (void)sizeof((extra)))
 #endif
 
 extern bool stopState;
