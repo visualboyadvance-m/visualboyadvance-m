@@ -117,6 +117,16 @@ if(VBAM_FETCH_TEST_ROMS)
 
     set(_vbam_suite_gba "")
     foreach(_cand
+            # Vendored copy in the source tree takes priority over any
+            # rebuild attempt. Cycle-sensitive sub-tests (hblankBit,
+            # dmaPrefetch::Break) are tuned to a specific compiler
+            # output, so a fresh devkitARM build with newer GCC will
+            # drift expected vs measured by 1-2 cycles per polling
+            # iteration. Vendoring keeps the test deterministic across
+            # hosts and CI runners. Delete suite.gba/suite.elf and
+            # invoke the Docker/devkitARM rebuild path below to
+            # regenerate when upstream test source changes.
+            "${CMAKE_CURRENT_SOURCE_DIR}/suite.gba"
             "${_vbam_roms_dir}/mgba-suite/suite.gba"
             "${_vbam_roms_dir}/mgba-suite/build/suite.gba"
             "${_vbam_roms_dir}/suite.gba")
@@ -378,7 +388,7 @@ if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
     # Plus a separate fix: lcdNextEventAbsCycle is re-anchored per CPU
     # iteration so SWI cycle bumps don't accumulate it ahead of the
     # actual next-transition cycle.
-    set(VBAM_TEST_GBA_MIN_PASS 6400 CACHE STRING
+    set(VBAM_TEST_GBA_MIN_PASS 6407 CACHE STRING
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
