@@ -209,7 +209,15 @@ static constexpr int kNumSuites = sizeof(kSuites) / sizeof(kSuites[0]);
 //     that read OAM see corrupt values and fail.
 // Comment any reorder so the reason survives. Names must match kSuites[].
 static const char* const kExecutionOrderNames[] = {
+    // dma + misc-edge run before any test that leaves state dirty.
+    // misc-edge's dmaPrefetch is sub-cycle-phase-sensitive: any test that
+    // leaves a timer running (timers, timer-irq, sio-timing) or that
+    // perturbs the cumulative HBlank phase shifts the loop into a basin
+    // that catches a different DMA-fire residue, producing a wrong but
+    // deterministic break value. Real HW and NanoBoyAdvance exhibit the
+    // same fragility — fix is environmental, not in any one emulator.
     "dma",            // must run before memory (memory pollutes OAM mirror)
+    "misc-edge",      // must run before timers/sio-timing pollute cycle phase
     "memory",
     "io-read",
     "timing",
@@ -221,7 +229,6 @@ static const char* const kExecutionOrderNames[] = {
     "bios-math",
     "sio-read",
     "sio-timing",
-    "misc-edge",
     "video",
 };
 static constexpr int kExecutionOrderN =
