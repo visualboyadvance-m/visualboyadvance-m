@@ -51,7 +51,7 @@ jobs:
           Acquire::https::Timeout "30";
           EOF
 
-          find /etc/apt/sources* -type f | xargs sudo perl -pi -e 's/noble/questling/g'
+          find /etc/apt/sources* -type f | xargs sudo perl -pi -e 's/noble/questling/g; s/24[.]04/25.10/g'
           bash installdeps
           if [ "${{ matrix.build_options }}" = sdl2 ]; then
             sudo apt -y install libsdl2-dev
