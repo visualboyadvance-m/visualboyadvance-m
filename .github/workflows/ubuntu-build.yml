@@ -42,14 +42,24 @@ jobs:
         with:
           submodules: recursive
 
+      # Capture the Ubuntu codename into the workflow env context so
+      # cache keys can include it. The runner sets ImageOS / lsb_release
+      # in the *process* environment, but ${{ env.X }} only reads from
+      # workflow-defined env or values pushed via $GITHUB_ENV, so we
+      # have to bridge it explicitly. Result: env.UBUNTU_CODENAME is
+      # "noble" today and flips automatically when GitHub bumps
+      # ubuntu-latest to plucky / resolute / whatever's next.
+      - name: Detect Ubuntu codename
+        run: echo "UBUNTU_CODENAME=$(lsb_release -cs)" >> "$GITHUB_ENV"
+
       # Cache /var/cache/apt/archives across runs. apt downloads .debs
       # to this directory and consults it before fetching from the
       # network, so a populated cache turns most of installdeps' apt
       # work into local file reads — useful for shaving the 30–60s
       # archive.ubuntu.com fetch off otherwise-healthy runs. Keyed on
-      # ImageOS (e.g. "ubuntu24") so each Ubuntu release gets its own
-      # cache pool; when GitHub bumps ubuntu-latest from 24 to 26, the
-      # noble caches become unreachable from resolute jobs and evict
+      # the Ubuntu codename so each release gets its own cache pool;
+      # when GitHub bumps ubuntu-latest to a new release, the noble
+      # caches become unreachable from new-codename jobs and evict
       # cleanly after 7 days unused. The installdeps hash invalidates
       # the key whenever the script itself changes (new dep added,
       # version pin moved, etc.). The dedicated SDL3 cache below is
@@ -59,9 +69,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /var/cache/apt/archives
-          key: apt-${{ env.ImageOS }}-${{ hashFiles('installdeps') }}-v1
+          key: apt-${{ env.UBUNTU_CODENAME }}-${{ hashFiles('installdeps') }}-v1
           restore-keys: |
-            apt-${{ env.ImageOS }}-
+            apt-${{ env.UBUNTU_CODENAME }}-
 
       # All apt-related setup in one step: retry config, SDL3 source
       # probing, PPA registration. Outputs drive the cache restore key
