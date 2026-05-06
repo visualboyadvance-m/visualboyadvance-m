@@ -92,8 +92,13 @@ private:
     }
 };
 
-// Custom validator for the kDispScale option. We rely on the existing
-// wxFloatingPointValidator validator for this.
+// Custom validator for the kDispScale option.
+//
+// We extend wxFloatingPointValidator only for its UI plumbing (Clone(), the
+// numeric-key filter); parsing and formatting of the value are handled here so
+// the validator accepts both '.' and ',' as decimal separators regardless of
+// the user's locale. See
+// https://github.com/visualboyadvance-m/visualboyadvance-m/issues/836
 class ScaleValidator : public wxFloatingPointValidator<double>,
                        public config::Option::Observer {
 public:
@@ -113,16 +118,59 @@ public:
 private:
     // wxValidator implementation.
     bool TransferFromWindow() final {
-        if (!wxFloatingPointValidator<double>::TransferFromWindow()) {
+        wxTextCtrl* ctrl = wxDynamicCast(GetWindow(), wxTextCtrl);
+        if (!ctrl) {
+            // Not a text control? Fall back to base behavior.
+            if (!wxFloatingPointValidator<double>::TransferFromWindow()) {
+                wxLogWarning(_("Invalid value for Default magnification."));
+                return false;
+            }
+            return option()->SetDouble(value_);
+        }
+
+        wxString text = ctrl->GetValue();
+        text.Trim(true).Trim(false);
+        if (text.empty()) {
             wxLogWarning(_("Invalid value for Default magnification."));
             return false;
         }
+
+        // Accept either the C locale separator '.' or any system-locale
+        // separator ',' . wxFloatingPointValidator's own round-trip
+        // (format-with-locale -> parse-with-locale) is unreliable across
+        // wxWidgets versions when the user's display locale uses ',' and
+        // LC_NUMERIC disagrees -- the same string the validator wrote can
+        // be rejected on parse, which silently breaks the OK button.
+        double parsed = 0.0;
+        bool ok = text.ToDouble(&parsed);          // locale-aware
+        if (!ok) ok = text.ToCDouble(&parsed);     // C locale
+        if (!ok) {
+            wxString normalized = text;
+            normalized.Replace(wxT(","), wxT("."));
+            ok = normalized.ToCDouble(&parsed);
+        }
+        if (!ok) {
+            wxLogWarning(_("Invalid value for Default magnification."));
+            return false;
+        }
+        if (parsed < option()->GetDoubleMin() ||
+            parsed > option()->GetDoubleMax()) {
+            wxLogWarning(_("Invalid value for Default magnification."));
+            return false;
+        }
+        value_ = parsed;
         return option()->SetDouble(value_);
     }
 
     bool TransferToWindow() final {
         value_ = option()->GetDouble();
-        return wxFloatingPointValidator<double>::TransferToWindow();
+        // Format with the C locale ('.') unconditionally so the field never
+        // contains a separator the parse step might reject. wxString::FromCDouble
+        // is locale-independent.
+        wxTextCtrl* ctrl = wxDynamicCast(GetWindow(), wxTextCtrl);
+        if (!ctrl) return wxFloatingPointValidator<double>::TransferToWindow();
+        ctrl->ChangeValue(wxString::FromCDouble(value_, 1));
+        return true;
     };
 
 #if WX_HAS_VALIDATOR_SET_WINDOW_OVERRIDE
