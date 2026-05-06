@@ -7,7 +7,8 @@ jobs:
       matrix:
         build_compiler: [gcc, clang]
         build_type: [release, debug]
-        build_options: [default, sdl2, link_off, translations_only]
+#        build_options: [default, link_off, translations_only, libretro]
+        build_options: [default, link_off, translations_only]
         include:
           - cmake_compiler: '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
             build_compiler: gcc
@@ -17,12 +18,16 @@ jobs:
             build_type: release
           - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
             build_type: debug
-          - cmake_options: '-DENABLE_SDL3=OFF'
-            build_options: sdl2
           - cmake_options: '-DENABLE_LINK=OFF'
             build_options: link_off
           - cmake_options: '-DTRANSLATIONS_ONLY=ON'
             build_options: translations_only
+#          - libretro_build: 'DEBUG=0'
+#            build_type: release
+#            build_options: libretro
+#          - libretro_build: 'DEBUG=1'
+#            build_type: debug
+#            build_options: libretro
         exclude:
           # Exclude debug/translations_only build
           - build_type: debug
@@ -51,11 +56,20 @@ jobs:
           Acquire::https::Timeout "30";
           EOF
 
-          find /etc/apt/sources* -type f | xargs sudo perl -pi -e 's/noble/questling/g; s/24[.]04/25.10/g'
+          # Prefer SDL3 from official Ubuntu repos. SDL3 first landed in
+          # Ubuntu 25.04 (plucky); 24.04 LTS (noble) won't ever have it
+          # in main, so fall back to the hrzhu/sdl3-backport PPA there.
+          # Once we move to a runner that ships SDL3 natively (e.g.
+          # ubuntu-26.04 LTS once it's available), the probe succeeds
+          # and the PPA branch becomes a no-op.
+          #if apt-cache show libsdl3-dev >/dev/null 2>&1; then
+          #  echo "::notice::libsdl3-dev available from official sources; skipping PPA"
+          #else
+          #  echo "::notice::libsdl3-dev not in official sources; adding hrzhu/sdl3-backport PPA"
+          #  sudo add-apt-repository -y ppa:hrzhu/sdl3-backport
+          #  sudo apt-get update
+          #fi
           bash installdeps
-          if [ "${{ matrix.build_options }}" = sdl2 ]; then
-            sudo apt -y install libsdl2-dev
-          fi
           if [ "${{ matrix.build_compiler }}" = clang ]; then
             sudo apt -y install clang
           fi
@@ -103,6 +117,13 @@ jobs:
       - if: matrix.build_options != 'libretro'
         name: Install
         run: sudo ninja -C build install
+
+      # Libretro build
+#      - if: matrix.build_options == 'libretro'
+#        name: Build libretro core
+#        run: make -C src/libretro ${{ matrix.libretro_build }}
+
+      # Run tests
       - if: matrix.build_options == 'default'
         name: Run tests
         run: cd build && xvfb-run ctest -j --output-on-failure
