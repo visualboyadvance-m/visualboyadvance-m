@@ -42,21 +42,6 @@ jobs:
         with:
           submodules: recursive
 
-      # Configure apt-level retries upfront — every apt invocation in the
-      # job picks these up automatically (including the ones inside
-      # installdeps). 10 retries with 120s timeouts gives ~20 min of
-      # tolerance for a degraded Launchpad CDN before declaring a fetch
-      # dead. Real-world failure modes have been TCP-connect timeouts on
-      # ppa.launchpadcontent.net (185.125.190.80) lasting 2–10 minutes.
-      - name: Configure APT retries
-        run: |
-          sudo tee /etc/apt/apt.conf.d/80-vbam-retries >/dev/null <<'EOF'
-          Acquire::Retries "10";
-          Acquire::Retries::Delay "true";
-          Acquire::http::Timeout "120";
-          Acquire::https::Timeout "120";
-          EOF
-
       # Cache /var/cache/apt/archives across runs. apt downloads .debs
       # to this directory and consults it before fetching from the
       # network, so a populated cache turns most of installdeps' apt
@@ -78,170 +63,191 @@ jobs:
           restore-keys: |
             apt-${{ env.ImageOS }}-
 
-      # SDL3 lives in main on Ubuntu 25.04 (plucky) and later. On 24.04
-      # LTS (noble) it isn't there, so we fall back through a chain:
-      # PPA → cached debs → stale cached debs → SDL2.
-      - name: Probe for SDL3 in official sources
-        id: sdl3_official
+      # All apt-related setup in one step: retry config, SDL3 source
+      # probing, PPA registration. Outputs drive the cache restore key
+      # below and the install logic further down. Internal `::group::`
+      # markers create collapsible sections in the GHA log so this
+      # remains debuggable despite being one step.
+      - name: Resolve SDL3 source and configure apt
+        id: sdl3_meta
         run: |
+          # 10 retries with 120s timeouts gives ~20 min of tolerance for
+          # a degraded Launchpad CDN. Real-world failures have been
+          # TCP-connect timeouts on ppa.launchpadcontent.net lasting
+          # 2–10 minutes. Every apt invocation in the job picks this up
+          # automatically (including the ones inside installdeps).
+          echo "::group::Configure APT retries"
+          sudo tee /etc/apt/apt.conf.d/80-vbam-retries >/dev/null <<'EOF'
+          Acquire::Retries "10";
+          Acquire::Retries::Delay "true";
+          Acquire::http::Timeout "120";
+          Acquire::https::Timeout "120";
+          EOF
+          echo "::endgroup::"
+
+          # SDL3 lives in main on Ubuntu 25.04+ (plucky/resolute).
+          # On 24.04 LTS (noble) it isn't there, so we fall back through
+          # a chain: PPA → cached debs → stale cached debs → SDL2.
+          echo "::group::Probe for SDL3 in official sources"
           if apt-cache show libsdl3-dev >/dev/null 2>&1; then
             echo "::notice::SDL3 available in official archive; skipping PPA"
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "official_available=true" >> "$GITHUB_OUTPUT"
+            echo "version=" >> "$GITHUB_OUTPUT"
+            echo "ppa_reachable=false" >> "$GITHUB_OUTPUT"
+            echo "::endgroup::"
+            exit 0
           fi
+          echo "official_available=false" >> "$GITHUB_OUTPUT"
+          echo "::endgroup::"
 
-      # Add the PPA when SDL3 isn't in main. add-apt-repository runs
-      # `apt update` itself, so a separate update isn't needed.
-      # continue-on-error lets us drop into the cache-only branch when
-      # Launchpad is unreachable. apt-cache madison probes the candidate
-      # version; an empty result means the PPA's Packages index never
-      # landed (Launchpad index fetch failed even with retries).
-      - if: steps.sdl3_official.outputs.available == 'false'
-        name: Add hrzhu/sdl3-backport PPA and probe version
-        id: sdl3_ppa
-        continue-on-error: true
-        run: |
+          # add-apt-repository runs `apt update` itself, so a separate
+          # update isn't needed. apt-cache madison probes the candidate
+          # version; an empty result means the PPA's Packages index
+          # never landed (Launchpad index fetch failed even with
+          # retries). We don't `set -e` out on PPA failures — the
+          # `if ... ; then ... else ... fi` constructs handle them, and
+          # downstream steps fall through to cache-only or SDL2.
+          echo "::group::Add hrzhu/sdl3-backport PPA and probe version"
           if sudo add-apt-repository -y ppa:hrzhu/sdl3-backport; then
             ver=$(apt-cache madison libsdl3-dev 2>/dev/null \
                     | awk '/launchpadcontent/ {print $3; exit}')
             if [ -n "$ver" ]; then
               echo "::notice::PPA reachable; libsdl3-dev=$ver"
               echo "version=$ver" >> "$GITHUB_OUTPUT"
-              echo "reachable=true" >> "$GITHUB_OUTPUT"
+              echo "ppa_reachable=true" >> "$GITHUB_OUTPUT"
             else
               echo "::warning::PPA source added but apt-cache madison empty (Launchpad index fetch failed)"
               echo "version=unknown" >> "$GITHUB_OUTPUT"
-              echo "reachable=false" >> "$GITHUB_OUTPUT"
+              echo "ppa_reachable=false" >> "$GITHUB_OUTPUT"
             fi
           else
             echo "::warning::add-apt-repository failed; Launchpad unreachable"
             echo "version=unknown" >> "$GITHUB_OUTPUT"
-            echo "reachable=false" >> "$GITHUB_OUTPUT"
+            echo "ppa_reachable=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "::endgroup::"
 
-      # Restore the SDL3 deb cache. Exact-key match when the probe found
-      # a specific version; restore-keys fall back to ANY prior
+      # Restore the SDL3 deb cache. Exact-key match when the probe
+      # found a specific version; restore-keys fall back to ANY prior
       # sdl3-noble-* entry — that's the mechanism that makes the
       # "Launchpad down + we have an old cache" path work, since the
       # exact key (sdl3-noble-unknown) won't match anything but the
       # prefix-fallback will pull the most-recent cache available.
-      - if: steps.sdl3_official.outputs.available == 'false'
+      - if: steps.sdl3_meta.outputs.official_available == 'false'
         name: Restore SDL3 deb cache
         id: sdl3_cache
         uses: actions/cache/restore@v4
         with:
           path: /tmp/sdl3-debs
-          key: sdl3-noble-${{ steps.sdl3_ppa.outputs.version }}
+          key: sdl3-noble-${{ steps.sdl3_meta.outputs.version }}
           restore-keys: |
             sdl3-noble-
 
-      # Download fresh debs from the PPA only when (a) the PPA is
-      # reachable AND (b) we don't have an exact-key cache hit. Fuzzy
-      # restore-keys hits also pass this guard so a newer PPA upload
-      # supersedes an older cached version cleanly.
-      - if: steps.sdl3_official.outputs.available == 'false' && steps.sdl3_ppa.outputs.reachable == 'true' && steps.sdl3_cache.outputs.cache-hit != 'true'
-        name: Download SDL3 debs from PPA
+      # All install work in one step: download SDL3 fresh if needed,
+      # install SDL3 from cache or fall back to SDL2, run installdeps,
+      # add clang for clang matrix, install xvfb, then dedup and chown
+      # for the post-job cache save. Keeping it consolidated minimizes
+      # GHA UI clutter; `::group::` markers give debuggable structure
+      # in the log.
+      - name: Install dependencies
         run: |
-          mkdir -p /tmp/sdl3-debs
-          sudo apt-get install -y --download-only libsdl3-dev libsdl3-0
-          sudo cp /var/cache/apt/archives/libsdl3*.deb /tmp/sdl3-debs/
-          sudo chown -R "$USER" /tmp/sdl3-debs
-
-      # Save the cache only when we just downloaded a fresh,
-      # version-specific set of debs. Skipped when the restore was an
-      # exact-key hit (already cached under the right key) and when the
-      # PPA was unreachable (would create a bogus entry under "unknown").
-      - if: steps.sdl3_official.outputs.available == 'false' && steps.sdl3_ppa.outputs.reachable == 'true' && steps.sdl3_cache.outputs.cache-matched-key != format('sdl3-noble-{0}', steps.sdl3_ppa.outputs.version)
-        name: Save SDL3 deb cache
-        uses: actions/cache/save@v4
-        with:
-          path: /tmp/sdl3-debs
-          key: sdl3-noble-${{ steps.sdl3_ppa.outputs.version }}
-
-      # Install SDL3 from whatever we have, OR commit to the SDL2
-      # fallback. The four outcomes map onto distinct log messages so
-      # the chosen path is obvious from the run summary.
-      - name: Install SDL3 or commit to SDL2 fallback
-        id: sdl3_status
-        run: |
-          if [ "${{ steps.sdl3_official.outputs.available }}" = "true" ]; then
-            echo "::notice::SDL3 will install via installdeps from the official archive"
-            echo "outcome=sdl3_official" >> "$GITHUB_OUTPUT"
-            echo "fallback=false" >> "$GITHUB_OUTPUT"
-          elif [ -d /tmp/sdl3-debs ] && ls /tmp/sdl3-debs/*.deb >/dev/null 2>&1; then
-            if [ "${{ steps.sdl3_ppa.outputs.reachable }}" = "false" ]; then
-              echo "::warning::Launchpad unreachable — installing SDL3 from cached .debs (may be older than current PPA)"
-              echo "outcome=sdl3_cached_stale" >> "$GITHUB_OUTPUT"
-            elif [ "${{ steps.sdl3_cache.outputs.cache-hit }}" = "true" ]; then
-              echo "::notice::installing SDL3 from cache (exact version match for ${{ steps.sdl3_ppa.outputs.version }})"
-              echo "outcome=sdl3_cached_exact" >> "$GITHUB_OUTPUT"
-            else
-              echo "::notice::installing SDL3 from freshly downloaded PPA debs (${{ steps.sdl3_ppa.outputs.version }})"
-              echo "outcome=sdl3_fresh" >> "$GITHUB_OUTPUT"
-            fi
-            sudo dpkg -i /tmp/sdl3-debs/*.deb || sudo apt-get install -f -y
-            # Dedup: SDL3 .debs are preserved in the dedicated sdl3-noble-*
-            # cache via /tmp/sdl3-debs. Remove them from the general apt
-            # archives directory so they're not duplicated into the
-            # apt-${{ env.ImageOS }}-* cache too. installdeps' subsequent
-            # apt-get install for libsdl3-dev becomes a no-op (package
-            # already installed via dpkg above), so removing the .deb
-            # from /var/cache/apt/archives doesn't trigger a re-fetch.
-            # Also catches stale libsdl3*.deb pulled in from a prior
-            # general-cache restore, which self-cleans over a few runs.
-            sudo rm -f /var/cache/apt/archives/libsdl3*.deb
-            echo "fallback=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::SDL3 UNAVAILABLE from all sources — falling back to SDL2"
-            echo "::warning::  official archive: no libsdl3-dev"
-            echo "::warning::  PPA reachable: ${{ steps.sdl3_ppa.outputs.reachable }}"
-            echo "::warning::  cache: empty (no prior successful run to restore from)"
-            echo "::warning::Build will compile against SDL2 instead of SDL3."
-            # Remove the PPA source file so installdeps' `apt-cache search
-            # libsdl3-dev` returns empty and triggers its built-in SDL2
-            # codepath. Without this the source file is still present
-            # (just with no metadata) and installdeps may behave inconsistently.
-            sudo rm -f /etc/apt/sources.list.d/hrzhu-ubuntu-sdl3-backport-noble.sources
-            sudo apt-get update -qq || true
-            echo "outcome=sdl2_fallback" >> "$GITHUB_OUTPUT"
-            echo "fallback=true" >> "$GITHUB_OUTPUT"
+          # Download fresh debs from the PPA only when (a) the PPA is
+          # reachable AND (b) we don't have an exact-key cache hit.
+          # Fuzzy restore-keys hits also pass this guard so a newer PPA
+          # upload supersedes an older cached version cleanly.
+          if [ "${{ steps.sdl3_meta.outputs.official_available }}" = "false" ] && \
+             [ "${{ steps.sdl3_meta.outputs.ppa_reachable }}" = "true" ] && \
+             [ "${{ steps.sdl3_cache.outputs.cache-hit }}" != "true" ]; then
+            echo "::group::Download SDL3 debs from PPA"
+            mkdir -p /tmp/sdl3-debs
+            sudo apt-get install -y --download-only libsdl3-dev libsdl3-0
+            sudo cp /var/cache/apt/archives/libsdl3*.deb /tmp/sdl3-debs/
+            sudo chown -R "$USER" /tmp/sdl3-debs
+            echo "::endgroup::"
           fi
 
-      # installdeps does its own SDL3-vs-SDL2 detection via apt-cache
-      # search. In each path above we've left the apt environment in the
-      # state that makes its decision correct:
-      #   - sdl3_official: apt-cache shows libsdl3-dev → SDL3 install path.
-      #   - sdl3_cached_*/sdl3_fresh: libsdl3-dev already installed via
-      #     dpkg -i, PPA in apt sources, apt-cache shows it → SDL3 path,
-      #     and the install becomes a no-op for the lib itself.
-      #   - sdl2_fallback: PPA source removed, apt-cache empty for
-      #     libsdl3-dev → installdeps cleanly takes the SDL2 branch.
-      - name: Install remaining dependencies
-        run: |
-          echo "::notice::SDL3/SDL2 outcome: ${{ steps.sdl3_status.outputs.outcome }}"
-          if [ "${{ steps.sdl3_status.outputs.fallback }}" = "true" ]; then
+          # Install SDL3 from whatever we have, OR commit to SDL2 fallback.
+          # The five outcome strings map to distinct annotations so the
+          # path taken is obvious from the run summary alone.
+          echo "::group::Install SDL3 or commit to SDL2 fallback"
+          if [ "${{ steps.sdl3_meta.outputs.official_available }}" = "true" ]; then
+            echo "::notice::SDL3/SDL2 outcome: sdl3_official (will install via installdeps from official archive)"
+            FALLBACK=false
+          elif [ -d /tmp/sdl3-debs ] && ls /tmp/sdl3-debs/*.deb >/dev/null 2>&1; then
+            if [ "${{ steps.sdl3_meta.outputs.ppa_reachable }}" = "false" ]; then
+              echo "::warning::SDL3/SDL2 outcome: sdl3_cached_stale — Launchpad unreachable, installing from cache (may be older than current PPA)"
+            elif [ "${{ steps.sdl3_cache.outputs.cache-hit }}" = "true" ]; then
+              echo "::notice::SDL3/SDL2 outcome: sdl3_cached_exact (version ${{ steps.sdl3_meta.outputs.version }})"
+            else
+              echo "::notice::SDL3/SDL2 outcome: sdl3_fresh (downloaded ${{ steps.sdl3_meta.outputs.version }} from PPA)"
+            fi
+            sudo dpkg -i /tmp/sdl3-debs/*.deb || sudo apt-get install -f -y
+            # Dedup: remove SDL3 .debs from the general apt-archives
+            # cache. They live in the dedicated sdl3-noble-* cache via
+            # /tmp/sdl3-debs. Removing them from /var/cache/apt/archives
+            # keeps them out of the apt-${ImageOS}-* snapshot. Also
+            # catches stale libsdl3*.deb pulled in from a prior
+            # general-cache restore, which self-cleans over a few runs.
+            sudo rm -f /var/cache/apt/archives/libsdl3*.deb
+            FALLBACK=false
+          else
+            echo "::warning::SDL3/SDL2 outcome: sdl2_fallback — SDL3 UNAVAILABLE from all sources"
+            echo "::warning::  official archive: no libsdl3-dev"
+            echo "::warning::  PPA reachable: ${{ steps.sdl3_meta.outputs.ppa_reachable }}"
+            echo "::warning::  cache: empty (no prior successful run to restore from)"
+            echo "::warning::Build will compile against SDL2 instead of SDL3."
+            # Remove the PPA source file so installdeps' apt-cache
+            # search returns empty for libsdl3-dev and triggers its
+            # built-in SDL2 codepath. Without this the source file is
+            # still present (just with no metadata) and installdeps
+            # may behave inconsistently.
+            sudo rm -f /etc/apt/sources.list.d/hrzhu-ubuntu-sdl3-backport-noble.sources
+            sudo apt-get update -qq || true
+            FALLBACK=true
+          fi
+          echo "::endgroup::"
+
+          # installdeps does its own SDL3-vs-SDL2 detection via
+          # apt-cache search. The branches above leave the apt
+          # environment in the state that makes its decision correct
+          # in each path: official has libsdl3-dev visible; PPA paths
+          # have it pre-installed via dpkg -i; SDL2-fallback has the
+          # PPA source removed so apt-cache returns empty.
+          echo "::group::installdeps + clang + xvfb"
+          if [ "$FALLBACK" = "true" ]; then
             echo "::warning::SDL2 FALLBACK ACTIVE — see prior warnings for cause"
           fi
           bash installdeps
           if [ "${{ matrix.build_compiler }}" = clang ]; then
             sudo apt -y install clang
           fi
+          sudo apt -y install xvfb
+          echo "::endgroup::"
 
-      # De-duplicate the SDL3 .debs out of the general apt-archives
-      # cache. They live in the dedicated sdl3-noble-* cache (which is
-      # the resilient fallback when Launchpad is down); having them
-      # also captured in the general apt-${ImageOS}-* cache snapshot
-      # wastes a few MB per entry across all branches and contributes
-      # to the 10 GB repo cache cap. The post-job actions/cache save
-      # snapshots /var/cache/apt/archives at job-end, so deleting here
-      # — after installdeps has already consumed them — keeps them out
-      # of the snapshot without affecting this run.
-      - name: Drop SDL3 debs from general apt cache (deduplication)
-        run: sudo rm -f /var/cache/apt/archives/libsdl3*.deb
+          # Make /var/cache/apt/archives readable to the runner user
+          # before the post-job actions/cache save fires. apt sets
+          # `lock` and `partial/` to _apt:root with restrictive modes
+          # (0640 / 0700) which the unprivileged tar in the cache
+          # action can't read, causing the entire save to fail with
+          # exit 2 even though the .deb files themselves are
+          # world-readable. apt re-asserts its own ownership on the
+          # next install, so this is a one-shot prep for the snapshot.
+          echo "::group::Prep apt-archives for post-job cache save"
+          sudo chown -R "$USER:$USER" /var/cache/apt/archives
+          echo "::endgroup::"
 
-      - name: Install xvfb
-        run: sudo apt -y install xvfb
+      # Save the SDL3 deb cache only when we just downloaded a fresh,
+      # version-specific set of debs. Skipped when the restore was an
+      # exact-key hit (already cached under the right key) and when
+      # the PPA was unreachable (would create a bogus entry under the
+      # "unknown" sentinel).
+      - if: steps.sdl3_meta.outputs.official_available == 'false' && steps.sdl3_meta.outputs.ppa_reachable == 'true' && steps.sdl3_cache.outputs.cache-matched-key != format('sdl3-noble-{0}', steps.sdl3_meta.outputs.version)
+        name: Save SDL3 deb cache
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/sdl3-debs
+          key: sdl3-noble-${{ steps.sdl3_meta.outputs.version }}
+
 
       # Ensure Docker is available — CMake's auto-fetch path runs the
       # official `devkitpro/devkitarm` image to build mGBA's suite.gba
