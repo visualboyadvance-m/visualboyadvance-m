@@ -388,7 +388,7 @@ if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
     # Plus a separate fix: lcdNextEventAbsCycle is re-anchored per CPU
     # iteration so SWI cycle bumps don't accumulate it ahead of the
     # actual next-transition cycle.
-    set(VBAM_TEST_GBA_MIN_PASS 6410 CACHE STRING
+    set(VBAM_TEST_GBA_MIN_PASS 6415 CACHE STRING
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
