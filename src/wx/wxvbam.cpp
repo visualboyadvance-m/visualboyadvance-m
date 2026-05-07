@@ -575,10 +575,20 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
     wxFileName fn(path);
 
     if (fn.IsRelative()) {
+#ifdef __WXMSW__
+        // Anchor to the exe directory on Windows so file-association
+        // launches (which set CWD to the opened file's directory) don't
+        // change where relative config paths resolve.
+        const wxFileName exe(wxStandardPaths::Get().GetExecutablePath());
+        fn.MakeAbsolute(exe.GetPath());
+        fn.Normalize(wxPATH_NORM_ENV_VARS | wxPATH_NORM_DOTS | wxPATH_NORM_TILDE |
+                     wxPATH_NORM_CASE | wxPATH_NORM_LONG | wxPATH_NORM_SHORTCUT);
+#else
         fn.MakeRelativeTo(GetConfigurationPath());
         fn.Normalize(wxPATH_NORM_ENV_VARS | wxPATH_NORM_DOTS | wxPATH_NORM_TILDE |
                      wxPATH_NORM_CASE | wxPATH_NORM_ABSOLUTE | wxPATH_NORM_LONG |
                      wxPATH_NORM_SHORTCUT);
+#endif
         return fn.GetFullPath();
     }
 

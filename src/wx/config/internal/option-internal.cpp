@@ -506,19 +506,19 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"General/AutoLoadLastState", "", _("Automatically load last saved state")},
     OptionData{"General/BatteryDir", "",
                _("Directory to store game save files (relative paths are "
-                 "relative to ROM; blank is config dir)")},
+                 "relative to the executable; blank is ROM dir)")},
     OptionData{"General/FreezeRecent", "", _("Freeze recent load list")},
     OptionData{"General/RecordingDir", "",
                _("Directory to store A / V and game recordings (relative paths "
-                 "are relative to ROM)")},
+                 "paths are relative to the executable; blank is ROM dir)")},
     OptionData{"General/RewindInterval", "",
                _("Number of seconds between rewind snapshots (0 to disable)")},
     OptionData{"General/ScreenshotDir", "",
                _("Directory to store screenshots (relative paths are relative "
-                 "to ROM)")},
+                 "to the executable; blank is ROM dir)")},
     OptionData{"General/StateDir", "",
                _("Directory to store saved state files (relative paths are "
-                 "relative to BatteryDir)")},
+                 "relative to the executable; blank is ROM dir)")},
     OptionData{"General/StatusBar", "StatusBar", _("Enable status bar")},
     OptionData{"General/IniVersion", "", _("INI file version (DO NOT MODIFY)")},
 
