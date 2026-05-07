@@ -199,7 +199,21 @@ static void toggleBitVar(bool *menuValue, int *globalVar, int mask)
 EVT_HANDLER(wxID_OPEN, "Open ROM...")
 {
     static int open_ft = 0;
+    static wxString last_gba_picked_dir;
     const wxString gba_rom_dir = OPTION(kGBAROMDir);
+
+    // Hold Shift while invoking this menu item (or its accelerator) to
+    // open at the last directory a file was actually picked from,
+    // instead of the configured ROM directory.
+    const bool use_remembered =
+        wxGetKeyState(WXK_SHIFT) && !last_gba_picked_dir.empty();
+
+    wxString start_dir;
+    if (use_remembered) {
+        start_dir = last_gba_picked_dir;
+    } else if (!gba_rom_dir.empty()) {
+        start_dir = wxGetApp().GetAbsolutePath(gba_rom_dir);
+    }
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
@@ -221,16 +235,18 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
         "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
 
-    wxFileDialog dlg(this, _("Open ROM file"), gba_rom_dir, "",
+    wxFileDialog dlg(this, _("Open ROM file"), start_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
-    SetGenericPath(dlg, gba_rom_dir);
+    SetGenericPath(dlg, start_dir);
 
     dlg.SetFilterIndex(open_ft);
 
-    if (ShowModal(&dlg) == wxID_OK)
+    if (ShowModal(&dlg) == wxID_OK) {
+        last_gba_picked_dir = dlg.GetDirectory();
         wxGetApp().pending_load = dlg.GetPath();
+    }
 
     open_ft = dlg.GetFilterIndex();
     if (gba_rom_dir.empty()) {
@@ -241,7 +257,18 @@ EVT_HANDLER(wxID_OPEN, "Open ROM...")
 EVT_HANDLER(OpenGB, "Open GB...")
 {
     static int open_ft = 0;
+    static wxString last_gb_picked_dir;
     const wxString gb_rom_dir = OPTION(kGBROMDir);
+
+    const bool use_remembered =
+        wxGetKeyState(WXK_SHIFT) && !last_gb_picked_dir.empty();
+
+    wxString start_dir;
+    if (use_remembered) {
+        start_dir = last_gb_picked_dir;
+    } else if (!gb_rom_dir.empty()) {
+        start_dir = wxGetApp().GetAbsolutePath(gb_rom_dir);
+    }
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
@@ -254,15 +281,17 @@ EVT_HANDLER(OpenGB, "Open GB...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
-    wxFileDialog dlg(this, _("Open GB ROM file"), gb_rom_dir, "",
+    wxFileDialog dlg(this, _("Open GB ROM file"), start_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
 
-    SetGenericPath(dlg, gb_rom_dir);
+    SetGenericPath(dlg, start_dir);
 
-    if (ShowModal(&dlg) == wxID_OK)
+    if (ShowModal(&dlg) == wxID_OK) {
+        last_gb_picked_dir = dlg.GetDirectory();
         wxGetApp().pending_load = dlg.GetPath();
+    }
 
     open_ft = dlg.GetFilterIndex();
     if (gb_rom_dir.empty()) {
@@ -273,7 +302,18 @@ EVT_HANDLER(OpenGB, "Open GB...")
 EVT_HANDLER(OpenGBC, "Open GBC...")
 {
     static int open_ft = 0;
+    static wxString last_gbc_picked_dir;
     const wxString gbc_rom_dir = OPTION(kGBGBCROMDir);
+
+    const bool use_remembered =
+        wxGetKeyState(WXK_SHIFT) && !last_gbc_picked_dir.empty();
+
+    wxString start_dir;
+    if (use_remembered) {
+        start_dir = last_gbc_picked_dir;
+    } else if (!gbc_rom_dir.empty()) {
+        start_dir = wxGetApp().GetAbsolutePath(gbc_rom_dir);
+    }
 
     // FIXME: ignore if non-existent or not a dir
     wxString pats = _(
@@ -286,15 +326,17 @@ EVT_HANDLER(OpenGBC, "Open GBC...")
         "*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;"
         "*.tar;*.zip;*.7z;*.rar|");
     pats.append(wxALL_FILES);
-    wxFileDialog dlg(this, _("Open GBC ROM file"), gbc_rom_dir, "",
+    wxFileDialog dlg(this, _("Open GBC ROM file"), start_dir, "",
         pats,
         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     dlg.SetFilterIndex(open_ft);
 
-    SetGenericPath(dlg, gbc_rom_dir);
+    SetGenericPath(dlg, start_dir);
 
-    if (ShowModal(&dlg) == wxID_OK)
+    if (ShowModal(&dlg) == wxID_OK) {
+        last_gbc_picked_dir = dlg.GetDirectory();
         wxGetApp().pending_load = dlg.GetPath();
+    }
 
     open_ft = dlg.GetFilterIndex();
     if (gbc_rom_dir.empty()) {
