@@ -297,15 +297,15 @@ msgstr "Som desativado"
 
 #: cmdevents.cpp:1936
 msgid "Run Lua script"
-msgstr ""
+msgstr "Executar o script do Lua"
 
 #: cmdevents.cpp:1937
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Scripts do Lua (*.lua)|*.lua|Todos os arquivos|*"
 
 #: cmdevents.cpp:1945
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "O script do Lua falhou ao carregar — veja o console"
 
 #: cmdevents.cpp:1980
 msgid "Set to 0 for pseudo tty"
@@ -1936,7 +1936,7 @@ msgstr "Carregar automaticamente o último state salvo"
 msgid ""
 "Directory to store game save files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Diretório pra armazenar os arquivos dos saves dos jogos (os caminhos relativos são relativos ao executável; em branco é o diretório das ROMs)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:510
 msgid "Freeze recent load list"
@@ -1946,7 +1946,7 @@ msgstr "Congelar a lista dos carregados recentes"
 msgid ""
 "Directory to store A / V and game recordings (relative paths paths are "
 "relative to the executable; blank is ROM dir)"
-msgstr ""
+msgstr "Diretório pra armazenar as gravações dos jogos e A/V (os caminhos relativos são relativos ao executável, em branco é o diretório das ROMs)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
 msgid "Number of seconds between rewind snapshots (0 to disable)"
@@ -1956,13 +1956,13 @@ msgstr "Número de segundos entre snapshots de rebobinamento (0 pra desativar)"
 msgid ""
 "Directory to store screenshots (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Diretório pra armazenar as screenshots (os caminhos relativos são relativos ao executável, em branco é o diretório das ROMs)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
 msgid ""
 "Directory to store saved state files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Diretório pra armazenar os arquivos dos states salvos (os caminhos relativos são relativos ao executável; em branco é o diretório das ROMs)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 msgid "Enable status bar"
@@ -4398,23 +4398,23 @@ msgstr "V&isualizador de Memória..."
 
 #: xrc/MainMenu.xrc:630
 msgid "L&ua scripting"
-msgstr ""
+msgstr "S&cripting do Lua"
 
 #: xrc/MainMenu.xrc:632
 msgid "&Run script..."
-msgstr ""
+msgstr "&Executar script..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&Stop script"
-msgstr ""
+msgstr "&Parar Script"
 
 #: xrc/MainMenu.xrc:639
 msgid "Show &console"
-msgstr ""
+msgstr "Mostrar &console"
 
 #: xrc/MainMenu.xrc:642
 msgid "Show &editor"
-msgstr ""
+msgstr "Mostrar &editor"
 
 #: xrc/MainMenu.xrc:646
 msgid "&OAM Viewer..."
