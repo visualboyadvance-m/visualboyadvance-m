@@ -952,6 +952,12 @@ set(
     xrc/DirectoriesConfig.xrc
     xrc/Disassemble.xrc
     xrc/DisplayConfig.xrc
+    xrc/DisplayConfigBasic.xrc
+    xrc/DisplayConfigBitDepth.xrc
+    xrc/DisplayConfigColorCorrection.xrc
+    xrc/DisplayConfigOSD.xrc
+    xrc/DisplayConfigSpeed.xrc
+    xrc/DisplayConfigZoom.xrc
     xrc/ExportSPS.xrc
     xrc/GBAROMInfo.xrc
     xrc/GBColorPrefPanel.xrc
@@ -963,10 +969,18 @@ set(
     xrc/GBROMInfo.xrc
     xrc/GBTileViewer.xrc
     xrc/GameBoyAdvanceConfig.xrc
+    xrc/GameBoyAdvanceConfigBootRom.xrc
+    xrc/GameBoyAdvanceConfigGameOverrides.xrc
+    xrc/GameBoyAdvanceConfigSaveType.xrc
     xrc/GameBoyConfig.xrc
+    xrc/GameBoyConfigBootRom.xrc
+    xrc/GameBoyConfigCustomColors.xrc
+    xrc/GameBoyConfigSystem.xrc
     xrc/GeneralConfig.xrc
     xrc/IOViewer.xrc
     xrc/JoyPanel.xrc
+    xrc/JoyPanelSpecial.xrc
+    xrc/JoyPanelStandard.xrc
     xrc/JoypadConfig.xrc
     xrc/LinkConfig.xrc
     xrc/Logging.xrc
@@ -980,6 +994,10 @@ set(
     xrc/OAMViewer.xrc
     xrc/PaletteViewer.xrc
     xrc/SoundConfig.xrc
+    xrc/SoundConfigAdvanced.xrc
+    xrc/SoundConfigBasic.xrc
+    xrc/SoundConfigGameBoy.xrc
+    xrc/SoundConfigGameBoyAdvance.xrc
     xrc/TileViewer.xrc
     xrc/SpeedupConfig.xrc
 )

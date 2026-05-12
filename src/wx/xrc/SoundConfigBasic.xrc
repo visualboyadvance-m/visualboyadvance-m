@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="SoundConfigBasicPanel">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText">
+          <label>Volume:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <object class="wxSlider" name="Volume">
+              <value>100</value>
+              <min>0</min>
+              <max>200</max>
+            </object>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Mute</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <object class="spacer">
+                <option>1</option>
+                <flag>wxEXPAND</flag>
+              </object>
+              <object class="sizeritem">
+                <object class="wxButton" name="Volume100">
+                  <label translate="0">100%</label>
+                </object>
+              </object>
+              <object class="spacer">
+                <option>1</option>
+                <flag>wxEXPAND</flag>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText">
+                  <label>Maximum</label>
+                </object>
+                <flag>wxALL</flag>
+                <border>5</border>
+              </object>
+              <orient>wxHORIZONTAL</orient>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <orient>wxVERTICAL</orient>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText">
+          <label>Sample rate:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxChoice" name="Rate">
+          <content>
+            <item>48 KHz</item>
+            <item>44.1 KHz</item>
+            <item>22 KHz</item>
+            <item>11 KHz</item>
+          </content>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <cols>2</cols>
+      <growablecols>1</growablecols>
+    </object>
+  </object>
+</resource>

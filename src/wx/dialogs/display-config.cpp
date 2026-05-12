@@ -10,7 +10,9 @@
 #include <wx/dynlib.h>
 #include <wx/filepicker.h>
 #include <wx/log.h>
+#include <wx/notebook.h>
 #include <wx/object.h>
+#include <wx/panel.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/textctrl.h>
@@ -396,6 +398,7 @@ DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
 
 DisplayConfig::DisplayConfig(wxWindow* parent)
     : BaseDialog(parent, "DisplayConfig"),
+      tab_loaded_(kTabCount, false),
       filter_observer_(config::OptionID::kDispFilter,
                        std::bind(&DisplayConfig::OnFilterChanged,
                                  this,
@@ -404,30 +407,60 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                            std::bind(&DisplayConfig::OnInterframeChanged,
                                      this,
                                      std::placeholders::_1)) {
-    GetValidatedChild("BitDepth")
-        ->SetValidator(
-            widgets::OptionChoiceValidator(config::OptionID::kBitDepth));
+    notebook_ = GetValidatedChild<wxNotebook>("DisplayConfigNotebook");
 
-    // Speed
-    GetValidatedChild("FrameSkip")
-        ->SetValidator(
-            widgets::OptionIntValidator(config::OptionID::kPrefFrameSkip));
+    Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShowEvent, this, GetId());
+}
 
-    // On-Screen Display
-    GetValidatedChild("SpeedIndicator")
-        ->SetValidator(
-            widgets::OptionChoiceValidator(config::OptionID::kPrefShowSpeed));
+bool DisplayConfig::LoadLazyTab(int index) {
+    if (index < 0 || index >= kTabCount || tab_loaded_[index]) {
+        return false;
+    }
 
-    // Zoom
-    GetValidatedChild("DefaultScale")->SetValidator(ScaleValidator());
+    // Tabs must be added in order (0, 1, 2, ...) because we use
+    // wxNotebook::AddPage. The preload queue and OnFirstShow both load in
+    // ascending order, so this holds.
+    if (index != static_cast<int>(notebook_->GetPageCount())) {
+        // Out-of-order request: load any earlier missing tabs first.
+        for (int i = 0; i < index; ++i) {
+            if (!tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
 
-    // this was a choice, but I'd rather not have to make an off-by-one
-    // validator just for this, and spinctrl is good enough.
-    GetValidatedChild("MaxScale")
-        ->SetValidator(wxGenericValidator(&gopts.max_scale));
+    struct TabSpec {
+        const wxChar* xrc_name;
+        const wxChar* tab_label;
+        void (DisplayConfig::*init)();
+    };
+    static const TabSpec kSpecs[kTabCount] = {
+        {wxT("DisplayConfigBasicPanel"),           wxT("Basic"),           &DisplayConfig::InitBasicTab},
+        {wxT("DisplayConfigBitDepthPanel"),        wxT("Bit Depth"),       &DisplayConfig::InitBitDepthTab},
+        {wxT("DisplayConfigColorCorrectionPanel"), wxT("Color Correction"),&DisplayConfig::InitColorCorrectionTab},
+        {wxT("DisplayConfigSpeedPanel"),           wxT("Speed"),           &DisplayConfig::InitSpeedTab},
+        {wxT("DisplayConfigOSDPanel"),             wxT("On-Screen Display"),&DisplayConfig::InitOSDTab},
+        {wxT("DisplayConfigZoomPanel"),            wxT("Zoom"),            &DisplayConfig::InitZoomTab},
+    };
 
-    // Basic
-    wxWindow *render_method = GetValidatedChild("OutputSimple");
+    const TabSpec& spec = kSpecs[index];
+    wxPanel* panel = wxXmlResource::Get()->LoadPanel(notebook_, spec.xrc_name);
+    if (!panel) {
+        wxLogError(_("Failed to load DisplayConfig tab '%s'"), spec.xrc_name);
+        return false;
+    }
+    notebook_->AddPage(panel, wxGetTranslation(spec.tab_label));
+    tab_loaded_[index] = true;
+    (this->*spec.init)();
+
+    // Re-fit: page count just changed.
+    Fit();
+    return true;
+}
+
+void DisplayConfig::InitBasicTab() {
+    // Render-method radio buttons.
+    wxWindow* render_method = GetValidatedChild("OutputSimple");
     render_method->SetValidator(RenderValidator(config::RenderMethod::kSimple));
 
     render_method = GetValidatedChild("OutputSDL");
@@ -450,7 +483,6 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #ifdef NO_OGL
     GetValidatedChild("OutputOpenGL")->Hide();
 #elif defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
-    // wxGLCanvas segfaults on Wayland before wx 3.2.
     if (IsWayland()) {
         GetValidatedChild("OutputOpenGL")->Hide();
     } else {
@@ -460,10 +492,9 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #else
     render_method = GetValidatedChild("OutputOpenGL");
     render_method->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
-#endif  // NO_OGL
+#endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
-    // Enable the Direct3D option on Windows.
     render_method = GetValidatedChild("OutputDirect3D");
     render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));
 #else
@@ -471,7 +502,6 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D12)
-    // Enable the Direct3D option on Windows.
     render_method = GetValidatedChild("OutputDirect3D12");
     render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d12));
 #else
@@ -479,7 +509,6 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
 #endif
 
 #ifndef NO_VULKAN
-    // Enable the Direct3D option on Windows.
     render_method = GetValidatedChild("OutputVulkan");
     render_method->SetValidator(RenderValidator(config::RenderMethod::kVulkan));
 #else
@@ -499,7 +528,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
             widgets::OptionBoolValidator(config::OptionID::kDispSDLPixelArt));
 #endif
 
-    // Bind event handlers to all output module radio buttons
+    // Bind event handlers to all output module radio buttons.
     GetValidatedChild("OutputSimple")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
     GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
@@ -528,6 +557,37 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
 
+    // Filter / plugin selectors.
+    filter_selector_ = GetValidatedChild<wxChoice>("Filter");
+    filter_selector_->SetValidator(FilterValidator());
+    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
+
+    plugin_dir_label_ = GetValidatedChild<wxControl>("PluginDirLab");
+    plugin_dir_picker_ = GetValidatedChild<wxDirPickerCtrl>("PluginDir");
+    plugin_label_ = GetValidatedChild<wxControl>("PluginLab");
+    plugin_selector_ = GetValidatedChild<wxChoice>("Plugin");
+    plugin_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::OnPluginSelected, this);
+
+    const wxString config_plugin_dir = OPTION(kDispPluginDir);
+    if (!config_plugin_dir.empty()) {
+        plugin_dir_picker_->SetPath(config_plugin_dir);
+    } else {
+        plugin_dir_picker_->SetPath(wxGetApp().GetPluginsDir());
+    }
+
+    plugin_dir_picker_->Bind(wxEVT_DIRPICKER_CHANGED, &DisplayConfig::OnPluginDirChanged, this);
+
+    interframe_selector_ = GetValidatedChild<wxChoice>("IFB");
+    interframe_selector_->SetValidator(InterframeValidator());
+}
+
+void DisplayConfig::InitBitDepthTab() {
+    GetValidatedChild("BitDepth")
+        ->SetValidator(
+            widgets::OptionChoiceValidator(config::OptionID::kBitDepth));
+}
+
+void DisplayConfig::InitColorCorrectionTab() {
     wxWindow* color_profile_srgb = GetValidatedChild("ColorProfileSRGB");
     color_profile_srgb->SetValidator(
         ColorCorrectionProfileValidator(config::ColorCorrectionProfile::kSRGB));
@@ -565,36 +625,24 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     gbc_lighten_slider->SetToolTip(wxString::Format("%d", gbc_lighten_slider->GetValue()));
     gbc_lighten_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gbc_lighten_slider, std::placeholders::_1));
     gbc_lighten_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gbc_lighten_slider, std::placeholders::_1));
+}
 
-    filter_selector_ = GetValidatedChild<wxChoice>("Filter");
-    filter_selector_->SetValidator(FilterValidator());
-    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
+void DisplayConfig::InitSpeedTab() {
+    GetValidatedChild("FrameSkip")
+        ->SetValidator(
+            widgets::OptionIntValidator(config::OptionID::kPrefFrameSkip));
+}
 
-    // These are filled and/or hidden at dialog load time.
-    plugin_dir_label_ = GetValidatedChild<wxControl>("PluginDirLab");
-    plugin_dir_picker_ = GetValidatedChild<wxDirPickerCtrl>("PluginDir");
-    plugin_label_ = GetValidatedChild<wxControl>("PluginLab");
-    plugin_selector_ = GetValidatedChild<wxChoice>("Plugin");
-    plugin_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::OnPluginSelected, this);
+void DisplayConfig::InitOSDTab() {
+    GetValidatedChild("SpeedIndicator")
+        ->SetValidator(
+            widgets::OptionChoiceValidator(config::OptionID::kPrefShowSpeed));
+}
 
-    // Set initial plugin directory from config
-    const wxString config_plugin_dir = OPTION(kDispPluginDir);
-    if (!config_plugin_dir.empty()) {
-        plugin_dir_picker_->SetPath(config_plugin_dir);
-    } else {
-        plugin_dir_picker_->SetPath(wxGetApp().GetPluginsDir());
-    }
-
-    // Bind event to reload plugins when directory changes
-    plugin_dir_picker_->Bind(wxEVT_DIRPICKER_CHANGED, &DisplayConfig::OnPluginDirChanged, this);
-
-    interframe_selector_ = GetValidatedChild<wxChoice>("IFB");
-    interframe_selector_->SetValidator(InterframeValidator());
-
-    Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShowEvent, this, GetId());
-
-    // Finally, fit everything nicely.
-    Fit();
+void DisplayConfig::InitZoomTab() {
+    GetValidatedChild("DefaultScale")->SetValidator(ScaleValidator());
+    GetValidatedChild("MaxScale")
+        ->SetValidator(wxGenericValidator(&gopts.max_scale));
 }
 
 void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
@@ -633,6 +681,8 @@ void DisplayConfig::PopulatePluginOptions() {
 
     if (plugins.empty()) {
         HidePluginOptions();
+        Layout();
+        Fit();
         return;
     }
 
@@ -702,6 +752,8 @@ void DisplayConfig::PopulatePluginOptions() {
         wxLogWarning(wxString::Format(_("No usable rpi plugins found in %s"),
                                       plugin_path));
         HidePluginOptions();
+        Layout();
+        Fit();
         return;
     }
 
@@ -711,6 +763,8 @@ void DisplayConfig::PopulatePluginOptions() {
 
     plugin_selector_->SetValidator(PluginSelectorValidator());
     ShowPluginOptions();
+    Layout();
+    Fit();
 }
 
 void DisplayConfig::StopPluginHandler() {
@@ -744,6 +798,13 @@ void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {
+    // The Basic tab owns the Filter/Plugin selectors. The observer can fire
+    // before that tab has been lazy-loaded (e.g. another part of the app
+    // mutates kDispFilter while we're still preloading).
+    if (!filter_selector_ || !plugin_selector_) {
+        return;
+    }
+
     const config::Filter option_filter = option->GetFilter();
     const bool is_plugin = (option_filter == config::Filter::kPlugin);
 
@@ -782,6 +843,9 @@ void DisplayConfig::OnFilterChanged(config::Option* option) {
 }
 
 void DisplayConfig::OnInterframeChanged(config::Option* option) {
+    if (!interframe_selector_) {
+        return;
+    }
     const config::Interframe interframe = option->GetInterframe();
 
     systemScreenMessage(wxString::Format(

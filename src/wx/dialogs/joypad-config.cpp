@@ -1,6 +1,10 @@
 #include "wx/dialogs/joypad-config.h"
 
 #include <wx/checkbox.h>
+#include <wx/log.h>
+#include <wx/notebook.h>
+#include <wx/panel.h>
+#include <wx/xrc/xmlres.h>
 
 #include "core/base/check.h"
 #include "wx/config/command.h"
@@ -79,7 +83,11 @@ JoypadConfig* JoypadConfig::NewInstance(wxWindow* parent,
 }
 
 JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bindings_provider)
-    : BaseDialog(parent, "JoypadConfig"), bindings_provider_(bindings_provider) {
+    : BaseDialog(parent, "JoypadConfig"),
+      tab_loaded_(8, false),
+      bindings_provider_(bindings_provider) {
+    notebook_ = GetValidatedChild<wxNotebook>("JoypadConfigNotebook");
+
     this->Bind(wxEVT_CHECKBOX, std::bind(&JoypadConfig::ToggleSDLGameControllerMode, this),
                XRCID("SDLGameControllerMode"));
 
@@ -89,51 +97,148 @@ JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bind
     GetValidatedChild("AutofireThrottle")
         ->SetValidator(
             widgets::OptionIntValidator(config::OptionID::kJoyAutofireThrottle));
+}
 
-    for (const config::GameJoy& joypad : config::kAllGameJoys) {
-        wxWindow* panel = GetValidatedChild(wxString::Format("joy%zu", joypad.ux_index()));
-        panel->SetClientObject(new GameJoyClientData(joypad));
-
-        widgets::GetValidatedChild(panel, "DefaultConfig")
-            ->SetValidator(
-                widgets::OptionSelectedValidator(config::OptionID::kJoyDefault, joypad.ux_index()));
-
-        // Set up tab order so input is easy to configure. Note that there are
-        // two tabs for each panel, so we must check for the parent before
-        // setting up the tab order.
-        wxWindow* prev = NULL;
-        wxWindow* prev_parent = NULL;
-        for (const config::GameKey& game_key : config::kAllGameKeys) {
-            const wxString game_key_name = config::GameKeyToString(game_key);
-            widgets::UserInputCtrl* game_key_control =
-                widgets::GetValidatedChild<widgets::UserInputCtrl>(panel, game_key_name);
-            wxWindow* current_parent = game_key_control->GetParent();
-
-            game_key_control->SetValidator(
-                UserInputCtrlValidator(config::GameCommand(joypad, game_key), bindings_provider));
-
-            if (current_parent == prev_parent) {
-                // The first control will be skipped here, but that's fine since
-                // we don't care where it fits in the tab order.
-                VBAM_CHECK(prev);
-                game_key_control->MoveAfterInTabOrder(prev);
-            }
-            prev = game_key_control;
-            prev_parent = current_parent;
-
-            // Bind the individual "Clear" key event.
-            panel->Bind(wxEVT_BUTTON, std::bind(&widgets::UserInputCtrl::Clear, game_key_control),
-                        XRCID(wxString("Clear" + config::GameKeyToString(game_key)).c_str()));
-        }
-
-        // Finally, bind the per-joypad "Defaults" and "Clear" events.
-        panel->Bind(wxEVT_BUTTON, std::bind(&JoypadConfig::ResetToDefaults, this, panel),
-                    XRCID("Defaults"));
-        panel->Bind(wxEVT_BUTTON, std::bind(&JoypadConfig::ClearJoypad, this, panel),
-                    XRCID("Clear"));
+bool JoypadConfig::LoadLazyTab(int index) {
+    if (index < 0 || index >= 8 || tab_loaded_[index]) {
+        return false;
     }
 
-    this->Fit();
+    // Index layout: 0/1 = P1 Standard/Special, 2/3 = P2, 4/5 = P3, 6/7 = P4.
+    // Even indices load the player's outer JoyPanel skeleton plus its
+    // Standard sub-tab. Odd indices load only the Special sub-tab and
+    // therefore depend on the matching even index being loaded first.
+    const unsigned ux_index = static_cast<unsigned>(index / 2) + 1;
+    const int sub_index = index % 2;
+    const int paired_skeleton_index = index - sub_index;
+
+    if (sub_index == 1 && !tab_loaded_[paired_skeleton_index]) {
+        LoadLazyTab(paired_skeleton_index);
+    }
+    if (sub_index == 0 &&
+        ux_index - 1 != static_cast<unsigned>(notebook_->GetPageCount())) {
+        // Earlier players not loaded yet; load them in order so AddPage
+        // appends pages in the right slot.
+        for (int i = 0; i < index; ++i) {
+            if (!tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
+
+    wxPanel* player_panel = nullptr;
+    if (sub_index == 0) {
+        player_panel = LoadPlayerSkeleton(ux_index);
+        if (!player_panel) {
+            return false;
+        }
+    } else {
+        player_panel = wxDynamicCast(
+            FindWindow(wxString::Format("joy%u", ux_index)), wxPanel);
+        VBAM_CHECK(player_panel);
+    }
+
+    LoadPlayerSubTab(player_panel, ux_index, sub_index);
+    tab_loaded_[index] = true;
+    Fit();
+    return true;
+}
+
+wxPanel* JoypadConfig::LoadPlayerSkeleton(unsigned ux_index) {
+    wxPanel* panel = wxXmlResource::Get()->LoadPanel(notebook_, "JoyPanel");
+    if (!panel) {
+        wxLogError(_("Failed to load JoyPanel"));
+        return nullptr;
+    }
+    // The XRC names every instance "JoyPanel"; rename to joy{N} so dialog-
+    // level lookups can identify which player this panel belongs to.
+    panel->SetName(wxString::Format("joy%u", ux_index));
+    notebook_->AddPage(panel, wxString::Format(_("Player %u"), ux_index));
+
+    // Per-player DefaultConfig validator and the Defaults/Clear buttons
+    // live on the JoyPanel skeleton, not on its sub-tabs.
+    const config::GameJoy* joypad_match = nullptr;
+    for (const config::GameJoy& joypad : config::kAllGameJoys) {
+        if (joypad.ux_index() == ux_index) {
+            joypad_match = &joypad;
+            break;
+        }
+    }
+    VBAM_CHECK(joypad_match);
+    panel->SetClientObject(new GameJoyClientData(*joypad_match));
+
+    widgets::GetValidatedChild(panel, "DefaultConfig")
+        ->SetValidator(widgets::OptionSelectedValidator(
+            config::OptionID::kJoyDefault, ux_index));
+
+    panel->Bind(wxEVT_BUTTON,
+                std::bind(&JoypadConfig::ResetToDefaults, this, panel),
+                XRCID("Defaults"));
+    panel->Bind(wxEVT_BUTTON,
+                std::bind(&JoypadConfig::ClearJoypad, this, panel),
+                XRCID("Clear"));
+    return panel;
+}
+
+void JoypadConfig::LoadPlayerSubTab(wxPanel* player_panel, unsigned ux_index,
+                                    int sub_index) {
+    wxNotebook* inner =
+        widgets::GetValidatedChild<wxNotebook>(player_panel, "JoyPanelNotebook");
+
+    const wxString xrc_name =
+        sub_index == 0 ? wxT("JoyPanelStandard") : wxT("JoyPanelSpecial");
+    const wxString label = sub_index == 0 ? _("Standard") : _("Special");
+
+    wxPanel* sub_panel =
+        wxXmlResource::Get()->LoadPanel(inner, xrc_name);
+    if (!sub_panel) {
+        wxLogError(_("Failed to load joypad sub-tab '%s'"), xrc_name);
+        return;
+    }
+    inner->AddPage(sub_panel, label);
+    InitPlayerSubTab(player_panel, sub_panel, ux_index);
+}
+
+void JoypadConfig::InitPlayerSubTab(wxPanel* player_panel, wxPanel* sub_panel,
+                                    unsigned ux_index) {
+    const config::GameJoy* joypad_match = nullptr;
+    for (const config::GameJoy& joypad : config::kAllGameJoys) {
+        if (joypad.ux_index() == ux_index) {
+            joypad_match = &joypad;
+            break;
+        }
+    }
+    VBAM_CHECK(joypad_match);
+    const config::GameJoy& joypad = *joypad_match;
+
+    // Walk every GameKey and wire any control that happens to live in this
+    // sub-panel. Keys that belong to the other sub-tab are silently skipped.
+    wxWindow* prev = nullptr;
+    for (const config::GameKey& game_key : config::kAllGameKeys) {
+        const wxString game_key_name = config::GameKeyToString(game_key);
+        wxWindow* found = sub_panel->FindWindow(game_key_name);
+        if (!found) continue;
+
+        widgets::UserInputCtrl* game_key_control =
+            wxDynamicCast(found, widgets::UserInputCtrl);
+        VBAM_CHECK(game_key_control);
+
+        game_key_control->SetValidator(UserInputCtrlValidator(
+            config::GameCommand(joypad, game_key), bindings_provider_));
+
+        if (prev) {
+            game_key_control->MoveAfterInTabOrder(prev);
+        }
+        prev = game_key_control;
+
+        // Per-key Clear button. Bind on the player_panel so the event
+        // handler is rooted at the level that stays alive for the
+        // lifetime of the dialog.
+        player_panel->Bind(
+            wxEVT_BUTTON,
+            std::bind(&widgets::UserInputCtrl::Clear, game_key_control),
+            XRCID(wxString("Clear" + game_key_name).c_str()));
+    }
 }
 
 void JoypadConfig::ResetToDefaults(wxWindow* panel) {

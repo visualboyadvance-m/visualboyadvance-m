@@ -2117,7 +2117,7 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
     wxTextCtrl* tc = nullptr;
     wxSpinCtrl* sc = nullptr;
     wxChoice* ch = nullptr;
-    wxFilePickerCtrl* fp = nullptr;
+    [[maybe_unused]] wxFilePickerCtrl* fp = nullptr;
     [[maybe_unused]] wxBoolEnValidator* benval = nullptr;
     [[maybe_unused]] wxBoolEnHandler* ben = nullptr;
     [[maybe_unused]] wxBoolRevEnValidator* brenval = nullptr;
@@ -2486,31 +2486,59 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
         }
         else if (name == "GameBoyAdvanceConfig") {
             d = LoadXRCDialog("GameBoyAdvanceConfig");
-            ch = GetValidatedChild<wxChoice, wxGenericValidator>(d, "SaveType", wxGenericValidator(&coreOptions.cpuSaveType));
-            BatConfigHandler.type = ch;
-            ch = GetValidatedChild<wxChoice, widgets::OptionChoiceValidator>(
-                d, "FlashSize",
-                widgets::OptionChoiceValidator(
-                    config::OptionID::kPrefFlashSize));
-            BatConfigHandler.size = ch;
-            d->Connect(XRCID("SaveType"), wxEVT_COMMAND_CHOICE_SELECTED,
-                wxCommandEventHandler(BatConfig_t::ChangeType),
-                NULL, &BatConfigHandler);
-            getgbaw("Detect");
-            d->Connect(XRCID("Detect"), wxEVT_COMMAND_BUTTON_CLICKED,
-                wxCommandEventHandler(BatConfig_t::Detect),
-                NULL, &BatConfigHandler);
-            wxStaticText *label = SafeXRCCTRL<wxStaticText>(d, "BiosFile");
-            if (!gopts.gba_bios.empty()) label->SetLabel(gopts.gba_bios);
-            getfp("BootRom", gopts.gba_bios, label);
-            getlab("BootRomLab");
-            getgbaw("GameSettings");
-            SafeXRCCTRL<wxTextCtrl>(d, "Comment");
-            SafeXRCCTRL<wxChoice>(d, "OvRTC");
-            SafeXRCCTRL<wxChoice>(d, "OvSaveType");
-            SafeXRCCTRL<wxChoice>(d, "OvFlashSize");
-            SafeXRCCTRL<wxChoice>(d, "OvMirroring");
-            d->Fit();
+            auto* base = wxStaticCast(d, dialogs::BaseDialog);
+            base->SetupLazyTabs("GameBoyAdvanceConfigNotebook", {
+                {"GameBoyAdvanceConfigSaveTypePanel", _("Save type"),
+                 [d](wxPanel*) {
+                     wxChoice* save_type =
+                         GetValidatedChild<wxChoice, wxGenericValidator>(
+                             d, "SaveType",
+                             wxGenericValidator(&coreOptions.cpuSaveType));
+                     BatConfigHandler.type = save_type;
+                     wxChoice* flash_size = GetValidatedChild<
+                         wxChoice, widgets::OptionChoiceValidator>(
+                         d, "FlashSize",
+                         widgets::OptionChoiceValidator(
+                             config::OptionID::kPrefFlashSize));
+                     BatConfigHandler.size = flash_size;
+                     d->Connect(XRCID("SaveType"),
+                                wxEVT_COMMAND_CHOICE_SELECTED,
+                                wxCommandEventHandler(BatConfig_t::ChangeType),
+                                NULL, &BatConfigHandler);
+                     wxWindow* detect = d->FindWindow(XRCID("Detect"));
+                     CheckThrowXRCError(detect, "Detect");
+                     detect->SetValidator(GBACtrlEnabler());
+                     d->Connect(XRCID("Detect"),
+                                wxEVT_COMMAND_BUTTON_CLICKED,
+                                wxCommandEventHandler(BatConfig_t::Detect),
+                                NULL, &BatConfigHandler);
+                 }},
+                {"GameBoyAdvanceConfigBootRomPanel", _("Boot ROM"),
+                 [d](wxPanel*) {
+                     wxStaticText* label =
+                         SafeXRCCTRL<wxStaticText>(d, "BiosFile");
+                     if (!gopts.gba_bios.empty())
+                         label->SetLabel(gopts.gba_bios);
+                     wxFilePickerCtrl* fp =
+                         SafeXRCCTRL<wxFilePickerCtrl>(d, "BootRom");
+                     fp->SetValidator(
+                         wxFileDirPickerValidator(&gopts.gba_bios, label));
+                     wxControl* boot_rom_lab =
+                         SafeXRCCTRL<wxControl>(d, "BootRomLab");
+                     (void)boot_rom_lab;
+                 }},
+                {"GameBoyAdvanceConfigGameOverridesPanel", _("Game Overrides"),
+                 [d](wxPanel*) {
+                     wxWindow* gs = d->FindWindow(XRCID("GameSettings"));
+                     CheckThrowXRCError(gs, "GameSettings");
+                     gs->SetValidator(GBACtrlEnabler());
+                     SafeXRCCTRL<wxTextCtrl>(d, "Comment");
+                     SafeXRCCTRL<wxChoice>(d, "OvRTC");
+                     SafeXRCCTRL<wxChoice>(d, "OvSaveType");
+                     SafeXRCCTRL<wxChoice>(d, "OvFlashSize");
+                     SafeXRCCTRL<wxChoice>(d, "OvMirroring");
+                 }},
+            });
         }
         else if (name == "DisplayConfig") {
             dialogs::DisplayConfig::NewInstance(this);

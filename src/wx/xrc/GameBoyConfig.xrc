@@ -3,214 +3,24 @@
   <object class="wxDialog" name="GameBoyConfig">
     <title>Game Boy settings</title>
     <object class="wxBoxSizer">
-    <orient>wxVERTICAL</orient>
-    <object class="sizeritem">
-    <object class="wxNotebook">
-    <object class="notebookpage">
-      <object class="wxPanel">
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Emulated _system:</label>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxChoice" name="System">
-                  <content>
-                    <item>Automatic</item>
-                    <item translate="0">Game Boy Color</item>
-                    <item translate="0">Super Game Boy</item>
-                    <item translate="0">Game Boy</item>
-                    <item translate="0">Game Boy Advance</item>
-                    <item translate="0">Super Game Boy 2</item>
-                  </content>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Display _borders:</label>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxChoice" name="Borders">
-                  <content>
-                    <item>Never</item>
-                    <item>Always</item>
-                    <item>Automatic</item>
-                  </content>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-            </object>
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-          </object>
-        </object>
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <option>1</option>
+        <flag>wxALL|wxEXPAND</flag>
+        <object class="wxNotebook" name="GameBoyConfigNotebook"/>
       </object>
-      <label>System</label>
-    </object>
-    <object class="notebookpage">
-      <object class="wxPanel">
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <flag>wxEXPAND</flag>
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="BootRomLab">
-                  <label>Game Boy Boot _ROM file:</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="GBBiosPicker">
-                  <message>Select a File</message>
-                  <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
-                  <size>472,30</size>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="CBootRomLab">
-                  <label>Game Boy Color Boot ROM _file:</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxFilePickerCtrl" name="GBCBiosPicker">
-                  <message>Select a File</message>
-                  <wildcard>BIOS files (*.bin;*.rom)|*.bin;*.rom|All files|*</wildcard>
-                  <size>472,30</size>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-              </object>
-            </object>
-            <flag>wxEXPAND</flag>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-                  <label>Current Game Boy BIOS file:</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="GBBiosLabel">
-                  <label>(None)</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxBoxSizer">
-              <orient>wxHORIZONTAL</orient>
-              <object class="sizeritem">
-                <object class="wxStaticText">
-              <label>Current Game Boy Color BIOS file:</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-              <object class="sizeritem">
-                <object class="wxStaticText" name="GBCBiosLabel">
-              <label>(None)</label>
-                </object>
-                <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
-                <border>5</border>
-              </object>
-            </object>
-          </object>
-        </object>
-      </object>
-      <label>Boot ROM</label>
-    </object>
-    <object class="notebookpage">
-      <object class="wxPanel">
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
-          <object class="sizeritem">
-            <object class="wxNotebook">
-              <object class="notebookpage">
-                <object_ref name="cp0" ref="GBColorPrefPanel">
-                  <pos>0,0</pos>
-                </object_ref>
-                <label>Default</label>
-              </object>
-              <object class="notebookpage">
-                <object_ref name="cp1" ref="GBColorPrefPanel">
-                  <pos>0,0</pos>
-                </object_ref>
-                <label>User 1</label>
-              </object>
-              <object class="notebookpage">
-                <object_ref name="cp2" ref="GBColorPrefPanel">
-                  <pos>0,0</pos>
-                </object_ref>
-                <label>User 2</label>
-              </object>
-            </object>
-          </object>
-        </object>
-      </object>
-      <label>Custom Colors</label>
-    </object>
-  </object>
-  </object>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>
         <border>5</border>
         <object class="wxStdDialogButtonSizer">
           <object class="button">
-             <object class="wxButton" name="wxID_OK"/>
+            <object class="wxButton" name="wxID_OK"/>
           </object>
           <object class="button">
-             <object class="wxButton" name="wxID_CANCEL"/>
+            <object class="wxButton" name="wxID_CANCEL"/>
           </object>
         </object>
       </object>
-  </object>
+    </object>
   </object>
 </resource>

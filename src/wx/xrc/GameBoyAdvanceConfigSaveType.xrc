@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="GameBoyAdvanceConfigSaveTypePanel">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <object class="sizeritem">
+                <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+                <object class="wxStaticText">
+                  <label>Save type:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="SaveType">
+                  <content>
+                    <item>Automatic</item>
+                    <item translate="0">EEPROM</item>
+                    <item>SRAM</item>
+                    <item>Flash</item>
+                    <item>EEPROM + Sensor</item>
+                    <item>None</item>
+                  </content>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+                <border>5</border>
+                <object class="wxStaticText">
+                  <label>Flash size:</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="FlashSize">
+                  <content>
+                    <item>64 K</item>
+                    <item>128 K</item>
+                  </content>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <cols>2</cols>
+              <growablecols>1</growablecols>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Detect">
+              <label>Detect Now</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE</flag>
+            <border>5</border>
+          </object>
+          <label>Cartridge</label>
+          <orient>wxVERTICAL</orient>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+    </object>
+  </object>
+</resource>

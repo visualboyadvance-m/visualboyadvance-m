@@ -49,6 +49,7 @@
 #include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
 #include "wx/config/emulated-gamepad.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/config/user-input.h"
@@ -1284,46 +1285,88 @@ EVT_MENU_HIGHLIGHT_ALL(MainFrame::MenuPopped)
 END_EVENT_TABLE()
 
 bool MainFrame::PreloadOneDialog() {
-    // Don't parse XRC while the user has a dialog open: it would freeze input
-    // for the duration of the parse and contend with the active dialog.
-    for (wxWindow* win : wxTopLevelWindows) {
-        if (wxDynamicCast(win, wxDialog) && win->IsShown()) {
-            return false;
-        }
+    // Don't parse XRC while the user is interacting with a menu or has a
+    // dialog open: the parse would freeze input and contend with whatever
+    // they're doing.
+    if (menus_opened || dialog_opened > 0) {
+        return false;
+    }
+
+    // Throttle: at most one preload every ~30ms, so several idle events
+    // in quick succession can't chain into a sustained parse burst.
+    const wxLongLong now = wxGetLocalTimeMillis();
+    if (dialogs_preload_last_ms_ != 0 &&
+        now - dialogs_preload_last_ms_ < 30) {
+        return true;
     }
 
     // Populate the queue on first call. LoadDialog() is a no-op for dialogs
     // already in dialogs_initialized_, so we just list every entry point;
     // sub-dialogs (LinkConfig, CheatEdit, CheatAdd) are brought in by their
-    // parents' LoadDialog() implementations.
+    // parents' LoadDialog() implementations. Most-likely-opened dialogs go
+    // last so they are popped (and parsed) first. ROM-info dialogs are
+    // omitted: they cannot be opened without a loaded ROM, and preloading
+    // is itself gated on no ROM being loaded.
     if (!dialogs_preload_populated_) {
         dialogs_preload_populated_ = true;
         dialogs_preload_queue_ = {
-            wxT("GeneralConfig"),       wxT("GameBoyConfig"),
-            wxT("GameBoyAdvanceConfig"), wxT("DisplayConfig"),
-            wxT("SoundConfig"),         wxT("DirectoriesConfig"),
-            wxT("JoypadConfig"),        wxT("SpeedupConfig"),
-            wxT("AccelConfig"),         wxT("CheatList"),
-            wxT("CheatCreate"),         wxT("NetLink"),
-            wxT("CodeSelect"),          wxT("ExportSPS"),
-            wxT("GBPrinter"),           wxT("GBAROMInfo"),
-            wxT("GBROMInfo"),
+            wxT("GBPrinter"),     wxT("ExportSPS"),
+            wxT("CodeSelect"),    wxT("NetLink"),
+            wxT("CheatCreate"),   wxT("CheatList"),
+            wxT("AccelConfig"),   wxT("SpeedupConfig"),
+            wxT("DirectoriesConfig"), wxT("SoundConfig"),
+            wxT("GameBoyAdvanceConfig"), wxT("GameBoyConfig"),
+            wxT("DisplayConfig"), wxT("JoypadConfig"),
+            wxT("GeneralConfig"),
         };
     }
 
-    // Skip over any dialog that's already been loaded on demand.
-    while (!dialogs_preload_queue_.empty() &&
-           dialogs_initialized_.count(dialogs_preload_queue_.back())) {
-        dialogs_preload_queue_.pop_back();
+    // Skip over any whole-dialog entry that's already been loaded on demand.
+    // Tab entries (containing ':') are handled below — the dialog itself may
+    // be loaded but a particular tab might still be unparsed.
+    while (!dialogs_preload_queue_.empty()) {
+        const wxString& back = dialogs_preload_queue_.back();
+        if (back.Find(':') == wxNOT_FOUND &&
+            dialogs_initialized_.count(back)) {
+            dialogs_preload_queue_.pop_back();
+            continue;
+        }
+        break;
     }
 
     if (dialogs_preload_queue_.empty()) {
         return false;
     }
 
-    const wxString name = dialogs_preload_queue_.back();
+    const wxString entry = dialogs_preload_queue_.back();
     dialogs_preload_queue_.pop_back();
-    LoadDialog(name);
+
+    const int colon = entry.Find(':');
+    if (colon == wxNOT_FOUND) {
+        // Whole-dialog entry: load the skeleton, then enqueue per-tab
+        // entries if the dialog uses lazy tab loading.
+        wxDialog* d = LoadDialog(entry);
+        if (auto* base = dynamic_cast<dialogs::BaseDialog*>(d)) {
+            const int tab_count = base->LazyTabCount();
+            // Push in reverse so tab 0 ends up at the back of the vector
+            // and is parsed first (we pop from the back).
+            for (int i = tab_count - 1; i >= 0; --i) {
+                dialogs_preload_queue_.push_back(
+                    wxString::Format(wxT("%s:%d"), entry, i));
+            }
+        }
+    } else {
+        // Per-tab entry: "DialogName:tab_index".
+        const wxString dialog_name = entry.Mid(0, colon);
+        long tab_index = 0;
+        entry.Mid(colon + 1).ToLong(&tab_index);
+        if (auto* base = dynamic_cast<dialogs::BaseDialog*>(
+                FindWindowByName(dialog_name))) {
+            base->LoadLazyTab(static_cast<int>(tab_index));
+        }
+    }
+
+    dialogs_preload_last_ms_ = wxGetLocalTimeMillis();
     return !dialogs_preload_queue_.empty();
 }
 

@@ -226,6 +226,7 @@ public:
     bool PreloadOneDialog();
     std::vector<wxString> dialogs_preload_queue_;
     bool dialogs_preload_populated_ = false;
+    wxLongLong dialogs_preload_last_ms_ = 0;
     void MenuOptionIntMask(const wxString& menuName, int field, int mask);
     void MenuOptionIntRadioValue(const wxString& menuName, int field, int mask);
     void MenuOptionBool(const wxString& menuName, bool field);

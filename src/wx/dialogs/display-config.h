@@ -1,6 +1,8 @@
 #ifndef VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
+#include <vector>
+
 #include <wx/filepicker.h>
 
 #include "wx/dialogs/base-dialog.h"
@@ -9,6 +11,7 @@
 // Forward declarations.
 class wxChoice;
 class wxControl;
+class wxNotebook;
 class wxWindow;
 
 namespace config {
@@ -23,11 +26,34 @@ public:
     static DisplayConfig* NewInstance(wxWindow* parent);
     ~DisplayConfig() override = default;
 
+    // BaseDialog lazy-tab interface.
+    int LazyTabCount() const override { return kTabCount; }
+    bool LoadLazyTab(int index) override;
+
 private:
+    enum Tab {
+        kTabBasic = 0,
+        kTabBitDepth,
+        kTabColorCorrection,
+        kTabSpeed,
+        kTabOSD,
+        kTabZoom,
+        kTabCount,
+    };
+
     // The constructor is private so initialization has to be done via the
     // static method. This is because this class is destroyed when its
     // owner, `parent` is destroyed. This prevents accidental deletion.
     DisplayConfig(wxWindow* parent);
+
+    // Per-tab init: called from LoadLazyTab once the tab's panel is parsed
+    // and added to the notebook.
+    void InitBasicTab();
+    void InitBitDepthTab();
+    void InitColorCorrectionTab();
+    void InitSpeedTab();
+    void InitOSDTab();
+    void InitZoomTab();
 
     // Handler for the wxEVT_SHOW event.
     void OnDialogShowEvent(wxShowEvent& event);
@@ -67,15 +93,18 @@ private:
     // Handler for plugin directory change.
     void OnPluginDirChanged(wxFileDirPickerEvent& event);
 
-    wxControl* plugin_dir_label_;
-    wxDirPickerCtrl* plugin_dir_picker_;
-    wxControl* plugin_label_;
-    wxChoice* plugin_selector_;
-    wxChoice* filter_selector_;
-    wxChoice* interframe_selector_;
-    wxChoice* sdlrenderer_selector_;
-    wxControl* sdlrenderer_label_;
-    wxControl* sdlpixelart_checkbox_;
+    wxNotebook* notebook_ = nullptr;
+    std::vector<bool> tab_loaded_;
+
+    wxControl* plugin_dir_label_ = nullptr;
+    wxDirPickerCtrl* plugin_dir_picker_ = nullptr;
+    wxControl* plugin_label_ = nullptr;
+    wxChoice* plugin_selector_ = nullptr;
+    wxChoice* filter_selector_ = nullptr;
+    wxChoice* interframe_selector_ = nullptr;
+    wxChoice* sdlrenderer_selector_ = nullptr;
+    wxControl* sdlrenderer_label_ = nullptr;
+    wxControl* sdlpixelart_checkbox_ = nullptr;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

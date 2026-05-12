@@ -8,6 +8,8 @@
 #include <wx/choice.h>
 #include <wx/clrpicker.h>
 #include <wx/filepicker.h>
+#include <wx/log.h>
+#include <wx/notebook.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
 
@@ -318,35 +320,126 @@ GameBoyConfig* GameBoyConfig::NewInstance(wxWindow* parent) {
     return new GameBoyConfig(parent);
 }
 
-GameBoyConfig::GameBoyConfig(wxWindow* parent) : BaseDialog(parent, "GameBoyConfig") {
-    // System and Peripherals.
+GameBoyConfig::GameBoyConfig(wxWindow* parent)
+    : BaseDialog(parent, "GameBoyConfig"), tab_loaded_(kTabCount, false) {
+    outer_notebook_ = GetValidatedChild<wxNotebook>("GameBoyConfigNotebook");
+}
+
+bool GameBoyConfig::LoadLazyTab(int index) {
+    if (index < 0 || index >= kTabCount || tab_loaded_[index]) {
+        return false;
+    }
+
+    // Outer tabs (0..2) live in the outer notebook; inner Custom Colors
+    // sub-tabs (3..5) live inside the inner notebook that's created when
+    // the outer Custom Colors tab loads. Enforce load order so the
+    // notebooks always have the right page count.
+    if (index >= kTabPalette0 && !tab_loaded_[kTabCustomColors]) {
+        LoadLazyTab(kTabCustomColors);
+    }
+    if (index < kTabPalette0 &&
+        index != static_cast<int>(outer_notebook_->GetPageCount())) {
+        for (int i = 0; i < index; ++i) {
+            if (!tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
+    if (index >= kTabPalette0 && inner_notebook_ &&
+        index - kTabPalette0 !=
+            static_cast<int>(inner_notebook_->GetPageCount())) {
+        for (int i = kTabPalette0; i < index; ++i) {
+            if (!tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
+
+    switch (index) {
+        case kTabSystem: {
+            wxPanel* panel = wxXmlResource::Get()->LoadPanel(
+                outer_notebook_, "GameBoyConfigSystemPanel");
+            if (!panel) return false;
+            outer_notebook_->AddPage(panel, _("System"));
+            tab_loaded_[index] = true;
+            InitSystemTab();
+            break;
+        }
+        case kTabBootRom: {
+            wxPanel* panel = wxXmlResource::Get()->LoadPanel(
+                outer_notebook_, "GameBoyConfigBootRomPanel");
+            if (!panel) return false;
+            outer_notebook_->AddPage(panel, _("Boot ROM"));
+            tab_loaded_[index] = true;
+            InitBootRomTab();
+            break;
+        }
+        case kTabCustomColors: {
+            wxPanel* panel = wxXmlResource::Get()->LoadPanel(
+                outer_notebook_, "GameBoyConfigCustomColorsPanel");
+            if (!panel) return false;
+            outer_notebook_->AddPage(panel, _("Custom Colors"));
+            tab_loaded_[index] = true;
+            InitCustomColorsTab();
+            break;
+        }
+        case kTabPalette0:
+        case kTabPalette1:
+        case kTabPalette2: {
+            const size_t palette_id = index - kTabPalette0;
+            InitPaletteTab(palette_id);
+            tab_loaded_[index] = true;
+            break;
+        }
+        default:
+            return false;
+    }
+
+    Fit();
+    return true;
+}
+
+void GameBoyConfig::InitSystemTab() {
     GetValidatedChild("System")->SetValidator(
         widgets::OptionChoiceValidator(config::OptionID::kPrefEmulatorType));
-
-    // "Display borders" corresponds to 2 variables.
     GetValidatedChild("Borders")->SetValidator(BorderSelectorValidator());
+}
 
-    // GB BIOS ROM
+void GameBoyConfig::InitBootRomTab() {
     GetValidatedChild("GBBiosPicker")
         ->SetValidator(BIOSPickerValidator(config::OptionID::kGBBiosFile,
                                            GetValidatedChild<wxStaticText>("GBBiosLabel")));
-
-    // GBC BIOS ROM
     GetValidatedChild("GBCBiosPicker")
         ->SetValidator(BIOSPickerValidator(config::OptionID::kGBGBCBiosFile,
                                            GetValidatedChild<wxStaticText>("GBCBiosLabel")));
+}
 
-    for (size_t i = 0; i < kNbPalettes; i++) {
-        // All of the wxPanel logic is handled in its client object.
-        wxPanel* panel = GetValidatedChild<wxPanel>(wxString::Format("cp%zu", i));
-        GBPalettePanelData* palette_data = new GBPalettePanelData(panel, i);
+void GameBoyConfig::InitCustomColorsTab() {
+    inner_notebook_ = GetValidatedChild<wxNotebook>(
+        "GameBoyConfigCustomColorsNotebook");
+}
 
-        // `panel` takes ownership of `palette_data` here.
-        panel->SetClientObject(palette_data);
-        panel->SetValidator(PaletteValidator(palette_data));
+void GameBoyConfig::InitPaletteTab(size_t palette_id) {
+    VBAM_CHECK(inner_notebook_);
+    VBAM_CHECK(palette_id < kNbPalettes);
+
+    wxPanel* panel = wxXmlResource::Get()->LoadPanel(
+        inner_notebook_, "GBColorPrefPanel");
+    if (!panel) {
+        wxLogError(_("Failed to load GBColorPrefPanel"));
+        return;
     }
+    // The XRC names the panel "GBColorPrefPanel"; rename so subsequent loads
+    // don't clash and so dialog-level lookups (cp0/cp1/cp2) still work for
+    // any external callers.
+    panel->SetName(wxString::Format("cp%zu", palette_id));
 
-    this->Fit();
+    GBPalettePanelData* palette_data = new GBPalettePanelData(panel, palette_id);
+    panel->SetClientObject(palette_data);
+    panel->SetValidator(PaletteValidator(palette_data));
+
+    const wxString labels[kNbPalettes] = {_("Default"), _("User 1"), _("User 2")};
+    inner_notebook_->AddPage(panel, labels[palette_id]);
 }
 
 }  // namespace dialogs

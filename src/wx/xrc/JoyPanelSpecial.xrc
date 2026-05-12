@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="JoyPanelSpecial">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Motion Up</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionUp">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionUp">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Autofire A</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="AutoA">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearAutoA">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Motion Down</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionDown">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionDown">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Autofire B</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="AutoB">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearAutoB">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Motion Left / Dark</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionLeft">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionLeft">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label translate="0">Game Shark</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="GS">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearGS">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Motion Right / Light</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionRight">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxGROW</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionRight">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Speed Up</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="Speed">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearSpeed">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Spin Left</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionIn">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionIn">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="spacer">
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="spacer">
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="spacer">
+        <flag>wxEXPAND</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Spin Right</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="MotionOut">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxGROW</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearMotionOut">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText">
+          <label>Screenshot</label>
+        </object>
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="UserInputCtrl" name="Capture">
+          <multikey>1</multikey>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="ClearCapture">
+          <label>_Clear</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+        <flag>wxALL</flag>
+        <border>5</border>
+      </object>
+      <cols>6</cols>
+      <growablecols>1,2,4,5</growablecols>
+    </object>
+  </object>
+</resource>

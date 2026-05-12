@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<resource version="2.5.3.0">
+  <object class="wxPanel" name="DisplayConfigOSDPanel">
+    <object class="wxBoxSizer">
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText">
+          <label>Speed indicator:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxChoice" name="SpeedIndicator">
+          <content>
+            <item>None</item>
+            <item>Percentage</item>
+            <item>Detailed</item>
+          </content>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

@@ -2,7 +2,9 @@
 
 #include <functional>
 
+#include <wx/log.h>
 #include <wx/notebook.h>
+#include <wx/panel.h>
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
 #include <wx/xrc/xmlres.h>
@@ -150,6 +152,63 @@ BaseDialog::BaseDialog(wxWindow* parent, const wxString& xrc_file)
     this->Bind(wxEVT_SHOW, &BaseDialog::OnBaseDialogShow, this);
 
     wxPersistenceManager::Get().Register(this, new PersistentBaseDialog(this));
+}
+
+int BaseDialog::LazyTabCount() const {
+    return static_cast<int>(lazy_tabs_.size());
+}
+
+bool BaseDialog::LoadLazyTab(int index) {
+    if (!lazy_notebook_ || index < 0 ||
+        index >= static_cast<int>(lazy_tabs_.size()) ||
+        lazy_tab_loaded_[index]) {
+        return false;
+    }
+
+    // Tabs must be added in order (notebook->AddPage appends). If a later
+    // tab is requested first, load any earlier missing tabs first.
+    if (index != static_cast<int>(lazy_notebook_->GetPageCount())) {
+        for (int i = 0; i < index; ++i) {
+            if (!lazy_tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
+
+    const LazyTabSpec& spec = lazy_tabs_[index];
+    wxPanel* panel =
+        wxXmlResource::Get()->LoadPanel(lazy_notebook_, spec.xrc_name);
+    if (!panel) {
+        wxLogError(_("Failed to load lazy tab '%s'"), spec.xrc_name);
+        return false;
+    }
+    lazy_notebook_->AddPage(panel, wxGetTranslation(spec.tab_label));
+    lazy_tab_loaded_[index] = true;
+    if (spec.init) {
+        spec.init(panel);
+    }
+    Fit();
+    return true;
+}
+
+void BaseDialog::SetupLazyTabs(const wxString& notebook_name,
+                               std::vector<LazyTabSpec> tabs) {
+    lazy_notebook_ = wxDynamicCast(FindWindow(notebook_name), wxNotebook);
+    VBAM_CHECK(lazy_notebook_);
+    lazy_tabs_ = std::move(tabs);
+    lazy_tab_loaded_.assign(lazy_tabs_.size(), false);
+}
+
+bool BaseDialog::Show(bool show) {
+    if (show) {
+        // Force-load any lazy tabs that the preload queue hasn't reached
+        // yet, so the dialog is fully constructed before it is rendered.
+        const int count = LazyTabCount();
+        for (int i = 0; i < count; ++i) {
+            LoadLazyTab(i);
+        }
+    }
+    return wxDialog::Show(show);
 }
 
 wxWindow* BaseDialog::GetValidatedChild(const wxString& name) const {

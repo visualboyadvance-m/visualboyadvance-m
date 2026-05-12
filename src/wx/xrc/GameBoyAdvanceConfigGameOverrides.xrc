@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
+  <object class="wxPanel" name="GameBoyAdvanceConfigGameOverridesPanel">
+    <object class="wxPanel" name="GameSettings">
+      <object class="wxBoxSizer">
+        <orient>wxVERTICAL</orient>
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Game Code</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="GameCode">
+                <style>wxBORDER_SUNKEN</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Comment</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="Comment"/>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Real Time Clock:</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxChoice" name="OvRTC">
+                <content>
+                  <item>Default</item>
+                  <item>Disabled</item>
+                  <item>Enabled</item>
+                </content>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Save Type:</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxChoice" name="OvSaveType">
+                <content>
+                  <item>Default</item>
+                  <item>Automatic</item>
+                  <item translate="0">EEPROM</item>
+                  <item>SRAM</item>
+                  <item>Flash</item>
+                  <item>EEPROM + Sensor</item>
+                  <item>None</item>
+                </content>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Flash Size:</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxChoice" name="OvFlashSize">
+                <content>
+                  <item>Default</item>
+                  <item>64 K</item>
+                  <item>128 K</item>
+                </content>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Mirroring:</label>
+              </object>
+              <flag>wxALL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxChoice" name="OvMirroring">
+                <content>
+                  <item>Default</item>
+                  <item>Disabled</item>
+                  <item>Enabled</item>
+                </content>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <cols>2</cols>
+            <growablecols>1</growablecols>
+          </object>
+          <option>1</option>
+          <flag>wxEXPAND</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxButton" name="Defaults">
+            <label>_Defaults</label>
+          </object>
+          <flag>wxALL|wxALIGN_CENTRE_HORIZONTAL</flag>
+          <border>5</border>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<resource version="2.5.3.0">
+  <object class="wxPanel" name="DisplayConfigBitDepthPanel">
+    <object class="wxFlexGridSizer">
+      <cols>2</cols>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText" name="BitDepthLab">
+          <label>Bit Depth:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxChoice" name="BitDepth">
+          <content>
+            <item>8</item>
+            <item>16</item>
+            <item>24</item>
+            <item>32</item>
+          </content>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

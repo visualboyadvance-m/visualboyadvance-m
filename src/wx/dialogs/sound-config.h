@@ -1,6 +1,8 @@
 #ifndef VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 #define VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 
+#include <vector>
+
 #include "wx/config/option.h"
 #include "wx/dialogs/base-dialog.h"
 
@@ -8,6 +10,7 @@
 class wxChoice;
 class wxCheckBox;
 class wxControl;
+class wxNotebook;
 class wxSlider;
 class wxWindow;
 
@@ -19,11 +22,24 @@ public:
     static SoundConfig* NewInstance(wxWindow* parent);
     ~SoundConfig() override = default;
 
+    int LazyTabCount() const override { return kTabCount; }
+    bool LoadLazyTab(int index) override;
+
 private:
-    // The constructor is private so initialization has to be done via the
-    // static method. This is because this class is destroyed when its
-    // owner, `parent` is destroyed. This prevents accidental deletion.
+    enum Tab {
+        kTabBasic = 0,
+        kTabAdvanced,
+        kTabGameBoy,
+        kTabGameBoyAdvance,
+        kTabCount,
+    };
+
     SoundConfig(wxWindow* parent);
+
+    void InitBasicTab();
+    void InitAdvancedTab();
+    void InitGameBoyTab();
+    void InitGameBoyAdvanceTab();
 
     void OnShow(wxShowEvent& event);
 
@@ -33,11 +49,14 @@ private:
     // Refresh `audio_device_selector_`.
     void OnAudioApiChanged(wxCommandEvent& event, config::AudioApi api);
 
-    wxSlider* buffers_slider_;
-    wxControl* buffers_info_label_;
-    wxChoice* audio_device_selector_;
-    wxCheckBox* upmix_checkbox_;
-    wxCheckBox* hw_accel_checkbox_;
+    wxNotebook* notebook_ = nullptr;
+    std::vector<bool> tab_loaded_;
+
+    wxSlider* buffers_slider_ = nullptr;
+    wxControl* buffers_info_label_ = nullptr;
+    wxChoice* audio_device_selector_ = nullptr;
+    wxCheckBox* upmix_checkbox_ = nullptr;
+    wxCheckBox* hw_accel_checkbox_ = nullptr;
     config::AudioApi current_audio_api_;
 };
 

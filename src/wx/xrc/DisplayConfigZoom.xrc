@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<resource version="2.5.3.0">
+  <object class="wxPanel" name="DisplayConfigZoomPanel">
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>Default magnification:</label>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxTextCtrl" name="DefaultScale"/>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxEXPAND</flag>
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+            <object class="wxStaticText">
+              <label>Maximum magnification factor:</label>
+              <tooltip>0 = no maximum</tooltip>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxSpinCtrl" name="MaxScale">
+              <tooltip>0 = no limit</tooltip>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+</resource>

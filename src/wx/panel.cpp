@@ -1757,8 +1757,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     // Preload one config dialog per idle tick while no ROM is running, so
     // the user doesn't pay the XRC parse cost the first time they open
-    // Options. Skipped once emulation is active.
-    if (!emusys && mf && mf->PreloadOneDialog()) {
+    // Options. Skipped once emulation is active. Only request another idle
+    // round if no user input is queued, so we yield promptly on click/key.
+    if (!emusys && mf && mf->PreloadOneDialog() &&
+        !wxTheApp->HasPendingEvents()) {
         event.RequestMore();
     }
 

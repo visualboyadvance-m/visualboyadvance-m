@@ -1,10 +1,14 @@
 #include "wx/dialogs/sound-config.h"
 
 #include <wx/arrstr.h>
+#include <wx/button.h>
 #include <wx/checkbox.h>
 #include <wx/choice.h>
 #include <wx/clntdata.h>
 #include <wx/event.h>
+#include <wx/log.h>
+#include <wx/notebook.h>
+#include <wx/panel.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 
@@ -157,8 +161,51 @@ SoundConfig* SoundConfig::NewInstance(wxWindow* parent) {
     return new SoundConfig(parent);
 }
 
-SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
-    // Volume slider configuration.
+SoundConfig::SoundConfig(wxWindow* parent)
+    : BaseDialog(parent, "SoundConfig"), tab_loaded_(kTabCount, false) {
+    notebook_ = GetValidatedChild<wxNotebook>("SoundConfigNotebook");
+    this->Bind(wxEVT_SHOW, &SoundConfig::OnShow, this);
+}
+
+bool SoundConfig::LoadLazyTab(int index) {
+    if (index < 0 || index >= kTabCount || tab_loaded_[index]) {
+        return false;
+    }
+    if (index != static_cast<int>(notebook_->GetPageCount())) {
+        for (int i = 0; i < index; ++i) {
+            if (!tab_loaded_[i]) {
+                LoadLazyTab(i);
+            }
+        }
+    }
+
+    struct TabSpec {
+        const wxChar* xrc_name;
+        const wxChar* tab_label;
+        void (SoundConfig::*init)();
+    };
+    static const TabSpec kSpecs[kTabCount] = {
+        {wxT("SoundConfigBasicPanel"),    wxT("Basic"),    &SoundConfig::InitBasicTab},
+        {wxT("SoundConfigAdvancedPanel"), wxT("Advanced"), &SoundConfig::InitAdvancedTab},
+        {wxT("SoundConfigGameBoyPanel"),  wxT("Game Boy"), &SoundConfig::InitGameBoyTab},
+        {wxT("SoundConfigGameBoyAdvancePanel"), wxT("Game Boy Advance"),
+         &SoundConfig::InitGameBoyAdvanceTab},
+    };
+
+    const TabSpec& spec = kSpecs[index];
+    wxPanel* panel = wxXmlResource::Get()->LoadPanel(notebook_, spec.xrc_name);
+    if (!panel) {
+        wxLogError(_("Failed to load SoundConfig tab '%s'"), spec.xrc_name);
+        return false;
+    }
+    notebook_->AddPage(panel, wxGetTranslation(spec.tab_label));
+    tab_loaded_[index] = true;
+    (this->*spec.init)();
+    Fit();
+    return true;
+}
+
+void SoundConfig::InitBasicTab() {
     wxSlider* volume_slider = GetValidatedChild<wxSlider>("Volume");
     volume_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundVolume));
     volume_slider->SetToolTip(wxString::Format("%d", volume_slider->GetValue()));
@@ -167,10 +214,10 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     GetValidatedChild("Volume100")
         ->Bind(wxEVT_BUTTON, std::bind(&wxSlider::SetValue, volume_slider, 100));
 
-    // Sound quality.
     GetValidatedChild("Rate")->SetValidator(SoundRateValidator());
+}
 
-    // Audio API selection.
+void SoundConfig::InitAdvancedTab() {
     wxWindow* audio_api_button = GetValidatedChild("OpenAL");
 #if defined(VBAM_ENABLE_OPENAL)
     audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kOpenAL));
@@ -227,7 +274,6 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     audio_api_button->Hide();
 #endif
 
-    // Upmix configuration.
     upmix_checkbox_ = GetValidatedChild<wxCheckBox>("Upmix");
 #if defined(VBAM_ENABLE_XAUDIO2) || defined(VBAM_ENABLE_FAUDIO)
     upmix_checkbox_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kSoundUpmix));
@@ -235,7 +281,6 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     upmix_checkbox_->Hide();
 #endif
 
-    // DSound HW acceleration.
     hw_accel_checkbox_ = GetValidatedChild<wxCheckBox>("HWAccel");
 #if defined(__WXMSW__)
     hw_accel_checkbox_->SetValidator(
@@ -244,7 +289,6 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     hw_accel_checkbox_->Hide();
 #endif
 
-    // Buffers configuration.
     buffers_info_label_ = GetValidatedChild<wxControl>("BuffersInfo");
     buffers_slider_ = GetValidatedChild<wxSlider>("Buffers");
     buffers_slider_->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundBuffers));
@@ -253,7 +297,11 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     buffers_slider_->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, buffers_slider_, std::placeholders::_1));
     buffers_slider_->Bind(wxEVT_SLIDER, &SoundConfig::OnBuffersChanged, this);
 
-    // Game Boy configuration.
+    audio_device_selector_ = GetValidatedChild<wxChoice>("Device");
+    audio_device_selector_->SetValidator(AudioDeviceValidator());
+}
+
+void SoundConfig::InitGameBoyTab() {
     wxSlider* gb_echo_slider = GetValidatedChild<wxSlider>("GBEcho");
     gb_echo_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
     gb_echo_slider->SetToolTip(wxString::Format("%d", gb_echo_slider->GetValue()));
@@ -265,22 +313,14 @@ SoundConfig::SoundConfig(wxWindow* parent) : BaseDialog(parent, "SoundConfig") {
     gb_stereo_slider->SetToolTip(wxString::Format("%d", gb_stereo_slider->GetValue()));
     gb_stereo_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gb_stereo_slider, std::placeholders::_1));
     gb_stereo_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gb_stereo_slider, std::placeholders::_1));
+}
 
-    // Game Boy Advance configuration.
+void SoundConfig::InitGameBoyAdvanceTab() {
     wxSlider* gba_filtering_slider = GetValidatedChild<wxSlider>("GBASoundFiltering");
     gba_filtering_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBAFiltering));
     gba_filtering_slider->SetToolTip(wxString::Format("%d", gba_filtering_slider->GetValue()));
     gba_filtering_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gba_filtering_slider, std::placeholders::_1));
     gba_filtering_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gba_filtering_slider, std::placeholders::_1));
-
-    // Audio Device configuration.
-    audio_device_selector_ = GetValidatedChild<wxChoice>("Device");
-    audio_device_selector_->SetValidator(AudioDeviceValidator());
-
-    this->Bind(wxEVT_SHOW, &SoundConfig::OnShow, this);
-
-    // Finally, fit everything nicely.
-    Fit();
 }
 
 void SoundConfig::OnShow(wxShowEvent& event) {
