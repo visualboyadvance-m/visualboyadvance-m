@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:00+0000\n"
+"POT-Creation-Date: 2026-05-12 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Benjamin Siskoo <siskoo@tradu-france.com>, 2018,2020,2024,2026\n"
 "Language-Team: French (France) (http://app.transifex.com/bgk/vba-m/language/fr_FR/)\n"
@@ -52,7 +52,7 @@ msgstr "Échec de l'allocation du tampon %d CoreAudio : erreur %d"
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Échec du démarrage de la file d'attente CoreAudio : erreur %d"
 
-#: cmdevents.cpp:68 wxvbam.cpp:889
+#: cmdevents.cpp:68 wxvbam.cpp:890
 msgid "Could not create main window"
 msgstr "Impossible de créer la fenêtre principale"
 
@@ -392,50 +392,93 @@ msgstr "Confirmer"
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr "Cette action va supprimer l'attribution de \"%s\" pour la commande \"%s\". Êtes-vous sûr·e ?"
 
+#: dialogs/base-dialog.cpp:182
+#, c-format
+msgid "Failed to load lazy tab '%s'"
+msgstr ""
+
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
 msgstr "Naviguer"
 
-#: dialogs/display-config.cpp:125 dialogs/display-config.cpp:134
-#: dialogs/display-config.cpp:153 dialogs/display-config.cpp:158
+#: dialogs/display-config.cpp:127 dialogs/display-config.cpp:136
+#: dialogs/display-config.cpp:155 dialogs/display-config.cpp:160
 msgid "Invalid value for Default magnification."
 msgstr "Valeur de zoom par défaut invalide"
 
-#: dialogs/display-config.cpp:554
+#: dialogs/display-config.cpp:449
+#, c-format
+msgid "Failed to load DisplayConfig tab '%s'"
+msgstr ""
+
+#: dialogs/display-config.cpp:614
 msgid "Invalid color correction profile"
 msgstr "Profil de correction des couleurs non valide"
 
-#: dialogs/display-config.cpp:640 xrc/DisplayConfig.xrc:142
-#: xrc/DisplayConfig.xrc:182 xrc/DisplayConfig.xrc:412
-#: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
+#: dialogs/display-config.cpp:690 xrc/DisplayConfigBasic.xrc:132
+#: xrc/DisplayConfigBasic.xrc:172 xrc/DisplayConfigOSD.xrc:17
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
+#: xrc/SoundConfigGameBoyAdvance.xrc:19
 msgid "None"
 msgstr "Aucun"
 
-#: dialogs/display-config.cpp:702
+#: dialogs/display-config.cpp:752
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Aucun plugin RPI utilisable n'a été trouvé dans %s"
 
-#: dialogs/display-config.cpp:772 dialogs/display-config.cpp:855
-#: xrc/DisplayConfig.xrc:158
+#: dialogs/display-config.cpp:833 dialogs/display-config.cpp:919
+#: xrc/DisplayConfigBasic.xrc:148
 msgid "Plugin"
 msgstr "Plugin"
 
-#: dialogs/display-config.cpp:781
+#: dialogs/display-config.cpp:842
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Utilisation du filtre pixel : %s"
 
-#: dialogs/display-config.cpp:788
+#: dialogs/display-config.cpp:852
 #, c-format
 msgid "interframe blend: %s"
 msgstr "Fondu intertrame : %s"
 
-#: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
-#: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
+#: dialogs/game-boy-config.cpp:145 xrc/GameBoyAdvanceConfigBootRom.xrc:45
+#: xrc/GameBoyConfigBootRom.xrc:66 xrc/GameBoyConfigBootRom.xrc:87
 msgid "(None)"
 msgstr "(Aucun)"
+
+#: dialogs/game-boy-config.cpp:363
+msgid "System"
+msgstr "Système"
+
+#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2516
+msgid "Boot ROM"
+msgstr "ROM de démarrage"
+
+#: dialogs/game-boy-config.cpp:381
+msgid "Custom Colors"
+msgstr "Couleurs personnalisées"
+
+#: dialogs/game-boy-config.cpp:429
+msgid "Failed to load GBColorPrefPanel"
+msgstr ""
+
+#: dialogs/game-boy-config.cpp:441
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:63
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:85
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:103
+msgid "Default"
+msgstr "Défaut"
+
+#: dialogs/game-boy-config.cpp:441
+msgid "User 1"
+msgstr "Utilisateur 1"
+
+#: dialogs/game-boy-config.cpp:441
+msgid "User 2"
+msgstr "Utilisateur 2"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
 msgid "Unknown"
@@ -584,7 +627,34 @@ msgstr "%02X (Réel : %02X)"
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (Réel : %04X)"
 
-#: dialogs/sound-config.cpp:303
+#: dialogs/joypad-config.cpp:150
+msgid "Failed to load JoyPanel"
+msgstr ""
+
+#: dialogs/joypad-config.cpp:156
+#, c-format
+msgid "Player %u"
+msgstr ""
+
+#: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
+msgid "Standard"
+msgstr "Standard"
+
+#: dialogs/joypad-config.cpp:190
+msgid "Special"
+msgstr "Spécial"
+
+#: dialogs/joypad-config.cpp:195
+#, c-format
+msgid "Failed to load joypad sub-tab '%s'"
+msgstr ""
+
+#: dialogs/sound-config.cpp:198
+#, c-format
+msgid "Failed to load SoundConfig tab '%s'"
+msgstr ""
+
+#: dialogs/sound-config.cpp:343
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr "%d images = %.2f ms"
@@ -768,6 +838,14 @@ msgstr "Ancienne valeur"
 msgid "New Value"
 msgstr "Nouvelle valeur"
 
+#: guiinit.cpp:2491
+msgid "Save type"
+msgstr "Type de sauvegarde"
+
+#: guiinit.cpp:2530
+msgid "Game Overrides"
+msgstr "Dérogations pour ce jeu"
+
 #: opts.cpp:155
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
@@ -805,7 +883,7 @@ msgstr "Problème de chargement du fichier"
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Impossible de lancer la ROM Game Boy %s"
 
-#: panel.cpp:813 panel.cpp:957 panel.cpp:1850
+#: panel.cpp:813 panel.cpp:957 panel.cpp:1852
 msgid "Could not initialize the sound driver!"
 msgstr "Impossible d'initialiser le pilote de son !"
 
@@ -838,7 +916,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Impossible de créer le répertoire Sauvegardes Natives :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
-#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1472
+#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1515
 msgid "Directory Error"
 msgstr "Erreur de Répertoire"
 
@@ -896,552 +974,552 @@ msgstr "Mode d'affichage sélectionné %dx%d-%d@%d"
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Impossible de changer de mode d'affichage pour %dx%d-%d@%d"
 
-#: panel.cpp:1777
+#: panel.cpp:1779
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Cartouche Game Boy Advance invalide"
 
-#: panel.cpp:1871
+#: panel.cpp:1873
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Le métal n'est pas disponible, le réglage par défaut est OpenGL."
 
-#: panel.cpp:1904
+#: panel.cpp:1906
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:2043
+#: panel.cpp:2045
 msgid "No memory for rewinding"
 msgstr "Pas de mémoire pour le rembobinage"
 
-#: panel.cpp:2053
+#: panel.cpp:2055
 msgid "Error writing rewind state"
 msgstr "Erreur d'écriture pour le rembobinage"
 
-#: panel.cpp:3686
+#: panel.cpp:3688
 msgid "Failed to set wayland display"
 msgstr "Échec du paramétrage d'affichage Wayland"
 
-#: panel.cpp:3717
+#: panel.cpp:3719
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Échec de l'initialition du sous-systèmes SDL video"
 
-#: panel.cpp:3728
+#: panel.cpp:3730
 msgid "Failed to initialize SDL video"
 msgstr "Échec de l'initialition de SDL video"
 
-#: panel.cpp:3738
+#: panel.cpp:3740
 msgid "Failed to set wayland surface"
 msgstr "Échec du paramétrage de Wayland surface"
 
-#: panel.cpp:3752
+#: panel.cpp:3754
 msgid "Failed to set parent window"
 msgstr "Échec du paramétrage de la fenêtre parente"
 
-#: panel.cpp:3763
+#: panel.cpp:3765
 msgid "Failed to set OpenGL properties"
 msgstr "Échec du paramétrage des proriétés d'OpenGL"
 
-#: panel.cpp:3776 panel.cpp:3815
+#: panel.cpp:3778 panel.cpp:3817
 msgid "Failed to create SDL window"
 msgstr "Échec de la création d'une fênêtre SDL"
 
-#: panel.cpp:3786 panel.cpp:3843
+#: panel.cpp:3788 panel.cpp:3845
 msgid "Renderer creating failed, using default renderer"
 msgstr "Échec de la création du moteur de rendu, utilisation du moteur de rendu par défaut"
 
-#: panel.cpp:3787
+#: panel.cpp:3789
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Erreur SDL : %s"
 
-#: panel.cpp:3794 panel.cpp:3849
+#: panel.cpp:3796 panel.cpp:3851
 msgid "Failed to create SDL renderer"
 msgstr "Échec de la création du mùoteur de rendu SDL"
 
-#: panel.cpp:3800
+#: panel.cpp:3802
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Échec de la configuration de vsync pour le rendu SDL"
 
-#: panel.cpp:3804 panel.cpp:3838
+#: panel.cpp:3806 panel.cpp:3840
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "Rendu SDL :%s"
 
-#: panel.cpp:3823
+#: panel.cpp:3825
 msgid "SDL renderer: default"
 msgstr "Rendu SDL : par défaut"
 
-#: panel.cpp:4606
+#: panel.cpp:4608
 msgid "Enabling EGL VSync."
 msgstr "Activation de la VSync EGL."
 
-#: panel.cpp:4608
+#: panel.cpp:4610
 msgid "Disabling EGL VSync."
 msgstr "Désactivation de la VSync EGL."
 
-#: panel.cpp:4616
+#: panel.cpp:4618
 msgid "Enabling GLX VSync."
 msgstr "Activation de la VSync GLX."
 
-#: panel.cpp:4618
+#: panel.cpp:4620
 msgid "Disabling GLX VSync."
 msgstr "Désactivation de la VSync GLX."
 
-#: panel.cpp:4636
+#: panel.cpp:4638
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Échec du paramétrage du glXSwapIntervalEXT"
 
-#: panel.cpp:4645
+#: panel.cpp:4647
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Échec du paramétrage du glXSwapIntervalSGI"
 
-#: panel.cpp:4654
+#: panel.cpp:4656
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Échec du paramétrage du glXSwapIntervalMESA"
 
-#: panel.cpp:4663
+#: panel.cpp:4665
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT non supporté"
 
-#: panel.cpp:4666
+#: panel.cpp:4668
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control non supporté"
 
-#: panel.cpp:4675
+#: panel.cpp:4677
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Échec du paramétrage de wglSwapIntervalEXT"
 
-#: panel.cpp:4681
+#: panel.cpp:4683
 msgid "No VSYNC available on this platform"
 msgstr "Aucune VSYNC n'est disponible sur cette plateforme"
 
-#: panel.cpp:4814
+#: panel.cpp:4816
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr ""
 
-#: panel.cpp:4840
+#: panel.cpp:4842
 msgid "Failed to get D3D12 function pointers"
 msgstr ""
 
-#: panel.cpp:4845
+#: panel.cpp:4847
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4859
+#: panel.cpp:4861
 msgid "No hardware adapter found, falling back to WARP"
 msgstr ""
 
-#: panel.cpp:4866
+#: panel.cpp:4868
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4867
+#: panel.cpp:4869
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr ""
 
-#: panel.cpp:4874
+#: panel.cpp:4876
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4895
+#: panel.cpp:4897
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4901
+#: panel.cpp:4903
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4910
+#: panel.cpp:4912
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4919
+#: panel.cpp:4921
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4926
+#: panel.cpp:4928
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4934
+#: panel.cpp:4936
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4939
+#: panel.cpp:4941
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4978
+#: panel.cpp:4980
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr ""
 
-#: panel.cpp:4985
+#: panel.cpp:4987
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr ""
 
-#: panel.cpp:4999
+#: panel.cpp:5001
 #, c-format
 msgid "VS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:5007
+#: panel.cpp:5009
 #, c-format
 msgid "PS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:5036
+#: panel.cpp:5038
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr ""
 
-#: panel.cpp:5056
+#: panel.cpp:5058
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr ""
 
-#: panel.cpp:5065
+#: panel.cpp:5067
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr ""
 
-#: panel.cpp:5068
+#: panel.cpp:5070
 msgid "Failed to create fence event"
 msgstr ""
 
-#: panel.cpp:5070
+#: panel.cpp:5072
 msgid "D3D12 pipeline fully initialized"
 msgstr ""
 
-#: panel.cpp:5100
+#: panel.cpp:5102
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:5122
+#: panel.cpp:5124
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr ""
 
-#: panel.cpp:5133
+#: panel.cpp:5135
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr ""
 
-#: panel.cpp:5385
+#: panel.cpp:5387
 msgid "Texture upload failed"
 msgstr ""
 
-#: panel.cpp:5528
+#: panel.cpp:5530
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Utilisation de Direct3D 9Ex (chargé dynamiquement)"
 
-#: panel.cpp:5532
+#: panel.cpp:5534
 msgid "Failed to load d3d9.dll"
 msgstr "Échec du chargement de d3d9.dll"
 
-#: panel.cpp:5541
+#: panel.cpp:5543
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Échec de la création de l'interface Direct3D 9"
 
-#: panel.cpp:5544
+#: panel.cpp:5546
 msgid "Using Direct3D 9"
 msgstr "Utilisation de Direct3D 9"
 
-#: panel.cpp:5551
+#: panel.cpp:5553
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur : 0x%08X"
 
-#: panel.cpp:5575
+#: panel.cpp:5577
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx non pris en charge, retour à l'effet Discard swap"
 
-#: panel.cpp:5591
+#: panel.cpp:5593
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Traitement matériel des sommets indisponible, retour au traitement logiciel"
 
-#: panel.cpp:5615
+#: panel.cpp:5617
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Échec de la création du périphérique Direct3D : 0x%08X"
 
-#: panel.cpp:5620
+#: panel.cpp:5622
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Périphérique Direct3D 9 %scréé avec succès (SwapEffect :%s )"
 
-#: panel.cpp:5653
+#: panel.cpp:5655
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DXDrawingPanel initialisé :%d x %d(échelle : %f)"
 
-#: panel.cpp:5675
+#: panel.cpp:5677
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Échec de l'obtention du mode d'affichage de l'adaptateur pour la réinitialisation : 0x%08X"
 
-#: panel.cpp:5707
+#: panel.cpp:5709
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Tentative de réinitialisation du périphérique Direct3D (SwapEffect :%s )"
 
-#: panel.cpp:5714
+#: panel.cpp:5716
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "Réinitialisation avec FlipEx échouée, nouvelle tentative avec effet d'échange Discard"
 
-#: panel.cpp:5726
+#: panel.cpp:5728
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Échec de la réinitialisation du périphérique Direct3D : 0x%08X"
 
-#: panel.cpp:5731
+#: panel.cpp:5733
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Réinitialisation du périphérique Direct3D réussie (effet d'échange final :%s )"
 
-#: panel.cpp:5799
+#: panel.cpp:5801
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Échec de la création de la texture : 0x%08X"
 
-#: panel.cpp:5811
+#: panel.cpp:5813
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Échec du verrouillage de la texture : 0x%08X"
 
-#: panel.cpp:6003
+#: panel.cpp:6005
 msgid "Memory allocation error"
 msgstr "Erreur d'allocation mémoire"
 
-#: panel.cpp:6006
+#: panel.cpp:6008
 msgid "Error initializing codec"
 msgstr "Erreur d'initialisation du codec"
 
-#: panel.cpp:6009
+#: panel.cpp:6011
 msgid "Error writing to output file"
 msgstr "Erreur d'écriture du fichier de sortie"
 
-#: panel.cpp:6012
+#: panel.cpp:6014
 msgid "Can't guess output format from file name"
 msgstr "Impossible de déduire le format de sortie à partir du nom de fichier"
 
-#: panel.cpp:6017
+#: panel.cpp:6019
 msgid "Programming error; aborting!"
 msgstr "Erreur de programmation ; annulation !"
 
-#: panel.cpp:6029 panel.cpp:6058
+#: panel.cpp:6031 panel.cpp:6060
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Impossible de commencer l'enregistrement de %s (%s)"
 
-#: panel.cpp:6086
+#: panel.cpp:6088
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio/vidéo (%s); annulation"
 
-#: panel.cpp:6092
+#: panel.cpp:6094
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement audio (%s) ; annulation"
 
-#: panel.cpp:6102
+#: panel.cpp:6104
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erreur pendant l'enregistrement vidéo (%s) ; annulation"
 
-#: panel.cpp:6297
+#: panel.cpp:6299
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume : %d %%"
 
-#: panel.cpp:6819
+#: panel.cpp:6821
 msgid "Vulkan device created successfully"
 msgstr ""
 
-#: panel.cpp:6915
+#: panel.cpp:6917
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr ""
 
-#: panel.cpp:6944
+#: panel.cpp:6946
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr ""
 
-#: panel.cpp:6947
+#: panel.cpp:6949
 msgid "Vulkan instance created"
 msgstr ""
 
-#: panel.cpp:6962
+#: panel.cpp:6964
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr ""
 
-#: panel.cpp:6985
+#: panel.cpp:6987
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:6996
+#: panel.cpp:6998
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr ""
 
-#: panel.cpp:7014
+#: panel.cpp:7016
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr ""
 
-#: panel.cpp:7033
+#: panel.cpp:7035
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr ""
 
-#: panel.cpp:7072
+#: panel.cpp:7074
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr ""
 
-#: panel.cpp:7086
+#: panel.cpp:7088
 msgid "No supported Vulkan surface extension available"
 msgstr ""
 
-#: panel.cpp:7097
+#: panel.cpp:7099
 msgid "No Vulkan physical devices found"
 msgstr ""
 
-#: panel.cpp:7147
+#: panel.cpp:7149
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr ""
 
-#: panel.cpp:7151
+#: panel.cpp:7153
 msgid "No suitable Vulkan physical device found"
 msgstr ""
 
-#: panel.cpp:7190
+#: panel.cpp:7192
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr ""
 
-#: panel.cpp:7277
+#: panel.cpp:7279
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr ""
 
-#: panel.cpp:7289
+#: panel.cpp:7291
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s"
 msgstr ""
 
-#: panel.cpp:7333
+#: panel.cpp:7335
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr ""
 
-#: panel.cpp:7379
+#: panel.cpp:7381
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr ""
 
-#: panel.cpp:7401
+#: panel.cpp:7403
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr ""
 
-#: panel.cpp:7424
+#: panel.cpp:7426
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr ""
 
-#: panel.cpp:7447
+#: panel.cpp:7449
 msgid "Failed to create shader modules"
 msgstr ""
 
-#: panel.cpp:7515
+#: panel.cpp:7517
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr ""
 
-#: panel.cpp:7542
+#: panel.cpp:7544
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr ""
 
-#: panel.cpp:7558
+#: panel.cpp:7560
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr ""
 
-#: panel.cpp:7576
+#: panel.cpp:7578
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr ""
 
-#: panel.cpp:7596
+#: panel.cpp:7598
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr ""
 
-#: panel.cpp:7618
+#: panel.cpp:7620
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr ""
 
-#: panel.cpp:7630
+#: panel.cpp:7632
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:7668
+#: panel.cpp:7670
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr ""
 
-#: panel.cpp:7682
+#: panel.cpp:7684
 msgid "Failed to allocate texture memory"
 msgstr ""
 
-#: panel.cpp:7698
+#: panel.cpp:7700
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr ""
 
-#: panel.cpp:7716
+#: panel.cpp:7718
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr ""
 
-#: panel.cpp:7750
+#: panel.cpp:7752
 msgid "Failed to create staging buffer"
 msgstr ""
 
-#: panel.cpp:7765
+#: panel.cpp:7767
 msgid "Failed to allocate staging memory"
 msgstr ""
 
-#: panel.cpp:7803
+#: panel.cpp:7805
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr ""
 
-#: panel.cpp:7841
+#: panel.cpp:7843
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr ""
 
-#: panel.cpp:8098
+#: panel.cpp:8100
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr ""
@@ -1550,76 +1628,76 @@ msgstr "Bleu :"
 msgid "Unable to load dialog %s from resources"
 msgstr "Impossible de charger le dialogue %s depuis les ressources"
 
-#: wxvbam.cpp:706 wxvbam.cpp:723
+#: wxvbam.cpp:707 wxvbam.cpp:724
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Fichier de configuration invalide : %s"
 
-#: wxvbam.cpp:1005
+#: wxvbam.cpp:1006
 msgid "Save built-in XRC file and exit"
 msgstr "Sauvegarder le fichier XRC intégré et quitter"
 
-#: wxvbam.cpp:1008
+#: wxvbam.cpp:1009
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Sauvegarder le fichier vba-over.ini intégré et quitter"
 
-#: wxvbam.cpp:1011
+#: wxvbam.cpp:1012
 msgid "Print configuration path and exit"
 msgstr "Afficher le chemin de configuration et quitter"
 
-#: wxvbam.cpp:1014
+#: wxvbam.cpp:1015
 msgid "Start in full-screen mode"
 msgstr "Démarrer en mode plein écran"
 
-#: wxvbam.cpp:1017
+#: wxvbam.cpp:1018
 msgid "Set a configuration file"
 msgstr "Choisir un fichier de configuration"
 
-#: wxvbam.cpp:1021
+#: wxvbam.cpp:1022
 msgid "Delete shared link state first, if it exists"
 msgstr "Supprimer l'objet de mémoire partagé, s'il existe"
 
-#: wxvbam.cpp:1028
+#: wxvbam.cpp:1029
 msgid "List all settable options and exit"
 msgstr "Lister toutes les options configurables et quitter"
 
-#: wxvbam.cpp:1031
+#: wxvbam.cpp:1032
 msgid "ROM file"
 msgstr "Fichier ROM"
 
-#: wxvbam.cpp:1033
+#: wxvbam.cpp:1034
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1064
+#: wxvbam.cpp:1065
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Erreur de configuration / d'assemblage : impossible de trouver le fichier xrc intégré"
 
-#: wxvbam.cpp:1072
+#: wxvbam.cpp:1073
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "A écrit la configuration intégrée dans %s.\nPour remplacer, supprimez tout sauf les nœud(s) racine modifiés. Le premier nœud racine trouvé avec le nom correct dans les fichiers .xrc ou .xrs du chemin de recherche suivant remplace la configuration intégrée :"
 
-#: wxvbam.cpp:1086
+#: wxvbam.cpp:1087
 msgid "Configuration is read from, in order:"
 msgstr "La configuration est lue depuis, dans l'ordre :"
 
-#: wxvbam.cpp:1100
+#: wxvbam.cpp:1101
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Override intégré enregistré sur %s\nPour passer outre, tout supprimer sauf la section changée. La première section trouvée est utilisée depuis le chemin de recherche :"
 
-#: wxvbam.cpp:1106
+#: wxvbam.cpp:1107
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tintégré"
 
-#: wxvbam.cpp:1121
+#: wxvbam.cpp:1122
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1627,21 +1705,21 @@ msgid ""
 "\n"
 msgstr "Les options définies depuis la ligne de commande sont sauvegardées si des changements de configuration sont faits dans l'interface utilisateur.\n\nPour les options flag, vrai et faux sont spécifiés comme 1 et 0, respectivement.\n\n"
 
-#: wxvbam.cpp:1129
+#: wxvbam.cpp:1130
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Les commandes disponibles pour les options Keyboard/* sont :\n\n"
 
-#: wxvbam.cpp:1141
+#: wxvbam.cpp:1142
 msgid "Configuration file not found."
 msgstr "Fichier de configuration introuvable."
 
-#: wxvbam.cpp:1172
+#: wxvbam.cpp:1173
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Mauvaise option de configuration ou plusieurs fichiers ROM fournis :\n"
 
-#: wxvbam.cpp:1471
+#: wxvbam.cpp:1514
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1650,67 +1728,67 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Impossible de créer le répertoire :\n%s\n\nVeuillez vérifier le chemin d'accès que vous avez configuré dans Options > Répertoires."
 
-#: wxvbam.cpp:1736
+#: wxvbam.cpp:1779
 msgid "Failed to load dialog"
 msgstr ""
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:446
+#: xrc/JoyPanelStandard.xrc:7 xrc/MainMenu.xrc:446
 msgid "Up"
 msgstr "Haut"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:450
+#: xrc/JoyPanelStandard.xrc:53 xrc/MainMenu.xrc:450
 msgid "Down"
 msgstr "Bas"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:454
+#: xrc/JoyPanelStandard.xrc:99 xrc/MainMenu.xrc:454
 msgid "Left"
 msgstr "Gauche"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:458
+#: xrc/JoyPanelStandard.xrc:145 xrc/MainMenu.xrc:458
 msgid "Right"
 msgstr "Droite"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:37
+#: xrc/JoyPanelStandard.xrc:30
 msgid "A"
 msgstr "A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:83
+#: xrc/JoyPanelStandard.xrc:76
 msgid "B"
 msgstr "B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:129
+#: xrc/JoyPanelStandard.xrc:122
 msgid "L"
 msgstr "L"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:175
+#: xrc/JoyPanelStandard.xrc:168
 msgid "R"
 msgstr "R"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:478
+#: xrc/JoyPanelStandard.xrc:192 xrc/MainMenu.xrc:478
 msgid "Select"
 msgstr "Select"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:482
+#: xrc/JoyPanelStandard.xrc:215 xrc/MainMenu.xrc:482
 msgid "Start"
 msgstr "Start"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
-#: xrc/JoyPanel.xrc:254
+#: xrc/JoyPanelSpecial.xrc:7
 msgid "Motion Up"
 msgstr "Mouvement vers le haut"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
-#: xrc/JoyPanel.xrc:298
+#: xrc/JoyPanelSpecial.xrc:51
 msgid "Motion Down"
 msgstr "Mouvement vers le bas"
 
@@ -1739,7 +1817,6 @@ msgid "Auto B"
 msgstr "Auto B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:349
 msgid "Speed"
 msgstr "Vitesse"
 
@@ -2880,14 +2957,18 @@ msgstr "&Rechercher"
 msgid "U&pdate Old"
 msgstr "Ancienne Mi&se à Jour"
 
-#: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
-#: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
-#: xrc/JoyPanel.xrc:144 xrc/JoyPanel.xrc:167 xrc/JoyPanel.xrc:191
-#: xrc/JoyPanel.xrc:214 xrc/JoyPanel.xrc:237 xrc/JoyPanel.xrc:268
-#: xrc/JoyPanel.xrc:290 xrc/JoyPanel.xrc:312 xrc/JoyPanel.xrc:334
-#: xrc/JoyPanel.xrc:356 xrc/JoyPanel.xrc:378 xrc/JoyPanel.xrc:400
-#: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
-#: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
+#: xrc/CheatCreate.xrc:195 xrc/JoyPanelSpecial.xrc:21
+#: xrc/JoyPanelSpecial.xrc:43 xrc/JoyPanelSpecial.xrc:65
+#: xrc/JoyPanelSpecial.xrc:87 xrc/JoyPanelSpecial.xrc:109
+#: xrc/JoyPanelSpecial.xrc:131 xrc/JoyPanelSpecial.xrc:153
+#: xrc/JoyPanelSpecial.xrc:175 xrc/JoyPanelSpecial.xrc:197
+#: xrc/JoyPanelSpecial.xrc:228 xrc/JoyPanelSpecial.xrc:250
+#: xrc/JoyPanelStandard.xrc:22 xrc/JoyPanelStandard.xrc:45
+#: xrc/JoyPanelStandard.xrc:68 xrc/JoyPanelStandard.xrc:91
+#: xrc/JoyPanelStandard.xrc:114 xrc/JoyPanelStandard.xrc:137
+#: xrc/JoyPanelStandard.xrc:160 xrc/JoyPanelStandard.xrc:184
+#: xrc/JoyPanelStandard.xrc:207 xrc/JoyPanelStandard.xrc:230
+#: xrc/Logging.xrc:119
 msgid "&Clear"
 msgstr "&Nettoyer"
 
@@ -3013,187 +3094,167 @@ msgstr "&Suivant"
 msgid "Display settings"
 msgstr "Paramètres d'affichage"
 
-#: xrc/DisplayConfig.xrc:12 xrc/SoundConfig.xrc:93
-msgid "Basic"
-msgstr "Basique"
-
-#: xrc/DisplayConfig.xrc:23
+#: xrc/DisplayConfigBasic.xrc:13
 msgid "Output module"
 msgstr "Module de sortie"
 
-#: xrc/DisplayConfig.xrc:33
+#: xrc/DisplayConfigBasic.xrc:23
 msgid "Simple"
 msgstr "Simple"
 
-#: xrc/DisplayConfig.xrc:84
+#: xrc/DisplayConfigBasic.xrc:74
 msgid "SDL Renderer:"
 msgstr "Moteur de rendu SDL"
 
-#: xrc/DisplayConfig.xrc:93
+#: xrc/DisplayConfigBasic.xrc:83
 msgid "SDL Pixel Art Filter"
 msgstr "Filtre SDL Pixel Art"
 
-#: xrc/DisplayConfig.xrc:107
+#: xrc/DisplayConfigBasic.xrc:97
 msgid "Filters"
 msgstr "Filtres"
 
-#: xrc/DisplayConfig.xrc:122
+#: xrc/DisplayConfigBasic.xrc:112
 msgid "Plugin filter dir:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:128
+#: xrc/DisplayConfigBasic.xrc:118
 msgid "Select plugin directory"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:135
+#: xrc/DisplayConfigBasic.xrc:125
 msgid "Display filter:"
 msgstr "Filtre d'affichage :"
 
-#: xrc/DisplayConfig.xrc:143
+#: xrc/DisplayConfigBasic.xrc:133
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: xrc/DisplayConfig.xrc:144
+#: xrc/DisplayConfigBasic.xrc:134
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: xrc/DisplayConfig.xrc:145
+#: xrc/DisplayConfigBasic.xrc:135
 msgid "Pixelate"
 msgstr "Pixéliser"
 
-#: xrc/DisplayConfig.xrc:146
+#: xrc/DisplayConfigBasic.xrc:136
 msgid "Advance MAME Scale 2x"
 msgstr "Advance MAME Scale 2x"
 
-#: xrc/DisplayConfig.xrc:147
+#: xrc/DisplayConfigBasic.xrc:137
 msgid "Bilinear Plus"
 msgstr "Bilinéaire Plus"
 
-#: xrc/DisplayConfig.xrc:148
+#: xrc/DisplayConfigBasic.xrc:138
 msgid "Scanlines"
 msgstr "Scanlines"
 
-#: xrc/DisplayConfig.xrc:149
+#: xrc/DisplayConfigBasic.xrc:139
 msgid "TV Mode"
 msgstr "Mode TV"
 
-#: xrc/DisplayConfig.xrc:152
+#: xrc/DisplayConfigBasic.xrc:142
 msgid "Simple 4x"
 msgstr "Simple 4x"
 
-#: xrc/DisplayConfig.xrc:165
+#: xrc/DisplayConfigBasic.xrc:155
 msgid "Filter plugin:"
 msgstr ""
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfigBasic.xrc:165
 msgid "Interframe blending:"
 msgstr "Filtre de fusion inter-image :"
 
-#: xrc/DisplayConfig.xrc:183
+#: xrc/DisplayConfigBasic.xrc:173
 msgid "Smart"
 msgstr "Intelligent"
 
-#: xrc/DisplayConfig.xrc:184
+#: xrc/DisplayConfigBasic.xrc:174
 msgid "Motion Blur"
 msgstr "Flou de mouvement"
 
-#: xrc/DisplayConfig.xrc:196
-msgid "Bit Depth"
-msgstr "Profondeur de Bits"
-
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfigBitDepth.xrc:11
 msgid "Bit Depth:"
 msgstr "Profondeur de Bits"
 
-#: xrc/DisplayConfig.xrc:213
+#: xrc/DisplayConfigBitDepth.xrc:19
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:214
+#: xrc/DisplayConfigBitDepth.xrc:20
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:215
+#: xrc/DisplayConfigBitDepth.xrc:21
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:216
+#: xrc/DisplayConfigBitDepth.xrc:22
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:224
-msgid "Color Correction"
-msgstr "Correction des couleurs"
-
-#: xrc/DisplayConfig.xrc:233
+#: xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
 msgstr "Profil :"
 
-#: xrc/DisplayConfig.xrc:267
+#: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "GBA Darken:"
 msgstr "GBA Assombrie :"
 
-#: xrc/DisplayConfig.xrc:286
+#: xrc/DisplayConfigColorCorrection.xrc:64
 msgid "Lighter"
 msgstr "Plus léger"
 
-#: xrc/DisplayConfig.xrc:297
+#: xrc/DisplayConfigColorCorrection.xrc:75
 msgid "Very Dark"
 msgstr "Très foncé"
 
-#: xrc/DisplayConfig.xrc:308
+#: xrc/DisplayConfigColorCorrection.xrc:86
 msgid "GBC Lighten:"
 msgstr "GBC Eclaircie :"
 
-#: xrc/DisplayConfig.xrc:327
+#: xrc/DisplayConfigColorCorrection.xrc:105
 msgid "Darker"
 msgstr "Plus foncé"
 
-#: xrc/DisplayConfig.xrc:338
+#: xrc/DisplayConfigColorCorrection.xrc:116
 msgid "Very Light"
 msgstr "Très léger"
 
-#: xrc/DisplayConfig.xrc:355
-msgid "Frame Skip"
-msgstr "Saut d'image"
-
-#: xrc/DisplayConfig.xrc:373
-msgid "&Number of frames to skip:"
-msgstr "&Nombre d'images à passer :"
-
-#: xrc/DisplayConfig.xrc:397
-msgid "On-Screen Display"
-msgstr "Affichage sur l'écran"
-
-#: xrc/DisplayConfig.xrc:404
+#: xrc/DisplayConfigOSD.xrc:9
 msgid "Speed indicator:"
 msgstr "Indicateur de vitesse :"
 
-#: xrc/DisplayConfig.xrc:413
+#: xrc/DisplayConfigOSD.xrc:18
 msgid "Percentage"
 msgstr "Pourcentage"
 
-#: xrc/DisplayConfig.xrc:414
+#: xrc/DisplayConfigOSD.xrc:19
 msgid "Detailed"
 msgstr "Détaillé"
 
-#: xrc/DisplayConfig.xrc:422
-msgid "Zoom"
-msgstr "Zoom"
+#: xrc/DisplayConfigSpeed.xrc:8
+msgid "Frame Skip"
+msgstr "Saut d'image"
 
-#: xrc/DisplayConfig.xrc:432
+#: xrc/DisplayConfigSpeed.xrc:26
+msgid "&Number of frames to skip:"
+msgstr "&Nombre d'images à passer :"
+
+#: xrc/DisplayConfigZoom.xrc:12
 msgid "Default magnification:"
 msgstr "Zoom par défaut :"
 
-#: xrc/DisplayConfig.xrc:450
+#: xrc/DisplayConfigZoom.xrc:30
 msgid "Maximum magnification factor:"
 msgstr "Zoom maximum :"
 
-#: xrc/DisplayConfig.xrc:451
+#: xrc/DisplayConfigZoom.xrc:31
 msgid "0 = no maximum"
 msgstr "0 = pas de maximum"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfigZoom.xrc:38
 msgid "0 = no limit"
 msgstr "0 = aucune limite"
 
@@ -3260,10 +3321,6 @@ msgstr "Information sur la ROM"
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
 msgstr "Personnalisé"
-
-#: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
-msgid "Standard"
-msgstr "Standard"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
@@ -3486,164 +3543,138 @@ msgstr "Banque VRAM"
 msgid "Game Boy Advance settings"
 msgstr "Paramètres Game Boy Advance"
 
-#: xrc/GameBoyAdvanceConfig.xrc:21
-msgid "Save type:"
-msgstr "Type de sauvegarde :"
-
-#: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
-#: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
-msgid "Automatic"
-msgstr "Automatique"
-
-#: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
-msgid "SRAM"
-msgstr "SRAM"
-
-#: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
-msgid "Flash"
-msgstr "Flash"
-
-#: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
-msgid "EEPROM + Sensor"
-msgstr "EEPROM + Détecteur"
-
-#: xrc/GameBoyAdvanceConfig.xrc:43
-msgid "Flash size:"
-msgstr "Taille Flash  :"
-
-#: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
-msgid "64 K"
-msgstr "64 K"
-
-#: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
-msgid "128 K"
-msgstr "128 K"
-
-#: xrc/GameBoyAdvanceConfig.xrc:64
-msgid "Detect Now"
-msgstr "Détecter maintenant"
-
-#: xrc/GameBoyAdvanceConfig.xrc:69
-msgid "Cartridge"
-msgstr "Cartouche"
-
-#: xrc/GameBoyAdvanceConfig.xrc:77
-msgid "Save type"
-msgstr "Type de sauvegarde"
-
-#: xrc/GameBoyAdvanceConfig.xrc:92
+#: xrc/GameBoyAdvanceConfigBootRom.xrc:15
 msgid "BIOS file:"
 msgstr "Fichier Bios :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:115
+#: xrc/GameBoyAdvanceConfigBootRom.xrc:38
 msgid "Current BIOS file:"
 msgstr "Fichier BIOS actuel :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
-msgid "Boot ROM"
-msgstr "ROM de démarrage"
-
-#: xrc/GameBoyAdvanceConfig.xrc:146
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:11
 msgid "Game Code"
 msgstr "Code du jeu"
 
-#: xrc/GameBoyAdvanceConfig.xrc:160
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:25
 msgid "Comment"
 msgstr "Commenter"
 
-#: xrc/GameBoyAdvanceConfig.xrc:172
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:37
 msgid "Real Time Clock:"
 msgstr "Horloge en temps réel :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
-#: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
-#: xrc/GameBoyConfig.xrc:180
-msgid "Default"
-msgstr "Défaut"
-
-#: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:46
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:104
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:47
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:105
 msgid "Enabled"
 msgstr "Activé"
 
-#: xrc/GameBoyAdvanceConfig.xrc:190
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:55
 msgid "Save Type:"
 msgstr "Type de sauvegarde :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:212
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:64
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:20 xrc/GameBoyConfigSystem.xrc:22
+#: xrc/GameBoyConfigSystem.xrc:52
+msgid "Automatic"
+msgstr "Automatique"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:66
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:22
+msgid "SRAM"
+msgstr "SRAM"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:67
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:23
+msgid "Flash"
+msgstr "Flash"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:68
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:24
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Détecteur"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:77
 msgid "Flash Size:"
 msgstr "Taille Flash :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:230
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:86
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:42
+msgid "64 K"
+msgstr "64 K"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:87
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:43
+msgid "128 K"
+msgstr "128 K"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:95
 msgid "Mirroring:"
 msgstr "Symétrie :"
 
-#: xrc/GameBoyAdvanceConfig.xrc:254
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:119
 msgid "&Defaults"
 msgstr "&Défauts"
 
-#: xrc/GameBoyAdvanceConfig.xrc:261
-msgid "Game Overrides"
-msgstr "Dérogations pour ce jeu"
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:14
+msgid "Save type:"
+msgstr "Type de sauvegarde :"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:36
+msgid "Flash size:"
+msgstr "Taille Flash  :"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:57
+msgid "Detect Now"
+msgstr "Détecter maintenant"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:62
+msgid "Cartridge"
+msgstr "Cartouche"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
 msgstr "Paramètres Game Boy"
 
-#: xrc/GameBoyConfig.xrc:20
-msgid "Emulated &system:"
-msgstr "&Système émulé :"
-
-#: xrc/GameBoyConfig.xrc:48
-msgid "Display &borders:"
-msgstr "Afficher les &bordures :"
-
-#: xrc/GameBoyConfig.xrc:57
-msgid "Never"
-msgstr "Jamais"
-
-#: xrc/GameBoyConfig.xrc:58
-msgid "Always"
-msgstr "Toujours"
-
-#: xrc/GameBoyConfig.xrc:72
-msgid "System"
-msgstr "Système"
-
-#: xrc/GameBoyConfig.xrc:84
+#: xrc/GameBoyConfigBootRom.xrc:12
 msgid "Game Boy Boot &ROM file:"
 msgstr "Fichier &ROM de démarrage Game Boy : "
 
-#: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
+#: xrc/GameBoyConfigBootRom.xrc:19 xrc/GameBoyConfigBootRom.xrc:41
 msgid "Select a File"
 msgstr "Sélectionner un fichier"
 
-#: xrc/GameBoyConfig.xrc:106
+#: xrc/GameBoyConfigBootRom.xrc:34
 msgid "Game Boy Color Boot ROM &file:"
 msgstr "&Fichier ROM de démarrage Game Boy Color : "
 
-#: xrc/GameBoyConfig.xrc:131
+#: xrc/GameBoyConfigBootRom.xrc:59
 msgid "Current Game Boy BIOS file:"
 msgstr "Fichier BIOS Game Boy actuel :"
 
-#: xrc/GameBoyConfig.xrc:152
+#: xrc/GameBoyConfigBootRom.xrc:80
 msgid "Current Game Boy Color BIOS file:"
 msgstr "Fichier BIOS Game Boy Color actuel :"
 
-#: xrc/GameBoyConfig.xrc:186
-msgid "User 1"
-msgstr "Utilisateur 1"
+#: xrc/GameBoyConfigSystem.xrc:13
+msgid "Emulated &system:"
+msgstr "&Système émulé :"
 
-#: xrc/GameBoyConfig.xrc:192
-msgid "User 2"
-msgstr "Utilisateur 2"
+#: xrc/GameBoyConfigSystem.xrc:41
+msgid "Display &borders:"
+msgstr "Afficher les &bordures :"
 
-#: xrc/GameBoyConfig.xrc:198
-msgid "Custom Colors"
-msgstr "Couleurs personnalisées"
+#: xrc/GameBoyConfigSystem.xrc:50
+msgid "Never"
+msgstr "Jamais"
+
+#: xrc/GameBoyConfigSystem.xrc:51
+msgid "Always"
+msgstr "Toujours"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
@@ -3689,60 +3720,56 @@ msgstr "Illimité"
 msgid "IO Viewer"
 msgstr "Visualiseur IO"
 
-#: xrc/JoyPanel.xrc:8
+#: xrc/JoyPanel.xrc:10
 msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
 msgstr "Cliquer sur un champ et presser une touche ou bouger l'analogique pour ajouter. Presser la touche « retour arrière » pour effacer la dernière touche ajoutée. Redimensionner la fenêtre ou cliquer à l'intérieur et bouger le pointeur pour voir les contenus en entier si trop petit."
 
-#: xrc/JoyPanel.xrc:276
-msgid "Autofire A"
-msgstr "Auto A"
-
-#: xrc/JoyPanel.xrc:320
-msgid "Autofire B"
-msgstr "Auto B"
-
-#: xrc/JoyPanel.xrc:342
-msgid "Motion Left / Dark"
-msgstr "Mouvement Gauche / Assombrir"
-
-#: xrc/JoyPanel.xrc:386
-msgid "Motion Right / Light"
-msgstr "Mouvement Droite / Éclaircir"
-
-#: xrc/JoyPanel.xrc:408
-msgid "Speed Up"
-msgstr "Accélérer"
-
-#: xrc/JoyPanel.xrc:430
-msgid "Spin Left"
-msgstr "Tourner à gauche"
-
-#: xrc/JoyPanel.xrc:461
-msgid "Spin Right"
-msgstr "Tourner à droite"
-
-#: xrc/JoyPanel.xrc:483
-msgid "Screenshot"
-msgstr "Capture d'écran"
-
-#: xrc/JoyPanel.xrc:507
-msgid "Special"
-msgstr "Spécial"
-
-#: xrc/JoyPanel.xrc:515
+#: xrc/JoyPanel.xrc:15
 msgid "Use as default"
 msgstr "Utiliser par défaut"
 
-#: xrc/JoyPanel.xrc:522
+#: xrc/JoyPanel.xrc:22
 msgid "Defaults"
 msgstr "Défauts"
 
-#: xrc/JoyPanel.xrc:529
+#: xrc/JoyPanel.xrc:29
 msgid "Clear All"
 msgstr "Tout vider"
+
+#: xrc/JoyPanelSpecial.xrc:29
+msgid "Autofire A"
+msgstr "Auto A"
+
+#: xrc/JoyPanelSpecial.xrc:73
+msgid "Autofire B"
+msgstr "Auto B"
+
+#: xrc/JoyPanelSpecial.xrc:95
+msgid "Motion Left / Dark"
+msgstr "Mouvement Gauche / Assombrir"
+
+#: xrc/JoyPanelSpecial.xrc:139
+msgid "Motion Right / Light"
+msgstr "Mouvement Droite / Éclaircir"
+
+#: xrc/JoyPanelSpecial.xrc:161
+msgid "Speed Up"
+msgstr "Accélérer"
+
+#: xrc/JoyPanelSpecial.xrc:183
+msgid "Spin Left"
+msgstr "Tourner à gauche"
+
+#: xrc/JoyPanelSpecial.xrc:214
+msgid "Spin Right"
+msgstr "Tourner à droite"
+
+#: xrc/JoyPanelSpecial.xrc:236
+msgid "Screenshot"
+msgstr "Capture d'écran"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
@@ -3755,22 +3782,6 @@ msgstr "Mode GameController SDL"
 #: xrc/JoypadConfig.xrc:21
 msgid "Autofire Throttle (frames):"
 msgstr ""
-
-#: xrc/JoypadConfig.xrc:40
-msgid "Player 1"
-msgstr "Joueur 1"
-
-#: xrc/JoypadConfig.xrc:46
-msgid "Player 2"
-msgstr "Joueur 2"
-
-#: xrc/JoypadConfig.xrc:52
-msgid "Player 3"
-msgstr "Joueur 3"
-
-#: xrc/JoypadConfig.xrc:58
-msgid "Player 4"
-msgstr "Joueur 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -4733,83 +4744,79 @@ msgstr "C&hanger la couleur en arrière plan"
 msgid "Sound Settings"
 msgstr "Paramètres du son"
 
-#: xrc/SoundConfig.xrc:18
-msgid "Volume:"
-msgstr "Volume :"
-
-#: xrc/SoundConfig.xrc:36
-msgid "Mute"
-msgstr "Muet"
-
-#: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:328
-msgid "Maximum"
-msgstr "Maximum"
-
-#: xrc/SoundConfig.xrc:73
-msgid "Sample rate:"
-msgstr "Échantillonnage :"
-
-#: xrc/SoundConfig.xrc:79
-msgid "48 KHz"
-msgstr "48 KHz"
-
-#: xrc/SoundConfig.xrc:80
-msgid "44.1 KHz"
-msgstr "44.1 KHz"
-
-#: xrc/SoundConfig.xrc:81
-msgid "22 KHz"
-msgstr "22 KHz"
-
-#: xrc/SoundConfig.xrc:82
-msgid "11 KHz"
-msgstr "11 KHz"
-
-#: xrc/SoundConfig.xrc:119
+#: xrc/SoundConfigAdvanced.xrc:26
 msgid "Direct Sound"
 msgstr "Direct Sound"
 
-#: xrc/SoundConfig.xrc:154
+#: xrc/SoundConfigAdvanced.xrc:61
 msgid "Device"
 msgstr "Périphérique"
 
-#: xrc/SoundConfig.xrc:162
+#: xrc/SoundConfigAdvanced.xrc:69
 msgid "Enable stereo upmixing"
 msgstr "Activer le mixage stéréo"
 
-#: xrc/SoundConfig.xrc:169
+#: xrc/SoundConfigAdvanced.xrc:76
 msgid "Enable hardware acceleration"
 msgstr "Activer l'accélération matériel"
 
-#: xrc/SoundConfig.xrc:198
+#: xrc/SoundConfigAdvanced.xrc:105
 msgid "Number of sound buffers:"
 msgstr "Nombre de tampons audio :"
 
-#: xrc/SoundConfig.xrc:206
-msgid "Advanced"
-msgstr "Avancée"
+#: xrc/SoundConfigBasic.xrc:9
+msgid "Volume:"
+msgstr "Volume :"
 
-#: xrc/SoundConfig.xrc:238
+#: xrc/SoundConfigBasic.xrc:27
+msgid "Mute"
+msgstr "Muet"
+
+#: xrc/SoundConfigBasic.xrc:47 xrc/SoundConfigGameBoyAdvance.xrc:30
+msgid "Maximum"
+msgstr "Maximum"
+
+#: xrc/SoundConfigBasic.xrc:64
+msgid "Sample rate:"
+msgstr "Échantillonnage :"
+
+#: xrc/SoundConfigBasic.xrc:70
+msgid "48 KHz"
+msgstr "48 KHz"
+
+#: xrc/SoundConfigBasic.xrc:71
+msgid "44.1 KHz"
+msgstr "44.1 KHz"
+
+#: xrc/SoundConfigBasic.xrc:72
+msgid "22 KHz"
+msgstr "22 KHz"
+
+#: xrc/SoundConfigBasic.xrc:73
+msgid "11 KHz"
+msgstr "11 KHz"
+
+#: xrc/SoundConfigGameBoy.xrc:32
 msgid "Lots"
 msgstr "Lots"
 
-#: xrc/SoundConfig.xrc:247
+#: xrc/SoundConfigGameBoy.xrc:41
 msgid "Echo"
 msgstr "Écho"
 
-#: xrc/SoundConfig.xrc:255
+#: xrc/SoundConfigGameBoy.xrc:49
 msgid "Stereo"
 msgstr "Stéréo"
 
-#: xrc/SoundConfig.xrc:266
+#: xrc/SoundConfigGameBoy.xrc:60
 msgid "Center"
 msgstr "Centre"
 
-#: xrc/SoundConfig.xrc:277
+#: xrc/SoundConfigGameBoy.xrc:71
 msgid "Left / Right"
 msgstr "Gauche / Droite"
 
-#: xrc/SoundConfig.xrc:306
+#: xrc/SoundConfigGameBoyAdvance.xrc:8
 msgid "Sound filtering"
 msgstr "Filtrage du son"
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:00+0000\n"
+"POT-Creation-Date: 2026-05-12 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -41,7 +41,7 @@ msgstr "Не вдалося призначити буфер Core Audio %d: по�
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
-#: cmdevents.cpp:68 wxvbam.cpp:889
+#: cmdevents.cpp:68 wxvbam.cpp:890
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -381,50 +381,93 @@ msgstr "Підтвердити"
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr "Скасувати призначення \"%s\" з \"%s\"?"
 
+#: dialogs/base-dialog.cpp:182
+#, c-format
+msgid "Failed to load lazy tab '%s'"
+msgstr ""
+
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
 msgstr "Огляд"
 
-#: dialogs/display-config.cpp:125 dialogs/display-config.cpp:134
-#: dialogs/display-config.cpp:153 dialogs/display-config.cpp:158
+#: dialogs/display-config.cpp:127 dialogs/display-config.cpp:136
+#: dialogs/display-config.cpp:155 dialogs/display-config.cpp:160
 msgid "Invalid value for Default magnification."
 msgstr "Недійсне значення типового збільшення."
 
-#: dialogs/display-config.cpp:554
+#: dialogs/display-config.cpp:449
+#, c-format
+msgid "Failed to load DisplayConfig tab '%s'"
+msgstr ""
+
+#: dialogs/display-config.cpp:614
 msgid "Invalid color correction profile"
 msgstr "Недійсний профіль виправлення кольору."
 
-#: dialogs/display-config.cpp:640 xrc/DisplayConfig.xrc:142
-#: xrc/DisplayConfig.xrc:182 xrc/DisplayConfig.xrc:412
-#: xrc/GameBoyAdvanceConfig.xrc:32 xrc/GameBoyAdvanceConfig.xrc:204
-#: xrc/SoundConfig.xrc:227 xrc/SoundConfig.xrc:317
+#: dialogs/display-config.cpp:690 xrc/DisplayConfigBasic.xrc:132
+#: xrc/DisplayConfigBasic.xrc:172 xrc/DisplayConfigOSD.xrc:17
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
+#: xrc/SoundConfigGameBoyAdvance.xrc:19
 msgid "None"
 msgstr "Не вказано"
 
-#: dialogs/display-config.cpp:702
+#: dialogs/display-config.cpp:752
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Не знайдено придатних rpi-плаґінів у %s."
 
-#: dialogs/display-config.cpp:772 dialogs/display-config.cpp:855
-#: xrc/DisplayConfig.xrc:158
+#: dialogs/display-config.cpp:833 dialogs/display-config.cpp:919
+#: xrc/DisplayConfigBasic.xrc:148
 msgid "Plugin"
 msgstr "Плаґін"
 
-#: dialogs/display-config.cpp:781
+#: dialogs/display-config.cpp:842
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Використання піксельного фільтра: %s."
 
-#: dialogs/display-config.cpp:788
+#: dialogs/display-config.cpp:852
 #, c-format
 msgid "interframe blend: %s"
 msgstr "міжкадрове накладання: %s."
 
-#: dialogs/game-boy-config.cpp:143 xrc/GameBoyAdvanceConfig.xrc:122
-#: xrc/GameBoyConfig.xrc:138 xrc/GameBoyConfig.xrc:159
+#: dialogs/game-boy-config.cpp:145 xrc/GameBoyAdvanceConfigBootRom.xrc:45
+#: xrc/GameBoyConfigBootRom.xrc:66 xrc/GameBoyConfigBootRom.xrc:87
 msgid "(None)"
 msgstr "(Не вказано)"
+
+#: dialogs/game-boy-config.cpp:363
+msgid "System"
+msgstr "Система"
+
+#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2516
+msgid "Boot ROM"
+msgstr "ROM завантаження"
+
+#: dialogs/game-boy-config.cpp:381
+msgid "Custom Colors"
+msgstr "Указані кольори"
+
+#: dialogs/game-boy-config.cpp:429
+msgid "Failed to load GBColorPrefPanel"
+msgstr ""
+
+#: dialogs/game-boy-config.cpp:441
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:63
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:85
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:103
+msgid "Default"
+msgstr "Типово"
+
+#: dialogs/game-boy-config.cpp:441
+msgid "User 1"
+msgstr "Користувач 1"
+
+#: dialogs/game-boy-config.cpp:441
+msgid "User 2"
+msgstr "Користувач 2"
 
 #: dialogs/game-maker.cpp:234 dialogs/gb-rom-info.cpp:64
 msgid "Unknown"
@@ -573,7 +616,34 @@ msgstr "%02X (Дійсний: %02X)"
 msgid "%04X (Actual: %04X)"
 msgstr "%04X (Дійсний: %04X)"
 
-#: dialogs/sound-config.cpp:303
+#: dialogs/joypad-config.cpp:150
+msgid "Failed to load JoyPanel"
+msgstr ""
+
+#: dialogs/joypad-config.cpp:156
+#, c-format
+msgid "Player %u"
+msgstr ""
+
+#: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
+msgid "Standard"
+msgstr "Типова"
+
+#: dialogs/joypad-config.cpp:190
+msgid "Special"
+msgstr "Додаткова"
+
+#: dialogs/joypad-config.cpp:195
+#, c-format
+msgid "Failed to load joypad sub-tab '%s'"
+msgstr ""
+
+#: dialogs/sound-config.cpp:198
+#, c-format
+msgid "Failed to load SoundConfig tab '%s'"
+msgstr ""
+
+#: dialogs/sound-config.cpp:343
 #, c-format
 msgid "%d frame = %.2f ms"
 msgstr "%d кадрів = %.2f мсек"
@@ -757,6 +827,14 @@ msgstr "Старе значення"
 msgid "New Value"
 msgstr "Нове значення"
 
+#: guiinit.cpp:2491
+msgid "Save type"
+msgstr "Тип збереження"
+
+#: guiinit.cpp:2530
+msgid "Game Overrides"
+msgstr "Перевизначення гри"
+
 #: opts.cpp:155
 msgid ""
 "The INI file was written for a more recent version of VBA-M. Some INI option"
@@ -794,7 +872,7 @@ msgstr "Проблема завантаження файлу."
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Неможливо завантажити Game Boy ROM %s."
 
-#: panel.cpp:813 panel.cpp:957 panel.cpp:1850
+#: panel.cpp:813 panel.cpp:957 panel.cpp:1852
 msgid "Could not initialize the sound driver!"
 msgstr "Неможливо визначити аудіодрайвер!"
 
@@ -827,7 +905,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог рідних збережень:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1472
+#: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1515
 msgid "Directory Error"
 msgstr "Помилка каталогу."
 
@@ -885,552 +963,552 @@ msgstr "Вибрано режим %d * %d - %d @ %d."
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
-#: panel.cpp:1777
+#: panel.cpp:1779
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Недійсний Game Boy Advance-картридж."
 
-#: panel.cpp:1871
+#: panel.cpp:1873
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Metal недоступний, використано типову Open GL."
 
-#: panel.cpp:1904
+#: panel.cpp:1906
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "Vulkan недоступний, використано типову Open GL."
 
-#: panel.cpp:2043
+#: panel.cpp:2045
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:2053
+#: panel.cpp:2055
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:3686
+#: panel.cpp:3688
 msgid "Failed to set wayland display"
 msgstr "Не вдалося встановити Wayland-відображення."
 
-#: panel.cpp:3717
+#: panel.cpp:3719
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Не вдалося визначити підсистему SDL-відео."
 
-#: panel.cpp:3728
+#: panel.cpp:3730
 msgid "Failed to initialize SDL video"
 msgstr "Не вдалося визначити SDL-відео."
 
-#: panel.cpp:3738
+#: panel.cpp:3740
 msgid "Failed to set wayland surface"
 msgstr "Не вдалося встановити Wayland-поверхню."
 
-#: panel.cpp:3752
+#: panel.cpp:3754
 msgid "Failed to set parent window"
 msgstr "Не вдалося встановити головне вікно."
 
-#: panel.cpp:3763
+#: panel.cpp:3765
 msgid "Failed to set OpenGL properties"
 msgstr "Не вдалося встановити властивості Open GL."
 
-#: panel.cpp:3776 panel.cpp:3815
+#: panel.cpp:3778 panel.cpp:3817
 msgid "Failed to create SDL window"
 msgstr "Не вдалося створити SDL-вікно."
 
-#: panel.cpp:3786 panel.cpp:3843
+#: panel.cpp:3788 panel.cpp:3845
 msgid "Renderer creating failed, using default renderer"
 msgstr "Не вдалося створити опрацьовувач, використано типовий."
 
-#: panel.cpp:3787
+#: panel.cpp:3789
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Помилка SDL: %s."
 
-#: panel.cpp:3794 panel.cpp:3849
+#: panel.cpp:3796 panel.cpp:3851
 msgid "Failed to create SDL renderer"
 msgstr "Не вдалося створити SDL-опрацьовувач."
 
-#: panel.cpp:3800
+#: panel.cpp:3802
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Не вдалося встановити вертикальну синхронізацію для SDL-опрацьовувача."
 
-#: panel.cpp:3804 panel.cpp:3838
+#: panel.cpp:3806 panel.cpp:3840
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL-опрацьовувач: %s"
 
-#: panel.cpp:3823
+#: panel.cpp:3825
 msgid "SDL renderer: default"
 msgstr "SDL-опрацьовувач: типово"
 
-#: panel.cpp:4606
+#: panel.cpp:4608
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:4608
+#: panel.cpp:4610
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:4616
+#: panel.cpp:4618
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:4618
+#: panel.cpp:4620
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:4636
+#: panel.cpp:4638
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:4645
+#: panel.cpp:4647
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:4654
+#: panel.cpp:4656
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:4663
+#: panel.cpp:4665
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:4666
+#: panel.cpp:4668
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:4675
+#: panel.cpp:4677
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:4681
+#: panel.cpp:4683
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:4814
+#: panel.cpp:4816
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr "Не вдалося завантажити Direct 3D 12 чи Direct 3D Compiler DLL."
 
-#: panel.cpp:4840
+#: panel.cpp:4842
 msgid "Failed to get D3D12 function pointers"
 msgstr "Не вдалось отримати вказівники функцій Direct 3D 12."
 
-#: panel.cpp:4845
+#: panel.cpp:4847
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr "Не вдалося створити DXGI-фабрику: 0x%08X."
 
-#: panel.cpp:4859
+#: panel.cpp:4861
 msgid "No hardware adapter found, falling back to WARP"
 msgstr "Апаратний адаптер не знайдено, повернення до WARP."
 
-#: panel.cpp:4866
+#: panel.cpp:4868
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr "Не вдалося створити пристрій Direct 3D 12: 0x%08X."
 
-#: panel.cpp:4867
+#: panel.cpp:4869
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr "Пристрій Direct 3D 12 створено (%s)."
 
-#: panel.cpp:4874
+#: panel.cpp:4876
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr "Не вдалося створити чергу команд: 0x%08X."
 
-#: panel.cpp:4895
+#: panel.cpp:4897
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr "Не вдалося створити ланцюг обміну: 0x%08X."
 
-#: panel.cpp:4901
+#: panel.cpp:4903
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr "Не вдалось отримати IDXGI Swap Chain 3: 0x%08X"
 
-#: panel.cpp:4910
+#: panel.cpp:4912
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr "Не вдалося створити RTV-сховище: 0x%08X."
 
-#: panel.cpp:4919
+#: panel.cpp:4921
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr "Не вдалося створити SRV-сховище: 0x%08X."
 
-#: panel.cpp:4926
+#: panel.cpp:4928
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr "Не вдалось отримати задній буфер %u: 0x%08X."
 
-#: panel.cpp:4934
+#: panel.cpp:4936
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr "Не вдалося створити розподільник команд: 0x%08X."
 
-#: panel.cpp:4939
+#: panel.cpp:4941
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr "Не вдалося створити перелік команд: 0x%08X."
 
-#: panel.cpp:4978
+#: panel.cpp:4980
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr "Не вдалося перетворити кореневий підпис: %s."
 
-#: panel.cpp:4985
+#: panel.cpp:4987
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr "Не вдалося створити кореневий підпис: 0x%08X."
 
-#: panel.cpp:4999
+#: panel.cpp:5001
 #, c-format
 msgid "VS compile failed: %s"
 msgstr "Не вдалося компілювати VS: %s."
 
-#: panel.cpp:5007
+#: panel.cpp:5009
 #, c-format
 msgid "PS compile failed: %s"
 msgstr "Не вдалося компілювати PS: %s."
 
-#: panel.cpp:5036
+#: panel.cpp:5038
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr "Не вдалося створити об'єкт конвеєра шейдерів: 0x%08X."
 
-#: panel.cpp:5056
+#: panel.cpp:5058
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr "Не вдалося створити буфер вершин: 0x%08X."
 
-#: panel.cpp:5065
+#: panel.cpp:5067
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr "Не вдалося створити сітку: 0x%08X."
 
-#: panel.cpp:5068
+#: panel.cpp:5070
 msgid "Failed to create fence event"
 msgstr "Не вдалося створити подію сітки."
 
-#: panel.cpp:5070
+#: panel.cpp:5072
 msgid "D3D12 pipeline fully initialized"
 msgstr "Конвеєр Direct 3D 12 повністю визначено."
 
-#: panel.cpp:5100
+#: panel.cpp:5102
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "Direct X 12 Drawing Panel визначено: %d * %d (масштаб: %f)."
 
-#: panel.cpp:5122
+#: panel.cpp:5124
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr "Не вдалося змінити розмір буферів: 0x%08X."
 
-#: panel.cpp:5133
+#: panel.cpp:5135
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr "Розмір ланцюга обміну змінено на %d * %d."
 
-#: panel.cpp:5385
+#: panel.cpp:5387
 msgid "Texture upload failed"
 msgstr "Не вдалося завантажити текстуру."
 
-#: panel.cpp:5528
+#: panel.cpp:5530
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Використання Direct 3D 9 Ex (динамічне завантаження)"
 
-#: panel.cpp:5532
+#: panel.cpp:5534
 msgid "Failed to load d3d9.dll"
 msgstr "Не вдалося завантажити d3d9.dll."
 
-#: panel.cpp:5541
+#: panel.cpp:5543
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Не вдалося створити інтерфейс Direct 3D 9."
 
-#: panel.cpp:5544
+#: panel.cpp:5546
 msgid "Using Direct3D 9"
 msgstr "Використання Direct 3D 9"
 
-#: panel.cpp:5551
+#: panel.cpp:5553
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
 
-#: panel.cpp:5575
+#: panel.cpp:5577
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "Flip Ex не підтримується, повернення скасування ефекту обміну."
 
-#: panel.cpp:5591
+#: panel.cpp:5593
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Апаратне опрацювання вершин недоступне, повернення програмного."
 
-#: panel.cpp:5615
+#: panel.cpp:5617
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Не вдалося створити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:5620
+#: panel.cpp:5622
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Direct 3D 9 %s-пристрій успішно створено (ефект обміну: %s)."
 
-#: panel.cpp:5653
+#: panel.cpp:5655
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX Drawing Panel визначено: %d * %d (масштаб: %f)."
 
-#: panel.cpp:5675
+#: panel.cpp:5677
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
-#: panel.cpp:5707
+#: panel.cpp:5709
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Спроба відновлення налаштувань Direct 3D-пристрою (ефект обміну: %s)."
 
-#: panel.cpp:5714
+#: panel.cpp:5716
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "Не вдалося перезавантажити Flip Ex, повторення скасування ефекту обміну."
 
-#: panel.cpp:5726
+#: panel.cpp:5728
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Не вдалося перезавантажити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:5731
+#: panel.cpp:5733
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Direct 3D-пристрій успішно перезавантажено (кінцевий ефект обміну: %s)."
 
-#: panel.cpp:5799
+#: panel.cpp:5801
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Не вдалося створити текстуру: 0x%08X."
 
-#: panel.cpp:5811
+#: panel.cpp:5813
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Не вдалося заблокувати текстуру: 0x%08X."
 
-#: panel.cpp:6003
+#: panel.cpp:6005
 msgid "Memory allocation error"
 msgstr "Помилка розподілу пам'яті."
 
-#: panel.cpp:6006
+#: panel.cpp:6008
 msgid "Error initializing codec"
 msgstr "Помилка визначення кодека."
 
-#: panel.cpp:6009
+#: panel.cpp:6011
 msgid "Error writing to output file"
 msgstr "Помилка запису до кінцевого файлу."
 
-#: panel.cpp:6012
+#: panel.cpp:6014
 msgid "Can't guess output format from file name"
 msgstr "Неможливо визначити кінцевий формат імені файлу."
 
-#: panel.cpp:6017
+#: panel.cpp:6019
 msgid "Programming error; aborting!"
 msgstr "Програмна помилка; перервано!"
 
-#: panel.cpp:6029 panel.cpp:6058
+#: panel.cpp:6031 panel.cpp:6060
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:6086
+#: panel.cpp:6088
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:6092
+#: panel.cpp:6094
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:6102
+#: panel.cpp:6104
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:6297
+#: panel.cpp:6299
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
 
-#: panel.cpp:6819
+#: panel.cpp:6821
 msgid "Vulkan device created successfully"
 msgstr "Vulkan-пристрій створено успішно."
 
-#: panel.cpp:6915
+#: panel.cpp:6917
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "Поверхні VK_KHR_Wayland і VK_KHR_Xlib недоступні - неможливо створити Vulkan-поверхню в системі."
 
-#: panel.cpp:6944
+#: panel.cpp:6946
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "Не вдалося створити Vulkan-екземпляр: %d."
 
-#: panel.cpp:6947
+#: panel.cpp:6949
 msgid "Vulkan instance created"
 msgstr "Vulkan-екземпляр створено."
 
-#: panel.cpp:6962
+#: panel.cpp:6964
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "Не вдалося створити Vulkan-поверхню Win 32: %d."
 
-#: panel.cpp:6985
+#: panel.cpp:6987
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "Не вдалось отримати NSView-опрацьовувач Vulkan-поверхні."
 
-#: panel.cpp:6996
+#: panel.cpp:6998
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "Не вдалося створити Vulkan Metal-поверхню: %d."
 
-#: panel.cpp:7014
+#: panel.cpp:7016
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "Не вдалося створити Vulkan Xlib-поверхню: %d."
 
-#: panel.cpp:7033
+#: panel.cpp:7035
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "Не вдалося створити Vulkan Wayland-поверхню: %d."
 
-#: panel.cpp:7072
+#: panel.cpp:7074
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "Не вдалось отримати Wayland-опрацьовувачі дисплею та поверхні."
 
-#: panel.cpp:7086
+#: panel.cpp:7088
 msgid "No supported Vulkan surface extension available"
 msgstr "Відсутнє підтримуване розширення Vulkan-поверхні."
 
-#: panel.cpp:7097
+#: panel.cpp:7099
 msgid "No Vulkan physical devices found"
 msgstr "Не знайдено фізичних Vulkan-пристроїв."
 
-#: panel.cpp:7147
+#: panel.cpp:7149
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "Вибрано Vulkan-пристрій: %s."
 
-#: panel.cpp:7151
+#: panel.cpp:7153
 msgid "No suitable Vulkan physical device found"
 msgstr "Не знайдено відповідного фізичного Vulkan-пристрою."
 
-#: panel.cpp:7190
+#: panel.cpp:7192
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "Не вдалося створити логічний Vulkan-пристрій: %d."
 
-#: panel.cpp:7277
+#: panel.cpp:7279
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "Не вдалося створити Vulkan-ланцюг обміну: %d."
 
-#: panel.cpp:7289
+#: panel.cpp:7291
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s"
 msgstr "Ланцюг обміну створено: %u * %u, %u зображень, вертикальна синхронізація = %s."
 
-#: panel.cpp:7333
+#: panel.cpp:7335
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "Не вдалося створити перегляд зображення ланцюга обміну %zu: %d."
 
-#: panel.cpp:7379
+#: panel.cpp:7381
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "Не вдалося створити рендер-прохід: %d."
 
-#: panel.cpp:7401
+#: panel.cpp:7403
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "Не вдалося створити буфер кадрів %zu: %d."
 
-#: panel.cpp:7424
+#: panel.cpp:7426
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "Не вдалося створити макет набору дескрипторів: %d."
 
-#: panel.cpp:7447
+#: panel.cpp:7449
 msgid "Failed to create shader modules"
 msgstr "Не вдалося створити модулі шейдерів."
 
-#: panel.cpp:7515
+#: panel.cpp:7517
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "Не вдалося створити макет конвеєрів: %d."
 
-#: panel.cpp:7542
+#: panel.cpp:7544
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "Не вдалося створити конвеєр графіки: %d."
 
-#: panel.cpp:7558
+#: panel.cpp:7560
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "Не вдалося створити командний пул: %d."
 
-#: panel.cpp:7576
+#: panel.cpp:7578
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "Не вдалося призначити командні буфери: %d."
 
-#: panel.cpp:7596
+#: panel.cpp:7598
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "Не вдалося створити об'єкти синхронізації кадру %d."
 
-#: panel.cpp:7618
+#: panel.cpp:7620
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "Не вдалося створити дескрипторний пул: %d."
 
-#: panel.cpp:7630
+#: panel.cpp:7632
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "Не вдалося призначити дескрипторний набір: %d."
 
-#: panel.cpp:7668
+#: panel.cpp:7670
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "Не вдалося створити зображення текстур: %d."
 
-#: panel.cpp:7682
+#: panel.cpp:7684
 msgid "Failed to allocate texture memory"
 msgstr "Не вдалося розподілити пам'ять текстур."
 
-#: panel.cpp:7698
+#: panel.cpp:7700
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "Не вдалося створити перегляд зображення текстур: %d."
 
-#: panel.cpp:7716
+#: panel.cpp:7718
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "Не вдалося створити семплер текстур: %d."
 
-#: panel.cpp:7750
+#: panel.cpp:7752
 msgid "Failed to create staging buffer"
 msgstr "Не вдалося створити проміжний буфер."
 
-#: panel.cpp:7765
+#: panel.cpp:7767
 msgid "Failed to allocate staging memory"
 msgstr "Не вдалося розподілити проміжну пам'ять."
 
-#: panel.cpp:7803
+#: panel.cpp:7805
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VK Drawing Panel визначено: %u * %u (масштаб: %f)."
 
-#: panel.cpp:7841
+#: panel.cpp:7843
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "Не вдалось отримати зображення ланцюга обміну: %d."
 
-#: panel.cpp:8098
+#: panel.cpp:8100
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "Не вдалося представити зображення ланцюга обміну: %d."
@@ -1539,76 +1617,76 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:706 wxvbam.cpp:723
+#: wxvbam.cpp:707 wxvbam.cpp:724
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:1005
+#: wxvbam.cpp:1006
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:1008
+#: wxvbam.cpp:1009
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:1011
+#: wxvbam.cpp:1012
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:1014
+#: wxvbam.cpp:1015
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:1017
+#: wxvbam.cpp:1018
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:1021
+#: wxvbam.cpp:1022
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального з'єднання за наявності"
 
-#: wxvbam.cpp:1028
+#: wxvbam.cpp:1029
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:1031
+#: wxvbam.cpp:1032
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:1033
+#: wxvbam.cpp:1034
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1064
+#: wxvbam.cpp:1065
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:1072
+#: wxvbam.cpp:1073
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:1086
+#: wxvbam.cpp:1087
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:1100
+#: wxvbam.cpp:1101
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:1106
+#: wxvbam.cpp:1107
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:1121
+#: wxvbam.cpp:1122
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1616,21 +1694,21 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:1129
+#: wxvbam.cpp:1130
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:1141
+#: wxvbam.cpp:1142
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:1172
+#: wxvbam.cpp:1173
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: wxvbam.cpp:1471
+#: wxvbam.cpp:1514
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1639,67 +1717,67 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: wxvbam.cpp:1736
+#: wxvbam.cpp:1779
 msgid "Failed to load dialog"
 msgstr "Не вдалося завантажити вікно."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:14 xrc/MainMenu.xrc:446
+#: xrc/JoyPanelStandard.xrc:7 xrc/MainMenu.xrc:446
 msgid "Up"
 msgstr "↑"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:60 xrc/MainMenu.xrc:450
+#: xrc/JoyPanelStandard.xrc:53 xrc/MainMenu.xrc:450
 msgid "Down"
 msgstr "↓"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:106 xrc/MainMenu.xrc:454
+#: xrc/JoyPanelStandard.xrc:99 xrc/MainMenu.xrc:454
 msgid "Left"
 msgstr "←"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:152 xrc/MainMenu.xrc:458
+#: xrc/JoyPanelStandard.xrc:145 xrc/MainMenu.xrc:458
 msgid "Right"
 msgstr "→"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
-#: xrc/JoyPanel.xrc:37
+#: xrc/JoyPanelStandard.xrc:30
 msgid "A"
 msgstr "A"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:83
+#: xrc/JoyPanelStandard.xrc:76
 msgid "B"
 msgstr "B"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:129
+#: xrc/JoyPanelStandard.xrc:122
 msgid "L"
 msgstr "L"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:175
+#: xrc/JoyPanelStandard.xrc:168
 msgid "R"
 msgstr "R"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:199 xrc/MainMenu.xrc:478
+#: xrc/JoyPanelStandard.xrc:192 xrc/MainMenu.xrc:478
 msgid "Select"
 msgstr "Select"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:30
-#: xrc/JoyPanel.xrc:222 xrc/MainMenu.xrc:482
+#: xrc/JoyPanelStandard.xrc:215 xrc/MainMenu.xrc:482
 msgid "Start"
 msgstr "Start"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
-#: xrc/JoyPanel.xrc:254
+#: xrc/JoyPanelSpecial.xrc:7
 msgid "Motion Up"
 msgstr "Рух ↑"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:31
-#: xrc/JoyPanel.xrc:298
+#: xrc/JoyPanelSpecial.xrc:51
 msgid "Motion Down"
 msgstr "Рух ↓"
 
@@ -1728,7 +1806,6 @@ msgid "Auto B"
 msgstr "B-Turbo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:32
-#: xrc/DisplayConfig.xrc:349
 msgid "Speed"
 msgstr "Швидкість"
 
@@ -2869,14 +2946,18 @@ msgstr "&Шукати"
 msgid "U&pdate Old"
 msgstr "&Оновити старий"
 
-#: xrc/CheatCreate.xrc:195 xrc/JoyPanel.xrc:29 xrc/JoyPanel.xrc:52
-#: xrc/JoyPanel.xrc:75 xrc/JoyPanel.xrc:98 xrc/JoyPanel.xrc:121
-#: xrc/JoyPanel.xrc:144 xrc/JoyPanel.xrc:167 xrc/JoyPanel.xrc:191
-#: xrc/JoyPanel.xrc:214 xrc/JoyPanel.xrc:237 xrc/JoyPanel.xrc:268
-#: xrc/JoyPanel.xrc:290 xrc/JoyPanel.xrc:312 xrc/JoyPanel.xrc:334
-#: xrc/JoyPanel.xrc:356 xrc/JoyPanel.xrc:378 xrc/JoyPanel.xrc:400
-#: xrc/JoyPanel.xrc:422 xrc/JoyPanel.xrc:444 xrc/JoyPanel.xrc:475
-#: xrc/JoyPanel.xrc:497 xrc/Logging.xrc:119
+#: xrc/CheatCreate.xrc:195 xrc/JoyPanelSpecial.xrc:21
+#: xrc/JoyPanelSpecial.xrc:43 xrc/JoyPanelSpecial.xrc:65
+#: xrc/JoyPanelSpecial.xrc:87 xrc/JoyPanelSpecial.xrc:109
+#: xrc/JoyPanelSpecial.xrc:131 xrc/JoyPanelSpecial.xrc:153
+#: xrc/JoyPanelSpecial.xrc:175 xrc/JoyPanelSpecial.xrc:197
+#: xrc/JoyPanelSpecial.xrc:228 xrc/JoyPanelSpecial.xrc:250
+#: xrc/JoyPanelStandard.xrc:22 xrc/JoyPanelStandard.xrc:45
+#: xrc/JoyPanelStandard.xrc:68 xrc/JoyPanelStandard.xrc:91
+#: xrc/JoyPanelStandard.xrc:114 xrc/JoyPanelStandard.xrc:137
+#: xrc/JoyPanelStandard.xrc:160 xrc/JoyPanelStandard.xrc:184
+#: xrc/JoyPanelStandard.xrc:207 xrc/JoyPanelStandard.xrc:230
+#: xrc/Logging.xrc:119
 msgid "&Clear"
 msgstr "&Очистити"
 
@@ -3002,187 +3083,167 @@ msgstr "&Наступний"
 msgid "Display settings"
 msgstr "Налаштування відображення"
 
-#: xrc/DisplayConfig.xrc:12 xrc/SoundConfig.xrc:93
-msgid "Basic"
-msgstr "Основні"
-
-#: xrc/DisplayConfig.xrc:23
+#: xrc/DisplayConfigBasic.xrc:13
 msgid "Output module"
 msgstr "Кінцевий модуль"
 
-#: xrc/DisplayConfig.xrc:33
+#: xrc/DisplayConfigBasic.xrc:23
 msgid "Simple"
 msgstr "Simple"
 
-#: xrc/DisplayConfig.xrc:84
+#: xrc/DisplayConfigBasic.xrc:74
 msgid "SDL Renderer:"
 msgstr "SDL-опрацьовувач:"
 
-#: xrc/DisplayConfig.xrc:93
+#: xrc/DisplayConfigBasic.xrc:83
 msgid "SDL Pixel Art Filter"
 msgstr "SDL-фільтр піксельної графіки"
 
-#: xrc/DisplayConfig.xrc:107
+#: xrc/DisplayConfigBasic.xrc:97
 msgid "Filters"
 msgstr "Фільтри"
 
-#: xrc/DisplayConfig.xrc:122
+#: xrc/DisplayConfigBasic.xrc:112
 msgid "Plugin filter dir:"
 msgstr "Каталог фільтрів плаґінів:"
 
-#: xrc/DisplayConfig.xrc:128
+#: xrc/DisplayConfigBasic.xrc:118
 msgid "Select plugin directory"
 msgstr "Вибір каталогу плаґінів"
 
-#: xrc/DisplayConfig.xrc:135
+#: xrc/DisplayConfigBasic.xrc:125
 msgid "Display filter:"
 msgstr "Фільтр відображення:"
 
-#: xrc/DisplayConfig.xrc:143
+#: xrc/DisplayConfigBasic.xrc:133
 msgid "Super 2xSaI"
 msgstr "Super 2xSaI"
 
-#: xrc/DisplayConfig.xrc:144
+#: xrc/DisplayConfigBasic.xrc:134
 msgid "Super Eagle"
 msgstr "Super Eagle"
 
-#: xrc/DisplayConfig.xrc:145
+#: xrc/DisplayConfigBasic.xrc:135
 msgid "Pixelate"
 msgstr "Pixelate"
 
-#: xrc/DisplayConfig.xrc:146
+#: xrc/DisplayConfigBasic.xrc:136
 msgid "Advance MAME Scale 2x"
 msgstr "Advance MAME Scale 2x"
 
-#: xrc/DisplayConfig.xrc:147
+#: xrc/DisplayConfigBasic.xrc:137
 msgid "Bilinear Plus"
 msgstr "Bilinear Plus"
 
-#: xrc/DisplayConfig.xrc:148
+#: xrc/DisplayConfigBasic.xrc:138
 msgid "Scanlines"
 msgstr "Scanlines"
 
-#: xrc/DisplayConfig.xrc:149
+#: xrc/DisplayConfigBasic.xrc:139
 msgid "TV Mode"
 msgstr "TV Mode"
 
-#: xrc/DisplayConfig.xrc:152
+#: xrc/DisplayConfigBasic.xrc:142
 msgid "Simple 4x"
 msgstr "Simple 4x"
 
-#: xrc/DisplayConfig.xrc:165
+#: xrc/DisplayConfigBasic.xrc:155
 msgid "Filter plugin:"
 msgstr "Фільтрований плаґін:"
 
-#: xrc/DisplayConfig.xrc:175
+#: xrc/DisplayConfigBasic.xrc:165
 msgid "Interframe blending:"
 msgstr "Міжкадрове накладання:"
 
-#: xrc/DisplayConfig.xrc:183
+#: xrc/DisplayConfigBasic.xrc:173
 msgid "Smart"
 msgstr "Розумне"
 
-#: xrc/DisplayConfig.xrc:184
+#: xrc/DisplayConfigBasic.xrc:174
 msgid "Motion Blur"
 msgstr "Міжкадрове розмиття"
 
-#: xrc/DisplayConfig.xrc:196
-msgid "Bit Depth"
-msgstr "Бітова глибина"
-
-#: xrc/DisplayConfig.xrc:205
+#: xrc/DisplayConfigBitDepth.xrc:11
 msgid "Bit Depth:"
 msgstr "Бітова глибина:"
 
-#: xrc/DisplayConfig.xrc:213
+#: xrc/DisplayConfigBitDepth.xrc:19
 msgid "8"
 msgstr "8"
 
-#: xrc/DisplayConfig.xrc:214
+#: xrc/DisplayConfigBitDepth.xrc:20
 msgid "16"
 msgstr "16"
 
-#: xrc/DisplayConfig.xrc:215
+#: xrc/DisplayConfigBitDepth.xrc:21
 msgid "24"
 msgstr "24"
 
-#: xrc/DisplayConfig.xrc:216
+#: xrc/DisplayConfigBitDepth.xrc:22
 msgid "32"
 msgstr "32"
 
-#: xrc/DisplayConfig.xrc:224
-msgid "Color Correction"
-msgstr "Виправлення кольору"
-
-#: xrc/DisplayConfig.xrc:233
+#: xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
 msgstr "Профіль:"
 
-#: xrc/DisplayConfig.xrc:267
+#: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "GBA Darken:"
 msgstr "Затемнення Game Boy Advance: "
 
-#: xrc/DisplayConfig.xrc:286
+#: xrc/DisplayConfigColorCorrection.xrc:64
 msgid "Lighter"
 msgstr "Світліше"
 
-#: xrc/DisplayConfig.xrc:297
+#: xrc/DisplayConfigColorCorrection.xrc:75
 msgid "Very Dark"
 msgstr "Дуже темно"
 
-#: xrc/DisplayConfig.xrc:308
+#: xrc/DisplayConfigColorCorrection.xrc:86
 msgid "GBC Lighten:"
 msgstr "Освітлення Game Boy Color: "
 
-#: xrc/DisplayConfig.xrc:327
+#: xrc/DisplayConfigColorCorrection.xrc:105
 msgid "Darker"
 msgstr "Темніше"
 
-#: xrc/DisplayConfig.xrc:338
+#: xrc/DisplayConfigColorCorrection.xrc:116
 msgid "Very Light"
 msgstr "Дуже світло"
 
-#: xrc/DisplayConfig.xrc:355
-msgid "Frame Skip"
-msgstr "Пропуск кадрів"
-
-#: xrc/DisplayConfig.xrc:373
-msgid "&Number of frames to skip:"
-msgstr "&Кількість кадрів для пропуску:"
-
-#: xrc/DisplayConfig.xrc:397
-msgid "On-Screen Display"
-msgstr "Екранне відображення"
-
-#: xrc/DisplayConfig.xrc:404
+#: xrc/DisplayConfigOSD.xrc:9
 msgid "Speed indicator:"
 msgstr "Указівник швидкості:"
 
-#: xrc/DisplayConfig.xrc:413
+#: xrc/DisplayConfigOSD.xrc:18
 msgid "Percentage"
 msgstr "Проценти"
 
-#: xrc/DisplayConfig.xrc:414
+#: xrc/DisplayConfigOSD.xrc:19
 msgid "Detailed"
 msgstr "Докладний"
 
-#: xrc/DisplayConfig.xrc:422
-msgid "Zoom"
-msgstr "Масштабувати"
+#: xrc/DisplayConfigSpeed.xrc:8
+msgid "Frame Skip"
+msgstr "Пропуск кадрів"
 
-#: xrc/DisplayConfig.xrc:432
+#: xrc/DisplayConfigSpeed.xrc:26
+msgid "&Number of frames to skip:"
+msgstr "&Кількість кадрів для пропуску:"
+
+#: xrc/DisplayConfigZoom.xrc:12
 msgid "Default magnification:"
 msgstr "Типове збільшення:"
 
-#: xrc/DisplayConfig.xrc:450
+#: xrc/DisplayConfigZoom.xrc:30
 msgid "Maximum magnification factor:"
 msgstr "Максимальний коефіцієнт збільшення:"
 
-#: xrc/DisplayConfig.xrc:451
+#: xrc/DisplayConfigZoom.xrc:31
 msgid "0 = no maximum"
 msgstr "0: не максимум"
 
-#: xrc/DisplayConfig.xrc:458
+#: xrc/DisplayConfigZoom.xrc:38
 msgid "0 = no limit"
 msgstr "0: без обмежень"
 
@@ -3249,10 +3310,6 @@ msgstr "ROM-відомості"
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
 msgstr "Указати"
-
-#: xrc/GBColorPrefPanel.xrc:10 xrc/JoyPanel.xrc:247
-msgid "Standard"
-msgstr "Типова"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
@@ -3475,164 +3532,138 @@ msgstr "VRAM-банк"
 msgid "Game Boy Advance settings"
 msgstr "Налаштування Game Boy Advance"
 
-#: xrc/GameBoyAdvanceConfig.xrc:21
-msgid "Save type:"
-msgstr "Тип збереження:"
-
-#: xrc/GameBoyAdvanceConfig.xrc:27 xrc/GameBoyAdvanceConfig.xrc:199
-#: xrc/GameBoyConfig.xrc:29 xrc/GameBoyConfig.xrc:59
-msgid "Automatic"
-msgstr "Автоматично"
-
-#: xrc/GameBoyAdvanceConfig.xrc:29 xrc/GameBoyAdvanceConfig.xrc:201
-msgid "SRAM"
-msgstr "SRAM"
-
-#: xrc/GameBoyAdvanceConfig.xrc:30 xrc/GameBoyAdvanceConfig.xrc:202
-msgid "Flash"
-msgstr "Флеш-пам'ять"
-
-#: xrc/GameBoyAdvanceConfig.xrc:31 xrc/GameBoyAdvanceConfig.xrc:203
-msgid "EEPROM + Sensor"
-msgstr "EEPROM + Sensor"
-
-#: xrc/GameBoyAdvanceConfig.xrc:43
-msgid "Flash size:"
-msgstr "Флеш-розмір:"
-
-#: xrc/GameBoyAdvanceConfig.xrc:49 xrc/GameBoyAdvanceConfig.xrc:221
-msgid "64 K"
-msgstr "64 Кбайт"
-
-#: xrc/GameBoyAdvanceConfig.xrc:50 xrc/GameBoyAdvanceConfig.xrc:222
-msgid "128 K"
-msgstr "128 Кбайт"
-
-#: xrc/GameBoyAdvanceConfig.xrc:64
-msgid "Detect Now"
-msgstr "Виявити"
-
-#: xrc/GameBoyAdvanceConfig.xrc:69
-msgid "Cartridge"
-msgstr "Картридж"
-
-#: xrc/GameBoyAdvanceConfig.xrc:77
-msgid "Save type"
-msgstr "Тип збереження"
-
-#: xrc/GameBoyAdvanceConfig.xrc:92
+#: xrc/GameBoyAdvanceConfigBootRom.xrc:15
 msgid "BIOS file:"
 msgstr "BIOS:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:115
+#: xrc/GameBoyAdvanceConfigBootRom.xrc:38
 msgid "Current BIOS file:"
 msgstr "Поточний BIOS:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:136 xrc/GameBoyConfig.xrc:168
-msgid "Boot ROM"
-msgstr "ROM завантаження"
-
-#: xrc/GameBoyAdvanceConfig.xrc:146
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:11
 msgid "Game Code"
 msgstr "Код гри"
 
-#: xrc/GameBoyAdvanceConfig.xrc:160
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:25
 msgid "Comment"
 msgstr "Коментар"
 
-#: xrc/GameBoyAdvanceConfig.xrc:172
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:37
 msgid "Real Time Clock:"
 msgstr "Годинник реального часу:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:180 xrc/GameBoyAdvanceConfig.xrc:198
-#: xrc/GameBoyAdvanceConfig.xrc:220 xrc/GameBoyAdvanceConfig.xrc:238
-#: xrc/GameBoyConfig.xrc:180
-msgid "Default"
-msgstr "Типово"
-
-#: xrc/GameBoyAdvanceConfig.xrc:181 xrc/GameBoyAdvanceConfig.xrc:239
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:46
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:104
 msgid "Disabled"
 msgstr "Вимкнено"
 
-#: xrc/GameBoyAdvanceConfig.xrc:182 xrc/GameBoyAdvanceConfig.xrc:240
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:47
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:105
 msgid "Enabled"
 msgstr "Увімкнено"
 
-#: xrc/GameBoyAdvanceConfig.xrc:190
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:55
 msgid "Save Type:"
 msgstr "Тип збереження:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:212
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:64
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:20 xrc/GameBoyConfigSystem.xrc:22
+#: xrc/GameBoyConfigSystem.xrc:52
+msgid "Automatic"
+msgstr "Автоматично"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:66
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:22
+msgid "SRAM"
+msgstr "SRAM"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:67
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:23
+msgid "Flash"
+msgstr "Флеш-пам'ять"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:68
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:24
+msgid "EEPROM + Sensor"
+msgstr "EEPROM + Sensor"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:77
 msgid "Flash Size:"
 msgstr "Флеш-розмір:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:230
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:86
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:42
+msgid "64 K"
+msgstr "64 Кбайт"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:87
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:43
+msgid "128 K"
+msgstr "128 Кбайт"
+
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:95
 msgid "Mirroring:"
 msgstr "Віддзеркалення:"
 
-#: xrc/GameBoyAdvanceConfig.xrc:254
+#: xrc/GameBoyAdvanceConfigGameOverrides.xrc:119
 msgid "&Defaults"
 msgstr "&Типово"
 
-#: xrc/GameBoyAdvanceConfig.xrc:261
-msgid "Game Overrides"
-msgstr "Перевизначення гри"
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:14
+msgid "Save type:"
+msgstr "Тип збереження:"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:36
+msgid "Flash size:"
+msgstr "Флеш-розмір:"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:57
+msgid "Detect Now"
+msgstr "Виявити"
+
+#: xrc/GameBoyAdvanceConfigSaveType.xrc:62
+msgid "Cartridge"
+msgstr "Картридж"
 
 #: xrc/GameBoyConfig.xrc:4
 msgid "Game Boy settings"
 msgstr "Налаштування Game Boy"
 
-#: xrc/GameBoyConfig.xrc:20
-msgid "Emulated &system:"
-msgstr "Емульована &система:"
-
-#: xrc/GameBoyConfig.xrc:48
-msgid "Display &borders:"
-msgstr "&Межі відображення:"
-
-#: xrc/GameBoyConfig.xrc:57
-msgid "Never"
-msgstr "Ніколи"
-
-#: xrc/GameBoyConfig.xrc:58
-msgid "Always"
-msgstr "Завжди"
-
-#: xrc/GameBoyConfig.xrc:72
-msgid "System"
-msgstr "Система"
-
-#: xrc/GameBoyConfig.xrc:84
+#: xrc/GameBoyConfigBootRom.xrc:12
 msgid "Game Boy Boot &ROM file:"
 msgstr "Game &Boy ROM завантаження:"
 
-#: xrc/GameBoyConfig.xrc:91 xrc/GameBoyConfig.xrc:113
+#: xrc/GameBoyConfigBootRom.xrc:19 xrc/GameBoyConfigBootRom.xrc:41
 msgid "Select a File"
 msgstr "Вибір файлу"
 
-#: xrc/GameBoyConfig.xrc:106
+#: xrc/GameBoyConfigBootRom.xrc:34
 msgid "Game Boy Color Boot ROM &file:"
 msgstr "Game Boy &Color ROM завантаження:"
 
-#: xrc/GameBoyConfig.xrc:131
+#: xrc/GameBoyConfigBootRom.xrc:59
 msgid "Current Game Boy BIOS file:"
 msgstr "Поточний Game Boy BIOS:"
 
-#: xrc/GameBoyConfig.xrc:152
+#: xrc/GameBoyConfigBootRom.xrc:80
 msgid "Current Game Boy Color BIOS file:"
 msgstr "Поточний Game Boy Color BIOS:"
 
-#: xrc/GameBoyConfig.xrc:186
-msgid "User 1"
-msgstr "Користувач 1"
+#: xrc/GameBoyConfigSystem.xrc:13
+msgid "Emulated &system:"
+msgstr "Емульована &система:"
 
-#: xrc/GameBoyConfig.xrc:192
-msgid "User 2"
-msgstr "Користувач 2"
+#: xrc/GameBoyConfigSystem.xrc:41
+msgid "Display &borders:"
+msgstr "&Межі відображення:"
 
-#: xrc/GameBoyConfig.xrc:198
-msgid "Custom Colors"
-msgstr "Указані кольори"
+#: xrc/GameBoyConfigSystem.xrc:50
+msgid "Never"
+msgstr "Ніколи"
+
+#: xrc/GameBoyConfigSystem.xrc:51
+msgid "Always"
+msgstr "Завжди"
 
 #: xrc/GeneralConfig.xrc:4
 msgid "General settings"
@@ -3678,60 +3709,56 @@ msgstr "Без обмежень"
 msgid "IO Viewer"
 msgstr "Переглядач введення-виведення"
 
-#: xrc/JoyPanel.xrc:8
+#: xrc/JoyPanel.xrc:10
 msgid ""
 "Click a field and press a key or move joystick to add. Press backspace to "
 "delete last added key. Resize window or click inside and move pointer to see"
 " entire contents if too small."
 msgstr "Натисни поле та кнопку чи перемісти джойстик для додання. Натисни Backspace для видалення останньої доданої кнопки. Зміни розмір вікна чи натисни всередині та перемісти вказівник для показу замалого вмісту."
 
-#: xrc/JoyPanel.xrc:276
-msgid "Autofire A"
-msgstr "A-Turbo"
-
-#: xrc/JoyPanel.xrc:320
-msgid "Autofire B"
-msgstr "B-Turbo"
-
-#: xrc/JoyPanel.xrc:342
-msgid "Motion Left / Dark"
-msgstr "Рух ← / Темрява"
-
-#: xrc/JoyPanel.xrc:386
-msgid "Motion Right / Light"
-msgstr "Рух → / Світло"
-
-#: xrc/JoyPanel.xrc:408
-msgid "Speed Up"
-msgstr "Прискорити"
-
-#: xrc/JoyPanel.xrc:430
-msgid "Spin Left"
-msgstr "Повернути ліворуч"
-
-#: xrc/JoyPanel.xrc:461
-msgid "Spin Right"
-msgstr "Повернути праворуч"
-
-#: xrc/JoyPanel.xrc:483
-msgid "Screenshot"
-msgstr "Екранний кадр"
-
-#: xrc/JoyPanel.xrc:507
-msgid "Special"
-msgstr "Додаткова"
-
-#: xrc/JoyPanel.xrc:515
+#: xrc/JoyPanel.xrc:15
 msgid "Use as default"
 msgstr "Використовувати типово"
 
-#: xrc/JoyPanel.xrc:522
+#: xrc/JoyPanel.xrc:22
 msgid "Defaults"
 msgstr "Типово"
 
-#: xrc/JoyPanel.xrc:529
+#: xrc/JoyPanel.xrc:29
 msgid "Clear All"
 msgstr "Очистити все"
+
+#: xrc/JoyPanelSpecial.xrc:29
+msgid "Autofire A"
+msgstr "A-Turbo"
+
+#: xrc/JoyPanelSpecial.xrc:73
+msgid "Autofire B"
+msgstr "B-Turbo"
+
+#: xrc/JoyPanelSpecial.xrc:95
+msgid "Motion Left / Dark"
+msgstr "Рух ← / Темрява"
+
+#: xrc/JoyPanelSpecial.xrc:139
+msgid "Motion Right / Light"
+msgstr "Рух → / Світло"
+
+#: xrc/JoyPanelSpecial.xrc:161
+msgid "Speed Up"
+msgstr "Прискорити"
+
+#: xrc/JoyPanelSpecial.xrc:183
+msgid "Spin Left"
+msgstr "Повернути ліворуч"
+
+#: xrc/JoyPanelSpecial.xrc:214
+msgid "Spin Right"
+msgstr "Повернути праворуч"
+
+#: xrc/JoyPanelSpecial.xrc:236
+msgid "Screenshot"
+msgstr "Екранний кадр"
 
 #: xrc/JoypadConfig.xrc:4
 msgid "Joypad Configuration"
@@ -3744,22 +3771,6 @@ msgstr "Режим SDL Game Controller"
 #: xrc/JoypadConfig.xrc:21
 msgid "Autofire Throttle (frames):"
 msgstr "Прискорення турбо (кадрів):"
-
-#: xrc/JoypadConfig.xrc:40
-msgid "Player 1"
-msgstr "Гравець 1"
-
-#: xrc/JoypadConfig.xrc:46
-msgid "Player 2"
-msgstr "Гравець 2"
-
-#: xrc/JoypadConfig.xrc:52
-msgid "Player 3"
-msgstr "Гравець 3"
-
-#: xrc/JoypadConfig.xrc:58
-msgid "Player 4"
-msgstr "Гравець 4"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -4722,83 +4733,79 @@ msgstr "&Змінити колір тла..."
 msgid "Sound Settings"
 msgstr "Налаштування звуку"
 
-#: xrc/SoundConfig.xrc:18
-msgid "Volume:"
-msgstr "Гучність:"
-
-#: xrc/SoundConfig.xrc:36
-msgid "Mute"
-msgstr "Притлумити звук"
-
-#: xrc/SoundConfig.xrc:56 xrc/SoundConfig.xrc:328
-msgid "Maximum"
-msgstr "Максимум"
-
-#: xrc/SoundConfig.xrc:73
-msgid "Sample rate:"
-msgstr "Частота дискретизації:"
-
-#: xrc/SoundConfig.xrc:79
-msgid "48 KHz"
-msgstr "48000 Гц"
-
-#: xrc/SoundConfig.xrc:80
-msgid "44.1 KHz"
-msgstr "44100 Гц"
-
-#: xrc/SoundConfig.xrc:81
-msgid "22 KHz"
-msgstr "22050 Гц"
-
-#: xrc/SoundConfig.xrc:82
-msgid "11 KHz"
-msgstr "11025 Гц"
-
-#: xrc/SoundConfig.xrc:119
+#: xrc/SoundConfigAdvanced.xrc:26
 msgid "Direct Sound"
 msgstr "Direct Sound"
 
-#: xrc/SoundConfig.xrc:154
+#: xrc/SoundConfigAdvanced.xrc:61
 msgid "Device"
 msgstr "Пристрій"
 
-#: xrc/SoundConfig.xrc:162
+#: xrc/SoundConfigAdvanced.xrc:69
 msgid "Enable stereo upmixing"
 msgstr "Увімкнути стерео-зведення"
 
-#: xrc/SoundConfig.xrc:169
+#: xrc/SoundConfigAdvanced.xrc:76
 msgid "Enable hardware acceleration"
 msgstr "Увімкнути апаратне прискорення"
 
-#: xrc/SoundConfig.xrc:198
+#: xrc/SoundConfigAdvanced.xrc:105
 msgid "Number of sound buffers:"
 msgstr "Кількість звукових буферів:"
 
-#: xrc/SoundConfig.xrc:206
-msgid "Advanced"
-msgstr "Розширені"
+#: xrc/SoundConfigBasic.xrc:9
+msgid "Volume:"
+msgstr "Гучність:"
 
-#: xrc/SoundConfig.xrc:238
+#: xrc/SoundConfigBasic.xrc:27
+msgid "Mute"
+msgstr "Притлумити звук"
+
+#: xrc/SoundConfigBasic.xrc:47 xrc/SoundConfigGameBoyAdvance.xrc:30
+msgid "Maximum"
+msgstr "Максимум"
+
+#: xrc/SoundConfigBasic.xrc:64
+msgid "Sample rate:"
+msgstr "Частота дискретизації:"
+
+#: xrc/SoundConfigBasic.xrc:70
+msgid "48 KHz"
+msgstr "48000 Гц"
+
+#: xrc/SoundConfigBasic.xrc:71
+msgid "44.1 KHz"
+msgstr "44100 Гц"
+
+#: xrc/SoundConfigBasic.xrc:72
+msgid "22 KHz"
+msgstr "22050 Гц"
+
+#: xrc/SoundConfigBasic.xrc:73
+msgid "11 KHz"
+msgstr "11025 Гц"
+
+#: xrc/SoundConfigGameBoy.xrc:32
 msgid "Lots"
 msgstr "Багато"
 
-#: xrc/SoundConfig.xrc:247
+#: xrc/SoundConfigGameBoy.xrc:41
 msgid "Echo"
 msgstr "Луна"
 
-#: xrc/SoundConfig.xrc:255
+#: xrc/SoundConfigGameBoy.xrc:49
 msgid "Stereo"
 msgstr "Стерео"
 
-#: xrc/SoundConfig.xrc:266
+#: xrc/SoundConfigGameBoy.xrc:60
 msgid "Center"
 msgstr "Центр"
 
-#: xrc/SoundConfig.xrc:277
+#: xrc/SoundConfigGameBoy.xrc:71
 msgid "Left / Right"
 msgstr "Лівий / правий канали"
 
-#: xrc/SoundConfig.xrc:306
+#: xrc/SoundConfigGameBoyAdvance.xrc:8
 msgid "Sound filtering"
 msgstr "Фільтрація звуку"
 
