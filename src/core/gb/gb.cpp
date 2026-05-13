@@ -2814,9 +2814,10 @@ void gbGetHardwareType()
     }
 
     // Also allow SGB-on-CGB dual mode for hybrid carts when borders are
-    // forced on, so the game ships its border setup packets. The captured
-    // guard makes this fire only on initial load, not on the handover reset.
-    if (((!gbCgbMode) || (gbBorderOn && !gbSgbBorderCaptured)) && (g_gbCartData.sgb_support())) {
+    // enabled (forced on, or automatic), so the game ships its border
+    // setup packets. The captured guard makes this fire only on initial
+    // load, not on the handover reset.
+    if (((!gbCgbMode) || ((gbBorderOn || gbBorderAutomatic) && !gbSgbBorderCaptured)) && (g_gbCartData.sgb_support())) {
         if (gbEmulatorType == 0 || gbEmulatorType == 2 || gbEmulatorType == 5)
             gbSgbMode = true;
     }
