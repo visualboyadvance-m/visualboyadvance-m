@@ -500,6 +500,11 @@ bool gbInitializeRom(size_t romSize) {
 
 }  // namespace
 
+// Set once the CGB+SGB handover has captured the border. Prevents
+// gbGetHardwareType from re-enabling gbSgbMode on subsequent resets in the
+// same session. Cleared on ROM load in gbCPUInit.
+bool gbSgbBorderCaptured = false;
+
 bool inBios = false;
 
 extern uint16_t gbLineMix[kGBWidth];
@@ -2771,6 +2776,9 @@ bool CPUIsGBBios(const char* file)
 
 void gbCPUInit(const char* biosFileName, bool useBiosFile)
 {
+    // Fresh cart: clear any handover state from a previous session.
+    gbSgbBorderCaptured = false;
+
     // GB/GBC/SGB only at the moment
     if (!(gbHardware & 7))
         return;
@@ -2805,7 +2813,10 @@ void gbGetHardwareType()
         gbCgbMode = true;
     }
 
-    if ((!gbCgbMode) && (g_gbCartData.sgb_support())) {
+    // Also allow SGB-on-CGB dual mode for hybrid carts when borders are
+    // forced on, so the game ships its border setup packets. The captured
+    // guard makes this fire only on initial load, not on the handover reset.
+    if (((!gbCgbMode) || (gbBorderOn && !gbSgbBorderCaptured)) && (g_gbCartData.sgb_support())) {
         if (gbEmulatorType == 0 || gbEmulatorType == 2 || gbEmulatorType == 5)
             gbSgbMode = true;
     }
@@ -3099,8 +3110,17 @@ void gbReset()
     if (gbHardware & 0xa) {
 
         if (gbHardware & 2) {
-            AF.W = 0x1180;
-            BC.W = 0x0000;
+            if (gbSgbMode) {
+                // Dual mode: present DMG/SGB register state so the game
+                // takes its SGB init path and ships border packets.
+                AF.W = 0x01b0;
+                BC.W = 0x0013;
+                DE.W = 0x00d8;
+                HL.W = 0x014d;
+            } else {
+                AF.W = 0x1180;
+                BC.W = 0x0000;
+            }
         } else {
             AF.W = 0x1100;
             BC.W = 0x0100; // GBA/SP have B = 0x01 (which means GBC & GBA/SP bootrom are different !)

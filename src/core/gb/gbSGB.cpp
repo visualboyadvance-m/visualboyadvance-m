@@ -10,6 +10,8 @@
 #include "core/gb/gbGlobals.h"
 
 extern uint8_t* g_pix;
+extern bool gbSgbBorderCaptured;
+
 extern bool speedup;
 extern bool gbSgbResetFlag;
 
@@ -355,8 +357,14 @@ void gbSgbPicture()
         gbSgbCGBSupport = 0;
         gbSgbMode = false;
         gbSgbMask = 0;
+        gbSgbBorderCaptured = true;
+        // Preserve the SGB border palette across gbReset, which would
+        // otherwise zero gbPalette while we're in CGB mode.
+        uint16_t savedSgbPal[64];
+        memcpy(savedSgbPal, &gbPalette[64], sizeof(savedSgbPal));
         gbSgbRenderBorder();
         gbReset();
+        memcpy(&gbPalette[64], savedSgbPal, sizeof(savedSgbPal));
     }
 
     if (gbSgbCGBSupport > 4)
@@ -699,8 +707,12 @@ void gbSgbChrTransfer()
         gbSgbCGBSupport = 0;
         gbSgbMode = false;
         gbSgbMask = 0;
+        gbSgbBorderCaptured = true;
+        uint16_t savedSgbPal[64];
+        memcpy(savedSgbPal, &gbPalette[64], sizeof(savedSgbPal));
         gbSgbRenderBorder();
         gbReset();
+        memcpy(&gbPalette[64], savedSgbPal, sizeof(savedSgbPal));
     }
 
     if (gbSgbCGBSupport > 4)
