@@ -469,7 +469,7 @@ const wxString wxvbamApp::GetPluginsDir()
 {
     const wxString config_dir = OPTION(kDispPluginDir);
     if (!config_dir.empty()) {
-        return config_dir;
+        return GetAbsolutePath(config_dir);
     }
     return wxStandardPaths::Get().GetPluginsDir();
 }
