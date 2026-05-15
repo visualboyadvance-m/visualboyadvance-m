@@ -384,7 +384,7 @@ msgstr "Скасувати призначення \"%s\" з \"%s\"?"
 #: dialogs/base-dialog.cpp:182
 #, c-format
 msgid "Failed to load lazy tab '%s'"
-msgstr ""
+msgstr "Не вдалося завантажити ліниву вкладку \"%s\"."
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -398,7 +398,7 @@ msgstr "Недійсне значення типового збільшення.
 #: dialogs/display-config.cpp:449
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
-msgstr ""
+msgstr "Не вдалося завантажити вкладку налаштування відображення \"%s\"."
 
 #: dialogs/display-config.cpp:614
 msgid "Invalid color correction profile"
@@ -451,7 +451,7 @@ msgstr "Указані кольори"
 
 #: dialogs/game-boy-config.cpp:429
 msgid "Failed to load GBColorPrefPanel"
-msgstr ""
+msgstr "Не вдалося завантажити панель передзавантаження Game Boy Color."
 
 #: dialogs/game-boy-config.cpp:441
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
@@ -618,12 +618,12 @@ msgstr "%04X (Дійсний: %04X)"
 
 #: dialogs/joypad-config.cpp:150
 msgid "Failed to load JoyPanel"
-msgstr ""
+msgstr "Не вдалося завантажити панель джойстиків."
 
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "Гравець %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
@@ -636,12 +636,12 @@ msgstr "Додаткова"
 #: dialogs/joypad-config.cpp:195
 #, c-format
 msgid "Failed to load joypad sub-tab '%s'"
-msgstr ""
+msgstr "Не вдалося завантажити підвкладку джойстика \"%s\"."
 
 #: dialogs/sound-config.cpp:198
 #, c-format
 msgid "Failed to load SoundConfig tab '%s'"
-msgstr ""
+msgstr "Не вдалося завантажити вкладку налаштування звуку \"%s\"."
 
 #: dialogs/sound-config.cpp:343
 #, c-format
