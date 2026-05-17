@@ -175,36 +175,37 @@ void gbSoundReset()
 
     soundPaused = 1;
 
-    gbSoundEvent(0, 0xff10, 0x80);
-    gbSoundEvent(0, 0xff11, 0xbf);
-    gbSoundEvent(0, 0xff12, 0xf3);
-    gbSoundEvent(0, 0xff14, 0xbf);
-    gbSoundEvent(0, 0xff16, 0x3f);
-    gbSoundEvent(0, 0xff17, 0x00);
-    gbSoundEvent(0, 0xff19, 0xbf);
-
-    gbSoundEvent(0, 0xff1a, 0x7f);
-    gbSoundEvent(0, 0xff1b, 0xff);
-    gbSoundEvent(0, 0xff1c, 0xbf);
-    gbSoundEvent(0, 0xff1e, 0xbf);
-
-    gbSoundEvent(0, 0xff20, 0xff);
-    gbSoundEvent(0, 0xff21, 0x00);
-    gbSoundEvent(0, 0xff22, 0x00);
-    gbSoundEvent(0, 0xff23, 0xbf);
-    gbSoundEvent(0, 0xff24, 0x77);
-    gbSoundEvent(0, 0xff25, 0xf3);
-
+    // Power the APU on first. If we don't, all subsequent writes to
+    // sound registers get dropped by the APU (Gb_Apu::write_register
+    // gates non-status writes on the power bit), leaving NR50/NR51 at
+    // zero after the eventual NR52 power-on triggers reset_regs().
     if (gbHardware & 0x4)
         gbSoundEvent(0, 0xff26, 0xf0);
     else
         gbSoundEvent(0, 0xff26, 0xf1);
 
-    /* workaround for game Beetlejuice */
-    if (gbHardware & 0x1) {
-        gbSoundEvent(0, 0xff24, 0x77);
-        gbSoundEvent(0, 0xff25, 0xf3);
-    }
+    gbSoundEvent(0, 0xff10, 0x80);   // NR10  ch1 sweep (period=0, no shift)
+    gbSoundEvent(0, 0xff11, 0xbf);   // NR11  ch1 duty=50%, length-load=63
+    gbSoundEvent(0, 0xff12, 0xf3);   // NR12  ch1 envelope: init=$F, decay, period=3
+    gbSoundEvent(0, 0xff13, 0xf3);   // NR13  ch1 freq low
+    gbSoundEvent(0, 0xff14, 0x3f);   // NR14  ch1 freq hi/length-en
+
+    gbSoundEvent(0, 0xff16, 0x3f);   // NR21  ch2 duty=0, length-load=63
+    gbSoundEvent(0, 0xff17, 0x00);   // NR22  ch2 envelope: off (DAC disabled)
+    gbSoundEvent(0, 0xff19, 0x3f);   // NR24  ch2 freq hi/length-en (trigger bit cleared)
+
+    gbSoundEvent(0, 0xff1a, 0x7f);   // NR30  ch3 DAC enable
+    gbSoundEvent(0, 0xff1b, 0xff);   // NR31  ch3 length-load=255
+    gbSoundEvent(0, 0xff1c, 0x9f);   // NR32  ch3 output level=mute
+    gbSoundEvent(0, 0xff1e, 0x3f);   // NR34  ch3 freq hi/length-en (trigger bit cleared)
+
+    gbSoundEvent(0, 0xff20, 0xff);   // NR41  ch4 length-load=63
+    gbSoundEvent(0, 0xff21, 0x00);   // NR42  ch4 envelope: off (DAC disabled)
+    gbSoundEvent(0, 0xff22, 0x00);   // NR43  ch4 polynomial counter
+    gbSoundEvent(0, 0xff23, 0x3f);   // NR44  ch4 trigger/length-en (trigger bit cleared)
+
+    gbSoundEvent(0, 0xff24, 0x77);   // NR50  master volume L=R=7 (max), Vin off
+    gbSoundEvent(0, 0xff25, 0xf3);   // NR51  channel-to-terminal routing
 
     int addr = 0xff30;
 

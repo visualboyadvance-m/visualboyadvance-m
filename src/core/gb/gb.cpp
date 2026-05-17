@@ -3168,9 +3168,9 @@ void gbReset()
                 AF.W = 0xffb0;
             else
                 AF.W = 0x01b0;
-            BC.W = 0x0013;
+            BC.W = 0x0014;
             DE.W = 0x00d8;
-            HL.W = 0x014d;
+            HL.W = 0xC060;
         }
         gbDivTicks = 14;
         gbInternalTimer = gbDivTicks--;
