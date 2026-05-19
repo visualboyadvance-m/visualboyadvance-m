@@ -18,7 +18,7 @@
 # 智弘 王, 2022
 # 智弘 王, 2022
 # ssc19940105 <ssc19940105@gmail.com>, 2015
-# 王晨旭 <wcxu21@126.com>, 2021
+# 王晨旭 <wcxu21@126.com>, 2021,2026
 # 陈 依云 <c1998lf@qq.com>, 2023-2024
 msgid ""
 msgstr ""
@@ -26,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-12 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: 天绝星 <c.cejhb@gmail.com>, 2017,2019-2020,2022-2026\n"
+"Last-Translator: 王晨旭 <wcxu21@126.com>, 2021,2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -112,7 +112,7 @@ msgstr "电池文件 (*.sav)|*.sav|Flash 存档(*.dat)|*.dat"
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
-msgstr ""
+msgstr "导入电池文件会覆盖当前的 .sav 文件并重置当前正在运行的游戏。是否继续？"
 
 #: cmdevents.cpp:560 cmdevents.cpp:593 cmdevents.cpp:716
 msgid "Confirm import"
@@ -278,15 +278,15 @@ msgstr "声音已禁用"
 
 #: cmdevents.cpp:1936
 msgid "Run Lua script"
-msgstr ""
+msgstr "运行 Lua 脚本"
 
 #: cmdevents.cpp:1937
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Lua 脚本 (*.lua)|*.lua|所有文件|*"
 
 #: cmdevents.cpp:1945
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "Lua 脚本加载失败 — 请查看控制台"
 
 #: cmdevents.cpp:1980
 msgid "Set to 0 for pseudo tty"
@@ -322,7 +322,7 @@ msgstr "滤镜: %s"
 #: cmdevents.cpp:2424 cmdevents.cpp:2441
 #, c-format
 msgid "Filter: Plugin (%s)"
-msgstr ""
+msgstr "滤镜：插件 (%s)"
 
 #: cmdevents.cpp:2461
 #, c-format
@@ -399,7 +399,7 @@ msgstr "这将从“%s”中取消分配“%s”。您确定吗？"
 #: dialogs/base-dialog.cpp:182
 #, c-format
 msgid "Failed to load lazy tab '%s'"
-msgstr ""
+msgstr "加载延迟标签 '%s' 失败"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -413,7 +413,7 @@ msgstr "无效的默认放大倍数值。"
 #: dialogs/display-config.cpp:449
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
-msgstr ""
+msgstr "加载 DisplayConfig 选项卡 '%s' 失败"
 
 #: dialogs/display-config.cpp:614
 msgid "Invalid color correction profile"
@@ -466,7 +466,7 @@ msgstr "自定义颜色"
 
 #: dialogs/game-boy-config.cpp:429
 msgid "Failed to load GBColorPrefPanel"
-msgstr ""
+msgstr "GBColorPrefPanel 加载失败"
 
 #: dialogs/game-boy-config.cpp:441
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
@@ -633,12 +633,12 @@ msgstr "%04X (实际: %04X)"
 
 #: dialogs/joypad-config.cpp:150
 msgid "Failed to load JoyPanel"
-msgstr ""
+msgstr "JoyPanel 加载失败"
 
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "玩家 %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
@@ -651,12 +651,12 @@ msgstr " 特定"
 #: dialogs/joypad-config.cpp:195
 #, c-format
 msgid "Failed to load joypad sub-tab '%s'"
-msgstr ""
+msgstr "加载游戏手柄子选项卡 '%s' 失败"
 
 #: dialogs/sound-config.cpp:198
 #, c-format
 msgid "Failed to load SoundConfig tab '%s'"
-msgstr ""
+msgstr "加载 SoundConfig 选项卡 '%s' 失败"
 
 #: dialogs/sound-config.cpp:343
 #, c-format
@@ -988,7 +988,7 @@ msgstr "Metal 后端不可用，默认使用 OpenGL"
 
 #: panel.cpp:1906
 msgid "Vulkan is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Vulkan 不可用，默认使用 OpenGL。"
 
 #: panel.cpp:2045
 msgid "No memory for rewinding"
@@ -1098,132 +1098,132 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:4816
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
-msgstr ""
+msgstr "加载 D3D12 或 D3DCompiler DLL 失败"
 
 #: panel.cpp:4842
 msgid "Failed to get D3D12 function pointers"
-msgstr ""
+msgstr "获取 D3D12 函数指针失败"
 
 #: panel.cpp:4847
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
-msgstr ""
+msgstr "创建 DXGI 工厂失败：0x%08X"
 
 #: panel.cpp:4861
 msgid "No hardware adapter found, falling back to WARP"
-msgstr ""
+msgstr "未找到硬件适配器，回退到 WARP"
 
 #: panel.cpp:4868
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
-msgstr ""
+msgstr "创建 D3D12 设备失败：0x%08X"
 
 #: panel.cpp:4869
 #, c-format
 msgid "D3D12 device created (%s)"
-msgstr ""
+msgstr "D3D12 设备已创建 (%s)"
 
 #: panel.cpp:4876
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
-msgstr ""
+msgstr "创建命令队列失败：0x%08X"
 
 #: panel.cpp:4897
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "创建交换链失败：0x%08X"
 
 #: panel.cpp:4903
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
-msgstr ""
+msgstr "获取 IDXGISwapChain3 失败：0x%08X"
 
 #: panel.cpp:4912
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
-msgstr ""
+msgstr "创建 RTV 堆失败：0x%08X"
 
 #: panel.cpp:4921
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
-msgstr ""
+msgstr "创建 SRV 堆失败：0x%08X"
 
 #: panel.cpp:4928
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
-msgstr ""
+msgstr "无法获取缓冲区 %u: 0x%08X"
 
 #: panel.cpp:4936
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
-msgstr ""
+msgstr "创建命令分配器失败：0x%08X"
 
 #: panel.cpp:4941
 #, c-format
 msgid "Failed to create command list: 0x%08X"
-msgstr ""
+msgstr "创建命令列表失败：0x%08X"
 
 #: panel.cpp:4980
 #, c-format
 msgid "Failed to serialize root signature: %s"
-msgstr ""
+msgstr "序列化根签名失败：%s"
 
 #: panel.cpp:4987
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
-msgstr ""
+msgstr "创建根签名失败：0x%08X"
 
 #: panel.cpp:5001
 #, c-format
 msgid "VS compile failed: %s"
-msgstr ""
+msgstr "VS 编译失败：%s"
 
 #: panel.cpp:5009
 #, c-format
 msgid "PS compile failed: %s"
-msgstr ""
+msgstr "PS 编译失败： %s"
 
 #: panel.cpp:5038
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
-msgstr ""
+msgstr "创建 PSO 失败：0x%08X"
 
 #: panel.cpp:5058
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
-msgstr ""
+msgstr "创建顶点缓冲区失败：0x%08X"
 
 #: panel.cpp:5067
 #, c-format
 msgid "Failed to create fence: 0x%08X"
-msgstr ""
+msgstr "创建围栏失败：0x%08X"
 
 #: panel.cpp:5070
 msgid "Failed to create fence event"
-msgstr ""
+msgstr "创建围栏事件失败"
 
 #: panel.cpp:5072
 msgid "D3D12 pipeline fully initialized"
-msgstr ""
+msgstr "D3D12 流水线已完全初始化"
 
 #: panel.cpp:5102
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DX12DrawingPanel 已初始化：%dx%d (缩放：%f)"
 
 #: panel.cpp:5124
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
-msgstr ""
+msgstr "调整缓冲区大小失败：0x%08X"
 
 #: panel.cpp:5135
 #, c-format
 msgid "Swap chain resized to %dx%d"
-msgstr ""
+msgstr "交换链已调整大小为 %dx%d"
 
 #: panel.cpp:5387
 msgid "Texture upload failed"
-msgstr ""
+msgstr "纹理上传失败"
 
 #: panel.cpp:5530
 msgid "Using Direct3D 9Ex (dynamically loaded)"
@@ -1350,183 +1350,183 @@ msgstr "音量: %d %%"
 
 #: panel.cpp:6821
 msgid "Vulkan device created successfully"
-msgstr ""
+msgstr "Vulkan 设备创建成功"
 
 #: panel.cpp:6917
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
-msgstr ""
+msgstr "VK_KHR_wayland_surface 和 VK_KHR_xlib_surface 均不可用 — 无法在此系统上创建 Vulkan 表面。"
 
 #: panel.cpp:6946
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
-msgstr ""
+msgstr "创建 Vulkan 实例失败：%d"
 
 #: panel.cpp:6949
 msgid "Vulkan instance created"
-msgstr ""
+msgstr "创建 Vulkan 实例"
 
 #: panel.cpp:6964
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
-msgstr ""
+msgstr "创建 Vulkan Win32 表面失败：%d"
 
 #: panel.cpp:6987
 msgid "Failed to obtain NSView handle for Vulkan surface"
-msgstr ""
+msgstr "无法获取 Vulkan 表面的 NSView 句柄"
 
 #: panel.cpp:6998
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
-msgstr ""
+msgstr "创建 Vulkan Metal 表面失败：%d"
 
 #: panel.cpp:7016
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
-msgstr ""
+msgstr "创建 Vulkan Xlib 表面失败：%d"
 
 #: panel.cpp:7035
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
-msgstr ""
+msgstr "创建 Vulkan Wayland 表面失败：%d"
 
 #: panel.cpp:7074
 msgid "Failed to obtain Wayland display/surface handles"
-msgstr ""
+msgstr "获取 Wayland 显示/表面句柄失败"
 
 #: panel.cpp:7088
 msgid "No supported Vulkan surface extension available"
-msgstr ""
+msgstr "暂无支持的 Vulkan 表面扩展可用"
 
 #: panel.cpp:7099
 msgid "No Vulkan physical devices found"
-msgstr ""
+msgstr "未找到 Vulkan 物理设备"
 
 #: panel.cpp:7149
 #, c-format
 msgid "Selected Vulkan device: %s"
-msgstr ""
+msgstr "已选择 Vulkan 设备：%s"
 
 #: panel.cpp:7153
 msgid "No suitable Vulkan physical device found"
-msgstr ""
+msgstr "未找到合适的 Vulkan 物理设备"
 
 #: panel.cpp:7192
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
-msgstr ""
+msgstr "创建 Vulkan 逻辑设备失败：%d"
 
 #: panel.cpp:7279
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
-msgstr ""
+msgstr "创建 Vulkan 交换链失败：%d"
 
 #: panel.cpp:7291
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s"
-msgstr ""
+msgstr "交换链已创建：%ux%u, %u 个镜像，vsync=%s"
 
 #: panel.cpp:7335
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
-msgstr ""
+msgstr "创建交换链图像视图 %zu 失败：%d"
 
 #: panel.cpp:7381
 #, c-format
 msgid "Failed to create render pass: %d"
-msgstr ""
+msgstr "创建渲染通道失败：%d"
 
 #: panel.cpp:7403
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
-msgstr ""
+msgstr "创建帧缓冲区 %zu 失败：%d"
 
 #: panel.cpp:7426
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
-msgstr ""
+msgstr "创建描述符集布局失败：%d"
 
 #: panel.cpp:7449
 msgid "Failed to create shader modules"
-msgstr ""
+msgstr "创建着色器模块失败"
 
 #: panel.cpp:7517
 #, c-format
 msgid "Failed to create pipeline layout: %d"
-msgstr ""
+msgstr "创建管道布局失败：%d"
 
 #: panel.cpp:7544
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
-msgstr ""
+msgstr "创建图形管线失败：%d"
 
 #: panel.cpp:7560
 #, c-format
 msgid "Failed to create command pool: %d"
-msgstr ""
+msgstr "创建命令池失败：%d"
 
 #: panel.cpp:7578
 #, c-format
 msgid "Failed to allocate command buffers: %d"
-msgstr ""
+msgstr "分配命令缓冲区失败：%d"
 
 #: panel.cpp:7598
 #, c-format
 msgid "Failed to create sync objects for frame %d"
-msgstr ""
+msgstr "创建帧 %d 的同步对象失败"
 
 #: panel.cpp:7620
 #, c-format
 msgid "Failed to create descriptor pool: %d"
-msgstr ""
+msgstr "创建描述符池失败：%d"
 
 #: panel.cpp:7632
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
-msgstr ""
+msgstr "分配描述符集失败：%d"
 
 #: panel.cpp:7670
 #, c-format
 msgid "Failed to create texture image: %d"
-msgstr ""
+msgstr "创建纹理图像失败：%d"
 
 #: panel.cpp:7684
 msgid "Failed to allocate texture memory"
-msgstr ""
+msgstr "分配纹理内存失败"
 
 #: panel.cpp:7700
 #, c-format
 msgid "Failed to create texture image view: %d"
-msgstr ""
+msgstr "创建纹理图像视图失败：%d"
 
 #: panel.cpp:7718
 #, c-format
 msgid "Failed to create texture sampler: %d"
-msgstr ""
+msgstr "创建纹理采样器失败：%d"
 
 #: panel.cpp:7752
 msgid "Failed to create staging buffer"
-msgstr ""
+msgstr "创建暂存缓冲区失败"
 
 #: panel.cpp:7767
 msgid "Failed to allocate staging memory"
-msgstr ""
+msgstr "分配暂存内存失败"
 
 #: panel.cpp:7805
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
-msgstr ""
+msgstr "VKDrawingPanel 已初始化：%ux%u (缩放：%f)"
 
 #: panel.cpp:7843
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
-msgstr ""
+msgstr "获取交换链镜像失败：%d"
 
 #: panel.cpp:8100
 #, c-format
 msgid "Failed to present swapchain image: %d"
-msgstr ""
+msgstr "交换链镜像呈现失败：%d"
 
 #: sys.cpp:248 sys.cpp:309
 msgid "No game in progress to record"
