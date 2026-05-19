@@ -1596,12 +1596,12 @@ msgstr "打开伪 tty 错误: %s"
 #: sys.cpp:1486
 #, c-format
 msgid "Invalid GDB server port %d"
-msgstr ""
+msgstr "无效的 GDB 服务器端口 %d"
 
 #: sys.cpp:1499
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
-msgstr ""
+msgstr "在端口 %d 上设置 GDB 服务器套接字时出错"
 
 #: viewers.cpp:609
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
@@ -1855,7 +1855,7 @@ msgstr "滤镜插件库"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
 msgid "Directory containing RPI filter plugins"
-msgstr ""
+msgstr "包含 RPI 过滤器插件的目录"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Interframe blending function"
@@ -1994,7 +1994,7 @@ msgstr "自动加载上次保存的状态"
 msgid ""
 "Directory to store game save files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "用于存储游戏存档文件的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:510
 msgid "Freeze recent load list"
@@ -2004,7 +2004,7 @@ msgstr "冻结最近的加载列表"
 msgid ""
 "Directory to store A / V and game recordings (relative paths paths are "
 "relative to the executable; blank is ROM dir)"
-msgstr ""
+msgstr "用于存储音视频和游戏录像的目录（相对路径，路径相对于可执行文件；留空为 ROM 目录）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
 msgid "Number of seconds between rewind snapshots (0 to disable)"
@@ -2014,13 +2014,13 @@ msgstr "倒带快照之间的秒数（0 表示禁用）"
 msgid ""
 "Directory to store screenshots (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "用于存储屏幕截图的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
 msgid ""
 "Directory to store saved state files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "用于存储已保存状态文件的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 msgid "Enable status bar"
@@ -2634,25 +2634,25 @@ msgstr "FAudio: 创建源语音失败！"
 #: audio/internal/xaudio2.cpp:168
 #, c-format
 msgid "XAudio2: Too many audio instances (max %d)"
-msgstr ""
+msgstr "XAudio2：音频实例过多 (最大 %d)"
 
 #: audio/internal/xaudio2.cpp:291
 #, c-format
 msgid "XAudio2: XAudio2_7 Initialize failed with HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2：XAudio2_7 初始化失败，HRESULT：0x%08X"
 
 #: audio/internal/xaudio2.cpp:296
 msgid "XAudio2: Failed to create XAudio2 2.7"
-msgstr ""
+msgstr "XAudio2：创建 XAudio2 2.7 失败"
 
 #: audio/internal/xaudio2.cpp:303
 msgid ""
 "XAudio2: Could not load XAudio2_9.dll, XAudio2_8.dll, or XAudio2_7.dll!"
-msgstr ""
+msgstr "XAudio2：无法加载 XAudio2_9.dll、XAudio2_8.dll 或 XAudio2_7.dll！"
 
 #: audio/internal/xaudio2.cpp:322
 msgid "XAudio2: Failed to enumerate devices for XAudio2 2.7"
-msgstr ""
+msgstr "XAudio2：枚举 XAudio2 2.7 的设备失败"
 
 #: audio/internal/xaudio2_7.cpp:112 audio/internal/xaudio2_7.cpp:525
 msgid "XAudio2: Enumerating devices failed!"
@@ -2660,84 +2660,84 @@ msgstr "XAudio2: 枚举设备失败！"
 
 #: audio/internal/xaudio2_7.cpp:128
 msgid "XAudio2: Device not found, using default"
-msgstr ""
+msgstr "XAudio2：未找到设备，使用默认设备"
 
 #: audio/internal/xaudio2_7.cpp:141
 msgid "XAudio2: Could not get device details for upmix"
-msgstr ""
+msgstr "XAudio2：无法获取混音的设备详细信息"
 
 #: audio/internal/xaudio2_7.cpp:155 audio/internal/xaudio2_9.cpp:131
 msgid "XAudio2: Failed to allocate upmix matrix"
-msgstr ""
+msgstr "XAudio2：分配上混矩阵失败"
 
 #: audio/internal/xaudio2_7.cpp:216 audio/internal/xaudio2_9.cpp:192
 #, c-format
 msgid "XAudio2: Unsupported channel count for upmix: %d"
-msgstr ""
+msgstr "XAudio2：不支持的上混声道数：%d"
 
 #: audio/internal/xaudio2_7.cpp:223 audio/internal/xaudio2_9.cpp:199
 msgid "XAudio2: Failed to set output matrix for upmix"
-msgstr ""
+msgstr "XAudio2：设置上混输出矩阵失败"
 
 #: audio/internal/xaudio2_7.cpp:236
 msgid "XAudio2: Null XAudio2 instance passed to driver!"
-msgstr ""
+msgstr "XAudio2：传递给驱动程序的 XAudio2 实例为空！"
 
 #: audio/internal/xaudio2_7.cpp:305 audio/internal/xaudio2_9.cpp:267
 msgid "XAudio2 instance not available!"
-msgstr ""
+msgstr "XAudio2 实例不可用！"
 
 #: audio/internal/xaudio2_7.cpp:314
 msgid "XAudio2 instance appears to be invalid"
-msgstr ""
+msgstr "XAudio2 实例似乎无效"
 
 #: audio/internal/xaudio2_7.cpp:323 audio/internal/xaudio2_9.cpp:276
 msgid "XAudio2: Failed to allocate audio buffers!"
-msgstr ""
+msgstr "XAudio2：分配音频缓冲区失败！"
 
 #: audio/internal/xaudio2_7.cpp:346 audio/internal/xaudio2_9.cpp:301
 #, c-format
 msgid "XAudio2: Creating mastering voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2：创建母带处理语音失败！HRESULT：0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:355 audio/internal/xaudio2_9.cpp:310
 #, c-format
 msgid "XAudio2: Creating source voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2：创建源语音失败！HRESULT：0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:369 audio/internal/xaudio2_9.cpp:324
 #, c-format
 msgid "XAudio2: Starting source voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2：启动源语音失败！HRESULT：0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:397 audio/internal/xaudio2_9.cpp:350
 msgid "XAudio2: Failed to reinitialize audio after device change"
-msgstr ""
+msgstr "XAudio2：设备更改后音频重新初始化失败"
 
 #: audio/internal/xaudio2_7.cpp:410 audio/internal/xaudio2_9.cpp:363
 msgid "XAudio2: Too many buffers queued, resetting"
-msgstr ""
+msgstr "XAudio2：队列中的缓冲区过多，正在重置"
 
 #: audio/internal/xaudio2_7.cpp:448 audio/internal/xaudio2_9.cpp:400
 #, c-format
 msgid "XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2：提交源缓冲区失败！HRESULT：0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:471 audio/internal/xaudio2_9.cpp:423
 msgid "XAudio2: Failed to resume playback!"
-msgstr ""
+msgstr "XAudio2：恢复播放失败！"
 
 #: audio/internal/xaudio2_7.cpp:499
 msgid "XAudio2: Cannot create driver with null XAudio2 instance"
-msgstr ""
+msgstr "XAudio2：无法使用空的 XAudio2 实例创建驱动程序"
 
 #: audio/internal/xaudio2_7.cpp:507
 msgid "XAudio2: XAudio2 instance appears to be invalid"
-msgstr ""
+msgstr "XAudio2：XAudio2 实例似乎无效"
 
 #: audio/internal/xaudio2_7.cpp:540
 msgid "XAudio2: Exception during device enumeration"
-msgstr ""
+msgstr "XAudio2：设备枚举期间发生异常"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:681
 msgid "Error, link already connected"
@@ -3120,11 +3120,11 @@ msgstr "滤镜"
 
 #: xrc/DisplayConfigBasic.xrc:112
 msgid "Plugin filter dir:"
-msgstr ""
+msgstr "插件过滤器目录："
 
 #: xrc/DisplayConfigBasic.xrc:118
 msgid "Select plugin directory"
-msgstr ""
+msgstr "选择插件目录"
 
 #: xrc/DisplayConfigBasic.xrc:125
 msgid "Display filter:"
@@ -3164,7 +3164,7 @@ msgstr "采样 4x"
 
 #: xrc/DisplayConfigBasic.xrc:155
 msgid "Filter plugin:"
-msgstr ""
+msgstr "过滤器插件："
 
 #: xrc/DisplayConfigBasic.xrc:165
 msgid "Interframe blending:"
@@ -3785,7 +3785,7 @@ msgstr "SDL 游戏控制器模式"
 
 #: xrc/JoypadConfig.xrc:21
 msgid "Autofire Throttle (frames):"
-msgstr ""
+msgstr "自动点火节流（帧）："
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -4390,23 +4390,23 @@ msgstr "内存查看器(&E)..."
 
 #: xrc/MainMenu.xrc:630
 msgid "L&ua scripting"
-msgstr ""
+msgstr "Lua 脚本(&U)"
 
 #: xrc/MainMenu.xrc:632
 msgid "&Run script..."
-msgstr ""
+msgstr "运行脚本(&R)..."
 
 #: xrc/MainMenu.xrc:635
 msgid "&Stop script"
-msgstr ""
+msgstr "停止脚本(&S)"
 
 #: xrc/MainMenu.xrc:639
 msgid "Show &console"
-msgstr ""
+msgstr "显示控制台(&C)"
 
 #: xrc/MainMenu.xrc:642
 msgid "Show &editor"
-msgstr ""
+msgstr "显示编辑器(&E)"
 
 #: xrc/MainMenu.xrc:646
 msgid "&OAM Viewer..."
