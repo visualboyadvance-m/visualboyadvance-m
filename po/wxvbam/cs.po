@@ -65,7 +65,7 @@ msgstr "Otevřít soubor ROM"
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
-msgstr ""
+msgstr "Soubory Game Boy (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
 #: cmdevents.cpp:284
 msgid "Open GB ROM file"
@@ -2766,7 +2766,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1786
 #, c-format
 msgid "Player %d connected"
-msgstr ""
+msgstr "Hráč %d se připojil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1224
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1800
@@ -2782,11 +2782,11 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1254
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1831
 msgid "All players joined."
-msgstr ""
+msgstr "Všichni hráči se připojili."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1747
 msgid "Server timed out."
-msgstr ""
+msgstr "Vypršelo spojení se serverem."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2705
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2726
@@ -2804,7 +2804,7 @@ msgstr ""
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2782
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2801
 msgid "Error opening event"
-msgstr ""
+msgstr "Chyba při otvírání události"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2901
 msgid "Lost link; reinitialize to reconnect"
@@ -3097,11 +3097,11 @@ msgstr "Jednoduché"
 
 #: xrc/DisplayConfigBasic.xrc:74
 msgid "SDL Renderer:"
-msgstr ""
+msgstr "Vykreslování SDL:"
 
 #: xrc/DisplayConfigBasic.xrc:83
 msgid "SDL Pixel Art Filter"
-msgstr ""
+msgstr "Filtr Pixel Art pro SDL"
 
 #: xrc/DisplayConfigBasic.xrc:97
 msgid "Filters"
@@ -3113,7 +3113,7 @@ msgstr ""
 
 #: xrc/DisplayConfigBasic.xrc:118
 msgid "Select plugin directory"
-msgstr ""
+msgstr "Vyberte adresář s rozšířeními"
 
 #: xrc/DisplayConfigBasic.xrc:125
 msgid "Display filter:"
@@ -3161,7 +3161,7 @@ msgstr ""
 
 #: xrc/DisplayConfigBasic.xrc:173
 msgid "Smart"
-msgstr ""
+msgstr "Chytrá"
 
 #: xrc/DisplayConfigBasic.xrc:174
 msgid "Motion Blur"
@@ -3173,23 +3173,23 @@ msgstr ""
 
 #: xrc/DisplayConfigBitDepth.xrc:19
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: xrc/DisplayConfigBitDepth.xrc:20
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: xrc/DisplayConfigBitDepth.xrc:21
 msgid "24"
-msgstr ""
+msgstr "24"
 
 #: xrc/DisplayConfigBitDepth.xrc:22
 msgid "32"
-msgstr ""
+msgstr "32"
 
 #: xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
-msgstr ""
+msgstr "Profil:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "GBA Darken:"
@@ -3201,7 +3201,7 @@ msgstr ""
 
 #: xrc/DisplayConfigColorCorrection.xrc:75
 msgid "Very Dark"
-msgstr ""
+msgstr "Velmi tmavé"
 
 #: xrc/DisplayConfigColorCorrection.xrc:86
 msgid "GBC Lighten:"
@@ -3233,15 +3233,15 @@ msgstr "Přeskakování snímku"
 
 #: xrc/DisplayConfigSpeed.xrc:26
 msgid "&Number of frames to skip:"
-msgstr ""
+msgstr "&Počet snímků k přeskočení :"
 
 #: xrc/DisplayConfigZoom.xrc:12
 msgid "Default magnification:"
-msgstr ""
+msgstr "Výchozí zvětšení :"
 
 #: xrc/DisplayConfigZoom.xrc:30
 msgid "Maximum magnification factor:"
-msgstr ""
+msgstr "Maximální faktor zvětšení:"
 
 #: xrc/DisplayConfigZoom.xrc:31
 msgid "0 = no maximum"
@@ -3313,7 +3313,7 @@ msgstr "Informace o ROM"
 
 #: xrc/GBColorPrefPanel.xrc:9
 msgid "Custom"
-msgstr ""
+msgstr "Volitelné"
 
 #: xrc/GBColorPrefPanel.xrc:11
 msgid "Blue Sea"
