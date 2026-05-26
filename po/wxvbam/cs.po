@@ -3341,7 +3341,7 @@ msgstr "Divné barvy"
 
 #: xrc/GBColorPrefPanel.xrc:17
 msgid "Real Game Boy Colors"
-msgstr ""
+msgstr "Opravdové barvy Game Boy"
 
 #: xrc/GBColorPrefPanel.xrc:18
 msgid "Real 'Game Boy on Game Boy Advance Special' Colors"
@@ -3393,7 +3393,7 @@ msgstr "Políčko:"
 
 #: xrc/GBMapViewer.xrc:90 xrc/MapViewer.xrc:160
 msgid "Flip:"
-msgstr ""
+msgstr "Prohození:"
 
 #: xrc/GBMapViewer.xrc:98 xrc/GBTileViewer.xrc:50 xrc/MapViewer.xrc:168
 #: xrc/TileViewer.xrc:66
@@ -3421,7 +3421,7 @@ msgstr ""
 
 #: xrc/GBOAMViewer.xrc:29 xrc/OAMViewer.xrc:29
 msgid "Pos:"
-msgstr ""
+msgstr "Poz:"
 
 #: xrc/GBOAMViewer.xrc:45 xrc/OAMViewer.xrc:69
 msgid "Prio:"
@@ -3494,7 +3494,7 @@ msgstr "&Pokračovat"
 
 #: xrc/GBROMInfo.xrc:48
 msgid "Cartridge type:"
-msgstr ""
+msgstr "Druh cartridge:"
 
 #: xrc/GBROMInfo.xrc:60
 msgid "SGB code:"
@@ -3538,11 +3538,11 @@ msgstr "Nastavení Game Boy Advance"
 
 #: xrc/GameBoyAdvanceConfigBootRom.xrc:15
 msgid "BIOS file:"
-msgstr ""
+msgstr "Soubor BIOS:"
 
 #: xrc/GameBoyAdvanceConfigBootRom.xrc:38
 msgid "Current BIOS file:"
-msgstr ""
+msgstr "Současný soubor BIOS:"
 
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:11
 msgid "Game Code"
@@ -3593,17 +3593,17 @@ msgstr "EEPROM + Senzor"
 
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:77
 msgid "Flash Size:"
-msgstr ""
+msgstr "Velikost flash:"
 
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:86
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:42
 msgid "64 K"
-msgstr ""
+msgstr "64 K"
 
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:87
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:43
 msgid "128 K"
-msgstr ""
+msgstr "128 K"
 
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:95
 msgid "Mirroring:"
@@ -3615,7 +3615,7 @@ msgstr "&Výchozí"
 
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:14
 msgid "Save type:"
-msgstr ""
+msgstr "Typ uložení:"
 
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:36
 msgid "Flash size:"
@@ -3639,7 +3639,7 @@ msgstr ""
 
 #: xrc/GameBoyConfigBootRom.xrc:19 xrc/GameBoyConfigBootRom.xrc:41
 msgid "Select a File"
-msgstr ""
+msgstr "Vyberte soubor"
 
 #: xrc/GameBoyConfigBootRom.xrc:34
 msgid "Game Boy Color Boot ROM &file:"
