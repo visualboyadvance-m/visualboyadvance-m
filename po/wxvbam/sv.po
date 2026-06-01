@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 16:00+0000\n"
+"POT-Creation-Date: 2026-06-01 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
@@ -4485,142 +4485,102 @@ msgid "Default Language"
 msgstr "Standardspråk"
 
 #: xrc/MainMenu.xrc:770
-msgid "Bulgarian"
-msgstr "Bulgariska"
-
-#: xrc/MainMenu.xrc:774
-msgid "Breton"
-msgstr "Bretonska"
-
-#: xrc/MainMenu.xrc:778
-msgid "Czech"
-msgstr "Tjeckiska"
-
-#: xrc/MainMenu.xrc:782
-msgid "Greek"
-msgstr "Grekiska"
-
-#: xrc/MainMenu.xrc:786
-msgid "English [US]"
-msgstr ""
-
-#: xrc/MainMenu.xrc:790
 msgid "Spanish [Latin American]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:774
 msgid "Spanish [Colombia]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:798
+#: xrc/MainMenu.xrc:778
 msgid "Spanish [Peru]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:802
+#: xrc/MainMenu.xrc:782
 msgid "Spanish [United States]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:806
+#: xrc/MainMenu.xrc:786
 msgid "Spanish"
 msgstr "Spanska"
 
-#: xrc/MainMenu.xrc:810
+#: xrc/MainMenu.xrc:790
 msgid "French [France]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:814
+#: xrc/MainMenu.xrc:794
 msgid "French"
 msgstr "Franska"
 
-#: xrc/MainMenu.xrc:818
+#: xrc/MainMenu.xrc:798
 msgid "Galician"
 msgstr "Galiciska"
 
-#: xrc/MainMenu.xrc:822
+#: xrc/MainMenu.xrc:802
 msgid "Hebrew [Israel]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:826
+#: xrc/MainMenu.xrc:806
 msgid "Hungarian [Hungary]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:830
+#: xrc/MainMenu.xrc:810
 msgid "Hungarian"
 msgstr "Ungerska"
 
-#: xrc/MainMenu.xrc:834
+#: xrc/MainMenu.xrc:814
 msgid "Indonesian"
 msgstr "Indonesiska"
 
-#: xrc/MainMenu.xrc:838
+#: xrc/MainMenu.xrc:818
 msgid "Italian"
 msgstr "Italienska"
 
-#: xrc/MainMenu.xrc:842
-msgid "Japanese"
-msgstr "Japanska"
-
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:822
 msgid "Korean [Korea]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:850
+#: xrc/MainMenu.xrc:826
 msgid "Korean"
 msgstr "Koreanska"
 
-#: xrc/MainMenu.xrc:854
-msgid "Malay [Malaysia]"
-msgstr ""
-
-#: xrc/MainMenu.xrc:858
-msgid "Norwegian"
-msgstr "Norska"
-
-#: xrc/MainMenu.xrc:862
-msgid "Dutch"
-msgstr "Nederländska"
-
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:830
 msgid "Polish [Poland]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:870
+#: xrc/MainMenu.xrc:834
 msgid "Polish"
 msgstr "Polska"
 
-#: xrc/MainMenu.xrc:874
+#: xrc/MainMenu.xrc:838
 msgid "Portuguese [Brazil]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:878
+#: xrc/MainMenu.xrc:842
 msgid "Portuguese [Portugal]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:882
-msgid "Russian [Russia]"
-msgstr ""
-
-#: xrc/MainMenu.xrc:886
+#: xrc/MainMenu.xrc:846
 msgid "Swedish"
 msgstr "Svenska"
 
-#: xrc/MainMenu.xrc:890
+#: xrc/MainMenu.xrc:850
 msgid "Turkish"
 msgstr "Turkiska"
 
-#: xrc/MainMenu.xrc:894
+#: xrc/MainMenu.xrc:854
 msgid "Ukrainian"
 msgstr "Ukrainska"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:858
 msgid "Urdu [Pakistan]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:862
 msgid "Chinese [China]"
 msgstr ""
 
-#: xrc/MainMenu.xrc:906
+#: xrc/MainMenu.xrc:866
 msgid "&Use external translations"
 msgstr "&Använd externa översättningar"
 

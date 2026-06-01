@@ -27,7 +27,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 16:00+0000\n"
+"POT-Creation-Date: 2026-06-01 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Uriel Sánchez, 2026\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
@@ -4496,142 +4496,102 @@ msgid "Default Language"
 msgstr "Lenguaje Predeterminado"
 
 #: xrc/MainMenu.xrc:770
-msgid "Bulgarian"
-msgstr "Búlgaro"
-
-#: xrc/MainMenu.xrc:774
-msgid "Breton"
-msgstr "Breton"
-
-#: xrc/MainMenu.xrc:778
-msgid "Czech"
-msgstr "Czech"
-
-#: xrc/MainMenu.xrc:782
-msgid "Greek"
-msgstr "Greek"
-
-#: xrc/MainMenu.xrc:786
-msgid "English [US]"
-msgstr "English [US]"
-
-#: xrc/MainMenu.xrc:790
 msgid "Spanish [Latin American]"
 msgstr "Spanish [Latin American]"
 
-#: xrc/MainMenu.xrc:794
+#: xrc/MainMenu.xrc:774
 msgid "Spanish [Colombia]"
 msgstr "Spanish [Colombia]"
 
-#: xrc/MainMenu.xrc:798
+#: xrc/MainMenu.xrc:778
 msgid "Spanish [Peru]"
 msgstr "Spanish [Peru]"
 
-#: xrc/MainMenu.xrc:802
+#: xrc/MainMenu.xrc:782
 msgid "Spanish [United States]"
 msgstr "Spanish [United States]"
 
-#: xrc/MainMenu.xrc:806
+#: xrc/MainMenu.xrc:786
 msgid "Spanish"
 msgstr "Español"
 
-#: xrc/MainMenu.xrc:810
+#: xrc/MainMenu.xrc:790
 msgid "French [France]"
 msgstr "French [France]"
 
-#: xrc/MainMenu.xrc:814
+#: xrc/MainMenu.xrc:794
 msgid "French"
 msgstr "French"
 
-#: xrc/MainMenu.xrc:818
+#: xrc/MainMenu.xrc:798
 msgid "Galician"
 msgstr "Galician"
 
-#: xrc/MainMenu.xrc:822
+#: xrc/MainMenu.xrc:802
 msgid "Hebrew [Israel]"
 msgstr "Hebrew [Israel]"
 
-#: xrc/MainMenu.xrc:826
+#: xrc/MainMenu.xrc:806
 msgid "Hungarian [Hungary]"
 msgstr "Hungarian [Hungary]"
 
-#: xrc/MainMenu.xrc:830
+#: xrc/MainMenu.xrc:810
 msgid "Hungarian"
 msgstr "Hungarian"
 
-#: xrc/MainMenu.xrc:834
+#: xrc/MainMenu.xrc:814
 msgid "Indonesian"
 msgstr "Indonesian"
 
-#: xrc/MainMenu.xrc:838
+#: xrc/MainMenu.xrc:818
 msgid "Italian"
 msgstr "Italiano"
 
-#: xrc/MainMenu.xrc:842
-msgid "Japanese"
-msgstr "Japones"
-
-#: xrc/MainMenu.xrc:846
+#: xrc/MainMenu.xrc:822
 msgid "Korean [Korea]"
 msgstr "Korean [Korea]"
 
-#: xrc/MainMenu.xrc:850
+#: xrc/MainMenu.xrc:826
 msgid "Korean"
 msgstr "Korean"
 
-#: xrc/MainMenu.xrc:854
-msgid "Malay [Malaysia]"
-msgstr "Malay [Malaysia]"
-
-#: xrc/MainMenu.xrc:858
-msgid "Norwegian"
-msgstr "Norwegian"
-
-#: xrc/MainMenu.xrc:862
-msgid "Dutch"
-msgstr "Dutch"
-
-#: xrc/MainMenu.xrc:866
+#: xrc/MainMenu.xrc:830
 msgid "Polish [Poland]"
 msgstr "Polish [Poland]"
 
-#: xrc/MainMenu.xrc:870
+#: xrc/MainMenu.xrc:834
 msgid "Polish"
 msgstr "Polish"
 
-#: xrc/MainMenu.xrc:874
+#: xrc/MainMenu.xrc:838
 msgid "Portuguese [Brazil]"
 msgstr "Portuguese [Brazil]"
 
-#: xrc/MainMenu.xrc:878
+#: xrc/MainMenu.xrc:842
 msgid "Portuguese [Portugal]"
 msgstr "Portuguese [Portugal]"
 
-#: xrc/MainMenu.xrc:882
-msgid "Russian [Russia]"
-msgstr "Russian [Russia]"
-
-#: xrc/MainMenu.xrc:886
+#: xrc/MainMenu.xrc:846
 msgid "Swedish"
 msgstr "Swedish"
 
-#: xrc/MainMenu.xrc:890
+#: xrc/MainMenu.xrc:850
 msgid "Turkish"
 msgstr "Turkish"
 
-#: xrc/MainMenu.xrc:894
+#: xrc/MainMenu.xrc:854
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
-#: xrc/MainMenu.xrc:898
+#: xrc/MainMenu.xrc:858
 msgid "Urdu [Pakistan]"
 msgstr "Urdu [Pakistan]"
 
-#: xrc/MainMenu.xrc:902
+#: xrc/MainMenu.xrc:862
 msgid "Chinese [China]"
 msgstr "Chinese [China]"
 
-#: xrc/MainMenu.xrc:906
+#: xrc/MainMenu.xrc:866
 msgid "&Use external translations"
 msgstr "&Use external translations"
 
