@@ -418,7 +418,7 @@ msgstr "Isto removerá o \"%s\" do \"%s\". Você tem certeza?"
 #: dialogs/base-dialog.cpp:182
 #, c-format
 msgid "Failed to load lazy tab '%s'"
-msgstr ""
+msgstr "Falhou em carregar a aba preguiçosa '%s'"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -432,7 +432,7 @@ msgstr "Valor inválido pra ampliação padrão."
 #: dialogs/display-config.cpp:449
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
-msgstr ""
+msgstr "Falhou em carregar a aba '%s' do DisplayConfig"
 
 #: dialogs/display-config.cpp:614
 msgid "Invalid color correction profile"
@@ -485,7 +485,7 @@ msgstr "Cores Personalizadas"
 
 #: dialogs/game-boy-config.cpp:429
 msgid "Failed to load GBColorPrefPanel"
-msgstr ""
+msgstr "Falhou em carregar o GBColorPrefPanel"
 
 #: dialogs/game-boy-config.cpp:441
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
@@ -652,12 +652,12 @@ msgstr "%04X (Real: %04X)"
 
 #: dialogs/joypad-config.cpp:150
 msgid "Failed to load JoyPanel"
-msgstr ""
+msgstr "Falhou em carregar o JoyPanel"
 
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "Jogador %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
@@ -670,12 +670,12 @@ msgstr "Especial"
 #: dialogs/joypad-config.cpp:195
 #, c-format
 msgid "Failed to load joypad sub-tab '%s'"
-msgstr ""
+msgstr "Falhou em carregar a sub-aba do joypad '%s'"
 
 #: dialogs/sound-config.cpp:198
 #, c-format
 msgid "Failed to load SoundConfig tab '%s'"
-msgstr ""
+msgstr "Falhou em carregar a aba '%s' do SoundConfig"
 
 #: dialogs/sound-config.cpp:343
 #, c-format
