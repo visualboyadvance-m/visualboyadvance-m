@@ -72,6 +72,11 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
 
     configure_wx_target(vbam-wx-widgets-tests)
 
+    # Disable LTO on the test executable. It only slows the link with no
+    # benefit (no-op when LTO is off).
+    set_target_properties(vbam-wx-widgets-tests PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION OFF)
+
     # Workaround for wxWidgets 3.3 Debug build linker issue with wxFormatString::Validate
     # This is a known issue where the symbol is defined in both the wxWidgets library and user code
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")

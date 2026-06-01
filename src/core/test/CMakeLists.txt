@@ -29,6 +29,11 @@ if(APPLE)
         "-framework CoreFoundation" iconv)
 endif()
 
+# Disable LTO on the test runners. It only slows their link with no
+# benefit, and these are throwaway test drivers (no-op when LTO is off).
+set_target_properties(suite_runner gb_suite_runner PROPERTIES
+    INTERPROCEDURAL_OPTIMIZATION OFF)
+
 # -----------------------------------------------------------------------------
 # Test ROM integration
 #

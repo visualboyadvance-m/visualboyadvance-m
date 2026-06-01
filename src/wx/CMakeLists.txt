@@ -544,6 +544,10 @@ if(ENABLE_LUA AND TARGET vbam-lua)
             target_link_libraries(lua_test_runner PRIVATE
                 "-framework CoreFoundation" iconv)
         endif()
+        # Disable LTO on the test runner. It only slows the link with no
+        # benefit (no-op when LTO is off).
+        set_target_properties(lua_test_runner PROPERTIES
+            INTERPROCEDURAL_OPTIMIZATION OFF)
         add_test(NAME wx.lua.api
                  COMMAND lua_test_runner
                      "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")
