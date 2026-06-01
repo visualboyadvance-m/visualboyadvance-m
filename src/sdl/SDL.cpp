@@ -697,7 +697,7 @@ static void sdlApplyPerImagePreferences()
         if (buffer[i] < 0x21 || buffer[i] > 0x7e) { validCode = false; break; }
     }
     if (!validCode) {
-        uint32_t romcrc = crc32(0L, g_rom, gbaGetRomSize());
+        uint32_t romcrc = crc32(0L, g_rom, static_cast<uInt>(gbaGetRomSize()));
         snprintf(buffer, sizeof(buffer), "[CRC_%08X]", romcrc);
     }
 

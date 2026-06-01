@@ -40,8 +40,31 @@ list(REMOVE_ITEM _vbam_lua_sources
     "${vbam_lua_SOURCE_DIR}/src/luac.c"
     "${vbam_lua_SOURCE_DIR}/src/onelua.c")
 
+# The project sets a global warning level via add_compile_options(/W4)
+# (see cmake/Toolchain-msvc.cmake), which every target in this directory
+# inherits. Appending /W0 for the vendored Lua sources below would then
+# put two warning-level flags on the command line, and MSVC's driver
+# emits "command line warning D9025: overriding '/W4' with '/W0'" for
+# every Lua object. D9025 can't be suppressed with /wd, so we instead
+# drop the inherited /W4 from the directory-options snapshot that this
+# target captures at creation time, then restore it so every other
+# target still builds at /W4.
+if(MSVC)
+    get_directory_property(_vbam_saved_compile_options COMPILE_OPTIONS)
+    set(_vbam_lua_compile_options "${_vbam_saved_compile_options}")
+    list(FILTER _vbam_lua_compile_options EXCLUDE REGEX "^/W[0-4]$")
+    set_directory_properties(PROPERTIES
+        COMPILE_OPTIONS "${_vbam_lua_compile_options}")
+endif()
+
 add_library(vbam-lua STATIC ${_vbam_lua_sources})
 target_include_directories(vbam-lua PUBLIC "${vbam_lua_SOURCE_DIR}/src")
+
+if(MSVC)
+    # Restore /W4 for all subsequently-created targets.
+    set_directory_properties(PROPERTIES
+        COMPILE_OPTIONS "${_vbam_saved_compile_options}")
+endif()
 
 # Lua expects the host to define LUA_USE_<PLATFORM> so it picks the
 # right system facilities (dlopen, popen, signal, etc.). On Linux,

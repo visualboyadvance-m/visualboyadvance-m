@@ -701,12 +701,12 @@ static int sensorZ = 0;
 
 void inputUpdateMotionSensor()
 {
-    auto& motion = vbam::core::SdlMotion::Instance();
-    if (motion.IsActive()) {
-        motion.Poll();
-        sensorX = motion.TiltX();
-        sensorY = motion.TiltY();
-        sensorZ = motion.GyroZ();
+    auto& sdl_motion = vbam::core::SdlMotion::Instance();
+    if (sdl_motion.IsActive()) {
+        sdl_motion.Poll();
+        sensorX = sdl_motion.TiltX();
+        sensorY = sdl_motion.TiltY();
+        sensorZ = sdl_motion.GyroZ();
         return;
     }
 
