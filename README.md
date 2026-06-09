@@ -1,37 +1,19 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Visual Boy Advance - M](#visual-boy-advance---m)
   - [System Requirements](#system-requirements)
   - [Building](#building)
-  - [Building a Libretro core](#building-a-libretro-core)
-  - [Visual Studio Support](#visual-studio-support)
   - [Visual Studio Code Support](#visual-studio-code-support)
   - [Dependencies](#dependencies)
-  - [Cross compiling for 32 bit on a 64 bit host](#cross-compiling-for-32-bit-on-a-64-bit-host)
-  - [Cross Compiling for Win32](#cross-compiling-for-win32)
   - [CMake Options](#cmake-options)
-  - [MSys2 Notes](#msys2-notes)
-  - [Debug Messages](#debug-messages)
-  - [Reporting Crash Bugs](#reporting-crash-bugs)
   - [Contributing](#contributing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Our bridged Discord server is [Here](https://discord.gg/EpfxEuGMKH).
-
-We are also on *`#vba-m`* on [Libera IRC](https://libera.chat/) which has a [Web
-Chat](https://web.libera.chat/).
-
-[![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
-
-***Want to know where you can install visualboyadvance-m in your linux distribution?***
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/visualboyadvance-m.svg)](https://repology.org/project/visualboyadvance-m/versions)
-
 # Visual Boy Advance - M
+
+Our Discord server is [here](https://discord.gg/EpfxEuGMKH).
 
 Game Boy and Game Boy Advance Emulator
 
@@ -41,6 +23,11 @@ Windows and Mac builds are in the [releases tab](https://github.com/visualboyadv
 
 Nightly builds for Windows and macOS are at [https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
 
+<!--
+[![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/visualboyadvance-m)
+-->
+
 **PLEASE TEST THE NIGHTLY OR MASTER WITH A FACTORY RESET BEFORE REPORTING
 ISSUES**
 
@@ -49,37 +36,30 @@ Your distribution may have packages available as well, search for
 
 It is also generally very easy to build from source, see below.
 
-If you are using the windows binary release and you need localization, unzip
-the `translations.zip` to the same directory as the executable.
-
 If you are having issues, try resetting the config file first, go to `Help ->
 Factory Reset`.
 
 ## System Requirements
 
-Windows XP, Vista, 7, 8.1 or 10/11, Linux distros or macOS.
+Windows XP+, macOS or Linux.
 
-2Ghz x86 (or x86-64) Intel Core 2 or AMD Athlon processor with SSE, Snapdragon 835 
-or newer CPU compatible with Arm for Windows.
+Older and weaker systems may not be able to run the higher level xBRZ and
+ScaleFX scalers.
 
-- Just a guideline, lower clock speeds and Celeron processors may be able to run at full
-speed on lower settings, and Linux based ARM Operating systems have wider CPU support.
+For Windows XP install:
 
-DirectX June 2010 Redist
-[Full](https://www.microsoft.com/en-au/download/details.aspx?id=8109) /
-[Websetup](https://www.microsoft.com/en-au/download/details.aspx?id=35) for
-Xaudio (Remember to uncheck Bing on the websetup.)
+- [DirectX June 2010 Redist](https://www.microsoft.com/en-au/download/details.aspx?id=8109)
+- [Visual C++ runtimes all-on-one pack for January 202 ](https://cachemiss.com/files/Visual-C-Runtimes-All-in-One-Jan-2021.zip)
 
 ## Building
 
 The basic formula to build vba-m is:
 
 ```bash
-cd ~ && mkdir src && cd src
-git clone https://github.com/visualboyadvance-m/visualboyadvance-m.git
+git clone https://github.com/visualboyadvance-m/visualboyadvance-m
 cd visualboyadvance-m
 
-./installdeps # On Linux or macOS
+./installdeps # On Linux, macOS or MSYS2
 
 mkdir build
 cd build
@@ -87,49 +67,38 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -G Ninja
 ninja
 ```
 
-`./installdeps` is supported on MSYS2, Linux (Debian/Ubuntu, Fedora, Arch,
-Solus, OpenSUSE, Gentoo and RHEL/CentOS) and Mac OS X (homebrew, MacPorts or
-Fink.)
+If `./installdeps` does not work, you may need to install dependencies manually,
+see below for the list. `./installdeps` also works on MSYS2.
 
-## Building a Libretro core
-
-Clone this repo and then,
+For builds using automatically downloaded vcpkg packages for dependencies on
+macOS or Linux, make sure PowerShell Core is installed, and use:
 
 ```bash
-cd src/libretro
-make -j`nproc`
+cmake .. -DVCPKG_TARGET_TRIPLET=**<SYSTEM>** -DCMAKE_BUILD_TYPE=Release -G Ninja
 ```
 
-Copy `vbam_libretro.so` to your RetroArch cores directory.
+, where **SYSTEM** is one of:
 
-## Visual Studio Support
+- x64-linux,
+- arm64-macos,
+- x64-macos,
 
-For visual studio, dependency management is handled automatically with vcpkg,
-From the Visual Studio GUI, just clone the repository with git and build with
-the cmake configurations provided.
+. On Windows, vcpkg is the default and that is handled automatically.
 
-If the GUI does not detect cmake, go to `File -> Open -> CMake` and open the
-`CMakeLists.txt`.
+If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
+`./installdeps` are the default, unless you pass
+`-DVCPKG_TARGET_TRIPLET=**<MSYS2-ENVIRONMENT>** which is one of:
 
-If you are using 2017, make sure you have all the latest updates, some issues
-with cmake projects in the GUI have been fixed.
+- x64-mingw-static (for MINGW64, UCRT64 or CLANG64),
+- x32-mingw-static (for Windows XP builds using a MINGW32 toolchain.)
 
-You can also build from the developer command prompt or powershell with the
-environment loaded.
+You can download a MINGW32 toolchain
+[here](https://cachemiss.com/files/winxp-mingw32.7z) and extract it to
+`C:\msys64` or wherever your MSYS2 is installed. After which `C:\msys64\mingw32`
+has to be in your `PATH` for the vcpkg build.
 
-Using your own user-wide installation of vcpkg is supported, just make sure the
-environment variable `VCPKG_ROOT` is set.
-
-To build in the Visual Studio `x64 Native Tools Command Prompt`, use something
-like this:
-
-```
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -G Ninja
-ninja
-```
-.
+A `VCPKG_ROOT` is automatically created as a sibling of the project directory,
+unless you set it to something else in your environment.
 
 ## Visual Studio Code Support
 
@@ -151,45 +120,39 @@ Add the following to your `settings.json`:
 
 ## Dependencies
 
-If your OS is not supported, you will need the following:
+You will need the following:
 
-- C++ compiler and binutils
-- [make](https://en.wikipedia.org/wiki/Make_(software))
-- [CMake](https://cmake.org/)
-- [git](https://git-scm.com/)
-- [nasm](https://www.nasm.us/) (optional, for 32 bit builds)
+- C++ and C compiler and binutils,
+- CMake.
 
-And the following development libraries:
+And the following development libraries,
 
-- [zlib](https://zlib.net/) (required)
-- [mesa](https://mesa3d.org/) (if using X11 or any OpenGL otherwise)
-- [ffmpeg](https://ffmpeg.org/) (optional, at least version `4.0.4`, for game recording)
-- [gettext](https://www.gnu.org/software/gettext/) and gettext-tools
-- [SDL2](https://www.libsdl.org/) (required)
-- [openal-soft](https://kcat.strangesoft.net/openal.html) (optional, a sound interface)
-- [wxWidgets](https://wxwidgets.org/) (required for GUI, 2.8 and non-stl builds are no longer supported)
+all platforms, required:
 
-On Linux and similar, you also need the version of GTK your wxWidgets is linked
-to (usually 2 or 3) and the xorg development libraries.
+- zlib,
+- Gettext and gettext-tools,
+- SDL3 or SDL2,
+- wxWidgets,
+- bzip2,
+- xz/lzma,
 
-Support for more OSes/distributions for `./installdeps` is planned.
+optional:
 
-## Cross compiling for 32 bit on a 64 bit host
+- FFmpeg,
+- OpenAL-Soft,
+- Lua,
+- FAudio,
+- Vulkan,
 
-`./installdeps m32` will set things up to build a 32 bit binary.
+on Linux you will also need:
 
-This is supported on Fedora, Arch, Solus and MSYS2.
+- glibc-devel,
+- mesa,
+- GTK3,
+- XOrg,
+- Wayland,
 
-## Cross Compiling for Win32
-
-`./installdeps` takes one optional parameter for cross-compiling target, which
-may be `win32` which is an alias for `mingw-w64-i686` to target 32 bit Windows,
-or `mingw-w64-x86_64` for 64 bit Windows targets.
-
-The target is implicit on MSYS2 depending on which MINGW shell you started (the
-value of `$MSYSTEM`.)
-
-On Debian/Ubuntu this uses the MXE apt repository and works quite well.
+on macOS you will need MoltenVK for Vulkan support.
 
 ## CMake Options
 
@@ -199,80 +162,51 @@ override them, for example:
 ```shell
 cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 ```
-. Here is the complete list:
 
-| **CMake Option**      | **What it Does**                                                     | **Defaults**          |
-|-----------------------|----------------------------------------------------------------------|-----------------------|
-| `ENABLE_SDL`            | Build the SDL port                                                   | OFF                   |
-| `ENABLE_WX`             | Build the wxWidgets port                                             | ON                    |
-| `ENABLE_DEBUGGER`       | Enable the debugger                                                  | ON                    |
-| `ENABLE_ASM_CORE`       | Enable x86 ASM CPU cores (**BUGGY AND DANGEROUS**)                   | OFF                   |
-| `ENABLE_ASM`            | Enable the following two ASM options                                 | ON for 32 bit builds  |
-| `ENABLE_ASM_SCALERS`    | Enable x86 ASM graphic filters                                       | ON for 32 bit builds  |
-| `ENABLE_MMX`            | Enable MMX                                                           | ON for 32 bit builds  |
-| `ENABLE_LINK`           | Enable GBA linking functionality                                     | AUTO                  |
-| `ENABLE_LIRC`           | Enable LIRC support                                                  | OFF                   |
-| `ENABLE_FFMPEG`         | Enable ffmpeg A/V recording                                          | AUTO                  |
-| `ENABLE_ONLINEUPDATES`  | Enable online update checks                                          | ON                    |
-| `ENABLE_LTO`            | Compile with Link Time Optimization (gcc and clang only)             | ON for release build  |
-| `ENABLE_GBA_LOGGING`    | Enable extended GBA logging                                          | ON                    |
-| `ENABLE_OPENAL`         | Enable openal-soft sound output for wxWidgets                        | ON, not 32 bit Win    |
-| `ENABLE_XAUDIO2`        | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
-| `ENABLE_FAUDIO`         | Enable faudio sound output for wxWidgets,                            | ON, not 32 bit Win    |
-| `ENABLE_ASAN`           | Enable libasan sanitizers (by default address, only in debug mode)   | OFF                   |
-| `UPSTREAM_RELEASE`      | Do some release tasks, like codesigning, making zip and gpg sigs.    | OFF                   |
-| `BUILD_TESTING`         | Build the tests and enable ctest support.                            | ON                    |
-| `VBAM_STATIC`           | Try link all libs statically (the following are set to ON if ON)     | OFF                   |
-| `SDL2_STATIC`           | Try to link static SDL2 libraries                                    | OFF                   |
-| `FFMPEG_STATIC`         | Try to link static ffmpeg libraries                                  | OFF                   |
-| `OPENAL_STATIC`         | Try to link static OpenAL libraries                                  | OFF                   |
-| `TRANSLATIONS_ONLY`     | Build only the translations.zip and nothing else                     | OFF                   |
+. Here is the list:
+
+| **CMake Option**                          | **What it Does**                                                     | **Defaults**          |
+|-------------------------------------------|----------------------------------------------------------------------|-----------------------|
+| `ENABLE_SDL`                              | Build the SDL port                                                   | OFF - Win, ON - rest  |
+| `ENABLE_WX`                               | Build the wxWidgets port                                             | ON                    |
+| `ENABLE_LINK`                             | Enable GBA/GB linking functionality                                  | ON                    |
+| `ENABLE_LIBRETRO`                         | Build the libretro core                                              | ON                    |
+| `BUILD_TESTING`                           | Build the tests                                                      | ON                    |
+| `UPSTREAM_RELEASE`                        | Do some release tasks, like codesigning and making zips              | OFF                   |
+| `TRANSLATIONS_ONLY`                       | Build only the translations.zip and nothing else                     | OFF                   |
+| `ENABLE_LTO`                              | Compile with Link Time Optimization                                  | ON for release build  |
+| `VCPKG_BINARY_PACKAGES`                   | Download/use vcpkg binary packages                                   | ON - Win, OFF - rest  |
+| `VCPKG_TARGET_TRIPLET`                    | Enable vcpkg download/use of vcpkg binary packages for that triplet  | ON - Win, OFF - rest  |
+| `VCPKG_SOURCE_PACKAGES`                   | Enable builds of vcpkg deps when binary packageas are not available  | ON - Win, OFF - rest  |
+| `NO_VCPKG_UPDATES`                        | Do not update vcpkg ports from either binaries or source             | OFF                   |
+| `VBAM_STATIC`                             | Try to link as many libraries statically as possible                 | ON - Win/MSYS2 or OFF |
+| `DISABLE_MACOS_PACKAGE_MANAGERS`          | Do not use the detected brew/Nix/MacPorts on macOS                   | OFF                   |
+| `ENABLE_SDL3`                             | Use SDL3 not SDL2                                                    | ON if detected        |
+| `ENABLE_GENERIC_FILE_DIALOGS`             | Use generic file open/selection dialogs on macOS                     | OFF                   |
+| `DISABLE_OPENGL`                          | Disable OpenGL support                                               | OFF                   |
+| `ENABLE_DEBUGGER`                         | Enable the debugger                                                  | ON                    |
+| `ENABLE_LUA`                              | Enable Lua scripting support for wxWidgets port                      | ON                    |
+| `ENABLE_ASAN`                             | Use `-fsanitize=address` for GCC/Clang Debug builds                  | OFF                   |
+| `ENABLE_BZ2`                              | Enable bzip2 .bz2 archive support                                    | ON                    |
+| `ENABLE_LZMA`                             | Enable lzma .xz archive support                                      | ON                    |
+| `ENABLE_LIRC`                             | Enable LIRC support                                                  | OFF                   |
+| `ENABLE_FFMPEG`                           | Enable ffmpeg A/V recording                                          | ON                    |
+| `ENABLE_ONLINEUPDATES`                    | Enable online update checks                                          | ON (release builds)   |
+| `ENABLE_GBA_LOGGING`                      | Enable extended GBA logging                                          | ON                    |
+| `ENABLE_OPENAL`                           | Enable openal-soft sound output for wxWidgets                        | ON                    |
+| `ENABLE_XAUDIO2`                          | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
+| `ENABLE_FAUDIO`                           | Enable faudio sound output for wxWidgets                             | ON                    |
+| `ENABLE_VULKAN`                           | Enable Vulkan video output                                           | ON                    |
+| `ENABLE_DIRECT3D`                         | Enable Direct3D 9 support (Windows only)                             | ON - Win              |
+| `ENABLE_DIRECT3D12`                       | Enable Direct3D 12 support (Windows only)                            | ON - Win              |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)
 to configure installation directories.
 
-On Unix to use a different version of wxWidgets, set
+On Linux or macOS, to use a different version of wxWidgets, set
 `wxWidgets_CONFIG_EXECUTABLE` to the path to the `wx-config` script you want to
 use.
-
-## Reporting Crash Bugs
-
-If the emulator crashes and you wish to report the bug, a backtrace made with
-debug symbols would be immensely helpful.
-
-To generate one (on Linux and MSYS2) first build in debug mode by invoking
-`cmake` as:
-
-```shell
-cmake .. -DCMAKE_BUILD_TYPE=Debug
-```
-
-After you've reproduced the crash, you need the core dump file, you may need to
-do something such as:
-
-```shell
-ulimit -c unlimited
-```
-, in your shell to enable core files.
-
-[This
-post](https://ask.fedoraproject.org/en/question/98776/where-is-core-dump-located/?answer=98779#post-id-98779)
-explains how to retrieve core dump on some distributions, when they are managed
-by systemd.
-
-Once you have the core file, open it with `gdb`, for example:
-
-```shell
-gdb -c core ./visualboyadvance-m
-```
-. In the `gdb` shell, to start the process and print the backtrace, type:
-
-```
-run
-bt
-```
-. This may be a bit of a hassle, but it helps us out immensely.
 
 ## Contributing
 
