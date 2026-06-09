@@ -82,11 +82,11 @@ Write everything in the imperative mood, e.g. change, fix, **NOT** changes,
 changed, fixed, fixes etc..
 
 A commit message must always have a title and a description, the description
-must be independent of the title line, if necessary repeat the information in
-the title line in the description.
+must be independent of the title line, the information in the title line must be
+restated in the description.
 
-The commit message must **ALL** changes, unless it's a minor refactor or
-white space change or something and is not important.
+The commit message should any important changes in general, not necessarily the
+specifics of the code changes.
 
 The commit title line should be prefixed with an area, unless it involves the
 wxWidgets GUI app, in which case it should **NOT** have a prefix.
@@ -101,13 +101,13 @@ Please use one of these area prefixes for non-main-GUI-app commits:
 
 - doc: documentation, README.md etc..
 - build: CMake, installdeps, preprocessor compatibility defines, compatibility
-  headers, macOS build system etc..
+  headers, any dependencies, macOS build system etc..
 - gb: the GameBoy emulator core or changes related to it.
 - gba: the GameBoy Advance emulator core or changes related to it.
 - libretro: the libretro core glue and build.
-- sdl: anything for the SDL port, but **NOT** SDL functionality in the wxWidgets
-  GUI app.
+- sdl: anything for the SDL port, but **NOT** SDL functionality in GUI
 - translations: anything related to translations.
+- tests: any work on the test suite.
 
 . Add other areas here if needed.
 
@@ -159,28 +159,6 @@ git commit -a --verbose --amend --reset-author --signoff -S
 git push -f
 ```
 
-. If you are a project member, then the workflow will be roughly:
-
-```bash
-git clone git@github.com:visualboyadvance-m/visualboyadvance-m
-git fetch --all --prune
-git checkout -b your-work-branch-name
-git commit -a --verbose --signoff -S
-```
-
-. Your first push will be:
-
-```bash
-git push -u origin HEAD
-```
-
-. And subsequent pushes will be:
-
-```bash
-git commit -a --verbose --signoff -S --amend --reset-author
-git push -f
-```
-
 . Please push frequently so that we can track your progress and review it.
 
 Make sure the git history in your branch is clean and logical, edit when
@@ -190,10 +168,6 @@ logical commits for a large work, but a single commit is also fine if the title
 line encapsulates all of the work for the changelog.
 
 See the previous section on how to write commit messages.
-
-If you are using Windows as your development environment, I recommend reading my
-manual on Windows development environments
-[here](https://github.com/rkitover/windows-dev-guide).
 
 #### Collaboration on a Branch
 
@@ -224,10 +198,9 @@ git push -f
 
 . You may sometimes need to fix conflicts, follow the instructions.
 
-#### Commits from Admins
+#### Commits from Project Members
 
-Maintainers and project members have the power to commit directly to master.
-This power must be used responsibly.
+Maintainers and project members can commit directly to master.
 
 Make your best attempt to follow these general guidelines:
 
@@ -235,18 +208,16 @@ Make your best attempt to follow these general guidelines:
   can be committed directly, keeping the following guidelines in mind.
 
 - Bigger new features, code refactors and changes in architecture should go
-  through the PR process.
+  through the PR process. Discussion on the Discord server is also fine.
 
-- Absolutely **NEVER** `git push -f` on `master`. If you make a mistake, revert
-  or push a fix commit.
+- Absolutely **NEVER** `git push -f` on `master`. If you make a mistake, use
+  `git revert` or push a fix commit.
 
-- Push code changes to a branch first, so they can run through the CI. When you
-  open the commit in GitHub there is a little icon in the upper left corner that
-  shows the CI status for this commit. Differences in what different compilers
-  allow is a problem that comes up **VERY** frequently. As well as
-  incompatibilities between different configurations for both the C++ code and
-  any supporting code. Once the CI is clear, you can merge your branch like
-  this:
+- Push code changes to a branch first, with a PR opened or not, so they can run
+  through the CI. When you open the commit in GitHub there is a little icon in
+  the upper left corner that shows the CI status for this commit. 
+
+Once the CI is clear, you can merge your branch like this:
 
 ```bash
 git push -f
@@ -257,31 +228,21 @@ git branch -D <your-work-branch-name>
 git push origin ':refs/heads/your-work-branch-nbame'
 ```
 
-. The last line there deletes the branch in our repository.
+. The last line there deletes the remote branch.
+
+Never `git merge` `master` into your branch, rebase on top of it.
+
+Never `git merge` your branch into `master`, fast-forward commits only on
+`master`, unless there is a legitimate reason to use a merge, like a dissimilar
+remote fork.
 
 ### Miscellaneous
 
-#### Debug Messages
+#### Debug Builds
 
-We have an override for `wxLogDebug()` to make it work even in non-debug builds
-of wxWidgets and on windows, even in mintty.
-
-It works like `printf()`, e.g.:
-
-```cpp
-int foo = 42;
-wxLogDebug(wxT("the value of foo = %d"), foo);
-```
-
-From the core etc. the usual:
-
-```cpp
-fprintf(stderr, "...", ...);
-```
-, will work fine.
-
-You need a debug build for this to work or to even have a console on Windows.
-Pass `-DCMAKE_BUILD_TYPE=Debug` to CMake.
+Pass `-DCMAKE_BUILD_TYPE=Debug` to CMake to make a debug build with console
+debug messages etc.. On Windows use `devenv /debugexe visualboyadvance-m.exe
+<args>` to open it in the Visual Studio debugger.
 
 ### Release Process
 
@@ -293,14 +254,16 @@ and upload it to a keyserver.
 Make sure to install GnuPG on all environments where you will be making commits
 and tags.
 
+Upload your public key to GitHub in the settings.
+
 #### Certificates
 
 Make sure you have set up a Windows code signing certificate with the right
 password and a Mac 'Developer ID Application' certificate.
 
-Put the Windows certificate into `~/.codesign/windows_comodo.pkcs12` as a PKCS12
-file that is password protected, and put the password for it into
-`~/.codesign/windows_comodo.pkcs12.password`.
+The Windows code signing certificate is optional, if you have one put it into
+`~/.codesign/windows_comodo.pkcs12` as a PKCS12 file that is password protected,
+and put the password for it into `~/.codesign/windows_comodo.pkcs12.password`.
 
 #### Release Commit and Tag
 
@@ -344,64 +307,46 @@ ninja
 Collect the following files for the release:
 
 - `visualboyadvance-m-Win-x86_64.zip`
+= `vbam-libretro-Win-x86_64.zip`
 - `translations.zip`
-
-Repeat the process for the debug build, with `-DCMAKE_BUILD_TYPE=Debug` and
-collect this file:
-
-- `visualboyadvance-m-Win-x86_64-debug.zip`
 .
 
 #### 32-bit Windows Binary
 
-The 32-bit build is a legacy build for Windows XP compatibility. You will need
-the MinGW toolchain to build it. The easiest method is to use the MINGW32 MSYS2
-environment.
+The 32-bit build is a legacy build for Windows XP compatibility. You will need a
+special MinGW toolchain to build it. Install MSYS2 and extract
+[this](https://cachemiss.com/files/winxp-mingw32.7z) archive into `C:\msys64`.
 
-Make sure the Visual Studio `signtool.exe` is in your path, you can start MSYS2
-with an inherited `PATH` from a Visual Studio enabled environment or add it to
-your shell configuration.
-
-First install dependencies with:
+From a shell as described in the previous section, run:
 
 ```bash
-./installdeps
-```
-. Then build the 32-bit binary as follows:
-
-```bash
-mkdir build-mingw32
-cd build-mingw32
-cmake .. -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
+mkdir build-winxp
+cd build-winxp
+cmake .. -DVCPKG_TARGET_TRIPLET=x32-mingw-static -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
 ninja
 ```
-. Collect this file for the release:
+. Collect these files for the release:
 
 - `visualboyadvance-m-Win-x86_32.zip`
-
-. Then repeat the process for the debug build with `-DCMAKE_BUILD_TYPE=Debug`,
-and collect this file:
-
-- `visualboyadvance-m-Win-x86_32-debug.zip`
+= `vbam-libretro-Win-x86_32.zip`
+- 'translations.zip'
 .
 
 #### ARM64 Windows Binary
 
-You will need the MSVC ARM64 cross toolchain to build this binary, if you used
-the install script from [here](https://github.com/rkitover/windows-dev-guide)
-you will have it installed, otherwise run Visual Studio Installer and install
-the component.
+You will need the MSVC ARM64 cross toolchain to build this binary, unless you
+are using an ARM64 device. Install it from the Visual Studio Installer.
 
-To enter the ARM64 cross environment, edit the PowerShell profile described
-[here](https://github.com/rkitover/windows-dev-guide) or use the `vcvarsall.bat`
-script with the `amd64_arm64` argument as described
-[here](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170).
+Use the `vcvarsall.bat` script with the `amd64_arm64` argument as described
+[here](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line?view=msvc-170)
+or some analogous mechanism.
 
 From there the process is the same as for the 64-bit build, collect the
 following files for the release:
 
 - `visualboyadvance-m-Win-arm64.zip`
-- 'visualboyadvance-m-Win-arm64-debug.zip'
+= `vbam-libretro-Win-arm64.zip`
+- 'translations.zip'
 .
 
 #### macOS Binary
@@ -445,10 +390,24 @@ tools/osx/builder
 ```
 , this will take a while because it builds all of the dependencies.
 
-Collect the following files from `~/vbam-build-mac-64bit/project`:
+Then run it again as:
+
+```bash
+tools/osx/builder -intel
+```
+
+, to generate the x64 binary.
+
+Collect the following files from `~/vbam-build-mac-arm64/project`:
+
+- `visualboyadvance-m-Mac-ARM64.zip`
+= `vbam-libretro-Mac-arm64.zip`
+- 'translations.zip'
+
+, and from `~/vbam-build-mac-x86_64/project`:
 
 - `visualboyadvance-m-Mac-x86_64.zip`
-- `visualboyadvance-m-Mac-x86_64-debug.zip`
+= `vbam-libretro-Mac-x86_64.zip`
 .
 
 #### Final steps
@@ -463,20 +422,22 @@ Upload all files collected during the earlier builds, the complete list is:
 
 
 - `translations.zip`
+= `vbam-libretro-Win-x86_32.zip`
+= `vbam-libretro-Win-x86_64.zip`
+= `vbam-libretro-Win-arm64.zip`
+= `vbam-libretro-Mac-arm64.zip`
+= `vbam-libretro-Mac-x86_64.zip`
 - `visualboyadvance-m-Win-x86_64.zip`
-- `visualboyadvance-m-Win-x86_64-debug.zip`
 - `visualboyadvance-m-Win-x86_32.zip`
-- `visualboyadvance-m-Win-x86_32-debug.zip`
 - `visualboyadvance-m-Win-arm64.zip`
-- 'visualboyadvance-m-Win-arm64-debug.zip'
+- `visualboyadvance-m-Mac-ARM64.zip`
 - `visualboyadvance-m-Mac-x86_64.zip`
-- `visualboyadvance-m-Mac-x86_64-debug.zip`
 
-Update the winsparkle `appcast.xml` by running this cmake command:
+. Update the winsparkle `appcast.xml` by running this cmake command:
 
 ```bash
 cmake .. -DUPDATE_APPCAST=TRUE
 ```
-, follow the instructions to push the change to the web data repo.
+, and push it to the org repository `visualboyadvance-m.github.io`.
 
 Announce the release on reddit r/emulation and the forum.
