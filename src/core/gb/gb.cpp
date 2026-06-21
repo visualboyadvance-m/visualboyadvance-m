@@ -2012,7 +2012,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x50: {
         if (inBios && (value & 1)) {
             gbMemoryMap[0x00] = &gbRom[0x0000];
-            if (gbHardware & 5) {
+            if ((gbHardware & 5) && gbMemory && gbRom) {
                 memcpy((uint8_t*)(gbRom + 0x100), (uint8_t*)(gbMemory + 0x100), 0xF00);
             }
             inBios = false;
@@ -3778,7 +3778,7 @@ static bool gbReadSaveState(gzFile gzFile)
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
-        } else if (gbHardware & 2) {
+        } else if ((gbHardware & 2) && gbMemory && gbRom) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kCGBBiosSize);
             memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
         }

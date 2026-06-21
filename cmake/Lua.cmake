@@ -60,6 +60,7 @@ endif()
 add_library(vbam-lua STATIC ${_vbam_lua_sources})
 target_include_directories(vbam-lua PUBLIC "${vbam_lua_SOURCE_DIR}/src")
 
+
 if(MSVC)
     # Restore /W4 for all subsequently-created targets.
     set_directory_properties(PROPERTIES
@@ -90,5 +91,9 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
 elseif(MSVC)
     target_compile_options(vbam-lua PRIVATE /W0 /wd4244)
 endif()
+
+# LTO link-time analysis re-emits warnings from Lua internals even though
+# -w is set above; compile Lua as plain .o to keep it opaque to the LTO pass.
+set_target_properties(vbam-lua PROPERTIES INTERPROCEDURAL_OPTIMIZATION FALSE)
 
 add_library(vbam::lua ALIAS vbam-lua)
