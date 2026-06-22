@@ -1177,12 +1177,14 @@ mac_installdeps() {
 }
 
 brew_installdeps() {
+    export HOMEBREW_NO_ASK=1
+
     check_cross
     installing
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext libtiff pkg-config sdl3 wxwidgets faudio ccache ninja zlib bzip2"
+    brews="nasm cmake ccache gettext libtiff pkg-config sdl3 wxwidgets faudio ccache ninja zlib bzip2 molten-vk vulkan-loader vulkan-headers"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
 
@@ -1205,7 +1207,7 @@ macports_installdeps() {
 
     check sudo port -v selfupdate
 
-    ports="cmake ccache nasm gettext pkgconfig libsdl3 wxWidgets-3.0 libiconv ninja"
+    ports="cmake ccache nasm gettext pkgconfig libsdl3 wxWidgets-3.0 libiconv ninja MoltenVK vulkan-loader vulkan-headers"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
 

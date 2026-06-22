@@ -1,4 +1,4 @@
-#ifndef NO_METAL
+#ifndef NO_VULKAN
 
 // ============================================================================
 //  vkdrawingpanel_metal.mm  —  Objective-C++ translation unit
@@ -88,5 +88,5 @@ void* VKBGetMetalLayer(void* ns_view_ptr)
     return nullptr;
 }
 
-#endif
+#endif // !defined(NO_VULKAN)
 
