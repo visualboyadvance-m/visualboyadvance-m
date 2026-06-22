@@ -178,11 +178,21 @@ endif()
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
 if(APPLE)
-   find_library(MOLTENVK MoltenVK)
+   # Prefer a linkable libMoltenVK.dylib over the .xcframework that Homebrew also
+   # ships under Frameworks/: an .xcframework is a directory and cannot be linked
+   # (CMake drops it). Searching frameworks last makes the dylib win.
+   set(_vbam_save_find_framework ${CMAKE_FIND_FRAMEWORK})
+   set(CMAKE_FIND_FRAMEWORK LAST)
+   find_library(MOLTENVK NAMES MoltenVK)
+   set(CMAKE_FIND_FRAMEWORK ${_vbam_save_find_framework})
+   unset(_vbam_save_find_framework)
+
    if(MOLTENVK)
-      include(CheckIncludeFile)
-      check_include_file(vulkan/vulkan.h HAVE_VULKAN_H)
-      if(HAVE_VULKAN_H)
+      # check_include_file() only searches the compiler's default include paths,
+      # which miss Homebrew/MacPorts. find_path() honors CMAKE_INCLUDE_PATH (set
+      # by MacPackageManagers), so it locates vulkan-headers installed via brew.
+      find_path(VULKAN_INCLUDE_DIR vulkan/vulkan.h)
+      if(VULKAN_INCLUDE_DIR)
          set(ENABLE_VULKAN ON)
          set(ENABLE_MOLTENVK ON)
       endif()
