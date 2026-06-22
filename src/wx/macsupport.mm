@@ -11,9 +11,6 @@
 #include "wx/config/option.h"
 #include "wx/wxvbam.h"
 
-<<<<<<< Updated upstream
-#ifndef NO_METAL
-=======
 // True if any screen reports extended dynamic range headroom (EDR / HDR).
 bool VbamProbeMacosHdr() {
     for (NSScreen* screen in [NSScreen screens]) {
@@ -25,7 +22,6 @@ bool VbamProbeMacosHdr() {
 
 // macOS version checks. Not Metal-specific: the Vulkan (MoltenVK) path also
 // relies on these, so they must exist even when the Metal renderer is absent.
->>>>>>> Stashed changes
 bool is_macosx_1013_or_newer()
 {
     // Mac OS X 10.13 version check

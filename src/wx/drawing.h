@@ -234,18 +234,7 @@ private:
 class Quartz2DDrawingPanel : public BasicDrawingPanel {
 public:
     Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height);
-<<<<<<< Updated upstream
-    virtual void DrawImage(wxWindowDC& dc, wxImage* im);
-=======
     void DrawImage(wxWindowDC& dc, wxImage* im) override;
-
-protected:
-    // CoreGraphics can present EDR by drawing an extended-linear Display P3
-    // float image into an EDR-enabled layer.
-    bool SupportsHdr() const override { return hdr::HdrAvailable(); }
-    hdr::Encoding PreferredHdrEncoding() const override { return hdr::Encoding::kScRGBFp16; }
-    bool HdrScRgbUsesP3() const override { return true; }
->>>>>>> Stashed changes
 };
 #endif
 
