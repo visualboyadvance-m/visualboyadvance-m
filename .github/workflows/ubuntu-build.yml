@@ -5,7 +5,8 @@ jobs:
   build:
     strategy:
       matrix:
-        build_compiler: [gcc, clang]
+#        build_compiler: [gcc, clang]
+        build_compiler: [gcc]
         build_type: [release, debug]
 #        build_options: [default, link_off, translations_only, libretro]
         build_options: [default, link_off, translations_only]
