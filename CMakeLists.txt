@@ -194,10 +194,17 @@ if(APPLE)
     include(CheckLanguage)
     include(MetalShaderSupport)
 
+    # Locate the Metal compiler via the system xcrun with DEVELOPER_DIR unset.
+    # The Nix build ships its own xcrun reimplementation (no metal tool) and
+    # points DEVELOPER_DIR at the Nix SDK; using the host /usr/bin/xcrun finds
+    # the real Xcode Metal toolchain, which is self-contained for the air64
+    # target. The compiler is only used to build the shader metallib.
     execute_process(
-        COMMAND xcrun -f metal
+        COMMAND ${CMAKE_COMMAND} -E env --unset=DEVELOPER_DIR
+                /usr/bin/xcrun -f metal
         OUTPUT_STRIP_TRAILING_WHITESPACE
         OUTPUT_VARIABLE CMAKE_Metal_COMPILER
+        ERROR_QUIET
     )
 
     if(NOT CMAKE_Metal_COMPILER)

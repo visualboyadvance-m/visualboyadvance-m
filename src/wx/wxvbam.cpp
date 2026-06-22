@@ -630,10 +630,17 @@ bool wxvbamApp::OnInit() {
 
     language = OPTION(kLocale);
 
-    if (language != wxLANGUAGE_DEFAULT) {
-        wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
-    } else {
-        wxvbam_locale->Init();
+    {
+        // wxLocale::Init() warns ("Cannot set locale to language ...") when the
+        // detected system language has no matching C locale installed (e.g.
+        // "English (U.S. Virgin Islands)"). This is harmless — gettext catalogs
+        // are loaded separately via wxTranslations — so suppress the noise.
+        const wxLogNull disable_logging;
+        if (language != wxLANGUAGE_DEFAULT) {
+            wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
+        } else {
+            wxvbam_locale->Init();
+        }
     }
 
     // load selected language
@@ -748,10 +755,14 @@ bool wxvbamApp::OnInit() {
 
     language = OPTION(kLocale);
 
-    if (language != wxLANGUAGE_DEFAULT) {
-        wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
-    } else {
-        wxvbam_locale->Init();
+    {
+        // See note above: suppress the harmless "Cannot set locale" warning.
+        const wxLogNull disable_logging;
+        if (language != wxLANGUAGE_DEFAULT) {
+            wxvbam_locale->Init(language, wxLOCALE_LOAD_DEFAULT);
+        } else {
+            wxvbam_locale->Init();
+        }
     }
 
     // load selected language

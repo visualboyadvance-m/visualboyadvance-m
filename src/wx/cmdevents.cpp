@@ -2893,7 +2893,11 @@ EVT_HANDLER(Language0, "Default Language")
         wxDELETE(wxvbam_locale);
     
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -2914,7 +2918,11 @@ EVT_HANDLER(Language1, "Bulgarian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -2935,7 +2943,11 @@ EVT_HANDLER(Language2, "Breton")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -2956,7 +2968,11 @@ EVT_HANDLER(Language3, "Czech")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -2977,7 +2993,11 @@ EVT_HANDLER(Language5, "Greek")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -2998,7 +3018,11 @@ EVT_HANDLER(Language6, "English (US)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3019,7 +3043,11 @@ EVT_HANDLER(Language7, "Spanish (Latin American)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3040,7 +3068,11 @@ EVT_HANDLER(Language8, "Spanish (Colombia)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3061,7 +3093,11 @@ EVT_HANDLER(Language9, "Spanish (Peru)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3082,7 +3118,11 @@ EVT_HANDLER(Language10, "Spanish (US)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3103,7 +3143,11 @@ EVT_HANDLER(Language11, "Spanish")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3124,7 +3168,11 @@ EVT_HANDLER(Language12, "French (France)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3145,7 +3193,11 @@ EVT_HANDLER(Language13, "French")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3166,7 +3218,11 @@ EVT_HANDLER(Language14, "Galician")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3187,7 +3243,11 @@ EVT_HANDLER(Language15, "Hebrew (Israel)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3208,7 +3268,11 @@ EVT_HANDLER(Language16, "Hungarian (Hungary)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3229,7 +3293,11 @@ EVT_HANDLER(Language17, "Hungarian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3250,7 +3318,11 @@ EVT_HANDLER(Language18, "Indonesian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3271,7 +3343,11 @@ EVT_HANDLER(Language19, "Italian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3292,7 +3368,11 @@ EVT_HANDLER(Language20, "Japanese")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3313,7 +3393,11 @@ EVT_HANDLER(Language21, "Korean (Korea)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3334,7 +3418,11 @@ EVT_HANDLER(Language22, "Korean")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3355,7 +3443,11 @@ EVT_HANDLER(Language23, "Malay (Malaysia)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3376,7 +3468,11 @@ EVT_HANDLER(Language24, "Norwegian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3397,7 +3493,11 @@ EVT_HANDLER(Language25, "Dutch")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3418,7 +3518,11 @@ EVT_HANDLER(Language26, "Polish (Poland)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3439,7 +3543,11 @@ EVT_HANDLER(Language27, "Polish")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3460,7 +3568,11 @@ EVT_HANDLER(Language28, "Portuguese (Brazil)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3481,7 +3593,11 @@ EVT_HANDLER(Language29, "Portuguese (Portugal)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3502,7 +3618,11 @@ EVT_HANDLER(Language30, "Russian (Russia)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3523,7 +3643,11 @@ EVT_HANDLER(Language31, "Swedish")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3544,7 +3668,11 @@ EVT_HANDLER(Language32, "Turkish")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3565,7 +3693,11 @@ EVT_HANDLER(Language33, "Ukrainian")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3586,7 +3718,11 @@ EVT_HANDLER(Language34, "Urdu (Pakistan)")
         wxDELETE(wxvbam_locale);
 
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
@@ -3607,7 +3743,11 @@ EVT_HANDLER(Language35, "Chinese (China)")
         wxDELETE(wxvbam_locale);
     
     wxvbam_locale = new wxLocale;
-    wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    {
+        // Suppress the harmless "Cannot set locale" warning (see wxvbam.cpp).
+        const wxLogNull disable_logging;
+        wxvbam_locale->Init(OPTION(kLocale), wxLOCALE_LOAD_DEFAULT);
+    }
 
 #ifdef _WIN32
     if (OPTION(kExternalTranslations) == false)
