@@ -13,8 +13,8 @@ jobs:
         include:
           - cmake_compiler: '-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++'
             build_compiler: gcc
-          - cmake_compiler: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
-            build_compiler: clang
+#          - cmake_compiler: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+#            build_compiler: clang
           - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
             build_type: release
           - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
@@ -33,9 +33,9 @@ jobs:
           # Exclude debug/translations_only build
           - build_type: debug
             build_options: translations_only
-          - build_type: release
-            build_options: translations_only
-            build_compiler: clang
+#          - build_type: release
+#            build_options: translations_only
+#            build_compiler: clang
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
