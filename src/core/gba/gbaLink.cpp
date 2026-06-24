@@ -35,6 +35,8 @@
 #include "core/base/port.h"
 #include "core/gba/gba.h"
 #include "core/gba/gbaCpu.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbpSio.h"
 #include "core/gba/internal/gbaSockClient.h"
 
 #ifdef _MSC_VER
@@ -708,6 +710,11 @@ ConnectionState InitLink(LinkMode mode)
 
 void StartLink(uint16_t siocnt)
 {
+    if (GbpHandleSioStart(siocnt, cpuNextEvent)) {
+        UPDATE_REG(COMM_SIOCNT, siocnt);
+        return;
+    }
+
     if (!linkDriver || !linkDriver->start) {
         // Stand-alone (no real link cable) fallback. Some games rely on
         // SIOCNT being updated so they don't hang, so we have to commit
@@ -822,6 +829,8 @@ void StartGPLink(uint16_t value)
 
 void LinkUpdate(int ticks)
 {
+    GbpLinkUpdateTick(ticks);
+
     if (!linkDriver || !linkDriver->update) {
         return;
     }
@@ -845,6 +854,9 @@ void CheckLinkConnection()
 
 void CloseLink(void)
 {
+    // Reset GBP state unconditionally so rumble doesn't get stuck on.
+    GbpReset();
+
     if (!linkDriver || !linkDriver->close) {
         return; // Nothing to do
     }
