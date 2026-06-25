@@ -79,6 +79,11 @@ extern void CPUUndefinedException();
 extern void CPUSoftwareInterrupt();
 extern void CPUSoftwareInterrupt(int comment);
 
+// Re-arm the kSchedIrq scheduler event after IF/IE/IME have been mutated from
+// a translation unit that cannot see the file-local CPUTestIRQ() (e.g. the GBP
+// SIO module). Required for any externally-raised IRQ to actually be delivered.
+extern void CPUReevaluateIRQ();
+
 // Waitstates when accessing data
 inline int dataTicksAccess16(uint32_t address) // DATA 8/16bits NON SEQ
 {

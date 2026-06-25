@@ -124,6 +124,8 @@ if(ENABLE_LINK)
     target_sources(vbam-core
         PRIVATE
         gba/gbaLink.cpp
+        gba/gbpSio.cpp
+        gba/gbpSio.h
         gba/internal/gbaSockClient.cpp
         gba/internal/gbaSockClient.h
 
