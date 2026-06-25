@@ -10,7 +10,9 @@
 extern int armExecute();
 extern int thumbExecute();
 
-#if defined(__i386__) || defined(__x86_64__)
+// regparm only has an effect on 32-bit x86; on x86_64 it is ignored by the
+// compiler and emits a -Wattributes warning, so restrict it to __i386__.
+#if defined(__i386__)
 #define INSN_REGPARM __attribute__((regparm(1)))
 #else
 #define INSN_REGPARM /*nothing*/
