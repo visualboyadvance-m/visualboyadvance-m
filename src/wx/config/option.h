@@ -131,7 +131,7 @@ static constexpr size_t kNbSoundRate = static_cast<size_t>(AudioRate::kLast);
 
 // This is incremented whenever we want to change a default value between
 // release versions. The option update code is in load_opts.
-static constexpr uint32_t kIniLatestVersion = 2;
+static constexpr uint32_t kIniLatestVersion = 3;
 
 // Represents a single option saved in the INI file. Option does not own the
 // individual option, but keeps a pointer to where the data is actually saved.

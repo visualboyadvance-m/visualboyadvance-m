@@ -388,6 +388,13 @@ void load_opts(bool first_time_launch) {
                 // Previous defaults were false.
                 OPTION(kGBALCDFilter) = true;
                 OPTION(kGBLCDFilter)  = true;
+                [[fallthrough]];
+            }
+            case 2: { // new default for 2.3.0 and later.
+                // Previous default was no filter.
+                if (OPTION(kDispFilter) == config::Filter::kNone) {
+                    OPTION(kDispFilter) = config::Filter::kXbrz2x;
+                }
             }
         }
         ini_version++;

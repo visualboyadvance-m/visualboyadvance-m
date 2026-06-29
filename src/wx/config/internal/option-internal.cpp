@@ -154,7 +154,7 @@ std::array<Option, kNbOptions>& Option::All() {
         /// Display
         bool bilinear = false;
         bool sdl_pixel_art = false;
-        Filter filter = Filter::kNone;
+        Filter filter = Filter::kXbrz2x;
         wxString filter_plugin = wxEmptyString;
         wxString plugin_dir = wxEmptyString;
         Interframe interframe = Interframe::kNone;
