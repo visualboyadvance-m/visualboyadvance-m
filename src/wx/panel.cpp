@@ -978,8 +978,9 @@ void GameArea::LoadGame(const wxString& name)
         emusys = &GBASystem;
     }
 
-    // Set sound volume.
-    soundSetVolume((float)OPTION(kSoundVolume) / 100.0);
+    // Set sound volume. The --mute command-line switch forces silence for the
+    // session without altering the saved volume.
+    soundSetVolume(wxGetApp().mute ? 0.0 : (float)OPTION(kSoundVolume) / 100.0);
 
     if (OPTION(kGeomFullScreen)) {
         GameArea::ShowFullScreen(true);
@@ -6295,7 +6296,7 @@ void GameArea::OnAudioRateChanged() {
         
 void GameArea::OnVolumeChanged(config::Option* option) {
     const int volume = option->GetInt();
-    soundSetVolume((float)volume / 100.0);
+    soundSetVolume(wxGetApp().mute ? 0.0 : (float)volume / 100.0);
     systemScreenMessage(wxString::Format(_("Volume: %d %%"), volume));
 }
         

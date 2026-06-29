@@ -399,6 +399,7 @@ bool g_app_is_active = true;
 wxvbamApp::wxvbamApp()
     : wxApp(),
       pending_fullscreen(false),
+      mute(false),
       frame(NULL),
 #ifndef NO_WAYLAND
       using_wayland(false),
@@ -1056,6 +1057,9 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
         { wxCMD_LINE_SWITCH, t("f"), t("fullscreen"),
             N_("Start in full-screen mode"),
             wxCMD_LINE_VAL_NONE, 0 },
+        { wxCMD_LINE_SWITCH, NULL, t("mute"),
+            N_("Mute the audio for this session, without saving to the config"),
+            wxCMD_LINE_VAL_NONE, 0 },
         { wxCMD_LINE_OPTION, t("c"), t("config"),
             N_("Set a configuration file"),
             wxCMD_LINE_VAL_STRING, 0 },
@@ -1154,6 +1158,10 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
 
     if (cl.Found(wxT("f"))) {
         pending_fullscreen = true;
+    }
+
+    if (cl.Found(wxT("mute"))) {
+        mute = true;
     }
 
     if (cl.Found(wxT("o"))) {

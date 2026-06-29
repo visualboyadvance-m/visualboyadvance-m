@@ -113,6 +113,8 @@ public:
     wxArrayString pending_optset;
     // set fullscreen mode after init
     bool pending_fullscreen;
+    // mute audio for this session without persisting to the config
+    bool mute;
 #if __WXMAC__
     // I suppose making this work will require tweaking the bundle
     void MacOpenFile(const wxString& f) override
