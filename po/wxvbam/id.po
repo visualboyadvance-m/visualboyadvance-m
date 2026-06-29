@@ -10,13 +10,14 @@
 # heydootdoot last, 2024-2025
 # Jeremy Belpois <jeremy.belpois.einstein@gmail.com>, 2019-2020
 # Rahman Abd (Ckuzero), 2025
+# Sayyid Imaddudin AL. <thetanger13@gmail.com>, 2026
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-06-01 16:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Rahman Abd (Ckuzero), 2025\n"
+"Last-Translator: Sayyid Imaddudin AL. <thetanger13@gmail.com>, 2026\n"
 "Language-Team: Indonesian (http://app.transifex.com/bgk/vba-m/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,12 +35,12 @@ msgstr "Perangkat bawaan"
 
 #: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
-msgstr ""
+msgstr "Tidak menemukan perangkat CoreAudio"
 
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Gagal untuk mengalokasikan buffer CoreAudio 1%d: error 1%d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
@@ -102,7 +103,7 @@ msgstr "Berkas baterai (*.sav)|*.sav|Simpanan Flash (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
-msgstr ""
+msgstr "Mengimpor berkas battery akan menimpa berkas .sav yang sudah ada dan mengatur ulang permainan yang sedang berjalan. Apa anda masih mau melanjutkannya?"
 
 #: cmdevents.cpp:560 cmdevents.cpp:593 cmdevents.cpp:716
 msgid "Confirm import"
@@ -268,15 +269,15 @@ msgstr "Matikan suara"
 
 #: cmdevents.cpp:1936
 msgid "Run Lua script"
-msgstr ""
+msgstr "menjalankan skrip Lua"
 
 #: cmdevents.cpp:1937
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Skrip-skrip Lua (*.lua)|*.lua|All files|*"
 
 #: cmdevents.cpp:1945
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "Skrip Lua gagal untuk dimuat — lihat konsol"
 
 #: cmdevents.cpp:1980
 msgid "Set to 0 for pseudo tty"
@@ -307,12 +308,12 @@ msgstr "Menunggu GDB"
 #: cmdevents.cpp:2406 cmdevents.cpp:2419 cmdevents.cpp:2445 cmdevents.cpp:2450
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Menyaring: 1%s"
 
 #: cmdevents.cpp:2424 cmdevents.cpp:2441
 #, c-format
 msgid "Filter: Plugin (%s)"
-msgstr ""
+msgstr "Menyaring: plugin (%s)"
 
 #: cmdevents.cpp:2461
 #, c-format
@@ -628,7 +629,7 @@ msgstr ""
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "Pemain %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
