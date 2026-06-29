@@ -391,10 +391,13 @@ void load_opts(bool first_time_launch) {
                 [[fallthrough]];
             }
             case 2: { // new default for 2.3.0 and later.
-                // Previous default was no filter.
+#if !defined(WINXP)
+                // Previous default was no filter. WINXP builds keep none, as
+                // they target older CPUs without the SIMD that xBRZ needs.
                 if (OPTION(kDispFilter) == config::Filter::kNone) {
                     OPTION(kDispFilter) = config::Filter::kXbrz2x;
                 }
+#endif
             }
         }
         ini_version++;
