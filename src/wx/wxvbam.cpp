@@ -892,6 +892,8 @@ bool wxvbamApp::OnInit() {
         OPTION(kGeomWindowY).Get(),
         OPTION(kGeomWindowWidth).Get(),
         OPTION(kGeomWindowHeight).Get());
+    const bool dimensions_unset =
+        OPTION(kGeomWindowWidth).Get() == 0 || OPTION(kGeomWindowHeight).Get() == 0;
     const bool is_fullscreen = OPTION(kGeomFullScreen);
     const bool is_maximized = OPTION(kGeomIsMaximized);
 
@@ -907,8 +909,37 @@ bool wxvbamApp::OnInit() {
         return false;
     }
 
-    // Ensure we are not drawing out of bounds.
-    if (widgets::GetDisplayRect().Intersects(client_rect)) {
+    if (dimensions_unset) {
+        // First run: default to roughly 90% of the primary display while
+        // keeping the game panel at the native GBA aspect ratio (240x160 ==
+        // 3:2), then center on that display. We size the client area rather
+        // than the whole frame so the menubar, statusbar and window borders
+        // don't skew the panel's aspect ratio. BindControls() must have run so
+        // that the chrome exists and can be measured.
+        const wxRect display_rect = wxDisplay(0u).GetClientArea();
+        const wxSize chrome = frame->GetSize() - frame->GetClientSize();
+        constexpr double kAspectRatio = 3.0 / 2.0;
+
+        // Budget the 90% box against the chrome so the outer window still fits.
+        int client_w = display_rect.GetWidth() * 9 / 10 - chrome.GetWidth();
+        int client_h = display_rect.GetHeight() * 9 / 10 - chrome.GetHeight();
+
+        // Fit the 3:2 client area within the available box.
+        if (client_w > static_cast<int>(client_h * kAspectRatio)) {
+            client_w = static_cast<int>(client_h * kAspectRatio);
+        } else {
+            client_h = static_cast<int>(client_w / kAspectRatio);
+        }
+
+        frame->SetClientSize(client_w, client_h);
+
+        // Center the resulting window on the display.
+        const wxSize window_size = frame->GetSize();
+        frame->SetPosition(wxPoint(
+            display_rect.GetX() + (display_rect.GetWidth() - window_size.GetWidth()) / 2,
+            display_rect.GetY() + (display_rect.GetHeight() - window_size.GetHeight()) / 2));
+    } else if (widgets::GetDisplayRect().Intersects(client_rect)) {
+        // Ensure we are not drawing out of bounds.
         frame->SetSize(client_rect);
     }
 
