@@ -1674,7 +1674,7 @@ msgstr "Iniciar no modo de tela cheia"
 
 #: wxvbam.cpp:1061
 msgid "Mute the audio for this session, without saving to the config"
-msgstr ""
+msgstr "Silenciar o áudio desta sessão, sem salvar na configuração"
 
 #: wxvbam.cpp:1064
 msgid "Set a configuration file"
