@@ -909,11 +909,11 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Tidak bisa membuat direktori penyimpan natif:\n%s\n\nMohon periksa jalur yang sudah anda konfigurasikan di Pengaturan > Direktori"
 
 #: panel.cpp:1190 panel.cpp:1211 wxvbam.cpp:1515
 msgid "Directory Error"
-msgstr ""
+msgstr "Kesalahan direktori"
 
 #: panel.cpp:1210
 #, c-format
@@ -922,7 +922,7 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Tidak bisa membuat direktori penyimpan emulator:\n%s\n\nMohon periksa jalur yang sudah anda konfigurasikan di Pengaturan > Direktori"
 
 #: panel.cpp:1354
 #, c-format
@@ -1721,7 +1721,7 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Tidak bisa membuat direktori:\n%s\n\nMohon periksa jalur yang sudah anda konfigurasikan di Pengaturan > Direktori"
 
 #: wxvbam.cpp:1779
 msgid "Failed to load dialog"
@@ -1846,7 +1846,7 @@ msgstr "Filter plugin library"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
 msgid "Directory containing RPI filter plugins"
-msgstr ""
+msgstr "Direktori mengandung plugin penyaring RPI"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
 msgid "Interframe blending function"
@@ -2451,11 +2451,11 @@ msgstr "Play/Pause"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:114
 msgid "LAlt+"
-msgstr ""
+msgstr "LAlt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:116
 msgid "RAlt+"
-msgstr ""
+msgstr "RAlt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:118
 msgid "Alt+"
@@ -2464,17 +2464,17 @@ msgstr "Alt+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:127
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:141
 msgid "LCtrl+"
-msgstr ""
+msgstr "LCtrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:130
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
 msgid "RCtrl+"
-msgstr ""
+msgstr "RCtrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
 msgid "Cmd+"
-msgstr ""
+msgstr "Cmd+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
@@ -2483,11 +2483,11 @@ msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
-msgstr ""
+msgstr "LShift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:151
 msgid "RShift+"
-msgstr ""
+msgstr "RShift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:153
 msgid "Shift+"
@@ -2495,11 +2495,11 @@ msgstr "Shift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:162
 msgid "LMeta+"
-msgstr ""
+msgstr "LMeta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:164
 msgid "RMeta+"
-msgstr ""
+msgstr "RMeta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:166
 msgid "Meta+"
@@ -2547,20 +2547,20 @@ msgstr "%s: Hat %d East"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
-msgstr ""
+msgstr "Shift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:514
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:521
 msgid "Key"
@@ -4485,19 +4485,19 @@ msgstr "Default Language"
 
 #: xrc/MainMenu.xrc:770
 msgid "Spanish [Latin American]"
-msgstr ""
+msgstr "Bahasa Spanyol [Amerika Latin]"
 
 #: xrc/MainMenu.xrc:774
 msgid "Spanish [Colombia]"
-msgstr ""
+msgstr "Bahasa Spanyol [Colombia]"
 
 #: xrc/MainMenu.xrc:778
 msgid "Spanish [Peru]"
-msgstr ""
+msgstr "Bahasa Spanyol [Peru]"
 
 #: xrc/MainMenu.xrc:782
 msgid "Spanish [United States]"
-msgstr ""
+msgstr "Bahasa Spanyol [Amerika Serikat]"
 
 #: xrc/MainMenu.xrc:786
 msgid "Spanish"
@@ -4505,7 +4505,7 @@ msgstr "Spanish"
 
 #: xrc/MainMenu.xrc:790
 msgid "French [France]"
-msgstr ""
+msgstr "Bahasa Prancis [Prancis]"
 
 #: xrc/MainMenu.xrc:794
 msgid "French"
@@ -4517,11 +4517,11 @@ msgstr "Galician"
 
 #: xrc/MainMenu.xrc:802
 msgid "Hebrew [Israel]"
-msgstr ""
+msgstr "Bahasa Ibrani [Israel]"
 
 #: xrc/MainMenu.xrc:806
 msgid "Hungarian [Hungary]"
-msgstr ""
+msgstr "Bahasa Hongaria [Hongaria]"
 
 #: xrc/MainMenu.xrc:810
 msgid "Hungarian"
@@ -4537,7 +4537,7 @@ msgstr "Italian"
 
 #: xrc/MainMenu.xrc:822
 msgid "Korean [Korea]"
-msgstr ""
+msgstr "Bahasa Korea [Korea]"
 
 #: xrc/MainMenu.xrc:826
 msgid "Korean"
@@ -4545,7 +4545,7 @@ msgstr "Korean"
 
 #: xrc/MainMenu.xrc:830
 msgid "Polish [Poland]"
-msgstr ""
+msgstr "Bahasa Polandia [Polandia]"
 
 #: xrc/MainMenu.xrc:834
 msgid "Polish"
@@ -4553,11 +4553,11 @@ msgstr "Polish"
 
 #: xrc/MainMenu.xrc:838
 msgid "Portuguese [Brazil]"
-msgstr ""
+msgstr "Bahasa Portugis [Brasil]"
 
 #: xrc/MainMenu.xrc:842
 msgid "Portuguese [Portugal]"
-msgstr ""
+msgstr "Bahasa Portugis [Portugal]"
 
 #: xrc/MainMenu.xrc:846
 msgid "Swedish"
@@ -4573,11 +4573,11 @@ msgstr "Ukrainian"
 
 #: xrc/MainMenu.xrc:858
 msgid "Urdu [Pakistan]"
-msgstr ""
+msgstr "Bahasa Urdu [Pakistan]"
 
 #: xrc/MainMenu.xrc:862
 msgid "Chinese [China]"
-msgstr ""
+msgstr "Bahasa Cina [China]"
 
 #: xrc/MainMenu.xrc:866
 msgid "&Use external translations"
