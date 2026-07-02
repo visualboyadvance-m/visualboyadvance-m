@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-29 19:00+0000\n"
+"POT-Creation-Date: 2026-07-02 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: 王晨旭 <wcxu21@126.com>, 2021,2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -56,11 +56,11 @@ msgstr "分配核心音频缓冲区失败%d: 错误 %d"
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "启动核心音频队列失败: 错误 %d"
 
-#: cmdevents.cpp:68 wxvbam.cpp:904
+#: cmdevents.cpp:69 wxvbam.cpp:1048
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
-#: cmdevents.cpp:220
+#: cmdevents.cpp:221
 msgid ""
 "Game Boy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
@@ -68,290 +68,290 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "GBA 文件 (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:238
+#: cmdevents.cpp:239
 msgid "Open ROM file"
 msgstr "打开 ROM 文件"
 
-#: cmdevents.cpp:275
+#: cmdevents.cpp:276
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "GB 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:284
+#: cmdevents.cpp:285
 msgid "Open GB ROM file"
 msgstr "打开 GB ROM 文件"
 
-#: cmdevents.cpp:320
+#: cmdevents.cpp:321
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "GBC 文件 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:329
+#: cmdevents.cpp:330
 msgid "Open GBC ROM file"
 msgstr "打开 GBC ROM 文件"
 
-#: cmdevents.cpp:498 cmdevents.cpp:523
+#: cmdevents.cpp:499 cmdevents.cpp:524
 msgid "Select Dot Code file"
 msgstr "选择点代码文件"
 
-#: cmdevents.cpp:500 cmdevents.cpp:525
+#: cmdevents.cpp:501 cmdevents.cpp:526
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "E-Reader 点代码 (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:547 cmdevents.cpp:753
+#: cmdevents.cpp:548 cmdevents.cpp:754
 msgid "Select battery file"
 msgstr "选择电池文件"
 
-#: cmdevents.cpp:548 cmdevents.cpp:754
+#: cmdevents.cpp:549 cmdevents.cpp:755
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "电池文件 (*.sav)|*.sav|Flash 存档(*.dat)|*.dat"
 
-#: cmdevents.cpp:559
+#: cmdevents.cpp:560
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
 msgstr "导入电池文件会覆盖当前的 .sav 文件并重置当前正在运行的游戏。是否继续？"
 
-#: cmdevents.cpp:560 cmdevents.cpp:593 cmdevents.cpp:716
+#: cmdevents.cpp:561 cmdevents.cpp:594 cmdevents.cpp:717
 msgid "Confirm import"
 msgstr "确认导入"
 
-#: cmdevents.cpp:567 panel.cpp:1047
+#: cmdevents.cpp:568 panel.cpp:1066
 #, c-format
 msgid "Loaded battery %s"
 msgstr "已读取电池档 %s"
 
-#: cmdevents.cpp:569
+#: cmdevents.cpp:570
 #, c-format
 msgid "Error loading battery %s"
 msgstr "读取电池档错误 %s"
 
-#: cmdevents.cpp:579
+#: cmdevents.cpp:580
 msgid "Select code file"
 msgstr "选择代码文件"
 
-#: cmdevents.cpp:580
+#: cmdevents.cpp:581
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Gameshark 代码文件 (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:580
+#: cmdevents.cpp:581
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr "Gameshark 代码文件 (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:592
+#: cmdevents.cpp:593
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr "导入代码将会重置之前已读取的所有金手指代码。你确定要继续吗？"
 
-#: cmdevents.cpp:609
+#: cmdevents.cpp:610
 #, c-format
 msgid "Cannot open file %s"
 msgstr "无法打开文件 %s"
 
-#: cmdevents.cpp:619
+#: cmdevents.cpp:620
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "不支持的代码文件 %s"
 
-#: cmdevents.cpp:689
+#: cmdevents.cpp:690
 #, c-format
 msgid "Loaded code file %s"
 msgstr "已读取的代码文件 %s"
 
-#: cmdevents.cpp:691
+#: cmdevents.cpp:692
 #, c-format
 msgid "Error loading code file %s"
 msgstr "读取代码文件错误 %s"
 
-#: cmdevents.cpp:702 cmdevents.cpp:784
+#: cmdevents.cpp:703 cmdevents.cpp:785
 msgid "Select snapshot file"
 msgstr "选择快照文件"
 
-#: cmdevents.cpp:703
+#: cmdevents.cpp:704
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr "GameShark & PAC 快照 (*.sps;*.xps)|*.sps;*.xps|GameShark SP 快照 (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:703
+#: cmdevents.cpp:704
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr "Gameboy 快照 (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:715
+#: cmdevents.cpp:716
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "导入快照将删除之前保存的游戏进度(直到下次保存前)。你确定要继续吗？ "
 
-#: cmdevents.cpp:740
+#: cmdevents.cpp:741
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "已读取的快照文件 %s"
 
-#: cmdevents.cpp:742
+#: cmdevents.cpp:743
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "快照文件读取错误 %s"
 
-#: cmdevents.cpp:768
+#: cmdevents.cpp:769
 #, c-format
 msgid "Wrote battery %s"
 msgstr "已写入电池档 %s"
 
-#: cmdevents.cpp:770 panel.cpp:1407
+#: cmdevents.cpp:771 panel.cpp:1426
 #, c-format
 msgid "Error writing battery %s"
 msgstr "写入电池档错误 %s"
 
-#: cmdevents.cpp:778
+#: cmdevents.cpp:779
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM 存档无法导出"
 
-#: cmdevents.cpp:785
+#: cmdevents.cpp:786
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr "Gameshark 快照 (*.sps)|*.sps"
 
-#: cmdevents.cpp:802
+#: cmdevents.cpp:803
 msgid "Exported from Visual Boy Advance-M"
 msgstr "从 VBA-M 导出"
 
-#: cmdevents.cpp:814
+#: cmdevents.cpp:815
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "保存快照文件 %s "
 
-#: cmdevents.cpp:816
+#: cmdevents.cpp:817
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "保存快照文件错误 %s"
 
-#: cmdevents.cpp:832 cmdevents.cpp:913 cmdevents.cpp:986 cmdevents.cpp:1058
+#: cmdevents.cpp:833 cmdevents.cpp:914 cmdevents.cpp:987 cmdevents.cpp:1059
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:611 viewers.cpp:832
 #: viewsupt.cpp:1237
 msgid "Select output file"
 msgstr "选择输出文件"
 
-#: cmdevents.cpp:833 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1238
+#: cmdevents.cpp:834 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1238
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 图片|*.png|BMP 图片|*.bmp"
 
-#: cmdevents.cpp:860 sys.cpp:634
+#: cmdevents.cpp:861 sys.cpp:634
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "写入快照 %s"
 
-#: cmdevents.cpp:881 cmdevents.cpp:954 cmdevents.cpp:1026 cmdevents.cpp:1095
+#: cmdevents.cpp:882 cmdevents.cpp:955 cmdevents.cpp:1027 cmdevents.cpp:1096
 msgid " files ("
 msgstr "文件 ("
 
-#: cmdevents.cpp:1128
+#: cmdevents.cpp:1129
 msgid "Select file"
 msgstr "选择文件"
 
-#: cmdevents.cpp:1435 cmdevents.cpp:1531
+#: cmdevents.cpp:1436 cmdevents.cpp:1532
 msgid "Select state file"
 msgstr "选择状态文件"
 
-#: cmdevents.cpp:1436 cmdevents.cpp:1532
+#: cmdevents.cpp:1437 cmdevents.cpp:1533
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Visual Boy Advance 保存游戏文件|*.sgm"
 
-#: cmdevents.cpp:1565 cmdevents.cpp:1575 cmdevents.cpp:1586
+#: cmdevents.cpp:1566 cmdevents.cpp:1576 cmdevents.cpp:1587
 #, c-format
 msgid "Current state slot #%d"
 msgstr "当前状态插槽 #%d"
 
-#: cmdevents.cpp:1649
+#: cmdevents.cpp:1650
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr "启用 GB BIOS 文件时无法使用色彩修改。"
 
-#: cmdevents.cpp:1860
+#: cmdevents.cpp:1861
 msgid "Sound enabled"
 msgstr "声音已启用"
 
-#: cmdevents.cpp:1860
+#: cmdevents.cpp:1861
 msgid "Sound disabled"
 msgstr "声音已禁用"
 
-#: cmdevents.cpp:1936
+#: cmdevents.cpp:1937
 msgid "Run Lua script"
 msgstr "运行 Lua 脚本"
 
-#: cmdevents.cpp:1937
+#: cmdevents.cpp:1938
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
 msgstr "Lua 脚本 (*.lua)|*.lua|所有文件|*"
 
-#: cmdevents.cpp:1945
+#: cmdevents.cpp:1946
 msgid "Lua script failed to load — see console"
 msgstr "Lua 脚本加载失败 — 请查看控制台"
 
-#: cmdevents.cpp:1980
+#: cmdevents.cpp:1981
 msgid "Set to 0 for pseudo tty"
 msgstr "把伪 tty 设置成 0"
 
-#: cmdevents.cpp:1982
+#: cmdevents.cpp:1983
 msgid "Port to wait for connection:"
 msgstr "准备连接的端口："
 
-#: cmdevents.cpp:1983
+#: cmdevents.cpp:1984
 msgid "GDB Connection"
 msgstr "GDB 连接"
 
-#: cmdevents.cpp:2035
+#: cmdevents.cpp:2036
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "等待连接到 %s"
 
-#: cmdevents.cpp:2042
+#: cmdevents.cpp:2043
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "等待连接到端口 %d"
 
-#: cmdevents.cpp:2046
+#: cmdevents.cpp:2047
 msgid "Waiting for GDB..."
 msgstr "等待 GDB..."
 
-#: cmdevents.cpp:2406 cmdevents.cpp:2419 cmdevents.cpp:2445 cmdevents.cpp:2450
+#: cmdevents.cpp:2414 cmdevents.cpp:2427 cmdevents.cpp:2453 cmdevents.cpp:2458
 #, c-format
 msgid "Filter: %s"
 msgstr "滤镜: %s"
 
-#: cmdevents.cpp:2424 cmdevents.cpp:2441
+#: cmdevents.cpp:2432 cmdevents.cpp:2449
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr "滤镜：插件 (%s)"
 
-#: cmdevents.cpp:2461
+#: cmdevents.cpp:2469
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr "帧间混合: %s"
 
-#: cmdevents.cpp:2510
+#: cmdevents.cpp:2518
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "你的配置将被删除！\n\n是否确定？"
 
-#: cmdevents.cpp:2511
+#: cmdevents.cpp:2519
 msgid "FACTORY RESET"
 msgstr "恢复默认"
 
-#: cmdevents.cpp:2546
+#: cmdevents.cpp:2554
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "任天堂 GameBoy/Color/Advance 模拟器。"
 
-#: cmdevents.cpp:2547
+#: cmdevents.cpp:2555
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "版权 (C) 1999-2003 Forgotten\n版权 (C) 2004-2006 VBA 开发团队\n版权 (C) 2007-2020 VBA-M 开发团队"
 
-#: cmdevents.cpp:2549
+#: cmdevents.cpp:2557
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -367,31 +367,31 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "本程序是自由软件: 你可以在自由软件基金会公布的 GNU 通用发布\n许可证条款下重新分发和/或修改此软件，依自己意愿许可证 V2 版或\n任意更新版许可证选其一即可。\n\n本程序希望是能有作用的分发出去，但【无任何担保】；甚至没有隐含\n的【可销售性】或【特定用途的适用性】保证。请查阅 GNU 通用发布\n许可证了解更多信息。\n\n你应该已经收到 GNU 通用发布许可证的副本以及本程序。\n如果没有，请查看 http://www.gnu.org/licenses 。"
 
-#: cmdevents.cpp:2731
+#: cmdevents.cpp:2739
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "启用色彩修改时无法使用 GB BIOS。"
 
-#: cmdevents.cpp:2797
+#: cmdevents.cpp:2805
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "局域网联机已激活，禁用联机模式即可断开联网。"
 
-#: cmdevents.cpp:2803
+#: cmdevents.cpp:2811
 msgid "Network is not supported in local mode."
 msgstr "本地模式不支持网络"
 
-#: dialogs/accel-config.cpp:142
+#: dialogs/accel-config.cpp:146
 msgid "Menu commands"
 msgstr "菜单命令"
 
-#: dialogs/accel-config.cpp:255
+#: dialogs/accel-config.cpp:259
 msgid "This will clear all user-defined accelerators. Are you sure?"
 msgstr "将清除所有自定义加速，是否确定？"
 
-#: dialogs/accel-config.cpp:255 dialogs/accel-config.cpp:302
+#: dialogs/accel-config.cpp:259 dialogs/accel-config.cpp:306
 msgid "Confirm"
 msgstr "确定"
 
-#: dialogs/accel-config.cpp:300
+#: dialogs/accel-config.cpp:304
 #, c-format
 msgid "This will unassign \"%s\" from \"%s\". Are you sure?"
 msgstr "这将从“%s”中取消分配“%s”。您确定吗？"
@@ -405,44 +405,50 @@ msgstr "加载延迟标签 '%s' 失败"
 msgid "Browse"
 msgstr "浏览"
 
-#: dialogs/display-config.cpp:127 dialogs/display-config.cpp:136
-#: dialogs/display-config.cpp:155 dialogs/display-config.cpp:160
+#: dialogs/display-config.cpp:132 dialogs/display-config.cpp:141
+#: dialogs/display-config.cpp:160 dialogs/display-config.cpp:165
 msgid "Invalid value for Default magnification."
 msgstr "无效的默认放大倍数值。"
 
-#: dialogs/display-config.cpp:449
+#: dialogs/display-config.cpp:454
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
 msgstr "加载 DisplayConfig 选项卡 '%s' 失败"
 
-#: dialogs/display-config.cpp:614
+#: dialogs/display-config.cpp:639
+msgid ""
+"Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
+" was found, so the display fell back to XWayland (8-bit SDR only)."
+msgstr ""
+
+#: dialogs/display-config.cpp:814
 msgid "Invalid color correction profile"
 msgstr "颜色校正配置文件无效"
 
-#: dialogs/display-config.cpp:690 xrc/DisplayConfigBasic.xrc:132
-#: xrc/DisplayConfigBasic.xrc:172 xrc/DisplayConfigOSD.xrc:17
+#: dialogs/display-config.cpp:985 xrc/DisplayConfigBasic.xrc:166
+#: xrc/DisplayConfigBasic.xrc:206 xrc/DisplayConfigOSD.xrc:17
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
 #: xrc/SoundConfigGameBoyAdvance.xrc:19
 msgid "None"
 msgstr "无"
 
-#: dialogs/display-config.cpp:752
+#: dialogs/display-config.cpp:1047
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "在 %s 中没有可用 rpi 插件"
 
-#: dialogs/display-config.cpp:833 dialogs/display-config.cpp:919
-#: xrc/DisplayConfigBasic.xrc:148
+#: dialogs/display-config.cpp:1128 dialogs/display-config.cpp:1491
+#: xrc/DisplayConfigBasic.xrc:182
 msgid "Plugin"
 msgstr "插件"
 
-#: dialogs/display-config.cpp:842
+#: dialogs/display-config.cpp:1137
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "正在使用像素滤镜: %s"
 
-#: dialogs/display-config.cpp:852
+#: dialogs/display-config.cpp:1147
 #, c-format
 msgid "interframe blend: %s"
 msgstr "帧间混合: %s"
@@ -749,7 +755,7 @@ msgstr "选择金手指文件"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 金手指列表 (*.clt)|*.clt|CHT 金手指列表 (*.cht)|*.cht"
 
-#: guiinit.cpp:282 panel.cpp:1105
+#: guiinit.cpp:282 panel.cpp:1124
 msgid "Loaded cheats"
 msgstr "打开金手指"
 
@@ -856,62 +862,62 @@ msgid ""
 " values may have been reset."
 msgstr "此 INI 文件是为新版本 VBA-M 编写的。某些 INI 选项值可能已被重置。"
 
-#: opts.cpp:326 opts.cpp:342 opts.cpp:507
+#: opts.cpp:326 opts.cpp:342 opts.cpp:528
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr "%s 键不能绑定为 %s"
 
-#: opts.cpp:452 opts.cpp:461 opts.cpp:470 opts.cpp:479
+#: opts.cpp:473 opts.cpp:482 opts.cpp:491 opts.cpp:500
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:512
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:523
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "数值 %s 对于选项 %s 无效"
 
-#: opts.cpp:513
+#: opts.cpp:534
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "未知选项 %s 带有数值 %s"
 
-#: panel.cpp:727
+#: panel.cpp:746
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 不是有效的 ROM 文件"
 
-#: panel.cpp:728 panel.cpp:789 panel.cpp:875
+#: panel.cpp:747 panel.cpp:808 panel.cpp:894
 msgid "Problem loading file"
 msgstr "载入文件发生问题"
 
-#: panel.cpp:788
+#: panel.cpp:807
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "无法载入 Game Boy ROM %s"
 
-#: panel.cpp:813 panel.cpp:957 panel.cpp:1853
+#: panel.cpp:832 panel.cpp:976 panel.cpp:1887
 msgid "Could not initialize the sound driver!"
 msgstr "无法初始化声音驱动！"
 
-#: panel.cpp:824
+#: panel.cpp:843
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "启用色彩修改时无法使用 GB BIOS 文件，正在禁用 GB BIOS 文件。"
 
-#: panel.cpp:851 panel.cpp:970
+#: panel.cpp:870 panel.cpp:989
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "无法载入 BIOS %s"
 
-#: panel.cpp:874
+#: panel.cpp:893
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "无法载入 Game Boy Advance ROM %s"
 
-#: panel.cpp:1142
+#: panel.cpp:1161
 msgid " player "
 msgstr "玩家"
 
-#: panel.cpp:1190
+#: panel.cpp:1209
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -920,11 +926,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建原生存档目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: panel.cpp:1191 panel.cpp:1212 wxvbam.cpp:1565
+#: panel.cpp:1210 panel.cpp:1231 wxvbam.cpp:1719
 msgid "Directory Error"
 msgstr "目录错误"
 
-#: panel.cpp:1211
+#: panel.cpp:1230
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -933,597 +939,656 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建模拟器存档目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: panel.cpp:1355
+#: panel.cpp:1374
 #, c-format
 msgid "Loaded state %s"
 msgstr "载入状态 %s"
 
-#: panel.cpp:1355
+#: panel.cpp:1374
 #, c-format
 msgid "Error loading state %s"
 msgstr "载入状态错误 %s"
 
-#: panel.cpp:1379
+#: panel.cpp:1398
 #, c-format
 msgid "Saved state %s"
 msgstr "保存状态 %s"
 
-#: panel.cpp:1379
+#: panel.cpp:1398
 #, c-format
 msgid "Error saving state %s"
 msgstr "保存状态错误 %s"
 
-#: panel.cpp:1629
+#: panel.cpp:1663
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "不支持 %d x %d - %d @ %d 全屏模式，正在寻找其他模式"
 
-#: panel.cpp:1667
+#: panel.cpp:1701
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "不支持 %d x %d - %d @ %d 全屏模式"
 
-#: panel.cpp:1672
+#: panel.cpp:1706
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "有效模式: %d x %d - %d @ %d"
 
-#: panel.cpp:1680
+#: panel.cpp:1714
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "选择模式 %d x %d - %d @ %d"
 
-#: panel.cpp:1684
+#: panel.cpp:1718
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "切换模式失败 %d x %d - %d @ %d"
 
-#: panel.cpp:1780
+#: panel.cpp:1814
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "无效 GBA 卡带"
 
-#: panel.cpp:1874
-msgid "Metal is unavailable, defaulting to OpenGL"
-msgstr "Metal 后端不可用，默认使用 OpenGL"
-
-#: panel.cpp:1907
-msgid "Vulkan is unavailable, defaulting to OpenGL"
-msgstr "Vulkan 不可用，默认使用 OpenGL。"
-
-#: panel.cpp:2046
+#: panel.cpp:2061
 msgid "No memory for rewinding"
 msgstr "没有用于回退的内存"
 
-#: panel.cpp:2056
+#: panel.cpp:2071
 msgid "Error writing rewind state"
 msgstr "回写状态错误"
 
-#: panel.cpp:3689
+#: panel.cpp:3986
 msgid "Failed to set wayland display"
 msgstr "设置 wayland 显示失败"
 
-#: panel.cpp:3720
+#: panel.cpp:4018
 msgid "Failed to initialize SDL video subsystem"
 msgstr "初始化 SDL 视频子系统失败"
 
-#: panel.cpp:3731
+#: panel.cpp:4030
 msgid "Failed to initialize SDL video"
 msgstr "初始化 SDL 视频失败"
 
-#: panel.cpp:3741
+#: panel.cpp:4045
 msgid "Failed to set wayland surface"
 msgstr "设置 wayland 表面失败"
 
-#: panel.cpp:3755
+#: panel.cpp:4085
 msgid "Failed to set parent window"
 msgstr "设置主窗口失败"
 
-#: panel.cpp:3766
+#: panel.cpp:4097
 msgid "Failed to set OpenGL properties"
 msgstr "设置 OpenGL 属性失败"
 
-#: panel.cpp:3779 panel.cpp:3818
+#: panel.cpp:4118 panel.cpp:4311
 msgid "Failed to create SDL window"
 msgstr "创建 SDL 窗口失败"
 
-#: panel.cpp:3789 panel.cpp:3846
+#: panel.cpp:4229 panel.cpp:4340
 msgid "Renderer creating failed, using default renderer"
 msgstr "渲染器创建失败，开始使用默认渲染器"
 
-#: panel.cpp:3790
+#: panel.cpp:4230
 #, c-format
 msgid "SDL Error: %s"
 msgstr "SDL 错误: %s"
 
-#: panel.cpp:3797 panel.cpp:3852
+#: panel.cpp:4237 panel.cpp:4346
 msgid "Failed to create SDL renderer"
 msgstr "创建 SDL 渲染器失败"
 
-#: panel.cpp:3803
+#: panel.cpp:4296
 msgid "Failed to set vsync for SDL renderer"
 msgstr "无法为 SDL 渲染器设置垂直同步"
 
-#: panel.cpp:3807 panel.cpp:3841
+#: panel.cpp:4300 panel.cpp:4335
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL 渲染器: %s"
 
-#: panel.cpp:3826
+#: panel.cpp:4320
 msgid "SDL renderer: default"
 msgstr "SDL 渲染器: 默认"
 
-#: panel.cpp:4609
+#: panel.cpp:5942
 msgid "Enabling EGL VSync."
 msgstr "正在启用 EGL 垂直同步。"
 
-#: panel.cpp:4611
+#: panel.cpp:5944
 msgid "Disabling EGL VSync."
 msgstr "正在禁用 EGL 垂直同步。"
 
-#: panel.cpp:4619
+#: panel.cpp:5952
 msgid "Enabling GLX VSync."
 msgstr "正在启用 GLX 垂直同步。"
 
-#: panel.cpp:4621
+#: panel.cpp:5954
 msgid "Disabling GLX VSync."
 msgstr "正在禁用 GLX 垂直同步。"
 
-#: panel.cpp:4639
+#: panel.cpp:5972
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "设置 glXSwapIntervalEXT 失败"
 
-#: panel.cpp:4648
+#: panel.cpp:5981
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "设置 glXSwapIntervalSGI 失败"
 
-#: panel.cpp:4657
+#: panel.cpp:5990
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "设置 glXSwapIntervalMESA 失败"
 
-#: panel.cpp:4666
+#: panel.cpp:5999
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "不支持 wglGetExtensionsStringEXT"
 
-#: panel.cpp:4669
+#: panel.cpp:6002
 msgid "No support for WGL_EXT_swap_control"
 msgstr "不支持 WGL_EXT_swap_control"
 
-#: panel.cpp:4678
+#: panel.cpp:6011
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "设置 wglSwapIntervalEXT 失败"
 
-#: panel.cpp:4684
+#: panel.cpp:6017
 msgid "No VSYNC available on this platform"
 msgstr "垂直同步在该平台上不可用 "
 
-#: panel.cpp:4817
+#: panel.cpp:6106
+msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
+msgstr ""
+
+#: panel.cpp:6355
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr "加载 D3D12 或 D3DCompiler DLL 失败"
 
-#: panel.cpp:4843
+#: panel.cpp:6381
 msgid "Failed to get D3D12 function pointers"
 msgstr "获取 D3D12 函数指针失败"
 
-#: panel.cpp:4848
+#: panel.cpp:6386
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr "创建 DXGI 工厂失败：0x%08X"
 
-#: panel.cpp:4862
+#: panel.cpp:6400
 msgid "No hardware adapter found, falling back to WARP"
 msgstr "未找到硬件适配器，回退到 WARP"
 
-#: panel.cpp:4869
+#: panel.cpp:6407
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr "创建 D3D12 设备失败：0x%08X"
 
-#: panel.cpp:4870
+#: panel.cpp:6408
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr "D3D12 设备已创建 (%s)"
 
-#: panel.cpp:4877
+#: panel.cpp:6415
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr "创建命令队列失败：0x%08X"
 
-#: panel.cpp:4898
+#: panel.cpp:6441
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr "创建交换链失败：0x%08X"
 
-#: panel.cpp:4904
+#: panel.cpp:6447
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr "获取 IDXGISwapChain3 失败：0x%08X"
 
-#: panel.cpp:4913
+#: panel.cpp:6478
+msgid ""
+"HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
+msgstr ""
+
+#: panel.cpp:6488
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr "创建 RTV 堆失败：0x%08X"
 
-#: panel.cpp:4922
+#: panel.cpp:6497
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr "创建 SRV 堆失败：0x%08X"
 
-#: panel.cpp:4929
+#: panel.cpp:6504
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr "无法获取缓冲区 %u: 0x%08X"
 
-#: panel.cpp:4937
+#: panel.cpp:6512
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr "创建命令分配器失败：0x%08X"
 
-#: panel.cpp:4942
+#: panel.cpp:6517
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr "创建命令列表失败：0x%08X"
 
-#: panel.cpp:4981
+#: panel.cpp:6556
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr "序列化根签名失败：%s"
 
-#: panel.cpp:4988
+#: panel.cpp:6563
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr "创建根签名失败：0x%08X"
 
-#: panel.cpp:5002
+#: panel.cpp:6577
 #, c-format
 msgid "VS compile failed: %s"
 msgstr "VS 编译失败：%s"
 
-#: panel.cpp:5010
+#: panel.cpp:6585
 #, c-format
 msgid "PS compile failed: %s"
 msgstr "PS 编译失败： %s"
 
-#: panel.cpp:5039
+#: panel.cpp:6614
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr "创建 PSO 失败：0x%08X"
 
-#: panel.cpp:5059
+#: panel.cpp:6634
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr "创建顶点缓冲区失败：0x%08X"
 
-#: panel.cpp:5068
+#: panel.cpp:6643
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr "创建围栏失败：0x%08X"
 
-#: panel.cpp:5071
+#: panel.cpp:6646
 msgid "Failed to create fence event"
 msgstr "创建围栏事件失败"
 
-#: panel.cpp:5073
+#: panel.cpp:6648
 msgid "D3D12 pipeline fully initialized"
 msgstr "D3D12 流水线已完全初始化"
 
-#: panel.cpp:5103
+#: panel.cpp:6680
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX12DrawingPanel 已初始化：%dx%d (缩放：%f)"
 
-#: panel.cpp:5125
+#: panel.cpp:6702
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr "调整缓冲区大小失败：0x%08X"
 
-#: panel.cpp:5136
+#: panel.cpp:6713
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr "交换链已调整大小为 %dx%d"
 
-#: panel.cpp:5388
+#: panel.cpp:6979
 msgid "Texture upload failed"
 msgstr "纹理上传失败"
 
-#: panel.cpp:5531
+#: panel.cpp:7133
+msgid ""
+"D3D11: failed to create device; Simple renderer will use the software (wx) "
+"path."
+msgstr ""
+
+#: panel.cpp:7185
+#, c-format
+msgid "D3D11: failed to create swap chain: 0x%08X"
+msgstr ""
+
+#: panel.cpp:7251
+msgid ""
+"D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
+"(wx) path."
+msgstr ""
+
+#: panel.cpp:7303
+msgid ""
+"D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
+"path."
+msgstr ""
+
+#: panel.cpp:7588
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "使用 Direct3D 9Ex (动态加载)"
 
-#: panel.cpp:5535
+#: panel.cpp:7592
 msgid "Failed to load d3d9.dll"
 msgstr "加载 d3d9.dll 失败"
 
-#: panel.cpp:5544
+#: panel.cpp:7601
 msgid "Failed to create Direct3D 9 interface"
 msgstr "创建 Direct3D 9 接口失败"
 
-#: panel.cpp:5547
+#: panel.cpp:7604
 msgid "Using Direct3D 9"
 msgstr "使用 Direct3D 9"
 
-#: panel.cpp:5554
+#: panel.cpp:7611
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "获取适配器显示模式失败: 0x%08X"
 
-#: panel.cpp:5578
+#: panel.cpp:7635
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx 功能不支持，回退到弃用 SwapEffect"
 
-#: panel.cpp:5594
+#: panel.cpp:7651
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "硬件顶点处理不可用，回退到软件顶点处理"
 
-#: panel.cpp:5618
+#: panel.cpp:7675
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "创建 Direct3D 设备失败: 0x%08X"
 
-#: panel.cpp:5623
+#: panel.cpp:7680
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Direct3D 9%s 设备创建成功 (SwapEffect: %s)"
 
-#: panel.cpp:5656
+#: panel.cpp:7716
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DXDrawingPanel 已初始化: %dx%d(缩放: %f)"
 
-#: panel.cpp:5678
+#: panel.cpp:7738
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "获取适配器显示模式进行重置失败: 0x%08X"
 
-#: panel.cpp:5710
+#: panel.cpp:7770
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "尝试重置 Direct3D 设备 (SwapEffect: %s)"
 
-#: panel.cpp:5717
+#: panel.cpp:7777
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "使用 FlipEx 重置失败，正在尝试弃用 SwapEffect"
 
-#: panel.cpp:5729
+#: panel.cpp:7789
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "重置 Direct3D 设备失败: 0x%08X"
 
-#: panel.cpp:5734
+#: panel.cpp:7794
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Direct3D 设备重置成功 (最终 SwapEffect: %s)"
 
-#: panel.cpp:5802
+#: panel.cpp:7862
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "创建纹理失败: 0x%08X"
 
-#: panel.cpp:5814
+#: panel.cpp:7874
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "锁定纹理失败: 0x%08X"
 
-#: panel.cpp:6006
+#: panel.cpp:8066
 msgid "Memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:6009
+#: panel.cpp:8069
 msgid "Error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:6012
+#: panel.cpp:8072
 msgid "Error writing to output file"
 msgstr "写入输出文件错误"
 
-#: panel.cpp:6015
+#: panel.cpp:8075
 msgid "Can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:6020
+#: panel.cpp:8080
 msgid "Programming error; aborting!"
 msgstr "程序错误；正在中止！"
 
-#: panel.cpp:6032 panel.cpp:6061
+#: panel.cpp:8092 panel.cpp:8121
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:6089
+#: panel.cpp:8149
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:6095
+#: panel.cpp:8155
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:6105
+#: panel.cpp:8165
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
-#: panel.cpp:6300
+#: panel.cpp:8467
+msgid "Renderer failed to initialize; trying the next available renderer."
+msgstr ""
+
+#: panel.cpp:8475
+msgid "No renderer could be initialized."
+msgstr ""
+
+#: panel.cpp:8569
+msgid ""
+"No renderer could present 10-bit deep color; using 8-bit for this session."
+msgstr ""
+
+#: panel.cpp:8607
+msgid "Metal is unavailable, defaulting to OpenGL"
+msgstr "Metal 后端不可用，默认使用 OpenGL"
+
+#: panel.cpp:8620
+msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
+msgstr ""
+
+#: panel.cpp:8639
+msgid "Vulkan is unavailable, defaulting to OpenGL"
+msgstr "Vulkan 不可用，默认使用 OpenGL。"
+
+#: panel.cpp:8911
 #, c-format
 msgid "Volume: %d %%"
 msgstr "音量: %d %%"
 
-#: panel.cpp:6822
+#: panel.cpp:9596
 msgid "Vulkan device created successfully"
 msgstr "Vulkan 设备创建成功"
 
-#: panel.cpp:6918
+#: panel.cpp:9702
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "VK_KHR_wayland_surface 和 VK_KHR_xlib_surface 均不可用 — 无法在此系统上创建 Vulkan 表面。"
 
-#: panel.cpp:6947
+#: panel.cpp:9747
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "创建 Vulkan 实例失败：%d"
 
-#: panel.cpp:6950
+#: panel.cpp:9750
 msgid "Vulkan instance created"
 msgstr "创建 Vulkan 实例"
 
-#: panel.cpp:6965
+#: panel.cpp:9769
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "创建 Vulkan Win32 表面失败：%d"
 
-#: panel.cpp:6988
+#: panel.cpp:9792
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "无法获取 Vulkan 表面的 NSView 句柄"
 
-#: panel.cpp:6999
+#: panel.cpp:9803
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "创建 Vulkan Metal 表面失败：%d"
 
-#: panel.cpp:7017
+#: panel.cpp:9821
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "创建 Vulkan Xlib 表面失败：%d"
 
-#: panel.cpp:7036
+#: panel.cpp:9877
+msgid ""
+"Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
+"subsurface"
+msgstr ""
+
+#: panel.cpp:9886
+msgid "Wayland: failed to create Vulkan subsurface"
+msgstr ""
+
+#: panel.cpp:9924
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "创建 Vulkan Wayland 表面失败：%d"
 
-#: panel.cpp:7075
+#: panel.cpp:9963
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "获取 Wayland 显示/表面句柄失败"
 
-#: panel.cpp:7089
+#: panel.cpp:9981
 msgid "No supported Vulkan surface extension available"
 msgstr "暂无支持的 Vulkan 表面扩展可用"
 
-#: panel.cpp:7100
+#: panel.cpp:9992
 msgid "No Vulkan physical devices found"
 msgstr "未找到 Vulkan 物理设备"
 
-#: panel.cpp:7150
+#: panel.cpp:10051
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "已选择 Vulkan 设备：%s"
 
-#: panel.cpp:7154
+#: panel.cpp:10055
 msgid "No suitable Vulkan physical device found"
 msgstr "未找到合适的 Vulkan 物理设备"
 
-#: panel.cpp:7193
+#: panel.cpp:10100
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "创建 Vulkan 逻辑设备失败：%d"
 
-#: panel.cpp:7280
+#: panel.cpp:10223
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "创建 Vulkan 交换链失败：%d"
 
-#: panel.cpp:7292
+#: panel.cpp:10263
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s"
 msgstr "交换链已创建：%ux%u, %u 个镜像，vsync=%s"
 
-#: panel.cpp:7336
+#: panel.cpp:10307
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "创建交换链图像视图 %zu 失败：%d"
 
-#: panel.cpp:7382
+#: panel.cpp:10353
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "创建渲染通道失败：%d"
 
-#: panel.cpp:7404
+#: panel.cpp:10375
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "创建帧缓冲区 %zu 失败：%d"
 
-#: panel.cpp:7427
+#: panel.cpp:10398
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "创建描述符集布局失败：%d"
 
-#: panel.cpp:7450
+#: panel.cpp:10421
 msgid "Failed to create shader modules"
 msgstr "创建着色器模块失败"
 
-#: panel.cpp:7518
+#: panel.cpp:10489
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "创建管道布局失败：%d"
 
-#: panel.cpp:7545
+#: panel.cpp:10516
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "创建图形管线失败：%d"
 
-#: panel.cpp:7561
+#: panel.cpp:10532
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "创建命令池失败：%d"
 
-#: panel.cpp:7579
+#: panel.cpp:10550
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "分配命令缓冲区失败：%d"
 
-#: panel.cpp:7599
+#: panel.cpp:10570
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "创建帧 %d 的同步对象失败"
 
-#: panel.cpp:7621
+#: panel.cpp:10592
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "创建描述符池失败：%d"
 
-#: panel.cpp:7633
+#: panel.cpp:10604
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "分配描述符集失败：%d"
 
-#: panel.cpp:7671
+#: panel.cpp:10642
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "创建纹理图像失败：%d"
 
-#: panel.cpp:7685
+#: panel.cpp:10656
 msgid "Failed to allocate texture memory"
 msgstr "分配纹理内存失败"
 
-#: panel.cpp:7701
+#: panel.cpp:10672
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "创建纹理图像视图失败：%d"
 
-#: panel.cpp:7719
+#: panel.cpp:10690
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "创建纹理采样器失败：%d"
 
-#: panel.cpp:7753
+#: panel.cpp:10724
 msgid "Failed to create staging buffer"
 msgstr "创建暂存缓冲区失败"
 
-#: panel.cpp:7768
+#: panel.cpp:10739
 msgid "Failed to allocate staging memory"
 msgstr "分配暂存内存失败"
 
-#: panel.cpp:7806
+#: panel.cpp:10780
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VKDrawingPanel 已初始化：%ux%u (缩放：%f)"
 
-#: panel.cpp:7844
+#: panel.cpp:10822
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "获取交换链镜像失败：%d"
 
-#: panel.cpp:8101
+#: panel.cpp:11090
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "交换链镜像呈现失败：%d"
@@ -1632,80 +1697,80 @@ msgstr "Blue:"
 msgid "Unable to load dialog %s from resources"
 msgstr "无法从源加载对话框 %s "
 
-#: wxvbam.cpp:715 wxvbam.cpp:732
+#: wxvbam.cpp:739 wxvbam.cpp:756
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "提供的配置文件无效: %s"
 
-#: wxvbam.cpp:1049
+#: wxvbam.cpp:1203
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: wxvbam.cpp:1052
+#: wxvbam.cpp:1206
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: wxvbam.cpp:1055
+#: wxvbam.cpp:1209
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: wxvbam.cpp:1058
+#: wxvbam.cpp:1212
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: wxvbam.cpp:1061
+#: wxvbam.cpp:1215
 msgid "Mute the audio for this session, without saving to the config"
 msgstr ""
 
-#: wxvbam.cpp:1064
+#: wxvbam.cpp:1218
 msgid "Set a configuration file"
 msgstr "设置配置文件"
 
-#: wxvbam.cpp:1068
+#: wxvbam.cpp:1222
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享联机状态，如果存在的话"
 
-#: wxvbam.cpp:1075
+#: wxvbam.cpp:1229
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: wxvbam.cpp:1078
+#: wxvbam.cpp:1232
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: wxvbam.cpp:1080
+#: wxvbam.cpp:1234
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1111
+#: wxvbam.cpp:1265
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: wxvbam.cpp:1119
+#: wxvbam.cpp:1273
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: wxvbam.cpp:1133
+#: wxvbam.cpp:1287
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: wxvbam.cpp:1147
+#: wxvbam.cpp:1301
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: wxvbam.cpp:1153
+#: wxvbam.cpp:1307
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: wxvbam.cpp:1172
+#: wxvbam.cpp:1326
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1713,21 +1778,21 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: wxvbam.cpp:1180
+#: wxvbam.cpp:1334
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: wxvbam.cpp:1192
+#: wxvbam.cpp:1346
 msgid "Configuration file not found."
 msgstr "未找到配置文件。"
 
-#: wxvbam.cpp:1223
+#: wxvbam.cpp:1377
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
-#: wxvbam.cpp:1564
+#: wxvbam.cpp:1718
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1736,7 +1801,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: wxvbam.cpp:1829
+#: wxvbam.cpp:1983
 msgid "Failed to load dialog"
 msgstr "加载对话框失败"
 
@@ -1841,200 +1906,230 @@ msgstr "GameShark"
 msgid "Joypad %zu %s"
 msgstr "手柄 %zu %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:437
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
 msgid "Use bilinear filter with 3d renderer"
 msgstr "在 3D 渲染器中使用双线过滤 "
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:438
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:483
 msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr "将 SDL 像素艺术滤镜与 SDL 渲染器一起使用"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:439
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:484
 msgid "Full-screen filter to apply"
 msgstr "要应用的全屏滤镜"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:440
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:485
 msgid "Filter plugin library"
 msgstr "滤镜插件库"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:441
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:486
 msgid "Directory containing RPI filter plugins"
 msgstr "包含 RPI 过滤器插件的目录"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:442
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:487
 msgid "Interframe blending function"
 msgstr "帧间混合功能"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:443
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:488
 msgid "Bit depth"
 msgstr "位深"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:444
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:489
 msgid "Keep window on top"
 msgstr "保持窗口在最前"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:446
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:491
 msgid "Maximum number of threads to run filters in"
 msgstr "运行滤镜的最大线程数"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:448
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "渲染方式；如果不支持，则使用简单方式"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:449
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:494
 msgid "Default scale factor"
 msgstr "默认缩放系数"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:450
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:495
 msgid "Retain aspect ratio when resizing"
 msgstr "调整大小时保持长宽比"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:451
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
 msgid "SDL renderer"
 msgstr "SDL 渲染器"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:452
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
 msgid "Color correction profile"
 msgstr "颜色校正配置文件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:455
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
+msgid "Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
+msgid "Output HDR on supported displays and renderers"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
+msgid "HDR diffuse (paper) white luminance, in nits"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
+msgid "HDR peak/highlight luminance, in nits"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
+msgid "Input level percentage above which HDR highlights ramp to peak"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
+msgid ""
+"HDR shadow contrast as a percentage gamma (100 = neutral; higher deepens "
+"blacks)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
+msgid "Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "用于 GB 的 BIOS 文件（如果启用）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:456
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
 msgid "Enable DX Colorization Hacks"
 msgstr "启用 DX 色彩修改"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:457
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:482
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:516
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
 msgid "Apply LCD filter, if enabled"
 msgstr "应用 LCD 滤镜（如果启用）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:458
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "用于 GBC 的 BIOS 文件（如果启用）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:460
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "默认调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:463
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "第一用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:466
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "第二用户调色板，8 个逗号分隔的 4 位十六进制整数 (rgb555)。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:469
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
 msgid "Automatically gather a full page before printing"
 msgstr "打印前自动聚集整个页面"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:471
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "使用 -print 后缀自动将打印输出保存为屏幕截图"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:473
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:532
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
 msgid "Directory to look for ROM files"
 msgstr "要查找 ROM 文件的目录"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:474
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "要查找 GBC ROM 文件的目录"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:475
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
 msgid "Color lightness factor"
 msgstr "颜色亮度系数"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:478
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "BIOS file to use, if enabled"
 msgstr "要使用的 BIOS 文件（如果启用）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:488
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Enable link at boot"
 msgstr "在启动时启用联机"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:493
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid "Enable faster network protocol by default"
 msgstr "默认启用更快的网络协议"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:495
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
 msgid "Default network link client host"
 msgstr "默认网络联机客户端主机"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:496
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
 msgid "Default network link server IP to bind"
 msgstr "要绑定的默认网络联机服务器 IP"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:497
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid "Default network link port (server and client)"
 msgstr "默认网络联机端口（服务器和客户端）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:498
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
 msgid "Default network protocol"
 msgstr "默认网络协议"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid "Link timeout (ms)"
 msgstr "联机超时（毫秒）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
 msgid "Link cable type"
 msgstr "联机线缆类型"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:503
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Color darkness factor"
 msgstr "颜色暗度系数"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
 msgid "Automatically load last saved state"
 msgstr "自动加载上次保存的状态"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
 msgid ""
 "Directory to store game save files (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "用于存储游戏存档文件的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:510
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:569
 msgid "Freeze recent load list"
 msgstr "冻结最近的加载列表"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:512
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:571
 msgid ""
 "Directory to store A / V and game recordings (relative paths paths are "
 "relative to the executable; blank is ROM dir)"
 msgstr "用于存储音视频和游戏录像的目录（相对路径，路径相对于可执行文件；留空为 ROM 目录）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:515
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "倒带快照之间的秒数（0 表示禁用）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid ""
 "Directory to store screenshots (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "用于存储屏幕截图的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
 msgid ""
 "Directory to store saved state files (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "用于存储已保存状态文件的目录（相对路径相对于可执行文件；留空则为 ROM 目录）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Enable status bar"
 msgstr "启用状态栏"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:523
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:582
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "INI 文件版本 (请勿修改)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -2042,275 +2137,275 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "参数 手柄/<n>/<button> 包含一个逗号分隔的键名列表，这些键名映射到 手柄 #<n> 按键 <button>。 按键是 上、下、左、右、A、B、L、R、Select、Start、体感上、体感下、体感左、体感右、连发A、连发B、加速、截图、GS 中某一个"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:532
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "连发切换周期，以帧为单位（1/60 秒）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
 msgid "The number of the stick to use in single-player mode"
 msgstr "在单人模式中使用的摇杆数量"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:535
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:594
 msgid "Whether to enable SDL GameController mode"
 msgstr "选择是否启用 SDL 游戏控制器模式"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:598
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "参数 键盘/<cmd> 包含一个以逗号分隔的键名列表（例如 Alt-Shift-F1）。 当按下指定的键时，命令 <cmd> 被执行。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:544
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
 msgid "Enable AGB debug print"
 msgstr "启用 AGB 调试打印"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
 msgid "Auto skip frames"
 msgstr "自动跳帧"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "如发现 IPS/UPS/IPF 补丁即应用"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
 msgid "Automatically save and load cheat list"
 msgstr "自动保存和加载金手指列表"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "对 Super GameBoy 游戏自动启用边框"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
 msgid "Always enable border"
 msgstr "始终启用边框"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "Screen capture file format"
 msgstr "屏幕截图文件格式"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
 msgid "Enable cheats"
 msgstr "启用金手指"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
 msgid "Disable on-screen status messages"
 msgstr "禁用屏幕状态消息"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
 msgid "Type of system to emulate"
 msgstr "要模拟的系统类型"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Flash 大小 0 = 64 KB 1 = 128 KB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "跳帧。值为 0-9 或 -1 以根据时间自动跳过。"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
 msgid "The palette to use"
 msgstr "要使用的调色板"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:565
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
 msgid "Enable printer emulation"
 msgstr "启用打印机模拟"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
 msgid "Break into GDB after loading the game."
 msgstr "加载游戏后切入 GDB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:627
 msgid "Port to connect GDB to"
 msgstr "连接 GDB 的端口"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:629
 msgid "Number of players in network"
 msgstr "联机中的玩家数量"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "最大缩放系数（0 = 无限制）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:633
 msgid "Pause game when main window loses focus"
 msgstr "当主窗口非活动时暂停游戏"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:635
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "启用 RTC（vba-over.ini 里覆盖为 rtcEnabled"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:577
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:636
 msgid "Native save (\"battery\") hardware type"
 msgstr "原生存档（“电池档”）硬件类型"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:637
 msgid "Show speed indicator"
 msgstr "显示速度指示器"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:638
 msgid "Skip BIOS initialization"
 msgstr "跳过 BIOS 初始化"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:640
 msgid "Do not overwrite cheat list when loading state"
 msgstr "加载状态时不覆盖金手指列表"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:642
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "加载状态时不覆盖原生 (电池) 存档"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:585
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:644
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "限制游戏速度，包括加速后的（0-450 %，0 = 无限制）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:647
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "设置加速键的限制（0-3000 %，0 = 无限制）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:649
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "加速时跳过的帧数（而不是加速限制）"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:593
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:652
 msgid "Use frame skip for speedup throttle"
 msgstr "使用跳帧来限制加速"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:654
 msgid "Mute sound during speedup"
 msgstr "游戏加速时静音"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:655
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "对 GB 使用指定的 BIOS 文件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:656
 msgid "Use the specified BIOS file"
 msgstr "使用指定的 BIOS 文件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:658
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "对 GBC 使用指定的 BIOS 文件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:600
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:659
 msgid "Wait for vertical sync"
 msgstr "等待垂直同步"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:662
 msgid "Enter fullscreen mode at startup"
 msgstr "启动时进入全屏模式"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:663
 msgid "Window maximized"
 msgstr "窗口最大化"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:605
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:664
 msgid "Window height at startup"
 msgstr "启动时的窗口高度"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:665
 msgid "Window width at startup"
 msgstr "启动时的窗口宽度"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:666
 msgid "Window axis X position at startup"
 msgstr "启动时的窗口 X 坐标位置"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:667
 msgid "Window axis Y position at startup"
 msgstr "启动时的窗口 Y 坐标位置"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:671
 msgid "Capture key events while on background"
 msgstr "在后台截取按键事件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:673
 msgid "Capture joy events while on background"
 msgstr "在后台截取摇杆事件"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:674
 msgid "Hide menu bar when mouse is inactive"
 msgstr "鼠标非活动时隐藏菜单栏"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:676
 msgid "Suspend screensaver when game is running"
 msgstr "游戏运行时暂停屏幕保护程序"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:679
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "声音 API；如果不支持，将使用默认 API"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:680
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "所选驱动程序下的所选音频设备 ID"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:622
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:681
 msgid "Number of sound buffers"
 msgstr "声音缓冲区数"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:682
 msgid "Bit mask of sound channels to enable"
 msgstr "要启用的声道位掩码"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:683
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "GBA 声音过滤 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:685
 msgid "Game Boy Advance sound interpolation"
 msgstr "GBA 声音插值"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:627
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:686
 msgid "Game Boy sound declicking"
 msgstr "GB 声音降噪"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:628
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:687
 msgid "Game Boy echo effect (%)"
 msgstr "GB 回声音效 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:629
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:688
 msgid "Enable Game Boy sound effects"
 msgstr "启用 GB 音效"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:630
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:689
 msgid "Game Boy stereo effect (%)"
 msgstr "GB 立体声音效 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:690
 msgid "Game Boy surround sound effect (%)"
 msgstr "GB 环绕音效 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:632
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:691
 msgid "Sound sample rate (kHz)"
 msgstr "声音采样率 (kHz)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:633
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:692
 msgid "Use DirectSound hardware acceleration"
 msgstr "启用 DirectSound 硬件加速"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:634
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:693
 msgid "Upmix stereo to surround"
 msgstr "将立体声升级为环绕立体声"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:635
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:694
 msgid "Sound volume (%)"
 msgstr "音量 (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:636
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:695
 msgid "Language"
 msgstr "语言"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:637
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:696
 msgid "External translations"
 msgstr "外部翻译"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:712
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:732
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:753
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:774
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:794
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:814
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:771
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:791
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:812
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:833
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:853
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:873
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "数值 %s 对于选项 %s 无效，有效数值为 %s"
@@ -3110,75 +3205,91 @@ msgstr "输出模块"
 msgid "Simple"
 msgstr "简单"
 
-#: xrc/DisplayConfigBasic.xrc:74
+#: xrc/DisplayConfigBasic.xrc:69
 msgid "SDL Renderer:"
 msgstr "SDL 渲染器："
 
-#: xrc/DisplayConfigBasic.xrc:83
+#: xrc/DisplayConfigBasic.xrc:78
 msgid "SDL Pixel Art Filter"
 msgstr "SDL 像素艺术滤镜"
 
-#: xrc/DisplayConfigBasic.xrc:97
+#: xrc/DisplayConfigBasic.xrc:94
+msgid "Output HDR (Wayland, Vulkan, D3D12, macOS)"
+msgstr ""
+
+#: xrc/DisplayConfigBasic.xrc:101
+msgid "HDR is not available: this display or renderer is not HDR capable."
+msgstr ""
+
+#: xrc/DisplayConfigBasic.xrc:110
+msgid "10-bit deep color (reduces banding)"
+msgstr ""
+
+#: xrc/DisplayConfigBasic.xrc:117
+msgid "10-bit deep color is not available: no 10-bit visual on this display."
+msgstr ""
+
+#: xrc/DisplayConfigBasic.xrc:131
 msgid "Filters"
 msgstr "滤镜"
 
-#: xrc/DisplayConfigBasic.xrc:112
+#: xrc/DisplayConfigBasic.xrc:146
 msgid "Plugin filter dir:"
 msgstr "插件过滤器目录："
 
-#: xrc/DisplayConfigBasic.xrc:118
+#: xrc/DisplayConfigBasic.xrc:152
 msgid "Select plugin directory"
 msgstr "选择插件目录"
 
-#: xrc/DisplayConfigBasic.xrc:125
+#: xrc/DisplayConfigBasic.xrc:159
 msgid "Display filter:"
 msgstr "显示滤镜："
 
-#: xrc/DisplayConfigBasic.xrc:133
+#: xrc/DisplayConfigBasic.xrc:167
 msgid "Super 2xSaI"
 msgstr "超级 2xSaI"
 
-#: xrc/DisplayConfigBasic.xrc:134
+#: xrc/DisplayConfigBasic.xrc:168
 msgid "Super Eagle"
 msgstr "超级锐化"
 
-#: xrc/DisplayConfigBasic.xrc:135
+#: xrc/DisplayConfigBasic.xrc:169
 msgid "Pixelate"
 msgstr "像素化"
 
-#: xrc/DisplayConfigBasic.xrc:136
+#: xrc/DisplayConfigBasic.xrc:170
 msgid "Advance MAME Scale 2x"
 msgstr "高级 MAME 缩放 2x"
 
-#: xrc/DisplayConfigBasic.xrc:137
+#: xrc/DisplayConfigBasic.xrc:171
 msgid "Bilinear Plus"
 msgstr "增强双线性"
 
-#: xrc/DisplayConfigBasic.xrc:138
+#: xrc/DisplayConfigBasic.xrc:172
 msgid "Scanlines"
 msgstr "扫描线"
 
-#: xrc/DisplayConfigBasic.xrc:139
+#: xrc/DisplayConfigBasic.xrc:173
 msgid "TV Mode"
 msgstr "电视模式"
 
-#: xrc/DisplayConfigBasic.xrc:142
+#: xrc/DisplayConfigBasic.xrc:176
 msgid "Simple 4x"
 msgstr "采样 4x"
 
-#: xrc/DisplayConfigBasic.xrc:155
+#: xrc/DisplayConfigBasic.xrc:189
 msgid "Filter plugin:"
 msgstr "过滤器插件："
 
-#: xrc/DisplayConfigBasic.xrc:165
+#: xrc/DisplayConfigBasic.xrc:199
 msgid "Interframe blending:"
 msgstr "帧间混合:"
 
-#: xrc/DisplayConfigBasic.xrc:173
+#: xrc/DisplayConfigBasic.xrc:207
 msgid "Smart"
 msgstr "智能"
 
-#: xrc/DisplayConfigBasic.xrc:174
+#: xrc/DisplayConfigBasic.xrc:208
 msgid "Motion Blur"
 msgstr "动态模糊"
 
@@ -3229,6 +3340,22 @@ msgstr "较暗"
 #: xrc/DisplayConfigColorCorrection.xrc:116
 msgid "Very Light"
 msgstr "很亮"
+
+#: xrc/DisplayConfigColorCorrection.xrc:127
+msgid "HDR White (nits):"
+msgstr ""
+
+#: xrc/DisplayConfigColorCorrection.xrc:143
+msgid "HDR Peak (nits):"
+msgstr ""
+
+#: xrc/DisplayConfigColorCorrection.xrc:159
+msgid "HDR Highlight Knee:"
+msgstr ""
+
+#: xrc/DisplayConfigColorCorrection.xrc:175
+msgid "HDR Shadow Contrast:"
+msgstr ""
 
 #: xrc/DisplayConfigOSD.xrc:9
 msgid "Speed indicator:"
