@@ -1,6 +1,8 @@
 #include <cmath>
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
+#import <QuartzCore/CAMetalLayer.h>
+#import <IOKit/IOKitLib.h>
 
 #include <wx/rawbmp.h>
 #include <wx/log.h>
@@ -11,13 +13,170 @@
 #include "wx/config/option.h"
 #include "wx/wxvbam.h"
 
-// True if any screen reports extended dynamic range headroom (EDR / HDR).
+// True if any screen is capable of extended dynamic range (EDR / HDR).
+//
+// Use maximumPotentialExtendedDynamicRangeColorComponentValue, not
+// maximumExtendedDynamicRangeColorComponentValue: the latter is the headroom
+// *currently* allocated, which stays 1.0 until some layer actually requests EDR
+// content, so it would report "no HDR" at startup even on an HDR display. The
+// "potential" value reflects the display's capability regardless.
 bool VbamProbeMacosHdr() {
     for (NSScreen* screen in [NSScreen screens]) {
-        if (screen.maximumExtendedDynamicRangeColorComponentValue > 1.0)
+        if (screen.maximumPotentialExtendedDynamicRangeColorComponentValue > 1.0)
             return true;
     }
     return false;
+}
+
+// The display's EDR headroom -- a multiplier over SDR white (1.0 == no HDR). The
+// EDR path clips content above this, so the headroom times our SDR-white nits is
+// the display's usable peak in our luminance model. Uses the window's screen when
+// available, else the brightest connected screen. Returns 1.0 when HDR is off or
+// unsupported. "Potential" (capability) rather than the currently-allocated value.
+double VbamMacosMaxEdrHeadroom() {
+    NSScreen* window_screen =
+        wxGetApp().frame ? ((NSView*)wxGetApp().frame->GetHandle()).window.screen : nil;
+    if (window_screen)
+        return window_screen.maximumPotentialExtendedDynamicRangeColorComponentValue;
+
+    double best = 1.0;
+    for (NSScreen* screen in [NSScreen screens]) {
+        double h = screen.maximumPotentialExtendedDynamicRangeColorComponentValue;
+        if (h > best)
+            best = h;
+    }
+    return best;
+}
+
+// SDL, given an external Cocoa view, makes that view the host NSWindow's
+// contentView (its macOS embedding model wraps/takes over a window), which
+// detaches the entire wx view tree -- including the status bar -- from the
+// window. We undo that after SDL sets up: capture the view SDL was handed, its
+// original superview, and the window's original contentView before the takeover
+// so it can be reattached.
+//
+// Capture just before SDL_CreateWindow. Retains the original contentView (SDL is
+// about to displace it, dropping the window's reference); the superview and
+// window are wx-owned and outlive this panel, so they are held weakly. Outputs
+// are null when the view is not yet in a window (nothing to undo).
+void VbamSdlCaptureViewState(void* sdl_view, void** out_window,
+                             void** out_content_view, void** out_superview) {
+    *out_window = nullptr;
+    *out_content_view = nullptr;
+    *out_superview = nullptr;
+    NSView* v = (__bridge NSView*)sdl_view;
+    NSWindow* w = v.window;
+    if (!w)
+        return;
+    *out_window = (__bridge void*)w;
+    *out_content_view = (void*)CFBridgingRetain(w.contentView);
+    *out_superview = (__bridge void*)v.superview;
+}
+
+// Undo SDL's takeover: re-nest SDL's view under its original superview and put
+// wx's original contentView back as the window's content. SDL keeps rendering
+// into its now-nested view, and the wx tree (status bar) is live and laid out by
+// wx again. Balances the contentView retain from capture.
+void VbamSdlReattachViewState(void* sdl_view, void* window,
+                              void* content_view, void* superview) {
+    NSView* v = (__bridge NSView*)sdl_view;
+    NSWindow* w = (__bridge NSWindow*)window;
+    NSView* cv = (NSView*)CFBridgingRelease(content_view);
+    NSView* sv = (__bridge NSView*)superview;
+    if (!v || !w || !cv || !sv)
+        return;
+    if (v.superview != sv)
+        [sv addSubview:v];
+    if (w.contentView != cv)
+        w.contentView = cv;
+}
+
+void VbamRemoveSdlMetalViews() {
+    NSView* host = (NSView*)wxGetApp().frame->GetPanel()->GetHandle();
+    if (!host)
+        return;
+    // Copy: removeFromSuperview mutates the live subviews array.
+    for (NSView* sub in [[host.subviews copy] autorelease]) {
+        // The wx panel subviews are plain (layer=nil); only SDL's leftover
+        // metal view is CAMetalLayer-backed, so this targets it uniquely.
+        if ([sub.layer isKindOfClass:[CAMetalLayer class]])
+            [sub removeFromSuperview];
+    }
+}
+
+// Parse an EDID's CTA-861 extension block(s) for the HDR Static Metadata Data
+// Block (extended tag 0x06). Returns true when it advertises a PQ (SMPTE ST.2084)
+// or HLG EOTF -- i.e. the display is intrinsically HDR-capable. This reflects the
+// panel's hardware capability and is independent of the current macOS HDR mode,
+// unlike the NSScreen EDR headroom (which collapses to 1.0 when HDR is off).
+static bool EdidDeclaresHdr(const uint8_t* edid, size_t len) {
+    if (len < 128)
+        return false;
+    const int extensions = edid[126];
+    for (int e = 1; e <= extensions; ++e) {
+        const size_t base = static_cast<size_t>(e) * 128;
+        if (base + 128 > len)
+            break;
+        const uint8_t* ext = edid + base;
+        if (ext[0] != 0x02)              // CTA-861 extension tag
+            continue;
+        const int dtd_start = ext[2];    // end of the data-block collection
+        if (dtd_start < 4)
+            continue;
+        size_t i = 4;
+        while (i < static_cast<size_t>(dtd_start) && i < 128) {
+            const uint8_t tag = ext[i] >> 5;
+            const uint8_t blocklen = ext[i] & 0x1f;
+            if (blocklen == 0)
+                break;
+            // Use-Extended-Tag block (tag 7), extended tag 0x06 = HDR Static
+            // Metadata. Byte after the ext tag is the supported-EOTF bitmap:
+            // bit0 SDR, bit1 traditional HDR, bit2 PQ (ST.2084), bit3 HLG.
+            if (tag == 7 && blocklen >= 2 && ext[i + 1] == 0x06) {
+                if (ext[i + 2] & 0x0c)   // PQ or HLG
+                    return true;
+            }
+            i += 1 + blocklen;
+        }
+    }
+    return false;
+}
+
+// True if a connected display is HDR-capable (per its EDID) but macOS is not
+// currently presenting HDR -- i.e. the System Settings "High Dynamic Range"
+// toggle is off. Detected as: no screen has EDR headroom (so VbamProbeMacosHdr
+// would report unavailable) yet some display's EDID advertises HDR. Mirrors the
+// Windows "supported but off" case so the dialog can suppress the "HDR not
+// available" warning for a deliberate, reversible off-state.
+bool VbamMacosHdrSupportedButOff() {
+    // Any EDR headroom means HDR is actually on -- not the "off" case.
+    for (NSScreen* screen in [NSScreen screens]) {
+        if (screen.maximumPotentialExtendedDynamicRangeColorComponentValue > 1.0)
+            return false;
+    }
+    // No headroom anywhere: is any connected panel HDR-capable in hardware?
+    bool capable = false;
+    io_iterator_t it = 0;
+    if (IOServiceGetMatchingServices(kIOMainPortDefault,
+            IOServiceMatching("IODisplay"), &it) == KERN_SUCCESS) {
+        io_service_t svc;
+        while ((svc = IOIteratorNext(it))) {
+            CFMutableDictionaryRef props = NULL;
+            if (IORegistryEntryCreateCFProperties(
+                    svc, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS && props) {
+                NSData* edid = ((__bridge NSDictionary*)props)[@"IODisplayEDID"];
+                if (edid && EdidDeclaresHdr(
+                        static_cast<const uint8_t*>(edid.bytes), edid.length))
+                    capable = true;
+                CFRelease(props);
+            }
+            IOObjectRelease(svc);
+            if (capable)
+                break;
+        }
+        IOObjectRelease(it);
+    }
+    return capable;
 }
 
 // macOS version checks. Not Metal-specific: the Vulkan (MoltenVK) path also
@@ -117,6 +276,16 @@ void MetalDrawingPanel::EraseBackground(wxEraseEvent& ev)
     // do nothing, do not allow propagation
 }
 
+// The view's backing scale factor (2 or 3 on Retina/HiDPI). A CAMetalLayer's
+// drawableSize is in physical pixels, so point sizes must be multiplied by this
+// or the framebuffer comes up at half resolution and gets upscaled (soft).
+static CGFloat MetalBackingScale(NSView* v) {
+    CGFloat sf = v.window ? v.window.backingScaleFactor : 0.0;
+    if (sf <= 0.0)
+        sf = NSScreen.mainScreen.backingScaleFactor;
+    return sf > 0.0 ? sf : 1.0;
+}
+
 void MetalDrawingPanel::CreateMetalView()
 {
     view = (NSView *)wxGetApp().frame->GetPanel()->GetHandle();
@@ -128,12 +297,43 @@ void MetalDrawingPanel::CreateMetalView()
 
     metalView = [[MTKView alloc] init];
 
+    // We drive rendering imperatively from DrawArea() (per emulated frame and on
+    // paint), acquiring and presenting currentDrawable ourselves. Leave MTKView's
+    // own CADisplayLink draw loop off, otherwise it cycles/presents drawables on
+    // its vsync timer concurrently with our manual presents, which intermittently
+    // leaves part of an older frame on screen (e.g. a stale strip at one edge).
+    metalView.paused = YES;
+    metalView.enableSetNeedsDisplay = NO;
+
     metalView.layer.backgroundColor = [NSColor colorWithCalibratedRed:0.0f
                                                                 green:0.0f
                                                                  blue:0.0f
                                                                 alpha:0.0f].CGColor;
     metalView.device = MTLCreateSystemDefaultDevice();
-    metalView.colorPixelFormat = MTLPixelFormatRGBA8Unorm;
+
+    // HDR / EDR: when requested and the screen has dynamic-range headroom, use a
+    // float back buffer in linear extended-sRGB so values above 1.0 map to the
+    // panel's extra brightness. The encoder produces matching scRGB fp16 data.
+    metal_is_hdr_ = false;
+    if (OPTION(kDispHDR)) {
+        NSScreen* screen = view.window.screen ?: [NSScreen mainScreen];
+        // Potential, not current: the layer has not requested EDR content yet,
+        // so the current headroom is still 1.0 at this point.
+        if (screen.maximumPotentialExtendedDynamicRangeColorComponentValue > 1.0)
+            metal_is_hdr_ = true;
+    }
+
+    metalView.colorPixelFormat =
+        metal_is_hdr_ ? MTLPixelFormatRGBA16Float : MTLPixelFormatRGBA8Unorm;
+
+    if (metal_is_hdr_) {
+        CAMetalLayer* hdrLayer = (CAMetalLayer*)metalView.layer;
+        hdrLayer.wantsExtendedDynamicRangeContent = YES;
+        CGColorSpaceRef cs =
+            CGColorSpaceCreateWithName(kCGColorSpaceExtendedLinearDisplayP3);
+        hdrLayer.colorspace = cs;
+        if (cs) CGColorSpaceRelease(cs);
+    }
 
     metalView.layerContentsRedrawPolicy = NSViewLayerContentsRedrawDuringViewResize;
     metalView.layerContentsPlacement = NSViewLayerContentsPlacementCenter;
@@ -238,14 +438,22 @@ void MetalDrawingPanel::CreateMetalView()
         metalView.frame = metalFrame;
     }
 
-    metalView.wantsLayer = YES;
-    metalView.layer.contentsScale = 1.0;
-    metalView.autoResizeDrawable = NO;
-    metalView.drawableSize = metalFrame.size;
-    ((CAMetalLayer *)metalView.layer).drawableSize = metalFrame.size;
+    // drawableSize is in physical pixels: scale the point-sized frame by the
+    // backing factor so the framebuffer (and the render viewport) is at native
+    // resolution rather than half-res upscaled by Core Animation on Retina.
+    const CGFloat sf = MetalBackingScale(view);
+    const CGSize drawablePx =
+        CGSizeMake(std::ceil(metalFrame.size.width * sf),
+                   std::ceil(metalFrame.size.height * sf));
 
-    _contentSize.x = metalFrame.size.width;
-    _contentSize.y = metalFrame.size.height;
+    metalView.wantsLayer = YES;
+    metalView.layer.contentsScale = sf;
+    metalView.autoResizeDrawable = NO;
+    metalView.drawableSize = drawablePx;
+    ((CAMetalLayer *)metalView.layer).drawableSize = drawablePx;
+
+    _contentSize.x = drawablePx.width;
+    _contentSize.y = drawablePx.height;
     _viewportSize.x = width * scale;
     _viewportSize.y = height * scale;
 
@@ -266,6 +474,10 @@ void MetalDrawingPanel::DrawingPanelInit()
     _conversion_buffer_size = 0;
 
     CreateMetalView();
+
+    // CreateMetalView() has decided metal_is_hdr_; fold the brightness settings
+    // into the encoder and activate the scRGB encoding if HDR is on.
+    UpdateHdrState();
 
     did_init = true;
 }
@@ -322,11 +534,18 @@ void MetalDrawingPanel::OnSize(wxSizeEvent& ev)
         metalView.frame = metalFrame;
     }
 
-    metalView.drawableSize = metalFrame.size;
-    ((CAMetalLayer *)metalView.layer).drawableSize = metalFrame.size;
+    // Match CreateMetalView: drawable in physical pixels (native, not half-res).
+    const CGFloat sf = MetalBackingScale(view);
+    const CGSize drawablePx =
+        CGSizeMake(std::ceil(metalFrame.size.width * sf),
+                   std::ceil(metalFrame.size.height * sf));
 
-    _contentSize.x = metalFrame.size.width;
-    _contentSize.y = metalFrame.size.height;
+    metalView.layer.contentsScale = sf;
+    metalView.drawableSize = drawablePx;
+    ((CAMetalLayer *)metalView.layer).drawableSize = drawablePx;
+
+    _contentSize.x = drawablePx.width;
+    _contentSize.y = drawablePx.height;
     _viewportSize.x = width * scale;
     _viewportSize.y = height * scale;
 
@@ -483,6 +702,23 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
             }
             _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
+        } else if (HdrActive() && metal_is_hdr_ && panel_color_depth_ == 32) {
+            // HDR: encode the corrected RGBA8 image to linear scRGB fp16
+            // (8 bytes/pixel) matching the RGBA16Float EDR layer.
+            int w = (int)(width * scale);
+            int h = (int)(height * scale);
+            size_t required_size = (size_t)w * h * 8;
+            if (_conversion_buffer_size < required_size) {
+                if (_conversion_buffer != NULL) free(_conversion_buffer);
+                _conversion_buffer = (uint32_t*)malloc(required_size);
+                _conversion_buffer_size = required_size;
+            }
+            hdr::EncodeScRGBFp16(todraw + srcPitch, srcPitch, w, h,
+                                 (uint16_t*)_conversion_buffer, w * 8);
+            if (_texture != nil) {
+                [_texture release];
+            }
+            _texture = CreateTextureWithData(_conversion_buffer, w * 8);
         } else {
             // Release old texture and create new one
             // 32bpp todraw has borders; skip 1 row of top border
@@ -492,8 +728,13 @@ void MetalDrawingPanel::DrawArea()
             _texture = CreateTextureWithData(todraw + srcPitch, srcPitch);
         }
 
-        // Get the drawable from MTKView (non-blocking)
-        id<CAMetalDrawable> drawable = metalView.currentDrawable;
+        // Acquire the drawable straight from the CAMetalLayer rather than
+        // MTKView.currentDrawable: with the view paused (no internal draw loop)
+        // currentDrawable is only vended inside MTKView's own draw cycle and would
+        // be nil here. nextDrawable gives us a fresh drawable per manual present,
+        // with no contention from the view's vsync timer.
+        CAMetalLayer* metalLayer = (CAMetalLayer*)metalView.layer;
+        id<CAMetalDrawable> drawable = [metalLayer nextDrawable];
         if (drawable == nil) {
             return;  // No drawable available, skip this frame
         }
@@ -548,6 +789,31 @@ void MetalDrawingPanel::DrawArea()
 Quartz2DDrawingPanel::Quartz2DDrawingPanel(wxWindow* parent, int _width, int _height)
     : BasicDrawingPanel(parent, _width, _height)
 {
+    // BasicDrawingPanel never runs DrawingPanelInit(), so set the HDR state up
+    // here (availability is already known from the startup probe).
+    UpdateHdrState();
+    // Mark initialized so GameArea runs the HDR "working" check
+    // (EvaluateHdrRenderer): if this panel isn't presenting HDR while HDR is
+    // available, it records the failure and falls back to another HDR renderer
+    // (e.g. Metal or Vulkan).
+    did_init = true;
+}
+
+bool Quartz2DDrawingPanel::SupportsHdr() const
+{
+    // Probe the EDR headroom of the screen this window is currently on, rather
+    // than the global startup probe (which only checks the main screen). EDR is
+    // presentable when the screen's maximum extended-dynamic-range component
+    // value exceeds 1.0. Falls back to the main screen before the window is
+    // placed (e.g. when called from the constructor's UpdateHdrState()).
+    NSView* view =
+        (NSView*)const_cast<Quartz2DDrawingPanel*>(this)->GetWindow()->GetHandle();
+    NSScreen* screen = view ? view.window.screen : nil;
+    if (!screen)
+        screen = [NSScreen mainScreen];
+    if (!screen)
+        return false;
+    return screen.maximumExtendedDynamicRangeColorComponentValue > 1.0;
 }
 
 void Quartz2DDrawingPanel::DrawImage([[maybe_unused]] wxWindowDC& dc, wxImage* im)
@@ -555,15 +821,40 @@ void Quartz2DDrawingPanel::DrawImage([[maybe_unused]] wxWindowDC& dc, wxImage* i
     NSView *view = (NSView *)GetWindow()->GetHandle();
     size_t w    = std::ceil(width  * scale);
     size_t h    = std::ceil(height * scale);
-    size_t size = w * h * 3;
 
-    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, im->GetData(), size, NULL);
+    const bool hdr = HdrActive() && panel_color_depth_ == 32;
 
-    CGColorSpaceRef color_space = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+    CGDataProviderRef provider = nullptr;
+    CGColorSpaceRef color_space = nullptr;
     CGImageRef image = nil;
 
-    image = CGImageCreate(w, h, 8, 24, w * 3, color_space, kCGBitmapByteOrderDefault,
-                          provider, NULL, true, kCGRenderingIntentDefault);
+    if (hdr) {
+        // Enable an EDR, float-backed layer for the view.
+        view.wantsLayer = YES;
+        view.layer.contentsFormat = kCAContentsFormatRGBA16Float;
+        if ([view.layer respondsToSelector:@selector(setWantsExtendedDynamicRangeContent:)])
+            [view.layer setValue:@YES forKey:@"wantsExtendedDynamicRangeContent"];
+
+        // Encode the corrected image to linear scRGB fp16 (RGBA halves).
+        int rowlen = (int)std::ceil((width + 1) * scale);  // 1px filter border
+        const uint8_t* tex_ptr = todraw + (size_t)rowlen * 4;
+        int bpp = 0;
+        const uint8_t* enc = EncodeHdr(tex_ptr, rowlen * 4, (int)w, (int)h, &bpp);
+
+        provider = CGDataProviderCreateWithData(NULL, enc, w * h * 8, NULL);
+        color_space = CGColorSpaceCreateWithName(kCGColorSpaceExtendedLinearDisplayP3);
+        const CGBitmapInfo info = kCGBitmapByteOrder16Little |
+                                  kCGBitmapFloatComponents |
+                                  (CGBitmapInfo)kCGImageAlphaLast;
+        image = CGImageCreate(w, h, 16, 64, w * 8, color_space, info,
+                              provider, NULL, false, kCGRenderingIntentDefault);
+    } else {
+        size_t size = w * h * 3;
+        provider = CGDataProviderCreateWithData(NULL, im->GetData(), size, NULL);
+        color_space = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB);
+        image = CGImageCreate(w, h, 8, 24, w * 3, color_space, kCGBitmapByteOrderDefault,
+                              provider, NULL, true, kCGRenderingIntentDefault);
+    }
 
     // draw the image
 #if MAC_OS_X_VERSION_MIN_REQUIRED >= 101000

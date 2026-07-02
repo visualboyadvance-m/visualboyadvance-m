@@ -199,6 +199,8 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `ENABLE_VULKAN`                           | Enable Vulkan video output                                           | ON                    |
 | `ENABLE_DIRECT3D`                         | Enable Direct3D 9 support (Windows only)                             | ON - Win              |
 | `ENABLE_DIRECT3D12`                       | Enable Direct3D 12 support (Windows only)                            | ON - Win              |
+| `ENABLE_DIRECT3D11`                       | Enable Direct3D 11 support (Windows only)                            | ON - Win              |
+| `ENABLE_WAYLAND_PROTOCOLS`                | Generate Wayland protocol client glue (HDR, viewporter)              | ON if detected        |
 
 Note for distro packagers, we use the CMake module
 [GNUInstallDirs](https://cmake.org/cmake/help/v2.8.12/cmake.html#module:GNUInstallDirs)

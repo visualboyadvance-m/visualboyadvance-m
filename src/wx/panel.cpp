@@ -15,17 +15,28 @@
 
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
     #define Status int
     #include <gdk/gdkx.h>
 
 #ifndef NO_WAYLAND
     #include <gdk/gdkwayland.h>
+    #include <wayland-client.h>
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    #include "viewporter-client-protocol.h"
+#endif
+    // For the software "Simple" Wayland HDR path's shm buffers.
+    #include <sys/mman.h>
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <cstdlib>
 #endif
 
     #include <gtk/gtk.h>
     // For Wayland EGL.
     #ifdef HAVE_EGL
         #include <EGL/egl.h>
+        #include <EGL/eglext.h>
     #endif
 #ifdef HAVE_XSS
     #include <X11/extensions/scrnsaver.h>
@@ -72,6 +83,10 @@
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
 #include "wx/drawing.h"
+
+#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+#include <wx/dynlib.h>  // wxDynamicLibrary, for run-time Vulkan loader resolution
+#endif
 
 #ifndef NO_WAYLAND
 #include "wx/wayland.h"
@@ -632,8 +647,11 @@ GameArea::GameArea()
                         config::OptionID::kDispFilterPlugin, config::OptionID::kDispRenderMethod,
                         config::OptionID::kDispIFB, config::OptionID::kDispStretch,
                         config::OptionID::kPrefVsync, config::OptionID::kSDLRenderer,
-                        config::OptionID::kBitDepth},
+                        config::OptionID::kBitDepth, config::OptionID::kDispHDR,
+                        config::OptionID::kDispDeepColor},
                        std::bind(&GameArea::ResetPanel, this)),
+      color_correction_auto_observer_(config::OptionID::kDispHDR,
+                                      std::bind(&GameArea::ApplyAutoColorCorrection, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
       gb_border_observer_(config::OptionID::kPrefBorderOn,
                           std::bind(&GameArea::OnGBBorderChanged, this, std::placeholders::_1)),
@@ -643,7 +661,8 @@ GameArea::GameArea()
       gb_declick_observer_(
           config::OptionID::kSoundGBDeclicking,
           [&](config::Option* option) { gbSoundSetDeclicking(option->GetBool()); }),
-      lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBADarken, config::OptionID::kGBLighten, config::OptionID::kDispColorCorrectionProfile, config::OptionID::kGBALCDFilter},
+      lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBADarken, config::OptionID::kGBLighten, config::OptionID::kDispColorCorrectionProfile, config::OptionID::kGBALCDFilter,
+                             config::OptionID::kDispHDRReferenceWhite, config::OptionID::kDispHDRPeakBrightness, config::OptionID::kDispHDRHighlightKnee, config::OptionID::kDispHDRShadowContrast},
                             std::bind(&GameArea::UpdateLcdFilter, this)),
       audio_rate_observer_(config::OptionID::kSoundAudioRate,
                            std::bind(&GameArea::OnAudioRateChanged, this)),
@@ -1499,6 +1518,9 @@ void GameArea::AdjustSize(bool force)
 }
 
 void GameArea::ResetPanel() {
+    // The new panel's renderer-init and HDR success must be re-evaluated.
+    hdr_evaluated_ = false;
+    renderer_evaluated_ = false;
     if (panel) {
         // Pause emulation while panel is being reset to prevent crashes
         // from accessing invalid panel state during the transition.
@@ -1537,6 +1559,18 @@ void GameArea::ResetPanel() {
             delete dx9;
         } else
 #endif
+        // SDL panels must also be destroyed synchronously. wx's deferred
+        // Destroy() keeps the old SDL window -- and the swapchain/CAMetalLayer it
+        // attached to the borrowed host view -- alive until the event loop runs
+        // the deferred delete. The replacement panel creates a new SDL window on
+        // the same host view first, so the stale layer from the old renderer
+        // lingers behind it (seen as bars of the previous frame at the edges)
+        // when switching SDL sub-renderers. Deleting now tears it down in time.
+        // Use the concrete type so the (non-virtual) DrawingPanelBase destructor
+        // chain runs correctly.
+        if (auto* sdl = dynamic_cast<SDLDrawingPanel*>(panel)) {
+            delete sdl;
+        } else
         {
         panel->Destroy();
         }
@@ -1856,63 +1890,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 
     if (!panel) {
-        switch (OPTION(kDispRenderMethod)) {
-            case config::RenderMethod::kSimple:
-                panel = new BasicDrawingPanel(this, basic_width, basic_height);
-                break;
-            case config::RenderMethod::kSDL:
-                panel = new SDLDrawingPanel(this, basic_width, basic_height);
-                break;
-#ifdef __WXMAC__
-#ifndef NO_METAL
-            case config::RenderMethod::kMetal:
-                if (is_macosx_1012_or_newer()) {
-                    panel =
-                    new MetalDrawingPanel(this, basic_width, basic_height);
-                } else {
-                    panel = new GLDrawingPanel(this, basic_width, basic_height);
-                    wxLogInfo(_("Metal is unavailable, defaulting to OpenGL"));
-                }
-                break;
-#endif
-            case config::RenderMethod::kQuartz2d:
-                panel =
-                    new Quartz2DDrawingPanel(this, basic_width, basic_height);
-                break;
-#endif
-#ifndef NO_OGL
-            case config::RenderMethod::kOpenGL:
-                panel = new GLDrawingPanel(this, basic_width, basic_height);
-                break;
-#endif
-#if defined(__WXMSW__) && !defined(NO_D3D)
-            case config::RenderMethod::kDirect3d:
-                panel = new DXDrawingPanel(this, basic_width, basic_height);
-                break;
-#endif
-#if defined(__WXMSW__) && !defined(NO_D3D12)
-            case config::RenderMethod::kDirect3d12:
-                panel = new DX12DrawingPanel(this, basic_width, basic_height);
-                break;
-#endif
-#ifndef NO_VULKAN
-            case config::RenderMethod::kVulkan:
-#ifdef __WXMAC__
-                if (is_macosx_11_or_newer()) {
-#endif
-                    panel = new VKDrawingPanel(this, basic_width, basic_height);
-#ifdef __WXMAC__
-                } else {
-                    panel = new GLDrawingPanel(this, basic_width, basic_height);
-                    wxLogInfo(_("Vulkan is unavailable, defaulting to OpenGL"));
-                }
-#endif
-                break;
-#endif
-            case config::RenderMethod::kLast:
-                VBAM_NOTREACHED();
-                return;
-        }
+        panel = NewPanelForRenderMethod(OPTION(kDispRenderMethod));
+        if (!panel)
+            return;
 
         wxWindow* w = NULL;
 
@@ -1985,6 +1965,41 @@ void GameArea::OnIdle(wxIdleEvent& event)
         // The next OnIdle will start emulation.
         event.RequestMore();
         return;
+    }
+
+    // Once the new panel is initialized, check whether it actually presents HDR
+    // (when HDR is requested). A renderer that fails is recorded and another is
+    // tried; if all fail, HDR reverts to SDR. This may change the render method
+    // or HDR option, scheduling another panel reset.
+    // If the active renderer failed to initialize (no device/context/renderer),
+    // fall back to the next renderer in the platform priority list before
+    // evaluating HDR/deep color. Gate on init having resolved -- either it
+    // succeeded (DrawingInitialized) or it explicitly failed (DrawingInitFailed).
+    if (panel && !renderer_evaluated_ &&
+        (panel->DrawingInitialized() || panel->DrawingInitFailed())) {
+        renderer_evaluated_ = true;
+        if (panel->DrawingInitFailed()) {
+            EvaluateRenderer();  // may switch the render method, resetting the panel
+            if (!panel) {
+                event.RequestMore();
+                return;
+            }
+        }
+    }
+
+    if (panel && !hdr_evaluated_ && panel->DrawingInitialized()) {
+        hdr_evaluated_ = true;
+        EvaluateHdrRenderer();
+        EvaluateDeepColorRenderer();
+        // Switching the render method fires the render observer, which resets
+        // the panel synchronously (panel == NULL). The recreation path below
+        // requires another idle tick, and the RequestMore() at the bottom of
+        // OnIdle only runs while a panel exists -- so request one here and let
+        // the next tick recreate the panel with the new renderer.
+        if (!panel) {
+            event.RequestMore();
+            return;
+        }
     }
 
     // Resume emulation if we paused for a panel reset and the panel is now ready
@@ -2317,6 +2332,13 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         systemColorDepth = panel_color_depth_;  // Core needs this to output correct format
     }
 
+    // HDR output re-encodes the final RGBA8 image, so force a 32-bit source
+    // when it is enabled (unless an RPI plugin has locked us to 16-bit).
+    if (hdr::HdrAvailable() && OPTION(kDispHDR) && !(rpi_ && rpi_bpp_ == 2)) {
+        panel_color_depth_ = 32;
+        systemColorDepth = 32;
+    }
+
     // Intialize color tables based on panel's color depth
     if (panel_color_depth_ == 24) {
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
@@ -2370,6 +2392,72 @@ DrawingPanel::DrawingPanel(wxWindow* parent, int _width, int _height)
 void DrawingPanelBase::DrawingPanelInit()
 {
     did_init = true;
+    UpdateHdrState();
+}
+
+void DrawingPanelBase::UpdateHdrState()
+{
+    hdr::Settings s;
+    s.enabled = OPTION(kDispHDR) && SupportsHdr();
+    s.sdr_reference_nits = static_cast<float>(OPTION(kDispHDRReferenceWhite));
+    s.peak_nits = static_cast<float>(OPTION(kDispHDRPeakBrightness));
+    // Never encode above what the display can present: on the scRGB/EDR path
+    // anything brighter just clips, and on PQ the compositor tone-maps a phantom
+    // range and dims real highlights. When the display's peak is known, cap to it
+    // -- this is also what makes the "auto" default (peak set to the option max)
+    // resolve to the display's peak. 0 = unknown, leave the setting as-is.
+    if (const uint32_t dp = hdr::DisplayPeakNits())
+        s.peak_nits = std::min(s.peak_nits, static_cast<float>(dp));
+    s.highlight_knee = static_cast<float>(OPTION(kDispHDRHighlightKnee)) / 100.0f;
+    s.shadow_contrast = static_cast<float>(OPTION(kDispHDRShadowContrast)) / 100.0f;
+    s.input_is_rec2020 =
+        OPTION(kDispColorCorrectionProfile) == config::ColorCorrectionProfile::kRec2020;
+    // scRGB consumers (macOS EDR, SDL3) use a relative model where SDR white is
+    // 1.0; the PQ path doesn't use this. Map our reference white to 1.0.
+    // scRGB white point: the nits that map to 1.0 in the float output.
+    //  * macOS EDR (and any relative scRGB surface): SDR white is the system
+    //    brightness, so map the reference white to 1.0.
+    //  * Windows scRGB via SDL: SDL auto-multiplies its SDR white point (> 1)
+    //    into the output, so map that absolute white (HdrScRgbWhiteNits) to 1.0
+    //    to cancel the multiply and land content at its true nits.
+    //  * PQ path doesn't use this.
+    if (PreferredHdrEncoding() == hdr::Encoding::kScRGBFp16) {
+        const float scrgb_white = HdrScRgbWhiteNits();
+        s.scrgb_white_nits = scrgb_white > 0.0f ? scrgb_white : s.sdr_reference_nits;
+    } else {
+        s.scrgb_white_nits = 80.0f;
+    }
+    s.scrgb_target_p3 = HdrScRgbUsesP3();
+    hdr::Configure(s);
+
+    hdr_encoding_ = s.enabled ? PreferredHdrEncoding() : hdr::Encoding::kNone;
+}
+
+const uint8_t* DrawingPanelBase::EncodeHdr(const uint8_t* src, int src_stride,
+                                           int row_pixels, int rows, int* out_bpp)
+{
+    const int bpp = hdr::BytesPerPixel(hdr_encoding_);
+    if (out_bpp)
+        *out_bpp = bpp;
+    if (bpp == 0 || row_pixels <= 0 || rows <= 0)
+        return src;
+
+    const int dst_stride = row_pixels * bpp;
+    hdr_buf_.resize(static_cast<size_t>(dst_stride) * rows);
+
+    switch (hdr_encoding_) {
+        case hdr::Encoding::kPQ10:
+            hdr::EncodePQ10(src, src_stride, row_pixels, rows,
+                            reinterpret_cast<uint32_t*>(hdr_buf_.data()), dst_stride);
+            break;
+        case hdr::Encoding::kScRGBFp16:
+            hdr::EncodeScRGBFp16(src, src_stride, row_pixels, rows,
+                                 reinterpret_cast<uint16_t*>(hdr_buf_.data()), dst_stride);
+            break;
+        case hdr::Encoding::kNone:
+            return src;
+    }
+    return hdr_buf_.data();
 }
 
 void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
@@ -3623,16 +3711,53 @@ SDLDrawingPanel::~SDLDrawingPanel()
 {
     if (did_init)
     {
-        if (sdlwindow != NULL)
-             SDL_DestroyWindow(sdlwindow);
-
+        // Tear down in reverse order of creation: texture and renderer (which
+        // own the swapchain / CAMetalLayer attached to the borrowed host view)
+        // before the window. Destroying the window first orphans the renderer
+        // and can leave its layer behind on the host view as stale content.
         if (texture != NULL)
              SDL_DestroyTexture(texture);
 
         if (renderer != NULL)
              SDL_DestroyRenderer(renderer);
 
+        if (sdlwindow != NULL)
+             SDL_DestroyWindow(sdlwindow);
+#if defined(__WXMAC__)
+        // SDL leaves its SDL3_cocoametalview attached to the borrowed (persistent
+        // GameArea) host view on teardown; detach it so its CAMetalLayer's last
+        // frame doesn't show through as stale bars after a sub-renderer switch.
+        VbamRemoveSdlMetalViews();
+#endif
+
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+#if defined(HAVE_WAYLAND_SUPPORT)
+        // Tear down the Wayland subsurface SDL was presenting into, now that SDL
+        // has released it (destroy child objects before their globals).
+        if (sdl_wl_subsurface_) {
+            wl_subsurface_destroy(static_cast<wl_subsurface*>(sdl_wl_subsurface_));
+            sdl_wl_subsurface_ = nullptr;
+        }
+        if (sdl_wl_child_surface_) {
+            wl_surface_destroy(static_cast<wl_surface*>(sdl_wl_child_surface_));
+            sdl_wl_child_surface_ = nullptr;
+        }
+        if (sdl_wl_subcompositor_) {
+            wl_subcompositor_destroy(static_cast<wl_subcompositor*>(sdl_wl_subcompositor_));
+            sdl_wl_subcompositor_ = nullptr;
+        }
+        if (sdl_wl_compositor_) {
+            wl_compositor_destroy(static_cast<wl_compositor*>(sdl_wl_compositor_));
+            sdl_wl_compositor_ = nullptr;
+        }
+        // Destroy the private bind queue last: the globals/subsurface above were
+        // assigned to it.
+        if (sdl_wl_queue_) {
+            wl_event_queue_destroy(static_cast<wl_event_queue*>(sdl_wl_queue_));
+            sdl_wl_queue_ = nullptr;
+        }
+#endif
 
         did_init = false;
     }
@@ -3646,7 +3771,6 @@ void SDLDrawingPanel::EraseBackground(wxEraseEvent& ev)
 
 void SDLDrawingPanel::PaintEv(wxPaintEvent& ev)
 {
-    // FIXME: implement
     if (!did_init) {
         DrawingPanelInit();
     }
@@ -3654,20 +3778,128 @@ void SDLDrawingPanel::PaintEv(wxPaintEvent& ev)
     (void)ev; // unused params
 
     if (!todraw) {
-        // since this is set for custom background, not drawing anything
-        // will cause garbage to be displayed, so draw a black area
-        draw_black_background(GetWindow());
+        // No frame yet. Clear the placeholder through SDL, never with a wx DC:
+        // on macOS the GL backends make this view an NSOpenGLView and any wx DC
+        // drawing on it spins an endless repaint loop (see DrawingPanelInit), which
+        // would also starve emulation so todraw never arrives. SDL_RenderClear is
+        // the right way to blank an SDL surface on every platform anyway.
+        if (renderer) {
+            SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+            SDL_RenderClear(renderer);
+            SDL_RenderPresent(renderer);
+        }
         return;
     }
 
-    if (todraw) {
-        DrawArea();
+    DrawArea();
+}
+
+#ifdef ENABLE_SDL3
+// Pick a 10-bit packed (2101010) texture format the SDL renderer advertises, or
+// SDL_PIXELFORMAT_UNKNOWN when it offers none. Used for X11 "deep color" SDR:
+// only backends that can render to a 10-bit target qualify.
+static SDL_PixelFormat SdlPickDeepColorFormat(SDL_Renderer* r) {
+    auto is_2101010 = [](SDL_PixelFormat f) {
+        return f == SDL_PIXELFORMAT_XRGB2101010 || f == SDL_PIXELFORMAT_ARGB2101010 ||
+               f == SDL_PIXELFORMAT_XBGR2101010 || f == SDL_PIXELFORMAT_ABGR2101010;
+    };
+    SDL_PropertiesID rp = SDL_GetRendererProperties(r);
+    const SDL_PixelFormat* fmts = (const SDL_PixelFormat*)SDL_GetPointerProperty(
+        rp, SDL_PROP_RENDERER_TEXTURE_FORMATS_POINTER, NULL);
+    for (; fmts && *fmts != SDL_PIXELFORMAT_UNKNOWN; ++fmts)
+        if (is_2101010(*fmts))
+            return *fmts;
+    return SDL_PIXELFORMAT_UNKNOWN;
+}
+
+// Pack a color-corrected RGBA8 image (memory order R,G,B,X) into a 2101010
+// texture. The 8-bit source is expanded to 10 bits, so the win is a 10-bit
+// output surface and 10-bit scaling/blending (less banding), not extra source
+// precision -- the same trade-off the OpenGL deep-color path makes.
+static void SdlPackDeepColor(const uint8_t* src, int src_stride, int w, int h,
+                             SDL_PixelFormat fmt, uint32_t* dst, int dst_stride_px) {
+    const bool bgr = (fmt == SDL_PIXELFORMAT_ABGR2101010 ||
+                      fmt == SDL_PIXELFORMAT_XBGR2101010);
+    for (int y = 0; y < h; ++y) {
+        const uint8_t* sp = src + (size_t)y * src_stride;
+        uint32_t* dp = dst + (size_t)y * dst_stride_px;
+        for (int x = 0; x < w; ++x, sp += 4) {
+            uint32_t r = sp[0], g = sp[1], b = sp[2];
+            r = (r << 2) | (r >> 6);
+            g = (g << 2) | (g >> 6);
+            b = (b << 2) | (b >> 6);
+            // ARGB2101010 layout: A[31:30] R[29:20] G[19:10] B[9:0]; the BGR
+            // variants swap red and blue. Alpha is opaque (3).
+            const uint32_t hi = bgr ? b : r;
+            const uint32_t lo = bgr ? r : b;
+            dp[x] = (3u << 30) | (hi << 20) | (g << 10) | lo;
+        }
     }
 }
+#endif
+
+#if defined(__WXGTK__) && !defined(NO_WAYLAND) && defined(ENABLE_SDL3)
+namespace {
+// SDL cannot present into GTK's own wl_surface on Wayland (GTK drives it), so we
+// hand SDL a dedicated child wl_subsurface instead -- the same approach
+// VKDrawingPanel uses for its swapchain. Bound per panel.
+struct VbamSdlWlGlobals {
+    struct wl_compositor*    comp    = nullptr;
+    struct wl_subcompositor* subcomp = nullptr;
+};
+void vbam_sdl_wl_global(void* data, struct wl_registry* reg, uint32_t name,
+                        const char* iface, uint32_t /*version*/) {
+    auto* g = static_cast<VbamSdlWlGlobals*>(data);
+    if (std::strcmp(iface, "wl_compositor") == 0)
+        g->comp = static_cast<struct wl_compositor*>(
+            wl_registry_bind(reg, name, &wl_compositor_interface, 1));
+    else if (std::strcmp(iface, "wl_subcompositor") == 0)
+        g->subcomp = static_cast<struct wl_subcompositor*>(
+            wl_registry_bind(reg, name, &wl_subcompositor_interface, 1));
+}
+void vbam_sdl_wl_global_remove(void*, struct wl_registry*, uint32_t) {}
+const struct wl_registry_listener kVbamSdlWlRegistryListener = {
+    vbam_sdl_wl_global, vbam_sdl_wl_global_remove
+};
+}  // namespace
+#endif
 
 void SDLDrawingPanel::DrawingPanelInit()
 {
     wxString renderer_name = OPTION(kSDLRenderer);
+
+    // Two SDL backends don't work into our borrowed Wayland subsurface: "gpu"
+    // presents a black frame (its SDL_GPU swapchain is gated on the window being
+    // "shown", which never happens for our custom roleless surface), and
+    // "opengles2" fails to create (eglMakeCurrent -> EGL_BAD_SURFACE on the EGL
+    // surface SDL makes for our wl_egl_window). The dialog no longer offers
+    // either on Wayland, but a saved config may still select one -- substitute
+    // the working equivalent (vulkan for gpu, desktop opengl for opengles2) so we
+    // never come up black or fail.
+    if (IsWayland()) {
+        if (renderer_name == wxString("gpu"))
+            renderer_name = wxString("vulkan");
+        else if (renderer_name == wxString("opengles2"))
+            renderer_name = wxString("opengl");
+    }
+
+#if defined(__WXMAC__)
+    // macOS has no native OpenGL ES, so SDL's "opengles2" renderer fails to
+    // create; desktop "opengl" is the working equivalent (and the dialog no
+    // longer offers opengles2 here). Substitute it so a saved choice still runs
+    // instead of erroring on every launch.
+    if (renderer_name == wxString("opengles2"))
+        renderer_name = wxString("opengl");
+
+    // The view we hand SDL as its render target: the GL backends need this
+    // panel's own (frontmost) view -- SDL turns it into an NSOpenGLView and GL
+    // into GameArea would sit under this view -- while metal/gpu/software use the
+    // shared GameArea view. SDL then makes whichever we pass the window's
+    // contentView; VbamSdlCaptureViewState/ReattachViewState undo that below.
+    sdl_cocoa_view_ = (renderer_name == wxString("opengl"))
+                          ? GetHandle()
+                          : wxGetApp().frame->GetPanel()->GetHandle();
+#endif
 
 #ifdef ENABLE_SDL3
     SDL_PropertiesID props = SDL_CreateProperties();
@@ -3683,10 +3915,76 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
         wayland_display = gdk_wayland_display_get_wl_display(gtk_widget_get_display(widget));
-        wayland_surface = gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
+        struct wl_surface* gtk_surface =
+            gdk_wayland_window_get_wl_surface(gtk_widget_get_window(widget));
 
-        if (SDL_SetPointerProperty(SDL_GetGlobalProperties(), SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, wayland_display) == false) {
+        // SDL cannot present into GTK's own surface; create a dedicated child
+        // subsurface and hand SDL that instead (mirrors VKDrawingPanel).
+        //
+        // Bind our globals on a PRIVATE event queue. wl_display_roundtrip()
+        // dispatches the display's *default* queue -- the one GTK/GDK owns and
+        // pumps from its own main loop. Driving it from here reenters GDK's
+        // dispatch and corrupts libwayland's reader bookkeeping, which surfaces
+        // as GDK's "Error 22 (Invalid argument) dispatching to Wayland display".
+        // A dedicated queue keeps this one-shot registry roundtrip off GDK's
+        // queue; objects bound from the registry inherit the queue, so it is
+        // kept alive for the panel's lifetime (torn down in the destructor).
+        VbamSdlWlGlobals g;
+        struct wl_event_queue* wlq = wl_display_create_queue(wayland_display);
+        struct wl_registry* reg = wl_display_get_registry(wayland_display);
+        wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(reg), wlq);
+        wl_registry_add_listener(reg, &kVbamSdlWlRegistryListener, &g);
+        wl_display_roundtrip_queue(wayland_display, wlq);
+        wl_registry_destroy(reg);
+        sdl_wl_queue_ = wlq;
+        if (g.comp && g.subcomp && gtk_surface) {
+            struct wl_surface* child = wl_compositor_create_surface(g.comp);
+            struct wl_subsurface* sub =
+                wl_subcompositor_get_subsurface(g.subcomp, child, gtk_surface);
+            // Desync so SDL's presents take effect without a parent commit; drop
+            // the input region so GTK keeps handling pointer/keyboard.
+            wl_subsurface_set_desync(sub);
+            struct wl_region* empty = wl_compositor_create_region(g.comp);
+            wl_surface_set_input_region(child, empty);
+            wl_region_destroy(empty);
+            // Position over the panel (toplevel-relative, like the Vulkan path).
+            GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+            int sx = 0, sy = 0;
+            gtk_widget_translate_coordinates(widget, toplevel, 0, 0, &sx, &sy);
+            wl_subsurface_set_position(sub, sx, sy);
+            wl_surface_commit(child);
+
+            sdl_wl_compositor_    = g.comp;
+            sdl_wl_subcompositor_ = g.subcomp;
+            sdl_wl_child_surface_ = child;
+            sdl_wl_subsurface_    = sub;
+            wayland_surface       = child;
+
+            // A subsurface has no intrinsic size (unlike an X11 window), so tell
+            // SDL how big to make its swapchain.
+            int cw = 0, ch = 0;
+            GetClientSize(&cw, &ch);
+            if (cw < 1) cw = static_cast<int>(std::ceil(width * scale));
+            if (ch < 1) ch = static_cast<int>(std::ceil(height * scale));
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, cw);
+            SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, ch);
+        } else {
+            // Couldn't bind a (sub)compositor; fall back to GTK's surface (likely
+            // still blank, but no worse than before).
+            if (g.comp)    wl_compositor_destroy(g.comp);
+            if (g.subcomp) wl_subcompositor_destroy(g.subcomp);
+            wayland_surface = gtk_surface;
+        }
+
+        // Import GDK's wl_display so SDL shares our connection -- our subsurface
+        // is a proxy on that display, and SDL must put it on a queue from the
+        // same display or wl_proxy_set_queue aborts. This is the *global video*
+        // import property ("SDL.video.wayland.wl_display"), read before video
+        // init; the non-create SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER is only a
+        // per-window getter, so SDL was opening its own connection instead.
+        if (SDL_SetPointerProperty(SDL_GetGlobalProperties(), SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER, wayland_display) == false) {
             wxLogError(_("Failed to set wayland display"));
+            init_failed_ = true;
             return;
         }
     } else {
@@ -3718,6 +4016,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
 #endif
         wxLogError(_("Failed to initialize SDL video subsystem"));
+        init_failed_ = true;
         return;
     }
 
@@ -3729,6 +4028,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 #endif
             wxLogError(_("Failed to initialize SDL video"));
+            init_failed_ = true;
             return;
         }
     }
@@ -3737,15 +4037,45 @@ void SDLDrawingPanel::DrawingPanelInit()
 #ifdef __WXGTK__
 #ifndef NO_WAYLAND
     if (GDK_IS_WAYLAND_WINDOW(gtk_widget_get_window(widget))) {
-        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, wayland_surface) == false) {
+        // Wrap our existing wl_surface. This is the *create* property
+        // ("...create.wayland.wl_surface"); the non-create
+        // SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER is only a getter, so passing it
+        // here was ignored and SDL spawned its own toplevel window instead.
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WAYLAND_WL_SURFACE_POINTER, wayland_surface) == false) {
             wxLogError(_("Failed to set wayland surface"));
+            init_failed_ = true;
             return;
         }
+        // The surface we pass is a wl_subsurface we gave its role; tell SDL not
+        // to attach its own XDG toplevel (which is what created the separate
+        // window).
+        SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_WAYLAND_SURFACE_ROLE_CUSTOM_BOOLEAN, true);
+
+        // Create the wl_egl_window only for the GL-based SDL renderers
+        // (opengl/opengles2), which need it to present into our custom surface.
+        // Vulkan and software don't use EGL, and forcing an unused GL buffer
+        // source onto our wl_surface is just cruft (and a second "role"-like
+        // attachment on a surface that already drives a Vulkan swapchain). The
+        // "default" backend picks opengl on Wayland, so it needs the EGL window
+        // too -- except when HDR makes us force the vulkan backend instead.
+        const bool wl_force_vulkan = (renderer_name == wxString("default")) &&
+                                     hdr::HdrAvailable() && OPTION(kDispHDR);
+        const bool wl_gl_renderer =
+            renderer_name == wxString("opengl") ||
+            renderer_name == wxString("opengles2") ||
+            (renderer_name == wxString("default") && !wl_force_vulkan);
+        if (wl_gl_renderer)
+            SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_WAYLAND_CREATE_EGL_WINDOW_BOOLEAN, true);
     } else {
 #endif
         if (SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, xid) == false)
 #elif defined(__WXMAC__)
-        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER, wxGetApp().frame->GetPanel()->GetHandle()) == false)
+        // sdl_cocoa_view_ (computed above): GL backends target this panel's own
+        // frontmost view (an NSOpenGLView backing its own layer -- GameArea would
+        // put GL under this view and show black); metal/gpu/software target the
+        // shared GameArea view where SDL adds a CAMetalLayer subview.
+        if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_COCOA_VIEW_POINTER,
+                sdl_cocoa_view_) == false)
 #elif defined(__WXMSW__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
 #else
@@ -3753,6 +4083,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
         {
             wxLogError(_("Failed to set parent window"));
+            init_failed_ = true;
             return;
         }
 
@@ -3772,17 +4103,126 @@ void SDLDrawingPanel::DrawingPanelInit()
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 #endif
 
+#if defined(__WXMAC__)
+    // SDL is about to make sdl_cocoa_view_ the window's contentView, detaching
+    // the wx tree (status bar included). Capture the pre-takeover state so we can
+    // undo it after SDL is set up (see the reattach at the end of init).
+    VbamSdlCaptureViewState(sdl_cocoa_view_, &sdl_saved_window_,
+                            &sdl_saved_content_view_, &sdl_saved_superview_);
+#endif
+
     sdlwindow = SDL_CreateWindowWithProperties(props);
     SDL_DestroyProperties(props);
 
     if (sdlwindow == NULL) {
         wxLogError(_("Failed to create SDL window"));
+        init_failed_ = true;
         return;
     }
 
-    if (OPTION(kSDLRenderer) == wxString("default")) {
+#if defined(__WXMAC__)
+    // The GL backends make our own view an NSOpenGLView (see the COCOA_VIEW pick
+    // above). wx's MacDoRedraw erases a window's background through a wxWindowDC
+    // unless its style is wxBG_STYLE_PAINT, and any wx DC drawing on an
+    // NSOpenGLView triggers an endless repaint loop (EnsureIsValid ->
+    // wxOSXLockFocus -> setNeedsDisplay:YES), pinning the main thread (spinning
+    // cursor). GameArea sets this style on us, but only after construction --
+    // i.e. after this init runs from our ctor -- so set it now, before SDL turns
+    // the view into a GL surface. SDL clears the whole view itself, so suppressing
+    // the wx erase loses nothing.
+    GetWindow()->SetBackgroundStyle(wxBG_STYLE_PAINT);
+#endif
+
+    // The SDL_GPU-backed "gpu" renderer only acquires its swapchain for a window
+    // SDL considers "shown". A window wrapping an already-visible host view
+    // (Cocoa NSView / X11 / Win32 HWND) starts hidden in SDL's bookkeeping, so
+    // the gpu renderer would present a black frame. Show it so the swapchain is
+    // claimed. (Other backends present fine regardless; this is a no-op for an
+    // already-mapped host surface.)
+    if (renderer_name == wxString("gpu"))
+        SDL_ShowWindow(sdlwindow);
+
+    // When HDR is available and on, ask SDL for a linear scRGB output so it can
+    // present HDR; we then upload a float (scRGB fp16) texture. Otherwise create
+    // an ordinary SDR renderer.
+    const bool sdl_want_hdr = hdr::HdrAvailable() && OPTION(kDispHDR);
+    // On native Wayland, SDL's own HDR path does not work for our borrowed
+    // child subsurface: SDL never sees the output's HDR headroom (it reports
+    // SDR), so SDL_PROP_RENDERER_HDR_ENABLED stays false. Instead we drive HDR
+    // through the compositor exactly like the OpenGL/Simple panels: present a
+    // 10-bit PQ-encoded texture and tag the child surface BT.2020 PQ via
+    // wp_color_manager_v1. So on Wayland the SDL HDR path wants a 10-bit
+    // (2101010) surface, not SDL's scRGB-float one.
+    const bool sdl_wl_hdr = sdl_want_hdr && IsWayland() && WaylandHdrPqSupported();
+    // 10-bit "deep color" SDR (X11) wants a 2101010 texture; mutually exclusive
+    // with HDR (which wants RGBA64_FLOAT). Decided here, before renderer
+    // creation, because the high-bit-depth lanes need a particular SDL backend.
+    const bool sdl_want_deep = !sdl_want_hdr && OPTION(kDispDeepColor) &&
+                               hdr::DeepColor10Available() && panel_color_depth_ == 32;
+    const bool sdl_default_backend = (OPTION(kSDLRenderer) == wxString("default"));
+
+    // The SDL backend that can present our high-bit-depth surfaces. On macOS that
+    // is "metal": it advertises RGBA64_FLOAT and drives EDR HDR (and is SDL's own
+    // default). SDL's "vulkan" backend there is MoltenVK, which fails to even load
+    // the Vulkan Portability library, so forcing it breaks HDR entirely.
+    // Everywhere else "metal" does not exist and "vulkan" is the backend that
+    // advertises both RGBA64_FLOAT (HDR) and 2101010 (deep color); SDL's usual
+    // default pick ("opengl") exposes 8-bit formats only.
+#if defined(__WXMAC__)
+    const char* const kSdlHiDepthBackend = "metal";
+#else
+    const char* const kSdlHiDepthBackend = "vulkan";
+#endif
+
+    // When the user hasn't pinned a backend but we need a high-bit-depth surface,
+    // ask for the high-bit-depth backend explicitly -- SDL's default pick would
+    // otherwise be 8-bit-only and the panel would get bounced to another renderer.
+    const char* sdl_hidepth_backend =
+        (sdl_default_backend && (sdl_want_hdr || sdl_want_deep)) ? kSdlHiDepthBackend : nullptr;
+
+    // Same problem for an *explicit* backend pick that isn't the high-bit-depth
+    // one: "opengl"/"opengles2"/"software" expose 8-bit formats only and the "gpu"
+    // backend can't create a suitable swapchain here, so such a pick would
+    // silently drop to 8-bit and make GameArea abandon the SDL render method.
+    // Substitute the high-bit-depth backend so SDL actually delivers 10-bit/HDR.
+    // (Wayland HDR drives its own backend via sdl_wl_hdr and is handled
+    // separately, so skip it there.)
+    if (!IsWayland() && !sdl_default_backend && (sdl_want_hdr || sdl_want_deep) &&
+        renderer_name != wxString(kSdlHiDepthBackend)) {
+        renderer_name = wxString(kSdlHiDepthBackend);
+    }
+
+    if (sdl_want_hdr && !sdl_wl_hdr) {
+        SDL_PropertiesID rprops = SDL_CreateProperties();
+        SDL_SetPointerProperty(rprops, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, sdlwindow);
+        if (!sdl_default_backend)
+            SDL_SetStringProperty(rprops, SDL_PROP_RENDERER_CREATE_NAME_STRING,
+                                  renderer_name.mb_str());
+        else if (sdl_hidepth_backend)
+            SDL_SetStringProperty(rprops, SDL_PROP_RENDERER_CREATE_NAME_STRING,
+                                  sdl_hidepth_backend);
+        SDL_SetNumberProperty(rprops, SDL_PROP_RENDERER_CREATE_OUTPUT_COLORSPACE_NUMBER,
+                              SDL_COLORSPACE_SRGB_LINEAR);
+        renderer = SDL_CreateRendererWithProperties(rprops);
+        SDL_DestroyProperties(rprops);
+    }
+    // Wayland compositor-driven PQ HDR uses the 10-bit-capable backend (same as
+    // deep color) with SDL's default (sRGB) output colorspace: we hand SDL
+    // already-PQ-encoded 10-bit pixels and let the compositor interpret the
+    // surface as BT.2020 PQ, so SDL must not colour-convert them.
+    if (sdl_wl_hdr && renderer == NULL && !sdl_default_backend) {
+        renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
+    }
+
+    // Deep color on the default backend: ask for the 10-bit-capable backend
+    // before falling back to SDL's plain default.
+    if (renderer == NULL && sdl_default_backend && sdl_hidepth_backend) {
+        renderer = SDL_CreateRenderer(sdlwindow, sdl_hidepth_backend);
+    }
+
+    if (renderer == NULL && sdl_default_backend) {
         renderer = SDL_CreateRenderer(sdlwindow, NULL);
-    } else {
+    } else if (renderer == NULL) {
         renderer = SDL_CreateRenderer(sdlwindow, renderer_name.mb_str());
 
         if (renderer == NULL) {
@@ -3795,7 +4235,60 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     if (renderer == NULL) {
         wxLogError(_("Failed to create SDL renderer"));
+        init_failed_ = true;
         return;
+    }
+
+    // Did we actually get an HDR-enabled renderer?
+    if (sdl_want_hdr && !sdl_wl_hdr) {
+        // scRGB HDR (macOS EDR, etc.): SDL drives HDR itself.
+        SDL_PropertiesID rp = SDL_GetRendererProperties(renderer);
+        sdl_hdr_ = SDL_GetBooleanProperty(rp, SDL_PROP_RENDERER_HDR_ENABLED_BOOLEAN, false);
+        // SDL auto-multiplies this SDR white point into the color scale; the HDR
+        // encoder cancels it (see HdrScRgbWhiteNits) so content lands at true nits.
+        sdl_sdr_white_point_ =
+            SDL_GetFloatProperty(rp, SDL_PROP_RENDERER_SDR_WHITE_POINT_FLOAT, 1.0f);
+    } else if (sdl_wl_hdr) {
+        // Wayland: drive HDR via the compositor. We need a 2101010 texture
+        // whose memory order matches EncodePQ10's A2B10G10R10 output -- that is
+        // an *BGR* 2101010 SDL format -- and the compositor must accept the
+        // BT.2020 PQ tag on our child surface. Only then is HDR really live.
+        //
+        // Restrict this to the "vulkan" backend. SDL's "gpu" renderer advertises
+        // the 2101010 format and accepts everything without error, but presents
+        // a black frame into our custom-role subsurface (its swapchain/present
+        // path doesn't drive a borrowed wl_surface the way the vulkan renderer
+        // does). Other backends (opengl, software) don't offer a 2101010 format
+        // at all. So vulkan is the only SDL backend that actually presents HDR
+        // here; on anything else we leave sdl_hdr_ false and EvaluateHdrRenderer
+        // falls back to the (working) native Vulkan renderer rather than showing
+        // a black HDR screen. "gpu" stays fully usable for SDR.
+        const bool vulkan_backend =
+            wxString(SDL_GetRendererName(renderer)) == wxString("vulkan");
+        sdl_deep_color_fmt_ = SdlPickDeepColorFormat(renderer);
+        const bool bgr10 = (sdl_deep_color_fmt_ == SDL_PIXELFORMAT_ABGR2101010 ||
+                            sdl_deep_color_fmt_ == SDL_PIXELFORMAT_XBGR2101010);
+        if (vulkan_backend && bgr10 && sdl_wl_child_surface_ &&
+            WaylandSetWlSurfaceHdrPq(
+                static_cast<wl_surface*>(sdl_wl_child_surface_),
+                static_cast<float>(OPTION(kDispHDRReferenceWhite)),
+                static_cast<float>(OPTION(kDispHDRPeakBrightness)))) {
+            sdl_wl_hdr_tagged_ = true;
+            sdl_hdr_ = true;
+        }
+    }
+
+    // 10-bit "deep color" SDR (X11): when the option is on, a 10-bit screen was
+    // probed and the source is 32-bit, present into a 2101010 texture if the
+    // chosen SDL backend offers one, so scaling/blending and the output surface
+    // stay 10-bit (less banding). Still SDR -- no tone mapping. Mutually
+    // exclusive with HDR; if the backend has no 10-bit format it stays off and
+    // the panel falls back to the ordinary 8-bit path (the GameArea then records
+    // the failure and tries another renderer).
+    sdl_deep_color_ = false;
+    if (!sdl_hdr_ && sdl_want_deep) {
+        sdl_deep_color_fmt_ = SdlPickDeepColorFormat(renderer);
+        sdl_deep_color_ = (sdl_deep_color_fmt_ != SDL_PIXELFORMAT_UNKNOWN);
     }
 
     // Set vsync
@@ -3816,6 +4309,7 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     if (sdlwindow == NULL) {
         wxLogError(_("Failed to create SDL window"));
+        init_failed_ = true;
         return;
     }
 
@@ -3850,18 +4344,62 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     if (renderer == NULL) {
         wxLogError(_("Failed to create SDL renderer"));
+        init_failed_ = true;
         return;
     }
 
     renderername = OPTION(kSDLRenderer);
 #endif
 
+    // Decide the active HDR encoding now that the renderer exists.
+    UpdateHdrState();
+
+#ifdef ENABLE_SDL3
+    if (sdl_hdr_ && !sdl_wl_hdr_tagged_) {
+        // HDR: a linear scRGB float texture; we upload scRGB fp16 each frame.
+        SDL_PropertiesID tp = SDL_CreateProperties();
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_COLORSPACE_NUMBER,
+                              SDL_COLORSPACE_SRGB_LINEAR);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_FORMAT_NUMBER,
+                              SDL_PIXELFORMAT_RGBA64_FLOAT);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_ACCESS_NUMBER,
+                              SDL_TEXTUREACCESS_STREAMING);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_WIDTH_NUMBER,
+                              (int)std::ceil(width * scale));
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_HEIGHT_NUMBER,
+                              (int)std::ceil(height * scale));
+        texture = SDL_CreateTextureWithProperties(renderer, tp);
+        SDL_DestroyProperties(tp);
+    } else if (sdl_deep_color_ || sdl_wl_hdr_tagged_) {
+        // 10-bit 2101010 texture, used two ways:
+        //  * deep color (X11 SDR): pack the corrected RGBA8 frame, 10-bit output.
+        //  * Wayland HDR: upload PQ10-encoded pixels; the child surface is tagged
+        //    BT.2020 PQ so the compositor presents them as HDR.
+        // Either way SDL must NOT transfer/gamut-convert: a 2101010 texture
+        // otherwise defaults to HDR10 (BT.2020 PQ) and SDL would convert our
+        // already-final data to the sRGB output (over-saturated, red cast). Tag
+        // it sRGB so the bits are presented as-is.
+        SDL_PropertiesID tp = SDL_CreateProperties();
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_COLORSPACE_NUMBER,
+                              SDL_COLORSPACE_SRGB);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_FORMAT_NUMBER,
+                              sdl_deep_color_fmt_);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_ACCESS_NUMBER,
+                              SDL_TEXTUREACCESS_STREAMING);
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_WIDTH_NUMBER,
+                              (int)std::ceil(width * scale));
+        SDL_SetNumberProperty(tp, SDL_PROP_TEXTURE_CREATE_HEIGHT_NUMBER,
+                              (int)std::ceil(height * scale));
+        texture = SDL_CreateTextureWithProperties(renderer, tp);
+        SDL_DestroyProperties(tp);
+    } else
+#endif
     if (out_8) {
 #ifdef ENABLE_SDL3
         if (renderername == wxString("direct3d")) {
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB332, SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         } else {
-            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00), 
+            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(8, 0xE0, 0x1C, 0x03, 0x00),
 SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
         }
 #else
@@ -3925,16 +4463,51 @@ SDL_TEXTUREACCESS_STREAMING, (width * scale), (height * scale));
 #else
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, OPTION(kDispBilinear) ? "1" : "0");
 #endif
-            
+
+#if defined(__WXMAC__)
+    // SDL has finished taking over the window's contentView; undo it now that its
+    // renderer is up. Re-nest SDL's view under its original superview and put wx's
+    // contentView back, so the status bar (and the rest of the wx frame) stays
+    // visible and laid out by wx while SDL keeps rendering into its nested view.
+    VbamSdlReattachViewState(sdl_cocoa_view_, sdl_saved_window_,
+                             sdl_saved_content_view_, sdl_saved_superview_);
+    sdl_saved_content_view_ = nullptr;  // released by ReattachViewState
+    sdl_saved_window_ = nullptr;
+    sdl_saved_superview_ = nullptr;
+
+    // SDL's takeover left our view (GameArea) filling the whole window, covering
+    // the status bar. wx sizes the client area and reserves the status-bar strip
+    // in the frame's layout, which the takeover bypassed -- re-run it so GameArea
+    // shrinks to leave the bar visible.
+    if (wxGetApp().frame)
+        wxGetApp().frame->SendSizeEvent();
+#endif
+
     did_init = true;
 }
         
 void SDLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
+#if defined(HAVE_WAYLAND_SUPPORT)
+    // Keep the SDL subsurface aligned with and sized to the panel.
+    if (sdl_wl_subsurface_) {
+        GtkWidget* widget   = wxGetApp().frame->GetPanel()->GetHandle();
+        GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+        int sx = 0, sy = 0;
+        gtk_widget_translate_coordinates(widget, toplevel, 0, 0, &sx, &sy);
+        wl_subsurface_set_position(static_cast<wl_subsurface*>(sdl_wl_subsurface_), sx, sy);
+        if (sdlwindow) {
+            int cw = 0, ch = 0;
+            GetClientSize(&cw, &ch);
+            if (cw > 0 && ch > 0)
+                SDL_SetWindowSize(sdlwindow, cw, ch);
+        }
+    }
+#endif
     if (todraw) {
         DrawArea();
     }
-            
+
     ev.Skip();
 }
         
@@ -3967,7 +4540,41 @@ void SDLDrawingPanel::DrawArea()
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
 
-    if ((renderername == wxString("direct3d")) && (panel_color_depth_ == 32)) {
+    if (HdrActive() && sdl_wl_hdr_tagged_ && panel_color_depth_ == 32 && texture != NULL) {
+        // Wayland HDR: encode the corrected RGBA8 image to BT.2100 PQ packed as
+        // A2B10G10R10 and upload it to the 2101010 texture. The child surface is
+        // tagged BT.2020 PQ, so the compositor presents these bits as HDR.
+        int tex_w = (int)std::ceil(width * scale);
+        int tex_h = (int)std::ceil(height * scale);
+        sdl_deep_color_buf_.resize((size_t)tex_w * tex_h * 4);
+        hdr::EncodePQ10(todraw + srcPitch, srcPitch, tex_w, tex_h,
+                        reinterpret_cast<uint32_t*>(sdl_deep_color_buf_.data()), tex_w * 4);
+        SDL_UpdateTexture(texture, NULL, sdl_deep_color_buf_.data(), tex_w * 4);
+    }
+    else if (HdrActive() && sdl_hdr_ && panel_color_depth_ == 32 && texture != NULL) {
+        // HDR: encode the corrected RGBA8 image to linear scRGB fp16 (8 bytes
+        // per pixel) and upload it to the float texture.
+        int tex_w = (int)std::ceil(width * scale);
+        int tex_h = (int)std::ceil(height * scale);
+        sdl_hdr_buf_.resize((size_t)tex_w * tex_h * 8);
+        hdr::EncodeScRGBFp16(todraw + srcPitch, srcPitch, tex_w, tex_h,
+                             reinterpret_cast<uint16_t*>(sdl_hdr_buf_.data()), tex_w * 8);
+        SDL_UpdateTexture(texture, NULL, sdl_hdr_buf_.data(), tex_w * 8);
+    }
+#ifdef ENABLE_SDL3
+    else if (sdl_deep_color_ && panel_color_depth_ == 32 && texture != NULL) {
+        // 10-bit SDR: pack the corrected RGBA8 image into the 2101010 texture.
+        int tex_w = (int)std::ceil(width * scale);
+        int tex_h = (int)std::ceil(height * scale);
+        sdl_deep_color_buf_.resize((size_t)tex_w * tex_h * 4);
+        SdlPackDeepColor(todraw + srcPitch, srcPitch, tex_w, tex_h,
+                         sdl_deep_color_fmt_,
+                         reinterpret_cast<uint32_t*>(sdl_deep_color_buf_.data()),
+                         tex_w);
+        SDL_UpdateTexture(texture, NULL, sdl_deep_color_buf_.data(), tex_w * 4);
+    }
+#endif
+    else if ((renderername == wxString("direct3d")) && (panel_color_depth_ == 32)) {
         todraw_argb = (uint32_t *)(todraw + srcPitch);
 
         for (int i = 0; i < (height * scale); i++) {
@@ -4384,6 +4991,667 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
 }
+
+#if defined(__WXGTK__)
+// ─── XOrg native software driver (backs Simple on X11) ──────────────────────
+
+XOrgDrawingPanel::XOrgDrawingPanel(wxWindow* parent, int _width, int _height)
+    : BasicDrawingPanel(parent, _width, _height)
+{
+    // Set up the 10-bit child window now so DeepColorActive() is valid before
+    // the first paint. BasicDrawingPanel never runs DrawingPanelInit().
+    EnsureSetup();
+    // Mark initialized so GameArea runs the 10-bit "working" check
+    // (EvaluateDeepColorRenderer): if we couldn't get a 10-bit visual despite
+    // deep color being available, it records the failure and falls back to
+    // another capable renderer.
+    did_init = true;
+}
+
+XOrgDrawingPanel::~XOrgDrawingPanel()
+{
+    Teardown();
+}
+
+void XOrgDrawingPanel::EnsureSetup()
+{
+    if (xorg_setup_done_)
+        return;
+    xorg_setup_done_ = true;
+
+    // Only stand up the 10-bit child window when deep color is actually wanted
+    // and the display supports it; otherwise behave exactly like the plain wx
+    // software panel. The panel is recreated when kDispDeepColor changes
+    // (render_observer_ -> ResetPanel), so this is re-evaluated on toggle.
+    if (!OPTION(kDispDeepColor) || !hdr::DeepColor10Available())
+        return;
+
+    GtkWidget* widget = GetWindow()->GetHandle();
+    if (!widget)
+        return;
+    gtk_widget_realize(widget);
+    GdkWindow* gwin = gtk_widget_get_window(widget);
+    // X11 only: on Wayland (or any non-X11 GdkWindow) stay on the 8-bit wx path.
+    // GDK_IS_X11_WINDOW comes from gdkx.h and needs no Wayland headers.
+    if (!gwin || !GDK_IS_X11_WINDOW(gwin))
+        return;
+
+    Display* dpy = GDK_WINDOW_XDISPLAY(gwin);
+    Window parent_win = GDK_WINDOW_XID(gwin);
+    if (!dpy || !parent_win)
+        return;
+
+    // Find a 30-bit TrueColor visual (10 bits per channel).
+    XVisualInfo tmpl{};
+    tmpl.screen  = DefaultScreen(dpy);
+    tmpl.depth   = 30;
+    tmpl.c_class = TrueColor;
+    int nvis = 0;
+    XVisualInfo* vis = XGetVisualInfo(
+        dpy, VisualScreenMask | VisualDepthMask | VisualClassMask, &tmpl, &nvis);
+    if (!vis || nvis == 0) {
+        if (vis) XFree(vis);
+        return;  // no 10-bit visual -> stay on the 8-bit wx path
+    }
+
+    Visual* visual = vis[0].visual;
+    // Derive channel shifts from the visual's masks (normally X2R10G10B10).
+    auto mask_shift = [](unsigned long mask) {
+        int s = 0;
+        if (!mask) return 0;
+        while (!(mask & 1)) { mask >>= 1; ++s; }
+        return s;
+    };
+    xorg_r_shift_ = mask_shift(vis[0].red_mask);
+    xorg_g_shift_ = mask_shift(vis[0].green_mask);
+    xorg_b_shift_ = mask_shift(vis[0].blue_mask);
+
+    Colormap cmap = XCreateColormap(dpy, parent_win, visual, AllocNone);
+
+    int pw = 1, ph = 1;
+    GetClientSize(&pw, &ph);
+    if (pw < 1) pw = 1;
+    if (ph < 1) ph = 1;
+
+    XSetWindowAttributes swa{};
+    swa.colormap         = cmap;
+    swa.background_pixel  = 0;
+    swa.border_pixel      = 0;
+    swa.event_mask        = ExposureMask;  // pointer/key events propagate to parent
+    Window child = XCreateWindow(
+        dpy, parent_win, 0, 0, pw, ph, 0, 30, InputOutput, visual,
+        CWColormap | CWBackPixel | CWBorderPixel | CWEventMask, &swa);
+    XFree(vis);
+    if (!child) {
+        XFreeColormap(dpy, cmap);
+        return;
+    }
+    // Mapped lazily in DrawImage so it never obscures the wx software path when
+    // deep color is on but inactive (e.g. a 16-bit source).
+
+    xorg_display_    = dpy;
+    xorg_window_     = child;
+    xorg_visual_     = visual;
+    xorg_gc_         = XCreateGC(dpy, child, 0, nullptr);
+    xorg_deep_color_ = true;
+}
+
+void XOrgDrawingPanel::Teardown()
+{
+    if (!xorg_display_)
+        return;
+    Display* dpy = static_cast<Display*>(xorg_display_);
+    if (xorg_image_) {
+        XImage* img = static_cast<XImage*>(xorg_image_);
+        img->data = nullptr;  // we own the buffer (xorg_buf_); don't let X free it
+        XDestroyImage(img);
+        xorg_image_ = nullptr;
+    }
+    if (xorg_gc_) { XFreeGC(dpy, static_cast<GC>(xorg_gc_)); xorg_gc_ = nullptr; }
+    if (xorg_window_) { XDestroyWindow(dpy, xorg_window_); xorg_window_ = 0; }
+    xorg_display_    = nullptr;
+    xorg_deep_color_ = false;
+}
+
+void XOrgDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+{
+    const bool active = xorg_deep_color_ && OPTION(kDispDeepColor) &&
+                        hdr::DeepColor10Available() && panel_color_depth_ == 32;
+    if (!active || !im) {
+        // Hide the 10-bit child (if any) so the wx software path shows through.
+        if (xorg_mapped_) {
+            XUnmapWindow(static_cast<Display*>(xorg_display_), xorg_window_);
+            xorg_mapped_ = false;
+        }
+        BasicDrawingPanel::DrawImage(dc, im);  // ordinary 8-bit wx path
+        return;
+    }
+
+    Display* dpy = static_cast<Display*>(xorg_display_);
+    Visual*  vis = static_cast<Visual*>(xorg_visual_);
+
+    if (!xorg_mapped_) {
+        XMapWindow(dpy, xorg_window_);
+        xorg_mapped_ = true;
+    }
+
+    int W = 1, H = 1;
+    GetClientSize(&W, &H);
+    if (W < 1) W = 1;
+    if (H < 1) H = 1;
+
+    // Keep the child window covering the panel.
+    XMoveResizeWindow(dpy, xorg_window_, 0, 0, W, H);
+
+    // (Re)allocate the 10-bit image when the window size changes.
+    if (!xorg_image_ || xorg_img_w_ != W || xorg_img_h_ != H) {
+        if (xorg_image_) {
+            XImage* old = static_cast<XImage*>(xorg_image_);
+            old->data = nullptr;
+            XDestroyImage(old);
+            xorg_image_ = nullptr;
+        }
+        xorg_buf_.assign((size_t)W * H, 0);
+        XImage* img = XCreateImage(dpy, vis, 30, ZPixmap, 0,
+                                   reinterpret_cast<char*>(xorg_buf_.data()),
+                                   W, H, 32, 0);
+        if (!img) {
+            BasicDrawingPanel::DrawImage(dc, im);
+            return;
+        }
+        xorg_image_ = img;
+        xorg_img_w_ = W;
+        xorg_img_h_ = H;
+    }
+
+    // Nearest-neighbor scale the corrected 8-bit image to the window size and
+    // expand each channel to 10 bits. The source is 8-bit, so (like the GL and
+    // Vulkan deep-color paths) the win is a 10-bit output surface and 10-bit
+    // scaling -- less banding -- not extra source precision.
+    const unsigned char* sd = im->GetData();
+    const int sw = im->GetWidth();
+    const int sh = im->GetHeight();
+    const int rs = xorg_r_shift_, gs = xorg_g_shift_, bs = xorg_b_shift_;
+    uint32_t* dst = xorg_buf_.data();
+    for (int y = 0; y < H; ++y) {
+        const int sy = (sh == H) ? y : (y * sh / H);
+        const unsigned char* srow = sd + (size_t)sy * sw * 3;
+        uint32_t* drow = dst + (size_t)y * W;
+        for (int x = 0; x < W; ++x) {
+            const int sx = (sw == W) ? x : (x * sw / W);
+            const unsigned char* p = srow + (size_t)sx * 3;
+            uint32_t r = p[0], g = p[1], b = p[2];
+            r = (r << 2) | (r >> 6);
+            g = (g << 2) | (g >> 6);
+            b = (b << 2) | (b >> 6);
+            drow[x] = (r << rs) | (g << gs) | (b << bs);
+        }
+    }
+
+    XPutImage(dpy, xorg_window_, static_cast<GC>(xorg_gc_),
+              static_cast<XImage*>(xorg_image_), 0, 0, 0, 0, W, H);
+    XFlush(dpy);
+}
+#endif  // __WXGTK__
+
+#if defined(HAVE_WAYLAND_SUPPORT)
+// ============================================================================
+// WaylandDrawingPanel -- software HDR sub-driver backing Simple on Wayland.
+// Mirrors XOrgDrawingPanel: a child native surface (here a wl_subsurface) carries
+// a deep/HDR image while the wx software path handles the non-HDR case.
+// ============================================================================
+namespace {
+
+// Anonymous shm file for a wl_shm pool. Canonical Wayland pattern: a temp file
+// in XDG_RUNTIME_DIR, immediately unlinked, then sized via ftruncate.
+int VbamCreateShmFile(size_t size) {
+    const char* runtime = getenv("XDG_RUNTIME_DIR");
+    if (!runtime || !*runtime)
+        runtime = "/tmp";
+    char tmpl[256];
+    std::snprintf(tmpl, sizeof(tmpl), "%s/vbam-wl-shm-XXXXXX", runtime);
+    int fd = mkstemp(tmpl);
+    if (fd < 0)
+        return -1;
+    unlink(tmpl);
+    int flags = fcntl(fd, F_GETFD);
+    if (flags != -1)
+        fcntl(fd, F_SETFD, flags | FD_CLOEXEC);
+    if (ftruncate(fd, static_cast<off_t>(size)) < 0) {
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+// Bind only the globals the software HDR path needs: compositor (child surface),
+// subcompositor (subsurface to overlay the panel), shm (CPU buffers).
+struct VbamWlSimpleGlobals {
+    struct wl_compositor*    comp    = nullptr;
+    struct wl_subcompositor* subcomp = nullptr;
+    struct wl_shm*           shm     = nullptr;
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    struct wp_viewporter*    vp      = nullptr;
+#endif
+};
+void vbam_wl_simple_global(void* data, struct wl_registry* reg, uint32_t name,
+                           const char* iface, uint32_t /*version*/) {
+    auto* g = static_cast<VbamWlSimpleGlobals*>(data);
+    if (std::strcmp(iface, "wl_compositor") == 0)
+        g->comp = static_cast<struct wl_compositor*>(
+            wl_registry_bind(reg, name, &wl_compositor_interface, 1));
+    else if (std::strcmp(iface, "wl_subcompositor") == 0)
+        g->subcomp = static_cast<struct wl_subcompositor*>(
+            wl_registry_bind(reg, name, &wl_subcompositor_interface, 1));
+    else if (std::strcmp(iface, "wl_shm") == 0)
+        g->shm = static_cast<struct wl_shm*>(
+            wl_registry_bind(reg, name, &wl_shm_interface, 1));
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    else if (std::strcmp(iface, "wp_viewporter") == 0)
+        g->vp = static_cast<struct wp_viewporter*>(
+            wl_registry_bind(reg, name, &wp_viewporter_interface, 1));
+#endif
+}
+void vbam_wl_simple_global_remove(void*, struct wl_registry*, uint32_t) {}
+const struct wl_registry_listener kVbamWlSimpleRegistryListener = {
+    vbam_wl_simple_global, vbam_wl_simple_global_remove
+};
+
+}  // namespace
+
+void WaylandDrawingPanel::BufferReleaseCb(void* data, struct wl_buffer* buf) {
+    auto* self = static_cast<WaylandDrawingPanel*>(data);
+    for (int i = 0; i < 2; ++i)
+        if (self->wl_buffer_[i] == buf)
+            self->wl_buffer_busy_[i] = false;
+}
+static const struct wl_buffer_listener kVbamWlBufferListener = {
+    WaylandDrawingPanel::BufferReleaseCb
+};
+
+WaylandDrawingPanel::WaylandDrawingPanel(wxWindow* parent, int _width, int _height)
+    : BasicDrawingPanel(parent, _width, _height)
+{
+    // Stand up the HDR subsurface now so SupportsHdr() is valid before the first
+    // paint (BasicDrawingPanel never runs DrawingPanelInit()).
+    EnsureSetup();
+    // Configure the HDR encoder and latch hdr_encoding_ from SupportsHdr().
+    UpdateHdrState();
+    // Mark initialized so GameArea's EvaluateHdrRenderer runs its "working"
+    // check: if HDR is wanted but we couldn't present it, it falls back to
+    // another HDR-capable renderer.
+    did_init = true;
+}
+
+WaylandDrawingPanel::~WaylandDrawingPanel()
+{
+    Teardown();
+}
+
+void WaylandDrawingPanel::EnsureSetup()
+{
+    if (wl_setup_done_)
+        return;
+    wl_setup_done_ = true;
+
+    // Only stand up the HDR subsurface when HDR is actually wanted and the
+    // compositor can present BT.2020 PQ; otherwise behave exactly like the plain
+    // wx software panel. The panel is recreated when kDispHDR changes (render
+    // observer -> ResetPanel), so this is re-evaluated on toggle.
+    if (!OPTION(kDispHDR) || !hdr::HdrAvailable() || !WaylandHdrPqSupported())
+        return;
+    if (!IsWayland())
+        return;
+
+    GtkWidget* widget = GetWindow()->GetHandle();
+    if (!widget)
+        return;
+    gtk_widget_realize(widget);
+    GdkWindow* gwin = gtk_widget_get_window(widget);
+    if (!gwin || !GDK_IS_WAYLAND_WINDOW(gwin))
+        return;
+
+    GdkDisplay* gdpy = gtk_widget_get_display(widget);
+    struct wl_display* dpy = gdk_wayland_display_get_wl_display(gdpy);
+    struct wl_surface* parent = gdk_wayland_window_get_wl_surface(gwin);
+    if (!dpy || !parent)
+        return;
+
+    // Bind our globals on a private event queue, so dispatching buffer-release
+    // events (PresentHdr) never reenters GTK's default-queue handlers. Objects
+    // created from these globals inherit the queue.
+    struct wl_event_queue* queue = wl_display_create_queue(dpy);
+    VbamWlSimpleGlobals g;
+    struct wl_registry* reg = wl_display_get_registry(dpy);
+    wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(reg), queue);
+    wl_registry_add_listener(reg, &kVbamWlSimpleRegistryListener, &g);
+    wl_display_roundtrip_queue(dpy, queue);
+    wl_registry_destroy(reg);
+    if (!g.comp || !g.subcomp || !g.shm) {
+        if (g.comp)    wl_compositor_destroy(g.comp);
+        if (g.subcomp) wl_subcompositor_destroy(g.subcomp);
+        if (g.shm)     wl_shm_destroy(g.shm);
+#ifdef HAVE_WAYLAND_VIEWPORTER
+        if (g.vp)      wp_viewporter_destroy(g.vp);
+#endif
+        wl_event_queue_destroy(queue);
+        return;
+    }
+
+    // Child surface + subsurface under GTK's surface.
+    struct wl_surface* child = wl_compositor_create_surface(g.comp);
+    struct wl_subsurface* sub =
+        wl_subcompositor_get_subsurface(g.subcomp, child, parent);
+    if (!child || !sub) {
+        if (sub)   wl_subsurface_destroy(sub);
+        if (child) wl_surface_destroy(child);
+        wl_compositor_destroy(g.comp);
+        wl_subcompositor_destroy(g.subcomp);
+        wl_shm_destroy(g.shm);
+#ifdef HAVE_WAYLAND_VIEWPORTER
+        if (g.vp) wp_viewporter_destroy(g.vp);
+#endif
+        wl_event_queue_destroy(queue);
+        return;
+    }
+    // Desync so our commits take effect without a parent commit; drop the input
+    // region so GTK keeps handling pointer/keyboard.
+    wl_subsurface_set_desync(sub);
+    struct wl_region* empty = wl_compositor_create_region(g.comp);
+    wl_surface_set_input_region(child, empty);
+    wl_region_destroy(empty);
+    wl_surface_commit(child);
+
+    // Tag the child surface BT.2020 PQ. If the compositor refuses, abandon the
+    // HDR path (fall back to the wx 8-bit software path).
+    if (!WaylandSetWlSurfaceHdrPq(child,
+            static_cast<float>(OPTION(kDispHDRReferenceWhite)),
+            static_cast<float>(OPTION(kDispHDRPeakBrightness)))) {
+        wl_subsurface_destroy(sub);
+        wl_surface_destroy(child);
+        wl_compositor_destroy(g.comp);
+        wl_subcompositor_destroy(g.subcomp);
+        wl_shm_destroy(g.shm);
+#ifdef HAVE_WAYLAND_VIEWPORTER
+        if (g.vp) wp_viewporter_destroy(g.vp);
+#endif
+        wl_event_queue_destroy(queue);
+        return;
+    }
+
+    wl_display_        = dpy;
+    wl_queue_          = queue;
+    wl_parent_surface_ = parent;
+    wl_compositor_     = g.comp;
+    wl_subcompositor_  = g.subcomp;
+    wl_shm_            = g.shm;
+    wl_child_surface_  = child;
+    wl_subsurface_     = sub;
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    // Optional: when the compositor offers viewporter, scale a source-resolution
+    // buffer to the window on its side so we PQ-encode only source pixels per
+    // frame instead of the whole window.
+    if (g.vp) {
+        wl_viewporter_ = g.vp;
+        wl_viewport_   = wp_viewporter_get_viewport(g.vp, child);
+    }
+#endif
+    wl_hdr_ready_      = true;
+}
+
+bool WaylandDrawingPanel::EnsureBuffers(int W, int H)
+{
+    if (wl_pool_ && W == wl_buf_w_ && H == wl_buf_h_)
+        return true;
+
+    // Tear down any previous pool/buffers.
+    for (int i = 0; i < 2; ++i) {
+        if (wl_buffer_[i]) {
+            wl_buffer_destroy(static_cast<wl_buffer*>(wl_buffer_[i]));
+            wl_buffer_[i] = nullptr;
+        }
+        wl_buffer_busy_[i] = false;
+    }
+    if (wl_pool_) {
+        wl_shm_pool_destroy(static_cast<wl_shm_pool*>(wl_pool_));
+        wl_pool_ = nullptr;
+    }
+    if (wl_buffer_data_[0] && wl_pool_size_)
+        munmap(wl_buffer_data_[0], wl_pool_size_);
+    wl_buffer_data_[0] = wl_buffer_data_[1] = nullptr;
+    if (wl_pool_fd_ >= 0) { close(wl_pool_fd_); wl_pool_fd_ = -1; }
+    wl_pool_size_ = 0;
+    wl_buf_w_ = wl_buf_h_ = 0;
+
+    if (W < 1 || H < 1)
+        return false;
+
+    const size_t stride = static_cast<size_t>(W) * 4;       // ABGR2101010: 4 B/px
+    const size_t one    = stride * static_cast<size_t>(H);
+    const size_t total  = one * 2;                          // double-buffered
+
+    int fd = VbamCreateShmFile(total);
+    if (fd < 0)
+        return false;
+    void* base = mmap(nullptr, total, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (base == MAP_FAILED) {
+        close(fd);
+        return false;
+    }
+    struct wl_shm_pool* pool = wl_shm_create_pool(
+        static_cast<wl_shm*>(wl_shm_), fd, static_cast<int32_t>(total));
+    if (!pool) {
+        munmap(base, total);
+        close(fd);
+        return false;
+    }
+    for (int i = 0; i < 2; ++i) {
+        struct wl_buffer* b = wl_shm_pool_create_buffer(
+            pool, static_cast<int32_t>(i * one), W, H,
+            static_cast<int32_t>(stride), WL_SHM_FORMAT_ABGR2101010);
+        if (!b) {
+            if (i == 1 && wl_buffer_[0]) {
+                wl_buffer_destroy(static_cast<wl_buffer*>(wl_buffer_[0]));
+                wl_buffer_[0] = nullptr;
+            }
+            wl_shm_pool_destroy(pool);
+            munmap(base, total);
+            close(fd);
+            return false;
+        }
+        wl_buffer_add_listener(b, &kVbamWlBufferListener, this);
+        wl_buffer_[i]      = b;
+        wl_buffer_data_[i] = static_cast<uint8_t*>(base) + i * one;
+        wl_buffer_busy_[i] = false;
+    }
+    wl_pool_      = pool;
+    wl_pool_fd_   = fd;
+    wl_pool_size_ = total;
+    wl_buf_w_     = W;
+    wl_buf_h_     = H;
+    return true;
+}
+
+int WaylandDrawingPanel::AcquireBuffer()
+{
+    for (int i = 0; i < 2; ++i)
+        if (!wl_buffer_busy_[i])
+            return i;
+    return -1;
+}
+
+bool WaylandDrawingPanel::PresentHdr()
+{
+    struct wl_display* dpy = static_cast<wl_display*>(wl_display_);
+
+    int W = 1, H = 1;
+    GetClientSize(&W, &H);
+    if (W < 1) W = 1;
+    if (H < 1) H = 1;
+
+    // Source: 32-bit RGBA8 todraw (R in the low byte) with a 1px filter border;
+    // skip the top border row, like the GL/Vulkan/Quartz HDR paths.
+    const int sw     = static_cast<int>(std::ceil(width * scale));
+    const int sh     = static_cast<int>(std::ceil(height * scale));
+    const int rowlen = static_cast<int>(std::ceil((width + 1) * scale));
+    const uint8_t* srcb = todraw + static_cast<size_t>(rowlen) * 4;
+
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    // Fast path: encode the source-resolution frame and let the compositor scale
+    // it to the window via the viewport, so the per-frame PQ encode is only
+    // sw*sh pixels (and the buffer is reallocated only when the source size
+    // changes, not on every window resize).
+    const bool use_vp = (wl_viewport_ != nullptr) && sw > 0 && sh > 0;
+#else
+    const bool use_vp = false;
+#endif
+
+    const int bufW = use_vp ? sw : W;
+    const int bufH = use_vp ? sh : H;
+    if (!EnsureBuffers(bufW, bufH))
+        return false;
+
+    // Harvest any pending buffer-release events on our private queue so the busy
+    // flags are current (GTK's main loop reads the socket; we only dispatch our
+    // queue, never GTK's).
+    wl_display_dispatch_queue_pending(dpy, static_cast<wl_event_queue*>(wl_queue_));
+
+    int idx = AcquireBuffer();
+    if (idx < 0)
+        return true;  // both buffers still held; keep showing the last frame
+
+    if (use_vp) {
+        // No CPU scaling: PQ10-encode source pixels straight into the
+        // source-sized buffer (ABGR2101010 == EncodePQ10's A2B10G10R10 output).
+        hdr::EncodePQ10(srcb, rowlen * 4, sw, sh,
+                        reinterpret_cast<uint32_t*>(wl_buffer_data_[idx]), sw * 4);
+    } else {
+        // Fallback (no viewporter): nearest-scale to the client size, then
+        // encode the window-sized result.
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(srcb);
+        wl_scaled_.resize(static_cast<size_t>(W) * H * 4);
+        uint32_t* scaled = reinterpret_cast<uint32_t*>(wl_scaled_.data());
+        for (int y = 0; y < H; ++y) {
+            const int sy = (sh == H) ? y : (sh > 0 ? y * sh / H : 0);
+            const uint32_t* srow = src + static_cast<size_t>(sy) * rowlen;
+            uint32_t* drow = scaled + static_cast<size_t>(y) * W;
+            for (int x = 0; x < W; ++x) {
+                const int sx = (sw == W) ? x : (sw > 0 ? x * sw / W : 0);
+                drow[x] = srow[sx];
+            }
+        }
+        hdr::EncodePQ10(wl_scaled_.data(), W * 4, W, H,
+                        reinterpret_cast<uint32_t*>(wl_buffer_data_[idx]), W * 4);
+    }
+
+    // Keep the subsurface positioned over the panel (toplevel-relative, like the
+    // Vulkan path), then attach + present.
+    GtkWidget* widget   = GetWindow()->GetHandle();
+    GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+    int px = 0, py = 0;
+    gtk_widget_translate_coordinates(widget, toplevel, 0, 0, &px, &py);
+    wl_subsurface_set_position(static_cast<wl_subsurface*>(wl_subsurface_), px, py);
+
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    // Scale the source-sized buffer to the current window size (re-issued only
+    // when it changes).
+    if (use_vp && (W != wl_vp_dst_w_ || H != wl_vp_dst_h_)) {
+        wp_viewport_set_destination(static_cast<wp_viewport*>(wl_viewport_), W, H);
+        wl_vp_dst_w_ = W;
+        wl_vp_dst_h_ = H;
+    }
+#endif
+
+    wl_surface* child = static_cast<wl_surface*>(wl_child_surface_);
+    wl_surface_attach(child, static_cast<wl_buffer*>(wl_buffer_[idx]), 0, 0);
+    // Our wl_surface comes from a v1 wl_compositor, which predates
+    // wl_surface_damage_buffer (v4); use the v1 wl_surface_damage with the
+    // "whole surface" sentinel, which damages everything in any coordinate space
+    // (with or without a viewport). (Calling the v4 request on a v1 surface is a
+    // protocol error that drops the whole Wayland connection.)
+    wl_surface_damage(child, 0, 0, INT32_MAX, INT32_MAX);
+    wl_surface_commit(child);
+    wl_buffer_busy_[idx] = true;
+    wl_mapped_ = true;
+    wl_display_flush(dpy);
+    return true;
+}
+
+void WaylandDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+{
+    const bool active =
+        wl_hdr_ready_ && HdrActive() && panel_color_depth_ == 32 && todraw;
+    if (active && PresentHdr())
+        return;
+
+    // Not HDR (or present failed): hide our subsurface so the wx path shows
+    // through, then draw the ordinary 8-bit image.
+    if (wl_mapped_ && wl_child_surface_) {
+        wl_surface* child = static_cast<wl_surface*>(wl_child_surface_);
+        wl_surface_attach(child, nullptr, 0, 0);
+        wl_surface_commit(child);
+        wl_mapped_ = false;
+        if (wl_display_)
+            wl_display_flush(static_cast<wl_display*>(wl_display_));
+    }
+    BasicDrawingPanel::DrawImage(dc, im);
+}
+
+void WaylandDrawingPanel::Teardown()
+{
+    if (wl_child_surface_)
+        WaylandClearWlSurfaceColor(static_cast<wl_surface*>(wl_child_surface_));
+    for (int i = 0; i < 2; ++i)
+        if (wl_buffer_[i]) {
+            wl_buffer_destroy(static_cast<wl_buffer*>(wl_buffer_[i]));
+            wl_buffer_[i] = nullptr;
+        }
+    if (wl_pool_) {
+        wl_shm_pool_destroy(static_cast<wl_shm_pool*>(wl_pool_));
+        wl_pool_ = nullptr;
+    }
+    if (wl_buffer_data_[0] && wl_pool_size_)
+        munmap(wl_buffer_data_[0], wl_pool_size_);
+    wl_buffer_data_[0] = wl_buffer_data_[1] = nullptr;
+    if (wl_pool_fd_ >= 0) { close(wl_pool_fd_); wl_pool_fd_ = -1; }
+#ifdef HAVE_WAYLAND_VIEWPORTER
+    if (wl_viewport_) {
+        wp_viewport_destroy(static_cast<wp_viewport*>(wl_viewport_));
+        wl_viewport_ = nullptr;
+    }
+    if (wl_viewporter_) {
+        wp_viewporter_destroy(static_cast<wp_viewporter*>(wl_viewporter_));
+        wl_viewporter_ = nullptr;
+    }
+#endif
+    if (wl_subsurface_) {
+        wl_subsurface_destroy(static_cast<wl_subsurface*>(wl_subsurface_));
+        wl_subsurface_ = nullptr;
+    }
+    if (wl_child_surface_) {
+        wl_surface_destroy(static_cast<wl_surface*>(wl_child_surface_));
+        wl_child_surface_ = nullptr;
+    }
+    if (wl_shm_) {
+        wl_shm_destroy(static_cast<wl_shm*>(wl_shm_));
+        wl_shm_ = nullptr;
+    }
+    if (wl_subcompositor_) {
+        wl_subcompositor_destroy(static_cast<wl_subcompositor*>(wl_subcompositor_));
+        wl_subcompositor_ = nullptr;
+    }
+    if (wl_compositor_) {
+        wl_compositor_destroy(static_cast<wl_compositor*>(wl_compositor_));
+        wl_compositor_ = nullptr;
+    }
+    if (wl_queue_) {
+        wl_event_queue_destroy(static_cast<wl_event_queue*>(wl_queue_));
+        wl_queue_ = nullptr;
+    }
+    wl_hdr_ready_ = false;
+    wl_mapped_    = false;
+}
+#endif  // HAVE_WAYLAND_SUPPORT
         
 #ifndef NO_OGL
 // following 3 for vsync
@@ -4447,6 +5715,53 @@ static int glopts[] = {
     WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0
 };
 
+// 10-bit (deep color) visual, required for an HDR / BT.2020 PQ surface.
+static int glopts_hdr[] = {
+    WX_GL_RGBA, WX_GL_DOUBLEBUFFER,
+    WX_GL_MIN_RED, 10, WX_GL_MIN_GREEN, 10, WX_GL_MIN_BLUE, 10, WX_GL_MIN_ALPHA, 2,
+    0
+};
+
+// Depth of the X11 screen the app is running on, or 0 when not on X11 (e.g.
+// Wayland). A depth >= 30 means the root is a 10-bit "deep color" screen.
+static int X11RootDepth() {
+#if defined(__WXGTK__)
+    GdkDisplay* gdk_dpy = gdk_display_get_default();
+    if (!gdk_dpy || !GDK_IS_X11_DISPLAY(gdk_dpy))
+        return 0;
+    Display* dpy = GDK_DISPLAY_XDISPLAY(gdk_dpy);
+    if (!dpy)
+        return 0;
+    return DefaultDepth(dpy, DefaultScreen(dpy));
+#else
+    return 0;
+#endif
+}
+
+// Choose the GL pixel-format attributes for a new canvas. A 10-bit visual is
+// only useful where we can actually present HDR (Wayland EGL today), so request
+// it solely in that case to avoid disturbing the ordinary 8-bit path.
+static int* SelectGlOpts() {
+#ifdef HAVE_WAYLAND_EGL
+    if (hdr::HdrAvailable() && OPTION(kDispHDR) && IsWayland())
+        return glopts_hdr;
+#endif
+    // 10-bit "deep color" SDR visual (X11). The option is a preference that may
+    // be on without 10-bit support, so gate on actual availability here.
+    if (hdr::DeepColor10Available() && OPTION(kDispDeepColor))
+        return glopts_hdr;
+    // On a 10-bit (depth-30) X screen the GL canvas visual must match the
+    // screen depth: wx's default FBConfig pick is an 8-bit (depth-24) visual,
+    // and a depth-24 GL window composited onto a depth-30 root renders with a
+    // heavy red/magenta cast. Request the native 10-bit visual regardless of
+    // the deep-color option (which only controls the GL_RGB10_A2 upload
+    // precision); without a matching 10-bit FBConfig there is nothing better
+    // to pick, so fall through to the ordinary 8-bit attributes.
+    if (X11RootDepth() >= 30 && hdr::DeepColor10Available())
+        return glopts_hdr;
+    return glopts;
+}
+
 bool GLDrawingPanel::SetContext()
 {
 #ifdef __WXMSW__
@@ -4492,7 +5807,7 @@ bool GLDrawingPanel::SetContext()
         
 GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
         : DrawingPanelBase(_width, _height)
-        , wxglc(parent, wxID_ANY, glopts, wxPoint(0, 0), parent->GetClientSize(),
+        , wxglc(parent, wxID_ANY, SelectGlOpts(), wxPoint(0, 0), parent->GetClientSize(),
                 wxFULL_REPAINT_ON_RESIZE | wxWANTS_CHARS)
 {
     widgets::RequestHighResolutionOpenGlSurfaceForWindow(this);
@@ -4501,6 +5816,8 @@ GLDrawingPanel::GLDrawingPanel(wxWindow* parent, int _width, int _height)
         
 GLDrawingPanel::~GLDrawingPanel()
 {
+    DestroyHdrSurface();
+
     // Skip GL cleanup entirely on Windows when caching context
     // The resources will be reused or cleaned up when the context is eventually deleted
 #ifdef __WXMSW__
@@ -4542,10 +5859,17 @@ GLDrawingPanel::~GLDrawingPanel()
         
 void GLDrawingPanel::DrawingPanelInit()
 {
-    SetContext();
+    // No usable GL context (creation or MakeCurrent failed) -> flag so GameArea
+    // falls back to the next renderer in the priority list. We return before the
+    // base init, so did_init stays false and the destructor's GL cleanup (guarded
+    // by did_init) is correctly skipped -- texid/vlist were never generated.
+    if (!SetContext()) {
+        init_failed_ = true;
+        return;
+    }
 
     DrawingPanelBase::DrawingPanelInit();
-            
+
     AdjustViewport();
             
     const bool bilinear = OPTION(kDispBilinear);
@@ -4600,6 +5924,15 @@ void GLDrawingPanel::DrawingPanelInit()
     glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, std::ceil(width * scale), std::ceil(height * scale), 0, tex_fmt, NULL);
 #endif
     glClearColor(0.0, 0.0, 0.0, 1.0);
+
+    // Record whether we actually got a >=10-bit visual, so the deep-color
+    // option can tell if it took effect (legacy GL: GL_RED_BITS is valid).
+    {
+        GLint red_bits = 8;
+        glGetIntegerv(GL_RED_BITS, &red_bits);
+        gl_deep_color_ = OPTION(kDispDeepColor) && red_bits >= 10;
+    }
+
     // non-portable vsync code
 #if defined(__WXGTK__)
 #ifndef NO_WAYLAND
@@ -4683,8 +6016,168 @@ void GLDrawingPanel::DrawingPanelInit()
 #else
     systemScreenMessage(_("No VSYNC available on this platform"));
 #endif
+
+    SetupHdrSurface();
 }
-        
+
+bool GLDrawingPanel::SupportsHdr() const
+{
+    // True HDR presentation requires a compositor color-management path, which
+    // on Linux means Wayland. X11/GLX has no way to signal an HDR surface.
+    //
+    // Two routes signal BT.2020 PQ to the compositor:
+    //  - the wp_color_manager_v1 protocol (KWin etc.), which tags our existing
+    //    EGL surface -- the general, driver-independent path (works on Mesa); or
+    //  - EGL_EXT_gl_colorspace_bt2020_pq, exposed only by the NVIDIA driver.
+    // Probe both here so HDR is advertised only when one can actually present
+    // it, rather than enabling HDR and failing later at draw time.
+#ifdef HAVE_WAYLAND_EGL
+    return IsWayland() && (WaylandHdrPqSupported() || HdrEglColorspaceAvailable());
+#else
+    return false;
+#endif
+}
+
+bool GLDrawingPanel::HdrEglColorspaceAvailable() const
+{
+#ifdef HAVE_WAYLAND_EGL
+    EGLDisplay dpy = GetEGLDisplay();
+    if (dpy == EGL_NO_DISPLAY)
+        return false;
+    const char* exts = eglQueryString(dpy, EGL_EXTENSIONS);
+    return exts && strstr(exts, "EGL_EXT_gl_colorspace_bt2020_pq");
+#else
+    return false;
+#endif
+}
+
+#ifdef HAVE_WAYLAND_EGL
+// wxGLCanvasEGL::GetEGLConfig() returns EGLConfig* on wx 3.2 but EGLConfig on
+// wx 3.3; normalize both to a single EGLConfig value.
+static inline EGLConfig VbamEglConfig(EGLConfig* c) { return c ? *c : nullptr; }
+static inline EGLConfig VbamEglConfig(EGLConfig c) { return c; }
+#endif
+
+void GLDrawingPanel::SetupHdrSurface()
+{
+    DestroyHdrSurface();
+
+#ifdef HAVE_WAYLAND_EGL
+    if (!HdrActive() || !IsWayland())
+        return;
+
+    // Preferred, driver-independent path: keep rendering PQ-encoded 10-bit
+    // content into the ordinary EGL surface and tag that surface as BT.2020 PQ
+    // via wp_color_manager_v1. No dedicated PQ EGL surface is involved, so
+    // hdr_egl_surface_ stays null and DrawArea() presents through SwapBuffers().
+    if (WaylandHdrPqSupported()) {
+        if (WaylandSetSurfaceHdrPq(this,
+                static_cast<float>(OPTION(kDispHDRReferenceWhite)),
+                static_cast<float>(OPTION(kDispHDRPeakBrightness)))) {
+            wxLogDebug(wxT("HDR: tagged surface BT.2020 PQ via wp_color_manager_v1."));
+            return;
+        }
+        // Tagging failed unexpectedly; fall through to the EGL extension path.
+    }
+
+    EGLDisplay dpy = GetEGLDisplay();
+    EGLConfig  cfg = VbamEglConfig(GetEGLConfig());
+    if (dpy == EGL_NO_DISPLAY || !cfg || !m_wlEGLWindow) {
+        wxLogDebug(wxT("HDR: no EGL display/config/window; falling back to SDR."));
+        hdr_encoding_ = hdr::Encoding::kNone;
+        return;
+    }
+
+    // Already vetted by SupportsHdr() before HDR was enabled; this is a
+    // defensive guard, so log at debug level rather than popping a dialog.
+    if (!HdrEglColorspaceAvailable()) {
+        wxLogDebug(wxT("HDR: EGL_EXT_gl_colorspace_bt2020_pq unavailable; "
+                       "falling back to SDR."));
+        hdr_encoding_ = hdr::Encoding::kNone;
+        return;
+    }
+
+    const EGLint attribs[] = {
+        EGL_GL_COLORSPACE, EGL_GL_COLORSPACE_BT2020_PQ_EXT, EGL_NONE
+    };
+    EGLSurface surf = eglCreateWindowSurface(
+        dpy, cfg, reinterpret_cast<EGLNativeWindowType>(m_wlEGLWindow), attribs);
+    if (surf == EGL_NO_SURFACE) {
+        wxLogError(_("HDR: failed to create BT.2020 PQ surface; "
+                     "falling back to SDR."));
+        hdr_encoding_ = hdr::Encoding::kNone;
+        return;
+    }
+    hdr_egl_surface_ = surf;
+    wxLogDebug(wxT("HDR: created BT.2020 PQ EGL surface."));
+
+    // Declare the content luminance envelope on the PQ surface. A bare PQ
+    // surface is assumed to carry PQ's full 0..10000-nit range, so the
+    // compositor tone-maps that phantom range down to the display and squashes
+    // our real highlights -- which only reach peak_nits -- back near reference
+    // white, making the luminance settings invisible. The NVIDIA driver carries
+    // this via the SMPTE 2086 / CTA-861.3 EGL metadata extensions; mirrors the
+    // Wayland wp_color_manager_v1, Vulkan vkSetHdrMetadataEXT and D3D12 paths.
+#if defined(EGL_EXT_surface_SMPTE2086_metadata) && \
+    defined(EGL_EXT_surface_CTA861_3_metadata)
+    {
+        const char* surf_exts = eglQueryString(dpy, EGL_EXTENSIONS);
+        const bool have_smpte2086 = surf_exts &&
+            strstr(surf_exts, "EGL_EXT_surface_SMPTE2086_metadata");
+        const bool have_cta861_3 = surf_exts &&
+            strstr(surf_exts, "EGL_EXT_surface_CTA861_3_metadata");
+
+        const int peak_nits = static_cast<int>(OPTION(kDispHDRPeakBrightness));
+        const int ref_nits  = static_cast<int>(OPTION(kDispHDRReferenceWhite));
+        // All metadata values are passed as integers scaled by
+        // EGL_METADATA_SCALING_EXT (chromaticities in [0,1], luminance in cd/m²).
+        const int S = EGL_METADATA_SCALING_EXT;
+        auto attr = [&](EGLint a, EGLint v) {
+            eglSurfaceAttrib(dpy, surf, a, v);
+        };
+
+        if (have_smpte2086) {
+            // BT.2020 primaries + D65 white, matching the PQ color space.
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_RX_EXT, (EGLint)(0.708f * S));
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_RY_EXT, (EGLint)(0.292f * S));
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_GX_EXT, (EGLint)(0.170f * S));
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_GY_EXT, (EGLint)(0.797f * S));
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_BX_EXT, (EGLint)(0.131f * S));
+            attr(EGL_SMPTE2086_DISPLAY_PRIMARY_BY_EXT, (EGLint)(0.046f * S));
+            attr(EGL_SMPTE2086_WHITE_POINT_X_EXT,      (EGLint)(0.3127f * S));
+            attr(EGL_SMPTE2086_WHITE_POINT_Y_EXT,      (EGLint)(0.3290f * S));
+            attr(EGL_SMPTE2086_MAX_LUMINANCE_EXT,      peak_nits * S);
+            attr(EGL_SMPTE2086_MIN_LUMINANCE_EXT,      0);
+        }
+        if (have_cta861_3) {
+            attr(EGL_CTA861_3_MAX_CONTENT_LIGHT_LEVEL_EXT, peak_nits * S);
+            // Frame-average light level must not exceed peak.
+            attr(EGL_CTA861_3_MAX_FRAME_AVERAGE_LEVEL_EXT,
+                 std::min(ref_nits, peak_nits) * S);
+        }
+        if (!have_smpte2086 && !have_cta861_3)
+            wxLogDebug(wxT("HDR: no EGL HDR metadata extension; luminance hints "
+                           "not signaled to compositor."));
+    }
+#endif
+#endif
+}
+
+void GLDrawingPanel::DestroyHdrSurface()
+{
+#ifdef HAVE_WAYLAND_EGL
+    // Drop any wp_color_manager_v1 tag on our wl_surface (no-op if untagged).
+    WaylandClearSurfaceColor(this);
+
+    if (hdr_egl_surface_) {
+        EGLDisplay dpy = GetEGLDisplay();
+        if (dpy != EGL_NO_DISPLAY)
+            eglDestroySurface(dpy, static_cast<EGLSurface>(hdr_egl_surface_));
+    }
+#endif
+    hdr_egl_surface_ = nullptr;
+}
+
 void GLDrawingPanel::OnSize(wxSizeEvent& ev)
 {
     AdjustViewport();
@@ -4739,32 +6232,77 @@ void GLDrawingPanel::DrawArea(wxWindowDC& dc)
     if (!did_init)
         DrawingPanelInit();
 
+    // HDR presentation encodes the frame to 10-bit BT.2020 PQ. Two delivery
+    // paths share that encoding:
+    //  - color-management protocol: render into wx's ordinary surface (already
+    //    tagged BT.2020 PQ) and present via SwapBuffers() -- hdr_egl_surface_ is
+    //    null;
+    //  - NVIDIA EGL_EXT_gl_colorspace_bt2020_pq: present into a dedicated PQ
+    //    surface (hdr_egl_surface_). Bind it now, after RefreshGL()/SetContext()
+    //    bound wx's surface; texture/viewport bindings are context state and
+    //    survive the surface switch since the EGLContext is unchanged.
+    const bool hdr     = HdrActive() && panel_color_depth_ == 32;
+    [[maybe_unused]] const bool hdr_egl = hdr && hdr_egl_surface_;
+#ifdef HAVE_WAYLAND_EGL
+    if (hdr_egl)
+        eglMakeCurrent(GetEGLDisplay(), static_cast<EGLSurface>(hdr_egl_surface_),
+                       static_cast<EGLSurface>(hdr_egl_surface_), eglGetCurrentContext());
+#endif
+
     if (todraw) {
         // Calculate inrb based on panel's color depth, not global systemColorDepth
         int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2 : (panel_color_depth_ == 24) ? 0 : 1;
         int rowlen = std::ceil((width + inrb) * scale);
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
-#if wxBYTE_ORDER == wxBIG_ENDIAN
-
-                // FIXME: is this necessary?
-        if (panel_color_depth_ == 16)
-            glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-
-#endif
         int tex_width = (int)std::ceil(width * scale);
         int tex_height = (int)std::ceil(height * scale);
         int offset = (int)std::ceil(rowlen * (panel_color_depth_ >> 3));
         uint8_t* tex_ptr = todraw + offset;
-        glTexImage2D(GL_TEXTURE_2D, 0, int_fmt, tex_width, tex_height,
-                     0, tex_fmt, tex_ptr);
+
+        if (hdr) {
+            // Re-encode the corrected RGBA8 image to 10-bit BT.2020 PQ. The
+            // encoder output is tightly packed, so reset the row length.
+            int bpp = 0;
+            const uint8_t* enc =
+                EncodeHdr(tex_ptr, rowlen * 4, tex_width, tex_height, &bpp);
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, tex_width);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, tex_width, tex_height, 0,
+                         GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, enc);
+        } else {
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, rowlen);
+#if wxBYTE_ORDER == wxBIG_ENDIAN
+            // FIXME: is this necessary?
+            if (panel_color_depth_ == 16)
+                glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
+#endif
+            // 10-bit "deep color" SDR: keep the normal 8-bit upload but ask GL
+            // for a 10-bit internal format, so filtering and the framebuffer
+            // stay 10-bit and the compositor gets a 10-bit surface (less
+            // banding). No tone mapping -- this is still SDR.
+            GLint ifmt = int_fmt;
+            if (hdr::DeepColor10Available() && OPTION(kDispDeepColor) && panel_color_depth_ == 32)
+                ifmt = GL_RGB10_A2;
+            glTexImage2D(GL_TEXTURE_2D, 0, ifmt, tex_width, tex_height,
+                         0, tex_fmt, tex_ptr);
+        }
 
         glCallList(vlist);
     } else
         glClear(GL_COLOR_BUFFER_BIT);
 
+#ifdef HAVE_WAYLAND_EGL
+    if (hdr_egl) {
+        eglSwapBuffers(GetEGLDisplay(), static_cast<EGLSurface>(hdr_egl_surface_));
+        return;
+    }
+#endif
     SwapBuffers();
 }
-        
+
+// These GL-only helper macros must not leak into the D3D12 code below, which
+// uses a local `tex_fmt` variable of its own.
+#undef int_fmt
+#undef tex_fmt
+
 #endif // GL support
 
 #if defined(__WXMSW__) && !defined(NO_D3D12)
@@ -4877,12 +6415,17 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     if (FAILED(hr)) { wxLogError(_("Failed to create command queue: 0x%08X"), hr); return; }
 
     // --- 4. Swap Chain ---
+    // For HDR use a 10-bit back buffer; the BT.2020 PQ color space is set on
+    // the swapchain below once we have an IDXGISwapChain3.
+    rt_format_ = (hdr::HdrAvailable() && OPTION(kDispHDR)) ? DXGI_FORMAT_R10G10B10A2_UNORM
+                                                          : DXGI_FORMAT_B8G8R8A8_UNORM;
+
     wxSize win_size = GetClientSize();
     DXGI_SWAP_CHAIN_DESC1 sc_desc = {};
     sc_desc.BufferCount = FRAME_COUNT;
     sc_desc.Width = (UINT)win_size.GetWidth();
     sc_desc.Height = (UINT)win_size.GetHeight();
-    sc_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    sc_desc.Format = rt_format_;
     sc_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     sc_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // D3D12 requires FLIP_*
     sc_desc.SampleDesc.Count = 1;
@@ -4903,6 +6446,38 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     hr = sc1.As(&swap_chain);
     if (FAILED(hr)) { wxLogError(_("Failed to get IDXGISwapChain3: 0x%08X"), hr); return; }
     frame_index = swap_chain->GetCurrentBackBufferIndex();
+
+    // --- 4b. HDR10 BT.2020 PQ color space (if requested and supported) ---
+    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+        const DXGI_COLOR_SPACE_TYPE pq_cs =
+            DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020;
+        UINT cs_support = 0;
+        if (SUCCEEDED(swap_chain->CheckColorSpaceSupport(pq_cs, &cs_support)) &&
+            (cs_support & DXGI_SWAP_CHAIN_COLOR_SPACE_SUPPORT_FLAG_PRESENT)) {
+            if (SUCCEEDED(swap_chain->SetColorSpace1(pq_cs))) {
+                hdr_swapchain_ = true;
+
+                // Provide HDR10 mastering metadata derived from the user's
+                // brightness settings (luminance is in 0.0001-nit units).
+                ComPtr<IDXGISwapChain4> sc4;
+                if (SUCCEEDED(swap_chain.As(&sc4))) {
+                    DXGI_HDR_METADATA_HDR10 md = {};
+                    md.MaxMasteringLuminance =
+                        (UINT)(OPTION(kDispHDRPeakBrightness) * 10000u);
+                    md.MinMasteringLuminance = 0;
+                    md.MaxContentLightLevel =
+                        (UINT16)OPTION(kDispHDRPeakBrightness);
+                    md.MaxFrameAverageLightLevel =
+                        (UINT16)OPTION(kDispHDRReferenceWhite);
+                    sc4->SetHDRMetaData(DXGI_HDR_METADATA_TYPE_HDR10,
+                                        sizeof(md), &md);
+                }
+            }
+        }
+        if (!hdr_swapchain_)
+            wxLogError(_("HDR: display/swapchain does not support BT.2020 PQ; "
+                         "output will be SDR."));
+    }
 
     // --- 5. RTV Descriptor Heap ---
     D3D12_DESCRIPTOR_HEAP_DESC rtv_heap_desc = {};
@@ -5024,7 +6599,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
         pso_desc.InputLayout = { input_layout, _countof(input_layout) };
         pso_desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
         pso_desc.NumRenderTargets = 1;
-        pso_desc.RTVFormats[0] = DXGI_FORMAT_B8G8R8A8_UNORM;
+        pso_desc.RTVFormats[0] = rt_format_;
         pso_desc.SampleDesc.Count = 1;
         // Default blend / rasterizer / depth-stencil are fine for a simple 2D blit
         pso_desc.BlendState.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
@@ -5095,7 +6670,9 @@ void DX12DrawingPanel::DrawingPanelInit()
 {
     DrawingPanelBase::DrawingPanelInit();
 
-    if (!device) return;
+    // No D3D12 device -> setup (done in the constructor) failed; flag it so
+    // GameArea falls back to the next renderer in the priority list.
+    if (!device) { init_failed_ = true; return; }
 
     texture_width = (int)std::ceil(width * scale);
     texture_height = (int)std::ceil(height * scale);
@@ -5120,7 +6697,7 @@ bool DX12DrawingPanel::ResizeSwapChain()
     HRESULT hr = swap_chain->ResizeBuffers(FRAME_COUNT,
         (UINT)client_size.GetWidth(),
         (UINT)client_size.GetHeight(),
-        DXGI_FORMAT_B8G8R8A8_UNORM,
+        rt_format_,
         flags);
     if (FAILED(hr)) { wxLogError(_("ResizeBuffers failed: 0x%08X"), hr); return false; }
 
@@ -5292,7 +6869,21 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
 
         uint8_t* src = todraw;
 
-        if (out_8) {
+        // Texture format for this frame; HDR overrides it to a 10-bit PQ format.
+        DXGI_FORMAT tex_fmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+
+        // HDR: encode the corrected RGBA8 image to 10-bit BT.2020 PQ matching
+        // the HDR10 swapchain. Only the 32-bit source path feeds the encoder.
+        const bool hdr = HdrActive() && hdr_swapchain_ &&
+                         !out_8 && !out_16 && !out_24;
+        if (hdr) {
+            const uint8_t* tex_ptr = src + src_pitch;  // skip top border row
+            hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
+                            reinterpret_cast<uint32_t*>(dst_pixels),
+                            scaled_width * 4);
+            tex_fmt = DXGI_FORMAT_R10G10B10A2_UNORM;
+        }
+        else if (out_8) {
             src += src_pitch; // skip top border row
             for (int y = 0; y < scaled_height; y++) {
                 uint8_t* sr = src;
@@ -5382,14 +6973,14 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
         // Upload texture (upload_heap kept alive via member until WaitForGPU)
         texture = UploadTexture(device.Get(), command_list.Get(),
             upload_heap,
-            DXGI_FORMAT_B8G8R8A8_UNORM,
+            tex_fmt,
             (UINT)scaled_width, (UINT)scaled_height,
             dst_pixels, (UINT)scaled_width * 4);
         if (!texture) { wxLogError(_("Texture upload failed")); goto present; }
 
         // Create / refresh SRV
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-        srv_desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        srv_desc.Format = tex_fmt;
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srv_desc.Texture2D.MipLevels = 1;
@@ -5479,6 +7070,472 @@ present:
     frame_index = swap_chain->GetCurrentBackBufferIndex();
 }
 #endif
+
+#if defined(__WXMSW__) && !defined(NO_D3D11)
+// ============================================================================
+// DX11DrawingPanel -- software-style HDR sub-driver backing Simple on Windows.
+// A minimal flip-model DXGI swapchain fed by a CPU-filled STAGING texture
+// (CopyResource'd into the back buffer) -- no 3D pipeline. HDR uses a 10-bit
+// R10G10B10A2 back buffer tagged BT.2020 PQ (mirroring D3D12); SDR uses 8-bit
+// B8G8R8A8. Device: hardware, then WARP; else the base wx software path.
+// ============================================================================
+
+DX11DrawingPanel::DX11DrawingPanel(wxWindow* parent, int _width, int _height)
+    : BasicDrawingPanel(parent, _width, _height)
+{
+    if (CreateDeviceAndSwapchain())
+        InitPipeline();  // shaders/quad/sampler; on failure -> wx software path
+    // Configure the HDR encoder and latch hdr_encoding_ from SupportsHdr().
+    UpdateHdrState();
+    // Mark initialized so GameArea's EvaluateHdrRenderer runs its "working"
+    // check (and falls back to another HDR renderer if HDR didn't come up).
+    did_init = true;
+}
+
+DX11DrawingPanel::~DX11DrawingPanel()
+{
+    Teardown();
+}
+
+bool DX11DrawingPanel::CreateDeviceAndSwapchain()
+{
+    // Load d3d11.dll dynamically (matching the D3D12 path) so there is no static
+    // import dependency.
+    HMODULE d3d11 = LoadLibrary(TEXT("d3d11.dll"));
+    if (!d3d11)
+        return false;
+    auto create = reinterpret_cast<PFN_D3D11_CREATE_DEVICE>(
+        reinterpret_cast<void*>(GetProcAddress(d3d11, "D3D11CreateDevice")));
+    if (!create) {
+        FreeLibrary(d3d11);
+        return false;
+    }
+
+    const D3D_FEATURE_LEVEL want[] = {
+        D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0,
+        D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0,
+    };
+    const UINT flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+
+    // Hardware first, then WARP (the CPU rasterizer -- the "software" tier).
+    HRESULT hr = E_FAIL;
+    for (D3D_DRIVER_TYPE dt : {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP}) {
+        hr = create(nullptr, dt, nullptr, flags, want,
+                    (UINT)(sizeof(want) / sizeof(want[0])), D3D11_SDK_VERSION,
+                    device_.GetAddressOf(), nullptr, context_.GetAddressOf());
+        if (SUCCEEDED(hr))
+            break;
+        device_.Reset();
+        context_.Reset();
+    }
+    if (FAILED(hr) || !device_) {
+        FreeLibrary(d3d11);
+        wxLogError(_("D3D11: failed to create device; Simple renderer will use "
+                     "the software (wx) path."));
+        return false;
+    }
+    // d3d11.dll intentionally left loaded for the device's lifetime (process
+    // lifetime), like the wx app itself; do not FreeLibrary while device_ lives.
+    wxLogDebug(wxT("D3D11 device created."));
+
+    // Get the DXGI factory from the device (no separate dxgi load needed).
+    Microsoft::WRL::ComPtr<IDXGIDevice> dxgi_dev;
+    if (FAILED(device_.As(&dxgi_dev))) return false;
+    Microsoft::WRL::ComPtr<IDXGIAdapter> adapter;
+    if (FAILED(dxgi_dev->GetAdapter(&adapter))) return false;
+    Microsoft::WRL::ComPtr<IDXGIFactory2> factory;
+    if (FAILED(adapter->GetParent(IID_PPV_ARGS(&factory)))) return false;
+
+    // Tearing (uncapped present) only when vsync is off and the OS supports it.
+    allow_tearing_ = false;
+    if (!OPTION(kPrefVsync)) {
+        Microsoft::WRL::ComPtr<IDXGIFactory5> f5;
+        if (SUCCEEDED(factory.As(&f5))) {
+            BOOL at = FALSE;
+            if (SUCCEEDED(f5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING,
+                                                  &at, sizeof(at))))
+                allow_tearing_ = (at == TRUE);
+        }
+    }
+
+    // 10-bit back buffer for HDR (tagged PQ below), 8-bit for SDR.
+    rt_format_ = (hdr::HdrAvailable() && OPTION(kDispHDR))
+                     ? DXGI_FORMAT_R10G10B10A2_UNORM
+                     : DXGI_FORMAT_B8G8R8A8_UNORM;
+
+    wxSize sz = GetClientSize();
+    int W = std::max(1, sz.GetWidth());
+    int H = std::max(1, sz.GetHeight());
+
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    desc.Width       = (UINT)W;
+    desc.Height      = (UINT)H;
+    desc.Format      = rt_format_;
+    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    desc.BufferCount = 2;
+    desc.SwapEffect  = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    desc.SampleDesc.Count = 1;
+    desc.AlphaMode   = DXGI_ALPHA_MODE_IGNORE;
+    desc.Flags       = allow_tearing_ ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+
+    Microsoft::WRL::ComPtr<IDXGISwapChain1> sc1;
+    hr = factory->CreateSwapChainForHwnd(device_.Get(), (HWND)GetHandle(),
+                                         &desc, nullptr, nullptr, &sc1);
+    if (FAILED(hr)) {
+        wxLogError(_("D3D11: failed to create swap chain: 0x%08X"), hr);
+        device_.Reset(); context_.Reset();
+        return false;
+    }
+    factory->MakeWindowAssociation((HWND)GetHandle(), DXGI_MWA_NO_ALT_ENTER);
+    if (FAILED(sc1.As(&swap_chain_))) {
+        device_.Reset(); context_.Reset();
+        return false;
+    }
+    sc_w_ = W; sc_h_ = H;
+
+    // HDR10 BT.2020 PQ: the display is in HDR10 mode (hdr::HdrAvailable() already
+    // confirmed it via a real renderer at startup) and rt_format_ is the 10-bit
+    // PQ-capable back buffer, so treat this panel as HDR. Do NOT make that
+    // conditional on SetColorSpace1()/CheckColorSpaceSupport() succeeding right
+    // now: at the very first panel creation -- before the window is composited on
+    // the HDR output -- those can fail transiently even though HDR presents fine
+    // once the window is up, and gating on them made GameArea see this HDR-capable
+    // renderer as SDR and bounce the user off Simple to Direct3D 12 on every
+    // launch. Apply the color space best-effort here and, if it has not taken yet,
+    // keep retrying it per-frame in PresentFrame (ApplyHdrColorSpace).
+    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+        hdr_swapchain_ = true;
+        ApplyHdrColorSpace();
+    }
+
+    // The render-target view is created lazily by ResizeSwapchain() on the first
+    // PresentFrame, once the window is realized at its real client size. It is NOT
+    // built here: at startup this constructor runs before the panel is sized, and
+    // a transient RTV-creation failure here used to clear hdr_swapchain_ and fail
+    // the panel -- making GameArea see Simple as non-HDR and bounce it to Direct3D
+    // 12. The device and swapchain are what matter for "did the renderer come up".
+    return true;
+}
+
+// Set the swapchain's BT.2020 PQ color space (+ HDR10 metadata). This can fail
+// at first call before the window is composited on the HDR output, so it is
+// retried per-frame from PresentFrame until it takes; once applied it is a no-op.
+void DX11DrawingPanel::ApplyHdrColorSpace()
+{
+    if (colorspace_applied_ || !hdr_swapchain_ || !swap_chain_)
+        return;
+    if (FAILED(swap_chain_->SetColorSpace1(DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020)))
+        return;  // not ready yet -- try again next frame
+    colorspace_applied_ = true;
+    Microsoft::WRL::ComPtr<IDXGISwapChain4> sc4;
+    if (SUCCEEDED(swap_chain_.As(&sc4))) {
+        DXGI_HDR_METADATA_HDR10 md = {};
+        md.MaxMasteringLuminance     = (UINT)(OPTION(kDispHDRPeakBrightness) * 10000u);
+        md.MinMasteringLuminance     = 0;
+        md.MaxContentLightLevel      = (UINT16)OPTION(kDispHDRPeakBrightness);
+        md.MaxFrameAverageLightLevel = (UINT16)OPTION(kDispHDRReferenceWhite);
+        sc4->SetHDRMetaData(DXGI_HDR_METADATA_TYPE_HDR10, sizeof(md), &md);
+    }
+}
+
+// Compile the passthrough blit shaders, build the full-screen quad and the
+// sampler. Returns false (leaving pipeline_ready_ false) if anything fails, in
+// which case PresentFrame bails and DrawImage uses the wx software path.
+bool DX11DrawingPanel::InitPipeline()
+{
+    if (!device_)
+        return false;
+
+    HMODULE hCompiler = LoadLibrary(TEXT("d3dcompiler_47.dll"));
+    if (!hCompiler) {
+        wxLogError(_("D3D11: d3dcompiler_47.dll not found; Simple renderer will "
+                     "use the software (wx) path."));
+        return false;
+    }
+    auto D3DCompileFn = reinterpret_cast<LPFND3DCompile>(
+        reinterpret_cast<void*>(GetProcAddress(hCompiler, "D3DCompile")));
+    if (!D3DCompileFn) {
+        FreeLibrary(hCompiler);
+        return false;
+    }
+
+    bool shaders_ok = false;
+    {
+        // Shader-compiler COM objects (ID3DBlob) live in d3dcompiler_47.dll, so
+        // they must be released before FreeLibrary -- keep them in this scope.
+        Microsoft::WRL::ComPtr<ID3DBlob> vsb, psb, err;
+        UINT cflags = 0;
+#if defined(_DEBUG)
+        cflags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+        // vs_4_0/ps_4_0: trivial passthrough, valid on feature level 10.0+ (so it
+        // also works on the WARP/old-hardware fallback tiers).
+        HRESULT hr = D3DCompileFn(g_VertexShaderSrc, strlen(g_VertexShaderSrc),
+                                  nullptr, nullptr, nullptr, "main", "vs_4_0",
+                                  cflags, 0, &vsb, &err);
+        if (SUCCEEDED(hr))
+            hr = device_->CreateVertexShader(vsb->GetBufferPointer(),
+                                             vsb->GetBufferSize(), nullptr,
+                                             vs_.GetAddressOf());
+        if (SUCCEEDED(hr)) {
+            const D3D11_INPUT_ELEMENT_DESC il[] = {
+                { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,  0,
+                  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+                { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,       0, 16,
+                  D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            };
+            hr = device_->CreateInputLayout(il, 2, vsb->GetBufferPointer(),
+                                            vsb->GetBufferSize(),
+                                            input_layout_.GetAddressOf());
+        }
+        if (SUCCEEDED(hr)) {
+            err.Reset();
+            hr = D3DCompileFn(g_PixelShaderSrc, strlen(g_PixelShaderSrc),
+                              nullptr, nullptr, nullptr, "main", "ps_4_0",
+                              cflags, 0, &psb, &err);
+        }
+        if (SUCCEEDED(hr))
+            hr = device_->CreatePixelShader(psb->GetBufferPointer(),
+                                            psb->GetBufferSize(), nullptr,
+                                            ps_.GetAddressOf());
+        shaders_ok = SUCCEEDED(hr);
+        if (!shaders_ok)
+            wxLogError(_("D3D11: blit shader setup failed; Simple renderer will "
+                         "use the software (wx) path."));
+    }
+    FreeLibrary(hCompiler);
+    if (!shaders_ok)
+        return false;
+
+    // Full-screen quad as a triangle strip: float4 position (clip space) + float2
+    // texcoord. Texture v grows downward, clip-space y grows upward, so the top
+    // edge (y=+1) maps to v=0.
+    const float verts[] = {
+        -1.f,  1.f, 0.f, 1.f,   0.f, 0.f,
+        -1.f, -1.f, 0.f, 1.f,   0.f, 1.f,
+         1.f,  1.f, 0.f, 1.f,   1.f, 0.f,
+         1.f, -1.f, 0.f, 1.f,   1.f, 1.f,
+    };
+    D3D11_BUFFER_DESC bd = {};
+    bd.ByteWidth = sizeof(verts);
+    bd.Usage     = D3D11_USAGE_IMMUTABLE;
+    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    D3D11_SUBRESOURCE_DATA srd = {};
+    srd.pSysMem = verts;
+    if (FAILED(device_->CreateBuffer(&bd, &srd, vertex_buffer_.GetAddressOf())))
+        return false;
+
+    // Point sampling by default (pixel-exact, matching the old nearest blit);
+    // linear when the user enables bilinear, like the D3D12 path.
+    D3D11_SAMPLER_DESC sd = {};
+    sd.Filter = OPTION(kDispBilinear) ? D3D11_FILTER_MIN_MAG_MIP_LINEAR
+                                      : D3D11_FILTER_MIN_MAG_MIP_POINT;
+    sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sd.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sd.MaxLOD = D3D11_FLOAT32_MAX;
+    if (FAILED(device_->CreateSamplerState(&sd, sampler_.GetAddressOf())))
+        return false;
+
+    // Solid fill, no culling -- the full-screen quad must draw regardless of its
+    // winding (the D3D12 path likewise uses CULL_NONE). Without this the default
+    // back-face cull can drop the quad and present a black frame.
+    D3D11_RASTERIZER_DESC rd = {};
+    rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_NONE;
+    rd.DepthClipEnable = TRUE;
+    if (FAILED(device_->CreateRasterizerState(&rd, rasterizer_.GetAddressOf())))
+        return false;
+
+    pipeline_ready_ = true;
+    return true;
+}
+
+bool DX11DrawingPanel::ResizeSwapchain(int W, int H)
+{
+    if (!swap_chain_) return false;
+    if (W < 1) W = 1;
+    if (H < 1) H = 1;
+    if (W == sc_w_ && H == sc_h_ && rtv_) return true;
+    // The RTV holds a reference to the back buffer; it must be released before
+    // ResizeBuffers and rebuilt afterward.
+    rtv_.Reset();
+    const UINT flags = allow_tearing_ ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+    HRESULT hr = swap_chain_->ResizeBuffers(0, (UINT)W, (UINT)H,
+                                            DXGI_FORMAT_UNKNOWN, flags);
+    if (FAILED(hr)) {
+        wxLogDebug(wxT("D3D11: ResizeBuffers failed: 0x%08X"), hr);
+        return false;
+    }
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> back;
+    if (FAILED(swap_chain_->GetBuffer(0, IID_PPV_ARGS(&back))) || !back)
+        return false;
+    if (FAILED(device_->CreateRenderTargetView(back.Get(), nullptr,
+                                               rtv_.GetAddressOf())))
+        return false;
+    sc_w_ = W; sc_h_ = H;
+    // ResizeBuffers can drop the swapchain color space; re-apply it next frame.
+    colorspace_applied_ = false;
+    return true;
+}
+
+// (Re)create the DYNAMIC source texture (and its SRV) the corrected frame is
+// uploaded into at its own resolution; the GPU then scales it to the window.
+bool DX11DrawingPanel::EnsureSourceTexture(int W, int H, DXGI_FORMAT fmt)
+{
+    if (src_tex_ && W == src_w_ && H == src_h_ && fmt == src_fmt_)
+        return true;
+    src_srv_.Reset();
+    src_tex_.Reset();
+    if (W < 1 || H < 1) return false;
+
+    D3D11_TEXTURE2D_DESC td = {};
+    td.Width            = (UINT)W;
+    td.Height           = (UINT)H;
+    td.MipLevels        = 1;
+    td.ArraySize        = 1;
+    td.Format           = fmt;
+    td.SampleDesc.Count = 1;
+    td.Usage            = D3D11_USAGE_DYNAMIC;
+    td.BindFlags        = D3D11_BIND_SHADER_RESOURCE;
+    td.CPUAccessFlags   = D3D11_CPU_ACCESS_WRITE;
+    if (FAILED(device_->CreateTexture2D(&td, nullptr, src_tex_.GetAddressOf()))) {
+        src_tex_.Reset();
+        return false;
+    }
+    if (FAILED(device_->CreateShaderResourceView(src_tex_.Get(), nullptr,
+                                                 src_srv_.GetAddressOf()))) {
+        src_srv_.Reset();
+        src_tex_.Reset();
+        return false;
+    }
+    src_w_ = W; src_h_ = H; src_fmt_ = fmt;
+    return true;
+}
+
+bool DX11DrawingPanel::PresentFrame(wxImage* im)
+{
+    if (!swap_chain_ || !device_ || !context_ || !pipeline_ready_)
+        return false;
+
+    int W = 1, H = 1;
+    GetClientSize(&W, &H);
+    if (W < 1) W = 1;
+    if (H < 1) H = 1;
+
+    if (!ResizeSwapchain(W, H)) return false;
+
+    const bool hdr =
+        hdr_swapchain_ && HdrActive() && panel_color_depth_ == 32 && todraw;
+
+    // Ensure the BT.2020 PQ color space is set now that the window is up (no-op
+    // once it has taken); it can fail at construction before the window is shown.
+    if (hdr) ApplyHdrColorSpace();
+
+    // Upload the corrected frame at its own (source) resolution -- not the window
+    // size -- into the DYNAMIC texture; the GPU upscales it when sampling. So the
+    // CPU only ever touches source-sized pixels and there is no back-buffer copy.
+    if (hdr) {
+        // 32-bit RGBA8 todraw has a 1px filter border; skip the first row and use
+        // the bordered row length as the source stride. Encode straight to PQ10
+        // (A2B10G10R10 == DXGI_FORMAT_R10G10B10A2_UNORM).
+        const int sw     = (int)std::ceil(width * scale);
+        const int sh     = (int)std::ceil(height * scale);
+        const int rowlen = (int)std::ceil((width + 1) * scale);
+        if (sw < 1 || sh < 1) return false;
+        if (!EnsureSourceTexture(sw, sh, DXGI_FORMAT_R10G10B10A2_UNORM))
+            return false;
+        D3D11_MAPPED_SUBRESOURCE mapped = {};
+        if (FAILED(context_->Map(src_tex_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
+                                 &mapped)))
+            return false;
+        hdr::EncodePQ10(todraw + (size_t)rowlen * 4, rowlen * 4, sw, sh,
+                        reinterpret_cast<uint32_t*>(mapped.pData),
+                        (int)mapped.RowPitch);
+        context_->Unmap(src_tex_.Get(), 0);
+    } else if (im) {
+        // SDR: convert the 24-bit RGB image to BGRA8 (B8G8R8A8_UNORM) at its own
+        // size, honoring the mapped row pitch.
+        const int sw = im->GetWidth();
+        const int sh = im->GetHeight();
+        if (sw < 1 || sh < 1) return false;
+        if (!EnsureSourceTexture(sw, sh, DXGI_FORMAT_B8G8R8A8_UNORM))
+            return false;
+        D3D11_MAPPED_SUBRESOURCE mapped = {};
+        if (FAILED(context_->Map(src_tex_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
+                                 &mapped)))
+            return false;
+        const unsigned char* sd = im->GetData();
+        uint8_t* base = static_cast<uint8_t*>(mapped.pData);
+        for (int y = 0; y < sh; ++y) {
+            const unsigned char* srow = sd + (size_t)y * sw * 3;
+            uint8_t* drow = base + (size_t)y * mapped.RowPitch;
+            for (int x = 0; x < sw; ++x) {
+                const unsigned char* p = srow + (size_t)x * 3;
+                drow[x * 4 + 0] = p[2];  // B
+                drow[x * 4 + 1] = p[1];  // G
+                drow[x * 4 + 2] = p[0];  // R
+                drow[x * 4 + 3] = 0xff;  // A
+            }
+        }
+        context_->Unmap(src_tex_.Get(), 0);
+    } else {
+        return false;
+    }
+
+    // Draw the full-screen quad: the GPU samples the source texture across the
+    // whole client area, doing the upscale.
+    ID3D11RenderTargetView* rtv = rtv_.Get();
+    context_->OMSetRenderTargets(1, &rtv, nullptr);
+    D3D11_VIEWPORT vp = {};
+    vp.Width = (float)W; vp.Height = (float)H; vp.MaxDepth = 1.0f;
+    context_->RSSetViewports(1, &vp);
+    context_->RSSetState(rasterizer_.Get());
+
+    const UINT stride = 6 * sizeof(float), offset = 0;
+    ID3D11Buffer* vb = vertex_buffer_.Get();
+    context_->IASetInputLayout(input_layout_.Get());
+    context_->IASetVertexBuffers(0, 1, &vb, &stride, &offset);
+    context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+    context_->VSSetShader(vs_.Get(), nullptr, 0);
+    context_->PSSetShader(ps_.Get(), nullptr, 0);
+    ID3D11ShaderResourceView* srv = src_srv_.Get();
+    context_->PSSetShaderResources(0, 1, &srv);
+    ID3D11SamplerState* smp = sampler_.Get();
+    context_->PSSetSamplers(0, 1, &smp);
+    context_->Draw(4, 0);
+
+    const UINT sync = OPTION(kPrefVsync) ? 1u : 0u;
+    const UINT pf =
+        (allow_tearing_ && !OPTION(kPrefVsync)) ? DXGI_PRESENT_ALLOW_TEARING : 0u;
+    swap_chain_->Present(sync, pf);
+    return true;
+}
+
+void DX11DrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+{
+    if (swap_chain_ && PresentFrame(im))
+        return;
+    // Device unavailable (or present failed): plain wx software path.
+    BasicDrawingPanel::DrawImage(dc, im);
+}
+
+void DX11DrawingPanel::Teardown()
+{
+    if (context_) context_->ClearState();
+    src_srv_.Reset();
+    src_tex_.Reset();
+    rasterizer_.Reset();
+    sampler_.Reset();
+    vertex_buffer_.Reset();
+    input_layout_.Reset();
+    ps_.Reset();
+    vs_.Reset();
+    rtv_.Reset();
+    swap_chain_.Reset();
+    context_.Reset();
+    device_.Reset();
+}
+#endif  // __WXMSW__ && !NO_D3D11
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
 #undef  DIRECT3D_VERSION
@@ -5645,7 +7702,10 @@ void DXDrawingPanel::DrawingPanelInit()
 {
     DrawingPanelBase::DrawingPanelInit();
 
+    // No Direct3D 9 device -> setup (done in the constructor) failed; flag it so
+    // GameArea falls back to the next renderer in the priority list.
     if (!device) {
+        init_failed_ = true;
         return;
     }
 
@@ -6202,6 +8262,552 @@ void GameArea::OnGBBorderChanged(config::Option* option) {
     }
 }
         
+bool GameArea::HdrEffective() const {
+    return panel && panel->HdrActive();
+}
+
+void GameArea::ApplyAutoColorCorrection() {
+    if (!OPTION(kDispColorCorrectionAuto))
+        return;
+    // Follow the effective output, not the raw preference: HDR may be enabled in
+    // the options but unavailable on this display, in which case we output SDR.
+    const bool hdr_effective = HdrEffectivelyAvailable() && OPTION(kDispHDR);
+    const auto wanted = hdr_effective
+                            ? config::ColorCorrectionProfile::kRec2020
+                            : config::ColorCorrectionProfile::kSRGB;
+    if (OPTION(kDispColorCorrectionProfile) != wanted)
+        OPTION(kDispColorCorrectionProfile) = wanted;
+}
+
+bool GameArea::IsHdrCapableRenderer(config::RenderMethod m) const {
+    using RM = config::RenderMethod;
+#ifndef NO_VULKAN
+    if (m == RM::kVulkan) return VbamVulkanRuntimeAvailable();
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+    if (m == RM::kDirect3d12) return true;
+#endif
+#if defined(__WXMAC__)
+#ifndef NO_METAL
+    if (m == RM::kMetal) return true;
+#endif
+    if (m == RM::kQuartz2d) return true;  // CoreGraphics EDR
+    if (m == RM::kSimple) return true;    // Simple is the Quartz2D driver on macOS
+#endif
+#if defined(__WXGTK__) && defined(HAVE_WAYLAND_CM)
+    // On Wayland, Simple is the software shm BT.2020 PQ driver (HDR-capable);
+    // on X11 it is the XOrg deep-color driver (not HDR), so gate on Wayland.
+    if (m == RM::kSimple && IsWayland()) return true;
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D11)
+    if (m == RM::kSimple) return true;    // D3D11 software HDR path
+#endif
+#if !defined(NO_OGL) && defined(HAVE_WAYLAND_EGL)
+    if (m == RM::kOpenGL) return true;    // Wayland EGL only
+#endif
+#ifdef ENABLE_SDL3
+    if (m == RM::kSDL) return true;
+#endif
+    return false;
+}
+
+bool GameArea::HdrEffectivelyAvailable() const {
+    return hdr::HdrAvailable() && !hdr_reverted_to_sdr_;
+}
+
+bool GameArea::RenderMethodHiddenForHdr(config::RenderMethod m) const {
+    if (!OPTION(kDispHDR) || !HdrEffectivelyAvailable())
+        return false;
+    // Hidden if it can't do HDR, or it tried and failed this session.
+    return !IsHdrCapableRenderer(m) || hdr_failed_renderers_.count(m) != 0;
+}
+
+void GameArea::EvaluateHdrRenderer() {
+    if (!OPTION(kDispHDR) || !hdr::HdrAvailable() || !panel)
+        return;
+    if (panel->HdrActive()) {
+        hdr_reverted_to_sdr_ = false;  // working -- clear any stale session revert
+        return;
+    }
+    if (hdr_reverted_to_sdr_)
+        return;  // already gave up this session; don't keep retrying/looping
+
+    const config::RenderMethod current = OPTION(kDispRenderMethod);
+
+    // An HDR swapchain's BT.2020 PQ color-space support can't be confirmed until
+    // the window is composited on the HDR output, which may not have happened
+    // when this panel latched its HDR state at construction -- a freshly shown
+    // window, and especially the very first panel at startup. So an HDR-capable
+    // renderer can come up reporting SDR purely because it was checked too early.
+    // Before abandoning the user's choice for a different renderer, give it one
+    // second chance: recreate its panel now that the window is up (this is the
+    // same moment a fallback renderer would have been created, by which point the
+    // output is ready). If it still can't present HDR after that, fall through to
+    // the normal fallback below.
+    if (IsHdrCapableRenderer(current) &&
+        hdr_retried_renderers_.count(current) == 0) {
+        hdr_retried_renderers_.insert(current);
+        wxLogDebug(wxT("HDR-capable renderer reported SDR on first init; "
+                       "recreating it once before falling back."));
+        ResetPanel();  // recreate the same renderer; HDR re-evaluated next idle
+        return;
+    }
+
+    // This renderer failed to present HDR; record it and try another. Iterate in
+    // order of preference (most robust native HDR backend first) rather than
+    // RenderMethod enum order: e.g. on Linux that means Vulkan before SDL, since
+    // SDL's HDR path is the least reliable and shouldn't be picked over Vulkan
+    // just because it has a lower enum value.
+    hdr_failed_renderers_.insert(current);
+
+    using RM = config::RenderMethod;
+    static const RM kHdrPreference[] = {
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        RM::kDirect3d12,
+#endif
+#if defined(__WXMAC__) && !defined(NO_METAL)
+        RM::kMetal,
+#endif
+#ifndef NO_VULKAN
+        RM::kVulkan,
+#endif
+#if !defined(NO_OGL) && defined(HAVE_WAYLAND_EGL)
+        RM::kOpenGL,
+#endif
+#ifdef ENABLE_SDL3
+        RM::kSDL,
+#endif
+#if defined(__WXMAC__) || (defined(__WXGTK__) && defined(HAVE_WAYLAND_CM)) || \
+    (defined(__WXMSW__) && !defined(NO_D3D11))
+        // Software HDR last resort: Quartz2D EDR (macOS), shm BT.2020 PQ
+        // (Wayland) or D3D11 (Windows). IsHdrCapableRenderer() filters it out
+        // where Simple isn't HDR-capable (e.g. X11).
+        RM::kSimple,
+#endif
+    };
+
+    for (const RM m : kHdrPreference) {
+        if (m != OPTION(kDispRenderMethod) && IsHdrCapableRenderer(m) &&
+            hdr_failed_renderers_.count(m) == 0 &&
+            render_init_failed_.count(m) == 0) {
+            // Expected, silent fallback (e.g. OpenGL HDR is NVIDIA-only, so on
+            // Mesa we transparently move to Vulkan). Debug-level, not a dialog.
+            // Skip renderers that failed to initialize at all (render_init_failed_)
+            // so an HDR-capable-but-broken renderer isn't picked in a loop with
+            // EvaluateRenderer.
+            wxLogDebug(wxT("HDR renderer failed; trying another HDR renderer."));
+            OPTION(kDispRenderMethod) = m;  // observer schedules a panel reset
+            return;
+        }
+    }
+
+    // Every HDR-capable renderer failed: fall back to SDR for this session.
+    // Leave the HDR option in "auto" (true) -- only the user turns it off. The
+    // checkbox stays checked and the dialog shows a warning; output is SDR. But
+    // reflect SDR in the auto color-correction profile (HDR would have used
+    // Rec2020) so colors aren't corrected for a wide gamut we aren't presenting.
+    wxLogDebug(wxT("No renderer could present HDR; reverting to SDR for this session."));
+    hdr_reverted_to_sdr_ = true;
+    if (OPTION(kDispColorCorrectionAuto))
+        OPTION(kDispColorCorrectionProfile) = config::ColorCorrectionProfile::kSRGB;
+}
+
+void GameArea::EvaluateRenderer() {
+    if (!panel || !panel->DrawingInitFailed())
+        return;
+
+    // The SDL render method is a meta-renderer that selects and falls back among
+    // its own backends internally (and the dialog steers its backend picker).
+    // Don't pull the user off an explicitly chosen SDL onto a different native
+    // render method on an init hiccup -- a transient failure during a panel
+    // reset (e.g. toggling deep color) would otherwise bounce SDL to the first
+    // working method in the priority list (Vulkan), abandoning the SDL choice.
+    if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL)
+        return;
+
+    using RM = config::RenderMethod;
+    // Per-platform renderer priority. Only methods compiled in on this platform
+    // appear (the #if guards mirror the RenderMethod enum and NewPanelForRender-
+    // Method cases), so the list is exactly:
+    //   Windows: DX12, Vulkan, SDL, OpenGL, Direct3D 9, Simple
+    //   macOS:   Metal, Vulkan, SDL, OpenGL, Simple
+    //   Linux:   Vulkan, SDL, OpenGL, Simple
+    static const RM kRendererPriority[] = {
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        RM::kDirect3d12,
+#endif
+#if defined(__WXMAC__) && !defined(NO_METAL)
+        RM::kMetal,
+#endif
+#ifndef NO_VULKAN
+        RM::kVulkan,
+#endif
+        RM::kSDL,
+#ifndef NO_OGL
+        RM::kOpenGL,
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+        RM::kDirect3d,  // legacy D3D9, after OpenGL
+#endif
+        RM::kSimple,
+    };
+
+    // Record the failed renderer and switch to the next one not yet tried. The
+    // option write fires the render observer, which resets the panel; the next
+    // OnIdle recreates it with the new renderer and re-evaluates.
+    render_init_failed_.insert(OPTION(kDispRenderMethod));
+    for (const RM m : kRendererPriority) {
+#ifndef NO_VULKAN
+        // Skip Vulkan when its loader is absent at run time (delay-loaded, not
+        // present) -- selecting it would fault on the first delay-loaded call.
+        if (m == RM::kVulkan && !VbamVulkanRuntimeAvailable())
+            continue;
+#endif
+        if (m != OPTION(kDispRenderMethod) && render_init_failed_.count(m) == 0) {
+            wxLogInfo(_("Renderer failed to initialize; trying the next available renderer."));
+            OPTION(kDispRenderMethod) = m;  // observer schedules a panel reset
+            return;
+        }
+    }
+
+    // Nothing left to try: keep the (non-working) panel rather than loop. The
+    // user will see a blank/error frame, but every fallback was exhausted.
+    wxLogError(_("No renderer could be initialized."));
+}
+
+bool GameArea::DeepColorEffectivelyAvailable() const {
+    return hdr::DeepColor10Available() && !deep_color_reverted_;
+}
+
+bool GameArea::IsDeepColorCapableRenderer(config::RenderMethod m) const {
+    using RM = config::RenderMethod;
+#if !defined(NO_OGL)
+    if (m == RM::kOpenGL) return true;
+#endif
+#ifndef NO_VULKAN
+    if (m == RM::kVulkan) return VbamVulkanRuntimeAvailable();
+#endif
+#ifdef ENABLE_SDL3
+    // The SDL3 renderer can present a 10-bit SDR surface on X11 when the chosen
+    // backend advertises a 2101010 texture format (verified at panel init). If
+    // the selected SDL backend turns out not to, EvaluateDeepColorRenderer
+    // records the failure and moves on, like any other capable renderer.
+    if (m == RM::kSDL) return true;
+#endif
+#ifdef __WXGTK__
+    // On X11 the Simple renderer is backed by the native XOrg driver, which
+    // presents a 10-bit deep-color surface on a depth-30 screen. (On Wayland
+    // deep color is never available, so this is moot there.)
+    if (m == RM::kSimple) return true;
+#endif
+    return false;
+}
+
+bool GameArea::RenderMethodHiddenForDeepColor(config::RenderMethod m) const {
+    if (!OPTION(kDispDeepColor) || !DeepColorEffectivelyAvailable())
+        return false;
+    // Hidden if it can't present 10-bit, or it tried and failed this session.
+    return !IsDeepColorCapableRenderer(m) || deep_color_failed_renderers_.count(m) != 0;
+}
+
+void GameArea::EvaluateDeepColorRenderer() {
+    if (!OPTION(kDispDeepColor) || !hdr::DeepColor10Available() || !panel)
+        return;
+    if (panel->DeepColorActive()) {
+        deep_color_reverted_ = false;  // working -- clear any stale session revert
+        return;
+    }
+    if (deep_color_reverted_)
+        return;  // already gave up this session; don't keep retrying/looping
+
+    // The SDL renderer manages its own 10-bit-capable backend: the panel
+    // substitutes a 2101010-capable backend (vulkan) internally and the dialog
+    // steers the backend picker to "default". So never switch the render method
+    // away from a deep-color-capable SDL build -- it presents 10-bit through its
+    // own backend once the source is 32-bit, and a transient inactive state
+    // (e.g. a 16-bit source) must not bounce the user onto the native Vulkan
+    // renderer. An SDL2 build (where kSDL is not deep-color-capable) still falls
+    // through and switches, as it genuinely cannot present 10-bit.
+    if (OPTION(kDispRenderMethod) == config::RenderMethod::kSDL &&
+        IsDeepColorCapableRenderer(config::RenderMethod::kSDL))
+        return;
+
+    // The active renderer did not present 10-bit -- either it isn't capable
+    // (simple/wx, SDL) or it is capable but failed to obtain a 10-bit surface.
+    // Record it and move to another capable renderer, preferring the most
+    // robust native backend, so enabling deep color while on a non-capable
+    // renderer transparently switches to one that works.
+    deep_color_failed_renderers_.insert(OPTION(kDispRenderMethod));
+
+    using RM = config::RenderMethod;
+    static const RM kDeepColorPreference[] = {
+#ifndef NO_VULKAN
+        RM::kVulkan,
+#endif
+#if !defined(NO_OGL)
+        RM::kOpenGL,
+#endif
+#if defined(__WXGTK__)
+        RM::kSimple,  // software (XOrg 10-bit) -- last resort
+#endif
+    };
+
+    for (const RM m : kDeepColorPreference) {
+        if (m != OPTION(kDispRenderMethod) && IsDeepColorCapableRenderer(m) &&
+            deep_color_failed_renderers_.count(m) == 0 &&
+            render_init_failed_.count(m) == 0) {  // skip init-failed renderers
+            wxLogDebug(wxT("Deep-color renderer failed; trying another renderer."));
+            OPTION(kDispRenderMethod) = m;  // observer schedules a panel reset
+            return;
+        }
+    }
+
+    // Every capable renderer failed to present 10-bit: fall back to ordinary
+    // 8-bit SDR for this session. Leave the option in "auto" (true) -- only the
+    // user turns it off; the checkbox stays checked and the dialog shows a
+    // warning.
+    wxLogInfo(_("No renderer could present 10-bit deep color; using 8-bit for this session."));
+    deep_color_reverted_ = true;
+}
+
+DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method) {
+    switch (method) {
+        case config::RenderMethod::kSimple:
+#if defined(__WXMAC__)
+            // Simple is backed by the Quartz2D (CoreGraphics) driver, which
+            // can also present EDR HDR.
+            return new Quartz2DDrawingPanel(this, basic_width, basic_height);
+#elif defined(__WXGTK__)
+            // On X11, Simple is backed by the native XOrg driver (10-bit deep
+            // color capable). On Wayland it is backed by the software HDR driver
+            // (shm BT.2020 PQ subsurface), which falls back to the plain wx path
+            // when HDR is off/unavailable.
+            if (!IsWayland())
+                return new XOrgDrawingPanel(this, basic_width, basic_height);
+#if defined(HAVE_WAYLAND_SUPPORT)
+            return new WaylandDrawingPanel(this, basic_width, basic_height);
+#else
+            return new BasicDrawingPanel(this, basic_width, basic_height);
+#endif
+#elif defined(__WXMSW__) && !defined(NO_D3D11)
+            // On Windows, Simple is backed by the D3D11 software-style driver
+            // (HDR-capable via a flip swapchain; falls back to the wx path if no
+            // device).
+            return new DX11DrawingPanel(this, basic_width, basic_height);
+#else
+            return new BasicDrawingPanel(this, basic_width, basic_height);
+#endif
+        case config::RenderMethod::kSDL:
+            return new SDLDrawingPanel(this, basic_width, basic_height);
+#ifdef __WXMAC__
+#ifndef NO_METAL
+        case config::RenderMethod::kMetal:
+            if (is_macosx_1012_or_newer())
+                return new MetalDrawingPanel(this, basic_width, basic_height);
+            wxLogInfo(_("Metal is unavailable, defaulting to OpenGL"));
+            return new GLDrawingPanel(this, basic_width, basic_height);
+#endif
+        case config::RenderMethod::kQuartz2d:
+            return new Quartz2DDrawingPanel(this, basic_width, basic_height);
+#endif
+#ifndef NO_OGL
+        case config::RenderMethod::kOpenGL:
+#if !defined(HAVE_WAYLAND_EGL) && !defined(NO_VULKAN)
+            // OpenGL needs EGL/GLX, which a native Wayland client without
+            // the wx EGL canvas cannot provide. Fall back to Vulkan, which
+            // presents natively (and can do HDR).
+            if (IsWayland()) {
+                wxLogInfo(_("OpenGL is unavailable on Wayland without EGL, using Vulkan"));
+                return new VKDrawingPanel(this, basic_width, basic_height);
+            }
+#endif
+            return new GLDrawingPanel(this, basic_width, basic_height);
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+        case config::RenderMethod::kDirect3d:
+            return new DXDrawingPanel(this, basic_width, basic_height);
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        case config::RenderMethod::kDirect3d12:
+            return new DX12DrawingPanel(this, basic_width, basic_height);
+#endif
+#ifndef NO_VULKAN
+        case config::RenderMethod::kVulkan:
+#ifdef __WXMAC__
+            if (is_macosx_11_or_newer())
+                return new VKDrawingPanel(this, basic_width, basic_height);
+            wxLogInfo(_("Vulkan is unavailable, defaulting to OpenGL"));
+            return new GLDrawingPanel(this, basic_width, basic_height);
+#else
+            return new VKDrawingPanel(this, basic_width, basic_height);
+#endif
+#endif
+        case config::RenderMethod::kLast:
+            VBAM_NOTREACHED();
+            return nullptr;
+    }
+    return nullptr;
+}
+
+void GameArea::ProbeOutputCapabilities() {
+    using RM = config::RenderMethod;
+
+    // Startup-only: never disturb a live panel / running game.
+    if (panel || emusys)
+        return;
+
+    // The cheap startup probe (hdr::DetectAvailability) gates which lane is even
+    // worth bringing a GPU up for: HDR on the HDR-capable platforms, 10-bit SDR
+    // on X11. If it found nothing plausible there is nothing to confirm.
+    const bool try_hdr  = hdr::HdrAvailable();
+    const bool try_deep = hdr::DeepColor10Available();
+    if (!try_hdr && !try_deep)
+        return;
+
+    // Save everything the probe mutates. The feature flags must be on for the
+    // renderers to request an HDR / 10-bit surface; filtering is forced off so a
+    // single plain black frame drives the simplest (no thread / no upscale) path.
+    // NB: snapshot the *values*, not the OptionProxy. `const auto x = OPTION(...)`
+    // deduces the proxy type (a live view of the option), so it would track the
+    // probe's own mutations below, and the restore would be a no-op proxy-to-proxy
+    // copy -- leaving filter/IFB/profile stuck at the forced kNone (and saved that
+    // way on exit). Naming the value type forces the proxy's conversion operator,
+    // taking a real snapshot.
+    const RM saved_method = OPTION(kDispRenderMethod);
+    const bool saved_hdr  = OPTION(kDispHDR);
+    const bool saved_deep = OPTION(kDispDeepColor);
+    const config::Filter saved_filter = OPTION(kDispFilter);
+    const config::Interframe saved_ifb = OPTION(kDispIFB);
+    const config::ColorCorrectionProfile saved_profile =
+        OPTION(kDispColorCorrectionProfile);
+
+    OPTION(kDispFilter) = config::Filter::kNone;
+    OPTION(kDispIFB)    = config::Interframe::kNone;
+
+    // Bring `method` up on this panel, render one black frame so DrawingPanelInit()
+    // creates the real swapchain/visual and latches its capability flags, and
+    // return the panel for inspection. Sets this->panel so the draw path's
+    // GetPanel()->panel lookup resolves to it; the caller tears it back down.
+    auto bring_up = [this](RM method) -> DrawingPanelBase* {
+        DrawingPanelBase* p = NewPanelForRenderMethod(method);
+        if (!p)
+            return nullptr;
+        panel = p;
+        wxWindow* w = p->GetWindow();
+        w->SetSize(wxSize(basic_width, basic_height));
+        // scale is 1 and filtering is off, so a (basic_width+2)x(basic_height+4)
+        // 32-bpp zero buffer is a safe upper bound for any panel_color_depth_.
+        const int stride = (basic_width + 2) * 4;
+        std::vector<uint8_t> black(
+            static_cast<size_t>(stride) * (basic_height + 4), 0);
+        uint8_t* data = black.data();
+        p->DrawArea(&data);
+        // On Wayland the draw path only queues a paint; force it now so init runs
+        // synchronously before we read the flags.
+        w->Update();
+        return p;
+    };
+
+    auto tear_down = [this](DrawingPanelBase* p) {
+        if (!p)
+            return;
+        p->StopFilterThreads();
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        if (auto* dx12 = dynamic_cast<DX12DrawingPanel*>(p)) {
+            delete dx12;
+        } else
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+        if (auto* dx9 = dynamic_cast<DXDrawingPanel*>(p)) {
+            delete dx9;
+        } else
+#endif
+        {
+            p->Destroy();
+        }
+        panel = nullptr;
+    };
+
+    bool hdr_ok = false, deep_ok = false;
+
+    if (try_hdr) {
+        OPTION(kDispHDR)       = true;
+        OPTION(kDispDeepColor) = false;
+        // Same preference order EvaluateHdrRenderer() uses at runtime.
+        static const RM kHdrPreference[] = {
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+            RM::kDirect3d12,
+#endif
+#if defined(__WXMAC__) && !defined(NO_METAL)
+            RM::kMetal,
+#endif
+#ifndef NO_VULKAN
+            RM::kVulkan,
+#endif
+#if !defined(NO_OGL) && defined(HAVE_WAYLAND_EGL)
+            RM::kOpenGL,
+#endif
+#ifdef ENABLE_SDL3
+            RM::kSDL,
+#endif
+#if defined(__WXMAC__) || (defined(__WXGTK__) && defined(HAVE_WAYLAND_CM)) || \
+    (defined(__WXMSW__) && !defined(NO_D3D11))
+            // Software HDR last resort: Quartz2D EDR (macOS), shm BT.2020 PQ
+            // (Wayland) or D3D11 (Windows). IsHdrCapableRenderer() filters it
+            // out where Simple isn't HDR-capable (e.g. X11).
+            RM::kSimple,
+#endif
+        };
+        for (const RM m : kHdrPreference) {
+            if (!IsHdrCapableRenderer(m))
+                continue;
+            DrawingPanelBase* p = bring_up(m);
+            hdr_ok = p && p->HdrActive();
+            tear_down(p);
+            if (hdr_ok)
+                break;
+        }
+    } else if (try_deep) {
+        OPTION(kDispDeepColor) = true;
+        OPTION(kDispHDR)       = false;
+        // Same preference order EvaluateDeepColorRenderer() uses at runtime.
+        static const RM kDeepColorPreference[] = {
+#ifndef NO_VULKAN
+            RM::kVulkan,
+#endif
+#if !defined(NO_OGL)
+            RM::kOpenGL,
+#endif
+#if defined(__WXGTK__)
+            RM::kSimple,  // software (XOrg 10-bit) -- last resort
+#endif
+        };
+        for (const RM m : kDeepColorPreference) {
+            if (!IsDeepColorCapableRenderer(m))
+                continue;
+            DrawingPanelBase* p = bring_up(m);
+            deep_ok = p && p->DeepColorActive();
+            tear_down(p);
+            if (deep_ok)
+                break;
+        }
+    }
+
+    // Restore the user's settings. (Toggling options above may have scheduled a
+    // panel reset via the render observer; clear it -- there is no panel yet.)
+    OPTION(kDispRenderMethod)          = saved_method;
+    OPTION(kDispHDR)                   = saved_hdr;
+    OPTION(kDispDeepColor)             = saved_deep;
+    OPTION(kDispFilter)                = saved_filter;
+    OPTION(kDispIFB)                   = saved_ifb;
+    OPTION(kDispColorCorrectionProfile) = saved_profile;
+    pending_panel_reset_ = false;
+
+    // Publish the definite result: the checkbox now appears only when a renderer
+    // actually presented the feature.
+    hdr::SetAvailability(hdr_ok, deep_ok);
+}
+
 void GameArea::UpdateLcdFilter() {
     int DCCP = 0;
 
@@ -6245,6 +8851,11 @@ void GameArea::UpdateLcdFilter() {
         gbafilter_update_colors(false);
         gbcfilter_update_colors(false);
     }
+
+    // Brightness/knee sliders and the color-correction profile feed the HDR
+    // encoder; refresh its tables live without recreating the panel.
+    if (panel)
+        panel->UpdateHdrState();
 }
         
 void GameArea::SuspendScreenSaver() {
@@ -6310,14 +8921,16 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
     // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
     // 16 or 32, though
     if (OPTION(kDispFilter) == config::Filter::kNone &&
-        OPTION(kDispIFB) == config::Interframe::kNone) {
-        // changing from 32 to 24 does not require regenerating color tables
+        OPTION(kDispIFB) == config::Interframe::kNone &&
+        !(hdr::HdrAvailable() && OPTION(kDispHDR))) {
+        // changing from 32 to 24 does not require regenerating color tables.
+        // HDR needs a 32-bit source for the encoder, so leave it forced to 32.
         systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
     }
 
     DrawingPanelInit();
 }
-        
+
 void MetalDrawingPanel::DrawArea(uint8_t** data)
 {
     // double-buffer buffer:
@@ -6782,6 +9395,167 @@ const uint32_t VKDrawingPanel::kFragSpv[] = {
 const size_t VKDrawingPanel::kFragSpvSize = sizeof(kFragSpv);
          
 // ─── Constructor ──────────────────────────────────────────────────────────────
+#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+// ── Run-time Vulkan loader (volk-style) ──────────────────────────────────────
+// On Windows and Linux we do not link the Vulkan import library; vulkan.h is
+// included with VK_NO_PROTOTYPES (drawing.h) and the functions we use are
+// resolved at run time from the system loader via wxDynamicLibrary +
+// vkGetInstanceProcAddr. This keeps the loader out of the import table (never a
+// load-time dependency, never bundled / app-local-copied) and lets the app run
+// on machines without Vulkan, with the renderer simply reported unavailable.
+
+// Bootstrap entry point, fetched from the loader library by symbol.
+static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
+
+// Global-level functions, resolvable before any instance exists.
+#define VBAM_VK_GLOBAL_FUNCS(F) \
+    F(vkCreateInstance) \
+    F(vkEnumerateInstanceExtensionProperties)
+
+// Instance- and device-level functions, resolved once an instance exists
+// (vkGetInstanceProcAddr returns working dispatch for device-level entries too).
+#define VBAM_VK_INSTANCE_FUNCS(F) \
+    F(vkAcquireNextImageKHR) \
+    F(vkAllocateCommandBuffers) \
+    F(vkAllocateDescriptorSets) \
+    F(vkAllocateMemory) \
+    F(vkBeginCommandBuffer) \
+    F(vkBindBufferMemory) \
+    F(vkBindImageMemory) \
+    F(vkCmdBeginRenderPass) \
+    F(vkCmdBindDescriptorSets) \
+    F(vkCmdBindPipeline) \
+    F(vkCmdClearColorImage) \
+    F(vkCmdCopyBufferToImage) \
+    F(vkCmdDraw) \
+    F(vkCmdEndRenderPass) \
+    F(vkCmdPipelineBarrier) \
+    F(vkCmdPushConstants) \
+    F(vkCmdSetScissor) \
+    F(vkCmdSetViewport) \
+    F(vkCreateBuffer) \
+    F(vkCreateCommandPool) \
+    F(vkCreateDescriptorPool) \
+    F(vkCreateDescriptorSetLayout) \
+    F(vkCreateDevice) \
+    F(vkCreateFence) \
+    F(vkCreateFramebuffer) \
+    F(vkCreateGraphicsPipelines) \
+    F(vkCreateImage) \
+    F(vkCreateImageView) \
+    F(vkCreatePipelineLayout) \
+    F(vkCreateRenderPass) \
+    F(vkCreateSampler) \
+    F(vkCreateSemaphore) \
+    F(vkCreateShaderModule) \
+    F(vkCreateSwapchainKHR) \
+    F(vkDestroyBuffer) \
+    F(vkDestroyCommandPool) \
+    F(vkDestroyDescriptorPool) \
+    F(vkDestroyDescriptorSetLayout) \
+    F(vkDestroyDevice) \
+    F(vkDestroyFence) \
+    F(vkDestroyFramebuffer) \
+    F(vkDestroyImage) \
+    F(vkDestroyImageView) \
+    F(vkDestroyInstance) \
+    F(vkDestroyPipeline) \
+    F(vkDestroyPipelineLayout) \
+    F(vkDestroyRenderPass) \
+    F(vkDestroySampler) \
+    F(vkDestroySemaphore) \
+    F(vkDestroyShaderModule) \
+    F(vkDestroySurfaceKHR) \
+    F(vkDestroySwapchainKHR) \
+    F(vkDeviceWaitIdle) \
+    F(vkEndCommandBuffer) \
+    F(vkEnumerateDeviceExtensionProperties) \
+    F(vkEnumeratePhysicalDevices) \
+    F(vkFreeMemory) \
+    F(vkGetBufferMemoryRequirements) \
+    F(vkGetDeviceProcAddr) \
+    F(vkGetDeviceQueue) \
+    F(vkGetImageMemoryRequirements) \
+    F(vkGetPhysicalDeviceMemoryProperties) \
+    F(vkGetPhysicalDeviceProperties) \
+    F(vkGetPhysicalDeviceQueueFamilyProperties) \
+    F(vkGetPhysicalDeviceSurfaceCapabilitiesKHR) \
+    F(vkGetPhysicalDeviceSurfaceFormatsKHR) \
+    F(vkGetPhysicalDeviceSurfacePresentModesKHR) \
+    F(vkGetPhysicalDeviceSurfaceSupportKHR) \
+    F(vkGetSwapchainImagesKHR) \
+    F(vkMapMemory) \
+    F(vkQueuePresentKHR) \
+    F(vkQueueSubmit) \
+    F(vkResetCommandBuffer) \
+    F(vkResetFences) \
+    F(vkSetHdrMetadataEXT) \
+    F(vkUnmapMemory) \
+    F(vkUpdateDescriptorSets) \
+    F(vkWaitForFences)
+
+// Platform surface-creation functions (instance-level).
+#if defined(__WXMSW__)
+#define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateWin32SurfaceKHR)
+#elif defined(__WXGTK__)
+#define VBAM_VK_SURFACE_FUNCS(F) \
+    F(vkCreateWaylandSurfaceKHR) \
+    F(vkCreateXlibSurfaceKHR)
+#else
+#define VBAM_VK_SURFACE_FUNCS(F)
+#endif
+
+#define VBAM_VK_DECLARE(name) static PFN_##name name = nullptr;
+VBAM_VK_GLOBAL_FUNCS(VBAM_VK_DECLARE)
+VBAM_VK_INSTANCE_FUNCS(VBAM_VK_DECLARE)
+VBAM_VK_SURFACE_FUNCS(VBAM_VK_DECLARE)
+#undef VBAM_VK_DECLARE
+
+// Load the loader library and the global-level functions. Cached; returns false
+// (Vulkan unavailable) if the loader or any required global symbol is missing.
+static bool VbamVulkanBootstrap() {
+    static int state = 0;  // 0 = untried, 1 = ok, -1 = failed
+    if (state != 0) return state == 1;
+
+    static wxDynamicLibrary vklib;
+    static const wxChar* const kNames[] = {
+#if defined(__WXMSW__)
+        wxT("vulkan-1.dll"),
+#else
+        wxT("libvulkan.so.1"), wxT("libvulkan.so"),
+#endif
+    };
+    for (const wxChar* n : kNames) {
+        if (vklib.Load(n, wxDL_VERBATIM | wxDL_QUIET))
+            break;
+    }
+    if (!vklib.IsLoaded()) { state = -1; return false; }
+
+    vkGetInstanceProcAddr = reinterpret_cast<PFN_vkGetInstanceProcAddr>(
+        vklib.GetSymbol(wxT("vkGetInstanceProcAddr")));
+    if (!vkGetInstanceProcAddr) { state = -1; return false; }
+
+#define VBAM_VK_LOAD_GLOBAL(name) \
+    name = reinterpret_cast<PFN_##name>(vkGetInstanceProcAddr(nullptr, #name)); \
+    if (!name) { state = -1; return false; }
+    VBAM_VK_GLOBAL_FUNCS(VBAM_VK_LOAD_GLOBAL)
+#undef VBAM_VK_LOAD_GLOBAL
+
+    state = 1;
+    return true;
+}
+
+// Resolve the instance-/device-level functions once an instance exists. Must be
+// called immediately after each successful vkCreateInstance.
+static void VbamVulkanLoadInstanceFns(VkInstance instance) {
+#define VBAM_VK_LOAD_INSTANCE(name) \
+    name = reinterpret_cast<PFN_##name>(vkGetInstanceProcAddr(instance, #name));
+    VBAM_VK_INSTANCE_FUNCS(VBAM_VK_LOAD_INSTANCE)
+    VBAM_VK_SURFACE_FUNCS(VBAM_VK_LOAD_INSTANCE)
+#undef VBAM_VK_LOAD_INSTANCE
+}
+#endif  // dynamic Vulkan (Windows / Linux)
+
 VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
     : DrawingPanel(parent, _width, _height)
 {
@@ -6795,7 +9569,7 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
     vsync_ = OPTION(kPrefVsync);
  
     if (!CreateInstance())    { return; }
- 
+
 #ifdef __WXMSW__
     if (!CreateSurfaceWIN32()){ return; }
 #elif defined(__WXMAC__)
@@ -6805,7 +9579,7 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
 #else
 #error "Must be GTK, macOS or Windows"
 #endif
- 
+
     if (!PickPhysicalDevice())          { return; }
     if (!CreateLogicalDevice())         { return; }
     if (!CreateSwapchain())             { return; }
@@ -6818,7 +9592,7 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
     if (!CreateCommandBuffers())        { return; }
     if (!CreateSyncObjects())           { return; }
     if (!CreateDescriptorPoolAndSet())  { return; }
- 
+
     wxLogDebug(_("Vulkan device created successfully"));
 }
  
@@ -6849,11 +9623,21 @@ VKDrawingPanel::~VKDrawingPanel()
     if (device_)   vkDestroyDevice      (device_,            nullptr);
     if (surface_)  vkDestroySurfaceKHR  (instance_, surface_, nullptr);
     if (instance_) vkDestroyInstance    (instance_,           nullptr);
+
+#if defined(__WXGTK__) && !defined(NO_WAYLAND)
+    // Tear down the Wayland subsurface after the Vulkan surface that used it.
+    DestroyWaylandSubsurface();
+#endif
 }
  
 // ─── CreateInstance ───────────────────────────────────────────────────────────
 bool VKDrawingPanel::CreateInstance()
 {
+#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+    // Resolve the Vulkan loader before any vk* call; bail if it is absent.
+    if (!VbamVulkanBootstrap())
+        return false;
+#endif
     VkApplicationInfo app_info{};
     app_info.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     app_info.pApplicationName   = "VBAm";
@@ -6932,6 +9716,22 @@ bool VKDrawingPanel::CreateInstance()
     }
 #endif
  
+    // Enable extra swapchain color spaces (HDR10 PQ, scRGB, ...) when the
+    // loader exposes them. Required to enumerate HDR surface formats below.
+    {
+        uint32_t n = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &n, nullptr);
+        std::vector<VkExtensionProperties> all(n);
+        vkEnumerateInstanceExtensionProperties(nullptr, &n, all.data());
+        for (auto& e : all) {
+            if (strcmp(e.extensionName,
+                       VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME) == 0) {
+                extensions.push_back(VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME);
+                break;
+            }
+        }
+    }
+
     VkInstanceCreateInfo ci{};
     ci.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     ci.pApplicationInfo        = &app_info;
@@ -6948,6 +9748,10 @@ bool VKDrawingPanel::CreateInstance()
         return false;
     }
     wxLogDebug(_("Vulkan instance created"));
+#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+    // Resolve instance-/device-level entry points now that the instance exists.
+    VbamVulkanLoadInstanceFns(instance_);
+#endif
     return true;
 }
  
@@ -7021,6 +9825,90 @@ bool VKDrawingPanel::CreateSurfaceXLIB(Window win)
 }
  
 #ifndef NO_WAYLAND
+// ─── Wayland subsurface for Vulkan ────────────────────────────────────────────
+// GTK owns and renders to the toplevel wl_surface, so Vulkan must present to a
+// dedicated child surface. Bind wl_compositor/wl_subcompositor from the display
+// registry, then create a desync subsurface parented under GTK's surface.
+namespace {
+struct VbamWlGlobals {
+    struct wl_compositor*    comp    = nullptr;
+    struct wl_subcompositor* subcomp = nullptr;
+};
+void vbam_wl_global(void* data, struct wl_registry* reg, uint32_t name,
+                    const char* iface, uint32_t /*version*/) {
+    auto* g = static_cast<VbamWlGlobals*>(data);
+    if (strcmp(iface, "wl_compositor") == 0)
+        g->comp = static_cast<struct wl_compositor*>(
+            wl_registry_bind(reg, name, &wl_compositor_interface, 1));
+    else if (strcmp(iface, "wl_subcompositor") == 0)
+        g->subcomp = static_cast<struct wl_subcompositor*>(
+            wl_registry_bind(reg, name, &wl_subcompositor_interface, 1));
+}
+void vbam_wl_global_remove(void*, struct wl_registry*, uint32_t) {}
+const struct wl_registry_listener kVbamWlRegistryListener = {
+    vbam_wl_global, vbam_wl_global_remove
+};
+}  // namespace
+
+void VKDrawingPanel::PositionWaylandSubsurface()
+{
+    if (!wl_subsurface_)
+        return;
+    GtkWidget* widget   = static_cast<GtkWidget*>(GetHandle());
+    GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+    int x = 0, y = 0;
+    gtk_widget_translate_coordinates(widget, toplevel, 0, 0, &x, &y);
+    wl_subsurface_set_position(wl_subsurface_, x, y);
+}
+
+struct wl_surface* VKDrawingPanel::CreateWaylandSubsurface(struct wl_display* dpy,
+                                                           struct wl_surface* parent)
+{
+    if (!wl_compositor_ || !wl_subcompositor_) {
+        VbamWlGlobals g;
+        struct wl_registry* reg = wl_display_get_registry(dpy);
+        wl_registry_add_listener(reg, &kVbamWlRegistryListener, &g);
+        wl_display_roundtrip(dpy);
+        wl_registry_destroy(reg);
+        wl_compositor_    = g.comp;
+        wl_subcompositor_ = g.subcomp;
+    }
+    if (!wl_compositor_ || !wl_subcompositor_) {
+        wxLogError(_("Wayland: wl_compositor/wl_subcompositor unavailable; "
+                     "cannot create Vulkan subsurface"));
+        return nullptr;
+    }
+
+    wl_child_surface_ = wl_compositor_create_surface(wl_compositor_);
+    wl_subsurface_    = wl_subcompositor_get_subsurface(
+        wl_subcompositor_, wl_child_surface_, parent);
+    if (!wl_child_surface_ || !wl_subsurface_) {
+        wxLogError(_("Wayland: failed to create Vulkan subsurface"));
+        DestroyWaylandSubsurface();
+        return nullptr;
+    }
+
+    // Desync so Vulkan present commits take effect without a parent commit.
+    wl_subsurface_set_desync(wl_subsurface_);
+    PositionWaylandSubsurface();
+
+    // Don't intercept input -- let GTK keep handling pointer/keyboard.
+    struct wl_region* empty = wl_compositor_create_region(wl_compositor_);
+    wl_surface_set_input_region(wl_child_surface_, empty);
+    wl_region_destroy(empty);
+    wl_surface_commit(wl_child_surface_);
+
+    return wl_child_surface_;
+}
+
+void VKDrawingPanel::DestroyWaylandSubsurface()
+{
+    if (wl_subsurface_)    { wl_subsurface_destroy(wl_subsurface_);    wl_subsurface_ = nullptr; }
+    if (wl_child_surface_) { wl_surface_destroy(wl_child_surface_);    wl_child_surface_ = nullptr; }
+    if (wl_subcompositor_) { wl_subcompositor_destroy(wl_subcompositor_); wl_subcompositor_ = nullptr; }
+    if (wl_compositor_)    { wl_compositor_destroy(wl_compositor_);    wl_compositor_ = nullptr; }
+}
+
 // ─── CreateSurface (Wayland) ──────────────────────────────────────────────────
 // FIX: Error message previously said "Win32 surface" (copy-paste).
 bool VKDrawingPanel::CreateSurfaceWAYLAND(struct wl_surface* wayland_surface,
@@ -7068,14 +9956,18 @@ bool VKDrawingPanel::CreateSurfaceUNIX()
     if (have_wayland_surface_ && GDK_IS_WAYLAND_WINDOW(gdk_win)) {
         struct wl_display* wl_dpy =
             gdk_wayland_display_get_wl_display(gdk_dpy);
-        struct wl_surface* wl_surf =
+        struct wl_surface* parent =
             gdk_wayland_window_get_wl_surface(gdk_win);
- 
-        if (!wl_dpy || !wl_surf) {
+
+        if (!wl_dpy || !parent) {
             wxLogError(_("Failed to obtain Wayland display/surface handles"));
             return false;
         }
-        return CreateSurfaceWAYLAND(wl_surf, wl_dpy);
+        // Present to a dedicated child subsurface, not GTK's own surface.
+        struct wl_surface* child = CreateWaylandSubsurface(wl_dpy, parent);
+        if (!child)
+            return false;
+        return CreateSurfaceWAYLAND(child, wl_dpy);
     } else if (have_xlib_surface_) {
 #endif
         XID xid = GDK_WINDOW_XID(gdk_win);
@@ -7130,8 +10022,13 @@ bool VKDrawingPanel::PickPhysicalDevice()
         std::vector<VkExtensionProperties> exts(ext_count);
         vkEnumerateDeviceExtensionProperties(pd, nullptr, &ext_count, exts.data());
         bool has_swapchain = false;
-        for (auto& e : exts)
-            if (strcmp(e.extensionName, req_ext) == 0) { has_swapchain = true; break; }
+        bool has_hdr_metadata = false;
+        for (auto& e : exts) {
+            if (strcmp(e.extensionName, req_ext) == 0) has_swapchain = true;
+            else if (strcmp(e.extensionName,
+                            VK_EXT_HDR_METADATA_EXTENSION_NAME) == 0)
+                has_hdr_metadata = true;
+        }
         if (!has_swapchain)
             continue;
  
@@ -7144,7 +10041,11 @@ bool VKDrawingPanel::PickPhysicalDevice()
         physical_device_ = pd;
         graphics_family_ = gfx;
         present_family_  = prs;
- 
+        // VK_EXT_hdr_metadata lets us hand the compositor the content's
+        // luminance envelope (vkSetHdrMetadataEXT) so it tone-maps our peak to
+        // the display peak instead of assuming PQ's 10000-nit default range.
+        hdr_metadata_ext_ = has_hdr_metadata;
+
         VkPhysicalDeviceProperties props;
         vkGetPhysicalDeviceProperties(pd, &props);
         wxLogDebug(_("Selected Vulkan device: %s"), props.deviceName);
@@ -7175,7 +10076,13 @@ bool VKDrawingPanel::CreateLogicalDevice()
         add_queue(present_family_);
  
     std::vector<const char*> dev_exts = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
- 
+
+    // Enable HDR luminance metadata when the device supports it (detected in
+    // PickPhysicalDevice). CreateSwapchain uses it to declare our content
+    // luminance envelope on an HDR10 swapchain.
+    if (hdr_metadata_ext_)
+        dev_exts.push_back(VK_EXT_HDR_METADATA_EXTENSION_NAME);
+
 #ifdef __WXMAC__
     // Required by MoltenVK when the portability enumeration layer is active.
     dev_exts.push_back("VK_KHR_portability_subset");
@@ -7211,14 +10118,50 @@ bool VKDrawingPanel::CreateSwapchain()
     vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device_, surface_, &fmt_count, formats.data());
  
     VkSurfaceFormatKHR chosen_fmt = formats[0];
-    for (auto& f : formats) {
-        if (f.format     == VK_FORMAT_B8G8R8A8_UNORM &&
-            f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            chosen_fmt = f;
-            break;
+    swapchain_is_hdr_ = false;
+
+    // Prefer a 10-bit BT.2020 PQ (HDR10) swapchain when HDR is requested and the
+    // surface advertises it; the encoder produces matching A2B10G10R10 PQ data.
+    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+        for (auto& f : formats) {
+            if (f.format     == VK_FORMAT_A2B10G10R10_UNORM_PACK32 &&
+                f.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT) {
+                chosen_fmt = f;
+                swapchain_is_hdr_ = true;
+                break;
+            }
         }
     }
- 
+
+    // 10-bit SDR "deep color" (X11): when the option is on and the surface
+    // advertises a 10-bit UNORM format in the ordinary sRGB color space, present
+    // into it so the compositor receives a 10-bit image (less banding). On a
+    // depth-30 X screen the surface typically offers ONLY a 10-bit format, so
+    // this is the natural pick anyway; selecting it explicitly lets us report
+    // DeepColorActive() and keep the choice deliberate.
+    vk_deep_color_ = false;
+    if (!swapchain_is_hdr_ && OPTION(kDispDeepColor) && hdr::DeepColor10Available()) {
+        for (auto& f : formats) {
+            if ((f.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ||
+                 f.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32) &&
+                f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                chosen_fmt = f;
+                vk_deep_color_ = true;
+                break;
+            }
+        }
+    }
+
+    if (!swapchain_is_hdr_ && !vk_deep_color_) {
+        for (auto& f : formats) {
+            if (f.format     == VK_FORMAT_B8G8R8A8_UNORM &&
+                f.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                chosen_fmt = f;
+                break;
+            }
+        }
+    }
+
     uint32_t mode_count = 0;
     vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device_, surface_, &mode_count, nullptr);
     std::vector<VkPresentModeKHR> modes(mode_count);
@@ -7288,7 +10231,35 @@ bool VKDrawingPanel::CreateSwapchain()
     vkGetSwapchainImagesKHR(device_, swapchain_, &sc_count, nullptr);
     swapchain_images_.resize(sc_count);
     vkGetSwapchainImagesKHR(device_, swapchain_, &sc_count, swapchain_images_.data());
- 
+
+    // Declare the content luminance envelope to the compositor. Without it an
+    // HDR10 PQ surface is assumed to carry PQ's full 0..10000-nit range, so the
+    // compositor tone-maps that phantom range down to the display and squashes
+    // our real highlights -- which only reach peak_nits -- back near reference
+    // white, making the luminance settings invisible. Matches the Wayland
+    // wp_color_manager_v1 and D3D12 SetHDRMetaData paths.
+    if (swapchain_is_hdr_ && hdr_metadata_ext_) {
+        auto set_md = reinterpret_cast<PFN_vkSetHdrMetadataEXT>(
+            vkGetDeviceProcAddr(device_, "vkSetHdrMetadataEXT"));
+        if (set_md) {
+            const float peak_nits = (float)(int)OPTION(kDispHDRPeakBrightness);
+            const float ref_nits  = (float)(int)OPTION(kDispHDRReferenceWhite);
+            VkHdrMetadataEXT md{};
+            md.sType = VK_STRUCTURE_TYPE_HDR_METADATA_EXT;
+            // BT.2020 primaries + D65 white, matching the swapchain color space.
+            md.displayPrimaryRed   = { 0.708f, 0.292f };
+            md.displayPrimaryGreen = { 0.170f, 0.797f };
+            md.displayPrimaryBlue  = { 0.131f, 0.046f };
+            md.whitePoint          = { 0.3127f, 0.3290f };
+            md.maxLuminance        = peak_nits;
+            md.minLuminance        = 0.0f;
+            md.maxContentLightLevel = peak_nits;
+            // Frame-average light level must not exceed peak.
+            md.maxFrameAverageLightLevel = std::min(ref_nits, peak_nits);
+            set_md(device_, 1, &swapchain_, &md);
+        }
+    }
+
     wxLogDebug(_("Swapchain created: %ux%u, %u images, vsync=%s"),
                extent.width, extent.height, sc_count,
                vsync_ ? wxT("on") : wxT("off"));
@@ -7797,9 +10768,12 @@ void VKDrawingPanel::DestroyTexture()
 void VKDrawingPanel::DrawingPanelInit()
 {
     DrawingPanelBase::DrawingPanelInit();
- 
-    if (!device_) return;
- 
+
+    // No logical device -> Vulkan setup (instance/device/surface/swapchain, done
+    // in the constructor) failed. Flag it so GameArea falls back to the next
+    // renderer in the priority list.
+    if (!device_) { init_failed_ = true; return; }
+
     texture_width_  = (uint32_t)std::ceil(width  * scale);
     texture_height_ = (uint32_t)std::ceil(height * scale);
  
@@ -7810,6 +10784,10 @@ void VKDrawingPanel::DrawingPanelInit()
 // ─── OnSize ───────────────────────────────────────────────────────────────────
 void VKDrawingPanel::OnSize(wxSizeEvent& ev)
 {
+#if defined(__WXGTK__) && !defined(NO_WAYLAND)
+    // Keep the Vulkan subsurface aligned with the (possibly moved) panel.
+    PositionWaylandSubsurface();
+#endif
     if (device_)
         RecreateSwapchain();
     ev.Skip();
@@ -7886,8 +10864,13 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
  
     } else {
         // ── Pixel data present: upload and draw ───────────────────────────────
-        VkFormat vk_fmt = out_16 ? VK_FORMAT_R5G6B5_UNORM_PACK16
-                                 : VK_FORMAT_B8G8R8A8_UNORM;
+        // HDR uploads 10-bit BT.2020 PQ to match the HDR10 swapchain. Only the
+        // 32-bit source path feeds the encoder.
+        const bool hdr = HdrActive() && swapchain_is_hdr_ &&
+                         !out_8 && !out_16 && !out_24;
+        VkFormat vk_fmt = hdr     ? VK_FORMAT_A2B10G10R10_UNORM_PACK32
+                        : out_16  ? VK_FORMAT_R5G6B5_UNORM_PACK16
+                                  : VK_FORMAT_B8G8R8A8_UNORM;
  
         int scaled_width  = (int)std::ceil(width  * scale);
         int scaled_height = (int)std::ceil(height * scale);
@@ -7916,8 +10899,14 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
         void* mapped = nullptr;
         vkMapMemory(device_, staging_memory_, 0, staging_size_, 0, &mapped);
         uint8_t* stg = static_cast<uint8_t*>(mapped);
- 
-        if (out_8) {
+
+        if (hdr) {
+            // Skip the top border row, then encode the scaled region directly
+            // into the staging buffer as A2B10G10R10 PQ (4 bytes/pixel).
+            const uint8_t* tex_ptr = src + src_pitch;
+            hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
+                            reinterpret_cast<uint32_t*>(stg), scaled_width * 4);
+        } else if (out_8) {
             src += src_pitch;
             for (int y = 0; y < scaled_height; ++y) {
                 const uint8_t* sr = src;
@@ -8102,5 +11091,396 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
  
     current_frame_ = (current_frame_ + 1) % MAX_FRAMES_IN_FLIGHT;
 }
- 
+
 #endif // !defined(NO_VULKAN)
+
+// ============================================================================
+// HDR / deep-color availability detection (startup probe).
+// ============================================================================
+
+// The DXGI 1.6 output-desc / DisplayConfig advanced-color APIs used below only
+// exist on modern Windows SDKs and are not present in the WINXP (WINVER 0x0501)
+// mingw32 toolchain, so the whole probe is compiled out there -- the callers
+// fall back to "no HDR" stubs. Include the headers directly (rather than relying
+// on the D3D11/D3D12 panels having pulled them in) so the probe works even when
+// both D3D backends are disabled.
+#if defined(__WXMSW__) && !defined(WINXP)
+#include <dxgi1_6.h>
+#include <wrl/client.h>
+using Microsoft::WRL::ComPtr;
+
+// True if any DXGI output is currently in HDR10 (ST.2084 BT.2020) mode.
+static bool VbamProbeWindowsHdr() {
+    bool hdr = false;
+
+    // Resolve CreateDXGIFactory1 dynamically so we don't add a static
+    // dxgi.lib link dependency (matching the D3D12 init path).
+    typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
+    HMODULE hDXGI = LoadLibrary(TEXT("dxgi.dll"));
+    if (!hDXGI)
+        return false;
+    auto CreateFactory1 = reinterpret_cast<LPFNCreateDXGIFactory1>(
+        reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateDXGIFactory1")));
+    if (!CreateFactory1) {
+        FreeLibrary(hDXGI);
+        return false;
+    }
+
+    // All DXGI COM objects must be released before FreeLibrary, since their
+    // vtables live inside dxgi.dll. Keep them in an inner scope.
+    {
+        ComPtr<IDXGIFactory1> factory;
+        if (SUCCEEDED(CreateFactory1(IID_PPV_ARGS(&factory)))) {
+            ComPtr<IDXGIAdapter1> adapter;
+            for (UINT a = 0; !hdr && factory->EnumAdapters1(a, &adapter) != DXGI_ERROR_NOT_FOUND; ++a) {
+                ComPtr<IDXGIOutput> output;
+                for (UINT o = 0; !hdr && adapter->EnumOutputs(o, &output) != DXGI_ERROR_NOT_FOUND; ++o) {
+                    ComPtr<IDXGIOutput6> output6;
+                    if (SUCCEEDED(output.As(&output6))) {
+                        DXGI_OUTPUT_DESC1 desc{};
+                        if (SUCCEEDED(output6->GetDesc1(&desc)) &&
+                            desc.ColorSpace == DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020)
+                            hdr = true;
+                    }
+                    output.Reset();
+                }
+                adapter.Reset();
+            }
+        }
+    }
+
+    FreeLibrary(hDXGI);
+    return hdr;
+}
+
+// The peak luminance (nits) of an HDR-enabled output, from DXGI. Windows PQ is
+// absolute-nits, so this is the display peak directly (no reference-white
+// scaling, unlike macOS EDR).
+//
+// Mirrors the macOS EDR probe (VbamMacosMaxEdrHeadroom): prefer the output the
+// emulator window is currently on, so a multi-monitor setup reports the peak of
+// the panel actually showing the game rather than whichever attached panel is
+// brightest. Falls back to the max over all outputs in HDR mode when the window
+// is not up yet or is not on an HDR output. 0 when no output is in HDR mode
+// (G2084 colorspace) -- callers then keep the fixed default.
+static uint32_t VbamWindowsDisplayPeakNits() {
+    // The monitor the emulator's main window is on (null before the frame
+    // exists), matched against each DXGI output's HMONITOR below.
+    HMONITOR window_monitor = nullptr;
+    if (wxGetApp().frame) {
+        HWND hwnd = reinterpret_cast<HWND>(wxGetApp().frame->GetHWND());
+        if (hwnd)
+            window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+    }
+
+    uint32_t peak_any = 0;     // brightest HDR output (fallback)
+    uint32_t peak_window = 0;  // the HDR output the window is on, if any
+
+    typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
+    HMODULE hDXGI = LoadLibrary(TEXT("dxgi.dll"));
+    if (!hDXGI)
+        return 0;
+    auto CreateFactory1 = reinterpret_cast<LPFNCreateDXGIFactory1>(
+        reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateDXGIFactory1")));
+    if (!CreateFactory1) {
+        FreeLibrary(hDXGI);
+        return 0;
+    }
+
+    {
+        ComPtr<IDXGIFactory1> factory;
+        if (SUCCEEDED(CreateFactory1(IID_PPV_ARGS(&factory)))) {
+            ComPtr<IDXGIAdapter1> adapter;
+            for (UINT a = 0; factory->EnumAdapters1(a, &adapter) != DXGI_ERROR_NOT_FOUND; ++a) {
+                ComPtr<IDXGIOutput> output;
+                for (UINT o = 0; adapter->EnumOutputs(o, &output) != DXGI_ERROR_NOT_FOUND; ++o) {
+                    ComPtr<IDXGIOutput6> output6;
+                    if (SUCCEEDED(output.As(&output6))) {
+                        DXGI_OUTPUT_DESC1 desc{};
+                        if (SUCCEEDED(output6->GetDesc1(&desc)) &&
+                            desc.ColorSpace == DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020) {
+                            const uint32_t m = static_cast<uint32_t>(desc.MaxLuminance + 0.5f);
+                            if (m > peak_any)
+                                peak_any = m;
+                            if (window_monitor && desc.Monitor == window_monitor)
+                                peak_window = m;
+                        }
+                    }
+                    output.Reset();
+                }
+                adapter.Reset();
+            }
+        }
+    }
+
+    FreeLibrary(hDXGI);
+    return peak_window ? peak_window : peak_any;
+}
+
+// True if the current display *supports* HDR but the user has it turned off in
+// Windows display settings, as opposed to a display with no HDR support at all.
+// VbamProbeWindowsHdr() (the DXGI G2084 colorspace check) returns false for both
+// cases, so it cannot tell them apart; this uses the DisplayConfig advanced-
+// color API, which reports "supported" and "enabled" separately. Queried live
+// (not cached at startup) so toggling Windows HDR while the app runs is seen
+// when the dialog reopens.
+static bool VbamWindowsHdrSupportedButOff() {
+    UINT32 num_paths = 0, num_modes = 0;
+    if (GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &num_paths,
+                                    &num_modes) != ERROR_SUCCESS)
+        return false;
+
+    std::vector<DISPLAYCONFIG_PATH_INFO> paths(num_paths);
+    std::vector<DISPLAYCONFIG_MODE_INFO> modes(num_modes);
+    if (QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &num_paths, paths.data(),
+                           &num_modes, modes.data(), nullptr) != ERROR_SUCCESS)
+        return false;
+
+    for (UINT32 i = 0; i < num_paths; ++i) {
+        DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO aci = {};
+        aci.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO;
+        aci.header.size = sizeof(aci);
+        aci.header.adapterId = paths[i].targetInfo.adapterId;
+        aci.header.id = paths[i].targetInfo.id;
+        if (DisplayConfigGetDeviceInfo(&aci.header) != ERROR_SUCCESS)
+            continue;
+        // advancedColorSupported: the panel/link can do HDR (BT.2020 PQ).
+        // advancedColorEnabled:   it is currently in HDR mode.
+        // Supported but not enabled => HDR is present but switched off.
+        if (aci.advancedColorSupported && !aci.advancedColorEnabled)
+            return true;
+    }
+    return false;
+}
+#endif
+
+#if defined(__WXMAC__)
+// Defined in macsupport.mm.
+extern bool VbamProbeMacosHdr();
+extern bool VbamMacosHdrSupportedButOff();
+extern double VbamMacosMaxEdrHeadroom();
+#endif
+
+#if defined(__WXGTK__)
+#ifndef NO_OGL
+// True if a 10-bit (deep color) RGBA GLX framebuffer config exists on X11.
+static bool VbamProbeX11DeepColor() {
+    Display* dpy = GDK_DISPLAY_XDISPLAY(gdk_display_get_default());
+    if (!dpy)
+        return false;
+    int attribs[] = {
+        GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_RED_SIZE,   10,
+        GLX_GREEN_SIZE, 10,
+        GLX_BLUE_SIZE,  10,
+        None
+    };
+    int n = 0;
+    GLXFBConfig* cfgs = glXChooseFBConfig(dpy, DefaultScreen(dpy), attribs, &n);
+    if (cfgs)
+        XFree(cfgs);
+    return n > 0;
+}
+#endif  // !NO_OGL
+
+#if !defined(NO_VULKAN) && !defined(NO_WAYLAND)
+// True if a Wayland Vulkan surface advertises an HDR10 ST.2084 / A2B10G10R10
+// format -- i.e. the compositor/display can present HDR right now.
+static bool VbamProbeWaylandVulkanHdr() {
+    if (!VbamVulkanBootstrap())
+        return false;  // no Vulkan loader -> no Vulkan HDR
+    GdkDisplay* gdk_dpy = gdk_display_get_default();
+    if (!GDK_IS_WAYLAND_DISPLAY(gdk_dpy))
+        return false;
+    struct wl_display* wl_dpy = gdk_wayland_display_get_wl_display(gdk_dpy);
+    if (!wl_dpy)
+        return false;
+
+    // Bind wl_compositor and create a throwaway surface to query against.
+    VbamWlGlobals g;
+    struct wl_registry* reg = wl_display_get_registry(wl_dpy);
+    wl_registry_add_listener(reg, &kVbamWlRegistryListener, &g);
+    wl_display_roundtrip(wl_dpy);
+    wl_registry_destroy(reg);
+    if (!g.comp) {
+        if (g.subcomp) wl_subcompositor_destroy(g.subcomp);
+        return false;
+    }
+    struct wl_surface* surf = wl_compositor_create_surface(g.comp);
+
+    bool hdr = false;
+    const char* exts[] = { VK_KHR_SURFACE_EXTENSION_NAME,
+                           VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
+                           VK_EXT_SWAPCHAIN_COLOR_SPACE_EXTENSION_NAME };
+    VkApplicationInfo app{};
+    app.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app.apiVersion = VK_API_VERSION_1_0;
+    VkInstanceCreateInfo ici{};
+    ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    ici.pApplicationInfo = &app;
+    ici.enabledExtensionCount = 3;
+    ici.ppEnabledExtensionNames = exts;
+
+    VkInstance inst = VK_NULL_HANDLE;
+    if (vkCreateInstance(&ici, nullptr, &inst) == VK_SUCCESS) {
+        VbamVulkanLoadInstanceFns(inst);
+        VkWaylandSurfaceCreateInfoKHR sci{};
+        sci.sType = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+        sci.display = wl_dpy;
+        sci.surface = surf;
+        VkSurfaceKHR vksurf = VK_NULL_HANDLE;
+        if (vkCreateWaylandSurfaceKHR(inst, &sci, nullptr, &vksurf) == VK_SUCCESS) {
+            uint32_t nd = 0;
+            vkEnumeratePhysicalDevices(inst, &nd, nullptr);
+            std::vector<VkPhysicalDevice> devs(nd);
+            vkEnumeratePhysicalDevices(inst, &nd, devs.data());
+            for (auto pd : devs) {
+                uint32_t nf = 0;
+                vkGetPhysicalDeviceSurfaceFormatsKHR(pd, vksurf, &nf, nullptr);
+                std::vector<VkSurfaceFormatKHR> fmts(nf);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(pd, vksurf, &nf, fmts.data());
+                for (auto& f : fmts) {
+                    if (f.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 &&
+                        f.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT) {
+                        hdr = true;
+                        break;
+                    }
+                }
+                if (hdr) break;
+            }
+            vkDestroySurfaceKHR(inst, vksurf, nullptr);
+        }
+        vkDestroyInstance(inst, nullptr);
+    }
+
+    wl_surface_destroy(surf);
+    if (g.subcomp) wl_subcompositor_destroy(g.subcomp);
+    wl_compositor_destroy(g.comp);
+    return hdr;
+}
+#endif  // Vulkan + Wayland
+#endif  // __WXGTK__
+
+// True if a native-Wayland Vulkan renderer can actually run: Vulkan is compiled
+// in and an instance with VK_KHR_wayland_surface can be created with at least
+// one physical device. Needs no display connection, so it is safe to call from
+// main() before the GUI toolkit is up (to choose GDK_BACKEND).
+bool VbamVulkanRuntimeUsable() {
+#if !defined(NO_VULKAN) && !defined(NO_WAYLAND) && defined(__WXGTK__)
+    if (!VbamVulkanBootstrap())
+        return false;  // no Vulkan loader
+    const char* exts[] = { VK_KHR_SURFACE_EXTENSION_NAME,
+                           VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME };
+    VkApplicationInfo app{};
+    app.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app.apiVersion = VK_API_VERSION_1_0;
+    VkInstanceCreateInfo ici{};
+    ici.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    ici.pApplicationInfo = &app;
+    ici.enabledExtensionCount = 2;
+    ici.ppEnabledExtensionNames = exts;
+
+    VkInstance inst = VK_NULL_HANDLE;
+    if (vkCreateInstance(&ici, nullptr, &inst) != VK_SUCCESS)
+        return false;  // loader/driver missing or no Wayland surface extension
+    VbamVulkanLoadInstanceFns(inst);
+
+    uint32_t nd = 0;
+    vkEnumeratePhysicalDevices(inst, &nd, nullptr);
+    vkDestroyInstance(inst, nullptr);
+    return nd > 0;     // a Vulkan-capable GPU is present
+#else
+    return false;
+#endif
+}
+
+bool VbamVulkanRuntimeAvailable() {
+#if defined(NO_VULKAN)
+    return false;
+#elif defined(__WXMSW__) || defined(__WXGTK__)
+    // Vulkan is loaded dynamically on Windows/Linux: report it available only if
+    // the loader and the global entry points resolve. Cached by VbamVulkanBootstrap.
+    return VbamVulkanBootstrap();
+#else
+    return true;  // linked normally elsewhere (macOS / MoltenVK)
+#endif
+}
+
+namespace hdr {
+void DetectAvailability() {
+    static bool done = false;
+    if (done) return;
+    done = true;
+
+    bool hdr_avail = false;
+    bool deep10 = false;
+
+#if defined(__WXMSW__) && !defined(WINXP)
+    hdr_avail = VbamProbeWindowsHdr();
+#elif defined(__WXMAC__)
+    hdr_avail = VbamProbeMacosHdr();
+#elif defined(__WXGTK__)
+    if (IsWayland()) {
+#if !defined(NO_VULKAN) && !defined(NO_WAYLAND)
+        hdr_avail = VbamProbeWaylandVulkanHdr();
+#endif
+        // On KDE, if the display's HDR mode is off the compositor still accepts
+        // PQ content (it tone-maps it), so the protocol probe says "available".
+        // But there is no real HDR to present, so treat it as unavailable: the
+        // dialog hides the HDR checkbox and (uniquely for this case) shows no
+        // warning, since the user deliberately turned HDR off in KDE.
+        if (KdeHdrDisabled())
+            hdr_avail = false;
+    } else {
+        // X11/Xorg cannot signal HDR per window; only offer 10-bit deep color.
+#ifndef NO_OGL
+        deep10 = VbamProbeX11DeepColor();
+#endif
+    }
+#endif
+
+    hdr::SetAvailability(hdr_avail, deep10);
+}
+
+bool WindowsHdrDisabled() {
+#if defined(__WXMSW__) && !defined(WINXP)
+    return VbamWindowsHdrSupportedButOff();
+#else
+    return false;
+#endif
+}
+
+bool MacosHdrDisabled() {
+#if defined(__WXMAC__)
+    return VbamMacosHdrSupportedButOff();
+#else
+    return false;
+#endif
+}
+
+uint32_t DisplayPeakNits() {
+#if defined(__WXMAC__)
+    // EDR headroom is a multiplier over SDR white; our encoder maps the
+    // reference-white setting to 1.0, so the display's usable peak in our model
+    // is headroom x reference white. Content above that just clips on EDR.
+    const double head = VbamMacosMaxEdrHeadroom();
+    if (head > 1.0)
+        return static_cast<uint32_t>(
+            head * static_cast<double>(OPTION(kDispHDRReferenceWhite)) + 0.5);
+    return 0;
+#elif defined(__WXMSW__) && !defined(WINXP)
+    // PQ is absolute-nits, so the DXGI display peak is used directly.
+    return VbamWindowsDisplayPeakNits();
+#elif defined(__WXGTK__)
+#if !defined(NO_WAYLAND)
+    // Wayland PQ is absolute-nits too; query the compositor's per-output max
+    // luminance. X11 has no per-window HDR, so it stays 0.
+    if (IsWayland())
+        return WaylandDisplayPeakNits();
+#endif
+    return 0;
+#else
+    return 0;
+#endif
+}
+}  // namespace hdr

@@ -25,6 +25,13 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kDispStretch*/ Option::Type::kBool,
     /*kSDLRenderer*/ Option::Type::kString,
     /*kDispColorCorrectionProfile*/ Option::Type::kColorCorrectionProfile,
+    /*kDispColorCorrectionAuto*/ Option::Type::kBool,
+    /*kDispHDR*/ Option::Type::kBool,
+    /*kDispHDRReferenceWhite*/ Option::Type::kUnsigned,
+    /*kDispHDRPeakBrightness*/ Option::Type::kUnsigned,
+    /*kDispHDRHighlightKnee*/ Option::Type::kUnsigned,
+    /*kDispHDRShadowContrast*/ Option::Type::kUnsigned,
+    /*kDispDeepColor*/ Option::Type::kBool,
 
     /// GB
     /*kGBBiosFile*/ Option::Type::kString,

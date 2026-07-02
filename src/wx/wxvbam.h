@@ -7,6 +7,7 @@
 #include <memory>
 #include <set>
 #include <stdexcept>
+#include <vector>
 #include <iostream>
 
 #include <wx/arrstr.h>
@@ -17,6 +18,7 @@
 
 #include "core/base/system.h"
 #include "wx/config/bindings.h"
+#include "wx/hdr.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option.h"
@@ -42,6 +44,27 @@
 #include "wx/compat_generic_file_dialog.h"
 
 extern wxLocale *wxvbam_locale;
+
+// True if Vulkan is built in and a runtime instance with the Wayland surface
+// extension can be created with at least one physical device -- i.e. the native
+// Wayland Vulkan renderer can actually run. Probed at startup (before the GUI is
+// up) to decide whether an SDL2 + no-EGL-canvas build can stay a native Wayland
+// client or must fall back to XWayland. Defined in panel.cpp.
+bool VbamVulkanRuntimeUsable();
+
+// True if the Vulkan loader (vulkan-1.dll) can be loaded at run time. On MSVC the
+// loader is delay-loaded -- not bundled and not a load-time dependency -- so this
+// probes for it once before any Vulkan code runs; a missing loader must never
+// reach a delay-loaded vk* call. On other toolchains Vulkan is linked normally,
+// so availability follows the compile-time option. Defined in panel.cpp.
+bool VbamVulkanRuntimeAvailable();
+
+// Set when the app fell back to XWayland (GDK_BACKEND=x11) because no native
+// Wayland renderer was available (SDL2 + no wx EGL canvas + no usable Vulkan).
+// In that state neither HDR nor 10-bit SDR can be presented. Defined in
+// wxvbam.cpp.
+void VbamSetWaylandNoNativeRenderer(bool value);
+bool VbamWaylandNoNativeRenderer();
 
 template <typename T>
 void CheckPointer(T pointer)
@@ -485,6 +508,67 @@ public:
                      GBAWidth = 240, GBAHeight = 160;
     void AddBorder();
     void DelBorder();
+
+    // True if HDR is enabled AND actually being presented by the current
+    // renderer/display. False when there is no panel yet, or when HDR is on but
+    // unsupported (in which case it stays on but has no effect).
+    bool HdrEffective() const;
+
+    // While the color-correction profile is in "auto" mode (the user hasn't
+    // explicitly picked one), keep it following the output: Rec2020 for HDR,
+    // sRGB for SDR.
+    void ApplyAutoColorCorrection();
+
+    // HDR is "effectively available" when the display probed HDR-capable AND not
+    // every HDR-capable renderer has failed to present it this session.
+    bool HdrEffectivelyAvailable() const;
+
+    // Return HDR / 10-bit deep color to "auto": clear the session revert and the
+    // failed-renderer set so the feature is reconsidered (and renderers may be
+    // switched again) on the next panel init. Used when the user re-checks a
+    // toggle that had fallen back to SDR this session. The caller drives the
+    // actual panel reset (the live option write does so via the render observer),
+    // so this only resets the bookkeeping.
+    void ResetHdrRevert() {
+        hdr_reverted_to_sdr_ = false;
+        hdr_failed_renderers_.clear();
+        hdr_retried_renderers_.clear();
+    }
+    void ResetDeepColorRevert() {
+        deep_color_reverted_ = false;
+        deep_color_failed_renderers_.clear();
+    }
+
+    // True if the render method should be hidden from the display dialog because
+    // HDR is on and effective and this renderer either can't do HDR or has
+    // failed to present it.
+    bool RenderMethodHiddenForHdr(config::RenderMethod method) const;
+
+    // 10-bit deep color (X11): available when a 10-bit visual was probed AND a
+    // capable renderer has not failed to present 10-bit this session.
+    bool DeepColorEffectivelyAvailable() const;
+
+    // True if the render method can present a 10-bit SDR surface in XOrg
+    // (OpenGL via a 10-bit visual, Vulkan via a 10-bit swapchain). SDL's GL
+    // renderer only outputs 8-bit sRGB and the simple/wx renderer is software,
+    // so neither is deep-color capable.
+    bool IsDeepColorCapableRenderer(config::RenderMethod method) const;
+
+    // True if the render method should be hidden from the display dialog because
+    // the 10-bit deep color option is on and effective and this renderer can't
+    // present 10-bit (or has failed to this session).
+    bool RenderMethodHiddenForDeepColor(config::RenderMethod method) const;
+
+    // Definitive HDR / 10-bit availability probe: actually brings each capable
+    // renderer up on this (already-shown) panel with the feature forced on,
+    // renders one black frame so the renderer creates its real swapchain/visual
+    // and reports whether it presents the feature, then tears it down. The first
+    // renderer that succeeds wins; the result is published via hdr::SetAvailability
+    // so the dialog checkbox is shown only when a renderer definitely can present
+    // it -- i.e. probe and runtime use the very same test. Call once, after the
+    // main window is shown and before a ROM is loaded. No-op once a panel exists.
+    void ProbeOutputCapabilities();
+
     // Delete() & set to NULL to force reinit
     DrawingPanelBase* panel;
     struct EmulatedSystem* emusys;
@@ -607,12 +691,51 @@ private:
     bool pending_resume_after_panel_ = false;
     bool pending_panel_reset_ = false;  // Deferred panel reset to avoid mid-frame crashes
 
+    // HDR renderer fallback state. When HDR is on, the active renderer is
+    // checked once its panel is initialized; a renderer that fails to present
+    // HDR is recorded here and another HDR-capable renderer is tried. If they
+    // all fail, HDR reverts to SDR for the session.
+    std::set<config::RenderMethod> hdr_failed_renderers_;
+    // An HDR-capable renderer can latch its HDR state at panel construction
+    // before the window has been composited on the HDR output (notably the very
+    // first panel at startup), reporting SDR even though it can present HDR. Each
+    // such renderer is recreated once -- recorded here -- before being treated as
+    // a genuine HDR failure, so the user's choice isn't abandoned over a timing
+    // artifact. Cleared by ResetHdrRevert() when the user re-enables HDR.
+    std::set<config::RenderMethod> hdr_retried_renderers_;
+    bool hdr_evaluated_ = false;        // current panel's HDR/deep-color checked
+    bool hdr_reverted_to_sdr_ = false;  // every HDR renderer failed this session
+    bool deep_color_reverted_ = false;  // no renderer could present 10-bit
+    // Deep-color renderer fallback state, mirroring the HDR set above: a capable
+    // renderer that fails to actually present 10-bit this session is recorded
+    // here so another capable renderer is tried before reverting.
+    std::set<config::RenderMethod> deep_color_failed_renderers_;
+    void EvaluateHdrRenderer();
+    void EvaluateDeepColorRenderer();
+    bool IsHdrCapableRenderer(config::RenderMethod method) const;
+
+    // Renderer-init fallback: when a panel reports DrawingInitFailed(), record
+    // the method and switch to the next renderer in the platform priority list
+    // (Windows: DX12, Vulkan, SDL, OpenGL, Simple; Linux: Vulkan, SDL, OpenGL,
+    // Simple; macOS: Metal, Vulkan, SDL, OpenGL, Simple). Mirrors the HDR
+    // fallback above. Renderers that failed to init are remembered for the
+    // session so the search converges instead of looping.
+    std::set<config::RenderMethod> render_init_failed_;
+    bool renderer_evaluated_ = false;   // current panel's renderer-init checked
+    void EvaluateRenderer();
+
+    // Construct (but do not lay out) the DrawingPanel for `method`, applying the
+    // same per-platform fallbacks as panel creation in OnIdle. Returns nullptr
+    // for kLast. Shared by OnIdle and ProbeOutputCapabilities().
+    DrawingPanelBase* NewPanelForRenderMethod(config::RenderMethod method);
+
     // Schedule a panel reset to occur at the start of the next OnIdle
     // This is used instead of calling ResetPanel directly from observers
     // to avoid resetting the panel while emulation is in progress
     void SchedulePanelReset();
 
     const config::OptionsObserver render_observer_;
+    const config::OptionsObserver color_correction_auto_observer_;
     const config::OptionsObserver scale_observer_;
     const config::OptionsObserver gb_border_observer_;
     const config::OptionsObserver gb_palette_observer_;
@@ -648,6 +771,59 @@ public:
     wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
     virtual bool Destroy() { return GetWindow()->Destroy(); }
 
+    // ---- HDR output (renderer-independent, see src/wx/hdr.h) ----------------
+
+    // True if this renderer can present an HDR surface on the current display.
+    // Default false; renderers override and may consult the windowing system
+    // (e.g. only on Wayland).
+    virtual bool SupportsHdr() const { return false; }
+
+    // Surface encoding this renderer wants when HDR is active. PQ10 for the
+    // 10-bit platforms (OpenGL/Vulkan/D3D12), scRGB fp16 for macOS EDR.
+    virtual hdr::Encoding PreferredHdrEncoding() const { return hdr::Encoding::kPQ10; }
+
+    // For the scRGB encoding, whether the surface is extended-linear Display P3
+    // (macOS EDR) rather than extended-linear Rec.709 (SDL3 / generic scRGB).
+    virtual bool HdrScRgbUsesP3() const { return false; }
+
+    // For the scRGB encoding, the nits value mapped to 1.0 in the float output,
+    // or 0 to use the relative reference-white model (reference -> 1.0). Non-zero
+    // on SDL where the renderer applies an SDR white point > 1 (Windows scRGB
+    // swapchains): the encoder then emits absolute nits that survive SDL's
+    // automatic white-point scaling instead of being over-brightened by it.
+    virtual float HdrScRgbWhiteNits() const { return 0.0f; }
+
+    // Recompute the active HDR encoding from the options and this renderer's
+    // capabilities, and push the brightness settings into the encoder. Call on
+    // panel init and whenever the HDR / color-correction options change.
+    void UpdateHdrState();
+
+    bool HdrActive() const { return hdr_encoding_ != hdr::Encoding::kNone; }
+    hdr::Encoding hdr_encoding() const { return hdr_encoding_; }
+
+    // True if this panel is actually presenting a 10-bit "deep color" SDR
+    // surface (only the OpenGL panel can, and only if it got a 10-bit visual).
+    virtual bool DeepColorActive() const { return false; }
+
+    // True once DrawingPanelInit() has run, i.e. HdrActive()/DeepColorActive()
+    // are final.
+    bool DrawingInitialized() const { return did_init; }
+
+    // True if this renderer failed to come up (no GPU device/context/renderer).
+    // The panel object still exists but cannot present; GameArea uses this to
+    // fall back to the next renderer in the platform priority list. Set by each
+    // renderer panel on its creation-failure path. Note did_init is unreliable
+    // for this: several panels set it (via the base init) before the renderer is
+    // actually created, so it can be true even when the renderer failed.
+    bool DrawingInitFailed() const { return init_failed_; }
+
+    // Encode `rows` x `row_pixels` RGBA8 pixels read from `src` (with
+    // `src_stride` bytes per scanline) into hdr_buf_, tightly packed. Returns
+    // the encoded buffer and sets `out_bpp` to its bytes per pixel. Only valid
+    // when HdrActive(); the source must be 32-bit (panel_color_depth_ == 32).
+    const uint8_t* EncodeHdr(const uint8_t* src, int src_stride, int row_pixels,
+                             int rows, int* out_bpp);
+
 protected:
     virtual void DrawArea(wxWindowDC&) = 0;
     virtual void DrawOSD(wxWindowDC&);
@@ -655,6 +831,7 @@ protected:
     double scale;
     virtual void DrawingPanelInit();
     bool did_init;
+    bool init_failed_ = false;  // renderer creation failed (see DrawingInitFailed)
     uint8_t* todraw;
     uint8_t *pixbuf1, *pixbuf2;
     FilterThread* threads;
@@ -668,6 +845,8 @@ protected:
     bool rpi_is_mt_ = false; // true if plugin is multi-threaded (name contains " MT")
     int rpi_bpp_ = 4; // bytes per pixel for RPI plugin (4 for 32-bit, 2 for 16-bit)
     int panel_color_depth_ = 16; // Color depth for this panel (may differ from global systemColorDepth)
+    hdr::Encoding hdr_encoding_ = hdr::Encoding::kNone; // active HDR surface encoding
+    std::vector<uint8_t> hdr_buf_;                       // scratch for EncodeHdr()
 #ifdef VBAM_RPI_PROXY_SUPPORT
     rpi_proxy::RpiProxyClient* rpi_proxy_client_ = nullptr;  // Points to shared instance
     bool using_rpi_proxy_ = false;

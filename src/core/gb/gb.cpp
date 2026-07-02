@@ -5499,12 +5499,14 @@ bool gbReadSaveState(const uint8_t* data)
 
     if (inBios) {
         gbMemoryMap[0x00] = &gbMemory[0x0000];
-        if (gbHardware & 5) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
-        } else if (gbHardware & 2) {
-            memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kCGBBiosSize);
-            memcpy((uint8_t*)(gbMemory + 0x100), (uint8_t*)(gbRom + 0x100), 0x100);
+        if (gbMemory && gbRom) {
+            if (gbHardware & 5) {
+                memcpy(gbMemory, gbRom, 0x1000);
+                memcpy(gbMemory, g_bios, kGBBiosSize);
+            } else if (gbHardware & 2) {
+                memcpy(gbMemory, g_bios, kCGBBiosSize);
+                memcpy(gbMemory + 0x100, gbRom + 0x100, 0x100);
+            }
         }
 
     } else {

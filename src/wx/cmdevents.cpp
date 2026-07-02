@@ -31,6 +31,7 @@
 #include "wx/config/cmdtab.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
+#include "wx/dialogs/base-dialog.h"
 #include "wx/dialogs/game-maker.h"
 #include "wx/wxvbam.h"
 #include "wx/widgets/group-check-box.h"
@@ -2207,6 +2208,13 @@ static wxString gbaGetOverrideId() {
 EVT_HANDLER(GameBoyAdvanceConfigure, "Game Boy Advance options...")
 {
     wxDialog* dlg = GetXRCDialog("GameBoyAdvanceConfig");
+    // The dialog's notebook tabs are lazily parsed; force-load them all so
+    // the override controls below exist before we touch them.
+    auto* base = wxStaticCast(dlg, dialogs::BaseDialog);
+    const int tab_count = base->LazyTabCount();
+    for (int i = 0; i < tab_count; ++i)
+        base->LoadLazyTab(i);
+
     wxTextCtrl* ovcmt = XRCCTRL(*dlg, "Comment", wxTextCtrl);
     wxString cmt;
     wxChoice *ovrtc = XRCCTRL(*dlg, "OvRTC", wxChoice),

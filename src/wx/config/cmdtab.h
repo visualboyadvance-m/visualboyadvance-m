@@ -53,6 +53,11 @@ namespace config {
     // * "NOOP" -> XRCID("NOOP")
     // O(log(n)) search.
     nonstd::optional<int> CommandFromConfigString(const wxString& config);
+
+    // True if `command` is a known, bindable command (present in cmdtab). Used to
+    // skip menu items with no command-event entry (e.g. items created with
+    // wxID_ANY) so they don't reach GetCommandHelper. O(n) search.
+    bool IsCommandId(int command);
 }
 
 // here are those conditions

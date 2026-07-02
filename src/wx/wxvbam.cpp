@@ -191,6 +191,12 @@ void(*dbgSignal)(int, int) = remoteStubSignal;
 void(*dbgOutput)(const char *, uint32_t) = debuggerOutput;
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
+// Set in main() when the app fell back to XWayland because no native Wayland
+// renderer was available; consumed at startup (force SDR) and by the dialog.
+static bool g_wayland_no_native_renderer = false;
+void VbamSetWaylandNoNativeRenderer(bool value) { g_wayland_no_native_renderer = value; }
+bool VbamWaylandNoNativeRenderer() { return g_wayland_no_native_renderer; }
+
 #ifdef __WXMSW__
 
 int __stdcall WinMain(HINSTANCE hInstance,
@@ -246,17 +252,35 @@ int main(int argc, char** argv) {
     wxLog::SetLogLevel(wxLOG_Info);
 #endif  // DEBUG
 
-    // Launch under xwayland on Wayland if EGL is not available.
+    // Without the wx EGL GL canvas, OpenGL on Wayland would need GLX, which only
+    // works under XWayland. We would rather stay a native Wayland client and let
+    // the Vulkan renderer present (it can also do HDR), so OpenGL is disabled on
+    // Wayland in this configuration (the dialog hides it, panel creation falls
+    // back to Vulkan) and GLX is never needed.
+    //
+    // With SDL3 both SDL and Vulkan present natively on Wayland, so we always
+    // stay native. With SDL2 the SDL renderer needs an X11 window, so the only
+    // native-Wayland renderer is Vulkan: stay native only when Vulkan actually
+    // works, otherwise fall back to XWayland (GDK_BACKEND=x11) so the SDL2
+    // outputs still render -- at the cost of HDR and 10-bit SDR, which XWayland
+    // cannot provide (the output is forced to 8-bit SDR and the dialog warns).
 #if defined(__WXGTK3__) && !defined(HAVE_WAYLAND_EGL)
     wxString xdg_session_type = wxGetenv("XDG_SESSION_TYPE");
 #ifndef NO_WAYLAND
     wxString wayland_display  = wxGetenv("WAYLAND_DISPLAY");
 
     if (xdg_session_type == "wayland" || wayland_display.Contains("wayland")) {
-        gdk_set_allowed_backends("x11,*");
-
         if (wxGetenv("GDK_BACKEND") == NULL) {
-            wxSetEnv("GDK_BACKEND", "x11");
+#ifdef ENABLE_SDL3
+            wxSetEnv("GDK_BACKEND", "wayland");
+#else
+            if (VbamVulkanRuntimeUsable()) {
+                wxSetEnv("GDK_BACKEND", "wayland");
+            } else {
+                wxSetEnv("GDK_BACKEND", "x11");
+                VbamSetWaylandNoNativeRenderer(true);
+            }
+#endif
         }
     }
 #endif
@@ -775,10 +799,130 @@ bool wxvbamApp::OnInit() {
 
     wxvbam_locale->AddCatalog("wxvbam");
 
-    // wxGLCanvas segfaults under wayland before wx 3.2
-#if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
-    if (UsingWayland()) {
+    // Probe the display/session for HDR (and X11 10-bit deep color) once, then
+    // bring the saved options in line with what is actually available.
+    hdr::DetectAvailability();
+
+    // If we fell back to XWayland because no native Wayland renderer (Vulkan)
+    // was available (SDL2 + no wx EGL canvas), neither HDR nor 10-bit SDR can be
+    // presented -- force both unavailable so the output stays plain 8-bit SDR.
+    // The display dialog shows a matching warning.
+    if (VbamWaylandNoNativeRenderer())
+        hdr::SetAvailability(false, false);
+
+#if defined(__WXMAC__)
+    // Quartz2D is folded into the Simple renderer (Simple uses the Quartz2D
+    // driver on macOS). Migrate a saved explicit Quartz2D choice to Simple so
+    // the dialog -- which no longer shows a Quartz2D radio -- stays consistent.
+    if (OPTION(kDispRenderMethod) == config::RenderMethod::kQuartz2d)
         OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
+
+    // SDL's "vulkan" sub-renderer is MoltenVK via the Vulkan Portability dynamic
+    // library, which is absent in our build, so it fails to create. The dialog no
+    // longer offers it on macOS; migrate a saved choice to "default" (Metal) so
+    // we don't attempt it and fall back with an error on every launch.
+    if (OPTION(kSDLRenderer) == wxString("vulkan"))
+        OPTION(kSDLRenderer) = wxString("default");
+#endif
+
+#if !defined(NO_VULKAN)
+    // The Vulkan loader (vulkan-1.dll) is delay-loaded and may be absent (e.g. a
+    // Windows machine with no GPU-driver Vulkan ICD). A saved Vulkan render
+    // method would then create a Vulkan panel and fault on the first delay-loaded
+    // call, so migrate it to the platform's primary non-Vulkan renderer. The
+    // dialog likewise hides the Vulkan radio and the renderer fallbacks skip it.
+    if (OPTION(kDispRenderMethod) == config::RenderMethod::kVulkan &&
+        !VbamVulkanRuntimeAvailable()) {
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d12;
+#elif defined(__WXMAC__) && !defined(NO_METAL)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kMetal;
+#elif !defined(NO_OGL)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kOpenGL;
+#else
+        OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
+#endif
+    }
+#endif
+
+    // HDR and 10-bit deep color default on and behave as "auto": they are honored
+    // only where the display/renderer can actually present them, but the saved
+    // preference is NOT overwritten when detection fails. Clobbering it here would
+    // permanently flip the user's default from on to off just because HDR was not
+    // detected (e.g. an undetected display or a transient probe miss). Every
+    // consumption path gates on availability, so leaving the option on while
+    // unavailable is harmless -- output simply stays SDR until HDR is available.
+    const bool hdr_effective = hdr::HdrAvailable() && OPTION(kDispHDR);
+
+    // With the color-correction profile in auto mode (user hasn't picked one),
+    // follow the effective output: Rec2020 for HDR, sRGB for SDR.
+    if (OPTION(kDispColorCorrectionAuto))
+        OPTION(kDispColorCorrectionProfile) = hdr_effective
+            ? config::ColorCorrectionProfile::kRec2020
+            : config::ColorCorrectionProfile::kSRGB;
+
+    // On Windows/macOS, OpenGL has no HDR path. Only when HDR is both available
+    // and enabled do we steer an OpenGL setting to the native HDR backend (and
+    // hide OpenGL in the dialog). If HDR is unavailable or off, OpenGL stays.
+    // An explicit Vulkan choice is left untouched.
+#if defined(__WXMSW__)
+    if (hdr::HdrAvailable() && OPTION(kDispHDR) &&
+        OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
+#if !defined(NO_D3D12)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d12;
+#elif !defined(NO_VULKAN)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
+#endif
+    }
+#elif defined(__WXMAC__)
+    if (hdr::HdrAvailable() && OPTION(kDispHDR) &&
+        OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
+#if !defined(NO_METAL)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kMetal;
+#elif !defined(NO_VULKAN)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
+#endif
+    }
+#endif
+
+    // NOTE: the Simple renderer IS HDR-capable on the platforms where HDR is
+    // available -- Direct3D 11 on Windows, Quartz2D EDR on macOS, and the shm
+    // BT.2020 PQ driver on Wayland -- so a saved Simple choice is left alone. (On
+    // X11, where Simple cannot present HDR, HdrAvailable() is false, so there is
+    // nothing to migrate.) An earlier build rewrote Simple to a native HDR
+    // backend here on the assumption that Simple "cannot present HDR anywhere";
+    // that rewrote and persisted over the user's Simple choice on every launch.
+
+    // With SDL2 the SDL renderer cannot present HDR. When HDR is available and
+    // on, move a saved SDL choice to a native HDR backend so it isn't left as
+    // the active (but inert) renderer. If no HDR backend is compiled in, leave
+    // it -- don't strand the user.
+#ifndef ENABLE_SDL3
+    if (hdr::HdrAvailable() && OPTION(kDispHDR) &&
+        OPTION(kDispRenderMethod) == config::RenderMethod::kSDL) {
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d12;
+#elif defined(__WXMAC__) && !defined(NO_METAL)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kMetal;
+#elif !defined(NO_VULKAN)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
+#endif
+    }
+#endif
+
+    // OpenGL can't run on a native Wayland client without the wx EGL canvas
+    // (it would need GLX). Redirect it to Vulkan, which presents natively and
+    // supports HDR; only fall back to the simple renderer if Vulkan is
+    // unavailable. Renderers the user explicitly chose that already work on
+    // Wayland (Vulkan, SDL, simple) are left untouched.
+#if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
+    if (UsingWayland() &&
+        OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
+#ifndef NO_VULKAN
+        OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
+#else
+        OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
+#endif
     }
 #endif
 
@@ -984,6 +1128,16 @@ bool wxvbamApp::OnInit() {
     // Pre-enumerate plugins so hotkey cycling and display config are instant.
     // Use CallAfter so the main window paints first.
     CallAfter([this] { EnumeratePlugins(); });
+
+    // Confirm HDR / 10-bit availability by actually bringing the real renderer
+    // up once and seeing whether it presents the feature, so the display dialog
+    // offers the toggle only when it definitely works. Deferred until after the
+    // window is mapped (the renderers need a realized surface) and before a ROM
+    // is loaded.
+    CallAfter([this] {
+        if (frame && frame->GetPanel())
+            frame->GetPanel()->ProbeOutputCapabilities();
+    });
 
     return true;
 }

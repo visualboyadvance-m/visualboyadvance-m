@@ -40,6 +40,8 @@ set(VBAM_WX_COMMON
     extra-translations.cpp
     gfxviewers.cpp
     guiinit.cpp
+    hdr.cpp
+    hdr.h
     ioregs.h
     opts.cpp
     opts.h
@@ -152,6 +154,7 @@ if(APPLE)
     find_library(METAL Metal)
     find_library(METALKIT MetalKit)
     find_library(IOSURFACE IOSurface)
+    find_library(IOKIT IOKit)
 endif()
 
 # Vulkan::Vulkan imported target (set by find_package in Options.cmake) covers
@@ -358,15 +361,27 @@ function(configure_wx_target target)
         _add_link_libraries(d3d12)
     endif()
 
+    # D3D11 (software "Simple" HDR path). The device is loaded dynamically
+    # (LoadLibrary d3d11.dll), like the D3D12 path, so no import library is
+    # linked here.
+    if(NOT ENABLE_DIRECT3D11)
+        _add_compile_definitions(NO_D3D11)
+    endif()
+
     # SDL.
     _add_link_libraries(${VBAM_SDL_LIBS})
 
     if(ENABLE_VULKAN)
         if(APPLE AND ENABLE_MOLTENVK)
             _add_link_libraries($<LINK_LIBRARY:WEAK_LIBRARY,${MOLTENVK}>)
-        else()
+        elseif(APPLE)
             _add_link_libraries(Vulkan::Vulkan)
         endif()
+        # On Windows and Linux the Vulkan loader is resolved at run time
+        # (wxDynamicLibrary + vkGetInstanceProcAddr; see panel.cpp), so the import
+        # library is intentionally NOT linked -- the loader is never a load-time
+        # dependency and is never bundled. Only the headers are needed, added via
+        # target_include_directories below.
     endif()
 
     if(APPLE AND NOT NIX AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
@@ -388,6 +403,7 @@ function(configure_wx_target target)
         _add_link_libraries(${COREAUDIO})
         _add_link_libraries(${AUDIOTOOLBOX})
         _add_link_libraries(${IOSURFACE})
+        _add_link_libraries(${IOKIT})
 
         if(CMAKE_Metal_COMPILER)
             _add_link_libraries($<LINK_LIBRARY:WEAK_FRAMEWORK,${METAL}>)
@@ -474,6 +490,8 @@ if(ENABLE_VULKAN AND APPLE)
 endif()
 
 if(ENABLE_VULKAN)
+    # Headers only; on Windows/Linux the loader is linked nowhere and resolved at
+    # run time (see the Vulkan link block above and panel.cpp). macOS links it.
     target_include_directories(visualboyadvance-m PRIVATE ${Vulkan_INCLUDE_DIRS})
 endif()
 
@@ -636,6 +654,68 @@ if(NOT WIN32 AND NOT APPLE)
     find_library(WAYLAND_LIBRARY wayland-client)
     if(WAYLAND_LIBRARY AND NOT COMPILE_ONLY)
         target_link_libraries(visualboyadvance-m ${WAYLAND_LIBRARY})
+    endif()
+
+    # Wayland protocol client glue. ENABLE_WAYLAND_PROTOCOLS (cmake/Options.cmake)
+    # auto-detects the wayland-scanner toolchain as its own feature -- separate
+    # from the GDK Wayland backend detection -- and exports WAYLAND_SCANNER and
+    # WAYLAND_PROTOCOLS_DIR. Each protocol below is additionally gated on its XML
+    # being present. HDR (color-management-v1, BT.2020 PQ) tags the OpenGL EGL
+    # surface and the software "Simple" renderer's shm subsurface; viewporter
+    # scales that shm buffer compositor-side. The C++ falls back when missing.
+    if(ENABLE_WAYLAND_PROTOCOLS)
+        set(_cm_xml
+            "${WAYLAND_PROTOCOLS_DIR}/staging/color-management/color-management-v1.xml")
+
+        if(WAYLAND_SCANNER AND WAYLAND_PROTOCOLS_DIR AND EXISTS "${_cm_xml}")
+            set(_cm_hdr "${CMAKE_CURRENT_BINARY_DIR}/color-management-v1-client-protocol.h")
+            set(_cm_src "${CMAKE_CURRENT_BINARY_DIR}/color-management-v1-protocol.c")
+
+            add_custom_command(
+                OUTPUT  "${_cm_hdr}"
+                COMMAND "${WAYLAND_SCANNER}" client-header "${_cm_xml}" "${_cm_hdr}"
+                DEPENDS "${_cm_xml}"
+                VERBATIM)
+            add_custom_command(
+                OUTPUT  "${_cm_src}"
+                COMMAND "${WAYLAND_SCANNER}" private-code "${_cm_xml}" "${_cm_src}"
+                DEPENDS "${_cm_xml}"
+                VERBATIM)
+
+            target_sources(visualboyadvance-m PRIVATE "${_cm_src}" "${_cm_hdr}")
+            target_include_directories(visualboyadvance-m PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+            target_compile_definitions(visualboyadvance-m PRIVATE HAVE_WAYLAND_COLOR_PROTOCOL)
+        else()
+            message(STATUS "Wayland color-management protocol unavailable; OpenGL HDR on Wayland disabled")
+        endif()
+
+        # Generate client glue for the stable viewporter protocol. The software
+        # "Simple" Wayland HDR renderer uses it to scale a source-resolution shm
+        # buffer to the window on the compositor (GPU) side, so it only has to
+        # PQ-encode source pixels instead of the whole window each frame.
+        # Optional: without it the renderer falls back to CPU scaling.
+        set(_vp_xml "${WAYLAND_PROTOCOLS_DIR}/stable/viewporter/viewporter.xml")
+        if(WAYLAND_SCANNER AND WAYLAND_PROTOCOLS_DIR AND EXISTS "${_vp_xml}")
+            set(_vp_hdr "${CMAKE_CURRENT_BINARY_DIR}/viewporter-client-protocol.h")
+            set(_vp_src "${CMAKE_CURRENT_BINARY_DIR}/viewporter-protocol.c")
+
+            add_custom_command(
+                OUTPUT  "${_vp_hdr}"
+                COMMAND "${WAYLAND_SCANNER}" client-header "${_vp_xml}" "${_vp_hdr}"
+                DEPENDS "${_vp_xml}"
+                VERBATIM)
+            add_custom_command(
+                OUTPUT  "${_vp_src}"
+                COMMAND "${WAYLAND_SCANNER}" private-code "${_vp_xml}" "${_vp_src}"
+                DEPENDS "${_vp_xml}"
+                VERBATIM)
+
+            target_sources(visualboyadvance-m PRIVATE "${_vp_src}" "${_vp_hdr}")
+            target_include_directories(visualboyadvance-m PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+            target_compile_definitions(visualboyadvance-m PRIVATE HAVE_WAYLAND_VIEWPORTER)
+        else()
+            message(STATUS "Wayland viewporter protocol unavailable; Simple Wayland HDR will CPU-scale")
+        endif()
     endif()
 endif()
 

@@ -86,7 +86,11 @@ endif()
 # keeps -Werror clean.
 if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     target_compile_options(vbam-lua PRIVATE
-        -w        # disable all warnings for vendored Lua
+        -w           # disable all warnings for vendored Lua
+        -fno-lto     # keep Lua out of LTO: its -w doesn't reach LTO-time
+                     # codegen, so _FORTIFY_SOURCE/-Wstringop-* false
+                     # positives in upstream Lua (e.g. luaL_addlstring) would
+                     # otherwise surface when linking consumers with -flto
         -fPIC)
 elseif(MSVC)
     target_compile_options(vbam-lua PRIVATE /W0 /wd4244)

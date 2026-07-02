@@ -48,6 +48,11 @@
 #include <SDL.h>
 #endif
 
+#if defined(HAVE_WAYLAND_SUPPORT)
+#include <gdk/gdkwayland.h>
+#include <wayland-client.h>
+#endif
+
 namespace dialogs {
 
 namespace {
@@ -459,24 +464,25 @@ bool DisplayConfig::LoadLazyTab(int index) {
 }
 
 void DisplayConfig::InitBasicTab() {
-    // Render-method radio buttons.
-    wxWindow* render_method = GetValidatedChild("OutputSimple");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kSimple));
+    // Render-method radio buttons. Record each radio that actually exists on
+    // this build/platform so UpdateRenderMethodVisibility() can show/hide just
+    // those (the statically #ifdef-hidden ones below are never recorded, so they
+    // stay hidden).
+    render_method_radios_.clear();
+    auto add_radio = [this](const char* name, config::RenderMethod m) {
+        GetValidatedChild(name)->SetValidator(RenderValidator(m));
+        render_method_radios_.push_back({name, m});
+    };
 
-    render_method = GetValidatedChild("OutputSDL");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kSDL));
+    add_radio("OutputSimple", config::RenderMethod::kSimple);
+    add_radio("OutputSDL", config::RenderMethod::kSDL);
 
-#if defined(__WXMAC__)
-    render_method = GetValidatedChild("OutputQuartz2D");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kQuartz2d));
-#ifndef NO_METAL
-    render_method = GetValidatedChild("OutputMetal");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kMetal));
+    // Quartz2D is no longer a separate choice: on macOS the Simple renderer is
+    // backed by the Quartz2D driver automatically, so there is no OutputQuartz2D
+    // radio anymore.
+#if defined(__WXMAC__) && !defined(NO_METAL)
+    add_radio("OutputMetal", config::RenderMethod::kMetal);
 #else
-    GetValidatedChild("OutputMetal")->Hide();
-#endif
-#else
-    GetValidatedChild("OutputQuartz2D")->Hide();
     GetValidatedChild("OutputMetal")->Hide();
 #endif
 
@@ -486,60 +492,59 @@ void DisplayConfig::InitBasicTab() {
     if (IsWayland()) {
         GetValidatedChild("OutputOpenGL")->Hide();
     } else {
-        render_method = GetValidatedChild("OutputOpenGL");
-        render_method->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
+        add_radio("OutputOpenGL", config::RenderMethod::kOpenGL);
     }
 #else
-    render_method = GetValidatedChild("OutputOpenGL");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kOpenGL));
+    add_radio("OutputOpenGL", config::RenderMethod::kOpenGL);
 #endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D)
-    render_method = GetValidatedChild("OutputDirect3D");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d));
+    add_radio("OutputDirect3D", config::RenderMethod::kDirect3d);
 #else
     GetValidatedChild("OutputDirect3D")->Hide();
 #endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D12)
-    render_method = GetValidatedChild("OutputDirect3D12");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kDirect3d12));
+    add_radio("OutputDirect3D12", config::RenderMethod::kDirect3d12);
 #else
     GetValidatedChild("OutputDirect3D12")->Hide();
 #endif
 
 #ifndef NO_VULKAN
-    render_method = GetValidatedChild("OutputVulkan");
-    render_method->SetValidator(RenderValidator(config::RenderMethod::kVulkan));
+    // Offer Vulkan only when its loader is actually present at run time (it is
+    // delay-loaded on Windows and may be absent). When it is not, hide the radio
+    // so it cannot be selected; the renderer fallbacks skip it too.
+    if (VbamVulkanRuntimeAvailable())
+        add_radio("OutputVulkan", config::RenderMethod::kVulkan);
+    else
+        GetValidatedChild("OutputVulkan")->Hide();
 #else
     GetValidatedChild("OutputVulkan")->Hide();
 #endif
+
+    // Hide renderers that can't present the active HDR / 10-bit deep-color
+    // feature (and re-show them when it is turned off). Recomputed on every
+    // HDR/deep-color toggle, so nothing stays hidden once the user unchecks.
+    UpdateRenderMethodVisibility();
 
     sdlrenderer_label_ = GetValidatedChild<wxControl>("SDLRendererLab");
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
     sdlrenderer_selector_->SetValidator(SDLDevicesValidator());
 
     sdlpixelart_checkbox_ = GetValidatedChild<wxControl>("SDLPixelArt");
-#if !defined(ENABLE_SDL3) || !defined(HAVE_SDL3_PIXELART)
+    // The SDL3 pixel-art scaler is disabled until further investigation: hide the
+    // checkbox unconditionally and do not bind it to the option, regardless of
+    // ENABLE_SDL3 / HAVE_SDL3_PIXELART support.
     sdlpixelart_checkbox_->Hide();
-#else
-    wxDynamicCast(sdlpixelart_checkbox_, wxCheckBox)
-        ->SetValidator(
-            widgets::OptionBoolValidator(config::OptionID::kDispSDLPixelArt));
-#endif
 
     // Bind event handlers to all output module radio buttons.
     GetValidatedChild("OutputSimple")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
     GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
-#ifdef __WXMAC__
-    GetValidatedChild("OutputQuartz2D")->Bind(wxEVT_RADIOBUTTON,
-        &DisplayConfig::UpdateSDLOptionsVisibility, this);
-#ifndef NO_METAL
+#if defined(__WXMAC__) && !defined(NO_METAL)
     GetValidatedChild("OutputMetal")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
-#endif
 #endif
 #ifndef NO_OGL
 #if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
@@ -554,6 +559,14 @@ void DisplayConfig::InitBasicTab() {
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
     GetValidatedChild("OutputDirect3D")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+    GetValidatedChild("OutputDirect3D12")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#ifndef NO_VULKAN
+    GetValidatedChild("OutputVulkan")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
 
@@ -579,6 +592,193 @@ void DisplayConfig::InitBasicTab() {
 
     interframe_selector_ = GetValidatedChild<wxChoice>("IFB");
     interframe_selector_->SetValidator(InterframeValidator());
+
+    // HDR / deep-color controls. HDR is for the HDR-capable platforms; X11
+    // (Linux/BSD) gets the 10-bit deep-color SDR option instead.
+    wxCheckBox*   hdr_check    = GetValidatedChild<wxCheckBox>("HDR");
+    wxStaticText* hdr_warning  = GetValidatedChild<wxStaticText>("HDRNoEffectWarning");
+    wxCheckBox*   deep_check   = GetValidatedChild<wxCheckBox>("DeepColor");
+    wxStaticText* deep_warning = GetValidatedChild<wxStaticText>("DeepColorNoEffectWarning");
+
+    bool is_x11 = false;
+#ifdef __WXGTK__
+    is_x11 = !IsWayland();
+#endif
+
+    // HDR vs 10-bit deep color: X11 (Linux/BSD) has no per-window HDR, so it gets
+    // the 10-bit deep-color SDR toggle; the HDR-capable platforms get the HDR
+    // toggle. Exactly one is shown.
+    //
+    // Both toggles are two-state: checked = "auto" (honor it whenever the display
+    // and a renderer can present it), unchecked = "off". The default is auto.
+    // Nothing turns the option off automatically -- a renderer that cannot present
+    // the feature falls back at runtime but leaves the option in auto, so the
+    // checkbox stays checked and a warning is shown. Only the user unchecking it
+    // sets it off (and the warning then hides); re-checking returns it to auto and
+    // re-probes.
+    //
+    // The checkbox is shown only when the startup capability probe
+    // (hdr::HdrAvailable()/hdr::DeepColor10Available()) found the feature usable
+    // on this platform and display. When the probe found nothing -- platform has
+    // no per-window HDR, no 10-bit visual, etc. -- there is nothing to toggle, so
+    // the checkbox is hidden and only the warning is shown. A mid-session renderer
+    // fallback (the probe succeeded but every capable renderer later failed) is
+    // distinct: there the checkbox stays visible so the user can turn it off.
+    GameArea* ga = wxGetApp().frame ? wxGetApp().frame->GetPanel() : nullptr;
+    if (is_x11) {
+        hdr_check->Hide();
+        hdr_warning->Hide();
+
+        // Sets the deep-color warning label, overriding the XRC default only for
+        // the XWayland-fallback case.
+        auto set_deep_warning_label = [deep_warning]() {
+            if (VbamWaylandNoNativeRenderer()) {
+                // Wayland session with no native renderer fell back to XWayland,
+                // which can present neither HDR nor 10-bit SDR.
+                deep_warning->SetLabel(
+                    _("Neither HDR nor 10-bit SDR is available: no native "
+                      "Wayland (Vulkan) renderer was found, so the display fell "
+                      "back to XWayland (8-bit SDR only)."));
+            }
+        };
+
+        if (!hdr::DeepColor10Available()) {
+            // Capability probe found no 10-bit support on this platform/display:
+            // nothing to toggle, so hide the checkbox. An ordinary 8-bit screen
+            // is not worth a warning -- there was never a 10-bit visual for the
+            // runtime test to fail on. Only warn for the XWayland-fallback case
+            // (no native renderer), which is an actionable "no native renderer"
+            // condition rather than a plain non-10-bit display.
+            deep_check->Hide();
+            if (VbamWaylandNoNativeRenderer()) {
+                set_deep_warning_label();
+                deep_warning->Show(true);
+            } else {
+                deep_warning->Hide();
+            }
+        } else {
+            // Applied live on toggle (no OK-deferred validator) so the renderer
+            // checks run immediately and the user sees the result. Initialize the
+            // checkbox from the saved option.
+            deep_check->SetValue(OPTION(kDispDeepColor));
+
+            // Warning shown only when deep color is on (auto) but it cannot
+            // actually be presented (every capable renderer failed this session).
+            auto update_deep_warning =
+                [this, ga, deep_warning, set_deep_warning_label](bool checked) {
+                const bool avail = ga ? ga->DeepColorEffectivelyAvailable()
+                                      : hdr::DeepColor10Available();
+                const bool show = checked && !avail;
+                if (show)
+                    set_deep_warning_label();
+                deep_warning->Show(show);
+                Layout();
+            };
+            update_deep_warning(OPTION(kDispDeepColor));
+            deep_check->Bind(wxEVT_CHECKBOX,
+                             [this, ga, update_deep_warning](wxCommandEvent& ev) {
+                const bool on = ev.IsChecked();
+                if (on && ga)
+                    ga->ResetDeepColorRevert();  // clear session revert so re-probe is honored
+                OPTION(kDispDeepColor) = on;     // apply now: resets the panel + re-runs the checks
+                update_deep_warning(on);
+                // Re-show/switch renderers; also re-selects the radio and syncs
+                // the SDL backend picker (re-filtered, so a now-hidden backend
+                // drops to "default").
+                UpdateRenderMethodVisibility();
+                ev.Skip();
+            });
+        }
+    } else {
+        deep_check->Hide();
+        deep_warning->Hide();
+
+        // All four HDR brightness/tone sliders (white, peak, highlight knee,
+        // shadow contrast) feed only the HDR encode, so enable them only when HDR
+        // is effectively active -- they're disabled in SDR (and 10-bit-SDR).
+        //
+        // The sliders live on the Color Correction tab, which is loaded lazily and
+        // independently of this one -- during idle preload the Basic tab is built
+        // first, so they may not exist yet. Look them up tolerantly (FindWindow,
+        // not the asserting GetValidatedChild): when the Color Correction tab is
+        // built it sets their initial enabled state itself, and a live HDR toggle
+        // updates them here only if they are already present.
+        auto enable_hdr_sliders = [this](bool active) {
+            for (const char* n : {"HDRReferenceWhite", "HDRPeakBrightness",
+                                  "HDRHighlightKnee", "HDRShadowContrast"})
+                if (wxWindow* slider = FindWindow(n))
+                    slider->Enable(active);
+        };
+
+        if (!hdr::HdrAvailable()) {
+            // Capability probe found no HDR support on this platform/display:
+            // nothing to toggle, so hide the checkbox but keep the warning.
+            // Exception: when HDR is unavailable only because the user turned it
+            // off (in KDE, via the Windows HDR toggle, or the macOS System
+            // Settings HDR toggle), hide the warning too -- it's a deliberate
+            // choice, not a missing capability, so a "no effect" warning would be
+            // noise.
+            hdr_check->Hide();
+#if defined(__WXMSW__) && defined(WINXP)
+            // The 32-bit XP-compat build has no HDR-capable renderer (no
+            // D3D11/D3D12/Vulkan) and cannot probe the display's HDR state (the
+            // DXGI 1.6 / DisplayConfig advanced-color APIs are absent from the
+            // WINVER 0x0501 toolchain), so it can neither present HDR nor tell
+            // "HDR off" from "no HDR support". Suppress the "no effect" warning
+            // that the modern builds show for a genuinely HDR-less display --
+            // here it would be constant noise with nothing the user can act on.
+            hdr_warning->Hide();
+#else
+            hdr_warning->Show(!KdeHdrDisabled() && !hdr::WindowsHdrDisabled() &&
+                              !hdr::MacosHdrDisabled());
+#endif
+            enable_hdr_sliders(false);
+        } else {
+            // Applied live on toggle (no OK-deferred validator) so the renderer
+            // checks run immediately. Initialize from the saved option.
+            hdr_check->SetValue(OPTION(kDispHDR));
+
+            // While the profile is in auto mode, an HDR toggle retargets it
+            // (Rec2020 for HDR, sRGB for SDR). SetValue() doesn't fire the radio
+            // event, so this doesn't clear auto mode.
+            // The profile radios are also on the (lazily loaded) Color Correction
+            // tab, so look them up tolerantly. This only mirrors the auto-chosen
+            // profile into the radio UI; the profile option itself is updated by
+            // the auto-follow when kDispHDR changes, so when that tab is built it
+            // selects the right radio from the option regardless.
+            auto retarget_profile = [this](bool checked) {
+                if (OPTION(kDispColorCorrectionAuto)) {
+                    const char* name = checked ? "ColorProfileRec2020" : "ColorProfileSRGB";
+                    if (auto* rb = wxDynamicCast(FindWindow(name), wxRadioButton))
+                        rb->SetValue(true);
+                }
+            };
+            // Warning shown only when HDR is on (auto) but it cannot actually be
+            // presented (every HDR renderer failed this session).
+            auto update_hdr_warning =
+                [this, ga, hdr_warning, enable_hdr_sliders](bool checked) {
+                const bool avail = ga ? ga->HdrEffectivelyAvailable() : hdr::HdrAvailable();
+                hdr_warning->Show(checked && !avail);
+                enable_hdr_sliders(checked && avail);
+                Layout();
+            };
+            update_hdr_warning(OPTION(kDispHDR));
+            hdr_check->Bind(wxEVT_CHECKBOX,
+                            [this, ga, retarget_profile, update_hdr_warning](wxCommandEvent& ev) {
+                const bool on = ev.IsChecked();
+                if (on && ga)
+                    ga->ResetHdrRevert();  // clear session revert so re-probe is honored
+                OPTION(kDispHDR) = on;     // apply now: resets the panel + re-runs the checks
+                retarget_profile(on);
+                update_hdr_warning(on);
+                // Re-show/switch renderers; also re-selects the radio and syncs
+                // the SDL backend picker (re-filtered, so a now-hidden backend
+                // drops to "default").
+                UpdateRenderMethodVisibility();
+                ev.Skip();
+            });
+        }
+    }
 }
 
 void DisplayConfig::InitBitDepthTab() {
@@ -614,6 +814,16 @@ void DisplayConfig::InitColorCorrectionTab() {
             wxLogError(_("Invalid color correction profile"));
     }
 
+    // An explicit pick takes the profile out of auto mode (where it otherwise
+    // follows HDR: sRGB for SDR, Rec2020 for HDR).
+    auto clear_auto = [](wxCommandEvent& ev) {
+        OPTION(kDispColorCorrectionAuto) = false;
+        ev.Skip();
+    };
+    color_profile_srgb->Bind(wxEVT_RADIOBUTTON, clear_auto);
+    color_profile_dci->Bind(wxEVT_RADIOBUTTON, clear_auto);
+    color_profile_rec2020->Bind(wxEVT_RADIOBUTTON, clear_auto);
+
     wxSlider* gba_darken_slider = GetValidatedChild<wxSlider>("GBADarken");
     gba_darken_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBADarken));
     gba_darken_slider->SetToolTip(wxString::Format("%d", gba_darken_slider->GetValue()));
@@ -625,6 +835,44 @@ void DisplayConfig::InitColorCorrectionTab() {
     gbc_lighten_slider->SetToolTip(wxString::Format("%d", gbc_lighten_slider->GetValue()));
     gbc_lighten_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gbc_lighten_slider, std::placeholders::_1));
     gbc_lighten_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gbc_lighten_slider, std::placeholders::_1));
+
+    // HDR brightness sliders (the HDR enable checkbox lives on the Basic tab).
+    for (const auto& entry : {
+             std::make_pair("HDRReferenceWhite", config::OptionID::kDispHDRReferenceWhite),
+             std::make_pair("HDRPeakBrightness", config::OptionID::kDispHDRPeakBrightness),
+             std::make_pair("HDRHighlightKnee",  config::OptionID::kDispHDRHighlightKnee),
+             std::make_pair("HDRShadowContrast", config::OptionID::kDispHDRShadowContrast),
+         }) {
+        wxSlider* slider = GetValidatedChild<wxSlider>(entry.first);
+        // Cap the peak-brightness slider at the display's actual peak when known
+        // (macOS): higher values only clip/compress, and the option default is the
+        // slider max, so this also makes the default resolve to the display peak.
+        // Set the range before the validator loads the value so it isn't clamped
+        // to the stale XRC max. 0 = unknown -> keep the XRC range.
+        if (entry.second == config::OptionID::kDispHDRPeakBrightness) {
+            if (const uint32_t dp = hdr::DisplayPeakNits())
+                slider->SetRange(slider->GetMin(), static_cast<int>(dp));
+        }
+        slider->SetValidator(widgets::OptionUnsignedValidator(entry.second));
+        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
+        slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, slider, std::placeholders::_1));
+        slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, slider, std::placeholders::_1));
+    }
+
+    // All four HDR brightness/tone sliders (white, peak, highlight knee, shadow
+    // contrast) feed only the HDR encode (LumScale), so they have no effect in
+    // SDR or 10-bit-SDR (deep color) modes. Set their initial enabled state to
+    // match whether HDR is effectively active; on the HDR platforms the HDR
+    // checkbox handler keeps it in sync as the user toggles, and on X11 (no HDR)
+    // this leaves them disabled.
+    {
+        GameArea* ga = wxGetApp().frame ? wxGetApp().frame->GetPanel() : nullptr;
+        const bool hdr_active = OPTION(kDispHDR) &&
+            (ga ? ga->HdrEffectivelyAvailable() : hdr::HdrAvailable());
+        for (const char* n : {"HDRReferenceWhite", "HDRPeakBrightness",
+                              "HDRHighlightKnee", "HDRShadowContrast"})
+            GetValidatedChild(n)->Enable(hdr_active);
+    }
 }
 
 void DisplayConfig::InitSpeedTab() {
@@ -663,12 +911,59 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
         }
 
         Fit();
+
+        // BaseDialog restores any persisted size on this same wxEVT_SHOW, after
+        // this handler returns (its handler runs later in the chain). That
+        // restored size can be too narrow for the render-method radio row, or
+        // too tall (it reserved space for the SDL sub-options that are hidden
+        // this time). Defer the size reconciliation so it runs after the restore.
+        CallAfter(&DisplayConfig::AdjustSizeOnShow);
     } else {
         StopPluginHandler();
     }
 
     // Let the event propagate.
     event.Skip();
+}
+
+void DisplayConfig::AdjustSizeOnShow() {
+    if (render_method_radios_.empty())
+        return;
+    wxWindow* radio = GetValidatedChild(render_method_radios_.front().first);
+    if (!radio)
+        return;
+
+    // Lay out the page first so its sizer recomputes its min size after the
+    // show handler hid/showed the SDL sub-options; GetBestSize() reads that
+    // cached sizer min size, which a bare InvalidateBestSize() does not refresh.
+    // Without this the fitting height still includes the hidden SDL options and
+    // the slack is not removed until some later Layout (e.g. clicking a radio).
+    if (wxWindow* page = radio->GetParent()) {
+        page->Layout();
+        page->Refresh();
+    }
+
+    // GetBestSize() on the dialog is derived from the notebook, which caches
+    // each page's best size; invalidate that cache up the chain so the fitting
+    // size reflects the currently visible widgets (radios shown, SDL sub-options
+    // shown/hidden).
+    for (wxWindow* w = radio; w; w = w->GetParent()) {
+        w->InvalidateBestSize();
+        if (w == this)
+            break;
+    }
+
+    const wxSize best = GetBestSize();
+    const wxSize current = GetSize();
+    // Width: grow if the radio row would be clipped, but keep a user-widened
+    // dialog (never shrink). Height: size to content, which removes any leftover
+    // vertical space a persisted size reserved for the now-hidden SDL options
+    // (and grows if the visible content needs more).
+    const int width =
+        current.GetWidth() < best.GetWidth() ? best.GetWidth() : current.GetWidth();
+    const int height = best.GetHeight();
+    if (width != current.GetWidth() || height != current.GetHeight())
+        SetSize(width, height);
 }
 
 void DisplayConfig::PopulatePluginOptions() {
@@ -853,11 +1148,176 @@ void DisplayConfig::OnInterframeChanged(config::Option* option) {
         interframe_selector_->GetString(static_cast<size_t>(interframe))));
 }
 
+void DisplayConfig::UpdateRenderMethodVisibility() {
+    // When HDR or 10-bit deep color is available and on, hide every renderer that
+    // can't present the active feature (and any capable renderer that failed this
+    // session). When neither is on, RenderMethodHiddenFor*() return false for
+    // every method, so all applicable renderers are shown -- restoring radios
+    // that an earlier "on" state had hidden. Only the radios recorded as existing
+    // on this build/platform are touched; statically hidden ones stay hidden.
+    GameArea* ga = wxGetApp().frame ? wxGetApp().frame->GetPanel() : nullptr;
+
+    auto is_visible = [&](config::RenderMethod m) {
+        for (const auto& r : render_method_radios_)
+            if (r.second == m)
+                return !(ga && (ga->RenderMethodHiddenForHdr(m) ||
+                                ga->RenderMethodHiddenForDeepColor(m)));
+        return false;  // not an applicable radio on this build/platform
+    };
+
+    // The render method is applied on OK, not live, so OPTION(kDispRenderMethod)
+    // can lag a manual radio click. Use the checked radio as the source of truth
+    // for the active selection (fall back to the option if none is checked yet),
+    // so a manual selection isn't reverted to the stale option below.
+    config::RenderMethod current = OPTION(kDispRenderMethod);
+    for (const auto& radio : render_method_radios_)
+        if (auto* rb = wxDynamicCast(GetValidatedChild(radio.first), wxRadioButton))
+            if (rb->GetValue()) { current = radio.second; break; }
+
+    bool current_hidden = false;
+    for (const auto& radio : render_method_radios_) {
+        const bool hide = ga && (ga->RenderMethodHiddenForHdr(radio.second) ||
+                                 ga->RenderMethodHiddenForDeepColor(radio.second));
+        GetValidatedChild(radio.first)->Show(!hide);
+        if (radio.second == current && hide)
+            current_hidden = true;
+    }
+
+    // The active renderer was just hidden -- it can't present the feature that's
+    // now on. Move the selection to one that can: the SDL renderer falls back to
+    // Vulkan (its native equivalent), anything else to the next available
+    // renderer in priority order. Setting the option drives both the radio
+    // selection (via the option observer) and the panel.
+    if (current_hidden) {
+        static const config::RenderMethod kPriority[] = {
+#ifndef NO_VULKAN
+            config::RenderMethod::kVulkan,
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+            config::RenderMethod::kDirect3d12,
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+            config::RenderMethod::kDirect3d,
+#endif
+#if defined(__WXMAC__) && !defined(NO_METAL)
+            config::RenderMethod::kMetal,
+#endif
+            config::RenderMethod::kOpenGL,
+            config::RenderMethod::kSimple,
+            config::RenderMethod::kSDL,
+        };
+        config::RenderMethod target = current;
+#ifndef NO_VULKAN
+        if (current == config::RenderMethod::kSDL &&
+            is_visible(config::RenderMethod::kVulkan)) {
+            target = config::RenderMethod::kVulkan;
+        } else
+#endif
+        {
+            for (const config::RenderMethod m : kPriority)
+                if (m != current && is_visible(m)) { target = m; break; }
+        }
+        if (target != current) {
+            // Leaving SDL because this build can't present the feature (e.g. an
+            // SDL2 build with 10-bit deep color on): reset its backend to
+            // "default" so returning to SDL later starts from a clean, working
+            // backend rather than the incapable one that was selected.
+            if (current == config::RenderMethod::kSDL)
+                OPTION(kSDLRenderer) = wxString("default");
+            // Forced switch (the selected renderer can't present the feature now
+            // on): apply it live and reflect it in the radios -- SetSelection()
+            // fires no wxEVT_RADIOBUTTON, so set them explicitly.
+            OPTION(kDispRenderMethod) = target;
+            for (const auto& radio : render_method_radios_)
+                if (auto* rb = wxDynamicCast(GetValidatedChild(radio.first), wxRadioButton))
+                    rb->SetValue(radio.second == target);
+            current = target;
+        }
+    }
+
+    // Sync the SDL sub-options to the active selection (the checked radio, which
+    // `current` tracks). Don't re-sync the radios from the option otherwise: the
+    // render method is applied on OK, so the option can lag a manual radio click,
+    // and forcing the radios from it would revert the user's selection. The SDL
+    // sub-options are created later in InitBasicTab, so the selector may be null
+    // on the initial call (OnDialogShowEvent sets their first-time visibility).
+    if (sdlrenderer_selector_) {
+        if (current == config::RenderMethod::kSDL) {
+            ShowSDLOptions();
+            wxCommandEvent dummy;
+            FillRendererList(dummy);
+        } else {
+            HideSDLOptions();
+        }
+    }
+
+    // Re-fit so the dialog grows/shrinks to the radios just shown/hidden (and
+    // the SDL sub-options toggled above).
+    if (!render_method_radios_.empty())
+        RefitForVisibilityChange(
+            GetValidatedChild(render_method_radios_.front().first));
+}
+
+void DisplayConfig::RefitForVisibilityChange(wxWindow* changed) {
+    if (!changed)
+        return;
+
+    // Lay out and repaint the page that owns `changed` first. A dialog-level
+    // Fit()/Layout() only re-runs a notebook page's sizer when the dialog's
+    // computed size changes; when a toggle changes a page's content without
+    // changing the overall best size, that cascade never fires and the affected
+    // widgets stay unplaced (drawing garbled / overlapping until a stray
+    // repaint). Lay out and repaint the page explicitly so the toggle alone
+    // reflects the change.
+    if (wxWindow* page = changed->GetParent()) {
+        page->Layout();
+        page->Refresh();
+    }
+
+    // Fit() below computes the dialog's fitting size from the notebook, which
+    // caches each page's best size. After a visibility change that cache is
+    // stale (it still reflects the pre-change layout), so the dialog neither
+    // grows nor shrinks. Invalidate the cached best size up the chain --
+    // changed -> sizers' window -> page -> notebook -> dialog -- so Fit() sees
+    // the new content.
+    for (wxWindow* w = changed; w; w = w->GetParent()) {
+        w->InvalidateBestSize();
+        if (w == this)
+            break;
+    }
+
+    // Re-fit the frame to the new content. Match the existing platform
+    // convention used elsewhere in this dialog.
+#ifdef __WXMAC__
+    Layout();
+#else
+    Fit();
+#endif
+}
+
 void DisplayConfig::FillRendererList(wxCommandEvent& event) {
 #ifndef ENABLE_SDL3
     SDL_RendererInfo render_info;
 #endif
     int num_drivers = 0;
+
+#if defined(HAVE_WAYLAND_SUPPORT) && defined(ENABLE_SDL3)
+    // On Wayland, every SDL video init in this process must share GDK's
+    // wl_display. SDL reads this global property only at the first video init;
+    // if we let SDL open its own connection here (just to enumerate render
+    // drivers), that stale display sticks. The SDL panel would then hand SDL a
+    // wl_surface (its subsurface) created on GDK's display while SDL's event
+    // queue belongs to its own -- and wl_proxy_set_queue aborts the process.
+    // Import GDK's display first so the enumeration init and the later panel
+    // init agree on one display. (The panel sets the same property; this just
+    // covers the case where the dialog brings video up first.)
+    if (IsWayland()) {
+        SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "wayland");
+        if (wl_display* wl = gdk_wayland_display_get_wl_display(gdk_display_get_default()))
+            SDL_SetPointerProperty(SDL_GetGlobalProperties(),
+                SDL_PROP_GLOBAL_VIDEO_WAYLAND_WL_DISPLAY_POINTER, wl);
+    }
+#endif
 
     SDL_InitSubSystem(SDL_INIT_VIDEO);
     SDL_Init(SDL_INIT_VIDEO);
@@ -868,22 +1328,134 @@ void DisplayConfig::FillRendererList(wxCommandEvent& event) {
     sdlrenderer_selector_->Append("default", new wxStringClientData("default"));
     sdlrenderer_selector_->SetSelection(0);
 
+    // When HDR is on, only the HDR-capable SDL3 render backends can present it;
+    // hide the legacy (SDL2-era) drivers that can only do SDR.
+    const bool sdl_hdr_only =
+#ifdef ENABLE_SDL3
+        hdr::HdrAvailable() && OPTION(kDispHDR);
+#else
+        false;
+#endif
+    auto sdl_driver_is_hdr_capable = [](const wxString& name) {
+        // On Wayland we drive HDR through the compositor with a 10-bit PQ
+        // surface, and only SDL's "vulkan" backend actually presents that into
+        // our borrowed subsurface -- "gpu" advertises support but shows a black
+        // frame. So offer only vulkan for SDL HDR there.
+        if (IsWayland())
+            return name == "vulkan";
+        return name == "direct3d11" || name == "direct3d12" ||
+               name == "vulkan" || name == "metal" || name == "gpu";
+    };
+
+    // When 10-bit deep color is on (X11 only), keep only the SDL backends that
+    // can actually render to a 10-bit target; drop the rest. Of the SDL render
+    // backends only "vulkan" advertises a 2101010 texture format on X11: the
+    // "opengl"/"opengles2" renderers expose 8-bit formats only, "software"
+    // likewise, and the "gpu" (SDL_GPU) backend can't present into our borrowed
+    // X11 window at all -- SDL_GPU builds its own VkSurfaceKHR, and for a window
+    // SDL did not create SDL_WindowSupportsGPUSwapchainComposition reports every
+    // composition (even SDR) unsupported, so ClaimWindowForGPUDevice fails ("Device
+    // does not support requested swapchain composition"). The native "vulkan"
+    // render backend uses the video subsystem's surface path, which does handle
+    // an external window, so it is the only working 10-bit SDL backend here.
+    // (The panel substitutes vulkan if one of those is somehow selected, but
+    // there's no reason to offer a backend that only works by being silently
+    // replaced.)
+    GameArea* ga = wxGetApp().frame ? wxGetApp().frame->GetPanel() : nullptr;
+    const bool sdl_deep_color_only =
+#ifdef ENABLE_SDL3
+        OPTION(kDispDeepColor) &&
+        (ga ? ga->DeepColorEffectivelyAvailable() : hdr::DeepColor10Available());
+#else
+        ((void)ga, false);
+#endif
+    auto sdl_driver_is_deep_color_capable = [](const wxString& name) {
+        return name == "vulkan";
+    };
+
+    // Normalize a saved backend that is exactly what "default" resolves to at
+    // runtime back to "default", so picking "default" doesn't come back pinned to
+    // the specific backend it happened to run as. "default" resolves to:
+    //   * vulkan in the high-bit-depth modes (HDR / 10-bit deep color) -- the
+    //     panel forces it; and
+    //   * SDL's own first/most-preferred render driver otherwise (what
+    //     SDL_CreateRenderer(NULL) selects -- e.g. opengl on X11).
+    wxString eff_default;
+    if (sdl_hdr_only || sdl_deep_color_only) {
+        eff_default = wxString("vulkan");
+    } else if (num_drivers > 0) {
+#ifdef ENABLE_SDL3
+        eff_default = wxString(SDL_GetRenderDriver(0));
+#else
+        SDL_RendererInfo first_info;
+        SDL_GetRenderDriverInfo(0, &first_info);
+        eff_default = wxString(first_info.name);
+#endif
+    }
+    if (!eff_default.empty() && OPTION(kSDLRenderer) == eff_default) {
+        OPTION(kSDLRenderer) = wxString("default");
+    }
+
+    // Track whether the saved backend survived the filtering above. "default" is
+    // always offered; a named backend that got filtered out (e.g. opengl/gpu once
+    // deep color or HDR is on) is no longer selectable, so we fall the option
+    // back to "default" below.
+    bool selected_shown = (OPTION(kSDLRenderer) == wxString("default"));
+
     for (int i = 0; i < num_drivers; i++) {
 #ifdef ENABLE_SDL3
+        // Two SDL backends don't work into our borrowed Wayland subsurface and
+        // are never offered there: "gpu" presents a black frame, and "opengles2"
+        // fails to create (EGL_BAD_SURFACE). "vulkan" (accelerated) and "opengl"
+        // (GL) both work.
+        if (IsWayland() && (wxString(SDL_GetRenderDriver(i)) == "gpu" ||
+                            wxString(SDL_GetRenderDriver(i)) == "opengles2"))
+            continue;
+#if defined(__WXMAC__)
+        // SDL's "vulkan" backend on macOS is MoltenVK loaded through the Vulkan
+        // Portability dynamic library, which is absent in our build -- the
+        // renderer fails to create ("Failed to load Vulkan Portability library").
+        // Metal is the accelerated/HDR backend here, so never offer "vulkan".
+        // "opengles2" likewise fails to create (macOS has no native OpenGL ES);
+        // desktop "opengl" is the working GL backend, so never offer opengles2.
+        if (wxString(SDL_GetRenderDriver(i)) == "vulkan" ||
+            wxString(SDL_GetRenderDriver(i)) == "opengles2")
+            continue;
+#endif
+        if (sdl_hdr_only && !sdl_driver_is_hdr_capable(wxString(SDL_GetRenderDriver(i))))
+            continue;
+        if (sdl_deep_color_only && !sdl_driver_is_deep_color_capable(wxString(SDL_GetRenderDriver(i))))
+            continue;
+
         sdlrenderer_selector_->Append(SDL_GetRenderDriver(i), new wxStringClientData(SDL_GetRenderDriver(i)));
 
         if (OPTION(kSDLRenderer) == wxString(SDL_GetRenderDriver(i))) {
-            sdlrenderer_selector_->SetSelection(i+1);
+            // Use the actual appended index: filtered-out drivers above mean it
+            // is not i+1.
+            sdlrenderer_selector_->SetSelection(sdlrenderer_selector_->GetCount() - 1);
+            selected_shown = true;
         }
 #else
+        (void)sdl_hdr_only; (void)sdl_driver_is_hdr_capable;
+        (void)sdl_deep_color_only; (void)sdl_driver_is_deep_color_capable;
         SDL_GetRenderDriverInfo(i, &render_info);
 
         sdlrenderer_selector_->Append(render_info.name, new wxStringClientData(render_info.name));
 
         if (OPTION(kSDLRenderer) == wxString(render_info.name)) {
-            sdlrenderer_selector_->SetSelection(i+1);
+            sdlrenderer_selector_->SetSelection(sdlrenderer_selector_->GetCount() - 1);
+            selected_shown = true;
         }
 #endif
+    }
+
+    // The saved SDL backend is no longer offered (hidden for the active HDR /
+    // deep-color mode): fall back to "default", which the panel resolves to a
+    // working backend (vulkan for the high-bit-depth modes). Apply it to the
+    // option too so the choice is consistent and persists, not just the UI.
+    if (!selected_shown) {
+        OPTION(kSDLRenderer) = wxString("default");
+        sdlrenderer_selector_->SetSelection(0);
     }
 
     // Let the event propagate.
@@ -945,9 +1517,8 @@ void DisplayConfig::HideSDLOptions() {
 void DisplayConfig::ShowSDLOptions() {
     sdlrenderer_label_->Show();
     sdlrenderer_selector_->Show();
-#if defined(ENABLE_SDL3) && defined(HAVE_SDL3_PIXELART)
-    sdlpixelart_checkbox_->Show();
-#endif
+    // Pixel-art checkbox intentionally left hidden (disabled until further
+    // investigation); see InitBasicTab.
 }
 
 void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
@@ -955,15 +1526,21 @@ void DisplayConfig::UpdateSDLOptionsVisibility(wxCommandEvent& event) {
     wxRadioButton* sdl_button = wxDynamicCast(GetValidatedChild("OutputSDL"), wxRadioButton);
     if (sdl_button && sdl_button->GetValue()) {
         ShowSDLOptions();
+        // Populate the renderer list now that SDL has just been selected. It is
+        // filled on selection rather than at dialog-open (where OnDialogShowEvent
+        // only fills it if SDL was already the active renderer) because
+        // FillRendererList calls SDL_Init, which can disturb a live OpenGL panel.
+        wxCommandEvent dummy_event;
+        FillRendererList(dummy_event);
     } else {
         HideSDLOptions();
     }
 
-#ifdef __WXMAC__
-    Layout();
-#else
-    Fit();
-#endif
+    // Re-fit so the dialog gains room for the renderer dropdown when SDL options
+    // are shown and gives it back when hidden. A plain Fit() can't shrink/grow
+    // here because the notebook caches the page's pre-toggle best size; the
+    // helper invalidates that cache up the chain first.
+    RefitForVisibilityChange(sdlrenderer_selector_);
 
     // Let the event propagate
     event.Skip();
