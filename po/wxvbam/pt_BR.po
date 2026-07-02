@@ -438,7 +438,7 @@ msgstr "Falhou em carregar a aba '%s' do DisplayConfig"
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
-msgstr ""
+msgstr "Nem HDR nem SDR de 10 bits estão disponíveis: nenhum renderizador nativo de Wayland (Vulkan) foi achado, então a tela voltou pro XWayland (só no SDR de 8 bits)."
 
 #: dialogs/display-config.cpp:814
 msgid "Invalid color correction profile"
@@ -1115,7 +1115,7 @@ msgstr "Não há VSYNC disponível nesta plataforma"
 
 #: panel.cpp:6106
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
-msgstr ""
+msgstr "HDR: falhou em criar a superfície PQ BT.2020; Voltando pro SDR."
 
 #: panel.cpp:6355
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
@@ -1162,7 +1162,7 @@ msgstr "Falhou em obter o IDXGISwapChain3: 0x%08X"
 #: panel.cpp:6478
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
-msgstr ""
+msgstr "HDR: a tela/cadeia de troca não suporta BT.2020 PQ; A saída será SDR."
 
 #: panel.cpp:6488
 #, c-format
@@ -1255,24 +1255,24 @@ msgstr "O upload da textura falhou"
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11: falhou em criar o dispositivo; O renderizador simples usará o caminho do software (wx)."
 
 #: panel.cpp:7185
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "D3D11: falhou em criar a cadeia de troca: 0x%08X"
 
 #: panel.cpp:7251
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
-msgstr ""
+msgstr "D3D11: o d3dcompiler_47.dll não foi achado; O renderizador simples usará o caminho do software (wx)."
 
 #: panel.cpp:7303
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11: a configuração do shader dos blits falhou; O renderizador simples usará o caminho do software (wx)."
 
 #: panel.cpp:7588
 msgid "Using Direct3D 9Ex (dynamically loaded)"
@@ -1394,16 +1394,16 @@ msgstr "Erro na gravação do vídeo (%s); abortando"
 
 #: panel.cpp:8467
 msgid "Renderer failed to initialize; trying the next available renderer."
-msgstr ""
+msgstr "O renderizador falhou em inicializar; Tentando o próximo renderizador disponível."
 
 #: panel.cpp:8475
 msgid "No renderer could be initialized."
-msgstr ""
+msgstr "Nenhum renderizador pôde ser inicializado."
 
 #: panel.cpp:8569
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
-msgstr ""
+msgstr "Nenhum renderizador pôde apresentar cor de 10 bits de profundidade; Usando 8 bits pra esta sessão."
 
 #: panel.cpp:8607
 msgid "Metal is unavailable, defaulting to OpenGL"
@@ -1411,7 +1411,7 @@ msgstr "O Metal não está disponível, revertendo pro padrão OpenGL"
 
 #: panel.cpp:8620
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
-msgstr ""
+msgstr "O OpenGL não está disponível no Wayland sem o EGL, usando o Vulkan"
 
 #: panel.cpp:8639
 msgid "Vulkan is unavailable, defaulting to OpenGL"
@@ -1464,11 +1464,11 @@ msgstr "Falhou em criar a superfície do Vulkan pro Xlib: %d"
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
-msgstr ""
+msgstr "Wayland: wl_compositor/wl_subcompositor indisponível; não consegue criar a sub-superfície do Vulkan"
 
 #: panel.cpp:9886
 msgid "Wayland: failed to create Vulkan subsurface"
-msgstr ""
+msgstr "Wayland: falhou em criar a superfície do Vulkan pro Xlib: %d"
 
 #: panel.cpp:9924
 #, c-format
@@ -1983,33 +1983,33 @@ msgstr "Perfil de correção das cores"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
 msgid "Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)"
-msgstr ""
+msgstr "Auto-selecionar o perfil de correção das cores (sRGB pra SDR, Rec2020 pra HDR)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
 msgid "Output HDR on supported displays and renderers"
-msgstr ""
+msgstr "HDR de saída nas telas e renderizadores suportados"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
 msgid "HDR diffuse (paper) white luminance, in nits"
-msgstr ""
+msgstr "HDR difusa (papel), luminância branca, em nível de brilho"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid "HDR peak/highlight luminance, in nits"
-msgstr ""
+msgstr "Luminância de pico/destaque do HDR, em nível de brilho"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid "Input level percentage above which HDR highlights ramp to peak"
-msgstr ""
+msgstr "Percentual do nível de entrada acima do qual os destaques do HDR aumentam para o pico"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
 msgid ""
 "HDR shadow contrast as a percentage gamma (100 = neutral; higher deepens "
 "blacks)"
-msgstr ""
+msgstr "Contraste da sombra do HDR como uma porcentagem do gama (100 = neutro; maior aprofunda os pretos)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid "Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)"
-msgstr ""
+msgstr "Usar um visual SDR colorido profundo de 10 bits pro OpenGL (X11; reduz as faixas)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -3234,19 +3234,19 @@ msgstr "Filtro da Arte dos Pixels do SDL"
 
 #: xrc/DisplayConfigBasic.xrc:94
 msgid "Output HDR (Wayland, Vulkan, D3D12, macOS)"
-msgstr ""
+msgstr "HDR de saída (Wayland, Vulkan, D3D12, macOS)"
 
 #: xrc/DisplayConfigBasic.xrc:101
 msgid "HDR is not available: this display or renderer is not HDR capable."
-msgstr ""
+msgstr "O HDR não está disponível: esta tela ou renderizador não é capaz de HDR."
 
 #: xrc/DisplayConfigBasic.xrc:110
 msgid "10-bit deep color (reduces banding)"
-msgstr ""
+msgstr "Cor de 10 bits de profundidade (reduz as faixas)"
 
 #: xrc/DisplayConfigBasic.xrc:117
 msgid "10-bit deep color is not available: no 10-bit visual on this display."
-msgstr ""
+msgstr "A cor de 10 bits de profundidade não está disponível: não há visualização de 10 bits nesta tela."
 
 #: xrc/DisplayConfigBasic.xrc:131
 msgid "Filters"
@@ -3362,19 +3362,19 @@ msgstr "Muito Claro"
 
 #: xrc/DisplayConfigColorCorrection.xrc:127
 msgid "HDR White (nits):"
-msgstr ""
+msgstr "Branco do HDR (nível do brilho):"
 
 #: xrc/DisplayConfigColorCorrection.xrc:143
 msgid "HDR Peak (nits):"
-msgstr ""
+msgstr "Pico do HDR (nível do brilho):"
 
 #: xrc/DisplayConfigColorCorrection.xrc:159
 msgid "HDR Highlight Knee:"
-msgstr ""
+msgstr "Ponto de Destaque do HDR:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:175
 msgid "HDR Shadow Contrast:"
-msgstr ""
+msgstr "Contraste de Sombras do HDR:"
 
 #: xrc/DisplayConfigOSD.xrc:9
 msgid "Speed indicator:"
