@@ -23,8 +23,8 @@ namespace config {
             }
         }
 
-        // Command not found. This should never happen.
-        VBAM_NOTREACHED_RETURN(wxEmptyString);
+        // Command not in the table -- degrade gracefully (see GetCommandHelper).
+        return wxEmptyString;
     }
 
     wxString GetCommandHelper(int command) {
@@ -34,8 +34,21 @@ namespace config {
             }
         }
 
-        // Command not found. This should never happen.
-        VBAM_NOTREACHED_RETURN(wxEmptyString);
+        // Command not in the table (e.g. a menu item created with wxID_ANY, which
+        // has no command-event entry). Returning via VBAM_NOTREACHED here is
+        // undefined behavior in release builds -- the discarded return value
+        // yields a corrupt wxString whose later copy crashes. Degrade gracefully.
+        // Callers that build bindable lists should gate on IsCommandId() first.
+        return wxEmptyString;
+    }
+
+    bool IsCommandId(int command) {
+        for (const auto& cmd_item : cmdtab) {
+            if (cmd_item.cmd_id == command) {
+                return true;
+            }
+        }
+        return false;
     }
 
     nonstd::optional<int> CommandFromConfigString(const wxString& config) {

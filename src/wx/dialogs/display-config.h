@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
+#include <utility>
 #include <vector>
 
 #include <wx/filepicker.h>
@@ -16,6 +17,7 @@ class wxWindow;
 
 namespace config {
 class Option;
+enum class RenderMethod;
 }
 
 namespace dialogs {
@@ -79,6 +81,29 @@ private:
     // Renderer changed
     void FillRendererList(wxCommandEvent& event);
 
+    // Re-evaluate which render-method radios are visible for the current HDR /
+    // 10-bit deep-color option state: show every renderer applicable on this
+    // build/platform and hide only the ones that can't present the active
+    // feature. Called from InitBasicTab and whenever the HDR or deep-color
+    // checkbox is toggled, so turning a feature off restores all hidden radios.
+    void UpdateRenderMethodVisibility();
+
+    // Reconcile the dialog size with its current content on show. Widens if the
+    // render-method radio row (a single horizontal row) would be clipped, and
+    // sizes the height to content -- dropping any leftover vertical space a
+    // persisted size reserved for the SDL sub-options when they are now hidden.
+    // Width only ever grows (a user-widened dialog is kept). Run deferred
+    // (CallAfter) from the show handler so it applies after BaseDialog restores
+    // any persisted size.
+    void AdjustSizeOnShow();
+
+    // Re-fit the dialog after a child's visibility changed. Lays out and
+    // repaints the page that owns `changed`, invalidates the cached best size up
+    // the chain to the dialog (the notebook caches each page's best size, so
+    // without this Fit() reuses the stale pre-change size and the dialog neither
+    // grows nor shrinks), then fits the frame to the new content.
+    void RefitForVisibilityChange(wxWindow* changed);
+
     // Hides/Shows the plugin-related filter options.
     void HidePluginOptions();
     void ShowPluginOptions();
@@ -105,6 +130,13 @@ private:
     wxChoice* sdlrenderer_selector_ = nullptr;
     wxControl* sdlrenderer_label_ = nullptr;
     wxControl* sdlpixelart_checkbox_ = nullptr;
+
+    // Render-method radios that actually exist on this build/platform (validator
+    // set, not statically #ifdef-hidden), paired with their RenderMethod. Drives
+    // UpdateRenderMethodVisibility() so it never re-shows a radio that this build
+    // hides unconditionally.
+    std::vector<std::pair<const char*, config::RenderMethod>> render_method_radios_;
+
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

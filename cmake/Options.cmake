@@ -75,6 +75,32 @@ if(NOT WIN32 AND NOT APPLE)
     unset(_have_gdk_wayland)
     unset(_have_gdkwayland_header CACHE)
     unset(_saved_required_includes)
+
+    # Wayland protocol client glue is a SEPARATE, independently auto-detected
+    # feature from the gdk/gdkwayland.h backend detection above. Generating it
+    # needs the wayland-scanner code generator, the wayland-protocols data
+    # directory, and libwayland-client -- none of which GDK provides. It drives
+    # the HDR (color-management-v1) and software-scaling (viewporter) paths; the
+    # C++ code falls back when a protocol is missing. Auto-enabled when the
+    # toolchain is present, regardless of whether the GDK Wayland backend was
+    # found. The found tools are reused by src/wx/CMakeLists.txt.
+    find_program(WAYLAND_SCANNER wayland-scanner)
+    find_library(WAYLAND_LIBRARY wayland-client)
+    if(PkgConfig_FOUND)
+        pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
+    endif()
+
+    if(WAYLAND_SCANNER AND WAYLAND_PROTOCOLS_DIR AND WAYLAND_LIBRARY)
+        set(_wayland_protocols_default ON)
+    else()
+        set(_wayland_protocols_default OFF)
+    endif()
+
+    option(ENABLE_WAYLAND_PROTOCOLS
+        "Generate Wayland protocol client glue (HDR color management, viewporter)"
+        ${_wayland_protocols_default})
+
+    unset(_wayland_protocols_default)
 endif()
 
 # Static linking
@@ -206,20 +232,20 @@ if(ENABLE_SDL3)
    set(CMAKE_CXX_FLAGS    "-DENABLE_SDL3 ${CMAKE_CXX_FLAGS}")
    set(CMAKE_OBJC_FLAGS   "-DENABLE_SDL3 ${CMAKE_OBJC_FLAGS}")
    set(CMAKE_OBJCXX_FLAGS "-DENABLE_SDL3 ${CMAKE_OBJCXX_FLAGS}")
-
-   include(CheckSourceCompiles)
-   check_source_compiles(CXX
-"#include <SDL3/SDL.h>
-
-int main() { return SDL_SCALEMODE_PIXELART; }
-"       HAVE_SDL_SCALEMODE_PIXELART)
-
-   if(HAVE_SDL_SCALEMODE_PIXELART)
-      set(CMAKE_C_FLAGS      "-DHAVE_SDL3_PIXELART ${CMAKE_C_FLAGS}")
-      set(CMAKE_CXX_FLAGS    "-DHAVE_SDL3_PIXELART ${CMAKE_CXX_FLAGS}")
-      set(CMAKE_OBJC_FLAGS   "-DHAVE_SDL3_PIXELART ${CMAKE_OBJC_FLAGS}")
-      set(CMAKE_OBJCXX_FLAGS "-DHAVE_SDL3_PIXELART ${CMAKE_OBJCXX_FLAGS}")
-   endif()
+#
+#   include(CheckSourceCompiles)
+#   check_source_compiles(CXX
+#"#include <SDL3/SDL.h>
+#
+#int main() { return SDL_SCALEMODE_PIXELART; }
+#"       HAVE_SDL_SCALEMODE_PIXELART)
+#
+#   if(HAVE_SDL_SCALEMODE_PIXELART)
+#      set(CMAKE_C_FLAGS      "-DHAVE_SDL3_PIXELART ${CMAKE_C_FLAGS}")
+#      set(CMAKE_CXX_FLAGS    "-DHAVE_SDL3_PIXELART ${CMAKE_CXX_FLAGS}")
+#      set(CMAKE_OBJC_FLAGS   "-DHAVE_SDL3_PIXELART ${CMAKE_OBJC_FLAGS}")
+#      set(CMAKE_OBJCXX_FLAGS "-DHAVE_SDL3_PIXELART ${CMAKE_OBJCXX_FLAGS}")
+#   endif()
 endif()
 
 set(enable_asm_default OFF)
@@ -313,8 +339,11 @@ if(WIN32)
 
     if(NOT WINXP)
         option(ENABLE_DIRECT3D12 "Enable Direct3D 12 rendering for the wxWidgets port" ON)
+        # D3D11 backs the software "Simple" renderer's HDR path on Windows.
+        option(ENABLE_DIRECT3D11 "Enable Direct3D 11 rendering for the wxWidgets port" ON)
     else()
         set(ENABLE_DIRECT3D12 OFF)
+        set(ENABLE_DIRECT3D11 OFF)
     endif()
 
     set(XAUDIO2_DEFAULT ON)

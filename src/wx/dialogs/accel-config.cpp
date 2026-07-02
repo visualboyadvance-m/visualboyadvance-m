@@ -100,9 +100,13 @@ void PopulateTreeWithMenu(
                 PopulateTreeWithMenu(command_to_item_id, tree, sub_parent, menu_item->GetSubMenu(),
                                      recents, AppendMenuItem(prefix, level, menu_item), level + 1);
             }
-        } else {
+        } else if (config::IsCommandId(menu_item->GetId())) {
             AppendItemToTree(command_to_item_id, tree, parent, menu_item->GetId(), prefix, level);
         }
+        // Else: a menu item with no command-event entry -- e.g. the dynamically
+        // built Language submenu items, which are created with wxID_ANY. They
+        // have no stable id to bind a shortcut to, so they don't belong in the
+        // accelerator tree (and feeding their id to GetCommandHelper would crash).
     }
 }
 

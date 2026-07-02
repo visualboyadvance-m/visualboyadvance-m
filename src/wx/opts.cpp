@@ -398,6 +398,24 @@ void load_opts(bool first_time_launch) {
                     OPTION(kDispFilter) = config::Filter::kXbrz2x;
                 }
 #endif
+                // OpenGL is no longer the preferred default on any platform.
+                // One-time: steer a saved OpenGL choice to the head of the
+                // platform's renderer priority list (Windows: Direct3D 12,
+                // macOS: Metal, Linux/BSD: Vulkan), falling through to whatever
+                // is compiled in. New installs already default to the right one;
+                // the runtime fallback handles the case where the head doesn't
+                // actually work on this machine.
+                if (OPTION(kDispRenderMethod) == config::RenderMethod::kOpenGL) {
+#if defined(__WXMSW__) && !defined(WINDOWSXP) && !defined(NO_D3D12)
+                    OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d12;
+#elif defined(__WXMSW__) && !defined(NO_D3D)
+                    OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d;
+#elif defined(__WXMAC__) && !defined(NO_METAL)
+                    OPTION(kDispRenderMethod) = config::RenderMethod::kMetal;
+#elif !defined(NO_VULKAN)
+                    OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
+#endif
+                }
             }
         }
         ini_version++;

@@ -152,6 +152,16 @@ if(MSVC AND DEFINED VBAM_VS_LIB_DIRS)
     unset(VBAM_MSVC_LIB_FLAGS)
 endif()
 
+# With a static vcpkg triplet there are no DLL dependencies to stage next to the
+# executables -- everything is linked statically, and the Vulkan loader is loaded
+# dynamically (delay-loaded), not as a normal import. So vcpkg's app-local
+# deployment has nothing to copy; turn it off to skip its per-target post-build
+# step and the "deploying dependencies" message it prints. Dynamic triplets still
+# need it, so this is gated on a static triplet.
+if(VCPKG_TARGET_TRIPLET MATCHES "static")
+    set(VCPKG_APPLOCAL_DEPS OFF)
+endif()
+
 # When VS environment was auto-loaded, generate wrappers that prepend VS tool
 # paths (containing dumpbin, etc.) to PATH at build time.  vcpkg's applocal.ps1
 # post-build script needs dumpbin, but neither ninja nor the powershell process

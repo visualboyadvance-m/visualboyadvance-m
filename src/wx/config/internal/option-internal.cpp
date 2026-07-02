@@ -173,14 +173,47 @@ std::array<Option, kNbOptions>& Option::All() {
 #elif defined(__WXMSW__) && !defined(NO_D3D)
         RenderMethod render_method = RenderMethod::kDirect3d;
 #else
-#if defined(NO_OGL)
-        RenderMethod render_method = RenderMethod::kSDL;
-#else
+        // Linux/BSD and other X11/Wayland platforms. Priority head is Vulkan
+        // (then SDL, OpenGL, Simple via the runtime fallback); pick the first
+        // that is compiled in for the static default.
+#if !defined(NO_VULKAN)
+        RenderMethod render_method = RenderMethod::kVulkan;
+#elif !defined(NO_OGL)
         RenderMethod render_method = RenderMethod::kOpenGL;
+#else
+        RenderMethod render_method = RenderMethod::kSDL;
 #endif
 #endif
 
         ColorCorrectionProfile color_correction_profile = ColorCorrectionProfile::kSRGB;
+        // When true (default), the profile auto-follows output: sRGB for SDR,
+        // Rec2020 for HDR. Cleared once the user picks a profile explicitly.
+        bool color_correction_auto = true;
+
+        // On by default: takes effect only where the display/renderer supports
+        // it (gated by DrawingPanelBase::SupportsHdr()); otherwise it stays on
+        // but inert and the display dialog shows a "no effect" warning.
+        bool hdr = true;
+        uint32_t hdr_reference_white = 220;
+        // Auto peak: the HDR encoder and the dialog peak slider both cap peak at
+        // the display's real peak (hdr::DisplayPeakNits), so defaulting to the
+        // slider max resolves to the exact display peak per screen. Safe on every
+        // platform whose peak probe is validated to be non-zero whenever HDR is
+        // actually live -- macOS (EDR headroom), Windows (DXGI MaxLuminance) and
+        // Wayland (compositor max luminance). X11 never presents HDR
+        // (HdrAvailable() is false, so the encode is inert and DisplayPeakNits
+        // returns 0), so this value stays unused there rather than driving a
+        // compositor's phantom 10000-nit range. Linux picks X11 vs Wayland at
+        // runtime, so this cannot be a compile-time split anyway.
+        uint32_t hdr_peak_brightness = 10000;
+        uint32_t hdr_highlight_knee = 50;
+        // Shadow contrast as a percentage gamma (100 == 1.0, neutral). Higher
+        // deepens blacks/dark shades below the highlight knee. Defaults to a
+        // moderately aggressive 1.7 for punchier blacks out of the box.
+        uint32_t hdr_shadow_contrast = 170;
+        // 10-bit "deep color" SDR for OpenGL on X11 (banding reduction). On by
+        // default; reset to off at startup when the X11 visual is unavailable.
+        bool deep_color = true;
 
         double video_scale = 3;
         bool retain_aspect = true;
@@ -306,6 +339,13 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispStretch, &g_owned_opts.retain_aspect),
         Option(OptionID::kSDLRenderer, &g_owned_opts.sdlrenderer),
         Option(OptionID::kDispColorCorrectionProfile, &g_owned_opts.color_correction_profile),
+        Option(OptionID::kDispColorCorrectionAuto, &g_owned_opts.color_correction_auto),
+        Option(OptionID::kDispHDR, &g_owned_opts.hdr),
+        Option(OptionID::kDispHDRReferenceWhite, &g_owned_opts.hdr_reference_white, 80, 400),
+        Option(OptionID::kDispHDRPeakBrightness, &g_owned_opts.hdr_peak_brightness, 100, 10000),
+        Option(OptionID::kDispHDRHighlightKnee, &g_owned_opts.hdr_highlight_knee, 0, 100),
+        Option(OptionID::kDispHDRShadowContrast, &g_owned_opts.hdr_shadow_contrast, 100, 300),
+        Option(OptionID::kDispDeepColor, &g_owned_opts.deep_color),
 
         /// GB
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
@@ -455,6 +495,20 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/Stretch", "RetainAspect", _("Retain aspect ratio when resizing")},
     OptionData{"Display/SDLRenderer", "", _("SDL renderer")},
     OptionData{"Display/ColorCorrectionProfile", "", _("Color correction profile")},
+    OptionData{"Display/ColorCorrectionAuto", "",
+               _("Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)")},
+    OptionData{"Display/HDR", "", _("Output HDR on supported displays and renderers")},
+    OptionData{"Display/HDRReferenceWhite", "",
+               _("HDR diffuse (paper) white luminance, in nits")},
+    OptionData{"Display/HDRPeakBrightness", "",
+               _("HDR peak/highlight luminance, in nits")},
+    OptionData{"Display/HDRHighlightKnee", "",
+               _("Input level percentage above which HDR highlights ramp to peak")},
+    OptionData{"Display/HDRShadowContrast", "",
+               _("HDR shadow contrast as a percentage gamma (100 = neutral; "
+                 "higher deepens blacks)")},
+    OptionData{"Display/DeepColor", "",
+               _("Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)")},
 
     /// GB
     OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled")},

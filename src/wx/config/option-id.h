@@ -21,6 +21,13 @@ enum class OptionID {
     kDispStretch,
     kSDLRenderer,
     kDispColorCorrectionProfile,
+    kDispColorCorrectionAuto,
+    kDispHDR,
+    kDispHDRReferenceWhite,
+    kDispHDRPeakBrightness,
+    kDispHDRHighlightKnee,
+    kDispHDRShadowContrast,
+    kDispDeepColor,
 
     /// GB
     kGBBiosFile,
