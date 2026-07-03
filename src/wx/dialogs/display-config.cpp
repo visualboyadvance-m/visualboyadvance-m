@@ -1425,11 +1425,11 @@ void DisplayConfig::FillRendererList(wxCommandEvent& event) {
 #if defined(WINXP)
         // The 32-bit XP-compat build targets legacy Windows/hardware where these
         // SDL render backends rely on APIs or GPU features that are absent
-        // (Direct3D 11/12, Vulkan, OpenGL ES 1, SDL_GPU), so never offer them.
+        // (Direct3D 11/12, Vulkan, OpenGL ES 2, SDL_GPU), so never offer them.
         {
             const wxString drv(SDL_GetRenderDriver(i));
             if (drv == "direct3d11" || drv == "direct3d12" ||
-                drv == "opengles1" || drv == "vulkan" || drv == "gpu")
+                drv == "opengles2" || drv == "vulkan" || drv == "gpu")
                 continue;
         }
 #endif
@@ -1457,7 +1457,7 @@ void DisplayConfig::FillRendererList(wxCommandEvent& event) {
         {
             const wxString drv(render_info.name);
             if (drv == "direct3d11" || drv == "direct3d12" ||
-                drv == "opengles1" || drv == "vulkan" || drv == "gpu")
+                drv == "opengles2" || drv == "vulkan" || drv == "gpu")
                 continue;
         }
 #endif
