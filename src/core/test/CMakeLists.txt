@@ -16,8 +16,14 @@ target_sources(vbam-core-fake
 add_executable(suite_runner suite_runner.cpp)
 target_link_libraries(suite_runner PRIVATE vbam-core)
 if(APPLE)
+    # Link iconv by its resolved path (the SDK .tbd) rather than a bare
+    # `-liconv`. Non-Apple toolchains (e.g. a Nix/Homebrew Clang) do not
+    # implicitly search the macOS SDK's usr/lib for `-l` flags.
+    if(NOT LIBICONV_LIB)
+        find_library(LIBICONV_LIB NAMES libiconv iconv)
+    endif()
     target_link_libraries(suite_runner PRIVATE
-        "-framework CoreFoundation" iconv)
+        "-framework CoreFoundation" ${LIBICONV_LIB})
 endif()
 
 # gb_suite_runner: headless driver for Blargg's Game Boy / Game Boy Color
@@ -25,8 +31,11 @@ endif()
 add_executable(gb_suite_runner gb_suite_runner.cpp)
 target_link_libraries(gb_suite_runner PRIVATE vbam-core)
 if(APPLE)
+    if(NOT LIBICONV_LIB)
+        find_library(LIBICONV_LIB NAMES libiconv iconv)
+    endif()
     target_link_libraries(gb_suite_runner PRIVATE
-        "-framework CoreFoundation" iconv)
+        "-framework CoreFoundation" ${LIBICONV_LIB})
 endif()
 
 # Disable LTO on the test runners. It only slows their link with no

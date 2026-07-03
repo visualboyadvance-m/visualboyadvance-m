@@ -559,8 +559,14 @@ if(ENABLE_LUA AND TARGET vbam-lua)
         target_link_libraries(lua_test_runner PRIVATE
             vbam-core vbam-core-fake vbam-lua)
         if(APPLE)
+            # Link iconv by its resolved path (the SDK .tbd) rather than a
+            # bare `-liconv`; non-Apple toolchains do not implicitly search
+            # the macOS SDK's usr/lib for `-l` flags.
+            if(NOT LIBICONV_LIB)
+                find_library(LIBICONV_LIB NAMES libiconv iconv)
+            endif()
             target_link_libraries(lua_test_runner PRIVATE
-                "-framework CoreFoundation" iconv)
+                "-framework CoreFoundation" ${LIBICONV_LIB})
         endif()
         # Disable LTO on the test runner. It only slows the link with no
         # benefit (no-op when LTO is off).
