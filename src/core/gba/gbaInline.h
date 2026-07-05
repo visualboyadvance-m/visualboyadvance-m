@@ -567,7 +567,20 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
             //                       -6 cycle lookahead, detect ~1 iter
             //                       later so HBlank measure grows.
             if ((address & 0x3fe) == IO_REG_DISPSTAT) {
-                const int64_t bias = (value & 2) ? -6 : 8;
+                static const int64_t biasOff = [] {
+                    const char* e = getenv("VBAM_DSTAT_OFF");
+                    return (int64_t)(e ? atoi(e) : -6);
+                }();
+                // The +8 pre-flip lookahead predates the GamePak prefetch
+                // model (gbaCpu.h); with real prefetch floors the polling
+                // loops no longer drift and the lookahead overshoots by an
+                // iteration (misc-edge "Flip 2"). 0 verified best across
+                // -4..16; the -6 off-direction bias is still required.
+                static const int64_t biasOn = [] {
+                    const char* e = getenv("VBAM_DSTAT_ON");
+                    return (int64_t)(e ? atoi(e) : 0);
+                }();
+                const int64_t bias = (value & 2) ? biasOff : biasOn;
                 if (cpuAbsCycle + bias >= lcdNextEventAbsCycle) {
                     value ^= 2;
                 }
