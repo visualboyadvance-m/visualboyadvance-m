@@ -388,25 +388,20 @@ _vbam_resolve_test_path(VBAM_TEST_GB_DMG_BIOS VBAM_TEST_GB_DMG_BIOS
 # them in lockstep with any improvement so a regression actually fails
 # CI. They can be overridden with -DVBAM_TEST_GBA_MIN_PASS=… etc.
 if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
-    # 6400 with the GBATEK-correct scanline = 1008 + 224 = 1232. Two
-    # misc-edge sub-tests (Hblank, Flip 2) that previously passed only
-    # because of a non-spec 1232→1233 hack are now recovered without
-    # changing scanline timing:
-    #   1) Hblank — asymmetric +1-cycle bus-arbitration latency on
-    #      consecutive Halt-waked HBlank IRQs
-    #      (g_lastHaltWakeHblankIrqCycle in gba.cpp).
-    #   2) Flip 2 — direction-asymmetric DISPSTAT-live-read lookahead
-    #      to compensate for the polling-loop iteration alignment our
-    #      sub-cycle ARM7TDMI cycle model can't reproduce exactly
-    #      (gbaInline.h's IO_REG_DISPSTAT path).
-    # Plus a separate fix: lcdNextEventAbsCycle is re-anchored per CPU
-    # iteration so SWI cycle bumps don't accumulate it ahead of the
-    # actual next-transition cycle.
-    set(VBAM_TEST_GBA_MIN_PASS 6415 CACHE STRING
+    # 6755 after the timer prescaler-phase / IRQ-latency-split /
+    # GamePak-prefetch work (see the test-suite-accuracy commits).
+    # Remaining known-failing groups: timer count-up value freezes and
+    # part of the sums (~219), Timing C-loop/CpuSet (32), misc-edge
+    # DMA-prefetch + H-blank flips (8), one period-1 Timer IRQ boundary.
+    set(VBAM_TEST_GBA_MIN_PASS 6755 CACHE STRING
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
-    set(VBAM_TEST_GB_MIN_PASS 49 CACHE STRING
+    # 57 of 58: everything passes except oam_bug 7-timing_effect, whose
+    # single-ROM print buffer is unbounded and self-corrupts under
+    # correct OAM-bug emulation (excluded upstream as a broken ROM; its
+    # test-7 logic passes inside the combined oam_bug.gb).
+    set(VBAM_TEST_GB_MIN_PASS 57 CACHE STRING
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
 
