@@ -4347,6 +4347,11 @@ void gbEmulate(int ticksToStop)
     uint8_t tempValue;
     int8_t offset;
 
+    // State for read-modify-write (HL) instructions: the read is
+    // performed one machine cycle before the final (write) cycle.
+    int rmwStage = 0;
+    uint8_t rmwValue = 0;
+
 
     clockTicks = 0;
     gbDmaTicks = 0;
@@ -4423,6 +4428,21 @@ void gbEmulate(int ticksToStop)
             }
             gbOldClockTicks = clockTicks - 1;
             gbIntBreak = 1;
+
+            // Read-modify-write (HL) instructions (INC/DEC (HL) and the
+            // CB-prefixed rotates/shifts/SWAP/RES/SET on (HL), but not the
+            // read-only BIT) perform their read one machine cycle before
+            // the final write cycle. Hold back one cycle here so the read
+            // can be done at the correct time, then let the last cycle
+            // elapse before the opcode handler performs the write.
+            rmwStage = 0;
+            if (opcode1 == 0xCB) {
+                if (((opcode2 & 0x07) == 0x06) && ((opcode2 & 0xC0) != 0x40))
+                    rmwStage = 1;
+            } else if ((opcode1 == 0x34) || (opcode1 == 0x35))
+                rmwStage = 1;
+            if (rmwStage)
+                gbOldClockTicks--;
         }
 
         if (!emulating)
@@ -5139,6 +5159,15 @@ void gbEmulate(int ticksToStop)
                 gbOldClockTicks = 0;
                 goto gbRedoLoop;
             }
+        }
+
+        // Perform the read of a read-modify-write (HL) instruction now,
+        // one machine cycle before the write done by the opcode handler.
+        if ((rmwStage == 1) && execute) {
+            rmwStage = 2;
+            rmwValue = gbReadMemory(HL.W);
+            clockTicks = 1;
+            goto gbRedoLoop;
         }
 
         // Executes the opcode(s), and apply the instruction's remaining clockTicks (if any).

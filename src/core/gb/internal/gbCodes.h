@@ -278,13 +278,13 @@ SP.W++;
 break;
 case 0x34:
 // INC (HL)
-tempValue = gbReadMemory(HL.W) + 1;
+tempValue = rmwValue + 1;
 AF.B.B0 = (AF.B.B0 & GB_C_FLAG) | ZeroTable[tempValue] | (tempValue & 0x0F ? 0 : GB_H_FLAG);
 gbWriteMemory(HL.W, tempValue);
 break;
 case 0x35:
 // DEC (HL)
-tempValue = gbReadMemory(HL.W) - 1;
+tempValue = rmwValue - 1;
 AF.B.B0 = GB_N_FLAG | (AF.B.B0 & GB_C_FLAG) | ZeroTable[tempValue] | ((tempValue & 0x0F) == 0x0F ? GB_H_FLAG : 0);
 gbWriteMemory(HL.W, tempValue);
 break;
