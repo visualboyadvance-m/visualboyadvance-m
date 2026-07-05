@@ -294,6 +294,13 @@ static int haltWakeCycles()
 // Pending post-handler charge armed by a halt-wake IRQ delivery; applied at
 // the handler's exception return (armIrqEnable false->true transition).
 static int pendingWakeCharge = 0;
+// Period-1 enable edge case: a timer enabled with reload 0xFFFF (prescale 1)
+// overflows one cycle after enable, BEFORE a back-to-back reload rewrite
+// commits. The IRQ comes from that first overflow while the counter's zero
+// anchor is the second overflow (with the new reload), so the handler sees
+// the counter one tick lower than the normal IRQ latency. Armed per timer
+// at enable, consumed at the first overflow.
+uint8_t timerPeriod1Armed = 0;
 // ARM exception-entry cost charged inside CPUInterrupt (the rest of the
 // total hardware IRQ latency is the scheduled delay in CPUTestIRQ; the
 // split keeps the total constant while moving the preemption point
@@ -830,7 +837,7 @@ void cpuEnableProfiling(int hz)
 // Note: IME is NOT consulted for the schedule decision -- it gates
 // DELIVERY at kSchedIrq dispatch time, but a pending IRQ should still
 // wake from halt unconditionally on (IF & IE) per GBATEK and mgba.
-static inline void CPUTestIRQ(bool software_unmask = false)
+static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
 {
     if (!(IF & IE)) {
         if (gbaScheduler::IsScheduled(kSchedIrq)) {
@@ -858,7 +865,9 @@ static inline void CPUTestIRQ(bool software_unmask = false)
             const char* e = getenv("VBAM_IRQ_DELAY");
             return e ? atoi(e) : 5;
         }();
-        delay = (IRQRecentTicks > 0) ? 3 : hwDelay;
+        delay = ((IRQRecentTicks > 0) ? 3 : hwDelay) + delay_bias;
+        if (delay < 0)
+            delay = 0;
     }
     gbaScheduler::Schedule(kSchedIrq, delay);
     int when = cpuTotalTicks + delay;
@@ -4605,6 +4614,10 @@ void applyTimer()
             timer0Ticks = ((0x10000 - TM0D) << timer0ClockReload)
                           - gbaTimerEnablePhase(0);
             UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
+            if (TM0D == 0xFFFF && timer0ClockReload == 0)
+                timerPeriod1Armed |= 1;
+            else
+                timerPeriod1Armed &= ~1;
         }
         timer0On = timer0Value & 0x80 ? true : false;
         TM0CNT = timer0Value & 0xC7;
@@ -5719,13 +5732,24 @@ void CPULoop(int ticks)
                 if (timer0On) {
                     timer0Ticks -= clockTicks;
                     if (timer0Ticks <= 0) {
+                        // Period-1 edge case (see timerPeriod1Armed): if the
+                        // reload register was rewritten right after a
+                        // reload=0xFFFF enable, the IRQ belongs to the
+                        // overflow one cycle BEFORE the counter's new zero
+                        // anchor -- deliver it one cycle early.
+                        int p1_bias = 0;
+                        if (timerPeriod1Armed & 1) {
+                            timerPeriod1Armed &= ~1;
+                            if (DowncastU16(timer0Reload) != 0xFFFF)
+                                p1_bias = -1;
+                        }
                         timer0Ticks += (0x10000 - timer0Reload) << timer0ClockReload;
                         timerOverflow |= 1;
                         soundTimerOverflow(0);
                         if (TM0CNT & 0x40) {
                             IF |= 0x08;
                             UPDATE_REG(IO_REG_IF, IF);
-                            CPUTestIRQ();
+                            CPUTestIRQ(false, p1_bias);
                         }
                     }
                     // Period-1 special case: real HW counter is always
