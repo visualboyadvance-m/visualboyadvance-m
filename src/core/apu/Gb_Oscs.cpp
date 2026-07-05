@@ -122,6 +122,10 @@ int Gb_Wave::access( unsigned addr ) const
 			if ( delay > clk_mul )
 				return -1; // can only access within narrow time window while playing
 		}
+		else if ( !delay )
+		{
+			addr++; // CGB: sample fetch due this cycle occurs before the access
+		}
 		addr >>= 1;
 	}
 	return addr & 0x0F;
