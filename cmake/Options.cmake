@@ -169,13 +169,22 @@ if(NOT TRANSLATIONS_ONLY)
     endif()
 endif()
 
+set(lua_default OFF)
+
+find_package(Lua)
+
+if(Lua_FOUND)
+    set(lua_default ON)
+endif()
+
+option(ENABLE_LUA "Enable Lua scripting (wx frontend)" ${lua_default})
+
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
 option(DISABLE_OPENGL "Disable OpenGL" OFF)
 option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
 option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
 option(ENABLE_LIBRETRO "Build the libretro core" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
-option(ENABLE_LUA "Enable Lua 5.4 scripting (wx frontend)" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)

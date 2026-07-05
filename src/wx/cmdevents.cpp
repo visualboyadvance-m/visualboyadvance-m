@@ -1927,7 +1927,7 @@ EVT_HANDLER_MASK(TileViewer, "Tile Viewer...", CMDEN_GB | CMDEN_GBA)
     TileViewer();
 }
 
-#ifdef VBAM_ENABLE_LUA
+#ifdef ENABLE_LUA
 #include "wx/lua/lua_console.h"
 #include "wx/lua/lua_editor.h"
 #include "wx/lua/lua_engine.h"
@@ -1966,7 +1966,7 @@ EVT_HANDLER(LuaEditor, "Show Lua editor")
     editor->Show(!editor->IsShown());
     if (editor->IsShown()) editor->Raise();
 }
-#endif  // VBAM_ENABLE_LUA
+#endif  // ENABLE_LUA
 
 #if defined(VBAM_ENABLE_DEBUGGER)
 extern int remotePort;

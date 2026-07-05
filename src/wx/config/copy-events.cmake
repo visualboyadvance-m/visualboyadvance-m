@@ -11,6 +11,14 @@ SET(EVTABLE "${OUTDIR}/cmd-evtable.h")
 FILE(READ ../cmdevents.cpp MW)
 STRING(REGEX MATCHALL "\nEVT_HANDLER([^\")]|\"[^\"]*\")*\\)" MW "${MW}")
 
+if(NOT ENABLE_LUA)
+    foreach(EV ${MW})
+        if(EV MATCHES "Lua")
+            list(REMOVE_ITEM MW ${EV})
+        endif()
+    endforeach()
+endif()
+
 # cmdtab.cpp is a table of cmd-id-name/cmd-name pairs
 # sorted for binary searching
 FILE(WRITE "${CMDTAB}" "// Generated from cmdevents.cpp; do not edit\n\n")

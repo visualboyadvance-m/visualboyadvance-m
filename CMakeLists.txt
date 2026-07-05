@@ -233,7 +233,6 @@ include(Architecture)
 include(Options)
 include(Toolchain)
 include(Dependencies)
-include(Lua)  # ENABLE_LUA: fetches Lua 5.4 from upstream and builds vbam-lua
 
 # We target Windows XP for 32 bit Windows builds.
 if(WIN32 AND X86)

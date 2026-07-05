@@ -11,7 +11,7 @@ add_custom_command(
         ${VBAM_GENERATED_DIR}/wx/cmdhandlers.h
         ${VBAM_GENERATED_DIR}/wx/cmd-evtable.h
     COMMAND
-        ${CMAKE_COMMAND} -D OUTDIR=${VBAM_GENERATED_DIR}/wx/ -P copy-events.cmake
+    ${CMAKE_COMMAND} -D OUTDIR=${VBAM_GENERATED_DIR}/wx/ -DENABLE_LUA=${ENABLE_LUA} -P copy-events.cmake
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS

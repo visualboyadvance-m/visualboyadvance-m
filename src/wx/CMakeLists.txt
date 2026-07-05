@@ -505,10 +505,7 @@ if(ENABLE_SDL3)
     target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_SDL3)
 endif()
 
-# Lua 5.4 scripting (FCEUX-compatible API). The Lua engine + bindings
-# live under src/wx/lua/ and link against the static `vbam-lua` lib
-# built from upstream Lua 5.4 sources (see cmake/Lua.cmake).
-if(ENABLE_LUA AND TARGET vbam-lua)
+if(ENABLE_LUA)
     target_sources(visualboyadvance-m PRIVATE
         lua/lua_engine.cpp
         lua/lua_engine.h
@@ -526,8 +523,9 @@ if(ENABLE_LUA AND TARGET vbam-lua)
         lua/lua_editor.h
         lua/lua_overlay.cpp
     )
-    target_link_libraries(visualboyadvance-m vbam-lua)
-    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_LUA)
+    target_link_libraries(     visualboyadvance-m ${LUA_LIBRARIES})
+    target_include_directories(visualboyadvance-m PRIVATE ${LUA_INCLUDE_DIR})
+    target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_LUA)
     if(VBAM_HAVE_WXSTC)
         target_compile_definitions(visualboyadvance-m PRIVATE VBAM_HAVE_WXSTC)
     endif()
@@ -547,17 +545,9 @@ if(ENABLE_LUA AND TARGET vbam-lua)
             lua/lua_api_bit.cpp
             lua/lua_overlay.cpp
         )
-        # vcpkg's prefix path can leak a system Lua 5.4.x header that
-        # mismatches our vendored 5.4.7 (different luaL_openlibs ABI).
-        # Force the vendored Lua source dir to the front of the
-        # include search path so we get headers consistent with the
-        # vbam-lua static library we're linking against.
-        get_target_property(_vbam_lua_inc vbam-lua INTERFACE_INCLUDE_DIRECTORIES)
-        target_include_directories(lua_test_runner BEFORE PRIVATE
-            "${_vbam_lua_inc}"
-            "${CMAKE_SOURCE_DIR}/src")
-        target_link_libraries(lua_test_runner PRIVATE
-            vbam-core vbam-core-fake vbam-lua)
+        target_link_libraries(     lua_test_runner PRIVATE ${LUA_LIBRARIES})
+        target_include_directories(lua_test_runner PRIVATE ${LUA_INCLUDE_DIR} "${CMAKE_SOURCE_DIR}/src")
+        target_link_libraries(lua_test_runner PRIVATE vbam-core vbam-core-fake)
         if(APPLE)
             # Link iconv by its resolved path (the SDK .tbd) rather than a
             # bare `-liconv`; non-Apple toolchains do not implicitly search

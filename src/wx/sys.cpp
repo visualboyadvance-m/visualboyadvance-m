@@ -16,7 +16,7 @@
 #include "wx/config/option-proxy.h"
 #include "wx/wxvbam.h"
 
-#ifdef VBAM_ENABLE_LUA
+#ifdef ENABLE_LUA
 #include "wx/lua/lua_engine.h"
 namespace vbam { namespace wx { namespace lua_internal {
 extern int g_frame_count;
@@ -115,7 +115,7 @@ void systemDrawScreen()
 
 #endif
 
-#ifdef VBAM_ENABLE_LUA
+#ifdef ENABLE_LUA
     // FCEUX-style per-frame Lua hooks. The order is:
     //   1) Drop last frame's gui.* overlay queue.
     //   2) Resume the script's main coroutine — this is what makes
@@ -147,7 +147,7 @@ void systemDrawScreen()
         ga->panel->DrawArea(&g_pix);
     }
 
-#ifdef VBAM_ENABLE_LUA
+#ifdef ENABLE_LUA
     if (vbam::wx::LuaInstance().IsLoaded())
         vbam::wx::LuaInstance().DispatchAfterFrame();
 #endif
@@ -429,7 +429,7 @@ uint32_t systemReadJoypad(int joy)
     ret &= ~((ret & (KEYM_LEFT | KEYM_DOWN | KEYM_MOTION_DOWN | KEYM_MOTION_RIGHT)) >> 1);
     ret &= REALKEY_MASK;
 
-#ifdef VBAM_ENABLE_LUA
+#ifdef ENABLE_LUA
     // joypad.set() override. The script's mask is in FCEUX bit
     // positions (A=0..L=9); KEYM_* bits in this frontend match those
     // positions, so the OR-substitute below directly slots in the
