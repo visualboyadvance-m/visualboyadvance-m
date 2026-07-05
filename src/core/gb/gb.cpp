@@ -1361,43 +1361,84 @@ void gbCompareLYToLYC()
 }
 
 // DMG OAM corruption bug. Fires when a 16-bit register operation
-// places a value in $FE00-$FEFF on the address bus during mode 2's
-// active window. Real HW window is ~19 T-cycles into mode 2 (which
-// is 80 T-cycles total). In our M-cycle dispatch model (mode 2 = 20
-// M-cycles), the window covers gbLcdTicks 18..0 — i.e. all of mode 2
-// EXCEPT the very first M-cycle (gbLcdTicks=19). Excluding the first
-// M-cycle is necessary so that 6-timing_no_bug — which carefully
-// places INC DE at the precise start of mode 2 — does not trigger a
-// false positive.
+// places a value in $FE00-$FEFF on the address bus during mode 2
+// (OAM scan). The PPU scans one 8-byte OAM row per M-cycle (20 rows
+// in 20 M-cycles); the row that gets corrupted is the one being
+// scanned during the access M-cycle — the actual address (beyond
+// selecting $FExx) has no effect. Row 0 is never corrupted.
 //
-// Address clamping: bug only fires for $FE00-$FEFF (high byte $FE).
-// Within that, the row is (addr & 0xFF) >> 3; rows past 19 (above OAM
-// proper) wrap-corrupt within the 20-row OAM region.
-static inline void gbOamBugAccess(uint16_t addr)
+// Calibrated against Blargg's oam_bug tests 4-6: at instruction end,
+// gbLcdTicks == 20 corresponds to the PPU scanning row 0, so the
+// scanned row is (20 - gbLcdTicks). For accesses in earlier M-cycles
+// of an instruction (POP/PUSH), cyclesBeforeEnd shifts the row back.
+//
+// Corruption patterns per pandocs "OAM Corruption Bug": distinct
+// bitwise glitches for reads, writes, and a read combined with an
+// increment/decrement in the same M-cycle.
+#define GB_OAM_BUG_READ     0
+#define GB_OAM_BUG_WRITE    1
+#define GB_OAM_BUG_READ_INC 2
+
+static inline uint16_t gbOamBugReadWord(int offset)
+{
+    return (uint16_t)(gbMemory[0xFE00 + offset] | (gbMemory[0xFE01 + offset] << 8));
+}
+
+static inline void gbOamBugWriteWord(int offset, uint16_t value)
+{
+    gbMemory[0xFE00 + offset] = (uint8_t)(value & 0xFF);
+    gbMemory[0xFE01 + offset] = (uint8_t)(value >> 8);
+}
+
+static void gbOamBugCorrupt(int type, int row)
+{
+    uint8_t* oam = &gbMemory[0xFE00];
+
+    if ((row < 1) || (row > 19))
+        return;
+
+    if (type == GB_OAM_BUG_READ_INC) {
+        // Read during increment/decrement: unless the row is one of
+        // the first four or the last one, the first word of the
+        // preceding row is glitched, then the preceding row is copied
+        // both to the current row and to two rows back. A normal read
+        // corruption then follows (a no-op after those copies).
+        if ((row >= 4) && (row <= 18)) {
+            uint16_t a = gbOamBugReadWord((row - 2) * 8);
+            uint16_t b = gbOamBugReadWord((row - 1) * 8);
+            uint16_t c = gbOamBugReadWord(row * 8);
+            uint16_t d = gbOamBugReadWord((row - 1) * 8 + 4);
+            gbOamBugWriteWord((row - 1) * 8, (uint16_t)((b & (a | c | d)) | (a & c & d)));
+            memcpy(&oam[(row - 2) * 8], &oam[(row - 1) * 8], 8);
+            memcpy(&oam[row * 8], &oam[(row - 1) * 8], 8);
+        }
+        type = GB_OAM_BUG_READ;
+    }
+
+    // a = first word of the current row, b = first word of the
+    // preceding row, c = third word of the preceding row. The first
+    // word of the current row is glitched; its last three words are
+    // copied from the preceding row.
+    uint16_t a = gbOamBugReadWord(row * 8);
+    uint16_t b = gbOamBugReadWord((row - 1) * 8);
+    uint16_t c = gbOamBugReadWord((row - 1) * 8 + 4);
+    uint16_t corrupted;
+    if (type == GB_OAM_BUG_WRITE)
+        corrupted = (uint16_t)(((a ^ c) & (b ^ c)) ^ c);
+    else
+        corrupted = (uint16_t)(b | (a & c));
+    gbOamBugWriteWord(row * 8, corrupted);
+    memcpy(&oam[row * 8 + 2], &oam[(row - 1) * 8 + 2], 6);
+}
+
+static inline void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
 {
     if (!(gbHardware & 1))               return;
     if (!(register_LCDC & 0x80))         return;
     if (gbLcdMode != 2)                  return;
-    if (gbLcdTicks > 19)                 return;
     if ((addr & 0xFF00) != 0xFE00)       return;
 
-    int row = ((addr & 0xFF) >> 3);
-    if (row >= 20) row = row % 20;
-    uint8_t* oam = &gbMemory[0xFE00];
-    int cur = row * 8;
-    if (row == 0) {
-        for (int i = 0; i < 8; ++i) oam[i] = 0;
-        return;
-    }
-    int prev = (row - 1) * 8;
-    uint16_t a = (uint16_t)oam[prev + 0] | ((uint16_t)oam[prev + 1] << 8);
-    uint16_t b = (uint16_t)oam[prev + 2] | ((uint16_t)oam[prev + 3] << 8);
-    uint16_t c = (uint16_t)oam[cur + 0]  | ((uint16_t)oam[cur + 1]  << 8);
-    uint16_t corrupted = (uint16_t)(b | (a & c));
-    oam[cur + 0] = (uint8_t)(corrupted & 0xFF);
-    oam[cur + 1] = (uint8_t)((corrupted >> 8) & 0xFF);
-    for (int i = 2; i < 8; ++i)
-        oam[cur + i] = oam[prev + i];
+    gbOamBugCorrupt(type, 20 - (gbLcdTicks + cyclesBeforeEnd));
 }
 
 void gbWriteMemory(uint16_t address, uint8_t value)
