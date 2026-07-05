@@ -1300,10 +1300,12 @@ static inline uint32_t arm7_mull_c_flag(uint32_t rm, uint32_t rs, bool sign_rs) 
         clockTicks += 2;                                               \
     else                                                               \
         clockTicks += 3;                                               \
+    int mulPure = clockTicks + CYCLES + 1;                             \
     if (busPrefetchEnable && busPrefetchCount == 0)                    \
         busPrefetchCount = ((busPrefetchCount + 1)                     \
             << (clockTicks + CYCLES - 1)) - 1;                         \
-    clockTicks += CYCLES + 1 + codeTicksAccess32(armNextPC);
+    clockTicks += CYCLES + 1 + codeTicksAccess32(armNextPC);           \
+    clockTicks = busPrefetchRomFloor(clockTicks, mulPure, 2, false);
 
 #define OP_MUL \
     reg[dest].I = reg[mult].I * rs;
@@ -2054,6 +2056,7 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
             clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
         } else if ((_ldmAddr >> 24) != ((_ldmAddr - 4) >> 24)) {           \
             /* crossing memory region: access becomes non-sequential */    \
+            clockTicks += busPrefetchAbortStall(_ldmAddr, clockTicks);     \
             clockTicks += 1 + dataTicksAccess32(_ldmAddr);                 \
         } else {                                                           \
             clockTicks += 1 + dataTicksAccessSeq32(_ldmAddr);              \
@@ -2233,6 +2236,34 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
         clockTicks += 1 + codeTicksAccessSeq32(armNextPC); \
     }
 
+// Final tick accounting for STM/LDM. `address` is one past the last
+// transferred word and `count` the number of transfers, so the first
+// and last data addresses are available for the prefetch cart-bus
+// check in busPrefetchRomFloor (see gbaCpu.h). LDM that reloads R15
+// keeps the legacy cost: the pipeline refill dominates.
+#define STM_FINISH                                                         \
+    {                                                                      \
+        int _pure = clockTicks + 1;                                        \
+        uint32_t _fr = ((address - 4 * count) >> 24) & 15;                 \
+        uint32_t _lr = ((address - 4) >> 24) & 15;                         \
+        clockTicks += 1 + codeTicksAccess32(armNextPC);                    \
+        clockTicks = busPrefetchRomFloor(clockTicks, _pure, 2,             \
+                                         count == 0 || _fr < 0x02          \
+                                             || _lr >= 0x08);              \
+    }
+#define LDM_FINISH                                                         \
+    {                                                                      \
+        int _pure = clockTicks + 2;                                        \
+        uint32_t _fr = ((address - 4 * count) >> 24) & 15;                 \
+        uint32_t _lr = ((address - 4) >> 24) & 15;                         \
+        clockTicks += 2 + codeTicksAccess32(armNextPC);                    \
+        clockTicks = busPrefetchRomFloor(clockTicks, _pure, 2,             \
+                                         count == 0                        \
+                                             || (opcode & (1U << 15)) != 0 \
+                                             || _fr < 0x02                 \
+                                             || _lr >= 0x08);              \
+    }
+
 // STMDA Rn, {Rlist}
 static INSN_REGPARM void arm800(uint32_t opcode)
 {
@@ -2243,7 +2274,7 @@ static INSN_REGPARM void arm800(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     STM_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDA Rn, {Rlist}
@@ -2256,7 +2287,7 @@ static INSN_REGPARM void arm810(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMDA Rn!, {Rlist}
@@ -2269,7 +2300,7 @@ static INSN_REGPARM void arm820(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     STMW_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDA Rn!, {Rlist}
@@ -2282,7 +2313,7 @@ static INSN_REGPARM void arm830(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
 }
@@ -2297,7 +2328,7 @@ static INSN_REGPARM void arm840(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     STM_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDA Rn, {Rlist}^
@@ -2311,7 +2342,7 @@ static INSN_REGPARM void arm850(uint32_t opcode)
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMDA Rn!, {Rlist}^
@@ -2324,7 +2355,7 @@ static INSN_REGPARM void arm860(uint32_t opcode)
     uint32_t address = (temp + 4) & 0xFFFFFFFC;
     int count = 0;
     STMW_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDA Rn!, {Rlist}^
@@ -2340,7 +2371,7 @@ static INSN_REGPARM void arm870(uint32_t opcode)
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIA Rn, {Rlist}
@@ -2352,7 +2383,7 @@ static INSN_REGPARM void arm880(uint32_t opcode)
     uint32_t address = reg[base].I & 0xFFFFFFFC;
     int count = 0;
     STM_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIA Rn, {Rlist}
@@ -2364,7 +2395,7 @@ static INSN_REGPARM void arm890(uint32_t opcode)
     uint32_t address = reg[base].I & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIA Rn!, {Rlist}
@@ -2377,7 +2408,7 @@ static INSN_REGPARM void arm8A0(uint32_t opcode)
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIA Rn!, {Rlist}
@@ -2390,7 +2421,7 @@ static INSN_REGPARM void arm8B0(uint32_t opcode)
     uint32_t address = reg[base].I & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
 }
@@ -2404,7 +2435,7 @@ static INSN_REGPARM void arm8C0(uint32_t opcode)
     uint32_t address = reg[base].I & 0xFFFFFFFC;
     int count = 0;
     STM_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIA Rn, {Rlist}^
@@ -2417,7 +2448,7 @@ static INSN_REGPARM void arm8D0(uint32_t opcode)
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIA Rn!, {Rlist}^
@@ -2430,7 +2461,7 @@ static INSN_REGPARM void arm8E0(uint32_t opcode)
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIA Rn!, {Rlist}^
@@ -2446,7 +2477,7 @@ static INSN_REGPARM void arm8F0(uint32_t opcode)
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMDB Rn, {Rlist}
@@ -2459,7 +2490,7 @@ static INSN_REGPARM void arm900(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     STM_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDB Rn, {Rlist}
@@ -2472,7 +2503,7 @@ static INSN_REGPARM void arm910(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMDB Rn!, {Rlist}
@@ -2485,7 +2516,7 @@ static INSN_REGPARM void arm920(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     STMW_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDB Rn!, {Rlist}
@@ -2498,7 +2529,7 @@ static INSN_REGPARM void arm930(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
 }
@@ -2513,7 +2544,7 @@ static INSN_REGPARM void arm940(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     STM_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDB Rn, {Rlist}^
@@ -2527,7 +2558,7 @@ static INSN_REGPARM void arm950(uint32_t opcode)
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMDB Rn!, {Rlist}^
@@ -2540,7 +2571,7 @@ static INSN_REGPARM void arm960(uint32_t opcode)
     uint32_t address = temp & 0xFFFFFFFC;
     int count = 0;
     STMW_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMDB Rn!, {Rlist}^
@@ -2556,7 +2587,7 @@ static INSN_REGPARM void arm970(uint32_t opcode)
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIB Rn, {Rlist}
@@ -2568,7 +2599,7 @@ static INSN_REGPARM void arm980(uint32_t opcode)
     uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
     int count = 0;
     STM_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIB Rn, {Rlist}
@@ -2580,7 +2611,7 @@ static INSN_REGPARM void arm990(uint32_t opcode)
     uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIB Rn!, {Rlist}
@@ -2593,7 +2624,7 @@ static INSN_REGPARM void arm9A0(uint32_t opcode)
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIB Rn!, {Rlist}
@@ -2606,7 +2637,7 @@ static INSN_REGPARM void arm9B0(uint32_t opcode)
     uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
     int count = 0;
     LDM_ALL;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
 }
@@ -2620,7 +2651,7 @@ static INSN_REGPARM void arm9C0(uint32_t opcode)
     uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
     int count = 0;
     STM_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIB Rn, {Rlist}^
@@ -2633,7 +2664,7 @@ static INSN_REGPARM void arm9D0(uint32_t opcode)
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // STMIB Rn!, {Rlist}^
@@ -2646,7 +2677,7 @@ static INSN_REGPARM void arm9E0(uint32_t opcode)
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL_2;
-    clockTicks += 1 + codeTicksAccess32(armNextPC);
+    STM_FINISH;
 }
 
 // LDMIB Rn!, {Rlist}^
@@ -2662,7 +2693,7 @@ static INSN_REGPARM void arm9F0(uint32_t opcode)
     if (!(opcode & (1U << base)))
         reg[base].I = temp;
     LDM_ALL_2B;
-    clockTicks += 2 + codeTicksAccess32(armNextPC);
+    LDM_FINISH;
 }
 
 // B/BL/SWI and (unimplemented) coproc support ////////////////////////////
@@ -2952,6 +2983,8 @@ int armExecute()
         cpuPrefetch[0] = cpuPrefetch[1];
 
         busPrefetch = false;
+        busPrefetchHalfwords = busPrefetchAccum;
+        busPrefetchAccum = 0;
         if (busPrefetchCount & 0xFFFFFE00)
             busPrefetchCount = 0x100 | (busPrefetchCount & 0xFF);
 
