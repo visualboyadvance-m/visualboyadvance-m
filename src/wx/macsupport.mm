@@ -1,3 +1,13 @@
+// Work around a stray non-Apple <uuid/uuid.h> (e.g. a libuuid install in
+// /usr/local/include, which Apple clang searches before the SDK) shadowing
+// the SDK header: pre-declare the type the SDK's hfs_format.h needs. The
+// real SDK uuid.h honors the _UUID_STRING_T guard.
+#include <sys/types.h>
+#ifndef _UUID_STRING_T
+#define _UUID_STRING_T
+typedef __darwin_uuid_string_t uuid_string_t;
+#endif
+
 #include <cmath>
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
