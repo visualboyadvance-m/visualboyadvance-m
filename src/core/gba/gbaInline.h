@@ -115,6 +115,7 @@ extern int64_t cpuAbsCycle;
 extern int64_t lcdNextEventAbsCycle;
 extern int64_t timerEnableAbsCycle[4];
 extern uint16_t timerReloadAtEnable[4];
+extern int gbaTimerEnablePhase(int n);
 extern int timer0Reload;
 extern int timer1Reload;
 extern int timer2Reload;
@@ -132,6 +133,61 @@ extern uint32_t cpuDmaBusValue;
 
 static inline uint16_t DowncastU16(uint32_t value) {
     return static_cast<uint16_t>(value);
+}
+
+// Live timer-counter value for timer `n` after `elapsed` cycles of run time.
+// Precise reload-register semantics: the counter cycles with period
+// (0x10000 - reloadAtEnable) until the first overflow, then with period
+// (0x10000 - reloadNow) thereafter -- matching real HW's "reload register is
+// latched on overflow" behavior. Callers pick the anchoring offset (read vs
+// write commit point) when computing `elapsed`.
+static inline uint16_t gbaTimerLiveValue(int n, int64_t elapsed)
+{
+    uint32_t reloadNow;
+    int prescale;
+    switch (n) {
+    case 0:  reloadNow = (uint16_t)timer0Reload; prescale = timer0ClockReload; break;
+    case 1:  reloadNow = (uint16_t)timer1Reload; prescale = timer1ClockReload; break;
+    case 2:  reloadNow = (uint16_t)timer2Reload; prescale = timer2ClockReload; break;
+    default: reloadNow = (uint16_t)timer3Reload; prescale = timer3ClockReload; break;
+    }
+    uint32_t r0 = timerReloadAtEnable[n];
+    if (elapsed < 0)
+        elapsed = 0;
+    int64_t cyclesToFirstOverflow = (int64_t)(0x10000u - r0) << prescale;
+    if (elapsed < cyclesToFirstOverflow) {
+        return (uint16_t)(r0 + (uint32_t)(elapsed >> prescale));
+    }
+    int64_t post = elapsed - cyclesToFirstOverflow;
+    int64_t period = (int64_t)(0x10000u - reloadNow) << prescale;
+    if (period <= 0)
+        period = (int64_t)0x10000 << prescale;
+    post %= period;
+    return (uint16_t)(reloadNow + (uint32_t)(post >> prescale));
+}
+
+// Live timer read at the current CPU cycle, for use in memory-read paths.
+// The standard offset is -2 (compensates for the write-handler snapshot of
+// timerEnableAbsCycle happening at instruction START while real HW commits
+// the store mid-pipeline). For reloadAtEnable=0xFFFF (period=1) with a
+// different current reload, the very first overflow happens during the same
+// dispatch boundary as the read; real HW latches the new reload register
+// before the read can sample, but our model lags by one cycle. Use -3 in
+// that boundary case only.
+static inline uint16_t gbaTimerLiveRead(int n)
+{
+    uint32_t reloadNow;
+    switch (n) {
+    case 0:  reloadNow = (uint16_t)timer0Reload; break;
+    case 1:  reloadNow = (uint16_t)timer1Reload; break;
+    case 2:  reloadNow = (uint16_t)timer2Reload; break;
+    default: reloadNow = (uint16_t)timer3Reload; break;
+    }
+    int64_t offset = (timerReloadAtEnable[n] == 0xFFFF && reloadNow != timerReloadAtEnable[n]) ? 3 : 2;
+    // Anchor at the prescaler-aligned enable edge (see gbaTimerEnablePhase)
+    // so live reads agree with the aligned countdown in applyTimer.
+    return gbaTimerLiveValue(
+        n, cpuAbsCycle - timerEnableAbsCycle[n] - offset + gbaTimerEnablePhase(n));
 }
 
 static inline int16_t Downcast16(int32_t value) {
@@ -280,6 +336,22 @@ static inline uint32_t CPUReadMemory(uint32_t address)
             // low byte; high byte/halfword are unused/zero.
             if ((address & 0x3fc) == IO_REG_SOUNDCNT_X) {
                 value = (value & 0xFFFF0000u) | (uint32_t)soundReadNR52();
+            }
+            // A 32-bit read at TMnCNT covers the counter (low halfword)
+            // plus the control register (high halfword). Substitute the
+            // live counter value just like the halfword read path does;
+            // the control half stays as stored in g_ioMem.
+            if (((address & 0x3fc) >= 0x100) && ((address & 0x3fc) <= 0x10C)) {
+                if (((address & 0x3fc) == IO_REG_TM0CNT_L) && timer0On) {
+                    value = (value & 0xFFFF0000u) | gbaTimerLiveRead(0);
+                    vbam_hb_trace("tm0-read32", cpuAbsCycle,
+                                   (int)(value & 0xFFFF));
+                } else if (((address & 0x3fc) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
+                    value = (value & 0xFFFF0000u) | gbaTimerLiveRead(1);
+                else if (((address & 0x3fc) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
+                    value = (value & 0xFFFF0000u) | gbaTimerLiveRead(2);
+                else if (((address & 0x3fc) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
+                    value = (value & 0xFFFF0000u) | gbaTimerLiveRead(3);
             }
         } else
             goto unreadable;
@@ -446,46 +518,17 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 break;
             }
             if (((address & 0x3fe) > 0xFF) && ((address & 0x3fe) < 0x10E)) {
-                // Live timer-counter read using absolute cycles with precise
-                // reload-register semantics. The counter cycles with period
-                // (0x10000 - reloadAtEnable) until the first overflow, then
-                // with period (0x10000 - reloadNow) thereafter -- matching real
-                // HW's "reload register is latched on overflow" behavior.
-                // The 2-cycle startup delay compensates for the write-handler
-                // snapshot happening at instruction START (real HW commits the
-                // store mid-pipeline).
-                auto liveTimerRead = [&](int n, uint32_t reloadNow, int prescale) -> uint16_t {
-                    uint32_t r0 = timerReloadAtEnable[n];
-                    // Standard offset is -2 (compensates for write-handler
-                    // snapshot at instruction START). For reload=0xFFFF
-                    // (period=1), the very first overflow happens during
-                    // the same dispatch boundary as the read; real HW
-                    // latches the new reload register before the read can
-                    // sample, but our model lags by one cycle. Use -3 in
-                    // that boundary case only.
-                    int64_t offset = (r0 == 0xFFFF && reloadNow != r0) ? 3 : 2;
-                    int64_t elapsed = cpuAbsCycle - timerEnableAbsCycle[n] - offset;
-                    if (elapsed < 0) elapsed = 0;
-                    int64_t cyclesToFirstOverflow = (int64_t)(0x10000u - r0) << prescale;
-                    if (elapsed < cyclesToFirstOverflow) {
-                        return (uint16_t)(r0 + (uint32_t)(elapsed >> prescale));
-                    }
-                    int64_t post = elapsed - cyclesToFirstOverflow;
-                    int64_t period = (int64_t)(0x10000u - reloadNow) << prescale;
-                    if (period <= 0) period = (int64_t)0x10000 << prescale;
-                    post %= period;
-                    return (uint16_t)(reloadNow + (uint32_t)(post >> prescale));
-                };
+                // Live timer-counter read (see gbaTimerLiveRead).
                 if (((address & 0x3fe) == IO_REG_TM0CNT_L) && timer0On) {
-                    value = liveTimerRead(0, (uint16_t)timer0Reload, timer0ClockReload);
+                    value = gbaTimerLiveRead(0);
                     vbam_hb_trace("tm0-read", cpuAbsCycle,
                                    (int)(value & 0xFFFF));
                 } else if (((address & 0x3fe) == IO_REG_TM1CNT_L) && timer1On && !(TM1CNT & 4))
-                    value = liveTimerRead(1, (uint16_t)timer1Reload, timer1ClockReload);
+                    value = gbaTimerLiveRead(1);
                 else if (((address & 0x3fe) == IO_REG_TM2CNT_L) && timer2On && !(TM2CNT & 4))
-                    value = liveTimerRead(2, (uint16_t)timer2Reload, timer2ClockReload);
+                    value = gbaTimerLiveRead(2);
                 else if (((address & 0x3fe) == IO_REG_TM3CNT_L) && timer3On && !(TM3CNT & 4))
-                    value = liveTimerRead(3, (uint16_t)timer3Reload, timer3ClockReload);
+                    value = gbaTimerLiveRead(3);
             }
             // Sub-cycle DISPSTAT alignment: the dispatch loop only flips
             // DISPSTAT.HBlank at event boundaries, but a poll-loop read
