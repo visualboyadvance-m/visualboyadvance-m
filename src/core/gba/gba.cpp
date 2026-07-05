@@ -865,7 +865,11 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
             const char* e = getenv("VBAM_IRQ_DELAY");
             return e ? atoi(e) : 5;
         }();
-        delay = ((IRQRecentTicks > 0) ? 3 : hwDelay) + delay_bias;
+        static const int recentDelay = [] {
+            const char* e = getenv("VBAM_IRQ_RECENT");
+            return e ? atoi(e) : 3;
+        }();
+        delay = ((IRQRecentTicks > 0) ? recentDelay : hwDelay) + delay_bias;
         if (delay < 0)
             delay = 0;
     }
