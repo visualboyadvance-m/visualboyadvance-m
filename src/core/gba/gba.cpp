@@ -4714,9 +4714,6 @@ void applyTimer()
             TM0D = DowncastU16(timer0Reload);
             timer0Ticks = ((0x10000 - TM0D) << timer0ClockReload)
                           - gbaTimerEnablePhase(0);
-            vbam_hb_trace("tm0-enable", timerEnableAbsCycle[0],
-                          (gbaTimerEnablePhase(0) << 20)
-                              | (timer0ClockReload << 16) | TM0D);
             UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
             if (TM0D == 0xFFFF && timer0ClockReload == 0)
                 timerPeriod1Armed |= 1;
@@ -5891,7 +5888,6 @@ void CPULoop(int ticks)
                         }
                         timer0Ticks += (0x10000 - timer0Reload) << timer0ClockReload;
                         timerOverflow |= 1;
-                        vbam_hb_trace("tm0-overflow", cpuAbsCycle, timer0Ticks);
                         soundTimerOverflow(0);
                         if (TM0CNT & 0x40) {
                             IF |= 0x08;
