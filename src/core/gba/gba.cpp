@@ -3069,6 +3069,21 @@ void CPUSoftwareInterrupt(int comment)
         // overhead that ArcTan/Sqrt also need.
         int len = (reg[2].I & 0x1FFFFF) >> 3;
         int swi_cycles = armState ? 95 : 101;
+        // Caller-region dispatch/return correction, calibrated against
+        // the mGBA suite "CpuSet" timing test (which is CpuFastSet)
+        // across IWRAM/EWRAM/ROM callers and all WAITCNT combinations.
+        // Beyond the flat base above, the caller-visible overhead is
+        // one nonseq code fetch for ARM callers, and two nonseq + two
+        // seq fetches for Thumb callers, less the fixed portion the
+        // flat base already covers.
+        {
+            int pcRegion = (armNextPC >> 24) & 15;
+            if (armState)
+                swi_cycles += (memoryWait[pcRegion] + 1) - 5;
+            else
+                swi_cycles += 2 * (memoryWait[pcRegion] + 1)
+                            + 2 * (memoryWaitSeq[pcRegion] + 1) - 14;
+        }
         if (!(((reg[0].I & 0xe000000) == 0) || ((reg[0].I + len) & 0xe000000) == 0)) {
             if ((reg[2].I >> 24) & 1)
                 swi_cycles += (6 + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 1)) * len;
