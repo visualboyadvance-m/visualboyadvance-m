@@ -4342,7 +4342,6 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         timer0Value = value;
         if (timer0On && !(value & 0x80)) {
             timerDisableAbsCycle[0] = cpuAbsCycle;
-            vbam_hb_trace("tm0-stop", cpuAbsCycle, TM0D);
         }
         // Snapshot the absolute cycle at the write moment so the later
         // applyTimer() can anchor the timer's counter to it without losing
