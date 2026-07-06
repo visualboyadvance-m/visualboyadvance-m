@@ -266,6 +266,12 @@ int lastBgDisableVCount = -100;
 // 0x10000 against these. Unset (and irrelevant) when the timer is off.
 int64_t timerEnableAbsCycle[4] = {0, 0, 0, 0};
 uint16_t timerReloadAtEnable[4] = {0, 0, 0, 0};
+// Absolute cycle of a TMxCNT_H disable write. The eager loop only
+// refreshes TMxD at dispatch boundaries, so the value it leaves behind
+// when a timer stops can be stale by up to the width of the stopping
+// instruction; the freeze must instead be computed from the live model
+// at the write commit point (see the disable paths in applyTimer).
+int64_t timerDisableAbsCycle[4] = {0, 0, 0, 0};
 // GBA timers with prescale > 1 tick on a free-running global prescaler: the
 // first tick after enable lands on the next prescale-aligned absolute cycle,
 // not a full prescale period after the enable. timerPhaseBias calibrates our
@@ -281,14 +287,18 @@ static int timerPhaseBias()
 }
 // Halt-wake epilogue cost in cycles (see kSchedIrq dispatch and
 // CPUUpdateFlags): the BIOS IntrWait flag-check + return-to-caller path
-// costs ~16 more cycles than our ARM core attributes. Calibrated against
-// the mGBA suite's Timer count-up tests (free-running-prescaler phases
-// observe this segment). Env knob VBAM_HALT_WAKE for calibration sweeps.
+// costs a few more cycles than our ARM core attributes. Calibrated against
+// the mGBA suite's Timer count-up tests, whose free-running-prescaler
+// phases observe this segment mod the prescale period: 4 minimizes the
+// phase error across the 6b/8b/10b prescaler groups (a sweep of 0..72
+// leaves every non-timer suite unchanged and moves the timer group from
+// 217 failures at the old value 16 down to 61).
+// Env knob VBAM_HALT_WAKE for calibration sweeps.
 static int haltWakeCycles()
 {
     static int v = [] {
         const char* e = getenv("VBAM_HALT_WAKE");
-        return e ? atoi(e) : 16;
+        return e ? atoi(e) : 4;
     }();
     return v;
 }
@@ -311,6 +321,21 @@ static int irqEntryCost()
     static int v = [] {
         const char* e = getenv("VBAM_IRQ_ENTRY");
         return e ? atoi(e) : 3;
+    }();
+    return v;
+}
+// Cycle offset between the timerDisableAbsCycle snapshot (instruction
+// start) and the point in the stopping store where real hardware commits
+// the disable, i.e. where the counter freezes. One cycle later than the
+// -2 read offset in gbaTimerLiveRead: the counter still takes the tick
+// on the commit cycle itself before it stops (sharp calibration optimum
+// -- the suite's short-period count-up configs freeze exactly on period
+// boundaries). Env knob VBAM_TIMER_FREEZE for sweeps.
+static int timerFreezeOffset()
+{
+    static int v = [] {
+        const char* e = getenv("VBAM_TIMER_FREEZE");
+        return e ? atoi(e) : 1;
     }();
     return v;
 }
@@ -4286,6 +4311,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM0CNT_H:
         timer0Value = value;
+        if (timer0On && !(value & 0x80)) {
+            timerDisableAbsCycle[0] = cpuAbsCycle;
+            vbam_hb_trace("tm0-stop", cpuAbsCycle, TM0D);
+        }
         // Snapshot the absolute cycle at the write moment so the later
         // applyTimer() can anchor the timer's counter to it without losing
         // the cycles consumed between the write and the dispatch boundary.
@@ -4306,6 +4335,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM1CNT_H:
         timer1Value = value;
+        if (timer1On && !(value & 0x80))
+            timerDisableAbsCycle[1] = cpuAbsCycle;
         if (!timer1On && (value & 0x80)) {
             timerEnableAbsCycle[1] = cpuAbsCycle;
             timerReloadAtEnable[1] = DowncastU16(timer1Reload);
@@ -4319,6 +4350,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM2CNT_H:
         timer2Value = value;
+        if (timer2On && !(value & 0x80))
+            timerDisableAbsCycle[2] = cpuAbsCycle;
         if (!timer2On && (value & 0x80)) {
             timerEnableAbsCycle[2] = cpuAbsCycle;
             timerReloadAtEnable[2] = DowncastU16(timer2Reload);
@@ -4332,6 +4365,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         break;
     case IO_REG_TM3CNT_H:
         timer3Value = value;
+        if (timer3On && !(value & 0x80))
+            timerDisableAbsCycle[3] = cpuAbsCycle;
         if (!timer3On && (value & 0x80)) {
             timerEnableAbsCycle[3] = cpuAbsCycle;
             timerReloadAtEnable[3] = DowncastU16(timer3Reload);
@@ -4626,6 +4661,18 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 void applyTimer()
 {
     if (timerOnOffDelay & 1) {
+        if (timer0On && !(timer0Value & 0x80)) {
+            // Freeze the counter at the disable-write commit point,
+            // BEFORE timer0ClockReload picks up the written value: the
+            // live model must use the prescale the timer was running
+            // with. The eager loop's last TMxD refresh is up to an
+            // instruction stale, which the short-period configs of the
+            // suite's count-up tests observe directly.
+            TM0D = gbaTimerLiveValue(
+                0, timerDisableAbsCycle[0] - timerEnableAbsCycle[0]
+                       - timerFreezeOffset() + gbaTimerEnablePhase(0));
+            UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
+        }
         timer0ClockReload = TIMER_TICKS[timer0Value & 3];
         if (!timer0On && (timer0Value & 0x80)) {
             // reload the counter; the first tick lands on the next
@@ -4633,6 +4680,9 @@ void applyTimer()
             TM0D = DowncastU16(timer0Reload);
             timer0Ticks = ((0x10000 - TM0D) << timer0ClockReload)
                           - gbaTimerEnablePhase(0);
+            vbam_hb_trace("tm0-enable", timerEnableAbsCycle[0],
+                          (gbaTimerEnablePhase(0) << 20)
+                              | (timer0ClockReload << 16) | TM0D);
             UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
             if (TM0D == 0xFFFF && timer0ClockReload == 0)
                 timerPeriod1Armed |= 1;
@@ -4646,6 +4696,12 @@ void applyTimer()
         //    CPUUpdateTicks();
     }
     if (timerOnOffDelay & 2) {
+        if (timer1On && !(timer1Value & 0x80) && !(TM1CNT & 4)) {
+            TM1D = gbaTimerLiveValue(
+                1, timerDisableAbsCycle[1] - timerEnableAbsCycle[1]
+                       - timerFreezeOffset() + gbaTimerEnablePhase(1));
+            UPDATE_REG(IO_REG_TM1CNT_L, TM1D);
+        }
         timer1ClockReload = TIMER_TICKS[timer1Value & 3];
         if (!timer1On && (timer1Value & 0x80)) {
             // reload the counter
@@ -4660,6 +4716,12 @@ void applyTimer()
         UPDATE_REG(IO_REG_TM1CNT_H, TM1CNT);
     }
     if (timerOnOffDelay & 4) {
+        if (timer2On && !(timer2Value & 0x80) && !(TM2CNT & 4)) {
+            TM2D = gbaTimerLiveValue(
+                2, timerDisableAbsCycle[2] - timerEnableAbsCycle[2]
+                       - timerFreezeOffset() + gbaTimerEnablePhase(2));
+            UPDATE_REG(IO_REG_TM2CNT_L, TM2D);
+        }
         timer2ClockReload = TIMER_TICKS[timer2Value & 3];
         if (!timer2On && (timer2Value & 0x80)) {
             // reload the counter
@@ -4673,6 +4735,12 @@ void applyTimer()
         UPDATE_REG(IO_REG_TM2CNT_H, TM2CNT);
     }
     if (timerOnOffDelay & 8) {
+        if (timer3On && !(timer3Value & 0x80) && !(TM3CNT & 4)) {
+            TM3D = gbaTimerLiveValue(
+                3, timerDisableAbsCycle[3] - timerEnableAbsCycle[3]
+                       - timerFreezeOffset() + gbaTimerEnablePhase(3));
+            UPDATE_REG(IO_REG_TM3CNT_L, TM3D);
+        }
         timer3ClockReload = TIMER_TICKS[timer3Value & 3];
         if (!timer3On && (timer3Value & 0x80)) {
             // reload the counter
@@ -5765,6 +5833,7 @@ void CPULoop(int ticks)
                         }
                         timer0Ticks += (0x10000 - timer0Reload) << timer0ClockReload;
                         timerOverflow |= 1;
+                        vbam_hb_trace("tm0-overflow", cpuAbsCycle, timer0Ticks);
                         soundTimerOverflow(0);
                         if (TM0CNT & 0x40) {
                             IF |= 0x08;
