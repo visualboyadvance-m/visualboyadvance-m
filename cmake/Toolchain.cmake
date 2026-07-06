@@ -106,7 +106,7 @@ endif()
 
 # Assembler flags.
 if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
-    if(MSVC)
+    if(WIN32 AND X86)
         if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
             file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
         endif()

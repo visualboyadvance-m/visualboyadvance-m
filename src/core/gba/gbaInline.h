@@ -2,6 +2,7 @@
 #define VBAM_CORE_GBA_GBAINLINE_H_
 
 #include <cstdint>
+#include <cstdlib>
 #include <type_traits>
 
 #include "core/base/port.h"
