@@ -5346,6 +5346,17 @@ void CPULoop(int ticks)
                         // at zero epilogue cost (video "Layer toggle 2",
                         // SIO timing); charging them regresses those suites.
                         pendingWakeCharge = haltWakeCycles();
+                    } else if (was_halted && deliver && (IF & IE & 0x02)) {
+                        // HBlank-source wakes carry their own epilogue
+                        // charge, calibrated independently (misc-edge
+                        // "H-blank bit start" Flip 1 anchors its first
+                        // measurement at an HBlank IntrWait return).
+                        // Env knob VBAM_HB_WAKE for sweeps.
+                        static const int hbWake = [] {
+                            const char* e = getenv("VBAM_HB_WAKE");
+                            return e ? atoi(e) : 24;
+                        }();
+                        pendingWakeCharge = hbWake;
                     }
                     if (deliver) {
                         CPUInterrupt();

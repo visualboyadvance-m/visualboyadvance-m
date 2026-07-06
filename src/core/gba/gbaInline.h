@@ -46,7 +46,7 @@ extern const uint32_t objTilesAddress[3];
 // supersedes the legacy one for that category. See gba.cpp for the
 // per-tag extra-bits schema.
 //
-// #define VBAM_HB_TRACE
+#define VBAM_HB_TRACE
 #ifdef VBAM_HB_TRACE
 
 // Trace category. Each call site picks the category whose data it
@@ -571,14 +571,14 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                     const char* e = getenv("VBAM_DSTAT_OFF");
                     return (int64_t)(e ? atoi(e) : -6);
                 }();
-                // The +8 pre-flip lookahead predates the GamePak prefetch
-                // model (gbaCpu.h); with real prefetch floors the polling
-                // loops no longer drift and the lookahead overshoots by an
-                // iteration (misc-edge "Flip 2"). 0 verified best across
-                // -4..16; the -6 off-direction bias is still required.
+                // Recalibrated after the timer IRQ-latency rework
+                // (matured pending-IRQ delivery, halt-wake 5, recent 5)
+                // shifted the polling-loop alignment: 3 passes all six
+                // misc-edge "H-blank bit start" flips together with the
+                // HBlank-source wake charge (VBAM_HB_WAKE, gba.cpp).
                 static const int64_t biasOn = [] {
                     const char* e = getenv("VBAM_DSTAT_ON");
-                    return (int64_t)(e ? atoi(e) : 0);
+                    return (int64_t)(e ? atoi(e) : 3);
                 }();
                 const int64_t bias = (value & 2) ? biasOff : biasOn;
                 if (cpuAbsCycle + bias >= lcdNextEventAbsCycle) {
