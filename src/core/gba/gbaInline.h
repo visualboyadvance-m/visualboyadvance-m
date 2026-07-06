@@ -46,7 +46,7 @@ extern const uint32_t objTilesAddress[3];
 // supersedes the legacy one for that category. See gba.cpp for the
 // per-tag extra-bits schema.
 //
-#define VBAM_HB_TRACE
+// #define VBAM_HB_TRACE
 #ifdef VBAM_HB_TRACE
 
 // Trace category. Each call site picks the category whose data it

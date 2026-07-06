@@ -4696,10 +4696,16 @@ void applyTimer()
             // live model must use the prescale the timer was running
             // with. The eager loop's last TMxD refresh is up to an
             // instruction stale, which the short-period configs of the
-            // suite's count-up tests observe directly.
+            // suite's count-up tests observe directly. A timer that was
+            // enabled at period 1 (reload 0xFFFF) reloads its counter one
+            // cycle sooner after its first overflow than the generic
+            // freeze offset assumes, so it freezes one count lower (the
+            // Timer-IRQ "FFFF" frozen-value case).
+            int foff = timerFreezeOffset()
+                       + (timerReloadAtEnable[0] == 0xFFFF ? 1 : 0);
             TM0D = gbaTimerLiveValue(
                 0, timerDisableAbsCycle[0] - timerEnableAbsCycle[0]
-                       - timerFreezeOffset() + gbaTimerEnablePhase(0));
+                       - foff + gbaTimerEnablePhase(0));
             UPDATE_REG(IO_REG_TM0CNT_L, TM0D);
         }
         timer0ClockReload = TIMER_TICKS[timer0Value & 3];
@@ -5879,7 +5885,7 @@ void CPULoop(int ticks)
                             if (DowncastU16(timer0Reload) != 0xFFFF) {
                                 static const int p1 = [] {
                                     const char* e = getenv("VBAM_IRQ_P1");
-                                    return e ? atoi(e) : -1;
+                                    return e ? atoi(e) : 0;
                                 }();
                                 p1_bias = p1;
                             }

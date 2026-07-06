@@ -3116,13 +3116,6 @@ int armExecute()
             return 0;
         if (clockTicks == 0)
             clockTicks = 1 + codeTicksAccessSeq32(oldArmNextPC);
-#ifdef VBAM_TRACE_P1
-        if (timerReloadAtEnable[0] == 0xFFFF && (uint16_t)timer0Reload == 0
-            && cpuAbsCycle - timerEnableAbsCycle[0] < 60)
-            fprintf(stderr, "P1 pc=%08x ticks=%d abs=%lld tot=%d next=%d\n",
-                    oldArmNextPC, clockTicks, (long long)cpuAbsCycle,
-                    cpuTotalTicks, cpuNextEvent);
-#endif
         cpuTotalTicks += clockTicks;
         cpuAbsCycle   += clockTicks;
 
