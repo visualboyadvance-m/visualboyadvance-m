@@ -388,12 +388,12 @@ _vbam_resolve_test_path(VBAM_TEST_GB_DMG_BIOS VBAM_TEST_GB_DMG_BIOS
 # them in lockstep with any improvement so a regression actually fails
 # CI. They can be overridden with -DVBAM_TEST_GBA_MIN_PASS=… etc.
 if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
-    # 6755 after the timer prescaler-phase / IRQ-latency-split /
+    # 6760 of 7017 after the timer prescaler-phase / IRQ-latency-split /
     # GamePak-prefetch work (see the test-suite-accuracy commits).
     # Remaining known-failing groups: timer count-up value freezes and
     # part of the sums (~219), Timing C-loop/CpuSet (32), misc-edge
     # DMA-prefetch + H-blank flips (8), one period-1 Timer IRQ boundary.
-    set(VBAM_TEST_GBA_MIN_PASS 6755 CACHE STRING
+    set(VBAM_TEST_GBA_MIN_PASS 6760 CACHE STRING
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
