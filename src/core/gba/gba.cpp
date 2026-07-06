@@ -289,22 +289,39 @@ static int timerPhaseBias()
 // CPUUpdateFlags): the BIOS IntrWait flag-check + return-to-caller path
 // costs a few more cycles than our ARM core attributes. Calibrated against
 // the mGBA suite's Timer count-up tests, whose free-running-prescaler
-// phases observe this segment mod the prescale period: 4 minimizes the
-// phase error across the 6b/8b/10b prescaler groups (a sweep of 0..72
-// leaves every non-timer suite unchanged and moves the timer group from
-// 217 failures at the old value 16 down to 61).
-// Env knob VBAM_HALT_WAKE for calibration sweeps.
+// phases observe this segment mod the prescale period: jointly with the
+// disable-freeze offset, 5 minimizes the phase error across the 6b/8b/10b
+// prescaler groups (a sweep of 0..72 leaves every non-timer suite
+// unchanged and moves the timer group from 217 failures at the old value
+// 16 down to 36). Env knob VBAM_HALT_WAKE for calibration sweeps.
 static int haltWakeCycles()
 {
     static int v = [] {
         const char* e = getenv("VBAM_HALT_WAKE");
-        return e ? atoi(e) : 4;
+        return e ? atoi(e) : 5;
     }();
     return v;
 }
 // Pending post-handler charge armed by a halt-wake IRQ delivery; applied at
 // the handler's exception return (armIrqEnable false->true transition).
 static int pendingWakeCharge = 0;
+// A kSchedIrq dispatch that found IF&IE pending but could not deliver
+// (CPSR I-flag set inside a handler, or IME off) means the hardware IRQ
+// synchronization delay has already elapsed while delivery was blocked.
+// When the block lifts (exception return / IME write), the pending IRQ
+// is taken with only the short re-synchronization latency below (2, the
+// value at which every chained configuration of the suite's Timer
+// count-up tests matches hardware), not a fresh full delivery delay.
+// Env knob VBAM_IRQ_RETURN for sweeps.
+static bool irqDelayMatured = false;
+static int irqMaturedDelay()
+{
+    static int v = [] {
+        const char* e = getenv("VBAM_IRQ_RETURN");
+        return e ? atoi(e) : 2;
+    }();
+    return v;
+}
 // Period-1 enable edge case: a timer enabled with reload 0xFFFF (prescale 1)
 // overflows one cycle after enable, BEFORE a back-to-back reload rewrite
 // commits. The IRQ comes from that first overflow while the counter's zero
@@ -863,7 +880,8 @@ void cpuEnableProfiling(int hz)
 // Note: IME is NOT consulted for the schedule decision -- it gates
 // DELIVERY at kSchedIrq dispatch time, but a pending IRQ should still
 // wake from halt unconditionally on (IF & IE) per GBATEK and mgba.
-static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
+static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0,
+                              bool matured_return = false)
 {
     if (!(IF & IE)) {
         if (gbaScheduler::IsScheduled(kSchedIrq)) {
@@ -871,10 +889,17 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
                            (int)(IF | (IE << 16)));
         }
         gbaScheduler::Cancel(kSchedIrq);
+        irqDelayMatured = false;
         return;
     }
     int delay;
-    if (holdState && (IME & 1) && armIrqEnable) {
+    if (matured_return && irqDelayMatured && (IME & 1) && armIrqEnable) {
+        // Exception return with a pending IRQ whose delivery delay
+        // already elapsed while the handler had it blocked (see
+        // irqDelayMatured); take it with the short matured latency.
+        delay = irqMaturedDelay();
+        gbaScheduler::Cancel(kSchedIrq);
+    } else if (holdState && (IME & 1) && armIrqEnable) {
         // Halt-wake: 0 cycles. Supersede any pending longer-delay
         // schedule -- the wake-from-halt is the minimum-latency path.
         delay = 0;
@@ -891,9 +916,13 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
             const char* e = getenv("VBAM_IRQ_DELAY");
             return e ? atoi(e) : 5;
         }();
+        // With the matured-pending path modeling in-handler IRQ raises
+        // (see irqDelayMatured), chained deliveries take the same
+        // synchronization delay as first deliveries; the old fast-path
+        // value 3 was compensating for the missing maturity model.
         static const int recentDelay = [] {
             const char* e = getenv("VBAM_IRQ_RECENT");
-            return e ? atoi(e) : 3;
+            return e ? atoi(e) : 5;
         }();
         delay = ((IRQRecentTicks > 0) ? recentDelay : hwDelay) + delay_bias;
         if (delay < 0)
@@ -2630,7 +2659,7 @@ void CPUUpdateFlags(bool breakLoop)
             cpuAbsCycle += pendingWakeCharge;
             pendingWakeCharge = 0;
         }
-        CPUTestIRQ();
+        CPUTestIRQ(false, 0, /*matured_return=*/true);
     }
     if (breakLoop) {
         // (Legacy gate retained as a no-op marker; the rearm above
@@ -5325,6 +5354,14 @@ void CPULoop(int ticks)
                         }
                         if (SWITicks)
                             SWITicks = 0;
+                        irqDelayMatured = false;
+                    } else if (IF & IE) {
+                        // Delivery blocked (handler has CPSR.I set, or
+                        // IME off) with the source still pending: the
+                        // synchronization delay has now elapsed, so the
+                        // eventual unblock takes the IRQ with only the
+                        // matured short latency (see irqDelayMatured).
+                        irqDelayMatured = true;
                     }
                     // outcome encoding (low 4 bits of trace `extra`):
                     //   0 = delivered, 1 = no IF&IE, 2 = no IME, 3 = no armIrqEnable
