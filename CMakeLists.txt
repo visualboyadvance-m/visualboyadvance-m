@@ -234,9 +234,11 @@ include(Options)
 include(Toolchain)
 include(Dependencies)
 
-# We target Windows XP for 32 bit Windows builds.
+# We target Windows XP for 32 bit Windows builds. Define WINXP here too so the
+# compile macro always tracks the _WIN32_WINNT=0x0501 target; the WINXP CMake
+# variable (set in Architecture.cmake) governs build-time logic separately.
 if(WIN32 AND X86)
-    add_compile_definitions(-DWINVER=0x0501 -D_WIN32_WINNT=0x0501)
+    add_compile_definitions(-DWINVER=0x0501 -D_WIN32_WINNT=0x0501 -DWINXP)
 endif()
 
 # Disable tests when not in a git checkout.

@@ -558,10 +558,10 @@ if(ENABLE_LUA)
             target_link_libraries(lua_test_runner PRIVATE
                 "-framework CoreFoundation" ${LIBICONV_LIB})
         endif()
-        # Disable LTO on the test runner. It only slows the link with no
-        # benefit (no-op when LTO is off).
-        set_target_properties(lua_test_runner PROPERTIES
-            INTERPROCEDURAL_OPTIMIZATION OFF)
+        # Inherit the global LTO setting: this runner links vbam-core, whose
+        # archive is LLVM bitcode when LTO is on. Forcing IPO off here makes
+        # the clang driver skip the LTO plugin, so GNU ld (bfd) rejects the
+        # bitcode archive with "file format not recognized".
         add_test(NAME wx.lua.api
                  COMMAND lua_test_runner
                      "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")

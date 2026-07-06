@@ -32,6 +32,14 @@
 #define SCALEFX_USE_MMX
 #ifdef _MSC_VER
 #include <intrin.h>
+// MSVC's C4799 flags any function that touches an __m64 but has no EMMS in its
+// own body. Our MMX code follows the correct discipline: the leaf helpers
+// (MMXLoad2/MMXStore2/MMXBlend50) run inside tight loops and must not emit EMMS,
+// and each top-level pass calls MMXEnd() (_mm_empty()) exactly once when done.
+// At /Od that MMXEnd() is a real call MSVC won't credit to the caller, so C4799
+// is a false positive here (and would be an error under /WX). Suppress it for
+// the MMX translation units; this header is only included by the MMX pass file.
+#pragma warning(disable: 4799)
 #else
 #include <mmintrin.h>
 #endif

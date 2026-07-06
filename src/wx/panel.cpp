@@ -8643,8 +8643,7 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
 #endif
 #endif
         case config::RenderMethod::kLast:
-            VBAM_NOTREACHED();
-            return nullptr;
+            VBAM_NOTREACHED_RETURN(nullptr);
     }
     return nullptr;
 }

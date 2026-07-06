@@ -43,7 +43,8 @@ if(UPSTREAM_RELEASE)
         add_compile_options(-msse3)
     elseif(WIN32 AND X86_32)
         set(WINXP TRUE)
-        add_compile_definitions(-DWINXP)
+        # -DWINXP is added unconditionally for 32-bit Windows in the root
+        # CMakeLists.txt alongside -D_WIN32_WINNT=0x0501.
         add_compile_options(-march=pentium3 -mmmx -msse -mfpmath=sse)
     endif()
 elseif(X86_32)
@@ -66,6 +67,19 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
     add_compile_options(-Wno-unused-command-line-argument -Wno-unknown-pragmas  -Wno-nan-infinity-disabled -Wno-unknown-warning-option)
+
+    # With Clang + LTO the static archives hold LLVM bitcode rather than native
+    # objects, which GNU ar/ld cannot handle ("file format not recognized").
+    # Use llvm-ar/llvm-ranlib, which understand bitcode via the LLVM plugin,
+    # whenever they are available.
+    find_program(LLVM_AR NAMES llvm-ar)
+    find_program(LLVM_RANLIB NAMES llvm-ranlib)
+    if(LLVM_AR)
+        set(CMAKE_AR "${LLVM_AR}" CACHE FILEPATH "Archiver" FORCE)
+    endif()
+    if(LLVM_RANLIB)
+        set(CMAKE_RANLIB "${LLVM_RANLIB}" CACHE FILEPATH "Ranlib" FORCE)
+    endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-feliminate-unused-debug-types)
 endif()

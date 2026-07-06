@@ -38,10 +38,13 @@ if(APPLE)
         "-framework CoreFoundation" ${LIBICONV_LIB})
 endif()
 
-# Disable LTO on the test runners. It only slows their link with no
-# benefit, and these are throwaway test drivers (no-op when LTO is off).
-set_target_properties(suite_runner gb_suite_runner PROPERTIES
-    INTERPROCEDURAL_OPTIMIZATION OFF)
+# The test runners must inherit the global LTO setting rather than force it
+# off: they link vbam-core, whose archive holds LLVM bitcode when LTO is on.
+# Linking a bitcode archive into a non-LTO executable makes the clang driver
+# skip the LTO plugin, so GNU ld (bfd) rejects it with "file format not
+# recognized". Keeping them consistent with the library avoids the mismatch
+# (and with lld/gold the plugin would run at link time anyway, so forcing IPO
+# off here saved nothing).
 
 # -----------------------------------------------------------------------------
 # Test ROM integration
