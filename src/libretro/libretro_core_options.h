@@ -428,6 +428,20 @@ struct retro_core_option_v2_definition option_defs_us[] = {
         "0"
     },
     {
+        "vbam_gbpenabled",
+        "Enable Game Boy Player",
+        NULL,
+        "Enable Game Boy Player SIO emulation (handshake + rumble).",
+        NULL,
+        "system",
+        {
+            { "disabled", NULL },
+            { "enabled",  NULL },
+            { NULL, NULL },
+        },
+        "enabled"
+    },
+    {
         "vbam_astick_deadzone",
         "Sensors Deadzone (%)",
         NULL,

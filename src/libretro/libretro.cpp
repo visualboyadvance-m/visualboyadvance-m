@@ -1450,11 +1450,18 @@ static void update_variables_gba() {
         systemUpdateSolarSensor(sensorDarknessLevel);
     }
 
-    char options[4][35] = {
+    var.key = "vbam_gbpenabled";
+    var.value = NULL;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        coreOptions.gbpEnabled = !strcmp(var.value, "enabled");
+    }
+
+    char options[5][35] = {
         "vbam_soundinterpolation",
         "vbam_soundfiltering",
         "vbam_forceRTCenable",
         "vbam_solarsensor",
+        "vbam_gbpenabled"
     };
 
     struct retro_core_option_display option_display_gba;

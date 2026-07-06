@@ -2671,6 +2671,11 @@ EVT_HANDLER_MASK(GBALcdFilter, "Enable LCD filter", CMDEN_GBA)
     GetMenuOptionConfig("GBALcdFilter", config::OptionID::kGBALCDFilter);
 }
 
+EVT_HANDLER_MASK(GBPEnabled, "Enable Game Boy Player", CMDEN_GBA)
+{
+    GetMenuOptionConfig("GBPEnabled", config::OptionID::kPrefGBPEnabled);
+}
+
 EVT_HANDLER_MASK(GBLcdFilter, "Enable LCD filter", CMDEN_GB)
 {
     GetMenuOptionConfig("GBLcdFilter", config::OptionID::kGBLCDFilter);

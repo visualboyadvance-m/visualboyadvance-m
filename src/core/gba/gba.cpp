@@ -35,6 +35,7 @@
 
 #if !defined(NO_LINK)
 #include "core/gba/gbaLink.h"
+#include "core/gba/gbpSio.h"
 #endif  // !defined(NOLINK)
 
 #if !defined(__LIBRETRO__)
@@ -886,6 +887,17 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0)
                    ((armIrqEnable ? 1 : 0) << 22) |
                    (((int)IME & 1) << 23) |
                    ((software_unmask ? 1 : 0) << 24));
+}
+
+// Exposed for IF mutators living in other translation units -- currently
+// the GBP SIO module (gbpSio.cpp), which raises the serial IRQ on transfer
+// completion and must re-arm kSchedIrq just like the in-TU completion path
+// gbaScheduler_OnSioComplete() does. Without this, the raised IF.serial bit
+// is never delivered (the legacy end-of-CPULoop IRQ block was removed in the
+// scheduler rewrite).
+void CPUReevaluateIRQ()
+{
+    CPUTestIRQ();
 }
 
 // Scheduler callback: a pending SIO Normal-8/32 internal-clock transfer
@@ -4362,8 +4374,18 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         const uint32_t mode       = (value >> 12) & 0x3u;
         const bool     start_edge = (value & 0x80) && !(old_siocnt & 0x80);
         const bool     internal   = (value & 0x01) != 0;
+        // The Game Boy Player runs its own SIO transfer machinery
+        // (GbpHandleSioStart / GbpLinkUpdateTick). Letting the generic
+        // kSchedSio completion also fire would double-handle the transfer
+        // and clobber the GBP handshake response, breaking rumble.
+#if !defined(NO_LINK)
+        const bool gbp_owns_sio = GbpWillHandleSio();
+#else
+        const bool gbp_owns_sio = false;
+#endif
         const bool cycle_accurate_path =
-            start_edge && rcnt_plain && internal && (mode == 0 || mode == 1);
+            start_edge && rcnt_plain && internal && (mode == 0 || mode == 1)
+            && !gbp_owns_sio;
         // [SIO] sio-cnt-write extra layout:
         //   bits  0..15 : raw value written (low 16 bits of `value`)
         //   bit   16    : start_edge -- bit-7 0->1 transition this write
@@ -5416,6 +5438,12 @@ void CPULoop(int ticks)
                                 CPUTestIRQ();
                             }
                             CPUCheckDMA(1, 0x0f);
+
+#ifndef NO_LINK
+                            if (coreOptions.gbpEnabled) {
+                                GBPUpdate();
+                            }
+#endif
                         }
 
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
@@ -5900,11 +5928,19 @@ void CPULoop(int ticks)
             ticks -= clockTicks;
 
 #ifndef NO_LINK
-            if (GetLinkMode() != LINK_DISCONNECTED)
+            if (GetLinkMode() != LINK_DISCONNECTED || GBPIsActive())
                 LinkUpdate(clockTicks);
 #endif
 
             cpuNextEvent = CPUUpdateTicks();
+
+#ifndef NO_LINK
+            {
+                int gbp_rem = GBPTransferEnd();
+                if (gbp_rem > 0 && gbp_rem < cpuNextEvent)
+                    cpuNextEvent = gbp_rem;
+            }
+#endif
 
             if (cpuDmaTicksToUpdate > 0) {
                 if (cpuDmaTicksToUpdate > cpuNextEvent)
