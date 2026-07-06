@@ -5876,8 +5876,13 @@ void CPULoop(int ticks)
                         int p1_bias = 0;
                         if (timerPeriod1Armed & 1) {
                             timerPeriod1Armed &= ~1;
-                            if (DowncastU16(timer0Reload) != 0xFFFF)
-                                p1_bias = -1;
+                            if (DowncastU16(timer0Reload) != 0xFFFF) {
+                                static const int p1 = [] {
+                                    const char* e = getenv("VBAM_IRQ_P1");
+                                    return e ? atoi(e) : -1;
+                                }();
+                                p1_bias = p1;
+                            }
                         }
                         timer0Ticks += (0x10000 - timer0Reload) << timer0ClockReload;
                         timerOverflow |= 1;
