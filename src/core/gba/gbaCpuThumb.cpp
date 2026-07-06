@@ -1548,7 +1548,8 @@ static INSN_REGPARM void thumbB0(uint32_t opcode)
     if (opcode & 0x80)
         offset = -offset;
     reg[13].I += offset;
-    clockTicks = 1 + codeTicksAccess16(armNextPC);
+    // Plain ALU operation: the following code fetch stays sequential.
+    clockTicks = 1 + codeTicksAccessSeq16(armNextPC);
 }
 
 // Push and pop ///////////////////////////////////////////////////////////
