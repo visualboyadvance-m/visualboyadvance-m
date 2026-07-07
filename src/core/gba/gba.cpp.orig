@@ -203,25 +203,6 @@ uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
 uint32_t cpuDmaLatchData[4];
 uint32_t cpuDmaBusValue = 0;
-// Event-batch bookkeeping for the DMA bus-release window: g_eventBatchId
-// increments at each event service; a DMA that ran during event processing
-// tags the batch, and an open-bus read early in that batch (within the
-// bus-release window) still observes the DMA's last bus value.
-uint64_t g_eventBatchId = 0;
-uint64_t g_dmaFireBatchId = ~0ull;
-// Set when a DMA transfer ran; the first subsequent cart-bus access is
-// forced non-sequential (the DMA disturbed the cart address latch).
-bool g_dmaBrokeBurst = false;
-// Overshoot of the instruction in flight across the last event boundary.
-int g_eventBatchOvershoot = 0;
-// Set by CPUCheckDMA for event-triggered (HBlank/VBlank) DMA dispatch:
-// the DMA's bus grant waits for the in-flight instruction to complete.
-bool g_dmaEventTriggered = false;
-// The first post-DMA fetch slipped in before the DMA's bus grant; the
-// burst break applies to the following cart access instead.
-bool g_dmaBreakSkipOne = false;
-
-
 
 const uint32_t cpuDmaSrcMask[4] = { 0x07ffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff };
 const uint32_t cpuDmaDstMask[4] = { 0x07ffffff, 0x07ffffff, 0x07ffffff, 0x0fffffff };
@@ -3641,63 +3622,11 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     if (gateOpen) {
         cpuAbsCycle += attrib;
     }
-    g_dmaFireBatchId = g_eventBatchId;
-    // A DMA transfer breaks any ROM burst in progress: the first cart-bus
-    // access after the DMA is non-sequential (the address latch was
-    // disturbed), and the CPU is held off the bus for the DMA's duration.
-    g_dmaBrokeBurst = true;
-    if (g_dmaEventTriggered) {
-        // Event-triggered (HBlank/VBlank) DMA: the trigger fires mid-
-        // instruction, the unit takes its 2-cycle activation latency, but
-        // it cannot take the bus until the in-flight instruction
-        // completes. The CPU-visible stall is therefore only the part of
-        // (activation + transfer) that extends past the instruction's
-        // overshoot of the trigger point. totalTicks was already charged
-        // above; rebase it against the overshoot here.
-        // The DMA is busy on the bus during [activation, activation +
-        // transfer] after the trigger; the CPU keeps executing through
-        // the activation latency and is only stalled for the part of the
-        // busy interval that extends past its own progress (the in-flight
-        // instruction's overshoot, or the activation window if the
-        // instruction ended sooner).
-        // Trigger-to-bus-grant latency: the DMA unit's 2-cycle activation
-        // plus the bus handover at the CPU's next access boundary.
-        // Calibrated against NanoBoyAdvance's observable timing on both
-        // suite.gba builds (see the DMA Prefetch Break reference tables).
-        const int dmaAct = 4;
-        int stall;
-        if (holdState) {
-            // CPU halted: no instruction stream races the DMA's bus
-            // grant; the transfer time already charged above stands and
-            // the burst break lands on the first post-wake cart access.
-            stall = totalTicks;
-        } else if (g_eventBatchOvershoot < dmaAct) {
-            // The trigger instruction ended inside the activation window:
-            // the next instruction's opcode fetch reaches the bus first,
-            // the DMA waits for it, then holds the bus for its full
-            // transfer. That fetch is unbroken; the one after it is the
-            // first to find the disturbed address latch.
-            stall = totalTicks;
-            g_dmaBreakSkipOne = true;
-        } else {
-            // The in-flight instruction covered the activation latency;
-            // the DMA takes the bus as soon as it completes, and the CPU
-            // is stalled for whatever part of the busy interval extends
-            // past its own progress.
-            stall = (dmaAct + totalTicks) - g_eventBatchOvershoot;
-            if (stall < 0)
-                stall = 0;
-        }
-        cpuDmaTicksToUpdate += stall - totalTicks;
-        if (cpuDmaTicksToUpdate < 0)
-            cpuDmaTicksToUpdate = 0;
-    }
     cpuDmaRunning = false;
 }
 
 void CPUCheckDMA(int reason, int dmamask)
 {
-    g_dmaEventTriggered = (reason == 1 || reason == 2);
     // DMA 0
     if ((DM0CNT_H & 0x8000) && (dmamask & 1)) {
         if (((DM0CNT_H >> 12) & 3) == reason) {
@@ -5386,8 +5315,6 @@ void CPULoop(int ticks)
 
             clockTicks = cpuNextEvent;
             cpuTotalTicks = 0;
-            ++g_eventBatchId;
-            g_eventBatchOvershoot = remainingTicks;
 
         updateLoop:
 

@@ -80,9 +80,6 @@ extern void CPUUndefinedException();
 extern void CPUSoftwareInterrupt();
 extern void CPUSoftwareInterrupt(int comment);
 
-extern bool g_dmaBrokeBurst;  // first cart access after a DMA is non-seq
-extern bool g_dmaBreakSkipOne; // that access slipped in pre-DMA; skip it
-
 // Waitstates when accessing data
 inline int dataTicksAccess16(uint32_t address) // DATA 8/16bits NON SEQ
 {
@@ -166,10 +163,6 @@ inline int codeTicksAccess16(uint32_t address) // THUMB NON SEQ
     int addr = (address >> 24) & 15;
 
     if ((addr >= 0x08) && (addr <= 0x0D)) {
-        if (g_dmaBreakSkipOne)
-            g_dmaBreakSkipOne = false;
-        else
-            g_dmaBrokeBurst = false;
         if (busPrefetchCount & 0x1) {
             if (busPrefetchCount & 0x2) {
                 busPrefetchCount = ((busPrefetchCount & 0xFF) >> 2) | (busPrefetchCount & 0xFFFFFF00);
@@ -192,10 +185,6 @@ inline int codeTicksAccess32(uint32_t address) // ARM NON SEQ
     int addr = (address >> 24) & 15;
 
     if ((addr >= 0x08) && (addr <= 0x0D)) {
-        if (g_dmaBreakSkipOne)
-            g_dmaBreakSkipOne = false;
-        else
-            g_dmaBrokeBurst = false;
         if (busPrefetchCount & 0x1) {
             if (busPrefetchCount & 0x2) {
                 busPrefetchCount = ((busPrefetchCount & 0xFF) >> 2) | (busPrefetchCount & 0xFFFFFF00);
@@ -218,15 +207,6 @@ inline int codeTicksAccessSeq16(uint32_t address) // THUMB SEQ
     int addr = (address >> 24) & 15;
 
     if ((addr >= 0x08) && (addr <= 0x0D)) {
-        if (g_dmaBrokeBurst) {
-            if (g_dmaBreakSkipOne) {
-                g_dmaBreakSkipOne = false;
-            } else {
-                g_dmaBrokeBurst = false;
-                busPrefetchCount = 0;
-                return memoryWait[addr];
-            }
-        }
         if (busPrefetchCount & 0x1) {
             busPrefetchCount = ((busPrefetchCount & 0xFF) >> 1) | (busPrefetchCount & 0xFFFFFF00);
             return 0;
@@ -253,15 +233,6 @@ inline int codeTicksAccessSeq32(uint32_t address) // ARM SEQ
     int addr = (address >> 24) & 15;
 
     if ((addr >= 0x08) && (addr <= 0x0D)) {
-        if (g_dmaBrokeBurst) {
-            if (g_dmaBreakSkipOne) {
-                g_dmaBreakSkipOne = false;
-            } else {
-                g_dmaBrokeBurst = false;
-                busPrefetchCount = 0;
-                return memoryWait32[addr];
-            }
-        }
         if (busPrefetchCount & 0x1) {
             if (busPrefetchCount & 0x2) {
                 busPrefetchCount = ((busPrefetchCount & 0xFF) >> 2) | (busPrefetchCount & 0xFFFFFF00);

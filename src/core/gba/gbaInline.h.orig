@@ -214,24 +214,8 @@ static inline int8_t Downcast8(T value) {
 static inline uint32_t CPUReadOpenBus()
 {
     /* DMA shadowing overrides everything */
-    if (cpuDmaRunning)
+    if (cpuDmaRunning || ((reg[15].I - cpuDmaPC) == (armState ? 4u : 2u)))
         return cpuDmaBusValue;
-    /* DMA bus-release window: a DMA that just released the bus leaves its
-       last transferred value latched there. An open-bus read whose data
-       access happens before anything re-drives the bus (the prefetcher's
-       first refill fetch takes one ROM non-sequential access) still samples
-       the DMA's value instead of the prefetch latch. cpuTotalTicks resets
-       at event service, so within the DMA's event batch it measures cycles
-       since the DMA ran. */
-    {
-        extern uint64_t g_eventBatchId, g_dmaFireBatchId;
-        extern int cpuTotalTicks;
-        /* The window is one ROM non-sequential access: the prefetcher's
-           first refill fetch after the DMA releases the bus. */
-        if (g_eventBatchId == g_dmaFireBatchId
-            && cpuTotalTicks <= memoryWait[0x08] + 1)
-            return cpuDmaBusValue;
-    }
 
     /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
     if (!armState) {
