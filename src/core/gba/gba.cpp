@@ -239,6 +239,15 @@ int64_t cpuAbsCycle = 0;
 // the original line's HBlank for BG-enable-delay-latch purposes.
 int64_t hblankIrqRaiseAbsCycle = -1;
 int hblankIrqRaiseVCount = -1;
+// cpuAbsCycle of the most recent live DISPSTAT read that observed the
+// HBlank flag set. A DISPCNT-enable write whose IRQ handler busy-waited
+// on the HBlank flag (`while (DISPSTAT & LCDC_HBL_FLAG)`) will have polled
+// after the current line's HBlank-IRQ raise; an "immediate" handler that
+// writes DISPCNT without polling will not. This distinction is physical
+// and latency-independent, unlike cycSinceIrq (which bakes in the IRQ
+// delivery latency). Used to classify the mid-frame BG-enable latch delay
+// and the wait+enable glitch in the video "Layer toggle 2" test.
+int64_t lastHblankPollCycle = -1;
 // Sub-cycle DISPSTAT alignment: cpuAbsCycle at which the next lcdTicks
 // transition is scheduled. When a DISPSTAT read happens after this
 // boundary but before the dispatch loop has processed the event, the
@@ -3907,45 +3916,53 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         }
 
         if (changeBGon) {
-            // Real-HW BG-enable becomes visible 3 scanlines after the write
-            // (delay=4 in our decrement-each-VCount model = visible at
-            // write_line+3). When the write happens during an HBlank-IRQ
-            // handler that started in HBlank of line N but spilled into
-            // early HDraw of line N+1 (so vcdiff==1 and cycSinceIrq is
-            // close to the HBlank-period length), real HW would have
-            // latched the write while still on line N -- compensate by
-            // using delay=3 so visibility lands at N+3 instead of N+4.
-            // Wait+enable handlers (which busy-wait on the HBlank flag
-            // before writing) take longer post-IRQ-raise (~260+ cycles),
-            // so the threshold of 250 separates them from genuine
-            // spillover (~243 cycles).
+            // Real-HW mid-frame BG-enable latch delay. In our
+            // decrement-each-VCount model, layerEnableDelay=4 makes the
+            // BG visible at write_line+3, layerEnableDelay=3 at write_line+2.
+            //
+            // The mGBA video "Layer toggle 2" test enables BG0 from an
+            // HBlank-IRQ handler in two distinct ways per scanline:
+            //   * "immediate":  REG_DISPCNT |= BG0_ON;               (no poll)
+            //   * "busy-wait":  while (DISPSTAT & LCDC_HBL_FLAG);     (polls)
+            //                   REG_DISPCNT |= BG0_ON;
+            // By the time the write commits, our IRQ delivery latency has
+            // already carried VCOUNT past the HBlank of the origin line, so
+            // cycSinceIrq/inHBlank can no longer tell the two cases apart
+            // (that timing was the ground the old 250/270 thresholds stood
+            // on). The busy-wait poll, however, is directly observable and
+            // latency-independent: lastHblankPollCycle >= this line's HBlank
+            // raise iff the handler spun on the HBlank flag before writing.
             const bool inHBlank = (DISPSTAT & 2) != 0;
             const int vcdiff = (hblankIrqRaiseVCount >= 0)
                 ? (VCOUNT - hblankIrqRaiseVCount) : -1;
             const int64_t cycSinceIrq = (hblankIrqRaiseAbsCycle >= 0)
                 ? (cpuAbsCycle - hblankIrqRaiseAbsCycle) : -1;
-            const bool spillover = (vcdiff == 1) && !inHBlank
-                                   && cycSinceIrq >= 0 && cycSinceIrq < 250;
-            // Wait+enable: HBlank-IRQ handler busy-waits past HBlank-end
-            // then writes DISPCNT during early HDraw of the next line.
-            // Real HW shows the BG turning on partway through that
-            // single scanline ("BG-enable latch glitch"), but ONLY
-            // when the BG-enable latch is still mid-drain -- i.e. the
-            // last disable was within 2 lines of the wait+enable line.
-            // Otherwise (latch fully off) re-enable produces no glitch.
+            const bool busyWaited = (hblankIrqRaiseAbsCycle >= 0)
+                && (lastHblankPollCycle >= hblankIrqRaiseAbsCycle);
+            // Delay: a write that committed during the origin line's HBlank
+            // (VCOUNT not yet advanced, vcdiff==0) and a busy-wait write that
+            // spun into the next line's HDraw both latch with the full
+            // 3-line pipeline (visible at write_line+3). A non-polling write
+            // that merely slipped into early HDraw of the next line
+            // (vcdiff==1, VCOUNT already advanced) latches one line sooner.
+            const bool spillover = (vcdiff == 1) && !busyWaited;
+            // Wait+enable BG glitch: a busy-wait enable committing in early
+            // HDraw of the next line catches that line partway ("BG-enable
+            // latch glitch") -- but only while the enable latch is still
+            // draining, i.e. BG was last rendered exactly 2 lines earlier
+            // (the bounding disable write landed on the immediately
+            // preceding line). A fully-settled latch re-enables cleanly.
             const bool waitEnable = (vcdiff == 1) && !inHBlank
-                                    && cycSinceIrq >= 250 && VCOUNT < 160;
+                                    && busyWaited && VCOUNT < 160;
             const bool latchStillDraining =
-                ((int)VCOUNT - lastBgDisableVCount) <= 2;
+                ((int)VCOUNT - lastBgDisableVCount) == 1;
             if (waitEnable && latchStillDraining) {
                 pendingBgGlitchBits = changeBGon;
                 pendingBgGlitchVCount = VCOUNT;
-                // Empirical splice column: faster handlers (lower
-                // cycSinceIrq) skip a couple of columns at the row
-                // start; slower handlers cover the full row from col 0.
-                // Tuned against mGBA's "Layer toggle 2" reference for
-                // case 0x40 (cycSinceIrq~263 -> col 2) and case 0x91
-                // (cycSinceIrq~274 -> col 0).
+                // Sub-line splice column: the busy-wait poll lands the write
+                // a few pixels into the row for faster commits (case 0x40)
+                // and at column 0 for slower ones (case 0x91), matching
+                // mGBA's "Layer toggle 2" reference.
                 pendingBgGlitchSpliceCol = (cycSinceIrq <= 270) ? 2 : 0;
             }
             layerEnableDelay = spillover ? 3 : 4;

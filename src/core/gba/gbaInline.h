@@ -114,6 +114,8 @@ extern int timer3ClockReload;
 extern int cpuTotalTicks;
 extern int64_t cpuAbsCycle;
 extern int64_t lcdNextEventAbsCycle;
+extern int64_t hblankIrqRaiseAbsCycle;
+extern int64_t lastHblankPollCycle;
 extern int64_t timerEnableAbsCycle[4];
 extern uint16_t timerReloadAtEnable[4];
 extern int gbaTimerEnablePhase(int n);
@@ -585,6 +587,14 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
                 if (cpuAbsCycle + bias >= lcdNextEventAbsCycle) {
                     value ^= 2;
                 }
+                // Record DISPSTAT reads so the DISPCNT-enable handler can
+                // tell a busy-wait handler (`while (DISPSTAT & HBL)`) from an
+                // immediate one. Mark on ANY read, not just HBlank=1: by the
+                // time IRQ latency lets the handler run, the HBlank flag may
+                // already have cleared, so the busy-wait's first read sees 0
+                // and exits -- but the read still happened, which is the
+                // latency-independent signal. See lastHblankPollCycle.
+                lastHblankPollCycle = cpuAbsCycle;
             }
         } else if ((address < 0x4000400) && ioReadable[address & 0x3fc]) {
             value = 0;
