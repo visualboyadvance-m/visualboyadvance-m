@@ -1298,6 +1298,7 @@ static INSN_REGPARM void thumb47(uint32_t opcode)
 {
     int base = (opcode >> 3) & 15;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
     UPDATE_OLDREG;
     reg[15].I = reg[base].I;
     if (reg[base].I & 1) {
@@ -1328,6 +1329,7 @@ static INSN_REGPARM void thumb48(uint32_t opcode)
     uint32_t address = (reg[15].I & 0xFFFFFFFC) + ((opcode & 0xFF) << 2);
     reg[regist].I = CPUReadMemoryQuick(address);
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
     { int _dt = dataTicksAccess32(address); int _dr = (address >> 24) & 15;
       clockTicks = busPrefetchRomFloor(3 + _dt + codeTicksAccess16(armNextPC),
                                        3 + _dt, 1, _dr < 0x02 || _dr >= 0x08);
@@ -1678,6 +1680,7 @@ static INSN_REGPARM void thumbBD(uint32_t opcode)
     reg[13].I = temp;
     THUMB_PREFETCH;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
     clockTicks += 3 + (codeTicksAccess16(armNextPC) * 2);
 }
 
@@ -1773,6 +1776,7 @@ static INSN_REGPARM void thumbC8(uint32_t opcode)
         clockTicks += codeTicksAccessSeq16(armNextPC)                   \
             + codeTicksAccess16(armNextPC) + 2;                         \
         busPrefetchCount = 0;                                           \
+        busPrefetchFrac = 0;                                            \
     }
 
 // BEQ offset
@@ -1868,6 +1872,7 @@ static INSN_REGPARM void thumbDF(uint32_t opcode)
     //clockTicks = codeTicksAccessSeq16(address)*2 + codeTicksAccess16(address)+3;
     clockTicks = 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
     CPUSoftwareInterrupt(opcode & 0xFF);
 }
 
@@ -1883,6 +1888,7 @@ static INSN_REGPARM void thumbE0(uint32_t opcode)
     THUMB_PREFETCH;
     clockTicks = codeTicksAccessSeq16(armNextPC) * 2 + codeTicksAccess16(armNextPC) + 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
 }
 
 static INSN_REGPARM void thumbE8([[maybe_unused]] uint32_t opcode)
@@ -1923,6 +1929,7 @@ static INSN_REGPARM void thumbF8(uint32_t opcode)
     THUMB_PREFETCH;
     clockTicks = codeTicksAccessSeq16(armNextPC) * 2 + codeTicksAccess16(armNextPC) + 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
 }
 
 // Instruction table //////////////////////////////////////////////////////

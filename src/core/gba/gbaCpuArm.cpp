@@ -1539,6 +1539,7 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     if (LIKELY((opcode & 0x0FFFFFF0) == 0x012FFF10)) {
         int base = opcode & 0x0F;
         busPrefetchCount = 0;
+        busPrefetchFrac = 0;
         armState = reg[base].I & 1 ? false : true;
         if (armState) {
             reg[15].I = reg[base].I & 0xFFFFFFFC;
@@ -2708,6 +2709,7 @@ static INSN_REGPARM void armA00(uint32_t opcode)
     ARM_PREFETCH;
     clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
 }
 
 // BL <offset>
@@ -2721,6 +2723,7 @@ static INSN_REGPARM void armB00(uint32_t opcode)
     ARM_PREFETCH;
     clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
 }
 
 #ifdef GP_SUPPORT
@@ -2750,6 +2753,7 @@ static INSN_REGPARM void armF00(uint32_t opcode)
 {
     clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
     busPrefetchCount = 0;
+    busPrefetchFrac = 0;
     CPUSoftwareInterrupt(opcode & 0x00FFFFFF);
 }
 

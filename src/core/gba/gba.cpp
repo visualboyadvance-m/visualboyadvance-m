@@ -190,6 +190,12 @@ uint32_t busPrefetchCount = 0;
 // (busPrefetchRomStall).
 int busPrefetchHalfwords = 0;
 int busPrefetchAccum = 0;
+// Persistent prefetch-buffer depth carry (mGBA lastPrefetchedPc model): the
+// fractional prefetch progress each ROM code-fetch leaves behind accumulates
+// here instead of being discarded, and completes an extra buffered halfword
+// once it reaches a full sequential fetch. Reset wherever busPrefetchCount is
+// hard-reset (branches, cart-bus data aborts, prefetch disable).
+int busPrefetchFrac = 0;
 int cpuDmaTicksToUpdate = 0;
 int cpuDmaCount = 0;
 bool cpuDmaRunning = false;

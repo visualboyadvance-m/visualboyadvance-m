@@ -54,6 +54,7 @@ extern bool busPrefetchEnable;
 extern uint32_t busPrefetchCount;     // legacy bitmask (kept for save/restore)
 extern int busPrefetchHalfwords;       // previous instruction's fractional prefetch progress
 extern int busPrefetchAccum;           // cycles accumulated toward next halfword
+extern int busPrefetchFrac;            // persistent prefetch-depth carry (mGBA model)
 extern int cpuNextEvent;
 extern bool holdState;
 extern uint32_t cpuPrefetch[2];
@@ -88,6 +89,7 @@ inline int dataTicksAccess16(uint32_t address) // DATA 8/16bits NON SEQ
     if ((addr >= 0x08) || (addr < 0x02)) {
         busPrefetchCount = 0;
         busPrefetch = false;
+        busPrefetchFrac = 0;
     } else if (busPrefetch) {
         int waitState = value;
         if (!waitState)
@@ -106,6 +108,7 @@ inline int dataTicksAccess32(uint32_t address) // DATA 32bits NON SEQ
     if ((addr >= 0x08) || (addr < 0x02)) {
         busPrefetchCount = 0;
         busPrefetch = false;
+        busPrefetchFrac = 0;
     } else if (busPrefetch) {
         int waitState = value;
         if (!waitState)
@@ -124,6 +127,7 @@ inline int dataTicksAccessSeq16(uint32_t address) // DATA 8/16bits SEQ
     if ((addr >= 0x08) || (addr < 0x02)) {
         busPrefetchCount = 0;
         busPrefetch = false;
+        busPrefetchFrac = 0;
     } else if (busPrefetch) {
         int waitState = value;
         if (!waitState)
@@ -142,6 +146,7 @@ inline int dataTicksAccessSeq32(uint32_t address) // DATA 32bits SEQ
     if ((addr >= 0x08) || (addr < 0x02)) {
         busPrefetchCount = 0;
         busPrefetch = false;
+        busPrefetchFrac = 0;
     } else if (busPrefetch) {
         int waitState = value;
         if (!waitState)
@@ -208,6 +213,13 @@ inline int codeTicksAccessSeq16(uint32_t address) // THUMB SEQ
         } else if (busPrefetchCount > 0xFF) {
             busPrefetchCount = 0;
             return memoryWait[addr];
+        } else if (busPrefetchFrac >= (memoryWaitSeq[addr] + 1)) {
+            // Fetch-bound sequential fetch, but the persistent prefetch
+            // reservoir (busPrefetchRomFloor) has buffered a full extra
+            // halfword: the opcode is already in the buffer, so this fetch
+            // is one waitstate cheaper (mGBA deep-prefetch behaviour).
+            busPrefetchFrac -= (memoryWaitSeq[addr] + 1);
+            return memoryWaitSeq[addr] - 1;
         } else
             return memoryWaitSeq[addr];
     } else {
@@ -269,7 +281,21 @@ inline int busPrefetchRomFloor(int legacy, int pure, int halfwords, bool cartDat
     if (surplus > 8)
         surplus = 8;
     busPrefetchCount |= (1u << surplus) - 1;
-    busPrefetchAccum = (pure - fetch) % (memoryWaitSeq[addr] + 1);
+    int frac = (pure - fetch) % (memoryWaitSeq[addr] + 1);
+    busPrefetchAccum = frac;
+    // mGBA lastPrefetchedPc model: the fractional prefetch progress this
+    // fetch leaves behind is not lost — it accumulates into a persistent
+    // reservoir that survives across the stores/ALU/loads of a straight-line
+    // ROM run (the per-instruction busPrefetchCount bits only track one
+    // pending halfword). The reservoir is *separate* from those bits, so the
+    // ordinary opcode consumers don't drain it; only a fetch-bound access
+    // that finds the single-halfword buffer empty taps it (see
+    // codeTicksAccessSeq16). Over a long run it fills deep enough that one
+    // later fetch hits a hot buffer — the C-loop +1. Capped at 8 halfworths.
+    busPrefetchFrac += frac;
+    int cap = (memoryWaitSeq[addr] + 1) * 8;
+    if (busPrefetchFrac > cap)
+        busPrefetchFrac = cap;
     return pure;
 }
 
