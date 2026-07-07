@@ -183,20 +183,26 @@ static const SuiteDesc* kSuites = reinterpret_cast<const SuiteDesc*>(kSuitesAuto
 static constexpr int kNumSuites = sizeof(kSuitesAuto) / sizeof(kSuitesAuto[0]);
 #else
 static const SuiteDesc kSuites[] = {
-    {"memory",        0x0803d798},
-    {"io-read",       0x0803cef4},
-    {"timing",        0x0804417c},
-    {"timers",        0x08043598},
-    {"timer-irq",     0x08043480},
-    {"shifter",       0x08042664},
-    {"carry",         0x0802dd60},
-    {"multiply-long", 0x08041cb8},
-    {"bios-math",     0x0802cbf4},
-    {"dma",           0x0802e258},
-    {"sio-read",      0x08042e28},
-    {"sio-timing",    0x080433e4},
-    {"misc-edge",     0x08041a88},
-    {"video",         0x080471ac},
+    // Fallback table matching the suite.gba/suite.elf shipped in this
+    // directory (gcc13 build). Normally unused: discover_suites_in_rom()
+    // resolves all 14 structs from the loaded ROM at runtime, and these
+    // values only serve as per-slot fallback if discovery misses one.
+    // Refresh via the "struct=" lines the runner prints, or
+    // `arm-none-eabi-objdump -t suite.elf` on the matching elf.
+    {"memory",        0x0803b6a8},
+    {"io-read",       0x0803ae04},
+    {"timing",        0x080420d4},
+    {"timers",        0x080414f0},
+    {"timer-irq",     0x080413d8},
+    {"shifter",       0x080405bc},
+    {"carry",         0x0802bc74},
+    {"multiply-long", 0x0803fc10},
+    {"bios-math",     0x0802ab0c},
+    {"dma",           0x0802c168},
+    {"sio-read",      0x08040d80},
+    {"sio-timing",    0x0804133c},
+    {"misc-edge",     0x0803f8dc},
+    {"video",         0x08045104},
 };
 static constexpr int kNumSuites = sizeof(kSuites) / sizeof(kSuites[0]);
 #endif
@@ -428,24 +434,77 @@ static void press_button(uint32_t mask, int hold_frames = 6) {
 //
 // From suite-master/src/main.c:
 //   IWRAM_DATA struct ActiveInfo activeTestInfo = { {'I','n','f','o'}, -1, -1, -1 };
-// Layout on ARM (packed/aligned, 4-byte members): int32 tag, int32 suiteId,
-// int32 testId, int32 subTestId. The .iwram section starts at 0x03000000 and
-// the linker places activeTestInfo first after any preceding IWRAM data.
-//
-// We resolve the address at runtime by scanning IWRAM for the 'Info' tag since
-// there can be multiple copies (IWRAM vs shadow). This avoids hardcoding.
+// The struct is 8 bytes (see the layout note below iwram_read_u8). Its IWRAM
+// address depends on the compiler used to build suite.gba: the linker places
+// it after whatever preceding IWRAM data that toolchain emits, so the same
+// source lands at different addresses per build (gcc13: 0x030000a8,
+// gcc15/suite-latest: 0x030000ac). locate_active_info() below selects the
+// address by fingerprinting the loaded ROM.
 static uint32_t g_active_info_addr = 0;
 
+// FNV-1a 64 over the loaded ROM image, used to key per-build constants.
+static uint64_t rom_fnv1a64() {
+    if (!g_rom) return 0;
+    const uint32_t size = (uint32_t)gbaGetRomSize();
+    uint64_t h = 0xcbf29ce484222325ull;
+    for (uint32_t i = 0; i < size; ++i) {
+        h ^= g_rom[i];
+        h *= 0x100000001b3ull;
+    }
+    return h;
+}
+
 static bool locate_active_info() {
-    // `activeTestInfo` is at a fixed IWRAM address in suite.gba (found via
-    // `arm-none-eabi-nm suite.elf`). Hardcoding avoids false positives from
-    // any other 'Info' ASCII strings that might live in IWRAM — for example
-    // the 'I','n','f','o' characters embedded in some message text. The
-    // former IWRAM scan returned a bogus address for test 2+ of the video
-    // suite because it matched such a copy instead of the struct itself.
-    g_active_info_addr = 0x030000ac;
-    uint32_t tag = iwram_read32(g_active_info_addr);
-    return tag == 0x6f666e49u;
+    // `activeTestInfo` sits at a fixed IWRAM address per suite.gba build
+    // (found via `arm-none-eabi-nm` on the matching suite.elf), and the
+    // address shifts between builds. Select it by fingerprinting the loaded
+    // ROM; known builds:
+    //   0x33be6dfef0f617d5  gcc13 build shipped in src/core/test  -> 0x030000a8
+    //   0x5c0226907bbefae2  suite-latest (gcc15)                  -> 0x030000ac
+    // For unknown builds, fall back to verifying the 'Info' tag at each
+    // known candidate. A free IWRAM scan is deliberately avoided: it
+    // previously matched 'Info' inside message text and returned a bogus
+    // address for video tests 2+.
+    struct KnownBuild { uint64_t fnv; uint32_t addr; };
+    static const KnownBuild kBuilds[] = {
+        { 0x33be6dfef0f617d5ull, 0x030000a8u },
+        { 0x5c0226907bbefae2ull, 0x030000acu },
+    };
+    static const uint32_t kCandidates[] = { 0x030000a8, 0x030000ac };
+
+    const uint64_t fnv = rom_fnv1a64();
+    for (const KnownBuild& b : kBuilds) {
+        if (b.fnv == fnv) {
+            g_active_info_addr = b.addr;
+            if (iwram_read32(g_active_info_addr) == 0x6f666e49u)
+                return true;
+            // Tag not (yet) present at the known address; report failure so
+            // the caller can surface it rather than reading garbage.
+            fprintf(stderr,
+                    "suite_runner: known ROM (fnv=%016llx) but no 'Info' tag "
+                    "at %08x\n",
+                    (unsigned long long)fnv, g_active_info_addr);
+            g_active_info_addr = 0;
+            return false;
+        }
+    }
+    // Unknown suite build: try the known candidate addresses by tag.
+    for (uint32_t addr : kCandidates) {
+        if (iwram_read32(addr) == 0x6f666e49u) {
+            g_active_info_addr = addr;
+            fprintf(stderr,
+                    "suite_runner: unknown suite build (fnv=%016llx), "
+                    "activeTestInfo located by tag at %08x\n",
+                    (unsigned long long)fnv, addr);
+            return true;
+        }
+    }
+    fprintf(stderr,
+            "suite_runner: unknown suite build (fnv=%016llx), activeTestInfo "
+            "not found; video-suite driving will be unreliable\n",
+            (unsigned long long)fnv);
+    g_active_info_addr = 0;
+    return false;
 }
 
 // The `ActiveInfo` struct in the test ROM (see suite-master/include/common.h)
