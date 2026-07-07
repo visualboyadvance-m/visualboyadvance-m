@@ -400,11 +400,12 @@ if(NOT DEFINED VBAM_TEST_GBA_MIN_PASS)
         "Floor PASS count for the GBA accuracy suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
-    # 57 of 58: everything passes except oam_bug 7-timing_effect, whose
-    # single-ROM print buffer is unbounded and self-corrupts under
-    # correct OAM-bug emulation (excluded upstream as a broken ROM; its
-    # test-7 logic passes inside the combined oam_bug.gb).
-    set(VBAM_TEST_GB_MIN_PASS 57 CACHE STRING
+    # 58 of 58. oam_bug 7-timing_effect's single-ROM print buffer is
+    # unbounded and self-corrupts under correct OAM-bug emulation; the
+    # runner repairs that ROM defect at load time (see
+    # patch_blargg_text_out_overflow in gb_suite_runner.cpp), letting
+    # the ROM's own CRC check verify the emulation and report Passed.
+    set(VBAM_TEST_GB_MIN_PASS 58 CACHE STRING
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
 
