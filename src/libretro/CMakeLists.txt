@@ -498,6 +498,46 @@ if(NOT WIN32)
     set_target_properties(vbam_libretro PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
+# --- Accuracy test: run mGBA's suite.gba through the libretro core ---
+#
+# The libretro core compiles its own copy of the emulator sources with
+# libretro-specific defines (__LIBRETRO__, NO_LINK, TILED_RENDERING, ...),
+# so accuracy regressions can hide here even when the desktop vbam-core
+# passes gba.suite. The harness dlopens the built core and drives it purely
+# through the libretro API (the same path RetroArch uses).
+#
+# Registered from this directory rather than src/core/test because src/core
+# is processed before src/libretro, so the vbam_libretro target does not
+# exist yet there. VBAM_TEST_GBA_ROM / VBAM_TEST_GBA_MIN_PASS are resolved
+# by src/core/test/CMakeLists.txt (see the test-ROM integration notes
+# there); the harness always runs with the HLE BIOS.
+if(BUILD_TESTING AND NOT WIN32
+   AND VBAM_TEST_GBA_ROM AND EXISTS "${VBAM_TEST_GBA_ROM}")
+    add_executable(libretro_suite_runner
+        ${VBAM_SRC_DIR}/core/test/libretro_suite_runner.cpp)
+    target_include_directories(libretro_suite_runner PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libretro-common/include)
+    target_link_libraries(libretro_suite_runner PRIVATE ${CMAKE_DL_LIBS})
+    add_dependencies(libretro_suite_runner vbam_libretro)
+
+    add_test(NAME gba.suite.libretro
+             COMMAND libretro_suite_runner
+                     --min-pass ${VBAM_TEST_GBA_MIN_PASS}
+                     $<TARGET_FILE:vbam_libretro>
+                     "${VBAM_TEST_GBA_ROM}")
+    # Same generous timeout as gba.suite: sanitizer-enabled CI runners are
+    # dramatically slower than a local release build.
+    set_tests_properties(gba.suite.libretro PROPERTIES
+        LABELS "gba;accuracy;libretro"
+        TIMEOUT 1800)
+    message(STATUS "vbam-core test: gba.suite.libretro enabled "
+        "(rom=${VBAM_TEST_GBA_ROM} floor=${VBAM_TEST_GBA_MIN_PASS})")
+elseif(BUILD_TESTING AND NOT WIN32)
+    message(STATUS
+        "vbam-core test: gba.suite.libretro SKIPPED — set VBAM_TEST_GBA_ROM \
+to enable")
+endif()
+
 # --- Upstream release zip ---
 if(UPSTREAM_RELEASE)
     if(WIN32)

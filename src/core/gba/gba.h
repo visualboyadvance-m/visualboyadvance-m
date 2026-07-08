@@ -147,6 +147,12 @@ extern int CPULoadRom(const char*);
 extern int CPULoadRomData(const char* data, int size);
 extern void doMirroring(bool);
 extern void CPUUpdateRegister(uint32_t, uint16_t);
+// Stand-alone (no link cable attached) SIO register write semantics,
+// shared between the link build (gbaLink.cpp falls back here when no link
+// driver is active) and the NO_LINK (libretro) build so both expose the
+// same CPU-visible serial-register behavior.
+extern void SioStandaloneSiocntWrite(uint16_t value);
+extern uint16_t SioStandaloneRcntWrite(uint16_t value, int multi_id);
 extern void applyTimer();
 extern void CPUInit(const char*, bool);
 void SetSaveType(int st);
@@ -241,6 +247,14 @@ enum MemoryRegion : uint8_t {
 
 #define JOYSTAT_RECV 2
 #define JOYSTAT_SEND 8
+
+// JOYCNT bits. gbaLink.h carries identical definitions for the link build;
+// they live here too so the NO_LINK (libretro) build can share the JOY-bus
+// register semantics in CPUUpdateRegister.
+#define JOYCNT_RESET 1
+#define JOYCNT_RECV_COMPLETE 2
+#define JOYCNT_SEND_COMPLETE 4
+#define JOYCNT_INT_ENABLE 0x40
 
 /*
 ** An enumeration of all IO registers.

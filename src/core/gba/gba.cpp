@@ -3972,6 +3972,79 @@ void CPUCheckDMA(int reason, int dmamask)
     }
 }
 
+// ---- Stand-alone (no link cable attached) SIO register semantics ----------
+//
+// The CPU-visible behavior of SIOCNT / RCNT writes when no link session is
+// running. gbaLink.cpp's StartLink/StartGPLink route here when no link
+// driver is active; the NO_LINK (libretro) build calls these directly from
+// CPUUpdateRegister. Keeping one implementation means both builds pass the
+// same mGBA suite sio-read / sio-timing tests.
+
+void SioStandaloneSiocntWrite(uint16_t siocnt)
+{
+    if (!g_ioMem)
+        return;
+
+    // Strip HW-owned / reserved bits according to the active SIO mode.
+    // Bit 15 is unused in every mode.
+    // Bits 4-6 are R/O hardware status in every mode (multiplayer ID +
+    // error in Multi; RxFull / TxEmpty / Error in UART; unused in
+    // Normal 8/32). CPU writes must not affect them.
+    // Bit 7 is Start/Busy in Normal/Multi (R/W) and Data Length in UART
+    // (R/W), so it is always preserved from the write: without real link
+    // hardware the transfer never progresses, so it stays set. (The old
+    // "pretend the transfer completed immediately and raise the IRQ"
+    // shortcut is gone; the cycle-accurate kSchedSio path in
+    // CPUUpdateRegister covers internal-clock Normal-8/32 completion.)
+    // In UART mode the Send-Data flag (bit 5) reads as 1 while nothing is
+    // being transmitted, which is the state at reset.
+    const uint32_t mode = (siocnt >> 12) & 0x3; // 0=N8,1=N32,2=Multi,3=UART
+    siocnt &= ~0x8000u;
+    siocnt &= ~0x0070u;
+    if (mode == 3)
+        siocnt |= 0x0020u;
+    UPDATE_REG(COMM_SIOCNT, siocnt);
+}
+
+uint16_t SioStandaloneRcntWrite(uint16_t value, int multi_id)
+{
+    if (!g_ioMem)
+        return 0;
+
+    // RCNT bits 9..13 are unused on hardware and always read as 0.
+    value &= 0xC1FFu;
+    // Per-mode masking of data-line bits 0..3:
+    //   * Normal-8 / Normal-32 mode (SIOCNT bits 12-13 = 00 or 01 with
+    //     RCNT[15:14] = 00): SC/SI are CPU-controlled, but SD (bit 1) and
+    //     SO (bit 3) are driven by the SIO hardware and read back as 0.
+    //   * JOY-bus mode (RCNT[15:14] = 11): SC (bit 0) and SD (bit 1) are
+    //     hardware-driven, read back as 0.
+    //   * Multiplayer, UART, and GP modes preserve all four data bits.
+    const uint16_t siocnt   = READ16LE(&g_ioMem[COMM_SIOCNT]);
+    const uint32_t sio_mode = (siocnt >> 12) & 0x3u;
+    const uint32_t rcnt_mode = (value >> 14) & 0x3u;
+    if (rcnt_mode == 0) {
+        if (sio_mode == 0 || sio_mode == 1)
+            value &= ~0x000Au; // clear bits 1 (SD) and 3 (SO)
+    } else if (rcnt_mode == 3) {
+        value &= ~0x0003u;     // clear bits 0 (SC) and 1 (SD)
+    }
+    UPDATE_REG(COMM_RCNT, value);
+
+    if (!value)
+        return value;
+
+    // Multiplayer mode: the ID / SD-ready status bits in SIOCNT are
+    // hardware-driven (SI=0 and ready for the master, ID from the cable
+    // for children — multi_id is 0 with no cable attached).
+    if (!(value & 0x8000) && sio_mode == 2) {
+        UPDATE_REG(COMM_SIOCNT,
+                   (siocnt & 0xff8b) | (multi_id ? 0xcu : 8u) |
+                       ((uint16_t)multi_id << 4));
+    }
+    return value;
+}
+
 void CPUUpdateRegister(uint32_t address, uint16_t value)
 {
     switch (address) {
@@ -4595,35 +4668,11 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 #ifndef NO_LINK
         StartLink(value);
 #else
-        if (!g_ioMem)
-            return;
-
-        if (value & 0x80) {
-            value &= 0xff7f;
-            // Only run the legacy "fire IRQ now" path when the cycle-
-            // accurate kSchedSio path is NOT handling this transfer.
-            // The cycle-accurate path covers Normal8/Normal32 with
-            // internal clock and plain RCNT; everything else (Multi,
-            // UART, external clock, GP/JOY RCNT modes) falls through
-            // to here. Without this guard, both paths run for
-            // Normal8/32 and the legacy IRQ raise dominates -- every
-            // SIO timing measurement comes back as a fixed ~94 cycles
-            // (just the SWI/handler dispatch latency) regardless of
-            // the programmed bit rate.
-            if (!cycle_accurate_path && (value & 1) && (value & 0x4000)) {
-                UPDATE_REG(COMM_SIOCNT, 0xFF);
-                IF |= 0x80;
-                UPDATE_REG(IO_REG_IF, IF);
-                CPUTestIRQ();
-                value &= 0x7f7f;
-            }
-        }
-        UPDATE_REG(COMM_SIOCNT, value);
+        SioStandaloneSiocntWrite(value);
 #endif
         break;
     }
 
-#ifndef NO_LINK
     case COMM_SIODATA8: {
         // Shared register:
         //   Normal-8 mode -- data to be transmitted (R/W).
@@ -4636,7 +4685,6 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             UPDATE_REG(COMM_SIODATA8, value);
         break;
     }
-#endif
 
     case IO_REG_KEYINPUT:
         P1 |= (value & 0x3FF);
@@ -4652,14 +4700,10 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 #ifndef NO_LINK
         StartGPLink(value);
 #else
-        if (!g_ioMem)
-            return;
-
-        UPDATE_REG(COMM_RCNT, value);
+        SioStandaloneRcntWrite(value, 0);
 #endif
         break;
 
-#ifndef NO_LINK
     case COMM_JOYCNT: {
         uint16_t cur = READ16LE(&g_ioMem[COMM_JOYCNT]);
 
@@ -4700,7 +4744,6 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
     case COMM_JOYSTAT:
         UPDATE_REG(COMM_JOYSTAT, (READ16LE(&g_ioMem[COMM_JOYSTAT]) & 0x0a) | (value & ~0x0a));
         break;
-#endif
 
     case IO_REG_IE:
         IE = value & 0x3FFF;

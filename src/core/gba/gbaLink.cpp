@@ -710,49 +710,10 @@ void StartLink(uint16_t siocnt)
 {
     if (!linkDriver || !linkDriver->start) {
         // Stand-alone (no real link cable) fallback. Some games rely on
-        // SIOCNT being updated so they don't hang, so we have to commit
-        // writes here, but applying proper hardware-side masking:
-        //
-        //   - Bit 15 is unused in every SIO mode → always read as 0.
-        //   - In Multiplayer mode bits 4-6 (ID + error) are hardware-owned.
-        //   - In UART mode bit 7 is unused (always 0); in Normal/Multi/MC
-        //     the CPU can set bit 7 to request a transfer, and without real
-        //     link hardware that transfer never progresses so bit 7 stays.
-        //
-        // The internal-clock + IRQ combination below is the "pretend the
-        // transfer completed immediately" shortcut VBA-M has always taken
-        // for single-player games that poll SIOCNT bit 7.
-        uint32_t mode = (siocnt >> 12) & 0x3; // 0=N8,1=N32,2=M,3=UART
-        bool is_uart = (mode == 3);
-        bool is_multi = (mode == 2);
-
-        // Strip HW-owned / reserved bits according to the active SIO mode.
-        // Bit 15 is unused in every mode.
-        // Bits 4-6 are R/O hardware status in every mode (multiplayer ID +
-        // error in Multi; RxFull / TxEmpty / Error in UART; unused in
-        // Normal 8/32). CPU writes must not affect them.
-        // Bit 7 is Start/Busy in Normal/Multi (R/W) and Data Length in
-        // UART (R/W), so it is always preserved from the write.
-        // In UART mode the Send-Data flag (bit 5) reads as 1 while nothing
-        // is being transmitted, which is the state at reset — we set it
-        // so the register readback matches hardware.
-        siocnt &= ~0x8000u;
-        siocnt &= ~0x0070u;
-        if (is_uart) {
-            siocnt |= 0x0020u;
-        }
-        (void)is_multi;
-
-        // NOTE: VBA-M previously shortcut the internal-clock transfer here
-        // by synthesizing an immediate IRQ and clearing bit 7 so polling
-        // single-player games wouldn't spin. That shortcut is inaccurate
-        // compared to real hardware (bit 7 stays set until the cable
-        // actually completes the round), and breaks mGBA's SIO register
-        // R/W tests. We now preserve bit 7 across all modes. Games that
-        // truly depend on the old synthetic completion would need a
-        // cycle-scheduled completion event, which is outside this change.
-
-        UPDATE_REG(COMM_SIOCNT, siocnt);
+        // SIOCNT being updated so they don't hang; the shared helper
+        // commits the write with proper hardware-side masking (also used
+        // by the NO_LINK / libretro build — see gba.cpp).
+        SioStandaloneSiocntWrite(siocnt);
         return;
     }
 
@@ -777,40 +738,15 @@ ConnectionState ConnectLinkUpdate(char* const message, size_t size)
 
 void StartGPLink(uint16_t value)
 {
-    // RCNT bits 9..13 are unused on hardware and always read as 0. Masking
-    // them here prevents writes from leaving stale 1s in those positions
-    // (which mGBA's SIO register R/W tests detect).
-    value &= 0xC1FFu;
-    // Per-mode masking of data-line bits 0..3:
-    //   * Normal-8 / Normal-32 mode (SIOCNT bits 12-13 = 00 or 01 with
-    //     RCNT[15:14] = 00): SC/SI are CPU-controlled, but SD (bit 1) and
-    //     SO (bit 3) are driven by the SIO hardware and read back as 0.
-    //   * JOY-bus mode (RCNT[15:14] = 11): SC (bit 0) and SD (bit 1) are
-    //     hardware-driven, read back as 0.
-    //   * Multiplayer, UART, and GP modes preserve all four data bits.
-    const uint32_t rcnt_mode = (value >> 14) & 0x3u;
-    if (rcnt_mode == 0) {
-        const uint16_t siocnt  = READ16LE(&g_ioMem[COMM_SIOCNT]);
-        const uint32_t sio_mode = (siocnt >> 12) & 0x3u;
-        if (sio_mode == 0 || sio_mode == 1)
-            value &= ~0x000Au; // clear bits 1 (SD) and 3 (SO)
-    } else if (rcnt_mode == 3) {
-        value &= ~0x0003u;     // clear bits 0 (SC) and 1 (SD)
-    }
-    UPDATE_REG(COMM_RCNT, value);
+    // The register-commit part (RCNT masking + the multiplayer-mode SIOCNT
+    // status bits) is shared with the NO_LINK / libretro build — see
+    // SioStandaloneRcntWrite in gba.cpp.
+    value = SioStandaloneRcntWrite(value, linkid);
 
     if (!value)
         return;
 
     switch (GetSIOMode(READ16LE(&g_ioMem[COMM_SIOCNT]), value)) {
-    case MULTIPLAYER:
-        value &= 0xc0f0;
-        value |= 3;
-        if (linkid)
-            value |= 4;
-        UPDATE_REG(COMM_SIOCNT, ((READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff8b) | (linkid ? 0xcu : 8u) | (linkid << 4u)));
-        break;
-
     case GP:
 #if (defined __WIN32__ || defined _WIN32)
         if (GetLinkMode() == LINK_RFU_IPC)
