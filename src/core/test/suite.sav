@@ -168,15 +168,6 @@ Timing test: Short DMA (32)
 Timing test: Short DMA (32/from ROM)
 Timing test: Short DMA (32/to ROM)
 Timing test: Short DMA (32/ROM to ROM)
-Timer IRQ test: FFFF
-Timer IRQ test: FFFE
-Timer IRQ test: FFFD
-Timer IRQ test: FFFC
-Timer IRQ test: FFFB
-Timer IRQ test: FFFA
-Timer IRQ test: FFF9
-Timer IRQ test: FFF8
-Timer IRQ test: FFF7
 Timer count-up test: 0b, 0x0001
 Timer count-up test: 0b, 0x0005
 Timer count-up test: 0b, 0x000C
@@ -203,6 +194,15 @@ Timer count-up test: 10b, 0x0010
 Timer count-up test: 10b, 0x0011
 Timer count-up test: 10b, 0x0012
 Timer count-up test: 10b, 0x0013
+Timer IRQ test: FFFF
+Timer IRQ test: FFFE
+Timer IRQ test: FFFD
+Timer IRQ test: FFFC
+Timer IRQ test: FFFB
+Timer IRQ test: FFFA
+Timer IRQ test: FFF9
+Timer IRQ test: FFF8
+Timer IRQ test: FFF7
 Shifter test: #0
 Shifter test: #FF
 Shifter test: #FF000000
@@ -340,6 +340,129 @@ Multiply Long test:  -1 * $81
 Multiply Long test: $7F * $81
 Multiply Long test: $80 * $81
 Multiply Long test: $81 * $81
+Math test: ArcTan 00000000
+Math test: ArcTan 00000001
+Math test: ArcTan 00003FFF
+Math test: ArcTan 00004000
+Math test: ArcTan 00004001
+Math test: ArcTan 00007FFF
+Math test: ArcTan 00008000
+Math test: ArcTan 00008001
+Math test: ArcTan 0000BFFF
+Math test: ArcTan 0000C000
+Math test: ArcTan 0000C001
+Math test: ArcTan 0000FFFF
+Math test: ArcTan FFFF0000
+Math test: ArcTan FFFF0001
+Math test: ArcTan FFFF3FFF
+Math test: ArcTan FFFF4000
+Math test: ArcTan FFFF4001
+Math test: ArcTan FFFF7FFF
+Math test: ArcTan FFFF8000
+Math test: ArcTan FFFF8001
+Math test: ArcTan FFFFBFFF
+Math test: ArcTan FFFFC000
+Math test: ArcTan FFFFC001
+Math test: ArcTan FFFFFFFF
+Math test: ArcTan2 00000000,00000000
+Math test: ArcTan2 00000001,00000000
+Math test: ArcTan2 00003FFF,00000000
+Math test: ArcTan2 00004000,00000000
+Math test: ArcTan2 00004001,00000000
+Math test: ArcTan2 00007FFF,00000000
+Math test: ArcTan2 00008000,00000000
+Math test: ArcTan2 00008001,00000000
+Math test: ArcTan2 0000BFFF,00000000
+Math test: ArcTan2 0000C000,00000000
+Math test: ArcTan2 0000C001,00000000
+Math test: ArcTan2 0000FFFF,00000000
+Math test: ArcTan2 FFFF0000,00000000
+Math test: ArcTan2 FFFF0001,00000000
+Math test: ArcTan2 FFFF3FFF,00000000
+Math test: ArcTan2 FFFF4000,00000000
+Math test: ArcTan2 FFFF4001,00000000
+Math test: ArcTan2 FFFF7FFF,00000000
+Math test: ArcTan2 FFFF8000,00000000
+Math test: ArcTan2 FFFF8001,00000000
+Math test: ArcTan2 FFFFBFFF,00000000
+Math test: ArcTan2 FFFFC000,00000000
+Math test: ArcTan2 FFFFC001,00000000
+Math test: ArcTan2 FFFFFFFF,00000000
+Math test: ArcTan2 00000000,00000001
+Math test: ArcTan2 00000001,00000001
+Math test: ArcTan2 00004000,00000001
+Math test: ArcTan2 00008000,00000001
+Math test: ArcTan2 0000C000,00000001
+Math test: ArcTan2 0000FFFF,00000001
+Math test: ArcTan2 FFFF0000,00000001
+Math test: ArcTan2 FFFF4000,00000001
+Math test: ArcTan2 FFFF8000,00000001
+Math test: ArcTan2 FFFFC000,00000001
+Math test: ArcTan2 FFFFFFFF,00000001
+Math test: ArcTan2 00000000,00004000
+Math test: ArcTan2 00000001,00004000
+Math test: ArcTan2 00004000,00004000
+Math test: ArcTan2 00008000,00004000
+Math test: ArcTan2 0000C000,00004000
+Math test: ArcTan2 0000FFFF,00004000
+Math test: ArcTan2 FFFF0000,00004000
+Math test: ArcTan2 FFFF0001,00004000
+Math test: ArcTan2 FFFF4000,00004000
+Math test: ArcTan2 FFFF8000,00004000
+Math test: ArcTan2 FFFFC000,00004000
+Math test: ArcTan2 FFFFFFFF,00004000
+Math test: ArcTan2 00000000,00008000
+Math test: ArcTan2 00000001,00008000
+Math test: ArcTan2 00004000,00008000
+Math test: ArcTan2 00008000,00008000
+Math test: ArcTan2 0000C000,00008000
+Math test: ArcTan2 0000FFFF,00008000
+Math test: ArcTan2 FFFF0000,00008000
+Math test: ArcTan2 FFFF0001,00008000
+Math test: ArcTan2 FFFF4000,00008000
+Math test: ArcTan2 FFFF8000,00008000
+Math test: ArcTan2 FFFFC000,00008000
+Math test: ArcTan2 FFFFFFFF,00008000
+Math test: ArcTan2 00000000,0000C000
+Math test: ArcTan2 00000001,0000C000
+Math test: ArcTan2 00004000,0000C000
+Math test: ArcTan2 00008000,0000C000
+Math test: ArcTan2 0000C000,0000C000
+Math test: ArcTan2 0000FFFF,0000C000
+Math test: ArcTan2 FFFF0000,0000C000
+Math test: ArcTan2 FFFF0001,0000C000
+Math test: ArcTan2 FFFF4000,0000C000
+Math test: ArcTan2 FFFF8000,0000C000
+Math test: ArcTan2 FFFFC000,0000C000
+Math test: ArcTan2 FFFFFFFF,0000C000
+Math test: ArcTan2 00000000,00010000
+Math test: ArcTan2 00000001,00010000
+Math test: ArcTan2 00004000,00010000
+Math test: ArcTan2 00008000,00010000
+Math test: ArcTan2 0000C000,00010000
+Math test: ArcTan2 0000FFFF,00010000
+Math test: ArcTan2 FFFF0000,00010000
+Math test: ArcTan2 FFFF0001,00010000
+Math test: ArcTan2 FFFF4000,00010000
+Math test: ArcTan2 FFFF8000,00010000
+Math test: ArcTan2 FFFFC000,00010000
+Math test: ArcTan2 FFFFFFFF,00010000
+Math test: ArcTan2 00000000,FFFF0000
+Math test: ArcTan2 00000001,FFFF0000
+Math test: ArcTan2 00004000,FFFF0000
+Math test: ArcTan2 00008000,FFFF0000
+Math test: ArcTan2 0000C000,FFFF0000
+Math test: ArcTan2 0000FFFF,FFFF0000
+Math test: ArcTan2 FFFF0000,FFFF0000
+Math test: ArcTan2 FFFF0001,FFFF0000
+Math test: ArcTan2 FFFF4000,FFFF0000
+Math test: ArcTan2 FFFF8000,FFFF0000
+Math test: ArcTan2 FFFFC000,FFFF0000
+Math test: ArcTan2 FFFFFFFF,FFFF0000
+Math test: Div 00000000/00000000
+Math test: Div 00000001/00000000
+Math test: Div FFFFFFFF/00000000
+Math test: Div 80000000/FFFFFFFF
 Math test: ArcTan 00000000
 Math test: ArcTan 00000001
 Math test: ArcTan 00003FFF
@@ -895,145 +1018,4 @@ DMA test: 1 HBl W =EWRAM/=IWRAM
 DMA test: 2 HBl W =EWRAM/=IWRAM
 DMA test: 3 HBl W =EWRAM/=IWRAM
 DMA test: 0 HBl W =EWRAM/=EWRAM
-DMA test: 1 HBl W =EWRAM/=EWRAM
-DMA test: 2 HBl W =EWRAM/=EWRAM
-DMA test: 3 HBl W =EWRAM/=EWRAM
-DMA test: 0 HBl W =EWRAM/=ROM
-DMA test: 1 HBl W =EWRAM/=ROM
-DMA test: 2 HBl W =EWRAM/=ROM
-DMA test: 3 HBl W =EWRAM/=ROM
-DMA test: 0 HBl W =ROM/=IWRAM
-DMA test: 1 HBl W =ROM/=IWRAM
-DMA test: 2 HBl W =ROM/=IWRAM
-DMA test: 3 HBl W =ROM/=IWRAM
-DMA test: 0 HBl W =ROM/=EWRAM
-DMA test: 1 HBl W =ROM/=EWRAM
-DMA test: 2 HBl W =ROM/=EWRAM
-DMA test: 3 HBl W =ROM/=EWRAM
-DMA test: 0 HBl W =ROM/=ROM
-DMA test: 1 HBl W =ROM/=ROM
-DMA test: 2 HBl W =ROM/=ROM
-DMA test: 3 HBl W =ROM/=ROM
-DMA test: 0 HBl W =BIOS/=IWRAM
-DMA test: 1 HBl W =BIOS/=IWRAM
-DMA test: 2 HBl W =BIOS/=IWRAM
-DMA test: 3 HBl W =BIOS/=IWRAM
-DMA test: 0 HBl W =BIOS/=EWRAM
-DMA test: 1 HBl W =BIOS/=EWRAM
-DMA test: 2 HBl W =BIOS/=EWRAM
-DMA test: 3 HBl W =BIOS/=EWRAM
-DMA test: 0 HBl W =BIOS/=ROM
-DMA test: 1 HBl W =BIOS/=ROM
-DMA test: 2 HBl W =BIOS/=ROM
-DMA test: 3 HBl W =BIOS/=ROM
-DMA test: 0 HBl W =SRAM/=IWRAM
-DMA test: 1 HBl W =SRAM/=IWRAM
-DMA test: 2 HBl W =SRAM/=IWRAM
-DMA test: 3 HBl W =SRAM/=IWRAM
-DMA test: 0 HBl W =SRAM/=EWRAM
-DMA test: 1 HBl W =SRAM/=EWRAM
-DMA test: 2 HBl W =SRAM/=EWRAM
-DMA test: 3 HBl W =SRAM/=EWRAM
-DMA test: 0 HBl W =SRAM/=ROM
-DMA test: 1 HBl W =SRAM/=ROM
-DMA test: 2 HBl W =SRAM/=ROM
-DMA test: 0 HBl H +IWRAM/=IWRAM
-DMA test: 1 HBl H +IWRAM/=IWRAM
-DMA test: 2 HBl H +IWRAM/=IWRAM
-DMA test: 3 HBl H +IWRAM/=IWRAM
-DMA test: 0 HBl H +IWRAM/=EWRAM
-DMA test: 1 HBl H +IWRAM/=EWRAM
-DMA test: 2 HBl H +IWRAM/=EWRAM
-DMA test: 3 HBl H +IWRAM/=EWRAM
-DMA test: 0 HBl H +IWRAM/=ROM
-DMA test: 1 HBl H +IWRAM/=ROM
-DMA test: 2 HBl H +IWRAM/=ROM
-DMA test: 3 HBl H +IWRAM/=ROM
-DMA test: 0 HBl H +EWRAM/=IWRAM
-DMA test: 1 HBl H +EWRAM/=IWRAM
-DMA test: 2 HBl H +EWRAM/=IWRAM
-DMA test: 3 HBl H +EWRAM/=IWRAM
-DMA test: 0 HBl H +EWRAM/=EWRAM
-DMA test: 1 HBl H +EWRAM/=EWRAM
-DMA test: 2 HBl H +EWRAM/=EWRAM
-DMA test: 3 HBl H +EWRAM/=EWRAM
-DMA test: 0 HBl H +EWRAM/=ROM
-DMA test: 1 HBl H +EWRAM/=ROM
-DMA test: 2 HBl H +EWRAM/=ROM
-DMA test: 3 HBl H +EWRAM/=ROM
-DMA test: 0 HBl H +ROM/=IWRAM
-DMA test: 1 HBl H +ROM/=IWRAM
-DMA test: 2 HBl H +ROM/=IWRAM
-DMA test: 3 HBl H +ROM/=IWRAM
-DMA test: 0 HBl H +ROM/=EWRAM
-DMA test: 1 HBl H +ROM/=EWRAM
-DMA test: 2 HBl H +ROM/=EWRAM
-DMA test: 3 HBl H +ROM/=EWRAM
-DMA test: 0 HBl H +ROM/=ROM
-DMA test: 1 HBl H +ROM/=ROM
-DMA test: 2 HBl H +ROM/=ROM
-DMA test: 3 HBl H +ROM/=ROM
-DMA test: 0 HBl H +BIOS/=IWRAM
-DMA test: 1 HBl H +BIOS/=IWRAM
-DMA test: 2 HBl H +BIOS/=IWRAM
-DMA test: 3 HBl H +BIOS/=IWRAM
-DMA test: 0 HBl H +BIOS/=EWRAM
-DMA test: 1 HBl H +BIOS/=EWRAM
-DMA test: 2 HBl H +BIOS/=EWRAM
-DMA test: 3 HBl H +BIOS/=EWRAM
-DMA test: 0 HBl H +BIOS/=ROM
-DMA test: 1 HBl H +BIOS/=ROM
-DMA test: 2 HBl H +BIOS/=ROM
-DMA test: 3 HBl H +BIOS/=ROM
-DMA test: 0 HBl H +SRAM/=IWRAM
-DMA test: 1 HBl H +SRAM/=IWRAM
-DMA test: 2 HBl H +SRAM/=IWRAM
-DMA test: 3 HBl H +SRAM/=IWRAM
-DMA test: 0 HBl H +SRAM/=EWRAM
-DMA test: 1 HBl H +SRAM/=EWRAM
-DMA test: 2 HBl H +SRAM/=EWRAM
-DMA test: 3 HBl H +SRAM/=EWRAM
-DMA test: 0 HBl H +SRAM/=ROM
-DMA test: 1 HBl H +SRAM/=ROM
-DMA test: 2 HBl H +SRAM/=ROM
-DMA test: 0 HBl W +IWRAM/=IWRAM
-DMA test: 1 HBl W +IWRAM/=IWRAM
-DMA test: 2 HBl W +IWRAM/=IWRAM
-DMA test: 3 HBl W +IWRAM/=IWRAM
-DMA test: 0 HBl W +IWRAM/=EWRAM
-DMA test: 1 HBl W +IWRAM/=EWRAM
-DMA test: 2 HBl W +IWRAM/=EWRAM
-DMA test: 3 HBl W +IWRAM/=EWRAM
-DMA test: 0 HBl W +IWRAM/=ROM
-DMA test: 1 HBl W +IWRAM/=ROM
-DMA test: 2 HBl W +IWRAM/=ROM
-DMA test: 3 HBl W +IWRAM/=ROM
-DMA test: 0 HBl W +EWRAM/=IWRAM
-DMA test: 1 HBl W +EWRAM/=IWRAM
-DMA test: 2 HBl W +EWRAM/=IWRAM
-DMA test: 3 HBl W +EWRAM/=IWRAM
-DMA test: 0 HBl W +EWRAM/=EWRAM
-DMA test: 1 HBl W +EWRAM/=EWRAM
-DMA test: 2 HBl W +EWRAM/=EWRAM
-DMA test: 3 HBl W +EWRAM/=EWRAM
-DMA test: 0 HBl W +EWRAM/=ROM
-DMA test: 1 HBl W +EWRAM/=ROM
-DMA test: 2 HBl W +EWRAM/=ROM
-DMA test: 3 HBl W +EWRAM/=ROM
-DMA test: 0 HBl W +ROM/=IWRAM
-DMA test: 1 HBl W +ROM/=IWRAM
-DMA test: 2 HBl W +ROM/=IWRAM
-DMA test: 3 HBl W +ROM/=IWRAM
-DMA test: 0 HBl W +ROM/=EWRAM
-DMA test: 1 HBl W +ROM/=EWRAM
-DMA test: 2 HBl W +ROM/=EWRAM
-DMA test: 3 HBl W +ROM/=EWRAM
-DMA test: 0 HBl W +ROM/=ROM
-DMA test: 1 HBl W +ROM/=ROM
-DMA test: 2 HBl W +ROM/=ROM
-DMA test: 3 HBl W +ROM/=ROM
-DMA test: 0 HBl W +BIOS/=IWRAM
-DMA test: 1 HBl W +BIOS/=IWRAM
-DMA test: 2 HBl W +BIOS/=IWRAM
-DMA test: 3 HBl W +BIOS/=IWRAM
-DMA test: 3 Imm 
+Break: Got 0x10002A

@@ -2618,12 +2618,10 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
 EVT_HANDLER(Printer, "Enable printer emulation")
 {
     GetMenuOptionInt("Printer", &coreOptions.gbPrinterEnabled, 1);
-#if (defined __WIN32__ || defined _WIN32)
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
 #else
     gbSerialFunction = NULL;
-#endif
 #endif
     if (coreOptions.gbPrinterEnabled)
         gbSerialFunction = gbPrinterSend;

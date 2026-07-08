@@ -105,14 +105,40 @@ std::string IP_LINK_BIND_ADDRESS = "*";
     } while (0)
 #define WAIT_TIMEOUT -1
 
+static uint32_t GetTickCount()
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint32_t)((uint64_t)ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
+
+// The GB/RFU IPC paths use the named link semaphores as event-style wakeups.
+static void SetEvent(sem_t* s)
+{
+    sem_post(s);
+}
+
+static void ResetEvent(sem_t* s)
+{
+    while (sem_trywait(s) == 0)
+        ;
+}
+
 #ifdef HAVE_SEM_TIMEDWAIT
 
 int WaitForSingleObject(sem_t* s, int t)
 {
+    if (t <= 0)
+        return sem_trywait(s) ? WAIT_TIMEOUT : 0;
+
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += t / 1000;
     ts.tv_nsec += (t % 1000) * 1000000;
+    if (ts.tv_nsec >= 1000000000) {
+        ts.tv_sec++;
+        ts.tv_nsec -= 1000000000;
+    }
     do {
         if (!sem_timedwait(s, &ts))
             return 0;
@@ -147,6 +173,11 @@ static void alrmhand(int sig)
 #endif
 int WaitForSingleObject(sem_t* s, int t)
 {
+    // A zero timeout with the itimer scheme below would disarm the timer
+    // and block forever; poll instead.
+    if (t <= 0)
+        return sem_trywait(s) ? WAIT_TIMEOUT : 0;
+
 #if !TIMEDWAIT_ALRM
     struct timeval ts;
     gettimeofday(&ts, NULL);
@@ -344,8 +375,6 @@ bool EmuReseted = true;
 bool LinkIsWaiting = false;
 bool LinkFirstTime = true;
 
-#if (defined _WIN32)
-
 static ConnectionState InitIPC();
 static void StartCableIPC(uint16_t siocnt);
 static void ReconnectCableIPC();
@@ -353,8 +382,6 @@ static void UpdateCableIPC(int ticks);
 static void StartRFU(uint16_t siocnt);
 static void UpdateRFUIPC(int ticks);
 static void CloseIPC();
-
-#endif
 
 struct LinkDriver {
     typedef ConnectionState(ConnectFunc)();
@@ -381,11 +408,9 @@ static GBASockClient* dol = NULL;
 static sf::IpAddress joybusHostAddr = sf::IpAddress::LocalHost;
 
 static const LinkDriver linkDrivers[] = {
-#if (defined __WIN32__ || defined _WIN32)
     { LINK_CABLE_IPC, InitIPC, NULL, StartCableIPC, UpdateCableIPC, CloseIPC, false },
     { LINK_RFU_IPC, InitIPC, NULL, StartRFU, UpdateRFUIPC, CloseIPC, false },
     { LINK_GAMEBOY_IPC, InitIPC, NULL, NULL, NULL, CloseIPC, false },
-#endif
     { LINK_CABLE_SOCKET, InitSocket, ConnectUpdateSocket, StartCableSocket, UpdateCableSocket, CloseSocket, true },
     { LINK_RFU_SOCKET, InitSocket, ConnectUpdateRFUSocket, StartRFUSocket, UpdateRFUSocket, CloseSocket, true },
     { LINK_GAMECUBE_DOLPHIN, JoyBusConnect, NULL, NULL, JoyBusUpdate, JoyBusShutdown, false },
@@ -417,17 +442,19 @@ class CableServer {
     uint16_t* uint16_tinbuffer;
     int32_t* intoutbuffer;
     uint16_t* uint16_toutbuffer;
-    int counter;
     [[maybe_unused]] int done;
 
 public:
     sf::TcpSocket tcpsocket[4];
     sf::IpAddress udpaddr[4] = { sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0} };
+    // replies still owed to us from exchanges that timed out
+    int gb_pending;
     CableServer(void);
     void Send(void);
     void Recv(void);
     void SendGB(void);
-    bool RecvGB(void);
+    bool RecvGB(int timeout_ms);
+    bool ExchangeGB(uint8_t b, int timeout_ms);
 };
 
 class CableClient {
@@ -443,11 +470,14 @@ public:
     sf::IpAddress serveraddr{0};
     unsigned short serverport;
     bool transferring;
+    // replies still owed to us from exchanges that timed out
+    int gb_pending;
     CableClient(void);
     void Send(void);
     void Recv(void);
     void SendGB(void);
-    bool RecvGB(void);
+    bool RecvGB(int timeout_ms);
+    bool ExchangeGB(uint8_t b, int timeout_ms);
     void CheckConn(void);
 };
 
@@ -748,10 +778,8 @@ void StartGPLink(uint16_t value)
 
     switch (GetSIOMode(READ16LE(&g_ioMem[COMM_SIOCNT]), value)) {
     case GP:
-#if (defined __WIN32__ || defined _WIN32)
         if (GetLinkMode() == LINK_RFU_IPC)
             rfu_state = RFU_INIT;
-#endif
         break;
     }
 }
@@ -798,6 +826,7 @@ CableServer::CableServer(void)
     uint16_tinbuffer = (uint16_t*)inbuffer;
     intoutbuffer = (int32_t*)outbuffer;
     uint16_toutbuffer = (uint16_t*)outbuffer;
+    gb_pending = 0;
 }
 
 void CableServer::Send(void)
@@ -881,63 +910,63 @@ void CableServer::Recv(void)
 
 void CableServer::SendGB(void)
 {
-    if (counter == 0)
-        return;
-
-    if (lanlink.type == 0) { // TCP
-        if (lanlink.numslaves == 1) {
-            if (lanlink.type == 0) {
-                (void)tcpsocket[1].send(&cable_gb_data[0], 1);
-            }
-        }
+    if (lanlink.type == 0 && lanlink.numslaves == 1) { // TCP
+        (void)tcpsocket[1].send(&cable_gb_data[0], 1);
     }
-    counter = 0;
 }
 
-// Receive data from all slaves to master
-bool CableServer::RecvGB(void)
+// Receive one byte from the slave into cable_gb_data[1]
+bool CableServer::RecvGB(int timeout_ms)
 {
-    if (counter == 1)
+    if (lanlink.type != 0 || lanlink.numslaves != 1)
         return false;
 
-    int numbytes = 0;
-    if (lanlink.type == 0) { // TCP
-        fdset.clear();
+    fdset.clear();
+    fdset.add(tcpsocket[1]);
 
-        for (int i = 0; i < lanlink.numslaves; i++)
-            fdset.add(tcpsocket[i + 1]);
+    // sf::Time::Zero means "wait forever" to the selector, so always give
+    // the poll case a real (minimal) timeout
+    if (fdset.wait(sf::milliseconds(timeout_ms > 0 ? timeout_ms : 1)) == 0)
+        return false;
 
-        if (fdset.wait(sf::milliseconds(1)) == 0) {
-            return false;
-        }
+    uint8_t recv_byte = 0;
+    size_t nr = 0;
+    sf::Socket::Status status = tcpsocket[1].receive(&recv_byte, 1, nr);
 
-        for (int i = 0; i < lanlink.numslaves; i++) {
-            numbytes = 0;
-            uint8_t recv_byte = 0;
-
-            size_t nr;
-            (void)tcpsocket[i + 1].receive(&recv_byte, 1, nr);
-            numbytes += (int)nr;
-
-            if (numbytes != 0)
-                counter = 1;
-
-            if (inbuffer[1] == -32) {
-                char message[30];
-                snprintf(message, sizeof(message), _("Player %d disconnected."), i + 2);
-                systemScreenMessage(message);
-                for (i = 1; i < lanlink.numslaves; i++) {
-                    tcpsocket[i].disconnect();
-                }
-                CloseLink();
-                return false;
-            }
-            if (numbytes > 0)
-                cable_gb_data[i + 1] = recv_byte;
-        }
+    if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
+        systemScreenMessage(_("Player 2 disconnected."));
+        tcpsocket[1].disconnect();
+        CloseLink();
+        return false;
     }
 
-    return numbytes != 0;
+    if (status != sf::Socket::Status::Done || nr == 0)
+        return false;
+
+    cable_gb_data[1] = recv_byte;
+    return true;
+}
+
+// Master-side transfer: send our byte and wait for the slave's reply.
+// Late replies from timed-out exchanges are drained first so the byte
+// stream stays aligned with the transfers.
+bool CableServer::ExchangeGB(uint8_t b, int timeout_ms)
+{
+    while (gb_pending > 0 && RecvGB(0))
+        gb_pending--;
+
+    cable_gb_data[0] = b;
+    SendGB();
+
+    if (GetLinkMode() == LINK_DISCONNECTED)
+        return false;
+
+    if (RecvGB(timeout_ms))
+        return true;
+
+    if (GetLinkMode() != LINK_DISCONNECTED)
+        gb_pending++;
+    return false;
 }
 
 // Client
@@ -948,6 +977,7 @@ CableClient::CableClient(void)
     intoutbuffer = (int32_t*)outbuffer;
     uint16_toutbuffer = (uint16_t*)outbuffer;
     transferring = false;
+    gb_pending = 0;
     return;
 }
 
@@ -981,47 +1011,59 @@ void CableClient::CheckConn(void)
     return;
 }
 
-bool CableClient::RecvGB(void)
+// Receive one byte from the server into cable_gb_data[0]
+bool CableClient::RecvGB(int timeout_ms)
 {
-    if (!transferring)
-        return false;
-
     fdset.clear();
-    // old code used socket # instead of mask again
     fdset.add(lanlink.tcpsocket);
-    // old code stripped off ms again
-    if (fdset.wait(sf::milliseconds(1)) == 0) {
+
+    // sf::Time::Zero means "wait forever" to the selector, so always give
+    // the poll case a real (minimal) timeout
+    if (fdset.wait(sf::milliseconds(timeout_ms > 0 ? timeout_ms : 1)) == 0)
         return false;
-    }
-    numbytes = 0;
-    size_t nr;
+
     uint8_t recv_byte = 0;
+    size_t nr = 0;
+    sf::Socket::Status status = lanlink.tcpsocket.receive(&recv_byte, 1, nr);
 
-    (void)lanlink.tcpsocket.receive(&recv_byte, 1, nr);
-    numbytes += (int)nr;
-
-    if (numbytes != 0)
-        transferring = false;
-
-    if (inbuffer[1] == -32) {
+    if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
         systemScreenMessage(_("Server disconnected."));
         CloseLink();
         return false;
     }
-    if (numbytes > 0)
-        cable_gb_data[0] = recv_byte;
 
-    return numbytes != 0;
+    if (status != sf::Socket::Status::Done || nr == 0)
+        return false;
+
+    cable_gb_data[0] = recv_byte;
+    return true;
 }
 
 void CableClient::SendGB()
 {
-    if (transferring)
-        return;
-
     (void)lanlink.tcpsocket.send(&cable_gb_data[1], 1);
+}
 
-    transferring = true;
+// Master-side transfer: send our byte and wait for the server's reply.
+// Late replies from timed-out exchanges are drained first so the byte
+// stream stays aligned with the transfers.
+bool CableClient::ExchangeGB(uint8_t b, int timeout_ms)
+{
+    while (gb_pending > 0 && RecvGB(0))
+        gb_pending--;
+
+    cable_gb_data[1] = b;
+    SendGB();
+
+    if (GetLinkMode() == LINK_DISCONNECTED)
+        return false;
+
+    if (RecvGB(timeout_ms))
+        return true;
+
+    if (GetLinkMode() != LINK_DISCONNECTED)
+        gb_pending++;
+    return false;
 }
 
 void CableClient::Recv(void)
@@ -1079,6 +1121,9 @@ static ConnectionState InitSocket()
     for (int i = 0; i < 4; i++) {
         cable_gb_data[i] = 0xff;
     }
+
+    ls.gb_pending = 0;
+    lc.gb_pending = 0;
 
     if (lanlink.server) {
         lanlink.connectedSlaves = 0;
@@ -1287,11 +1332,16 @@ static void UpdateCableSocket(int ticks)
 
 static void CloseSocket()
 {
+    // The GB byte stream has no framing, so the -32 goodbye marker used by
+    // the GBA protocol would be read back as transfer data; GB peers detect
+    // the plain TCP disconnect instead.
+    bool send_goodbye = GetLinkMode() != LINK_GAMEBOY_SOCKET;
+
     if (linkid) {
         char outbuffer[4];
         outbuffer[0] = 4;
         outbuffer[1] = -32;
-        if (lanlink.type == 0)
+        if (send_goodbye && lanlink.type == 0)
             (void)lanlink.tcpsocket.send(outbuffer, 4);
     } else {
         char outbuffer[12];
@@ -1299,7 +1349,7 @@ static void CloseSocket()
         outbuffer[0] = 12;
         outbuffer[1] = -32;
         for (i = 1; i <= lanlink.numslaves; i++) {
-            if (lanlink.type == 0) {
+            if (send_goodbye && lanlink.type == 0) {
                 (void)ls.tcpsocket[i].send(outbuffer, 12);
             }
             ls.tcpsocket[i].disconnect();
@@ -2529,9 +2579,7 @@ static void UpdateRFUSocket(int ticks)
 void gbInitLink()
 {
     if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
         gbInitLinkIPC();
-#endif
     } else {
         LinkIsWaiting = false;
         LinkFirstTime = true;
@@ -2551,22 +2599,14 @@ uint8_t gbStartLink(uint8_t b) //used on internal clock
 
     //Single Computer
     if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
         dat = gbStartLinkIPC(b);
-#endif
     } else {
         if (lanlink.numslaves == 1) {
             if (lanlink.server) {
-                cable_gb_data[0] = b;
-                ls.SendGB();
-
-                if (ls.RecvGB())
+                if (ls.ExchangeGB(b, linktimeout))
                     dat = cable_gb_data[1];
             } else {
-                cable_gb_data[1] = b;
-                lc.SendGB();
-
-                if (lc.RecvGB())
+                if (lc.ExchangeGB(b, linktimeout))
                     dat = cable_gb_data[0];
             }
 
@@ -2591,13 +2631,11 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
         if (gba_link_enabled) {
             //Single Computer
             if (GetLinkMode() == LINK_GAMEBOY_IPC) {
-#if (defined __WIN32__ || defined _WIN32)
                 return gbLinkUpdateIPC(b, gbSerialOn);
-#endif
             } else {
                 if (lanlink.numslaves == 1) {
                     if (lanlink.server) {
-                        recvd = ls.RecvGB() ? 1 : 0;
+                        recvd = ls.RecvGB(0) ? 1 : 0;
                         if (recvd) {
                             dat = cable_gb_data[1];
                             LinkIsWaiting = false;
@@ -2609,7 +2647,7 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                             ls.SendGB();
                         }
                     } else {
-                        recvd = lc.RecvGB() ? 1 : 0;
+                        recvd = lc.RecvGB(0) ? 1 : 0;
                         if (recvd) {
                             dat = cable_gb_data[0];
                             LinkIsWaiting = false;
@@ -2629,8 +2667,6 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
     }
     return ((dat << 8) | (recvd & (uint8_t)0xff));
 }
-
-#if (defined __WIN32__ || defined _WIN32)
 
 static ConnectionState InitIPC()
 {
@@ -2658,13 +2694,19 @@ static ConnectionState InitIPC()
         mmf = shm_open("/" LOCAL_LINK_NAME, O_RDWR, 0);
     } else
         vbaid = 0;
-    if (mmf < 0 || ftruncate(mmf, sizeof(LINKDATA)) < 0 || !(linkmem = (LINKDATA*)mmap(NULL, sizeof(LINKDATA), PROT_READ | PROT_WRITE, MAP_SHARED, mmf, 0))) {
+    // Only the creator may size the segment; on macOS a second ftruncate
+    // on an already-sized shm object fails with EINVAL.
+    if (mmf < 0 || (!vbaid && ftruncate(mmf, sizeof(LINKDATA)) < 0)
+        || (linkmem = (LINKDATA*)mmap(NULL, sizeof(LINKDATA), PROT_READ | PROT_WRITE, MAP_SHARED, mmf, 0)) == MAP_FAILED) {
         systemMessage(0, N_("Error creating file mapping"));
-        if (mmf) {
+        linkmem = NULL;
+        if (mmf >= 0) {
             if (!vbaid)
                 shm_unlink("/" LOCAL_LINK_NAME);
             close(mmf);
+            mmf = -1;
         }
+        return LINK_ERROR;
     }
 #endif
 
@@ -2719,6 +2761,10 @@ static ConnectionState InitIPC()
             return LINK_ERROR;
         }
 #else
+        if (firstone) {
+            // remove any stale semaphore left over from a crashed instance
+            sem_unlink(linkevent);
+        }
         if ((linksync[i] = sem_open(linkevent,
                  firstone ? O_CREAT | O_EXCL : 0,
                  0777, 0))
@@ -2726,11 +2772,13 @@ static ConnectionState InitIPC()
             if (firstone)
                 shm_unlink("/" LOCAL_LINK_NAME);
             munmap(linkmem, sizeof(LINKDATA));
+            linkmem = NULL;
             close(mmf);
-            for (j = 0; j < i; j++) {
-                sem_close(linksync[i]);
+            mmf = -1;
+            for (int j = 0; j < i; j++) {
+                sem_close(linksync[j]);
                 if (firstone) {
-                    linkevent[sizeof(linkevent) - 2] = (char)i + '1';
+                    linkevent[sizeof(linkevent) - 2] = (char)j + '1';
                     sem_unlink(linkevent);
                 }
             }
@@ -2949,8 +2997,9 @@ static void UpdateCableIPC(int)
             UPDATE_REG(COMM_RCNT, 0x22);
         }
 
-        // next cycle
-        transfer_direction = !transfer_direction;
+        // next cycle; this is a 1-based transfer counter here, not a
+        // SENDING/RECEIVING flag (see the > trgbas completion check below)
+        transfer_direction++;
     }
 
     if (transfer_direction > linkmem->trgbas && linktime >= trtimeend[transfer_direction - 3][tspeed]) {
@@ -3089,7 +3138,7 @@ static void StartRFU(uint16_t value)
                             //previous important data need to be received successfully before sending another important data
                             rfu_lasttime = GetTickCount(); //just to mark the last time a data being sent
                             if (!speedhack) {
-                                while (linkmem->numgbas >= 2 && linkmem->rfu_q[vbaid] > 1 && vbaid != gbaid && linkmem->rfu_signal[vbaid] && linkmem->rfu_signal[gbaid] && (GetTickCount() - rfu_lasttime) < (DWORD)linktimeout) {
+                                while (linkmem->numgbas >= 2 && linkmem->rfu_q[vbaid] > 1 && vbaid != gbaid && linkmem->rfu_signal[vbaid] && linkmem->rfu_signal[gbaid] && (GetTickCount() - rfu_lasttime) < (uint32_t)linktimeout) {
                                     if (!rfu_ishost)
                                         SetEvent(linksync[gbaid]);
                                     else //unlock other gba, allow other gba to move (sending their data)  //is max value of vbaid=1 ?
@@ -3130,7 +3179,7 @@ static void StartRFU(uint16_t value)
                             rfu_lasttime = GetTickCount();
                             if (!speedhack) {
                                 //2 players connected
-                                while (linkmem->numgbas >= 2 && linkmem->rfu_q[vbaid] > 1 && vbaid != gbaid && linkmem->rfu_signal[vbaid] && linkmem->rfu_signal[gbaid] && (GetTickCount() - rfu_lasttime) < (DWORD)linktimeout) {
+                                while (linkmem->numgbas >= 2 && linkmem->rfu_q[vbaid] > 1 && vbaid != gbaid && linkmem->rfu_signal[vbaid] && linkmem->rfu_signal[gbaid] && (GetTickCount() - rfu_lasttime) < (uint32_t)linktimeout) {
                                     if (!rfu_ishost)
                                         SetEvent(linksync[gbaid]); //unlock other gba, allow other gba to move (sending their data)  //is max value of vbaid=1 ?
                                     else
@@ -3961,7 +4010,7 @@ bool LinkRFUUpdate()
                         //c_s.Lock();
                         ok = linkmem->rfu_signal[vbaid] && linkmem->rfu_q[vbaid] > 1 && rfu_qsend > 1;
                         //c_s.Unlock();
-                        if (ok && (GetTickCount() - rfu_lasttime) < (DWORD)linktimeout) {
+                        if (ok && (GetTickCount() - rfu_lasttime) < (uint32_t)linktimeout) {
                             return false;
                         }
                         if (linkmem->rfu_q[vbaid] < 2 || rfu_qsend > 1) {
@@ -3974,7 +4023,7 @@ bool LinkRFUUpdate()
                         rfu_buf = 0x80000000;
                     } else {
 
-                        if (((rfu_cmd == 0x11 || rfu_cmd == 0x1a || rfu_cmd == 0x26) && (GetTickCount() - rfu_lasttime) < 16) || ((rfu_cmd == 0xa5 || rfu_cmd == 0xb5) && (GetTickCount() - rfu_lasttime) < 16) || ((rfu_cmd == 0xa7 || rfu_cmd == 0xb7) && (GetTickCount() - rfu_lasttime) < (DWORD)linktimeout)) {
+                        if (((rfu_cmd == 0x11 || rfu_cmd == 0x1a || rfu_cmd == 0x26) && (GetTickCount() - rfu_lasttime) < 16) || ((rfu_cmd == 0xa5 || rfu_cmd == 0xb5) && (GetTickCount() - rfu_lasttime) < 16) || ((rfu_cmd == 0xa7 || rfu_cmd == 0xb7) && (GetTickCount() - rfu_lasttime) < (uint32_t)linktimeout)) {
                             //c_s.Lock();
                             ok = (linkmem->rfu_listfront[vbaid] != linkmem->rfu_listback[vbaid]);
                             //c_s.Unlock();
@@ -4094,7 +4143,7 @@ uint8_t gbStartLinkIPC(uint8_t b) //used on internal clock
 uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
 {
     uint8_t dat = b; //0xff; //slave (w/ external clocks) won't be getting 0xff if master turned off
-    BOOL recvd = false;
+    bool recvd = false;
 
     gba_link_enabled = true; //(gbMemory[0xff02]!=0);
     rfu_enabled = false;
@@ -4180,5 +4229,3 @@ static void CloseIPC()
     close(mmf);
 #endif
 }
-
-#endif

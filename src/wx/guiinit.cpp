@@ -2066,7 +2066,6 @@ bool MainFrame::BindControls()
 
         if (!isv) {
             wxLogError(_("JoyBus host invalid; disabling"));
-        } else {
             link_mode = LINK_DISCONNECTED;
         }
     }

@@ -1018,12 +1018,10 @@ void GameArea::LoadGame(const wxString& name)
     mf->cmd_enable |= ONLOAD_CMDEN;
     mf->cmd_enable |= loaded == IMAGE_GB ? CMDEN_GB : (CMDEN_GBA | CMDEN_NGDB_GBA);
     mf->enable_menus();
-#if (defined __WIN32__ || defined _WIN32)
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
 #else
     gbSerialFunction = NULL;
-#endif
 #endif
 
     SuspendScreenSaver();
