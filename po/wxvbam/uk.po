@@ -2844,7 +2844,7 @@ msgstr "Гравця %d роз'єднано."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:937
 msgid "Player 2 disconnected."
-msgstr ""
+msgstr "Гравця 2 роз'єднано."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:997
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1030
