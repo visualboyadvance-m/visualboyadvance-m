@@ -385,6 +385,20 @@ _vbam_resolve_test_path(VBAM_TEST_GB_CGB_BIOS VBAM_TEST_GB_CGB_BIOS
 _vbam_resolve_test_path(VBAM_TEST_GB_DMG_BIOS VBAM_TEST_GB_DMG_BIOS
     "Optional DMG boot ROM (256 bytes) for gb_suite_runner")
 
+# When the user hasn't supplied (or otherwise fetched) a GBA suite ROM, build
+# one automatically: fetch a build-local devkitPro at configure time and
+# compile the latest mgba-emu/suite into <build>/.../suite.gba at build time.
+# Runs whenever BUILD_TESTING is on (this whole file is BUILD_TESTING-gated),
+# on Linux/macOS/Windows; unsupported hosts and any fetch/build prerequisite
+# that's missing degrade to "gba.suite skipped". NOTE: this builds the ROM from
+# the latest upstream source with the current devkitARM, so cycle-sensitive
+# sub-tests can drift by a cycle or two versus a pinned build -- keep
+# VBAM_TEST_GBA_MIN_PASS in step, or set VBAM_TEST_GBA_ROM to pin a known ROM.
+if(NOT VBAM_TEST_GBA_ROM)
+    include(GbaSuiteRom)
+    vbam_provision_mgba_suite(VBAM_TEST_GBA_ROM)
+endif()
+
 # Pass-count baselines for CI. The runners exit 0 if the actual PASS
 # count is >= the floor below, else exit 2 (regression). These floors
 # are the empirically-stable PASS counts in the current tree; bump
@@ -408,8 +422,10 @@ if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
 
-# GBA accuracy suite (mGBA suite.gba)
-if(VBAM_TEST_GBA_ROM AND EXISTS "${VBAM_TEST_GBA_ROM}")
+# GBA accuracy suite (mGBA suite.gba). The ROM either already exists (user- or
+# fetch-provided) or is produced at build time by the mgba_suite_rom target, in
+# which case it won't exist yet at configure time -- register the test anyway.
+if(VBAM_TEST_GBA_ROM AND (EXISTS "${VBAM_TEST_GBA_ROM}" OR TARGET mgba_suite_rom))
     set(_gba_args "--min-pass" "${VBAM_TEST_GBA_MIN_PASS}")
     if(VBAM_TEST_GBA_BIOS AND EXISTS "${VBAM_TEST_GBA_BIOS}")
         list(APPEND _gba_args "--bios" "${VBAM_TEST_GBA_BIOS}")

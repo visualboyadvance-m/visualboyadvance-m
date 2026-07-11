@@ -226,6 +226,13 @@ if(APPLE)
     endif()
 endif()
 
+# Default BUILD_TESTING to OFF unless the user explicitly requested it. Defining
+# the option here (before CTest's include(), which declares it ON) makes OFF the
+# default while still honoring an explicit -DBUILD_TESTING=ON. Tests pull in a
+# build-local devkitPro toolchain to build the mGBA suite ROM, so we don't want
+# that happening on ordinary builds that never opted in.
+option(BUILD_TESTING "Build the testing tree." OFF)
+
 include(CTest)
 include(FetchContent)
 include(GNUInstallDirs)
