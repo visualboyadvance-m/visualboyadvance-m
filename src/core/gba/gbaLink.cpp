@@ -4406,7 +4406,7 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
         if (dat == 0xff /*||dat==0x00||b==0x00*/) //dat==0xff||dat==0x00
             LinkFirstTime = true;
     }
-    return ((dat << 8) | (recvd & (uint8_t)0xff));
+    return ((dat << 8) | (recvd ? 1 : 0));
 }
 
 static void CloseIPC()
