@@ -6,6 +6,7 @@
 #include "core/apu/Gb_Apu.h"
 #include "core/apu/Multi_Buffer.h"
 #include "core/base/file_util.h"
+#include "core/base/null_sound_driver.h"
 #include "core/base/port.h"
 #include "core/base/sound_driver.h"
 #include "core/gba/gba.h"
@@ -723,8 +724,17 @@ bool soundInit()
     if (!soundDriver)
         return false;
 
-    if (!soundDriver->init(soundSampleRate))
-        return false;
+    if (!soundDriver->init(soundSampleRate)) {
+        // The selected driver failed to initialize (e.g. no working audio
+        // device, or one whose playback has stalled). Fall back to the null
+        // driver so emulation still runs, paced to real time, rather than
+        // failing outright.
+        soundDriver = std::make_unique<NullSoundDriver>();
+        if (!soundDriver->init(soundSampleRate)) {
+            soundDriver.reset();
+            return false;
+        }
+    }
 
     if (!stereo_buffer) {
         remake_stereo_buffer();

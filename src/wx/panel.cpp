@@ -828,8 +828,13 @@ void GameArea::LoadGame(const wxString& name)
         gb_effects_config.surround = OPTION(kSoundGBSurround);
         gb_effects_config.echo = (float)OPTION(kSoundGBEcho) / 100.0;
         gb_effects_config.stereo = (float)OPTION(kSoundGBStereo) / 100.0;
-        if (!soundInit()) {
-            wxLogError(_("Could not initialize the sound driver!"));
+        // soundInit() silently falls back to the null (timer-paced) driver when
+        // the selected driver can't initialize, so a failed audio device is not
+        // a fatal, user-facing error -- suppress the driver's error dialog while
+        // it tries.
+        {
+            wxLogNull no_sound_error_dialog;
+            soundInit();
         }
         soundSetEnable(gopts.sound_en);
         gbSoundSetSampleRate(GetSampleRate());
@@ -972,8 +977,13 @@ void GameArea::LoadGame(const wxString& name)
 
         doMirroring(coreOptions.mirroringEnable);
         // start sound; this must happen before CPU stuff
-        if (!soundInit()) {
-            wxLogError(_("Could not initialize the sound driver!"));
+        // soundInit() silently falls back to the null (timer-paced) driver when
+        // the selected driver can't initialize, so a failed audio device is not
+        // a fatal, user-facing error -- suppress the driver's error dialog while
+        // it tries.
+        {
+            wxLogNull no_sound_error_dialog;
+            soundInit();
         }
         soundSetEnable(gopts.sound_en);
         soundSetSampleRate(GetSampleRate());
@@ -1881,8 +1891,13 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
     if (schedule_audio_restart_) {
         soundShutdown();
-        if (!soundInit()) {
-            wxLogError(_("Could not initialize the sound driver!"));
+        // soundInit() silently falls back to the null (timer-paced) driver when
+        // the selected driver can't initialize, so a failed audio device is not
+        // a fatal, user-facing error -- suppress the driver's error dialog while
+        // it tries.
+        {
+            wxLogNull no_sound_error_dialog;
+            soundInit();
         }
         schedule_audio_restart_ = false;
     }

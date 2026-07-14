@@ -13,6 +13,7 @@
 #include "components/filters_cgb/filters_cgb.h"
 #include "components/filters_interframe/interframe.h"
 #include "core/base/check.h"
+#include "core/base/null_sound_driver.h"
 #include "core/base/system.h"
 #include "core/base/file_util.h"
 #include "core/base/sizes.h"
@@ -2335,6 +2336,10 @@ uint32_t systemGetClock(void)
 std::unique_ptr<SoundDriver> systemSoundInit(void)
 {
     soundShutdown();
+    struct retro_variable var = { "vbam_audio_driver", NULL };
+    if (environ_cb && environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) &&
+        var.value && strcmp(var.value, "null") == 0)
+        return std::make_unique<NullSoundDriver>();
     return std::make_unique<SoundRetro>();
 }
 

@@ -208,6 +208,38 @@ bool DirectSound::init(long sampleRate) {
         return false;
     }
 
+    // Verify the secondary buffer's play cursor actually advances. Some
+    // endpoints (seen with certain virtual / basic-render audio devices) report
+    // DSBSTATUS_PLAYING but never move the cursor; write() would then block
+    // forever draining a buffer that never empties, hanging emulation. Detect
+    // that here so soundInit() can fall back to the null driver instead. The
+    // buffer is silent and reset afterwards, so normal playback is unaffected.
+    if (FAILED(hr = dsbSecondary->Play(0, 0, DSBPLAY_LOOPING))) {
+        wxLogError(_("Cannot Play secondary %08x"), hr);
+        return false;
+    }
+    {
+        DWORD probe_start = 0, probe_now = 0;
+        dsbSecondary->GetCurrentPosition(&probe_start, NULL);
+        bool advanced = false;
+        for (int probe = 0; probe < 10 && !advanced; ++probe) {
+            Sleep(20);  // up to ~200ms total before declaring the device stalled
+            if (SUCCEEDED(dsbSecondary->GetCurrentPosition(&probe_now, NULL)) &&
+                probe_now != probe_start)
+                advanced = true;
+        }
+        dsbSecondary->Stop();
+        dsbSecondary->SetCurrentPosition(0);
+        soundNextPosition = 0;
+        if (!advanced) {
+            // Silent: soundInit() falls back to the null driver. Log only to
+            // the debug log so no error/warning dialog is shown to the user.
+            wxLogDebug(wxT("DirectSound playback cursor not advancing; "
+                           "falling back to the null sound driver."));
+            return false;
+        }
+    }
+
     return true;
 }
 

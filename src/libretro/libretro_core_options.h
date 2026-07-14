@@ -267,6 +267,20 @@ struct retro_core_option_v2_definition option_defs_us[] = {
         "enabled"
     },
     {
+        "vbam_audio_driver",
+        "Audio Driver",
+        NULL,
+        "Selects the audio output backend. \"None\" outputs no audio and only paces emulation with a timer; it is also used automatically if the normal driver fails to initialize. Core needs to be restarted for changes to apply.",
+        NULL,
+        "audio",
+        {
+            { "normal", "Normal" },
+            { "null",   "None (timer paced)" },
+            { NULL, NULL },
+        },
+        "normal"
+    },
+    {
         "vbam_soundfiltering",
         "(GBA) Sound Filtering",
         NULL,

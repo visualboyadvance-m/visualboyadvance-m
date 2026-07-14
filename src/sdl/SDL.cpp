@@ -119,6 +119,7 @@
 #include "components/user_config/user_config.h"
 #include "core/base/file_util.h"
 #include "core/base/message.h"
+#include "core/base/null_sound_driver.h"
 #include "core/base/patch.h"
 #include "core/base/version.h"
 #include "core/gb/gb.h"
@@ -2923,6 +2924,9 @@ uint8_t systemGetSensorDarkness()
 
 std::unique_ptr<SoundDriver> systemSoundInit() {
     soundShutdown();
+
+    if (useNullSoundDriver)
+        return std::make_unique<NullSoundDriver>();
 
     return std::make_unique<SoundSDL>();
 }

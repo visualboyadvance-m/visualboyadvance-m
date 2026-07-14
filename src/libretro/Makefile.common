@@ -33,6 +33,7 @@ SOURCES_CXX += \
 	$(CORE_DIR)/core/base/internal/file_util_internal.cpp \
 	$(CORE_DIR)/core/base/file_util_common.cpp \
 	$(CORE_DIR)/core/base/file_util_libretro.cpp \
+	$(CORE_DIR)/core/base/null_sound_driver.cpp \
 	$(CORE_DIR)/core/base/script_hooks.cpp
 
 SOURCES_CXX += \

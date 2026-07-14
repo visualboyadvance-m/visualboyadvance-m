@@ -136,6 +136,7 @@ int disableStatusMessages = 0;
 int filter = kStretch2x;
 int frameSkip = 1;
 int fullScreen;
+int useNullSoundDriver = 0;
 int ifbType = kIFBNone;
 int openGL;
 int optFlashSize;
@@ -211,6 +212,7 @@ struct option argOptions[] = {
 	{ "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
 	{ "no-rtc", no_argument, &coreOptions.rtcEnabled, 0 },
 	{ "no-show-speed", no_argument, &showSpeed, 0 },
+	{ "null-sound", no_argument, &useNullSoundDriver, 1 },
 	{ "opengl", required_argument, 0, 'O' },
 	{ "opengl-bilinear", no_argument, &openGL, 2 },
 	{ "opengl-nearest", no_argument, &openGL, 1 },
@@ -353,6 +355,7 @@ void LoadConfig()
 	coreOptions.skipSaveGameCheats = ReadPref("skipSaveGameCheats", 0);
 	soundFiltering = (float)ReadPref("gbaSoundFiltering", 50) / 100.0f;
 	g_gbaSoundInterpolation = ReadPref("gbaSoundInterpolation", 1);
+	useNullSoundDriver = ReadPref("nullSound", 0);
 	coreOptions.throttle = ReadPref("throttle", 100);
 	if (coreOptions.throttle > kMaxThrottlePercent)
 		coreOptions.throttle = kMaxThrottlePercent;

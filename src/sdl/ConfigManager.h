@@ -17,6 +17,9 @@ extern int disableStatusMessages;
 extern int filter;
 extern int frameSkip;
 extern int fullScreen;
+// When set, use the null sound driver (no audio output; paces emulation with a
+// timer). Also selected automatically if the normal driver fails to init.
+extern int useNullSoundDriver;
 extern int ifbType;
 extern int openGL;
 extern int optFlashSize;

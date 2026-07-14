@@ -1,6 +1,9 @@
 #include "wx/audio/audio.h"
 
+#include <memory>
+
 #include "core/base/check.h"
+#include "core/base/null_sound_driver.h"
 #include "wx/audio/internal/sdl.h"
 
 #if defined(VBAM_ENABLE_OPENAL)
@@ -55,6 +58,10 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
             return audio::internal::GetCoreAudioDevices();
 #endif
 
+        case config::AudioApi::kNull:
+            // No device selection for the null driver.
+            return std::vector<AudioDevice>();
+
         case config::AudioApi::kLast:
         default:
             VBAM_NOTREACHED_RETURN(std::vector<AudioDevice>());
@@ -90,6 +97,9 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
         case config::AudioApi::kCoreAudio:
             return audio::internal::CreateCoreAudioDriver();
 #endif
+
+        case config::AudioApi::kNull:
+            return std::make_unique<NullSoundDriver>();
 
         case config::AudioApi::kLast:
         default:

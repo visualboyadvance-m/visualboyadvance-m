@@ -26,6 +26,7 @@ add_library(vbam_libretro SHARED
     ${VBAM_SRC_DIR}/core/base/internal/file_util_internal.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_common.cpp
     ${VBAM_SRC_DIR}/core/base/file_util_libretro.cpp
+    ${VBAM_SRC_DIR}/core/base/null_sound_driver.cpp
     ${VBAM_SRC_DIR}/core/base/script_hooks.cpp
 
     # APU

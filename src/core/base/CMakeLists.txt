@@ -31,6 +31,7 @@ target_sources(vbam-core-base
     internal/file_util_internal.h
     internal/memgzio.c
     internal/memgzio.h
+    null_sound_driver.cpp
     patch.cpp
     script_hooks.cpp
     version.cpp
@@ -41,6 +42,7 @@ target_sources(vbam-core-base
     file_util.h
     image_util.h
     message.h
+    null_sound_driver.h
     patch.h
     port.h
     ringbuffer.h

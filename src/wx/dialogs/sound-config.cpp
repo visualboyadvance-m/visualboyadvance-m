@@ -274,6 +274,14 @@ void SoundConfig::InitAdvancedTab() {
     audio_api_button->Hide();
 #endif
 
+    // The null driver outputs no audio (it only paces emulation). Always
+    // available, on every platform.
+    audio_api_button = GetValidatedChild("Null");
+    audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kNull));
+    audio_api_button->Bind(wxEVT_RADIOBUTTON,
+                           std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
+                                     config::AudioApi::kNull));
+
     upmix_checkbox_ = GetValidatedChild<wxCheckBox>("Upmix");
 #if defined(VBAM_ENABLE_XAUDIO2) || defined(VBAM_ENABLE_FAUDIO)
     upmix_checkbox_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kSoundUpmix));
