@@ -419,7 +419,7 @@ msgstr "加载 DisplayConfig 选项卡 '%s' 失败"
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
-msgstr ""
+msgstr "HDR 和 10-bit SDR 均不可用：未找到原生的 Wayland (Vulkan) 渲染器，因此显示回退到了 XWayland（仅支持 8-bit SDR）。"
 
 #: dialogs/display-config.cpp:814
 msgid "Invalid color correction profile"
@@ -1096,7 +1096,7 @@ msgstr "垂直同步在该平台上不可用 "
 
 #: panel.cpp:6104
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
-msgstr ""
+msgstr "HDR：无法创建 BT.2020 PQ 表面；回退至 SDR。"
 
 #: panel.cpp:6353
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
@@ -1143,7 +1143,7 @@ msgstr "获取 IDXGISwapChain3 失败：0x%08X"
 #: panel.cpp:6476
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
-msgstr ""
+msgstr "HDR：显示设备/交换链不支持 BT.2020 PQ；输出将为 SDR。"
 
 #: panel.cpp:6486
 #, c-format
@@ -1236,24 +1236,24 @@ msgstr "纹理上传失败"
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11：创建设备失败；简单渲染器将使用软件 (wx) 路径。"
 
 #: panel.cpp:7183
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "D3D11：创建交换链失败：0x%08X"
 
 #: panel.cpp:7249
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
-msgstr ""
+msgstr "D3D11：未找到 d3dcompiler_47.dll；简单渲染器将使用软件 (wx) 路径。"
 
 #: panel.cpp:7301
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11：Blit 着色器设置失败；简单渲染器将使用软件 (wx) 路径。"
 
 #: panel.cpp:7586
 msgid "Using Direct3D 9Ex (dynamically loaded)"
@@ -1375,16 +1375,16 @@ msgstr "录制视频时错误 (%s); 正在中止"
 
 #: panel.cpp:8465
 msgid "Renderer failed to initialize; trying the next available renderer."
-msgstr ""
+msgstr "渲染器初始化失败；正在尝试下一个可用渲染器。"
 
 #: panel.cpp:8473
 msgid "No renderer could be initialized."
-msgstr ""
+msgstr "无法初始化任何渲染器。"
 
 #: panel.cpp:8567
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
-msgstr ""
+msgstr "没有渲染器能够呈现 10-bit 深度色彩；本次会话将使用 8-bit。"
 
 #: panel.cpp:8605
 msgid "Metal is unavailable, defaulting to OpenGL"
@@ -1392,7 +1392,7 @@ msgstr "Metal 后端不可用，默认使用 OpenGL"
 
 #: panel.cpp:8618
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
-msgstr ""
+msgstr "在没有 EGL 的情况下，Wayland 上无法使用 OpenGL，将改用 Vulkan。"
 
 #: panel.cpp:8637
 msgid "Vulkan is unavailable, defaulting to OpenGL"
@@ -1445,11 +1445,11 @@ msgstr "创建 Vulkan Xlib 表面失败：%d"
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
-msgstr ""
+msgstr "Wayland：wl_compositor/wl_subcompositor 不可用；无法创建 Vulkan 子表面"
 
 #: panel.cpp:9883
 msgid "Wayland: failed to create Vulkan subsurface"
-msgstr ""
+msgstr "Wayland：无法创建 Vulkan 子表面"
 
 #: panel.cpp:9921
 #, c-format
@@ -1720,7 +1720,7 @@ msgstr "以全屏模式启动"
 
 #: wxvbam.cpp:1215
 msgid "Mute the audio for this session, without saving to the config"
-msgstr ""
+msgstr "将此会话的音频静音，且不保存至配置。"
 
 #: wxvbam.cpp:1218
 msgid "Set a configuration file"
@@ -1964,33 +1964,33 @@ msgstr "颜色校正配置文件"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:499
 msgid "Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)"
-msgstr ""
+msgstr "自动选择色彩校正配置文件（SDR 使用 sRGB，HDR 使用 Rec.2020）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:500
 msgid "Output HDR on supported displays and renderers"
-msgstr ""
+msgstr "在支持的显示器和渲染器上输出 HDR"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:502
 msgid "HDR diffuse (paper) white luminance, in nits"
-msgstr ""
+msgstr "HDR 漫反射（纸张）白亮度（单位：尼特）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:504
 msgid "HDR peak/highlight luminance, in nits"
-msgstr ""
+msgstr "HDR 峰值/高光亮度（单位：尼特）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:506
 msgid "Input level percentage above which HDR highlights ramp to peak"
-msgstr ""
+msgstr "HDR 高光开始向峰值亮度过渡的输入电平百分比阈值"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:508
 msgid ""
 "HDR shadow contrast as a percentage gamma (100 = neutral; higher deepens "
 "blacks)"
-msgstr ""
+msgstr "HDR 阴影对比度（以 Gamma 百分比表示；100 为中性；数值越高，黑色越深）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:511
 msgid "Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)"
-msgstr ""
+msgstr "在 OpenGL (X11) 中使用 10-bit 深度色彩 SDR 视觉效果（可减少色彩断层）"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:514
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -2859,7 +2859,7 @@ msgstr "玩家 %d 已断开连接。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:937
 msgid "Player 2 disconnected."
-msgstr ""
+msgstr "玩家 2 已断开连接。"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:997
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1030
@@ -3218,19 +3218,19 @@ msgstr "SDL 像素艺术滤镜"
 
 #: xrc/DisplayConfigBasic.xrc:94
 msgid "Output HDR (Wayland, Vulkan, D3D12, macOS)"
-msgstr ""
+msgstr "HDR 输出 (Wayland, Vulkan, D3D12, macOS)"
 
 #: xrc/DisplayConfigBasic.xrc:101
 msgid "HDR is not available: this display or renderer is not HDR capable."
-msgstr ""
+msgstr "HDR 不可用：此显示器或渲染器不支持 HDR。"
 
 #: xrc/DisplayConfigBasic.xrc:110
 msgid "10-bit deep color (reduces banding)"
-msgstr ""
+msgstr "10-bit 深度色彩（减少色彩断层）"
 
 #: xrc/DisplayConfigBasic.xrc:117
 msgid "10-bit deep color is not available: no 10-bit visual on this display."
-msgstr ""
+msgstr "无法使用 10-bit 深度色彩：此显示器不支持 10-bit 视觉显示。"
 
 #: xrc/DisplayConfigBasic.xrc:131
 msgid "Filters"
@@ -3346,19 +3346,19 @@ msgstr "很亮"
 
 #: xrc/DisplayConfigColorCorrection.xrc:127
 msgid "HDR White (nits):"
-msgstr ""
+msgstr "HDR 白色亮度 (nits)："
 
 #: xrc/DisplayConfigColorCorrection.xrc:143
 msgid "HDR Peak (nits):"
-msgstr ""
+msgstr "HDR 峰值亮度 (nits)："
 
 #: xrc/DisplayConfigColorCorrection.xrc:159
 msgid "HDR Highlight Knee:"
-msgstr ""
+msgstr "HDR 高光拐点："
 
 #: xrc/DisplayConfigColorCorrection.xrc:175
 msgid "HDR Shadow Contrast:"
-msgstr ""
+msgstr "HDR 阴影对比度："
 
 #: xrc/DisplayConfigOSD.xrc:9
 msgid "Speed indicator:"
