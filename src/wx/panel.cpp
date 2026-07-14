@@ -8609,10 +8609,15 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
             return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif
 #elif defined(__WXMSW__) && !defined(NO_D3D11)
-            // On Windows, Simple is backed by the D3D11 software-style driver
-            // (HDR-capable via a flip swapchain; falls back to the wx path if no
-            // device).
-            return new DX11DrawingPanel(this, basic_width, basic_height);
+            // On Windows, Simple is normally backed by the D3D11 software-style
+            // driver (HDR-capable via a flip swapchain). But on a machine with no
+            // hardware GPU the only D3D11 device available is WARP, and its
+            // flip-model present white-screens and hangs on the Microsoft Basic
+            // Display Adapter -- so drop straight to the plain wx GDI path there.
+            // HDR is unavailable without a GPU anyway, so nothing is lost.
+            if (VbamWindowsHasHardwareGpu())
+                return new DX11DrawingPanel(this, basic_width, basic_height);
+            return new BasicDrawingPanel(this, basic_width, basic_height);
 #else
             return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif
@@ -11271,13 +11276,22 @@ static bool VbamWindowsHdrSupportedButOff() {
     return false;
 }
 
-// True if the machine exposes a hardware graphics adapter. A box with only the
-// Microsoft Basic Render Driver (headless server, some VMs / RDP sessions) has
-// no GPU: every GPU render method fails there and only the Simple renderer's
-// software fallback works. Fails open (returns true) if DXGI cannot be queried,
-// so we force Simple only when we positively enumerate zero hardware adapters.
-// Cached -- GPU presence does not change during a run, and this is consulted on
-// every panel (re)creation.
+// True if the machine has a real hardware GPU capable of accelerated rendering.
+// Detected by DXGI adapter enumeration: a box whose only adapters are
+// Microsoft's software ones -- the "Basic Render Driver" / WARP and the "Basic
+// Display Adapter" -- has no usable GPU. Those all report Microsoft's vendor id
+// 0x1414, and/or the SOFTWARE flag, and/or a "Basic" description; a real GPU
+// reports its own vendor (0x10DE/0x1002/0x8086/...).
+//
+// We must NOT probe by creating a D3D11 device: on such a box
+// D3D11CreateDevice(D3D_DRIVER_TYPE_HARDWARE) *succeeds* at feature level 11_1
+// via a WARP-backed device, so it cannot tell a real GPU from the software
+// fallback. (Verified on the Microsoft Basic Display Adapter, which enumerates
+// two 0x1414 "Basic Render Driver" adapters -- one without the SOFTWARE flag.)
+// A GPU render method's flip-model present then white-screens and hangs there,
+// so callers route to the plain-wx Simple path instead. Fails open (returns
+// true) if DXGI can't be queried. Cached -- GPU presence does not change during
+// a run and this is consulted on every panel (re)creation.
 bool VbamWindowsHasHardwareGpu() {
     static const bool has_hw = [] () -> bool {
         typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
@@ -11290,7 +11304,6 @@ bool VbamWindowsHasHardwareGpu() {
             FreeLibrary(hDXGI);
             return true;
         }
-
         bool found_hw = true;  // fail open unless we enumerate and find none
         // COM objects must be released before FreeLibrary (their vtables live in
         // dxgi.dll), so keep them in an inner scope.
@@ -11303,20 +11316,20 @@ bool VbamWindowsHasHardwareGpu() {
                      factory->EnumAdapters1(a, &adapter) != DXGI_ERROR_NOT_FOUND; ++a) {
                     DXGI_ADAPTER_DESC1 desc{};
                     if (SUCCEEDED(adapter->GetDesc1(&desc))) {
-                        // Skip the WARP/software adapter and the Microsoft Basic
-                        // Render Driver (vendor 0x1414) -- what shows up when
-                        // there is no real GPU.
-                        const bool is_software =
+                        // Microsoft's software adapters: WARP / Basic Render
+                        // Driver (SOFTWARE flag) and the Basic Display Adapter --
+                        // all carry vendor id 0x1414 and/or a "Basic" description.
+                        const bool is_basic =
                             (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) ||
-                            desc.VendorId == 0x1414;
-                        if (!is_software)
+                            desc.VendorId == 0x1414 ||
+                            wcsstr(desc.Description, L"Basic") != nullptr;
+                        if (!is_basic)
                             found_hw = true;
                     }
                     adapter.Reset();
                 }
             }
         }
-
         FreeLibrary(hDXGI);
         return found_hw;
     }();
