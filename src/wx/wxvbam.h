@@ -59,6 +59,19 @@ bool VbamVulkanRuntimeUsable();
 // so availability follows the compile-time option. Defined in panel.cpp.
 bool VbamVulkanRuntimeAvailable();
 
+#if defined(__WXMSW__)
+// True if the machine has a usable hardware graphics adapter. When false (a
+// headless server or a VM/RDP session exposing only the Microsoft Basic Render
+// Driver), every GPU render method fails to initialize and only the Simple
+// renderer's software fallback works. Fails open (returns true) when it cannot
+// probe. Result is cached. Defined in panel.cpp.
+bool VbamWindowsHasHardwareGpu();
+
+// True if running on Windows 10 or newer, where Direct3D 12 is available. On
+// older Windows the D3D12 entry points are absent. Defined in panel.cpp.
+bool VbamWindowsIsWin10OrGreater();
+#endif  // defined(__WXMSW__)
+
 // Set when the app fell back to XWayland (GDK_BACKEND=x11) because no native
 // Wayland renderer was available (SDL2 + no wx EGL canvas + no usable Vulkan).
 // In that state neither HDR nor 10-bit SDR can be presented. Defined in

@@ -845,6 +845,30 @@ bool wxvbamApp::OnInit() {
     }
 #endif
 
+#if defined(__WXMSW__)
+    // On a machine with no hardware GPU (headless server, some VMs / RDP
+    // sessions with only the Microsoft Basic Render Driver) every GPU render
+    // method fails to initialize; only the Simple renderer, whose Windows
+    // backend falls back to software, works. Migrate any saved GPU method to
+    // Simple so we don't fail to init on every launch.
+    if (!VbamWindowsHasHardwareGpu()) {
+        OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
+    }
+#if !defined(NO_D3D12)
+    // Direct3D 12 requires Windows 10 or newer; on older Windows the d3d12.dll
+    // entry points are absent, so a saved DX12 method would fault. Fall back to
+    // the Direct3D 9 renderer (or Simple if D3D9 is not compiled in).
+    else if (OPTION(kDispRenderMethod) == config::RenderMethod::kDirect3d12 &&
+             !VbamWindowsIsWin10OrGreater()) {
+#if !defined(NO_D3D)
+        OPTION(kDispRenderMethod) = config::RenderMethod::kDirect3d;
+#else
+        OPTION(kDispRenderMethod) = config::RenderMethod::kSimple;
+#endif
+    }
+#endif
+#endif  // defined(__WXMSW__)
+
     // HDR and 10-bit deep color default on and behave as "auto": they are honored
     // only where the display/renderer can actually present them, but the saved
     // preference is NOT overwritten when detection fails. Clobbering it here would

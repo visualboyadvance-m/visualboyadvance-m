@@ -8569,6 +8569,27 @@ void GameArea::EvaluateDeepColorRenderer() {
 }
 
 DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method) {
+#if defined(__WXMSW__)
+    // Last-line defense against render methods that cannot work on this machine,
+    // regardless of how `method` was chosen (saved option, dialog pick, or a
+    // fallback). The authoritative migration happens once at startup (see
+    // wxvbam.cpp); this guarantees a doomed panel is never created.
+    //   * No hardware GPU -> only the Simple (software) renderer works.
+    //   * Direct3D 12 on pre-Windows 10 -> fall back to Direct3D 9.
+    if (!VbamWindowsHasHardwareGpu()) {
+        method = config::RenderMethod::kSimple;
+    }
+#if !defined(NO_D3D12)
+    else if (method == config::RenderMethod::kDirect3d12 &&
+             !VbamWindowsIsWin10OrGreater()) {
+#if !defined(NO_D3D)
+        method = config::RenderMethod::kDirect3d;
+#else
+        method = config::RenderMethod::kSimple;
+#endif
+    }
+#endif
+#endif  // defined(__WXMSW__)
     switch (method) {
         case config::RenderMethod::kSimple:
 #if defined(__WXMAC__)
@@ -11249,7 +11270,87 @@ static bool VbamWindowsHdrSupportedButOff() {
     }
     return false;
 }
+
+// True if the machine exposes a hardware graphics adapter. A box with only the
+// Microsoft Basic Render Driver (headless server, some VMs / RDP sessions) has
+// no GPU: every GPU render method fails there and only the Simple renderer's
+// software fallback works. Fails open (returns true) if DXGI cannot be queried,
+// so we force Simple only when we positively enumerate zero hardware adapters.
+// Cached -- GPU presence does not change during a run, and this is consulted on
+// every panel (re)creation.
+bool VbamWindowsHasHardwareGpu() {
+    static const bool has_hw = [] () -> bool {
+        typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
+        HMODULE hDXGI = LoadLibrary(TEXT("dxgi.dll"));
+        if (!hDXGI)
+            return true;
+        auto CreateFactory1 = reinterpret_cast<LPFNCreateDXGIFactory1>(
+            reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateDXGIFactory1")));
+        if (!CreateFactory1) {
+            FreeLibrary(hDXGI);
+            return true;
+        }
+
+        bool found_hw = true;  // fail open unless we enumerate and find none
+        // COM objects must be released before FreeLibrary (their vtables live in
+        // dxgi.dll), so keep them in an inner scope.
+        {
+            ComPtr<IDXGIFactory1> factory;
+            if (SUCCEEDED(CreateFactory1(IID_PPV_ARGS(&factory)))) {
+                found_hw = false;
+                ComPtr<IDXGIAdapter1> adapter;
+                for (UINT a = 0; !found_hw &&
+                     factory->EnumAdapters1(a, &adapter) != DXGI_ERROR_NOT_FOUND; ++a) {
+                    DXGI_ADAPTER_DESC1 desc{};
+                    if (SUCCEEDED(adapter->GetDesc1(&desc))) {
+                        // Skip the WARP/software adapter and the Microsoft Basic
+                        // Render Driver (vendor 0x1414) -- what shows up when
+                        // there is no real GPU.
+                        const bool is_software =
+                            (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) ||
+                            desc.VendorId == 0x1414;
+                        if (!is_software)
+                            found_hw = true;
+                    }
+                    adapter.Reset();
+                }
+            }
+        }
+
+        FreeLibrary(hDXGI);
+        return found_hw;
+    }();
+    return has_hw;
+}
 #endif
+
+#if defined(__WXMSW__)
+#if defined(WINXP)
+// DXGI adapter enumeration isn't available on the WINXP toolchain; assume a GPU
+// is present (D3D9/software works there, and Direct3D 12 isn't built for XP).
+bool VbamWindowsHasHardwareGpu() { return true; }
+#endif
+
+// True on Windows 10 or newer (where Direct3D 12 is available). Uses
+// RtlGetVersion (ntdll) rather than GetVersionEx / the VersionHelpers macros,
+// which lie for an unmanifested process and cap the reported version at
+// Windows 8. RtlGetVersion always returns the true OS version.
+bool VbamWindowsIsWin10OrGreater() {
+    HMODULE hNtdll = GetModuleHandle(TEXT("ntdll.dll"));
+    if (!hNtdll)
+        return false;
+    typedef LONG(WINAPI* LPFNRtlGetVersion)(OSVERSIONINFOW*);
+    auto RtlGetVersionFn = reinterpret_cast<LPFNRtlGetVersion>(
+        reinterpret_cast<void*>(GetProcAddress(hNtdll, "RtlGetVersion")));
+    if (!RtlGetVersionFn)
+        return false;
+    OSVERSIONINFOW info{};
+    info.dwOSVersionInfoSize = sizeof(info);
+    if (RtlGetVersionFn(&info) != 0)  // STATUS_SUCCESS
+        return false;
+    return info.dwMajorVersion >= 10;
+}
+#endif  // defined(__WXMSW__)
 
 #if defined(__WXMAC__)
 // Defined in macsupport.mm.

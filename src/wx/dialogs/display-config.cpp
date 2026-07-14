@@ -468,8 +468,22 @@ void DisplayConfig::InitBasicTab() {
     // this build/platform so UpdateRenderMethodVisibility() can show/hide just
     // those (the statically #ifdef-hidden ones below are never recorded, so they
     // stay hidden).
+#if defined(__WXMSW__)
+    // On a machine with no hardware GPU only the Simple (software) renderer
+    // works; every GPU-backed method fails to initialize. Offer only the Simple
+    // radio there. Radios that aren't recorded below stay hidden, since
+    // UpdateRenderMethodVisibility() only ever touches recorded ones.
+    const bool gpu_absent = !VbamWindowsHasHardwareGpu();
+#else
+    const bool gpu_absent = false;
+#endif
+
     render_method_radios_.clear();
-    auto add_radio = [this](const char* name, config::RenderMethod m) {
+    auto add_radio = [this, gpu_absent](const char* name, config::RenderMethod m) {
+        if (gpu_absent && m != config::RenderMethod::kSimple) {
+            GetValidatedChild(name)->Hide();
+            return;
+        }
         GetValidatedChild(name)->SetValidator(RenderValidator(m));
         render_method_radios_.push_back({name, m});
     };
@@ -505,7 +519,13 @@ void DisplayConfig::InitBasicTab() {
 #endif
 
 #if defined(__WXMSW__) && !defined(NO_D3D12)
-    add_radio("OutputDirect3D12", config::RenderMethod::kDirect3d12);
+    // Direct3D 12 needs Windows 10+. On older Windows the renderer is disabled
+    // (it falls back to Direct3D 9), so hide the radio there so it can't be
+    // picked -- mirroring the run-time gating of the Vulkan radio below.
+    if (VbamWindowsIsWin10OrGreater())
+        add_radio("OutputDirect3D12", config::RenderMethod::kDirect3d12);
+    else
+        GetValidatedChild("OutputDirect3D12")->Hide();
 #else
     GetValidatedChild("OutputDirect3D12")->Hide();
 #endif
