@@ -2727,7 +2727,7 @@ msgstr "Não pôde jogar no primário %08x"
 #: audio/internal/dsound.cpp:218
 #, c-format
 msgid "Cannot Play secondary %08x"
-msgstr ""
+msgstr "Não pôde jogar no secundário %08x"
 
 #: audio/internal/dsound.cpp:360
 #, c-format
@@ -4871,7 +4871,7 @@ msgstr "Direct Sound"
 
 #: xrc/SoundConfigAdvanced.xrc:54
 msgid "No sound (timer paced)"
-msgstr ""
+msgstr "Sem som (ritmo do cronômetro)"
 
 #: xrc/SoundConfigAdvanced.xrc:68
 msgid "Device"
