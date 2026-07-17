@@ -2,6 +2,7 @@
 
 #if FEX_ENABLE_LZMA
 
+#include <climits>
 #include <stdio.h>
 
 #include "LZ_Reader.h"
@@ -36,48 +37,41 @@ static blargg_err_t LZ_reader_read( void* file, void* out, int* count )
 
 enum { header_size = 6, trailer_size = 20 };
 
-size_t LZ_Reader::get_uncompressed_size()
+blargg_err_t LZ_Reader::get_uncompressed_size(int& size)
 {
-   uint8_t *header_ptr = (uint8_t *)malloc(header_size);
-   uint8_t *trailer_ptr = (uint8_t *)malloc(trailer_size);
+   if (in->size() < header_size + trailer_size)
+       return blargg_err_file_corrupt;
 
-   if ((header_ptr == NULL) || (trailer_ptr == NULL)) {
-        fprintf(stderr, "Error: Couldn't allocate data\n");
-        return 0;
-   }
+   uint8_t header[header_size];
+   uint8_t trailer[trailer_size];
 
-   in->seek(0);
-   in->read((void *)header_ptr, header_size);
+   RETURN_ERR( in->seek(0) );
+   RETURN_ERR( in->read(header, header_size) );
 
-   unsigned dict_size = 1 << (header_ptr[5] & 0x1F);
-   dict_size -= (dict_size / 16) * ((header_ptr[5] >> 5 ) & 7);
+   uint64_t dict_size = (uint64_t)1 << (header[5] & 0x1F);
+   dict_size -= (dict_size / 16) * ((header[5] >> 5) & 7);
 
-   if(dict_size < (1 << 12) || dict_size > (1 << 29))
-   {
-      fprintf(stderr, "Invalid dictionary size in member header.\n");
-      free((void *)header_ptr);
-      free((void *)trailer_ptr);
-      return 0;
-   }
+   if (dict_size < (1 << 12) || dict_size > (1 << 29))
+       return blargg_err_file_corrupt;
 
-   in->seek(in->size() - trailer_size);
-   in->read((void *)trailer_ptr, trailer_size);
+   RETURN_ERR( in->seek(in->size() - trailer_size) );
+   RETURN_ERR( in->read(trailer, trailer_size) );
 
-   unsigned long long data_size = 0;
+   uint64_t data_size = 0;
    for (int i = 11; i >= 4; --i)
-       data_size = ( data_size << 8 ) + trailer_ptr[i];
+       data_size = (data_size << 8) + trailer[i];
 
-   in->seek(0);
+   if (data_size > (uint64_t)INT_MAX)
+       return BLARGG_ERR(BLARGG_ERR_FILE_FEATURE, "LZIP larger than 2GB");
 
-   free((void *)header_ptr);
-   free((void *)trailer_ptr);
-
-   return (size_t)data_size;
+   RETURN_ERR( in->seek(0) );
+   size = (int)data_size;
+   return blargg_ok;
 }
 
 blargg_err_t LZ_Reader::calc_size()
 {
-	size_  = (int)get_uncompressed_size();
+    RETURN_ERR( get_uncompressed_size(size_) );
     fprintf(stderr, "LZ uncompressed size: %d\n", size_);
 
 	crc32_ = 0;
