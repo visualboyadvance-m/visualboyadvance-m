@@ -2,6 +2,7 @@
 
 #if FEX_ENABLE_LZMA
 
+#include <climits>
 #include <stdio.h>
 
 #include "XZ_Reader.h"
@@ -34,43 +35,64 @@ static blargg_err_t XZ_reader_read( void* file, void* out, int* count )
 	return STATIC_CAST(File_Reader*,file)->read_avail( out, count );
 }
 
-size_t XZ_Reader::get_uncompressed_size()
+blargg_err_t XZ_Reader::get_uncompressed_size(int& size)
 {
-   lzma_stream_flags stream_flags;
+   enum { footer_size = 12 };
+   const int file_size = in->size();
+   if (file_size < footer_size)
+       return blargg_err_file_corrupt;
 
-   const uint8_t *footer_ptr = NULL;
-   const uint8_t *index_ptr = NULL;
-   const uint8_t *data = (const uint8_t *)malloc(in->size());
+   uint8_t* data = (uint8_t*)malloc((size_t)file_size);
 
    if (data == NULL) {
-        fprintf(stderr, "Error: Couldn't allocate data\n");
-        return 0;
+        return BLARGG_ERR(BLARGG_ERR_MEMORY, "couldn't allocate XZ data");
    }
 
-   in->seek(0);
-   in->read((void *)data, in->size());
+   blargg_err_t err = in->seek(0);
+   if (err) {
+       free(data);
+       return err;
+   }
+   err = in->read(data, file_size);
+   if (err) {
+       free(data);
+       return err;
+   }
 
    // 12 is the size of the footer per the file-spec...
-   footer_ptr = data + (in->size() - 12);
+   const uint8_t* footer_ptr = data + (file_size - footer_size);
 
    // Decode the footer, so we have the backward_size pointing to the index
-   [[maybe_unused]] auto _ignored = lzma_stream_footer_decode(&stream_flags, (const uint8_t *)footer_ptr);
+   lzma_stream_flags stream_flags;
+   if (lzma_stream_footer_decode(&stream_flags, footer_ptr) != LZMA_OK) {
+       free(data);
+       return blargg_err_file_corrupt;
+   }
+
+   if (stream_flags.backward_size == 0
+       || stream_flags.backward_size > (lzma_vli)(footer_ptr - data)) {
+       free(data);
+       return blargg_err_file_corrupt;
+   }
+
    // This is the index pointer, where the size is ultimately stored...
-   index_ptr = data + ((in->size() - 12) - stream_flags.backward_size);
+   const uint8_t* index_ptr = footer_ptr - stream_flags.backward_size;
 
    // Allocate an index
-   lzma_index *index = lzma_index_init(NULL);
-   uint64_t memlimit;
+   lzma_index* index = NULL;
+   uint64_t memlimit = ~(uint64_t)0;
    size_t in_pos = 0;
    // decode the index we calculated
-   lzma_index_buffer_decode(&index, &memlimit, NULL, (const uint8_t *)index_ptr, &in_pos, footer_ptr - index_ptr);
+   lzma_ret result = lzma_index_buffer_decode(&index, &memlimit, NULL,
+       index_ptr, &in_pos, (size_t)stream_flags.backward_size);
    // Just make sure the whole index was decoded, otherwise, we might be
    // dealing with something utterly corrupt
-   if (in_pos != stream_flags.backward_size) {
-     lzma_index_end(index, NULL);
+   if (result != LZMA_OK || index == NULL
+       || in_pos != (size_t)stream_flags.backward_size) {
+     if (index != NULL)
+       lzma_index_end(index, NULL);
      free((void *)data);
-     fprintf(stderr, "Error: input position %lu is not equal to backward size %llu\n", (long unsigned int)in_pos, (long long unsigned int)stream_flags.backward_size);
-     return 0;
+     return blargg_err_file_corrupt;
    }
 
    // Finally get the size
@@ -78,14 +100,17 @@ size_t XZ_Reader::get_uncompressed_size()
    lzma_index_end(index, NULL);
 
    free((void *)data);
-   in->seek(0);
+   if (uSize > (lzma_vli)INT_MAX)
+       return BLARGG_ERR(BLARGG_ERR_FILE_FEATURE, "XZ larger than 2GB");
 
-   return (size_t) uSize;
+   RETURN_ERR( in->seek(0) );
+   size = (int)uSize;
+   return blargg_ok;
 }
 
 blargg_err_t XZ_Reader::calc_size()
 {
-	size_  = (int)get_uncompressed_size();
+    RETURN_ERR( get_uncompressed_size(size_) );
     fprintf(stderr, "XZ uncompressed size: %d\n", size_);
 
 	crc32_ = 0;

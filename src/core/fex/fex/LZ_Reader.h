@@ -43,7 +43,6 @@ class LZ_Reader : public Data_Reader
         public:
         LZ_Reader();
         virtual ~LZ_Reader();
-        size_t get_uncompressed_size();
 
         protected:
         virtual blargg_err_t read_v(void *, int);
@@ -54,6 +53,7 @@ class LZ_Reader : public Data_Reader
         int size_;
         LZMA_Inflater inflater;
 
+        blargg_err_t get_uncompressed_size(int& size);
         blargg_err_t calc_size();
 };
 
