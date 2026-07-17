@@ -29,6 +29,7 @@ int gbSgbBit = 0;
 int gbSgbPacketTimeout = 0;
 int GBSGB_PACKET_TIMEOUT = 66666;
 uint8_t gbSgbPacket[16 * 7];
+constexpr int kSgbMaxPackets = sizeof(gbSgbPacket) / 16;
 int gbSgbPacketNBits = 0;
 int gbSgbPacketByte = 0;
 int gbSgbPacketNumber = 0;
@@ -796,6 +797,9 @@ void gbSgbResetPacketState()
 {
     gbSgbPacketState = GBSGB_NONE;
     gbSgbPacketTimeout = 0;
+    gbSgbPacketNBits = 0;
+    gbSgbPacketByte = 0;
+    gbSgbPacketNumber = 0;
 }
 
 void gbSgbDoBitTransfer(uint8_t value)
@@ -854,11 +858,17 @@ void gbSgbDoBitTransfer(uint8_t value)
             gbSgbPacketTimeout = 0;
         } else if (value == 0x30) {
             if (gbSgbPacketNBits == 128) {
+                const int packetCount = gbSgbPacket[0] & 7;
+                if (packetCount == 0 || gbSgbPacketNumber >= kSgbMaxPackets) {
+                    gbSgbResetPacketState();
+                    break;
+                }
+
                 gbSgbPacketNBits = 0;
                 gbSgbPacketByte = 0;
                 gbSgbPacketNumber++;
                 gbSgbPacketTimeout = 0;
-                if (gbSgbPacketNumber == (gbSgbPacket[0] & 7)) {
+                if (gbSgbPacketNumber == packetCount) {
                     gbSgbCommand();
                     gbSgbPacketNumber = 0;
                     gbSgbPacketState = GBSGB_NONE;
@@ -866,6 +876,11 @@ void gbSgbDoBitTransfer(uint8_t value)
                 }
             } else {
                 if (gbSgbPacketNBits < 128) {
+                    if (gbSgbPacketNumber >= kSgbMaxPackets ||
+                        gbSgbPacketByte >= 16) {
+                        gbSgbResetPacketState();
+                        break;
+                    }
                     gbSgbPacket[gbSgbPacketNumber * 16 + gbSgbPacketByte] >>= 1;
                     gbSgbPacket[gbSgbPacketNumber * 16 + gbSgbPacketByte] |= gbSgbBit;
                     gbSgbPacketNBits++;
