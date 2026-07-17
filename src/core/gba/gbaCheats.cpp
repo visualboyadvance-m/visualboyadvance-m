@@ -2771,24 +2771,39 @@ bool cheatsLoadCheatList(const char* file)
         fclose(f);
         return false;
     }
+
+    if (count < 0 || count > MAX_CHEATS) {
+        fclose(f);
+        return false;
+    }
+
     if (type == 1) {
-        if (fread(cheatsList, 1, sizeof(cheatsList), f) > sizeof(cheatsList)) {
+        if (fread(cheatsList, sizeof(CheatsData), count, f) != (size_t)count) {
             fclose(f);
             return false;
         }
     } else if (type == 0) {
         for (int i = 0; i < count; i++) {
-            FREAD_UNCHECKED(&cheatsList[i].code, 1, sizeof(int), f);
-            FREAD_UNCHECKED(&cheatsList[i].size, 1, sizeof(int), f);
-            FREAD_UNCHECKED(&cheatsList[i].status, 1, sizeof(int), f);
-            FREAD_UNCHECKED(&cheatsList[i].enabled, 1, sizeof(int), f);
-            cheatsList[i].enabled = cheatsList[i].enabled ? true : false;
-            FREAD_UNCHECKED(&cheatsList[i].address, 1, sizeof(uint32_t), f);
+            int enabled;
+            if (fread(&cheatsList[i].code, 1, sizeof(int), f) != sizeof(int)
+                || fread(&cheatsList[i].size, 1, sizeof(int), f) != sizeof(int)
+                || fread(&cheatsList[i].status, 1, sizeof(int), f) != sizeof(int)
+                || fread(&enabled, 1, sizeof(enabled), f) != sizeof(enabled)) {
+                fclose(f);
+                return false;
+            }
+            cheatsList[i].enabled = enabled ? true : false;
+            if (fread(&cheatsList[i].address, 1, sizeof(uint32_t), f) != sizeof(uint32_t)) {
+                fclose(f);
+                return false;
+            }
             cheatsList[i].rawaddress = cheatsList[i].address;
-            FREAD_UNCHECKED(&cheatsList[i].value, 1, sizeof(uint32_t), f);
-            FREAD_UNCHECKED(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f);
-            FREAD_UNCHECKED(&cheatsList[i].codestring, 1, 20 * sizeof(char), f);
-            if (fread(&cheatsList[i].desc, 1, 32 * sizeof(char), f) != 32 * sizeof(char)) {
+            if (fread(&cheatsList[i].value, 1, sizeof(uint32_t), f) != sizeof(uint32_t)
+                || fread(&cheatsList[i].oldValue, 1, sizeof(uint32_t), f) != sizeof(uint32_t)
+                || fread(&cheatsList[i].codestring, 1, sizeof(cheatsList[i].codestring), f)
+                    != sizeof(cheatsList[i].codestring)
+                || fread(&cheatsList[i].desc, 1, sizeof(cheatsList[i].desc), f)
+                    != sizeof(cheatsList[i].desc)) {
                 fclose(f);
                 return false;
             }

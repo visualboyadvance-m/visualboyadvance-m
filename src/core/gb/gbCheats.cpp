@@ -160,7 +160,12 @@ bool gbCheatsLoadCheatList(const char* file)
         return false;
     }
 
-    if (fread(gbCheatList, 1, sizeof(gbCheatList), f) > sizeof(gbCheatList)) {
+    if (count < 0 || count > MAX_CHEATS) {
+        fclose(f);
+        return false;
+    }
+
+    if (fread(gbCheatList, sizeof(gbCheat), count, f) != (size_t)count) {
         fclose(f);
         return false;
     }
