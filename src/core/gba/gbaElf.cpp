@@ -2508,41 +2508,92 @@ void elfParseAranges()
     uint8_t* end = data + sh->size;
 
     int max = 4;
-    ARanges* ranges = (ARanges*)calloc(4, sizeof(ARanges));
+    ARanges* ranges = (ARanges*)calloc(max, sizeof(ARanges));
+    if (ranges == NULL)
+        return;
 
     int index = 0;
 
     while (data < end) {
+        if ((size_t)(end - data) < 4) {
+            fprintf(stderr, "Invalid aranges record length\n");
+            break;
+        }
+
         uint32_t _len = elfRead4Bytes(data);
         data += 4;
-        //    uint16_t version = elfRead2Bytes(data);
-        data += 2;
+
+        if (_len < 20 || _len > (uint32_t)(end - data)) {
+            fprintf(stderr, "Invalid aranges record length\n");
+            break;
+        }
+
+        uint8_t* recordEnd = data + _len;
+        data += 2; // version
         uint32_t offset = elfRead4Bytes(data);
         data += 4;
-        //    uint8_t addrSize = *data++;
-        //    uint8_t segSize = *data++;
-        data += 2; // remove if uncommenting above
+        uint8_t addrSize = *data++;
+        uint8_t segSize = *data++;
+
+        // The legacy parser only supports 32-bit, non-segmented addresses.
+        if (addrSize != 4 || segSize != 0 || (size_t)(recordEnd - data) < 12) {
+            fprintf(stderr, "Unsupported aranges address format\n");
+            break;
+        }
+
+        // Align the first tuple to the eight-byte address/length pair.
         data += 4;
-        ranges[index].count = (_len - 20) / 8;
+        size_t tupleCount = (size_t)(recordEnd - data) / 8;
+        if (tupleCount == 0 || (size_t)(recordEnd - data) % 8 != 0) {
+            fprintf(stderr, "Invalid aranges record length\n");
+            break;
+        }
+
+        if (index == max) {
+            int newMax = max + 4;
+            ARanges* newRanges = (ARanges*)realloc(ranges,
+                newMax * sizeof(ARanges));
+            if (newRanges == NULL)
+                break;
+            memset(newRanges + max, 0, (newMax - max) * sizeof(ARanges));
+            ranges = newRanges;
+            max = newMax;
+        }
+
+        ranges[index].count = (int)(tupleCount - 1);
         ranges[index].offset = offset;
-        ranges[index].ranges = (ARange*)calloc((_len - 20) / 8, sizeof(ARange));
-        int i = 0;
-        while (true) {
+        ranges[index].ranges = (ARange*)calloc(tupleCount - 1, sizeof(ARange));
+        if (tupleCount > 1 && ranges[index].ranges == NULL)
+            break;
+
+        bool terminated = false;
+        size_t i;
+        for (i = 0; i < tupleCount; i++) {
             uint32_t addr = elfRead4Bytes(data);
             data += 4;
             uint32_t len = elfRead4Bytes(data);
             data += 4;
-            if (addr == 0 && len == 0)
+
+            if (addr == 0 && len == 0) {
+                terminated = true;
                 break;
+            }
+
+            if (i == tupleCount - 1)
+                break;
+
             ranges[index].ranges[i].lowPC = addr;
             ranges[index].ranges[i].highPC = addr + len;
-            i++;
         }
+
+        if (!terminated) {
+            fprintf(stderr, "Unterminated aranges record\n");
+            break;
+        }
+
+        ranges[index].count = (int)i;
         index++;
-        if (index == max) {
-            max += 4;
-            ranges = (ARanges*)realloc(ranges, max * sizeof(ARanges));
-        }
+        data = recordEnd;
     }
     elfDebugInfo->numRanges = index;
     elfDebugInfo->ranges = ranges;
