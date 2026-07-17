@@ -3663,21 +3663,22 @@ void remoteOutput(const char* s, uint32_t addr)
 
     if (s) {
         char c = *s++;
-        while (c) {
-            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
+        while (c && sizeof(buffer) - (d - buffer) >= 3) {
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", (unsigned char)c);
             d += 2;
             c = *s++;
         }
     } else {
         char c = debuggerReadByte(addr);
         addr++;
-        while (c) {
-            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", c);
+        while (c && sizeof(buffer) - (d - buffer) >= 3) {
+            snprintf(d, (sizeof(buffer) - (d - buffer)), "%02x", (unsigned char)c);
             d += 2;
             c = debuggerReadByte(addr);
             addr++;
         }
     }
+    *d = 0;
     remotePutPacket(buffer);
     //  fprintf(stderr, "Output sent %s\n", buffer);
 }
