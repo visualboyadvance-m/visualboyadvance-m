@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <climits>
 
 #if !defined(__LIBRETRO__)
 #include <zlib.h>
@@ -197,10 +198,20 @@ static bool patchApplyIPS(const char* patchname, uint8_t** r, int* s)
                 b = (uint8_t)c;
             } else
                 b = -1;
-            // check if we need to reallocate our ROM
-            if ((offset + len) >= size) {
-                size *= 2;
-                rom = (uint8_t*)realloc(rom, size);
+            // Grow until the complete record fits in the ROM buffer.
+            const int required_size = offset + len;
+            if (required_size > size) {
+                int new_size = size > 0 ? size : 1;
+                while (new_size < required_size)
+                    new_size *= 2;
+
+                uint8_t* new_rom = (uint8_t*)realloc(rom, new_size);
+                if (new_rom == NULL) {
+                    result = false;
+                    break;
+                }
+                rom = new_rom;
+                size = new_size;
                 *r = rom;
                 *s = size;
             }
@@ -354,7 +365,7 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
     crc = crc32(crc, *rom, *size);
 
     fseeko64(f, 4, SEEK_SET);
-    int dataSize;
+    int64_t dataSize;
     const int64_t srcSize = readVarPtr(f);
     const int64_t dstSize = readVarPtr(f);
     const int64_t mtdSize = readVarPtr(f);
@@ -365,30 +376,48 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
             fclose(f);
             return false;
         }
-        dataSize = (int)(dstSize);
+        dataSize = dstSize;
     } else if (crc == dstCRC) {
         if (dstSize != *size) {
             fclose(f);
             return false;
         }
-        dataSize = (int)(srcSize);
+        dataSize = srcSize;
     } else {
         fclose(f);
         return false;
     }
 
-    uint8_t* new_rom = (uint8_t*)calloc(1, dataSize);
+    if (dataSize < 0 || dataSize > INT_MAX) {
+        fclose(f);
+        return false;
+    }
+
+    uint8_t* new_rom = (uint8_t*)calloc((size_t)(dataSize ? dataSize : 1), 1);
+    if (new_rom == NULL) {
+        fclose(f);
+        return false;
+    }
 
     int64_t length = 0;
     uint8_t action = 0;
-    uint32_t outputOffset = 0, sourceRelativeOffset = 0, targetRelativeOffset = 0;
+    int64_t outputOffset = 0, sourceRelativeOffset = 0, targetRelativeOffset = 0;
+    bool valid = true;
 
     while (ftello64(f) < patchSize - 12) {
         length = readVarPtr(f);
         action = length & 3 ;
         length = (length>>2) + 1;
+        if (length <= 0 || outputOffset > dataSize - length) {
+            valid = false;
+            break;
+        }
         switch(action){
         case 0: // sourceRead
+            if (outputOffset > *size - length) {
+                valid = false;
+                break;
+            }
             while(length--) {
                 new_rom[outputOffset] = rom[0][outputOffset];
                 outputOffset++;
@@ -400,32 +429,57 @@ static bool patchApplyBPS(const char* patchname, uint8_t** rom, int* size)
             }
             break;
         case 2: // sourceCopy
-            sourceRelativeOffset += readSignVarPtr(f);
+            sourceRelativeOffset += (int32_t)readSignVarPtr(f);
+            if (sourceRelativeOffset < 0 || sourceRelativeOffset > *size - length) {
+                valid = false;
+                break;
+            }
             while(length--) {
                 new_rom[outputOffset++] = rom[0][sourceRelativeOffset++];
             }
             break;
         case 3: // targetCopy
-            targetRelativeOffset += readSignVarPtr(f);
+            targetRelativeOffset += (int32_t)readSignVarPtr(f);
+            if (targetRelativeOffset < 0 || targetRelativeOffset >= outputOffset) {
+                valid = false;
+                break;
+            }
             while(length--) { // yes, copy from alredy patched rom, and only 1 byte at time (pseudo-rle)
                 new_rom[outputOffset++] = new_rom[targetRelativeOffset++];
             }
             break;
         }
+        if (!valid)
+            break;
+    }
+
+    if (!valid) {
+        free(new_rom);
+        fclose(f);
+        return false;
     }
 
     crc = crc32(0L, Z_NULL, 0);
-    crc = crc32(crc, new_rom, dataSize);
+    crc = crc32(crc, new_rom, static_cast<uInt>(dataSize));
 
-    if(crc == dstCRC)
-    {
-        if (dataSize > *size) {
-            *rom = (uint8_t*)realloc(*rom, dataSize);
-        }
-        memcpy(*rom, new_rom, dataSize);
-        *size = dataSize;
+    if (crc != dstCRC) {
         free(new_rom);
+        fclose(f);
+        return false;
     }
+
+    if (dataSize > *size) {
+        uint8_t* resized_rom = (uint8_t*)realloc(*rom, (size_t)dataSize);
+        if (resized_rom == NULL) {
+            free(new_rom);
+            fclose(f);
+            return false;
+        }
+        *rom = resized_rom;
+    }
+    memcpy(*rom, new_rom, (size_t)dataSize);
+    *size = (int)dataSize;
+    free(new_rom);
 
     fclose(f);
     return true;
@@ -478,12 +532,12 @@ static bool patchApplyPPF1(FILE* f, uint8_t** rom, int* size)
         int64_t offset_read = readInt4(f);
         if (offset_read == -1)
             break;
-        int offset = (int)(offset_read);
         int len = fgetc(f);
         if (len == EOF)
             break;
-        if (offset + len > *size)
+        if (offset_read < 0 || offset_read > *size || len > *size - offset_read)
             break;
+        int offset = (int)(offset_read);
         if (fread(&mem[offset], 1, len, f) != (size_t)len)
             break;
         count -= 4 + 1 + len;
@@ -510,6 +564,9 @@ static bool patchApplyPPF2(FILE* f, uint8_t** rom, int* size)
     if (datalen != *size)
         return false;
 
+    if (*size < 0x9320 + 1024)
+        return false;
+
     uint8_t* mem = *rom;
 
     uint8_t block[1024];
@@ -527,12 +584,12 @@ static bool patchApplyPPF2(FILE* f, uint8_t** rom, int* size)
         int64_t offset_read = readInt4(f);
         if (offset_read == -1)
             break;
-        int offset = (int)(offset_read);
         int len = fgetc(f);
         if (len == EOF)
             break;
-        if (offset + len > *size)
+        if (offset_read < 0 || offset_read > *size || len > *size - offset_read)
             break;
+        int offset = (int)(offset_read);
         if (fread(&mem[offset], 1, len, f) != (size_t)len)
             break;
         count -= 4 + 1 + len;
@@ -559,9 +616,12 @@ static bool patchApplyPPF3(FILE* f, uint8_t** rom, int* size)
     uint8_t* mem = *rom;
 
     if (blockcheck) {
+        const int block_offset = imagetype == 0 ? 0x9320 : 0x80A0;
+        if (*size < block_offset + 1024)
+            return false;
         uint8_t block[1024];
         if (fread(&block, 1, 1024, f) == 0 ||
-                memcmp(&mem[(imagetype == 0) ? 0x9320 : 0x80A0], &block, 1024) != 0)
+                memcmp(&mem[block_offset], &block, 1024) != 0)
             return false;
         count -= 1024;
     }
@@ -579,7 +639,7 @@ static bool patchApplyPPF3(FILE* f, uint8_t** rom, int* size)
         int len = fgetc(f);
         if (len == EOF)
             break;
-        if (offset + len > *size)
+        if (offset < 0 || offset > *size || len > *size - offset)
             break;
         if (fread(&mem[offset], 1, len, f) != (size_t)len)
             break;
