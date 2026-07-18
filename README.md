@@ -13,9 +13,9 @@
 
 # Visual Boy Advance - M
 
-Our Discord server is [here](https://discord.gg/EpfxEuGMKH).
-
 Game Boy and Game Boy Advance Emulator
+
+Our Discord server is [here](https://discord.gg/EpfxEuGMKH).
 
 The forums are [here](https://board.visualboyadvance-m.org/).
 
@@ -34,7 +34,7 @@ ISSUES**
 Your distribution may have packages available as well, search for
 `visualboyadvance-m` or `vbam`.
 
-It is also generally very easy to build from source, see below.
+To build from source, see below.
 
 If you are having issues, try resetting the config file first, go to `Help ->
 Factory Reset`.
@@ -49,7 +49,7 @@ ScaleFX scalers.
 For Windows XP install:
 
 - [DirectX June 2010 Redist](https://www.microsoft.com/en-au/download/details.aspx?id=8109)
-- [Visual C++ runtimes all-on-one pack for January 202 ](https://cachemiss.com/files/Visual-C-Runtimes-All-in-One-Jan-2021.zip)
+- [Visual C++ runtimes all-on-one pack for January 2021](https://cachemiss.com/files/Visual-C-Runtimes-All-in-One-Jan-2021.zip)
 
 ## Building
 

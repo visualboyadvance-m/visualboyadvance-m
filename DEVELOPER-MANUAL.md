@@ -295,7 +295,9 @@ cmake .. -DTAG_RELEASE=UNDO
 
 For this you will preferably need the PowerShell environment setup described
 [here](https://github.com/rkitover/windows-dev-guide), or by starting the `x64
-Native Tools Command Prompt` from your Start Menu.
+Native Tools Command Prompt` from your Start Menu. You must build with the v143
+toolset or Visual Studio 2022. The new toolset does not produce binaries that
+work on Windows 8/7.
 
 ```powershell
 mkdir build-msvc64
