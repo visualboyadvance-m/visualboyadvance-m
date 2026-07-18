@@ -409,6 +409,16 @@ if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
 
+# When cross-compiling (e.g. ARM64 on an x64 CI host) the runners still
+# build — which validates linking — but the host can't launch them, so
+# ctest would report BAD_COMMAND / "Process not started". Skip registering
+# the tests in that case.
+if(CMAKE_CROSSCOMPILING)
+    message(STATUS
+        "vbam-core test: cross-compiling — accuracy suites will not be registered")
+    return()
+endif()
+
 # GBA accuracy suite (mGBA suite.gba)
 if(VBAM_TEST_GBA_ROM AND EXISTS "${VBAM_TEST_GBA_ROM}")
     set(_gba_args "--min-pass" "${VBAM_TEST_GBA_MIN_PASS}")

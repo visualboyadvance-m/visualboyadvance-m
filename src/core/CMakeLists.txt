@@ -118,6 +118,12 @@ if(ENABLE_DEBUGGER)
         PUBLIC
         gba/gbaRemote.h
     )
+
+    # gbaRemote.cpp uses winsock; link it here so consumers (including the
+    # test runners) resolve the socket symbols even when ENABLE_LINK is OFF.
+    if(WIN32)
+        target_link_libraries(vbam-core PUBLIC ws2_32)
+    endif()
 endif()
 
 if(ENABLE_LINK)

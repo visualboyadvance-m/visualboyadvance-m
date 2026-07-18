@@ -562,9 +562,15 @@ if(ENABLE_LUA)
         # archive is LLVM bitcode when LTO is on. Forcing IPO off here makes
         # the clang driver skip the LTO plugin, so GNU ld (bfd) rejects the
         # bitcode archive with "file format not recognized".
-        add_test(NAME wx.lua.api
-                 COMMAND lua_test_runner
-                     "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")
+        # Only register the test when we can actually run the binary. When
+        # cross-compiling (e.g. ARM64 on an x64 CI host) the executable still
+        # builds — which validates linking — but the host can't launch it, so
+        # ctest would report BAD_COMMAND / "Process not started".
+        if(NOT CMAKE_CROSSCOMPILING)
+            add_test(NAME wx.lua.api
+                     COMMAND lua_test_runner
+                         "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")
+        endif()
     endif()
 endif()
 

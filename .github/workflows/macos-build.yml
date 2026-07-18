@@ -6,22 +6,18 @@ jobs:
     strategy:
       matrix:
         build_type: [release, debug]
-        build_options: [default, link_off, translations_only, libretro]
+        build_options: [default, link_off, translations_only]
         include:
           - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
             build_type: release
           - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
             build_type: debug
-          - cmake_options: '-DENABLE_LINK=OFF'
+          - cmake_options: '-DENABLE_SDL=ON -DENABLE_LIBRETRO=ON'
+            build_options: default
+          - cmake_options: '-DENABLE_LINK=OFF -DENABLE_SDL=ON -DENABLE_LIBRETRO=ON'
             build_options: link_off
           - cmake_options: '-DTRANSLATIONS_ONLY=ON'
             build_options: translations_only
-          - libretro_build: 'DEBUG=0'
-            build_type: release
-            build_options: libretro
-          - libretro_build: 'DEBUG=1'
-            build_type: debug
-            build_options: libretro
         exclude:
           # Exclude debug/translations_only build
           - build_type: debug
@@ -74,23 +70,15 @@ jobs:
       # mGBA's own docker-build.sh uses). If Docker isn't available
       # on this runner the gba.suite test gracefully skips; gb.blargg
       # always works since gb-test-roms ships prebuilt .gb files.
-      - if: matrix.build_options != 'libretro'
-        name: Configure CMake
+      - name: Configure CMake
         run: >-
           nix-shell --command 'cmake -B build -G Ninja
           ${{ matrix.cmake_build }} -DENABLE_LTO=OFF
           ${{ matrix.cmake_options }}
           ${{ matrix.build_options == 'default' && '-DVBAM_FETCH_TEST_ROMS=ON' || '' }}'
-      - if: matrix.build_options != 'libretro'
-        name: Build
+      - name: Build
         run: >-
           nix-shell --command 'ninja -C build'
-
-      # Libretro build
-      - if: matrix.build_options == 'libretro'
-        name: Build libretro core
-        run: >-
-          nix-shell --command 'make -C src/libretro ${{ matrix.libretro_build }}'
 
       # Run tests
       - if: matrix.build_options == 'default'

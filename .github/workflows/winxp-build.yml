@@ -12,7 +12,9 @@ jobs:
             build_type: release
           - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
             build_type: debug
-          - cmake_options: '-DENABLE_LINK=OFF'
+          - cmake_options: '-DENABLE_SDL=ON -DENABLE_LIBRETRO=ON'
+            build_options: default
+          - cmake_options: '-DENABLE_LINK=OFF -DENABLE_SDL=ON -DENABLE_LIBRETRO=ON'
             build_options: link_off
     runs-on: windows-latest
 
@@ -32,9 +34,7 @@ jobs:
       - name: Configure CMake
         shell: pwsh
         run: >-
-          cmake -B build -G Ninja
-          -DVCPKG_TARGET_TRIPLET=x86-mingw-static
-          -DBUILD_TESTING=ON
+          cmake -B build -G Ninja -DVCPKG_TARGET_TRIPLET=x86-mingw-static
           ${{ matrix.cmake_build }}
           ${{ matrix.cmake_options }}
 

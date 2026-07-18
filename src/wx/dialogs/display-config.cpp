@@ -473,9 +473,9 @@ void DisplayConfig::InitBasicTab() {
     // works; every GPU-backed method fails to initialize. Offer only the Simple
     // radio there. Radios that aren't recorded below stay hidden, since
     // UpdateRenderMethodVisibility() only ever touches recorded ones.
-    const bool gpu_absent = !VbamWindowsHasHardwareGpu();
+    bool gpu_absent = !VbamWindowsHasHardwareGpu();
 #else
-    const bool gpu_absent = false;
+    bool gpu_absent = false;
 #endif
 
     render_method_radios_.clear();

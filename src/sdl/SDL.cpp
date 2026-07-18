@@ -68,7 +68,9 @@
 // OpenGL library.
 #if defined(_WIN32)
 
+#if defined(_MSC_VER)
 #pragma comment(lib, "OpenGL32")
+#endif
 #include <Windows.h>
 
 #define strdup _strdup
