@@ -7,8 +7,11 @@
 
 uint8_t gbPrinterStatus = 0;
 int gbPrinterState = 0;
-uint8_t gbPrinterData[0x280 * 9];
-uint8_t gbPrinterPacket[0x400];
+constexpr int kGbPrinterMaxPacketDataSize = 0x280;
+constexpr int kGbPrinterDataCapacity = kGbPrinterMaxPacketDataSize * 9;
+constexpr int kGbPrinterPacketCapacity = 0x400;
+uint8_t gbPrinterData[kGbPrinterDataCapacity];
+uint8_t gbPrinterPacket[kGbPrinterPacketCapacity];
 int gbPrinterCount = 0;
 int gbPrinterDataCount = 0;
 int gbPrinterDataSize = 0;
@@ -90,28 +93,41 @@ void gbPrinterShowData()
 
 void gbPrinterReceiveData()
 {
+    if (gbPrinterDataCount < 0 ||
+        gbPrinterDataCount > kGbPrinterDataCapacity) {
+        return;
+    }
+
     if (gbPrinterPacket[3]) { // compressed
         uint8_t* data = &gbPrinterPacket[6];
+        uint8_t* const end = data + gbPrinterDataSize;
         uint8_t* dest = &gbPrinterData[gbPrinterDataCount];
-        int len = 0;
-        while (len < gbPrinterDataSize) {
+        uint8_t* const destEnd = gbPrinterData + kGbPrinterDataCapacity;
+        while (data < end) {
             uint8_t control = *data++;
             if (control & 0x80) { // repeated data
                 control &= 0x7f;
                 control += 2;
+                if (data == end || control > destEnd - dest) {
+                    return;
+                }
                 memset(dest, *data++, control);
-                len += 2;
                 dest += control;
             } else { // raw data
                 control++;
+                if (control > end - data || control > destEnd - dest) {
+                    return;
+                }
                 memcpy(dest, data, control);
                 dest += control;
                 data += control;
-                len += control + 1;
             }
         }
         gbPrinterDataCount = (int)(dest - gbPrinterData);
     } else {
+        if (gbPrinterDataSize > kGbPrinterDataCapacity - gbPrinterDataCount) {
+            return;
+        }
         memcpy(&gbPrinterData[gbPrinterDataCount],
             &gbPrinterPacket[6],
             gbPrinterDataSize);
@@ -169,8 +185,12 @@ uint8_t gbPrinterSend(uint8_t b)
         // receiving header
         gbPrinterPacket[gbPrinterCount++] = b;
         if (gbPrinterCount == 6) {
-            gbPrinterState++;
             gbPrinterDataSize = gbPrinterPacket[4] + (gbPrinterPacket[5] << 8);
+            if (gbPrinterDataSize > kGbPrinterMaxPacketDataSize) {
+                gbPrinterReset();
+                break;
+            }
+            gbPrinterState++;
         }
         break;
     case 3:
