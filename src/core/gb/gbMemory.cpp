@@ -1498,7 +1498,7 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
         } break;
         case 1: // 'Commands' Register
         {
-            gbDataTAMA5.mapperCommandNumber = value;
+            gbDataTAMA5.mapperCommandNumber = value & 0x0f;
             gbMemoryMap[0xa][1] = value;
 
             // This should be only a 'is the flashrom ready ?' command.
