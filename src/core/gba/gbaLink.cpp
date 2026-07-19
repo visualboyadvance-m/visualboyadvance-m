@@ -252,6 +252,8 @@ const uint64_t TICKS_PER_FRAME = TICKS_PER_SECOND / 60;
 const uint64_t BITS_PER_SECOND = 115200;
 const uint64_t BYTES_PER_SECOND = BITS_PER_SECOND / 8;
 
+static constexpr uint8_t kRfuBroadcastPayloadWords = 6;
+
 static uint32_t lastjoybusupdate = 0;
 static uint32_t nextjoybusupdate = 0;
 static uint32_t lastcommand = 0;
@@ -289,7 +291,7 @@ typedef struct {
     uint16_t rfu_reqid[5]; //id to join
     uint16_t rfu_clientidx[5]; //only used by clients
     int32_t rfu_linktime[5];
-    uint32_t rfu_broadcastdata[5][7]; //for 0x16/0x1d/0x1e?
+    uint32_t rfu_broadcastdata[5][kRfuBroadcastPayloadWords + 1]; //for 0x16/0x1d/0x1e?
     uint32_t rfu_gdata[5]; //for 0x17/0x19?/0x1e?
     int32_t rfu_state[5]; //0=none, 1=waiting for ACK
     uint8_t rfu_listfront[5];
@@ -2571,7 +2573,11 @@ static void StartRFUSocket(uint16_t value)
 
                 switch (rfu_cmd) {
                 case 0x16:
-                    rfu_data.rfu_broadcastdata[linkid][1 + rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    if (rfu_counter < kRfuBroadcastPayloadWords) {
+                        rfu_data.rfu_broadcastdata[linkid][1 + rfu_counter] =
+                            READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    }
+                    rfu_counter++;
                     break;
 
                 case 0x17:
@@ -4103,7 +4109,11 @@ static void StartRFU(uint16_t value)
 
                 switch (rfu_cmd) {
                 case 0x16:
-                    linkmem->rfu_broadcastdata[vbaid][1 + rfu_counter++] = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    if (rfu_counter < kRfuBroadcastPayloadWords) {
+                        linkmem->rfu_broadcastdata[vbaid][1 + rfu_counter] =
+                            READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    }
+                    rfu_counter++;
                     break;
 
                 case 0x17:
