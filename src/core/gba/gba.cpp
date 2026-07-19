@@ -2411,6 +2411,11 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
+    const int maxSize = coreOptions.cpuIsMultiBoot ? SIZE_WRAM : SIZE_ROM * 4;
+    if (data == NULL || size <= 0 || size > maxSize) {
+        return 0;
+    }
+
     romSize = SIZE_ROM * 4;
     if (g_rom != NULL) {
         CPUCleanUp();
