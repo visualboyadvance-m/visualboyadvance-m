@@ -9,6 +9,7 @@ typedef __darwin_uuid_string_t uuid_string_t;
 #endif
 
 #include <cmath>
+#include <sys/sysctl.h>
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CAMetalLayer.h>
@@ -36,6 +37,18 @@ bool VbamProbeMacosHdr() {
             return true;
     }
     return false;
+}
+
+// True if the host CPU is Apple Silicon (arm64) -- even when this process is the
+// x86_64 slice running under Rosetta 2, which a compile-time __x86_64__ check
+// would misreport as Intel. hw.optional.arm64 is 1 on Apple Silicon and
+// absent (or 0) on genuine Intel Macs.
+bool VbamMacHostIsAppleSilicon() {
+    int is_arm64 = 0;
+    size_t sz = sizeof(is_arm64);
+    if (sysctlbyname("hw.optional.arm64", &is_arm64, &sz, nullptr, 0) != 0)
+        return false;  // sysctl absent -> genuine Intel
+    return is_arm64 != 0;
 }
 
 // The display's EDR headroom -- a multiplier over SDR white (1.0 == no HDR). The

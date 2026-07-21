@@ -168,6 +168,9 @@ std::array<Option, kNbOptions>& Option::All() {
         int32_t max_threads = 0;
 
 #if defined(__WXMAC__) && !defined(NO_METAL)
+        // Metal is the pre-resolution default. load_opts() downgrades this to
+        // OpenGL on Intel Macs without an HDR display (it needs NSScreen, which
+        // isn't up this early at static-init time); Apple Silicon keeps Metal.
         RenderMethod render_method = RenderMethod::kMetal;
 #elif defined(__WXMSW__) && !defined(WINDOWSXP) && !defined(NO_D3D12)
         RenderMethod render_method = RenderMethod::kDirect3d12;

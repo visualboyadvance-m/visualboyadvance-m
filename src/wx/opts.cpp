@@ -115,6 +115,27 @@ opts_t::opts_t()
     recent = new wxFileHistory(10);
 }
 
+#if defined(__WXMAC__) && !defined(NO_METAL) && !defined(NO_OGL)
+extern bool VbamProbeMacosHdr();          // macsupport.mm
+extern bool VbamMacHostIsAppleSilicon();  // macsupport.mm
+
+namespace {
+// Intel Macs without an HDR-capable display default to OpenGL rather than Metal:
+// Metal's only real advantage on macOS is HDR/EDR presentation, which those
+// displays can't do, and OpenGL avoids Metal's overhead there. Apple Silicon
+// (Metal is the native path) and HDR-capable Intel Macs keep Metal. Only the
+// Metal *default* is rewritten, so a filter the user explicitly picked (SDL,
+// OpenGL, ...) is preserved. Must run after the GUI toolkit is up (NSScreen),
+// which it is by the time load_opts() runs.
+void MacApplyIntelOpenGLRenderDefault() {
+    if (OPTION(kDispRenderMethod) == config::RenderMethod::kMetal &&
+        !VbamMacHostIsAppleSilicon() && !VbamProbeMacosHdr()) {
+        OPTION(kDispRenderMethod) = config::RenderMethod::kOpenGL;
+    }
+}
+}  // namespace
+#endif
+
 // FIXME: simulate MakeInstanceFilename(vbam.ini) using subkeys (Slave%d/*)
 void load_opts(bool first_time_launch) {
     // just for sanity...
@@ -370,6 +391,15 @@ void load_opts(bool first_time_launch) {
         }
     }
 
+#if defined(__WXMAC__) && !defined(NO_METAL) && !defined(NO_OGL)
+    // New installs skip the version-upgrade loop below (they start at the latest
+    // version), so apply the macOS Intel-without-HDR OpenGL default here. The
+    // version upgrade (case 2) does the same for existing pre-3 configs.
+    if (first_time_launch) {
+        MacApplyIntelOpenGLRenderDefault();
+    }
+#endif
+
     // Apply Option updates.
     while (ini_version < config::kIniLatestVersion) {
         // Update the ini version as we go in case we fail halfway through.
@@ -416,6 +446,14 @@ void load_opts(bool first_time_launch) {
                     OPTION(kDispRenderMethod) = config::RenderMethod::kVulkan;
 #endif
                 }
+#if defined(__WXMAC__) && !defined(NO_METAL) && !defined(NO_OGL)
+                // Intel Macs without an HDR display default to OpenGL, not Metal
+                // (folded into this still-unreleased upgrade). Rewrites the Metal
+                // default in place; Apple Silicon and HDR-capable Intel Macs are
+                // left on Metal. Runs after the OpenGL-steer above so a saved
+                // OpenGL choice that just became Metal is re-evaluated too.
+                MacApplyIntelOpenGLRenderDefault();
+#endif
             }
         }
         ini_version++;
