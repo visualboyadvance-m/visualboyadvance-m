@@ -18,39 +18,32 @@ else
     target_cpu=x86_64
 fi
 
-case "$1" in
-    -[Ii][Nn][Tt][Ee][Ll])
-        intel_target=1
-        target_cpu=x86_64
-        shift
-        ;;
-    -[Ii][Nn][Tt][Ee][Ll]64)
-        intel_target=1
-        target_cpu=x86_64
-        shift
-        ;;
-    -[Xx]86_64)
-        intel_target=1
-        target_cpu=x86_64
-        shift
-        ;;
-    -64)
-        intel_target=1
-        target_cpu=x86_64
-        shift
-        ;;
-    -[Aa][Rr][Mm]64|-[Aa][Aa][Rr][Cc][Hh]64)
-        arm64_target=1
-        target_cpu=ARM64
-        shift
-        ;;
-    -32)
-        intel_target=1
-        target_build_arch=-m32
-        target_cpu=i386
-        shift
-        ;;
-esac
+# Extract an architecture flag from the arguments. It may appear anywhere,
+# alongside the --debug/--release flags handled by core.sh; all other
+# arguments are preserved and passed through to the builder.
+argc=$#
+while [ "$argc" -gt 0 ]; do
+    argc=$((argc - 1))
+    case "$1" in
+        -[Ii][Nn][Tt][Ee][Ll]|--[Ii][Nn][Tt][Ee][Ll]|-[Ii][Nn][Tt][Ee][Ll]64|--[Ii][Nn][Tt][Ee][Ll]64|-[Xx]86_64|--[Xx]86_64|-64|--64)
+            intel_target=1
+            target_cpu=x86_64
+            ;;
+        -[Aa][Rr][Mm]64|--[Aa][Rr][Mm]64|-[Aa][Aa][Rr][Cc][Hh]64|--[Aa][Aa][Rr][Cc][Hh]64)
+            arm64_target=1
+            target_cpu=ARM64
+            ;;
+        -32|--32)
+            intel_target=1
+            target_build_arch=-m32
+            target_cpu=i386
+            ;;
+        *)
+            set -- "$@" "$1"
+            ;;
+    esac
+    shift
+done
 
 if [ -n "$intel_host" ] && [ -z "$intel_target" ] && [ -z "$arm64_target" ]; then
     intel_target=1

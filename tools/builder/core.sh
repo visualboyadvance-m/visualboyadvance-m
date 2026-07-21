@@ -118,38 +118,38 @@ ORIG_PATH=$PATH
 #PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz 7zip"
 
 DISTS=$DISTS'
-    xz              https://tukaani.org/xz/xz-5.8.2.tar.gz                                                      lib/liblzma.a
-    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz                                   lib/libiconv.a
+    xz              https://tukaani.org/xz/xz-5.8.3.tar.gz                                                      lib/liblzma.a
+    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.19.tar.gz                                   lib/libiconv.a
     zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.3.3.tar.gz                           lib/libz.a
-    libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.xz                              lib/libunistring.a
+    libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.xz                              lib/libunistring.a
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz       lib/libdeflate.a
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-1.0.tar.xz                                       lib/libintl.a
     pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2     lib/libpcre2-posix.a
     libffi          https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz               lib/libffi.a
-    expat           https://github.com/libexpat/libexpat/releases/download/R_2_7_4/expat-2.7.4.tar.xz           lib/libexpat.a
-    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.1/libxml2-v2.15.1.tar.bz2            lib/libxml2.a
-    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.55/libpng-1.6.55.tar.xz          lib/libpng.a
-    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.1.3.tar.gz                         lib/libjpeg.a
-    libtiff         https://download.osgeo.org/libtiff/tiff-4.7.1.tar.xz                                        lib/libtiff.a
+    expat           https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz           lib/libexpat.a
+    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.3/libxml2-v2.15.3.tar.bz2            lib/libxml2.a
+    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.xz          lib/libpng.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.2.0.tar.gz                         lib/libjpeg.a
+    libtiff         https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz                                        lib/libtiff.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
-    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-1/freetype-VER-2-14-1.tar.bz2 lib/libfreetype.a
-    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.17.1/fontconfig-2.17.1.tar.bz2   lib/libfontconfig.a
-    glib            https://download.gnome.org/sources/glib/2.9/glib-2.9.6.tar.xz                               lib/libglib-2.0.a
-    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.0.tar.bz2                             lib/libgcrypt.a
+    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-3/freetype-VER-2-14-3.tar.bz2 lib/libfreetype.a
+    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.2/fontconfig-2.18.2.tar.bz2   lib/libfontconfig.a
+    glib            https://download.gnome.org/sources/glib/2.88/glib-2.88.2.tar.xz                             lib/libglib-2.0.a
+    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.2.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.2/SDL3-3.4.2.tar.gz         lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.02.tar.gz                            lib/libFAudio.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/12.3.2/harfbuzz-12.3.2.tar.xz        lib/libharfbuzz.a
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.12/SDL3-3.4.12.tar.gz       lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.07.tar.gz                            lib/libFAudio.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/14.2.1/harfbuzz-14.2.1.tar.xz        lib/libharfbuzz.a
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz                             lib/libmspack.a
-    giflib          https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz/download                  lib/libgif.a
+    giflib          https://sourceforge.net/projects/giflib/files/giflib-6.1.3.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
-    fmt             https://github.com/fmtlib/fmt/releases/download/12.1.0/fmt-12.1.0.zip                       lib/libfmt.a
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.2/wxWidgets-3.3.2.tar.bz2     lib/libwx_baseu-3.*.a
+    fmt             https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip                       lib/libfmt.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.3/wxWidgets-3.3.3.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz                                              lib/libavformat.a
-    VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.348.tar.gz            include/vulkan/vulkan.h
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz                                              lib/libavformat.a
+    VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.357.tar.gz            include/vulkan/vulkan.h
     MoltenVK        https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar        lib/libMoltenVK.a
 '
 
@@ -419,6 +419,33 @@ TAB='	'
 
 builder() {
     eval "$BUILD_ENV"
+
+    # Parse --debug/--release build-type flags, stripping them from the
+    # argument list so they are not passed through to CMake. The default,
+    # when neither is given, is a Release build only. When both are given,
+    # both a Release and a Debug build are made.
+    BUILD_DEBUG= BUILD_RELEASE=
+    _argc=$#
+    while [ "$_argc" -gt 0 ]; do
+        _argc=$((_argc - 1))
+        case "$1" in
+            -debug|--debug)
+                BUILD_DEBUG=1
+                ;;
+            -release|--release)
+                BUILD_RELEASE=1
+                ;;
+            *)
+                set -- "$@" "$1"
+                ;;
+        esac
+        shift
+    done
+
+    if [ -z "$BUILD_DEBUG" ] && [ -z "$BUILD_RELEASE" ]; then
+        BUILD_RELEASE=1
+    fi
+
     setup
     read_command_line "$@"
     install_core_deps
@@ -443,16 +470,16 @@ builder() {
 
 read_command_line() {
     case "$1" in
-        --env|--target-env)
+        -env|--env|-target-env|--target-env)
             puts "$BUILD_ENV"
             exit 0
             ;;
-        --host-env)
+        -host-env|--host-env)
             puts "$BUILD_ENV"
             host_env 2>/dev/null || :
             exit 0
             ;;
-        --clean)
+        -clean|--clean)
             rm -rf "$BUILD_ROOT/dists/*"
             unpack_dists
             exit 0
@@ -2882,24 +2909,29 @@ build_project() {
         lto=OFF
     fi
 
-    rm -rf   release debug
-    mkdir -p release debug
-
     # Release build.
-    puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
-    cd release
-    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
-    run_ninja
-    dist_post_build project
-    cd ..
+    if [ -n "$BUILD_RELEASE" ]; then
+        rm -rf   release
+        mkdir -p release
+        puts "${NL}[32mBuilding Release...[0m${NL}${NL}"
+        cd release
+        echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON $CMAKE_ARGS $PROJECT_ARGS -G Ninja $@
+        run_ninja
+        dist_post_build project
+        cd ..
+    fi
 
     # Debug build.
-#    puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
-#    cd debug
-#    echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=${lto} -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON -G Ninja $@
-#    run_ninja
-#    dist_post_build project
-#    cd ..
+    if [ -n "$BUILD_DEBUG" ]; then
+        rm -rf   debug
+        mkdir -p debug
+        puts "${NL}[32mBuilding Debug...[0m${NL}${NL}"
+        cd debug
+        echo_eval_run cmake "'$CHECKOUT'" $CMAKE_REQUIRED_ARGS -DENABLE_FAUDIO=ON -DENABLE_FFMPEG=ON -DENABLE_GENERIC_FILE_DIALOGS=ON -DVBAM_STATIC=ON -DENABLE_LTO=OFF -DUPSTREAM_RELEASE=TRUE $CMAKE_ARGS $PROJECT_ARGS -DCMAKE_BUILD_TYPE=Debug -DENABLE_VULKAN=ON -DENABLE_MOLTENVK=ON -G Ninja $@
+        run_ninja
+        dist_post_build project
+        cd ..
+    fi
 
     puts "${NL}[32mBuild Successful!!![0m${NL}${NL}Build results can be found in: [1;34m$BUILD_ROOT/project[0m${NL}${NL}"
 }
