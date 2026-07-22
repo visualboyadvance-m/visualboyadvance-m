@@ -749,8 +749,17 @@ void DisplayConfig::InitBasicTab() {
             // here it would be constant noise with nothing the user can act on.
             hdr_warning->Hide();
 #else
-            hdr_warning->Show(!KdeHdrDisabled() && !hdr::WindowsHdrDisabled() &&
-                              !hdr::MacosHdrDisabled());
+            // A software-only display adapter (e.g. the Microsoft Basic Display
+            // Driver on a box with no GPU) falls back to the Simple renderer,
+            // which has no HDR path regardless of the monitor's capability. Like
+            // the WINXP case above, that is not something the user can act on
+            // from here, so suppress the "no effect" warning rather than nagging.
+            bool no_hdr_renderer = false;
+#if defined(__WXMSW__)
+            no_hdr_renderer = !VbamWindowsHasHardwareGpu();
+#endif
+            hdr_warning->Show(!no_hdr_renderer && !KdeHdrDisabled() &&
+                              !hdr::WindowsHdrDisabled() && !hdr::MacosHdrDisabled());
 #endif
             enable_hdr_sliders(false);
         } else {
