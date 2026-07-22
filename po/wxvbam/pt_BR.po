@@ -976,11 +976,11 @@ msgstr "Erro ao salvar o state %s"
 
 #: panel.cpp:1801
 msgid "Done"
-msgstr ""
+msgstr "Feito"
 
 #: panel.cpp:1838
 msgid "Running quick first-time performance test"
-msgstr ""
+msgstr "Executando um teste rápido de performance pela primeira vez"
 
 #: panel.cpp:1991
 #, c-format
