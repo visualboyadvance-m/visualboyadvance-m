@@ -155,12 +155,10 @@ std::array<Option, kNbOptions>& Option::All() {
         /// Display
         bool bilinear = false;
         bool sdl_pixel_art = false;
-#if defined(WINXP)
-        // WINXP builds target older CPUs without the SIMD that xBRZ needs.
-        Filter filter = Filter::kNone;
-#else
+        // First launch runs a runtime probe (GameArea::StepFilterProbe) that
+        // measures real frame rate once a ROM loads and picks the best filter,
+        // persisting it; this stored default is only the pre-probe placeholder.
         Filter filter = Filter::kXbrz2x;
-#endif
         wxString filter_plugin = wxEmptyString;
         wxString plugin_dir = wxEmptyString;
         Interframe interframe = Interframe::kNone;

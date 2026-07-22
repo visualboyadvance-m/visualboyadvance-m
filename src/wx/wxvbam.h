@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_WXVBAM_H_
 #define VBAM_WX_WXVBAM_H_
 
+#include <chrono>
 #include <cstdio>
 #include <ctime>
 #include <list>
@@ -464,6 +465,10 @@ class DrawingPanelBase;
 #include <windows.h>
 #endif
 
+// Set on first launch (no config file yet) to arm the one-time runtime
+// display-filter probe; cleared once GameArea has settled on a filter.
+extern bool g_default_filter_probe_pending;
+
 class GameArea : public wxPanel {
 public:
     GameArea();
@@ -625,6 +630,14 @@ public:
     // Resets the panel, it will be re-created on the next frame.
     void ResetPanel();
 
+    // Re-initialise an existing panel WITHOUT flashing black: keep the outgoing
+    // panel (and the frame it is showing) alive while the replacement is built
+    // behind it, and retire the old one only once the replacement has drawn.
+    // Use this instead of ResetPanel() everywhere an existing panel is being
+    // rebuilt (filter/render/border/fullscreen/HDR), i.e. whenever the panel is
+    // destroyed to be re-created rather than created for the first time.
+    void ReinitPanel();
+
     void ShowFullScreen(bool full);
     bool IsFullScreen()
     {
@@ -704,6 +717,47 @@ private:
     bool pending_resume_after_panel_ = false;
     bool pending_panel_reset_ = false;  // Deferred panel reset to avoid mid-frame crashes
 
+    // Outgoing panel kept alive by ReinitPanel() so its last frame stays on
+    // screen while the replacement is built behind it; destroyed by
+    // RetireOldPanel() once the replacement has drawn its first real frame.
+    DrawingPanelBase* old_panel_ = nullptr;
+    void RetireOldPanel();
+    void TeardownPanel(DrawingPanelBase* p);
+    // kDispFilter observer: adopt the new filter in place when the renderer
+    // supports it (no panel rebuild, no black flash), else fall back to a full
+    // ReinitPanel().
+    void OnDispFilterChanged();
+    // Which live panel owns the window an event targets (see PaintEv). Handles
+    // the swap window where both old_panel_ and panel exist simultaneously.
+    DrawingPanelBase* PanelForWindow(wxObject* obj) const;
+
+    // Runtime display-filter auto-probe (first launch only). Once a ROM is
+    // running, this cycles candidate filters from highest to lowest quality,
+    // measures each one's real frame rate, and settles on the highest that
+    // sustains ~60fps, persisting the choice. Armed by g_default_filter_probe_
+    // pending; driven from OnIdle via StepFilterProbe(). Implementation and
+    // tuning constants live in panel.cpp.
+    enum class FilterProbeState { kInactive, kStartupDelay, kStabilize, kMeasure };
+    FilterProbeState filter_probe_state_ = FilterProbeState::kInactive;
+    int filter_probe_index_ = 0;       // index into the candidate list
+    int filter_probe_frames_ = 0;      // frames counted in the current phase
+    std::chrono::steady_clock::time_point filter_probe_phase_start_;
+    // Per-frame tracking used by the kStabilize phase to wait for steady-state
+    // frame pacing (after the panel rebuild's cold-start frames) before
+    // measuring, instead of a fixed warm-up window.
+    std::chrono::steady_clock::time_point filter_probe_last_frame_;
+    double filter_probe_min_interval_ms_ = 0.0;
+    int filter_probe_stable_count_ = 0;
+    // Per-frame intervals collected during the kMeasure window. The candidate's
+    // fps is derived from the fast quarter of these (its highest sustained rate),
+    // so the slow-frame tail from transient hitches doesn't drag it below the
+    // accept threshold when the filter otherwise holds ~60fps.
+    std::vector<double> filter_probe_intervals_;
+    void StepFilterProbe();            // called once per emulated frame
+    void BeginFilterProbeCandidate();  // switch to candidate and start stabilizing
+    void AdvanceFilterProbe(double measured_fps);  // pass/settle or step down
+    void FinishFilterProbe();          // stop probing and persist the result
+
     // HDR renderer fallback state. When HDR is on, the active renderer is
     // checked once its panel is initialized; a renderer that fails to present
     // HDR is recorded here and another HDR-capable renderer is tried. If they
@@ -748,6 +802,7 @@ private:
     void SchedulePanelReset();
 
     const config::OptionsObserver render_observer_;
+    const config::OptionsObserver disp_filter_observer_;
     const config::OptionsObserver color_correction_auto_observer_;
     const config::OptionsObserver scale_observer_;
     const config::OptionsObserver gb_border_observer_;
@@ -777,6 +832,32 @@ public:
     // Synchronously stop filter threads - call before Destroy() to ensure
     // threads are stopped before InterframeManager is cleaned up
     void StopFilterThreads();
+
+    // True if this renderer can adopt a new (non-plugin) display filter in place
+    // -- recomputing scale and rebuilding its source texture on the next
+    // DrawArea -- without recreating its window/device/swapchain, so a filter
+    // change doesn't flash black. Every renderer re-specifies its source texture
+    // from `width * scale` each frame (or, for the wx software panel, rebuilds
+    // its wxImage each frame), so this is true by default; a renderer that ever
+    // cannot may override it to false to fall back to a full ReinitPanel.
+    virtual bool SupportsInPlaceFilterChange() const { return true; }
+
+    // Arm an in-place filter change: the next DrawArea() adopts the current
+    // OPTION(kDispFilter) via ApplyPendingFilterChange(). Only valid when
+    // SupportsInPlaceFilterChange() and the filter is not a plugin. See
+    // GameArea's kDispFilter observer.
+    void ApplyInPlaceFilterChange();
+
+    // Apply an armed in-place filter change at the start of a frame (called from
+    // every DrawArea(uint8_t**) path): recompute the scale, drop the now
+    // wrongly-sized filter output buffer, and reset the filter threads so they
+    // rebuild at the new scale. No-op unless a change is pending.
+    void ApplyPendingFilterChange();
+
+    // True if this panel was built for a filter plugin (its color format and
+    // pipeline are plugin-specific). Switching a plugin in or out needs a full
+    // rebuild, so the in-place filter path is skipped for it.
+    bool IsUsingFilterPlugin() const { return rpi_ != nullptr; }
 
     virtual void PaintEv(wxPaintEvent& ev);
     virtual void EraseBackground(wxEraseEvent& ev);
@@ -845,6 +926,12 @@ protected:
     virtual void DrawingPanelInit();
     bool did_init;
     bool init_failed_ = false;  // renderer creation failed (see DrawingInitFailed)
+    // Set by ApplyInPlaceFilterChange(); the next DrawArea() recomputes scale,
+    // rebuilds the filter buffer/threads at that scale, and clears this. Applied
+    // there (not when the option changes) so scale/pixbuf2/todraw stay mutually
+    // consistent -- an interleaved repaint keeps showing the old frame until the
+    // new one is ready instead of flashing black.
+    bool pending_filter_change_ = false;
     uint8_t* todraw;
     uint8_t *pixbuf1, *pixbuf2;
     FilterThread* threads;

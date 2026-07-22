@@ -15,6 +15,7 @@
 #endif
 
 #include <stdio.h>
+
 #include <wx/cmdline.h>
 #include <wx/display.h>
 #include <wx/file.h>
@@ -771,7 +772,17 @@ bool wxvbamApp::OnInit() {
     }
 
     // Load the default options.
-    load_opts(!config_file_.Exists());
+    const bool first_run = !config_file_.Exists();
+    load_opts(first_run);
+
+    // On first launch only (no config file yet), arm the runtime display-filter
+    // probe. Once a ROM is running, GameArea cycles candidate filters, measures
+    // the real frame rate of each, and settles on the highest that sustains
+    // ~60fps, then persists the choice (see GameArea::StepFilterProbe). This
+    // runs solely when there was no config, so it never overrides a filter the
+    // user has explicitly chosen.
+    if (first_run)
+        g_default_filter_probe_pending = true;
 
     if (wxvbam_locale)
         wxDELETE(wxvbam_locale);

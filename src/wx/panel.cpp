@@ -5,6 +5,7 @@
 #include "wx/wxvbam.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -643,13 +644,17 @@ GameArea::GameArea()
       paused(false),
       pointer_blanked(false),
       mouse_active_time(0),
-      render_observer_({config::OptionID::kDispBilinear, config::OptionID::kDispFilter,
+      render_observer_({config::OptionID::kDispBilinear,
                         config::OptionID::kDispFilterPlugin, config::OptionID::kDispRenderMethod,
                         config::OptionID::kDispIFB, config::OptionID::kDispStretch,
                         config::OptionID::kPrefVsync, config::OptionID::kSDLRenderer,
                         config::OptionID::kBitDepth, config::OptionID::kDispHDR,
                         config::OptionID::kDispDeepColor},
-                       std::bind(&GameArea::ResetPanel, this)),
+                       std::bind(&GameArea::ReinitPanel, this)),
+      // kDispFilter is handled separately: a filter change can often be adopted
+      // in place (no panel rebuild / no black flash), unlike the options above.
+      disp_filter_observer_(config::OptionID::kDispFilter,
+                            std::bind(&GameArea::OnDispFilterChanged, this)),
       color_correction_auto_observer_(config::OptionID::kDispHDR,
                                       std::bind(&GameArea::ApplyAutoColorCorrection, this)),
       scale_observer_(config::OptionID::kDispScale, std::bind(&GameArea::AdjustSize, this, true)),
@@ -1449,7 +1454,7 @@ void GameArea::AddBorder()
     AdjustSize(false);
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
-    ResetPanel();
+    ReinitPanel();
 }
 
 void GameArea::DelBorder()
@@ -1464,7 +1469,7 @@ void GameArea::DelBorder()
     AdjustSize(false);
     wxGetApp().frame->Fit();
     GetSizer()->Detach(panel->GetWindow());
-    ResetPanel();
+    ReinitPanel();
 }
 
 void GameArea::AdjustMinSize()
@@ -1526,6 +1531,13 @@ void GameArea::AdjustSize(bool force)
 }
 
 void GameArea::ResetPanel() {
+    // If a panel re-init swap is still in flight, tear the outgoing panel down
+    // now so it can't outlive this reset (e.g. ResetPanel from UnloadGame).
+    if (old_panel_) {
+        TeardownPanel(old_panel_);
+        old_panel_ = nullptr;
+    }
+
     // The new panel's renderer-init and HDR success must be re-evaluated.
     hdr_evaluated_ = false;
     renderer_evaluated_ = false;
@@ -1590,11 +1602,319 @@ void GameArea::ResetPanel() {
     }
 }
 
+void GameArea::TeardownPanel(DrawingPanelBase* p) {
+    // Delete a panel through its concrete type so the (non-virtual)
+    // DrawingPanelBase destructor chain runs correctly, matching the
+    // synchronous-destruction requirements in ResetPanel(). Stop its filter
+    // threads first, as ResetPanel() does.
+    if (!p)
+        return;
+    p->StopFilterThreads();
+#if defined(__WXMSW__) && !defined(NO_D3D12)
+    if (auto* dx12 = dynamic_cast<DX12DrawingPanel*>(p)) {
+        delete dx12;
+        return;
+    }
+#endif
+#if defined(__WXMSW__) && !defined(NO_D3D)
+    if (auto* dx9 = dynamic_cast<DXDrawingPanel*>(p)) {
+        delete dx9;
+        return;
+    }
+#endif
+    if (auto* sdl = dynamic_cast<SDLDrawingPanel*>(p)) {
+        delete sdl;
+        return;
+    }
+    p->Destroy();
+}
+
+void GameArea::RetireOldPanel() {
+    // Tear down the outgoing panel now that its replacement has drawn a real
+    // frame. Called from OnIdle right after the first post-swap emuMain().
+    if (!old_panel_)
+        return;
+    DrawingPanelBase* p = old_panel_;
+    old_panel_ = nullptr;
+
+    // The replacement is now the only panel; make sure it's on top before the
+    // old window is destroyed underneath it.
+    if (panel && panel->GetWindow())
+        panel->GetWindow()->Raise();
+
+    // ~DrawingPanelBase calls InterframeCleanup(), which frees the *shared*
+    // interframe/filter state the replacement panel may already be using. Tear
+    // the old panel down, then force the replacement to rebuild its filter
+    // threads (and re-init the interframe manager) on its next DrawArea.
+    TeardownPanel(p);
+    if (panel)
+        panel->StopFilterThreads();
+}
+
+void GameArea::ReinitPanel() {
+    // Re-initialising an existing panel (not first creation). Instead of
+    // destroying the panel up front -- which flashes black through the rebuild,
+    // and worse on GPU backends whose fresh swapchain presents black until the
+    // first real frame -- keep the outgoing panel (and the frame it is showing)
+    // alive and on screen. The replacement is created behind it (see OnIdle) and
+    // the old one is retired only once the replacement has drawn (RetireOldPanel).
+    if (!panel) {
+        // Nothing on screen to preserve; a plain reset is equivalent.
+        ResetPanel();
+        return;
+    }
+
+    // We only ever hold one outgoing panel. If a previous swap hasn't completed
+    // (rebuilt panel not yet drawn), finish it now before starting another.
+    RetireOldPanel();
+
+    // The replacement's renderer-init and HDR success must be re-evaluated.
+    hdr_evaluated_ = false;
+    renderer_evaluated_ = false;
+
+    // Pause emulation across the swap to prevent crashes from accessing invalid
+    // panel state during the transition (same rationale as ResetPanel; force
+    // paused=true directly because Pause() no-ops in link mode).
+    if (!paused) {
+        paused = was_paused = true;
+        UnsuspendScreenSaver();
+        wxGetApp().emulated_gamepad()->Reset();
+        if (loaded != IMAGE_UNKNOWN)
+            soundPause();
+        pending_resume_after_panel_ = true;
+    }
+
+    // Detach the outgoing window from the sizer so the replacement can take the
+    // slot, but keep the window alive and visible; OnIdle recreates the panel
+    // behind it and RetireOldPanel() destroys it once the new one has drawn.
+    GetSizer()->Detach(panel->GetWindow());
+    old_panel_ = panel;
+    panel = nullptr;
+}
+
+void GameArea::OnDispFilterChanged() {
+    // A filter change only alters the intermediate (filtered) image size, not the
+    // window or its swapchain. Every renderer re-specifies its source texture
+    // (or wxImage) from width * scale each frame, so it can adopt the new filter
+    // in place -- no panel teardown, so no black flash and no device/swapchain
+    // rebuild. This is what makes the first-run filter probe smooth on every
+    // backend, including the wx software (Simple) panel used on GPU-less hosts.
+    //
+    // A plugin filter (on either side of the change) alters the color format and
+    // pipeline, so it still needs a full rebuild, as does any renderer that
+    // reports it cannot resize in place.
+    if (panel && OPTION(kDispFilter) != config::Filter::kPlugin &&
+        !panel->IsUsingFilterPlugin() && panel->SupportsInPlaceFilterChange()) {
+        panel->ApplyInPlaceFilterChange();
+        return;
+    }
+    ReinitPanel();
+}
+
 void GameArea::SchedulePanelReset() {
     // Set flag to defer panel reset until start of next OnIdle.
     // This avoids resetting the panel while CPULoop is in the middle of rendering,
     // which would cause crashes due to invalid g_pix or panel state.
     pending_panel_reset_ = true;
+}
+
+// ---------------------------------------------------------------------------
+// Runtime display-filter auto-probe (first launch only).
+//
+// A static, config-load-time heuristic can't predict the sustainable filter
+// scale: the bottleneck is presenting the scaled frame -- a GPU texture upload,
+// or (on a software path) a StretchBlt whose cost grows with the filter's
+// output size -- which nothing measurable before the renderer exists can see.
+// So on the very first launch we run each candidate filter briefly on the real
+// render path, measure the actual frame rate, and settle on the highest-quality
+// one that holds ~60fps. The result is persisted, so this runs exactly once.
+// ---------------------------------------------------------------------------
+bool g_default_filter_probe_pending = false;
+
+namespace {
+
+// Candidates from highest to lowest cost/quality. The last entry is always
+// accepted (the floor), so the probe always terminates.
+constexpr config::Filter kFilterProbeCandidates[] = {
+    config::Filter::kXbrz9x,
+    config::Filter::kXbrz6x,
+    config::Filter::kXbrz2x,
+    config::Filter::kNone,
+};
+constexpr int kNbFilterProbeCandidates =
+    static_cast<int>(sizeof(kFilterProbeCandidates) / sizeof(kFilterProbeCandidates[0]));
+
+// Let the emulator settle at the initial filter for this long before probing,
+// so ROM boot/intro frames and one-time warmup don't skew the first candidate.
+constexpr double kFilterProbeStartupDelayMs = 50.0;
+// After each candidate's in-place filter switch the first frames are cold
+// (filter-buffer reallocation, filter-thread spin-up, the first upload at the
+// new scale) and run slow. Wait for frame pacing to stabilize before measuring
+// rather than using a fixed warm-up: a run of this many consecutive frames whose
+// interval is within kFilterProbeStableTolMs of the fastest seen counts as steady.
+constexpr int kFilterProbeStableFrames = 8;
+constexpr double kFilterProbeStableTolMs = 2.0;
+// Safety cap: measure anyway once stabilization has run this long, so a filter
+// whose pacing never settles (e.g. genuinely too slow) still terminates. Its
+// slow steady rate is then measured and correctly rejected.
+constexpr double kFilterProbeStabilizeCapMs = 2000.0;
+// Wall-clock window over which per-frame intervals are collected for the rate.
+constexpr double kFilterProbeMeasureMs = 350.0;
+// A candidate must reach this rate to be accepted (just under 60 to tolerate
+// throttle/timer jitter).
+constexpr double kFilterProbeTargetFps = 55.0;
+
+const wxChar* FilterProbeName(config::Filter f) {
+    switch (f) {
+        case config::Filter::kXbrz9x:    return wxT("xBRZ 9x");
+        case config::Filter::kXbrz6x:    return wxT("xBRZ 6x");
+        case config::Filter::kScaleFX3x: return wxT("ScaleFX 3x");
+        case config::Filter::kXbrz2x:    return wxT("xBRZ 2x");
+        case config::Filter::kNone:      return wxT("None");
+        default:                         return wxT("?");
+    }
+}
+
+}  // namespace
+
+void GameArea::BeginFilterProbeCandidate() {
+    filter_probe_state_ = FilterProbeState::kStabilize;
+    filter_probe_frames_ = 0;
+    filter_probe_stable_count_ = 0;
+    filter_probe_min_interval_ms_ = 0.0;
+    filter_probe_intervals_.clear();
+    filter_probe_phase_start_ = std::chrono::steady_clock::now();
+    // Changing the filter fires the render observer, which adopts it in place on
+    // the next frame (recompute scale, drop the filter buffer, reset the filter
+    // threads) with no panel rebuild. StepFilterProbe() waits for frame pacing to
+    // reach steady state (past those cold-start frames) before measuring.
+    OPTION(kDispFilter) = kFilterProbeCandidates[filter_probe_index_];
+}
+
+void GameArea::FinishFilterProbe() {
+    g_default_filter_probe_pending = false;
+    filter_probe_state_ = FilterProbeState::kInactive;
+    // OPTION(kDispFilter) already holds the settled filter; persist it so the
+    // probe never runs again.
+    update_opts();
+    // Replace the "running" notice now that the probe has settled.
+    systemScreenMessage(_("Done"));
+    wxLogDebug(wxT("Filter probe settled on %s"),
+               FilterProbeName(kFilterProbeCandidates[filter_probe_index_]));
+}
+
+void GameArea::AdvanceFilterProbe(double measured_fps) {
+    const bool pass = measured_fps >= kFilterProbeTargetFps;
+    wxLogDebug(wxT("Filter probe: %s -> %.1f fps (%s)"),
+               FilterProbeName(kFilterProbeCandidates[filter_probe_index_]),
+               measured_fps, pass ? wxT("accept") : wxT("step down"));
+    if (pass || filter_probe_index_ + 1 >= kNbFilterProbeCandidates) {
+        FinishFilterProbe();
+        return;
+    }
+    ++filter_probe_index_;
+    BeginFilterProbeCandidate();
+}
+
+void GameArea::StepFilterProbe() {
+    if (!g_default_filter_probe_pending)
+        return;
+
+    const auto now = std::chrono::steady_clock::now();
+
+    // Begin with a brief startup delay at the initial filter so the emulator
+    // settles (ROM boot/intro, one-time warmup) before the first candidate is
+    // switched in and measured.
+    if (filter_probe_state_ == FilterProbeState::kInactive) {
+        filter_probe_state_ = FilterProbeState::kStartupDelay;
+        filter_probe_phase_start_ = now;
+        return;
+    }
+    if (filter_probe_state_ == FilterProbeState::kStartupDelay) {
+        const double settle_ms = std::chrono::duration<double, std::milli>(
+            now - filter_probe_phase_start_).count();
+        if (settle_ms >= kFilterProbeStartupDelayMs) {
+            // Show the on-screen notice once, as the probe begins.
+            systemScreenMessage(_("Running quick first-time performance test"));
+            filter_probe_index_ = 0;
+            BeginFilterProbeCandidate();
+        }
+        return;
+    }
+
+    ++filter_probe_frames_;
+    const double elapsed_ms = std::chrono::duration<double, std::milli>(
+        now - filter_probe_phase_start_).count();
+
+    if (filter_probe_state_ == FilterProbeState::kStabilize) {
+        // The in-place filter switch leaves the first frames cold (filter-buffer
+        // reallocation, filter-thread spin-up) so they run slow; measuring them
+        // would understate a capable filter. Wait for frame pacing to reach steady
+        // state instead of using a fixed warm-up: track the interval between
+        // consecutive rendered frames and require a run of frames whose interval
+        // is close to the fastest seen. The initial stall is excluded by starting
+        // the interval series on the first rendered frame.
+        if (filter_probe_frames_ == 1) {
+            filter_probe_last_frame_ = now;
+            filter_probe_phase_start_ = now;
+            return;
+        }
+        const double interval_ms = std::chrono::duration<double, std::milli>(
+            now - filter_probe_last_frame_).count();
+        filter_probe_last_frame_ = now;
+        if (filter_probe_min_interval_ms_ <= 0.0 ||
+            interval_ms < filter_probe_min_interval_ms_)
+            filter_probe_min_interval_ms_ = interval_ms;
+
+        if (interval_ms <= filter_probe_min_interval_ms_ + kFilterProbeStableTolMs)
+            ++filter_probe_stable_count_;
+        else
+            filter_probe_stable_count_ = 0;
+
+        // Steady once we've seen a run of on-pace frames; the cap guarantees
+        // termination for a filter whose pacing never settles.
+        if (filter_probe_stable_count_ >= kFilterProbeStableFrames ||
+            elapsed_ms >= kFilterProbeStabilizeCapMs) {
+            filter_probe_state_ = FilterProbeState::kMeasure;
+            filter_probe_frames_ = 0;
+            filter_probe_intervals_.clear();
+            filter_probe_phase_start_ = std::chrono::steady_clock::now();
+        }
+        return;
+    }
+
+    // kMeasure: collect per-frame intervals over the window, then decide from
+    // the candidate's highest *sustained* rate rather than its average. Under the
+    // ~60fps throttle a capable filter's good frames sit right at the frame
+    // period, while occasional slow frames (scheduler hitches, background work)
+    // only add a tail of longer intervals; a filter that genuinely can't keep up
+    // can't reach the period even at its best. So the fast end of the interval
+    // distribution -- not the mean or median, both of which the slow tail drags
+    // down -- is what tells the two apart.
+    if (filter_probe_frames_ == 1) {
+        // First measured frame: no interval yet, just anchor the series.
+        filter_probe_last_frame_ = now;
+        return;
+    }
+    filter_probe_intervals_.push_back(
+        std::chrono::duration<double, std::milli>(now - filter_probe_last_frame_).count());
+    filter_probe_last_frame_ = now;
+
+    if (elapsed_ms >= kFilterProbeMeasureMs) {
+        double fps = 0.0;
+        if (!filter_probe_intervals_.empty()) {
+            std::sort(filter_probe_intervals_.begin(), filter_probe_intervals_.end());
+            // 25th-percentile interval: the frame time held across the fastest
+            // quarter of the window -- the highest sustained rate. Taking a
+            // percentile rather than the outright minimum skips a lone
+            // spuriously-short interval (throttle catch-up right after a stall).
+            const size_t idx = (filter_probe_intervals_.size() - 1) / 4;
+            const double best_sustained_ms = filter_probe_intervals_[idx];
+            if (best_sustained_ms > 0.0)
+                fps = 1000.0 / best_sustained_ms;
+        }
+        AdvanceFilterProbe(fps);
+    }
 }
 
 void GameArea::ShowFullScreen(bool full)
@@ -1616,7 +1936,7 @@ void GameArea::ShowFullScreen(bool full)
 
     // just in case screen mode is going to change, go ahead and preemptively
     // delete panel to be recreated immediately after resize
-    ResetPanel();
+    ReinitPanel();
 
     // Windows does not restore old window size/pos
     // at least under Wine
@@ -1848,7 +2168,7 @@ void GameArea::OnIdle(wxIdleEvent& event)
     // to avoid resetting the panel while CPULoop is in progress.
     if (pending_panel_reset_) {
         pending_panel_reset_ = false;
-        ResetPanel();
+        ReinitPanel();
         // After reset, panel is NULL and will be recreated below.
         // Request more idle events to trigger panel creation.
         event.RequestMore();
@@ -1968,6 +2288,13 @@ void GameArea::OnIdle(wxIdleEvent& event)
         if (pointer_blanked)
             w->SetCursor(wxCursor(wxCURSOR_BLANK));
 
+        // When swapping panels (the outgoing one is kept alive to avoid a black
+        // flash), put this fresh panel behind it. Its swapchain still presents
+        // while occluded, so once it has drawn a real frame RetireOldPanel()
+        // can destroy the old window and reveal this one without a black gap.
+        if (old_panel_)
+            w->Lower();
+
         // set focus to panel
         w->SetFocus();
 
@@ -2049,6 +2376,17 @@ void GameArea::OnIdle(wxIdleEvent& event)
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
         emusys->emuMain(emusys->emuCount);
+
+        // The replacement panel has now presented a real frame, so retire the
+        // outgoing one kept alive across the swap (no-op unless a panel
+        // re-init is in flight).
+        RetireOldPanel();
+
+        // First-launch display-filter probe: measures this frame under the
+        // current candidate filter and may switch to the next one (which resets
+        // the panel). Safe here -- emuMain (CPULoop) has returned. No-op unless
+        // armed on first launch.
+        StepFilterProbe();
 #ifndef NO_LINK
 
         if (loaded == IMAGE_GBA && GetLinkMode() != LINK_DISCONNECTED)
@@ -2164,15 +2502,35 @@ void GameArea::OnUserInput(widgets::UserInputEvent& event) {
     }
 }
 
-// these three are forwarded to the DrawingPanel instance
+// these three are forwarded to the DrawingPanel instance.
+//
+// During a panel re-init swap two panel windows are alive at once (the outgoing
+// old_panel_ kept on screen and the replacement built behind it), and this
+// handler is bound to *both* windows. Route each event to the panel that owns
+// the window it targets: forwarding an old-window paint to the new panel would
+// build a wxPaintDC for the wrong window (wx asserts that a wxPaintDC matches
+// the window being repainted).
+DrawingPanelBase* GameArea::PanelForWindow(wxObject* obj) const
+{
+    if (old_panel_ && obj == old_panel_->GetWindow())
+        return old_panel_;
+    if (panel && obj == panel->GetWindow())
+        return panel;
+    // Fall back to the current panel (covers the common single-panel case where
+    // the event object isn't one we recognise).
+    return panel;
+}
+
 void GameArea::PaintEv(wxPaintEvent& ev)
 {
-    panel->PaintEv(ev);
+    if (DrawingPanelBase* p = PanelForWindow(ev.GetEventObject()))
+        p->PaintEv(ev);
 }
 
 void GameArea::EraseBackground(wxEraseEvent& ev)
 {
-    panel->EraseBackground(ev);
+    if (DrawingPanelBase* p = PanelForWindow(ev.GetEventObject()))
+        p->EraseBackground(ev);
 }
 
 void GameArea::OnSize(wxSizeEvent& ev)
@@ -3272,6 +3630,9 @@ private:
 
 void DrawingPanelBase::DrawArea(uint8_t** data)
 {
+    // Adopt a pending in-place filter change before anything reads `scale`.
+    ApplyPendingFilterChange();
+
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
@@ -3667,6 +4028,37 @@ void DrawingPanelBase::StopFilterThreads()
         threads = nullptr;
         nthreads = 0;
     }
+}
+
+void DrawingPanelBase::ApplyInPlaceFilterChange()
+{
+    // Only arm the change here; DrawArea() applies it on the next frame. Doing
+    // the work now (recompute scale, free pixbuf2, reset threads) would leave
+    // scale ahead of the buffer, so a repaint before the next frame would either
+    // upload a new-scale texture from the old-scale buffer or read a freed one --
+    // exactly the black/garbage flash we are trying to avoid. Deferring keeps the
+    // last good frame on screen until DrawArea rebuilds everything atomically.
+    pending_filter_change_ = true;
+}
+
+void DrawingPanelBase::ApplyPendingFilterChange()
+{
+    if (!pending_filter_change_)
+        return;
+    pending_filter_change_ = false;
+    // Recompute the scale for the newly selected filter, drop the old-scale
+    // filter output buffer (reallocated below at the new size), and reset the
+    // filter threads (they cache scale at creation) so they rebuild at the new
+    // scale. `todraw` may still point at the old buffer here but is reassigned
+    // before use further down in DrawArea.
+    scale = GetFilterScale();
+    StopFilterThreads();
+    extern uint8_t* g_pix;
+    if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
+        free(pixbuf2);
+    pixbuf2 = nullptr;
+    // Interframe motion-blur delta history is keyed to the old geometry.
+    memset(delta, 0xff, sizeof(delta));
 }
 
 DrawingPanelBase::~DrawingPanelBase()
@@ -4626,6 +5018,9 @@ void SDLDrawingPanel::DrawArea()
         
 void SDLDrawingPanel::DrawArea(uint8_t** data)
 {
+    // Adopt a pending in-place filter change before anything reads `scale`.
+    ApplyPendingFilterChange();
+
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
@@ -5035,7 +5430,7 @@ void XOrgDrawingPanel::EnsureSetup()
     // Only stand up the 10-bit child window when deep color is actually wanted
     // and the display supports it; otherwise behave exactly like the plain wx
     // software panel. The panel is recreated when kDispDeepColor changes
-    // (render_observer_ -> ResetPanel), so this is re-evaluated on toggle.
+    // (render_observer_ -> ReinitPanel), so this is re-evaluated on toggle.
     if (!OPTION(kDispDeepColor) || !hdr::DeepColor10Available())
         return;
 
@@ -5310,7 +5705,7 @@ void WaylandDrawingPanel::EnsureSetup()
     // Only stand up the HDR subsurface when HDR is actually wanted and the
     // compositor can present BT.2020 PQ; otherwise behave exactly like the plain
     // wx software panel. The panel is recreated when kDispHDR changes (render
-    // observer -> ResetPanel), so this is re-evaluated on toggle.
+    // observer -> ReinitPanel), so this is re-evaluated on toggle.
     if (!OPTION(kDispHDR) || !hdr::HdrAvailable() || !WaylandHdrPqSupported())
         return;
     if (!IsWayland())
@@ -8362,7 +8757,7 @@ void GameArea::EvaluateHdrRenderer() {
         hdr_retried_renderers_.insert(current);
         wxLogDebug(wxT("HDR-capable renderer reported SDR on first init; "
                        "recreating it once before falling back."));
-        ResetPanel();  // recreate the same renderer; HDR re-evaluated next idle
+        ReinitPanel();  // recreate the same renderer; HDR re-evaluated next idle
         return;
     }
 
@@ -8971,6 +9366,9 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
 
 void MetalDrawingPanel::DrawArea(uint8_t** data)
 {
+    // Adopt a pending in-place filter change before anything reads `scale`.
+    ApplyPendingFilterChange();
+
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
     //   if not filtering, we still retain current image for redraws
