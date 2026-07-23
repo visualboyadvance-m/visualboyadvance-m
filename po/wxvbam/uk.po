@@ -942,11 +942,11 @@ msgstr "Помилка збереження стану %s."
 
 #: panel.cpp:1801
 msgid "Done"
-msgstr ""
+msgstr "Виконано."
 
 #: panel.cpp:1838
 msgid "Running quick first-time performance test"
-msgstr ""
+msgstr "Проведення швидкого першого тесту продуктивності."
 
 #: panel.cpp:1991
 #, c-format
