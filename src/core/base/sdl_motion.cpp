@@ -74,7 +74,13 @@ inline bool PadReadSensor(SdlPad* pad, SDL_SensorType type, float out[3]) {
 // SDL3 dropped the SDL_INIT_GAMECONTROLLER flag in favor of
 // SDL_INIT_GAMEPAD; both can be re-initialized cheaply (idempotent).
 inline void EnsureSdlSubsystem() {
-#ifdef ENABLE_SDL3
+#if defined(__ANDROID__)
+    // No SDLActivity backs SDL's gamepad/sensor JNI on Android (the app runs
+    // under a QtActivity); initializing them dereferences a null joystick
+    // handler and aborts. Physical-pad motion input isn't used on Android —
+    // the on-screen controller drives input — so skip the subsystem entirely.
+    return;
+#elif defined(ENABLE_SDL3)
     SDL_InitSubSystem(SDL_INIT_GAMEPAD | SDL_INIT_SENSOR);
 #else
     SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR);

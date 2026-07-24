@@ -112,6 +112,15 @@ bool EmulatedGamepad::OnInputReleased(const config::UserInput& user_input) {
     return true;
 }
 
+void EmulatedGamepad::SetGameKey(const GameJoy& joypad, const GameKey& game_key, bool pressed) {
+    const uint32_t bit = kBitMask[GameKeyToInt(game_key)];
+    if (pressed) {
+        joypads_[joypad.index()] |= bit;
+    } else {
+        joypads_[joypad.index()] &= ~bit;
+    }
+}
+
 void EmulatedGamepad::Reset() {
     active_controls_.clear();
     joypads_.fill(0);

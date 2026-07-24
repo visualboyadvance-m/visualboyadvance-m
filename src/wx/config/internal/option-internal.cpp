@@ -114,6 +114,9 @@ static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
 #if defined(__WXMAC__)
     "coreaudio",
 #endif
+#if defined(__ANDROID__)
+    "aaudio",
+#endif
     "null",
 };
 
@@ -178,7 +181,12 @@ std::array<Option, kNbOptions>& Option::All() {
         // Linux/BSD and other X11/Wayland platforms. Priority head is Vulkan
         // (then SDL, OpenGL, Simple via the runtime fallback); pick the first
         // that is compiled in for the static default.
-#if !defined(NO_VULKAN)
+#if defined(__ANDROID__)
+        // wxQt/Android: render in-tree via a GLES2 QOpenGLWidget
+        // (GLESDrawingPanel). kOpenGL maps to that panel on Android (see
+        // NewPanelForRenderMethod); the software Simple renderer is the fallback.
+        RenderMethod render_method = RenderMethod::kOpenGL;
+#elif !defined(NO_VULKAN)
         RenderMethod render_method = RenderMethod::kVulkan;
 #elif !defined(NO_OGL)
         RenderMethod render_method = RenderMethod::kOpenGL;
@@ -285,7 +293,9 @@ std::array<Option, kNbOptions>& Option::All() {
         bool allow_joystick_background_input = true;
 
         /// Sound
-#if defined(__WXMAC__) && !defined(NO_COREAUDIO_DEFAULT)
+#if defined(__ANDROID__)
+        AudioApi audio_api = AudioApi::kAAudio;
+#elif defined(__WXMAC__) && !defined(NO_COREAUDIO_DEFAULT)
         AudioApi audio_api = AudioApi::kCoreAudio;
 #elif defined(__WXMSW__) && !defined(NO_DIRECTAUDIO_DEFAULT)
 		AudioApi audio_api = AudioApi::kDirectSound;
@@ -449,6 +459,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kUIAllowKeyboardBackgroundInput, &g_owned_opts.allow_keyboard_background_input),
         Option(OptionID::kUIAllowJoystickBackgroundInput, &g_owned_opts.allow_joystick_background_input),
         Option(OptionID::kUIHideMenuBar, &gopts.hide_menu_bar),
+        Option(OptionID::kUIShowOnScreenController, &gopts.show_onscreen_controller),
         Option(OptionID::kUISuspendScreenSaver, &gopts.suspend_screensaver),
 
         /// Sound
@@ -674,6 +685,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"ui/allowJoystickBackgroundInput", "AllowJoystickBackgroundInput",
                _("Capture joy events while on background")},
     OptionData{"ui/hideMenuBar", "HideMenuBar", _("Hide menu bar when mouse is inactive")},
+    OptionData{"ui/onScreenController", "OnScreenController",
+               _("Show the on-screen touch controller")},
     OptionData{"ui/suspendScreenSaver", "SuspendScreenSaver",
                _("Suspend screensaver when game is running")},
 

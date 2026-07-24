@@ -7,6 +7,10 @@
 
 #include "wx/wxvbam.h"
 
+#if defined(__ANDROID__)
+#include <android/log.h>
+#endif
+
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
 #endif
@@ -1938,6 +1942,7 @@ bool MainFrame::BindControls()
     // and set initial checked status
     if (checkable_mi.size()) {
         MenuOptionBool("RecentFreeze", OPTION(kGenFreezeRecent));
+        MenuOptionBool("OnScreenController", OPTION(kUIShowOnScreenController));
         MenuOptionBool("Pause", paused);
         MenuOptionIntMask("SoundChannel1", gopts.sound_en, (1 << 0));
         MenuOptionIntMask("SoundChannel2", gopts.sound_en, (1 << 1));
@@ -2570,6 +2575,10 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
         }
     } catch (std::exception& e) {
         wxLogError(wxString::FromUTF8(e.what()));
+#if defined(__ANDROID__)
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM", "LoadDialog('%s') threw: %s",
+                            (const char*)name.utf8_str(), e.what());
+#endif
         return nullptr;
     }
 

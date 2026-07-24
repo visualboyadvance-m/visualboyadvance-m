@@ -1,5 +1,9 @@
 #include "wx/wxvbam.h"
 
+#if defined(__ANDROID__)
+#include <android/log.h>
+#endif
+
 #ifdef __WXMSW__
 #include <windows.h>
 #include <versionhelpers.h>
@@ -625,9 +629,19 @@ wxString wxvbamApp::GetAbsolutePath(wxString path)
 int language = wxLANGUAGE_DEFAULT;
 wxLocale *wxvbam_locale = NULL;
 
+#if defined(__WXQT__) && defined(__ANDROID__)
+// Defined in android-compat.cpp: installs a fallback wxArtProvider so stock-art
+// lookups never return a null bitmap (which crashes wxQt's toolbar code).
+void VbamInstallAndroidArtFallback();
+#endif
+
 bool wxvbamApp::OnInit() {
 #ifndef NO_WAYLAND
     using_wayland = IsWayland();
+#endif
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    VbamInstallAndroidArtFallback();
 #endif
 
 #if ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)
@@ -644,7 +658,10 @@ bool wxvbamApp::OnInit() {
     // Initialize wxSocket early so the GDB debug stub can bind reliably on
     // macOS. If we defer this until the Debug menu handler, wxSocketServer
     // constructs with a null impl and LastError() null-derefs.
+    // (Sockets are disabled in the wxQt/Android build -- no debug stub there.)
+#if wxUSE_SOCKETS
     wxSocketBase::Initialize();
+#endif
 
     // use consistent names for config, DO NOT TRANSLATE
     SetAppName("visualboyadvance-m");
@@ -1089,6 +1106,16 @@ bool wxvbamApp::OnInit() {
         return false;
     }
 
+#if defined(__ANDROID__)
+    // The Android activity is always a fullscreen surface; the desktop
+    // geometry logic (90%-of-display 3:2 box, saved window rect) produces a
+    // frame larger than the screen (wxDisplay reports the wrong area on
+    // Android), which clips the content. Just fill the surface.
+    (void)dimensions_unset;
+    (void)is_fullscreen;
+    (void)is_maximized;
+    frame->Maximize(true);
+#else
     if (dimensions_unset) {
         // First run: default to roughly 90% of the primary display while
         // keeping the game panel at the native GBA aspect ratio (240x160 ==
@@ -1128,6 +1155,7 @@ bool wxvbamApp::OnInit() {
     }
     if (is_fullscreen && wxGetApp().pending_load != wxEmptyString)
         frame->ShowFullScreen(is_fullscreen);
+#endif  // !defined(__ANDROID__)
 
     frame->Show(true);
 
@@ -2016,6 +2044,9 @@ int MainFrame::ShowModal(wxDialog* dlg)
 {
     if (!dlg) {
         wxLogError(_("Failed to load dialog"));
+#if defined(__ANDROID__)
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM", "ShowModal: dialog is null");
+#endif
         return wxID_CANCEL;
     }
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);

@@ -112,6 +112,9 @@ enum class AudioApi {
 #if defined(__WXMAC__)
     kCoreAudio,
 #endif
+#if defined(__ANDROID__)
+    kAAudio,
+#endif  // __ANDROID__
     // Outputs no audio; paces emulation with a timer. Always available, and
     // used as the fallback when the selected driver fails to initialize.
     kNull,

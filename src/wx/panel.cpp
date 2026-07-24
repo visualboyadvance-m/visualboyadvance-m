@@ -14,6 +14,13 @@
 #include <utility>
 #include <vector>
 
+#if defined(__ANDROID__)
+#include <android/log.h>
+// Declared here (not via <SDL3/SDL_main.h>, which redefines main) so the SDL
+// panel can mark SDL "main ready" — VBA-M has its own main() (wxEntry).
+extern "C" void SDL_SetMainReady(void);
+#endif
+
 #ifdef __WXGTK__
     #include <X11/Xlib.h>
     #include <X11/Xutil.h>
@@ -689,6 +696,11 @@ GameArea::GameArea()
     // and binding inside that block accumulates duplicate handlers, causing
     // OnSize to fire N times after N filter changes.
     this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
+
+    // React to the on-screen controller option being toggled at runtime.
+    osc_observer_ = std::make_unique<config::OptionsObserver>(
+        config::OptionID::kUIShowOnScreenController,
+        [this](config::Option*) { UpdateOnScreenController(); });
 }
 
 // Returns a valid override key for the loaded GBA ROM.
@@ -706,8 +718,16 @@ static wxString gbaGetOverrideId() {
     return wxString::Format(wxT("CRC_%08X"), romcrc);
 }
 
-void GameArea::LoadGame(const wxString& name)
+void GameArea::LoadGame(const wxString& load_path)
 {
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // The Android file picker hands back Storage-Access-Framework content://
+    // URIs; resolve them to a real local file the stdio ROM loader can open.
+    wxString VbamResolveAndroidContentUri(const wxString&);
+    const wxString name = VbamResolveAndroidContentUri(load_path);
+#else
+    const wxString& name = load_path;
+#endif
     rom_scene_rls = "-";
     rom_scene_rls_name = "-";
     rom_name = "";
@@ -1475,6 +1495,16 @@ void GameArea::DelBorder()
 void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
+#if defined(__ANDROID__)
+    // The Android window is a fixed fullscreen surface. Inflating the min size
+    // by the large hi-DPI factor makes it exceed the screen, clipping/zooming
+    // the image. Use the unscaled native size and let the fullscreen window and
+    // sizer size the panel; DrawImage() then aspect-fits the frame to it.
+    const wxSize android_min(basic_width, basic_height);
+    SetMinSize(android_min);
+    frame->SetMinSize(frame->ClientToWindowSize(android_min));
+    return;
+#endif
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
     const double display_scale = OPTION(kDispScale);
 
@@ -1510,6 +1540,12 @@ void GameArea::AdjustSize(bool force)
 
     if (fullscreen)
         return;
+
+#if defined(__ANDROID__)
+    // Never resize the frame on Android: it is a fixed fullscreen surface and
+    // the sizer fills it. Resizing here would fight the window manager.
+    return;
+#endif
 
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
     const double display_scale = OPTION(kDispScale);
@@ -2254,15 +2290,23 @@ void GameArea::OnIdle(wxIdleEvent& event)
             enableKeyboardBackgroundInput(w->GetEventHandler());
         }
 
+#if !defined(__ANDROID__)
         if (gopts.max_scale)
             w->SetMaxSize(wxSize(basic_width * gopts.max_scale,
                                  basic_height * gopts.max_scale));
+#endif
 
         // if user changed Display/Scale config, this needs to run
         AdjustMinSize();
         AdjustSize(false);
 
+#if defined(__ANDROID__)
+        // Fill the whole (fullscreen) game area; DrawImage() aspect-fits/letterboxes
+        // the frame inside it. wxSHAPED made the panel taller than the screen on wxQt.
+        const bool retain_aspect = false;
+#else
         const bool retain_aspect = OPTION(kDispStretch);
+#endif
         const unsigned frame_priority = retain_aspect ? 0 : 1;
 
         GetSizer()->Clear();
@@ -2300,6 +2344,9 @@ void GameArea::OnIdle(wxIdleEvent& event)
 
         // generate system color maps (after output module init)
         UpdateLcdFilter();
+
+        // Bring up / re-stack the on-screen touch controller over this panel.
+        UpdateOnScreenController();
 
         // Return here to let the panel fully initialize before running emulation.
         // The next OnIdle will start emulation.
@@ -2543,7 +2590,84 @@ void GameArea::OnSize(wxSizeEvent& ev)
         panel->OnSize(ev);
     Layout();
 
+    // Keep the on-screen controller overlaying the whole game area. This also
+    // brings it up at startup (before any ROM is loaded) so its Menu button is
+    // reachable to open a game.
+    UpdateOnScreenController();
+
     ev.Skip();
+}
+
+void GameArea::UpdateOnScreenController()
+{
+#if defined(__ANDROID__)
+    // On Android the on-screen controller is standard equipment: there is no
+    // physical keyboard or gamepad, so it is always on and cannot be turned off.
+    const bool want = true;
+#else
+    const bool want = OPTION(kUIShowOnScreenController);
+#endif
+    if (want) {
+#if defined(__ANDROID__)
+        // Parent the overlay to the render panel window, a sibling stacked above
+        // the GLES2 QOpenGLWidget (also a panel child). Both share the panel's
+        // composited backing store, so the controller's translucent regions show
+        // the GL game frame through. Falls back to GameArea before a panel exists.
+        wxWindow* osc_parent = panel ? panel->GetWindow() : static_cast<wxWindow*>(this);
+#else
+        wxWindow* osc_parent = this;
+#endif
+        // If the parent went away or changed (panel (re)created), drop the old
+        // overlay so we re-create it under the current parent.
+        if (osc_ && osc_->GetParent() != osc_parent) {
+            osc_->Destroy();
+            osc_ = nullptr;
+        }
+        if (!osc_) {
+            osc_ = new widgets::OnScreenController(
+                osc_parent, wxGetApp().emulated_gamepad(), [this]() { ShowOnScreenMenu(); });
+            // The overlay may be destroyed with its parent panel; clear our
+            // pointer when that happens so we never dereference a dangling window.
+            osc_->Bind(wxEVT_DESTROY, [this](wxWindowDestroyEvent& e) {
+                if (e.GetWindow() == osc_)
+                    osc_ = nullptr;
+                e.Skip();
+            });
+        }
+        osc_->SetSize(osc_parent->GetClientSize());
+        osc_->Raise();
+        if (!osc_->IsShown())
+            osc_->Show();
+    } else if (osc_) {
+        osc_->Hide();
+    }
+}
+
+void GameArea::ShowOnScreenMenu()
+{
+    if (!main_frame)
+        return;
+
+    // A compact subset of the menu bar, dispatched through the existing command
+    // handlers by XRC id. Useful on touch devices where the menu bar is hidden.
+    wxMenu menu;
+    menu.Append(XRCID("wxID_OPEN"), _("Open GBA..."));
+    menu.Append(XRCID("OpenGB"), _("Open Game Boy..."));
+    menu.Append(XRCID("OpenGBC"), _("Open Game Boy Color..."));
+    menu.AppendSeparator();
+    menu.Append(XRCID("Pause"), _("Pause"));
+    menu.Append(XRCID("Reset"), _("Reset"));
+    menu.Append(XRCID("SaveGameOldest"), _("Save state"));
+    menu.Append(XRCID("LoadGameAutoLoad"), _("Load state"));
+    menu.AppendSeparator();
+    menu.Append(XRCID("Fullscreen"), _("Full screen"));
+    menu.Append(XRCID("GeneralConfigure"), _("Settings..."));
+    menu.AppendSeparator();
+    menu.Append(XRCID("wxID_EXIT"), _("Quit"));
+
+    // Pop up on the main frame so the resulting command events reach its
+    // command handlers.
+    main_frame->PopupMenu(&menu);
 }
 
 BEGIN_EVENT_TABLE(GameArea, wxPanel)
@@ -2829,6 +2953,12 @@ const uint8_t* DrawingPanelBase::EncodeHdr(const uint8_t* src, int src_stride,
             return src;
     }
     return hdr_buf_.data();
+}
+
+void DrawingPanelBase::PresentFrame()
+{
+    // Default: invalidate so a paint event re-presents the retained `todraw`.
+    GetWindow()->Refresh();
 }
 
 void DrawingPanelBase::PaintEv(wxPaintEvent& ev)
@@ -3886,6 +4016,13 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // next, draw the frame (queue a PaintEv) Refresh must be used under
     // Wayland or nothing is drawn.
+#if defined(__WXQT__)
+    // Qt only paints inside paint events; drawing via wxClientDC outside a
+    // paint handler is silently dropped (black screen). The default PresentFrame
+    // Refresh()es to queue a PaintEv that re-presents `todraw`; the GLES panel
+    // overrides it to upload directly and skip the extra paint pass.
+    PresentFrame();
+#else
 #ifndef NO_WAYLAND
     if (wxGetApp().UsingWayland())
         GetWindow()->Refresh();
@@ -3910,6 +4047,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 #ifndef NO_WAYLAND
     }
 #endif
+#endif  // defined(__WXQT__)
 
     // finally, draw on-screen text using wx method, if possible
     // this method flickers too much right now
@@ -4136,6 +4274,14 @@ SDLDrawingPanel::~SDLDrawingPanel()
 #endif
 
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+#if defined(__ANDROID__)
+        // Clear the external native window binding and tear down the overlay
+        // SurfaceView we created for it.
+        extern void VbamDestroyAndroidVideoSurface();
+        SDL_SetPointerProperty(SDL_GetGlobalProperties(), "vbam.android.native_window", nullptr);
+        VbamDestroyAndroidVideoSurface();
+#endif
 
 #if defined(HAVE_WAYLAND_SUPPORT)
         // Tear down the Wayland subsurface SDL was presenting into, now that SDL
@@ -4415,10 +4561,44 @@ void SDLDrawingPanel::DrawingPanelInit()
 
     DrawingPanel::DrawingPanelInit();
 
+#if defined(__ANDROID__)
+    // SDL's Android video driver has no host SDLActivity here, so create a
+    // dedicated SurfaceView over this panel and hand its native window to our
+    // patched SDL via SDL_SetAndroidExternalWindow() before video init.
+    {
+        // Populate SDL's SDLActivity JNI cache (class + method IDs + mutexes)
+        // that SDLActivity's lifecycle would normally set up, so SDL's Android
+        // init doesn't abort on a NULL jclass under our QtActivity.
+        extern void VbamSetupSdlActivityJni();
+        VbamSetupSdlActivityJni();
+
+        extern void* VbamCreateAndroidVideoSurface(void*);
+        void* anw = VbamCreateAndroidVideoSurface(GetHandle());
+        __android_log_print(ANDROID_LOG_INFO, "VBAM", "AndroidVideoSurface anw=%p", anw);
+        if (!anw) {
+            wxLogError(_("Failed to create Android video surface"));
+            init_failed_ = true;
+            return;
+        }
+        // Hand the native window to our patched SDL via a global property; SDL's
+        // Android VideoInit picks it up (see SDL_androidvideo.c).
+        SDL_SetPointerProperty(SDL_GetGlobalProperties(), "vbam.android.native_window", anw);
+
+        // VBA-M provides its own main() (wxEntry), so SDL is never told the app
+        // is "main ready". On Android SDL_Init(VIDEO) hard-fails without this;
+        // normally SDLActivity's SDL_main path calls it for us.
+        SDL_SetMainReady();
+    }
+#endif
+
 #ifdef ENABLE_SDL3
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) == false) {
 #else
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0) {
+#endif
+#if defined(__ANDROID__)
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM", "SDL_InitSubSystem(VIDEO) failed: %s",
+                            SDL_GetError());
 #endif
         wxLogError(_("Failed to initialize SDL video subsystem"));
         init_failed_ = true;
@@ -4483,6 +4663,10 @@ void SDLDrawingPanel::DrawingPanelInit()
                 sdl_cocoa_view_) == false)
 #elif defined(__WXMSW__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
+#elif defined(__ANDROID__)
+        // The external native window is bound globally via
+        // SDL_SetAndroidExternalWindow(); no per-window handle property needed.
+        if (false)
 #else
         if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
 #endif
@@ -5284,7 +5468,7 @@ BasicDrawingPanel::BasicDrawingPanel(wxWindow* parent, int _width, int _height)
     DrawingPanelInit();
 }
         
-void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
+wxImage* BasicDrawingPanel::BuildImage()
 {
     wxImage* im;
 
@@ -5382,12 +5566,17 @@ void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
             ++src; // skip rhs border
         }
     }
-            
+
+    return im;
+}
+
+void BasicDrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    wxImage* im = BuildImage();
     DrawImage(dc, im);
-            
     delete im;
 }
-        
+
 void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
 {
     double sx, sy;
@@ -5395,10 +5584,96 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     GetClientSize(&w, &h);
     sx = w / (width * scale);
     sy = h / (height * scale);
+#if defined(__ANDROID__)
+    // Aspect-preserving fit (letterbox), centered: use a single uniform scale
+    // and offset so the GBA image fills the fullscreen window without distortion
+    // instead of stretching independently on each axis.
+    {
+        const double s = std::min(sx, sy);
+        const double drawn_w = width * scale * s;
+        const double drawn_h = height * scale * s;
+        const double off_x = (w - drawn_w) / 2.0;
+        const double off_y = (h - drawn_h) / 2.0;
+        dc.SetUserScale(s, s);
+        wxBitmap bm(*im);
+        dc.DrawBitmap(bm, static_cast<int>(off_x / s), static_cast<int>(off_y / s));
+        return;
+    }
+#endif
     dc.SetUserScale(sx, sy);
     wxBitmap bm(*im);
     dc.DrawBitmap(bm, 0, 0);
 }
+
+#if defined(__ANDROID__)
+// ─── GLES2 in-tree renderer (Android/wxQt) ──────────────────────────────────
+
+extern "C" void* VbamAndroidGLCreate(void* parent_qwidget);
+extern "C" void VbamAndroidGLResize(void* widget, int w, int h);
+extern "C" void VbamAndroidGLPresent(void* widget, const void* rgb, int w, int h);
+extern "C" void VbamAndroidGLDestroy(void* widget);
+
+GLESDrawingPanel::GLESDrawingPanel(wxWindow* parent, int _width, int _height)
+    : BasicDrawingPanel(parent, _width, _height)
+{
+    // Host the GLES2 QOpenGLWidget inside this panel's own QWidget, so it
+    // composites in-tree with the rest of the Qt scene.
+    gl_widget_ = VbamAndroidGLCreate(GetWindow()->GetHandle());
+    SyncGeometry();
+    GetWindow()->Bind(wxEVT_SIZE, &GLESDrawingPanel::OnSize, this);
+}
+
+GLESDrawingPanel::~GLESDrawingPanel()
+{
+    if (gl_widget_) {
+        VbamAndroidGLDestroy(gl_widget_);
+        gl_widget_ = nullptr;
+    }
+}
+
+void GLESDrawingPanel::SyncGeometry()
+{
+    if (!gl_widget_) {
+        return;
+    }
+    int w = 0, h = 0;
+    GetWindow()->GetClientSize(&w, &h);
+    VbamAndroidGLResize(gl_widget_, w, h);
+}
+
+void GLESDrawingPanel::OnSize(wxSizeEvent& ev)
+{
+    SyncGeometry();
+    ev.Skip();
+}
+
+void GLESDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
+{
+    (void)dc;  // Present through Qt's GL context, not the (dropped) wxDC.
+    if (!gl_widget_ || !im || !im->IsOk()) {
+        return;
+    }
+    // VbamAndroidGLPresent syncs the widget geometry to its parent internally.
+    // wxImage data is tightly packed 24-bit RGB (stride = width*3).
+    VbamAndroidGLPresent(gl_widget_, im->GetData(), im->GetWidth(), im->GetHeight());
+}
+
+void GLESDrawingPanel::PresentFrame()
+{
+    // Build the RGB frame and upload straight to the GL widget -- no
+    // GetWindow()->Refresh() / PaintEv / wxPaintDC round-trip. That extra wx
+    // paint pass roughly doubled the per-frame composite on Android and pushed
+    // the frame past the vsync budget; presenting directly here restores 60fps.
+    if (!gl_widget_) {
+        return;
+    }
+    wxImage* im = BuildImage();
+    if (im && im->IsOk()) {
+        VbamAndroidGLPresent(gl_widget_, im->GetData(), im->GetWidth(), im->GetHeight());
+    }
+    delete im;
+}
+#endif  // defined(__ANDROID__)
 
 #if defined(__WXGTK__)
 // ─── XOrg native software driver (backs Simple on X11) ──────────────────────
@@ -8979,6 +9254,17 @@ void GameArea::EvaluateDeepColorRenderer() {
 }
 
 DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method) {
+#if defined(__ANDROID__)
+    // wxQt/Android renders in-tree via a GLES2 QOpenGLWidget (GLESDrawingPanel)
+    // for every accelerated method. A separate SDL SurfaceView is composited
+    // behind Qt's own rendering surface and never shows, so it is not used here;
+    // only the software Simple renderer uses the plain wx (BasicDrawingPanel)
+    // path. GL/Vulkan/Metal/D3D/SDL all map to the GLES panel.
+    if (method == config::RenderMethod::kSimple) {
+        return new BasicDrawingPanel(this, basic_width, basic_height);
+    }
+    return new GLESDrawingPanel(this, basic_width, basic_height);
+#endif
 #if defined(__WXMSW__)
     // Last-line defense against render methods that cannot work on this machine,
     // regardless of how `method` was chosen (saved option, dialog pick, or a

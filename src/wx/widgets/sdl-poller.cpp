@@ -381,7 +381,13 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     // UserInputEvent is now ~2.5ms instead of ~25ms — well below
     // the per-frame budget.
     wxTimer::Start(5);
-#ifndef ENABLE_SDL3
+#if defined(__ANDROID__)
+    // SDL's joystick/gamepad subsystem is backed by the SDLActivity Java
+    // lifecycle, which doesn't exist under the QtActivity host; initializing it
+    // dereferences a null joystick handler and aborts. Physical controllers
+    // aren't polled through SDL on Android (input comes from the on-screen
+    // controller), so skip SDL init entirely here.
+#elif !defined(ENABLE_SDL3)
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_JoystickEventState(SDL_ENABLE);
@@ -429,6 +435,12 @@ void SdlPoller::ReconnectControllers(bool enable_game_controller) {
 }
 
 void SdlPoller::Notify() {
+#if defined(__ANDROID__)
+    // SDL joystick/gamepad is not initialized on Android (see the constructor);
+    // pumping SDL_PollEvent here would touch the uninitialized Android event
+    // backend. Nothing to poll — input arrives via the on-screen controller.
+    return;
+#else
     SDL_Event sdl_event;
 
     while (SDL_PollEvent(&sdl_event)) {
@@ -556,6 +568,7 @@ void SdlPoller::Notify() {
             }
         }
     }
+#endif  // !__ANDROID__
 }
 
 JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {

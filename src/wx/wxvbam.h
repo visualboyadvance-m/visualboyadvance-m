@@ -28,6 +28,7 @@
 #include "wx/widgets/event-handler-provider.h"
 #include "wx/widgets/keep-on-top-styler.h"
 #include "wx/widgets/keyboard-input-handler.h"
+#include "wx/widgets/on-screen-controller.h"
 #include "wx/widgets/sdl-poller.h"
 #include "wx/widgets/user-input-event.h"
 #include "wx/widgets/wxmisc.h"
@@ -731,6 +732,16 @@ private:
     // the swap window where both old_panel_ and panel exist simultaneously.
     DrawingPanelBase* PanelForWindow(wxObject* obj) const;
 
+    // On-screen touch controller overlay. Created lazily and kept stacked above
+    // the render panel; on by default on Android, optional elsewhere.
+    widgets::OnScreenController* osc_ = nullptr;
+    std::unique_ptr<config::OptionsObserver> osc_observer_;
+    // Creates/shows/hides and resizes the overlay to match
+    // kUIShowOnScreenController and whether a game is loaded.
+    void UpdateOnScreenController();
+    // Pops up a compact application menu (invoked by the overlay Menu button).
+    void ShowOnScreenMenu();
+
     // Runtime display-filter auto-probe (first launch only). Once a ROM is
     // running, this cycles candidate filters from highest to lowest quality,
     // measures each one's real frame rate, and settles on the highest that
@@ -862,6 +873,11 @@ public:
     virtual void PaintEv(wxPaintEvent& ev);
     virtual void EraseBackground(wxEraseEvent& ev);
     virtual void OnSize(wxSizeEvent& ev);
+    // Present the frame just produced by DrawArea(uint8_t**). The default (used
+    // by the wxQt software path) invalidates the window so a paint event
+    // re-presents `todraw`. A renderer that can present the frame directly
+    // (e.g. the Android GLES panel) overrides this to skip the paint round-trip.
+    virtual void PresentFrame();
     wxWindow* GetWindow() { return dynamic_cast<wxWindow*>(this); }
     virtual bool Destroy() { return GetWindow()->Destroy(); }
 

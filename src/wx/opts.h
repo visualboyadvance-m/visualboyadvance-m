@@ -43,6 +43,13 @@ extern struct opts_t {
 
     /// UI Config
     bool hide_menu_bar = false;
+#if defined(__ANDROID__)
+    // On touch devices there is no physical keyboard or gamepad, so the
+    // on-screen controller is on by default. It is optional elsewhere.
+    bool show_onscreen_controller = true;
+#else
+    bool show_onscreen_controller = false;
+#endif
     bool suspend_screensaver = false;
 
     /// wxWindows

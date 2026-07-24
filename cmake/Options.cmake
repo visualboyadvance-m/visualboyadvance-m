@@ -19,11 +19,11 @@ endif()
 
 set(ENABLE_SDL_DEFAULT ${BUILD_DEFAULT})
 
-if(WIN32 OR APPLE)
+if(WIN32 OR APPLE OR ANDROID)
     set(ENABLE_SDL_DEFAULT OFF)
 endif()
 
-if(NOT WIN32 AND NOT APPLE)
+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     # Detect whether the installed GDK supports Wayland.
     #
     # We try, in order:
@@ -155,7 +155,58 @@ if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
 
-find_package(SDL3 QUIET)
+if(ANDROID)
+    # The NDK ships SDL3 in a multi-arch sysroot, but its CMake package config
+    # points at a non-existent single-arch "<prefix>/lib/libSDL3.so", so
+    # find_package(SDL3) fails its import check. Build the imported target by
+    # hand from the real per-ABI sysroot paths (headers + libSDL3.so) instead.
+    if(NOT TARGET SDL3::SDL3)
+        if(DEFINED CMAKE_LIBRARY_ARCHITECTURE AND CMAKE_LIBRARY_ARCHITECTURE)
+            set(_vbam_android_triple "${CMAKE_LIBRARY_ARCHITECTURE}")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "riscv64")
+            set(_vbam_android_triple "riscv64-linux-android")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
+            set(_vbam_android_triple "aarch64-linux-android")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "armeabi-v7a")
+            set(_vbam_android_triple "arm-linux-androideabi")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86_64")
+            set(_vbam_android_triple "x86_64-linux-android")
+        elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86")
+            set(_vbam_android_triple "i686-linux-android")
+        else()
+            message(FATAL_ERROR "Unsupported Android ABI for SDL3: ${CMAKE_ANDROID_ARCH_ABI}")
+        endif()
+
+        # A custom-built (patched) SDL3 prefix takes precedence over the NDK's
+        # vendored SDL3 -- this is how the external-native-window video support is
+        # supplied (see SDL_SetAndroidExternalWindow). Point at its lib + headers.
+        set(VBAM_ANDROID_SDL3_PREFIX "" CACHE PATH
+            "Prefix of a custom/patched SDL3 install for Android (lib/libSDL3.so + include)")
+        if(VBAM_ANDROID_SDL3_PREFIX AND EXISTS "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.so")
+            set(_vbam_sdl3_lib "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.so")
+            set(_vbam_sdl3_inc "${VBAM_ANDROID_SDL3_PREFIX}/include")
+            message(STATUS "Using custom Android SDL3 from ${VBAM_ANDROID_SDL3_PREFIX}")
+        else()
+            set(_vbam_sdl3_lib "${CMAKE_SYSROOT}/usr/lib/${_vbam_android_triple}/libSDL3.so")
+            set(_vbam_sdl3_inc "${CMAKE_SYSROOT}/usr/include")
+        endif()
+        if(NOT EXISTS "${_vbam_sdl3_lib}")
+            message(FATAL_ERROR "SDL3 not found: ${_vbam_sdl3_lib}")
+        endif()
+
+        add_library(SDL3::SDL3 SHARED IMPORTED)
+        set_target_properties(SDL3::SDL3 PROPERTIES
+            IMPORTED_LOCATION "${_vbam_sdl3_lib}"
+            INTERFACE_INCLUDE_DIRECTORIES "${_vbam_sdl3_inc}")
+        # Stash the resolved .so path so the wx target can hand it to
+        # androiddeployqt (QT_ANDROID_EXTRA_LIBS) without a $<TARGET_FILE> genex,
+        # whose "::" target name breaks Qt's deployment-settings parser.
+        set(VBAM_SDL3_ANDROID_LIB "${_vbam_sdl3_lib}" CACHE INTERNAL "SDL3 .so to bundle in the APK")
+    endif()
+    set(SDL3_FOUND TRUE)
+else()
+    find_package(SDL3 QUIET)
+endif()
 
 option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
@@ -191,7 +242,7 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream.
-if(NOT (X86 AND WIN32))
+if(NOT (X86 AND WIN32) AND NOT ANDROID)
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
@@ -279,7 +330,10 @@ cmake_dependent_option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT} "ENABLE_ASM_SCALER
 option(ENABLE_LIRC "Enable LIRC support" OFF)
 
 # Link / SFML
-if(NOT TRANSLATIONS_ONLY)
+if(NOT TRANSLATIONS_ONLY AND NOT ANDROID)
+    # GBA cable-link uses bundled SFML, whose Android backend isn't vendored
+    # here (and cable link is not meaningful on a phone), so default it off on
+    # Android to keep SFML out of the build.
     set(ENABLE_LINK_DEFAULT ON)
 endif()
 option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})

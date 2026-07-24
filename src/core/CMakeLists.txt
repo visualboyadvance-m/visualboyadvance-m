@@ -143,13 +143,17 @@ if(ENABLE_LINK)
         PRIVATE ${SFML_LIBRARIES}
     )
 
-    # Add libintl.h
-    target_include_directories(vbam-core
-        PRIVATE ${LIBINTL_INC}
-    )
-    target_link_libraries(vbam-core
-        PRIVATE ${NLS_LIBS}
-    )
+    # Add libintl.h (absent on platforms without gettext, e.g. the Android NDK)
+    if(LIBINTL_INC)
+        target_include_directories(vbam-core
+            PRIVATE ${LIBINTL_INC}
+        )
+    endif()
+    if(NLS_LIBS)
+        target_link_libraries(vbam-core
+            PRIVATE ${NLS_LIBS}
+        )
+    endif()
 endif()
 
 add_subdirectory(test)

@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <wx/translation.h>
+
 #include "core/base/check.h"
 #include "core/base/null_sound_driver.h"
 #include "wx/audio/internal/sdl.h"
@@ -24,6 +26,10 @@
 
 #if defined(VBAM_ENABLE_XAUDIO2)
 #include "wx/audio/internal/xaudio2.h"
+#endif
+
+#if defined(__ANDROID__)
+#include "wx/audio/internal/aaudio.h"
 #endif
 
 namespace audio {
@@ -56,6 +62,12 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 #if defined(__WXMAC__)
         case config::AudioApi::kCoreAudio:
             return audio::internal::GetCoreAudioDevices();
+#endif
+
+#if defined(__ANDROID__)
+        case config::AudioApi::kAAudio:
+            // AAudio plays to the default output; no device selection.
+            return std::vector<AudioDevice>({{_("Default device"), wxEmptyString}});
 #endif
 
         case config::AudioApi::kNull:
@@ -96,6 +108,11 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 #if defined(__WXMAC__)
         case config::AudioApi::kCoreAudio:
             return audio::internal::CreateCoreAudioDriver();
+#endif
+
+#if defined(__ANDROID__)
+        case config::AudioApi::kAAudio:
+            return audio::internal::CreateAAudioDriver();
 #endif
 
         case config::AudioApi::kNull:

@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
 #else  // defined(__WXGTK__)
 
 #include <X11/Xlib.h>
@@ -261,7 +261,7 @@ int VKToWX(WXWORD vk, WXLPARAM lParam, wchar_t *uc)
     return wxk;
 }
 
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
 
 #else // defined(__WXGTK__)
 
@@ -494,7 +494,7 @@ private:
     [[maybe_unused]] wxEvtHandler *handler;
 #if defined(__WXMSW__)
     SHORT previousState[0xFF];
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
 #else // defined(__WXGTK__)
     Display *x11display = NULL;
     char previousState[32];
@@ -515,7 +515,7 @@ wxThread::ExitCode BackgroundInput::Setup()
     for (int i = 0x08; i < 0xFF; ++i) {
         previousState[i] = GetAsyncKeyState(i);
     }
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
     wxLogError(wxT("Yet to be implemented!"));
     return ANY_ERROR;
 #else // defined(__WXGTK__)
@@ -648,7 +648,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
         }
         previousState[i] = bits;
     }
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
 #else // defined(__WXGTK__)
     XQueryKeymap(x11display, currentState);
     for (int i = 0; i < 32; ++i) {
@@ -708,7 +708,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
 void BackgroundInput::Cleanup()
 {
 #if defined(__WXMSW__)
-#elif defined(__WXMAC__)
+#elif defined(__WXMAC__) || defined(__WXQT__)
 #else // defined(__WXGTK__)
     if (x11display) {
         XCloseDisplay(x11display);

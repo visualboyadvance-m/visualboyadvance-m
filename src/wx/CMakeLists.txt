@@ -10,6 +10,8 @@ include(VbamFunctions)
 set(VBAM_WX_COMMON
     audio/audio.cpp
     audio/audio.h
+    audio/internal/aaudio.cpp
+    audio/internal/aaudio.h
     audio/internal/coreaudio.cpp
     audio/internal/sdl.cpp
     audio/internal/sdl.h
@@ -166,15 +168,27 @@ set(ENABLE_OPENGL TRUE)
 # part of every standard wxWidgets install but some minimal builds
 # omit it; the editor falls back to a plain wxTextCtrl in that case
 # (see src/wx/lua/lua_editor.cpp).
-find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl stc ${wx_find_extra})
-set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
-
-if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
-endif()
-if(NOT wxWidgets_FOUND)
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
+if(ANDROID)
+    # The wxQt Android build ships no wx 'gl' component, and the desktop GL
+    # canvas isn't used on Android (Vulkan/software renderers cover it), so omit
+    # gl entirely -- requesting it would put a nonexistent .a on the link line.
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base stc ${wx_find_extra})
+    set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
+    if(NOT wxWidgets_FOUND)
+        find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
+    endif()
     set(ENABLE_OPENGL FALSE)
+else()
+    find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl stc ${wx_find_extra})
+    set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
+
+    if(NOT wxWidgets_FOUND)
+        find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl ${wx_find_extra})
+    endif()
+    if(NOT wxWidgets_FOUND)
+        find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
+        set(ENABLE_OPENGL FALSE)
+    endif()
 endif()
 
 # Fixup wxWidgets paths for vcpkg debug builds.
@@ -446,6 +460,13 @@ set(VBAM_ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/icons/${VBAM_ICON})
 
 if(COMPILE_ONLY)
     add_library(visualboyadvance-m OBJECT)
+elseif(ANDROID)
+    # wxWidgets is the wxQt backend here; Qt-for-Android turns the "executable"
+    # into a shared module (lib<name>_<abi>.so) loaded by the Qt Java activity,
+    # and qt_add_executable wires up androiddeployqt to build the APK.
+    # PrintSupport is needed because the wxQt build references QPrinter/QPrinterInfo.
+    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets PrintSupport)
+    qt_add_executable(visualboyadvance-m)
 else()
     add_executable(
         visualboyadvance-m
@@ -483,7 +504,34 @@ if(APPLE)
         COMPILE_OPTIONS "-Wno-elaborated-enum-base;-Wno-availability")
 endif()
 
-target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
+if(ANDROID)
+    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp widgets/android-gl.cpp)
+else()
+    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
+endif()
+
+if(ANDROID)
+    # On Android qt_add_executable makes this a MODULE library, so
+    # _add_link_libraries uses the keyword (PUBLIC) signature and Qt's finalizer
+    # links with keywords too. Use the keyword signature here to match (CMake
+    # forbids mixing plain and keyword target_link_libraries on one target).
+    target_link_libraries(visualboyadvance-m PUBLIC
+        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::PrintSupport
+        aaudio android)
+
+    # androiddeployqt bundles the Java activity template and any extra shared
+    # libraries the app dlopen()s. SDL3 (from the NDK sysroot) is a shared lib,
+    # so it must travel in the APK.
+    set_target_properties(visualboyadvance-m PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+        QT_ANDROID_MIN_SDK_VERSION 28
+        QT_ANDROID_TARGET_SDK_VERSION 34)
+
+    if(VBAM_SDL3_ANDROID_LIB)
+        set_property(TARGET visualboyadvance-m PROPERTY
+            QT_ANDROID_EXTRA_LIBS "${VBAM_SDL3_ANDROID_LIB}")
+    endif()
+endif()
 
 if(ENABLE_VULKAN AND APPLE)
     target_sources(visualboyadvance-m PRIVATE VKMetalLayer.mm)
@@ -591,9 +639,20 @@ if(ENABLE_OPENAL)
 endif()
 
 
+# On Android the target is a MODULE library and Qt's finalizer links it with the
+# keyword signature, so keyword must be used consistently (CMake forbids mixing
+# plain and keyword target_link_libraries on one target). Empty on desktop keeps
+# the existing plain signature.
+if(ANDROID)
+    set(VBAM_WX_TLL_SCOPE PUBLIC)
+else()
+    set(VBAM_WX_TLL_SCOPE "")
+endif()
+
 if(NOT COMPILE_ONLY)
     target_link_libraries(
         visualboyadvance-m
+        ${VBAM_WX_TLL_SCOPE}
         vbam-components-draw-text
         vbam-components-filters
         vbam-components-filters-agb
@@ -626,8 +685,9 @@ endif()
 add_dependencies(visualboyadvance-m translations-zip)
 
 # on unix we have to check for X11 before we overwrite all the compile/link
+# (Android is UNIX-like in CMake but uses the wxQt backend, so skip X11/Wayland)
 # flags with the wx tests
-if(NOT WIN32 AND NOT APPLE)
+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     find_package(X11)
 
     if(X11_X11_LIB)
@@ -837,7 +897,7 @@ endif()
 
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
-if(NOT WIN32 AND NOT APPLE)
+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     find_package(PkgConfig REQUIRED)
 
     find_path(WX_SETUP_H NAMES wx/setup.h PATHS ${wxWidgets_INCLUDE_DIRS})
@@ -928,7 +988,8 @@ if(ENABLE_FFMPEG AND NOT COMPILE_ONLY)
     endif()
 endif()
 
-if(COMPILE_ONLY)
+if(COMPILE_ONLY OR ANDROID)
+    # ANDROID: keyword signature to match Qt's finalizer (see the Qt link above).
     target_link_libraries(visualboyadvance-m PUBLIC nonstd-lib)
 else()
     target_link_libraries(visualboyadvance-m nonstd-lib)
@@ -967,6 +1028,16 @@ if(APPLE AND CMAKE_CROSSCOMPILING)
         if(EXISTS "${MAC_HOMEBREW_WXWIDGETS_PREFIX}/bin/wxrc")
             set(WXRC "${MAC_HOMEBREW_WXWIDGETS_PREFIX}/bin/wxrc")
         endif()
+    endif()
+endif()
+
+# When cross-compiling for Android the wx-config from the Qt-for-Android prefix
+# reports a target (aarch64) wxrc that cannot run on the host. Use the host
+# wxWidgets' wxrc instead (e.g. /usr/local/bin/wxrc-3.3).
+if(ANDROID AND CMAKE_CROSSCOMPILING AND NOT WXRC AND NOT DEFINED ENV{WXRC})
+    find_program(WXRC_HOST NAMES wxrc-3.3 wxrc)
+    if(WXRC_HOST)
+        set(WXRC ${WXRC_HOST})
     endif()
 endif()
 
@@ -1526,22 +1597,27 @@ if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND CMAKE_BUILD_TYPE MATCHES "^(
     endif()
 endif()
 
-install(
-    TARGETS visualboyadvance-m
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+# On Android the deliverable is an APK produced by androiddeployqt (the target
+# is a MODULE library, not an installable executable/bundle), so skip the
+# desktop install rules entirely.
+if(NOT ANDROID)
+    install(
+        TARGETS visualboyadvance-m
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE  DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 
-# Installation scripts.
-install(
-    PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX}
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-install(
-    FILES ${CMAKE_SOURCE_DIR}/src/vba-over.ini
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/vbam
-)
+    # Installation scripts.
+    install(
+        PROGRAMS ${PROJECT_BINARY_DIR}/visualboyadvance-m${CMAKE_EXECUTABLE_SUFFIX}
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+    install(
+        FILES ${CMAKE_SOURCE_DIR}/src/vba-over.ini
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/vbam
+    )
 
-if (UNIX)
-    install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+    if (UNIX)
+        install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+    endif()
 endif()

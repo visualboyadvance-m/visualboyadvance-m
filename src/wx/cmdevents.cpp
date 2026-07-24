@@ -2755,6 +2755,11 @@ EVT_HANDLER(HideMenuBar, "Hide menu bar when mouse is inactive")
     GetMenuOptionConfig("HideMenuBar", config::OptionID::kUIHideMenuBar);
 }
 
+EVT_HANDLER(OnScreenController, "Show the on-screen touch controller")
+{
+    GetMenuOptionConfig("OnScreenController", config::OptionID::kUIShowOnScreenController);
+}
+
 EVT_HANDLER(SuspendScreenSaver, "Suspend screensaver when game is running")
 {
     GetMenuOptionConfig("SuspendScreenSaver", config::OptionID::kUISuspendScreenSaver);

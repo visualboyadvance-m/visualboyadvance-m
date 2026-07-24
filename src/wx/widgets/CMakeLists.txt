@@ -12,6 +12,7 @@ target_sources(vbam-wx-widgets
     group-check-box.cpp
     keep-on-top-styler.cpp
     keyboard-input-handler.cpp
+    on-screen-controller.cpp
     option-validator.cpp
     pulse-action-dialog.cpp
     render-plugin.cpp
@@ -31,6 +32,7 @@ target_sources(vbam-wx-widgets
     group-check-box.h
     keep-on-top-styler.h
     keyboard-input-handler.h
+    on-screen-controller.h
     option-validator.h
     pulse-action-dialog.h
     render-plugin.h
@@ -44,6 +46,13 @@ target_sources(vbam-wx-widgets
 
 target_link_libraries(vbam-wx-widgets PUBLIC vbam-wx-config vbam-sdl-motion)
 configure_wx_target(vbam-wx-widgets)
+
+# The on-screen controller uses Qt multi-touch events on the wxQt/Android
+# backend. Link Qt so <QtGui/QTouchEvent> and friends are on the include path.
+if(ANDROID)
+    find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+    target_link_libraries(vbam-wx-widgets PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets)
+endif()
 
 if(BUILD_TESTING AND NOT COMPILE_ONLY)
     add_executable(vbam-wx-widgets-tests

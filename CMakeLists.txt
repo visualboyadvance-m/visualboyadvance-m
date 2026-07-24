@@ -408,8 +408,12 @@ if(NOT TRANSLATIONS_ONLY)
 
     add_subdirectory(src/core)
     add_subdirectory(src/components)
-    add_subdirectory(src/sdl)
-    add_subdirectory(src/libretro)
+    # The SDL and libretro frontends are desktop/RetroArch targets; the Android
+    # deliverable is the wxQt app, so skip them there.
+    if(NOT ANDROID)
+        add_subdirectory(src/sdl)
+        add_subdirectory(src/libretro)
+    endif()
 endif()
 
 add_subdirectory(src/wx)

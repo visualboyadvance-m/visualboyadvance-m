@@ -129,6 +129,7 @@ enum class OptionID {
     kUIAllowKeyboardBackgroundInput,
     kUIAllowJoystickBackgroundInput,
     kUIHideMenuBar,
+    kUIShowOnScreenController,
     kUISuspendScreenSaver,
 
     /// Sound

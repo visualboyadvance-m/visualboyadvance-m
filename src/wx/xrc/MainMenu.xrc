@@ -565,6 +565,10 @@
 							<label>Hide _Menu Bar</label>
 							<checkable>1</checkable>
 					</object>
+					<object class="wxMenuItem" name="OnScreenController">
+							<label>Show On-Screen _Controller</label>
+							<checkable>1</checkable>
+					</object>
 					<object class="wxMenuItem" name="SuspendScreenSaver">
 							<label>Suspend _Screen Saver</label>
 							<checkable>1</checkable>

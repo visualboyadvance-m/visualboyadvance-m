@@ -11,6 +11,9 @@ public:
 protected:
     void DrawArea(wxWindowDC& dc);
     virtual void DrawImage(wxWindowDC& dc, wxImage* im);
+    // Build the current frame (`todraw`) as a 24-bit RGB wxImage (caller owns
+    // it). Shared by DrawArea(dc) and the GLES panel's direct present path.
+    wxImage* BuildImage();
 };
 
 #if defined(HAVE_WAYLAND_SUPPORT)
@@ -173,6 +176,31 @@ protected:
 #endif
 
 #include <wx/string.h>
+
+#if defined(__ANDROID__)
+// In-tree GLES2 renderer for Android/wxQt. Reuses BasicDrawingPanel's filter and
+// bit-depth -> 24-bit RGB conversion, then overrides DrawImage to upload the
+// finished frame to a QOpenGLWidget (see widgets/android-gl.cpp) instead of
+// blitting through a wxDC. Rendering in Qt's own GL context composites correctly
+// within the scene, unlike a separate SDL SurfaceView (which SurfaceFlinger
+// places behind Qt's surface) or the wxDC push (dropped by Qt outside paint).
+class GLESDrawingPanel : public BasicDrawingPanel {
+public:
+    GLESDrawingPanel(wxWindow* parent, int _width, int _height);
+    ~GLESDrawingPanel() override;
+
+protected:
+    void DrawImage(wxWindowDC& dc, wxImage* im) override;
+    // Present directly to the GL widget from the emulator frame, skipping the
+    // wx Refresh()/PaintEv paint round-trip (halves the per-frame composite).
+    void PresentFrame() override;
+    void OnSize(wxSizeEvent& ev);
+
+private:
+    void SyncGeometry();
+    void* gl_widget_ = nullptr;  // VbamGLWidget* (QOpenGLWidget), opaque here
+};
+#endif  // defined(__ANDROID__)
 
 class SDLDrawingPanel : public DrawingPanel {
 public:

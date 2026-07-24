@@ -31,6 +31,11 @@ public:
     bool OnInputPressed(const UserInput& user_input);
     bool OnInputReleased(const UserInput& user_input);
 
+    // Directly sets or clears a single game key on `joypad`, bypassing the
+    // bindings lookup. Used by the on-screen touch controller, which maps
+    // straight to game keys rather than to a bound physical input.
+    void SetGameKey(const GameJoy& joypad, const GameKey& game_key, bool pressed);
+
     // Clears all input.
     void Reset();
 
