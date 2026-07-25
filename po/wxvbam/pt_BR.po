@@ -1022,43 +1022,43 @@ msgstr "Erro ao gravar o estado do retrocesso"
 
 #: panel.cpp:2654
 msgid "Open GBA..."
-msgstr ""
+msgstr "Abrir GBA..."
 
 #: panel.cpp:2655
 msgid "Open Game Boy..."
-msgstr ""
+msgstr "Abrir Game Boy..."
 
 #: panel.cpp:2656
 msgid "Open Game Boy Color..."
-msgstr ""
+msgstr "Abrir Game Boy Color..."
 
 #: panel.cpp:2658
 msgid "Pause"
-msgstr ""
+msgstr "Pausar"
 
 #: panel.cpp:2659
 msgid "Reset"
-msgstr ""
+msgstr "Resetar"
 
 #: panel.cpp:2660
 msgid "Save state"
-msgstr ""
+msgstr "Salvar o state"
 
 #: panel.cpp:2661
 msgid "Load state"
-msgstr ""
+msgstr "Carregar o state"
 
 #: panel.cpp:2663
 msgid "Full screen"
-msgstr ""
+msgstr "Tela cheia"
 
 #: panel.cpp:2664
 msgid "Settings..."
-msgstr ""
+msgstr "Configurações..."
 
 #: panel.cpp:2666
 msgid "Quit"
-msgstr ""
+msgstr "Sair"
 
 #: panel.cpp:4537
 msgid "Failed to set wayland display"
@@ -1066,7 +1066,7 @@ msgstr "Falhou em definir a exibição do wayland"
 
 #: panel.cpp:4579
 msgid "Failed to create Android video surface"
-msgstr ""
+msgstr "Falhou em criar a superfície de vídeo do Android"
 
 #: panel.cpp:4603
 msgid "Failed to initialize SDL video subsystem"
@@ -2398,7 +2398,7 @@ msgstr "Esconder a barra do menu quando o mouse está inativo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:689
 msgid "Show the on-screen touch controller"
-msgstr ""
+msgstr "Mostrar o controle sensível ao toque na tela"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:691
 msgid "Suspend screensaver when game is running"
@@ -4540,7 +4540,7 @@ msgstr "Esconder a &Barra do Menu"
 
 #: xrc/MainMenu.xrc:569
 msgid "Show On-Screen &Controller"
-msgstr ""
+msgstr "Mostrar o Controle na &Tela"
 
 #: xrc/MainMenu.xrc:573
 msgid "Suspend &Screen Saver"
