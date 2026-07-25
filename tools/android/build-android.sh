@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 #
-# Build the VisualBoyAdvance-M wxQt frontend for Android (arm64-v8a) and
-# package it into an APK using Qt-for-Android + androiddeployqt.
+# Build the VisualBoyAdvance-M wxQt frontend for Android and package it into an
+# APK using Qt-for-Android + androiddeployqt.
+#
+# The target ABI and build type are selected via the environment. Defaults
+# below target armeabi-v7a Release against the matching Qt/wx prefix; override
+# QT_ANDROID_PREFIX/ABI/BUILD_TYPE for arm64-v8a or Debug builds.
 #
 # Prerequisites (already present on the reference machine):
 #   - Qt-for-Android with the wxQt (wxWidgets) build installed in its prefix:
@@ -15,16 +19,17 @@ set -euo pipefail
 
 # --- Configuration ----------------------------------------------------------
 
-QT_ANDROID_PREFIX="${QT_ANDROID_PREFIX:-/usr/local/qt-6.9.3-android-arm64}"
+QT_ANDROID_PREFIX="${QT_ANDROID_PREFIX:-/usr/local/qt-6.9.3-android-armv7}"
 ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}"
 ANDROID_NDK_ROOT="${ANDROID_NDK_ROOT:-$ANDROID_SDK_ROOT/ndk/29.0.14206865}"
 
-BUILD_TYPE="${BUILD_TYPE:-Debug}"
+BUILD_TYPE="${BUILD_TYPE:-Release}"
+ABI="${ABI:-armeabi-v7a}"
 
 # Resolve the repository root (two levels up from tools/android).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-BUILD_DIR="${BUILD_DIR:-$SRC_DIR/build-android}"
+BUILD_DIR="${BUILD_DIR:-$SRC_DIR/build-android-$ABI}"
 
 QT_CMAKE="$QT_ANDROID_PREFIX/bin/qt-cmake"
 WX_CONFIG="$QT_ANDROID_PREFIX/bin/wx-config"
@@ -59,7 +64,8 @@ export ANDROID_SDK_ROOT ANDROID_NDK_ROOT
     -DENABLE_DEBUGGER=OFF \
     -DENABLE_VULKAN=OFF \
     -DENABLE_LINK=OFF \
-    -DBUILD_TESTING=OFF
+    -DBUILD_TESTING=OFF \
+    -DANDROID_ABI=$ABI
 
 # --- Build + package ---------------------------------------------------------
 

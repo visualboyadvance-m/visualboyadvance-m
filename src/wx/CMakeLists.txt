@@ -169,14 +169,85 @@ set(ENABLE_OPENGL TRUE)
 # omit it; the editor falls back to a plain wxTextCtrl in that case
 # (see src/wx/lua/lua_editor.cpp).
 if(ANDROID)
-    # The wxQt Android build ships no wx 'gl' component, and the desktop GL
-    # canvas isn't used on Android (Vulkan/software renderers cover it), so omit
-    # gl entirely -- requesting it would put a nonexistent .a on the link line.
-    find_package(wxWidgets COMPONENTS xrc xml html adv net core base stc ${wx_find_extra})
-    set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
-    if(NOT wxWidgets_FOUND)
-        find_package(wxWidgets COMPONENTS xrc xml html adv net core base ${wx_find_extra} REQUIRED)
+    # The wxQt Android build's wx-config emits Qt5-style `-lQt5Core ...` link
+    # flags even though this is a Qt6 build whose libraries are ABI-suffixed
+    # (e.g. libQt6Core_armeabi-v7a.so). CMake's FindwxWidgets validates every
+    # `-l` entry with find_library() and declares wx "not found" when those
+    # bogus Qt5 names fail to resolve. Qt is linked instead through
+    # find_package(Qt6) and the Qt6:: imported targets further below, so we
+    # query wx-config directly here and drop the redundant Qt5 flags.
+    #
+    # The wx 'gl' component is intentionally omitted: the desktop GL canvas
+    # isn't used on Android (Vulkan/software renderers cover it) and its .a is
+    # not shipped -- requesting it would put a nonexistent lib on the link line.
+    if(NOT wxWidgets_CONFIG_EXECUTABLE)
+        message(FATAL_ERROR
+            "wxWidgets_CONFIG_EXECUTABLE must be set for the Android wxQt build "
+            "(pass -DwxWidgets_CONFIG_EXECUTABLE=<prefix>/bin/wx-config).")
     endif()
+
+    execute_process(
+        COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --version
+        OUTPUT_VARIABLE wxWidgets_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE _wx_rc)
+    if(NOT _wx_rc EQUAL 0)
+        message(FATAL_ERROR "Failed to run ${wxWidgets_CONFIG_EXECUTABLE} --version")
+    endif()
+
+    # Parse --cxxflags into include dirs, compile definitions and other flags.
+    execute_process(
+        COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --cxxflags
+        OUTPUT_VARIABLE _wx_cxxflags OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE _wx_rc)
+    if(NOT _wx_rc EQUAL 0)
+        message(FATAL_ERROR "Failed to run ${wxWidgets_CONFIG_EXECUTABLE} --cxxflags")
+    endif()
+    separate_arguments(_wx_cxxflags_list NATIVE_COMMAND "${_wx_cxxflags}")
+    unset(wxWidgets_INCLUDE_DIRS)
+    unset(wxWidgets_DEFINITIONS)
+    unset(wxWidgets_CXX_FLAGS)
+    foreach(_arg IN LISTS _wx_cxxflags_list)
+        if(_arg MATCHES "^-I(.*)$")
+            list(APPEND wxWidgets_INCLUDE_DIRS "${CMAKE_MATCH_1}")
+        elseif(_arg MATCHES "^-D(.*)$")
+            list(APPEND wxWidgets_DEFINITIONS "${CMAKE_MATCH_1}")
+        else()
+            list(APPEND wxWidgets_CXX_FLAGS "${_arg}")
+        endif()
+    endforeach()
+
+    # Prefer building with the optional stc (wxStyledTextCtrl) component; fall
+    # back to the base set if this wx build doesn't ship it.
+    set(_wx_components "xrc,xml,html,adv,net,core,base,stc")
+    execute_process(
+        COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --libs ${_wx_components}
+        OUTPUT_VARIABLE _wx_libs OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE _wx_rc ERROR_QUIET)
+    if(_wx_rc EQUAL 0)
+        set(VBAM_HAVE_WXSTC TRUE)
+    else()
+        set(VBAM_HAVE_WXSTC FALSE)
+        set(_wx_components "xrc,xml,html,adv,net,core,base")
+        execute_process(
+            COMMAND sh "${wxWidgets_CONFIG_EXECUTABLE}" --libs ${_wx_components}
+            OUTPUT_VARIABLE _wx_libs OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE _wx_rc)
+        if(NOT _wx_rc EQUAL 0)
+            message(FATAL_ERROR "Failed to run ${wxWidgets_CONFIG_EXECUTABLE} --libs ${_wx_components}")
+        endif()
+    endif()
+
+    # Drop the bogus `-lQt5*` entries; Qt6 is linked via imported targets below.
+    separate_arguments(_wx_libs_list NATIVE_COMMAND "${_wx_libs}")
+    unset(wxWidgets_LIBRARIES)
+    foreach(_arg IN LISTS _wx_libs_list)
+        if(_arg MATCHES "^-lQt[0-9]")
+            continue()
+        endif()
+        list(APPEND wxWidgets_LIBRARIES "${_arg}")
+    endforeach()
+
+    set(wxWidgets_FOUND TRUE)
     set(ENABLE_OPENGL FALSE)
 else()
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl stc ${wx_find_extra})
