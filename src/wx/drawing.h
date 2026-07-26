@@ -556,12 +556,16 @@ protected:
 #endif
 
 #ifndef NO_VULKAN
-// On Windows and Linux the Vulkan loader is resolved at run time (LoadLibrary /
-// dlopen + vkGetInstanceProcAddr; see the function-pointer table and VbamVulkan*
-// loaders in panel.cpp), so the import library is not linked. VK_NO_PROTOTYPES
-// suppresses the linked prototypes so that table can define the symbols instead.
+// On Windows, Linux and Android the Vulkan loader is resolved at run time
+// (LoadLibrary / dlopen + vkGetInstanceProcAddr; see the function-pointer table
+// and VbamVulkan* loaders in panel.cpp), so the import library is not linked.
+// VK_NO_PROTOTYPES suppresses the linked prototypes so that table can define the
+// symbols instead. On Android this also keeps libvulkan.so out of the APK's
+// load-time dependencies, so the app still starts on devices without it.
 // macOS still links Vulkan (MoltenVK) for now, so it keeps the prototypes.
-#if defined(__WXMSW__) || defined(__WXGTK__)
+#if defined(__WXMSW__) || defined(__WXGTK__) || \
+    (defined(__WXQT__) && defined(__ANDROID__))
+#define VBAM_VULKAN_DYNAMIC_LOADER 1
 #define VK_NO_PROTOTYPES
 #endif
 #include <vulkan/vulkan.h>
@@ -573,6 +577,9 @@ protected:
 #elif defined(__WXGTK__)
 #include <vulkan/vulkan_wayland.h>
 #include <vulkan/vulkan_xlib.h>
+#elif defined(__WXQT__) && defined(__ANDROID__)
+#include <android/native_window.h>
+#include <vulkan/vulkan_android.h>
 #endif
 
 #include <vector>
@@ -604,6 +611,8 @@ private:
 
 #ifdef __WXMSW__
     bool CreateSurfaceWIN32();
+#elif defined(__WXQT__) && defined(__ANDROID__)
+    bool CreateSurfaceAndroid();
 #elif defined(__WXMAC__)
     bool CreateSurfaceMACOS();
 #elif defined(__WXGTK__)
@@ -705,6 +714,13 @@ private:
     bool     vsync_          = false;
     bool     have_wayland_surface_ = false;
     bool     have_xlib_surface_ = false;
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // ANativeWindow the swapchain presents to, obtained from the QWindow behind
+    // this panel (see CreateSurfaceAndroid). Retained by us; released in the
+    // destructor.
+    ANativeWindow* android_window_ = nullptr;
+#endif
 
 #if defined(__WXGTK__) && !defined(NO_WAYLAND)
     // On Wayland the Vulkan swapchain cannot present to GTK's own wl_surface

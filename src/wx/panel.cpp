@@ -92,8 +92,15 @@ extern "C" void SDL_SetMainReady(void);
 #include "wx/config/option.h"
 #include "wx/drawing.h"
 
-#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+#if !defined(NO_VULKAN) && defined(VBAM_VULKAN_DYNAMIC_LOADER)
 #include <wx/dynlib.h>  // wxDynamicLibrary, for run-time Vulkan loader resolution
+#endif
+
+#if !defined(NO_VULKAN) && defined(__WXQT__) && defined(__ANDROID__)
+// CreateSurfaceAndroid() walks GetHandle() (QWidget) -> windowHandle() (QWindow)
+// to find the Qt window the Vulkan surface must cover.
+#include <QtGui/QWindow>
+#include <QtWidgets/QWidget>
 #endif
 
 #ifndef NO_WAYLAND
@@ -10137,9 +10144,9 @@ const uint32_t VKDrawingPanel::kFragSpv[] = {
 const size_t VKDrawingPanel::kFragSpvSize = sizeof(kFragSpv);
          
 // ─── Constructor ──────────────────────────────────────────────────────────────
-#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+#if !defined(NO_VULKAN) && defined(VBAM_VULKAN_DYNAMIC_LOADER)
 // ── Run-time Vulkan loader (volk-style) ──────────────────────────────────────
-// On Windows and Linux we do not link the Vulkan import library; vulkan.h is
+// On Windows, Linux and Android we do not link the Vulkan library; vulkan.h is
 // included with VK_NO_PROTOTYPES (drawing.h) and the functions we use are
 // resolved at run time from the system loader via wxDynamicLibrary +
 // vkGetInstanceProcAddr. This keeps the loader out of the import table (never a
@@ -10243,6 +10250,8 @@ static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
 #define VBAM_VK_SURFACE_FUNCS(F) \
     F(vkCreateWaylandSurfaceKHR) \
     F(vkCreateXlibSurfaceKHR)
+#elif defined(__WXQT__) && defined(__ANDROID__)
+#define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateAndroidSurfaceKHR)
 #else
 #define VBAM_VK_SURFACE_FUNCS(F)
 #endif
@@ -10314,12 +10323,14 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
 
 #ifdef __WXMSW__
     if (!CreateSurfaceWIN32()){ return; }
+#elif defined(__WXQT__) && defined(__ANDROID__)
+    if (!CreateSurfaceAndroid()){ return; }
 #elif defined(__WXMAC__)
     if (!CreateSurfaceMACOS()){ return; }
 #elif defined(__WXGTK__)
     if (!CreateSurfaceUNIX()) { return; }
 #else
-#error "Must be GTK, macOS or Windows"
+#error "Must be GTK, Android, macOS or Windows"
 #endif
 
     if (!PickPhysicalDevice())          { return; }
@@ -10370,12 +10381,23 @@ VKDrawingPanel::~VKDrawingPanel()
     // Tear down the Wayland subsurface after the Vulkan surface that used it.
     DestroyWaylandSubsurface();
 #endif
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Release our ANativeWindow reference and drop the overlay SurfaceView it
+    // came from, after the Vulkan surface built on it is gone.
+    if (android_window_) {
+        extern void VbamDestroyAndroidVideoSurface();
+        ANativeWindow_release(android_window_);
+        android_window_ = nullptr;
+        VbamDestroyAndroidVideoSurface();
+    }
+#endif
 }
  
 // ─── CreateInstance ───────────────────────────────────────────────────────────
 bool VKDrawingPanel::CreateInstance()
 {
-#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+#if !defined(NO_VULKAN) && defined(VBAM_VULKAN_DYNAMIC_LOADER)
     // Resolve the Vulkan loader before any vk* call; bail if it is absent.
     if (!VbamVulkanBootstrap())
         return false;
@@ -10415,6 +10437,9 @@ bool VKDrawingPanel::CreateInstance()
     // Required companion for MoltenVK portability
     if (has_ext(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
         extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+#elif defined(__WXQT__) && defined(__ANDROID__)
+    // Required by CreateSurfaceAndroid()'s vkCreateAndroidSurfaceKHR.
+    extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 #elif defined(__WXGTK__)
     // ── Probe which surface extensions the instance actually supports ─────────
     // Requesting an extension that isn't present causes vkCreateInstance to
@@ -10490,7 +10515,7 @@ bool VKDrawingPanel::CreateInstance()
         return false;
     }
     wxLogDebug(_("Vulkan instance created"));
-#if !defined(NO_VULKAN) && (defined(__WXMSW__) || defined(__WXGTK__))
+#if !defined(NO_VULKAN) && defined(VBAM_VULKAN_DYNAMIC_LOADER)
     // Resolve instance-/device-level entry points now that the instance exists.
     VbamVulkanLoadInstanceFns(instance_);
 #endif
@@ -10547,7 +10572,56 @@ bool VKDrawingPanel::CreateSurfaceMACOS()
     }
     return true;
 }
- 
+#elif defined(__WXQT__) && defined(__ANDROID__)
+// ─── CreateSurface (Android / wxQt) ──────────────────────────────────────────
+//
+// VK_KHR_android_surface takes an ANativeWindow*, which is not what wxQt hands
+// out: GetHandle() returns this panel's QWidget, and the Qt window behind it is
+// QWidget::windowHandle() -- a QWindow. Qt's Android QPA renders every widget
+// into the activity's single QtSurface and exposes no public ANativeWindow for a
+// QWindow, so take the same route Qt's own QAndroidPlatformVulkanWindow does:
+// attach a SurfaceView to the activity over that QWindow's on-screen rect and
+// use its Surface's ANativeWindow. VbamVideoSurface (android-compat.cpp) is the
+// same overlay helper the SDL renderer already uses.
+bool VKDrawingPanel::CreateSurfaceAndroid()
+{
+    // Force a native window so windowHandle() is non-null for this child widget.
+    QWidget* qwidget = static_cast<QWidget*>(GetHandle());
+    if (!qwidget) {
+        wxLogError(_("Failed to obtain QWidget handle for Vulkan surface"));
+        return false;
+    }
+    qwidget->setAttribute(Qt::WA_NativeWindow, true);
+
+    QWindow* qwindow = qwidget->windowHandle();
+    if (!qwindow && qwidget->window())
+        qwindow = qwidget->window()->windowHandle();
+    if (!qwindow) {
+        wxLogError(_("Failed to obtain QWindow handle for Vulkan surface"));
+        return false;
+    }
+
+    if (!android_window_) {
+        extern void* VbamCreateAndroidVideoSurfaceForWindow(void*);
+        android_window_ = static_cast<ANativeWindow*>(
+            VbamCreateAndroidVideoSurfaceForWindow(qwindow));
+    }
+    if (!android_window_) {
+        wxLogError(_("Failed to obtain ANativeWindow for the panel's QWindow"));
+        return false;
+    }
+
+    VkAndroidSurfaceCreateInfoKHR ci{};
+    ci.sType  = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+    ci.window = android_window_;
+
+    VkResult res = vkCreateAndroidSurfaceKHR(instance_, &ci, nullptr, &surface_);
+    if (res != VK_SUCCESS) {
+        wxLogError(_("Failed to create Vulkan Android surface: %d"), (int)res);
+        return false;
+    }
+    return true;
+}
 #elif defined(__WXGTK__)
 // ─── CreateSurface (Xlib) ────────────────────────────────────────────────────
 // FIX: Error message previously said "Win32 surface" (copy-paste).
@@ -11530,6 +11604,16 @@ void VKDrawingPanel::OnSize(wxSizeEvent& ev)
     // Keep the Vulkan subsurface aligned with the (possibly moved) panel.
     PositionWaylandSubsurface();
 #endif
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Keep the overlay SurfaceView aligned with the (possibly moved) QWindow.
+    if (android_window_) {
+        extern void VbamSetAndroidVideoSurfaceGeometryForWindow(void*);
+        QWidget* qwidget = static_cast<QWidget*>(GetHandle());
+        QWindow* qwindow = qwidget ? qwidget->windowHandle() : nullptr;
+        if (qwindow)
+            VbamSetAndroidVideoSurfaceGeometryForWindow(qwindow);
+    }
+#endif
     if (device_)
         RecreateSwapchain();
     ev.Skip();
@@ -12227,9 +12311,10 @@ bool VbamVulkanRuntimeUsable() {
 bool VbamVulkanRuntimeAvailable() {
 #if defined(NO_VULKAN)
     return false;
-#elif defined(__WXMSW__) || defined(__WXGTK__)
-    // Vulkan is loaded dynamically on Windows/Linux: report it available only if
-    // the loader and the global entry points resolve. Cached by VbamVulkanBootstrap.
+#elif defined(VBAM_VULKAN_DYNAMIC_LOADER)
+    // Vulkan is loaded dynamically on Windows/Linux/Android: report it available
+    // only if the loader and the global entry points resolve. Cached by
+    // VbamVulkanBootstrap.
     return VbamVulkanBootstrap();
 #else
     return true;  // linked normally elsewhere (macOS / MoltenVK)

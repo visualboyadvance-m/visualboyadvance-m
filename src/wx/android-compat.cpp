@@ -22,6 +22,7 @@
 #include <QtCore/QJniObject>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
+#include <QtGui/QWindow>
 #include <QtWidgets/QWidget>
 
 #include <wx/apptrait.h>
@@ -218,13 +219,29 @@ static void VbamWidgetScreenRectPx(void* qwidget, int* x, int* y, int* w, int* h
     *h = static_cast<int>(sz.height() * dpr);
 }
 
-// Creates the overlay SurfaceView (org.visualboyadvance_m.VbamVideoSurface)
-// positioned over `qwidget` (the SDL render panel) and returns its
-// ANativeWindow* (retained by SDL), or nullptr on failure.
-void* VbamCreateAndroidVideoSurface(void* qwidget) {
+// Same, for the QWindow behind a widget (QWidget::windowHandle()). Qt's Android
+// QPA gives a QWindow no reachable ANativeWindow of its own, so the Vulkan path
+// asks for the window's on-screen rect here and gets a SurfaceView covering it.
+static void VbamWindowScreenRectPx(void* qwindow, int* x, int* y, int* w, int* h) {
+    *x = *y = 0;
+    *w = *h = 0;
+    QWindow* window = reinterpret_cast<QWindow*>(qwindow);
+    if (!window) {
+        return;
+    }
+    const qreal dpr = window->devicePixelRatio();
+    const QPoint g = window->mapToGlobal(QPoint(0, 0));
+    const QSize sz = window->size();
+    *x = static_cast<int>(g.x() * dpr);
+    *y = static_cast<int>(g.y() * dpr);
+    *w = static_cast<int>(sz.width() * dpr);
+    *h = static_cast<int>(sz.height() * dpr);
+}
+
+// Creates (or returns the already-created) overlay SurfaceView covering the
+// given physical-pixel rect and returns its ANativeWindow*, or nullptr.
+static void* VbamCreateAndroidVideoSurfaceRect(int x, int y, int w, int h) {
     QJniObject activity = QNativeInterface::QAndroidApplication::context();
-    int x, y, w, h;
-    VbamWidgetScreenRectPx(qwidget, &x, &y, &w, &h);
     __android_log_print(ANDROID_LOG_INFO, "VBAM",
                         "CreateAndroidVideoSurface activityValid=%d rect=%d,%d %dx%d",
                         (int)activity.isValid(), x, y, w, h);
@@ -249,6 +266,25 @@ void* VbamCreateAndroidVideoSurface(void* qwidget) {
     return ANativeWindow_fromSurface(jenv.jniEnv(), surface.object());
 }
 
+// Creates the overlay SurfaceView (org.visualboyadvance_m.VbamVideoSurface)
+// positioned over `qwidget` (the SDL render panel) and returns its
+// ANativeWindow* (retained by SDL), or nullptr on failure.
+void* VbamCreateAndroidVideoSurface(void* qwidget) {
+    int x, y, w, h;
+    VbamWidgetScreenRectPx(qwidget, &x, &y, &w, &h);
+    return VbamCreateAndroidVideoSurfaceRect(x, y, w, h);
+}
+
+// Same, but driven by the panel's QWindow (QWidget::windowHandle()); used by the
+// Vulkan renderer, which needs an ANativeWindow for VK_KHR_android_surface.
+// The returned ANativeWindow is retained -- the caller owns one reference and
+// must ANativeWindow_release() it.
+void* VbamCreateAndroidVideoSurfaceForWindow(void* qwindow) {
+    int x, y, w, h;
+    VbamWindowScreenRectPx(qwindow, &x, &y, &w, &h);
+    return VbamCreateAndroidVideoSurfaceRect(x, y, w, h);
+}
+
 void VbamSetAndroidVideoSurfaceGeometry(void* qwidget) {
     QJniObject activity = QNativeInterface::QAndroidApplication::context();
     if (!activity.isValid()) {
@@ -256,6 +292,18 @@ void VbamSetAndroidVideoSurfaceGeometry(void* qwidget) {
     }
     int x, y, w, h;
     VbamWidgetScreenRectPx(qwidget, &x, &y, &w, &h);
+    QJniObject::callStaticMethod<void>(
+        "org/visualboyadvance_m/VbamVideoSurface", "setGeometry",
+        "(Landroid/app/Activity;IIII)V", activity.object(), x, y, w, h);
+}
+
+void VbamSetAndroidVideoSurfaceGeometryForWindow(void* qwindow) {
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    if (!activity.isValid()) {
+        return;
+    }
+    int x, y, w, h;
+    VbamWindowScreenRectPx(qwindow, &x, &y, &w, &h);
     QJniObject::callStaticMethod<void>(
         "org/visualboyadvance_m/VbamVideoSurface", "setGeometry",
         "(Landroid/app/Activity;IIII)V", activity.object(), x, y, w, h);
