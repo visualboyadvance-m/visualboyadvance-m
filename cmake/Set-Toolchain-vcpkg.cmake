@@ -618,9 +618,7 @@ function(get_binary_packages)
             WORKING_DIRECTORY ${bin_pkgs_dir}
         )
 
-        if (VCPKG_TARGET_TRIPLET CONTAINS NOT -android)
-            file(REMOVE_RECURSE ${bin_pkgs_dir})
-        endif()
+        file(REMOVE_RECURSE ${bin_pkgs_dir})
     endif()
 
     cleanup_binary_packages()
