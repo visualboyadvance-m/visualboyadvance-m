@@ -177,7 +177,7 @@ protected:
 
 #include <wx/string.h>
 
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_GLES)
 // In-tree GLES2 renderer for Android/wxQt. Reuses BasicDrawingPanel's filter and
 // bit-depth -> 24-bit RGB conversion, then overrides DrawImage to upload the
 // finished frame to a QOpenGLWidget (see widgets/android-gl.cpp) instead of
@@ -200,7 +200,7 @@ private:
     void SyncGeometry();
     void* gl_widget_ = nullptr;  // VbamGLWidget* (QOpenGLWidget), opaque here
 };
-#endif  // defined(__ANDROID__)
+#endif  // defined(VBAM_ENABLE_GLES)
 
 class SDLDrawingPanel : public DrawingPanel {
 public:

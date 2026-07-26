@@ -489,7 +489,22 @@ void DisplayConfig::InitBasicTab() {
     };
 
     add_radio("OutputSimple", config::RenderMethod::kSimple);
+
+    // Android has no working SDL video or desktop-OpenGL output (see
+    // NewPanelForRenderMethod); the accelerated choice there is GLES, which is
+    // offered only when it was compiled in (ENABLE_GLES). Everywhere else the
+    // GLES radio does not apply.
+#if defined(__ANDROID__)
+    GetValidatedChild("OutputSDL")->Hide();
+#else
     add_radio("OutputSDL", config::RenderMethod::kSDL);
+#endif
+
+#if defined(VBAM_ENABLE_GLES)
+    add_radio("OutputGLES", config::RenderMethod::kGLES);
+#else
+    GetValidatedChild("OutputGLES")->Hide();
+#endif
 
     // Quartz2D is no longer a separate choice: on macOS the Simple renderer is
     // backed by the Quartz2D driver automatically, so there is no OutputQuartz2D
@@ -500,7 +515,9 @@ void DisplayConfig::InitBasicTab() {
     GetValidatedChild("OutputMetal")->Hide();
 #endif
 
-#ifdef NO_OGL
+#if defined(NO_OGL) || defined(__ANDROID__)
+    // Android: wxQt has no wxGLCanvas and the legacy panel is fixed-function
+    // desktop GL, which GLES2 cannot run -- the GLES radio above covers it.
     GetValidatedChild("OutputOpenGL")->Hide();
 #elif defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
     if (IsWayland()) {
@@ -560,13 +577,19 @@ void DisplayConfig::InitBasicTab() {
     // Bind event handlers to all output module radio buttons.
     GetValidatedChild("OutputSimple")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#if !defined(__ANDROID__)
     GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#if defined(VBAM_ENABLE_GLES)
+    GetValidatedChild("OutputGLES")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
 #if defined(__WXMAC__) && !defined(NO_METAL)
     GetValidatedChild("OutputMetal")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
-#ifndef NO_OGL
+#if !defined(NO_OGL) && !defined(__ANDROID__)
 #if defined(HAVE_WAYLAND_SUPPORT) && !defined(HAVE_WAYLAND_EGL)
     if (!IsWayland()) {
         GetValidatedChild("OutputOpenGL")->Bind(wxEVT_RADIOBUTTON,
@@ -1230,6 +1253,9 @@ void DisplayConfig::UpdateRenderMethodVisibility() {
 #endif
 #if defined(__WXMAC__) && !defined(NO_METAL)
             config::RenderMethod::kMetal,
+#endif
+#if defined(VBAM_ENABLE_GLES)
+            config::RenderMethod::kGLES,
 #endif
             config::RenderMethod::kOpenGL,
             config::RenderMethod::kSimple,

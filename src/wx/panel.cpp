@@ -5605,7 +5605,7 @@ void BasicDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     dc.DrawBitmap(bm, 0, 0);
 }
 
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_GLES)
 // ─── GLES2 in-tree renderer (Android/wxQt) ──────────────────────────────────
 
 extern "C" void* VbamAndroidGLCreate(void* parent_qwidget);
@@ -5673,7 +5673,7 @@ void GLESDrawingPanel::PresentFrame()
     }
     delete im;
 }
-#endif  // defined(__ANDROID__)
+#endif  // defined(VBAM_ENABLE_GLES)
 
 #if defined(__WXGTK__)
 // ─── XOrg native software driver (backs Simple on X11) ──────────────────────
@@ -9116,6 +9116,11 @@ void GameArea::EvaluateRenderer() {
     //   macOS:   Metal, Vulkan, SDL, OpenGL, Simple
     //   Linux:   Vulkan, SDL, OpenGL, Simple
     static const RM kRendererPriority[] = {
+#if defined(VBAM_ENABLE_GLES)
+        // Android: GLES is the only accelerated renderer, Simple the only other
+        // entry (SDL video and desktop OpenGL don't work under wxQt/Android).
+        RM::kGLES,
+#endif
 #if defined(__WXMSW__) && !defined(NO_D3D12)
         RM::kDirect3d12,
 #endif
@@ -9255,16 +9260,25 @@ void GameArea::EvaluateDeepColorRenderer() {
 
 DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method) {
 #if defined(__ANDROID__)
-    // wxQt/Android renders in-tree via a GLES2 QOpenGLWidget (GLESDrawingPanel)
-    // for every accelerated method. A separate SDL SurfaceView is composited
-    // behind Qt's own rendering surface and never shows, so it is not used here;
-    // only the software Simple renderer uses the plain wx (BasicDrawingPanel)
-    // path. GL/Vulkan/Metal/D3D/SDL all map to the GLES panel.
+    // wxQt/Android renders in-tree via a GLES2 QOpenGLWidget (GLESDrawingPanel).
+    // A separate SDL SurfaceView is composited behind Qt's own rendering surface
+    // and never shows, and the legacy desktop-GL panel can't run on GLES2, so
+    // kGLES is the only accelerated method here; the software Simple renderer
+    // uses the plain wx (BasicDrawingPanel) path. Any other saved method
+    // (OpenGL/SDL/Vulkan/... from a config written on another platform, or by an
+    // Android build made before kGLES existed) maps to the GLES panel.
+    // Every branch returns: none of the desktop panels below can be constructed
+    // on Android, so control must never reach them.
     if (method == config::RenderMethod::kSimple) {
+        // Simple, or GLES compiled out (ENABLE_GLES=OFF), which leaves the software
+        // renderer as the only output module.
         return new BasicDrawingPanel(this, basic_width, basic_height);
-    }
-    return new GLESDrawingPanel(this, basic_width, basic_height);
+#if defined(VBAM_ENABLE_GLES)
+    } else if (method == config::RenderMethod::kGLES) {
+        return new GLESDrawingPanel(this, basic_width, basic_height);
 #endif
+    }
+#endif  // defined(__ANDROID__)
 #if defined(__WXMSW__)
     // Last-line defense against render methods that cannot work on this machine,
     // regardless of how `method` was chosen (saved option, dialog pick, or a
@@ -9319,6 +9333,12 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
 #endif
         case config::RenderMethod::kSDL:
             return new SDLDrawingPanel(this, basic_width, basic_height);
+#if defined(VBAM_ENABLE_GLES)
+        case config::RenderMethod::kGLES:
+            // Only reachable on Android, which returns above; kept so the switch
+            // stays exhaustive over RenderMethod.
+            return new GLESDrawingPanel(this, basic_width, basic_height);
+#endif
 #ifdef __WXMAC__
 #ifndef NO_METAL
         case config::RenderMethod::kMetal:

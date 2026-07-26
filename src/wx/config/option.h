@@ -61,6 +61,10 @@ enum class RenderMethod {
     kSimple = 0,
     kOpenGL,
     kSDL,
+#if defined(VBAM_ENABLE_GLES)
+    // Android only: the in-tree OpenGL ES 2 renderer (GLESDrawingPanel).
+    kGLES,
+#endif  // VBAM_ENABLE_GLES
 #if defined(__WXMSW__)
 #if defined(__WXMSW__) && !defined(NO_D3D12)
     kDirect3d12,
@@ -112,9 +116,9 @@ enum class AudioApi {
 #if defined(__WXMAC__)
     kCoreAudio,
 #endif
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_AAUDIO)
     kAAudio,
-#endif  // __ANDROID__
+#endif  // VBAM_ENABLE_AAUDIO
     // Outputs no audio; paces emulation with a timer. Always available, and
     // used as the fallback when the selected driver fails to initialize.
     kNull,
@@ -137,7 +141,7 @@ static constexpr size_t kNbSoundRate = static_cast<size_t>(AudioRate::kLast);
 
 // This is incremented whenever we want to change a default value between
 // release versions. The option update code is in load_opts.
-static constexpr uint32_t kIniLatestVersion = 3;
+static constexpr uint32_t kIniLatestVersion = 4;
 
 // Represents a single option saved in the INI file. Option does not own the
 // individual option, but keeps a pointer to where the data is actually saved.

@@ -8,7 +8,8 @@
 namespace audio {
 namespace internal {
 
-// Creates the Android AAudio sound driver. Android only.
+// Creates the Android AAudio sound driver. Android only, and only when the
+// ENABLE_AAUDIO build option is on (VBAM_ENABLE_AAUDIO).
 std::unique_ptr<SoundDriver> CreateAAudioDriver();
 
 }  // namespace internal

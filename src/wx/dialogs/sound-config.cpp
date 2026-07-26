@@ -274,6 +274,16 @@ void SoundConfig::InitAdvancedTab() {
     audio_api_button->Hide();
 #endif
 
+    audio_api_button = GetValidatedChild("AAudio");
+#if defined(VBAM_ENABLE_AAUDIO)
+    audio_api_button->SetValidator(AudioApiValidator(config::AudioApi::kAAudio));
+    audio_api_button->Bind(wxEVT_RADIOBUTTON,
+                           std::bind(&SoundConfig::OnAudioApiChanged, this, std::placeholders::_1,
+                                     config::AudioApi::kAAudio));
+#else
+    audio_api_button->Hide();
+#endif
+
     // The null driver outputs no audio (it only paces emulation). Always
     // available, on every platform.
     audio_api_button = GetValidatedChild("Null");

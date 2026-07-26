@@ -34,6 +34,11 @@
                 </object>
               </object>
               <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputGLES">
+                  <label translate="0">OpenGL ES</label>
+                </object>
+              </object>
+              <object class="sizeritem">
                 <object class="wxRadioButton" name="OutputSDL">
                   <label translate="0">SDL</label>
                 </object>

@@ -454,6 +454,20 @@ void load_opts(bool first_time_launch) {
                 // OpenGL choice that just became Metal is re-evaluated too.
                 MacApplyIntelOpenGLRenderDefault();
 #endif
+                [[fallthrough]];
+            }
+            case 3: { // new default for Android: the GLES renderer.
+#if defined(VBAM_ENABLE_GLES)
+                // Android gained an explicit "gles" render method; before it,
+                // every accelerated choice (opengl, sdl_video, ...) was silently
+                // drawn by the GLES panel anyway, and the static default was
+                // opengl. Name what was already happening so the saved value and
+                // the dialog agree. Simple (the software path) is a real, distinct
+                // choice on Android and is left alone.
+                if (OPTION(kDispRenderMethod) != config::RenderMethod::kSimple) {
+                    OPTION(kDispRenderMethod) = config::RenderMethod::kGLES;
+                }
+#endif
             }
         }
         ini_version++;

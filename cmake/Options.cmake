@@ -566,6 +566,23 @@ endif()
 
 option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
 
+# Android-only backends. Both are native NDK/Qt paths with no counterpart on any
+# other platform, so they are hard-off elsewhere rather than merely defaulted off
+# -- an explicit -DENABLE_AAUDIO=ON on a desktop build would not compile.
+if(ANDROID)
+    # AAudio is the NDK's low-latency audio output (API 26+). Turning it off
+    # leaves SDL as the Android sound backend.
+    option(ENABLE_AAUDIO "Enable AAudio sound output for the wxWidgets port (Android only)" ON)
+
+    # The in-tree GLES2 renderer (a QOpenGLWidget hosted in Qt's scene graph).
+    # Turning it off leaves the software Simple renderer as the only output
+    # module, since neither desktop OpenGL nor SDL video works on wxQt/Android.
+    option(ENABLE_GLES "Enable the OpenGL ES 2 renderer for the wxWidgets port (Android only)" ON)
+else()
+    set(ENABLE_AAUDIO OFF)
+    set(ENABLE_GLES OFF)
+endif()
+
 option(ZIP_SUFFIX [=[suffix for release zip files, e.g.  "-somebranch".zip]=] OFF)
 
 # The SDL port can't be built without debugging support

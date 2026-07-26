@@ -67,6 +67,9 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
     "simple",
     "opengl",
     "sdl_video",
+#if defined(VBAM_ENABLE_GLES)
+    "gles",
+#endif
 #if defined(__WXMSW__)
 #if defined(__WXMSW__) && !defined(NO_D3D12)
     "direct3d12",
@@ -114,7 +117,7 @@ static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
 #if defined(__WXMAC__)
     "coreaudio",
 #endif
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_AAUDIO)
     "aaudio",
 #endif
     "null",
@@ -181,11 +184,14 @@ std::array<Option, kNbOptions>& Option::All() {
         // Linux/BSD and other X11/Wayland platforms. Priority head is Vulkan
         // (then SDL, OpenGL, Simple via the runtime fallback); pick the first
         // that is compiled in for the static default.
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_GLES)
         // wxQt/Android: render in-tree via a GLES2 QOpenGLWidget
-        // (GLESDrawingPanel). kOpenGL maps to that panel on Android (see
-        // NewPanelForRenderMethod); the software Simple renderer is the fallback.
-        RenderMethod render_method = RenderMethod::kOpenGL;
+        // (GLESDrawingPanel). Desktop OpenGL and SDL video don't work there, so
+        // GLES is the only accelerated choice; Simple is the fallback.
+        RenderMethod render_method = RenderMethod::kGLES;
+#elif defined(__ANDROID__)
+        // GLES compiled out: the software Simple renderer is all that is left.
+        RenderMethod render_method = RenderMethod::kSimple;
 #elif !defined(NO_VULKAN)
         RenderMethod render_method = RenderMethod::kVulkan;
 #elif !defined(NO_OGL)
@@ -293,7 +299,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool allow_joystick_background_input = true;
 
         /// Sound
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_AAUDIO)
         AudioApi audio_api = AudioApi::kAAudio;
 #elif defined(__WXMAC__) && !defined(NO_COREAUDIO_DEFAULT)
         AudioApi audio_api = AudioApi::kCoreAudio;

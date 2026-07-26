@@ -196,7 +196,9 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_LINK=NO -G Ninja
 | `ENABLE_OPENAL`                           | Enable openal-soft sound output for wxWidgets                        | ON                    |
 | `ENABLE_XAUDIO2`                          | Enable xaudio2 sound output for wxWidgets (Windows only)             | ON                    |
 | `ENABLE_FAUDIO`                           | Enable faudio sound output for wxWidgets                             | ON                    |
+| `ENABLE_AAUDIO`                           | Enable AAudio sound output for wxWidgets (Android only)              | ON - Android          |
 | `ENABLE_VULKAN`                           | Enable Vulkan video output                                           | ON                    |
+| `ENABLE_GLES`                             | Enable the OpenGL ES 2 video output (Android only)                   | ON - Android          |
 | `ENABLE_DIRECT3D`                         | Enable Direct3D 9 support (Windows only)                             | ON - Win              |
 | `ENABLE_DIRECT3D12`                       | Enable Direct3D 12 support (Windows only)                            | ON - Win              |
 | `ENABLE_DIRECT3D11`                       | Enable Direct3D 11 support (Windows only)                            | ON - Win              |

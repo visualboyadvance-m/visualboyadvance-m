@@ -1,6 +1,6 @@
 #include "wx/audio/internal/aaudio.h"
 
-#if defined(__ANDROID__)
+#if defined(VBAM_ENABLE_AAUDIO)
 
 #include <aaudio/AAudio.h>
 #include <android/log.h>
@@ -227,4 +227,4 @@ std::unique_ptr<SoundDriver> CreateAAudioDriver() {
 }  // namespace internal
 }  // namespace audio
 
-#endif  // defined(__ANDROID__)
+#endif  // defined(VBAM_ENABLE_AAUDIO)

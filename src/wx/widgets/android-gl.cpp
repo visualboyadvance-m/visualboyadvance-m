@@ -16,7 +16,7 @@
 // filter/scale pipeline) via VbamAndroidGLPresent(); we upload it to a texture
 // and draw a single aspect-preserving (letterboxed) quad.
 
-#if defined(__WXQT__) && defined(__ANDROID__)
+#if defined(VBAM_ENABLE_GLES) && defined(__WXQT__) && defined(__ANDROID__)
 
 #include <cstdint>
 #include <cstring>

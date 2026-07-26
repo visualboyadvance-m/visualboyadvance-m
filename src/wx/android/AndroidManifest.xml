@@ -18,7 +18,7 @@
     <!-- Needed to load ROMs / save files from shared storage on older devices.
          Android 13+ uses the Storage Access Framework via Qt's file dialog. -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+        android:maxSdkVersion="36" />
 
     <!-- %%INSERT_PERMISSIONS -->
     <!-- %%INSERT_FEATURES -->

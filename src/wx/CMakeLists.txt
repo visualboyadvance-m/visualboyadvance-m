@@ -428,6 +428,18 @@ function(configure_wx_target target)
         endif()
     endif()
 
+    # AAudio (Android only). The driver TU and the kAAudio option value are both
+    # compiled out when this is off; the sound dialog hides its radio button.
+    if(ENABLE_AAUDIO)
+        _add_compile_definitions(VBAM_ENABLE_AAUDIO)
+    endif()
+
+    # OpenGL ES 2 renderer (Android only). Compiles out the GLES drawing panel,
+    # the widgets/android-gl.cpp Qt widget and the kGLES render method.
+    if(ENABLE_GLES)
+        _add_compile_definitions(VBAM_ENABLE_GLES)
+    endif()
+
     # Vukan.
     if(NOT ENABLE_VULKAN)
         _add_compile_definitions(NO_VULKAN)
@@ -536,7 +548,13 @@ elseif(ANDROID)
     # into a shared module (lib<name>_<abi>.so) loaded by the Qt Java activity,
     # and qt_add_executable wires up androiddeployqt to build the APK.
     # PrintSupport is needed because the wxQt build references QPrinter/QPrinterInfo.
-    find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets PrintSupport)
+    # OpenGLWidgets is only required by the GLES renderer (widgets/android-gl.cpp).
+    set(_vbam_qt_components Core Gui Widgets PrintSupport)
+    if(ENABLE_GLES)
+        list(APPEND _vbam_qt_components OpenGLWidgets)
+    endif()
+    find_package(Qt6 REQUIRED COMPONENTS ${_vbam_qt_components})
+    unset(_vbam_qt_components)
     qt_add_executable(visualboyadvance-m)
 else()
     add_executable(
@@ -576,7 +594,10 @@ if(APPLE)
 endif()
 
 if(ANDROID)
-    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp widgets/android-gl.cpp)
+    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp)
+    if(ENABLE_GLES)
+        target_sources(visualboyadvance-m PRIVATE widgets/android-gl.cpp)
+    endif()
 else()
     target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
 endif()
@@ -587,8 +608,16 @@ if(ANDROID)
     # links with keywords too. Use the keyword signature here to match (CMake
     # forbids mixing plain and keyword target_link_libraries on one target).
     target_link_libraries(visualboyadvance-m PUBLIC
-        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::PrintSupport
-        aaudio android)
+        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::PrintSupport android)
+
+    # QOpenGLWidgets is only pulled in by the GLES renderer.
+    if(ENABLE_GLES)
+        target_link_libraries(visualboyadvance-m PUBLIC Qt6::OpenGLWidgets)
+    endif()
+
+    if(ENABLE_AAUDIO)
+        target_link_libraries(visualboyadvance-m PUBLIC aaudio)
+    endif()
 
     # androiddeployqt bundles the Java activity template and any extra shared
     # libraries the app dlopen()s. SDL3 (from the NDK sysroot) is a shared lib,
