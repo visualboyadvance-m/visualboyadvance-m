@@ -208,6 +208,117 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
+# Remember a toolchain file the caller already selected.
+#
+# vcpkg_set_toolchain() below points CMAKE_TOOLCHAIN_FILE at vcpkg.cmake, which
+# would throw away the caller's choice - and with it the cross-compilation
+# setup. Qt's qt-cmake wrapper passes qt.toolchain.cmake through the
+# CMAKE_TOOLCHAIN_FILE *environment* variable rather than -D, so without this
+# an Android configure silently falls back to the host compiler.
+#
+# When one is found it stays as CMAKE_TOOLCHAIN_FILE and vcpkg.cmake is included
+# next to it at the bottom of this file, which is all vcpkg needs for its
+# find_package() integration and prefix paths.
+if(NOT DEFINED VBAM_OUTER_TOOLCHAIN_FILE)
+    set(vbam_outer_toolchain "")
+
+    if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+        set(vbam_outer_toolchain "${CMAKE_TOOLCHAIN_FILE}")
+    elseif(NOT "$ENV{CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
+        set(vbam_outer_toolchain "$ENV{CMAKE_TOOLCHAIN_FILE}")
+    endif()
+
+    # vcpkg's own toolchain is not an "outer" one, we load it unconditionally.
+    if(vbam_outer_toolchain MATCHES "buildsystems/vcpkg\\.cmake$")
+        set(vbam_outer_toolchain "")
+    endif()
+
+    # Cached because CMAKE_TOOLCHAIN_FILE gets rewritten below, and re-configures
+    # of an existing build directory are usually run through plain cmake rather
+    # than the qt-cmake wrapper that set the environment variable.
+    set(VBAM_OUTER_TOOLCHAIN_FILE "${vbam_outer_toolchain}"
+        CACHE INTERNAL "Caller-supplied toolchain file loaded alongside vcpkg")
+
+    unset(vbam_outer_toolchain)
+endif()
+
+if(VBAM_OUTER_TOOLCHAIN_FILE)
+    message(STATUS "Using caller-supplied toolchain file: ${VBAM_OUTER_TOOLCHAIN_FILE}")
+endif()
+
+# Android: hand the NDK toolchain to vcpkg. Nothing else selects a cross
+# compiler - the vcpkg triplet only sets VCPKG_CMAKE_SYSTEM_NAME for vcpkg's own
+# port builds, and the Qt toolchain chainloads whatever
+# VCPKG_CHAINLOAD_TOOLCHAIN_FILE names, so setting it here serves both.
+if(VCPKG_TARGET_TRIPLET MATCHES "-android$" AND NOT VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+    set(vbam_android_ndk "")
+
+    foreach(ndk_var CMAKE_ANDROID_NDK ANDROID_NDK_ROOT ANDROID_NDK ANDROID_NDK_HOME)
+        if(NOT "${${ndk_var}}" STREQUAL "")
+            set(vbam_android_ndk "${${ndk_var}}")
+            break()
+        endif()
+
+        if(NOT "$ENV{${ndk_var}}" STREQUAL "")
+            set(vbam_android_ndk "$ENV{${ndk_var}}")
+            break()
+        endif()
+    endforeach()
+
+    # Fall back to the newest NDK installed under the SDK root.
+    if(vbam_android_ndk STREQUAL "")
+        foreach(sdk_var ANDROID_SDK_ROOT ANDROID_HOME ANDROID_SDK_HOME)
+            if(NOT "${${sdk_var}}" STREQUAL "")
+                set(vbam_android_sdk "${${sdk_var}}")
+                break()
+            endif()
+
+            if(NOT "$ENV{${sdk_var}}" STREQUAL "")
+                set(vbam_android_sdk "$ENV{${sdk_var}}")
+                break()
+            endif()
+        endforeach()
+
+        if(vbam_android_sdk)
+            file(GLOB vbam_android_ndks "${vbam_android_sdk}/ndk/*")
+            list(FILTER vbam_android_ndks INCLUDE REGEX "/[0-9]")
+            list(SORT  vbam_android_ndks COMPARE NATURAL)
+            list(POP_BACK vbam_android_ndks vbam_android_ndk)
+            unset(vbam_android_ndks)
+        endif()
+    endif()
+
+    if(NOT vbam_android_ndk OR NOT EXISTS "${vbam_android_ndk}/build/cmake/android.toolchain.cmake")
+        message(FATAL_ERROR
+            "Triplet '${VCPKG_TARGET_TRIPLET}' needs the Android NDK, but no NDK was found. "
+            "Set ANDROID_NDK_HOME (or -DANDROID_NDK_ROOT=<path>) to an NDK containing "
+            "build/cmake/android.toolchain.cmake."
+        )
+    endif()
+
+    set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${vbam_android_ndk}/build/cmake/android.toolchain.cmake"
+        CACHE FILEPATH "Toolchain file chainloaded by vcpkg" FORCE)
+
+    message(STATUS "Android NDK toolchain: ${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+
+    # Qt's Android support and androiddeployqt look the SDK and NDK up under
+    # these names, and the NDK toolchain itself reads ANDROID_ABI.
+    if(NOT ANDROID_NDK_ROOT)
+        set(ANDROID_NDK_ROOT "${vbam_android_ndk}" CACHE PATH "Path to the Android NDK" FORCE)
+    endif()
+
+    if(NOT ANDROID_SDK_ROOT AND vbam_android_sdk)
+        set(ANDROID_SDK_ROOT "${vbam_android_sdk}" CACHE PATH "Path to the Android SDK" FORCE)
+    endif()
+
+    if(NOT ANDROID_ABI AND CMAKE_ANDROID_ARCH_ABI)
+        set(ANDROID_ABI "${CMAKE_ANDROID_ARCH_ABI}" CACHE STRING "Android ABI" FORCE)
+    endif()
+
+    unset(vbam_android_ndk)
+    unset(vbam_android_sdk)
+endif()
+
 if(WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
     find_program(make_path NAME mingw32-make.exe)
 
@@ -859,7 +970,16 @@ function(vcpkg_set_toolchain)
         endif()
     endif()
 
-    set(CMAKE_TOOLCHAIN_FILE    "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"        CACHE FILEPATH  "vcpkg toolchain"       FORCE)
+    # Keep a caller-supplied toolchain (e.g. Qt's qt.toolchain.cmake, which
+    # chainloads the Android NDK toolchain) as the project toolchain. vcpkg.cmake
+    # is included directly at the bottom of this file either way, so vcpkg
+    # integration is not lost by leaving CMAKE_TOOLCHAIN_FILE alone.
+    if(VBAM_OUTER_TOOLCHAIN_FILE)
+        set(CMAKE_TOOLCHAIN_FILE "${VBAM_OUTER_TOOLCHAIN_FILE}"                        CACHE FILEPATH  "toolchain"             FORCE)
+    else()
+        set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"       CACHE FILEPATH  "vcpkg toolchain"       FORCE)
+    endif()
+
     set(CMAKE_PREFIX_PATH       "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/"      CACHE STRING    "vcpkg prefix path"     FORCE)
 
     # These may be set in an MSYS2 environment and interfere with finding packages.

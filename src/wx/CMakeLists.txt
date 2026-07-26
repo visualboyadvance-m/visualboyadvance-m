@@ -262,6 +262,18 @@ else()
     endif()
 endif()
 
+# wx-config for a wxQt build echoes Qt's INTERFACE_COMPILE_DEFINITIONS
+# verbatim, unevaluated generator expressions included (Qt6::Test contributes a
+# QT_TESTCASE_BUILDDIR one). They mean nothing outside Qt's own test targets,
+# and the literal '$' breaks the build.ninja that try_compile() generates, so
+# drop any flag carrying one.
+foreach(_wx_flag_var wxWidgets_DEFINITIONS wxWidgets_DEFINITIONS_DEBUG wxWidgets_CXX_FLAGS)
+    if(${_wx_flag_var})
+        list(FILTER ${_wx_flag_var} EXCLUDE REGEX "\\$<")
+    endif()
+endforeach()
+unset(_wx_flag_var)
+
 # Fixup wxWidgets paths for vcpkg debug builds.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_ROOT_DIR "${wxWidgets_ROOT_DIR}/debug" CACHE INTERNAL "wxWidgets root directory" FORCE)
@@ -602,6 +614,16 @@ else()
     target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} ${VBAM_ICON_PATH})
 endif()
 
+# On Android the target is a MODULE library and Qt's finalizer links it with the
+# keyword signature, so keyword must be used consistently (CMake forbids mixing
+# plain and keyword target_link_libraries on one target). Empty on desktop keeps
+# the existing plain signature.
+if(ANDROID)
+    set(VBAM_WX_TLL_SCOPE PUBLIC)
+else()
+    set(VBAM_WX_TLL_SCOPE "")
+endif()
+
 if(ANDROID)
     # On Android qt_add_executable makes this a MODULE library, so
     # _add_link_libraries uses the keyword (PUBLIC) signature and Qt's finalizer
@@ -671,7 +693,7 @@ if(ENABLE_LUA)
         lua/lua_editor.h
         lua/lua_overlay.cpp
     )
-    target_link_libraries(     visualboyadvance-m ${LUA_LIBRARIES})
+    target_link_libraries(     visualboyadvance-m ${VBAM_WX_TLL_SCOPE} ${LUA_LIBRARIES})
     target_include_directories(visualboyadvance-m PRIVATE ${LUA_INCLUDE_DIR})
     target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_LUA)
     if(VBAM_HAVE_WXSTC)
@@ -738,16 +760,6 @@ if(ENABLE_OPENAL)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_ENABLE_OPENAL)
 endif()
 
-
-# On Android the target is a MODULE library and Qt's finalizer links it with the
-# keyword signature, so keyword must be used consistently (CMake forbids mixing
-# plain and keyword target_link_libraries on one target). Empty on desktop keeps
-# the existing plain signature.
-if(ANDROID)
-    set(VBAM_WX_TLL_SCOPE PUBLIC)
-else()
-    set(VBAM_WX_TLL_SCOPE "")
-endif()
 
 if(NOT COMPILE_ONLY)
     target_link_libraries(
@@ -1079,6 +1091,7 @@ endif()
 if(ENABLE_FFMPEG AND NOT COMPILE_ONLY)
     target_link_libraries(
         visualboyadvance-m
+        ${VBAM_WX_TLL_SCOPE}
         vbam-components-av-recording
         ${FFMPEG_LIBRARIES}
     )

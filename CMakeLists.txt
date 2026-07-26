@@ -116,7 +116,10 @@ if(APPLE)
     add_link_options(-Wl,-w)
 endif()
 
-if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+# VCPKG_TOOLCHAIN is set by vcpkg.cmake itself. Testing CMAKE_TOOLCHAIN_FILE
+# would miss the case where vcpkg is loaded alongside another toolchain file
+# (see VBAM_OUTER_TOOLCHAIN_FILE in Set-Toolchain-vcpkg.cmake).
+if(VCPKG_TOOLCHAIN)
     add_compile_definitions(-DVCPKG)
     if(MSVC)
         set(CMAKE_C_FLAGS      "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_C_FLAGS}")
