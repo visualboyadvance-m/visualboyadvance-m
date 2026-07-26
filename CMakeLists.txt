@@ -45,7 +45,11 @@ endif()
 
 option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
 
-set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl wxwidgets nanosvg)
+if (VCPKG_TARGET_TRIPLET STREQUAL arm64-android OR VCPKG_TARGET_TRIPLET STREQUAL arm-android OR VCPKG_TARGET_TRIPLET STREQUAL i686-android OR VCPKG_TARGET_TRIPLET STREQUAL x86_64-android OR VCPKG_TARGET_TRIPLET STREQUAL riscv64-android)
+    set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl qtbase qttools wxwidgets nanosvg)
+else()
+    set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl wxwidgets nanosvg)
+endif()
 
 set(VCPKG_DEPS_OPTIONAL
     "sdl3[vulkan]"      ENABLE_SDL3
