@@ -24,7 +24,7 @@ ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}"
 ANDROID_NDK_ROOT="${ANDROID_NDK_ROOT:-$ANDROID_SDK_ROOT/ndk/29.0.14206865}"
 
 BUILD_TYPE="${BUILD_TYPE:-Release}"
-ABI="${ABI:-armeabi-v7a}"
+ABI="${ABI:-arm64-v8a}"
 
 # Resolve the repository root (two levels up from tools/android).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
