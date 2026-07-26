@@ -10,6 +10,10 @@
 #include <zconf.h>
 #endif
 
+#if defined(__ANDROID__)
+#define fseeko64 fseeko
+#define ftello64 ftello
+#endif
 
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/param.h>

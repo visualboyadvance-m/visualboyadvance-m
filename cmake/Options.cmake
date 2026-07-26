@@ -198,14 +198,28 @@ if(ANDROID)
             message(FATAL_ERROR "SDL3 not found: ${_vbam_sdl3_lib}")
         endif()
 
-        add_library(SDL3::SDL3 SHARED IMPORTED)
+        # Import as STATIC or SHARED according to what was actually resolved; a
+        # static archive imported as SHARED makes CMake treat it as a runtime
+        # dependency (and confuses install/deploy logic).
+        if(_vbam_sdl3_lib MATCHES "\\.a$")
+            add_library(SDL3::SDL3 STATIC IMPORTED)
+        else()
+            add_library(SDL3::SDL3 SHARED IMPORTED)
+        endif()
         set_target_properties(SDL3::SDL3 PROPERTIES
             IMPORTED_LOCATION "${_vbam_sdl3_lib}"
             INTERFACE_INCLUDE_DIRECTORIES "${_vbam_sdl3_inc}")
         # Stash the resolved .so path so the wx target can hand it to
         # androiddeployqt (QT_ANDROID_EXTRA_LIBS) without a $<TARGET_FILE> genex,
         # whose "::" target name breaks Qt's deployment-settings parser.
-        set(VBAM_SDL3_ANDROID_LIB "${_vbam_sdl3_lib}" CACHE INTERNAL "SDL3 .so to bundle in the APK")
+        # androiddeployqt only accepts "lib*.so" there and hard-errors on
+        # anything else, so a statically linked SDL3 must not be listed: it is
+        # already inside the app's own module .so and needs no bundling.
+        if(_vbam_sdl3_lib MATCHES "\\.a$")
+            set(VBAM_SDL3_ANDROID_LIB "" CACHE INTERNAL "SDL3 .so to bundle in the APK")
+        else()
+            set(VBAM_SDL3_ANDROID_LIB "${_vbam_sdl3_lib}" CACHE INTERNAL "SDL3 .so to bundle in the APK")
+        endif()
     endif()
     set(SDL3_FOUND TRUE)
 else()

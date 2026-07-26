@@ -642,8 +642,9 @@ if(ANDROID)
     endif()
 
     # androiddeployqt bundles the Java activity template and any extra shared
-    # libraries the app dlopen()s. SDL3 (from the NDK sysroot) is a shared lib,
-    # so it must travel in the APK.
+    # libraries the app dlopen()s. When SDL3 comes from the NDK sysroot (or any
+    # prefix providing libSDL3.so) it must travel in the APK; a static SDL3 is
+    # linked into our own module .so and VBAM_SDL3_ANDROID_LIB is left empty.
     set_target_properties(visualboyadvance-m PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
         QT_ANDROID_MIN_SDK_VERSION 28
@@ -693,7 +694,7 @@ if(ENABLE_LUA)
         lua/lua_editor.h
         lua/lua_overlay.cpp
     )
-    target_link_libraries(     visualboyadvance-m ${VBAM_WX_TLL_SCOPE} ${LUA_LIBRARIES})
+    target_link_libraries(     visualboyadvance-m ${vbam-sdl-motion} ${VBAM_WX_TLL_SCOPE} ${LUA_LIBRARIES})
     target_include_directories(visualboyadvance-m PRIVATE ${LUA_INCLUDE_DIR})
     target_compile_definitions(visualboyadvance-m PRIVATE ENABLE_LUA)
     if(VBAM_HAVE_WXSTC)
