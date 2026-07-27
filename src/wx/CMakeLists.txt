@@ -606,7 +606,16 @@ if(APPLE)
 endif()
 
 if(ANDROID)
-    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp)
+    target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp
+        android-iconv.cpp)
+
+    # bionic's iconv() cannot decode U+0000 from UTF-8: it consumes no input and
+    # returns E2BIG, so wxMBConv_iconv::ToWChar()'s "retry while E2BIG" sizing
+    # loop spins forever and the app never paints. Redirect the wxWidgets static
+    # libraries' iconv calls to the NUL-safe wrappers in android-iconv.cpp.
+    target_link_options(visualboyadvance-m PRIVATE
+        -Wl,--wrap=iconv -Wl,--wrap=iconv_open -Wl,--wrap=iconv_close)
+
     if(ENABLE_GLES)
         target_sources(visualboyadvance-m PRIVATE widgets/android-gl.cpp)
     endif()
@@ -1096,6 +1105,14 @@ if(ENABLE_FFMPEG AND NOT COMPILE_ONLY)
         vbam-components-av-recording
         ${FFMPEG_LIBRARIES}
     )
+
+    if(ANDROID)
+        target_link_libraries(
+            visualboyadvance-m
+            ${VBAM_WX_TLL_SCOPE}
+            mediandk
+        )
+    endif()
 
     if(FFMPEG_LDFLAGS)
         target_link_options(visualboyadvance-m PRIVATE ${FFMPEG_LDFLAGS})
