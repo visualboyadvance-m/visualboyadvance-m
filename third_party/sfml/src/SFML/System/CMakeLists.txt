@@ -56,16 +56,16 @@ else()
         ${SRCROOT}/Unix/SleepImpl.hpp
     )
 
-    if(ANDROID)
-        set(PLATFORM_SRC ${PLATFORM_SRC}
-            ${SRCROOT}/Android/Activity.cpp
-            ${SRCROOT}/Android/Activity.hpp
-            ${SRCROOT}/Android/NativeActivity.cpp
-            ${SRCROOT}/Android/ResourceStream.cpp
-            ${SRCROOT}/Android/ResourceStream.hpp
-            ${SRCROOT}/Android/SuspendAwareClock.cpp
-        )
-    endif()
+#   if(ANDROID)
+#       set(PLATFORM_SRC ${PLATFORM_SRC}
+#           ${SRCROOT}/Android/Activity.cpp
+#           ${SRCROOT}/Android/Activity.hpp
+#           ${SRCROOT}/Android/NativeActivity.cpp
+#           ${SRCROOT}/Android/ResourceStream.cpp
+#           ${SRCROOT}/Android/ResourceStream.hpp
+#           ${SRCROOT}/Android/SuspendAwareClock.cpp
+#       )
+#   endif()
 
     source_group("unix" FILES ${PLATFORM_SRC})
 endif()
@@ -79,10 +79,10 @@ target_include_directories(sfml-system PRIVATE              ${CMAKE_CURRENT_SOUR
 target_compile_definitions(sfml-system PRIVATE   SFML_STATIC)
 target_compile_definitions(sfml-system INTERFACE SFML_STATIC)
 
-if(ANDROID)
+#if(ANDROID)
     # glad sources
-    target_include_directories(sfml-system SYSTEM BEFORE PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/glad/include")
-endif()
+#    target_include_directories(sfml-system SYSTEM BEFORE PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/glad/include")
+#endif()
 
 # setup dependencies
 if(UNIX OR APPLE)

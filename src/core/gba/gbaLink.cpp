@@ -19,6 +19,19 @@
 #include <sys/mman.h>
 #include <time.h>
 
+#if defined(__ANDROID__)
+// Bionic has no POSIX shared memory at all (there is no shm_open()/
+// shm_unlink()), and its named semaphores are declared but unimplemented:
+// <semaphore.h> carries the comment "These aren't actually implemented."
+// above sem_open()/sem_close()/sem_unlink(), which always fail with ENOSYS.
+// The Android IPC backend further down replaces both with a file-backed
+// shared mapping holding process-shared unnamed semaphores.
+#include <limits.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif  // defined(__ANDROID__)
+
 #endif  // defined(_WIN32)
 
 #include <cstdio>
@@ -96,6 +109,19 @@ uint16_t IP_LINK_PORT = 5738;
 
 std::string IP_LINK_BIND_ADDRESS = "*";
 
+// Directory holding the backing file for the IPC (same-machine) link.
+// Only consulted on Android, where there is no POSIX shared memory to name;
+// see AndroidLinkShmPath(). A frontend that knows a better location (an
+// Android app's own cache dir, say) can set this before InitLink(); when it
+// is empty a location is derived automatically.
+std::string LOCAL_LINK_DIR;
+
+// The byte a peer sends to announce it is leaving. inbuffer/outbuffer are
+// plain char, which is *unsigned* on ARM -- so on Android/AArch64 comparing
+// a received byte against -32 is always false and a clean disconnect would
+// never be recognized. Compare the byte value instead of the char.
+static const uint8_t kLinkGoodbyeByte = 0xe0;  // (uint8_t)-32
+
 #if !defined(_WIN32)
 
 #define ReleaseSemaphore(sem, nrel, orel) \
@@ -126,13 +152,26 @@ static void ResetEvent(sem_t* s)
 
 #ifdef HAVE_SEM_TIMEDWAIT
 
+// Android hands out CLOCK_REALTIME steps at will (NTP, the telephony stack,
+// the user), and a stepped wall clock makes a CLOCK_REALTIME sem_timedwait()
+// either return instantly or hang far past its deadline -- which for the link
+// means spurious comm errors or a wedged emulator. Bionic's monotonic variant
+// avoids that; it has existed since API 28.
+#if defined(__ANDROID__) && __ANDROID_API__ >= 28
+#define VBAM_LINK_TIMEDWAIT_CLOCK CLOCK_MONOTONIC
+#define vbam_link_sem_timedwait   sem_timedwait_monotonic_np
+#else
+#define VBAM_LINK_TIMEDWAIT_CLOCK CLOCK_REALTIME
+#define vbam_link_sem_timedwait   sem_timedwait
+#endif
+
 int WaitForSingleObject(sem_t* s, int t)
 {
     if (t <= 0)
         return sem_trywait(s) ? WAIT_TIMEOUT : 0;
 
     struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
+    clock_gettime(VBAM_LINK_TIMEDWAIT_CLOCK, &ts);
     ts.tv_sec += t / 1000;
     ts.tv_nsec += (t % 1000) * 1000000;
     if (ts.tv_nsec >= 1000000000) {
@@ -140,7 +179,7 @@ int WaitForSingleObject(sem_t* s, int t)
         ts.tv_nsec -= 1000000000;
     }
     do {
-        if (!sem_timedwait(s, &ts))
+        if (!vbam_link_sem_timedwait(s, &ts))
             return 0;
     } while (errno == EINTR);
     return WAIT_TIMEOUT;
@@ -528,7 +567,7 @@ static HANDLE mmf = NULL;
 #else
 [[maybe_unused]] static int mmf = -1;
 #endif
-static char linkevent[] =
+[[maybe_unused]] static char linkevent[] =
 #if !(defined __WIN32__ || defined _WIN32)
     "/"
 #endif
@@ -547,11 +586,260 @@ static HANDLE linkmem_lock = NULL;
 #else
 static sem_t* linkmem_lock = SEM_FAILED;
 #endif
-static char linklockname[] =
+[[maybe_unused]] static char linklockname[] =
 #if !(defined __WIN32__ || defined _WIN32)
     "/"
 #endif
     "VBA link lock";
+
+#if defined(__ANDROID__)
+// ---------------------------------------------------------------------------
+// Android IPC backend
+//
+// Bionic offers none of the named POSIX IPC this code was written against:
+// shm_open()/shm_unlink() do not exist, and sem_open()/sem_close()/
+// sem_unlink() are stubs that always fail with ENOSYS. memfd_create() is
+// API 30+ and, being anonymous, cannot be found by a peer by name anyway.
+//
+// So the entire session lives in one MAP_SHARED mapping of a regular file in
+// the app's private directory -- every instance of the app runs under the
+// same uid and sees the same data dir -- with the structural lock and the
+// four handshake semaphores placed *inside* that mapping as process-shared
+// unnamed semaphores. sem_init(..., pshared=1, ...) is supported by Bionic
+// (it futexes on the shared address), so every existing sem_wait/sem_post/
+// sem_trywait/sem_timedwait call site keeps working untouched.
+//
+// Each participant also holds a shared flock() on the file for as long as it
+// is connected. That answers the two questions the named-IPC version got
+// from O_EXCL: "am I the first instance?" is "can I take the lock
+// exclusively?", and "am I the last one out?" is the same probe at teardown.
+// Unlike a leftover shm object, it also makes a segment abandoned by a
+// crashed instance detectable -- nobody holds the lock, so the next instance
+// reinitializes it instead of joining a dead session with every slot marked
+// taken. Role selection is serialized through a separate lock file so two
+// instances starting at once cannot both decide they are the creator.
+// ---------------------------------------------------------------------------
+
+#define VBAM_LINK_SHM_MAGIC 0x4c4b4256u  // 'VBKL'
+
+struct AndroidLinkShm {
+    uint32_t magic;    // written last by the creator; joiners wait to see it
+    uint32_t layout;   // sizeof(LINKDATA), so a stale file of a different
+                       // build is rejected rather than misread
+    sem_t lock;        // the linkmem structural lock, initial count 1
+    sem_t sync[4];     // the per-slot handshake semaphores, initial count 0
+    LINKDATA data;     // what linkmem points at
+};
+
+static AndroidLinkShm* android_shm = NULL;
+static int android_shm_fd = -1;
+static bool android_shm_created = false;
+static std::string android_shm_path;
+
+// The app's own cache dir, derived without any framework calls: for an
+// Android app process /proc/self/cmdline is the package name (possibly with
+// a ":subprocess" suffix), and the Android user id is the uid divided by the
+// per-user offset. Returns an empty string when we are plainly not running
+// as an app (an adb-shell binary, a test runner), whose cmdline is a path.
+static std::string AndroidAppCacheDir()
+{
+    int fd = open("/proc/self/cmdline", O_RDONLY | O_CLOEXEC);
+    if (fd < 0)
+        return std::string();
+
+    char cmdline[192];
+    ssize_t n = read(fd, cmdline, sizeof(cmdline) - 1);
+    close(fd);
+    if (n <= 0)
+        return std::string();
+    cmdline[n] = '\0';
+
+    char* colon = strchr(cmdline, ':');
+    if (colon != NULL)
+        *colon = '\0';
+    // A package name, not a path to an executable.
+    if (cmdline[0] == '\0' || cmdline[0] == '/' || strchr(cmdline, '.') == NULL)
+        return std::string();
+
+    char path[PATH_MAX];
+    snprintf(path, sizeof(path), "/data/user/%d/%s/cache",
+        (int)(getuid() / 100000), cmdline);
+    return std::string(path);
+}
+
+static bool AndroidDirUsable(const std::string& dir)
+{
+    if (dir.empty())
+        return false;
+    struct stat st;
+    if (stat(dir.c_str(), &st) != 0 || !S_ISDIR(st.st_mode))
+        return false;
+    return access(dir.c_str(), R_OK | W_OK | X_OK) == 0;
+}
+
+// Locate the backing file, preferring anything the frontend or the user
+// pointed us at. All instances must resolve this to the same path, which is
+// why the candidates are process-independent.
+static const std::string& AndroidLinkShmPath()
+{
+    if (!android_shm_path.empty())
+        return android_shm_path;
+
+    const char* env_dir = getenv("VBAM_LINK_DIR");
+    const char* tmp_dir = getenv("TMPDIR");
+    const char* run_dir = getenv("XDG_RUNTIME_DIR");
+    const std::string candidates[] = {
+        LOCAL_LINK_DIR,
+        env_dir != NULL ? std::string(env_dir) : std::string(),
+        tmp_dir != NULL ? std::string(tmp_dir) : std::string(),
+        run_dir != NULL ? std::string(run_dir) : std::string(),
+        AndroidAppCacheDir(),
+        std::string("/data/local/tmp"),
+    };
+
+    for (const std::string& dir : candidates) {
+        if (AndroidDirUsable(dir)) {
+            android_shm_path = dir + "/vbam-link.shm";
+            break;
+        }
+    }
+    return android_shm_path;
+}
+
+static void AndroidLinkShmUnlinkFiles()
+{
+    if (android_shm_path.empty())
+        return;
+    unlink(android_shm_path.c_str());
+    unlink((android_shm_path + ".lock").c_str());
+}
+
+// Release our mapping and liveness lock; the last instance out also removes
+// the backing file so a later run starts from a clean slate.
+static void AndroidLinkShmClose()
+{
+    if (android_shm != NULL) {
+        void* base = android_shm;
+        android_shm = NULL;
+        munmap(base, sizeof(AndroidLinkShm));
+    }
+    if (android_shm_fd >= 0) {
+        // Taking the lock exclusively can only succeed if no other instance
+        // still holds its shared lock, i.e. we really are the last one out.
+        if (flock(android_shm_fd, LOCK_EX | LOCK_NB) == 0)
+            AndroidLinkShmUnlinkFiles();
+        close(android_shm_fd);  // also drops the flock
+        android_shm_fd = -1;
+    }
+    android_shm_created = false;
+}
+
+// Map the shared session, creating and initializing it if we are first.
+// On success android_shm is mapped and android_shm_created says which role
+// we took; on failure nothing is left open.
+static bool AndroidLinkShmOpen()
+{
+    const std::string& path = AndroidLinkShmPath();
+    if (path.empty()) {
+        fprintf(stderr,
+            "gbaLink: no writable directory for the IPC link segment; set "
+            "VBAM_LINK_DIR or use the LAN link instead\n");
+        return false;
+    }
+
+    // Serialize creator/joiner selection across instances. Best effort: if
+    // the lock file cannot be opened we still work, just with the same
+    // startup race the named-IPC backends have.
+    const std::string lock_path = path + ".lock";
+    int init_fd = open(lock_path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0600);
+    if (init_fd >= 0)
+        while (flock(init_fd, LOCK_EX) < 0 && errno == EINTR)
+            ;
+
+    android_shm_fd = open(path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0600);
+    if (android_shm_fd < 0) {
+        fprintf(stderr, "gbaLink: cannot open %s: %s\n", path.c_str(), strerror(errno));
+        if (init_fd >= 0) {
+            flock(init_fd, LOCK_UN);
+            close(init_fd);
+        }
+        return false;
+    }
+
+    // Nobody holding a shared lock means no live peer: we are the first
+    // instance, and anything already in the file is a crashed run's corpse.
+    android_shm_created = flock(android_shm_fd, LOCK_EX | LOCK_NB) == 0;
+
+    void* map = MAP_FAILED;
+    if (android_shm_created) {
+        if (ftruncate(android_shm_fd, 0) == 0
+            && ftruncate(android_shm_fd, (off_t)sizeof(AndroidLinkShm)) == 0) {
+            map = mmap(NULL, sizeof(AndroidLinkShm), PROT_READ | PROT_WRITE,
+                MAP_SHARED, android_shm_fd, 0);
+        }
+        if (map != MAP_FAILED) {
+            AndroidLinkShm* shm = (AndroidLinkShm*)map;
+            memset(shm, 0, sizeof(*shm));
+            bool ok = sem_init(&shm->lock, 1, 1) == 0;
+            for (int i = 0; i < 4 && ok; i++)
+                ok = sem_init(&shm->sync[i], 1, 0) == 0;
+            if (!ok) {
+                fprintf(stderr, "gbaLink: sem_init failed: %s\n", strerror(errno));
+                munmap(map, sizeof(AndroidLinkShm));
+                map = MAP_FAILED;
+            } else {
+                shm->layout = (uint32_t)sizeof(LINKDATA);
+                // Publish last: a joiner spins on magic, and this release
+                // store is what makes the initialized semaphores visible.
+                __atomic_store_n(&shm->magic, VBAM_LINK_SHM_MAGIC, __ATOMIC_RELEASE);
+            }
+        }
+    } else {
+        // A peer is alive, so the segment is fully initialized -- the init
+        // lock above held us behind the creator until it published magic.
+        struct stat st;
+        if (fstat(android_shm_fd, &st) == 0
+            && (size_t)st.st_size >= sizeof(AndroidLinkShm)) {
+            map = mmap(NULL, sizeof(AndroidLinkShm), PROT_READ | PROT_WRITE,
+                MAP_SHARED, android_shm_fd, 0);
+        }
+        if (map != MAP_FAILED) {
+            AndroidLinkShm* shm = (AndroidLinkShm*)map;
+            if (__atomic_load_n(&shm->magic, __ATOMIC_ACQUIRE) != VBAM_LINK_SHM_MAGIC
+                || shm->layout != (uint32_t)sizeof(LINKDATA)) {
+                fprintf(stderr, "gbaLink: %s is not a usable link segment\n", path.c_str());
+                munmap(map, sizeof(AndroidLinkShm));
+                map = MAP_FAILED;
+            }
+        }
+    }
+
+    if (map == MAP_FAILED) {
+        if (android_shm_created)
+            AndroidLinkShmUnlinkFiles();
+        close(android_shm_fd);
+        android_shm_fd = -1;
+        android_shm_created = false;
+        if (init_fd >= 0) {
+            flock(init_fd, LOCK_UN);
+            close(init_fd);
+        }
+        return false;
+    }
+
+    // Downgrade to (or take) the shared lock we hold while connected. Safe
+    // to do under the init lock: no other instance can be probing for the
+    // exclusive lock right now.
+    flock(android_shm_fd, LOCK_SH);
+    if (init_fd >= 0) {
+        flock(init_fd, LOCK_UN);
+        close(init_fd);
+    }
+
+    android_shm = (AndroidLinkShm*)map;
+    return true;
+}
+#endif  // defined(__ANDROID__)
 
 // Acquire the linkmem structural lock, giving up after timeout_ms so a
 // crashed peer that died holding the lock cannot wedge every other
@@ -1026,12 +1314,12 @@ void CableServer::Recv(void)
                 }
                 numbytes += (int)nr;
             }
-            if (dropped || inbuffer[1] == -32) {
+            if (dropped || (uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
                 char message[30];
                 snprintf(message, sizeof(message), _("Player %d disconnected."), i + 2);
                 systemScreenMessage(message);
                 outbuffer[0] = 4;
-                outbuffer[1] = -32;
+                outbuffer[1] = (char)kLinkGoodbyeByte;
                 // Use a separate index; the old code reused the outer loop
                 // variable i, corrupting this loop's own iteration.
                 for (int j = 1; j < lanlink.numslaves; j++) {
@@ -1142,7 +1430,7 @@ void CableClient::CheckConn(void)
             }
             numbytes += (int)nr;
         }
-        if (inbuffer[1] == -32) {
+        if ((uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
             outbuffer[0] = 4;
             (void)lanlink.tcpsocket.send(outbuffer, 4);
             systemScreenMessage(_("Server disconnected."));
@@ -1240,7 +1528,7 @@ void CableClient::Recv(void)
         }
         numbytes += (int)nr;
     }
-    if (inbuffer[1] == -32) {
+    if ((uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
         outbuffer[0] = 4;
         (void)lanlink.tcpsocket.send(outbuffer, 4);
         systemScreenMessage(_("Server disconnected."));
@@ -1505,14 +1793,14 @@ static void CloseSocket()
     if (linkid) {
         char outbuffer[4];
         outbuffer[0] = 4;
-        outbuffer[1] = -32;
+        outbuffer[1] = (char)kLinkGoodbyeByte;
         if (send_goodbye && lanlink.type == 0)
             (void)lanlink.tcpsocket.send(outbuffer, 4);
     } else {
         char outbuffer[12];
         int i;
         outbuffer[0] = 12;
-        outbuffer[1] = -32;
+        outbuffer[1] = (char)kLinkGoodbyeByte;
         for (i = 1; i <= lanlink.numslaves; i++) {
             if (send_goodbye && lanlink.type == 0) {
                 (void)ls.tcpsocket[i].send(outbuffer, 12);
@@ -1528,7 +1816,20 @@ static void CloseSocket()
 // this may be necessary under MSW as well, but I wouldn't know how
 void CleanLocalLink()
 {
-#if !(defined __WIN32__ || defined _WIN32)
+#if defined(__ANDROID__)
+    // Everything lives in one file, so dropping it clears the whole session.
+    // Only do that when no instance is still attached, otherwise the peers
+    // that remain would keep running against a mapping nobody can find.
+    const std::string& path = AndroidLinkShmPath();
+    if (path.empty())
+        return;
+    int fd = open(path.c_str(), O_RDWR | O_CLOEXEC);
+    if (fd < 0)
+        return;
+    if (flock(fd, LOCK_EX | LOCK_NB) == 0)
+        AndroidLinkShmUnlinkFiles();
+    close(fd);
+#elif !(defined __WIN32__ || defined _WIN32)
     shm_unlink("/" LOCAL_LINK_NAME);
     for (int i = 0; i < 4; i++) {
         linkevent[sizeof(linkevent) - 2] = '1' + i;
@@ -2872,6 +3173,15 @@ static ConnectionState InitIPC()
         systemMessage(0, N_("Error mapping file"));
         return LINK_ERROR;
     }
+#elif defined(__ANDROID__)
+    if (!AndroidLinkShmOpen()) {
+        systemMessage(0, N_("Error creating file mapping"));
+        return LINK_ERROR;
+    }
+    // Same role split as the O_EXCL dance below: the creator is machine 0,
+    // everyone else searches for a free slot further down.
+    vbaid = android_shm_created ? 0 : 1;
+    linkmem = &android_shm->data;
 #else
     if ((mmf = shm_open("/" LOCAL_LINK_NAME, O_RDWR | O_CREAT | O_EXCL, 0777)) < 0) {
         vbaid = 1;
@@ -2908,6 +3218,10 @@ static ConnectionState InitIPC()
         Sleep(2);
         linkmem_lock = OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, linklockname);
     }
+#elif defined(__ANDROID__)
+    // Lives in the shared mapping; the creator initialized it to count 1
+    // before publishing the segment, so it is ready for everyone.
+    linkmem_lock = &android_shm->lock;
 #else
     if (firstone)
         sem_unlink(linklockname); // drop any stale lock from a crashed run
@@ -2945,6 +3259,10 @@ static ConnectionState InitIPC()
                 linkmem_lock = NULL;
                 UnmapViewOfFile(linkmem);
                 CloseHandle(mmf);
+#elif defined(__ANDROID__)
+                linkmem_lock = SEM_FAILED;
+                linkmem = NULL;
+                AndroidLinkShmClose();
 #else
                 sem_close(linkmem_lock);
                 linkmem_lock = SEM_FAILED;
@@ -2961,6 +3279,12 @@ static ConnectionState InitIPC()
     }
     linkid = (uint16_t)vbaid;
 
+#if defined(__ANDROID__)
+    // The handshake semaphores are part of the shared mapping; there is
+    // nothing to open, and no stale named object to clean up.
+    for (int i = 0; i < 4; i++)
+        linksync[i] = &android_shm->sync[i];
+#else
     for (int i = 0; i < 4; i++) {
         linkevent[sizeof(linkevent) - 2] = (char)i + '1';
 #if (defined __WIN32__ || defined _WIN32)
@@ -3001,6 +3325,7 @@ static ConnectionState InitIPC()
         }
 #endif
     }
+#endif  // defined(__ANDROID__)
 
     return LINK_OK;
 }
@@ -4445,6 +4770,13 @@ static void CloseIPC()
 #if (defined __WIN32__ || defined _WIN32)
             ReleaseSemaphore(linksync[i], 1, NULL);
             CloseHandle(linksync[i]);
+#elif defined(__ANDROID__)
+            // Owned by the shared mapping, which AndroidLinkShmClose()
+            // unmaps below, so there is nothing to close or unlink. Don't
+            // post either: the count is visible to every peer still in the
+            // session, and a stray token there reads as a completed
+            // transfer. Peers notice us leaving via linkflags, and every
+            // wait on these is bounded by linktimeout anyway.
 #else
             sem_close(linksync[i]);
             if (!(f & 0xf)) {
@@ -4462,6 +4794,9 @@ static void CloseIPC()
         CloseHandle(linkmem_lock);
         linkmem_lock = NULL;
     }
+#elif defined(__ANDROID__)
+    // Part of the shared mapping; just forget it.
+    linkmem_lock = SEM_FAILED;
 #else
     if (linkmem_lock != SEM_FAILED) {
         sem_close(linkmem_lock);
@@ -4476,6 +4811,13 @@ static void CloseIPC()
     UnmapViewOfFile(linkmem);
     mmf = NULL;
     linkmem = NULL;
+#elif defined(__ANDROID__)
+    // Unmaps the segment and, if we turn out to be the last participant,
+    // removes the backing file. That check is a lock probe rather than the
+    // linkflags test used above, so a session whose other members crashed
+    // without clearing their flags still gets cleaned up.
+    linkmem = NULL;
+    AndroidLinkShmClose();
 #else
     if (!(f & 0xf))
         shm_unlink("/" LOCAL_LINK_NAME);

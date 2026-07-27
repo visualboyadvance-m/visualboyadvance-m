@@ -74,7 +74,7 @@
 #if defined(__ANDROID__)
 
 // Android
-#define SFML_SYSTEM_ANDROID
+#define SFML_SYSTEM_LINUX
 
 #elif defined(__linux__)
 

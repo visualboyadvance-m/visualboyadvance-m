@@ -13,6 +13,16 @@ extern uint16_t IP_LINK_PORT;
 extern std::string IP_LINK_BIND_ADDRESS;
 
 /**
+ * Directory used to hold the shared state of the IPC (same-machine) link.
+ *
+ * Only consulted on Android, which has no POSIX shared memory to name, so
+ * the segment has to be a file somewhere every instance can reach. Leave it
+ * empty to let the core pick a location ($VBAM_LINK_DIR, $TMPDIR, then the
+ * app's own cache directory); set it before InitLink() to override.
+ */
+extern std::string LOCAL_LINK_DIR;
+
+/**
  * Link modes to be passed to InitLink
  */
 enum LinkMode {
