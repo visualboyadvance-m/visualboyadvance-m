@@ -260,7 +260,7 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream.
-if(NOT (X86 AND WIN32) AND NOT ANDROID)
+if(NOT (X86 AND WIN32))
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
