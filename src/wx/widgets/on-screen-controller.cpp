@@ -4,8 +4,11 @@
 #include <cmath>
 #include <memory>
 
+#include <wx/bitmap.h>
 #include <wx/dcclient.h>
+#include <wx/dcmemory.h>
 #include <wx/graphics.h>
+#include <wx/image.h>
 
 #include "wx/config/emulated-gamepad.h"
 
@@ -222,14 +225,19 @@ void OnScreenController::RecomputePressedKeys() {
         }
     }
 
+    bool changed = false;
     for (const config::GameKey key : kManagedKeys) {
         const size_t index = static_cast<size_t>(key);
         if (desired[index] != pressed_[index]) {
             pressed_[index] = desired[index];
             gamepad_->SetGameKey(kJoypad, key, desired[index]);
+            changed = true;
         }
     }
 
+    if (changed) {
+        ++revision_;
+    }
     Refresh();
 }
 
@@ -276,6 +284,72 @@ void OnScreenController::OnPaint(wxPaintEvent&) {
     if (!gc) {
         return;
     }
+    DrawContent(*gc);
+}
+
+bool OnScreenController::RenderRgba(std::vector<uint8_t>* rgba, int* out_width,
+                                    int* out_height, double scale) {
+    const wxSize sz = GetClientSize();
+    if (sz.GetWidth() < 1 || sz.GetHeight() < 1) {
+        return false;
+    }
+    if (scale <= 0.0) {
+        scale = 1.0;
+    }
+    const int bitmap_w = std::max(1, static_cast<int>(sz.GetWidth() * scale));
+    const int bitmap_h = std::max(1, static_cast<int>(sz.GetHeight() * scale));
+
+    // Draw onto a fully transparent 32-bit bitmap, so the caller gets the same
+    // overlay it would see on screen with the gaps between controls left clear.
+    // `scale` renders it at device resolution for a compositing renderer.
+    wxBitmap bitmap(bitmap_w, bitmap_h, 32);
+    if (!bitmap.IsOk()) {
+        return false;
+    }
+    bitmap.UseAlpha();
+    {
+        wxMemoryDC dc(bitmap);
+        std::unique_ptr<wxGraphicsContext> gc(wxGraphicsContext::Create(dc));
+        if (!gc) {
+            return false;
+        }
+        // wxMemoryDC leaves the bitmap opaque-white on some backends; start from
+        // transparent instead.
+        gc->SetCompositionMode(wxCOMPOSITION_SOURCE);
+        gc->SetBrush(wxBrush(wxColour(0, 0, 0, wxALPHA_TRANSPARENT)));
+        gc->DrawRectangle(0, 0, bitmap_w, bitmap_h);
+        gc->SetCompositionMode(wxCOMPOSITION_OVER);
+        gc->Scale(scale, scale);
+        DrawContent(*gc);
+    }
+
+    const wxImage image = bitmap.ConvertToImage();
+    if (!image.IsOk()) {
+        return false;
+    }
+    const int w = image.GetWidth();
+    const int h = image.GetHeight();
+    const unsigned char* rgb = image.GetData();
+    const unsigned char* alpha = image.HasAlpha() ? image.GetAlpha() : nullptr;
+    if (!rgb) {
+        return false;
+    }
+
+    rgba->resize(static_cast<size_t>(w) * static_cast<size_t>(h) * 4);
+    uint8_t* out = rgba->data();
+    for (size_t i = 0, n = static_cast<size_t>(w) * static_cast<size_t>(h); i < n; ++i) {
+        out[i * 4 + 0] = rgb[i * 3 + 0];
+        out[i * 4 + 1] = rgb[i * 3 + 1];
+        out[i * 4 + 2] = rgb[i * 3 + 2];
+        out[i * 4 + 3] = alpha ? alpha[i] : 0xFF;
+    }
+    *out_width = w;
+    *out_height = h;
+    return true;
+}
+
+void OnScreenController::DrawContent(wxGraphicsContext& context) {
+    wxGraphicsContext* const gc = &context;
 
     const auto draw_shape = [&](const wxRect& rect, bool round, bool pressed) {
         gc->SetPen(wxPen(kBorder, 2));
@@ -353,6 +427,7 @@ void OnScreenController::OnPaint(wxPaintEvent&) {
 
 void OnScreenController::OnSize(wxSizeEvent& event) {
     LayoutButtons();
+    ++revision_;
     Refresh();
     event.Skip();
 }

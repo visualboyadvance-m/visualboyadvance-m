@@ -2641,7 +2641,22 @@ void GameArea::UpdateOnScreenController()
                 e.Skip();
             });
         }
-        osc_->SetSize(osc_parent->GetClientSize());
+        wxSize osc_size = osc_parent->GetClientSize();
+#if defined(__WXQT__) && defined(__ANDROID__)
+        // Clamp to what is on screen: Qt's window overhangs the Android content
+        // view below the action bar, and controls anchored to the bottom of an
+        // over-tall overlay would sit below the edge of the display.
+        {
+            extern bool VbamAndroidVisibleClientSize(void*, int*, int*);
+            int visible_w = 0, visible_h = 0;
+            if (VbamAndroidVisibleClientSize(osc_parent->GetHandle(),
+                                             &visible_w, &visible_h)) {
+                osc_size.SetWidth (std::min(osc_size.GetWidth(),  visible_w));
+                osc_size.SetHeight(std::min(osc_size.GetHeight(), visible_h));
+            }
+        }
+#endif
+        osc_->SetSize(osc_size);
         osc_->Raise();
         if (!osc_->IsShown())
             osc_->Show();
@@ -9962,15 +9977,44 @@ void MetalDrawingPanel::PaintEv(wxPaintEvent& ev)
 #include <cassert>
  
 // ─── SPIR-V shaders ─────────────────────────────────────────────────────────
-// (unchanged — see original file for GLSL source reference)
+// Vertex stage GLSL source (compiled with `glslangValidator -V`); the fragment
+// stage is a plain textured-quad sample of set 0 binding 0.
+//
+//   #version 450
+//
+//   // Full-screen textured quad, drawn as a 4-vertex triangle strip with no vertex
+//   // buffer: the corner is derived from gl_VertexIndex (bit 1 -> x, bit 0 -> y).
+//   layout(push_constant) uniform PC {
+//       vec4 src_rect;   // u0, v0, u1, v1
+//       vec4 dst_rect;   // x0, y0, x1, y1, in display-oriented NDC
+//       vec4 rot;        // row-major 2x2 pre-rotation matrix (a, b, c, d)
+//   } pc;
+//
+//   layout(location = 0) out vec2 o_uv;
+//
+//   void main() {
+//       vec2 pos = vec2((gl_VertexIndex & 2) == 0 ? pc.dst_rect.x : pc.dst_rect.z,
+//                       (gl_VertexIndex & 1) == 0 ? pc.dst_rect.y : pc.dst_rect.w);
+//       vec2 uv  = vec2((gl_VertexIndex & 2) == 0 ? pc.src_rect.x : pc.src_rect.z,
+//                       (gl_VertexIndex & 1) == 0 ? pc.src_rect.y : pc.src_rect.w);
+//
+//       // Rotate display-oriented NDC into the swapchain's pre-transformed space, so
+//       // a surface whose currentTransform is a rotation (Android portrait panel in
+//       // landscape, etc.) still presents the picture upright.
+//       vec2 xf = vec2(pc.rot.x * pos.x + pc.rot.y * pos.y,
+//                      pc.rot.z * pos.x + pc.rot.w * pos.y);
+//
+//       gl_Position = vec4(xf, 0.0, 1.0);
+//       o_uv = uv;
+//   }
  
 const uint32_t VKDrawingPanel::kVertSpv[] = {
-    0x07230203, 0x00010000, 0x0008000b, 0x0000005e,
+    0x07230203, 0x00010000, 0x0008000b, 0x00000076,
     0x00000000, 0x00020011, 0x00000001, 0x0006000b,
     0x00000001, 0x4c534c47, 0x6474732e, 0x3035342e,
     0x00000000, 0x0003000e, 0x00000000, 0x00000001,
     0x0008000f, 0x00000000, 0x00000004, 0x6e69616d,
-    0x00000000, 0x0000000c, 0x00000052, 0x0000005c,
+    0x00000000, 0x0000000c, 0x0000006a, 0x00000074,
     0x00030003, 0x00000002, 0x000001c2, 0x00040005,
     0x00000004, 0x6e69616d, 0x00000000, 0x00030005,
     0x00000009, 0x00736f70, 0x00060005, 0x0000000c,
@@ -9978,29 +10022,32 @@ const uint32_t VKDrawingPanel::kVertSpv[] = {
     0x00030005, 0x00000018, 0x00004350, 0x00060006,
     0x00000018, 0x00000000, 0x5f637273, 0x74636572,
     0x00000000, 0x00060006, 0x00000018, 0x00000001,
-    0x5f747364, 0x74636572, 0x00000000, 0x00030005,
+    0x5f747364, 0x74636572, 0x00000000, 0x00040006,
+    0x00000018, 0x00000002, 0x00746f72, 0x00030005,
     0x0000001a, 0x00006370, 0x00030005, 0x00000035,
-    0x00007675, 0x00060005, 0x00000050, 0x505f6c67,
-    0x65567265, 0x78657472, 0x00000000, 0x00060006,
-    0x00000050, 0x00000000, 0x505f6c67, 0x7469736f,
-    0x006e6f69, 0x00070006, 0x00000050, 0x00000001,
-    0x505f6c67, 0x746e696f, 0x657a6953, 0x00000000,
-    0x00070006, 0x00000050, 0x00000002, 0x435f6c67,
-    0x4470696c, 0x61747369, 0x0065636e, 0x00070006,
-    0x00000050, 0x00000003, 0x435f6c67, 0x446c6c75,
-    0x61747369, 0x0065636e, 0x00030005, 0x00000052,
-    0x00000000, 0x00040005, 0x0000005c, 0x76755f6f,
-    0x00000000, 0x00040047, 0x0000000c, 0x0000000b,
-    0x0000002a, 0x00030047, 0x00000018, 0x00000002,
-    0x00050048, 0x00000018, 0x00000000, 0x00000023,
-    0x00000000, 0x00050048, 0x00000018, 0x00000001,
-    0x00000023, 0x00000010, 0x00030047, 0x00000050,
-    0x00000002, 0x00050048, 0x00000050, 0x00000000,
-    0x0000000b, 0x00000000, 0x00050048, 0x00000050,
+    0x00007675, 0x00030005, 0x0000004f, 0x00006678,
+    0x00060005, 0x00000068, 0x505f6c67, 0x65567265,
+    0x78657472, 0x00000000, 0x00060006, 0x00000068,
+    0x00000000, 0x505f6c67, 0x7469736f, 0x006e6f69,
+    0x00070006, 0x00000068, 0x00000001, 0x505f6c67,
+    0x746e696f, 0x657a6953, 0x00000000, 0x00070006,
+    0x00000068, 0x00000002, 0x435f6c67, 0x4470696c,
+    0x61747369, 0x0065636e, 0x00070006, 0x00000068,
+    0x00000003, 0x435f6c67, 0x446c6c75, 0x61747369,
+    0x0065636e, 0x00030005, 0x0000006a, 0x00000000,
+    0x00040005, 0x00000074, 0x76755f6f, 0x00000000,
+    0x00040047, 0x0000000c, 0x0000000b, 0x0000002a,
+    0x00030047, 0x00000018, 0x00000002, 0x00050048,
+    0x00000018, 0x00000000, 0x00000023, 0x00000000,
+    0x00050048, 0x00000018, 0x00000001, 0x00000023,
+    0x00000010, 0x00050048, 0x00000018, 0x00000002,
+    0x00000023, 0x00000020, 0x00030047, 0x00000068,
+    0x00000002, 0x00050048, 0x00000068, 0x00000000,
+    0x0000000b, 0x00000000, 0x00050048, 0x00000068,
     0x00000001, 0x0000000b, 0x00000001, 0x00050048,
-    0x00000050, 0x00000002, 0x0000000b, 0x00000003,
-    0x00050048, 0x00000050, 0x00000003, 0x0000000b,
-    0x00000004, 0x00040047, 0x0000005c, 0x0000001e,
+    0x00000068, 0x00000002, 0x0000000b, 0x00000003,
+    0x00050048, 0x00000068, 0x00000003, 0x0000000b,
+    0x00000004, 0x00040047, 0x00000074, 0x0000001e,
     0x00000000, 0x00020013, 0x00000002, 0x00030021,
     0x00000003, 0x00000002, 0x00030016, 0x00000006,
     0x00000020, 0x00040017, 0x00000007, 0x00000006,
@@ -10012,109 +10059,139 @@ const uint32_t VKDrawingPanel::kVertSpv[] = {
     0x00000002, 0x0004002b, 0x0000000a, 0x00000010,
     0x00000000, 0x00020014, 0x00000011, 0x00040020,
     0x00000013, 0x00000007, 0x00000006, 0x00040017,
-    0x00000017, 0x00000006, 0x00000004, 0x0004001e,
-    0x00000018, 0x00000017, 0x00000017, 0x00040020,
-    0x00000019, 0x00000009, 0x00000018, 0x0004003b,
-    0x00000019, 0x0000001a, 0x00000009, 0x0004002b,
-    0x0000000a, 0x0000001b, 0x00000001, 0x00040015,
-    0x0000001c, 0x00000020, 0x00000000, 0x0004002b,
-    0x0000001c, 0x0000001d, 0x00000000, 0x00040020,
-    0x0000001e, 0x00000009, 0x00000006, 0x0004002b,
-    0x0000001c, 0x00000022, 0x00000002, 0x0004002b,
-    0x0000001c, 0x0000002c, 0x00000001, 0x0004002b,
-    0x0000001c, 0x00000030, 0x00000003, 0x0004001c,
-    0x0000004f, 0x00000006, 0x0000002c, 0x0006001e,
-    0x00000050, 0x00000017, 0x00000006, 0x0000004f,
-    0x0000004f, 0x00040020, 0x00000051, 0x00000003,
-    0x00000050, 0x0004003b, 0x00000051, 0x00000052,
-    0x00000003, 0x0004002b, 0x00000006, 0x00000054,
-    0x00000000, 0x0004002b, 0x00000006, 0x00000055,
-    0x3f800000, 0x00040020, 0x00000059, 0x00000003,
-    0x00000017, 0x00040020, 0x0000005b, 0x00000003,
-    0x00000007, 0x0004003b, 0x0000005b, 0x0000005c,
-    0x00000003, 0x00050036, 0x00000002, 0x00000004,
-    0x00000000, 0x00000003, 0x000200f8, 0x00000005,
-    0x0004003b, 0x00000008, 0x00000009, 0x00000007,
-    0x0004003b, 0x00000013, 0x00000014, 0x00000007,
-    0x0004003b, 0x00000013, 0x00000029, 0x00000007,
-    0x0004003b, 0x00000008, 0x00000035, 0x00000007,
-    0x0004003b, 0x00000013, 0x00000039, 0x00000007,
-    0x0004003b, 0x00000013, 0x00000045, 0x00000007,
-    0x0004003d, 0x0000000a, 0x0000000d, 0x0000000c,
-    0x000500c7, 0x0000000a, 0x0000000f, 0x0000000d,
-    0x0000000e, 0x000500aa, 0x00000011, 0x00000012,
-    0x0000000f, 0x00000010, 0x000300f7, 0x00000016,
-    0x00000000, 0x000400fa, 0x00000012, 0x00000015,
-    0x00000021, 0x000200f8, 0x00000015, 0x00060041,
-    0x0000001e, 0x0000001f, 0x0000001a, 0x0000001b,
-    0x0000001d, 0x0004003d, 0x00000006, 0x00000020,
-    0x0000001f, 0x0003003e, 0x00000014, 0x00000020,
-    0x000200f9, 0x00000016, 0x000200f8, 0x00000021,
-    0x00060041, 0x0000001e, 0x00000023, 0x0000001a,
-    0x0000001b, 0x00000022, 0x0004003d, 0x00000006,
-    0x00000024, 0x00000023, 0x0003003e, 0x00000014,
-    0x00000024, 0x000200f9, 0x00000016, 0x000200f8,
-    0x00000016, 0x0004003d, 0x00000006, 0x00000025,
-    0x00000014, 0x0004003d, 0x0000000a, 0x00000026,
-    0x0000000c, 0x000500c7, 0x0000000a, 0x00000027,
-    0x00000026, 0x0000001b, 0x000500aa, 0x00000011,
-    0x00000028, 0x00000027, 0x00000010, 0x000300f7,
-    0x0000002b, 0x00000000, 0x000400fa, 0x00000028,
-    0x0000002a, 0x0000002f, 0x000200f8, 0x0000002a,
-    0x00060041, 0x0000001e, 0x0000002d, 0x0000001a,
-    0x0000001b, 0x0000002c, 0x0004003d, 0x00000006,
-    0x0000002e, 0x0000002d, 0x0003003e, 0x00000029,
-    0x0000002e, 0x000200f9, 0x0000002b, 0x000200f8,
-    0x0000002f, 0x00060041, 0x0000001e, 0x00000031,
-    0x0000001a, 0x0000001b, 0x00000030, 0x0004003d,
-    0x00000006, 0x00000032, 0x00000031, 0x0003003e,
-    0x00000029, 0x00000032, 0x000200f9, 0x0000002b,
-    0x000200f8, 0x0000002b, 0x0004003d, 0x00000006,
-    0x00000033, 0x00000029, 0x00050050, 0x00000007,
-    0x00000034, 0x00000025, 0x00000033, 0x0003003e,
-    0x00000009, 0x00000034, 0x0004003d, 0x0000000a,
-    0x00000036, 0x0000000c, 0x000500c7, 0x0000000a,
-    0x00000037, 0x00000036, 0x0000000e, 0x000500aa,
-    0x00000011, 0x00000038, 0x00000037, 0x00000010,
-    0x000300f7, 0x0000003b, 0x00000000, 0x000400fa,
-    0x00000038, 0x0000003a, 0x0000003e, 0x000200f8,
-    0x0000003a, 0x00060041, 0x0000001e, 0x0000003c,
-    0x0000001a, 0x00000010, 0x0000001d, 0x0004003d,
-    0x00000006, 0x0000003d, 0x0000003c, 0x0003003e,
-    0x00000039, 0x0000003d, 0x000200f9, 0x0000003b,
-    0x000200f8, 0x0000003e, 0x00060041, 0x0000001e,
-    0x0000003f, 0x0000001a, 0x00000010, 0x00000022,
-    0x0004003d, 0x00000006, 0x00000040, 0x0000003f,
-    0x0003003e, 0x00000039, 0x00000040, 0x000200f9,
-    0x0000003b, 0x000200f8, 0x0000003b, 0x0004003d,
-    0x00000006, 0x00000041, 0x00000039, 0x0004003d,
-    0x0000000a, 0x00000042, 0x0000000c, 0x000500c7,
-    0x0000000a, 0x00000043, 0x00000042, 0x0000001b,
-    0x000500aa, 0x00000011, 0x00000044, 0x00000043,
-    0x00000010, 0x000300f7, 0x00000047, 0x00000000,
-    0x000400fa, 0x00000044, 0x00000046, 0x0000004a,
-    0x000200f8, 0x00000046, 0x00060041, 0x0000001e,
-    0x00000048, 0x0000001a, 0x00000010, 0x0000002c,
-    0x0004003d, 0x00000006, 0x00000049, 0x00000048,
-    0x0003003e, 0x00000045, 0x00000049, 0x000200f9,
-    0x00000047, 0x000200f8, 0x0000004a, 0x00060041,
-    0x0000001e, 0x0000004b, 0x0000001a, 0x00000010,
-    0x00000030, 0x0004003d, 0x00000006, 0x0000004c,
-    0x0000004b, 0x0003003e, 0x00000045, 0x0000004c,
-    0x000200f9, 0x00000047, 0x000200f8, 0x00000047,
-    0x0004003d, 0x00000006, 0x0000004d, 0x00000045,
-    0x00050050, 0x00000007, 0x0000004e, 0x00000041,
-    0x0000004d, 0x0003003e, 0x00000035, 0x0000004e,
-    0x0004003d, 0x00000007, 0x00000053, 0x00000009,
-    0x00050051, 0x00000006, 0x00000056, 0x00000053,
-    0x00000000, 0x00050051, 0x00000006, 0x00000057,
-    0x00000053, 0x00000001, 0x00070050, 0x00000017,
-    0x00000058, 0x00000056, 0x00000057, 0x00000054,
-    0x00000055, 0x00050041, 0x00000059, 0x0000005a,
-    0x00000052, 0x00000010, 0x0003003e, 0x0000005a,
-    0x00000058, 0x0004003d, 0x00000007, 0x0000005d,
-    0x00000035, 0x0003003e, 0x0000005c, 0x0000005d,
-    0x000100fd, 0x00010038
+    0x00000017, 0x00000006, 0x00000004, 0x0005001e,
+    0x00000018, 0x00000017, 0x00000017, 0x00000017,
+    0x00040020, 0x00000019, 0x00000009, 0x00000018,
+    0x0004003b, 0x00000019, 0x0000001a, 0x00000009,
+    0x0004002b, 0x0000000a, 0x0000001b, 0x00000001,
+    0x00040015, 0x0000001c, 0x00000020, 0x00000000,
+    0x0004002b, 0x0000001c, 0x0000001d, 0x00000000,
+    0x00040020, 0x0000001e, 0x00000009, 0x00000006,
+    0x0004002b, 0x0000001c, 0x00000022, 0x00000002,
+    0x0004002b, 0x0000001c, 0x0000002c, 0x00000001,
+    0x0004002b, 0x0000001c, 0x00000030, 0x00000003,
+    0x0004001c, 0x00000067, 0x00000006, 0x0000002c,
+    0x0006001e, 0x00000068, 0x00000017, 0x00000006,
+    0x00000067, 0x00000067, 0x00040020, 0x00000069,
+    0x00000003, 0x00000068, 0x0004003b, 0x00000069,
+    0x0000006a, 0x00000003, 0x0004002b, 0x00000006,
+    0x0000006c, 0x00000000, 0x0004002b, 0x00000006,
+    0x0000006d, 0x3f800000, 0x00040020, 0x00000071,
+    0x00000003, 0x00000017, 0x00040020, 0x00000073,
+    0x00000003, 0x00000007, 0x0004003b, 0x00000073,
+    0x00000074, 0x00000003, 0x00050036, 0x00000002,
+    0x00000004, 0x00000000, 0x00000003, 0x000200f8,
+    0x00000005, 0x0004003b, 0x00000008, 0x00000009,
+    0x00000007, 0x0004003b, 0x00000013, 0x00000014,
+    0x00000007, 0x0004003b, 0x00000013, 0x00000029,
+    0x00000007, 0x0004003b, 0x00000008, 0x00000035,
+    0x00000007, 0x0004003b, 0x00000013, 0x00000039,
+    0x00000007, 0x0004003b, 0x00000013, 0x00000045,
+    0x00000007, 0x0004003b, 0x00000008, 0x0000004f,
+    0x00000007, 0x0004003d, 0x0000000a, 0x0000000d,
+    0x0000000c, 0x000500c7, 0x0000000a, 0x0000000f,
+    0x0000000d, 0x0000000e, 0x000500aa, 0x00000011,
+    0x00000012, 0x0000000f, 0x00000010, 0x000300f7,
+    0x00000016, 0x00000000, 0x000400fa, 0x00000012,
+    0x00000015, 0x00000021, 0x000200f8, 0x00000015,
+    0x00060041, 0x0000001e, 0x0000001f, 0x0000001a,
+    0x0000001b, 0x0000001d, 0x0004003d, 0x00000006,
+    0x00000020, 0x0000001f, 0x0003003e, 0x00000014,
+    0x00000020, 0x000200f9, 0x00000016, 0x000200f8,
+    0x00000021, 0x00060041, 0x0000001e, 0x00000023,
+    0x0000001a, 0x0000001b, 0x00000022, 0x0004003d,
+    0x00000006, 0x00000024, 0x00000023, 0x0003003e,
+    0x00000014, 0x00000024, 0x000200f9, 0x00000016,
+    0x000200f8, 0x00000016, 0x0004003d, 0x00000006,
+    0x00000025, 0x00000014, 0x0004003d, 0x0000000a,
+    0x00000026, 0x0000000c, 0x000500c7, 0x0000000a,
+    0x00000027, 0x00000026, 0x0000001b, 0x000500aa,
+    0x00000011, 0x00000028, 0x00000027, 0x00000010,
+    0x000300f7, 0x0000002b, 0x00000000, 0x000400fa,
+    0x00000028, 0x0000002a, 0x0000002f, 0x000200f8,
+    0x0000002a, 0x00060041, 0x0000001e, 0x0000002d,
+    0x0000001a, 0x0000001b, 0x0000002c, 0x0004003d,
+    0x00000006, 0x0000002e, 0x0000002d, 0x0003003e,
+    0x00000029, 0x0000002e, 0x000200f9, 0x0000002b,
+    0x000200f8, 0x0000002f, 0x00060041, 0x0000001e,
+    0x00000031, 0x0000001a, 0x0000001b, 0x00000030,
+    0x0004003d, 0x00000006, 0x00000032, 0x00000031,
+    0x0003003e, 0x00000029, 0x00000032, 0x000200f9,
+    0x0000002b, 0x000200f8, 0x0000002b, 0x0004003d,
+    0x00000006, 0x00000033, 0x00000029, 0x00050050,
+    0x00000007, 0x00000034, 0x00000025, 0x00000033,
+    0x0003003e, 0x00000009, 0x00000034, 0x0004003d,
+    0x0000000a, 0x00000036, 0x0000000c, 0x000500c7,
+    0x0000000a, 0x00000037, 0x00000036, 0x0000000e,
+    0x000500aa, 0x00000011, 0x00000038, 0x00000037,
+    0x00000010, 0x000300f7, 0x0000003b, 0x00000000,
+    0x000400fa, 0x00000038, 0x0000003a, 0x0000003e,
+    0x000200f8, 0x0000003a, 0x00060041, 0x0000001e,
+    0x0000003c, 0x0000001a, 0x00000010, 0x0000001d,
+    0x0004003d, 0x00000006, 0x0000003d, 0x0000003c,
+    0x0003003e, 0x00000039, 0x0000003d, 0x000200f9,
+    0x0000003b, 0x000200f8, 0x0000003e, 0x00060041,
+    0x0000001e, 0x0000003f, 0x0000001a, 0x00000010,
+    0x00000022, 0x0004003d, 0x00000006, 0x00000040,
+    0x0000003f, 0x0003003e, 0x00000039, 0x00000040,
+    0x000200f9, 0x0000003b, 0x000200f8, 0x0000003b,
+    0x0004003d, 0x00000006, 0x00000041, 0x00000039,
+    0x0004003d, 0x0000000a, 0x00000042, 0x0000000c,
+    0x000500c7, 0x0000000a, 0x00000043, 0x00000042,
+    0x0000001b, 0x000500aa, 0x00000011, 0x00000044,
+    0x00000043, 0x00000010, 0x000300f7, 0x00000047,
+    0x00000000, 0x000400fa, 0x00000044, 0x00000046,
+    0x0000004a, 0x000200f8, 0x00000046, 0x00060041,
+    0x0000001e, 0x00000048, 0x0000001a, 0x00000010,
+    0x0000002c, 0x0004003d, 0x00000006, 0x00000049,
+    0x00000048, 0x0003003e, 0x00000045, 0x00000049,
+    0x000200f9, 0x00000047, 0x000200f8, 0x0000004a,
+    0x00060041, 0x0000001e, 0x0000004b, 0x0000001a,
+    0x00000010, 0x00000030, 0x0004003d, 0x00000006,
+    0x0000004c, 0x0000004b, 0x0003003e, 0x00000045,
+    0x0000004c, 0x000200f9, 0x00000047, 0x000200f8,
+    0x00000047, 0x0004003d, 0x00000006, 0x0000004d,
+    0x00000045, 0x00050050, 0x00000007, 0x0000004e,
+    0x00000041, 0x0000004d, 0x0003003e, 0x00000035,
+    0x0000004e, 0x00060041, 0x0000001e, 0x00000050,
+    0x0000001a, 0x0000000e, 0x0000001d, 0x0004003d,
+    0x00000006, 0x00000051, 0x00000050, 0x00050041,
+    0x00000013, 0x00000052, 0x00000009, 0x0000001d,
+    0x0004003d, 0x00000006, 0x00000053, 0x00000052,
+    0x00050085, 0x00000006, 0x00000054, 0x00000051,
+    0x00000053, 0x00060041, 0x0000001e, 0x00000055,
+    0x0000001a, 0x0000000e, 0x0000002c, 0x0004003d,
+    0x00000006, 0x00000056, 0x00000055, 0x00050041,
+    0x00000013, 0x00000057, 0x00000009, 0x0000002c,
+    0x0004003d, 0x00000006, 0x00000058, 0x00000057,
+    0x00050085, 0x00000006, 0x00000059, 0x00000056,
+    0x00000058, 0x00050081, 0x00000006, 0x0000005a,
+    0x00000054, 0x00000059, 0x00060041, 0x0000001e,
+    0x0000005b, 0x0000001a, 0x0000000e, 0x00000022,
+    0x0004003d, 0x00000006, 0x0000005c, 0x0000005b,
+    0x00050041, 0x00000013, 0x0000005d, 0x00000009,
+    0x0000001d, 0x0004003d, 0x00000006, 0x0000005e,
+    0x0000005d, 0x00050085, 0x00000006, 0x0000005f,
+    0x0000005c, 0x0000005e, 0x00060041, 0x0000001e,
+    0x00000060, 0x0000001a, 0x0000000e, 0x00000030,
+    0x0004003d, 0x00000006, 0x00000061, 0x00000060,
+    0x00050041, 0x00000013, 0x00000062, 0x00000009,
+    0x0000002c, 0x0004003d, 0x00000006, 0x00000063,
+    0x00000062, 0x00050085, 0x00000006, 0x00000064,
+    0x00000061, 0x00000063, 0x00050081, 0x00000006,
+    0x00000065, 0x0000005f, 0x00000064, 0x00050050,
+    0x00000007, 0x00000066, 0x0000005a, 0x00000065,
+    0x0003003e, 0x0000004f, 0x00000066, 0x0004003d,
+    0x00000007, 0x0000006b, 0x0000004f, 0x00050051,
+    0x00000006, 0x0000006e, 0x0000006b, 0x00000000,
+    0x00050051, 0x00000006, 0x0000006f, 0x0000006b,
+    0x00000001, 0x00070050, 0x00000017, 0x00000070,
+    0x0000006e, 0x0000006f, 0x0000006c, 0x0000006d,
+    0x00050041, 0x00000071, 0x00000072, 0x0000006a,
+    0x00000010, 0x0003003e, 0x00000072, 0x00000070,
+    0x0004003d, 0x00000007, 0x00000075, 0x00000035,
+    0x0003003e, 0x00000074, 0x00000075, 0x000100fd,
+    0x00010038
 };
 const size_t VKDrawingPanel::kVertSpvSize = sizeof(kVertSpv);
          
@@ -10354,9 +10431,12 @@ VKDrawingPanel::~VKDrawingPanel()
 {
     if (device_ != VK_NULL_HANDLE)
         vkDeviceWaitIdle(device_);
- 
+
     DestroyTexture();
- 
+#if defined(__WXQT__) && defined(__ANDROID__)
+    DestroyOverlayTexture();
+#endif
+
     for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
         if (image_available_sem_[i]) vkDestroySemaphore(device_, image_available_sem_[i], nullptr);
         if (render_finished_sem_[i]) vkDestroySemaphore(device_, render_finished_sem_[i], nullptr);
@@ -10369,6 +10449,9 @@ VKDrawingPanel::~VKDrawingPanel()
  
     if (desc_pool_)       vkDestroyDescriptorPool     (device_, desc_pool_,       nullptr);
     if (pipeline_)        vkDestroyPipeline            (device_, pipeline_,        nullptr);
+#if defined(__WXQT__) && defined(__ANDROID__)
+    if (osc_pipeline_)    vkDestroyPipeline            (device_, osc_pipeline_,    nullptr);
+#endif
     if (pipeline_layout_) vkDestroyPipelineLayout      (device_, pipeline_layout_, nullptr);
     if (desc_set_layout_) vkDestroyDescriptorSetLayout (device_, desc_set_layout_, nullptr);
     if (render_pass_)     vkDestroyRenderPass          (device_, render_pass_,     nullptr);
@@ -10580,34 +10663,29 @@ bool VKDrawingPanel::CreateSurfaceMACOS()
 // QWidget::windowHandle() -- a QWindow. Qt's Android QPA renders every widget
 // into the activity's single QtSurface and exposes no public ANativeWindow for a
 // QWindow, so take the same route Qt's own QAndroidPlatformVulkanWindow does:
-// attach a SurfaceView to the activity over that QWindow's on-screen rect and
-// use its Surface's ANativeWindow. VbamVideoSurface (android-compat.cpp) is the
-// same overlay helper the SDL renderer already uses.
+// attach a SurfaceView to the activity over this panel's on-screen rect and use
+// its Surface's ANativeWindow. VbamVideoSurface (android-compat.cpp) is the same
+// overlay helper the SDL renderer already uses.
+//
+// The rect comes from the panel widget, not from its toplevel QWindow: the
+// overlay has to cover exactly the area the panel occupies, or the picture ends
+// up centred in the wrong box (a window-sized overlay also runs under the menu
+// bar and past the bottom of the screen).
 bool VKDrawingPanel::CreateSurfaceAndroid()
 {
-    // Force a native window so windowHandle() is non-null for this child widget.
     QWidget* qwidget = static_cast<QWidget*>(GetHandle());
     if (!qwidget) {
         wxLogError(_("Failed to obtain QWidget handle for Vulkan surface"));
         return false;
     }
-    qwidget->setAttribute(Qt::WA_NativeWindow, true);
-
-    QWindow* qwindow = qwidget->windowHandle();
-    if (!qwindow && qwidget->window())
-        qwindow = qwidget->window()->windowHandle();
-    if (!qwindow) {
-        wxLogError(_("Failed to obtain QWindow handle for Vulkan surface"));
-        return false;
-    }
 
     if (!android_window_) {
-        extern void* VbamCreateAndroidVideoSurfaceForWindow(void*);
+        extern void* VbamCreateAndroidVideoSurface(void*);
         android_window_ = static_cast<ANativeWindow*>(
-            VbamCreateAndroidVideoSurfaceForWindow(qwindow));
+            VbamCreateAndroidVideoSurface(qwidget));
     }
     if (!android_window_) {
-        wxLogError(_("Failed to obtain ANativeWindow for the panel's QWindow"));
+        wxLogError(_("Failed to obtain ANativeWindow for the panel"));
         return false;
     }
 
@@ -11029,7 +11107,20 @@ bool VKDrawingPanel::CreateSwapchain()
         ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
  
-    ci.preTransform   = caps.currentTransform;
+    // Present without any transform of the presentation engine's own: ask for the
+    // surface's currentTransform, then rotate our quad to match (the shader gets
+    // the matrix through push constants). On Android currentTransform is
+    // ROTATE_90/180/270 whenever the window orientation differs from the panel's
+    // natural one, and currentExtent is reported in that pre-transformed (panel)
+    // space -- drawing an unrotated quad into it is what tips the picture over.
+    // A driver that cannot take currentTransform back gets identity, and then
+    // does the rotation itself, so the picture stays upright either way.
+    if (caps.supportedTransforms & caps.currentTransform)
+        swapchain_pre_transform_ = caps.currentTransform;
+    else
+        swapchain_pre_transform_ = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+
+    ci.preTransform   = swapchain_pre_transform_;
     ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     ci.presentMode    = chosen_mode;
     ci.clipped        = VK_TRUE;
@@ -11076,12 +11167,70 @@ bool VKDrawingPanel::CreateSwapchain()
         }
     }
 
-    wxLogDebug(_("Swapchain created: %ux%u, %u images, vsync=%s"),
+    wxLogDebug(_("Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"),
                extent.width, extent.height, sc_count,
-               vsync_ ? wxT("on") : wxT("off"));
+               vsync_ ? wxT("on") : wxT("off"),
+               (unsigned)swapchain_pre_transform_);
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // wxLogDebug is compiled out of release builds, and this is the one thing
+    // worth having in logcat when the panel misbehaves on a device.
+    {
+        const wxSize client = GetClientSize();
+        __android_log_print(ANDROID_LOG_INFO, "VBAM",
+                            "VK swapchain %ux%u images=%u pre-transform=0x%x panel=%dx%d",
+                            extent.width, extent.height, sc_count,
+                            (unsigned)swapchain_pre_transform_,
+                            client.GetWidth(), client.GetHeight());
+    }
+#endif
     return true;
 }
- 
+
+// ─── PreTransformMatrix ───────────────────────────────────────────────────────
+//
+// The swapchain images live in the surface's pre-transformed space, which for a
+// rotated surface is the display's space turned by -preTransform. Geometry is
+// therefore built in display-oriented NDC and mapped over with this matrix; a
+// VK_SURFACE_TRANSFORM_ROTATE_90 surface wants its content rotated 90 degrees
+// clockwise, which in Vulkan's y-down clip space is (x, y) -> (-y, x).
+//
+// out_mat is row-major: pos' = (m[0]*x + m[1]*y, m[2]*x + m[3]*y).
+void VKDrawingPanel::PreTransformMatrix(float out_mat[4]) const
+{
+    // Rotation, then the mirror (x negation) that the MIRROR variants prepend.
+    float c = 1.f, s = 0.f;
+    switch (swapchain_pre_transform_) {
+        case VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR:
+            c =  0.f; s =  1.f; break;
+        case VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR:
+            c = -1.f; s =  0.f; break;
+        case VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR:
+            c =  0.f; s = -1.f; break;
+        default:  // IDENTITY, HORIZONTAL_MIRROR, INHERIT
+            break;
+    }
+
+    float mirror = 1.f;
+    switch (swapchain_pre_transform_) {
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR:
+            mirror = -1.f; break;
+        default:
+            break;
+    }
+
+    // rotate(c, s) * mirror(x)
+    out_mat[0] =  c * mirror;
+    out_mat[1] = -s;
+    out_mat[2] =  s * mirror;
+    out_mat[3] =  c;
+}
+
 // ─── DestroySwapchain ─────────────────────────────────────────────────────────
 void VKDrawingPanel::DestroySwapchain()
 {
@@ -11273,6 +11422,10 @@ bool VKDrawingPanel::CreateGraphicsPipeline()
     ms.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     ms.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
  
+    // The frame is drawn without blending: the emulator's 32-bit pixel format
+    // leaves the alpha byte at 0, which the upload copies verbatim, so blending
+    // the frame would erase the picture entirely. The overlay gets its own
+    // blend-enabled pipeline below.
     VkPipelineColorBlendAttachmentState blend_att{};
     blend_att.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
                                VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -11291,7 +11444,8 @@ bool VKDrawingPanel::CreateGraphicsPipeline()
     VkPushConstantRange pc_range{};
     pc_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pc_range.offset     = 0;
-    pc_range.size       = sizeof(float) * 8;
+    // src_rect + dst_rect + pre-rotation matrix, see the shader source above.
+    pc_range.size       = sizeof(float) * 12;
  
     VkPipelineLayoutCreateInfo layout_ci{};
     layout_ci.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -11324,10 +11478,30 @@ bool VKDrawingPanel::CreateGraphicsPipeline()
     pipe_ci.subpass             = 0;
  
     res = vkCreateGraphicsPipelines(device_, VK_NULL_HANDLE, 1, &pipe_ci, nullptr, &pipeline_);
- 
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Same pipeline with straight-alpha blending, for the on-screen controller
+    // overlay composited over the frame (see UpdateOverlayTexture).
+    if (res == VK_SUCCESS) {
+        blend_att.blendEnable         = VK_TRUE;
+        blend_att.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        blend_att.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_att.colorBlendOp        = VK_BLEND_OP_ADD;
+        blend_att.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        blend_att.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_att.alphaBlendOp        = VK_BLEND_OP_ADD;
+        if (vkCreateGraphicsPipelines(device_, VK_NULL_HANDLE, 1, &pipe_ci, nullptr,
+                                      &osc_pipeline_) != VK_SUCCESS) {
+            // Not fatal: the frame still presents, only the overlay is missing.
+            wxLogError(_("Failed to create overlay pipeline"));
+            osc_pipeline_ = VK_NULL_HANDLE;
+        }
+    }
+#endif
+
     vkDestroyShaderModule(device_, vert_mod, nullptr);
     vkDestroyShaderModule(device_, frag_mod, nullptr);
- 
+
     if (res != VK_SUCCESS) {
         wxLogError(_("Failed to create graphics pipeline: %d"), (int)res);
         return false;
@@ -11393,13 +11567,15 @@ bool VKDrawingPanel::CreateSyncObjects()
 // ─── CreateDescriptorPoolAndSet ───────────────────────────────────────────────
 bool VKDrawingPanel::CreateDescriptorPoolAndSet()
 {
+    // Two sets: the emulator frame, plus the on-screen controller overlay the
+    // Android path composites on top of it (see UpdateOverlayTexture).
     VkDescriptorPoolSize pool_size{};
     pool_size.type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    pool_size.descriptorCount = 1;
- 
+    pool_size.descriptorCount = 2;
+
     VkDescriptorPoolCreateInfo ci{};
     ci.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    ci.maxSets       = 1;
+    ci.maxSets       = 2;
     ci.poolSizeCount = 1;
     ci.pPoolSizes    = &pool_size;
  
@@ -11420,6 +11596,15 @@ bool VKDrawingPanel::CreateDescriptorPoolAndSet()
         wxLogError(_("Failed to allocate descriptor set: %d"), (int)res);
         return false;
     }
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    res = vkAllocateDescriptorSets(device_, &ai, &osc_desc_set_);
+    if (res != VK_SUCCESS) {
+        // Not fatal: the frame still presents, only the overlay is missing.
+        wxLogError(_("Failed to allocate overlay descriptor set: %d"), (int)res);
+        osc_desc_set_ = VK_NULL_HANDLE;
+    }
+#endif
     return true;
 }
  
@@ -11579,6 +11764,252 @@ void VKDrawingPanel::DestroyTexture()
     texture_width_  = 0;
     texture_height_ = 0;
 }
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+// ─── UpdateOverlayTexture ─────────────────────────────────────────────────────
+//
+// The Android swapchain presents into a SurfaceView stacked over the Qt content,
+// which hides the on-screen controller widget living under it. Render that widget
+// to RGBA and keep it in a texture here so DrawArea can composite it over the
+// emulator frame; the widget stays where it is and keeps receiving touches.
+bool VKDrawingPanel::UpdateOverlayTexture(VkCommandBuffer cmd)
+{
+    if (!osc_desc_set_ || !osc_pipeline_)
+        return false;
+
+    MainFrame* frame = wxGetApp().frame;
+    GameArea* game_area = frame ? frame->GetPanel() : nullptr;
+    widgets::OnScreenController* osc =
+        game_area ? game_area->on_screen_controller() : nullptr;
+    if (!osc || !osc->IsShown())
+        return false;
+
+    // Keep the controller inside the visible area. GameArea does this too when it
+    // (re)creates the overlay, but the content size only becomes known once the
+    // activity has laid the video surface out, which can be later than that.
+    {
+        extern bool VbamAndroidVisibleClientSize(void*, int*, int*);
+        int visible_w = 0, visible_h = 0;
+        if (VbamAndroidVisibleClientSize(GetHandle(), &visible_w, &visible_h)) {
+            const wxSize want(std::min(GetClientSize().GetWidth(),  visible_w),
+                              std::min(GetClientSize().GetHeight(), visible_h));
+            if (osc->GetClientSize() != want)
+                osc->SetSize(want);
+        }
+    }
+
+    const wxSize osc_size = osc->GetClientSize();
+    if (osc_size.GetWidth() < 1 || osc_size.GetHeight() < 1)
+        return false;
+
+    const bool resized = (uint32_t)osc_size.GetWidth()  != osc_width_ ||
+                         (uint32_t)osc_size.GetHeight() != osc_height_;
+    if (!resized && osc_revision_ == osc->revision())
+        return osc_image_ != VK_NULL_HANDLE;  // unchanged, reuse the texture
+
+    // Render at device resolution: the texture is presented 1:1 into a native
+    // surface, so the widget's logical size would come out soft.
+    QWidget* osc_qwidget = static_cast<QWidget*>(osc->GetHandle());
+    const double osc_scale =
+        (osc_qwidget && osc_qwidget->devicePixelRatio() > 0)
+            ? (double)osc_qwidget->devicePixelRatio() : 1.0;
+
+    std::vector<uint8_t> pixels;
+    int w = 0, h = 0;
+    if (!osc->RenderRgba(&pixels, &w, &h, osc_scale) || w < 1 || h < 1) {
+        // Log once per size, not per frame: this would otherwise fire at 60Hz.
+        static bool warned = false;
+        if (!warned) {
+            warned = true;
+            __android_log_print(ANDROID_LOG_WARN, "VBAM",
+                                "on-screen controller render failed (%dx%d)",
+                                osc_size.GetWidth(), osc_size.GetHeight());
+        }
+        return false;
+    }
+
+    if (osc_image_ == VK_NULL_HANDLE ||
+        (uint32_t)w != osc_width_ || (uint32_t)h != osc_height_) {
+        // A frame still in flight may be sampling the old image through the
+        // overlay descriptor set, and both are about to be replaced. Resizes are
+        // rare (panel geometry changes), so idling here costs nothing.
+        if (osc_image_ != VK_NULL_HANDLE)
+            vkDeviceWaitIdle(device_);
+        DestroyOverlayTexture();
+
+        VkImageCreateInfo img_ci{};
+        img_ci.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        img_ci.imageType     = VK_IMAGE_TYPE_2D;
+        img_ci.format        = VK_FORMAT_R8G8B8A8_UNORM;
+        img_ci.extent        = { (uint32_t)w, (uint32_t)h, 1 };
+        img_ci.mipLevels     = 1;
+        img_ci.arrayLayers   = 1;
+        img_ci.samples       = VK_SAMPLE_COUNT_1_BIT;
+        img_ci.tiling        = VK_IMAGE_TILING_OPTIMAL;
+        img_ci.usage         = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        img_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        if (vkCreateImage(device_, &img_ci, nullptr, &osc_image_) != VK_SUCCESS) {
+            wxLogError(_("Failed to create overlay image"));
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        VkMemoryRequirements mem_req;
+        vkGetImageMemoryRequirements(device_, osc_image_, &mem_req);
+        VkMemoryAllocateInfo alloc{};
+        alloc.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc.allocationSize  = mem_req.size;
+        alloc.memoryTypeIndex = FindMemoryType(mem_req.memoryTypeBits,
+                                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        if (alloc.memoryTypeIndex == UINT32_MAX ||
+            vkAllocateMemory(device_, &alloc, nullptr, &osc_memory_) != VK_SUCCESS) {
+            wxLogError(_("Failed to allocate overlay image memory"));
+            DestroyOverlayTexture();
+            return false;
+        }
+        vkBindImageMemory(device_, osc_image_, osc_memory_, 0);
+
+        VkImageViewCreateInfo view_ci{};
+        view_ci.sType                       = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_ci.image                       = osc_image_;
+        view_ci.viewType                    = VK_IMAGE_VIEW_TYPE_2D;
+        view_ci.format                      = VK_FORMAT_R8G8B8A8_UNORM;
+        view_ci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view_ci.subresourceRange.levelCount = 1;
+        view_ci.subresourceRange.layerCount = 1;
+        if (vkCreateImageView(device_, &view_ci, nullptr, &osc_view_) != VK_SUCCESS) {
+            wxLogError(_("Failed to create overlay image view"));
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        // The overlay is drawn at panel resolution, so it is sampled 1:1; linear
+        // filtering only softens its edges when the surface is being resized.
+        VkSamplerCreateInfo samp_ci{};
+        samp_ci.sType        = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samp_ci.magFilter    = VK_FILTER_LINEAR;
+        samp_ci.minFilter    = VK_FILTER_LINEAR;
+        samp_ci.mipmapMode   = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        samp_ci.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.maxLod       = 0.0f;
+        if (vkCreateSampler(device_, &samp_ci, nullptr, &osc_sampler_) != VK_SUCCESS) {
+            wxLogError(_("Failed to create overlay sampler"));
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        VkDescriptorImageInfo img_info{};
+        img_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        img_info.imageView   = osc_view_;
+        img_info.sampler     = osc_sampler_;
+
+        VkWriteDescriptorSet write{};
+        write.sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstSet          = osc_desc_set_;
+        write.dstBinding      = 0;
+        write.descriptorCount = 1;
+        write.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write.pImageInfo      = &img_info;
+        vkUpdateDescriptorSets(device_, 1, &write, 0, nullptr);
+
+        osc_width_  = (uint32_t)w;
+        osc_height_ = (uint32_t)h;
+    }
+
+    const VkDeviceSize needed = (VkDeviceSize)w * h * 4;
+    if (needed > osc_staging_size_) {
+        if (osc_staging_buffer_) {
+            vkDestroyBuffer(device_, osc_staging_buffer_, nullptr);
+            vkFreeMemory   (device_, osc_staging_memory_, nullptr);
+            osc_staging_buffer_ = VK_NULL_HANDLE;
+            osc_staging_memory_ = VK_NULL_HANDLE;
+        }
+
+        VkBufferCreateInfo buf_ci{};
+        buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buf_ci.size  = needed;
+        buf_ci.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        if (vkCreateBuffer(device_, &buf_ci, nullptr, &osc_staging_buffer_) != VK_SUCCESS) {
+            wxLogError(_("Failed to create overlay staging buffer"));
+            return false;
+        }
+
+        VkMemoryRequirements stg_req;
+        vkGetBufferMemoryRequirements(device_, osc_staging_buffer_, &stg_req);
+        VkMemoryAllocateInfo stg_alloc{};
+        stg_alloc.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        stg_alloc.allocationSize  = stg_req.size;
+        stg_alloc.memoryTypeIndex = FindMemoryType(stg_req.memoryTypeBits,
+                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        if (stg_alloc.memoryTypeIndex == UINT32_MAX ||
+            vkAllocateMemory(device_, &stg_alloc, nullptr, &osc_staging_memory_) != VK_SUCCESS) {
+            wxLogError(_("Failed to allocate overlay staging memory"));
+            return false;
+        }
+        vkBindBufferMemory(device_, osc_staging_buffer_, osc_staging_memory_, 0);
+        osc_staging_size_ = needed;
+    }
+
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, osc_staging_memory_, 0, needed, 0, &mapped) != VK_SUCCESS)
+        return false;
+    memcpy(mapped, pixels.data(), (size_t)needed);
+    vkUnmapMemory(device_, osc_staging_memory_);
+
+    VkImageMemoryBarrier to_dst{};
+    to_dst.sType            = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    to_dst.oldLayout        = VK_IMAGE_LAYOUT_UNDEFINED;
+    to_dst.newLayout        = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    to_dst.image            = osc_image_;
+    to_dst.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+    to_dst.dstAccessMask    = VK_ACCESS_TRANSFER_WRITE_BIT;
+    vkCmdPipelineBarrier(cmd,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        0, 0, nullptr, 0, nullptr, 1, &to_dst);
+
+    VkBufferImageCopy copy{};
+    copy.bufferRowLength  = (uint32_t)w;
+    copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+    copy.imageExtent      = {(uint32_t)w, (uint32_t)h, 1};
+    vkCmdCopyBufferToImage(cmd, osc_staging_buffer_, osc_image_,
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
+
+    VkImageMemoryBarrier to_read = to_dst;
+    to_read.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    to_read.newLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    to_read.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    to_read.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    vkCmdPipelineBarrier(cmd,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+        0, 0, nullptr, 0, nullptr, 1, &to_read);
+
+    if (osc_revision_ == 0) {
+        __android_log_print(ANDROID_LOG_INFO, "VBAM",
+                            "on-screen controller overlay uploaded %dx%d", w, h);
+    }
+    osc_revision_ = osc->revision();
+    return true;
+}
+
+// ─── DestroyOverlayTexture ────────────────────────────────────────────────────
+void VKDrawingPanel::DestroyOverlayTexture()
+{
+    if (osc_sampler_) { vkDestroySampler  (device_, osc_sampler_, nullptr); osc_sampler_ = VK_NULL_HANDLE; }
+    if (osc_view_)    { vkDestroyImageView(device_, osc_view_,    nullptr); osc_view_    = VK_NULL_HANDLE; }
+    if (osc_image_)   { vkDestroyImage    (device_, osc_image_,   nullptr); osc_image_   = VK_NULL_HANDLE; }
+    if (osc_memory_)  { vkFreeMemory      (device_, osc_memory_,  nullptr); osc_memory_  = VK_NULL_HANDLE; }
+
+    if (osc_staging_buffer_) { vkDestroyBuffer(device_, osc_staging_buffer_, nullptr); osc_staging_buffer_ = VK_NULL_HANDLE; }
+    if (osc_staging_memory_) { vkFreeMemory   (device_, osc_staging_memory_, nullptr); osc_staging_memory_ = VK_NULL_HANDLE; }
+    osc_staging_size_ = 0;
+    osc_width_        = 0;
+    osc_height_       = 0;
+    osc_revision_     = 0;
+}
+#endif  // __WXQT__ && __ANDROID__
  
 // ─── DrawingPanelInit ─────────────────────────────────────────────────────────
 void VKDrawingPanel::DrawingPanelInit()
@@ -11605,19 +12036,33 @@ void VKDrawingPanel::OnSize(wxSizeEvent& ev)
     PositionWaylandSubsurface();
 #endif
 #if defined(__WXQT__) && defined(__ANDROID__)
-    // Keep the overlay SurfaceView aligned with the (possibly moved) QWindow.
-    if (android_window_) {
-        extern void VbamSetAndroidVideoSurfaceGeometryForWindow(void*);
-        QWidget* qwidget = static_cast<QWidget*>(GetHandle());
-        QWindow* qwindow = qwidget ? qwidget->windowHandle() : nullptr;
-        if (qwindow)
-            VbamSetAndroidVideoSurfaceGeometryForWindow(qwindow);
-    }
+    // Keep the overlay SurfaceView aligned with the (possibly moved) panel. Same
+    // widget rect the surface was created from, so create and resize can't drift
+    // apart.
+    SyncAndroidOverlayGeometry();
 #endif
     if (device_)
         RecreateSwapchain();
     ev.Skip();
 }
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+// ─── SyncAndroidOverlayGeometry ───────────────────────────────────────────────
+// Moves/resizes the overlay SurfaceView onto this panel's current on-screen rect.
+// Needed from OnSize and once after the first layout: the surface is created in
+// the constructor, before GameArea has put the panel in its sizer, so the initial
+// rect is the unlaid-out default.
+void VKDrawingPanel::SyncAndroidOverlayGeometry()
+{
+    if (!android_window_)
+        return;
+    QWidget* qwidget = static_cast<QWidget*>(GetHandle());
+    if (!qwidget)
+        return;
+    extern void VbamSetAndroidVideoSurfaceGeometry(void*);
+    VbamSetAndroidVideoSurfaceGeometry(qwidget);
+}
+#endif
  
 // ─── DrawArea ─────────────────────────────────────────────────────────────────
 //
@@ -11632,7 +12077,37 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
  
     if (!device_) return;
     if (!did_init) DrawingPanelInit();
- 
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // The overlay SurfaceView is created before GameArea lays the panel out, so
+    // glue it to the panel rect as soon as that rect is real (and whenever it
+    // changes without an OnSize reaching us).
+    const wxSize panel_size = GetClientSize();
+    if (panel_size != android_overlay_size_ &&
+        panel_size.GetWidth() > 1 && panel_size.GetHeight() > 1) {
+        android_overlay_size_ = panel_size;
+        SyncAndroidOverlayGeometry();
+    }
+
+    // That resize lands on the Android UI thread, so the surface follows a few
+    // frames later; rebuild the swapchain whenever the surface no longer matches
+    // it instead of waiting for a VK_ERROR_OUT_OF_DATE_KHR that a driver may not
+    // report. Also covers the tiny surface the constructor starts out with.
+    {
+        VkSurfaceCapabilitiesKHR caps{};
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device_, surface_,
+                                                      &caps) == VK_SUCCESS &&
+            caps.currentExtent.width != UINT32_MAX &&
+            (caps.currentExtent.width  != swapchain_extent_.width ||
+             caps.currentExtent.height != swapchain_extent_.height)) {
+            if (caps.currentExtent.width == 0 || caps.currentExtent.height == 0)
+                return;  // surface not presentable yet
+            if (!RecreateSwapchain())
+                return;
+        }
+    }
+#endif
+
     vkWaitForFences(device_, 1, &in_flight_fence_[current_frame_], VK_TRUE, UINT64_MAX);
  
     uint32_t image_index = 0;
@@ -11824,7 +12299,13 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
         vkCmdPipelineBarrier(cmd,
             VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0, 0, nullptr, 0, nullptr, 1, &to_read);
- 
+
+        // Overlay upload has to happen outside the render pass too.
+        bool draw_overlay = false;
+#if defined(__WXQT__) && defined(__ANDROID__)
+        draw_overlay = UpdateOverlayTexture(cmd);
+#endif
+
         VkClearValue clear_val{};
         clear_val.color = {{0.f, 0.f, 0.f, 1.f}};
  
@@ -11853,12 +12334,60 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                                 pipeline_layout_, 0, 1, &desc_set_, 0, nullptr);
  
-        float win_w = (float)swapchain_extent_.width;
-        float win_h = (float)swapchain_extent_.height;
- 
+        // Letterboxing is computed in on-screen space, like the GLES renderer
+        // (widgets/android-gl.cpp).
+        int client_w = 0, client_h = 0;
+        GetClientSize(&client_w, &client_h);
+        float win_w = (float)client_w;
+        float win_h = (float)client_h;
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+        // Overlay crop: how much of the panel the surface actually covers, in
+        // 0..1 of the on-screen controller texture. 1,1 unless the surface was
+        // clipped (see below).
+        float osc_u1 = 1.f, osc_v1 = 1.f;
+
+        // The panel widget can be larger than the visible drawing area -- Qt's
+        // window overhangs the Android content view below the action bar -- and
+        // the SurfaceView is clamped to that area, so the surface, not the panel,
+        // is what the picture has to fit. Take the extent as display-oriented,
+        // flipping it when the driver reports pre-rotated extents (they differ).
+        {
+            float surf_w = (float)swapchain_extent_.width;
+            float surf_h = (float)swapchain_extent_.height;
+            if ((win_w >= win_h) != (surf_w >= surf_h))
+                std::swap(surf_w, surf_h);
+
+            // The overlay texture is rendered at device resolution from the
+            // controller widget, which is itself clamped to the visible area, so
+            // this normally resolves to the whole texture. It only crops if the
+            // widget still ends up larger than the surface.
+            if (osc_width_ >= 1 && osc_height_ >= 1) {
+                osc_u1 = std::min(1.f, surf_w / (float)osc_width_);
+                osc_v1 = std::min(1.f, surf_h / (float)osc_height_);
+            }
+
+            win_w = surf_w;
+            win_h = surf_h;
+        }
+#endif
+        if (win_w < 1.f || win_h < 1.f) {  // not laid out yet
+            win_w = (float)swapchain_extent_.width;
+            win_h = (float)swapchain_extent_.height;
+        }
+
         float dst_x0 = -1.f, dst_y0 = -1.f, dst_x1 = 1.f, dst_y1 = 1.f;
- 
-        if (OPTION(kDispStretch)) {
+
+        // Android always letterboxes here: GameArea hands the panel the whole
+        // game area (the retain_aspect override in GameArea::OnIdle) and the GLES
+        // panel keeps the aspect internally too, so kDispStretch has no say on
+        // that platform.
+#if defined(__ANDROID__)
+        const bool keep_aspect = true;
+#else
+        const bool keep_aspect = OPTION(kDispStretch);
+#endif
+        if (keep_aspect) {
             float tex_aspect = (float)scaled_width  / (float)scaled_height;
             float win_aspect = win_w / win_h;
             if (win_aspect > tex_aspect) {
@@ -11872,13 +12401,38 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
             }
         }
  
-        float pc[8] = { 0.f, 0.f, 1.f, 1.f,
-                        dst_x0, dst_y0, dst_x1, dst_y1 };
+        float rot[4];
+        PreTransformMatrix(rot);
+
+        float pc[12] = { 0.f, 0.f, 1.f, 1.f,
+                         dst_x0, dst_y0, dst_x1, dst_y1,
+                         rot[0], rot[1], rot[2], rot[3] };
         vkCmdPushConstants(cmd, pipeline_layout_,
                            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                            0, sizeof(pc), pc);
- 
+
         vkCmdDraw(cmd, 4, 1, 0, 0);
+
+        // The on-screen controller covers the whole panel and is blended over the
+        // frame, letterbox bars included -- same as the widget would look if it
+        // were visible above this surface.
+        if (draw_overlay) {
+#if defined(__WXQT__) && defined(__ANDROID__)
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, osc_pipeline_);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                    pipeline_layout_, 0, 1, &osc_desc_set_, 0, nullptr);
+            // Sampling only the covered part of the overlay keeps the controls
+            // where the widget itself puts them, so touches still line up.
+            float osc_pc[12] = { 0.f, 0.f, osc_u1, osc_v1,
+                                 -1.f, -1.f, 1.f, 1.f,
+                                 rot[0], rot[1], rot[2], rot[3] };
+            vkCmdPushConstants(cmd, pipeline_layout_,
+                               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                               0, sizeof(osc_pc), osc_pc);
+            vkCmdDraw(cmd, 4, 1, 0, 0);
+#endif
+        }
+
         vkCmdEndRenderPass(cmd);
     }
  

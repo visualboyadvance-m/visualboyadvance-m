@@ -613,6 +613,10 @@ private:
     bool CreateSurfaceWIN32();
 #elif defined(__WXQT__) && defined(__ANDROID__)
     bool CreateSurfaceAndroid();
+    // Keeps the overlay SurfaceView on this panel's current on-screen rect.
+    void SyncAndroidOverlayGeometry();
+    // Panel size the overlay was last synced for.
+    wxSize android_overlay_size_ = wxSize(0, 0);
 #elif defined(__WXMAC__)
     bool CreateSurfaceMACOS();
 #elif defined(__WXGTK__)
@@ -674,6 +678,17 @@ private:
     bool                     vk_deep_color_    = false;  // 10-bit SDR swapchain (X11 deep color)
     bool                     hdr_metadata_ext_ = false;  // VK_EXT_hdr_metadata enabled
     VkExtent2D               swapchain_extent_ = {};
+    // The surface transform the swapchain was created with (its preTransform).
+    // Equals the surface's currentTransform whenever that is supported, so the
+    // presentation engine performs no rotation of its own and we pre-rotate the
+    // quad ourselves -- see PreTransformMatrix(). On Android this is a real
+    // rotation whenever the panel's natural orientation differs from the
+    // window's; elsewhere it is normally identity.
+    VkSurfaceTransformFlagBitsKHR swapchain_pre_transform_ =
+        VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    // Row-major 2x2 matrix mapping display-oriented NDC to the swapchain's
+    // pre-transformed space.
+    void PreTransformMatrix(float out_mat[4]) const;
     std::vector<VkImage>     swapchain_images_;
     std::vector<VkImageView> swapchain_views_;
     std::vector<VkFramebuffer> framebuffers_;
@@ -707,7 +722,34 @@ private:
     VkBuffer       staging_buffer_   = VK_NULL_HANDLE;
     VkDeviceMemory staging_memory_   = VK_NULL_HANDLE;
     VkDeviceSize   staging_size_     = 0;
- 
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // ── On-screen controller overlay ─────────────────────────────────────────
+    // This panel presents into an Android SurfaceView layered over the Qt
+    // content, so the wx overlay widget below it cannot be seen. Its pixels are
+    // uploaded here and composited over the frame instead. The widget itself
+    // stays alive and keeps handling touches (a SurfaceView is not clickable, so
+    // touches fall through to it).
+    VkImage         osc_image_          = VK_NULL_HANDLE;
+    VkDeviceMemory  osc_memory_         = VK_NULL_HANDLE;
+    VkImageView     osc_view_           = VK_NULL_HANDLE;
+    VkSampler       osc_sampler_        = VK_NULL_HANDLE;
+    VkBuffer        osc_staging_buffer_ = VK_NULL_HANDLE;
+    VkDeviceMemory  osc_staging_memory_ = VK_NULL_HANDLE;
+    VkDeviceSize    osc_staging_size_   = 0;
+    VkDescriptorSet osc_desc_set_       = VK_NULL_HANDLE;
+    // Blend-enabled twin of pipeline_; the frame itself must stay unblended.
+    VkPipeline      osc_pipeline_       = VK_NULL_HANDLE;
+    uint32_t        osc_width_          = 0;
+    uint32_t        osc_height_         = 0;
+    // Overlay revision the texture holds; 0 means "nothing uploaded yet".
+    uint32_t        osc_revision_       = 0;
+    // Re-renders and uploads the overlay when it changed, recording the copy
+    // into `cmd`. Returns true when the texture is ready to be drawn.
+    bool UpdateOverlayTexture(VkCommandBuffer cmd);
+    void DestroyOverlayTexture();
+#endif
+
     // ── State ────────────────────────────────────────────────────────────────
     uint32_t texture_width_  = 0;
     uint32_t texture_height_ = 0;

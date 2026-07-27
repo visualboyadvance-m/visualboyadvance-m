@@ -2,6 +2,7 @@
 #define VBAM_WX_WIDGETS_ON_SCREEN_CONTROLLER_H_
 
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <set>
@@ -17,6 +18,7 @@ class EmulatedGamepad;
 }  // namespace config
 
 class wxEraseEvent;
+class wxGraphicsContext;
 class wxMouseEvent;
 class wxPaintEvent;
 class wxSizeEvent;
@@ -50,6 +52,19 @@ public:
     // `released` is true when the point is lifted or the sequence is cancelled.
     // Coordinates are in widget-local pixels.
     void OnPlatformTouch(int pointer_id, double x, double y, bool released);
+
+    // Renders the overlay into straight-alpha RGBA at the widget's client size
+    // times `scale` (pass the device pixel ratio to match a native surface).
+    // Used by renderers that present into their own layer (the Android Vulkan
+    // panel draws into an Android SurfaceView above the Qt content, where this
+    // widget cannot be seen), so they can composite the controller themselves.
+    // Returns false when the widget has no usable size or drawing failed.
+    bool RenderRgba(std::vector<uint8_t>* rgba, int* out_width, int* out_height,
+                    double scale = 1.0);
+
+    // Bumped whenever the drawn appearance changes (press state, layout), so a
+    // compositing renderer can skip re-rendering an unchanged overlay.
+    uint32_t revision() const { return revision_; }
 
 private:
     enum class Shape { kCircle, kRoundedRect, kPill };
@@ -85,6 +100,9 @@ private:
     void OnSize(wxSizeEvent& event);
     void OnEraseBackground(wxEraseEvent& event);
 
+    // Draws the controls; shared by OnPaint() and RenderRgba().
+    void DrawContent(wxGraphicsContext& context);
+
     // Single-pointer mouse fallback (desktop).
     void OnMouseDown(wxMouseEvent& event);
     void OnMouseUp(wxMouseEvent& event);
@@ -101,6 +119,9 @@ private:
 
     std::map<int, PointerState> pointers_;
     std::array<bool, config::kNbGameKeys> pressed_{};
+
+    // See revision().
+    uint32_t revision_ = 1;
 
     static constexpr int kMousePointerId = -1;
 

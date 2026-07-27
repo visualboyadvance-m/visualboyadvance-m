@@ -10,15 +10,32 @@ import android.widget.FrameLayout;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-// Hosts an android.view.SurfaceView inside the (non-SDL) QtActivity so SDL can
-// render video into its Surface. Created/managed from native code (panel.cpp)
-// via JNI. Placed as a media-overlay layer above the app window surface, sized
-// to the emulator panel; the wx on-screen controller keeps working over/around
-// it. All view work runs on the UI thread; native callers block on a latch for
-// the Surface to be created.
+// Hosts an android.view.SurfaceView inside the (non-SDL) QtActivity so the SDL
+// and Vulkan renderers can render video into its Surface. Created/managed from
+// native code (panel.cpp) via JNI. Placed as a media-overlay layer above the app
+// window surface and sized to the emulator panel, so Qt content underneath it --
+// including the wx on-screen controller -- is hidden; the renderer composites
+// that overlay into the frame itself. Touches still reach the widgets below,
+// because a SurfaceView is neither clickable nor focusable. All view work runs on
+// the UI thread; native callers block on a latch for the Surface to be created.
 public class VbamVideoSurface implements SurfaceHolder.Callback {
 
     private static VbamVideoSurface sInstance;
+
+    // Last known size of the activity's content view, in physical pixels. This is
+    // the area actually visible below the action bar, which Qt's window can
+    // overhang; native code sizes the panel overlays against it. Written on the
+    // UI thread whenever the overlay is laid out, read from the emulator thread.
+    private static volatile int sContentWidth;
+    private static volatile int sContentHeight;
+
+    public static int contentWidthPx() {
+        return sContentWidth;
+    }
+
+    public static int contentHeightPx() {
+        return sContentHeight;
+    }
 
     private SurfaceView mView;
     private Surface mSurface;
@@ -41,12 +58,8 @@ public class VbamVideoSurface implements SurfaceHolder.Callback {
                 SurfaceView sv = new SurfaceView(activity);
                 sv.setZOrderMediaOverlay(true);
                 sv.getHolder().addCallback(self);
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                        Math.max(1, w), Math.max(1, h));
-                lp.leftMargin = x;
-                lp.topMargin = y;
                 ViewGroup content = (ViewGroup) activity.findViewById(android.R.id.content);
-                content.addView(sv, lp);
+                content.addView(sv, layoutParamsFor(content, x, y, w, h));
                 self.mView = sv;
             }
         });
@@ -70,13 +83,37 @@ public class VbamVideoSurface implements SurfaceHolder.Callback {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-                        Math.max(1, w), Math.max(1, h));
-                lp.leftMargin = x;
-                lp.topMargin = y;
-                self.mView.setLayoutParams(lp);
+                ViewGroup parent = (ViewGroup) self.mView.getParent();
+                self.mView.setLayoutParams(layoutParamsFor(parent, x, y, w, h));
             }
         });
+    }
+
+    // Builds layout params for the overlay. Native passes the panel's rect in
+    // physical pixels relative to the Qt drawing area, which is this parent's
+    // origin. The size is clamped to what is left of the parent: Qt's window can
+    // be taller than the content view below the action bar, and an overlay sized
+    // from it would draw the picture partly off the bottom of the screen.
+    private static FrameLayout.LayoutParams layoutParamsFor(final ViewGroup parent,
+                                                            final int x, final int y,
+                                                            final int w, final int h) {
+        final int left = Math.max(0, x);
+        final int top = Math.max(0, y);
+        int width = Math.max(1, w);
+        int height = Math.max(1, h);
+        if (parent != null && parent.getWidth() > 0 && parent.getHeight() > 0) {
+            sContentWidth = parent.getWidth();
+            sContentHeight = parent.getHeight();
+            width = Math.max(1, Math.min(width, parent.getWidth() - left));
+            height = Math.max(1, Math.min(height, parent.getHeight() - top));
+            android.util.Log.i("VBAM", "VbamVideoSurface layout " + width + "x" + height
+                    + " at " + left + "," + top
+                    + " parent " + parent.getWidth() + "x" + parent.getHeight());
+        }
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(width, height);
+        lp.leftMargin = left;
+        lp.topMargin = top;
+        return lp;
     }
 
     public static synchronized void destroy(final Activity activity) {

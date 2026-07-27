@@ -732,6 +732,13 @@ private:
     // the swap window where both old_panel_ and panel exist simultaneously.
     DrawingPanelBase* PanelForWindow(wxObject* obj) const;
 
+public:
+    // The live on-screen controller overlay, or nullptr when there is none.
+    // Renderers that present into a layer of their own (the Android Vulkan panel
+    // and its SurfaceView, which covers the Qt content) composite it themselves.
+    widgets::OnScreenController* on_screen_controller() const { return osc_; }
+
+private:
     // On-screen touch controller overlay. Created lazily and kept stacked above
     // the render panel; on by default on Android, optional elsewhere.
     widgets::OnScreenController* osc_ = nullptr;

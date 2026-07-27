@@ -8,6 +8,7 @@
 
 #if defined(__WXQT__) && defined(__ANDROID__)
 
+#include <algorithm>
 #include <cstring>
 
 #include <android/log.h>
@@ -22,7 +23,6 @@
 #include <QtCore/QJniObject>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
-#include <QtGui/QWindow>
 #include <QtWidgets/QWidget>
 
 #include <wx/apptrait.h>
@@ -219,23 +219,29 @@ static void VbamWidgetScreenRectPx(void* qwidget, int* x, int* y, int* w, int* h
     *h = static_cast<int>(sz.height() * dpr);
 }
 
-// Same, for the QWindow behind a widget (QWidget::windowHandle()). Qt's Android
-// QPA gives a QWindow no reachable ANativeWindow of its own, so the Vulkan path
-// asks for the window's on-screen rect here and gets a SurfaceView covering it.
-static void VbamWindowScreenRectPx(void* qwindow, int* x, int* y, int* w, int* h) {
-    *x = *y = 0;
-    *w = *h = 0;
-    QWindow* window = reinterpret_cast<QWindow*>(qwindow);
-    if (!window) {
-        return;
+// The part of `qwidget` that is actually on screen, in Qt logical pixels.
+//
+// Qt's Android window can be taller than the activity's content view -- the
+// action bar above it is not subtracted -- so a widget laid out to fill that
+// window overhangs the bottom of the screen. Callers that must stay visible
+// (the video overlay, the on-screen controller) clamp themselves to this.
+// Returns false when the content size is not known yet, leaving *w and *h alone.
+bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h) {
+    QWidget* widget = reinterpret_cast<QWidget*>(qwidget);
+    if (!widget) {
+        return false;
     }
-    const qreal dpr = window->devicePixelRatio();
-    const QPoint g = window->mapToGlobal(QPoint(0, 0));
-    const QSize sz = window->size();
-    *x = static_cast<int>(g.x() * dpr);
-    *y = static_cast<int>(g.y() * dpr);
-    *w = static_cast<int>(sz.width() * dpr);
-    *h = static_cast<int>(sz.height() * dpr);
+    const int content_w_px = QJniObject::callStaticMethod<jint>(
+        "org/visualboyadvance_m/VbamVideoSurface", "contentWidthPx", "()I");
+    const int content_h_px = QJniObject::callStaticMethod<jint>(
+        "org/visualboyadvance_m/VbamVideoSurface", "contentHeightPx", "()I");
+    if (content_w_px <= 0 || content_h_px <= 0) {
+        return false;
+    }
+    const qreal dpr = widget->devicePixelRatio() > 0 ? widget->devicePixelRatio() : 1;
+    *w = std::min(widget->width(),  static_cast<int>(content_w_px / dpr));
+    *h = std::min(widget->height(), static_cast<int>(content_h_px / dpr));
+    return *w > 0 && *h > 0;
 }
 
 // Creates (or returns the already-created) overlay SurfaceView covering the
@@ -267,21 +273,14 @@ static void* VbamCreateAndroidVideoSurfaceRect(int x, int y, int w, int h) {
 }
 
 // Creates the overlay SurfaceView (org.visualboyadvance_m.VbamVideoSurface)
-// positioned over `qwidget` (the SDL render panel) and returns its
-// ANativeWindow* (retained by SDL), or nullptr on failure.
+// positioned over `qwidget` (the render panel) and returns its ANativeWindow*,
+// or nullptr on failure. Used by both the SDL renderer (which retains it itself)
+// and the Vulkan renderer, which needs an ANativeWindow for
+// VK_KHR_android_surface; the returned window carries one reference the caller
+// owns and must ANativeWindow_release().
 void* VbamCreateAndroidVideoSurface(void* qwidget) {
     int x, y, w, h;
     VbamWidgetScreenRectPx(qwidget, &x, &y, &w, &h);
-    return VbamCreateAndroidVideoSurfaceRect(x, y, w, h);
-}
-
-// Same, but driven by the panel's QWindow (QWidget::windowHandle()); used by the
-// Vulkan renderer, which needs an ANativeWindow for VK_KHR_android_surface.
-// The returned ANativeWindow is retained -- the caller owns one reference and
-// must ANativeWindow_release() it.
-void* VbamCreateAndroidVideoSurfaceForWindow(void* qwindow) {
-    int x, y, w, h;
-    VbamWindowScreenRectPx(qwindow, &x, &y, &w, &h);
     return VbamCreateAndroidVideoSurfaceRect(x, y, w, h);
 }
 
@@ -292,18 +291,8 @@ void VbamSetAndroidVideoSurfaceGeometry(void* qwidget) {
     }
     int x, y, w, h;
     VbamWidgetScreenRectPx(qwidget, &x, &y, &w, &h);
-    QJniObject::callStaticMethod<void>(
-        "org/visualboyadvance_m/VbamVideoSurface", "setGeometry",
-        "(Landroid/app/Activity;IIII)V", activity.object(), x, y, w, h);
-}
-
-void VbamSetAndroidVideoSurfaceGeometryForWindow(void* qwindow) {
-    QJniObject activity = QNativeInterface::QAndroidApplication::context();
-    if (!activity.isValid()) {
-        return;
-    }
-    int x, y, w, h;
-    VbamWindowScreenRectPx(qwindow, &x, &y, &w, &h);
+    __android_log_print(ANDROID_LOG_INFO, "VBAM",
+                        "SetAndroidVideoSurfaceGeometry rect=%d,%d %dx%d", x, y, w, h);
     QJniObject::callStaticMethod<void>(
         "org/visualboyadvance_m/VbamVideoSurface", "setGeometry",
         "(Landroid/app/Activity;IIII)V", activity.object(), x, y, w, h);
