@@ -649,8 +649,10 @@ public:
 #ifndef NO_FFMPEG
     void StartSoundRecording(const wxString& fname);
     void StopSoundRecording();
+    void FinishSoundRecording();
     void StartVidRecording(const wxString& fname);
     void StopVidRecording();
+    void FinishVidRecording();
     void AddFrame(const uint8_t* data); // video
     void AddFrame(const uint16_t* data, int length); // audio
     bool IsRecording()
@@ -686,6 +688,10 @@ protected:
 
 #ifndef NO_FFMPEG
     recording::MediaRecorder snd_rec, vid_rec;
+    // Local file a recording in progress is being written to, when it is not
+    // the destination the user picked (Android content:// URIs are staged and
+    // transferred on stop). Empty when nothing needs transferring.
+    wxString snd_rec_file, vid_rec_file;
 #endif
 
 public:

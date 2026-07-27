@@ -28,6 +28,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaSound.h"
+#include "wx/android-compat.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/option-proxy.h"
 #include "wx/config/option.h"
@@ -845,20 +846,37 @@ EVT_HANDLER_MASK(ScreenCapture, "Screen capture...", CMDEN_GB | CMDEN_GBA)
     wxString fn = dlg.GetPath();
     int fmt = dlg.GetFilterIndex();
 
-    if (fn.size() >= 4) {
-        if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".bmp"), false))
+    // The Android file picker hands back a Storage-Access-Framework content://
+    // URI, which the stdio-based image writers cannot open. Write to a local
+    // staging file -- named after the picked document, so the format check
+    // below still has an extension to read -- and transfer it once written.
+    const wxString out_name =
+        VbamStageAndroidOutputFile(fn, fmt == 0 ? wxT("png") : wxT("bmp"));
+
+    if (out_name.size() >= 4) {
+        if (wxString(out_name.substr(out_name.size() - 4)).IsSameAs(wxT(".bmp"), false))
             fmt = 1;
-        else if (wxString(fn.substr(fn.size() - 4)).IsSameAs(wxT(".png"), false))
+        else if (wxString(out_name.substr(out_name.size() - 4)).IsSameAs(wxT(".png"), false))
             fmt = 0;
     }
 
-    if (fmt == 0)
-        panel->emusys->emuWritePNG(UTF8(fn));
+    bool ok = fmt == 0 ? panel->emusys->emuWritePNG(UTF8(out_name))
+                       : panel->emusys->emuWriteBMP(UTF8(out_name));
+
+    if (ok)
+        ok = VbamCommitAndroidOutputFile(out_name);
     else
-        panel->emusys->emuWriteBMP(UTF8(fn));
+        VbamDiscardAndroidOutputFile(out_name);
 
     wxString msg;
-    msg.Printf(_("Wrote snapshot %s"), fn.wc_str());
+
+    // The write was previously reported as successful whatever happened, so a
+    // failure left no trace at all.
+    if (ok)
+        msg.Printf(_("Wrote snapshot %s"), fn.wc_str());
+    else
+        msg.Printf(_("Error saving snapshot file %s"), fn.wc_str());
+
     systemScreenMessage(msg);
 }
 
@@ -1444,7 +1462,10 @@ EVT_HANDLER_MASK(Load, "Load state...", CMDEN_GB | CMDEN_GBA)
     if (ret != wxID_OK)
         return;
 
-    panel->LoadState(dlg.GetPath());
+    // LoadState() takes a wxFileName, which mangles an Android content:// URI
+    // (and the state reader could not open one anyway), so resolve it to a
+    // local copy first. A no-op for a real path.
+    panel->LoadState(VbamResolveAndroidContentUri(dlg.GetPath()));
 }
 
 // new
@@ -1540,7 +1561,24 @@ EVT_HANDLER_MASK(Save, "Save state as...", CMDEN_GB | CMDEN_GBA)
     if (ret != wxID_OK)
         return;
 
-    panel->SaveState(dlg.GetPath());
+    // SaveState() takes a wxFileName, which mangles an Android content:// URI
+    // (and the state writer could not open one anyway), so write to a local
+    // staging file and transfer it to the picked document. A no-op for a real
+    // path.
+    const wxString out_name = VbamStageAndroidOutputFile(dlg.GetPath(), wxT("sgm"));
+
+    if (!panel->SaveState(out_name)) {
+        VbamDiscardAndroidOutputFile(out_name);
+        return;
+    }
+
+    if (!VbamCommitAndroidOutputFile(out_name)) {
+        // SaveState() already reported success for the staging file, so say
+        // that the state did not reach the file the user actually picked.
+        wxString msg;
+        msg.Printf(_("Error saving state %s"), dlg.GetPath().wc_str());
+        systemScreenMessage(msg);
+    }
 }
 
 static int state_slot = 0;

@@ -84,6 +84,7 @@ extern "C" void SDL_SetMainReady(void);
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
+#include "wx/android-compat.h"
 #include "wx/background-input.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
@@ -727,14 +728,9 @@ static wxString gbaGetOverrideId() {
 
 void GameArea::LoadGame(const wxString& load_path)
 {
-#if defined(__WXQT__) && defined(__ANDROID__)
     // The Android file picker hands back Storage-Access-Framework content://
     // URIs; resolve them to a real local file the stdio ROM loader can open.
-    wxString VbamResolveAndroidContentUri(const wxString&);
     const wxString name = VbamResolveAndroidContentUri(load_path);
-#else
-    const wxString& name = load_path;
-#endif
     rom_scene_rls = "-";
     rom_scene_rls_name = "-";
     rom_name = "";
@@ -899,6 +895,9 @@ void GameArea::LoadGame(const wxString& load_path)
             use_bios = OPTION(kPrefUseBiosGB).Get();
             bios_file = OPTION(kGBBiosFile).Get();
         }
+
+        bios_file = VbamResolveAndroidContentUri(bios_file);
+
         // For SGB/SGB2 (4) and GBA (8), use_bios remains false (no BIOS loaded)
 
         gbCPUInit(bios_file.To8BitData().data(), use_bios);
@@ -1025,7 +1024,11 @@ void GameArea::LoadGame(const wxString& load_path)
 
         rtcEnableRumble(true);
 
-        CPUInit(UTF8(gopts.gba_bios), OPTION(kPrefUseBiosGBA));
+        // The Android file picker hands back Storage-Access-Framework content://
+        // URIs; resolve them to a real local file the stdio loader can open.
+        const wxString bios_file = VbamResolveAndroidContentUri(gopts.gba_bios);
+
+        CPUInit(UTF8(bios_file), OPTION(kPrefUseBiosGBA));
 
         if (OPTION(kPrefUseBiosGBA) && !coreOptions.useBios) {
             wxLogError(_("Could not load BIOS %s"), gopts.gba_bios.mb_str());
@@ -1313,6 +1316,10 @@ void GameArea::UnloadGame(bool destruct)
 #ifndef NO_FFMPEG
     snd_rec.Stop();
     vid_rec.Stop();
+    // Both recorders have closed their files, so any staged output can now be
+    // handed over to the document the user picked.
+    FinishSoundRecording();
+    FinishVidRecording();
 #endif
     systemStopGameRecording();
     systemStopGamePlayback();
@@ -8829,86 +8836,130 @@ static const wxString media_err(recording::MediaRet ret)
 void GameArea::StartVidRecording(const wxString& fname)
 {
     recording::MediaRet ret;
-            
+
+    // ffmpeg writes through stdio and guesses the container from the file name,
+    // neither of which works for an Android content:// URI, so record to a local
+    // staging file and hand it over to the picked document when we stop.
+    const wxString out_name = VbamStageAndroidOutputFile(fname, wxEmptyString);
+
     vid_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = vid_rec.Record(UTF8(fname), basic_width, basic_height,
+    if ((ret = vid_rec.Record(UTF8(out_name), basic_width, basic_height,
                                 systemColorDepth))
-        != recording::MRET_OK)
+        != recording::MRET_OK) {
+        VbamDiscardAndroidOutputFile(out_name);
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
                     media_err(ret));
+    }
     else {
+        vid_rec_file = out_name;
         MainFrame* mf = wxGetApp().frame;
         mf->cmd_enable &= ~(CMDEN_NVREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_VREC;
         mf->enable_menus();
     }
 }
-        
+
 void GameArea::StopVidRecording()
 {
     vid_rec.Stop();
+    FinishVidRecording();
     MainFrame* mf = wxGetApp().frame;
     mf->cmd_enable &= ~CMDEN_VREC;
     mf->cmd_enable |= CMDEN_NVREC;
-            
+
     if (!(mf->cmd_enable & (CMDEN_VREC | CMDEN_SREC)))
         mf->cmd_enable |= CMDEN_NREC_ANY;
-            
+
     mf->enable_menus();
 }
-        
+
+// Transfers a finished video recording to the document the user picked, for the
+// cases where recording is torn down without going through StopVidRecording():
+// unloading the game, and an encoder error mid-recording. A no-op unless the
+// output was staged, which only ever happens on Android.
+void GameArea::FinishVidRecording()
+{
+    if (vid_rec_file.empty())
+        return;
+
+    const wxString staged = vid_rec_file;
+    vid_rec_file.clear();
+
+    if (!VbamCommitAndroidOutputFile(staged))
+        wxLogError(_("Error writing to output file"));
+}
+
 void GameArea::StartSoundRecording(const wxString& fname)
 {
     recording::MediaRet ret;
-            
+
+    const wxString out_name = VbamStageAndroidOutputFile(fname, wxEmptyString);
+
     snd_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = snd_rec.Record(UTF8(fname))) != recording::MRET_OK)
+    if ((ret = snd_rec.Record(UTF8(out_name))) != recording::MRET_OK) {
+        VbamDiscardAndroidOutputFile(out_name);
         wxLogError(_("Unable to begin recording to %s (%s)"), fname.mb_str(),
                     media_err(ret));
+    }
     else {
+        snd_rec_file = out_name;
         MainFrame* mf = wxGetApp().frame;
         mf->cmd_enable &= ~(CMDEN_NSREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_SREC;
         mf->enable_menus();
     }
 }
-        
+
 void GameArea::StopSoundRecording()
 {
     snd_rec.Stop();
+    FinishSoundRecording();
     MainFrame* mf = wxGetApp().frame;
     mf->cmd_enable &= ~CMDEN_SREC;
     mf->cmd_enable |= CMDEN_NSREC;
-            
+
     if (!(mf->cmd_enable & (CMDEN_VREC | CMDEN_SREC)))
         mf->cmd_enable |= CMDEN_NREC_ANY;
-            
+
     mf->enable_menus();
 }
-        
+
+// See FinishVidRecording().
+void GameArea::FinishSoundRecording()
+{
+    if (snd_rec_file.empty())
+        return;
+
+    const wxString staged = snd_rec_file;
+    snd_rec_file.clear();
+
+    if (!VbamCommitAndroidOutputFile(staged))
+        wxLogError(_("Error writing to output file"));
+}
+
 void GameArea::AddFrame(const uint16_t* data, int length)
 {
     recording::MediaRet ret;
-            
+
     if ((ret = vid_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio / video recording (%s); aborting"),
                     media_err(ret));
-        vid_rec.Stop();
+        StopVidRecording();
     }
-            
+
     if ((ret = snd_rec.AddFrame(data, length)) != recording::MRET_OK) {
         wxLogError(_("Error in audio recording (%s); aborting"), media_err(ret));
-        snd_rec.Stop();
+        StopSoundRecording();
     }
 }
-        
+
 void GameArea::AddFrame(const uint8_t* data)
 {
     recording::MediaRet ret;
-            
+
     if ((ret = vid_rec.AddFrame(data)) != recording::MRET_OK) {
         wxLogError(_("Error in video recording (%s); aborting"), media_err(ret));
-        vid_rec.Stop();
+        StopVidRecording();
     }
 }
 #endif

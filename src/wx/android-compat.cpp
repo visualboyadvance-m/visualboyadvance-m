@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <vector>
 
 #include <android/log.h>
 #include <android/native_window.h>
@@ -19,6 +20,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 #include <QtCore/QJniEnvironment>
 #include <QtCore/QJniObject>
 #include <QtCore/QStandardPaths>
@@ -31,6 +33,8 @@
 #include <wx/image.h>
 #include <wx/log.h>
 #include <wx/string.h>
+
+#include "wx/android-compat.h"
 
 wxEventLoopSourcesManagerBase* wxGUIAppTraits::GetEventLoopSourcesManager() {
     return nullptr;
@@ -78,76 +82,358 @@ void VbamInstallAndroidArtFallback() {
     wxSetAssertHandler(VbamAndroidAssertHandler);
 }
 
+// --- Storage Access Framework file staging -----------------------------------
+//
 // The Android file picker returns Storage-Access-Framework "content://" URIs,
-// which VBA-M's stdio-based ROM loader can't open. Resolve such a URI to a real
-// local file: read the stream through Qt (which understands content:// on
-// Android) and copy it into the app cache under its display name, so the ROM
-// type detection (which keys off the file extension) still works. Non-content
-// paths are returned unchanged.
-wxString VbamResolveAndroidContentUri(const wxString& path) {
-    if (!path.StartsWith("content://")) {
-        return path;
-    }
+// which none of VBA-M's stdio / ffmpeg / wxFFile based readers and writers can
+// open. Everything below translates between such a URI and a real local file
+// that those can use, going through Qt (whose Android file engine understands
+// content://) and falling back to the ContentResolver over JNI.
 
-    const QString uri = QString::fromStdString(path.ToStdString());
+namespace {
 
-    // Query the human-readable display name for its extension.
-    QString display_name;
+const char kContentScheme[] = "content://";
+
+wxString FromQString(const QString& s) {
+    return wxString::FromUTF8(s.toUtf8().constData());
+}
+
+QString ToQString(const wxString& s) {
+    return QString::fromUtf8(s.utf8_str().data());
+}
+
+// Wraps `uri` as an android.net.Uri, or an invalid object on failure.
+QJniObject ParseUri(const QString& uri) {
     QJniObject j_uri_str = QJniObject::fromString(uri);
     QJniObject j_uri = QJniObject::callStaticObjectMethod(
         "android/net/Uri", "parse", "(Ljava/lang/String;)Landroid/net/Uri;", j_uri_str.object());
+    QJniEnvironment env;
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        return QJniObject();
+    }
+    return j_uri;
+}
+
+QJniObject ContentResolver() {
     QJniObject context = QNativeInterface::QAndroidApplication::context();
-    if (j_uri.isValid() && context.isValid()) {
-        QJniObject resolver =
-            context.callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
-        if (resolver.isValid()) {
-            QJniObject cursor = resolver.callObjectMethod(
-                "query",
-                "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;"
-                "Ljava/lang/String;)Landroid/database/Cursor;",
-                j_uri.object(), nullptr, nullptr, nullptr, nullptr);
-            if (cursor.isValid() && cursor.callMethod<jboolean>("moveToFirst")) {
-                QJniObject col = QJniObject::fromString(QStringLiteral("_display_name"));
-                const jint idx =
-                    cursor.callMethod<jint>("getColumnIndex", "(Ljava/lang/String;)I", col.object());
-                if (idx >= 0) {
-                    QJniObject name_obj =
-                        cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", idx);
-                    if (name_obj.isValid()) {
-                        display_name = name_obj.toString();
-                    }
-                }
-                cursor.callMethod<void>("close");
-            }
-        }
+    if (!context.isValid()) {
+        return QJniObject();
+    }
+    return context.callObjectMethod("getContentResolver", "()Landroid/content/ContentResolver;");
+}
+
+// The provider's human-readable file name for `uri`, empty if unavailable. This
+// is the only place an extension can be recovered from a content:// URI, and
+// both ROM type detection and ffmpeg's output format guessing need one.
+QString ContentUriDisplayName(const QString& uri) {
+    QJniObject j_uri = ParseUri(uri);
+    QJniObject resolver = ContentResolver();
+    if (!j_uri.isValid() || !resolver.isValid()) {
+        return QString();
     }
 
-    if (display_name.isEmpty()) {
-        display_name = QStringLiteral("rom.gba");
+    QString display_name;
+    QJniObject cursor = resolver.callObjectMethod(
+        "query",
+        "(Landroid/net/Uri;[Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;"
+        "Ljava/lang/String;)Landroid/database/Cursor;",
+        j_uri.object(), nullptr, nullptr, nullptr, nullptr);
+    if (cursor.isValid() && cursor.callMethod<jboolean>("moveToFirst")) {
+        QJniObject col = QJniObject::fromString(QStringLiteral("_display_name"));
+        const jint idx =
+            cursor.callMethod<jint>("getColumnIndex", "(Ljava/lang/String;)I", col.object());
+        if (idx >= 0) {
+            QJniObject name_obj = cursor.callObjectMethod("getString", "(I)Ljava/lang/String;", idx);
+            if (name_obj.isValid()) {
+                display_name = name_obj.toString();
+            }
+        }
+        cursor.callMethod<void>("close");
     }
+    // A provider may report a name with directory components; keep the leaf so
+    // it can be appended to a staging directory.
+    return QFileInfo(display_name).fileName();
+}
+
+// Shared staging directory for SAF transfers. This is app data rather than the
+// cache dir because formats that write a companion file -- the movie recorder
+// emits a .vm0 save state beside its .vmv -- must find that companion again
+// when the recording is played back in a later session.
+QString SafStagingDir() {
+    QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (dir.isEmpty()) {
+        dir = QDir::tempPath();
+    }
+    dir += QStringLiteral("/saf-staging");
+    QDir().mkpath(dir);
+    return dir;
+}
+
+// Appends `.<required_ext>` to `name` unless it already ends in it. Callers
+// that derive companion file names from the extension, or that need a
+// particular container, cannot trust a provider to report a name with one.
+QString EnsureExtension(const QString& name, const wxString& required_ext) {
+    if (required_ext.empty()) {
+        return name;
+    }
+    const QString ext = QLatin1Char('.') + QString::fromUtf8(required_ext.utf8_str().data());
+    if (name.endsWith(ext, Qt::CaseInsensitive)) {
+        return name;
+    }
+    return name + ext;
+}
+
+// Copies the content of `uri` into `dir` under its display name (falling back
+// to `fallback_name`) and returns the local path, or an empty string on error.
+QString CopyContentUriToDir(const QString& uri, const QString& dir, const QString& fallback_name,
+                            const wxString& required_ext) {
+    QString name = ContentUriDisplayName(uri);
+    if (name.isEmpty()) {
+        name = fallback_name;
+    }
+    name = EnsureExtension(name, required_ext);
 
     QFile in(uri);
     if (!in.open(QIODevice::ReadOnly)) {
-        return path;  // let the caller report the load failure
+        return QString();
     }
     const QByteArray bytes = in.readAll();
     in.close();
 
-    QString out_dir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-    if (out_dir.isEmpty()) {
-        out_dir = QDir::tempPath();
-    }
-    QDir().mkpath(out_dir);
-    const QString out_path = out_dir + QLatin1Char('/') + display_name;
+    QDir().mkpath(dir);
+    const QString out_path = dir + QLatin1Char('/') + name;
 
     QFile out(out_path);
     if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return QString();
+    }
+    const bool ok = out.write(bytes) == bytes.size();
+    out.close();
+    return ok ? out_path : QString();
+}
+
+// Streams `staged` into an already-opened java.io.OutputStream.
+bool WriteFileToStream(const QString& staged, QJniObject& stream) {
+    QFile in(staged);
+    if (!in.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    static const qint64 kChunk = 1 << 20;
+    QByteArray buf(kChunk, '\0');
+    QJniEnvironment env;
+    bool ok = true;
+    while (ok) {
+        const qint64 n = in.read(buf.data(), kChunk);
+        if (n < 0) {
+            ok = false;
+            break;
+        }
+        if (n == 0) {
+            break;
+        }
+        jbyteArray arr = env->NewByteArray(static_cast<jsize>(n));
+        if (!arr) {
+            ok = false;
+            break;
+        }
+        env->SetByteArrayRegion(arr, 0, static_cast<jsize>(n),
+                                reinterpret_cast<const jbyte*>(buf.constData()));
+        stream.callMethod<void>("write", "([B)V", arr);
+        if (env->ExceptionCheck()) {
+            env->ExceptionClear();
+            ok = false;
+        }
+        env->DeleteLocalRef(arr);
+    }
+    in.close();
+    return ok;
+}
+
+// Copies `staged` back to `uri` through the ContentResolver. Used when Qt's own
+// content:// write path is unavailable, which is the case for providers that
+// reject the truncating open mode Qt asks for.
+bool WriteFileToContentUriViaJni(const QString& staged, const QString& uri) {
+    QJniObject j_uri = ParseUri(uri);
+    QJniObject resolver = ContentResolver();
+    if (!j_uri.isValid() || !resolver.isValid()) {
+        return false;
+    }
+
+    QJniEnvironment env;
+    // "wt" truncates first; a provider is only required to support "w", which
+    // can leave a tail of the previous contents behind, so try "wt" first.
+    QJniObject mode = QJniObject::fromString(QStringLiteral("wt"));
+    QJniObject stream = resolver.callObjectMethod(
+        "openOutputStream", "(Landroid/net/Uri;Ljava/lang/String;)Ljava/io/OutputStream;",
+        j_uri.object(), mode.object());
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        stream = QJniObject();
+    }
+    if (!stream.isValid()) {
+        stream = resolver.callObjectMethod(
+            "openOutputStream", "(Landroid/net/Uri;)Ljava/io/OutputStream;", j_uri.object());
+        if (env->ExceptionCheck()) {
+            env->ExceptionClear();
+            return false;
+        }
+    }
+    if (!stream.isValid()) {
+        return false;
+    }
+
+    const bool ok = WriteFileToStream(staged, stream);
+    stream.callMethod<void>("flush");
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+    }
+    stream.callMethod<void>("close");
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+    }
+    return ok;
+}
+
+bool WriteFileToContentUri(const QString& staged, const QString& uri) {
+    QFile out(uri);
+    if (out.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QFile in(staged);
+        if (!in.open(QIODevice::ReadOnly)) {
+            out.close();
+            return false;
+        }
+        static const qint64 kChunk = 1 << 20;
+        QByteArray buf(kChunk, '\0');
+        bool ok = true;
+        while (ok) {
+            const qint64 n = in.read(buf.data(), kChunk);
+            if (n < 0) {
+                ok = false;
+                break;
+            }
+            if (n == 0) {
+                break;
+            }
+            ok = out.write(buf.constData(), n) == n;
+        }
+        in.close();
+        ok = out.flush() && ok;
+        out.close();
+        if (ok) {
+            return true;
+        }
+    }
+    return WriteFileToContentUriViaJni(staged, uri);
+}
+
+// Staging files handed out by VbamStageAndroidOutputFile() that have not been
+// committed or discarded yet, keyed by the local path the writer was given.
+struct SafOutputTarget {
+    QString staged;
+    QString uri;
+};
+
+std::vector<SafOutputTarget>& SafOutputTargets() {
+    static std::vector<SafOutputTarget> targets;
+    return targets;
+}
+
+}  // namespace
+
+wxString VbamResolveAndroidContentUri(const wxString& path) {
+    if (!path.StartsWith(kContentScheme)) {
         return path;
     }
-    out.write(bytes);
-    out.close();
 
-    return wxString::FromUTF8(out_path.toUtf8().constData());
+    QString cache_dir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    if (cache_dir.isEmpty()) {
+        cache_dir = QDir::tempPath();
+    }
+
+    const QString out_path =
+        CopyContentUriToDir(ToQString(path), cache_dir, QStringLiteral("rom.gba"), wxEmptyString);
+    if (out_path.isEmpty()) {
+        return path;  // let the caller report the load failure
+    }
+    return FromQString(out_path);
+}
+
+wxString VbamStageAndroidInputFile(const wxString& path, const wxString& required_ext) {
+    if (!path.StartsWith(kContentScheme)) {
+        return path;
+    }
+
+    const QString out_path = CopyContentUriToDir(ToQString(path), SafStagingDir(),
+                                                 QStringLiteral("movie"), required_ext);
+    if (out_path.isEmpty()) {
+        return path;  // let the caller report the load failure
+    }
+    return FromQString(out_path);
+}
+
+wxString VbamStageAndroidOutputFile(const wxString& path, const wxString& required_ext) {
+    if (!path.StartsWith(kContentScheme)) {
+        return path;
+    }
+
+    const QString uri = ToQString(path);
+    QString name = ContentUriDisplayName(uri);
+    if (name.isEmpty()) {
+        name = QStringLiteral("recording");
+    }
+    name = EnsureExtension(name, required_ext);
+
+    // The staging name is derived from the display name rather than made unique
+    // so that a companion file written beside a previous staging of the same
+    // document is still found; drop any leftover content so a failed transfer
+    // can never masquerade as this recording.
+    const QString staged = SafStagingDir() + QLatin1Char('/') + name;
+    QFile::remove(staged);
+
+    for (SafOutputTarget& target : SafOutputTargets()) {
+        if (target.staged == staged) {
+            target.uri = uri;
+            return FromQString(staged);
+        }
+    }
+    SafOutputTargets().push_back({staged, uri});
+    return FromQString(staged);
+}
+
+bool VbamCommitAndroidOutputFile(const wxString& staged_path) {
+    const QString staged = ToQString(staged_path);
+    std::vector<SafOutputTarget>& targets = SafOutputTargets();
+    for (size_t i = 0; i < targets.size(); i++) {
+        if (targets[i].staged != staged) {
+            continue;
+        }
+        const QString uri = targets[i].uri;
+        targets.erase(targets.begin() + i);
+        const bool ok = WriteFileToContentUri(staged, uri);
+        if (!ok) {
+            __android_log_print(ANDROID_LOG_ERROR, "VBAM", "failed to write %s back to %s",
+                                staged.toUtf8().constData(), uri.toUtf8().constData());
+        }
+        // The staging copy is disposable either way: recordings can be large,
+        // and playback re-stages from the URI.
+        QFile::remove(staged);
+        return ok;
+    }
+    return true;  // not a staged path; the writer already wrote where it should
+}
+
+void VbamDiscardAndroidOutputFile(const wxString& staged_path) {
+    const QString staged = ToQString(staged_path);
+    std::vector<SafOutputTarget>& targets = SafOutputTargets();
+    for (size_t i = 0; i < targets.size(); i++) {
+        if (targets[i].staged == staged) {
+            targets.erase(targets.begin() + i);
+            QFile::remove(staged);
+            return;
+        }
+    }
 }
 
 // --- Android video SurfaceView glue (for SDL video into the Qt activity) -----

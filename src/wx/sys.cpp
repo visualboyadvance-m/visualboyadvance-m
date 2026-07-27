@@ -10,6 +10,7 @@
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
+#include "wx/android-compat.h"
 #include "wx/audio/audio.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
@@ -236,6 +237,10 @@ const MVFormatID VMVFormatVersions[] = {
 
 enum MVFormatID recording_format;
 wxFFile game_file;
+// Local file a recording in progress is being written to, when it is not the
+// destination the user picked (Android content:// URIs are staged and
+// transferred on stop). Empty when nothing needs transferring.
+wxString game_file_staged;
 bool game_recording, game_playback;
 uint32_t game_frame;
 uint32_t game_joypad;
@@ -250,7 +255,13 @@ void systemStartGameRecording(const wxString& fname, MVFormatID format)
     }
 
     systemStopGamePlayback();
-    wxString fn = fname;
+
+    // A movie is two files: the .vmv itself and a .vm0 save state named after
+    // it. Neither wxFFile nor the state writer can open an Android content://
+    // URI, and the URI has no name to derive the companion from, so record to a
+    // local staging file (whose name is guaranteed to end in .vmv) and transfer
+    // it to the picked document when recording stops.
+    wxString fn = VbamStageAndroidOutputFile(fname, wxT("vmv"));
 
     recording_format = format;
 
@@ -263,15 +274,19 @@ void systemStartGameRecording(const wxString& fname, MVFormatID format)
         version = 2;
 
     if (!game_file.Open(fn, wxT("wb")) || game_file.Write(&version, sizeof(version)) != sizeof(version)) {
+        VbamDiscardAndroidOutputFile(fn);
         wxLogError(_("Cannot open output file %s"), fname.c_str());
         return;
     }
 
+    game_file_staged = fn;
     fn[fn.size() - 1] = wxT('0');
 
     if (!panel->emusys->emuWriteState(UTF8(fn))) {
         wxLogError(_("Error writing game recording"));
         game_file.Close();
+        VbamDiscardAndroidOutputFile(game_file_staged);
+        game_file_staged.clear();
         return;
     }
 
@@ -291,6 +306,15 @@ void systemStopGameRecording()
 
     if (game_file.Write(&game_frame, sizeof(game_frame)) != sizeof(game_frame) || game_file.Write(&game_joypad, sizeof(game_joypad)) != sizeof(game_joypad) || !game_file.Close())
         wxLogError(_("Error writing game recording"));
+
+    // The file is closed, so a staged recording can be handed over now.
+    if (!game_file_staged.empty()) {
+        const wxString staged = game_file_staged;
+        game_file_staged.clear();
+
+        if (!VbamCommitAndroidOutputFile(staged))
+            wxLogError(_("Error writing game recording"));
+    }
 
     game_recording = false;
     MainFrame* mf = wxGetApp().frame;
@@ -316,7 +340,10 @@ void systemStartGamePlayback(const wxString& fname, MVFormatID format)
     }
 
     systemStopGamePlayback();
-    wxString fn = fname;
+
+    // Staged into the same directory recording uses, so the .vm0 save state
+    // written next to the .vmv back then is still beside it now.
+    wxString fn = VbamStageAndroidInputFile(fname, wxT("vmv"));
 
     recording_format = format;
 
