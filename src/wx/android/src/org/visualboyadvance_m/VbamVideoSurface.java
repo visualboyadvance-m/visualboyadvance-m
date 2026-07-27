@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import java.util.concurrent.CountDownLatch;
@@ -35,6 +37,52 @@ public class VbamVideoSurface implements SurfaceHolder.Callback {
 
     public static int contentHeightPx() {
         return sContentHeight;
+    }
+
+    // True once a layout listener is watching the content view (UI thread only).
+    private static boolean sWatchingContent;
+
+    // Starts (once) tracking the activity content view's size, so the numbers
+    // above are available even when no overlay SurfaceView exists. The overlay
+    // path fills them in as a side effect of laying the overlay out, but the
+    // in-tree GLES2 renderer draws inside Qt's own window and creates no
+    // overlay, while still needing to know how much of that window is on screen.
+    // Safe to call from any thread; the measurement is posted to the UI thread,
+    // so the first call after startup may return before any value is available.
+    public static void watchContentSize(final Activity activity) {
+        if (activity == null) {
+            return;
+        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final View content = activity.findViewById(android.R.id.content);
+                if (content == null) {
+                    return;
+                }
+                measureContent(content);
+                if (sWatchingContent) {
+                    return;
+                }
+                sWatchingContent = true;
+                content.getViewTreeObserver().addOnGlobalLayoutListener(
+                        new ViewTreeObserver.OnGlobalLayoutListener() {
+                            @Override
+                            public void onGlobalLayout() {
+                                measureContent(content);
+                            }
+                        });
+            }
+        });
+    }
+
+    private static void measureContent(final View content) {
+        final int w = content.getWidth();
+        final int h = content.getHeight();
+        if (w > 0 && h > 0) {
+            sContentWidth = w;
+            sContentHeight = h;
+        }
     }
 
     private SurfaceView mView;

@@ -5635,6 +5635,37 @@ extern "C" void VbamAndroidGLResize(void* widget, int w, int h);
 extern "C" void VbamAndroidGLPresent(void* widget, const void* rgb, int w, int h);
 extern "C" void VbamAndroidGLDestroy(void* widget);
 
+#if defined(__WXQT__) && defined(__ANDROID__)
+// Keep the on-screen controller inside the visible area, the same way the GL
+// widget keeps itself there. GameArea already clamps the overlay when it
+// (re)creates it, but the Android content size is only known once the activity
+// has laid itself out, which is usually later than that; re-check per frame so
+// the controls settle at the bottom of the display instead of below it.
+static void ClampOnScreenControllerToVisible(wxWindow* panel_window)
+{
+    if (!panel_window)
+        return;
+
+    MainFrame* frame = wxGetApp().frame;
+    GameArea* game_area = frame ? frame->GetPanel() : nullptr;
+    widgets::OnScreenController* osc =
+        game_area ? game_area->on_screen_controller() : nullptr;
+    if (!osc || !osc->IsShown())
+        return;
+
+    extern bool VbamAndroidVisibleClientSize(void*, int*, int*);
+    int visible_w = 0, visible_h = 0;
+    if (!VbamAndroidVisibleClientSize(panel_window->GetHandle(), &visible_w, &visible_h))
+        return;
+
+    const wxSize panel_size = panel_window->GetClientSize();
+    const wxSize want(std::min(panel_size.GetWidth(),  visible_w),
+                      std::min(panel_size.GetHeight(), visible_h));
+    if (osc->GetClientSize() != want)
+        osc->SetSize(want);
+}
+#endif  // defined(__WXQT__) && defined(__ANDROID__)
+
 GLESDrawingPanel::GLESDrawingPanel(wxWindow* parent, int _width, int _height)
     : BasicDrawingPanel(parent, _width, _height)
 {
@@ -5661,6 +5692,9 @@ void GLESDrawingPanel::SyncGeometry()
     int w = 0, h = 0;
     GetWindow()->GetClientSize(&w, &h);
     VbamAndroidGLResize(gl_widget_, w, h);
+#if defined(__WXQT__) && defined(__ANDROID__)
+    ClampOnScreenControllerToVisible(GetWindow());
+#endif
 }
 
 void GLESDrawingPanel::OnSize(wxSizeEvent& ev)
@@ -5678,6 +5712,9 @@ void GLESDrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)
     // VbamAndroidGLPresent syncs the widget geometry to its parent internally.
     // wxImage data is tightly packed 24-bit RGB (stride = width*3).
     VbamAndroidGLPresent(gl_widget_, im->GetData(), im->GetWidth(), im->GetHeight());
+#if defined(__WXQT__) && defined(__ANDROID__)
+    ClampOnScreenControllerToVisible(GetWindow());
+#endif
 }
 
 void GLESDrawingPanel::PresentFrame()
@@ -5694,6 +5731,9 @@ void GLESDrawingPanel::PresentFrame()
         VbamAndroidGLPresent(gl_widget_, im->GetData(), im->GetWidth(), im->GetHeight());
     }
     delete im;
+#if defined(__WXQT__) && defined(__ANDROID__)
+    ClampOnScreenControllerToVisible(GetWindow());
+#endif
 }
 #endif  // defined(VBAM_ENABLE_GLES)
 

@@ -231,6 +231,26 @@ bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h) {
     if (!widget) {
         return false;
     }
+    // Make sure something is measuring the content view for us. Laying out the
+    // overlay SurfaceView records its size, but the in-tree GLES2 renderer never
+    // creates that overlay, which used to leave the size unknown (and every
+    // caller unclamped) for the whole session. One call installs a layout
+    // listener on the Java side that keeps the size current across rotations.
+    static bool watching = false;
+    if (!watching) {
+        QJniObject activity = QNativeInterface::QAndroidApplication::context();
+        if (activity.isValid()) {
+            QJniObject::callStaticMethod<void>(
+                "org/visualboyadvance_m/VbamVideoSurface", "watchContentSize",
+                "(Landroid/app/Activity;)V", activity.object());
+            QJniEnvironment env;
+            if (env->ExceptionCheck()) {
+                env->ExceptionClear();
+            } else {
+                watching = true;
+            }
+        }
+    }
     const int content_w_px = QJniObject::callStaticMethod<jint>(
         "org/visualboyadvance_m/VbamVideoSurface", "contentWidthPx", "()I");
     const int content_h_px = QJniObject::callStaticMethod<jint>(

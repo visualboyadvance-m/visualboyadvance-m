@@ -18,6 +18,7 @@
 
 #if defined(VBAM_ENABLE_GLES) && defined(__WXQT__) && defined(__ANDROID__)
 
+#include <algorithm>
 #include <cstdint>
 #include <cstring>
 #include <vector>
@@ -29,6 +30,11 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QWidget>
+
+// android-compat.cpp: the part of a widget that is really on screen, in Qt
+// logical pixels. Qt's Android window is not shortened by the action bar above
+// it, so a child laid out to fill it hangs off the bottom of the display.
+extern bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h);
 
 namespace {
 
@@ -67,12 +73,19 @@ public:
         SyncGeometry();
     }
 
-    // Fill the parent panel.
+    // Fill the parent panel, minus whatever part of it is off screen. Without
+    // the clamp the quad is letterboxed inside a rect that is taller than the
+    // display, so the picture is centred too low and its bottom is cut off.
     void SyncGeometry() {
         if (!parent_) {
             return;
         }
-        const QSize sz = parent_->size();
+        QSize sz = parent_->size();
+        int visible_w = 0, visible_h = 0;
+        if (VbamAndroidVisibleClientSize(parent_, &visible_w, &visible_h)) {
+            sz.setWidth (std::min(sz.width(),  visible_w));
+            sz.setHeight(std::min(sz.height(), visible_h));
+        }
         const QRect r(0, 0, sz.width(), sz.height());
         if (r != geometry() && sz.width() > 0 && sz.height() > 0) {
             setGeometry(r);
