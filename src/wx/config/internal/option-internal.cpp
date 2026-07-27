@@ -184,7 +184,9 @@ std::array<Option, kNbOptions>& Option::All() {
         // Linux/BSD and other X11/Wayland platforms. Priority head is Vulkan
         // (then SDL, OpenGL, Simple via the runtime fallback); pick the first
         // that is compiled in for the static default.
-#if defined(VBAM_ENABLE_GLES)
+#if !defined(NO_VULKAN)
+        RenderMethod render_method = RenderMethod::kVulkan;
+#elif defined(VBAM_ENABLE_GLES)
         // wxQt/Android: render in-tree via a GLES2 QOpenGLWidget
         // (GLESDrawingPanel). Desktop OpenGL and SDL video don't work there, so
         // GLES is the only accelerated choice; Simple is the fallback.
@@ -192,8 +194,6 @@ std::array<Option, kNbOptions>& Option::All() {
 #elif defined(__ANDROID__)
         // GLES compiled out: the software Simple renderer is all that is left.
         RenderMethod render_method = RenderMethod::kSimple;
-#elif !defined(NO_VULKAN)
-        RenderMethod render_method = RenderMethod::kVulkan;
 #elif !defined(NO_OGL)
         RenderMethod render_method = RenderMethod::kOpenGL;
 #else

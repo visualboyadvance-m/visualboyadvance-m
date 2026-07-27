@@ -464,7 +464,11 @@ void load_opts(bool first_time_launch) {
                 // opengl. Name what was already happening so the saved value and
                 // the dialog agree. Simple (the software path) is a real, distinct
                 // choice on Android and is left alone.
-                if (OPTION(kDispRenderMethod) != config::RenderMethod::kSimple) {
+                if ((OPTION(kDispRenderMethod) != config::RenderMethod::kSimple)
+#if !defined(NO_VULKAN)
+                    && (OPTION(kDispRenderMethod) != config::RenderMethod::kVulkan)
+#endif
+                ) {
                     OPTION(kDispRenderMethod) = config::RenderMethod::kGLES;
                 }
 #endif
