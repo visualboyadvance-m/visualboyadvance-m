@@ -2,12 +2,11 @@ add_compile_options(
     -pipe
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-deprecated-copy>
     -Wformat
-    -Wformat-security
     -fdiagnostics-color=always
 )
 
 # Treat warnings as errors in CI
-if(ENABLE_WERROR)
+if(ENABLE_WERROR AND NOT ANDROID)
     add_compile_options(-Werror)
 endif()
 

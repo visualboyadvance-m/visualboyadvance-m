@@ -1386,17 +1386,36 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
         // stderr instead of gui for messages
         wxLog::SetActiveTarget(new wxLogStderr);
 
+#ifdef __ANDROID__
+        printf("Options set from the command line are saved if any"
+               " configuration changes are made in the user interface.\n\n"
+               "For flag options, true and false are specified as 1 and 0, respectively.\n\n");
+#else
         wxPrintf(_("Options set from the command line are saved if any"
                    " configuration changes are made in the user interface.\n\n"
                    "For flag options, true and false are specified as 1 and 0, respectively.\n\n"));
+#endif
 
         for (const config::Option& opt : config::Option::All()) {
+#ifdef __ANDROID__
+            printf("%s\n", opt.ToHelperString().ToStdString().c_str());
+#else
             wxPrintf("%s\n", opt.ToHelperString());
+#endif
         }
 
+#ifdef __ANDROID__
+        printf("The commands available for the Keyboard/* option are:\n\n");
+#else
         wxPrintf(_("The commands available for the Keyboard/* option are:\n\n"));
+#endif
+
         for (const cmditem& cmd_item : cmdtab) {
+#ifdef __ANDROID__
+            printf("%s (%s)\n", cmd_item.cmd.ToStdString().c_str(), cmd_item.name.ToStdString().c_str());
+#else
             wxPrintf("%s (%s)\n", cmd_item.cmd.c_str(), cmd_item.name.c_str());
+#endif
         }
 
         console_mode = true;
@@ -1437,8 +1456,14 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
                 gotfile = true;
             } else {
                 if (!complained) {
+#ifdef __ANDROID__
+                    fprintf(stderr, "Bad configuration option or multiple ROM files given:\n");
+                    fprintf(stderr, "%s\n", pending_load.ToStdString().c_str());
+#else
                     wxFprintf(stderr, _("Bad configuration option or multiple ROM files given:\n"));
                     wxFprintf(stderr, wxT("%s\n"), pending_load.c_str());
+#endif
+
                     complained = true;
                 }
 

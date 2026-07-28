@@ -85,10 +85,10 @@ target_compile_definitions(sfml-system INTERFACE SFML_STATIC)
 #endif()
 
 # setup dependencies
-if(UNIX OR APPLE)
+if((UNIX OR APPLE) AND NOT ANDROID)
     target_link_libraries(sfml-system PRIVATE pthread)
 endif()
-if(UNIX AND NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
     target_link_libraries(sfml-system PRIVATE rt)
 elseif(WIN32)
     target_link_libraries(sfml-system PRIVATE winmm)

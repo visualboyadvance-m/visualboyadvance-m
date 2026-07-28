@@ -4,6 +4,7 @@
 #include <wx/generic/prntdlgg.h>
 #include <wx/print.h>
 #include <wx/printdlg.h>
+#include <wx/socket.h>
 
 #include "core/base/image_util.h"
 #include "core/base/sdl_motion.h"
