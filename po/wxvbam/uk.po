@@ -988,43 +988,43 @@ msgstr "Помилка запису стану звороту."
 
 #: panel.cpp:2683
 msgid "Open GBA..."
-msgstr ""
+msgstr "Відкрити Game Boy Advance..."
 
 #: panel.cpp:2684
 msgid "Open Game Boy..."
-msgstr ""
+msgstr "Відкрити Game Boy..."
 
 #: panel.cpp:2685
 msgid "Open Game Boy Color..."
-msgstr ""
+msgstr "Відкрити Game Boy Color..."
 
 #: panel.cpp:2687
 msgid "Pause"
-msgstr ""
+msgstr "Призупинити"
 
 #: panel.cpp:2688
 msgid "Reset"
-msgstr ""
+msgstr "Відновити"
 
 #: panel.cpp:2689
 msgid "Save state"
-msgstr ""
+msgstr "Зберегти стан"
 
 #: panel.cpp:2690
 msgid "Load state"
-msgstr ""
+msgstr "Завантажити стан"
 
 #: panel.cpp:2692
 msgid "Full screen"
-msgstr ""
+msgstr "Повний екран"
 
 #: panel.cpp:2693
 msgid "Settings..."
-msgstr ""
+msgstr "Налатшування..."
 
 #: panel.cpp:2695
 msgid "Quit"
-msgstr ""
+msgstr "Вихід"
 
 #: panel.cpp:4566
 msgid "Failed to set wayland display"
@@ -1032,7 +1032,7 @@ msgstr "Не вдалося встановити Wayland-відображенн�
 
 #: panel.cpp:4608
 msgid "Failed to create Android video surface"
-msgstr ""
+msgstr "Не вдалося створити Android-відеоповерхню."
 
 #: panel.cpp:4632
 msgid "Failed to initialize SDL video subsystem"
@@ -1472,16 +1472,16 @@ msgstr "Не вдалося створити Vulkan Metal-поверхню: %d."
 
 #: panel.cpp:10769
 msgid "Failed to obtain QWidget handle for Vulkan surface"
-msgstr ""
+msgstr "Не вдалось отримати QWidget-опрацьовувач для Vulkan-поверхні."
 
 #: panel.cpp:10779
 msgid "Failed to obtain ANativeWindow for the panel"
-msgstr ""
+msgstr "Не вдалось отримати ANativeWindow для панелі."
 
 #: panel.cpp:10789
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
-msgstr ""
+msgstr "Не вдалося створити Vulkan Android-поверхню: %d."
 
 #: panel.cpp:10806
 #, c-format
@@ -1537,7 +1537,7 @@ msgstr "Не вдалося створити Vulkan-ланцюг обміну: %
 #: panel.cpp:11261
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
-msgstr ""
+msgstr "Ланцюг обміну створено: %u * %u, %u зображень, вертикальна синхронізація = %s, попереднє перетворення = 0x%x."
 
 #: panel.cpp:11363
 #, c-format
@@ -1570,7 +1570,7 @@ msgstr "Не вдалося створити макет конвеєрів: %d."
 
 #: panel.cpp:11587
 msgid "Failed to create overlay pipeline"
-msgstr ""
+msgstr "Не вдалося створити конвеєр накладання."
 
 #: panel.cpp:11597
 #, c-format
@@ -1605,7 +1605,7 @@ msgstr "Не вдалося призначити дескрипторний на
 #: panel.cpp:11695
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
-msgstr ""
+msgstr "Не вдалося призначити набір дескрипторів накладання: %d."
 
 #: panel.cpp:11734
 #, c-format
@@ -1636,27 +1636,27 @@ msgstr "Не вдалося розподілити проміжну пам'ят�
 
 #: panel.cpp:11943
 msgid "Failed to create overlay image"
-msgstr ""
+msgstr "Не вдалося створити накладене зображення."
 
 #: panel.cpp:11957
 msgid "Failed to allocate overlay image memory"
-msgstr ""
+msgstr "Не вдалося розподілити пам'ять накладеного зображення."
 
 #: panel.cpp:11972
 msgid "Failed to create overlay image view"
-msgstr ""
+msgstr "Не вдалося створити вигляд накладеного зображення."
 
 #: panel.cpp:11989
 msgid "Failed to create overlay sampler"
-msgstr ""
+msgstr "Не вдалося створити семплер накладання."
 
 #: panel.cpp:12026
 msgid "Failed to create overlay staging buffer"
-msgstr ""
+msgstr "Не вдалося створити проміжний буфер накладання."
 
 #: panel.cpp:12040
 msgid "Failed to allocate overlay staging memory"
-msgstr ""
+msgstr "Не вдалося розподілити проміжну пам'ять накладання."
 
 #: panel.cpp:12118
 #, c-format
@@ -2410,7 +2410,7 @@ msgstr "Приховати панель меню при неактивній м�
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:695
 msgid "Show the on-screen touch controller"
-msgstr ""
+msgstr "Показати сенсорний контролер на екрані"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:697
 msgid "Suspend screensaver when game is running"
@@ -4552,7 +4552,7 @@ msgstr "Приховати панель &меню"
 
 #: xrc/MainMenu.xrc:569
 msgid "Show On-Screen &Controller"
-msgstr ""
+msgstr "Показати екранний &контролер"
 
 #: xrc/MainMenu.xrc:573
 msgid "Suspend &Screen Saver"
