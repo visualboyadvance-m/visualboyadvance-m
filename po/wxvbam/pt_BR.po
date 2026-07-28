@@ -1506,16 +1506,16 @@ msgstr "Falhou em criar a superfície do Vulkan pro Metal: %d"
 
 #: panel.cpp:10769
 msgid "Failed to obtain QWidget handle for Vulkan surface"
-msgstr ""
+msgstr "Falhou em obter a alavanca do QWidget pra superfície do Vulkan"
 
 #: panel.cpp:10779
 msgid "Failed to obtain ANativeWindow for the panel"
-msgstr ""
+msgstr "Falhou em obter ANativeWindow para o painel"
 
 #: panel.cpp:10789
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
-msgstr ""
+msgstr "Falhou em criar a superfície do Android pro Vulkan : %d"
 
 #: panel.cpp:10806
 #, c-format
@@ -1571,7 +1571,7 @@ msgstr "Falhou em criar a troca de cadeia do Vulkan: %d"
 #: panel.cpp:11261
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
-msgstr ""
+msgstr "Cadeia de troca criada: %ux%u, %u imagens, vsync=%s, pré-transformação=0x%x"
 
 #: panel.cpp:11363
 #, c-format
@@ -1604,7 +1604,7 @@ msgstr "Falhou em criar o esquema do pipeline: %d"
 
 #: panel.cpp:11587
 msgid "Failed to create overlay pipeline"
-msgstr ""
+msgstr "Falhou em criar o pipeline da sobreposição"
 
 #: panel.cpp:11597
 #, c-format
@@ -1639,7 +1639,7 @@ msgstr "Falhou em alocar o agrupamento dos descritores: %d"
 #: panel.cpp:11695
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
-msgstr ""
+msgstr "Falhou em alocar o conjunto de descritores da sobreposição: %d"
 
 #: panel.cpp:11734
 #, c-format
@@ -1670,27 +1670,27 @@ msgstr "Falhou em alocar a memória dos testes"
 
 #: panel.cpp:11943
 msgid "Failed to create overlay image"
-msgstr ""
+msgstr "Falhou em criar a imagem da sobreposição"
 
 #: panel.cpp:11957
 msgid "Failed to allocate overlay image memory"
-msgstr ""
+msgstr "Falhou em alocar a memória da imagem da sobreposição"
 
 #: panel.cpp:11972
 msgid "Failed to create overlay image view"
-msgstr ""
+msgstr "Falhou em criar a visualização da imagem da sobreposição"
 
 #: panel.cpp:11989
 msgid "Failed to create overlay sampler"
-msgstr ""
+msgstr "Falhou em criar o coletor de amostras da sobreposição"
 
 #: panel.cpp:12026
 msgid "Failed to create overlay staging buffer"
-msgstr ""
+msgstr "Falhou em criar o buffer de testes da sobreposição"
 
 #: panel.cpp:12040
 msgid "Failed to allocate overlay staging memory"
-msgstr ""
+msgstr "Falhou em alocar a memória dos testes da sobreposição"
 
 #: panel.cpp:12118
 #, c-format
