@@ -45,6 +45,25 @@ bool VbamCommitAndroidOutputFile(const wxString& staged_path);
 // Drops a staged output file without transferring it, for failed starts.
 void VbamDiscardAndroidOutputFile(const wxString& staged_path);
 
+// Holds the device awake (screen-on window flag plus, when the WAKE_LOCK
+// permission is granted, a partial wake lock) so the display never dims or
+// locks while a game runs. This is Android's equivalent of suspending the
+// screensaver, and is driven from the same place: GameArea::SuspendScreenSaver()
+// and GameArea::UnsuspendScreenSaver(). Idempotent; safe off the UI thread.
+void VbamSetAndroidWakeLock(bool enable);
+
+// Size of the activity's content view in Qt logical pixels, i.e. the area a
+// top-level window can actually occupy. Unlike Qt's screen availableGeometry()
+// this excludes the action bar, so a dialog clamped to it always fits. Returns
+// false (leaving the outputs alone) before the first layout has been measured.
+bool VbamAndroidScreenClientSize(int* w, int* h);
+
+// Makes a scrolling wx window usable with a finger: widens its scrollbars to a
+// touch target and enables Qt's kinetic drag-to-scroll on its viewport. Takes
+// the wxWindow's Qt handle (wxWindow::GetHandle()); does nothing when that
+// handle is not a scroll area.
+void VbamEnableAndroidTouchScrolling(void* qwidget);
+
 #else  // !(__WXQT__ && __ANDROID__)
 
 inline wxString VbamResolveAndroidContentUri(const wxString& path) { return path; }
@@ -52,6 +71,9 @@ inline wxString VbamStageAndroidInputFile(const wxString& path, const wxString&)
 inline wxString VbamStageAndroidOutputFile(const wxString& path, const wxString&) { return path; }
 inline bool VbamCommitAndroidOutputFile(const wxString&) { return true; }
 inline void VbamDiscardAndroidOutputFile(const wxString&) {}
+inline void VbamSetAndroidWakeLock(bool) {}
+inline bool VbamAndroidScreenClientSize(int*, int*) { return false; }
+inline void VbamEnableAndroidTouchScrolling(void*) {}
 
 #endif  // defined(__WXQT__) && defined(__ANDROID__)
 

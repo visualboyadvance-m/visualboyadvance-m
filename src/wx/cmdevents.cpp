@@ -2801,6 +2801,16 @@ EVT_HANDLER(OnScreenController, "Show the on-screen touch controller")
 EVT_HANDLER(SuspendScreenSaver, "Suspend screensaver when game is running")
 {
     GetMenuOptionConfig("SuspendScreenSaver", config::OptionID::kUISuspendScreenSaver);
+
+    // Apply right away rather than at the next pause/resume: on Android this
+    // toggle holds the wake lock that keeps the screen from locking, and the
+    // user expects the change to take effect while the game keeps running.
+    if (panel) {
+        if (gopts.suspend_screensaver)
+            panel->SuspendScreenSaver();
+        else
+            panel->UnsuspendScreenSaver();
+    }
 }
 
 #ifndef NO_LINK

@@ -9711,6 +9711,12 @@ void GameArea::UpdateLcdFilter() {
 }
         
 void GameArea::SuspendScreenSaver() {
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Android has no screensaver to suspend; the equivalent is holding a wake
+    // lock so the display does not dim and lock while the game is running.
+    if (gopts.suspend_screensaver && emulating)
+        VbamSetAndroidWakeLock(true);
+#endif
 #ifdef HAVE_XSS
     if (xscreensaver_suspended || !gopts.suspend_screensaver)
         return;
@@ -9728,6 +9734,9 @@ void GameArea::SuspendScreenSaver() {
 }
         
 void GameArea::UnsuspendScreenSaver() {
+#if defined(__WXQT__) && defined(__ANDROID__)
+    VbamSetAndroidWakeLock(false);
+#endif
 #ifdef HAVE_XSS
             // unsuspend screensaver
     if (xscreensaver_suspended) {

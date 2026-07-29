@@ -2075,6 +2075,11 @@ int MainFrame::ShowModal(wxDialog* dlg)
         return wxID_CANCEL;
     }
     dlg->SetWindowStyle(dlg->GetWindowStyle() | wxCAPTION | wxRESIZE_BORDER);
+    // Android: fit the dialog to the phone screen here as well as in the
+    // Show() overrides. Every modal dialog in the app goes through this one
+    // function, whatever class it is and however its own Show() is routed, so
+    // this is the one place that cannot be bypassed.
+    widgets::AdaptDialogToScreen(dlg);
     StartModal();
     int ret = dlg->ShowModal();
     StopModal();

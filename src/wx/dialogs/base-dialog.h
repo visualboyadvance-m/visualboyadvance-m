@@ -17,6 +17,11 @@ class wxPanel;
 #if defined(__WXGTK__)
 // Moving and resizing dialogs does not work properly on wxGTK.
 #define WX_RESIZE_DIALOGS 0
+#elif defined(__WXQT__) && defined(__ANDROID__)
+// On Android there is one window size worth having -- as much of the screen as
+// the activity owns -- and it is recomputed from the content view every time a
+// dialog is shown. Saving and restoring a geometry would only fight that.
+#define WX_RESIZE_DIALOGS 0
 #else
 #define WX_RESIZE_DIALOGS 1
 #endif
@@ -53,6 +58,13 @@ public:
     // visible. Runs strictly before any wxEVT_SHOW handler so per-dialog
     // OnShow handlers see a fully populated tree.
     bool Show(bool show = true) override;
+
+    // On Android an adapted dialog's size belongs to the screen, not to the
+    // content: sizing it to what the content wants is what put it off-screen in
+    // the first place. Callers that Fit() after adding controls -- guiinit.cpp,
+    // the config dialogs, the lazy-tab loader -- get a re-clamp instead.
+    // Elsewhere, and before the dialog has been adapted, this is a plain Fit().
+    void Fit() override;
 
 protected:
     BaseDialog(wxWindow* parent, const wxString& xrc_file);

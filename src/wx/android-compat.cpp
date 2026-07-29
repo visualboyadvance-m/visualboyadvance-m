@@ -25,6 +25,11 @@
 #include <QtCore/QJniObject>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
+#include <QtWidgets/QAbstractScrollArea>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QScroller>
 #include <QtWidgets/QWidget>
 
 #include <wx/apptrait.h>
@@ -436,6 +441,33 @@ void VbamDiscardAndroidOutputFile(const wxString& staged_path) {
     }
 }
 
+// --- Wake lock ---------------------------------------------------------------
+
+void VbamSetAndroidWakeLock(bool enable) {
+    // Remember the last state we asked for: this is called from the emulator
+    // thread on every pause/resume and each JNI round trip posts to the UI
+    // thread, so skip the no-op transitions here as well as in Java.
+    static int last = -1;
+    if (last == static_cast<int>(enable)) {
+        return;
+    }
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    if (!activity.isValid()) {
+        return;
+    }
+    QJniObject::callStaticMethod<void>(
+        "org/visualboyadvance_m/VbamWakeLock", "setEnabled",
+        "(Landroid/app/Activity;Z)V", activity.object(), static_cast<jboolean>(enable));
+    QJniEnvironment env;
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM", "VbamWakeLock.setEnabled threw");
+        return;
+    }
+    last = static_cast<int>(enable);
+}
+
 // --- Android video SurfaceView glue (for SDL video into the Qt activity) -----
 
 // SDL's Android backend caches the SDLActivity jclass + method IDs and creates
@@ -505,23 +537,15 @@ static void VbamWidgetScreenRectPx(void* qwidget, int* x, int* y, int* w, int* h
     *h = static_cast<int>(sz.height() * dpr);
 }
 
-// The part of `qwidget` that is actually on screen, in Qt logical pixels.
+// Size of the activity's content view in physical pixels, or false if no
+// layout has been measured yet.
 //
-// Qt's Android window can be taller than the activity's content view -- the
-// action bar above it is not subtracted -- so a widget laid out to fill that
-// window overhangs the bottom of the screen. Callers that must stay visible
-// (the video overlay, the on-screen controller) clamp themselves to this.
-// Returns false when the content size is not known yet, leaving *w and *h alone.
-bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h) {
-    QWidget* widget = reinterpret_cast<QWidget*>(qwidget);
-    if (!widget) {
-        return false;
-    }
-    // Make sure something is measuring the content view for us. Laying out the
-    // overlay SurfaceView records its size, but the in-tree GLES2 renderer never
-    // creates that overlay, which used to leave the size unknown (and every
-    // caller unclamped) for the whole session. One call installs a layout
-    // listener on the Java side that keeps the size current across rotations.
+// Make sure something is measuring the content view for us first. Laying out
+// the overlay SurfaceView records its size, but the in-tree GLES2 renderer never
+// creates that overlay, which used to leave the size unknown (and every caller
+// unclamped) for the whole session. One call installs a layout listener on the
+// Java side that keeps the size current across rotations.
+static bool AndroidContentSizePx(int* w, int* h) {
     static bool watching = false;
     if (!watching) {
         QJniObject activity = QNativeInterface::QAndroidApplication::context();
@@ -544,10 +568,71 @@ bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h) {
     if (content_w_px <= 0 || content_h_px <= 0) {
         return false;
     }
+    *w = content_w_px;
+    *h = content_h_px;
+    return true;
+}
+
+// The part of `qwidget` that is actually on screen, in Qt logical pixels.
+//
+// Qt's Android window can be taller than the activity's content view -- the
+// action bar above it is not subtracted -- so a widget laid out to fill that
+// window overhangs the bottom of the screen. Callers that must stay visible
+// (the video overlay, the on-screen controller) clamp themselves to this.
+// Returns false when the content size is not known yet, leaving *w and *h alone.
+bool VbamAndroidVisibleClientSize(void* qwidget, int* w, int* h) {
+    QWidget* widget = reinterpret_cast<QWidget*>(qwidget);
+    if (!widget) {
+        return false;
+    }
+    int content_w_px = 0, content_h_px = 0;
+    if (!AndroidContentSizePx(&content_w_px, &content_h_px)) {
+        return false;
+    }
     const qreal dpr = widget->devicePixelRatio() > 0 ? widget->devicePixelRatio() : 1;
     *w = std::min(widget->width(),  static_cast<int>(content_w_px / dpr));
     *h = std::min(widget->height(), static_cast<int>(content_h_px / dpr));
     return *w > 0 && *h > 0;
+}
+
+bool VbamAndroidScreenClientSize(int* w, int* h) {
+    int content_w_px = 0, content_h_px = 0;
+    if (!AndroidContentSizePx(&content_w_px, &content_h_px)) {
+        return false;
+    }
+    // No widget to ask, so scale by the screen: on Android every window shares
+    // the one screen's device pixel ratio.
+    qreal dpr = 1;
+    if (const QScreen* screen = QGuiApplication::primaryScreen()) {
+        if (screen->devicePixelRatio() > 0) {
+            dpr = screen->devicePixelRatio();
+        }
+    }
+    *w = static_cast<int>(content_w_px / dpr);
+    *h = static_cast<int>(content_h_px / dpr);
+    return *w > 0 && *h > 0;
+}
+
+void VbamEnableAndroidTouchScrolling(void* qwidget) {
+    QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(
+        reinterpret_cast<QWidget*>(qwidget));
+    if (!area) {
+        return;
+    }
+    // A desktop scrollbar is a few pixels wide, which on a phone is far below a
+    // usable touch target. Style the two scrollbars directly rather than the
+    // scroll area, so the stylesheet cannot cascade into the dialog's controls.
+    if (QScrollBar* bar = area->verticalScrollBar()) {
+        bar->setStyleSheet("QScrollBar:vertical { width: 22px; }");
+    }
+    if (QScrollBar* bar = area->horizontalScrollBar()) {
+        bar->setStyleSheet("QScrollBar:horizontal { height: 22px; }");
+    }
+    // Kinetic drag-to-scroll, so the content follows the finger the way a
+    // native list does instead of only moving via the scrollbars. Qt replays
+    // presses that turn out not to be drags, so taps on the controls inside
+    // still arrive (with a short press delay).
+    QScroller::grabGesture(area->viewport(), QScroller::TouchGesture);
 }
 
 // Creates (or returns the already-created) overlay SurfaceView covering the

@@ -20,6 +20,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="36" />
 
+    <!-- Keeps the CPU running for the emulator thread while a game is running.
+         The screen itself is held on with FLAG_KEEP_SCREEN_ON, which needs no
+         permission; see org.visualboyadvance_m.VbamWakeLock. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!-- %%INSERT_PERMISSIONS -->
     <!-- %%INSERT_FEATURES -->
 

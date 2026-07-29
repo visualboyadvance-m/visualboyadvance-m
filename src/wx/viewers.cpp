@@ -14,6 +14,7 @@
 #include "core/gba/gbaCpuArmDis.h"
 #include "wx/config/option-proxy.h"
 #include "wx/viewsupt.h"
+#include "wx/widgets/utils.h"
 #include "wx/wxvbam.h"
 
 // avoid exporting classes
@@ -786,6 +787,9 @@ public:
         s.Printf(addrlen == 4 ? wxT("%04X") : wxT("%08X"), len);
         selreg_len->SetValue(s);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+        // A plain XRC dialog, neither a BaseDialog nor a Viewer, so the Android
+        // screen fitting has to be applied by hand before it is shown.
+        widgets::AdaptDialogToScreen(selregion);
 
         if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);
@@ -811,6 +815,7 @@ public:
         selreg_lenlab->Enable();
         selreg_len->SetValue(wxEmptyString);
         selregion->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
+        widgets::AdaptDialogToScreen(selregion);
 
         if (OPTION(kDispKeepOnTop))
             selregion->SetWindowStyle(selregion->GetWindowStyle() | wxSTAY_ON_TOP);

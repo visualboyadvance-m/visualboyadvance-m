@@ -207,8 +207,21 @@ bool BaseDialog::Show(bool show) {
         for (int i = 0; i < count; ++i) {
             LoadLazyTab(i);
         }
+
+        // Android: make the now-complete dialog fit the screen and scroll.
+        // This is the right moment for it: subclass constructors and the
+        // initialization code in guiinit.cpp are done adding controls, and
+        // wxDialog::ShowModal() routes through here as well.
+        widgets::AdaptDialogToScreen(this);
     }
     return wxDialog::Show(show);
+}
+
+void BaseDialog::Fit() {
+    if (widgets::AdaptDialogToScreen(this, /*wrap=*/false)) {
+        return;
+    }
+    wxDialog::Fit();
 }
 
 wxWindow* BaseDialog::GetValidatedChild(const wxString& name) const {
@@ -224,6 +237,15 @@ void BaseDialog::OnBaseDialogShow(wxShowEvent& event) {
     if (!event.IsShown()) {
         return;
     }
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Nothing to restore or bounds-check: BaseDialog::Show() has just sized the
+    // dialog to the activity's content area, so it only needs to be moved to
+    // that area's origin. A saved or default position could only push it off.
+    dialog_shown_ = true;
+    this->RepositionDialog();
+    return;
+#endif
 
     if (!dialog_shown_) {
         // First time call.
@@ -250,6 +272,14 @@ void BaseDialog::OnBaseDialogShow(wxShowEvent& event) {
 }
 
 void BaseDialog::RepositionDialog() {
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // The dialog is sized to the activity's content area, whose origin is the
+    // origin of Qt's window; offsetting from the parent would only push it off
+    // the bottom-right of the screen.
+    this->SetPosition(wxPoint(0, 0));
+    return;
+#endif
+
     // Re-position the dialog slightly to the bottom-right of the parent.
     const wxWindow* parent = this->GetParent();
     wxPoint parent_pos;

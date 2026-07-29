@@ -47,6 +47,16 @@ public:
         ActiveCtrl(ev);
     }
 
+    // Adapts the viewer to the screen on Android before showing it; see
+    // widgets::AdaptDialogToScreen(). Done here rather than in the constructor
+    // because the GfxViewer subclasses are still wiring up XRC controls at that
+    // point, and the layout has to be complete before it can be reflowed.
+    bool Show(bool show = true) override;
+
+    // Once adapted, the viewer's size is the screen's to decide; the many Fit()
+    // calls in the viewers would otherwise size it back to its full content.
+    void Fit() override;
+
 protected:
     wxString dname;
     void SetAutoUpdate(wxCommandEvent& ev)

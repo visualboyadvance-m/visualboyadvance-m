@@ -2038,8 +2038,10 @@ bool MainFrame::BindControls()
     if (suspend_scr_saver_mi)
     {
         // TODO: change preprocessor directive to fit other platforms
-#if !defined(HAVE_XSS)
+#if !defined(HAVE_XSS) && !(defined(__WXQT__) && defined(__ANDROID__))
         suspend_scr_saver_mi->GetMenu()->Remove(suspend_scr_saver_mi);
+#elif !defined(HAVE_XSS)
+        // Android: kept, and implemented as a wake lock rather than XScreenSaver.
 #else
 #ifndef NO_WAYLAND
         if (wxGetApp().UsingWayland())

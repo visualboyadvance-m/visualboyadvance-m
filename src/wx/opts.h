@@ -50,7 +50,14 @@ extern struct opts_t {
 #else
     bool show_onscreen_controller = false;
 #endif
+#if defined(__ANDROID__)
+    // A phone blanks and locks its screen after a minute or two of no touches,
+    // which is fatal while playing with a gamepad or the on-screen controller,
+    // so hold the display awake by default. Off by default elsewhere.
+    bool suspend_screensaver = true;
+#else
     bool suspend_screensaver = false;
+#endif
 
     /// wxWindows
     // wxWidgets-generated options (opaque)
