@@ -4,7 +4,16 @@
 #include <android/log.h>
 
 #ifdef ENABLE_SDL3
-extern "C" int SDL_CheckDefaultArgcArgv(int *argc, char **argv[]);
+extern "C" void SDL_CheckDefaultArgcArgv(int *argc, char ***argv)
+{
+    if (!*argv) {
+        static char dummyargv0[] = { 'S', 'D', 'L', '_', 'a', 'p', 'p', '\0' };
+        static char *argvdummy[2] = { dummyargv0, NULL };
+        *argc = 1;
+        *argv = argvdummy;
+    }
+}
+
 extern "C" void SDL_SetMainReady();
 #endif
 #endif
