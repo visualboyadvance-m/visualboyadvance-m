@@ -16,9 +16,6 @@
 
 #if defined(__ANDROID__)
 #include <android/log.h>
-// Declared here (not via <SDL3/SDL_main.h>, which redefines main) so the SDL
-// panel can mark SDL "main ready" — VBA-M has its own main() (wxEntry).
-extern "C" void SDL_SetMainReady(void);
 #endif
 
 #ifdef __WXGTK__
@@ -4612,11 +4609,6 @@ void SDLDrawingPanel::DrawingPanelInit()
         // Hand the native window to our patched SDL via a global property; SDL's
         // Android VideoInit picks it up (see SDL_androidvideo.c).
         SDL_SetPointerProperty(SDL_GetGlobalProperties(), "vbam.android.native_window", anw);
-
-        // VBA-M provides its own main() (wxEntry), so SDL is never told the app
-        // is "main ready". On Android SDL_Init(VIDEO) hard-fails without this;
-        // normally SDLActivity's SDL_main path calls it for us.
-        SDL_SetMainReady();
     }
 #endif
 

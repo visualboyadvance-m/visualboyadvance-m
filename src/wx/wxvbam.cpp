@@ -2,10 +2,11 @@
 
 #if defined(__ANDROID__)
 #include <android/log.h>
-#endif
 
 #ifdef ENABLE_SDL3
-#include <SDL3/SDL_main.h>
+extern "C" int SDL_CheckDefaultArgcArgv(int *argc, char **argv[]);
+extern "C" void SDL_SetMainReady();
+#endif
 #endif
 
 #ifdef __WXMSW__
@@ -319,6 +320,12 @@ int main(int argc, char** argv) {
 
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
+
+#if defined(ENABLE_SDL3) && defined(__ANDROID__)
+    SDL_CheckDefaultArgcArgv(&argc, &argv);
+    SDL_SetMainReady();
+#endif
+
     return wxEntry(argc, argv);
 }
 
