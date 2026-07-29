@@ -606,8 +606,11 @@ if(APPLE)
 endif()
 
 if(ANDROID)
+    # builtin-translations.cpp reads the compiled catalogs out of the copy of
+    # translations.zip embedded in the binary; an APK has no share/locale.
     target_sources(visualboyadvance-m PRIVATE ${VBAM_WX_COMMON} android-compat.cpp
-        android-iconv.cpp)
+        android-iconv.cpp builtin-translations.cpp builtin-translations.h
+        ${VBAM_GENERATED_DIR}/wx/builtin-translations-data.h)
 
     # bionic's iconv() cannot decode U+0000 from UTF-8: it consumes no input and
     # returns E2BIG, so wxMBConv_iconv::ToWChar()'s "retry while E2BIG" sizing
@@ -1319,6 +1322,16 @@ add_custom_command(
     COMMAND ${BIN2C} ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs ${VBAM_GENERATED_DIR}/wx/builtin-xrc.h builtin_xrs
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs ${BIN2C}
 )
+
+# Android reads the gettext catalogs from the binary itself (there is no
+# share/locale in an APK), so embed the translations.zip built above.
+if(ANDROID)
+    add_custom_command(
+        OUTPUT ${VBAM_GENERATED_DIR}/wx/builtin-translations-data.h
+        COMMAND ${BIN2C} ${CMAKE_BINARY_DIR}/translations.zip ${VBAM_GENERATED_DIR}/wx/builtin-translations-data.h builtin_translations
+        DEPENDS ${CMAKE_BINARY_DIR}/translations.zip ${BIN2C}
+    )
+endif()
 
 # use a built-in vba-over.ini if no config file present
 add_custom_command(

@@ -50,6 +50,7 @@
 #include "core/gba/gbaSound.h"
 #include "wx/gb-builtin-over.h"
 #include "wx/builtin-over.h"
+#include "wx/builtin-translations.h"
 #include "wx/builtin-xrc.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
@@ -688,6 +689,13 @@ bool wxvbamApp::OnInit() {
 
     // load selected language
 
+#if defined(__ANDROID__)
+    // An APK has no share/locale for the file loader to scan, so read the
+    // catalogs from the translations.zip embedded in the binary. This has to be
+    // redone after every wxLocale::Init() (it installs a fresh wxTranslations).
+    VbamInstallBuiltinTranslations();
+#endif
+
     wxvbam_locale->AddCatalog("wxvbam");
 
     // make built-in xrc file available
@@ -820,9 +828,14 @@ bool wxvbamApp::OnInit() {
 
     // load selected language
 
-#ifdef _WIN32
+#if defined(_WIN32)
     if (OPTION(kExternalTranslations) == false)
         wxTranslations::Get()->SetLoader(new wxResourceTranslationsLoader);
+#elif defined(__ANDROID__)
+    // See above: catalogs come from the binary unless external ones are asked
+    // for (there are none to find on Android, but honor the option anyway).
+    if (OPTION(kExternalTranslations) == false)
+        VbamInstallBuiltinTranslations();
 #endif
 
     wxvbam_locale->AddCatalog("wxvbam");
