@@ -4,6 +4,10 @@
 #include <android/log.h>
 #endif
 
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL_main.h>
+#endif
+
 #ifdef __WXMSW__
 #include <windows.h>
 #include <versionhelpers.h>
