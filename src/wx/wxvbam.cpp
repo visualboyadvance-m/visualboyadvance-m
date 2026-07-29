@@ -2,20 +2,6 @@
 
 #if defined(__ANDROID__)
 #include <android/log.h>
-
-#ifdef ENABLE_SDL3
-extern "C" void SDL_CheckDefaultArgcArgv(int *argc, char ***argv)
-{
-    if (!*argv) {
-        static char dummyargv0[] = { 'S', 'D', 'L', '_', 'a', 'p', 'p', '\0' };
-        static char *argvdummy[2] = { dummyargv0, NULL };
-        *argc = 1;
-        *argv = argvdummy;
-    }
-}
-
-extern "C" void SDL_SetMainReady();
-#endif
 #endif
 
 #ifdef __WXMSW__
@@ -329,11 +315,6 @@ int main(int argc, char** argv) {
 
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
-
-#if defined(ENABLE_SDL3) && defined(__ANDROID__)
-    SDL_CheckDefaultArgcArgv(&argc, &argv);
-    SDL_SetMainReady();
-#endif
 
     return wxEntry(argc, argv);
 }
