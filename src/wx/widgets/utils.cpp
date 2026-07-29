@@ -90,6 +90,23 @@ wxSize AvailableSize() {
 // UI thread, so a single flag covers all of them.
 bool g_clamping = false;
 
+// Clears the cached best size of a whole subtree, children first.
+//
+// Every window caches its best size, and a wxNotebook's cache still reflects
+// the page count it had when it was first measured. The config dialogs build
+// their notebook pages lazily -- and this runs from MainFrame::ShowModal(),
+// before BaseDialog::Show() has force-loaded them -- so without this the dialog
+// gets measured for an empty notebook and comes out a sliver tall.
+// DisplayConfig::RefitForVisibilityChange() does the same thing for the same
+// reason after it hides or shows controls.
+void InvalidateBestSizeRecursively(wxWindow* window) {
+    const wxWindowList& children = window->GetChildren();
+    for (wxWindowList::const_iterator it = children.begin(); it != children.end(); ++it) {
+        InvalidateBestSizeRecursively(*it);
+    }
+    window->InvalidateBestSize();
+}
+
 // Sizes an already-wrapped dialog: as large as its content wants, but never
 // larger than the screen, with the scrollable area set to the content so
 // whatever did not fit can be reached.
@@ -99,6 +116,11 @@ void ClampDialog(wxDialog* dialog, wxScrolledWindow* scroller) {
     if (!content || !outer) {
         return;
     }
+
+    // Measure against what the content is now, not what it was when some
+    // window last cached its best size.
+    InvalidateBestSizeRecursively(scroller);
+    scroller->Layout();
 
     // What the dialog would need to show everything at once. The scroller's own
     // minimum has to be the content's for this one measurement, and small again
@@ -127,7 +149,11 @@ void ClampDialog(wxDialog* dialog, wxScrolledWindow* scroller) {
                         available.x, available.y, client.x, client.y);
 
     g_clamping = true;
-    dialog->SetClientSize(client);
+    // Skip a no-op resize: a layout whose minimum depends on the width it was
+    // given can otherwise ping-pong between two sizes.
+    if (dialog->GetClientSize() != client) {
+        dialog->SetClientSize(client);
+    }
     dialog->Layout();
 
     // The scrollable area is the content's own size, which is what makes the
@@ -241,20 +267,13 @@ bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
             if (g_clamping) {
                 return;
             }
-            const wxSize size = dialog->GetSize();
-            const wxSize available = AvailableSize();
-            if (size.x > available.x || size.y > available.y) {
-                ClampDialog(dialog, bound_scroller);
-                return;
-            }
-            // Still fits: just keep the scrollable area in step with the new
-            // size, so the content stretches into it or scrolls out of it.
-            if (wxSizer* const content = bound_scroller->GetSizer()) {
-                const wxSize content_size = content->CalcMin();
-                const wxSize visible = bound_scroller->GetClientSize();
-                bound_scroller->SetVirtualSize(std::max(content_size.x, visible.x),
-                                               std::max(content_size.y, visible.y));
-            }
+            // Authoritative in both directions, not just "shrink if too big".
+            // Once the content lives in the scroller the dialog's own best size
+            // is the scroller's deliberately tiny minimum, so anything sizing
+            // itself from GetBestSize() -- DisplayConfig::AdjustSizeOnShow()
+            // does exactly that -- collapses the dialog to a sliver. There is no
+            // user window sizing on Android, so the fit always wins.
+            ClampDialog(dialog, bound_scroller);
         });
 
         // And once more after the window is really on screen. Qt applies its own
