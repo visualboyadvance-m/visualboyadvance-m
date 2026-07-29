@@ -76,13 +76,18 @@ macOS or Linux, make sure PowerShell Core is installed, and use:
 ```bash
 cmake .. -DVCPKG_TARGET_TRIPLET=**<SYSTEM>** -DCMAKE_BUILD_TYPE=Release -G Ninja
 ```
-
 , where **SYSTEM** is one of:
 
 - x64-linux,
 - arm64-macos,
 - x64-macos,
+- arm64-android
+- armv7-android
+- i686-android
+- x86_64-android
+- riscv64-android
 
+. For Android you need to set ANDROID_HOME and ANDROID_NDK_HOME.
 . On Windows, vcpkg is the default and that is handled automatically.
 
 If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
