@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
 #include <vector>
 
 #include <android/log.h>
@@ -613,7 +614,7 @@ bool VbamAndroidScreenClientSize(int* w, int* h) {
     return *w > 0 && *h > 0;
 }
 
-void VbamEnableAndroidTouchScrolling(void* qwidget) {
+void VbamEnableAndroidTouchScrolling(void* qwidget, std::function<void(int, int)> on_scroll) {
     QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(
         reinterpret_cast<QWidget*>(qwidget));
     if (!area) {
@@ -633,6 +634,40 @@ void VbamEnableAndroidTouchScrolling(void* qwidget) {
     // presses that turn out not to be drags, so taps on the controls inside
     // still arrive (with a short press delay).
     QScroller::grabGesture(area->viewport(), QScroller::TouchGesture);
+
+    if (!on_scroll) {
+        return;
+    }
+    // Report every scrollbar movement to wx.
+    //
+    // wxQt's scroll area only translates QAbstractSlider::actionTriggered and
+    // sliderReleased into wx scroll events, and neither is emitted when the
+    // value is set programmatically -- which is exactly how the kinetic
+    // scrolling just grabbed above moves the view: QScroller hands the scroll
+    // area a QScrollEvent, which sets the scrollbar values. wx would never learn
+    // about it, so its scroll position would stay at zero and the child widgets
+    // it positions would never move: the scrollbars slide and nothing else does.
+    //
+    // The callback runs the scroll on the wx side, which repositions the content
+    // and sets the scrollbar position back to where it already is (a no-op for
+    // Qt, and guarded against recursion below regardless).
+    const auto guard = std::make_shared<bool>(false);
+    const auto notify = [area, on_scroll, guard] {
+        if (*guard) {
+            return;
+        }
+        *guard = true;
+        const int x = area->horizontalScrollBar() ? area->horizontalScrollBar()->value() : 0;
+        const int y = area->verticalScrollBar() ? area->verticalScrollBar()->value() : 0;
+        on_scroll(x, y);
+        *guard = false;
+    };
+    if (QScrollBar* bar = area->horizontalScrollBar()) {
+        QObject::connect(bar, &QScrollBar::valueChanged, area, notify);
+    }
+    if (QScrollBar* bar = area->verticalScrollBar()) {
+        QObject::connect(bar, &QScrollBar::valueChanged, area, notify);
+    }
 }
 
 // Creates (or returns the already-created) overlay SurfaceView covering the

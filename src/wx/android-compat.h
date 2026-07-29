@@ -10,6 +10,8 @@
 // that is copied back through the ContentResolver once the writer has closed
 // it. On every other platform they are pass-throughs.
 
+#include <functional>
+
 #include <wx/string.h>
 
 #if defined(__WXQT__) && defined(__ANDROID__)
@@ -62,7 +64,16 @@ bool VbamAndroidScreenClientSize(int* w, int* h);
 // touch target and enables Qt's kinetic drag-to-scroll on its viewport. Takes
 // the wxWindow's Qt handle (wxWindow::GetHandle()); does nothing when that
 // handle is not a scroll area.
-void VbamEnableAndroidTouchScrolling(void* qwidget);
+//
+// `on_scroll` is called with the new scrollbar positions, in the scroll units
+// wx set the scrollbars up with, whenever Qt moves them. wxQt only forwards
+// scrollbar *actions* -- a dragged thumb, a clicked arrow -- to wx, and a
+// kinetic drag is neither: it sets the scrollbar values directly, so without
+// this callback the scrollbars move while the content stays where it was. The
+// callback has to scroll the wx window to the reported position; it may be
+// empty for scroll areas wx does not manage itself.
+void VbamEnableAndroidTouchScrolling(void* qwidget,
+                                     std::function<void(int, int)> on_scroll = {});
 
 #else  // !(__WXQT__ && __ANDROID__)
 
@@ -73,7 +84,7 @@ inline bool VbamCommitAndroidOutputFile(const wxString&) { return true; }
 inline void VbamDiscardAndroidOutputFile(const wxString&) {}
 inline void VbamSetAndroidWakeLock(bool) {}
 inline bool VbamAndroidScreenClientSize(int*, int*) { return false; }
-inline void VbamEnableAndroidTouchScrolling(void*) {}
+inline void VbamEnableAndroidTouchScrolling(void*, std::function<void(int, int)> = {}) {}
 
 #endif  // defined(__WXQT__) && defined(__ANDROID__)
 

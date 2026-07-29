@@ -4,6 +4,7 @@
 #include <wx/textctrl.h>
 
 #include "wx/lua/lua_engine.h"
+#include "wx/widgets/utils.h"
 
 namespace vbam {
 namespace wx {
@@ -34,6 +35,10 @@ LuaConsoleFrame::LuaConsoleFrame(wxWindow* parent)
 
     repl_->Bind(wxEVT_TEXT_ENTER, &LuaConsoleFrame::OnReplEnter, this);
     Bind     (wxEVT_CLOSE_WINDOW, &LuaConsoleFrame::OnClose,     this);
+
+    // Android has no title bar to close this window from, so give it a button.
+    // No-op everywhere else, where the frame decoration does the job.
+    widgets::AddAndroidCloseButton(this);
 }
 
 LuaConsoleFrame::~LuaConsoleFrame() {

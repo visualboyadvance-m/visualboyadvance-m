@@ -2,6 +2,9 @@
 
 #include <wx/aboutdlg.h>
 #include <wx/dir.h>
+#if defined(__WXQT__) && defined(__ANDROID__)
+#include <wx/generic/aboutdlgg.h>
+#endif
 #include <wx/dynlib.h>
 #include <wx/ffile.h>
 #include <wx/filename.h>
@@ -2640,7 +2643,22 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     ai.AddDeveloper(wxT("mGBA"));
     ai.AddDeveloper(wxT("Orig. VBA team"));
     ai.AddDeveloper(wxT("... many contributors who send us patches/PRs"));
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // wxAboutBox() creates the dialog and shows it itself, so it never passes
+    // through MainFrame::ShowModal() and is neither fitted to the screen nor
+    // made scrollable: on a phone the license text runs off the bottom, and the
+    // dialog's own button goes with it, leaving nothing to dismiss it with.
+    // Build the same generic dialog here so it goes through the Android
+    // adaptation, which scrolls the text and pins the button row along the
+    // bottom, and label that button Close, which is all it does.
+    wxGenericAboutDialog dlg(ai, this);
+    if (wxWindow* const button = dlg.FindWindow(wxID_OK)) {
+        button->SetLabel(_("Close"));
+    }
+    ShowModal(&dlg);
+#else
     wxAboutBox(ai);
+#endif
 }
 
 EVT_HANDLER(Bilinear, "Use bilinear filter with 3d renderer")

@@ -9,8 +9,10 @@
 
 #include <android/log.h>
 
+#include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/event.h>
+#include <wx/intl.h>
 #include <wx/scrolwin.h>
 #include <wx/sizer.h>
 
@@ -38,6 +40,10 @@ namespace {
 // controls, and notebook tabs are parsed lazily, both of which change the size
 // the content wants after the first adaptation.
 const char kScrollerName[] = "vbamAndroidScroller";
+
+// Name of the close button added by AddAndroidCloseButton(), so a window that
+// already has one is recognized.
+const char kCloseButtonName[] = "vbamAndroidCloseButton";
 
 // Every window laid out by `sizer`, recursively.
 void CollectSizerWindows(const wxSizer* sizer, std::set<wxWindow*>* out) {
@@ -244,11 +250,20 @@ bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
         wxBoxSizer* const outer = new wxBoxSizer(wxVERTICAL);
         outer->Add(scroller, 1, wxEXPAND);
         if (buttons) {
-            outer->Add(buttons, 0, wxEXPAND | wxALL, dialog->FromDIP(4));
+            // Centered rather than expanded: a phone-width row of two buttons
+            // pushed to the opposite edges reads as two unrelated controls, and
+            // the bottom-center of the screen is where a thumb already is.
+            outer->Add(buttons, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, dialog->FromDIP(4));
         }
         dialog->SetSizer(outer);
 
-        VbamEnableAndroidTouchScrolling(scroller->GetHandle());
+        // Touch scrolling, plus the Qt-to-wx feedback that makes it move
+        // anything: wx owns the position of the content inside the scroller, so
+        // a scrollbar Qt moved by itself has to be replayed as a wx scroll.
+        wxScrolledWindow* const scrolled = scroller;
+        VbamEnableAndroidTouchScrolling(scroller->GetHandle(), [scrolled](int x, int y) {
+            scrolled->Scroll(x, y);
+        });
 
         __android_log_print(ANDROID_LOG_INFO, "VBAM",
                             "AdaptDialog %s: wrapped %d children, buttons pinned=%d",
@@ -292,6 +307,49 @@ bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
     }
 
     ClampDialog(dialog, scroller);
+    return true;
+}
+
+bool AddAndroidCloseButton(wxWindow* window) {
+    if (!window) {
+        return false;
+    }
+    if (window->FindWindow(kCloseButtonName)) {
+        return true;
+    }
+    wxSizer* const sizer = window->GetSizer();
+    if (!sizer) {
+        __android_log_print(ANDROID_LOG_INFO, "VBAM", "CloseButton %s: no sizer, skipped",
+                            static_cast<const char*>(window->GetName().utf8_str()));
+        return false;
+    }
+
+    wxButton* const button = new wxButton(window, wxID_CANCEL, _("Close"), wxDefaultPosition,
+                                          wxDefaultSize, 0, wxDefaultValidator,
+                                          kCloseButtonName);
+    wxStdDialogButtonSizer* const row = new wxStdDialogButtonSizer();
+    row->Add(button, 0, wxALIGN_CENTER_VERTICAL);
+    sizer->Add(row, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, window->FromDIP(6));
+
+    // A frame gets no wxID_CANCEL handling from wx, and closing it is what the
+    // button is for. Bound on the button rather than the window so a dialog,
+    // where wxDialog already does the right thing, is left alone.
+    if (!wxDynamicCast(window, wxDialog)) {
+        button->Bind(wxEVT_BUTTON, [window](wxCommandEvent&) { window->Close(); });
+
+        // Nothing clamps a frame to the screen -- AdaptDialogToScreen() only
+        // handles dialogs -- and a frame asking for a desktop-sized window would
+        // put this button below the bottom edge.
+        const wxSize available = AvailableSize();
+        const wxSize size = window->GetSize();
+        const wxSize fitted(std::min(size.x, available.x), std::min(size.y, available.y));
+        if (fitted != size) {
+            window->SetSize(fitted);
+        }
+        window->Move(0, 0);
+    }
+
+    window->Layout();
     return true;
 }
 

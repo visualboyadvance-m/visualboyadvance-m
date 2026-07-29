@@ -14,6 +14,7 @@
 
 #include "wx/lua/lua_console.h"
 #include "wx/lua/lua_engine.h"
+#include "wx/widgets/utils.h"
 
 #ifdef VBAM_HAVE_WXSTC
 #include <wx/stc/stc.h>
@@ -150,6 +151,10 @@ LuaEditorFrame::LuaEditorFrame(wxWindow* parent)
         "emu.print('hello from lua ' .. _VERSION)\n");
     dirty_ = false;
     UpdateTitle();
+
+    // Android has no title bar to close this window from, so give it a button.
+    // No-op everywhere else, where the frame decoration does the job.
+    widgets::AddAndroidCloseButton(this);
 }
 
 LuaEditorFrame::~LuaEditorFrame() {
