@@ -75,6 +75,22 @@ bool VbamAndroidScreenClientSize(int* w, int* h);
 void VbamEnableAndroidTouchScrolling(void* qwidget,
                                      std::function<void(int, int)> on_scroll = {});
 
+// Puts a wx window that was reparented into a scrolling window where wxQt's own
+// scrolling expects it: inside the scroll area's viewport.
+//
+// wxQt keeps the children of a scrolling window in the QScrollArea's viewport --
+// wxWindowQt::AddChild() reparents every child there -- and scrolls by scrolling
+// that viewport, which moves its children with it. wxWindow::Reparent() undoes
+// that: after the base class has added the child to the viewport it reparents the
+// Qt widget to wxWindowQt::QtGetParentWidget(), which for a scrolling window is
+// the scroll area itself, not its viewport. The content then sits outside the
+// widget wx scrolls, so scrolling moves the scrollbars and nothing else. Call
+// this for each window reparented into a scroller.
+//
+// Takes the two wxWindow::GetHandle() pointers; does nothing when the second is
+// not a scroll area.
+void VbamReparentIntoAndroidViewport(void* child_qwidget, void* scrollarea_qwidget);
+
 #else  // !(__WXQT__ && __ANDROID__)
 
 inline wxString VbamResolveAndroidContentUri(const wxString& path) { return path; }
@@ -85,6 +101,7 @@ inline void VbamDiscardAndroidOutputFile(const wxString&) {}
 inline void VbamSetAndroidWakeLock(bool) {}
 inline bool VbamAndroidScreenClientSize(int*, int*) { return false; }
 inline void VbamEnableAndroidTouchScrolling(void*, std::function<void(int, int)> = {}) {}
+inline void VbamReparentIntoAndroidViewport(void*, void*) {}
 
 #endif  // defined(__WXQT__) && defined(__ANDROID__)
 

@@ -186,6 +186,22 @@ void ClampDialog(wxDialog* dialog, wxScrolledWindow* scroller) {
     g_clamping = false;
 }
 
+// Shrinks a top-level window that is larger than the screen and puts it at the
+// screen's origin. ClampDialog() does this and much more for dialogs, whose
+// content is reflowed into a scroller; a frame keeps its own layout and only
+// needs to be no bigger than what it is displayed on.
+void ClampFrame(wxWindow* window) {
+    const wxSize available = AvailableSize();
+    const wxSize size = window->GetSize();
+    const wxSize fitted(std::min(size.x, available.x), std::min(size.y, available.y));
+    if (fitted != size) {
+        window->SetSize(fitted);
+    }
+    if (window->GetPosition() != wxPoint(0, 0)) {
+        window->Move(0, 0);
+    }
+}
+
 }  // namespace
 
 bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
@@ -236,6 +252,11 @@ bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
              it != content_windows.end(); ++it) {
             if (pinned.count(*it) == 0) {
                 (*it)->Reparent(scroller);
+                // ... and into the viewport wx actually scrolls, which
+                // wxWindow::Reparent() does not do by itself. Without this the
+                // content is a sibling of the viewport rather than its child, so
+                // scrolling moves the scrollbars and leaves the content behind.
+                VbamReparentIntoAndroidViewport((*it)->GetHandle(), scroller->GetHandle());
             }
         }
 
@@ -260,9 +281,30 @@ bool AdaptDialogToScreen(wxDialog* dialog, bool wrap) {
         // Touch scrolling, plus the Qt-to-wx feedback that makes it move
         // anything: wx owns the position of the content inside the scroller, so
         // a scrollbar Qt moved by itself has to be replayed as a wx scroll.
+        //
+        // Every wx scroll path -- a dragged thumb, an arrow, a page click, the
+        // kinetic drag -- ends in wxScrollHelper calling SetScrollPos(), i.e.
+        // QScrollBar::setValue(), so this one hook sees all of them, and all of
+        // them need the re-layout below.
         wxScrolledWindow* const scrolled = scroller;
         VbamEnableAndroidTouchScrolling(scroller->GetHandle(), [scrolled](int x, int y) {
             scrolled->Scroll(x, y);
+            // Re-place the content at the new scrolled origin ourselves.
+            //
+            // wxScrollHelper moves the content by handing the scroll delta to
+            // wxWindow::ScrollWindow(), which on wxQt is QWidget::scroll() on
+            // the scroll area's viewport -- and that does not visibly move the
+            // child widgets here: the scrollbar slides, wx's scroll position
+            // updates, and the dialog keeps showing the same pixels until
+            // something lays it out again. (Closing and reopening the dialog
+            // used to be the only way to see the new position, since
+            // ClampDialog() lays the scroller out on the way in.) Layout() is
+            // wxScrolled's ScrollLayout(), which sets the content sizer's
+            // dimension at CalcScrolledPosition(0, 0) -- exactly the placement
+            // ScrollWindow() failed to do -- so doing it on every scroll makes
+            // the content follow the scrollbar.
+            scrolled->Layout();
+            scrolled->Refresh();
         });
 
         __android_log_print(ANDROID_LOG_INFO, "VBAM",
@@ -338,15 +380,17 @@ bool AddAndroidCloseButton(wxWindow* window) {
         button->Bind(wxEVT_BUTTON, [window](wxCommandEvent&) { window->Close(); });
 
         // Nothing clamps a frame to the screen -- AdaptDialogToScreen() only
-        // handles dialogs -- and a frame asking for a desktop-sized window would
-        // put this button below the bottom edge.
-        const wxSize available = AvailableSize();
-        const wxSize size = window->GetSize();
-        const wxSize fitted(std::min(size.x, available.x), std::min(size.y, available.y));
-        if (fitted != size) {
-            window->SetSize(fitted);
-        }
-        window->Move(0, 0);
+        // handles dialogs -- and the Lua windows ask for desktop-sized frames,
+        // which would put this button past the bottom edge. Once at creation and
+        // again on show, since Qt applies its own geometry when a window is first
+        // shown and the screen may have rotated in between.
+        ClampFrame(window);
+        window->Bind(wxEVT_SHOW, [window](wxShowEvent& event) {
+            event.Skip();
+            if (event.IsShown()) {
+                ClampFrame(window);
+            }
+        });
     }
 
     window->Layout();

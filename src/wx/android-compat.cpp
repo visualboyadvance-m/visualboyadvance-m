@@ -614,6 +614,28 @@ bool VbamAndroidScreenClientSize(int* w, int* h) {
     return *w > 0 && *h > 0;
 }
 
+void VbamReparentIntoAndroidViewport(void* child_qwidget, void* scrollarea_qwidget) {
+    QWidget* const child = reinterpret_cast<QWidget*>(child_qwidget);
+    QAbstractScrollArea* const area = qobject_cast<QAbstractScrollArea*>(
+        reinterpret_cast<QWidget*>(scrollarea_qwidget));
+    if (!child || !area) {
+        return;
+    }
+    QWidget* const viewport = area->viewport();
+    if (!viewport || child->parentWidget() == viewport) {
+        return;
+    }
+    // setParent() hides the widget and does not promise to keep its geometry, and
+    // the caller's wx layout has already run by now, so restore both. isHidden()
+    // rather than isVisible(): the dialog itself is usually still hidden here, in
+    // which case none of its children are visible either.
+    const bool hidden = child->isHidden();
+    const QRect geometry = child->geometry();
+    child->setParent(viewport, child->windowFlags());
+    child->setGeometry(geometry);
+    child->setHidden(hidden);
+}
+
 void VbamEnableAndroidTouchScrolling(void* qwidget, std::function<void(int, int)> on_scroll) {
     QAbstractScrollArea* area = qobject_cast<QAbstractScrollArea*>(
         reinterpret_cast<QWidget*>(qwidget));
