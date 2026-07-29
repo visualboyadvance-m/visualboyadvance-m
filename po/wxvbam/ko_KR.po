@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-27 16:00+0000\n"
+"POT-Creation-Date: 2026-07-29 09:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: JS OH, 2026\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -46,11 +46,11 @@ msgstr "CoreAudio 버퍼를 할당하는 데 실패했습니다."
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "CoreAudio 대기열(큐)을 시작하는 데 실패했습니다: 오류 발생"
 
-#: cmdevents.cpp:70 wxvbam.cpp:1100
+#: cmdevents.cpp:73 wxvbam.cpp:1100
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
-#: cmdevents.cpp:222
+#: cmdevents.cpp:225
 msgid ""
 "Game Boy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
@@ -58,295 +58,295 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "게임보이 어드밴스 파일 (*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game Boy Files (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:240
+#: cmdevents.cpp:243
 msgid "Open ROM file"
 msgstr "롬 파일 열기"
 
-#: cmdevents.cpp:277
+#: cmdevents.cpp:280
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "게임보이 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:286
+#: cmdevents.cpp:289
 msgid "Open GB ROM file"
 msgstr "게임보이 롬 파일 열기"
 
-#: cmdevents.cpp:322
+#: cmdevents.cpp:325
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr "게임보이 컬러 파일 (*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 
-#: cmdevents.cpp:331
+#: cmdevents.cpp:334
 msgid "Open GBC ROM file"
 msgstr "게임보이컬러 롬 파일 열기"
 
-#: cmdevents.cpp:500 cmdevents.cpp:525
+#: cmdevents.cpp:503 cmdevents.cpp:528
 msgid "Select Dot Code file"
 msgstr "닷 코드 파일을 선택"
 
-#: cmdevents.cpp:502 cmdevents.cpp:527
+#: cmdevents.cpp:505 cmdevents.cpp:530
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr "E-리더 닷 코드 (*.bin;*.raw)|*.bin;*.raw"
 
-#: cmdevents.cpp:549 cmdevents.cpp:755
+#: cmdevents.cpp:552 cmdevents.cpp:758
 msgid "Select battery file"
 msgstr "배터리 파일을 선택"
 
-#: cmdevents.cpp:550 cmdevents.cpp:756
+#: cmdevents.cpp:553 cmdevents.cpp:759
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 
-#: cmdevents.cpp:561
+#: cmdevents.cpp:564
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:562 cmdevents.cpp:595 cmdevents.cpp:718
+#: cmdevents.cpp:565 cmdevents.cpp:598 cmdevents.cpp:721
 msgid "Confirm import"
 msgstr "가져오기 확인"
 
-#: cmdevents.cpp:569 panel.cpp:1109
+#: cmdevents.cpp:572 panel.cpp:1109
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s를 로드한 배터리"
 
-#: cmdevents.cpp:571
+#: cmdevents.cpp:574
 #, c-format
 msgid "Error loading battery %s"
 msgstr "%s 배터리 불러오기 오류"
 
-#: cmdevents.cpp:581
+#: cmdevents.cpp:584
 msgid "Select code file"
 msgstr "코드파일 선택"
 
-#: cmdevents.cpp:582
+#: cmdevents.cpp:585
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "게임 샤크 코드 파일 (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:582
+#: cmdevents.cpp:585
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr "게임 샤크 코드 파일 (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:594
+#: cmdevents.cpp:597
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr "코드 파일을 가져오면 로드된 치트가 모두 대체됩니다. 계속하겠습니까?"
 
-#: cmdevents.cpp:611
+#: cmdevents.cpp:614
 #, c-format
 msgid "Cannot open file %s"
 msgstr "%s파일을 열수 없습니다"
 
-#: cmdevents.cpp:621
+#: cmdevents.cpp:624
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "%s 코드 파일을 지원하지 않음"
 
-#: cmdevents.cpp:691
+#: cmdevents.cpp:694
 #, c-format
 msgid "Loaded code file %s"
 msgstr "%s 코드 파일을 불러옴"
 
-#: cmdevents.cpp:693
+#: cmdevents.cpp:696
 #, c-format
 msgid "Error loading code file %s"
 msgstr "%s 코드 파일 불러오기 오류"
 
-#: cmdevents.cpp:704 cmdevents.cpp:786
+#: cmdevents.cpp:707 cmdevents.cpp:789
 msgid "Select snapshot file"
 msgstr "스냅샷 파일 선택"
 
-#: cmdevents.cpp:705
+#: cmdevents.cpp:708
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr "게임 샤크 & PAC 스크린샷 (*.sps;*.xps)|*.sps;*.xps|게임 샤크 SP 스냅샷 (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:705
+#: cmdevents.cpp:708
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr "게임보이 스냅샵 (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:717
+#: cmdevents.cpp:720
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "스냅샷 파일을 가져오면 저장된 게임이 모두 지워집니다 (다음 쓰기 이후에는 영구적으로 지워집니다). 계속하겠습니까?"
 
-#: cmdevents.cpp:742
+#: cmdevents.cpp:745
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "%s 스냅샷 파일을 불러옴"
 
-#: cmdevents.cpp:744
+#: cmdevents.cpp:747
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "로드중 %s 스넵샷 파일 에러"
 
-#: cmdevents.cpp:770
+#: cmdevents.cpp:773
 #, c-format
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:772 panel.cpp:1473
+#: cmdevents.cpp:775 panel.cpp:1473
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
 
-#: cmdevents.cpp:780
+#: cmdevents.cpp:783
 msgid "EEPROM saves cannot be exported"
 msgstr "EEPROM 저장 방식은 내보낼 수 없음"
 
-#: cmdevents.cpp:787
+#: cmdevents.cpp:790
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr "게임 샤크 스냅샷 (*.sps)|*.sps"
 
-#: cmdevents.cpp:804
+#: cmdevents.cpp:807
 msgid "Exported from Visual Boy Advance-M"
 msgstr "Visual Boy Advance-M에서 내보내기"
 
-#: cmdevents.cpp:816
+#: cmdevents.cpp:819
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "%s스넵샷 저장완료 "
 
-#: cmdevents.cpp:818 cmdevents.cpp:878
+#: cmdevents.cpp:821 cmdevents.cpp:881
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "스넵샷%s저장 중 에러"
 
-#: cmdevents.cpp:834 cmdevents.cpp:932 cmdevents.cpp:1005 cmdevents.cpp:1077
-#: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:611 viewers.cpp:832
-#: viewsupt.cpp:1237
+#: cmdevents.cpp:837 cmdevents.cpp:935 cmdevents.cpp:1008 cmdevents.cpp:1080
+#: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:612 viewers.cpp:837
+#: viewsupt.cpp:1254
 msgid "Select output file"
 msgstr "출력파일 선택"
 
-#: cmdevents.cpp:835 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1238
+#: cmdevents.cpp:838 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1255
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "PNG 이미지|*.png|BMP 이미지|*.bmp"
 
-#: cmdevents.cpp:876 sys.cpp:661
+#: cmdevents.cpp:879 sys.cpp:662
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "%s 스냅샷이 기록됨"
 
-#: cmdevents.cpp:900 cmdevents.cpp:973 cmdevents.cpp:1045 cmdevents.cpp:1114
+#: cmdevents.cpp:903 cmdevents.cpp:976 cmdevents.cpp:1048 cmdevents.cpp:1117
 msgid " files ("
 msgstr "파일("
 
-#: cmdevents.cpp:1147
+#: cmdevents.cpp:1150
 msgid "Select file"
 msgstr "파일 선택"
 
-#: cmdevents.cpp:1454 cmdevents.cpp:1553
+#: cmdevents.cpp:1457 cmdevents.cpp:1556
 msgid "Select state file"
 msgstr "스테이트 파일을 선택"
 
-#: cmdevents.cpp:1455 cmdevents.cpp:1554
+#: cmdevents.cpp:1458 cmdevents.cpp:1557
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "비주얼 보이 어드밴스 저장된 게임 파일|*.sgm"
 
-#: cmdevents.cpp:1579 panel.cpp:1445
+#: cmdevents.cpp:1582 panel.cpp:1445
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
 
-#: cmdevents.cpp:1604 cmdevents.cpp:1614 cmdevents.cpp:1625
+#: cmdevents.cpp:1607 cmdevents.cpp:1617 cmdevents.cpp:1628
 #, c-format
 msgid "Current state slot #%d"
 msgstr "현재 상태 슬롯 # %d"
 
-#: cmdevents.cpp:1688
+#: cmdevents.cpp:1691
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr "게임보이 바이오스 파일이 활성화된 경우 컬러라이저 해킹을 사용할 수 없습니다."
 
-#: cmdevents.cpp:1899
+#: cmdevents.cpp:1902
 msgid "Sound enabled"
 msgstr "소리 켜기"
 
-#: cmdevents.cpp:1899
+#: cmdevents.cpp:1902
 msgid "Sound disabled"
 msgstr "소리 끄기"
 
-#: cmdevents.cpp:1975
+#: cmdevents.cpp:1978
 msgid "Run Lua script"
 msgstr ""
 
-#: cmdevents.cpp:1976
+#: cmdevents.cpp:1979
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
 msgstr ""
 
-#: cmdevents.cpp:1984
+#: cmdevents.cpp:1987
 msgid "Lua script failed to load — see console"
 msgstr ""
 
-#: cmdevents.cpp:2019
+#: cmdevents.cpp:2022
 msgid "Set to 0 for pseudo tty"
 msgstr "가상 Teletypewriter를 0으로 설정"
 
-#: cmdevents.cpp:2021
+#: cmdevents.cpp:2024
 msgid "Port to wait for connection:"
 msgstr "연결 대기용 포트:"
 
-#: cmdevents.cpp:2022
+#: cmdevents.cpp:2025
 msgid "GDB Connection"
 msgstr "GDB 연결"
 
-#: cmdevents.cpp:2074
+#: cmdevents.cpp:2077
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "%s로 연결 대기 중"
 
-#: cmdevents.cpp:2081
+#: cmdevents.cpp:2084
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "포트%d에 연결중이니 기다려주세요"
 
-#: cmdevents.cpp:2085
+#: cmdevents.cpp:2088
 msgid "Waiting for GDB..."
 msgstr "GDB 대기 중..."
 
-#: cmdevents.cpp:2452 cmdevents.cpp:2465 cmdevents.cpp:2491 cmdevents.cpp:2496
+#: cmdevents.cpp:2455 cmdevents.cpp:2468 cmdevents.cpp:2494 cmdevents.cpp:2499
 #, c-format
 msgid "Filter: %s"
 msgstr "필터:"
 
-#: cmdevents.cpp:2470 cmdevents.cpp:2487
+#: cmdevents.cpp:2473 cmdevents.cpp:2490
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr ""
 
-#: cmdevents.cpp:2507
+#: cmdevents.cpp:2510
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr ""
 
-#: cmdevents.cpp:2556
+#: cmdevents.cpp:2559
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "설정이 삭제됩니다!\n\n확실한가요?"
 
-#: cmdevents.cpp:2557
+#: cmdevents.cpp:2560
 msgid "FACTORY RESET"
 msgstr "공장 초기화"
 
-#: cmdevents.cpp:2592
+#: cmdevents.cpp:2595
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "닌텐도 게임보이 / 컬러 / 어드밴스 에뮬레이터입니다."
 
-#: cmdevents.cpp:2593
+#: cmdevents.cpp:2596
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA 개발팀\nCopyright (C) 2007-2020 VBA-M 개발팀"
 
-#: cmdevents.cpp:2595
+#: cmdevents.cpp:2598
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -362,15 +362,19 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "이 프로그램은 자유 소프트웨어이므로 재배포 및/또는 수정할 수 있습니다.\n자유 소프트웨어 재단에서 게시한 GNU 일반 공중 사용 허가서 조건에 따라\n자유 소프트웨어 재단, 라이선스 버전 2 또는 (귀하의 선택에 따라)\n이후 버전에 따라 재배포할 수 있습니다.\n\n이 프로그램은 유용하게 사용되기를 바라는 마음으로 배포되며, 어떠한 보증도 없이\n상품성 또는 특정 목적에의 적합성에 대한 묵시적 보증도 없이 배포됩니다.\n자세한 내용은 GNU 일반 공중 사용 허가서를 참조하세요.\n\n이 프로그램과 함께 GNU 일반 공중 사용 허가서 사본을 이 프로그램과 함께 받았어야 합니다.\n그렇지 않은 경우 http://www.gnu.org/licenses 을 참조하세요."
 
-#: cmdevents.cpp:2775
+#: cmdevents.cpp:2656 extra-translations.cpp:16
+msgid "Close"
+msgstr "닫기"
+
+#: cmdevents.cpp:2793
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스를 사용할 수 없습니다."
 
-#: cmdevents.cpp:2846
+#: cmdevents.cpp:2874
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "랜 링크가 이미 활성화되어 있습니다. 연결을 끊으려면 링크 모드를 비활성화합니다."
 
-#: cmdevents.cpp:2852
+#: cmdevents.cpp:2880
 msgid "Network is not supported in local mode."
 msgstr "로컬 모드에서는 네트워크가 지원되지 않음."
 
@@ -457,7 +461,7 @@ msgstr "(없음)"
 msgid "System"
 msgstr "시스템"
 
-#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2520
+#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2522
 msgid "Boot ROM"
 msgstr "부팅 ROM"
 
@@ -676,10 +680,6 @@ msgstr "아티스트"
 msgid "Cancel"
 msgstr "취소"
 
-#: extra-translations.cpp:16
-msgid "Close"
-msgstr "닫기"
-
 #: extra-translations.cpp:17
 msgid "Developers"
 msgstr "개발자"
@@ -819,35 +819,35 @@ msgstr "메인 디스플레이 패널을 찾을 수 없음"
 msgid "Invalid menu item %s; removing"
 msgstr "무효한 %s메뉴 항목 ; 제거합니다."
 
-#: guiinit.cpp:2073
+#: guiinit.cpp:2075
 msgid "JoyBus host invalid; disabling"
 msgstr "조이버스 호스트 무효; 비활성화합니다."
 
-#: guiinit.cpp:2332
+#: guiinit.cpp:2334
 msgid "Code"
 msgstr "코드"
 
-#: guiinit.cpp:2338
+#: guiinit.cpp:2340
 msgid "Description"
 msgstr "서술"
 
-#: guiinit.cpp:2391 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2393 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "주소"
 
-#: guiinit.cpp:2392
+#: guiinit.cpp:2394
 msgid "Old Value"
 msgstr "오래된 값"
 
-#: guiinit.cpp:2393
+#: guiinit.cpp:2395
 msgid "New Value"
 msgstr "새로운 값"
 
-#: guiinit.cpp:2495
+#: guiinit.cpp:2497
 msgid "Save type"
 msgstr "저장 형식"
 
-#: guiinit.cpp:2534
+#: guiinit.cpp:2536
 msgid "Game Overrides"
 msgstr "게임 오버라이드"
 
@@ -917,7 +917,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1253 panel.cpp:1274 wxvbam.cpp:1782
+#: panel.cpp:1253 panel.cpp:1274 wxvbam.cpp:1807
 msgid "Directory Error"
 msgstr "디렉터리 오류"
 
@@ -1436,347 +1436,347 @@ msgstr ""
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:9763
+#: panel.cpp:9772
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"
 
-#: panel.cpp:10517
+#: panel.cpp:10526
 msgid "Vulkan device created successfully"
 msgstr ""
 
-#: panel.cpp:10643
+#: panel.cpp:10652
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr ""
 
-#: panel.cpp:10688
+#: panel.cpp:10697
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr ""
 
-#: panel.cpp:10691
+#: panel.cpp:10700
 msgid "Vulkan instance created"
 msgstr ""
 
-#: panel.cpp:10710
+#: panel.cpp:10719
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr ""
 
-#: panel.cpp:10733
+#: panel.cpp:10742
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:10744
+#: panel.cpp:10753
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr ""
 
-#: panel.cpp:10769
+#: panel.cpp:10778
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:10779
+#: panel.cpp:10788
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr ""
 
-#: panel.cpp:10789
+#: panel.cpp:10798
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr ""
 
-#: panel.cpp:10806
+#: panel.cpp:10815
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr ""
 
-#: panel.cpp:10862
+#: panel.cpp:10871
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr ""
 
-#: panel.cpp:10871
+#: panel.cpp:10880
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr ""
 
-#: panel.cpp:10909
+#: panel.cpp:10918
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr ""
 
-#: panel.cpp:10948
+#: panel.cpp:10957
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr ""
 
-#: panel.cpp:10966
+#: panel.cpp:10975
 msgid "No supported Vulkan surface extension available"
 msgstr ""
 
-#: panel.cpp:10977
+#: panel.cpp:10986
 msgid "No Vulkan physical devices found"
 msgstr ""
 
-#: panel.cpp:11036
+#: panel.cpp:11045
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr ""
 
-#: panel.cpp:11040
+#: panel.cpp:11049
 msgid "No suitable Vulkan physical device found"
 msgstr ""
 
-#: panel.cpp:11085
+#: panel.cpp:11094
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr ""
 
-#: panel.cpp:11221
+#: panel.cpp:11230
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr ""
 
-#: panel.cpp:11261
+#: panel.cpp:11270
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr ""
 
-#: panel.cpp:11363
+#: panel.cpp:11372
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr ""
 
-#: panel.cpp:11409
+#: panel.cpp:11418
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr ""
 
-#: panel.cpp:11431
+#: panel.cpp:11440
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr ""
 
-#: panel.cpp:11454
+#: panel.cpp:11463
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr ""
 
-#: panel.cpp:11477
+#: panel.cpp:11486
 msgid "Failed to create shader modules"
 msgstr ""
 
-#: panel.cpp:11550
+#: panel.cpp:11559
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr ""
 
-#: panel.cpp:11587
+#: panel.cpp:11596
 msgid "Failed to create overlay pipeline"
 msgstr ""
 
-#: panel.cpp:11597
+#: panel.cpp:11606
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr ""
 
-#: panel.cpp:11613
+#: panel.cpp:11622
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr ""
 
-#: panel.cpp:11631
+#: panel.cpp:11640
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr ""
 
-#: panel.cpp:11651
+#: panel.cpp:11660
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr ""
 
-#: panel.cpp:11675
+#: panel.cpp:11684
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr ""
 
-#: panel.cpp:11687
+#: panel.cpp:11696
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:11695
+#: panel.cpp:11704
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:11734
+#: panel.cpp:11743
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr ""
 
-#: panel.cpp:11748
+#: panel.cpp:11757
 msgid "Failed to allocate texture memory"
 msgstr ""
 
-#: panel.cpp:11764
+#: panel.cpp:11773
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr ""
 
-#: panel.cpp:11782
+#: panel.cpp:11791
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr ""
 
-#: panel.cpp:11816
+#: panel.cpp:11825
 msgid "Failed to create staging buffer"
 msgstr ""
 
-#: panel.cpp:11831
+#: panel.cpp:11840
 msgid "Failed to allocate staging memory"
 msgstr ""
 
-#: panel.cpp:11943
+#: panel.cpp:11952
 msgid "Failed to create overlay image"
 msgstr ""
 
-#: panel.cpp:11957
+#: panel.cpp:11966
 msgid "Failed to allocate overlay image memory"
 msgstr ""
 
-#: panel.cpp:11972
+#: panel.cpp:11981
 msgid "Failed to create overlay image view"
 msgstr ""
 
-#: panel.cpp:11989
+#: panel.cpp:11998
 msgid "Failed to create overlay sampler"
 msgstr ""
 
-#: panel.cpp:12026
+#: panel.cpp:12035
 msgid "Failed to create overlay staging buffer"
 msgstr ""
 
-#: panel.cpp:12040
+#: panel.cpp:12049
 msgid "Failed to allocate overlay staging memory"
 msgstr ""
 
-#: panel.cpp:12118
+#: panel.cpp:12127
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr ""
 
-#: panel.cpp:12214
+#: panel.cpp:12223
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr ""
 
-#: panel.cpp:12561
+#: panel.cpp:12570
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr ""
 
-#: sys.cpp:253 sys.cpp:333
+#: sys.cpp:254 sys.cpp:334
 msgid "No game in progress to record"
 msgstr "진행 중인 게임이 없어 기록할 수 없습니다."
 
-#: sys.cpp:278
+#: sys.cpp:279
 #, c-format
 msgid "Cannot open output file %s"
 msgstr "출력파일 %s을 열 수 없습니다."
 
-#: sys.cpp:286 sys.cpp:308 sys.cpp:316 sys.cpp:482
+#: sys.cpp:287 sys.cpp:309 sys.cpp:317 sys.cpp:483
 msgid "Error writing game recording"
 msgstr "게임 녹화를 기록할 수 없습니다."
 
-#: sys.cpp:338
+#: sys.cpp:339
 msgid "Cannot play game recording while recording"
 msgstr "녹화중에는 게임 녹화를 재생할 수 없습니다."
 
-#: sys.cpp:356
+#: sys.cpp:357
 #, c-format
 msgid "Cannot open recording file %s"
 msgstr "녹화 파일 %s 을 열 수 없습니다."
 
-#: sys.cpp:365 sys.cpp:375
+#: sys.cpp:366 sys.cpp:376
 msgid "Error reading game recording"
 msgstr "게임 녹화를 읽을 수 없습니다."
 
-#: sys.cpp:497 sys.cpp:516
+#: sys.cpp:498 sys.cpp:517
 msgid "Playback ended"
 msgstr "재생 종료."
 
-#: sys.cpp:540
+#: sys.cpp:541
 #, c-format
 msgid "%d %% (%d, %d fps)"
 msgstr "%d %% (%d, %d fps)"
 
-#: sys.cpp:1002 xrc/GBPrinter.xrc:65
+#: sys.cpp:1003 xrc/GBPrinter.xrc:65
 msgid "&Discard"
 msgstr "버리기(&D)"
 
-#: sys.cpp:1036
+#: sys.cpp:1037
 msgid "Image files (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 msgstr "이미지 파일 (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|"
 
-#: sys.cpp:1045
+#: sys.cpp:1046
 msgid "Save printer image to"
 msgstr "프린터 이미지 저장 : "
 
-#: sys.cpp:1062 sys.cpp:1246
+#: sys.cpp:1063 sys.cpp:1247
 #, c-format
 msgid "Wrote printer output to %s"
 msgstr "프린터 출력을 %s에 작성했습니다."
 
-#: sys.cpp:1067 sys.cpp:1138
+#: sys.cpp:1068 sys.cpp:1139
 msgid "&Close"
 msgstr "닫기(&C)"
 
-#: sys.cpp:1133
+#: sys.cpp:1134
 msgid "Printed"
 msgstr "출력됨"
 
-#: sys.cpp:1419
+#: sys.cpp:1420
 #, c-format
 msgid "Error opening pseudo tty: %s"
 msgstr "가상 tty %s를 열 수 없습니다."
 
-#: sys.cpp:1513
+#: sys.cpp:1514
 #, c-format
 msgid "Invalid GDB server port %d"
 msgstr ""
 
-#: sys.cpp:1526
+#: sys.cpp:1527
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
 msgstr ""
 
-#: viewers.cpp:609
+#: viewers.cpp:610
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
 msgstr "텍스트 파일 (*.txt;*.log)|*.txt;*.log|"
 
-#: viewers.cpp:755 viewers.cpp:830
+#: viewers.cpp:756 viewers.cpp:835
 msgid "Memory dumps (*.dmp;*.bin)|*.dmp;*.bin|"
 msgstr "메모리 덤프 (*.dmp;*.bin)|*.dmp;*.bin|"
 
-#: viewers.cpp:757
+#: viewers.cpp:758
 msgid "Select memory dump file"
 msgstr "메모리 덤프 파일을 선택"
 
-#: viewsupt.cpp:827
+#: viewsupt.cpp:844
 msgid "Red:"
 msgstr "빨강:"
 
-#: viewsupt.cpp:836
+#: viewsupt.cpp:853
 msgid "Green:"
 msgstr "초록:"
 
-#: viewsupt.cpp:845
+#: viewsupt.cpp:862
 msgid "Blue:"
 msgstr "파랑:"
 
-#: viewsupt.h:63
+#: viewsupt.h:73
 #, c-format
 msgid "Unable to load dialog %s from resources"
 msgstr "리소스로부터 대화 %s을 불러올 수 없습니다."
@@ -1854,7 +1854,7 @@ msgid ""
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:1389
+#: wxvbam.cpp:1394
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1862,21 +1862,21 @@ msgid ""
 "\n"
 msgstr "사용자 인터페이스에서 설정이 변경되면, 명령 줄에서 선택된 옵션이 저장됩니다. \n\n플래그 옵션에서, true와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:1397
+#: wxvbam.cpp:1410
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
-#: wxvbam.cpp:1409
+#: wxvbam.cpp:1428
 msgid "Configuration file not found."
 msgstr "설정 파일을 찾을 수 없습니다."
 
-#: wxvbam.cpp:1440
+#: wxvbam.cpp:1463
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
-#: wxvbam.cpp:1781
+#: wxvbam.cpp:1806
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1885,7 +1885,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: wxvbam.cpp:2046
+#: wxvbam.cpp:2071
 msgid "Failed to load dialog"
 msgstr ""
 
@@ -2931,99 +2931,100 @@ msgstr ""
 msgid "XAudio2: Exception during device enumeration"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:787
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1075
 msgid "Error, link already connected"
 msgstr "오류, 링크가 이미 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:801
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1089
 msgid "Unable to find link driver"
 msgstr "링크 드라이버를 찾을 수 없음"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:840
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1128
 msgid "Link connection does not need updates."
 msgstr "링크 연결에 업데이트가 필요하지 않습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1031
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1797
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3194
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1319
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2098
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3519
 #, c-format
 msgid "Player %d disconnected."
 msgstr "플레이어 %d의 연결이 끊어졌습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1078
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1366
 msgid "Player 2 disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1130
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1139
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1148
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1181
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1237
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1246
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1911
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1418
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1427
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1436
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1469
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1525
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1534
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2212
 msgid "Server disconnected."
 msgstr "서버 연결이 끊어졌습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1348
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1379
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1937
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1969
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1636
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1667
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2238
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2270
 msgid "Network error."
 msgstr "네트워크 오류입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1356
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1945
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1644
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2246
 #, c-format
 msgid "Player %d connected"
 msgstr "플레이어 %d 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1370
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1959
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1658
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2260
 msgid "All players connected"
 msgstr "모든 플레이어 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1391
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1981
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1679
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2282
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "#%d으로 연결됨, %d 플레이어 참여 대기 중"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1400
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1990
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1688
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2291
 msgid "All players joined."
 msgstr "모든 플레이어가 참여했습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1905
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2206
 msgid "Server timed out."
 msgstr "서버 시간이 초과되었습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2861
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2885
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3162
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3178
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3195
 msgid "Error creating file mapping"
 msgstr "파일 매핑 생성 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2872
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3173
 msgid "Error mapping file"
 msgstr "매핑 파일 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2954
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3272
 msgid "5 or more GBAs not supported."
 msgstr "5개 이상의 GBA는 지원되지 않습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2974
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2999
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3298
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3323
 msgid "Error opening event"
 msgstr "이벤트 열기 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3110
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3435
 msgid "Lost link; reinitialize to reconnect"
 msgstr "링크가 끊어짐; 다시 연결하려면 다시 초기화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3117
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3442
 msgid "Lost link; reconnected"
 msgstr "링크가 끊어짐; 다시 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3242
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3567
 msgid "Unknown slave timed out; resetting comm"
 msgstr "알 수 없는 슬레이브 시간 초과; 통신 재설정"
 
