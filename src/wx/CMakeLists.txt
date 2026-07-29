@@ -757,6 +757,16 @@ if(ENABLE_LUA)
     endif()
 endif()
 
+# The Languages menu is described by three separate lists keyed by the same XRC
+# ids (menu items, command handlers, radio state). Nothing in the compile catches
+# a mismatch -- it just applies a language other than the one clicked -- so check
+# them against each other. Source-only, so it also runs when cross-compiling.
+if(BUILD_TESTING)
+    add_test(NAME wx.language-menu
+             COMMAND ${CMAKE_COMMAND} -D "SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
+                     -P ${CMAKE_CURRENT_SOURCE_DIR}/check-language-menu.cmake)
+endif()
+
 # Setting an SDL audio device by name segfaults on FreeBSD.
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     target_compile_definitions(visualboyadvance-m PRIVATE ONLY_DEFAULT_AUDIO_DEVICE)
