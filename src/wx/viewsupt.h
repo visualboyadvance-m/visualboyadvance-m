@@ -31,7 +31,7 @@ public:
     virtual ~Viewer()
     {
     }
-    virtual void Update() = 0;
+    virtual void Update() wxOVERRIDE = 0;
     bool auto_update;
 
     // A lot of viewers have GUI elements to set parameters.  Almost all
