@@ -238,14 +238,28 @@ if(ANDROID)
     endif()
 
     # Drop the bogus `-lQt5*` entries; Qt6 is linked via imported targets below.
+    #
+    # Some wx builds also emit a bare `-` in ldlibs_core (a dependency whose
+    # own --libs query came back empty leaves the dash of its flag behind; the
+    # armeabi-v7a wxwidgets vcpkg port does this). clang reads a lone `-` as
+    # "read from stdin" and dies with "-E or -x required when input is from
+    # standard input", which breaks every try_compile() that inherits
+    # CMAKE_REQUIRED_LIBRARIES -- including the check_cxx_source_compiles() in
+    # Qt's FindGLESv2, making find_package(Qt6 COMPONENTS Gui) fail. Drop any
+    # token that is not a usable link item.
     separate_arguments(_wx_libs_list NATIVE_COMMAND "${_wx_libs}")
     unset(wxWidgets_LIBRARIES)
     foreach(_arg IN LISTS _wx_libs_list)
         if(_arg MATCHES "^-lQt[0-9]")
             continue()
         endif()
+        string(STRIP "${_arg}" _arg_stripped)
+        if(_arg_stripped STREQUAL "" OR _arg_stripped STREQUAL "-")
+            continue()
+        endif()
         list(APPEND wxWidgets_LIBRARIES "${_arg}")
     endforeach()
+    unset(_arg_stripped)
 
     set(wxWidgets_FOUND TRUE)
     set(ENABLE_OPENGL FALSE)
