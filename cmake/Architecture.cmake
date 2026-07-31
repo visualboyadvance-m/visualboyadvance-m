@@ -31,6 +31,10 @@ if(VCPKG_TARGET_TRIPLET MATCHES "^[aA][rR][mM]64")
     set(CMAKE_SYSTEM_PROCESSOR ARM64)
 elseif(VCPKG_TARGET_TRIPLET MATCHES "^[aA][rR][mM]-")
     set(CMAKE_SYSTEM_PROCESSOR ARM)
+elseif(VCPKG_TARGET_TRIPLET MATCHES "^[rR][iI][sS][cC][vV]64")
+    set(CMAKE_SYSTEM_PROCESSOR riscv64)
+elseif(VCPKG_TARGET_TRIPLET MATCHES "^[rR][iI][sS][cC][vV]32")
+    set(CMAKE_SYSTEM_PROCESSOR riscv32)
 endif()
 
 if(APPLE AND
@@ -72,6 +76,22 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
     endif()
 
     if(NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
+        set(CMAKE_CROSSCOMPILING TRUE)
+    endif()
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[rR][iI][sS][cC][vV]")
+    # No asm or SIMD paths here; these just give the rest of the build a name
+    # and a bitness for the target (release archive names, machine checks).
+    if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
+        set(RISCV32 ON)
+        set(RISCV ON)
+        set(ARCH_NAME riscv32)
+    elseif(CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
+        set(RISCV64 ON)
+        set(RISCV ON)
+        set(ARCH_NAME riscv64)
+    endif()
+
+    if(NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[rR][iI][sS][cC][vV]")
         set(CMAKE_CROSSCOMPILING TRUE)
     endif()
 endif()

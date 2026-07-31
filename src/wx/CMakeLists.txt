@@ -247,19 +247,61 @@ if(ANDROID)
     # CMAKE_REQUIRED_LIBRARIES -- including the check_cxx_source_compiles() in
     # Qt's FindGLESv2, making find_package(Qt6 COMPONENTS Gui) fail. Drop any
     # token that is not a usable link item.
+    #
+    # wx-config also bakes in the absolute path of the NDK sysroot libc.so it
+    # was configured against, which is a per-API-level stub directory (the
+    # vcpkg wxwidgets ports here recorded .../<triple>/28/libc.so). Linking
+    # that stub while targeting a newer ANDROID_PLATFORM hides everything
+    # bionic added since: on armeabi-v7a the API 28 stub has no
+    # __tls_get_addr, so any dynamic-TLS reference -- e.g. the thread_local
+    # singleton in src/components/filters_scalefx/scalefx_manager.cpp -- fails
+    # to link. The clang driver already links libc from the correct
+    # per-API-level directory, so drop the pinned copy.
+    #
+    # Finally, some ports record an absolute library path that does not exist:
+    # the riscv64-android wxwidgets port writes nanosvg into ldlibs_core with a
+    # stray `l` glued to the file name, `${prefix}/lib/llibnanosvg.a` for
+    # `${prefix}/lib/libnanosvg.a`, left over from wx prefixing `-l` to an
+    # already absolute path. CMake treats an absolute link item as a file
+    # dependency, so ninja aborts with "missing and no known rule to make it"
+    # in every try_compile() that inherits CMAKE_REQUIRED_LIBRARIES -- again
+    # taking out FindGLESv2 and with it find_package(Qt6 COMPONENTS Gui).
+    # Repair the name when the de-`l`-ed path is a real library, otherwise drop
+    # the item with a warning instead of poisoning every link line.
     separate_arguments(_wx_libs_list NATIVE_COMMAND "${_wx_libs}")
     unset(wxWidgets_LIBRARIES)
     foreach(_arg IN LISTS _wx_libs_list)
         if(_arg MATCHES "^-lQt[0-9]")
             continue()
         endif()
+        if(_arg MATCHES "/sysroot/usr/lib/[^/]+/[0-9]+/libc\\.so$")
+            continue()
+        endif()
         string(STRIP "${_arg}" _arg_stripped)
         if(_arg_stripped STREQUAL "" OR _arg_stripped STREQUAL "-")
             continue()
         endif()
+        if(_arg MATCHES "^/.*\\.(a|so)$" AND NOT EXISTS "${_arg}")
+            get_filename_component(_wx_lib_dir  "${_arg}" DIRECTORY)
+            get_filename_component(_wx_lib_name "${_arg}" NAME)
+            set(_wx_lib_fixed "")
+            if(_wx_lib_name MATCHES "^l(lib.+)$")
+                set(_wx_lib_fixed "${_wx_lib_dir}/${CMAKE_MATCH_1}")
+            endif()
+            if(_wx_lib_fixed AND EXISTS "${_wx_lib_fixed}")
+                message(STATUS "wx-config: repairing link item ${_arg} -> ${_wx_lib_fixed}")
+                set(_arg "${_wx_lib_fixed}")
+            else()
+                message(WARNING "wx-config: dropping nonexistent link item ${_arg}")
+                continue()
+            endif()
+        endif()
         list(APPEND wxWidgets_LIBRARIES "${_arg}")
     endforeach()
     unset(_arg_stripped)
+    unset(_wx_lib_dir)
+    unset(_wx_lib_name)
+    unset(_wx_lib_fixed)
 
     set(wxWidgets_FOUND TRUE)
     set(ENABLE_OPENGL FALSE)
