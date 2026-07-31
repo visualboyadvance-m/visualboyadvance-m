@@ -45,7 +45,7 @@ endif()
 
 option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
 
-if (VCPKG_TARGET_TRIPLET STREQUAL arm64-android OR VCPKG_TARGET_TRIPLET STREQUAL arm-android OR VCPKG_TARGET_TRIPLET STREQUAL i686-android OR VCPKG_TARGET_TRIPLET STREQUAL x86_64-android OR VCPKG_TARGET_TRIPLET STREQUAL riscv64-android)
+if (VCPKG_TARGET_TRIPLET STREQUAL arm64-android OR VCPKG_TARGET_TRIPLET STREQUAL arm-android OR VCPKG_TARGET_TRIPLET STREQUAL x86-android OR VCPKG_TARGET_TRIPLET STREQUAL x64-android OR VCPKG_TARGET_TRIPLET STREQUAL riscv64-android)
     set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl qtbase qttools wxwidgets nanosvg)
 else()
     set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl wxwidgets nanosvg)
