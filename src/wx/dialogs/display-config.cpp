@@ -762,7 +762,14 @@ void DisplayConfig::InitBasicTab() {
             // choice, not a missing capability, so a "no effect" warning would be
             // noise.
             hdr_check->Hide();
-#if defined(__WXMSW__) && defined(WINXP)
+#if defined(__ANDROID__)
+            // Android has no HDR support in the port yet: the startup probe has
+            // no Android branch, so HDR always reads as unavailable regardless
+            // of what the device's display can actually do. Suppress the "no
+            // effect" warning until real support lands -- it would show on every
+            // device, including HDR-capable ones, with nothing to act on.
+            hdr_warning->Hide();
+#elif defined(__WXMSW__) && defined(WINXP)
             // The 32-bit XP-compat build has no HDR-capable renderer (no
             // D3D11/D3D12/Vulkan) and cannot probe the display's HDR state (the
             // DXGI 1.6 / DisplayConfig advanced-color APIs are absent from the
