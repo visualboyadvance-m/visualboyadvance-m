@@ -74,6 +74,14 @@ Socket::Status TcpListener::listen(unsigned short port, IpAddress address)
     if (address == IpAddress::Broadcast)
         return Status::Error;
 
+#ifndef _WIN32
+    // Allow rebinding the port while connections from a previous session
+    // linger in TIME_WAIT; without this, closing and reopening a listener
+    // on the same port fails with EADDRINUSE on BSD/macOS.
+    int reuse = 1;
+    setsockopt(getNativeHandle(), SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&reuse), sizeof(reuse));
+#endif
+
     // Bind the socket to the specified port
     sockaddr_in addr = SocketImpl::createAddress(address.toInteger(), port);
     if (bind(getNativeHandle(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1)

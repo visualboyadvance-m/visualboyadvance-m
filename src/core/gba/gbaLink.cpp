@@ -16,8 +16,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <semaphore.h>
+#include <sys/file.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 
 #if defined(__ANDROID__)
 // Bionic has no POSIX shared memory at all (there is no shm_open()/
@@ -27,13 +30,11 @@
 // The Android IPC backend further down replaces both with a file-backed
 // shared mapping holding process-shared unnamed semaphores.
 #include <limits.h>
-#include <sys/file.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #endif  // defined(__ANDROID__)
 
 #endif  // defined(_WIN32)
 
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -75,9 +76,13 @@ const char* MakeInstanceFilename(const char* Input)
         free(result);
     }
 
-    result = (char*)malloc(strlen(Input) + 4);
-    char* p = strrchr((char*)Input, '.');
-    snprintf(result, strlen(Input) + 3, "%.*s-%d.%s", (int)(p - Input), Input, vbaid + 1, p + 1);
+    const size_t len = strlen(Input) + 16;
+    result = (char*)malloc(len);
+    const char* p = strrchr(Input, '.');
+    if (p != NULL)
+        snprintf(result, len, "%.*s-%d.%s", (int)(p - Input), Input, vbaid + 1, p + 1);
+    else
+        snprintf(result, len, "%s-%d", Input, vbaid + 1);
     return result;
 }
 
@@ -109,11 +114,12 @@ uint16_t IP_LINK_PORT = 5738;
 
 std::string IP_LINK_BIND_ADDRESS = "*";
 
-// Directory holding the backing file for the IPC (same-machine) link.
-// Only consulted on Android, where there is no POSIX shared memory to name;
-// see AndroidLinkShmPath(). A frontend that knows a better location (an
-// Android app's own cache dir, say) can set this before InitLink(); when it
-// is empty a location is derived automatically.
+// Directory holding the on-disk files backing the IPC (same-machine) link:
+// the whole shared mapping on Android (see AndroidLinkShmPath()) and the
+// flock(2) liveness/init lock files on other POSIX systems (see
+// LinkLockFilePath()). A frontend that knows a better location (an Android
+// app's own cache dir, say) can set this before InitLink(); when it is
+// empty a location is derived automatically.
 std::string LOCAL_LINK_DIR;
 
 // The byte a peer sends to announce it is leaving. inbuffer/outbuffer are
@@ -165,7 +171,7 @@ static void ResetEvent(sem_t* s)
 #define vbam_link_sem_timedwait   sem_timedwait
 #endif
 
-int WaitForSingleObject(sem_t* s, int t)
+static int WaitForSingleObject(sem_t* s, int t)
 {
     if (t <= 0)
         return sem_trywait(s) ? WAIT_TIMEOUT : 0;
@@ -185,88 +191,28 @@ int WaitForSingleObject(sem_t* s, int t)
     return WAIT_TIMEOUT;
 }
 
-// urg.. MacOSX has no sem_timedwait (POSIX) or semtimedop (SYSV)
-// so we'll have to simulate it..
-// MacOSX also has no clock_gettime, and since both are "real-time", assume
-// anyone who doesn't have one also doesn't have the other
-
-// 2 ways to do this:
-//   - poll & sleep loop
-//   - poll & wait for timer interrupt loop
-
-// the first consumes more CPU and requires selection of a good sleep value
-
-// the second may interfere with other timers running on system, and
-// requires that a dummy signal handler be installed for SIGALRM
 #else
-#include <sys/time.h>
-#ifndef TIMEDWAIT_ALRM
-#define TIMEDWAIT_ALRM 1
-#endif
-#if TIMEDWAIT_ALRM
-#include <signal.h>
-static void alrmhand(int sig)
+// macOS has no sem_timedwait(); emulate it with the same bounded
+// sem_trywait + short-sleep poll LinkMemLock uses below. The previous
+// emulation parked in sem_wait() with a SIGALRM/setitimer interrupt,
+// which swapped a process-global signal handler and ITIMER_REAL on
+// every call -- unsafe with threads (the signal can be delivered to a
+// thread that is not in sem_wait(), leaving this one parked past its
+// deadline) and hostile to any other itimer user in the process.
+static int WaitForSingleObject(sem_t* s, int t)
 {
-    (void)sig;
-}
-#endif
-int WaitForSingleObject(sem_t* s, int t)
-{
-    // A zero timeout with the itimer scheme below would disarm the timer
-    // and block forever; poll instead.
+    if (sem_trywait(s) == 0)
+        return 0;
     if (t <= 0)
-        return sem_trywait(s) ? WAIT_TIMEOUT : 0;
+        return WAIT_TIMEOUT;
 
-#if !TIMEDWAIT_ALRM
-    struct timeval ts;
-    gettimeofday(&ts, NULL);
-    ts.tv_sec += t / 1000;
-    ts.tv_usec += (t % 1000) * 1000;
-#else
-    struct sigaction sa, osa;
-    sigaction(SIGALRM, NULL, &osa);
-    sa = osa;
-    sa.sa_flags &= ~SA_RESTART;
-    sa.sa_handler = alrmhand;
-    sigaction(SIGALRM, &sa, NULL);
-    struct itimerval tv, otv;
-    tv.it_value.tv_sec = t / 1000;
-    tv.it_value.tv_usec = (t % 1000) * 1000;
-    // this should be 0/0, but in the wait loop, it's possible to
-    // have the signal fire while not in sem_wait().  This will ensure
-    // another signal within 1ms
-    tv.it_interval.tv_sec = 0;
-    tv.it_interval.tv_usec = 999;
-    setitimer(ITIMER_REAL, &tv, &otv);
-#endif
-    while (1) {
-#if !TIMEDWAIT_ALRM
-        if (!sem_trywait(s))
+    const uint32_t start = GetTickCount();
+    do {
+        struct timespec ts = { 0, 200000 }; // 0.2 ms, as in LinkMemLock
+        nanosleep(&ts, NULL);
+        if (sem_trywait(s) == 0)
             return 0;
-        struct timeval ts2;
-        gettimeofday(&ts2, NULL);
-        if (ts2.tv_sec > ts.tv_sec || (ts2.tv_sec == ts.tv_sec && ts2.tv_usec > ts.tv_usec)) {
-            return WAIT_TIMEOUT;
-        }
-        // is .1 ms short enough?  long enough?  who knows?
-        struct timespec ts3;
-        ts3.tv_sec = 0;
-        ts3.tv_nsec = 100000;
-        nanosleep(&ts3, NULL);
-#else
-        if (!sem_wait(s)) {
-            setitimer(ITIMER_REAL, &otv, NULL);
-            sigaction(SIGALRM, &osa, NULL);
-            return 0;
-        }
-        getitimer(ITIMER_REAL, &tv);
-        if (tv.it_value.tv_sec || tv.it_value.tv_usec > 999)
-            continue;
-        setitimer(ITIMER_REAL, &otv, NULL);
-        sigaction(SIGALRM, &osa, NULL);
-        break;
-#endif
-    }
+    } while ((int)(GetTickCount() - start) < t);
     return WAIT_TIMEOUT;
 }
 #endif
@@ -470,9 +416,10 @@ typedef struct {
     sf::TcpListener tcplistener;
     uint16_t numslaves;
     int connectedSlaves;
-    int type;
     bool server;
-    bool speed; //speedhack
+    // speedhack toggle from EnableSpeedHacks(); currently write-only, kept
+    // because it is part of the public link configuration surface.
+    bool speed;
 } LANLINKDATA;
 
 class CableServer {
@@ -492,7 +439,7 @@ public:
     int gb_pending;
     CableServer(void);
     void Send(void);
-    void Recv(void);
+    bool Recv(void);
     void SendGB(void);
     bool RecvGB(int timeout_ms);
     bool ExchangeGB(uint8_t b, int timeout_ms);
@@ -515,7 +462,7 @@ public:
     int gb_pending;
     CableClient(void);
     void Send(void);
-    void Recv(void);
+    bool Recv(void);
     void SendGB(void);
     bool RecvGB(int timeout_ms);
     bool ExchangeGB(uint8_t b, int timeout_ms);
@@ -567,12 +514,6 @@ static HANDLE mmf = NULL;
 #else
 [[maybe_unused]] static int mmf = -1;
 #endif
-[[maybe_unused]] static char linkevent[] =
-#if !(defined __WIN32__ || defined _WIN32)
-    "/"
-#endif
-    "VBA link event  ";
-
 // Interprocess lock guarding *structural* mutations of the shared linkmem
 // metadata: slot allocation in InitIPC, the linkflags/numgbas connection
 // topology, numtransfers/trgbas bookkeeping, and disconnect cleanup. It is
@@ -586,11 +527,111 @@ static HANDLE linkmem_lock = NULL;
 #else
 static sem_t* linkmem_lock = SEM_FAILED;
 #endif
-[[maybe_unused]] static char linklockname[] =
-#if !(defined __WIN32__ || defined _WIN32)
-    "/"
+
+// ---------------------------------------------------------------------------
+// Names of the shared IPC objects.
+//
+// VBAM_LINK_NAMESPACE (sanitized to [A-Za-z0-9_-], at most 10 chars) lets a
+// test harness or CI job run link sessions isolated from a real emulator on
+// the same machine. With it unset, every name is byte-identical to the
+// historical ones. Longest macOS-visible name is "/VBA link event <sfx>N" =
+// 17 + 10 chars, under the 31-char macOS shm/sem name limit.
+static const std::string& LinkNamespaceSuffix()
+{
+    static const std::string suffix = [] {
+        std::string s;
+        if (const char* env = getenv("VBAM_LINK_NAMESPACE")) {
+            for (const char* p = env; *p && s.size() < 10; p++)
+                if (isalnum((unsigned char)*p) || *p == '_' || *p == '-')
+                    s += *p;
+        }
+        return s;
+    }();
+    return suffix;
+}
+
+#if (defined __WIN32__ || defined _WIN32)
+#define LINK_NAME_PREFIX ""
+#else
+#define LINK_NAME_PREFIX "/"
 #endif
-    "VBA link lock";
+
+static std::string LinkShmName()
+{
+    return LINK_NAME_PREFIX LOCAL_LINK_NAME + LinkNamespaceSuffix();
+}
+
+static std::string LinkSemName(int i)
+{
+    return LINK_NAME_PREFIX "VBA link event " + LinkNamespaceSuffix() + (char)('1' + i);
+}
+
+static std::string LinkLockSemName()
+{
+    return LINK_NAME_PREFIX "VBA link lock" + LinkNamespaceSuffix();
+}
+
+#if !(defined __WIN32__ || defined _WIN32) && !defined(__ANDROID__)
+// The POSIX backend pairs the named objects above with two flock(2)-based
+// lock files (never unlinked -- unlink+recreate would split the lock across
+// two inodes and let two probes both "succeed"):
+//  - ".init" is held exclusively for the whole of InitIPC's role selection
+//    and CloseIPC's last-one-out probe, so a joiner can never observe a
+//    half-initialized segment or race the creator for slot 0.
+//  - ".flock" is held shared by every attached instance for its whole
+//    session. flock locks die with their process (even on SIGKILL), so a
+//    LOCK_EX|LOCK_NB probe succeeding proves any existing shm/semaphores
+//    are a crashed run's leftovers: sweep them and recreate instead of
+//    joining a corpse (macOS shm objects otherwise persist until reboot).
+//    The Android backend below already works this way.
+// They live in a world-writable directory because the POSIX shm/sem
+// namespace is system-global: a per-user $TMPDIR would let two users'
+// probes disagree about one global object.
+static int link_liveness_fd = -1;
+
+static std::string LinkLockFilePath(const char* which)
+{
+    std::string dir = LOCAL_LINK_DIR;
+    if (dir.empty())
+        if (const char* env = getenv("VBAM_LINK_DIR"))
+            dir = env;
+    if (dir.empty())
+        dir = "/tmp";
+    return dir + "/vbam-link" + LinkNamespaceSuffix() + which;
+}
+
+// RAII holder of the exclusive ".init" lock.
+class LinkInitLock {
+public:
+    explicit LinkInitLock(const std::string& path)
+    {
+        fd_ = open(path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0666);
+        if (fd_ >= 0) {
+            fchmod(fd_, 0666); // umask-proof; any user may take the lock
+            int r;
+            do {
+                r = flock(fd_, LOCK_EX);
+            } while (r != 0 && errno == EINTR);
+            held_ = (r == 0);
+        }
+    }
+    ~LinkInitLock()
+    {
+        if (fd_ >= 0) {
+            if (held_)
+                flock(fd_, LOCK_UN);
+            close(fd_);
+        }
+    }
+    bool held() const { return held_; }
+    LinkInitLock(const LinkInitLock&) = delete;
+    LinkInitLock& operator=(const LinkInitLock&) = delete;
+
+private:
+    int fd_ = -1;
+    bool held_ = false;
+};
+#endif  // POSIX non-Android
 
 #if defined(__ANDROID__)
 // ---------------------------------------------------------------------------
@@ -967,6 +1008,9 @@ bool GetLinkServerHost(char* const host, size_t size)
 #endif
     }
 
+    // strncpy does not NUL-terminate a source exactly `size` bytes long.
+    host[size - 1] = '\0';
+
     return true;
 }
 
@@ -1239,6 +1283,78 @@ void CloseLink(void)
     return;
 }
 
+// ---------------------------------------------------------------------------
+// Socket I/O discipline.
+//
+// The connect handshake runs fully non-blocking (it is polled from a modal
+// UI dialog every 50 ms and must never stall a tick). Once a connection is
+// established the sockets run *blocking*: an SFML blocking send() loops
+// internally until everything is written (Partial is unreachable), and every
+// receive below is guarded by a selector wait with a bounded budget so a
+// stalled peer can cost the emulator thread at most ~50 ms per call.
+
+// The canonical goodbye frame: 4 bytes, length + marker, zero padding. Sent
+// in both directions with no reply round-trip -- a dying or dead peer can't
+// be counted on to answer, and waiting for one used to block the emulator.
+static void SendGoodbye(sf::TcpSocket& sock)
+{
+    char goodbye[4] = { 4, (char)kLinkGoodbyeByte, 0, 0 };
+    (void)sock.send(goodbye, sizeof(goodbye));
+}
+
+// A failed send is the only way an idle endpoint notices a vanished peer
+// (there may be nothing to receive for a long time); flag the close here.
+static bool CheckSendResult(sf::Socket::Status st)
+{
+    if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error) {
+        RequestLinkClose();
+        return false;
+    }
+    return true;
+}
+
+enum class RecvResult { Ok, Timeout, Dropped };
+
+// Read exactly len bytes, spending at most budget_ms measured from the
+// caller's budget clock (shared across several reads of one frame set).
+static RecvResult ReceiveExact(sf::TcpSocket& sock, sf::SocketSelector& sel,
+    char* buf, size_t len, sf::Clock& budget, int budget_ms)
+{
+    size_t got = 0;
+    while (got < len) {
+        const int remaining = budget_ms - (int)budget.getElapsedTime().asMilliseconds();
+        if (remaining <= 0)
+            return RecvResult::Timeout;
+        sel.clear();
+        sel.add(sock);
+        if (!sel.wait(sf::milliseconds(remaining)))
+            continue; // re-checks the budget above
+        size_t nr = 0;
+        sf::Socket::Status st = sock.receive(buf + got, len - got, nr);
+        if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error)
+            return RecvResult::Dropped;
+        // NotReady is only defensive here: established sockets are blocking.
+        got += nr;
+    }
+    return RecvResult::Ok;
+}
+
+// Client-side connect handshake state (see InitSocket/ConnectUpdateSocket).
+static sf::Clock connect_clock;
+static bool client_handshake_connected = false;
+static bool connect_attempt_failed = false;
+static int32_t last_connect_attempt_ms = 0;
+// How long the client keeps trying to reach the server. Deliberately much
+// longer than linktimeout (which paces in-game transfers): the user is
+// watching a cancellable progress dialog and may have started the client
+// before the server.
+static const int kConnectTimeoutMs = 30000;
+static const int kConnectRetryMs = 500;
+
+// Accumulated missed-frame time in UpdateCableSocket; once it exceeds
+// linktimeout the link is declared dead.
+static int missed_recv_ms = 0;
+
 // Server
 CableServer::CableServer(void)
 {
@@ -1247,133 +1363,135 @@ CableServer::CableServer(void)
     intoutbuffer = (int32_t*)outbuffer;
     uint16_toutbuffer = (uint16_t*)outbuffer;
     gb_pending = 0;
+    // Never let uninitialized stack/heap bytes reach the wire.
+    memset(inbuffer, 0, sizeof(inbuffer));
+    memset(outbuffer, 0, sizeof(outbuffer));
 }
 
 void CableServer::Send(void)
 {
-    if (lanlink.type == 0) { // TCP
-        outbuffer[1] = tspeed;
-        WRITE16LE(&uint16_toutbuffer[1], cable_data[0]);
-        WRITE32LE(&intoutbuffer[1], transfer_start_time_from_master);
+    outbuffer[1] = tspeed;
+    WRITE16LE(&uint16_toutbuffer[1], cable_data[0]);
+    WRITE32LE(&intoutbuffer[1], transfer_start_time_from_master);
 
-        if (lanlink.numslaves == 1) {
-            if (lanlink.type == 0) {
-                outbuffer[0] = 8;
-                (void)tcpsocket[1].send(outbuffer, 8);
-            }
-        } else if (lanlink.numslaves == 2) {
-            WRITE16LE(&uint16_toutbuffer[4], cable_data[2]);
-            if (lanlink.type == 0) {
-                outbuffer[0] = 10;
-                (void)tcpsocket[1].send(outbuffer, 10);
-                WRITE16LE(&uint16_toutbuffer[4], cable_data[1]);
-                (void)tcpsocket[2].send(outbuffer, 10);
-            }
-        } else {
-            if (lanlink.type == 0) {
-                outbuffer[0] = 12;
-                WRITE16LE(&uint16_toutbuffer[4], cable_data[2]);
-                WRITE16LE(&uint16_toutbuffer[5], cable_data[3]);
-                (void)tcpsocket[1].send(outbuffer, 12);
-                WRITE16LE(&uint16_toutbuffer[4], cable_data[1]);
-                (void)tcpsocket[2].send(outbuffer, 12);
-                WRITE16LE(&uint16_toutbuffer[5], cable_data[2]);
-                (void)tcpsocket[3].send(outbuffer, 12);
-            }
-        }
+    if (lanlink.numslaves == 1) {
+        outbuffer[0] = 8;
+        CheckSendResult(tcpsocket[1].send(outbuffer, 8));
+    } else if (lanlink.numslaves == 2) {
+        outbuffer[0] = 10;
+        WRITE16LE(&uint16_toutbuffer[4], cable_data[2]);
+        CheckSendResult(tcpsocket[1].send(outbuffer, 10));
+        WRITE16LE(&uint16_toutbuffer[4], cable_data[1]);
+        CheckSendResult(tcpsocket[2].send(outbuffer, 10));
+    } else {
+        outbuffer[0] = 12;
+        WRITE16LE(&uint16_toutbuffer[4], cable_data[2]);
+        WRITE16LE(&uint16_toutbuffer[5], cable_data[3]);
+        CheckSendResult(tcpsocket[1].send(outbuffer, 12));
+        WRITE16LE(&uint16_toutbuffer[4], cable_data[1]);
+        CheckSendResult(tcpsocket[2].send(outbuffer, 12));
+        WRITE16LE(&uint16_toutbuffer[5], cable_data[2]);
+        CheckSendResult(tcpsocket[3].send(outbuffer, 12));
     }
-    return;
 }
 
-// Receive data from all slaves to master
-void CableServer::Recv(void)
+// Receive data from all slaves to master. Returns true only when every
+// slave's frame arrived intact this call; on a timeout the caller retries
+// on its next update tick (the stream is still frame-aligned then).
+bool CableServer::Recv(void)
 {
-    int numbytes;
-    if (lanlink.type == 0) { // TCP
-        fdset.clear();
+    fdset.clear();
 
-        for (int i = 0; i < lanlink.numslaves; i++)
-            fdset.add(tcpsocket[i + 1]);
+    for (int i = 0; i < lanlink.numslaves; i++)
+        fdset.add(tcpsocket[i + 1]);
 
-        if (fdset.wait(sf::milliseconds(50)) == 0) {
-            return;
+    sf::Clock budget;
+    if (fdset.wait(sf::milliseconds(50)) == 0)
+        return false;
+
+    for (int i = 0; i < lanlink.numslaves; i++) {
+        RecvResult r = ReceiveExact(tcpsocket[i + 1], fdset, inbuffer, 1, budget, 50);
+        if (r == RecvResult::Timeout)
+            return false; // clean frame boundary; safe to retry
+        bool dropped = (r == RecvResult::Dropped);
+        if (!dropped) {
+            // A slave frame is always 4 bytes (CableClient::Send), as is
+            // the goodbye frame; any other length byte is a protocol
+            // desync. A timeout mid-frame would leave the stream
+            // misaligned, so it counts as a drop too.
+            dropped = inbuffer[0] != 4
+                || ReceiveExact(tcpsocket[i + 1], fdset, inbuffer + 1, 3, budget, 50) != RecvResult::Ok;
         }
-
-        for (int i = 0; i < lanlink.numslaves; i++) {
-            numbytes = 0;
-            inbuffer[0] = 1;
-            bool dropped = false;
-            while (numbytes < inbuffer[0]) {
-                size_t nr = 0;
-                sf::Socket::Status st = tcpsocket[i + 1].receive(inbuffer + numbytes, inbuffer[0] - numbytes, nr);
-                // A dropped/erroring peer would otherwise spin here forever
-                // (nr stays 0 and numbytes never reaches inbuffer[0]).
-                if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error) {
-                    dropped = true;
-                    break;
-                }
-                numbytes += (int)nr;
+        if (dropped || (uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
+            char message[30];
+            snprintf(message, sizeof(message), _("Player %d disconnected."), i + 2);
+            systemScreenMessage(message);
+            // Tell the remaining slaves and shut the session down. No
+            // reply round-trip: a dead peer never answers, and the old
+            // blocking wait for one could hang the emulator here.
+            for (int j = 1; j <= lanlink.numslaves; j++) {
+                if (j != i + 1)
+                    SendGoodbye(tcpsocket[j]);
+                tcpsocket[j].disconnect();
             }
-            if (dropped || (uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
-                char message[30];
-                snprintf(message, sizeof(message), _("Player %d disconnected."), i + 2);
-                systemScreenMessage(message);
-                outbuffer[0] = 4;
-                outbuffer[1] = (char)kLinkGoodbyeByte;
-                // Use a separate index; the old code reused the outer loop
-                // variable i, corrupting this loop's own iteration.
-                for (int j = 1; j < lanlink.numslaves; j++) {
-                    (void)tcpsocket[j].send(outbuffer, 12);
-                    size_t nr;
-                    (void)tcpsocket[j].receive(inbuffer, 256, nr);
-                    tcpsocket[j].disconnect();
-                }
-                RequestLinkClose();
-                return;
-            }
-            cable_data[i + 1] = READ16LE(&uint16_tinbuffer[1]);
+            RequestLinkClose();
+            return false;
         }
+        cable_data[i + 1] = READ16LE(&uint16_tinbuffer[1]);
     }
-    return;
+    return true;
 }
 
 void CableServer::SendGB(void)
 {
-    if (lanlink.type == 0 && lanlink.numslaves == 1) { // TCP
-        (void)tcpsocket[1].send(&cable_gb_data[0], 1);
+    if (lanlink.numslaves == 1) {
+        CheckSendResult(tcpsocket[1].send(&cable_gb_data[0], 1));
     }
 }
 
-// Receive one byte from the slave into cable_gb_data[1]
+// Receive one byte from the slave into cable_gb_data[1].
+// Waits in <= 50 ms slices so a deferred close request is honored promptly
+// even with a long user-configured timeout.
 bool CableServer::RecvGB(int timeout_ms)
 {
-    if (lanlink.type != 0 || lanlink.numslaves != 1)
+    if (lanlink.numslaves != 1)
         return false;
 
-    fdset.clear();
-    fdset.add(tcpsocket[1]);
+    sf::Clock budget;
+    do {
+        if (LinkIsClosing())
+            return false;
 
-    // sf::Time::Zero means "wait forever" to the selector, so always give
-    // the poll case a real (minimal) timeout
-    if (fdset.wait(sf::milliseconds(timeout_ms > 0 ? timeout_ms : 1)) == 0)
-        return false;
+        fdset.clear();
+        fdset.add(tcpsocket[1]);
 
-    uint8_t recv_byte = 0;
-    size_t nr = 0;
-    sf::Socket::Status status = tcpsocket[1].receive(&recv_byte, 1, nr);
+        int slice = timeout_ms - (int)budget.getElapsedTime().asMilliseconds();
+        if (slice > 50)
+            slice = 50;
+        // sf::Time::Zero means "wait forever" to the selector, so always
+        // give the poll case a real (minimal) timeout
+        if (slice < 1)
+            slice = 1;
 
-    if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
-        systemScreenMessage(_("Player 2 disconnected."));
-        tcpsocket[1].disconnect();
-        RequestLinkClose();
-        return false;
-    }
+        if (fdset.wait(sf::milliseconds(slice))) {
+            uint8_t recv_byte = 0;
+            size_t nr = 0;
+            sf::Socket::Status status = tcpsocket[1].receive(&recv_byte, 1, nr);
 
-    if (status != sf::Socket::Status::Done || nr == 0)
-        return false;
+            if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
+                systemScreenMessage(_("Player 2 disconnected."));
+                tcpsocket[1].disconnect();
+                RequestLinkClose();
+                return false;
+            }
 
-    cable_gb_data[1] = recv_byte;
-    return true;
+            if (status == sf::Socket::Status::Done && nr > 0) {
+                cable_gb_data[1] = recv_byte;
+                return true;
+            }
+        }
+    } while ((int)budget.getElapsedTime().asMilliseconds() < timeout_ms);
+    return false;
 }
 
 // Master-side transfer: send our byte and wait for the slave's reply.
@@ -1407,80 +1525,94 @@ CableClient::CableClient(void)
     uint16_toutbuffer = (uint16_t*)outbuffer;
     transferring = false;
     gb_pending = 0;
+    // Never let uninitialized stack/heap bytes reach the wire.
+    memset(inbuffer, 0, sizeof(inbuffer));
+    memset(outbuffer, 0, sizeof(outbuffer));
     return;
 }
 
+// Idle-time poll for the master starting a transfer (or leaving). The
+// socket is blocking, so probe with a short selector wait first; an idle
+// frame costs ~1 ms rather than parking the emulator thread in recv().
 void CableClient::CheckConn(void)
 {
-    size_t nr;
-    sf::Socket::Status st = lanlink.tcpsocket.receive(inbuffer, 1, nr);
-    if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error) {
+    fdset.clear();
+    fdset.add(lanlink.tcpsocket);
+    if (fdset.wait(sf::milliseconds(1)) == 0)
+        return;
+
+    sf::Clock budget;
+    RecvResult r = ReceiveExact(lanlink.tcpsocket, fdset, inbuffer, 1, budget, 50);
+    if (r == RecvResult::Timeout)
+        return;
+    bool dropped = (r == RecvResult::Dropped);
+    if (!dropped) {
+        // Master frames are 8/10/12 bytes for 1/2/3 slaves; goodbye is 4.
+        uint8_t len = (uint8_t)inbuffer[0];
+        dropped = (len != 4 && len != 8 && len != 10 && len != 12)
+            || ReceiveExact(lanlink.tcpsocket, fdset, inbuffer + 1, len - 1, budget, 50) != RecvResult::Ok;
+    }
+    if (dropped || (uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
         systemScreenMessage(_("Server disconnected."));
         RequestLinkClose();
         return;
     }
-    numbytes = (int)nr;
-    if (numbytes > 0) {
-        while (numbytes < inbuffer[0]) {
-            st = lanlink.tcpsocket.receive(inbuffer + numbytes, inbuffer[0] - numbytes, nr);
-            if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error) {
-                systemScreenMessage(_("Server disconnected."));
-                RequestLinkClose();
-                return;
-            }
-            numbytes += (int)nr;
+    transferring = true;
+    transfer_start_time_from_master = 0;
+    cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
+    tspeed = inbuffer[1] & 3;
+    for (int i = 1, bytes = 4; i <= lanlink.numslaves; i++)
+        if (i != linkid) {
+            cable_data[i] = READ16LE(&uint16_tinbuffer[bytes]);
+            bytes++;
         }
-        if ((uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
-            outbuffer[0] = 4;
-            (void)lanlink.tcpsocket.send(outbuffer, 4);
-            systemScreenMessage(_("Server disconnected."));
-            RequestLinkClose();
-            return;
-        }
-        transferring = true;
-        transfer_start_time_from_master = 0;
-        cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
-        tspeed = inbuffer[1] & 3;
-        for (int i = 1, bytes = 4; i <= lanlink.numslaves; i++)
-            if (i != linkid) {
-                cable_data[i] = READ16LE(&uint16_tinbuffer[bytes]);
-                bytes++;
-            }
-    }
     return;
 }
 
-// Receive one byte from the server into cable_gb_data[0]
+// Receive one byte from the server into cable_gb_data[0].
+// Waits in <= 50 ms slices so a deferred close request is honored promptly
+// even with a long user-configured timeout.
 bool CableClient::RecvGB(int timeout_ms)
 {
-    fdset.clear();
-    fdset.add(lanlink.tcpsocket);
+    sf::Clock budget;
+    do {
+        if (LinkIsClosing())
+            return false;
 
-    // sf::Time::Zero means "wait forever" to the selector, so always give
-    // the poll case a real (minimal) timeout
-    if (fdset.wait(sf::milliseconds(timeout_ms > 0 ? timeout_ms : 1)) == 0)
-        return false;
+        fdset.clear();
+        fdset.add(lanlink.tcpsocket);
 
-    uint8_t recv_byte = 0;
-    size_t nr = 0;
-    sf::Socket::Status status = lanlink.tcpsocket.receive(&recv_byte, 1, nr);
+        int slice = timeout_ms - (int)budget.getElapsedTime().asMilliseconds();
+        if (slice > 50)
+            slice = 50;
+        // sf::Time::Zero means "wait forever" to the selector, so always
+        // give the poll case a real (minimal) timeout
+        if (slice < 1)
+            slice = 1;
 
-    if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
-        systemScreenMessage(_("Server disconnected."));
-        RequestLinkClose();
-        return false;
-    }
+        if (fdset.wait(sf::milliseconds(slice))) {
+            uint8_t recv_byte = 0;
+            size_t nr = 0;
+            sf::Socket::Status status = lanlink.tcpsocket.receive(&recv_byte, 1, nr);
 
-    if (status != sf::Socket::Status::Done || nr == 0)
-        return false;
+            if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
+                systemScreenMessage(_("Server disconnected."));
+                RequestLinkClose();
+                return false;
+            }
 
-    cable_gb_data[0] = recv_byte;
-    return true;
+            if (status == sf::Socket::Status::Done && nr > 0) {
+                cable_gb_data[0] = recv_byte;
+                return true;
+            }
+        }
+    } while ((int)budget.getElapsedTime().asMilliseconds() < timeout_ms);
+    return false;
 }
 
 void CableClient::SendGB()
 {
-    (void)lanlink.tcpsocket.send(&cable_gb_data[1], 1);
+    CheckSendResult(lanlink.tcpsocket.send(&cable_gb_data[1], 1));
 }
 
 // Master-side transfer: send our byte and wait for the server's reply.
@@ -1505,35 +1637,35 @@ bool CableClient::ExchangeGB(uint8_t b, int timeout_ms)
     return false;
 }
 
-void CableClient::Recv(void)
+// Receive the master's frame. Returns true only when a full frame arrived;
+// on a timeout the caller retries next tick (the stream is frame-aligned),
+// and `transferring` is deliberately left alone -- clearing it re-armed
+// CheckConn, which then re-parsed this same frame with the clock field
+// forced to zero.
+bool CableClient::Recv(void)
 {
     fdset.clear();
-    // old code used socket # instead of mask again
     fdset.add(lanlink.tcpsocket);
-    // old code stripped off ms again
-    if (fdset.wait(sf::milliseconds(50)) == 0) {
-        transferring = false;
-        return;
+    sf::Clock budget;
+    if (fdset.wait(sf::milliseconds(50)) == 0)
+        return false;
+
+    RecvResult r = ReceiveExact(lanlink.tcpsocket, fdset, inbuffer, 1, budget, 50);
+    if (r == RecvResult::Timeout)
+        return false; // clean frame boundary; safe to retry
+    bool dropped = (r == RecvResult::Dropped);
+    if (!dropped) {
+        // Master frames are 8/10/12 bytes for 1/2/3 slaves; goodbye is 4.
+        // A timeout mid-frame would leave the stream misaligned, so it
+        // counts as a drop too.
+        uint8_t len = (uint8_t)inbuffer[0];
+        dropped = (len != 4 && len != 8 && len != 10 && len != 12)
+            || ReceiveExact(lanlink.tcpsocket, fdset, inbuffer + 1, len - 1, budget, 50) != RecvResult::Ok;
     }
-    numbytes = 0;
-    inbuffer[0] = 1;
-    size_t nr;
-    while (numbytes < inbuffer[0]) {
-        sf::Socket::Status st = lanlink.tcpsocket.receive(inbuffer + numbytes, inbuffer[0] - numbytes, nr);
-        // Don't spin forever if the server drops mid-frame.
-        if (st == sf::Socket::Status::Disconnected || st == sf::Socket::Status::Error) {
-            systemScreenMessage(_("Server disconnected."));
-            RequestLinkClose();
-            return;
-        }
-        numbytes += (int)nr;
-    }
-    if ((uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
-        outbuffer[0] = 4;
-        (void)lanlink.tcpsocket.send(outbuffer, 4);
+    if (dropped || (uint8_t)inbuffer[1] == kLinkGoodbyeByte) {
         systemScreenMessage(_("Server disconnected."));
         RequestLinkClose();
-        return;
+        return false;
     }
     tspeed = inbuffer[1] & 3;
     cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
@@ -1544,6 +1676,7 @@ void CableClient::Recv(void)
             bytes++;
         }
     }
+    return true;
 }
 
 void CableClient::Send()
@@ -1551,7 +1684,7 @@ void CableClient::Send()
     outbuffer[0] = 4;
     outbuffer[1] = (char)(linkid << 2);
     WRITE16LE(&uint16_toutbuffer[1], cable_data[linkid]);
-    (void)lanlink.tcpsocket.send(outbuffer, 4);
+    CheckSendResult(lanlink.tcpsocket.send(outbuffer, 4));
     return;
 }
 
@@ -1564,6 +1697,7 @@ static ConnectionState InitSocket()
     // new one.
     link_close_pending = false;
     transfer_direction = 0;
+    missed_recv_ms = 0;
     lc.transferring = false;
     rfu_client.transferring = false;
 
@@ -1605,10 +1739,21 @@ static ConnectionState InitSocket()
     } else {
         lc.serverport = IP_LINK_PORT;
 
+        // Non-blocking connect; ConnectUpdateSocket polls it to completion
+        // under a wall-clock deadline, keeping the modal progress dialog
+        // responsive and cancellable throughout.
         lanlink.tcpsocket.setBlocking(false);
         sf::Socket::Status status = lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport);
 
-        if (status == sf::Socket::Status::Error || status == sf::Socket::Status::Disconnected) {
+        connect_clock.restart();
+        client_handshake_connected = false;
+        connect_attempt_failed = (status == sf::Socket::Status::Disconnected);
+        last_connect_attempt_ms = 0;
+
+        // Only a synchronous failure is fatal here. NotReady means the
+        // connect is in progress, and even Disconnected only means this
+        // attempt failed fast (server not up yet); the poll loop retries.
+        if (status == sf::Socket::Status::Error) {
             return LINK_ERROR;
         } else {
             return LINK_NEEDS_UPDATE;
@@ -1629,21 +1774,19 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
 
             sf::Socket::Status st = lanlink.tcplistener.accept(ls.tcpsocket[nextSlave]);
 
-            if (st == sf::Socket::Status::Error) {
-                for (int j = 1; j < nextSlave; j++)
-                    ls.tcpsocket[j].disconnect();
-
-                snprintf(message, size, N_("Network error."));
-                newState = LINK_ERROR;
-            } else {
+            // Anything but a completed accept just means "no new client
+            // this tick"; treating it as fatal (or counting a dead socket
+            // as a connected slave) broke the whole session.
+            if (st == sf::Socket::Status::Done) {
                 sf::Packet packet;
                 packet << nextSlave << lanlink.numslaves;
 
-                (void)ls.tcpsocket[nextSlave].send(packet);
-
-                snprintf(message, size, N_("Player %d connected"), nextSlave);
-
-                lanlink.connectedSlaves++;
+                if (ls.tcpsocket[nextSlave].send(packet) == sf::Socket::Status::Done) {
+                    snprintf(message, size, N_("Player %d connected"), nextSlave);
+                    lanlink.connectedSlaves++;
+                } else {
+                    ls.tcpsocket[nextSlave].disconnect();
+                }
             }
         }
 
@@ -1659,6 +1802,41 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
             newState = LINK_OK;
         }
     } else {
+        if (!client_handshake_connected) {
+            // getpeername() succeeds only once the TCP connection is
+            // ESTABLISHED. Probing with receive() before that is not
+            // portable: during SYN_SENT macOS fails recv() with ENOTCONN,
+            // which SFML maps to Disconnected -- the old code treated that
+            // as a fatal network error on the very first poll tick.
+            if (lanlink.tcpsocket.getRemoteAddress().has_value()) {
+                client_handshake_connected = true;
+            } else {
+                const int32_t elapsed = (int32_t)connect_clock.getElapsedTime().asMilliseconds();
+                if (elapsed > kConnectTimeoutMs) {
+                    snprintf(message, size, N_("Connection to server timed out."));
+                    return LINK_ERROR;
+                }
+
+                // A refused attempt (server not listening yet) reports its
+                // error exactly once, on the next socket op (ECONNREFUSED
+                // -> Error; later probes degrade to ENOTCONN ->
+                // Disconnected, which also means "still connecting" on
+                // macOS). Latch the failure and retry the connect,
+                // throttled, so starting the client first works.
+                char probe;
+                size_t nr = 0;
+                if (lanlink.tcpsocket.receive(&probe, 1, nr) == sf::Socket::Status::Error)
+                    connect_attempt_failed = true;
+                if (connect_attempt_failed && elapsed - last_connect_attempt_ms >= kConnectRetryMs) {
+                    last_connect_attempt_ms = elapsed;
+                    connect_attempt_failed = false;
+                    (void)lanlink.tcpsocket.connect(lc.serveraddr, lc.serverport);
+                }
+
+                snprintf(message, size, N_("Connecting to server..."));
+                return LINK_NEEDS_UPDATE;
+            }
+        }
 
         sf::Packet packet;
         sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
@@ -1684,14 +1862,15 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
                 packet >> gameReady;
 
                 if (packet && gameReady) {
+                    // Established sockets run blocking from here on: every
+                    // receive is selector-guarded (see ReceiveExact), and a
+                    // blocking send can't return Partial. Left non-blocking,
+                    // the transfer loops spun on NotReady at 100% CPU.
+                    lanlink.tcpsocket.setBlocking(true);
                     newState = LINK_OK;
                     snprintf(message, size, N_("All players joined."));
                 }
             }
-
-            sf::SocketSelector fdset;
-            fdset.add(lanlink.tcpsocket);
-            (void)fdset.wait(sf::milliseconds(150));
         }
     }
 
@@ -1762,6 +1941,32 @@ static void UpdateCableSocket(int ticks)
     }
 
     if (transfer_direction == RECEIVING && linktime >= trtimeend[lanlink.numslaves - 1][tspeed]) {
+        // Commit the transfer (IRQ, SIOCNT, SIOMULTI) only when the peer
+        // frames actually arrived. The old code committed unconditionally,
+        // publishing the *previous* transfer's cable_data as this one's
+        // result on any 50 ms hiccup -- a silent, undetectable desync.
+        // On a miss, stay in RECEIVING and retry next update; declare the
+        // link dead once linktimeout worth of retries has accumulated.
+        bool received;
+        if (linkid) {
+            lc.transferring = true;
+            received = lc.Recv();
+        } else {
+            received = ls.Recv(); // Receive data from all of the slaves
+        }
+
+        if (!received) {
+            if (LinkIsClosing())
+                return; // drop already flagged; CloseLink runs after update
+            missed_recv_ms += 50;
+            if (missed_recv_ms > linktimeout) {
+                systemScreenMessage(_("Link timeout."));
+                RequestLinkClose();
+            }
+            return;
+        }
+        missed_recv_ms = 0;
+
         if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) {
             IF |= 0x80;
             UPDATE_REG(IO_REG_IF, IF);
@@ -1771,12 +1976,6 @@ static void UpdateCableSocket(int ticks)
         transfer_direction = SENDING;
         linktime -= trtimeend[lanlink.numslaves - 1][tspeed];
 
-        if (linkid) {
-            lc.transferring = true;
-            lc.Recv();
-        } else {
-            ls.Recv(); // Receive data from all of the slaves
-        }
         UPDATE_REG(COMM_SIOMULTI1, cable_data[1]);
         UPDATE_REG(COMM_SIOMULTI2, cable_data[2]);
         UPDATE_REG(COMM_SIOMULTI3, cable_data[3]);
@@ -1791,24 +1990,24 @@ static void CloseSocket()
     bool send_goodbye = GetLinkMode() != LINK_GAMEBOY_SOCKET;
 
     if (linkid) {
-        char outbuffer[4];
-        outbuffer[0] = 4;
-        outbuffer[1] = (char)kLinkGoodbyeByte;
-        if (send_goodbye && lanlink.type == 0)
-            (void)lanlink.tcpsocket.send(outbuffer, 4);
+        if (send_goodbye)
+            SendGoodbye(lanlink.tcpsocket);
     } else {
-        char outbuffer[12];
-        int i;
-        outbuffer[0] = 12;
-        outbuffer[1] = (char)kLinkGoodbyeByte;
-        for (i = 1; i <= lanlink.numslaves; i++) {
-            if (send_goodbye && lanlink.type == 0) {
-                (void)ls.tcpsocket[i].send(outbuffer, 12);
-            }
+        for (int i = 1; i <= lanlink.numslaves; i++) {
+            if (send_goodbye)
+                SendGoodbye(ls.tcpsocket[i]);
             ls.tcpsocket[i].disconnect();
         }
     }
     lanlink.tcpsocket.disconnect();
+
+    // Free the listening port and any RFU per-slave sockets. These used to
+    // leak: the listener kept the link port bound for the whole process
+    // lifetime, and RFU server sessions leaked their slave sockets.
+    lanlink.tcplistener.close();
+    for (int i = 1; i <= 4; i++)
+        rfu_server.tcpsocket[i].disconnect();
+    lanlink.connectedSlaves = 0;
 }
 
 // call this to clean up crashed program's shared state
@@ -1830,12 +2029,20 @@ void CleanLocalLink()
         AndroidLinkShmUnlinkFiles();
     close(fd);
 #elif !(defined __WIN32__ || defined _WIN32)
-    shm_unlink("/" LOCAL_LINK_NAME);
-    for (int i = 0; i < 4; i++) {
-        linkevent[sizeof(linkevent) - 2] = '1' + i;
-        sem_unlink(linkevent);
+    // Crash recovery is automatic these days -- InitIPC sweeps a dead
+    // session's leftovers once nobody holds the liveness lock -- so this
+    // manual escape hatch only sweeps when it can prove no instance is
+    // attached; unguarded, it used to nuke a *live* session's IPC.
+    int fd = open(LinkLockFilePath(".flock").c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0666);
+    if (fd < 0)
+        return;
+    if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
+        shm_unlink(LinkShmName().c_str());
+        for (int i = 0; i < 4; i++)
+            sem_unlink(LinkSemName(i).c_str());
+        sem_unlink(LinkLockSemName().c_str());
     }
-    sem_unlink(linklockname);
+    close(fd);
 #endif
 }
 
@@ -1966,11 +2173,14 @@ static void JoyBusShutdown()
     dol = NULL;
 }
 
-#define MAX_CLIENTS lanlink.numslaves + 1
+#define MAX_CLIENTS (lanlink.numslaves + 1)
 
 // Server
 RFUServer::RFUServer(void)
 {
+    // Nobody has declared themselves host yet; without this the "is host"
+    // flag serialized to every client was an indeterminate stack value.
+    current_host = 0;
     for (int j = 0; j < 5; j++)
         rfu_data.rfu_signal[j] = 0;
 }
@@ -2044,24 +2254,12 @@ void RFUServer::DeSerialize(sf::Packet& packet, int slave)
 
 void RFUServer::Send(void)
 {
-    if (lanlink.type == 0) { // TCP
+    // One fresh packet per slave: Serialize() appends to the packet it is
+    // given, so reusing one packet sent slave 2 a copy of slave 1's frame
+    // followed by its own (and slave 3 all three).
+    for (int i = 1; i <= lanlink.numslaves && i <= 3; i++) {
         sf::Packet packet;
-        if (lanlink.numslaves == 1) {
-            if (lanlink.type == 0) {
-                (void)tcpsocket[1].send(Serialize(packet, 1));
-            }
-        } else if (lanlink.numslaves == 2) {
-            if (lanlink.type == 0) {
-                (void)tcpsocket[1].send(Serialize(packet, 1));
-                (void)tcpsocket[2].send(Serialize(packet, 2));
-            }
-        } else {
-            if (lanlink.type == 0) {
-                (void)tcpsocket[1].send(Serialize(packet, 1));
-                (void)tcpsocket[2].send(Serialize(packet, 2));
-                (void)tcpsocket[3].send(Serialize(packet, 3));
-            }
-        }
+        (void)tcpsocket[i].send(Serialize(packet, i));
     }
 }
 
@@ -2069,7 +2267,7 @@ void RFUServer::Send(void)
 void RFUServer::Recv(void)
 {
     //int numbytes;
-    if (lanlink.type == 0) { // TCP
+    {
         fdset.clear();
 
         for (int i = 0; i < lanlink.numslaves; i++)
@@ -2203,7 +2401,12 @@ void RFUClient::Recv(void)
         // No data within the window. Bail instead of falling through to
         // receive(): the old code deserialized an unfilled packet, which
         // wrote zeros over rfu_data and corrupted the RFU state.
-        systemScreenMessage(_("Server timed out."));
+        // Rate-limit the message; on a slow link this fired every 166 ms.
+        static sf::Clock timeout_message_clock;
+        if (timeout_message_clock.getElapsedTime().asMilliseconds() > 3000) {
+            timeout_message_clock.restart();
+            systemScreenMessage(_("Server timed out."));
+        }
         return;
     }
     sf::Packet packet;
@@ -2227,24 +2430,25 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
         fdset.add(lanlink.tcplistener);
 
         if (fdset.wait(sf::milliseconds(150))) {
-            int nextSlave = lanlink.connectedSlaves + 1;
+            // uint16_t to match the client's `packet >> receivedId`; as an
+            // int this serialized 4 bytes where the client read 2, so the
+            // client parsed id 0 and never finished the handshake.
+            uint16_t nextSlave = (uint16_t)(lanlink.connectedSlaves + 1);
 
             sf::Socket::Status st = lanlink.tcplistener.accept(rfu_server.tcpsocket[nextSlave]);
 
-            if (st == sf::Socket::Status::Error) {
-                for (int j = 1; j < nextSlave; j++)
-                    rfu_server.tcpsocket[j].disconnect();
-
-                snprintf(message, size, N_("Network error."));
-                newState = LINK_ERROR;
-            } else {
+            // Anything but a completed accept just means "no new client
+            // this tick".
+            if (st == sf::Socket::Status::Done) {
                 sf::Packet packet;
                 packet << nextSlave << lanlink.numslaves;
 
-                (void)rfu_server.tcpsocket[nextSlave].send(packet);
-
-                snprintf(message, size, N_("Player %d connected"), nextSlave);
-                lanlink.connectedSlaves++;
+                if (rfu_server.tcpsocket[nextSlave].send(packet) == sf::Socket::Status::Done) {
+                    snprintf(message, size, N_("Player %d connected"), nextSlave);
+                    lanlink.connectedSlaves++;
+                } else {
+                    rfu_server.tcpsocket[nextSlave].disconnect();
+                }
             }
         }
 
@@ -3122,6 +3326,11 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                     if (lanlink.server) {
                         recvd = ls.RecvGB(0) ? 1 : 0;
                         if (recvd) {
+                            // A byte consumed on the external-clock path
+                            // means any exchange stream this counter was
+                            // tracking has been abandoned; without this,
+                            // ExchangeGB's drain later eats a real byte.
+                            ls.gb_pending = 0;
                             dat = cable_gb_data[1];
                             LinkIsWaiting = false;
                         } else
@@ -3134,6 +3343,7 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
                     } else {
                         recvd = lc.RecvGB(0) ? 1 : 0;
                         if (recvd) {
+                            lc.gb_pending = 0;
                             dat = cable_gb_data[0];
                             LinkIsWaiting = false;
                         } else
@@ -3153,12 +3363,93 @@ uint16_t gbLinkUpdate(uint8_t b, int gbSerialOn) //used on external clock
     return ((dat << 8) | (recvd & (uint8_t)0xff));
 }
 
+// Undo a partially-completed InitIPC. release_slot says the shared topology
+// already records our slot claim and must be rolled back; that path takes
+// the structural lock, so callers must NOT hold a LinkMemGuard when passing
+// release_slot = true. The creator tears the whole session down (it is the
+// only member); a joiner only detaches.
+static void AbortIPCInit([[maybe_unused]] bool firstone, bool release_slot)
+{
+    if (release_slot && linkmem != NULL) {
+        LinkMemGuard guard;
+        int f = linkmem->linkflags & ~(1 << vbaid);
+        linkmem->linkflags = (uint8_t)f;
+        int highest = 0;
+        for (int i = 0; i < 4; i++)
+            if (f & (1 << i))
+                highest = i + 1;
+        linkmem->numgbas = (uint8_t)highest;
+    }
+#if (defined __WIN32__ || defined _WIN32)
+    for (int i = 0; i < 4; i++) {
+        if (linksync[i] != NULL) {
+            CloseHandle(linksync[i]);
+            linksync[i] = NULL;
+        }
+    }
+    if (linkmem_lock != NULL) {
+        CloseHandle(linkmem_lock);
+        linkmem_lock = NULL;
+    }
+    if (linkmem != NULL) {
+        UnmapViewOfFile(linkmem);
+        linkmem = NULL;
+    }
+    if (mmf != NULL) {
+        CloseHandle(mmf);
+        mmf = NULL;
+    }
+#elif defined(__ANDROID__)
+    // Everything lives in the shared mapping; there is nothing to close
+    // per-object, and AndroidLinkShmClose() handles last-out cleanup.
+    for (int i = 0; i < 4; i++)
+        linksync[i] = NULL;
+    linkmem_lock = SEM_FAILED;
+    if (linkmem != NULL) {
+        linkmem = NULL;
+        AndroidLinkShmClose();
+    }
+#else
+    for (int i = 0; i < 4; i++) {
+        if (linksync[i] != NULL && linksync[i] != SEM_FAILED) {
+            sem_close(linksync[i]);
+            if (firstone)
+                sem_unlink(LinkSemName(i).c_str());
+        }
+        linksync[i] = NULL;
+    }
+    if (linkmem_lock != SEM_FAILED) {
+        sem_close(linkmem_lock);
+        if (firstone)
+            sem_unlink(LinkLockSemName().c_str());
+        linkmem_lock = SEM_FAILED;
+    }
+    if (linkmem != NULL) {
+        munmap(linkmem, sizeof(LINKDATA));
+        linkmem = NULL;
+    }
+    if (mmf >= 0) {
+        close(mmf);
+        mmf = -1;
+    }
+    if (firstone)
+        shm_unlink(LinkShmName().c_str());
+    if (link_liveness_fd >= 0) {
+        close(link_liveness_fd);
+        link_liveness_fd = -1;
+    }
+#endif
+    vbaid = 0;
+    linkid = 0;
+}
+
 static ConnectionState InitIPC()
 {
+    vbaid = 0;
     linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
-    if ((mmf = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LOCAL_LINK_NAME)) == NULL) {
+    if ((mmf = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LinkShmName().c_str())) == NULL) {
         systemMessage(0, N_("Error creating file mapping"));
         return LINK_ERROR;
     }
@@ -3170,6 +3461,7 @@ static ConnectionState InitIPC()
 
     if ((linkmem = (LINKDATA*)MapViewOfFile(mmf, FILE_MAP_WRITE, 0, 0, sizeof(LINKDATA))) == NULL) {
         CloseHandle(mmf);
+        mmf = NULL;
         systemMessage(0, N_("Error mapping file"));
         return LINK_ERROR;
     }
@@ -3178,30 +3470,58 @@ static ConnectionState InitIPC()
         systemMessage(0, N_("Error creating file mapping"));
         return LINK_ERROR;
     }
-    // Same role split as the O_EXCL dance below: the creator is machine 0,
-    // everyone else searches for a free slot further down.
+    // Same role split as the liveness probe below: the creator is machine
+    // 0, everyone else searches for a free slot further down.
     vbaid = android_shm_created ? 0 : 1;
     linkmem = &android_shm->data;
 #else
-    if ((mmf = shm_open("/" LOCAL_LINK_NAME, O_RDWR | O_CREAT | O_EXCL, 0777)) < 0) {
-        vbaid = 1;
-        mmf = shm_open("/" LOCAL_LINK_NAME, O_RDWR, 0);
-    } else
-        vbaid = 0;
+    // Serialize the whole of role selection + segment creation against
+    // other instances (CloseIPC's last-one-out probe takes it too). A
+    // joiner therefore never sees a half-initialized segment, and two
+    // simultaneous starters cannot both become machine 0.
+    LinkInitLock init_lock(LinkLockFilePath(".init"));
+
+    const std::string shm_name = LinkShmName();
+    bool posix_creator = false;
+    link_liveness_fd = open(LinkLockFilePath(".flock").c_str(), O_RDWR | O_CREAT | O_CLOEXEC, 0666);
+    if (link_liveness_fd >= 0 && init_lock.held()) {
+        fchmod(link_liveness_fd, 0666);
+        // Nobody holding the liveness lock means no instance is attached,
+        // so any existing shm/semaphores are a crashed run's leftovers
+        // (they persist until reboot on macOS). Sweep them and start a
+        // fresh session rather than joining a corpse.
+        posix_creator = (flock(link_liveness_fd, LOCK_EX | LOCK_NB) == 0);
+        if (posix_creator) {
+            shm_unlink(shm_name.c_str());
+            for (int i = 0; i < 4; i++)
+                sem_unlink(LinkSemName(i).c_str());
+            sem_unlink(LinkLockSemName().c_str());
+        }
+        mmf = shm_open(shm_name.c_str(), posix_creator ? (O_RDWR | O_CREAT | O_EXCL) : O_RDWR, 0777);
+    } else {
+        // Degraded fallback (no usable lock file): the historical O_EXCL
+        // role heuristic, without stale-crash recovery.
+        if (link_liveness_fd >= 0) {
+            close(link_liveness_fd);
+            link_liveness_fd = -1;
+        }
+        if ((mmf = shm_open(shm_name.c_str(), O_RDWR | O_CREAT | O_EXCL, 0777)) >= 0)
+            posix_creator = true;
+        else
+            mmf = shm_open(shm_name.c_str(), O_RDWR, 0);
+    }
+    vbaid = posix_creator ? 0 : 1;
     // Only the creator may size the segment; on macOS a second ftruncate
     // on an already-sized shm object fails with EINVAL.
-    if (mmf < 0 || (!vbaid && ftruncate(mmf, sizeof(LINKDATA)) < 0)
+    if (mmf < 0 || (posix_creator && ftruncate(mmf, sizeof(LINKDATA)) < 0)
         || (linkmem = (LINKDATA*)mmap(NULL, sizeof(LINKDATA), PROT_READ | PROT_WRITE, MAP_SHARED, mmf, 0)) == MAP_FAILED) {
-        systemMessage(0, N_("Error creating file mapping"));
         linkmem = NULL;
-        if (mmf >= 0) {
-            if (!vbaid)
-                shm_unlink("/" LOCAL_LINK_NAME);
-            close(mmf);
-            mmf = -1;
-        }
+        AbortIPCInit(posix_creator, false);
+        systemMessage(0, N_("Error creating file mapping"));
         return LINK_ERROR;
     }
+    if (posix_creator)
+        memset(linkmem, 0, sizeof(LINKDATA));
 #endif
 
     // get lowest-numbered available machine slot
@@ -3209,14 +3529,16 @@ static ConnectionState InitIPC()
 
     // Create/open the structural lock before touching the shared topology.
     // The creator initializes it unlocked (count 1); late joiners open it,
-    // retrying briefly because the creator may not have created it yet.
+    // retrying briefly because the creator may not have created it yet
+    // (only possible in the degraded no-lock-file fallback; under the
+    // .init fence the creator finished before any joiner got here).
 #if (defined __WIN32__ || defined _WIN32)
     linkmem_lock = firstone
-        ? CreateSemaphoreA(NULL, 1, 1, linklockname)
-        : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, linklockname);
+        ? CreateSemaphoreA(NULL, 1, 1, LinkLockSemName().c_str())
+        : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, LinkLockSemName().c_str());
     for (int tries = 0; linkmem_lock == NULL && !firstone && tries < 100; tries++) {
         Sleep(2);
-        linkmem_lock = OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, linklockname);
+        linkmem_lock = OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, LinkLockSemName().c_str());
     }
 #elif defined(__ANDROID__)
     // Lives in the shared mapping; the creator initialized it to count 1
@@ -3224,12 +3546,12 @@ static ConnectionState InitIPC()
     linkmem_lock = &android_shm->lock;
 #else
     if (firstone)
-        sem_unlink(linklockname); // drop any stale lock from a crashed run
-    linkmem_lock = sem_open(linklockname, firstone ? (O_CREAT | O_EXCL) : 0, 0777, 1);
+        sem_unlink(LinkLockSemName().c_str()); // drop any stale lock from a crashed run
+    linkmem_lock = sem_open(LinkLockSemName().c_str(), firstone ? (O_CREAT | O_EXCL) : 0, 0777, 1);
     for (int tries = 0; linkmem_lock == SEM_FAILED && !firstone && tries < 100; tries++) {
         struct timespec ts = { 0, 2000000 }; // 2 ms
         nanosleep(&ts, NULL);
-        linkmem_lock = sem_open(linklockname, 0, 0777, 1);
+        linkmem_lock = sem_open(LinkLockSemName().c_str(), 0, 0777, 1);
     }
 #endif
 
@@ -3242,7 +3564,7 @@ static ConnectionState InitIPC()
             linkmem->linkflags = 1;
             linkmem->numgbas = 1;
             linkmem->numtransfers = 0;
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
                 linkmem->linkdata[i] = 0xffff;
         } else {
             int n = linkmem->numgbas;
@@ -3253,22 +3575,11 @@ static ConnectionState InitIPC()
                     break;
                 }
             if (vbaid == 4) {
-                LinkMemUnlock(guard.held()); // release before closing the lock
-#if (defined __WIN32__ || defined _WIN32)
-                CloseHandle(linkmem_lock);
-                linkmem_lock = NULL;
-                UnmapViewOfFile(linkmem);
-                CloseHandle(mmf);
-#elif defined(__ANDROID__)
-                linkmem_lock = SEM_FAILED;
-                linkmem = NULL;
-                AndroidLinkShmClose();
-#else
-                sem_close(linkmem_lock);
-                linkmem_lock = SEM_FAILED;
-                munmap(linkmem, sizeof(LINKDATA));
-                close(mmf);
-#endif
+                // Release the structural lock by hand before AbortIPCInit
+                // closes it; the guard's destructor then finds it gone and
+                // does nothing.
+                LinkMemUnlock(guard.held());
+                AbortIPCInit(firstone, false);
                 systemMessage(0, N_("5 or more GBAs not supported."));
                 return LINK_ERROR;
             }
@@ -3279,6 +3590,14 @@ static ConnectionState InitIPC()
     }
     linkid = (uint16_t)vbaid;
 
+    // The GB serial path is strictly 2-player: it indexes linkcmd/linkdata/
+    // linksync with 1 - linkid, so a third instance would index [-1].
+    if (linkDriver != NULL && linkDriver->mode == LINK_GAMEBOY_IPC && vbaid > 1) {
+        AbortIPCInit(firstone, true);
+        systemMessage(0, N_("The GB link supports only 2 players."));
+        return LINK_ERROR;
+    }
+
 #if defined(__ANDROID__)
     // The handshake semaphores are part of the shared mapping; there is
     // nothing to open, and no stale named object to clean up.
@@ -3286,46 +3605,41 @@ static ConnectionState InitIPC()
         linksync[i] = &android_shm->sync[i];
 #else
     for (int i = 0; i < 4; i++) {
-        linkevent[sizeof(linkevent) - 2] = (char)i + '1';
 #if (defined __WIN32__ || defined _WIN32)
-        linksync[i] = firstone ? CreateSemaphoreA(NULL, 0, 4, linkevent) : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, linkevent);
+        linksync[i] = firstone ? CreateSemaphoreA(NULL, 0, 4, LinkSemName(i).c_str())
+                               : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, LinkSemName(i).c_str());
         if (linksync[i] == NULL) {
-            UnmapViewOfFile(linkmem);
-            CloseHandle(mmf);
-            for (int j = 0; j < i; j++) {
-                CloseHandle(linksync[j]);
-            }
+            AbortIPCInit(firstone, !firstone);
             systemMessage(0, N_("Error opening event"));
             return LINK_ERROR;
         }
 #else
         if (firstone) {
             // remove any stale semaphore left over from a crashed instance
-            sem_unlink(linkevent);
+            // (redundant after the liveness sweep; still needed in the
+            // degraded no-lock-file fallback)
+            sem_unlink(LinkSemName(i).c_str());
         }
-        if ((linksync[i] = sem_open(linkevent,
+        if ((linksync[i] = sem_open(LinkSemName(i).c_str(),
                  firstone ? O_CREAT | O_EXCL : 0,
                  0777, 0))
             == SEM_FAILED) {
-            if (firstone)
-                shm_unlink("/" LOCAL_LINK_NAME);
-            munmap(linkmem, sizeof(LINKDATA));
-            linkmem = NULL;
-            close(mmf);
-            mmf = -1;
-            for (int j = 0; j < i; j++) {
-                sem_close(linksync[j]);
-                if (firstone) {
-                    linkevent[sizeof(linkevent) - 2] = (char)j + '1';
-                    sem_unlink(linkevent);
-                }
-            }
+            linksync[i] = NULL;
+            AbortIPCInit(firstone, !firstone);
             systemMessage(0, N_("Error opening event"));
             return LINK_ERROR;
         }
 #endif
     }
 #endif  // defined(__ANDROID__)
+
+#if !(defined __WIN32__ || defined _WIN32) && !defined(__ANDROID__)
+    // Hold the session-long shared liveness lock. The creator converts its
+    // exclusive probe lock; safe under the init lock, since no other
+    // instance can be probing right now.
+    if (link_liveness_fd >= 0)
+        flock(link_liveness_fd, LOCK_SH);
+#endif
 
     return LINK_OK;
 }
@@ -3479,22 +3793,12 @@ static void UpdateCableIPC(int)
         else
             linktime -= linkmem->lastlinktime;
 
-// there's really no point to this switch; 'M' is the only
-// possible command.
-#if 0
-		switch ((linkmem->linkcmd) >> 8)
-		{
-		case 'M':
-#endif
+        // 'M' (multiplayer start) is the only possible command here.
         tspeed = linkmem->linkcmd[0] & 3;
         transfer_direction = 1;
         WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
         WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
         UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & ~0x40) | 0x80);
-#if 0
-			break;
-		}
-#endif
     }
 
     if (!transfer_direction)
@@ -3542,7 +3846,11 @@ static void UpdateCableIPC(int)
             UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & ~4);
             UPDATE_REG(COMM_RCNT, 10);
             linkmem->linkdata[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
-            ReleaseSemaphore(linksync[linkid], linkmem->numgbas - 1, NULL);
+            // The waiters this transfer are the trgbas participants minus
+            // the sender; posting numgbas - 1 leaks tokens whenever a
+            // machine joined or dropped mid-session (numgbas > trgbas),
+            // pre-satisfying a rejoining slave's next wait.
+            ReleaseSemaphore(linksync[linkid], linkmem->trgbas - 1, NULL);
         }
         if (linkid == transfer_direction - 1) {
             // SO becomes low to begin next trasnfer
@@ -3555,7 +3863,12 @@ static void UpdateCableIPC(int)
         transfer_direction++;
     }
 
-    if (transfer_direction > linkmem->trgbas && linktime >= trtimeend[transfer_direction - 3][tspeed]) {
+    // trgbas can collapse to 1 after a drop, making transfer_direction 2
+    // here; clamp so the lookups below can't index trtimeend[-1].
+    int tt = transfer_direction - 3;
+    if (tt < 0)
+        tt = 0;
+    if (transfer_direction > linkmem->trgbas && linktime >= trtimeend[tt][tspeed]) {
         // wait for slaves to finish
         // this keeps unfinished slaves from screwing up last xfer
         // not strictly necessary; may just slow things down
@@ -3571,7 +3884,7 @@ static void UpdateCableIPC(int)
         } else if (linkmem->trgbas > linkid)
             // signal master that this slave is finished
             ReleaseSemaphore(linksync[0], 1, NULL);
-        linktime -= trtimeend[transfer_direction - 3][tspeed];
+        linktime -= trtimeend[tt][tspeed];
         transfer_direction = 0;
         uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
         if (!linkid)
@@ -4724,11 +5037,16 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
                 SetEvent(linksync[1 - linkid]);
 
                 if (!LinkIsWaiting) {
+                    // Wait for the master to consume our *own* previous
+                    // byte (linkcmd[linkid]) before queueing the next one;
+                    // waiting on the master's slot here made this loop exit
+                    // immediately and the guard below silently dropped the
+                    // reply byte, stalling the exchange for linktimeout.
                     tm = GetTickCount();
                     do {
                         WaitForSingleObject(linksync[linkid], 1);
                         ResetEvent(linksync[linkid]);
-                    } while (linkmem->linkcmd[1 - linkid] && (GetTickCount() - tm) < (uint32_t)linktimeout);
+                    } while (linkmem->linkcmd[linkid] && (GetTickCount() - tm) < (uint32_t)linktimeout);
                     if (!linkmem->linkcmd[linkid]) {
                         linkmem->linkdata[linkid] = b;
                         linkmem->linkcmd[linkid] = 1;
@@ -4746,8 +5064,15 @@ uint16_t gbLinkUpdateIPC(uint8_t b, int gbSerialOn) //used on external clock
 
 static void CloseIPC()
 {
-    int f = 0;
-    if (linkmem != NULL) {
+    // Nothing to do when InitIPC never succeeded -- its error paths clean
+    // up after themselves, and the last-one-out logic below must not run
+    // with no session attached: it would unlink a live session's objects
+    // out from under its members.
+    if (linkmem == NULL)
+        return;
+
+    [[maybe_unused]] int f = 0;
+    {
         // Clearing our slot and recomputing the peer count is a
         // read-modify-write on the shared topology; serialize it.
         LinkMemGuard guard;
@@ -4778,17 +5103,18 @@ static void CloseIPC()
             // transfer. Peers notice us leaving via linkflags, and every
             // wait on these is bounded by linktimeout anyway.
 #else
+            // Wake a peer blocked on this semaphore now rather than after
+            // its full linktimeout (mirrors the Win32 branch); the master's
+            // pre-start drain reclaims the stray token.
+            sem_post(linksync[i]);
             sem_close(linksync[i]);
-            if (!(f & 0xf)) {
-                linkevent[sizeof(linkevent) - 2] = (char)i + '1';
-                sem_unlink(linkevent);
-            }
 #endif
             linksync[i] = NULL;
         }
     }
 
-    // Tear down the structural lock; the last instance out unlinks it.
+    // Tear down the structural lock; name unlinking is the last-one-out
+    // block's job below.
 #if (defined __WIN32__ || defined _WIN32)
     if (linkmem_lock != NULL) {
         CloseHandle(linkmem_lock);
@@ -4800,8 +5126,6 @@ static void CloseIPC()
 #else
     if (linkmem_lock != SEM_FAILED) {
         sem_close(linkmem_lock);
-        if (!(f & 0xf))
-            sem_unlink(linklockname);
         linkmem_lock = SEM_FAILED;
     }
 #endif
@@ -4819,13 +5143,44 @@ static void CloseIPC()
     linkmem = NULL;
     AndroidLinkShmClose();
 #else
-    if (!(f & 0xf))
-        shm_unlink("/" LOCAL_LINK_NAME);
-    if (linkmem != NULL)
-        munmap(linkmem, sizeof(LINKDATA));
+    munmap(linkmem, sizeof(LINKDATA));
+    linkmem = NULL;
     if (mmf >= 0)
         close(mmf);
-    linkmem = NULL;
     mmf = -1;
+
+    // Last-one-out cleanup keys off the flock liveness probe rather than
+    // linkflags: a crashed peer leaves its flag bit set (yet nobody is
+    // alive, so the objects must go), while a live peer whose bit was
+    // cleared by a drop must not have its session unlinked from under it.
+    {
+        LinkInitLock init_lock(LinkLockFilePath(".init"));
+        bool last_out;
+        if (link_liveness_fd >= 0) {
+            // Drop our shared lock first; flock lock upgrades are not
+            // atomic, so probe with a fresh descriptor instead.
+            close(link_liveness_fd);
+            link_liveness_fd = -1;
+            last_out = false;
+            int probe = open(LinkLockFilePath(".flock").c_str(), O_RDWR | O_CLOEXEC);
+            if (probe >= 0) {
+                last_out = (flock(probe, LOCK_EX | LOCK_NB) == 0);
+                close(probe);
+            }
+        } else {
+            last_out = !(f & 0xf); // degraded fallback (no lock file)
+        }
+        if (last_out) {
+            shm_unlink(LinkShmName().c_str());
+            for (int i = 0; i < 4; i++)
+                sem_unlink(LinkSemName(i).c_str());
+            sem_unlink(LinkLockSemName().c_str());
+        }
+    }
 #endif
+
+    // Don't leak an in-progress transfer into a later InitLink().
+    transfer_direction = 0;
+    numtransfers = 0;
+    linktime = 0;
 }

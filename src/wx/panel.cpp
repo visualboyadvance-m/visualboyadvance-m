@@ -2447,7 +2447,10 @@ void GameArea::OnIdle(wxIdleEvent& event)
         StepFilterProbe();
 #ifndef NO_LINK
 
-        if (loaded == IMAGE_GBA && GetLinkMode() != LINK_DISCONNECTED)
+        // GB sessions need this too: it drains a deferred link close
+        // (e.g. the peer vanished while the serial port was idle) that
+        // the GB path would otherwise only notice on the next transfer.
+        if ((loaded == IMAGE_GBA || loaded == IMAGE_GB) && GetLinkMode() != LINK_DISCONNECTED)
             CheckLinkConnection();
 
 #endif

@@ -38,6 +38,45 @@ if(APPLE)
         "-framework CoreFoundation" ${LIBICONV_LIB})
 endif()
 
+# link_ipc_test / link_socket_runner: two-process harnesses for the local
+# IPC link (shared memory + named semaphores + flock liveness) and the LAN
+# TCP link. They fork() and drive both endpoints at the gbaLink API level,
+# so no ROMs are needed; each scenario is its own ctest entry. UNIX-only:
+# the harness relies on fork/pipes/flock, and on Windows the kernel cleans
+# up the named objects itself.
+if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
+    foreach(_link_runner link_ipc_test link_socket_runner)
+        add_executable(${_link_runner} ${_link_runner}.cpp)
+        target_link_libraries(${_link_runner} PRIVATE vbam-core)
+        if(APPLE)
+            if(NOT LIBICONV_LIB)
+                find_library(LIBICONV_LIB NAMES libiconv iconv)
+            endif()
+            target_link_libraries(${_link_runner} PRIVATE
+                "-framework CoreFoundation" ${LIBICONV_LIB})
+        endif()
+    endforeach()
+
+    foreach(_t role_assignment stale_recovery gb_exchange gb_third_instance)
+        add_test(NAME link.ipc.${_t} COMMAND link_ipc_test --test ${_t})
+        set_tests_properties(link.ipc.${_t} PROPERTIES
+            LABELS "link" TIMEOUT 120)
+    endforeach()
+    # The 2-player GBA cable exchange is the most timing-coupled scenario;
+    # it gets its own name so the deterministic tests above stay the gate
+    # if it ever needs to be excluded on a loaded CI runner.
+    add_test(NAME link.ipc.cable COMMAND link_ipc_test --test gba_cable_2p)
+    set_tests_properties(link.ipc.cable PROPERTIES
+        LABELS "link" TIMEOUT 120)
+
+    foreach(_t handshake handshake_retry cable gb disconnect disconnect_goodbye)
+        add_test(NAME link.socket.${_t} COMMAND link_socket_runner --test ${_t})
+        set_tests_properties(link.socket.${_t} PROPERTIES
+            LABELS "link" TIMEOUT 120)
+    endforeach()
+    message(STATUS "vbam-core test: link.* two-process tests enabled")
+endif()
+
 # The test runners must inherit the global LTO setting rather than force it
 # off: they link vbam-core, whose archive holds LLVM bitcode when LTO is on.
 # Linking a bitcode archive into a non-LTO executable makes the clang driver
