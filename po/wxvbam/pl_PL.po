@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 09:00+0000\n"
+"POT-Creation-Date: 2026-08-02 14:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Damian Drakon <dragon1590@gmail.com>, 2019-2020,2022-2023\n"
 "Language-Team: Polish (Poland) (http://app.transifex.com/bgk/vba-m/language/pl_PL/)\n"
@@ -41,11 +41,11 @@ msgstr ""
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr ""
 
-#: cmdevents.cpp:73 wxvbam.cpp:1100
+#: cmdevents.cpp:74 wxvbam.cpp:1114
 msgid "Could not create main window"
 msgstr "Nie można utworzyć okna głównego"
 
-#: cmdevents.cpp:225
+#: cmdevents.cpp:226
 msgid ""
 "Game Boy Advance Files "
 "(*.agb;*.gba;*.bin;*.elf;*.mb;*.zip;*.7z;*.rar)|*.agb;*.gba;*.bin;*.elf;*.mb;*.agb.lz;*.gba.lz;*.bin.lz;*.elf.lz;*.mb.lz;*.agb.xz;*.gba.xz;*.bin.xz;*.elf.xz;*.mb.xz;*.agb.bz2;*.gba.bz2;*.bin.bz2;*.elf.bz2;*.mb.bz2;*.agb.gz;*.gba.gz;*.bin.gz;*.elf.gz;*.mb.gz;*.agb.z;*.gba.z;*.bin.z;*.elf.z;*.mb.z;*.zip;*.7z;*.rar|Game"
@@ -53,295 +53,295 @@ msgid ""
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:243
+#: cmdevents.cpp:244
 msgid "Open ROM file"
 msgstr "Otwórz plik pamięci ROM"
 
-#: cmdevents.cpp:280
+#: cmdevents.cpp:281
 msgid ""
 "Game Boy Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:289
+#: cmdevents.cpp:290
 msgid "Open GB ROM file"
 msgstr "Otwórz plik pamięci ROM konsoli GB"
 
-#: cmdevents.cpp:325
+#: cmdevents.cpp:326
 msgid ""
 "Game Boy Color Files "
 "(*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.zip;*.7z;*.rar)|*.dmg;*.gb;*.gbc;*.cgb;*.sgb;*.dmg.lz;*.gb.lz;*.gbc.lz;*.cgb.lz;*.sgb.lz;*.dmg.xz;*.gb.xz;*.gbc.xz;*.cgb.xz;*.sgb.xz;*.dmg.bz2;*.gb.bz2;*.gbc.bz2;*.cgb.bz2;*.sgb.bz2;*.dmg.gz;*.gb.gz;*.gbc.gz;*.cgb.gz;*.sgb.gz;*.dmg.z;*.gb.z;*.gbc.z;*.cgb.z;*.sgb.z;*.tar;*.zip;*.7z;*.rar|"
 msgstr ""
 
-#: cmdevents.cpp:334
+#: cmdevents.cpp:335
 msgid "Open GBC ROM file"
 msgstr "Otwórz plik pamięci ROM konsoli GBC"
 
-#: cmdevents.cpp:503 cmdevents.cpp:528
+#: cmdevents.cpp:504 cmdevents.cpp:529
 msgid "Select Dot Code file"
 msgstr "Wybierz plik Dot Code"
 
-#: cmdevents.cpp:505 cmdevents.cpp:530
+#: cmdevents.cpp:506 cmdevents.cpp:531
 msgid "E-Reader Dot Code (*.bin;*.raw)|*.bin;*.raw"
 msgstr ""
 
-#: cmdevents.cpp:552 cmdevents.cpp:758
+#: cmdevents.cpp:553 cmdevents.cpp:759
 msgid "Select battery file"
 msgstr "Wybierz plik baterii"
 
-#: cmdevents.cpp:553 cmdevents.cpp:759
+#: cmdevents.cpp:554 cmdevents.cpp:760
 msgid "Battery file (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgstr "Plik baterii (*.sav)|*.sav|Zapis Flash (*.dat)|*.dat"
 
-#: cmdevents.cpp:564
+#: cmdevents.cpp:565
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
 msgstr ""
 
-#: cmdevents.cpp:565 cmdevents.cpp:598 cmdevents.cpp:721
+#: cmdevents.cpp:566 cmdevents.cpp:599 cmdevents.cpp:722
 msgid "Confirm import"
 msgstr "Potwierdź importowanie"
 
-#: cmdevents.cpp:572 panel.cpp:1109
+#: cmdevents.cpp:573 panel.cpp:1106
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Wczytana bateria %s"
 
-#: cmdevents.cpp:574
+#: cmdevents.cpp:575
 #, c-format
 msgid "Error loading battery %s"
 msgstr "Niepowodzenie przy wczytywaniu baterii %s"
 
-#: cmdevents.cpp:584
+#: cmdevents.cpp:585
 msgid "Select code file"
 msgstr "Wybierz plik z kodami"
 
-#: cmdevents.cpp:585
+#: cmdevents.cpp:586
 msgid "Game Shark Code File (*.spc;*.xpc)|*.spc;*.xpc"
 msgstr "Plik kodów Game Shark (*.spc;*.xpc)|*.spc;*.xpc"
 
-#: cmdevents.cpp:585
+#: cmdevents.cpp:586
 msgid "Game Shark Code File (*.gcf)|*.gcf"
 msgstr "Plik kodów Game Shark (*.gcf)|*.gcf"
 
-#: cmdevents.cpp:597
+#: cmdevents.cpp:598
 msgid ""
 "Importing a code file will replace any loaded cheats. Do you want to "
 "continue?"
 msgstr "Zaimportowanie pliku z kodami zastąpi wszystkie wczytane kody. Czy chcesz kontynuować?"
 
-#: cmdevents.cpp:614
+#: cmdevents.cpp:615
 #, c-format
 msgid "Cannot open file %s"
 msgstr "Nie można otworzyć pliku %s"
 
-#: cmdevents.cpp:624
+#: cmdevents.cpp:625
 #, c-format
 msgid "Unsupported code file %s"
 msgstr "Nieobsługiwany plik z kodami %s"
 
-#: cmdevents.cpp:694
+#: cmdevents.cpp:695
 #, c-format
 msgid "Loaded code file %s"
 msgstr "Wczytany plik z kodami %s"
 
-#: cmdevents.cpp:696
+#: cmdevents.cpp:697
 #, c-format
 msgid "Error loading code file %s"
 msgstr "Niepowodzenie przy wczytywaniu pliku z kodami %s"
 
-#: cmdevents.cpp:707 cmdevents.cpp:789
+#: cmdevents.cpp:708 cmdevents.cpp:790
 msgid "Select snapshot file"
 msgstr "Wybierz plik migawki"
 
-#: cmdevents.cpp:708
+#: cmdevents.cpp:709
 msgid ""
 "Game Shark & PAC Snapshots (*.sps;*.xps)|*.sps;*.xps|Game Shark SP Snapshots"
 " (*.gsv)|*.gsv"
 msgstr "Migawki Game Shark i PAC (*.sps;*.xps)|*.sps;*.xps|Migawki Game Shark SP (*.gsv)|*.gsv"
 
-#: cmdevents.cpp:708
+#: cmdevents.cpp:709
 msgid "Game Boy Snapshot (*.gbs)|*.gbs"
 msgstr "Migawka konsoli Game Boy (*.gbs)|*.gbs"
 
-#: cmdevents.cpp:720
+#: cmdevents.cpp:721
 msgid ""
 "Importing a snapshot file will erase any saved games (permanently after the "
 "next write). Do you want to continue?"
 msgstr "Zaimportowanie pliku migawki usunie wszystkie zapisy gry (na stałe po ponownym zapisie). Czy chcesz kontynuować?"
 
-#: cmdevents.cpp:745
+#: cmdevents.cpp:746
 #, c-format
 msgid "Loaded snapshot file %s"
 msgstr "Wczytany plik migawki %s"
 
-#: cmdevents.cpp:747
+#: cmdevents.cpp:748
 #, c-format
 msgid "Error loading snapshot file %s"
 msgstr "Niepowodzenie przy wczytywaniu pliku migawki %s"
 
-#: cmdevents.cpp:773
+#: cmdevents.cpp:774
 #, c-format
 msgid "Wrote battery %s"
 msgstr "Zapisana bateria %s"
 
-#: cmdevents.cpp:775 panel.cpp:1473
+#: cmdevents.cpp:776 panel.cpp:1470
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Niepowodzenie przy zapisywaniu baterii %s"
 
-#: cmdevents.cpp:783
+#: cmdevents.cpp:784
 msgid "EEPROM saves cannot be exported"
 msgstr "Zapisy EEPROM nie mogą być wyeksportowane"
 
-#: cmdevents.cpp:790
+#: cmdevents.cpp:791
 msgid "Game Shark Snapshot (*.sps)|*.sps"
 msgstr "Migawka Game Shark (*.sps)|*.sps"
 
-#: cmdevents.cpp:807
+#: cmdevents.cpp:808
 msgid "Exported from Visual Boy Advance-M"
 msgstr "Wyeksportowane z Visual Boy Advance-M"
 
-#: cmdevents.cpp:819
+#: cmdevents.cpp:820
 #, c-format
 msgid "Saved snapshot file %s"
 msgstr "Zapisany plik migawki %s"
 
-#: cmdevents.cpp:821 cmdevents.cpp:881
+#: cmdevents.cpp:822 cmdevents.cpp:882
 #, c-format
 msgid "Error saving snapshot file %s"
 msgstr "Niepowodzenie przy zapisywaniu pliku migawki %s"
 
-#: cmdevents.cpp:837 cmdevents.cpp:935 cmdevents.cpp:1008 cmdevents.cpp:1080
+#: cmdevents.cpp:838 cmdevents.cpp:936 cmdevents.cpp:1009 cmdevents.cpp:1081
 #: gfxviewers.cpp:1716 gfxviewers.cpp:1884 viewers.cpp:612 viewers.cpp:837
 #: viewsupt.cpp:1254
 msgid "Select output file"
 msgstr "Zapisz jako..."
 
-#: cmdevents.cpp:838 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1255
+#: cmdevents.cpp:839 gfxviewers.cpp:1717 gfxviewers.cpp:1885 viewsupt.cpp:1255
 msgid "PNG images|*.png|BMP images|*.bmp"
 msgstr "Obrazy PNG|*.png|Obrazy BMP|*.bmp"
 
-#: cmdevents.cpp:879 sys.cpp:662
+#: cmdevents.cpp:880 sys.cpp:662
 #, c-format
 msgid "Wrote snapshot %s"
 msgstr "Zapisana migawka %s"
 
-#: cmdevents.cpp:903 cmdevents.cpp:976 cmdevents.cpp:1048 cmdevents.cpp:1117
+#: cmdevents.cpp:904 cmdevents.cpp:977 cmdevents.cpp:1049 cmdevents.cpp:1118
 msgid " files ("
 msgstr " pliki ("
 
-#: cmdevents.cpp:1150
+#: cmdevents.cpp:1151
 msgid "Select file"
 msgstr "Wybierz plik"
 
-#: cmdevents.cpp:1457 cmdevents.cpp:1556
+#: cmdevents.cpp:1458 cmdevents.cpp:1557
 msgid "Select state file"
 msgstr "Wybierz plik zapisu stanu gry"
 
-#: cmdevents.cpp:1458 cmdevents.cpp:1557
+#: cmdevents.cpp:1459 cmdevents.cpp:1558
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Pliki zapisu gry emulatora Visual Boy Advance|*.sgm"
 
-#: cmdevents.cpp:1582 panel.cpp:1445
+#: cmdevents.cpp:1583 panel.cpp:1442
 #, c-format
 msgid "Error saving state %s"
 msgstr "Niepowodzenie przy zapisywaniu stanu gry %s"
 
-#: cmdevents.cpp:1607 cmdevents.cpp:1617 cmdevents.cpp:1628
+#: cmdevents.cpp:1608 cmdevents.cpp:1618 cmdevents.cpp:1629
 #, c-format
 msgid "Current state slot #%d"
 msgstr "Bieżące gniazdo zapisu stanu gry #%d"
 
-#: cmdevents.cpp:1691
+#: cmdevents.cpp:1692
 msgid "Cannot use Colorizer Hack when Game Boy BIOS File is enabled."
 msgstr "Nie można użyć Hacku Koloryzatora, gdy plik BIOSu konsoli Game Boy jest włączony."
 
-#: cmdevents.cpp:1902
+#: cmdevents.cpp:1903
 msgid "Sound enabled"
 msgstr "Dźwięk włączony"
 
-#: cmdevents.cpp:1902
+#: cmdevents.cpp:1903
 msgid "Sound disabled"
 msgstr "Dźwięk wyłączony"
 
-#: cmdevents.cpp:1978
+#: cmdevents.cpp:1979
 msgid "Run Lua script"
 msgstr ""
 
-#: cmdevents.cpp:1979
+#: cmdevents.cpp:1980
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
 msgstr ""
 
-#: cmdevents.cpp:1987
+#: cmdevents.cpp:1988
 msgid "Lua script failed to load — see console"
 msgstr ""
 
-#: cmdevents.cpp:2022
+#: cmdevents.cpp:2023
 msgid "Set to 0 for pseudo tty"
 msgstr "Ustaw na 0 dla pseudo tty"
 
-#: cmdevents.cpp:2024
+#: cmdevents.cpp:2025
 msgid "Port to wait for connection:"
 msgstr "Port oczekiwania na połączenie:"
 
-#: cmdevents.cpp:2025
+#: cmdevents.cpp:2026
 msgid "GDB Connection"
 msgstr "Połączenie GDB"
 
-#: cmdevents.cpp:2077
+#: cmdevents.cpp:2078
 #, c-format
 msgid "Waiting for connection at %s"
 msgstr "Oczekiwanie na połączenie z %s"
 
-#: cmdevents.cpp:2084
+#: cmdevents.cpp:2085
 #, c-format
 msgid "Waiting for connection on port %d"
 msgstr "Oczekiwanie na połączenie z portem %d"
 
-#: cmdevents.cpp:2088
+#: cmdevents.cpp:2089
 msgid "Waiting for GDB..."
 msgstr "Oczekiwanie na GDB..."
 
-#: cmdevents.cpp:2455 cmdevents.cpp:2468 cmdevents.cpp:2494 cmdevents.cpp:2499
+#: cmdevents.cpp:2456 cmdevents.cpp:2469 cmdevents.cpp:2495 cmdevents.cpp:2500
 #, c-format
 msgid "Filter: %s"
 msgstr ""
 
-#: cmdevents.cpp:2473 cmdevents.cpp:2490
+#: cmdevents.cpp:2474 cmdevents.cpp:2491
 #, c-format
 msgid "Filter: Plugin (%s)"
 msgstr ""
 
-#: cmdevents.cpp:2510
+#: cmdevents.cpp:2511
 #, c-format
 msgid "Interframe Blending: %s"
 msgstr ""
 
-#: cmdevents.cpp:2559
+#: cmdevents.cpp:2560
 msgid ""
 "YOUR CONFIGURATION WILL BE DELETED!\n"
 "\n"
 "Are you sure?"
 msgstr "TWOJA KONFIGURACJA ZOSTANIE USUNIĘTA!\n\nJesteś pewien(wna)?"
 
-#: cmdevents.cpp:2560
+#: cmdevents.cpp:2561
 msgid "FACTORY RESET"
 msgstr "PRZYWRÓCENIE USTAWIEŃ FABRYCZNYCH"
 
-#: cmdevents.cpp:2595
+#: cmdevents.cpp:2596
 msgid "Nintendo Game Boy / Color / Advance emulator."
 msgstr "Emulator konsoli Nintendo Game Boy / Color / Advance."
 
-#: cmdevents.cpp:2596
+#: cmdevents.cpp:2597
 msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
 msgstr "Prawo autorskie (C) 1999-2003 Forgotten\nPrawo autorskie (C) 2004-2006 VBA development team\nPrawo autorskie (C) 2007-2020 VBA-M development team"
 
-#: cmdevents.cpp:2598
+#: cmdevents.cpp:2599
 msgid ""
 "This program is free software: you can redistribute it and / or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -357,19 +357,19 @@ msgid ""
 "along with this program. If not, see http://www.gnu.org/licenses ."
 msgstr "Niniejszy program jest wolnym oprogramowaniem; możesz go\nrozprowadzać dalej lub modyfikować na warunkach Powszechnej\nLicencji Publicznej GNU, wydanej przez Fundację Wolnego\nOprogramowania - według wersji 2 tej Licencji lub (według twojego\nwyboru) którejś z późniejszych wersji.\n\nNiniejszy program rozpowszechniany jest z nadzieją, iż będzie on\nużyteczny - jednak BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej\ngwarancji PRZYDATNOŚCI HANDLOWEJ albo PRZYDATNOŚCI DO\nOkreślonych ZASTOSOWAŃ. W celu uzyskania bliższych informacji\nsięgnij do Powszechnej Licencji Publicznej GNU.\n\nZ pewnością wraz z niniejszym programem otrzymałeś też egzemplarz\nPowszechnej Licencji Publicznej GNU (GNU General Public License);\njeśli nie - zobacz http://www.gnu.org/licenses ."
 
-#: cmdevents.cpp:2656 extra-translations.cpp:16
+#: cmdevents.cpp:2657 extra-translations.cpp:16
 msgid "Close"
 msgstr "Zamknij"
 
-#: cmdevents.cpp:2793
+#: cmdevents.cpp:2794
 msgid "Cannot use Game Boy BIOS when Colorizer Hack is enabled."
 msgstr "Nie można użyć BIOSu konsoli Game Boy, gdy Hack Koloryzatora jest włączony."
 
-#: cmdevents.cpp:2874
+#: cmdevents.cpp:2875
 msgid "LAN link is already active. Disable link mode to disconnect."
 msgstr "Połączenie LAN jest już aktywne. Wyłącz tryb połączenia aby się rozłączyć."
 
-#: cmdevents.cpp:2880
+#: cmdevents.cpp:2881
 msgid "Network is not supported in local mode."
 msgstr "W trybie lokalnym sieć nie jest wspierana."
 
@@ -415,11 +415,11 @@ msgid ""
 " was found, so the display fell back to XWayland (8-bit SDR only)."
 msgstr ""
 
-#: dialogs/display-config.cpp:866
+#: dialogs/display-config.cpp:873
 msgid "Invalid color correction profile"
 msgstr ""
 
-#: dialogs/display-config.cpp:1037 xrc/DisplayConfigBasic.xrc:171
+#: dialogs/display-config.cpp:1044 xrc/DisplayConfigBasic.xrc:171
 #: xrc/DisplayConfigBasic.xrc:211 xrc/DisplayConfigOSD.xrc:17
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
@@ -427,22 +427,22 @@ msgstr ""
 msgid "None"
 msgstr "Brak"
 
-#: dialogs/display-config.cpp:1099
+#: dialogs/display-config.cpp:1106
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Nie znaleziono użytecznych wtyczek rpi w %s"
 
-#: dialogs/display-config.cpp:1180 dialogs/display-config.cpp:1568
+#: dialogs/display-config.cpp:1187 dialogs/display-config.cpp:1575
 #: xrc/DisplayConfigBasic.xrc:187
 msgid "Plugin"
 msgstr "Wtyczka"
 
-#: dialogs/display-config.cpp:1189
+#: dialogs/display-config.cpp:1196
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Używany filtr pikseli: %s"
 
-#: dialogs/display-config.cpp:1199
+#: dialogs/display-config.cpp:1206
 #, c-format
 msgid "interframe blend: %s"
 msgstr ""
@@ -456,7 +456,7 @@ msgstr "(Brak)"
 msgid "System"
 msgstr "Konsola"
 
-#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2522
+#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2514
 msgid "Boot ROM"
 msgstr "Rozruchowa pamięć ROM"
 
@@ -745,7 +745,7 @@ msgstr "Wybierz plik z kodami"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Listy kodów VBA (*.clt)|*.clt|Listy kodów CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:286 panel.cpp:1167
+#: guiinit.cpp:286 panel.cpp:1164
 msgid "Loaded cheats"
 msgstr "Wczytane kody"
 
@@ -809,40 +809,40 @@ msgstr "Nie znaleziono głównej ikony"
 msgid "Main display panel not found"
 msgstr "Nie znaleziono głównego panelu wyświetlacza"
 
-#: guiinit.cpp:2028
+#: guiinit.cpp:2020
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Nieprawidłowy element menu %s; usuwanie"
 
-#: guiinit.cpp:2075
+#: guiinit.cpp:2067
 msgid "JoyBus host invalid; disabling"
 msgstr "Nieprawidłowy host JoyBus; wyłączanie"
 
-#: guiinit.cpp:2334
+#: guiinit.cpp:2326
 msgid "Code"
 msgstr "Kod"
 
-#: guiinit.cpp:2340
+#: guiinit.cpp:2332
 msgid "Description"
 msgstr "Opis"
 
-#: guiinit.cpp:2393 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2385 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Adres"
 
-#: guiinit.cpp:2394
+#: guiinit.cpp:2386
 msgid "Old Value"
 msgstr "Stara Wartość"
 
-#: guiinit.cpp:2395
+#: guiinit.cpp:2387
 msgid "New Value"
 msgstr "Nowa Wartość"
 
-#: guiinit.cpp:2497
+#: guiinit.cpp:2489
 msgid "Save type"
 msgstr "Typ zapisu"
 
-#: guiinit.cpp:2536
+#: guiinit.cpp:2528
 msgid "Game Overrides"
 msgstr "Przedefiniowanie ustawień gry"
 
@@ -869,41 +869,41 @@ msgstr "Nieprawidłowa wartość %s dla opcji %s"
 msgid "Unknown option %s with value %s"
 msgstr "Nieznana opcja %s z wartością %s"
 
-#: panel.cpp:774
+#: panel.cpp:771
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s nie jest prawidłowym plikiem pamięci ROM"
 
-#: panel.cpp:775 panel.cpp:836 panel.cpp:930
+#: panel.cpp:772 panel.cpp:833 panel.cpp:927
 msgid "Problem loading file"
 msgstr "Problem z wczytywaniem pliku"
 
-#: panel.cpp:835
+#: panel.cpp:832
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Nie można załadować pliku pamięci ROM konsoli Game Boy %s"
 
-#: panel.cpp:876
+#: panel.cpp:873
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Nie można użyć pliku BIOS konsoli Game Boy, gdy Hack Koloryzatora jest włączony, wyłączanie Pliku BIOSu konsoli Game Boy."
 
-#: panel.cpp:906 panel.cpp:1034
+#: panel.cpp:903 panel.cpp:1031
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Nie można załadować pliku BIOS %s"
 
-#: panel.cpp:929
+#: panel.cpp:926
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Nie można załadować pliku pamięci ROM konsoli Game Boy Advance %s"
 
-#: panel.cpp:1204
+#: panel.cpp:1201
 msgid " player "
 msgstr "gracz"
 
-#: panel.cpp:1252
+#: panel.cpp:1249
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -912,11 +912,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1253 panel.cpp:1274 wxvbam.cpp:1807
+#: panel.cpp:1250 panel.cpp:1271 wxvbam.cpp:1821
 msgid "Directory Error"
 msgstr ""
 
-#: panel.cpp:1273
+#: panel.cpp:1270
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -925,55 +925,55 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1421
+#: panel.cpp:1418
 #, c-format
 msgid "Loaded state %s"
 msgstr "Wczytano zapisany stan gry %s"
 
-#: panel.cpp:1421
+#: panel.cpp:1418
 #, c-format
 msgid "Error loading state %s"
 msgstr "Niepowodzenie przy wczytywaniu zapisanego stanu gry %s"
 
-#: panel.cpp:1445
+#: panel.cpp:1442
 #, c-format
 msgid "Saved state %s"
 msgstr "Zapisany stan gry %s"
 
-#: panel.cpp:1851
+#: panel.cpp:1848
 msgid "Done"
 msgstr ""
 
-#: panel.cpp:1888
+#: panel.cpp:1885
 msgid "Running quick first-time performance test"
 msgstr ""
 
-#: panel.cpp:2041
+#: panel.cpp:2038
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Tryb pełnoekranowy %d x %d - %d @ %d nie jest wspierany; szukanie innego"
 
-#: panel.cpp:2079
+#: panel.cpp:2076
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Tryb pełnoekranowy %d x %d - %d @ %d nie jest wspierany"
 
-#: panel.cpp:2084
+#: panel.cpp:2081
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Wspierany tryb: %d x %d - %d @ %d"
 
-#: panel.cpp:2092
+#: panel.cpp:2089
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Wybrano tryb %d x %d - %d @ %d"
 
-#: panel.cpp:2096
+#: panel.cpp:2093
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Nie można zmienić trybu na %d x %d - %d @ %d"
 
-#: panel.cpp:2192
+#: panel.cpp:2189
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Nieprawidłowy kartridż konsoli Game Boy Advance"
 
@@ -1033,641 +1033,641 @@ msgstr ""
 msgid "Failed to create Android video surface"
 msgstr ""
 
-#: panel.cpp:4632
+#: panel.cpp:4627
 msgid "Failed to initialize SDL video subsystem"
 msgstr ""
 
-#: panel.cpp:4644
+#: panel.cpp:4639
 msgid "Failed to initialize SDL video"
 msgstr ""
 
-#: panel.cpp:4659
+#: panel.cpp:4654
 msgid "Failed to set wayland surface"
 msgstr ""
 
-#: panel.cpp:4703
+#: panel.cpp:4698
 msgid "Failed to set parent window"
 msgstr ""
 
-#: panel.cpp:4715
+#: panel.cpp:4710
 msgid "Failed to set OpenGL properties"
 msgstr ""
 
-#: panel.cpp:4736 panel.cpp:4929
+#: panel.cpp:4731 panel.cpp:4924
 msgid "Failed to create SDL window"
 msgstr ""
 
-#: panel.cpp:4847 panel.cpp:4958
+#: panel.cpp:4842 panel.cpp:4953
 msgid "Renderer creating failed, using default renderer"
 msgstr ""
 
-#: panel.cpp:4848
+#: panel.cpp:4843
 #, c-format
 msgid "SDL Error: %s"
 msgstr ""
 
-#: panel.cpp:4855 panel.cpp:4964
+#: panel.cpp:4850 panel.cpp:4959
 msgid "Failed to create SDL renderer"
 msgstr ""
 
-#: panel.cpp:4914
+#: panel.cpp:4909
 msgid "Failed to set vsync for SDL renderer"
 msgstr ""
 
-#: panel.cpp:4918 panel.cpp:4953
+#: panel.cpp:4913 panel.cpp:4948
 #, c-format
 msgid "SDL renderer: %s"
 msgstr ""
 
-#: panel.cpp:4938
+#: panel.cpp:4933
 msgid "SDL renderer: default"
 msgstr ""
 
-#: panel.cpp:6694
+#: panel.cpp:6689
 msgid "Enabling EGL VSync."
 msgstr "Włączenie EGL VSync."
 
-#: panel.cpp:6696
+#: panel.cpp:6691
 msgid "Disabling EGL VSync."
 msgstr "Wyłączenie EGL VSync."
 
-#: panel.cpp:6704
+#: panel.cpp:6699
 msgid "Enabling GLX VSync."
 msgstr "Włączenie GLX VSync."
 
-#: panel.cpp:6706
+#: panel.cpp:6701
 msgid "Disabling GLX VSync."
 msgstr "Wyłączenie GLX VSync."
 
-#: panel.cpp:6724
+#: panel.cpp:6719
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Nie udało się ustawić glXSwapIntervalEXT"
 
-#: panel.cpp:6733
+#: panel.cpp:6728
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Nie udało się ustawić glXSwapIntervalSGI"
 
-#: panel.cpp:6742
+#: panel.cpp:6737
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Nie udało się ustawić glXSwapIntervalMESA"
 
-#: panel.cpp:6751
+#: panel.cpp:6746
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Brak wsparcia dla wglGetExtensionsStringEXT"
 
-#: panel.cpp:6754
+#: panel.cpp:6749
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Brak wsparcia dla WGL_EXT_swap_control"
 
-#: panel.cpp:6763
+#: panel.cpp:6758
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Nie udało się ustawić wglSwapIntervalEXT"
 
-#: panel.cpp:6769
+#: panel.cpp:6764
 msgid "No VSYNC available on this platform"
 msgstr "VSYNC jest niedostępne na tej platformie"
 
-#: panel.cpp:6858
+#: panel.cpp:6853
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
 msgstr ""
 
-#: panel.cpp:7107
+#: panel.cpp:7102
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr ""
 
-#: panel.cpp:7133
+#: panel.cpp:7128
 msgid "Failed to get D3D12 function pointers"
 msgstr ""
 
-#: panel.cpp:7138
+#: panel.cpp:7133
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7152
+#: panel.cpp:7147
 msgid "No hardware adapter found, falling back to WARP"
 msgstr ""
 
-#: panel.cpp:7159
+#: panel.cpp:7154
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7160
+#: panel.cpp:7155
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr ""
 
-#: panel.cpp:7167
+#: panel.cpp:7162
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7193
+#: panel.cpp:7188
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7199
+#: panel.cpp:7194
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7230
+#: panel.cpp:7225
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
 msgstr ""
 
-#: panel.cpp:7240
+#: panel.cpp:7235
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7249
+#: panel.cpp:7244
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7256
+#: panel.cpp:7251
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7264
+#: panel.cpp:7259
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7269
+#: panel.cpp:7264
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7308
+#: panel.cpp:7303
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr ""
 
-#: panel.cpp:7315
+#: panel.cpp:7310
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7329
+#: panel.cpp:7324
 #, c-format
 msgid "VS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:7337
+#: panel.cpp:7332
 #, c-format
 msgid "PS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:7366
+#: panel.cpp:7361
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7386
+#: panel.cpp:7381
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7395
+#: panel.cpp:7390
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7398
+#: panel.cpp:7393
 msgid "Failed to create fence event"
 msgstr ""
 
-#: panel.cpp:7400
+#: panel.cpp:7395
 msgid "D3D12 pipeline fully initialized"
 msgstr ""
 
-#: panel.cpp:7432
+#: panel.cpp:7427
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:7454
+#: panel.cpp:7449
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7465
+#: panel.cpp:7460
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr ""
 
-#: panel.cpp:7731
+#: panel.cpp:7726
 msgid "Texture upload failed"
 msgstr ""
 
-#: panel.cpp:7885
+#: panel.cpp:7880
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
 msgstr ""
 
-#: panel.cpp:7937
+#: panel.cpp:7932
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8003
+#: panel.cpp:7998
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
 msgstr ""
 
-#: panel.cpp:8055
+#: panel.cpp:8050
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
 msgstr ""
 
-#: panel.cpp:8340
+#: panel.cpp:8335
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr ""
 
-#: panel.cpp:8344
+#: panel.cpp:8339
 msgid "Failed to load d3d9.dll"
 msgstr ""
 
-#: panel.cpp:8353
+#: panel.cpp:8348
 msgid "Failed to create Direct3D 9 interface"
 msgstr ""
 
-#: panel.cpp:8356
+#: panel.cpp:8351
 msgid "Using Direct3D 9"
 msgstr ""
 
-#: panel.cpp:8363
+#: panel.cpp:8358
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8387
+#: panel.cpp:8382
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr ""
 
-#: panel.cpp:8403
+#: panel.cpp:8398
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr ""
 
-#: panel.cpp:8427
+#: panel.cpp:8422
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8432
+#: panel.cpp:8427
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8468
+#: panel.cpp:8463
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:8490
+#: panel.cpp:8485
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8522
+#: panel.cpp:8517
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8529
+#: panel.cpp:8524
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr ""
 
-#: panel.cpp:8541
+#: panel.cpp:8536
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8546
+#: panel.cpp:8541
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8614
+#: panel.cpp:8609
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8626
+#: panel.cpp:8621
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8818
+#: panel.cpp:8813
 msgid "Memory allocation error"
 msgstr ""
 
-#: panel.cpp:8821
+#: panel.cpp:8816
 msgid "Error initializing codec"
 msgstr ""
 
-#: panel.cpp:8824 panel.cpp:8889 panel.cpp:8937
+#: panel.cpp:8819 panel.cpp:8884 panel.cpp:8932
 msgid "Error writing to output file"
 msgstr ""
 
-#: panel.cpp:8827
+#: panel.cpp:8822
 msgid "Can't guess output format from file name"
 msgstr ""
 
-#: panel.cpp:8832
+#: panel.cpp:8827
 msgid "Programming error; aborting!"
 msgstr ""
 
-#: panel.cpp:8850 panel.cpp:8901
+#: panel.cpp:8845 panel.cpp:8896
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Nie można rozpocząć nagrywania do %s (%s)"
 
-#: panel.cpp:8945
+#: panel.cpp:8940
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania dźwięku / obrazu (%s); przerywanie"
 
-#: panel.cpp:8951
+#: panel.cpp:8946
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Błąd podczas nagrywania dźwięku (%s); przerywanie"
 
-#: panel.cpp:8961
+#: panel.cpp:8956
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Błąd podczas nagrywania wideo (%s); przerywanie"
 
-#: panel.cpp:9268
+#: panel.cpp:9263
 msgid "Renderer failed to initialize; trying the next available renderer."
 msgstr ""
 
-#: panel.cpp:9276
+#: panel.cpp:9271
 msgid "No renderer could be initialized."
 msgstr ""
 
-#: panel.cpp:9370
+#: panel.cpp:9365
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
 msgstr ""
 
-#: panel.cpp:9460
+#: panel.cpp:9455
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:9473
+#: panel.cpp:9468
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
 msgstr ""
 
-#: panel.cpp:9492
+#: panel.cpp:9487
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:9772
+#: panel.cpp:9767
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Głośność: %d %%"
 
-#: panel.cpp:10526
+#: panel.cpp:10521
 msgid "Vulkan device created successfully"
 msgstr ""
 
-#: panel.cpp:10652
+#: panel.cpp:10647
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr ""
 
-#: panel.cpp:10697
+#: panel.cpp:10692
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr ""
 
-#: panel.cpp:10700
+#: panel.cpp:10695
 msgid "Vulkan instance created"
 msgstr ""
 
-#: panel.cpp:10719
+#: panel.cpp:10714
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr ""
 
-#: panel.cpp:10742
+#: panel.cpp:10737
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:10753
+#: panel.cpp:10748
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr ""
 
-#: panel.cpp:10778
+#: panel.cpp:10773
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:10788
+#: panel.cpp:10783
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr ""
 
-#: panel.cpp:10798
+#: panel.cpp:10793
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr ""
 
-#: panel.cpp:10815
+#: panel.cpp:10810
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr ""
 
-#: panel.cpp:10871
+#: panel.cpp:10866
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr ""
 
-#: panel.cpp:10880
+#: panel.cpp:10875
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr ""
 
-#: panel.cpp:10918
+#: panel.cpp:10913
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr ""
 
-#: panel.cpp:10957
+#: panel.cpp:10952
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr ""
 
-#: panel.cpp:10975
+#: panel.cpp:10970
 msgid "No supported Vulkan surface extension available"
 msgstr ""
 
-#: panel.cpp:10986
+#: panel.cpp:10981
 msgid "No Vulkan physical devices found"
 msgstr ""
 
-#: panel.cpp:11045
+#: panel.cpp:11040
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr ""
 
-#: panel.cpp:11049
+#: panel.cpp:11044
 msgid "No suitable Vulkan physical device found"
 msgstr ""
 
-#: panel.cpp:11094
+#: panel.cpp:11089
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr ""
 
-#: panel.cpp:11230
+#: panel.cpp:11225
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr ""
 
-#: panel.cpp:11270
+#: panel.cpp:11265
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr ""
 
-#: panel.cpp:11372
+#: panel.cpp:11367
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr ""
 
-#: panel.cpp:11418
+#: panel.cpp:11413
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr ""
 
-#: panel.cpp:11440
+#: panel.cpp:11435
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr ""
 
-#: panel.cpp:11463
+#: panel.cpp:11458
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr ""
 
-#: panel.cpp:11486
+#: panel.cpp:11481
 msgid "Failed to create shader modules"
 msgstr ""
 
-#: panel.cpp:11559
+#: panel.cpp:11554
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr ""
 
-#: panel.cpp:11596
+#: panel.cpp:11591
 msgid "Failed to create overlay pipeline"
 msgstr ""
 
-#: panel.cpp:11606
+#: panel.cpp:11601
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr ""
 
-#: panel.cpp:11622
+#: panel.cpp:11617
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr ""
 
-#: panel.cpp:11640
+#: panel.cpp:11635
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr ""
 
-#: panel.cpp:11660
+#: panel.cpp:11655
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr ""
 
-#: panel.cpp:11684
+#: panel.cpp:11679
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr ""
 
-#: panel.cpp:11696
+#: panel.cpp:11691
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:11704
+#: panel.cpp:11699
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:11743
+#: panel.cpp:11738
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr ""
 
-#: panel.cpp:11757
+#: panel.cpp:11752
 msgid "Failed to allocate texture memory"
 msgstr ""
 
-#: panel.cpp:11773
+#: panel.cpp:11768
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr ""
 
-#: panel.cpp:11791
+#: panel.cpp:11786
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr ""
 
-#: panel.cpp:11825
+#: panel.cpp:11820
 msgid "Failed to create staging buffer"
 msgstr ""
 
-#: panel.cpp:11840
+#: panel.cpp:11835
 msgid "Failed to allocate staging memory"
 msgstr ""
 
-#: panel.cpp:11952
+#: panel.cpp:11947
 msgid "Failed to create overlay image"
 msgstr ""
 
-#: panel.cpp:11966
+#: panel.cpp:11961
 msgid "Failed to allocate overlay image memory"
 msgstr ""
 
-#: panel.cpp:11981
+#: panel.cpp:11976
 msgid "Failed to create overlay image view"
 msgstr ""
 
-#: panel.cpp:11998
+#: panel.cpp:11993
 msgid "Failed to create overlay sampler"
 msgstr ""
 
-#: panel.cpp:12035
+#: panel.cpp:12030
 msgid "Failed to create overlay staging buffer"
 msgstr ""
 
-#: panel.cpp:12049
+#: panel.cpp:12044
 msgid "Failed to allocate overlay staging memory"
 msgstr ""
 
-#: panel.cpp:12127
+#: panel.cpp:12122
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr ""
 
-#: panel.cpp:12223
+#: panel.cpp:12218
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr ""
 
-#: panel.cpp:12570
+#: panel.cpp:12565
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr ""
@@ -1776,80 +1776,80 @@ msgstr ""
 msgid "Unable to load dialog %s from resources"
 msgstr "Nie można załadować okna dialogowego %s z zasobów"
 
-#: wxvbam.cpp:757 wxvbam.cpp:774
+#: wxvbam.cpp:766 wxvbam.cpp:783
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Podano nieprawidłowy plik konfiguracyjny: %s"
 
-#: wxvbam.cpp:1266
+#: wxvbam.cpp:1280
 msgid "Save built-in XRC file and exit"
 msgstr "Zapisz wbudowany plik XRC i wyjdź"
 
-#: wxvbam.cpp:1269
+#: wxvbam.cpp:1283
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Zapisz wbudowaną wersję vba-over.ini i wyjdź"
 
-#: wxvbam.cpp:1272
+#: wxvbam.cpp:1286
 msgid "Print configuration path and exit"
 msgstr "Wydrukuj ścieżkę konfiguracji i wyjdź"
 
-#: wxvbam.cpp:1275
+#: wxvbam.cpp:1289
 msgid "Start in full-screen mode"
 msgstr "Uruchom w trybie pełnoekranowym"
 
-#: wxvbam.cpp:1278
+#: wxvbam.cpp:1292
 msgid "Mute the audio for this session, without saving to the config"
 msgstr ""
 
-#: wxvbam.cpp:1281
+#: wxvbam.cpp:1295
 msgid "Set a configuration file"
 msgstr "Ustaw plik konfiguracyjny"
 
-#: wxvbam.cpp:1285
+#: wxvbam.cpp:1299
 msgid "Delete shared link state first, if it exists"
 msgstr "Najpierw usuń stan dzielonego łącza, jeśli istnieje"
 
-#: wxvbam.cpp:1292
+#: wxvbam.cpp:1306
 msgid "List all settable options and exit"
 msgstr "Wyświetl wszystkie możliwe do ustawienia opcje i wyjdź"
 
-#: wxvbam.cpp:1295
+#: wxvbam.cpp:1309
 msgid "ROM file"
 msgstr "Plik pamięci ROM"
 
-#: wxvbam.cpp:1297
+#: wxvbam.cpp:1311
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1328
+#: wxvbam.cpp:1342
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Błąd konfiguracji / kompilacji: nie można odnaleźć wbudowanego pliku xrc"
 
-#: wxvbam.cpp:1336
+#: wxvbam.cpp:1350
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Zapisano wbudowany plik konfiguracyjny do %s.\nAby zastąpić jakieś ustawienia, pozostaw jedynie zmieniony/ne węzeł/zły główny/ne (pozostałe usuń). Pierwszy węzeł główny, którego poprawna nazwa znajduje się w pliku .xrc lub .xrs w następującym folderze, zastępuje wbudowany:"
 
-#: wxvbam.cpp:1350
+#: wxvbam.cpp:1364
 msgid "Configuration is read from, in order:"
 msgstr "Konfiguracja jest odczytywana, w kolejności, z:"
 
-#: wxvbam.cpp:1364
+#: wxvbam.cpp:1378
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Zapisano wbudowany plik zastępowania do %s\nAby zastąpić jakieś ustawienia, pozostaw jedynie zmienioną sekcję, zaś pozostałe usuń. Wykorzystywana jest pierwsza sekcja, znaleziona w pliku/plikach w następującym folderze:"
 
-#: wxvbam.cpp:1370
+#: wxvbam.cpp:1384
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\twbudowany"
 
-#: wxvbam.cpp:1394
+#: wxvbam.cpp:1408
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1857,21 +1857,21 @@ msgid ""
 "\n"
 msgstr "Opcje ustawione za pomocą wiersza poleceń są zapisywane podczas zmiany ustawień w interfejsie użytkownika.\n\nOpcje flag prawda i fałsz są określone odpowiednio jako 1 i 0.\n\n"
 
-#: wxvbam.cpp:1410
+#: wxvbam.cpp:1424
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Polecenia dostępne dla opcji Klawiatura/* to:\n\n"
 
-#: wxvbam.cpp:1428
+#: wxvbam.cpp:1442
 msgid "Configuration file not found."
 msgstr "Nie znaleziono pliku konfiguracyjnego."
 
-#: wxvbam.cpp:1463
+#: wxvbam.cpp:1477
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Nieprawidłowe ustawienia lub podanych zostało wiele plików pamięci ROM:\n"
 
-#: wxvbam.cpp:1806
+#: wxvbam.cpp:1820
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1880,7 +1880,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: wxvbam.cpp:2071
+#: wxvbam.cpp:2085
 msgid "Failed to load dialog"
 msgstr ""
 
@@ -2926,100 +2926,111 @@ msgstr ""
 msgid "XAudio2: Exception during device enumeration"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1075
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1119
 msgid "Error, link already connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1089
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
 msgid "Unable to find link driver"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1128
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1172
 msgid "Link connection does not need updates."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1319
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2098
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3519
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1427
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2296
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3823
 #, c-format
 msgid "Player %d disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1366
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1482
 msgid "Player 2 disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1418
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1427
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1436
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1469
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1525
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1534
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2212
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1556
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1666
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2415
 msgid "Server disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1636
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1667
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2238
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2270
-msgid "Network error."
-msgstr ""
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1644
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2246
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1785
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2447
 #, c-format
 msgid "Player %d connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1658
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2260
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1801
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2464
 msgid "All players connected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1679
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2282
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1816
+msgid "Connection to server timed out."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1836
+msgid "Connecting to server..."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1845
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2474
+msgid "Network error."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1857
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2486
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1688
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2291
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1871
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2495
 msgid "All players joined."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2206
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1963
+msgid "Link timeout."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2408
 msgid "Server timed out."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3162
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3178
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3195
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3453
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3470
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3520
 msgid "Error creating file mapping"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3173
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3465
 msgid "Error mapping file"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3272
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3583
 msgid "5 or more GBAs not supported."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3298
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3323
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3597
+msgid "The GB link supports only 2 players."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3613
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3629
 msgid "Error opening event"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3435
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3749
 msgid "Lost link; reinitialize to reconnect"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3442
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3756
 msgid "Lost link; reconnected"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3567
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3880
 msgid "Unknown slave timed out; resetting comm"
 msgstr ""
 
