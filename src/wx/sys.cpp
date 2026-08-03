@@ -400,6 +400,63 @@ void systemStopGamePlayback()
     mf->enable_menus();
 }
 
+// Hidden test hook: VBAM_AUTOINPUT="<frame>:<keys>,<frame>:<keys>,..."
+// holds <keys> for the default joypad from emulated frame <frame> until
+// the next entry's frame (empty <keys> releases everything). Keys are
+// '+'-separated tokens: A B ST SE U D L R TL TR. Frames are counted as
+// calls for the default pad, one per emulated frame. Used by automated
+// two-instance link tests to navigate game menus; inert unless the env
+// var is set.
+static uint32_t AutoInputMask(int joy)
+{
+    struct Step {
+        long frame;
+        uint32_t keys;
+    };
+    static std::vector<Step> script;
+    static long frame_count = 0;
+    static bool parsed = false;
+
+    if (!parsed) {
+        parsed = true;
+        if (const char* env = getenv("VBAM_AUTOINPUT")) {
+            for (const char* p = env; *p;) {
+                char* end = nullptr;
+                long f = strtol(p, &end, 10);
+                if (end == p || *end != ':')
+                    break;
+                p = end + 1;
+                uint32_t keys = 0;
+                while (*p && *p != ',') {
+                    if (!strncmp(p, "ST", 2)) { keys |= KEYM_START; p += 2; }
+                    else if (!strncmp(p, "SE", 2)) { keys |= KEYM_SELECT; p += 2; }
+                    else if (!strncmp(p, "TL", 2)) { keys |= KEYM_L; p += 2; }
+                    else if (!strncmp(p, "TR", 2)) { keys |= KEYM_R; p += 2; }
+                    else if (*p == 'A') { keys |= KEYM_A; p++; }
+                    else if (*p == 'B') { keys |= KEYM_B; p++; }
+                    else if (*p == 'U') { keys |= KEYM_UP; p++; }
+                    else if (*p == 'D') { keys |= KEYM_DOWN; p++; }
+                    else if (*p == 'L') { keys |= KEYM_LEFT; p++; }
+                    else if (*p == 'R') { keys |= KEYM_RIGHT; p++; }
+                    else p++;
+                }
+                script.push_back({ f, keys });
+                if (*p == ',')
+                    p++;
+            }
+        }
+    }
+    if (script.empty())
+        return 0;
+    if (joy == OPTION(kJoyDefault) - 1)
+        frame_count++;
+    uint32_t mask = 0;
+    for (const Step& s : script)
+        if (frame_count >= s.frame)
+            mask = s.keys;
+    return mask;
+}
+
 // updates the joystick data (done in background using wxJoyPoller)
 bool systemReadJoypads()
 {
@@ -413,6 +470,7 @@ uint32_t systemReadJoypad(int joy)
         joy = OPTION(kJoyDefault) - 1;
 
     uint32_t ret = wxGetApp().emulated_gamepad()->GetJoypad(joy);
+    ret |= AutoInputMask(joy);
 
     if (turbo)
         ret |= KEYM_SPEED;
