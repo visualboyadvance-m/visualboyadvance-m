@@ -16,6 +16,10 @@
 //   bind_conflict        Server bind failures: a busy port must report
 //                        "already in use", and a non-local bind address
 //                        must warn and fall back to all interfaces.
+//   gp                   General-Purpose (RCNT GPIO) mode over the socket:
+//                        driven pin levels cross in both directions,
+//                        undriven lines read pull-up 1s, and an SI falling
+//                        edge raises the slave's serial IRQ.
 //
 // The port is derived from the parent pid so parallel runs don't collide.
 
@@ -223,6 +227,106 @@ static int run_disconnect(bool clean_goodbye) {
     return 0;
 }
 
+// ---- gp ---------------------------------------------------------------------
+
+// RCNT General-Purpose mode, as driven below: 0x8000 selects GP mode; data
+// bits SC/SD/SI/SO are 0-3; direction bits (1 = output) are 4-7; bit 8
+// enables the serial IRQ on an SI falling edge. The cable crosses SO and
+// SI; undriven lines read pull-up 1s. LinkUpdate(80000) crosses the GP
+// receive-poll throttle (~TICKS_PER_FRAME / 4) every iteration.
+
+static void gp_wait_nibble(const char* who, uint16_t want) {
+    double deadline = now_seconds() + 15.0;
+    while ((io_read16(COMM_RCNT) & 0xF) != want) {
+        CHECK(GetLinkMode() == LINK_CABLE_SOCKET,
+            "%s: link dropped waiting for nibble 0x%x", who, want);
+        CHECK(now_seconds() < deadline,
+            "%s: RCNT data nibble stuck at 0x%x, want 0x%x", who,
+            io_read16(COMM_RCNT) & 0xF, want);
+        CheckLinkConnection();
+        LinkUpdate(80000);
+    }
+}
+
+static int run_gp() {
+    Barrier b;
+    pid_t pid = fork();
+    CHECK(pid >= 0, "fork failed");
+    bool child = (pid == 0);
+    b.set_child(child);
+    if (child)
+        g_role = "client";
+
+    setup_fake_io();
+    establish(b, child, LINK_CABLE_SOCKET, 0);
+
+    if (!child) {
+        // (a) Drive SO low; our own inputs read pull-up 1s (the all-input
+        // client drives nothing) and our SO output reads back its latch.
+        StartGPLink(0x8080); // GP, SO output, SO = 0
+        gp_wait_nibble("server", 0x7);
+        b.sync(); // client saw SI = 0 (nibble 0xB)
+
+        // (b) Raise SO; the client's SI must follow.
+        StartGPLink(0x8088);
+        b.sync(); // client saw nibble 0xF
+
+        // (c) Swap directions: the client drives, we read SI = 0.
+        StartGPLink(0x8000); // all inputs
+        b.sync(); // client now drives SO low
+        gp_wait_nibble("server", 0xB);
+        b.sync(); // direction swap verified
+
+        // (d) SI falling-edge IRQ on the client: it re-armed as all-input
+        // with the SI IRQ enabled (SI reads pull-up 1); driving our SO low
+        // is the falling edge that must raise its serial IRQ.
+        b.sync(); // client latched SI = 1 with the IRQ enabled
+        StartGPLink(0x8080);
+        b.sync(); // client observed IF bit 7
+
+        CloseLink();
+        expect_child_success(pid);
+        return 0;
+    }
+
+    // (a) All inputs: SI must follow the server's driven SO (low), the
+    // other three lines read pull-up 1s.
+    StartGPLink(0x8000);
+    gp_wait_nibble("client", 0xB);
+    b.sync();
+
+    // (b) The server raised SO.
+    gp_wait_nibble("client", 0xF);
+    b.sync();
+
+    // (c) Swap: drive our SO low, the server reads SI = 0.
+    StartGPLink(0x8080);
+    b.sync();
+    b.sync(); // server verified nibble 0xB
+
+    // (d) Arm the SI IRQ as all-input (the server is all-input from (c),
+    // so SI reads 1), latch the high level, then wait for the falling edge.
+    StartGPLink(0x8100); // GP, all inputs, SI-IRQ enable
+    gp_wait_nibble("client", 0xF);
+    CHECK((io_read16(IO_REG_IF) & 0x80) == 0, "IF.7 set before the edge");
+    b.sync(); // tell the server to drive SO low
+    double deadline = now_seconds() + 15.0;
+    while ((io_read16(IO_REG_IF) & 0x80) == 0) {
+        CHECK(GetLinkMode() == LINK_CABLE_SOCKET,
+            "client: link dropped waiting for the SI IRQ");
+        CHECK(now_seconds() < deadline,
+            "client: SI falling edge never raised the serial IRQ (RCNT=0x%04x)",
+            io_read16(COMM_RCNT));
+        CheckLinkConnection();
+        LinkUpdate(80000);
+    }
+    CHECK((io_read16(COMM_RCNT) & 4) == 0, "IRQ raised but SI still reads 1");
+    b.sync();
+
+    CloseLink();
+    _exit(0);
+}
+
 // ---- bind_conflict ----------------------------------------------------------
 
 static int run_bind_conflict() {
@@ -270,7 +374,7 @@ int main(int argc, char** argv) {
     if (!test) {
         fprintf(stderr,
             "usage: %s --test <handshake|handshake_retry|cable|gb|disconnect|"
-            "disconnect_goodbye|bind_conflict>\n",
+            "disconnect_goodbye|bind_conflict|gp>\n",
             argv[0]);
         return 2;
     }
@@ -301,6 +405,8 @@ int main(int argc, char** argv) {
         return run_disconnect(true);
     if (strcmp(test, "bind_conflict") == 0)
         return run_bind_conflict();
+    if (strcmp(test, "gp") == 0)
+        return run_gp();
 
     fprintf(stderr, "unknown test '%s'\n", test);
     return 2;

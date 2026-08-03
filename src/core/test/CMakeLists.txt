@@ -68,9 +68,13 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
     add_test(NAME link.ipc.cable COMMAND link_ipc_test --test gba_cable_2p)
     set_tests_properties(link.ipc.cable PROPERTIES
         LABELS "link" TIMEOUT 120)
+    # General-Purpose (RCNT GPIO) pin exchange over the IPC cable.
+    add_test(NAME link.ipc.gp COMMAND link_ipc_test --test gp_exchange)
+    set_tests_properties(link.ipc.gp PROPERTIES
+        LABELS "link" TIMEOUT 120)
 
     foreach(_t handshake handshake_retry cable gb disconnect disconnect_goodbye
-            bind_conflict)
+            bind_conflict gp)
         add_test(NAME link.socket.${_t} COMMAND link_socket_runner --test ${_t})
         set_tests_properties(link.socket.${_t} PROPERTIES
             LABELS "link" TIMEOUT 120)

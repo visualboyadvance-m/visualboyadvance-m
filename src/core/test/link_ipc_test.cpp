@@ -17,6 +17,11 @@
 //                     SIOMULTI0/1 = 0x1234/0x5678. The most timing-coupled
 //                     scenario; registered under its own ctest name so the
 //                     deterministic tests above stay the gate.
+//   gp_exchange       General-Purpose (RCNT GPIO) mode: driven pin levels
+//                     cross the link in both directions, undriven lines
+//                     read pull-up 1s, an SI falling edge raises the serial
+//                     IRQ, and leaving GP mode doesn't disturb a subsequent
+//                     multiplayer transfer.
 //
 // Every run sets a pid-derived VBAM_LINK_NAMESPACE before touching the link,
 // isolating it from real emulator instances and parallel CI jobs.
@@ -285,6 +290,143 @@ static int run_gba_cable_2p() {
     _exit(0);
 }
 
+// ---- gp_exchange ------------------------------------------------------------
+
+// RCNT General-Purpose mode, as driven below: 0x8000 selects GP mode; data
+// bits SC/SD/SI/SO are 0-3; direction bits (1 = output) are 4-7; bit 8
+// enables the serial IRQ on an SI falling edge. The cable crosses SO and
+// SI, so one side's driven SO is the other side's SI level; undriven lines
+// read pull-up 1s.
+
+static void gp_wait_nibble(const char* who, uint16_t want) {
+    double deadline = now_seconds() + 10.0;
+    while ((io_read16(COMM_RCNT) & 0xF) != want) {
+        CHECK(now_seconds() < deadline,
+            "%s: RCNT data nibble stuck at 0x%x, want 0x%x", who,
+            io_read16(COMM_RCNT) & 0xF, want);
+        LinkUpdate(4096);
+    }
+}
+
+static int run_gp_exchange() {
+    Barrier b;
+    pid_t pid = fork();
+    CHECK(pid >= 0, "fork failed");
+    bool child = (pid == 0);
+    b.set_child(child);
+    if (child)
+        g_role = "child";
+
+    setup_fake_io();
+    SetLinkTimeout(1000);
+
+    if (!child) {
+        ConnectionState st = InitLink(LINK_CABLE_IPC);
+        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+        CHECK(is_slot0(), "master did not get slot 0");
+        b.sync(); // slave attached
+
+        // (a) Drive SO low; our own inputs read pull-up 1s (the all-input
+        // slave drives nothing) and our SO output reads back its latch.
+        StartGPLink(0x8080); // GP, SO output, SO = 0
+        gp_wait_nibble("master", 0x7);
+        b.sync(); // slave saw SI = 0 (nibble 0xB)
+
+        // (b) Raise SO; the slave's SI must follow.
+        StartGPLink(0x8088);
+        b.sync(); // slave saw nibble 0xF
+
+        // (c) Swap directions: the slave drives, we read SI = 0.
+        StartGPLink(0x8000); // all inputs
+        b.sync(); // slave now drives SO low
+        gp_wait_nibble("master", 0xB);
+        b.sync(); // direction swap verified
+
+        // (d) SI falling-edge IRQ: the slave re-armed as all-input with the
+        // SI IRQ enabled (its SI reads pull-up 1); driving our SO low is
+        // the falling edge that must raise its serial IRQ.
+        b.sync(); // slave latched SI = 1 with the IRQ enabled
+        StartGPLink(0x8080);
+        b.sync(); // slave observed IF bit 7
+
+        // (e) Leave GP mode and run one multiplayer transfer; GP state must
+        // not leak into it (mirrors gba_cable_2p).
+        StartGPLink(0);
+        b.sync(); // both left GP mode; slave armed its transfer reply
+        usleep(50 * 1000); // slave head start into its LinkUpdate loop
+        io_write16(COMM_SIODATA8, 0x1234);
+        StartLink(0x2080); // MULTIPLAYER, start bit, 9600 baud
+
+        double deadline = now_seconds() + 10.0;
+        while (io_read16(COMM_SIOMULTI0) != 0x1234
+            || io_read16(COMM_SIOMULTI1) != 0x5678) {
+            CHECK(now_seconds() < deadline,
+                "master timed out after GP: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+                io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+            LinkUpdate(4096);
+        }
+        b.sync(); // both sides verified
+        CloseLink();
+        expect_child_success(pid);
+        return 0;
+    }
+
+    b.sync(); // creator attached first
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "slave InitLink returned %d", (int)st);
+    CHECK(is_slot1(), "slave did not get slot 1");
+
+    // (a) All inputs: SI must follow the master's driven SO (low), the
+    // other three lines read pull-up 1s.
+    StartGPLink(0x8000);
+    gp_wait_nibble("slave", 0xB);
+    b.sync();
+
+    // (b) The master raised SO.
+    gp_wait_nibble("slave", 0xF);
+    b.sync();
+
+    // (c) Swap: drive our SO low, the master reads SI = 0.
+    StartGPLink(0x8080);
+    b.sync();
+    b.sync(); // master verified nibble 0xB
+
+    // (d) Arm the SI IRQ as all-input (SI reads 1: the master stopped
+    // driving in (c)... it is still all-input from (c)); latch the high
+    // level, then wait for the master's falling edge to raise IF bit 7.
+    StartGPLink(0x8100); // GP, all inputs, SI-IRQ enable
+    gp_wait_nibble("slave", 0xF); // SI = 1 latched by the update path
+    CHECK((io_read16(IO_REG_IF) & 0x80) == 0, "IF.7 set before the edge");
+    b.sync(); // tell the master to drive SO low
+    double deadline = now_seconds() + 10.0;
+    while ((io_read16(IO_REG_IF) & 0x80) == 0) {
+        CHECK(now_seconds() < deadline,
+            "slave: SI falling edge never raised the serial IRQ (RCNT=0x%04x)",
+            io_read16(COMM_RCNT));
+        LinkUpdate(4096);
+    }
+    CHECK((io_read16(COMM_RCNT) & 4) == 0, "IRQ raised but SI still reads 1");
+    b.sync();
+
+    // (e) Multiplayer transfer after GP.
+    StartGPLink(0);
+    io_write16(COMM_SIODATA8, 0x5678);
+    StartLink(0x2000); // MULTIPLAYER mode, no start bit (slave)
+    b.sync();
+
+    deadline = now_seconds() + 10.0;
+    while (io_read16(COMM_SIOMULTI0) != 0x1234
+        || io_read16(COMM_SIOMULTI1) != 0x5678) {
+        CHECK(now_seconds() < deadline,
+            "slave timed out after GP: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+            io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+        LinkUpdate(4096);
+    }
+    b.sync();
+    CloseLink();
+    _exit(0);
+}
+
 // ---- main -------------------------------------------------------------------
 
 int main(int argc, char** argv) {
@@ -296,7 +438,7 @@ int main(int argc, char** argv) {
     if (!test) {
         fprintf(stderr,
             "usage: %s --test <role_assignment|stale_recovery|gb_exchange|"
-            "gb_third_instance|gba_cable_2p>\n",
+            "gb_third_instance|gba_cable_2p|gp_exchange>\n",
             argv[0]);
         return 2;
     }
@@ -319,6 +461,8 @@ int main(int argc, char** argv) {
         return run_gb_third_instance();
     if (strcmp(test, "gba_cable_2p") == 0)
         return run_gba_cable_2p();
+    if (strcmp(test, "gp_exchange") == 0)
+        return run_gp_exchange();
 
     fprintf(stderr, "unknown test '%s'\n", test);
     return 2;
