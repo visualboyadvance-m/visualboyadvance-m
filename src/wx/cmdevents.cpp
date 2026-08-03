@@ -2838,11 +2838,11 @@ void MainFrame::EnableNetworkMenu()
 {
     cmd_enable &= ~CMDEN_LINK_ANY;
 
+    // "Start Link..." attaches either transport: the NetLink dialog in
+    // network mode, or a direct IPC attach in local mode. It only stays
+    // disabled while the link type is "Nothing".
     if (gopts.gba_link_type != 0)
         cmd_enable |= CMDEN_LINK_ANY;
-
-    if (OPTION(kGBALinkProto))
-        cmd_enable &= ~CMDEN_LINK_ANY;
 
     enable_menus();
 }
@@ -2864,26 +2864,53 @@ void SetLinkTypeMenu(const char* type, int value)
 
 #endif  // NO_LINK
 
-EVT_HANDLER_MASK(LanLink, "Start Network link", CMDEN_LINK_ANY)
+EVT_HANDLER_MASK(LanLink, "Start link", CMDEN_LINK_ANY)
 {
 #ifndef NO_LINK
-    LinkMode mode = GetLinkMode();
+    if (GetLinkMode() != LINK_DISCONNECTED) {
+        wxMessageDialog dlg(this, _("A link is already active.\nDisconnect it?"),
+                            _("Link"), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
 
-    if (mode != LINK_DISCONNECTED) {
-        // while we could deactivate the command when connected, it is more
-        // user-friendly to display a message indidcating why
-        wxLogError(_("LAN link is already active. Disable link mode to disconnect."));
+        if (dlg.ShowModal() == wxID_YES) {
+            CloseLink();
+            panel->SetFrameTitle();
+            EnableNetworkMenu();
+        }
+
         return;
     }
 
-    if (OPTION(kGBALinkProto)) {
-        // see above comment
-        wxLogError(_("Network is not supported in local mode."));
+    const LinkMode configured = GetConfiguredLinkMode();
+
+    if (configured == LINK_DISCONNECTED)
+        return;  // the CMDEN_LINK_ANY gate should prevent this
+
+    // Dolphin and the network modes collect host / player count in the
+    // NetLink dialog. Everything else in local mode attaches directly.
+    // The dialog's init handler clamps GB sessions to 2 players.
+    if (configured == LINK_GAMECUBE_DOLPHIN || !OPTION(kGBALinkProto)) {
+        wxDialog* dlg = GetXRCDialog("NetLink");
+        ShowModal(dlg);
+        panel->SetFrameTitle();
         return;
     }
 
-    wxDialog* dlg = GetXRCDialog("NetLink");
-    ShowModal(dlg);
+    // Local (IPC) mode: the attach is synchronous, no dialog needed.
+    CloseLink();
+    SetLinkTimeout(gopts.link_timeout);
+    EnableSpeedHacks(OPTION(kGBALinkFast));
+
+    if (InitLink(configured) != LINK_OK) {
+        // InitIPC already reported the specific failure.
+        CloseLink();
+        return;
+    }
+
+    if (configured == LINK_GAMEBOY_IPC)
+        gbInitLink();  // gbReset already ran at ROM load; hook GB serial now
+
+    systemScreenMessage(
+        wxString::Format(_("Started local link as player %d"), GetLinkPlayerId() + 1));
     panel->SetFrameTitle();
 #endif
 }

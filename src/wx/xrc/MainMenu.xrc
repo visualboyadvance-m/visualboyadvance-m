@@ -269,7 +269,7 @@
       <object class="wxMenu" name="LinkMenu">
         <label>_Link</label>
         <object class="wxMenuItem" name="LanLink">
-          <label>Start _Network Link...</label>
+          <label>Start _Link...</label>
         </object>
         <object class="wxMenu">
           <label>_Type</label>

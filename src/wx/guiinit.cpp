@@ -121,6 +121,21 @@ public:
         (void)ev; // unused params
         okb->SetLabel(_("Connect"));
     }
+    // Runs on every show, before the validators push data into the
+    // controls: the GB serial protocol is strictly 2-player, so clamp the
+    // player count and gray the 3P/4P choices for a GB session.
+    void OnInitDialog(wxInitDialogEvent& ev)
+    {
+        const bool gb2p =
+            wxGetApp().frame->GetConfiguredLinkMode() == LINK_GAMEBOY_SOCKET;
+
+        if (gb2p && n_players > 2)
+            n_players = 2;
+
+        XRCCTRL(*dlg, "Link3P", wxRadioButton)->Enable(!gb2p);
+        XRCCTRL(*dlg, "Link4P", wxRadioButton)->Enable(!gb2p);
+        ev.Skip(); // let TransferDataToWindow run
+    }
     // attached to OK, so skip when OK
     void NetConnect(wxCommandEvent& ev)
     {
@@ -141,6 +156,14 @@ public:
                 return;
             }
         }
+
+        MainFrame* mf = wxGetApp().frame;
+
+        // Backstop for the 2-player GB serial limit: a GB server with more
+        // slaves would never transfer (the exchange code requires exactly
+        // one slave).
+        if (mf->GetConfiguredLinkMode() == LINK_GAMEBOY_SOCKET)
+            n_players = 2;
 
         gopts.link_num_players = n_players;
         update_opts(); // save fast flag and client host
@@ -166,8 +189,8 @@ public:
         }
 
         // Init link
-        MainFrame* mf = wxGetApp().frame;
         ConnectionState state = InitLink(mf->GetConfiguredLinkMode());
+        const bool init_failed = state == LINK_ERROR;
 
         // Display a progress dialog while the connection is establishing
         if (state == LINK_NEEDS_UPDATE) {
@@ -193,7 +216,13 @@ public:
         // Something failed during init
         if (state == LINK_ERROR) {
             CloseLink();
-            wxLogError(_("Error occurred.\nPlease try again."));
+
+            // An InitLink failure already queued a specific systemMessage
+            // (bad bind address, port in use, ...); only failures from the
+            // connect pulse loop need reporting here, and connmsg holds
+            // the loop's last status ("Connection to server timed out.").
+            if (!init_failed)
+                wxLogError(_("Link connection failed: %s"), connmsg);
         }
 
         if (GetLinkMode() != LINK_DISCONNECTED) {
@@ -2287,6 +2316,9 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                     NULL, &net_link_handler);
                 d->Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED,
                     wxCommandEventHandler(NetLink_t::NetConnect),
+                    NULL, &net_link_handler);
+                d->Connect(wxEVT_INIT_DIALOG,
+                    wxInitDialogEventHandler(NetLink_t::OnInitDialog),
                     NULL, &net_link_handler);
                 d->Fit();
             }
