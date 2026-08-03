@@ -13,10 +13,17 @@
 //                        must reach LINK_DISCONNECTED within the timeout.
 //   disconnect_goodbye   Client closes cleanly (goodbye frame); same
 //                        expectation via the framed-goodbye path.
+//   bind_conflict        Server bind failures: a busy port must report
+//                        "already in use", and a non-local bind address
+//                        must warn and fall back to all interfaces.
 //
 // The port is derived from the parent pid so parallel runs don't collide.
 
 #include "link_test_support.h"
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 static void pump_connect(const char* what, double deadline_s) {
     char msg[256] = { 0 };
@@ -216,6 +223,42 @@ static int run_disconnect(bool clean_goodbye) {
     return 0;
 }
 
+// ---- bind_conflict ----------------------------------------------------------
+
+static int run_bind_conflict() {
+    // Occupy the link port with a plain listener.
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    CHECK(fd >= 0, "socket failed: %s", strerror(errno));
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(IP_LINK_PORT);
+    sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    CHECK(bind(fd, (struct sockaddr*)&sa, sizeof(sa)) == 0, "bind failed: %s",
+        strerror(errno));
+    CHECK(listen(fd, 1) == 0, "listen failed: %s", strerror(errno));
+
+    g_last_system_message[0] = 0;
+    EnableLinkServer(true, 1);
+    ConnectionState st = InitLink(LINK_CABLE_SOCKET);
+    CHECK(st == LINK_ERROR, "InitLink on a busy port returned %d", (int)st);
+    CHECK(strstr(g_last_system_message, "already in use") != nullptr,
+        "unexpected message: \"%s\"", g_last_system_message);
+    close(fd);
+
+    // A non-local bind address must warn and fall back to all interfaces.
+    IP_LINK_PORT++;
+    IP_LINK_BIND_ADDRESS = "203.0.113.1"; // TEST-NET-3, never a local address
+    g_last_system_message[0] = 0;
+    st = InitLink(LINK_CABLE_SOCKET);
+    CHECK(st == LINK_NEEDS_UPDATE,
+        "InitLink with a non-local bind address returned %d", (int)st);
+    CHECK(strstr(g_last_system_message, "not a local address") != nullptr,
+        "unexpected message: \"%s\"", g_last_system_message);
+    CloseLink();
+    return 0;
+}
+
 // ---- main -------------------------------------------------------------------
 
 int main(int argc, char** argv) {
@@ -227,7 +270,7 @@ int main(int argc, char** argv) {
     if (!test) {
         fprintf(stderr,
             "usage: %s --test <handshake|handshake_retry|cable|gb|disconnect|"
-            "disconnect_goodbye>\n",
+            "disconnect_goodbye|bind_conflict>\n",
             argv[0]);
         return 2;
     }
@@ -256,6 +299,8 @@ int main(int argc, char** argv) {
         return run_disconnect(false);
     if (strcmp(test, "disconnect_goodbye") == 0)
         return run_disconnect(true);
+    if (strcmp(test, "bind_conflict") == 0)
+        return run_bind_conflict();
 
     fprintf(stderr, "unknown test '%s'\n", test);
     return 2;

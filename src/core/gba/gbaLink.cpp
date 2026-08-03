@@ -1688,6 +1688,51 @@ void CableClient::Send()
     return;
 }
 
+// The OS error left behind by the last failed socket call. The bundled SFML
+// preserves it across its own err() logging, so this is reliable right after
+// a Status::Error return.
+static int LastSocketError()
+{
+#if defined(_WIN32)
+    return WSAGetLastError();
+#else
+    return errno;
+#endif
+}
+
+static const char* SocketErrorString(int error)
+{
+#if defined(_WIN32)
+    static char buf[256];
+    if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL,
+                       (DWORD)error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), buf,
+                       sizeof(buf), NULL) == 0) {
+        snprintf(buf, sizeof(buf), "socket error %d", error);
+    }
+    return buf;
+#else
+    return strerror(error);
+#endif
+}
+
+static bool IsAddrInUse(int error)
+{
+#if defined(_WIN32)
+    return error == WSAEADDRINUSE;
+#else
+    return error == EADDRINUSE;
+#endif
+}
+
+static bool IsAddrNotAvail(int error)
+{
+#if defined(_WIN32)
+    return error == WSAEADDRNOTAVAIL;
+#else
+    return error == EADDRNOTAVAIL;
+#endif
+}
+
 static ConnectionState InitSocket()
 {
     linkid = 0;
@@ -1726,13 +1771,40 @@ static ConnectionState InitSocket()
             if (resolved) {
                 bind_ip = resolved.value();
             } else {
+                systemMessage(0,
+                              N_("Could not resolve link server bind address \"%s\".\nUse \"*\" to listen on all interfaces."),
+                              IP_LINK_BIND_ADDRESS.c_str());
                 return LINK_ERROR;
             }
         }
 
         if (lanlink.tcplistener.listen(IP_LINK_PORT, bind_ip) == sf::Socket::Status::Error) {
-            // Note: old code closed socket & retried once on bind failure
-            return LINK_ERROR; // FIXME: error code?
+            int error = LastSocketError();
+
+            // A non-local bind address, typically the peer's IP typed into
+            // the Server IP field: fall back to listening on all interfaces.
+            if (IsAddrNotAvail(error) && bind_ip.toInteger() != 0) {
+                systemMessage(0,
+                              N_("Bind address \"%s\" is not a local address; listening on all interfaces instead."),
+                              IP_LINK_BIND_ADDRESS.c_str());
+
+                if (lanlink.tcplistener.listen(IP_LINK_PORT, sf::IpAddress{0}) != sf::Socket::Status::Error) {
+                    return LINK_NEEDS_UPDATE;
+                }
+
+                error = LastSocketError();
+            }
+
+            if (IsAddrInUse(error)) {
+                systemMessage(0,
+                              N_("Port %d is already in use by another program (or another emulator instance acting as server).\nClose it or change the link port."),
+                              (int)IP_LINK_PORT);
+            } else {
+                systemMessage(0, N_("Failed to start link server on port %d: %s"),
+                              (int)IP_LINK_PORT, SocketErrorString(error));
+            }
+
+            return LINK_ERROR;
         } else {
             return LINK_NEEDS_UPDATE;
         }
@@ -1754,6 +1826,9 @@ static ConnectionState InitSocket()
         // connect is in progress, and even Disconnected only means this
         // attempt failed fast (server not up yet); the poll loop retries.
         if (status == sf::Socket::Status::Error) {
+            systemMessage(0, N_("Could not initiate connection to %s port %d: %s"),
+                          lc.serveraddr.toString().c_str(), (int)lc.serverport,
+                          SocketErrorString(LastSocketError()));
             return LINK_ERROR;
         } else {
             return LINK_NEEDS_UPDATE;

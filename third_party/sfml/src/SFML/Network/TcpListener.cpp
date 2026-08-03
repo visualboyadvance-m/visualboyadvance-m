@@ -31,7 +31,31 @@
 
 #include "../../../include/SFML/System/Err.hpp"
 
+#include <cerrno>
 #include <ostream>
+
+namespace
+{
+// err() logging may clobber the thread's socket error state; stash it so
+// callers of listen() can still read the real bind/listen failure cause.
+int getSocketError()
+{
+#ifdef _WIN32
+    return WSAGetLastError();
+#else
+    return errno;
+#endif
+}
+
+void setSocketError(int error)
+{
+#ifdef _WIN32
+    WSASetLastError(error);
+#else
+    errno = error;
+#endif
+}
+} // namespace
 
 
 namespace sf
@@ -87,7 +111,9 @@ Socket::Status TcpListener::listen(unsigned short port, IpAddress address)
     if (bind(getNativeHandle(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1)
     {
         // Not likely to happen, but...
+        const int bindError = getSocketError();
         err() << "Failed to bind listener socket to port " << port << std::endl;
+        setSocketError(bindError);
         return Status::Error;
     }
 
@@ -95,7 +121,9 @@ Socket::Status TcpListener::listen(unsigned short port, IpAddress address)
     if (::listen(getNativeHandle(), SOMAXCONN) == -1)
     {
         // Oops, socket is deaf
+        const int listenError = getSocketError();
         err() << "Failed to listen to port " << port << std::endl;
+        setSocketError(listenError);
         return Status::Error;
     }
 

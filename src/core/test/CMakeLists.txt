@@ -69,7 +69,8 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
     set_tests_properties(link.ipc.cable PROPERTIES
         LABELS "link" TIMEOUT 120)
 
-    foreach(_t handshake handshake_retry cable gb disconnect disconnect_goodbye)
+    foreach(_t handshake handshake_retry cable gb disconnect disconnect_goodbye
+            bind_conflict)
         add_test(NAME link.socket.${_t} COMMAND link_socket_runner --test ${_t})
         set_tests_properties(link.socket.${_t} PROPERTIES
             LABELS "link" TIMEOUT 120)

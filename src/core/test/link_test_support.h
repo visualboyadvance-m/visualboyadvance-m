@@ -28,7 +28,14 @@
 
 struct CoreOptions coreOptions;
 
-void systemMessage(int, const char*, ...) {}
+// Record the last message so tests can assert on the error the core reports.
+static char g_last_system_message[512];
+void systemMessage(int, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(g_last_system_message, sizeof(g_last_system_message), fmt, args);
+    va_end(args);
+}
 void log(const char*, ...) {}
 bool systemPauseOnFrame() { return false; }
 void systemGbPrint(uint8_t*, int, int, int, int, int) {}
