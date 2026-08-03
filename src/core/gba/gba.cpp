@@ -1008,6 +1008,32 @@ static inline void gbaScheduler_OnSioComplete() {
     }
 }
 
+// Serial-IRQ raise for the link layer (gbaLink.cpp). CPUTestIRQ() is
+// static to this translation unit, and under the kSchedIrq architecture
+// setting IF without re-arming the scheduler delivers nothing: a game
+// halted in IntrWait waiting on the serial IRQ stays halted forever
+// (white-screen hang at link-game boot on every platform).
+void CPURaiseSioIRQ()
+{
+    if (!g_ioMem)
+        return;
+    IF |= 0x80;
+    UPDATE_REG(IO_REG_IF, IF);
+    CPUTestIRQ();
+}
+
+// Deferred SIO completion for the link layer: after `cycles`, the
+// kSchedSio handler clears the SIOCNT busy bit and raises the serial
+// IRQ if enabled. Raising the IRQ synchronously inside the SIOCNT
+// write would race the game's own IntrWait entry -- the BIOS discards
+// already-pending flags when called with r0=1, so an IRQ delivered
+// before the halt is a lost wakeup. Scheduling it at a realistic
+// transfer duration (like real hardware) sidesteps that entirely.
+void CPUScheduleSioCompletion(int cycles)
+{
+    gbaScheduler::Schedule(kSchedSio, cycles);
+}
+
 inline int CPUUpdateTicks()
 {
     int cpuLoopTicks = lcdTicks;
@@ -6206,8 +6232,17 @@ void CPULoop(int ticks)
             }
 
 #ifndef NO_LINK
-            // shuffle2: what's the purpose?
-            if (GetLinkMode() != LINK_DISCONNECTED || gba_joybus_active)
+            // Poll the link every cycle by keeping the event horizon at 1.
+            // This must only ever LOWER cpuNextEvent: CPUUpdateTicks() just
+            // above can legitimately return 0 when a scheduler event (e.g.
+            // a kSchedIrq halt-wake) is due RIGHT NOW, and overwriting that
+            // 0 with 1 strands the event -- a halted CPU then computes
+            // clockTicks = CPUUpdateTicks() = 0, cpuTotalTicks never
+            // reaches cpuNextEvent, the pop loop never runs, and the
+            // emulator spins forever at the BIOS IntrWait (the two-instance
+            // cable-link white-screen boot hang).
+            if ((GetLinkMode() != LINK_DISCONNECTED || gba_joybus_active)
+                && cpuNextEvent > 1)
                 cpuNextEvent = 1;
 #endif
 

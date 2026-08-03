@@ -1967,10 +1967,8 @@ static void UpdateCableSocket(int ticks)
         }
         missed_recv_ms = 0;
 
-        if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) {
-            IF |= 0x80;
-            UPDATE_REG(IO_REG_IF, IF);
-        }
+        if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000)
+            CPURaiseSioIRQ();
 
         UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
         transfer_direction = SENDING;
@@ -2159,8 +2157,7 @@ static void JoyBusUpdate(int ticks)
         // Generate SIO interrupt if we can
         if (((cmd == JOY_CMD_RESET) || (cmd == JOY_CMD_READ) || (cmd == JOY_CMD_WRITE))
             && (READ16LE(&g_ioMem[COMM_JOYCNT]) & JOYCNT_INT_ENABLE)) {
-            IF |= 0x80;
-            UPDATE_REG(IO_REG_IF, IF);
+            CPURaiseSioIRQ();
         }
 
         lastcommand = 0;
@@ -2525,8 +2522,7 @@ static void StartRFUSocket(uint16_t value)
         if ((value & 0x5080) == (SIO_TRANS_32BIT | SIO_IRQ_ENABLE | SIO_TRANS_START)) { //0x5083 //game tried to send wireless command but w/o the adapter
             if (READ16LE(&g_ioMem[COMM_SIOCNT]) & SIO_IRQ_ENABLE) //IRQ Enable
             {
-                IF |= 0x80; //Serial Communication
-                UPDATE_REG(IO_REG_IF, IF); //Interrupt Request Flags / IRQ Acknowledge
+                CPURaiseSioIRQ(); //Serial Communication
             }
             value &= ~SIO_TRANS_START; //Start bit.7 reset //may cause the game to retry sending again
             value |= SIO_TRANS_FLAG_SEND_DISABLE; //SO bit.3 set automatically upon transfer completion
@@ -3243,8 +3239,7 @@ static void UpdateRFUSocket(int ticks)
                 transfer_direction = SENDING;
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & SIO_IRQ_ENABLE) {
-                    IF |= 0x80;
-                    UPDATE_REG(IO_REG_IF, IF);
+                    CPURaiseSioIRQ();
                 }
 
                 //if (rfu_polarity) value ^= 4;
@@ -3709,7 +3704,20 @@ static void StartCableIPC(uint16_t value)
                 WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
                 value &= ~0x40;
             } else {
-                value |= 0x40; // comm error
+                // No partner in the session. Real hardware still clocks a
+                // lone master's transfer out: its own word shows up in
+                // SIOMULTI0, the absent slots read back 0xffff, the error
+                // bit is set (SI stays high with no slaves), and the
+                // completion IRQ fires when the transfer time elapses.
+                // Setting only the error bit here left a game that starts
+                // a probe transfer and IntrWaits on the serial IRQ hanging
+                // at a white screen until a second instance appeared.
+                UPDATE_REG(COMM_SIOMULTI0, READ16LE(&g_ioMem[COMM_SIODATA8]));
+                UPDATE_REG(COMM_SIOMULTI1, 0xffff);
+                WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
+                value |= 0x40; // comm error: no slaves attached
+                value |= 0x80; // busy until the scheduled completion
+                CPUScheduleSioCompletion(trtimedata[0][value & 3]);
             }
         }
         value |= (transfer_direction != 0) << 7;
@@ -3892,10 +3900,8 @@ static void UpdateCableIPC(int)
         UPDATE_REG(COMM_SIOCNT, (value & 0xff0f) | (linkid << 4));
         // SC/SI high after transfer
         UPDATE_REG(COMM_RCNT, linkid ? 15 : 11);
-        if (value & 0x4000) {
-            IF |= 0x80;
-            UPDATE_REG(IO_REG_IF, IF);
-        }
+        if (value & 0x4000)
+            CPURaiseSioIRQ();
     }
 }
 
@@ -3921,8 +3927,7 @@ static void StartRFU(uint16_t value)
 			value |= 4; //bit.2=1 (otherside is Not Ready)*/
             if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) //IRQ Enable
             {
-                IF |= 0x80; //Serial Communication
-                UPDATE_REG(IO_REG_IF, IF); //Interrupt Request Flags / IRQ Acknowledge
+                CPURaiseSioIRQ(); //Serial Communication
             }
             value &= 0xff7f; //Start bit.7 reset //may cause the game to retry sending again
             //value |= 0x0008; //SO bit.3 set automatically upon transfer completion
@@ -4942,8 +4947,7 @@ static void UpdateRFUIPC(int ticks)
                 transfer_direction = 0;
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
                 if (value & 0x4000) {
-                    IF |= 0x80;
-                    UPDATE_REG(IO_REG_IF, IF);
+                    CPURaiseSioIRQ();
                 }
 
                 //if (rfu_polarity) value ^= 4;

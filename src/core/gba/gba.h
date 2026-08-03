@@ -153,6 +153,16 @@ extern void CPUUpdateRegister(uint32_t, uint16_t);
 // same CPU-visible serial-register behavior.
 extern void SioStandaloneSiocntWrite(uint16_t value);
 extern uint16_t SioStandaloneRcntWrite(uint16_t value, int multi_id);
+// Raise the serial interrupt (IF bit 7) on behalf of the link layer.
+// Sets IF and re-arms the kSchedIrq scheduler event; gbaLink.cpp must
+// use this instead of writing IF directly, or a game halted in
+// IntrWait on the serial IRQ is never woken.
+extern void CPURaiseSioIRQ();
+// Schedule the kSchedSio completion event `cycles` from now: it clears
+// the SIOCNT busy bit and raises the serial IRQ if enabled. Used by the
+// link layer for transfers that must complete after a realistic delay
+// (an IRQ raised synchronously races the game's IntrWait entry).
+extern void CPUScheduleSioCompletion(int cycles);
 extern void applyTimer();
 extern void CPUInit(const char*, bool);
 void SetSaveType(int st);
