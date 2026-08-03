@@ -3004,11 +3004,11 @@ msgstr "Todos os jogadores conectados"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1816
 msgid "Connection to server timed out."
-msgstr ""
+msgstr "O tempo da conexão com o servidor se esgotou."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1836
 msgid "Connecting to server..."
-msgstr ""
+msgstr "Conectando ao servidor..."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1845
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2474
@@ -3028,7 +3028,7 @@ msgstr "Todos os jogadores entraram."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1963
 msgid "Link timeout."
-msgstr ""
+msgstr "Tempo pra esgotar a conexão com o link."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2408
 msgid "Server timed out."
@@ -3050,7 +3050,7 @@ msgstr "5 ou mais GBAs não suportados."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3597
 msgid "The GB link supports only 2 players."
-msgstr ""
+msgstr "O link do GB suporta apenas 2 jogadores."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3613
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3629
