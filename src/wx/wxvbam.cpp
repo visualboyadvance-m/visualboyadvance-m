@@ -2132,13 +2132,18 @@ LinkMode MainFrame::GetConfiguredLinkMode()
         return LINK_DISCONNECTED;
         break;
 
-    case 1:
-        if (OPTION(kGBALinkProto))
-                return LINK_CABLE_IPC;
-        else
-            return LINK_CABLE_SOCKET;
+    case 1: {
+        // A GB/GBC ROM talks over the Game Boy serial protocol; the GBA
+        // multi-cable modes never move GB serial data (gb.cpp gates its
+        // serial hooks on LINK_GAMEBOY_*). Map "Cable" to whatever the
+        // loaded ROM actually needs so one setting works for both.
+        const bool gb_rom = panel && panel->game_type() == IMAGE_GB;
 
-        break;
+        if (OPTION(kGBALinkProto))
+            return gb_rom ? LINK_GAMEBOY_IPC : LINK_CABLE_IPC;
+        else
+            return gb_rom ? LINK_GAMEBOY_SOCKET : LINK_CABLE_SOCKET;
+    }
 
     case 2:
         if (OPTION(kGBALinkProto))

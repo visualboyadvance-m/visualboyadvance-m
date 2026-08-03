@@ -1062,6 +1062,33 @@ void GameArea::LoadGame(const wxString& load_path)
     mf->enable_menus();
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
+
+    // The effective link protocol depends on the ROM class (GB serial vs
+    // GBA cable). If a local (IPC) link is attached in the wrong mode,
+    // re-attach in the right one; never tear down an established network
+    // session behind the user's back.
+    {
+        const LinkMode active = GetLinkMode();
+        const LinkMode wanted = mf->GetConfiguredLinkMode(); // ROM-aware
+
+        if (active != LINK_DISCONNECTED && active != wanted) {
+            const bool ipc_swap =
+                (active == LINK_CABLE_IPC || active == LINK_GAMEBOY_IPC) &&
+                (wanted == LINK_CABLE_IPC || wanted == LINK_GAMEBOY_IPC);
+
+            if (ipc_swap) {
+                CloseLink();
+
+                if (InitLink(wanted) != LINK_OK)
+                    CloseLink();
+                else if (wanted == LINK_GAMEBOY_IPC)
+                    gbInitLink(); // gbReset already ran above
+            } else {
+                systemScreenMessage(
+                    _("Active link mode does not match this ROM; use Options > Link > Start Link to reconnect."));
+            }
+        }
+    }
 #else
     gbSerialFunction = NULL;
 #endif
