@@ -9,8 +9,8 @@
 
 #if defined(_WIN32)
 
-#include <Windows.h>
 #include <winsock2.h>
+#include <Windows.h>
 
 #else  // !defined(_WIN32)
 
