@@ -128,6 +128,13 @@ std::string LOCAL_LINK_DIR;
 // never be recognized. Compare the byte value instead of the char.
 static const uint8_t kLinkGoodbyeByte = 0xe0;  // (uint8_t)-32
 
+// The byte tagging a General-Purpose-mode (RCNT GPIO) state frame on the
+// cable socket protocol: 4 bytes {4, kLinkGpByte, RCNT lo, RCNT hi}.
+// Length 4 is already accepted by every frame-length check, and 0xe1 is
+// distinct from every other live byte-1 value (tspeed 0-3, linkid << 2
+// in {4, 8, 12}, and the goodbye marker above).
+static const uint8_t kLinkGpByte = 0xe1;
+
 #if !defined(_WIN32)
 
 #define ReleaseSemaphore(sem, nrel, orel) \
@@ -227,6 +234,7 @@ static int WaitForSingleObject(sem_t* s, int t)
 #define GP 5
 
 static int GetSIOMode(uint16_t, uint16_t);
+static void GpSocketRcntWritten(uint16_t value);
 static ConnectionState InitSocket();
 static void StartCableSocket(uint16_t siocnt);
 static ConnectionState ConnectUpdateSocket(char* const message, size_t size);
@@ -287,6 +295,15 @@ typedef struct {
 	uint16_t rfu_qlist[5][256];
 	uint32_t rfu_datalist[5][256][255];
 	uint32_t rfu_timelist[5][256];*/
+
+    // Committed RCNT of each slot, published on every CPU write so peers in
+    // General-Purpose mode can read our driven pin levels. Zero (the
+    // creator's memset / zero-fill default) means "not in GP mode, drives
+    // nothing", which is exactly right for a slot that never wrote RCNT.
+    // Appended last so all existing field offsets are unchanged; sizeof
+    // still grows, so mismatched old/new builds refuse to share a session
+    // (the segment size / AndroidLinkShm layout checks catch it).
+    uint16_t gp_rcnt[5];
 } LINKDATA;
 
 class RFUServer {
@@ -958,6 +975,142 @@ inline static int GetSIOMode(uint16_t siocnt, uint16_t rcnt)
     return GP;
 }
 
+// ---------------------------------------------------------------------------
+// General-Purpose (GP) mode: RCNT[15:14] = 10 turns the four cable lines
+// SC/SD/SI/SO into 4-bit GPIO (RCNT bits 0-3 data, 4-7 direction with
+// 1 = output, bit 8 = serial IRQ on SI falling edge). Games use it to probe
+// cable/peer presence and for custom protocols. The cable drivers exchange
+// each side's committed RCNT and model the wires here.
+//
+// Wiring of a standard GBA<->GBA cable: SC<->SC and SD<->SD straight
+// through, SO and SI crossed (each side's SO drives the other side's SI).
+// All lines are pulled up: a wire nobody drives reads 1. With more than two
+// IPC instances the shared lines are the wired-AND of every driver (the
+// 2-player case degenerates to exactly the crossed cable; real >2-player GP
+// wiring through multi cables is not modeled). The socket transport is
+// 2-player-exact: slave<->slave GP state is not relayed.
+
+// Which peer pin feeds each local pin: SC<-SC, SD<-SD, SI<-SO, SO<-SI.
+static const int kGpPeerPin[4] = { 0, 1, 3, 2 };
+
+// Process-local GP session state. Deliberately not serialized in save
+// states (like linktime/transfer_direction); it resets with Init*/Close*
+// and resynchronizes on the next RCNT write or peer update.
+static bool gp_prev_si = false;
+static bool gp_prev_si_valid = false; // suppresses a phantom edge on entry
+static bool gp_mode_active = false;   // last committed RCNT was GP mode
+static uint16_t gp_peer_rcnt[4];      // socket: last state received per player
+static uint16_t gp_last_sent = 0;     // socket: last state we transmitted
+static int gp_poll_ticks = 0;         // socket: receive-poll throttle
+static bool gp_socket_sent_initial = false;
+
+static void GpResetState()
+{
+    gp_prev_si = false;
+    gp_prev_si_valid = false;
+    gp_mode_active = false;
+    for (int i = 0; i < 4; i++)
+        gp_peer_rcnt[i] = 0;
+    gp_last_sent = 0;
+    gp_poll_ticks = 0;
+    gp_socket_sent_initial = false;
+}
+
+// Recompute the local input pins from the peers' published RCNT values.
+// Rewrites ONLY data bits 0-3 whose direction bit says input; output-pin
+// data, direction, IRQ-enable, and mode bits pass through untouched (an
+// output pin reads back its own latch on hardware). A peer whose published
+// RCNT is not GP mode contributes no drive -- its pins belong to its SIO
+// engine -- which is also what makes mode transitions safe: leaving GP mode
+// publishes a non-GP value and the peers stop honoring our old levels.
+static uint16_t GpMergeInputs(uint16_t my, const uint16_t* peers, int npeers)
+{
+    uint16_t out = my;
+    for (int pin = 0; pin < 4; pin++) {
+        if (my & (1 << (pin + 4)))
+            continue; // output: the latch reads back, never rewritten
+        int level = 1; // pull-up default
+        for (int p = 0; p < npeers; p++) {
+            const uint16_t pr = peers[p];
+            if ((pr >> 14) != 2)
+                continue; // peer not in GP mode: not driving
+            const int pp = kGpPeerPin[pin];
+            if (pr & (1 << (pp + 4)))
+                level &= (pr >> pp) & 1; // wired-AND of all drivers
+        }
+        out = (uint16_t)((out & ~(1 << pin)) | (level << pin));
+    }
+    return out;
+}
+
+// Commit a merged RCNT and deliver the SI falling-edge IRQ. Called only
+// from the LinkUpdate paths, never from the register-write handler: an IRQ
+// raised synchronously inside the write could be discarded by a BIOS
+// IntrWait the game is just entering (see CPURaiseSioIRQ's contract).
+static void GpCommitMerged(uint16_t merged)
+{
+    if (merged != READ16LE(&g_ioMem[COMM_RCNT]))
+        UPDATE_REG(COMM_RCNT, merged);
+
+    const bool si = (merged >> 2) & 1;
+    if ((merged & 0x0100) && !(merged & 0x40) // IRQ enabled, SI is an input
+        && gp_prev_si_valid && gp_prev_si && !si)
+        CPURaiseSioIRQ();
+    gp_prev_si = si;
+    gp_prev_si_valid = true;
+}
+
+// Peers currently attached to the IPC session, by their published RCNT.
+static int GpIpcCollectPeers(uint16_t peers[4])
+{
+    int n = 0;
+    const int f = linkmem->linkflags;
+    for (int i = 0; i < 4; i++) {
+        if (i == linkid || !(f & (1 << i)))
+            continue;
+        peers[n++] = linkmem->gp_rcnt[i];
+    }
+    return n;
+}
+
+// A CPU write to RCNT was committed; publish it to the IPC session.
+// gp_rcnt[linkid] is a single aligned word with exactly one writer (us), so
+// no LinkMemGuard -- same discipline as the per-tick lastlinktime reads.
+static void GpIpcRcntWritten(uint16_t value)
+{
+    if (!linkmem)
+        return;
+
+    linkmem->gp_rcnt[linkid] = value;
+
+    // Refresh our input pins immediately so a write-then-read sequence sees
+    // current peer state. Data bits only: no IRQ, no gp_prev_si update --
+    // edge delivery stays in the update path (see GpCommitMerged).
+    if ((value >> 14) == 2) {
+        uint16_t peers[4];
+        const int n = GpIpcCollectPeers(peers);
+        const uint16_t merged = GpMergeInputs(value, peers, n);
+        if (merged != READ16LE(&g_ioMem[COMM_RCNT]))
+            UPDATE_REG(COMM_RCNT, merged);
+    }
+}
+
+// Per-tick GP servicing for the IPC cable driver (local RCNT is GP mode).
+static void GpIpcUpdate()
+{
+    if (!linkmem)
+        return;
+
+    // GP mode has no multiplayer transfer in flight; abandon any
+    // half-finished cycle from before the mode switch. Peers' waits on
+    // linksync[] are bounded by linktimeout, so nobody blocks forever.
+    transfer_direction = 0;
+
+    uint16_t peers[4];
+    const int n = GpIpcCollectPeers(peers);
+    GpCommitMerged(GpMergeInputs(READ16LE(&g_ioMem[COMM_RCNT]), peers, n));
+}
+
 LinkMode GetLinkMode()
 {
     if (linkDriver && gba_connection_state == LINK_OK)
@@ -1186,15 +1339,35 @@ void StartGPLink(uint16_t value)
     // SioStandaloneRcntWrite in gba.cpp.
     value = SioStandaloneRcntWrite(value, linkid);
 
-    if (!value)
-        return;
-
-    switch (GetSIOMode(READ16LE(&g_ioMem[COMM_SIOCNT]), value)) {
-    case GP:
-        if (GetLinkMode() == LINK_RFU_IPC)
-            rfu_state = RFU_INIT;
+    // Publish the committed register to cable peers before the !value
+    // early-out below: writing 0 *leaves* GP mode, and the peers must see
+    // the departure or they would keep honoring our last driven levels.
+    // (The multiplayer paths' own RCNT status writes are direct UPDATE_REGs
+    // that never come through here, so the published value always reflects
+    // the last CPU write — the correct hardware model.)
+    switch (GetLinkMode()) {
+    case LINK_CABLE_IPC:
+        GpIpcRcntWritten(value);
+        break;
+    case LINK_CABLE_SOCKET:
+        GpSocketRcntWritten(value);
+        break;
+    default:
         break;
     }
+
+    if (!value) {
+        gp_mode_active = false;
+        return;
+    }
+
+    const bool now_gp = GetSIOMode(READ16LE(&g_ioMem[COMM_SIOCNT]), value) == GP;
+    if (now_gp && !gp_mode_active)
+        gp_prev_si_valid = false; // fresh GP entry: no phantom SI edge
+    gp_mode_active = now_gp;
+
+    if (now_gp && GetLinkMode() == LINK_RFU_IPC)
+        rfu_state = RFU_INIT;
 }
 
 // Deferred link teardown.
@@ -1339,6 +1512,35 @@ static RecvResult ReceiveExact(sf::TcpSocket& sock, sf::SocketSelector& sel,
     return RecvResult::Ok;
 }
 
+// A General-Purpose-mode state frame (see kLinkGpByte).
+static void SendGpFrame(sf::TcpSocket& sock, uint16_t rcnt)
+{
+    char frame[4] = { 4, (char)kLinkGpByte, (char)(rcnt & 0xff), (char)(rcnt >> 8) };
+    CheckSendResult(sock.send(frame, sizeof(frame)));
+}
+
+// A CPU write to RCNT was committed; publish it to the socket session.
+// Send-on-change only, and only while GP mode is involved on our side (the
+// value entering or leaving GP mode both matter to the peers); blocking
+// sends from a register write match StartCableSocket's existing behavior.
+static void GpSocketRcntWritten(uint16_t value)
+{
+    if (gba_connection_state != LINK_OK)
+        return;
+    if (value == gp_last_sent)
+        return;
+    if ((value >> 14) != 2 && (gp_last_sent >> 14) != 2)
+        return;
+
+    gp_last_sent = value;
+    if (linkid) {
+        SendGpFrame(lanlink.tcpsocket, value);
+    } else {
+        for (int i = 1; i <= lanlink.numslaves; i++)
+            SendGpFrame(ls.tcpsocket[i], value);
+    }
+}
+
 // Client-side connect handshake state (see InitSocket/ConnectUpdateSocket).
 static sf::Clock connect_clock;
 static bool client_handshake_connected = false;
@@ -1436,6 +1638,13 @@ bool CableServer::Recv(void)
             }
             RequestLinkClose();
             return false;
+        }
+        if ((uint8_t)inbuffer[1] == kLinkGpByte) {
+            // A GP state frame racing the transfer start; cache it and
+            // re-read this slave's actual data frame (same 50 ms budget).
+            gp_peer_rcnt[i + 1] = READ16LE(&uint16_tinbuffer[1]);
+            i--;
+            continue;
         }
         cable_data[i + 1] = READ16LE(&uint16_tinbuffer[1]);
     }
@@ -1557,6 +1766,11 @@ void CableClient::CheckConn(void)
         RequestLinkClose();
         return;
     }
+    if ((uint8_t)inbuffer[0] == 4 && (uint8_t)inbuffer[1] == kLinkGpByte) {
+        // A GP state frame, not a transfer start; just cache it.
+        gp_peer_rcnt[0] = READ16LE(&uint16_tinbuffer[1]);
+        return;
+    }
     transferring = true;
     transfer_start_time_from_master = 0;
     cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
@@ -1667,6 +1881,12 @@ bool CableClient::Recv(void)
         RequestLinkClose();
         return false;
     }
+    if ((uint8_t)inbuffer[0] == 4 && (uint8_t)inbuffer[1] == kLinkGpByte) {
+        // A GP state frame, not our transfer result; cache it and retry on
+        // the next update tick (the stream is still frame-aligned).
+        gp_peer_rcnt[0] = READ16LE(&uint16_tinbuffer[1]);
+        return false;
+    }
     tspeed = inbuffer[1] & 3;
     cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
     transfer_start_time_from_master = (int32_t)READ32LE(&intinbuffer[1]);
@@ -1745,6 +1965,7 @@ static ConnectionState InitSocket()
     missed_recv_ms = 0;
     lc.transferring = false;
     rfu_client.transferring = false;
+    GpResetState();
 
     for (int i = 0; i < 4; i++) {
         cable_data[i] = 0xffff;
@@ -2002,8 +2223,100 @@ void StartCableSocket(uint16_t value)
     }
 }
 
+// Drain any frames pending on one peer socket while we are in GP mode. GP
+// state frames update the cache; a goodbye or dropped connection tears the
+// session down (mirroring CableServer/CableClient::Recv); anything else is
+// stale multiplayer traffic from before a mode switch -- parsed to its full
+// length and discarded so the stream stays frame-aligned. peer_index is the
+// peer's player id (server caches slave i at [i], the client caches the
+// server at [0]). Returns false when the link is going down.
+static bool GpSocketDrainOne(sf::TcpSocket& sock, int peer_index)
+{
+    sf::SocketSelector sel;
+    for (;;) {
+        sel.clear();
+        sel.add(sock);
+        // A real (minimal) timeout: sf::Time::Zero means wait forever.
+        if (!sel.wait(sf::microseconds(1)))
+            return true;
+
+        sf::Clock budget;
+        char buf[16];
+        RecvResult r = ReceiveExact(sock, sel, buf, 1, budget, 50);
+        if (r == RecvResult::Timeout)
+            return true; // clean frame boundary; drained again next poll
+        bool dropped = (r == RecvResult::Dropped);
+        if (!dropped) {
+            const uint8_t len = (uint8_t)buf[0];
+            dropped = (len != 4 && len != 8 && len != 10 && len != 12)
+                || ReceiveExact(sock, sel, buf + 1, len - 1, budget, 50) != RecvResult::Ok;
+        }
+        if (dropped || (uint8_t)buf[1] == kLinkGoodbyeByte) {
+            if (linkid) {
+                systemScreenMessage(_("Server disconnected."));
+            } else {
+                char message[30];
+                snprintf(message, sizeof(message), _("Player %d disconnected."), peer_index + 1);
+                systemScreenMessage(message);
+                for (int j = 1; j <= lanlink.numslaves; j++) {
+                    if (j != peer_index)
+                        SendGoodbye(ls.tcpsocket[j]);
+                    ls.tcpsocket[j].disconnect();
+                }
+            }
+            RequestLinkClose();
+            return false;
+        }
+        if ((uint8_t)buf[1] == kLinkGpByte)
+            gp_peer_rcnt[peer_index] = (uint16_t)((uint8_t)buf[2] | ((uint16_t)(uint8_t)buf[3] << 8));
+        // else: stale multiplayer traffic from a mode transition; discarded
+    }
+}
+
+// Per-tick GP servicing for the socket cable driver (local RCNT is in GP
+// mode). 2-player-exact; the server does not relay slave<->slave GP state.
+static void GpSocketUpdate(int ticks)
+{
+    // GP mode has no multiplayer transfer in flight; clear the machinery so
+    // a half-finished cycle from before the mode switch can't resume, and
+    // never let GP quiescence accumulate toward the link-death timeout.
+    transfer_direction = SENDING;
+    lc.transferring = false;
+    missed_recv_ms = 0;
+
+    // State committed before the connection existed (or while the connect
+    // dialog was still up) was never transmitted; publish it once.
+    if (!gp_socket_sent_initial) {
+        gp_socket_sent_initial = true;
+        GpSocketRcntWritten(READ16LE(&g_ioMem[COMM_RCNT]));
+    }
+
+    // Throttle the receive poll: LinkUpdate runs every instruction batch,
+    // and even a minimal selector wait per call would swamp the emulator.
+    gp_poll_ticks += ticks;
+    if (gp_poll_ticks >= (int)(TICKS_PER_FRAME / 4)) {
+        gp_poll_ticks = 0;
+        if (linkid) {
+            if (!GpSocketDrainOne(lanlink.tcpsocket, 0))
+                return;
+        } else {
+            for (int i = 1; i <= lanlink.numslaves; i++)
+                if (!GpSocketDrainOne(ls.tcpsocket[i], i))
+                    return;
+        }
+    }
+
+    GpCommitMerged(GpMergeInputs(READ16LE(&g_ioMem[COMM_RCNT]),
+                                 linkid ? gp_peer_rcnt : gp_peer_rcnt + 1,
+                                 linkid ? 1 : lanlink.numslaves));
+}
+
 static void UpdateCableSocket(int ticks)
 {
+    if ((READ16LE(&g_ioMem[COMM_RCNT]) >> 14) == 2) {
+        GpSocketUpdate(ticks);
+        return;
+    }
     (void)ticks; // unused param
     if (linkid && transfer_direction == SENDING && lc.transferring && linktime >= transfer_start_time_from_master) {
         cable_data[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
@@ -2081,6 +2394,7 @@ static void CloseSocket()
     for (int i = 1; i <= 4; i++)
         rfu_server.tcpsocket[i].disconnect();
     lanlink.connectedSlaves = 0;
+    GpResetState();
 }
 
 // call this to clean up crashed program's shared state
@@ -3656,9 +3970,12 @@ static ConnectionState InitIPC()
             if (vbaid == n)
                 linkmem->numgbas = (uint8_t)(n + 1);
             linkmem->linkflags = (uint8_t)(f | (1 << vbaid));
+            // Don't inherit a previous occupant's published GP pin state.
+            linkmem->gp_rcnt[vbaid] = 0;
         }
     }
     linkid = (uint16_t)vbaid;
+    GpResetState();
 
     // The GB serial path is strictly 2-player: it indexes linkcmd/linkdata/
     // linksync with 1 - linkid, so a third instance would index [-1].
@@ -3841,8 +4158,13 @@ static void ReconnectCableIPC()
 
 static void UpdateCableIPC(int)
 {
-    if (((READ16LE(&g_ioMem[COMM_RCNT])) >> 14) == 3)
+    const uint16_t rcnt = READ16LE(&g_ioMem[COMM_RCNT]);
+    if ((rcnt >> 14) == 3) // JOY mode: pins belong to the JoyBus engine
         return;
+    if ((rcnt >> 14) == 2) { // GP mode: GPIO exchange, no transfers
+        GpIpcUpdate();
+        return;
+    }
 
     // slave startup depends on detecting change in numtransfers
     // and syncing clock with master (after first transfer)
@@ -5158,6 +5480,8 @@ static void CloseIPC()
         f = linkmem->linkflags;
         f &= ~(1 << linkid);
         linkmem->linkflags = (uint8_t)f;
+        // Stop driving GP pins for the peers that remain.
+        linkmem->gp_rcnt[linkid] = 0;
         // numgbas is (highest still-connected slot) + 1. The old loop
         // wrote "for (i = 0; i < n; i--)", which decrements i in a "< n"
         // test -- it never scanned and left numgbas stale, corrupting the
@@ -5262,4 +5586,5 @@ static void CloseIPC()
     transfer_direction = 0;
     numtransfers = 0;
     linktime = 0;
+    GpResetState();
 }
