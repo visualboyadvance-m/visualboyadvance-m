@@ -470,7 +470,7 @@ class CableClient {
     uint16_t* uint16_tinbuffer;
     int32_t* intoutbuffer;
     uint16_t* uint16_toutbuffer;
-    int numbytes;
+    [[maybe_unused]] int numbytes;
 
 public:
     sf::IpAddress serveraddr{0};
