@@ -448,7 +448,7 @@ static uint32_t AutoInputMask(int joy)
     }
     if (script.empty())
         return 0;
-    if (joy == OPTION(kJoyDefault) - 1)
+    if (joy == (int)(OPTION(kJoyDefault) - 1))
         frame_count++;
     uint32_t mask = 0;
     for (const Step& s : script)
