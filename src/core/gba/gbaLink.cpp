@@ -10,6 +10,7 @@
 #if defined(_WIN32)
 
 #include <Windows.h>
+#include <winsock2.h>
 
 #else  // !defined(_WIN32)
 
