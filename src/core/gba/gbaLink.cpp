@@ -542,8 +542,29 @@ static const int kMaxLinkClockLagTicks = 10 * (TICKS_PER_SECOND / 60);
 // transferring (scene fade, menu, or gone entirely) can only slow the
 // slave down for a moment, never freeze it.
 static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
-static const int kAheadThrottleBudgetUs = 250000;
+// Generous: the throttle must ride out multi-second peer stalls (occluded
+// window, coalesced timers), not just scheduler jitter. It only engages
+// while this side is already several frames ahead of the transfer stream,
+// so a master that legitimately paused transfers costs at most one
+// budget's worth of slowdown before the slave runs free again.
+static const int kAheadThrottleBudgetUs = 3000000;
 static int ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+
+// How long an in-flight IPC transfer keeps waiting for a peer that is
+// still a session member (its linkflags bit is set) before giving up. A
+// GUI emulator process can stop emulating for SECONDS for reasons that
+// have nothing to do with the game -- an occluded window, timer
+// coalescing, a dragged window, GPU contention -- and a real cable never
+// times out. linktimeout is the probe granularity of the wait, not the
+// drop deadline; a peer that left cleanly cleared its flag and is dropped
+// immediately, one that crashed with the flag still set is cut loose here.
+static const int kPeerStallCapMs = 10000;
+
+// Wait for a linksync token during an in-flight IPC transfer. Returns
+// false when the wait should be abandoned (peer left the session, local
+// close requested, or the stall ceiling was reached). peer_mask selects
+// the linkflags bits that must stay set for the wait to keep going.
+static bool WaitForLinkToken(int sem_index, uint8_t peer_mask);
 
 // One bounded throttle step: ~0.2 ms per LinkUpdate call while ahead.
 static bool LinkAheadThrottleStep()
@@ -1477,6 +1498,31 @@ static void ProcessDeferredLinkClose()
     if (link_close_pending) {
         link_close_pending = false;
         CloseLink();
+    }
+}
+
+// See the declaration next to kPeerStallCapMs for the rationale. Blocking
+// here is deliberate: it freezes this instance's emulated time so its game
+// never observes the peer's stall -- exactly what a physical cable does.
+static bool WaitForLinkToken(int sem_index, uint8_t peer_mask)
+{
+    if (peer_mask == 0)
+        return false; // no live peers to wait for
+    const int probe_ms = linktimeout > 0 ? linktimeout : 1;
+    int waited_ms = 0;
+    for (;;) {
+        if (WaitForSingleObject(linksync[sem_index], probe_ms) != WAIT_TIMEOUT)
+            return true;
+        waited_ms += probe_ms;
+        if (LinkIsClosing())
+            return false;
+        if ((linkmem->linkflags & peer_mask) != peer_mask)
+            return false; // peer left the session cleanly
+        if (waited_ms >= kPeerStallCapMs) {
+            CableTrace("ipc wait: peer stalled past %d ms, giving up",
+                kPeerStallCapMs);
+            return false;
+        }
     }
 }
 
@@ -2518,14 +2564,16 @@ static void UpdateCableSocket(int ticks)
             if (LinkIsClosing())
                 return; // drop already flagged; CloseLink runs after update
             missed_recv_ms += 50;
+            const int miss_budget =
+                4 * linktimeout > kPeerStallCapMs ? 4 * linktimeout : kPeerStallCapMs;
             CableTrace("sock[%d] recv miss (missed_recv_ms=%d/%d)", linkid,
-                missed_recv_ms, 4 * linktimeout);
-            // 4x the configured timeout, matching the IPC retry budget: a
-            // peer that stops emulating for a moment (focus loss, window
-            // drag) must not kill the session. A peer that actually died
-            // is caught much sooner by the TCP layer (goodbye frame or
-            // Dropped status in Recv/CheckSendResult).
-            if (missed_recv_ms > 4 * linktimeout) {
+                missed_recv_ms, miss_budget);
+            // Ride out peer stalls of several seconds (occluded window,
+            // coalesced timers), same ceiling as the IPC wait. A peer that
+            // actually died is caught much sooner by the TCP layer
+            // (goodbye frame or Dropped status in Recv/CheckSendResult),
+            // so the long budget costs nothing in the real-death case.
+            if (missed_recv_ms > miss_budget) {
                 CableTrace("sock[%d] LINK TIMEOUT", linkid);
                 systemScreenMessage(_("Link timeout."));
                 RequestLinkClose();
@@ -4428,25 +4476,19 @@ static void UpdateCableIPC(int)
     if (transfer_direction <= linkmem->trgbas && linktime >= trtimedata[transfer_direction - 1][tspeed]) {
         // transfer #n -> wait for value n - 1
         if (transfer_direction > 1 && linkid != transfer_direction - 1) {
-            // Retry transient stalls before declaring the peer gone: a GUI
-            // instance can stop emulating for hundreds of milliseconds for
-            // completely healthy reasons (window drag, dialog, scheduler
-            // hiccup), and the old one-shot timeout rewrote the shared
-            // topology on the first miss — unrecoverable for the game even
-            // though the peer came right back. Blocking here keeps the two
-            // instances in lockstep exactly like the cable would; only a
-            // peer that stays silent for the full budget is dropped.
-            int wait_tries = 4;
-            bool timed_out = false;
-            while (WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
-                if (--wait_tries > 0 && !LinkIsClosing())
-                    continue;
-                timed_out = true;
-                break;
-            }
-            if (timed_out) {
-                CableTrace("ipc[%d] slot-%d wait TIMEOUT (%dx%d ms), dropping player %d",
-                    linkid, transfer_direction, 4, linktimeout, transfer_direction - 1);
+            // Wait out peer stalls instead of dropping on the first missed
+            // linktimeout: a GUI instance can stop emulating for seconds
+            // for completely healthy reasons (occluded window, drag,
+            // dialog, scheduler hiccup), and the old one-shot timeout
+            // rewrote the shared topology on the first miss --
+            // unrecoverable for the game even though the peer came right
+            // back. The wait keeps going while the peer is still a session
+            // member (its linkflags bit is set), bounded by
+            // kPeerStallCapMs for a peer that crashed with its flag up.
+            if (!WaitForLinkToken(transfer_direction - 1,
+                    (uint8_t)(1 << (transfer_direction - 1)))) {
+                CableTrace("ipc[%d] slot-%d wait abandoned, dropping player %d",
+                    linkid, transfer_direction, transfer_direction - 1);
                 // assume slave has dropped off if timed out
                 if (!linkid) {
                     // Dropping a slave rewrites the shared topology
@@ -4515,19 +4557,13 @@ static void UpdateCableIPC(int)
         // not strictly necessary; may just slow things down
         if (!linkid) {
             for (int i = 2; i < transfer_direction; i++) {
-                // Same bounded retry as the slot wait above: don't reset a
-                // healthy session over one transient stall.
-                int wait_tries = 4;
-                bool timed_out = false;
-                while (WaitForSingleObject(linksync[0], linktimeout) == WAIT_TIMEOUT) {
-                    if (--wait_tries > 0 && !LinkIsClosing())
-                        continue;
-                    timed_out = true;
-                    break;
-                }
-                if (timed_out) {
-                    CableTrace("ipc[%d] completion wait TIMEOUT (%dx%d ms), resetting comm",
-                        linkid, 4, linktimeout);
+                // Same stall-tolerant wait as the slot wait above: don't
+                // reset a healthy session over one transient stall. Any
+                // still-flagged slave keeps the wait alive.
+                if (!WaitForLinkToken(0,
+                        (uint8_t)(linkmem->linkflags & ~1u))) {
+                    CableTrace("ipc[%d] completion wait abandoned, resetting comm",
+                        linkid);
                     // impossible to determine which slave died
                     // so leave them alone for now
                     systemScreenMessage(_("Unknown slave timed out; resetting comm"));
