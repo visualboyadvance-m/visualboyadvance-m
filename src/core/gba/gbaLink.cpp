@@ -563,6 +563,15 @@ static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
 static const int32_t kMaxLinkLeadTicks = 2 * (TICKS_PER_SECOND / 60);
 static const int32_t kHotWindowTicks = 8 * (TICKS_PER_SECOND / 60);
 static uint32_t last_hot_own_clock = 0;
+// Leads are measured relative to the moment the link became hot, NOT from
+// process start: instances legitimately diverge by minutes of emulated
+// time while the link is cold (one player boots or fast-forwards long
+// before the other reaches the Cable Club), and that pre-existing offset
+// is the game's business to synchronize, not ours. Pacing only equalizes
+// the RATE of progress while transfers are flowing.
+static bool link_was_hot = false;
+static uint32_t hot_base_own = 0;
+static uint32_t hot_base_peer[4] = { 0, 0, 0, 0 };
 // Generous — matches kPeerStallCapMs: the throttle must ride out
 // multi-second peer stalls (occluded window, coalesced timers), not just
 // scheduler jitter. It only engages while this side is already several
@@ -4462,16 +4471,30 @@ static void UpdateCableIPC(int ticks)
     linkmem->core_clock[linkid] += (uint32_t)ticks;
     if (transfer_direction)
         last_hot_own_clock = linkmem->core_clock[linkid];
-    if (linkmem->numgbas > 1
-        && (int32_t)(linkmem->core_clock[linkid] - last_hot_own_clock)
-               < kHotWindowTicks) {
-        const uint32_t mine = linkmem->core_clock[linkid];
+    const uint32_t mine = linkmem->core_clock[linkid];
+    const bool link_hot = linkmem->numgbas > 1
+        && (int32_t)(mine - last_hot_own_clock) < kHotWindowTicks;
+    if (link_hot && !link_was_hot) {
+        // Cold -> hot: rebase the lead measurement (see hot_base_own).
+        hot_base_own = mine;
+        for (int i = 0; i < 4; i++)
+            hot_base_peer[i] = linkmem->core_clock[i];
+    }
+    link_was_hot = link_hot;
+    // Never throttle while local progress is needed to serve the link: an
+    // in-flight transfer (transfer_direction) or one pending detection
+    // (numtransfers changed) must be reached at full speed, or the peer's
+    // wait for our reply would be starved by our own pacing.
+    if (link_hot && !transfer_direction
+        && linkmem->numtransfers == numtransfers) {
+        const int32_t my_progress = (int32_t)(mine - hot_base_own);
         const int f = linkmem->linkflags;
         int32_t worst_lead = 0;
         for (int i = 0; i < 4; i++) {
             if (i == (int)linkid || !(f & (1 << i)))
                 continue;
-            const int32_t lead = (int32_t)(mine - linkmem->core_clock[i]);
+            const int32_t lead = my_progress
+                - (int32_t)(linkmem->core_clock[i] - hot_base_peer[i]);
             if (lead > worst_lead)
                 worst_lead = lead;
         }
