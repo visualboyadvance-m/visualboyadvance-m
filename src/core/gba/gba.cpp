@@ -6241,9 +6241,22 @@ void CPULoop(int ticks)
             // reaches cpuNextEvent, the pop loop never runs, and the
             // emulator spins forever at the BIOS IntrWait (the two-instance
             // cable-link white-screen boot hang).
-            if ((GetLinkMode() != LINK_DISCONNECTED || gba_joybus_active)
-                && cpuNextEvent > 1)
-                cpuNextEvent = 1;
+            // Keep the event horizon tight enough to service the link
+            // promptly, but do not collapse it to a single tick. A 1-tick
+            // horizon ran the whole event tail (CPUUpdateTicks + LinkUpdate)
+            // every instruction -- ~280k LinkUpdate calls/frame -- which on a
+            // live IPC/socket link is a large linked-mode framerate cost for
+            // no benefit: the link drivers accumulate linktime and act on tick
+            // thresholds, so a coarser horizon preserves transfer timing to
+            // within the poll interval. Must only ever LOWER cpuNextEvent so a
+            // due (==0) event is never stranded (see the halt-wake note above).
+            // JoyBus keeps its 1-tick cadence for its tighter GC-side timing.
+            {
+                const int linkHorizon = gba_joybus_active ? 1 : 64;
+                if ((GetLinkMode() != LINK_DISCONNECTED || gba_joybus_active)
+                    && cpuNextEvent > linkHorizon)
+                    cpuNextEvent = linkHorizon;
+            }
 #endif
 
             // Legacy IRQ-delivery block removed. IRQ delivery and halt-wake

@@ -4554,45 +4554,65 @@ static void ReconnectCableIPC()
     systemScreenMessage(_("Lost link; reconnected"));
 }
 
+// The lockstep pacing tolerates kMaxLinkLeadTicks (two frames) of skew, so the
+// shared clock does not need per-tick precision. Publishing it on every
+// LinkUpdate wrote a single shared cache line (all four core_clock[] slots
+// share one line) ~once per emulated tick; on multi-core that line ping-pongs
+// between the two instances' cores continuously (write own slot + read peers'
+// slots = false + true sharing) and shows up as a large linked framerate drop.
+// Keep the clock local and flush only when the peer actually needs it.
+static uint32_t s_ipc_unpublished_ticks = 0;
+static const uint32_t kClockPublishTicks = 1024; // << kMaxLinkLeadTicks; tunable
+
 static void UpdateCableIPC(int ticks)
 {
-    // Publish our emulated clock and pace against live peers -- the
-    // CPU-rate lockstep. Runs in every RCNT mode (before the JOY/GP
+    // CPU-rate lockstep. Accumulate our emulated clock locally and only flush
+    // it to shared memory when the peer needs our progress: in/entering a
+    // transfer, a pending detection, or once we have advanced a meaningful
+    // fraction of the two-frame pacing tolerance. Between those the shared
+    // cache line stays cold. Runs in every RCNT mode (before the JOY/GP
     // early-outs) so pacing holds across mode probes too.
-    linkmem->core_clock[linkid] += (uint32_t)ticks;
-    if (transfer_direction)
-        last_hot_own_clock = linkmem->core_clock[linkid];
-    const uint32_t mine = linkmem->core_clock[linkid];
-    const bool link_hot = linkmem->numgbas > 1
-        && (int32_t)(mine - last_hot_own_clock) < kHotWindowTicks;
-    if (link_hot && !link_was_hot) {
-        // Cold -> hot: rebase the lead measurement (see hot_base_own).
-        hot_base_own = mine;
-        for (int i = 0; i < 4; i++)
-            hot_base_peer[i] = linkmem->core_clock[i];
-    }
-    link_was_hot = link_hot;
-    // Never throttle while local progress is needed to serve the link: an
-    // in-flight transfer (transfer_direction) or one pending detection
-    // (numtransfers changed) must be reached at full speed, or the peer's
-    // wait for our reply would be starved by our own pacing.
-    if (link_hot && !transfer_direction
-        && linkmem->numtransfers == numtransfers) {
-        const int32_t my_progress = (int32_t)(mine - hot_base_own);
-        const int f = linkmem->linkflags;
-        int32_t worst_lead = 0;
-        for (int i = 0; i < 4; i++) {
-            if (i == (int)linkid || !(f & (1 << i)))
-                continue;
-            const int32_t lead = my_progress
-                - (int32_t)(linkmem->core_clock[i] - hot_base_peer[i]);
-            if (lead > worst_lead)
-                worst_lead = lead;
+    s_ipc_unpublished_ticks += (uint32_t)ticks;
+    const bool need_publish = transfer_direction
+        || linkmem->numtransfers != numtransfers
+        || s_ipc_unpublished_ticks >= kClockPublishTicks;
+    if (need_publish) {
+        linkmem->core_clock[linkid] += s_ipc_unpublished_ticks;
+        s_ipc_unpublished_ticks = 0;
+        if (transfer_direction)
+            last_hot_own_clock = linkmem->core_clock[linkid];
+        const uint32_t mine = linkmem->core_clock[linkid];
+        const bool link_hot = linkmem->numgbas > 1
+            && (int32_t)(mine - last_hot_own_clock) < kHotWindowTicks;
+        if (link_hot && !link_was_hot) {
+            // Cold -> hot: rebase the lead measurement (see hot_base_own).
+            hot_base_own = mine;
+            for (int i = 0; i < 4; i++)
+                hot_base_peer[i] = linkmem->core_clock[i];
         }
-        if (worst_lead > kMaxLinkLeadTicks)
-            (void)LinkAheadThrottleStep();
-        else
-            ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+        link_was_hot = link_hot;
+        // Never throttle while local progress is needed to serve the link: an
+        // in-flight transfer (transfer_direction) or one pending detection
+        // (numtransfers changed) must be reached at full speed, or the peer's
+        // wait for our reply would be starved by our own pacing.
+        if (link_hot && !transfer_direction
+            && linkmem->numtransfers == numtransfers) {
+            const int32_t my_progress = (int32_t)(mine - hot_base_own);
+            const int f = linkmem->linkflags;
+            int32_t worst_lead = 0;
+            for (int i = 0; i < 4; i++) {
+                if (i == (int)linkid || !(f & (1 << i)))
+                    continue;
+                const int32_t lead = my_progress
+                    - (int32_t)(linkmem->core_clock[i] - hot_base_peer[i]);
+                if (lead > worst_lead)
+                    worst_lead = lead;
+            }
+            if (worst_lead > kMaxLinkLeadTicks)
+                (void)LinkAheadThrottleStep();
+            else
+                ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+        }
     }
 
     const uint16_t rcnt = READ16LE(&g_ioMem[COMM_RCNT]);
