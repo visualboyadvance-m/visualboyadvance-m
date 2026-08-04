@@ -2975,29 +2975,12 @@ EVT_HANDLER(LinkProto, "Local host IPC")
 EVT_HANDLER(LinkConfigure, "Link options...")
 {
 #ifndef NO_LINK
-    // The dialog's LinkType choice only has entries 0..4; anything else in
-    // the config would leave the control unselected and read back as -1.
-    if (gopts.gba_link_type < 0 || gopts.gba_link_type > 4)
-        gopts.gba_link_type = 0;
-    const int old_type = gopts.gba_link_type;
-
+    // Link type is selected via the Options->Link->Type menu radio group;
+    // this dialog only configures the timeout.
     wxDialog* dlg = GetXRCDialog("LinkConfig");
 
     if (ShowModal(dlg) != wxID_OK)
         return;
-
-    if (gopts.gba_link_type != old_type) {
-        // Route through the same helper the Options->Link->Type menu uses:
-        // it re-checks the matching radio item, persists the option, closes
-        // any active link so the new adapter takes effect on next attach,
-        // and refreshes the Start Link menu enable state.
-        static const char* const link_type_menu[] = {
-            "LinkType0Nothing", "LinkType1Cable", "LinkType2Wireless",
-            "LinkType3GameCube", "LinkType4Gameboy",
-        };
-        SetLinkTypeMenu(link_type_menu[gopts.gba_link_type],
-                        gopts.gba_link_type);
-    }
 
     SetLinkTimeout(gopts.link_timeout);
     update_opts();
