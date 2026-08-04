@@ -2519,8 +2519,13 @@ static void UpdateCableSocket(int ticks)
                 return; // drop already flagged; CloseLink runs after update
             missed_recv_ms += 50;
             CableTrace("sock[%d] recv miss (missed_recv_ms=%d/%d)", linkid,
-                missed_recv_ms, linktimeout);
-            if (missed_recv_ms > linktimeout) {
+                missed_recv_ms, 4 * linktimeout);
+            // 4x the configured timeout, matching the IPC retry budget: a
+            // peer that stops emulating for a moment (focus loss, window
+            // drag) must not kill the session. A peer that actually died
+            // is caught much sooner by the TCP layer (goodbye frame or
+            // Dropped status in Recv/CheckSendResult).
+            if (missed_recv_ms > 4 * linktimeout) {
                 CableTrace("sock[%d] LINK TIMEOUT", linkid);
                 systemScreenMessage(_("Link timeout."));
                 RequestLinkClose();
@@ -4423,9 +4428,25 @@ static void UpdateCableIPC(int)
     if (transfer_direction <= linkmem->trgbas && linktime >= trtimedata[transfer_direction - 1][tspeed]) {
         // transfer #n -> wait for value n - 1
         if (transfer_direction > 1 && linkid != transfer_direction - 1) {
-            if (WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
-                CableTrace("ipc[%d] slot-%d wait TIMEOUT (%d ms), dropping player %d",
-                    linkid, transfer_direction, linktimeout, transfer_direction - 1);
+            // Retry transient stalls before declaring the peer gone: a GUI
+            // instance can stop emulating for hundreds of milliseconds for
+            // completely healthy reasons (window drag, dialog, scheduler
+            // hiccup), and the old one-shot timeout rewrote the shared
+            // topology on the first miss — unrecoverable for the game even
+            // though the peer came right back. Blocking here keeps the two
+            // instances in lockstep exactly like the cable would; only a
+            // peer that stays silent for the full budget is dropped.
+            int wait_tries = 4;
+            bool timed_out = false;
+            while (WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
+                if (--wait_tries > 0 && !LinkIsClosing())
+                    continue;
+                timed_out = true;
+                break;
+            }
+            if (timed_out) {
+                CableTrace("ipc[%d] slot-%d wait TIMEOUT (%dx%d ms), dropping player %d",
+                    linkid, transfer_direction, 4, linktimeout, transfer_direction - 1);
                 // assume slave has dropped off if timed out
                 if (!linkid) {
                     // Dropping a slave rewrites the shared topology
@@ -4493,16 +4514,27 @@ static void UpdateCableIPC(int)
         // this keeps unfinished slaves from screwing up last xfer
         // not strictly necessary; may just slow things down
         if (!linkid) {
-            for (int i = 2; i < transfer_direction; i++)
-                if (WaitForSingleObject(linksync[0], linktimeout) == WAIT_TIMEOUT) {
-                    CableTrace("ipc[%d] completion wait TIMEOUT (%d ms), resetting comm",
-                        linkid, linktimeout);
+            for (int i = 2; i < transfer_direction; i++) {
+                // Same bounded retry as the slot wait above: don't reset a
+                // healthy session over one transient stall.
+                int wait_tries = 4;
+                bool timed_out = false;
+                while (WaitForSingleObject(linksync[0], linktimeout) == WAIT_TIMEOUT) {
+                    if (--wait_tries > 0 && !LinkIsClosing())
+                        continue;
+                    timed_out = true;
+                    break;
+                }
+                if (timed_out) {
+                    CableTrace("ipc[%d] completion wait TIMEOUT (%dx%d ms), resetting comm",
+                        linkid, 4, linktimeout);
                     // impossible to determine which slave died
                     // so leave them alone for now
                     systemScreenMessage(_("Unknown slave timed out; resetting comm"));
                     linkmem->numtransfers = numtransfers = 0;
                     break;
                 }
+            }
         } else if (linkmem->trgbas > linkid)
             // signal master that this slave is finished
             ReleaseSemaphore(linksync[0], 1, NULL);

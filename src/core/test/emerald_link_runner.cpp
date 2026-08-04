@@ -31,6 +31,9 @@
 //   savewrite NAME   write battery to <dump>/p<id>_NAME.sav (never touches
 //                    the input .sav; use to persist a better start position)
 //   speed X          change pacing multiplier (0 = unthrottled)
+//   pause N          stop emulating for N ms of wall time (the peer keeps
+//                    running) — simulates a GUI window losing focus with
+//                    pause-when-inactive, a drag, or any one-sided stall
 //   msg TEXT         log TEXT to stderr with the current frame number
 //   waitpeer         pipe barrier with the peer (pre-link phases only!)
 // After EOF the process dumps a final frame and exits.
@@ -501,6 +504,13 @@ static void run_script(const Args& a, Barrier& b) {
             double s = 0;
             if (sscanf(p, "%*s %lf", &s) == 1) {
                 g_speed = s;
+                g_next_frame_at = 0;
+            }
+        } else if (!strcmp(cmd, "pause")) {
+            if (sscanf(p, "%*s %ld", &n) == 1) {
+                fprintf(stderr, "[P%d f%06ld] pausing %ld ms\n", g_player,
+                    g_frame, n);
+                usleep((useconds_t)(n * 1000));
                 g_next_frame_at = 0;
             }
         } else if (!strcmp(cmd, "msg")) {
