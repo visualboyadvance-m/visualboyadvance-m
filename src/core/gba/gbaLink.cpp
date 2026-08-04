@@ -4819,7 +4819,7 @@ static void StartRFU(uint16_t value)
         rfu_enabled = (siomode == NORMAL32);
 
     if (((READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x5080) == 0x1000) && ((value & 0x5080) == 0x5080)) { //RFU Reset, may also occur before cable link started
-        log("RFU Reset2 : %04X  %04X  %d\n", READ16LE(&g_ioMem[COMM_RCNT]), READ16LE(&g_ioMem[COMM_SIOCNT]), GetTickCount());
+        //log("RFU Reset2 : %04X  %04X  %d\n", READ16LE(&g_ioMem[COMM_RCNT]), READ16LE(&g_ioMem[COMM_SIOCNT]), GetTickCount());
         linkmem->rfu_listfront[vbaid] = 0;
         linkmem->rfu_listback[vbaid] = 0;
     }
