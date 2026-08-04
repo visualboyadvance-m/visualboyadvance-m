@@ -4564,6 +4564,20 @@ static void UpdateCableIPC(int ticks)
             linktime = 0;
         else
             linktime -= linkmem->lastlinktime;
+        // Cap the leftover: residue above one transfer slot pre-satisfies
+        // every pacing gate below, so a run of pending transfers commits
+        // back-to-back with almost no emulated time between serial IRQs --
+        // the game's ISR (a few thousand cycles) then misses words, which
+        // corrupts block transfers and trips the game's checksum ("link
+        // error" mid-trade). The wx GUI's bursty frame pacing builds
+        // exactly this residue (observed steady-state ~2 frames); bounding
+        // it makes the slave spend the master's inter-transfer gap in its
+        // OWN emulated time, the way real hardware does. The socket slave
+        // already gets this for free by zeroing linktime at every send.
+        // (linkcmd holds this transfer's speed; tspeed is assigned from it
+        // a few lines below.)
+        if (linktime > trtimedata[0][linkmem->linkcmd[0] & 3])
+            linktime = trtimedata[0][linkmem->linkcmd[0] & 3];
 
         // 'M' (multiplayer start) is the only possible command here.
         tspeed = linkmem->linkcmd[0] & 3;
