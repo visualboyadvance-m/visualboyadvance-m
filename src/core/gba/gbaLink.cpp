@@ -668,6 +668,53 @@ static void CableTrace(const char* fmt, ...)
     fprintf(out, "[CABLE %u.%03u] %s\n", ms / 1000, ms % 1000, buf);
 }
 
+// RFU-path tracing: set VBAM_TRACE_RFU=1 (or `touch /tmp/vbam-trace-rfu`
+// for Finder-launched GUI instances) to stream every wireless-adapter
+// transfer to stderr / a per-pid log: the word the game clocked out, the
+// state machine's reply, and the state/command context. The adapter
+// protocol is a strict request/response lockstep, so this is the only
+// diagnostic that shows *which* exchange desynchronized a game's RFU
+// library. Same design as CableTraceStream above.
+static FILE* RfuTraceStream()
+{
+    static FILE* const stream = []() -> FILE* {
+        const char* v = getenv("VBAM_TRACE_RFU");
+        if (v && *v && *v != '0')
+            return stderr;
+#ifndef _WIN32
+        if (FILE* trigger = fopen("/tmp/vbam-trace-rfu", "r")) {
+            fclose(trigger);
+            char path[64];
+            snprintf(path, sizeof(path), "/tmp/vbam-rfu-%d.log",
+                (int)getpid());
+            FILE* f = fopen(path, "w");
+            if (f)
+                setvbuf(f, NULL, _IOLBF, 0);
+            return f;
+        }
+#endif
+        return NULL;
+    }();
+    return stream;
+}
+
+#if defined(__GNUC__)
+__attribute__((format(printf, 1, 2)))
+#endif
+static void RfuTrace(const char* fmt, ...)
+{
+    FILE* out = RfuTraceStream();
+    if (!out)
+        return;
+    char buf[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    const uint32_t ms = GetTickCount();
+    fprintf(out, "[RFU %u.%03u] %s\n", ms / 1000, ms % 1000, buf);
+}
+
 // Hodgepodge
 static uint8_t tspeed = 3;
 static int transfer_direction = 0;
@@ -3237,6 +3284,9 @@ static void StartRFUSocket(uint16_t value)
                 rfu_transfer_end = 256;
 
             uint16_t siodata_h = READ16LE(&g_ioMem[COMM_SIODATA32_H]);
+            RfuTrace("sock st=%d out=%08X cnt=%04X cmd=%02X pol=%d",
+                rfu_state, READ32LE(&g_ioMem[COMM_SIODATA32_L]), value,
+                rfu_cmd, rfu_polarity);
             switch (rfu_state) {
             case RFU_INIT:
                 if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
@@ -3731,10 +3781,37 @@ static void StartRFUSocket(uint16_t value)
                         else
                             rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     }
-                } else { //unknown COMM word //in MarioGolfAdv (when a player/client exiting lobby), There is a possibility COMM = 0x7FFE8001, PrevVAL = 0x5087, PrevCOM = 0, is this part of initialization?
-                    log("%09d: UnkCOM %08X  %04X  %08X %08X\n", linktime, READ32LE(&g_ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
-                    if ((READ32LE(&g_ioMem[COMM_SIODATA32_L]) >> 24) != 0x7ff)
-                        rfu_state = RFU_INIT; //to prevent the next reinit words from getting in finalization processing (here), may cause MarioGolfAdv to show Linking error when this occurs instead of continuing with COMM cmd
+                } else { //unknown COMM word
+                    // Three cases land here:
+                    //  1. The game's RFU library restarts the adapter login
+                    //     mid-session: the first handshake word carries the
+                    //     "NI" key halfword in the LSBs (e.g. 0x7FFF494E when
+                    //     our last reply was 0x8000xxxx). Drop back to
+                    //     RFU_INIT with a clean slate so the NINTENDO
+                    //     handshake is served by the login echo; stale
+                    //     polarity/command state from the aborted session
+                    //     would otherwise flip the SI bit during login and
+                    //     make the library retry forever.
+                    //  2. A stray login-tail word with the 0x7FF prefix
+                    //     (MarioGolfAdv sends 0x7FFE8001 when a client exits
+                    //     the lobby): must NOT reset the state machine or the
+                    //     game shows "Linking error" instead of continuing.
+                    //     (The old `>> 24 != 0x7ff` guard meant this but a
+                    //     byte can never equal 0x7ff, so it always reset.)
+                    //  3. Garbage: resync via a fresh login.
+                    const uint32_t com = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    log("%09d: UnkCOM %08X  %04X  %08X %08X\n", linktime, com, PrevVAL, PrevCOM, PrevDAT);
+                    if ((com & 0xFFFF) == 0x494E) { // login restart ("NI")
+                        rfu_state = RFU_INIT;
+                        rfu_polarity = 0;
+                        rfu_cmd = 0;
+                        rfu_cmd2 = 0;
+                        rfu_lastcmd = 0;
+                        rfu_lastcmd2 = 0;
+                        rfu_waiting = false;
+                    } else if ((com >> 20) != 0x7ff) {
+                        rfu_state = RFU_INIT;
+                    }
                     rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 }
                 break;
@@ -3880,6 +3957,14 @@ bool LinkRFUUpdateSocket()
 
 static void UpdateRFUSocket(int ticks)
 {
+    // Age the in-flight transfer like the IPC path does (UpdateRFUIPC);
+    // without this a started exchange only completed when the broadcast
+    // timer below happened to zero rfu_transfer_end, up to 3000 ticks
+    // late. The RFU library polls the start bit with a short timeout,
+    // reads SIODATA32 before the reply is committed, fails its login
+    // validation and restarts the NINTENDO handshake forever.
+    rfu_transfer_end -= ticks;
+
     rfu_last_broadcast_time -= ticks;
 
     if (rfu_last_broadcast_time < 0) {
@@ -3899,7 +3984,10 @@ static void UpdateRFUSocket(int ticks)
                 }
             }
         }
-        rfu_transfer_end = 0;
+        // (rfu_transfer_end is aged by ticks above; historically it was
+        // only zeroed here, which made every SIO exchange complete at the
+        // whim of this 3000-tick broadcast timer instead of after the
+        // 256/2048-tick transfer the game's RFU library expects.)
 
         if (rfu_last_broadcast_time < 0)
             rfu_last_broadcast_time = 3000;
@@ -3911,6 +3999,9 @@ static void UpdateRFUSocket(int ticks)
             if (transfer_direction == RECEIVING && rfu_transfer_end <= 0) {
                 transfer_direction = SENDING;
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
+                RfuTrace("sock st=%d  in=%08X cnt=%04X cmd=%02X pol=%d done",
+                    rfu_state, READ32LE(&g_ioMem[COMM_SIODATA32_L]), value,
+                    rfu_cmd, rfu_polarity);
                 if (value & SIO_IRQ_ENABLE) {
                     CPURaiseSioIRQ();
                 }
@@ -4784,6 +4875,9 @@ static void StartRFU(uint16_t value)
             else
                 rfu_transfer_end = 256;
             uint16_t siodata_h = READ16LE(&g_ioMem[COMM_SIODATA32_H]);
+            RfuTrace("ipc st=%d out=%08X cnt=%04X cmd=%02X pol=%d",
+                rfu_state, READ32LE(&g_ioMem[COMM_SIODATA32_L]), value,
+                rfu_cmd, rfu_polarity);
             switch (rfu_state) {
             case RFU_INIT:
                 if (READ32LE(&g_ioMem[COMM_SIODATA32_L]) == 0xb0bb8001) {
@@ -5545,14 +5639,29 @@ static void StartRFU(uint16_t value)
                         else
                             rfu_buf = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
                     }
-                } else { //unknown COMM word //in MarioGolfAdv (when a player/client exiting lobby), There is a possibility COMM = 0x7FFE8001, PrevVAL = 0x5087, PrevCOM = 0, is this part of initialization?
-                    log("%08X : UnkCOM %08X  %04X  %08X %08X\n", GetTickCount(), READ32LE(&g_ioMem[COMM_SIODATA32_L]), PrevVAL, PrevCOM, PrevDAT);
-                    /*rfu_cmd ^= 0x80;
-				 UPDATE_REG(COMM_SIODATA32_L, 0);
-				 UPDATE_REG(COMM_SIODATA32_H, 0x8000);*/
-                    rfu_state = RFU_INIT; //to prevent the next reinit words from getting in finalization processing (here), may cause MarioGolfAdv to show Linking error when this occurs instead of continuing with COMM cmd
-                    //UPDATE_REG(COMM_SIODATA32_H, READ16LE(&g_ioMem[COMM_SIODATA32_L])); //replying with reversed words may cause MarioGolfAdv to reinit RFU when COMM = 0x7FFE8001
-                    //UPDATE_REG(COMM_SIODATA32_L, a);
+                } else { //unknown COMM word
+                    // Same three-way handling as the socket path (see
+                    // StartRFUSocket): a mid-session login restart (LSBs =
+                    // "NI" key, e.g. 0x7FFF494E) drops to RFU_INIT with
+                    // clean polarity/command state; a stray login-tail word
+                    // with the 0x7FF prefix (MarioGolfAdv's 0x7FFE8001 on
+                    // lobby exit) stays in RFU_COMM; anything else resyncs
+                    // via a fresh login. This copy used to reset
+                    // unconditionally, which broke the MarioGolfAdv case
+                    // and carried stale polarity into re-logins.
+                    const uint32_t com = READ32LE(&g_ioMem[COMM_SIODATA32_L]);
+                    log("%08X : UnkCOM %08X  %04X  %08X %08X\n", GetTickCount(), com, PrevVAL, PrevCOM, PrevDAT);
+                    if ((com & 0xFFFF) == 0x494E) { // login restart ("NI")
+                        rfu_state = RFU_INIT;
+                        rfu_polarity = 0;
+                        rfu_cmd = 0;
+                        rfu_cmd2 = 0;
+                        rfu_lastcmd = 0;
+                        rfu_lastcmd2 = 0;
+                        rfu_waiting = false;
+                    } else if ((com >> 20) != 0x7ff) {
+                        rfu_state = RFU_INIT;
+                    }
                     rfu_buf = (READ16LE(&g_ioMem[COMM_SIODATA32_L]) << 16) | siodata_h;
                 }
                 break;
@@ -5760,6 +5869,9 @@ static void UpdateRFUIPC(int ticks)
             if (transfer_direction && rfu_transfer_end <= 0) {
                 transfer_direction = 0;
                 uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
+                RfuTrace("ipc st=%d  in=%08X cnt=%04X cmd=%02X pol=%d done",
+                    rfu_state, READ32LE(&g_ioMem[COMM_SIODATA32_L]), value,
+                    rfu_cmd, rfu_polarity);
                 if (value & 0x4000) {
                     CPURaiseSioIRQ();
                 }

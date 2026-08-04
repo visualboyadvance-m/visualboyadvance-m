@@ -18,9 +18,15 @@
 //   emerald_link_runner --mode ipc|socket --rom <path>
 //                       --sav0 <path> --sav1 <path>
 //                       --script0 <path> --script1 <path>
+//                       [--link cable|rfu] [--savetype 1|2|3]
 //                       [--dump <dir>] [--speed <x>] [--bios <path>]
 //                       [--timeout <ms>] [--watchdog <s>] [--trace]
 //                       [--watch NAME=0xADDR[:n]]...
+//
+// --link rfu drives the wireless-adapter (RFU) transport instead of the
+// cable; combine with VBAM_TRACE_RFU=1 for per-transfer adapter traces.
+// --savetype selects the battery type (default 3 = flash 128K, as used
+// by Emerald; Digimon Racing wants 1 = EEPROM).
 //
 // Script commands (one per line, '#' comments):
 //   run N            run N frames with the currently-held keys
@@ -62,6 +68,7 @@
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
 #include "core/gba/gba.h"
+#include "core/gba/gbaEeprom.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaLink.h"
@@ -424,11 +431,13 @@ class Barrier {
 
 struct Args {
     const char* mode = "ipc";
+    const char* link = "cable"; // cable | rfu (wireless adapter)
     const char* rom = nullptr;
     const char* sav[2] = { nullptr, nullptr };
     const char* script[2] = { nullptr, nullptr };
     const char* dump = ".";
     const char* bios = nullptr;
+    int savetype = 3; // 1 = EEPROM, 2 = SRAM, 3 = flash
     int timeout_ms = 1000;
     unsigned watchdog_s = 900;
 };
@@ -513,6 +522,12 @@ static void run_script(const Args& a, Barrier& b) {
                 usleep((useconds_t)(n * 1000));
                 g_next_frame_at = 0;
             }
+        } else if (!strcmp(cmd, "pc")) {
+            fprintf(stderr,
+                "[P%d f%06ld] pc=%08x r0=%08x r1=%08x r2=%08x r3=%08x "
+                "lr=%08x sp=%08x\n",
+                g_player, g_frame, armNextPC, reg[0].I, reg[1].I, reg[2].I,
+                reg[3].I, reg[14].I, reg[13].I);
         } else if (!strcmp(cmd, "msg")) {
             char* nl = strchr(p, '\n');
             if (nl)
@@ -568,6 +583,8 @@ int main(int argc, char** argv) {
             return argv[++i];
         };
         if (!strcmp(argv[i], "--mode")) a.mode = next();
+        else if (!strcmp(argv[i], "--link")) a.link = next();
+        else if (!strcmp(argv[i], "--savetype")) a.savetype = atoi(next());
         else if (!strcmp(argv[i], "--rom")) a.rom = next();
         else if (!strcmp(argv[i], "--sav0")) a.sav[0] = next();
         else if (!strcmp(argv[i], "--sav1")) a.sav[1] = next();
@@ -579,6 +596,7 @@ int main(int argc, char** argv) {
         else if (!strcmp(argv[i], "--timeout")) a.timeout_ms = atoi(next());
         else if (!strcmp(argv[i], "--watchdog")) a.watchdog_s = (unsigned)atoi(next());
         else if (!strcmp(argv[i], "--trace")) g_trace = true;
+        else if (!strcmp(argv[i], "--verbose")) systemVerbose = atoi(next());
         else if (!strcmp(argv[i], "--watch")) parse_watch(next());
         else {
             fprintf(stderr, "unknown arg %s\n", argv[i]);
@@ -626,20 +644,27 @@ int main(int argc, char** argv) {
         die("short ROM read");
     fclose(rf);
 
-    coreOptions.saveType = 3; // flash
+    coreOptions.saveType = a.savetype;
     coreOptions.useBios = a.bios ? 1 : 0;
     coreOptions.skipBios = true;
     coreOptions.rtcEnabled = 1;
 
     if (!CPULoadRomData(rom_buf.data(), (int)rom_bytes))
         die("CPULoadRomData failed");
-    flashSetSize(0x20000);
+    if (a.savetype == 3)
+        flashSetSize(0x20000);
+    // eepromMask starts 0 (= matches every ROM address in IsEEPROM) until
+    // eepromSetSize runs; the GUI calls this from LoadGame (e285d2eb) and
+    // every embedder must do the same or all ROM data reads return 0.
+    // The size self-corrects to 8K on the first oversized EEPROM DMA.
+    if (a.savetype == 1)
+        eepromSetSize(SIZE_EEPROM_512);
     rtcEnable(true);
     if (a.bios)
         CPUInit(a.bios, true);
     else
         CPUInit("", false);
-    SetSaveType(3);
+    SetSaveType(a.savetype);
     soundInit();
     CPUReset();
     if (!CPUReadBatteryFile(a.sav[g_player]))
@@ -661,11 +686,14 @@ int main(int argc, char** argv) {
     }
 
     // ---- Link bring-up ----
+    const bool rfu = !strcmp(a.link, "rfu");
     SetLinkTimeout(a.timeout_ms);
-    if (socket_mode) {
+    if (!strcmp(a.link, "none")) {
+        // No link driver at all — for isolating link-vs-core behavior.
+    } else if (socket_mode) {
         if (!child) {
             EnableLinkServer(true, 1);
-            ConnectionState st = InitLink(LINK_CABLE_SOCKET);
+            ConnectionState st = InitLink(rfu ? LINK_RFU_SOCKET : LINK_CABLE_SOCKET);
             if (st != LINK_NEEDS_UPDATE)
                 die("server InitLink returned %d", (int)st);
             b.sync();
@@ -674,7 +702,7 @@ int main(int argc, char** argv) {
             b.sync(); // wait for the server to be listening
             EnableLinkServer(false, 0);
             SetLinkServerHost("127.0.0.1");
-            ConnectionState st = InitLink(LINK_CABLE_SOCKET);
+            ConnectionState st = InitLink(rfu ? LINK_RFU_SOCKET : LINK_CABLE_SOCKET);
             if (st != LINK_NEEDS_UPDATE)
                 die("client InitLink returned %d", (int)st);
             pump_connect("client");
@@ -682,19 +710,19 @@ int main(int argc, char** argv) {
     } else {
         // Deterministic role assignment: parent inits first.
         if (!child) {
-            ConnectionState st = InitLink(LINK_CABLE_IPC);
+            ConnectionState st = InitLink(rfu ? LINK_RFU_IPC : LINK_CABLE_IPC);
             if (st != LINK_OK)
                 die("InitLink returned %d", (int)st);
             b.sync();
         } else {
             b.sync();
-            ConnectionState st = InitLink(LINK_CABLE_IPC);
+            ConnectionState st = InitLink(rfu ? LINK_RFU_IPC : LINK_CABLE_IPC);
             if (st != LINK_OK)
                 die("InitLink returned %d", (int)st);
         }
     }
-    fprintf(stderr, "[P%d] link up (player id %d, mode %s)\n", g_player,
-        GetLinkPlayerId(), a.mode);
+    fprintf(stderr, "[P%d] link up (player id %d, mode %s, link %s)\n",
+        g_player, GetLinkPlayerId(), a.mode, a.link);
     b.sync();
 
     run_script(a, b);

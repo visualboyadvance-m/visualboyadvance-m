@@ -2327,6 +2327,12 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
             // Also initialize LinkConfig since it shares ben/benval
             {
                 wxDialog* d2 = LoadXRCDialog("LinkConfig");
+                // Link type (index == gopts.gba_link_type: 0 Nothing,
+                // 1 Cable, 2 Wireless/RFU, 3 GameCube, 4 Game Boy); kept
+                // in sync with the Options->Link->Type menu radio group by
+                // the LinkConfigure handler.
+                wxChoice* lt = SafeXRCCTRL<wxChoice>(d2, "LinkType");
+                lt->SetValidator(wxGenericValidator(&gopts.gba_link_type));
                 lab = SafeXRCCTRL<wxControl>(d2, "LinkTimeoutLab");
                 addbe(lab);
                 sc = SafeXRCCTRL<wxSpinCtrl>(d2, "LinkTimeout");

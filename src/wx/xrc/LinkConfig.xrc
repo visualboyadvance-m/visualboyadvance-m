@@ -7,6 +7,34 @@
       <object class="sizeritem">
         <object class="wxBoxSizer">
           <object class="sizeritem">
+            <object class="wxStaticText" name="LinkTypeLab">
+              <label>Link type</label>
+            </object>
+            <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            <border>5</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxChoice" name="LinkType">
+              <content>
+                <item>Nothing</item>
+                <item>Cable</item>
+                <item>Wireless adapter (RFU)</item>
+                <item>Game Cube</item>
+                <item>Game Boy</item>
+              </content>
+            </object>
+            <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+          </object>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <object class="sizeritem">
             <object class="wxStaticText" name="LinkTimeoutLab">
               <label>Link timeout (in milliseconds)</label>
             </object>
