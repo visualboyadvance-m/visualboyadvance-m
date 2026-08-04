@@ -542,12 +542,14 @@ static const int kMaxLinkClockLagTicks = 10 * (TICKS_PER_SECOND / 60);
 // transferring (scene fade, menu, or gone entirely) can only slow the
 // slave down for a moment, never freeze it.
 static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
-// Generous: the throttle must ride out multi-second peer stalls (occluded
-// window, coalesced timers), not just scheduler jitter. It only engages
-// while this side is already several frames ahead of the transfer stream,
-// so a master that legitimately paused transfers costs at most one
-// budget's worth of slowdown before the slave runs free again.
-static const int kAheadThrottleBudgetUs = 3000000;
+// Generous — matches kPeerStallCapMs: the throttle must ride out
+// multi-second peer stalls (occluded window, coalesced timers), not just
+// scheduler jitter. It only engages while this side is already several
+// frames ahead of the transfer stream, and it disengages the moment the
+// master publishes the next transfer, so a master that legitimately
+// paused transfers costs at most one budget's worth of slowdown before
+// the slave runs free again.
+static const int kAheadThrottleBudgetUs = 10000000;
 static int ahead_throttle_budget_us = kAheadThrottleBudgetUs;
 
 // How long an in-flight IPC transfer keeps waiting for a peer that is
