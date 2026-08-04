@@ -45,7 +45,12 @@ endif()
 # the harness relies on fork/pipes/flock, and on Windows the kernel cleans
 # up the named objects itself.
 if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
-    foreach(_link_runner link_ipc_test link_socket_runner)
+    # emerald_link_runner is a two-process debugging harness that drives a
+    # real commercial ROM (Pokémon Emerald) through a link session with
+    # scripted input and PNG frame dumps. The target always builds here;
+    # ctest registration is gated on the VBAM_TEST_EMERALD_* cache vars
+    # further down since the ROM cannot be bundled.
+    foreach(_link_runner link_ipc_test link_socket_runner emerald_link_runner)
         add_executable(${_link_runner} ${_link_runner}.cpp)
         target_link_libraries(${_link_runner} PRIVATE vbam-core)
         if(APPLE)
@@ -57,7 +62,8 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
         endif()
     endforeach()
 
-    foreach(_t role_assignment stale_recovery gb_exchange gb_third_instance)
+    foreach(_t role_assignment stale_recovery gb_exchange gb_third_instance
+            idle_overflow)
         add_test(NAME link.ipc.${_t} COMMAND link_ipc_test --test ${_t})
         set_tests_properties(link.ipc.${_t} PROPERTIES
             LABELS "link" TIMEOUT 120)
@@ -73,8 +79,8 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
     set_tests_properties(link.ipc.gp PROPERTIES
         LABELS "link" TIMEOUT 120)
 
-    foreach(_t handshake handshake_retry cable gb disconnect disconnect_goodbye
-            bind_conflict gp)
+    foreach(_t handshake handshake_retry cable slave_commit idle_overflow gb
+            disconnect disconnect_goodbye bind_conflict gp)
         add_test(NAME link.socket.${_t} COMMAND link_socket_runner --test ${_t})
         set_tests_properties(link.socket.${_t} PROPERTIES
             LABELS "link" TIMEOUT 120)
@@ -508,4 +514,38 @@ if(VBAM_TEST_GB_ROMS AND IS_DIRECTORY "${VBAM_TEST_GB_ROMS}")
 else()
     message(STATUS
         "vbam-core test: gb.blargg SKIPPED — set VBAM_TEST_GB_ROMS to enable")
+endif()
+
+# Pokémon Emerald two-process link session (IPC + socket). Needs a
+# commercial ROM, two battery saves positioned at the Cable Club counter,
+# and input scripts — none of which can be bundled, so registration is
+# fully cache-var-gated:
+#
+#   VBAM_TEST_EMERALD_ROM      — path to the Emerald ROM
+#   VBAM_TEST_EMERALD_SAV0/1   — per-player battery saves
+#   VBAM_TEST_EMERALD_SCRIPTS  — directory containing emerald_p0.script /
+#                                emerald_p1.script
+if(ENABLE_LINK AND UNIX AND NOT ANDROID
+        AND VBAM_TEST_EMERALD_ROM AND EXISTS "${VBAM_TEST_EMERALD_ROM}"
+        AND VBAM_TEST_EMERALD_SAV0 AND EXISTS "${VBAM_TEST_EMERALD_SAV0}"
+        AND VBAM_TEST_EMERALD_SAV1 AND EXISTS "${VBAM_TEST_EMERALD_SAV1}"
+        AND VBAM_TEST_EMERALD_SCRIPTS
+        AND EXISTS "${VBAM_TEST_EMERALD_SCRIPTS}/emerald_p0.script")
+    foreach(_mode ipc socket)
+        add_test(NAME link.emerald.${_mode}
+                 COMMAND emerald_link_runner --mode ${_mode}
+                     --rom "${VBAM_TEST_EMERALD_ROM}"
+                     --sav0 "${VBAM_TEST_EMERALD_SAV0}"
+                     --sav1 "${VBAM_TEST_EMERALD_SAV1}"
+                     --script0 "${VBAM_TEST_EMERALD_SCRIPTS}/emerald_p0.script"
+                     --script1 "${VBAM_TEST_EMERALD_SCRIPTS}/emerald_p1.script"
+                     --dump "${CMAKE_CURRENT_BINARY_DIR}"
+                     --speed 0 --timeout 2000)
+        set_tests_properties(link.emerald.${_mode} PROPERTIES
+            LABELS "link;emerald" TIMEOUT 600)
+    endforeach()
+    message(STATUS "vbam-core test: link.emerald.* enabled")
+else()
+    message(STATUS "vbam-core test: link.emerald.* SKIPPED — set "
+        "VBAM_TEST_EMERALD_ROM/SAV0/SAV1/SCRIPTS to enable")
 endif()

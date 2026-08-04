@@ -290,6 +290,85 @@ static int run_gba_cable_2p() {
     _exit(0);
 }
 
+// ---- idle_overflow ----------------------------------------------------------
+
+// linktime is a signed 32-bit tick counter that only transfer activity
+// resets; ~128 s of emulated idle wraps it negative. The slave's start gate
+// (linktime >= linkmem->lastlinktime) was then unsatisfiable for the next
+// ~128 s, and the old overflow clamp was gated on numtransfers != 0, so a
+// session's FIRST transfer after a long idle found a dead cable (Pokémon at
+// the Cable Club). Regression: pump > 2^31 idle ticks through both sides,
+// then assert a transfer still completes.
+static int run_idle_overflow() {
+    Barrier b;
+    pid_t pid = fork();
+    CHECK(pid >= 0, "fork failed");
+    bool child = (pid == 0);
+    b.set_child(child);
+    if (child)
+        g_role = "child";
+
+    setup_fake_io();
+    SetLinkTimeout(1000);
+
+    if (!child) {
+        ConnectionState st = InitLink(LINK_CABLE_IPC);
+        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+        b.sync(); // slave attached
+        // 3 * 2^30 ticks of idle: linktime wraps negative after the second.
+        for (int i = 0; i < 3; i++)
+            LinkUpdate(0x40000000);
+        b.sync(); // both sides idled past the overflow
+        b.sync(); // slave is pumping its update loop
+
+        usleep(50 * 1000);
+        io_write16(COMM_SIODATA8, 0x1234);
+        StartLink(0x2080);
+
+        double deadline = now_seconds() + 10.0;
+        while (io_read16(COMM_SIOMULTI0) != 0x1234
+            || io_read16(COMM_SIOMULTI1) != 0x5678) {
+            CHECK(now_seconds() < deadline,
+                "master timed out after idle overflow: "
+                "SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+                io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+            LinkUpdate(4096);
+        }
+        b.sync();
+        CloseLink();
+        expect_child_success(pid);
+        return 0;
+    }
+
+    b.sync(); // creator attached first
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "slave InitLink returned %d", (int)st);
+    io_write16(COMM_SIODATA8, 0x5678);
+    StartLink(0x2000);
+    for (int i = 0; i < 3; i++)
+        LinkUpdate(0x40000000);
+    b.sync();
+    b.sync();
+
+    double deadline = now_seconds() + 10.0;
+    while (io_read16(COMM_SIOMULTI0) != 0x1234
+        || io_read16(COMM_SIOMULTI1) != 0x5678) {
+        CHECK(now_seconds() < deadline,
+            "slave timed out after idle overflow: "
+            "SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+            io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+        LinkUpdate(4096);
+        // Pace to roughly real time: an unpaced loop advances emulated
+        // ticks ~100x faster than a real emulator and would climb out of
+        // the negative-linktime window before the master's wall-clock
+        // timeout, hiding the very bug this test guards against.
+        usleep(200);
+    }
+    b.sync();
+    CloseLink();
+    _exit(0);
+}
+
 // ---- gp_exchange ------------------------------------------------------------
 
 // RCNT General-Purpose mode, as driven below: 0x8000 selects GP mode; data
@@ -461,6 +540,8 @@ int main(int argc, char** argv) {
         return run_gb_third_instance();
     if (strcmp(test, "gba_cable_2p") == 0)
         return run_gba_cable_2p();
+    if (strcmp(test, "idle_overflow") == 0)
+        return run_idle_overflow();
     if (strcmp(test, "gp_exchange") == 0)
         return run_gp_exchange();
 

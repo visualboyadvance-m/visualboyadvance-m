@@ -487,7 +487,12 @@ public:
     void CheckConn(void);
 };
 
-static int linktimeout = 1;
+// Wall-clock budget for peer waits (IPC semaphore waits, socket recv retry
+// accumulation). The wx GUI overrides this via SetLinkTimeout (default 500);
+// 500 here too, so embedders that don't call SetLinkTimeout (the SDL
+// frontend, harnesses) get a survivable wait instead of the old 1 ms, which
+// dropped a healthy peer on nearly every in-game transfer.
+static int linktimeout = 500;
 static LANLINKDATA lanlink;
 static uint16_t cable_data[4];
 // Add extra byte to suppress warning.
@@ -516,6 +521,78 @@ static const int trtimeend[3][4] = {
     { 106608, 26652, 17768, 8884 },
     { 133692, 33423, 22282, 11141 }
 };
+
+// The slave paces each transfer start to the master's published clock so
+// exchanges land at hardware-plausible emulated times. If the slave's clock
+// is further behind than this, the clocks are desynced (an instance was
+// paused or backgrounded, or the idle-overflow clamp fired on one side
+// only); waiting out the difference just serves dead air until the peer's
+// timeout drops the link, so resync and start immediately instead.
+static const int kMaxLinkClockLagTicks = 10 * (TICKS_PER_SECOND / 60);
+
+// Loose lockstep in the other direction: real linked GBAs share one wall
+// clock, but two emulator processes don't, and the master pays all the
+// blocking costs of the link (semaphore waits, socket receives), so the
+// slave's emulated clock tends to run AHEAD of the master's transfer
+// stream. A slave that gets several frames ahead piles up vblanks without
+// serial IRQs and the game declares the link dead (Pokémon errors after 10
+// quiet vblanks, mid-trade). Once the slave is more than this far ahead of
+// the last transfer, it briefly sleeps instead of emulating onward --
+// bounded by a per-gap wall budget so a master that legitimately stopped
+// transferring (scene fade, menu, or gone entirely) can only slow the
+// slave down for a moment, never freeze it.
+static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
+static const int kAheadThrottleBudgetUs = 250000;
+static int ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+
+// One bounded throttle step: ~0.2 ms per LinkUpdate call while ahead.
+static bool LinkAheadThrottleStep()
+{
+    if (ahead_throttle_budget_us <= 0)
+        return false;
+    ahead_throttle_budget_us -= 200;
+#ifdef _WIN32
+    Sleep(1);
+#else
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = 200 * 1000;
+    nanosleep(&ts, NULL);
+#endif
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// Cable-path tracing: set VBAM_TRACE_CABLE=1 to stream per-transfer events
+// (starts, latches, commits, timeouts, drops) to stderr with linktime /
+// numtransfers stamps. Always compiled — unlike the VBAM_TRACE_SIO hooks in
+// gba.cpp, which only exist under the VBAM_HB_TRACE build flag — because a
+// game like Pokémon clocks nine transfers per frame and per-transfer
+// visibility is the only way to diagnose a stall in a release build. Cost
+// when disabled is one cached-bool test per event.
+static bool CableTraceEnabled()
+{
+    static const bool enabled = [] {
+        const char* v = getenv("VBAM_TRACE_CABLE");
+        return v && *v && *v != '0';
+    }();
+    return enabled;
+}
+
+#if defined(__GNUC__)
+__attribute__((format(printf, 1, 2)))
+#endif
+static void CableTrace(const char* fmt, ...)
+{
+    if (!CableTraceEnabled())
+        return;
+    char buf[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    fprintf(stderr, "[CABLE] %s\n", buf);
+}
 
 // Hodgepodge
 static uint8_t tspeed = 3;
@@ -1558,6 +1635,10 @@ static const int kConnectRetryMs = 500;
 // linktimeout the link is declared dead.
 static int missed_recv_ms = 0;
 
+// Tick accumulator for the cable slave's idle poll for the master's next
+// start frame (see UpdateCableSocket).
+static int cable_poll_ticks = 0;
+
 // Server
 CableServer::CableServer(void)
 {
@@ -1748,7 +1829,11 @@ void CableClient::CheckConn(void)
 {
     fdset.clear();
     fdset.add(lanlink.tcpsocket);
-    if (fdset.wait(sf::milliseconds(1)) == 0)
+    // Minimal-timeout probe (sf::Time::Zero would wait forever). This runs
+    // both from the frontend's per-frame CheckLinkConnection and from the
+    // tick-throttled idle poll in UpdateCableSocket, so it must cost
+    // microseconds, not milliseconds, when nothing is pending.
+    if (fdset.wait(sf::microseconds(1)) == 0)
         return;
 
     sf::Clock budget;
@@ -1776,6 +1861,8 @@ void CableClient::CheckConn(void)
     transfer_start_time_from_master = 0;
     cable_data[0] = READ16LE(&uint16_tinbuffer[1]);
     tspeed = inbuffer[1] & 3;
+    CableTrace("sock[%d] CheckConn transfer detected data=%04x speed=%d",
+        linkid, cable_data[0], tspeed);
     for (int i = 1, bytes = 4; i <= lanlink.numslaves; i++)
         if (i != linkid) {
             cable_data[i] = READ16LE(&uint16_tinbuffer[bytes]);
@@ -2189,9 +2276,17 @@ void StartCableSocket(uint16_t value)
                 value |= READ16LE(&g_ioMem[COMM_SIOCNT]) & 4;
         }
         if (start) {
+            // linktime overflows negative after ~128 s of emulated idle; a
+            // negative published clock would still work (the slave's gate
+            // passes trivially) but destroys the pacing semantics, so
+            // normalize before publishing.
+            if (linktime < 0)
+                linktime = 0;
             cable_data[0] = READ16LE(&g_ioMem[COMM_SIODATA8]);
             transfer_start_time_from_master = linktime;
             tspeed = value & 3;
+            CableTrace("sock[%d] master start data=%04x speed=%d start_time=%d",
+                linkid, cable_data[0], tspeed, transfer_start_time_from_master);
             (void)ls.Send();
             transfer_direction = RECEIVING;
             linktime = 0;
@@ -2318,15 +2413,90 @@ static void UpdateCableSocket(int ticks)
         GpSocketUpdate(ticks);
         return;
     }
-    (void)ticks; // unused param
-    if (linkid && transfer_direction == SENDING && lc.transferring && linktime >= transfer_start_time_from_master) {
+
+    if (linkid && transfer_direction == SENDING) {
+        // linktime overflows negative after ~128 s of emulated time without
+        // a transfer; a negative clock deadlocks the send gate below until
+        // it wraps back positive (~128 s later). Pokémon reaches the Cable
+        // Club minutes into a session, so this window is hit in normal
+        // play, not just in pathological cases.
+        if (linktime < 0) {
+            CableTrace("sock[%d] idle-overflow clamp (linktime<0)", linkid);
+            linktime = 0;
+        }
+
+        // Between transfers, poll for the master's next start frame here
+        // rather than only in the frontend's once-per-frame
+        // CheckLinkConnection: a master chaining several transfers per
+        // frame off its timer interrupt (Pokémon clocks its whole command
+        // block back-to-back) outruns a 60 Hz poll unrecoverably.
+        if (!lc.transferring) {
+            cable_poll_ticks += ticks;
+            if (cable_poll_ticks >= (int)(TICKS_PER_FRAME / 64)) {
+                cable_poll_ticks = 0;
+                lc.CheckConn();
+            }
+            if (!lc.transferring) {
+                // Between transfers, hold a slave that ran several frames
+                // ahead of the master's transfer stream (see
+                // kMaxLinkClockAheadTicks).
+                if (linktime > kMaxLinkClockAheadTicks)
+                    (void)LinkAheadThrottleStep();
+                return;
+            }
+            ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+        }
+    }
+
+    if (linkid && transfer_direction == SENDING && lc.transferring) {
+        // Pace our reply to the master's inter-transfer gap, but never
+        // wait out a clock desync bigger than the cap: past it the master
+        // is only accumulating missed_recv_ms toward a bogus timeout.
+        if (transfer_start_time_from_master - linktime > kMaxLinkClockLagTicks)
+            linktime = transfer_start_time_from_master;
+        if (linktime < transfer_start_time_from_master)
+            return;
         cable_data[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
 
+        CableTrace("sock[%d] slave latch data=%04x linktime=%d start_time=%d",
+            linkid, cable_data[linkid], linktime, transfer_start_time_from_master);
         (void)lc.Send();
         UPDATE_REG(COMM_SIODATA32_L, cable_data[0]);
         UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) | 0x80);
         transfer_direction = RECEIVING;
         linktime = 0;
+    }
+
+    if (linkid && lanlink.numslaves == 1 && transfer_direction == RECEIVING
+        && linktime >= trtimeend[0][tspeed]) {
+        // 2-player slave: nothing more travels on the wire for this
+        // transfer -- SIOMULTI0 was committed at send time from the
+        // master's start frame and SIOMULTI1 is our own word -- so complete
+        // at the hardware transfer time and go idle. The old code parked in
+        // Recv() until the *next* start frame arrived, which delayed the
+        // last serial IRQ of every burst by a whole frame and turned any
+        // master-side lull into 50 ms emulation stalls that accumulated
+        // missed_recv_ms into a bogus "Link timeout." The next start frame
+        // is picked up by the tick-throttled poll above. 3-4 player
+        // sessions keep the pipelined path below: the other slaves' words
+        // genuinely travel in the master's next frame.
+        if (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000)
+            CPURaiseSioIRQ();
+
+        UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0xff0f) | (linkid << 4));
+        transfer_direction = SENDING;
+        linktime -= trtimeend[0][tspeed];
+
+        UPDATE_REG(COMM_SIOMULTI1, cable_data[1]);
+        // Absent slots read back 0xffff on hardware.
+        UPDATE_REG(COMM_SIOMULTI2, 0xffff);
+        UPDATE_REG(COMM_SIOMULTI3, 0xffff);
+        lc.transferring = false;
+        missed_recv_ms = 0;
+        CableTrace("sock[%d] commit M0=%04x M1=%04x M2=ffff M3=ffff irq=%d",
+            linkid, READ16LE(&g_ioMem[COMM_SIOMULTI0]), cable_data[1],
+            (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) ? 1 : 0);
+        return;
     }
 
     if (transfer_direction == RECEIVING && linktime >= trtimeend[lanlink.numslaves - 1][tspeed]) {
@@ -2348,7 +2518,10 @@ static void UpdateCableSocket(int ticks)
             if (LinkIsClosing())
                 return; // drop already flagged; CloseLink runs after update
             missed_recv_ms += 50;
+            CableTrace("sock[%d] recv miss (missed_recv_ms=%d/%d)", linkid,
+                missed_recv_ms, linktimeout);
             if (missed_recv_ms > linktimeout) {
+                CableTrace("sock[%d] LINK TIMEOUT", linkid);
                 systemScreenMessage(_("Link timeout."));
                 RequestLinkClose();
             }
@@ -2366,6 +2539,10 @@ static void UpdateCableSocket(int ticks)
         UPDATE_REG(COMM_SIOMULTI1, cable_data[1]);
         UPDATE_REG(COMM_SIOMULTI2, cable_data[2]);
         UPDATE_REG(COMM_SIOMULTI3, cable_data[3]);
+        CableTrace("sock[%d] commit M0=%04x M1=%04x M2=%04x M3=%04x irq=%d",
+            linkid, READ16LE(&g_ioMem[COMM_SIOMULTI0]), cable_data[1],
+            cable_data[2], cable_data[3],
+            (READ16LE(&g_ioMem[COMM_SIOCNT]) & 0x4000) ? 1 : 0);
     }
 }
 
@@ -4096,6 +4273,9 @@ static void StartCableIPC(uint16_t value)
                 WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
                 WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
                 value &= ~0x40;
+                CableTrace("ipc[%d] start #%u data=%04x speed=%d trgbas=%d lastlinktime=%d",
+                    linkid, (unsigned)numtransfers, linkmem->linkdata[0], tspeed,
+                    linkmem->trgbas, linkmem->lastlinktime);
             } else {
                 // No partner in the session. Real hardware still clocks a
                 // lone master's transfer out: its own word shows up in
@@ -4110,6 +4290,8 @@ static void StartCableIPC(uint16_t value)
                 WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
                 value |= 0x40; // comm error: no slaves attached
                 value |= 0x80; // busy until the scheduled completion
+                CableTrace("ipc[%d] lone-master start data=%04x", linkid,
+                    READ16LE(&g_ioMem[COMM_SIODATA8]));
                 CPUScheduleSioCompletion(trtimedata[0][value & 3]);
             }
         }
@@ -4169,18 +4351,45 @@ static void UpdateCableIPC(int)
 
     // slave startup depends on detecting change in numtransfers
     // and syncing clock with master (after first transfer)
-    // this will fail if > ~2 minutes have passed since last transfer due
-    // to integer overflow
-    if (!transfer_direction && numtransfers && linktime < 0) {
+    if (!transfer_direction && linktime < 0) {
+        // linktime overflows negative after ~128 s of emulated time with no
+        // transfer. This clamp used to be gated on numtransfers != 0, so the
+        // overflow went unhandled before a session's FIRST transfer --
+        // leaving the start gate below unsatisfiable for the next ~128 s. A
+        // game that opens the link minutes into the session (Pokémon at the
+        // Cable Club) found a dead cable half the time.
+        CableTrace("ipc[%d] idle-overflow reset (linktime<0)", linkid);
         linktime = 0;
-        // there is a very, very, small chance that this will abort
-        // a transfer that was just started
-        linkmem->numtransfers = numtransfers = 0;
+        if (numtransfers) {
+            // there is a very, very, small chance that this will abort
+            // a transfer that was just started
+            linkmem->numtransfers = numtransfers = 0;
+        }
+    }
+    // Between transfers, hold a slave that ran several frames ahead of the
+    // master's transfer stream (see kMaxLinkClockAheadTicks).
+    if (linkid && !transfer_direction && numtransfers
+        && linkmem->numtransfers == numtransfers
+        && linktime > kMaxLinkClockAheadTicks)
+        (void)LinkAheadThrottleStep();
+    // If our clock is impossibly far behind the master's published start
+    // time (asymmetric stall: one instance paused or backgrounded, or the
+    // overflow clamp above fired on one side only), waiting out the
+    // difference serves dead air until the master's semaphore timeout drops
+    // us from the session; resync and start immediately instead.
+    if (linkid && !transfer_direction && linkmem->numtransfers != numtransfers
+        && linkmem->lastlinktime - linktime > kMaxLinkClockLagTicks) {
+        CableTrace("ipc[%d] clock-lag resync linktime=%d lastlinktime=%d",
+            linkid, linktime, linkmem->lastlinktime);
+        linktime = linkmem->lastlinktime;
     }
     if (linkid && !transfer_direction && linktime >= linkmem->lastlinktime && linkmem->numtransfers != numtransfers) {
         numtransfers = linkmem->numtransfers;
         if (!numtransfers)
             return;
+        CableTrace("ipc[%d] slave detect #%u linktime=%d lastlinktime=%d trgbas=%d",
+            linkid, (unsigned)numtransfers, linktime, linkmem->lastlinktime,
+            linkmem->trgbas);
 
         // if this or any previous machine was dropped, no transfer
         // can take place
@@ -4202,6 +4411,7 @@ static void UpdateCableIPC(int)
         // 'M' (multiplayer start) is the only possible command here.
         tspeed = linkmem->linkcmd[0] & 3;
         transfer_direction = 1;
+        ahead_throttle_budget_us = kAheadThrottleBudgetUs;
         WRITE32LE(&g_ioMem[COMM_SIOMULTI0], 0xffffffff);
         WRITE32LE(&g_ioMem[COMM_SIOMULTI2], 0xffffffff);
         UPDATE_REG(COMM_SIOCNT, (READ16LE(&g_ioMem[COMM_SIOCNT]) & ~0x40) | 0x80);
@@ -4214,6 +4424,8 @@ static void UpdateCableIPC(int)
         // transfer #n -> wait for value n - 1
         if (transfer_direction > 1 && linkid != transfer_direction - 1) {
             if (WaitForSingleObject(linksync[transfer_direction - 1], linktimeout) == WAIT_TIMEOUT) {
+                CableTrace("ipc[%d] slot-%d wait TIMEOUT (%d ms), dropping player %d",
+                    linkid, transfer_direction, linktimeout, transfer_direction - 1);
                 // assume slave has dropped off if timed out
                 if (!linkid) {
                     // Dropping a slave rewrites the shared topology
@@ -4252,6 +4464,8 @@ static void UpdateCableIPC(int)
             UPDATE_REG(COMM_SIOCNT, READ16LE(&g_ioMem[COMM_SIOCNT]) & ~4);
             UPDATE_REG(COMM_RCNT, 10);
             linkmem->linkdata[linkid] = READ16LE(&g_ioMem[COMM_SIODATA8]);
+            CableTrace("ipc[%d] slave latch data=%04x linktime=%d", linkid,
+                linkmem->linkdata[linkid], linktime);
             // The waiters this transfer are the trgbas participants minus
             // the sender; posting numgbas - 1 leaks tokens whenever a
             // machine joined or dropped mid-session (numgbas > trgbas),
@@ -4281,6 +4495,8 @@ static void UpdateCableIPC(int)
         if (!linkid) {
             for (int i = 2; i < transfer_direction; i++)
                 if (WaitForSingleObject(linksync[0], linktimeout) == WAIT_TIMEOUT) {
+                    CableTrace("ipc[%d] completion wait TIMEOUT (%d ms), resetting comm",
+                        linkid, linktimeout);
                     // impossible to determine which slave died
                     // so leave them alone for now
                     systemScreenMessage(_("Unknown slave timed out; resetting comm"));
@@ -4293,11 +4509,25 @@ static void UpdateCableIPC(int)
         linktime -= trtimeend[tt][tspeed];
         transfer_direction = 0;
         uint16_t value = READ16LE(&g_ioMem[COMM_SIOCNT]);
-        if (!linkid)
-            value |= 4; // SI becomes high on slaves after xfer
+        // SI returns high on SLAVES after the transfer (the previous
+        // device's SO idles high); the master's SI pin is hardwired low.
+        // This condition used to be inverted (!linkid), which set SI on the
+        // master after every transfer -- and Pokémon's per-frame master
+        // election (master ⇔ SD=1, SI=0, ID=0) then demoted the master, so
+        // no second transfer was ever started: the Cable Club sat on
+        // "Please wait." forever after exactly one exchange.
+        if (linkid)
+            value |= 4;
+        else
+            value &= ~4;
         UPDATE_REG(COMM_SIOCNT, (value & 0xff0f) | (linkid << 4));
         // SC/SI high after transfer
         UPDATE_REG(COMM_RCNT, linkid ? 15 : 11);
+        CableTrace("ipc[%d] commit M0=%04x M1=%04x M2=%04x M3=%04x irq=%d",
+            linkid, READ16LE(&g_ioMem[COMM_SIOMULTI0]),
+            READ16LE(&g_ioMem[COMM_SIOMULTI1]),
+            READ16LE(&g_ioMem[COMM_SIOMULTI2]),
+            READ16LE(&g_ioMem[COMM_SIOMULTI3]), (value & 0x4000) ? 1 : 0);
         if (value & 0x4000)
             CPURaiseSioIRQ();
     }

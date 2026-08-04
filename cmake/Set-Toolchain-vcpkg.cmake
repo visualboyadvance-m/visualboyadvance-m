@@ -803,7 +803,13 @@ function(vcpkg_set_toolchain)
 
     set(VCPKG_ROOT ${VCPKG_ROOT} CACHE FILEPATH "vcpkg installation root path" FORCE)
 
-    if(NOT EXISTS ${VCPKG_ROOT})
+    if(NO_VCPKG_UPDATES AND EXISTS ${VCPKG_ROOT})
+        # Leave the existing checkout exactly as-is: no fetch, no pull, no
+        # re-bootstrap. A vcpkg tree with local port modifications makes
+        # `git pull --rebase` fail and would otherwise break every
+        # reconfigure. git_up_to_date also gates the bootstrap step below.
+        set(git_up_to_date TRUE)
+    elseif(NOT EXISTS ${VCPKG_ROOT})
         get_filename_component(root_parent ${VCPKG_ROOT}/.. ABSOLUTE)
 
         execute_process(
