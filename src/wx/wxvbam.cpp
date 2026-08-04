@@ -1690,6 +1690,15 @@ void MainFrame::OnActivate(wxActivateEvent& event) {
     }
 
     if (OPTION(kPrefPauseWhenInactive)) {
+#ifndef NO_LINK
+        // Never pause a live link session on focus loss: two instances on
+        // one machine (the whole point of the local/IPC link) can only have
+        // one focused window, and a paused peer is indistinguishable from a
+        // dead one — the other side's game declares a link error within a
+        // few frames.
+        if (GetLinkMode() != LINK_DISCONNECTED)
+            return;
+#endif
         // Handle user preferences for pausing the game when the window is inactive.
         if (focused && !paused) {
             panel->Resume();
@@ -1775,6 +1784,11 @@ void MainFrame::OnIconize(wxIconizeEvent& event)
     }
 
     if (OPTION(kPrefPauseWhenInactive)) {
+#ifndef NO_LINK
+        // Keep a live link session running while iconized (see OnActivate).
+        if (GetLinkMode() != LINK_DISCONNECTED)
+            return;
+#endif
         panel->Pause();
     }
 }
