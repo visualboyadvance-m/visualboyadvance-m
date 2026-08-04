@@ -305,6 +305,17 @@ typedef struct {
     // still grows, so mismatched old/new builds refuse to share a session
     // (the segment size / AndroidLinkShm layout checks catch it).
     uint16_t gp_rcnt[5];
+
+    // Each slot's emulated-CPU tick counter (16.78 MHz), published on every
+    // LinkUpdate. This is what paces the IPC link at CPU rate: while the
+    // link is hot (a transfer happened within the last few frames), an
+    // instance whose clock runs more than a couple of frames ahead of a
+    // live peer's briefly sleeps instead of emulating onward, so two GUI
+    // processes advance in lockstep the way two real GBAs on one cable do.
+    // Single-writer per slot, wrapping uint32 arithmetic. Appended last:
+    // field offsets are unchanged, sizeof grows, so mismatched old/new
+    // builds refuse to share a session (layout check above).
+    uint32_t core_clock[4];
 } LINKDATA;
 
 class RFUServer {
@@ -542,6 +553,16 @@ static const int kMaxLinkClockLagTicks = 10 * (TICKS_PER_SECOND / 60);
 // transferring (scene fade, menu, or gone entirely) can only slow the
 // slave down for a moment, never freeze it.
 static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
+
+// CPU-rate lockstep for the IPC link (see LINKDATA::core_clock): while the
+// link is hot -- own clock within kHotWindowTicks of the last transfer --
+// an instance more than kMaxLinkLeadTicks of emulated time ahead of a live
+// peer sleeps briefly instead of emulating onward. Outside the hot window
+// (single-player sections, a peer that has not loaded a ROM yet) both
+// instances free-run.
+static const int32_t kMaxLinkLeadTicks = 2 * (TICKS_PER_SECOND / 60);
+static const int32_t kHotWindowTicks = 8 * (TICKS_PER_SECOND / 60);
+static uint32_t last_hot_own_clock = 0;
 // Generous — matches kPeerStallCapMs: the throttle must ride out
 // multi-second peer stalls (occluded window, coalesced timers), not just
 // scheduler jitter. It only engages while this side is already several
@@ -593,13 +614,32 @@ static bool LinkAheadThrottleStep()
 // game like Pokémon clocks nine transfers per frame and per-transfer
 // visibility is the only way to diagnose a stall in a release build. Cost
 // when disabled is one cached-bool test per event.
-static bool CableTraceEnabled()
+// Trace sink: stderr when VBAM_TRACE_CABLE is set in the environment; a
+// per-process /tmp/vbam-cable-<pid>.log when the trigger file
+// /tmp/vbam-trace-cable exists (`touch /tmp/vbam-trace-cable`) -- that
+// second path is for GUI instances launched from Finder, whose stderr goes
+// nowhere. NULL means tracing is off.
+static FILE* CableTraceStream()
 {
-    static const bool enabled = [] {
+    static FILE* const stream = []() -> FILE* {
         const char* v = getenv("VBAM_TRACE_CABLE");
-        return v && *v && *v != '0';
+        if (v && *v && *v != '0')
+            return stderr;
+#ifndef _WIN32
+        if (FILE* trigger = fopen("/tmp/vbam-trace-cable", "r")) {
+            fclose(trigger);
+            char path[64];
+            snprintf(path, sizeof(path), "/tmp/vbam-cable-%d.log",
+                (int)getpid());
+            FILE* f = fopen(path, "w");
+            if (f)
+                setvbuf(f, NULL, _IOLBF, 0);
+            return f;
+        }
+#endif
+        return NULL;
     }();
-    return enabled;
+    return stream;
 }
 
 #if defined(__GNUC__)
@@ -607,14 +647,16 @@ __attribute__((format(printf, 1, 2)))
 #endif
 static void CableTrace(const char* fmt, ...)
 {
-    if (!CableTraceEnabled())
+    FILE* out = CableTraceStream();
+    if (!out)
         return;
     char buf[256];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
-    fprintf(stderr, "[CABLE] %s\n", buf);
+    const uint32_t ms = GetTickCount();
+    fprintf(out, "[CABLE %u.%03u] %s\n", ms / 1000, ms % 1000, buf);
 }
 
 // Hodgepodge
@@ -4183,6 +4225,8 @@ static ConnectionState InitIPC()
             linkmem->numtransfers = 0;
             for (int i = 0; i < 5; i++)
                 linkmem->linkdata[i] = 0xffff;
+            for (int i = 0; i < 4; i++)
+                linkmem->core_clock[i] = 0;
         } else {
             int n = linkmem->numgbas;
             int f = linkmem->linkflags;
@@ -4205,6 +4249,15 @@ static ConnectionState InitIPC()
             linkmem->linkflags = (uint8_t)(f | (1 << vbaid));
             // Don't inherit a previous occupant's published GP pin state.
             linkmem->gp_rcnt[vbaid] = 0;
+            // Join the CPU-rate lockstep in sync with the incumbents: a
+            // fresh clock of 0 would read as "hours behind", making every
+            // running peer stall against us (or us free-run against them).
+            uint32_t max_clock = 0;
+            for (int i = 0; i < 4; i++)
+                if (i != vbaid && (f & (1 << i))
+                    && (int32_t)(linkmem->core_clock[i] - max_clock) > 0)
+                    max_clock = linkmem->core_clock[i];
+            linkmem->core_clock[vbaid] = max_clock;
         }
     }
     linkid = (uint16_t)vbaid;
@@ -4391,11 +4444,43 @@ static void ReconnectCableIPC()
     if (n < linkid + 1)
         linkmem->numgbas = (uint8_t)(linkid + 1);
     numtransfers = linkmem->numtransfers;
+    // Rejoin the CPU-rate lockstep in sync with the peers (see InitIPC).
+    uint32_t max_clock = 0;
+    for (int i = 0; i < 4; i++)
+        if (i != (int)linkid && (f & (1 << i))
+            && (int32_t)(linkmem->core_clock[i] - max_clock) > 0)
+            max_clock = linkmem->core_clock[i];
+    linkmem->core_clock[linkid] = max_clock;
     systemScreenMessage(_("Lost link; reconnected"));
 }
 
-static void UpdateCableIPC(int)
+static void UpdateCableIPC(int ticks)
 {
+    // Publish our emulated clock and pace against live peers -- the
+    // CPU-rate lockstep. Runs in every RCNT mode (before the JOY/GP
+    // early-outs) so pacing holds across mode probes too.
+    linkmem->core_clock[linkid] += (uint32_t)ticks;
+    if (transfer_direction)
+        last_hot_own_clock = linkmem->core_clock[linkid];
+    if (linkmem->numgbas > 1
+        && (int32_t)(linkmem->core_clock[linkid] - last_hot_own_clock)
+               < kHotWindowTicks) {
+        const uint32_t mine = linkmem->core_clock[linkid];
+        const int f = linkmem->linkflags;
+        int32_t worst_lead = 0;
+        for (int i = 0; i < 4; i++) {
+            if (i == (int)linkid || !(f & (1 << i)))
+                continue;
+            const int32_t lead = (int32_t)(mine - linkmem->core_clock[i]);
+            if (lead > worst_lead)
+                worst_lead = lead;
+        }
+        if (worst_lead > kMaxLinkLeadTicks)
+            (void)LinkAheadThrottleStep();
+        else
+            ahead_throttle_budget_us = kAheadThrottleBudgetUs;
+    }
+
     const uint16_t rcnt = READ16LE(&g_ioMem[COMM_RCNT]);
     if ((rcnt >> 14) == 3) // JOY mode: pins belong to the JoyBus engine
         return;
@@ -4421,12 +4506,6 @@ static void UpdateCableIPC(int)
             linkmem->numtransfers = numtransfers = 0;
         }
     }
-    // Between transfers, hold a slave that ran several frames ahead of the
-    // master's transfer stream (see kMaxLinkClockAheadTicks).
-    if (linkid && !transfer_direction && numtransfers
-        && linkmem->numtransfers == numtransfers
-        && linktime > kMaxLinkClockAheadTicks)
-        (void)LinkAheadThrottleStep();
     // If our clock is impossibly far behind the master's published start
     // time (asymmetric stall: one instance paused or backgrounded, or the
     // overflow clamp above fired on one side only), waiting out the
