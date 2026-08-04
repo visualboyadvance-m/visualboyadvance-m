@@ -404,16 +404,16 @@ msgstr "Não pode usar a BIOS do Game Boy quando o Hack Colorizador estiver ativ
 msgid ""
 "A link is already active.\n"
 "Disconnect it?"
-msgstr ""
+msgstr "Um link já está ativo.\nDesconectar?"
 
 #: cmdevents.cpp:2872
 msgid "Link"
-msgstr ""
+msgstr "Link"
 
 #: cmdevents.cpp:2913
 #, c-format
 msgid "Started local link as player %d"
-msgstr ""
+msgstr "Iniciou o link local como jogador %d"
 
 #: dialogs/accel-config.cpp:146
 msgid "Menu commands"
@@ -776,7 +776,7 @@ msgstr "Conectando com o %s\n"
 #: guiinit.cpp:225
 #, c-format
 msgid "Link connection failed: %s"
-msgstr ""
+msgstr "A conexão do link falhou: %s"
 
 #: guiinit.cpp:292 guiinit.cpp:348
 msgid "Select cheat file"
@@ -944,7 +944,7 @@ msgstr "Incapaz de carregar a ROM do Game Boy Advance %s"
 msgid ""
 "Active link mode does not match this ROM; use Options > Link > Start Link to"
 " reconnect."
-msgstr ""
+msgstr "O modo do link ativo não combina com esta ROM, use Opções > Link > Iniciar Link pra reconectar."
 
 #: panel.cpp:1228
 msgid " player "
@@ -3008,31 +3008,31 @@ msgstr "O servidor desconectou."
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
-msgstr ""
+msgstr "Não pôde resolver o link do endereço de vinculação do servidor \"%s\".\nUse \"*\" pra escutar todas as interfaces."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1788
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
-msgstr ""
+msgstr "O endereço vinculado \"%s\" não é um endereço local; escutando todas as interfaces ao invés disto."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1800
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
-msgstr ""
+msgstr "A porta %d já está em uso por outro programa (ou outra instância do emulador atuando como servidor).\nFeche-a ou troque a porta do link."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1803
 #, c-format
 msgid "Failed to start link server on port %d: %s"
-msgstr ""
+msgstr "Falhou em iniciar o link do servidor na porta %d: %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1829
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
-msgstr ""
+msgstr "Não pôde iniciar a conexão com %s na porta %d: %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1860
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2519
@@ -4408,7 +4408,7 @@ msgstr "&Link"
 
 #: xrc/MainMenu.xrc:272
 msgid "Start &Link..."
-msgstr ""
+msgstr "Iniciar o &Link..."
 
 #: xrc/MainMenu.xrc:277
 msgid "&Nothing"
