@@ -113,6 +113,26 @@ bool gba_link_enabled = false;
 
 bool speedhack = true;
 
+// Transfer-start doorbell, one per slot (see LinkAheadThrottleStep and the
+// ring in StartCableIPC). The master publishes a new transfer by bumping
+// linkmem->numtransfers, which peers only ever POLL -- there is no wakeup at
+// transfer start (the linksync tokens signal data readiness later in the
+// exchange). A peer napping in the ahead-throttle is therefore deaf to a
+// transfer it is needed for until its nap quantum expires: >= 1 ms on
+// Windows (Sleep(1)), which at a transfer-dense screen (FFTA link menus,
+// ~27 transfers/frame) gates the master's rendezvous ~14-16x per frame --
+// the measured 60->37 fps collapse that sets in once audio pacing engages.
+// The doorbell makes the nap interruptible: the master rings every live
+// peer when it publishes a transfer, and the throttle nap waits on the
+// bell instead of sleeping blind. Best-effort: creation failure just
+// leaves the old blind sleep.
+#if (defined __WIN32__ || defined _WIN32)
+static HANDLE link_doorbell[4];
+#else
+[[maybe_unused]] static sem_t* link_doorbell[4];
+#endif
+static int link_doorbell_self = -1;
+
 #define LOCAL_LINK_NAME "VBA link memory"
 
 #include <stdint.h>
@@ -663,6 +683,17 @@ static bool LinkAheadThrottleStep()
 {
     if (ahead_throttle_budget_us <= 0)
         return false;
+    // Nap on the doorbell when we have one: drain stale rings (bounding the
+    // count without sem_getvalue, which macOS lacks), then wait for a fresh
+    // ring or the quantum. A ring consumed by the drain belonged to a
+    // transfer the post-nap numtransfers check picks up anyway.
+    if (link_doorbell_self >= 0 && link_doorbell[link_doorbell_self] != NULL) {
+        ahead_throttle_budget_us -= 1000;
+        while (WaitForSingleObject(link_doorbell[link_doorbell_self], 0) != WAIT_TIMEOUT) {
+        }
+        WaitForSingleObject(link_doorbell[link_doorbell_self], 1);
+        return true;
+    }
 #ifdef _WIN32
     ahead_throttle_budget_us -= 1000;
     Sleep(1);
@@ -841,6 +872,11 @@ static std::string LinkShmName()
 static std::string LinkSemName(int i)
 {
     return LINK_NAME_PREFIX "VBA link event " + LinkNamespaceSuffix() + (char)('1' + i);
+}
+
+static std::string LinkDoorbellName(int i)
+{
+    return LINK_NAME_PREFIX "VBA link doorbell " + LinkNamespaceSuffix() + (char)('1' + i);
 }
 
 static std::string LinkLockSemName()
@@ -2963,8 +2999,10 @@ void CleanLocalLink()
         return;
     if (flock(fd, LOCK_EX | LOCK_NB) == 0) {
         shm_unlink(LinkShmName().c_str());
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
             sem_unlink(LinkSemName(i).c_str());
+            sem_unlink(LinkDoorbellName(i).c_str());
+        }
         sem_unlink(LinkLockSemName().c_str());
     }
     close(fd);
@@ -4358,6 +4396,10 @@ static void AbortIPCInit([[maybe_unused]] bool firstone, bool release_slot)
             CloseHandle(linksync[i]);
             linksync[i] = NULL;
         }
+        if (link_doorbell[i] != NULL) {
+            CloseHandle(link_doorbell[i]);
+            link_doorbell[i] = NULL;
+        }
     }
     if (linkmem_lock != NULL) {
         CloseHandle(linkmem_lock);
@@ -4389,7 +4431,14 @@ static void AbortIPCInit([[maybe_unused]] bool firstone, bool release_slot)
                 sem_unlink(LinkSemName(i).c_str());
         }
         linksync[i] = NULL;
+        if (link_doorbell[i] != NULL && link_doorbell[i] != SEM_FAILED) {
+            sem_close(link_doorbell[i]);
+            if (firstone)
+                sem_unlink(LinkDoorbellName(i).c_str());
+        }
+        link_doorbell[i] = NULL;
     }
+    link_doorbell_self = -1;
     if (linkmem_lock != SEM_FAILED) {
         sem_close(linkmem_lock);
         if (firstone)
@@ -4574,6 +4623,7 @@ static ConnectionState InitIPC()
         }
     }
     linkid = (uint16_t)vbaid;
+    link_doorbell_self = (int)linkid;
     // Publish our per-slot liveness token before any peer could start
     // waiting on us (see LinkPeerAlive).
     LinkAliveAcquire(vbaid);
@@ -4590,8 +4640,12 @@ static ConnectionState InitIPC()
 #if defined(__ANDROID__)
     // The handshake semaphores are part of the shared mapping; there is
     // nothing to open, and no stale named object to clean up.
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         linksync[i] = &android_shm->sync[i];
+        // The shm layout is fixed, so there is no doorbell on Android; the
+        // throttle keeps its blind nap there.
+        link_doorbell[i] = NULL;
+    }
 #else
     for (int i = 0; i < 4; i++) {
 #if (defined __WIN32__ || defined _WIN32)
@@ -4602,12 +4656,17 @@ static ConnectionState InitIPC()
             systemMessage(0, N_("Error opening event"));
             return LINK_ERROR;
         }
+        // Best-effort doorbell: on failure the throttle falls back to the
+        // blind nap, nothing else depends on it.
+        link_doorbell[i] = firstone ? CreateSemaphoreA(NULL, 0, 16, LinkDoorbellName(i).c_str())
+                                    : OpenSemaphoreA(SEMAPHORE_ALL_ACCESS, false, LinkDoorbellName(i).c_str());
 #else
         if (firstone) {
             // remove any stale semaphore left over from a crashed instance
             // (redundant after the liveness sweep; still needed in the
             // degraded no-lock-file fallback)
             sem_unlink(LinkSemName(i).c_str());
+            sem_unlink(LinkDoorbellName(i).c_str());
         }
         if ((linksync[i] = sem_open(LinkSemName(i).c_str(),
                  firstone ? O_CREAT | O_EXCL : 0,
@@ -4618,6 +4677,13 @@ static ConnectionState InitIPC()
             systemMessage(0, N_("Error opening event"));
             return LINK_ERROR;
         }
+        // Best-effort doorbell: on failure the throttle falls back to the
+        // blind nap, nothing else depends on it.
+        if ((link_doorbell[i] = sem_open(LinkDoorbellName(i).c_str(),
+                 firstone ? O_CREAT | O_EXCL : 0,
+                 0777, 0))
+            == SEM_FAILED)
+            link_doorbell[i] = NULL;
 #endif
     }
 #endif  // defined(__ANDROID__)
@@ -4690,6 +4756,20 @@ static void StartCableIPC(uint16_t value)
                     linkmem->numtransfers = 2;
                 else
                     linkmem->numtransfers = numtransfers;
+
+                // Ring every live peer's doorbell: a peer napping in the
+                // ahead-throttle wakes immediately instead of discovering
+                // the new transfer at its next nap boundary.
+                for (int i = 0; i < 4; i++) {
+                    if (i == (int)linkid || !(linkmem->linkflags & (1 << i)))
+                        continue;
+                    if (link_doorbell[i] != NULL)
+#if (defined __WIN32__ || defined _WIN32)
+                        ReleaseSemaphore(link_doorbell[i], 1, NULL);
+#else
+                        sem_post(link_doorbell[i]);
+#endif
+                }
 
                 transfer_direction = 1;
                 linktime = 0;
