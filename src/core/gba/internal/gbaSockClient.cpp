@@ -4,7 +4,25 @@
 #error "This file should not be compiled with NO_LINK."
 #endif  // defined(NO_LINK)
 
+#if defined(_WIN32)
+#include <winsock2.h>
+#else
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
+#endif
+
 // Currently only for Joybus communications
+
+// The JoyBus protocol is a per-command request/response of a few bytes;
+// Nagle + delayed ACK would serialize it at ACK latency (worst on Windows,
+// ~200 ms), so disable it like the LAN link sockets do (see gbaLink.cpp).
+static void SockSetNoDelay(sf::TcpSocket& sock)
+{
+    const int one = 1;
+    setsockopt(sock.getNativeHandle(), IPPROTO_TCP, TCP_NODELAY,
+        (const char*)&one, sizeof(one));
+}
 
 GBASockClient::GBASockClient(sf::IpAddress _server_addr)
 {
@@ -12,9 +30,11 @@ GBASockClient::GBASockClient(sf::IpAddress _server_addr)
 
     (void)client.connect(server_addr, 0xd6ba);
     client.setBlocking(false);
+    SockSetNoDelay(client);
 
     (void)clock_client.connect(server_addr, 0xc10c);
     clock_client.setBlocking(false);
+    SockSetNoDelay(clock_client);
 
     clock_sync = 0;
     is_disconnected = false;

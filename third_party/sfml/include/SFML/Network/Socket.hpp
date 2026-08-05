@@ -120,6 +120,21 @@ public:
     ////////////////////////////////////////////////////////////
     [[nodiscard]] bool isBlocking() const;
 
+    ////////////////////////////////////////////////////////////
+    /// \brief Return the internal handle of the socket
+    ///
+    /// The returned handle may be invalid if the socket
+    /// was not created yet (or already destroyed).
+    ///
+    /// VBA-M: made public (upstream has it protected) so the link
+    /// code can set OS-level options SFML does not wrap, e.g.
+    /// TCP_NODELAY on the tiny-frame link sockets.
+    ///
+    /// \return The internal (OS-specific) handle of the socket
+    ///
+    ////////////////////////////////////////////////////////////
+    [[nodiscard]] SocketHandle getNativeHandle() const;
+
 protected:
     ////////////////////////////////////////////////////////////
     /// \brief Types of protocols that the socket can use
@@ -140,18 +155,6 @@ protected:
     ///
     ////////////////////////////////////////////////////////////
     explicit Socket(Type type);
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Return the internal handle of the socket
-    ///
-    /// The returned handle may be invalid if the socket
-    /// was not created yet (or already destroyed).
-    /// This function can only be accessed by derived classes.
-    ///
-    /// \return The internal (OS-specific) handle of the socket
-    ///
-    ////////////////////////////////////////////////////////////
-    [[nodiscard]] SocketHandle getNativeHandle() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Create the internal representation of the socket

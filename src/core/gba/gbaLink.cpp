@@ -19,9 +19,12 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <semaphore.h>
 #include <sys/file.h>
 #include <sys/mman.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
@@ -589,8 +592,8 @@ static const int trtimeend[3][4] = {
 // exchanges land at hardware-plausible emulated times. If the slave's clock
 // is further behind than this, the clocks are desynced (an instance was
 // paused or backgrounded, or the idle-overflow clamp fired on one side
-// only); waiting out the difference just serves dead air until the peer's
-// timeout drops the link, so resync and start immediately instead.
+// only); waiting out the difference just serves dead air while the peer
+// waits for our reply, so resync and start immediately instead.
 static const int kMaxLinkClockLagTicks = 10 * (TICKS_PER_SECOND / 60);
 
 // Loose lockstep in the other direction: real linked GBAs share one wall
@@ -624,8 +627,8 @@ static uint32_t last_hot_own_clock = 0;
 static bool link_was_hot = false;
 static uint32_t hot_base_own = 0;
 static uint32_t hot_base_peer[4] = { 0, 0, 0, 0 };
-// Generous — matches kPeerStallCapMs: the throttle must ride out
-// multi-second peer stalls (occluded window, coalesced timers), not just
+// Generous: the throttle must ride out multi-second peer stalls (occluded
+// window, coalesced timers), not just
 // scheduler jitter. It only engages while this side is already several
 // frames ahead of the transfer stream, and it disengages the moment the
 // master publishes the next transfer, so a master that legitimately
@@ -634,19 +637,21 @@ static uint32_t hot_base_peer[4] = { 0, 0, 0, 0 };
 static const int kAheadThrottleBudgetUs = 10000000;
 static int ahead_throttle_budget_us = kAheadThrottleBudgetUs;
 
-// How long an in-flight IPC transfer keeps waiting for a peer that is
-// still a session member (its linkflags bit is set) before giving up. A
-// GUI emulator process can stop emulating for SECONDS for reasons that
-// have nothing to do with the game -- an occluded window, timer
-// coalescing, a dragged window, GPU contention -- and a real cable never
-// times out. linktimeout is the probe granularity of the wait, not the
+// How often an in-flight IPC wait re-verifies that a stalled peer's
+// process still exists (see LinkPeerAlive further down). A GUI emulator
+// process can stop emulating INDEFINITELY for reasons that have nothing to
+// do with the game -- an occluded window, timer coalescing, a dragged
+// window, GPU contention, an Android app in the background -- and a real
+// cable never times out, so there is deliberately NO wall-clock ceiling on
+// the wait itself. linktimeout is the probe granularity of the wait, not a
 // drop deadline; a peer that left cleanly cleared its flag and is dropped
-// immediately, one that crashed with the flag still set is cut loose here.
-static const int kPeerStallCapMs = 10000;
+// immediately, one whose process died with the flag still set is caught by
+// the periodic liveness probe.
+static const int kPeerAliveProbeMs = 2000;
 
 // Wait for a linksync token during an in-flight IPC transfer. Returns
 // false when the wait should be abandoned (peer left the session, local
-// close requested, or the stall ceiling was reached). peer_mask selects
+// close requested, or the peer's process died). peer_mask selects
 // the linkflags bits that must stay set for the wait to keep going.
 static bool WaitForLinkToken(int sem_index, uint8_t peer_mask);
 
@@ -1025,6 +1030,11 @@ static void AndroidLinkShmUnlinkFiles()
         return;
     unlink(android_shm_path.c_str());
     unlink((android_shm_path + ".lock").c_str());
+    // The per-slot liveness files (see LinkAliveFilePath). Only ever
+    // reached when nobody holds the session's shared lock, so no live
+    // instance can still be flock-holding one of these.
+    for (int i = 0; i < 4; i++)
+        unlink((android_shm_path + ".slot" + (char)('0' + i)).c_str());
 }
 
 // Release our mapping and liveness lock; the last instance out also removes
@@ -1153,6 +1163,114 @@ static bool AndroidLinkShmOpen()
     return true;
 }
 #endif  // defined(__ANDROID__)
+
+// ---------------------------------------------------------------------------
+// Per-slot liveness for the IPC link.
+//
+// A stalled peer must never be dropped on a timer: a real cable never times
+// out, and a GUI emulator process can legitimately stop emulating for a
+// very long time (occluded or dragged window, modal dialog, an Android app
+// sent to the background). But a peer whose PROCESS died with its linkflags
+// bit still set would otherwise hang every wait forever, so each instance
+// holds a per-slot token that its OS releases on any exit, even SIGKILL: a
+// named kernel object on Windows (it vanishes when the owning process's
+// last handle closes), an flock(2)-held file everywhere else (the lock dies
+// with the process). LinkPeerAlive() probes that token to tell "slow" from
+// "gone" without ever putting a deadline on "slow".
+#if (defined __WIN32__ || defined _WIN32)
+static HANDLE link_alive_handle = NULL;
+
+static std::string LinkAliveName(int slot)
+{
+    return "VBA link alive " + LinkNamespaceSuffix() + (char)('1' + slot);
+}
+
+static void LinkAliveAcquire(int slot)
+{
+    if (link_alive_handle == NULL)
+        link_alive_handle = CreateEventA(NULL, TRUE, FALSE, LinkAliveName(slot).c_str());
+}
+
+static void LinkAliveRelease()
+{
+    if (link_alive_handle != NULL) {
+        CloseHandle(link_alive_handle);
+        link_alive_handle = NULL;
+    }
+}
+
+static bool LinkPeerAlive(int slot)
+{
+    // The named object exists exactly while some process holds a handle to
+    // it; close the probe handle immediately so we never keep a dead
+    // peer's token alive ourselves between probes.
+    HANDLE h = OpenEventA(SYNCHRONIZE, FALSE, LinkAliveName(slot).c_str());
+    if (h != NULL) {
+        CloseHandle(h);
+        return true;
+    }
+    return false;
+}
+
+#else  // POSIX (including Android)
+
+static int link_alive_fd = -1;
+
+static std::string LinkAliveFilePath(int slot)
+{
+#if defined(__ANDROID__)
+    // Next to the shared mapping, so every instance resolves the same file
+    // (AndroidLinkShmUnlinkFiles removes these with the session).
+    return AndroidLinkShmPath() + ".slot" + (char)('0' + slot);
+#else
+    char which[8];
+    snprintf(which, sizeof(which), ".slot%d", slot);
+    return LinkLockFilePath(which);
+#endif
+}
+
+static void LinkAliveAcquire(int slot)
+{
+    if (link_alive_fd >= 0)
+        return;
+    link_alive_fd = open(LinkAliveFilePath(slot).c_str(),
+        O_RDWR | O_CREAT | O_CLOEXEC, 0666);
+    if (link_alive_fd < 0)
+        return;
+    fchmod(link_alive_fd, 0666); // umask-proof; any user's instance may probe
+    // Never blocks: slot allocation is serialized, and a previous owner's
+    // lock died with its process. On failure this slot simply has no
+    // liveness token; peers then treat it as alive and keep waiting.
+    if (flock(link_alive_fd, LOCK_EX | LOCK_NB) != 0) {
+        close(link_alive_fd);
+        link_alive_fd = -1;
+    }
+}
+
+static void LinkAliveRelease()
+{
+    if (link_alive_fd >= 0) {
+        close(link_alive_fd); // drops the flock with it
+        link_alive_fd = -1;
+    }
+}
+
+static bool LinkPeerAlive(int slot)
+{
+    // A live owner holds LOCK_EX, so a non-blocking shared probe failing
+    // proves the peer is alive, and the probe succeeding proves nobody
+    // owns the slot. Can't-tell (no file, open failure) counts as alive:
+    // better to keep waiting on a peer we cannot verify than to drop a
+    // healthy one.
+    int fd = open(LinkAliveFilePath(slot).c_str(), O_RDWR | O_CLOEXEC);
+    if (fd < 0)
+        return true;
+    bool dead = (flock(fd, LOCK_SH | LOCK_NB) == 0);
+    close(fd); // drops the probe lock
+    return !dead;
+}
+
+#endif  // POSIX
 
 // Acquire the linkmem structural lock, giving up after timeout_ms so a
 // crashed peer that died holding the lock cannot wedge every other
@@ -1664,27 +1782,35 @@ static void ProcessDeferredLinkClose()
     }
 }
 
-// See the declaration next to kPeerStallCapMs for the rationale. Blocking
+// See the declaration next to kPeerAliveProbeMs for the rationale. Blocking
 // here is deliberate: it freezes this instance's emulated time so its game
 // never observes the peer's stall -- exactly what a physical cable does.
+// There is NO wall-clock ceiling on the wait: a healthy-but-stalled peer is
+// waited out indefinitely on every platform. Only a peer that left the
+// session (flag cleared) or whose process died (liveness probe) ends it.
 static bool WaitForLinkToken(int sem_index, uint8_t peer_mask)
 {
     if (peer_mask == 0)
         return false; // no live peers to wait for
     const int probe_ms = linktimeout > 0 ? linktimeout : 1;
-    int waited_ms = 0;
+    int since_alive_probe_ms = 0;
     for (;;) {
         if (WaitForSingleObject(linksync[sem_index], probe_ms) != WAIT_TIMEOUT)
             return true;
-        waited_ms += probe_ms;
         if (LinkIsClosing())
             return false;
         if ((linkmem->linkflags & peer_mask) != peer_mask)
             return false; // peer left the session cleanly
-        if (waited_ms >= kPeerStallCapMs) {
-            CableTrace("ipc wait: peer stalled past %d ms, giving up",
-                kPeerStallCapMs);
-            return false;
+        since_alive_probe_ms += probe_ms;
+        if (since_alive_probe_ms >= kPeerAliveProbeMs) {
+            since_alive_probe_ms = 0;
+            for (int slot = 0; slot < 4; slot++) {
+                if ((peer_mask & (1 << slot)) && !LinkPeerAlive(slot)) {
+                    CableTrace("ipc wait: peer %d process died, giving up",
+                        slot);
+                    return false;
+                }
+            }
         }
     }
 }
@@ -1758,6 +1884,21 @@ void CloseLink(void)
 // internally until everything is written (Partial is unreachable), and every
 // receive below is guarded by a selector wait with a bounded budget so a
 // stalled peer can cost the emulator thread at most ~50 ms per call.
+
+// Every link protocol here is a request/response exchange of tiny frames
+// (4-12 bytes, thousands per second in-game). With Nagle enabled the OS
+// holds each frame until the previous one is ACKed, and the peer's delayed
+// ACK stretches that to tens of milliseconds per exchange -- on Windows the
+// classic Nagle + 200 ms delayed-ACK interaction made the LAN link crawl no
+// matter how fast both emulators ran, the socket-transport twin of the
+// 15.6 ms timer-tick crawl fixed by LinkRaiseTimerResolution. Latency beats
+// throughput on a link cable; disable Nagle on every established socket.
+static void LinkSetNoDelay(sf::TcpSocket& sock)
+{
+    const int one = 1;
+    setsockopt(sock.getNativeHandle(), IPPROTO_TCP, TCP_NODELAY,
+        (const char*)&one, sizeof(one));
+}
 
 // The canonical goodbye frame: 4 bytes, length + marker, zero padding. Sent
 // in both directions with no reply round-trip -- a dying or dead peer can't
@@ -1839,15 +1980,17 @@ static sf::Clock connect_clock;
 static bool client_handshake_connected = false;
 static bool connect_attempt_failed = false;
 static int32_t last_connect_attempt_ms = 0;
-// How long the client keeps trying to reach the server. Deliberately much
-// longer than linktimeout (which paces in-game transfers): the user is
-// watching a cancellable progress dialog and may have started the client
-// before the server.
-static const int kConnectTimeoutMs = 30000;
+// The client keeps trying to reach the server for as long as the user
+// lets it: the connect poll runs inside a cancellable progress dialog, so
+// a wall-clock deadline would only second-guess the user (who may well
+// have started the client before the server on purpose). Attempts are
+// merely paced.
 static const int kConnectRetryMs = 500;
 
-// Accumulated missed-frame time in UpdateCableSocket; once it exceeds
-// linktimeout the link is declared dead.
+// Accumulated missed-frame time in UpdateCableSocket, kept only for
+// tracing. A stalled peer never times the link out (a real cable doesn't);
+// only a real disconnect (goodbye frame, TCP drop, failed send) ends the
+// session.
 static int missed_recv_ms = 0;
 
 // Tick accumulator for the cable slave's idle poll for the master's next
@@ -2377,6 +2520,7 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
             // this tick"; treating it as fatal (or counting a dead socket
             // as a connected slave) broke the whole session.
             if (st == sf::Socket::Status::Done) {
+                LinkSetNoDelay(ls.tcpsocket[nextSlave]);
                 sf::Packet packet;
                 packet << nextSlave << lanlink.numslaves;
 
@@ -2409,12 +2553,12 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
             // as a fatal network error on the very first poll tick.
             if (lanlink.tcpsocket.getRemoteAddress().has_value()) {
                 client_handshake_connected = true;
+                LinkSetNoDelay(lanlink.tcpsocket);
             } else {
+                // No deadline here: the user is watching a cancellable
+                // progress dialog, so how long to keep trying is their
+                // call, not a timer's.
                 const int32_t elapsed = (int32_t)connect_clock.getElapsedTime().asMilliseconds();
-                if (elapsed > kConnectTimeoutMs) {
-                    snprintf(message, size, N_("Connection to server timed out."));
-                    return LINK_ERROR;
-                }
 
                 // A refused attempt (server not listening yet) reports its
                 // error exactly once, on the next socket op (ECONNREFUSED
@@ -2666,7 +2810,7 @@ static void UpdateCableSocket(int ticks)
     if (linkid && transfer_direction == SENDING && lc.transferring) {
         // Pace our reply to the master's inter-transfer gap, but never
         // wait out a clock desync bigger than the cap: past it the master
-        // is only accumulating missed_recv_ms toward a bogus timeout.
+        // is only serving dead air waiting for our reply.
         if (transfer_start_time_from_master - linktime > kMaxLinkClockLagTicks)
             linktime = transfer_start_time_from_master;
         if (linktime < transfer_start_time_from_master)
@@ -2719,8 +2863,14 @@ static void UpdateCableSocket(int ticks)
         // frames actually arrived. The old code committed unconditionally,
         // publishing the *previous* transfer's cable_data as this one's
         // result on any 50 ms hiccup -- a silent, undetectable desync.
-        // On a miss, stay in RECEIVING and retry next update; declare the
-        // link dead once linktimeout worth of retries has accumulated.
+        // On a miss, stay in RECEIVING and retry next update, forever: a
+        // real cable never times out, and a stalled peer (occluded or
+        // dragged window, coalesced timers, an Android app backgrounded)
+        // only freezes progress -- the stream is still frame-aligned when
+        // it comes back. A peer that actually DIED is caught by the TCP
+        // layer instead (goodbye frame or Dropped status in
+        // Recv/CheckSendResult), so no wall-clock budget is needed on any
+        // platform.
         bool received;
         if (linkid) {
             lc.transferring = true;
@@ -2733,20 +2883,8 @@ static void UpdateCableSocket(int ticks)
             if (LinkIsClosing())
                 return; // drop already flagged; CloseLink runs after update
             missed_recv_ms += 50;
-            const int miss_budget =
-                4 * linktimeout > kPeerStallCapMs ? 4 * linktimeout : kPeerStallCapMs;
-            CableTrace("sock[%d] recv miss (missed_recv_ms=%d/%d)", linkid,
-                missed_recv_ms, miss_budget);
-            // Ride out peer stalls of several seconds (occluded window,
-            // coalesced timers), same ceiling as the IPC wait. A peer that
-            // actually died is caught much sooner by the TCP layer
-            // (goodbye frame or Dropped status in Recv/CheckSendResult),
-            // so the long budget costs nothing in the real-death case.
-            if (missed_recv_ms > miss_budget) {
-                CableTrace("sock[%d] LINK TIMEOUT", linkid);
-                systemScreenMessage(_("Link timeout."));
-                RequestLinkClose();
-            }
+            CableTrace("sock[%d] recv miss (missed_recv_ms=%d)", linkid,
+                missed_recv_ms);
             return;
         }
         missed_recv_ms = 0;
@@ -3226,6 +3364,7 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
             // Anything but a completed accept just means "no new client
             // this tick".
             if (st == sf::Socket::Status::Done) {
+                LinkSetNoDelay(rfu_server.tcpsocket[nextSlave]);
                 sf::Packet packet;
                 packet << nextSlave << lanlink.numslaves;
 
@@ -3260,6 +3399,10 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
             snprintf(message, size, N_("Network error."));
             newState = LINK_ERROR;
         } else if (status == sf::Socket::Status::Done) {
+            // First completed receive proves the connection is established
+            // (and survives any connect retry, which swaps the underlying
+            // socket handle).
+            LinkSetNoDelay(lanlink.tcpsocket);
 
             if (linkid == 0) {
                 uint16_t receivedId, receivedSlaves;
@@ -4208,6 +4351,7 @@ static void AbortIPCInit([[maybe_unused]] bool firstone, bool release_slot)
                 highest = i + 1;
         linkmem->numgbas = (uint8_t)highest;
     }
+    LinkAliveRelease();
 #if (defined __WIN32__ || defined _WIN32)
     for (int i = 0; i < 4; i++) {
         if (linksync[i] != NULL) {
@@ -4430,6 +4574,9 @@ static ConnectionState InitIPC()
         }
     }
     linkid = (uint16_t)vbaid;
+    // Publish our per-slot liveness token before any peer could start
+    // waiting on us (see LinkPeerAlive).
+    LinkAliveAcquire(vbaid);
     GpResetState();
 
     // The GB serial path is strictly 2-player: it indexes linkcmd/linkdata/
@@ -4712,8 +4859,8 @@ static void UpdateCableIPC(int ticks)
     // If our clock is impossibly far behind the master's published start
     // time (asymmetric stall: one instance paused or backgrounded, or the
     // overflow clamp above fired on one side only), waiting out the
-    // difference serves dead air until the master's semaphore timeout drops
-    // us from the session; resync and start immediately instead.
+    // difference just serves dead air while the master blocks on our
+    // reply; resync and start immediately instead.
     if (linkid && !transfer_direction && linkmem->numtransfers != numtransfers
         && linkmem->lastlinktime - linktime > kMaxLinkClockLagTicks) {
         CableTrace("ipc[%d] clock-lag resync linktime=%d lastlinktime=%d",
@@ -4775,14 +4922,16 @@ static void UpdateCableIPC(int ticks)
         // transfer #n -> wait for value n - 1
         if (transfer_direction > 1 && linkid != transfer_direction - 1) {
             // Wait out peer stalls instead of dropping on the first missed
-            // linktimeout: a GUI instance can stop emulating for seconds
+            // linktimeout: a GUI instance can stop emulating indefinitely
             // for completely healthy reasons (occluded window, drag,
-            // dialog, scheduler hiccup), and the old one-shot timeout
+            // dialog, backgrounded app), and the old one-shot timeout
             // rewrote the shared topology on the first miss --
             // unrecoverable for the game even though the peer came right
-            // back. The wait keeps going while the peer is still a session
-            // member (its linkflags bit is set), bounded by
-            // kPeerStallCapMs for a peer that crashed with its flag up.
+            // back. The wait keeps going for as long as the peer is still
+            // a session member (its linkflags bit is set) and its process
+            // exists; one that crashed with its flag up is caught by the
+            // per-slot liveness probe (see LinkPeerAlive), never by a
+            // wall-clock deadline.
             if (!WaitForLinkToken(transfer_direction - 1,
                     (uint8_t)(1 << (transfer_direction - 1)))) {
                 CableTrace("ipc[%d] slot-%d wait abandoned, dropping player %d",
@@ -6110,6 +6259,10 @@ static void CloseIPC()
                 highest = i + 1;
         linkmem->numgbas = (uint8_t)highest;
     }
+
+    // Retire our liveness token only after the flag above is cleared, so
+    // no probe can see "flag set, process gone" during a clean close.
+    LinkAliveRelease();
 
     for (int i = 0; i < 4; i++) {
         if (linksync[i] != NULL) {
