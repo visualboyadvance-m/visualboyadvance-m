@@ -143,6 +143,12 @@ if(ENABLE_LINK)
         PRIVATE ${SFML_LIBRARIES}
     )
 
+    # gbaLink.cpp holds the 1 ms multimedia timer resolution
+    # (timeBeginPeriod/timeEndPeriod) while a link session is open.
+    if(WIN32)
+        target_link_libraries(vbam-core PRIVATE winmm)
+    endif()
+
     # Add libintl.h (absent on platforms without gettext, e.g. the Android NDK)
     if(LIBINTL_INC)
         target_include_directories(vbam-core

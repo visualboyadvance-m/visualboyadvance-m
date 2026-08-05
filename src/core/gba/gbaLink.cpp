@@ -11,6 +11,9 @@
 
 #include <winsock2.h>
 #include <Windows.h>
+// timeBeginPeriod/timeEndPeriod; not pulled in by Windows.h under
+// WIN32_LEAN_AND_MEAN (which the MSVC toolchain file defines globally).
+#include <mmsystem.h>
 
 #else  // !defined(_WIN32)
 
@@ -136,7 +139,56 @@ static const uint8_t kLinkGoodbyeByte = 0xe0;  // (uint8_t)-32
 // in {4, 8, 12}, and the goodbye marker above).
 static const uint8_t kLinkGpByte = 0xe1;
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+
+// linksync[] are named SEMAPHORES on every platform: the cable path posts
+// counted tokens (ReleaseSemaphore with trgbas - 1) for up to 4 players.
+// The RFU and GB IPC paths, however, signal them through the event-style
+// SetEvent/ResetEvent names, matching the POSIX sem_t shims below. Win32's
+// real SetEvent()/ResetEvent() fail with ERROR_INVALID_HANDLE on a
+// semaphore handle -- silently -- so on Windows every one of those peer
+// wake-ups was lost and the other side's WaitForSingleObject always ran to
+// its full timeout: the link crawled at timer-tick speed while the POSIX
+// builds ran normally. Route the names onto semaphore operations instead.
+static void LinkSemSignal(HANDLE s)
+{
+    // Fails harmlessly at the max count (4): "event already set".
+    ReleaseSemaphore(s, 1, NULL);
+}
+
+static void LinkSemDrain(HANDLE s)
+{
+    while (WaitForSingleObject(s, 0) == WAIT_OBJECT_0) {
+    }
+}
+
+#define SetEvent LinkSemSignal
+#define ResetEvent LinkSemDrain
+
+// The link paths sleep and wait in ~1 ms units: Sleep(1) in the ahead
+// throttle, 1 ms semaphore timeouts in the RFU/GB lockstep. At the default
+// ~15.6 ms Windows scheduler tick each of those quantizes up an order of
+// magnitude, so a wait that should cost 1 ms costs a whole tick and the
+// linked game slows to a crawl. Hold the 1 ms multimedia timer resolution
+// for the life of the link session (matches the 0.2 ms nanosleep polls the
+// POSIX builds get natively).
+static bool link_timer_period_raised = false;
+
+static void LinkRaiseTimerResolution()
+{
+    if (!link_timer_period_raised)
+        link_timer_period_raised = (timeBeginPeriod(1) == TIMERR_NOERROR);
+}
+
+static void LinkRestoreTimerResolution()
+{
+    if (link_timer_period_raised) {
+        timeEndPeriod(1);
+        link_timer_period_raised = false;
+    }
+}
+
+#else  // !defined(_WIN32)
 
 #define ReleaseSemaphore(sem, nrel, orel) \
     do {                                  \
@@ -598,15 +650,19 @@ static const int kPeerStallCapMs = 10000;
 // the linkflags bits that must stay set for the wait to keep going.
 static bool WaitForLinkToken(int sem_index, uint8_t peer_mask);
 
-// One bounded throttle step: ~0.2 ms per LinkUpdate call while ahead.
+// One bounded throttle step per LinkUpdate call while ahead: ~0.2 ms on
+// POSIX (nanosleep), ~1 ms on Windows (Sleep(1) at the raised 1 ms timer
+// resolution -- Windows cannot sleep shorter). Each branch debits the
+// budget by what it actually sleeps.
 static bool LinkAheadThrottleStep()
 {
     if (ahead_throttle_budget_us <= 0)
         return false;
-    ahead_throttle_budget_us -= 200;
 #ifdef _WIN32
+    ahead_throttle_budget_us -= 1000;
     Sleep(1);
 #else
+    ahead_throttle_budget_us -= 200;
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 200 * 1000;
@@ -1486,6 +1542,13 @@ ConnectionState InitLink(LinkMode mode)
         return LINK_ERROR;
     }
 
+#ifdef _WIN32
+    // Raised before connect() so the handshake waits already run at 1 ms
+    // granularity; restored in CloseLink (every failure path below funnels
+    // through it).
+    LinkRaiseTimerResolution();
+#endif
+
     // Connect the link
     gba_connection_state = linkDriver->connect();
 
@@ -1670,6 +1733,12 @@ void CheckLinkConnection()
 
 void CloseLink(void)
 {
+#ifdef _WIN32
+    // Balanced with the raise in InitLink; a no-op when never raised, so
+    // it is safe ahead of the driver check below.
+    LinkRestoreTimerResolution();
+#endif
+
     if (!linkDriver || !linkDriver->close) {
         return; // Nothing to do
     }
