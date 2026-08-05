@@ -571,6 +571,9 @@ public:
     bool RecvGB(int timeout_ms);
     bool ExchangeGB(uint8_t b, int timeout_ms);
     void CheckConn(void);
+    // Wait up to timeout_ms for data from the master -- the socket-mode
+    // doorbell (see the ahead-throttle hold in UpdateCableSocket).
+    bool WaitData(int timeout_ms) { return fdset.wait(sf::milliseconds(timeout_ms)); }
 };
 
 // Wall-clock budget for peer waits (IPC semaphore waits, socket recv retry
@@ -2802,6 +2805,30 @@ static void GpSocketUpdate(int ticks)
                                  linkid ? 1 : lanlink.numslaves));
 }
 
+// Socket-mode flavor of the ahead-throttle nap for the lan cable client --
+// the network counterpart of the IPC transfer-start doorbell. Two
+// differences from the blind LinkAheadThrottleStep. (1) The nap waits on
+// the client's own socket, so the master's next transfer interrupts it
+// immediately (over sockets the transfer data itself is the bell; there is
+// no shared memory to ring through); on wake the caller polls at once
+// instead of waiting out the emulated-tick poll cadence, which a blind nap
+// starved to one look every ~70 quanta of wall time. (2) The caller tracks
+// consecutive dry quanta: several in a row mean there is no live transfer
+// stream to pace against (idle map screen, boot), so the hold is released
+// instead of burning the whole nap budget against dead air -- the failure
+// that froze a lan client for ~10 s after connecting (advancing ~64 ticks
+// per 1 ms nap) and then let it race unthrottled once the budget died,
+// while the server ran full speed.
+static bool LinkAheadThrottleStepSocket(bool* woke_by_data)
+{
+    *woke_by_data = false;
+    if (ahead_throttle_budget_us <= 0)
+        return false;
+    ahead_throttle_budget_us -= 1000;
+    *woke_by_data = lc.WaitData(1);
+    return true;
+}
+
 static void UpdateCableSocket(int ticks)
 {
     if ((READ16LE(&g_ioMem[COMM_RCNT]) >> 14) == 2) {
@@ -2834,10 +2861,28 @@ static void UpdateCableSocket(int ticks)
             if (!lc.transferring) {
                 // Between transfers, hold a slave that ran several frames
                 // ahead of the master's transfer stream (see
-                // kMaxLinkClockAheadTicks).
-                if (linktime > kMaxLinkClockAheadTicks)
-                    (void)LinkAheadThrottleStep();
-                return;
+                // kMaxLinkClockAheadTicks). The hold naps on the socket so
+                // the master's next start wakes us instantly, and releases
+                // after a few dry quanta -- no data means no live stream to
+                // pace against (see LinkAheadThrottleStepSocket).
+                static int sock_nap_dry_quanta = 0;
+                const int kSockNapDryLimit = 8;
+                if (linktime > kMaxLinkClockAheadTicks
+                    && sock_nap_dry_quanta < kSockNapDryLimit) {
+                    bool woke_by_data = false;
+                    if (LinkAheadThrottleStepSocket(&woke_by_data)) {
+                        if (woke_by_data) {
+                            sock_nap_dry_quanta = 0;
+                            cable_poll_ticks = 0;
+                            lc.CheckConn();
+                        } else {
+                            ++sock_nap_dry_quanta;
+                        }
+                    }
+                }
+                if (!lc.transferring)
+                    return;
+                sock_nap_dry_quanta = 0;
             }
             ahead_throttle_budget_us = kAheadThrottleBudgetUs;
         }
