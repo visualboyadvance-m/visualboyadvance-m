@@ -639,6 +639,19 @@ static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
 // (single-player sections, a peer that has not loaded a ROM yet) both
 // instances free-run.
 static const int32_t kMaxLinkLeadTicks = 2 * (TICKS_PER_SECOND / 60);
+// Larger cap used while the transfer stream is LIVE. A live stream keeps
+// both games fed with serial IRQs at the master's cadence, so a frozen
+// clock offset between the instances (banked during a scene load, a pause,
+// or a minimized window) harms nothing -- napping to fight it just parks
+// the leader at the boundary paying a nap per publish forever: the
+// linked-menu fps never returning to full speed after minimize/restore.
+// Only genuine runaway -- a lead so large the leader's game would outrun
+// the IRQ cadence into its quiet-vblank error -- still needs braking while
+// the stream flows. On SILENCE (peer paused, window minimized) the tight
+// cap re-engages and the hold keeps both instances synched-paused.
+static const int32_t kMaxLinkLeadLiveTicks = 8 * (TICKS_PER_SECOND / 60);
+static const uint32_t kStreamLiveMs = 100;
+static uint32_t last_stream_ms = 0;
 static const int32_t kHotWindowTicks = 8 * (TICKS_PER_SECOND / 60);
 static uint32_t last_hot_own_clock = 0;
 // Leads are measured relative to the moment the link became hot, NOT from
@@ -694,7 +707,15 @@ static bool LinkAheadThrottleStep()
         ahead_throttle_budget_us -= 1000;
         while (WaitForSingleObject(link_doorbell[link_doorbell_self], 0) != WAIT_TIMEOUT) {
         }
-        WaitForSingleObject(link_doorbell[link_doorbell_self], 1);
+        if (WaitForSingleObject(link_doorbell[link_doorbell_self], 1) == WAIT_TIMEOUT) {
+            // A dry hold means the peer is silent (paused emulator,
+            // minimized window). Holding against silence is the synched-
+            // pause and must not expire into a free-run (the budget dying
+            // after ~10 s of menu ended in the game's desync error);
+            // sleeping costs nothing, so refund it. A dead peer is caught
+            // by the token-wait liveness probes and session teardown.
+            ahead_throttle_budget_us += 1000;
+        }
         return true;
     }
 #ifdef _WIN32
@@ -1408,6 +1429,8 @@ static const int kGpPeerPin[4] = { 0, 1, 3, 2 };
 // Process-local GP session state. Deliberately not serialized in save
 // states (like linktime/transfer_direction); it resets with Init*/Close*
 // and resynchronizes on the next RCNT write or peer update.
+// Set at the first completed lan-cable transfer; cleared on teardown.
+static bool sock_session_live = false;
 static bool gp_prev_si = false;
 static bool gp_prev_si_valid = false; // suppresses a phantom edge on entry
 static bool gp_mode_active = false;   // last committed RCNT was GP mode
@@ -2449,6 +2472,7 @@ static ConnectionState InitSocket()
     transfer_direction = 0;
     missed_recv_ms = 0;
     lc.transferring = false;
+    sock_session_live = false;
     rfu_client.transferring = false;
     GpResetState();
 
@@ -2865,24 +2889,36 @@ static void UpdateCableSocket(int ticks)
                 // the master's next start wakes us instantly, and releases
                 // after a few dry quanta -- no data means no live stream to
                 // pace against (see LinkAheadThrottleStepSocket).
-                static int sock_nap_dry_quanta = 0;
-                const int kSockNapDryLimit = 8;
-                if (linktime > kMaxLinkClockAheadTicks
-                    && sock_nap_dry_quanta < kSockNapDryLimit) {
+                // Hold only once a session is live (first completed
+                // transfer): before that there is no stream to pace against
+                // and holding just burns the boot at ~64 ticks per quantum.
+                // Once live, hold through silence indefinitely -- a silent
+                // master is a paused/minimized emulator, and releasing the
+                // hold free-runs the client into the game's quiet-vblank
+                // desync error (the previous dry-quanta release also stuck
+                // permanently after boot exhausted its counter, disabling
+                // the hold outright). Dry quanta are refunded (sleeping
+                // against a pause costs nothing); the periodic CheckConn
+                // notices a closed socket and ends the session.
+                static int sock_dry_quanta = 0;
+                if (linktime > kMaxLinkClockAheadTicks && sock_session_live) {
                     bool woke_by_data = false;
                     if (LinkAheadThrottleStepSocket(&woke_by_data)) {
                         if (woke_by_data) {
-                            sock_nap_dry_quanta = 0;
+                            sock_dry_quanta = 0;
                             cable_poll_ticks = 0;
                             lc.CheckConn();
                         } else {
-                            ++sock_nap_dry_quanta;
+                            ahead_throttle_budget_us += 1000;
+                            if ((++sock_dry_quanta & 511) == 0)
+                                lc.CheckConn();
                         }
                     }
                 }
                 if (!lc.transferring)
                     return;
-                sock_nap_dry_quanta = 0;
+                sock_dry_quanta = 0;
+                sock_session_live = true;
             }
             ahead_throttle_budget_us = kAheadThrottleBudgetUs;
         }
@@ -4917,6 +4953,8 @@ static void UpdateCableIPC(int ticks)
     const bool need_publish = transfer_direction
         || linkmem->numtransfers != numtransfers
         || s_ipc_unpublished_ticks >= kClockPublishTicks;
+    if (transfer_direction || linkmem->numtransfers != numtransfers)
+        last_stream_ms = GetTickCount();
     if (need_publish) {
         linkmem->core_clock[linkid] += s_ipc_unpublished_ticks;
         s_ipc_unpublished_ticks = 0;
@@ -4949,7 +4987,11 @@ static void UpdateCableIPC(int ticks)
                 if (lead > worst_lead)
                     worst_lead = lead;
             }
-            if (worst_lead > kMaxLinkLeadTicks)
+            const bool stream_live =
+                (uint32_t)(GetTickCount() - last_stream_ms) < kStreamLiveMs;
+            const int32_t lead_cap =
+                stream_live ? kMaxLinkLeadLiveTicks : kMaxLinkLeadTicks;
+            if (worst_lead > lead_cap)
                 (void)LinkAheadThrottleStep();
             else
                 ahead_throttle_budget_us = kAheadThrottleBudgetUs;
