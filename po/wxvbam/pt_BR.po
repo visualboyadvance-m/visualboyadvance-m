@@ -43,7 +43,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-03 14:00+0000\n"
+"POT-Creation-Date: 2026-08-05 11:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
@@ -498,7 +498,7 @@ msgstr "(Nenhum)"
 msgid "System"
 msgstr "Sistema"
 
-#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2546
+#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2538
 msgid "Boot ROM"
 msgstr "Inicializar a ROM"
 
@@ -850,40 +850,40 @@ msgstr "O ícone principal não foi encontrado"
 msgid "Main display panel not found"
 msgstr "O painel de exibição principal não foi encontrado"
 
-#: guiinit.cpp:2049
+#: guiinit.cpp:2039
 #, c-format
 msgid "Invalid menu item %s; removing"
 msgstr "Item do menu inválido %s; removendo"
 
-#: guiinit.cpp:2096
+#: guiinit.cpp:2086
 msgid "JoyBus host invalid; disabling"
 msgstr "Hospedeiro JoyBus inválido; desativando"
 
-#: guiinit.cpp:2358
+#: guiinit.cpp:2350
 msgid "Code"
 msgstr "Código"
 
-#: guiinit.cpp:2364
+#: guiinit.cpp:2356
 msgid "Description"
 msgstr "Descrição"
 
-#: guiinit.cpp:2417 xrc/CheatAdd.xrc:31
+#: guiinit.cpp:2409 xrc/CheatAdd.xrc:31
 msgid "Address"
 msgstr "Endereço"
 
-#: guiinit.cpp:2418
+#: guiinit.cpp:2410
 msgid "Old Value"
 msgstr "Valor Antigo"
 
-#: guiinit.cpp:2419
+#: guiinit.cpp:2411
 msgid "New Value"
 msgstr "Valor Novo"
 
-#: guiinit.cpp:2521
+#: guiinit.cpp:2513
 msgid "Save type"
 msgstr "Tipo de save"
 
-#: guiinit.cpp:2560
+#: guiinit.cpp:2552
 msgid "Game Overrides"
 msgstr "Substituições do Jogo"
 
@@ -959,7 +959,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório de Salvamentos Nativos:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: panel.cpp:1277 panel.cpp:1298 wxvbam.cpp:1821
+#: panel.cpp:1277 panel.cpp:1298 wxvbam.cpp:1835
 msgid "Directory Error"
 msgstr "Erro do Diretório"
 
@@ -1918,7 +1918,7 @@ msgstr "Arquivo de configuração não encontrado."
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Opção ruim da configuração ou múltiplos arquivos de ROMs dados:\n"
 
-#: wxvbam.cpp:1820
+#: wxvbam.cpp:1834
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1927,7 +1927,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: wxvbam.cpp:2085
+#: wxvbam.cpp:2099
 msgid "Failed to load dialog"
 msgstr "Falhou em carregar o diálogo"
 
@@ -2973,142 +2973,136 @@ msgstr "XAudio2: A instância do XAudio2 aparenta ser inválida"
 msgid "XAudio2: Exception during device enumeration"
 msgstr "XAudio2: Exceção durante a enumeração dos dispositivos"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1119
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1645
 msgid "Error, link already connected"
 msgstr "Erro, link já conectado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1133
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1659
 msgid "Unable to find link driver"
 msgstr "Incapaz de achar o driver do link"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1172
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1705
 msgid "Link connection does not need updates."
 msgstr "A conexão do link não precisa de atualizações."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1427
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2368
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3906
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2069
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2714
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3220
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4951
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Jogador %d desconectado."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1482
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2131
 msgid "Player 2 disconnected."
 msgstr "Jogador 2 desconectado."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1556
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1599
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1666
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2209
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2259
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2326
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2711
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3339
 msgid "Server disconnected."
 msgstr "O servidor desconectou."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1775
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2442
 #, c-format
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
 msgstr "Não pôde resolver o link do endereço de vinculação do servidor \"%s\".\nUse \"*\" pra escutar todas as interfaces."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1788
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2455
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
 msgstr "O endereço vinculado \"%s\" não é um endereço local; escutando todas as interfaces ao invés disto."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1800
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2467
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
 msgstr "A porta %d já está em uso por outro programa (ou outra instância do emulador atuando como servidor).\nFeche-a ou troque a porta do link."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1803
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2470
 #, c-format
 msgid "Failed to start link server on port %d: %s"
 msgstr "Falhou em iniciar o link do servidor na porta %d: %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1829
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2496
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
 msgstr "Não pôde iniciar a conexão com %s na porta %d: %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1860
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2519
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2528
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3372
 #, c-format
 msgid "Player %d connected"
 msgstr "Jogador %d conectado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1876
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2536
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2544
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3389
 msgid "All players connected"
 msgstr "Todos os jogadores conectados"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1891
-msgid "Connection to server timed out."
-msgstr "O tempo da conexão com o servidor se esgotou."
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1911
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2579
 msgid "Connecting to server..."
 msgstr "Conectando ao servidor..."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1920
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2546
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2588
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3399
 msgid "Network error."
 msgstr "Erro da rede."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1932
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2558
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2600
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3415
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "Conectado como #%d, esperando %d jogadores se juntarem"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1946
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2567
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3424
 msgid "All players joined."
 msgstr "Todos os jogadores entraram."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2038
-msgid "Link timeout."
-msgstr "Tempo pra esgotar a conexão com o link."
-
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2480
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3332
 msgid "Server timed out."
 msgstr "O tempo do servidor se esgotou."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3523
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3540
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3590
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4425
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4442
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4492
 msgid "Error creating file mapping"
 msgstr "Erro ao criar o mapeamento do arquivo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3535
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4437
 msgid "Error mapping file"
 msgstr "Erro ao mapear o arquivo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3653
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4557
 msgid "5 or more GBAs not supported."
 msgstr "5 ou mais GBAs não suportados."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3667
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4586
 msgid "The GB link supports only 2 players."
 msgstr "O link do GB suporta apenas 2 jogadores."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3683
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3699
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4602
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4618
 msgid "Error opening event"
 msgstr "Erro ao abrir o evento"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3832
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4756
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Link perdido; reinicializar pra reconectar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3839
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4770
 msgid "Lost link; reconnected"
 msgstr "Link perdido; reconectado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3963
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5016
 msgid "Unknown slave timed out; resetting comm"
 msgstr "O tempo do escravo desconhecido se esgotou; resetando a comunicação"
 
