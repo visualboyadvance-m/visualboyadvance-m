@@ -8,7 +8,7 @@
 # Usage:
 #   make PUMPKIN=/path/to/PumpkinOS        (default below)
 
-PUMPKIN ?= /Users/andyvand/Downloads/PumpkinOS
+PUMPKIN ?= ${HOME}/Downloads/PumpkinOS
 VBAM_SRC := $(abspath ..)
 
 PROGRAM = VBAM
