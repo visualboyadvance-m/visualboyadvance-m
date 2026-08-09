@@ -1,0 +1,42 @@
+#include "resource.h"
+
+MENU MainMenu
+BEGIN
+  PULLDOWN "Game"
+  BEGIN
+    MENUITEM "Open ROM..." menuOpen      "O"
+    MENUITEM "Reset"       menuReset     "R"
+    MENUITEM SEPARATOR
+    MENUITEM "Save State"  menuSaveState "S"
+    MENUITEM "Load State"  menuLoadState "L"
+    MENUITEM SEPARATOR
+    MENUITEM "Quit"        menuQuit      "Q"
+  END
+END
+
+FORM ChooseForm 0 0 160 160
+USABLE
+NOFRAME
+MENUID MainMenu
+BEGIN
+  TITLE "VBA-M"
+  LABEL "ROM:" romLbl 8 18 FONT 1
+  LIST "" romList 8 32 144 AUTO VISIBLEITEMS 9
+  BUTTON "Run" runBtn 8 140 AUTO AUTO
+  LABEL "ROMs go in /PALM/Programs/VBAM" hintLbl 48 142 FONT 0
+END
+
+FORM MainForm 0 0 160 160
+USABLE
+NOFRAME
+MENUID MainMenu
+BEGIN
+  TITLE "VBA-M"
+END
+
+ICONFAMILY "vbam.bmp" "" "" "vbam.bmp" TRANSPARENT 0 255 0
+
+HEX "wind" ID 1
+  0x02 0x00 0x01 0x90
+
+VERSION "1.0"

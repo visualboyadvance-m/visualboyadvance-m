@@ -1,0 +1,7 @@
+obj/
+resources/
+res.flag
+*.dlib
+*.prc
+dlib*.bin
+*.bak
