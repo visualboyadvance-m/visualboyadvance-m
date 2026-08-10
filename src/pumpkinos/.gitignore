@@ -1,6 +1,11 @@
 obj/
+obj-m68k/
 resources/
+resources-m68k/
 res.flag
+res-m68k.flag
+VBAM.elf
+VBAM.def
 *.dlib
 *.prc
 dlib*.bin

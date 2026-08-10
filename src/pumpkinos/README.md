@@ -26,6 +26,24 @@ triple and must match the values baked into `libpumpkin` when it was built
 from `uname -m` with 64-bit defaults; override `SYS_CPU`/`SYS_SIZE` on the
 make command line if your PumpkinOS build differs.
 
+### Classic 68k build
+
+`Makefile.m68k` carries the build parameters for the `m68k-palmos-elf`
+cross toolchain (prc-tools style), producing a plain 68k code PRC that
+runs through the PumpkinOS m68k emulator (or classic PalmOS):
+
+```sh
+cd src/pumpkinos
+make -f Makefile.m68k [TOOLPREFIX=m68k-palmos-elf-] [PALMDEV=/opt/palmdev]
+make -f Makefile.m68k install   # copy PRC into $(PUMPKIN)/vfs/app_install
+```
+
+It defines `WORDS_BIGENDIAN`/`MSB_FIRST` for the big-endian target and
+`PALMOS_68K` for the glue. See the caveats at the top of the file: code
+segments are limited to 64 KiB (the generated `.def` declares a
+multi-segment application), and the native `pumpkin_*` calls in the glue
+need 68k equivalents.
+
 ## Usage
 
 - Put ROMs in the PumpkinOS VFS at `/PALM/Programs/VBAM/`
