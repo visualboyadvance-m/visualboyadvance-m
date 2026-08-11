@@ -21,6 +21,7 @@ if(NOT COMPILE_ONLY)
     add_executable(save_state_tests
         save_state_test_env.cpp
         gb_cheats_save_state_test.cpp
+        gb_bank_save_state_test.cpp
     )
     target_link_libraries(save_state_tests PRIVATE
         vbam-core

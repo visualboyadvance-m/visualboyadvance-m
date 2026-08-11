@@ -3566,6 +3566,32 @@ variable_desc gbSaveGameStruct[] = {
     { NULL, 0 }
 };
 
+// Point the CGB banked memory map entries at the banks named by register_VBK
+// and register_SVBK after a save state has been loaded.
+//
+// The values come straight off disk, so they get the same masking the register
+// write handlers apply (see the 0x4f and 0x70 cases in gbWriteMemory). Without
+// it, register_VBK is a full uint8_t indexing a 16 KiB VRAM buffer in 8 KiB
+// steps, and every later CPU access through 0x8000-0x9fff runs off the end of
+// the allocation.
+//
+// Sits above the __LIBRETRO__ guards below because both the gzFile and the
+// in-memory loader call it.
+void gbApplySaveStateBanks()
+{
+    // VBK selects one of two 8 KiB VRAM banks: 1 bit.
+    const int vram_bank = register_VBK & 1;
+
+    gbMemoryMap[0x08] = &gbVram[vram_bank * 0x2000];
+    gbMemoryMap[0x09] = &gbVram[vram_bank * 0x2000 + 0x1000];
+
+    int wram_bank = register_SVBK;
+    if (wram_bank == 0)
+        wram_bank = 1;
+
+    gbMemoryMap[0x0d] = &gbWram[wram_bank * 0x1000];
+}
+
 #ifndef __LIBRETRO__
 static bool gbWriteSaveState(gzFile gzFile)
 {
@@ -3886,13 +3912,7 @@ static bool gbReadSaveState(gzFile gzFile)
         utilGzRead(gzFile, gbVram, kGBVRamSize);
         utilGzRead(gzFile, gbWram, kGBWRamSize);
 
-        int value = register_SVBK;
-        if (value == 0)
-            value = 1;
-
-        gbMemoryMap[0x08] = &gbVram[register_VBK * 0x2000];
-        gbMemoryMap[0x09] = &gbVram[register_VBK * 0x2000 + 0x1000];
-        gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
+        gbApplySaveStateBanks();
     }
 
     gbSoundReadGame(version, gzFile);
@@ -5643,14 +5663,8 @@ bool gbReadSaveState(const uint8_t* data)
         utilReadMem(gbVram, data, kGBVRamSize);
         utilReadMem(gbWram, data, kGBWRamSize);
 
-        int value = register_SVBK;
-        if (value == 0)
-            value = 1;
-
-        gbMemoryMap[0x08] = &gbVram[register_VBK * 0x2000];
-        gbMemoryMap[0x09] = &gbVram[register_VBK * 0x2000 + 0x1000];
         gbMemoryMap[0x0c] = &gbWram[0x0000];
-        gbMemoryMap[0x0d] = &gbWram[value * 0x1000];
+        gbApplySaveStateBanks();
     }
 
     gbSoundReadGame(data);

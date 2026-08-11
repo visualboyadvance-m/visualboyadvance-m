@@ -21,6 +21,12 @@ extern uint8_t* gbTAMA5ram;
 
 extern uint8_t* gbMemoryMap[16];
 
+// Rebuilds the CGB banked entries of gbMemoryMap from register_VBK and
+// register_SVBK, masking them to the bit widths the hardware registers have.
+// Called after loading a save state, where those values arrive unvalidated.
+// Exposed so the save state tests can drive it without a ROM.
+void gbApplySaveStateBanks();
+
 extern int gbFrameSkip;
 extern uint32_t gbEmulatorType;
 extern uint32_t gbPaletteOption;
