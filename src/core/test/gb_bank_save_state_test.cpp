@@ -114,4 +114,53 @@ TEST_F(GbBankSaveStateTest, VramBankMatchesRegisterWriteMasking)
     }
 }
 
+// SVBK holds 0-7, with 0 aliasing bank 1. All of those must keep selecting the
+// page they always did.
+TEST_F(GbBankSaveStateTest, ValidWramBanksAreUnchanged)
+{
+    register_VBK = 0;
+
+    register_SVBK = 0;
+    gbApplySaveStateBanks();
+    EXPECT_EQ(gbMemoryMap[0x0d], wram_.data() + 0x1000) << "bank 0 aliases 1";
+
+    for (int bank = 1; bank <= 7; bank++) {
+        register_SVBK = static_cast<uint8_t>(bank);
+        gbApplySaveStateBanks();
+        ASSERT_EQ(gbMemoryMap[0x0d], wram_.data() + bank * 0x1000)
+            << "register_SVBK=" << bank;
+    }
+}
+
+// register_SVBK = 8 puts the map entry exactly at the end of the 32 KiB
+// buffer; the old code's only guard was the 0 alias, which does not help here.
+TEST_F(GbBankSaveStateTest, HostileWramBankStaysInsideWram)
+{
+    register_VBK = 0;
+
+    for (int bank = 8; bank <= 255; bank++) {
+        register_SVBK = static_cast<uint8_t>(bank);
+        gbApplySaveStateBanks();
+
+        ASSERT_TRUE(WramPageInBounds(0x0d))
+            << "register_SVBK=" << bank << " escaped gbWram";
+    }
+}
+
+TEST_F(GbBankSaveStateTest, WramBankMatchesRegisterWriteMasking)
+{
+    register_VBK = 0;
+
+    for (int value = 0; value <= 255; value++) {
+        register_SVBK = static_cast<uint8_t>(value);
+        gbApplySaveStateBanks();
+
+        int expected = value & 7;
+        if (expected == 0)
+            expected = 1;
+        ASSERT_EQ(gbMemoryMap[0x0d], wram_.data() + expected * 0x1000)
+            << "register_SVBK=" << value;
+    }
+}
+
 }  // namespace

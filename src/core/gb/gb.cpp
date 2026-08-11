@@ -3585,7 +3585,9 @@ void gbApplySaveStateBanks()
     gbMemoryMap[0x08] = &gbVram[vram_bank * 0x2000];
     gbMemoryMap[0x09] = &gbVram[vram_bank * 0x2000 + 0x1000];
 
-    int wram_bank = register_SVBK;
+    // SVBK selects one of eight 4 KiB WRAM banks: 3 bits. Bank 0 is an alias
+    // for bank 1, which is why the map never points at the first page here.
+    int wram_bank = register_SVBK & 7;
     if (wram_bank == 0)
         wram_bank = 1;
 
