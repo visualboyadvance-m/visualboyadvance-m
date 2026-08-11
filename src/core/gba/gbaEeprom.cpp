@@ -75,10 +75,14 @@ static void eepromSanitizeSaveState()
     // eepromData holds 1024 eight-byte words.
     eepromAddress &= (SIZE_EEPROM_8K >> 3) - 1;
 
-    // Byte offset within the current word. Bounded by 7 rather than by
-    // eepromBuffer's 16 bytes: it is also added to the word address above, and
-    // the protocol never advances it past the eighth byte anyway.
-    if (eepromByte < 0 || eepromByte > 7)
+    // Byte offset within the current word. The protocol takes it up to 8, not
+    // 7: eepromWrite advances it on every eighth bit, so the final step of a
+    // 64-bit transfer -- the one that commits eepromBuffer to eepromData --
+    // runs with eepromByte == 8, and eepromBuffer[8] is written at 0x41.
+    // Resetting that to 0 would corrupt an in-flight battery write across a
+    // save and reload. eepromBuffer has 16 bytes, so 8 is in range there; the
+    // eepromData index it also feeds is bounded at the point of use.
+    if (eepromByte < 0 || eepromByte > 8)
         eepromByte = 0;
 
     // Bit counter. The state machine compares it against 0x40 and 0x41 for
@@ -157,7 +161,12 @@ int eepromRead(uint32_t /* address */)
     case EEPROM_READDATA2: {
         int address = eepromAddress << 3;
         int mask = 1 << (7 - (eepromBits & 7));
-        int data = (eepromData[address + eepromByte] & mask) ? 1 : 0;
+        // eepromAddress is bounded to the buffer's 1024 words and eepromByte
+        // to 8, so the sum reaches 8192 -- one past the end -- for the last
+        // word. Wrap rather than read off the end; the state machine leaves
+        // READDATA2 before a legitimate transfer ever gets there.
+        int index = (address + eepromByte) & (SIZE_EEPROM_8K - 1);
+        int data = (eepromData[index] & mask) ? 1 : 0;
         eepromBits++;
         if ((eepromBits & 7) == 0)
             eepromByte++;

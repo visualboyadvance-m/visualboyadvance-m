@@ -104,14 +104,94 @@ TEST_F(GbaEepromSaveStateTest, HostileAddressIsMasked)
 
 // eepromByte is added to the word address, so it is part of the same index
 // expression and needs bounding too.
+// 0 through 8 are what the protocol produces; anything above is not.
 TEST_F(GbaEepromSaveStateTest, HostileByteOffsetIsReset)
 {
-    for (int byte : { 8, 16, 4096, 0x7FFFFFFF, -1 }) {
+    for (int byte : { 9, 16, 4096, 0x7FFFFFFF, -1 }) {
         LoadState(MakeEepromState(EEPROM_IDLE, byte, 0, 0, 0x00),
             "gba_eeprom_hostile_byte");
         ASSERT_GE(eepromByte, 0) << "state byte " << byte;
-        ASSERT_LE(eepromByte, 7) << "state byte " << byte;
+        ASSERT_LE(eepromByte, 8) << "state byte " << byte;
     }
+}
+
+// The largest word address combined with the largest byte offset composes an
+// index one past eepromData. A crafted state can pair them even though the
+// state machine never does.
+TEST_F(GbaEepromSaveStateTest, ReadAtMaxAddressAndByteStaysInBuffer)
+{
+    LoadState(MakeEepromState(EEPROM_READDATA2, 8, 0, kMaxEepromAddress, 0x00),
+        "gba_eeprom_max_index");
+
+    ASSERT_EQ(eepromAddress, kMaxEepromAddress);
+    ASSERT_EQ(eepromByte, 8);
+
+    // (1023 << 3) + 8 == 8192 == SIZE_EEPROM_8K. Reading must not touch it.
+    for (int i = 0; i < 8; i++)
+        ASSERT_EQ(eepromRead(0), 0) << "bit " << i;
+}
+
+// eepromByte legitimately reaches 8. In the WRITEDATA phase eepromBits runs
+// from 1 to 0x41 and eepromByte advances every eighth bit, so it is 8 for the
+// last step of a 64-bit transfer -- the step that commits eepromBuffer to
+// eepromData. A save state taken there must reload with the counter intact,
+// or the in-flight battery write resumes at the wrong byte.
+TEST_F(GbaEepromSaveStateTest, ByteOffsetEightSurvivesLoad)
+{
+    LoadState(MakeEepromState(EEPROM_WRITEDATA, 8, 0x40, 4, 0x00),
+        "gba_eeprom_byte_eight");
+
+    EXPECT_EQ(eepromByte, 8);
+}
+
+// The same value has to survive a full save/load round trip of a transfer
+// driven through the real state machine, not just a synthetic blob.
+TEST_F(GbaEepromSaveStateTest, InFlightWriteTransferSurvivesRoundTrip)
+{
+    // Drive a real 8 KiB write command: 17 bits of "1 0 <14-bit address>".
+    // Bit 1 clear selects a write; the address bits below encode word 0x105,
+    // which is inside the 1024 words an 8 KiB EEPROM holds -- an address a
+    // game would actually issue.
+    static const int kCommand[0x11] = {
+        1, 0,                          // write
+        0, 0, 0, 0, 0, 1,              // address bits 13..8  -> 0x01
+        0, 0, 0, 0, 0, 1, 0, 1,        // address bits  7..0  -> 0x05
+        0,                             // trailing bit
+    };
+
+    eepromReset();
+    eepromMode = EEPROM_IDLE;
+    for (int i = 0; i < 0x11; i++)
+        eepromWrite(0, static_cast<uint8_t>(kCommand[i]));
+
+    ASSERT_EQ(eepromMode, EEPROM_WRITEDATA);
+    ASSERT_EQ(eepromAddress, 0x105);
+
+    while (eepromBits < 0x40)
+        eepromWrite(0, 1);
+
+    const int mode_before = eepromMode;
+    const int byte_before = eepromByte;
+    const int bits_before = eepromBits;
+    const int address_before = eepromAddress;
+
+    const vbam_test::TempStateFile file("gba_eeprom_inflight");
+    gzFile out = file.OpenWrite();
+    ASSERT_NE(out, nullptr);
+    eepromSaveGame(out);
+    utilGzClose(out);
+
+    eepromReset();
+
+    gzFile in = file.OpenRead();
+    ASSERT_NE(in, nullptr);
+    eepromReadGame(in, SAVE_GAME_VERSION_11);
+    utilGzClose(in);
+
+    EXPECT_EQ(eepromMode, mode_before);
+    EXPECT_EQ(eepromByte, byte_before);
+    EXPECT_EQ(eepromBits, bits_before);
+    EXPECT_EQ(eepromAddress, address_before);
 }
 
 TEST_F(GbaEepromSaveStateTest, HostileBitCountIsReset)
