@@ -1,3 +1,9 @@
+# The frontend selection drives which ports end up in VCPKG_DEPS and
+# VCPKG_DEPS_OPTIONAL. The top-level CMakeLists.txt includes this module and
+# builds those lists from the same options, but include it here as well so this
+# file does not silently depend on that ordering.
+include(FrontendOptions)
+
 if(TRANSLATIONS_ONLY)
     return()
 endif()
@@ -894,6 +900,26 @@ function(vcpkg_set_toolchain)
         set(VCPKG_PROGRAM_EXECUTABLE "${VCPKG_ROOT}/vcpkg" CACHE FILEPATH "vcpkg executable" FORCE)
     endif()
 
+    # Report the port set the frontend selection resolved to; which ports are
+    # missing from it is the usual thing to check when a dependency turns up
+    # unexpectedly absent.
+    set(deps_report ${VCPKG_DEPS})
+
+    list(LENGTH VCPKG_DEPS_OPTIONAL optionals_report_len)
+    if(optionals_report_len GREATER 0)
+        math(EXPR optionals_report_last "${optionals_report_len} - 1")
+
+        foreach(i RANGE 0 ${optionals_report_last} 2)
+            list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
+            list(APPEND deps_report "${dep}?")
+        endforeach()
+    endif()
+
+    message(STATUS
+        "vcpkg ports for the selected frontends (ENABLE_WX=${ENABLE_WX} "
+        "ENABLE_SDL=${ENABLE_SDL} ENABLE_LIBRETRO=${ENABLE_LIBRETRO}): "
+        "${deps_report}")
+
     if (NOT (NO_VCPKG_UPDATES OR (NOT VCPKG_BINARY_PACKAGES)))
         get_binary_packages()
     endif()
@@ -936,25 +962,29 @@ function(vcpkg_set_toolchain)
             )
         endif()
 
-        # Install optional deps.
+        # Install optional deps. The list is empty when no frontend that uses
+        # any of them was selected, and foreach(RANGE 0 -1 2) is an error.
         list(LENGTH VCPKG_DEPS_OPTIONAL optionals_list_len)
-        math(EXPR optionals_list_last "${optionals_list_len} - 1")
 
         unset(optional_deps)
 
-        foreach(i RANGE 0 ${optionals_list_last} 2)
-            list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
+        if(optionals_list_len GREATER 0)
+            math(EXPR optionals_list_last "${optionals_list_len} - 1")
 
-            math(EXPR var_idx "${i} + 1")
-            list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
+            foreach(i RANGE 0 ${optionals_list_last} 2)
+                list(GET VCPKG_DEPS_OPTIONAL ${i} dep)
 
-            if(NOT DEFINED ${var} OR ${var})
-                list(APPEND optional_deps ${dep})
-                set(${var} ON)
-            else()
-                set(${var} OFF)
-            endif()
-        endforeach()
+                math(EXPR var_idx "${i} + 1")
+                list(GET VCPKG_DEPS_OPTIONAL ${var_idx} var)
+
+                if(NOT DEFINED ${var} OR ${var})
+                    list(APPEND optional_deps ${dep})
+                    set(${var} ON)
+                else()
+                    set(${var} OFF)
+                endif()
+            endforeach()
+        endif()
 
         if(optional_deps)
             execute_process(

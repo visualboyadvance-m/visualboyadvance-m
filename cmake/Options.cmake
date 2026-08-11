@@ -10,20 +10,14 @@ else()
 endif()
 option(ENABLE_WERROR "Treat warnings as errors (enabled in CI)" ${VBAM_CI_DEFAULT})
 
-option(TRANSLATIONS_ONLY "Build only the translations.zip" OFF)
-if(TRANSLATIONS_ONLY)
-    set(BUILD_DEFAULT OFF)
-else()
-    set(BUILD_DEFAULT ON)
-endif()
+# TRANSLATIONS_ONLY, ENABLE_WX, ENABLE_SDL, ENABLE_LIBRETRO, ENABLE_LINK and
+# the VBAM_NEED_* dependency predicates. Already included (before project())
+# by the top-level CMakeLists.txt, so this is normally a no-op; it is repeated
+# here to keep Options.cmake readable on its own.
+include(FrontendOptions)
 
-set(ENABLE_SDL_DEFAULT ${BUILD_DEFAULT})
-
-if(WIN32 OR APPLE OR ANDROID)
-    set(ENABLE_SDL_DEFAULT OFF)
-endif()
-
-if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+# Wayland is a wx port display backend.
+if(ENABLE_WX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     # Detect whether the installed GDK supports Wayland.
     #
     # We try, in order:
@@ -155,7 +149,13 @@ if(APPLE AND NOT DISABLE_MACOS_PACKAGE_MANAGERS)
     include(MacPackageManagers)
 endif()
 
-if(ANDROID)
+# SDL. The SDL port is built on it, and the wx port uses it for audio output
+# and game controller input; the libretro core does not use it at all.
+if(NOT VBAM_NEED_SDL)
+    set(SDL3_FOUND  OFF)
+    set(SDL2_FOUND  OFF)
+    set(ENABLE_SDL3 OFF)
+elseif(ANDROID)
     # The NDK ships SDL3 in a multi-arch sysroot, but its CMake package config
     # points at a non-existent single-arch "<prefix>/lib/libSDL3.so", so
     # find_package(SDL3) fails its import check. Build the imported target by
@@ -226,41 +226,47 @@ else()
     find_package(SDL3 QUIET)
 endif()
 
-option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
+if(VBAM_NEED_SDL)
+    option(ENABLE_SDL3 "Use SDL3" "${SDL3_FOUND}")
 
-if(NOT TRANSLATIONS_ONLY)
-    if(NOT ENABLE_SDL3)
-        find_package(SDL2 QUIET)
-    endif()
+    if(NOT TRANSLATIONS_ONLY)
+        if(NOT ENABLE_SDL3)
+            find_package(SDL2 QUIET)
+        endif()
 
-    if(NOT SDL3_FOUND AND NOT SDL2_FOUND)
-        message(FATAL_ERROR "SDL2 or SDL3 is required, preferred SDL3")
+        if(NOT SDL3_FOUND AND NOT SDL2_FOUND)
+            message(FATAL_ERROR "SDL2 or SDL3 is required, preferred SDL3")
+        endif()
     endif()
 endif()
 
-set(lua_default OFF)
+# Lua scripting is a wx port feature.
+if(ENABLE_WX)
+    set(lua_default OFF)
 
-find_package(Lua)
+    find_package(Lua)
 
-if(Lua_FOUND)
-    set(lua_default ON)
+    if(Lua_FOUND)
+        set(lua_default ON)
+    endif()
+
+    option(ENABLE_LUA "Enable Lua scripting (wx frontend)" ${lua_default})
+else()
+    vbam_disable_option_without_wx(ENABLE_LUA)
 endif()
-
-option(ENABLE_LUA "Enable Lua scripting (wx frontend)" ${lua_default})
 
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
 option(DISABLE_OPENGL "Disable OpenGL" OFF)
-option(ENABLE_SDL "Build the SDL port" ${ENABLE_SDL_DEFAULT})
-option(ENABLE_WX "Build the wxWidgets port" ${BUILD_DEFAULT})
-option(ENABLE_LIBRETRO "Build the libretro core" ${BUILD_DEFAULT})
 option(ENABLE_DEBUGGER "Enable the debugger" ON)
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
+# Vulkan is a wx port renderer backend.
+#
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream.
-if(NOT (X86 AND WIN32))
+if(ENABLE_WX AND NOT (X86 AND WIN32))
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
@@ -281,7 +287,7 @@ endif()
 
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
-if(APPLE)
+if(ENABLE_WX AND APPLE)
    # Prefer a linkable libMoltenVK.dylib over the .xcframework that Homebrew also
    # ships under Frameworks/: an .xcframework is a directory and cannot be linked
    # (CMake drops it). Searching frameworks last makes the dylib win.
@@ -345,23 +351,24 @@ option(ENABLE_ASM_SCALERS "Enable x86 ASM graphic filters" ${ASM_SCALERS_DEFAULT
 include(CMakeDependentOption)
 cmake_dependent_option(ENABLE_MMX "Enable MMX" ${MMX_DEFAULT} "ENABLE_ASM_SCALERS" OFF)
 
-option(ENABLE_LIRC "Enable LIRC support" OFF)
-
-# Link / SFML
-if(NOT TRANSLATIONS_ONLY AND NOT ANDROID)
-    # GBA cable-link uses bundled SFML, whose Android backend isn't vendored
-    # here (and cable link is not meaningful on a phone), so default it off on
-    # Android to keep SFML out of the build.
-    set(ENABLE_LINK_DEFAULT ON)
+# LIRC remote control support is an SDL port feature.
+if(ENABLE_SDL)
+    option(ENABLE_LIRC "Enable LIRC support" OFF)
+else()
+    set(ENABLE_LIRC OFF)
 endif()
-option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
 
-# FFMpeg
+# ENABLE_LINK (GBA cable link, built on the bundled SFML) is declared in
+# FrontendOptions.cmake, since libintl is a dependency of the link code as
+# well as of the wx port.
+
+# ffmpeg A/V recording is a wx port feature; the SDL port and the libretro
+# core have no recording UI.
 set(FFMPEG_DEFAULT OFF)
 set(FFMPEG_COMPONENTS         AVFORMAT            AVCODEC            SWSCALE          AVUTIL            SWRESAMPLE          X264    X265)
 set(FFMPEG_COMPONENT_VERSIONS AVFORMAT>=58.12.100 AVCODEC>=58.18.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100 X264>=0 X265>=0)
 
-if(NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
+if(ENABLE_WX AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
     set(FFMPEG_DEFAULT ON)
 
     find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
@@ -383,14 +390,22 @@ if(NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
         set(FFMPEG_DEFAULT OFF)
     endif()
 endif()
-option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
+if(ENABLE_WX)
+    option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
+else()
+    vbam_disable_option_without_wx(ENABLE_FFMPEG)
+endif()
 
-# Online Updates
+# Online Updates (WinSparkle/Sparkle), a wx port feature.
 set(ONLINEUPDATES_DEFAULT OFF)
 if(DEFINED(UPSTREAM_RELEASE) AND UPSTREAM_RELEASE)
     set(ONLINEUPDATES_DEFAULT ON)
 endif()
-option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
+if(ENABLE_WX)
+    option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
+else()
+    set(ENABLE_ONLINEUPDATES OFF)
+endif()
 option(HTTPS "Use https URL for winsparkle" ON)
 
 # We generally don't want LTO when debugging because it makes linking slow
@@ -415,7 +430,8 @@ if(APPLE)
     option(BUNDLE_DYLIBS "Bundle dylibs into .app" ${bundle_dylibs_default})
 endif()
 
-if(WIN32)
+# Direct3D renderers and the XAudio2 sound backend are wx port only.
+if(ENABLE_WX AND WIN32)
     option(ENABLE_DIRECT3D "Enable Direct3D 9 rendering for the wxWidgets port" ON)
 
     if(NOT WINXP)
@@ -434,26 +450,39 @@ if(WIN32)
         set(XAUDIO2_DEFAULT OFF)
     endif()
     option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ${XAUDIO2_DEFAULT})
+elseif(WIN32)
+    set(ENABLE_DIRECT3D   OFF)
+    set(ENABLE_DIRECT3D12 OFF)
+    set(ENABLE_DIRECT3D11 OFF)
+    set(ENABLE_XAUDIO2    OFF)
 endif()
 
-find_package(OpenAL QUIET)
+# OpenAL-Soft, a wx port sound backend.
+if(ENABLE_WX)
+    find_package(OpenAL QUIET)
 
-set(OPENAL_DEFAULT ${OpenAL_FOUND})
+    set(OPENAL_DEFAULT ${OpenAL_FOUND})
 
-if(APPLE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-   set(OPENAL_DEFAULT OFF)
+    if(APPLE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+       set(OPENAL_DEFAULT OFF)
+    endif()
+
+    if(MINGW AND X86)
+        # OpenAL-Soft uses avrt.dll which is not available on Windows XP.
+        set(OPENAL_DEFAULT OFF)
+    endif()
+
+    option(ENABLE_OPENAL "Enable OpenAL-Soft sound output for the wxWidgets port" ${OPENAL_DEFAULT})
+else()
+    vbam_disable_option_without_wx(ENABLE_OPENAL)
 endif()
 
-if(MINGW AND X86)
-    # OpenAL-Soft uses avrt.dll which is not available on Windows XP.
-    set(OPENAL_DEFAULT OFF)
-endif()
-
-option(ENABLE_OPENAL "Enable OpenAL-Soft sound output for the wxWidgets port" ${OPENAL_DEFAULT})
-
+# FAudio, a wx port sound backend.
 set(ENABLE_FAUDIO_DEFAULT OFF)
 
-find_package(FAudio QUIET)
+if(ENABLE_WX)
+    find_package(FAudio QUIET)
+endif()
 
 if(FAudio_FOUND)
     # Check that FAudio links to the same SDL version we're using.
@@ -582,12 +611,16 @@ if(FAudio_FOUND)
     unset(_links_sdl3)
 endif()
 
-option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
+if(ENABLE_WX)
+    option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
+else()
+    vbam_disable_option_without_wx(ENABLE_FAUDIO)
+endif()
 
 # Android-only backends. Both are native NDK/Qt paths with no counterpart on any
 # other platform, so they are hard-off elsewhere rather than merely defaulted off
 # -- an explicit -DENABLE_AAUDIO=ON on a desktop build would not compile.
-if(ANDROID)
+if(ENABLE_WX AND ANDROID)
     # AAudio is the NDK's low-latency audio output (API 26+). Turning it off
     # leaves SDL as the Android sound backend.
     option(ENABLE_AAUDIO "Enable AAudio sound output for the wxWidgets port (Android only)" ON)
@@ -614,7 +647,7 @@ endif()
 
 option(GPG_SIGNATURES "Create GPG signatures for release files" OFF)
 
-if(APPLE)
+if(ENABLE_WX AND APPLE)
    set(wx_mac_patched_default OFF)
 
    if(UPSTREAM_RELEASE)

@@ -45,21 +45,50 @@ endif()
 
 option(VCPKG_BINARY_PACKAGES "Use vcpkg binary packages" TRUE)
 
-if (VCPKG_TARGET_TRIPLET STREQUAL arm64-android OR VCPKG_TARGET_TRIPLET STREQUAL arm-android OR VCPKG_TARGET_TRIPLET STREQUAL x86-android OR VCPKG_TARGET_TRIPLET STREQUAL x64-android OR VCPKG_TARGET_TRIPLET STREQUAL riscv64-android)
-    set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl qtbase qttools wxwidgets nanosvg)
-else()
-    set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" lua pthreads gettext-libintl wxwidgets nanosvg)
+# Which frontends are being built decides which dependencies are worth
+# installing and probing for. This has to be known before the vcpkg lists
+# below, hence a separate module included ahead of project()/Options.cmake.
+include(FrontendOptions)
+
+# Core dependencies. vbam-core and its file extractors are built for every
+# frontend selection.
+set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
+
+# The wxWidgets frontend. Qt is the wx backend on Android (wxQt), and nanosvg
+# is what the vcpkg wxWidgets port wants for SVG art.
+if(ENABLE_WX)
+    list(APPEND VCPKG_DEPS wxwidgets nanosvg lua)
+
+    if(VBAM_TARGET_ANDROID)
+        list(APPEND VCPKG_DEPS qtbase qttools)
+    endif()
+
+    # The Vulkan renderer. On Apple platforms it goes through MoltenVK, which
+    # is not a vcpkg port here.
+    if(NOT VBAM_TARGET_APPLE)
+        list(APPEND VCPKG_DEPS vulkan)
+    endif()
 endif()
 
-set(VCPKG_DEPS_OPTIONAL
-    "sdl3[vulkan]"      ENABLE_SDL3
-    openal-soft         ENABLE_OPENAL
-    "ffmpeg[x264,x265]" ENABLE_FFMPEG
-    faudio              ENABLE_FAUDIO
-)
+if(VBAM_NEED_NLS)
+    list(APPEND VCPKG_DEPS gettext-libintl)
+endif()
 
-if(NOT APPLE)
-    list(APPEND VCPKG_DEPS vulkan)
+unset(VCPKG_DEPS_OPTIONAL)
+
+# SDL is the SDL port's toolkit and the wx port's audio/game controller
+# backend, so either frontend pulls it in.
+if(VBAM_NEED_SDL)
+    list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan]" ENABLE_SDL3)
+endif()
+
+# Sound backends and A/V recording are wxWidgets-only features.
+if(ENABLE_WX)
+    list(APPEND VCPKG_DEPS_OPTIONAL
+        openal-soft         ENABLE_OPENAL
+        "ffmpeg[x264,x265]" ENABLE_FFMPEG
+        faudio              ENABLE_FAUDIO
+    )
 endif()
 
 include(Set-Toolchain-vcpkg)

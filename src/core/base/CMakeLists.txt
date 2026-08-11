@@ -65,14 +65,19 @@ target_link_libraries(vbam-core-base
     PUBLIC ${ZLIB_LIBRARY}
 )
 
-add_library(vbam-sdl-motion STATIC)
-target_sources(vbam-sdl-motion
-    PRIVATE
-    sdl_motion.cpp
+# Accelerometer/gyro support built on SDL, used by the wx and SDL ports. The
+# libretro core gets motion state from the frontend instead, so this target is
+# skipped (along with the SDL dependency) when neither port is being built.
+if(VBAM_NEED_SDL)
+    add_library(vbam-sdl-motion STATIC)
+    target_sources(vbam-sdl-motion
+        PRIVATE
+        sdl_motion.cpp
 
-    PUBLIC
-    sdl_motion.h
-)
-target_link_libraries(vbam-sdl-motion PUBLIC ${VBAM_SDL_LIBS})
+        PUBLIC
+        sdl_motion.h
+    )
+    target_link_libraries(vbam-sdl-motion PUBLIC ${VBAM_SDL_LIBS})
+endif()
 
 add_subdirectory(test)

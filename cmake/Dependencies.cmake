@@ -4,69 +4,82 @@ if(TRANSLATIONS_ONLY)
     return()
 endif()
 
-# Look for some dependencies using CMake scripts
+# Look for some dependencies using CMake scripts.
+#
+# Everything here is gated on the frontends that actually use it: the
+# VBAM_NEED_* predicates come from FrontendOptions.cmake. Only zlib and the
+# archive libraries used by the file extractors are unconditional, since
+# vbam-core is built for every frontend selection.
 find_package(ZLIB REQUIRED)
 
-set(OpenGL_GL_PREFERENCE GLVND)
+# OpenGL is a renderer backend in the wx and SDL ports.
+if(VBAM_NEED_OPENGL)
+    set(OpenGL_GL_PREFERENCE GLVND)
 
-if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
-    set(OpenGL_GL_PREFERENCE LEGACY)
-endif()
-
-if(NOT DISABLE_OPENGL)
-    find_package(OpenGL)
-
-    if(NOT OpenGL_FOUND)
-        set(CMAKE_C_FLAGS      "-DNO_OPENGL -DNO_OGL ${CMAKE_C_FLAGS}")
-        set(CMAKE_CXX_FLAGS    "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
-        set(CMAKE_OBJC_FLAGS   "-DNO_OPENGL -DNO_OGL ${CMAKE_OBJC_FLAGS}")
-        set(CMAKE_OBJCXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_OBJCXX_FLAGS}")
+    if(CMAKE_SYSTEM_NAME STREQUAL FreeBSD)
+        set(OpenGL_GL_PREFERENCE LEGACY)
     endif()
-endif()
 
-# Add libsamplerate to SDL2 with vcpkg
-unset(SDL_LIBRARY_TEMP)
-if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-    if(WIN32)
-        unset(arch_suffix)
-        unset(path_prefix)
-        if(VCPKG_TARGET_TRIPLET MATCHES -static)
-            set(arch_suffix  -static)
+    if(NOT DISABLE_OPENGL)
+        find_package(OpenGL)
+
+        if(NOT OpenGL_FOUND)
+            set(CMAKE_C_FLAGS      "-DNO_OPENGL -DNO_OGL ${CMAKE_C_FLAGS}")
+            set(CMAKE_CXX_FLAGS    "-DNO_OPENGL -DNO_OGL ${CMAKE_CXX_FLAGS}")
+            set(CMAKE_OBJC_FLAGS   "-DNO_OPENGL -DNO_OGL ${CMAKE_OBJC_FLAGS}")
+            set(CMAKE_OBJCXX_FLAGS "-DNO_OPENGL -DNO_OGL ${CMAKE_OBJCXX_FLAGS}")
         endif()
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(path_prefix debug)
-        endif()
-
-        set(samplerate_lib_name samplerate)
-        set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
-
-        if(MINGW)
-            set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-mingw${arch_suffix}/${path_prefix})
-            set(samplerate_lib_name lib${samplerate_lib_name})
-        endif()
-
-        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} "${installed_prefix}/lib/${samplerate_lib_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    else()
-        SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} -lsamplerate)
     endif()
 endif()
 
-if(ENABLE_SDL3)
-    if(VBAM_STATIC)
-        set(VBAM_SDL_LIBS SDL3::SDL3-static ${SDL_LIBRARY_TEMP})
-    else()
-        set(VBAM_SDL_LIBS SDL3::SDL3        ${SDL_LIBRARY_TEMP})
-    endif()
-else()
-    if(VBAM_STATIC)
-        set(VBAM_SDL_LIBS SDL2::SDL2-static ${SDL_LIBRARY_TEMP})
-    else()
-        set(VBAM_SDL_LIBS SDL2::SDL2        ${SDL_LIBRARY_TEMP})
-    endif()
-endif()
+# SDL, shared by the SDL port and the wx port's audio/game controller code.
+unset(VBAM_SDL_LIBS)
 
-if(APPLE)
-    list(APPEND VBAM_SDL_LIBS "-framework System")
+if(VBAM_NEED_SDL)
+    # Add libsamplerate to SDL2 with vcpkg
+    unset(SDL_LIBRARY_TEMP)
+    if((NOT ENABLE_SDL3) AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+        if(WIN32)
+            unset(arch_suffix)
+            unset(path_prefix)
+            if(VCPKG_TARGET_TRIPLET MATCHES -static)
+                set(arch_suffix  -static)
+            endif()
+            if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+                set(path_prefix debug)
+            endif()
+
+            set(samplerate_lib_name samplerate)
+            set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-windows${arch_suffix}/${path_prefix})
+
+            if(MINGW)
+                set(installed_prefix    ${_VCPKG_INSTALLED_DIR}/${WINARCH}-mingw${arch_suffix}/${path_prefix})
+                set(samplerate_lib_name lib${samplerate_lib_name})
+            endif()
+
+            SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} "${installed_prefix}/lib/${samplerate_lib_name}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        else()
+            SET(SDL_LIBRARY_TEMP ${SDL_LIBRARY_TEMP} -lsamplerate)
+        endif()
+    endif()
+
+    if(ENABLE_SDL3)
+        if(VBAM_STATIC)
+            set(VBAM_SDL_LIBS SDL3::SDL3-static ${SDL_LIBRARY_TEMP})
+        else()
+            set(VBAM_SDL_LIBS SDL3::SDL3        ${SDL_LIBRARY_TEMP})
+        endif()
+    else()
+        if(VBAM_STATIC)
+            set(VBAM_SDL_LIBS SDL2::SDL2-static ${SDL_LIBRARY_TEMP})
+        else()
+            set(VBAM_SDL_LIBS SDL2::SDL2        ${SDL_LIBRARY_TEMP})
+        endif()
+    endif()
+
+    if(APPLE)
+        list(APPEND VBAM_SDL_LIBS "-framework System")
+    endif()
 endif()
 
 if(ENABLE_FFMPEG)
@@ -165,7 +178,8 @@ else()
     add_compile_definitions(NO_LINK)
 endif()
 
-if(ENABLE_LINK OR ENABLE_WX)
+# gettext/libintl: the wx port's translations and the link code's messages.
+if(VBAM_NEED_NLS)
     find_path(LIBINTL_INC libintl.h)
 
     find_library(LIBINTL_LIB    NAMES libintl    intl)
