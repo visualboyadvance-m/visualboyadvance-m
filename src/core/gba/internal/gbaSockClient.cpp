@@ -1,12 +1,16 @@
+// winsock2.h must come before anything that may pull in windows.h, which the
+// SFML network headers do (via ghc filesystem.hpp), or the mingw headers warn.
+#if defined(_WIN32)
+#include <winsock2.h>
+#endif
+
 #include "core/gba/internal/gbaSockClient.h"
 
 #if defined(NO_LINK)
 #error "This file should not be compiled with NO_LINK."
 #endif  // defined(NO_LINK)
 
-#if defined(_WIN32)
-#include <winsock2.h>
-#else
+#if !defined(_WIN32)
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>

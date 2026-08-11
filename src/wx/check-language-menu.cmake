@@ -11,6 +11,10 @@
 #
 #   cmake -D SRC_DIR=<src/wx> -P check-language-menu.cmake
 
+# Script mode does not inherit the project's policies, so IN_LIST below needs
+# CMP0057 set here.
+cmake_minimum_required(VERSION 3.19)
+
 if(NOT SRC_DIR)
     message(FATAL_ERROR "SRC_DIR must be set")
 endif()
