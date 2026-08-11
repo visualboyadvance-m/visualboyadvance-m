@@ -51,6 +51,43 @@ void eepromSetSize(int size) {
     eepromMask = (gbaGetRomSize() > (16 * 1024 * 1024)) ? 0x01FFFF00 : 0x01000000;
 }
 
+// Bring the EEPROM state machine back into the range its own protocol can
+// produce after a save state has been loaded.
+//
+// eepromMode, eepromAddress, eepromByte and eepromBits are all raw ints off
+// disk, and the first three end up as array indices:
+//
+//     eepromData[(eepromAddress << 3) + eepromByte]   (read)
+//     eepromData[(eepromAddress << 3) + i]            (write)
+//     eepromBuffer[eepromByte]                        (both)
+//
+// During emulation these are derived from incoming command bits with explicit
+// masking (see the eepromAddress assignments in eepromWrite), so the values
+// are structurally bounded. Loading a state skipped all of that, and because
+// eepromMode is restored too, a crafted state can land directly in
+// EEPROM_READDATA2 or EEPROM_WRITEDATA and hit the access on the first EEPROM
+// operation after the load.
+static void eepromSanitizeSaveState()
+{
+    if (eepromMode < EEPROM_IDLE || eepromMode > EEPROM_WRITEDATA)
+        eepromMode = EEPROM_IDLE;
+
+    // eepromData holds 1024 eight-byte words.
+    eepromAddress &= (SIZE_EEPROM_8K >> 3) - 1;
+
+    // Byte offset within the current word. Bounded by 7 rather than by
+    // eepromBuffer's 16 bytes: it is also added to the word address above, and
+    // the protocol never advances it past the eighth byte anyway.
+    if (eepromByte < 0 || eepromByte > 7)
+        eepromByte = 0;
+
+    // Bit counter. The state machine compares it against 0x40 and 0x41 for
+    // termination, so a value past those would never finish a transfer, and
+    // incrementing it from INT_MAX is undefined behaviour besides.
+    if (eepromBits < 0 || eepromBits > 0x41)
+        eepromBits = 0;
+}
+
 #ifdef __LIBRETRO__
 void eepromSaveGame(uint8_t*& data)
 {
@@ -64,6 +101,7 @@ void eepromReadGame(const uint8_t*& data)
     utilReadDataMem(data, eepromSaveData);
     eepromSize = utilReadIntMem(data);
     utilReadMem(eepromData, data, SIZE_EEPROM_8K);
+    eepromSanitizeSaveState();
 }
 
 #else // !__LIBRETRO__
@@ -85,6 +123,8 @@ void eepromReadGame(gzFile gzFile, int version)
         // prior to 0.7.1, only 4K EEPROM was supported
         eepromSize = SIZE_EEPROM_512;
     }
+
+    eepromSanitizeSaveState();
 }
 
 void eepromReadGameSkip(gzFile gzFile, int version)

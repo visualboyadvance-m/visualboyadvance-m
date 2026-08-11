@@ -23,6 +23,7 @@ if(NOT COMPILE_ONLY)
         gb_cheats_save_state_test.cpp
         gb_bank_save_state_test.cpp
         gba_flash_save_state_test.cpp
+        gba_eeprom_save_state_test.cpp
     )
     target_link_libraries(save_state_tests PRIVATE
         vbam-core
