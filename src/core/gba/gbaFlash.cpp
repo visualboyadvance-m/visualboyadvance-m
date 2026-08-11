@@ -101,6 +101,15 @@ void flashReset()
 void flashSetSize(int size)
 {
     //  log("Setting flash size to %d\n", size);
+
+    // Only the two real chip sizes are addressable. ROM detection never
+    // produces anything else, but a save state can: pre-version-7 states feed
+    // their stored g_flashSize straight back in here. Since g_flashSize is
+    // later used as a memset length over flashSaveMemory, fall back to the
+    // smaller chip rather than trusting the value.
+    if (size != SIZE_FLASH512 && size != SIZE_FLASH1M)
+        size = SIZE_FLASH512;
+
     if (size == SIZE_FLASH512) {
         flashDeviceID = 0x1b;
         flashManufacturerID = 0x32;
@@ -296,6 +305,14 @@ static variable_desc flashSaveData3[] = {
 static void flashSanitizeSaveState()
 {
     flashBank &= 1;
+
+    // g_flashSize is the length of the CHIP ERASE memset over
+    // flashSaveMemory, so a state claiming a size larger than the 128 KiB
+    // buffer turns the first erase into a heap overflow of 0xff bytes. Only
+    // the two real chip sizes exist; fall back to the smaller one. Erasing
+    // less than the state intended is harmless next to writing past the end.
+    if (g_flashSize != SIZE_FLASH512 && g_flashSize != SIZE_FLASH1M)
+        g_flashSize = SIZE_FLASH512;
 }
 
 #ifdef __LIBRETRO__

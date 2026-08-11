@@ -133,4 +133,68 @@ TEST_F(GbaFlashSaveStateTest, SectorEraseAfterHostileBankStaysInBuffer)
     EXPECT_TRUE(erased_bank0 || erased_bank1);
 }
 
+// g_flashSize is the CHIP ERASE memset length. Only the two real chip sizes
+// exist, and both must survive a load unchanged.
+TEST_F(GbaFlashSaveStateTest, ValidFlashSizesSurviveLoad)
+{
+    for (int size : { SIZE_FLASH512, SIZE_FLASH1M }) {
+        LoadState(MakeFlashState(kFlashReadArray, kFlashReadArray, size, 0,
+                      0x00),
+            "gba_flash_valid_size");
+        ASSERT_EQ(g_flashSize, size);
+    }
+}
+
+TEST_F(GbaFlashSaveStateTest, HostileFlashSizeIsRejected)
+{
+    for (int size : { -1, 0, 1, SIZE_FLASH1M + 1, 0x00100000, 0x7FFFFFFF }) {
+        LoadState(MakeFlashState(kFlashReadArray, kFlashReadArray, size, 0,
+                      0x00),
+            "gba_flash_hostile_size");
+        ASSERT_TRUE(g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
+            << "state size " << size << " produced g_flashSize " << g_flashSize;
+    }
+}
+
+// The overflow itself: a crafted state sets flashState to FLASH_CMD_5 so the
+// next flash write of 0x10 runs CHIP ERASE with the attacker's length. Guard
+// pages either side of flashSaveMemory are not available here, so assert on
+// the sanitized length -- with 0x7FFFFFFF this memset ran ~2 GiB.
+TEST_F(GbaFlashSaveStateTest, ChipEraseAfterHostileSizeStaysInBuffer)
+{
+    LoadState(MakeFlashState(kFlashCmd5, kFlashReadArray, 0x7FFFFFFF, 0, 0x11),
+        "gba_flash_chip_erase");
+
+    ASSERT_LE(g_flashSize, SIZE_FLASH1M);
+    const int erase_length = g_flashSize;
+
+    // 0x10 is CHIP ERASE: memset(flashSaveMemory, 0xff, g_flashSize).
+    flashWrite(0x0000, 0x10);
+
+    // Erased up to the sanitized length...
+    EXPECT_EQ(flashSaveMemory[0], 0xFF);
+    EXPECT_EQ(flashSaveMemory[erase_length - 1], 0xFF);
+
+    // ...and not one byte beyond it. Anything past the buffer would have run
+    // off the end of the BSS object entirely.
+    if (erase_length < SIZE_FLASH1M)
+        EXPECT_EQ(flashSaveMemory[erase_length], 0x11);
+}
+
+// Pre-version-7 states route their stored size through flashSetSize(), which
+// stored it unconditionally.
+TEST_F(GbaFlashSaveStateTest, FlashSetSizeRejectsHostileSizes)
+{
+    for (int size : { -1, 0, 0x7FFFFFFF }) {
+        flashSetSize(size);
+        ASSERT_TRUE(g_flashSize == SIZE_FLASH512 || g_flashSize == SIZE_FLASH1M)
+            << "flashSetSize(" << size << ") stored " << g_flashSize;
+    }
+
+    flashSetSize(SIZE_FLASH1M);
+    EXPECT_EQ(g_flashSize, SIZE_FLASH1M);
+    flashSetSize(SIZE_FLASH512);
+    EXPECT_EQ(g_flashSize, SIZE_FLASH512);
+}
+
 }  // namespace
