@@ -237,7 +237,10 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
     // that's what those bits actually mean on hardware.
     if (playing_samples > 0) {
         count--;
-        dac = fifo[readIndex];
+        // Mask on the way in as well as on the way out: readIndex is restored
+        // verbatim from a save state, so the first read after a load would
+        // otherwise use it unmasked.
+        dac = fifo[readIndex & 31];
         readIndex = (readIndex + 1) & 31;
         playing_samples--;
         if (enabled) {
@@ -277,8 +280,11 @@ void Gba_Pcm_Fifo::write_fifo(int data)
     // come in matched halfword pairs, hardware would leave stale bytes
     // in the unwritten lanes - but typical audio code uses 32-bit DMA
     // exclusively, so we don't emulate that detail.
-    fifo[writeIndex] = data & 0xFF;
-    fifo[writeIndex + 1] = static_cast<uint8_t>(data >> 8);
+    // Both offsets are masked: writeIndex comes back from a save state
+    // unmasked, and writeIndex + 1 runs one byte past the ring even for the
+    // largest in-range writeIndex.
+    fifo[writeIndex & 31] = data & 0xFF;
+    fifo[(writeIndex + 1) & 31] = static_cast<uint8_t>(data >> 8);
     count += 2;
     writeIndex = (writeIndex + 2) & 31;
 
@@ -1071,6 +1077,12 @@ void soundReadGame(gzFile in, int version)
     // aren't saved in the state). Conservative split: assume playing
     // buffer is full first, rest in main ring.
     for (int i = 0; i < 2; ++i) {
+        // readIndex and writeIndex are restored as raw ints and index the
+        // 32-byte ring. Emulation re-masks them after every increment, so
+        // this applies the same bound to values that skipped that path.
+        pcm[i].readIndex &= 31;
+        pcm[i].writeIndex &= 31;
+
         int c = pcm[i].count;
         if (c < 0) c = 0;
         if (c > 32) c = 32;
@@ -1118,6 +1130,12 @@ void soundReadGame(const uint8_t*& in)
     // aren't saved in the state). Conservative split: assume playing
     // buffer is full first, rest in main ring.
     for (int i = 0; i < 2; ++i) {
+        // readIndex and writeIndex are restored as raw ints and index the
+        // 32-byte ring. Emulation re-masks them after every increment, so
+        // this applies the same bound to values that skipped that path.
+        pcm[i].readIndex &= 31;
+        pcm[i].writeIndex &= 31;
+
         int c = pcm[i].count;
         if (c < 0) c = 0;
         if (c > 32) c = 32;
