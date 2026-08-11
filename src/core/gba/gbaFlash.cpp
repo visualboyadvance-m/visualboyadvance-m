@@ -284,6 +284,20 @@ static variable_desc flashSaveData3[] = {
     { NULL, 0 }
 };
 
+// Bring the state restored from a save state back into the range the flash
+// hardware can actually produce.
+//
+// Everything in flashSaveData3 is a raw int off disk, but flashBank indexes
+// flashSaveMemory in 64 KiB steps -- flashSaveMemory[(flashBank << 16) +
+// address] on every flash read, write and sector erase. flashSaveMemory is
+// 128 KiB, so any bank above 1 leaves the buffer, and a negative one indexes
+// backwards out of it. The FLASH_SETBANK command handler masks the value to a
+// single bit; do the same here.
+static void flashSanitizeSaveState()
+{
+    flashBank &= 1;
+}
+
 #ifdef __LIBRETRO__
 void flashSaveGame(uint8_t*& data)
 {
@@ -293,6 +307,7 @@ void flashSaveGame(uint8_t*& data)
 void flashReadGame(const uint8_t*& data)
 {
     utilReadDataMem(data, flashSaveData3);
+    flashSanitizeSaveState();
 }
 
 #else // !__LIBRETRO__
@@ -327,6 +342,8 @@ void flashReadGame(gzFile gzFile, int version)
     } else {
         utilReadData(gzFile, flashSaveData3);
     }
+
+    flashSanitizeSaveState();
 }
 
 void flashReadGameSkip(gzFile gzFile, int version)
