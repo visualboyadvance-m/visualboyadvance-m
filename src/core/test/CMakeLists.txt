@@ -12,6 +12,37 @@ target_sources(vbam-core-fake
     fake_core.cpp
 )
 
+# save_state_tests: hardening regression tests for the save state
+# deserializers. Each case hands a hand-crafted blob to a *ReadGame()
+# function, which is what loading a malicious .sgm does, and asserts the
+# values that reach the emulator globals are in range. No ROMs needed, so
+# unlike the accuracy suites these always run.
+if(NOT COMPILE_ONLY)
+    add_executable(save_state_tests
+        save_state_test_env.cpp
+        gb_cheats_save_state_test.cpp
+    )
+    target_link_libraries(save_state_tests PRIVATE
+        vbam-core
+        vbam-core-fake
+        GTest::gtest_main
+    )
+    target_compile_definitions(save_state_tests PRIVATE
+        VBAM_TEST_TMP_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    )
+    if(APPLE)
+        if(NOT LIBICONV_LIB)
+            find_library(LIBICONV_LIB NAMES libiconv iconv)
+        endif()
+        target_link_libraries(save_state_tests PRIVATE
+            "-framework CoreFoundation" ${LIBICONV_LIB})
+    endif()
+
+    if(NOT CMAKE_CROSSCOMPILING)
+        vbam_gtest_discover_tests(save_state_tests)
+    endif()
+endif()
+
 # suite_runner: headless driver for mGBA's suite.gba accuracy tests.
 add_executable(suite_runner suite_runner.cpp)
 target_link_libraries(suite_runner PRIVATE vbam-core)

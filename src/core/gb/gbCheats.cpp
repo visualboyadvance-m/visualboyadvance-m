@@ -18,6 +18,29 @@ bool gbCheatMap[0x10000];
 #define GBCHEAT_IS_HEX(a) (((a) >= 'A' && (a) <= 'F') || ((a) >= '0' && (a) <= '9'))
 #define GBCHEAT_HEX_VALUE(a) ((a) >= 'A' ? (a) - 'A' + 10 : (a) - '0')
 
+// Copy a code or description into one of gbCheat's fixed-size char fields,
+// truncating rather than overflowing.
+//
+// The source is not always shorter than the destination: the legacy save state
+// format hands us a gbXxCheat, whose cheatDesc is 100 bytes, while gbCheat's is
+// 32. strcpy_s would catch that, but it is only available behind
+// __STDC_WANT_SECURE_LIB__ (MSVC), so every other platform needs this.
+static void gbCopyCheatText(char* dest, size_t dest_size, const char* src)
+{
+    if (dest == nullptr || dest_size == 0)
+        return;
+
+    size_t len = (src == nullptr) ? 0 : strlen(src);
+
+    if (len >= dest_size)
+        len = dest_size - 1;
+
+    if (len > 0)
+        memcpy(dest, src, len);
+
+    dest[len] = '\0';
+}
+
 void gbCheatUpdateMap()
 {
     memset(gbCheatMap, 0, 0x10000);
@@ -29,6 +52,16 @@ void gbCheatUpdateMap()
 }
 
 #ifndef __LIBRETRO__
+// Clamp a cheat record count read from a save state to what gbCheatList holds.
+static int gbClampCheatCount(int count)
+{
+    if (count < 0)
+        return 0;
+    if (count > MAX_CHEATS)
+        return MAX_CHEATS;
+    return count;
+}
+
 void gbCheatsSaveGame(gzFile gzFile)
 {
     utilWriteInt(gzFile, gbCheatNumber);
@@ -42,10 +75,16 @@ void gbCheatsReadGame(gzFile gzFile, int version)
         int gbGgOn = utilReadInt(gzFile);
 
         if (gbGgOn) {
-            int n = utilReadInt(gzFile);
+            // The record count comes straight from the file. Cap it: past
+            // MAX_CHEATS gbAddGgCheat only refuses and warns, so an absurd
+            // count would spin for as long as the counter allows.
+            int n = gbClampCheatCount(utilReadInt(gzFile));
             gbXxCheat tmpCheat;
             for (int i = 0; i < n; i++) {
                 utilGzRead(gzFile, &tmpCheat, sizeof(gbXxCheat));
+                // gbXxCheat's fields are not necessarily terminated.
+                tmpCheat.cheatCode[sizeof(tmpCheat.cheatCode) - 1] = '\0';
+                tmpCheat.cheatDesc[sizeof(tmpCheat.cheatDesc) - 1] = '\0';
                 gbAddGgCheat(tmpCheat.cheatCode, tmpCheat.cheatDesc);
             }
         }
@@ -53,10 +92,12 @@ void gbCheatsReadGame(gzFile gzFile, int version)
         int gbGsOn = utilReadInt(gzFile);
 
         if (gbGsOn) {
-            int n = utilReadInt(gzFile);
+            int n = gbClampCheatCount(utilReadInt(gzFile));
             gbXxCheat tmpCheat;
             for (int i = 0; i < n; i++) {
                 utilGzRead(gzFile, &tmpCheat, sizeof(gbXxCheat));
+                tmpCheat.cheatCode[sizeof(tmpCheat.cheatCode) - 1] = '\0';
+                tmpCheat.cheatDesc[sizeof(tmpCheat.cheatDesc) - 1] = '\0';
                 gbAddGsCheat(tmpCheat.cheatCode, tmpCheat.cheatDesc);
             }
         }
@@ -214,13 +255,8 @@ bool gbAddGsCheat(const char* code, const char* desc)
 
     int i = gbCheatNumber;
 
-#if __STDC_WANT_SECURE_LIB__
-    strcpy_s(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
-    strcpy_s(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
-#else
-    strcpy(gbCheatList[i].cheatCode, code);
-    strcpy(gbCheatList[i].cheatDesc, desc);
-#endif
+    gbCopyCheatText(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
+    gbCopyCheatText(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
 
     gbCheatList[i].code = GBCHEAT_HEX_VALUE(code[0]) << 4 | GBCHEAT_HEX_VALUE(code[1]);
 
@@ -328,13 +364,8 @@ bool gbAddGgCheat(const char* code, const char* desc)
 
     size_t len = strlen(code);
 
-#if __STDC_WANT_SECURE_LIB__
-    strcpy_s(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
-    strcpy_s(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
-#else
-    strcpy(gbCheatList[i].cheatCode, code);
-    strcpy(gbCheatList[i].cheatDesc, desc);
-#endif
+    gbCopyCheatText(gbCheatList[i].cheatCode, sizeof(gbCheatList[i].cheatCode), code);
+    gbCopyCheatText(gbCheatList[i].cheatDesc, sizeof(gbCheatList[i].cheatDesc), desc);
 
     gbCheatList[i].code = 0x101;
     gbCheatList[i].value = (GBCHEAT_HEX_VALUE(code[0]) << 4) + GBCHEAT_HEX_VALUE(code[1]);
