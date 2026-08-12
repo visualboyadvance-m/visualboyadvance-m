@@ -1,0 +1,166 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/${presetName}/install",
+      "cacheVariables": {
+        "ENABLE_WX": "ON",
+        "ENABLE_SDL": "ON",
+        "ENABLE_LIBRETRO": "ON"
+      }
+    },
+    {
+      "name": "x64-static",
+      "hidden": true,
+      "inherits": "base",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "arm64-static",
+      "hidden": true,
+      "inherits": "base",
+      "architecture": {
+        "value": "arm64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "arm64-windows-static"
+      }
+    },
+
+    {
+      "name": "x64-static-Debug",
+      "displayName": "x64 static Debug",
+      "description": "64-bit MSVC, static vcpkg triplet, debug information",
+      "inherits": "x64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "x64-static-Release",
+      "displayName": "x64 static Release",
+      "description": "64-bit MSVC, static vcpkg triplet, optimized",
+      "inherits": "x64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "x64-static-RelWithDebInfo",
+      "displayName": "x64 static RelWithDebInfo",
+      "description": "64-bit MSVC, static vcpkg triplet, optimized with debug information",
+      "inherits": "x64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    },
+
+    {
+      "name": "arm64-static-Debug",
+      "displayName": "arm64 static Debug",
+      "description": "ARM64 MSVC, static vcpkg triplet, debug information",
+      "inherits": "arm64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "arm64-static-Release",
+      "displayName": "arm64 static Release",
+      "description": "ARM64 MSVC, static vcpkg triplet, optimized",
+      "inherits": "arm64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "arm64-static-RelWithDebInfo",
+      "displayName": "arm64 static RelWithDebInfo",
+      "description": "ARM64 MSVC, static vcpkg triplet, optimized with debug information",
+      "inherits": "arm64-static",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-static-Debug",
+      "displayName": "x64 static Debug",
+      "configurePreset": "x64-static-Debug"
+    },
+    {
+      "name": "x64-static-Release",
+      "displayName": "x64 static Release",
+      "configurePreset": "x64-static-Release"
+    },
+    {
+      "name": "x64-static-RelWithDebInfo",
+      "displayName": "x64 static RelWithDebInfo",
+      "configurePreset": "x64-static-RelWithDebInfo"
+    },
+    {
+      "name": "arm64-static-Debug",
+      "displayName": "arm64 static Debug",
+      "configurePreset": "arm64-static-Debug"
+    },
+    {
+      "name": "arm64-static-Release",
+      "displayName": "arm64 static Release",
+      "configurePreset": "arm64-static-Release"
+    },
+    {
+      "name": "arm64-static-RelWithDebInfo",
+      "displayName": "arm64 static RelWithDebInfo",
+      "configurePreset": "arm64-static-RelWithDebInfo"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "ignore" }
+    },
+    {
+      "name": "x64-static-Debug",
+      "displayName": "x64 static Debug",
+      "inherits": "base",
+      "configurePreset": "x64-static-Debug"
+    },
+    {
+      "name": "x64-static-Release",
+      "displayName": "x64 static Release",
+      "inherits": "base",
+      "configurePreset": "x64-static-Release"
+    },
+    {
+      "name": "x64-static-RelWithDebInfo",
+      "displayName": "x64 static RelWithDebInfo",
+      "inherits": "base",
+      "configurePreset": "x64-static-RelWithDebInfo"
+    },
+    {
+      "name": "arm64-static-Debug",
+      "displayName": "arm64 static Debug",
+      "inherits": "base",
+      "configurePreset": "arm64-static-Debug"
+    },
+    {
+      "name": "arm64-static-Release",
+      "displayName": "arm64 static Release",
+      "inherits": "base",
+      "configurePreset": "arm64-static-Release"
+    },
+    {
+      "name": "arm64-static-RelWithDebInfo",
+      "displayName": "arm64 static RelWithDebInfo",
+      "inherits": "base",
+      "configurePreset": "arm64-static-RelWithDebInfo"
+    }
+  ]
+}

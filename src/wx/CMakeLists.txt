@@ -1828,6 +1828,6 @@ if(NOT ANDROID)
     )
 
     if (UNIX)
-        install(FILES ${CMAKE_SOURCE_DIR}/src/debian/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
+        install(FILES ${CMAKE_CURRENT_LIST_DIR}/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
     endif()
 endif()
