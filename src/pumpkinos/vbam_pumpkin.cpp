@@ -313,7 +313,9 @@ void systemDrawScreen(void) {
         }
     }
 
+    pumpkin_dirty_region_mode(dirtyRegionBegin);
     pumpkin_screen_dirty(wh, x0, TITLE_H, emuWidth * scale, emuHeight * scale);
+    pumpkin_dirty_region_mode(dirtyRegionEnd);
 }
 
 void systemGbBorderOn(void) {
