@@ -197,6 +197,12 @@ if(VBAM_NEED_NLS)
         list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBCHARSET_LIB})
         list(APPEND NLS_LIBS                 ${LIBCHARSET_LIB})
     endif()
+    # Static libintl uses CFLocale/CFPreferences to detect the user's
+    # preferred languages, so it needs CoreFoundation at link time.
+    if(APPLE AND LIBINTL_LIB)
+        list(APPEND CMAKE_REQUIRED_LIBRARIES "-framework CoreFoundation")
+        list(APPEND NLS_LIBS                 "-framework CoreFoundation")
+    endif()
     include(CheckFunctionExists)
     check_function_exists(gettext GETTEXT_FN)
     if(NOT (LIBINTL_INC OR GETTEXT_FN))
