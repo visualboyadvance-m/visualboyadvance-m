@@ -7,7 +7,6 @@ Igor Pavlov : Public domain */
 
 #include "CpuArch.h"
 
-#undef MY_CPU_X86_OR_AMD64
 #ifdef MY_CPU_X86_OR_AMD64
 
 #undef NEED_CHECK_FOR_CPUID
