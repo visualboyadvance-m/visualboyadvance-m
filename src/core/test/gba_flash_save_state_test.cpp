@@ -177,8 +177,9 @@ TEST_F(GbaFlashSaveStateTest, ChipEraseAfterHostileSizeStaysInBuffer)
 
     // ...and not one byte beyond it. Anything past the buffer would have run
     // off the end of the BSS object entirely.
-    if (erase_length < SIZE_FLASH1M)
+    if (erase_length < SIZE_FLASH1M) {
         EXPECT_EQ(flashSaveMemory[erase_length], 0x11);
+    }
 }
 
 // Pre-version-7 states route their stored size through flashSetSize(), which
