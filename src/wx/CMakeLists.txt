@@ -425,7 +425,14 @@ function(configure_wx_target target)
 
     # wxWidgets.
     _add_link_libraries(${wxWidgets_LIBRARIES})
-    _add_include_directories(${wxWidgets_INCLUDE_DIRS})
+    # Prepend the wxWidgets include directories so that a wx/setup.h from an
+    # unrelated dependency prefix (e.g. a vcpkg tree used for other
+    # dependencies) cannot shadow the one matching ${wxWidgets_LIBRARIES}.
+    if(${target_is_executable})
+        target_include_directories(${target} BEFORE PRIVATE ${wxWidgets_INCLUDE_DIRS})
+    else()
+        target_include_directories(${target} BEFORE PUBLIC ${wxWidgets_INCLUDE_DIRS})
+    endif()
     _add_compile_options(${wxWidgets_CXX_FLAGS})
     _add_compile_definitions(${wxWidgets_DEFINITIONS})
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
