@@ -639,21 +639,9 @@ static const int kMaxLinkClockAheadTicks = 3 * (TICKS_PER_SECOND / 60);
 // (single-player sections, a peer that has not loaded a ROM yet) both
 // instances free-run.
 static const int32_t kMaxLinkLeadTicks = 2 * (TICKS_PER_SECOND / 60);
-// Larger cap used while the transfer stream is LIVE. A live stream keeps
-// both games fed with serial IRQs at the master's cadence, so a frozen
-// clock offset between the instances (banked during a scene load, a pause,
-// or a minimized window) harms nothing -- napping to fight it just parks
-// the leader at the boundary paying a nap per publish forever: the
-// linked-menu fps never returning to full speed after minimize/restore.
-// Only genuine runaway -- a lead so large the leader's game would outrun
-// the IRQ cadence into its quiet-vblank error -- still needs braking while
-// the stream flows. On SILENCE (peer paused, window minimized) the tight
-// cap re-engages and the hold keeps both instances synched-paused.
-static const int32_t kMaxLinkLeadLiveTicks = 8 * (TICKS_PER_SECOND / 60);
-static const uint32_t kStreamLiveMs = 100;
-static uint32_t last_stream_ms = 0;
 static const int32_t kHotWindowTicks = 8 * (TICKS_PER_SECOND / 60);
 static uint32_t last_hot_own_clock = 0;
+static bool hot_ever_transferred = false;
 // Leads are measured relative to the moment the link became hot, NOT from
 // process start: instances legitimately diverge by minutes of emulated
 // time while the link is cold (one player boots or fast-forwards long
@@ -690,46 +678,6 @@ static const int kPeerAliveProbeMs = 2000;
 // close requested, or the peer's process died). peer_mask selects
 // the linkflags bits that must stay set for the wait to keep going.
 static bool WaitForLinkToken(int sem_index, uint8_t peer_mask);
-
-// One bounded throttle step per LinkUpdate call while ahead: ~0.2 ms on
-// POSIX (nanosleep), ~1 ms on Windows (Sleep(1) at the raised 1 ms timer
-// resolution -- Windows cannot sleep shorter). Each branch debits the
-// budget by what it actually sleeps.
-static bool LinkAheadThrottleStep()
-{
-    if (ahead_throttle_budget_us <= 0)
-        return false;
-    // Nap on the doorbell when we have one: drain stale rings (bounding the
-    // count without sem_getvalue, which macOS lacks), then wait for a fresh
-    // ring or the quantum. A ring consumed by the drain belonged to a
-    // transfer the post-nap numtransfers check picks up anyway.
-    if (link_doorbell_self >= 0 && link_doorbell[link_doorbell_self] != NULL) {
-        ahead_throttle_budget_us -= 1000;
-        while (WaitForSingleObject(link_doorbell[link_doorbell_self], 0) != WAIT_TIMEOUT) {
-        }
-        if (WaitForSingleObject(link_doorbell[link_doorbell_self], 1) == WAIT_TIMEOUT) {
-            // A dry hold means the peer is silent (paused emulator,
-            // minimized window). Holding against silence is the synched-
-            // pause and must not expire into a free-run (the budget dying
-            // after ~10 s of menu ended in the game's desync error);
-            // sleeping costs nothing, so refund it. A dead peer is caught
-            // by the token-wait liveness probes and session teardown.
-            ahead_throttle_budget_us += 1000;
-        }
-        return true;
-    }
-#ifdef _WIN32
-    ahead_throttle_budget_us -= 1000;
-    Sleep(1);
-#else
-    ahead_throttle_budget_us -= 200;
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 200 * 1000;
-    nanosleep(&ts, NULL);
-#endif
-    return true;
-}
 
 // ---------------------------------------------------------------------------
 // Cable-path tracing: set VBAM_TRACE_CABLE=1 to stream per-transfer events
@@ -2911,35 +2859,36 @@ static void UpdateCableSocket(int ticks)
                 // the master's next start wakes us instantly, and releases
                 // after a few dry quanta -- no data means no live stream to
                 // pace against (see LinkAheadThrottleStepSocket).
-                // Hold only once a session is live (first completed
-                // transfer): before that there is no stream to pace against
-                // and holding just burns the boot at ~64 ticks per quantum.
-                // Once live, hold through silence indefinitely -- a silent
-                // master is a paused/minimized emulator, and releasing the
-                // hold free-runs the client into the game's quiet-vblank
-                // desync error (the previous dry-quanta release also stuck
-                // permanently after boot exhausted its counter, disabling
-                // the hold outright). Dry quanta are refunded (sleeping
-                // against a pause costs nothing); the periodic CheckConn
-                // notices a closed socket and ends the session.
-                static int sock_dry_quanta = 0;
+                // Hard pacing, socket flavor: once a session is live, a
+                // client more than the clock-ahead cap past the master's
+                // stream BLOCKS on its socket -- zero emulation -- until the
+                // master's next transfer arrives. A sleep-and-continue nap
+                // creeps (~64 ticks per quantum), and against a paused
+                // master the creep walks the game into its quiet-vblank
+                // desync; blocking holds the client frozen (the synched
+                // pause) and doubles as the turbo lock. Escapes: data from
+                // the master (the socket is the doorbell), link teardown or
+                // mode exit, or a dead connection noticed by the periodic
+                // CheckConn.
                 if (linktime > kMaxLinkClockAheadTicks && sock_session_live) {
-                    bool woke_by_data = false;
-                    if (LinkAheadThrottleStepSocket(&woke_by_data)) {
+                    int dry = 0;
+                    while (!LinkIsClosing() && !lc.transferring
+                           && GetLinkMode() == LINK_CABLE_SOCKET) {
+                        bool woke_by_data = false;
+                        if (!LinkAheadThrottleStepSocket(&woke_by_data))
+                            break;
+                        ahead_throttle_budget_us += 1000;
                         if (woke_by_data) {
-                            sock_dry_quanta = 0;
                             cable_poll_ticks = 0;
                             lc.CheckConn();
-                        } else {
-                            ahead_throttle_budget_us += 1000;
-                            if ((++sock_dry_quanta & 511) == 0)
-                                lc.CheckConn();
+                            dry = 0;
+                        } else if ((++dry & 511) == 0) {
+                            lc.CheckConn();
                         }
                     }
                 }
                 if (!lc.transferring)
                     return;
-                sock_dry_quanta = 0;
                 sock_session_live = true;
             }
             ahead_throttle_budget_us = kAheadThrottleBudgetUs;
@@ -4994,16 +4943,25 @@ static void UpdateCableIPC(int ticks)
     const bool need_publish = transfer_direction
         || linkmem->numtransfers != numtransfers
         || s_ipc_unpublished_ticks >= kClockPublishTicks;
-    if (transfer_direction || linkmem->numtransfers != numtransfers)
-        last_stream_ms = GetTickCount();
     if (need_publish) {
         linkmem->core_clock[linkid] += s_ipc_unpublished_ticks;
         s_ipc_unpublished_ticks = 0;
-        if (transfer_direction)
+        if (transfer_direction) {
             last_hot_own_clock = linkmem->core_clock[linkid];
+            hot_ever_transferred = true;
+        }
         const uint32_t mine = linkmem->core_clock[linkid];
+        // Hot means "a transfer happened within the last kHotWindowTicks of
+        // our clock". Two wrap traps matter now that the lead throttle is a
+        // hard block instead of a lossy nap: (a) before any transfer,
+        // last_hot_own_clock is 0 and a small clock read as hot; (b) a
+        // signed window compare wraps negative once the clock difference
+        // passes 2^31 (~128 s of never-transferred idle), reading as hot
+        // against garbage rebase clocks and producing a phantom multi-
+        // minute block. Require a real transfer and compare unsigned.
         const bool link_hot = linkmem->numgbas > 1
-            && (int32_t)(mine - last_hot_own_clock) < kHotWindowTicks;
+            && hot_ever_transferred
+            && (uint32_t)(mine - last_hot_own_clock) < (uint32_t)kHotWindowTicks;
         if (link_hot && !link_was_hot) {
             // Cold -> hot: rebase the lead measurement (see hot_base_own).
             hot_base_own = mine;
@@ -5028,13 +4986,78 @@ static void UpdateCableIPC(int ticks)
                 if (lead > worst_lead)
                     worst_lead = lead;
             }
-            const bool stream_live =
-                (uint32_t)(GetTickCount() - last_stream_ms) < kStreamLiveMs;
-            const int32_t lead_cap =
-                stream_live ? kMaxLinkLeadLiveTicks : kMaxLinkLeadTicks;
-            if (worst_lead > lead_cap)
-                (void)LinkAheadThrottleStep();
-            else
+            // Hard pacing: when we are more than the cap ahead of the
+            // slowest live peer, BLOCK here -- no emulation at all -- until
+            // the lead is back under the cap. A sleep-and-continue nap is
+            // the wrong primitive: every quantum still advances the CPU by
+            // one event horizon, so a held instance creeps (~64 ticks/ms),
+            // and against a paused peer (emulator menu, minimized window)
+            // the creep eventually walks the game past its quiet-vblank
+            // tolerance into a desync error. Blocking gives zero creep: a
+            // paused peer holds us frozen at the cap indefinitely (the
+            // synched pause), and it is also the linked turbo lock -- a
+            // fast-forwarding instance slams into the cap and is paced to
+            // its peer's rate, so linked speed cannot exceed the slower
+            // side and its audio pitch stays normal. In normal play the
+            // block only consumes the leader's idle slack (it runs again
+            // the instant the peer's clock catches up), so there is no
+            // boundary-park fps tax. Escapes: a transfer that needs us
+            // (numtransfers moved -- the doorbell ring wakes us for it
+            // immediately), link teardown, or all peers dead.
+            if (worst_lead > kMaxLinkLeadTicks) {
+                int dry = 0;
+                while (!LinkIsClosing()) {
+                    if (link_doorbell_self >= 0
+                        && link_doorbell[link_doorbell_self] != NULL) {
+                        if (WaitForSingleObject(
+                                link_doorbell[link_doorbell_self], 1)
+                            != WAIT_TIMEOUT)
+                            dry = 0;
+                        else
+                            ++dry;
+                    } else {
+#ifdef _WIN32
+                        Sleep(1);
+#else
+                        struct timespec ts;
+                        ts.tv_sec = 0;
+                        ts.tv_nsec = 1000 * 1000;
+                        nanosleep(&ts, NULL);
+#endif
+                        ++dry;
+                    }
+                    // A transfer arrived that needs our participation.
+                    if (linkmem->numtransfers != numtransfers)
+                        break;
+                    // Recompute the lead against fresh peer clocks.
+                    const int f2 = linkmem->linkflags;
+                    int32_t lead2 = 0;
+                    for (int i = 0; i < 4; i++) {
+                        if (i == (int)linkid || !(f2 & (1 << i)))
+                            continue;
+                        const int32_t l2 = my_progress
+                            - (int32_t)(linkmem->core_clock[i] - hot_base_peer[i]);
+                        if (l2 > lead2)
+                            lead2 = l2;
+                    }
+                    if (lead2 <= kMaxLinkLeadTicks)
+                        break;
+                    // Every ~2 s of dry blocking, make sure the peers we
+                    // are waiting on still exist.
+                    if (dry >= 2048) {
+                        dry = 0;
+                        bool any_alive = false;
+                        for (int i = 0; i < 4; i++) {
+                            if (i == (int)linkid || !(f2 & (1 << i)))
+                                continue;
+                            if (LinkPeerAlive(i))
+                                any_alive = true;
+                        }
+                        if (!any_alive)
+                            break;
+                    }
+                }
+            } else
                 ahead_throttle_budget_us = kAheadThrottleBudgetUs;
         }
     }

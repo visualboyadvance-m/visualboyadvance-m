@@ -17,6 +17,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include "core/base/sound_driver.h"
 #include "core/base/system.h"
@@ -128,10 +129,39 @@ class Barrier {
         int wfd = child_ ? c2p_[1] : p2c_[1];
         int rfd = child_ ? p2c_[0] : c2p_[0];
         uint8_t theirs = 0xee;
-        if (write(wfd, &mine, 1) != 1 || read(rfd, &theirs, 1) != 1) {
+        if (write(wfd, &mine, 1) != 1) {
             fprintf(stderr, "FAIL [%s pid %d]: barrier peer vanished\n",
                 g_role, (int)getpid());
             _exit(1);
+        }
+        // Poll instead of blocking, pumping the link while we wait: a real
+        // emulator's clock keeps advancing while it waits for anything, and
+        // the hard lead-block releases when a live peer's clock catches up.
+        // A frozen-clock blocking read here deadlocks against a peer
+        // legitimately blocked at the lead cap (it waits for our clock; we
+        // wait for its barrier write).
+        for (;;) {
+            struct pollfd pf;
+            pf.fd = rfd;
+            pf.events = POLLIN;
+            pf.revents = 0;
+            int r = poll(&pf, 1, 1);
+            if (r > 0) {
+                if (read(rfd, &theirs, 1) != 1) {
+                    fprintf(stderr,
+                        "FAIL [%s pid %d]: barrier peer vanished\n",
+                        g_role, (int)getpid());
+                    _exit(1);
+                }
+                break;
+            }
+            if (r < 0 && errno != EINTR) {
+                fprintf(stderr, "FAIL [%s pid %d]: barrier poll error\n",
+                    g_role, (int)getpid());
+                _exit(1);
+            }
+            if (GetLinkMode() == LINK_CABLE_IPC)
+                LinkUpdate(4096);
         }
         return theirs;
     }
