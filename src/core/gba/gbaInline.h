@@ -286,12 +286,11 @@ static inline uint32_t CPUReadOpenBus()
        at event service, so within the DMA's event batch it measures cycles
        since the DMA ran. */
     {
-        extern uint32_t g_dmaOpenBusPC;
         /* The last DMA's bus word remains visible to open-bus reads for
            exactly one instruction slot after the transfer (the reading
            pc is one instruction width past the pc that was pending when
            the DMA ran). armNextPC here is the pc of the instruction
-           doing this read; g_dmaOpenBusPC was the pending pc when the
+           doing this read; g_hdmaActAbs was the pending pc when the
            DMA ran. */
         /* Hardware grants an HBlank DMA the bus mid-instruction: when
            the grant lands inside the reading instruction's own span --
@@ -306,7 +305,6 @@ static inline uint32_t CPUReadOpenBus()
            latched cpuDmaBusValue. */
         {
             extern uint32_t dma3Source;
-            extern int cpuTotalTicks;
             if (gbaScheduler::IsScheduled(kSchedHdma) && (DM3CNT_H & 0x8000)) {
                 /* Grant window: after the reader's opcode fetch
                    completes (>= 3 at seq-ROM cost) and before its data
@@ -322,7 +320,7 @@ static inline uint32_t CPUReadOpenBus()
                 static const int winLo = 1;
                 static const int winHi = 4;
                 /* The scheduler cursor sits at the batch start; the read
-                   executes cpuTotalTicks into the batch. */
+                   executes cpuAbsCycle into the batch. */
                 extern int64_t g_hdmaActAbs;
                 extern int64_t cpuAbsCycle;
                 const int rel = (int)(g_hdmaActAbs - cpuAbsCycle);
