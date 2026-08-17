@@ -70,6 +70,32 @@ int32_t NextDelta() {
     return (int32_t)d;
 }
 
+int32_t NextDeltaClamping() {
+    // Like NextDelta() but excludes lazy event types: kSchedHdma must
+    // not end CPU batches at its due time -- hardware's DMA bus grant
+    // does not quantize the instruction stream to itself; the transfer
+    // is applied at the next natural boundary (bounded lateness) and
+    // open-bus visibility is computed from true times.
+    int64_t best = INT64_MAX;
+    for (uint32_t i = 0; i < kSchedCount; ++i) {
+        if (i == (uint32_t)kSchedHdma) continue;
+        if (g_slots[i].active && g_slots[i].when < best) best = g_slots[i].when;
+    }
+    if (best == INT64_MAX) return INT32_MAX;
+    int64_t d = best - g_now;
+    if (d < 0)            return 0;
+    if (d > INT32_MAX)    return INT32_MAX;
+    return (int32_t)d;
+}
+
+int32_t DeltaOf(SchedulerEventType type) {
+    if (!g_slots[type].active) return INT32_MAX;
+    int64_t d = g_slots[type].when - g_now;
+    if (d < 0)         return 0;
+    if (d > INT32_MAX) return INT32_MAX;
+    return (int32_t)d;
+}
+
 SchedulerEventType PopExpired() {
     int64_t          best_when = INT64_MAX;
     uint32_t         best_idx  = kSchedCount;

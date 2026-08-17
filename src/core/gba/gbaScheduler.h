@@ -47,6 +47,12 @@ enum SchedulerEventType : uint32_t {
                                // the vector. Replaces the legacy
                                // intState/IRQTicks state machine and the
                                // end-of-CPULoop IRQ-delivery block.
+    kSchedHdma           = 3,  // Deferred HBlank-DMA activation: hardware
+                               // grants the DMA the bus a few cycles
+                               // after the trigger; firing synchronously
+                               // at the HBlank event
+                               // put the transfer -- and its open-bus
+                               // side effects -- 3 cycles early.
     // Reserved for later phases:
     // kSchedLcdHdraw, kSchedLcdHblank, kSchedLcdVblank,
     // kSchedTimer0..Timer3, kSchedSwi,
@@ -83,6 +89,16 @@ bool HasPending();
 // Cycles until the next event fires (>= 0). Caller must have already
 // checked HasPending(); returns INT32_MAX if nothing is scheduled.
 int32_t NextDelta();
+
+// Cycles until an event of this specific type fires; INT32_MAX if none
+// pending. Used by the open-bus model to detect an HBlank-DMA bus grant
+// landing inside the current instruction's span.
+int32_t DeltaOf(SchedulerEventType type);
+
+// NextDelta() excluding lazy event types (kSchedHdma): used for the CPU
+// batch ceiling so the DMA bus grant does not quantize the instruction
+// stream to itself.
+int32_t NextDeltaClamping();
 
 // Pop and return the next expired event type, advancing the "current"
 // cursor to its firing time. Returns kSchedCount and leaves state

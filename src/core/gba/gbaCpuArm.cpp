@@ -4,12 +4,27 @@
 #include "core/gba/gbaInline.h"
 #include "core/gba/gbaGlobals.h"
 
+// 8-bit-bus backup regions (SRAM/flash, 0x0E-0x0F) see the CPU's
+// untranslated low address lines: a 32-bit LDM/STM with an unaligned
+// base fetches/stores the byte at the unaligned address (mGBA test suite
+// "SRAM load swi B/C 32 (unaligned)" -- the real-BIOS CpuSet copy
+// loops are bare LDM/STM). Word-bus regions mask A[1:0] internally,
+// and the SRAM byte-broadcast read is rotation-invariant, so
+// preserving the low bits for backup-region bases only is safe
+// against CPUReadMemory's LDR rotate tail.
+static inline uint32_t blockXferSramLowBits(uint32_t address, uint32_t base) {
+    if ((base >> 25) == 7)  // regions 0x0E / 0x0F
+        address |= base & 3;
+    return address;
+}
+
 #if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 #ifdef PROFILING
 #include "prof/prof.h"
+
 #endif
 
 #ifdef _MSC_VER
@@ -1118,16 +1133,26 @@ static void count(uint32_t opcode, int cond_res)
             armNextPC = reg[15].I;                               \
             reg[15].I += 4;                                      \
             ARM_PREFETCH;                                        \
+            clockTicks = 3 + ISREGSHIFT                          \
+                + codeTicksAccess32(armNextPC)                   \
+                + codeTicksAccessSeq32(armNextPC)                \
+                + codeTicksAccessSeq32(armNextPC);               \
         } else {                                                 \
             reg[15].I &= 0xFFFFFFFE;                             \
             armNextPC = reg[15].I;                               \
             reg[15].I += 2;                                      \
             THUMB_PREFETCH;                                      \
+            /* Mode switched to Thumb (SPSR restore, e.g. the   */ \
+            /* movs pc,lr exception return): the pipeline       */ \
+            /* refill is two 16-bit fetches + one nonseq 16-bit */ \
+            /* fetch at the destination, not 32-bit ones.       */ \
+            /* Charging 32-bit added 3x the seq-16 wait per     */ \
+            /* return into Thumb code (mGBA test suite, all Thumb-   */ \
+            /* caller BIOS timing tests, +6..+9).               */ \
+            clockTicks = 3 + ISREGSHIFT                          \
+                + codeTicksAccess16(armNextPC)                   \
+                + 2 * codeTicksAccessSeq16(armNextPC);           \
         }                                                        \
-        clockTicks = 3 + ISREGSHIFT                              \
-            + codeTicksAccess32(armNextPC)                       \
-            + codeTicksAccessSeq32(armNextPC)                    \
-            + codeTicksAccessSeq32(armNextPC);                   \
     }
 
 #define MODECHANGE_NO /*nothing*/
@@ -2272,7 +2297,7 @@ static INSN_REGPARM void arm800(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL;
     STM_FINISH;
@@ -2285,7 +2310,7 @@ static INSN_REGPARM void arm810(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2298,7 +2323,7 @@ static INSN_REGPARM void arm820(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STMW_ALL;
     STM_FINISH;
@@ -2311,7 +2336,7 @@ static INSN_REGPARM void arm830(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2326,7 +2351,7 @@ static INSN_REGPARM void arm840(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL_2;
     STM_FINISH;
@@ -2339,7 +2364,7 @@ static INSN_REGPARM void arm850(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
@@ -2353,7 +2378,7 @@ static INSN_REGPARM void arm860(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STMW_ALL_2;
     STM_FINISH;
@@ -2366,7 +2391,7 @@ static INSN_REGPARM void arm870(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (temp + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((temp + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     if (!(opcode & (1U << base)))
@@ -2381,7 +2406,7 @@ static INSN_REGPARM void arm880(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL;
     STM_FINISH;
@@ -2393,7 +2418,7 @@ static INSN_REGPARM void arm890(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2405,7 +2430,7 @@ static INSN_REGPARM void arm8A0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL;
@@ -2419,7 +2444,7 @@ static INSN_REGPARM void arm8B0(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2433,7 +2458,7 @@ static INSN_REGPARM void arm8C0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL_2;
     STM_FINISH;
@@ -2445,7 +2470,7 @@ static INSN_REGPARM void arm8D0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
@@ -2458,7 +2483,7 @@ static INSN_REGPARM void arm8E0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL_2;
@@ -2472,7 +2497,7 @@ static INSN_REGPARM void arm8F0(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = reg[base].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[base].I & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     if (!(opcode & (1U << base)))
@@ -2488,7 +2513,7 @@ static INSN_REGPARM void arm900(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL;
     STM_FINISH;
@@ -2501,7 +2526,7 @@ static INSN_REGPARM void arm910(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2514,7 +2539,7 @@ static INSN_REGPARM void arm920(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STMW_ALL;
     STM_FINISH;
@@ -2527,7 +2552,7 @@ static INSN_REGPARM void arm930(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2542,7 +2567,7 @@ static INSN_REGPARM void arm940(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL_2;
     STM_FINISH;
@@ -2555,7 +2580,7 @@ static INSN_REGPARM void arm950(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
@@ -2569,7 +2594,7 @@ static INSN_REGPARM void arm960(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STMW_ALL_2;
     STM_FINISH;
@@ -2582,7 +2607,7 @@ static INSN_REGPARM void arm970(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I - 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = temp & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(temp & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     if (!(opcode & (1U << base)))
@@ -2597,7 +2622,7 @@ static INSN_REGPARM void arm980(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL;
     STM_FINISH;
@@ -2609,7 +2634,7 @@ static INSN_REGPARM void arm990(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2621,7 +2646,7 @@ static INSN_REGPARM void arm9A0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL;
@@ -2635,7 +2660,7 @@ static INSN_REGPARM void arm9B0(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL;
     LDM_FINISH;
@@ -2649,7 +2674,7 @@ static INSN_REGPARM void arm9C0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     STM_ALL_2;
     STM_FINISH;
@@ -2661,7 +2686,7 @@ static INSN_REGPARM void arm9D0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     LDM_ALL_2B;
@@ -2674,7 +2699,7 @@ static INSN_REGPARM void arm9E0(uint32_t opcode)
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 0xFF] + cpuBitsSet[(opcode >> 8) & 255]);
     STMW_ALL_2;
@@ -2688,7 +2713,7 @@ static INSN_REGPARM void arm9F0(uint32_t opcode)
         busPrefetch = busPrefetchEnable;
     int base = (opcode & 0x000F0000) >> 16;
     uint32_t temp = reg[base].I + 4 * (cpuBitsSet[opcode & 255] + cpuBitsSet[(opcode >> 8) & 255]);
-    uint32_t address = (reg[base].I + 4) & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits((reg[base].I + 4) & 0xFFFFFFFC, reg[base].I);
     int count = 0;
     LDM_ALL_2;
     if (!(opcode & (1U << base)))
@@ -2751,7 +2776,12 @@ static INSN_REGPARM void armE80(uint32_t opcode)
 // SWI <comment>
 static INSN_REGPARM void armF00(uint32_t opcode)
 {
-    clockTicks = (codeTicksAccessSeq32(armNextPC) * 2) + codeTicksAccess32(armNextPC) + 3;
+    // SWI is 2S+1N with the pipeline refill at the exception vector
+    // (0x08, BIOS: 32-bit bus, zero waits -> 3 cycles total), NOT at the
+    // caller's region. Charging the refill at armNextPC added the
+    // caller's ROM waitstates to every SWI (the suite's "CpuSet"
+    // ARM-caller timing tests, +8..+11 vs hardware, waitstate-scaled).
+    clockTicks = 3;
     busPrefetchCount = 0;
     busPrefetchFrac = 0;
     CPUSoftwareInterrupt(opcode & 0x00FFFFFF);
@@ -2961,6 +2991,7 @@ static insnfunc_t armInsnTable[4096] = {
 
 #if 0
 #include <time.h>
+
 static void tester(void) {
   static int ran=0;if(ran)return;ran=1;
   FILE*f=fopen("p:\\timing.txt","w");if(!f)return;
@@ -3120,6 +3151,10 @@ int armExecute()
             return 0;
         if (clockTicks == 0)
             clockTicks = 1 + codeTicksAccessSeq32(oldArmNextPC);
+        // Fold any PPU VRAM bus-contention stall accrued by this instruction's
+        // VRAM accesses into its cycle count.
+        { extern int vramContentionCycles;
+          if (vramContentionCycles) { clockTicks += vramContentionCycles; vramContentionCycles = 0; } }
         cpuTotalTicks += clockTicks;
         cpuAbsCycle   += clockTicks;
 

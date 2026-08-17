@@ -25,6 +25,7 @@
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
 #include "core/gba/gba.h"
+#include "core/gba/gbaLink.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaSound.h"
@@ -799,6 +800,7 @@ int main(int argc, char** argv) {
     const char* rom_path = nullptr;
     const char* bios_arg = nullptr;
     bool force_hle = false;
+    int link_mode = 0;
     int min_pass = -1;            // CI baseline; see gba.suite test in CMake.
     for (int i = 1; i < argc; ++i) {
         const char* a = argv[i];
@@ -809,6 +811,10 @@ int main(int argc, char** argv) {
             force_hle = true;
         } else if (std::strcmp(a, "--min-pass") == 0 && i + 1 < argc) {
             min_pass = std::atoi(argv[++i]);
+        } else if (std::strcmp(a, "--link") == 0 && i + 1 < argc) {
+            // Bring up a link driver with no peer (the UI's "start
+            // linking" with a link type selected on a single machine).
+            link_mode = std::atoi(argv[++i]);
         } else if (!rom_path) {
             rom_path = a;
         }
@@ -906,6 +912,13 @@ int main(int argc, char** argv) {
     }
     SetSaveType(2);
     soundInit();
+#ifndef NO_LINK
+    if (link_mode) {
+        ConnectionState st = InitLink((LinkMode)link_mode);
+        fprintf(stderr, "suite_runner: link mode %d -> state %d\n",
+                link_mode, (int)st);
+    }
+#endif
     CPUReset();
     emulating = 1;
 

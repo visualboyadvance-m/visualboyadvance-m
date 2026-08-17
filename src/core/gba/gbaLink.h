@@ -133,6 +133,13 @@ extern int GetLinkPlayerId();
  * @param siocnt the value of SIOCNT to be written
  */
 extern void StartLink(uint16_t siocnt);
+// True when the active link driver itself drives the Normal-mode transfer
+// this SIOCNT write starts (currently only the wireless adapter in
+// Normal-32, whose emulated adapter is the far end). The caller skips the
+// stand-alone cycle-accurate completion event in that case; every other
+// configuration -- no driver, cable drivers, RFU in Normal-8 -- behaves as
+// a dangling cable and takes the stand-alone path.
+extern bool LinkOwnsNormalSio(uint16_t siocnt);
 
 /**
  * Start a general purpose link transfer

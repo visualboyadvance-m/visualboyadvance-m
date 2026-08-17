@@ -1,6 +1,9 @@
 #ifndef VBAM_CORE_GBA_GBACPU_H_
 #define VBAM_CORE_GBA_GBACPU_H_
 
+#include <cstdlib>
+
+
 #include <cstdint>
 
 #include "core/base/system.h"
@@ -86,6 +89,9 @@ extern bool g_dmaBreakSkipOne; // that access slipped in pre-DMA; skip it
 // Waitstates when accessing data
 inline int dataTicksAccess16(uint32_t address) // DATA 8/16bits NON SEQ
 {
+    if ((address >> 24) >= 0x10) {
+        return 0;  // unmapped: no cart bus activity (see dataTicksAccess32)
+    }
     int addr = (address >> 24) & 15;
     int value = memoryWait[addr];
 
@@ -105,6 +111,19 @@ inline int dataTicksAccess16(uint32_t address) // DATA 8/16bits NON SEQ
 
 inline int dataTicksAccess32(uint32_t address) // DATA 32bits NON SEQ
 {
+    if ((address >> 24) >= 0x10) {
+        // True unmapped region (open bus): the access never reaches the
+        // cart bus, so it costs no waitstates AND leaves the GamePak
+        // prefetcher undisturbed. The &15 fold below would misclassify
+        // it as BIOS-region and kill busPrefetch on every open-bus read
+        // (the mGBA suite's "DMA Prefetch" Break test: its LDM loop from
+        // 0x10000000 must keep the ROM prefetcher hot between fetches,
+        // as it does on hardware). The access itself is a single
+        // internal cycle; the LDM/LDR base charges already assume a
+        // 1-cycle bus slot, so the adjustment (relative to that model)
+        // is negative -- net zero against the base charge.
+        return 0;
+    }
     int addr = (address >> 24) & 15;
     int value = memoryWait32[addr];
 
@@ -124,6 +143,9 @@ inline int dataTicksAccess32(uint32_t address) // DATA 32bits NON SEQ
 
 inline int dataTicksAccessSeq16(uint32_t address) // DATA 8/16bits SEQ
 {
+    if ((address >> 24) >= 0x10) {
+        return 0;  // unmapped: no cart bus activity (see dataTicksAccess32)
+    }
     int addr = (address >> 24) & 15;
     int value = memoryWaitSeq[addr];
 
@@ -143,6 +165,9 @@ inline int dataTicksAccessSeq16(uint32_t address) // DATA 8/16bits SEQ
 
 inline int dataTicksAccessSeq32(uint32_t address) // DATA 32bits SEQ
 {
+    if ((address >> 24) >= 0x10) {
+        return 0;  // unmapped: no cart bus activity (see dataTicksAccess32)
+    }
     int addr = (address >> 24) & 15;
     int value = memoryWaitSeq32[addr];
 

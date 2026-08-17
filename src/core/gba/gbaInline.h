@@ -1,11 +1,14 @@
 #ifndef VBAM_CORE_GBA_GBAINLINE_H_
 #define VBAM_CORE_GBA_GBAINLINE_H_
 
+#include <cstdlib>
+#include <cstdio>
 #include <cstdint>
 #include <cstdlib>
 #include <type_traits>
 
 #include "core/base/port.h"
+#include "core/gba/gbaScheduler.h"
 #include "core/base/script_hooks.h"
 #include "core/base/system.h"
 #include "core/gba/gbaCpu.h"
@@ -21,6 +24,16 @@
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 extern const uint32_t objTilesAddress[3];
+
+// PPU VRAM fetch-slot occupancy bits, keyed into kVramFetchSlots. Each bit
+// marks a background layer (text 4bpp / text 8bpp / affine BG2 / affine BG3 /
+// bitmap) that consumes VRAM fetch bandwidth on a given slot of the PPU's
+// 32-cycle fetch cadence.
+#define VRAM_FETCH_T4(X) (0x011u << (X))
+#define VRAM_FETCH_T8(X) (0x010u << (X))
+#define VRAM_FETCH_AFF2    0x100u
+#define VRAM_FETCH_AFF3    0x200u
+#define VRAM_FETCH_BMP     0x400u
 
 // =====================================================================
 // VBAM_HB_TRACE: ad-hoc cycle-level instrumentation. Default OFF -- every
@@ -197,6 +210,55 @@ static inline int16_t Downcast16(int32_t value) {
     return static_cast<int16_t>(value);
 }
 
+// --- PPU/CPU VRAM bus-contention helpers -------------------------------------
+extern unsigned bgFetchMask;
+extern int lcdTicks;
+extern const uint16_t kVramFetchSlots[32];
+
+static inline int computeVramContentionStall(int wait, int extra) {
+    // lcdTicks counts down to the next LCD event (the HBlank start while
+    // in HDraw), giving the PPU's phase within the scanline; it advances
+    // only at batch boundaries, so subtract the CPU's progress into the
+    // current batch for the live position at this access. -until & 0x1F
+    // selects the current slot of the 32-cycle VRAM fetch cadence. The
+    // loop walks forward to the first slot the PPU leaves free (skipping
+    // one extra free slot for a wide 32-bit access, which needs two).
+    // If every examined slot is occupied, the CPU waits until the PPU
+    // releases the bus at HBlank -- `until` exactly (the mask is zeroed
+    // on HBlank entry, so this fallback only arises mid-HDraw). The
+    // access's own duration absorbs the head of the stall (stall -= wait).
+    extern int cpuTotalTicks;
+    int32_t until = lcdTicks - cpuTotalTicks;
+    if (until <= 0) return 0;
+    int period = (-until) & 0x1F;
+    int32_t stall = until;
+    for (int i = 0; i < 16; ++i) {
+        if (!(kVramFetchSlots[(period + i) & 0x1F] & bgFetchMask)) {
+            if (!extra) { stall = i; break; }
+            --extra;
+        }
+    }
+    stall -= wait;
+    if (stall < 0) return 0;
+    return stall;
+}
+
+// Charge VRAM bus contention for a BG-VRAM access. `origAddr` is the masked
+// VRAM offset; `wide` marks a 32-bit access. The stall is accumulated into
+// vramContentionCycles and folded into the instruction's clockTicks by the CPU
+// core. OBJ (sprite) VRAM sits above the BG region and is fetched on a separate
+// path, so it does not contend here.
+static inline void chargeVramContention(unsigned origAddr, bool wide) {
+    if (!bgFetchMask) return;
+    const unsigned mode = DISPCNT & 7;
+    const unsigned gate = (mode >= 3) ? 0x14000u : 0x10000u;
+    if ((origAddr & 0x1FFFF) >= gate) return; // OBJ VRAM: no contention
+    extern int vramContentionCycles;
+    // 16-bit VRAM accesses take the base cycle (wait 0); 32-bit split into
+    // two halfword slots (wait 1) and reserve two free fetch slots.
+    vramContentionCycles += computeVramContentionStall(wide ? 1 : 0, wide ? 1 : 0);
+}
+
 template<typename T>
 static inline uint8_t DowncastU8(T value) {
     static_assert(std::is_integral<T>::value, "Integral type required.");
@@ -224,13 +286,54 @@ static inline uint32_t CPUReadOpenBus()
        at event service, so within the DMA's event batch it measures cycles
        since the DMA ran. */
     {
-        extern uint64_t g_eventBatchId, g_dmaFireBatchId;
-        extern int cpuTotalTicks;
-        /* The window is one ROM non-sequential access: the prefetcher's
-           first refill fetch after the DMA releases the bus. */
-        if (g_eventBatchId == g_dmaFireBatchId
-            && cpuTotalTicks <= memoryWait[0x08] + 1)
-            return cpuDmaBusValue;
+        extern uint32_t g_dmaOpenBusPC;
+        /* The last DMA's bus word remains visible to open-bus reads for
+           exactly one instruction slot after the transfer (the reading
+           pc is one instruction width past the pc that was pending when
+           the DMA ran). armNextPC here is the pc of the instruction
+           doing this read; g_dmaOpenBusPC was the pending pc when the
+           DMA ran. */
+        /* Hardware grants an HBlank DMA the bus mid-instruction: when
+           the grant lands inside the reading instruction's own span --
+           after its opcode fetch, before its data cycle -- the data
+           read returns the DMA's word.
+           In this batch model the reader has already started when the
+           deferred kSchedHdma event is still pending, so peek: if the
+           fire is due within the reader's span, return the word the
+           DMA is about to drive (its source data). The complementary
+           boundary case -- the transfer ran in the gap right before
+           the reader started (pending == reader) -- reads the freshly
+           latched cpuDmaBusValue. */
+        {
+            extern uint32_t dma3Source;
+            extern int cpuTotalTicks;
+            if (gbaScheduler::IsScheduled(kSchedHdma) && (DM3CNT_H & 0x8000)) {
+                /* Grant window: after the reader's opcode fetch
+                   completes (>= 3 at seq-ROM cost) and before its data
+                   cycle (the 7-cycle unmapped LDM's data slot). A grant
+                   landing during the fetch waits for it and still owns
+                   the bus at the data cycle; one landing at/after the
+                   data cycle is too late. */
+                /* The activation must land strictly inside the reading
+                   instruction's opcode fetch: an activation at the
+                   fetch's own start is consumed by that fetch and the
+                   latch is refreshed away. Window (0, 3] at seq-ROM
+                   fetch cost. */
+                static const int winLo = 1;
+                static const int winHi = 4;
+                /* The scheduler cursor sits at the batch start; the read
+                   executes cpuTotalTicks into the batch. */
+                extern int64_t g_hdmaActAbs;
+                extern int64_t cpuAbsCycle;
+                const int rel = (int)(g_hdmaActAbs - cpuAbsCycle);
+
+                if (rel >= winLo && rel < winHi)
+                    return CPUReadMemoryQuick(dma3Source);
+            }
+            /* A transfer that completed before this instruction's own
+               opcode fetch is never visible: the fetch refreshes the
+               bus latch. No boundary case. */
+        }
     }
 
     /* THUMB: compose 32-bit from last fetched halfwords according to region/alignment */
@@ -379,6 +482,7 @@ static inline uint32_t CPUReadMemory(uint32_t address)
         value = READ32LE(((uint32_t*)&g_paletteRAM[address & 0x3fC]));
         break;
     case REGION_VRAM: {
+        chargeVramContention(address & 0x1FFFF, true);
         unsigned addr = (address & 0x1fffc);
         if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
@@ -627,6 +731,7 @@ static inline uint32_t CPUReadHalfWord(uint32_t address)
         value = READ16LE(((uint16_t*)&g_paletteRAM[address & 0x3fe]));
         break;
     case REGION_VRAM: {
+        chargeVramContention(address & 0x1FFFF, false);
         unsigned addr = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((addr & 0x1C000) == 0x18000)) {
             value = 0;
@@ -767,6 +872,7 @@ static inline uint8_t CPUReadByte(uint32_t address)
     case REGION_PRAM:
         return g_paletteRAM[address & 0x3ff];
     case REGION_VRAM:
+        chargeVramContention(address & 0x1FFFF, false);
         address = (address & 0x1ffff);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return 0;
@@ -886,6 +992,7 @@ static inline void CPUWriteMemory(uint32_t address, uint32_t value)
             WRITE32LE(((uint32_t*)&g_paletteRAM[address & 0x3FC]), value);
         break;
     case REGION_VRAM:
+        chargeVramContention(address & 0x1FFFF, true);
         address = (address & 0x1fffc);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;
@@ -1004,6 +1111,7 @@ static inline void CPUWriteHalfWord(uint32_t address, uint16_t value)
             WRITE16LE(((uint16_t*)&g_paletteRAM[address & 0x3fe]), value);
         break;
     case REGION_VRAM:
+        chargeVramContention(address & 0x1FFFF, false);
         address = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;
@@ -1180,6 +1288,7 @@ static inline void CPUWriteByte(uint32_t address, uint8_t b)
         *((uint16_t*)&g_paletteRAM[address & 0x3FE]) = (b << 8) | b;
         break;
     case REGION_VRAM:
+        chargeVramContention(address & 0x1FFFF, false);
         address = (address & 0x1fffe);
         if (((DISPCNT & 7) > 2) && ((address & 0x1C000) == 0x18000))
             return;

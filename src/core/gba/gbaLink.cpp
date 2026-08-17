@@ -1739,6 +1739,15 @@ ConnectionState InitLink(LinkMode mode)
     return gba_connection_state;
 }
 
+bool LinkOwnsNormalSio(uint16_t siocnt)
+{
+    if (!linkDriver || !linkDriver->start || gba_connection_state != LINK_OK)
+        return false;
+    if (linkDriver->mode != LINK_RFU_IPC && linkDriver->mode != LINK_RFU_SOCKET)
+        return false;
+    return GetSIOMode(siocnt, READ16LE(&g_ioMem[COMM_RCNT])) == NORMAL32;
+}
+
 void StartLink(uint16_t siocnt)
 {
     // Only drive a real transfer once the connection is fully established.
@@ -2687,6 +2696,16 @@ void StartCableSocket(uint16_t value)
 {
     switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case MULTIPLAYER: {
+        if (!linkid && lanlink.numslaves == 0) {
+        // No session peer: nothing is attached, so this is the bare
+        // console. Registers take the stand-alone hardware masking, and
+        // a lone master's Multi transfer never completes -- SD reads low
+        // with no other unit driving it, so the start bit stays busy and
+        // no serial IRQ fires (the suite's Multi timing tests
+        // encode exactly this as their bare-hardware timeout).
+        SioStandaloneSiocntWrite(value);
+        break;
+        }
         bool start = (value & 0x80) && !linkid && !transfer_direction;
         // clear start, seqno, si (RO on slave, start = pulse on master)
         value &= 0xff4b;
@@ -2736,7 +2755,10 @@ void StartCableSocket(uint16_t value)
     case NORMAL32:
     case UART:
     default:
-        UPDATE_REG(COMM_SIOCNT, value);
+        // No cable-driver transfer exists for these modes: behave as a
+        // dangling cable (hardware-masked register commit; the
+        // cycle-accurate kSchedSio event drives completion).
+        SioStandaloneSiocntWrite(value);
         break;
     }
 }
@@ -3587,7 +3609,13 @@ static void StartRFUSocket(uint16_t value)
     switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case NORMAL8:
         rfu_polarity = 0;
-        UPDATE_REG(COMM_SIOCNT, value);
+        SioStandaloneSiocntWrite(value);
+        return;
+    case MULTIPLAYER:
+    case UART:
+        // The wireless adapter does not participate in Multi or UART
+        // mode: bare-console stand-alone semantics.
+        SioStandaloneSiocntWrite(value);
         return;
         break;
     case NORMAL32:
@@ -4784,6 +4812,16 @@ static void StartCableIPC(uint16_t value)
 {
     switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case MULTIPLAYER: {
+        if (linkmem->numgbas <= 1) {
+        // No session peer: nothing is attached, so this is the bare
+        // console. Registers take the stand-alone hardware masking, and
+        // a lone master's Multi transfer never completes -- SD reads low
+        // with no other unit driving it, so the start bit stays busy and
+        // no serial IRQ fires (the suite's Multi timing tests
+        // encode exactly this as their bare-hardware timeout).
+        SioStandaloneSiocntWrite(value);
+        break;
+        }
         bool start = (value & 0x80) && !linkid && !transfer_direction;
         // clear start, seqno, si (RO on slave, start = pulse on master)
         value &= 0xff4b;
@@ -4899,7 +4937,10 @@ static void StartCableIPC(uint16_t value)
     case NORMAL32:
     case UART:
     default:
-        UPDATE_REG(COMM_SIOCNT, value);
+        // No cable-driver transfer exists for these modes: behave as a
+        // dangling cable (hardware-masked register commit; the
+        // cycle-accurate kSchedSio event drives completion).
+        SioStandaloneSiocntWrite(value);
         break;
     }
 }
@@ -5254,7 +5295,13 @@ static void StartRFU(uint16_t value)
     switch (GetSIOMode(value, READ16LE(&g_ioMem[COMM_RCNT]))) {
     case NORMAL8:
         rfu_polarity = 0;
-        UPDATE_REG(COMM_SIOCNT, value);
+        SioStandaloneSiocntWrite(value);
+        return;
+    case MULTIPLAYER:
+    case UART:
+        // The wireless adapter does not participate in Multi or UART
+        // mode: bare-console stand-alone semantics.
+        SioStandaloneSiocntWrite(value);
         return;
         break;
     case NORMAL32:

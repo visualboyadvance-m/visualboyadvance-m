@@ -22,3 +22,4 @@ compile_commands.json
 
 # online updates header
 src/wx/winsparkle-path.h
+*.patch

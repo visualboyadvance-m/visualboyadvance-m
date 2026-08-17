@@ -11,12 +11,27 @@
 #include "core/gba/gbaInline.h"
 #include "core/gba/gbaGlobals.h"
 
+// 8-bit-bus backup regions (SRAM/flash, 0x0E-0x0F) see the CPU's
+// untranslated low address lines: a 32-bit LDM/STM with an unaligned
+// base fetches/stores the byte at the unaligned address (mGBA test suite
+// "SRAM load swi B/C 32 (unaligned)" -- the real-BIOS CpuSet copy
+// loops are bare LDM/STM). Word-bus regions mask A[1:0] internally,
+// and the SRAM byte-broadcast read is rotation-invariant, so
+// preserving the low bits for backup-region bases only is safe
+// against CPUReadMemory's LDR rotate tail.
+static inline uint32_t blockXferSramLowBits(uint32_t address, uint32_t base) {
+    if ((base >> 25) == 7)  // regions 0x0E / 0x0F
+        address |= base & 3;
+    return address;
+}
+
 #if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
 #ifdef PROFILING
 #include "prof/prof.h"
+
 #endif
 
 #ifdef _MSC_VER
@@ -1725,7 +1740,7 @@ static INSN_REGPARM void thumbC0(uint32_t opcode)
     uint8_t regist = (opcode >> 8) & 7;
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
-    uint32_t address = reg[regist].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[regist].I & 0xFFFFFFFC, reg[regist].I);
     uint32_t temp = reg[regist].I + 4 * cpuBitsSet[opcode & 0xff];
     int count = 0;
     // store
@@ -1746,7 +1761,7 @@ static INSN_REGPARM void thumbC8(uint32_t opcode)
     uint8_t regist = (opcode >> 8) & 7;
     if (busPrefetchCount == 0)
         busPrefetch = busPrefetchEnable;
-    uint32_t address = reg[regist].I & 0xFFFFFFFC;
+    uint32_t address = blockXferSramLowBits(reg[regist].I & 0xFFFFFFFC, reg[regist].I);
     uint32_t temp = reg[regist].I + 4 * cpuBitsSet[opcode & 0xFF];
     int count = 0;
     // load
@@ -2161,6 +2176,10 @@ int thumbExecute()
             return 0;
         if (clockTicks == 0)
             clockTicks = codeTicksAccessSeq16(oldArmNextPC) + 1;
+        // Fold any PPU VRAM bus-contention stall accrued by this instruction's
+        // VRAM accesses into its cycle count.
+        { extern int vramContentionCycles;
+          if (vramContentionCycles) { clockTicks += vramContentionCycles; vramContentionCycles = 0; } }
         cpuTotalTicks += clockTicks;
         cpuAbsCycle   += clockTicks;
 

@@ -177,6 +177,16 @@ int IRQTicks = 0;
 // IRQs in tight handler loops have minimal inter-IRQ latency).
 int IRQRecentTicks = 0;
 
+// LCD HDraw phase length: where the per-line HBlank event (DISPSTAT flag,
+// HBlank DMA trigger, IRQ-raise chain, scanline render) fires. Hardware
+// sets the HBlank flag at cycle 1006 of the 1232-cycle line (960 visible
+// + 46 fetch tail); the legacy grid used 1008.
+static int lcdHDrawLen()
+{
+    return 1008;
+}
+
+
 uint32_t mastercode = 0;
 int layerEnableDelay = 0;
 bool busPrefetch = false;
@@ -203,6 +213,18 @@ uint32_t cpuDmaPC = 0;
 int dummyAddress = 0;
 uint32_t cpuDmaLatchData[4];
 uint32_t cpuDmaBusValue = 0;
+// PC of the instruction pending when the last DMA ran: the DMA's last
+// bus word is visible to open-bus reads for exactly one instruction
+// slot after the transfer (the reading pc sits one instruction width
+// past this one).
+uint32_t g_dmaOpenBusPC = 0xFFFFFFFF;
+// Attribution the generic doDMA path added to cpuAbsCycle for the current
+// transfer; the event-triggered charging revokes it (see the unified-clock
+// stall block).
+int g_dmaEventAttrib = 0;
+// Absolute-time (cpuAbsCycle-domain) stamp of the pending HBlank-DMA
+// activation, for the open-bus visibility window.
+int64_t g_hdmaActAbs = -1;
 // Event-batch bookkeeping for the DMA bus-release window: g_eventBatchId
 // increments at each event service; a DMA that ran during event processing
 // tags the batch, and an open-bus read early in that batch (within the
@@ -222,6 +244,87 @@ bool g_dmaEventTriggered = false;
 bool g_dmaBreakSkipOne = false;
 
 
+
+// PPU/CPU VRAM bus contention. During active display the PPU fetches BG
+// tile, map and affine data over the VRAM bus; a CPU access to the same
+// region is held until the PPU releases it. bgFetchMask records which of the
+// 32 fetch slots the PPU occupies for the current DISPCNT configuration;
+// vramContentionCycles accumulates the stall for the in-flight instruction.
+// See gbaInline.h for computeVramContentionStall/chargeVramContention. This is
+// what lets games that race a VRAM write against the PPU fetch pattern (e.g.
+// the Madden coin-toss screen) compose correctly.
+unsigned bgFetchMask = 0;
+int vramContentionCycles = 0;
+
+const uint16_t kVramFetchSlots[32] = {
+    VRAM_FETCH_T4(0) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(1) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(2) | VRAM_FETCH_AFF2,
+    VRAM_FETCH_T4(3) | VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_T4(0) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(1) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(2) | VRAM_FETCH_AFF2,
+    VRAM_FETCH_T4(3) | VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF2,
+    VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_T8(0) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T8(1) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T8(2) | VRAM_FETCH_AFF2,
+    VRAM_FETCH_T8(3) | VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF2,
+    VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_T4(0) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(1) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T4(2) | VRAM_FETCH_AFF2,
+    VRAM_FETCH_T4(3) | VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF3,
+    VRAM_FETCH_AFF2,
+    VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+    VRAM_FETCH_T8(0) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T8(1) | VRAM_FETCH_AFF3,
+    VRAM_FETCH_T8(2) | VRAM_FETCH_AFF2,
+    VRAM_FETCH_T8(3) | VRAM_FETCH_AFF2 | VRAM_FETCH_BMP,
+};
+
+static unsigned computeBgFetchMask(uint16_t dispcnt) {
+    if (dispcnt & 0x0080) return 0;
+    unsigned mask = 0;
+    const unsigned mode = dispcnt & 7;
+    const bool bg0 = (dispcnt & 0x0100) != 0;
+    const bool bg1 = (dispcnt & 0x0200) != 0;
+    const bool bg2 = (dispcnt & 0x0400) != 0;
+    const bool bg3 = (dispcnt & 0x0800) != 0;
+    switch (mode) {
+    case 0:
+        if (bg0) mask |= (BG0CNT & 0x0080) ? VRAM_FETCH_T8(0) : VRAM_FETCH_T4(0);
+        if (bg1) mask |= (BG1CNT & 0x0080) ? VRAM_FETCH_T8(1) : VRAM_FETCH_T4(1);
+        if (bg2) mask |= (BG2CNT & 0x0080) ? VRAM_FETCH_T8(2) : VRAM_FETCH_T4(2);
+        if (bg3) mask |= (BG3CNT & 0x0080) ? VRAM_FETCH_T8(3) : VRAM_FETCH_T4(3);
+        break;
+    case 1:
+        if (bg0) mask |= (BG0CNT & 0x0080) ? VRAM_FETCH_T8(0) : VRAM_FETCH_T4(0);
+        if (bg1) mask |= (BG1CNT & 0x0080) ? VRAM_FETCH_T8(1) : VRAM_FETCH_T4(1);
+        if (bg2) mask |= VRAM_FETCH_AFF2;
+        break;
+    case 2:
+        if (bg2) mask |= VRAM_FETCH_AFF2;
+        if (bg3) mask |= VRAM_FETCH_AFF3;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        if (bg2) mask |= VRAM_FETCH_BMP;
+        break;
+    default:
+        break;
+    }
+    return mask;
+}
 
 const uint32_t cpuDmaSrcMask[4] = { 0x07ffffff, 0x0fffffff, 0x0fffffff, 0x0fffffff };
 const uint32_t cpuDmaDstMask[4] = { 0x07ffffff, 0x07ffffff, 0x07ffffff, 0x0fffffff };
@@ -321,24 +424,27 @@ static int timerPhaseBias()
 }
 // Halt-wake epilogue cost in cycles (see kSchedIrq dispatch and
 // CPUUpdateFlags): the BIOS IntrWait flag-check + return-to-caller path
-// costs a few more cycles than our ARM core attributes. Calibrated against
-// the mGBA suite's Timer count-up tests, whose free-running-prescaler
-// phases observe this segment mod the prescale period: jointly with the
-// disable-freeze offset, 5 minimizes the phase error across the 6b/8b/10b
-// prescaler groups (a sweep of 0..72 leaves every non-timer suite
-// unchanged and moves the timer group from 217 failures at the old value
-// 16 down to 36). Env knob VBAM_HALT_WAKE for calibration sweeps.
+// costs a few more cycles than our ARM core attributes. Constrained by
+// the timer count-up tests, whose free-running-prescaler phases observe
+// this segment mod the prescale period; includes the halted-wake entry
+// discount absorbed back into this residual.
 static int haltWakeCycles()
 {
     static int v = [] {
         const char* e = getenv("VBAM_HALT_WAKE");
-        return e ? atoi(e) : 5;
+        return e ? atoi(e) : 7;
     }();
     return v;
 }
 // Pending post-handler charge armed by a halt-wake IRQ delivery; applied at
 // the handler's exception return (armIrqEnable false->true transition).
 static int pendingWakeCharge = 0;
+// True while the innermost CPUUpdateFlags call originates from a real
+// mode switch (exception entry/return), as opposed to an MSR that only
+// alters flags/IRQ-disable within the current mode. Lets the halt-wake
+// epilogue charge distinguish a handler's true exception return from a
+// mid-handler nested-IRQ MSR enable.
+static bool cpuModeSwitching = false;
 // A kSchedIrq dispatch that found IF&IE pending but could not deliver
 // (CPSR I-flag set inside a handler, or IME off) means the hardware IRQ
 // synchronization delay has already elapsed while delivery was blocked.
@@ -346,7 +452,7 @@ static int pendingWakeCharge = 0;
 // is taken with only the short re-synchronization latency below (2, the
 // value at which every chained configuration of the suite's Timer
 // count-up tests matches hardware), not a fresh full delivery delay.
-// Env knob VBAM_IRQ_RETURN for sweeps.
+//
 static bool irqDelayMatured = false;
 static int irqMaturedDelay()
 {
@@ -366,7 +472,7 @@ uint8_t timerPeriod1Armed = 0;
 // ARM exception-entry cost charged inside CPUInterrupt (the rest of the
 // total hardware IRQ latency is the scheduled delay in CPUTestIRQ; the
 // split keeps the total constant while moving the preemption point
-// earlier). Env knob VBAM_IRQ_ENTRY for calibration sweeps.
+// earlier).
 static int irqEntryCost()
 {
     static int v = [] {
@@ -381,7 +487,7 @@ static int irqEntryCost()
 // -2 read offset in gbaTimerLiveRead: the counter still takes the tick
 // on the commit cycle itself before it stops (sharp calibration optimum
 // -- the suite's short-period count-up configs freeze exactly on period
-// boundaries). Env knob VBAM_TIMER_FREEZE for sweeps.
+// boundaries).
 static int timerFreezeOffset()
 {
     static int v = [] {
@@ -885,13 +991,10 @@ void cpuEnableProfiling(int hz)
 // (re)arm the kSchedIrq scheduler event. Call from any site that
 // mutates IF, IE, or IME.
 //
-// Three latency regimes, tuned empirically to vbam's CPU instruction
-// cycle accounting (which differs from mgba's by ~28 cycles through
-// the IRQ-vector + BIOS-IntrWait-return path -- see the SIO `+35`
-// comment for details). Using mgba's single-constant model directly
-// would shift every IRQ-driven measurement by 28 cycles, breaking
-// SIO/Video/r76 misc-edge calibration; we keep vbam's tiered model
-// until the underlying CPU cycle accounting is reworked.
+// Three latency regimes, matched to this core's CPU instruction cycle
+// accounting through the IRQ-vector + BIOS-IntrWait-return path (a
+// single hardware constant would need that whole path's attribution
+// reworked first).
 //
 //   * Halt-wake (holdState=true, IME and armIrqEnable set): delay = 0.
 //     Matches the legacy `holdState=false; CPUInterrupt()` end-of-
@@ -907,13 +1010,11 @@ void cpuEnableProfiling(int hz)
 //
 //   * Hardware-source (default): delay = 8 normally, 3 inside the
 //     IRQRecentTicks > 0 window (cascaded handler chains within ~130
-//     cycles of a prior IRQ). The +8 is one cycle longer than mgba's
-//     GBA_IRQ_DELAY=7 because vbam's CPUInterrupt charges one fewer
-//     cycle than mgba's ARMRaiseIRQ.
+//     cycles of a prior IRQ).
 //
 // Note: IME is NOT consulted for the schedule decision -- it gates
 // DELIVERY at kSchedIrq dispatch time, but a pending IRQ should still
-// wake from halt unconditionally on (IF & IE) per GBATEK and mgba.
+// wake from halt unconditionally on (IF & IE) per GBATEK.
 static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0,
                               bool matured_return = false)
 {
@@ -948,6 +1049,12 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0,
             return;
         static const int hwDelay = [] {
             const char* e = getenv("VBAM_IRQ_DELAY");
+            // 5: pinned by the timer count-up family (the preemption
+            // point a running CPU observes). The exception-entry share
+            // (VBAM_IRQ_ENTRY, pinned at 1 by the two suite builds'
+            // Break addresses) is invisible to a halted CPU's wait but
+            // charged at delivery, so the two constants are calibrated
+            // by disjoint observations.
             return e ? atoi(e) : 5;
         }();
         // With the matured-pending path modeling in-handler IRQ raises
@@ -2719,7 +2826,16 @@ void CPUUpdateFlags(bool breakLoop)
         // armed at kSchedIrq delivery (see pendingWakeCharge) before
         // re-testing for cascaded IRQs, so the post-halt code observes
         // the BIOS IntrWait/Halt return cost.
-        if (pendingWakeCharge) {
+        //
+        // Gate on an actual mode switch (leaving the exception mode):
+        // a handler that re-enables IRQs mid-body with an MSR (nested-
+        // IRQ pattern) has NOT returned yet -- charging there lands the
+        // epilogue cost inside the handler, ahead of handler-internal
+        // measurements (mGBA-suite misc-edge "H-blank bit start" flips read
+        // timers inside the handler; "Layer toggle 2" writes DISPCNT
+        // after the true return: the flat charge can only satisfy both
+        // when applied at the genuine return).
+        if (pendingWakeCharge && cpuModeSwitching) {
             cpuTotalTicks += pendingWakeCharge;
             cpuAbsCycle += pendingWakeCharge;
             pendingWakeCharge = 0;
@@ -2759,6 +2875,7 @@ void CPUSwitchMode(int mode, bool saveState, bool breakLoop)
     //  if(armMode == mode)
     //    return;
 
+    cpuModeSwitching = (mode != armMode);
     CPUUpdateCPSR();
 
     switch (armMode) {
@@ -2867,6 +2984,7 @@ void CPUSwitchMode(int mode, bool saveState, bool breakLoop)
     armMode = mode;
     CPUUpdateFlags(breakLoop);
     CPUUpdateCPSR();
+    cpuModeSwitching = false;
 }
 
 void CPUSwitchMode(int mode, bool saveState)
@@ -2943,17 +3061,30 @@ void CPUSoftwareInterrupt(int comment)
         return;
     }
 #endif
-    // Run HLE handlers regardless of `coreOptions.useBios`. The HLE path
-    // bakes in the cycle accounting and SRAM-region quirks the mGBA suite
-    // expects; running real-BIOS ARM code natively for these SWIs causes
-    // 17-21 cycle drift in `timing` / `sio-timing` tests and breaks SRAM
-    // 32-bit unaligned tests because the real BIOS aligns r0 with `bic`.
-    // Real BIOS remains loaded in `g_bios` for IRQ vector (0x18) and any
-    // direct g_bios reads; only SWI dispatch is HLE'd.
-    //
-    // SWIs that have no HLE handler fall through to the `default:` case,
-    // where (if real BIOS is available) we dispatch to it via the no-arg
-    // `CPUSoftwareInterrupt()` so unknown BIOS calls still work end-to-end.
+    // With a real BIOS loaded, dispatch every BIOS call natively: the
+    // BIOS routines are ordinary interruptible code on hardware, so this
+    // gives correct IRQ preemption (Advance Wars' dialog raster split),
+    // correct per-configuration cycle counts, and the hardware SRAM
+    // semantics (see blockXferSramLowBits: the LDM/STM copy loops fetch
+    // the byte at the *unaligned* address from 8-bit-bus regions).
+    // Software-only services (E-Reader 0xE0-0xE7, agbprint/debug/
+    // profiling 0xF9-0xFF above) stay HLE'd; the BIOS does not
+    // implement them.
+    if (coreOptions.useBios && (comment & 0xF8) != 0xE0) {
+        CPUSoftwareInterrupt();
+        return;
+    }
+    // HLE path (no real BIOS): the swi_cycles constants below were
+    // calibrated when the ARM SWI opcode also charged its pipeline
+    // refill at the caller's region (2S+1N there instead of at the
+    // BIOS vector). armF00 now charges the hardware-correct flat 3,
+    // so preserve the HLE calibration by charging the difference here.
+    if (armState) {
+        int entryComp = (codeTicksAccessSeq32(armNextPC) * 2)
+                      + codeTicksAccess32(armNextPC);
+        cpuTotalTicks += entryComp;
+        cpuAbsCycle += entryComp;
+    }
 #ifdef GBA_LOGGING
     if (coreOptions.useBios && (systemVerbose & VERBOSE_SWI)) {
         log("SWI: %08x at %08x (0x%08x,0x%08x,0x%08x,VCOUNT = %2d)\n", comment,
@@ -3056,8 +3187,22 @@ void CPUSoftwareInterrupt(int comment)
             }
         }
         int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
-        cpuAbsCycle += swi_cycles;
-        cpuTotalTicks += swi_cycles;
+        // Charge the routine's cycles through the SWITicks drain instead
+        // of as one atomic lump on cpuTotalTicks. The drain freezes the
+        // CPU and advances time in event-respecting chunks, so HBlank /
+        // timer events that fall inside the BIOS routine fire on
+        // schedule, and IRQ delivery preempts the remainder -- matching
+        // the interruptible BIOS code on hardware. An atomic lump delays
+        // event processing by up to the routine's whole length: Advance
+        // Wars' dialog raster split (HBlank handler matching VCOUNT ==
+        // 47 - scroll) misses its line when a Div or CpuFastSet lump
+        // straddles the HBlank, drawing entire frames with the wrong
+        // BG screen bases.
+        // `cpuNextEvent = cpuTotalTicks` ends the batch at the SWI (the
+        // HALTCNT idiom) so the drain's batch-relative chunks start at
+        // a boundary. Applied identically to SWIs 0x06-0x0C below.
+        SWITicks = swi_cycles;
+        cpuNextEvent = cpuTotalTicks;
         break;
     }
     case 0x07: {
@@ -3096,8 +3241,8 @@ void CPUSoftwareInterrupt(int comment)
             }
         }
         int swi_cycles = base + hi_bit * 12 + hi_bit / 2 - (hi_bit ? 2 : 0);
-        cpuAbsCycle += swi_cycles;
-        cpuTotalTicks += swi_cycles;
+        SWITicks = swi_cycles;
+        cpuNextEvent = cpuTotalTicks;
         break;
     }
     case 0x08: {
@@ -3122,8 +3267,8 @@ void CPUSoftwareInterrupt(int comment)
             swi_cycles += hi_bit * 6 + hi_bit * hi_bit + hi_bit / 2 - 1
                         + (hi_bit >= 16 ? 3 : 0);
         }
-        cpuAbsCycle += swi_cycles;
-        cpuTotalTicks += swi_cycles;
+        SWITicks = swi_cycles;
+        cpuNextEvent = cpuTotalTicks;
         break;
     }
     case 0x09:
@@ -3145,8 +3290,8 @@ void CPUSoftwareInterrupt(int comment)
                     if (!armState && memoryWaitSeq[8] != 2) swi_cycles -= 2;
                 }
             }
-            cpuAbsCycle += swi_cycles;
-            cpuTotalTicks += swi_cycles;
+            SWITicks = swi_cycles;
+            cpuNextEvent = cpuTotalTicks;
         }
         break;
     case 0x0A:
@@ -3154,8 +3299,8 @@ void CPUSoftwareInterrupt(int comment)
         // Real BIOS ArcTan2 calls Div+ArcTan internally.
         {
             int swi_cycles = armState ? 142 : 150;
-            cpuAbsCycle += swi_cycles;
-            cpuTotalTicks += swi_cycles;
+            SWITicks = swi_cycles;
+            cpuNextEvent = cpuTotalTicks;
         }
         break;
     case 0x0B: {
@@ -3174,8 +3319,8 @@ void CPUSoftwareInterrupt(int comment)
                     swi_cycles = (11 + memoryWait[(reg[0].I >> 24) & 0xF] + memoryWait[(reg[1].I >> 24) & 0xF]) * len;
             }
         }
-        cpuAbsCycle += swi_cycles;
-        cpuTotalTicks += swi_cycles;
+        SWITicks = swi_cycles;
+        cpuNextEvent = cpuTotalTicks;
     }
         BIOS_CpuSet();
         break;
@@ -3188,9 +3333,9 @@ void CPUSoftwareInterrupt(int comment)
         // overhead that ArcTan/Sqrt also need.
         int len = (reg[2].I & 0x1FFFFF) >> 3;
         int swi_cycles = armState ? 95 : 101;
-        // Caller-region dispatch/return correction, calibrated against
-        // the mGBA suite "CpuSet" timing test (which is CpuFastSet)
-        // across IWRAM/EWRAM/ROM callers and all WAITCNT combinations.
+        // Caller-region dispatch/return correction, covering
+        // IWRAM/EWRAM/ROM callers across all WAITCNT combinations
+        // (the mGBA suite's "CpuSet" timing test, which is CpuFastSet).
         // Beyond the flat base above, the caller-visible overhead is
         // one nonseq code fetch for ARM callers, and two nonseq + two
         // seq fetches for Thumb callers, less the fixed portion the
@@ -3209,8 +3354,8 @@ void CPUSoftwareInterrupt(int comment)
             else
                 swi_cycles += (9 + memoryWait32[(reg[0].I >> 24) & 0xF] + memoryWait32[(reg[1].I >> 24) & 0xF] + 7 * (memoryWaitSeq32[(reg[0].I >> 24) & 0xF] + memoryWaitSeq32[(reg[1].I >> 24) & 0xF] + 2)) * len;
         }
-        cpuAbsCycle += swi_cycles;
-        cpuTotalTicks += swi_cycles;
+        SWITicks = swi_cycles;
+        cpuNextEvent = cpuTotalTicks;
     }
         BIOS_CpuFastSet();
         break;
@@ -3408,6 +3553,9 @@ void CPUCompareVCOUNT()
 
 void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t c, int transfer32, bool isFIFO)
 {
+    // Open-bus persistence anchor (see g_dmaOpenBusPC): armNextPC is the
+    // instruction that resumes after this (atomic) transfer.
+    g_dmaOpenBusPC = armNextPC;
     int sm = s >> 24;
     int dm = d >> 24;
     int sw = 0;
@@ -3564,10 +3712,9 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     //
     // - IWRAM/BIOS-trigger PC for FIFO DMA (`isFIFO`): real HW does
     //   stall the CPU because the timer-clocked DMA holds the bus
-    //   regardless of where the trigger fetched from. Reference:
-    //   directaudiotest measurement loop in IWRAM -- without
-    //   attributing FIFO-DMA cycles here, the sound-DMA fires that
-    //   NBA observes don't show up in our timer reads.
+    //   regardless of where the trigger fetched from (the
+    //   directaudiotest measurement loop runs from IWRAM and must see
+    //   the sound-DMA fires in its timer reads).
     int pcRegion = (armNextPC >> 24) & 15;
     int attrib = totalTicks;
     const bool gateOpen =
@@ -3669,14 +3816,24 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
             if (attrib < 0) attrib = 0;
         }
     }
+    g_dmaEventAttrib = 0;
     if (gateOpen) {
         cpuAbsCycle += attrib;
+        g_dmaEventAttrib = attrib;
     }
     g_dmaFireBatchId = g_eventBatchId;
-    // A DMA transfer breaks any ROM burst in progress: the first cart-bus
-    // access after the DMA is non-sequential (the address latch was
-    // disturbed), and the CPU is held off the bus for the DMA's duration.
-    g_dmaBrokeBurst = true;
+    // A DMA transfer breaks any ROM burst in progress -- but only when
+    // the DMA actually occupies the cart bus (source or destination in
+    // 0x08-0x0D). A pure internal-memory transfer (e.g. the mGBA
+    // suite's "DMA Prefetch" test's IWRAM-to-IWRAM word) leaves the GamePak address
+    // latch, and any burst, undisturbed.
+    {
+        const bool dmaTouchesCart =
+            (((s >> 24) >= 0x08) && ((s >> 24) <= 0x0D)) ||
+            (((d >> 24) >= 0x08) && ((d >> 24) <= 0x0D));
+        if (dmaTouchesCart)
+            g_dmaBrokeBurst = true;
+    }
     if (g_dmaEventTriggered) {
         // Event-triggered (HBlank/VBlank) DMA: the trigger fires mid-
         // instruction, the unit takes its 2-cycle activation latency, but
@@ -3691,33 +3848,44 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
         // busy interval that extends past its own progress (the in-flight
         // instruction's overshoot, or the activation window if the
         // instruction ended sooner).
-        // Trigger-to-bus-grant latency: the DMA unit's 2-cycle activation
-        // plus the bus handover at the CPU's next access boundary.
-        // Calibrated against NanoBoyAdvance's observable timing on both
-        // suite.gba builds (see the DMA Prefetch Break reference tables).
-        const int dmaAct = 4;
+        // Trigger-to-bus-grant latency: the DMA unit takes 2 cycles from
+        // the trigger before it can hold the bus.
+        static const int dmaAct = 2;
         int stall;
         if (holdState) {
             // CPU halted: no instruction stream races the DMA's bus
             // grant; the transfer time already charged above stands and
             // the burst break lands on the first post-wake cart access.
             stall = totalTicks;
-        } else if (g_eventBatchOvershoot < dmaAct) {
-            // The trigger instruction ended inside the activation window:
-            // the next instruction's opcode fetch reaches the bus first,
-            // the DMA waits for it, then holds the bus for its full
-            // transfer. That fetch is unbroken; the one after it is the
-            // first to find the disturbed address latch.
-            stall = totalTicks;
-            g_dmaBreakSkipOne = true;
         } else {
-            // The in-flight instruction covered the activation latency;
-            // the DMA takes the bus as soon as it completes, and the CPU
-            // is stalled for whatever part of the busy interval extends
-            // past its own progress.
-            stall = (dmaAct + totalTicks) - g_eventBatchOvershoot;
-            if (stall < 0)
-                stall = 0;
+            // Cart-bus burst breaking for the first fetch after a
+            // cart-touching transfer (the skip-one machinery) still
+            // applies regardless of where the activation fell.
+            if ((((s >> 24) >= 0x08) && ((s >> 24) <= 0x0D)) ||
+                (((d >> 24) >= 0x08) && ((d >> 24) <= 0x0D)))
+                g_dmaBreakSkipOne = true;
+            // An event-triggered fire costs the CPU a constant
+            // activation + transfer: the DMA takes the bus at the CPU's
+            // first access past the activation and holds it for the
+            // whole transfer. Charge it here, immediately, on the
+            // unified clock: the clamped kSchedHdma event processes at
+            // the first instruction boundary past the activation, which
+            // is where the delay lands at this core's granularity. The
+            // generic doDMA bookkeeping above (deferred
+            // cpuDmaTicksToUpdate and the ROM-trigger cpuAbsCycle
+            // attribution) models register-armed transfers whose stall
+            // the trigger instruction absorbs; for the event-triggered
+            // case it would split the delay across two clocks that
+            // hardware keeps in lockstep, so revoke it and charge once.
+            stall = dmaAct + totalTicks;
+            cpuDmaTicksToUpdate -= totalTicks;
+            if (cpuDmaTicksToUpdate < 0)
+                cpuDmaTicksToUpdate = 0;
+            if (g_dmaEventAttrib > 0)
+                cpuAbsCycle -= g_dmaEventAttrib;
+            cpuTotalTicks += stall;
+            cpuAbsCycle += stall;
+            stall = totalTicks;  // nothing further to defer
         }
         cpuDmaTicksToUpdate += stall - totalTicks;
         if (cpuDmaTicksToUpdate < 0)
@@ -4093,7 +4261,20 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         UPDATE_REG(IO_REG_DISPCNT, DISPCNT);
 
         if (changeBGoff && VCOUNT < 160) {
-            lastBgDisableVCount = VCOUNT;
+            // Effective write line: a disable landing in the origin
+            // line's late HBlank (VCOUNT not yet advanced) belongs to
+            // the next line for latch-drain bookkeeping -- the emulated
+            // IRQ-handler chain reaches the write ~18 cycles before
+            // hardware's would (the IRQ recognition-latency attribution
+            // lives elsewhere and is load-bearing there), so a write
+            // hardware lands just after VCOUNT++
+            // can land just before it in the emulator.
+            static const int lateHb = 190;
+            const bool lateHblank = (DISPSTAT & 2)
+                && hblankIrqRaiseAbsCycle >= 0
+                && (cpuAbsCycle - hblankIrqRaiseAbsCycle) >= lateHb
+                && VCOUNT == hblankIrqRaiseVCount;
+            lastBgDisableVCount = VCOUNT + (lateHblank ? 1 : 0);
         }
 
         if (changeBGon) {
@@ -4144,7 +4325,23 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
                 // a few pixels into the row for faster commits (case 0x40)
                 // and at column 0 for slower ones (case 0x91), matching
                 // mGBA's "Layer toggle 2" reference.
-                pendingBgGlitchSpliceCol = (cycSinceIrq <= 270) ? 2 : 0;
+                // Sub-line splice column, matching the mGBA suite's "Layer
+                // toggle 2" reference (case 0x40 splices at column 2,
+                // case 0x91 at column 0). The discriminator between the
+                // two chains is their arrival time after the raise, and
+                // the two dispatch modes place the chains differently:
+                // under native SWI dispatch the busy-wait chain arrives
+                // later (>= 262) and the IntrWait-return chain earlier;
+                // under HLE dispatch the calibrated ordering is
+                // inverted (busy-wait <= 270, IntrWait-return at ~280
+                // carrying the hbWake charge).
+                static const int spliceThresh =
+                    coreOptions.useBios ? 262 : 270;
+                static const bool spliceGe =
+                    coreOptions.useBios;
+                pendingBgGlitchSpliceCol =
+                    (spliceGe ? (cycSinceIrq >= spliceThresh)
+                              : (cycSinceIrq <= spliceThresh)) ? 2 : 0;
             }
             layerEnableDelay = spillover ? 3 : 4;
             coreOptions.layerEnable = coreOptions.layerSettings & value & (~changeBGon);
@@ -4650,45 +4847,23 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
                        (int)((value & 0xFFFF) |
                              ((start_edge          ? 1 : 0) << 16) |
                              ((cycle_accurate_path ? 1 : 0) << 17)));
-        if (cycle_accurate_path) {
+#ifndef NO_LINK
+        const bool link_owns = LinkOwnsNormalSio(value);
+#else
+        const bool link_owns = false;
+#endif
+        if (cycle_accurate_path && !link_owns) {
             const int bits    = (mode == 1) ? 32 : 8;
             const int per_bit = (value & 0x02) ? 8 : 64;
-            // SIO scheduling has TWO components combined:
-            //   - bits * per_bit  : pure serial-clock time. Matches mgba's
-            //                       GBASIOTransferCycles (src/gba/sio.c)
-            //                       and NBA's bus/io.cpp table value
-            //                       (512/64/2048/256 for the four modes).
-            //                       This part is hardware-spec-derived.
-            //   - + 28            : empirical compensation for the local
-            //                       CPU instruction cycle accounting being
-            //                       ~28 cycles SHORTER than mgba's through
-            //                       the IRQ-vector-entry + BIOS-IntrWait-
-            //                       return path. mgba's BIOS+handler path
-            //                       takes ~114 cycles between IRQ-vector
-            //                       entry and the test ROM's TM0 stop
-            //                       write; ours takes ~86. The 28-cycle
-            //                       gap is in CPUInterrupt() / ARM
-            //                       exception entry cycle counts. Until
-            //                       those are reworked to match mgba, the
-            //                       SIO scheduler eats the difference
-            //                       here so the test ROM's 633-cycle
-            //                       expectation lands.
-            //   - + 7             : ARM exception-entry pipeline-fill delay
-            //                       (matches mgba's GBA_IRQ_DELAY=7).
-            //                       Folded into the SIO schedule rather
-            //                       than the kSchedIrq path because the
-            //                       halt-wake path uses delay=0 to match
-            //                       the legacy end-of-CPULoop instant-
-            //                       CPUInterrupt accounting (see
-            //                       CPUTestIRQ comments).
-            //
-            // 28 + 7 = 35: the historical "startup_overhead" constant. Now
-            // documented as the sum of two distinct (and known-imperfect)
-            // compensations rather than a single mystery value.
-            // The exception-entry cost (irqEntryCost) now delays the
-            // ROM-visible completion write by that many cycles, so deduct
-            // it here to keep the test ROM's expectation aligned.
-            const int sio_delay = bits * per_bit + 35 - irqEntryCost();
+            // The scheduled delay is the serial-clock time for the
+            // transfer plus a fixed startup residual covering the SIO
+            // unit's start latency and the completion IRQ's delivery
+            // path; the residual differs between a real-BIOS IntrWait
+            // return and the HLE handler's shortcut, and absorbs the
+            // halted-wake entry discount (the wait for this IRQ is
+            // always a halt).
+            const int sio_startup = coreOptions.useBios ? 16 : 37;
+            const int sio_delay = bits * per_bit + sio_startup - irqEntryCost();
             // [SIO] sio-sched extra = the absolute scheduled delay in
             // cycles, so the trace can be diffed against [SIO]
             // sio-complete (cyc) and against the CPU's own
@@ -5463,6 +5638,7 @@ void CPULoop(int ticks)
             ++g_eventBatchId;
             g_eventBatchOvershoot = remainingTicks;
 
+
         updateLoop:
 
             // Advance the cycle-accurate scheduler by the same "snapped"
@@ -5476,15 +5652,28 @@ void CPULoop(int ticks)
                 case kSchedSio:
                     gbaScheduler_OnSioComplete();
                     break;
-                case kSchedHblankIrqDelay:
+                case kSchedHdma:
+                    CPUCheckDMA(2, 0x0f);
+                    break;
+                case kSchedHblankIrqDelay: {
                     // (See comment block below.) IF.HBlank set 1 cycle
                     // after DISPSTAT.HBlank bit toggle.
                     IF |= 2;
                     UPDATE_REG(IO_REG_IF, IF);
                     vbam_hb_trace("hb-raise", cpuAbsCycle,
                                    (int)((IF & 0xFFFF) | ((IE & 0xFFFF) << 16)));
-                    CPUTestIRQ();
+                    // Video-sourced IRQs reach the CPU 6 cycles later
+                    // than timer/serial ones: the LCD's IF path has an
+                    // extra synchronizer stage. A delivery-side delay
+                    // shifts both endpoints
+                    // of interval measurements equally (misc-edge flip
+                    // tests unaffected) while raise-anchored chains
+                    // (Layer toggle 2 write timing, the DMA Prefetch
+                    // loop phase) stretch by the full amount.
+                    static const int hbIrqExtra = 6;
+                    CPUTestIRQ(false, hbIrqExtra);
                     break;
+                }
                 case kSchedIrq: {
                     // Unified IRQ delivery + halt-wake. Replaces the legacy
                     // intState/IRQTicks state machine and the end-of-CPULoop
@@ -5523,14 +5712,33 @@ void CPULoop(int ticks)
                         // charge, calibrated independently (misc-edge
                         // "H-blank bit start" Flip 1 anchors its first
                         // measurement at an HBlank IntrWait return).
-                        // Env knob VBAM_HB_WAKE for sweeps.
+                        // The residual halt-wake epilogue charge for
+                        // HBlank-source wakes. Under native SWI dispatch
+                        // the BIOS epilogue executes for real and the
+                        // residual collapses to ~2 cycles; under HLE
+                        // dispatch the calibrated 24 still holds (the
+                        // HLE'd SWIs shift every chain's phase).
+                        //
                         static const int hbWake = [] {
                             const char* e = getenv("VBAM_HB_WAKE");
-                            return e ? atoi(e) : 24;
+                            if (e) return atoi(e);
+                            return (coreOptions.useBios) ? 4 : 26;
                         }();
                         pendingWakeCharge = hbWake;
                     }
                     if (deliver) {
+                        // A halted CPU enters the exception 2 cycles
+                        // faster than a running one: there is no
+                        // in-flight instruction to drain before the
+                        // vector fetch. The running-CPU entry cost is
+                        // unaffected.
+                        static const int haltEntryDiscount = 2;
+                        if (was_halted && haltEntryDiscount) {
+                            int back = haltEntryDiscount;
+                            if (back > irqEntryCost()) back = irqEntryCost();
+                            cpuTotalTicks -= back;
+                            cpuAbsCycle -= back;
+                        }
                         CPUInterrupt();
                         if (IF & 0x78) {
                             IRQRecentTicks = 130;
@@ -5593,8 +5801,8 @@ void CPULoop(int ticks)
                 if (DISPSTAT & 1) { // V-BLANK
                     // if in V-Blank mode, keep computing...
                     if (DISPSTAT & 2) {
-                        lcdTicks += 1008;
-                        lcdNextEventAbsCycle += 1008;
+                        lcdTicks += lcdHDrawLen();
+                        lcdNextEventAbsCycle += lcdHDrawLen();
                         VCOUNT++;
                         UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         gfxUpdateWindowY();
@@ -5604,9 +5812,14 @@ void CPULoop(int ticks)
                     } else {
                         // GBATEK: HBlank phase is exactly 224 cycles
                         // (scanline = 1008 HDraw + 224 HBlank = 1232).
-                        lcdTicks += 224;
-                        lcdNextEventAbsCycle += 224;
+                        lcdTicks += 1232 - lcdHDrawLen();
+                        lcdNextEventAbsCycle += 1232 - lcdHDrawLen();
                         DISPSTAT |= 2;
+                        // The PPU releases the VRAM bus for the
+                        // HBlank interval: no BG fetch slots are
+                        // occupied until the next HDraw recomputes
+                        // the mask.
+                        bgFetchMask = 0;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         if (DISPSTAT & 16) {
                             // Defer the HBlank IRQ raise by 1 cycle: the
@@ -5681,9 +5894,13 @@ void CPULoop(int ticks)
                         UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         gfxUpdateWindowY();
 
-                        lcdTicks += 1008;
-                        lcdNextEventAbsCycle += 1008;
+                        lcdTicks += lcdHDrawLen();
+                        lcdNextEventAbsCycle += lcdHDrawLen();
                         DISPSTAT &= 0xFFFD;
+                        // Recompute PPU fetch-slot occupancy for the scanline
+                        // about to be drawn (visible lines only).
+                        if (VCOUNT < 160)
+                            bgFetchMask = computeBgFetchMask(DISPCNT);
                         if (VCOUNT == 160) {
                             P1 = 0x03FF ^ (joy & 0x3FF);
                             systemUpdateMotionSensor();
@@ -5943,12 +6160,42 @@ void CPULoop(int ticks)
                             std::memcpy(g_oamShadow, g_oam, SIZE_OAM);
                         }
                         DISPSTAT |= 2;
+                        // The PPU releases the VRAM bus for the
+                        // HBlank interval: no BG fetch slots are
+                        // occupied until the next HDraw recomputes
+                        // the mask.
+                        bgFetchMask = 0;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         // GBATEK: HBlank phase is exactly 224 cycles
                         // (scanline = 1008 HDraw + 224 HBlank = 1232).
-                        lcdTicks += 224;
-                        lcdNextEventAbsCycle += 224;
-                        CPUCheckDMA(2, 0x0f);
+                        lcdTicks += 1232 - lcdHDrawLen();
+                        lcdNextEventAbsCycle += 1232 - lcdHDrawLen();
+                        // HBlank DMA triggers only during the visible
+                        // frame (VCOUNT 0..159). Line 227 is processed by
+                        // this branch too (the VBlank flag clears at 227),
+                        // but hardware does NOT fire HBlank DMA there.
+                        // The bus grant lags the trigger, so the
+                        // transfer is scheduled rather than run
+                        // synchronously.
+                        if (VCOUNT < 160) {
+                            static const int hdmaDelay = 2;
+                            // Anchor the activation to the HBlank's true
+                            // grid time: this event processes at the CPU's
+                            // batch boundary, g_eventBatchOvershoot cycles
+                            // past the grid point, and the activation
+                            // window must not inherit that snap.
+                            int d = hdmaDelay - (int)g_eventBatchOvershoot;
+                            if (d < 0) d = 0;
+                            // Absolute-time activation stamp for the
+                            // open-bus visibility window: the HBlank's
+                            // true grid time (this event processed
+                            // overshoot cycles past it) plus the
+                            // activation latency. The scheduler event
+                            // below carries the transfer itself.
+                            g_hdmaActAbs = cpuAbsCycle
+                                - (int64_t)g_eventBatchOvershoot + hdmaDelay;
+                            gbaScheduler::Schedule(kSchedHdma, d);
+                        }
                         if (DISPSTAT & 16) {
                             // See HBlank IRQ defer note in the matching
                             // V-Blank scanline path above.
