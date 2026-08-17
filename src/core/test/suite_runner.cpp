@@ -25,7 +25,9 @@
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
 #include "core/gba/gba.h"
+#ifndef NO_LINK
 #include "core/gba/gbaLink.h"
+#endif
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaSound.h"
@@ -917,6 +919,12 @@ int main(int argc, char** argv) {
         ConnectionState st = InitLink((LinkMode)link_mode);
         fprintf(stderr, "suite_runner: link mode %d -> state %d\n",
                 link_mode, (int)st);
+    }
+#else
+    if (link_mode) {
+        fprintf(stderr,
+                "suite_runner: --link requires a build with ENABLE_LINK\n");
+        return 2;
     }
 #endif
     CPUReset();
