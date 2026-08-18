@@ -1,5 +1,7 @@
 #include "background-input.h"
 
+#include <atomic>
+
 #if defined(__WXMSW__)
 
 #include <windows.h>
