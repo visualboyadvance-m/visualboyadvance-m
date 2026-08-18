@@ -35,6 +35,10 @@
 #include "wx/rpi.h"
 #include "wx/wayland.h"
 #include "wx/widgets/option-validator.h"
+#include "wx/widgets/slider-value-label.h"
+
+#include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #include "wx/widgets/render-plugin.h"
 #include "wx/wxvbam.h"
 
@@ -379,22 +383,6 @@ private:
 
 }  // namespace
 
-// Helper function to update slider tooltip with its current value
-static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
-
-// Helper function to update slider tooltip on mouse enter
-static void UpdateSliderTooltipOnHover(wxSlider* slider, wxMouseEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
-
 // static
 DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
     VBAM_CHECK(parent);
@@ -415,6 +403,18 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     notebook_ = GetValidatedChild<wxNotebook>("DisplayConfigNotebook");
 
     Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShowEvent, this, GetId());
+
+    // Filter, interframe blending and the LCD correction controls apply as soon
+    // as they change, so Cancel and the window close box have to put the
+    // snapshot back. Escape routes through wxID_CANCEL as well.
+    Bind(wxEVT_BUTTON, [this](wxCommandEvent& ev) {
+        RestoreLiveOptions();
+        ev.Skip();
+    }, wxID_CANCEL);
+    Bind(wxEVT_CLOSE_WINDOW, [this](wxCloseEvent& ev) {
+        RestoreLiveOptions();
+        ev.Skip();
+    });
 }
 
 bool DisplayConfig::LoadLazyTab(int index) {
@@ -617,6 +617,7 @@ void DisplayConfig::InitBasicTab() {
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
     filter_selector_->SetValidator(FilterValidator());
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
+    filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
 
     plugin_dir_label_ = GetValidatedChild<wxControl>("PluginDirLab");
     plugin_dir_picker_ = GetValidatedChild<wxDirPickerCtrl>("PluginDir");
@@ -635,6 +636,7 @@ void DisplayConfig::InitBasicTab() {
 
     interframe_selector_ = GetValidatedChild<wxChoice>("IFB");
     interframe_selector_->SetValidator(InterframeValidator());
+    interframe_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
 
     // HDR / deep-color controls. HDR is for the HDR-capable platforms; X11
     // (Linux/BSD) gets the 10-bit deep-color SDR option instead.
@@ -879,21 +881,68 @@ void DisplayConfig::InitColorCorrectionTab() {
         OPTION(kDispColorCorrectionAuto) = false;
         ev.Skip();
     };
+    // Apply the profile as it changes rather than on OK. Only the newly checked
+    // radio fires, and the unchecked validators write nothing. Bound before
+    // clear_auto: wx runs dynamic handlers newest first, and the auto flag has
+    // to be cleared before the profile write reaches UpdateLcdFilter(), which
+    // consults it.
+    color_profile_srgb->Bind(wxEVT_RADIOBUTTON, &DisplayConfig::ApplyLive, this);
+    color_profile_dci->Bind(wxEVT_RADIOBUTTON, &DisplayConfig::ApplyLive, this);
+    color_profile_rec2020->Bind(wxEVT_RADIOBUTTON, &DisplayConfig::ApplyLive, this);
+
     color_profile_srgb->Bind(wxEVT_RADIOBUTTON, clear_auto);
     color_profile_dci->Bind(wxEVT_RADIOBUTTON, clear_auto);
     color_profile_rec2020->Bind(wxEVT_RADIOBUTTON, clear_auto);
 
+    // The XRC item order must match GbaFilterVariant / GbcFilterVariant.
+    wxChoice* gba_variant = GetValidatedChild<wxChoice>("GBALCDFilterVariant");
+    gba_variant->SetValidator(
+        widgets::OptionChoiceValidator(config::OptionID::kGBALCDFilterVariant));
+
+    wxChoice* gb_variant = GetValidatedChild<wxChoice>("GBLCDFilterVariant");
+    gb_variant->SetValidator(
+        widgets::OptionChoiceValidator(config::OptionID::kGBLCDFilterVariant));
+
     wxSlider* gba_darken_slider = GetValidatedChild<wxSlider>("GBADarken");
     gba_darken_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBADarken));
-    gba_darken_slider->SetToolTip(wxString::Format("%d", gba_darken_slider->GetValue()));
-    gba_darken_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gba_darken_slider, std::placeholders::_1));
-    gba_darken_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gba_darken_slider, std::placeholders::_1));
+    widgets::AttachSliderValueLabel(gba_darken_slider, "%", [] {
+        config::Option::ByID(config::OptionID::kGBADarken)->ResetToDefault();
+    });
 
     wxSlider* gbc_lighten_slider = GetValidatedChild<wxSlider>("GBCLighten");
     gbc_lighten_slider->SetValidator(widgets::OptionUnsignedValidator(config::OptionID::kGBLighten));
-    gbc_lighten_slider->SetToolTip(wxString::Format("%d", gbc_lighten_slider->GetValue()));
-    gbc_lighten_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gbc_lighten_slider, std::placeholders::_1));
-    gbc_lighten_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gbc_lighten_slider, std::placeholders::_1));
+    widgets::AttachSliderValueLabel(gbc_lighten_slider, "%", [] {
+        config::Option::ByID(config::OptionID::kGBLighten)->ResetToDefault();
+    });
+
+    // Grey out the slider for variants whose shader has no darken/lighten term.
+    auto sync_slider_enable = [gba_variant, gb_variant, gba_darken_slider,
+                               gbc_lighten_slider]() {
+        // The choice has no selection until TransferDataToWindow() runs.
+        const int gba_sel = gba_variant->GetSelection() == wxNOT_FOUND
+                                ? static_cast<int>(OPTION(kGBALCDFilterVariant))
+                                : gba_variant->GetSelection();
+        const int gb_sel = gb_variant->GetSelection() == wxNOT_FOUND
+                               ? static_cast<int>(OPTION(kGBLCDFilterVariant))
+                               : gb_variant->GetSelection();
+        gba_darken_slider->Enable(gbafilter_variant_has_darken(gba_sel));
+        gbc_lighten_slider->Enable(gbcfilter_variant_has_lighten(gb_sel));
+    };
+    gba_variant->Bind(wxEVT_CHOICE, [sync_slider_enable](wxCommandEvent& ev) {
+        sync_slider_enable();
+        ev.Skip();
+    });
+    gb_variant->Bind(wxEVT_CHOICE, [sync_slider_enable](wxCommandEvent& ev) {
+        sync_slider_enable();
+        ev.Skip();
+    });
+    sync_slider_enable();
+
+    // Apply the correction controls as they change rather than on OK.
+    gba_variant->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
+    gb_variant->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
+    gba_darken_slider->Bind(wxEVT_SLIDER, &DisplayConfig::ApplyLive, this);
+    gbc_lighten_slider->Bind(wxEVT_SLIDER, &DisplayConfig::ApplyLive, this);
 
     // HDR brightness sliders (the HDR enable checkbox lives on the Basic tab).
     for (const auto& entry : {
@@ -913,9 +962,10 @@ void DisplayConfig::InitColorCorrectionTab() {
                 slider->SetRange(slider->GetMin(), static_cast<int>(dp));
         }
         slider->SetValidator(widgets::OptionUnsignedValidator(entry.second));
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-        slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, slider, std::placeholders::_1));
-        slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, slider, std::placeholders::_1));
+        widgets::AttachSliderValueLabel(
+            slider, entry.second == config::OptionID::kDispHDRShadowContrast ? "%" : "",
+            [id = entry.second] { config::Option::ByID(id)->ResetToDefault(); });
+        slider->Bind(wxEVT_SLIDER, &DisplayConfig::ApplyLive, this);
     }
 
     // All four HDR brightness/tone sliders (white, peak, highlight knee, shadow
@@ -956,6 +1006,9 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
     wxCommandEvent dummy_event;
 
     if (event.IsShown()) {
+        // Retake every time: the dialog instance is cached and reused.
+        SnapshotLiveOptions();
+
         PopulatePluginOptions();
 
         // Set initial SDL options visibility based on current selection
@@ -979,6 +1032,7 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
         CallAfter(&DisplayConfig::AdjustSizeOnShow);
     } else {
         StopPluginHandler();
+        live_snapshot_taken_ = false;
     }
 
     // Let the event propagate.
@@ -1574,6 +1628,48 @@ void DisplayConfig::ShowPluginOptions() {
     if (filter_selector_->GetCount() != config::kNbFilters) {
         filter_selector_->Append(_("Plugin"));
     }
+}
+
+void DisplayConfig::ApplyLive(wxCommandEvent& event) {
+    wxWindow* window = wxDynamicCast(event.GetEventObject(), wxWindow);
+    if (window && window->GetValidator()) {
+        window->GetValidator()->TransferFromWindow();
+    }
+    event.Skip();
+}
+
+void DisplayConfig::SnapshotLiveOptions() {
+    live_snapshot_.filter = OPTION(kDispFilter);
+    live_snapshot_.interframe = OPTION(kDispIFB);
+    live_snapshot_.gba_variant = OPTION(kGBALCDFilterVariant);
+    live_snapshot_.gb_variant = OPTION(kGBLCDFilterVariant);
+    live_snapshot_.gba_darken = OPTION(kGBADarken);
+    live_snapshot_.gb_lighten = OPTION(kGBLighten);
+    live_snapshot_.profile = OPTION(kDispColorCorrectionProfile);
+    live_snapshot_.profile_auto = OPTION(kDispColorCorrectionAuto);
+    live_snapshot_.hdr_reference_white = OPTION(kDispHDRReferenceWhite);
+    live_snapshot_.hdr_peak_brightness = OPTION(kDispHDRPeakBrightness);
+    live_snapshot_.hdr_highlight_knee = OPTION(kDispHDRHighlightKnee);
+    live_snapshot_.hdr_shadow_contrast = OPTION(kDispHDRShadowContrast);
+    live_snapshot_taken_ = true;
+}
+
+void DisplayConfig::RestoreLiveOptions() {
+    if (!live_snapshot_taken_) {
+        return;
+    }
+    OPTION(kDispFilter) = live_snapshot_.filter;
+    OPTION(kDispIFB) = live_snapshot_.interframe;
+    OPTION(kGBALCDFilterVariant) = live_snapshot_.gba_variant;
+    OPTION(kGBLCDFilterVariant) = live_snapshot_.gb_variant;
+    OPTION(kGBADarken) = live_snapshot_.gba_darken;
+    OPTION(kGBLighten) = live_snapshot_.gb_lighten;
+    OPTION(kDispColorCorrectionProfile) = live_snapshot_.profile;
+    OPTION(kDispColorCorrectionAuto) = live_snapshot_.profile_auto;
+    OPTION(kDispHDRReferenceWhite) = live_snapshot_.hdr_reference_white;
+    OPTION(kDispHDRPeakBrightness) = live_snapshot_.hdr_peak_brightness;
+    OPTION(kDispHDRHighlightKnee) = live_snapshot_.hdr_highlight_knee;
+    OPTION(kDispHDRShadowContrast) = live_snapshot_.hdr_shadow_contrast;
 }
 
 void DisplayConfig::OnPluginDirChanged(wxFileDirPickerEvent& event) {

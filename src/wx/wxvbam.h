@@ -129,7 +129,7 @@ public:
             return false;
         }
     }
-#ifndef VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND
+#if defined(__WXMAC__) && !defined(VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND)
     bool ProcessEvent(wxEvent& event) final;
 #endif
 
@@ -604,7 +604,9 @@ public:
 
     // osdtext is displayed for 3 seconds after osdtime, and then cleared
     wxString osdtext;
-    uint32_t osdtime;
+    // Initialised so the idle handler's expiry check is well defined before the
+    // first message is posted.
+    uint32_t osdtime = 0;
 
     // Rewind: count down to 0 and rewind
     uint32_t rewind_time;
@@ -840,6 +842,13 @@ private:
 
 // wxString version of OSD message
 void systemScreenMessage(const wxString& msg);
+
+// Takes the status bar copy of the last screen message down. The OSD text
+// expires on its own, but the status bar entry does not, and wx restores
+// whatever the status bar held whenever a menu closes -- so an expired message
+// keeps reappearing until it is popped. Called from the idle handler. No-op if
+// nothing is currently pushed.
+void systemClearStatusMessage();
 
 #include "wx/rpi.h"
 #include <wx/dynlib.h>

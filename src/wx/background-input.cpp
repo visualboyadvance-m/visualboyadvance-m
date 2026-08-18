@@ -588,12 +588,30 @@ static bool IsEmuPaused()
     return wxGetApp().frame && wxGetApp().frame->IsPaused();
 }
 
+namespace {
+// Set from the UI thread on focus loss, consumed by the poll thread. An atomic
+// flag rather than clearing previousState directly, which the poll thread owns.
+std::atomic<bool> g_reset_state_snapshot{false};
+}  // namespace
+
+void resetBackgroundInputStateSnapshot()
+{
+    g_reset_state_snapshot.store(true, std::memory_order_relaxed);
+}
+
 wxThread::ExitCode BackgroundInput::CheckKeyboard()
 {
 #if defined(__WXMSW__)
-    if (AppIsForeground()) {
-        // if our app is the foreground app, do nothing
-        return NO_ERROR;
+    // No foreground early-out on Windows. A low-level keyboard hook in another
+    // process -- Steam Link's desktop streaming installs one -- can swallow a
+    // WM_KEYUP before it reaches our HWND, and the key stays latched until it is
+    // tapped again. GetAsyncKeyState reads the hardware state, so polling it
+    // while foreground catches the release within one interval. KEY_DOWN stays
+    // gated on !AppIsForeground() below so ordinary typing is unaffected.
+    if (g_reset_state_snapshot.exchange(false, std::memory_order_relaxed)) {
+        for (int i = 0x08; i < 0xFF; ++i) {
+            previousState[i] = 0;
+        }
     }
 #else
     if (wxWindow::FindFocus()) {
@@ -639,8 +657,12 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
             }
         }
         // virtual key "i" is released
+        // Not gated on !AppIsForeground(): this is the recovery path for a
+        // release that never arrived as a window message. A duplicate release
+        // is harmless -- the shortcut branch of FilterEvent only acts on
+        // presses, so this just clears an already-clear button.
         else if (((bits & 0x8000) == 0) && (previousState[i] & 0x8000)) {
-            if (handler && !AppIsForeground()) {
+            if (handler) {
                 wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_UP);
                 event->m_keyCode = xKeySym;
                 handler->QueueEvent(event);

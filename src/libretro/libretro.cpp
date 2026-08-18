@@ -1246,6 +1246,8 @@ static bool option_swapAnalogSticks;
 static int color_mode = 0;
 static int prev_color_mode = 0;
 static float color_change = 0.0f;
+static int gba_panel = kGbaFilterGba;
+static int gbc_panel = kGbcFilterCgb;
 static float prev_color_change = 0.0f;
 
 static void ApplyLayerAndSoundSettings(void)
@@ -1543,20 +1545,62 @@ static void update_variables(bool startup)
         color_change = ((float)atoi(var.value)) / 100;
     }
 
+    static const struct { const char* name; int value; } gba_panels[] = {
+        { "GBA", kGbaFilterGba },
+        { "GBASP Backlit", kGbaFilterGbaSpBacklit },
+        { "Micro", kGbaFilterMicro },
+        { "DS", kGbaFilterDs },
+        { "DS-Lite", kGbaFilterDsLite },
+        { "NSO", kGbaFilterNso },
+    };
+    static const struct { const char* name; int value; } gbc_panels[] = {
+        { "GBC", kGbcFilterCgb },
+        { "NSO", kGbcFilterNso },
+    };
+
+    int prev_gba_panel = gba_panel;
+    int prev_gbc_panel = gbc_panel;
+
+    var.key = "vbam_lcdfilter_gba_panel";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        for (size_t i = 0; i < sizeof(gba_panels) / sizeof(gba_panels[0]); i++) {
+            if (!strcmp(var.value, gba_panels[i].name)) {
+                gba_panel = gba_panels[i].value;
+                break;
+            }
+        }
+    }
+
+    var.key = "vbam_lcdfilter_gbc_panel";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+        for (size_t i = 0; i < sizeof(gbc_panels) / sizeof(gbc_panels[0]); i++) {
+            if (!strcmp(var.value, gbc_panels[i].name)) {
+                gbc_panel = gbc_panels[i].value;
+                break;
+            }
+        }
+    }
+
+    bool panel_changed = (prev_gba_panel != gba_panel) || (prev_gbc_panel != gbc_panel);
+
     var.key = "vbam_lcdfilter";
     var.value = NULL;
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
         bool prev_lcdfilter = option_lcdfilter;
         option_lcdfilter = (!strcmp(var.value, "enabled")) ? true : false;
-        if ((prev_color_change != color_change) || (prev_color_mode != color_mode)) {
+        if ((prev_color_change != color_change) || (prev_color_mode != color_mode) || panel_changed) {
             if (type == IMAGE_GBA) {
-                gbafilter_set_params(color_mode, color_change);
+                gbafilter_set_params(color_mode, color_change, gba_panel);
             } else {
-                gbcfilter_set_params(color_mode, color_change);
+                gbcfilter_set_params(color_mode, color_change, gbc_panel);
             }
         }
-        if ((prev_lcdfilter != option_lcdfilter) || (prev_color_change != color_change) || (prev_color_mode != color_mode)) {
+        if ((prev_lcdfilter != option_lcdfilter) || (prev_color_change != color_change) || (prev_color_mode != color_mode) || panel_changed) {
             if (type == IMAGE_GBA) {
                 gbafilter_update_colors_native(option_lcdfilter);
             } else {

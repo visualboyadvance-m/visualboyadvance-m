@@ -42,6 +42,27 @@
         <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
         <border>5</border>
         <object class="wxStaticText">
+          <label>LCD Correction for GBA:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxChoice" name="GBALCDFilterVariant">
+          <content>
+            <item translate="0">GBA</item>
+            <item translate="0">GBASP Backlit</item>
+            <item translate="0">Micro</item>
+            <item translate="0">DS</item>
+            <item translate="0">DS-Lite</item>
+            <item translate="0">NSO</item>
+          </content>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText">
           <label>GBA Darken:</label>
         </object>
       </object>
@@ -77,6 +98,23 @@
               </object>
             </object>
           </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+        <border>5</border>
+        <object class="wxStaticText">
+          <label>LCD Correction for GBC:</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxChoice" name="GBLCDFilterVariant">
+          <content>
+            <item translate="0">GBC</item>
+            <item translate="0">NSO</item>
+          </content>
         </object>
       </object>
       <object class="sizeritem">

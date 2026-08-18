@@ -52,6 +52,7 @@
 #include "wx/builtin-over.h"
 #include "wx/builtin-translations.h"
 #include "wx/builtin-xrc.h"
+#include "wx/background-input.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/command.h"
 #include "wx/config/emulated-gamepad.h"
@@ -476,6 +477,11 @@ wxvbamApp::wxvbamApp()
             // the user gets a clean slate when they alt-tab back.
             keyboard_input_handler_.Reset();
             emulated_gamepad_.Reset();
+            // The poller keeps its snapshot current while the app is
+            // foreground, so a key held across the focus change reads as "no
+            // change" on the first background poll. Zeroing the snapshot
+            // restores the rising edge that background input relies on.
+            resetBackgroundInputStateSnapshot();
         }
 #ifdef __WXGTK__
         else {
@@ -1557,6 +1563,7 @@ MainFrame::~MainFrame() {
 
 void MainFrame::SetStatusBar(wxStatusBar* menu_bar) {
     wxFrame::SetStatusBar(menu_bar);
+
     // This will take care of hiding the menu bar at startup, if needed.
     menu_bar->Show(OPTION(kGenStatusBar));
 }
@@ -2024,6 +2031,14 @@ static gboolean HandleMenuKeyboardNavigation(GtkWidget* widget, GdkEventKey* eve
 #endif
 
 void MainFrame::MenuPopped(wxMenuEvent& evt) {
+    // wxFrame stashes the status bar's text when a menu item is highlighted and
+    // restores it when the menu closes. A screen message sitting there gets
+    // captured that way and handed back on every later menu interaction, on
+    // items that print nothing themselves. Taking it down as the menu opens --
+    // before the first highlight -- leaves wx nothing to capture.
+    if (evt.GetEventType() == wxEVT_MENU_OPEN)
+        systemClearStatusMessage();
+
     // Track menu open/close state for audio handling
     // On macOS, the menubar is in the OS menubar and doesn't need this tracking
 #if !defined(__WXMAC__)
@@ -3012,7 +3027,8 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         // Exception: UserInputCtrl needs keyboard processing to capture key bindings
         wxWindow* focused = wxWindow::FindFocus();
         if (focused && !wxDynamicCast(focused, widgets::UserInputCtrl) &&
-            (wxDynamicCast(focused, wxTextCtrl) || wxDynamicCast(focused, wxComboBox))) {
+            (wxDynamicCast(focused, wxTextCtrl) || wxDynamicCast(focused, wxComboBox) ||
+             wxDynamicCast(focused, wxSpinCtrl) || wxDynamicCast(focused, wxSpinCtrlDouble))) {
             return wxEventFilter::Event_Skip;
         }
 #ifdef __WXGTK__
@@ -3034,7 +3050,14 @@ int wxvbamApp::FilterEvent(wxEvent& event)
         // If menus are open, handle menu item mnemonics recursively
         // Exception: UserInputCtrl needs keyboard processing to capture key bindings
         if (!frame->CanProcessShortcuts() && !wxDynamicCast(focused, widgets::UserInputCtrl)) {
-            if (event.GetEventType() == wxEVT_KEY_DOWN) {
+            // Mnemonic matching applies to an open menu only. CanProcessShortcuts()
+            // is also false while a dialog is open, and matching there hijacks
+            // ordinary typing: a digit reaches the "&1 rom" mnemonics wxFileHistory
+            // puts on the Recent submenu and loads that ROM, and Escape is consumed
+            // before the dialog can close on it. A dialog still falls through to the
+            // Event_Skip below, so key events reach it without generating emulator
+            // input.
+            if (frame->MenusOpened() && event.GetEventType() == wxEVT_KEY_DOWN) {
                 wxKeyEvent& key_event = static_cast<wxKeyEvent&>(event);
                 int key_code = key_event.GetKeyCode();
 
@@ -3253,7 +3276,14 @@ int wxvbamApp::FilterEvent(wxEvent& event)
     return user_input_event.FilterProcessedInput(user_input.value());
 }
 
-#ifndef VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND
+// macOS only. Reporting a key down as handled stops wxWidgets from passing it to
+// the system, which is what silences the alert sound described in
+// https://github.com/wxWidgets/wxWidgets/issues/25262. It also stops the native
+// default handler from running, so any control that navigates with the keyboard
+// -- wxChoice, wxListBox, sliders, notebooks -- goes inert while it is in
+// effect. That trade is confined to the platform with the bug: the other ports
+// never install this override and keep normal key handling.
+#if defined(__WXMAC__) && !defined(VBAM_WX_MAC_PATCHED_FOR_ALERT_SOUND)
 bool wxvbamApp::ProcessEvent(wxEvent& event) {
     if (event.GetEventType() == wxEVT_KEY_DOWN) {
         // First, figure out if the focused window can process the key down event.

@@ -23,29 +23,114 @@ extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 
 // --- Global Constants and Variables for GBA Color Correction ---
-// Define the color profile matrix as a static const float 2D array
-// This replicates the column-major order of GLSL mat4 for easier translation.
-// Format: { {col0_row0, col0_row1, col0_row2, col0_row3}, ... }
-static const float GBA_sRGB[4][4] = {
-    {0.905f, 0.10f, 0.1575f, 0.0f}, // Column 0 (R output contributions from R, G, B, A)
-    {0.195f, 0.65f, 0.1425f, 0.0f}, // Column 1 (G output contributions from R, G, B, A)
-    {-0.10f, 0.25f, 0.70f,   0.0f}, // Column 2 (B output contributions from R, G, B, A)
-    {0.0f,   0.0f,  0.0f,    0.91f} // Column 3 (A/Luminance contribution)
+// One profile per (panel variant, color mode), taken from the matching shader.
+// Matrices use the column-major order of GLSL mat4.
+struct LcdProfile {
+    float m[4][4];       // Column 0-2 = R/G/B, column 3 = black lift + luminance
+    float in_gamma[3];   // Per-channel input gamma
+    float out_gamma;     // Output gamma; the pipeline raises to 1/out_gamma
+    float darken_scale;  // Darken slider multiplier, 0 = shader has no darken
 };
 
-static const float GBA_DCI[4][4] = {
-    {0.76f,  0.125f,  0.16f, 0.0f},
-    {0.27f,  0.6375f, 0.18f, 0.0f},
-    {-0.03f, 0.2375f, 0.66f, 0.0f},
-    {0.0f,   0.0f,    0.0f,  0.97f}
+// Every AGB-family shader uses a flat 2.2 in and out.
+#define AGB_GAMMA 2.2f, 2.2f, 2.2f
+#define AGB_OUT   2.2f
+
+static const LcdProfile kProfiles[kGbaFilterVariantCount][3] = {
+    // gba-color. darken_screen is applied 1:1.
+    {
+        {{{0.905f, 0.10f,   0.1575f, 0.0f},
+          {0.195f, 0.65f,   0.1425f, 0.0f},
+          {-0.10f, 0.25f,   0.70f,   0.0f},
+          {0.0f,   0.0f,    0.0f,    0.91f}}, {AGB_GAMMA}, AGB_OUT, 1.0f},
+        {{{0.76f,  0.125f,  0.16f,   0.0f},
+          {0.27f,  0.6375f, 0.18f,   0.0f},
+          {-0.03f, 0.2375f, 0.66f,   0.0f},
+          {0.0f,   0.0f,    0.0f,    0.97f}}, {AGB_GAMMA}, AGB_OUT, 1.0f},
+        {{{0.61f,  0.155f,  0.16f,   0.0f},
+          {0.345f, 0.615f,  0.1875f, 0.0f},
+          {0.045f, 0.23f,   0.6525f, 0.0f},
+          {0.0f,   0.0f,    0.0f,    1.0f}},  {AGB_GAMMA}, AGB_OUT, 1.0f},
+    },
+    // sp101-color
+    {
+        {{{0.96f,   0.0325f, 0.001f,  0.0f},
+          {0.11f,   0.89f,   -0.03f,  0.0f},
+          {-0.07f,  0.0775f, 1.029f,  0.0f},
+          {0.0f,    0.0f,    0.0f,    0.935f}}, {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.805f,  0.0675f, 0.017f,  0.0f},
+          {0.24f,   0.86f,   0.02f,   0.0f},
+          {-0.045f, 0.0725f, 0.963f,  0.0f},
+          {0.0f,    0.0f,    0.0f,    0.955f}}, {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.625f,  0.10f,   0.015f,  0.0f},
+          {0.35f,   0.82f,   0.0325f, 0.0f},
+          {0.025f,  0.08f,   0.9525f, 0.0f},
+          {0.0f,    0.0f,    0.0f,    1.0f}},  {AGB_GAMMA}, AGB_OUT, 0.0f},
+    },
+    // gbMicro-color
+    {
+        {{{0.8025f,  0.10f,   0.1225f, 0.0f},
+          {0.31f,    0.6875f, 0.1125f, 0.0f},
+          {-0.1125f, 0.2125f, 0.765f,  0.0f},
+          {0.0f,     0.0f,    0.0f,    0.9f}},  {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.6675f,  0.125f,  0.13f,   0.0f},
+          {0.3825f,  0.675f,  0.1475f, 0.0f},
+          {-0.05f,   0.20f,   0.7225f, 0.0f},
+          {0.0f,     0.0f,    0.0f,    0.96f}}, {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.525f,   0.15f,   0.13f,   0.0f},
+          {0.43f,    0.65f,   0.155f,  0.0f},
+          {0.045f,   0.20f,   0.715f,  0.0f},
+          {0.0f,     0.0f,    0.0f,    1.0f}},  {AGB_GAMMA}, AGB_OUT, 0.0f},
+    },
+    // nds-color
+    {
+        {{{0.835f,  0.10f,    0.105f,  0.0f},
+          {0.27f,   0.6375f,  0.175f,  0.0f},
+          {-0.105f, 0.2625f,  0.72f,   0.0f},
+          {0.0f,    0.0f,     0.0f,    0.905f}}, {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.70f,   0.125f,   0.12f,   0.0f},
+          {0.34f,   0.625f,   0.20f,   0.0f},
+          {-0.04f,  0.25f,    0.68f,   0.0f},
+          {0.0f,    0.0f,     0.0f,    0.96f}},  {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.555f,  0.1475f,  0.1175f, 0.0f},
+          {0.39f,   0.6075f,  0.2075f, 0.0f},
+          {0.055f,  0.245f,   0.675f,  0.0f},
+          {0.0f,    0.0f,     0.0f,    1.0f}},   {AGB_GAMMA}, AGB_OUT, 0.0f},
+    },
+    // dslite-color
+    {
+        {{{0.93f,   0.025f,  0.008f,  0.0f},
+          {0.14f,   0.90f,   -0.03f,  0.0f},
+          {-0.07f,  0.075f,  1.022f,  0.0f},
+          {0.0f,    0.0f,    0.0f,    0.935f}}, {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.76f,   0.055f,  0.0225f, 0.0f},
+          {0.27f,   0.875f,  0.0225f, 0.0f},
+          {-0.03f,  0.07f,   0.955f,  0.0f},
+          {0.0f,    0.0f,    0.0f,    0.97f}},  {AGB_GAMMA}, AGB_OUT, 0.0f},
+        {{{0.585f,  0.09f,   0.0225f, 0.0f},
+          {0.3725f, 0.825f,  0.035f,  0.0f},
+          {0.0425f, 0.085f,  0.9425f, 0.0f},
+          {0.0f,    0.0f,    0.0f,    1.0f}},   {AGB_GAMMA}, AGB_OUT, 0.0f},
+    },
+    // NSO-gba-color (darken applied 1:1; shader default is 0.8)
+    {
+        {{{0.865f,  0.0575f, 0.0575f, 0.0f},
+          {0.1225f, 0.925f,  0.1225f, 0.0f},
+          {0.0125f, 0.0125f, 0.82f,   0.0f},
+          {0.0f,    0.0f,    0.0f,    1.0f}}, {AGB_GAMMA}, AGB_OUT, 1.0f},
+        {{{0.72f,   0.0875f, 0.0725f, 0.0f},
+          {0.2675f, 0.9f,    0.185f,  0.0f},
+          {0.0125f, 0.0125f, 0.7425f, 0.0f},
+          {0.0f,    0.0f,    0.0f,    1.0f}}, {AGB_GAMMA}, AGB_OUT, 1.0f},
+        {{{0.57f,   0.115f,  0.0725f, 0.0f},
+          {0.3825f, 0.8625f, 0.195f,  0.0f},
+          {0.0475f, 0.0225f, 0.7325f, 0.0f},
+          {0.0f,    0.0f,    0.0f,    1.0f}}, {AGB_GAMMA}, AGB_OUT, 1.0f},
+    },
 };
 
-static const float GBA_Rec2020[4][4] = {
-    {0.61f,  0.155f, 0.16f,   0.0f},
-    {0.345f, 0.615f, 0.1875f, 0.0f},
-    {0.045f, 0.23f,  0.6525f, 0.0f},
-    {0.0f,   0.0f,   0.0f,    1.0f}
-};
+#undef AGB_GAMMA
+#undef AGB_OUT
 
 // Screen darkening factor. Default to 0.0f
 static float darken_screen = 0.0f;
@@ -53,13 +138,19 @@ static float darken_screen = 0.0f;
 // Color mode (0 for sRGB, 1 for DCI, 2 for Rec2020). Default to sRGB (0).
 static int color_mode = 0;
 
-// Pointer to the currently selected color profile matrix.
-static const float (*profile)[4];
+// Panel variant. Default to GBA (0).
+static int variant = kGbaFilterGba;
 
-// Global constants from the shader for gamma correction values
-static const float target_gamma = 2.2f;
-static const float display_gamma = 2.2f;
+// The active profile, resolved for the per-pixel loop.
+struct LcdKernel {
+    float gamma[3];   // Input gamma with darken_screen folded in
+    float mat[3][3];  // mat[out][in], transposed from LcdProfile
+    float off[3];     // Black lift, scaled by the alpha channel
+    float lum;
+    float out_recip;  // 1 / out_gamma
+};
 
+static LcdKernel kernel;
 
 // --- Function Implementations ---
 
@@ -75,30 +166,77 @@ struct GbafilterInitializer {
 static GbafilterInitializer __gbafilter_initializer;
 
 
-// Helper function to set the 'profile' pointer based on the 'color_mode' variable.
+// Helper function to resolve 'variant' and 'color_mode' into the kernel.
 static void set_profile_from_mode() {
-    if (color_mode == 0) {
-        profile = GBA_sRGB;
-    }
-    else if (color_mode == 1) {
-        profile = GBA_DCI;
-    }
-    else if (color_mode == 2) {
-        profile = GBA_Rec2020;
-    }
-    else {
-        profile = GBA_sRGB; // Default to sRGB if an invalid mode is set
+    const int v = (variant >= 0 && variant < kGbaFilterVariantCount)
+                      ? variant : kGbaFilterGba;
+    const int m = (color_mode >= 0 && color_mode < 3) ? color_mode : 0;
+    const LcdProfile& p = kProfiles[v][m];
+
+    kernel.lum = p.m[3][3];
+    kernel.out_recip = 1.0f / p.out_gamma;
+
+    for (int row = 0; row < 3; row++) {
+        kernel.gamma[row] = p.in_gamma[row] + darken_screen * p.darken_scale;
+
+        // The shader lift column is scaled by the clamped alpha channel, which
+        // is lum for an opaque framebuffer.
+        kernel.off[row] = p.m[3][row] * kernel.lum;
+
+        for (int col = 0; col < 3; col++)
+            kernel.mat[row][col] = p.m[col][row];
     }
 }
 
 
-// Public function to set color mode and darken screen from external calls
-void gbafilter_set_params(int new_color_mode, float new_darken_screen) {
+// Public function to set color mode, darken screen and panel variant from
+// external calls.
+void gbafilter_set_params(int new_color_mode, float new_darken_screen,
+                          int new_variant) {
     color_mode = new_color_mode;
     darken_screen = fmaxf(0.0f, fminf(1.0f, new_darken_screen)); // Clamp to 0.0-1.0
+    variant = new_variant;
 
-    // Call the helper to update 'profile' based on the new 'color_mode'
+    // Call the helper to update the kernel based on the new parameters.
     set_profile_from_mode();
+}
+
+bool gbafilter_variant_has_darken(int v) {
+    if (v < 0 || v >= kGbaFilterVariantCount)
+        return true;
+    return kProfiles[v][0].darken_scale != 0.0f;
+}
+
+// Shared by every palette function below.
+static inline void apply_filter(float& r, float& g, float& b) {
+    // 1. Apply initial gamma (including darken_screen) to convert to linear space.
+    r = powf(r, kernel.gamma[0]);
+    g = powf(g, kernel.gamma[1]);
+    b = powf(b, kernel.gamma[2]);
+
+    // 2. Apply luminance factor and clamp.
+    r = fmaxf(0.0f, fminf(1.0f, r * kernel.lum));
+    g = fmaxf(0.0f, fminf(1.0f, g * kernel.lum));
+    b = fmaxf(0.0f, fminf(1.0f, b * kernel.lum));
+
+    // 3. Apply color profile matrix.
+    const float tr = kernel.mat[0][0] * r + kernel.mat[0][1] * g +
+                     kernel.mat[0][2] * b + kernel.off[0];
+    const float tg = kernel.mat[1][0] * r + kernel.mat[1][1] * g +
+                     kernel.mat[1][2] * b + kernel.off[1];
+    const float tb = kernel.mat[2][0] * r + kernel.mat[2][1] * g +
+                     kernel.mat[2][2] * b + kernel.off[2];
+
+    // 4. Apply display gamma. Mirror through the origin; the matrices carry
+    // negative cross terms and powf() rejects a negative base.
+    r = copysignf(powf(fabsf(tr), kernel.out_recip), tr);
+    g = copysignf(powf(fabsf(tg), kernel.out_recip), tg);
+    b = copysignf(powf(fabsf(tb), kernel.out_recip), tb);
+
+    // Final clamp: ensure values are within 0.0-1.0 range
+    r = fmaxf(0.0f, fminf(1.0f, r));
+    g = fmaxf(0.0f, fminf(1.0f, g));
+    b = fmaxf(0.0f, fminf(1.0f, b));
 }
 
 void gbafilter_update_colors(bool lcd) {
@@ -163,11 +301,6 @@ void gbafilter_update_colors(bool lcd) {
 
 void gbafilter_pal8(uint8_t* buf, int count)
 {
-    // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
-    const float display_gamma_reciprocal = 1.0f / display_gamma;
-    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
-
     while (count--) {
         uint8_t pix = *buf;
 
@@ -180,31 +313,10 @@ void gbafilter_pal8(uint8_t* buf, int count)
         float g = (float)original_g_val_3bit / 7.0f;
         float b = (float)original_b_val_2bit / 3.0f;
 
-        // 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space.
-        // This step will affect non-"white" values.
-        r = powf(r, target_gamma_exponent);
-        g = powf(g, target_gamma_exponent);
-        b = powf(b, target_gamma_exponent);
-
-        // 2. Apply luminance factor and clamp.
-        r = fmaxf(0.0f, fminf(1.0f, r * luminance_factor));
-        g = fmaxf(0.0f, fminf(1.0f, g * luminance_factor));
-        b = fmaxf(0.0f, fminf(1.0f, b * luminance_factor));
-
-        // 3. Apply color profile matrix (using profile[column][row] access)
-        float transformed_r = profile[0][0] * r + profile[1][0] * g + profile[2][0] * b;
-        float transformed_g = profile[0][1] * r + profile[1][1] * g + profile[2][1] * b;
-        float transformed_b = profile[0][2] * r + profile[1][2] * g + profile[2][2] * b;
-
-        // 4. Apply display gamma to convert back for display.
-        transformed_r = copysignf(powf(fabsf(transformed_r), display_gamma_reciprocal), transformed_r);
-        transformed_g = copysignf(powf(fabsf(transformed_g), display_gamma_reciprocal), transformed_g);
-        transformed_b = copysignf(powf(fabsf(transformed_b), display_gamma_reciprocal), transformed_b);
-
-        // Final clamp: ensure values are within 0.0-1.0 range
-        transformed_r = fmaxf(0.0f, fminf(1.0f, transformed_r));
-        transformed_g = fmaxf(0.0f, fminf(1.0f, transformed_g));
-        transformed_b = fmaxf(0.0f, fminf(1.0f, transformed_b));
+        apply_filter(r, g, b);
+        const float transformed_r = r;
+        const float transformed_g = g;
+        const float transformed_b = b;
 
         // Convert back to 3-bit or 2-bit (0-7 or 0-3) integer and combine into uint8_t
         // Apply 5-bit to 5-bit conversion, as this palette is for 16-bit output.
@@ -225,11 +337,6 @@ void gbafilter_pal8(uint8_t* buf, int count)
 
 void gbafilter_pal(uint16_t* buf, int count)
 {
-    // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
-    const float display_gamma_reciprocal = 1.0f / display_gamma;
-    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
-
     while (count--) {
         uint16_t pix = *buf;
 
@@ -245,31 +352,10 @@ void gbafilter_pal(uint16_t* buf, int count)
         float g = (float)original_g_val_5bit / 31.0f;
         float b = (float)original_b_val_5bit / 31.0f;
 
-        // 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space.
-        // This step will affect non-"white" values.
-        r = powf(r, target_gamma_exponent);
-        g = powf(g, target_gamma_exponent);
-        b = powf(b, target_gamma_exponent);
-
-        // 2. Apply luminance factor and clamp.
-        r = fmaxf(0.0f, fminf(1.0f, r * luminance_factor));
-        g = fmaxf(0.0f, fminf(1.0f, g * luminance_factor));
-        b = fmaxf(0.0f, fminf(1.0f, b * luminance_factor));
-
-        // 3. Apply color profile matrix (using profile[column][row] access)
-        float transformed_r = profile[0][0] * r + profile[1][0] * g + profile[2][0] * b;
-        float transformed_g = profile[0][1] * r + profile[1][1] * g + profile[2][1] * b;
-        float transformed_b = profile[0][2] * r + profile[1][2] * g + profile[2][2] * b;
-
-        // 4. Apply display gamma to convert back for display.
-        transformed_r = copysignf(powf(fabsf(transformed_r), display_gamma_reciprocal), transformed_r);
-        transformed_g = copysignf(powf(fabsf(transformed_g), display_gamma_reciprocal), transformed_g);
-        transformed_b = copysignf(powf(fabsf(transformed_b), display_gamma_reciprocal), transformed_b);
-
-        // Final clamp: ensure values are within 0.0-1.0 range
-        transformed_r = fmaxf(0.0f, fminf(1.0f, transformed_r));
-        transformed_g = fmaxf(0.0f, fminf(1.0f, transformed_g));
-        transformed_b = fmaxf(0.0f, fminf(1.0f, transformed_b));
+        apply_filter(r, g, b);
+        const float transformed_r = r;
+        const float transformed_g = g;
+        const float transformed_b = b;
 
         // Convert back to 5-bit (0-31) integer and combine into uint16_t
         // Apply 5-bit to 5-bit conversion, as this palette is for 16-bit output.
@@ -290,11 +376,6 @@ void gbafilter_pal(uint16_t* buf, int count)
 
 void gbafilter_pal32(uint32_t* buf, int count)
 {
-    // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
-    const float display_gamma_reciprocal = 1.0f / display_gamma;
-    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
-
     // Hardcode shifts to avoid race with filter threads temporarily overriding globals.
 #if wxBYTE_ORDER == wxLITTLE_ENDIAN
     const int rShift = 3, gShift = 11, bShift = 19;
@@ -316,30 +397,10 @@ void gbafilter_pal32(uint32_t* buf, int count)
         float g = (float)original_g_val_5bit / 31.0f;
         float b = (float)original_b_val_5bit / 31.0f;
 
-        // 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space.
-        r = powf(r, target_gamma_exponent);
-        g = powf(g, target_gamma_exponent);
-        b = powf(b, target_gamma_exponent);
-
-        // 2. Apply luminance factor and clamp.
-        r = fmaxf(0.0f, fminf(1.0f, r * luminance_factor));
-        g = fmaxf(0.0f, fminf(1.0f, g * luminance_factor));
-        b = fmaxf(0.0f, fminf(1.0f, b * luminance_factor));
-
-        // 3. Apply color profile matrix
-        float transformed_r = profile[0][0] * r + profile[1][0] * g + profile[2][0] * b;
-        float transformed_g = profile[0][1] * r + profile[1][1] * g + profile[2][1] * b;
-        float transformed_b = profile[0][2] * r + profile[1][2] * g + profile[2][2] * b;
-
-        // 4. Apply display gamma.
-        transformed_r = copysignf(powf(fabsf(transformed_r), display_gamma_reciprocal), transformed_r);
-        transformed_g = copysignf(powf(fabsf(transformed_g), display_gamma_reciprocal), transformed_g);
-        transformed_b = copysignf(powf(fabsf(transformed_b), display_gamma_reciprocal), transformed_b);
-
-        // Final clamp: ensure values are within 0.0-1.0 range
-        transformed_r = fmaxf(0.0f, fminf(1.0f, transformed_r));
-        transformed_g = fmaxf(0.0f, fminf(1.0f, transformed_g));
-        transformed_b = fmaxf(0.0f, fminf(1.0f, transformed_b));
+        apply_filter(r, g, b);
+        const float transformed_r = r;
+        const float transformed_g = g;
+        const float transformed_b = b;
 
 
         // Convert the floating-point values to 8-bit integer components (0-255).
@@ -464,41 +525,9 @@ void gbafilter_update_colors_native(bool lcd) {
     }
 }
 
-#define APPLY_FILTER(r, g, b) \
-    do { \
-        /* 1. Apply initial gamma (including darken_screen as exponent) to convert to linear space. */ \
-        /* This step will affect non-"white" values. */ \
-        r = powf(r, target_gamma_exponent); \
-        g = powf(g, target_gamma_exponent); \
-        b = powf(b, target_gamma_exponent); \
-        /* 2. Apply luminance factor and clamp. */ \
-        r = fmaxf(0.0f, fminf(1.0f, r * luminance_factor)); \
-        g = fmaxf(0.0f, fminf(1.0f, g * luminance_factor)); \
-        b = fmaxf(0.0f, fminf(1.0f, b * luminance_factor)); \
-        /* 3. Apply color profile matrix (using profile[column][row] access) */ \
-        transformed_r = profile[0][0] * r + profile[1][0] * g + profile[2][0] * b; \
-        transformed_g = profile[0][1] * r + profile[1][1] * g + profile[2][1] * b; \
-        transformed_b = profile[0][2] * r + profile[1][2] * g + profile[2][2] * b; \
-        /* 4. Apply display gamma to convert back for display. */ \
-        transformed_r = copysignf(powf(fabsf(transformed_r), display_gamma_reciprocal), transformed_r); \
-        transformed_g = copysignf(powf(fabsf(transformed_g), display_gamma_reciprocal), transformed_g); \
-        transformed_b = copysignf(powf(fabsf(transformed_b), display_gamma_reciprocal), transformed_b); \
-        /* Final clamp: ensure values are within 0.0-1.0 range */ \
-        transformed_r = fmaxf(0.0f, fminf(1.0f, transformed_r)); \
-        transformed_g = fmaxf(0.0f, fminf(1.0f, transformed_g)); \
-        transformed_b = fmaxf(0.0f, fminf(1.0f, transformed_b)); \
-    } while(0)
-
-
 void gbafilter_pal_565(uint16_t* buf, int count)
 {
-    // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
-    const float display_gamma_reciprocal = 1.0f / display_gamma;
-    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
-
     while (count--) {
-        float transformed_r, transformed_g, transformed_b;
         uint16_t pix = *buf;
 
         uint8_t original_r_val_5bit = (uint8_t)((pix >> systemRedShift) & 0x1f);
@@ -510,7 +539,10 @@ void gbafilter_pal_565(uint16_t* buf, int count)
         float g = (float)original_g_val_6bit / 63.0f;
         float b = (float)original_b_val_5bit / 31.0f;
 
-        APPLY_FILTER(r, g, b);
+        apply_filter(r, g, b);
+        const float transformed_r = r;
+        const float transformed_g = g;
+        const float transformed_b = b;
 
         // Convert back to 5-bit (0-31) integer and combine into uint16_t
         // Apply 5-bit to 5-bit conversion, as this palette is for 16-bit output.
@@ -531,13 +563,7 @@ void gbafilter_pal_565(uint16_t* buf, int count)
 
 void gbafilter_pal_888(uint32_t* buf, int count)
 {
-    // Pre-calculate constants for efficiency within function scope
-    const float target_gamma_exponent = target_gamma + darken_screen;
-    const float display_gamma_reciprocal = 1.0f / display_gamma;
-    const float luminance_factor = profile[3][3]; // profile[3].w from GLSL
-
     while (count--) {
-        float transformed_r, transformed_g, transformed_b;
         uint32_t pix = *buf;
 
         // Extract original 5-bit R, G, B values from the shifted positions in the 32-bit pixel.
@@ -551,7 +577,10 @@ void gbafilter_pal_888(uint32_t* buf, int count)
         float g = (float)original_g_val_8bit / 255.0f;
         float b = (float)original_b_val_8bit / 255.0f;
 
-        APPLY_FILTER(r, g, b);
+        apply_filter(r, g, b);
+        const float transformed_r = r;
+        const float transformed_g = g;
+        const float transformed_b = b;
 
         // Convert the floating-point values to 8-bit integer components (0-255).
         // Values are already guaranteed to be in 0-255 range since they are uint8_t

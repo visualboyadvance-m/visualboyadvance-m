@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 #define VBAM_WX_DIALOGS_SOUND_CONFIG_H_
 
+#include <cstdint>
 #include <vector>
 
 #include "wx/config/option.h"
@@ -42,6 +43,10 @@ private:
     void InitGameBoyAdvanceTab();
 
     void OnShow(wxShowEvent& event);
+
+    // Volume applies while the dialog is open, so Cancel has to put it back.
+    int32_t volume_on_show_ = 0;
+    bool volume_snapshot_taken_ = false;
 
     // Populate `buffers_info_label_` with the current buffer information.
     void OnBuffersChanged(wxCommandEvent& event);

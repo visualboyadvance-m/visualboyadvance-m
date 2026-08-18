@@ -141,7 +141,7 @@ static constexpr size_t kNbSoundRate = static_cast<size_t>(AudioRate::kLast);
 
 // This is incremented whenever we want to change a default value between
 // release versions. The option update code is in load_opts.
-static constexpr uint32_t kIniLatestVersion = 4;
+static constexpr uint32_t kIniLatestVersion = 5;
 
 // Represents a single option saved in the INI file. Option does not own the
 // individual option, but keeps a pointer to where the data is actually saved.
@@ -266,6 +266,15 @@ public:
     bool SetGbPalette(const std::array<uint16_t, 8>& value);
     bool SetGbPaletteString(const wxString& value);
 
+    // The compiled-in default, recorded when the option was constructed, which
+    // happens before any configuration file is read. kInt and kUnsigned only.
+    int32_t GetIntDefault() const;
+    uint32_t GetUnsignedDefault() const;
+
+    // Restores the compiled-in default. Returns false for the types that do not
+    // record one.
+    bool ResetToDefault();
+
     // Min/Max accessors.
     double GetDoubleMin() const;
     double GetDoubleMax() const;
@@ -340,6 +349,10 @@ private:
     // in a compiler error if we use `size_t` here.
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> min_;
     const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t, uint64_t> max_;
+
+    // Set in the kInt and kUnsigned constructors, after the initial value has
+    // been validated. Unused for the other types.
+    int64_t numeric_default_ = 0;
 };
 
 }  // namespace config

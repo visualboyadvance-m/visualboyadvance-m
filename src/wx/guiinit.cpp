@@ -1954,7 +1954,7 @@ bool MainFrame::BindControls()
 
     // just setting to UNLOAD_CMDEN_KEEP is invalid
     // so just set individual flags here
-    cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY;
+    cmd_enable = CMDEN_NGDB_ANY | CMDEN_NREC_ANY | CMDEN_LINK_OFF;
     update_state_ts(true);
 
     // set pointers for checkable menu items

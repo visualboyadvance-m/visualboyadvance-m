@@ -23,6 +23,7 @@
 #include "wx/config/option.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/widgets/option-validator.h"
+#include "wx/widgets/slider-value-label.h"
 
 namespace dialogs {
 
@@ -139,22 +140,6 @@ private:
 
 }  // namespace
 
-// Helper function to update slider tooltip with its current value
-static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
-
-// Helper function to update slider tooltip on mouse enter
-static void UpdateSliderTooltipOnHover(wxSlider* slider, wxMouseEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
-
 // static
 SoundConfig* SoundConfig::NewInstance(wxWindow* parent) {
     VBAM_CHECK(parent);
@@ -165,6 +150,20 @@ SoundConfig::SoundConfig(wxWindow* parent)
     : BaseDialog(parent, "SoundConfig"), tab_loaded_(kTabCount, false) {
     notebook_ = GetValidatedChild<wxNotebook>("SoundConfigNotebook");
     this->Bind(wxEVT_SHOW, &SoundConfig::OnShow, this);
+
+    auto restore_volume = [this]() {
+        if (volume_snapshot_taken_) {
+            OPTION(kSoundVolume) = volume_on_show_;
+        }
+    };
+    Bind(wxEVT_BUTTON, [restore_volume](wxCommandEvent& ev) {
+        restore_volume();
+        ev.Skip();
+    }, wxID_CANCEL);
+    Bind(wxEVT_CLOSE_WINDOW, [restore_volume](wxCloseEvent& ev) {
+        restore_volume();
+        ev.Skip();
+    });
 }
 
 bool SoundConfig::LoadLazyTab(int index) {
@@ -208,12 +207,20 @@ bool SoundConfig::LoadLazyTab(int index) {
 void SoundConfig::InitBasicTab() {
     wxSlider* volume_slider = GetValidatedChild<wxSlider>("Volume");
     volume_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundVolume));
-    volume_slider->SetToolTip(wxString::Format("%d", volume_slider->GetValue()));
-    volume_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, volume_slider, std::placeholders::_1));
-    volume_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, volume_slider, std::placeholders::_1));
-    GetValidatedChild("Volume100")
-        ->Bind(wxEVT_BUTTON, std::bind(&wxSlider::SetValue, volume_slider, 100));
+    widgets::AttachSliderValueLabel(volume_slider, wxEmptyString, [] {
+        config::Option::ByID(config::OptionID::kSoundVolume)->ResetToDefault();
+    });
 
+    // Apply the volume once the drag settles rather than on OK, so it can be
+    // set by ear. wxEVT_SCROLL_CHANGED is the end-of-drag event; using
+    // wxEVT_SLIDER instead would write on every intermediate thumb position.
+    // GameArea's audio_volume_observer_ pushes the option to the backend.
+    volume_slider->Bind(wxEVT_SCROLL_CHANGED, [volume_slider](wxScrollEvent& event) {
+        if (wxValidator* const validator = volume_slider->GetValidator()) {
+            validator->TransferFromWindow();
+        }
+        event.Skip();
+    });
     GetValidatedChild("Rate")->SetValidator(SoundRateValidator());
 }
 
@@ -310,9 +317,9 @@ void SoundConfig::InitAdvancedTab() {
     buffers_info_label_ = GetValidatedChild<wxControl>("BuffersInfo");
     buffers_slider_ = GetValidatedChild<wxSlider>("Buffers");
     buffers_slider_->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundBuffers));
-    buffers_slider_->SetToolTip(wxString::Format("%d", buffers_slider_->GetValue()));
-    buffers_slider_->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, buffers_slider_, std::placeholders::_1));
-    buffers_slider_->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, buffers_slider_, std::placeholders::_1));
+    widgets::AttachSliderDefaultButton(buffers_slider_, [] {
+        config::Option::ByID(config::OptionID::kSoundBuffers)->ResetToDefault();
+    });
     buffers_slider_->Bind(wxEVT_SLIDER, &SoundConfig::OnBuffersChanged, this);
 
     audio_device_selector_ = GetValidatedChild<wxChoice>("Device");
@@ -322,27 +329,35 @@ void SoundConfig::InitAdvancedTab() {
 void SoundConfig::InitGameBoyTab() {
     wxSlider* gb_echo_slider = GetValidatedChild<wxSlider>("GBEcho");
     gb_echo_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBEcho));
-    gb_echo_slider->SetToolTip(wxString::Format("%d", gb_echo_slider->GetValue()));
-    gb_echo_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gb_echo_slider, std::placeholders::_1));
-    gb_echo_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gb_echo_slider, std::placeholders::_1));
+    widgets::AttachSliderValueLabel(gb_echo_slider, wxEmptyString, [] {
+        config::Option::ByID(config::OptionID::kSoundGBEcho)->ResetToDefault();
+    });
 
     wxSlider* gb_stereo_slider = GetValidatedChild<wxSlider>("GBStereo");
     gb_stereo_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBStereo));
-    gb_stereo_slider->SetToolTip(wxString::Format("%d", gb_stereo_slider->GetValue()));
-    gb_stereo_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gb_stereo_slider, std::placeholders::_1));
-    gb_stereo_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gb_stereo_slider, std::placeholders::_1));
+    widgets::AttachSliderValueLabel(gb_stereo_slider, wxEmptyString, [] {
+        config::Option::ByID(config::OptionID::kSoundGBStereo)->ResetToDefault();
+    });
 }
 
 void SoundConfig::InitGameBoyAdvanceTab() {
     wxSlider* gba_filtering_slider = GetValidatedChild<wxSlider>("GBASoundFiltering");
     gba_filtering_slider->SetValidator(widgets::OptionIntValidator(config::OptionID::kSoundGBAFiltering));
-    gba_filtering_slider->SetToolTip(wxString::Format("%d", gba_filtering_slider->GetValue()));
-    gba_filtering_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, gba_filtering_slider, std::placeholders::_1));
-    gba_filtering_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, gba_filtering_slider, std::placeholders::_1));
+    widgets::AttachSliderValueLabel(gba_filtering_slider, wxEmptyString, [] {
+        config::Option::ByID(config::OptionID::kSoundGBAFiltering)->ResetToDefault();
+    });
 }
 
 void SoundConfig::OnShow(wxShowEvent& event) {
     wxCommandEvent dummy_event;
+
+    // Retake every time: the dialog instance is cached and reused.
+    if (event.IsShown()) {
+        volume_on_show_ = OPTION(kSoundVolume);
+        volume_snapshot_taken_ = true;
+    } else {
+        volume_snapshot_taken_ = false;
+    }
 
     // Referesh the buffers information.
     OnBuffersChanged(dummy_event);

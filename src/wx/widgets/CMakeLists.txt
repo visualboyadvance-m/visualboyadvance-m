@@ -16,6 +16,7 @@ target_sources(vbam-wx-widgets
     option-validator.cpp
     pulse-action-dialog.cpp
     render-plugin.cpp
+    slider-value-label.cpp
     user-input-ctrl.cpp
     user-input-event.cpp
     sdl-poller.cpp
@@ -36,6 +37,7 @@ target_sources(vbam-wx-widgets
     option-validator.h
     pulse-action-dialog.h
     render-plugin.h
+    slider-value-label.h
     user-input-ctrl.h
     user-input-event.h
     sdl-poller.h

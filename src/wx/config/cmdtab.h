@@ -81,10 +81,11 @@ enum { CMDEN_GB = (1 << 0), // GB ROM loaded
     CMDEN_NGDB_ANY = (1 << 14), // gdb not connected
     CMDEN_NREC_ANY = (1 << 15), // not a/v recording
     CMDEN_LINK_ANY = (1 << 16), // link enabled
+    CMDEN_LINK_OFF = (1 << 17), // no link session active
 
     CMDEN_NEVER = (1 << 31) // never (for NOOP)
 };
 #define ONLOAD_CMDEN (CMDEN_NSREC | CMDEN_NVREC | CMDEN_NGREC | CMDEN_NGPLAY)
-#define UNLOAD_CMDEN_KEEP (CMDEN_NGDB_ANY | CMDEN_NREC_ANY | CMDEN_LINK_ANY)
+#define UNLOAD_CMDEN_KEEP (CMDEN_NGDB_ANY | CMDEN_NREC_ANY | CMDEN_LINK_ANY | CMDEN_LINK_OFF)
 
 #endif  // VBAM_WX_CONFIG_CMDTAB_H_

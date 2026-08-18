@@ -1,6 +1,7 @@
 #ifndef VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -17,6 +18,9 @@ class wxWindow;
 
 namespace config {
 class Option;
+enum class ColorCorrectionProfile;
+enum class Filter;
+enum class Interframe;
 enum class RenderMethod;
 }
 
@@ -117,6 +121,32 @@ private:
 
     // Handler for plugin directory change.
     void OnPluginDirChanged(wxFileDirPickerEvent& event);
+
+    // Pushes a widget's value into its option as soon as the user changes it,
+    // rather than waiting for OK. Bind on the widget's change event.
+    void ApplyLive(wxCommandEvent& event);
+
+    // Records the value of every option ApplyLive() can write, so Cancel can
+    // put them back.
+    void SnapshotLiveOptions();
+    void RestoreLiveOptions();
+
+    struct LiveSnapshot {
+        config::Filter filter;
+        config::Interframe interframe;
+        uint32_t gba_variant;
+        uint32_t gb_variant;
+        uint32_t gba_darken;
+        uint32_t gb_lighten;
+        config::ColorCorrectionProfile profile;
+        bool profile_auto;
+        uint32_t hdr_reference_white;
+        uint32_t hdr_peak_brightness;
+        uint32_t hdr_highlight_knee;
+        uint32_t hdr_shadow_contrast;
+    };
+    LiveSnapshot live_snapshot_;
+    bool live_snapshot_taken_ = false;
 
     wxNotebook* notebook_ = nullptr;
     std::vector<bool> tab_loaded_;

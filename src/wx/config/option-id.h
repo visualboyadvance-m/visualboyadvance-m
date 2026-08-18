@@ -33,6 +33,7 @@ enum class OptionID {
     kGBBiosFile,
     kGBColorizerHack,
     kGBLCDFilter,
+    kGBLCDFilterVariant,
     kGBGBCBiosFile,
     kGBPalette0,
     kGBPalette1,
@@ -46,6 +47,7 @@ enum class OptionID {
     /// GBA
     kGBABiosFile,
     kGBALCDFilter,
+    kGBALCDFilterVariant,
 #ifndef NO_LINK
     kGBALinkAuto,
     kGBALinkFast,

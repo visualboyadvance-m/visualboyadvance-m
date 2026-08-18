@@ -97,6 +97,8 @@ Option::Option(OptionID id, int32_t* option, int32_t min, int32_t max)
 
     // Validate the initial value.
     SetInt(*option);
+
+    numeric_default_ = *option;
 }
 
 Option::Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max)
@@ -113,6 +115,8 @@ Option::Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max)
 
     // Validate the initial value.
     SetUnsigned(*option);
+
+    numeric_default_ = *option;
 }
 
 Option::Option(OptionID id, wxString* option)
@@ -546,6 +550,27 @@ int32_t Option::GetIntMin() const {
 int32_t Option::GetIntMax() const {
     VBAM_CHECK(is_int());
     return nonstd::get<int32_t>(max_);
+}
+
+int32_t Option::GetIntDefault() const {
+    VBAM_CHECK(is_int());
+    return static_cast<int32_t>(numeric_default_);
+}
+
+uint32_t Option::GetUnsignedDefault() const {
+    VBAM_CHECK(is_unsigned());
+    return static_cast<uint32_t>(numeric_default_);
+}
+
+bool Option::ResetToDefault() {
+    switch (type_) {
+        case Option::Type::kInt:
+            return SetInt(static_cast<int32_t>(numeric_default_));
+        case Option::Type::kUnsigned:
+            return SetUnsigned(static_cast<uint32_t>(numeric_default_));
+        default:
+            return false;
+    }
 }
 
 uint32_t Option::GetUnsignedMin() const {

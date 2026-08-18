@@ -679,6 +679,8 @@ GameArea::GameArea()
           config::OptionID::kSoundGBDeclicking,
           [&](config::Option* option) { gbSoundSetDeclicking(option->GetBool()); }),
       lcd_filters_observer_({config::OptionID::kGBLCDFilter, config::OptionID::kGBADarken, config::OptionID::kGBLighten, config::OptionID::kDispColorCorrectionProfile, config::OptionID::kGBALCDFilter,
+                             config::OptionID::kGBALCDFilterVariant, config::OptionID::kGBLCDFilterVariant,
+                             config::OptionID::kDispColorCorrectionAuto,
                              config::OptionID::kDispHDRReferenceWhite, config::OptionID::kDispHDRPeakBrightness, config::OptionID::kDispHDRHighlightKnee, config::OptionID::kDispHDRShadowContrast},
                             std::bind(&GameArea::UpdateLcdFilter, this)),
       audio_rate_observer_(config::OptionID::kSoundAudioRate,
@@ -1200,6 +1202,12 @@ void GameArea::LoadGame(const wxString& load_path)
                  gopts.link_timeout, OPTION(kGBALinkFast),
                  gopts.link_num_players);
     }
+
+    // The title and the link menu were set earlier in the load, before either
+    // the boot attach above or the IPC mode swap further up could assign a
+    // player id, so both need a second pass here to pick the session up.
+    SetFrameTitle();
+    mf->EnableNetworkMenu();
 #endif
 
 #if defined(VBAM_ENABLE_DEBUGGER)
@@ -2191,6 +2199,13 @@ void GameArea::OnIdle(wxIdleEvent& event)
 {
     wxString pl = wxGetApp().pending_load;
     MainFrame* mf = wxGetApp().frame;
+
+    // The OSD text expires on its own in the draw path, but the status bar copy
+    // does not, and wx restores the status bar's contents every time a menu
+    // closes -- so an expired message keeps coming back on unrelated menu use.
+    // Take it down here, on the main thread.
+    if (systemGetClock() - osdtime >= OSD_TIME)
+        systemClearStatusMessage();
 
     // Preload one config dialog per idle tick while no ROM is running, so
     // the user doesn't pay the XRC parse cost the first time they open
@@ -9703,8 +9718,21 @@ void GameArea::UpdateLcdFilter() {
             break;
     }
 
+    const int gba_variant = static_cast<int>(OPTION(kGBALCDFilterVariant));
+    const int gb_variant = static_cast<int>(OPTION(kGBLCDFilterVariant));
+    const float gba_darken = ((float)OPTION(kGBADarken)) / 100;
+    const float gb_lighten = ((float)OPTION(kGBLighten)) / 100;
+
+    // NSO GBC shares one matrix across all three profiles, so Rec2020 gains no
+    // gamut over sRGB and only clips (white lands at 1.28). In auto mode the
+    // profile is not the user's pick, so use sRGB; an explicit pick clears
+    // kDispColorCorrectionAuto and is honored.
+    int gb_DCCP = DCCP;
+    if (gb_variant == kGbcFilterNso && OPTION(kDispColorCorrectionAuto))
+        gb_DCCP = 0;
+
     if (loaded == IMAGE_GBA) {
-        gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
+        gbafilter_set_params(DCCP, gba_darken, gba_variant);
         gbafilter_update_colors(OPTION(kGBALCDFilter));
     } else if (loaded == IMAGE_GB) {
         if (gbHardware & 4) { // Emulated Hardware is SGB
@@ -9712,16 +9740,16 @@ void GameArea::UpdateLcdFilter() {
             gbcfilter_update_colors(false);
         } else if (gbHardware & 8) { // Emulated Hardware is GBA
             // Apply GBA LCD filter instead of the GBC LCD Filter
-            gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
+            gbafilter_set_params(DCCP, gba_darken, gba_variant);
             gbafilter_update_colors(OPTION(kGBLCDFilter));
         } else {
             // Apply GBC LCD filter for GB/GBC modes
-            gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
+            gbcfilter_set_params(gb_DCCP, gb_lighten, gb_variant);
             gbcfilter_update_colors(OPTION(kGBLCDFilter));
         }
     } else {
-        gbafilter_set_params(DCCP, (((float)OPTION(kGBADarken)) / 100));
-        gbcfilter_set_params(DCCP, (((float)OPTION(kGBLighten)) / 100));
+        gbafilter_set_params(DCCP, gba_darken, gba_variant);
+        gbcfilter_set_params(gb_DCCP, gb_lighten, gb_variant);
         gbafilter_update_colors(false);
         gbcfilter_update_colors(false);
     }

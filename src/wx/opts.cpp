@@ -472,6 +472,15 @@ void load_opts(bool first_time_launch) {
                     OPTION(kDispRenderMethod) = config::RenderMethod::kGLES;
                 }
 #endif
+                [[fallthrough]];
+            }
+            case 4: { // new default for the sound buffer count.
+                // Each buffer is a frame of audio, so the count is latency:
+                // the previous default of 10 was 167ms. Only move a config that
+                // still holds that value; an explicit choice is left alone.
+                if (OPTION(kSoundBuffers) == 10) {
+                    OPTION(kSoundBuffers) = 3;
+                }
             }
         }
         ini_version++;

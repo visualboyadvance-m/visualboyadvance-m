@@ -2672,11 +2672,30 @@ EVT_HANDLER(RetainAspect, "Retain aspect ratio when resizing")
     GetMenuOptionConfig("RetainAspect", config::OptionID::kDispStretch);
 }
 
-EVT_HANDLER(Printer, "Enable printer emulation")
+#ifndef NO_LINK
+// The Game Boy printer and a link session are mutually exclusive uses of the
+// serial port, so the printer is turned off for the duration of a session.
+// Remembered here rather than written through to the option, so an enforced
+// off does not become the user's saved preference.
+static bool printer_enabled_before_link = false;
+static bool printer_suspended_by_link = false;
+
+// Reattaches the GB serial handler to whichever of the two owns it now.
+static void UpdateGbSerialFunction()
+{
+    gbSerialFunction = coreOptions.gbPrinterEnabled ? gbPrinterSend : gbStartLink;
+}
+
+#endif  // NO_LINK
+
+EVT_HANDLER_MASK(Printer, "Enable printer emulation", CMDEN_LINK_OFF)
 {
     GetMenuOptionInt("Printer", &coreOptions.gbPrinterEnabled, 1);
 #ifndef NO_LINK
     gbSerialFunction = gbStartLink;
+    // An explicit toggle is the user's preference, so it survives the next
+    // link session rather than being overwritten when that session ends.
+    printer_enabled_before_link = coreOptions.gbPrinterEnabled != 0;
 #else
     gbSerialFunction = NULL;
 #endif
@@ -2836,7 +2855,9 @@ EVT_HANDLER(SuspendScreenSaver, "Suspend screensaver when game is running")
 
 void MainFrame::EnableNetworkMenu()
 {
-    cmd_enable &= ~CMDEN_LINK_ANY;
+    const bool linked = GetLinkMode() != LINK_DISCONNECTED;
+
+    cmd_enable &= ~(CMDEN_LINK_ANY | CMDEN_LINK_OFF);
 
     // "Start Link..." attaches either transport: the NetLink dialog in
     // network mode, or a direct IPC attach in local mode. It only stays
@@ -2844,7 +2865,104 @@ void MainFrame::EnableNetworkMenu()
     if (gopts.gba_link_type != 0)
         cmd_enable |= CMDEN_LINK_ANY;
 
+    if (!linked)
+        cmd_enable |= CMDEN_LINK_OFF;
+
+    // Suspend the printer for the session, restoring the user's setting when
+    // the session ends.
+    if (linked && !printer_suspended_by_link) {
+        printer_enabled_before_link = coreOptions.gbPrinterEnabled != 0;
+        printer_suspended_by_link = true;
+        coreOptions.gbPrinterEnabled = 0;
+        SetMenuOption("Printer", 0);
+        UpdateGbSerialFunction();
+    } else if (!linked && printer_suspended_by_link) {
+        printer_suspended_by_link = false;
+        coreOptions.gbPrinterEnabled = printer_enabled_before_link ? 1 : 0;
+        SetMenuOption("Printer", coreOptions.gbPrinterEnabled ? 1 : 0);
+        UpdateGbSerialFunction();
+    }
+
+    // The one menu entry both starts and stops, so it says which it will do.
+    // XRC turns '_' into wx's '&' mnemonic marker when it loads a label; a
+    // label set from code has to use '&' itself. Any accelerator text the
+    // binding code appended is carried across, since SetItemLabel replaces the
+    // whole string.
+    for (const cmditem& cmd_item : cmdtab) {
+        if (cmd_item.cmd_id != XRCID("LanLink") || !cmd_item.mi)
+            continue;
+
+        const wxString old_label = cmd_item.mi->GetItemLabel();
+        wxString accel;
+        const size_t tab_index = old_label.find('\t');
+        if (tab_index != wxString::npos) {
+            accel = old_label.substr(tab_index);
+        } else {
+            const size_t paren_index = old_label.rfind(" (");
+            if (paren_index != wxString::npos && old_label.Last() == ')')
+                accel = old_label.substr(paren_index);
+        }
+
+        const wxString label =
+            (linked ? _("Stop &Link") : _("Start &Link...")) + accel;
+        if (label != old_label)
+            cmd_item.mi->SetItemLabel(label);
+        break;
+    }
+
     enable_menus();
+}
+
+// Brings a link session up for the configured mode without going through the
+// menu handler. Returns true if a session is running afterwards. Network and
+// Dolphin modes need the NetLink dialog, so they are not restarted silently.
+static bool RestartLinkSession()
+{
+    MainFrame* mf = wxGetApp().frame;
+    const LinkMode configured = mf->GetConfiguredLinkMode();
+
+    if (configured == LINK_DISCONNECTED)
+        return false;
+
+    if (configured == LINK_GAMECUBE_DOLPHIN || !OPTION(kGBALinkProto))
+        return false;
+
+    SetLinkTimeout(gopts.link_timeout);
+    EnableSpeedHacks(OPTION(kGBALinkFast));
+
+    if (InitLink(configured) != LINK_OK) {
+        // InitIPC already reported the specific failure.
+        CloseLink();
+        return false;
+    }
+
+    if (configured == LINK_GAMEBOY_IPC)
+        gbInitLink();
+
+    systemScreenMessage(
+        wxString::Format(_("Started local link as player %d"), GetLinkPlayerId() + 1));
+    return true;
+}
+
+// Drops the current session and brings it back up under the settings that just
+// changed. Nothing to do when no session was running.
+static void RelinkAfterSettingChange()
+{
+    MainFrame* mf = wxGetApp().frame;
+
+    if (GetLinkMode() == LINK_DISCONNECTED) {
+        mf->EnableNetworkMenu();
+        return;
+    }
+
+    CloseLink();
+
+    if (!RestartLinkSession()) {
+        systemScreenMessage(_("Link stopped: restart it to apply the new settings"));
+    }
+
+    mf->GetPanel()->SetFrameTitle();
+    mf->EnableNetworkMenu();
 }
 
 void SetLinkTypeMenu(const char* type, int value)
@@ -2858,8 +2976,9 @@ void SetLinkTypeMenu(const char* type, int value)
     mf->SetMenuOption(type, 1);
     gopts.gba_link_type = value;
     update_opts();
-    CloseLink();
-    mf->EnableNetworkMenu();
+    // The mode is part of the session, so an open one is rebuilt under the new
+    // type rather than left running as the old one.
+    RelinkAfterSettingChange();
 }
 
 #endif  // NO_LINK
@@ -2867,16 +2986,13 @@ void SetLinkTypeMenu(const char* type, int value)
 EVT_HANDLER_MASK(LanLink, "Start link", CMDEN_LINK_ANY)
 {
 #ifndef NO_LINK
+    // The menu entry reads "Stop Link" while a session is up, so acting on it
+    // is unambiguous and needs no confirmation.
     if (GetLinkMode() != LINK_DISCONNECTED) {
-        wxMessageDialog dlg(this, _("A link is already active.\nDisconnect it?"),
-                            _("Link"), wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
-
-        if (dlg.ShowModal() == wxID_YES) {
-            CloseLink();
-            panel->SetFrameTitle();
-            EnableNetworkMenu();
-        }
-
+        CloseLink();
+        systemScreenMessage(_("Link stopped"));
+        panel->SetFrameTitle();
+        EnableNetworkMenu();
         return;
     }
 
@@ -2892,26 +3008,15 @@ EVT_HANDLER_MASK(LanLink, "Start link", CMDEN_LINK_ANY)
         wxDialog* dlg = GetXRCDialog("NetLink");
         ShowModal(dlg);
         panel->SetFrameTitle();
+        EnableNetworkMenu();
         return;
     }
 
     // Local (IPC) mode: the attach is synchronous, no dialog needed.
     CloseLink();
-    SetLinkTimeout(gopts.link_timeout);
-    EnableSpeedHacks(OPTION(kGBALinkFast));
-
-    if (InitLink(configured) != LINK_OK) {
-        // InitIPC already reported the specific failure.
-        CloseLink();
-        return;
-    }
-
-    if (configured == LINK_GAMEBOY_IPC)
-        gbInitLink();  // gbReset already ran at ROM load; hook GB serial now
-
-    systemScreenMessage(
-        wxString::Format(_("Started local link as player %d"), GetLinkPlayerId() + 1));
+    RestartLinkSession();
     panel->SetFrameTitle();
+    EnableNetworkMenu();
 #endif
 }
 
@@ -2968,7 +3073,8 @@ EVT_HANDLER(LinkProto, "Local host IPC")
 {
 #ifndef NO_LINK
     GetMenuOptionConfig("LinkProto", config::OptionID::kGBALinkProto);
-    EnableNetworkMenu();
+    // Local vs network is the transport, so an open session is rebuilt on it.
+    RelinkAfterSettingChange();
 #endif
 }
 

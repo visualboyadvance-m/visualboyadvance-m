@@ -5,6 +5,7 @@
 #include <wx/print.h>
 #include <wx/printdlg.h>
 #include <wx/socket.h>
+#include <wx/statusbr.h>
 
 #include "core/base/image_util.h"
 #include "core/base/sdl_motion.h"
@@ -16,6 +17,7 @@
 #include "wx/config/cmdtab.h"
 #include "wx/config/emulated-gamepad.h"
 #include "wx/config/option-proxy.h"
+
 #include "wx/wxvbam.h"
 
 #ifdef ENABLE_LUA
@@ -1334,6 +1336,16 @@ void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int con
     }
 }
 
+void systemClearStatusMessage()
+{
+    if (!wxGetApp().IsMainLoopRunning())
+        return;
+
+    MainFrame* f = wxGetApp().frame;
+    if (f && f->GetStatusBar() && !f->GetStatusBar()->GetStatusText(0).empty())
+        f->SetStatusText(wxEmptyString, 0);
+}
+
 void systemScreenMessage(const wxString& msg)
 {
     // During teardown the main loop stops running before the frame and its
@@ -1348,10 +1360,12 @@ void systemScreenMessage(const wxString& msg)
         GameArea* panel = f->GetPanel();
 
         if (panel && f->GetStatusBar()) {
-            if (!panel->osdtext.empty())
-                f->PopStatusText();
-
-            f->PushStatusText(msg);
+            // Set outright rather than pushed. The push/pop stack shares its
+            // state with wxFrame's menu-help mechanism, which writes this same
+            // field, and the two overwrote each other. Cleared by the idle
+            // handler once the message expires, and by MenuPopped() when a menu
+            // opens.
+            f->SetStatusText(msg, 0);
         }
 
         if (panel) {
@@ -1512,6 +1526,7 @@ bool debugWaitPty()
 #endif
 
 #include <wx/socket.h>
+#include <wx/statusbr.h>
 
 static wxSocketServer* debug_server = NULL;
 wxSocketBase* debug_remote = NULL;

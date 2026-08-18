@@ -10,6 +10,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/option-proxy.h"
 #include "wx/viewsupt.h"
+#include "wx/widgets/slider-value-label.h"
 #include "wx/wxvbam.h"
 
 #if __STDC_WANT_SECURE_LIB__
@@ -17,22 +18,6 @@
 #endif
 
 namespace {
-
-// Helper function to update slider tooltip with its current value
-static void UpdateSliderTooltip(wxSlider* slider, wxCommandEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
-
-// Helper function to update slider tooltip on mouse enter
-static void UpdateSliderTooltipOnHover(wxSlider* slider, wxMouseEvent& event) {
-    if (slider) {
-        slider->SetToolTip(wxString::Format("%d", slider->GetValue()));
-    }
-    event.Skip();
-}
 
 void utilReadScreenPixels(uint8_t* dest, int w, int h) {
     uint8_t* b = dest;
@@ -1569,9 +1554,7 @@ public:
         getslider(, "Palette", palette_);
         wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
         if (palette_slider) {
-            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
-            palette_slider->Bind(wxEVT_SLIDER, std::bind(UpdateSliderTooltip, palette_slider, std::placeholders::_1));
-            palette_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, palette_slider, std::placeholders::_1));
+            widgets::AttachSliderValueLabel(palette_slider);
         }
         getlab(tileno_, "Tile", "1WWW");
         getlab(addr_, "Address", "06WWWWWW");
@@ -1768,13 +1751,12 @@ public:
         wxSlider* palette_slider = XRCCTRL(*this, "Palette", wxSlider);
         if (palette_slider) {
             palette = palette_slider->GetValue(); // Sync palette to slider value
-            palette_slider->SetToolTip(wxString::Format("%d", palette_slider->GetValue()));
+            widgets::AttachSliderValueLabel(palette_slider);
             palette_slider->Bind(wxEVT_SLIDER, [this, palette_slider](wxCommandEvent& event) {
                 palette = palette_slider->GetValue(); // Update palette on slider change
-                UpdateSliderTooltip(palette_slider, event);
                 this->Update(); // Refresh display
+                event.Skip();
                 });
-            palette_slider->Bind(wxEVT_ENTER_WINDOW, std::bind(UpdateSliderTooltipOnHover, palette_slider, std::placeholders::_1));
         }
         getlab(tileno, "Tile", "2WW");
         getlab(addr, "Address", "WWWW");

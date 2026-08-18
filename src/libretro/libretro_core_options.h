@@ -205,6 +205,38 @@ struct retro_core_option_v2_definition option_defs_us[] = {
         "sRGB"
     },
     {
+        "vbam_lcdfilter_gba_panel",
+        "LCD Color Filter GBA Panel",
+        NULL,
+        "LCD panel the GBA color correction emulates.",
+        NULL,
+        "video",
+        {
+            { "GBA",  NULL },
+            { "GBASP Backlit",  NULL },
+            { "Micro", NULL },
+            { "DS", NULL },
+            { "DS-Lite", NULL },
+            { "NSO", NULL },
+            { NULL, NULL },
+        },
+        "GBA"
+    },
+    {
+        "vbam_lcdfilter_gbc_panel",
+        "LCD Color Filter GBC Panel",
+        NULL,
+        "LCD panel the GBC color correction emulates.",
+        NULL,
+        "video",
+        {
+            { "GBC",  NULL },
+            { "NSO", NULL },
+            { NULL, NULL },
+        },
+        "GBC"
+    },
+    {
         "vbam_color_change",
         "LCD Color Lighten/Darken",
         NULL,

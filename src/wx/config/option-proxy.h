@@ -37,6 +37,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kGBBiosFile*/ Option::Type::kString,
     /*kGBColorizerHack*/ Option::Type::kBool,
     /*kGBLCDFilter*/ Option::Type::kBool,
+    /*kGBLCDFilterVariant*/ Option::Type::kUnsigned,
     /*kGBGBCBiosFile*/ Option::Type::kString,
     /*kGBPalette0*/ Option::Type::kGbPalette,
     /*kGBPalette1*/ Option::Type::kGbPalette,
@@ -50,6 +51,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /// GBA
     /*kGBABiosFile*/ Option::Type::kString,
     /*kGBALCDFilter*/ Option::Type::kBool,
+    /*kGBALCDFilterVariant*/ Option::Type::kUnsigned,
 #ifndef NO_LINK
     /*kGBALinkAuto*/ Option::Type::kBool,
     /*kGBALinkFast*/ Option::Type::kBool,

@@ -34,15 +34,6 @@
                 <flag>wxEXPAND</flag>
               </object>
               <object class="sizeritem">
-                <object class="wxButton" name="Volume100">
-                  <label translate="0">100%</label>
-                </object>
-              </object>
-              <object class="spacer">
-                <option>1</option>
-                <flag>wxEXPAND</flag>
-              </object>
-              <object class="sizeritem">
                 <object class="wxStaticText">
                   <label>Maximum</label>
                 </object>

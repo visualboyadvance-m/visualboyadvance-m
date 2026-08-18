@@ -19,6 +19,9 @@
 
 #define VBAM_OPTION_INTERNAL_INCLUDE
 #include "wx/config/internal/option-internal.h"
+
+#include "components/filters_agb/filters_agb.h"
+#include "components/filters_cgb/filters_cgb.h"
 #undef VBAM_OPTION_INTERNAL_INCLUDE
 
 struct CoreOptions coreOptions;
@@ -238,6 +241,8 @@ std::array<Option, kNbOptions>& Option::All() {
         wxString gb_bios = wxEmptyString;
         bool colorizer_hack = false;
         bool gb_lcd_filter = true;
+        // Index into GbcFilterVariant.
+        uint32_t gb_lcd_filter_variant = 0;
         wxString gbc_bios = wxEmptyString;
         bool print_auto_page = true;
         bool print_screen_cap = false;
@@ -247,6 +252,8 @@ std::array<Option, kNbOptions>& Option::All() {
 
         /// GBA
         bool gba_lcd_filter = true;
+        // Index into GbaFilterVariant.
+        uint32_t gba_lcd_filter_variant = 0;
 #ifndef NO_LINK
         bool link_auto = false;
         bool link_hacks = true;
@@ -315,9 +322,10 @@ std::array<Option, kNbOptions>& Option::All() {
         AudioApi audio_api = AudioApi::kSDL;
 #endif
         wxString audio_dev;
-        // 10 fixes stuttering on mac with openal, as opposed to 5
-        // also should be better for modern hardware in general
-        int32_t audio_buffers = 10;
+        // Buffer count is latency: each one is a frame of audio, so this is
+        // 50ms at 3. Keep it as low as the backend tolerates without crackling
+        // rather than padding it for headroom.
+        int32_t audio_buffers = 3;
         int32_t gba_sound_filtering = 50;
         bool gb_declicking = true;
         int32_t gb_echo = 20;
@@ -369,6 +377,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kGBBiosFile, &g_owned_opts.gb_bios),
         Option(OptionID::kGBColorizerHack, &g_owned_opts.colorizer_hack),
         Option(OptionID::kGBLCDFilter, &g_owned_opts.gb_lcd_filter),
+        Option(OptionID::kGBLCDFilterVariant, &g_owned_opts.gb_lcd_filter_variant, 0,
+               kGbcFilterVariantCount - 1),
         Option(OptionID::kGBGBCBiosFile, &g_owned_opts.gbc_bios),
         Option(OptionID::kGBPalette0, systemGbPalette),
         Option(OptionID::kGBPalette1, systemGbPalette + 8),
@@ -382,6 +392,8 @@ std::array<Option, kNbOptions>& Option::All() {
         /// GBA
         Option(OptionID::kGBABiosFile, &gopts.gba_bios),
         Option(OptionID::kGBALCDFilter, &g_owned_opts.gba_lcd_filter),
+        Option(OptionID::kGBALCDFilterVariant, &g_owned_opts.gba_lcd_filter_variant, 0,
+               kGbaFilterVariantCount - 1),
 #ifndef NO_LINK
         Option(OptionID::kGBALinkAuto, &g_owned_opts.link_auto),
         Option(OptionID::kGBALinkFast, &g_owned_opts.link_hacks),
@@ -533,6 +545,9 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"GB/BiosFile", "", _("BIOS file to use for Game Boy, if enabled")},
     OptionData{"GB/ColorizerHack", "ColorizerHack", _("Enable DX Colorization Hacks")},
     OptionData{"GB/LCDFilter", "GBLcdFilter", _("Apply LCD filter, if enabled")},
+    OptionData{"GB/LCDFilterVariant", "",
+               _("LCD panel the GBC color correction emulates "
+                 "(0 = GBC, 1 = NSO)")},
     OptionData{"GB/GBCBiosFile", "", _("BIOS file to use for Game Boy Color, if enabled")},
     OptionData{"GB/Palette0", "",
                _("The default palette, as 8 comma-separated 4-digit hex "
@@ -559,6 +574,9 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
         "GBALcdFilter",
         _("Apply LCD filter, if enabled"),
     },
+    OptionData{"GBA/LCDFilterVariant", "",
+               _("LCD panel the GBA color correction emulates (0 = GBA, "
+                 "1 = GBASP Backlit, 2 = Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)")},
 #ifndef NO_LINK
     OptionData{
         "GBA/LinkAuto",
