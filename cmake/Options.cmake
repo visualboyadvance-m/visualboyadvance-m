@@ -247,10 +247,36 @@ if(ENABLE_WX)
     find_package(Lua)
 
     if(Lua_FOUND)
-        set(lua_default ON)
+        # A located Lua is not necessarily a usable one. On macOS a package
+        # manager install for the host architecture is happily found for a
+        # cross build, and the mismatch then only shows up as undefined
+        # symbols at link time, at the very end of the build. Link a probe
+        # against it instead of trusting the find.
+        include(CMakePushCheckState)
+        include(CheckCSourceCompiles)
+
+        cmake_push_check_state(RESET)
+        set(CMAKE_REQUIRED_INCLUDES  ${LUA_INCLUDE_DIR})
+        set(CMAKE_REQUIRED_LIBRARIES ${LUA_LIBRARIES})
+        check_c_source_compiles("
+            #include <lua.h>
+            #include <lauxlib.h>
+            int main(void) { lua_close(luaL_newstate()); return 0; }
+        " LUA_LINKS)
+        cmake_pop_check_state()
+
+        if(LUA_LINKS)
+            set(lua_default ON)
+        else()
+            message(WARNING "Lua ${LUA_VERSION_STRING} was found at ${LUA_LIBRARY} but a test program does not link against it, it is probably for a different architecture")
+        endif()
     endif()
 
     option(ENABLE_LUA "Enable Lua scripting (wx frontend)" ${lua_default})
+
+    if(ENABLE_LUA AND NOT lua_default)
+        message(FATAL_ERROR "ENABLE_LUA is set, but no usable Lua was found")
+    endif()
 else()
     vbam_disable_option_without_wx(ENABLE_LUA)
 endif()
