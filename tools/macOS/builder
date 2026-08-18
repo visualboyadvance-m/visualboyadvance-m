@@ -181,23 +181,6 @@ done
 
 table_line_replace DIST_PREFIX libuuid /usr/stow/libuuid
 
-# Lua for the wx frontend's scripting support. Without it in our own prefix,
-# find_package(Lua) falls through to whatever Homebrew/MacPorts has installed,
-# which is the wrong architecture whenever the host and target differ (and is a
-# dylib we would then have to bundle.) Upstream has no configure script and only
-# the static library and the headers are wanted, so build the `a' target
-# directly and install by hand; that also avoids linking the interpreter
-# binaries, which want readline.
-DISTS=$DISTS'
-    lua             https://www.lua.org/ftp/lua-5.5.1.tar.gz                                                    lib/liblua.a
-'
-
-table_line_append DIST_BUILD_OVERRIDES lua '$MAKE -j$NUM_CPUS -C src a CC="$CC" MYCFLAGS="$CPPFLAGS $CFLAGS -DLUA_USE_MACOSX" && cp -f src/liblua.a "$BUILD_ROOT/root/lib" && cp -f src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h src/lua.hpp "$BUILD_ROOT/root/include"'
-
-# Fail the configure rather than quietly turn out a release build without
-# scripting support if the Lua above is ever not picked up.
-PROJECT_ARGS="$PROJECT_ARGS -DENABLE_LUA=ON"
-
 stdint_h=
 
 if [ -f "$(xcode-select -p)/SDKs/MacOSX.sdk/usr/include/stdint.h" ]; then

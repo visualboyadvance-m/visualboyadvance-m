@@ -145,6 +145,7 @@ DISTS=$DISTS'
     giflib          https://sourceforge.net/projects/giflib/files/giflib-6.1.3.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
     fmt             https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip                       lib/libfmt.a
+    lua             https://www.lua.org/ftp/lua-5.5.1.tar.gz                                                    lib/liblua.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.3/wxWidgets-3.3.3.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
@@ -161,7 +162,7 @@ FFMPEG_DISTS='
     libvpx libx264 libx265 libxavs libzmq libzvbi ffmpeg
 '
 
-PROJECT_ARGS="-DDISABLE_MACOS_PACKAGE_MANAGERS=TRUE -DENABLE_ONLINEUPDATES=ON -DwxWidgets_CONFIG_EXECUTABLE='$BUILD_ROOT/root/bin/wx-config' -DwxWidgets_CONFIG_OPTIONS='--prefix=$BUILD_ROOT/root' -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_C_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_OBJC_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_OBJCXX_FLAGS='-I$BUILD_ROOT/root/include'"
+PROJECT_ARGS="-DDISABLE_MACOS_PACKAGE_MANAGERS=TRUE -DENABLE_ONLINEUPDATES=ON -DENABLE_LUA=ON -DwxWidgets_CONFIG_EXECUTABLE='$BUILD_ROOT/root/bin/wx-config' -DwxWidgets_CONFIG_OPTIONS='--prefix=$BUILD_ROOT/root' -DBUILD_TESTING=OFF -DCMAKE_CXX_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_C_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_OBJC_FLAGS='-I$BUILD_ROOT/root/include' -DCMAKE_OBJCXX_FLAGS='-I$BUILD_ROOT/root/include'"
 
 : ${PATH_SEP:=':'}
 
@@ -293,6 +294,7 @@ DIST_BUILD_OVERRIDES="$DIST_BUILD_OVERRIDES
                    \$MAKE -j\$NUM_CPUS; \
                    \$MAKE install bin=\"\$BUILD_ROOT/root/bin\" mansrc=\"\$BUILD_ROOT/root/share/man/man1\" privlib=\"\$BUILD_ROOT/root/lib/c2man\"
     zstd           \$MAKE -j\$NUM_CPUS -C lib install-static DESTDIR=\"\$BUILD_ROOT/root\" LIBDIR=/lib
+    lua            build_lua
     setuptools     python bootstrap.py; python easy_install.py .
     pip            easy_install .
     ninja          python configure.py --bootstrap && cp -af ./ninja \"\$BUILD_ROOT/root/bin\"
@@ -2681,6 +2683,40 @@ install_fonts() {
     IFS=$OIFS
 
     [ -n "$font_found" ] && echo_run fc-cache -fv "$BUILD_ROOT/root/share/fonts/${PWD##*/}"
+}
+
+# Lua ships a plain makefile with no configure script, and only the static
+# library and the headers are wanted here, so build the `a' target directly and
+# install it by hand. That also avoids linking the interpreter binaries, which
+# want readline.
+build_lua() {
+    case "$target_os" in
+        mac)
+            _lua_defines=-DLUA_USE_MACOSX
+            ;;
+        linux)
+            _lua_defines=-DLUA_USE_LINUX
+            ;;
+        windows)
+            _lua_defines=
+            ;;
+        *)
+            _lua_defines=-DLUA_USE_POSIX
+            ;;
+    esac
+
+    # The makefile hardcodes the native archiver.
+    _lua_ar=ar _lua_ranlib=ranlib
+
+    if [ -n "$target_platform" ] && command -v "$target_platform-ar" >/dev/null; then
+        _lua_ar="$target_platform-ar" _lua_ranlib="$target_platform-ranlib"
+    fi
+
+    echo_run $MAKE -j$NUM_CPUS -C src a CC="$CC" AR="$_lua_ar rcu" RANLIB="$_lua_ranlib" \
+             MYCFLAGS="$CPPFLAGS $CFLAGS $_lua_defines"
+
+    echo_run cp -f src/liblua.a "$BUILD_ROOT/root/lib"
+    echo_run cp -f src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h src/lua.hpp "$BUILD_ROOT/root/include"
 }
 
 table_line() {
