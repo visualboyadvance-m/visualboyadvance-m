@@ -65,22 +65,35 @@ extern "C"
 		return SZ_OK;
 	}
 
+	// ILookInStream::Seek contract: resolve *pos against the requested origin,
+	// perform the seek, and write the resulting ABSOLUTE position back to *pos.
+	// All three origins must be honoured. 7-Zip >= 24.x issues a SZ_SEEK_CUR/0
+	// query in SzArEx_Open2() purely to learn the current offset; treating that
+	// as SZ_SEEK_SET (as this function used to) rewinds the reader to 0 and
+	// reports 0, leaving p->startPosAfterHeader short by k7zStartHeaderSize and
+	// sending every subsequent absolute seek 32 bytes too low.
 	static SRes zip7_seek_( ISeekInStreamPtr vstream, Int64* pos, ESzSeek mode )
 	{
+		assert( pos );
 		ISeekInStream *stream = (ISeekInStream *)vstream;
 		Zip7_Extractor_Impl* impl = (Zip7_Extractor_Impl*)stream;
 		
-		// assert( mode != SZ_SEEK_CUR ); // never used
-		
-		if ( mode == SZ_SEEK_END )
+		Int64 base;
+		switch ( mode )
 		{
-			assert( *pos == 0 ); // only used to find file length
-			*pos = impl->in->size();
-			return SZ_OK;
+		case SZ_SEEK_SET: base = 0;                            break;
+		case SZ_SEEK_CUR: base = (Int64) impl->in->tell();     break;
+		case SZ_SEEK_END: base = (Int64) impl->in->size();     break;
+		default:          return SZ_ERROR_PARAM;
 		}
 		
-		// assert( mode == SZ_SEEK_SET );
-		blargg_err_t err = impl->in->seek( (int)*pos );
+		const Int64 target = base + *pos;
+		
+		// File_Reader is int-indexed; reject anything it cannot express
+		if ( target < 0 || target > (Int64) impl->in->size() )
+			return SZ_ERROR_INPUT_EOF;
+		
+		blargg_err_t err = impl->in->seek( (int) target );
 		if ( err )
 		{
 			// don't set in_err in this case, since it might be benign
@@ -91,6 +104,7 @@ extern "C"
 			return SZ_ERROR_READ;
 		}
 		
+		*pos = target;
 		return SZ_OK;
 	}
 }
