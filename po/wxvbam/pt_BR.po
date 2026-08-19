@@ -402,7 +402,7 @@ msgstr "Não pode usar a BIOS do Game Boy quando o Hack Colorizador estiver ativ
 
 #: cmdevents.cpp:2907
 msgid "Stop &Link"
-msgstr ""
+msgstr "Parar o &Link"
 
 #: cmdevents.cpp:2907 xrc/MainMenu.xrc:272
 msgid "Start &Link..."
@@ -415,11 +415,11 @@ msgstr "Iniciou o link local como jogador %d"
 
 #: cmdevents.cpp:2961
 msgid "Link stopped: restart it to apply the new settings"
-msgstr ""
+msgstr "O link parou: reinicie-o pra aplicar as novas configurações"
 
 #: cmdevents.cpp:2993
 msgid "Link stopped"
-msgstr ""
+msgstr "O link parou"
 
 #: dialogs/accel-config.cpp:146
 msgid "Menu commands"
@@ -2139,7 +2139,7 @@ msgstr "Aplicar o filtro LCD, se ativado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "LCD panel the GBC color correction emulates (0 = GBC, 1 = NSO)"
-msgstr ""
+msgstr "Painel LCD que a correção das cores do GBC emula (0 = GBC, 1 = NSO)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
 msgid "BIOS file to use for Game Boy Color, if enabled"
@@ -2189,7 +2189,7 @@ msgstr "O arquivo da BIOS a usar, se ativado"
 msgid ""
 "LCD panel the GBA color correction emulates (0 = GBA, 1 = GBASP Backlit, 2 ="
 " Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
-msgstr ""
+msgstr "Painel LCD que a correção das cores do GBA emula (0 = GBA, 1 = GBASP Backlight, 2 = Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Enable link at boot"
@@ -3513,7 +3513,7 @@ msgstr "Perfil:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "LCD Correction for GBA:"
-msgstr ""
+msgstr "Correção do LCD pro GBA:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:66
 msgid "GBA Darken:"
@@ -3529,7 +3529,7 @@ msgstr "Muito Escuro"
 
 #: xrc/DisplayConfigColorCorrection.xrc:107
 msgid "LCD Correction for GBC:"
-msgstr ""
+msgstr "Correção do LCD pro GBC:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:124
 msgid "GBC Lighten:"
