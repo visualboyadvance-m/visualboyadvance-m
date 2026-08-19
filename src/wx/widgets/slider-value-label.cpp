@@ -1,6 +1,7 @@
 #include "wx/widgets/slider-value-label.h"
 
 #include <memory>
+#include <vector>
 
 #include <wx/button.h>
 #include <wx/control.h>
@@ -50,6 +51,35 @@ void SwapInColumn(wxSlider* slider, wxSizer* sizer, size_t index, wxSizerItem* i
     column->Add(slider, 0, wxEXPAND);
     column->Add(box, 0, wxALIGN_CENTRE_HORIZONTAL | wxTOP, slider->FromDIP(2));
     sizer->Insert(index, column, proportion, flag, border);
+
+    // Mutating an already-laid-out sizer does not reposition anything, and the
+    // caller's Fit() is a no-op once the dialog has reached its final size, so
+    // no size event follows to trigger a layout. Without this the box is left
+    // at its construction origin, on top of the static box label.
+    //
+    // Every ancestor that owns a sizer is laid out, outermost first: a panel
+    // can only grow once its parent has given it the room, so laying out just
+    // the innermost one redistributes the old height and squeezes whichever box
+    // comes last. Deferred to the next idle because a page usually carries more
+    // than one slider, and laying out after each compresses the boxes still
+    // being built.
+    std::vector<wxWindow*> chain;
+    for (wxWindow* w = slider->GetParent(); w; w = w->GetParent()) {
+        // A wxStaticBox owns no sizer of its own; its parent panel does.
+        if (w->GetSizer()) {
+            chain.push_back(w);
+        }
+        if (w->IsTopLevel()) {
+            break;
+        }
+    }
+    if (!chain.empty()) {
+        chain.front()->CallAfter([chain]() {
+            for (auto it = chain.rbegin(); it != chain.rend(); ++it) {
+                (*it)->Layout();
+            }
+        });
+    }
 }
 
 // Locates the slider's own item in its containing sizer. Returns false when the
