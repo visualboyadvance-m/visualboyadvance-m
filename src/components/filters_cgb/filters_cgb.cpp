@@ -25,6 +25,8 @@ extern uint32_t systemColorMap32[0x10000];
 // --- Global Constants and Variables for GBC Color Correction ---
 // One profile per (panel variant, color mode), taken from the matching shader.
 // Matrices use the column-major order of GLSL mat4.
+namespace {
+
 struct LcdProfile {
     float m[4][4];        // Column 0-2 = R/G/B, column 3 = black lift + luminance
     float in_gamma[3];    // Per-channel input gamma
@@ -32,7 +34,7 @@ struct LcdProfile {
     float lighten_scale;  // Lighten slider multiplier, 0 = shader has no lighten
 };
 
-static const LcdProfile kProfiles[kGbcFilterVariantCount][3] = {
+const LcdProfile kProfiles[kGbcFilterVariantCount][3] = {
     // gbc-color. Same matrices as gba-color; lighten_screen offsets the gamma.
     {
         {{{0.905f, 0.10f,   0.1575f, 0.0f},
@@ -68,13 +70,13 @@ static const LcdProfile kProfiles[kGbcFilterVariantCount][3] = {
 };
 
 // Screen lightening factor. Default to 0.0f.
-static float lighten_screen = 0.0f;
+float lighten_screen = 0.0f;
 
 // Color mode (0 for sRGB, 1 for DCI, 2 for Rec2020). Default to sRGB (0).
-static int color_mode = 0;
+int color_mode = 0;
 
 // Panel variant. Default to CGB (0).
-static int variant = kGbcFilterCgb;
+int variant = kGbcFilterCgb;
 
 // The active profile, resolved for the per-pixel loop.
 struct LcdKernel {
@@ -85,7 +87,9 @@ struct LcdKernel {
     float out_recip;  // 1 / out_gamma
 };
 
-static LcdKernel kernel;
+LcdKernel kernel;
+
+}  // namespace
 
 // --- Function Implementations ---
 
