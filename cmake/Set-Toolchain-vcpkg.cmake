@@ -592,17 +592,99 @@ function(get_binary_packages)
         return()
     endif()
 
-    # Fetch vcpkg-binpkg tool.
+    # Fetch vcpkg-binpkg tool. Download only when the remote head commit differs
+    # from the extracted one. Not FetchContent: it stamps the URL and never
+    # re-fetches a branch archive, so tool fixes never reach an existing build.
     set(vcpkg_binpkg_dir ${CMAKE_BINARY_DIR}/vcpkg-binpkg)
-    include(FetchContent)
-    FetchContent_Declare(
-        vcpkg_binpkg
-        URL "https://github.com/rkitover/vcpkg-binpkg-prototype/archive/refs/heads/master.zip"
-        SOURCE_DIR ${vcpkg_binpkg_dir}
-    )
-    FetchContent_GetProperties(vcpkg_binpkg)
-    if(NOT vcpkg_binpkg_POPULATED)
-        FetchContent_MakeAvailable(vcpkg_binpkg)
+    set(vcpkg_binpkg_zip ${CMAKE_BINARY_DIR}/vcpkg-binpkg.zip)
+    set(vcpkg_binpkg_tmp ${CMAKE_BINARY_DIR}/vcpkg-binpkg-extract)
+    set(vcpkg_binpkg_url "https://github.com/rkitover/vcpkg-binpkg-prototype")
+
+    set(vcpkg_binpkg_head "")
+
+    find_package(Git QUIET)
+
+    if(GIT_FOUND)
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} ls-remote "${vcpkg_binpkg_url}.git" refs/heads/master
+            OUTPUT_VARIABLE vcpkg_binpkg_ls_remote
+            ERROR_QUIET
+            RESULT_VARIABLE vcpkg_binpkg_ls_error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        if(vcpkg_binpkg_ls_error EQUAL 0)
+            string(REGEX MATCH "^[0-9a-f]+" vcpkg_binpkg_head "${vcpkg_binpkg_ls_remote}")
+        endif()
+    endif()
+
+    set(vcpkg_binpkg_have_tool FALSE)
+    if(EXISTS "${vcpkg_binpkg_dir}/vcpkg-binpkg.psm1")
+        set(vcpkg_binpkg_have_tool TRUE)
+    endif()
+
+    if(vcpkg_binpkg_head AND vcpkg_binpkg_have_tool
+        AND vcpkg_binpkg_head STREQUAL "${VCPKG_BINPKG_COMMIT}")
+        # Up to date.
+    else()
+        if(vcpkg_binpkg_head)
+            set(vcpkg_binpkg_archive "${vcpkg_binpkg_url}/archive/${vcpkg_binpkg_head}.zip")
+        else()
+            # No usable remote answer; keep what is there, or fall back to
+            # master if there is nothing to keep.
+            if(vcpkg_binpkg_have_tool)
+                message(STATUS "Could not reach vcpkg-binpkg remote; using the extracted copy.")
+                set(vcpkg_binpkg_archive "")
+            else()
+                set(vcpkg_binpkg_archive "${vcpkg_binpkg_url}/archive/refs/heads/master.zip")
+            endif()
+        endif()
+
+        if(vcpkg_binpkg_archive)
+            file(DOWNLOAD "${vcpkg_binpkg_archive}" "${vcpkg_binpkg_zip}"
+                STATUS vcpkg_binpkg_status
+                TIMEOUT 60
+            )
+            list(GET vcpkg_binpkg_status 0 vcpkg_binpkg_error)
+
+            if(vcpkg_binpkg_error EQUAL 0)
+                file(REMOVE_RECURSE "${vcpkg_binpkg_tmp}")
+                file(MAKE_DIRECTORY "${vcpkg_binpkg_tmp}")
+                file(ARCHIVE_EXTRACT INPUT "${vcpkg_binpkg_zip}" DESTINATION "${vcpkg_binpkg_tmp}")
+
+                # Strip the archive's top-level directory.
+                file(GLOB_RECURSE vcpkg_binpkg_module "${vcpkg_binpkg_tmp}/*/vcpkg-binpkg.psm1")
+
+                if(vcpkg_binpkg_module)
+                    list(GET vcpkg_binpkg_module 0 vcpkg_binpkg_module)
+                    get_filename_component(vcpkg_binpkg_root "${vcpkg_binpkg_module}" DIRECTORY)
+                    file(REMOVE_RECURSE "${vcpkg_binpkg_dir}")
+                    file(RENAME "${vcpkg_binpkg_root}" "${vcpkg_binpkg_dir}")
+                    set(vcpkg_binpkg_have_tool TRUE)
+                    set(VCPKG_BINPKG_COMMIT "${vcpkg_binpkg_head}" CACHE INTERNAL
+                        "Commit of the extracted vcpkg-binpkg tool")
+                    if(vcpkg_binpkg_head)
+                        message(STATUS "Updated vcpkg-binpkg tool to ${vcpkg_binpkg_head}.")
+                    else()
+                        message(STATUS "Updated vcpkg-binpkg tool from master.")
+                    endif()
+                else()
+                    message(WARNING "vcpkg-binpkg archive has no vcpkg-binpkg.psm1.")
+                endif()
+
+                file(REMOVE_RECURSE "${vcpkg_binpkg_tmp}")
+                file(REMOVE "${vcpkg_binpkg_zip}")
+            elseif(NOT vcpkg_binpkg_have_tool)
+                list(GET vcpkg_binpkg_status 1 vcpkg_binpkg_message)
+                message(STATUS "Could not fetch vcpkg-binpkg (${vcpkg_binpkg_message}); binary packages unavailable.")
+                return()
+            endif()
+        endif()
+    endif()
+
+    if(NOT vcpkg_binpkg_have_tool)
+        message(STATUS "vcpkg-binpkg tool unavailable; binary packages unavailable.")
+        return()
     endif()
 
     # Filter out already-installed packages.
