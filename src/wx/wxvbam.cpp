@@ -2135,9 +2135,17 @@ void MainFrame::StartModal()
     // pointer when dialog popped up
     // it will auto-hide again once game resumes
     panel->ShowPointer();
-    // Pause emulation during modal dialogs to prevent race conditions
-    // when display settings change and the panel is recreated
-    panel->Pause();
+    // Emulation is deliberately left running. The race this used to guard --
+    // display settings recreating the drawing panel underneath a live frame --
+    // is handled where it happens: GameArea::ResetPanel() forces paused=true
+    // around the teardown and restores it after, and does so unconditionally
+    // rather than through Pause(), which returns early while a link is up.
+    //
+    // Pausing here instead covered the whole lifetime of every modal dialog,
+    // so filter, LCD-correction and volume changes could not be seen or heard
+    // as they were made. It also only ever took effect when no link was
+    // active, since it went through Pause() -- which is why the behaviour
+    // differed between linked and unlinked sessions.
     ++dialog_opened;
 }
 
