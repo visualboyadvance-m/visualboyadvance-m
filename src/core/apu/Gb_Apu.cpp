@@ -22,11 +22,17 @@ unsigned const wave_ram   = 0xFF30;
 
 int const power_mask = 0x80;
 
+// Blip_Synth normalises its kernel differently from Blip_Synth_Fast, so the
+// same volume value yields a quieter step. This compensates, so which synth the
+// noise channel uses changes its bandwidth and not its loudness.
+static double const kNoiseBandGain = 1.53;
+
 void Gb_Apu::treble_eq( blip_eq_t const& eq )
 {
 	good_synth.treble_eq( eq );
 	med_synth .treble_eq( eq );
 	noise_synth.treble_eq( eq );
+	noise_band_synth.treble_eq( eq );
 }
 
 inline int Gb_Apu::calc_output( int osc ) const
@@ -65,6 +71,7 @@ void Gb_Apu::synth_volume( int iv )
 	good_synth.volume( v );
 	med_synth .volume( v );
 	noise_synth.volume( v );
+	noise_band_synth.volume( v * kNoiseBandGain );
 }
 
 void Gb_Apu::apply_volume()
@@ -187,6 +194,7 @@ Gb_Apu::Gb_Apu()
 		o.good_synth  = &good_synth;
 		o.med_synth   = &med_synth;
 		o.noise_synth = &noise_synth;
+		o.noise_band_synth = &noise_band_synth;
 	}
 
 	reduce_clicks_ = false;

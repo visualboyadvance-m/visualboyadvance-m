@@ -168,8 +168,13 @@ class Blip_Buffer
 
 // Number of bits in resample ratio fraction. Higher values give a more accurate ratio
 // but reduce maximum buffer size.
+// Fractional bits in the clock-to-sample ratio. At 16 the ratio for a GBA's
+// 16.78 MHz APU clock at 44100 Hz output rounds 172.266 to 172, which runs
+// every channel 0.154% sharp -- small, but audible against hardware and other
+// emulators, and it does not affect the Game Boy's 4.19 MHz clock nearly as
+// much, so it shows up only on GBA. 20 bits brings the error to 0.009%.
 #ifndef BLIP_BUFFER_ACCURACY
-#define BLIP_BUFFER_ACCURACY 16
+#define BLIP_BUFFER_ACCURACY 20
 #endif
 
 // Number bits in phase offset. Fewer than 6 bits (64 phase offsets) results in

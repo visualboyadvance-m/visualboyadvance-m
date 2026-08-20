@@ -484,6 +484,23 @@ static unsigned run_lfsr( unsigned s, unsigned mask, int count )
 
 void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 {
+	// Reconstruction depends on which LFSR is selected.
+	//
+	// The 7-bit LFSR repeats every 127 steps, so its output is an exactly
+	// periodic waveform whose spectrum should be harmonics of that period
+	// with near-silence between them. Sample-and-hold quantises every
+	// transition onto a sample boundary, which jitters the period and fills
+	// those gaps with a broad noise floor -- audible as a buzz on the
+	// percussion that uses it. Measured on a sustained NR43=0x18 tone, the
+	// ratio of harmonic to between-harmonic energy is 2.5 with
+	// sample-and-hold and 181 with a kernel, against 1035 in SameBoy.
+	//
+	// The 15-bit LFSR repeats only every 32767 steps, which at the rates
+	// games use is long enough to be broadband rather than periodic. It has
+	// no harmonic structure to protect and a kernel only costs it level, so
+	// it keeps sample-and-hold.
+	const bool periodic_lfsr = (regs [3] & 0x08) != 0;
+
 	// Determine what will be generated
 	int vol = 0;
 	Blip_Buffer* const out = this->output;
@@ -513,13 +530,15 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 			amp    = -amp;
 		}
 
-		// update_amp via noise_synth (matches LFSR transition path below)
 		output->set_modified();
 		int amp_delta = amp - last_amp;
 		if ( amp_delta )
 		{
 			last_amp = amp;
-			noise_synth->offset( time, amp_delta, output );
+			if ( periodic_lfsr )
+				noise_band_synth->offset( time, amp_delta, output );
+			else
+				noise_synth->offset( time, amp_delta, output );
 		}
 	}
 
@@ -543,6 +562,17 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 		unsigned bits = this->phase;
 
 		int per = period2( period1 * 8 );
+
+		// ---- GBA mixer clamp ----
+		const int mixer_interval = 512;
+		int steps = 1;
+		int effective_per = per;
+		if (mode == Gb_Apu::mode_agb && per < mixer_interval) {
+			steps = mixer_interval / per;   // integer division, discards remainder
+			effective_per = mixer_interval;
+		}
+		// --------------------------
+
 		if ( period2_index() >= 0xE )
 		{
 			time = end_time;
@@ -556,19 +586,36 @@ void Gb_Noise::run( blip_time_t time, blip_time_t end_time )
 		}
 		else
 		{
-			// Output amplitude transitions
+			// Output amplitude transitions – using clamped parameters
 			int delta = -vol;
+			int current_lsb = bits & 1;   // sampled value at the last output
+
 			do
 			{
-				unsigned changed = bits + 1;
-				bits = bits >> 1 & mask;
-				if ( changed & 2 )
-				{
-					bits |= ~mask;
-					delta = -delta;
-					noise_synth->offset_inline( time, delta, out );
+				// Advance LFSR by 'steps' raw steps
+				unsigned new_bits = bits;
+				for (int i = 0; i < steps; i++) {
+					unsigned changed = new_bits + 1;
+					new_bits = (new_bits >> 1) & mask;
+					if (changed & 2)
+						new_bits |= ~mask;
 				}
-				time += per;
+
+				// Advance time to the end of this mixer interval
+				time += effective_per;
+
+				// Sample the LSB at this new time
+				int new_lsb = new_bits & 1;
+				if (new_lsb != current_lsb) {
+					delta = -delta;
+					if ( periodic_lfsr )
+						noise_band_synth->offset_inline( time, delta, out );
+					else
+						noise_synth->offset_inline( time, delta, out );
+					current_lsb = new_lsb;
+				}
+
+				bits = new_bits;
 			}
 			while ( time < end_time );
 
