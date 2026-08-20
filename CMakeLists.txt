@@ -422,7 +422,9 @@ endif()
 # When ZIP_PROGRAM is cached, ENV{PATH} must be set every time.
 if(ZIP_PROGRAM)
     get_filename_component(ZIP_PROGRAM_DIR ${ZIP_PROGRAM} DIRECTORY)
-    if(WIN32)
+    # ENV{PATH} runs host tools, so it is the host that decides the separator.
+    # WIN32 is the target, and is true for a MinGW cross build from Unix.
+    if(CMAKE_HOST_WIN32)
         set(ENV{PATH} "${ZIP_PROGRAM_DIR};$ENV{PATH}")
     else()
         set(ENV{PATH} "${ZIP_PROGRAM_DIR}:$ENV{PATH}")

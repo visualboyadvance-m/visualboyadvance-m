@@ -1,5 +1,6 @@
 #include "wx/widgets/user-input-event.h"
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 

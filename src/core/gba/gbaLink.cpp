@@ -10,8 +10,8 @@
 #if defined(_WIN32)
 
 #include <winsock2.h>
-#include <Windows.h>
-// timeBeginPeriod/timeEndPeriod; not pulled in by Windows.h under
+#include <windows.h>
+// timeBeginPeriod/timeEndPeriod; not pulled in by windows.h under
 // WIN32_LEAN_AND_MEAN (which the MSVC toolchain file defines globally).
 #include <mmsystem.h>
 

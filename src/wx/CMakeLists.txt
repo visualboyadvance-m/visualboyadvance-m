@@ -1366,9 +1366,11 @@ set(
     xrc/SpeedupConfig.xrc
 )
 
-# Include the dir containing wxrc in ENVPPATH} every run.
+# Include the dir containing wxrc in $ENV{PATH} every run.
 get_filename_component(WXRC_DIR ${WXRC} DIRECTORY)
-if(WIN32)
+# ENV{PATH} runs host tools, so it is the host that decides the separator.
+# WIN32 is the target, and is true for a MinGW cross build from Unix.
+if(CMAKE_HOST_WIN32)
     set(ENV{PATH} "${WXRC_DIR};$ENV{PATH}")
 else()
     set(ENV{PATH} "${WXRC_DIR}:$ENV{PATH}")
@@ -1378,7 +1380,7 @@ endif()
 
 # This is needed for builds in WSL.
 set(path_escaped "$ENV{PATH}")
-if(NOT WIN32)
+if(NOT CMAKE_HOST_WIN32)
     string(REPLACE "(" "\\(" path_escaped "${path_escaped}")
     string(REPLACE ")" "\\)" path_escaped "${path_escaped}")
 endif()

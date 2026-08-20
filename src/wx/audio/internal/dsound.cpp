@@ -6,7 +6,7 @@
 
 // DirectSound8
 #define DIRECTSOUND_VERSION 0x0800
-#include <Windows.h>
+#include <windows.h>
 #include <mmeapi.h>
 
 #include <dsound.h>
