@@ -86,8 +86,9 @@ Blip_Buffer::blargg_err_t Blip_Buffer::set_sample_rate( long new_rate, int msec 
 		return "Internal (tried to resize Silent_Blip_Buffer)";
 	}
 
-	// start with maximum length that resampled time can represent
-	long new_size = (ULONG_MAX >> BLIP_BUFFER_ACCURACY) - blip_buffer_extra_ - 64;
+	// start with maximum buffer length, preserving the original 
+	// ~64K range across platforms with 20bit BLIP_BUFFER_ACCURACY
+	long new_size = ((ULONG_MAX & 0xFFFFFFFFUL) >> (BLIP_BUFFER_ACCURACY - 4)) - blip_buffer_extra_ - 64;
 	if ( msec != blip_max_length )
 	{
 		long s = (new_rate * (msec + 1) + 999) / 1000;
