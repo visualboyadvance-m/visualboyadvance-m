@@ -10,6 +10,8 @@ typedef __darwin_uuid_string_t uuid_string_t;
 
 #include "wx/widgets/dpi-support.h"
 
+#include <cmath>
+
 #import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 
@@ -28,6 +30,14 @@ double DPIScaleFactorForWindow(wxWindow* window) {
     }
     return 1.0;
 #endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
+}
+
+int FromDIP(int value, wxWindow* window) {
+#if wxCHECK_VERSION(3, 1, 0)
+    return window->FromDIP(value);
+#else
+    return std::lround(value * DPIScaleFactorForWindow(window));
+#endif  // wxCHECK_VERSION(3, 1, 0)
 }
 
 void RequestHighResolutionOpenGlSurfaceForWindow([[maybe_unused]] wxWindow* window) {
