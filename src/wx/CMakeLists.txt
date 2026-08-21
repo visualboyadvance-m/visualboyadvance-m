@@ -344,6 +344,105 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wxWidgets_INCLUDE_DIRS "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include/wx-${wx_version_major_minor}" CACHE INTERNAL "wxWidgets include directories" FORCE)
 endif()
 
+# vcpkg's wxWidgets imported targets carry the whole static link chain in
+# INTERFACE_LINK_LIBRARIES, and alongside vcpkg's own config-wrapped archives
+# they name some libraries by absolute host path. Most are host-coupled system
+# libraries -- libGL, libX11, libwayland-*, libxkbcommon, libc -- which have to
+# come from the host and must be left alone.
+#
+# But wx also records host copies of libraries vcpkg itself built, and by
+# versioned soname (/usr/lib64/libtiff.so.6.2.0) when the machine wx was built
+# on had no development symlink for the linker to prefer. Those drag a host
+# shared library into an otherwise static build, and a distro upgrade of one
+# leaves the path dangling -- which breaks every try_compile() inheriting
+# CMAKE_REQUIRED_LIBRARIES below, including the check_cxx_symbol_exists()
+# probes for __WXGTK3__ and friends, whose failure then surfaces as the
+# unrelated-looking "Could not find gtk".
+#
+# So for any host path naming a library vcpkg also has a static archive for,
+# drop the host copy and make sure vcpkg's archive is linked in its place.
+# Whether vcpkg provides the library is the whole test: the ones it does not
+# are untouched, which is what keeps the genuinely-system ones working.
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    if(VCPKG_INSTALLED_DIR)
+        set(_wx_vcpkg_prefix "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+    else()
+        set(_wx_vcpkg_prefix "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}")
+    endif()
+
+    get_property(_wx_imported_targets DIRECTORY PROPERTY IMPORTED_TARGETS)
+
+    foreach(_wx_target IN LISTS _wx_imported_targets)
+        if(NOT _wx_target MATCHES "^wx::")
+            continue()
+        endif()
+
+        get_target_property(_wx_ill ${_wx_target} INTERFACE_LINK_LIBRARIES)
+        if(NOT _wx_ill)
+            continue()
+        endif()
+
+        unset(_wx_ill_kept)
+        unset(_wx_replaced_libs)
+
+        foreach(_wx_lib IN LISTS _wx_ill)
+            # Only bare absolute paths outside the vcpkg prefix. vcpkg's own
+            # entries are generator expressions, so they start with '$' and are
+            # skipped here, as are plain link flags and target names.
+            string(FIND "${_wx_lib}" "${_wx_vcpkg_prefix}/" _wx_in_vcpkg)
+
+            if(_wx_lib MATCHES "^/" AND NOT _wx_in_vcpkg EQUAL 0)
+                get_filename_component(_wx_lib_name "${_wx_lib}" NAME)
+
+                # lib<name> up to the first dot, so libtiff.so.6.2.0,
+                # libpng16.so.16 and libfoo.6.dylib all yield <name>.
+                if(_wx_lib_name MATCHES "^lib([^.]+)\\.")
+                    set(_wx_lib_stem "${CMAKE_MATCH_1}")
+
+                    if(EXISTS "${_wx_vcpkg_prefix}/lib/lib${_wx_lib_stem}.a")
+                        message(STATUS
+                            "wx: dropping host ${_wx_lib} from ${_wx_target}, "
+                            "vcpkg provides lib${_wx_lib_stem}.a")
+                        list(APPEND _wx_replaced_libs "${_wx_lib_stem}")
+                        continue()
+                    endif()
+                endif()
+            endif()
+
+            list(APPEND _wx_ill_kept "${_wx_lib}")
+        endforeach()
+
+        # Only a redundancy removal when the target already references vcpkg's
+        # archive, which is the normal case since the port records its own
+        # dependencies. Append it when it does not, so dropping the host copy
+        # can never lose the library.
+        foreach(_wx_lib_stem IN LISTS _wx_replaced_libs)
+            string(FIND "${_wx_ill_kept}" "/lib${_wx_lib_stem}.a" _wx_have_release)
+            string(FIND "${_wx_ill_kept}" "/lib${_wx_lib_stem}d.a" _wx_have_debug)
+
+            if(_wx_have_release EQUAL -1 AND _wx_have_debug EQUAL -1)
+                message(STATUS
+                    "wx: adding ${_wx_vcpkg_prefix}/lib/lib${_wx_lib_stem}.a to ${_wx_target}")
+                list(APPEND _wx_ill_kept "${_wx_vcpkg_prefix}/lib/lib${_wx_lib_stem}.a")
+            endif()
+        endforeach()
+
+        set_property(TARGET ${_wx_target}
+                     PROPERTY INTERFACE_LINK_LIBRARIES "${_wx_ill_kept}")
+    endforeach()
+
+    unset(_wx_vcpkg_prefix)
+    unset(_wx_imported_targets)
+    unset(_wx_ill)
+    unset(_wx_ill_kept)
+    unset(_wx_in_vcpkg)
+    unset(_wx_lib_name)
+    unset(_wx_lib_stem)
+    unset(_wx_replaced_libs)
+    unset(_wx_have_release)
+    unset(_wx_have_debug)
+endif()
+
 # Workaround for wx trying to link dynamic lzma on MSYS2.
 # Also extract -L flags into link_directories() to avoid Windows path
 # colon mangling when arguments are passed on the command line (test

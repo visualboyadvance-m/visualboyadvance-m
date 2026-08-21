@@ -345,9 +345,11 @@ endif()
 
 # Detect MSVC toolkit version for binary package URL path.
 # v143 = VS 2022 (VCToolsVersion env var starts with 14.3).
+# No trailing separator: vcpkg_binary_package_dir() appends one only when there
+# is a subdirectory, so a URL never ends up with an empty path part.
 set(VBAM_VCPKG_TOOLKIT_SUBDIR "")
 if("$ENV{VCToolsVersion}" MATCHES "^14\\.[34]")
-    set(VBAM_VCPKG_TOOLKIT_SUBDIR "v143/")
+    set(VBAM_VCPKG_TOOLKIT_SUBDIR "v143")
 endif()
 
 function(vcpkg_check_git_status git_status)
@@ -435,15 +437,25 @@ function(vcpkg_is_installed pkg_name pkg_ver pkg_triplet powershell outvar)
     endforeach()
 endfunction()
 
+# Path under the binary package host for one triplet. The toolkit
+# subdirectory applies only to the triplet being built for, and is appended
+# only when there is one.
+function(vcpkg_binary_package_dir triplet outvar)
+    set(pkg_dir "${triplet}")
+
+    if(triplet STREQUAL VCPKG_TARGET_TRIPLET AND VBAM_VCPKG_TOOLKIT_SUBDIR)
+        set(pkg_dir "${triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
+    endif()
+
+    set(${outvar} "${pkg_dir}" PARENT_SCOPE)
+endfunction()
+
 function(get_triplet_package_list triplet)
     if(EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
         return()
     endif()
 
-    set(pkg_dir "${triplet}")
-    if(triplet STREQUAL VCPKG_TARGET_TRIPLET)
-        set(pkg_dir "${triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
-    endif()
+    vcpkg_binary_package_dir("${triplet}" pkg_dir)
 
     file(
         DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
@@ -462,10 +474,7 @@ endfunction()
 function(download_package pkg pkgs_dir)
     string(REGEX REPLACE "^[^_]+_[^_]+_([^.]+)[.]zip\$" "\\1" pkg_triplet ${pkg})
 
-    set(pkg_dir "${pkg_triplet}")
-    if(pkg_triplet STREQUAL VCPKG_TARGET_TRIPLET)
-        set(pkg_dir "${pkg_triplet}/${VBAM_VCPKG_TOOLKIT_SUBDIR}")
-    endif()
+    vcpkg_binary_package_dir("${pkg_triplet}" pkg_dir)
 
     message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg} ...")
 

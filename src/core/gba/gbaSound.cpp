@@ -5,6 +5,7 @@
 
 #include "core/apu/Gb_Apu.h"
 #include "core/apu/Multi_Buffer.h"
+#include "core/base/check.h"
 #include "core/base/file_util.h"
 #include "core/base/null_sound_driver.h"
 #include "core/base/port.h"
@@ -422,6 +423,14 @@ static void write_SGCNT0_H(int data)
 
 void soundEvent16(uint32_t address, uint16_t data)
 {
+    // g_ioMem is allocated by CPUInit()/CPUReset() before any register write
+    // reaches here, but it is a global initialized to null, and under LTO gcc
+    // propagates that initializer into this function when it is inlined into
+    // CPUUpdateRegister(). The writes below then look like stores through a
+    // null pointer ("writing 2 bytes into a region of size 0"). The check is
+    // cheap, states the invariant, and gives gcc the fact it is missing.
+    VBAM_CHECK(g_ioMem);
+
     switch (address) {
     case SGCNT0_H:
         write_SGCNT0_H(data);
