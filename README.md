@@ -71,7 +71,7 @@ If `./installdeps` does not work, you may need to install dependencies manually,
 see below for the list. `./installdeps` also works on MSYS2.
 
 For builds using automatically downloaded vcpkg packages for dependencies on
-macOS or Linux, make sure PowerShell Core is installed, and use:
+macOS or Linux use:
 
 ```bash
 cmake .. -DVCPKG_TARGET_TRIPLET=**<SYSTEM>** -DCMAKE_BUILD_TYPE=Release -G Ninja
@@ -80,14 +80,16 @@ cmake .. -DVCPKG_TARGET_TRIPLET=**<SYSTEM>** -DCMAKE_BUILD_TYPE=Release -G Ninja
 
 - x64-linux,
 - arm64-macos,
-- x64-macos,
+- x64-macos
+
+. For Android set `ANDROID_HOME` and `ANDROID_NDK_HOME` and use:
+
 - arm64-android
 - arm-android
 - x64-android
 - x86-android
 - riscv64-android
 
-. For Android you need to set ANDROID_HOME and ANDROID_NDK_HOME.
 . On Windows, vcpkg is the default and that is handled automatically.
 
 If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
@@ -99,8 +101,7 @@ If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
 
 You can download a MINGW32 toolchain
 [here](https://cachemiss.com/files/winxp-mingw32.7z) and extract it to
-`C:\msys64` or wherever your MSYS2 is installed. After which `C:\msys64\mingw32`
-has to be in your `PATH` for the vcpkg build.
+`C:\msys64`.
 
 A `VCPKG_ROOT` is automatically created as a sibling of the project directory,
 unless you set it to something else in your environment.

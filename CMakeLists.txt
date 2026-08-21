@@ -25,6 +25,120 @@ if(WIN32)
         REQUIRED)
 else()
     find_program(POWERSHELL pwsh)
+
+    # PowerShell drives the vcpkg binary package tooling, and without it
+    # Set-Toolchain-vcpkg.cmake stops with "Powershell is required to use
+    # vcpkg binaries". Few Linux or macOS systems have it, and some have no
+    # package for it at all, so fetch the upstream portable build into the
+    # build tree rather than failing.
+    #
+    # Only when vcpkg is actually in use: Set-Toolchain-vcpkg.cmake returns
+    # early off Windows unless VCPKG_TARGET_TRIPLET is set, and every other
+    # user of POWERSHELL here is Windows-only, so an ordinary build is not
+    # made to pull down an archive it would never run.
+    #
+    # Upstream publishes .tar.gz for these platforms; the .zip archives are
+    # Windows-only.
+    if(DEFINED VCPKG_TARGET_TRIPLET
+       AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux"
+            OR CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin"))
+        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+            set(vbam_pwsh_os osx)
+        else()
+            set(vbam_pwsh_os linux)
+        endif()
+
+        if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+            set(vbam_pwsh_arch x64)
+        elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
+            set(vbam_pwsh_arch arm64)
+        endif()
+
+        set(vbam_pwsh_dir "${CMAKE_BINARY_DIR}/pwsh")
+        set(vbam_pwsh_exe "${vbam_pwsh_dir}/pwsh")
+
+        if(NOT POWERSHELL AND NOT EXISTS "${vbam_pwsh_exe}")
+            if(NOT vbam_pwsh_arch)
+                message(WARNING
+                    "No PowerShell build for ${CMAKE_HOST_SYSTEM_PROCESSOR}, "
+                    "install pwsh to use vcpkg binary packages.")
+            else()
+                # Resolve the current release. Upstream's own machine-readable
+                # endpoint, rather than the GitHub API, which is rate limited
+                # per IP and would be unreliable from CI.
+                set(vbam_pwsh_buildinfo "${CMAKE_BINARY_DIR}/pwsh-buildinfo.json")
+
+                file(DOWNLOAD
+                    "https://aka.ms/pwsh-buildinfo-stable"
+                    "${vbam_pwsh_buildinfo}"
+                    STATUS vbam_pwsh_status
+                )
+                list(GET vbam_pwsh_status 0 vbam_pwsh_rc)
+
+                if(NOT vbam_pwsh_rc EQUAL 0)
+                    list(GET vbam_pwsh_status 1 vbam_pwsh_error)
+                    file(REMOVE "${vbam_pwsh_buildinfo}")
+                    message(FATAL_ERROR
+                        "Failed to look up the current PowerShell release: ${vbam_pwsh_error}")
+                endif()
+
+                file(READ "${vbam_pwsh_buildinfo}" vbam_pwsh_buildinfo_json)
+                file(REMOVE "${vbam_pwsh_buildinfo}")
+
+                string(JSON vbam_pwsh_tag
+                       ERROR_VARIABLE vbam_pwsh_json_error
+                       GET "${vbam_pwsh_buildinfo_json}" ReleaseTag)
+
+                if(vbam_pwsh_json_error OR NOT vbam_pwsh_tag)
+                    message(FATAL_ERROR
+                        "Could not read ReleaseTag from the PowerShell build info: ${vbam_pwsh_json_error}")
+                endif()
+
+                string(REGEX REPLACE "^v" "" vbam_pwsh_version "${vbam_pwsh_tag}")
+
+                set(vbam_pwsh_archive
+                    "powershell-${vbam_pwsh_version}-${vbam_pwsh_os}-${vbam_pwsh_arch}.tar.gz")
+                set(vbam_pwsh_tarball "${CMAKE_BINARY_DIR}/${vbam_pwsh_archive}")
+
+                message(STATUS "Downloading ${vbam_pwsh_archive}")
+
+                file(DOWNLOAD
+                    "https://github.com/PowerShell/PowerShell/releases/download/${vbam_pwsh_tag}/${vbam_pwsh_archive}"
+                    "${vbam_pwsh_tarball}"
+                    STATUS vbam_pwsh_status
+                )
+                list(GET vbam_pwsh_status 0 vbam_pwsh_rc)
+
+                if(NOT vbam_pwsh_rc EQUAL 0)
+                    list(GET vbam_pwsh_status 1 vbam_pwsh_error)
+                    file(REMOVE "${vbam_pwsh_tarball}")
+                    message(FATAL_ERROR
+                        "Failed to download PowerShell: ${vbam_pwsh_error}")
+                endif()
+
+                file(MAKE_DIRECTORY "${vbam_pwsh_dir}")
+                file(ARCHIVE_EXTRACT
+                    INPUT "${vbam_pwsh_tarball}"
+                    DESTINATION "${vbam_pwsh_dir}")
+                file(REMOVE "${vbam_pwsh_tarball}")
+
+                # The archive does not carry a mode bit the extractor keeps.
+                file(CHMOD "${vbam_pwsh_exe}"
+                     PERMISSIONS
+                     OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                     GROUP_READ GROUP_EXECUTE
+                     WORLD_READ WORLD_EXECUTE)
+            endif()
+        endif()
+
+        # Also on reconfigure, when the download above is skipped: $ENV{PATH}
+        # does not persist across runs.
+        if(EXISTS "${vbam_pwsh_exe}")
+            set(POWERSHELL "${vbam_pwsh_exe}"
+                CACHE FILEPATH "PowerShell executable" FORCE)
+            set(ENV{PATH} "${vbam_pwsh_dir}:$ENV{PATH}")
+        endif()
+    endif()
 endif()
 
 if(UPDATE_APPCAST)
