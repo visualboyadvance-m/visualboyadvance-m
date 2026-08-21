@@ -99,7 +99,7 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
         endif()
     endif()
 
-    if (NOT CMAKE_CROSSCOMPILING)
+    if (NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
         vbam_gtest_discover_tests(vbam-wx-widgets-tests)
     endif()
 endif()

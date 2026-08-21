@@ -48,6 +48,7 @@
 #include "core/gba/gbaGlobals.h"
 #include "wx/config/cmdtab.h"
 #include "wx/config/option-proxy.h"
+#include "wx/language-compat.h"
 #include "wx/dialogs/accel-config.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/dialogs/directories-config.h"
@@ -2007,29 +2008,19 @@ bool MainFrame::BindControls()
         // Language<N> menu items in xrc/MainMenu.xrc; see the comment there.
         MenuOptionIntRadioValue("Language0", OPTION(kLocale), wxLANGUAGE_DEFAULT);
         MenuOptionIntRadioValue("Language1", OPTION(kLocale), wxLANGUAGE_SPANISH_LATIN_AMERICA);
-        MenuOptionIntRadioValue("Language2", OPTION(kLocale), wxLANGUAGE_SPANISH_COLOMBIA);
-        MenuOptionIntRadioValue("Language3", OPTION(kLocale), wxLANGUAGE_SPANISH_PERU);
-        MenuOptionIntRadioValue("Language4", OPTION(kLocale), wxLANGUAGE_SPANISH_US);
-        MenuOptionIntRadioValue("Language5", OPTION(kLocale), wxLANGUAGE_SPANISH);
-        MenuOptionIntRadioValue("Language6", OPTION(kLocale), wxLANGUAGE_FRENCH_FRANCE);
-        MenuOptionIntRadioValue("Language7", OPTION(kLocale), wxLANGUAGE_FRENCH);
-        MenuOptionIntRadioValue("Language8", OPTION(kLocale), wxLANGUAGE_GALICIAN);
-        MenuOptionIntRadioValue("Language9", OPTION(kLocale), wxLANGUAGE_HEBREW_ISRAEL);
-        MenuOptionIntRadioValue("Language10", OPTION(kLocale), wxLANGUAGE_HUNGARIAN_HUNGARY);
-        MenuOptionIntRadioValue("Language11", OPTION(kLocale), wxLANGUAGE_HUNGARIAN);
-        MenuOptionIntRadioValue("Language12", OPTION(kLocale), wxLANGUAGE_INDONESIAN);
-        MenuOptionIntRadioValue("Language13", OPTION(kLocale), wxLANGUAGE_ITALIAN_ITALY);
-        MenuOptionIntRadioValue("Language14", OPTION(kLocale), wxLANGUAGE_KOREAN_KOREA);
-        MenuOptionIntRadioValue("Language15", OPTION(kLocale), wxLANGUAGE_KOREAN);
-        MenuOptionIntRadioValue("Language16", OPTION(kLocale), wxLANGUAGE_POLISH_POLAND);
-        MenuOptionIntRadioValue("Language17", OPTION(kLocale), wxLANGUAGE_POLISH);
-        MenuOptionIntRadioValue("Language18", OPTION(kLocale), wxLANGUAGE_PORTUGUESE_BRAZILIAN);
-        MenuOptionIntRadioValue("Language19", OPTION(kLocale), wxLANGUAGE_PORTUGUESE_PORTUGAL);
-        MenuOptionIntRadioValue("Language20", OPTION(kLocale), wxLANGUAGE_SWEDISH);
-        MenuOptionIntRadioValue("Language21", OPTION(kLocale), wxLANGUAGE_TURKISH);
-        MenuOptionIntRadioValue("Language22", OPTION(kLocale), wxLANGUAGE_UKRAINIAN);
-        MenuOptionIntRadioValue("Language23", OPTION(kLocale), wxLANGUAGE_URDU_PAKISTAN);
-        MenuOptionIntRadioValue("Language24", OPTION(kLocale), wxLANGUAGE_CHINESE_CHINA);
+        MenuOptionIntRadioValue("Language2", OPTION(kLocale), wxLANGUAGE_SPANISH);
+        MenuOptionIntRadioValue("Language3", OPTION(kLocale), wxLANGUAGE_FRENCH_FRANCE);
+        MenuOptionIntRadioValue("Language4", OPTION(kLocale), wxLANGUAGE_HEBREW_ISRAEL);
+        MenuOptionIntRadioValue("Language5", OPTION(kLocale), wxLANGUAGE_HUNGARIAN_HUNGARY);
+        MenuOptionIntRadioValue("Language6", OPTION(kLocale), wxLANGUAGE_INDONESIAN);
+        MenuOptionIntRadioValue("Language7", OPTION(kLocale), wxLANGUAGE_ITALIAN_ITALY);
+        MenuOptionIntRadioValue("Language8", OPTION(kLocale), wxLANGUAGE_KOREAN_KOREA);
+        MenuOptionIntRadioValue("Language9", OPTION(kLocale), wxLANGUAGE_POLISH_POLAND);
+        MenuOptionIntRadioValue("Language10", OPTION(kLocale), wxLANGUAGE_PORTUGUESE_BRAZILIAN);
+        MenuOptionIntRadioValue("Language11", OPTION(kLocale), wxLANGUAGE_SWEDISH);
+        MenuOptionIntRadioValue("Language12", OPTION(kLocale), wxLANGUAGE_TURKISH);
+        MenuOptionIntRadioValue("Language13", OPTION(kLocale), wxLANGUAGE_UKRAINIAN);
+        MenuOptionIntRadioValue("Language14", OPTION(kLocale), wxLANGUAGE_CHINESE_CHINA);
         MenuOptionBool("ExternalTranslations", OPTION(kExternalTranslations));
     }
 

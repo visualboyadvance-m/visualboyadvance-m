@@ -45,6 +45,8 @@ set(VBAM_WX_COMMON
     hdr.cpp
     hdr.h
     ioregs.h
+    language-compat.cpp
+    language-compat.h
     opts.cpp
     opts.h
     panel.cpp
@@ -114,7 +116,7 @@ endif()
 # Make the translations.zip
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
-    COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
+    COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -D "SRC_DIR=${CMAKE_SOURCE_DIR}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     DEPENDS translations make-translations-zip.cmake
 )
@@ -980,11 +982,31 @@ if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
 endif()
 
 if(WIN32)
+    # The MOFILE resource list must name every catalog, so generate it from the
+    # catalogs that actually exist instead of keeping a second list in sync by
+    # hand -- it had already drifted (es_PE had a menu entry but no resource).
+    # wxResourceTranslationsLoader looks resources up as <domain>_<lang>, and
+    # the paths are relative to the build root, where windres runs, matching the
+    # tree make-translations-zip.cmake lays out.
+    file(GLOB vbam_po_files CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/po/wxvbam/*.po")
+    set(vbam_translations_rc "")
+    foreach(vbam_po IN LISTS vbam_po_files)
+        get_filename_component(vbam_locale "${vbam_po}" NAME_WE)
+        string(APPEND vbam_translations_rc
+               "wxvbam_${vbam_locale} MOFILE \"translations/${vbam_locale}/LC_MESSAGES/wxvbam.mo\"\n")
+    endforeach()
+    file(GENERATE
+        OUTPUT  "${CMAKE_CURRENT_BINARY_DIR}/wxvbam_translations.rc"
+        CONTENT "${vbam_translations_rc}"
+    )
+    set_source_files_properties(
+        "${CMAKE_CURRENT_BINARY_DIR}/wxvbam_translations.rc" PROPERTIES GENERATED TRUE)
+
     target_sources(visualboyadvance-m
         PRIVATE
         audio/internal/dsound.cpp
         wxvbam.rc
-        wxvbam_translations.rc
+        "${CMAKE_CURRENT_BINARY_DIR}/wxvbam_translations.rc"
     )
 
     # Explicitly tell resource compiler to embed RPI host when proxy is available
@@ -1583,6 +1605,34 @@ if(NOT ZIP_SUFFIX)
     set(ZIP_SUFFIX "")
 endif()
 
+# Strip the binary at $path (relative to CMAKE_BINARY_DIR) in optimized
+# builds. Keyed off the build type rather than UPSTREAM_RELEASE: a static link
+# against distro-supplied libraries inherits their debug info, which can dwarf
+# our own code -- a MinGW cross build against Fedora's wxWidgets is ~250MB
+# unstripped and ~23MB stripped.
+function(vbam_strip_release_binary path)
+    if(MSVC OR NOT CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+        return()
+    endif()
+
+    # CMAKE_STRIP is the toolchain's strip. A bare find_program() finds the host
+    # one, which need not understand the target's object format when cross
+    # compiling, so only fall back to it.
+    set(strip_program "${CMAKE_STRIP}")
+    if(NOT strip_program)
+        find_program(strip_program strip)
+    endif()
+
+    if(strip_program)
+        add_custom_command(
+            TARGET visualboyadvance-m
+            POST_BUILD
+            COMMAND "${strip_program}" "${path}"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+    endif()
+endfunction()
+
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
@@ -1663,18 +1713,10 @@ if(UPSTREAM_RELEASE AND WIN32)
         )
     endif()
 
-    if(NOT MSVC AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
-        find_program(STRIP_PROGRAM strip)
+endif()
 
-        if(STRIP_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.exe
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endif()
-    endif()
+if(WIN32)
+    vbam_strip_release_binary(visualboyadvance-m.exe)
 endif()
 
 # Bundle dylibs and relink them for releasing .app, but only in Release mode, also install translations into the .app.
@@ -1717,20 +1759,13 @@ if(APPLE)
     )
 endif()
 
+# Between bundle assembly and codesigning: stripping invalidates a signature,
+# and POST_BUILD commands run in the order they are added.
+if(APPLE)
+    vbam_strip_release_binary(visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m)
+endif()
+
 if(APPLE AND UPSTREAM_RELEASE)
-    if(CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
-        find_program(STRIP_PROGRAM strip)
-
-        if(STRIP_PROGRAM)
-            add_custom_command(
-                TARGET visualboyadvance-m
-                POST_BUILD
-                COMMAND ${STRIP_PROGRAM} visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m
-                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            )
-        endif()
-    endif()
-
     # Sign bundled dylibs individually before signing the app bundle.
     # codesign --deep does not sign loose .dylib files, only .framework bundles,
     # so dylibs in Contents/Frameworks must be signed explicitly at build time.
@@ -1803,17 +1838,8 @@ if(APPLE AND UPSTREAM_RELEASE)
     endif()
 endif()
 
-if(UPSTREAM_RELEASE AND NOT WIN32 AND NOT APPLE AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
-    find_program(STRIP_PROGRAM strip)
-
-    if(STRIP_PROGRAM)
-        add_custom_command(
-            TARGET visualboyadvance-m
-            POST_BUILD
-            COMMAND ${STRIP_PROGRAM} visualboyadvance-m
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
-    endif()
+if(NOT WIN32 AND NOT APPLE)
+    vbam_strip_release_binary(visualboyadvance-m)
 endif()
 
 # On Android the deliverable is an APK produced by androiddeployqt (the target

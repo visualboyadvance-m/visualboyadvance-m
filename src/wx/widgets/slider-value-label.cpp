@@ -12,6 +12,8 @@
 #include <wx/stattext.h>
 #include <wx/validate.h>
 
+#include "wx/widgets/dpi-support.h"
+
 namespace widgets {
 
 namespace {
@@ -35,7 +37,7 @@ int WidestValueWidth(wxControl* box, const wxSlider* slider, const wxString& suf
     }
 
     // Padding for the control's own border and internal margins.
-    return width + box->FromDIP(16);
+    return width + FromDIP(16, box);
 }
 
 // Replaces the slider's sizer cell with a column holding the slider and `box`,
@@ -49,7 +51,7 @@ void SwapInColumn(wxSlider* slider, wxSizer* sizer, size_t index, wxSizerItem* i
     sizer->Detach(slider);
     wxBoxSizer* const column = new wxBoxSizer(wxVERTICAL);
     column->Add(slider, 0, wxEXPAND);
-    column->Add(box, 0, wxALIGN_CENTRE_HORIZONTAL | wxTOP, slider->FromDIP(2));
+    column->Add(box, 0, wxALIGN_CENTRE_HORIZONTAL | wxTOP, FromDIP(2, slider));
     sizer->Insert(index, column, proportion, flag, border);
 
     // Mutating an already-laid-out sizer does not reposition anything, and the

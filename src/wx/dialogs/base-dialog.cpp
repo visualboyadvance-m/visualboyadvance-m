@@ -20,6 +20,7 @@
 
 #include "core/base/check.h"
 #include "wx/config/option-proxy.h"
+#include "wx/widgets/dpi-support.h"
 #include "wx/widgets/utils.h"
 
 namespace dialogs {
@@ -58,7 +59,7 @@ private:
         this->SaveValue("y", dialog_rect.y);
         this->SaveValue("width", dialog_rect.width);
         this->SaveValue("height", dialog_rect.height);
-        const long dpi = this->Get()->GetDPIScaleFactor() * 100;
+        const long dpi = widgets::DPIScaleFactorForWindow(this->Get()) * 100;
         this->SaveValue("dpi", dpi);
 #endif  // WX_RESIZE_DIALOGS
     }
@@ -67,7 +68,7 @@ private:
         dialog_shown_ = true;
 
 #if WX_RESIZE_DIALOGS
-        const long current_dpi = this->Get()->GetDPIScaleFactor() * 100;
+        const long current_dpi = widgets::DPIScaleFactorForWindow(this->Get()) * 100;
         long saved_dpi = 1;
         if (!this->RestoreValue("dpi", &saved_dpi)) {
             return false;

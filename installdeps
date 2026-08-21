@@ -81,7 +81,7 @@ Try to install the dependencies needed for this project appropriately on the hos
 
 This program may require [1;35msudo[0m.
 
-A cross-compile target may be specified as the only parameter, of either [1;35mm32[0m which targets the host in 32 bit mode (e.g. x86 on an amd64 host) or [1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.  [1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m to target Windows via MinGW.  Cross compiling for Windows is only supported on Debian/Ubuntu, Fedora, Arch Linux and MSYS2.
+A cross-compile target may be specified as the only parameter, of either [1;35mm32[0m which targets the host in 32 bit mode (e.g. x86 on an amd64 host) or [1;35mwin32[0m, [1;35mMinGW-w64-i686[0m or [1;35mMinGW-w64-x86_64[0m.  [1;35mwin32[0m is an alias for [1;35mMinGW-w64-i686[0m to target Windows via MinGW.  Cross compiling for Windows is only supported on Debian/Ubuntu, Fedora, RHEL, Arch Linux and MSYS2.
 
 On MSYS2 the [1;35mMinGW-w64-clang-x86_64[0m target for CLANG64 and the [1;35mMinGW-w64-clang-i686[0m target for CLANG32 are also supported, as well as [1;35mMinGW-w64-ucrt-x86_64[0m for UCRT64.
 
@@ -159,7 +159,10 @@ linux_installdeps() {
     elif [ -f /etc/fedora-release ]; then
         fedora_installdeps
     elif [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
-        rhel_installdeps
+        # RHEL and its rebuilds differ from Fedora only in the repos they need
+        # and a couple of package names, so they share fedora_installdeps.
+        rhel=1
+        fedora_installdeps
     elif [ -f /etc/solus-release ]; then
         solus_installdeps
     elif [ -f /etc/gentoo-release ]; then
@@ -271,7 +274,7 @@ check_cross() {
     case "$target" in
         win32|win64|mingw*)
             if [ -z "$arch_linux" -a -z "$msys2" -a -z "$debian" -a -z "$fedora" ]; then
-                error 'win32 cross compiling targets are only supported on Debian/Ubuntu, Fedora, Arch and MSYS2 at the moment'
+                error 'win32 cross compiling targets are only supported on Debian/Ubuntu, Fedora, RHEL, Arch and MSYS2 at the moment'
             fi
 
             case "$target" in
@@ -291,7 +294,7 @@ check_cross() {
         m32|-m32)
             target=m32
             if [ -z "$msys2" -a -z "$fedora" -a -z "$arch_linux" -a -z "$solus" -a -z "$suse" ]; then
-                error '32 bit builds are only supported on Fedora, OpenSUSE, Arch, Solus and MSYS2 at the moment'
+                error '32 bit builds are only supported on Fedora, RHEL, OpenSUSE, Arch, Solus and MSYS2 at the moment'
             fi
 
             if [ -n "$msys2" ]; then
@@ -476,20 +479,36 @@ fedora_installdeps() {
 
     # the mingw cross builds get no ffmpeg, so only look for it for host builds
     if [ -n "$ENABLE_FFMPEG" ] && [ -z "$target" -o "$target" = m32 ]; then
-        fedora_release=$(rpm -E %fedora)
+        if [ -n "$rhel" ]; then
+            fusion_dist=el
+            fedora_release=$(rpm -E %rhel)
+        else
+            fusion_dist=fedora
+            fedora_release=$(rpm -E %fedora)
+        fi
+
+        # rpm -E leaves the macro unexpanded when the distro does not define
+        # it, and the loop below does arithmetic on this.
+        case "$fedora_release" in
+            ''|*[!0-9]*)
+                fedora_release=
+                ;;
+        esac
+
         tries=3
+        [ -z "$fedora_release" ] && tries=0
         curdir=$(pwd)
 
         # make sure rpmfusion is installed for the full ffmpeg
         while [ $tries -gt 0 ]; do
             mkdir -p "${tmp}/fusion"
             cd "${tmp}/fusion"
-            if ! curl -fLO https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-${fedora_release}.noarch.rpm; then
+            if ! curl -fLO https://download1.rpmfusion.org/free/${fusion_dist}/rpmfusion-free-release-${fedora_release}.noarch.rpm; then
                 fedora_release=$((fedora_release - 1))
                 tries=$((tries - 1))
                 continue
             fi
-            if ! curl -fLO https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${fedora_release}.noarch.rpm; then
+            if ! curl -fLO https://download1.rpmfusion.org/nonfree/${fusion_dist}/rpmfusion-nonfree-release-${fedora_release}.noarch.rpm; then
                 tries=0
                 break
             fi
@@ -536,6 +555,20 @@ fedora_installdeps() {
         [ -z "$ffmpeg" ] && warning 'no ffmpeg development package found, continuing without ffmpeg'
     fi
 
+    # EPEL carries the mingw packages, nasm and ninja-build on RHEL. Install it
+    # before anything below queries the repos.
+    if [ -n "$rhel" ]; then
+        check fedora_dnf_install epel-release
+    fi
+
+    # RHEL 7 and its rebuilds ship CMake 3 as cmake3, alongside a cmake that is
+    # too old. Newer releases have no cmake3 package and a new enough cmake.
+    cmake_pkg=cmake
+    if [ -n "$rhel" ] && fedora_have_pkg cmake3; then
+        cmake_pkg=cmake3
+        CMAKE=cmake3
+    fi
+
     # pkgconfig is only a virtual provide on current Fedora and so cannot take
     # the architecture suffix the multiarch installs below append
     pkgconfig=pkgconfig
@@ -550,7 +583,7 @@ fedora_installdeps() {
     fedora_have_pkg "$wx" || wx=wxGTK3-devel
 
     # non-multiarch packages first
-    check fedora_dnf_install gcc gcc-c++ make cmake ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build
+    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build
 
     # try to install multiarch libgcc, libstdc++, glibc-devel and pkgconfig if
     # available.  libstdc++-devel carries the libstdc++.so the linker resolves
@@ -668,8 +701,9 @@ fedora_installdeps() {
         esac
         # install the cross toolchain
         set -- "$@" "${target}-gcc" "${target}-gcc-c++"
-        # install static deps
-        for pkg in zlib gettext SDL3 wxWidgets3; do
+        # install static deps; wxWidgets pulls in expat, jpeg, png and tiff and
+        # a static wx needs the static builds of them
+        for pkg in zlib gettext SDL3 wxWidgets3 expat libjpeg-turbo libpng libtiff; do
             set -- "$@" "${target}-${pkg}-static"
         done
         # fedora has no static build of openal-soft
@@ -682,182 +716,6 @@ fedora_installdeps() {
     [ -z "$rpms_installed" ] && check fedora_dnf_install "$@"
 
     if [ -n "$ENABLE_FFMPEG" ] && [ -n "$ffmpeg" ] && ! rpm -q "$ffmpeg" >/dev/null 2>&1; then
-        warning 'ffmpeg failed to install (probably due to conflicts)'
-    fi
-
-    [ -n "$warning" ] && warning "$warning"
-
-    build_instructions
-}
-
-rhel_installdeps() {
-    rhel=1
-    ffmpeg=ffmpeg-devel
-    rpms_installed=
-
-    check_cross
-    installing
-
-    warning=
-
-    rhel_release=$(rpm -E %rhel)
-    tries=3
-    curdir=$(pwd)
-
-    # this source is necessary for mingw packages on rhel, and may be for other things in the future
-    check sudo yum -y install epel-release
-
-    # make sure rpmfusion is installed for ffmpeg
-    if [ -n "$ENABLE_FFMPEG" ]; then
-        while [ $tries -gt 0 ]; do
-            mkdir -p "${tmp}/fusion"
-            cd "${tmp}/fusion"
-            if ! curl -fLO https://download1.rpmfusion.org/free/el/rpmfusion-free-release-${rhel_release}.noarch.rpm; then
-                rhel_release=$((rhel_release - 1))
-                tries=$((tries - 1))
-                continue
-            fi
-            if ! curl -fLO https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-${rhel_release}.noarch.rpm; then
-                tries=0
-                break
-            fi
-            # check if already installed
-            if rpm -q rpmfusion-free-release-${rhel_release} >/dev/null 2>&1 && rpm -q rpmfusion-nonfree-release-${rhel_release} >/dev/null 2>&1; then
-                info_msg 'rpmfusion already installed, good'
-                break
-            fi
-            # otherwise try to install
-            if ! sudo rpm --nodeps -Uvh ./rpmfusion-*.rpm; then
-                tries=0
-                break
-            fi
-            break
-        done
-        cd "$curdir"
-        if [ $tries -eq 0 ]; then
-            warning 'installing rpmfusion repos failed, continuing without ffmpeg'
-        fi
-    fi
-
-    # non-multiarch packages first
-    CMAKE=cmake3
-    check sudo yum -y install gcc gcc-c++ make cmake3 ccache git nasm redhat-rpm-config pkgconfig ccache ninja-build
-
-    # try to install multiarch libgcc, glibc-devel and pkgconfig if available
-    if [ -n "$amd64" ]; then
-        for pkg in pkgconfig libgcc glibc-devel; do
-            if [ "$target" = m32 ]; then
-                sudo yum -y install "$pkg".i686
-            else
-                sudo yum -y install "$pkg".x86_64
-            fi
-        done
-    fi
-
-    set --
-    if [ -z "$target" -o "$target" = m32 ]; then
-        # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
-        if [ -n "$amd64" ]; then
-            # this is sometimes necessary for rawhide
-            set -- --exclude='glibc32*'
-        fi
-
-        for pkg in zlib-devel mesa-libGL-devel ffmpeg-devel gettext-devel SDL3-devel openal-soft-devel wxGTK3-devel gtk3-devel; do
-            case $pkg in
-                *ffmpeg*)
-                    [ -z "$ENABLE_FFMPEG" ] && continue
-                    ;;
-            esac
-
-            if [ -n "$amd64" ]; then
-                if [ "$target" = m32 ]; then
-                    set -- "$@" "${pkg}.i686"
-                else
-                    set -- "$@" "${pkg}.x86_64"
-                fi
-            else
-                set -- "$@" "$pkg"
-            fi
-        done
-
-        # redhat has a bug where all necessary -devel packages are not pulled in for 32 bit direct -devel deps
-        # this hack adds them to the list
-        if [ -n "$amd64" -a "$target" = m32 ]; then
-            info_msg 'Calculating dependencies, this will take a while..'
-            curdeps=
-            newdeps=$@
-            while [ "$curdeps" != "$newdeps" ]; do
-                curdeps=$newdeps
-                set -- $(echo "$@" $(repoquery --deplist "$@" 2>/dev/null | sed -n 's/\.x86_64$/.i686/; s/^ *provider: *\([^ ]*-devel-.*\)$/\1/p' | sort -u) | sed 's/  */\n/g' | sort -u)
-                newdeps=$@
-                printf '%s' .
-            done
-
-            echo
-            info_msg 'Done'
-
-            ## install the RPMs with rpm --force get around file conflicts
-
-            host_rpms=$(echo "$@" | sed 's/\.i686//g')
-
-            # first update the host arch versions to reduce chances of conflicts
-            check sudo yum -y install $host_rpms
-
-            oldcwd=$PWD
-            mkdir "$tmp/rpms"
-            cd "$tmp/rpms"
-
-            check sudo yum -y download "$@"
-
-            # first try installing with yum to pull in deps
-            check sudo yum -y --skip-broken install *.rpm
-
-            # follow up with rpm --force to ignore conflicts
-            check sudo rpm -Uvh --force *.rpm
-
-            rm -f *.rpm
-
-            # reinstall the host rpms to make sure any overwritten files are the host version
-            check sudo yum -y download $host_rpms
-
-            check sudo yum -y --skip-broken install *.rpm
-
-            check sudo rpm -Uvh --force *.rpm
-
-            cd "$oldcwd"
-            rm -rf "$tmp/rpms"
-
-            ffmpeg=ffmpeg-devel.i686
-
-            rpms_installed=1
-        fi
-    else # mingw build
-        set -- "$@" pkgconfig
-        case "$target" in
-            mingw-w64-i686)
-                target=mingw32
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-i686.cmake"
-                ;;
-            mingw-w64-x86_64)
-                target=mingw64
-                cmake_flags="$cmake_flags -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cross-MinGW-w64-x86_64.cmake"
-                ;;
-            *)
-                error 'unknown cross target (this should not happen)'
-                ;;
-        esac
-        # install static deps
-        for pkg in zlib gettext SDL3 wxWidgets openal-soft; do
-            set -- "$@" "${target}-${pkg}-static"
-        done
-
-        # get the necessary win32 headers
-        git submodule update --init --remote --recursive
-    fi
-
-    [ -z "$rpms_installed" ] && check sudo yum -y install "$@"
-
-    if [ -n "$ENABLE_FFMPEG" ] && ! rpm -q $ffmpeg >/dev/null 2>&1; then
         warning 'ffmpeg failed to install (probably due to conflicts)'
     fi
 

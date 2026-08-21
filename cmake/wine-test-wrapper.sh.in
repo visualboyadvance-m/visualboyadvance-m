@@ -1,0 +1,35 @@
+#!/bin/sh
+# Generated from cmake/wine-test-wrapper.sh.in -- do not edit.
+#
+# Runs a Windows executable under wine, for ctest and for the test-enumerating
+# run that gtest_discover_tests() does at build time.
+#
+# The target's own DLLs (libwinpthread-1, iconv, ...) live in the MinGW
+# sysroot's bin, which is not on wine's Windows PATH, so WINEPATH prepends
+# them. WINEDEBUG defaults to -all so wine's chatter is not mistaken for test
+# output; an explicit setting is honored.
+
+WINEPATH="@WINE_DLL_PATH@${WINEPATH:+;$WINEPATH}"
+export WINEPATH
+
+WINEDEBUG="${WINEDEBUG:--all}"
+export WINEDEBUG
+
+# On a crash wine puts up a "...encountered a serious problem" dialog and waits
+# for someone to click it, which stalls a test run and is useless headless.
+# Turn it off; the crash still goes to stderr, where ctest captures it.
+#
+# Recorded in a stamp file rather than checked against the prefix registry:
+# wine buffers registry writes in wineserver and only flushes them on shutdown,
+# so reading user.reg back would re-run this for every single test.
+: "${WINEPREFIX:=$HOME/.wine}"
+
+wine_stamp="@CMAKE_BINARY_DIR@/.wine-crash-dialog-off"
+
+if [ "$(cat "$wine_stamp" 2>/dev/null)" != "$WINEPREFIX" ]; then
+    "@WINE_EXECUTABLE@" reg add 'HKCU\Software\Wine\WineDbg' \
+        /v ShowCrashDialog /t REG_DWORD /d 0 /f >/dev/null 2>&1
+    printf '%s' "$WINEPREFIX" > "$wine_stamp" 2>/dev/null || :
+fi
+
+exec "@WINE_EXECUTABLE@" "$@"

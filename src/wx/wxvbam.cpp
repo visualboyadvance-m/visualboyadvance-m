@@ -1,5 +1,7 @@
 #include "wx/wxvbam.h"
 
+#include "wx/language-compat.h"
+
 #if defined(__ANDROID__)
 #include <android/log.h>
 #endif
@@ -676,6 +678,10 @@ bool wxvbamApp::OnInit() {
 #if (wxMAJOR_VERSION >= 3)
     SetAppDisplayName("VisualBoyAdvance-M");
 #endif
+
+    // Must precede every wxLocale::Init() below; AddLanguage() is ignored
+    // afterwards.
+    VbamRegisterCustomLanguages();
 
     wxvbam_locale = new wxLocale;
 

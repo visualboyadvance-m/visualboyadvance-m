@@ -76,3 +76,38 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 # pkg-config may be under the prefix
 find_program(PKG_CONFIG_EXECUTABLE NAMES ${COMPILER_PREFIX}-pkg-config)
+
+# Run target executables under wine, so ctest works when cross compiling from a
+# Unix host. CMake applies this to add_test() and to gtest_discover_tests(),
+# which has to run the test binary to enumerate its cases. Not on macOS: wine
+# there cannot run the 32 bit target, and 64 bit support is patchy.
+if(CMAKE_HOST_UNIX AND NOT CMAKE_HOST_APPLE)
+    find_program(WINE_EXECUTABLE NAMES wine)
+
+    if(WINE_EXECUTABLE)
+        set(WINE_DLL_PATH "")
+
+        foreach(root ${CMAKE_FIND_ROOT_PATH})
+            if(IS_DIRECTORY ${root}/bin)
+                list(APPEND WINE_DLL_PATH ${root}/bin)
+            endif()
+        endforeach()
+
+        # A wrapper rather than `cmake -E env WINEPATH=...`, because WINEPATH
+        # separates entries with ';' and there is no way to keep that out of
+        # CMake's list splitting in the emulator command.
+        set(wine_wrapper ${CMAKE_BINARY_DIR}/wine-test-wrapper.sh)
+
+        configure_file(
+            ${CMAKE_CURRENT_LIST_DIR}/wine-test-wrapper.sh.in
+            ${wine_wrapper}
+            @ONLY
+        )
+        file(CHMOD ${wine_wrapper}
+             PERMISSIONS
+             OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE
+             WORLD_READ WORLD_EXECUTE)
+
+        set(CMAKE_CROSSCOMPILING_EMULATOR ${wine_wrapper})
+    endif()
+endif()

@@ -15,6 +15,10 @@ class wxWindow;
 namespace widgets {
 
 double DPIScaleFactorForWindow(wxWindow* window);
+
+// wxWindow::FromDIP() is wx 3.1.0 and later.  Before that wx has no DPI
+// scaling of its own, so this falls back to the content scale factor.
+int FromDIP(int value, wxWindow* window);
 void RequestHighResolutionOpenGlSurfaceForWindow(wxWindow* window);
 void GetRealPixelClientSize(wxWindow* window, int* x, int* y);
 

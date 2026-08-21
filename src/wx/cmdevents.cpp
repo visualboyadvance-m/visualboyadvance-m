@@ -17,6 +17,7 @@
 #include <wx/msgdlg.h>
 
 #include "components/filters_interframe/interframe.h"
+#include "wx/language-compat.h"
 #include "wx/rpi.h"
 #include "wx/widgets/render-plugin.h"
 #include "core/base/check.h"
@@ -3158,117 +3159,67 @@ EVT_HANDLER(Language1, "Spanish (Latin American)")
     SetUiLanguage(wxLANGUAGE_SPANISH_LATIN_AMERICA);
 }
 
-EVT_HANDLER(Language2, "Spanish (Colombia)")
-{
-    SetUiLanguage(wxLANGUAGE_SPANISH_COLOMBIA);
-}
-
-EVT_HANDLER(Language3, "Spanish (Peru)")
-{
-    SetUiLanguage(wxLANGUAGE_SPANISH_PERU);
-}
-
-EVT_HANDLER(Language4, "Spanish (US)")
-{
-    SetUiLanguage(wxLANGUAGE_SPANISH_US);
-}
-
-EVT_HANDLER(Language5, "Spanish")
+EVT_HANDLER(Language2, "Spanish")
 {
     SetUiLanguage(wxLANGUAGE_SPANISH);
 }
 
-EVT_HANDLER(Language6, "French (France)")
+EVT_HANDLER(Language3, "French (France)")
 {
     SetUiLanguage(wxLANGUAGE_FRENCH_FRANCE);
 }
 
-EVT_HANDLER(Language7, "French")
-{
-    SetUiLanguage(wxLANGUAGE_FRENCH);
-}
-
-EVT_HANDLER(Language8, "Galician")
-{
-    SetUiLanguage(wxLANGUAGE_GALICIAN);
-}
-
-EVT_HANDLER(Language9, "Hebrew (Israel)")
+EVT_HANDLER(Language4, "Hebrew (Israel)")
 {
     SetUiLanguage(wxLANGUAGE_HEBREW_ISRAEL);
 }
 
-EVT_HANDLER(Language10, "Hungarian (Hungary)")
+EVT_HANDLER(Language5, "Hungarian (Hungary)")
 {
     SetUiLanguage(wxLANGUAGE_HUNGARIAN_HUNGARY);
 }
 
-EVT_HANDLER(Language11, "Hungarian")
-{
-    SetUiLanguage(wxLANGUAGE_HUNGARIAN);
-}
-
-EVT_HANDLER(Language12, "Indonesian")
+EVT_HANDLER(Language6, "Indonesian")
 {
     SetUiLanguage(wxLANGUAGE_INDONESIAN);
 }
 
-EVT_HANDLER(Language13, "Italian")
+EVT_HANDLER(Language7, "Italian")
 {
     SetUiLanguage(wxLANGUAGE_ITALIAN_ITALY);
 }
 
-EVT_HANDLER(Language14, "Korean (Korea)")
+EVT_HANDLER(Language8, "Korean (Korea)")
 {
     SetUiLanguage(wxLANGUAGE_KOREAN_KOREA);
 }
 
-EVT_HANDLER(Language15, "Korean")
-{
-    SetUiLanguage(wxLANGUAGE_KOREAN);
-}
-
-EVT_HANDLER(Language16, "Polish (Poland)")
+EVT_HANDLER(Language9, "Polish (Poland)")
 {
     SetUiLanguage(wxLANGUAGE_POLISH_POLAND);
 }
 
-EVT_HANDLER(Language17, "Polish")
-{
-    SetUiLanguage(wxLANGUAGE_POLISH);
-}
-
-EVT_HANDLER(Language18, "Portuguese (Brazil)")
+EVT_HANDLER(Language10, "Portuguese (Brazil)")
 {
     SetUiLanguage(wxLANGUAGE_PORTUGUESE_BRAZILIAN);
 }
 
-EVT_HANDLER(Language19, "Portuguese (Portugal)")
-{
-    SetUiLanguage(wxLANGUAGE_PORTUGUESE_PORTUGAL);
-}
-
-EVT_HANDLER(Language20, "Swedish")
+EVT_HANDLER(Language11, "Swedish")
 {
     SetUiLanguage(wxLANGUAGE_SWEDISH);
 }
 
-EVT_HANDLER(Language21, "Turkish")
+EVT_HANDLER(Language12, "Turkish")
 {
     SetUiLanguage(wxLANGUAGE_TURKISH);
 }
 
-EVT_HANDLER(Language22, "Ukrainian")
+EVT_HANDLER(Language13, "Ukrainian")
 {
     SetUiLanguage(wxLANGUAGE_UKRAINIAN);
 }
 
-EVT_HANDLER(Language23, "Urdu (Pakistan)")
-{
-    SetUiLanguage(wxLANGUAGE_URDU_PAKISTAN);
-}
-
-EVT_HANDLER(Language24, "Chinese (China)")
+EVT_HANDLER(Language14, "Chinese (China)")
 {
     SetUiLanguage(wxLANGUAGE_CHINESE_CHINA);
 }

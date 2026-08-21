@@ -1,6 +1,14 @@
 #include "background-input.h"
 
 #include <atomic>
+#include <unordered_map>
+
+// The wx headers must come before the platform ones. windows.h turns
+// GetClassInfo and CreateDialog into macros, and wx declares methods of both
+// names -- GetClassInfo virtually, via wxDECLARE_DYNAMIC_CLASS -- so parsing
+// wx after windows.h silently gives this file a vtable one slot longer than
+// every other translation unit's.
+#include "wx/wxvbam.h"
 
 #if defined(__WXMSW__)
 
@@ -15,10 +23,6 @@
 #include "wx/wayland.h"
 
 #endif  // defined(__WXMSW__)
-
-#include <unordered_map>
-
-#include "wx/wxvbam.h"
 
 #undef  NO_ERROR
 #define NO_ERROR  (wxThread::ExitCode)0

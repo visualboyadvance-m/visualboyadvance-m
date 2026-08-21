@@ -2,6 +2,7 @@
 
 #include <cmath>
 
+#include <wx/version.h>
 #include <wx/window.h>
 
 namespace widgets {
@@ -12,6 +13,14 @@ double DPIScaleFactorForWindow(wxWindow* window) {
 #else
     return window->GetContentScaleFactor();
 #endif  // WX_HAS_NATIVE_HI_DPI_SUPPORT
+}
+
+int FromDIP(int value, wxWindow* window) {
+#if wxCHECK_VERSION(3, 1, 0)
+    return window->FromDIP(value);
+#else
+    return std::lround(value * DPIScaleFactorForWindow(window));
+#endif  // wxCHECK_VERSION(3, 1, 0)
 }
 
 void RequestHighResolutionOpenGlSurfaceForWindow(wxWindow*) {}

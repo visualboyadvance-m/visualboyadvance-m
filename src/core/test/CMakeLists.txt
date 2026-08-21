@@ -42,7 +42,7 @@ if(NOT COMPILE_ONLY)
             "-framework CoreFoundation" ${LIBICONV_LIB})
     endif()
 
-    if(NOT CMAKE_CROSSCOMPILING)
+    if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
         vbam_gtest_discover_tests(save_state_tests)
     endif()
 endif()
