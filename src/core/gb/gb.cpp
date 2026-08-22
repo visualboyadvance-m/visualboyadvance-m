@@ -615,6 +615,15 @@ static uint8_t gbIrqDispatchIE = 0;
 // writes SCX mid-line.
 static int gbScxMode3Extra = 0;
 static int gbScxMode3ExtraDelayed = 0;
+// TIMA overflow-reload window (mooneye timer/tima_reload,
+// tima_write_reloading, tma_write_reloading): when TIMA overflows it
+// reads $00 for exactly one M-cycle before TMA is loaded. A TIMA write
+// in that window cancels the reload; a TIMA write on the reload cycle
+// itself is ignored; a TMA write on the reload cycle propagates into
+// TIMA. Cycle-stamped against gbCycleCounter.
+static int gbTimaReloadPending = 0;
+static uint64_t gbTimaReloadCycle = 0;
+static uint64_t gbTimaReloadAppliedCycle = (uint64_t)-1;
 
 // Debug bookkeeping for VBAM_TRACE_GBIRQ (no effect on emulation).
 static uint64_t gbCycleCounter = 0;
@@ -1678,11 +1687,22 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         return;
     }
     case 0x05:
+        // A write on the reload cycle itself is ignored (TMA wins); a
+        // write during the one-cycle $00 window cancels the reload
+        // (mooneye timer/tima_write_reloading).
+        if (gbTimaReloadAppliedCycle == gbCycleCounter)
+            return;
+        if (gbTimaReloadPending && gbCycleCounter < gbTimaReloadCycle)
+            gbTimaReloadPending = 0;
         gbMemory[0xff05] = register_TIMA = value;
         return;
 
     case 0x06:
         gbMemory[0xff06] = register_TMA = value;
+        // A TMA write on the reload cycle propagates into TIMA
+        // (mooneye timer/tma_write_reloading).
+        if (gbTimaReloadAppliedCycle == gbCycleCounter)
+            register_TIMA = value;
         return;
 
     // TIMER control
@@ -3099,6 +3119,8 @@ void gbReset()
     gbVblankEndOamIrqPending = 0;
     gbScxMode3Extra = 0;
     gbScxMode3ExtraDelayed = 0;
+    gbTimaReloadPending = 0;
+    gbTimaReloadAppliedCycle = (uint64_t)-1;
     gbDmaTicks = 0;
     gbCartBus = 0xff;
     clockTicks = 0;
@@ -5357,14 +5379,28 @@ void gbEmulate(int ticksToStop)
         // timer emulation
 
         if (gbTimerOn) {
+            // Apply a reload left pending by an overflow on the last
+            // cycle of an earlier lump.
+            if (gbTimaReloadPending && gbCycleCounter >= gbTimaReloadCycle) {
+                gbTimaReloadPending = 0;
+                register_TIMA = register_TMA;
+                gbTimaReloadAppliedCycle = gbTimaReloadCycle;
+            }
+
             gbTimerTicks = ((gbInternalTimer)&gbTimerMask[gbTimerMode]) + 1 - clockTicks;
 
+            // Cycle of the first prescaler boundary inside this lump.
+            uint64_t bcyc = gbCycleCounter - (uint64_t)clockTicks
+                + (uint64_t)(((gbInternalTimer)&gbTimerMask[gbTimerMode]) + 1);
             while (gbTimerTicks <= 0) {
                 register_TIMA++;
                 // timer overflow!
                 if ((register_TIMA & 0xff) == 0) {
-                    // reload timer modulo
-                    register_TIMA = register_TMA;
+                    // TIMA reads $00 for one M-cycle; TMA is loaded on
+                    // the next cycle (may fall into the next lump).
+                    register_TIMA = 0;
+                    gbTimaReloadPending = 1;
+                    gbTimaReloadCycle = bcyc + 1;
                     // flag interrupt
                     gbMemory[0xff0f] = register_IF |= 4;
                     gbLastTimerRaiseCycle = gbCycleCounter;
@@ -5376,6 +5412,12 @@ void gbEmulate(int ticksToStop)
                         gbInterruptWait = 1;
                 }
                 gbTimerTicks += gbTimerClockTicks;
+                bcyc += (uint64_t)gbTimerClockTicks;
+            }
+            if (gbTimaReloadPending && gbCycleCounter >= gbTimaReloadCycle) {
+                gbTimaReloadPending = 0;
+                register_TIMA = register_TMA;
+                gbTimaReloadAppliedCycle = gbTimaReloadCycle;
             }
             gbTimerOnChange = false;
             gbTimerModeChange = false;
