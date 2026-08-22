@@ -5325,9 +5325,12 @@ void gbEmulate(int ticksToStop)
             goto gbRedoLoop;
         }
 
-        // Remove the 'if an IE is pending' flag if IE has finished being executed.
+        // Remove the 'if an EI is pending' flag if EI has finished being
+        // executed. Only the EI machinery bits (4-6) are cleared: a DI
+        // executed in the very next instruction slot has set bit 3 by now
+        // and must still take effect (mooneye rapid_di_ei).
         if ((IFF & 0x40) && !(IFF & 0x30))
-            IFF &= 0x81;
+            IFF &= ~0x70;
 
         // On DMG/SGB, DI takes effect immediately: an interrupt raised
         // during the DI instruction itself must not be dispatched
