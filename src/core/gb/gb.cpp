@@ -604,11 +604,24 @@ int gbInterruptWait = 0;
 // single gbEmulate() call, so this state never has to be serialized.
 static int gbIrqDispatchStage = 0;
 static uint8_t gbIrqDispatchArmed = 0;
+static uint8_t gbIrqDispatchIE = 0;
+// Mode-3 fine-scroll penalty: SCX%8 shifts the BG fetcher, extending
+// mode 3 (and shortening H-Blank) by up to 7 T-cycles. Quantized to
+// this core's M-cycle ticks that is +1 tick for SCX%8 = 1-4 and +2
+// ticks for 5-7 (mooneye ppu/hblank_ly_scx_timing-GS: the STAT mode-0
+// interrupt to LY-increment distance is 51/50/49 cycles). Latched per
+// pipeline at each mode 2->3 transition so the mode 3 add and the
+// mode 0 subtract always balance to a full line even if the game
+// writes SCX mid-line.
+static int gbScxMode3Extra = 0;
+static int gbScxMode3ExtraDelayed = 0;
+
 // Debug bookkeeping for VBAM_TRACE_GBIRQ (no effect on emulation).
 static uint64_t gbCycleCounter = 0;
 static uint64_t gbLastOamRaiseCycle = 0;
 static uint64_t gbLastTimerRaiseCycle = 0;
 static uint64_t gbLastRetiCycle = 0;
+static uint64_t gbIrqDecisionCycle = 0;
 static long long gbTraceStatThresh(void)
 {
     static long long thresh = -2;
@@ -630,10 +643,11 @@ static void gbTraceStatRaise(const char* src, int fired)
     if (thresh < 0 || gbCycleCounter < (uint64_t)thresh)
         return;
     fprintf(stderr,
-            "[stat] cyc=%llu %s %s LY=%d LYC=%d STAT=$%02X sig=$%02X IF=$%02X\n",
+            "[stat] cyc=%llu %s %s LY=%d LYC=%d STAT=$%02X sig=$%02X IF=$%02X SCX=%d WY=%d LCDC=$%02X\n",
             (unsigned long long)gbCycleCounter, src,
             fired ? "FIRE" : "block", register_LY, register_LYC,
-            register_STAT, gbInt48Signal, register_IF);
+            register_STAT, gbInt48Signal, register_IF,
+            register_SCX, register_WY, register_LCDC);
 }
 // On DMG/SGB the OAM (mode 2) STAT interrupt for line 0 — the one at the
 // mode 1 -> mode 2 transition when V-Blank ends — is raised one M-cycle
@@ -3071,6 +3085,8 @@ void gbReset()
     gbInterruptWait = 0;
     gbIrqDispatchStage = 0;
     gbVblankEndOamIrqPending = 0;
+    gbScxMode3Extra = 0;
+    gbScxMode3ExtraDelayed = 0;
     gbDmaTicks = 0;
     gbCartBus = 0xff;
     clockTicks = 0;
@@ -4831,7 +4847,13 @@ void gbEmulate(int ticksToStop)
 
                         gbInt48Signal &= ~7;
 
-                        gbLcdTicks += GBLCD_MODE_3_CLOCK_TICKS + gbSpritesTicks[299];
+                        {
+                            int scxFine = register_SCX & 7;
+                            gbScxMode3Extra = (scxFine == 0) ? 0 : ((scxFine <= 4) ? 1 : 2);
+                            if (gbSpeed)
+                                gbScxMode3Extra <<= 1;
+                        }
+                        gbLcdTicks += GBLCD_MODE_3_CLOCK_TICKS + gbSpritesTicks[299] + gbScxMode3Extra;
                         gbLcdMode = 3;
                     } break;
                     case 3: {
@@ -4850,7 +4872,7 @@ void gbEmulate(int ticksToStop)
                             gbInt48Signal |= 1;
                         }
 
-                        gbLcdTicks += GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299];
+                        gbLcdTicks += GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299] - gbScxMode3Extra;
 
                         gbLcdMode = 0;
 
@@ -5013,7 +5035,14 @@ void gbEmulate(int ticksToStop)
                     case 2: {
                         // OAM being accessed mode
                         // next mode is OAM and VRAM in use
-                        gbLcdTicksDelayed += GBLCD_MODE_3_CLOCK_TICKS + gbSpritesTicks[299];
+                        {
+                            int scxFine = register_SCX & 7;
+                            gbScxMode3ExtraDelayed = (scxFine == 0) ? 0 : ((scxFine <= 4) ? 1 : 2);
+                            if (gbSpeed)
+                                gbScxMode3ExtraDelayed <<= 1;
+                        }
+                        gbLcdTicksDelayed += GBLCD_MODE_3_CLOCK_TICKS + gbSpritesTicks[299]
+                            + gbScxMode3ExtraDelayed;
                         gbLcdModeDelayed = 3;
                     } break;
                     case 3: {
@@ -5039,7 +5068,8 @@ void gbEmulate(int ticksToStop)
                                 }
                             }
                         }
-                        gbLcdTicksDelayed += GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299];
+                        gbLcdTicksDelayed += GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299]
+                            - gbScxMode3ExtraDelayed;
                         gbLcdModeDelayed = 0;
                     } break;
                     }
@@ -5398,6 +5428,7 @@ void gbEmulate(int ticksToStop)
             switch (gbIrqDispatchStage) {
             case 0:
                 if (IFF & 1) {
+                    gbIrqDecisionCycle = gbCycleCounter;
                     // First IE/IF read: an interrupt fires. Two internal
                     // M-cycles pass before the PC pushes; events raised
                     // during them are still seen by the second read below.
@@ -5428,11 +5459,10 @@ void gbEmulate(int ticksToStop)
                 break;
 
             case 2:
-                // Second IE/IF read, between the two pushes: it sees the
-                // PC-high push's effect on IE but not the PC-low push's,
-                // and it sees any IF bit raised since the dispatch began —
-                // a higher-priority interrupt hijacks the dispatch here.
-                gbIrqDispatchArmed = register_IE & register_IF & 0x1f;
+                // Second IE read, between the two pushes: it sees the
+                // PC-high push's effect on IE but not the PC-low push's
+                // (mooneye interrupts/ie_push).
+                gbIrqDispatchIE = register_IE;
 
                 // M-cycle 4: push PC.low to [SP-1], SP--.
                 gbWriteMemory(--SP.W, PC.B.B0);
@@ -5441,6 +5471,13 @@ void gbEmulate(int ticksToStop)
                 break;
 
             case 3:
+                // Second IF read, one M-cycle after the IE read: the two
+                // reads are not in the same M-cycle, so an interrupt
+                // raised as late as the PC-low push cycle still hijacks
+                // the dispatch — a VBlank or STAT interrupt landing on a
+                // timer dispatch takes priority here (Pinball Deluxe).
+                gbIrqDispatchArmed = gbIrqDispatchIE & register_IF & 0x1f;
+
                 // M-cycle 5: jump to the highest-priority armed vector.
                 if (gbIrqDispatchArmed & 1) {
                     register_IF &= 0xfe;
@@ -5476,11 +5513,12 @@ void gbEmulate(int ticksToStop)
                         fprintf(stderr,
                                 "[gbirq] fc=%d vec=$%04X from=$%04X SP=$%04X "
                                 "IF=$%02X IE=$%02X LY=%d STAT=$%02X armed=$%02X "
-                                "cyc=%llu oam=-%llu tmr=-%llu reti=-%llu\n",
+                                "cyc=%llu dec=%llu oam=-%llu tmr=-%llu reti=-%llu\n",
                                 gbFrameCount, PC.W, pushedPC, SP.W,
                                 register_IF, register_IE, register_LY,
                                 register_STAT, gbIrqDispatchArmed,
                                 (unsigned long long)gbCycleCounter,
+                                (unsigned long long)gbIrqDecisionCycle,
                                 (unsigned long long)(gbCycleCounter - gbLastOamRaiseCycle),
                                 (unsigned long long)(gbCycleCounter - gbLastTimerRaiseCycle),
                                 (unsigned long long)(gbCycleCounter - gbLastRetiCycle));
