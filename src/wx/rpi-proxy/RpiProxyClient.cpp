@@ -750,6 +750,7 @@ bool RpiProxyClient::LoadPlugin(const wxString& path, RENDER_PLUGIN_INFO* info) 
 
     // Copy plugin info from shared memory
     is_loaded_ = true;
+    ++load_generation_;
     strncpy(plugin_info_.Name, shared_mem_->pluginInfo.name, sizeof(plugin_info_.Name) - 1);
     plugin_info_.Name[sizeof(plugin_info_.Name) - 1] = '\0';
     plugin_info_.Flags = shared_mem_->pluginInfo.flags;
@@ -997,13 +998,21 @@ void RpiProxyClient::UnloadPlugin() {
         return;
     }
 
+    // Stop each active filter thread through StopThread() so any in-flight
+    // ApplyFilter() call is properly drained (it blocks on the per-thread
+    // critical section until the call finishes) and its IPC channel is torn
+    // down cleanly, before the host is told to unload the plugin under it.
+    for (uint32_t i = 0; i < kMaxFilterThreads; i++) {
+        if (thread_ipc_[i].active) {
+            StopThread(i);
+        }
+    }
+
     if (shared_mem_ && host_process_) {
         SendCommand(FilterCommand::UnloadPlugin);
     }
 
-    // Mark all thread IPC channels as inactive.
-    // The host stops all filter threads when plugin is unloaded.
-    // This ensures StartThread() will actually restart them if needed.
+    // Covers any slot StopThread() above didn't reach.
     for (uint32_t i = 0; i < kMaxFilterThreads; i++) {
         thread_ipc_[i].active = false;
     }

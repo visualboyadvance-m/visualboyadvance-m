@@ -988,6 +988,10 @@ protected:
 #ifdef VBAM_RPI_PROXY_SUPPORT
     rpi_proxy::RpiProxyClient* rpi_proxy_client_ = nullptr;  // Points to shared instance
     bool using_rpi_proxy_ = false;
+    // Generation of rpi_proxy_client_'s session that this panel loaded. Used
+    // in ~DrawingPanelBase to confirm this panel still owns the session
+    // before unloading it.
+    uint64_t rpi_proxy_load_generation_ = 0;
 #endif
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];

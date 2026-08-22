@@ -71,6 +71,14 @@ public:
     // Check if a plugin is currently loaded
     bool IsLoaded() const { return is_loaded_; }
 
+    // Monotonically increasing token, bumped on every successful LoadPlugin().
+    // This is a shared singleton, so more than one owner can hold a pointer
+    // to it at once. A caller that records the generation at load time can
+    // compare against it later to check it is still the current owner
+    // before calling UnloadPlugin() -- otherwise it would unload a session
+    // that a different, later owner is actively using.
+    uint64_t LoadGeneration() const { return load_generation_; }
+
     // Get the loaded plugin's info
     const RENDER_PLUGIN_INFO* GetPluginInfo() const {
         return is_loaded_ ? &plugin_info_ : nullptr;
@@ -209,6 +217,9 @@ private:
     // Plugin state
     bool is_loaded_ = false;
     RENDER_PLUGIN_INFO plugin_info_;
+
+    // See LoadGeneration().
+    uint64_t load_generation_ = 0;
 };
 
 }  // namespace rpi_proxy

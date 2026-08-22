@@ -2774,6 +2774,9 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
                     rpi_proxy_client_, &rpi_info_)) {
                 rpi_ = &rpi_info_;
                 using_rpi_proxy_ = true;
+                // Record which load this panel owns, so the destructor can
+                // confirm it's still the current owner before unloading.
+                rpi_proxy_load_generation_ = rpi_proxy_client_->LoadGeneration();
                 loaded = true;
             } else {
                 rpi_proxy_client_ = nullptr;
@@ -4289,12 +4292,16 @@ DrawingPanelBase::~DrawingPanelBase()
 
     InterframeCleanup();
 #ifdef VBAM_RPI_PROXY_SUPPORT
-    // Unload plugin from proxy client if we were using it
-    if (using_rpi_proxy_ && rpi_proxy_client_) {
+    // rpi_proxy_client_ points at a shared singleton another panel may also
+    // hold. Only unload if this panel's load is still the current one --
+    // unloading a session another panel now owns would silently kill its
+    // filtering (ApplyFilter() then always fails, with nothing to reload it).
+    if (using_rpi_proxy_ && rpi_proxy_client_ &&
+        rpi_proxy_client_->LoadGeneration() == rpi_proxy_load_generation_) {
         rpi_proxy_client_->UnloadPlugin();
-        using_rpi_proxy_ = false;
-        rpi_proxy_client_ = nullptr;
     }
+    using_rpi_proxy_ = false;
+    rpi_proxy_client_ = nullptr;
 #endif
 
     disableKeyboardBackgroundInput();
