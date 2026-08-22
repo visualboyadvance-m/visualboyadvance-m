@@ -493,6 +493,18 @@ if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
     set(VBAM_TEST_GB_MIN_PASS 58 CACHE STRING
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
+if(NOT DEFINED VBAM_TEST_GB_MTS_MIN_PASS)
+    # 39 of 75 mooneye-test-suite acceptance ROMs (mts-20240926-1737).
+    # The interrupt cluster is green: ie_push, intr_timing,
+    # reti_intr_timing, rapid_di_ei, di_timing-GS, stat_irq_blocking,
+    # intr_1_2_timing-GS, intr_2_0/mode0/mode3/oam_ok, the halt_ime*
+    # group and all tim* timer tests. Remaining failures are boot-state
+    # (boot_div/boot_hwio), instruction memory-access timing
+    # (call/jp/ret/rst/push/pop/ld_hl_sp_e), OAM DMA timing and PPU
+    # lcdon/scx edge cases.
+    set(VBAM_TEST_GB_MTS_MIN_PASS 39 CACHE STRING
+        "Floor PASS count for the mooneye-test-suite acceptance ROMs")
+endif()
 
 # When cross-compiling (e.g. ARM64 on an x64 CI host) the runners still
 # build — which validates linking — but the host can't launch them, so
@@ -549,6 +561,25 @@ if(VBAM_TEST_GB_ROMS AND IS_DIRECTORY "${VBAM_TEST_GB_ROMS}")
 else()
     message(STATUS
         "vbam-core test: gb.blargg SKIPPED — set VBAM_TEST_GB_ROMS to enable")
+endif()
+
+# GB accuracy suite (gekkio's mooneye-test-suite acceptance ROMs).
+# Point VBAM_TEST_GB_MTS_ROMS at the extracted mts-*/acceptance
+# directory — the runner's mooneye detection keys off the "mts-"
+# path component and the Fibonacci serial-byte protocol.
+if(VBAM_TEST_GB_MTS_ROMS AND IS_DIRECTORY "${VBAM_TEST_GB_MTS_ROMS}")
+    add_test(NAME gb.mooneye
+             COMMAND gb_suite_runner
+                     "--min-pass" "${VBAM_TEST_GB_MTS_MIN_PASS}"
+                     "${VBAM_TEST_GB_MTS_ROMS}")
+    set_tests_properties(gb.mooneye PROPERTIES
+        LABELS "gb;accuracy"
+        TIMEOUT 1200)
+    message(STATUS "vbam-core test: gb.mooneye enabled "
+        "(roms=${VBAM_TEST_GB_MTS_ROMS} floor=${VBAM_TEST_GB_MTS_MIN_PASS})")
+else()
+    message(STATUS
+        "vbam-core test: gb.mooneye SKIPPED — set VBAM_TEST_GB_MTS_ROMS to enable")
 endif()
 
 # Pokémon Emerald two-process link session (IPC + socket). Needs a
