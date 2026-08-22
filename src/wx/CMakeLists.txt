@@ -1938,7 +1938,10 @@ if(APPLE AND UPSTREAM_RELEASE)
 endif()
 
 if(NOT WIN32 AND NOT APPLE)
-    vbam_strip_release_binary(visualboyadvance-m)
+    # $<TARGET_FILE:...> rather than a bare name: on Android the target is a
+    # MODULE library under src/wx/ (libvisualboyadvance-m_<abi>.so), not an
+    # executable at the top of the build tree.
+    vbam_strip_release_binary($<TARGET_FILE:visualboyadvance-m>)
 endif()
 
 # On Android the deliverable is an APK produced by androiddeployqt (the target
