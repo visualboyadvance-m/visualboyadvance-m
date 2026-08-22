@@ -239,7 +239,6 @@ static int run_gba_cable_2p() {
     if (child)
         g_role = "child";
 
-    setup_fake_io();
     SetLinkTimeout(1000);
 
     if (!child) {
@@ -308,7 +307,6 @@ static int run_idle_overflow() {
     if (child)
         g_role = "child";
 
-    setup_fake_io();
     SetLinkTimeout(1000);
 
     if (!child) {
@@ -396,7 +394,6 @@ static int run_gp_exchange() {
     if (child)
         g_role = "child";
 
-    setup_fake_io();
     SetLinkTimeout(1000);
 
     if (!child) {
@@ -527,6 +524,13 @@ int main(int argc, char** argv) {
     // link call; the core latches the namespace on first use.
     snprintf(g_namespace, sizeof(g_namespace), "t%x", (unsigned)getpid());
     setenv("VBAM_LINK_NAMESPACE", g_namespace, 1);
+
+    // Every test needs g_ioMem, not just the ones that read COMM_* directly:
+    // the barrier pumps LinkUpdate() while it waits (see Barrier::swap), and
+    // the cable update path dereferences g_ioMem for RCNT on the way in. That
+    // pump only runs when the 1 ms poll times out, so leaving g_ioMem null
+    // segfaulted only on a loaded machine — an intermittent CI failure.
+    setup_fake_io();
 
     arm_watchdog(90);
 
