@@ -648,6 +648,15 @@ static uint16_t gbOamDmaCopySource = 0;
 // which is derived from the same divider as DIV — edges align to the
 // reset time, not the SC write (mooneye serial/boot_sclk_align).
 static int gbSerialMasterWait = 0;
+// First line after LCD enable: the PPU skips the OAM scan and STAT
+// reads mode 0 until mode 3 begins (mooneye ppu/stat_lyc_onoff,
+// lcdon_timing-GS).
+static int gbLcdOnGlitchMode0 = 0;
+
+static inline bool gbLcdOnGlitchActive(void)
+{
+    return gbLcdOnGlitchMode0 != 0;
+}
 static int gbMemAccessCycleAdj = 0;
 
 static inline bool gbOamDmaBlocked(void)
@@ -665,6 +674,7 @@ static void gbOamDmaFlushIfDue(void)
     uint64_t eff = gbCycleCounter - (uint64_t)gbMemAccessCycleAdj;
     if (gbOamDmaCopyPending && eff >= gbOamDmaBlockUntil) {
         gbOamDmaCopyPending = 0;
+    gbLcdOnGlitchMode0 = 0;
         gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
     }
 }
@@ -1341,8 +1351,12 @@ bool allowColorizerHack(void)
     return false;
 }
 
+static inline bool gbLcdOnGlitchActive(void);
+
 static inline bool gbVramReadAccessValid(void)
 {
+    if (gbLcdOnGlitchActive())
+        return true;
     // A lot of 'ugly' checks... But only way to emulate this particular behaviour...
     if (allowColorizerHack()||
         ((gbHardware & 0xa) && ((gbLcdModeDelayed != 3) || (((register_LY == 0) && (gbScreenOn == false) && (register_LCDC & 0x80)) && (gbLcdLYIncrementTicksDelayed == (GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS))))) ||
@@ -1353,6 +1367,8 @@ static inline bool gbVramReadAccessValid(void)
 
 static inline bool gbVramWriteAccessValid(void)
 {
+    if (gbLcdOnGlitchActive())
+        return true;
     if (allowColorizerHack() ||
         // No access to Vram during mode 3
         // (used to emulate the gfx differences between GB & GBC-GBA/SP in Stunt Racer)
@@ -1653,7 +1669,8 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         if (gbOamDmaBlocked())
             return;
         gbOamDmaFlushIfDue();
-        if (((gbHardware & 0xa) && ((gbLcdMode | gbLcdModeDelayed) & 2)) || ((gbHardware & 5) && (((gbLcdModeDelayed == 2) && (gbLcdTicksDelayed <= GBLCD_MODE_2_CLOCK_TICKS)) || (gbLcdModeDelayed == 3))))
+        if (!gbLcdOnGlitchActive()
+            && ((((gbHardware & 0xa) && ((gbLcdMode | gbLcdModeDelayed) & 2)) || ((gbHardware & 5) && (((gbLcdModeDelayed == 2) && (gbLcdTicksDelayed <= GBLCD_MODE_2_CLOCK_TICKS) && (gbLcdTicksDelayed > 1)) || (gbLcdModeDelayed == 3))))))
             return;
         else {
             gbMemory[address] = value;
@@ -1963,9 +1980,10 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 gbLcdLYIncrementTicksDelayed = GBLY_INCREMENT_CLOCK_TICKS - (gbSpeed ? 1 : 0);
                 gbLcdMode = 2;
                 gbLcdModeDelayed = 2;
-                gbMemory[0xff41] = register_STAT = (register_STAT & 0xfc) | 2;
+                gbLcdOnGlitchMode0 = 1;
+                gbMemory[0xff41] = register_STAT = (uint8_t)(register_STAT & 0xfc);
                 gbMemory[0xff44] = register_LY = 0x00;
-                gbInt48Signal = 0;
+                gbInt48Signal &= 8;
                 gbLYChangeHappened = false;
                 gbLCDChangeHappened = false;
                 gbWindowLine = 146;
@@ -1999,8 +2017,14 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 gbLcdMode = 0;
                 gbLcdModeDelayed = 0;
                 gbMemory[0xff41] = register_STAT &= 0xfc;
-                gbInt48Signal = 0;
+                // The coincidence flag is retained while the LCD is
+                // off; if the LYC source is enabled the STAT IRQ line
+                // stays high through the off period, so re-enabling
+                // with the comparison still true must not fire another
+                // interrupt (mooneye ppu/stat_lyc_onoff).
+                gbInt48Signal = ((register_STAT & 0x44) == 0x44) ? 8 : 0;
                 gbVblankEndOamIrqPending = 0;
+                gbLcdOnGlitchMode0 = 0;
             }
         }
         return;
@@ -2131,6 +2155,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         // Complete a previous transfer's copy before arming the next.
         if (gbOamDmaCopyPending) {
             gbOamDmaCopyPending = 0;
+    gbLcdOnGlitchMode0 = 0;
             gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
         }
         gbOamDmaCopyPending = 1;
@@ -2839,6 +2864,8 @@ uint8_t gbReadMemory(uint16_t address)
                 statv = (uint8_t)(0x80 | (gbMemory[0xff41] & 0xFC));
             else
                 statv = (uint8_t)(0x80 | gbMemory[0xff41]);
+            if (gbLcdOnGlitchMode0)
+                statv &= 0xfc;
             gbTraceStatRead(statv);
             return statv;
         }
@@ -2935,7 +2962,7 @@ uint8_t gbReadMemory(uint16_t address)
         gbOamDmaFlushIfDue();
     }
     // OAM not accessible during mode 2 & 3.
-    if (((address >= 0xfe00) && (address < 0xfea0)) && ((((gbLcdMode | gbLcdModeDelayed) & 2) && (!(gbSpeed && (gbHardware & 0x2) && !(gbLcdModeDelayed & 2) && (gbLcdMode == 2)))) || (gbSpeed && (gbHardware & 0x2) && (gbLcdModeDelayed == 0) && (gbLcdTicksDelayed == (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299])))))
+    if (((address >= 0xfe00) && (address < 0xfea0)) && !gbLcdOnGlitchActive() && ((((gbLcdMode | gbLcdModeDelayed) & 2) && (!(gbSpeed && (gbHardware & 0x2) && !(gbLcdModeDelayed & 2) && (gbLcdMode == 2)))) || (gbSpeed && (gbHardware & 0x2) && (gbLcdModeDelayed == 0) && (gbLcdTicksDelayed == (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299])))))
         return 0xff;
 
     if ((address >= 0xfea0) && (address < 0xff00)) {
@@ -3262,6 +3289,7 @@ void gbReset()
     gbOamDmaBlockFrom = 0;
     gbOamDmaBlockUntil = 0;
     gbOamDmaCopyPending = 0;
+    gbLcdOnGlitchMode0 = 0;
     gbDmaTicks = 0;
     gbCartBus = 0xff;
     clockTicks = 0;
@@ -4880,6 +4908,15 @@ void gbEmulate(int ticksToStop)
                     gbLYChangeHappened = true;
                     gbMemory[0xff44] = register_LY = (register_LY + 1) % 154;
 
+                    // The LY=LYC comparison takes one cycle: during the
+                    // LY-change cycle the coincidence flag reads 0; the
+                    // delayed compare sets the new value (mooneye
+                    // ppu/lcdon_timing-GS).
+                    if (gbHardware & 5) {
+                        register_STAT &= ~4;
+                        gbMemory[0xff41] = register_STAT;
+                    }
+
                     if (register_LY == 0x91) {
                         /* if (IFF & 0x80)
               gbScreenOn = !gbScreenOn;
@@ -4928,7 +4965,12 @@ void gbEmulate(int ticksToStop)
                             }
 
                             gbInt48Signal &= ~6;
-                            if (register_STAT & 0x10) {
+                            // On DMG/SGB the OAM (mode 2) STAT source also
+                            // pulses at V-Blank entry, at the same cycle as
+                            // the V-Blank interrupt itself (mooneye
+                            // ppu/vblank_stat_intr-GS rounds 3-4).
+                            if ((register_STAT & 0x10)
+                                || ((gbHardware & 5) && (register_STAT & 0x20))) {
                                 gbTraceStatRaise("vbl1", (!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a)));
                                 // send LCD interrupt only if no interrupt 48h signal...
                                 if ((!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a))) {
@@ -5236,6 +5278,7 @@ void gbEmulate(int ticksToStop)
                     case 2: {
                         // OAM being accessed mode
                         // next mode is OAM and VRAM in use
+                        gbLcdOnGlitchMode0 = 0;
                         {
                             int scxFine = register_SCX & 7;
                             gbScxMode3ExtraDelayed = (scxFine == 0) ? 0 : ((scxFine <= 4) ? 1 : 2);

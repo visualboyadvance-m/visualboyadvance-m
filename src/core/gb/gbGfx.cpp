@@ -532,8 +532,16 @@ void gbDrawSprites(bool draw)
 
     int size = (register_LCDC & 4);
 
-    if (!draw)
+    static unsigned long long gbSpritesWindowMask = 0;
+    static int gbSpritesTotalT = 0;
+    static int gbSpritesPrevTicks = 0;
+
+    if (!draw) {
         memset(gbSpritesTicks, 0, sizeof(gbSpritesTicks));
+        gbSpritesWindowMask = 0;
+        gbSpritesTotalT = 0;
+        gbSpritesPrevTicks = 0;
+    }
 
     if (!(register_LCDC & 0x80))
         return;
@@ -550,20 +558,43 @@ void gbDrawSprites(bool draw)
                 tile &= 254;
             int flags = gbOAMLatch[address++];
 
-            if (x > 0 && y > 0 && x < 168 && y < 160) {
+            // The OAM scan selects sprites by Y only; X (even fully
+            // off-screen) still consumes one of the 10 per-line slots.
+            if (y > 0 && y < 160) {
                 // check if sprite intersects current line
                 int t = yc - y + 16;
                 if ((size && t >= 0 && t < 16) || (!size && t >= 0 && t < 8)) {
-                    if (draw)
-                        gbDrawSpriteTile(tile, x - 8, yc, t, flags, size, i);
-                    else {
-                        for (int j = x - 8; j < 300; j++)
-                            if (j >= 0) {
-                                if (gbSpeed)
-                                    gbSpritesTicks[j] += 5;
-                                else
-                                    gbSpritesTicks[j] += 2 + (count & 1);
-                            }
+                    if (draw) {
+                        if (x > 0 && x < 168)
+                            gbDrawSpriteTile(tile, x - 8, yc, t, flags, size, i);
+                    } else if (x < 168) {
+                        // Mode-3 penalty (mooneye ppu/
+                        // intr_2_mode0_timing_sprites): every fetched
+                        // sprite stalls the pipeline 6 T-cycles; the
+                        // first sprite in each BG tile window pays an
+                        // extra 5 - ((x + SCX) & 7) T (one less when
+                        // clipped at the left edge). Quantized to this
+                        // core's ticks via a running T total.
+                        int m = (x + register_SCX) & 7;
+                        int w = (x + register_SCX) >> 3;
+                        int penaltyT = 6;
+                        if (!(gbSpritesWindowMask & (1ULL << w))) {
+                            gbSpritesWindowMask |= (1ULL << w);
+                            int b = 5 - m;
+                            if (b > 0)
+                                penaltyT += b;
+                        }
+                        gbSpritesTotalT += penaltyT;
+                        int tickDiv = gbSpeed ? 2 : 4;
+                        int add = gbSpritesTotalT / tickDiv - gbSpritesPrevTicks;
+                        gbSpritesPrevTicks += add;
+                        if (add > 0) {
+                            int start = x - 8;
+                            if (start < 0)
+                                start = 0;
+                            for (int j = start; j < 300; j++)
+                                gbSpritesTicks[j] += add;
+                        }
                     }
                     count++;
                 }
