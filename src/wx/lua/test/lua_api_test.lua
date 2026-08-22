@@ -49,6 +49,51 @@ check(bit.tobit(0x100000000) == 0,                "bit.tobit truncates to 32")
 check(bit.tohex(0xdeadbeef)  == "deadbeef",       "bit.tohex lowercase")
 check(bit.tohex(0xdeadbeef, -8) == "DEADBEEF",    "bit.tohex uppercase via -n")
 
+emu.print("=== bit library edge cases ===")
+
+-- band/bor/bxor fold over every argument, so the no-argument case falls
+-- back to each operation's identity.
+check(bit.band(0xff, 0x3f, 0x0f) == 0x0f,     "bit.band is variadic")
+check(bit.bor (0x01, 0x02, 0x04) == 0x07,     "bit.bor is variadic")
+check(bit.bxor(0xff, 0x0f, 0x01) == 0xf1,     "bit.bxor is variadic")
+check(bit.band()                 == 0xffffffff, "bit.band() is all ones")
+check(bit.bor ()                 == 0,        "bit.bor() is zero")
+
+-- Arguments are truncated to 32 bits, and negatives read back as their
+-- unsigned bit pattern.
+check(bit.band(-1, 0xff)          == 0xff,       "bit.band normalizes negatives")
+check(bit.band(0x1ffffffff, 0xff) == 0xff,       "bit.band truncates to 32 bits")
+check(bit.bnot(-1)                == 0,          "bit.bnot(-1) is zero")
+
+-- Shift and rotate counts are masked to five bits, so 32 is a no-op.
+check(bit.lshift(1, 32)           == 1,          "bit.lshift masks count to 5 bits")
+check(bit.lshift(1, 33)           == 2,          "bit.lshift count 33 shifts by 1")
+check(bit.rshift(0x80000000, 32)  == 0x80000000, "bit.rshift masks count to 5 bits")
+check(bit.rol(0x12345678, 32)     == 0x12345678, "bit.rol by 32 is identity")
+check(bit.ror(0x12345678, 0)      == 0x12345678, "bit.ror by 0 is identity")
+check(bit.rol(0x12345678, 8)      == 0x34567812, "bit.rol by 8")
+check(bit.ror(0x12345678, 8)      == 0x78123456, "bit.ror by 8")
+
+check(bit.arshift(16, 2)          == 4,          "bit.arshift of a positive")
+check(bit.arshift(0x80000000, 31) == 0xffffffff, "bit.arshift smears the sign bit")
+
+-- tobit is the one binding that returns a signed result; the rest push
+-- the unsigned 32-bit pattern.
+check(bit.tobit(0xffffffff)       == -1,         "bit.tobit returns signed")
+check(bit.tobit(0x7fffffff)       == 0x7fffffff, "bit.tobit keeps positives")
+
+check(bit.tohex(0xff, 2)          == "ff",       "bit.tohex honours a width")
+check(bit.tohex(0xff, 4)          == "00ff",     "bit.tohex pads to width")
+check(bit.tohex(0xff, -4)         == "00FF",     "bit.tohex -n is uppercase")
+
+-- The bindings take their arguments through luaL_checkinteger, so Lua's
+-- integer subtype rules apply: a float with an exact integer value is
+-- accepted and one without is an error. This is the part most likely to
+-- shift under a Lua version change.
+check(bit.band(255.0, 0x0f)       == 0x0f,       "bit.band accepts integral floats")
+check(not pcall(bit.band, 255.5, 0x0f),          "bit.band rejects fractional floats")
+check(not pcall(bit.lshift, 1),                  "bit.lshift requires a count")
+
 emu.print("=== emu namespace ===")
 
 check(type(emu.print)         == "function", "emu.print exists")

@@ -460,6 +460,8 @@ fedora_dnf_download() {
 fedora_installdeps() {
     fedora=1
     ffmpeg=
+    ffmpeg_codecs=
+    no_codecs=
     rpms_installed=
     dnf_install_opts=
 
@@ -543,8 +545,7 @@ fedora_installdeps() {
         cd "$curdir"
         [ $tries -eq 0 ] && warning 'installing rpmfusion repos failed, falling back to the Fedora ffmpeg build'
 
-        # ffmpeg-devel is the rpmfusion build, ffmpeg-free-devel the Fedora
-        # one, either is enough for A/V recording
+        # ffmpeg-devel is the rpmfusion build, ffmpeg-free-devel the Fedora one.
         for pkg in ffmpeg-devel ffmpeg-free-devel; do
             if fedora_have_pkg "$pkg"; then
                 ffmpeg=$pkg
@@ -552,7 +553,33 @@ fedora_installdeps() {
             fi
         done
 
-        [ -z "$ffmpeg" ] && warning 'no ffmpeg development package found, continuing without ffmpeg'
+        # cmake/Options.cmake asks FindFFmpeg for X264 and X265, and every
+        # requested component is a required var there, so ffmpeg is unusable
+        # to us without them. Fedora cannot ship either: they come from
+        # rpmfusion along with the full ffmpeg. Install nothing rather than
+        # pull in an ffmpeg the build will then refuse to link.
+        for pkg in x264-devel x265-devel; do
+            if fedora_have_pkg "$pkg"; then
+                ffmpeg_codecs="$ffmpeg_codecs $pkg"
+            else
+                no_codecs=1
+            fi
+        done
+
+        if [ -n "$no_codecs" ]; then
+            ffmpeg=
+            ffmpeg_codecs=
+            warning='x264 and x265 are rpmfusion-only and the build requires them for ffmpeg, skipping ffmpeg'
+        elif [ -z "$ffmpeg" ]; then
+            warning='no ffmpeg development package found, continuing without ffmpeg'
+        fi
+
+        # Nothing was installed to record with, so tell the build not to look.
+        # Otherwise the configure reports ffmpeg as missing, which reads like
+        # something went wrong rather than a dependency we deliberately left
+        # out. Only for a host build we actually tried: --no-ffmpeg and the
+        # mingw targets are left to decide for themselves.
+        [ -z "$ffmpeg" ] && cmake_flags="$cmake_flags -DENABLE_FFMPEG=NO"
     fi
 
     # EPEL carries the mingw packages, nasm and ninja-build on RHEL. Install it
@@ -583,7 +610,9 @@ fedora_installdeps() {
     fedora_have_pkg "$wx" || wx=wxGTK3-devel
 
     # non-multiarch packages first
-    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build
+    # vulkan-headers is noarch and so cannot take the architecture suffix the
+    # list further down appends.
+    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers
 
     # try to install multiarch libgcc, libstdc++, glibc-devel and pkgconfig if
     # available.  libstdc++-devel carries the libstdc++.so the linker resolves
@@ -602,7 +631,9 @@ fedora_installdeps() {
     set --
     if [ -z "$target" -o "$target" = m32 ]; then
         # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
-        for pkg in "$zlib" mesa-libGL-devel "$ffmpeg" gettext-devel SDL3-devel openal-soft-devel "$wx" gtk3-devel; do
+        for pkg in "$zlib" mesa-libGL-devel "$ffmpeg" $ffmpeg_codecs lua-devel \
+                   vulkan-loader-devel gettext-devel SDL3-devel openal-soft-devel \
+                   "$wx" gtk3-devel; do
             # $ffmpeg is empty when ffmpeg is disabled or unavailable
             [ -z "$pkg" ] && continue
 
