@@ -593,6 +593,25 @@ bool breakpoint = false;
 // interrupt
 int gbInt48Signal = 0;
 int gbInterruptWait = 0;
+// Interrupt-dispatch state machine. The SM83 dispatch takes 5 M-cycles:
+// two internal cycles, the PC-high push, the PC-low push and the vector
+// jump. IE and IF are read twice — once to decide that an interrupt
+// fires at all, and again (between the two pushes) to pick the vector.
+// A higher-priority interrupt raised during the first dispatch cycles
+// therefore hijacks the dispatch (Pinball Deluxe), and a PC-high push
+// that lands on IE ($FFFF) can cancel it entirely, jumping to $0000
+// (mooneye interrupts/ie_push). The dispatch always completes within a
+// single gbEmulate() call, so this state never has to be serialized.
+static int gbIrqDispatchStage = 0;
+static uint8_t gbIrqDispatchArmed = 0;
+// On DMG/SGB the OAM (mode 2) STAT interrupt for line 0 — the one at the
+// mode 1 -> mode 2 transition when V-Blank ends — is raised one M-cycle
+// after the mode transition itself (mooneye ppu/intr_1_2_timing-GS). The
+// immediate LCD pass decides whether the IRQ fires (STAT blocking is
+// evaluated there) and the delayed LCD pass, which runs exactly one tick
+// behind, sets the IF bit. Not serialized: the window is a single
+// M-cycle, so only a save state captured inside it could lose one IRQ.
+static int gbVblankEndOamIrqPending = 0;
 // serial
 int gbSerialOn = 0;
 int gbSerialTicks = 0;
@@ -1349,6 +1368,12 @@ void gbCompareLYToLYC()
                 // send LCD interrupt only if no interrupt 48h signal...
                 if (!gbInt48Signal) {
                     register_IF |= 2;
+                    // CGB: LYC wakes the CPU from halt one M-cycle late,
+                    // like every other interrupt. DMG: LYC is NOT delayed
+                    // in halt mode (the halt-break-early quirk below in
+                    // gbEmulate handles the DMG side).
+                    if ((gbHardware & 0xa) && (IFF & 0x80))
+                        gbInterruptWait = 1;
                 }
                 gbInt48Signal |= 8;
             }
@@ -1804,6 +1829,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 gbLcdModeDelayed = 0;
                 gbMemory[0xff41] = register_STAT &= 0xfc;
                 gbInt48Signal = 0;
+                gbVblankEndOamIrqPending = 0;
             }
         }
         return;
@@ -2997,6 +3023,8 @@ void gbReset()
     gbLCDChangeHappened = false;
     gbBlackScreen = false;
     gbInterruptWait = 0;
+    gbIrqDispatchStage = 0;
+    gbVblankEndOamIrqPending = 0;
     gbDmaTicks = 0;
     gbCartBus = 0xff;
     clockTicks = 0;
@@ -3993,6 +4021,8 @@ static bool gbReadSaveState(gzFile gzFile)
         gbLcdTicksDelayed = gbLcdTicks--;
         gbLcdLYIncrementTicksDelayed = gbLcdLYIncrementTicks--;
         gbInterruptWait = 0;
+        gbIrqDispatchStage = 0;
+        gbVblankEndOamIrqPending = 0;
         memset(gbSpritesTicks, 0, sizeof(gbSpritesTicks));
     } else {
         gbLcdModeDelayed = utilReadInt(gzFile);
@@ -4661,6 +4691,13 @@ void gbEmulate(int ticksToStop)
                                 if (!gbInt48Signal) {
                                     register_IF |= 2;
                                     gbInterruptLaunched |= 2;
+                                    // CGB: in halt mode IF is read one
+                                    // T-cycle later, so the OAM interrupt
+                                    // wakes the CPU one M-cycle late. On
+                                    // DMG the mid-frame OAM wake is not
+                                    // delayed (mooneye intr_2_* tests).
+                                    if ((gbHardware & 0xa) && (IFF & 0x80))
+                                        gbInterruptWait = 1;
                                 }
                                 gbInt48Signal |= 4;
                             }
@@ -4674,10 +4711,18 @@ void gbEmulate(int ticksToStop)
                         if (register_STAT & 0x20) {
                             // send LCD interrupt only if no interrupt 48h signal...
                             if (!gbInt48Signal) {
-                                register_IF |= 2;
-                                gbInterruptLaunched |= 2;
-                                if ((gbHardware & 0xa) && (IFF & 0x80))
-                                    gbInterruptWait = 1;
+                                if (gbHardware & 5) {
+                                    // DMG/SGB: the line-0 OAM IRQ is
+                                    // raised one M-cycle later, from the
+                                    // delayed LCD pass (mooneye
+                                    // ppu/intr_1_2_timing-GS).
+                                    gbVblankEndOamIrqPending = 1;
+                                } else {
+                                    register_IF |= 2;
+                                    gbInterruptLaunched |= 2;
+                                    if ((gbHardware & 0xa) && (IFF & 0x80))
+                                        gbInterruptWait = 1;
+                                }
                             }
                             gbInt48Signal |= 4;
                         }
@@ -4895,6 +4940,15 @@ void gbEmulate(int ticksToStop)
                         // next mode is OAM being accessed mode
 
                         // gbScreenOn = true;
+
+                        // DMG/SGB line-0 OAM IRQ, deferred by the
+                        // immediate pass one M-cycle ago (mooneye
+                        // ppu/intr_1_2_timing-GS).
+                        if (gbVblankEndOamIrqPending) {
+                            gbVblankEndOamIrqPending = 0;
+                            register_IF |= 2;
+                            gbInterruptLaunched |= 2;
+                        }
 
                         oldRegister_WY = register_WY;
 
@@ -5194,6 +5248,12 @@ void gbEmulate(int ticksToStop)
                     register_TIMA = register_TMA;
                     // flag interrupt
                     gbMemory[0xff0f] = register_IF |= 4;
+                    // The timer interrupt is one of the interrupts that
+                    // wake the CPU from halt one M-cycle late (IF is
+                    // read one T-cycle later in halt mode) — on both
+                    // DMG and CGB.
+                    if (IFF & 0x80)
+                        gbInterruptWait = 1;
                 }
                 gbTimerTicks += gbTimerClockTicks;
             }
@@ -5269,47 +5329,76 @@ void gbEmulate(int ticksToStop)
         if ((IFF & 0x40) && !(IFF & 0x30))
             IFF &= 0x81;
 
-        if ((register_IE & register_IF & 0x1f) && (IFF & 0x81) && (!gbInterruptWait)) {
+        // On DMG/SGB, DI takes effect immediately: an interrupt raised
+        // during the DI instruction itself must not be dispatched
+        // (mooneye di_timing-GS round 2). On CGB/AGB, DI is delayed by
+        // one instruction — there the IME clear stays below, after the
+        // dispatch check.
+        if ((gbHardware & 5) && (IFF & 0x08))
+            IFF &= ~0x79;
 
-            if (IFF & 1) {
-                // Add 5 ticks for the interrupt execution time
-                gbDmaTicks += 5;
+        if (gbIrqDispatchStage || ((register_IE & register_IF & 0x1f) && (IFF & 0x81) && (!gbInterruptWait))) {
 
-                if (gbIntBreak == 2) {
-                    gbDmaTicks--;
-                    gbIntBreak = 0;
+            switch (gbIrqDispatchStage) {
+            case 0:
+                if (IFF & 1) {
+                    // First IE/IF read: an interrupt fires. Two internal
+                    // M-cycles pass before the PC pushes; events raised
+                    // during them are still seen by the second read below.
+                    gbIrqDispatchStage = 1;
+                    gbDmaTicks += 2;
+
+                    if (gbIntBreak == 2) {
+                        gbDmaTicks--;
+                        gbIntBreak = 0;
+                    }
+
+                    // The CPU leaves halt as soon as the dispatch begins.
+                    IFF &= ~0x80;
+                } else {
+                    // Halt released with IME clear: no dispatch.
+                    IFF &= ~0x81;
                 }
+                break;
 
-                // Real DMG/CGB interrupt dispatch:
-                //   1. Push PC.high to [SP-1], SP--
-                //   2. Push PC.low to [SP-1], SP--
-                //   3. Read IE *now* (the high-byte push above may have
-                //      written to the IE register at $FFFF, changing
-                //      which interrupts are armed) and pick the vector
-                //      from the highest-priority armed bit.
-                // Mooneye's interrupts/ie_push test exercises exactly
-                // this corner case by setting SP=$FFFF before the
-                // interrupt fires. We previously routed each interrupt
-                // through a dedicated function that cleared IF then
-                // pushed; that didn't see the post-push IE.
+            case 1:
+                // M-cycle 3: push PC.high to [SP-1], SP--. This write can
+                // land on the IE register at $FFFF and change which
+                // interrupts are armed (mooneye interrupts/ie_push).
                 gbCheatWrite(false);
                 gbWriteMemory(--SP.W, PC.B.B1);
-                gbWriteMemory(--SP.W, PC.B.B0);
+                gbIrqDispatchStage = 2;
+                gbDmaTicks += 1;
+                break;
 
-                uint8_t armed = register_IE & register_IF & 0x1f;
-                if (armed & 1) {
+            case 2:
+                // Second IE/IF read, between the two pushes: it sees the
+                // PC-high push's effect on IE but not the PC-low push's,
+                // and it sees any IF bit raised since the dispatch began —
+                // a higher-priority interrupt hijacks the dispatch here.
+                gbIrqDispatchArmed = register_IE & register_IF & 0x1f;
+
+                // M-cycle 4: push PC.low to [SP-1], SP--.
+                gbWriteMemory(--SP.W, PC.B.B0);
+                gbIrqDispatchStage = 3;
+                gbDmaTicks += 1;
+                break;
+
+            case 3:
+                // M-cycle 5: jump to the highest-priority armed vector.
+                if (gbIrqDispatchArmed & 1) {
                     register_IF &= 0xfe;
                     PC.W = 0x40;
-                } else if (armed & 2) {
+                } else if (gbIrqDispatchArmed & 2) {
                     register_IF &= 0xfd;
                     PC.W = 0x48;
-                } else if (armed & 4) {
+                } else if (gbIrqDispatchArmed & 4) {
                     register_IF &= 0xfb;
                     PC.W = 0x50;
-                } else if (armed & 8) {
+                } else if (gbIrqDispatchArmed & 8) {
                     register_IF &= 0xf7;
                     PC.W = 0x58;
-                } else if (armed & 16) {
+                } else if (gbIrqDispatchArmed & 16) {
                     register_IF &= 0xef;
                     PC.W = 0x60;
                 } else {
@@ -5318,9 +5407,11 @@ void gbEmulate(int ticksToStop)
                     PC.W = 0x0000;
                 }
                 gbMemory[0xff0f] = register_IF;
+                gbIrqDispatchStage = 0;
+                gbDmaTicks += 1;
+                IFF &= ~0x81;
+                break;
             }
-
-            IFF &= ~0x81;
         }
 
         if (IFF & 0x08)
