@@ -41,6 +41,13 @@
 #include <memory>
 #include <filesystem>
 
+// PNG decoding for screenshot-compare suites (mealybug, acid2, gambatte,
+// scribbltests, ...). vbam-core only compiles the stb_image_write
+// implementation (image_util.cpp), so compile the reader privately here.
+#define STB_IMAGE_STATIC
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include "core/base/system.h"
 #include "core/base/sound_driver.h"
 #include "core/gb/gb.h"
@@ -67,6 +74,44 @@ bool systemReadJoypads() { return true; }
 uint32_t systemReadJoypad(int) { return g_joy_mask; }
 uint32_t systemGetClock() { return 0; }
 void systemSetTitle(const char*) {}
+// ---- Audio capture ---------------------------------------------------------
+//
+// Gambatte `_outaudio0` / `_outaudio1` tests: the pass criterion is
+// whether the audio output around emulated frame 15 is completely flat
+// (audio0 = must be silent) or varies (audio1 = must produce sound).
+// We hook the sound-driver write path and record, per emulated frame,
+// whether any sample differed from the first sample seen that frame.
+static bool g_audio_capture = false;
+static bool g_audio_varied_this_frame = false;
+static bool g_audio_have_first = false;
+static int16_t g_audio_first_sample = 0;
+static bool g_audio_wrote_this_frame = false;
+
+static void audio_capture_write(const uint16_t* data, int length) {
+    if (!g_audio_capture || data == nullptr || length <= 0)
+        return;
+    // `length` is in bytes on the driver flush path; be conservative and
+    // never scan past 64K samples in case a caller passes sample counts.
+    size_t n = (size_t)length / 2;
+    if (n > 0x10000) n = 0x10000;
+    const int16_t* s = (const int16_t*)data;
+    g_audio_wrote_this_frame = true;
+    for (size_t i = 0; i < n; ++i) {
+        if (!g_audio_have_first) {
+            g_audio_first_sample = s[i];
+            g_audio_have_first = true;
+        } else if (s[i] != g_audio_first_sample) {
+            g_audio_varied_this_frame = true;
+        }
+    }
+}
+
+static void audio_capture_new_frame() {
+    g_audio_varied_this_frame = false;
+    g_audio_have_first = false;
+    g_audio_wrote_this_frame = false;
+}
+
 namespace {
 class NullSoundDriver : public SoundDriver {
   public:
@@ -74,7 +119,9 @@ class NullSoundDriver : public SoundDriver {
     void pause() override {}
     void reset() override {}
     void resume() override {}
-    void write(uint16_t*, int) override {}
+    void write(uint16_t* data, int length) override {
+        audio_capture_write(data, length);
+    }
     void setThrottle(unsigned short) override {}
 };
 } // namespace
@@ -150,7 +197,7 @@ static uint8_t serial_capture(uint8_t b) {
 
 // ---- Result detection ------------------------------------------------------
 
-enum class Verdict { Pass, Fail, Timeout, BadRom };
+enum class Verdict { Pass, Fail, Timeout, BadRom, Skip };
 
 struct TestResult {
     std::string rom_path;
@@ -208,6 +255,169 @@ static std::string read_screen_text() {
         out.push_back('\n');
     }
     return out;
+}
+
+// ---- Rendered-framebuffer access & image comparison -------------------------
+//
+// The GB core renders each scanline into `g_pix` (32bpp here). The
+// non-libretro 32-bit pitch is (gbBorderLineSkip + 1) pixels with a
+// one-row/one-pixel offset (see gbDrawLine in gb.cpp). We build
+// systemColorMap32 so pixels come out as 0x00RRGGBB, then compare
+// against reference images with each channel masked to its top 5 bits
+// (& 0xF8F8F8) — that makes the comparison independent of how 5-bit
+// channels were expanded to 8 bits (X<<3 vs (X<<3)|(X>>2)).
+extern uint8_t* g_pix;  // shared GB/GBA framebuffer (gbaGlobals.h)
+
+static inline uint32_t fb_px(int x, int y) {
+    const uint32_t* fb = (const uint32_t*)g_pix;
+    return fb[(gbBorderLineSkip + 1) * (y + gbBorderRowSkip + 1) +
+              gbBorderColumnSkip + x] & 0xF8F8F8u;
+}
+
+// Build the BGR555 → 32-bit color LUT. Two flavors:
+//  - raw:      each 5-bit channel expanded with X<<3. Combined with the
+//              masked compare this matches the c-sp reference-screenshot
+//              convention ((X<<3)|(X>>2)) and the DMG grey shades
+//              #000000/#555555/#AAAAAA/#FFFFFF.
+//  - gambatte: the color-correction formula gambatte's testrunner.cpp
+//              uses for CGB (red=(R*13+G*2+B)/2, green=(G*3+B)*2,
+//              blue=(R*3+G*2+B*11)/2). For greys (R==G==B) this agrees
+//              with raw under the 0xF8 mask, so DMG runs are unaffected.
+static void build_colormap(bool gambatte_cgb) {
+    systemColorDepth = 32;
+    systemRedShift   = 19;
+    systemGreenShift = 11;
+    systemBlueShift  = 3;
+    for (uint32_t i = 0; i < 0x10000; ++i) {
+        uint32_t r = i & 0x1F, g = (i >> 5) & 0x1F, b = (i >> 10) & 0x1F;
+        uint32_t r8, g8, b8;
+        if (gambatte_cgb) {
+            r8 = (r * 13 + g * 2 + b) >> 1;
+            g8 = (g * 3 + b) << 1;
+            b8 = (r * 3 + g * 2 + b * 11) >> 1;
+        } else {
+            r8 = r << 3;
+            g8 = g << 3;
+            b8 = b << 3;
+        }
+        systemColorMap32[i] = 0xFF000000u | (r8 << 16) | (g8 << 8) | b8;
+    }
+}
+
+// Gambatte testrunner.cpp hex font: 8x8 glyphs for 0-F drawn at the top
+// left of the screen, black (#000000) on white (#FFFFFF). Bit 7 of each
+// row byte is the leftmost pixel.
+static const uint8_t kGambatteHexGlyphs[16][8] = {
+    { 0x00, 0x7F, 0x41, 0x41, 0x41, 0x41, 0x41, 0x7F },  // 0
+    { 0x00, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08 },  // 1
+    { 0x00, 0x7F, 0x01, 0x01, 0x7F, 0x40, 0x40, 0x7F },  // 2
+    { 0x00, 0x7F, 0x01, 0x01, 0x3F, 0x01, 0x01, 0x7F },  // 3
+    { 0x00, 0x41, 0x41, 0x41, 0x7F, 0x01, 0x01, 0x01 },  // 4
+    { 0x00, 0x7F, 0x40, 0x40, 0x7E, 0x01, 0x01, 0x7E },  // 5
+    { 0x00, 0x7F, 0x40, 0x40, 0x7F, 0x41, 0x41, 0x7F },  // 6
+    { 0x00, 0x7F, 0x01, 0x02, 0x04, 0x08, 0x10, 0x10 },  // 7
+    { 0x00, 0x3E, 0x41, 0x41, 0x3E, 0x41, 0x41, 0x3E },  // 8
+    { 0x00, 0x7F, 0x41, 0x41, 0x7F, 0x01, 0x01, 0x7F },  // 9
+    { 0x00, 0x08, 0x22, 0x41, 0x7F, 0x41, 0x41, 0x41 },  // A
+    { 0x00, 0x7E, 0x41, 0x41, 0x7E, 0x41, 0x41, 0x7E },  // B
+    { 0x00, 0x3E, 0x41, 0x40, 0x40, 0x40, 0x41, 0x3E },  // C
+    { 0x00, 0x7E, 0x41, 0x41, 0x41, 0x41, 0x41, 0x7E },  // D
+    { 0x00, 0x7F, 0x40, 0x40, 0x7F, 0x40, 0x40, 0x7F },  // E
+    { 0x00, 0x7F, 0x40, 0x40, 0x7F, 0x40, 0x40, 0x40 },  // F
+};
+
+static int gambatte_glyph_index(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+    return -1;
+}
+
+// True if the top-left of the rendered frame shows exactly the hex
+// characters of `expect` in the gambatte font.
+static bool gambatte_screen_matches(const std::string& expect) {
+    for (size_t i = 0; i < expect.size(); ++i) {
+        int gi = gambatte_glyph_index(expect[i]);
+        if (gi < 0) break;
+        const uint8_t* rows = kGambatteHexGlyphs[gi];
+        for (int y = 0; y < 8; ++y)
+            for (int x = 0; x < 8; ++x) {
+                uint32_t want = ((rows[y] >> (7 - x)) & 1) ? 0x000000u
+                                                           : 0xF8F8F8u;
+                if (fb_px((int)i * 8 + x, y) != want)
+                    return false;
+            }
+    }
+    return true;
+}
+
+// Decode whatever hex characters are visible at the top-left, for
+// failure diagnostics ("expected 3, screen shows 2").
+static std::string gambatte_decode_screen(size_t nchars) {
+    std::string out;
+    for (size_t i = 0; i < nchars; ++i) {
+        int match = -1;
+        for (int gi = 0; gi < 16 && match < 0; ++gi) {
+            bool ok = true;
+            for (int y = 0; y < 8 && ok; ++y)
+                for (int x = 0; x < 8 && ok; ++x) {
+                    uint32_t want =
+                        ((kGambatteHexGlyphs[gi][y] >> (7 - x)) & 1)
+                            ? 0x000000u : 0xF8F8F8u;
+                    if (fb_px((int)i * 8 + x, y) != want) ok = false;
+                }
+            if (ok) match = gi;
+        }
+        out.push_back(match < 0 ? '?' : "0123456789ABCDEF"[match]);
+    }
+    return out;
+}
+
+// A reference screenshot, decoded to 160x144 masked 0x00RRGGBB words.
+struct PngImage {
+    std::string path;
+    int w = 0, h = 0;
+    std::vector<uint32_t> px;
+    bool ok = false;
+};
+
+static PngImage load_png_masked(const std::string& path) {
+    PngImage img;
+    img.path = path;
+    int n = 0;
+    unsigned char* data = stbi_load(path.c_str(), &img.w, &img.h, &n, 3);
+    if (!data)
+        return img;
+    img.px.resize((size_t)img.w * (size_t)img.h);
+    for (size_t i = 0; i < img.px.size(); ++i) {
+        img.px[i] = ((uint32_t)(data[i * 3 + 0] & 0xF8) << 16) |
+                    ((uint32_t)(data[i * 3 + 1] & 0xF8) << 8) |
+                    (uint32_t)(data[i * 3 + 2] & 0xF8);
+    }
+    stbi_image_free(data);
+    img.ok = (img.w == 160 && img.h == 144);
+    return img;
+}
+
+static bool fb_matches_png(const PngImage& img) {
+    if (!img.ok)
+        return false;
+    for (int y = 0; y < 144; ++y)
+        for (int x = 0; x < 160; ++x)
+            if (fb_px(x, y) != img.px[(size_t)y * 160 + x])
+                return false;
+    return true;
+}
+
+static int fb_png_diff_count(const PngImage& img) {
+    if (!img.ok)
+        return 160 * 144;
+    int diff = 0;
+    for (int y = 0; y < 144; ++y)
+        for (int x = 0; x < 160; ++x)
+            if (fb_px(x, y) != img.px[(size_t)y * 160 + x])
+                ++diff;
+    return diff;
 }
 
 // Returns true if the serial log contains a final-result marker.
@@ -368,27 +578,15 @@ static bool is_age_rom(const std::string& rom_path) {
     return rom_path.find("age-test-roms") != std::string::npos;
 }
 
-// Gambatte ROMs encode the expected result in the filename:
-// "name_outN.gb" → after the test runs, register A should be N (decimal).
-// Returns -1 if the filename doesn't follow this convention.
-static int gambatte_expected_a(const std::string& rom_path) {
-    if (!ends_with_(rom_path, ".gb") && !ends_with_(rom_path, ".gbc"))
-        return -1;
-    // Find the last "_out" before the extension.
-    size_t ext = rom_path.rfind('.');
-    if (ext == std::string::npos) return -1;
-    size_t out_pos = rom_path.rfind("_out", ext);
-    if (out_pos == std::string::npos) return -1;
-    out_pos += 4; // skip "_out"
-    int v = 0;
-    bool any = false;
-    while (out_pos < ext && rom_path[out_pos] >= '0' && rom_path[out_pos] <= '9') {
-        v = v * 10 + (rom_path[out_pos] - '0');
-        ++out_pos;
-        any = true;
+// Strip the user-supplied prefix from the ROM path so the report is short.
+static std::string trim_prefix(const std::string& s, const std::string& prefix) {
+    if (s.size() > prefix.size() &&
+        std::memcmp(s.data(), prefix.data(), prefix.size()) == 0) {
+        std::string r = s.substr(prefix.size());
+        if (!r.empty() && r[0] == '/') r.erase(0, 1);
+        return r;
     }
-    if (!any || out_pos != ext) return -1;
-    return v;
+    return s;
 }
 
 static const char* mode_name(uint32_t et) {
@@ -401,6 +599,295 @@ static const char* mode_name(uint32_t et) {
         case 5: return "sgb2";
         default: return "?";
     }
+}
+
+// ---- Test-case model ---------------------------------------------------------
+//
+// A single ROM can expand to several test cases (e.g. a gambatte ROM
+// verified on both DMG and CGB, or a mealybug ROM with per-revision
+// reference screenshots). Each case carries its own detector, hardware
+// mode and expectation.
+
+enum class Detect {
+    Generic,        // legacy path: blargg serial/screen + mooneye + AGE markers
+    WilbertPol,     // wilbertpol mooneye fork: "TEST OK" / "TEST FAILED" on BG map
+    GambatteHex,    // gambatte _out<hex>: glyph compare at top-left of frame
+    GambatteAudio,  // gambatte _outaudio0/1: silence vs. sound around frame 15
+    Png,            // rendered frame must match one of png_paths exactly
+    GbMicrotest,    // result byte at $FF82: 0x01 pass / 0xFF fail
+    Skip,           // recognized as not automatically verifiable (manual test,
+                    // utility dumper, ...) — reported but not counted as FAIL
+};
+
+struct TestCase {
+    std::string rom_path;
+    std::string label;              // report label (relative path + variant tag)
+    Detect detect = Detect::Generic;
+    uint32_t emu_type = kEtAuto;    // hardware mode; kEtAuto = pick_emulator_type
+    std::string expect;             // GambatteHex: expected hex string
+    bool expect_audio = false;      // GambatteAudio: true = expect sound
+    std::vector<std::string> png_paths; // Png: pass if ANY matches
+    bool gambatte_colors = false;   // use gambatte CGB color-correction LUT
+    int max_frames = 8192;
+
+    static const uint32_t kEtAuto = 0xFFFFFFFFu;
+};
+
+static bool contains(const std::string& s, const char* sub) {
+    return s.find(sub) != std::string::npos;
+}
+
+static bool file_exists(const std::string& p) {
+    std::error_code ec;
+    return std::filesystem::exists(p, ec);
+}
+
+// Expand one ROM path into test cases, appended to `out`.
+static void make_cases(const std::string& rom, const std::string& root,
+                       std::vector<TestCase>& out) {
+    const std::string base = rom.substr(0, rom.rfind('.'));
+    const std::string rel = trim_prefix(rom, root);
+
+    auto add_skip = [&](const char* why) {
+        TestCase c;
+        c.rom_path = rom;
+        c.label = rel + " [" + why + "]";
+        c.detect = Detect::Skip;
+        out.push_back(std::move(c));
+    };
+
+    // -- gambatte: per-model expected values from the filename, exactly
+    //    following testrunner.cpp main().
+    if (contains(rom, "/gambatte/")) {
+        size_t before = out.size();
+        std::string dmg_expect, cgb_expect;
+        bool have_dmg = false, have_cgb = false;
+        size_t p;
+        if ((p = base.find("dmg08_cgb04c_out")) != std::string::npos) {
+            dmg_expect = cgb_expect = base.substr(p + 16);
+            have_dmg = have_cgb = true;
+        } else if ((p = base.find("dmg08_out")) != std::string::npos) {
+            dmg_expect = base.substr(p + 9);
+            have_dmg = true;
+            size_t q = base.find("cgb04c_out");
+            if (q != std::string::npos) {
+                cgb_expect = base.substr(q + 10);
+                have_cgb = true;
+            }
+        } else if ((p = base.find("_out")) != std::string::npos) {
+            cgb_expect = base.substr(p + 4);
+            have_cgb = true;
+        }
+        auto add_str_case = [&](const std::string& e, uint32_t et,
+                                const char* tag) {
+            TestCase c;
+            c.rom_path = rom;
+            c.emu_type = et;
+            c.gambatte_colors = true;
+            c.max_frames = 150;
+            if (e.compare(0, 6, "audio0") == 0) {
+                c.detect = Detect::GambatteAudio;
+                c.expect_audio = false;
+            } else if (e.compare(0, 6, "audio1") == 0) {
+                c.detect = Detect::GambatteAudio;
+                c.expect_audio = true;
+            } else {
+                std::string hex;
+                for (char ch : e) {
+                    if (gambatte_glyph_index(ch) < 0) break;
+                    hex.push_back(ch);
+                }
+                if (hex.empty()) return;
+                c.detect = Detect::GambatteHex;
+                c.expect = hex;
+            }
+            c.label = rel + " [" + tag + "]";
+            out.push_back(std::move(c));
+        };
+        if (have_cgb) add_str_case(cgb_expect, 1, "cgb");
+        if (have_dmg) add_str_case(dmg_expect, 3, "dmg");
+
+        auto add_png_case = [&](const std::string& png, uint32_t et,
+                                const char* tag) {
+            TestCase c;
+            c.rom_path = rom;
+            c.emu_type = et;
+            c.gambatte_colors = true;
+            c.detect = Detect::Png;
+            c.png_paths.push_back(png);
+            c.max_frames = 150;
+            c.label = rel + " [png " + tag + "]";
+            out.push_back(std::move(c));
+        };
+        if (file_exists(base + "_dmg08_cgb04c.png")) {
+            add_png_case(base + "_dmg08_cgb04c.png", 1, "cgb");
+            add_png_case(base + "_dmg08_cgb04c.png", 3, "dmg");
+        } else {
+            if (file_exists(base + "_cgb04c.png"))
+                add_png_case(base + "_cgb04c.png", 1, "cgb");
+            if (file_exists(base + "_dmg08.png"))
+                add_png_case(base + "_dmg08.png", 3, "dmg");
+        }
+        if (out.size() == before)
+            add_skip("no expectation");
+        return;
+    }
+
+    // -- gbmicrotest: $FF80-$FF82 result bytes, DMG hardware.
+    if (contains(rom, "gbmicrotest")) {
+        TestCase c;
+        c.rom_path = rom;
+        c.label = rel;
+        c.detect = Detect::GbMicrotest;
+        c.emu_type = 3;
+        c.max_frames = 96;
+        out.push_back(std::move(c));
+        return;
+    }
+
+    // -- Interactive/manual suites with no automatic pass criterion.
+    if (contains(rom, "/rtc3test") || contains(rom, "/mbc3-tester")) {
+        add_skip("manual");
+        return;
+    }
+
+    // -- AGE screenshot tests: <base>-<model>.png next to the ROM, where
+    //    <model> is a single token (dmgC, cgbBCE, ncmBC, ncmE, ...).
+    //    ncm = the ROM running in non-CGB (compatibility) mode on a CGB.
+    if (contains(rom, "age-test-roms")) {
+        std::vector<std::string> dmg_pngs, cgb_pngs, ncm_pngs;
+        std::error_code ec;
+        std::string dir = rom.substr(0, rom.rfind('/'));
+        std::string stem = base.substr(base.rfind('/') + 1);
+        for (const auto& entry :
+             std::filesystem::directory_iterator(dir, ec)) {
+            std::string name = entry.path().filename().string();
+            if (name.size() < stem.size() + 5) continue;
+            if (name.compare(0, stem.size(), stem) != 0) continue;
+            if (name[stem.size()] != '-') continue;
+            if (name.compare(name.size() - 4, 4, ".png") != 0) continue;
+            std::string tok = name.substr(stem.size() + 1,
+                                          name.size() - stem.size() - 5);
+            if (tok.find('-') != std::string::npos) continue;  // other ROM
+            std::string full = dir + "/" + name;
+            if (tok.find("dmg") == 0) dmg_pngs.push_back(full);
+            else if (tok.find("cgb") == 0) cgb_pngs.push_back(full);
+            else if (tok.find("ncm") == 0) ncm_pngs.push_back(full);
+        }
+        if (dmg_pngs.empty() && cgb_pngs.empty() && ncm_pngs.empty()) {
+            // Marker-based AGE test ("TEST PASSED!" on the BG map) —
+            // handled by the legacy path.
+            TestCase c;
+            c.rom_path = rom;
+            c.label = rel;
+            c.detect = Detect::Generic;
+            out.push_back(std::move(c));
+            return;
+        }
+        auto add_png_group = [&](std::vector<std::string>& pngs, uint32_t et,
+                                 const char* tag) {
+            if (pngs.empty()) return;
+            TestCase c;
+            c.rom_path = rom;
+            c.emu_type = et;
+            c.detect = Detect::Png;
+            c.png_paths = pngs;
+            c.max_frames = 700;
+            c.label = rel + " [png " + tag + "]";
+            out.push_back(std::move(c));
+        };
+        add_png_group(dmg_pngs, 3, "dmg");
+        add_png_group(cgb_pngs, 1, "cgb");
+        add_png_group(ncm_pngs, 1, "ncm");
+        return;
+    }
+
+    // -- mealybug: per-revision screenshots <base>_dmg_b/_dmg_blob/
+    //    _cgb_c/_cgb_d.png. Pass if the frame matches any revision of
+    //    the chosen model class.
+    if (contains(rom, "mealybug")) {
+        std::vector<std::string> dmg_pngs, cgb_pngs;
+        for (const char* sfx : { "_dmg_b.png", "_dmg_blob.png" })
+            if (file_exists(base + sfx)) dmg_pngs.push_back(base + sfx);
+        for (const char* sfx : { "_cgb_c.png", "_cgb_d.png" })
+            if (file_exists(base + sfx)) cgb_pngs.push_back(base + sfx);
+        if (dmg_pngs.empty() && cgb_pngs.empty()) {
+            add_skip("no reference png");
+            return;
+        }
+        auto add_png_group = [&](std::vector<std::string>& pngs, uint32_t et,
+                                 const char* tag) {
+            if (pngs.empty()) return;
+            TestCase c;
+            c.rom_path = rom;
+            c.emu_type = et;
+            c.detect = Detect::Png;
+            c.png_paths = pngs;
+            c.max_frames = 700;
+            c.label = rel + " [png " + tag + "]";
+            out.push_back(std::move(c));
+        };
+        add_png_group(dmg_pngs, 3, "dmg");
+        add_png_group(cgb_pngs, 1, "cgb");
+        return;
+    }
+
+    // -- Generic screenshot-compare suites (acid2 trio, scribbltests,
+    //    turtle-tests, little-things, strikethrough, bully, and the
+    //    mooneye manual-only/madness ROMs). Blargg is deliberately NOT
+    //    probed for PNGs — its serial/screen text detection is
+    //    authoritative and already covers every ROM.
+    if (!contains(rom, "/blargg/")) {
+        size_t before = out.size();
+        auto add_png_case = [&](const std::string& png, uint32_t et,
+                                const char* tag) {
+            TestCase c;
+            c.rom_path = rom;
+            c.emu_type = et;
+            c.detect = Detect::Png;
+            c.png_paths.push_back(png);
+            c.max_frames = 700;
+            c.label = rel;
+            if (tag[0]) c.label += std::string(" [png ") + tag + "]";
+            out.push_back(std::move(c));
+        };
+        if (file_exists(base + ".png"))
+            add_png_case(base + ".png", TestCase::kEtAuto, "");
+        if (file_exists(base + "_expected.png"))
+            add_png_case(base + "_expected.png", TestCase::kEtAuto, "");
+        if (file_exists(base + "-dmg.png"))
+            add_png_case(base + "-dmg.png", 3, "dmg");
+        if (file_exists(base + "-cgb.png"))
+            add_png_case(base + "-cgb.png", 1, "cgb");
+        // A single reference image valid for both DMG and CGB-compat:
+        // verify the DMG run (the CGB-compat run would need the exact
+        // boot-ROM colorization to reproduce identical RGB values).
+        for (const char* sfx : { "-dmg-cgb.png", "-cgb-dmg.png" })
+            if (file_exists(base + sfx))
+                add_png_case(base + sfx, 3, "dmg");
+        if (out.size() != before)
+            return;
+    }
+
+    // -- wilbertpol mooneye fork: prints "TEST OK" / failure text on the
+    //    BG tile map.
+    if (contains(rom, "mooneye-test-suite-wilbertpol")) {
+        TestCase c;
+        c.rom_path = rom;
+        c.label = rel;
+        c.detect = Detect::WilbertPol;
+        c.max_frames = 4096;
+        out.push_back(std::move(c));
+        return;
+    }
+
+    // -- everything else: legacy combined detection (blargg serial +
+    //    screen text, mooneye fibonacci, AGE markers).
+    TestCase c;
+    c.rom_path = rom;
+    c.label = rel;
+    c.detect = Detect::Generic;
+    out.push_back(std::move(c));
 }
 
 // ---- Known-broken-ROM repair -----------------------------------------------
@@ -464,15 +951,37 @@ static void patch_blargg_text_out_overflow(const std::string& rom_path) {
 
 // ---- Per-ROM driver --------------------------------------------------------
 
-static void run_one_rom(const std::string& rom_path, TestResult& out) {
+static void run_case(const TestCase& tc, TestResult& out) {
+    const std::string& rom_path = tc.rom_path;
     out.rom_path = rom_path;
     out.verdict = Verdict::Timeout;
     out.detail.clear();
     out.frames_run = 0;
 
-    uint32_t et = pick_emulator_type(rom_path);
+    if (tc.detect == Detect::Skip) {
+        out.verdict = Verdict::Skip;
+        out.mode = "-";
+        out.detail = "not automatically verifiable";
+        return;
+    }
+
+    uint32_t et = (tc.emu_type != TestCase::kEtAuto)
+                      ? tc.emu_type
+                      : pick_emulator_type(rom_path);
     gbEmulatorType = et;
     out.mode = mode_name(et);
+
+    build_colormap(tc.gambatte_colors);
+
+    // Decode reference screenshots up front (Png cases).
+    std::vector<PngImage> refs;
+    for (const std::string& p : tc.png_paths) {
+        PngImage img = load_png_masked(p);
+        if (!img.ok)
+            fprintf(stderr, "[warn] unusable reference png %s (%dx%d)\n",
+                    p.c_str(), img.w, img.h);
+        refs.push_back(std::move(img));
+    }
 
     g_serial_log.clear();
     gbSerialFunction = serial_capture;
@@ -599,12 +1108,11 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
 
     // 4194304 cycles/sec / ~70224 cycles/frame ≈ 60 fps.
     // Most Blargg tests finish in under 100 frames; the master ROMs
-    // (cpu_instrs, dmg_sound) take ~2K. 8192 frames (~135 sec emulated)
-    // accommodates oam_bug/7-timing_effect, which prints the OAM dump
-    // for every iteration where corruption is detected — our broader
-    // bug window detects more corruptions than real HW would, so the
-    // test prints ~20 dumps instead of ~5, which adds ~30 frames each.
-    const int kMaxFrames = 8192;
+    // (cpu_instrs, dmg_sound) take ~2K. The default 8192 frames
+    // (~135 sec emulated) accommodates oam_bug/7-timing_effect;
+    // screenshot/gambatte/microtest cases use much smaller budgets
+    // (set per-case in make_cases).
+    const int kMaxFrames = tc.max_frames;
     const int kCheckEvery = 4;         // check serial log every N frames
     const int kFrameTicks = 70224;     // ~one DMG frame's cycles
 
@@ -623,13 +1131,108 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         while (!line.empty() && line.back() == ' ') line.pop_back();
         return line;
     };
-    bool mooneye = is_mooneye_rom(rom_path);
-    bool age = is_age_rom(rom_path);
-    int gambatte_a = gambatte_expected_a(rom_path);
-    bool gambatte = (gambatte_a >= 0);
+    bool mooneye = tc.detect == Detect::Generic && is_mooneye_rom(rom_path);
+    bool age = tc.detect == Detect::Generic && is_age_rom(rom_path);
+    g_audio_capture = (tc.detect == Detect::GambatteAudio);
+    int audio_silent_streak = 0;
+    int audio_varied_frames = 0;
     for (int i = 0; i < kMaxFrames && !done; ++i) {
+        audio_capture_new_frame();
         GBSystem.emuMain(kFrameTicks);
         out.frames_run = i + 1;
+        const int frame = i + 1;
+
+        // -- gambatte hex-glyph compare: the test settles by frame 15
+        //    (post-BIOS); poll a window around that to tolerate small
+        //    boot-state differences.
+        if (tc.detect == Detect::GambatteHex) {
+            if (frame >= 12 && gambatte_screen_matches(tc.expect)) {
+                out.detail = "[gambatte] Passed (" + tc.expect + ")";
+                out.verdict = Verdict::Pass;
+                done = true;
+            }
+            continue;
+        }
+
+        // -- gambatte audio: judge the frames around frame 15.
+        if (tc.detect == Detect::GambatteAudio) {
+            if (frame >= 13) {
+                if (g_audio_varied_this_frame) {
+                    ++audio_varied_frames;
+                    audio_silent_streak = 0;
+                } else if (g_audio_wrote_this_frame) {
+                    ++audio_silent_streak;
+                }
+                if (tc.expect_audio && audio_varied_frames > 0) {
+                    out.detail = "[gambatte] Passed (audio present)";
+                    out.verdict = Verdict::Pass;
+                    done = true;
+                } else if (!tc.expect_audio && frame >= 15 &&
+                           audio_silent_streak >= 3) {
+                    out.detail = "[gambatte] Passed (silence)";
+                    out.verdict = Verdict::Pass;
+                    done = true;
+                }
+            }
+            continue;
+        }
+
+        // -- screenshot compare: pass as soon as the rendered frame
+        //    matches any reference image.
+        if (tc.detect == Detect::Png) {
+            if (frame >= 8 && (frame & 3) == 0) {
+                for (const PngImage& img : refs) {
+                    if (fb_matches_png(img)) {
+                        out.detail = "[png] Passed";
+                        out.verdict = Verdict::Pass;
+                        done = true;
+                        break;
+                    }
+                }
+            }
+            continue;
+        }
+
+        // -- gbmicrotest: poll the $FF82 result byte every frame.
+        if (tc.detect == Detect::GbMicrotest) {
+            uint8_t res = gbReadMemory(0xFF82);
+            if (res == 0x01) {
+                out.detail = "[microtest] Passed";
+                out.verdict = Verdict::Pass;
+                done = true;
+            } else if (res == 0xFF) {
+                char buf[80];
+                std::snprintf(buf, sizeof(buf),
+                              "[microtest] Failed (result=$%02X expected=$%02X)",
+                              gbReadMemory(0xFF80), gbReadMemory(0xFF81));
+                out.detail = buf;
+                out.verdict = Verdict::Fail;
+                done = true;
+            }
+            continue;
+        }
+
+        // -- wilbertpol mooneye fork: "TEST OK" / "TEST FAILED" printed
+        //    on the BG tile map with an ASCII font; some ROMs also do
+        //    the fibonacci serial write.
+        if (tc.detect == Detect::WilbertPol) {
+            if ((i % kCheckEvery) == (kCheckEvery - 1)) {
+                int m = detect_mooneye_done(g_serial_log, PC.W);
+                std::string screen = read_screen_text();
+                if (m == 1 || screen.find("TEST OK") != std::string::npos) {
+                    out.detail = "[wilbertpol] TEST OK";
+                    out.verdict = Verdict::Pass;
+                    done = true;
+                } else if (m == 2 ||
+                           screen.find("TEST FAILED") != std::string::npos ||
+                           screen.find("FAILED") != std::string::npos) {
+                    out.detail = "[wilbertpol] TEST FAILED";
+                    out.verdict = Verdict::Fail;
+                    done = true;
+                }
+            }
+            continue;
+        }
 
         if ((i % kCheckEvery) == (kCheckEvery - 1)) {
             // 0) Mooneye magic-breakpoint detection (mts/, mooneye-test-suite,
@@ -645,28 +1248,6 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
                 if (m == 2) {
                     out.detail = "[mooneye] Failed";
                     out.verdict = Verdict::Fail;
-                    done = true;
-                    continue;
-                }
-            }
-
-            // Gambatte: filename `_outN.gb` → register A should equal N
-            // after the test settles. Tests typically halt after a few
-            // frames; check after the screen has stabilized.
-            if (gambatte && i >= 64) {
-                std::string scr_now = read_screen_text();
-                if (scr_now == prev_screen) {
-                    int got_a = (int)AF.B.B1;
-                    if (got_a == gambatte_a) {
-                        out.detail = "[gambatte] Pass (A=" +
-                                     std::to_string(got_a) + ")";
-                        out.verdict = Verdict::Pass;
-                    } else {
-                        out.detail = "[gambatte] Fail (got A=" +
-                                     std::to_string(got_a) + ", expected " +
-                                     std::to_string(gambatte_a) + ")";
-                        out.verdict = Verdict::Fail;
-                    }
                     done = true;
                     continue;
                 }
@@ -734,6 +1315,53 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         }
     }
 
+    g_audio_capture = false;
+
+    if (!done && tc.detect == Detect::GambatteHex) {
+        out.detail = "[gambatte] Failed (expected " + tc.expect +
+                     ", screen shows " +
+                     gambatte_decode_screen(tc.expect.size()) + ")";
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+    if (!done && tc.detect == Detect::GambatteAudio) {
+        char buf[96];
+        std::snprintf(buf, sizeof(buf),
+                      "[gambatte] Failed (expected %s, varied-frames=%d)",
+                      tc.expect_audio ? "sound" : "silence",
+                      audio_varied_frames);
+        out.detail = buf;
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+    if (!done && tc.detect == Detect::Png) {
+        int best = 160 * 144 + 1;
+        for (const PngImage& img : refs)
+            best = std::min(best, fb_png_diff_count(img));
+        char buf[96];
+        std::snprintf(buf, sizeof(buf),
+                      "[png] Failed (%d/%d pixels differ)", best, 160 * 144);
+        out.detail = buf;
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+    if (!done && tc.detect == Detect::GbMicrotest) {
+        char buf[96];
+        std::snprintf(buf, sizeof(buf),
+                      "[microtest] Failed (no result: $FF80=$%02X "
+                      "$FF81=$%02X $FF82=$%02X)",
+                      gbReadMemory(0xFF80), gbReadMemory(0xFF81),
+                      gbReadMemory(0xFF82));
+        out.detail = buf;
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+    if (!done && tc.detect == Detect::WilbertPol) {
+        out.detail = "timeout-fail: [wilbertpol] no TEST OK";
+        out.verdict = Verdict::Fail;
+        done = true;
+    }
+
     if (!done) {
         // Timeout. If the screen has a "Failed" anywhere, treat as FAIL —
         // some wave-channel tests keep redrawing their output buffer so
@@ -786,17 +1414,6 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         // pass/fail visual checks; without a framebuffer hash database
         // we can't determine PASS, so classify as FAIL.
         out.detail = "timeout-fail: [age] no TEST PASSED/FAILED marker";
-        out.verdict = Verdict::Fail;
-        done = true;
-    }
-    if (!done && gambatte) {
-        // Gambatte tests have a deterministic expected register A; if
-        // we never matched, that's a FAIL.
-        char buf[64];
-        std::snprintf(buf, sizeof(buf),
-                      "timeout-fail: [gambatte] got A=%d, expected %d",
-                      (int)AF.B.B1, gambatte_a);
-        out.detail = buf;
         out.verdict = Verdict::Fail;
         done = true;
     }
@@ -936,19 +1553,9 @@ static const char* verdict_label(Verdict v) {
         case Verdict::Fail:    return "FAIL";
         case Verdict::Timeout: return "TIMEOUT";
         case Verdict::BadRom:  return "BAD";
+        case Verdict::Skip:    return "SKIP";
     }
     return "?";
-}
-
-// Strip the user-supplied prefix from the ROM path so the report is short.
-static std::string trim_prefix(const std::string& s, const std::string& prefix) {
-    if (s.size() > prefix.size() &&
-        std::memcmp(s.data(), prefix.data(), prefix.size()) == 0) {
-        std::string r = s.substr(prefix.size());
-        if (!r.empty() && r[0] == '/') r.erase(0, 1);
-        return r;
-    }
-    return s;
 }
 
 // ---- Main ------------------------------------------------------------------
@@ -1035,25 +1642,21 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Expand ROMs into test cases (a ROM can yield several: per-model
+    // gambatte runs, per-revision screenshot comparisons, ...).
+    std::vector<TestCase> cases;
+    for (const std::string& rom : roms)
+        make_cases(rom, roms_path, cases);
+
     fprintf(stderr, "gb_suite_runner: mode=%s, roms_root=%s\n",
             g_mode_force, roms_path);
-    fprintf(stderr, "gb_suite_runner: %zu ROMs to run\n\n", roms.size());
+    fprintf(stderr, "gb_suite_runner: %zu ROMs, %zu test cases\n\n",
+            roms.size(), cases.size());
 
-    // Initialize the GB color-map LUT. The serial-port-only Blargg tests
-    // don't need correct pixels, but render code paths still index these
-    // tables and would crash if left uninitialized.
-    systemColorDepth = 32;
-    systemRedShift   = 3;
-    systemGreenShift = 11;
-    systemBlueShift  = 19;
-    for (int i = 0; i < 0x10000; ++i) {
-        const uint32_t r5 = (uint32_t)(i & 0x1F);
-        const uint32_t g5 = (uint32_t)((i >> 5) & 0x1F);
-        const uint32_t b5 = (uint32_t)((i >> 10) & 0x1F);
-        systemColorMap32[i] =
-            (r5 << systemRedShift) | (g5 << systemGreenShift) |
-            (b5 << systemBlueShift) | 0xFF000000u;
-    }
+    // Initialize the GB color-map LUT (rebuilt per test case; this keeps
+    // render code paths from indexing uninitialized tables before the
+    // first case runs).
+    build_colormap(false);
 
     // Default GB greyscale palette (white → black, BGR555).
     systemGbPalette[ 0] = 0x7FFF;
@@ -1063,30 +1666,33 @@ int main(int argc, char** argv) {
     for (int i = 4; i < 24; ++i)
         systemGbPalette[i] = systemGbPalette[i & 3];
 
-    int n_pass = 0, n_fail = 0, n_timeout = 0, n_bad = 0;
+    int n_pass = 0, n_fail = 0, n_timeout = 0, n_bad = 0, n_skip = 0;
     std::vector<TestResult> results;
-    results.reserve(roms.size());
+    std::vector<std::string> labels;
+    results.reserve(cases.size());
+    labels.reserve(cases.size());
 
-    for (size_t i = 0; i < roms.size(); ++i) {
-        const std::string& rom = roms[i];
-        std::string label = trim_prefix(rom, roms_path);
+    for (size_t i = 0; i < cases.size(); ++i) {
+        const TestCase& tc = cases[i];
         TestResult r;
-        run_one_rom(rom, r);
+        run_case(tc, r);
 
         switch (r.verdict) {
             case Verdict::Pass:    ++n_pass;    break;
             case Verdict::Fail:    ++n_fail;    break;
             case Verdict::Timeout: ++n_timeout; break;
             case Verdict::BadRom:  ++n_bad;     break;
+            case Verdict::Skip:    ++n_skip;    break;
         }
 
         fprintf(stderr, "[%2zu/%2zu] %-7s %-4s %-50s %s\n",
-                i + 1, roms.size(),
+                i + 1, cases.size(),
                 verdict_label(r.verdict), r.mode.c_str(),
-                label.c_str(),
+                tc.label.c_str(),
                 r.detail.c_str());
 
         results.push_back(std::move(r));
+        labels.push_back(tc.label);
     }
 
     fprintf(stderr, "\n================ gb_suite_runner results ================\n");
@@ -1094,16 +1700,17 @@ int main(int argc, char** argv) {
     fprintf(stderr, "  FAIL    : %d\n", n_fail);
     fprintf(stderr, "  TIMEOUT : %d\n", n_timeout);
     fprintf(stderr, "  BAD ROM : %d\n", n_bad);
+    fprintf(stderr, "  SKIP    : %d\n", n_skip);
     fprintf(stderr, "  TOTAL   : %zu\n", results.size());
     fprintf(stderr, "==========================================================\n");
 
-    // stdout: machine-readable summary (one line per ROM).
+    // stdout: machine-readable summary (one line per test case).
     printf("# verdict mode frames rom : detail\n");
-    for (const TestResult& r : results) {
-        std::string label = trim_prefix(r.rom_path, roms_path);
+    for (size_t i = 0; i < results.size(); ++i) {
+        const TestResult& r = results[i];
         printf("%-7s %-4s %5d %s : %s\n",
                verdict_label(r.verdict), r.mode.c_str(), r.frames_run,
-               label.c_str(), r.detail.c_str());
+               labels[i].c_str(), r.detail.c_str());
     }
 
     if (g_min_pass >= 0) {

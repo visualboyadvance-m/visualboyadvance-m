@@ -3658,6 +3658,9 @@ void gbReset()
 
     memset(&gbDataMBC1, 0, sizeof(gbDataMBC1));
     gbDataMBC1.mapperROMBank = 1;
+    if (g_gbCartData.mapper_type() == gbCartData::MapperType::kMbc1 &&
+        gbIsMBC1Multicart())
+        gbDataMBC1.mapperRomBank0Remapping = 3;
 
     gbDataMBC2.mapperRAMEnable = 0;
     gbDataMBC2.mapperROMBank = 1;

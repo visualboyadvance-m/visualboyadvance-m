@@ -1,6 +1,7 @@
 #include "core/gb/gbMemory.h"
 
 #include <cstdint>
+#include <cstring>
 
 #include "core/base/port.h"
 #include "core/base/sizes.h"
@@ -21,136 +22,84 @@ mapperMBC1 gbDataMBC1 = {
     0 // Rom Bank 0 remapping
 };
 
+// Real MBC1 register model (verified by mooneye emulator-only/mbc1):
+//
+//   BANK1 (5 bits) — $2000-$3FFF. A value of 0 selects 1 (the check is
+//                    done on the full 5-bit register).
+//   BANK2 (2 bits) — $4000-$5FFF.
+//   MODE  (1 bit)  — $6000-$7FFF.
+//
+//   $4000-$7FFF always maps ROM bank (BANK2 << 5) | BANK1 — BANK2
+//   contributes in BOTH modes.
+//   $0000-$3FFF maps bank 0 in mode 0 and (BANK2 << 5) in mode 1.
+//   RAM maps bank 0 in mode 0 and BANK2 in mode 1.
+//
+// MBC1M multicarts (8 Mbit, detected by a second Nintendo logo in bank
+// $10) only wire 4 bits of BANK1, with BANK2 shifted left by 4.
+//
+// gbDataMBC1 field mapping: mapperROMBank = BANK1, mapperROMHighAddress
+// = BANK2, mapperMemoryModel = MODE, mapperRomBank0Remapping = 3 for a
+// detected MBC1M multicart (value kept for save-state compatibility).
+static void memoryUpdateMBC1Mapping()
+{
+    const bool multicart = (gbDataMBC1.mapperRomBank0Remapping == 3);
+    const int upper_shift = multicart ? 4 : 5;
+    const int bank1_mask = multicart ? 0x0f : 0x1f;
+
+    // The zero-adjust looks at the full 5-bit register, then the
+    // multicart truncates to the wired 4 bits (so writing $10 to a
+    // multicart's BANK1 really selects bank 0 within the game).
+    int bank1 = gbDataMBC1.mapperROMBank & 0x1f;
+    if (bank1 == 0)
+        bank1 = 1;
+    bank1 &= bank1_mask;
+
+    const int bank_upper = (gbDataMBC1.mapperROMHighAddress & 3) << upper_shift;
+
+    int tmpAddress = ((bank_upper | bank1) << 14) & (int)g_gbCartData.rom_mask();
+    gbMemoryMap[0x04] = &gbRom[tmpAddress];
+    gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+
+    tmpAddress = gbDataMBC1.mapperMemoryModel == 1
+                     ? (bank_upper << 14) & (int)g_gbCartData.rom_mask()
+                     : 0;
+    gbMemoryMap[0x00] = &gbRom[tmpAddress];
+    gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
+    gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
+    gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
+
+    if (g_gbCartData.HasRam()) {
+        const int ram_bank = gbDataMBC1.mapperMemoryModel == 1
+                                 ? (gbDataMBC1.mapperROMHighAddress & 3)
+                                 : 0;
+        const int ram_address = (ram_bank << 13) & (int)g_gbCartData.ram_mask();
+        gbDataMBC1.mapperRAMBank = ram_bank;
+        gbDataMBC1.mapperRAMAddress = ram_address;
+        gbMemoryMap[0x0a] = &gbRam[ram_address];
+        gbMemoryMap[0x0b] = &gbRam[ram_address + 0x1000];
+    }
+}
+
 // MBC1 ROM write registers
 void mapperMBC1ROM(uint16_t address, uint8_t value)
 {
-    int tmpAddress = 0;
-
     switch (address & 0x6000) {
     case 0x0000: // RAM enable register
         gbDataMBC1.mapperRAMEnable = ((value & 0x0f) == 0x0a ? 1 : 0);
         break;
-    case 0x2000: // ROM bank select
-        //    value = value & 0x1f;
-        if ((value == 1) && (address == 0x2100))
-            gbDataMBC1.mapperRomBank0Remapping = 1;
-
-        if ((value & 0x1f) == 0)
-            value += 1;
-        if (value == gbDataMBC1.mapperROMBank)
-            break;
-
-        tmpAddress = value << 14;
-
-        // check current model
-        if (gbDataMBC1.mapperRomBank0Remapping == 3) {
-            tmpAddress = (value & 0xf) << 14;
-            tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 18;
-        } else if (gbDataMBC1.mapperMemoryModel == 0) {
-            // model is 16/8, so we have a high address in use
-            tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
-        }
-
-        tmpAddress &= g_gbCartData.rom_mask();
-        gbDataMBC1.mapperROMBank = value;
-        gbMemoryMap[0x04] = &gbRom[tmpAddress];
-        gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-        gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-        gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
+    case 0x2000: // BANK1
+        gbDataMBC1.mapperROMBank = value & 0x1f;
+        memoryUpdateMBC1Mapping();
         break;
-    case 0x4000: // RAM bank select
-        if (gbDataMBC1.mapperMemoryModel == 1) {
-            if (!g_gbCartData.HasRam()) {
-                if (gbDataMBC1.mapperRomBank0Remapping == 3) {
-                    gbDataMBC1.mapperROMHighAddress = value & 0x03;
-                    tmpAddress = (gbDataMBC1.mapperROMHighAddress) << 18;
-                    tmpAddress &= g_gbCartData.rom_mask();
-                    gbMemoryMap[0x00] = &gbRom[tmpAddress];
-                    gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
-                    gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
-                    gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
-                    gbMemoryMap[0x04] = &gbRom[tmpAddress + 0x4000];
-                    gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x5000];
-                    gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x6000];
-                    gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x7000];
-                } else
-                    gbDataMBC1.mapperRomBank0Remapping = 0;
-            }
-            // 4/32 model, RAM bank switching provided
-            value = value & 0x03;
-            if (value == gbDataMBC1.mapperRAMBank)
-                break;
-            tmpAddress = value << 13;
-            tmpAddress &= g_gbCartData.ram_mask();
-            if (g_gbCartData.HasRam()) {
-                gbMemoryMap[0x0a] = &gbRam[tmpAddress];
-                gbMemoryMap[0x0b] = &gbRam[tmpAddress + 0x1000];
-            }
-            gbDataMBC1.mapperRAMBank = value;
-            gbDataMBC1.mapperRAMAddress = tmpAddress;
-
-            if (gbDataMBC1.mapperRomBank0Remapping != 3)
-                gbDataMBC1.mapperROMHighAddress = 0;
-        } else {
-            // 16/8, set the high address
-            gbDataMBC1.mapperROMHighAddress = value & 0x03;
-            tmpAddress = gbDataMBC1.mapperROMBank << 14;
-            tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
-            tmpAddress &= g_gbCartData.rom_mask();
-            gbMemoryMap[0x04] = &gbRom[tmpAddress];
-            gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-            gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-            gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-            if (g_gbCartData.HasRam()) {
-                gbMemoryMap[0x0a] = &gbRam[0];
-                gbMemoryMap[0x0b] = &gbRam[0x1000];
-            }
-
-            gbDataMBC1.mapperRAMBank = 0;
-        }
+    case 0x4000: // BANK2
+        gbDataMBC1.mapperROMHighAddress = value & 0x03;
+        memoryUpdateMBC1Mapping();
         break;
-    case 0x6000: // memory model select
+    case 0x6000: // MODE
         gbDataMBC1.mapperMemoryModel = value & 1;
-
-        if (gbDataMBC1.mapperMemoryModel == 1) {
-            // 4/32 model, RAM bank switching provided
-
-            value = gbDataMBC1.mapperRAMBank & 0x03;
-            tmpAddress = value << 13;
-            tmpAddress &= g_gbCartData.ram_mask();
-            if (g_gbCartData.HasRam()) {
-                gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
-                gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
-                gbDataMBC1.mapperRomBank0Remapping = 0;
-            } else
-                gbDataMBC1.mapperRomBank0Remapping |= 2;
-
-            gbDataMBC1.mapperRAMBank = value;
-            gbDataMBC1.mapperRAMAddress = tmpAddress;
-
-            tmpAddress = gbDataMBC1.mapperROMBank << 14;
-
-            tmpAddress &= g_gbCartData.rom_mask();
-            gbMemoryMap[0x04] = &gbRom[tmpAddress];
-            gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-            gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-            gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-
-        } else {
-            // 16/8, set the high address
-
-            tmpAddress = gbDataMBC1.mapperROMBank << 14;
-            tmpAddress |= (gbDataMBC1.mapperROMHighAddress) << 19;
-            tmpAddress &= g_gbCartData.rom_mask();
-            gbMemoryMap[0x04] = &gbRom[tmpAddress];
-            gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-            gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-            gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-            if (g_gbCartData.HasRam()) {
-                gbMemoryMap[0x0a] = &gbRam[0];
-                gbMemoryMap[0x0b] = &gbRam[0x1000];
-            }
-        }
+        memoryUpdateMBC1Mapping();
         break;
     }
 }
@@ -170,7 +119,7 @@ void mapperMBC1RAM(uint16_t address, uint8_t value)
 uint8_t mapperMBC1ReadRAM(uint16_t address)
 {
 
-    if (gbDataMBC1.mapperRAMEnable)
+    if (gbDataMBC1.mapperRAMEnable && g_gbCartData.HasRam())
         return gbMemoryMap[address >> 12][address & 0x0fff];
 
     return 0xff;
@@ -178,44 +127,17 @@ uint8_t mapperMBC1ReadRAM(uint16_t address)
 
 void memoryUpdateMapMBC1()
 {
-    int tmpAddress = gbDataMBC1.mapperROMBank << 14;
+    memoryUpdateMBC1Mapping();
+}
 
-    // check current model
-    if (gbDataMBC1.mapperRomBank0Remapping == 3) {
-        tmpAddress = (gbDataMBC1.mapperROMHighAddress & 3) << 18;
-        tmpAddress &= g_gbCartData.rom_mask();
-        gbMemoryMap[0x00] = &gbRom[tmpAddress];
-        gbMemoryMap[0x01] = &gbRom[tmpAddress + 0x1000];
-        gbMemoryMap[0x02] = &gbRom[tmpAddress + 0x2000];
-        gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
-
-        tmpAddress |= (gbDataMBC1.mapperROMBank & 0xf) << 14;
-        gbMemoryMap[0x04] = &gbRom[tmpAddress];
-        gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-        gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-        gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-    } else {
-        if (gbDataMBC1.mapperMemoryModel == 0) {
-            // model is 16/8, so we have a high address in use
-            tmpAddress |= (gbDataMBC1.mapperROMHighAddress & 3) << 19;
-        }
-
-        tmpAddress &= g_gbCartData.rom_mask();
-        gbMemoryMap[0x04] = &gbRom[tmpAddress];
-        gbMemoryMap[0x05] = &gbRom[tmpAddress + 0x1000];
-        gbMemoryMap[0x06] = &gbRom[tmpAddress + 0x2000];
-        gbMemoryMap[0x07] = &gbRom[tmpAddress + 0x3000];
-    }
-
-    if (g_gbCartData.HasRam()) {
-        if (gbDataMBC1.mapperMemoryModel == 1) {
-            gbMemoryMap[0x0a] = &gbRam[gbDataMBC1.mapperRAMAddress];
-            gbMemoryMap[0x0b] = &gbRam[gbDataMBC1.mapperRAMAddress + 0x1000];
-        } else {
-            gbMemoryMap[0x0a] = &gbRam[0];
-            gbMemoryMap[0x0b] = &gbRam[0x1000];
-        }
-    }
+// MBC1M multicart detection: 8 Mbit ROM with a second Nintendo logo in
+// bank $10 (each 2 Mbit sub-game carries its own header). Called from
+// gbReset() when the cartridge uses MBC1.
+bool gbIsMBC1Multicart()
+{
+    if (gbRom == nullptr || g_gbCartData.rom_size() != 0x100000)
+        return false;
+    return memcmp(&gbRom[0x0104], &gbRom[0x40104], 0x30) == 0;
 }
 
 mapperMBC2 gbDataMBC2 = {

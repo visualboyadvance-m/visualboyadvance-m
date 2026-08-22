@@ -194,6 +194,7 @@ void mapperGGROM(uint16_t, uint8_t);
 void mapperGS3ROM(uint16_t, uint8_t);
 
 extern void memoryUpdateMapMBC1();
+extern bool gbIsMBC1Multicart();
 extern void memoryUpdateMapMBC2();
 extern void memoryUpdateMapMBC3();
 extern void memoryUpdateMapMBC5();
