@@ -541,6 +541,25 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         gbMemory[0xff04] = 0x18;
         gbDivTicks = 53;
         gbInternalTimer = 53;
+        // DMG0 also exits with a different LCD phase: late in V-Blank,
+        // so mooneye boot_hwio-dmg0 sees LY=1 / STAT mode 3 at its read
+        // (the DMG-ABC boot exits ~9 lines earlier in the frame).
+        {
+            extern uint8_t register_LY;
+            extern int gbLcdTicks, gbLcdTicksDelayed;
+            extern int gbLcdLYIncrementTicks, gbLcdLYIncrementTicksDelayed;
+            extern int gbLcdMode, gbLcdModeDelayed;
+            int q = getenv("VBAM_DMG0_Q") ? atoi(getenv("VBAM_DMG0_Q")) : 64;
+            int ly0 = getenv("VBAM_DMG0_LY") ? atoi(getenv("VBAM_DMG0_LY")) : 145;
+            register_LY = (uint8_t)ly0;
+            gbMemory[0xff44] = register_LY;
+            gbLcdMode = 1;
+            gbLcdModeDelayed = 1;
+            gbLcdLYIncrementTicks = q;
+            gbLcdLYIncrementTicksDelayed = q + 1;
+            gbLcdTicks = (153 - ly0) * 114 + q;
+            gbLcdTicksDelayed = gbLcdTicks + 1;
+        }
     } else if (rom_path.find("-sgb2") != std::string::npos) {
         // SGB2: A=$FF, F=$00, BC=$0014, DE=$0000, HL=$C060.
         AF.W = 0xFF00;

@@ -186,9 +186,23 @@ void gbSoundReset()
 
     gbSoundEvent(0, 0xff10, 0x80);   // NR10  ch1 sweep (period=0, no shift)
     gbSoundEvent(0, 0xff11, 0xbf);   // NR11  ch1 duty=50%, length-load=63
-    gbSoundEvent(0, 0xff12, 0xf3);   // NR12  ch1 envelope: init=$F, decay, period=3
-    gbSoundEvent(0, 0xff13, 0xf3);   // NR13  ch1 freq low
-    gbSoundEvent(0, 0xff14, 0x3f);   // NR14  ch1 freq hi/length-en
+    if (gbHardware & 0x4) {
+        // SGB boot plays no ding: ch1 configured but never triggered.
+        gbSoundEvent(0, 0xff12, 0xf3);   // NR12  ch1 envelope: init=$F, decay, period=3
+        gbSoundEvent(0, 0xff13, 0xf3);   // NR13  ch1 freq low
+        gbSoundEvent(0, 0xff14, 0x3f);   // NR14  ch1 freq hi/length-en
+    } else {
+        // The DMG boot ROM's ding leaves channel 1 *active* at $0100 —
+        // NR52 reads $F1 (mooneye boot_hwio) — but fully decayed, i.e.
+        // silent. Reproduce that exactly: trigger with initial volume
+        // 15 / period 0, then a zombie NR12 write ($F8 -> $F3 flips the
+        // direction bit) that lands the volume on 0 and freezes the
+        // envelope. All writes happen at time 0, so nothing is audible.
+        gbSoundEvent(0, 0xff12, 0xf8);   // NR12  vol=15, add, period=0
+        gbSoundEvent(0, 0xff13, 0xf3);   // NR13  ch1 freq low
+        gbSoundEvent(0, 0xff14, 0x87);   // NR14  trigger
+        gbSoundEvent(0, 0xff12, 0xf3);   // NR12  zombie: volume -> 0
+    }
 
     gbSoundEvent(0, 0xff16, 0x3f);   // NR21  ch2 duty=0, length-load=63
     gbSoundEvent(0, 0xff17, 0x00);   // NR22  ch2 envelope: off (DAC disabled)

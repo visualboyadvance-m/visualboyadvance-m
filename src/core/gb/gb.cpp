@@ -2711,23 +2711,35 @@ uint8_t gbReadMemory(uint16_t address)
             case 0x4c:
                 return 0xff;
         case 0x4f:
-            return (0xfe | register_VBK);
+            if (gbCgbMode)
+                return (0xfe | register_VBK);
+            break;
         case 0x51:
-            return register_HDMA1;
+            if (gbCgbMode)
+                return register_HDMA1;
+            break;
         case 0x52:
-            return register_HDMA2;
+            if (gbCgbMode)
+                return register_HDMA2;
+            break;
         case 0x53:
-            return register_HDMA3;
+            if (gbCgbMode)
+                return register_HDMA3;
+            break;
         case 0x54:
-            return register_HDMA4;
+            if (gbCgbMode)
+                return register_HDMA4;
+            break;
         case 0x55:
-            return register_HDMA5;
+            if (gbCgbMode)
+                return register_HDMA5;
+            break;
         case 0x68:
         case 0x6a:
             if (gbCgbMode)
                 return (0x40 | gbMemory[address]);
             else
-                return 0xc0;
+                return 0xff;
         case 0x69:
         case 0x6b:
             if (gbCgbMode) {
@@ -2757,7 +2769,7 @@ uint8_t gbReadMemory(uint16_t address)
             lo == 0x15 ||                          // unused (between NR12 and NR13)
             lo == 0x1f ||                          // unused
             (lo >= 0x27 && lo <= 0x2f) ||          // unused
-            (lo >= 0x4c && lo <= 0x4e && !gbCgbMode) ||
+            (lo >= 0x4c && lo <= 0x7f && !gbCgbMode) ||
             (lo >= 0x57 && lo <= 0x67) ||          // unused
             (lo >= 0x6c && lo <= 0x6f) ||          // unused
             lo == 0x71 ||                          // unused
@@ -3209,6 +3221,12 @@ void gbReset()
         gbMemory[0xff02] = 0x7c;
     else
         gbMemory[0xff02] = 0x7e;
+
+    // Post-boot P1: on DMG both button-group selectors are low (reads
+    // $CF); the SGB boot ROM leaves them high (reads $FF). SB is $00
+    // on both (mooneye boot_hwio).
+    gbMemory[0xff00] = (gbHardware & 4) ? 0xff : 0xcf;
+    gbMemory[0xff01] = 0x00;
 
     gbMemory[0xff03] = 0xff;
     int i;
