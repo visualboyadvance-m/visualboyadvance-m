@@ -14,6 +14,11 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+# Silence the "Looking for <symbol>" / "<symbol> - found" pairs that the
+# Check* modules print. Only the progress lines go away; a failing check
+# still reports, and the find_package summaries are unaffected.
+set(CMAKE_REQUIRED_QUIET TRUE)
+
 if(WIN32)
     include(RemoveStrawberryPerlFromPATH)
 
@@ -249,6 +254,19 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 project(VBA-M C CXX)
+
+# FindThreads saves and overwrites CMAKE_REQUIRED_QUIET with its own
+# Threads_FIND_QUIETLY, so the setting above never reaches it and its probe
+# announces itself as "Performing Test CMAKE_HAVE_LIBC_PTHREAD". Ask for it
+# quietly here, before anything pulls it in transitively: the probe results are
+# cached, so the later transitive find_package(Threads) reuses them and stays
+# quiet too. QUIET also hides a failure, so on failure ask again loudly and let
+# the module report why.
+find_package(Threads QUIET)
+
+if(NOT Threads_FOUND)
+    find_package(Threads)
+endif()
 
 if(APPLE)
     enable_language(OBJC)

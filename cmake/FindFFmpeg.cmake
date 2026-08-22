@@ -59,9 +59,11 @@ endmacro()
 macro(find_component _component _pkgconfig _library _header)
   # use pkg-config to get the directories and then use these values
   # in the FIND_PATH() and FIND_LIBRARY() calls
-  find_package(PkgConfig)
+  find_package(PkgConfig QUIET)
   if (PKG_CONFIG_FOUND)
-    pkg_check_modules(PC_${_component} ${_pkgconfig})
+    # QUIET: this runs once per component, and the per-component chatter says
+    # nothing the FPHSA summary at the bottom does not.
+    pkg_check_modules(PC_${_component} QUIET ${_pkgconfig})
   endif ()
 
   find_path(${_component}_INCLUDE_DIRS ${_header}
