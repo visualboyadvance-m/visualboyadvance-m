@@ -494,15 +494,16 @@ if(NOT DEFINED VBAM_TEST_GB_MIN_PASS)
         "Floor PASS count for the Blargg gb-test-roms suite")
 endif()
 if(NOT DEFINED VBAM_TEST_GB_MTS_MIN_PASS)
-    # 39 of 75 mooneye-test-suite acceptance ROMs (mts-20240926-1737).
+    # 40 of 75 mooneye-test-suite acceptance ROMs (mts-20240926-1737).
     # The interrupt cluster is green: ie_push, intr_timing,
     # reti_intr_timing, rapid_di_ei, di_timing-GS, stat_irq_blocking,
     # intr_1_2_timing-GS, intr_2_0/mode0/mode3/oam_ok, the halt_ime*
-    # group and all tim* timer tests. Remaining failures are boot-state
+    # group, all tim* timer tests, and hblank_ly_scx_timing-GS (SCX
+    # fine-scroll mode-3 penalty). Remaining failures are boot-state
     # (boot_div/boot_hwio), instruction memory-access timing
     # (call/jp/ret/rst/push/pop/ld_hl_sp_e), OAM DMA timing and PPU
-    # lcdon/scx edge cases.
-    set(VBAM_TEST_GB_MTS_MIN_PASS 39 CACHE STRING
+    # lcdon edge cases.
+    set(VBAM_TEST_GB_MTS_MIN_PASS 40 CACHE STRING
         "Floor PASS count for the mooneye-test-suite acceptance ROMs")
 endif()
 
