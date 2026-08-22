@@ -3479,11 +3479,14 @@ void gbReset()
             gbMemory[0xff3d] = 0xff;
 
             gbMemory[0xff44] = register_LY = 0x90;
-            gbDivTicks = 0x19 + ((gbHardware & 2) >> 1);
-            gbInternalTimer = 0x58 + ((gbHardware & 2) >> 1);
+            // Post-boot DIV value and sub-period phase, calibrated with
+            // mooneye misc/boot_div-cgbABCDE (first increment 35 cycles
+            // after PC=$0100) and misc/boot_div-A (AGB: one cycle less).
+            gbDivTicks = 34 + ((gbHardware & 2) >> 1);
+            gbInternalTimer = gbDivTicks;
             gbLcdTicks = GBLCD_MODE_1_CLOCK_TICKS - (register_LY - 0x8F) * GBLY_INCREMENT_CLOCK_TICKS + 72 + ((gbHardware & 2) >> 1);
             gbLcdLYIncrementTicks = 72 + ((gbHardware & 2) >> 1);
-            gbMemory[0xff04] = register_DIV = 0x1E;
+            gbMemory[0xff04] = register_DIV = 0x26;
         } else {
             gbMemory[0xff44] = register_LY = 0x94;
             gbDivTicks = 0x22 + ((gbHardware & 2) >> 1);

@@ -1069,6 +1069,28 @@ static void run_case(const TestCase& tc, TestResult& out) {
             gbLcdTicks = (153 - ly0) * 114 + q;
             gbLcdTicksDelayed = gbLcdTicks + 1;
         }
+    } else if (getenv("VBAM_GB_DIV") || getenv("VBAM_GB_Q") ||
+               getenv("VBAM_GB_LCD")) {
+        // Calibration overrides for post-boot DIV / LCD phase (used to
+        // brute-force the constants that end up hardcoded in gbReset).
+        extern uint8_t register_DIV;
+        if (getenv("VBAM_GB_DIV")) {
+            register_DIV = (uint8_t)strtol(getenv("VBAM_GB_DIV"), nullptr, 16);
+            gbMemory[0xff04] = register_DIV;
+        }
+        if (getenv("VBAM_GB_Q")) {
+            gbDivTicks = atoi(getenv("VBAM_GB_Q"));
+            gbInternalTimer = gbDivTicks;
+        }
+        if (getenv("VBAM_GB_LCD")) {
+            extern int gbLcdTicks, gbLcdTicksDelayed;
+            extern int gbLcdLYIncrementTicks, gbLcdLYIncrementTicksDelayed;
+            int adj = atoi(getenv("VBAM_GB_LCD"));
+            gbLcdTicks += adj;
+            gbLcdTicksDelayed = gbLcdTicks + 1;
+            gbLcdLYIncrementTicks += adj;
+            gbLcdLYIncrementTicksDelayed = gbLcdLYIncrementTicks + 1;
+        }
     } else if (rom_path.find("-sgb2") != std::string::npos) {
         // SGB2: A=$FF, F=$00, BC=$0014, DE=$0000, HL=$C060.
         AF.W = 0xFF00;
