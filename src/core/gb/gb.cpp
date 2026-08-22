@@ -3303,9 +3303,28 @@ void gbReset()
             DE.W = 0x00d8;
             HL.W = 0xC060;
         }
+        // Post-boot DIV value and sub-period phase. Verified by mooneye
+        // boot_div-dmgABCmgb / boot_div-S / boot_div2-S: the first DIV
+        // increment after PC=$0100 must land exactly gbDivTicks cycles in.
         gbDivTicks = 14;
-        gbInternalTimer = gbDivTicks--;
+        gbInternalTimer = 14;
         gbMemory[0xff04] = register_DIV = 0xAB;
+        if (gbHardware & 4) {
+            // SGB/SGB2: the boot ROM's handoff duration depends on the
+            // cartridge header bytes it transfers — one extra cycle per
+            // set bit in the global-checksum word (mooneye boot_div-S
+            // vs boot_div2-S differ only in those bytes: 4 more bits
+            // set, 4 cycles later phase).
+            int pop = 0;
+            if (gbRom != NULL) {
+                for (int b = 0x14e; b <= 0x14f; b++)
+                    for (int i = 0; i < 8; i++)
+                        pop += (gbRom[b] >> i) & 1;
+            }
+            gbDivTicks = 36 + pop;
+            gbInternalTimer = gbDivTicks;
+            gbMemory[0xff04] = register_DIV = 0xD8;
+        }
         gbMemory[0xff41] = register_STAT = 0x85;
         gbMemory[0xff44] = register_LY = 0x00;
         gbLcdTicks = 15;

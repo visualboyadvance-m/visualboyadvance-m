@@ -534,6 +534,13 @@ static void run_one_rom(const std::string& rom_path, TestResult& out) {
         BC.W = 0xFF13;
         DE.W = 0x00C1;
         HL.W = 0x8403;
+        // DMG0 boot ROM exits with a different DIV value and phase
+        // (mooneye boot_div-dmg0: first increment 53 cycles after $0100).
+        extern uint8_t register_DIV;
+        register_DIV = 0x18;
+        gbMemory[0xff04] = 0x18;
+        gbDivTicks = 53;
+        gbInternalTimer = 53;
     } else if (rom_path.find("-sgb2") != std::string::npos) {
         // SGB2: A=$FF, F=$00, BC=$0014, DE=$0000, HL=$C060.
         AF.W = 0xFF00;
