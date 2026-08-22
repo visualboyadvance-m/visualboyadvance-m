@@ -969,8 +969,8 @@ break;
 case 0xc0:
 // RET NZ
 if (!(AF.B.B0 & GB_Z_FLAG)) {
-    PC.B.B0 = gbReadMemory(SP.W++);
-    PC.B.B1 = gbReadMemory(SP.W++);
+    PC.B.B0 = gbReadMemoryAt(SP.W++, -1);
+    PC.B.B1 = gbReadMemoryAt(SP.W++, -2);
     clockTicks += 3;
 }
 break;
@@ -978,24 +978,25 @@ case 0xc1:
 // POP BC
 gbOamBugAccess(SP.W, GB_OAM_BUG_READ_INC, 1);
 gbOamBugAccess((uint16_t)(SP.W + 1), GB_OAM_BUG_READ, 0);
-BC.B.B0 = gbReadMemory(SP.W++);
-BC.B.B1 = gbReadMemory(SP.W++);
+BC.B.B0 = gbReadMemoryAt(SP.W++, 1);
+BC.B.B1 = gbReadMemoryAt(SP.W++, 0);
 break;
 case 0xc2:
 // JP NZ,NNNN
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W, 0);
     PC.W = tempRegister.W;
     clockTicks++;
 }
 break;
 case 0xc3:
 // JP NNNN
-tempRegister.B.B0 = gbReadMemory(PC.W++);
-tempRegister.B.B1 = gbReadMemory(PC.W);
+// Access cycles (of 4): nn-lo M1, nn-hi M2.
+tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 2);
+tempRegister.B.B1 = gbReadMemoryAt(PC.W, 1);
 PC.W = tempRegister.W;
 break;
 case 0xc4:
@@ -1003,10 +1004,10 @@ case 0xc4:
 if (AF.B.B0 & GB_Z_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W++);
-    gbWriteMemory(--SP.W, PC.B.B1);
-    gbWriteMemory(--SP.W, PC.B.B0);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W++, 0);
+    gbWriteMemoryAt(--SP.W, PC.B.B1, -2);
+    gbWriteMemoryAt(--SP.W, PC.B.B0, -3);
     PC.W = tempRegister.W;
     clockTicks += 3;
 }
@@ -1016,8 +1017,8 @@ case 0xc5:
 gbOamBugAccess(SP.W, GB_OAM_BUG_WRITE, 2);
 gbOamBugAccess((uint16_t)(SP.W - 1), GB_OAM_BUG_WRITE, 1);
 gbOamBugAccess((uint16_t)(SP.W - 2), GB_OAM_BUG_WRITE, 0);
-gbWriteMemory(--SP.W, BC.B.B1);
-gbWriteMemory(--SP.W, BC.B.B0);
+gbWriteMemoryAt(--SP.W, BC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, BC.B.B0, 0);
 break;
 case 0xc6:
 // ADD NN
@@ -1028,28 +1029,28 @@ AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xc7:
 // RST 00
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0000;
 break;
 case 0xc8:
 // RET Z
 if (AF.B.B0 & GB_Z_FLAG) {
-    PC.B.B0 = gbReadMemory(SP.W++);
-    PC.B.B1 = gbReadMemory(SP.W++);
+    PC.B.B0 = gbReadMemoryAt(SP.W++, -1);
+    PC.B.B1 = gbReadMemoryAt(SP.W++, -2);
     clockTicks += 3;
 }
 break;
 case 0xc9:
 // RET
-PC.B.B0 = gbReadMemory(SP.W++);
-PC.B.B1 = gbReadMemory(SP.W++);
+PC.B.B0 = gbReadMemoryAt(SP.W++, 2);
+PC.B.B1 = gbReadMemoryAt(SP.W++, 1);
 break;
 case 0xca:
 // JP Z,NNNN
 if (AF.B.B0 & GB_Z_FLAG) {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W, 0);
     PC.W = tempRegister.W;
     clockTicks++;
 } else
@@ -1059,10 +1060,10 @@ break;
 case 0xcc:
 // CALL Z,NNNN
 if (AF.B.B0 & GB_Z_FLAG) {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W++);
-    gbWriteMemory(--SP.W, PC.B.B1);
-    gbWriteMemory(--SP.W, PC.B.B0);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W++, 0);
+    gbWriteMemoryAt(--SP.W, PC.B.B1, -2);
+    gbWriteMemoryAt(--SP.W, PC.B.B0, -3);
     PC.W = tempRegister.W;
     clockTicks += 3;
 } else
@@ -1070,10 +1071,11 @@ if (AF.B.B0 & GB_Z_FLAG) {
 break;
 case 0xcd:
 // CALL NNNN
-tempRegister.B.B0 = gbReadMemory(PC.W++);
-tempRegister.B.B1 = gbReadMemory(PC.W++);
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+// Access cycles (of 6): nn-lo M1, nn-hi M2, push-hi M4, push-lo M5.
+tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 4);
+tempRegister.B.B1 = gbReadMemoryAt(PC.W++, 3);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = tempRegister.W;
 break;
 case 0xce:
@@ -1085,15 +1087,15 @@ AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xcf:
 // RST 08
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0008;
 break;
 case 0xd0:
 // RET NC
 if (!(AF.B.B0 & GB_C_FLAG)) {
-    PC.B.B0 = gbReadMemory(SP.W++);
-    PC.B.B1 = gbReadMemory(SP.W++);
+    PC.B.B0 = gbReadMemoryAt(SP.W++, -1);
+    PC.B.B1 = gbReadMemoryAt(SP.W++, -2);
     clockTicks += 3;
 }
 break;
@@ -1101,16 +1103,16 @@ case 0xd1:
 // POP DE
 gbOamBugAccess(SP.W, GB_OAM_BUG_READ_INC, 1);
 gbOamBugAccess((uint16_t)(SP.W + 1), GB_OAM_BUG_READ, 0);
-DE.B.B0 = gbReadMemory(SP.W++);
-DE.B.B1 = gbReadMemory(SP.W++);
+DE.B.B0 = gbReadMemoryAt(SP.W++, 1);
+DE.B.B1 = gbReadMemoryAt(SP.W++, 0);
 break;
 case 0xd2:
 // JP NC,NNNN
 if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W, 0);
     PC.W = tempRegister.W;
     clockTicks++;
 }
@@ -1125,10 +1127,10 @@ case 0xd4:
 if (AF.B.B0 & GB_C_FLAG)
     PC.W += 2;
 else {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W++);
-    gbWriteMemory(--SP.W, PC.B.B1);
-    gbWriteMemory(--SP.W, PC.B.B0);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W++, 0);
+    gbWriteMemoryAt(--SP.W, PC.B.B1, -2);
+    gbWriteMemoryAt(--SP.W, PC.B.B0, -3);
     PC.W = tempRegister.W;
     clockTicks += 3;
 }
@@ -1138,8 +1140,8 @@ case 0xd5:
 gbOamBugAccess(SP.W, GB_OAM_BUG_WRITE, 2);
 gbOamBugAccess((uint16_t)(SP.W - 1), GB_OAM_BUG_WRITE, 1);
 gbOamBugAccess((uint16_t)(SP.W - 2), GB_OAM_BUG_WRITE, 0);
-gbWriteMemory(--SP.W, DE.B.B1);
-gbWriteMemory(--SP.W, DE.B.B0);
+gbWriteMemoryAt(--SP.W, DE.B.B1, 1);
+gbWriteMemoryAt(--SP.W, DE.B.B0, 0);
 break;
 case 0xd6:
 // SUB NN
@@ -1150,30 +1152,30 @@ AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xd7:
 // RST 10
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0010;
 break;
 case 0xd8:
 // RET C
 if (AF.B.B0 & GB_C_FLAG) {
-    PC.B.B0 = gbReadMemory(SP.W++);
-    PC.B.B1 = gbReadMemory(SP.W++);
+    PC.B.B0 = gbReadMemoryAt(SP.W++, -1);
+    PC.B.B1 = gbReadMemoryAt(SP.W++, -2);
     clockTicks += 3;
 }
 break;
 case 0xd9:
 // RETI
-PC.B.B0 = gbReadMemory(SP.W++);
-PC.B.B1 = gbReadMemory(SP.W++);
+PC.B.B0 = gbReadMemoryAt(SP.W++, 2);
+PC.B.B1 = gbReadMemoryAt(SP.W++, 1);
 IFF |= 0x01;
 gbLastRetiCycle = gbCycleCounter;
 break;
 case 0xda:
 // JP C,NNNN
 if (AF.B.B0 & GB_C_FLAG) {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W, 0);
     PC.W = tempRegister.W;
     clockTicks++;
 } else
@@ -1187,10 +1189,10 @@ break;
 case 0xdc:
 // CALL C,NNNN
 if (AF.B.B0 & GB_C_FLAG) {
-    tempRegister.B.B0 = gbReadMemory(PC.W++);
-    tempRegister.B.B1 = gbReadMemory(PC.W++);
-    gbWriteMemory(--SP.W, PC.B.B1);
-    gbWriteMemory(--SP.W, PC.B.B0);
+    tempRegister.B.B0 = gbReadMemoryAt(PC.W++, 1);
+    tempRegister.B.B1 = gbReadMemoryAt(PC.W++, 0);
+    gbWriteMemoryAt(--SP.W, PC.B.B1, -2);
+    gbWriteMemoryAt(--SP.W, PC.B.B0, -3);
     PC.W = tempRegister.W;
     clockTicks += 3;
 } else
@@ -1210,8 +1212,8 @@ AF.B.B1 = tempRegister.B.B0;
 break;
 case 0xdf:
 // RST 18
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0018;
 break;
 case 0xe0:
@@ -1222,8 +1224,8 @@ case 0xe1:
 // POP HL
 gbOamBugAccess(SP.W, GB_OAM_BUG_READ_INC, 1);
 gbOamBugAccess((uint16_t)(SP.W + 1), GB_OAM_BUG_READ, 0);
-HL.B.B0 = gbReadMemory(SP.W++);
-HL.B.B1 = gbReadMemory(SP.W++);
+HL.B.B0 = gbReadMemoryAt(SP.W++, 1);
+HL.B.B1 = gbReadMemoryAt(SP.W++, 0);
 break;
 case 0xe2:
 // LD (FF00+C),A
@@ -1241,8 +1243,8 @@ case 0xe5:
 gbOamBugAccess(SP.W, GB_OAM_BUG_WRITE, 2);
 gbOamBugAccess((uint16_t)(SP.W - 1), GB_OAM_BUG_WRITE, 1);
 gbOamBugAccess((uint16_t)(SP.W - 2), GB_OAM_BUG_WRITE, 0);
-gbWriteMemory(--SP.W, HL.B.B1);
-gbWriteMemory(--SP.W, HL.B.B0);
+gbWriteMemoryAt(--SP.W, HL.B.B1, 1);
+gbWriteMemoryAt(--SP.W, HL.B.B0, 0);
 break;
 case 0xe6:
 // AND NN
@@ -1252,13 +1254,13 @@ AF.B.B0 = GB_H_FLAG | ZeroTable[AF.B.B1];
 break;
 case 0xe7:
 // RST 20
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0020;
 break;
 case 0xe8:
 // ADD SP,NN
-offset = (int8_t)gbReadMemory(PC.W++);
+offset = (int8_t)gbReadMemoryAt(PC.W++, 2);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 SP.W = tempRegister.W;
@@ -1290,8 +1292,8 @@ AF.B.B0 = ZeroTable[AF.B.B1];
 break;
 case 0xef:
 // RST 28
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0028;
 break;
 case 0xf0:
@@ -1302,8 +1304,8 @@ case 0xf1:
 // POP AF
 gbOamBugAccess(SP.W, GB_OAM_BUG_READ_INC, 1);
 gbOamBugAccess((uint16_t)(SP.W + 1), GB_OAM_BUG_READ, 0);
-AF.B.B0 = gbReadMemory(SP.W++) & 0xF0;
-AF.B.B1 = gbReadMemory(SP.W++);
+AF.B.B0 = (uint8_t)(gbReadMemoryAt(SP.W++, 1) & 0xF0);
+AF.B.B1 = gbReadMemoryAt(SP.W++, 0);
 break;
 case 0xf2:
 // LD A,(FF00+C)
@@ -1324,8 +1326,8 @@ case 0xf5:
 gbOamBugAccess(SP.W, GB_OAM_BUG_WRITE, 2);
 gbOamBugAccess((uint16_t)(SP.W - 1), GB_OAM_BUG_WRITE, 1);
 gbOamBugAccess((uint16_t)(SP.W - 2), GB_OAM_BUG_WRITE, 0);
-gbWriteMemory(--SP.W, AF.B.B1);
-gbWriteMemory(--SP.W, AF.B.B0);
+gbWriteMemoryAt(--SP.W, AF.B.B1, 1);
+gbWriteMemoryAt(--SP.W, AF.B.B0, 0);
 break;
 case 0xf6:
 // OR NN
@@ -1335,13 +1337,13 @@ AF.B.B0 = ZeroTable[AF.B.B1];
 break;
 case 0xf7:
 // RST 30
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0030;
 break;
 case 0xf8:
 // LD HL,SP+NN
-offset = (int8_t)gbReadMemory(PC.W++);
+offset = (int8_t)gbReadMemoryAt(PC.W++, 1);
 tempRegister.W = SP.W + offset;
 AF.B.B0 = ((SP.W ^ offset ^ tempRegister.W) & 0x100 ? GB_C_FLAG : 0) | ((SP.W ^ offset ^ tempRegister.W) & 0x10 ? GB_H_FLAG : 0);
 HL.W = tempRegister.W;
@@ -1383,8 +1385,8 @@ AF.B.B0 = GB_N_FLAG | (tempRegister.B.B1 ? GB_C_FLAG : 0) | ZeroTable[tempRegist
 break;
 case 0xff:
 // RST 38
-gbWriteMemory(--SP.W, PC.B.B1);
-gbWriteMemory(--SP.W, PC.B.B0);
+gbWriteMemoryAt(--SP.W, PC.B.B1, 1);
+gbWriteMemoryAt(--SP.W, PC.B.B0, 0);
 PC.W = 0x0038;
 break;
 default:

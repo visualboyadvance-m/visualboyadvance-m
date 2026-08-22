@@ -615,6 +615,10 @@ static uint8_t gbIrqDispatchIE = 0;
 // writes SCX mid-line.
 static int gbScxMode3Extra = 0;
 static int gbScxMode3ExtraDelayed = 0;
+// Global emulated M-cycle counter. Originally debug-only, now also the
+// time base for the TIMA reload window and the OAM DMA window.
+static uint64_t gbCycleCounter = 0;
+
 // TIMA overflow-reload window (mooneye timer/tima_reload,
 // tima_write_reloading, tma_write_reloading): when TIMA overflows it
 // reads $00 for exactly one M-cycle before TMA is loaded. A TIMA write
@@ -624,9 +628,43 @@ static int gbScxMode3ExtraDelayed = 0;
 static int gbTimaReloadPending = 0;
 static uint64_t gbTimaReloadCycle = 0;
 static uint64_t gbTimaReloadAppliedCycle = (uint64_t)-1;
+// Timed OAM DMA (mooneye oam_dma_timing/start/restart and every
+// instruction-timing test that uses OAM DMA as its probe): a write to
+// $FF46 at cycle W makes OAM unreadable (reads $FF) and unwritable for
+// access-completion cycles [W+2, W+162). The 160-byte copy itself is
+// performed immediately (the content is only observable once the
+// window closes). A restart during the setup delay extends the window.
+// gbMemAccessCycleAdj is the distance (in M-cycles) between the end of
+// the current instruction and the memory access being performed, set
+// via gbReadMemoryAt/gbWriteMemoryAt for opcodes whose accesses do not
+// happen in their final machine cycle. Opcode fetches complete one
+// cycle after instruction start (adj -1).
+static uint64_t gbOamDmaBlockFrom = 0;
+static uint64_t gbOamDmaBlockUntil = 0;
+static int gbOamDmaCopyPending = 0;
+static uint16_t gbOamDmaCopySource = 0;
+static int gbMemAccessCycleAdj = 0;
+
+static inline bool gbOamDmaBlocked(void)
+{
+    uint64_t eff = gbCycleCounter - (uint64_t)gbMemAccessCycleAdj;
+    return eff >= gbOamDmaBlockFrom && eff < gbOamDmaBlockUntil;
+}
+
+// The 160-byte copy is performed once the blocked window has passed
+// (during the setup delay and the transfer, reads of OAM must still
+// see the old content / $FF respectively — mooneye oam_dma_start).
+static void gbOamDmaFlushIfDue(void)
+{
+    extern void gbCopyMemory(uint16_t d, uint16_t s, int count);
+    uint64_t eff = gbCycleCounter - (uint64_t)gbMemAccessCycleAdj;
+    if (gbOamDmaCopyPending && eff >= gbOamDmaBlockUntil) {
+        gbOamDmaCopyPending = 0;
+        gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
+    }
+}
 
 // Debug bookkeeping for VBAM_TRACE_GBIRQ (no effect on emulation).
-static uint64_t gbCycleCounter = 0;
 static uint64_t gbLastOamRaiseCycle = 0;
 static uint64_t gbLastTimerRaiseCycle = 0;
 static uint64_t gbLastRetiCycle = 0;
@@ -1356,6 +1394,26 @@ bool gbIsGameboyRom(char* file)
 // Forward declaration — gbReadMemory is defined further down.
 uint8_t gbReadMemory(uint16_t address);
 
+// Perform a memory access whose true position is `endOff` machine
+// cycles before the end of the current instruction. Only the OAM-DMA
+// visibility window looks at this — all other timing is unchanged.
+static inline uint8_t gbReadMemoryAt(uint16_t address, int endOff)
+{
+    gbMemAccessCycleAdj = endOff;
+    uint8_t v = gbReadMemory(address);
+    gbMemAccessCycleAdj = 0;
+    return v;
+}
+
+void gbWriteMemory(uint16_t address, uint8_t value);
+
+static inline void gbWriteMemoryAt(uint16_t address, uint8_t value, int endOff)
+{
+    gbMemAccessCycleAdj = endOff;
+    gbWriteMemory(address, value);
+    gbMemAccessCycleAdj = 0;
+}
+
 void gbCopyMemory(uint16_t d, uint16_t s, int count)
 {
     while (count) {
@@ -1585,8 +1643,11 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         return;
     }
 
-    // OAM not accessible during mode 2 & 3.
+    // OAM not accessible during mode 2 & 3, or while OAM DMA runs.
     if (address < 0xfea0) {
+        if (gbOamDmaBlocked())
+            return;
+        gbOamDmaFlushIfDue();
         if (((gbHardware & 0xa) && ((gbLcdMode | gbLcdModeDelayed) & 2)) || ((gbHardware & 5) && (((gbLcdModeDelayed == 2) && (gbLcdTicksDelayed <= GBLCD_MODE_2_CLOCK_TICKS)) || (gbLcdModeDelayed == 3))))
             return;
         else {
@@ -2028,9 +2089,32 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x46: {
         int source = value * 0x0100;
 
-        gbCopyMemory(0xfe00,
-            (uint16_t)source,
-            0xa0);
+        // A source in $FE00-$FFFF reads the external bus (echo RAM)
+        // on DMG (mooneye oam_dma/sources-GS).
+        if (!gbCgbMode && value >= 0xfe)
+            source = (value - 0x20) * 0x0100;
+
+        // Complete a previous transfer's copy before arming the next.
+        if (gbOamDmaCopyPending) {
+            gbOamDmaCopyPending = 0;
+            gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
+        }
+        gbOamDmaCopyPending = 1;
+        gbOamDmaCopySource = (uint16_t)source;
+
+        // OAM is blocked for access-completion cycles [W+2, W+162).
+        // A restart during an active window keeps the earlier start
+        // (the old transfer still blocks) and extends the end.
+        {
+            uint64_t from = gbCycleCounter + 2;
+            uint64_t until = gbCycleCounter + 162;
+            if (gbOamDmaBlockUntil > gbCycleCounter && gbOamDmaBlockFrom <= from) {
+                // window already armed/active: keep its start
+            } else {
+                gbOamDmaBlockFrom = from;
+            }
+            gbOamDmaBlockUntil = until;
+        }
         gbMemory[0xff46] = register_DMA = value;
         return;
     }
@@ -2628,8 +2712,21 @@ uint8_t gbReadMemory(uint16_t address)
                 address,
                 PC.W);
             return 0xff;
-        case 0x04:
-            return register_DIV;
+        case 0x04: {
+            // Reconstruct DIV as of the access cycle for instructions
+            // whose read is not in their final machine cycle (POP from
+            // $FF04 in mooneye pop_timing) or lands after it (RET cc).
+            uint8_t v = register_DIV;
+            if (gbMemAccessCycleAdj > 0) {
+                int sinceIncr = GBDIV_CLOCK_TICKS - gbDivTicks;
+                if (sinceIncr < gbMemAccessCycleAdj)
+                    v--;
+            } else if (gbMemAccessCycleAdj < 0) {
+                if (gbDivTicks <= -gbMemAccessCycleAdj)
+                    v++;
+            }
+            return v;
+        }
         case 0x05:
             return register_TIMA;
         case 0x06:
@@ -2795,6 +2892,13 @@ uint8_t gbReadMemory(uint16_t address)
             lo == 0x71 ||                          // unused
             (lo >= 0x78 && lo <= 0x7f))            // unused
             return 0xff;
+    }
+    // OAM reads return $FF while OAM DMA is active; once the window
+    // has passed, the transferred content becomes visible.
+    if ((address >= 0xfe00) && (address < 0xfea0)) {
+        if (gbOamDmaBlocked())
+            return 0xff;
+        gbOamDmaFlushIfDue();
     }
     // OAM not accessible during mode 2 & 3.
     if (((address >= 0xfe00) && (address < 0xfea0)) && ((((gbLcdMode | gbLcdModeDelayed) & 2) && (!(gbSpeed && (gbHardware & 0x2) && !(gbLcdModeDelayed & 2) && (gbLcdMode == 2)))) || (gbSpeed && (gbHardware & 0x2) && (gbLcdModeDelayed == 0) && (gbLcdTicksDelayed == (GBLCD_MODE_0_CLOCK_TICKS - gbSpritesTicks[299])))))
@@ -3121,6 +3225,9 @@ void gbReset()
     gbScxMode3ExtraDelayed = 0;
     gbTimaReloadPending = 0;
     gbTimaReloadAppliedCycle = (uint64_t)-1;
+    gbOamDmaBlockFrom = 0;
+    gbOamDmaBlockUntil = 0;
+    gbOamDmaCopyPending = 0;
     gbDmaTicks = 0;
     gbCartBus = 0xff;
     clockTicks = 0;
@@ -4622,7 +4729,7 @@ void gbEmulate(int ticksToStop)
             if (PC.W >= 0x8000)
                 gbCartBus = 0xff;
 
-            opcode2 = opcode1 = opcode = gbReadMemory(PC.W++);
+            opcode2 = opcode1 = opcode = gbReadMemoryAt(PC.W++, -1);
 
             // If HALT state was launched while IME = 0 and (register_IF & register_IE & 0x1F),
             // PC.W is not incremented for the first byte of the next instruction.
@@ -4636,7 +4743,7 @@ void gbEmulate(int ticksToStop)
             switch (opcode) {
             case 0xCB:
                 // extended opcode
-                opcode2 = opcode = gbReadMemory(PC.W++);
+                opcode2 = opcode = gbReadMemoryAt(PC.W++, -2);
                 clockTicks = gbCyclesCB[opcode];
                 break;
             }
@@ -4867,6 +4974,7 @@ void gbEmulate(int ticksToStop)
                         // Snapshot OAM at mode 2 entry. Real GBC hardware locks OAM
                         // during modes 2 and 3, so both pipeline passes must see the
                         // same OAM state.
+                        gbOamDmaFlushIfDue();
                         memcpy(gbOAMLatch, &gbMemory[0xfe00], 0xa0);
                         if ((gbScreenOn) && (register_LCDC & 0x80)) {
                             gbDrawSprites(false);
