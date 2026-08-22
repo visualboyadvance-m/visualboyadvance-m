@@ -643,6 +643,11 @@ static uint64_t gbOamDmaBlockFrom = 0;
 static uint64_t gbOamDmaBlockUntil = 0;
 static int gbOamDmaCopyPending = 0;
 static uint16_t gbOamDmaCopySource = 0;
+// Master-mode serial transfer with no link partner: the transfer
+// completes at the 8th edge of the free-running 8192 Hz serial clock,
+// which is derived from the same divider as DIV — edges align to the
+// reset time, not the SC write (mooneye serial/boot_sclk_align).
+static int gbSerialMasterWait = 0;
 static int gbMemAccessCycleAdj = 0;
 
 static inline bool gbOamDmaBlocked(void)
@@ -1696,14 +1701,34 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             //Do data exchange, master initiate the transfer
             //may cause visual artifact if not processed immediately, is it due to IRQ stuff or invalid data being exchanged?
             if ((value & 1)) { //internal clock
-                if (gbSerialFunction) {
-                    gbSIO_SC = value;
-                    gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]); //gbSerialFunction/gbStartLink/gbPrinter
-                } else
-                    gbMemory[0xff01] = 0xff;
-                gbMemory[0xff02] &= 0x7f;
-                gbSerialOn = 0;
-                gbMemory[0xff0f] = register_IF |= 8;
+                if (GetLinkMode() == LINK_DISCONNECTED && !coreOptions.gbPrinterEnabled) {
+                    // No partner: complete at the 8th 8192 Hz edge.
+                    // Edges land every 128 cycles where DIV increments
+                    // to an even value. The data exchange itself (the
+                    // embedder's serial hook) happens now so rapid
+                    // back-to-back sends all get captured; only the
+                    // completion (SC bit 7 clear + IF) is timed.
+                    if (gbSerialFunction) {
+                        gbSIO_SC = value;
+                        gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]);
+                    } else
+                        gbMemory[0xff01] = 0xff;
+                    uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
+                    uint64_t edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
+                    while (edge <= gbCycleCounter)
+                        edge += 128;
+                    gbSerialTicks = (int)((edge + 7 * 128 - 1) - gbCycleCounter);
+                    gbSerialMasterWait = 1;
+                } else {
+                    if (gbSerialFunction) {
+                        gbSIO_SC = value;
+                        gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]); //gbSerialFunction/gbStartLink/gbPrinter
+                    } else
+                        gbMemory[0xff01] = 0xff;
+                    gbMemory[0xff02] &= 0x7f;
+                    gbSerialOn = 0;
+                    gbMemory[0xff0f] = register_IF |= 8;
+                }
             }
 #ifdef OLD_GB_LINK
             if (linkConnected) {
@@ -1716,8 +1741,17 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         }
 #else
         gbMemory[0xff02] = value;
-        if (gbSerialOn)
+        if (gbSerialOn) {
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
+            if (value & 1) {
+                uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
+                uint64_t edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
+                while (edge <= gbCycleCounter)
+                    edge += 128;
+                gbSerialTicks = (int)((edge + 7 * 128 - 1) - gbCycleCounter);
+                gbSerialMasterWait = 1;
+            }
+        }
 #endif
         gbSerialBits = 0;
         return;
@@ -5364,6 +5398,16 @@ void gbEmulate(int ticksToStop)
 #ifndef NO_LINK
         // serial emulation
         gbSerialOn = (gbMemory[0xff02] & 0x80);
+        if (gbSerialMasterWait) {
+            gbSerialTicks -= clockTicks;
+            if (gbSerialTicks <= 0) {
+                gbSerialMasterWait = 0;
+                gbMemory[0xff02] &= 0x7f;
+                gbSerialOn = 0;
+                gbMemory[0xff0f] = register_IF |= 8;
+                gbSerialTicks = 0;
+            }
+        } else {
         static int SIOctr = 0;
         SIOctr++;
         if (SIOctr % 5)
@@ -5449,10 +5493,22 @@ void gbEmulate(int ticksToStop)
                 }
 #endif
             }
+        }
 #else
+        if (gbSerialMasterWait) {
+            gbSerialTicks -= clockTicks;
+            if (gbSerialTicks <= 0) {
+                gbSerialMasterWait = 0;
+                gbMemory[0xff01] = 0xff;
+                gbMemory[0xff02] &= 0x7f;
+                gbSerialOn = 0;
+                gbMemory[0xff0f] = register_IF |= 8;
+                gbSerialTicks = 0;
+            }
+        }
         static int SIOctr = 0;
         SIOctr++;
-        if (SIOctr % 5) {
+        if (SIOctr % 5 && !gbSerialMasterWait) {
             if (gbSerialOn) {
                 if  (gbMemory[0xff02] & 1) {
                     gbSerialTicks -= clockTicks;
