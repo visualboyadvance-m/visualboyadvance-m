@@ -1167,6 +1167,7 @@ case 0xd9:
 PC.B.B0 = gbReadMemory(SP.W++);
 PC.B.B1 = gbReadMemory(SP.W++);
 IFF |= 0x01;
+gbLastRetiCycle = gbCycleCounter;
 break;
 case 0xda:
 // JP C,NNNN

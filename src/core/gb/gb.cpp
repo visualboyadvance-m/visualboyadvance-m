@@ -604,6 +604,37 @@ int gbInterruptWait = 0;
 // single gbEmulate() call, so this state never has to be serialized.
 static int gbIrqDispatchStage = 0;
 static uint8_t gbIrqDispatchArmed = 0;
+// Debug bookkeeping for VBAM_TRACE_GBIRQ (no effect on emulation).
+static uint64_t gbCycleCounter = 0;
+static uint64_t gbLastOamRaiseCycle = 0;
+static uint64_t gbLastTimerRaiseCycle = 0;
+static uint64_t gbLastRetiCycle = 0;
+static long long gbTraceStatThresh(void)
+{
+    static long long thresh = -2;
+    if (thresh == -2) {
+        const char* e = getenv("VBAM_TRACE_STAT");
+        thresh = e ? atoll(e) : -1;
+    }
+    return thresh;
+}
+
+// Forward declarations for trace state defined above gbReadMemory.
+static void gbTraceStatRead(uint8_t statv);
+
+// VBAM_TRACE_STAT=<cycle>: log every STAT-IRQ raise decision once
+// gbCycleCounter passes <cycle>.
+static void gbTraceStatRaise(const char* src, int fired)
+{
+    long long thresh = gbTraceStatThresh();
+    if (thresh < 0 || gbCycleCounter < (uint64_t)thresh)
+        return;
+    fprintf(stderr,
+            "[stat] cyc=%llu %s %s LY=%d LYC=%d STAT=$%02X sig=$%02X IF=$%02X\n",
+            (unsigned long long)gbCycleCounter, src,
+            fired ? "FIRE" : "block", register_LY, register_LYC,
+            register_STAT, gbInt48Signal, register_IF);
+}
 // On DMG/SGB the OAM (mode 2) STAT interrupt for line 0 — the one at the
 // mode 1 -> mode 2 transition when V-Blank ends — is raised one M-cycle
 // after the mode transition itself (mooneye ppu/intr_1_2_timing-GS). The
@@ -635,6 +666,16 @@ int gbLcdMode = 2;
 int gbLcdModeDelayed = 2;
 int gbLcdTicks = GBLCD_MODE_2_CLOCK_TICKS - 1;
 int gbLcdTicksDelayed = GBLCD_MODE_2_CLOCK_TICKS;
+
+static void gbTraceStatRead(uint8_t statv)
+{
+    long long thresh = gbTraceStatThresh();
+    if (thresh < 0 || gbCycleCounter < (uint64_t)thresh)
+        return;
+    fprintf(stderr, "[statrd] cyc=%llu val=$%02X mode=%d modeDel=%d LY=%d lcdT=%d lcdTDel=%d PC=$%04X\n",
+            (unsigned long long)gbCycleCounter, statv, gbLcdMode, gbLcdModeDelayed,
+            register_LY, gbLcdTicks, gbLcdTicksDelayed, PC.W);
+}
 int gbLcdLYIncrementTicks = 114;
 int gbLcdLYIncrementTicksDelayed = 115;
 int gbScreenTicks = 0;
@@ -1365,6 +1406,7 @@ void gbCompareLYToLYC()
 
             // check if we need an interrupt
             if (register_STAT & 0x40) {
+                gbTraceStatRaise("lyc", !gbInt48Signal);
                 // send LCD interrupt only if no interrupt 48h signal...
                 if (!gbInt48Signal) {
                     register_IF |= 2;
@@ -2625,12 +2667,16 @@ uint8_t gbReadMemory(uint16_t address)
             return gbSoundRead(soundTicks, address);
         case 0x40:
             return register_LCDC;
-        case 0x41:
+        case 0x41: {
+            uint8_t statv;
             // This is a GB/C only bug (ie. not GBA/SP).
             if ((gbHardware & 7) && (gbLcdMode == 2) && (gbLcdModeDelayed == 1) && (!gbSpeed))
-                return (0x80 | (gbMemory[0xff41] & 0xFC));
+                statv = (uint8_t)(0x80 | (gbMemory[0xff41] & 0xFC));
             else
-                return (0x80 | gbMemory[0xff41]);
+                statv = (uint8_t)(0x80 | gbMemory[0xff41]);
+            gbTraceStatRead(statv);
+            return statv;
+        }
         case 0x42:
             return register_SCY;
         case 0x43:
@@ -4588,6 +4634,7 @@ void gbEmulate(int ticksToStop)
         }
 
         ticksToStop -= clockTicks;
+        gbCycleCounter += (uint64_t)clockTicks;
         soundTicks += clockTicks;
          if (!gbSpeed) soundTicks += clockTicks;
 
@@ -4666,6 +4713,7 @@ void gbEmulate(int ticksToStop)
 
                             gbInt48Signal &= ~6;
                             if (register_STAT & 0x10) {
+                                gbTraceStatRaise("vbl1", (!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a)));
                                 // send LCD interrupt only if no interrupt 48h signal...
                                 if ((!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a))) {
                                     register_IF |= 2;
@@ -4687,10 +4735,12 @@ void gbEmulate(int ticksToStop)
 
                             gbInt48Signal &= ~6;
                             if (register_STAT & 0x20) {
+                                gbTraceStatRaise("oam2", !gbInt48Signal);
                                 // send LCD interrupt only if no interrupt 48h signal...
                                 if (!gbInt48Signal) {
                                     register_IF |= 2;
                                     gbInterruptLaunched |= 2;
+                                    gbLastOamRaiseCycle = gbCycleCounter;
                                     // CGB: in halt mode IF is read one
                                     // T-cycle later, so the OAM interrupt
                                     // wakes the CPU one M-cycle late. On
@@ -4709,6 +4759,7 @@ void gbEmulate(int ticksToStop)
                         // next mode is OAM being accessed mode
                         gbInt48Signal &= ~5;
                         if (register_STAT & 0x20) {
+                            gbTraceStatRaise("oam1e", !gbInt48Signal);
                             // send LCD interrupt only if no interrupt 48h signal...
                             if (!gbInt48Signal) {
                                 if (gbHardware & 5) {
@@ -4789,6 +4840,7 @@ void gbEmulate(int ticksToStop)
 
                         gbInt48Signal &= ~7;
                         if (register_STAT & 0x08) {
+                            gbTraceStatRaise("hbl", !(gbInt48Signal & 8));
                             // send LCD interrupt only if no interrupt 48h signal...
                             if (!(gbInt48Signal & 8)) {
                                 register_IF |= 2;
@@ -5248,6 +5300,7 @@ void gbEmulate(int ticksToStop)
                     register_TIMA = register_TMA;
                     // flag interrupt
                     gbMemory[0xff0f] = register_IF |= 4;
+                    gbLastTimerRaiseCycle = gbCycleCounter;
                     // The timer interrupt is one of the interrupts that
                     // wake the CPU from halt one M-cycle late (IF is
                     // read one T-cycle later in halt mode) — on both
@@ -5408,6 +5461,30 @@ void gbEmulate(int ticksToStop)
                     // No bit armed (the push cancelled our interrupt) —
                     // dispatch to vector $0000 per real HW.
                     PC.W = 0x0000;
+                }
+
+                // Optional interrupt-dispatch trace for debugging games
+                // with interrupt-order sensitivities (Pinball Deluxe):
+                // VBAM_TRACE_GBIRQ=1 logs every dispatch to stderr.
+                {
+                    static int trace = -1;
+                    if (trace < 0)
+                        trace = getenv("VBAM_TRACE_GBIRQ") ? 1 : 0;
+                    if (trace) {
+                        uint16_t pushedPC = (uint16_t)(gbReadMemory((uint16_t)(SP.W + 1)) << 8
+                                                       | gbReadMemory(SP.W));
+                        fprintf(stderr,
+                                "[gbirq] fc=%d vec=$%04X from=$%04X SP=$%04X "
+                                "IF=$%02X IE=$%02X LY=%d STAT=$%02X armed=$%02X "
+                                "cyc=%llu oam=-%llu tmr=-%llu reti=-%llu\n",
+                                gbFrameCount, PC.W, pushedPC, SP.W,
+                                register_IF, register_IE, register_LY,
+                                register_STAT, gbIrqDispatchArmed,
+                                (unsigned long long)gbCycleCounter,
+                                (unsigned long long)(gbCycleCounter - gbLastOamRaiseCycle),
+                                (unsigned long long)(gbCycleCounter - gbLastTimerRaiseCycle),
+                                (unsigned long long)(gbCycleCounter - gbLastRetiCycle));
+                    }
                 }
                 gbMemory[0xff0f] = register_IF;
                 gbIrqDispatchStage = 0;
