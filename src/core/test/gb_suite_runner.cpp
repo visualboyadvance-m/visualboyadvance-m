@@ -746,7 +746,12 @@ static void make_cases(const std::string& rom, const std::string& root,
     }
 
     // -- Interactive/manual suites with no automatic pass criterion.
-    if (contains(rom, "/rtc3test") || contains(rom, "/mbc3-tester")) {
+    if (contains(rom, "/rtc3test") || contains(rom, "/mbc3-tester") ||
+        contains(rom, "/tellinglys") ||        // needs joypad-entropy input
+        contains(rom, "/fairylake/") ||        // animation, no reference png
+        contains(rom, "/winpos/") ||           // no reference png
+        ends_with_(rom, "/statcount.gb") ||    // manual variant (button-driven)
+        contains(rom, "/bootrom_dumper")) {    // utility, needs real boot ROM
         add_skip("manual");
         return;
     }
@@ -857,7 +862,9 @@ static void make_cases(const std::string& rom, const std::string& root,
             add_png_case(base + "_expected.png", TestCase::kEtAuto, "");
         if (file_exists(base + "-dmg.png"))
             add_png_case(base + "-dmg.png", 3, "dmg");
-        if (file_exists(base + "-cgb.png"))
+        // scribbltests' scxly-cgb.png was captured with a green-LCD
+        // palette instead of the standard shades — not comparable.
+        if (file_exists(base + "-cgb.png") && !contains(rom, "/scxly/"))
             add_png_case(base + "-cgb.png", 1, "cgb");
         // A single reference image valid for both DMG and CGB-compat:
         // verify the DMG run (the CGB-compat run would need the exact
@@ -865,6 +872,17 @@ static void make_cases(const std::string& rom, const std::string& root,
         for (const char* sfx : { "-dmg-cgb.png", "-cgb-dmg.png" })
             if (file_exists(base + sfx))
                 add_png_case(base + sfx, 3, "dmg");
+        // statcount-auto.gb's reference is named statcount_auto-cgb-dmg.png.
+        {
+            std::string alt = base;
+            size_t slash = alt.rfind('/');
+            for (size_t k = slash + 1; k < alt.size(); ++k)
+                if (alt[k] == '-') alt[k] = '_';
+            if (alt != base)
+                for (const char* sfx : { "-dmg-cgb.png", "-cgb-dmg.png" })
+                    if (file_exists(alt + sfx))
+                        add_png_case(alt + sfx, 3, "dmg");
+        }
         if (out.size() != before)
             return;
     }
@@ -1027,6 +1045,14 @@ static void run_case(const TestCase& tc, TestResult& out) {
     soundInit();
     gbReset();
     emulating = 1;
+
+    // gbmicrotest result bytes: power-on HRAM is $FF here, which equals
+    // the FAIL marker — clear them so only a value the test wrote counts.
+    if (tc.detect == Detect::GbMicrotest) {
+        gbMemory[0xff80] = 0x00;
+        gbMemory[0xff81] = 0x00;
+        gbMemory[0xff82] = 0x00;
+    }
 
     // Apply hardware-variant register overrides for Mooneye boot_regs
     // tests. Default gbReset() initializes for DMG-ABC (A=$01, F=$B0);
@@ -1360,6 +1386,17 @@ static void run_case(const TestCase& tc, TestResult& out) {
         int best = 160 * 144 + 1;
         for (const PngImage& img : refs)
             best = std::min(best, fb_png_diff_count(img));
+        if (getenv("VBAM_PNG_DIFF") && !refs.empty()) {
+            const PngImage& img = refs[0];
+            int shown = 0;
+            for (int y = 0; y < 144 && shown < 60; ++y)
+                for (int x = 0; x < 160 && shown < 60; ++x)
+                    if (img.ok && fb_px(x, y) != img.px[(size_t)y * 160 + x]) {
+                        fprintf(stderr, "[diff] (%3d,%3d) fb=%06X png=%06X\n",
+                                x, y, fb_px(x, y), img.px[(size_t)y * 160 + x]);
+                        ++shown;
+                    }
+        }
         char buf[96];
         std::snprintf(buf, sizeof(buf),
                       "[png] Failed (%d/%d pixels differ)", best, 160 * 144);
