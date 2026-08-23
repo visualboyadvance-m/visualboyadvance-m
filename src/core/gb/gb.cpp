@@ -2297,12 +2297,10 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 }
                 gbInt48Signal |= 2;
             }
-            if ((register_STAT & 0x20) && (gbLcdMode == 2)) {
-                if (!gbInt48Signal) {
-                    gbMemory[0xff0f] = register_IF |= 2;
-                }
-                //gbInt48Signal |= 4;
-            }
+            // The mode-2 STAT condition is a pulse at mode-2 entry,
+            // not a level: enabling the source mid-mode-2 does NOT
+            // raise the interrupt (gambatte miscmstatirq/
+            // m2statwirq_trigger_*).
             gbCompareLYToLYC();
 
             gbMemory[0xff0f] = register_IF;
