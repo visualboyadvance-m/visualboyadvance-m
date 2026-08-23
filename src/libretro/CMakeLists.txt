@@ -64,6 +64,7 @@ add_library(vbam_libretro SHARED
 
     # GB
     ${VBAM_SRC_DIR}/core/gb/gb.cpp
+    ${VBAM_SRC_DIR}/core/gb/gbPowerOn.cpp
     ${VBAM_SRC_DIR}/core/gb/gbCartData.cpp
     ${VBAM_SRC_DIR}/core/gb/gbCheats.cpp
     ${VBAM_SRC_DIR}/core/gb/gbGfx.cpp
