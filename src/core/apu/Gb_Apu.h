@@ -50,6 +50,17 @@ class Gb_Apu
         // Emulates CPU read from addr at specified time.
         uint8_t read_register(blip_time_t time, unsigned addr);
 
+        // Divider reset (DIV write / speed switch): if the divider bit
+        // that clocks the frame sequencer is currently high, the reset
+        // produces a falling edge and clocks the sequencer early; the
+        // sequencer then realigns to the reset.
+        void divider_reset(blip_time_t time, bool tap_high);
+
+        // Boot-state alignment of the frame sequencer to the system
+        // divider: next step fires `to_next` after `time`, with step
+        // index `phase`.
+        void align_frame_sequencer(blip_time_t time, blip_time_t to_next, int phase);
+
         // Emulates sound hardware up to specified time, ends current time frame, then
         // starts a new frame at time 0.
         void end_frame(blip_time_t frame_length);

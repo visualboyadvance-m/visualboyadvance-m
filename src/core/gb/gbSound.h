@@ -68,6 +68,12 @@ void gbSoundEvent(int st, uint16_t address, uint8_t data);
 // Emulates read from sound hardware
 uint8_t gbSoundRead(int st, uint16_t address);
 
+// Divider reset (DIV write / speed switch): frame-sequencer edge glitch.
+void gbSoundDivReset(int st, bool tap_high);
+
+// Boot alignment of the APU frame sequencer to the divider.
+void gbSoundFrameSeqAlign(int st, int to_next_st, int phase);
+
 // Notifies emulator that SOUND_CLOCK_TICKS clocks have passed
 void gbSoundTick(int st);
 extern int SOUND_CLOCK_TICKS; // Number of 16.8 MHz clocks between calls to gbSoundTick()

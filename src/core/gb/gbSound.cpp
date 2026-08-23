@@ -26,6 +26,20 @@ static bool declicking = false;
 int const chan_count = 4;
 int const ticks_to_time = 2 * GB_APU_OVERCLOCK;
 
+void gbSoundFrameSeqAlign(int st, int to_next_st, int phase)
+{
+    if (gb_apu)
+        gb_apu->align_frame_sequencer((blip_time_t)(st * ticks_to_time),
+                                      (blip_time_t)(to_next_st * ticks_to_time),
+                                      phase);
+}
+
+void gbSoundDivReset(int st, bool tap_high)
+{
+    if (gb_apu)
+        gb_apu->divider_reset((blip_time_t)(st * ticks_to_time), tap_high);
+}
+
 uint8_t gbSoundRead(int st, uint16_t address)
 {
     if (gb_apu && address >= NR10 && address <= 0xFF3F)

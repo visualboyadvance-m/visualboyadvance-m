@@ -249,6 +249,47 @@ void Gb_Apu::run_until_( blip_time_t end_time )
 	}
 }
 
+void Gb_Apu::align_frame_sequencer( blip_time_t time, blip_time_t to_next, int phase )
+{
+	if ( time > last_time )
+		run_until_( time );
+	frame_time  = time + to_next;
+	frame_phase = phase & 7;
+}
+
+void Gb_Apu::divider_reset( blip_time_t time, bool tap_high )
+{
+	if ( time > last_time )
+		run_until_( time );
+
+	blip_time_t period = frame_period * Gb_Osc::clk_mul;
+	if ( tap_high )
+	{
+		// tap bit high: the reset's falling edge clocks the sequencer
+		switch ( frame_phase++ )
+		{
+		case 2:
+		case 6:
+			square1.clock_sweep();
+			/* fallthrough */
+		case 0:
+		case 4:
+			square1.clock_length();
+			square2.clock_length();
+			wave   .clock_length();
+			noise  .clock_length();
+			break;
+
+		case 7:
+			frame_phase = 0;
+			square1.clock_envelope();
+			square2.clock_envelope();
+			noise  .clock_envelope();
+		}
+	}
+	frame_time = time + period;
+}
+
 inline void Gb_Apu::run_until( blip_time_t time )
 {
 	require( time >= last_time ); // end_time must not be before previous time

@@ -42,6 +42,7 @@ extern bool gbBorderAutomatic;
 extern bool gbBorderOn;
 extern bool gbScreenOn;
 extern uint8_t gbSCYLine[300];
+extern uint8_t gbLcdcLine[300];
 // gbSCXLine is used for the emulation (bug) of the SX change
 // found in the Artic Zone game.
 extern uint8_t gbSCXLine[300];

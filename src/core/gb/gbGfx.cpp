@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "core/gb/gbGfx.h"
 
 #include <memory.h>
@@ -58,15 +59,6 @@ void gbRenderLine()
         bank1 = NULL;
     }
 
-    int tile_map = 0x1800;
-    if ((register_LCDC & 8) != 0)
-        tile_map = 0x1c00;
-
-    int tile_pattern = 0x0800;
-
-    if ((register_LCDC & 16) != 0)
-        tile_pattern = 0x0000;
-
     int x = 0;
     int y = register_LY;
 
@@ -74,8 +66,24 @@ void gbRenderLine()
         return;
 
     int SpritesTicks = gbSpritesTicks[x] * (gbSpeed ? 2 : 4);
-    int sx = gbSCXLine[(gbSpeed ? 0 : 4) + SpritesTicks];
-    int sy = gbSCYLine[(gbSpeed ? 11 : 5) + SpritesTicks];
+    static int scxRd = getenv("VBAM_SCX_RD") ? atoi(getenv("VBAM_SCX_RD")) : 2;
+    static int scyRd = getenv("VBAM_SCY_RD") ? atoi(getenv("VBAM_SCY_RD")) : 5;
+    int sx = gbSCXLine[(gbSpeed ? 0 : scxRd) + SpritesTicks];
+    int sy = gbSCYLine[(gbSpeed ? 11 : scyRd) + SpritesTicks];
+
+    // Mid-scanline LCDC changes: sample the tile map / tile data select
+    // bits per fetch (gambatte bgtilemap/bgtiledata).
+    static int lcdcRd = getenv("VBAM_LCDC_RD") ? atoi(getenv("VBAM_LCDC_RD")) : 2;
+    uint8_t lcdc_px = gbLcdcLine[(gbSpeed ? 0 : lcdcRd) + SpritesTicks];
+
+    int tile_map = 0x1800;
+    if ((lcdc_px & 8) != 0)
+        tile_map = 0x1c00;
+
+    int tile_pattern = 0x0800;
+
+    if ((lcdc_px & 16) != 0)
+        tile_pattern = 0x0000;
 
     sy += y;
 
@@ -99,7 +107,7 @@ void gbRenderLine()
 
     tile_map_address++;
 
-    if (!(register_LCDC & 0x10))
+    if (!(lcdc_px & 0x10))
         tile ^= 0x80;
 
     int tile_pattern_address = tile_pattern + tile * 16 + by * 2;
@@ -169,9 +177,14 @@ void gbRenderLine()
 
                 SpritesTicks = gbSpritesTicks[x] * (gbSpeed ? 2 : 4);
 
-                sx = gbSCXLine[x + (gbSpeed ? 0 : 4) + SpritesTicks];
+                sx = gbSCXLine[x + (gbSpeed ? 0 : scxRd) + SpritesTicks];
 
-                sy = gbSCYLine[x + (gbSpeed ? 11 : 5) + SpritesTicks];
+                sy = gbSCYLine[x + (gbSpeed ? 11 : scyRd) + SpritesTicks];
+
+                lcdc_px = gbLcdcLine[x + (gbSpeed ? 0 : lcdcRd) + SpritesTicks];
+
+                tile_map = (lcdc_px & 8) ? 0x1c00 : 0x1800;
+                tile_pattern = (lcdc_px & 16) ? 0x0000 : 0x0800;
 
                 tx = ((sx + x) >> 3) & 0x1f;
 
@@ -194,7 +207,7 @@ void gbRenderLine()
 
                 tile = bank0[tile_map_line_y + tx];
 
-                if (!(register_LCDC & 0x10))
+                if (!(lcdc_px & 0x10))
                     tile ^= 0x80;
 
                 tile_pattern_address = tile_pattern + tile * 16 + by * 2;

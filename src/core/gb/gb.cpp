@@ -845,6 +845,9 @@ int gbLcdLYIncrementTicks = 114;
 int gbLcdLYIncrementTicksDelayed = 115;
 int gbScreenTicks = 0;
 uint8_t gbSCYLine[300];
+// Per-pixel LCDC snapshot within the current line, for mid-scanline
+// tile map / tile data select changes (gambatte bgtilemap/bgtiledata).
+uint8_t gbLcdcLine[300];
 uint8_t gbSCXLine[300];
 uint8_t gbBgpLine[300];
 uint8_t gbObp0Line[300];
@@ -1699,6 +1702,18 @@ static inline void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
     gbOamBugCorrupt(type, 20 - (gbLcdTicks + cyclesBeforeEnd));
 }
 
+// APU event time with sub-instruction resolution: soundTicks reflects
+// the state at instruction start; the access itself lands
+// (clockTicks + gbMemAccessCycleAdj) machine cycles later (gambatte
+// sound/ch1_late_div_write_nr52_1a vs 1b differ by exactly one cycle).
+static inline int gbSoundAccessTime(void)
+{
+    int in_instr = clockTicks + gbMemAccessCycleAdj;
+    if (in_instr < 0)
+        in_instr = 0;
+    return soundTicks + (in_instr << (gbSpeed ? 0 : 1));
+}
+
 // One serial-clock falling edge of an internally-clocked transfer with
 // no link partner: shift a bit into SB; the 8th edge completes the
 // transfer (SC bit 7 clears, serial IF raised).
@@ -1947,6 +1962,31 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             if (gbSerialMasterWait)
                 gbSerialTicks = gbSerialPeriodCycles - 1;
         }
+        // The APU frame sequencer is clocked by DIV bit 4 (falling
+        // edge, 512 Hz) — resetting the divider while that bit is high
+        // clocks the sequencer early (gambatte sound/ch*_div_write_*,
+        // same-suite apu/div_write_trigger*).
+        {
+            // Reconstruct DIV as of the write's access cycle (same
+            // convention as the $FF04 read handler).
+            uint8_t div_now = register_DIV;
+            if (gbMemAccessCycleAdj > 0) {
+                int sinceIncr = GBDIV_CLOCK_TICKS - gbDivTicks;
+                if (sinceIncr < gbMemAccessCycleAdj)
+                    div_now--;
+            } else if (gbMemAccessCycleAdj < 0) {
+                if (gbDivTicks <= -gbMemAccessCycleAdj)
+                    div_now++;
+            }
+            // Tap = DIV bit 4 (512 Hz half-period) sampled at the end
+            // of the write's access cycle (one cycle past the counter
+            // state we track — gambatte ch1_late_div_write_nr52_1a/1b
+            // bracket this exact boundary).
+            int phase = ((div_now & 0x1f) << 6) |
+                        ((GBDIV_CLOCK_TICKS - gbDivTicks) & 0x3f);
+            bool tap_high = (((phase + 1) & 0x7ff) >= 0x400);
+            gbSoundDivReset(gbSoundAccessTime(), tap_high);
+        }
         gbMemory[0xff04] = register_DIV = 0;
         gbDivTicks = GBDIV_CLOCK_TICKS;
         // Another weird timer 'bug' :
@@ -2117,12 +2157,23 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x3e:
     case 0x3f:
         // Sound registers handled by blargg
-        gbSoundEvent(soundTicks, address, value);
+        gbSoundEvent(gbSoundAccessTime(), address, value);
         //gbMemory[address] = value;
         return;
 
     case 0x40: {
         int lcdChange = (register_LCDC & 0x80) ^ (value & 0x80);
+
+        {
+            int temp = -1;
+            if (gbLcdModeDelayed == 3)
+                temp = ((GBLY_INCREMENT_CLOCK_TICKS - GBLCD_MODE_2_CLOCK_TICKS) - gbLcdLYIncrementTicksDelayed);
+            if (temp >= 0) {
+                for (int i = temp << (gbSpeed ? 1 : 2); i < 300; i++)
+                    gbLcdcLine[i] = value;
+            } else
+                memset(gbLcdcLine, value, sizeof(gbLcdcLine));
+        }
 
         // don't draw the window if it was not enabled and not being drawn before
         if (!(register_LCDC & 0x20) && (value & 0x20) && gbWindowLine == -1 && register_LY > register_WY)
@@ -3052,7 +3103,7 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x3e:
         case 0x3f:
             // Sound registers read
-            return gbSoundRead(soundTicks, address);
+            return gbSoundRead(gbSoundAccessTime(), address);
         case 0x40:
             return register_LCDC;
         case 0x41: {
@@ -3586,6 +3637,7 @@ void gbReset()
     }
 
     memset(gbSCYLine, 0, sizeof(gbSCYLine));
+    memset(gbLcdcLine, register_LCDC, sizeof(gbLcdcLine));
     memset(gbSCXLine, 0, sizeof(gbSCXLine));
     memset(gbBgpLine, 0xfc, sizeof(gbBgpLine));
     if (gbHardware & 5) {
@@ -3987,6 +4039,18 @@ void gbReset()
     }
 
     gbSoundReset();
+
+    // Align the APU frame sequencer to the divider's post-boot phase
+    // (the sequencer steps when DIV bit 4 falls; step index calibrated
+    // with gambatte sound/ch1_late_div_write_nr52 and friends).
+    {
+        int phase2048 = ((register_DIV & 0x1f) << 6) |
+                        ((GBDIV_CLOCK_TICKS - gbDivTicks) & 63);
+        int to_fall = 2048 - phase2048;
+        int boot_step = getenv("VBAM_APU_STEP")
+                            ? atoi(getenv("VBAM_APU_STEP")) : 1;
+        gbSoundFrameSeqAlign(soundTicks, to_fall * 2, boot_step);
+    }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
@@ -4401,6 +4465,7 @@ static bool gbReadSaveState(gzFile gzFile)
 
     memset(gbSCYLine, register_SCY, sizeof(gbSCYLine));
     memset(gbSCXLine, register_SCX, sizeof(gbSCXLine));
+    memset(gbLcdcLine, register_LCDC, sizeof(gbLcdcLine));
     memset(gbBgpLine, (gbBgp[0] | (gbBgp[1] << 2) | (gbBgp[2] << 4) | (gbBgp[3] << 6)), sizeof(gbBgpLine));
     memset(gbObp0Line, (gbObp0[0] | (gbObp0[1] << 2) | (gbObp0[2] << 4) | (gbObp0[3] << 6)), sizeof(gbObp0Line));
     memset(gbObp1Line, (gbObp1[0] | (gbObp1[1] << 2) | (gbObp1[2] << 4) | (gbObp1[3] << 6)), sizeof(gbObp1Line));
@@ -5454,6 +5519,7 @@ void gbEmulate(int ticksToStop)
 
                         memset(gbSCYLine, gbSCYLine[299], sizeof(gbSCYLine));
                         memset(gbSCXLine, gbSCXLine[299], sizeof(gbSCXLine));
+                        memset(gbLcdcLine, gbLcdcLine[299], sizeof(gbLcdcLine));
                         memset(gbBgpLine, gbBgpLine[299], sizeof(gbBgpLine));
                         memset(gbObp0Line, gbObp0Line[299], sizeof(gbObp0Line));
                         memset(gbObp1Line, gbObp1Line[299], sizeof(gbObp1Line));
@@ -6369,6 +6435,7 @@ bool gbReadSaveState(const uint8_t* data)
 
     memset(gbSCYLine, register_SCY, sizeof(gbSCYLine));
     memset(gbSCXLine, register_SCX, sizeof(gbSCXLine));
+    memset(gbLcdcLine, register_LCDC, sizeof(gbLcdcLine));
     memset(gbBgpLine, (gbBgp[0] | (gbBgp[1] << 2) | (gbBgp[2] << 4) | (gbBgp[3] << 6)), sizeof(gbBgpLine));
     memset(gbObp0Line, (gbObp0[0] | (gbObp0[1] << 2) | (gbObp0[2] << 4) | (gbObp0[3] << 6)), sizeof(gbObp0Line));
     memset(gbObp1Line, (gbObp1[0] | (gbObp1[1] << 2) | (gbObp1[2] << 4) | (gbObp1[3] << 6)), sizeof(gbObp1Line));
