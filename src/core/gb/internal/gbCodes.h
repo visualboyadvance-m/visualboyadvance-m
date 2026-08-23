@@ -80,15 +80,16 @@ break;
 case 0x10:
 // STOP
 opcode = gbReadMemory(PC.W++);
-if (gbCgbMode) {
+if (gbCgbMode && !gbCgbDmgCompat) {
     if (gbMemory[0xff4d] & 1) {
-        gbSpeedSwitch();
-        // clockTicks += 228*144-(gbSpeed ? 62 : 63);
-
-        if (gbSpeed == 0)
-            gbMemory[0xff4d] = 0x00;
-        else
-            gbMemory[0xff4d] = 0x80;
+        // CGB speed switch: the divider resets first (with the same
+        // falling-edge glitches as a $FF04 write), then the CPU stalls
+        // for 0x20000 T-cycles while the peripherals keep running at
+        // the old speed; the clock itself switches when the stall ends
+        // (gambatte speedchange/*).
+        gbWriteMemory(0xff04, 0);
+        gbSpeedSwitchPending = 1;
+        gbDmaTicks += gbSpeed ? 0x10000 : 0x8000;
     }
 }
 break;

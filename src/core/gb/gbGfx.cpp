@@ -105,7 +105,7 @@ void gbRenderLine()
     int tile_pattern_address = tile_pattern + tile * 16 + by * 2;
 
     if (register_LCDC & 0x80) {
-        if ((register_LCDC & 0x01 || gbCgbMode) && (coreOptions.layerSettings & 0x0100)) {
+        if ((register_LCDC & 0x01 || (gbCgbMode && !(gbMemory[0xff6c] & 1))) && (coreOptions.layerSettings & 0x0100)) {
             while (x < 160) {
 
                 uint8_t tile_a = 0;
@@ -215,7 +215,7 @@ void gbRenderLine()
         // LCDC.0 also enables/disables the window in !gbCgbMode ?!?!
         // (tested on real hardware)
         // This fixes Last Bible II & Zankurou Musouken
-        if ((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) && (coreOptions.layerSettings & 0x2000) && (gbWindowLine != -2)) {
+        if ((register_LCDC & 0x01 || (gbCgbMode && !(gbMemory[0xff6c] & 1))) && (register_LCDC & 0x20) && (coreOptions.layerSettings & 0x2000) && (gbWindowLine != -2)) {
             int i = 0;
             // Fix (accurate emulation) for most of the window display problems
             // (ie. Zen - Intergalactic Ninja, Urusei Yatsura...).
@@ -480,7 +480,9 @@ void gbDrawSpriteTile(int tile, int x, int y, int t, int flags,
                 if (sprite < spriteNumber)
                     continue;
             } else {
-                if (gbCgbMode) {
+                // OPRI bit 0 selects DMG-style X-coordinate priority —
+                // the CGB boot ROM sets it for DMG carts (compat mode).
+                if (gbCgbMode && !(gbMemory[0xff6c] & 1)) {
                     if (sprite < spriteNumber)
                         continue;
                 } else {

@@ -18,6 +18,7 @@
 #include "core/gb/gbGfx.h"
 #include "core/gb/gbGlobals.h"
 #include "core/gb/gbMemory.h"
+#include "core/gb/gbPowerOn.h"
 #include "core/gb/gbSGB.h"
 #include "core/gb/gbSound.h"
 #include "core/gba/gbaSound.h"
@@ -643,11 +644,89 @@ static uint64_t gbOamDmaBlockFrom = 0;
 static uint64_t gbOamDmaBlockUntil = 0;
 static int gbOamDmaCopyPending = 0;
 static uint16_t gbOamDmaCopySource = 0;
+static int gbMemAccessCycleAdj = 0;
+// OAM DMA bus conflicts (gambatte oamdma/oamdma_src*_busy*): while the
+// DMA engine owns a bus, a CPU read from an address on that same bus
+// returns the byte the DMA is currently transferring, and a CPU write
+// replaces that in-flight byte (it lands in OAM) without reaching the
+// addressed memory. Buses: external (ROM, cart RAM — plus WRAM/echo on
+// DMG, where WRAM shares the external bus), video (VRAM); on CGB the
+// WRAM bus is separate. Transfer byte i is on the bus during cycle
+// gbOamDmaTransferStart + i.
+static uint64_t gbOamDmaTransferStart = 0;
+static int gbOamDmaSrcBusClass = -1;
+static uint8_t gbOamDmaOverride[0xa0];
+static uint8_t gbOamDmaOverridden[0xa0];
+
+// Bus classification: 0 = external, 1 = video (VRAM), 3 = CGB WRAM,
+// 2 = not on a DMA-shared bus (OAM / IO / HRAM).
+static inline int gbDmaBusClass(uint16_t addr)
+{
+    if (addr < 0x8000) return 0;
+    if (addr < 0xa000) return 1;
+    if (addr < 0xc000) return 0;
+    if (addr < 0xfe00) return gbCgbMode ? 3 : 0;
+    return 2;
+}
+
+// Index of the DMA byte on the bus at effective CPU-access cycle `eff`,
+// or -1 when no transfer is on the bus at that moment.
+static inline int gbOamDmaInflightIndex(void)
+{
+    if (gbOamDmaSrcBusClass < 0)
+        return -1;
+    uint64_t eff = gbCycleCounter - (uint64_t)gbMemAccessCycleAdj;
+    if (eff < gbOamDmaTransferStart || eff >= gbOamDmaBlockUntil)
+        return -1;
+    uint64_t idx = eff - gbOamDmaTransferStart;
+    return idx > 159 ? 159 : (int)idx;
+}
+
+// CPU read conflict: returns true and sets *out when `address` is on
+// the bus the DMA engine currently owns.
+static bool gbOamDmaConflictRead(uint16_t address, uint8_t* out)
+{
+    int idx = gbOamDmaInflightIndex();
+    if (idx < 0 || gbDmaBusClass(address) != gbOamDmaSrcBusClass)
+        return false;
+    uint16_t src = (uint16_t)(gbOamDmaCopySource + idx);
+    if (src >= 0xe000 && src < 0xfe00)
+        src &= ~0x2000;  // echo RAM mirrors WRAM
+    *out = gbMemoryMap[src >> 12][src & 0x0fff];
+    return true;
+}
+
+// CPU write conflict: returns true (write swallowed) when `address` is
+// on the DMA bus; the written value replaces the in-flight byte.
+static bool gbOamDmaConflictWrite(uint16_t address, uint8_t value)
+{
+    int idx = gbOamDmaInflightIndex();
+    if (idx < 0 || gbDmaBusClass(address) != gbOamDmaSrcBusClass)
+        return false;
+    gbOamDmaOverride[idx] = value;
+    gbOamDmaOverridden[idx] = 1;
+    return true;
+}
 // Master-mode serial transfer with no link partner: the transfer
 // completes at the 8th edge of the free-running 8192 Hz serial clock,
 // which is derived from the same divider as DIV — edges align to the
 // reset time, not the SC write (mooneye serial/boot_sclk_align).
 static int gbSerialMasterWait = 0;
+// A CGB speed switch (STOP with KEY1 armed) stalls the CPU for 0x20000
+// T-cycles; the peripherals keep running at the OLD speed and the
+// actual clock switch happens when the stall ends (gambatte
+// speedchange/speedchange*_tima*).
+static int gbSpeedSwitchPending = 0;
+static int gbSpeedSwitchDivCarry = 0;
+// Edge-stepped master transfer (gambatte serial/*): one bit shifts per
+// serial-clock falling edge — SB itself is only committed on reads (see
+// the $FF01 read handler) and at completion, so pipelined sends that
+// rewrite SB mid-transfer are not corrupted. The arriving byte is
+// gbSerialShiftIn (MSB first); the completion IRQ fires on the 8th
+// edge. gbSerialPeriodCycles is 128 (8192 Hz) or 4 (CGB fast clock).
+static uint8_t gbSerialShiftIn = 0xff;
+static int gbSerialEdgesLeft = 0;
+static int gbSerialPeriodCycles = 128;
 // First line after LCD enable: the PPU skips the OAM scan and STAT
 // reads mode 0 until mode 3 begins (mooneye ppu/stat_lyc_onoff,
 // lcdon_timing-GS).
@@ -657,7 +736,6 @@ static inline bool gbLcdOnGlitchActive(void)
 {
     return gbLcdOnGlitchMode0 != 0;
 }
-static int gbMemAccessCycleAdj = 0;
 
 static inline bool gbOamDmaBlocked(void)
 {
@@ -676,6 +754,9 @@ static void gbOamDmaFlushIfDue(void)
         gbOamDmaCopyPending = 0;
     gbLcdOnGlitchMode0 = 0;
         gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
+        for (int i = 0; i < 0xa0; i++)
+            if (gbOamDmaOverridden[i])
+                gbMemory[0xfe00 + i] = gbOamDmaOverride[i];
     }
 }
 
@@ -719,6 +800,14 @@ static void gbTraceStatRaise(const char* src, int fired)
 // behind, sets the IF bit. Not serialized: the window is a single
 // M-cycle, so only a save state captured inside it could lose one IRQ.
 static int gbVblankEndOamIrqPending = 0;
+// DMG-compatibility mode on CGB/AGB hardware: CGB CPU revision, but the
+// CGB-only control registers are locked (set in gbGetHardwareType).
+int gbCgbDmgCompat = 0;
+// True when the CGB-only control registers are reachable.
+static inline bool gbCgbRegsUnlocked(void)
+{
+    return gbCgbMode && !gbCgbDmgCompat;
+}
 // serial
 int gbSerialOn = 0;
 int gbSerialTicks = 0;
@@ -1610,12 +1699,33 @@ static inline void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
     gbOamBugCorrupt(type, 20 - (gbLcdTicks + cyclesBeforeEnd));
 }
 
+// One serial-clock falling edge of an internally-clocked transfer with
+// no link partner: shift a bit into SB; the 8th edge completes the
+// transfer (SC bit 7 clears, serial IF raised).
+static void gbSerialMasterEdge(void)
+{
+    if (--gbSerialEdgesLeft <= 0) {
+        gbSerialMasterWait = 0;
+        gbMemory[0xff01] = gbSerialShiftIn;
+        gbMemory[0xff02] &= 0x7f;
+        gbSerialOn = 0;
+        gbMemory[0xff0f] = register_IF |= 8;
+        gbSerialTicks = 0;
+    }
+}
+
 void gbWriteMemory(uint16_t address, uint8_t value)
 {
     // Lua memory.registerwrite hooks. Pre-write the value Lua sees is
     // the new one; the write itself proceeds as normal afterward.
     if (g_vbam_script_has_write_hooks && g_vbam_script_mem_write)
         g_vbam_script_mem_write(address, 1, value);
+
+    // OAM DMA bus conflict: a write on the bus the DMA engine owns
+    // replaces the in-flight transfer byte and never reaches memory
+    // (nor the MBC).
+    if (address < 0xfe00 && gbOamDmaConflictWrite(address, value))
+        return;
 
     if (address < 0x8000) {
 #ifndef FINAL_VERSION
@@ -1701,6 +1811,11 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     // serial control
     case 0x02: {
         gbSerialOn = (value & 0x80);
+        // Any SC write cancels a pending internally-clocked transfer;
+        // a value with bit 7 and bit 0 set re-arms it below (gambatte
+        // serial/start_wait_stop, start_wait_sc80, start_wait_restart).
+        gbSerialMasterWait = 0;
+        gbSerialEdgesLeft = 0;
 #ifndef NO_LINK
         //trying to detect whether the game has exited multiplay mode, pokemon blue start w/ 0x7e while pocket racing start w/ 0x7c
         if (EmuReseted || (gbMemory[0xff02] & 0x7c) || (value & 0x7c) || (!(value & 0x81))) {
@@ -1725,16 +1840,38 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                     // embedder's serial hook) happens now so rapid
                     // back-to-back sends all get captured; only the
                     // completion (SC bit 7 clear + IF) is timed.
+                    // The exchanged byte is fetched up front (so the
+                    // embedder's serial hook sees every send), but SB
+                    // shifts it in bit by bit at each serial-clock
+                    // falling edge.
                     if (gbSerialFunction) {
                         gbSIO_SC = value;
-                        gbMemory[0xff01] = gbSerialFunction(gbMemory[0xff01]);
+                        gbSerialShiftIn = gbSerialFunction(gbMemory[0xff01]);
                     } else
-                        gbMemory[0xff01] = 0xff;
-                    uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
-                    uint64_t edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
-                    while (edge <= gbCycleCounter)
-                        edge += 128;
-                    gbSerialTicks = (int)((edge + 7 * 128 - 1) - gbCycleCounter);
+                        gbSerialShiftIn = 0xff;
+                    gbSerialEdgesLeft = 8;
+                    gbSerialPeriodCycles =
+                        (gbCgbRegsUnlocked() && (value & 2)) ? 4 : 128;
+                    uint64_t edge;
+                    if (gbSerialPeriodCycles == 128) {
+                        // 8192 Hz: falling edge where DIV increments to
+                        // an even value (mooneye serial/boot_sclk_align).
+                        uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
+                        edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
+                        while (edge <= gbCycleCounter)
+                            edge += 128;
+                    } else {
+                        // 262144 Hz fast clock: every 4 cycles, aligned
+                        // to the same divider.
+                        int p = (int)(64 - gbDivTicks) & 3;
+                        int delta = (4 - p) & 3;
+                        if (delta == 0)
+                            delta = 4;
+                        edge = gbCycleCounter + (uint64_t)delta;
+                    }
+                    gbSerialTicks = (int)(edge - gbCycleCounter) - 1;
+                    if (gbSerialTicks <= 0)
+                        gbSerialTicks = 1;
                     gbSerialMasterWait = 1;
                 } else {
                     if (gbSerialFunction) {
@@ -1761,11 +1898,26 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         if (gbSerialOn) {
             gbSerialTicks = GBSERIAL_CLOCK_TICKS;
             if (value & 1) {
-                uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
-                uint64_t edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
-                while (edge <= gbCycleCounter)
-                    edge += 128;
-                gbSerialTicks = (int)((edge + 7 * 128 - 1) - gbCycleCounter);
+                gbSerialShiftIn = 0xff;
+                gbSerialEdgesLeft = 8;
+                gbSerialPeriodCycles =
+                    (gbCgbRegsUnlocked() && (value & 2)) ? 4 : 128;
+                uint64_t edge;
+                if (gbSerialPeriodCycles == 128) {
+                    uint64_t nextIncr = gbCycleCounter + (uint64_t)gbDivTicks;
+                    edge = (((register_DIV + 1) & 1) == 0) ? nextIncr : nextIncr + 64;
+                    while (edge <= gbCycleCounter)
+                        edge += 128;
+                } else {
+                    int p = (int)(64 - gbDivTicks) & 3;
+                    int delta = (4 - p) & 3;
+                    if (delta == 0)
+                        delta = 4;
+                    edge = gbCycleCounter + (uint64_t)delta;
+                }
+                gbSerialTicks = (int)(edge - gbCycleCounter) - 1;
+                if (gbSerialTicks <= 0)
+                    gbSerialTicks = 1;
                 gbSerialMasterWait = 1;
             }
         }
@@ -1777,6 +1929,24 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     case 0x04: {
         // DIV register resets on any write
         // (not totally perfect, but better than nothing)
+        //
+        // The serial clock is derived from the same divider: if its
+        // output is high when DIV is written, the reset produces a
+        // falling edge and an internally-clocked transfer shifts one
+        // bit immediately; afterwards its edges realign to the reset
+        // (gambatte serial/start_late_div_write_wait_read_if*).
+        if (gbSerialMasterWait) {
+            bool bit_high;
+            if (gbSerialPeriodCycles == 128) {
+                bit_high = (register_DIV & 1) != 0;
+            } else {
+                bit_high = (((64 - gbDivTicks) & 3) >= 2);
+            }
+            if (bit_high)
+                gbSerialMasterEdge();
+            if (gbSerialMasterWait)
+                gbSerialTicks = gbSerialPeriodCycles - 1;
+        }
         gbMemory[0xff04] = register_DIV = 0;
         gbDivTicks = GBDIV_CLOCK_TICKS;
         // Another weird timer 'bug' :
@@ -1966,7 +2136,11 @@ void gbWriteMemory(uint16_t address, uint8_t value)
         gbMemory[0xff40] = register_LCDC = value;
 
         if (lcdChange) {
-            if ((value & 0x80) && (!register_LCDCBusy)) {
+            // Re-enabling works immediately, even right after a
+            // disable (gambatte enable_display/frame0_*; the old
+            // register_LCDCBusy lockout left the LCD off entirely
+            // when a game toggled it off/on back-to-back).
+            if (value & 0x80) {
 
                 //  if (!gbWhiteScreen && !gbSgbMask)
 
@@ -2157,9 +2331,15 @@ void gbWriteMemory(uint16_t address, uint8_t value)
             gbOamDmaCopyPending = 0;
     gbLcdOnGlitchMode0 = 0;
             gbCopyMemory(0xfe00, gbOamDmaCopySource, 0xa0);
+            for (int i = 0; i < 0xa0; i++)
+                if (gbOamDmaOverridden[i])
+                    gbMemory[0xfe00 + i] = gbOamDmaOverride[i];
         }
         gbOamDmaCopyPending = 1;
         gbOamDmaCopySource = (uint16_t)source;
+        gbOamDmaTransferStart = gbCycleCounter + 2;
+        gbOamDmaSrcBusClass = gbDmaBusClass((uint16_t)source);
+        memset(gbOamDmaOverridden, 0, sizeof(gbOamDmaOverridden));
 
         // OAM is blocked for access-completion cycles [W+2, W+162).
         // A restart during an active window keeps the earlier start
@@ -2271,7 +2451,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // KEY1
     case 0x4d: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             gbMemory[0xff4d] = (gbMemory[0xff4d] & 0x80) | (value & 1) | 0x7e;
             return;
         }
@@ -2279,7 +2459,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // VBK
     case 0x4f: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             value = value & 1;
             if (value == gbVramBank)
                 return;
@@ -2307,7 +2487,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // HDMA1
     case 0x51: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             if (value > 0x7f && value < 0xa0)
                 value = 0;
 
@@ -2320,7 +2500,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // HDMA2
     case 0x52: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             value = value & 0xf0;
 
             gbHdmaSource = (gbHdmaSource & 0xff00) | (value);
@@ -2332,7 +2512,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // HDMA3
     case 0x53: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             value = value & 0x1f;
             gbHdmaDestination = (value << 8) | (gbHdmaDestination & 0xf0);
             gbHdmaDestination |= 0x8000;
@@ -2343,7 +2523,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // HDMA4
     case 0x54: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             value = value & 0xf0;
             gbHdmaDestination = (gbHdmaDestination & 0x1f00) | value;
             gbHdmaDestination |= 0x8000;
@@ -2355,7 +2535,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     // HDMA5
     case 0x55: {
 
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             gbHdmaBytes = 16 + (value & 0x7f) * 16;
             if (gbHdmaOn) {
                 if (value & 0x80) {
@@ -2399,7 +2579,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // BCPS
     case 0x68: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             int paletteIndex = (value & 0x3f) >> 1;
             int paletteHiLo = (value & 0x01);
 
@@ -2412,7 +2592,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // BCPD
     case 0x69: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             int v = gbMemory[0xff68];
             int paletteIndex = (v & 0x3f) >> 1;
             int paletteHiLo = (v & 0x01);
@@ -2434,7 +2614,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // OCPS
     case 0x6a: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             int paletteIndex = (value & 0x3f) >> 1;
             int paletteHiLo = (value & 0x01);
 
@@ -2450,7 +2630,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     // OCPD
     case 0x6b: {
 
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             int v = gbMemory[0xff6a];
             int paletteIndex = (v & 0x3f) >> 1;
             int paletteHiLo = (v & 0x01);
@@ -2480,7 +2660,7 @@ void gbWriteMemory(uint16_t address, uint8_t value)
 
     // SVBK
     case 0x70: {
-        if (gbCgbMode) {
+        if (gbCgbRegsUnlocked()) {
             value = value & 7;
 
             int bank = value;
@@ -2531,6 +2711,14 @@ uint8_t gbReadMemory(uint16_t address)
 
     if (gbCheatMap[address])
         return gbCheatRead(address);
+
+    // OAM DMA bus conflict: a read on the bus the DMA engine owns
+    // returns the in-flight transfer byte.
+    if (address < 0xfe00) {
+        uint8_t v;
+        if (gbOamDmaConflictRead(address, &v))
+            return v;
+    }
 
     if (address < 0x8000) {
         // Update cart bus with value read from ROM
@@ -2757,13 +2945,23 @@ uint8_t gbReadMemory(uint16_t address)
             gbMemory[0xff00] = static_cast<uint8_t>(b);
             }
             return static_cast<uint8_t>(gbMemory[0xff00]);
-        case 0x01:
+        case 0x01: {
+            // Mid-transfer, SB has shifted (8 - edges-left) bits out,
+            // with the partner's bits (MSB first) shifted in.
+            if (gbSerialMasterWait && gbSerialEdgesLeft < 8 &&
+                gbSerialEdgesLeft > 0) {
+                int n = 8 - gbSerialEdgesLeft;
+                return (uint8_t)((gbMemory[0xff01] << n) |
+                                 (gbSerialShiftIn >> (8 - n)));
+            }
             return gbMemory[0xff01];
+        }
         case 0x02:
             // SC (serial control): bits 2-6 read as 1 (open-bus). On
-            // CGB also bit 1 is the shift-clock-speed bit; on DMG
+            // CGB also bit 1 is the shift-clock-speed bit; on DMG —
+            // and in DMG-compat mode on a CGB (mooneye unused_hwio-C) —
             // bit 1 is unused (reads 1). Bits 0,7 are real control bits.
-            if (gbCgbMode || (gbHardware & 2))
+            if (gbCgbRegsUnlocked())
                 return (uint8_t)(0x7c | (gbMemory[0xff02] & 0x83));
             return (uint8_t)(0x7e | (gbMemory[0xff02] & 0x81));
         case 0x03:
@@ -2874,6 +3072,11 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x43:
             return register_SCX;
         case 0x44:
+            if (getenv("VBAM_TRACE_LYREAD"))
+                fprintf(stderr, "[lyread] cyc=%llu LY=%d mode=%d lcdTicks=%d incrTicks=%d LCDC=%02X\n",
+                        (unsigned long long)gbCycleCounter, register_LY,
+                        gbLcdMode, gbLcdTicks, gbLcdLYIncrementTicks,
+                        register_LCDC);
             if (((gbHardware & 7) && ((gbLcdMode == 1) && (gbLcdTicks == 0x71))) || (!(register_LCDC & 0x80)))
                     return 0;
             else
@@ -2889,38 +3092,44 @@ uint8_t gbReadMemory(uint16_t address)
             case 0x4c:
                 return 0xff;
         case 0x4f:
+            // VBK reads back even in DMG-compat mode on a CGB ($FE, the
+            // bank latch stuck at 0 — mooneye boot_hwio-C); only the
+            // write is locked there.
             if (gbCgbMode)
                 return (0xfe | register_VBK);
             break;
         case 0x51:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return register_HDMA1;
             break;
         case 0x52:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return register_HDMA2;
             break;
         case 0x53:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return register_HDMA3;
             break;
         case 0x54:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return register_HDMA4;
             break;
         case 0x55:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return register_HDMA5;
             break;
         case 0x68:
         case 0x6a:
+            // BCPS/OCPS read back even in DMG-compat mode on a CGB
+            // (mooneye boot_hwio-C sees the boot ROM's parting values);
+            // only the writes are locked there.
             if (gbCgbMode)
                 return (0x40 | gbMemory[address]);
             else
                 return 0xff;
         case 0x69:
         case 0x6b:
-            if (gbCgbMode) {
+            if (gbCgbRegsUnlocked()) {
                 if (gbCgbPaletteAccessValid())
                     return (gbMemory[address]);
                 else
@@ -2928,7 +3137,7 @@ uint8_t gbReadMemory(uint16_t address)
             } else
                 return 0xff;
         case 0x70:
-            if (gbCgbMode)
+            if (gbCgbRegsUnlocked())
                 return (0xf8 | register_SVBK);
             else
                 return 0xff;
@@ -2942,12 +3151,22 @@ uint8_t gbReadMemory(uint16_t address)
         // the broader catch-all from $FF00-$FF7F broke 0x47/0x48/0x49
         // (BGP/OBP0/OBP1) and other writable-but-not-switched regs.
         const uint8_t lo = address & 0xff;
+        // CGB-revision CPU extras exist in every mode, including the
+        // DMG-compat mode on CGB/AGB (mooneye misc/bits/unused_hwio-C).
+        if (gbHardware & 0xa) {
+            if (lo == 0x72 || lo == 0x73)
+                return gbMemory[address];
+            if (lo == 0x75)
+                return 0x8f | gbMemory[address];
+            if (lo == 0x76 || lo == 0x77)
+                return 0x00;  // PCM12 / PCM34 with all channels silent
+        }
         if (lo == 0x03 ||                          // unused (between SC and DIV)
             (lo >= 0x08 && lo <= 0x0e) ||          // unused
             lo == 0x15 ||                          // unused (between NR12 and NR13)
             lo == 0x1f ||                          // unused
             (lo >= 0x27 && lo <= 0x2f) ||          // unused
-            (lo >= 0x4c && lo <= 0x7f && !gbCgbMode) ||
+            (lo >= 0x4c && lo <= 0x7f && !gbCgbRegsUnlocked()) ||
             (lo >= 0x57 && lo <= 0x67) ||          // unused
             (lo >= 0x6c && lo <= 0x6f) ||          // unused
             lo == 0x71 ||                          // unused
@@ -2966,6 +3185,10 @@ uint8_t gbReadMemory(uint16_t address)
         return 0xff;
 
     if ((address >= 0xfea0) && (address < 0xff00)) {
+        // The whole $FExx page reads $FF while an OAM DMA is in flight
+        // (gambatte oamdma_src*_busypopFE9F / busypopFEFF).
+        if (gbOamDmaBlocked())
+            return 0xff;
         if (gbHardware & 1)
             return ((((address + ((address >> 4) - 0xfea)) >> 2) & 1) ? 0x00 : 0xff);
         else if (gbHardware & 2)
@@ -3073,7 +3296,6 @@ void gbSpeedSwitch()
         if (gbHardware & 8)
             gbLine99Ticks++;
     }
-    gbDmaTicks += (134) * GBLY_INCREMENT_CLOCK_TICKS + (37 << (gbSpeed ? 1 : 0));
 }
 
 bool CPUIsGBBios(const char* file)
@@ -3137,6 +3359,13 @@ void gbGetHardwareType()
         gbCgbMode = true;
     }
 
+    // A cartridge without CGB support forced onto CGB/AGB hardware runs
+    // in DMG-compatibility mode: the boot ROM locks the CGB-only control
+    // registers (KEY1, VBK, HDMA, BCPS/BCPD, OCPS/OCPD, OPRI, SVBK read
+    // back $FF and writes are ignored), while the CGB-revision CPU
+    // extras ($FF72-$FF77) stay visible (mooneye misc/bits/unused_hwio-C).
+    gbCgbDmgCompat = (gbCgbMode && !g_gbCartData.SupportsCGB()) ? 1 : 0;
+
     // Also allow SGB-on-CGB dual mode for hybrid carts when borders are
     // enabled (forced on, or automatic), so the game ships its border
     // setup packets. The captured guard makes this fire only on initial
@@ -3199,6 +3428,13 @@ static void gbSelectColorizationPalette()
     }
     uint8_t palette = gbColorizationPaletteInfo[infoIdx] & 0x1F;
     uint8_t flags = (gbColorizationPaletteInfo[infoIdx] & 0xE0) >> 5;
+
+    // Titles whose checksum is not in the boot ROM's table get the
+    // default combo: OBP0 = OBP1 = triplet[0] (reds), BGP = triplet[2]
+    // (greens/blues) — flag value 7 encodes exactly that below
+    // (mooneye sprite_priority-cgb.png, dmg-acid2-cgb.png).
+    if (infoIdx == 0)
+        flags = 7;
 
     // Normally the first palette is used as OBP0.
     // If bit 0 is zero, the third palette is used instead.
@@ -3303,16 +3539,10 @@ void gbReset()
     // Karamuchou ha Oosawagi!.
     if (gbMemory != NULL) {
         memset(gbMemory, 0xff, 65536);
-        for (int temp = 0xC000; temp < 0xE000; temp++)
-            if ((temp & 0x8) ^ ((temp & 0x800) >> 8)) {
-                if ((gbHardware & 0x02) && (gbGBCColorType == 0))
-                    gbMemory[temp] = 0x0;
-                else
-                    gbMemory[temp] = 0x0f;
-            }
-
-            else
-                gbMemory[temp] = 0xff;
+        // Accurate DMG power-on WRAM pattern (gambatte hardware dumps);
+        // for CGB/AGB the gbWram fill below is mirrored into this
+        // window instead.
+        gbPowerOnWramDmg(&gbMemory[0xc000]);
     }
 
     if (gbSpeed) {
@@ -3320,10 +3550,11 @@ void gbReset()
         gbMemory[0xff4d] = 0;
     }
 
-    // GB bios set this memory area to 0
-    // Fixes Pitman (J) title screen
-    if (gbHardware & 0x1) {
-        memset(&gbMemory[0x8000], 0x0, 0x2000);
+    // Post-boot VRAM: zeros plus the Nintendo logo tiles/tile map the
+    // boot ROM leaves behind (also fixes Pitman (J) title screen,
+    // which relied on cleared VRAM).
+    if (gbHardware & 0x5) {
+        gbPowerOnVram(&gbMemory[0x8000], false, 0x2000);
     }
 
     // clean LineBuffer
@@ -3335,9 +3566,9 @@ void gbReset()
         free(g_pix);
         g_pix = (uint8_t *)malloc(kGBPixSize);
     }
-    // clean Vram
+    // Post-boot VRAM: zeros plus the boot ROM's Nintendo logo tiles.
     if (gbVram != NULL) {
-        memset(gbVram, 0, kGBVRamSize);
+        gbPowerOnVram(gbVram, true, kGBVRamSize);
     }
     // clean Wram 2
     // This kinda emulates the startup state of Wram on GBC (not very accurate,
@@ -3347,9 +3578,11 @@ void gbReset()
     // The starting data are important for some 'buggy' games, like Buster Brothers or
     // Karamuchou ha Oosawagi!
     if (gbWram != NULL) {
-        for (int i = 0; i < 8; i++)
-            if (i != 2)
-                memcpy((uint16_t*)(gbWram + i * 0x1000), (uint16_t*)(gbMemory + 0xC000), 0x1000);
+        // Accurate CGB power-on WRAM pattern (gambatte hardware dumps),
+        // mirrored into the fixed $C000/$D000 window.
+        gbPowerOnWramCgb(gbWram);
+        memcpy(gbMemory + 0xc000, gbWram, 0x1000);
+        memcpy(gbMemory + 0xd000, gbWram + 0x1000, 0x1000);
     }
 
     memset(gbSCYLine, 0, sizeof(gbSCYLine));
@@ -3413,11 +3646,15 @@ void gbReset()
     else
         gbMemory[0xff02] = 0x7e;
 
-    // Post-boot P1: on DMG both button-group selectors are low (reads
-    // $CF); the SGB boot ROM leaves them high (reads $FF). SB is $00
-    // on both (mooneye boot_hwio).
-    gbMemory[0xff00] = (gbHardware & 4) ? 0xff : 0xcf;
+    // Post-boot P1: on DMG/MGB both button-group selectors are low
+    // (reads $CF); the SGB and CGB/AGB boot ROMs leave them high (reads
+    // $FF — mooneye boot_hwio, boot_hwio-C). SB is $00 on all.
+    gbMemory[0xff00] = (gbHardware & 0xe) ? 0xff : 0xcf;
     gbMemory[0xff01] = 0x00;
+    // CGB-revision CPU extras come up cleared (mooneye boot_hwio-C).
+    gbMemory[0xff72] = 0x00;
+    gbMemory[0xff73] = 0x00;
+    gbMemory[0xff75] = 0x00;
 
     gbMemory[0xff03] = 0xff;
     int i;
@@ -3500,8 +3737,11 @@ void gbReset()
         HL.W = 0x000d;
 
         register_HDMA5 = 0xff;
-        gbMemory[0xff68] = 0xc0;
-        gbMemory[0xff6a] = 0xc0;
+        // The CGB boot ROM leaves the palette-index registers with the
+        // auto-increment bit set, pointing one past the last entry it
+        // wrote (reads $C8/$D0 — mooneye misc/boot_hwio-C).
+        gbMemory[0xff68] = 0x88;
+        gbMemory[0xff6a] = 0x90;
 
         gbMemory[0xff41] = register_STAT = 0x81;
         gbLcdMode = 1;
@@ -4888,8 +5128,18 @@ void gbEmulate(int ticksToStop)
         soundTicks += clockTicks;
          if (!gbSpeed) soundTicks += clockTicks;
 
+        // During a double-speed speed-switch stall the divider chain
+        // (DIV / TIMA) is clocked at the base 4 MHz rate — half the
+        // double-speed tick rate (gambatte speedchange2_tima*).
+        int divClockTicks = clockTicks;
+        if (gbSpeedSwitchPending && gbSpeed) {
+            gbSpeedSwitchDivCarry += clockTicks;
+            divClockTicks = gbSpeedSwitchDivCarry >> 1;
+            gbSpeedSwitchDivCarry &= 1;
+        }
+
         // DIV register emulation
-        gbDivTicks -= clockTicks;
+        gbDivTicks -= divClockTicks;
         while (gbDivTicks <= 0) {
             gbMemory[0xff04] = ++register_DIV;
             gbDivTicks += GBDIV_CLOCK_TICKS;
@@ -5058,11 +5308,42 @@ void gbEmulate(int ticksToStop)
                         // same OAM state.
                         gbOamDmaFlushIfDue();
                         memcpy(gbOAMLatch, &gbMemory[0xfe00], 0xa0);
+                        // While an OAM DMA transfer is in flight the
+                        // PPU's OAM scan reads $FF, so those sprite
+                        // slots vanish for this line; slots scanned
+                        // after the transfer completes (mode 2 scans 2
+                        // slots per M-cycle) see the freshly copied
+                        // bytes, and slots scanned before a transfer
+                        // that starts mid-scan still see the old
+                        // content (strikethrough.gb, gambatte
+                        // oamdma/late_sp*).
+                        if (gbOamDmaBlocked()) {
+                            for (int slot = 0; slot < 40; ++slot) {
+                                uint64_t scan =
+                                    gbCycleCounter + (uint64_t)(slot >> 1);
+                                if (scan < gbOamDmaBlockUntil) {
+                                    memset(gbOAMLatch + slot * 4, 0xff, 4);
+                                } else if (gbOamDmaCopyPending) {
+                                    for (int b = 0; b < 4; ++b) {
+                                        uint16_t src =
+                                            (uint16_t)(gbOamDmaCopySource +
+                                                       slot * 4 + b);
+                                        if (src >= 0xe000 && src < 0xfe00)
+                                            src &= ~0x2000;
+                                        gbOAMLatch[slot * 4 + b] =
+                                            gbOamDmaOverridden[slot * 4 + b]
+                                                ? gbOamDmaOverride[slot * 4 + b]
+                                                : gbMemoryMap[src >> 12]
+                                                             [src & 0x0fff];
+                                    }
+                                }
+                            }
+                        }
                         if ((gbScreenOn) && (register_LCDC & 0x80)) {
                             gbDrawSprites(false);
                             // Used to add a one tick delay when a window line is drawn.
                             //(fixes a part of Carmaggedon problem)
-                            if ((register_LCDC & 0x01 || gbCgbMode) && (register_LCDC & 0x20) && (gbWindowLine != -2)) {
+                            if ((register_LCDC & 0x01 || (gbCgbMode && !(gbMemory[0xff6c] & 1))) && (register_LCDC & 0x20) && (gbWindowLine != -2)) {
 
                                 int tempinUseRegister_WY = inUseRegister_WY;
                                 int tempgbWindowLine = gbWindowLine;
@@ -5449,12 +5730,10 @@ void gbEmulate(int ticksToStop)
         gbSerialOn = (gbMemory[0xff02] & 0x80);
         if (gbSerialMasterWait) {
             gbSerialTicks -= clockTicks;
-            if (gbSerialTicks <= 0) {
-                gbSerialMasterWait = 0;
-                gbMemory[0xff02] &= 0x7f;
-                gbSerialOn = 0;
-                gbMemory[0xff0f] = register_IF |= 8;
-                gbSerialTicks = 0;
+            while (gbSerialMasterWait && gbSerialTicks <= 0) {
+                gbSerialMasterEdge();
+                if (gbSerialMasterWait)
+                    gbSerialTicks += gbSerialPeriodCycles;
             }
         } else {
         static int SIOctr = 0;
@@ -5546,13 +5825,10 @@ void gbEmulate(int ticksToStop)
 #else
         if (gbSerialMasterWait) {
             gbSerialTicks -= clockTicks;
-            if (gbSerialTicks <= 0) {
-                gbSerialMasterWait = 0;
-                gbMemory[0xff01] = 0xff;
-                gbMemory[0xff02] &= 0x7f;
-                gbSerialOn = 0;
-                gbMemory[0xff0f] = register_IF |= 8;
-                gbSerialTicks = 0;
+            while (gbSerialMasterWait && gbSerialTicks <= 0) {
+                gbSerialMasterEdge();
+                if (gbSerialMasterWait)
+                    gbSerialTicks += gbSerialPeriodCycles;
             }
         }
         static int SIOctr = 0;
@@ -5600,7 +5876,7 @@ void gbEmulate(int ticksToStop)
                 gbTimaReloadAppliedCycle = gbTimaReloadCycle;
             }
 
-            gbTimerTicks = ((gbInternalTimer)&gbTimerMask[gbTimerMode]) + 1 - clockTicks;
+            gbTimerTicks = ((gbInternalTimer)&gbTimerMask[gbTimerMode]) + 1 - divClockTicks;
 
             // Cycle of the first prescaler boundary inside this lump.
             uint64_t bcyc = gbCycleCounter - (uint64_t)clockTicks
@@ -5638,7 +5914,7 @@ void gbEmulate(int ticksToStop)
             gbMemory[0xff05] = register_TIMA;
         }
 
-        gbInternalTimer -= clockTicks;
+        gbInternalTimer -= divClockTicks;
         while (gbInternalTimer < 0)
             gbInternalTimer += 0x100;
 
@@ -5685,6 +5961,14 @@ void gbEmulate(int ticksToStop)
                 gbDmaTicks += clockTicks;
                 clockTicks = 0;
             }
+        }
+
+        // A pending speed switch takes effect once its stall has fully
+        // elapsed (the peripherals ran at the old speed throughout).
+        if (gbSpeedSwitchPending && !gbDmaTicks) {
+            gbSpeedSwitchPending = 0;
+            gbSpeedSwitch();
+            gbMemory[0xff4d] = (uint8_t)(0x7e | (gbSpeed << 7));
         }
 
         if (gbDmaTicks) {

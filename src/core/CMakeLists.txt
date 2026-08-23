@@ -22,6 +22,7 @@ target_sources(vbam-core
     gb/gbGfx.cpp
     gb/gbGlobals.cpp
     gb/gbMemory.cpp
+    gb/gbPowerOn.cpp
     gb/gbPrinter.cpp
     gb/gbSGB.cpp
     gb/gbSound.cpp
