@@ -1,6 +1,6 @@
 #include "wx/widgets/keyboard-input-handler.h"
 
-#include <algorithm>
+#include <unordered_set>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -52,17 +52,20 @@ protected:
 
     // Net effect on the sink: inputs left pressed with no matching release.
     // Anything in here after a key sequence has finished is a stuck button.
+    //
+    // Accumulated in a set rather than a vector: config::UserInput has const
+    // members, so it is copy-constructible but not assignable, which rules out
+    // the erase-remove idiom.
     std::vector<config::UserInput> StillHeld() {
-        std::vector<config::UserInput> held;
+        std::unordered_set<config::UserInput> held;
         for (const auto& data : sink_data_) {
             if (data.pressed) {
-                held.push_back(data.input);
+                held.insert(data.input);
             } else {
-                held.erase(std::remove(held.begin(), held.end(), data.input),
-                           held.end());
+                held.erase(data.input);
             }
         }
-        return held;
+        return std::vector<config::UserInput>(held.begin(), held.end());
     }
 
     // Track modifier state for creating realistic test events
