@@ -45,26 +45,25 @@
 // scribbltests, ...). vbam-core only compiles the stb_image_write
 // implementation (image_util.cpp), so compile the reader privately here.
 //
-// STB_IMAGE_STATIC gives every function in the header internal linkage, and
-// this runner calls only stbi_load, so the rest are unreferenced. That is the
-// intended way to use the header, but the compiler cannot know it: MSVC warns
-// C4505 for each one and /WX turns those into errors, and GCC and Clang have
-// the same complaint under -Wunused-function. Silence it around the include
-// only, so the rest of the file keeps its warning level.
 #define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #ifdef _MSC_VER
 #pragma warning(push)
-// 'function': unreferenced function with internal linkage has been removed
 #pragma warning(disable : 4505)
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
 #include <stb/stb_image.h>
 #ifdef _MSC_VER
 #pragma warning(pop)
-#elif defined(__GNUC__) || defined(__clang__)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
 
