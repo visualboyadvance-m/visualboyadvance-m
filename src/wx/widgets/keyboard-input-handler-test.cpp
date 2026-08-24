@@ -37,7 +37,12 @@ protected:
     // Processes `key_event` and returns the data from the generated events.
     std::vector<UserInputEvent::Data> ProcessKeyEvent(wxKeyEvent key_event) {
         handler_.ProcessKeyEvent(key_event);
-        ProcessPendingEvents();
+        // Only dispatch if something was queued: a key event that changes
+        // nothing -- the auto-repeat of a key already held, say -- produces no
+        // event, and ProcessPendingEvents() asserts on an empty queue.
+        if (wxTheApp && wxTheApp->HasPendingEvents()) {
+            ProcessPendingEvents();
+        }
         std::vector<UserInputEvent::Data> data;
         std::swap(data, pending_data_);
         return data;
