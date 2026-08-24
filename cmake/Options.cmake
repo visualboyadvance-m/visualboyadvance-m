@@ -156,11 +156,47 @@ if(NOT VBAM_NEED_SDL)
     set(SDL2_FOUND  OFF)
     set(ENABLE_SDL3 OFF)
 elseif(ANDROID)
-    # The NDK ships SDL3 in a multi-arch sysroot, but its CMake package config
-    # points at a non-existent single-arch "<prefix>/lib/libSDL3.so", so
-    # find_package(SDL3) fails its import check. Build the imported target by
-    # hand from the real per-ABI sysroot paths (headers + libSDL3.so) instead.
-    if(NOT TARGET SDL3::SDL3)
+    # SDL3 for Android is resolved from, in order of precedence:
+    #
+    #   1. VBAM_ANDROID_SDL3_PREFIX, a custom/patched SDL3 install -- this is
+    #      how external-native-window video support is supplied (see
+    #      SDL_SetAndroidExternalWindow).
+    #   2. A working CMake package config, which is what the vcpkg sdl3 port
+    #      installs for the *-android triplets. This is the normal case.
+    #   3. The NDK sysroot. NDK r29 vendored SDL3 in a multi-arch sysroot, but
+    #      its package config points at a non-existent single-arch
+    #      "<prefix>/lib/libSDL3.so" and so fails find_package()'s import check;
+    #      the target has to be built by hand from the real per-ABI paths.
+    #      Later NDKs ship no SDL3 at all, so this step usually finds nothing.
+    set(VBAM_ANDROID_SDL3_PREFIX "" CACHE PATH
+        "Prefix of a custom/patched SDL3 install for Android (lib/libSDL3.so + include)")
+
+    unset(_vbam_sdl3_lib)
+    unset(_vbam_sdl3_inc)
+
+    if(VBAM_ANDROID_SDL3_PREFIX AND NOT TARGET SDL3::SDL3)
+        foreach(_vbam_sdl3_suffix .so .a)
+            if(EXISTS "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3${_vbam_sdl3_suffix}")
+                set(_vbam_sdl3_lib "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3${_vbam_sdl3_suffix}")
+                set(_vbam_sdl3_inc "${VBAM_ANDROID_SDL3_PREFIX}/include")
+                break()
+            endif()
+        endforeach()
+
+        if(_vbam_sdl3_lib)
+            message(STATUS "Using custom Android SDL3 from ${VBAM_ANDROID_SDL3_PREFIX}")
+        else()
+            message(FATAL_ERROR
+                "VBAM_ANDROID_SDL3_PREFIX is set to ${VBAM_ANDROID_SDL3_PREFIX}, which "
+                "has neither lib/libSDL3.so nor lib/libSDL3.a")
+        endif()
+    endif()
+
+    if(NOT _vbam_sdl3_lib AND NOT TARGET SDL3::SDL3)
+        find_package(SDL3 QUIET)
+    endif()
+
+    if(NOT _vbam_sdl3_lib AND NOT TARGET SDL3::SDL3)
         if(DEFINED CMAKE_LIBRARY_ARCHITECTURE AND CMAKE_LIBRARY_ARCHITECTURE)
             set(_vbam_android_triple "${CMAKE_LIBRARY_ARCHITECTURE}")
         elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "riscv64")
@@ -174,30 +210,18 @@ elseif(ANDROID)
         elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86")
             set(_vbam_android_triple "i686-linux-android")
         else()
-            message(FATAL_ERROR "Unsupported Android ABI for SDL3: ${CMAKE_ANDROID_ARCH_ABI}")
+            set(_vbam_android_triple "")
         endif()
 
-        # A custom-built (patched) SDL3 prefix takes precedence over the NDK's
-        # vendored SDL3 -- this is how the external-native-window video support is
-        # supplied (see SDL_SetAndroidExternalWindow). Point at its lib + headers.
-        set(VBAM_ANDROID_SDL3_PREFIX "" CACHE PATH
-            "Prefix of a custom/patched SDL3 install for Android (lib/libSDL3.so + include)")
-        if(VBAM_ANDROID_SDL3_PREFIX AND EXISTS "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.so")
-            set(_vbam_sdl3_lib "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.so")
-            set(_vbam_sdl3_inc "${VBAM_ANDROID_SDL3_PREFIX}/include")
-            message(STATUS "Using custom Android SDL3 from ${VBAM_ANDROID_SDL3_PREFIX}")
-        elseif(VBAM_ANDROID_SDL3_PREFIX AND EXISTS "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.a")
-            set(_vbam_sdl3_lib "${VBAM_ANDROID_SDL3_PREFIX}/lib/libSDL3.a")
-            set(_vbam_sdl3_inc "${VBAM_ANDROID_SDL3_PREFIX}/include")
-            message(STATUS "Using custom Android SDL3 from ${VBAM_ANDROID_SDL3_PREFIX}")
-        else()
+        if(_vbam_android_triple AND
+                EXISTS "${CMAKE_SYSROOT}/usr/lib/${_vbam_android_triple}/libSDL3.so")
             set(_vbam_sdl3_lib "${CMAKE_SYSROOT}/usr/lib/${_vbam_android_triple}/libSDL3.so")
             set(_vbam_sdl3_inc "${CMAKE_SYSROOT}/usr/include")
+            message(STATUS "Using the SDL3 vendored in the NDK sysroot: ${_vbam_sdl3_lib}")
         endif()
-        if(NOT EXISTS "${_vbam_sdl3_lib}")
-            message(FATAL_ERROR "SDL3 not found: ${_vbam_sdl3_lib}")
-        endif()
+    endif()
 
+    if(_vbam_sdl3_lib)
         # Import as STATIC or SHARED according to what was actually resolved; a
         # static archive imported as SHARED makes CMake treat it as a runtime
         # dependency (and confuses install/deploy logic).
@@ -209,18 +233,40 @@ elseif(ANDROID)
         set_target_properties(SDL3::SDL3 PROPERTIES
             IMPORTED_LOCATION "${_vbam_sdl3_lib}"
             INTERFACE_INCLUDE_DIRECTORIES "${_vbam_sdl3_inc}")
-        # Stash the resolved .so path so the wx target can hand it to
-        # androiddeployqt (QT_ANDROID_EXTRA_LIBS) without a $<TARGET_FILE> genex,
-        # whose "::" target name breaks Qt's deployment-settings parser.
-        # androiddeployqt only accepts "lib*.so" there and hard-errors on
-        # anything else, so a statically linked SDL3 must not be listed: it is
-        # already inside the app's own module .so and needs no bundling.
-        if(_vbam_sdl3_lib MATCHES "\\.a$")
-            set(VBAM_SDL3_ANDROID_LIB "" CACHE INTERNAL "SDL3 .so to bundle in the APK")
-        else()
-            set(VBAM_SDL3_ANDROID_LIB "${_vbam_sdl3_lib}" CACHE INTERNAL "SDL3 .so to bundle in the APK")
-        endif()
     endif()
+
+    if(NOT TARGET SDL3::SDL3)
+        message(FATAL_ERROR
+            "SDL3 not found for Android ABI ${CMAKE_ANDROID_ARCH_ABI}. Install the "
+            "vcpkg sdl3 port for this triplet, or set VBAM_ANDROID_SDL3_PREFIX to an "
+            "SDL3 install providing lib/libSDL3.so (or .a) and include/SDL3.")
+    endif()
+
+    # Stash the SDL3 .so the APK has to carry, so the wx target can hand it to
+    # androiddeployqt (QT_ANDROID_EXTRA_LIBS) without a $<TARGET_FILE> genex,
+    # whose "::" target name breaks Qt's deployment-settings parser.
+    # androiddeployqt only accepts "lib*.so" there and hard-errors on anything
+    # else, so a statically linked SDL3 must not be listed: it is already inside
+    # the app's own module .so and needs no bundling.
+    unset(_vbam_sdl3_bundle)
+
+    if(TARGET SDL3::SDL3-shared)
+        get_target_property(_vbam_sdl3_bundle SDL3::SDL3-shared IMPORTED_LOCATION)
+
+        if(NOT _vbam_sdl3_bundle)
+            get_target_property(_vbam_sdl3_bundle SDL3::SDL3-shared IMPORTED_LOCATION_RELEASE)
+        endif()
+    elseif(_vbam_sdl3_lib AND NOT _vbam_sdl3_lib MATCHES "\\.a$")
+        set(_vbam_sdl3_bundle "${_vbam_sdl3_lib}")
+    endif()
+
+    if(NOT _vbam_sdl3_bundle)
+        set(_vbam_sdl3_bundle "")
+    endif()
+
+    set(VBAM_SDL3_ANDROID_LIB "${_vbam_sdl3_bundle}" CACHE INTERNAL
+        "SDL3 .so to bundle in the APK")
+
     set(SDL3_FOUND TRUE)
 else()
     find_package(SDL3 QUIET)
@@ -283,7 +329,17 @@ endif()
 
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
 option(DISABLE_OPENGL "Disable OpenGL" OFF)
-option(ENABLE_DEBUGGER "Enable the debugger" ON)
+# The debugger's remote (GDB stub) transport is built on wxSocket, and the wx
+# build for Android has wxUSE_SOCKETS=0 -- Android has no wxSocket backend, so
+# the vcpkg wxwidgets port configures it out. tools/android/build-android.sh
+# passes -DENABLE_DEBUGGER=OFF for the same reason; make that the default so a
+# plain Android configure works, while leaving it overridable.
+set(ENABLE_DEBUGGER_DEFAULT ON)
+if(ANDROID)
+    set(ENABLE_DEBUGGER_DEFAULT OFF)
+endif()
+
+option(ENABLE_DEBUGGER "Enable the debugger" ${ENABLE_DEBUGGER_DEFAULT})
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)

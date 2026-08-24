@@ -256,7 +256,12 @@ endif()
 # compiler - the vcpkg triplet only sets VCPKG_CMAKE_SYSTEM_NAME for vcpkg's own
 # port builds, and the Qt toolchain chainloads whatever
 # VCPKG_CHAINLOAD_TOOLCHAIN_FILE names, so setting it here serves both.
-if(VCPKG_TARGET_TRIPLET MATCHES "-android$" AND NOT VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+# ANDROID_SDK_ROOT is part of what this block exports, so a build directory
+# configured before it was set here has to be able to pick it up: run again when
+# it is missing, even though VCPKG_CHAINLOAD_TOOLCHAIN_FILE is already cached.
+# Rediscovery is only environment lookups and one glob.
+if(VCPKG_TARGET_TRIPLET MATCHES "-android$"
+        AND (NOT VCPKG_CHAINLOAD_TOOLCHAIN_FILE OR NOT ANDROID_SDK_ROOT))
     set(vbam_android_ndk "")
 
     foreach(ndk_var CMAKE_ANDROID_NDK ANDROID_NDK_ROOT ANDROID_NDK ANDROID_NDK_HOME)
@@ -271,27 +276,37 @@ if(VCPKG_TARGET_TRIPLET MATCHES "-android$" AND NOT VCPKG_CHAINLOAD_TOOLCHAIN_FI
         endif()
     endforeach()
 
-    # Fall back to the newest NDK installed under the SDK root.
-    if(vbam_android_ndk STREQUAL "")
-        foreach(sdk_var ANDROID_SDK_ROOT ANDROID_HOME ANDROID_SDK_HOME)
-            if(NOT "${${sdk_var}}" STREQUAL "")
-                set(vbam_android_sdk "${${sdk_var}}")
-                break()
-            endif()
+    # The SDK root is wanted in its own right, not just as somewhere to look for
+    # an NDK: Qt's androiddeployqt support reads ANDROID_SDK_ROOT to find
+    # build-tools and the platform jars, and fails with 'Could not locate
+    # Android SDK build tools under "/build-tools"' when it is unset.
+    set(vbam_android_sdk "")
 
-            if(NOT "$ENV{${sdk_var}}" STREQUAL "")
-                set(vbam_android_sdk "$ENV{${sdk_var}}")
-                break()
-            endif()
-        endforeach()
-
-        if(vbam_android_sdk)
-            file(GLOB vbam_android_ndks "${vbam_android_sdk}/ndk/*")
-            list(FILTER vbam_android_ndks INCLUDE REGEX "/[0-9]")
-            list(SORT  vbam_android_ndks COMPARE NATURAL)
-            list(POP_BACK vbam_android_ndks vbam_android_ndk)
-            unset(vbam_android_ndks)
+    foreach(sdk_var ANDROID_SDK_ROOT ANDROID_HOME ANDROID_SDK_HOME)
+        if(NOT "${${sdk_var}}" STREQUAL "")
+            set(vbam_android_sdk "${${sdk_var}}")
+            break()
         endif()
+
+        if(NOT "$ENV{${sdk_var}}" STREQUAL "")
+            set(vbam_android_sdk "$ENV{${sdk_var}}")
+            break()
+        endif()
+    endforeach()
+
+    # Fall back to the newest NDK installed under the SDK root.
+    if(vbam_android_ndk STREQUAL "" AND vbam_android_sdk)
+        file(GLOB vbam_android_ndks "${vbam_android_sdk}/ndk/*")
+        list(FILTER vbam_android_ndks INCLUDE REGEX "/[0-9]")
+        list(SORT  vbam_android_ndks COMPARE NATURAL)
+        list(POP_BACK vbam_android_ndks vbam_android_ndk)
+        unset(vbam_android_ndks)
+    endif()
+
+    # And the other way round: an NDK installed at <sdk>/ndk/<version> names the
+    # SDK it belongs to, which covers pointing only ANDROID_NDK_HOME at it.
+    if(vbam_android_sdk STREQUAL "" AND vbam_android_ndk MATCHES "^(.+)/ndk/[^/]+/?$")
+        set(vbam_android_sdk "${CMAKE_MATCH_1}")
     endif()
 
     if(NOT vbam_android_ndk OR NOT EXISTS "${vbam_android_ndk}/build/cmake/android.toolchain.cmake")
@@ -317,8 +332,45 @@ if(VCPKG_TARGET_TRIPLET MATCHES "-android$" AND NOT VCPKG_CHAINLOAD_TOOLCHAIN_FI
         set(ANDROID_SDK_ROOT "${vbam_android_sdk}" CACHE PATH "Path to the Android SDK" FORCE)
     endif()
 
-    if(NOT ANDROID_ABI AND CMAKE_ANDROID_ARCH_ABI)
-        set(ANDROID_ABI "${CMAKE_ANDROID_ARCH_ABI}" CACHE STRING "Android ABI" FORCE)
+    # ANDROID_ABI is what the NDK toolchain reads, and it has no idea about the
+    # vcpkg triplet: left unset it defaults to armeabi-v7a, so an arm64-android
+    # configure would quietly build 32-bit ARM code against 64-bit vcpkg
+    # packages. This runs before project(), so CMAKE_ANDROID_ARCH_ABI is not set
+    # yet either and the triplet is the only thing naming the target.
+    if(NOT ANDROID_ABI)
+        if(CMAKE_ANDROID_ARCH_ABI)
+            set(vbam_android_abi "${CMAKE_ANDROID_ARCH_ABI}")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "arm64-android")
+            set(vbam_android_abi "arm64-v8a")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "arm-android")
+            set(vbam_android_abi "armeabi-v7a")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "x64-android")
+            set(vbam_android_abi "x86_64")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "x86-android")
+            set(vbam_android_abi "x86")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "riscv64-android")
+            set(vbam_android_abi "riscv64")
+        else()
+            set(vbam_android_abi "")
+        endif()
+
+        if(vbam_android_abi)
+            set(ANDROID_ABI "${vbam_android_abi}" CACHE STRING "Android ABI" FORCE)
+            message(STATUS "Android ABI for triplet ${VCPKG_TARGET_TRIPLET}: ${ANDROID_ABI}")
+        endif()
+
+        unset(vbam_android_abi)
+    endif()
+
+    # The API level to compile against. Every vcpkg *-android triplet builds its
+    # ports against API 28 (VCPKG_CMAKE_SYSTEM_VERSION), which is also the app's
+    # own minimum (QT_ANDROID_MIN_SDK_VERSION in src/wx/CMakeLists.txt), but the
+    # NDK toolchain defaults to the oldest API it still supports. Compiling at
+    # that older level against API-28 ports breaks at link time on symbols the
+    # older headers define as macros -- stdin, stderr, __fread_chk and friends.
+    if(NOT ANDROID_PLATFORM AND NOT ANDROID_NATIVE_API_LEVEL AND NOT CMAKE_SYSTEM_VERSION)
+        set(ANDROID_PLATFORM "android-28" CACHE STRING "Android API level" FORCE)
+        message(STATUS "Android API level: ${ANDROID_PLATFORM}")
     endif()
 
     unset(vbam_android_ndk)

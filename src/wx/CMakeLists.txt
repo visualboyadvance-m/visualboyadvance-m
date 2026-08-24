@@ -144,8 +144,33 @@ unset(wx_find_extra)
 if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     set(wx_find_extra NO_DEFAULT_PATH)
     set(wxWidgets_DIR "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/share/wxwidgets")
+    # vcpkg's nanosvg port installs NanoSVGConfig.cmake, so the CMake package
+    # name is NanoSVG even though the port (and VCPKG_DEPS entry) is lowercase.
     if(NOT LINUX)
-        find_package(nanosvg)
+        find_package(NanoSVG)
+    endif()
+
+    # The Android branch below drives wx-config directly instead of going
+    # through FindwxWidgets (see the comment there). The vcpkg wxwidgets port
+    # installs it under tools/, so a vcpkg build needs nothing passed in: the
+    # installed prefix supplies wx and, through find_package(Qt6), the Qt it is
+    # built on.
+    if(ANDROID AND NOT wxWidgets_CONFIG_EXECUTABLE)
+        set(wx_vcpkg_tools "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/wxwidgets")
+        set(wx_vcpkg_config "${wx_vcpkg_tools}/wx-config")
+
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND EXISTS "${wx_vcpkg_tools}/debug/wx-config")
+            set(wx_vcpkg_config "${wx_vcpkg_tools}/debug/wx-config")
+        endif()
+
+        if(EXISTS "${wx_vcpkg_config}")
+            set(wxWidgets_CONFIG_EXECUTABLE "${wx_vcpkg_config}" CACHE FILEPATH
+                "path to wx-config script for the desired wxWidgets configuration")
+            message(STATUS "Using the vcpkg wx-config: ${wxWidgets_CONFIG_EXECUTABLE}")
+        endif()
+
+        unset(wx_vcpkg_tools)
+        unset(wx_vcpkg_config)
     endif()
 endif()
 
@@ -184,8 +209,10 @@ if(ANDROID)
     # not shipped -- requesting it would put a nonexistent lib on the link line.
     if(NOT wxWidgets_CONFIG_EXECUTABLE)
         message(FATAL_ERROR
-            "wxWidgets_CONFIG_EXECUTABLE must be set for the Android wxQt build "
-            "(pass -DwxWidgets_CONFIG_EXECUTABLE=<prefix>/bin/wx-config).")
+            "No wx-config for the Android wxQt build. A vcpkg build takes it from "
+            "the installed prefix (tools/wxwidgets/wx-config) once the wxwidgets "
+            "port is built for ${VCPKG_TARGET_TRIPLET}; otherwise pass "
+            "-DwxWidgets_CONFIG_EXECUTABLE=<prefix>/bin/wx-config.")
     endif()
 
     execute_process(
@@ -276,6 +303,15 @@ if(ANDROID)
         if(_arg MATCHES "^-lQt[0-9]")
             continue()
         endif()
+        # A raw CMake target name, `-lNanoSVG::nanosvg`: wx's wx_get_dependencies
+        # writes the target itself when an imported dependency has no
+        # IMPORTED_LOCATION. It is not a link item at all -- CMake fails the
+        # target_link_libraries() in every try_compile() that inherits
+        # CMAKE_REQUIRED_LIBRARIES with "the target was not found". The real
+        # imported targets are added after the loop.
+        if(_arg MATCHES "^-l[A-Za-z0-9_+.-]+::[A-Za-z0-9_+.-]+$")
+            continue()
+        endif()
         if(_arg MATCHES "/sysroot/usr/lib/[^/]+/[0-9]+/libc\\.so$")
             continue()
         endif()
@@ -304,6 +340,18 @@ if(ANDROID)
     unset(_wx_lib_dir)
     unset(_wx_lib_name)
     unset(_wx_lib_fixed)
+
+    # wx links nanosvg for its SVG art support. Its wx-config cannot name the
+    # libraries (see the target-name case above), and the vcpkg wxwidgets port
+    # strips those entries precisely because they break downstream links --
+    # relying instead on its FindwxWidgets wrapper to re-add the imported
+    # targets, which this path does not go through. So add them here.
+    foreach(_nanosvg_target NanoSVG::nanosvg NanoSVG::nanosvgrast)
+        if(TARGET ${_nanosvg_target})
+            list(APPEND wxWidgets_LIBRARIES ${_nanosvg_target})
+        endif()
+    endforeach()
+    unset(_nanosvg_target)
 
     set(wxWidgets_FOUND TRUE)
     set(ENABLE_OPENGL FALSE)
@@ -731,6 +779,18 @@ elseif(ANDROID)
     endif()
     find_package(Qt6 REQUIRED COMPONENTS ${_vbam_qt_components})
     unset(_vbam_qt_components)
+
+    # Take the values of the QT_ANDROID_* path properties set below as they are,
+    # rather than through the conversion Qt applies to keep Windows paths from
+    # breaking the JSON of the deployment settings. The properties here are
+    # plain POSIX paths with no generator expressions, so both behaviours agree;
+    # opting in just settles the policy and silences the QTP0002 warning.
+    # QT_KNOWN_POLICY_<policy> is how Qt says it knows a policy, so this stays
+    # quiet on a Qt too old to have it.
+    if(QT_KNOWN_POLICY_QTP0002)
+        qt_policy(SET QTP0002 NEW)
+    endif()
+
     qt_add_executable(visualboyadvance-m)
 else()
     add_executable(
@@ -1362,14 +1422,72 @@ if(APPLE AND CMAKE_CROSSCOMPILING)
     endif()
 endif()
 
-# When cross-compiling for Android the wx-config from the Qt-for-Android prefix
-# reports a target (aarch64) wxrc that cannot run on the host. Use the host
-# wxWidgets' wxrc instead (e.g. /usr/local/bin/wxrc-3.3).
+# When cross-compiling for Android, the wx-config from the target prefix reports
+# a target (aarch64) wxrc, and a plain find_program() lands on the same binary
+# because vcpkg puts the target triplet's tools directory on CMAKE_PROGRAM_PATH.
+# The host cannot run either: "cannot execute binary file", 150 targets into the
+# build. wxrc compiles the XRC resources during the build, so it has to be a
+# host binary. Collect the candidates -- the vcpkg host triplet's tools
+# directory, then any other installed triplet's, then the host's own PATH with
+# CMake's vcpkg-populated search paths excluded -- and take the first that runs.
 if(ANDROID AND CMAKE_CROSSCOMPILING AND NOT WXRC AND NOT DEFINED ENV{WXRC})
-    find_program(WXRC_HOST NAMES wxrc-3.3 wxrc)
-    if(WXRC_HOST)
-        set(WXRC ${WXRC_HOST})
+    unset(_wxrc_candidates)
+
+    if(VCPKG_INSTALLED_DIR)
+        if(VCPKG_HOST_TRIPLET)
+            file(GLOB _wxrc_hits
+                "${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}/tools/wxwidgets/wxrc-[0-9].[0-9]"
+                "${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}/tools/wxwidgets/wxrc")
+            list(APPEND _wxrc_candidates ${_wxrc_hits})
+        endif()
+
+        # VCPKG_HOST_TRIPLET is only set when it was passed in, so fall back to
+        # whatever other triplets have been installed; the target's own tools
+        # directory is the one thing that cannot work.
+        file(GLOB _wxrc_hits
+            "${VCPKG_INSTALLED_DIR}/*/tools/wxwidgets/wxrc-[0-9].[0-9]"
+            "${VCPKG_INSTALLED_DIR}/*/tools/wxwidgets/wxrc")
+        foreach(_wxrc_hit IN LISTS _wxrc_hits)
+            if(NOT _wxrc_hit MATCHES "/${VCPKG_TARGET_TRIPLET}/tools/")
+                list(APPEND _wxrc_candidates "${_wxrc_hit}")
+            endif()
+        endforeach()
     endif()
+
+    find_program(WXRC_HOST NAMES wxrc-3.3 wxrc
+        NO_CMAKE_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+    if(WXRC_HOST)
+        list(APPEND _wxrc_candidates "${WXRC_HOST}")
+    endif()
+
+    list(REMOVE_DUPLICATES _wxrc_candidates)
+
+    # `wxrc -h` exits 0 on a wxrc the host can execute and 126 on one it cannot,
+    # so running it is both the sanity check and the host-binary test.
+    foreach(_wxrc_cand IN LISTS _wxrc_candidates)
+        execute_process(COMMAND "${_wxrc_cand}" -h
+            RESULT_VARIABLE _wxrc_rc OUTPUT_QUIET ERROR_QUIET)
+        if(_wxrc_rc EQUAL 0)
+            set(WXRC "${_wxrc_cand}")
+            message(STATUS "Using the host wxrc: ${WXRC}")
+            break()
+        endif()
+    endforeach()
+
+    if(NOT WXRC)
+        message(FATAL_ERROR
+            "No host-runnable wxrc found for the Android build. wxrc compiles the "
+            "XRC resources during the build and so must be a host binary, but the "
+            "only ones available are for the target. Install wxWidgets for the "
+            "host (vcpkg or the system package manager), or set WXRC / the WXRC "
+            "environment variable to a host wxrc.")
+    endif()
+
+    unset(_wxrc_candidates)
+    unset(_wxrc_hits)
+    unset(_wxrc_hit)
+    unset(_wxrc_cand)
+    unset(_wxrc_rc)
 endif()
 
 # Configure wxrc.

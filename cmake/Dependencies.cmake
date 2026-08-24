@@ -87,6 +87,73 @@ if(ENABLE_FFMPEG)
         message(FATAL_ERROR "ENABLE_FFMPEG was specified, but required versions of ffmpeg libraries cannot be found!")
     endif()
 
+    if(ANDROID)
+        # vcpkg's ffmpeg CMake wrapper reads the codec dependency lists out of
+        # the .pc files with pkg_check_modules(... IMPORTED_TARGET ...), and
+        # x265's "Libs: -L${libdir} -lx265 -lc++ -lm -pthread" sends
+        # find_library() after a bare "c++". The NDK's per-ABI sysroot has no
+        # libc++.so -- its C++ runtime is libc++_shared.so/libc++_static.a -- so
+        # the search falls through to the host toolchain's own lib directory and
+        # records <ndk>/toolchains/llvm/prebuilt/<host>/lib/libc++.so, an x86-64
+        # library on an aarch64 link line:
+        #
+        #   ld.lld: error: .../prebuilt/linux-x86_64/lib/libc++.so is
+        #   incompatible with aarch64linux
+        #
+        # No .pc file needs to name the C++ runtime here: the clang driver links
+        # it according to ANDROID_STL (this build uses -static-libstdc++). Drop
+        # every link item that resolved into the host toolchain, both from the
+        # list and from the imported targets whose interfaces carry them.
+        get_filename_component(vbam_ndk_host_dir "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        get_filename_component(vbam_ndk_host_dir "${vbam_ndk_host_dir}"   DIRECTORY)
+        set(vbam_ndk_host_lib "${vbam_ndk_host_dir}/lib/")
+
+        # Plain prefix matching, not a regex: these are filesystem paths and a
+        # path is not a pattern.
+        macro(vbam_strip_host_libs list_var context)
+            set(vbam_kept_libs "")
+
+            foreach(vbam_lib_item IN LISTS ${list_var})
+                string(FIND "${vbam_lib_item}" "${vbam_ndk_host_lib}" vbam_host_pos)
+
+                if(vbam_host_pos EQUAL 0)
+                    message(STATUS
+                        "ffmpeg: dropping host-toolchain link item from ${context}: ${vbam_lib_item}")
+                else()
+                    list(APPEND vbam_kept_libs "${vbam_lib_item}")
+                endif()
+            endforeach()
+
+            set(${list_var} "${vbam_kept_libs}")
+        endmacro()
+
+        vbam_strip_host_libs(FFMPEG_LIBRARIES "FFMPEG_LIBRARIES")
+
+        foreach(vbam_ffmpeg_lib IN LISTS FFMPEG_LIBRARIES)
+            if(NOT TARGET "${vbam_ffmpeg_lib}")
+                continue()
+            endif()
+
+            get_target_property(vbam_ffmpeg_iface "${vbam_ffmpeg_lib}" INTERFACE_LINK_LIBRARIES)
+
+            if(NOT vbam_ffmpeg_iface)
+                continue()
+            endif()
+
+            vbam_strip_host_libs(vbam_ffmpeg_iface "${vbam_ffmpeg_lib}")
+            set_target_properties("${vbam_ffmpeg_lib}" PROPERTIES
+                INTERFACE_LINK_LIBRARIES "${vbam_ffmpeg_iface}")
+        endforeach()
+
+        unset(vbam_ndk_host_dir)
+        unset(vbam_ndk_host_lib)
+        unset(vbam_kept_libs)
+        unset(vbam_lib_item)
+        unset(vbam_host_pos)
+        unset(vbam_ffmpeg_lib)
+        unset(vbam_ffmpeg_iface)
+    endif()
+
     if(APPLE)
         list(APPEND FFMPEG_LDFLAGS "SHELL:-framework CoreText" "SHELL:-framework ApplicationServices")
 

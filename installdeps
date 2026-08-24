@@ -2,6 +2,8 @@
 
 CMAKE=cmake
 ENABLE_FFMPEG=1
+ENABLE_OPENAL=1
+vcpkg_only=
 
 main() {
     cd "$(dirname $0)"
@@ -11,6 +13,10 @@ main() {
     mktmp
 
     check_os
+
+    if [ -n "$vcpkg_only" -a "$os" != linux ]; then
+        error '--vcpkg is only supported on Fedora, RHEL and its rebuilds at the moment'
+    fi
 
     ${os}_installdeps
 
@@ -26,6 +32,14 @@ check_command_line_args() {
                 ;;
             --no-ffmpeg)
                 ENABLE_FFMPEG=
+                shift
+                ;;
+            --no-openal)
+                ENABLE_OPENAL=
+                shift
+                ;;
+            --vcpkg)
+                vcpkg_only=1
                 shift
                 ;;
             *)
@@ -90,6 +104,7 @@ On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets base
   [1m-h, --help, --usage[0m                Show this help screen and exit.
   [1m--no-openal[0m                        Do not install OpenAL dependencies.
   [1m--no-ffmpeg[0m                        Do not install ffmpeg dependencies.
+  [1m--vcpkg[0m                            Install only the host tools needed to build the dependencies with vcpkg, and none of the library packages a system build uses (Fedora and RHEL only).
 
 Examples:
   [32m./installdeps[0m                        # install dependencies for a host build
@@ -154,6 +169,13 @@ linux_installdeps() {
             ;;
     esac
 
+    if [ -n "$vcpkg_only" ] \
+       && [ ! -f /etc/fedora-release ] \
+       && [ ! -f /etc/redhat-release ] \
+       && [ ! -f /etc/centos-release ]; then
+        error '--vcpkg is only supported on Fedora, RHEL and its rebuilds at the moment'
+    fi
+
     if [ -f /etc/debian_version ]; then
         debian_installdeps
     elif [ -f /etc/fedora-release ]; then
@@ -196,9 +218,10 @@ freebsd_installdeps() {
 
     wx_pkg=$(pkg search wx | grep gtk3 | grep '^wx' | sed -E 's/-[0-9].*//' | sort -Vr | head -1)
 
-    pkgs="llvm-devel cmake ccache nasm ffmpeg openal-soft FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja"
+    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
+    [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal-soft"
 
     # currently the wx30 and wx31 packages produce GTK errors on CURRENT (as of 04/2019)
     check sudo pkg install -y $pkgs
@@ -352,9 +375,10 @@ debian_installdeps() {
 
         faudio_lib=$(apt-cache search libfaudio-dev | grep libfaudio-dev | awk '{ print $1 }')
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build libopenal-dev $faudio_lib"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev libx264-dev libx265-dev"
+        [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
 
         check sudo apt-get -qy install $pkgs
     else
@@ -403,8 +427,9 @@ debian_installdeps() {
             fi
         fi
 
-        deps="gcc zlib ffmpeg gettext sdl3 openal wxwidgets openal"
+        deps="gcc zlib ffmpeg gettext sdl3 wxwidgets"
         [ -n "$ENABLE_FFMPEG" ] && deps="$deps ffmpeg"
+        [ -n "$ENABLE_OPENAL" ] && deps="$deps openal"
 
         set --
         for dep in $deps; do
@@ -478,6 +503,52 @@ fedora_installdeps() {
     installing
 
     warning=
+
+    # What the vcpkg ports need from the system when the dependencies are built
+    # from source rather than taken from it (any VCPKG_TARGET_TRIPLET build,
+    # cross targets included):
+    #
+    #   - the autotools for the ports that run a configure script, and flex and
+    #     bison for the ones with a generated lexer or parser;
+    #   - the perl modules OpenSSL's Configure and build scripts use, which the
+    #     base perl package does not pull in;
+    #   - the xcb, X11, xkbcommon and GL -devel packages qtbase asks for by
+    #     their Ubuntu names in the warning its portfile prints. Fedora keeps
+    #     the whole libxcb family in libxcb-devel, so only the xcb-util ports
+    #     that Ubuntu splits out need naming individually. An Android build
+    #     wants these too: it builds a host Qt to run moc and androiddeployqt;
+    #   - libSM and libICE, which that warning leaves out. The portfile forces
+    #     FEATURE_xcb_sm=ON, whose condition needs X11_SM_FOUND from CMake's
+    #     FindX11, and that wants both X11/SM/SM.h and libSM.so (which in turn
+    #     links against libICE). Without them the configure fails outright with
+    #     'Feature "xcb_sm": Forcing to "ON" breaks its condition'.
+    #
+    # The tools are noarch or host-only and the libraries are for the host Qt,
+    # so none of them take the architecture suffix the multiarch list further
+    # down appends.
+    vcpkg_deps=
+    for pkg in autoconf autoconf-archive automake libtool bison flex \
+               perl-IPC-Cmd perl-FindBin perl-Time-Piece \
+               libxcb-devel xcb-util-devel xcb-util-image-devel \
+               xcb-util-keysyms-devel xcb-util-renderutil-devel \
+               xcb-util-wm-devel xcb-util-cursor-devel libX11-devel \
+               libXrender-devel libXi-devel libxkbcommon-devel \
+               libxkbcommon-x11-devel libSM-devel libICE-devel \
+               mesa-libGLU-devel mesa-libEGL-devel; do
+        if fedora_have_pkg "$pkg"; then
+            vcpkg_deps="$vcpkg_deps $pkg"
+        else
+            warning "no $pkg package found, building dependencies with vcpkg may fail without it"
+        fi
+    done
+
+    # --vcpkg wants nothing else: vcpkg builds the libraries itself, so the
+    # -devel packages below would only shadow what it installs, and the
+    # rpmfusion repo setup for ffmpeg is wasted work.
+    if [ -n "$vcpkg_only" ]; then
+        [ -n "$vcpkg_deps" ] && check fedora_dnf_install $vcpkg_deps
+        return 0
+    fi
 
     # the mingw cross builds get no ffmpeg, so only look for it for host builds
     if [ -n "$ENABLE_FFMPEG" ] && [ -z "$target" -o "$target" = m32 ]; then
@@ -609,10 +680,16 @@ fedora_installdeps() {
     wx=wxGTK-devel
     fedora_have_pkg "$wx" || wx=wxGTK3-devel
 
+    openal=
+    [ -n "$ENABLE_OPENAL" ] && openal=openal-soft-devel
+
     # non-multiarch packages first
     # vulkan-headers is noarch and so cannot take the architecture suffix the
     # list further down appends.
-    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers
+    # $vcpkg_deps is unquoted on purpose: it is a space-separated list built
+    # above, and it is installed by default because a vcpkg build is one flag
+    # away from a system one.
+    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers $vcpkg_deps
 
     # try to install multiarch libgcc, libstdc++, glibc-devel and pkgconfig if
     # available.  libstdc++-devel carries the libstdc++.so the linker resolves
@@ -632,9 +709,10 @@ fedora_installdeps() {
     if [ -z "$target" -o "$target" = m32 ]; then
         # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
         for pkg in "$zlib" mesa-libGL-devel "$ffmpeg" $ffmpeg_codecs lua-devel \
-                   vulkan-loader-devel gettext-devel SDL3-devel openal-soft-devel \
+                   vulkan-loader-devel gettext-devel SDL3-devel "$openal" \
                    "$wx" gtk3-devel; do
-            # $ffmpeg is empty when ffmpeg is disabled or unavailable
+            # $ffmpeg is empty when ffmpeg is disabled or unavailable, $openal
+            # when --no-openal was passed
             [ -z "$pkg" ] && continue
 
             pkg_arch=
@@ -738,7 +816,7 @@ fedora_installdeps() {
             set -- "$@" "${target}-${pkg}-static"
         done
         # fedora has no static build of openal-soft
-        set -- "$@" "${target}-openal-soft"
+        [ -n "$ENABLE_OPENAL" ] && set -- "$@" "${target}-openal-soft"
 
         # get the necessary win32 headers
         git submodule update --init --remote --recursive
@@ -762,7 +840,12 @@ suse_installdeps() {
 
     tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja"
 
-    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel openal-soft-devel ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
+    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel"
+
+    # openSUSE splits ffmpeg into one -devel package per library, all under a
+    # versioned prefix.
+    [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
+    [ -n "$ENABLE_OPENAL" ] && libs="$libs openal-soft-devel"
 
     if [ "$target" = m32 ]; then
         error '32 bit cross builds are no longer supported on OpenSUSE'
@@ -829,9 +912,10 @@ archlinux_installdeps() {
 
     $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
 
-    libs="zlib mesa gettext sdl3 wxgtk3 $gtk openal"
+    libs="zlib mesa gettext sdl3 wxgtk3 $gtk"
 
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg"
+    [ -n "$ENABLE_OPENAL" ] && libs="$libs openal"
 
     if [ -z "$target" -o "$target" = m32 ]; then
         if [ -z "$target" -o -z "$amd64" ]; then
@@ -925,7 +1009,8 @@ EOF
           fi
         done
 
-        deps="zlib gettext pkg-config sdl3 wxmsw openal"
+        deps="zlib gettext pkg-config sdl3 wxmsw"
+        [ -n "$ENABLE_OPENAL" ] && deps="$deps openal"
 
         # and the actual deps
         for p in $deps; do
@@ -954,7 +1039,9 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel openal-soft-devel
+    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel
+
+    [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
     if [ -n "$amd64" -a "$target" = m32 ]; then
         info_msg 'Calculating dependencies, this will take a while..'
@@ -1001,7 +1088,7 @@ solus_installdeps() {
         done
     else
         # no 32bit versions of these
-        set -- "$@" ffmpeg-devel
+        [ -n "$ENABLE_FFMPEG" ] && set -- "$@" ffmpeg-devel
     fi
 
     check sudo eopkg -y install "$@"
@@ -1028,7 +1115,6 @@ gentoo_installdeps() {
       dev-util/ccache \
       sys-devel/binutils \
       media-libs/libsdl3 \
-      media-libs/openal \
       x11-libs/wxGTK:$wx_slot \
       sys-libs/zlib \
       dev-util/pkgconf \
@@ -1036,6 +1122,7 @@ gentoo_installdeps() {
       dev-build/ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && ebuilds="$ebuilds media-video/ffmpeg"
+    [ -n "$ENABLE_OPENAL" ] && ebuilds="$ebuilds media-libs/openal"
 
     check sudo emerge -vna $ebuilds
 
@@ -1080,7 +1167,9 @@ windows_installdeps() {
             ;;
     esac
 
-    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache openal"
+    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache"
+
+    [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
 
     case "$target" in
         *x86_64)

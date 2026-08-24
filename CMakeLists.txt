@@ -414,6 +414,16 @@ if(NOT EXISTS "${CMAKE_SOURCE_DIR}/.git")
     set(BUILD_TESTING OFF)
 endif()
 
+# The test executables are host binaries by nature -- ctest runs them on the
+# machine doing the build -- so cross-compiling them for a phone produces
+# something that cannot be run. They also link wx directly, without the
+# wxQt/Android shims in src/wx/android-compat.cpp that the app target pulls in,
+# so they do not even link. tools/android/build-android.sh passes
+# -DBUILD_TESTING=OFF for this reason.
+if(ANDROID)
+    set(BUILD_TESTING OFF)
+endif()
+
 # Configure gtest
 if(BUILD_TESTING)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

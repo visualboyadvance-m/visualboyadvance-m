@@ -4,6 +4,18 @@
 
 #if defined(__ANDROID__)
 #include <android/log.h>
+
+// wxWidgets owns main() (see below), so SDL must not be allowed to claim it.
+// Left to itself SDL_main.h -- where SDL_SetMainReady() is declared -- does
+// "#define main SDL_main" on Android and emits its own entry point, which
+// collides with the wx main() below. SDL_MAIN_HANDLED suppresses both, leaving
+// just the declaration; main() then calls SDL_SetMainReady() by hand.
+#define SDL_MAIN_HANDLED 1
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL_main.h>
+#else
+#include <SDL_main.h>
+#endif
 #endif
 
 #ifdef __WXMSW__
@@ -254,6 +266,17 @@ int __stdcall WinMain(HINSTANCE hInstance,
 #else  // __WXMSW__
 
 int main(int argc, char** argv) {
+#if defined(__ANDROID__)
+    // On Android SDL defines SDL_MAIN_NEEDED, so SDL_Init() refuses to run
+    // until the SDL entry point has marked main() as reached. That entry point
+    // is SDL's own Java activity calling into SDL_main, which never happens
+    // here: this is a Qt activity, Qt calls this main() directly, and SDL is
+    // only used for audio output and game controller input. Say so ourselves,
+    // or every SDL_Init() in the app fails with "Application didn't initialize
+    // properly".
+    SDL_SetMainReady();
+#endif
+
     // Set up logging.
 #ifdef DEBUG
     wxLog::SetLogLevel(wxLOG_Trace);
