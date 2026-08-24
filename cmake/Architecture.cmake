@@ -84,11 +84,11 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[rR][iI][sS][cC][vV]")
     if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
         set(RISCV32 ON)
         set(RISCV ON)
-        set(ARCH_NAME riscv32)
+        set(ARCH_NAME RISCV32)
     elseif(CMAKE_C_SIZEOF_DATA_PTR EQUAL 8)
         set(RISCV64 ON)
         set(RISCV ON)
-        set(ARCH_NAME riscv64)
+        set(ARCH_NAME RISCV64)
     endif()
 
     if(NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[rR][iI][sS][cC][vV]")
