@@ -393,11 +393,42 @@ void KeyboardInputHandler::ProcessKeyEvent(wxKeyEvent& event) {
     }
 }
 
-void KeyboardInputHandler::Reset() {
+// Releases every input this handler currently believes is held, through the
+// synchronous sink, and forgets them.
+//
+// The tracking sets are cleared in several places to recover from missed key
+// events -- a modal dialog, a focus change, a modifier whose release never
+// arrived. Clearing them alone is not enough: the joypad bits those inputs set
+// are owned by the sink, and once the handler has forgotten a key its eventual
+// release finds nothing to match and returns early, so the bit is never cleared
+// and the button stays down for good. Release first, then forget.
+void KeyboardInputHandler::ReleaseAllTracked() {
+    for (const config::KeyboardInput& input : active_mod_inputs_) {
+        sync_sink_(input, false);
+    }
+    for (const wxKeyCode key : active_keys_) {
+        sync_sink_(config::KeyboardInput(key, config::kKeyModNone), false);
+    }
+    for (const wxKeyModifier mod : active_mods_) {
+        const wxKeyCode mod_key = KeyFromModifier(mod);
+        if (mod_key == WXK_NONE) {
+            continue;
+        }
+        const auto iter = key_extended_mods_.find(mod_key);
+        const uint32_t ext_mod = (iter != key_extended_mods_.end())
+                                     ? iter->second
+                                     : static_cast<uint32_t>(mod);
+        sync_sink_(config::KeyboardInput(mod_key, ext_mod), false);
+    }
+
     active_keys_.clear();
     active_mods_.clear();
     active_mod_inputs_.clear();
     key_extended_mods_.clear();
+}
+
+void KeyboardInputHandler::Reset() {
+    ReleaseAllTracked();
 }
 
 void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
@@ -419,10 +450,23 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
     if (event.RawControlDown()) event_mods.insert(wxMOD_RAW_CONTROL);
 #endif
 
+    // A modifier's own key-down does not necessarily report that modifier as
+    // held -- the flags describe the state the key event is modifying, not the
+    // key itself -- so its absence there says nothing about whether it is down.
+    // Exempt it, or every auto-repeat of a held modifier reads as a release and
+    // takes everything else held down with it.
+    std::unordered_set<wxKeyModifier> self_mods;
+    if (key == WXK_NONE) {
+        for (const wxKeyModifier mod : mods) {
+            self_mods.insert(mod);
+        }
+    }
+
     // Remove any modifiers we think are held but the event says aren't
     std::vector<wxKeyModifier> to_remove;
     for (const wxKeyModifier mod : active_mods_) {
-        if (event_mods.find(mod) == event_mods.end()) {
+        if (event_mods.find(mod) == event_mods.end() &&
+            self_mods.find(mod) == self_mods.end()) {
             to_remove.push_back(mod);
         }
     }
@@ -431,32 +475,20 @@ void KeyboardInputHandler::OnKeyDown(wxKeyEvent& event) {
     // a modal dialog), also clear active_keys_ since those key releases were likely
     // missed too.
     if (!to_remove.empty()) {
-        active_keys_.clear();
-        active_mod_inputs_.clear();
+        // Release everything before forgetting it -- see ReleaseAllTracked().
+        // The modifiers in `to_remove` are held by the handler but gone from the
+        // event, so their releases were missed too; ReleaseAllTracked() covers
+        // them along with the keys.
+        ReleaseAllTracked();
     }
 
-    for (const wxKeyModifier mod : to_remove) {
-        active_mods_.erase(mod);
-        // Also clean up the extended mod tracking for this modifier key
-        key_extended_mods_.erase(KeyFromModifier(mod));
-    }
-
-    // Handle standalone modifier key press.
-    // If a modifier key is pressed and we think it's already active, this means
-    // the release was missed (e.g., during a modal dialog). Clear all state and
-    // treat this as a fresh press.
-    if (key == WXK_NONE && !mods.empty()) {
-        const wxKeyModifier mod = *mods.begin();
-        if (active_mods_.find(mod) != active_mods_.end()) {
-            // We think this modifier was already held, but we're getting a fresh
-            // key down event for it. This means the release was missed.
-            // Clear all state to recover.
-            active_keys_.clear();
-            active_mods_.clear();
-            active_mod_inputs_.clear();
-            key_extended_mods_.clear();
-        }
-    }
+    // A repeated key-down for a modifier we already have down is just
+    // auto-repeat, and is ignored below by the same "already active" test the
+    // rest of the keys use. It is not evidence of a missed release: the OS
+    // resends key-down for any held key, and treating that as a desync would
+    // drop whatever else is held at the time -- a direction, say, which then
+    // stops responding a moment after the modifier is pressed. Genuine desync
+    // is caught by the reconciliation above.
 
     wxKeyCode key_pressed = WXK_NONE;
     if (key != WXK_NONE) {
@@ -583,6 +615,25 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
             key_extended_mods_.erase(ext_iter);
         }
         event_data.emplace_back(config::KeyboardInput(mod_key, ext_mod), false);
+
+        // A key pressed while this modifier was held was reported as the
+        // combination, and that combination is no longer held once the modifier
+        // goes up. Release it here rather than waiting for the key itself:
+        // by then the modifier is gone from active_mods_, so the key's own
+        // release reports the plain form and the combination is never matched
+        // by anything, leaving it stuck down.
+        for (auto iter = active_mod_inputs_.begin();
+             iter != active_mod_inputs_.end();) {
+            // Compare through the base modifier: an entry recorded with the
+            // left/right-specific flag (kKeyModLeftControl and friends) does
+            // not share bits with wxMOD_CONTROL, so a raw mask misses it.
+            if (config::ToWxKeyModifier(iter->mod_extended()) & mod_released) {
+                event_data.emplace_back(*iter, false);
+                iter = active_mod_inputs_.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
     } else {
         // A key was released.
         if (previous_mods == wxMOD_NONE) {

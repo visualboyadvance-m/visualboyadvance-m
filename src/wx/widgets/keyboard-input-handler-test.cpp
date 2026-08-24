@@ -22,10 +22,14 @@ class KeyboardInputHandlerTest : public WidgetsTest,
 public:
     KeyboardInputHandlerTest()
         : handler_(this,
-                   // Tests exercise the async UserInputEvent path; the
-                   // sync sink is a no-op here. (Production code wires
-                   // it to EmulatedGamepad in wxvbamApp's constructor.)
-                   [](const config::UserInput&, bool) {}) {
+                   // Record what reaches the sync sink. Production wires this
+                   // to EmulatedGamepad, and the joypad bits live entirely on
+                   // this path -- a press here that never gets a matching
+                   // release is a button stuck down, which the async
+                   // UserInputEvent path cannot show.
+                   [this](const config::UserInput& input, bool pressed) {
+                       sink_data_.emplace_back(input, pressed);
+                   }) {
         Bind(VBAM_EVT_USER_INPUT, &KeyboardInputHandlerTest::OnUserInputEvent, this);
     }
 
@@ -37,6 +41,28 @@ protected:
         std::vector<UserInputEvent::Data> data;
         std::swap(data, pending_data_);
         return data;
+    }
+
+    // Returns and clears what the sync sink has seen since the last call.
+    std::vector<UserInputEvent::Data> TakeSinkData() {
+        std::vector<UserInputEvent::Data> data;
+        std::swap(data, sink_data_);
+        return data;
+    }
+
+    // Net effect on the sink: inputs left pressed with no matching release.
+    // Anything in here after a key sequence has finished is a stuck button.
+    std::vector<config::UserInput> StillHeld() {
+        std::vector<config::UserInput> held;
+        for (const auto& data : sink_data_) {
+            if (data.pressed) {
+                held.push_back(data.input);
+            } else {
+                held.erase(std::remove(held.begin(), held.end(), data.input),
+                           held.end());
+            }
+        }
+        return held;
     }
 
     // Track modifier state for creating realistic test events
@@ -69,6 +95,7 @@ private:
 
     KeyboardInputHandler handler_;
     std::vector<UserInputEvent::Data> pending_data_;
+    std::vector<UserInputEvent::Data> sink_data_;
     std::set<wxKeyCode> active_test_modifiers_;
 };
 
@@ -200,6 +227,60 @@ TEST_F(KeyboardInputHandlerTest, KeyThenModifier) {
     ASSERT_THAT(ProcessKeyEvent(F1UpEvent()),
                 testing::ElementsAre(kCtrlF1Pressed, kCtrlF1Released, kF1Released));
     ASSERT_THAT(ProcessKeyEvent(CtrlUpEvent()), testing::ElementsAre(kCtrlReleased));
+}
+
+TEST_F(KeyboardInputHandlerTest, ModifierRepeatDoesNotDropHeldKey) {
+    // F1 Down -> Ctrl Down -> Ctrl Down (auto-repeat) -> Ctrl Down ...
+    //
+    // Holding a modifier makes the OS resend its key-down. That must not
+    // disturb a key already held: in game terms, pressing and holding the
+    // button bound to a modifier while a direction is held should not stop the
+    // direction a moment later, when auto-repeat starts.
+    ProcessKeyEvent(F1DownEvent());
+    ProcessKeyEvent(CtrlDownEvent());
+    const auto held_before = StillHeld();
+    ASSERT_THAT(held_before, testing::SizeIs(2));
+
+    // Auto-repeat of the held modifier.
+    for (int i = 0; i < 5; ++i) {
+        ProcessKeyEvent(CtrlDownEvent());
+    }
+
+    EXPECT_THAT(StillHeld(), testing::UnorderedElementsAreArray(held_before));
+}
+
+TEST_F(KeyboardInputHandlerTest, RecoveryReleasesHeldInputs) {
+    // Ctrl Down -> Ctrl+F1 Down -> a key down whose event no longer reports
+    // Ctrl, which is how a missed modifier release looks from here.
+    //
+    // The handler drops its tracking to recover. It must release what it was
+    // holding first: the joypad bits belong to the sink, and once the handler
+    // has forgotten a key its later release matches nothing and returns early,
+    // so the bit would stay set with no way back.
+    ProcessKeyEvent(CtrlDownEvent());
+    ProcessKeyEvent(CtrlF1DownEvent());
+    ASSERT_FALSE(StillHeld().empty());
+
+    // F1 again, this time with no Ctrl in the event.
+    ProcessKeyEvent(F1DownEvent());
+    ProcessKeyEvent(F1UpEvent());
+
+    EXPECT_THAT(StillHeld(), testing::IsEmpty());
+}
+
+TEST_F(KeyboardInputHandlerTest, ModifierReleasedBeforeKey) {
+    // Ctrl Down -> Ctrl+F1 Down -> Ctrl Up -> F1 Up
+    //
+    // The modifier goes up first, so by the time F1 is released the handler no
+    // longer sees Ctrl held and reports the plain form. Ctrl+F1 was reported as
+    // pressed on the way down, so it has to be released when Ctrl goes up --
+    // otherwise nothing ever matches it and whatever it is bound to stays down.
+    ASSERT_THAT(ProcessKeyEvent(CtrlDownEvent()), testing::ElementsAre(kCtrlPressed));
+    ASSERT_THAT(ProcessKeyEvent(CtrlF1DownEvent()),
+                testing::ElementsAre(kCtrlF1Pressed, kF1Pressed));
+    ASSERT_THAT(ProcessKeyEvent(CtrlUpEvent()),
+                testing::ElementsAre(kCtrlReleased, kCtrlF1Released));
+    ASSERT_THAT(ProcessKeyEvent(F1UpEvent()), testing::ElementsAre(kF1Released));
 }
 
 TEST_F(KeyboardInputHandlerTest, Multiplemodifiers) {

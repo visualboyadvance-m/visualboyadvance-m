@@ -453,6 +453,46 @@ namespace {
 bool g_app_is_active = true;
 }  // namespace
 
+namespace {
+
+// True when `input` is bound to a joypad control, as opposed to a hotkey or
+// nothing at all. Used to decide whether a modified form of a key -- Ctrl+Right
+// and the like -- means anything to the joypad, or whether only the plain key
+// does.
+bool IsJoypadBound(const config::Bindings* const bindings,
+                   const config::UserInput& input) {
+    if (!bindings)
+        return false;
+    const nonstd::optional<config::Command> command =
+        bindings->CommandForInput(input);
+    return command != nonstd::nullopt && command->is_game();
+}
+
+// True when `key` is a modifier key in its own right. A modifier reports itself
+// with its own flag set, so it looks "modified" to the check below even when it
+// was pressed alone -- and it can legitimately be bound as a joypad button, so
+// it must not be filtered out on that basis.
+bool KeyIsModifier(wxKeyCode key) {
+    switch (key) {
+        case WXK_SHIFT:
+        case WXK_ALT:
+        case WXK_CONTROL:
+            return true;
+#ifdef __WXMAC__
+        // Only a distinct value on macOS, where Control and Command are
+        // separate keys; elsewhere it is the same as WXK_CONTROL and listing
+        // it would be a duplicate case. Matches KeyFromModifier() in
+        // keyboard-input-handler.cpp, which guards it the same way.
+        case WXK_RAW_CONTROL:
+            return true;
+#endif
+        default:
+            return false;
+    }
+}
+
+}  // namespace
+
 wxvbamApp::wxvbamApp()
     : wxApp(),
       pending_fullscreen(false),
@@ -480,9 +520,29 @@ wxvbamApp::wxvbamApp()
       // FilterEvent's UserInputEvent branch is focus-gated below.
       // EmulatedGamepad::OnInputPressed/Released filter non-game
       // commands internally, so passing every key here is safe.
+      // A key held with a modifier arrives here twice: once as the modified
+      // input and once plain, because the shortcut consumer needs both to
+      // pick the more specific binding. The joypad wants the opposite -- a
+      // direction is that direction whatever else is held -- so pass the
+      // modified form on only when it is bound as a joypad control in its own
+      // right. Otherwise the plain form alone represents the key.
+      //
+      // Without that, a modified press sets the joypad bit twice, from two
+      // different UserInputs, while the release only ever clears one of them:
+      // whichever form the release takes depends on the modifier still being
+      // held at that moment, so letting go of the modifier first leaves the
+      // modified press unmatched and the button latched down. The order the
+      // two keys happen to be released in should not decide whether input
+      // sticks.
       keyboard_input_handler_(
           this,
           [this](const config::UserInput& input, bool pressed) {
+              if (input.is_keyboard() &&
+                  !KeyIsModifier(input.keyboard_input().key()) &&
+                  input.keyboard_input().mod_extended() != config::kKeyModNone &&
+                  !IsJoypadBound(bindings(), input)) {
+                  return;
+              }
               if (pressed) {
                   emulated_gamepad_.OnInputPressed(input);
               } else {

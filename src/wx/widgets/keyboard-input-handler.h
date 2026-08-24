@@ -54,6 +54,11 @@ private:
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
 
+    // Releases every tracked input through the sink, then forgets them. Used
+    // by the recovery paths that would otherwise drop the tracking state while
+    // the joypad bits it set stay held.
+    void ReleaseAllTracked();
+
     std::unordered_set<wxKeyCode> active_keys_;
     std::unordered_set<wxKeyModifier> active_mods_;
     std::unordered_set<config::KeyboardInput> active_mod_inputs_;
