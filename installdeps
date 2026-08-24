@@ -15,7 +15,7 @@ main() {
     check_os
 
     if [ -n "$vcpkg_only" -a "$os" != linux ]; then
-        error '--vcpkg is only supported on Fedora, RHEL and its rebuilds at the moment'
+        error '--vcpkg is only supported on Fedora, RHEL and its rebuilds, and OpenSUSE at the moment'
     fi
 
     ${os}_installdeps
@@ -104,7 +104,7 @@ On MSYS2 dependencies are installed for 32 or 64 bit native Windows targets base
   [1m-h, --help, --usage[0m                Show this help screen and exit.
   [1m--no-openal[0m                        Do not install OpenAL dependencies.
   [1m--no-ffmpeg[0m                        Do not install ffmpeg dependencies.
-  [1m--vcpkg[0m                            Install only the host tools needed to build the dependencies with vcpkg, and none of the library packages a system build uses (Fedora and RHEL only).
+  [1m--vcpkg[0m                            Install only the host tools needed to build the dependencies with vcpkg, and none of the library packages a system build uses (Fedora, RHEL and OpenSUSE only).
 
 Examples:
   [32m./installdeps[0m                        # install dependencies for a host build
@@ -169,11 +169,21 @@ linux_installdeps() {
             ;;
     esac
 
-    if [ -n "$vcpkg_only" ] \
-       && [ ! -f /etc/fedora-release ] \
-       && [ ! -f /etc/redhat-release ] \
-       && [ ! -f /etc/centos-release ]; then
-        error '--vcpkg is only supported on Fedora, RHEL and its rebuilds at the moment'
+    if [ -n "$vcpkg_only" ]; then
+        vcpkg_distro=
+        if [ -f /etc/fedora-release ] || [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
+            vcpkg_distro=1
+        elif [ -f /etc/os-release ]; then
+            case "$(. /etc/os-release; echo "${ID_LIKE:-$ID}")" in
+                *suse*)
+                    vcpkg_distro=1
+                    ;;
+            esac
+        fi
+
+        if [ -z "$vcpkg_distro" ]; then
+            error '--vcpkg is only supported on Fedora, RHEL and its rebuilds, and OpenSUSE at the moment'
+        fi
     fi
 
     if [ -f /etc/debian_version ]; then
@@ -462,6 +472,51 @@ fedora_have_pkg() {
     [ -n "$(dnf -q repoquery --qf '%{name}\n' "$1" 2>/dev/null)" ]
 }
 
+# Same for zypper, which exits 104 when nothing matches.
+suse_have_pkg() {
+    zypper -q --no-refresh se -x -t package "$1" >/dev/null 2>&1
+}
+
+# Sets $vcpkg_deps to those of $2.. that the distro actually has, warning about
+# the rest.  $1 names the have-pkg predicate to filter with.
+#
+# What the vcpkg ports need from the system when the dependencies are built from
+# source rather than taken from it (any VCPKG_TARGET_TRIPLET build, cross
+# targets included):
+#
+#   - the autotools for the ports that run a configure script, and flex and
+#     bison for the ones with a generated lexer or parser;
+#   - the perl modules OpenSSL's Configure and build scripts use (IPC::Cmd,
+#     FindBin, Time::Piece).  Fedora splits these into their own packages;
+#     openSUSE ships them in perl/perl-base;
+#   - the xcb, X11, xkbcommon and GL -devel packages qtbase asks for by their
+#     Ubuntu names in the warning its portfile prints.  Both distros keep the
+#     whole libxcb family in libxcb-devel, so only the xcb-util ports that
+#     Ubuntu splits out need naming individually.  An Android build wants these
+#     too: it builds a host Qt to run moc and androiddeployqt;
+#   - libSM and libICE, which that warning leaves out.  The portfile forces
+#     FEATURE_xcb_sm=ON, whose condition needs X11_SM_FOUND from CMake's
+#     FindX11, and that wants both X11/SM/SM.h and libSM.so (which in turn links
+#     against libICE).  Without them the configure fails outright with
+#     'Feature "xcb_sm": Forcing to "ON" breaks its condition'.
+#
+# The tools are noarch or host-only and the libraries are for the host Qt, so
+# none of them take an architecture suffix.
+build_vcpkg_deps() {
+    have_pkg=$1
+    shift
+
+    vcpkg_deps=
+
+    for pkg in "$@"; do
+        if "$have_pkg" "$pkg"; then
+            vcpkg_deps="$vcpkg_deps $pkg"
+        else
+            warning "no $pkg package found, building dependencies with vcpkg may fail without it"
+        fi
+    done
+}
+
 # dnf5 (Fedora 41 and newer) only accepts --allowerasing and --skip-broken
 # after the subcommand, while dnf4 accepts them anywhere, so wrap the two
 # invocations that need them.  $dnf_install_opts holds extra subcommand
@@ -504,43 +559,17 @@ fedora_installdeps() {
 
     warning=
 
-    # What the vcpkg ports need from the system when the dependencies are built
-    # from source rather than taken from it (any VCPKG_TARGET_TRIPLET build,
-    # cross targets included):
-    #
-    #   - the autotools for the ports that run a configure script, and flex and
-    #     bison for the ones with a generated lexer or parser;
-    #   - the perl modules OpenSSL's Configure and build scripts use, which the
-    #     base perl package does not pull in;
-    #   - the xcb, X11, xkbcommon and GL -devel packages qtbase asks for by
-    #     their Ubuntu names in the warning its portfile prints. Fedora keeps
-    #     the whole libxcb family in libxcb-devel, so only the xcb-util ports
-    #     that Ubuntu splits out need naming individually. An Android build
-    #     wants these too: it builds a host Qt to run moc and androiddeployqt;
-    #   - libSM and libICE, which that warning leaves out. The portfile forces
-    #     FEATURE_xcb_sm=ON, whose condition needs X11_SM_FOUND from CMake's
-    #     FindX11, and that wants both X11/SM/SM.h and libSM.so (which in turn
-    #     links against libICE). Without them the configure fails outright with
-    #     'Feature "xcb_sm": Forcing to "ON" breaks its condition'.
-    #
-    # The tools are noarch or host-only and the libraries are for the host Qt,
-    # so none of them take the architecture suffix the multiarch list further
-    # down appends.
-    vcpkg_deps=
-    for pkg in autoconf autoconf-archive automake libtool bison flex \
-               perl-IPC-Cmd perl-FindBin perl-Time-Piece \
-               libxcb-devel xcb-util-devel xcb-util-image-devel \
-               xcb-util-keysyms-devel xcb-util-renderutil-devel \
-               xcb-util-wm-devel xcb-util-cursor-devel libX11-devel \
-               libXrender-devel libXi-devel libxkbcommon-devel \
-               libxkbcommon-x11-devel libSM-devel libICE-devel \
-               mesa-libGLU-devel mesa-libEGL-devel; do
-        if fedora_have_pkg "$pkg"; then
-            vcpkg_deps="$vcpkg_deps $pkg"
-        else
-            warning "no $pkg package found, building dependencies with vcpkg may fail without it"
-        fi
-    done
+    # See build_vcpkg_deps() for what these are and why.  None of them take the
+    # architecture suffix the multiarch list further down appends.
+    build_vcpkg_deps fedora_have_pkg \
+        autoconf autoconf-archive automake libtool bison flex \
+        perl-IPC-Cmd perl-FindBin perl-Time-Piece \
+        libxcb-devel xcb-util-devel xcb-util-image-devel \
+        xcb-util-keysyms-devel xcb-util-renderutil-devel \
+        xcb-util-wm-devel xcb-util-cursor-devel libX11-devel \
+        libXrender-devel libXi-devel libxkbcommon-devel \
+        libxkbcommon-x11-devel libSM-devel libICE-devel \
+        mesa-libGLU-devel mesa-libEGL-devel
 
     # --vcpkg wants nothing else: vcpkg builds the libraries itself, so the
     # -devel packages below would only shadow what it installs, and the
@@ -842,6 +871,26 @@ suse_installdeps() {
 
     libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel"
 
+    # See build_vcpkg_deps().  openSUSE differs from Fedora in three names: GLU
+    # is glu-devel, EGL is Mesa-libEGL-devel (capital M), and IPC::Cmd, FindBin
+    # and Time::Piece come with perl itself instead of in packages of their own.
+    build_vcpkg_deps suse_have_pkg \
+        autoconf autoconf-archive automake libtool bison flex \
+        perl \
+        libxcb-devel xcb-util-devel xcb-util-image-devel \
+        xcb-util-keysyms-devel xcb-util-renderutil-devel \
+        xcb-util-wm-devel xcb-util-cursor-devel libX11-devel \
+        libXrender-devel libXi-devel libxkbcommon-devel \
+        libxkbcommon-x11-devel libSM-devel libICE-devel \
+        glu-devel Mesa-libEGL-devel
+
+    # --vcpkg wants nothing else: vcpkg builds the libraries itself, so the
+    # -devel packages above would only shadow what it installs.
+    if [ -n "$vcpkg_only" ]; then
+        [ -n "$vcpkg_deps" ] && check sudo zypper in -y $vcpkg_deps
+        return 0
+    fi
+
     # openSUSE splits ffmpeg into one -devel package per library, all under a
     # versioned prefix.
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg-7-libavcodec-devel ffmpeg-7-libavdevice-devel ffmpeg-7-libavfilter-devel ffmpeg-7-libavformat-devel ffmpeg-7-libavutil-devel ffmpeg-7-libpostproc-devel ffmpeg-7-libswresample-devel ffmpeg-7-libswscale-devel"
@@ -851,7 +900,7 @@ suse_installdeps() {
         error '32 bit cross builds are no longer supported on OpenSUSE'
     fi
 
-    check sudo zypper in -y $tools $libs
+    check sudo zypper in -y $tools $libs $vcpkg_deps
 
     build_instructions
 }
