@@ -14,6 +14,19 @@ if(APPLE)
     add_compile_options(-Wno-deprecated-declarations)
 endif()
 
+# wx/wxcrtbase.h carries an unconditional #warning about the Android NDK's
+# limited mb/wchar conversion. Nothing in this project can act on it, and
+# because wx/string.h reaches nearly every wxWidgets translation unit it
+# accounted for 58 of the 62 warnings in an Android build. Marking the wx
+# include directories SYSTEM does not help: clang reports #warning from system
+# headers too. So turn the diagnostic off, on Android only, where the sole
+# instance of it comes from wx.
+# The flag has to be quoted: unquoted, CMake reads the # as the start of a
+# comment and the add_compile_options() call loses its closing paren.
+if(ANDROID)
+    add_compile_options("-Wno-#warnings")
+endif()
+
 # check if ssp flags are supported.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     check_cxx_compiler_flag(-fstack-protector-strong STACK_PROTECTOR_SUPPORTED)

@@ -33,7 +33,23 @@
 #include <QtWidgets/QScroller>
 #include <QtWidgets/QWidget>
 
+// wx/unix/apptrait.h redeclares GetEventLoopSourcesManager() without marking
+// it `override`, which -Winconsistent-missing-override reports. It is wx's own
+// header, and the wx include directories are deliberately -I rather than
+// -isystem so that the wx/setup.h matching ${wxWidgets_LIBRARIES} cannot be
+// shadowed (see src/wx/CMakeLists.txt), which leaves the diagnostic live here.
+// Silence it just around this include: the warning catches real mistakes in
+// our own code -- it found GLESDrawingPanel::OnSize -- so it should stay on
+// everywhere else. This is the only translation unit that includes the header.
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#endif
 #include <wx/apptrait.h>
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
+
 #include <wx/artprov.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>

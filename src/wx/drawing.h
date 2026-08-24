@@ -194,7 +194,7 @@ protected:
     // Present directly to the GL widget from the emulator frame, skipping the
     // wx Refresh()/PaintEv paint round-trip (halves the per-frame composite).
     void PresentFrame() override;
-    void OnSize(wxSizeEvent& ev);
+    void OnSize(wxSizeEvent& ev) override;
 
 private:
     void SyncGeometry();

@@ -890,6 +890,30 @@ if(ANDROID)
         set_property(TARGET visualboyadvance-m PROPERTY
             QT_ANDROID_EXTRA_LIBS "${VBAM_SDL3_ANDROID_LIB}")
     endif()
+
+    # androiddeployqt leaves the package deep in the build tree, at
+    # src/wx/android-build/visualboyadvance-m.apk (its own copy of gradle's
+    # android-build-release-unsigned.apk). Put it at the top of the build
+    # directory under a name that says which ABI it holds, using the same
+    # ARCH_NAME the libretro core uses for its release archives.
+    #
+    # This hangs off the .apk file rather than off Qt's apk target: that target
+    # is created by a deferred finalizer and so does not exist yet here, but the
+    # file is a known OUTPUT in this directory, which is enough for the
+    # dependency to resolve at generate time.
+    set(vbam_apk_built "${CMAKE_CURRENT_BINARY_DIR}/android-build/visualboyadvance-m.apk")
+    set(vbam_apk_named "${CMAKE_BINARY_DIR}/visualboyadvance-m-${ARCH_NAME}.apk")
+
+    add_custom_command(
+        OUTPUT  "${vbam_apk_named}"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${vbam_apk_built}" "${vbam_apk_named}"
+        DEPENDS "${vbam_apk_built}"
+        COMMENT "Copying APK to ${vbam_apk_named}"
+        VERBATIM
+    )
+
+    add_custom_target(vbam-android-apk ALL DEPENDS "${vbam_apk_named}")
 endif()
 
 if(ENABLE_VULKAN AND APPLE)

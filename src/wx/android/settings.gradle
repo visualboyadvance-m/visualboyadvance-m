@@ -1,0 +1,24 @@
+// Gradle settings for the APK build. androiddeployqt generates no settings.gradle
+// of its own, so this file adds to the build rather than replacing anything --
+// and deliberately leaves rootProject.name alone, because androiddeployqt looks
+// for the APK under a path named after this directory (android-build).
+//
+// Qt's generated build.gradle compiles the Java with -Xlint:all. Most of that
+// Java is SDL's upstream Android glue under src/org/libsdl/app, vendored
+// verbatim, and it produces ~75 warnings: deprecated Bluetooth GATT calls, the
+// deprecated OnSystemUiVisibilityChangeListener API, Intent.getParcelableExtra,
+// and auxiliaryclass reports for SDLControllerManager's helper classes. None of
+// it is ours to fix and editing the copies would only make them diverge from
+// SDL, so switch those categories back off.
+//
+// javac takes the last -Xlint option for a category, and this hook runs when
+// the compile tasks are realized, after build.gradle has been evaluated, so
+// these land after Qt's -Xlint:all. Every other lint stays on, for SDL's
+// sources and ours alike.
+gradle.afterProject { project ->
+    project.tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs += ['-Xlint:-deprecation',
+                                 '-Xlint:-auxiliaryclass',
+                                 '-Xlint:-this-escape']
+    }
+}

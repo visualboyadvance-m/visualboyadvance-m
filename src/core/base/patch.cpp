@@ -615,7 +615,7 @@ static bool patchApplyPPF3(FILE* f, uint8_t** rom, int* size)
     int imagetype = fgetc(f);
     int blockcheck = fgetc(f);
     int undo = fgetc(f);
-    fgetc(f);
+    fseek(f, 1, SEEK_CUR);  // skip the fourth byte
 
     uint8_t* mem = *rom;
 

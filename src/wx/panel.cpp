@@ -9426,15 +9426,14 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
     // Android build made before kGLES existed) maps to the GLES panel.
     // Every branch returns: none of the desktop panels below can be constructed
     // on Android, so control must never reach them.
-    if (method == config::RenderMethod::kSimple) {
-        // Simple, or GLES compiled out (ENABLE_GLES=OFF), which leaves the software
-        // renderer as the only output module.
-        return new BasicDrawingPanel(this, basic_width, basic_height);
 #if defined(VBAM_ENABLE_GLES)
-    } else if (method == config::RenderMethod::kGLES) {
+    if (method != config::RenderMethod::kSimple) {
         return new GLESDrawingPanel(this, basic_width, basic_height);
-#endif
     }
+#endif
+    // Simple, or GLES compiled out (ENABLE_GLES=OFF), which leaves the software
+    // renderer as the only output module.
+    return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif  // defined(__ANDROID__)
 #if defined(__WXMSW__)
     // Last-line defense against render methods that cannot work on this machine,
@@ -9507,8 +9506,8 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
         case config::RenderMethod::kQuartz2d:
             return new Quartz2DDrawingPanel(this, basic_width, basic_height);
 #endif
-#ifndef NO_OGL
         case config::RenderMethod::kOpenGL:
+#ifndef NO_OGL
 #if !defined(HAVE_WAYLAND_EGL) && !defined(NO_VULKAN)
             // OpenGL needs EGL/GLX, which a native Wayland client without
             // the wx EGL canvas cannot provide. Fall back to Vulkan, which
@@ -9519,6 +9518,11 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
             }
 #endif
             return new GLDrawingPanel(this, basic_width, basic_height);
+#else
+            // OpenGL compiled out (NO_OGL). The enumerator is still declared,
+            // so the label stays for the switch to cover RenderMethod; the
+            // software renderer is the fallback.
+            return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif
 #if defined(__WXMSW__) && !defined(NO_D3D)
         case config::RenderMethod::kDirect3d:
