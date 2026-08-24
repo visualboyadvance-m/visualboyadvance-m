@@ -565,6 +565,164 @@ function(cleanup_binary_packages)
     unset(VCPKG_INSTALLED_COUNT CACHE)
 endfunction()
 
+# The triplet vcpkg builds host tools for: the machine doing the building, which
+# is only the target triplet when not cross-compiling.
+function(vcpkg_host_triplet outvar)
+    if(VCPKG_HOST_TRIPLET)
+        set(${outvar} "${VCPKG_HOST_TRIPLET}" PARENT_SCOPE)
+        return()
+    endif()
+
+    if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([aA][aA][rR][cC][hH]64|[aA][rR][mM]64)$")
+        set(host_arch arm64)
+    else()
+        set(host_arch x64)
+    endif()
+
+    if(CMAKE_HOST_WIN32)
+        set(host_os windows)
+    elseif(CMAKE_HOST_APPLE)
+        set(host_os osx)
+    else()
+        set(host_os linux)
+    endif()
+
+    set(${outvar} "${host_arch}-${host_os}" PARENT_SCOPE)
+endfunction()
+
+# Install the host tools the target packages ask for from binary packages rather
+# than leaving vcpkg to build them. Cross-compiling for Android needs a host Qt
+# to run moc and androiddeployqt, and building one from source costs more than
+# the rest of the dependency set together, once per ABI.
+#
+# Android asks for the direct host dependencies only, matching how the nightly
+# packages them. The transitive closure is the right answer for a host expected
+# to build those tools from nothing, and the wrong one there: a Qt in the set
+# drags its whole desktop stack in behind it -- fontconfig, dbus, libsystemd --
+# which the host already has and no APK put on the server. Every other cross
+# target keeps the closure.
+#
+# Called after the target set is installed because vcpkg-listhostdeps reads
+# those packages' entries out of the vcpkg status file.
+function(get_host_binary_packages wanted_ports outvar)
+    set(${outvar} TRUE PARENT_SCOPE)
+
+    vcpkg_host_triplet(host_triplet)
+
+    if(host_triplet STREQUAL VCPKG_TARGET_TRIPLET)
+        return()
+    endif()
+
+    # Ask only about ports that actually made it in; listhostdeps errors out on
+    # a package that is not installed.
+    set(qualified "")
+
+    foreach(port ${wanted_ports})
+        vcpkg_is_installed(${port} 0 ${VCPKG_TARGET_TRIPLET} ${POWERSHELL} port_installed)
+
+        if(port_installed)
+            list(APPEND qualified "${port}:${VCPKG_TARGET_TRIPLET}")
+        endif()
+    endforeach()
+
+    if(NOT qualified)
+        return()
+    endif()
+
+    string(REPLACE ";" " " qualified_args "${qualified}")
+
+    if(VCPKG_TARGET_TRIPLET MATCHES "-android$")
+        set(host_deps_scope "-Direct ")
+    else()
+        set(host_deps_scope "")
+    endif()
+
+    execute_process(
+        COMMAND ${POWERSHELL}
+            -executionpolicy bypass -noprofile
+            -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-listhostdeps ${host_deps_scope}${qualified_args}"
+        OUTPUT_VARIABLE host_deps
+        RESULT_VARIABLE host_deps_status
+        ERROR_VARIABLE  host_deps_error
+    )
+
+    if(NOT host_deps_status EQUAL 0)
+        string(STRIP "${host_deps_error}" host_deps_error)
+        message(STATUS "Could not list host dependencies (${host_deps_error}); vcpkg will build any that are missing.")
+        set(${outvar} FALSE PARENT_SCOPE)
+        return()
+    endif()
+
+    string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
+    list(FILTER host_deps EXCLUDE REGEX "^ *$")
+
+    if(NOT host_deps)
+        return()
+    endif()
+
+    list(REMOVE_DUPLICATES host_deps)
+
+    get_triplet_package_list(${host_triplet})
+
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${host_triplet}.html")
+        message(STATUS "No binary package list for host triplet '${host_triplet}'; vcpkg will build the host tools.")
+        set(${outvar} FALSE PARENT_SCOPE)
+        return()
+    endif()
+
+    file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_triplet}.html" raw_html)
+
+    set(host_pkgs_dir ${CMAKE_BINARY_DIR}/vcpkg-host-binary-packages)
+    file(REMOVE_RECURSE ${host_pkgs_dir})
+    file(MAKE_DIRECTORY ${host_pkgs_dir})
+
+    set(host_all_found TRUE)
+    set(host_to_install "")
+
+    foreach(dep ${host_deps})
+        vcpkg_is_installed(${dep} 0 ${host_triplet} ${POWERSHELL} dep_installed)
+
+        if(dep_installed)
+            continue()
+        endif()
+
+        string(REGEX MATCHALL "<a href=\"${dep}_[^\"]+[.]zip\"" links "${raw_html}")
+        list(LENGTH links links_count)
+
+        if(NOT links_count EQUAL 1)
+            message(STATUS "No single binary package for host dependency '${dep}:${host_triplet}', will build from source.")
+            set(host_all_found FALSE)
+            continue()
+        endif()
+
+        string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
+
+        download_package("${pkg}" "${host_pkgs_dir}")
+
+        if(EXISTS "${host_pkgs_dir}/${pkg}")
+            list(APPEND host_to_install ${pkg})
+        else()
+            message(STATUS "Failed to download host dependency '${pkg}', will build from source.")
+            set(host_all_found FALSE)
+        endif()
+    endforeach()
+
+    if(host_to_install)
+        execute_process(
+            COMMAND ${POWERSHELL}
+                -executionpolicy bypass -noprofile
+                -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
+            WORKING_DIRECTORY ${host_pkgs_dir}
+        )
+    endif()
+
+    file(REMOVE_RECURSE ${host_pkgs_dir})
+
+    if(NOT host_all_found)
+        set(${outvar} FALSE PARENT_SCOPE)
+    endif()
+endfunction()
+
 function(get_binary_packages)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
@@ -879,6 +1037,12 @@ function(get_binary_packages)
         )
 
         file(REMOVE_RECURSE ${bin_pkgs_dir})
+    endif()
+
+    get_host_binary_packages("${wanted_ports}" host_packages_installed)
+
+    if(NOT host_packages_installed)
+        set(all_ports_found FALSE)
     endif()
 
     cleanup_binary_packages()
