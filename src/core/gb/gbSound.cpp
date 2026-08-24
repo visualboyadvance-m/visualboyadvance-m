@@ -200,7 +200,14 @@ void gbSoundReset()
 
     gbSoundEvent(0, 0xff10, 0x80);   // NR10  ch1 sweep (period=0, no shift)
     gbSoundEvent(0, 0xff11, 0xbf);   // NR11  ch1 duty=50%, length-load=63
-    if (gbHardware & 0x4) {
+    // With a boot ROM present the real one runs and leaves the hardware in
+    // whatever state it actually produces, so there is nothing to fabricate.
+    // Doing it anyway leaves channel 1 enabled at the frequency these writes
+    // happen to set; the boot ROM's own NR12 write then lands on an enabled
+    // channel and the zombie path lifts the volume back off zero, so it sings
+    // at that frequency until the ding reprograms it.
+    extern bool inBios;
+    if (inBios || (gbHardware & 0x4)) {
         // SGB boot plays no ding: ch1 configured but never triggered.
         gbSoundEvent(0, 0xff12, 0xf3);   // NR12  ch1 envelope: init=$F, decay, period=3
         gbSoundEvent(0, 0xff13, 0xf3);   // NR13  ch1 freq low

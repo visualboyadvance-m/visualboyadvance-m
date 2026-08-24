@@ -1,4 +1,7 @@
-#include <cstdlib>
+#ifdef VBAM_GB_TRACE
+#include <cstdlib>   // getenv/atoi for the tunable sample positions below
+#endif
+
 #include "core/gb/gbGfx.h"
 
 #include <memory.h>
@@ -66,14 +69,32 @@ void gbRenderLine()
         return;
 
     int SpritesTicks = gbSpritesTicks[x] * (gbSpeed ? 2 : 4);
-    static int scxRd = getenv("VBAM_SCX_RD") ? atoi(getenv("VBAM_SCX_RD")) : 2;
-    static int scyRd = getenv("VBAM_SCY_RD") ? atoi(getenv("VBAM_SCY_RD")) : 5;
+    // Sample positions within the fetch for SCX / SCY / LCDC.
+    //
+    // Constants in a normal build. They were calibrated against hardware
+    // behaviour and do not change at runtime, and a function-local static with
+    // a runtime initialiser carries a guard check on every call -- gbRenderLine
+    // runs for every visible scanline, several hundred thousand times a second.
+    //
+    // Build with VBAM_GB_TRACE to make them tunable again, for re-deriving them
+    // against a test ROM.
+#ifdef VBAM_GB_TRACE
+    static const int scxRd = getenv("VBAM_SCX_RD") ? atoi(getenv("VBAM_SCX_RD")) : 2;
+    static const int scyRd = getenv("VBAM_SCY_RD") ? atoi(getenv("VBAM_SCY_RD")) : 5;
+#else
+    constexpr int scxRd = 2;
+    constexpr int scyRd = 5;
+#endif
     int sx = gbSCXLine[(gbSpeed ? 0 : scxRd) + SpritesTicks];
     int sy = gbSCYLine[(gbSpeed ? 11 : scyRd) + SpritesTicks];
 
     // Mid-scanline LCDC changes: sample the tile map / tile data select
     // bits per fetch (gambatte bgtilemap/bgtiledata).
-    static int lcdcRd = getenv("VBAM_LCDC_RD") ? atoi(getenv("VBAM_LCDC_RD")) : 2;
+#ifdef VBAM_GB_TRACE
+    static const int lcdcRd = getenv("VBAM_LCDC_RD") ? atoi(getenv("VBAM_LCDC_RD")) : 2;
+#else
+    constexpr int lcdcRd = 2;
+#endif
     uint8_t lcdc_px = gbLcdcLine[(gbSpeed ? 0 : lcdcRd) + SpritesTicks];
 
     int tile_map = 0x1800;
@@ -601,6 +622,11 @@ void gbDrawSprites(bool draw)
                         }
                         gbSpritesTotalT += penaltyT;
                         int tickDiv = gbSpeed ? 2 : 4;
+                        // At most ten sprites per line, each costing 6 T plus
+                        // up to 5 T of fetch alignment, so the running total
+                        // cannot exceed 110 T -- about 28 ticks once divided.
+                        // The array element is a uint8_t and the value fits;
+                        // say so explicitly rather than narrowing implicitly.
                         int add = gbSpritesTotalT / tickDiv - gbSpritesPrevTicks;
                         gbSpritesPrevTicks += add;
                         if (add > 0) {
@@ -608,7 +634,8 @@ void gbDrawSprites(bool draw)
                             if (start < 0)
                                 start = 0;
                             for (int j = start; j < 300; j++)
-                                gbSpritesTicks[j] += add;
+                                gbSpritesTicks[j] =
+                                    (uint8_t)(gbSpritesTicks[j] + add);
                         }
                     }
                     count++;

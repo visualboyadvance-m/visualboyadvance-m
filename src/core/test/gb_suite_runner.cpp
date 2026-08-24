@@ -178,6 +178,22 @@ static bool g_dump_screen = false;
 // state mooneye's boot_div / boot_hwio tests verify.
 static std::vector<uint8_t> g_dmg_bios;     // 256 bytes
 static std::vector<uint8_t> g_cgb_bios;     // 2304 bytes
+// Model-specific boot ROMs. Mooneye's boot_* tests measure the state a
+// particular console's boot ROM hands over, so running them all against one
+// blob and patching the difference in afterwards tests the patch rather than
+// the emulator. When the matching ROM is supplied it is used instead.
+static std::vector<uint8_t> g_dmg0_bios;    // DMG rev 0
+static std::vector<uint8_t> g_mgb_bios;     // Game Boy Pocket
+static std::vector<uint8_t> g_cgb0_bios;    // CGB rev 0
+static std::vector<uint8_t> g_agb_bios;     // CGB boot ROM as shipped in AGB
+// No AGB entry either, for now: running the CGB-on-AGB boot ROM needs the
+// hardware-flag handling that lives in the palette/border work, so wiring it
+// here ahead of that would exercise a path the core is not ready for.
+//
+// No SGB entry on purpose: the SGB boot ROM transmits the cartridge header to
+// the SNES and waits for it, so with no SNES on the other end it never reaches
+// $0100. It hangs the test and leaves the machine mid-boot for whatever runs
+// next. The register overrides below stand in for it.
 
 // CI baseline: if set (--min-pass N), the process returns 0 when at
 // least N tests pass, regardless of how many fail. -1 (the default)
@@ -1031,11 +1047,44 @@ static void run_case(const TestCase& tc, TestResult& out) {
     coreOptions.useBios  = false;
     coreOptions.skipBios = false;
     if (g_bios != nullptr) {
-        if ((gbHardware & 2) && !g_cgb_bios.empty()) {
-            std::memcpy(g_bios, g_cgb_bios.data(), g_cgb_bios.size());
-            coreOptions.useBios = true;
-        } else if ((gbHardware & 1) && !g_dmg_bios.empty()) {
-            std::memcpy(g_bios, g_dmg_bios.data(), g_dmg_bios.size());
+        // Pick the blob for the console the test names, falling back to the
+        // generic one for that family.
+        // gbHardware is not set until gbReset(), which runs after this, so
+        // reading it here gets whatever the previous ROM left behind -- zero
+        // on the first test, and the wrong console on every one after a mode
+        // change. Use the emulator type this run already decided on.
+        // AGB deliberately excluded: it needs the CGB-on-AGB boot ROM, and
+        // handing it the plain CGB one would drop the hardware flag a GB cart
+        // reads. Until that is wired, AGB uses the register overrides.
+        const bool want_cgb = (et == 1);
+        const bool want_agb = (et == 4);
+        // A test named for SGB is an SGB test even when its mode resolves to
+        // auto; it must not be handed a DMG boot ROM.
+        const bool want_sgb = (et == 2 || et == 5) ||
+                              rom_path.find("-sgb") != std::string::npos ||
+                              rom_path.find("-S.gb") != std::string::npos;
+        (void)want_sgb;
+
+        const std::vector<uint8_t>* blob = nullptr;
+        if (want_cgb) {
+            if (rom_path.find("-cgb0") != std::string::npos && !g_cgb0_bios.empty())
+                blob = &g_cgb0_bios;
+            else if (!g_cgb_bios.empty())
+                blob = &g_cgb_bios;
+        } else if (want_agb) {
+            // see above: not yet
+        } else if (want_sgb) {
+            // see above: no SGB boot ROM
+        } else {
+            if (rom_path.find("-dmg0") != std::string::npos && !g_dmg0_bios.empty())
+                blob = &g_dmg0_bios;
+            else if (rom_path.find("-mgb") != std::string::npos && !g_mgb_bios.empty())
+                blob = &g_mgb_bios;
+            else if (!g_dmg_bios.empty())
+                blob = &g_dmg_bios;
+        }
+        if (blob) {
+            std::memcpy(g_bios, blob->data(), blob->size());
             coreOptions.useBios = true;
         }
     }
@@ -1059,7 +1108,13 @@ static void run_case(const TestCase& tc, TestResult& out) {
     // other variants ship with different boot ROMs that leave a
     // distinct A value. Patching the register post-reset is enough
     // because mooneye reads them on the first instruction.
-    if (rom_path.find("-mgb") != std::string::npos) {
+    // Only stand in for a boot ROM that is not there. These patch DIV and the
+    // LCD phase, and they run before the ROM executes -- so applied on top of a
+    // real boot ROM they do not describe its handover state, they corrupt its
+    // starting state and it hands over something else entirely.
+    if (coreOptions.useBios) {
+        // the real boot ROM will produce the state
+    } else if (rom_path.find("-mgb") != std::string::npos) {
         // MGB pocket: A=$FF (rest matches DMG-ABC).
         AF.B.B1 = 0xFF;
     } else if (rom_path.find("-dmg0") != std::string::npos) {
@@ -1652,6 +1707,23 @@ int main(int argc, char** argv) {
         } else if ((std::strcmp(a, "--bios") == 0 ||
                     std::strcmp(a, "--cgb-bios") == 0) && i + 1 < argc) {
             cgb_bios_path = argv[++i];
+        } else if (std::strcmp(a, "--dmg0-bios") == 0 && i + 1 < argc) {
+            const char* q = argv[++i];
+            if (!slurp_file(q, g_dmg0_bios) || g_dmg0_bios.size() != 256)
+                g_dmg0_bios.clear();
+        } else if (std::strcmp(a, "--mgb-bios") == 0 && i + 1 < argc) {
+            const char* q = argv[++i];
+            if (!slurp_file(q, g_mgb_bios) || g_mgb_bios.size() != 256)
+                g_mgb_bios.clear();
+        } else if (std::strcmp(a, "--agb-bios") == 0 && i + 1 < argc) {
+            // Accepted and validated, but not yet used — see the selection.
+            const char* q = argv[++i];
+            if (!slurp_file(q, g_agb_bios) || g_agb_bios.size() != 2304)
+                g_agb_bios.clear();
+        } else if (std::strcmp(a, "--cgb0-bios") == 0 && i + 1 < argc) {
+            const char* q = argv[++i];
+            if (!slurp_file(q, g_cgb0_bios) || g_cgb0_bios.size() != 2304)
+                g_cgb0_bios.clear();
         } else if (std::strcmp(a, "--dmg-bios") == 0 && i + 1 < argc) {
             dmg_bios_path = argv[++i];
         } else if (std::strcmp(a, "--min-pass") == 0 && i + 1 < argc) {

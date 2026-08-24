@@ -644,6 +644,12 @@ static uint64_t gbOamDmaBlockFrom = 0;
 static uint64_t gbOamDmaBlockUntil = 0;
 static int gbOamDmaCopyPending = 0;
 static uint16_t gbOamDmaCopySource = 0;
+// The transfer reads its source as it runs, not when it completes. Games
+// commonly write their sprite table, start the transfer, then immediately
+// reuse that buffer to build the next frame; sampling the source at the end
+// of the window copies the rewritten buffer instead, and the sprites for that
+// frame come out wrong or missing.
+static uint8_t gbOamDmaStaging[0xa0];
 static int gbMemAccessCycleAdj = 0;
 // OAM DMA bus conflicts (gambatte oamdma/oamdma_src*_busy*): while the
 // DMA engine owns a bus, a CPU read from an address on that same bus
@@ -660,7 +666,15 @@ static uint8_t gbOamDmaOverridden[0xa0];
 
 // Bus classification: 0 = external, 1 = video (VRAM), 3 = CGB WRAM,
 // 2 = not on a DMA-shared bus (OAM / IO / HRAM).
-static inline int gbDmaBusClass(uint16_t addr)
+#if defined(_MSC_VER)
+#define GB_ALWAYS_INLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define GB_ALWAYS_INLINE inline __attribute__((always_inline))
+#else
+#define GB_ALWAYS_INLINE inline
+#endif
+
+static GB_ALWAYS_INLINE int gbDmaBusClass(uint16_t addr)
 {
     if (addr < 0x8000) return 0;
     if (addr < 0xa000) return 1;
@@ -669,9 +683,22 @@ static inline int gbDmaBusClass(uint16_t addr)
     return 2;
 }
 
+// True while a transfer could still be on the bus.
+//
+// gbOamDmaSrcBusClass is never cleared once a transfer has run, so the cycle
+// window has to be part of the test as well, or every access for the rest of
+// the session pays for a check that can no longer match. The slack covers
+// gbMemAccessCycleAdj, which shifts the effective cycle by at most a couple of
+// M-cycles in either direction.
+static GB_ALWAYS_INLINE bool gbOamDmaBusActive(void)
+{
+    return gbOamDmaSrcBusClass >= 0 &&
+           gbCycleCounter < gbOamDmaBlockUntil + 4;
+}
+
 // Index of the DMA byte on the bus at effective CPU-access cycle `eff`,
 // or -1 when no transfer is on the bus at that moment.
-static inline int gbOamDmaInflightIndex(void)
+static GB_ALWAYS_INLINE int gbOamDmaInflightIndex(void)
 {
     if (gbOamDmaSrcBusClass < 0)
         return -1;
@@ -737,10 +764,23 @@ static inline bool gbLcdOnGlitchActive(void)
     return gbLcdOnGlitchMode0 != 0;
 }
 
-static inline bool gbOamDmaBlocked(void)
+static GB_ALWAYS_INLINE bool gbOamDmaBlocked(void)
 {
     uint64_t eff = gbCycleCounter - (uint64_t)gbMemAccessCycleAdj;
     return eff >= gbOamDmaBlockFrom && eff < gbOamDmaBlockUntil;
+}
+
+// Complete a pending transfer irrespective of the CPU-visibility window.
+// That window models the bus the CPU reads OAM through; the PPU does not
+// fetch its sprites through it, so leaving the copy pending here makes the
+// per-scanline latch take the previous contents and the frame's sprites go
+// missing.
+static void gbOamDmaFlushForPpu(void)
+{
+    if (gbOamDmaCopyPending) {
+        gbOamDmaCopyPending = 0;
+        memcpy(&gbMemory[0xfe00], gbOamDmaStaging, 0xa0);
+    }
 }
 
 // The 160-byte copy is performed once the blocked window has passed
@@ -760,11 +800,21 @@ static void gbOamDmaFlushIfDue(void)
     }
 }
 
+// Set VBAM_GB_TRACE at build time to compile in the STAT/IRQ tracing.
+#ifdef VBAM_GB_TRACE
+#define GB_TRACE_STAT_READ(v)      gbTraceStatRead(v)
+#define GB_TRACE_STAT_RAISE(s, f)  gbTraceStatRaise((s), (f))
+#else
+#define GB_TRACE_STAT_READ(v)      ((void)0)
+#define GB_TRACE_STAT_RAISE(s, f)  ((void)0)
+#endif
+
 // Debug bookkeeping for VBAM_TRACE_GBIRQ (no effect on emulation).
 static uint64_t gbLastOamRaiseCycle = 0;
 static uint64_t gbLastTimerRaiseCycle = 0;
 static uint64_t gbLastRetiCycle = 0;
 static uint64_t gbIrqDecisionCycle = 0;
+#ifdef VBAM_GB_TRACE
 static long long gbTraceStatThresh(void)
 {
     static long long thresh = -2;
@@ -775,8 +825,10 @@ static long long gbTraceStatThresh(void)
     return thresh;
 }
 
+#ifdef VBAM_GB_TRACE
 // Forward declarations for trace state defined above gbReadMemory.
 static void gbTraceStatRead(uint8_t statv);
+#endif
 
 // VBAM_TRACE_STAT=<cycle>: log every STAT-IRQ raise decision once
 // gbCycleCounter passes <cycle>.
@@ -792,6 +844,7 @@ static void gbTraceStatRaise(const char* src, int fired)
             register_STAT, gbInt48Signal, register_IF,
             register_SCX, register_WY, register_LCDC);
 }
+#endif  // VBAM_GB_TRACE
 // On DMG/SGB the OAM (mode 2) STAT interrupt for line 0 — the one at the
 // mode 1 -> mode 2 transition when V-Blank ends — is raised one M-cycle
 // after the mode transition itself (mooneye ppu/intr_1_2_timing-GS). The
@@ -803,10 +856,15 @@ static int gbVblankEndOamIrqPending = 0;
 // DMG-compatibility mode on CGB/AGB hardware: CGB CPU revision, but the
 // CGB-only control registers are locked (set in gbGetHardwareType).
 int gbCgbDmgCompat = 0;
+extern bool inBios;
 // True when the CGB-only control registers are reachable.
-static inline bool gbCgbRegsUnlocked(void)
+static GB_ALWAYS_INLINE bool gbCgbRegsUnlocked(void)
 {
-    return gbCgbMode && !gbCgbDmgCompat;
+    // The boot ROM is what applies the lock, so it must be able to reach
+    // these registers itself: its logo animation is drawn by writing the
+    // CGB palettes. Locking them from reset leaves a DMG cart booting on
+    // CGB hardware with an audible chime and a blank screen.
+    return gbCgbMode && (!gbCgbDmgCompat || inBios);
 }
 // serial
 int gbSerialOn = 0;
@@ -832,6 +890,7 @@ int gbLcdModeDelayed = 2;
 int gbLcdTicks = GBLCD_MODE_2_CLOCK_TICKS - 1;
 int gbLcdTicksDelayed = GBLCD_MODE_2_CLOCK_TICKS;
 
+#ifdef VBAM_GB_TRACE
 static void gbTraceStatRead(uint8_t statv)
 {
     long long thresh = gbTraceStatThresh();
@@ -841,6 +900,7 @@ static void gbTraceStatRead(uint8_t statv)
             (unsigned long long)gbCycleCounter, statv, gbLcdMode, gbLcdModeDelayed,
             register_LY, gbLcdTicks, gbLcdTicksDelayed, PC.W);
 }
+#endif  // VBAM_GB_TRACE
 int gbLcdLYIncrementTicks = 114;
 int gbLcdLYIncrementTicksDelayed = 115;
 int gbScreenTicks = 0;
@@ -1445,7 +1505,7 @@ bool allowColorizerHack(void)
 
 static inline bool gbLcdOnGlitchActive(void);
 
-static inline bool gbVramReadAccessValid(void)
+static GB_ALWAYS_INLINE bool gbVramReadAccessValid(void)
 {
     if (gbLcdOnGlitchActive())
         return true;
@@ -1457,7 +1517,7 @@ static inline bool gbVramReadAccessValid(void)
     return false;
 }
 
-static inline bool gbVramWriteAccessValid(void)
+static GB_ALWAYS_INLINE bool gbVramWriteAccessValid(void)
 {
     if (gbLcdOnGlitchActive())
         return true;
@@ -1472,7 +1532,7 @@ static inline bool gbVramWriteAccessValid(void)
     return false;
 }
 
-static inline bool gbCgbPaletteAccessValid(void)
+static GB_ALWAYS_INLINE bool gbCgbPaletteAccessValid(void)
 {
     // No access to gbPalette during mode 3 (Color Panel Demo)
     if (allowColorizerHack() ||
@@ -1504,14 +1564,28 @@ bool gbIsGameboyRom(char* file)
     return false;
 }
 
+// `inline` is only a hint, and gbEmulate is large enough that a compiler can
+// reasonably decline to inline into it. The wrappers below sit on every opcode
+// fetch and operand access, so declining turns each one into a call plus two
+// global stores -- cheap per access, but multiplied by every instruction the
+// CPU executes, which is what busy-looping code like a boot ROM animation or a
+// per-scanline fade does most of.
+
 // Forward declaration — gbReadMemory is defined further down.
 uint8_t gbReadMemory(uint16_t address);
 
 // Perform a memory access whose true position is `endOff` machine
 // cycles before the end of the current instruction. Only the OAM-DMA
 // visibility window looks at this — all other timing is unchanged.
-static inline uint8_t gbReadMemoryAt(uint16_t address, int endOff)
+static GB_ALWAYS_INLINE uint8_t gbReadMemoryAt(uint16_t address, int endOff)
 {
+    // Nothing reads gbMemAccessCycleAdj unless the access lands in OAM or the
+    // I/O page, or a transfer is on the bus. Everywhere else the two stores
+    // are dead -- and "everywhere else" is the overwhelming majority of the
+    // tens of millions of accesses a second the CPU makes.
+    if (address < 0xfe00 && !gbOamDmaBusActive())
+        return gbReadMemory(address);
+
     gbMemAccessCycleAdj = endOff;
     uint8_t v = gbReadMemory(address);
     gbMemAccessCycleAdj = 0;
@@ -1520,8 +1594,13 @@ static inline uint8_t gbReadMemoryAt(uint16_t address, int endOff)
 
 void gbWriteMemory(uint16_t address, uint8_t value);
 
-static inline void gbWriteMemoryAt(uint16_t address, uint8_t value, int endOff)
+static GB_ALWAYS_INLINE void gbWriteMemoryAt(uint16_t address, uint8_t value, int endOff)
 {
+    if (address < 0xfe00 && !gbOamDmaBusActive()) {
+        gbWriteMemory(address, value);
+        return;
+    }
+
     gbMemAccessCycleAdj = endOff;
     gbWriteMemory(address, value);
     gbMemAccessCycleAdj = 0;
@@ -1600,7 +1679,7 @@ void gbCompareLYToLYC()
 
             // check if we need an interrupt
             if (register_STAT & 0x40) {
-                gbTraceStatRaise("lyc", !gbInt48Signal);
+                GB_TRACE_STAT_RAISE("lyc", !gbInt48Signal);
                 // send LCD interrupt only if no interrupt 48h signal...
                 if (!gbInt48Signal) {
                     register_IF |= 2;
@@ -1640,12 +1719,12 @@ void gbCompareLYToLYC()
 #define GB_OAM_BUG_WRITE    1
 #define GB_OAM_BUG_READ_INC 2
 
-static inline uint16_t gbOamBugReadWord(int offset)
+static GB_ALWAYS_INLINE uint16_t gbOamBugReadWord(int offset)
 {
     return (uint16_t)(gbMemory[0xFE00 + offset] | (gbMemory[0xFE01 + offset] << 8));
 }
 
-static inline void gbOamBugWriteWord(int offset, uint16_t value)
+static GB_ALWAYS_INLINE void gbOamBugWriteWord(int offset, uint16_t value)
 {
     gbMemory[0xFE00 + offset] = (uint8_t)(value & 0xFF);
     gbMemory[0xFE01 + offset] = (uint8_t)(value >> 8);
@@ -1692,7 +1771,7 @@ static void gbOamBugCorrupt(int type, int row)
     memcpy(&oam[row * 8 + 2], &oam[(row - 1) * 8 + 2], 6);
 }
 
-static inline void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
+static GB_ALWAYS_INLINE void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
 {
     if (!(gbHardware & 1))               return;
     if (!(register_LCDC & 0x80))         return;
@@ -1706,7 +1785,7 @@ static inline void gbOamBugAccess(uint16_t addr, int type, int cyclesBeforeEnd)
 // the state at instruction start; the access itself lands
 // (clockTicks + gbMemAccessCycleAdj) machine cycles later (gambatte
 // sound/ch1_late_div_write_nr52_1a vs 1b differ by exactly one cycle).
-static inline int gbSoundAccessTime(void)
+static GB_ALWAYS_INLINE int gbSoundAccessTime(void)
 {
     int in_instr = clockTicks + gbMemAccessCycleAdj;
     if (in_instr < 0)
@@ -1739,7 +1818,8 @@ void gbWriteMemory(uint16_t address, uint8_t value)
     // OAM DMA bus conflict: a write on the bus the DMA engine owns
     // replaces the in-flight transfer byte and never reaches memory
     // (nor the MBC).
-    if (address < 0xfe00 && gbOamDmaConflictWrite(address, value))
+    if (gbOamDmaBusActive() && address < 0xfe00 &&
+        gbOamDmaConflictWrite(address, value))
         return;
 
     if (address < 0x8000) {
@@ -2384,6 +2464,18 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 if (gbOamDmaOverridden[i])
                     gbMemory[0xfe00 + i] = gbOamDmaOverride[i];
         }
+        // Sample the source now; reveal it when the window closes.
+        for (int i = 0; i < 0xa0; i++) {
+            uint16_t sa = (uint16_t)(source + i);
+            if (sa >= 0xa000 && sa < 0xc000) {
+                gbOamDmaStaging[i] = gbReadMemory(sa);
+            } else if (sa >= 0xe000 && sa < 0xfe00) {
+                uint16_t real = (uint16_t)(sa & ~0x2000);
+                gbOamDmaStaging[i] = gbMemoryMap[real >> 12][real & 0x0fff];
+            } else {
+                gbOamDmaStaging[i] = gbMemoryMap[sa >> 12][sa & 0x0fff];
+            }
+        }
         gbOamDmaCopyPending = 1;
         gbOamDmaCopySource = (uint16_t)source;
         gbOamDmaTransferStart = gbCycleCounter + 2;
@@ -2763,7 +2855,7 @@ uint8_t gbReadMemory(uint16_t address)
 
     // OAM DMA bus conflict: a read on the bus the DMA engine owns
     // returns the in-flight transfer byte.
-    if (address < 0xfe00) {
+    if (gbOamDmaBusActive() && address < 0xfe00) {
         uint8_t v;
         if (gbOamDmaConflictRead(address, &v))
             return v;
@@ -3113,7 +3205,7 @@ uint8_t gbReadMemory(uint16_t address)
                 statv = (uint8_t)(0x80 | gbMemory[0xff41]);
             if (gbLcdOnGlitchMode0)
                 statv &= 0xfc;
-            gbTraceStatRead(statv);
+            GB_TRACE_STAT_READ(statv);
             return statv;
         }
         case 0x42:
@@ -3121,11 +3213,18 @@ uint8_t gbReadMemory(uint16_t address)
         case 0x43:
             return register_SCX;
         case 0x44:
-            if (getenv("VBAM_TRACE_LYREAD"))
-                fprintf(stderr, "[lyread] cyc=%llu LY=%d mode=%d lcdTicks=%d incrTicks=%d LCDC=%02X\n",
-                        (unsigned long long)gbCycleCounter, register_LY,
-                        gbLcdMode, gbLcdTicks, gbLcdLYIncrementTicks,
-                        register_LCDC);
+#ifdef VBAM_GB_TRACE
+            {
+                static int lyTrace = -1;
+                if (lyTrace < 0)
+                    lyTrace = getenv("VBAM_TRACE_LYREAD") ? 1 : 0;
+                if (lyTrace)
+                    fprintf(stderr, "[lyread] cyc=%llu LY=%d mode=%d lcdTicks=%d incrTicks=%d LCDC=%02X\n",
+                            (unsigned long long)gbCycleCounter, register_LY,
+                            gbLcdMode, gbLcdTicks, gbLcdLYIncrementTicks,
+                            register_LCDC);
+            }
+#endif
             if (((gbHardware & 7) && ((gbLcdMode == 1) && (gbLcdTicks == 0x71))) || (!(register_LCDC & 0x80)))
                     return 0;
             else
@@ -3820,8 +3919,8 @@ void gbReset()
             int pop = 0;
             if (gbRom != NULL) {
                 for (int b = 0x14e; b <= 0x14f; b++)
-                    for (int i = 0; i < 8; i++)
-                        pop += (gbRom[b] >> i) & 1;
+                    for (int bit = 0; bit < 8; bit++)
+                        pop += (gbRom[b] >> bit) & 1;
             }
             gbDivTicks = 36 + pop;
             gbInternalTimer = gbDivTicks;
@@ -4045,8 +4144,8 @@ void gbReset()
         int phase2048 = ((register_DIV & 0x1f) << 6) |
                         ((GBDIV_CLOCK_TICKS - gbDivTicks) & 63);
         int to_fall = 2048 - phase2048;
-        int boot_step = getenv("VBAM_APU_STEP")
-                            ? atoi(getenv("VBAM_APU_STEP")) : 1;
+        // Calibrated step index; a constant rather than a runtime lookup.
+        constexpr int boot_step = 1;
         gbSoundFrameSeqAlign(soundTicks, to_fall * 2, boot_step);
     }
 
@@ -5290,7 +5389,7 @@ void gbEmulate(int ticksToStop)
                             // ppu/vblank_stat_intr-GS rounds 3-4).
                             if ((register_STAT & 0x10)
                                 || ((gbHardware & 5) && (register_STAT & 0x20))) {
-                                gbTraceStatRaise("vbl1", (!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a)));
+                                GB_TRACE_STAT_RAISE("vbl1", (!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a)));
                                 // send LCD interrupt only if no interrupt 48h signal...
                                 if ((!(gbInt48Signal & 1)) && ((!(gbInt48Signal & 8)) || (gbHardware & 0x0a))) {
                                     register_IF |= 2;
@@ -5312,7 +5411,7 @@ void gbEmulate(int ticksToStop)
 
                             gbInt48Signal &= ~6;
                             if (register_STAT & 0x20) {
-                                gbTraceStatRaise("oam2", !gbInt48Signal);
+                                GB_TRACE_STAT_RAISE("oam2", !gbInt48Signal);
                                 // send LCD interrupt only if no interrupt 48h signal...
                                 if (!gbInt48Signal) {
                                     register_IF |= 2;
@@ -5336,7 +5435,7 @@ void gbEmulate(int ticksToStop)
                         // next mode is OAM being accessed mode
                         gbInt48Signal &= ~5;
                         if (register_STAT & 0x20) {
-                            gbTraceStatRaise("oam1e", !gbInt48Signal);
+                            GB_TRACE_STAT_RAISE("oam1e", !gbInt48Signal);
                             // send LCD interrupt only if no interrupt 48h signal...
                             if (!gbInt48Signal) {
                                 if (gbHardware & 5) {
@@ -5369,7 +5468,7 @@ void gbEmulate(int ticksToStop)
                         // Snapshot OAM at mode 2 entry. Real GBC hardware locks OAM
                         // during modes 2 and 3, so both pipeline passes must see the
                         // same OAM state.
-                        gbOamDmaFlushIfDue();
+                        gbOamDmaFlushForPpu();
                         memcpy(gbOAMLatch, &gbMemory[0xfe00], 0xa0);
                         // While an OAM DMA transfer is in flight the
                         // PPU's OAM scan reads $FF, so those sprite
@@ -5455,7 +5554,7 @@ void gbEmulate(int ticksToStop)
 
                         gbInt48Signal &= ~7;
                         if (register_STAT & 0x08) {
-                            gbTraceStatRaise("hbl", !(gbInt48Signal & 8));
+                            GB_TRACE_STAT_RAISE("hbl", !(gbInt48Signal & 8));
                             // send LCD interrupt only if no interrupt 48h signal...
                             if (!(gbInt48Signal & 8)) {
                                 register_IF |= 2;
@@ -6145,8 +6244,12 @@ void gbEmulate(int ticksToStop)
                 // VBAM_TRACE_GBIRQ=1 logs every dispatch to stderr.
                 {
                     static int trace = -1;
+#ifdef VBAM_GB_TRACE
                     if (trace < 0)
                         trace = getenv("VBAM_TRACE_GBIRQ") ? 1 : 0;
+#else
+                    trace = 0;
+#endif
                     if (trace) {
                         uint16_t pushedPC = (uint16_t)(gbReadMemory((uint16_t)(SP.W + 1)) << 8
                                                        | gbReadMemory(SP.W));
