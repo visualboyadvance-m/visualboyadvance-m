@@ -962,6 +962,16 @@ function(get_binary_packages)
                 set(dep_name    ${CMAKE_MATCH_1})
                 set(dep_triplet ${CMAKE_MATCH_2})
 
+                # A dependency for another triplet is a host tool the target
+                # packages were built with, which only changes what a failure to
+                # find one means: vcpkg builds it if something still needs it,
+                # rather than this configure building the port itself.
+                set(host_dep FALSE)
+
+                if(NOT dep_triplet STREQUAL VCPKG_TARGET_TRIPLET)
+                    set(host_dep TRUE)
+                endif()
+
                 set(pkg_installed FALSE)
                 vcpkg_is_installed(${dep_name} 0 ${dep_triplet} ${POWERSHELL} pkg_installed)
 
@@ -984,7 +994,9 @@ function(get_binary_packages)
 
                 if(NOT links_count EQUAL 1)
                     if(links_count GREATER 1)
-                        message(STATUS "Multiple packages found for missing dependency '${dep_name}' for triplet '${dep_triplet}', skipping.")
+                        message(STATUS "Multiple packages found for '${dep_name}:${dep_triplet}', skipping.")
+                    elseif(host_dep)
+                        message(STATUS "No binary package for host tool '${dep_name}:${dep_triplet}'; vcpkg will build it if it is needed.")
                     else()
                         message(STATUS "No package found for missing dependency '${dep_name}' for triplet '${dep_triplet}', will build from source.")
                     endif()
@@ -1003,6 +1015,9 @@ function(get_binary_packages)
 
                 if(EXISTS "${bin_pkgs_dir}/${pkg}")
                     set(progress_made TRUE)
+                elseif(host_dep)
+                    message(STATUS "Failed to download host tool '${pkg}'; vcpkg will build it if it is needed.")
+                    set(all_ports_found FALSE)
                 else()
                     message(STATUS "Failed to download missing dependency '${pkg}', will build from source.")
                     set(all_ports_found FALSE)
