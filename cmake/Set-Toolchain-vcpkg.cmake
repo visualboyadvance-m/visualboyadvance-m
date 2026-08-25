@@ -477,11 +477,15 @@ function(vcpkg_is_installed pkg_name pkg_ver pkg_triplet powershell outvar)
             continue()
         endif()
 
+        # The name has to hold for either arm. AND binds tighter than OR, so
+        # written without the outer parentheses this asked for the name on the
+        # first arm only, and any package of the triplet carrying the same
+        # version satisfied the second.
         if(inst_pkg_name STREQUAL pkg_name
-            AND pkg_ver VERSION_LESS inst_pkg_ver
-            OR (pkg_ver VERSION_EQUAL inst_pkg_ver
-                AND ((NOT pkg_rev AND NOT inst_pkg_rev)
-                    OR (pkg_rev AND inst_pkg_rev AND (NOT pkg_rev GREATER inst_pkg_rev)))))
+            AND (pkg_ver VERSION_LESS inst_pkg_ver
+                OR (pkg_ver VERSION_EQUAL inst_pkg_ver
+                    AND ((NOT pkg_rev AND NOT inst_pkg_rev)
+                        OR (pkg_rev AND inst_pkg_rev AND (NOT pkg_rev GREATER inst_pkg_rev))))))
 
             set(${outvar} TRUE PARENT_SCOPE)
             return()
@@ -543,6 +547,37 @@ function(download_package pkg pkgs_dir)
     endif()
 
     message(STATUS "done.")
+endfunction()
+
+# The packages installed for one triplet, read from the listing
+# vcpkg_is_installed() caches.
+function(vcpkg_installed_ports triplet outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    if(NOT DEFINED VCPKG_INSTALLED_COUNT)
+        # Any query populates the cache; the answer is not wanted.
+        vcpkg_is_installed(vcpkg-cmake 0 ${triplet} ${POWERSHELL} vcpkg_installed_ports_ignored)
+    endif()
+
+    if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
+        return()
+    endif()
+
+    math(EXPR idx_max "(${VCPKG_INSTALLED_COUNT} - 1) * 4")
+    set(ports "")
+
+    foreach(idx RANGE 0 ${idx_max} 4)
+        math(EXPR idx_triplet "${idx} + 3")
+        list(GET VCPKG_INSTALLED ${idx}         inst_pkg_name)
+        list(GET VCPKG_INSTALLED ${idx_triplet} inst_pkg_triplet)
+
+        if(inst_pkg_triplet STREQUAL triplet)
+            list(APPEND ports "${inst_pkg_name}")
+        endif()
+    endforeach()
+
+    list(REMOVE_DUPLICATES ports)
+    set(${outvar} "${ports}" PARENT_SCOPE)
 endfunction()
 
 function(zip_is_installed zip outvar)
@@ -807,6 +842,7 @@ function(get_binary_packages)
     # Expose missing ports to the caller for surgical source-installs.
     set(VCPKG_MISSING_PORTS "${missing_ports}" PARENT_SCOPE)
 
+
     if(NOT binary_packages)
         return()
     endif()
@@ -906,6 +942,36 @@ function(get_binary_packages)
         return()
     endif()
 
+    # An installed package can fall behind the server with nothing to notice.
+    # A port reached only as a dependency is not in VCPKG_DEPS, so the matching
+    # above never considers it, and the missing-dependency walk further down
+    # sees only the dependencies of zips it has downloaded -- so when the
+    # dependent is itself current, and its zip is therefore never fetched, its
+    # stale dependency is invisible from every direction.
+    #
+    # What that leaves is a tree whose packages no longer agree with each other:
+    # an fmt older than the openal-soft built against it, an x264 whose
+    # X264_BUILD is a release behind the ffmpeg built against it. Neither is
+    # missing, so nothing complains until the link, which then reports
+    # undefined references to symbols in libraries that are right there.
+    #
+    # So offer everything installed for this triplet whatever the server has.
+    # zip_is_installed() below keeps the ones already current.
+    vcpkg_installed_ports(${VCPKG_TARGET_TRIPLET} installed_ports)
+
+    foreach(port ${installed_ports})
+        if(port IN_LIST wanted_ports)
+            continue()
+        endif()
+
+        foreach(pkg ${all_packages})
+            if(pkg MATCHES "^${port}_")
+                list(APPEND binary_packages "${pkg}")
+                break()
+            endif()
+        endforeach()
+    endforeach()
+
     # Filter out already-installed packages.
     foreach(pkg ${binary_packages})
         zip_is_installed(${pkg} pkg_installed)
@@ -972,13 +1038,6 @@ function(get_binary_packages)
                     set(host_dep TRUE)
                 endif()
 
-                set(pkg_installed FALSE)
-                vcpkg_is_installed(${dep_name} 0 ${dep_triplet} ${POWERSHELL} pkg_installed)
-
-                if(pkg_installed)
-                    continue()
-                endif()
-
                 get_triplet_package_list(${dep_triplet})
 
                 if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${dep_triplet}.html")
@@ -993,18 +1052,41 @@ function(get_binary_packages)
                 list(LENGTH links links_count)
 
                 if(NOT links_count EQUAL 1)
-                    if(links_count GREATER 1)
-                        message(STATUS "Multiple packages found for '${dep_name}:${dep_triplet}', skipping.")
-                    elseif(host_dep)
-                        message(STATUS "No binary package for host tool '${dep_name}:${dep_triplet}'; vcpkg will build it if it is needed.")
-                    else()
-                        message(STATUS "No package found for missing dependency '${dep_name}' for triplet '${dep_triplet}', will build from source.")
+                    # Nothing on offer. Only worth saying so when the port is
+                    # not there at all: one that is installed and simply has no
+                    # package needs nothing from anybody.
+                    vcpkg_is_installed(${dep_name} 0 ${dep_triplet} ${POWERSHELL} pkg_installed)
+
+                    if(NOT pkg_installed)
+                        if(links_count GREATER 1)
+                            message(STATUS "Multiple packages found for '${dep_name}:${dep_triplet}', skipping.")
+                        elseif(host_dep)
+                            message(STATUS "No binary package for host tool '${dep_name}:${dep_triplet}'; vcpkg will build it if it is needed.")
+                        else()
+                            message(STATUS "No package found for missing dependency '${dep_name}' for triplet '${dep_triplet}', will build from source.")
+                        endif()
+
+                        set(all_ports_found FALSE)
                     endif()
-                    set(all_ports_found FALSE)
+
                     continue()
                 endif()
 
                 string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
+
+                # Compare against the version on offer rather than asking
+                # whether some version of the port is installed. A port reached
+                # only as a dependency is never named in VCPKG_DEPS, so nothing
+                # else ever revisits it, and treating any version as good
+                # enough pinned it at whatever landed first: an fmt from before
+                # the openal-soft that needs it, an x264 whose X264_BUILD is a
+                # release behind the ffmpeg built against it. Both turn up as
+                # undefined references at link, a long way from here.
+                zip_is_installed("${pkg}" pkg_installed)
+
+                if(pkg_installed)
+                    continue()
+                endif()
 
                 # Skip if already downloaded.
                 if(EXISTS "${bin_pkgs_dir}/${pkg}")
