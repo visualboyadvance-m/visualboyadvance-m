@@ -65,6 +65,17 @@ endif()
 # test ROMs. Captures pass/fail via the GB serial port (SB/SC).
 add_executable(gb_suite_runner gb_suite_runner.cpp)
 target_link_libraries(gb_suite_runner PRIVATE vbam-core)
+
+# stb_image.h's tRNS handler writes img_n bytes into a tc[3], which the guard
+# two lines above it -- `if (!(s->img_n & 1)) return`, leaving img_n 1 or 3 --
+# makes safe, and which is more than GCC tracks. gb_suite_runner.cpp already
+# turns the warning off around the include, and that silences the compile; with
+# LTO the check runs a second time at link, over a constprop clone of
+# stbi__parse_png_file that the pragma's region no longer covers, so the flag
+# has to be on the link as well.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_options(gb_suite_runner PRIVATE -Wno-stringop-overflow)
+endif()
 if(APPLE)
     if(NOT LIBICONV_LIB)
         find_library(LIBICONV_LIB NAMES libiconv iconv)
