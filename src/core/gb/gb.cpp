@@ -506,6 +506,13 @@ bool gbInitializeRom(size_t romSize) {
 // same session. Cleared on ROM load in gbCPUInit.
 bool gbSgbBorderCaptured = false;
 
+// Set for one gbReset only, and cleared as that reset consumes it. The SGB
+// border handover resets the machine to restart the cart in CGB mode; with a
+// boot ROM in use that would run the boot animation a second time, so the
+// player sees the logo scroll once before the border arrives and again after.
+// The reset is still needed -- only the boot ROM replay is not.
+bool gbSkipBiosNextReset = false;
+
 bool inBios = false;
 
 extern uint16_t gbLineMix[kGBWidth];
@@ -2623,6 +2630,20 @@ void gbWriteMemory(uint16_t address, uint8_t value)
                 memcpy((uint8_t*)(gbRom + 0x100), (uint8_t*)(gbMemory + 0x100), 0xF00);
             }
             inBios = false;
+
+            // The CGB boot ROM hands off with A = 0x11, the CGB signature,
+            // because on real hardware a CGB-flagged cart is what it is
+            // running. A hybrid cart reads that and takes its CGB path, so it
+            // never ships the SGB packets the border is built from and the
+            // border never arrives. Present the SGB signature instead, which
+            // is what gbReset already does for the same carts when no boot ROM
+            // is in use. Only while the border is still outstanding: once it
+            // has been captured the cart should see the hardware it is
+            // actually running on.
+            if (gbSgbMode && gbCgbMode && !gbSgbBorderCaptured) {
+                AF.W = 0x01b0;
+                BC.W = 0x0013;
+            }
         }
     } break;
 
@@ -3648,7 +3669,12 @@ void gbReset()
                 return;
             }
         }
-        memset(gbPalette, 0, sizeof(gbPalette));
+        // Entries 64 and up are the SGB border's own palette, loaded by
+        // PCT_TRN. Once a border has been captured they belong to it and
+        // clearing them leaves it black, so clear only the game's entries.
+        memset(gbPalette, 0,
+               gbSgbBorderCaptured ? 64 * sizeof(gbPalette[0])
+                                   : sizeof(gbPalette));
     } else {
         if (gbVram != NULL) {
             free(gbVram);
@@ -3934,7 +3960,11 @@ void gbReset()
     }
 
     // used for the handling of the gb Boot Rom
-    if ((gbHardware & 7) && (g_bios != NULL) && coreOptions.useBios && !coreOptions.skipBios) {
+    const bool skipBiosThisReset = gbSkipBiosNextReset;
+    gbSkipBiosNextReset = false;
+
+    if ((gbHardware & 7) && (g_bios != NULL) && coreOptions.useBios &&
+        !coreOptions.skipBios && !skipBiosThisReset) {
         if (gbHardware & 5) {
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(gbRom), 0x1000);
             memcpy((uint8_t*)(gbMemory), (uint8_t*)(g_bios), kGBBiosSize);
@@ -4476,7 +4506,12 @@ static bool gbReadSaveState(gzFile gzFile)
                 return false;
             }
         }
-        memset(gbPalette, 0, sizeof(gbPalette));
+        // Entries 64 and up are the SGB border's own palette, loaded by
+        // PCT_TRN. Once a border has been captured they belong to it and
+        // clearing them leaves it black, so clear only the game's entries.
+        memset(gbPalette, 0,
+               gbSgbBorderCaptured ? 64 * sizeof(gbPalette[0])
+                                   : sizeof(gbPalette));
     } else {
         if (gbVram != NULL) {
             free(gbVram);
@@ -6488,7 +6523,12 @@ bool gbReadSaveState(const uint8_t* data)
                 return false;
             }
         }
-        memset(gbPalette, 0, sizeof(gbPalette));
+        // Entries 64 and up are the SGB border's own palette, loaded by
+        // PCT_TRN. Once a border has been captured they belong to it and
+        // clearing them leaves it black, so clear only the game's entries.
+        memset(gbPalette, 0,
+               gbSgbBorderCaptured ? 64 * sizeof(gbPalette[0])
+                                   : sizeof(gbPalette));
     } else {
         if (gbVram != NULL) {
             free(gbVram);

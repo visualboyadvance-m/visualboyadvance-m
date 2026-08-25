@@ -10,7 +10,15 @@
 void gbSgbInit();
 void gbSgbShutdown();
 void gbSgbCommand();
+// Abandons the packet in progress but keeps the position in a multi-packet
+// command; safe to call whenever the receiver should give up on the current
+// packet without discarding the ones already accepted.
 void gbSgbResetPacketState();
+
+// Abandons the whole command, position included. For a receiver that cannot
+// resume what it was doing -- a boot ROM handover, or an index past the end of
+// the packet buffer.
+void gbSgbResetPacketStateFull();
 void gbSgbReset();
 void gbSgbDoBitTransfer(uint8_t);
 void gbSgbRenderBorder();

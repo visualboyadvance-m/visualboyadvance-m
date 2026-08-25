@@ -11,6 +11,7 @@
 
 extern uint8_t* g_pix;
 extern bool gbSgbBorderCaptured;
+extern bool gbSkipBiosNextReset;
 
 extern bool speedup;
 extern bool gbSgbResetFlag;
@@ -23,6 +24,13 @@ uint8_t* gbSgbBorderChar = NULL;
 uint8_t* gbSgbBorder = NULL;
 
 int gbSgbCGBSupport = 0;
+
+// The colour to draw the border's transparent pixels in, taken when the border
+// arrives. Border tiles use palette index 0 for the areas the game shows
+// through, and drawing those from the live gbPalette[0] means the border is
+// tinted by whatever the game's background colour happens to be -- and follows
+// it as the game changes it, which in dual mode is constantly.
+uint16_t gbSgbBorderBgColor = 0;
 int gbSgbMask = 0;
 int gbSgbPacketState = GBSGB_NONE;
 int gbSgbBit = 0;
@@ -80,15 +88,28 @@ void gbSgbReset()
     memset(gbSgbATF, 0, 20 * 18);
     memset(gbSgbATFList, 0, 45 * 20 * 18);
     memset(gbSgbPacket, 0, 16 * 7);
-    memset(gbSgbBorderChar, 0, 32 * 256);
-    memset(gbSgbBorder, 0, 2048);
-
+    // Keep the border once the cart has sent one. gbSgbReset runs on every
+    // gbReset, so clearing these unconditionally loses the border on a reset
+    // and leaves the surround black until the cart happens to send another --
+    // which for a dual-mode cart it never will, having already handed over.
     int i;
-    for (i = 1; i < 2048; i += 2) {
-        gbSgbBorder[i] = 1 << 2;
+
+    if (!gbSgbBorderCaptured) {
+        memset(gbSgbBorderChar, 0, 32 * 256);
+        memset(gbSgbBorder, 0, 2048);
+
+        for (i = 1; i < 2048; i += 2) {
+            gbSgbBorder[i] = 1 << 2;
+        }
     }
 
-    for (i = 0; i < 32; i++) {
+    // Entries 64 upwards are the border's own palette, loaded by PCT_TRN.
+    // Once the cart has sent a border they are its colours, not ours to
+    // overwrite -- resetting them leaves the border drawn in the default
+    // greyscale ramp.
+    const int paletteEntries = gbSgbBorderCaptured ? 16 : 32;
+
+    for (i = 0; i < paletteEntries; i++) {
         gbPalette[i * 4] = (0x1f) | (0x1f << 5) | (0x1f << 10);
         gbPalette[i * 4 + 1] = (0x15) | (0x15 << 5) | (0x15 << 10);
         gbPalette[i * 4 + 2] = (0x0c) | (0x0c << 5) | (0x0c << 10);
@@ -274,7 +295,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
                 if (color) {
                     cc = gbPalette[palette + color];
                 } else {
-                    cc = gbPalette[0];
+                    cc = gbSgbBorderBgColor;
                 }
 
                 switch (systemColorDepth) {
@@ -344,6 +365,10 @@ void gbSgbPicture()
         gbPalette[i] = READ16LE(paletteAddr++);
     }
 
+    // Snapshot the background colour the border was authored against, before
+    // the game has a chance to move it.
+    gbSgbBorderBgColor = gbPalette[0];
+
     gbSgbCGBSupport |= 4;
 
     if (gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
@@ -364,6 +389,9 @@ void gbSgbPicture()
         uint16_t savedSgbPal[64];
         memcpy(savedSgbPal, &gbPalette[64], sizeof(savedSgbPal));
         gbSgbRenderBorder();
+        // The boot ROM has already run once; this reset only exists to restart
+        // the cart in CGB mode, so suppress the replay.
+        gbSkipBiosNextReset = true;
         gbReset();
         memcpy(&gbPalette[64], savedSgbPal, sizeof(savedSgbPal));
     }
@@ -712,6 +740,9 @@ void gbSgbChrTransfer()
         uint16_t savedSgbPal[64];
         memcpy(savedSgbPal, &gbPalette[64], sizeof(savedSgbPal));
         gbSgbRenderBorder();
+        // The boot ROM has already run once; this reset only exists to restart
+        // the cart in CGB mode, so suppress the replay.
+        gbSkipBiosNextReset = true;
         gbReset();
         memcpy(&gbPalette[64], savedSgbPal, sizeof(savedSgbPal));
     }
@@ -793,11 +824,25 @@ void gbSgbCommand()
     }
 }
 
+// Abandons the packet being received, but keeps the position in a multi-packet
+// command. A command of several packets carries gbSgbPacketNumber between them,
+// so clearing it discards every packet already accepted -- the whole command,
+// not the one that went wrong. ATTR_BLK arrives that way, which is how Pokemon
+// Red/Blue/Yellow set their in-game palettes.
 void gbSgbResetPacketState()
 {
     gbSgbPacketState = GBSGB_NONE;
     gbSgbPacketTimeout = 0;
     gbSgbPacketNBits = 0;
+}
+
+// Abandons the whole command, position included. Only for a genuinely stuck
+// receiver, where whatever was in progress cannot be resumed: the boot ROM
+// handover, where the SGB BIOS may leave a partial packet behind, and a
+// receiver that has run past the end of its buffer.
+void gbSgbResetPacketStateFull()
+{
+    gbSgbResetPacketState();
     gbSgbPacketByte = 0;
     gbSgbPacketNumber = 0;
 }
@@ -860,7 +905,7 @@ void gbSgbDoBitTransfer(uint8_t value)
             if (gbSgbPacketNBits == 128) {
                 const int packetCount = gbSgbPacket[0] & 7;
                 if (packetCount == 0 || gbSgbPacketNumber >= kSgbMaxPackets) {
-                    gbSgbResetPacketState();
+                    gbSgbResetPacketStateFull();
                     break;
                 }
 
@@ -878,7 +923,7 @@ void gbSgbDoBitTransfer(uint8_t value)
                 if (gbSgbPacketNBits < 128) {
                     if (gbSgbPacketNumber >= kSgbMaxPackets ||
                         gbSgbPacketByte >= 16) {
-                        gbSgbResetPacketState();
+                        gbSgbResetPacketStateFull();
                         break;
                     }
                     gbSgbPacket[gbSgbPacketNumber * 16 + gbSgbPacketByte] >>= 1;
