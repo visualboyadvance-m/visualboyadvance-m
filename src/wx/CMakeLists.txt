@@ -148,6 +148,10 @@ if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
     # name is NanoSVG even though the port (and VCPKG_DEPS entry) is lowercase.
     if(NOT LINUX)
         find_package(NanoSVG)
+
+        # Built against whichever NDK the package server used, which is not
+        # necessarily the one here; see vbam_drop_missing_link_items().
+        vbam_drop_missing_link_items(NanoSVG::nanosvg NanoSVG::nanosvgrast)
     endif()
 
     # The Android branch below drives wx-config directly instead of going

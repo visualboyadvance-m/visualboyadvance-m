@@ -138,3 +138,75 @@ function(find_wx_util var util)
         set(${var} ${util} PARENT_SCOPE)
     endforeach()
 endfunction()
+
+# Drop link items naming a file that is not there from the interfaces of the
+# given imported targets, and of the targets those pull in.
+#
+# A vcpkg package records the absolute path of whatever it was linked against,
+# the Android NDK's per-API-level stubs included, so a package built against one
+# NDK asks a machine with another NDK for libraries it does not have:
+# NanoSVGTargets.cmake carries
+# <sdk>/ndk/<other>/toolchains/llvm/prebuilt/<host>/sysroot/usr/lib/<triple>/<api>/libm.so.
+#
+# CMake treats an absolute link item as a file dependency, so ninja refuses to
+# build anything that inherits one, try_compile() included -- and the failure
+# surfaces a long way from the cause. A missing libm took out the
+# check_cxx_source_compiles() in Qt's FindGLESv2, which was reported as Qt6Gui,
+# and then Qt6 itself, not being found. The clang driver links the sysroot
+# libraries from the NDK actually in use, so dropping the recorded ones costs
+# nothing.
+#
+# This is deliberately narrow: an absolute path to a library file that does not
+# exist cannot be right, whatever it names.
+function(vbam_drop_missing_link_items)
+    get_property(visited GLOBAL PROPERTY VBAM_DROP_MISSING_VISITED)
+
+    foreach(target ${ARGN})
+        if(NOT TARGET "${target}")
+            continue()
+        endif()
+
+        # Properties are read and written through the target an alias names.
+        get_target_property(aliased "${target}" ALIASED_TARGET)
+        if(aliased)
+            set(target "${aliased}")
+        endif()
+
+        if(target IN_LIST visited)
+            continue()
+        endif()
+
+        set_property(GLOBAL APPEND PROPERTY VBAM_DROP_MISSING_VISITED "${target}")
+        list(APPEND visited "${target}")
+
+        get_target_property(items "${target}" INTERFACE_LINK_LIBRARIES)
+
+        if(NOT items)
+            continue()
+        endif()
+
+        set(kept "")
+        set(nested "")
+
+        foreach(item IN LISTS items)
+            if(item MATCHES "^/"
+                    AND item MATCHES "\\.(a|so|dylib|lib)(\\.[0-9.]+)?$"
+                    AND NOT EXISTS "${item}")
+                message(STATUS "${target}: dropping missing link item ${item}")
+                continue()
+            endif()
+
+            list(APPEND kept "${item}")
+
+            if(TARGET "${item}")
+                list(APPEND nested "${item}")
+            endif()
+        endforeach()
+
+        set_target_properties("${target}" PROPERTIES INTERFACE_LINK_LIBRARIES "${kept}")
+
+        if(nested)
+            vbam_drop_missing_link_items(${nested})
+        endif()
+    endforeach()
+endfunction()
