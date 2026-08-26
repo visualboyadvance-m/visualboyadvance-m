@@ -1193,6 +1193,133 @@ function(get_binary_packages)
 endfunction()
 
 
+# Point vcpkg at the overlay the binary packages were built from.
+#
+# The packages on the server are built from the ports in
+# visualboyadvance-m/vcpkg-overlay, so a build consuming them has to resolve
+# against the same ports. Against vcpkg's own tree every port the overlay
+# carries reads as a different version, and the upgrade that follows an
+# incomplete binary install rebuilds it from source -- wxWidgets above all,
+# which the overlay holds at a master snapshot no vcpkg release matches.
+#
+# Fetched into the build directory beside the other tools, and only when the
+# environment does not already name an overlay: someone with a checkout of it
+# keeps theirs.
+function(setup_vcpkg_overlay)
+    if(NOT "$ENV{VCPKG_OVERLAY_PORTS}" STREQUAL "")
+        return()
+    endif()
+
+    set(overlay_dir "${CMAKE_BINARY_DIR}/vcpkg-overlay")
+    set(overlay_zip "${CMAKE_BINARY_DIR}/vcpkg-overlay.zip")
+    set(overlay_tmp "${CMAKE_BINARY_DIR}/vcpkg-overlay-extract")
+    set(overlay_url "https://github.com/visualboyadvance-m/vcpkg-overlay")
+
+    # Download only when the remote head differs from the extracted one, the
+    # way the vcpkg-binpkg tool above is handled: a branch archive has no
+    # version to stamp, so nothing else would ever refresh it.
+    set(overlay_head "")
+
+    find_package(Git QUIET)
+
+    if(GIT_FOUND)
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} ls-remote "${overlay_url}.git" refs/heads/master
+            OUTPUT_VARIABLE overlay_ls_remote
+            ERROR_QUIET
+            RESULT_VARIABLE overlay_ls_error
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+
+        if(overlay_ls_error EQUAL 0)
+            string(REGEX MATCH "^[0-9a-f]+" overlay_head "${overlay_ls_remote}")
+        endif()
+    endif()
+
+    file(GLOB overlay_portfiles "${overlay_dir}/*/portfile.cmake")
+
+    set(overlay_have FALSE)
+    if(overlay_portfiles)
+        set(overlay_have TRUE)
+    endif()
+
+    if(overlay_head AND overlay_have AND overlay_head STREQUAL "${VCPKG_OVERLAY_COMMIT}")
+        # Up to date.
+    else()
+        if(overlay_head)
+            set(overlay_archive "${overlay_url}/archive/${overlay_head}.zip")
+        elseif(overlay_have)
+            message(STATUS "Could not reach the vcpkg overlay remote; using the extracted copy.")
+            set(overlay_archive "")
+        else()
+            set(overlay_archive "${overlay_url}/archive/refs/heads/master.zip")
+        endif()
+
+        if(overlay_archive)
+            file(DOWNLOAD "${overlay_archive}" "${overlay_zip}"
+                STATUS overlay_status
+                TIMEOUT 60
+            )
+            list(GET overlay_status 0 overlay_error)
+
+            if(overlay_error EQUAL 0)
+                file(REMOVE_RECURSE "${overlay_tmp}")
+                file(MAKE_DIRECTORY "${overlay_tmp}")
+                file(ARCHIVE_EXTRACT INPUT "${overlay_zip}" DESTINATION "${overlay_tmp}")
+
+                # Strip the archive's top-level directory.
+                file(GLOB overlay_roots LIST_DIRECTORIES true "${overlay_tmp}/*")
+                set(overlay_root "")
+
+                foreach(candidate ${overlay_roots})
+                    if(IS_DIRECTORY "${candidate}")
+                        set(overlay_root "${candidate}")
+                        break()
+                    endif()
+                endforeach()
+
+                if(overlay_root)
+                    file(REMOVE_RECURSE "${overlay_dir}")
+                    file(RENAME "${overlay_root}" "${overlay_dir}")
+                    set(overlay_have TRUE)
+                    set(VCPKG_OVERLAY_COMMIT "${overlay_head}" CACHE INTERNAL
+                        "Commit of the extracted vcpkg overlay")
+
+                    if(overlay_head)
+                        message(STATUS "Updated the vcpkg overlay to ${overlay_head}.")
+                    else()
+                        message(STATUS "Updated the vcpkg overlay from master.")
+                    endif()
+                else()
+                    message(WARNING "The vcpkg overlay archive has no top-level directory.")
+                endif()
+
+                file(REMOVE_RECURSE "${overlay_tmp}")
+                file(REMOVE "${overlay_zip}")
+            elseif(NOT overlay_have)
+                list(GET overlay_status 1 overlay_message)
+                message(STATUS
+                    "Could not fetch the vcpkg overlay (${overlay_message}); "
+                    "building against vcpkg's own ports.")
+                return()
+            endif()
+        endif()
+    endif()
+
+    if(NOT overlay_have)
+        return()
+    endif()
+
+    set(ENV{VCPKG_OVERLAY_PORTS} "${overlay_dir}")
+
+    # triplets/community, not triplets: vcpkg gives its own tree that split for
+    # free but does not recurse into an overlay's, and community is where the
+    # overlay's only triplet, riscv64-android, lives.
+    set(ENV{VCPKG_OVERLAY_TRIPLETS} "${overlay_dir}/triplets/community")
+
+    message(STATUS "Using the vcpkg overlay at ${overlay_dir}")
+endfunction()
+
 function(vcpkg_set_toolchain)
     get_filename_component(preferred_root ${CMAKE_SOURCE_DIR}/../vcpkg ABSOLUTE)
 
@@ -1366,6 +1493,8 @@ function(vcpkg_set_toolchain)
         "vcpkg ports for the selected frontends (ENABLE_WX=${ENABLE_WX} "
         "ENABLE_SDL=${ENABLE_SDL} ENABLE_LIBRETRO=${ENABLE_LIBRETRO}): "
         "${deps_report}")
+
+    setup_vcpkg_overlay()
 
     if (NOT (NO_VCPKG_UPDATES OR (NOT VCPKG_BINARY_PACKAGES)))
         get_binary_packages()
