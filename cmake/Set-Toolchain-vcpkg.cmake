@@ -549,6 +549,51 @@ function(download_package pkg pkgs_dir)
     message(STATUS "done.")
 endfunction()
 
+# Of the packages named after one port, the one with the highest version.
+#
+# A directory can hold more than one version of a port -- an upload that failed
+# to clear the previous one is enough -- and then taking whichever was listed
+# first, or refusing to choose between them, leaves the newest unused. The
+# version carries no underscore, so the three fields of the name are
+# unambiguous.
+function(vcpkg_newest_package port packages outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    set(best     "")
+    set(best_ver "")
+    set(best_rev "")
+
+    foreach(pkg ${packages})
+        if(NOT pkg MATCHES "^${port}_([^_]+)_[^_]+[.]zip$")
+            continue()
+        endif()
+
+        set(ver "${CMAKE_MATCH_1}")
+
+        unset(CMAKE_MATCH_1)
+        string(REGEX REPLACE "-r([0-9]+)$" "" ver_num "${ver}")
+        set(rev "${CMAKE_MATCH_1}")
+
+        if(NOT rev)
+            set(rev 0)
+        endif()
+
+        # A version can carry dashes of its own (3.3.4-17); compare it as the
+        # dotted number it stands for.
+        string(REPLACE "-" "." ver_num "${ver_num}")
+
+        if(NOT best
+                OR ver_num VERSION_GREATER best_ver
+                OR (ver_num VERSION_EQUAL best_ver AND rev GREATER best_rev))
+            set(best     "${pkg}")
+            set(best_ver "${ver_num}")
+            set(best_rev "${rev}")
+        endif()
+    endforeach()
+
+    set(${outvar} "${best}" PARENT_SCOPE)
+endfunction()
+
 # The packages installed for one triplet, read from the listing
 # vcpkg_is_installed() caches.
 function(vcpkg_installed_ports triplet outvar)
@@ -824,15 +869,11 @@ function(get_binary_packages)
     set(missing_ports "")
     set(all_ports_found TRUE)
     foreach(port ${wanted_ports})
-        set(found FALSE)
-        foreach(pkg ${all_packages})
-            if(pkg MATCHES "^${port}_")
-                list(APPEND binary_packages "${pkg}")
-                set(found TRUE)
-                break()
-            endif()
-        endforeach()
-        if(NOT found)
+        vcpkg_newest_package("${port}" "${all_packages}" pkg)
+
+        if(pkg)
+            list(APPEND binary_packages "${pkg}")
+        else()
             message(STATUS "No binary package found for port '${port}', will build from source.")
             list(APPEND missing_ports "${port}")
             set(all_ports_found FALSE)
@@ -964,12 +1005,11 @@ function(get_binary_packages)
             continue()
         endif()
 
-        foreach(pkg ${all_packages})
-            if(pkg MATCHES "^${port}_")
-                list(APPEND binary_packages "${pkg}")
-                break()
-            endif()
-        endforeach()
+        vcpkg_newest_package("${port}" "${all_packages}" pkg)
+
+        if(pkg)
+            list(APPEND binary_packages "${pkg}")
+        endif()
     endforeach()
 
     # Filter out already-installed packages.
@@ -1047,20 +1087,25 @@ function(get_binary_packages)
                 endif()
 
                 file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${dep_triplet}.html" raw_html)
-                string(REGEX MATCHALL "<a href=\"${dep_name}_[^\"]+[.]zip\"" links "${raw_html}")
+                string(REGEX MATCHALL "<a href=\"[^\"]+[.]zip\"" links "${raw_html}")
 
-                list(LENGTH links links_count)
+                set(dep_packages "")
 
-                if(NOT links_count EQUAL 1)
+                foreach(link ${links})
+                    string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" dep_pkg "${link}")
+                    list(APPEND dep_packages "${dep_pkg}")
+                endforeach()
+
+                vcpkg_newest_package("${dep_name}" "${dep_packages}" pkg)
+
+                if(NOT pkg)
                     # Nothing on offer. Only worth saying so when the port is
                     # not there at all: one that is installed and simply has no
                     # package needs nothing from anybody.
                     vcpkg_is_installed(${dep_name} 0 ${dep_triplet} ${POWERSHELL} pkg_installed)
 
                     if(NOT pkg_installed)
-                        if(links_count GREATER 1)
-                            message(STATUS "Multiple packages found for '${dep_name}:${dep_triplet}', skipping.")
-                        elseif(host_dep)
+                        if(host_dep)
                             message(STATUS "No binary package for host tool '${dep_name}:${dep_triplet}'; vcpkg will build it if it is needed.")
                         else()
                             message(STATUS "No package found for missing dependency '${dep_name}' for triplet '${dep_triplet}', will build from source.")
@@ -1071,8 +1116,6 @@ function(get_binary_packages)
 
                     continue()
                 endif()
-
-                string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
 
                 # Compare against the version on offer rather than asking
                 # whether some version of the port is installed. A port reached
