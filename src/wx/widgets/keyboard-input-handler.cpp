@@ -583,8 +583,15 @@ void KeyboardInputHandler::OnKeyUp(wxKeyEvent& event) {
     }
 
     wxKeyModifier mod_released = wxMOD_NONE;
-    if (key_released == WXK_NONE) {
-        // Only look for a standalone modifier if no key was released.
+    if (key == WXK_NONE) {
+        // Only look for a standalone modifier if the event carries no key at
+        // all. Testing key_released instead also catches a key that was
+        // released but was not in active_keys_ -- a duplicate release, which
+        // the background-input poller sends on purpose as its recovery path
+        // for a release swallowed by another process. That fell through to
+        // here and read the modifier still held in the event as the modifier
+        // having just gone up, releasing the button the player was holding to
+        // fire.
         for (const wxKeyModifier mod : mods) {
             auto iter = active_mods_.find(mod);
             if (iter != active_mods_.end()) {

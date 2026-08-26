@@ -302,6 +302,26 @@ TEST_F(KeyboardInputHandlerTest, SyntheticKeyDownCarryingModsKeepsThem) {
     EXPECT_THAT(StillHeld(), testing::IsSupersetOf(held_after_ctrl));
 }
 
+TEST_F(KeyboardInputHandlerTest, DuplicateKeyUpDoesNotReleaseAHeldModifier) {
+    // Ctrl Down -> Ctrl+F1 Down -> Ctrl+F1 Up -> Ctrl+F1 Up again.
+    //
+    // The background-input poller sends a second release for a key the window
+    // message already reported -- deliberately, as the recovery path for a
+    // release swallowed by another process's keyboard hook. The second one
+    // finds F1 gone from active_keys_, so no key is treated as released, and
+    // the modifier branch then reads the Ctrl still held in the event as Ctrl
+    // having just gone up. Ctrl is the fire button and must survive.
+    ProcessKeyEvent(CtrlDownEvent());
+    const auto held_after_ctrl = StillHeld();
+    ASSERT_THAT(held_after_ctrl, testing::SizeIs(1));
+
+    ProcessKeyEvent(CtrlF1DownEvent());
+    ProcessKeyEvent(CtrlF1UpEvent());
+    ProcessKeyEvent(CtrlF1UpEvent());
+
+    EXPECT_THAT(StillHeld(), testing::IsSupersetOf(held_after_ctrl));
+}
+
 TEST_F(KeyboardInputHandlerTest, RecoveryReleasesHeldInputs) {
     // Ctrl Down -> Ctrl+F1 Down -> a key down whose event no longer reports
     // Ctrl, which is how a missed modifier release looks from here.
