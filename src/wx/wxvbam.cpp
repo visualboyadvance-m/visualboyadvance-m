@@ -2182,6 +2182,18 @@ void MainFrame::MenuPopped(wxMenuEvent& evt) {
 
 void MainFrame::SetMenusOpened(bool state) {
     menus_opened = state;
+
+    if (state) {
+        // A menu takes keyboard focus without deactivating the application, so
+        // wxEVT_ACTIVATE_APP does not fire and nothing else clears input state
+        // here. A button held as the menu opens has its release delivered to
+        // the menu instead of to us, so the handler never sees it and the
+        // joypad bit stays set for as long as the game runs. Let go of
+        // everything now; the player has to press again either way, since the
+        // emulator is not running while the menu is up.
+        wxGetApp().keyboard_input_handler().Reset();
+        wxGetApp().emulated_gamepad()->Reset();
+    }
 #ifdef __WXGTK__
     g_menus_opened_for_gdk = state;
 #endif

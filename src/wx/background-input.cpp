@@ -600,6 +600,38 @@ namespace {
 std::atomic<bool> g_reset_state_snapshot{false};
 }  // namespace
 
+// A synthesised key event has to report the modifier state the same way a real
+// one does. Filling in only the key code leaves it claiming no modifiers are
+// held, and the input handler reads that as every modifier having just been
+// released -- which drops whatever is held at the time, so a modifier used as a
+// fire button stops firing the moment any other key is polled.
+#if defined(__WXMSW__)
+namespace {
+void SetModifierStateFromHardware(wxKeyEvent* event) {
+    event->SetControlDown((GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
+    event->SetShiftDown((GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
+    event->SetAltDown((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
+}
+}  // namespace
+#elif defined(__WXMAC__) || defined(__WXQT__)
+// No polling on these, so nothing to synthesise.
+#else  // defined(__WXGTK__)
+namespace {
+// keymap is the vector XQueryKeymap has already filled in, so the answer is
+// there without another round trip.
+void SetModifierStateFromKeymap(wxKeyEvent* ev, Display* dpy,
+                                const char* keymap) {
+    const auto held = [&](KeySym sym) {
+        const KeyCode code = XKeysymToKeycode(dpy, sym);
+        return code != 0 && (keymap[code >> 3] & (1 << (code & 7))) != 0;
+    };
+    ev->SetControlDown(held(XK_Control_L) || held(XK_Control_R));
+    ev->SetShiftDown(held(XK_Shift_L) || held(XK_Shift_R));
+    ev->SetAltDown(held(XK_Alt_L) || held(XK_Alt_R));
+}
+}  // namespace
+#endif  // defined(__WXMSW__)
+
 void resetBackgroundInputStateSnapshot()
 {
     g_reset_state_snapshot.store(true, std::memory_order_relaxed);
@@ -659,6 +691,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
             if (handler && !AppIsForeground()) {
                 wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_DOWN);
                 event->m_keyCode = xKeySym;
+                SetModifierStateFromHardware(event);
                 handler->QueueEvent(event);
             }
         }
@@ -671,6 +704,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
             if (handler) {
                 wxKeyEvent* event = new wxKeyEvent(wxEVT_KEY_UP);
                 event->m_keyCode = xKeySym;
+                SetModifierStateFromHardware(event);
                 handler->QueueEvent(event);
             }
         }
@@ -701,6 +735,15 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
                             wxKeyEvent ev(wxEVT_KEY_DOWN);
                             ev.m_uniChar = xKeySym;
                             ev.m_keyCode = xKeySym;
+                            // The raw keysym, which is what tells left from
+                            // right: the handler reads GetRawKeyCode() to pick
+                            // between kKeyModLeftControl and its right-hand
+                            // twin, and without it a polled modifier comes back
+                            // as the generic one and misses a binding made
+                            // against the specific side.
+                            ev.m_rawCode = static_cast<wxUint32>(kSym);
+                            SetModifierStateFromKeymap(&ev, x11display,
+                                                       currentState);
                             handler->AddPendingEvent(ev);
                         }
                     }
@@ -719,6 +762,15 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
                             wxKeyEvent ev(wxEVT_KEY_UP);
                             ev.m_uniChar = xKeySym;
                             ev.m_keyCode = xKeySym;
+                            // The raw keysym, which is what tells left from
+                            // right: the handler reads GetRawKeyCode() to pick
+                            // between kKeyModLeftControl and its right-hand
+                            // twin, and without it a polled modifier comes back
+                            // as the generic one and misses a binding made
+                            // against the specific side.
+                            ev.m_rawCode = static_cast<wxUint32>(kSym);
+                            SetModifierStateFromKeymap(&ev, x11display,
+                                                       currentState);
                             handler->AddPendingEvent(ev);
                         }
                     }

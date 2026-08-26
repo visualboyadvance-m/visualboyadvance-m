@@ -184,6 +184,9 @@ public:
     // Accessors for configuration data.
     config::Bindings* bindings() { return &bindings_; }
     config::EmulatedGamepad* emulated_gamepad() { return &emulated_gamepad_; }
+    widgets::KeyboardInputHandler& keyboard_input_handler() {
+        return keyboard_input_handler_;
+    }
 
     ~wxvbamApp() override;
 

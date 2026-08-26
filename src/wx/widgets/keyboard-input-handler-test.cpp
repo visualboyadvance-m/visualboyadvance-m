@@ -257,6 +257,51 @@ TEST_F(KeyboardInputHandlerTest, ModifierRepeatDoesNotDropHeldKey) {
     EXPECT_THAT(StillHeld(), testing::UnorderedElementsAreArray(held_before));
 }
 
+TEST_F(KeyboardInputHandlerTest, SyntheticEventWithoutModsKeepsHeldModifier) {
+    // Ctrl Down -> Ctrl+F1 Down -> Ctrl+F1 Up -> F1 Up reporting no modifiers.
+    //
+    // That last one is what the background-input poller synthesises: it fills
+    // in a key code and nothing else, so the event claims no modifiers are
+    // held. Ctrl is still physically down and still the fire button, and it
+    // must survive. This is the reported bug -- holding a modifier to fire and
+    // tapping any other key stopped the firing, but only with background input
+    // enabled, which is the only thing that produces these events.
+    ProcessKeyEvent(CtrlDownEvent());
+    const auto held_after_ctrl = StillHeld();
+    ASSERT_THAT(held_after_ctrl, testing::SizeIs(1));
+
+    ProcessKeyEvent(CtrlF1DownEvent());
+    ProcessKeyEvent(CtrlF1UpEvent());
+
+    // The poller's duplicate release, with no modifier state on it.
+    ProcessKeyEvent(F1UpEvent());
+
+    EXPECT_THAT(StillHeld(), testing::UnorderedElementsAreArray(held_after_ctrl));
+}
+
+TEST_F(KeyboardInputHandlerTest, SyntheticKeyDownCarryingModsKeepsThem) {
+    // Ctrl Down -> F1 Down, with the event correctly reporting Ctrl held.
+    //
+    // This is the contract the background-input poller has to meet. It
+    // synthesises key events by filling in a key code, and if it stops there
+    // the event claims no modifiers are held; the handler reads that as every
+    // modifier having been released and drops whatever is held, which is why
+    // holding a modifier to fire stopped firing the moment any other key was
+    // polled -- and only with background input enabled, the one thing that
+    // produces these events. The poller now fills in the modifier state from
+    // the hardware, and this is what it must look like when it does.
+    ProcessKeyEvent(CtrlDownEvent());
+    const auto held_after_ctrl = StillHeld();
+    ASSERT_THAT(held_after_ctrl, testing::SizeIs(1));
+
+    ProcessKeyEvent(CtrlF1DownEvent());
+
+    // Ctrl is still down. F1 joins it -- as the combination and as the plain
+    // key, which is why the count grows by more than one -- rather than
+    // replacing it.
+    EXPECT_THAT(StillHeld(), testing::IsSupersetOf(held_after_ctrl));
+}
+
 TEST_F(KeyboardInputHandlerTest, RecoveryReleasesHeldInputs) {
     // Ctrl Down -> Ctrl+F1 Down -> a key down whose event no longer reports
     // Ctrl, which is how a missed modifier release looks from here.
