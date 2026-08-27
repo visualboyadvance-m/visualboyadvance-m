@@ -854,6 +854,23 @@ function(get_host_binary_packages wanted_ports outvar)
     endif()
 endfunction()
 
+# git, told not to ask. A repository that is private, renamed or misspelled is
+# one the server declines to describe rather than one it says is absent, so git
+# asks for a username -- and execute_process() has the terminal, so configure
+# stops dead on a prompt for credentials to a repository nobody meant to name.
+# GIT_TERMINAL_PROMPT covers git's own asking, an empty credential.helper the
+# helper that would otherwise answer for it, and the unset ASKPASS variables
+# the program that would put up a window.
+function(git_no_prompt outvar)
+    set(${outvar}
+        ${CMAKE_COMMAND} -E env GIT_TERMINAL_PROMPT=0
+                                --unset=GIT_ASKPASS
+                                --unset=SSH_ASKPASS
+        ${GIT_EXECUTABLE} -c credential.helper=
+        PARENT_SCOPE
+    )
+endfunction()
+
 function(get_binary_packages)
     set(binary_packages_installed FALSE PARENT_SCOPE)
 
@@ -961,8 +978,10 @@ function(get_binary_packages)
     find_package(Git QUIET)
 
     if(GIT_FOUND)
+        git_no_prompt(git_cmd)
+
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} ls-remote "${vcpkg_binpkg_url}.git" refs/heads/master
+            COMMAND ${git_cmd} ls-remote "${vcpkg_binpkg_url}.git" refs/heads/master
             OUTPUT_VARIABLE vcpkg_binpkg_ls_remote
             ERROR_QUIET
             RESULT_VARIABLE vcpkg_binpkg_ls_error
@@ -1281,120 +1300,230 @@ function(get_binary_packages)
 endfunction()
 
 
-# Point vcpkg at the overlay the binary packages were built from.
+# The overlay from a GitHub repository's archive of a branch.
 #
-# The packages on the server are built from the ports in
-# visualboyadvance-m/vcpkg-overlay, so a build consuming them has to resolve
-# against the same ports. Against vcpkg's own tree every port the overlay
-# carries reads as a different version, and the upgrade that follows an
-# incomplete binary install rebuilds it from source -- wxWidgets above all,
-# which the overlay holds at a master snapshot no vcpkg release matches.
-#
-# Fetched into the build directory beside the other tools, and only when the
-# environment does not already name an overlay: someone with a checkout of it
-# keeps theirs.
-function(setup_vcpkg_overlay)
-    if(NOT "$ENV{VCPKG_OVERLAY_PORTS}" STREQUAL "")
-        return()
-    endif()
+# Downloaded only when the remote head differs from the extracted one, the way
+# the vcpkg-binpkg tool above is handled: a branch archive has no version to
+# stamp, so nothing else would ever refresh it.
+function(fetch_vcpkg_overlay_archive repo overlay_dir)
+    string(REGEX REPLACE "/+$"      "" repo "${repo}")
+    string(REGEX REPLACE "[.]git$"  "" repo "${repo}")
 
-    set(overlay_dir "${CMAKE_BINARY_DIR}/vcpkg-overlay")
-    set(overlay_zip "${CMAKE_BINARY_DIR}/vcpkg-overlay.zip")
-    set(overlay_tmp "${CMAKE_BINARY_DIR}/vcpkg-overlay-extract")
-    set(overlay_url "https://github.com/visualboyadvance-m/vcpkg-overlay")
-
-    # Download only when the remote head differs from the extracted one, the
-    # way the vcpkg-binpkg tool above is handled: a branch archive has no
-    # version to stamp, so nothing else would ever refresh it.
-    set(overlay_head "")
+    set(head "")
 
     find_package(Git QUIET)
 
     if(GIT_FOUND)
+        git_no_prompt(git_cmd)
+
         execute_process(
-            COMMAND ${GIT_EXECUTABLE} ls-remote "${overlay_url}.git" refs/heads/master
-            OUTPUT_VARIABLE overlay_ls_remote
+            COMMAND ${git_cmd} ls-remote "${repo}.git" refs/heads/master
+            OUTPUT_VARIABLE ls_remote
             ERROR_QUIET
-            RESULT_VARIABLE overlay_ls_error
+            RESULT_VARIABLE ls_error
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
-        if(overlay_ls_error EQUAL 0)
-            string(REGEX MATCH "^[0-9a-f]+" overlay_head "${overlay_ls_remote}")
+        if(ls_error EQUAL 0)
+            string(REGEX MATCH "^[0-9a-f]+" head "${ls_remote}")
         endif()
     endif()
 
+    file(GLOB portfiles "${overlay_dir}/*/portfile.cmake")
+
+    if(portfiles AND head AND head STREQUAL "${VCPKG_OVERLAY_COMMIT}")
+        return()
+    endif()
+
+    if(NOT head AND portfiles)
+        message(STATUS "Could not reach ${repo}; using the extracted vcpkg overlay.")
+        return()
+    endif()
+
+    if(head)
+        set(ref "${head}")
+    else()
+        set(ref "refs/heads/master")
+    endif()
+
+    # GitHub serves a ref as .zip and as .tar.gz, and file(ARCHIVE_EXTRACT)
+    # reads either from the bytes rather than the name. It does not serve .tgz,
+    # so .tar.gz is the second name to try.
+    set(fetched FALSE)
+
+    foreach(ext zip tar.gz)
+        set(archive "${CMAKE_BINARY_DIR}/vcpkg-overlay.${ext}")
+
+        file(DOWNLOAD "${repo}/archive/${ref}.${ext}" "${archive}"
+            STATUS download_status
+            TIMEOUT 60
+        )
+
+        list(GET download_status 0 download_error)
+
+        if(download_error EQUAL 0)
+            set(fetched TRUE)
+            break()
+        endif()
+
+        list(GET download_status 1 download_message)
+        file(REMOVE "${archive}")
+    endforeach()
+
+    if(NOT fetched)
+        if(NOT portfiles)
+            message(STATUS "Could not fetch the vcpkg overlay (${download_message}).")
+        endif()
+
+        return()
+    endif()
+
+    set(tmp "${CMAKE_BINARY_DIR}/vcpkg-overlay-extract")
+
+    file(REMOVE_RECURSE "${tmp}")
+    file(MAKE_DIRECTORY "${tmp}")
+    file(ARCHIVE_EXTRACT INPUT "${archive}" DESTINATION "${tmp}")
+
+    # Strip the archive's top-level directory.
+    file(GLOB roots LIST_DIRECTORIES true "${tmp}/*")
+    set(root "")
+
+    foreach(candidate ${roots})
+        if(IS_DIRECTORY "${candidate}")
+            set(root "${candidate}")
+            break()
+        endif()
+    endforeach()
+
+    if(root)
+        file(REMOVE_RECURSE "${overlay_dir}")
+        file(RENAME "${root}" "${overlay_dir}")
+
+        set(VCPKG_OVERLAY_COMMIT "${head}" CACHE INTERNAL
+            "Commit of the extracted vcpkg overlay")
+
+        if(head)
+            message(STATUS "Updated the vcpkg overlay to ${head}.")
+        else()
+            message(STATUS "Updated the vcpkg overlay from master.")
+        endif()
+    else()
+        message(WARNING "The vcpkg overlay archive has no top-level directory.")
+    endif()
+
+    file(REMOVE_RECURSE "${tmp}")
+    file(REMOVE "${archive}")
+endfunction()
+
+# The overlay from a git repository, for a host that serves no archive of a
+# branch. Shallow, and kept shallow: what is wanted is the tip of the default
+# branch and none of the history behind it.
+function(clone_vcpkg_overlay repo overlay_dir)
+    find_package(Git QUIET)
+
+    if(NOT GIT_FOUND)
+        message(STATUS "Git is needed to fetch the vcpkg overlay from ${repo}.")
+        return()
+    endif()
+
+    git_no_prompt(git_cmd)
+
+    if(IS_DIRECTORY "${overlay_dir}/.git")
+        # Fetch and reset rather than pull: this is a mirror of a remote branch
+        # that nothing here commits to, so a rewritten upstream should be taken
+        # as it now stands instead of refusing to fast-forward onto it.
+        execute_process(
+            COMMAND ${git_cmd} -C "${overlay_dir}" fetch --depth 1 --quiet origin
+            RESULT_VARIABLE fetch_error
+            ERROR_VARIABLE  fetch_message
+        )
+
+        if(NOT fetch_error EQUAL 0)
+            string(STRIP "${fetch_message}" fetch_message)
+            message(STATUS
+                "Could not update the vcpkg overlay (${fetch_message}); "
+                "using the checkout at ${overlay_dir}.")
+            return()
+        endif()
+
+        execute_process(
+            COMMAND ${git_cmd} -C "${overlay_dir}" reset --hard --quiet FETCH_HEAD
+            RESULT_VARIABLE reset_error
+            ERROR_QUIET
+        )
+
+        if(reset_error EQUAL 0)
+            message(STATUS "Updated the vcpkg overlay from ${repo}.")
+        endif()
+
+        return()
+    endif()
+
+    file(REMOVE_RECURSE "${overlay_dir}")
+
+    execute_process(
+        COMMAND ${git_cmd} clone --depth 1 --quiet "${repo}" "${overlay_dir}"
+        RESULT_VARIABLE clone_error
+        ERROR_VARIABLE  clone_message
+    )
+
+    if(clone_error EQUAL 0)
+        message(STATUS "Cloned the vcpkg overlay from ${repo}.")
+    else()
+        string(STRIP "${clone_message}" clone_message)
+        message(STATUS "Could not clone the vcpkg overlay (${clone_message}).")
+    endif()
+endfunction()
+
+# Point vcpkg at the overlay the binary packages were built from.
+#
+# The packages on the server are built from a set of ports that is not vcpkg's,
+# so a build consuming them has to resolve against the same ports. Against
+# vcpkg's own tree every port the overlay carries reads as a different version,
+# and the upgrade that follows an incomplete binary install rebuilds it from
+# source -- wxWidgets above all, which the overlay holds at a master snapshot no
+# vcpkg release matches.
+#
+# Which ports those are is VCPKG_OVERLAY_PORTS, from the top-level
+# CMakeLists.txt: a directory to use as it stands, or a repository to fetch into
+# the build directory beside the other tools. Nothing happens without it, and
+# nothing happens when the environment already names an overlay -- someone with
+# a checkout of it keeps theirs.
+function(setup_vcpkg_overlay)
+    if(NOT VCPKG_OVERLAY_PORTS)
+        return()
+    endif()
+
+    if(NOT "$ENV{VCPKG_OVERLAY_PORTS}" STREQUAL "")
+        return()
+    endif()
+
+    if(IS_DIRECTORY "${VCPKG_OVERLAY_PORTS}")
+        set(overlay_dir "${VCPKG_OVERLAY_PORTS}")
+    else()
+        set(overlay_dir "${CMAKE_BINARY_DIR}/vcpkg-overlay")
+
+        if(VCPKG_OVERLAY_PORTS MATCHES "^https?://github[.]com/")
+            fetch_vcpkg_overlay_archive("${VCPKG_OVERLAY_PORTS}" "${overlay_dir}")
+        else()
+            clone_vcpkg_overlay("${VCPKG_OVERLAY_PORTS}" "${overlay_dir}")
+        endif()
+    endif()
+
+    # An overlay is directories of portfiles. Anything else -- an extraction
+    # that did not happen, a clone that failed, a directory named by mistake --
+    # is one vcpkg fails on rather than ignores.
     file(GLOB overlay_portfiles "${overlay_dir}/*/portfile.cmake")
 
-    set(overlay_have FALSE)
-    if(overlay_portfiles)
-        set(overlay_have TRUE)
-    endif()
-
-    if(overlay_head AND overlay_have AND overlay_head STREQUAL "${VCPKG_OVERLAY_COMMIT}")
-        # Up to date.
-    else()
-        if(overlay_head)
-            set(overlay_archive "${overlay_url}/archive/${overlay_head}.zip")
-        elseif(overlay_have)
-            message(STATUS "Could not reach the vcpkg overlay remote; using the extracted copy.")
-            set(overlay_archive "")
+    if(NOT overlay_portfiles)
+        if(IS_DIRECTORY "${overlay_dir}")
+            message(STATUS
+                "No vcpkg overlay ports under ${overlay_dir}; "
+                "building against vcpkg's own ports.")
         else()
-            set(overlay_archive "${overlay_url}/archive/refs/heads/master.zip")
+            message(STATUS "No vcpkg overlay; building against vcpkg's own ports.")
         endif()
 
-        if(overlay_archive)
-            file(DOWNLOAD "${overlay_archive}" "${overlay_zip}"
-                STATUS overlay_status
-                TIMEOUT 60
-            )
-            list(GET overlay_status 0 overlay_error)
-
-            if(overlay_error EQUAL 0)
-                file(REMOVE_RECURSE "${overlay_tmp}")
-                file(MAKE_DIRECTORY "${overlay_tmp}")
-                file(ARCHIVE_EXTRACT INPUT "${overlay_zip}" DESTINATION "${overlay_tmp}")
-
-                # Strip the archive's top-level directory.
-                file(GLOB overlay_roots LIST_DIRECTORIES true "${overlay_tmp}/*")
-                set(overlay_root "")
-
-                foreach(candidate ${overlay_roots})
-                    if(IS_DIRECTORY "${candidate}")
-                        set(overlay_root "${candidate}")
-                        break()
-                    endif()
-                endforeach()
-
-                if(overlay_root)
-                    file(REMOVE_RECURSE "${overlay_dir}")
-                    file(RENAME "${overlay_root}" "${overlay_dir}")
-                    set(overlay_have TRUE)
-                    set(VCPKG_OVERLAY_COMMIT "${overlay_head}" CACHE INTERNAL
-                        "Commit of the extracted vcpkg overlay")
-
-                    if(overlay_head)
-                        message(STATUS "Updated the vcpkg overlay to ${overlay_head}.")
-                    else()
-                        message(STATUS "Updated the vcpkg overlay from master.")
-                    endif()
-                else()
-                    message(WARNING "The vcpkg overlay archive has no top-level directory.")
-                endif()
-
-                file(REMOVE_RECURSE "${overlay_tmp}")
-                file(REMOVE "${overlay_zip}")
-            elseif(NOT overlay_have)
-                list(GET overlay_status 1 overlay_message)
-                message(STATUS
-                    "Could not fetch the vcpkg overlay (${overlay_message}); "
-                    "building against vcpkg's own ports.")
-                return()
-            endif()
-        endif()
-    endif()
-
-    if(NOT overlay_have)
         return()
     endif()
 
@@ -1403,7 +1532,10 @@ function(setup_vcpkg_overlay)
     # triplets/community, not triplets: vcpkg gives its own tree that split for
     # free but does not recurse into an overlay's, and community is where the
     # overlay's only triplet, riscv64-android, lives.
-    set(ENV{VCPKG_OVERLAY_TRIPLETS} "${overlay_dir}/triplets/community")
+    if("$ENV{VCPKG_OVERLAY_TRIPLETS}" STREQUAL ""
+            AND IS_DIRECTORY "${overlay_dir}/triplets/community")
+        set(ENV{VCPKG_OVERLAY_TRIPLETS} "${overlay_dir}/triplets/community")
+    endif()
 
     message(STATUS "Using the vcpkg overlay at ${overlay_dir}")
 endfunction()

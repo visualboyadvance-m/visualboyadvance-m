@@ -227,6 +227,16 @@ if(ENABLE_WX)
     )
 endif()
 
+# The ports the binary packages on the nightly server are built from, which a
+# build consuming them has to resolve against; see setup_vcpkg_overlay() in
+# Set-Toolchain-vcpkg. A directory is used as it stands, a GitHub URL is
+# downloaded as an archive of its master branch, and any other git URL is
+# cloned. Empty builds against vcpkg's own ports, and VCPKG_OVERLAY_PORTS in
+# the environment overrides this whatever it says.
+if(NOT DEFINED VCPKG_OVERLAY_PORTS)
+    set(VCPKG_OVERLAY_PORTS "https://github.com/visualboyadvance-m/vcpkg-overlay")
+endif()
+
 include(Set-Toolchain-vcpkg)
 
 # Use ccache if available and not already enabled on the command line.
