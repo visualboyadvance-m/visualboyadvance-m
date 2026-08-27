@@ -433,7 +433,20 @@ function(vcpkg_is_installed pkg_name pkg_ver pkg_triplet powershell outvar)
         string(REGEX REPLACE "\r?\n" ";" vcpkg_list_raw "${vcpkg_list_text}")
 
         set(VCPKG_INSTALLED_COUNT 0 CACHE INTERNAL "Number of installed vcpkg packages" FORCE)
+        set(VCPKG_INSTALLED_FEATURES "")
+
         foreach(pkg ${vcpkg_list_raw})
+            # A feature is listed under its port as a row of its own, carrying
+            # a description where the port carries a version -- so the match
+            # below, which wants a version, never sees one. Which features a
+            # port was built with is the one thing its name does not say, and
+            # the only place it is written down.
+            if(pkg MATCHES "^([A-Za-z0-9_.+-]+)\\[([^]]+)\\]:([^ ]+)")
+                list(APPEND VCPKG_INSTALLED_FEATURES
+                     "${CMAKE_MATCH_1}[${CMAKE_MATCH_2}]:${CMAKE_MATCH_3}")
+                continue()
+            endif()
+
             if(NOT pkg MATCHES "^([^:[]+)[^:]*:([^ ]+) +([0-9][^ ]*) +.*\$")
                 continue()
             endif()
@@ -454,8 +467,9 @@ function(vcpkg_is_installed pkg_name pkg_ver pkg_triplet powershell outvar)
             list(APPEND VCPKG_INSTALLED ${inst_pkg_name} ${inst_pkg_ver} ${inst_pkg_rev} ${inst_pkg_triplet})
             math(EXPR VCPKG_INSTALLED_COUNT "${VCPKG_INSTALLED_COUNT} + 1")
         endforeach()
-        set(VCPKG_INSTALLED       ${VCPKG_INSTALLED}       CACHE INTERNAL "List of installed vcpkg packages"   FORCE)
-        set(VCPKG_INSTALLED_COUNT ${VCPKG_INSTALLED_COUNT} CACHE INTERNAL "Number of installed vcpkg packages" FORCE)
+        set(VCPKG_INSTALLED           ${VCPKG_INSTALLED}           CACHE INTERNAL "List of installed vcpkg packages"   FORCE)
+        set(VCPKG_INSTALLED_COUNT     ${VCPKG_INSTALLED_COUNT}     CACHE INTERNAL "Number of installed vcpkg packages" FORCE)
+        set(VCPKG_INSTALLED_FEATURES "${VCPKG_INSTALLED_FEATURES}" CACHE INTERNAL "Installed vcpkg port features"     FORCE)
     endif()
 
     if(NOT VCPKG_INSTALLED_COUNT GREATER 0)
@@ -547,6 +561,43 @@ function(download_package pkg pkgs_dir)
     endif()
 
     message(STATUS "done.")
+endfunction()
+
+# The features of a port spec that the status database does not have installed
+# for a triplet.
+#
+# `core` is never among them: it is not a feature but vcpkg's way of asking for
+# a port without its default ones, so it is never installed under that name and
+# looking for it would report every such port as short a feature forever.
+#
+# Reading the status database is the only way to ask. A package is named for
+# its port, its version and its triplet, and nothing in that says which of the
+# port's features are built into it, so two builds of one version that differ
+# only in features are indistinguishable until one is installed.
+function(vcpkg_missing_features spec triplet outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    if(NOT spec MATCHES "^([^[]+)\\[([^]]+)\\]\$")
+        return()
+    endif()
+
+    set(port "${CMAKE_MATCH_1}")
+
+    string(REPLACE "," ";" features "${CMAKE_MATCH_2}")
+
+    set(missing "")
+
+    foreach(feature ${features})
+        if(feature STREQUAL "core")
+            continue()
+        endif()
+
+        if(NOT "${port}[${feature}]:${triplet}" IN_LIST VCPKG_INSTALLED_FEATURES)
+            list(APPEND missing "${feature}")
+        endif()
+    endforeach()
+
+    set(${outvar} "${missing}" PARENT_SCOPE)
 endfunction()
 
 # Of the packages named after one port, the one with the highest version.
@@ -809,10 +860,14 @@ function(get_binary_packages)
     # Build the list of wanted port names from VCPKG_DEPS and VCPKG_DEPS_OPTIONAL.
     set(wanted_ports "")
 
-    # Add core dependencies (strip [features] to get bare port names).
+    # Add core dependencies. A package is named for its port alone, so the
+    # features come off whatever is matched against the listing; the spec is
+    # kept beside the name for what gets handed back to vcpkg, where they still
+    # mean something.
     foreach(dep ${VCPKG_DEPS})
         string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
         list(APPEND wanted_ports "${port_name}")
+        set(wanted_spec_${port_name} "${dep}")
     endforeach()
 
     # Add optional dependencies unless explicitly turned off.
@@ -828,6 +883,7 @@ function(get_binary_packages)
             if(NOT DEFINED ${var} OR ${var})
                 string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
                 list(APPEND wanted_ports "${port_name}")
+                set(wanted_spec_${port_name} "${dep}")
             endif()
         endforeach()
     endif()
@@ -875,7 +931,11 @@ function(get_binary_packages)
             list(APPEND binary_packages "${pkg}")
         else()
             message(STATUS "No binary package found for port '${port}', will build from source.")
-            list(APPEND missing_ports "${port}")
+
+            # The spec, not the name: this list is what a source install is
+            # given, and a port built without the features a frontend asked for
+            # is not the port that was asked for.
+            list(APPEND missing_ports "${wanted_spec_${port}}")
             set(all_ports_found FALSE)
         endif()
     endforeach()
@@ -1015,6 +1075,34 @@ function(get_binary_packages)
     # Filter out already-installed packages.
     foreach(pkg ${binary_packages})
         zip_is_installed(${pkg} pkg_installed)
+
+        if(pkg_installed)
+            # The same version can still be the wrong build of it. Unpack the
+            # package again when the port is installed without a feature that
+            # was asked for: a package's CONTROL carries its features, and
+            # installing is what writes them to the status database, so one
+            # that has the feature settles this in a single download.
+            #
+            # One that does not have it says so again every configure, which is
+            # what a package built from a port list that no longer agrees with
+            # this one looks like from here. Only the report repeats -- the
+            # port is not sent to be built from source over a feature, because
+            # a disagreement about wxWidgets would then rebuild wxWidgets every
+            # time rather than saying which feature it is short.
+            string(REGEX REPLACE "_.*" "" pkg_port "${pkg}")
+
+            vcpkg_missing_features("${wanted_spec_${pkg_port}}"
+                                   "${VCPKG_TARGET_TRIPLET}" pkg_features_missing)
+
+            if(pkg_features_missing)
+                message(STATUS
+                    "Port '${pkg_port}' is installed without feature(s) "
+                    "${pkg_features_missing}, reinstalling it.")
+
+                set(pkg_installed FALSE)
+            endif()
+        endif()
+
         if(NOT pkg_installed)
             list(APPEND to_install ${pkg})
         endif()

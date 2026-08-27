@@ -175,8 +175,15 @@ set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
 
 # The wxWidgets frontend. Qt is the wx backend on Android (wxQt), and nanosvg
 # is what the vcpkg wxWidgets port wants for SVG art.
+#
+# [core] is not a feature but vcpkg's way of spelling "without the default
+# ones", which for the wxWidgets port are sound and debug-support. Nothing here
+# calls wxSound -- audio goes through SDL, OpenAL or FAudio -- and nothing calls
+# wxDebugContext. It has to be said, and said the same way the binary packages
+# were built, because asking for a port whose defaults are not installed is
+# asking for a rebuild of it from source.
 if(ENABLE_WX)
-    list(APPEND VCPKG_DEPS wxwidgets nanosvg lua)
+    list(APPEND VCPKG_DEPS "wxwidgets[core]" nanosvg lua)
 
     if(VBAM_TARGET_ANDROID)
         list(APPEND VCPKG_DEPS qtbase qttools)
@@ -197,8 +204,18 @@ unset(VCPKG_DEPS_OPTIONAL)
 
 # SDL is the SDL port's toolkit and the wx port's audio/game controller
 # backend, so either frontend pulls it in.
+#
+# libusb is SDL_HIDAPI_LIBUSB, the controller backend that talks to the device
+# over raw USB. Android does not take it: the HID backend there is the Java one
+# under org/libsdl/app that the APK carries itself, and the port is not
+# platform-gated, so asking for it there builds libusb for a target that never
+# links it.
 if(VBAM_NEED_SDL)
-    list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan]" ENABLE_SDL3)
+    if(VBAM_TARGET_ANDROID)
+        list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan]"        ENABLE_SDL3)
+    else()
+        list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan,libusb]" ENABLE_SDL3)
+    endif()
 endif()
 
 # Sound backends and A/V recording are wxWidgets-only features.
