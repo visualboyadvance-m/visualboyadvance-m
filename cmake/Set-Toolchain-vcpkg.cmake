@@ -705,6 +705,31 @@ function(vcpkg_installed_ports triplet outvar)
     set(${outvar} "${ports}" PARENT_SCOPE)
 endfunction()
 
+# Of a set of ports, those with nothing installed for a triplet.
+#
+# Read from installed/vcpkg/info, which carries one .list per installed
+# package. Neither vcpkg nor vcpkg-binpkg is run to read it, because the caller
+# asks at a point where reaching the server has already failed and the tool may
+# never have been fetched.
+#
+# By name, not by version or by feature: the question is whether a port is
+# there at all. Which version ought to be there is a question about what the
+# server has, and this is asked precisely when the server could not be asked.
+function(vcpkg_ports_not_installed ports triplet outvar)
+    set(absent "")
+
+    foreach(port ${ports})
+        file(GLOB port_lists
+             "${VCPKG_ROOT}/installed/vcpkg/info/${port}_*_${triplet}.list")
+
+        if(NOT port_lists)
+            list(APPEND absent "${port}")
+        endif()
+    endforeach()
+
+    set(${outvar} "${absent}" PARENT_SCOPE)
+endfunction()
+
 function(zip_is_installed zip outvar)
     if(NOT zip MATCHES "([^_]+)_([^_]+)_([^.]+)[.]zip")
         return()
@@ -933,6 +958,12 @@ function(get_binary_packages)
             endif()
         endforeach()
     endif()
+
+    # Handed back for the caller's use whatever happens below: when this
+    # function cannot reach the packages at all it has nothing to say about
+    # which ports are missing, and the ports that were wanted are then the only
+    # thing left to go on.
+    set(VCPKG_WANTED_PORTS "${wanted_ports}" PARENT_SCOPE)
 
     if(NOT wanted_ports)
         message(STATUS "No packages to install.")
@@ -1751,7 +1782,37 @@ function(vcpkg_set_toolchain)
         get_binary_packages()
     endif()
 
-    if(NOT binary_packages_installed AND (NOT NO_VCPKG_UPDATES) AND VCPKG_SOURCE_PACKAGES)
+    # Whether anything is to be installed from source at all.
+    #
+    # Beyond the conditions that always governed it there is the case of the
+    # binary packages having been out of reach altogether: no listing, nothing
+    # in the listing, no tool to install with. Nothing then says which ports are
+    # missing, and what used to be made of that was that all of them were --
+    # the whole dependency set installed from source and then `vcpkg upgrade`,
+    # which rebuilds every port whose version in the port tree differs from the
+    # installed one. That is a long way round to the state already in place,
+    # which is where a connection to the package listing that timed out would
+    # leave a tree that had everything.
+    #
+    # A tree that has everything is left alone. One that does not still gets
+    # the whole set, there being nothing better to go on.
+    set(vcpkg_source_install TRUE)
+
+    if(binary_packages_installed OR NO_VCPKG_UPDATES OR (NOT VCPKG_SOURCE_PACKAGES))
+        set(vcpkg_source_install FALSE)
+    elseif(NOT (DEFINED VCPKG_MISSING_PORTS AND VCPKG_MISSING_PORTS))
+        vcpkg_ports_not_installed("${VCPKG_WANTED_PORTS}" "${VCPKG_TARGET_TRIPLET}"
+                                  vcpkg_ports_absent)
+
+        if(VCPKG_WANTED_PORTS AND NOT vcpkg_ports_absent)
+            message(STATUS
+                "Every port for ${VCPKG_TARGET_TRIPLET} is installed and none "
+                "can be checked against the server; leaving them as they are.")
+            set(vcpkg_source_install FALSE)
+        endif()
+    endif()
+
+    if(vcpkg_source_install)
         # If get_binary_packages exposed a list of missing ports, install
         # only those from source. Running `vcpkg install ${VCPKG_DEPS}`
         # over the entire dep set would re-resolve every port against
