@@ -527,9 +527,16 @@ function(get_triplet_package_list triplet)
 
     vcpkg_binary_package_dir("${triplet}" pkg_dir)
 
+    # A file(DOWNLOAD) with no timeout waits for the other end forever, and a
+    # configure that has reached this point has already said what it is doing,
+    # so a server that accepts the connection and then goes quiet reads as a
+    # build hung after the overlay checkout. A directory listing is small enough
+    # for a plain ceiling.
     file(
         DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
         STATUS pkg_list_status
+        INACTIVITY_TIMEOUT 30
+        TIMEOUT 60
     )
     list(GET pkg_list_status 1 pkg_list_error)
     list(GET pkg_list_status 0 pkg_list_status)
@@ -548,19 +555,41 @@ function(download_package pkg pkgs_dir)
 
     message(STATUS "Downloading https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg} ...")
 
-    file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg}" "${pkgs_dir}/${pkg}"
-        STATUS pkg_download_status
-    )
-    list(GET pkg_download_status 1 pkg_download_error)
-    list(GET pkg_download_status 0 pkg_download_status)
+    # INACTIVITY_TIMEOUT and not TIMEOUT: a package runs to tens of megabytes,
+    # and no ceiling fits both a fast link and a slow one. What is wanted is an
+    # end to a transfer that has stopped moving, which is the one this measures.
+    #
+    # Tried more than once, because what follows a package that did not arrive
+    # is the port built from source, and losing wxWidgets to a single stalled
+    # socket costs a great deal more than asking again. A failed download also
+    # leaves the part of the file that did arrive, and the caller reads the file
+    # being there as the download having worked, so it goes.
+    set(pkg_attempts 3)
 
-    if(NOT pkg_download_status EQUAL 0)
-        message(STATUS "Failed to download vcpkg binary package '${pkg}': ${pkg_download_status} - ${pkg_download_error}")
-        return()
-    endif()
+    foreach(pkg_attempt RANGE 1 ${pkg_attempts})
+        file(
+            DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}/${pkg}" "${pkgs_dir}/${pkg}"
+            STATUS pkg_download_status
+            INACTIVITY_TIMEOUT 30
+        )
+        list(GET pkg_download_status 1 pkg_download_error)
+        list(GET pkg_download_status 0 pkg_download_code)
 
-    message(STATUS "done.")
+        if(pkg_download_code EQUAL 0)
+            message(STATUS "done.")
+            return()
+        endif()
+
+        file(REMOVE "${pkgs_dir}/${pkg}")
+
+        if(pkg_attempt LESS pkg_attempts)
+            message(STATUS
+                "Download of '${pkg}' failed (${pkg_download_error}), "
+                "attempt ${pkg_attempt} of ${pkg_attempts}; trying again.")
+        endif()
+    endforeach()
+
+    message(STATUS "Failed to download vcpkg binary package '${pkg}': ${pkg_download_code} - ${pkg_download_error}")
 endfunction()
 
 # The features of a port spec that the status database does not have installed
@@ -1018,6 +1047,7 @@ function(get_binary_packages)
         if(vcpkg_binpkg_archive)
             file(DOWNLOAD "${vcpkg_binpkg_archive}" "${vcpkg_binpkg_zip}"
                 STATUS vcpkg_binpkg_status
+                INACTIVITY_TIMEOUT 30
                 TIMEOUT 60
             )
             list(GET vcpkg_binpkg_status 0 vcpkg_binpkg_error)
@@ -1356,6 +1386,7 @@ function(fetch_vcpkg_overlay_archive repo overlay_dir)
 
         file(DOWNLOAD "${repo}/archive/${ref}.${ext}" "${archive}"
             STATUS download_status
+            INACTIVITY_TIMEOUT 30
             TIMEOUT 60
         )
 
