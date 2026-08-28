@@ -527,25 +527,57 @@ function(get_triplet_package_list triplet)
 
     vcpkg_binary_package_dir("${triplet}" pkg_dir)
 
+    set(pkg_list_file "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
+
     # A file(DOWNLOAD) with no timeout waits for the other end forever, and a
     # configure that has reached this point has already said what it is doing,
     # so a server that accepts the connection and then goes quiet reads as a
-    # build hung after the overlay checkout. A directory listing is small enough
-    # for a plain ceiling.
-    file(
-        DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}" "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html"
-        STATUS pkg_list_status
-        INACTIVITY_TIMEOUT 30
-        TIMEOUT 60
-    )
-    list(GET pkg_list_status 1 pkg_list_error)
-    list(GET pkg_list_status 0 pkg_list_status)
+    # build hung after the overlay checkout.
+    #
+    # Asked for more than once, and with a ceiling low enough that failing is
+    # quick. A listing is a few kilobytes and arrives in a tenth of a second
+    # over a path that works, so fifteen seconds is not a slow reply but a
+    # reply that is never coming -- and a retry is worth more than the wait,
+    # because each attempt opens its own connection from a new source port.
+    # Where a route is chosen per flow, that is a fresh draw rather than
+    # another go at the same broken path: three draws leave a couple of percent
+    # of the failure a single one has.
+    #
+    # The ceiling has to be a plain TIMEOUT. INACTIVITY_TIMEOUT measures a
+    # transfer that has slowed to nothing, and a connection that is never
+    # answered has no transfer to measure -- it would sit through the kernel's
+    # own SYN retries instead, some two minutes of them.
+    set(pkg_list_attempts 3)
 
-    if(NOT pkg_list_status EQUAL 0)
-        message(STATUS "Failed to download vcpkg binary package list: ${pkg_list_status} - ${pkg_list_error}")
-        file(REMOVE "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
-        return()
-    endif()
+    foreach(pkg_list_attempt RANGE 1 ${pkg_list_attempts})
+        file(
+            DOWNLOAD "https://nightly.visualboyadvance-m.org/vcpkg/${pkg_dir}" "${pkg_list_file}"
+            STATUS pkg_list_status
+            INACTIVITY_TIMEOUT 10
+            TIMEOUT 15
+        )
+        list(GET pkg_list_status 1 pkg_list_error)
+        list(GET pkg_list_status 0 pkg_list_code)
+
+        if(pkg_list_code EQUAL 0)
+            return()
+        endif()
+
+        # Whatever arrived before it failed is not a listing, and the caller
+        # reads the file being there as the download having worked.
+        file(REMOVE "${pkg_list_file}")
+
+        if(pkg_list_attempt LESS pkg_list_attempts)
+            message(STATUS
+                "Download of the vcpkg binary package list failed "
+                "(${pkg_list_error}), attempt ${pkg_list_attempt} of "
+                "${pkg_list_attempts}; trying again.")
+        endif()
+    endforeach()
+
+    message(STATUS
+        "Failed to download vcpkg binary package list: "
+        "${pkg_list_code} - ${pkg_list_error}")
 endfunction()
 
 function(download_package pkg pkgs_dir)
