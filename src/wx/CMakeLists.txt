@@ -908,12 +908,125 @@ if(ANDROID)
     set(vbam_apk_built "${CMAKE_CURRENT_BINARY_DIR}/android-build/visualboyadvance-m.apk")
     set(vbam_apk_named "${CMAKE_BINARY_DIR}/visualboyadvance-m-${ARCH_NAME}.apk")
 
+    # Signing. What gradle leaves behind is signed by nobody, and Android
+    # installs no such thing, so a package meant to be handed to someone has to
+    # be signed before it is of any use. UPSTREAM_RELEASE is what says this
+    # build is meant to be handed to someone; anything else is told what to run
+    # and left alone, since a developer's key is not something to assume.
+    if(NOT DEFINED ENV{HOME})
+        set(vbam_home "$ENV{USERPROFILE}")
+    else()
+        set(vbam_home "$ENV{HOME}")
+    endif()
+
+    set(VBAM_ANDROID_KEYSTORE "${vbam_home}/.codesign/android_debug.keystore"
+        CACHE FILEPATH "Keystore the Android APK is signed with")
+    set(VBAM_ANDROID_KEY_ALIAS "androiddebugkey"
+        CACHE STRING "Key in VBAM_ANDROID_KEYSTORE the APK is signed with")
+    set(VBAM_ANDROID_KEYSTORE_PASS "android"
+        CACHE STRING "Password for VBAM_ANDROID_KEYSTORE and its key")
+
+    # apksigner ships per build-tools release, so take the newest installed
+    # rather than whichever the glob happens to list first. NATURAL so 37.0.0
+    # sorts above 9.0.0.
+    file(GLOB vbam_build_tools LIST_DIRECTORIES true "${ANDROID_SDK_ROOT}/build-tools/*")
+    list(SORT vbam_build_tools COMPARE NATURAL ORDER DESCENDING)
+
+    find_program(VBAM_APKSIGNER
+        NAMES apksigner apksigner.bat
+        HINTS ${vbam_build_tools}
+    )
+
+    # apksigner runs a JVM of its own, and a recent one answers every
+    # invocation with four lines about conscrypt reaching System::loadLibrary --
+    # a restricted native access that a later release says it will refuse
+    # outright. The flag the warning itself names is what turns it off.
+    #
+    # Not a flag every JDK knows, so ask this one: an option it does not
+    # recognise is a JVM that refuses to start, which would turn every signing
+    # into a failure. The wrapper reads -J options as JVM options only while
+    # they come ahead of the subcommand, and `version` is the cheapest one to
+    # put behind them.
+    if(VBAM_APKSIGNER AND NOT DEFINED VBAM_APKSIGNER_JVM_OPTS)
+        set(vbam_native_access -J-enable-native-access=ALL-UNNAMED)
+
+        execute_process(
+            COMMAND "${VBAM_APKSIGNER}" ${vbam_native_access} version
+            RESULT_VARIABLE vbam_native_access_status
+            OUTPUT_QUIET
+            ERROR_QUIET
+        )
+
+        if(NOT vbam_native_access_status EQUAL 0)
+            set(vbam_native_access "")
+        endif()
+
+        set(VBAM_APKSIGNER_JVM_OPTS "${vbam_native_access}" CACHE INTERNAL
+            "JVM options apksigner is invoked with")
+    endif()
+
+    set(vbam_sign_apk FALSE)
+
+    if(UPSTREAM_RELEASE)
+        if(NOT VBAM_APKSIGNER)
+            message(WARNING
+                "No apksigner in ${ANDROID_SDK_ROOT}/build-tools or on the PATH; "
+                "the APK will be left unsigned.")
+        elseif(NOT EXISTS "${VBAM_ANDROID_KEYSTORE}")
+            message(WARNING
+                "No keystore at ${VBAM_ANDROID_KEYSTORE}; the APK will be left "
+                "unsigned. Point VBAM_ANDROID_KEYSTORE at one, or make this one "
+                "with: keytool -genkeypair -keystore ${VBAM_ANDROID_KEYSTORE} "
+                "-storetype PKCS12 -storepass ${VBAM_ANDROID_KEYSTORE_PASS} "
+                "-keypass ${VBAM_ANDROID_KEYSTORE_PASS} "
+                "-alias ${VBAM_ANDROID_KEY_ALIAS} -keyalg RSA -keysize 4096 "
+                "-validity 10950 -- the password has to be "
+                "'${VBAM_ANDROID_KEYSTORE_PASS}', which is what "
+                "VBAM_ANDROID_KEYSTORE_PASS says to sign with, or set that to "
+                "whatever the keystore was made with instead.")
+        else()
+            set(vbam_sign_apk TRUE)
+        endif()
+    endif()
+
+    if(vbam_sign_apk)
+        # Signed straight to the destination rather than copied and then signed
+        # in place: a signing that fails then leaves no package at all, instead
+        # of an unsigned one carrying the name of a signed one.
+        set(vbam_apk_commands
+            COMMAND "${VBAM_APKSIGNER}" ${VBAM_APKSIGNER_JVM_OPTS} sign
+                    --ks       "${VBAM_ANDROID_KEYSTORE}"
+                    --ks-pass  "pass:${VBAM_ANDROID_KEYSTORE_PASS}"
+                    --key-pass "pass:${VBAM_ANDROID_KEYSTORE_PASS}"
+                    --ks-key-alias "${VBAM_ANDROID_KEY_ALIAS}"
+                    # v4 is a detached signature in a .idsig beside the package,
+                    # read by adb for incremental installs and by nothing else.
+                    # Only the .apk is ever published, so the file left next to
+                    # it would be one nothing goes on to use.
+                    --v4-signing-enabled false
+                    --out "${vbam_apk_named}"
+                    "${vbam_apk_built}"
+        )
+        set(vbam_apk_comment "Signing APK to ${vbam_apk_named}")
+    else()
+        set(vbam_apk_commands
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                    "${vbam_apk_built}" "${vbam_apk_named}"
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  ${vbam_apk_named} is unsigned and Android will not install it."
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  Sign it with: apksigner ${VBAM_APKSIGNER_JVM_OPTS} sign --ks ${VBAM_ANDROID_KEYSTORE} --ks-key-alias ${VBAM_ANDROID_KEY_ALIAS} ${vbam_apk_named}"
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  or configure with -DUPSTREAM_RELEASE=TRUE to have the build sign it."
+        )
+        set(vbam_apk_comment "Copying APK to ${vbam_apk_named}")
+    endif()
+
     add_custom_command(
         OUTPUT  "${vbam_apk_named}"
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-                "${vbam_apk_built}" "${vbam_apk_named}"
+        ${vbam_apk_commands}
         DEPENDS "${vbam_apk_built}"
-        COMMENT "Copying APK to ${vbam_apk_named}"
+        COMMENT "${vbam_apk_comment}"
         VERBATIM
     )
 
