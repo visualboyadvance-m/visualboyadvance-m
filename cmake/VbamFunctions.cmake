@@ -50,31 +50,44 @@ function(try_wx_util var util conf_suffix major_version minor_version)
         endif()
     endif()
 
-    # find_program caches the result
-    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
-    find_program(exe NAMES "${util}${suffix}")
+    set(names "${util}${suffix}")
 
-    # try infix variant, as on FreeBSD
-    if(NOT EXISTS "${exe}")
-        string(REGEX REPLACE "^-" "" suffix "${suffix}")
+    # infix variant, as on FreeBSD
+    string(REGEX REPLACE "^-" "" infix "${suffix}")
+    string(REGEX REPLACE "-" "${infix}-" infix_name "${util}")
 
-        string(REGEX REPLACE "-" "${suffix}-" try "${util}")
+    if(NOT infix_name STREQUAL "${util}${suffix}")
+        list(APPEND names "${infix_name}")
+    endif()
 
+    # Walk PATH a directory at a time instead of taking find_program's first
+    # hit anywhere on it.  A cross build has an unusable target-architecture
+    # copy of the utility in the build root, which comes first on PATH and
+    # would otherwise hide a usable one further along.  find_program is still
+    # what looks inside each directory, so CMAKE_EXECUTABLE_SUFFIX is honored.
+    file(TO_CMAKE_PATH "$ENV{PATH}" path_dirs)
+
+    foreach(dir IN LISTS path_dirs)
+        # find_program caches the result
         set(exe NOTFOUND CACHE INTERNAL "" FORCE)
-        find_program(exe NAMES "${try}")
-    endif()
+        find_program(exe NAMES ${names} PATHS "${dir}" NO_DEFAULT_PATH)
 
-    if(EXISTS "${exe}")
-        # check that the utility can be executed cleanly
-        # in case we find e.g. the wrong architecture binary
-        # when cross-compiling
-        check_clean_exit(exit_status "${exe}" --help)
+        # Copy it out of the cache entry, which stays visible to our caller.
+        set(candidate "${exe}")
+        set(exe NOTFOUND CACHE INTERNAL "" FORCE)
 
-        if(exit_status EQUAL 0)
-            set("${var}" "${exe}" PARENT_SCOPE)
-            return()
+        if(EXISTS "${candidate}")
+            # check that the utility can be executed cleanly
+            # in case we find e.g. the wrong architecture binary
+            # when cross-compiling
+            check_clean_exit(exit_status "${candidate}" --help)
+
+            if(exit_status EQUAL 0)
+                set("${var}" "${candidate}" PARENT_SCOPE)
+                return()
+            endif()
         endif()
-    endif()
+    endforeach()
 endfunction()
 
 function(find_wx_util var util)
@@ -100,7 +113,16 @@ function(find_wx_util var util)
     list(APPEND conf_suffixes  "" gtk3u gtk3 gtk2u gtk2)
     list(APPEND major_versions "" 3)
 
-    get_target_property(wx_base_lib_prop wx::base LOCATION)
+    # wx::base only exists when wxWidgets was found through its own CMake
+    # config package.  A wx-config based find (the classic FindwxWidgets
+    # module, which is what wxWidgets_CONFIG_EXECUTABLE selects) defines no
+    # imported targets, so fall back to the library list it does set.
+    if(TARGET wx::base)
+        get_target_property(wx_base_lib_prop wx::base LOCATION)
+    else()
+        string(REPLACE ";" " " wx_base_lib_prop "${wxWidgets_LIBRARIES}")
+    endif()
+
     string(STRIP "${wx_base_lib_prop}" wx_base_lib)
 
     if(wx_base_lib MATCHES "wx_baseu?-([0-9]+)\\.([0-9]+)\\.")
@@ -110,20 +132,22 @@ function(find_wx_util var util)
 
     foreach(conf_suffix IN LISTS conf_suffixes)
         if(lib_major AND lib_minor)
-            try_wx_util(exe "${util}" "${conf_suffix}" "${lib_major}" "${lib_minor}")
+            unset(wx_util_exe)
+            try_wx_util(wx_util_exe "${util}" "${conf_suffix}" "${lib_major}" "${lib_minor}")
 
-            if(exe)
-                set("${var}" "${exe}" PARENT_SCOPE)
+            if(wx_util_exe)
+                set("${var}" "${wx_util_exe}" PARENT_SCOPE)
                 return()
             endif()
         endif()
 
         foreach(major_version IN LISTS major_versions)
             foreach(minor_version RANGE 30 -1 -1)
-                try_wx_util(exe "${util}" "${conf_suffix}" "${major_version}" "${minor_version}")
+                unset(wx_util_exe)
+                try_wx_util(wx_util_exe "${util}" "${conf_suffix}" "${major_version}" "${minor_version}")
 
-                if(exe)
-                    set("${var}" "${exe}" PARENT_SCOPE)
+                if(wx_util_exe)
+                    set("${var}" "${wx_util_exe}" PARENT_SCOPE)
                     return()
                 endif()
 

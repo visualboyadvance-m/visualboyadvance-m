@@ -1292,9 +1292,12 @@ brew_installdeps() {
 
     check brew -v update
 
-    brews="nasm cmake ccache gettext libtiff pkg-config sdl3 wxwidgets faudio ccache ninja zlib bzip2 molten-vk vulkan-loader vulkan-headers"
+    # pkg-config is now only an alias for pkgconf.  Unlike the MacPorts one,
+    # the Homebrew faudio is built against SDL 3 and so works with our build.
+    brews="nasm cmake ccache gettext libtiff pkgconf ninja zlib bzip2 sdl3 wxwidgets lua faudio molten-vk vulkan-loader vulkan-headers"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
+    [ -n "$ENABLE_OPENAL" ] && brews="$brews openal-soft"
 
     # This is necessary for the GitHub Actions CI:
     if [ -n "$CI" ]; then
@@ -1315,12 +1318,25 @@ macports_installdeps() {
 
     check sudo port -v selfupdate
 
-    ports="cmake ccache nasm gettext pkgconfig libsdl3 wxWidgets-3.0 libiconv ninja MoltenVK vulkan-loader vulkan-headers"
+    # MacPorts calls SDL 3 SDL3, and wxWidgets-3.2 is the newest wx it ships.
+    # zlib, bzip2 and tiff arrive as wxWidgets dependencies, but the build
+    # looks for them itself, so ask for them by name.  There is no FAudio in
+    # the list: the faudio port is built against SDL 2 and so cannot be used
+    # with our SDL 3 build, and the wx port has other sound backends.  pkgconfig
+    # rather than pkgconf: the two conflict, and pkgconfig is what MacPorts
+    # installs by default for the path:bin/pkg-config:pkgconfig dependency that
+    # glib2, cairo and friends declare, so it is the one already on the system.
+    ports="cmake ccache nasm gettext pkgconfig ninja zlib bzip2 tiff libiconv SDL3 wxWidgets-3.2 lua54 MoltenVK vulkan-loader vulkan-headers"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
+    [ -n "$ENABLE_OPENAL" ] && ports="$ports openal-soft"
 
-    check sudo port -v install $ports
-    check sudo port select wxWidgets wxWidgets-3.0
+    # -N runs without prompting.  It answers no to the prompts that default to
+    # no, so a port that cannot be installed cleanly fails here instead of
+    # being forced through.  Piping 'yes' in would not answer them either:
+    # port registers its question handlers only when stdin is a tty.
+    check sudo port -N -v install $ports
+    check sudo port select wxWidgets wxWidgets-3.2
 
     build_instructions
 }

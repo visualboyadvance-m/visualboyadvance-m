@@ -19,6 +19,16 @@ fi
 
 [ -n "$BUILD_ENV" ] && eval "$BUILD_ENV"
 
+pkg_mgr_man_path=
+
+if [ -n "$BREW_PREFIX" ]; then
+    pkg_mgr_man_path="$pkg_mgr_man_path:$BREW_PREFIX/share/man"
+fi
+
+if [ -n "$MACPORTS_PREFIX" ]; then
+    pkg_mgr_man_path="$pkg_mgr_man_path:$MACPORTS_PREFIX/share/man"
+fi
+
 BUILD_ENV=$BUILD_ENV$(cat <<EOF
 
 export BUILD_ROOT="\${BUILD_ROOT:-$BUILD_ROOT}"
@@ -72,6 +82,7 @@ esac
 
 export CMAKE_PREFIX_PATH="\${CMAKE_PREFIX_PATH:-\$BUILD_ROOT/root}"
 export PKG_CONFIG_PATH="\$BUILD_ROOT/root/lib/pkgconfig:\$BUILD_ROOT/root/share/pkgconfig"
+export PKG_CONFIG_LIBDIR="\$BUILD_ROOT/root/lib/pkgconfig:\$BUILD_ROOT/root/share/pkgconfig"
 
 export LIBRARY_PATH="\$BUILD_ROOT/root/lib"
 export LD_LIBRARY_PATH="\$BUILD_ROOT/root/lib"
@@ -94,7 +105,7 @@ case "\$PATH" in
         ;;
 esac
 
-export MANPATH="\$BUILD_ROOT/root/man:\$BUILD_ROOT/root/share/man:/usr/share/man:/usr/local/share/man:$BREW_PREFIX/share/man"
+export MANPATH="\$BUILD_ROOT/root/man:\$BUILD_ROOT/root/share/man:/usr/share/man:/usr/local/share/man$pkg_mgr_man_path"
 
 export XML_CATALOG_FILES="\$(cygpath -m "\$BUILD_ROOT/root/etc/xml/catalog.xml" 2>/dev/null)"
 
@@ -123,24 +134,24 @@ DISTS=$DISTS'
     zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.3.3.tar.gz                           lib/libz.a
     libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.xz                              lib/libunistring.a
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
-    libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz       lib/libdeflate.a
+    libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.26/libdeflate-1.26.tar.gz       lib/libdeflate.a
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-1.0.tar.xz                                       lib/libintl.a
-    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2     lib/libpcre2-posix.a
-    libffi          https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz               lib/libffi.a
-    expat           https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz           lib/libexpat.a
+    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2     lib/libpcre2-posix.a
+    libffi          https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz               lib/libffi.a
+    expat           https://github.com/libexpat/libexpat/releases/download/R_2_8_4/expat-2.8.4.tar.xz           lib/libexpat.a
     libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.3/libxml2-v2.15.3.tar.bz2            lib/libxml2.a
     libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.xz          lib/libpng.a
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.2.0.tar.gz                         lib/libjpeg.a
     libtiff         https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz                                        lib/libtiff.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
     freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-3/freetype-VER-2-14-3.tar.bz2 lib/libfreetype.a
-    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.2/fontconfig-2.18.2.tar.bz2   lib/libfontconfig.a
-    glib            https://download.gnome.org/sources/glib/2.88/glib-2.88.2.tar.xz                             lib/libglib-2.0.a
-    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.2.tar.bz2                             lib/libgcrypt.a
+    fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.3/fontconfig-2.18.3.tar.bz2 lib/libfontconfig.a
+    glib            https://download.gnome.org/sources/glib/2.88/glib-2.88.3.tar.xz                             lib/libglib-2.0.a
+    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.3.tar.bz2                             lib/libgcrypt.a
     libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.12/SDL3-3.4.12.tar.gz       lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.07.tar.gz                            lib/libFAudio.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/14.2.1/harfbuzz-14.2.1.tar.xz        lib/libharfbuzz.a
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.14/SDL3-3.4.14.tar.gz       lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.08.tar.gz                            lib/libFAudio.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/14.4.0/harfbuzz-14.4.0.tar.xz        lib/libharfbuzz.a
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz                             lib/libmspack.a
     giflib          https://sourceforge.net/projects/giflib/files/giflib-6.1.3.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
@@ -148,10 +159,10 @@ DISTS=$DISTS'
     lua             https://www.lua.org/ftp/lua-5.5.1.tar.gz                                                    lib/liblua.a
     wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.3/wxWidgets-3.3.3.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
-    libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.1.tar.gz                      lib/libx265.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-8.1.2.tar.xz                                              lib/libavformat.a
+    libx265         https://bitbucket.org/multicoreware/x265_git/downloads/x265_4.2.tar.gz                      lib/libx265.a
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz                                              lib/libavformat.a
     VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.357.tar.gz            include/vulkan/vulkan.h
-    MoltenVK        https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar        lib/libMoltenVK.a
+    MoltenVK        https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.2/MoltenVK-macos.tar        lib/libMoltenVK.a
 '
 
 BUILD_FFMPEG=1
@@ -188,7 +199,6 @@ export CMAKE_ARGS="$CMAKE_BASE_ARGS $CMAKE_ARGS $CMAKE_INSTALL_ARGS"
 export MESON_ARGS="$meSON_BASE_ARGS --buildtype release --default-library=static -Ddefault_both_libraries=static $MESON_INSTALL_ARGS"
 
 DIST_PATCHES=$DIST_PATCHES'
-    libx265         https://gist.githubusercontent.com/andyvand/9f9770878c63b6307f0b5384b01967da/raw/738672b9dd3a76c44b2368853f9c862366720416/libx265_cmake_fix.diff
     python3         https://gist.githubusercontent.com/andyvand/d275de733d362bf20a9c0b05f87ff4fc/raw/8d6e1c09fa52611ccf0b959284a6f68596769ba1/python3_configure.diff
     expat           https://gist.githubusercontent.com/andyvand/9c3f7497a68188db7d4be5e276c40d4f/raw/5816ef1bfdcb1f295e7ff0f152c4d6b960919c66/expat_buildconf.diff
     xmlto           https://gist.githubusercontent.com/andyvand/77efa5295baa1269c070b3c55981d30f/raw/59489e29529ebbaaac6df9da72e8da52b6eaf637/xmlto_local.diff
@@ -245,7 +255,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
                                 s/\\\$(LN_S).*\\\$(SHARED_LIB).*/:/; \
                                 s/@echo.*\\\$(SHARED_LIB).*/@:/; \
                     ' Makefile;
-    libx265         cd source;
+    libx265         cd source; sed -i.bak 's/register uint32_t/uint32_t/' common/md5.cpp;
     libsoxr         rm -rf tests; mkdir tests; touch tests/CMakeLists.txt;
     libvorbis       rm -f autogen.sh;
     XML-SAX         sed -i.bak 's/-MXML::SAX/-Mblib -MXML::SAX/' Makefile.PL;
@@ -282,7 +292,7 @@ DIST_CONFIGURE_OVERRIDES="$DIST_CONFIGURE_OVERRIDES
     cmake       $DASH ./configure --prefix=/usr --no-qt-gui --parallel=\$NUM_CPUS
     XML-SAX     echo no | PERL_MM_USE_DEFAULT=0 \"\$perl\" Makefile.PL
     libvpx      $DASH ./configure --disable-shared --enable-static --prefix=/usr --disable-unit-tests --disable-tools --disable-docs --disable-examples
-    ffmpeg      $DASH ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --disable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --disable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --enable-libx264 --enable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --disable-securetransport --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
+    ffmpeg      $DASH ./configure --disable-pthreads --disable-shared --enable-static --prefix=/usr --pkg-config-flags=--static --disable-nonfree --disable-fontconfig --enable-gpl --enable-version3 --disable-libass --disable-libbluray --disable-libfreetype --disable-libgsm --disable-libmodplug --disable-libmp3lame --disable-libopencore-amrnb --disable-libopencore-amrwb --disable-libopus --disable-libsnappy --disable-libsoxr --disable-libspeex --disable-libtheora --disable-libvidstab --disable-libvo-amrwbenc --disable-libvorbis --disable-libvpx --enable-libx264 --enable-libx265 --disable-libxavs --disable-libxvid --disable-libzmq --disable-openssl --disable-securetransport --disable-sdl2 --enable-lzma --extra-cflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-cxxflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-objcflags='-DMODPLUG_STATIC -DZMQ_STATIC' --extra-libs=-liconv --cc=\"\$CC\" --cxx=\"\$CXX\"
     VulkanHeaders   echo Copy Vulkan headers
     MoltenVK        echo Copy prebuilt static MoltenVK
 "
@@ -600,6 +610,8 @@ setup_perl() {
         perl=/usr/local/bin/perl
     elif [ -x "$BREW_PREFIX"/bin/perl ]; then
         perl="$BREW_PREFIX"/bin/perl
+    elif [ -x "$MACPORTS_PREFIX"/bin/perl ]; then
+        perl="$MACPORTS_PREFIX"/bin/perl
     else
         perl=$(command -v perl || :)
     fi
@@ -622,6 +634,8 @@ setup_meson() {
             meson=/usr/local/bin/meson
         elif [ -x "$BREW_PREFIX"/bin/meson ]; then
             meson="$BREW_PREFIX"/bin/meson
+        elif [ -x "$MACPORTS_PREFIX"/bin/meson ]; then
+            meson="$MACPORTS_PREFIX"/bin/meson
         else
             meson=$(command -v meson || :)
         fi
@@ -649,6 +663,8 @@ setup_ninja() {
         ninja=/usr/local/bin/ninja
     elif [ -x "$BREW_PREFIX"/bin/ninja ]; then
         ninja="$BREW_PREFIX"/bin/ninja
+    elif [ -x "$MACPORTS_PREFIX"/bin/ninja ]; then
+        ninja="$MACPORTS_PREFIX"/bin/ninja
     else
         ninja=$(command -v ninja || :)
     fi
@@ -664,7 +680,7 @@ setup_ninja() {
 }
 
 clear_build_env() {
-    for var in CC CXX CFLAGS CPPFLAGS CXXFLAGS OBJCXXFLAGS LDFLAGS CMAKE_PREFIX_PATH PKG_CONFIG_PATH PERL_MM_USE_DEFAULT PERL_EXTUTILS_AUTOINSTALL OPENSSL_ROOT PERL_MB_OPT PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT; do
+    for var in CC CXX CFLAGS CPPFLAGS CXXFLAGS OBJCXXFLAGS LDFLAGS CMAKE_PREFIX_PATH PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PERL_MM_USE_DEFAULT PERL_EXTUTILS_AUTOINSTALL OPENSSL_ROOT PERL_MB_OPT PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT; do
         unset $var
     done
     export PATH="$ORIG_PATH"
@@ -837,11 +853,21 @@ mac_install_core_deps() {
         error 'Please install XCode and the XCode Command Line Tools, then run this script again. On newer systems this can be done with: [35m;xcode-select --install[0m'
     fi
 
-    if ! [ -x "$BREW_PREFIX"/bin/brew ]; then
-        error 'Please install Mac Homebrew: [35mhttps://brew.sh/[0m'
+    if [ -x "$BREW_PREFIX"/bin/brew ]; then
+        mac_brew_install_core_deps
+    elif [ -x "$MACPORTS_PREFIX"/bin/port ]; then
+        mac_macports_install_core_deps
+    else
+        error 'Please install Mac Homebrew: [35mhttps://brew.sh/[0m or MacPorts: [35mhttps://www.macports.org/[0m'
     fi
+}
 
-    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext
+mac_brew_install_core_deps() {
+    # wxwidgets is here only for its wxrc: a cross build compiles a
+    # target-architecture wxrc into the build root that this machine cannot
+    # run, so tools/macOS/builder points the project at the host one.  The
+    # library itself still comes from the wxwidgets dist.
+    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext wxwidgets
 
     ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt'  | head -1)" "$BUILD_ROOT/root/bin/getopt"
     ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'      | head -1)" "$BUILD_ROOT/root/bin/m4"
@@ -852,6 +878,50 @@ mac_install_core_deps() {
 
     # This is necessary because someone broke my compiler.
     "$BREW_PREFIX"/bin/brew unlink openssl@3 >/dev/null 2>&1 || :
+}
+
+mac_macports_install_core_deps() {
+    # The MacPorts python3 to build with; bump all three together.
+    mp_python_port=python313
+    mp_python_pip=py313-pip
+    mp_python_bin=python3.13
+
+    # MacPorts names several of these differently to Homebrew: GNU getopt is
+    # built as part of util-linux, 7-zip is 7zip, XML::Parser is p5-xml-parser,
+    # and the python ports are already versioned so there is nothing for pyenv
+    # to do.  pkgconfig rather than pkgconf: the two ports conflict, and
+    # pkgconfig is the default provider of the path:bin/pkg-config:pkgconfig
+    # dependency that glib2, cairo and gobject-introspection declare, so it is
+    # the one a MacPorts system already has.
+    #
+    # -N keeps this from blocking on a prompt.  It takes each prompt's default,
+    # which is 'no' for the risky ones -- deactivating a port that has
+    # dependents, or one marked known-to-fail -- so a tool that cannot be
+    # installed cleanly fails loudly instead of being forced through.  Piping
+    # 'yes' in would not change that: port registers its question handlers only
+    # when stdin is a tty, so a pipe disables the questions exactly as -N does.
+    sudo "$MACPORTS_PREFIX"/bin/port -N install bzip2 xz 7zip autoconf \
+        autoconf-archive automake libtool util-linux bison flex m4 gperf \
+        pkgconfig nasm "$mp_python_port" "$mp_python_pip" perl5 p5-xml-parser \
+        meson ninja cmake ccache swig swig-python gettext wxWidgets-3.2
+
+    # wxWidgets-3.2 is in that list only for its wxrc: a cross build compiles a
+    # target-architecture wxrc into the build root that this machine cannot
+    # run, so tools/macOS/builder points the project at the host one.  The
+    # library itself still comes from the wxwidgets dist.
+    #
+    # MacPorts installs GNU m4 as gm4 to keep it clear of the system one, and
+    # leaves python unversioned only to 'port select', which is global state we
+    # would rather not touch.  Link both under the build root, which comes
+    # first on PATH, the way the Homebrew path links out of the Cellar.
+    ln -sf "$MACPORTS_PREFIX/bin/gm4"                  "$BUILD_ROOT/root/bin/m4"
+    ln -sf "$MACPORTS_PREFIX/bin/getopt"               "$BUILD_ROOT/root/bin/getopt"
+    # The meson cross file names a 'pkgconf' binary as well as a 'pkg-config'
+    # one, and the pkgconfig port only installs the latter, so point both at it.
+    ln -sf "$MACPORTS_PREFIX/bin/pkg-config"           "$BUILD_ROOT/root/bin/pkgconf"
+    ln -sf "$MACPORTS_PREFIX/bin/pkg-config"           "$BUILD_ROOT/root/bin/pkg-config"
+    ln -sf "$MACPORTS_PREFIX/bin/$mp_python_bin"       "$BUILD_ROOT/root/bin/python3"
+    ln -sf "$MACPORTS_PREFIX/bin/$mp_python_bin"       "$BUILD_ROOT/root/bin/python"
 }
 
 setup_tmp_dir() {
@@ -1550,14 +1620,19 @@ build_dist() {
                             ;;
                     esac
 
+                    # No sys_root property: meson turns it into
+                    # PKG_CONFIG_SYSROOT_DIR, and pkg-config then prepends it
+                    # to the paths our own .pc files already spell out in full,
+                    # giving -I$BUILD_ROOT/root$BUILD_ROOT/root/include/...
+                    # That setting is for a real cross sysroot, whose .pc files
+                    # hold sysroot-relative prefixes; the build root is not one.
+                    # PKG_CONFIG_LIBDIR already keeps the search inside it.
                     cat <<EOF > cross_def.txt
 [host_machine]
 endian = 'little'
 cpu = '$host_cpu'
 cpu_family = '$host_cpu'
 system = '$host_system'
-[properties]
-sys_root = '$BUILD_ROOT/root'
 [binaries]
 pkg-config = '$BUILD_ROOT/root/bin/pkg-config'
 pkgconf = '$BUILD_ROOT/root/bin/pkgconf'

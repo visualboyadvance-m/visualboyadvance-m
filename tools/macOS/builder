@@ -84,6 +84,18 @@ if [ -n "$BREW_PREFIX" ]; then
     "$BREW_PREFIX"/bin/brew unlink gettext >/dev/null 2>&1 || :
 fi
 
+# MacPorts is the fallback when there is no Homebrew.  Its prefix is two
+# directories up from the 'port' command, /opt/local unless it was relocated.
+mp_port=$(command -v port 2>/dev/null || :)
+
+if [ -z "$mp_port" ] && [ -x /opt/local/bin/port ]; then
+    mp_port=/opt/local/bin/port
+fi
+
+if [ -n "$mp_port" ]; then
+    export MACPORTS_PREFIX=$(dirname "$(dirname "$mp_port")")
+fi
+
 export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_cpu}}$BUILD_ROOT_SUFFIX"
 
 ver_file=$(mktemp)
@@ -91,21 +103,36 @@ sw_vers -productVersion | sed 's/\./ /g' > "$ver_file"
 read -r macos_major macos_minor macos_patch < "$ver_file"
 rm -f "$ver_file"
 
-# Find the highest version clang and llvm in Nix or Homebrew.
+# Nix and MacPorts report a bare "clang version 22.1.8" while Homebrew and
+# Apple prefix it with the vendor name, so pull the version out of the line
+# instead of depending on where it lands in the fields.
+clang_version() {
+    "$1" --version 2>/dev/null | head -1 | sed -E 's/.*version ([0-9]+(\.[0-9]+)*).*/\1/'
+}
+
+# Find the highest version clang and llvm in Nix, Homebrew or MacPorts.
 best_llvm_path=$(
     (
-        for nix_clang in $(find /nix/store -maxdepth 1 -type d -name '*-clang-[0-9]*[0-9]'); do
+        for nix_clang in $(find /nix/store -maxdepth 1 -type d -name '*-clang-[0-9]*[0-9]' 2>/dev/null); do
             llvm_ver=$(echo "$nix_clang" | sed -E 's/.*-([0-9][0-9.]*[0-9])$/\1/')
-            nix_llvm=$(find /nix/store -maxdepth 1 -type d -name '*-llvm-'"$llvm_ver")
+            nix_llvm=$(find /nix/store -maxdepth 1 -type d -name '*-llvm-'"$llvm_ver" 2>/dev/null)
 
             if [ -x "$nix_clang/bin/clang++" ]; then
-                echo "$nix_clang:$nix_llvm    $($nix_clang/bin/clang++ --version | head -1 | awk '{ print $NF }')"
+                echo "$nix_clang:$nix_llvm    $(clang_version "$nix_clang/bin/clang++")"
             fi
         done
 
         for brew_llvm in $(find "$BREW_PREFIX"/Cellar/llvm -maxdepth 1 -type d 2>/dev/null); do
             if [ -x "$brew_llvm/bin/clang++" ]; then
-                echo "$brew_llvm    $($brew_llvm/bin/clang++ --version | head -1 | awk '{ print $NF }')"
+                echo "$brew_llvm    $(clang_version "$brew_llvm/bin/clang++")"
+            fi
+        done
+
+        # MacPorts gives every clang-NN/llvm-NN pair its own libexec tree; what
+        # lands in ${MACPORTS_PREFIX}/bin is only a wrapper script per tool.
+        for mp_llvm in $(find "$MACPORTS_PREFIX"/libexec -maxdepth 1 -type d -name 'llvm-[0-9]*' 2>/dev/null); do
+            if [ -x "$mp_llvm/bin/clang++" ]; then
+                echo "$mp_llvm    $(clang_version "$mp_llvm/bin/clang++")"
             fi
         done
     ) | sort -k2,2 -V -r | head -1 | awk '{ print $1 }'
@@ -129,22 +156,53 @@ fi
 clang_path=${best_llvm_path%%:*}
 xcode_path=$(xcode-select -p)
 
+# Apple's clang and Homebrew's locate the SDK by themselves, but the MacPorts
+# one emits no -isysroot at all and then cannot find so much as stdio.h, so CC,
+# CPP and CXX below name the SDK explicitly.  It goes on the drivers rather
+# than in CFLAGS because plenty of callers use $CC or $CPP with none of our
+# flag variables: autoconf's preprocessor tests and ffmpeg's host_cc probe
+# both do.  xcrun knows which SDK is current; the fallbacks cover the full
+# Xcode and the Command Line Tools layouts.
+sdk_path=$(xcrun --show-sdk-path 2>/dev/null || :)
+
+if [ ! -d "$sdk_path" ]; then
+    if [ -d "$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" ]; then
+        sdk_path="$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+    elif [ -d "$xcode_path/SDKs/MacOSX.sdk" ]; then
+        sdk_path="$xcode_path/SDKs/MacOSX.sdk"
+    else
+        printf "\nCannot find the macOS SDK.\n\n" >&2
+        exit 1
+    fi
+fi
+
 export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
+
+# Homebrew first when both are installed, to keep the existing behavior.
+pkg_mgr_path=
+
+if [ -n "$BREW_PREFIX" ]; then
+    pkg_mgr_path="$BREW_PREFIX/bin:$BREW_PREFIX/opt/gettext/bin:"
+fi
+
+if [ -n "$MACPORTS_PREFIX" ]; then
+    pkg_mgr_path="$pkg_mgr_path$MACPORTS_PREFIX/bin:"
+fi
 
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH="$best_llvm_path/bin:$BREW_PREFIX/bin:$BREW_PREFIX/opt/gettext/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="$best_llvm_path/bin:$pkg_mgr_path/usr/bin:/bin:/usr/sbin:/sbin"
 
-export CC="$clang_path/bin/clang $target_build_arch"
-export CPP="$clang_path/bin/clang -E $target_build_arch"
-export CXX="$clang_path/bin/clang++ $target_build_arch"
+export CC="$clang_path/bin/clang $target_build_arch -isysroot $sdk_path"
+export CPP="$clang_path/bin/clang -E $target_build_arch -isysroot $sdk_path"
+export CXX="$clang_path/bin/clang++ $target_build_arch -isysroot $sdk_path"
 export ARCHFLAGS="$target_build_arch"
 export CPPFLAGS="-DICONV_CONST="
-export CFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=incompatible-function-pointer-types -fpermissive -Wno-error=unguarded-availability"
-export CXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include/c++/v1 -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include"
-export OBJCXXFLAGS="-F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include/c++/v1 -isystem $xcode_path/Platforms/MacOSX.platform/Developer//SDKs/MacOSX.sdk/usr/include"
-export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib -F$xcode_path/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
+export CFLAGS="-F$sdk_path/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=incompatible-function-pointer-types -fpermissive -Wno-error=unguarded-availability"
+export CXXFLAGS="-F$sdk_path/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $sdk_path/usr/include/c++/v1 -isystem $sdk_path/usr/include"
+export OBJCXXFLAGS="-F$sdk_path/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=unguarded-availability -nostdinc++ -isystem $sdk_path/usr/include/c++/v1 -isystem $sdk_path/usr/include"
+export LDFLAGS="-L\"\$BUILD_ROOT/root/lib\" -L$sdk_path/usr/lib -F$sdk_path/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wl,-no_compact_unwind"
 
 export UUID_CFLAGS="-I\"\$BUILD_ROOT/root/stow/libuuid/include\""
 export UUID_LIBS="-L\"\$BUILD_ROOT/root/stow/libuuid/lib\" -luuid"
@@ -160,11 +218,14 @@ if [ -f /bin/dash ]; then
 fi
 
 if [ "$target_cpu" = i386 ]; then
+    cross_build=1
     export CONFIGURE_REQUIRED_ARGS='--host=i386-apple-darwin --build=x86_64-apple-darwin'
 elif [ -n "$arm64_host" ] && [ -n "$intel_target" ]; then
+    cross_build=1
     export CONFIGURE_REQUIRED_ARGS='--host=x86_64-apple-darwin --build=aarch64-apple-darwin'
     export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=x86_64"
 elif [ -n "$intel_host" ] && [ -n "$arm64_target" ]; then
+    cross_build=1
     export CONFIGURE_REQUIRED_ARGS='--host=aarch64-apple-darwin --build=x86_64-apple-darwin'
     export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64"
 fi
@@ -174,6 +235,20 @@ fi
 # Remove -lm, macOS does not use it and it can cause build failures.
 BUILD_ENV=$(printf '%s' "$BUILD_ENV" | sed 's/ -lm / /g')
 export BUILD_ENV
+
+# wxrc runs on the build machine, so a cross build cannot use the one the
+# wxwidgets dist just compiled for the target.  Take the package manager's
+# instead -- installdeps and the core deps both install a wx that provides it.
+if [ -n "$cross_build" ]; then
+    for wxrc_dir in "$MACPORTS_PREFIX" "$BREW_PREFIX"; do
+        [ -n "$wxrc_dir" ] || continue
+
+        if [ -x "$wxrc_dir/bin/wxrc" ]; then
+            PROJECT_ARGS="$PROJECT_ARGS -DWXRC='$wxrc_dir/bin/wxrc'"
+            break
+        fi
+    done
+fi
 
 for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libgpg-error libsecret m4 ninja openssl python2 shared-mime-info swig xorg-macros flac; do
     table_line_remove DISTS $dist
@@ -207,6 +282,15 @@ if [ "$target_cpu" = i386 ]; then
 fi
 
 table_line_append DIST_PRE_BUILD ffmpeg "sed -i.bak 's/-lstdc++/-lc++/g' configure"
+
+# giflib's default target builds shared libraries and the gif utilities, and we
+# want neither -- this build is static only.  The dylib link fails outright on
+# macOS anyway: libutil calls GifErrorString from libgif and the Makefile links
+# the two against nothing, which ld tolerates for an ELF .so but not for a
+# Mach-O dylib.  Build and install just the static libraries.  install-* is
+# named explicitly because giflib's plain 'install' target depends on 'all'.
+table_line_replace DIST_MAKE_ARGS       giflib static-lib
+table_line_replace DIST_INSTALL_TARGETS giflib 'install-static-lib install-include'
 
 # For a 10.7 target:
 #table_line_replace DISTS wxwidgets "https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.5.1/wxWidgets-3.0.5.1.tar.bz2 lib/libwx_baseu-3.0*.a"
