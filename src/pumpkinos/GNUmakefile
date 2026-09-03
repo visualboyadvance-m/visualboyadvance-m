@@ -104,6 +104,7 @@ CORE_SRCS = \
     core/gba/internal/gbaEreader.cpp \
     core/gba/internal/gbaSram.cpp \
     core/gb/gb.cpp \
+    core/gb/gbPowerOn.cpp \
     core/gb/gbCartData.cpp \
     core/gb/gbCheats.cpp \
     core/gb/gbGfx.cpp \
