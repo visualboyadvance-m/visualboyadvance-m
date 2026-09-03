@@ -297,11 +297,11 @@ msgstr "Ejecutar el script Lua"
 
 #: cmdevents.cpp:1981
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Scripts Lua (*.lua)|*.lua|All files|*"
 
 #: cmdevents.cpp:1989
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "El script Lua falló al cargar — ver consola"
 
 #: cmdevents.cpp:2024
 msgid "Set to 0 for pseudo tty"
@@ -332,12 +332,12 @@ msgstr "Esperando por GDB..."
 #: cmdevents.cpp:2457 cmdevents.cpp:2470 cmdevents.cpp:2496 cmdevents.cpp:2501
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Filtro: %s"
 
 #: cmdevents.cpp:2475 cmdevents.cpp:2492
 #, c-format
 msgid "Filter: Plugin (%s)"
-msgstr ""
+msgstr "Filtro: Plugin (%s)"
 
 #: cmdevents.cpp:2512
 #, c-format
@@ -401,15 +401,15 @@ msgstr ""
 #: cmdevents.cpp:2944
 #, c-format
 msgid "Started local link as player %d"
-msgstr ""
+msgstr "Se inició el enlace local como jugador %d"
 
 #: cmdevents.cpp:2962
 msgid "Link stopped: restart it to apply the new settings"
-msgstr ""
+msgstr "Enlace detenido: reinicie para aplicar la nueva configuración"
 
 #: cmdevents.cpp:2994
 msgid "Link stopped"
-msgstr ""
+msgstr "Enlace detenido"
 
 #: dialogs/accel-config.cpp:146
 msgid "Menu commands"
@@ -431,7 +431,7 @@ msgstr "Esto desasignará \"1%s\" de \"1%s\". ¿Estás seguro?"
 #: dialogs/base-dialog.cpp:183
 #, c-format
 msgid "Failed to load lazy tab '%s'"
-msgstr ""
+msgstr "No se pudo cargar la pestaña '%s'"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -445,13 +445,13 @@ msgstr "Valor no válido para ampliación predeterminada."
 #: dialogs/display-config.cpp:454
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
-msgstr ""
+msgstr "No se pudo cargar la pestaña DisplayConfig '%s'"
 
 #: dialogs/display-config.cpp:684
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
-msgstr ""
+msgstr "Ni HDR ni SDR de 10 bits están disponibles: no se encontró ningún renderizador nativo Wayland (Vulkan), por lo que la pantalla cambió a XWayland (solo SDR de 8 bits)."
 
 #: dialogs/display-config.cpp:875
 msgid "Invalid color correction profile"
@@ -504,7 +504,7 @@ msgstr "Colores personalizados"
 
 #: dialogs/game-boy-config.cpp:429
 msgid "Failed to load GBColorPrefPanel"
-msgstr ""
+msgstr "No se pudo cargar GBColorPrefPanel"
 
 #: dialogs/game-boy-config.cpp:441
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
@@ -671,12 +671,12 @@ msgstr "%04X (Real: %04X)"
 
 #: dialogs/joypad-config.cpp:150
 msgid "Failed to load JoyPanel"
-msgstr ""
+msgstr "No se pudo cargar JoyPanel"
 
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "Jugador %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
