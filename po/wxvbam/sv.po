@@ -42,12 +42,12 @@ msgstr "Kunde inte få CoreAudio-enhet"
 #: audio/internal/coreaudio.cpp:440
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
-msgstr ""
+msgstr "Det gick inte att allokera CoreAudio-buffert %d: fel %d"
 
 #: audio/internal/coreaudio.cpp:452
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
-msgstr ""
+msgstr "Det gick inte att starta CoreAudio-kö: fel %d"
 
 #: cmdevents.cpp:75 wxvbam.cpp:1126
 msgid "Could not create main window"
@@ -105,7 +105,7 @@ msgstr "Batterifil (*.sav)|*.sav|Flash save (*.dat)|*.dat"
 msgid ""
 "Importing a battery file will overwrite the current .sav file and reset the "
 "current running game. Do you want to continue?"
-msgstr ""
+msgstr "Import av en batterifil skriver över den aktuella .sav-filen och återställer det pågående spelet. Vill du fortsätta?"
 
 #: cmdevents.cpp:567 cmdevents.cpp:600 cmdevents.cpp:723
 msgid "Confirm import"
@@ -276,15 +276,15 @@ msgstr "Ljud inaktiverat"
 
 #: cmdevents.cpp:1980
 msgid "Run Lua script"
-msgstr ""
+msgstr "Kör Lua-skript"
 
 #: cmdevents.cpp:1981
 msgid "Lua scripts (*.lua)|*.lua|All files|*"
-msgstr ""
+msgstr "Lua-skript (*.lua)|*.lua|Alla filer|*"
 
 #: cmdevents.cpp:1989
 msgid "Lua script failed to load — see console"
-msgstr ""
+msgstr "Det gick inte att läsa in Lua-skriptet — se konsolen"
 
 #: cmdevents.cpp:2024
 msgid "Set to 0 for pseudo tty"
@@ -315,17 +315,17 @@ msgstr "Väntar på GDB..."
 #: cmdevents.cpp:2457 cmdevents.cpp:2470 cmdevents.cpp:2496 cmdevents.cpp:2501
 #, c-format
 msgid "Filter: %s"
-msgstr ""
+msgstr "Filter: %s"
 
 #: cmdevents.cpp:2475 cmdevents.cpp:2492
 #, c-format
 msgid "Filter: Plugin (%s)"
-msgstr ""
+msgstr "Filter: insticksmodul (%s)"
 
 #: cmdevents.cpp:2512
 #, c-format
 msgid "Interframe Blending: %s"
-msgstr ""
+msgstr "Blandning mellan bildrutor: %s"
 
 #: cmdevents.cpp:2561
 msgid ""
@@ -375,24 +375,24 @@ msgstr "Game Boy BIOS kan inte användas när Colorizer Hack är aktiverat."
 
 #: cmdevents.cpp:2908
 msgid "Stop &Link"
-msgstr ""
+msgstr "Stoppa &länk"
 
 #: cmdevents.cpp:2908 xrc/MainMenu.xrc:272
 msgid "Start &Link..."
-msgstr ""
+msgstr "Starta &länk ..."
 
 #: cmdevents.cpp:2944
 #, c-format
 msgid "Started local link as player %d"
-msgstr ""
+msgstr "Startade lokal länk som spelare %d"
 
 #: cmdevents.cpp:2962
 msgid "Link stopped: restart it to apply the new settings"
-msgstr ""
+msgstr "Länken stoppades: starta om den för att tillämpa de nya inställningarna"
 
 #: cmdevents.cpp:2994
 msgid "Link stopped"
-msgstr ""
+msgstr "Länken stoppades"
 
 #: dialogs/accel-config.cpp:146
 msgid "Menu commands"
@@ -414,7 +414,7 @@ msgstr "Detta kommer att avmarkera ”%s” från ”%s”. Är du säker?"
 #: dialogs/base-dialog.cpp:183
 #, c-format
 msgid "Failed to load lazy tab '%s'"
-msgstr ""
+msgstr "Det gick inte att läsa in den lata fliken ”%s”"
 
 #: dialogs/directories-config.cpp:49
 msgid "Browse"
@@ -428,13 +428,13 @@ msgstr "Ogiltigt värde för standardförstoring."
 #: dialogs/display-config.cpp:454
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
-msgstr ""
+msgstr "Det gick inte att läsa in fliken DisplayConfig ”%s”"
 
 #: dialogs/display-config.cpp:684
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
-msgstr ""
+msgstr "Varken HDR eller 10-bitars SDR är tillgängligt: ingen inbyggd Wayland-renderare (Vulkan) hittades, så skärmen återgick till XWayland (endast 8-bitars SDR)."
 
 #: dialogs/display-config.cpp:875
 msgid "Invalid color correction profile"
@@ -466,7 +466,7 @@ msgstr "Använder bildpunktsfilter: %s"
 #: dialogs/display-config.cpp:1260
 #, c-format
 msgid "interframe blend: %s"
-msgstr ""
+msgstr "bildruteutjämning: %s"
 
 #: dialogs/game-boy-config.cpp:145 xrc/GameBoyAdvanceConfigBootRom.xrc:45
 #: xrc/GameBoyConfigBootRom.xrc:66 xrc/GameBoyConfigBootRom.xrc:87
@@ -487,7 +487,7 @@ msgstr "Anpassade färger"
 
 #: dialogs/game-boy-config.cpp:429
 msgid "Failed to load GBColorPrefPanel"
-msgstr ""
+msgstr "Det gick inte att läsa in GBColorPrefPanel"
 
 #: dialogs/game-boy-config.cpp:441
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
@@ -654,12 +654,12 @@ msgstr "%04X (Faktisk: %04X)"
 
 #: dialogs/joypad-config.cpp:150
 msgid "Failed to load JoyPanel"
-msgstr ""
+msgstr "Det gick inte att läsa in JoyPanel"
 
 #: dialogs/joypad-config.cpp:156
 #, c-format
 msgid "Player %u"
-msgstr ""
+msgstr "Spelare %u"
 
 #: dialogs/joypad-config.cpp:190 xrc/GBColorPrefPanel.xrc:10
 msgid "Standard"
@@ -672,12 +672,12 @@ msgstr "Special"
 #: dialogs/joypad-config.cpp:195
 #, c-format
 msgid "Failed to load joypad sub-tab '%s'"
-msgstr ""
+msgstr "Det gick inte att läsa in handkontrollsunderfliken ”%s”"
 
 #: dialogs/sound-config.cpp:197
 #, c-format
 msgid "Failed to load SoundConfig tab '%s'"
-msgstr ""
+msgstr "Det gick inte att läsa in fliken SoundConfig ”%s”"
 
 #: dialogs/sound-config.cpp:376
 #, c-format
@@ -755,7 +755,7 @@ msgstr "Ansluter till %s\n"
 #: guiinit.cpp:226
 #, c-format
 msgid "Link connection failed: %s"
-msgstr ""
+msgstr "Länkanslutningen misslyckades: %s"
 
 #: guiinit.cpp:293 guiinit.cpp:349
 msgid "Select cheat file"
@@ -923,7 +923,7 @@ msgstr "Oförmögen att ladda Game Boy Advance ROM %s"
 msgid ""
 "Active link mode does not match this ROM; use Options > Link > Start Link to"
 " reconnect."
-msgstr ""
+msgstr "Aktivt länkläge matchar inte denna ROM; använd Alternativ > Länk > Starta länk för att ansluta igen."
 
 #: panel.cpp:1236
 msgid " player "
@@ -936,11 +936,11 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Det gick inte att skapa katalogen för inbyggda sparfiler:\n%s\n\nKontrollera den inställda sökvägen i Alternativ > Kataloger."
 
 #: panel.cpp:1285 panel.cpp:1306 wxvbam.cpp:1848
 msgid "Directory Error"
-msgstr ""
+msgstr "Katalogfel"
 
 #: panel.cpp:1305
 #, c-format
@@ -949,7 +949,7 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Det gick inte att skapa katalogen för emulatorsparfiler:\n%s\n\nKontrollera den inställda sökvägen i Alternativ > Kataloger."
 
 #: panel.cpp:1453
 #, c-format
@@ -968,11 +968,11 @@ msgstr "Sparade tillstånd %s"
 
 #: panel.cpp:1883
 msgid "Done"
-msgstr ""
+msgstr "Klar"
 
 #: panel.cpp:1920
 msgid "Running quick first-time performance test"
-msgstr ""
+msgstr "Kör snabbt prestandatest vid första starten"
 
 #: panel.cpp:2073
 #, c-format
@@ -1013,43 +1013,43 @@ msgstr "Fel vid skrivande av återspolningstillstånd"
 
 #: panel.cpp:2725
 msgid "Open GBA..."
-msgstr ""
+msgstr "Öppna GBA ..."
 
 #: panel.cpp:2726
 msgid "Open Game Boy..."
-msgstr ""
+msgstr "Öppna Game Boy ..."
 
 #: panel.cpp:2727
 msgid "Open Game Boy Color..."
-msgstr ""
+msgstr "Öppna Game Boy Color ..."
 
 #: panel.cpp:2729
 msgid "Pause"
-msgstr ""
+msgstr "Pausa"
 
 #: panel.cpp:2730
 msgid "Reset"
-msgstr ""
+msgstr "Återställ"
 
 #: panel.cpp:2731
 msgid "Save state"
-msgstr ""
+msgstr "Spara läge"
 
 #: panel.cpp:2732
 msgid "Load state"
-msgstr ""
+msgstr "Läs in läge"
 
 #: panel.cpp:2734
 msgid "Full screen"
-msgstr ""
+msgstr "Helskärm"
 
 #: panel.cpp:2735
 msgid "Settings..."
-msgstr ""
+msgstr "Inställningar ..."
 
 #: panel.cpp:2737
 msgid "Quit"
-msgstr ""
+msgstr "Avsluta"
 
 #: panel.cpp:4608
 msgid "Failed to set wayland display"
@@ -1057,7 +1057,7 @@ msgstr "Misslyckades med att ställa in wayland display"
 
 #: panel.cpp:4650
 msgid "Failed to create Android video surface"
-msgstr ""
+msgstr "Det gick inte att skapa Android-videoyta"
 
 #: panel.cpp:4669
 msgid "Failed to initialize SDL video subsystem"
@@ -1085,12 +1085,12 @@ msgstr "Misslyckades med att skapa SDL-fönster"
 
 #: panel.cpp:4884 panel.cpp:4995
 msgid "Renderer creating failed, using default renderer"
-msgstr ""
+msgstr "Det gick inte att skapa renderare, använder standardrenderaren"
 
 #: panel.cpp:4885
 #, c-format
 msgid "SDL Error: %s"
-msgstr ""
+msgstr "SDL-fel: %s"
 
 #: panel.cpp:4892 panel.cpp:5001
 msgid "Failed to create SDL renderer"
@@ -1098,16 +1098,16 @@ msgstr "Misslyckades med att skapa SDL-renderare"
 
 #: panel.cpp:4951
 msgid "Failed to set vsync for SDL renderer"
-msgstr ""
+msgstr "Det gick inte att ställa in vsync för SDL-renderaren"
 
 #: panel.cpp:4955 panel.cpp:4990
 #, c-format
 msgid "SDL renderer: %s"
-msgstr ""
+msgstr "SDL-renderare: %s"
 
 #: panel.cpp:4975
 msgid "SDL renderer: default"
-msgstr ""
+msgstr "SDL-renderare: standard"
 
 #: panel.cpp:6731
 msgid "Enabling EGL VSync."
@@ -1155,242 +1155,242 @@ msgstr "Ingen VSYNC tillgänglig på denna plattform"
 
 #: panel.cpp:6895
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
-msgstr ""
+msgstr "HDR: det gick inte att skapa BT.2020 PQ-yta; återgår till SDR."
 
 #: panel.cpp:7144
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
-msgstr ""
+msgstr "Det gick inte att läsa in D3D12- eller D3DCompiler-DLL:er"
 
 #: panel.cpp:7170
 msgid "Failed to get D3D12 function pointers"
-msgstr ""
+msgstr "Det gick inte att hämta D3D12-funktionspekare"
 
 #: panel.cpp:7175
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa DXGI-fabrik: 0x%08X"
 
 #: panel.cpp:7189
 msgid "No hardware adapter found, falling back to WARP"
-msgstr ""
+msgstr "Ingen maskinvaruadapter hittades, återgår till WARP"
 
 #: panel.cpp:7196
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa D3D12-enhet: 0x%08X"
 
 #: panel.cpp:7197
 #, c-format
 msgid "D3D12 device created (%s)"
-msgstr ""
+msgstr "D3D12-enhet skapad (%s)"
 
 #: panel.cpp:7204
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa kommando-kö: 0x%08X"
 
 #: panel.cpp:7230
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa växlingskedja: 0x%08X"
 
 #: panel.cpp:7236
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att hämta IDXGISwapChain3: 0x%08X"
 
 #: panel.cpp:7267
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
-msgstr ""
+msgstr "HDR: skärm/växlingskedja stöder inte BT.2020 PQ; utdata blir SDR."
 
 #: panel.cpp:7277
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa RTV-heap: 0x%08X"
 
 #: panel.cpp:7286
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa SRV-heap: 0x%08X"
 
 #: panel.cpp:7293
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att hämta bakbuffert %u: 0x%08X"
 
 #: panel.cpp:7301
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa kommandoallokerare: 0x%08X"
 
 #: panel.cpp:7306
 #, c-format
 msgid "Failed to create command list: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa kommandolista: 0x%08X"
 
 #: panel.cpp:7345
 #, c-format
 msgid "Failed to serialize root signature: %s"
-msgstr ""
+msgstr "Det gick inte att serialisera rotsignatur: %s"
 
 #: panel.cpp:7352
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa rotsignatur: 0x%08X"
 
 #: panel.cpp:7366
 #, c-format
 msgid "VS compile failed: %s"
-msgstr ""
+msgstr "Kompilering av VS misslyckades: %s"
 
 #: panel.cpp:7374
 #, c-format
 msgid "PS compile failed: %s"
-msgstr ""
+msgstr "Kompilering av PS misslyckades: %s"
 
 #: panel.cpp:7403
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa PSO: 0x%08X"
 
 #: panel.cpp:7423
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa vertexbuffert: 0x%08X"
 
 #: panel.cpp:7432
 #, c-format
 msgid "Failed to create fence: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa staket: 0x%08X"
 
 #: panel.cpp:7435
 msgid "Failed to create fence event"
-msgstr ""
+msgstr "Det gick inte att skapa stakethändelse"
 
 #: panel.cpp:7437
 msgid "D3D12 pipeline fully initialized"
-msgstr ""
+msgstr "D3D12-pipeline har initierats helt"
 
 #: panel.cpp:7469
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DX12DrawingPanel har initierats: %dx%d (skala: %f)"
 
 #: panel.cpp:7491
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
-msgstr ""
+msgstr "ResizeBuffers misslyckades: 0x%08X"
 
 #: panel.cpp:7502
 #, c-format
 msgid "Swap chain resized to %dx%d"
-msgstr ""
+msgstr "Växlingskedjan ändrades till %dx%d"
 
 #: panel.cpp:7768
 msgid "Texture upload failed"
-msgstr ""
+msgstr "Det gick inte att ladda upp textur"
 
 #: panel.cpp:7922
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11: det gick inte att skapa enhet; enkel renderare använder programvägen (wx)."
 
 #: panel.cpp:7974
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
-msgstr ""
+msgstr "D3D11: det gick inte att skapa växlingskedja: 0x%08X"
 
 #: panel.cpp:8040
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
-msgstr ""
+msgstr "D3D11: d3dcompiler_47.dll hittades inte; enkel renderare använder programvägen (wx)."
 
 #: panel.cpp:8092
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
-msgstr ""
+msgstr "D3D11: inställning av blit-skuggning misslyckades; enkel renderare använder programvägen (wx)."
 
 #: panel.cpp:8377
 msgid "Using Direct3D 9Ex (dynamically loaded)"
-msgstr ""
+msgstr "Använder Direct3D 9Ex (dynamiskt inläst)"
 
 #: panel.cpp:8381
 msgid "Failed to load d3d9.dll"
-msgstr ""
+msgstr "Det gick inte att läsa in d3d9.dll"
 
 #: panel.cpp:8390
 msgid "Failed to create Direct3D 9 interface"
-msgstr ""
+msgstr "Det gick inte att skapa Direct3D 9-gränssnitt"
 
 #: panel.cpp:8393
 msgid "Using Direct3D 9"
-msgstr ""
+msgstr "Använder Direct3D 9"
 
 #: panel.cpp:8400
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att hämta adapterns visningsläge: 0x%08X"
 
 #: panel.cpp:8424
 msgid "FlipEx not supported, falling back to Discard swap effect"
-msgstr ""
+msgstr "FlipEx stöds inte, återgår till växlingseffekten Discard"
 
 #: panel.cpp:8440
 msgid "Hardware vertex processing not available, falling back to software"
-msgstr ""
+msgstr "Maskinvarubaserad vertexbearbetning saknas, återgår till programvara"
 
 #: panel.cpp:8464
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa Direct3D-enhet: 0x%08X"
 
 #: panel.cpp:8469
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
-msgstr ""
+msgstr "Direct3D 9%s-enhet skapades (SwapEffect: %s)"
 
 #: panel.cpp:8505
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
-msgstr ""
+msgstr "DXDrawingPanel har initierats: %dx%d (skala: %f)"
 
 #: panel.cpp:8527
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att hämta adapterns visningsläge för återställning: 0x%08X"
 
 #: panel.cpp:8559
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
-msgstr ""
+msgstr "Försöker återställa Direct3D-enhet (SwapEffect: %s)"
 
 #: panel.cpp:8566
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
-msgstr ""
+msgstr "Återställning med FlipEx misslyckades, försöker igen med växlingseffekten Discard"
 
 #: panel.cpp:8578
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att återställa Direct3D-enhet: 0x%08X"
 
 #: panel.cpp:8583
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
-msgstr ""
+msgstr "Direct3D-enhet återställdes (slutlig SwapEffect: %s)"
 
 #: panel.cpp:8651
 #, c-format
 msgid "Failed to create texture: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att skapa textur: 0x%08X"
 
 #: panel.cpp:8663
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
-msgstr ""
+msgstr "Det gick inte att låsa textur: 0x%08X"
 
 #: panel.cpp:8855
 msgid "Memory allocation error"
@@ -1434,28 +1434,28 @@ msgstr "Fel i videoinspelning (%s); avbryter"
 
 #: panel.cpp:9305
 msgid "Renderer failed to initialize; trying the next available renderer."
-msgstr ""
+msgstr "Renderaren kunde inte initieras; provar nästa tillgängliga renderare."
 
 #: panel.cpp:9313
 msgid "No renderer could be initialized."
-msgstr ""
+msgstr "Ingen renderare kunde initieras."
 
 #: panel.cpp:9407
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
-msgstr ""
+msgstr "Ingen renderare kunde visa 10-bitars djupa färger; använder 8 bitar för denna session."
 
 #: panel.cpp:9497
 msgid "Metal is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Metal är inte tillgängligt, använder OpenGL som standard"
 
 #: panel.cpp:9510
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
-msgstr ""
+msgstr "OpenGL är inte tillgängligt på Wayland utan EGL, använder Vulkan"
 
 #: panel.cpp:9529
 msgid "Vulkan is unavailable, defaulting to OpenGL"
-msgstr ""
+msgstr "Vulkan är inte tillgängligt, använder OpenGL som standard"
 
 #: panel.cpp:9822
 #, c-format
@@ -1464,239 +1464,239 @@ msgstr "Volym: %d %%"
 
 #: panel.cpp:10576
 msgid "Vulkan device created successfully"
-msgstr ""
+msgstr "Vulkan-enhet skapades"
 
 #: panel.cpp:10702
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
-msgstr ""
+msgstr "Varken VK_KHR_wayland_surface eller VK_KHR_xlib_surface är tillgängliga — kan inte skapa Vulkan-yta på detta system"
 
 #: panel.cpp:10747
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan-instans: %d"
 
 #: panel.cpp:10750
 msgid "Vulkan instance created"
-msgstr ""
+msgstr "Vulkan-instans skapades"
 
 #: panel.cpp:10769
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan Win32-yta: %d"
 
 #: panel.cpp:10792
 msgid "Failed to obtain NSView handle for Vulkan surface"
-msgstr ""
+msgstr "Det gick inte att hämta NSView-handtag för Vulkan-yta"
 
 #: panel.cpp:10803
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan Metal-yta: %d"
 
 #: panel.cpp:10828
 msgid "Failed to obtain QWidget handle for Vulkan surface"
-msgstr ""
+msgstr "Det gick inte att hämta QWidget-handtag för Vulkan-yta"
 
 #: panel.cpp:10838
 msgid "Failed to obtain ANativeWindow for the panel"
-msgstr ""
+msgstr "Det gick inte att hämta ANativeWindow för panelen"
 
 #: panel.cpp:10848
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan Android-yta: %d"
 
 #: panel.cpp:10865
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan Xlib-yta: %d"
 
 #: panel.cpp:10921
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
-msgstr ""
+msgstr "Wayland: wl_compositor/wl_subcompositor är inte tillgänglig; kan inte skapa Vulkan-underyta"
 
 #: panel.cpp:10930
 msgid "Wayland: failed to create Vulkan subsurface"
-msgstr ""
+msgstr "Wayland: det gick inte att skapa Vulkan-underyta"
 
 #: panel.cpp:10968
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan Wayland-yta: %d"
 
 #: panel.cpp:11007
 msgid "Failed to obtain Wayland display/surface handles"
-msgstr ""
+msgstr "Det gick inte att hämta Wayland-visnings-/ythandtag"
 
 #: panel.cpp:11025
 msgid "No supported Vulkan surface extension available"
-msgstr ""
+msgstr "Ingen Vulkan-ytutökning som stöds är tillgänglig"
 
 #: panel.cpp:11036
 msgid "No Vulkan physical devices found"
-msgstr ""
+msgstr "Inga fysiska Vulkan-enheter hittades"
 
 #: panel.cpp:11095
 #, c-format
 msgid "Selected Vulkan device: %s"
-msgstr ""
+msgstr "Vald Vulkan-enhet: %s"
 
 #: panel.cpp:11099
 msgid "No suitable Vulkan physical device found"
-msgstr ""
+msgstr "Ingen lämplig fysisk Vulkan-enhet hittades"
 
 #: panel.cpp:11144
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
-msgstr ""
+msgstr "Det gick inte att skapa logisk Vulkan-enhet: %d"
 
 #: panel.cpp:11280
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
-msgstr ""
+msgstr "Det gick inte att skapa Vulkan-växlingskedja: %d"
 
 #: panel.cpp:11320
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
-msgstr ""
+msgstr "Växlingskedja skapad: %ux%u, %u bilder, vsync=%s, förtransformering=0x%x"
 
 #: panel.cpp:11422
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
-msgstr ""
+msgstr "Det gick inte att skapa växlingskedjebildvy %zu: %d"
 
 #: panel.cpp:11468
 #, c-format
 msgid "Failed to create render pass: %d"
-msgstr ""
+msgstr "Det gick inte att skapa renderingspass: %d"
 
 #: panel.cpp:11490
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
-msgstr ""
+msgstr "Det gick inte att skapa bildbuffert %zu: %d"
 
 #: panel.cpp:11513
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
-msgstr ""
+msgstr "Det gick inte att skapa layout för deskriptoruppsättning: %d"
 
 #: panel.cpp:11536
 msgid "Failed to create shader modules"
-msgstr ""
+msgstr "Det gick inte att skapa shader-moduler"
 
 #: panel.cpp:11609
 #, c-format
 msgid "Failed to create pipeline layout: %d"
-msgstr ""
+msgstr "Det gick inte att skapa pipelinelayout: %d"
 
 #: panel.cpp:11646
 msgid "Failed to create overlay pipeline"
-msgstr ""
+msgstr "Det gick inte att skapa överlagringspipeline"
 
 #: panel.cpp:11656
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
-msgstr ""
+msgstr "Det gick inte att skapa grafikpipeline: %d"
 
 #: panel.cpp:11672
 #, c-format
 msgid "Failed to create command pool: %d"
-msgstr ""
+msgstr "Det gick inte att skapa kommandopool: %d"
 
 #: panel.cpp:11690
 #, c-format
 msgid "Failed to allocate command buffers: %d"
-msgstr ""
+msgstr "Det gick inte att allokera kommandobuffertar: %d"
 
 #: panel.cpp:11710
 #, c-format
 msgid "Failed to create sync objects for frame %d"
-msgstr ""
+msgstr "Det gick inte att skapa synkroniseringsobjekt för bildruta %d"
 
 #: panel.cpp:11734
 #, c-format
 msgid "Failed to create descriptor pool: %d"
-msgstr ""
+msgstr "Det gick inte att skapa deskriptorpool: %d"
 
 #: panel.cpp:11746
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
-msgstr ""
+msgstr "Det gick inte att allokera deskriptoruppsättning: %d"
 
 #: panel.cpp:11754
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
-msgstr ""
+msgstr "Det gick inte att allokera överlagringsdeskriptoruppsättning: %d"
 
 #: panel.cpp:11793
 #, c-format
 msgid "Failed to create texture image: %d"
-msgstr ""
+msgstr "Det gick inte att skapa texturbild: %d"
 
 #: panel.cpp:11807
 msgid "Failed to allocate texture memory"
-msgstr ""
+msgstr "Det gick inte att allokera texturminne"
 
 #: panel.cpp:11823
 #, c-format
 msgid "Failed to create texture image view: %d"
-msgstr ""
+msgstr "Det gick inte att skapa texturbildvy: %d"
 
 #: panel.cpp:11841
 #, c-format
 msgid "Failed to create texture sampler: %d"
-msgstr ""
+msgstr "Det gick inte att skapa textursamplare: %d"
 
 #: panel.cpp:11875
 msgid "Failed to create staging buffer"
-msgstr ""
+msgstr "Det gick inte att skapa stagingbuffert"
 
 #: panel.cpp:11890
 msgid "Failed to allocate staging memory"
-msgstr ""
+msgstr "Det gick inte att allokera stagingminne"
 
 #: panel.cpp:12002
 msgid "Failed to create overlay image"
-msgstr ""
+msgstr "Det gick inte att skapa överlagringsbild"
 
 #: panel.cpp:12016
 msgid "Failed to allocate overlay image memory"
-msgstr ""
+msgstr "Det gick inte att allokera minne för överlagringsbild"
 
 #: panel.cpp:12031
 msgid "Failed to create overlay image view"
-msgstr ""
+msgstr "Det gick inte att skapa överlagringsbildvy"
 
 #: panel.cpp:12048
 msgid "Failed to create overlay sampler"
-msgstr ""
+msgstr "Det gick inte att skapa överlagringssamplare"
 
 #: panel.cpp:12085
 msgid "Failed to create overlay staging buffer"
-msgstr ""
+msgstr "Det gick inte att skapa stagingbuffert för överlagring"
 
 #: panel.cpp:12099
 msgid "Failed to allocate overlay staging memory"
-msgstr ""
+msgstr "Det gick inte att allokera stagingminne för överlagring"
 
 #: panel.cpp:12177
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
-msgstr ""
+msgstr "VKDrawingPanel har initierats: %ux%u (skala: %f)"
 
 #: panel.cpp:12273
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
-msgstr ""
+msgstr "Det gick inte att hämta växlingskedjebild: %d"
 
 #: panel.cpp:12620
 #, c-format
 msgid "Failed to present swapchain image: %d"
-msgstr ""
+msgstr "Det gick inte att visa växlingskedjebild: %d"
 
 #: sys.cpp:256 sys.cpp:336
 msgid "No game in progress to record"
@@ -1766,12 +1766,12 @@ msgstr "Fel vid öppnande av pseudo tty: %s"
 #: sys.cpp:1587
 #, c-format
 msgid "Invalid GDB server port %d"
-msgstr ""
+msgstr "Ogiltig GDB-serverport %d"
 
 #: sys.cpp:1600
 #, c-format
 msgid "Error setting up GDB server socket on port %d"
-msgstr ""
+msgstr "Fel när GDB-serveruttag konfigurerades på port %d"
 
 #: viewers.cpp:610
 msgid "Text files (*.txt;*.log)|*.txt;*.log|"
@@ -1825,7 +1825,7 @@ msgstr "Starta i helskärmsläge"
 
 #: wxvbam.cpp:1304
 msgid "Mute the audio for this session, without saving to the config"
-msgstr ""
+msgstr "Stäng av ljudet för denna session utan att spara i konfigurationen"
 
 #: wxvbam.cpp:1307
 msgid "Set a configuration file"
@@ -1904,11 +1904,11 @@ msgid ""
 "%s\n"
 "\n"
 "Please check your configured path in Options > Directories."
-msgstr ""
+msgstr "Kunde inte skapa katalog:\n%s\n\nKontrollera den inställda sökvägen i Alternativ > Kataloger."
 
 #: wxvbam.cpp:2120
 msgid "Failed to load dialog"
-msgstr ""
+msgstr "Det gick inte att läsa in dialogrutan"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/command.cpp:29
 #: xrc/JoyPanelStandard.xrc:7 xrc/MainMenu.xrc:446
@@ -2029,7 +2029,7 @@ msgstr "Bibliotek för filtertillägg"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
 msgid "Directory containing RPI filter plugins"
-msgstr ""
+msgstr "Katalog som innehåller RPI-filterinsticksmoduler"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:518
 msgid "Interframe blending function"
@@ -2069,33 +2069,33 @@ msgstr "Färgkorrigeringsprofil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
 msgid "Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)"
-msgstr ""
+msgstr "Välj färgkorrigeringsprofil automatiskt (sRGB för SDR, Rec2020 för HDR)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:531
 msgid "Output HDR on supported displays and renderers"
-msgstr ""
+msgstr "Visa HDR på skärmar och renderare som stöds"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
 msgid "HDR diffuse (paper) white luminance, in nits"
-msgstr ""
+msgstr "HDR-luminans för diffust (papper) vitt, i nit"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:535
 msgid "HDR peak/highlight luminance, in nits"
-msgstr ""
+msgstr "HDR-luminans för högdagrar, i nit"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:537
 msgid "Input level percentage above which HDR highlights ramp to peak"
-msgstr ""
+msgstr "Inmatningsnivå i procent över vilken HDR-högdagrar ökar mot toppvärdet"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
 msgid ""
 "HDR shadow contrast as a percentage gamma (100 = neutral; higher deepens "
 "blacks)"
-msgstr ""
+msgstr "HDR-skuggkontrast som procentuell gamma (100 = neutral; högre fördjupar svärta)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:542
 msgid "Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)"
-msgstr ""
+msgstr "Använd 10-bitars djupfärgs-SDR för OpenGL (X11; minskar bandning)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
 msgid "BIOS file to use for Game Boy, if enabled"
@@ -2112,7 +2112,7 @@ msgstr "Tillämpa LCD-filter, om aktiverad"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:549
 msgid "LCD panel the GBC color correction emulates (0 = GBC, 1 = NSO)"
-msgstr ""
+msgstr "LCD-panel som GBC-färgkorrigeringen efterliknar (0 = GBC, 1 = NSO)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:551
 msgid "BIOS file to use for Game Boy Color, if enabled"
@@ -2162,7 +2162,7 @@ msgstr "BIOS-fil att använda, om aktiverad"
 msgid ""
 "LCD panel the GBA color correction emulates (0 = GBA, 1 = GBASP Backlit, 2 ="
 " Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
-msgstr ""
+msgstr "LCD-panel som GBA-färgkorrigeringen efterliknar (0 = GBA, 1 = GBASP Backlit, 2 = Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Enable link at boot"
@@ -2208,7 +2208,7 @@ msgstr "Läs automatiskt in senaste sparade tillstånd"
 msgid ""
 "Directory to store game save files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Katalog för spelens sparfiler (relativa sökvägar är relativa till den körbara filen; tomt betyder ROM-katalogen)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Freeze recent load list"
@@ -2218,7 +2218,7 @@ msgstr "Frys senaste inläsningslista"
 msgid ""
 "Directory to store A / V and game recordings (relative paths paths are "
 "relative to the executable; blank is ROM dir)"
-msgstr ""
+msgstr "Katalog för A/V- och spelinspelningar (relativa sökvägar är relativa till den körbara filen; tomt betyder ROM-katalogen)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
 msgid "Number of seconds between rewind snapshots (0 to disable)"
@@ -2228,13 +2228,13 @@ msgstr "Antal sekunder mellan ögonblicksbilder för tillbakaspolning (0 för at
 msgid ""
 "Directory to store screenshots (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Katalog för skärmbilder (relativa sökvägar är relativa till den körbara filen; tomt betyder ROM-katalogen)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
 msgid ""
 "Directory to store saved state files (relative paths are relative to the "
 "executable; blank is ROM dir)"
-msgstr ""
+msgstr "Katalog för sparade lägesfiler (relativa sökvägar är relativa till den körbara filen; tomt betyder ROM-katalogen)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:618
 msgid "Enable status bar"
@@ -2445,7 +2445,7 @@ msgstr "Dölj menyraden när musen är inaktiv"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:713
 msgid "Show the on-screen touch controller"
-msgstr ""
+msgstr "Visa pekstyrningen på skärmen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:715
 msgid "Suspend screensaver when game is running"
@@ -2678,11 +2678,11 @@ msgstr "Spela upp/Paus"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:114
 msgid "LAlt+"
-msgstr ""
+msgstr "Vänster Alt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:116
 msgid "RAlt+"
-msgstr ""
+msgstr "Höger Alt+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:118
 msgid "Alt+"
@@ -2691,17 +2691,17 @@ msgstr "Alt+"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:127
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:141
 msgid "LCtrl+"
-msgstr ""
+msgstr "Vänster Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:130
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:143
 msgid "RCtrl+"
-msgstr ""
+msgstr "Höger Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:133
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:158
 msgid "Cmd+"
-msgstr ""
+msgstr "Cmd+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:136
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:145
@@ -2710,11 +2710,11 @@ msgstr "Ctrl+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:149
 msgid "LShift+"
-msgstr ""
+msgstr "Vänster Skift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:151
 msgid "RShift+"
-msgstr ""
+msgstr "Höger Skift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:153
 msgid "Shift+"
@@ -2722,11 +2722,11 @@ msgstr "Skift+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:162
 msgid "LMeta+"
-msgstr ""
+msgstr "Vänster Meta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:164
 msgid "RMeta+"
-msgstr ""
+msgstr "Höger Meta+"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:166
 msgid "Meta+"
@@ -2774,20 +2774,20 @@ msgstr "%s: Hat %d Öst"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:505
 msgid "Shift"
-msgstr ""
+msgstr "Skift"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:509
 msgid "Cmd"
-msgstr ""
+msgstr "Cmd"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:511
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:518
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:514
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/user-input.cpp:521
 msgid "Key"
@@ -2831,7 +2831,7 @@ msgstr "Kan inte spela primary %08x"
 #: audio/internal/dsound.cpp:218
 #, c-format
 msgid "Cannot Play secondary %08x"
-msgstr ""
+msgstr "Kan inte spela sekundär %08x"
 
 #: audio/internal/dsound.cpp:360
 #, c-format
@@ -2857,25 +2857,25 @@ msgstr "FAudio: Skapande av källröst misslyckades!"
 #: audio/internal/xaudio2.cpp:168
 #, c-format
 msgid "XAudio2: Too many audio instances (max %d)"
-msgstr ""
+msgstr "XAudio2: för många ljudinstanser (max %d)"
 
 #: audio/internal/xaudio2.cpp:291
 #, c-format
 msgid "XAudio2: XAudio2_7 Initialize failed with HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2: XAudio2_7 Initialize misslyckades med HRESULT: 0x%08X"
 
 #: audio/internal/xaudio2.cpp:296
 msgid "XAudio2: Failed to create XAudio2 2.7"
-msgstr ""
+msgstr "XAudio2: det gick inte att skapa XAudio2 2.7"
 
 #: audio/internal/xaudio2.cpp:303
 msgid ""
 "XAudio2: Could not load XAudio2_9.dll, XAudio2_8.dll, or XAudio2_7.dll!"
-msgstr ""
+msgstr "XAudio2: kunde inte läsa in XAudio2_9.dll, XAudio2_8.dll eller XAudio2_7.dll!"
 
 #: audio/internal/xaudio2.cpp:322
 msgid "XAudio2: Failed to enumerate devices for XAudio2 2.7"
-msgstr ""
+msgstr "XAudio2: det gick inte att räkna upp enheter för XAudio2 2.7"
 
 #: audio/internal/xaudio2_7.cpp:112 audio/internal/xaudio2_7.cpp:525
 msgid "XAudio2: Enumerating devices failed!"
@@ -2883,84 +2883,84 @@ msgstr "XAudio2: Uppräkning av enheter misslyckades!"
 
 #: audio/internal/xaudio2_7.cpp:128
 msgid "XAudio2: Device not found, using default"
-msgstr ""
+msgstr "XAudio2: enheten hittades inte, använder standard"
 
 #: audio/internal/xaudio2_7.cpp:141
 msgid "XAudio2: Could not get device details for upmix"
-msgstr ""
+msgstr "XAudio2: kunde inte hämta enhetsinformation för uppmixning"
 
 #: audio/internal/xaudio2_7.cpp:155 audio/internal/xaudio2_9.cpp:131
 msgid "XAudio2: Failed to allocate upmix matrix"
-msgstr ""
+msgstr "XAudio2: det gick inte att allokera uppmixningsmatris"
 
 #: audio/internal/xaudio2_7.cpp:216 audio/internal/xaudio2_9.cpp:192
 #, c-format
 msgid "XAudio2: Unsupported channel count for upmix: %d"
-msgstr ""
+msgstr "XAudio2: kanalantalet stöds inte för uppmixning: %d"
 
 #: audio/internal/xaudio2_7.cpp:223 audio/internal/xaudio2_9.cpp:199
 msgid "XAudio2: Failed to set output matrix for upmix"
-msgstr ""
+msgstr "XAudio2: det gick inte att ställa in utdatamatris för uppmixning"
 
 #: audio/internal/xaudio2_7.cpp:236
 msgid "XAudio2: Null XAudio2 instance passed to driver!"
-msgstr ""
+msgstr "XAudio2: null-XAudio2-instans skickades till drivrutinen!"
 
 #: audio/internal/xaudio2_7.cpp:305 audio/internal/xaudio2_9.cpp:267
 msgid "XAudio2 instance not available!"
-msgstr ""
+msgstr "XAudio2-instans är inte tillgänglig!"
 
 #: audio/internal/xaudio2_7.cpp:314
 msgid "XAudio2 instance appears to be invalid"
-msgstr ""
+msgstr "XAudio2-instansen verkar vara ogiltig"
 
 #: audio/internal/xaudio2_7.cpp:323 audio/internal/xaudio2_9.cpp:276
 msgid "XAudio2: Failed to allocate audio buffers!"
-msgstr ""
+msgstr "XAudio2: det gick inte att allokera ljudbuffertar!"
 
 #: audio/internal/xaudio2_7.cpp:346 audio/internal/xaudio2_9.cpp:301
 #, c-format
 msgid "XAudio2: Creating mastering voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2: det gick inte att skapa mastering-röst! HRESULT: 0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:355 audio/internal/xaudio2_9.cpp:310
 #, c-format
 msgid "XAudio2: Creating source voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2: det gick inte att skapa källröst! HRESULT: 0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:369 audio/internal/xaudio2_9.cpp:324
 #, c-format
 msgid "XAudio2: Starting source voice failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2: det gick inte att starta källröst! HRESULT: 0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:397 audio/internal/xaudio2_9.cpp:350
 msgid "XAudio2: Failed to reinitialize audio after device change"
-msgstr ""
+msgstr "XAudio2: det gick inte att initiera om ljudet efter enhetsändring"
 
 #: audio/internal/xaudio2_7.cpp:410 audio/internal/xaudio2_9.cpp:363
 msgid "XAudio2: Too many buffers queued, resetting"
-msgstr ""
+msgstr "XAudio2: för många buffertar i kö, återställer"
 
 #: audio/internal/xaudio2_7.cpp:448 audio/internal/xaudio2_9.cpp:400
 #, c-format
 msgid "XAudio2: SubmitSourceBuffer failed! HRESULT: 0x%08X"
-msgstr ""
+msgstr "XAudio2: SubmitSourceBuffer misslyckades! HRESULT: 0x%08X"
 
 #: audio/internal/xaudio2_7.cpp:471 audio/internal/xaudio2_9.cpp:423
 msgid "XAudio2: Failed to resume playback!"
-msgstr ""
+msgstr "XAudio2: det gick inte att återuppta uppspelningen!"
 
 #: audio/internal/xaudio2_7.cpp:499
 msgid "XAudio2: Cannot create driver with null XAudio2 instance"
-msgstr ""
+msgstr "XAudio2: kan inte skapa drivrutin med null-XAudio2-instans"
 
 #: audio/internal/xaudio2_7.cpp:507
 msgid "XAudio2: XAudio2 instance appears to be invalid"
-msgstr ""
+msgstr "XAudio2: XAudio2-instansen verkar vara ogiltig"
 
 #: audio/internal/xaudio2_7.cpp:540
 msgid "XAudio2: Exception during device enumeration"
-msgstr ""
+msgstr "XAudio2: undantag under enhetsuppräkning"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1655
 msgid "Error, link already connected"
@@ -2984,7 +2984,7 @@ msgstr "Spelare %d kopplade från."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2150
 msgid "Player 2 disconnected."
-msgstr ""
+msgstr "Spelare 2 kopplades från."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2228
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2278
@@ -2999,31 +2999,31 @@ msgstr "Servern kopplade från."
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
-msgstr ""
+msgstr "Kunde inte slå upp bindningsadressen \"%s\" för länkservern.\nAnvänd \"*\" för att lyssna på alla gränssnitt."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2475
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
-msgstr ""
+msgstr "Bindningsadressen \"%s\" är inte lokal; lyssnar i stället på alla gränssnitt."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2487
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
-msgstr ""
+msgstr "Port %d används redan av ett annat program (eller en annan emulatorinstans som fungerar som server).\nStäng det eller ändra länkporten."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2490
 #, c-format
 msgid "Failed to start link server on port %d: %s"
-msgstr ""
+msgstr "Det gick inte att starta länkserver på port %d: %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2516
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
-msgstr ""
+msgstr "Kunde inte initiera anslutning till %s port %d: %s"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2548
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3462
@@ -3038,7 +3038,7 @@ msgstr "Alla spelare anslutna"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2599
 msgid "Connecting to server..."
-msgstr ""
+msgstr "Ansluter till server ..."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2608
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3489
@@ -3076,7 +3076,7 @@ msgstr "5 eller fler GBA stöds inte."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4694
 msgid "The GB link supports only 2 players."
-msgstr ""
+msgstr "GB-länken stöder endast 2 spelare."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4714
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4735
@@ -3323,7 +3323,7 @@ msgstr "Inspelningar"
 msgid ""
 "Use %s in paths for the system name (GameBoy Advance, GameBoy Color, Super "
 "GameBoy, or GameBoy)."
-msgstr ""
+msgstr "Använd %s i sökvägar för systemnamnet (GameBoy Advance, GameBoy Color, Super GameBoy eller GameBoy)."
 
 #: xrc/Disassemble.xrc:4
 msgid "Disassemble"
@@ -3382,19 +3382,19 @@ msgstr "Filter för SDL Pixel Art"
 
 #: xrc/DisplayConfigBasic.xrc:99
 msgid "Output HDR (Wayland, Vulkan, D3D12, macOS)"
-msgstr ""
+msgstr "Utdata-HDR (Wayland, Vulkan, D3D12, macOS)"
 
 #: xrc/DisplayConfigBasic.xrc:106
 msgid "HDR is not available: this display or renderer is not HDR capable."
-msgstr ""
+msgstr "HDR är inte tillgängligt: den här skärmen eller renderaren har inte HDR-stöd."
 
 #: xrc/DisplayConfigBasic.xrc:115
 msgid "10-bit deep color (reduces banding)"
-msgstr ""
+msgstr "10-bitars djup färg (minskar bandning)"
 
 #: xrc/DisplayConfigBasic.xrc:122
 msgid "10-bit deep color is not available: no 10-bit visual on this display."
-msgstr ""
+msgstr "10-bitars djup färg är inte tillgängligt: ingen 10-bitars visning på den här skärmen."
 
 #: xrc/DisplayConfigBasic.xrc:136
 msgid "Filters"
@@ -3402,11 +3402,11 @@ msgstr "Filter"
 
 #: xrc/DisplayConfigBasic.xrc:151
 msgid "Plugin filter dir:"
-msgstr ""
+msgstr "Katalog för filterinsticksmoduler:"
 
 #: xrc/DisplayConfigBasic.xrc:157
 msgid "Select plugin directory"
-msgstr ""
+msgstr "Välj katalog för insticksmoduler"
 
 #: xrc/DisplayConfigBasic.xrc:164
 msgid "Display filter:"
@@ -3446,7 +3446,7 @@ msgstr "Enkel 4x"
 
 #: xrc/DisplayConfigBasic.xrc:194
 msgid "Filter plugin:"
-msgstr ""
+msgstr "Filterinsticksmodul:"
 
 #: xrc/DisplayConfigBasic.xrc:204
 msgid "Interframe blending:"
@@ -3486,7 +3486,7 @@ msgstr "Profil:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "LCD Correction for GBA:"
-msgstr ""
+msgstr "LCD-korrigering för GBA:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:66
 msgid "GBA Darken:"
@@ -3502,7 +3502,7 @@ msgstr "Mycket mörkt"
 
 #: xrc/DisplayConfigColorCorrection.xrc:107
 msgid "LCD Correction for GBC:"
-msgstr ""
+msgstr "LCD-korrigering för GBC:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:124
 msgid "GBC Lighten:"
@@ -3518,19 +3518,19 @@ msgstr "Mycket ljust"
 
 #: xrc/DisplayConfigColorCorrection.xrc:165
 msgid "HDR White (nits):"
-msgstr ""
+msgstr "HDR-vitt (nit):"
 
 #: xrc/DisplayConfigColorCorrection.xrc:181
 msgid "HDR Peak (nits):"
-msgstr ""
+msgstr "HDR-toppvärde (nit):"
 
 #: xrc/DisplayConfigColorCorrection.xrc:197
 msgid "HDR Highlight Knee:"
-msgstr ""
+msgstr "HDR-högdagsknä:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:213
 msgid "HDR Shadow Contrast:"
-msgstr ""
+msgstr "HDR-skuggkontrast:"
 
 #: xrc/DisplayConfigOSD.xrc:12
 msgid "Speed indicator:"
@@ -4091,7 +4091,7 @@ msgstr "SDL GameController-läge"
 
 #: xrc/JoypadConfig.xrc:21
 msgid "Autofire Throttle (frames):"
-msgstr ""
+msgstr "Autofire-hastighet (bildrutor):"
 
 #: xrc/LinkConfig.xrc:4
 msgid "Link configuration"
@@ -4576,7 +4576,7 @@ msgstr "&LCD-filter"
 
 #: xrc/MainMenu.xrc:521
 msgid "&Game Boy Colorizer Hack [requires restart]"
-msgstr ""
+msgstr "&Game Boy Colorizer-hack [kräver omstart]"
 
 #: xrc/MainMenu.xrc:525
 msgid "&Game Boy printer"
@@ -4592,7 +4592,7 @@ msgstr "&Spara utskrifter som skärmbilder"
 
 #: xrc/MainMenu.xrc:538
 msgid "&Use Game Boy BIOS file [requires restart]"
-msgstr ""
+msgstr "&Använd Game Boy BIOS-fil [kräver omstart]"
 
 #: xrc/MainMenu.xrc:542
 msgid "&Use Game Boy Color BIOS file"
@@ -4628,7 +4628,7 @@ msgstr "Dölj men&yrad"
 
 #: xrc/MainMenu.xrc:569
 msgid "Show On-Screen &Controller"
-msgstr ""
+msgstr "Visa hand&kontroll på skärmen"
 
 #: xrc/MainMenu.xrc:573
 msgid "Suspend &Screen Saver"
@@ -4696,23 +4696,23 @@ msgstr "Minn&evisare…"
 
 #: xrc/MainMenu.xrc:634
 msgid "L&ua scripting"
-msgstr ""
+msgstr "L&ua-skriptning"
 
 #: xrc/MainMenu.xrc:636
 msgid "&Run script..."
-msgstr ""
+msgstr "&Kör skript ..."
 
 #: xrc/MainMenu.xrc:639
 msgid "&Stop script"
-msgstr ""
+msgstr "&Stoppa skript"
 
 #: xrc/MainMenu.xrc:643
 msgid "Show &console"
-msgstr ""
+msgstr "Visa &konsol"
 
 #: xrc/MainMenu.xrc:646
 msgid "Show &editor"
-msgstr ""
+msgstr "Visa &redigerare"
 
 #: xrc/MainMenu.xrc:650
 msgid "&OAM Viewer..."
@@ -4800,7 +4800,7 @@ msgstr "Standardspråk"
 
 #: xrc/MainMenu.xrc:774
 msgid "Spanish [Latin American]"
-msgstr ""
+msgstr "Spanska [Latinamerika]"
 
 #: xrc/MainMenu.xrc:778
 msgid "Spanish"
@@ -4808,15 +4808,15 @@ msgstr "Spanska"
 
 #: xrc/MainMenu.xrc:782
 msgid "French [France]"
-msgstr ""
+msgstr "Franska [Frankrike]"
 
 #: xrc/MainMenu.xrc:786
 msgid "Hebrew [Israel]"
-msgstr ""
+msgstr "Hebreiska [Israel]"
 
 #: xrc/MainMenu.xrc:790
 msgid "Hungarian [Hungary]"
-msgstr ""
+msgstr "Ungerska [Ungern]"
 
 #: xrc/MainMenu.xrc:794
 msgid "Indonesian"
@@ -4828,15 +4828,15 @@ msgstr "Italienska"
 
 #: xrc/MainMenu.xrc:802
 msgid "Korean [Korea]"
-msgstr ""
+msgstr "Koreanska [Korea]"
 
 #: xrc/MainMenu.xrc:806
 msgid "Polish [Poland]"
-msgstr ""
+msgstr "Polska [Polen]"
 
 #: xrc/MainMenu.xrc:810
 msgid "Portuguese [Brazil]"
-msgstr ""
+msgstr "Portugisiska [Brasilien]"
 
 #: xrc/MainMenu.xrc:814
 msgid "Swedish"
@@ -4852,7 +4852,7 @@ msgstr "Ukrainska"
 
 #: xrc/MainMenu.xrc:826
 msgid "Chinese [China]"
-msgstr ""
+msgstr "Kinesiska [Kina]"
 
 #: xrc/MainMenu.xrc:830
 msgid "&Use external translations"
@@ -4980,7 +4980,7 @@ msgstr "Direct Sound"
 
 #: xrc/SoundConfigAdvanced.xrc:61
 msgid "No sound (timer paced)"
-msgstr ""
+msgstr "Inget ljud (timerstyrt)"
 
 #: xrc/SoundConfigAdvanced.xrc:75
 msgid "Device"
