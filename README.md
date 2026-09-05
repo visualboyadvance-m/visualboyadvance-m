@@ -85,7 +85,7 @@ cmake .. -DVCPKG_TARGET_TRIPLET=**<SYSTEM>** -DCMAKE_BUILD_TYPE=Release -G Ninja
 . For Android set `ANDROID_HOME` and `ANDROID_NDK_HOME` and use:
 
 - arm64-android
-- arm-android
+- arm-neon-android
 - x64-android
 - x86-android
 - riscv64-android

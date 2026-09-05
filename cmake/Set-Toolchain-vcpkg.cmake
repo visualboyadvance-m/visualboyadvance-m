@@ -214,6 +214,20 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
     message(STATUS "Inferred VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}")
 endif()
 
+# vcpkg's community arm-android triplet still passes -DANDROID_ARM_NEON=OFF, and
+# NDK r29 removed that opt-out: android-legacy.toolchain.cmake now fails outright
+# with "Disabling Neon is no longer supported", so compiler detection dies before
+# anything is built. arm-neon-android is the same triplet with Neon on, and it is
+# the only armeabi-v7a configuration the NDK still accepts -- every armv7 device
+# Android still supports has Neon, which is why the opt-out went away. Take the
+# old name and build the one that works, so existing invocations keep running.
+if(VCPKG_TARGET_TRIPLET STREQUAL "arm-android")
+    set(VCPKG_TARGET_TRIPLET "arm-neon-android"
+        CACHE STRING "Vcpkg target triplet (ex. x64-windows-static)" FORCE)
+    message(STATUS
+        "Triplet arm-android rewritten to arm-neon-android: NDK r29 requires Neon on armeabi-v7a")
+endif()
+
 # Remember a toolchain file the caller already selected.
 #
 # vcpkg_set_toolchain() below points CMAKE_TOOLCHAIN_FILE at vcpkg.cmake, which
@@ -342,7 +356,7 @@ if(VCPKG_TARGET_TRIPLET MATCHES "-android$"
             set(vbam_android_abi "${CMAKE_ANDROID_ARCH_ABI}")
         elseif(VCPKG_TARGET_TRIPLET STREQUAL "arm64-android")
             set(vbam_android_abi "arm64-v8a")
-        elseif(VCPKG_TARGET_TRIPLET STREQUAL "arm-android")
+        elseif(VCPKG_TARGET_TRIPLET STREQUAL "arm-neon-android")
             set(vbam_android_abi "armeabi-v7a")
         elseif(VCPKG_TARGET_TRIPLET STREQUAL "x64-android")
             set(vbam_android_abi "x86_64")
