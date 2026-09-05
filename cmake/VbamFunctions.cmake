@@ -88,6 +88,27 @@ function(try_wx_util var util conf_suffix major_version minor_version)
             endif()
         endif()
     endforeach()
+
+    # Nothing usable on PATH.  Fall back to CMake's own search, which consults
+    # CMAKE_PROGRAM_PATH -- where vcpkg registers each port's tools directory,
+    # and so the only place a vcpkg-installed utility appears at all.  The walk
+    # above stays first: its NO_DEFAULT_PATH is what stops a cross build's
+    # target-architecture copy in the build root from winning, and the same
+    # check below still rejects one that cannot run here.
+    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+    find_program(exe NAMES ${names})
+
+    set(candidate "${exe}")
+    set(exe NOTFOUND CACHE INTERNAL "" FORCE)
+
+    if(EXISTS "${candidate}")
+        check_clean_exit(exit_status "${candidate}" --help)
+
+        if(exit_status EQUAL 0)
+            set("${var}" "${candidate}" PARENT_SCOPE)
+            return()
+        endif()
+    endif()
 endfunction()
 
 function(find_wx_util var util)
@@ -158,9 +179,13 @@ function(find_wx_util var util)
             endforeach()
         endforeach()
 
-        # default to util name if not found, so the error is more clear
-        set(${var} ${util} PARENT_SCOPE)
     endforeach()
+
+    # Leave ${var} unset when nothing was found, so the caller's check fails at
+    # configure time.  Defaulting to the bare utility name reads as friendlier
+    # but passes that check, and the name then reaches add_custom_command as a
+    # command that is not on PATH: the build died 146 targets in on "no such
+    # file or directory", naming neither wxrc nor the search that missed it.
 endfunction()
 
 # Drop link items naming a file that is not there from the interfaces of the
