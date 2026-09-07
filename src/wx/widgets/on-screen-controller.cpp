@@ -124,6 +124,26 @@ OnScreenController::~OnScreenController() {
 #endif
 }
 
+void OnScreenController::SetGameAspect(double aspect) {
+    if (aspect == game_aspect_) {
+        return;
+    }
+    game_aspect_ = aspect;
+    LayoutButtons();
+    ++revision_;
+    Refresh();
+}
+
+void OnScreenController::SetShowMenuButton(bool show) {
+    if (show == show_menu_button_) {
+        return;
+    }
+    show_menu_button_ = show;
+    LayoutButtons();
+    ++revision_;
+    Refresh();
+}
+
 void OnScreenController::LayoutButtons() {
     const wxSize sz = GetClientSize();
     const int w = sz.x;
@@ -135,24 +155,43 @@ void OnScreenController::LayoutButtons() {
     }
 
     const int unit = std::min(w, h);
+    const int m = std::max(4, static_cast<int>(unit * 0.03));
+
+    // Menu button, top center. Same spot in both layouts: over the top edge of
+    // the picture, where the menu bar it replaces would be.
+    if (show_menu_button_) {
+        const int menu_w = static_cast<int>(w * 0.14);
+        const int menu_h = static_cast<int>(h * 0.07);
+        buttons_.push_back({config::GameKey::A /* unused */, true, Shape::kRoundedRect,
+                            "MENU", wxRect((w - menu_w) / 2, m, menu_w, menu_h)});
+    }
+
+    // The pillarbox column beside the centered, aspect-fit game image. Wide
+    // enough (the usual case on a landscape phone, much wider than the GBA's
+    // 3:2), the controls all move into the two columns, leaving the picture
+    // unobscured.
+    int gutter = 0;
+    if (game_aspect_ > 0) {
+        const int game_w =
+            std::min(w, static_cast<int>(h * game_aspect_));
+        gutter = (w - game_w) / 2;
+    }
+    if (gutter >= static_cast<int>(unit * 0.25)) {
+        LayoutButtonsSideColumns(w, h, gutter, m);
+        return;
+    }
+
     const int face = static_cast<int>(unit * 0.17);
     const int shoulder_w = static_cast<int>(w * 0.16);
     const int shoulder_h = static_cast<int>(h * 0.09);
     const int pill_w = static_cast<int>(w * 0.13);
     const int pill_h = static_cast<int>(h * 0.07);
-    const int menu_w = static_cast<int>(w * 0.14);
-    const int menu_h = static_cast<int>(h * 0.07);
-    const int m = std::max(4, static_cast<int>(unit * 0.03));
 
     // Shoulder buttons along the top corners.
     buttons_.push_back({config::GameKey::L, false, Shape::kRoundedRect, "L",
                         wxRect(m, m, shoulder_w, shoulder_h)});
     buttons_.push_back({config::GameKey::R, false, Shape::kRoundedRect, "R",
                         wxRect(w - m - shoulder_w, m, shoulder_w, shoulder_h)});
-
-    // Menu button, top center.
-    buttons_.push_back({config::GameKey::A /* unused */, true, Shape::kRoundedRect,
-                        "MENU", wxRect((w - menu_w) / 2, m, menu_w, menu_h)});
 
     // Start / Select, bottom center.
     buttons_.push_back({config::GameKey::Select, false, Shape::kPill, "SEL",
@@ -173,6 +212,50 @@ void OnScreenController::LayoutButtons() {
     // D-pad, bottom left, square.
     const int dp = static_cast<int>(unit * 0.42);
     dpad_rect_ = wxRect(m, h - m - dp, dp, dp);
+}
+
+void OnScreenController::LayoutButtonsSideColumns(int w, int h, int gutter, int margin) {
+    const int m = margin;
+    const int cw = gutter - 2 * m;       // usable width of each column
+    const int right_x = w - gutter + m;  // left edge of the right column
+
+    // Shoulders across the top of each column.
+    const int shoulder_w = std::min(cw, static_cast<int>(h * 0.40));
+    const int shoulder_h = static_cast<int>(h * 0.10);
+    buttons_.push_back({config::GameKey::L, false, Shape::kRoundedRect, "L",
+                        wxRect(m + (cw - shoulder_w) / 2, m, shoulder_w, shoulder_h)});
+    buttons_.push_back({config::GameKey::R, false, Shape::kRoundedRect, "R",
+                        wxRect(right_x + (cw - shoulder_w) / 2, m, shoulder_w, shoulder_h)});
+
+    // Select / Start along the bottom of the left / right column.
+    const int pill_w = std::min(cw, static_cast<int>(h * 0.35));
+    const int pill_h = static_cast<int>(h * 0.08);
+    buttons_.push_back({config::GameKey::Select, false, Shape::kPill, "SEL",
+                        wxRect(m + (cw - pill_w) / 2, h - m - pill_h, pill_w, pill_h)});
+    buttons_.push_back({config::GameKey::Start, false, Shape::kPill, "START",
+                        wxRect(right_x + (cw - pill_w) / 2, h - m - pill_h, pill_w, pill_h)});
+
+    // The vertical band left free between the shoulders and the pills.
+    const int band_top = m + shoulder_h + m;
+    const int band_h = (h - m - pill_h - m) - band_top;
+    if (band_h <= 0) {
+        return;
+    }
+
+    // D-pad centered in the left band.
+    const int dp = std::min({cw, band_h, static_cast<int>(h * 0.52)});
+    dpad_rect_ = wxRect(m + (cw - dp) / 2, band_top + (band_h - dp) / 2, dp, dp);
+
+    // A/B centered in the right band (A upper-right, B lower-left of A).
+    const int face = std::min(static_cast<int>(cw / 2.15), static_cast<int>(h * 0.20));
+    const int cluster_w = static_cast<int>(face * 2.15);
+    const int cluster_h = static_cast<int>(face * 1.9);
+    const int cx = right_x + (cw - cluster_w) / 2;
+    const int cy = band_top + (band_h - cluster_h) / 2;
+    buttons_.push_back({config::GameKey::A, false, Shape::kCircle, "A",
+                        wxRect(cx + static_cast<int>(face * 1.15), cy, face, face)});
+    buttons_.push_back({config::GameKey::B, false, Shape::kCircle, "B",
+                        wxRect(cx, cy + static_cast<int>(face * 0.9), face, face)});
 }
 
 void OnScreenController::HitTest(const wxPoint& pos, PointerState* out) const {

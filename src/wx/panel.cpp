@@ -708,6 +708,29 @@ GameArea::GameArea()
     osc_observer_ = std::make_unique<config::OptionsObserver>(
         config::OptionID::kUIShowOnScreenController,
         [this](config::Option*) { UpdateOnScreenController(); });
+
+    // React to the hide-menu-bar option. On Android it is an immediate toggle:
+    // hide the action bar (the top bar carrying the overflow menu) and the
+    // system bars right away, and re-clamp the on-screen controller to the
+    // grown content view. On desktop the option arms a mouse-idle auto-hide
+    // (see HideMenuBar()), so only un-hiding needs to happen here.
+    menu_bar_observer_ = std::make_unique<config::OptionsObserver>(
+        config::OptionID::kUIHideMenuBar,
+        [this](config::Option* option) {
+#if defined(__WXQT__) && defined(__ANDROID__)
+            VbamSetAndroidMenuBarHidden(option->GetBool());
+            UpdateOnScreenController();
+#else
+            if (!option->GetBool())
+                ShowMenuBar();
+#endif
+        });
+
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Apply the persisted state once at startup; later changes arrive through
+    // the observer above.
+    VbamSetAndroidMenuBarHidden(gopts.hide_menu_bar);
+#endif
 }
 
 // Returns a valid override key for the loaded GBA ROM.
@@ -1054,6 +1077,10 @@ void GameArea::LoadGame(const wxString& load_path)
     SetFocus();
     // Use custom geometry
     AdjustSize(false);
+    // The overlay controller lays itself out around the picture, whose shape
+    // (basic_width/height) just changed; a maximized/fullscreen window gets no
+    // resize event from AdjustSize() to trigger this for us.
+    UpdateOnScreenController();
     emulating = true;
     was_paused = true;
     schedule_audio_restart_ = false;
@@ -2706,6 +2733,24 @@ void GameArea::UpdateOnScreenController()
         }
 #endif
         osc_->SetSize(osc_size);
+
+        // Tell the overlay the picture's shape so it can move the controls
+        // into the pillarbox columns beside it (the render panels aspect-fit
+        // the frame centered in the same rect the overlay covers).
+        // basic_width/height default to the GBA's dimensions, so the layout is
+        // sensible before a ROM is loaded too.
+        if (basic_width > 0 && basic_height > 0) {
+            osc_->SetGameAspect(static_cast<double>(basic_width) / basic_height);
+        }
+
+#if defined(__ANDROID__)
+        // While the top bar is on screen its three-dot menu opens the whole
+        // menu bar, so the on-screen MENU button is redundant; it comes back
+        // when the bar is hidden (kUIHideMenuBar), as the only remaining way
+        // to reach a menu.
+        osc_->SetShowMenuButton(OPTION(kUIHideMenuBar));
+#endif
+
         osc_->Raise();
         if (!osc_->IsShown())
             osc_->Show();
@@ -2732,6 +2777,25 @@ void GameArea::ShowOnScreenMenu()
     menu.Append(XRCID("LoadGameAutoLoad"), _("Load state"));
     menu.AppendSeparator();
     menu.Append(XRCID("Fullscreen"), _("Full screen"));
+#ifndef __WXMAC__
+    // The menu-bar toggle must stay reachable from here: once the bar is hidden
+    // (on Android that is the action bar with the overflow menu), this popup is
+    // the only menu left to un-hide it from.
+    wxMenuItem* hide_bar = menu.AppendCheckItem(XRCID("HideMenuBar"), _("Hide menu bar"));
+    hide_bar->Check(OPTION(kUIHideMenuBar));
+    // The frame's HideMenuBar handler reads the check state of the menu *bar's*
+    // item, which a tap on this copy does not flip. Handle it on the popup
+    // itself: update the option (its observer applies the change) and keep the
+    // menu-bar item in sync.
+    menu.Bind(
+        wxEVT_MENU,
+        [this](wxCommandEvent& ev) {
+            config::Option::ByID(config::OptionID::kUIHideMenuBar)->SetBool(ev.IsChecked());
+            if (main_frame)
+                main_frame->MenuOptionBool("HideMenuBar", ev.IsChecked());
+        },
+        XRCID("HideMenuBar"));
+#endif
     menu.Append(XRCID("GeneralConfigure"), _("Settings..."));
     menu.AppendSeparator();
     menu.Append(XRCID("wxID_EXIT"), _("Quit"));
@@ -9057,9 +9121,17 @@ void GameArea::HidePointer()
         // and the user can adjust hiding behavior herself.
 void GameArea::HideMenuBar()
 {
-#ifndef __WXMAC__
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // On Android the menu bar is the activity's action bar, and hiding it is a
+    // clickable toggle (kUIHideMenuBar), not a mouse-idle timeout: there is no
+    // mouse, and touches synthesize the mouse events that would keep un-hiding
+    // it. Re-assert the chosen state instead (a cached no-op when unchanged);
+    // the on-screen popup menu carries a check item to bring the bar back.
+    VbamSetAndroidMenuBarHidden(gopts.hide_menu_bar);
+    menu_bar_hidden = gopts.hide_menu_bar;
+#elif !defined(__WXMAC__)
     if (!main_frame || menu_bar_hidden || !gopts.hide_menu_bar) return;
-            
+
     if (((systemGetClock() - mouse_active_time) > 3000) && !main_frame->MenusOpened()) {
 #ifdef __WXMSW__
         current_hmenu = static_cast<HMENU>(main_frame->GetMenuBar()->GetHMenu());
@@ -9072,12 +9144,16 @@ void GameArea::HideMenuBar()
     }
 #endif
 }
-        
+
 void GameArea::ShowMenuBar()
 {
-#ifndef __WXMAC__
+#if defined(__WXQT__) && defined(__ANDROID__)
+    // Driven by the toggle, not by mouse activity; see HideMenuBar().
+    VbamSetAndroidMenuBarHidden(gopts.hide_menu_bar);
+    menu_bar_hidden = gopts.hide_menu_bar;
+#elif !defined(__WXMAC__)
     if (!main_frame || !menu_bar_hidden) return;
-            
+
 #ifdef __WXMSW__
     if (current_hmenu != NULL) {
         ::SetMenu(main_frame->GetHandle(), current_hmenu);

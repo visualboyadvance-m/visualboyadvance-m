@@ -54,6 +54,14 @@ void VbamDiscardAndroidOutputFile(const wxString& staged_path);
 // and GameArea::UnsuspendScreenSaver(). Idempotent; safe off the UI thread.
 void VbamSetAndroidWakeLock(bool enable);
 
+// Hides or shows the activity's top bar (the action bar carrying the overflow
+// menu the wx menu bar is mapped into) together with the system bars, so the
+// game takes the whole screen. Driven by the Hide Menu Bar option
+// (kUIHideMenuBar), which on Android is an immediate toggle rather than the
+// desktop mouse-idle auto-hide. Idempotent and cheap on repeat calls; safe off
+// the UI thread.
+void VbamSetAndroidMenuBarHidden(bool hidden);
+
 // Size of the activity's content view in Qt logical pixels, i.e. the area a
 // top-level window can actually occupy. Unlike Qt's screen availableGeometry()
 // this excludes the action bar, so a dialog clamped to it always fits. Returns
@@ -99,6 +107,7 @@ inline wxString VbamStageAndroidOutputFile(const wxString& path, const wxString&
 inline bool VbamCommitAndroidOutputFile(const wxString&) { return true; }
 inline void VbamDiscardAndroidOutputFile(const wxString&) {}
 inline void VbamSetAndroidWakeLock(bool) {}
+inline void VbamSetAndroidMenuBarHidden(bool) {}
 inline bool VbamAndroidScreenClientSize(int*, int*) { return false; }
 inline void VbamEnableAndroidTouchScrolling(void*, std::function<void(int, int)> = {}) {}
 inline void VbamReparentIntoAndroidViewport(void*, void*) {}

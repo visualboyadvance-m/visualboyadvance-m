@@ -711,7 +711,7 @@ public:
 
 protected:
     void MouseEvent(wxMouseEvent&);
-    bool pointer_blanked, menu_bar_hidden, xscreensaver_suspended = false;
+    bool pointer_blanked = false, menu_bar_hidden = false, xscreensaver_suspended = false;
     uint32_t mouse_active_time;
     wxPoint mouse_last_pos;
 #ifdef __WXMSW__
@@ -754,6 +754,10 @@ private:
     // the render panel; on by default on Android, optional elsewhere.
     widgets::OnScreenController* osc_ = nullptr;
     std::unique_ptr<config::OptionsObserver> osc_observer_;
+    // Applies kUIHideMenuBar changes as they happen (see the GameArea
+    // constructor): an immediate action-bar toggle on Android, un-hiding on
+    // desktop when the auto-hide option is switched off.
+    std::unique_ptr<config::OptionsObserver> menu_bar_observer_;
     // Creates/shows/hides and resizes the overlay to match
     // kUIShowOnScreenController and whether a game is loaded.
     void UpdateOnScreenController();

@@ -28,11 +28,16 @@ namespace widgets {
 // A semi-transparent on-screen GBA controller drawn over the emulation panel.
 //
 // Presses map directly to game keys through EmulatedGamepad (bypassing the
-// physical-input bindings), and the dedicated Menu button invokes a
-// caller-provided callback (typically pops up the application menu, since a
-// touch device has no menu bar). Real multi-touch is used on the wxQt/Android
-// backend so that, e.g., holding A while pressing the D-pad works; other
-// platforms fall back to a single-pointer mouse emulation.
+// physical-input bindings), and the optional Menu button invokes a
+// caller-provided callback (typically pops up the application menu, for when
+// no menu bar is on screen; see SetShowMenuButton()). Real multi-touch is used
+// on the wxQt/Android backend so that, e.g., holding A while pressing the
+// D-pad works; other platforms fall back to a single-pointer mouse emulation.
+//
+// When the caller reports the game image's aspect ratio via SetGameAspect()
+// and the pillarbox columns beside the (centered, aspect-fit) picture are wide
+// enough, the controls are laid out inside those columns so the picture stays
+// unobscured; otherwise they overlay the corners of the whole widget.
 //
 // The widget is a transparent child window meant to be stacked on top of the
 // render panel inside the GameArea. It only reacts to touches that land on a
@@ -66,6 +71,18 @@ public:
     // compositing renderer can skip re-rendering an unchanged overlay.
     uint32_t revision() const { return revision_; }
 
+    // The aspect ratio (width / height) of the game image. The renderers
+    // aspect-fit the frame centered in the same rect the overlay covers, so
+    // this is enough to know where the picture sits at any size; when the
+    // pillarbox columns beside it are wide enough, the controls move into
+    // them. Zero or negative (the default) keeps the corner-overlay layout.
+    void SetGameAspect(double aspect);
+
+    // Whether to lay out the Menu button (default true). Hidden on Android
+    // while the action bar is visible: its three-dot menu opens the full menu
+    // bar, making an extra on-screen button redundant.
+    void SetShowMenuButton(bool show);
+
 private:
     enum class Shape { kCircle, kRoundedRect, kPill };
 
@@ -85,6 +102,10 @@ private:
 
     // Recomputes button rectangles from the current client size.
     void LayoutButtons();
+
+    // Places the controls in the pillarbox columns beside the game image;
+    // called by LayoutButtons() when those columns are wide enough.
+    void LayoutButtonsSideColumns(int w, int h, int gutter, int margin);
 
     // Maps a point to the controls under it.
     void HitTest(const wxPoint& pos, PointerState* out) const;
@@ -116,6 +137,10 @@ private:
     std::vector<Button> buttons_;
     // The D-pad is handled specially (a point maps to up to two directions).
     wxRect dpad_rect_;
+
+    // See SetGameAspect() / SetShowMenuButton().
+    double game_aspect_ = 0.0;
+    bool show_menu_button_ = true;
 
     std::map<int, PointerState> pointers_;
     std::array<bool, config::kNbGameKeys> pressed_{};

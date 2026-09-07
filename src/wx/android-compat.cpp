@@ -485,6 +485,32 @@ void VbamSetAndroidWakeLock(bool enable) {
     last = static_cast<int>(enable);
 }
 
+// --- Menu bar (action bar) visibility -----------------------------------------
+
+void VbamSetAndroidMenuBarHidden(bool hidden) {
+    // Called from the idle loop on every frame to re-assert the option state,
+    // so skip the JNI round trip when nothing changed.
+    static int last = -1;
+    if (last == static_cast<int>(hidden)) {
+        return;
+    }
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    if (!activity.isValid()) {
+        return;
+    }
+    QJniObject::callStaticMethod<void>(
+        "org/visualboyadvance_m/VbamMenuBar", "setHidden",
+        "(Landroid/app/Activity;Z)V", activity.object(), static_cast<jboolean>(hidden));
+    QJniEnvironment env;
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM", "VbamMenuBar.setHidden threw");
+        return;
+    }
+    last = static_cast<int>(hidden);
+}
+
 // --- Android video SurfaceView glue (for SDL video into the Qt activity) -----
 
 // SDL's Android backend caches the SDLActivity jclass + method IDs and creates
