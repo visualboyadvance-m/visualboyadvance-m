@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 04:00+0000\n"
+"POT-Creation-Date: 2026-09-07 09:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Svyatoslav <zarazafamila@gmail.com>, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/bgk/vba-m/language/uk/)\n"
@@ -42,7 +42,7 @@ msgstr "Не вдалося призначити буфер Core Audio %d: по�
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "Не вдалося почати чергу Core Audio: помилка %d."
 
-#: cmdevents.cpp:75 wxvbam.cpp:1126
+#: cmdevents.cpp:75 wxvbam.cpp:1209
 msgid "Could not create main window"
 msgstr "Неможливо створити головне вікно."
 
@@ -104,7 +104,7 @@ msgstr "Перезаписати поточний .sav-файл імпортом
 msgid "Confirm import"
 msgstr "Підтвердити імпорт"
 
-#: cmdevents.cpp:574 panel.cpp:1135
+#: cmdevents.cpp:574 panel.cpp:1162
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Завантажено батарею %s."
@@ -187,7 +187,7 @@ msgstr "Помилка завантаження знімка %s."
 msgid "Wrote battery %s"
 msgstr "Записано батарею %s."
 
-#: cmdevents.cpp:777 panel.cpp:1505
+#: cmdevents.cpp:777 panel.cpp:1532
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Помилка запису батареї %s."
@@ -245,7 +245,7 @@ msgstr "Вибір стану"
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Visual Boy Advance-збереження|*.sgm"
 
-#: cmdevents.cpp:1584 panel.cpp:1477
+#: cmdevents.cpp:1584 panel.cpp:1504
 #, c-format
 msgid "Error saving state %s"
 msgstr "Помилка збереження стану %s."
@@ -758,7 +758,7 @@ msgstr "Вибір чітів"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Visual Boy Advance-чіти|*.clt|CHT-чіти|*.cht"
 
-#: guiinit.cpp:316 panel.cpp:1193
+#: guiinit.cpp:316 panel.cpp:1220
 msgid "Loaded cheats"
 msgstr "Завантажено чіти."
 
@@ -882,47 +882,47 @@ msgstr "Недійсне значення %s для опції %s."
 msgid "Unknown option %s with value %s"
 msgstr "Невідома опція %s зі значенням %s."
 
-#: panel.cpp:773
+#: panel.cpp:796
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s - недійсний ROM."
 
-#: panel.cpp:774 panel.cpp:835 panel.cpp:929
+#: panel.cpp:797 panel.cpp:858 panel.cpp:952
 msgid "Problem loading file"
 msgstr "Проблема завантаження файлу."
 
-#: panel.cpp:834
+#: panel.cpp:857
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Неможливо завантажити Game Boy ROM %s."
 
-#: panel.cpp:875
+#: panel.cpp:898
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Неможливо використати Game Boy BIOS при увімкненому колірному хаку, Game Boy BIOS вимкнено."
 
-#: panel.cpp:905 panel.cpp:1033
+#: panel.cpp:928 panel.cpp:1056
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Неможливо завантажити BIOS %s."
 
-#: panel.cpp:928
+#: panel.cpp:951
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Неможливо завантажити Game Boy Advance ROM %s."
 
-#: panel.cpp:1090
+#: panel.cpp:1117
 msgid ""
 "Active link mode does not match this ROM; use Options > Link > Start Link to"
 " reconnect."
 msgstr "Режим активного зв'язку незбіжний із ROM; для перез'єднання використовуй Опції → Зв'язок → Почати зв'язок."
 
-#: panel.cpp:1236
+#: panel.cpp:1263
 msgid " player "
 msgstr " гравець "
 
-#: panel.cpp:1284
+#: panel.cpp:1311
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -931,11 +931,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог рідних збережень:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:1285 panel.cpp:1306 wxvbam.cpp:1848
+#: panel.cpp:1312 panel.cpp:1333 wxvbam.cpp:1931
 msgid "Directory Error"
 msgstr "Помилка каталогу."
 
-#: panel.cpp:1305
+#: panel.cpp:1332
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -944,749 +944,753 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог збережень емулятора:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: panel.cpp:1453
+#: panel.cpp:1480
 #, c-format
 msgid "Loaded state %s"
 msgstr "Завантажено стан %s."
 
-#: panel.cpp:1453
+#: panel.cpp:1480
 #, c-format
 msgid "Error loading state %s"
 msgstr "Помилка завантаження стану %s."
 
-#: panel.cpp:1477
+#: panel.cpp:1504
 #, c-format
 msgid "Saved state %s"
 msgstr "Збережено стан %s."
 
-#: panel.cpp:1883
+#: panel.cpp:1910
 msgid "Done"
 msgstr "Виконано."
 
-#: panel.cpp:1920
+#: panel.cpp:1947
 msgid "Running quick first-time performance test"
 msgstr "Проведення швидкого першого тесту продуктивності."
 
-#: panel.cpp:2073
+#: panel.cpp:2100
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d; пошук іншого."
 
-#: panel.cpp:2111
+#: panel.cpp:2138
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "Непідтримуваний повний екран %d * %d - %d @ %d."
 
-#: panel.cpp:2116
+#: panel.cpp:2143
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Дійсний режим: %d * %d - %d @ %d."
 
-#: panel.cpp:2124
+#: panel.cpp:2151
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Вибрано режим %d * %d - %d @ %d."
 
-#: panel.cpp:2128
+#: panel.cpp:2155
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Не вдалося змінити режим на %d * %d - %d @ %d."
 
-#: panel.cpp:2231
+#: panel.cpp:2258
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Недійсний Game Boy Advance-картридж."
 
-#: panel.cpp:2515
+#: panel.cpp:2542
 msgid "No memory for rewinding"
 msgstr "Відсутня пам'ять для звороту."
 
-#: panel.cpp:2525
+#: panel.cpp:2552
 msgid "Error writing rewind state"
 msgstr "Помилка запису стану звороту."
 
-#: panel.cpp:2725
+#: panel.cpp:2770
 msgid "Open GBA..."
 msgstr "Відкрити Game Boy Advance..."
 
-#: panel.cpp:2726
+#: panel.cpp:2771
 msgid "Open Game Boy..."
 msgstr "Відкрити Game Boy..."
 
-#: panel.cpp:2727
+#: panel.cpp:2772
 msgid "Open Game Boy Color..."
 msgstr "Відкрити Game Boy Color..."
 
-#: panel.cpp:2729
+#: panel.cpp:2774
 msgid "Pause"
 msgstr "Призупинити"
 
-#: panel.cpp:2730
+#: panel.cpp:2775
 msgid "Reset"
 msgstr "Відновити"
 
-#: panel.cpp:2731
+#: panel.cpp:2776
 msgid "Save state"
 msgstr "Зберегти стан"
 
-#: panel.cpp:2732
+#: panel.cpp:2777
 msgid "Load state"
 msgstr "Завантажити стан"
 
-#: panel.cpp:2734
+#: panel.cpp:2779
 msgid "Full screen"
 msgstr "Повний екран"
 
-#: panel.cpp:2735
+#: panel.cpp:2784
+msgid "Hide menu bar"
+msgstr ""
+
+#: panel.cpp:2799
 msgid "Settings..."
 msgstr "Налатшування..."
 
-#: panel.cpp:2737
+#: panel.cpp:2801
 msgid "Quit"
 msgstr "Вихід"
 
-#: panel.cpp:4608
+#: panel.cpp:4679
 msgid "Failed to set wayland display"
 msgstr "Не вдалося встановити Wayland-відображення."
 
-#: panel.cpp:4650
+#: panel.cpp:4721
 msgid "Failed to create Android video surface"
 msgstr "Не вдалося створити Android-відеоповерхню."
 
-#: panel.cpp:4669
+#: panel.cpp:4740
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Не вдалося визначити підсистему SDL-відео."
 
-#: panel.cpp:4681
+#: panel.cpp:4752
 msgid "Failed to initialize SDL video"
 msgstr "Не вдалося визначити SDL-відео."
 
-#: panel.cpp:4696
+#: panel.cpp:4767
 msgid "Failed to set wayland surface"
 msgstr "Не вдалося встановити Wayland-поверхню."
 
-#: panel.cpp:4740
+#: panel.cpp:4811
 msgid "Failed to set parent window"
 msgstr "Не вдалося встановити головне вікно."
 
-#: panel.cpp:4752
+#: panel.cpp:4823
 msgid "Failed to set OpenGL properties"
 msgstr "Не вдалося встановити властивості Open GL."
 
-#: panel.cpp:4773 panel.cpp:4966
+#: panel.cpp:4844 panel.cpp:5037
 msgid "Failed to create SDL window"
 msgstr "Не вдалося створити SDL-вікно."
 
-#: panel.cpp:4884 panel.cpp:4995
+#: panel.cpp:4955 panel.cpp:5066
 msgid "Renderer creating failed, using default renderer"
 msgstr "Не вдалося створити опрацьовувач, використано типовий."
 
-#: panel.cpp:4885
+#: panel.cpp:4956
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Помилка SDL: %s."
 
-#: panel.cpp:4892 panel.cpp:5001
+#: panel.cpp:4963 panel.cpp:5072
 msgid "Failed to create SDL renderer"
 msgstr "Не вдалося створити SDL-опрацьовувач."
 
-#: panel.cpp:4951
+#: panel.cpp:5022
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Не вдалося встановити вертикальну синхронізацію для SDL-опрацьовувача."
 
-#: panel.cpp:4955 panel.cpp:4990
+#: panel.cpp:5026 panel.cpp:5061
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL-опрацьовувач: %s"
 
-#: panel.cpp:4975
+#: panel.cpp:5046
 msgid "SDL renderer: default"
 msgstr "SDL-опрацьовувач: типово"
 
-#: panel.cpp:6731
+#: panel.cpp:6802
 msgid "Enabling EGL VSync."
 msgstr "Увімкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:6733
+#: panel.cpp:6804
 msgid "Disabling EGL VSync."
 msgstr "Вимкнення вертикальної синхронізації EGL."
 
-#: panel.cpp:6741
+#: panel.cpp:6812
 msgid "Enabling GLX VSync."
 msgstr "Увімкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:6743
+#: panel.cpp:6814
 msgid "Disabling GLX VSync."
 msgstr "Вимкнення вертикальної синхронізації GLX."
 
-#: panel.cpp:6761
+#: panel.cpp:6832
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Не вдалося встановити glXSwapIntervalEXT."
 
-#: panel.cpp:6770
+#: panel.cpp:6841
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Не вдалося встановити glXSwapIntervalSGI."
 
-#: panel.cpp:6779
+#: panel.cpp:6850
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Не вдалося встановити glXSwapIntervalMESA."
 
-#: panel.cpp:6788
+#: panel.cpp:6859
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Відсутня підтримка wglGetExtensionsStringEXT."
 
-#: panel.cpp:6791
+#: panel.cpp:6862
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Відсутня підтримка WGL_EXT_swap_control."
 
-#: panel.cpp:6800
+#: panel.cpp:6871
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Не вдалося встановити wglSwapIntervalEXT."
 
-#: panel.cpp:6806
+#: panel.cpp:6877
 msgid "No VSYNC available on this platform"
 msgstr "Вертикальна синхронізація недоступна для платформи."
 
-#: panel.cpp:6895
+#: panel.cpp:6966
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
 msgstr "HDR: не вдалося створити поверхню BT.2020 PQ; повернено SDR."
 
-#: panel.cpp:7144
+#: panel.cpp:7215
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr "Не вдалося завантажити Direct 3D 12 чи Direct 3D Compiler DLL."
 
-#: panel.cpp:7170
+#: panel.cpp:7241
 msgid "Failed to get D3D12 function pointers"
 msgstr "Не вдалось отримати вказівники функцій Direct 3D 12."
 
-#: panel.cpp:7175
+#: panel.cpp:7246
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr "Не вдалося створити DXGI-фабрику: 0x%08X."
 
-#: panel.cpp:7189
+#: panel.cpp:7260
 msgid "No hardware adapter found, falling back to WARP"
 msgstr "Апаратний адаптер не знайдено, повернення до WARP."
 
-#: panel.cpp:7196
+#: panel.cpp:7267
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr "Не вдалося створити пристрій Direct 3D 12: 0x%08X."
 
-#: panel.cpp:7197
+#: panel.cpp:7268
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr "Пристрій Direct 3D 12 створено (%s)."
 
-#: panel.cpp:7204
+#: panel.cpp:7275
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr "Не вдалося створити чергу команд: 0x%08X."
 
-#: panel.cpp:7230
+#: panel.cpp:7301
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr "Не вдалося створити ланцюг обміну: 0x%08X."
 
-#: panel.cpp:7236
+#: panel.cpp:7307
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr "Не вдалось отримати IDXGI Swap Chain 3: 0x%08X"
 
-#: panel.cpp:7267
+#: panel.cpp:7338
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
 msgstr "HDR: дисплей / ланцюг обміну не підтримує BT.2020 PQ; буде показано SDR."
 
-#: panel.cpp:7277
+#: panel.cpp:7348
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr "Не вдалося створити RTV-сховище: 0x%08X."
 
-#: panel.cpp:7286
+#: panel.cpp:7357
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr "Не вдалося створити SRV-сховище: 0x%08X."
 
-#: panel.cpp:7293
+#: panel.cpp:7364
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr "Не вдалось отримати задній буфер %u: 0x%08X."
 
-#: panel.cpp:7301
+#: panel.cpp:7372
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr "Не вдалося створити розподільник команд: 0x%08X."
 
-#: panel.cpp:7306
+#: panel.cpp:7377
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr "Не вдалося створити перелік команд: 0x%08X."
 
-#: panel.cpp:7345
+#: panel.cpp:7416
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr "Не вдалося перетворити кореневий підпис: %s."
 
-#: panel.cpp:7352
+#: panel.cpp:7423
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr "Не вдалося створити кореневий підпис: 0x%08X."
 
-#: panel.cpp:7366
+#: panel.cpp:7437
 #, c-format
 msgid "VS compile failed: %s"
 msgstr "Не вдалося компілювати VS: %s."
 
-#: panel.cpp:7374
+#: panel.cpp:7445
 #, c-format
 msgid "PS compile failed: %s"
 msgstr "Не вдалося компілювати PS: %s."
 
-#: panel.cpp:7403
+#: panel.cpp:7474
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr "Не вдалося створити об'єкт конвеєра шейдерів: 0x%08X."
 
-#: panel.cpp:7423
+#: panel.cpp:7494
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr "Не вдалося створити буфер вершин: 0x%08X."
 
-#: panel.cpp:7432
+#: panel.cpp:7503
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr "Не вдалося створити сітку: 0x%08X."
 
-#: panel.cpp:7435
+#: panel.cpp:7506
 msgid "Failed to create fence event"
 msgstr "Не вдалося створити подію сітки."
 
-#: panel.cpp:7437
+#: panel.cpp:7508
 msgid "D3D12 pipeline fully initialized"
 msgstr "Конвеєр Direct 3D 12 повністю визначено."
 
-#: panel.cpp:7469
+#: panel.cpp:7540
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "Direct X 12 Drawing Panel визначено: %d * %d (масштаб: %f)."
 
-#: panel.cpp:7491
+#: panel.cpp:7562
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr "Не вдалося змінити розмір буферів: 0x%08X."
 
-#: panel.cpp:7502
+#: panel.cpp:7573
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr "Розмір ланцюга обміну змінено на %d * %d."
 
-#: panel.cpp:7768
+#: panel.cpp:7839
 msgid "Texture upload failed"
 msgstr "Не вдалося завантажити текстуру."
 
-#: panel.cpp:7922
+#: panel.cpp:7993
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11: не вдалося створити пристрій; Simple-опрацьовувач буде використовувати шлях програмного забезпечення (wx)."
 
-#: panel.cpp:7974
+#: panel.cpp:8045
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
 msgstr "D3D11: не вдалося створити ланцюг обміну: 0x%08X."
 
-#: panel.cpp:8040
+#: panel.cpp:8111
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
 msgstr "D3D11: d3dcompiler_47.dll не знайдено; Simple-опрацьовувач буде використовувати шлях програмного забезпечення (wx)."
 
-#: panel.cpp:8092
+#: panel.cpp:8163
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11: не вдалося налаштувати бліт-шейдер; Simple-опрацьовувач буде використовувати шлях програмного забезпечення (wx)."
 
-#: panel.cpp:8377
+#: panel.cpp:8448
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Використання Direct 3D 9 Ex (динамічне завантаження)"
 
-#: panel.cpp:8381
+#: panel.cpp:8452
 msgid "Failed to load d3d9.dll"
 msgstr "Не вдалося завантажити d3d9.dll."
 
-#: panel.cpp:8390
+#: panel.cpp:8461
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Не вдалося створити інтерфейс Direct 3D 9."
 
-#: panel.cpp:8393
+#: panel.cpp:8464
 msgid "Using Direct3D 9"
 msgstr "Використання Direct 3D 9"
 
-#: panel.cpp:8400
+#: panel.cpp:8471
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
 
-#: panel.cpp:8424
+#: panel.cpp:8495
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "Flip Ex не підтримується, повернення скасування ефекту обміну."
 
-#: panel.cpp:8440
+#: panel.cpp:8511
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Апаратне опрацювання вершин недоступне, повернення програмного."
 
-#: panel.cpp:8464
+#: panel.cpp:8535
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Не вдалося створити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:8469
+#: panel.cpp:8540
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Direct 3D 9 %s-пристрій успішно створено (ефект обміну: %s)."
 
-#: panel.cpp:8505
+#: panel.cpp:8576
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX Drawing Panel визначено: %d * %d (масштаб: %f)."
 
-#: panel.cpp:8527
+#: panel.cpp:8598
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
-#: panel.cpp:8559
+#: panel.cpp:8630
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Спроба відновлення налаштувань Direct 3D-пристрою (ефект обміну: %s)."
 
-#: panel.cpp:8566
+#: panel.cpp:8637
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "Не вдалося перезавантажити Flip Ex, повторення скасування ефекту обміну."
 
-#: panel.cpp:8578
+#: panel.cpp:8649
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Не вдалося перезавантажити Direct 3D-пристрій: 0x%08X."
 
-#: panel.cpp:8583
+#: panel.cpp:8654
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Direct 3D-пристрій успішно перезавантажено (кінцевий ефект обміну: %s)."
 
-#: panel.cpp:8651
+#: panel.cpp:8722
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Не вдалося створити текстуру: 0x%08X."
 
-#: panel.cpp:8663
+#: panel.cpp:8734
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Не вдалося заблокувати текстуру: 0x%08X."
 
-#: panel.cpp:8855
+#: panel.cpp:8926
 msgid "Memory allocation error"
 msgstr "Помилка розподілу пам'яті."
 
-#: panel.cpp:8858
+#: panel.cpp:8929
 msgid "Error initializing codec"
 msgstr "Помилка визначення кодека."
 
-#: panel.cpp:8861 panel.cpp:8926 panel.cpp:8974
+#: panel.cpp:8932 panel.cpp:8997 panel.cpp:9045
 msgid "Error writing to output file"
 msgstr "Помилка запису до кінцевого файлу."
 
-#: panel.cpp:8864
+#: panel.cpp:8935
 msgid "Can't guess output format from file name"
 msgstr "Неможливо визначити кінцевий формат імені файлу."
 
-#: panel.cpp:8869
+#: panel.cpp:8940
 msgid "Programming error; aborting!"
 msgstr "Програмна помилка; перервано!"
 
-#: panel.cpp:8887 panel.cpp:8938
+#: panel.cpp:8958 panel.cpp:9009
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Неможливо почати запис до %s (%s)."
 
-#: panel.cpp:8982
+#: panel.cpp:9053
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Помилка аудіо- / відеозапису (%s); перервано."
 
-#: panel.cpp:8988
+#: panel.cpp:9059
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Помилка аудіозапису (%s); перервано."
 
-#: panel.cpp:8998
+#: panel.cpp:9069
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Помилка відеозапису (%s); перервано."
 
-#: panel.cpp:9305
+#: panel.cpp:9388
 msgid "Renderer failed to initialize; trying the next available renderer."
 msgstr "Не вдалося визначити опрацьовувач; проба наступного доступного опрацьовувача."
 
-#: panel.cpp:9313
+#: panel.cpp:9396
 msgid "No renderer could be initialized."
 msgstr "Неможливо визначити опрацьовувач."
 
-#: panel.cpp:9407
+#: panel.cpp:9490
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
 msgstr "Неможливо відобразити 10-бітну глибину кольору жодним опрацьовувачем; для сесії використано 8-бітну."
 
-#: panel.cpp:9497
+#: panel.cpp:9579
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Metal недоступний, використано типову Open GL."
 
-#: panel.cpp:9510
+#: panel.cpp:9592
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
 msgstr "Open GL недоступний на Wayland без EGL, використано Vulkan."
 
-#: panel.cpp:9529
+#: panel.cpp:9616
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "Vulkan недоступний, використано типову Open GL."
 
-#: panel.cpp:9822
+#: panel.cpp:9909
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Гучність: %d %%"
 
-#: panel.cpp:10576
+#: panel.cpp:10663
 msgid "Vulkan device created successfully"
 msgstr "Vulkan-пристрій створено успішно."
 
-#: panel.cpp:10702
+#: panel.cpp:10789
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "Поверхні VK_KHR_Wayland і VK_KHR_Xlib недоступні - неможливо створити Vulkan-поверхню в системі."
 
-#: panel.cpp:10747
+#: panel.cpp:10834
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "Не вдалося створити Vulkan-екземпляр: %d."
 
-#: panel.cpp:10750
+#: panel.cpp:10837
 msgid "Vulkan instance created"
 msgstr "Vulkan-екземпляр створено."
 
-#: panel.cpp:10769
+#: panel.cpp:10856
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "Не вдалося створити Vulkan-поверхню Win 32: %d."
 
-#: panel.cpp:10792
+#: panel.cpp:10879
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "Не вдалось отримати NSView-опрацьовувач Vulkan-поверхні."
 
-#: panel.cpp:10803
+#: panel.cpp:10890
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "Не вдалося створити Vulkan Metal-поверхню: %d."
 
-#: panel.cpp:10828
+#: panel.cpp:10915
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr "Не вдалось отримати QWidget-опрацьовувач для Vulkan-поверхні."
 
-#: panel.cpp:10838
+#: panel.cpp:10925
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr "Не вдалось отримати ANativeWindow для панелі."
 
-#: panel.cpp:10848
+#: panel.cpp:10935
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr "Не вдалося створити Vulkan Android-поверхню: %d."
 
-#: panel.cpp:10865
+#: panel.cpp:10952
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "Не вдалося створити Vulkan Xlib-поверхню: %d."
 
-#: panel.cpp:10921
+#: panel.cpp:11008
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr "Wayland: wl_compositor/wl_subcompositor недоступні; неможливо створити Vulkan-підповерхню."
 
-#: panel.cpp:10930
+#: panel.cpp:11017
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr "Wayland: не вдалося створити Vulkan-підповерхню."
 
-#: panel.cpp:10968
+#: panel.cpp:11055
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "Не вдалося створити Vulkan Wayland-поверхню: %d."
 
-#: panel.cpp:11007
+#: panel.cpp:11094
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "Не вдалось отримати Wayland-опрацьовувачі дисплея та поверхні."
 
-#: panel.cpp:11025
+#: panel.cpp:11112
 msgid "No supported Vulkan surface extension available"
 msgstr "Відсутнє підтримуване розширення Vulkan-поверхні."
 
-#: panel.cpp:11036
+#: panel.cpp:11123
 msgid "No Vulkan physical devices found"
 msgstr "Не знайдено фізичних Vulkan-пристроїв."
 
-#: panel.cpp:11095
+#: panel.cpp:11182
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "Вибрано Vulkan-пристрій: %s."
 
-#: panel.cpp:11099
+#: panel.cpp:11186
 msgid "No suitable Vulkan physical device found"
 msgstr "Не знайдено відповідного фізичного Vulkan-пристрою."
 
-#: panel.cpp:11144
+#: panel.cpp:11231
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "Не вдалося створити логічний Vulkan-пристрій: %d."
 
-#: panel.cpp:11280
+#: panel.cpp:11367
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "Не вдалося створити Vulkan-ланцюг обміну: %d."
 
-#: panel.cpp:11320
+#: panel.cpp:11407
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr "Ланцюг обміну створено: %u * %u, %u зображень, вертикальна синхронізація = %s, попереднє перетворення = 0x%x."
 
-#: panel.cpp:11422
+#: panel.cpp:11509
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "Не вдалося створити перегляд зображення ланцюга обміну %zu: %d."
 
-#: panel.cpp:11468
+#: panel.cpp:11555
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "Не вдалося створити рендер-прохід: %d."
 
-#: panel.cpp:11490
+#: panel.cpp:11577
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "Не вдалося створити буфер кадрів %zu: %d."
 
-#: panel.cpp:11513
+#: panel.cpp:11600
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "Не вдалося створити макет набору дескрипторів: %d."
 
-#: panel.cpp:11536
+#: panel.cpp:11623
 msgid "Failed to create shader modules"
 msgstr "Не вдалося створити модулі шейдерів."
 
-#: panel.cpp:11609
+#: panel.cpp:11696
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "Не вдалося створити макет конвеєрів: %d."
 
-#: panel.cpp:11646
+#: panel.cpp:11733
 msgid "Failed to create overlay pipeline"
 msgstr "Не вдалося створити конвеєр накладання."
 
-#: panel.cpp:11656
+#: panel.cpp:11743
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "Не вдалося створити конвеєр графіки: %d."
 
-#: panel.cpp:11672
+#: panel.cpp:11759
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "Не вдалося створити командний пул: %d."
 
-#: panel.cpp:11690
+#: panel.cpp:11777
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "Не вдалося призначити командні буфери: %d."
 
-#: panel.cpp:11710
+#: panel.cpp:11797
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "Не вдалося створити об'єкти синхронізації кадру %d."
 
-#: panel.cpp:11734
+#: panel.cpp:11821
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "Не вдалося створити дескрипторний пул: %d."
 
-#: panel.cpp:11746
+#: panel.cpp:11833
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "Не вдалося призначити дескрипторний набір: %d."
 
-#: panel.cpp:11754
+#: panel.cpp:11841
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr "Не вдалося призначити набір дескрипторів накладання: %d."
 
-#: panel.cpp:11793
+#: panel.cpp:11880
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "Не вдалося створити зображення текстур: %d."
 
-#: panel.cpp:11807
+#: panel.cpp:11894
 msgid "Failed to allocate texture memory"
 msgstr "Не вдалося розподілити пам'ять текстур."
 
-#: panel.cpp:11823
+#: panel.cpp:11910
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "Не вдалося створити перегляд зображення текстур: %d."
 
-#: panel.cpp:11841
+#: panel.cpp:11928
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "Не вдалося створити семплер текстур: %d."
 
-#: panel.cpp:11875
+#: panel.cpp:11962
 msgid "Failed to create staging buffer"
 msgstr "Не вдалося створити проміжний буфер."
 
-#: panel.cpp:11890
+#: panel.cpp:11977
 msgid "Failed to allocate staging memory"
 msgstr "Не вдалося розподілити проміжну пам'ять."
 
-#: panel.cpp:12002
+#: panel.cpp:12089
 msgid "Failed to create overlay image"
 msgstr "Не вдалося створити накладене зображення."
 
-#: panel.cpp:12016
+#: panel.cpp:12103
 msgid "Failed to allocate overlay image memory"
 msgstr "Не вдалося розподілити пам'ять накладеного зображення."
 
-#: panel.cpp:12031
+#: panel.cpp:12118
 msgid "Failed to create overlay image view"
 msgstr "Не вдалося створити вигляд накладеного зображення."
 
-#: panel.cpp:12048
+#: panel.cpp:12135
 msgid "Failed to create overlay sampler"
 msgstr "Не вдалося створити семплер накладання."
 
-#: panel.cpp:12085
+#: panel.cpp:12172
 msgid "Failed to create overlay staging buffer"
 msgstr "Не вдалося створити проміжний буфер накладання."
 
-#: panel.cpp:12099
+#: panel.cpp:12186
 msgid "Failed to allocate overlay staging memory"
 msgstr "Не вдалося розподілити проміжну пам'ять накладання."
 
-#: panel.cpp:12177
+#: panel.cpp:12264
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VK Drawing Panel визначено: %u * %u (масштаб: %f)."
 
-#: panel.cpp:12273
+#: panel.cpp:12360
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "Не вдалось отримати зображення ланцюга обміну: %d."
 
-#: panel.cpp:12620
+#: panel.cpp:12707
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "Не вдалося представити зображення ланцюга обміну: %d."
@@ -1795,80 +1799,80 @@ msgstr "Синій:"
 msgid "Unable to load dialog %s from resources"
 msgstr "Неможливо завантажити вікно %s з ресурсів."
 
-#: wxvbam.cpp:778 wxvbam.cpp:795
+#: wxvbam.cpp:861 wxvbam.cpp:878
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "Надано недійсний файл конфігурації: %s."
 
-#: wxvbam.cpp:1292
+#: wxvbam.cpp:1375
 msgid "Save built-in XRC file and exit"
 msgstr "Зберегти вбудований XRC та вийти"
 
-#: wxvbam.cpp:1295
+#: wxvbam.cpp:1378
 msgid "Save built-in vba-over.ini and exit"
 msgstr "Зберегти вбудований vba-over.ini та вийти"
 
-#: wxvbam.cpp:1298
+#: wxvbam.cpp:1381
 msgid "Print configuration path and exit"
 msgstr "Роздрукувати шлях конфігурації та вийти"
 
-#: wxvbam.cpp:1301
+#: wxvbam.cpp:1384
 msgid "Start in full-screen mode"
 msgstr "Запускати в повному екрані"
 
-#: wxvbam.cpp:1304
+#: wxvbam.cpp:1387
 msgid "Mute the audio for this session, without saving to the config"
 msgstr "Притлумити звук для сеансу без збереження до конфігурації"
 
-#: wxvbam.cpp:1307
+#: wxvbam.cpp:1390
 msgid "Set a configuration file"
 msgstr "Встановити файл конфігурації"
 
-#: wxvbam.cpp:1311
+#: wxvbam.cpp:1394
 msgid "Delete shared link state first, if it exists"
 msgstr "Видалити спочатку стан загального зв'язку за наявності"
 
-#: wxvbam.cpp:1318
+#: wxvbam.cpp:1401
 msgid "List all settable options and exit"
 msgstr "Показати всі налаштовувані опції та вийти"
 
-#: wxvbam.cpp:1321
+#: wxvbam.cpp:1404
 msgid "ROM file"
 msgstr "ROM-файл"
 
-#: wxvbam.cpp:1323
+#: wxvbam.cpp:1406
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1354
+#: wxvbam.cpp:1437
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "Помилка конфігурації / випуску: неможливо знайти вбудований xrc."
 
-#: wxvbam.cpp:1362
+#: wxvbam.cpp:1445
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "Записано вбудовану конфігурацію до %s.\nДля перевизначення вилучи всі вузли, крім змінених кореневих. Перший знайдений кореневий вузол із правильним іменем у будь-якому файлі .xrc чи .xrs у наведених шляхах пошуку перевизначає вбудований:"
 
-#: wxvbam.cpp:1376
+#: wxvbam.cpp:1459
 msgid "Configuration is read from, in order:"
 msgstr "Конфігурацію прочитано з файлів за порядком:"
 
-#: wxvbam.cpp:1390
+#: wxvbam.cpp:1473
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "Записано вбудоване перевизначення файлу до %s.\nДля перевизначення видали всі розділи, крім змінених. Перший знайдений розділ буде використано зі шляху пошуку:"
 
-#: wxvbam.cpp:1396
+#: wxvbam.cpp:1479
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\tвбудовано"
 
-#: wxvbam.cpp:1420
+#: wxvbam.cpp:1503
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1876,21 +1880,21 @@ msgid ""
 "\n"
 msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
-#: wxvbam.cpp:1436
+#: wxvbam.cpp:1519
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "Доступні команди для опцій клавіатури:\n"
 
-#: wxvbam.cpp:1454
+#: wxvbam.cpp:1537
 msgid "Configuration file not found."
 msgstr "Файл конфігурації не знайдено."
 
-#: wxvbam.cpp:1489
+#: wxvbam.cpp:1572
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "Неправильна опція конфігурації чи вибрано декілька ROM'ів:\n"
 
-#: wxvbam.cpp:1847
+#: wxvbam.cpp:1930
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1899,7 +1903,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Неможливо створити каталог:\n%s.\n\nПеревір налаштований шлях у Опції → Каталоги."
 
-#: wxvbam.cpp:2120
+#: wxvbam.cpp:2215
 msgid "Failed to load dialog"
 msgstr "Не вдалося завантажити вікно."
 
