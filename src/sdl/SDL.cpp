@@ -1036,20 +1036,27 @@ static void sdlResizeVideo()
 #endif
 #endif
         } else if (systemColorDepth == 24) {
+            // The core emits 24-bit pixels as R,G,B bytes in memory (see the
+            // 24-bit writer in gba.cpp/gb.cpp), which is SDL_PIXELFORMAT_RGB24.
 #ifdef ENABLE_SDL3
-            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
-            texture = SDL_CreateTexture(renderer, SDL_GetPixelFormatForMasks(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_PIXELFORMAT_RGB24);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
 #else
-            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
-            texture = SDL_CreateTexture(renderer, SDL_MasksToPixelFormatEnum(24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000), SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+            surface = SDL_CreateRGBSurfaceWithFormat(0, destWidth, destHeight, 24, SDL_PIXELFORMAT_RGB24);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
 #endif
         } else {
+            // gbafilter_update_colors()/gbcfilter_update_colors() build the
+            // 32-bit palette with red in bits 0-7, green in 8-15 and blue in
+            // 16-23 (shifts 3/11/19), i.e. the packed word 0x00BBGGRR. That is
+            // SDL_PIXELFORMAT_XBGR8888; the masks below must agree with the
+            // rmask/gmask/bmask chosen in sdlInitVideo().
 #ifdef ENABLE_SDL3
-            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000));
-            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+            surface = SDL_CreateSurface(destWidth, destHeight, SDL_GetPixelFormatForMasks(32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000));
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XBGR8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
 #else
-            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000);
-            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XRGB8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
+            surface = SDL_CreateRGBSurface(0, destWidth, destHeight, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000);
+            texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_XBGR8888, SDL_TEXTUREACCESS_STREAMING, destWidth, destHeight);
 #endif
         }
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
@@ -1217,25 +1224,38 @@ void sdlInitVideo()
 #endif
     }
 
+    // The masks describe the pixel layout the core's palette tables produce
+    // (systemColorMap8/16/32, built by gbafilter_update_colors() and
+    // gbcfilter_update_colors()). The derived systemRed/Green/BlueShift values
+    // are what draw_text, the image writers and the scaling filters use, so
+    // they must match both the palette and the SDL surface created in
+    // sdlResizeVideo().
     if (systemColorDepth == 8)
     {
+        // RGB332
         rmask = 0x000000E0;
         gmask = 0x0000001C;
         bmask = 0x00000003;
+        RGB_LOW_BITS_MASK = 0x00000025;
     } else if (systemColorDepth == 16) {
 #ifdef CONFIG_RGB565
         rmask = 0x0000F800;
         gmask = 0x000007E0;
         bmask = 0x0000001F;
+        RGB_LOW_BITS_MASK = 0x00000821;
 #else
         rmask = 0x00007C00;
         gmask = 0x000003E0;
         bmask = 0x0000001F;
+        RGB_LOW_BITS_MASK = 0x00000421;
 #endif
     } else {
-        rmask = 0x00FF0000;
+        // 24 and 32-bit: red in the low byte, then green, then blue
+        // (R,G,B[,X] byte order in memory; packed word 0x00BBGGRR).
+        rmask = 0x000000FF;
         gmask = 0x0000FF00;
-        bmask = 0x000000FF;
+        bmask = 0x00FF0000;
+        RGB_LOW_BITS_MASK = 0x00010101;
     }
 
     systemRedShift = sdlCalculateShift(rmask);
@@ -1244,19 +1264,7 @@ void sdlInitVideo()
 
     //printf("systemRedShift %d, systemGreenShift %d, systemBlueShift %d\n",
     //   systemRedShift, systemGreenShift, systemBlueShift);
-    //  originally 3, 11, 19 -> 27, 19, 11
-
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    if (openGL) {
-        if (systemColorDepth == 32)
-        {
-            // Align to BGRA instead of ABGR
-            systemRedShift += 8;
-            systemGreenShift += 8;
-            systemBlueShift += 8;
-        }
-    }
-#endif
+    // 32-bit: 3, 11, 19; 16-bit RGB555: 10, 5, 0
 
 #if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
     if (openGL) {
@@ -2403,8 +2411,14 @@ int main(int argc, char** argv)
 
     fprintf(stdout, "Color depth: %d\n", systemColorDepth);
 
+#ifdef CONFIG_RGB565
+    // The RGB565 surface needs the shift-driven palette builders.
+    gbafilter_update_colors_native();
+    gbcfilter_update_colors_native();
+#else
     gbafilter_update_colors();
     gbcfilter_update_colors();
+#endif
 
     if (delta == NULL) {
         delta = (uint8_t*)malloc(delta_size);
@@ -2577,34 +2591,10 @@ void systemDrawScreen()
 
     filterFunction(g_pix + srcPitch, srcPitch, delta, screen, destPitch, sizeX, sizeY);
 
-#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
-    if (openGL) {
-        int bytes = (systemColorDepth >> 3);
-        for (int i = 0; i < destWidth; i++)
-            for (int j = 0; j < destHeight; j++) {
-                uint8_t k = 0;
-                uint8_t l = 0;
-
-                if (systemColorDepth == 24)
-                {
-                    k = filterPix[i * bytes + j * destPitch + 2];
-                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch];
-                    filterPix[i * bytes + j * destPitch] = k;
-                } else if (systemColorDepth == 32) {
-                    k = filterPix[i * bytes + j * destPitch + 3];
-                    l = filterPix[i * bytes + j * destPitch + 2];
-                    filterPix[i * bytes + j * destPitch + 3] = 0;
-                    filterPix[i * bytes + j * destPitch + 2] = filterPix[i * bytes + j * destPitch + 1];
-                    filterPix[i * bytes + j * destPitch + 1] = l;
-                    filterPix[i * bytes + j * destPitch] = k;
-                } else {
-                    k = filterPix[i * bytes + j * destPitch + 3];
-                    filterPix[i * bytes + j * destPitch + 3] = filterPix[i * bytes + j * destPitch + 1];
-                    filterPix[i * bytes + j * destPitch + 1] = k;
-                }
-            }
-    }
-#endif
+    // No byte swizzling is needed for OpenGL: the 24/32-bit buffers are
+    // already R,G,B[,X] in memory, which is exactly what GL_RGB/GL_RGBA with
+    // GL_UNSIGNED_BYTE consume, and the 16-bit RGB555 upload uses
+    // GL_UNSIGNED_SHORT_1_5_5_5_REV which matches the packed word directly.
 
     drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
