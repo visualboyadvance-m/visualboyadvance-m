@@ -42,8 +42,10 @@
         android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:fullBackupOnly="false">
+        <!-- QtActivity plus the hooks that keep the Hide Menu Bar option applied;
+             see src/org/visualboyadvance_m/VbamActivity.java. -->
         <activity
-            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:name="org.visualboyadvance_m.VbamActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
             android:label="VisualBoyAdvance-M"
             android:launchMode="singleTop"

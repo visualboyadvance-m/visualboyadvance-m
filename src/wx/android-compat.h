@@ -59,7 +59,8 @@ void VbamSetAndroidWakeLock(bool enable);
 // game takes the whole screen. Driven by the Hide Menu Bar option
 // (kUIHideMenuBar), which on Android is an immediate toggle rather than the
 // desktop mouse-idle auto-hide. Idempotent and cheap on repeat calls; safe off
-// the UI thread.
+// the UI thread. The Java side (VbamMenuBar / VbamActivity) remembers the state
+// and re-applies it whenever Qt re-shows the action bar on its own.
 void VbamSetAndroidMenuBarHidden(bool hidden);
 
 // Size of the activity's content view in Qt logical pixels, i.e. the area a

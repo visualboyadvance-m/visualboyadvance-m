@@ -42,7 +42,14 @@ extern struct opts_t {
     wxFileHistory* recent = NULL;
 
     /// UI Config
+#if defined(__ANDROID__)
+    // The menu bar is the activity's action bar, a strip taken off an already
+    // small screen; hide it by default and leave the on-screen controller's
+    // MENU button (and its popup's check item) as the way to the menus.
+    bool hide_menu_bar = true;
+#else
     bool hide_menu_bar = false;
+#endif
 #if defined(__ANDROID__)
     // On touch devices there is no physical keyboard or gamepad, so the
     // on-screen controller is on by default. It is optional elsewhere.

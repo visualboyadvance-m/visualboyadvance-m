@@ -157,15 +157,6 @@ void OnScreenController::LayoutButtons() {
     const int unit = std::min(w, h);
     const int m = std::max(4, static_cast<int>(unit * 0.03));
 
-    // Menu button, top center. Same spot in both layouts: over the top edge of
-    // the picture, where the menu bar it replaces would be.
-    if (show_menu_button_) {
-        const int menu_w = static_cast<int>(w * 0.14);
-        const int menu_h = static_cast<int>(h * 0.07);
-        buttons_.push_back({config::GameKey::A /* unused */, true, Shape::kRoundedRect,
-                            "MENU", wxRect((w - menu_w) / 2, m, menu_w, menu_h)});
-    }
-
     // The pillarbox column beside the centered, aspect-fit game image. Wide
     // enough (the usual case on a landscape phone, much wider than the GBA's
     // 3:2), the controls all move into the two columns, leaving the picture
@@ -192,6 +183,14 @@ void OnScreenController::LayoutButtons() {
                         wxRect(m, m, shoulder_w, shoulder_h)});
     buttons_.push_back({config::GameKey::R, false, Shape::kRoundedRect, "R",
                         wxRect(w - m - shoulder_w, m, shoulder_w, shoulder_h)});
+
+    // Menu button directly below L, in the left edge strip the D-pad leaves
+    // free above itself; kept off the picture's top center.
+    if (show_menu_button_) {
+        const int menu_h = static_cast<int>(h * 0.07);
+        buttons_.push_back({config::GameKey::A /* unused */, true, Shape::kRoundedRect,
+                            "MENU", wxRect(m, m + shoulder_h + m, shoulder_w, menu_h)});
+    }
 
     // Start / Select, bottom center.
     buttons_.push_back({config::GameKey::Select, false, Shape::kPill, "SEL",
@@ -227,6 +226,17 @@ void OnScreenController::LayoutButtonsSideColumns(int w, int h, int gutter, int 
     buttons_.push_back({config::GameKey::R, false, Shape::kRoundedRect, "R",
                         wxRect(right_x + (cw - shoulder_w) / 2, m, shoulder_w, shoulder_h)});
 
+    // Menu button directly below L, inside the left column so it never covers
+    // the picture. The D-pad band below starts under it.
+    int menu_h = 0;
+    if (show_menu_button_) {
+        menu_h = static_cast<int>(h * 0.07);
+        buttons_.push_back({config::GameKey::A /* unused */, true, Shape::kRoundedRect, "MENU",
+                            wxRect(m + (cw - shoulder_w) / 2, m + shoulder_h + m, shoulder_w,
+                                   menu_h)});
+        menu_h += m;
+    }
+
     // Select / Start along the bottom of the left / right column.
     const int pill_w = std::min(cw, static_cast<int>(h * 0.35));
     const int pill_h = static_cast<int>(h * 0.08);
@@ -235,8 +245,10 @@ void OnScreenController::LayoutButtonsSideColumns(int w, int h, int gutter, int 
     buttons_.push_back({config::GameKey::Start, false, Shape::kPill, "START",
                         wxRect(right_x + (cw - pill_w) / 2, h - m - pill_h, pill_w, pill_h)});
 
-    // The vertical band left free between the shoulders and the pills.
-    const int band_top = m + shoulder_h + m;
+    // The vertical band left free between the shoulders (plus the menu button
+    // under L) and the pills. Both columns share it so A/B line up with the
+    // D-pad.
+    const int band_top = m + shoulder_h + m + menu_h;
     const int band_h = (h - m - pill_h - m) - band_top;
     if (band_h <= 0) {
         return;
