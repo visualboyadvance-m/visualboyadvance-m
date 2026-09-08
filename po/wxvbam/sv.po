@@ -1045,7 +1045,7 @@ msgstr "Helskärm"
 
 #: panel.cpp:2784
 msgid "Hide menu bar"
-msgstr ""
+msgstr "Dölj menyrad"
 
 #: panel.cpp:2799
 msgid "Settings..."
