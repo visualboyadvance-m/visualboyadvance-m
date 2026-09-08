@@ -17,7 +17,7 @@
 # Emertels, 2021
 # erdrsd gfdfd <654654564@64564564.com>, 2017
 # Felipefpl, 2022
-# Felipefpl, 2022
+# Felipefpl, 2022,2026
 # Felipe Nascimento <aoc.anao78@gmail.com>, 2020
 # Gabriel Prado, 2022
 # Gabriel Prado, 2022
@@ -45,7 +45,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 09:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
+"Last-Translator: Felipefpl, 2022,2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1072,7 +1072,7 @@ msgstr "Tela cheia"
 
 #: panel.cpp:2784
 msgid "Hide menu bar"
-msgstr ""
+msgstr "Esconder a Barra do Menu"
 
 #: panel.cpp:2799
 msgid "Settings..."
