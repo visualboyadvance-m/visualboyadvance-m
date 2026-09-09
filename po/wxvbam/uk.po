@@ -340,7 +340,7 @@ msgid ""
 "Copyright (C) 1999-2003 Forgotten\n"
 "Copyright (C) 2004-2006 VBA development team\n"
 "Copyright (C) 2007-2020 VBA-M development team"
-msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2025"
+msgstr "Forgotten, 1999-2003\nКоманда виробників Visual Boy Advance, 2004-2006\nКоманда виробників Visual Boy Advance-M, 2007-2026"
 
 #: cmdevents.cpp:2600
 msgid ""
@@ -1038,7 +1038,7 @@ msgstr "Повний екран"
 
 #: panel.cpp:2784
 msgid "Hide menu bar"
-msgstr ""
+msgstr "Приховати панель меню"
 
 #: panel.cpp:2799
 msgid "Settings..."
