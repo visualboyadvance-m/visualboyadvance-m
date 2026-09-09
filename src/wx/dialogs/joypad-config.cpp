@@ -93,6 +93,11 @@ JoypadConfig::JoypadConfig(wxWindow* parent, const config::BindingsProvider bind
 
     GetValidatedChild<wxCheckBox>("SDLGameControllerMode")
         ->SetValue(OPTION(kSDLGameControllerMode));
+#if defined(__ANDROID__)
+    // Controllers do not go through SDL on Android (see
+    // widgets/android-gamepad.h); they always use the gamepad layout.
+    GetValidatedChild<wxCheckBox>("SDLGameControllerMode")->Hide();
+#endif
 
     GetValidatedChild("AutofireThrottle")
         ->SetValidator(

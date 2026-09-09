@@ -54,6 +54,9 @@ configure_wx_target(vbam-wx-widgets)
 if(ANDROID)
     find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
     target_link_libraries(vbam-wx-widgets PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets)
+    # Physical controllers arrive from the activity over JNI instead of SDL;
+    # SdlPoller drains them from widgets::AndroidGamepad.
+    target_sources(vbam-wx-widgets PRIVATE android-gamepad.cpp android-gamepad.h)
 endif()
 
 if(BUILD_TESTING AND NOT COMPILE_ONLY)

@@ -1609,6 +1609,24 @@ wxvbamApp::~wxvbamApp() {
 wxEvtHandler* wxvbamApp::event_handler() {
     // Use the active window, if any.
     wxWindow* focused_window = wxWindow::FindFocus();
+
+#if defined(__ANDROID__)
+    // Touch never moves the keyboard focus, so on Android the game panel is
+    // usually not the focused window (often nothing is). Controller events
+    // must still reach it: route them to the panel unless the focus sits in
+    // another top-level window, such as the joypad configuration dialog that
+    // is waiting to capture a button.
+    if (frame) {
+        wxWindow* top_level = focused_window ? wxGetTopLevelParent(focused_window) : nullptr;
+        if (!top_level || top_level == frame) {
+            auto panel = frame->GetPanel();
+            if (panel && panel->panel) {
+                return panel->panel->GetWindow()->GetEventHandler();
+            }
+        }
+    }
+#endif
+
     if (focused_window) {
         return focused_window;
     }

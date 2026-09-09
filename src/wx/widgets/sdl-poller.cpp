@@ -13,6 +13,9 @@
 
 #include "core/base/check.h"
 #include "core/base/sdl_motion.h"
+#if defined(__ANDROID__)
+#include "wx/widgets/android-gamepad.h"
+#endif
 #include "wx/config/option-id.h"
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
@@ -385,8 +388,9 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     // SDL's joystick/gamepad subsystem is backed by the SDLActivity Java
     // lifecycle, which doesn't exist under the QtActivity host; initializing it
     // dereferences a null joystick handler and aborts. Physical controllers
-    // aren't polled through SDL on Android (input comes from the on-screen
-    // controller), so skip SDL init entirely here.
+    // are instead delivered by the activity through widgets::AndroidGamepad,
+    // which Notify() drains below; it is initialized from the first tick, once
+    // Qt's JNI bridge is guaranteed to be up.
 #elif !defined(ENABLE_SDL3)
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);
@@ -416,6 +420,10 @@ SdlPoller::~SdlPoller() {
 }
 
 void SdlPoller::SetRumble(bool rumble) {
+#if defined(__ANDROID__)
+    AndroidGamepad::Instance().SetRumble(rumble);
+    return;
+#endif
     if (rumble) {
         if (!joystick_states_.empty()) {
             auto it = joystick_states_.begin();
@@ -438,7 +446,17 @@ void SdlPoller::Notify() {
 #if defined(__ANDROID__)
     // SDL joystick/gamepad is not initialized on Android (see the constructor);
     // pumping SDL_PollEvent here would touch the uninitialized Android event
-    // backend. Nothing to poll — input arrives via the on-screen controller.
+    // backend. Controller changes queued by the activity are converted here
+    // instead, so they take the same route as SDL joystick events elsewhere.
+    AndroidGamepad& gamepad = AndroidGamepad::Instance();
+    gamepad.Initialize();
+    std::vector<UserInputEvent::Data> event_data = gamepad.Drain();
+    if (!event_data.empty()) {
+        wxEvtHandler* handler = handler_provider_->event_handler();
+        if (handler) {
+            handler->QueueEvent(new UserInputEvent(std::move(event_data)));
+        }
+    }
     return;
 #else
     SDL_Event sdl_event;
