@@ -285,7 +285,13 @@ void systemStartGameRecording(const QString& fname, MVFormatID format)
 
     systemStopGamePlayback();
 
-    QString fn = fname;
+    // A movie is two files: the .vmv itself and a .vm0 save state named after
+    // it. Neither QFile nor the state writer can open an Android content://
+    // URI, and the URI has no name to derive the companion from, so record to a
+    // local staging file (whose name is guaranteed to end in .vmv) and transfer
+    // it to the picked document when recording stops (systemStopGameRecording).
+    QString fn = VbamStageAndroidOutputFile(fname, QStringLiteral("vmv"));
+
     recording_format = format;
 
     if (fn.size() < 4 || fn.right(4).compare(QStringLiteral(".vmv"), Qt::CaseInsensitive) != 0)
@@ -299,15 +305,18 @@ void systemStartGameRecording(const QString& fname, MVFormatID format)
     game_file.setFileName(fn);
     if (!game_file.open(QIODevice::WriteOnly | QIODevice::Truncate) || !WriteU32(game_file, qToLittleEndian(version))) {
         game_file.close();
+        VbamDiscardAndroidOutputFile(fn);
         vbam::LogError(TR("Cannot open output file %1").arg(fname));
         return;
     }
 
+    const QString staged = fn;
     fn[fn.size() - 1] = QLatin1Char('0');
 
     if (!panel->emusys->emuWriteState(vbam::ToPath(fn).c_str())) {
         vbam::LogError(TR("Error writing game recording"));
         game_file.close();
+        VbamDiscardAndroidOutputFile(staged);
         return;
     }
 
@@ -333,9 +342,11 @@ void systemStopGameRecording()
     bool ok = WriteU32(game_file, qToLittleEndian(game_frame)) &&
               WriteU32(game_file, qToLittleEndian(game_joypad));
     game_file.close();
-    // Android content:// staging: transfer the finished movie (no-op elsewhere).
-    VbamCommitAndroidOutputFile(game_file.fileName());
     if (!ok || game_file.error() != QFile::NoError)
+        vbam::LogError(TR("Error writing game recording"));
+    // The file is closed, so a staged Android content:// recording can be
+    // handed over now (no-op for a real path).
+    if (!VbamCommitAndroidOutputFile(game_file.fileName()))
         vbam::LogError(TR("Error writing game recording"));
 
     game_recording = false;
@@ -365,7 +376,10 @@ void systemStartGamePlayback(const QString& fname, MVFormatID format)
 
     systemStopGamePlayback();
 
-    QString fn = fname;
+    // Staged into the same directory recording uses, so the .vm0 save state
+    // written next to the .vmv back then is still beside it now.
+    QString fn = VbamStageAndroidInputFile(fname, QStringLiteral("vmv"));
+
     recording_format = format;
 
     if (fn.size() < 4 || fn.right(4).compare(QStringLiteral(".vmv"), Qt::CaseInsensitive) != 0)

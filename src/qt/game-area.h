@@ -144,8 +144,6 @@ public:
     void AddFrame(const uint16_t* data, int length); // audio
     bool IsRecording() { return snd_rec.IsRecording() || vid_rec.IsRecording(); }
 #endif
-    // Files a recorder is currently writing (see android-compat.h).
-    QStringList RecordingFiles() const;
 
     void StartGameRecording(const QString& fname);
     void StopGameRecording();

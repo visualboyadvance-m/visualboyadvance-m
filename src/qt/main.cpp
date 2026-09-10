@@ -37,7 +37,18 @@ int main(int argc, char** argv) {
     fmt.setDepthBufferSize(0);
     fmt.setStencilBufferSize(0);
     fmt.setSwapInterval(0);
+#if defined(__ANDROID__)
+    // This default is also what the top-level window's backing store uses to
+    // composite QOpenGLWidgets (QRhiBackingStore). Android EGL has no desktop
+    // OpenGL configs: asking for one yields "Cannot find EGLConfig" and Qt
+    // aborts with "EGL Error : Could not create the egl surface" as soon as
+    // the main window is first flushed. The GLES renderer requests ES 2.0
+    // explicitly as well (renderers/gles-panel.cpp).
+    fmt.setRenderableType(QSurfaceFormat::OpenGLES);
+    fmt.setVersion(2, 0);
+#else
     fmt.setRenderableType(QSurfaceFormat::OpenGL);
+#endif
     QSurfaceFormat::setDefaultFormat(fmt);
 
 #if defined(__APPLE__) || defined(_WIN32)

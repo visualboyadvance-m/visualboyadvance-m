@@ -345,8 +345,11 @@ QString GameArea::game_base_name() {
     return QFileInfo(loaded_game).completeBaseName();
 }
 
-void GameArea::LoadGame(const QString& name)
+void GameArea::LoadGame(const QString& load_path)
 {
+    // The Android file picker hands back Storage-Access-Framework content://
+    // URIs; resolve them to a real local file the stdio ROM loader can open.
+    const QString name = VbamResolveAndroidContentUri(load_path);
     rom_scene_rls = QStringLiteral("-");
     rom_scene_rls_name = QStringLiteral("-");
     rom_name.clear();
@@ -471,6 +474,10 @@ void GameArea::LoadGame(const QString& name)
             bios_file = OPTION(kGBBiosFile).Get();
         }
 
+        // The Android file picker hands back Storage-Access-Framework content://
+        // URIs; resolve them to a real local file the stdio loader can open.
+        bios_file = VbamResolveAndroidContentUri(bios_file);
+
         gbCPUInit(vbam::ToPath(bios_file).c_str(), use_bios);
 
         if (use_bios && !coreOptions.useBios) {
@@ -576,7 +583,11 @@ void GameArea::LoadGame(const QString& name)
 
         rtcEnableRumble(true);
 
-        CPUInit(vbam::ToPath(gopts.gba_bios).c_str(), OPTION(kPrefUseBiosGBA));
+        // The Android file picker hands back Storage-Access-Framework content://
+        // URIs; resolve them to a real local file the stdio loader can open.
+        const QString bios_file = VbamResolveAndroidContentUri(gopts.gba_bios);
+
+        CPUInit(vbam::ToPath(bios_file).c_str(), OPTION(kPrefUseBiosGBA));
 
         if (OPTION(kPrefUseBiosGBA) && !coreOptions.useBios) {
             vbam::LogError(TR("Could not load BIOS %1").arg(gopts.gba_bios));
@@ -2046,20 +2057,6 @@ void GameArea::OnVolumeChanged(config::Option* option) {
 // A/V recording (ffmpeg)
 // ---------------------------------------------------------------------------
 
-QStringList GameArea::RecordingFiles() const
-{
-    QStringList files;
-#ifndef NO_FFMPEG
-    if (!vid_rec_file_.isEmpty())
-        files << vid_rec_file_;
-    if (!snd_rec_file_.isEmpty())
-        files << snd_rec_file_;
-#endif
-    files << systemGameRecordingFile();
-    files.removeAll(QString());
-    return files;
-}
-
 #ifndef NO_FFMPEG
 static QString media_err(recording::MediaRet ret)
 {
@@ -2088,13 +2085,18 @@ void GameArea::StartVidRecording(const QString& fname)
 {
     recording::MediaRet ret;
 
+    // ffmpeg writes through stdio and guesses the container from the file name,
+    // neither of which works for an Android content:// URI, so record to a local
+    // staging file and hand it over to the picked document when we stop.
+    const QString out_name = VbamStageAndroidOutputFile(fname, QString());
+
     vid_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = vid_rec.Record(vbam::ToPath(fname).c_str(), basic_width, basic_height,
+    if ((ret = vid_rec.Record(vbam::ToPath(out_name).c_str(), basic_width, basic_height,
                               systemColorDepth)) != recording::MRET_OK) {
         vbam::LogError(TR("Unable to begin recording to %1 (%2)").arg(fname, media_err(ret)));
-        VbamDiscardAndroidOutputFile(fname);
+        VbamDiscardAndroidOutputFile(out_name);
     } else {
-        vid_rec_file_ = fname;
+        vid_rec_file_ = out_name;
         MainWindow* mf = vbamApp().frame;
         mf->cmd_enable &= ~(CMDEN_NVREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_VREC;
@@ -2123,12 +2125,15 @@ void GameArea::StartSoundRecording(const QString& fname)
 {
     recording::MediaRet ret;
 
+    // See StartVidRecording(): stage an Android content:// URI locally.
+    const QString out_name = VbamStageAndroidOutputFile(fname, QString());
+
     snd_rec.SetSampleRate(soundGetSampleRate());
-    if ((ret = snd_rec.Record(vbam::ToPath(fname).c_str())) != recording::MRET_OK) {
+    if ((ret = snd_rec.Record(vbam::ToPath(out_name).c_str())) != recording::MRET_OK) {
         vbam::LogError(TR("Unable to begin recording to %1 (%2)").arg(fname, media_err(ret)));
-        VbamDiscardAndroidOutputFile(fname);
+        VbamDiscardAndroidOutputFile(out_name);
     } else {
-        snd_rec_file_ = fname;
+        snd_rec_file_ = out_name;
         MainWindow* mf = vbamApp().frame;
         mf->cmd_enable &= ~(CMDEN_NSREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_SREC;

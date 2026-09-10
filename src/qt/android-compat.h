@@ -49,12 +49,6 @@ QString VbamStageAndroidOutputFile(const QString& path, const QString& required_
 // staged report success.
 bool VbamCommitAndroidOutputFile(const QString& staged_path);
 
-// Commits every staged output file that is still pending except the ones in
-// `keep` (files a writer still has open, e.g. a running recording). Used at
-// the end of a command so the synchronous writers (save state, screenshot,
-// battery export ...) need no per-call-site commit.
-void VbamCommitPendingAndroidOutputFiles(const QStringList& keep);
-
 // Drops a staged output file without transferring it, for failed starts.
 void VbamDiscardAndroidOutputFile(const QString& staged_path);
 
@@ -104,9 +98,11 @@ void VbamSetAndroidVideoSurfaceGeometry(QWidget* widget);
 void VbamDestroyAndroidVideoSurface();
 
 // SDL's Android backend caches its Java classes and method IDs from
-// SDLActivity.nativeSetupJNI(), which the SDLActivity lifecycle normally
-// invokes. Under the Qt activity that never happens, so call this once before
-// SDL_Init() (the SDL Java glue is bundled under org.libsdl.app).
+// SDLActivity.nativeSetupJNI(), and reaches its Activity through
+// SDLActivity.getContext(); the SDLActivity lifecycle normally sets both up.
+// Under the Qt activity that never happens, so call this once before
+// SDL_Init(): it runs the nativeSetupJNI() hooks and points SDL's Java context
+// at the Qt activity (the SDL Java glue is bundled under org.libsdl.app).
 void VbamSetupSdlActivityJni();
 
 #else  // !__ANDROID__
@@ -115,7 +111,6 @@ inline QString VbamResolveAndroidContentUri(const QString& path) { return path; 
 inline QString VbamStageAndroidInputFile(const QString& path, const QString&) { return path; }
 inline QString VbamStageAndroidOutputFile(const QString& path, const QString&) { return path; }
 inline bool VbamCommitAndroidOutputFile(const QString&) { return true; }
-inline void VbamCommitPendingAndroidOutputFiles(const QStringList&) {}
 inline void VbamDiscardAndroidOutputFile(const QString&) {}
 inline void VbamSetAndroidWakeLock(bool) {}
 inline void VbamSetAndroidMenuBarHidden(bool) {}

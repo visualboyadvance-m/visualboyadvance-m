@@ -804,6 +804,16 @@ bool VbamApp::Init() {
     VbamSetupSdlActivityJni();
     sdl_poller_ = std::make_unique<widgets::SdlPoller>(&input_dispatcher_);
 
+#if defined(__ANDROID__)
+    // Start measuring the Android content view now: the measurement is posted
+    // to the Java UI thread, and the dialogs that fit themselves to it
+    // (VbamAdaptDialogToScreen) must not have to wait for it when first shown.
+    {
+        int content_w = 0, content_h = 0;
+        VbamAndroidScreenClientSize(&content_w, &content_h);
+    }
+#endif
+
     // We need to gather this information before creating the main window as
     // the move/resize handlers can fire during construction.
     const QRect client_rect(OPTION(kGeomWindowX).Get(), OPTION(kGeomWindowY).Get(),
@@ -956,8 +966,9 @@ bool VbamApp::Init() {
 }
 
 void VbamApp::LoadGameLater(const QString& path) {
-    // A content:// URI (Android picker / intent) has to become a real file first.
-    pending_load = VbamResolveAndroidContentUri(path);
+    // A content:// URI (Android picker / intent) is resolved by
+    // GameArea::LoadGame(), like the wx port does.
+    pending_load = path;
     if (frame && frame->GetPanel()) {
         frame->GetPanel()->RequestMore();
     }

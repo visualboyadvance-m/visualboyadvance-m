@@ -337,7 +337,16 @@ SdlPoller::SdlPoller(InputDispatcher* dispatcher)
           [this](config::Option* option) { ReconnectControllers(option->GetBool()); }) {
     VBAM_CHECK(dispatcher_);
 
-#ifndef ENABLE_SDL3
+#if defined(__ANDROID__)
+    // SDL's joystick/gamepad subsystem is backed by the SDLActivity Java
+    // lifecycle, which the Qt activity host does not provide: SDL_Init() for
+    // the joystick subsystem opens <internal storage>/gamepad_map.txt through
+    // SDLActivity.getContext(), which is null here, and the JNI layer aborts
+    // the process (GetObjectClass on a null object). Physical controllers are
+    // instead delivered by the activity through widgets::AndroidGamepad,
+    // which Poll() drains below; it is initialized from the first tick, once
+    // Qt's JNI bridge is guaranteed to be up.
+#elif !defined(ENABLE_SDL3)
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS);
     SDL_GameControllerEventState(SDL_ENABLE);
     SDL_JoystickEventState(SDL_ENABLE);
@@ -395,22 +404,22 @@ void SdlPoller::ReconnectControllers(bool enable_game_controller) {
 
 void SdlPoller::Poll() {
 #if defined(__ANDROID__)
-    // SDL's joystick backend is tied to the SDLActivity lifecycle, which the
-    // QtActivity host does not provide; the activity hands controller changes
-    // to widgets::AndroidGamepad over JNI instead. Drain those here so they
-    // take the same route as SDL joystick events elsewhere. Initialize() is
-    // idempotent and needs Qt's JNI bridge, which is up by the first tick.
-    {
-        AndroidGamepad& gamepad = AndroidGamepad::Instance();
-        gamepad.Initialize();
-        std::vector<UserInputBatch::Data> android_data = gamepad.Drain();
-        if (!android_data.empty()) {
-            UserInputBatch batch;
-            batch.data = std::move(android_data);
-            dispatcher_->Dispatch(batch);
-        }
+    // SDL joystick/gamepad is not initialized on Android (see the constructor);
+    // pumping SDL_PollEvent here would touch the uninitialized Android event
+    // backend. Controller changes queued by the activity are converted here
+    // instead, so they take the same route as SDL joystick events elsewhere.
+    // Initialize() is idempotent and needs Qt's JNI bridge, which is up by the
+    // first tick.
+    AndroidGamepad& gamepad = AndroidGamepad::Instance();
+    gamepad.Initialize();
+    std::vector<UserInputBatch::Data> android_data = gamepad.Drain();
+    if (!android_data.empty()) {
+        UserInputBatch batch;
+        batch.data = std::move(android_data);
+        dispatcher_->Dispatch(batch);
     }
-#endif
+    return;
+#else
     SDL_Event sdl_event;
 
     while (SDL_PollEvent(&sdl_event)) {
@@ -535,6 +544,7 @@ void SdlPoller::Poll() {
             dispatcher_->Dispatch(batch);
         }
     }
+#endif  // !__ANDROID__
 }
 
 JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {
@@ -549,6 +559,11 @@ JoyState* SdlPoller::FindJoyState(const SDL_JoystickID& joy_id) {
 void SdlPoller::RemapControllers() {
     // Clear the current joystick states.
     joystick_states_.clear();
+
+#if defined(__ANDROID__)
+    // No SDL joysticks on Android; controllers live in widgets::AndroidGamepad.
+    return;
+#endif
 
 #ifdef ENABLE_SDL3
     int total_joysticks = 0;

@@ -10,15 +10,23 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QAbstractScrollArea>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QJniEnvironment>
 #include <QJniObject>
+#include <QPointer>
+#include <QTimer>
 #include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QScroller>
 #include <QStandardPaths>
+#include <QVBoxLayout>
 #include <QStringList>
 #include <QWidget>
 
@@ -355,19 +363,6 @@ bool VbamCommitAndroidOutputFile(const QString& staged) {
     return true;  // not a staged path; the writer already wrote where it should
 }
 
-void VbamCommitPendingAndroidOutputFiles(const QStringList& keep) {
-    // Copy the list: committing mutates it.
-    std::vector<QString> pending;
-    for (const SafOutputTarget& target : SafOutputTargets()) {
-        if (!keep.contains(target.staged)) {
-            pending.push_back(target.staged);
-        }
-    }
-    for (const QString& staged : pending) {
-        VbamCommitAndroidOutputFile(staged);
-    }
-}
-
 void VbamDiscardAndroidOutputFile(const QString& staged) {
     std::vector<SafOutputTarget>& targets = SafOutputTargets();
     for (size_t i = 0; i < targets.size(); i++) {
@@ -508,27 +503,156 @@ bool VbamAndroidScreenClientSize(int* w, int* h) {
     return *w > 0 && *h > 0;
 }
 
+namespace {
+
+// Name of the wrapper scroller, so a dialog that has already been adapted is
+// recognized on its next show.
+const char kScrollerName[] = "vbamAndroidScroller";
+
+// Makes a scroll area usable with a finger: widens its scrollbars to a touch
+// target and enables kinetic drag-to-scroll on its viewport. Qt replays presses
+// that turn out not to be drags, so taps on the controls inside still arrive.
+void EnableTouchScrolling(QAbstractScrollArea* area) {
+    // Style the two scrollbars directly rather than the scroll area, so the
+    // stylesheet cannot cascade into the dialog's controls.
+    if (QScrollBar* bar = area->verticalScrollBar()) {
+        bar->setStyleSheet("QScrollBar:vertical { width: 22px; }");
+    }
+    if (QScrollBar* bar = area->horizontalScrollBar()) {
+        bar->setStyleSheet("QScrollBar:horizontal { height: 22px; }");
+    }
+    QScroller::grabGesture(area->viewport(), QScroller::TouchGesture);
+}
+
+// Moves the dialog's whole layout into a scroll area, so content laid out for
+// a desktop window stays reachable on a phone screen (the wx Android build does
+// the same with a wxScrolledWindow). The standard button row is pulled out of
+// the content and pinned below the scroller, so OK/Cancel never scroll away.
+void WrapDialogInScroller(QDialog* dialog) {
+    if (dialog->findChild<QScrollArea*>(kScrollerName, Qt::FindDirectChildrenOnly)) {
+        return;
+    }
+    QLayout* content = dialog->layout();
+    if (!content) {
+        // Hand-built dialogs without a layout have nothing to reflow.
+        return;
+    }
+
+    QDialogButtonBox* buttons = nullptr;
+    for (int i = 0; i < content->count(); ++i) {
+        QLayoutItem* item = content->itemAt(i);
+        if (auto* box = qobject_cast<QDialogButtonBox*>(item ? item->widget() : nullptr)) {
+            buttons = box;
+            break;
+        }
+    }
+    if (buttons) {
+        content->removeWidget(buttons);
+    }
+
+    // QWidget::setLayout() steals a layout that belongs to another widget and
+    // reparents the widgets it manages, so the dialog's children move along.
+    auto* host = new QWidget;
+    host->setLayout(content);
+
+    auto* scroller = new QScrollArea(dialog);
+    scroller->setObjectName(kScrollerName);
+    scroller->setWidgetResizable(true);
+    scroller->setFrameShape(QFrame::NoFrame);
+    scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scroller->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scroller->setWidget(host);
+    EnableTouchScrolling(scroller);
+
+    auto* outer = new QVBoxLayout(dialog);
+    outer->setContentsMargins(0, 0, 0, 0);
+    outer->setSpacing(0);
+    outer->addWidget(scroller, 1);
+    if (buttons) {
+        // Centered rather than pushed to the opposite edges: the bottom center
+        // of the screen is where a thumb already is.
+        buttons->setParent(dialog);
+        buttons->setCenterButtons(true);
+        outer->addWidget(buttons, 0);
+    }
+    __android_log_print(ANDROID_LOG_INFO, "VBAM", "AdaptDialog %s: wrapped, buttons pinned=%d",
+                        dialog->objectName().toUtf8().constData(), buttons ? 1 : 0);
+}
+
+}  // namespace
+
 void VbamAdaptDialogToScreen(QDialog* dialog) {
     if (!dialog) {
         return;
     }
-    int w = 0, h = 0;
-    if (!VbamAndroidScreenClientSize(&w, &h)) {
-        if (const QScreen* screen = QGuiApplication::primaryScreen()) {
-            const QRect avail = screen->availableGeometry();
-            w = avail.width();
-            h = avail.height();
+    const bool first = !dialog->findChild<QScrollArea*>(kScrollerName, Qt::FindDirectChildrenOnly);
+    WrapDialogInScroller(dialog);
+    if (first) {
+        // A rotation changes the content view; the Java measurement follows a
+        // layout pass later, so re-fit once now and again shortly after.
+        if (QScreen* screen = QGuiApplication::primaryScreen()) {
+            QPointer<QDialog> guard(dialog);
+            QObject::connect(screen, &QScreen::availableGeometryChanged, dialog, [guard](const QRect&) {
+                if (guard && guard->isVisible()) {
+                    VbamAdaptDialogToScreen(guard);
+                    QTimer::singleShot(300, guard, [guard] {
+                        if (guard && guard->isVisible()) {
+                            VbamAdaptDialogToScreen(guard);
+                        }
+                    });
+                }
+            });
         }
     }
+
+    // The content view (android.R.id.content) is what a Qt window can cover: it
+    // excludes the status bar, the navigation bar and the action bar that shows
+    // the menu. The measurement is posted to the Java UI thread, so the very
+    // first request can come back empty; VbamApp::Init() starts it early, but
+    // fall back to the main window (which fills the content view) rather than
+    // to the screen, and re-fit as soon as the measurement is in.
+    int w = 0, h = 0;
+    const bool measured = VbamAndroidScreenClientSize(&w, &h);
+    if (!measured) {
+        QWidget* top = dialog->parentWidget() ? dialog->parentWidget()->window() : nullptr;
+        if (top && top != dialog && top->isVisible()) {
+            w = top->width();
+            h = top->height();
+        }
+        if (w <= 0 || h <= 0) {
+            if (const QScreen* screen = QGuiApplication::primaryScreen()) {
+                const QRect avail = screen->availableGeometry();
+                w = avail.width();
+                h = avail.height();
+            }
+        }
+        const int retries = dialog->property("vbamAdaptRetries").toInt();
+        if (retries < 20) {
+            dialog->setProperty("vbamAdaptRetries", retries + 1);
+            QPointer<QDialog> guard(dialog);
+            QTimer::singleShot(100, dialog, [guard] {
+                if (guard && guard->isVisible()) {
+                    VbamAdaptDialogToScreen(guard);
+                }
+            });
+        }
+    } else {
+        dialog->setProperty("vbamAdaptRetries", 0);
+    }
+    __android_log_print(ANDROID_LOG_INFO, "VBAM", "AdaptDialog %s: measured=%d -> %dx%d",
+                        dialog->objectName().toUtf8().constData(), measured ? 1 : 0, w, h);
     if (w <= 0 || h <= 0) {
         return;
     }
     // Fill the content view: a dialog laid out for a desktop is almost always
     // larger than a phone screen, and a dialog smaller than the screen gains
-    // finger room from the extra space.
-    dialog->setMinimumSize(0, 0);
-    dialog->setMaximumSize(w, h);
-    dialog->resize(w, h);
+    // finger room from the extra space. The size is fixed rather than merely
+    // clamped: once the content lives in the scroller the dialog's own size
+    // hint is tiny, and dialogs that adjustSize() after being shown (the ROM
+    // info dialogs do) would otherwise collapse to a sliver. There is no user
+    // window sizing on Android, so the fit always wins.
+    dialog->setSizeGripEnabled(false);
+    dialog->setFixedSize(w, h);
     dialog->move(0, 0);
 }
 
@@ -573,6 +697,40 @@ void VbamSetupSdlActivityJni() {
             }
             __android_log_print(ANDROID_LOG_INFO, "VBAM", "%s.nativeSetupJNI() done", name);
         }
+    }
+
+    // SDL's native side reaches its Activity through SDLActivity.getContext(),
+    // which returns SDL.mContext; SDLActivity.onCreate() would normally set it
+    // and it stays null under the Qt activity. SDL's Android file layer (asset
+    // manager, internal storage path, the gamepad mapping file the joystick
+    // subsystem opens at init) hands that null straight to GetObjectClass and
+    // the JNI layer aborts the process. Point SDL at the Qt activity instead.
+    QJniObject activity = QNativeInterface::QAndroidApplication::context();
+    jclass activity_class = env->FindClass("android/app/Activity");
+    if (env->ExceptionCheck()) {
+        env->ExceptionClear();
+        activity_class = nullptr;
+    }
+    if (activity.isValid() && activity_class &&
+        env->IsInstanceOf(activity.object<jobject>(), activity_class)) {
+        QJniObject::callStaticMethod<void>("org/libsdl/app/SDL", "setContext",
+                                           "(Landroid/app/Activity;)V",
+                                           activity.object<jobject>());
+        // SDLAudioManager keeps its own Context for getSystemService(); JNI is
+        // not subject to Java access checks, so the package-private setter is
+        // reachable. Without it the SDL audio backend NPEs in Java.
+        QJniObject::callStaticMethod<void>("org/libsdl/app/SDLAudioManager", "setContext",
+                                           "(Landroid/content/Context;)V",
+                                           activity.object<jobject>());
+        if (env->ExceptionCheck()) {
+            env->ExceptionClear();
+            __android_log_print(ANDROID_LOG_ERROR, "VBAM", "SDL.setContext() failed");
+        } else {
+            __android_log_print(ANDROID_LOG_INFO, "VBAM", "SDL.setContext(Qt activity) done");
+        }
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "VBAM",
+                            "no Activity context for SDL.setContext()");
     }
 }
 

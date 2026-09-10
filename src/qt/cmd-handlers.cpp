@@ -120,14 +120,11 @@ QString RunFileDialog(MainWindow* frame, QFileDialog& dlg) {
     if (files.isEmpty()) {
         return QString();
     }
-    // On Android the picker returns content:// URIs; hand the caller a real
-    // file instead (a copy for reading, a staging file for writing that is
-    // transferred back once the command has finished, see ExecuteCommand()).
-    // Pass-throughs elsewhere.
-    if (dlg.acceptMode() == QFileDialog::AcceptSave) {
-        return VbamStageAndroidOutputFile(files.first(), QString());
-    }
-    return VbamResolveAndroidContentUri(files.first());
+    // On Android the picker returns Storage-Access-Framework content:// URIs.
+    // They are handed back as they are: each call site resolves (for reading)
+    // or stages and commits (for writing) at the point that owns the file, the
+    // same way the wx port does (see android-compat.h).
+    return files.first();
 }
 
 // Helper function to get list of valid plugin paths.
@@ -397,20 +394,32 @@ void MainWindow::DoScreenCapture() {
     else if (fn.endsWith(".png", Qt::CaseInsensitive))
         fmt = 0;
 
-    QString out_name = fn;
-    if (!out_name.endsWith(".png", Qt::CaseInsensitive) &&
-        !out_name.endsWith(".bmp", Qt::CaseInsensitive)) {
+    // The Android file picker hands back a Storage-Access-Framework content://
+    // URI, which the stdio-based image writers cannot open. Write to a local
+    // staging file -- named after the picked document, so the format check
+    // below still has an extension to read -- and transfer it once written.
+    // A no-op for a real path.
+    QString out_name = VbamStageAndroidOutputFile(fn, fmt == 0 ? "png" : "bmp");
+    if (out_name.endsWith(".bmp", Qt::CaseInsensitive))
+        fmt = 1;
+    else if (out_name.endsWith(".png", Qt::CaseInsensitive))
+        fmt = 0;
+    else
         out_name += fmt == 0 ? ".png" : ".bmp";
-    }
 
-    const bool ok = fmt == 0 ? panel->emusys->emuWritePNG(vbam::ToPath(out_name).c_str())
-                             : panel->emusys->emuWriteBMP(vbam::ToPath(out_name).c_str());
+    bool ok = fmt == 0 ? panel->emusys->emuWritePNG(vbam::ToPath(out_name).c_str())
+                       : panel->emusys->emuWriteBMP(vbam::ToPath(out_name).c_str());
+
+    if (ok)
+        ok = VbamCommitAndroidOutputFile(out_name);
+    else
+        VbamDiscardAndroidOutputFile(out_name);
 
     QString msg;
     if (ok)
-        msg = tr("Wrote snapshot %1").arg(out_name);
+        msg = tr("Wrote snapshot %1").arg(fn);
     else
-        msg = tr("Error saving snapshot file %1").arg(out_name);
+        msg = tr("Error saving snapshot file %1").arg(fn);
 
     systemScreenMessage(msg);
 }
@@ -685,7 +694,8 @@ void MainWindow::DoLoad() {
     if (path.isEmpty())
         return;
 
-    panel->LoadState(path);
+    // An Android content:// URI becomes a local copy the state reader can open.
+    panel->LoadState(VbamResolveAndroidContentUri(path));
 }
 
 void MainWindow::OnKeepSaves() {
@@ -740,7 +750,21 @@ void MainWindow::DoSave() {
     if (path.isEmpty())
         return;
 
-    panel->SaveState(path);
+    // The state writer cannot open an Android content:// URI, so write to a
+    // local staging file and transfer it to the picked document. A no-op for
+    // a real path.
+    const QString out_name = VbamStageAndroidOutputFile(path, "sgm");
+
+    if (!panel->SaveState(out_name)) {
+        VbamDiscardAndroidOutputFile(out_name);
+        return;
+    }
+
+    if (!VbamCommitAndroidOutputFile(out_name)) {
+        // SaveState() already reported success for the staging file, so say
+        // that the state did not reach the file the user actually picked.
+        systemScreenMessage(tr("Error saving state %1").arg(path));
+    }
 }
 
 void MainWindow::DoLoadGameSlot() {
@@ -2067,17 +2091,7 @@ void MainWindow::OnNoop() {
 // Command dispatch.
 
 bool MainWindow::ExecuteCommand(int cmd_id) {
-    const bool handled = DispatchCommand(cmd_id);
-    // Android: transfer the files the command wrote into staged content://
-    // documents back to their documents. Recordings stay open until their
-    // stop command, which commits them itself (GameArea::Stop*Recording,
-    // systemStopGameRecording).
-    QStringList keep;
-    if (panel) {
-        keep << panel->RecordingFiles();
-    }
-    VbamCommitPendingAndroidOutputFiles(keep);
-    return handled;
+    return DispatchCommand(cmd_id);
 }
 
 bool MainWindow::DispatchCommand(int cmd_id) {
