@@ -1036,4 +1036,4 @@ DMA test: 0 HBl W +BIOS/=IWRAM
 DMA test: 1 HBl W +BIOS/=IWRAM
 DMA test: 2 HBl W +BIOS/=IWRAM
 DMA test: 3 HBl W +BIOS/=IWRAM
-DMA test: 3 Imm 
+Break: Got 0x100

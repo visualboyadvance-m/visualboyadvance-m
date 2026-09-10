@@ -60,6 +60,11 @@ option(ENABLE_WX       "Build the wxWidgets port" ${VBAM_BUILD_DEFAULT})
 option(ENABLE_SDL      "Build the SDL port"       ${ENABLE_SDL_DEFAULT})
 option(ENABLE_LIBRETRO "Build the libretro core"  ${VBAM_BUILD_DEFAULT})
 
+# The Qt port (src/qt) is a separate desktop frontend with the same feature
+# set as the wx port, built on Qt 6 Widgets. Off by default; it is an
+# alternative to the wx port rather than a replacement.
+option(ENABLE_QT       "Build the Qt port"        OFF)
+
 # GBA cable link is a core feature rather than a frontend, but it is the only
 # consumer of gettext/libintl besides the wx port, so its value is needed here
 # to decide whether libintl is a dependency at all.
@@ -83,17 +88,24 @@ option(ENABLE_LINK "Enable GBA linking functionality" ${ENABLE_LINK_DEFAULT})
 # The libretro core deliberately appears in none of them: it compiles its own
 # copy of the emulator sources and links no external library.
 
-# SDL is shared. The SDL port is built on it; the wx port uses it for audio
-# output and game controller input, as does vbam-sdl-motion in the core.
+# SDL is shared. The SDL port is built on it; the wx and Qt ports use it for
+# audio output and game controller input, as does vbam-sdl-motion in the core.
 set(VBAM_NEED_SDL OFF)
-if(ENABLE_WX OR ENABLE_SDL)
+if(ENABLE_WX OR ENABLE_SDL OR ENABLE_QT)
     set(VBAM_NEED_SDL ON)
 endif()
 
-# OpenGL is a renderer backend in both desktop frontends.
+# OpenGL is a renderer backend in every desktop frontend.
 set(VBAM_NEED_OPENGL OFF)
-if(ENABLE_WX OR ENABLE_SDL)
+if(ENABLE_WX OR ENABLE_SDL OR ENABLE_QT)
     set(VBAM_NEED_OPENGL ON)
+endif()
+
+# The GUI-frontend-only libraries (ffmpeg, OpenAL, FAudio, XAudio2, Lua) are
+# used by both the wx and the Qt port.
+set(VBAM_NEED_GUI_DEPS OFF)
+if(ENABLE_WX OR ENABLE_QT)
+    set(VBAM_NEED_GUI_DEPS ON)
 endif()
 
 # gettext/libintl: the wx port's translations and the link code's messages.
@@ -102,8 +114,8 @@ if(ENABLE_WX OR ENABLE_LINK)
     set(VBAM_NEED_NLS ON)
 endif()
 
-# Everything else - wxWidgets, Qt, nanosvg, Lua, Vulkan/MoltenVK, ffmpeg,
-# OpenAL, FAudio, Wayland, Direct3D, XAudio2 - belongs to the wx port alone.
+# Everything else - wxWidgets, nanosvg, Vulkan/MoltenVK, Wayland, Direct3D -
+# belongs to the wx port alone.
 set(VBAM_NEED_WX_DEPS ${ENABLE_WX})
 
 # Force a wx-only feature off when the wx port is not being built, and say so
@@ -117,6 +129,19 @@ function(vbam_disable_option_without_wx name)
     message(WARNING
         "${name} is only used by the wxWidgets frontend, which is not being "
         "built (ENABLE_WX=OFF). Disabling it.")
+
+    set(${name} OFF PARENT_SCOPE)
+endfunction()
+
+# Same, for the features shared by the wx and Qt ports.
+function(vbam_disable_option_without_gui name)
+    if(NOT ${name})
+        return()
+    endif()
+
+    message(WARNING
+        "${name} is only used by the wxWidgets and Qt frontends, neither of "
+        "which is being built (ENABLE_WX=OFF, ENABLE_QT=OFF). Disabling it.")
 
     set(${name} OFF PARENT_SCOPE)
 endfunction()

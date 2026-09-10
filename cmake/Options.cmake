@@ -286,8 +286,8 @@ if(VBAM_NEED_SDL)
     endif()
 endif()
 
-# Lua scripting is a wx port feature.
-if(ENABLE_WX)
+# Lua scripting is a wx / Qt port feature.
+if(VBAM_NEED_GUI_DEPS)
     set(lua_default OFF)
 
     find_package(Lua)
@@ -318,13 +318,13 @@ if(ENABLE_WX)
         endif()
     endif()
 
-    option(ENABLE_LUA "Enable Lua scripting (wx frontend)" ${lua_default})
+    option(ENABLE_LUA "Enable Lua scripting (wx and Qt frontends)" ${lua_default})
 
     if(ENABLE_LUA AND NOT lua_default)
         message(FATAL_ERROR "ENABLE_LUA is set, but no usable Lua was found")
     endif()
 else()
-    vbam_disable_option_without_wx(ENABLE_LUA)
+    vbam_disable_option_without_gui(ENABLE_LUA)
 endif()
 
 option(ENABLE_GENERIC_FILE_DIALOGS "Use generic file dialogs" OFF)
@@ -344,11 +344,12 @@ option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build w
 option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
 option(ENABLE_LZMA "Enable LZMA archive support" ON)
 
-# Vulkan is a wx port renderer backend.
+# Vulkan is a wx / Qt port renderer backend.
 #
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
-# Both produce the Vulkan::Vulkan imported target used downstream.
-if(ENABLE_WX AND NOT (X86 AND WIN32))
+# Both produce the Vulkan::Vulkan imported target used downstream. The Qt port
+# only needs the headers: it resolves the loader at run time.
+if(VBAM_NEED_GUI_DEPS AND NOT (X86 AND WIN32))
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
@@ -369,7 +370,7 @@ endif()
 
 option(ENABLE_MOLTENVK "Enable MoltenVK" OFF)
 
-if(ENABLE_WX AND APPLE)
+if(VBAM_NEED_GUI_DEPS AND APPLE)
    # Prefer a linkable libMoltenVK.dylib over the .xcframework that Homebrew also
    # ships under Frameworks/: an .xcframework is a directory and cannot be linked
    # (CMake drops it). Searching frameworks last makes the dylib win.
@@ -444,13 +445,13 @@ endif()
 # FrontendOptions.cmake, since libintl is a dependency of the link code as
 # well as of the wx port.
 
-# ffmpeg A/V recording is a wx port feature; the SDL port and the libretro
-# core have no recording UI.
+# ffmpeg A/V recording is a wx / Qt port feature; the SDL port and the
+# libretro core have no recording UI.
 set(FFMPEG_DEFAULT OFF)
 set(FFMPEG_COMPONENTS         AVFORMAT            AVCODEC            SWSCALE          AVUTIL            SWRESAMPLE          X264    X265)
 set(FFMPEG_COMPONENT_VERSIONS AVFORMAT>=58.12.100 AVCODEC>=58.18.100 SWSCALE>=5.1.100 AVUTIL>=56.14.100 SWRESAMPLE>=3.1.100 X264>=0 X265>=0)
 
-if(ENABLE_WX AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
+if(VBAM_NEED_GUI_DEPS AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
     set(FFMPEG_DEFAULT ON)
 
     find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
@@ -472,10 +473,10 @@ if(ENABLE_WX AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_
         set(FFMPEG_DEFAULT OFF)
     endif()
 endif()
-if(ENABLE_WX)
+if(VBAM_NEED_GUI_DEPS)
     option(ENABLE_FFMPEG "Enable ffmpeg A/V recording" ${FFMPEG_DEFAULT})
 else()
-    vbam_disable_option_without_wx(ENABLE_FFMPEG)
+    vbam_disable_option_without_gui(ENABLE_FFMPEG)
 endif()
 
 # Online Updates (WinSparkle/Sparkle), a wx port feature.
@@ -512,8 +513,10 @@ if(APPLE)
     option(BUNDLE_DYLIBS "Bundle dylibs into .app" ${bundle_dylibs_default})
 endif()
 
-# Direct3D renderers and the XAudio2 sound backend are wx port only.
-if(ENABLE_WX AND WIN32)
+# Direct3D renderers (9 and 12) and the XAudio2 sound backend are shared by
+# the wx and Qt ports; the D3D11 HDR sub-driver is wx only but rides the same
+# option.
+if(VBAM_NEED_GUI_DEPS AND WIN32)
     option(ENABLE_DIRECT3D "Enable Direct3D 9 rendering for the wxWidgets port" ON)
 
     if(NOT WINXP)
@@ -524,23 +527,26 @@ if(ENABLE_WX AND WIN32)
         set(ENABLE_DIRECT3D12 OFF)
         set(ENABLE_DIRECT3D11 OFF)
     endif()
+elseif(WIN32)
+    set(ENABLE_DIRECT3D   OFF)
+    set(ENABLE_DIRECT3D12 OFF)
+    set(ENABLE_DIRECT3D11 OFF)
+endif()
 
+if(VBAM_NEED_GUI_DEPS AND WIN32)
     set(XAUDIO2_DEFAULT ON)
     if ((MSVC AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
         # TODO: We should update the XAudio headers to build with clang-cl. See
         # https://github.com/visualboyadvance-m/visualboyadvance-m/issues/1021
         set(XAUDIO2_DEFAULT OFF)
     endif()
-    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets port" ${XAUDIO2_DEFAULT})
+    option(ENABLE_XAUDIO2 "Enable xaudio2 sound output for the wxWidgets and Qt ports" ${XAUDIO2_DEFAULT})
 elseif(WIN32)
-    set(ENABLE_DIRECT3D   OFF)
-    set(ENABLE_DIRECT3D12 OFF)
-    set(ENABLE_DIRECT3D11 OFF)
     set(ENABLE_XAUDIO2    OFF)
 endif()
 
-# OpenAL-Soft, a wx port sound backend.
-if(ENABLE_WX)
+# OpenAL-Soft, a wx / Qt port sound backend.
+if(VBAM_NEED_GUI_DEPS)
     find_package(OpenAL QUIET)
 
     set(OPENAL_DEFAULT ${OpenAL_FOUND})
@@ -554,15 +560,15 @@ if(ENABLE_WX)
         set(OPENAL_DEFAULT OFF)
     endif()
 
-    option(ENABLE_OPENAL "Enable OpenAL-Soft sound output for the wxWidgets port" ${OPENAL_DEFAULT})
+    option(ENABLE_OPENAL "Enable OpenAL-Soft sound output for the wxWidgets and Qt ports" ${OPENAL_DEFAULT})
 else()
-    vbam_disable_option_without_wx(ENABLE_OPENAL)
+    vbam_disable_option_without_gui(ENABLE_OPENAL)
 endif()
 
-# FAudio, a wx port sound backend.
+# FAudio, a wx / Qt port sound backend.
 set(ENABLE_FAUDIO_DEFAULT OFF)
 
-if(ENABLE_WX)
+if(VBAM_NEED_GUI_DEPS)
     find_package(FAudio QUIET)
 endif()
 
@@ -693,10 +699,10 @@ if(FAudio_FOUND)
     unset(_links_sdl3)
 endif()
 
-if(ENABLE_WX)
-    option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets port" ${ENABLE_FAUDIO_DEFAULT})
+if(VBAM_NEED_GUI_DEPS)
+    option(ENABLE_FAUDIO "Enable FAudio sound output for the wxWidgets and Qt ports" ${ENABLE_FAUDIO_DEFAULT})
 else()
-    vbam_disable_option_without_wx(ENABLE_FAUDIO)
+    vbam_disable_option_without_gui(ENABLE_FAUDIO)
 endif()
 
 # Android-only backends. Both are native NDK/Qt paths with no counterpart on any

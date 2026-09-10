@@ -1,0 +1,557 @@
+#if !defined(_WIN32)
+#error "This file should only be included on Windows"
+#endif
+
+#if !defined(VBAM_ENABLE_XAUDIO2)
+#error "This file should only be compiled if XAudio2 is enabled"
+#endif
+
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <vector>
+
+#include <QCoreApplication>
+#include <QString>
+
+#include "qt/audio/internal/xaudio2.h"
+
+#include "core/base/sound_driver.h"
+#include "core/base/system.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbaSound.h"
+#include "qt/config/option-proxy.h"
+#include "qt/log.h"
+
+#include "qt/audio/internal/xaudio2_7.h"
+
+namespace audio {
+namespace internal {
+
+namespace {
+
+QString Tr(const char* text) {
+    return QCoreApplication::translate("vbam", text);
+}
+
+QString HrString(HRESULT hr) {
+    return QStringLiteral("0x%1").arg(static_cast<unsigned long>(hr), 8, 16, QLatin1Char('0'));
+}
+
+class XAudio2_7_Output : public SoundDriver, public XAudio2_Output {
+public:
+    XAudio2_7_Output(IXAudio2* xaudio2);
+    ~XAudio2_7_Output() override;
+
+    // SoundDriver implementation
+    bool init(long sampleRate) override;
+    void pause() override;
+    void reset() override;
+    void resume() override;
+    void write(uint16_t* finalWave, int length) override;
+    void setThrottle(unsigned short throttle_) override;
+
+    // XAudio2_Output interface for device change
+    void signal_device_change() override;
+
+private:
+    void close();
+    int XA2GetDev();
+    bool SetupStereoUpmix();
+
+    bool failed = false;
+    bool initialized = false;
+    bool playing = false;
+    UINT32 freq = 0;
+    UINT32 bufferCount = 0;
+    BYTE* buffers = nullptr;
+    int currentBuffer = 0;
+    int soundBufferLen = 0;
+    volatile bool device_changed = false;
+    volatile bool is_destructing = false;
+    bool reinit_posted = false;
+
+    IXAudio2* xaud = nullptr;
+    IXAudio2MasteringVoice* mVoice = nullptr;
+    IXAudio2SourceVoice* sVoice = nullptr;
+    XAUDIO2_VOICE_STATE vState = {};
+
+    class XAudio2_BufferNotify* notify = nullptr;
+};
+
+// Buffer notification class
+class XAudio2_BufferNotify : public IXAudio2VoiceCallback {
+public:
+    HANDLE hBufferEndEvent;
+
+    XAudio2_BufferNotify() {
+        hBufferEndEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        assert(hBufferEndEvent != nullptr);
+    }
+
+    virtual ~XAudio2_BufferNotify() {
+        CloseHandle(hBufferEndEvent);
+        hBufferEndEvent = nullptr;
+    }
+
+    STDMETHOD_(void, OnBufferEnd)(void*) override {
+        assert(hBufferEndEvent != nullptr);
+        SetEvent(hBufferEndEvent);
+    }
+
+    // Dummy implementations
+    STDMETHOD_(void, OnVoiceProcessingPassStart)(UINT32) override {}
+    STDMETHOD_(void, OnVoiceProcessingPassEnd)() override {}
+    STDMETHOD_(void, OnStreamEnd)() override {}
+    STDMETHOD_(void, OnBufferStart)(void*) override {}
+    STDMETHOD_(void, OnLoopEnd)(void*) override {}
+    STDMETHOD_(void, OnVoiceError)(void*, HRESULT) override {}
+};
+
+int XAudio2_7_Output::XA2GetDev() {
+    const QString audio_device = OPTION(kSoundAudioDevice);
+    if (audio_device.isEmpty() || audio_device == audio::DefaultDeviceName()) {
+        return 0;
+    }
+
+    UINT32 dev_count = 0;
+    HRESULT hr = xaud->GetDeviceCount(&dev_count);
+    if (FAILED(hr)) {
+        vbam::LogError(Tr("XAudio2: Enumerating devices failed!"));
+        return 0;
+    }
+
+    for (UINT32 i = 0; i < dev_count; i++) {
+        XAUDIO2_DEVICE_DETAILS dd;
+        hr = xaud->GetDeviceDetails(i, &dd);
+        if (FAILED(hr)) {
+            continue;
+        }
+        const QString device_id = QString::fromWCharArray(dd.DeviceID);
+        if (audio_device == device_id) {
+            return i;
+        }
+    }
+
+    vbam::LogWarning(Tr("XAudio2: Device not found, using default"));
+    return 0;
+}
+
+bool XAudio2_7_Output::SetupStereoUpmix() {
+    if (!OPTION(kSoundUpmix)) {
+        return true;  // Upmix not enabled
+    }
+
+    // Get device details to determine channel count
+    XAUDIO2_DEVICE_DETAILS dd;
+    HRESULT hr = xaud->GetDeviceDetails(XA2GetDev(), &dd);
+    if (FAILED(hr)) {
+        vbam::LogWarning(Tr("XAudio2: Could not get device details for upmix"));
+        return false;
+    }
+
+    UINT32 outputChannels = dd.OutputFormat.Format.nChannels;
+
+    // Only setup upmix if we have more than 2 channels
+    if (outputChannels <= 2) {
+        return true;
+    }
+
+    // Allocate matrix for stereo -> multi-channel mapping
+    float* matrix = (float*)malloc(sizeof(float) * 2 * outputChannels);
+    if (!matrix) {
+        vbam::LogWarning(Tr("XAudio2: Failed to allocate upmix matrix"));
+        return false;
+    }
+
+    bool matrixAvailable = true;
+
+    // Set up stereo upmixing matrix with full volume normalization
+    // This reduces volume clipping at 100% on multichannel systems.
+    switch (outputChannels) {
+        case 4:  // 4.0 (Quad) - Normalize by sqrt(2)
+            // Speaker \ Left Source           Right Source
+            /*Front L*/ matrix[0] = 0.7071f; matrix[1] = 0.0000f;
+            /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.7071f;
+            /*Back  L*/ matrix[4] = 0.7071f; matrix[5] = 0.0000f;
+            /*Back  R*/ matrix[6] = 0.0000f; matrix[7] = 0.7071f;
+            break;
+
+        case 5:  // 5.0 - Normalize by sqrt(2.5)
+            // Speaker \ Left Source           Right Source
+            /*Front L*/ matrix[0] = 0.6325f; matrix[1] = 0.0000f;
+            /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.6325f;
+            /*Front C*/ matrix[4] = 0.4472f; matrix[5] = 0.4472f;
+            /*Side  L*/ matrix[6] = 0.6325f; matrix[7] = 0.0000f;
+            /*Side  R*/ matrix[8] = 0.0000f; matrix[9] = 0.6325f;
+            break;
+
+        case 6:  // 5.1 - Normalize by sqrt(3.0)
+            // Speaker \ Left Source           Right Source
+            /*Front L*/ matrix[0] = 0.5774f; matrix[1] = 0.0000f;
+            /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5774f;
+            /*Front C*/ matrix[4] = 0.4082f; matrix[5] = 0.4082f;
+            /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+            /*Side  L*/ matrix[8] = 0.5774f; matrix[9] = 0.0000f;
+            /*Side  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5774f;
+            break;
+
+        case 7:  // 6.1 - Normalize by sqrt(3.5)
+            // Speaker \ Left Source           Right Source
+            /*Front L*/ matrix[0] = 0.5345f; matrix[1] = 0.0000f;
+            /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5345f;
+            /*Front C*/ matrix[4] = 0.3780f; matrix[5] = 0.3780f;
+            /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+            /*Side  L*/ matrix[8] = 0.5345f; matrix[9] = 0.0000f;
+            /*Side  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5345f;
+            /*Back  C*/ matrix[12] = 0.3780f; matrix[13] = 0.3780f;
+            break;
+
+        case 8:  // 7.1 - Normalize by sqrt(4.0)
+            // Speaker \ Left Source           Right Source
+            /*Front L*/ matrix[0] = 0.5000f; matrix[1] = 0.0000f;
+            /*Front R*/ matrix[2] = 0.0000f; matrix[3] = 0.5000f;
+            /*Front C*/ matrix[4] = 0.3536f; matrix[5] = 0.3536f;
+            /*LFE    */ matrix[6] = 0.0000f; matrix[7] = 0.0000f;
+            /*Back  L*/ matrix[8] = 0.5000f; matrix[9] = 0.0000f;
+            /*Back  R*/ matrix[10] = 0.0000f; matrix[11] = 0.5000f;
+            /*Side  L*/ matrix[12] = 0.5000f; matrix[13] = 0.0000f;
+            /*Side  R*/ matrix[14] = 0.0000f; matrix[15] = 0.5000f;
+            break;
+
+        default:
+            matrixAvailable = false;
+            vbam::LogWarning(
+                Tr("XAudio2: Unsupported channel count for upmix: %1").arg(outputChannels));
+            break;
+    }
+
+    if (matrixAvailable) {
+        hr = sVoice->SetOutputMatrix(nullptr, 2, outputChannels, matrix);
+        if (FAILED(hr)) {
+            vbam::LogWarning(Tr("XAudio2: Failed to set output matrix for upmix"));
+            matrixAvailable = false;
+        } else {
+            log("XAudio2: Stereo upmix enabled for %d channels\n", outputChannels);
+        }
+    }
+
+    free(matrix);
+    return matrixAvailable;
+}
+
+XAudio2_7_Output::XAudio2_7_Output(IXAudio2* xaudio2) : xaud(xaudio2) {
+    if (!xaudio2) {
+        vbam::LogError(Tr("XAudio2: Null XAudio2 instance passed to driver!"));
+        failed = true;
+        return;
+    }
+
+    bufferCount = OPTION(kSoundBuffers);
+    if (bufferCount < 2 || bufferCount > 16) {
+        bufferCount = 3;
+    }
+}
+
+XAudio2_7_Output::~XAudio2_7_Output() {
+    // Mark as destructing FIRST to prevent callbacks from accessing this object
+    is_destructing = true;
+    // Unregister from device notifications
+    g_notifier.do_unregister(this, true);
+
+    close();
+}
+
+void XAudio2_7_Output::signal_device_change() {
+    // Called from the MMDevice notification thread - only set the flag. The
+    // actual reinit is handled on the GUI thread via write() detecting the
+    // flag and queueing a call there.
+    if (!is_destructing) {
+        device_changed = true;
+    }
+}
+
+void XAudio2_7_Output::close() {
+    initialized = false;
+    playing = false;
+
+    // Stop and destroy voices - but flush buffers first to reduce hang risk
+    if (sVoice) {
+        // Don't call Stop() if device changed - voice might already be stopped
+        if (!device_changed) {
+            sVoice->Stop(0, XAUDIO2_COMMIT_NOW);
+        }
+        sVoice->FlushSourceBuffers();
+        sVoice->DestroyVoice();
+        sVoice = nullptr;
+    }
+
+    if (buffers) {
+        free(buffers);
+        buffers = nullptr;
+    }
+
+    if (mVoice) {
+        mVoice->DestroyVoice();
+        mVoice = nullptr;
+    }
+
+    // Safe to delete callback after voices are destroyed
+    delete notify;
+    notify = nullptr;
+}
+
+bool XAudio2_7_Output::init(long sampleRate) {
+    if (failed)
+        return false;
+
+    if (initialized) {
+        log("XAudio2: Warning - init() called while already initialized\n");
+        return true;  // Already initialized
+    }
+
+    if (!xaud) {
+        vbam::LogError(Tr("XAudio2 instance not available!"));
+        failed = true;
+        return false;
+    }
+
+    // Verify the XAudio2 instance is still valid
+    UINT32 dev_count = 0;
+    HRESULT hr_check = xaud->GetDeviceCount(&dev_count);
+    if (FAILED(hr_check)) {
+        vbam::LogError(Tr("XAudio2 instance appears to be invalid"));
+        failed = true;
+        return false;
+    }
+
+    freq = sampleRate;
+    soundBufferLen = (freq / 60) * 4;
+    buffers = (BYTE*)malloc((bufferCount + 1) * soundBufferLen);
+    if (!buffers) {
+        vbam::LogError(Tr("XAudio2: Failed to allocate audio buffers!"));
+        failed = true;
+        return false;
+    }
+
+    WAVEFORMATEX wfx = {};
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nChannels = 2;
+    wfx.nSamplesPerSec = freq;
+    wfx.wBitsPerSample = 16;
+    wfx.nBlockAlign = wfx.nChannels * (wfx.wBitsPerSample / 8);
+    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
+
+    // Create mastering voice - XAudio2 2.7 uses device index
+    int deviceIndex = XA2GetDev();
+
+    HRESULT hr = xaud->CreateMasteringVoice(&mVoice, XAUDIO2_DEFAULT_CHANNELS,
+                                            freq,  // Use actual sample rate
+                                            0, deviceIndex, nullptr);
+    if (FAILED(hr)) {
+        vbam::LogError(
+            Tr("XAudio2: Creating mastering voice failed! HRESULT: %1").arg(HrString(hr)));
+        failed = true;
+        return false;
+    }
+
+    // Create source voice
+    notify = new XAudio2_BufferNotify();
+    hr = xaud->CreateSourceVoice(&sVoice, &wfx, 0, 4.0f, notify);
+    if (FAILED(hr)) {
+        vbam::LogError(Tr("XAudio2: Creating source voice failed! HRESULT: %1").arg(HrString(hr)));
+        failed = true;
+        delete notify;
+        notify = nullptr;
+        return false;
+    }
+
+    // Setup stereo upmix if enabled
+    if (OPTION(kSoundUpmix)) {
+        SetupStereoUpmix();
+    }
+
+    hr = sVoice->Start(0);
+    if (FAILED(hr)) {
+        vbam::LogError(Tr("XAudio2: Starting source voice failed! HRESULT: %1").arg(HrString(hr)));
+        failed = true;
+        return false;
+    }
+
+    // Register for device change notifications
+    g_notifier.do_register(this);
+
+    playing = true;
+    currentBuffer = 0;
+    device_changed = false;
+    initialized = true;
+    return true;
+}
+
+void XAudio2_7_Output::write(uint16_t* finalWave, int) {
+    if (failed)
+        return;
+
+    // If device changed, schedule reinitialization on the GUI thread.
+    if (device_changed && !reinit_posted) {
+        log("XAudio2: Device change detected, scheduling reinitialization\n");
+        device_changed = false;
+        reinit_posted = true;
+        ScheduleXAudio2Reinit();
+        return;
+    }
+    device_changed = false;
+
+    if (!initialized)
+        return;
+
+    while (true) {
+        sVoice->GetState(&vState);
+        if (vState.BuffersQueued > bufferCount) {
+            vbam::LogWarning(Tr("XAudio2: Too many buffers queued, resetting"));
+            reset();
+            continue;
+        }
+
+        if (vState.BuffersQueued < bufferCount) {
+            if (vState.BuffersQueued == 0) {
+                if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
+                    static unsigned int i = 0;
+                    log("XAudio2: Buffers were not refilled fast enough (i=%i)\n", i++);
+                }
+            }
+            break;
+        } else {
+            if (!coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
+                DWORD wait_result = WaitForSingleObject(notify->hBufferEndEvent, 200);
+                if (wait_result == WAIT_TIMEOUT) {
+                    // Timeout likely means device is gone or unresponsive
+                    if (!device_changed) {
+                        device_changed = true;
+                        log("XAudio2: Device appears unresponsive (timeout)\n");
+                    }
+                    return;
+                }
+            } else {
+                return;
+            }
+        }
+    }
+
+    CopyMemory(&buffers[currentBuffer * soundBufferLen], finalWave, soundBufferLen);
+
+    XAUDIO2_BUFFER newBuf = {};
+    newBuf.AudioBytes = soundBufferLen;
+    newBuf.pAudioData = &buffers[currentBuffer * soundBufferLen];
+
+    HRESULT submit_hr = sVoice->SubmitSourceBuffer(&newBuf);
+    if (FAILED(submit_hr)) {
+        vbam::LogError(
+            Tr("XAudio2: SubmitSourceBuffer failed! HRESULT: %1").arg(HrString(submit_hr)));
+        device_changed = true;
+        return;
+    }
+
+    currentBuffer = (currentBuffer + 1) % (bufferCount + 1);
+}
+
+void XAudio2_7_Output::pause() {
+    if (!initialized || failed)
+        return;
+    if (playing) {
+        sVoice->Stop(0);
+        playing = false;
+    }
+}
+
+void XAudio2_7_Output::resume() {
+    if (!initialized || failed)
+        return;
+    if (!playing) {
+        HRESULT hr = sVoice->Start(0);
+        if (SUCCEEDED(hr)) {
+            playing = true;
+        } else {
+            vbam::LogError(Tr("XAudio2: Failed to resume playback!"));
+        }
+    }
+}
+
+void XAudio2_7_Output::reset() {
+    if (!initialized || failed)
+        return;
+    if (playing) {
+        sVoice->Stop(0);
+    }
+    sVoice->FlushSourceBuffers();
+    HRESULT hr = sVoice->Start(0);
+    if (SUCCEEDED(hr)) {
+        playing = true;
+    }
+    currentBuffer = 0;
+}
+
+void XAudio2_7_Output::setThrottle(unsigned short throttle_) {
+    if (!initialized || failed)
+        return;
+    if (throttle_ == 0)
+        throttle_ = 100;
+    sVoice->SetFrequencyRatio((float)throttle_ / 100.0f);
+}
+
+}  // namespace
+
+std::unique_ptr<SoundDriver> CreateXAudio2_7_Driver(IXAudio2* xaudio2) {
+    if (!xaudio2) {
+        vbam::LogError(Tr("XAudio2: Cannot create driver with null XAudio2 instance"));
+        return nullptr;
+    }
+
+    // Verify the instance is working by checking device count
+    UINT32 dev_count = 0;
+    HRESULT hr = xaudio2->GetDeviceCount(&dev_count);
+    if (FAILED(hr)) {
+        vbam::LogError(Tr("XAudio2: XAudio2 instance appears to be invalid"));
+        return nullptr;
+    }
+
+    return std::make_unique<XAudio2_7_Output>(xaudio2);
+}
+
+std::vector<audio::AudioDevice> GetXAudio2_7_Devices(IXAudio2* xaudio2) {
+    if (!xaudio2) {
+        return {};
+    }
+
+    std::vector<audio::AudioDevice> devices;
+
+    try {
+        UINT32 dev_count = 0;
+        HRESULT hr = xaudio2->GetDeviceCount(&dev_count);
+        if (FAILED(hr)) {
+            vbam::LogError(Tr("XAudio2: Enumerating devices failed!"));
+            return {};
+        }
+
+        devices.reserve(dev_count + 1);
+        devices.push_back({audio::DefaultDeviceName(), QString()});
+
+        for (UINT32 i = 0; i < dev_count; i++) {
+            XAUDIO2_DEVICE_DETAILS dd;
+            hr = xaudio2->GetDeviceDetails(i, &dd);
+            if (SUCCEEDED(hr)) {
+                devices.push_back({QString::fromWCharArray(dd.DisplayName),
+                                   QString::fromWCharArray(dd.DeviceID)});
+            }
+        }
+    } catch (...) {
+        vbam::LogError(Tr("XAudio2: Exception during device enumeration"));
+        return {};
+    }
+
+    return devices;
+}
+
+}  // namespace internal
+}  // namespace audio

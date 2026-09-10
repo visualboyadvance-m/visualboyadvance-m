@@ -196,6 +196,11 @@ if(ENABLE_WX)
     endif()
 endif()
 
+# The Qt frontend. qttools supplies lrelease/lupdate for its translations.
+if(ENABLE_QT)
+    list(APPEND VCPKG_DEPS qtbase qttools)
+endif()
+
 if(VBAM_NEED_NLS)
     list(APPEND VCPKG_DEPS gettext-libintl)
 endif()
@@ -218,8 +223,8 @@ if(VBAM_NEED_SDL)
     endif()
 endif()
 
-# Sound backends and A/V recording are wxWidgets-only features.
-if(ENABLE_WX)
+# Sound backends and A/V recording are features of the wx and Qt frontends.
+if(ENABLE_WX OR ENABLE_QT)
     list(APPEND VCPKG_DEPS_OPTIONAL
         openal-soft         ENABLE_OPENAL
         "ffmpeg[x264,x265]" ENABLE_FFMPEG
@@ -625,6 +630,10 @@ endif()
 
 add_subdirectory(src/wx)
 add_subdirectory(po/wxvbam)
+
+if(NOT TRANSLATIONS_ONLY)
+    add_subdirectory(src/qt)
+endif()
 
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_SOURCE_GENERATOR "TGZ")

@@ -1,0 +1,358 @@
+#ifndef VBAM_QT_CONFIG_OPTIONS_H_
+#define VBAM_QT_CONFIG_OPTIONS_H_
+
+#include <array>
+#include <cstdint>
+#include <unordered_set>
+
+#include "variant.hpp"
+
+#include <QString>
+
+#include "qt/config/option-id.h"
+
+using std::uint8_t;
+using std::uint16_t;
+using std::uint32_t;
+using std::int8_t;
+using std::int16_t;
+using std::int32_t;
+
+namespace config {
+
+// Values for kDispFilter.
+enum class Filter {
+    kNone,
+    kSuper2xsai,
+    kSupereagle,
+    kPixelate,
+    kAdvmame,
+    kBilinearplus,
+    kScanlines,
+    kTvmode,
+    kHQ4x,
+    kLQ2x,
+    kSimple4x,
+    kXbrz2x,
+    kXbrz6x,
+    kXbrz9x,
+    kScaleFX3x,
+    kScaleFX9x,
+    kPlugin,  // This must always be last.
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbFilters = static_cast<size_t>(Filter::kLast);
+
+// Values for kDispIFB.
+enum class Interframe {
+    kNone = 0,
+    kSmart,
+    kMotionBlur,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbInterframes = static_cast<size_t>(Interframe::kLast);
+
+// Values for kDispRenderMethod. Same order and platform gating as the wx port
+// so the INI strings ("simple", "opengl", "sdl_video", "direct3d12",
+// "direct3d", "metal", "vulkan") mean the same renderer in both frontends.
+enum class RenderMethod {
+    kSimple = 0,  // QWidget software blit (QImage)
+    kOpenGL,      // QOpenGLWidget
+    kSDL,         // SDL_Renderer into this panel's native window
+#if defined(_WIN32)
+#if !defined(NO_D3D12)
+    kDirect3d12,
+#endif
+#if !defined(NO_D3D)
+    kDirect3d,
+#endif
+#elif defined(__APPLE__)
+    kQuartz2d,    // CoreGraphics image on a CALayer of the panel's NSView
+#ifndef NO_METAL
+    kMetal,       // CAMetalLayer on the panel's NSView
+#endif
+#endif
+#ifndef NO_VULKAN
+    kVulkan,
+#endif
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbRenderMethods = static_cast<size_t>(RenderMethod::kLast);
+
+// Values for kDispColorCorrectionProfile.
+enum class ColorCorrectionProfile {
+    kSRGB = 0,
+    kDCI,
+    kRec2020,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbColorCorrectionProfiles = static_cast<size_t>(ColorCorrectionProfile::kLast);
+
+// Values for kAudioApi.
+enum class AudioApi {
+#if defined(VBAM_ENABLE_OPENAL)
+    kOpenAL,
+#endif  // VBAM_ENABLE_OPENAL
+    kSDL,
+#if defined(_WIN32)
+    kDirectSound,
+#endif  // _WIN32
+#if defined(VBAM_ENABLE_XAUDIO2)
+    kXAudio2,
+#endif  // VBAM_ENABLE_XAUDIO2
+#if defined(VBAM_ENABLE_FAUDIO)
+    kFAudio,
+#endif  // VBAM_ENABLE_FAUDIO
+#if defined(__APPLE__)
+    kCoreAudio,
+#endif
+#if defined(VBAM_ENABLE_AAUDIO)
+    kAAudio,
+#endif  // VBAM_ENABLE_AAUDIO
+    // Outputs no audio; paces emulation with a timer. Always available, and
+    // used as the fallback when the selected driver fails to initialize.
+    kNull,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbAudioApis = static_cast<size_t>(AudioApi::kLast);
+
+enum class AudioRate {
+    k48kHz = 0,
+    k44kHz,
+    k22kHz,
+    k11kHz,
+
+    // Do not add anything under here.
+    kLast,
+};
+static constexpr size_t kNbSoundRate = static_cast<size_t>(AudioRate::kLast);
+
+// This is incremented whenever we want to change a default value between
+// release versions. The option update code is in load_opts.
+static constexpr uint32_t kIniLatestVersion = 5;
+
+// Represents a single option saved in the INI file (QSettings, INI format). Option does not own the
+// individual option, but keeps a pointer to where the data is actually saved.
+//
+// Ideally, options in the UI code should only be accessed and set via this
+// class, which should also take care of updating the INI file when
+// Option::Set*() is called. This should also handle keyboard and joystick
+// configuration so option parsing can be done in a uniform manner. If we ever
+// get to that point, we would be able to remove most update_opts() calls and
+// have individual UI elements access the option via Option::ByID().
+//
+// The implementation for this class is largely inspired by base::Value in
+// Chromium.
+// https://source.chromium.org/chromium/chromium/src/+/main:base/values.h
+class Option {
+public:
+    enum class Type {
+        kNone = 0,
+        kBool,
+        kDouble,
+        kInt,
+        kUnsigned,
+        kString,
+        kFilter,
+        kInterframe,
+        kRenderMethod,
+        kColorCorrectionProfile,
+        kAudioApi,
+        kAudioRate,
+        kGbPalette,
+    };
+
+    // Observer for an option. OnValueChanged() will be called when the value
+    // has changed. Implementers should take care of not modifying option()
+    // in the OnValueChanged() handler.
+    class Observer {
+    public:
+        explicit Observer(config::OptionID option_id);
+        virtual ~Observer();
+
+        // Class is move-only.
+        Observer(const Observer&) = delete;
+        Observer& operator=(const Observer&) = delete;
+        Observer(Observer&& other) = default;
+        Observer& operator=(Observer&& other) = default;
+
+        virtual void OnValueChanged() = 0;
+
+    protected:
+        Option* option() const { return option_; }
+
+    private:
+        Option* option_;
+    };
+
+    static std::array<Option, kNbOptions>& All();
+
+    // O(log(kNbOptions))
+    static Option* ByName(const QString& config_name);
+
+    // O(1)
+    static Option* ByID(OptionID id);
+
+    ~Option();
+
+    // Accessors.
+    const QString& config_name() const { return config_name_; }
+    const QString& command() const { return command_; }
+    const QString& ux_helper() const { return ux_helper_; }
+    const OptionID& id() const { return id_; }
+
+    // Returns the type of the value stored by the current object.
+    Type type() const { return type_; }
+
+    // Returns true if the current object represents a given type.
+    bool is_none() const { return type() == Type::kNone; }
+    bool is_bool() const { return type() == Type::kBool; }
+    bool is_double() const { return type() == Type::kDouble; }
+    bool is_int() const { return type() == Type::kInt; }
+    bool is_unsigned() const { return type() == Type::kUnsigned; }
+    bool is_string() const { return type() == Type::kString; }
+    bool is_filter() const { return type() == Type::kFilter; }
+    bool is_interframe() const { return type() == Type::kInterframe; }
+    bool is_render_method() const { return type() == Type::kRenderMethod; }
+    bool is_color_correction_profile() const { return type() == Type::kColorCorrectionProfile; }
+    bool is_audio_api() const { return type() == Type::kAudioApi; }
+    bool is_audio_rate() const { return type() == Type::kAudioRate; }
+    bool is_gb_palette() const { return type() == Type::kGbPalette; }
+
+    // Returns a reference to the stored data. Will assert on type mismatch.
+    // Only enum types can use GetEnumString().
+    bool GetBool() const;
+    double GetDouble() const;
+    int32_t GetInt() const;
+    uint32_t GetUnsigned() const;
+    const QString& GetString() const;
+    Filter GetFilter() const;
+    Interframe GetInterframe() const;
+    RenderMethod GetRenderMethod() const;
+    ColorCorrectionProfile GetColorCorrectionProfile() const;
+    AudioApi GetAudioApi() const;
+    AudioRate GetAudioRate() const;
+    QString GetEnumString() const;
+    std::array<uint16_t, 8> GetGbPalette() const;
+    QString GetGbPaletteString() const;
+
+    // Sets the value. Will assert on type mismatch.
+    // Only enum types can use SetEnumString().
+    // Returns true on success. On failure, the value will not be modified.
+    bool SetBool(bool value);
+    bool SetDouble(double value);
+    bool SetInt(int32_t value);
+    bool SetUnsigned(uint32_t value);
+    bool SetString(const QString& value);
+    bool SetFilter(const Filter& value);
+    bool SetInterframe(const Interframe& value);
+    bool SetRenderMethod(const RenderMethod& value);
+    bool SetColorCorrectionProfile(const ColorCorrectionProfile& value);
+    bool SetAudioApi(const AudioApi& value);
+    bool SetAudioRate(const AudioRate& value);
+    bool SetEnumString(const QString& value);
+    bool SetGbPalette(const std::array<uint16_t, 8>& value);
+    bool SetGbPaletteString(const QString& value);
+
+    // The compiled-in default, recorded when the option was constructed, which
+    // happens before any configuration file is read. kInt and kUnsigned only.
+    int32_t GetIntDefault() const;
+    uint32_t GetUnsignedDefault() const;
+
+    // Restores the compiled-in default. Returns false for the types that do not
+    // record one.
+    bool ResetToDefault();
+
+    // Min/Max accessors.
+    double GetDoubleMin() const;
+    double GetDoubleMax() const;
+    int32_t GetIntMin() const;
+    int32_t GetIntMax() const;
+    uint32_t GetUnsignedMin() const;
+    uint32_t GetUnsignedMax() const;
+    size_t GetEnumMax() const;
+
+    // Special convenience modifiers.
+    void NextFilter();
+    void NextInterframe();
+
+    // Command-line helper string.
+    QString ToHelperString() const;
+
+private:
+    // Disable copy and assignment. Every individual option is unique.
+    Option(const Option&) = delete;
+    Option& operator=(const Option&) = delete;
+
+    explicit Option(OptionID id);
+    Option(OptionID id, bool* option);
+    Option(OptionID id, double* option, double min, double max);
+    Option(OptionID id, int32_t* option, int32_t min, int32_t max);
+    Option(OptionID id, uint32_t* option, uint32_t min, uint32_t max);
+    Option(OptionID id, QString* option);
+    Option(OptionID id, Filter* option);
+    Option(OptionID id, Interframe* option);
+    Option(OptionID id, RenderMethod* option);
+    Option(OptionID id, ColorCorrectionProfile* option);
+    Option(OptionID id, AudioApi* option);
+    Option(OptionID id, AudioRate* option);
+    Option(OptionID id, int* option);
+    Option(OptionID id, uint16_t* option);
+
+    // Observer.
+    void AddObserver(Observer* observer);
+    void RemoveObserver(Observer* observer);
+    void CallObservers();
+    std::unordered_set<Observer*> observers_;
+
+    // Set to true when the observers are being called. This will fire an assert
+    // to prevent modifying the object again, which would trigger an infinite
+    // call stack.
+    bool calling_observers_ = false;
+
+    const OptionID id_;
+
+    const QString config_name_;
+    const QString command_;
+    const QString ux_helper_;
+
+    const Type type_;
+    const nonstd::variant<nonstd::monostate,
+                          bool*,
+                          double*,
+                          int32_t*,
+                          uint32_t*,
+                          QString*,
+                          Filter*,
+                          Interframe*,
+                          RenderMethod*,
+                          ColorCorrectionProfile*,
+                          AudioApi*,
+                          AudioRate*,
+                          uint16_t*>
+        value_;
+
+    // Technically, `uint64_t` is only needed for 64 bits targets, as `size_t`.
+    // However, `size_t` is the same as `uint32_t` on 32 bits targets, resulting
+    // in a compiler error if we use `size_t` here.
+    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t> min_;
+    const nonstd::variant<nonstd::monostate, double, int32_t, uint32_t, uint64_t> max_;
+
+    // Set in the kInt and kUnsigned constructors, after the initial value has
+    // been validated. Unused for the other types.
+    int64_t numeric_default_ = 0;
+};
+
+}  // namespace config
+
+#endif  // VBAM_QT_CONFIG_OPTIONS_H_

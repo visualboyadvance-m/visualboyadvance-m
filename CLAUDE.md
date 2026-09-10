@@ -39,6 +39,7 @@ make -j$(nproc)
 
 - `ENABLE_SDL`: Build the SDL port (default: OFF)
 - `ENABLE_WX`: Build the wxWidgets port (default: ON)
+- `ENABLE_QT`: Build the Qt 6 port (default: OFF; needs Qt6 Core/Gui/Widgets/OpenGL/OpenGLWidgets/Network/PrintSupport)
 - `ENABLE_DEBUGGER`: Enable the debugger (default: ON)
 - `ENABLE_LINK`: Enable GBA linking functionality (default: AUTO)
 - `ENABLE_FFMPEG`: Enable ffmpeg A/V recording (default: AUTO)
@@ -68,6 +69,20 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 **src/sdl/** - SDL-based frontend (command-line/minimal GUI)
 - Lightweight alternative to wxWidgets
 - Includes debugger support
+
+**src/qt/** - Qt 6 Widgets frontend (`ENABLE_QT=ON`, default OFF)
+- Separate desktop port with the wx port's feature set: same core, same
+  components, same INI option names (`config/`), same command table
+  (`cmd-ids.h`, `config/cmdtab-data.cpp` generated once from the wx
+  `cmdevents.cpp` handler list)
+- Menus are built in code (`menu-def.cpp`); commands dispatch through
+  `MainWindow::ExecuteCommand()` to `On<Name>()` handlers in
+  `cmd-handlers*.cpp`; shortcuts and game keys both flow through
+  `widgets::InputDispatcher`
+- Renderers: software, OpenGL (`QOpenGLWidget`), Quartz 2D (macOS), SDL,
+  Vulkan (run-time loader / MoltenVK), Direct3D 9/12 (Windows), Metal
+  (`renderers/`); init-failure fallback chain as in wx; no HDR/deep color
+- Target: `visualboyadvance-m-qt`; tests: `vbam-qt-config-tests`
 
 **src/libretro/** - Libretro core implementation
 - RetroArch/libretro API glue layer
@@ -106,6 +121,7 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - `gba:` - Game Boy Advance core changes
 - `libretro:` - Libretro core and build
 - `sdl:` - SDL port (not SDL functionality in wxWidgets)
+- `qt:` - Qt port (src/qt)
 - `translations:` - Translation-related changes
 
 wxWidgets GUI commits should NOT have a prefix.
