@@ -1,5 +1,7 @@
 #include "qt/app.h"
 
+#include "qt/android-compat.h"
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -36,12 +38,17 @@
 #include "core/base/system.h"
 #include "core/base/version.h"
 #include "core/gba/gbaGlobals.h"
+#if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
+#endif
 #include "qt/config/cmdtab.h"
 #include "qt/config/option-proxy.h"
 #include "qt/config/option.h"
 #include "qt/config/strutils.h"
 #include "qt/game-area.h"
+#if defined(__APPLE__)
+#include "qt/renderers/mac-support.h"
+#endif
 #include "qt/log.h"
 #include "qt/main-window.h"
 #include "qt/opts.h"
@@ -211,7 +218,13 @@ QString VbamApp::GetConfigDir() {
     }
 
     QString base;
-#if defined(Q_OS_WIN)
+#if defined(Q_OS_ANDROID)
+    // The app's private files dir; there is no shared config location and the
+    // user cannot browse it anyway.
+    config_dir_ = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(config_dir_);
+    return config_dir_;
+#elif defined(Q_OS_WIN)
     base = qEnvironmentVariable("APPDATA");
     if (base.isEmpty()) {
         base = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
@@ -786,6 +799,9 @@ bool VbamApp::Init() {
     LoadOverrides();
 
     // SDL: joystick / game controller input (and audio, per the audio driver).
+    // Populate SDL's cached Java classes before its first SDL_Init(); a no-op
+    // off Android.
+    VbamSetupSdlActivityJni();
     sdl_poller_ = std::make_unique<widgets::SdlPoller>(&input_dispatcher_);
 
     // We need to gather this information before creating the main window as
@@ -796,6 +812,14 @@ bool VbamApp::Init() {
         OPTION(kGeomWindowWidth).Get() == 0 || OPTION(kGeomWindowHeight).Get() == 0;
     const bool is_fullscreen = OPTION(kGeomFullScreen);
     const bool is_maximized = OPTION(kGeomIsMaximized);
+
+#if defined(__APPLE__)
+    // Test instances launched from a terminal must not steal the keyboard
+    // focus from whatever the developer is typing into.
+    if (qEnvironmentVariableIsSet("VBAM_QT_NO_ACTIVATE")) {
+        VbamQtSetAccessoryActivationPolicy();
+    }
+#endif
 
     // Create the main window.
     frame = new MainWindow();
@@ -904,6 +928,10 @@ bool VbamApp::Init() {
         }
     }
 
+    if (qEnvironmentVariableIsSet("VBAM_QT_NO_ACTIVATE")) {
+        frame->setAttribute(Qt::WA_ShowWithoutActivating, true);
+    }
+
     if (is_maximized) {
         frame->showMaximized();
     }
@@ -928,7 +956,8 @@ bool VbamApp::Init() {
 }
 
 void VbamApp::LoadGameLater(const QString& path) {
-    pending_load = path;
+    // A content:// URI (Android picker / intent) has to become a real file first.
+    pending_load = VbamResolveAndroidContentUri(path);
     if (frame && frame->GetPanel()) {
         frame->GetPanel()->RequestMore();
     }

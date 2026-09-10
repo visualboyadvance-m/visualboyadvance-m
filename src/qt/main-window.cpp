@@ -31,6 +31,7 @@
 #include "core/gb/gbGlobals.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaSound.h"
+#include "qt/android-compat.h"
 #include "qt/app.h"
 #include "qt/config/bindings.h"
 #include "qt/config/option-proxy.h"
@@ -951,6 +952,11 @@ LogDialog* MainWindow::GetLogDialog() {
 // Frame decorations / status bar
 
 void MainWindow::SetMenuBarVisible(bool visible) {
+#if defined(__ANDROID__)
+    // The menu bar is the activity's action bar (Qt maps QMenuBar into its
+    // overflow menu); hide that, together with the system bars.
+    VbamSetAndroidMenuBarHidden(!visible);
+#endif
     if (menuBar()->isNativeMenuBar()) {
         return;
     }

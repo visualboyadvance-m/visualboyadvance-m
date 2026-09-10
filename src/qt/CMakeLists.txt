@@ -52,6 +52,8 @@ set(VBAM_QT_WIDGETS_SOURCES
     widgets/input-dispatcher.h
     widgets/keyboard-input-handler.cpp
     widgets/keyboard-input-handler.h
+    widgets/on-screen-controller.cpp
+    widgets/on-screen-controller.h
     widgets/option-binding.cpp
     widgets/option-binding.h
     widgets/render-plugin.cpp
@@ -61,6 +63,10 @@ set(VBAM_QT_WIDGETS_SOURCES
     widgets/user-input-ctrl.cpp
     widgets/user-input-ctrl.h
 )
+if(ANDROID)
+    # Controllers come from the activity over JNI on Android (see the header).
+    list(APPEND VBAM_QT_WIDGETS_SOURCES widgets/android-gamepad.cpp widgets/android-gamepad.h)
+endif()
 
 set(VBAM_QT_AUDIO_SOURCES
     audio/audio.cpp
@@ -79,6 +85,9 @@ if(ENABLE_OPENAL)
 endif()
 if(ENABLE_FAUDIO)
     list(APPEND VBAM_QT_AUDIO_SOURCES audio/internal/faudio.cpp audio/internal/faudio.h)
+endif()
+if(ENABLE_AAUDIO)
+    list(APPEND VBAM_QT_AUDIO_SOURCES audio/internal/aaudio.cpp audio/internal/aaudio.h)
 endif()
 if(WIN32)
     list(APPEND VBAM_QT_AUDIO_SOURCES audio/internal/dsound.cpp audio/internal/dsound.h)
@@ -159,8 +168,16 @@ set(VBAM_QT_RENDERER_SOURCES
     renderers/sdl-panel.cpp
     renderers/sdl-panel.h
 )
-if(ENABLE_VULKAN)
+# On Android the Vulkan panel presents through VK_KHR_android_surface on an
+# overlay SurfaceView (see renderers/vulkan-panel.cpp); the headers come from
+# the NDK sysroot and the platform loader (libvulkan.so) is loaded at run time,
+# so nothing beyond ENABLE_VULKAN is needed there.
+set(VBAM_QT_VULKAN ${ENABLE_VULKAN})
+if(VBAM_QT_VULKAN)
     list(APPEND VBAM_QT_RENDERER_SOURCES renderers/vulkan-panel.cpp renderers/vulkan-panel.h)
+endif()
+if(ENABLE_GLES)
+    list(APPEND VBAM_QT_RENDERER_SOURCES renderers/gles-panel.cpp renderers/gles-panel.h)
 endif()
 if(APPLE)
     list(APPEND VBAM_QT_RENDERER_SOURCES
@@ -178,6 +195,8 @@ if(WIN32)
 endif()
 
 set(VBAM_QT_MAIN_SOURCES
+    android-compat.cpp
+    android-compat.h
     app.cpp
     app.h
     cmd-handlers.cpp
@@ -254,7 +273,7 @@ function(configure_qt_target target)
     endif()
 
     # Vulkan: headers only, the loader (or MoltenVK) is loaded at run time.
-    if(ENABLE_VULKAN)
+    if(VBAM_QT_VULKAN)
         if(TARGET Vulkan::Headers)
             target_link_libraries(${target} PRIVATE Vulkan::Headers)
         elseif(Vulkan_INCLUDE_DIRS)
@@ -277,6 +296,12 @@ function(configure_qt_target target)
         endif()
     else()
         target_compile_definitions(${target} PRIVATE NO_VULKAN)
+    endif()
+
+    # OpenGL ES 2 renderer (the Android output module; buildable elsewhere for
+    # testing with -DENABLE_GLES=ON).
+    if(ENABLE_GLES)
+        target_compile_definitions(${target} PRIVATE VBAM_ENABLE_GLES)
     endif()
 
     # Direct3D (d3d9.dll, d3d12.dll and dxgi.dll are loaded at run time; the
@@ -308,6 +333,18 @@ function(configure_qt_target target)
         endif()
         target_include_directories(${target} PRIVATE ${OPENAL_INCLUDE_DIR})
         target_link_libraries(${target} PRIVATE ${OPENAL_LIBRARY})
+        # A static OpenAL-Soft (vcpkg) needs the fmt library it was built with.
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            find_library(FMT_LIBRARY NAMES fmtd fmt)
+        else()
+            find_library(FMT_LIBRARY fmt)
+        endif()
+        if(FMT_LIBRARY)
+            target_link_libraries(${target} PRIVATE ${FMT_LIBRARY})
+        endif()
+        if(WIN32)
+            target_link_libraries(${target} PRIVATE avrt)
+        endif()
     endif()
 
     # XAudio2.
@@ -316,6 +353,13 @@ function(configure_qt_target target)
     endif()
 
     # FAudio.
+    # AAudio (Android only). The driver TU and the kAAudio option value are both
+    # compiled out when this is off; the sound dialog hides its radio button.
+    if(ENABLE_AAUDIO)
+        target_compile_definitions(${target} PRIVATE VBAM_ENABLE_AAUDIO)
+        target_link_libraries(${target} PRIVATE aaudio)
+    endif()
+
     if(ENABLE_FAUDIO)
         target_compile_definitions(${target} PRIVATE VBAM_ENABLE_FAUDIO)
         if(APPLE AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
@@ -360,6 +404,11 @@ function(configure_qt_target target)
     if(ENABLE_LINK)
         target_link_libraries(${target} PRIVATE ${SFML_LIBRARIES})
     endif()
+
+    if(ANDROID)
+        # JNI (android-compat.cpp, the gamepad bridge) and __android_log_print.
+        target_link_libraries(${target} PRIVATE android log)
+    endif()
 endfunction()
 
 # ---------------------------------------------------------------------------
@@ -373,6 +422,14 @@ set(VBAM_QT_ICON_ICO ${CMAKE_SOURCE_DIR}/src/wx/icons/visualboyadvance-m.ico)
 if(COMPILE_ONLY)
     add_library(visualboyadvance-m-qt OBJECT)
 else()
+    if(ANDROID AND QT_KNOWN_POLICY_QTP0002)
+        # Take the QT_ANDROID_* path properties below as they are (plain POSIX
+        # paths, no generator expressions); settles the policy and silences
+        # the QTP0002 warning.
+        qt_policy(SET QTP0002 NEW)
+    endif()
+    # On Android this is a shared module (lib<name>_<abi>.so) loaded by the Java
+    # activity, and qt_add_executable wires up androiddeployqt for the APK.
     qt_add_executable(visualboyadvance-m-qt WIN32 MACOSX_BUNDLE)
 endif()
 
@@ -417,6 +474,119 @@ if(WIN32 AND NOT COMPILE_ONLY)
     target_sources(visualboyadvance-m-qt PRIVATE visualboyadvance-m-qt.rc)
 endif()
 
+if(ANDROID AND NOT COMPILE_ONLY)
+    # The package overlay (manifest, Java activity + gamepad/wake-lock/menu-bar
+    # helpers shared with the wx port, SDL's Java glue, launcher icons).
+    # androiddeployqt bundles any extra shared libraries the app dlopen()s: when
+    # SDL3 comes from the NDK sysroot it must travel in the APK; a static SDL3
+    # is linked into our own module .so and VBAM_SDL3_ANDROID_LIB is empty.
+    set_target_properties(visualboyadvance-m-qt PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android"
+        QT_ANDROID_MIN_SDK_VERSION 28
+        QT_ANDROID_TARGET_SDK_VERSION 34)
+
+    if(VBAM_SDL3_ANDROID_LIB)
+        set_property(TARGET visualboyadvance-m-qt PROPERTY
+            QT_ANDROID_EXTRA_LIBS "${VBAM_SDL3_ANDROID_LIB}")
+    endif()
+
+    # androiddeployqt leaves the package at src/qt/android-build/<target>.apk.
+    # Put it at the top of the build directory under a name that says which
+    # ABI it holds. The dependency is on the .apk file, a known OUTPUT here,
+    # since Qt's apk target is created by a deferred finalizer.
+    set(vbam_qt_apk_built "${CMAKE_CURRENT_BINARY_DIR}/android-build/visualboyadvance-m-qt.apk")
+    set(vbam_qt_apk_named "${CMAKE_BINARY_DIR}/visualboyadvance-m-qt-${ARCH_NAME}.apk")
+
+    # Signing, same policy as the wx port: a package meant to be handed to
+    # someone (UPSTREAM_RELEASE) is signed with the developer keystore, any
+    # other build is copied unsigned and told how to sign it.
+    if(NOT DEFINED ENV{HOME})
+        set(vbam_home "$ENV{USERPROFILE}")
+    else()
+        set(vbam_home "$ENV{HOME}")
+    endif()
+
+    set(VBAM_ANDROID_KEYSTORE "${vbam_home}/.codesign/android_debug.keystore"
+        CACHE FILEPATH "Keystore the Android APK is signed with")
+    set(VBAM_ANDROID_KEY_ALIAS "androiddebugkey"
+        CACHE STRING "Key in VBAM_ANDROID_KEYSTORE the APK is signed with")
+    set(VBAM_ANDROID_KEYSTORE_PASS "android"
+        CACHE STRING "Password for VBAM_ANDROID_KEYSTORE and its key")
+
+    file(GLOB vbam_build_tools LIST_DIRECTORIES true "${ANDROID_SDK_ROOT}/build-tools/*")
+    list(SORT vbam_build_tools COMPARE NATURAL ORDER DESCENDING)
+
+    find_program(VBAM_APKSIGNER
+        NAMES apksigner apksigner.bat
+        HINTS ${vbam_build_tools}
+    )
+
+    if(VBAM_APKSIGNER AND NOT DEFINED VBAM_APKSIGNER_JVM_OPTS)
+        # Silences a recent JDK's conscrypt native-access warnings; only used
+        # when this JDK accepts the flag.
+        set(vbam_native_access -J-enable-native-access=ALL-UNNAMED)
+        execute_process(
+            COMMAND "${VBAM_APKSIGNER}" ${vbam_native_access} version
+            RESULT_VARIABLE vbam_native_access_status
+            OUTPUT_QUIET
+            ERROR_QUIET
+        )
+        if(NOT vbam_native_access_status EQUAL 0)
+            set(vbam_native_access "")
+        endif()
+        set(VBAM_APKSIGNER_JVM_OPTS "${vbam_native_access}" CACHE INTERNAL
+            "JVM options apksigner is invoked with")
+    endif()
+
+    set(vbam_qt_sign_apk FALSE)
+    if(UPSTREAM_RELEASE)
+        if(NOT VBAM_APKSIGNER)
+            message(WARNING "No apksigner in ${ANDROID_SDK_ROOT}/build-tools or on the PATH; "
+                            "the Qt APK will be left unsigned.")
+        elseif(NOT EXISTS "${VBAM_ANDROID_KEYSTORE}")
+            message(WARNING "No keystore at ${VBAM_ANDROID_KEYSTORE}; the Qt APK will be left "
+                            "unsigned. See src/wx/CMakeLists.txt for how to make one.")
+        else()
+            set(vbam_qt_sign_apk TRUE)
+        endif()
+    endif()
+
+    if(vbam_qt_sign_apk)
+        set(vbam_qt_apk_commands
+            COMMAND "${VBAM_APKSIGNER}" ${VBAM_APKSIGNER_JVM_OPTS} sign
+                    --ks       "${VBAM_ANDROID_KEYSTORE}"
+                    --ks-pass  "pass:${VBAM_ANDROID_KEYSTORE_PASS}"
+                    --key-pass "pass:${VBAM_ANDROID_KEYSTORE_PASS}"
+                    --ks-key-alias "${VBAM_ANDROID_KEY_ALIAS}"
+                    --v4-signing-enabled false
+                    --out "${vbam_qt_apk_named}"
+                    "${vbam_qt_apk_built}"
+        )
+        set(vbam_qt_apk_comment "Signing APK to ${vbam_qt_apk_named}")
+    else()
+        set(vbam_qt_apk_commands
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                    "${vbam_qt_apk_built}" "${vbam_qt_apk_named}"
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  ${vbam_qt_apk_named} is unsigned and Android will not install it."
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  Sign it with: apksigner ${VBAM_APKSIGNER_JVM_OPTS} sign --ks ${VBAM_ANDROID_KEYSTORE} --ks-key-alias ${VBAM_ANDROID_KEY_ALIAS} ${vbam_qt_apk_named}"
+            COMMAND "${CMAKE_COMMAND}" -E echo
+                    "  or configure with -DUPSTREAM_RELEASE=TRUE to have the build sign it."
+        )
+        set(vbam_qt_apk_comment "Copying APK to ${vbam_qt_apk_named}")
+    endif()
+
+    add_custom_command(
+        OUTPUT  "${vbam_qt_apk_named}"
+        ${vbam_qt_apk_commands}
+        DEPENDS "${vbam_qt_apk_built}"
+        COMMENT "${vbam_qt_apk_comment}"
+        VERBATIM
+    )
+    add_custom_target(visualboyadvance-m-qt-apk-named ALL DEPENDS "${vbam_qt_apk_named}")
+endif()
+
 target_link_libraries(visualboyadvance-m-qt PRIVATE
     vbam-components-draw-text
     vbam-components-filters
@@ -431,6 +601,10 @@ target_link_libraries(visualboyadvance-m-qt PRIVATE
 if(ENABLE_FFMPEG)
     target_link_libraries(visualboyadvance-m-qt PRIVATE vbam-components-av-recording)
     target_link_options(visualboyadvance-m-qt PRIVATE ${FFMPEG_LDFLAGS})
+    if(ANDROID)
+        # vcpkg's ffmpeg for Android uses the MediaCodec NDK wrapper.
+        target_link_libraries(visualboyadvance-m-qt PRIVATE mediandk)
+    endif()
 endif()
 
 configure_qt_target(visualboyadvance-m-qt)
@@ -513,7 +687,7 @@ endif()
 # Installation
 # ---------------------------------------------------------------------------
 
-if(NOT COMPILE_ONLY)
+if(NOT COMPILE_ONLY AND NOT ANDROID)
     if(APPLE)
         install(TARGETS visualboyadvance-m-qt BUNDLE DESTINATION .)
     else()

@@ -9,6 +9,7 @@
 #include <QWindow>
 
 #include "core/base/check.h"
+#include "qt/android-compat.h"
 #include "qt/app.h"
 #include "qt/config/option-proxy.h"
 
@@ -50,6 +51,10 @@ void BaseDialog::showEvent(QShowEvent* event) {
         dialog_shown_ = true;
         RepositionDialog();
     }
+#if defined(__ANDROID__)
+    // Desktop-sized dialogs overflow a phone; fill the content view instead.
+    VbamAdaptDialogToScreen(this);
+#endif
 
     ApplyKeepOnTop();
     keep_on_top_observer_ = std::make_unique<config::OptionsObserver>(

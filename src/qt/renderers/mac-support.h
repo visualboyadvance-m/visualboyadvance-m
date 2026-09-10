@@ -27,4 +27,9 @@ void VbamQtSdlReattachViewState(void* ns_view, void* window, void* content_view,
 // Removes the CAMetalLayer-backed subviews SDL leaves on `ns_view` at teardown.
 void VbamQtRemoveSdlMetalViews(void* ns_view);
 
+// Developer aid (VBAM_QT_NO_ACTIVATE=1): makes this an accessory app, so a
+// test instance launched from a terminal neither takes keyboard focus away
+// from the foreground app nor shows in the Dock. Its window still renders.
+void VbamQtSetAccessoryActivationPolicy();
+
 #endif  // VBAM_QT_RENDERERS_MAC_SUPPORT_H_

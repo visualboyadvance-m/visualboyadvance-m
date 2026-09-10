@@ -63,6 +63,9 @@ enum class RenderMethod {
     kSimple = 0,  // QWidget software blit (QImage)
     kOpenGL,      // QOpenGLWidget
     kSDL,         // SDL_Renderer into this panel's native window
+#if defined(VBAM_ENABLE_GLES)
+    kGLES,        // OpenGL ES 2 QOpenGLWidget (the Android output module)
+#endif
 #if defined(_WIN32)
 #if !defined(NO_D3D12)
     kDirect3d12,

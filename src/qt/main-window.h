@@ -86,6 +86,9 @@ public:
     // Returns the action for `cmd_id`, or nullptr.
     QAction* GetAction(int cmd_id) const;
 
+    // The command switch behind ExecuteCommand() (cmd-handlers.cpp).
+    bool DispatchCommand(int cmd_id);
+
     // Lazily creates and returns the dialog `name` (see dialogs/). Names match
     // the wx XRC names: "DisplayConfig", "SoundConfig", "JoypadConfig",
     // "DirectoriesConfig", "GameBoyConfig", "GameBoyAdvanceConfig",

@@ -82,7 +82,14 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - Renderers: software, OpenGL (`QOpenGLWidget`), Quartz 2D (macOS), SDL,
   Vulkan (run-time loader / MoltenVK), Direct3D 9/12 (Windows), Metal
   (`renderers/`); init-failure fallback chain as in wx; no HDR/deep color
-- Target: `visualboyadvance-m-qt`; tests: `vbam-qt-config-tests`
+- Android: `tools/android/build-android-qt.sh` builds the APK (package
+  `org.visualboyadvance_m.vbam_qt`, Java/JNI glue shared with wx under
+  `src/qt/android/`); GLES2 renderer (`renderers/gles-panel.*`, `ENABLE_GLES`,
+  also buildable on desktop for testing), AAudio backend (`ENABLE_AAUDIO`),
+  on-screen controller (`widgets/on-screen-controller.*`), SAF staging in
+  `android-compat.*`
+- Target: `visualboyadvance-m-qt`; tests: `vbam-qt-config-tests`; the hidden
+  `--check-dialogs [rom]` flag constructs every dialog and viewer off screen
 
 **src/libretro/** - Libretro core implementation
 - RetroArch/libretro API glue layer

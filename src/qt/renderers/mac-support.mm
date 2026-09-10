@@ -125,3 +125,7 @@ void VbamQtRemoveSdlMetalViews(void* ns_view) {
             [sub removeFromSuperview];
     }
 }
+
+void VbamQtSetAccessoryActivationPolicy() {
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+}

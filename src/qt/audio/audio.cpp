@@ -28,6 +28,10 @@
 #include "qt/audio/internal/xaudio2.h"
 #endif
 
+#if defined(VBAM_ENABLE_AAUDIO)
+#include "qt/audio/internal/aaudio.h"
+#endif
+
 namespace audio {
 
 QString DefaultDeviceName() {
@@ -62,6 +66,11 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 #if defined(__APPLE__)
         case config::AudioApi::kCoreAudio:
             return audio::internal::GetCoreAudioDevices();
+#endif
+
+#if defined(VBAM_ENABLE_AAUDIO)
+        case config::AudioApi::kAAudio:
+            return audio::internal::GetAAudioDevices();
 #endif
 
         case config::AudioApi::kNull:
@@ -102,6 +111,11 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 #if defined(__APPLE__)
         case config::AudioApi::kCoreAudio:
             return audio::internal::CreateCoreAudioDriver();
+#endif
+
+#if defined(VBAM_ENABLE_AAUDIO)
+        case config::AudioApi::kAAudio:
+            return audio::internal::CreateAAudioDriver();
 #endif
 
         case config::AudioApi::kNull:

@@ -4,6 +4,8 @@
 
 #include "qt/sys.h"
 
+#include "qt/android-compat.h"
+
 #include <algorithm>
 #include <cstdarg>
 #include <cstdio>
@@ -318,6 +320,11 @@ void systemStartGameRecording(const QString& fname, MVFormatID format)
     mf->enable_menus();
 }
 
+QString systemGameRecordingFile()
+{
+    return game_recording ? game_file.fileName() : QString();
+}
+
 void systemStopGameRecording()
 {
     if (!game_recording)
@@ -326,6 +333,8 @@ void systemStopGameRecording()
     bool ok = WriteU32(game_file, qToLittleEndian(game_frame)) &&
               WriteU32(game_file, qToLittleEndian(game_joypad));
     game_file.close();
+    // Android content:// staging: transfer the finished movie (no-op elsewhere).
+    VbamCommitAndroidOutputFile(game_file.fileName());
     if (!ok || game_file.error() != QFile::NoError)
         vbam::LogError(TR("Error writing game recording"));
 

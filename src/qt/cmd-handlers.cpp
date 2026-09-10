@@ -6,6 +6,8 @@
 
 #include "qt/main-window.h"
 
+#include "qt/android-compat.h"
+
 #include <cstring>
 
 #include <QAction>
@@ -35,7 +37,9 @@
 #include "core/gba/gba.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaPrint.h"
+#if defined(VBAM_ENABLE_DEBUGGER)
 #include "core/gba/gbaRemote.h"
+#endif
 #include "core/gba/gbaSound.h"
 #include "qt/app.h"
 #include "qt/config/cmdtab.h"
@@ -113,7 +117,17 @@ QString RunFileDialog(MainWindow* frame, QFileDialog& dlg) {
         return QString();
     }
     const QStringList files = dlg.selectedFiles();
-    return files.isEmpty() ? QString() : files.first();
+    if (files.isEmpty()) {
+        return QString();
+    }
+    // On Android the picker returns content:// URIs; hand the caller a real
+    // file instead (a copy for reading, a staging file for writing that is
+    // transferred back once the command has finished, see ExecuteCommand()).
+    // Pass-throughs elsewhere.
+    if (dlg.acceptMode() == QFileDialog::AcceptSave) {
+        return VbamStageAndroidOutputFile(files.first(), QString());
+    }
+    return VbamResolveAndroidContentUri(files.first());
 }
 
 // Helper function to get list of valid plugin paths.
@@ -2053,6 +2067,20 @@ void MainWindow::OnNoop() {
 // Command dispatch.
 
 bool MainWindow::ExecuteCommand(int cmd_id) {
+    const bool handled = DispatchCommand(cmd_id);
+    // Android: transfer the files the command wrote into staged content://
+    // documents back to their documents. Recordings stay open until their
+    // stop command, which commits them itself (GameArea::Stop*Recording,
+    // systemStopGameRecording).
+    QStringList keep;
+    if (panel) {
+        keep << panel->RecordingFiles();
+    }
+    VbamCommitPendingAndroidOutputFiles(keep);
+    return handled;
+}
+
+bool MainWindow::DispatchCommand(int cmd_id) {
     // Commands with an enable mask are refused while disabled, whatever the
     // source (menu, shortcut, command line).
     for (const cmditem& cmd_item : cmdtab) {

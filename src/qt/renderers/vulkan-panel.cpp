@@ -17,6 +17,15 @@
 #elif defined(Q_OS_MACOS)
 #include <vulkan/vulkan_metal.h>
 #include "qt/renderers/mac-support.h"
+#elif defined(Q_OS_ANDROID)
+#include <android/log.h>
+#include <android/native_window.h>
+#include <vulkan/vulkan_android.h>
+#include "qt/android-compat.h"
+#include "qt/app.h"
+#include "qt/game-area.h"
+#include "qt/main-window.h"
+#include "qt/widgets/on-screen-controller.h"
 #elif defined(Q_OS_UNIX)
 #include <QtGui/qguiapplication_platform.h>
 #if __has_include(<xcb/xcb.h>)
@@ -134,6 +143,8 @@ PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
 #define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateWin32SurfaceKHR)
 #elif defined(Q_OS_MACOS)
 #define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateMetalSurfaceEXT)
+#elif defined(Q_OS_ANDROID)
+#define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateAndroidSurfaceKHR)
 #else
 #if defined(VBAM_VK_HAVE_XCB) && defined(VBAM_VK_HAVE_XLIB)
 #define VBAM_VK_SURFACE_FUNCS(F) F(vkCreateXcbSurfaceKHR) F(vkCreateXlibSurfaceKHR)
@@ -182,6 +193,9 @@ bool VulkanBootstrap() {
     names << QStringLiteral("vulkan") << QStringLiteral("libvulkan.1.dylib")
           << QStringLiteral("/usr/local/lib/libvulkan.1.dylib")
           << QStringLiteral("/opt/homebrew/lib/libvulkan.1.dylib");
+#elif defined(Q_OS_ANDROID)
+    // The platform loader; every Vulkan-capable device ships it.
+    names << QStringLiteral("libvulkan.so") << QStringLiteral("vulkan");
 #else
     names << QStringLiteral("libvulkan.so.1") << QStringLiteral("libvulkan.so")
           << QStringLiteral("vulkan");
@@ -261,6 +275,9 @@ VKDrawingPanel::~VKDrawingPanel() {
         vkDeviceWaitIdle(device_);
 
     DestroyTexture();
+#if defined(Q_OS_ANDROID)
+    DestroyOverlayTexture();
+#endif
 
     for (int i = 0; i < kMaxFramesInFlight; ++i) {
         if (image_available_sem_[i]) vkDestroySemaphore(device_, image_available_sem_[i], nullptr);
@@ -274,6 +291,9 @@ VKDrawingPanel::~VKDrawingPanel() {
 
     if (desc_pool_) vkDestroyDescriptorPool(device_, desc_pool_, nullptr);
     if (pipeline_) vkDestroyPipeline(device_, pipeline_, nullptr);
+#if defined(Q_OS_ANDROID)
+    if (osc_pipeline_) vkDestroyPipeline(device_, osc_pipeline_, nullptr);
+#endif
     if (pipeline_layout_) vkDestroyPipelineLayout(device_, pipeline_layout_, nullptr);
     if (desc_set_layout_) vkDestroyDescriptorSetLayout(device_, desc_set_layout_, nullptr);
     if (render_pass_) vkDestroyRenderPass(device_, render_pass_, nullptr);
@@ -281,6 +301,16 @@ VKDrawingPanel::~VKDrawingPanel() {
     if (device_) vkDestroyDevice(device_, nullptr);
     if (surface_) vkDestroySurfaceKHR(instance_, surface_, nullptr);
     if (instance_) vkDestroyInstance(instance_, nullptr);
+
+#if defined(Q_OS_ANDROID)
+    // Release our ANativeWindow reference and drop the overlay SurfaceView it
+    // came from, after the Vulkan surface built on it is gone.
+    if (android_window_) {
+        ANativeWindow_release(static_cast<ANativeWindow*>(android_window_));
+        android_window_ = nullptr;
+        VbamDestroyAndroidVideoSurface();
+    }
+#endif
 }
 
 // ─── CreateInstance ───────────────────────────────────────────────────────────
@@ -316,6 +346,13 @@ bool VKDrawingPanel::CreateInstance() {
     }
     if (HasInstanceExtension(inst_exts, VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
         extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+#elif defined(Q_OS_ANDROID)
+    // Required by CreateSurface()'s vkCreateAndroidSurfaceKHR.
+    if (!HasInstanceExtension(inst_exts, VK_KHR_ANDROID_SURFACE_EXTENSION_NAME)) {
+        vbam::LogDebug(QStringLiteral("Vulkan: VK_KHR_android_surface not available"));
+        return false;
+    }
+    extensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 #else
     // Only the surface extensions the loader exposes: requesting a missing one
     // fails vkCreateInstance with VK_ERROR_EXTENSION_NOT_PRESENT.
@@ -382,6 +419,27 @@ bool VKDrawingPanel::CreateSurface() {
     ci.sType = VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT;
     ci.pLayer = static_cast<const CAMetalLayer*>(metal_layer_);
     res = vkCreateMetalSurfaceEXT(instance_, &ci, nullptr, &surface_);
+#elif defined(Q_OS_ANDROID)
+    // VK_KHR_android_surface takes an ANativeWindow*, which Qt's Android QPA
+    // exposes for no QWindow: every widget is drawn into the activity's single
+    // QtSurface. Take the route Qt's own QAndroidPlatformVulkanWindow does and
+    // attach a SurfaceView to the activity over this panel's on-screen rect,
+    // rendering into its Surface's ANativeWindow. The rect comes from this
+    // widget, not from its top-level window: the overlay has to cover exactly
+    // the panel, or the picture is centred in the wrong box (a window-sized
+    // overlay also runs under the action bar and past the bottom of the screen).
+    if (!vkCreateAndroidSurfaceKHR)
+        return false;
+    if (!android_window_)
+        android_window_ = VbamCreateAndroidVideoSurface(this);
+    if (!android_window_) {
+        vbam::LogError(Tr("Failed to obtain an Android native window for the Vulkan surface"));
+        return false;
+    }
+    VkAndroidSurfaceCreateInfoKHR ci{};
+    ci.sType = VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR;
+    ci.window = static_cast<ANativeWindow*>(android_window_);
+    res = vkCreateAndroidSurfaceKHR(instance_, &ci, nullptr, &surface_);
 #else
     if (QGuiApplication::platformName() != QLatin1String("xcb")) {
         // Wayland: Qt exposes no public wl_surface for a widget; GameArea falls
@@ -598,9 +656,19 @@ bool VKDrawingPanel::CreateSwapchain() {
         ci.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
 
-    ci.preTransform = (caps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
-                          ? VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
-                          : caps.currentTransform;
+    // Present without any transform of the presentation engine's own: ask for
+    // the surface's currentTransform, then rotate our quad to match (the shader
+    // gets the matrix through push constants). On Android currentTransform is
+    // ROTATE_90/180/270 whenever the window orientation differs from the
+    // panel's natural one, and currentExtent is reported in that pre-transformed
+    // space -- drawing an unrotated quad into it is what tips the picture over.
+    // A driver that cannot take currentTransform back gets identity, and then
+    // does the rotation itself, so the picture stays upright either way.
+    if (caps.supportedTransforms & caps.currentTransform)
+        swapchain_pre_transform_ = caps.currentTransform;
+    else
+        swapchain_pre_transform_ = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    ci.preTransform = swapchain_pre_transform_;
     ci.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     ci.presentMode = chosen_mode;
     ci.clipped = VK_TRUE;
@@ -619,10 +687,60 @@ bool VKDrawingPanel::CreateSwapchain() {
     swapchain_images_.resize(sc_count);
     vkGetSwapchainImagesKHR(device_, swapchain_, &sc_count, swapchain_images_.data());
 
-    vbam::LogDebug(QStringLiteral("Vulkan swapchain created: %1x%2, %3 images, vsync=%4")
+    vbam::LogDebug(QStringLiteral("Vulkan swapchain created: %1x%2, %3 images, vsync=%4, "
+                                  "pre-transform=0x%5")
                        .arg(extent.width).arg(extent.height).arg(sc_count)
-                       .arg(vsync_ ? QStringLiteral("on") : QStringLiteral("off")));
+                       .arg(vsync_ ? QStringLiteral("on") : QStringLiteral("off"))
+                       .arg(static_cast<unsigned>(swapchain_pre_transform_), 0, 16));
+#if defined(Q_OS_ANDROID)
+    // The one line worth having in logcat when the panel misbehaves on a device.
+    __android_log_print(ANDROID_LOG_INFO, "VBAM",
+                        "VK swapchain %ux%u images=%u pre-transform=0x%x panel=%dx%d",
+                        extent.width, extent.height, sc_count,
+                        static_cast<unsigned>(swapchain_pre_transform_), QWidget::width(),
+                        QWidget::height());
+#endif
     return true;
+}
+
+// ─── PreTransformMatrix ───────────────────────────────────────────────────────
+//
+// The swapchain images live in the surface's pre-transformed space, which for a
+// rotated surface is the display's space turned by -preTransform. Geometry is
+// therefore built in display-oriented NDC and mapped over with this matrix; a
+// VK_SURFACE_TRANSFORM_ROTATE_90 surface wants its content rotated 90 degrees
+// clockwise, which in Vulkan's y-down clip space is (x, y) -> (-y, x).
+void VKDrawingPanel::PreTransformMatrix(float out_mat[4]) const {
+    // Rotation, then the mirror (x negation) that the MIRROR variants prepend.
+    float c = 1.f, s = 0.f;
+    switch (swapchain_pre_transform_) {
+        case VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR:
+            c = 0.f; s = 1.f; break;
+        case VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR:
+            c = -1.f; s = 0.f; break;
+        case VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR:
+            c = 0.f; s = -1.f; break;
+        default:  // IDENTITY, HORIZONTAL_MIRROR, INHERIT
+            break;
+    }
+    float mirror = 1.f;
+    switch (swapchain_pre_transform_) {
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR:
+        case VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR:
+            mirror = -1.f; break;
+        default:
+            break;
+    }
+    // rotate(c, s) * mirror(x)
+    out_mat[0] = c * mirror;
+    out_mat[1] = -s;
+    out_mat[2] = s * mirror;
+    out_mat[3] = c;
 }
 
 void VKDrawingPanel::DestroySwapchain() {
@@ -866,6 +984,26 @@ bool VKDrawingPanel::CreateGraphicsPipeline() {
 
     res = vkCreateGraphicsPipelines(device_, VK_NULL_HANDLE, 1, &pipe_ci, nullptr, &pipeline_);
 
+#if defined(Q_OS_ANDROID)
+    // Same pipeline with straight-alpha blending, for the on-screen controller
+    // overlay composited over the frame (see UpdateOverlayTexture).
+    if (res == VK_SUCCESS) {
+        blend_att.blendEnable = VK_TRUE;
+        blend_att.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        blend_att.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_att.colorBlendOp = VK_BLEND_OP_ADD;
+        blend_att.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        blend_att.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        blend_att.alphaBlendOp = VK_BLEND_OP_ADD;
+        if (vkCreateGraphicsPipelines(device_, VK_NULL_HANDLE, 1, &pipe_ci, nullptr,
+                                      &osc_pipeline_) != VK_SUCCESS) {
+            // Not fatal: the frame still presents, only the overlay is missing.
+            vbam::LogDebug(QStringLiteral("Vulkan: failed to create the overlay pipeline"));
+            osc_pipeline_ = VK_NULL_HANDLE;
+        }
+    }
+#endif
+
     vkDestroyShaderModule(device_, vert_mod, nullptr);
     vkDestroyShaderModule(device_, frag_mod, nullptr);
 
@@ -927,13 +1065,15 @@ bool VKDrawingPanel::CreateSyncObjects() {
 }
 
 bool VKDrawingPanel::CreateDescriptorPoolAndSet() {
+    // Two sets: the emulator frame, plus the on-screen controller overlay the
+    // Android path composites on top of it (see UpdateOverlayTexture).
     VkDescriptorPoolSize pool_size{};
     pool_size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    pool_size.descriptorCount = 1;
+    pool_size.descriptorCount = 2;
 
     VkDescriptorPoolCreateInfo ci{};
     ci.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    ci.maxSets = 1;
+    ci.maxSets = 2;
     ci.poolSizeCount = 1;
     ci.pPoolSizes = &pool_size;
 
@@ -954,6 +1094,14 @@ bool VKDrawingPanel::CreateDescriptorPoolAndSet() {
         vbam::LogError(Tr("Failed to allocate descriptor set: %1").arg(static_cast<int>(res)));
         return false;
     }
+#if defined(Q_OS_ANDROID)
+    res = vkAllocateDescriptorSets(device_, &ai, &osc_desc_set_);
+    if (res != VK_SUCCESS) {
+        // Not fatal: the frame still presents, only the overlay is missing.
+        vbam::LogDebug(QStringLiteral("Vulkan: failed to allocate the overlay descriptor set"));
+        osc_desc_set_ = VK_NULL_HANDLE;
+    }
+#endif
     return true;
 }
 
@@ -1108,6 +1256,244 @@ void VKDrawingPanel::DestroyTexture() {
 }
 
 // ─── Init / resize ───────────────────────────────────────────────────────────
+#if defined(Q_OS_ANDROID)
+// ─── Android overlay ─────────────────────────────────────────────────────────
+
+void VKDrawingPanel::SyncAndroidOverlayGeometry() {
+    if (!android_window_)
+        return;
+    VbamSetAndroidVideoSurfaceGeometry(this);
+}
+
+// The Android swapchain presents into a SurfaceView stacked over the Qt
+// content, which hides the on-screen controller widget living under it. Render
+// that widget to RGBA and keep it in a texture here so Present() can composite
+// it over the emulator frame; the widget stays where it is and keeps receiving
+// touches.
+bool VKDrawingPanel::UpdateOverlayTexture(VkCommandBuffer cmd) {
+    if (!osc_desc_set_ || !osc_pipeline_)
+        return false;
+
+    MainWindow* frame = vbamApp().frame;
+    GameArea* game_area = frame ? frame->GetPanel() : nullptr;
+    widgets::OnScreenController* osc = game_area ? game_area->on_screen_controller() : nullptr;
+    if (!osc || !osc->isVisible())
+        return false;
+
+    // Keep the controller inside the visible area. GameArea does this too when
+    // it (re)creates the overlay, but the content size only becomes known once
+    // the activity has laid the video surface out, which can be later than that.
+    {
+        int visible_w = 0, visible_h = 0;
+        if (VbamAndroidVisibleClientSize(this, &visible_w, &visible_h)) {
+            const QSize want(std::min(QWidget::width(), visible_w),
+                             std::min(QWidget::height(), visible_h));
+            if (osc->size() != want)
+                osc->resize(want);
+        }
+    }
+
+    const QSize osc_size = osc->size();
+    if (osc_size.width() < 1 || osc_size.height() < 1)
+        return false;
+
+    const bool resized = static_cast<uint32_t>(osc_size.width()) != osc_width_ ||
+                         static_cast<uint32_t>(osc_size.height()) != osc_height_;
+    if (!resized && osc_revision_ == osc->revision())
+        return osc_image_ != VK_NULL_HANDLE;  // unchanged, reuse the texture
+
+    // Render at device resolution: the texture is presented 1:1 into a native
+    // surface, so the widget's logical size would come out soft.
+    const double osc_scale = osc->devicePixelRatioF() > 0 ? osc->devicePixelRatioF() : 1.0;
+
+    std::vector<uint8_t> pixels;
+    int w = 0, h = 0;
+    if (!osc->RenderRgba(&pixels, &w, &h, osc_scale) || w < 1 || h < 1) {
+        static bool warned = false;  // once per session, not at 60 Hz
+        if (!warned) {
+            warned = true;
+            __android_log_print(ANDROID_LOG_WARN, "VBAM",
+                                "on-screen controller render failed (%dx%d)", osc_size.width(),
+                                osc_size.height());
+        }
+        return false;
+    }
+
+    if (osc_image_ == VK_NULL_HANDLE || static_cast<uint32_t>(w) != osc_width_ ||
+        static_cast<uint32_t>(h) != osc_height_) {
+        // A frame still in flight may be sampling the old image through the
+        // overlay descriptor set, and both are about to be replaced. Resizes are
+        // rare (panel geometry changes), so idling here costs nothing.
+        if (osc_image_ != VK_NULL_HANDLE)
+            vkDeviceWaitIdle(device_);
+        DestroyOverlayTexture();
+
+        VkImageCreateInfo img_ci{};
+        img_ci.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        img_ci.imageType = VK_IMAGE_TYPE_2D;
+        img_ci.format = VK_FORMAT_R8G8B8A8_UNORM;
+        img_ci.extent = {static_cast<uint32_t>(w), static_cast<uint32_t>(h), 1};
+        img_ci.mipLevels = 1;
+        img_ci.arrayLayers = 1;
+        img_ci.samples = VK_SAMPLE_COUNT_1_BIT;
+        img_ci.tiling = VK_IMAGE_TILING_OPTIMAL;
+        img_ci.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        img_ci.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        if (vkCreateImage(device_, &img_ci, nullptr, &osc_image_) != VK_SUCCESS) {
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        VkMemoryRequirements mem_req;
+        vkGetImageMemoryRequirements(device_, osc_image_, &mem_req);
+        VkMemoryAllocateInfo alloc{};
+        alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc.allocationSize = mem_req.size;
+        alloc.memoryTypeIndex =
+            FindMemoryType(mem_req.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        if (alloc.memoryTypeIndex == UINT32_MAX ||
+            vkAllocateMemory(device_, &alloc, nullptr, &osc_memory_) != VK_SUCCESS) {
+            DestroyOverlayTexture();
+            return false;
+        }
+        vkBindImageMemory(device_, osc_image_, osc_memory_, 0);
+
+        VkImageViewCreateInfo view_ci{};
+        view_ci.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_ci.image = osc_image_;
+        view_ci.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_ci.format = VK_FORMAT_R8G8B8A8_UNORM;
+        view_ci.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view_ci.subresourceRange.levelCount = 1;
+        view_ci.subresourceRange.layerCount = 1;
+        if (vkCreateImageView(device_, &view_ci, nullptr, &osc_view_) != VK_SUCCESS) {
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        // Sampled 1:1 (drawn at panel resolution); linear only softens its
+        // edges while the surface is being resized.
+        VkSamplerCreateInfo samp_ci{};
+        samp_ci.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samp_ci.magFilter = VK_FILTER_LINEAR;
+        samp_ci.minFilter = VK_FILTER_LINEAR;
+        samp_ci.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+        samp_ci.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+        samp_ci.maxLod = 0.0f;
+        if (vkCreateSampler(device_, &samp_ci, nullptr, &osc_sampler_) != VK_SUCCESS) {
+            DestroyOverlayTexture();
+            return false;
+        }
+
+        VkDescriptorImageInfo img_info{};
+        img_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        img_info.imageView = osc_view_;
+        img_info.sampler = osc_sampler_;
+
+        VkWriteDescriptorSet write{};
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstSet = osc_desc_set_;
+        write.dstBinding = 0;
+        write.descriptorCount = 1;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write.pImageInfo = &img_info;
+        vkUpdateDescriptorSets(device_, 1, &write, 0, nullptr);
+
+        osc_width_ = static_cast<uint32_t>(w);
+        osc_height_ = static_cast<uint32_t>(h);
+    }
+
+    const VkDeviceSize needed = static_cast<VkDeviceSize>(w) * h * 4;
+    if (needed > osc_staging_size_) {
+        if (osc_staging_buffer_) {
+            vkDestroyBuffer(device_, osc_staging_buffer_, nullptr);
+            vkFreeMemory(device_, osc_staging_memory_, nullptr);
+            osc_staging_buffer_ = VK_NULL_HANDLE;
+            osc_staging_memory_ = VK_NULL_HANDLE;
+        }
+        VkBufferCreateInfo buf_ci{};
+        buf_ci.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buf_ci.size = needed;
+        buf_ci.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        if (vkCreateBuffer(device_, &buf_ci, nullptr, &osc_staging_buffer_) != VK_SUCCESS)
+            return false;
+
+        VkMemoryRequirements stg_req;
+        vkGetBufferMemoryRequirements(device_, osc_staging_buffer_, &stg_req);
+        VkMemoryAllocateInfo stg_alloc{};
+        stg_alloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        stg_alloc.allocationSize = stg_req.size;
+        stg_alloc.memoryTypeIndex =
+            FindMemoryType(stg_req.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        if (stg_alloc.memoryTypeIndex == UINT32_MAX ||
+            vkAllocateMemory(device_, &stg_alloc, nullptr, &osc_staging_memory_) != VK_SUCCESS)
+            return false;
+        vkBindBufferMemory(device_, osc_staging_buffer_, osc_staging_memory_, 0);
+        osc_staging_size_ = needed;
+    }
+
+    void* mapped = nullptr;
+    if (vkMapMemory(device_, osc_staging_memory_, 0, needed, 0, &mapped) != VK_SUCCESS)
+        return false;
+    memcpy(mapped, pixels.data(), static_cast<size_t>(needed));
+    vkUnmapMemory(device_, osc_staging_memory_);
+
+    VkImageMemoryBarrier to_dst{};
+    to_dst.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    to_dst.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    to_dst.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    to_dst.image = osc_image_;
+    to_dst.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+    to_dst.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         0, 0, nullptr, 0, nullptr, 1, &to_dst);
+
+    VkBufferImageCopy copy{};
+    copy.bufferRowLength = static_cast<uint32_t>(w);
+    copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+    copy.imageExtent = {static_cast<uint32_t>(w), static_cast<uint32_t>(h), 1};
+    vkCmdCopyBufferToImage(cmd, osc_staging_buffer_, osc_image_,
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copy);
+
+    VkImageMemoryBarrier to_read = to_dst;
+    to_read.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    to_read.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    to_read.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    to_read.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1,
+                         &to_read);
+
+    if (osc_revision_ == 0)
+        __android_log_print(ANDROID_LOG_INFO, "VBAM",
+                            "on-screen controller overlay uploaded %dx%d", w, h);
+    osc_revision_ = osc->revision();
+    return true;
+}
+
+void VKDrawingPanel::DestroyOverlayTexture() {
+    if (osc_sampler_) { vkDestroySampler(device_, osc_sampler_, nullptr); osc_sampler_ = VK_NULL_HANDLE; }
+    if (osc_view_) { vkDestroyImageView(device_, osc_view_, nullptr); osc_view_ = VK_NULL_HANDLE; }
+    if (osc_image_) { vkDestroyImage(device_, osc_image_, nullptr); osc_image_ = VK_NULL_HANDLE; }
+    if (osc_memory_) { vkFreeMemory(device_, osc_memory_, nullptr); osc_memory_ = VK_NULL_HANDLE; }
+    if (osc_staging_buffer_) {
+        vkDestroyBuffer(device_, osc_staging_buffer_, nullptr);
+        osc_staging_buffer_ = VK_NULL_HANDLE;
+    }
+    if (osc_staging_memory_) {
+        vkFreeMemory(device_, osc_staging_memory_, nullptr);
+        osc_staging_memory_ = VK_NULL_HANDLE;
+    }
+    osc_staging_size_ = 0;
+    osc_width_ = 0;
+    osc_height_ = 0;
+    osc_revision_ = 0;
+}
+#endif  // Q_OS_ANDROID
+
 void VKDrawingPanel::DrawingPanelInit() {
     DrawingPanelBase::DrawingPanelInit();
 
@@ -1124,6 +1510,12 @@ void VKDrawingPanel::DrawingPanelInit() {
 
 void VKDrawingPanel::OnNativeResize(const QSize& device_pixels) {
     (void)device_pixels;
+#if defined(Q_OS_ANDROID)
+    // The overlay SurfaceView follows the panel; the swapchain follows the
+    // surface once Android has laid it out (see Present()).
+    android_overlay_size_ = QWidget::size();
+    SyncAndroidOverlayGeometry();
+#endif
     if (device_)
         swapchain_dirty_ = true;
 }
@@ -1132,6 +1524,35 @@ void VKDrawingPanel::OnNativeResize(const QSize& device_pixels) {
 void VKDrawingPanel::Present() {
     if (!device_ || !swapchain_ || init_failed_)
         return;
+
+#if defined(Q_OS_ANDROID)
+    // The overlay SurfaceView is created before GameArea lays the panel out, so
+    // glue it to the panel rect as soon as that rect is real (and whenever it
+    // changes without a resize event reaching us).
+    const QSize panel_size = QWidget::size();
+    if (panel_size != android_overlay_size_ && panel_size.width() > 1 &&
+        panel_size.height() > 1) {
+        android_overlay_size_ = panel_size;
+        SyncAndroidOverlayGeometry();
+    }
+
+    // That resize lands on the Android UI thread, so the surface follows a few
+    // frames later; rebuild the swapchain whenever the surface no longer matches
+    // it instead of waiting for a VK_ERROR_OUT_OF_DATE_KHR that a driver may not
+    // report. Also covers the tiny surface the constructor starts out with.
+    {
+        VkSurfaceCapabilitiesKHR caps{};
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device_, surface_, &caps) ==
+                VK_SUCCESS &&
+            caps.currentExtent.width != UINT32_MAX &&
+            (caps.currentExtent.width != swapchain_extent_.width ||
+             caps.currentExtent.height != swapchain_extent_.height)) {
+            if (caps.currentExtent.width == 0 || caps.currentExtent.height == 0)
+                return;  // surface not presentable yet
+            swapchain_dirty_ = true;
+        }
+    }
+#endif
 
     if (swapchain_dirty_ && !RecreateSwapchain())
         return;
@@ -1303,6 +1724,12 @@ void VKDrawingPanel::Present() {
                              VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1,
                              &to_read);
 
+        // The overlay upload has to happen outside the render pass too.
+        bool draw_overlay = false;
+#if defined(Q_OS_ANDROID)
+        draw_overlay = UpdateOverlayTexture(cmd);
+#endif
+
         VkClearValue clear_val{};
         clear_val.color = {{0.f, 0.f, 0.f, 1.f}};
 
@@ -1331,14 +1758,81 @@ void VKDrawingPanel::Present() {
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0, 1,
                                 &desc_set_, 0, nullptr);
 
-        // Full-surface quad (the widget is already aspect-fitted by GameArea),
-        // identity pre-rotation.
-        const float pc[12] = {0.f, 0.f, 1.f, 1.f, -1.f, -1.f, 1.f, 1.f, 1.f, 0.f, 0.f, 1.f};
+        // On the desktop the widget is already aspect-fitted by GameArea, so
+        // the frame fills the surface. On Android the panel is handed the whole
+        // game area and the picture is letterboxed here, in display-oriented
+        // space, like the GLES renderer does.
+        float dst_x0 = -1.f, dst_y0 = -1.f, dst_x1 = 1.f, dst_y1 = 1.f;
+#if defined(Q_OS_ANDROID)
+        // Overlay crop: how much of the panel the surface actually covers, in
+        // 0..1 of the on-screen controller texture. 1,1 unless the surface was
+        // clipped (see below).
+        float osc_u1 = 1.f, osc_v1 = 1.f;
+        {
+            // The panel widget can be larger than the visible drawing area --
+            // Qt's window overhangs the Android content view below the action
+            // bar -- and the SurfaceView is clamped to that area, so the
+            // surface, not the panel, is what the picture has to fit. Take the
+            // extent as display-oriented, flipping it when the driver reports
+            // pre-rotated extents (they differ).
+            float surf_w = static_cast<float>(swapchain_extent_.width);
+            float surf_h = static_cast<float>(swapchain_extent_.height);
+            const float win_w = static_cast<float>(QWidget::width());
+            const float win_h = static_cast<float>(QWidget::height());
+            if (win_w >= 1.f && win_h >= 1.f && (win_w >= win_h) != (surf_w >= surf_h))
+                std::swap(surf_w, surf_h);
+
+            // The overlay texture is rendered at device resolution from the
+            // controller widget, itself clamped to the visible area, so this
+            // normally resolves to the whole texture.
+            if (osc_width_ >= 1 && osc_height_ >= 1) {
+                osc_u1 = std::min(1.f, surf_w / static_cast<float>(osc_width_));
+                osc_v1 = std::min(1.f, surf_h / static_cast<float>(osc_height_));
+            }
+
+            const float tex_aspect = static_cast<float>(scaled_width) / static_cast<float>(scaled_height);
+            const float win_aspect = surf_w / surf_h;
+            if (win_aspect > tex_aspect) {
+                const float ndc_w = tex_aspect / win_aspect;
+                dst_x0 = -ndc_w;
+                dst_x1 = ndc_w;
+            } else {
+                const float ndc_h = win_aspect / tex_aspect;
+                dst_y0 = -ndc_h;
+                dst_y1 = ndc_h;
+            }
+        }
+#endif
+
+        float rot[4];
+        PreTransformMatrix(rot);
+
+        const float pc[12] = {0.f, 0.f, 1.f, 1.f, dst_x0, dst_y0, dst_x1, dst_y1,
+                              rot[0], rot[1], rot[2], rot[3]};
         vkCmdPushConstants(cmd, pipeline_layout_,
                            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
                            sizeof(pc), pc);
 
         vkCmdDraw(cmd, 4, 1, 0, 0);
+
+        // The on-screen controller covers the whole panel and is blended over
+        // the frame, letterbox bars included -- the way the widget would look
+        // if it were visible above this surface.
+        if (draw_overlay) {
+#if defined(Q_OS_ANDROID)
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, osc_pipeline_);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout_, 0,
+                                    1, &osc_desc_set_, 0, nullptr);
+            // Sampling only the covered part of the overlay keeps the controls
+            // where the widget itself puts them, so touches still line up.
+            const float osc_pc[12] = {0.f, 0.f, osc_u1, osc_v1, -1.f, -1.f, 1.f, 1.f,
+                                      rot[0], rot[1], rot[2], rot[3]};
+            vkCmdPushConstants(cmd, pipeline_layout_,
+                               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+                               sizeof(osc_pc), osc_pc);
+            vkCmdDraw(cmd, 4, 1, 0, 0);
+#endif
+        }
         vkCmdEndRenderPass(cmd);
     }
 

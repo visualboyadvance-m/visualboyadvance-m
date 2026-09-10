@@ -47,6 +47,8 @@ std::vector<char*> getSupMovExtsToPlayback();
 
 // Game (input) recording / playback; these integrate with systemReadJoypad.
 void systemStartGameRecording(const QString& fname, MVFormatID format);
+// Path of the movie being recorded, empty when none.
+QString systemGameRecordingFile();
 void systemStopGameRecording();
 void systemStartGamePlayback(const QString& fname, MVFormatID format);
 void systemStopGamePlayback();

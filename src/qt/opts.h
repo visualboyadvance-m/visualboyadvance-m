@@ -60,9 +60,19 @@ extern struct opts_t {
     RecentFiles recent;
 
     /// UI Config
+#if defined(__ANDROID__)
+    // The menu bar is the activity's action bar, a strip taken off an already
+    // small screen; on touch devices there is no keyboard or gamepad, so the
+    // on-screen controller is on; and a phone blanks its screen after a minute
+    // without touches, which is fatal with a gamepad, so hold the display awake.
+    bool hide_menu_bar = true;
+    bool show_onscreen_controller = true;
+    bool suspend_screensaver = true;
+#else
     bool hide_menu_bar = false;
     bool show_onscreen_controller = false;
     bool suspend_screensaver = false;
+#endif
 } gopts;
 
 // call to load config (once)

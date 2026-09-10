@@ -8,6 +8,7 @@
 
 #include <QPoint>
 #include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QWidget>
 
@@ -22,6 +23,10 @@
 
 class MainWindow;
 class DrawingPanelBase;
+
+namespace widgets {
+class OnScreenController;
+}  // namespace widgets
 class QVBoxLayout;
 
 // Set on first launch (no config file yet) to arm the one-time runtime
@@ -139,6 +144,9 @@ public:
     void AddFrame(const uint16_t* data, int length); // audio
     bool IsRecording() { return snd_rec.IsRecording() || vid_rec.IsRecording(); }
 #endif
+    // Files a recorder is currently writing (see android-compat.h).
+    QStringList RecordingFiles() const;
+
     void StartGameRecording(const QString& fname);
     void StopGameRecording();
     void StartGamePlayback(const QString& fname);
@@ -163,6 +171,9 @@ public:
 
     // The widget currently presenting frames (the drawing panel), or nullptr.
     QWidget* PanelWidget() const;
+
+    // The live on-screen controller overlay, or nullptr when there is none.
+    widgets::OnScreenController* on_screen_controller() const { return osc_; }
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -195,6 +206,9 @@ private:
 
 #ifndef NO_FFMPEG
     recording::MediaRecorder snd_rec, vid_rec;
+    // The files the recorders write to; on Android these may be SAF staging
+    // files that are transferred to the document when the recording stops.
+    QString snd_rec_file_, vid_rec_file_;
 #endif
 
     void MouseActivity();
@@ -251,6 +265,17 @@ private:
     std::unique_ptr<config::OptionsObserver> audio_volume_observer_;
     std::unique_ptr<config::OptionsObserver> audio_observer_;
     std::unique_ptr<config::OptionsObserver> menu_bar_observer_;
+
+    // On-screen touch controller overlay. Created lazily and kept stacked
+    // above the render panel; on by default on Android, optional elsewhere
+    // (kUIShowOnScreenController).
+    widgets::OnScreenController* osc_ = nullptr;
+    std::unique_ptr<config::OptionsObserver> osc_observer_;
+    // Creates/shows/hides and resizes the overlay to match
+    // kUIShowOnScreenController and whether a game is loaded.
+    void UpdateOnScreenController();
+    // Pops up the application menu (invoked by the overlay's Menu button).
+    void ShowOnScreenMenu();
 };
 
 // QString version of OSD message

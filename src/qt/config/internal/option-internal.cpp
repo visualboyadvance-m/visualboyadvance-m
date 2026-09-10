@@ -68,6 +68,9 @@ static const std::array<QString, kNbRenderMethods> kRenderMethodStrings = {
     QStringLiteral("simple"),
     QStringLiteral("opengl"),
     QStringLiteral("sdl_video"),
+#if defined(VBAM_ENABLE_GLES)
+    QStringLiteral("gles"),
+#endif
 #if defined(_WIN32)
 #if !defined(NO_D3D12)
     QStringLiteral("direct3d12"),

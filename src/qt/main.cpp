@@ -15,6 +15,15 @@
 #include "qt/app.h"
 
 int main(int argc, char** argv) {
+#if defined(__APPLE__)
+    // Developer aid: with VBAM_QT_NO_ACTIVATE set, a test instance launched from
+    // a terminal must not take the keyboard focus. Qt turns the process into a
+    // foreground app (and activates it) in the Cocoa platform plugin unless
+    // told otherwise, so this has to be decided before QApplication exists.
+    if (qEnvironmentVariableIsSet("VBAM_QT_NO_ACTIVATE")) {
+        qputenv("QT_MAC_DISABLE_FOREGROUND_APPLICATION_TRANSFORM", "1");
+    }
+#endif
     // Consistent names for the configuration paths. DO NOT TRANSLATE.
     QCoreApplication::setOrganizationName("visualboyadvance-m");
     QCoreApplication::setOrganizationDomain("visualboyadvance-m.org");

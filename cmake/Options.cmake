@@ -349,7 +349,29 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).
 # Both produce the Vulkan::Vulkan imported target used downstream. The Qt port
 # only needs the headers: it resolves the loader at run time.
-if(VBAM_NEED_GUI_DEPS AND NOT (X86 AND WIN32))
+if(VBAM_NEED_GUI_DEPS AND ANDROID)
+    # The NDK sysroot carries the Vulkan headers and the platform loader
+    # (libvulkan.so, resolved at run time by the Qt port); FindVulkan does not
+    # know to look there, so check the sysroot directly. The wx port has no
+    # Android Vulkan surface path, so this only feeds the Qt port.
+    if(EXISTS "${CMAKE_SYSROOT}/usr/include/vulkan/vulkan.h")
+        set(Vulkan_FOUND ON)
+        set(Vulkan_INCLUDE_DIRS "${CMAKE_SYSROOT}/usr/include")
+    else()
+        set(Vulkan_FOUND OFF)
+    endif()
+
+    if(ENABLE_QT)
+        option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
+    else()
+        set(ENABLE_VULKAN OFF)
+    endif()
+
+    if(ENABLE_VULKAN AND NOT Vulkan_FOUND)
+        message(WARNING "ENABLE_VULKAN=ON but the NDK sysroot has no vulkan/vulkan.h. Disabling Vulkan.")
+        set(ENABLE_VULKAN OFF CACHE BOOL "Enable Vulkan" FORCE)
+    endif()
+elseif(VBAM_NEED_GUI_DEPS AND NOT (X86 AND WIN32))
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
@@ -708,17 +730,30 @@ endif()
 # Android-only backends. Both are native NDK/Qt paths with no counterpart on any
 # other platform, so they are hard-off elsewhere rather than merely defaulted off
 # -- an explicit -DENABLE_AAUDIO=ON on a desktop build would not compile.
-if(ENABLE_WX AND ANDROID)
+if((ENABLE_WX OR ENABLE_QT) AND ANDROID)
     # AAudio is the NDK's low-latency audio output (API 26+). Turning it off
     # leaves SDL as the Android sound backend.
-    option(ENABLE_AAUDIO "Enable AAudio sound output for the wxWidgets port (Android only)" ON)
-
-    # The in-tree GLES2 renderer (a QOpenGLWidget hosted in Qt's scene graph).
-    # Turning it off leaves the software Simple renderer as the only output
-    # module, since neither desktop OpenGL nor SDL video works on wxQt/Android.
-    option(ENABLE_GLES "Enable the OpenGL ES 2 renderer for the wxWidgets port (Android only)" ON)
+    option(ENABLE_AAUDIO "Enable AAudio sound output for the wx and Qt ports (Android only)" ON)
 else()
     set(ENABLE_AAUDIO OFF)
+endif()
+
+# The in-tree GLES2 renderer (a QOpenGLWidget hosted in Qt's scene graph).
+# Turning it off leaves the software Simple renderer as the only output module
+# on Android, since neither desktop OpenGL nor SDL video works on wxQt/Android.
+# For the wx port it only exists on Android; the Qt port's version uses the
+# GLES2 subset through QOpenGLFunctions and so also builds on a desktop GL
+# context, where it is off by default and can be turned on for testing.
+if(ENABLE_WX AND ANDROID)
+    option(ENABLE_GLES "Enable the OpenGL ES 2 renderer for the wxWidgets port (Android only)" ON)
+elseif(ENABLE_QT)
+    if(ANDROID)
+        set(gles_default ON)
+    else()
+        set(gles_default OFF)
+    endif()
+    option(ENABLE_GLES "Enable the OpenGL ES 2 renderer for the Qt port (default on Android)" ${gles_default})
+else()
     set(ENABLE_GLES OFF)
 endif()
 

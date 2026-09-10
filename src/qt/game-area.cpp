@@ -55,13 +55,16 @@
 #include "core/gba/gbaPrint.h"
 #include "core/gba/gbaRtc.h"
 #include "core/gba/gbaSound.h"
+#include "qt/android-compat.h"
 #include "qt/app.h"
+#include "qt/widgets/on-screen-controller.h"
 #include "qt/config/cmdtab.h"
 #include "qt/config/emulated-gamepad.h"
 #include "qt/config/option-id.h"
 #include "qt/config/option-proxy.h"
 #include "qt/config/option.h"
 #include "qt/drawing-panel.h"
+#include "qt/renderers/gles-panel.h"
 #include "qt/renderers/sdl-panel.h"
 #include "qt/widgets/option-binding.h"
 #if defined(_WIN32)
@@ -268,6 +271,59 @@ GameArea::GameArea(QWidget* parent) : QWidget(parent) {
             if (!option->GetBool())
                 ShowMenuBar();
         });
+    osc_observer_ = std::make_unique<config::OptionsObserver>(
+        config::OptionID::kUIShowOnScreenController,
+        [this](config::Option*) { UpdateOnScreenController(); });
+}
+
+// ---------------------------------------------------------------------------
+// On-screen controller
+
+void GameArea::UpdateOnScreenController()
+{
+    const bool want = OPTION(kUIShowOnScreenController) && emusys != nullptr;
+    if (!want) {
+        if (osc_)
+            osc_->hide();
+        return;
+    }
+
+    if (!osc_) {
+        osc_ = new widgets::OnScreenController(this, vbamApp().emulated_gamepad(),
+                                               [this] { ShowOnScreenMenu(); });
+    }
+
+    // Cover exactly the render panel so the pillarbox layout can be derived
+    // from the game aspect; fall back to the whole area before the panel
+    // exists.
+    QWidget* w = PanelWidget();
+    const QRect r = w ? w->geometry() : rect();
+    if (r.isValid() && !r.isEmpty())
+        osc_->setGeometry(r);
+    if (basic_height > 0)
+        osc_->SetGameAspect(static_cast<double>(basic_width) / basic_height);
+    // Without a menu bar on screen (fullscreen, hidden bar, Android) the
+    // overlay's Menu button is the way to the menus; with one it is redundant.
+    const bool menu_bar_visible =
+        main_frame && main_frame->menuBar() && main_frame->menuBar()->isVisible() &&
+        !fullscreen && !menu_bar_hidden;
+#if defined(__ANDROID__)
+    osc_->SetShowMenuButton(true);
+#else
+    osc_->SetShowMenuButton(!menu_bar_visible);
+#endif
+    osc_->show();
+    osc_->raise();
+}
+
+void GameArea::ShowOnScreenMenu()
+{
+    if (!main_frame)
+        return;
+    // Anchor the popup at the overlay's Menu button area (top-left corner of
+    // the game area) so it opens where the finger was.
+    const QPoint anchor = mapToGlobal(QPoint(8, 8));
+    main_frame->ShowContextMenu(anchor);
 }
 
 GameArea::~GameArea() {
@@ -846,6 +902,7 @@ void GameArea::UnloadGame(bool destruct)
 
     // remaining items are GUI updates that should not be needed in destructor
     SetFrameTitle();
+    UpdateOnScreenController();
     mf->cmd_enable &= UNLOAD_CMDEN_KEEP;
     mf->update_state_ts(true);
     mf->enable_menus();
@@ -1436,6 +1493,9 @@ void GameArea::OnIdle()
         // generate system color maps (after output module init)
         UpdateLcdFilter();
 
+        // Bring up / re-stack the on-screen touch controller over this panel.
+        UpdateOnScreenController();
+
         // Let the panel fully initialize before running emulation.
         RequestMore();
         return;
@@ -1455,6 +1515,16 @@ void GameArea::OnIdle()
     if (pending_resume_after_panel_ && panel) {
         pending_resume_after_panel_ = false;
         Resume();
+    }
+
+    // While a menu is open the emulation is held, as the wx port does on
+    // Windows: the frame loop must not present into a window whose event
+    // loop is inside the toolkit's menu tracking. Poll at frame rate for the
+    // menu to close instead of spinning the 0 ms idle timer.
+    if (mf->MenusOpened()) {
+        was_paused = true;
+        idle_timer_.start(16);
+        return;
     }
 
     if (!paused && panel) {
@@ -1567,6 +1637,10 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
             return new GLDrawingPanel(this, basic_width, basic_height);
         case config::RenderMethod::kSDL:
             return new SDLDrawingPanel(this, basic_width, basic_height);
+#if defined(VBAM_ENABLE_GLES)
+        case config::RenderMethod::kGLES:
+            return new GLESDrawingPanel(this, basic_width, basic_height);
+#endif
 #if defined(_WIN32)
 #if !defined(NO_D3D12)
         case config::RenderMethod::kDirect3d12:
@@ -1605,6 +1679,13 @@ void GameArea::EvaluateRenderer() {
     // Per-platform renderer priority. Only methods compiled in on this platform
     // appear (the #if guards mirror the RenderMethod enum).
     static const RM kRendererPriority[] = {
+#if defined(VBAM_ENABLE_GLES)
+        // The Android output module: Qt-composited, so it is the first choice
+        // there and tried right after the native APIs elsewhere.
+#if defined(__ANDROID__)
+        RM::kGLES,
+#endif
+#endif
 #if defined(_WIN32) && !defined(NO_D3D12)
         RM::kDirect3d12,
 #endif
@@ -1615,6 +1696,9 @@ void GameArea::EvaluateRenderer() {
         RM::kVulkan,
 #endif
         RM::kSDL,
+#if defined(VBAM_ENABLE_GLES) && !defined(__ANDROID__)
+        RM::kGLES,
+#endif
 #ifndef NO_OGL
         RM::kOpenGL,
 #endif
@@ -1682,6 +1766,15 @@ void GameArea::resizeEvent(QResizeEvent* event)
         w->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
         if (gopts.max_scale)
             w->setMaximumSize(basic_width * gopts.max_scale, basic_height * gopts.max_scale);
+    }
+
+    // The layout applies the panel geometry after this event; follow it once
+    // that has happened so the overlay covers the panel exactly.
+    if (osc_ && osc_->isVisible()) {
+        QTimer::singleShot(0, this, [this] {
+            if (osc_ && osc_->isVisible())
+                UpdateOnScreenController();
+        });
     }
 }
 
@@ -1776,7 +1869,13 @@ void GameArea::HidePointer()
 // and the user can adjust hiding behavior herself.
 void GameArea::HideMenuBar()
 {
-#if !defined(__APPLE__)
+#if defined(__ANDROID__)
+    // An immediate toggle on Android: the option decides whether the action
+    // bar is shown at all, there is no mouse to time out.
+    if (!main_frame || menu_bar_hidden || !gopts.hide_menu_bar) return;
+    main_frame->SetMenuBarVisible(false);
+    menu_bar_hidden = true;
+#elif !defined(__APPLE__)
     if (!main_frame || menu_bar_hidden || !gopts.hide_menu_bar) return;
 
     if (((systemGetClock() - mouse_active_time) > 3000) && !main_frame->MenusOpened()) {
@@ -1788,7 +1887,12 @@ void GameArea::HideMenuBar()
 
 void GameArea::ShowMenuBar()
 {
-#if !defined(__APPLE__)
+#if defined(__ANDROID__)
+    // Only when the option was switched off: the action bar never auto-shows.
+    if (!main_frame || !menu_bar_hidden || gopts.hide_menu_bar) return;
+    main_frame->SetMenuBarVisible(true);
+    menu_bar_hidden = false;
+#elif !defined(__APPLE__)
     if (!main_frame || !menu_bar_hidden) return;
 
     if (!fullscreen)
@@ -1868,7 +1972,10 @@ void GameArea::UpdateLcdFilter() {
 void GameArea::SuspendScreenSaver() {
     if (screensaver_suspended || !gopts.suspend_screensaver || !emulating)
         return;
-#if defined(__APPLE__)
+#if defined(__ANDROID__)
+    VbamSetAndroidWakeLock(true);
+    screensaver_suspended = true;
+#elif defined(__APPLE__)
     IOPMAssertionID id = kIOPMNullAssertionID;
     const IOReturn r = IOPMAssertionCreateWithName(
         kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn,
@@ -1893,7 +2000,9 @@ void GameArea::SuspendScreenSaver() {
 void GameArea::UnsuspendScreenSaver() {
     if (!screensaver_suspended)
         return;
-#if defined(__APPLE__)
+#if defined(__ANDROID__)
+    VbamSetAndroidWakeLock(false);
+#elif defined(__APPLE__)
     if (g_screensaver_assertion != kIOPMNullAssertionID) {
         IOPMAssertionRelease(g_screensaver_assertion);
         g_screensaver_assertion = kIOPMNullAssertionID;
@@ -1937,6 +2046,20 @@ void GameArea::OnVolumeChanged(config::Option* option) {
 // A/V recording (ffmpeg)
 // ---------------------------------------------------------------------------
 
+QStringList GameArea::RecordingFiles() const
+{
+    QStringList files;
+#ifndef NO_FFMPEG
+    if (!vid_rec_file_.isEmpty())
+        files << vid_rec_file_;
+    if (!snd_rec_file_.isEmpty())
+        files << snd_rec_file_;
+#endif
+    files << systemGameRecordingFile();
+    files.removeAll(QString());
+    return files;
+}
+
 #ifndef NO_FFMPEG
 static QString media_err(recording::MediaRet ret)
 {
@@ -1969,7 +2092,9 @@ void GameArea::StartVidRecording(const QString& fname)
     if ((ret = vid_rec.Record(vbam::ToPath(fname).c_str(), basic_width, basic_height,
                               systemColorDepth)) != recording::MRET_OK) {
         vbam::LogError(TR("Unable to begin recording to %1 (%2)").arg(fname, media_err(ret)));
+        VbamDiscardAndroidOutputFile(fname);
     } else {
+        vid_rec_file_ = fname;
         MainWindow* mf = vbamApp().frame;
         mf->cmd_enable &= ~(CMDEN_NVREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_VREC;
@@ -1980,6 +2105,10 @@ void GameArea::StartVidRecording(const QString& fname)
 void GameArea::StopVidRecording()
 {
     vid_rec.Stop();
+    // A recording written to a staged Android content:// file goes back to
+    // the document now that the file is closed (no-op elsewhere).
+    VbamCommitAndroidOutputFile(vid_rec_file_);
+    vid_rec_file_.clear();
     MainWindow* mf = vbamApp().frame;
     mf->cmd_enable &= ~CMDEN_VREC;
     mf->cmd_enable |= CMDEN_NVREC;
@@ -1997,7 +2126,9 @@ void GameArea::StartSoundRecording(const QString& fname)
     snd_rec.SetSampleRate(soundGetSampleRate());
     if ((ret = snd_rec.Record(vbam::ToPath(fname).c_str())) != recording::MRET_OK) {
         vbam::LogError(TR("Unable to begin recording to %1 (%2)").arg(fname, media_err(ret)));
+        VbamDiscardAndroidOutputFile(fname);
     } else {
+        snd_rec_file_ = fname;
         MainWindow* mf = vbamApp().frame;
         mf->cmd_enable &= ~(CMDEN_NSREC | CMDEN_NREC_ANY);
         mf->cmd_enable |= CMDEN_SREC;
@@ -2008,6 +2139,8 @@ void GameArea::StartSoundRecording(const QString& fname)
 void GameArea::StopSoundRecording()
 {
     snd_rec.Stop();
+    VbamCommitAndroidOutputFile(snd_rec_file_);
+    snd_rec_file_.clear();
     MainWindow* mf = vbamApp().frame;
     mf->cmd_enable &= ~CMDEN_SREC;
     mf->cmd_enable |= CMDEN_NSREC;

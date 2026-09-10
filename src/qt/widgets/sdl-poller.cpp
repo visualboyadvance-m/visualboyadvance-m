@@ -1,5 +1,9 @@
 #include "qt/widgets/sdl-poller.h"
 
+#if defined(__ANDROID__)
+#include "qt/widgets/android-gamepad.h"
+#endif
+
 #include <unordered_map>
 #include <vector>
 
@@ -373,6 +377,10 @@ SdlPoller::~SdlPoller() {
 }
 
 void SdlPoller::SetRumble(bool rumble) {
+#if defined(__ANDROID__)
+    AndroidGamepad::Instance().SetRumble(rumble);
+    return;
+#endif
     if (joystick_states_.empty())
         return;
 
@@ -386,6 +394,23 @@ void SdlPoller::ReconnectControllers(bool enable_game_controller) {
 }
 
 void SdlPoller::Poll() {
+#if defined(__ANDROID__)
+    // SDL's joystick backend is tied to the SDLActivity lifecycle, which the
+    // QtActivity host does not provide; the activity hands controller changes
+    // to widgets::AndroidGamepad over JNI instead. Drain those here so they
+    // take the same route as SDL joystick events elsewhere. Initialize() is
+    // idempotent and needs Qt's JNI bridge, which is up by the first tick.
+    {
+        AndroidGamepad& gamepad = AndroidGamepad::Instance();
+        gamepad.Initialize();
+        std::vector<UserInputBatch::Data> android_data = gamepad.Drain();
+        if (!android_data.empty()) {
+            UserInputBatch batch;
+            batch.data = std::move(android_data);
+            dispatcher_->Dispatch(batch);
+        }
+    }
+#endif
     SDL_Event sdl_event;
 
     while (SDL_PollEvent(&sdl_event)) {

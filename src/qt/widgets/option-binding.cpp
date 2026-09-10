@@ -464,6 +464,11 @@ QStringList RenderMethodLabels() {
             case config::RenderMethod::kSDL:
                 labels << QStringLiteral("SDL");
                 break;
+#if defined(VBAM_ENABLE_GLES)
+            case config::RenderMethod::kGLES:
+                labels << QStringLiteral("OpenGL ES 2");
+                break;
+#endif
 #if defined(_WIN32)
 #if !defined(NO_D3D12)
             case config::RenderMethod::kDirect3d12:
