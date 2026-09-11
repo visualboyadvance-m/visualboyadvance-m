@@ -1496,7 +1496,8 @@ static const uint16_t gbColorizationPaletteData[32][3][4] = {
 #define GBSAVE_GAME_VERSION_10 10
 #define GBSAVE_GAME_VERSION_11 11
 #define GBSAVE_GAME_VERSION_12 12
-#define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_12
+#define GBSAVE_GAME_VERSION_13 13
+#define GBSAVE_GAME_VERSION GBSAVE_GAME_VERSION_13
 
 void setColorizerHack(bool value)
 {
@@ -3493,6 +3494,8 @@ void gbCPUInit(const char* biosFileName, bool useBiosFile)
 {
     // Fresh cart: clear any handover state from a previous session.
     gbSgbBorderCaptured = false;
+    // Runtime state, so it must not carry over from the last cart.
+    gbBorderShown = false;
 
     // GB/GBC/SGB only at the moment
     if (!(gbHardware & 7))
@@ -3539,8 +3542,12 @@ void gbGetHardwareType()
     // enabled (forced on, or automatic), so the game ships its border
     // setup packets. The captured guard makes this fire only on initial
     // load, not on the handover reset.
-    if (((!gbCgbMode) || ((gbBorderOn || gbBorderAutomatic) && !gbSgbBorderCaptured)) && (g_gbCartData.sgb_support())) {
-        if (gbEmulatorType == 0 || gbEmulatorType == 2 || gbEmulatorType == 5)
+    if ((!gbCgbMode) || ((gbBorderVisible() || gbBorderAutomatic) && !gbSgbBorderCaptured)) {
+        // $146 says the game sends SGB commands, not that it may run on one.
+        // Only consult it when the machine is chosen automatically.
+        if (gbEmulatorType == 2 || gbEmulatorType == 5)
+            gbSgbMode = true;
+        else if (gbEmulatorType == 0 && g_gbCartData.sgb_support())
             gbSgbMode = true;
     }
 
@@ -4070,7 +4077,7 @@ void gbReset()
     if (gbSgbMode) {
         gbSgbResetFlag = true;
         gbSgbReset();
-        if (gbBorderOn)
+        if (gbBorderVisible())
             gbSgbRenderBorder();
         gbSgbResetFlag = false;
     }
@@ -4274,7 +4281,12 @@ variable_desc gbSaveGameStruct[] = {
     { &gbTimerMode, sizeof(int) },
     { &gbSerialOn, sizeof(int) },
     { &gbWindowLine, sizeof(int) },
-    { &gbCgbMode, sizeof(int) },
+    // gbCgbMode and gbSgbMode are bool: listing them here reads and writes
+    // four bytes onto one. Handled explicitly below, still four on the wire.
+    { NULL, 0 }
+};
+
+variable_desc gbSaveGameStruct2[] = {
     { &gbVramBank, sizeof(int) },
     { &gbWramBank, sizeof(int) },
     { &gbHdmaSource, sizeof(int) },
@@ -4282,7 +4294,10 @@ variable_desc gbSaveGameStruct[] = {
     { &gbHdmaBytes, sizeof(int) },
     { &gbHdmaOn, sizeof(int) },
     { &gbSpeed, sizeof(int) },
-    { &gbSgbMode, sizeof(int) },
+    { NULL, 0 }
+};
+
+variable_desc gbSaveGameStruct3[] = {
     { &register_DIV, sizeof(uint8_t) },
     { &register_TIMA, sizeof(uint8_t) },
     { &register_TMA, sizeof(uint8_t) },
@@ -4361,6 +4376,12 @@ static bool gbWriteSaveState(gzFile gzFile)
     utilWriteInt(gzFile, inBios);
 
     utilWriteData(gzFile, gbSaveGameStruct);
+    int cgbModeOnWire = gbCgbMode ? 1 : 0;
+    utilGzWrite(gzFile, &cgbModeOnWire, sizeof(int));
+    utilWriteData(gzFile, gbSaveGameStruct2);
+    int sgbModeOnWire = gbSgbMode ? 1 : 0;
+    utilGzWrite(gzFile, &sgbModeOnWire, sizeof(int));
+    utilWriteData(gzFile, gbSaveGameStruct3);
 
     utilGzWrite(gzFile, &IFF, 2);
 
@@ -4491,6 +4512,32 @@ static bool gbReadSaveState(gzFile gzFile)
     inBios = ib;
 
     utilReadData(gzFile, gbSaveGameStruct);
+    const int cgbModeOnWire = utilReadInt(gzFile);
+    utilReadData(gzFile, gbSaveGameStruct2);
+    const int sgbModeOnWire = utilReadInt(gzFile);
+    utilReadData(gzFile, gbSaveGameStruct3);
+
+    // Only the low byte is the flag: the upper three are whatever the linker
+    // put after the bool. Yellow states carry 0x00000100 for gbSgbMode, which
+    // reads as true if taken whole.
+    const bool stateIsCgb = (cgbModeOnWire & 0xff) != 0;
+
+    // A Game Boy Color state cannot be resumed on a Game Boy or the reverse.
+    // The two differ in how much video and work RAM they have, in how palettes
+    // work and in clock speed, so nothing in one describes the other and the
+    // loader would go on to read the wrong amount of memory. Super Game Boy is
+    // not a separate case -- it is a Game Boy with the border and palettes
+    // handled outside the machine -- so gbSgbMode differing is fine.
+    if (stateIsCgb != gbCgbMode) {
+        systemMessage(MSG_UNSUPPORTED_VB_SGM,
+                      N_("Cannot load a %s save state while running as %s"),
+                      stateIsCgb ? "Game Boy Color" : "Game Boy",
+                      gbCgbMode ? "Game Boy Color" : "Game Boy");
+        return false;
+    }
+
+    gbCgbMode = stateIsCgb;
+    gbSgbMode = (sgbModeOnWire & 0xff) != 0;
 
     // Correct crash when loading color gameboy save in regular gameboy type.
     if (gbCgbMode) {
@@ -4558,10 +4605,22 @@ static bool gbReadSaveState(gzFile gzFile)
     }
     memset(g_pix, 0, kGBPixSize);
 
-    if (version < GBSAVE_GAME_VERSION_6) {
-        utilGzRead(gzFile, gbPalette, 64 * sizeof(uint16_t));
-    } else
-        utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
+    {
+        // Entries 64 up are the border's colours. If the on-screen border was
+        // kept, its palette must be kept too or the tiles come back greyscale.
+        extern bool gbSgbKeptExistingBorder;
+        uint16_t keptBorderPalette[64];
+        if (gbSgbKeptExistingBorder)
+            memcpy(keptBorderPalette, &gbPalette[64], sizeof(keptBorderPalette));
+
+        if (version < GBSAVE_GAME_VERSION_6) {
+            utilGzRead(gzFile, gbPalette, 64 * sizeof(uint16_t));
+        } else
+            utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
+
+        if (gbSgbKeptExistingBorder)
+            memcpy(&gbPalette[64], keptBorderPalette, sizeof(keptBorderPalette));
+    }
 
     if (version < 11)
         utilGzRead(gzFile, gbPalette, 128 * sizeof(uint16_t));
@@ -4684,7 +4743,7 @@ static bool gbReadSaveState(gzFile gzFile)
         gbSgbMode = false;
     }
 
-    if (gbBorderOn && !gbSgbMask) {
+    if (gbBorderVisible() && !gbSgbMask) {
         gbSgbRenderBorder();
     }
 
@@ -4813,14 +4872,14 @@ bool gbReadSaveState(const char* name)
 
 bool gbWritePNGFile(const char* fileName)
 {
-    if (gbBorderOn)
+    if (gbBorderVisible())
         return utilWritePNGFile(fileName, kSGBWidth, kSGBHeight, g_pix);
     return utilWritePNGFile(fileName, kGBWidth, kGBHeight, g_pix);
 }
 
 bool gbWriteBMPFile(const char* fileName)
 {
-    if (gbBorderOn)
+    if (gbBorderVisible())
         return utilWriteBMPFile(fileName, kSGBWidth, kSGBHeight, g_pix);
     return utilWriteBMPFile(fileName, kGBWidth, kGBHeight, g_pix);
 }
@@ -4992,7 +5051,7 @@ void gbDrawLine()
             *dest++ = systemColorMap8[gbLineMix[x++]];
             *dest++ = systemColorMap8[gbLineMix[x++]];
         }
-        if (gbBorderOn)
+        if (gbBorderVisible())
             dest += gbBorderColumnSkip;
 #ifndef __LIBRETRO__
         * dest++ = 0; // for filters that read one pixel more
@@ -5027,7 +5086,7 @@ void gbDrawLine()
             *dest++ = systemColorMap16[gbLineMix[x++]];
             *dest++ = systemColorMap16[gbLineMix[x++]];
         }
-        if (gbBorderOn)
+        if (gbBorderVisible())
             dest += gbBorderColumnSkip;
 #ifndef __LIBRETRO__
         *dest++ = 0; // for filters that read one pixel more
@@ -5715,7 +5774,7 @@ void gbEmulate(int ticksToStop)
                             if (gbFrameSkipCount >= framesToSkip) {
 
                                 if (!gbSgbMask) {
-                                    if (gbBorderOn)
+                                    if (gbBorderVisible())
                                         gbSgbRenderBorder();
                                     //if (gbScreenOn)
                                     systemDrawScreen();
@@ -5888,7 +5947,7 @@ void gbEmulate(int ticksToStop)
                             gbWhiteScreen = 2;
 
                             if (!gbSgbMask) {
-                                if (gbBorderOn)
+                                if (gbBorderVisible())
                                     gbSgbRenderBorder();
                                 //if (gbScreenOn)
                                 systemDrawScreen();
@@ -6668,7 +6727,7 @@ bool gbReadSaveState(const uint8_t* data)
         gbSgbMode = false;
     }
 
-    if (gbBorderOn && !gbSgbMask) {
+    if (gbBorderVisible() && !gbSgbMask) {
         gbSgbRenderBorder();
     }
 

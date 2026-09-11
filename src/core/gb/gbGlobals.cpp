@@ -26,6 +26,7 @@ int gbDmaTicks = 0;
 uint8_t gbCartBus = 0xff;
 bool gbBorderAutomatic = false;
 bool gbBorderOn = false;
+bool gbBorderShown = false;
 bool gbCgbMode = false;
 bool gbSgbMode = false;
 

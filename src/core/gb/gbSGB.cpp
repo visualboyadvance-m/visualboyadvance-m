@@ -25,6 +25,10 @@ uint8_t* gbSgbBorder = NULL;
 
 int gbSgbCGBSupport = 0;
 
+// Set when gbSgbReadGame keeps the on-screen border rather than the state's.
+// The colours in gbPalette[64..127] have to be held back with the tiles.
+bool gbSgbKeptExistingBorder = false;
+
 // The colour to draw the border's transparent pixels in, taken when the border
 // arrives. Border tiles use palette index 0 for the areas the game shows
 // through, and drawing those from the live gbPalette[0] means the border is
@@ -94,7 +98,9 @@ void gbSgbReset()
     // which for a dual-mode cart it never will, having already handed over.
     int i;
 
-    if (!gbSgbBorderCaptured) {
+    // Also kept while a border is on screen: gbReadSaveState resets first, so
+    // clearing here destroys the border before the state has had its say.
+    if (!gbSgbBorderCaptured && !gbBorderVisible()) {
         memset(gbSgbBorderChar, 0, 32 * 256);
         memset(gbSgbBorder, 0, 2048);
 
@@ -107,7 +113,8 @@ void gbSgbReset()
     // Once the cart has sent a border they are its colours, not ours to
     // overwrite -- resetting them leaves the border drawn in the default
     // greyscale ramp.
-    const int paletteEntries = gbSgbBorderCaptured ? 16 : 32;
+    const int paletteEntries =
+        (gbSgbBorderCaptured || gbBorderVisible()) ? 16 : 32;
 
     for (i = 0; i < paletteEntries; i++) {
         gbPalette[i * 4] = (0x1f) | (0x1f << 5) | (0x1f << 10);
@@ -339,7 +346,7 @@ void gbSgbDrawBorderTile(int x, int y, int tile, int attr)
 
 void gbSgbRenderBorder()
 {
-    if (gbBorderOn) {
+    if (gbBorderVisible()) {
         uint8_t* fromAddress = gbSgbBorder;
 
         for (uint8_t y = 0; y < 28; y++) {
@@ -371,12 +378,13 @@ void gbSgbPicture()
 
     gbSgbCGBSupport |= 4;
 
-    if (gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
-        gbBorderOn = true;
+    if (gbBorderAutomatic && !gbBorderVisible() && gbSgbCGBSupport > 4) {
+        // Shown, not On: writing the setting here turns it into "always".
+        gbBorderShown = true;
         systemGbBorderOn();
     }
 
-    if (gbBorderOn && !gbSgbMask)
+    if (gbBorderVisible() && !gbSgbMask)
         gbSgbRenderBorder();
 
     if (gbSgbMode && gbCgbMode && gbSgbCGBSupport > 4) {
@@ -414,7 +422,7 @@ void gbSgbSetPalette(int a, int b, uint16_t* p)
     }
 
     gbPalette[0] = gbPalette[4] = gbPalette[8] = gbPalette[12] = bit00;
-    if (gbBorderOn && !gbSgbMask)
+    if (gbBorderVisible() && !gbSgbMask)
         gbSgbRenderBorder();
 }
 
@@ -439,7 +447,7 @@ void gbSgbSetATF(int n)
 
     if (gbSgbPacket[1] & 0x40) {
         gbSgbMask = 0;
-        if (gbBorderOn)
+        if (gbBorderVisible())
             gbSgbRenderBorder();
     }
 }
@@ -466,7 +474,7 @@ void gbSgbSetPalette()
 
     if (atf & 0x40) {
         gbSgbMask = 0;
-        if (gbBorderOn)
+        if (gbBorderVisible())
             gbSgbRenderBorder();
     }
 }
@@ -706,7 +714,7 @@ void gbSgbMaskEnable()
         break;
     }
     if (!gbSgbMask) {
-        if (gbBorderOn)
+        if (gbBorderVisible())
             gbSgbRenderBorder();
     }
 }
@@ -724,12 +732,12 @@ void gbSgbChrTransfer()
 
     memcpy(&gbSgbBorderChar[address], gbSgbScreenBuffer, 128 * 32);
 
-    if (gbBorderAutomatic && !gbBorderOn && gbSgbCGBSupport > 4) {
-        gbBorderOn = true;
+    if (gbBorderAutomatic && !gbBorderVisible() && gbSgbCGBSupport > 4) {
+        gbBorderShown = true;
         systemGbBorderOn();
     }
 
-    if (gbBorderOn && !gbSgbMask)
+    if (gbBorderVisible() && !gbSgbMask)
         gbSgbRenderBorder();
 
     if (gbSgbMode && gbCgbMode && gbSgbCGBSupport == 7) {
@@ -1020,6 +1028,14 @@ void gbSgbSaveGame(gzFile gzFile)
     utilGzWrite(gzFile, gbSgbSCPPalette, 4 * 512 * sizeof(uint16_t));
     utilGzWrite(gzFile, gbSgbATF, 20 * 18);
     utilGzWrite(gzFile, gbSgbATFList, 45 * 20 * 18);
+
+    // Where the border has got to, as distinct from the picture above.
+    // Shown, not On: a state records what was on screen, not a user setting.
+    int borderOnOnWire = gbBorderShown ? 1 : 0;
+    utilGzWrite(gzFile, &borderOnOnWire, sizeof(int));
+    int borderCapturedOnWire = gbSgbBorderCaptured ? 1 : 0;
+    utilGzWrite(gzFile, &borderCapturedOnWire, sizeof(int));
+    utilGzWrite(gzFile, &gbSgbCGBSupport, sizeof(gbSgbCGBSupport));
 }
 
 void gbSgbReadGame(gzFile gzFile, int version)
@@ -1031,9 +1047,22 @@ void gbSgbReadGame(gzFile gzFile, int version)
         gbSgbFourPlayers = 0;
     }
 
+    // A border on screen is kept even when the state predates it, so the
+    // incoming one waits here and is adopted only if the state carries one.
+    static uint8_t incomingBorder[2048];
+    static uint8_t incomingBorderChar[32 * 256];
+    bool stateHasBorder = false;
+
     if (version >= 8) {
-        utilGzRead(gzFile, gbSgbBorder, 2048);
-        utilGzRead(gzFile, gbSgbBorderChar, 32 * 256);
+        utilGzRead(gzFile, incomingBorder, 2048);
+        utilGzRead(gzFile, incomingBorderChar, 32 * 256);
+
+        for (size_t i = 0; i < sizeof(incomingBorderChar); i++) {
+            if (incomingBorderChar[i] != 0) {
+                stateHasBorder = true;
+                break;
+            }
+        }
     }
 
     utilGzRead(gzFile, gbSgbPacket, 16 * 7);
@@ -1041,5 +1070,35 @@ void gbSgbReadGame(gzFile gzFile, int version)
     utilGzRead(gzFile, gbSgbSCPPalette, 4 * 512 * sizeof(uint16_t));
     utilGzRead(gzFile, gbSgbATF, 20 * 18);
     utilGzRead(gzFile, gbSgbATFList, 45 * 20 * 18);
+
+    bool borderWasOn = false;
+
+    if (version >= 13) {
+        borderWasOn = utilReadInt(gzFile) != 0;
+        const bool capturedInState = utilReadInt(gzFile) != 0;
+        int supportInState = 0;
+        utilGzRead(gzFile, &supportInState, sizeof(supportInState));
+
+        // Both only move forwards, so a captured border survives an older state.
+        gbSgbBorderCaptured = gbSgbBorderCaptured || capturedInState;
+        if (supportInState > gbSgbCGBSupport)
+            gbSgbCGBSupport = supportInState;
+    }
+
+    gbSgbKeptExistingBorder = false;
+
+    if (stateHasBorder) {
+        memcpy(gbSgbBorder, incomingBorder, sizeof(incomingBorder));
+        memcpy(gbSgbBorderChar, incomingBorderChar, sizeof(incomingBorderChar));
+    } else if (gbBorderVisible()) {
+        gbSgbKeptExistingBorder = true;
+    }
+
+    // Turning it on resizes the output, so tell the frontend. Never turned
+    // off here: a border already up stays up.
+    if ((borderWasOn || stateHasBorder) && !gbBorderVisible()) {
+        gbBorderShown = true;
+        systemGbBorderOn();
+    }
 }
 #endif // !__LIBRETRO__

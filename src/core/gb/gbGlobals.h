@@ -39,7 +39,13 @@ extern uint8_t gbObp0[4];
 extern uint8_t gbObp1[4];
 extern uint16_t gbPalette[128];
 extern bool gbBorderAutomatic;
+// User setting, bound to kPrefBorderOn: writing it writes the saved config.
 extern bool gbBorderOn;
+
+// Whether a border is on screen. Automatic mode sets this, not the setting.
+extern bool gbBorderShown;
+
+inline bool gbBorderVisible() { return gbBorderOn || gbBorderShown; }
 extern bool gbScreenOn;
 extern uint8_t gbSCYLine[300];
 extern uint8_t gbLcdcLine[300];
