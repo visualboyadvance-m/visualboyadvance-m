@@ -17,8 +17,6 @@ Game Boy and Game Boy Advance Emulator
 
 Our Discord server is [here](https://discord.gg/EpfxEuGMKH).
 
-The forums are [here](https://board.visualboyadvance-m.org/).
-
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
 Nightly builds for Windows and macOS are at [https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
