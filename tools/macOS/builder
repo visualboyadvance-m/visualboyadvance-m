@@ -113,66 +113,35 @@ sw_vers -productVersion | sed 's/\./ /g' > "$ver_file"
 read -r macos_major macos_minor macos_patch < "$ver_file"
 rm -f "$ver_file"
 
-# Nix and MacPorts report a bare "clang version 22.1.8" while Homebrew and
-# Apple prefix it with the vendor name, so pull the version out of the line
-# instead of depending on where it lands in the fields.
-clang_version() {
-    "$1" --version 2>/dev/null | head -1 | sed -E 's/.*version ([0-9]+(\.[0-9]+)*).*/\1/'
-}
-
-# Find the highest version clang and llvm in Nix, Homebrew or MacPorts.
-best_llvm_path=$(
-    (
-        for nix_clang in $(find /nix/store -maxdepth 1 -type d -name '*-clang-[0-9]*[0-9]' 2>/dev/null); do
-            llvm_ver=$(echo "$nix_clang" | sed -E 's/.*-([0-9][0-9.]*[0-9])$/\1/')
-            nix_llvm=$(find /nix/store -maxdepth 1 -type d -name '*-llvm-'"$llvm_ver" 2>/dev/null)
-
-            if [ -x "$nix_clang/bin/clang++" ]; then
-                echo "$nix_clang:$nix_llvm    $(clang_version "$nix_clang/bin/clang++")"
-            fi
-        done
-
-        for brew_llvm in $(find "$BREW_PREFIX"/Cellar/llvm -maxdepth 1 -type d 2>/dev/null); do
-            if [ -x "$brew_llvm/bin/clang++" ]; then
-                echo "$brew_llvm    $(clang_version "$brew_llvm/bin/clang++")"
-            fi
-        done
-
-        # MacPorts gives every clang-NN/llvm-NN pair its own libexec tree; what
-        # lands in ${MACPORTS_PREFIX}/bin is only a wrapper script per tool.
-        for mp_llvm in $(find "$MACPORTS_PREFIX"/libexec -maxdepth 1 -type d -name 'llvm-[0-9]*' 2>/dev/null); do
-            if [ -x "$mp_llvm/bin/clang++" ]; then
-                echo "$mp_llvm    $(clang_version "$mp_llvm/bin/clang++")"
-            fi
-        done
-    ) | sort -k2,2 -V -r | head -1 | awk '{ print $1 }'
-)
-
-# Fallback to XCode version.
-[ -z "$best_llvm_path" ] && best_llvm_path=/usr
-
-if [ -n "$arm64_target" ]; then
-    case "$best_llvm_path" in
-        /nix/store/*) # Nix
-            rt_lib=$(find /nix/store -maxdepth 1 -type d -name '*-compiler-rt-libc-*[0-9]' | while read -r d; do echo $d $(echo $d | sed -E 's/.*-([0-9.]+)$/\1/'); done | sort -V -k 2 | tail -n 1 | awk '{ print $1 }')/lib/libclang_rt.osx.a
-            ;;
-    esac
-fi
-
-if [ -z "$rt_lib" ]; then
-    rt_lib=$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/"$(/usr/bin/clang --version | head -1 | awk '{ print $4 }')"/lib/darwin/libclang_rt.osx.a
-fi
-
-clang_path=${best_llvm_path%%:*}
+# Always build with the Xcode toolchain's own clang, named by its full path.
+# /usr/bin/clang is only a shim that re-execs the real driver by way of xcrun,
+# and that indirection costs about 14ms per invocation -- a link pays it twice,
+# once for the compiler and once for ld.  Spread over the hundreds of compile
+# and link probes an autoconf configure run makes, it is roughly a third of the
+# total time.  The toolchain binary emits no -isysroot of its own, so SDKROOT
+# in BUILD_ENV below names the SDK for it.
 xcode_path=$(xcode-select -p)
 
-# Apple's clang and Homebrew's locate the SDK by themselves, but the MacPorts
-# one emits no -isysroot at all and then cannot find so much as stdio.h, so CC,
-# CPP and CXX below name the SDK explicitly.  It goes on the drivers rather
-# than in CFLAGS because plenty of callers use $CC or $CPP with none of our
-# flag variables: autoconf's preprocessor tests and ffmpeg's host_cc probe
-# both do.  xcrun knows which SDK is current; the fallbacks cover the full
-# Xcode and the Command Line Tools layouts.
+clang_path=$(xcrun -f clang 2>/dev/null)
+clang_path=${clang_path%/bin/clang}
+
+if [ ! -x "$clang_path/bin/clang" ]; then
+    clang_path="$xcode_path/Toolchains/XcodeDefault.xctoolchain/usr"
+fi
+
+if [ ! -x "$clang_path/bin/clang" ]; then
+    printf "\nCannot find the Xcode toolchain clang.\n\n" >&2
+    exit 1
+fi
+
+# Only the /usr/bin shims find the SDK on their own; the toolchain clang we
+# invoke directly cannot locate so much as stdio.h without being told.  SDKROOT
+# in BUILD_ENV carries it, which reaches the compiler however it is spelled --
+# plenty of callers use $CC or $CPP with none of our flag variables, as
+# autoconf's preprocessor tests and ffmpeg's host_cc probe both do.  The SDK
+# path is still needed literally below for -F and -isystem.  xcrun knows which
+# SDK is current; the fallbacks cover the full Xcode and the Command Line Tools
+# layouts.
 sdk_path=$(xcrun --show-sdk-path 2>/dev/null || :)
 
 if [ ! -d "$sdk_path" ]; then
@@ -202,11 +171,12 @@ fi
 BUILD_ENV=$(cat <<EOF
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 export COMMAND_MODE=unix2003
-export PATH="$best_llvm_path/bin:$pkg_mgr_path/usr/bin:/bin:/usr/sbin:/sbin"
+export PATH="$clang_path/bin:$pkg_mgr_path/usr/bin:/bin:/usr/sbin:/sbin"
+export SDKROOT="$sdk_path"
 
-export CC="$clang_path/bin/clang $target_build_arch -isysroot $sdk_path"
-export CPP="$clang_path/bin/clang -E $target_build_arch -isysroot $sdk_path"
-export CXX="$clang_path/bin/clang++ $target_build_arch -isysroot $sdk_path"
+export CC="$clang_path/bin/clang $target_build_arch"
+export CPP="$clang_path/bin/clang -E $target_build_arch"
+export CXX="$clang_path/bin/clang++ $target_build_arch"
 export ARCHFLAGS="$target_build_arch"
 export CPPFLAGS="-DICONV_CONST="
 export CFLAGS="-F$sdk_path/System/Library/Frameworks -framework Carbon -framework Foundation -framework CoreServices -framework SystemConfiguration -Wno-unused-command-line-argument -Wno-error=incompatible-function-pointer-types -fpermissive -Wno-error=unguarded-availability"
