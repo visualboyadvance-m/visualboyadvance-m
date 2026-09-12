@@ -98,6 +98,16 @@ fi
 
 export BUILD_ROOT="${BUILD_ROOT:-$HOME/vbam-build-mac-${target_cpu}}$BUILD_ROOT_SUFFIX"
 
+# Keep Spotlight out of the build root.  A populated one holds thousands of
+# icons, toolbar bitmaps and test images, and every one of them gets handed to
+# mediaanalysisd for scene analysis -- which cannot decode most of them and
+# rescans the lot on a scheduler loop, burning entire cores indefinitely.
+# mdutil only operates on volume roots, so the marker file is the only way to
+# exclude a directory.  core.sh creates BUILD_ROOT later; make it here so the
+# marker is in place before anything is unpacked into it.
+mkdir -p "$BUILD_ROOT"
+[ -e "$BUILD_ROOT/.metadata_never_index" ] || : > "$BUILD_ROOT/.metadata_never_index"
+
 ver_file=$(mktemp)
 sw_vers -productVersion | sed 's/\./ /g' > "$ver_file"
 read -r macos_major macos_minor macos_patch < "$ver_file"
