@@ -367,6 +367,14 @@ void DisList::SetSel(uint32_t addr) {
 // ---------------------------------------------------------------------------
 // MemView
 
+// The column offset legend is drawn in an accent colour so it reads as a
+// ruler rather than as data.  A saturated red like the one in the feature
+// request goes muddy against a dark list background, so pick the shade from
+// how bright that background actually is.
+static QColor OffsetColour(const QColor& bg) {
+    return qGray(bg.rgb()) < 128 ? QColor(0xff, 0x8c, 0x82) : QColor(0xc0, 0x00, 0x00);
+}
+
 class MemView::Display final : public QWidget {
 public:
     explicit Display(MemView* owner) : QWidget(owner), owner_(owner) {
@@ -411,7 +419,8 @@ void MemView::Refit() {
     charwidth = fm.horizontalAdvance(QChar('M'));
     charheight = fm.lineSpacing();
 
-    QSize sz(charwidth * (69 + addrlen) + sb->sizeHint().width() + 2, charheight * 15);
+    // 15 lines of memory plus the offset legend above them
+    QSize sz(charwidth * (69 + addrlen) + sb->sizeHint().width() + 2, charheight * 16);
     setMinimumSize(sz);
     resize(sz);
 }
@@ -452,7 +461,7 @@ void MemView::MouseEvent(QMouseEvent* ev, bool press) {
         return;
 
     const QPoint p = ev->pos();
-    int x = p.x() / charwidth, y = p.y() / charheight;
+    int x = p.x() / charwidth, y = p.y() / charheight - 1;
     x -= addrlen + 3;
 
     if (x < 0 || y < 0 || y > nlines)
@@ -481,7 +490,9 @@ void MemView::MouseEvent(QMouseEvent* ev, bool press) {
 }
 
 void MemView::ShowCaret() {
-    if (seladdr < static_cast<int>(topaddr) || seladdr >= static_cast<int>(topaddr) + nlines * 16)
+    // compare the offset into the view rather than seladdr against
+    // topaddr + nlines * 16, which wraps near the top of the address space
+    if (seladdr < topaddr || seladdr - topaddr >= static_cast<uint32_t>(nlines) * 16)
         selnib = -1;
 
     if (selnib < 0) {
@@ -501,7 +512,7 @@ void MemView::ShowCaret() {
         addrlab->setText(QStringLiteral("0x") + Hex(addr, addrlen));
     }
 
-    int y = (seladdr - topaddr) / 16;
+    int y = static_cast<int>((seladdr - topaddr) / 16);
     int x = addrlen + 3;
     int nnib = 2 << fmt, nword = 16 >> fmt;
 
@@ -525,6 +536,10 @@ void MemView::KeyEvent(QKeyEvent* ev) {
     }
 
     int nnib = 2 << fmt;
+    // Address of the last row.  maxaddr is the highest valid address, which is
+    // UINT32_MAX in the GBA viewer: casting that to int gave -1, so the bounds
+    // checks below were never true and the down arrow did nothing at all.
+    const uint32_t lastrow = maxaddr & ~UINT32_C(0xf);
     switch (key) {
         case Qt::Key_Right:
             if (isasc)
@@ -537,7 +552,7 @@ void MemView::KeyEvent(QKeyEvent* ev) {
                 selnib--;
 
             if (selnib >= 32) {
-                if (seladdr == static_cast<int>(maxaddr) - 16)
+                if (seladdr >= lastrow)
                     selnib = 32 - nnib;
                 else {
                     selnib -= 32;
@@ -567,7 +582,7 @@ void MemView::KeyEvent(QKeyEvent* ev) {
             break;
 
         case Qt::Key_Down:
-            if (seladdr < static_cast<int>(maxaddr) - 16)
+            if (seladdr < lastrow)
                 seladdr += 16;
 
             break;
@@ -591,7 +606,7 @@ void MemView::KeyEvent(QKeyEvent* ev) {
             }
 
             // location in data array
-            int wno = (seladdr - topaddr) / 4 + selnib / 8;
+            int wno = static_cast<int>((seladdr - topaddr) / 4) + selnib / 8;
             int bno = (selnib % 8) / 2;
             int nibno = selnib % 2;
 
@@ -609,7 +624,7 @@ void MemView::KeyEvent(QKeyEvent* ev) {
                 selnib--;
 
             if (selnib >= 32) {
-                if (seladdr == static_cast<int>(maxaddr) - 16)
+                if (seladdr >= lastrow)
                     selnib = 32 - nnib;
                 else {
                     selnib -= 32;
@@ -685,11 +700,15 @@ void MemView::MoveSB() {
 
 void MemView::OnScrollAction(int action) {
     const int pos = sb->sliderPosition();
+    // MoveSB() maps line numbers to scrollbar positions, so invert it in the
+    // same units.  Going through maxaddr instead lands topaddr 15 bytes past
+    // the start of a line, which throws off every line in the view.
+    const uint32_t maxrow = maxaddr / 16;
 
     if (pos < 100)
         topaddr = pos * 16;
     else if (pos >= 400)
-        topaddr = maxaddr + (pos - 500) * 16;
+        topaddr = (maxrow + pos - 500) * 16;
     else if (action == QAbstractSlider::SliderSingleStepSub) {
         topaddr -= 16;
         MoveSB();
@@ -708,7 +727,7 @@ void MemView::OnScrollAction(int action) {
     } else if (pos <= 200)
         topaddr = ((pos - 100) * 10 + 100) * 16;
     else if (pos >= 300)
-        topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+        topaddr = ((pos - 300) * 10 - 1100 + maxrow) * 16;
     else
         topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
@@ -717,15 +736,17 @@ void MemView::OnScrollAction(int action) {
 
 void MemView::OnSliderReleased() {
     const int pos = sb->sliderPosition();
+    // as in OnScrollAction(), invert MoveSB() in line numbers
+    const uint32_t maxrow = maxaddr / 16;
 
     if (pos < 100)
         topaddr = pos * 16;
     else if (pos >= 400)
-        topaddr = maxaddr + (pos - 500) * 16;
+        topaddr = (maxrow + pos - 500) * 16;
     else if (pos <= 200)
         topaddr = ((pos - 100) * 10 + 100) * 16;
     else if (pos >= 300)
-        topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+        topaddr = ((pos - 300) * 10 - 1100 + maxrow) * 16;
     else
         topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
@@ -745,11 +766,41 @@ void MemView::Refill() {
     ShowCaret();
 }
 
+// Draw the 0-F column offsets above the hex area.  Bytes are shown
+// least-significant first within a column, so the digits of a multi-byte
+// column run backwards over it: "10" for a halfword at offset 0, "3210" for a
+// word.  Each label is centred on its column in device units rather than
+// padded with spaces, since a one-digit label cannot be centred on a
+// two-character column any other way.
+void MemView::DrawOffsets(QPainter& dc) {
+    // bytes per column, columns per line, characters per column
+    const int bpc = 1 << fmt, ncol = 16 >> fmt, colw = bpc * 2;
+    // first hex column, in characters
+    const int x0 = addrlen + 3;
+    const QFontMetrics fm(disp->font());
+    const QPen pen = dc.pen();
+    dc.setPen(OffsetColour(disp->palette().color(QPalette::Base)));
+
+    for (int c = 0; c < ncol; c++) {
+        QString lab;
+
+        for (int b = bpc - 1; b >= 0; b--)
+            lab += Hex(c * bpc + b, 1);
+
+        const int lw = fm.horizontalAdvance(lab);
+        dc.drawText((x0 + c * (colw + 1)) * charwidth + (colw * charwidth - lw) / 2,
+                    fm.ascent(), lab);
+    }
+
+    dc.setPen(pen);
+}
+
 void MemView::Paint(QPainter& dc) {
     dc.setFont(disp->font());
     dc.setPen(disp->palette().color(QPalette::Text));
     const QFontMetrics fm(disp->font());
     const int ascent = fm.ascent();
+    DrawOffsets(dc);
 
     for (size_t i = 0; i < static_cast<size_t>(nlines) && i < words.size() / 4; i++) {
         QString line = Hex(topaddr + static_cast<int>(i) * 16, maxaddr > 0xffff ? 8 : 4) +
@@ -791,18 +842,20 @@ void MemView::Paint(QPainter& dc) {
             appendc(v >> 24);
         }
 
-        dc.drawText(0, static_cast<int>(i) * charheight + ascent, line);
+        dc.drawText(0, (static_cast<int>(i) + 1) * charheight + ascent, line);
     }
 
     int lloc = charwidth * ((addrlen + 1) * 2 + 1) / 2;
-    dc.drawLine(lloc, 0, lloc, nlines * charheight);
+    dc.drawLine(lloc, 0, lloc, (nlines + 1) * charheight);
     lloc = charwidth *
            (2 * (addrlen + 3 + 32 + 4 + (fmt == 0 ? 3 * 4 : fmt == 1 ? 4 : 0)) + 1) / 2;
-    dc.drawLine(lloc, 0, lloc, nlines * charheight);
+    dc.drawLine(lloc, 0, lloc, (nlines + 1) * charheight);
+    // rule under the offset legend
+    dc.drawLine(0, charheight - 1, disp->width(), charheight - 1);
 
     // caret
     if (caretx >= 0 && carety >= 0) {
-        dc.fillRect(QRect(caretx * charwidth, carety * charheight, charwidth, charheight),
+        dc.fillRect(QRect(caretx * charwidth, (carety + 1) * charheight, charwidth, charheight),
                     disp->hasFocus() ? disp->palette().highlight()
                                      : disp->palette().mid());
         dc.setPen(disp->palette().color(QPalette::HighlightedText));
@@ -828,7 +881,7 @@ void MemView::Paint(QPainter& dc) {
                 ch = QString::number(nv, 16).toUpper().at(0);
             }
             if (!ch.isNull())
-                dc.drawText(caretx * charwidth, carety * charheight + ascent, QString(ch));
+                dc.drawText(caretx * charwidth, (carety + 1) * charheight + ascent, QString(ch));
         }
     }
 }
@@ -844,13 +897,14 @@ void MemView::resizeEvent(QResizeEvent* event) {
     sz.setWidth(sz.width() - sbw);
     sb->move(sz.width(), 0);
     sb->resize(sbw, sz.height());
-    nlines = std::max(1, (sz.height() + charheight - 1) / charheight);
+    // the top row holds the offset legend, not memory
+    nlines = std::max(1, (sz.height() + charheight - 1) / charheight - 1);
     disp->move(0, 0);
-    disp->resize(sz.width(), (nlines + 1) * charheight);
+    disp->resize(sz.width(), (nlines + 2) * charheight);
 
     if (static_cast<size_t>(nlines) > words.size() / 4) {
-        if (topaddr + nlines * 16 > maxaddr)
-            topaddr = maxaddr - nlines * 16 + 1;
+        if (topaddr > MaxTopAddr())
+            topaddr = MaxTopAddr();
 
         RefillNeeded();
     } else
@@ -858,12 +912,14 @@ void MemView::resizeEvent(QResizeEvent* event) {
 }
 
 void MemView::ShowAddr(uint32_t addr, bool force_update) {
-    if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
+    // test the offset into the view rather than addr against
+    // topaddr + (nlines - 1) * 16, which wraps near the top of the space
+    if (addr < topaddr || addr - topaddr >= static_cast<uint32_t>(nlines - 1) * 16) {
         // align to nearest 16-byte block
         uint32_t newtopaddr = addr & ~0xf;
 
-        if (newtopaddr + nlines * 16 > maxaddr)
-            newtopaddr = maxaddr - nlines * 16 + 1;
+        if (newtopaddr > MaxTopAddr())
+            newtopaddr = MaxTopAddr();
 
         force_update = newtopaddr != topaddr;
         topaddr = newtopaddr;

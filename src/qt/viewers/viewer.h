@@ -200,15 +200,22 @@ private:
     void MouseEvent(QMouseEvent* ev, bool press);
     void KeyEvent(QKeyEvent* ev);
     void Paint(QPainter& dc);
+    // column offset legend drawn above the hex area
+    void DrawOffsets(QPainter& dc);
     void ShowCaret();
 
     // easier than checking maxaddr
     int addrlen = 8;
+    // highest top address that still fills the view without running past
+    // maxaddr, computed so it does not wrap when maxaddr is UINT32_MAX
+    uint32_t MaxTopAddr() const { return maxaddr - static_cast<uint32_t>(nlines) * 16 + 1; }
     Display* disp;
     QScrollBar* sb;
     int charheight = 0, charwidth = 0;
     // selection info
-    int selnib = -1, seladdr = 0;
+    // seladdr must be unsigned, the GBA viewer addresses the whole 32-bit space
+    int selnib = -1;
+    uint32_t seladdr = 0;
     bool isasc = false;
     // caret position in characters, or -1 when hidden
     int caretx = -1, carety = -1;

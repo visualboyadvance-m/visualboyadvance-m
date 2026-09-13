@@ -200,6 +200,8 @@ public:
 
 private:
     void Refill(wxDC& dc);
+    // column offset legend drawn above the hex area
+    void DrawOffsets(wxDC& dc);
     void RepaintEv(wxPaintEvent& ev);
     void Repaint();
     void Resize(wxSizeEvent& ev);
@@ -229,6 +231,10 @@ protected:
     // easier than checking maxaddr
     int addrlen;
 
+    // highest top address that still fills the view without running past
+    // maxaddr, computed so it does not wrap when maxaddr is UINT32_MAX
+    uint32_t MaxTopAddr() const { return maxaddr - (uint32_t)nlines * 16 + 1; }
+
     void MouseEvent(wxMouseEvent& ev);
     void KeyEvent(widgets::UserInputEvent& ev);
     // the subwidgets
@@ -239,8 +245,10 @@ protected:
     int charheight, charwidth;
     // need to know if tc/sb have been Create()d yet
     bool didinit;
-    // selection info
-    int selnib, seladdr;
+    // selection info; seladdr must be unsigned, the GBA viewer addresses the
+    // whole 32-bit space
+    int selnib;
+    uint32_t seladdr;
     bool isasc;
     void ShowCaret();
 

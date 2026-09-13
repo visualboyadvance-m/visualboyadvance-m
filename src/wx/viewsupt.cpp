@@ -302,6 +302,16 @@ END_EVENT_TABLE()
 
 DEFINE_EVENT_TYPE(EVT_REFILL_NEEDED)
 
+// The column offset legend is drawn in an accent colour so it reads as a
+// ruler rather than as data.  A saturated red like the one in the feature
+// request goes muddy against a dark list background, so pick the shade from
+// how bright that background actually is.
+static wxColour OffsetColour(const wxColour& bg)
+{
+    const int lum = (bg.Red() * 299 + bg.Green() * 587 + bg.Blue() * 114) / 1000;
+    return lum < 128 ? wxColour(0xff, 0x8c, 0x82) : wxColour(0xc0, 0x00, 0x00);
+}
+
 IMPLEMENT_DYNAMIC_CLASS(MemView, wxPanel)
 
 MemView::MemView()
@@ -356,8 +366,9 @@ void MemView::Refit()
         didinit = true;
     }
 
+    // 15 lines of memory plus the offset legend above them
     wxSize sz(charwidth * (69 + addrlen) + sb.GetBestSize().GetWidth(),
-        charheight * 15);
+        charheight * 16);
     sz = sz + GetSize() - GetClientSize();
     SetMinSize(sz);
     SetSize(sz);
@@ -374,7 +385,7 @@ void MemView::MouseEvent(wxMouseEvent& ev)
     if (ev.GetEventType() == wxEVT_MOTION && !ev.LeftIsDown())
         return;
 
-    int x = ev.GetX() / charwidth, y = ev.GetY() / charheight;
+    int x = ev.GetX() / charwidth, y = ev.GetY() / charheight - 1;
     x -= addrlen + 3;
 
     if (x < 0 || y < 0 || y > nlines)
@@ -399,12 +410,14 @@ void MemView::MouseEvent(wxMouseEvent& ev)
 
     seladdr = topaddr + y * 16;
     selnib = word * nnib + nib;
-    Show(seladdr);
+    ShowAddr(seladdr);
 }
 
 void MemView::ShowCaret()
 {
-    if (seladdr < (int)topaddr || seladdr >= (int)topaddr + nlines * 16)
+    // compare the offset into the view rather than seladdr against
+    // topaddr + nlines * 16, which wraps near the top of the address space
+    if (seladdr < topaddr || seladdr - topaddr >= (uint32_t)nlines * 16)
         selnib = -1;
 
     if (selnib < 0) {
@@ -428,7 +441,7 @@ void MemView::ShowCaret()
         addrlab->SetLabel(lab);
     }
 
-    int y = (seladdr - topaddr) / 16;
+    int y = (int)((seladdr - topaddr) / 16);
     int x = addrlen + 3;
     int nnib = 2 << fmt, nword = 16 >> fmt;
 
@@ -437,7 +450,7 @@ void MemView::ShowCaret()
     else
         x += (nnib + 1) * (selnib / nnib) + nnib - selnib % nnib - 1;
 
-    caret->Move(x * charwidth, y * charheight);
+    caret->Move(x * charwidth, (y + 1) * charheight);
 
     while (!caret->IsVisible())
         caret->Show();
@@ -469,6 +482,10 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
     const wxKeyModifier mod = user_input.keyboard_input().mod();
 
     int nnib = 2 << fmt;
+    // Address of the last row.  maxaddr is the highest valid address, which is
+    // UINT32_MAX in the GBA viewer: casting that to int gave -1, so the bounds
+    // checks below were never true and the down arrow did nothing at all.
+    const uint32_t lastrow = maxaddr & ~UINT32_C(0xf);
     switch (key) {
     case WXK_RIGHT:
     case WXK_NUMPAD_RIGHT:
@@ -482,7 +499,7 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
             selnib--;
 
         if (selnib >= 32) {
-            if (seladdr == (int)maxaddr - 16)
+            if (seladdr >= lastrow)
                 selnib = 32 - nnib;
             else {
                 selnib -= 32;
@@ -514,7 +531,7 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
 
     case WXK_DOWN:
     case WXK_NUMPAD_DOWN:
-        if (seladdr < (int)maxaddr - 16)
+        if (seladdr < lastrow)
             seladdr += 16;
 
         break;
@@ -533,7 +550,7 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
         }
 
         // location in data array
-        int wno = (seladdr - topaddr) / 4 + selnib / 8;
+        int wno = (int)((seladdr - topaddr) / 4) + selnib / 8;
         int bno = (selnib % 8) / 2;
         int nibno = selnib % 2;
 
@@ -546,7 +563,7 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
             selnib--;
 
         if (selnib >= 32) {
-            if (seladdr == (int)maxaddr - 16)
+            if (seladdr >= lastrow)
                 selnib = 32 - nnib;
             else {
                 selnib -= 32;
@@ -597,7 +614,7 @@ void MemView::KeyEvent(widgets::UserInputEvent& ev)
         Repaint();
     }
 
-    Show(seladdr);
+    ShowAddr(seladdr);
 }
 
 void MemView::MoveSB()
@@ -621,11 +638,15 @@ void MemView::MoveSB()
 void MemView::MoveView(wxScrollEvent& ev)
 {
     int pos = ev.GetPosition();
+    // MoveSB() maps line numbers to scrollbar positions, so invert it in the
+    // same units.  Going through maxaddr instead lands topaddr 15 bytes past
+    // the start of a line, which throws off every line in the view.
+    const uint32_t maxrow = maxaddr / 16;
 
     if (pos < 100)
         topaddr = pos * 16;
     else if (pos >= 400)
-        topaddr = maxaddr + (pos - 500) * 16;
+        topaddr = (maxrow + pos - 500) * 16;
     else if (ev.GetEventType() == wxEVT_SCROLL_LINEUP) {
         topaddr -= 16;
         MoveSB();
@@ -642,7 +663,7 @@ void MemView::MoveView(wxScrollEvent& ev)
         if (pos <= 200)
             topaddr = ((pos - 100) * 10 + 100) * 16;
         else if (pos >= 300)
-            topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+            topaddr = ((pos - 300) * 10 - 1100 + maxrow) * 16;
         else
             topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
@@ -652,7 +673,7 @@ void MemView::MoveView(wxScrollEvent& ev)
     else if (pos <= 200)
         topaddr = ((pos - 100) * 10 + 100) * 16;
     else if (pos >= 300)
-        topaddr = ((pos - 300) * 10 - 1100) * 16 + maxaddr;
+        topaddr = ((pos - 300) * 10 - 1100 + maxrow) * 16;
     else if (pos > 200 && pos < 300)
         topaddr = ((pos - 200) * ((maxaddr / 16 - 2200) / 100) + 1100) * 16;
 
@@ -716,12 +737,49 @@ void MemView::RepaintEv(wxPaintEvent& ev)
     ShowCaret();
 }
 
+// Draw the 0-F column offsets above the hex area.  Bytes are shown
+// least-significant first within a column, so the digits of a multi-byte
+// column run backwards over it: "10" for a halfword at offset 0, "3210" for a
+// word.  Each label is centred on its column in device units rather than
+// padded with spaces, since a one-digit label cannot be centred on a
+// two-character column any other way.
+void MemView::DrawOffsets(wxDC& dc)
+{
+    // bytes per column, columns per line, characters per column
+    const int bpc = 1 << fmt, ncol = 16 >> fmt, colw = bpc * 2;
+    // first hex column, in characters
+    const int x0 = addrlen + 3;
+    const wxColour fg = dc.GetTextForeground();
+    dc.SetTextForeground(OffsetColour(disp.GetBackgroundColour()));
+
+    for (int c = 0; c < ncol; c++) {
+        wxString lab;
+
+        for (int b = bpc - 1; b >= 0; b--)
+            lab.append(wxString::Format(wxT("%X"), c * bpc + b));
+
+        int lw, lh;
+        dc.GetTextExtent(lab, &lw, &lh);
+        dc.DrawText(lab,
+            (x0 + c * (colw + 1)) * charwidth + (colw * charwidth - lw) / 2, 0);
+    }
+
+    dc.SetTextForeground(fg);
+}
+
 void MemView::Refill(wxDC& dc)
 {
     // don't want caret drawing at same time due to timer event
     wxCaretSuspend cs(&disp);
     // doesn't seem to inherit font properly
     dc.SetFont(GetFont());
+    // Nothing set these, so the text came out black on the wxSOLID default
+    // of white regardless of the theme, which is unreadable (or at best a
+    // sheet of white boxes) once the list background goes dark.
+    dc.SetTextForeground(wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOXTEXT));
+    dc.SetTextBackground(disp.GetBackgroundColour());
+    dc.SetPen(wxPen(dc.GetTextForeground()));
+    DrawOffsets(dc);
 
     for (size_t i = 0; i < (size_t)nlines && i < words.size() / 4; i++) {
         wxString line, word;
@@ -760,13 +818,15 @@ void MemView::Refill(wxDC& dc)
             appendc(v >> 24);
         }
 
-        dc.DrawText(line, 0, i * charheight);
+        dc.DrawText(line, 0, (i + 1) * charheight);
     }
 
     int lloc = charwidth * ((addrlen + 1) * 2 + 1) / 2;
-    dc.DrawLine(lloc, 0, lloc, nlines * charheight);
+    dc.DrawLine(lloc, 0, lloc, (nlines + 1) * charheight);
     lloc = charwidth * (2 * (addrlen + 3 + 32 + 4 + (fmt == 0 ? 3 * 4 : fmt == 1 ? 4 : 0)) + 1) / 2;
-    dc.DrawLine(lloc, 0, lloc, nlines * charheight);
+    dc.DrawLine(lloc, 0, lloc, (nlines + 1) * charheight);
+    // rule under the offset legend
+    dc.DrawLine(0, charheight - 1, disp.GetClientSize().GetWidth(), charheight - 1);
 }
 
 // on resize, recompute shown lines and refill if necessary
@@ -781,12 +841,17 @@ void MemView::Resize(wxSizeEvent& ev)
     sz.SetWidth(sz.GetWidth() - sbw);
     sb.Move(sz.GetWidth(), 0);
     sb.SetSize(sbw, sz.GetHeight());
-    nlines = (sz.GetHeight() + charheight - 1) / charheight;
-    disp.SetSize(sz.GetWidth(), (nlines + 1) * charheight);
+    // the top row holds the offset legend, not memory
+    nlines = (sz.GetHeight() + charheight - 1) / charheight - 1;
+
+    if (nlines < 1)
+        nlines = 1;
+
+    disp.SetSize(sz.GetWidth(), (nlines + 2) * charheight);
 
     if ((size_t)nlines > words.size() / 4) {
-        if (topaddr + nlines * 16 > maxaddr)
-            topaddr = maxaddr - nlines * 16 + 1;
+        if (topaddr > MaxTopAddr())
+            topaddr = MaxTopAddr();
 
         RefillNeeded();
     } else
@@ -795,13 +860,15 @@ void MemView::Resize(wxSizeEvent& ev)
 
 void MemView::ShowAddr(uint32_t addr, bool force_update)
 {
-    if (addr < topaddr || addr >= topaddr + (nlines - 1) * 16) {
+    // test the offset into the view rather than addr against
+    // topaddr + (nlines - 1) * 16, which wraps near the top of the space
+    if (addr < topaddr || addr - topaddr >= (uint32_t)(nlines - 1) * 16) {
         // align to nearest 16-byte block
         // note that mfc interface only aligns to nearest (1<<fmt)-byte
         uint32_t newtopaddr = addr & ~0xf;
 
-        if (newtopaddr + nlines * 16 > maxaddr)
-            newtopaddr = maxaddr - nlines * 16 + 1;
+        if (newtopaddr > MaxTopAddr())
+            newtopaddr = MaxTopAddr();
 
         force_update = newtopaddr != topaddr;
         topaddr = newtopaddr;
