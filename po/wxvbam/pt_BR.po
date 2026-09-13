@@ -22,6 +22,7 @@
 # Gabriel Prado, 2022
 # Gabriel Prado, 2022
 # Gustavo Canedo <gknedo@gmail.com>, 2015
+# João Guilherme, 2026
 # Marthay Mizover <officialjvgdac@gmail.com>, 2021
 # Josefumi Kujoh, 2021
 # Josefumi Kujoh, 2021
@@ -45,7 +46,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-07 09:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Felipefpl, 2022,2026\n"
+"Last-Translator: João Guilherme, 2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,7 +61,7 @@ msgstr ""
 #: audio/internal/faudio.cpp:482 audio/internal/xaudio2_7.cpp:530
 #: audio/internal/xaudio2_9.cpp:457
 msgid "Default device"
-msgstr "Dispositivo padrão"
+msgstr "Default device"
 
 #: audio/internal/coreaudio.cpp:393
 msgid "Could not get CoreAudio device"
