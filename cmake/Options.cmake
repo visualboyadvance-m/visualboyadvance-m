@@ -133,15 +133,68 @@ if(VBAM_STATIC)
     endif()
 endif()
 
-if(WIN32 AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
-   if(ARM64 AND NOT CMAKE_CROSSCOMPILING)
-      set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/arm64-windows/tools/pkgconf/pkgconf.exe")
-   else()
-      set(PKG_CONFIG_EXECUTABLE "$ENV{VCPKG_ROOT}/installed/x64-windows/tools/pkgconf/pkgconf.exe")
-   endif()
+# Where vcpkg keeps the tools that run on *this* machine.  In a cross build
+# (Android) the target triplet holds only target binaries, so anything we have
+# to execute during the configure -- pkgconf, Qt's moc/rcc/androiddeployqt --
+# comes from here instead.  vcpkg installs them as host dependencies of the
+# target ports, so they are already present in a vcpkg build.
+if(CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    if(VCPKG_HOST_TRIPLET)
+        set(vbam_host_triplet "${VCPKG_HOST_TRIPLET}")
+    elseif(CMAKE_HOST_WIN32)
+        if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(ARM64|aarch64)$")
+            set(vbam_host_triplet arm64-windows)
+        else()
+            set(vbam_host_triplet x64-windows)
+        endif()
+    elseif(CMAKE_HOST_APPLE)
+        if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+            set(vbam_host_triplet arm64-osx)
+        else()
+            set(vbam_host_triplet x64-osx)
+        endif()
+    elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+        set(vbam_host_triplet arm64-linux)
+    else()
+        set(vbam_host_triplet x64-linux)
+    endif()
+
+    if(VCPKG_ROOT)
+        set(VBAM_VCPKG_HOST_PREFIX "${VCPKG_ROOT}/installed/${vbam_host_triplet}")
+    else()
+        set(VBAM_VCPKG_HOST_PREFIX "$ENV{VCPKG_ROOT}/installed/${vbam_host_triplet}")
+    endif()
+
+    unset(vbam_host_triplet)
+endif()
+
+# Windows has no pkg-config of its own, so use vcpkg's.  This is keyed on the
+# host and not the target: a cross build still runs pkg-config here, and the
+# .pc files it reads are the target's, reached through CMAKE_PREFIX_PATH.
+if(CMAKE_HOST_WIN32 AND VBAM_VCPKG_HOST_PREFIX)
+    if(EXISTS "${VBAM_VCPKG_HOST_PREFIX}/tools/pkgconf/pkgconf.exe")
+        # Remembered so it can be put back if something overwrites it; see the
+        # ffmpeg wrapper note further down.
+        set(VBAM_PKG_CONFIG_EXECUTABLE "${VBAM_VCPKG_HOST_PREFIX}/tools/pkgconf/pkgconf.exe")
+        set(PKG_CONFIG_EXECUTABLE "${VBAM_PKG_CONFIG_EXECUTABLE}")
+    endif()
 endif()
 
 find_package(PkgConfig QUIET)
+
+# Cross-compiled Qt cannot run its own moc, rcc, uic or androiddeployqt, so Qt
+# requires QT_HOST_PATH.  vcpkg pulls the host Qt in as a host dependency of
+# qtbase, so a vcpkg build has one already and nothing needs to be passed in --
+# the same deal as the vcpkg wx-config in src/wx/CMakeLists.txt.  This has to
+# happen before any find_package(Qt6); on Android both ports need it, the wx
+# one included, because wxWidgets there is wxQt.
+if(CMAKE_CROSSCOMPILING AND NOT QT_HOST_PATH AND VBAM_VCPKG_HOST_PREFIX)
+    if(EXISTS "${VBAM_VCPKG_HOST_PREFIX}/share/Qt6HostInfo/Qt6HostInfoConfig.cmake")
+        set(QT_HOST_PATH "${VBAM_VCPKG_HOST_PREFIX}" CACHE PATH
+            "path to a host Qt installation, for the tools a cross build cannot run")
+        message(STATUS "Using the vcpkg host Qt: ${QT_HOST_PATH}")
+    endif()
+endif()
 
 # Add support for Homebrew, MacPorts and Fink on macOS
 option(DISABLE_MACOS_PACKAGE_MANAGERS "Set to TRUE to disable support for macOS Homebrew, MacPorts and Fink." FALSE)
@@ -490,6 +543,57 @@ if(VBAM_NEED_GUI_DEPS AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG O
             endif()
         endforeach()
     endif()
+
+    # The prebuilt ffmpeg packages ship a vcpkg wrapper that force-sets
+    # PKG_CONFIG_EXECUTABLE to <tree>/<host triplet>/tools/pkgconf/pkgconf.exe
+    # with the host triplet of the machine that built the package baked in,
+    # overwriting the one picked above.  Cross-triplet binary packages are
+    # normal here (see the NDK note in src/wx/CMakeLists.txt), and when that
+    # host triplet is not this machine's the path does not exist: FindPkgConfig
+    # blanks the variable, every pkg_check_modules() in the wrapper quietly
+    # does nothing, and the wrapper appends the PkgConfig::* targets it never
+    # created anyway.  Being a cache entry it also outlives the configure, so
+    # from the next one on it starves this project's own pkg-config users,
+    # FindFFmpeg included.  Put ours back.
+    if(VBAM_PKG_CONFIG_EXECUTABLE AND
+       NOT PKG_CONFIG_EXECUTABLE STREQUAL VBAM_PKG_CONFIG_EXECUTABLE)
+        unset(PKG_CONFIG_EXECUTABLE CACHE)
+        set(PKG_CONFIG_EXECUTABLE "${VBAM_PKG_CONFIG_EXECUTABLE}")
+        find_package(PkgConfig QUIET)
+    elseif(NOT PKG_CONFIG_FOUND OR NOT EXISTS "${PKG_CONFIG_EXECUTABLE}")
+        unset(PKG_CONFIG_EXECUTABLE CACHE)
+        find_package(PkgConfig QUIET)
+    endif()
+
+    # Retry the modules the wrapper named but could not look up, and drop the
+    # ones that stay missing.  Retrying only works where the module is spelled
+    # like the target (x264, x265); the wrapper also uses prefixes that differ
+    # from the module name, e.g. PkgConfig::svtav1 for SvtAv1Enc, and those
+    # just get dropped.  Nothing is lost with them: FFMPEG_LIBRARIES already
+    # carries the libraries themselves, found directly by FindFFmpeg.
+    set(vbam_ffmpeg_libs "")
+
+    foreach(vbam_ffmpeg_item IN LISTS FFMPEG_LIBRARIES)
+        if(TARGET "${vbam_ffmpeg_item}" OR NOT vbam_ffmpeg_item MATCHES "^PkgConfig::(.+)$")
+            list(APPEND vbam_ffmpeg_libs "${vbam_ffmpeg_item}")
+            continue()
+        endif()
+
+        if(PKG_CONFIG_FOUND)
+            pkg_check_modules(${CMAKE_MATCH_1} QUIET IMPORTED_TARGET ${CMAKE_MATCH_1})
+        endif()
+
+        if(TARGET "${vbam_ffmpeg_item}")
+            list(APPEND vbam_ffmpeg_libs "${vbam_ffmpeg_item}")
+        else()
+            message(STATUS
+                "ffmpeg: dropping ${vbam_ffmpeg_item}, named by the vcpkg wrapper but never created")
+        endif()
+    endforeach()
+
+    set(FFMPEG_LIBRARIES "${vbam_ffmpeg_libs}")
+    unset(vbam_ffmpeg_libs)
+    unset(vbam_ffmpeg_item)
 
     if(NOT FFmpeg_FOUND)
         set(FFMPEG_DEFAULT OFF)

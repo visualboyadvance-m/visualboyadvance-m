@@ -1530,6 +1530,13 @@ endif()
 # wxrc does not support xrs files in -c output (> 10x compression)
 # we do it using the bin2c.c utility.
 set(BIN2C ${CMAKE_BINARY_DIR}/bin2c)
+
+# Name it so the host can actually run it: cmd.exe will not execute an
+# extensionless file, and a cross build compiles this by hand rather than
+# through add_executable(), which would have added the suffix itself.
+if(CMAKE_HOST_WIN32)
+    set(BIN2C ${BIN2C}.exe)
+endif()
 include(HostCompile)
 host_compile(${CMAKE_CURRENT_SOURCE_DIR}/bin2c.c ${BIN2C})
 
