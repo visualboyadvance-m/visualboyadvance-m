@@ -265,6 +265,29 @@ The Windows code signing certificate is optional, if you have one put it into
 `~/.codesign/windows_comodo.pkcs12` as a PKCS12 file that is password protected,
 and put the password for it into `~/.codesign/windows_comodo.pkcs12.password`.
 
+For the Android APKs you will need a signing keystore. The build looks for one
+at `~/.codesign/android_debug.keystore`, make it with:
+
+```bash
+mkdir -p ~/.codesign
+keytool -genkeypair -keystore ~/.codesign/android_debug.keystore \
+        -storetype PKCS12 -storepass android -keypass android \
+        -alias androiddebugkey -keyalg RSA -keysize 4096 -validity 10950
+```
+
+, which will prompt for a name and organization to put in the certificate. Any
+answers will do, nothing checks them.
+
+The store password, the key password and the alias have to be the ones the
+build signs with. Those default to `android`, `android` and `androiddebugkey`,
+which is what the command above uses. To sign with something else, set
+`VBAM_ANDROID_KEYSTORE_PASS` and `VBAM_ANDROID_KEY_ALIAS` to match it, or point
+`VBAM_ANDROID_KEYSTORE` at an entirely different keystore.
+
+Keep this keystore. Android will not upgrade an installed app with a package
+signed by a different key, so a lost keystore means everyone has to uninstall
+and reinstall.
+
 #### Release Commit and Tag
 
 Once you are sure you're ready to release, and you are in a git clone on master
@@ -412,6 +435,44 @@ Collect the following files from `~/vbam-build-mac-arm64/project`:
 = `vbam-libretro-Mac-x86_64.zip`
 .
 
+#### Android APKs
+
+Install the Android SDK and NDK and point `ANDROID_HOME` and `ANDROID_NDK_HOME`
+at them. The NDK carries its own compilers for every ABI, so nothing needs to be
+installed from your distribution for the cross builds.
+
+Signing happens as part of the build, but only when `UPSTREAM_RELEASE` is set,
+and only if the keystore from the [Certificates](#certificates) section exists.
+Without it the build still finishes and warns, leaving packages that Android
+will refuse to install. Make the keystore first.
+
+Build each of the five Android triplets in its own build directory:
+
+```bash
+for triplet in arm64-android arm-neon-android x64-android x86-android riscv64-android; do
+    mkdir -p build-$triplet && (
+        cd build-$triplet
+        cmake .. -DVCPKG_TARGET_TRIPLET=$triplet -DCMAKE_BUILD_TYPE=Release \
+                 -DUPSTREAM_RELEASE=TRUE -G Ninja
+        ninja
+    )
+done
+```
+
+. The NDK supports riscv64 only from API 35 and ships no lower toolchain for
+it, while these builds default to API 28. If the riscv64 build fails to find a
+compiler, add `-DANDROID_PLATFORM=android-35` to its cmake line.
+
+Each build leaves a signed package at the top of its own build directory, named
+for the ABI it holds. Collect:
+
+- `visualboyadvance-m-ARM64.apk`
+- `visualboyadvance-m-ARM32.apk`
+- `visualboyadvance-m-x86_64.apk`
+- `visualboyadvance-m-x86_32.apk`
+- `visualboyadvance-m-RISCV64.apk`
+.
+
 #### Final steps
 
 Go to the github releases tab, and make a release for the tag you pushed
@@ -424,16 +485,21 @@ Upload all files collected during the earlier builds, the complete list is:
 
 
 - `translations.zip`
-= `vbam-libretro-Win-x86_32.zip`
-= `vbam-libretro-Win-x86_64.zip`
-= `vbam-libretro-Win-arm64.zip`
-= `vbam-libretro-Mac-arm64.zip`
-= `vbam-libretro-Mac-x86_64.zip`
+- `vbam-libretro-Win-x86_32.zip`
+- `vbam-libretro-Win-x86_64.zip`
+- `vbam-libretro-Win-ARM64.zip`
+- `vbam-libretro-Mac-ARM64.zip`
+- `vbam-libretro-Mac-x86_64.zip`
 - `visualboyadvance-m-Win-x86_64.zip`
 - `visualboyadvance-m-Win-x86_32.zip`
-- `visualboyadvance-m-Win-arm64.zip`
+- `visualboyadvance-m-Win-ARM64.zip`
 - `visualboyadvance-m-Mac-ARM64.zip`
 - `visualboyadvance-m-Mac-x86_64.zip`
+- `visualboyadvance-m-ARM64.apk`
+- `visualboyadvance-m-ARM32.apk`
+- `visualboyadvance-m-x86_64.apk`
+- `visualboyadvance-m-x86_32.apk`
+- `visualboyadvance-m-RISCV64.apk`
 
 . Update the winsparkle `appcast.xml` by running this cmake command:
 
@@ -442,4 +508,4 @@ cmake .. -DUPDATE_APPCAST=TRUE
 ```
 , and push it to the org repository `visualboyadvance-m.github.io`.
 
-Announce the release on reddit r/emulation and the forum.
+Announce the release on reddit r/emulation.

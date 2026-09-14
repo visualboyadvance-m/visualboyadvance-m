@@ -19,7 +19,12 @@ Our Discord server is [here](https://discord.gg/EpfxEuGMKH).
 
 Windows and Mac builds are in the [releases tab](https://github.com/visualboyadvance-m/visualboyadvance-m/releases).
 
-Nightly builds for Windows and macOS are at [https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
+<!--
+The forums are [here](https://board.visualboyadvance-m.org/).
+-->
+
+Nightly builds for Windows, macOS, Libretro and Android are at
+[https://nightly.visualboyadvance-m.org/](https://nightly.visualboyadvance-m.org/).
 
 <!--
 [![Get it from flathub](https://dl.flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/com.vba_m.visualboyadvance-m)
@@ -97,7 +102,7 @@ If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
 - x64-mingw-static (for MINGW64, UCRT64 or CLANG64),
 - x32-mingw-static (for Windows XP builds using a MINGW32 toolchain.)
 
-You can download a MINGW32 toolchain
+You can download a MINGW32 toolchain for XP
 [here](https://cachemiss.com/files/winxp-mingw32.7z) and extract it to
 `C:\msys64`.
 
