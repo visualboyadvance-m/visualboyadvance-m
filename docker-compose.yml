@@ -1,0 +1,11 @@
+services:
+  build:
+    build: .
+    volumes:
+      - .:/src
+    command:
+      - sh
+      - -c
+      - |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DENABLE_WX=ON -DENABLE_SDL=OFF -DBUILD_TESTING=OFF -DENABLE_FFMPEG=OFF -DENABLE_LINK=OFF &&
+        cmake --build build --parallel
