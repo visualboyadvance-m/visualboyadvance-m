@@ -2593,7 +2593,11 @@ EVT_HANDLER(wxID_ABOUT, "About...")
     // setting website, icon, license uses custom aboutbox on win32 & macosx
     // but at least win32 standard about is nothing special
     ai.SetWebSite(wxT("http://visualboyadvance-m.org/"));
-    ai.SetIcon(GetIcons().GetIcon(wxSize(32, 32), wxIconBundle::FALLBACK_NEAREST_LARGER));
+    // wxIconBundle::GetIcon() dereferences its ref data without checking it,
+    // so it cannot be called on a bundle that was never given an icon.
+    if (GetIcons().GetIconCount() != 0) {
+        ai.SetIcon(GetIcons().GetIcon(wxSize(32, 32), wxIconBundle::FALLBACK_NEAREST_LARGER));
+    }
     ai.SetDescription(_("Nintendo Game Boy / Color / Advance emulator."));
     ai.SetCopyright(_("Copyright (C) 1999-2003 Forgotten\nCopyright (C) 2004-2006 VBA development team\nCopyright (C) 2007-2020 VBA-M development team"));
     ai.SetLicense(_(

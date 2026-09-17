@@ -1702,27 +1702,13 @@ void MainFrame::MenuOptionIntRadioValue(const wxString& menuName, int field, int
 #endif
 
 void MainFrame::BindAppIcon() {
-#ifdef __WXMSW__
-    if (IsWindowsVistaOrGreater()) {
-        wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
-        func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
-        int icon_set_count = 0;
-
-        HICON hIconLg;
-        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), &hIconLg))) {
-            ::SendMessage(GetHandle(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIconLg));
-            ++icon_set_count;
-        }
-        HICON hIconSm;
-        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), &hIconSm))) {
-            ::SendMessage(GetHandle(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSm));
-            ++icon_set_count;
-        }
-
-        if (icon_set_count == 2) return;
-    }
-    // otherwise fall back to Wx method of setting icon
-#endif
+    // Always go through SetIcon() first, even on Windows where the scaled
+    // icons below replace what it puts on the frame. SetIcon() is what fills
+    // in the wxIconBundle that GetIcons() hands out, and that bundle is the
+    // only way the rest of the app can get at the application icon -- the
+    // About box takes its icon from there. Skipping it left the bundle empty,
+    // and wxIconBundle::GetIcon() dereferences its (null) ref data on an empty
+    // bundle, so Help -> About crashed.
     wxIcon icon = wxXmlResource::Get()->LoadIcon(wxT("MainIcon"));
 
     if (!icon.IsOk()) {
@@ -1731,6 +1717,26 @@ void MainFrame::BindAppIcon() {
     }
 
     SetIcon(icon);
+
+#ifdef __WXMSW__
+    // The icon wx just set is scaled down from the 256x256 image in the XRC,
+    // which makes the app-specific entry in the Windows volume mixer huge (see
+    // #149 and #121). Replace both sizes with properly scaled ones, straight
+    // through WM_SETICON so wx's own scaling is not involved.
+    if (IsWindowsVistaOrGreater()) {
+        wxDynamicLibrary comctl32("comctl32", wxDL_DEFAULT | wxDL_QUIET);
+        func_LoadIconWithScaleDown load_icon_scaled = reinterpret_cast<func_LoadIconWithScaleDown>(comctl32.GetSymbol("LoadIconWithScaleDown"));
+
+        HICON hIconLg;
+        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), &hIconLg))) {
+            ::SendMessage(GetHandle(), WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(hIconLg));
+        }
+        HICON hIconSm;
+        if (load_icon_scaled && SUCCEEDED(load_icon_scaled(wxGetInstance(), _T("AAAAA_MAINICON"), ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), &hIconSm))) {
+            ::SendMessage(GetHandle(), WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(hIconSm));
+        }
+    }
+#endif
 }
 
 // If there is a menubar, store all special menuitems
