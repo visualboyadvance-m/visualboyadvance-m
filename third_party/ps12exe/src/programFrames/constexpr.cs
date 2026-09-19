@@ -1,5 +1,4 @@
-﻿// Simple PowerShell host created by Ingo Karstein (http://blog.karstein-consulting.com)
-// Reworked and GUI support by Markus Scholtes
+﻿// 由 Ingo Karstein 创建的简单 PowerShell 主机（http://blog.karstein-consulting.com），由 Markus Scholtes 重构并支持 GUI。
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ using System.Reflection;
 #endif
 using System.Runtime.Versioning;
 
-// not displayed in details tab of properties dialog, but embedded to file
+// 不显示在属性对话框的详细信息选项卡中，但会嵌入到文件里
 #if Resources
 	[assembly: AssemblyDescription("$description")]
 	[assembly: AssemblyCompany("$company")]
@@ -36,13 +35,16 @@ namespace PSRunnerNS {
 				#if UNICODEEncoding && !noConsole
 				System.Console.OutputEncoding = new System.Text.UnicodeEncoding();
 				#endif
+				#if UTF8Encoding && !noConsole
+				System.Console.OutputEncoding = new System.Text.UTF8Encoding();
+				#endif
 
 				#if !noVisualStyles && noConsole
 				Application.EnableVisualStyles();
 				#endif
 
 				#if noConsole
-					// load assembly:AssemblyTitle
+					// 加载 assembly:AssemblyTitle
 					AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyTitleAttribute));
 					string title;
 					if (titleAttribute != null)

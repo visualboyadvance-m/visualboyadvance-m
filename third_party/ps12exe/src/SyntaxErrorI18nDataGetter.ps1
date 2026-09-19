@@ -1,6 +1,6 @@
-param ($Content,$Localize)
+﻿param ($Content, $Locale)
 
-[cultureinfo]::CurrentUICulture = $Localize
+[cultureinfo]::CurrentUICulture = $Locale
 
 $SyntaxErrors = $Tokens = $null
 $null = [System.Management.Automation.Language.Parser]::ParseInput($Content, [ref]$Tokens, [ref]$SyntaxErrors)

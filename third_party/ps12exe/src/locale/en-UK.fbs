@@ -77,7 +77,7 @@
 					<TextBox Name="VersionTextBox" Location="3,16" Size="357,22" />
 				</Label>
 			</GroupBox>
-			<GroupBox Name="CodeSigningGroupBox" Location="18,565" Size="712,109" Text="Code Signing">
+			<GroupBox Name="CodeSigningGroupBox" Location="17,564" Size="712,109" Text="Code Signing">
 				<CheckBox Name="EnableCodeSigningCheckBox" Location="552,10" Size="152,23" Text="Enable Code Signing" />
 				<Label Name="CertificatePathLabel" Location="14,19" Size="328,40" Text="Certificate Path (PFX)">
 					<TextBox Name="CertificatePathTextBox" AllowDrop="True" Location="-1,17" Size="284,22" />
@@ -110,14 +110,14 @@
 		<Button Name="SaveCfgButton" Location="801,50" Size="78,34" Text="Save Config" />
 		<Button Name="SaveCfg2OtherFileButton" Location="801,94" Size="77,42" Text="Save Config As" />
 		<Button Name="CompileButton" Location="802,630" Size="81,27" Text="Compile" />
-		<Label Name="CfgFileLabel" Location="9,683" Size="778,23" Text="No config file selected yet, man." />
+		<Label Name="CfgFileLabel" Location="9,683" Size="778,23" Text="No configuration file has been selected, old chap." />
 		<Button Name="DarkModeSetButton" BackgroundImageLayout="Stretch" Location="802,472" Size="51,51" />
 		<Button Name="BGMSetButton" BackgroundImageLayout="Stretch" Location="802,411" Size="51,51" />
 	</Form>
-	<OpenFileDialog Name="OpenCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Select a config file, if you would" />
-	<SaveFileDialog Name="SaveCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Save the config file, dude" />
-	<OpenFileDialog Name="OpenCompileFileDialog" DefaultExt="ps1" Filter="Powershell Files (*.ps1)|*.ps1|Powershell Data Files (*.psd1)|*.psd1" Title="Select a compilation file, my man" />
+	<OpenFileDialog Name="OpenCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Select a configuration file, if you'd be so kind" />
+	<SaveFileDialog Name="SaveCfgFileDialog" DefaultExt="psccfg" Filter="Configuration Files (*.psccfg)|*.psccfg" Title="Save the configuration file, old chap" />
+	<OpenFileDialog Name="OpenCompileFileDialog" DefaultExt="ps1" Filter="Powershell Files (*.ps1)|*.ps1|Powershell Data Files (*.psd1)|*.psd1" Title="Select a compilation file, my good sir" />
 	<SaveFileDialog Name="OpenOutputFileDialog" DefaultExt="exe" Filter="Executable Files (*.exe)|*.exe" Title="Select an output file, if you please" />
-	<OpenFileDialog Name="OpenIconFileDialog" DefaultExt="ico" Filter="Icon Files (*.ico)|*.ico" Title="Select an icon file, dude" />
-	<OpenFileDialog Name="OpenCertificateFileDialog" DefaultExt="pfx" Filter="Certificate Files (*.pfx)|*.pfx|All Files (*.*)|*.*" Title="Select a certificate file, dude" />
+	<OpenFileDialog Name="OpenIconFileDialog" DefaultExt="ico" Filter="Icon Files (*.ico)|*.ico" Title="Select an icon file, old bean" />
+	<OpenFileDialog Name="OpenCertificateFileDialog" DefaultExt="pfx" Filter="Certificate Files (*.pfx)|*.pfx|All Files (*.*)|*.*" Title="Select a certificate file, old chap" />
 </Data>

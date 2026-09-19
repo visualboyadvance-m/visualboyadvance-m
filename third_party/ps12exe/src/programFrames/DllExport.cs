@@ -58,7 +58,7 @@ namespace PSRunnerNS {
 				if (me.ShouldExit)
 					throw new InvalidOperationException("PSRunner is exiting."); // 更合适的异常
 
-				//set parameters as variables in psrunspace
+				// 将参数设置为 psrunspace 中的变量
 				me.PSRunSpace.SessionStateProxy.SetVariable("PSEXEDLLCallIngParameters", new ArrayList { a, b });
 				me.pwsh.Commands.Clear(); // 清除之前的命令
 				me.pwsh.AddScript("DllExportExample @PSEXEDLLCallIngParameters");

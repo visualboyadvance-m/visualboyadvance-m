@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Data>
+	<Form Name="MainForm" Size="938,750" Tag="VisualStyle,DPIAware" Text="ps12exe GUI">
+		<GroupBox Name="InputsGroupBox" Location="8,1" Size="773,682">
+			<GroupBox Name="BaseIOGroupBox" Location="5,13" Size="626,102">
+				<Label Name="CompileFileLabel" Location="6,17" Size="611,36" Text="コンパイルファイル">
+					<TextBox Name="CompileFileTextBox" AllowDrop="True" Location="0,13" Size="551,22" />
+					<Button Name="CompileFileButton" Location="552,10" Size="59,26" Text="..." />
+				</Label>
+				<Label Name="OutputFileLabel" Location="5,56" Size="613,37" Text="出力ファイル">
+					<TextBox Name="OutputFileTextBox" AllowDrop="True" Location="1,14" Size="550,22" />
+					<Button Name="OutputFileButton" Location="554,12" Size="59,25" Text="..." />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OtherInputsGroupBox" Location="6,118" Size="374,136">
+				<Label Name="CompileParamsLabel" Location="6,14" Size="359,38" Text="コンパイルパラメータ">
+					<TextBox Name="CompileParamsTextBox" Location="-1,16" Size="360,22" Text="/o+ /debug-" />
+				</Label>
+				<Label Name="TempDirLabel" Location="7,56" Size="359,36" Text="一時ディレクトリ">
+					<TextBox Name="TempDirTextBox" Location="-2,14" Size="360,22" />
+				</Label>
+				<Label Name="MinifyScriptLabel" Location="4,94" Size="362,38" Text="スクリプトを最小化">
+					<TextBox Name="MinifyScriptTextBox" Location="1,16" Size="360,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ArchitectureGroupBox" Location="15,262" Size="95,89" Text="アーキテクチャ">
+				<CheckBox Name="x64CheckBox" Location="8,15" Size="82,23" Text="x64" />
+				<CheckBox Name="x86CheckBox" Location="9,36" Size="81,26" Text="x86" />
+				<CheckBox Name="AnyCPUCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="8,58" Size="86,27" Text="AnyCPU" />
+			</GroupBox>
+			<GroupBox Name="CommonOptionsGroupBox" Location="639,18" Size="117,101" Text="一般的なオプション">
+				<CheckBox Name="ConsoleAppCheckBox" Checked="True" CheckState="Checked" Location="7,15" Size="103,26" Text="コンソールアプリケーション" />
+				<CheckBox Name="RequestAdminCheckBox" Location="10,65" Size="102,30" Text="管理者権限を要求" />
+				<CheckBox Name="DebugInfoCheckBox" Location="8,38" Size="108,31" Text="デバッグ情報を生成" />
+			</GroupBox>
+			<GroupBox Name="DetailedOptionsGroupBox" Location="639,125" Size="118,167" Text="その他のオプション">
+				<CheckBox Name="ConfigFileCheckBox" Location="11,18" Size="102,24" Text="設定ファイルを生成" />
+				<CheckBox Name="DisableOutputStreamCheckBox" Location="10,37" Size="100,26" Text="出力ストリームを無効にする" />
+				<CheckBox Name="DisableErrorStreamCheckBox" Location="10,60" Size="102,25" Text="エラーストリームを無効にする" />
+				<CheckBox Name="MoreOSFeaturesCheckBox" Location="10,129" Size="105,29" Text="その他のOS特性" />
+				<CheckBox Name="EnableVirtualizationCheckBox" Location="12,104" Size="102,28" Text="仮想化を有効にする" />
+				<CheckBox Name="LongPathSupportCheckBox" Location="10,80" Size="102,30" Text="長いパスのサポート" />
+			</GroupBox>
+			<GroupBox Name="RegionIDGroupBox" Location="219,262" Size="86,70">
+				<Label Name="RegionIDLabel" Location="7,15" Size="71,45" Text="ロケールIDの設定">
+					<TextBox Name="RegionIDTextBox" Location="-2,23" Size="73,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ThreadModelGroupBox" Location="116,264" Size="87,82" Text="スレッドモデル">
+				<CheckBox Name="SingleThreadCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="10,27" Size="72,21" Text="シングルスレッド" />
+				<CheckBox Name="MultiThreadCheckBox" Location="10,54" Size="73,25" Text="マルチスレッド" />
+			</GroupBox>
+			<GroupBox Name="ResourceParamsGroupBox" Location="17,359" Size="710,206" Text="リソースパラメータ">
+				<Label Name="IconFileLabel" Location="18,22" Size="318,36" Text="アイコンファイル">
+					<TextBox Name="IconFileTextBox" AllowDrop="True" Location="0,14" Size="279,22" />
+					<Button Name="IconFileButton" Location="280,13" Size="38,23" Text="..." />
+				</Label>
+				<Label Name="TitleLabel" Location="16,62" Size="318,39" Text="タイトル">
+					<TextBox Name="TitleTextBox" Location="1,17" Size="317,22" />
+				</Label>
+				<Label Name="DescriptionLabel" Location="15,106" Size="318,40" Text="説明">
+					<TextBox Name="DescriptionTextBox" Location="-1,18" Size="319,22" />
+				</Label>
+				<Label Name="CompanyLabel" Location="17,146" Size="321,41" Text="会社">
+					<TextBox Name="CompanyTextBox" Location="-1,19" Size="322,22" />
+				</Label>
+				<Label Name="ProductNameLabel" Location="343,19" Size="358,38" Text="製品名">
+					<TextBox Name="ProductNameTextBox" Location="-1,16" Size="359,22" />
+				</Label>
+				<Label Name="CopyrightInfoLabel" Location="342,62" Size="358,38" Text="著作権情報">
+					<TextBox Name="CopyrightInfoTextBox" Location="0,16" Size="358,22" />
+				</Label>
+				<Label Name="TrademarkInfoLabel" Location="342,106" Size="357,40" Text="商標情報">
+					<TextBox Name="TrademarkInfoTextBox" Location="0,18" Size="357,22" />
+				</Label>
+				<Label Name="VersionLabel" Location="344,149" Size="356,39" Text="バージョン">
+					<TextBox Name="VersionTextBox" Location="-1,17" Size="357,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="CodeSigningGroupBox" Location="16,565" Size="712,109" Text="コード署名">
+				<CheckBox Name="EnableCodeSigningCheckBox" Location="544,10" Size="152,23" Text="コード署名を有効にする" />
+				<Label Name="CertificatePathLabel" Location="14,19" Size="328,40" Text="証明書パス (PFX)">
+					<TextBox Name="CertificatePathTextBox" AllowDrop="True" Location="-1,17" Size="284,22" />
+					<Button Name="CertificatePathButton" Location="288,15" Size="40,26" Text="..." />
+				</Label>
+				<Label Name="CertificatePasswordLabel" Location="352,19" Size="348,40" Text="パスワード">
+					<TextBox Name="CertificatePasswordTextBox" Location="-1,17" PasswordChar="*" Size="356,22" />
+				</Label>
+				<Label Name="CertificateThumbprintLabel" Location="14,64" Size="336,40" Text="拇印">
+					<TextBox Name="CertificateThumbprintTextBox" Location="-1,17" Size="332,22" />
+				</Label>
+				<Label Name="TimestampServerLabel" Location="352,64" Size="348,40" Text="タイムスタンプサーバー">
+					<TextBox Name="TimestampServerTextBox" Location="-1,17" Size="356,22" Text="http://timestamp.digicert.com" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OptionsSplitterPanel" Location="385,119" Size="230,228">
+				<GroupBox Name="ConsoleOptionsSplitterPanel" Location="8,14" Size="206,75" Text="コンソールアプリケーションオプション">
+					<CheckBox Name="UnicodeEncodingCheckBox" Location="11,19" Size="187,28" Text="出力ストリームをUnicodeで強制的にエンコード" />
+					<CheckBox Name="CredentialGUICheckBox" Location="10,48" Size="178,20" Text="クレデンシャルGUI" />
+				</GroupBox>
+				<GroupBox Name="WindowsOptionsSplitterPanel" Location="8,102" Size="212,116" Text="ウィンドウアプリケーションオプション">
+					<CheckBox Name="IgnoreVisualStylesCheckBox" Location="10,18" Size="196,24" Text="ビジュアルスタイルを無視" />
+					<CheckBox Name="ExitOnCancelCheckBox" Location="10,88" Size="190,22" Text="キャンセル時に終了" />
+					<CheckBox Name="DPIAwareCheckBox" Location="10,40" Size="189,23" Text="DPI認識" />
+					<CheckBox Name="WinFormsDPIAwareCheckBox" Location="10,64" Size="194,24" Text="WinForms DPI認識" />
+				</GroupBox>
+			</GroupBox>
+		</GroupBox>
+		<Button Name="LoadCfgButton" Location="797,11" Size="83,26" Text="設定を読み込む" />
+		<Button Name="SaveCfgButton" Location="797,42" Size="85,27" Text="設定を保存" />
+		<Button Name="SaveCfg2OtherFileButton" Location="798,86" Size="85,31" Text="設定を別名で保存" />
+		<Button Name="CompileButton" Location="802,561" Size="81,27" Text="コンパイル" />
+		<Label Name="CfgFileLabel" Location="8,685" Size="778,21" Text="未選択の設定ファイル" />
+		<Button Name="DarkModeSetButton" BackgroundImageLayout="Stretch" Location="802,472" Size="51,51" />
+		<Button Name="BGMSetButton" BackgroundImageLayout="Stretch" Location="802,411" Size="51,51" />
+	</Form>
+	<OpenFileDialog Name="OpenCfgFileDialog" DefaultExt="psccfg" Filter="設定ファイル(*.psccfg)|*.psccfg" Title="設定ファイルを選択" />
+	<SaveFileDialog Name="SaveCfgFileDialog" DefaultExt="psccfg" Filter="設定ファイル(*.psccfg)|*.psccfg" Title="設定ファイルを保存" />
+	<OpenFileDialog Name="OpenCompileFileDialog" DefaultExt="ps1" Filter="powershellファイル(*.ps1)|*.ps1|powershellデータファイル(*.psd1)|*.psd1" Title="コンパイルファイルを選択" />
+	<SaveFileDialog Name="OpenOutputFileDialog" DefaultExt="exe" Filter="実行可能ファイル(*.exe)|*.exe" Title="出力ファイルを選択" />
+	<OpenFileDialog Name="OpenIconFileDialog" DefaultExt="ico" Filter="アイコンファイル(*.ico)|*.ico" Title="アイコンファイルを選択" />
+	<OpenFileDialog Name="OpenCertificateFileDialog" DefaultExt="pfx" Filter="証明書ファイル(*.pfx)|*.pfx|すべてのファイル(*.*)|*.*" Title="証明書ファイルを選択" />
+</Data>
