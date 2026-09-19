@@ -789,6 +789,244 @@ function(zip_is_installed zip outvar)
     set(${outvar} ${pkg_installed} PARENT_SCOPE)
 endfunction()
 
+# Days from 1970-01-01 to a date in the proleptic Gregorian calendar.
+#
+# Hinnant's days_from_civil. The era is four hundred years, the one span over
+# which the leap rule repeats, and the year is taken to start in March so that
+# the leap day falls at its end and no other month's length turns on it.
+#
+# Years before the epoch are not handled, because the dates reaching this are
+# the ones a directory listing printed.
+function(vcpkg_civil_days year month day outvar)
+    if(month LESS_EQUAL 2)
+        math(EXPR year "${year} - 1")
+    endif()
+
+    math(EXPR era "${year} / 400")
+    math(EXPR yoe "${year} - ${era} * 400")
+
+    if(month GREATER 2)
+        math(EXPR mp "${month} - 3")
+    else()
+        math(EXPR mp "${month} + 9")
+    endif()
+
+    math(EXPR doy  "(153 * ${mp} + 2) / 5 + ${day} - 1")
+    math(EXPR doe  "${yoe} * 365 + ${yoe} / 4 - ${yoe} / 100 + ${doy}")
+    math(EXPR days "${era} * 146097 + ${doe} - 719468")
+
+    set(${outvar} "${days}" PARENT_SCOPE)
+endfunction()
+
+# A directory listing's date, as seconds since the epoch.
+#
+# Two orders are in the field: "2026-Sep-19 02:50" from nginx-fancyindex and
+# "19-Sep-2026 02:50" from nginx's own autoindex. Anything else yields nothing,
+# and whatever asked is then left with no date rather than a wrong one.
+#
+# Read as UTC. A listing does not say whether its dates are UTC or the server's
+# own local time, and the comparison this feeds allows for either.
+function(vcpkg_date_seconds text outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    string(STRIP "${text}" text)
+
+    if(text MATCHES "^([0-9][0-9][0-9][0-9])-([A-Za-z][A-Za-z][A-Za-z])-([0-9][0-9]) ([0-9][0-9]):([0-9][0-9])$")
+        set(year "${CMAKE_MATCH_1}")
+        set(mon  "${CMAKE_MATCH_2}")
+        set(day  "${CMAKE_MATCH_3}")
+        set(hour "${CMAKE_MATCH_4}")
+        set(min  "${CMAKE_MATCH_5}")
+    elseif(text MATCHES "^([0-9][0-9])-([A-Za-z][A-Za-z][A-Za-z])-([0-9][0-9][0-9][0-9]) ([0-9][0-9]):([0-9][0-9])$")
+        set(day  "${CMAKE_MATCH_1}")
+        set(mon  "${CMAKE_MATCH_2}")
+        set(year "${CMAKE_MATCH_3}")
+        set(hour "${CMAKE_MATCH_4}")
+        set(min  "${CMAKE_MATCH_5}")
+    else()
+        return()
+    endif()
+
+    string(TOLOWER "${mon}" mon)
+
+    set(month_names jan feb mar apr may jun jul aug sep oct nov dec)
+
+    list(FIND month_names "${mon}" month)
+
+    if(month EQUAL -1)
+        return()
+    endif()
+
+    math(EXPR month "${month} + 1")
+
+    vcpkg_civil_days("${year}" "${month}" "${day}" days)
+
+    math(EXPR seconds "${days} * 86400 + ${hour} * 3600 + ${min} * 60")
+
+    set(${outvar} "${seconds}" PARENT_SCOPE)
+endfunction()
+
+# The date a directory listing carries for each package, as a flat list of name
+# and seconds pairs.
+#
+# A package is named for its port, its version and its triplet, and a rebuild
+# changes none of the three: a port relinked against a dependency whose ABI
+# moved is uploaded under the name it already had. So the name does not say
+# which build of a version is on offer, and the date is the only thing in a
+# listing that tells one from another.
+#
+# A row whose date this cannot read is left out, and whatever asks about that
+# package is told nothing rather than told wrongly.
+function(vcpkg_package_dates raw_html outvar)
+    set(dates "")
+
+    # Anchored on the link and carried across the two cells that follow it.
+    # Neither [^>]* nor [^<]* crosses a tag, so a match cannot run out of one
+    # row's name and into another row's date.
+    string(REGEX MATCHALL
+        "href=\"[^\"]+[.]zip\"[^>]*>[^<]*</a></td><td class=\"size\">[^<]*</td><td class=\"date\">[^<]*"
+        rows "${raw_html}")
+
+    foreach(row ${rows})
+        if(NOT row MATCHES "href=\"([^\"]+[.]zip)\"")
+            continue()
+        endif()
+
+        set(pkg "${CMAKE_MATCH_1}")
+
+        if(NOT row MATCHES "<td class=\"date\">(.*)$")
+            continue()
+        endif()
+
+        vcpkg_date_seconds("${CMAKE_MATCH_1}" pkg_date)
+
+        if(pkg_date)
+            list(APPEND dates "${pkg}" "${pkg_date}")
+        endif()
+    endforeach()
+
+    set(${outvar} "${dates}" PARENT_SCOPE)
+endfunction()
+
+# The date a listing gives for one package, or nothing when it gives none.
+function(vcpkg_listed_date pkg dates outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    list(FIND dates "${pkg}" idx)
+
+    if(idx EQUAL -1)
+        return()
+    endif()
+
+    math(EXPR idx "${idx} + 1")
+
+    list(GET dates ${idx} pkg_date)
+
+    set(${outvar} "${pkg_date}" PARENT_SCOPE)
+endfunction()
+
+# When the copy of a package installed here was put there, as seconds since the
+# epoch, or nothing when the port has nothing installed for the triplet.
+#
+# Read from the .list under installed/vcpkg/info, which vcpkg writes as the
+# last step of an install and which vcpkg_stamp_installed_packages() touches
+# after unpacking one. Before it has been touched it says something else: a
+# package carries the mtimes its files had when it was built, that .list among
+# them, so a package built a while before it was uploaded arrives already
+# looking its age. Older than the truth is the safe direction here -- it costs
+# one download, and the touch that follows settles it.
+function(vcpkg_package_install_time pkg outvar)
+    set(${outvar} "" PARENT_SCOPE)
+
+    if(NOT pkg MATCHES "^([^_]+)_([^_]+)_([^.]+)[.]zip$")
+        return()
+    endif()
+
+    set(port    "${CMAKE_MATCH_1}")
+    set(triplet "${CMAKE_MATCH_3}")
+
+    file(GLOB port_lists "${VCPKG_ROOT}/installed/vcpkg/info/${port}_*_${triplet}.list")
+
+    set(newest "")
+
+    foreach(port_list ${port_lists})
+        file(TIMESTAMP "${port_list}" port_list_time "%s" UTC)
+
+        if(NOT port_list_time)
+            continue()
+        endif()
+
+        if(NOT newest OR port_list_time GREATER newest)
+            set(newest "${port_list_time}")
+        endif()
+    endforeach()
+
+    set(${outvar} "${newest}" PARENT_SCOPE)
+endfunction()
+
+# Whether the copy of a package installed here is older than the one on offer.
+#
+# The version comparison that runs first cannot see this. A rebuild keeps the
+# version it had, so a port relinked against a dependency whose ABI moved -- an
+# ffmpeg from before X265_BUILD went from 215 to 217 -- answers "installed"
+# against a listing that is offering something else, and what is left is a tree
+# whose packages no longer agree with each other. Nothing says so until the
+# link, which reports an undefined x265_api_get_215 against an x265 that is
+# sitting right there.
+#
+# A day and a half of margin, because the two times are not quite one clock: a
+# listing may be rendered in the server's own local time, which the zones put
+# up to fourteen hours either side of the UTC a file's mtime is read as. What
+# the margin costs is a rebuild noticed a configure late, which is nothing
+# beside fetching a package again because a clock is off by an hour.
+function(vcpkg_package_is_stale pkg dates outvar)
+    set(${outvar} FALSE PARENT_SCOPE)
+
+    vcpkg_listed_date("${pkg}" "${dates}" listed_date)
+
+    if(NOT listed_date)
+        return()
+    endif()
+
+    vcpkg_package_install_time("${pkg}" install_time)
+
+    if(NOT install_time)
+        return()
+    endif()
+
+    math(EXPR cutoff "${install_time} + 129600")
+
+    if(listed_date GREATER cutoff)
+        set(${outvar} TRUE PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Mark the packages just unpacked as having arrived now.
+#
+# A package carries the mtimes its files had when it was built and unpacking
+# puts them back, so one uploaded a while after it was built arrives looking
+# older than the listing offering it -- and would be fetched again on the next
+# configure, and on every configure after that one. The install is the single
+# moment known to be later than the upload, so that is what the .list is left
+# saying.
+#
+# Only the .list is touched. The rest of a package keeps the times it came
+# with, which is what anything reading the installed tree expects of it.
+function(vcpkg_stamp_installed_packages pkgs)
+    foreach(pkg ${pkgs})
+        if(NOT pkg MATCHES "^([^_]+)_([^_]+)_([^.]+)[.]zip$")
+            continue()
+        endif()
+
+        file(GLOB port_lists
+             "${VCPKG_ROOT}/installed/vcpkg/info/${CMAKE_MATCH_1}_*_${CMAKE_MATCH_3}.list")
+
+        if(port_lists)
+            file(TOUCH ${port_lists})
+        endif()
+    endforeach()
+endfunction()
+
 function(cleanup_binary_packages)
     file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/vcpkg-binary-packages")
 
@@ -903,6 +1141,8 @@ function(get_host_binary_packages wanted_ports outvar)
 
     file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_triplet}.html" raw_html)
 
+    vcpkg_package_dates("${raw_html}" host_package_dates)
+
     set(host_pkgs_dir ${CMAKE_BINARY_DIR}/vcpkg-host-binary-packages)
     file(REMOVE_RECURSE ${host_pkgs_dir})
     file(MAKE_DIRECTORY ${host_pkgs_dir})
@@ -913,20 +1153,36 @@ function(get_host_binary_packages wanted_ports outvar)
     foreach(dep ${host_deps})
         vcpkg_is_installed(${dep} 0 ${host_triplet} ${POWERSHELL} dep_installed)
 
-        if(dep_installed)
-            continue()
-        endif()
-
         string(REGEX MATCHALL "<a href=\"${dep}_[^\"]+[.]zip\"" links "${raw_html}")
         list(LENGTH links links_count)
 
         if(NOT links_count EQUAL 1)
-            message(STATUS "No single binary package for host dependency '${dep}:${host_triplet}', will build from source.")
-            set(host_all_found FALSE)
+            # One that is installed and has nothing on offer needs nothing from
+            # anybody; one that is not installed has to come from somewhere.
+            if(NOT dep_installed)
+                message(STATUS "No single binary package for host dependency '${dep}:${host_triplet}', will build from source.")
+                set(host_all_found FALSE)
+            endif()
+
             continue()
         endif()
 
         string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg ${links})
+
+        # Asked of the package on offer and not of the port, for the reason the
+        # target triplet's packages are: a host tool rebuilt on the server is
+        # installed here under the name it already had.
+        if(dep_installed)
+            vcpkg_package_is_stale("${pkg}" "${host_package_dates}" dep_stale)
+
+            if(NOT dep_stale)
+                continue()
+            endif()
+
+            message(STATUS
+                "Host tool '${dep}:${host_triplet}' has been rebuilt on the "
+                "server, reinstalling it.")
+        endif()
 
         download_package("${pkg}" "${host_pkgs_dir}")
 
@@ -945,6 +1201,8 @@ function(get_host_binary_packages wanted_ports outvar)
                 -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
             WORKING_DIRECTORY ${host_pkgs_dir}
         )
+
+        vcpkg_stamp_installed_packages("${host_to_install}")
     endif()
 
     file(REMOVE_RECURSE ${host_pkgs_dir})
@@ -1031,6 +1289,8 @@ function(get_binary_packages)
         string(REGEX REPLACE "<a href=\"([^\"]+[.]zip)\"" "\\1" pkg "${link}")
         list(APPEND all_packages ${pkg})
     endforeach()
+
+    vcpkg_package_dates("${raw_html}" package_dates)
 
     if(NOT all_packages)
         message(STATUS "No binary packages available for triplet '${VCPKG_TARGET_TRIPLET}'.")
@@ -1202,8 +1462,26 @@ function(get_binary_packages)
     foreach(pkg ${binary_packages})
         zip_is_installed(${pkg} pkg_installed)
 
+        string(REGEX REPLACE "_.*" "" pkg_port "${pkg}")
+
         if(pkg_installed)
-            # The same version can still be the wrong build of it. Unpack the
+            # A version is not a build. A port rebuilt on the server -- against
+            # a dependency whose ABI moved, or with a toolchain that has -- goes
+            # up under the name it already had, so the comparison above answers
+            # for a package that is no longer the one on offer, and the date the
+            # listing carries is the only thing that says so.
+            vcpkg_package_is_stale("${pkg}" "${package_dates}" pkg_stale)
+
+            if(pkg_stale)
+                message(STATUS
+                    "Port '${pkg_port}' has been rebuilt on the server, reinstalling it.")
+
+                set(pkg_installed FALSE)
+            endif()
+        endif()
+
+        if(pkg_installed)
+            # A version can be the wrong one in another way. Unpack the
             # package again when the port is installed without a feature that
             # was asked for: a package's CONTROL carries its features, and
             # installing is what writes them to the status database, so one
@@ -1215,8 +1493,6 @@ function(get_binary_packages)
             # port is not sent to be built from source over a feature, because
             # a disagreement about wxWidgets would then rebuild wxWidgets every
             # time rather than saying which feature it is short.
-            string(REGEX REPLACE "_.*" "" pkg_port "${pkg}")
-
             vcpkg_missing_features("${wanted_spec_${pkg_port}}"
                                    "${VCPKG_TARGET_TRIPLET}" pkg_features_missing)
 
@@ -1310,6 +1586,8 @@ function(get_binary_packages)
                     list(APPEND dep_packages "${dep_pkg}")
                 endforeach()
 
+                vcpkg_package_dates("${raw_html}" dep_dates)
+
                 vcpkg_newest_package("${dep_name}" "${dep_packages}" pkg)
 
                 if(NOT pkg)
@@ -1342,7 +1620,15 @@ function(get_binary_packages)
                 zip_is_installed("${pkg}" pkg_installed)
 
                 if(pkg_installed)
-                    continue()
+                    vcpkg_package_is_stale("${pkg}" "${dep_dates}" pkg_stale)
+
+                    if(NOT pkg_stale)
+                        continue()
+                    endif()
+
+                    message(STATUS
+                        "Dependency '${dep_name}:${dep_triplet}' has been rebuilt "
+                        "on the server, reinstalling it.")
                 endif()
 
                 # Skip if already downloaded.
@@ -1376,8 +1662,11 @@ function(get_binary_packages)
             WORKING_DIRECTORY ${bin_pkgs_dir}
             OUTPUT_VARIABLE incomplete_pkgs
         )
+
+        string(REGEX REPLACE "\r?\n" ";" incomplete_pkgs "${incomplete_pkgs}")
+        list(FILTER incomplete_pkgs EXCLUDE REGEX "^ *$")
+
         if(incomplete_pkgs)
-            string(STRIP "${incomplete_pkgs}" incomplete_pkgs)
             message(STATUS "Binary packages: skipping (incomplete dependencies): ${incomplete_pkgs}")
             set(all_ports_found FALSE)
         endif()
@@ -1389,6 +1678,17 @@ function(get_binary_packages)
                 -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-instpkg ."
             WORKING_DIRECTORY ${bin_pkgs_dir}
         )
+
+        # What was unpacked: everything downloaded above and every dependency
+        # the walk added, less the ones instpkg passed over for the reason just
+        # reported.
+        file(GLOB unpacked RELATIVE "${bin_pkgs_dir}" "${bin_pkgs_dir}/*.zip")
+
+        if(incomplete_pkgs)
+            list(REMOVE_ITEM unpacked ${incomplete_pkgs})
+        endif()
+
+        vcpkg_stamp_installed_packages("${unpacked}")
 
         file(REMOVE_RECURSE ${bin_pkgs_dir})
     endif()
