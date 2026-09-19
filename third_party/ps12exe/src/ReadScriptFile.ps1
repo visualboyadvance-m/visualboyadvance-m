@@ -49,41 +49,113 @@ function ReadScriptFile($File) {
 }
 . $PSScriptRoot\predicate.ps1
 . $PSScriptRoot\PSObjectToString.ps1
+. $PSScriptRoot\AstAnalyze.ps1
 function Preprocessor($Content, $FilePath) {
 	$Result = @()
 	$requiredModules = @()
 	$requireFlag = $False
-	# 处理#_if <PSEXE/PSScript>、#_else、#_endif
+	# here-string 函数体与完全处于块注释内的行不参与 `#_!!` 使用检查（与 VS Code 插件的 computeSkipMask 一致）。
+	$OpaqueLines = [bool[]]::new($Content.Count)
+	$HereTerminator = $null
+	$InBlockComment = $false
+	for ($skipIndex = 0; $skipIndex -lt $Content.Count; $skipIndex++) {
+		$skipLine = [string]$Content[$skipIndex]
+		$skipTrimmed = $skipLine.Trim()
+		if ($HereTerminator) {
+			$OpaqueLines[$skipIndex] = $true
+			if ($skipTrimmed.StartsWith($HereTerminator)) { $HereTerminator = $null }
+			continue
+		}
+		if ($InBlockComment) {
+			$OpaqueLines[$skipIndex] = $true
+			if ($skipLine.Contains('#>')) { $InBlockComment = $false }
+			continue
+		}
+		if ($skipLine -match '@(["''])\s*$') {
+			$HereTerminator = $Matches[1] + '@'
+			continue
+		}
+		$rest = $skipLine
+		$hasCode = $false
+		while ($true) {
+			$open = $rest.IndexOf('<#')
+			if ($open -lt 0) {
+				if ($rest.Trim() -ne '') { $hasCode = $true }
+				break
+			}
+			if ($rest.Substring(0, $open).Trim() -ne '') { $hasCode = $true }
+			$close = $rest.IndexOf('#>', $open + 2)
+			if ($close -lt 0) { $InBlockComment = $true; break }
+			$rest = $rest.Substring($close + 2)
+		}
+		if (-not $hasCode) { $OpaqueLines[$skipIndex] = $true }
+	}
+	# 处理#_if <PSEXE/PSScript>、#_else、#_endif（支持嵌套：只有栈上所有分支都为真时才输出）
+	$conditionStack = [System.Collections.Generic.List[hashtable]]::new()
 	for ($index = 0; $index -lt $Content.Count; $index++) {
 		$Line = $Content[$index]
 		if ($Line -match "^\s*#_if\s+(?<condition>\S+)\s*(?!#.*)") {
-			$condition = $Matches["condition"]
-			$condition = switch ($condition) {
-				'PSEXE' { $TRUE }
-				'PSScript' { $False }
-				default { Write-I18n Error PreprocessUnknownIfCondition $condition -Category InvalidData; $False }
+			$conditionName = $Matches["condition"]
+			# 外层 #_if 已经决定了内层条件，内层必有一支是死代码
+			if ($conditionStack.Count -gt 0) {
+				Write-I18n Warning PreprocessNestedIfDeadCode @($conditionName, $conditionStack[$conditionStack.Count - 1].Name)
 			}
-			while ($index -lt $Content.Count) {
-				$index++
-				$Line = $Content[$index]
-				if ($Line -match "^\s*#_endif\s*(?!#.*)") {
-					break
+			$conditionStack.Add(@{
+				Name   = $conditionName
+				Active = switch ($conditionName) {
+					'PSEXE' { $TRUE }
+					'PSScript' { $False }
+					default { Write-I18n Error PreprocessUnknownIfCondition $conditionName -Category InvalidData; $False }
 				}
-				if ($condition) { $Result += $Line }
-				if ($Line -match "^\s*#_else\s*(?!#.*)") {
-					$condition = -not $condition
-				}
-			}
-			if ($Line -notmatch "^\s*#_endif\s*(?!#.*)") {
-				Write-I18n Error PreprocessMissingEndif -Category SyntaxError
-				return
-			}
+			})
+		}
+		elseif ($Line -match "^\s*#_else\s*(?!#.*)") {
+			if ($conditionStack.Count -eq 0) { $Result += $Line; continue }
+			$top = $conditionStack[$conditionStack.Count - 1]
+			$top.Active = -not $top.Active
+		}
+		elseif ($Line -match "^\s*#_endif\s*(?!#.*)") {
+			if ($conditionStack.Count -eq 0) { $Result += $Line; continue }
+			$conditionStack.RemoveAt($conditionStack.Count - 1)
 		}
 		else {
-			$Result += $Line
+			# `#_if PSEXE` 分支只会编译进 EXE：直接运行脚本时该分支并未被注释掉，因此其中的普通代码也必须带 `#_!!`。
+			# 反之 `#_if PSScript` 分支只在直接运行时存在：其中的 `#_!!` 会让它在直接运行时变成注释，属于误用。
+			if ($conditionStack.Count -gt 0 -and -not $OpaqueLines[$index]) {
+				$knownBranch = $true
+				foreach ($conditionEntry in $conditionStack) {
+					if ($conditionEntry.Name -ne 'PSEXE' -and $conditionEntry.Name -ne 'PSScript') { $knownBranch = $false; break }
+				}
+				if ($knownBranch) {
+					# 一行只有在其所有外层分支都于编译期被选中时才会进入 EXE，否则只在直接运行时存在。
+					$selectedInExe = -not ($conditionStack.Active -contains $false)
+					$trimmedLine = ([string]$Line).TrimStart()
+					if ($selectedInExe) {
+						if ($trimmedLine -ne '' -and -not $trimmedLine.StartsWith('#')) {
+							Write-I18n Warning PreprocessPsexeBranchCode
+						}
+					}
+					elseif ($trimmedLine.StartsWith('#_!!')) {
+						Write-I18n Warning PreprocessPsscriptBranchBang
+					}
+				}
+			}
+			if (-not ($conditionStack.Active -contains $false)) {
+				$Result += $Line
+			}
 		}
 	}
-	$ScriptRoot = $FilePath.Substring(0, $FilePath.LastIndexOfAny(@('\', '/')))
+	if ($conditionStack.Count -ne 0) {
+		Write-I18n Error PreprocessMissingEndif -Category SyntaxError
+		return
+	}
+	# 被处理文件所在目录，用于解析 #_include 里的 $PSScriptRoot。本地路径取绝对目录，避免相对输入路径被反复前缀。
+	$ScriptRoot = if ($FilePath -match "^(https?|ftp)://") {
+		$FilePath -replace '/[^/]*$', ''
+	}
+	else {
+		[System.IO.Path]::GetDirectoryName($ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($FilePath))
+	}
 	function GetIncludeFilePath($rest) {
 		if ($rest -match "((\'[^\']*\')+)\s*(?!#.*)") {
 			$file = $Matches[1]
@@ -95,19 +167,114 @@ function Preprocessor($Content, $FilePath) {
 		}
 		else { $file = $rest }
 		$file = $file.Replace('$PSScriptRoot', $ScriptRoot)
-		# 若是相对路径，则转换为基于$FilePath的绝对路径
-		if ($file -notmatch "^[a-zA-Z]:" -and $file -notmatch "^(https|ftp)://") {
+		# 仍是相对路径（未引用 $PSScriptRoot）时，基于被处理文件所在目录解析。
+		if (-not [System.IO.Path]::IsPathRooted($file) -and $file -notmatch "^(https?|ftp)://") {
 			$file = "$ScriptRoot/$file"
 		}
 		$file
+	}
+	# 校验 pragma 子表达式是否只使用白名单内的 path 相关命令/变量。返回：$true 表示安全；否则返回一个含具体原因的字符串数组。
+	function Test-PragmaExpressionSafe([string]$Expr) {
+		$PragmaSafeCommands = @('gcm', 'get-command', 'join-path', 'split-path', 'resolve-path', 'convert-path', 'get-item', 'test-path', 'get-childitem')
+		if (-not $GuestMode) { $PragmaSafeCommands += 'get-content' }
+		$PragmaSafeVariables = @('PSScriptRoot', 'ScriptRoot', 'HOME', 'PWD', 'PSCommandPath')
+		$Errors = [System.Collections.Generic.List[string]]::new()
+		$Tokens = $null
+		$ParseErrors = $null
+		$Ast = [System.Management.Automation.Language.Parser]::ParseInput($Expr, [ref]$Tokens, [ref]$ParseErrors)
+		if ($ParseErrors) {
+			$Errors.Add("parse: $($ParseErrors[0].Message)")
+			return $Errors.ToArray()
+		}
+		$Result = AstAnalyze $Ast
+		if ($Result.ImporttedExternalScripts) { $Errors.Add('external script invocation') }
+		if ($Result.UsedNonConstTypes) { $Errors.Add("type members: $($Result.UsedNonConstTypes -join ', ')") }
+		if ($Result.UsedInstanceMethods) { $Errors.Add("instance methods: $($Result.UsedInstanceMethods -join ', ')") }
+		foreach ($f in $Result.UsedNonConstFunctions) {
+			if ($PragmaSafeCommands -notcontains $f.ToLowerInvariant()) { $Errors.Add("command: $f") }
+		}
+		foreach ($v in $Result.UsedNonConstVariables) {
+			if ($PragmaSafeVariables -notcontains $v) { $Errors.Add("variable: `$$v") }
+		}
+		return $Errors.ToArray()
+	}
+	# 校验通过后对 pragma 值进行 PowerShell 字符串展开（求值 $(...) 子表达式）。展开时临时把 $PSScriptRoot 指向被编译脚本所在目录，使子表达式内能直接引用它。
+	function Expand-PragmaExpression([string]$Value, [string]$PragmaName) {
+		$Unsafe = Test-PragmaExpressionSafe ('"' + $Value + '"')
+		if ($Unsafe) {
+			Write-I18n Error PragmaUnsafeExpression $($PragmaName, ($Unsafe -join '; ')) -Category ReadError
+			throw
+		}
+		$PSScriptRootBackup = $PSScriptRoot
+		$PSScriptRoot = $ScriptRoot
+		try {
+			return $ExecutionContext.InvokeCommand.ExpandString($Value)
+		}
+		finally {
+			$PSScriptRoot = $PSScriptRootBackup
+		}
+	}
+	# 解析 pragma 的字符串值：支持双/单引号、$() 白名单子表达式展开、$PSScriptRoot 替换。
+	function ConvertFrom-PragmaStringValue([string]$Value, [string]$PragmaName) {
+		if ($Value -match '^\"(?<value>[^\"]*)\"\s*(?!#.*)') {
+			$Value = $Matches["value"]
+			if ($Value -match '\$\(') {
+				$Value = Expand-PragmaExpression $Value $PragmaName
+			}
+			else {
+				$Value = $Value.Replace('$PSScriptRoot', $ScriptRoot)
+			}
+		}
+		elseif ($Value -match "^\'(?<value>[^\']*)\'\s*(?!#.*)") {
+			$Value = $Matches["value"]
+		}
+		else {
+			if ($Value -match '\$\(') {
+				$Value = Expand-PragmaExpression $Value $PragmaName
+			}
+			else {
+				$Value = $Value.Replace('$PSScriptRoot', $ScriptRoot)
+			}
+		}
+		return $Value
+	}
+	# 嵌套设置：a.b 或 a.b.c...，根参数必须是哈希表。字符串值会做同样的 pragma 值转换。
+	function Set-NestedPragma([string]$PragmaName, $Value) {
+		$segments = $PragmaName -split '\.'
+		$root = $segments[0]
+		$rootType = $ParamList[$root].ParameterType
+		if ($rootType -ne [hashtable] -and $rootType -ne [System.Collections.IDictionary]) {
+			Write-I18n Warning UnknownPragma $PragmaName
+			return $false
+		}
+		if ($Value -is [string]) {
+			$Value = ConvertFrom-PragmaStringValue $Value $PragmaName
+			if ($root -eq 'Signing' -and $segments[-1] -eq 'Password') {
+				$Value = ConvertTo-SecureString -String $Value -AsPlainText -Force
+			}
+		}
+		$target = if ($Params.ContainsKey($root) -and $Params[$root] -is [hashtable]) { $Params[$root] } else { @{} }
+		$cursor = $target
+		for ($i = 1; $i -lt $segments.Count - 1; $i++) {
+			if (-not ($cursor[$segments[$i]] -is [hashtable])) { $cursor[$segments[$i]] = @{} }
+			$cursor = $cursor[$segments[$i]]
+		}
+		$cursor[$segments[-1]] = $Value
+		$Params[$root] = $target
+		return $true
 	}
 	$Content = $Result |
 	# 处理#_pragma
 	ForEach-Object {
 		$_ # 对于#_pragma，我们不在预处理时移除它：考虑到它可能被用于$PSEXEscript中
-		if ($_ -match "^\s*#_pragma\s+(?<pragmaname>[a-zA-Z_][a-zA-Z_0-9]+)\s*(?!#.*)$") {
+		if ($_ -match "^\s*#_pragma\s+(?<pragmaname>[a-zA-Z_][a-zA-Z_0-9]*(?:\.[a-zA-Z_][a-zA-Z_0-9]*)*)\s*(?!#.*)$") {
 			$pragmaname = $Matches["pragmaname"]
 			$value = $true
+			if ($pragmaname.Contains('.')) {
+				# 无值嵌套 pragma（如 #_pragma App.Windowed）等同于打开对应键
+				Set-NestedPragma $pragmaname $true | Out-Null
+				return
+			}
 			if ($pragmaname.StartsWith("no")) {
 				$pragmaname = $pragmaname.Substring(2)
 				$value = $false
@@ -122,9 +289,14 @@ function Preprocessor($Content, $FilePath) {
 			}
 			Write-I18n Warning UnknownPragma $($Matches["pragmaname"])
 		}
-		elseif ($_ -match "^\s*#_pragma\s+(?<pragmaname>[a-zA-Z_][a-zA-Z_0-9]+)\s+(?<rest>.+)\s*$") {
+		elseif ($_ -match "^\s*#_pragma\s+(?<pragmaname>[a-zA-Z_][a-zA-Z_0-9]*(?:\.[a-zA-Z_][a-zA-Z_0-9]*)*)\s+(?<rest>.+)\s*$") {
 			$pragmaname = $Matches["pragmaname"]
+			if ($ConstEvalPragmas -contains $pragmaname) { return }
 			$value = $Matches["rest"]
+			if ($pragmaname.Contains('.')) {
+				Set-NestedPragma $pragmaname $value | Out-Null
+				return
+			}
 			if ($ParamList[$pragmaname].ParameterType -eq [Switch] -or $ParamList["no$pragmaname"].ParameterType -eq [Switch]) {
 				if ($value.IndexOf("#") -ge 0) {
 					$value = $value.Substring(0, $value.IndexOf("#"))
@@ -152,15 +324,7 @@ function Preprocessor($Content, $FilePath) {
 				}
 			}
 			elseif ($ParamList[$pragmaname].ParameterType -eq [string] -or $ParamList[$pragmaname + "File"].ParameterType -eq [string]) {
-				if ($value -match '^\"(?<value>[^\"]*)\"\s*(?!#.*)') {
-					$value = $Matches["value"].Replace('$PSScriptRoot', $ScriptRoot)
-				}
-				elseif ($value -match "^\'(?<value>[^\']*)\'\s*(?!#.*)") {
-					$value = $Matches["value"]
-				}
-				else {
-					$value = $value.Replace('$PSScriptRoot', $ScriptRoot)
-				}
+				$value = ConvertFrom-PragmaStringValue $value $pragmaname
 				if ($ParamList[$pragmaname].ParameterType -eq [string]) {
 					$Params[$pragmaname] = $value
 				}
@@ -224,10 +388,10 @@ function Preprocessor($Content, $FilePath) {
 			$Matches[1] + $Matches["line"]
 		}
 		elseif ($_ -match "^(\s*)#_balus\s+(?<exitcode>\`$?\w+)") {
-			'Start-Process powershell @("-NoProfile";"-c";"sleep 1;rm `"$PSEXEpath`"") -WindowStyle hidden;exit ' + $Matches["exitcode"]
+			'Start-Process powershell @("-NoProfile";"-c";"sleep 1;rm `"$PSCommandPath`"") -WindowStyle hidden;exit ' + $Matches["exitcode"]
 		}
 		elseif ($_ -match "^(\s*)#_balus") {
-			'Start-Process powershell @("-NoProfile";"-c";"sleep 1;rm `"$PSEXEpath`"") -WindowStyle hidden;exit 0'
+			'Start-Process powershell @("-NoProfile";"-c";"sleep 1;rm `"$PSCommandPath`"") -WindowStyle hidden;exit 0'
 		}
 		else { $_ }
 	} |

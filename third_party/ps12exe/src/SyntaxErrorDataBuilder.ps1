@@ -1,4 +1,4 @@
-param ($SyntaxErrors)
+﻿param ($SyntaxErrors)
 $SyntaxErrors | ForEach-Object {
 	$Extent = $_.Extent
 	if ($Extent.StartLineNumber) {
@@ -14,19 +14,19 @@ $SyntaxErrors | ForEach-Object {
 		$ColumnStr += "-$($Extent.EndColumnNumber)"
 	}
 	$SpoceText = $Extent.StartLineNumber, $Extent.StartColumnNumber
-	if($Extent.StartScriptPosition) {
+	if ($Extent.StartScriptPosition) {
 		$FullText = $Extent.StartScriptPosition.GetFullScript()
 	}
 	@{
-		Text = $FullText
-		Message = $_.Message
-		Spoce = @{
-			Line = $Extent.StartLineNumber
-			Column = $Extent.StartColumnNumber
-			LineEnd = $Extent.EndLineNumber
+		Text      = $FullText
+		Message   = $_.Message
+		Spoce     = @{
+			Line      = $Extent.StartLineNumber
+			Column    = $Extent.StartColumnNumber
+			LineEnd   = $Extent.EndLineNumber
 			ColumnEnd = $Extent.EndColumnNumber
 		}
 		SpoceText = $SpoceText
-		ErrorId = $_.ErrorId
+		ErrorId   = $_.ErrorId
 	}
 }

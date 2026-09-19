@@ -575,7 +575,7 @@ if(NOT ZIP_PROGRAM)
 
             execute_process(
                 COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
-                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -noConsole:$false -architecture 'x86' -localize 'en' -skipVersionCheck:$true"
+                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -Build @{Platform='x86'} -Locale 'en' -NoUpdateCheck"
                 RESULT_VARIABLE PS12EXE_BUILD_RESULT
             )
 

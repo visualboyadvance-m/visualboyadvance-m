@@ -1,15 +1,13 @@
 ﻿$type = ('System.Collections.Generic.Dictionary`2') -as "Type"
 $type = $type.MakeGenericType(@([String], [String]) )
 $o = [Activator]::CreateInstance($type)
-if ($targetRuntime -eq 'Framework2.0') {
+if ($isPwsh20Sma) {
 	$o.Add("CompilerVersion", "v3.5")
 }
 else { $o.Add("CompilerVersion", "v4.0") }
 
 $cop = (New-Object Microsoft.CSharp.CSharpCodeProvider($o))
-$cp = New-Object System.CodeDom.Compiler.CompilerParameters($referenceAssembies, $outputFile)
-$cp.GenerateInMemory = $FALSE
-$cp.GenerateExecutable = $TRUE
+[string[]]$BaseCompilerOptions = @($CompilerOptions)
 
 $manifestParam = if (($AstAnalyzeResult.IsConst -or $virtualize) -and -not $requireAdmin) {
 	"/nowin32manifest"
@@ -53,7 +51,7 @@ $(if ($DPIAware -or $longPaths) {@"
 "@ | Set-Content ($outputFile + ".win32manifest") -Encoding UTF8
 }
 
-[string[]]$CompilerOptions = @($CompilerOptions)
+[string[]]$CompilerOptions = $BaseCompilerOptions
 
 if ($virtualize) {
 	Write-I18n Host ForceX86byVirtualization
@@ -83,35 +81,113 @@ $(if ($longPaths) {@'
 </configuration>
 "@
 
-$cp.TempFiles = New-Object System.CodeDom.Compiler.TempFileCollection($TempDir)
-
 if ($iconFile) {
 	$CompilerOptions += "`"/win32icon:$iconFile`""
 }
 
-$cp.IncludeDebugInformation = $prepareDebug
-
-if ($prepareDebug) {
-	$cp.TempFiles.KeepFiles = $TRUE
-}
-
 $CompilerOptions += "/define:$($Constants -join ';')"
-$cp.CompilerOptions = $CompilerOptions -ne '' -join ' '
-Write-Debug "Using Compiler Options: $($cp.CompilerOptions)"
 
-if (!$AstAnalyzeResult.IsConst) {
-	[VOID]$cp.EmbeddedResources.Add("$TempDir\main.ps1")
+function New-PS12ExeCompilerParameters([string]$outFile, [string[]]$opts, [bool]$debug) {
+	$p = New-Object System.CodeDom.Compiler.CompilerParameters($referenceAssembies, $outFile)
+	$p.GenerateInMemory = $FALSE
+	$p.GenerateExecutable = $TRUE
+	$p.IncludeDebugInformation = $debug
+	$p.CompilerOptions = ($opts -ne '') -join ' '
+	$p.TempFiles = New-Object System.CodeDom.Compiler.TempFileCollection($TempDir)
+	if ($debug) { $p.TempFiles.KeepFiles = $TRUE }
+	Write-Debug "Using Compiler Options: $($p.CompilerOptions)"
+	return $p
 }
-$cr = $cop.CompileAssemblyFromSource($cp, $programFrame)
-if ($cr.Errors.Count -gt 0) {
-	throw $cr.Errors -join "`n"
+
+# 默认路径：先编出普通托管程序集作为负载，gzip 后塞进一个极小的 launcher 里。launcher 启动时在内存中解压并用 Assembly.Load 载入负载，因此负载不会落到磁盘。仅当无法打包时才退化为普通编译（Build.KeepSource 需要负载源码/PDB、Build.DllExports、真实 PS2 SMA）。常量脚本的 constexpr.cs 入口是无参 Main()，与 pack launcher 的 Main(string[]) 调用约定不符，故不走 pack。
+$packEnabled = (
+	-not $prepareDebug -and
+	-not $isPwsh20Sma -and
+	-not $DllExportList -and
+	-not $AstAnalyzeResult.IsConst -and
+	$TempDir
+)
+
+if ($packEnabled) {
+	$payloadPath = Join-Path $TempDir 'PS12ExePayload.exe'
+	$payloadOptions = @($BaseCompilerOptions) + @(
+		"/platform:$architecture",
+		"/target:exe",
+		"/nowin32manifest",
+		"/define:$($Constants -join ';')"
+	)
+	$pcp = New-PS12ExeCompilerParameters $payloadPath $payloadOptions $FALSE
+	if (!$AstAnalyzeResult.IsConst) {
+		[VOID]$pcp.EmbeddedResources.Add("$TempDir\main.ps1")
+	}
+	$pcr = $cop.CompileAssemblyFromSource($pcp, $programFrame)
+	if ($pcr.Errors.Count -gt 0) {
+		throw $pcr.Errors -join "`n"
+	}
+
+	# csc 默认会塞进 manifest/版本信息资源；负载用不到这些，先剥掉再压缩省一点。
+	$exeSinker = Join-Path $PSScriptRoot 'ExeSinker.ps1'
+	if (Test-Path $exeSinker) {
+		& $exeSinker $payloadPath -removeResources
+	}
+
+	$gzPath = Join-Path $TempDir 'main'
+	[byte[]]$payloadBytes = [System.IO.File]::ReadAllBytes($payloadPath)
+	$fileStream = [System.IO.File]::Create($gzPath)
+	try {
+		$gzip = New-Object System.IO.Compression.GZipStream($fileStream, [System.IO.Compression.CompressionMode]::Compress)
+		try {
+			$gzip.Write($payloadBytes, 0, $payloadBytes.Length)
+		}
+		finally {
+			$gzip.Dispose()
+		}
+	}
+	finally {
+		$fileStream.Dispose()
+	}
+
+	# 和 default.cs 一样：编译进 ps12exe.exe 时内嵌 pack.cs，脚本模式从磁盘读取。
+	#_if PSEXE
+		#_include_as_value launcherSource "$PSScriptRoot/programFrames/pack.cs"
+	#_else
+		[string]$launcherSource = Get-Content $PSScriptRoot/programFrames/pack.cs -Raw -Encoding UTF8
+	#_endif
+	# 资源参数走 #if + $placeholder 替换，pack.cs 自身保持纯 C#。
+	$launcherSource = $launcherSource.Replace("`$TargetFramework", $TargetFramework)
+	$resourceParamKeys | ForEach-Object {
+		$launcherSource = $launcherSource.Replace("`$$_", $resourceParams[$_])
+	}
+
+	[string[]]$LauncherCompilerOptions = $CompilerOptions
+	if (-not $manifestParam) {
+		# 没有自定义清单需求时，launcher 也不需要默认清单。
+		$LauncherCompilerOptions += "/nowin32manifest"
+	}
+	$lcp = New-PS12ExeCompilerParameters $outputFile $LauncherCompilerOptions $FALSE
+	[VOID]$lcp.EmbeddedResources.Add($gzPath)
+	$cr = $cop.CompileAssemblyFromSource($lcp, $launcherSource)
+	if ($cr.Errors.Count -gt 0) {
+		throw $cr.Errors -join "`n"
+	}
+}
+else {
+	$cp = New-PS12ExeCompilerParameters $outputFile $CompilerOptions $prepareDebug
+	if (!$AstAnalyzeResult.IsConst) {
+		[VOID]$cp.EmbeddedResources.Add("$TempDir\main.ps1")
+	}
+	$cr = $cop.CompileAssemblyFromSource($cp, $programFrame)
+	if ($cr.Errors.Count -gt 0) {
+		throw $cr.Errors -join "`n"
+	}
 }
 
 if (
-#_if PSEXE
-	#_!! $AstAnalyzeResult.IsConst -or
-#_endif
-$requireAdmin -or $DPIAware -or $supportOS -or $longPaths) {
+	#_if PSEXE
+		#_!! $AstAnalyzeResult.IsConst -or
+	#_endif
+	$requireAdmin -or $DPIAware -or $supportOS -or $longPaths
+) {
 	if (Test-Path $($outputFile + ".win32manifest")) {
 		Remove-Item $($outputFile + ".win32manifest") -Verbose:$FALSE
 	}

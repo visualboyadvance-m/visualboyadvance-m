@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Data>
+	<Form Name="MainForm" Size="938,750" Tag="VisualStyle,DPIAware" Text="ps12exe GUI">
+		<GroupBox Name="InputsGroupBox" Location="8,1" Size="773,682">
+			<GroupBox Name="BaseIOGroupBox" Location="5,13" Size="626,102">
+				<Label Name="CompileFileLabel" Location="6,17" Size="611,36" Text="Archivo de compilación">
+					<TextBox Name="CompileFileTextBox" AllowDrop="True" Location="0,13" Size="551,22" />
+					<Button Name="CompileFileButton" Location="552,10" Size="59,26" Text="..." />
+				</Label>
+				<Label Name="OutputFileLabel" Location="5,56" Size="613,37" Text="Archivo de salida">
+					<TextBox Name="OutputFileTextBox" AllowDrop="True" Location="1,14" Size="550,22" />
+					<Button Name="OutputFileButton" Location="554,12" Size="59,25" Text="..." />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OtherInputsGroupBox" Location="6,118" Size="374,136">
+				<Label Name="CompileParamsLabel" Location="6,14" Size="359,38" Text="Parámetros de compilación">
+					<TextBox Name="CompileParamsTextBox" Location="-1,16" Size="360,22" Text="/o+ /debug-" />
+				</Label>
+				<Label Name="TempDirLabel" Location="7,56" Size="359,36" Text="Directorio temporal">
+					<TextBox Name="TempDirTextBox" Location="-2,14" Size="360,22" />
+				</Label>
+				<Label Name="MinifyScriptLabel" Location="4,94" Size="362,38" Text="Minimizar script">
+					<TextBox Name="MinifyScriptTextBox" Location="1,16" Size="360,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ArchitectureGroupBox" Location="15,262" Size="95,89" Text="Arquitectura">
+				<CheckBox Name="x64CheckBox" Location="8,15" Size="82,23" Text="x64" />
+				<CheckBox Name="x86CheckBox" Location="9,36" Size="81,26" Text="x86" />
+				<CheckBox Name="AnyCPUCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="8,58" Size="86,27" Text="AnyCPU" />
+			</GroupBox>
+			<GroupBox Name="CommonOptionsGroupBox" Location="639,18" Size="117,101" Text="Opciones comunes">
+				<CheckBox Name="ConsoleAppCheckBox" Checked="True" CheckState="Checked" Location="7,15" Size="103,26" Text="Aplicación de consola" />
+				<CheckBox Name="RequestAdminCheckBox" Location="10,65" Size="102,30" Text="Solicitar administrador" />
+				<CheckBox Name="DebugInfoCheckBox" Location="8,38" Size="108,31" Text="Generar información de depuración" />
+			</GroupBox>
+			<GroupBox Name="DetailedOptionsGroupBox" Location="639,125" Size="118,167" Text="Más opciones">
+				<CheckBox Name="ConfigFileCheckBox" Location="11,18" Size="102,24" Text="Generar archivo de configuración" />
+				<CheckBox Name="DisableOutputStreamCheckBox" Location="10,37" Size="100,26" Text="Desactivar flujo de salida" />
+				<CheckBox Name="DisableErrorStreamCheckBox" Location="10,60" Size="102,25" Text="Desactivar flujo de error" />
+				<CheckBox Name="MoreOSFeaturesCheckBox" Location="10,129" Size="105,29" Text="Más características del sistema operativo" />
+				<CheckBox Name="EnableVirtualizationCheckBox" Location="12,104" Size="102,28" Text="Habilitar virtualización" />
+				<CheckBox Name="LongPathSupportCheckBox" Location="10,80" Size="102,30" Text="Soporte de rutas largas" />
+			</GroupBox>
+			<GroupBox Name="RegionIDGroupBox" Location="219,262" Size="86,70">
+				<Label Name="RegionIDLabel" Location="7,15" Size="71,45" Text="Configuración de ID de región">
+					<TextBox Name="RegionIDTextBox" Location="-2,23" Size="73,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="ThreadModelGroupBox" Location="116,264" Size="87,82" Text="Modelo de hilos">
+				<CheckBox Name="SingleThreadCheckBox" AutoCheck="False" Checked="True" CheckState="Checked" Location="10,27" Size="72,21" Text="Un solo hilo" />
+				<CheckBox Name="MultiThreadCheckBox" Location="10,54" Size="73,25" Text="Multihilo" />
+			</GroupBox>
+			<GroupBox Name="ResourceParamsGroupBox" Location="17,359" Size="710,206" Text="Parámetros de recursos">
+				<Label Name="IconFileLabel" Location="18,22" Size="318,36" Text="Archivo de icono">
+					<TextBox Name="IconFileTextBox" AllowDrop="True" Location="0,14" Size="279,22" />
+					<Button Name="IconFileButton" Location="280,13" Size="38,23" Text="..." />
+				</Label>
+				<Label Name="TitleLabel" Location="16,62" Size="318,39" Text="Título">
+					<TextBox Name="TitleTextBox" Location="1,17" Size="317,22" />
+				</Label>
+				<Label Name="DescriptionLabel" Location="15,106" Size="318,40" Text="Descripción">
+					<TextBox Name="DescriptionTextBox" Location="-1,18" Size="319,22" />
+				</Label>
+				<Label Name="CompanyLabel" Location="17,146" Size="321,41" Text="Compañía">
+					<TextBox Name="CompanyTextBox" Location="-1,19" Size="322,22" />
+				</Label>
+				<Label Name="ProductNameLabel" Location="343,19" Size="358,38" Text="Nombre del producto">
+					<TextBox Name="ProductNameTextBox" Location="-1,16" Size="359,22" />
+				</Label>
+				<Label Name="CopyrightInfoLabel" Location="342,62" Size="358,38" Text="Información de derechos de autor">
+					<TextBox Name="CopyrightInfoTextBox" Location="0,16" Size="358,22" />
+				</Label>
+				<Label Name="TrademarkInfoLabel" Location="342,106" Size="357,40" Text="Información de marca registrada">
+					<TextBox Name="TrademarkInfoTextBox" Location="0,18" Size="357,22" />
+				</Label>
+				<Label Name="VersionLabel" Location="344,149" Size="356,39" Text="Versión">
+					<TextBox Name="VersionTextBox" Location="-1,17" Size="357,22" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="CodeSigningGroupBox" Location="17,562" Size="712,109" Text="Firma de código">
+				<CheckBox Name="EnableCodeSigningCheckBox" Location="520,10" Size="184,23" Text="Habilitar firma de código" />
+				<Label Name="CertificatePathLabel" Location="14,19" Size="328,40" Text="Ruta del certificado (PFX)">
+					<TextBox Name="CertificatePathTextBox" AllowDrop="True" Location="-1,17" Size="284,22" />
+					<Button Name="CertificatePathButton" Location="288,15" Size="40,26" Text="..." />
+				</Label>
+				<Label Name="CertificatePasswordLabel" Location="352,19" Size="348,40" Text="Contraseña">
+					<TextBox Name="CertificatePasswordTextBox" Location="-1,17" PasswordChar="*" Size="356,22" />
+				</Label>
+				<Label Name="CertificateThumbprintLabel" Location="14,64" Size="336,40" Text="Huella digital">
+					<TextBox Name="CertificateThumbprintTextBox" Location="-1,17" Size="332,22" />
+				</Label>
+				<Label Name="TimestampServerLabel" Location="352,64" Size="348,40" Text="Servidor de marca de tiempo">
+					<TextBox Name="TimestampServerTextBox" Location="-1,17" Size="356,22" Text="http://timestamp.digicert.com" />
+				</Label>
+			</GroupBox>
+			<GroupBox Name="OptionsSplitterPanel" Location="385,119" Size="230,228">
+				<GroupBox Name="ConsoleOptionsSplitterPanel" Location="8,14" Size="206,75" Text="Opciones de aplicación de consola">
+					<CheckBox Name="UnicodeEncodingCheckBox" Location="11,19" Size="187,28" Text="Forzar la codificación Unicode en el flujo de salida" />
+					<CheckBox Name="CredentialGUICheckBox" Location="10,48" Size="178,20" Text="GUI de credenciales" />
+				</GroupBox>
+				<GroupBox Name="WindowsOptionsSplitterPanel" Location="8,102" Size="212,116" Text="Opciones de aplicación de ventana">
+					<CheckBox Name="IgnoreVisualStylesCheckBox" Location="10,18" Size="196,24" Text="Ignorar estilos visuales" />
+					<CheckBox Name="ExitOnCancelCheckBox" Location="10,88" Size="190,22" Text="Salir al cancelar" />
+					<CheckBox Name="DPIAwareCheckBox" Location="10,40" Size="189,23" Text="DPI consciente" />
+					<CheckBox Name="WinFormsDPIAwareCheckBox" Location="10,64" Size="194,24" Text="WinForms DPI consciente" />
+				</GroupBox>
+			</GroupBox>
+		</GroupBox>
+		<Button Name="LoadCfgButton" Location="797,11" Size="83,26" Text="Cargar configuración" />
+		<Button Name="SaveCfgButton" Location="797,42" Size="85,27" Text="Guardar configuración" />
+		<Button Name="SaveCfg2OtherFileButton" Location="798,86" Size="85,31" Text="Guardar configuración como" />
+		<Button Name="CompileButton" Location="802,630" Size="81,27" Text="Compilar" />
+		<Label Name="CfgFileLabel" Location="9,683" Size="778,23" Text="No se ha seleccionado ningún archivo de configuración" />
+		<Button Name="DarkModeSetButton" BackgroundImageLayout="Stretch" Location="802,472" Size="51,51" />
+		<Button Name="BGMSetButton" BackgroundImageLayout="Stretch" Location="802,411" Size="51,51" />
+	</Form>
+	<OpenFileDialog Name="OpenCfgFileDialog" DefaultExt="psccfg" Filter="Archivos de configuración(*.psccfg)|*.psccfg" Title="Seleccionar archivo de configuración" />
+	<SaveFileDialog Name="SaveCfgFileDialog" DefaultExt="psccfg" Filter="Archivos de configuración(*.psccfg)|*.psccfg" Title="Guardar archivo de configuración" />
+	<OpenFileDialog Name="OpenCompileFileDialog" DefaultExt="ps1" Filter="Archivos de powershell(*.ps1)|*.ps1|Archivos de datos de powershell(*.psd1)|*.psd1" Title="Seleccionar archivo de compilación" />
+	<SaveFileDialog Name="OpenOutputFileDialog" DefaultExt="exe" Filter="Archivos ejecutables(*.exe)|*.exe" Title="Seleccionar archivo de salida" />
+	<OpenFileDialog Name="OpenIconFileDialog" DefaultExt="ico" Filter="Archivos de icono(*.ico)|*.ico" Title="Seleccionar archivo de icono" />
+	<OpenFileDialog Name="OpenCertificateFileDialog" DefaultExt="pfx" Filter="Archivos de certificado(*.pfx)|*.pfx|Todos los archivos(*.*)|*.*" Title="Seleccionar archivo de certificado" />
+</Data>

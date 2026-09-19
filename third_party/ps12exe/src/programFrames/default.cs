@@ -1,11 +1,12 @@
-﻿// Simple PowerShell host created by Ingo Karstein (http://blog.karstein-consulting.com)
-// Reworked and GUI support by Markus Scholtes
+﻿// 由 Ingo Karstein 创建的简单 PowerShell 宿主 (http://blog.karstein-consulting.com)
+// 由 Markus Scholtes 重构并添加 GUI 支持
 
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
+using System.IO;
 #if !Pwsh20
 	using System.Management.Automation.Language;
 #endif
@@ -21,7 +22,7 @@ using System.Runtime.InteropServices;
 #endif
 using System.Runtime.Versioning;
 
-// not displayed in details tab of properties dialog, but embedded to file
+// 不显示在属性对话框的详细信息选项卡中，但会嵌入到文件里
 #if Resources
 	[assembly: AssemblyDescription("$description")]
 	[assembly: AssemblyCompany("$company")]
@@ -101,7 +102,7 @@ namespace PSRunnerNS {
 		}
 
 		internal static User_Pwd PromptForPassword(string caption, string message, string target, string user, PSCredentialTypes credTypes, PSCredentialUIOptions options) {
-			// Flags und Variablen initialisieren
+			// 初始化标志和变量
 			StringBuilder userPassword = new StringBuilder("", 128), userID = new StringBuilder(user, 128);
 			CREDUI_INFO credUI = new CREDUI_INFO();
 			if (!string.IsNullOrEmpty(message)) credUI.pszMessageText = message;
@@ -117,7 +118,7 @@ namespace PSRunnerNS {
 				}
 			}
 
-			// den Benutzer nach Kennwort fragen, grafischer Prompt
+			// 以图形提示向用户询问密码
 			CredUI_ReturnCodes returnCode = CredUIPromptForCredentials(ref credUI, target, IntPtr.Zero, 0, userID, 128, userPassword, 128, ref save, flags);
 
 			if (returnCode == CredUI_ReturnCodes.NO_ERROR) {
@@ -135,14 +136,14 @@ namespace PSRunnerNS {
 
 	internal class PSRunnerRawUI: PSHostRawUserInterface {
 		#if noConsole
-			// Speicher für Konsolenfarben bei GUI-Output werden gelesen und gesetzt, aber im Moment nicht genutzt (for future use)
+			// GUI 输出时的控制台颜色会被读取和设置，但目前尚未使用（供将来使用）
 			private ConsoleColor _GUIBackgroundColor = ConsoleColor.White;
 			private ConsoleColor _GUIForegroundColor = ConsoleColor.Black;
 
 			#if noConsole
 			private string _windowTitleData;
 			public PSRunnerRawUI() {
-				// load assembly:AssemblyTitle
+				// 加载 assembly:AssemblyTitle
 				AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyTitleAttribute));
 				if (titleAttribute != null)
 					_windowTitleData = titleAttribute.Title;
@@ -153,27 +154,25 @@ namespace PSRunnerNS {
 		#else
 			const int STD_OUTPUT_HANDLE = -11;
 
-			//CHAR_INFO struct, which was a union in the old days
-			// so we want to use LayoutKind.Explicit to mimic it as closely
-			// as we can
+			//CHAR_INFO 结构体早年是一个 union，因此我们用 LayoutKind.Explicit 尽量贴近它
 			[StructLayout(LayoutKind.Explicit)]
 			public struct CHAR_INFO {
 				[FieldOffset(0)]
 				internal char UnicodeChar;
 				[FieldOffset(0)]
 				internal char AsciiChar;
-				[FieldOffset(2)] //2 bytes seems to work properly
+				[FieldOffset(2)] //2 字节似乎能正常工作
 				internal UInt16 Attributes;
 			}
 
-			//COORD struct
+			//COORD 结构体
 			[StructLayout(LayoutKind.Sequential)]
 			public struct COORD {
 				public short X;
 				public short Y;
 			}
 
-			//SMALL_RECT struct
+			//SMALL_RECT 结构体
 			[StructLayout(LayoutKind.Sequential)]
 			public struct SMALL_RECT {
 				public short Left;
@@ -182,32 +181,27 @@ namespace PSRunnerNS {
 				public short Bottom;
 			}
 
-			/* Reads character and color attribute data from a rectangular block of character cells in a console screen buffer,
-				and the function writes the data to a rectangular block at a specified location in the destination buffer. */
+			/* 从控制台屏幕缓冲区的矩形字符单元格块读取字符与颜色属性数据，并把数据写入目标缓冲区指定位置的矩形块。 */
 			[DllImport("Kernel32.dll", EntryPoint = "ReadConsoleOutputW", CharSet = CharSet.Unicode, SetLastError = true)]
 			internal static extern bool ReadConsoleOutput(
 				IntPtr hConsoleOutput,
-				/* This pointer is treated as the origin of a two-dimensional array of CHAR_INFO structures
-				whose size is specified by the dwBufferSize parameter.*/
+				/* 该指针被视为 CHAR_INFO 结构二维数组的原点，数组大小由 dwBufferSize 参数指定。*/
 				[MarshalAs(UnmanagedType.LPArray), Out] CHAR_INFO[, ] lpBuffer,
 				COORD dwBufferSize,
 				COORD dwBufferCoord,
 				ref SMALL_RECT lpReadRegion);
 
-			/* Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer.
-				The data to be written is taken from a correspondingly sized rectangular block at a specified location in the source buffer */
+			/* 把字符与颜色属性数据写入控制台屏幕缓冲区中指定的矩形字符单元格块。要写入的数据取自源缓冲区指定位置的相应大小矩形块。 */
 			[DllImport("Kernel32.dll", EntryPoint = "WriteConsoleOutputW", CharSet = CharSet.Unicode, SetLastError = true)]
 			internal static extern bool WriteConsoleOutput(
 				IntPtr hConsoleOutput,
-				/* This pointer is treated as the origin of a two-dimensional array of CHAR_INFO structures
-				whose size is specified by the dwBufferSize parameter.*/
+				/* 该指针被视为 CHAR_INFO 结构二维数组的原点，数组大小由 dwBufferSize 参数指定。*/
 				[MarshalAs(UnmanagedType.LPArray), In] CHAR_INFO[, ] lpBuffer,
 				COORD dwBufferSize,
 				COORD dwBufferCoord,
 				ref SMALL_RECT lpWriteRegion);
 
-			/* Moves a block of data in a screen buffer. The effects of the move can be limited by specifying a clipping rectangle, so
-				the contents of the console screen buffer outside the clipping rectangle are unchanged. */
+			/* 在屏幕缓冲区中移动一块数据。移动效果可用裁剪矩形加以限制，裁剪矩形之外的屏幕缓冲区内容保持不变。 */
 			[DllImport("Kernel32.dll", SetLastError = true)]
 			static extern bool ScrollConsoleScreenBuffer(
 				IntPtr hConsoleOutput,
@@ -236,7 +230,7 @@ namespace PSRunnerNS {
 					if (!Console_Info.IsOutputRedirected())
 						return new System.Management.Automation.Host.Size(Console.BufferWidth, Console.BufferHeight);
 				#endif
-				// return default value. If no valid value is returned WriteLine will not be called
+				// 返回默认值。如果没有返回有效值，WriteLine 将不会被调用
 				return new System.Management.Automation.Host.Size(120, 50);
 			}
 			set {
@@ -253,7 +247,7 @@ namespace PSRunnerNS {
 				#if !noConsole
 					Console.CursorLeft, Console.CursorTop
 				#else
-					// Dummywert für Winforms zurückgeben.
+					// 为 WinForms 返回一个虚拟值。
 					0, 0
 				#endif
 				);
@@ -272,7 +266,7 @@ namespace PSRunnerNS {
 					#if !noConsole
 						Console.CursorSize
 					#else
-						// Dummywert für Winforms zurückgeben.
+						// 为 WinForms 返回一个虚拟值。
 						25
 					#endif
 				;
@@ -370,7 +364,7 @@ namespace PSRunnerNS {
 					#if !noConsole
 						Console.LargestWindowWidth, Console.LargestWindowHeight
 					#else
-						// Dummy-Wert für Winforms
+						// WinForms 的虚拟值
 						240, 84
 					#endif
 				);
@@ -383,7 +377,7 @@ namespace PSRunnerNS {
 					#if !noConsole
 						Console.BufferWidth, Console.BufferWidth
 					#else
-						// Dummy-Wert für Winforms
+						// WinForms 的虚拟值
 						120, 84
 					#endif
 				);
@@ -415,10 +409,10 @@ namespace PSRunnerNS {
 			#endif
 		}
 
-		public override void ScrollBufferContents(System.Management.Automation.Host.Rectangle source, Coordinates destination, System.Management.Automation.Host.Rectangle clip, BufferCell fill) { // no destination block clipping implemented
+		public override void ScrollBufferContents(System.Management.Automation.Host.Rectangle source, Coordinates destination, System.Management.Automation.Host.Rectangle clip, BufferCell fill) { // 未实现目标块裁剪
 			#if !noConsole
-			// clip area out of source range?
-			if ((source.Left > clip.Right) || (source.Right < clip.Left) || (source.Top > clip.Bottom) || (source.Bottom < clip.Top)) { // clipping out of range -> nothing to do
+			// 裁剪区域超出源范围？
+			if ((source.Left > clip.Right) || (source.Right < clip.Left) || (source.Top > clip.Bottom) || (source.Bottom < clip.Top)) { // 裁剪超出范围 -> 无需处理
 				return;
 			}
 
@@ -449,10 +443,10 @@ namespace PSRunnerNS {
 
 		public override void SetBufferContents(System.Management.Automation.Host.Rectangle rectangle, BufferCell fill) {
 			#if !noConsole
-			// using a trick: move the buffer out of the screen, the source area gets filled with the char fill.Character
+			// 用一个小技巧：把缓冲区移出屏幕，源区域便会被 fill.Character 字符填充
 			if (rectangle.Left >= 0)
 				Console.MoveBufferArea(rectangle.Left, rectangle.Top, rectangle.Right - rectangle.Left + 1, rectangle.Bottom - rectangle.Top + 1, BufferSize.Width, BufferSize.Height, fill.Character, fill.ForegroundColor, fill.BackgroundColor);
-			else { // Clear-Host: move all content off the screen
+			else { // Clear-Host：把所有内容移出屏幕
 				Console.MoveBufferArea(0, 0, BufferSize.Width, BufferSize.Height, BufferSize.Width, BufferSize.Height, fill.Character, fill.ForegroundColor, fill.BackgroundColor);
 			}
 			#endif
@@ -489,7 +483,7 @@ namespace PSRunnerNS {
 					#if !noConsole
 						Console.WindowLeft, Console.WindowTop
 					#else
-						// Dummy-Wert für Winforms
+						// WinForms 的虚拟值
 						0, 0
 					#endif
 				);
@@ -508,7 +502,7 @@ namespace PSRunnerNS {
 				#if !noConsole
 					Console.WindowWidth, Console.WindowHeight
 				#else
-					// Dummy-Wert für Winforms
+					// WinForms 的虚拟值
 					120, 50
 				#endif
 				);
@@ -548,7 +542,7 @@ namespace PSRunnerNS {
 		private static extern IntPtr MB_GetString(uint strId);
 
 		public static DialogResult Show(string strTitle, string strPrompt, ref string strVal, bool blSecure) {
-			// Generate controls
+			// 生成控件
 			Form form = new Form();
 			form.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			form.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -557,8 +551,7 @@ namespace PSRunnerNS {
 			Button buttonOk = new Button();
 			Button buttonCancel = new Button();
 
-			// Sizes and positions are defined according to the label
-			// This control has to be finished first
+			// 尺寸和位置根据标签确定，必须先完成这个控件
 			if (string.IsNullOrEmpty(strPrompt)) {
 				if (blSecure)
 					strPrompt = "Secure input:";
@@ -569,23 +562,22 @@ namespace PSRunnerNS {
 			label.Location = new Point(9, 19);
 			label.MaximumSize = new System.Drawing.Size(System.Windows.Forms.Screen.FromControl(form).Bounds.Width * 5 / 8 - 18, 0);
 			label.AutoSize = true;
-			// Size of the label is defined not before Add()
+			// 标签的尺寸要到 Add() 之后才能确定
 			form.Controls.Add(label);
 
-			// Generate textbox
+			// 生成文本框
 			if (blSecure) textBox.UseSystemPasswordChar = true;
 			textBox.Text = strVal;
 			textBox.SetBounds(12, label.Bottom, label.Right - 12, 20);
 
-			// Generate buttons
-			// get localized "OK"-string
+			// 生成按钮，并获取本地化的 "OK" 字符串
 			string sTextOK = Marshal.PtrToStringUni(MB_GetString(0));
 			if (string.IsNullOrEmpty(sTextOK))
 				buttonOk.Text = "OK";
 			else
 				buttonOk.Text = sTextOK;
 
-			// get localized "Cancel"-string
+			// 获取本地化的 "Cancel" 字符串
 			string sTextCancel = Marshal.PtrToStringUni(MB_GetString(1));
 			if (string.IsNullOrEmpty(sTextCancel))
 				buttonCancel.Text = "Cancel";
@@ -597,7 +589,7 @@ namespace PSRunnerNS {
 			buttonOk.SetBounds(System.Math.Max(12, label.Right - 158), label.Bottom + 36, 75, 23);
 			buttonCancel.SetBounds(System.Math.Max(93, label.Right - 77), label.Bottom + 36, 75, 23);
 
-			// Configure form
+			// 配置窗体
 			form.Text = strTitle;
 			form.ClientSize = new System.Drawing.Size(System.Math.Max(178, label.Right + 10), label.Bottom + 71);
 			form.Controls.AddRange(new Control[] {
@@ -608,14 +600,14 @@ namespace PSRunnerNS {
 			form.FormBorderStyle = FormBorderStyle.FixedDialog;
 			form.StartPosition = FormStartPosition.CenterScreen;
 			try {
-				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 			} catch {}
 			form.MinimizeBox = false;
 			form.MaximizeBox = false;
 			form.AcceptButton = buttonOk;
 			form.CancelButton = buttonCancel;
 
-			// Show form and compute results
+			// 显示窗体并计算结果
 			DialogResult dialogResult = form.ShowDialog();
 			strVal = textBox.Text;
 			return dialogResult;
@@ -628,11 +620,11 @@ namespace PSRunnerNS {
 
 	public class Choice_Box {
 		public static int Show(System.Collections.ObjectModel.Collection<ChoiceDescription> arrChoice, int intDefault, string strTitle, string strPrompt) {
-			// cancel if array is empty
+			// 数组为空则取消
 			if (arrChoice == null) return -1;
 			if (arrChoice.Count < 1) return -1;
 
-			// Generate controls
+			// 生成控件
 			Form form = new Form();
 			form.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			form.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -640,8 +632,7 @@ namespace PSRunnerNS {
 			ToolTip toolTip = new ToolTip();
 			Button buttonOk = new Button();
 
-			// Sizes and positions are defined according to the label
-			// This control has to be finished first when a prompt is available
+			// 尺寸和位置根据标签确定，有提示时必须先完成这个控件
 			int iPosY = 19, iMaxX = 0;
 			if (!string.IsNullOrEmpty(strPrompt)) {
 				Label label = new Label();
@@ -649,14 +640,13 @@ namespace PSRunnerNS {
 				label.Location = new Point(9, 19);
 				label.MaximumSize = new System.Drawing.Size(System.Windows.Forms.Screen.FromControl(form).Bounds.Width * 5 / 8 - 18, 0);
 				label.AutoSize = true;
-				// erst durch Add() wird die Größe des Labels ermittelt
+				// 标签的尺寸要到 Add() 之后才能确定
 				form.Controls.Add(label);
 				iPosY = label.Bottom;
 				iMaxX = label.Right;
 			}
 
-			// An den Radiobuttons orientieren sich die weiteren Größen und Positionen
-			// Diese Controls also jetzt fertigstellen
+			// 其余尺寸和位置以单选按钮为基准，因此现在就完成这些控件
 			int Counter = 0;
 			int tempWidth = System.Windows.Forms.Screen.FromControl(form).Bounds.Width * 5 / 8 - 18;
 			foreach(ChoiceDescription sAuswahl in arrChoice) {
@@ -666,9 +656,9 @@ namespace PSRunnerNS {
 					aradioButton[Counter].Checked = true;
 				aradioButton[Counter].Location = new Point(9, iPosY);
 				aradioButton[Counter].AutoSize = true;
-				// erst durch Add() wird die Größe des Labels ermittelt
+				// 标签的尺寸要到 Add() 之后才能确定
 				form.Controls.Add(aradioButton[Counter]);
-				if (aradioButton[Counter].Width > tempWidth) { // radio field to wide for screen -> make two lines
+				if (aradioButton[Counter].Width > tempWidth) { // 单选按钮对屏幕来说太宽 -> 换成两行
 					int tempHeight = aradioButton[Counter].Height;
 					aradioButton[Counter].Height = tempHeight * (1 + (aradioButton[Counter].Width - 1) / tempWidth);
 					aradioButton[Counter].Width = tempWidth;
@@ -683,28 +673,28 @@ namespace PSRunnerNS {
 				Counter++;
 			}
 
-			// Tooltip auch anzeigen, wenn Parent-Fenster inaktiv ist
+			// 父窗口不活动时也显示工具提示
 			toolTip.ShowAlways = true;
 
-			// Button erzeugen
+			// 创建按钮
 			buttonOk.Text = "OK";
 			buttonOk.DialogResult = DialogResult.OK;
 			buttonOk.SetBounds(System.Math.Max(12, iMaxX - 77), iPosY + 36, 75, 23);
 
-			// configure form
+			// 配置窗体
 			form.Text = strTitle;
 			form.ClientSize = new System.Drawing.Size(System.Math.Max(178, iMaxX + 10), iPosY + 71);
 			form.Controls.Add(buttonOk);
 			form.FormBorderStyle = FormBorderStyle.FixedDialog;
 			form.StartPosition = FormStartPosition.CenterScreen;
 			try {
-				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 			} catch {}
 			form.MinimizeBox = false;
 			form.MaximizeBox = false;
 			form.AcceptButton = buttonOk;
 
-			// show and compute form
+			// 显示并计算窗体
 			if (form.ShowDialog() != DialogResult.OK)
 				return -1;
 			int iRueck = -1;
@@ -746,13 +736,13 @@ namespace PSRunnerNS {
 				this.KeyUp += new KeyEventHandler(Keyboard_Form_KeyUp);
 			}
 
-			// check for KeyDown or KeyUp?
+			// 检查 KeyDown 还是 KeyUp？
 			public bool checkKeyDown = true;
-			// key code for pressed key
+			// 按键的键码
 			public KeyInfo keyinfo;
 
 			void Keyboard_Form_KeyDown(object sender, KeyEventArgs kevent) {
-				if (checkKeyDown) { // store key info
+				if (checkKeyDown) { // 存储按键信息
 					keyinfo.VirtualKeyCode = kevent.KeyValue;
 					keyinfo.Character = GetCharFromKeys(kevent.KeyCode, kevent.Shift, kevent.Alt & kevent.Control)[0];
 					keyinfo.KeyDown = false;
@@ -775,13 +765,13 @@ namespace PSRunnerNS {
 					if ((kevent.Modifiers & System.Windows.Forms.Keys.NumLock) > 0) {
 						keyinfo.ControlKeyState |= ControlKeyStates.NumLockOn;
 					}
-					// and close the form
+					// 然后关闭窗体
 					this.Close();
 				}
 			}
 
 			void Keyboard_Form_KeyUp(object sender, KeyEventArgs kevent) {
-				if (!checkKeyDown) { // store key info
+				if (!checkKeyDown) { // 存储按键信息
 					keyinfo.VirtualKeyCode = kevent.KeyValue;
 					keyinfo.Character = GetCharFromKeys(kevent.KeyCode, kevent.Shift, kevent.Alt & kevent.Control)[0];
 					keyinfo.KeyDown = true;
@@ -804,19 +794,18 @@ namespace PSRunnerNS {
 					if ((kevent.Modifiers & System.Windows.Forms.Keys.NumLock) > 0) {
 						keyinfo.ControlKeyState |= ControlKeyStates.NumLockOn;
 					}
-					// and close the form
+					// 然后关闭窗体
 					this.Close();
 				}
 			}
 		}
 
 		public static KeyInfo Show(string strTitle, string strPrompt, bool blIncludeKeyDown) {
-			// Controls erzeugen
+			// 创建控件
 			Keyboard_Form form = new Keyboard_Form();
 			Label label = new Label();
 
-			// Am Label orientieren sich die Größen und Positionen
-			// Dieses Control also zuerst fertigstellen
+			// 尺寸和位置以标签为基准，因此先完成这个控件
 			if (string.IsNullOrEmpty(strPrompt))
 				label.Text = "Press a key";
 			else
@@ -824,21 +813,21 @@ namespace PSRunnerNS {
 			label.Location = new Point(9, 19);
 			label.MaximumSize = new System.Drawing.Size(System.Windows.Forms.Screen.FromControl(form).Bounds.Width * 5 / 8 - 18, 0);
 			label.AutoSize = true;
-			// erst durch Add() wird die Größe des Labels ermittelt
+			// 标签的尺寸要到 Add() 之后才能确定
 			form.Controls.Add(label);
 
-			// configure form
+			// 配置窗体
 			form.Text = strTitle;
 			form.ClientSize = new System.Drawing.Size(System.Math.Max(178, label.Right + 10), label.Bottom + 55);
 			form.FormBorderStyle = FormBorderStyle.FixedDialog;
 			form.StartPosition = FormStartPosition.CenterScreen;
 			try {
-				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+				form.Icon = Icon.ExtractAssociatedIcon(Assembly.GetEntryAssembly().Location);
 			} catch {}
 			form.MinimizeBox = false;
 			form.MaximizeBox = false;
 
-			// show and compute form
+			// 显示并计算窗体
 			form.checkKeyDown = blIncludeKeyDown;
 			form.ShowDialog();
 			return form.keyinfo;
@@ -894,13 +883,13 @@ namespace PSRunnerNS {
 			this.ResumeLayout();
 			#if !noVisualStyles
 			_timer.Elapsed += new System.Timers.ElapsedEventHandler(TimeTick);
-			_timer.Interval = 50; // milliseconds
+			_timer.Interval = 50; // 毫秒
 			_timer.AutoReset = true;
 			_timer.Start();
 			#endif
 		}
 
-		private Color DrawingColor(ConsoleColor color) { // convert ConsoleColor to System.Drawing.Color
+		private Color DrawingColor(ConsoleColor color) { // 把 ConsoleColor 转换为 System.Drawing.Color
 			switch (color) {
 			case ConsoleColor.DarkYellow:
 				return ColorTranslator.FromOle(35723);//#8B8B00
@@ -910,7 +899,7 @@ namespace PSRunnerNS {
 		}
 
 		#if !noVisualStyles
-		private void TimeTick(object source, System.Timers.ElapsedEventArgs eventargs) { // worker function that is called by _timer event
+		private void TimeTick(object source, System.Timers.ElapsedEventArgs eventargs) { // 由 _timer 事件调用的工作函数
 			if (_inTick) return;
 			_inTick = true;
 			if (_barNumber >= 0) {
@@ -925,7 +914,7 @@ namespace PSRunnerNS {
 		#endif
 
 		private void AddBar(ref Progress_Data pd, int position) {
-			// Create Label
+			// 创建标签
 			pd.lbActivity = new Label();
 			pd.lbActivity.Left = 5;
 			pd.lbActivity.Top = 104 * position + 10;
@@ -933,20 +922,20 @@ namespace PSRunnerNS {
 			pd.lbActivity.Height = 16;
 			pd.lbActivity.Font = new Font(pd.lbActivity.Font, FontStyle.Bold);
 			pd.lbActivity.Text = "";
-			// Add Label to Form
+			// 把标签添加到窗体
 			this.Controls.Add(pd.lbActivity);
 
-			// Create Label
+			// 创建标签
 			pd.lbStatus = new Label();
 			pd.lbStatus.Left = 25;
 			pd.lbStatus.Top = 104 * position + 26;
 			pd.lbStatus.Width = 800 - 40;
 			pd.lbStatus.Height = 16;
 			pd.lbStatus.Text = "";
-			// Add Label to Form
+			// 把标签添加到窗体
 			this.Controls.Add(pd.lbStatus);
 
-			// Create ProgressBar
+			// 创建进度条
 			pd.objProgressBar = new ProgressBar();
 			pd.objProgressBar.Value = 0;
 			pd.objProgressBar.Style =
@@ -965,27 +954,27 @@ namespace PSRunnerNS {
 				pd.objProgressBar.Left = 25 + 450;
 			}
 			pd.objProgressBar.Top = 104 * position + 47;
-			// Add ProgressBar to Form
+			// 把进度条添加到窗体
 			this.Controls.Add(pd.objProgressBar);
 
-			// Create Label
+			// 创建标签
 			pd.lbRemainingTime = new Label();
 			pd.lbRemainingTime.Left = 5;
 			pd.lbRemainingTime.Top = 104 * position + 72;
 			pd.lbRemainingTime.Width = 800 - 20;
 			pd.lbRemainingTime.Height = 16;
 			pd.lbRemainingTime.Text = "";
-			// Add Label to Form
+			// 把标签添加到窗体
 			this.Controls.Add(pd.lbRemainingTime);
 
-			// Create Label
+			// 创建标签
 			pd.lbOperation = new Label();
 			pd.lbOperation.Left = 25;
 			pd.lbOperation.Top = 104 * position + 88;
 			pd.lbOperation.Width = 800 - 40;
 			pd.lbOperation.Height = 16;
 			pd.lbOperation.Text = "";
-			// Add Label to Form
+			// 把标签添加到窗体
 			this.Controls.Add(pd.lbOperation);
 		}
 
@@ -1164,7 +1153,7 @@ namespace PSRunnerNS {
 	}
 	#endif
 
-	// define IsInputRedirected(), IsOutputRedirected() and IsErrorRedirected() here since they were introduced first with .Net 4.5
+	// 在这里定义 IsInputRedirected()、IsOutputRedirected() 和 IsErrorRedirected()，因为它们最早是在 .NET 4.5 中引入的
 	public class Console_Info {
 		private enum FileType: uint {
 			FILE_TYPE_UNKNOWN = 0x0000,
@@ -1280,14 +1269,14 @@ namespace PSRunnerNS {
 				if (!string.IsNullOrEmpty(message)) WriteLine(message);
 			#else
 				if ((!string.IsNullOrEmpty(caption)) || (!string.IsNullOrEmpty(message))) {
-					string sTitel = rawUI.WindowTitle, sMeldung = "";
+					string sTitle = rawUI.WindowTitle, sMeldung = "";
 
-					if (!string.IsNullOrEmpty(caption)) sTitel = caption;
+					if (!string.IsNullOrEmpty(caption)) sTitle = caption;
 					if (!string.IsNullOrEmpty(message)) sMeldung = message;
-					MessageBox.Show(sMeldung, sTitel);
+					MessageBox.Show(sMeldung, sTitle);
 				}
 
-				// Labeltext für Input_Box zurücksetzen
+				// 重置 Input_Box 的标签文本
 				_ib_message = "";
 			#endif
 			Dictionary<string, PSObject> ret = new Dictionary<string, PSObject> ();
@@ -1374,7 +1363,7 @@ namespace PSRunnerNS {
 				}
 			}
 			#if noConsole
-			// Labeltext für Input_Box zurücksetzen
+			// 重置 Input_Box 的标签文本
 			_ib_message = "";
 			#endif
 			return ret;
@@ -1422,7 +1411,7 @@ namespace PSRunnerNS {
 					inpkey = Console.ReadLine().ToLower();
 					if (res.ContainsKey(inpkey)) return res[inpkey];
 					if (string.IsNullOrEmpty(inpkey)) return defaultChoice;
-				} catch {/* ignore some read errors */}
+				} catch {/* 忽略部分读取错误 */}
 				if (inpkey == "?") {
 					foreach(ChoiceDescription cd in choices) {
 						string lkey = cd.Label.Substring(0, 1);
@@ -1575,7 +1564,7 @@ namespace PSRunnerNS {
 			return secstr;
 		}
 
-		// called by Write-Host
+		// 由 Write-Host 调用
 		public override void Write(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value) {
 			#if !noOutput
 			#if !noConsole
@@ -1603,9 +1592,9 @@ namespace PSRunnerNS {
 			#endif
 		}
 
-		// called by Write-Debug
+		// 由 Write-Debug 调用
 		public override void WriteDebugLine(string message) {
-			#if !noError
+			#if !noDebug
 			#if !noConsole
 				WriteLineInternal(DebugForegroundColor, DebugBackgroundColor, string.Format("DEBUG: {0}", message));
 			#else
@@ -1614,7 +1603,7 @@ namespace PSRunnerNS {
 			#endif
 		}
 
-		// called by Write-Error
+		// 由 Write-Error 调用
 		public override void WriteErrorLine(string value) {
 			#if !noError
 			#if !noConsole
@@ -1654,12 +1643,18 @@ namespace PSRunnerNS {
 		public override void WriteLine(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value) {
 			#if !noOutput
 			#if !noConsole
-				ConsoleColor fgc = Console.ForegroundColor, bgc = Console.BackgroundColor;
-				Console.ForegroundColor = foregroundColor;
-				Console.BackgroundColor = backgroundColor;
-				Console.WriteLine(value);
-				Console.ForegroundColor = fgc;
-				Console.BackgroundColor = bgc;
+				// 上色本身可能因宿主控制台状态异常而抛错（比如句柄暂时无效）；上色失败也不能让这行内容干脆不出现。
+				try {
+					ConsoleColor fgc = Console.ForegroundColor, bgc = Console.BackgroundColor;
+					Console.ForegroundColor = foregroundColor;
+					Console.BackgroundColor = backgroundColor;
+					Console.WriteLine(value);
+					Console.ForegroundColor = fgc;
+					Console.BackgroundColor = bgc;
+				}
+				catch {
+					Console.WriteLine(value);
+				}
 			#else
 				if ((!string.IsNullOrEmpty(value)) && (value != "\n"))
 					MessageBox.Show(value, rawUI.WindowTitle);
@@ -1667,18 +1662,24 @@ namespace PSRunnerNS {
 			#endif
 		}
 
-		#if !(noError || noConsole)
+		#if !noConsole
 		private void WriteLineInternal(ConsoleColor foregroundColor, ConsoleColor backgroundColor, string value) {
-			ConsoleColor fgc = Console.ForegroundColor, bgc = Console.BackgroundColor;
-			Console.ForegroundColor = foregroundColor;
-			Console.BackgroundColor = backgroundColor;
-			Console.WriteLine(value);
-			Console.ForegroundColor = fgc;
-			Console.BackgroundColor = bgc;
+			// 同上：ERROR/WARNING/DEBUG 走这条路，上色失败绝不能让失败原因本身消失（issue 60）。
+			try {
+				ConsoleColor fgc = Console.ForegroundColor, bgc = Console.BackgroundColor;
+				Console.ForegroundColor = foregroundColor;
+				Console.BackgroundColor = backgroundColor;
+				Console.WriteLine(value);
+				Console.ForegroundColor = fgc;
+				Console.BackgroundColor = bgc;
+			}
+			catch {
+				Console.WriteLine(value);
+			}
 		}
 		#endif
 
-		// called by Write-Output
+		// 由 Write-Output 调用
 		public override void WriteLine(string value) {
 			#if !noOutput
 			#if !noConsole
@@ -1705,16 +1706,15 @@ namespace PSRunnerNS {
 				if (pf.GetCount() == 0) pf = null;
 			}
 			#else
-			if (!Console_Info.IsOutputRedirected()) {// Do not write progress bar when the stdout is redirected.
-				// OSC sequence to turn on progress indicator
+			if (!Console_Info.IsOutputRedirected()) {// 标准输出被重定向时不写进度条。
+				// 用于开启进度指示器的 OSC 序列
 				// https://github.com/microsoft/terminal/issues/6700
 				if(Console_Info.IsVirtualTerminalSupported()){
-					if (record.RecordType == ProgressRecordType.Completed)//End progress indicator
+					if (record.RecordType == ProgressRecordType.Completed)//结束进度指示器
 						Console.Write("\x1b]9;4;0\x1b\\");
 					else {
 						int percentComplete = record.PercentComplete;
-						// Write-Progress allows for negative percent complete, but not greater than 100
-						// but OSC sequence is limited from 0 to 100.
+						// Write-Progress 允许负数完成百分比，但不得大于 100，而 OSC 序列限制在 0 到 100。
 						if (percentComplete < 0)
 							percentComplete = 0;
 						Console.Write(string.Format("\x1b]9;4;1;{0}\x1b\\", percentComplete));
@@ -1724,20 +1724,20 @@ namespace PSRunnerNS {
 			#endif
 		}
 
-		// called by Write-Verbose
+		// 由 Write-Verbose 调用
 		public override void WriteVerboseLine(string message) {
-			#if !noOutput
+			#if !noVerbose
 			#if !noConsole
-			WriteLine(VerboseForegroundColor, VerboseBackgroundColor, string.Format("VERBOSE: {0}", message));
+			WriteLineInternal(VerboseForegroundColor, VerboseBackgroundColor, string.Format("VERBOSE: {0}", message));
 			#else
 			MessageBox.Show(message, rawUI.WindowTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
 			#endif
 			#endif
 		}
 
-		// called by Write-Warning
+		// 由 Write-Warning 调用
 		public override void WriteWarningLine(string message) {
-			#if !noError
+			#if !noWarning
 				#if !noConsole
 					WriteLineInternal(WarningForegroundColor, WarningBackgroundColor, string.Format("WARNING: {0}", message));
 				#else
@@ -1874,6 +1874,17 @@ namespace PSRunnerNS {
 	}
 
 	internal class PSRunner: PSRunnerInterface {
+		// 启动计时。需要计时时用 ps12exe -StartupTiming 编译，计时输出走 stderr。
+		#if StartupTiming
+		internal static System.Diagnostics.Stopwatch TimerSw = System.Diagnostics.Stopwatch.StartNew();
+		#endif
+		[System.Diagnostics.Conditional("StartupTiming")]
+		internal static void TimerMark(string s) {
+			#if StartupTiming
+				System.Console.Error.WriteLine("[timing] " + s + ": " + TimerSw.Elapsed.TotalMilliseconds.ToString("F1") + " ms");
+			#endif
+		}
+
 		private bool shouldExit;
 
 		private int exitCode;
@@ -1895,25 +1906,41 @@ namespace PSRunnerNS {
 		public PowerShell pwsh;
 
 		public PSRunner() {
+			TimerMark("ctor:enter");
 			this.shouldExit = false;
 			this.exitCode = 0;
 			this.ui = new PSRunnerUI();
+			TimerMark("ctor:ui");
 			this.host = new PSRunnerHost(this, ui);
-			this.PSRunSpace = RunspaceFactory.CreateRunspace(host);
+			#if Pwsh20
+				this.PSRunSpace = RunspaceFactory.CreateRunspace(host);
+			#else
+				// 完整默认 ISS（含 Utility/Management 等内置管理单元）：自身创建稍慢，但首个 cmdlet 调用不必再走模块自动发现。CreateDefault2 的轻量 ISS 会把这份开销推迟到第一管道命令，对 hello world 实测反而慢约 70ms（见 tools/Benchmark）。
+				InitialSessionState iss = InitialSessionState.CreateDefault();
+				this.PSRunSpace = RunspaceFactory.CreateRunspace(host, iss);
+			#endif
+			TimerMark("ctor:runspace-create");
 			this.PSRunSpace.ApartmentState = System.Threading.ApartmentState.$threadingModel;
 			this.PSRunSpace.Open();
+			TimerMark("ctor:runspace-open");
 			this.pwsh = PowerShell.Create();
 			this.pwsh.Runspace = PSRunSpace;
-			string exepath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-			this.pwsh.Runspace.SessionStateProxy.SetVariable("PSEXEpath", exepath);
+			TimerMark("ctor:pwsh-create");
+			#if CoreHost
+				string exepath = System.Environment.ProcessPath;
+			#else
+				string exepath = Assembly.GetEntryAssembly().Location;
+			#endif
 			Assembly executingAssembly = Assembly.GetExecutingAssembly();
 			string script;
-			using(System.IO.Stream scriptstream = executingAssembly.GetManifestResourceStream("main.ps1")) {
-				using(System.IO.StreamReader scriptreader = new System.IO.StreamReader(scriptstream, System.Text.Encoding.UTF8)) {
+			// 脚本以 main.ps1 资源内嵌在负载程序集里；负载本身在打包时会被整体压缩。
+			using (Stream scriptstream = executingAssembly.GetManifestResourceStream("main.ps1")) {
+				using (var scriptreader = new StreamReader(scriptstream, Encoding.UTF8)) {
 					script = scriptreader.ReadToEnd();
 					this.PSRunSpace.SessionStateProxy.SetVariable("PSEXEscript", script);
 				}
 			}
+			TimerMark("ctor:read-script");
 			script = "function PSEXEMainFunction{"+script+"}";
 			#if Pwsh20
 				this.pwsh.AddScript(script);
@@ -1922,12 +1949,15 @@ namespace PSRunnerNS {
 				Token[] tokens;
 				ParseError[] errors;
 				ScriptBlockAst AST = Parser.ParseInput(script, exepath, out tokens, out errors);
+				TimerMark("ctor:parse");
 				this.PSRunSpace.SessionStateProxy.SetVariable("PSEXEIniter", AST.GetScriptBlock());
+				TimerMark("ctor:getscriptblock");
 				if(errors.Length > 0)
 					throw new System.InvalidProgramException(errors[0].Message);
 				this.pwsh.AddScript(".$PSEXEIniter");
 			}
 			#endif
+			TimerMark("ctor:done");
 		}
 		public void Dispose() {
 			if (pwsh != null) pwsh.Dispose();
@@ -1940,10 +1970,13 @@ namespace PSRunnerNS {
 
 			GC.SuppressFinalize(this);
 		}
-		//base init
+		//基础初始化
 		public static void BaseInit() {
 			#if UNICODEEncoding && !noConsole
 			System.Console.OutputEncoding = new System.Text.UnicodeEncoding();
+			#endif
+			#if UTF8Encoding && !noConsole
+			System.Console.OutputEncoding = new System.Text.UTF8Encoding();
 			#endif
 
 			#if culture
@@ -1954,16 +1987,195 @@ namespace PSRunnerNS {
 			#if !noVisualStyles && noConsole
 			Application.EnableVisualStyles();
 			#endif
+
+			FixModulePath();
+		}
+
+		// 把自己的模块目录前置；这里做同样的事，保证轻量 ISS 下命令仍能正确自动加载（issue 61）。
+		static void FixModulePath() {
+			try {
+				string docs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+				string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+				string systemRoot = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+				string[] preferred = new string[] {
+					string.IsNullOrEmpty(docs) ? null : Path.Combine(Path.Combine(docs, "WindowsPowerShell"), "Modules"),
+					string.IsNullOrEmpty(programFiles) ? null : Path.Combine(Path.Combine(programFiles, "WindowsPowerShell"), "Modules"),
+					string.IsNullOrEmpty(systemRoot) ? null : Path.Combine(Path.Combine(systemRoot, Path.Combine("System32", Path.Combine("WindowsPowerShell", Path.Combine("v1.0", "Modules"))))),
+				};
+				List<string> parts = new List<string>();
+				foreach (string path in preferred) {
+					if (!string.IsNullOrEmpty(path) && !parts.Contains(path)) parts.Add(path);
+				}
+				string existing = Environment.GetEnvironmentVariable("PSModulePath");
+				if (!string.IsNullOrEmpty(existing)) {
+					foreach (string path in existing.Split(';')) {
+						if (!string.IsNullOrEmpty(path) && !parts.Contains(path)) parts.Add(path);
+					}
+				}
+				Environment.SetEnvironmentVariable("PSModulePath", string.Join(";", parts.ToArray()));
+			} catch {
+				// 模块路径修正失败不应影响启动
+			}
 		}
 	}
 	static class PSRunnerEntry {
 		static PSRunner me;
 
-		// EXEMain
+		#if ScriptHasParam
+		// 把命令行参数当 PowerShell 数据(PSD)解析：只接受字面量（字符串/数字/bool/null/数组/哈希表），
+		// 任何表达式或命令都视为普通字符串。解析出的对象直接通过变量传入，不再作为文本进入命令行，
+		// 因此参数内容不会被当作 PowerShell 脚本求值。
+		// 例外：允许到安全类型的安全转换（如 [int]'5'、[hashtable]@{}、[ordered]@{}）。
+		static readonly Dictionary<string, Type> PsdSafeCastTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase) {
+			{ "int", typeof(int) }, { "int32", typeof(int) }, { "system.int32", typeof(int) },
+			{ "long", typeof(long) }, { "int64", typeof(long) }, { "system.int64", typeof(long) },
+			{ "short", typeof(short) }, { "int16", typeof(short) },
+			{ "byte", typeof(byte) }, { "sbyte", typeof(sbyte) },
+			{ "uint", typeof(uint) }, { "uint32", typeof(uint) },
+			{ "ulong", typeof(ulong) }, { "uint64", typeof(ulong) }, { "ushort", typeof(ushort) },
+			{ "single", typeof(float) }, { "float", typeof(float) },
+			{ "double", typeof(double) }, { "system.double", typeof(double) },
+			{ "decimal", typeof(decimal) },
+			{ "string", typeof(string) }, { "system.string", typeof(string) }, { "char", typeof(char) },
+			{ "bool", typeof(bool) }, { "boolean", typeof(bool) },
+			{ "hashtable", typeof(System.Collections.Hashtable) }, { "system.collections.hashtable", typeof(System.Collections.Hashtable) },
+			{ "array", typeof(object[]) }, { "object[]", typeof(object[]) }
+		};
+		static bool TryParsePsdValue(ExpressionAst expression, out object value) {
+			value = null;
+			if (expression is StringConstantExpressionAst) {
+				value = ((StringConstantExpressionAst)expression).Value;
+				return true;
+			}
+			if (expression is ConstantExpressionAst) {
+				value = ((ConstantExpressionAst)expression).Value;
+				return true;
+			}
+			ConvertExpressionAst convert = expression as ConvertExpressionAst;
+			if (convert != null) {
+				if (convert.Child == null || convert.Type == null || convert.Type.TypeName == null) return false;
+				string castName = convert.Type.TypeName.Name;
+				if (castName == null) return false;
+				// [ordered]@{}：与 PowerShell 一样保留键顺序
+				if (castName.Equals("ordered", StringComparison.OrdinalIgnoreCase) ||
+					castName.Equals("ordereddictionary", StringComparison.OrdinalIgnoreCase) ||
+					castName.Equals("System.Collections.Specialized.OrderedDictionary", StringComparison.OrdinalIgnoreCase)) {
+					HashtableAst orderedSource = convert.Child as HashtableAst;
+					if (orderedSource == null) return false;
+					System.Collections.Specialized.OrderedDictionary ordered = new System.Collections.Specialized.OrderedDictionary(StringComparer.OrdinalIgnoreCase);
+					foreach (var pair in orderedSource.KeyValuePairs) {
+						object key, item;
+						string keyText;
+						if (!TryParsePsdValue(pair.Item1, out key) || (keyText = key as string) == null) return false;
+						if (!TryParsePsdStatement(pair.Item2, out item)) return false;
+						ordered[keyText] = item;
+					}
+					value = ordered;
+					return true;
+				}
+				Type castType;
+				if (!PsdSafeCastTypes.TryGetValue(castName, out castType)) return false;
+				object converted;
+				if (!TryParsePsdValue(convert.Child, out converted)) return false;
+				try {
+					value = LanguagePrimitives.ConvertTo(converted, castType, CultureInfo.InvariantCulture);
+					return true;
+				}
+				catch {
+					return false;
+				}
+			}
+			VariableExpressionAst variable = expression as VariableExpressionAst;
+			if (variable != null) {
+				switch (variable.VariablePath.UserPath) {
+					case "true": value = true; return true;
+					case "false": value = false; return true;
+					case "null": return true;
+				}
+				return false;
+			}
+			UnaryExpressionAst unary = expression as UnaryExpressionAst;
+			if (unary != null && unary.TokenKind == TokenKind.Minus) {
+				object inner;
+				if (!TryParsePsdValue(unary.Child, out inner)) return false;
+				if (inner is int) { value = -(int)inner; return true; }
+				if (inner is long) { value = -(long)inner; return true; }
+				if (inner is double) { value = -(double)inner; return true; }
+				if (inner is decimal) { value = -(decimal)inner; return true; }
+				return false;
+			}
+			ArrayLiteralAst arrayLiteral = expression as ArrayLiteralAst;
+			if (arrayLiteral != null) {
+				List<object> items = new List<object>();
+				foreach (ExpressionAst element in arrayLiteral.Elements) {
+					object item;
+					if (!TryParsePsdValue(element, out item)) return false;
+					items.Add(item);
+				}
+				value = items.ToArray();
+				return true;
+			}
+			ArrayExpressionAst arrayExpression = expression as ArrayExpressionAst;
+			if (arrayExpression != null) {
+				if (arrayExpression.SubExpression == null || arrayExpression.SubExpression.Statements.Count != 1) return false;
+				return TryParsePsdStatement(arrayExpression.SubExpression.Statements[0], out value);
+			}
+			HashtableAst hashtable = expression as HashtableAst;
+			if (hashtable != null) {
+				System.Collections.Hashtable result = new System.Collections.Hashtable(StringComparer.OrdinalIgnoreCase);
+				foreach (var pair in hashtable.KeyValuePairs) {
+					object key, item;
+					string keyText;
+					if (!TryParsePsdValue(pair.Item1, out key) || (keyText = key as string) == null) return false;
+					if (!TryParsePsdStatement(pair.Item2, out item)) return false;
+					result[keyText] = item;
+				}
+				value = result;
+				return true;
+			}
+			return false;
+		}
+		// 哈希表的值在 AST 里是语句（PipelineAst），取其中的表达式再按 PSD 解析
+		static bool TryParsePsdStatement(StatementAst statement, out object value) {
+			value = null;
+			PipelineAst pipeline = statement as PipelineAst;
+			if (pipeline == null || pipeline.PipelineElements.Count != 1)
+				return false;
+			CommandExpressionAst expression = pipeline.PipelineElements[0] as CommandExpressionAst;
+			if (expression == null)
+				return false;
+			return TryParsePsdValue(expression.Expression, out value);
+		}
+		static bool TryParsePsd(string text, out object value, out bool explicitCast) {
+			value = null;
+			explicitCast = false;
+			Token[] tokens;
+			ParseError[] errors;
+			ScriptBlockAst ast = Parser.ParseInput(text, out tokens, out errors);
+			if (errors.Length > 0 || ast.EndBlock == null || ast.EndBlock.Statements.Count != 1)
+				return false;
+			PipelineAst pipeline = ast.EndBlock.Statements[0] as PipelineAst;
+			if (pipeline == null || pipeline.PipelineElements.Count != 1)
+				return false;
+			CommandExpressionAst commandExpression = pipeline.PipelineElements[0] as CommandExpressionAst;
+			if (commandExpression == null)
+				return false;
+			explicitCast = commandExpression.Expression is ConvertExpressionAst;
+			return TryParsePsdValue(commandExpression.Expression, out value);
+		}
+		#endif
+
+		// EXE 主入口
 		[$threadingModelThread]
 		private static int Main(string[] args) {
+			#if StartupTiming
+				PSRunner.TimerSw.Restart();
+			#endif
+			PSRunner.TimerMark("main:enter");
 			PSRunner.BaseInit();
+			PSRunner.TimerMark("main:baseinit");
 			me = new PSRunner();
+			PSRunner.TimerMark("main:ctor-done");
 			System.Threading.ManualResetEvent mre = new System.Threading.ManualResetEvent(false);
 
 			try {
@@ -1975,57 +2187,69 @@ namespace PSRunnerNS {
 							eventargs.Cancel = true;
 						}, null);
 					} catch {
-						// ignore because we are shutting down
+						// 忽略，因为正在关闭
 					}
 				};
 				#endif
 
-				PSDataCollection<string> colInput = new PSDataCollection<string> ();
-				if (Console_Info.IsInputRedirected()) { // read standard input
-					string sItem;
-					while ((sItem = Console.ReadLine()) != null) { // add to powershell pipeline
-						colInput.Add(sItem);
-					}
-				}
-				colInput.Complete();
-
-				PSDataCollection<PSObject> colOutput = new PSDataCollection<PSObject>();
-
+				#if ScriptHasParam
+				int psdIndex = 0;
+				#endif
 				for(int i = 0; i < args.Length; i++) {
-					if (!Regex.IsMatch(args[i], @"^(-|\$)\w*$"))
-						args[i] = "\'"+args[i].Replace("'", "''")+"\'";
+					if (Regex.IsMatch(args[i], @"^(-|\$)\w*$"))
+						continue;
+					#if ScriptHasParam
+					// 脚本有 param 块时，显式安全转换或表/数组类参数值按 PSD 数据解析成对象，再用变量传入，
+					// 避免作为文本被求值；其余值仍按字符串传递，保持数字/字符串的原有绑定行为。
+					object psdValue;
+					bool explicitCast;
+					if (TryParsePsd(args[i], out psdValue, out explicitCast) &&
+						(explicitCast || psdValue is System.Collections.IDictionary || psdValue is System.Array)) {
+						string psdVar = "PSEXEArg" + (psdIndex++);
+						me.pwsh.Runspace.SessionStateProxy.SetVariable(psdVar, psdValue);
+						args[i] = "$" + psdVar;
+						continue;
+					}
+					#endif
+					args[i] = "\'"+args[i].Replace("'", "''")+"\'";
 				}
 
-				me.pwsh.Runspace.SessionStateProxy.SetVariable("PSEXEInput", colInput);
-				me.pwsh.AddScript("$PSEXEInput|PSEXEMainFunction "+String.Join(" ", args)+"|Out-String -Stream");
-
-				// 使用 BeginInvoke 的重载，传入 colOutput
-				IAsyncResult asyncResult = me.pwsh.BeginInvoke<string, PSObject>(new PSDataCollection<string> (), colOutput);
-
-				// 在单独的线程中处理输出和错误
-				System.Threading.ThreadPool.QueueUserWorkItem(_ => {
-					try {
-						foreach (PSObject outputItem in colOutput)
-							me.ui.WriteLine(outputItem.ToString());
-						foreach (ErrorRecord errorItem in me.pwsh.Streams.Error)
-							me.ui.WriteErrorRecord(errorItem);
+				#if ReadInput
+					// 仅当编译期检测到脚本顶层使用 $input 时（ReadInput）才读取重定向的标准输入：否则保留原始 stdin，且不在启动时等待 stdin（issue 62）。
+					PSDataCollection<string> colInput = new PSDataCollection<string> ();
+					if (Console_Info.IsInputRedirected()) { // 读取标准输入
+						string sItem;
+						while ((sItem = Console.ReadLine()) != null) { // 添加到 powershell 管道
+							colInput.Add(sItem);
+						}
 					}
-					catch (Exception ex) {
-						me.ui.WriteErrorLine(ex.Message);
-						me.ExitCode = 1;
-					}
-					finally {
-						mre.Set(); //确保所有输出都已处理
-					}
-				});
+					colInput.Complete();
 
-				while (!mre.WaitOne(100))
+					me.pwsh.Runspace.SessionStateProxy.SetVariable("PSEXEInput", colInput);
+					me.pwsh.AddScript("$PSEXEInput|PSEXEMainFunction "+String.Join(" ", args));
+				#else
+					// 脚本顶层不用 $input：完全不带管道输入，也不设置 $PSEXEInput
+					me.pwsh.AddScript("PSEXEMainFunction "+String.Join(" ", args));
+				#endif
+				// Out-Default 走 host UI；勿用 Out-String/输出收集，否则 native 子进程 stdout 会变成管道（非 TTY）
+				me.pwsh.AddCommand("Out-Default");
+				me.pwsh.Streams.Error.DataAdded += (sender, eventargs) => {
+					me.ui.WriteErrorRecord(((PSDataCollection<ErrorRecord>)sender)[eventargs.Index]);
+				};
+				IAsyncResult asyncResult = me.pwsh.BeginInvoke();
+				PSRunner.TimerMark("main:begininvoke");
+
+				System.Threading.WaitHandle[] waitHandles = new System.Threading.WaitHandle[] { mre, asyncResult.AsyncWaitHandle };
+				while (System.Threading.WaitHandle.WaitAny(waitHandles, 10) == System.Threading.WaitHandle.WaitTimeout) {
 					if (me.ShouldExit) break;
+				}
 
+				PSRunner.TimerMark("main:pipeline-completed");
 				me.Inited = true;
 				me.pwsh.EndInvoke(asyncResult);
-
+				PSRunner.TimerMark("main:endinvoke");
 				me.pwsh.Stop();
+				PSRunner.TimerMark("main:stop");
 
 				if (me.pwsh.InvocationStateInfo.State == PSInvocationState.Failed)
 					me.ui.WriteErrorLine(me.pwsh.InvocationStateInfo.Reason.Message);
