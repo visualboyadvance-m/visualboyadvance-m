@@ -1,0 +1,615 @@
+# DLSS 5 Neural Rendering on Vulkan — the C runtime, the frame library, the shaders and the
+# tests, for Linux, macOS and Windows.
+#
+# The Makefile is the build this project grew up with and is still complete on Linux and
+# macOS; this is the same build described once for CMake, so that Windows (MSVC or clang-cl,
+# with the Vulkan SDK) configures too. Everything lands in the build directory — the
+# libraries, the executables, the SPIR-V, the ICD manifest — flat, under the same names the
+# Makefile gives them in `work/`. The Python side finds either through `src/nr_build.py`:
+# `NR_BUILD_DIR` in the environment first (ctest sets it), else the newest of `work/` and
+# `build*/`. Only the inputs stay in `work/`: the weights and the pinned Vulkan-Headers clone.
+#
+#     cmake -S . -B build && cmake --build build && ctest --test-dir build
+#     NR_BUILD_DIR=$PWD/build python3 src/ref/nr_frame.py IN.png OUT.png --resident
+#
+# What each platform builds:
+#   everywhere      libxmx, libnr_image, libnr_frame, nr_frame (needs libpng), gemm_runner,
+#                   test_nr_frame, every shader
+#   Linux, macOS    the Vulkan layer libnr_layer and its POSIX tests (NR_BUILD_LAYER)
+#   macOS           libxmx and gemm_runner link MoltenVK directly (NR_XMX_LINK_MOLTENVK);
+#                   the layer and its tests link the loader; work/MoltenVK_icd.json is written
+#
+# Windows: built and linked as a MinGW-w64 cross-compile from macOS (x86_64-pc-mingw32-gcc,
+# -DCMAKE_SYSTEM_NAME=Windows, libpng and the Vulkan import library under the cross prefix);
+# not yet run on a Windows machine, and MSVC is configured, not measured (notes/phase69).
+cmake_minimum_required(VERSION 3.21)
+project(dlss_nr_on_vulkan LANGUAGES C)
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)                 # dladdr, clock_gettime, strdup on glibc
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
+endif()
+
+set(NR_WORK_DIR "${PROJECT_SOURCE_DIR}/work" CACHE PATH "the inputs the build does not make: the weights, the Vulkan-Headers clone")
+set(NR_OUTPUT_DIR "${CMAKE_BINARY_DIR}" CACHE PATH "where libraries, executables and SPIR-V land; -DNR_OUTPUT_DIR=work reproduces the Makefile layout")
+if(WIN32)
+  set(NR_LAYER_DEFAULT OFF)                        # Unix sockets and pthreads; not ported
+else()
+  set(NR_LAYER_DEFAULT ON)
+endif()
+option(NR_BUILD_LAYER "the Vulkan layer that puts the pass inside a game, and its tests (POSIX)" ${NR_LAYER_DEFAULT})
+option(NR_XMX_LINK_MOLTENVK "macOS: link the compute runtime to MoltenVK directly rather than the loader" ${APPLE})
+option(NR_NO_FLOAT16 "use the software half conversion even where the compiler has _Float16 (for checking it)" OFF)
+if(CMAKE_CROSSCOMPILING)
+  set(NR_TESTS_DEFAULT OFF)                        # the executables cannot run here
+else()
+  set(NR_TESTS_DEFAULT ON)
+endif()
+option(NR_BUILD_TESTS "register the tests with ctest" ${NR_TESTS_DEFAULT})
+
+# The weights, compiled in. `nr_frame_open(NULL)` — what the command, the C test and
+# `NativeFrame()` default to — reads the logical safetensors from byte arrays inside
+# libnr_frame; no file is opened at run time. Those arrays are C sources in the weights
+# directory (`weights/` in the source tree): one header and one translation unit per
+# NR_EMBED_CHUNK_MB slice of the file, and a table listing the slices in order. The build
+# compiles what is in that directory. It only *regenerates* it with NR_BIN2C_WEIGHTS: then
+# `dlssnr-logical.safetensors` — in the source root, under work/mlxw/, or named in
+# NR_WEIGHTS_FILE — is cut into slices and each is run through bin2c into the directory.
+# Without the file the regeneration is skipped and the directory is used as it is.
+option(NR_EMBED_WEIGHTS "compile the logical weights from the weights directory into libnr_frame" ON)
+set(NR_WEIGHTS_DIR "${PROJECT_SOURCE_DIR}/weights" CACHE PATH "the weights as C: the bin2c slices and their table, compiled into libnr_frame")
+option(NR_BIN2C_WEIGHTS "regenerate the weights directory from dlssnr-logical.safetensors with slice and bin2c (skipped when the file is absent)" OFF)
+set(NR_WEIGHTS_FILE "" CACHE FILEPATH "the logical weights NR_BIN2C_WEIGHTS regenerates from (dlssnr-logical.safetensors); empty looks in the source root and work/mlxw/")
+set(NR_EMBED_CHUNK_MB 8 CACHE STRING "size of each slice the weights are regenerated as; the compiler needs ~90 bytes of memory per byte of a slice")
+set(NR_EMBED_JOBS 2 CACHE STRING "how many slices Ninja compiles at once (a job pool; ~0.75 GB each at 8 MB)")
+option(NR_EMBED_SHADERS "compile every SPIR-V module into libxmx and gemm_runner with bin2c, so shaders are loaded by name from the binary" ON)
+set(NR_EMBED_SYMBOL dlssnr_logical_safetensors)       # the slice arrays are ${NR_EMBED_SYMBOL}_<k>
+set(NR_REGENERATE_WEIGHTS OFF)                          # NR_BIN2C_WEIGHTS, and the file exists
+if(NR_EMBED_WEIGHTS AND NR_BIN2C_WEIGHTS)
+  if(NOT NR_WEIGHTS_FILE)
+    foreach(candidate "${PROJECT_SOURCE_DIR}/dlssnr-logical.safetensors" "${NR_WORK_DIR}/mlxw/dlssnr-logical.safetensors")
+      if(EXISTS "${candidate}")
+        set(NR_WEIGHTS_FILE "${candidate}")
+        break()
+      endif()
+    endforeach()
+  endif()
+  if(EXISTS "${NR_WEIGHTS_FILE}")
+    set(NR_REGENERATE_WEIGHTS ON)
+  else()
+    message(STATUS "NR_BIN2C_WEIGHTS: no dlssnr-logical.safetensors (source root, work/mlxw/, or -DNR_WEIGHTS_FILE=); bin2c skipped, using the weights directory as it is")
+  endif()
+endif()
+if(NR_EMBED_WEIGHTS AND NOT NR_REGENERATE_WEIGHTS)
+  # the pre-processed directory: its table and at least the first slice must be there
+  if(NOT EXISTS "${NR_WEIGHTS_DIR}/nr_weights_embedded.c" OR NOT EXISTS "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_0.h")
+    message(STATUS "no pre-processed weights in ${NR_WEIGHTS_DIR} (regenerate with -DNR_BIN2C_WEIGHTS=ON and the safetensors file); nr_frame_open(NULL) will refuse and a path is needed")
+    set(NR_EMBED_WEIGHTS OFF)
+  endif()
+endif()
+
+file(MAKE_DIRECTORY "${NR_OUTPUT_DIR}")
+
+# ---------------------------------------------------------------------------------------
+# dependencies
+# ---------------------------------------------------------------------------------------
+
+# Vulkan headers: the SDK's, the distribution's, vcpkg's, or the pinned clone in work/.
+find_package(Vulkan QUIET)
+if(Vulkan_FOUND)
+  set(NR_VULKAN_INCLUDE "${Vulkan_INCLUDE_DIRS}")
+else()
+  find_path(NR_VULKAN_INCLUDE vulkan/vulkan.h
+    HINTS "${NR_WORK_DIR}/vulkan-headers/include" "$ENV{VULKAN_SDK}/include"
+          "$ENV{HOME}/Downloads/vcpkg/installed/arm64-osx/include" /usr/local/include /opt/homebrew/include)
+  if(NOT NR_VULKAN_INCLUDE)
+    message(FATAL_ERROR "no Vulkan headers: install the Vulkan SDK, or\n"
+      "  git clone --depth 1 --branch v1.4.321 https://github.com/KhronosGroup/Vulkan-Headers.git work/vulkan-headers")
+  endif()
+endif()
+if(NOT Vulkan_INCLUDE_DIRS)
+  set(Vulkan_INCLUDE_DIRS "${NR_VULKAN_INCLUDE}")
+endif()
+
+# The loader, for everything that is not the compute runtime on macOS.
+if(Vulkan_FOUND AND TARGET Vulkan::Vulkan)
+  set(NR_LOADER Vulkan::Vulkan)
+else()
+  find_library(NR_LOADER_LIBRARY NAMES vulkan vulkan-1
+    HINTS "$ENV{VULKAN_SDK}/lib" "$ENV{VULKAN_SDK}/Lib" "$ENV{HOME}/Downloads/vcpkg/installed/arm64-osx/lib" /usr/local/lib)
+  set(NR_LOADER "${NR_LOADER_LIBRARY}")
+endif()
+
+# MoltenVK, for the compute runtime on macOS: it exports the whole Vulkan API, so the
+# path needs no loader, no ICD manifest and no portability enumeration.
+if(APPLE AND NR_XMX_LINK_MOLTENVK)
+  find_library(NR_MOLTENVK_LIBRARY NAMES MoltenVK
+    HINTS /usr/local/lib /opt/homebrew/lib "$ENV{VULKAN_SDK}/lib" "$ENV{VULKAN_SDK}/macOS/lib"
+          "$ENV{HOME}/Downloads/vcpkg/installed/arm64-osx/lib")
+  if(NOT NR_MOLTENVK_LIBRARY)
+    message(FATAL_ERROR "NR_XMX_LINK_MOLTENVK is on and libMoltenVK.dylib was not found; set NR_MOLTENVK_LIBRARY or turn the option off")
+  endif()
+  set(NR_XMX_VULKAN "${NR_MOLTENVK_LIBRARY}")
+  get_filename_component(NR_MOLTENVK_DIR "${NR_MOLTENVK_LIBRARY}" DIRECTORY)
+  # the loader finds no driver on its own on macOS; the layer tests point VK_DRIVER_FILES here
+  file(WRITE "${NR_OUTPUT_DIR}/MoltenVK_icd.json"
+"{
+  \"file_format_version\": \"1.0.0\",
+  \"ICD\": {
+    \"library_path\": \"${NR_MOLTENVK_DIR}/libMoltenVK.dylib\",
+    \"api_version\": \"1.4.0\",
+    \"is_portability_driver\": true
+  }
+}
+")
+else()
+  set(NR_XMX_VULKAN ${NR_LOADER})
+endif()
+
+# glslangValidator: the SDK's, or the one on the path.
+find_program(NR_GLSLANG NAMES glslangValidator HINTS "$ENV{VULKAN_SDK}/bin" "$ENV{VULKAN_SDK}/Bin" "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
+if(NOT NR_GLSLANG)
+  message(FATAL_ERROR "glslangValidator not found; it comes with the Vulkan SDK (or the glslang package)")
+endif()
+
+# libpng, for the nr_frame command only; the libraries need nothing.
+#
+# FindPNG picks the header and the library separately, and on macOS it searches framework
+# Headers directories first: on a Mac with a dead /usr/local/include/png.h symlink it paired
+# Mono.framework's libpng 1.4 header with /usr/local/lib's 1.6, which compiles, links, and
+# refuses every file at run time ("Application built with libpng-1.4.12 but running with
+# 1.6.58"). So: frameworks last, the prefixes a Mac keeps libpng under as hints, and a
+# run-time check at configure time that the header and the library are the same libpng.
+set(NR_SAVED_FIND_FRAMEWORK "${CMAKE_FIND_FRAMEWORK}")
+set(CMAKE_FIND_FRAMEWORK LAST)
+if(NOT PNG_ROOT AND NOT DEFINED ENV{PNG_ROOT})
+  foreach(prefix "$ENV{HOME}/Downloads/vcpkg/installed/arm64-osx" /opt/homebrew /usr/local)
+    if(EXISTS "${prefix}/include/png.h")
+      set(PNG_ROOT "${prefix}")
+      break()
+    endif()
+  endforeach()
+endif()
+find_package(PNG QUIET)
+set(CMAKE_FIND_FRAMEWORK "${NR_SAVED_FIND_FRAMEWORK}")
+if(PNG_FOUND AND NOT CMAKE_CROSSCOMPILING)
+  include(CheckCSourceRuns)
+  set(CMAKE_REQUIRED_LIBRARIES PNG::PNG)
+  set(NR_PNG_CHECK_SOURCE [[
+#include <png.h>
+#include <stdio.h>
+int main(void) {
+  unsigned lib = png_access_version_number();
+  printf("header %s library %u.%u.%u", PNG_LIBPNG_VER_STRING, lib / 10000, (lib / 100) % 100, lib % 100);
+  puts("");   /* no backslash escapes here: the check macro re-reads them */
+  return lib / 100 == PNG_LIBPNG_VER / 100 ? 0 : 1;   /* libpng wants major.minor to agree */
+}
+]])
+  check_c_source_runs("${NR_PNG_CHECK_SOURCE}" NR_PNG_HEADER_MATCHES_LIBRARY)
+  unset(CMAKE_REQUIRED_LIBRARIES)
+  if(NOT NR_PNG_HEADER_MATCHES_LIBRARY)
+    message(WARNING "libpng header ${PNG_VERSION_STRING} in ${PNG_PNG_INCLUDE_DIR} does not match the library ${PNG_LIBRARIES}; "
+      "the nr_frame command is not built. Set PNG_ROOT to a prefix whose include/ and lib/ hold the same libpng.")
+    set(PNG_FOUND FALSE)
+  endif()
+endif()
+
+find_package(Threads)
+find_package(Python3 COMPONENTS Interpreter QUIET)
+
+# ---------------------------------------------------------------------------------------
+# compiler flags. The host maths reproduces NumPy's float32 operation order, so no
+# fused multiply-add and no fast maths, anywhere.
+# ---------------------------------------------------------------------------------------
+
+if(MSVC)
+  set(NR_EXACT_FLAGS /fp:precise /W3 /D_CRT_SECURE_NO_WARNINGS)
+  set(NR_NATIVE_FLAGS "")                   # MSVC has no -march=native; /O2 is what there is
+  set(NR_WARN_FLAGS /W3 /D_CRT_SECURE_NO_WARNINGS)
+else()
+  set(NR_EXACT_FLAGS -ffp-contract=off -fno-fast-math)
+  set(NR_WARN_FLAGS -Wall -Wextra -Wno-unused-parameter)
+  set(NR_NATIVE_FLAGS "")
+endif()
+
+if(NR_NO_FLOAT16)
+  add_compile_definitions(NR_NO_FLOAT16)
+endif()
+
+# Every target lands in the output directory under its plain name: libxmx.so / .dylib / .dll, no
+# per-configuration subdirectory, and the Python's `lib` prefix on Windows too.
+function(nr_place target)
+  set_target_properties(${target} PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${NR_OUTPUT_DIR}/$<0:>"
+    RUNTIME_OUTPUT_DIRECTORY "${NR_OUTPUT_DIR}/$<0:>"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<0:>"
+    PREFIX "lib"
+    BUILD_RPATH "${NR_OUTPUT_DIR}"
+    INSTALL_RPATH "${NR_OUTPUT_DIR}")
+  if(WIN32)
+    set_target_properties(${target} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  endif()
+endfunction()
+
+function(nr_executable target)
+  set_target_properties(${target} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${NR_OUTPUT_DIR}/$<0:>"
+    BUILD_RPATH "${NR_OUTPUT_DIR}"
+    INSTALL_RPATH "${NR_OUTPUT_DIR}")
+endfunction()
+
+# ---------------------------------------------------------------------------------------
+# host tools: bin2c (a file as a C byte array) and slice (a range of a file), for embedding
+# the shaders and the weights. Both run on the build host, so a cross-compile names host
+# copies in NR_BIN2C / NR_SLICE or embeds nothing. The targets carry a suffix because this
+# tree is also added as a subdirectory of VBA-M, whose build has a bin2c of its own.
+# ---------------------------------------------------------------------------------------
+
+if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS)
+  if(CMAKE_CROSSCOMPILING)
+    find_program(NR_BIN2C NAMES bin2c DOC "a host build of src/tools/bin2c.c")
+    find_program(NR_SLICE NAMES slice nr_slice DOC "a host build of src/tools/slice.c")
+    if(NOT NR_BIN2C)
+      message(WARNING "cross-compiling and no host bin2c found (NR_BIN2C): the shaders are not embedded and the weights directory is used as it is")
+      set(NR_EMBED_SHADERS OFF)
+      set(NR_REGENERATE_WEIGHTS OFF)
+    elseif(NOT NR_SLICE)
+      message(WARNING "cross-compiling and no host slice found (NR_SLICE): the weights directory is used as it is")
+      set(NR_REGENERATE_WEIGHTS OFF)
+    endif()
+  else()
+    add_executable(bin2c_dlss src/tools/bin2c.c)
+    add_executable(slice_dlss src/tools/slice.c)
+    set_target_properties(bin2c_dlss slice_dlss PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tools/$<0:>")
+    if(MSVC)
+      target_compile_definitions(bin2c_dlss PRIVATE _CRT_SECURE_NO_WARNINGS)
+      target_compile_definitions(slice_dlss PRIVATE _CRT_SECURE_NO_WARNINGS)
+    endif()
+    set(NR_BIN2C bin2c_dlss)
+    set(NR_SLICE slice_dlss)
+  endif()
+endif()
+
+# ---------------------------------------------------------------------------------------
+# shaders: plain GLSL to SPIR-V, into the output directory — and, with NR_EMBED_SHADERS,
+# each module through bin2c into a header and all of them into one table object
+# (src/gpu/nr_shaders_embedded.h) that libxmx and gemm_runner link, so a shader is
+# loaded by name from the binary rather than from the file beside it. The .spv files are
+# still written: the Python benches and tests read some of them directly.
+# ---------------------------------------------------------------------------------------
+
+set(NR_SHADER_EMBED_DIR "${CMAKE_CURRENT_BINARY_DIR}/shaders")
+file(MAKE_DIRECTORY "${NR_SHADER_EMBED_DIR}")
+set(NR_SPV_HEADERS)
+set(NR_SPV_INCLUDES "")
+set(NR_SPV_ROWS "")
+
+set(NR_SHADER_INCLUDES "${PROJECT_SOURCE_DIR}/src/gpu/publish.glsl" "${PROJECT_SOURCE_DIR}/src/gpu/specialize.glsl")
+set(NR_SPV)
+function(nr_shader output source)          # extra arguments are -D defines
+  set(out "${NR_OUTPUT_DIR}/${output}")
+  add_custom_command(OUTPUT "${out}"
+    COMMAND "${NR_GLSLANG}" --target-env vulkan1.3 -I${PROJECT_SOURCE_DIR}/src/gpu ${ARGN} -o "${out}" "${PROJECT_SOURCE_DIR}/${source}"
+    DEPENDS "${PROJECT_SOURCE_DIR}/${source}" ${NR_SHADER_INCLUDES}
+    COMMENT "glslangValidator ${output}" VERBATIM)
+  set(NR_SPV ${NR_SPV} "${out}" PARENT_SCOPE)
+  if(NR_EMBED_SHADERS)
+    string(REGEX REPLACE "\\.spv$" "" stem "${output}")
+    set(symbol "spv_${stem}")
+    set(header "${NR_SHADER_EMBED_DIR}/${symbol}.h")
+    add_custom_command(OUTPUT "${header}"
+      COMMAND ${NR_BIN2C} "${out}" "${header}" ${symbol}
+      DEPENDS "${out}" ${NR_BIN2C}
+      COMMENT "bin2c ${symbol}.h" VERBATIM)
+    set(NR_SPV_HEADERS ${NR_SPV_HEADERS} "${header}" PARENT_SCOPE)
+    set(NR_SPV_INCLUDES "${NR_SPV_INCLUDES}#include \"${symbol}.h\"\n" PARENT_SCOPE)
+    set(NR_SPV_ROWS "${NR_SPV_ROWS}    { \"${output}\", ${symbol}, sizeof ${symbol} },\n" PARENT_SCOPE)
+  endif()
+endfunction()
+
+nr_shader(gemm_resident.spv        src/gpu/gemm_resident.comp)
+nr_shader(gemm_tiled.spv           src/gpu/gemm_resident.comp -DRM=2 -DRN=2)   # a 16x32 block in one subgroup
+nr_shader(gemm_staged.spv          src/gpu/gemm_staged.comp)
+nr_shader(resident.spv             src/gpu/resident.comp)
+nr_shader(attention.spv            src/gpu/attention.comp)
+nr_shader(attention_ab.spv         src/gpu/attention.comp -DSOFTMAX_AB)
+nr_shader(history.spv              src/gpu/history.comp)
+nr_shader(gemm_coopmat.spv         src/gpu/gemm_coopmat.comp)
+nr_shader(gemm_batched.spv         src/gpu/gemm_coopmat_batched.comp)
+nr_shader(gemm_f16acc.spv          src/gpu/gemm_coopmat_f16acc.comp)
+# the same GEMMs without the cooperative matrix, for a device that has none (MoltenVK)
+nr_shader(gemm_portable.spv        src/gpu/gemm_portable.comp)
+nr_shader(gemm_portable_tiled.spv  src/gpu/gemm_portable.comp -DRM=2 -DRN=2)
+nr_shader(gemm_portable_desc.spv   src/gpu/gemm_portable_desc.comp)
+nr_shader(gemm_portable_batched.spv src/gpu/gemm_portable_desc.comp -DBATCHED)
+nr_shader(half_probe.spv           src/bench/half_probe.comp)
+add_custom_target(shaders ALL DEPENDS ${NR_SPV})
+
+set(NR_SHADER_OBJECTS)
+if(NR_EMBED_SHADERS)
+  list(LENGTH NR_SPV_HEADERS NR_SPV_COUNT)
+  set(table "${NR_SHADER_EMBED_DIR}/nr_shaders_embedded.c")
+  file(WRITE "${table}.in"
+"/* generated by CMake: the ${NR_SPV_COUNT} SPIR-V modules, each from bin2c. Do not edit. */
+#include \"nr_shaders_embedded.h\"
+
+${NR_SPV_INCLUDES}
+const struct nr_embedded_shader nr_embedded_shaders[] = {
+${NR_SPV_ROWS}};
+const size_t nr_embedded_shader_count = ${NR_SPV_COUNT};
+")
+  configure_file("${table}.in" "${table}" COPYONLY)
+  set_source_files_properties("${table}" PROPERTIES OBJECT_DEPENDS "${NR_SPV_HEADERS}")
+  add_library(nr_shaders_blob OBJECT "${table}")
+  target_include_directories(nr_shaders_blob PRIVATE src/gpu "${NR_SHADER_EMBED_DIR}")
+  target_compile_definitions(nr_shaders_blob PRIVATE NR_EMBEDDED_SHADERS=1)
+  set_target_properties(nr_shaders_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  set(NR_SHADER_OBJECTS $<TARGET_OBJECTS:nr_shaders_blob>)
+  message(STATUS "embedding ${NR_SPV_COUNT} SPIR-V modules into libxmx and gemm_runner")
+endif()
+
+# ---------------------------------------------------------------------------------------
+# the compute runtime
+# ---------------------------------------------------------------------------------------
+
+add_library(xmx SHARED src/gpu/libxmx.c ${NR_SHADER_OBJECTS})
+target_include_directories(xmx PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu)
+target_link_libraries(xmx PRIVATE ${NR_XMX_VULKAN})
+target_compile_options(xmx PRIVATE ${NR_WARN_FLAGS})
+nr_place(xmx)
+
+add_executable(gemm_runner src/gpu/gemm_runner.c ${NR_SHADER_OBJECTS})
+target_include_directories(gemm_runner PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu)
+target_link_libraries(gemm_runner PRIVATE ${NR_XMX_VULKAN})
+target_compile_options(gemm_runner PRIVATE ${NR_WARN_FLAGS})
+nr_executable(gemm_runner)
+if(NR_EMBED_SHADERS)
+  target_compile_definitions(xmx PRIVATE NR_EMBEDDED_SHADERS=1)
+  target_compile_definitions(gemm_runner PRIVATE NR_EMBEDDED_SHADERS=1)
+endif()
+
+# ---------------------------------------------------------------------------------------
+# the host passes and the frame library
+# ---------------------------------------------------------------------------------------
+
+# nr_image.c is one object in two libraries: its own, for the Python, and the frame's.
+add_library(nr_image_objects OBJECT src/ref/nr_image.c)
+target_include_directories(nr_image_objects PRIVATE src/ref)
+target_compile_options(nr_image_objects PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+set_target_properties(nr_image_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(nr_image SHARED $<TARGET_OBJECTS:nr_image_objects>)
+nr_place(nr_image)
+
+# ---------------------------------------------------------------------------------------
+# the weights, as C: the slices in the weights directory, one object each
+# ---------------------------------------------------------------------------------------
+#
+# bin2c (Rafael Kitover's, BSD-2, the one the VBA-M wx build embeds its resources with)
+# writes a file as `const unsigned char NAME[] = { 0x.., ... }`. Compilers hold such an
+# initializer one element at a time — clang peaks at 1.4 GB on a 16 MB file, so the whole
+# 292 MB file in one array would want ~25 GB — which is why the weights live as a run of
+# NR_EMBED_CHUNK_MB slices: each its own header from bin2c and its own translation unit (a
+# typedef there checks the array is the size the table says), and a table listing them in
+# order for the reader in nr_frame.c. All of that sits in NR_WEIGHTS_DIR and is compiled
+# from there; the objects go into libnr_frame; the table's declarations are
+# src/ref/nr_weights_embedded.h.
+#
+# With NR_BIN2C_WEIGHTS and the safetensors file, the directory is regenerated: `slice`
+# cuts the file into NR_EMBED_CHUNK_MB pieces in the build tree, bin2c writes each piece's
+# header into the directory, and the translation units and the table are rewritten to
+# match — so the directory afterwards is the pre-processed form a build without the file
+# compiles. Slices past the new count are removed.
+set(NR_EMBED_OBJECTS)
+if(NR_EMBED_WEIGHTS)
+  set(NR_EMBED_SOURCES)
+  if(NR_REGENERATE_WEIGHTS)
+    file(MAKE_DIRECTORY "${NR_WEIGHTS_DIR}")
+    set(NR_EMBED_SCRATCH "${CMAKE_CURRENT_BINARY_DIR}/weights")     # the .bin slices and the .c.in
+    file(MAKE_DIRECTORY "${NR_EMBED_SCRATCH}")
+    file(SIZE "${NR_WEIGHTS_FILE}" NR_WEIGHTS_SIZE)
+    math(EXPR NR_EMBED_CHUNK "${NR_EMBED_CHUNK_MB} * 1024 * 1024")
+    math(EXPR NR_EMBED_COUNT "(${NR_WEIGHTS_SIZE} + ${NR_EMBED_CHUNK} - 1) / ${NR_EMBED_CHUNK}")
+    set(NR_EMBED_TABLE_EXTERNS "")
+    set(NR_EMBED_TABLE_ROWS "")
+    set(offset 0)
+    foreach(index RANGE 1 ${NR_EMBED_COUNT})
+      math(EXPR k "${index} - 1")
+      math(EXPR remaining "${NR_WEIGHTS_SIZE} - ${offset}")
+      if(remaining LESS NR_EMBED_CHUNK)
+        set(length ${remaining})
+      else()
+        set(length ${NR_EMBED_CHUNK})
+      endif()
+      set(symbol "${NR_EMBED_SYMBOL}_${k}")
+      set(bin "${NR_EMBED_SCRATCH}/${symbol}.bin")
+      set(header "${NR_WEIGHTS_DIR}/${symbol}.h")
+      set(source "${NR_WEIGHTS_DIR}/${symbol}.c")
+      add_custom_command(OUTPUT "${bin}"
+        COMMAND ${NR_SLICE} "${NR_WEIGHTS_FILE}" "${bin}" ${offset} ${length}
+        DEPENDS "${NR_WEIGHTS_FILE}" ${NR_SLICE}
+        COMMENT "slice ${symbol}: bytes ${offset} + ${length} of the weights" VERBATIM)
+      add_custom_command(OUTPUT "${header}"
+        COMMAND ${NR_BIN2C} "${bin}" "${header}" ${symbol}
+        DEPENDS "${bin}" ${NR_BIN2C}
+        COMMENT "bin2c ${symbol}.h -> ${NR_WEIGHTS_DIR}" VERBATIM)
+      # the translation unit for this slice: the generated header, and a check that the
+      # array is the length the table below was written with. Written through
+      # configure_file so an unchanged slice keeps its timestamp and is not recompiled.
+      file(WRITE "${NR_EMBED_SCRATCH}/${symbol}.c.in"
+"/* generated by CMake: slice ${k} of the embedded weights. Do not edit. */
+#include <stddef.h>
+#include \"${symbol}.h\"
+typedef char ${symbol}_size_check[sizeof ${symbol} == ${length} ? 1 : -1];
+")
+      configure_file("${NR_EMBED_SCRATCH}/${symbol}.c.in" "${source}" COPYONLY)
+      set_source_files_properties("${source}" PROPERTIES OBJECT_DEPENDS "${header}")
+      list(APPEND NR_EMBED_SOURCES "${source}")
+      string(APPEND NR_EMBED_TABLE_EXTERNS "extern const unsigned char ${symbol}[];\n")
+      string(APPEND NR_EMBED_TABLE_ROWS "    { ${symbol}, ${length} },\n")
+      math(EXPR offset "${offset} + ${length}")
+    endforeach()
+    # a shorter file leaves slices behind; they would still compile and confuse a reader
+    file(GLOB stale "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.c" "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.h")
+    foreach(old ${stale})
+      get_filename_component(name "${old}" NAME_WE)
+      string(REGEX REPLACE "^${NR_EMBED_SYMBOL}_" "" n "${name}")
+      if(n GREATER_EQUAL NR_EMBED_COUNT)
+        file(REMOVE "${old}")
+      endif()
+    endforeach()
+    get_filename_component(NR_WEIGHTS_FILE_NAME "${NR_WEIGHTS_FILE}" NAME)
+    file(WRITE "${NR_EMBED_SCRATCH}/nr_weights_embedded.c.in"
+"/* generated by CMake: the ${NR_EMBED_COUNT} slices of the embedded weights, in file order.
+ * Source: ${NR_WEIGHTS_FILE_NAME} (${NR_WEIGHTS_SIZE} bytes), ${NR_EMBED_CHUNK_MB} MB slices. Do not edit. */
+#include \"nr_weights_embedded.h\"
+
+${NR_EMBED_TABLE_EXTERNS}
+const struct nr_embedded_chunk nr_embedded_weights_chunks[] = {
+${NR_EMBED_TABLE_ROWS}};
+const size_t nr_embedded_weights_chunk_count = ${NR_EMBED_COUNT};
+const size_t nr_embedded_weights_size = ${NR_WEIGHTS_SIZE};
+")
+    configure_file("${NR_EMBED_SCRATCH}/nr_weights_embedded.c.in" "${NR_WEIGHTS_DIR}/nr_weights_embedded.c" COPYONLY)
+    math(EXPR NR_WEIGHTS_MB "${NR_WEIGHTS_SIZE} / 1048576")
+    message(STATUS "regenerating ${NR_WEIGHTS_DIR} from ${NR_WEIGHTS_FILE} (${NR_WEIGHTS_MB} MB): ${NR_EMBED_COUNT} slices of ${NR_EMBED_CHUNK_MB} MB, ${NR_EMBED_JOBS} compiled at a time")
+  else()
+    # the pre-processed directory as it is: every slice that has a header, in order
+    file(GLOB NR_EMBED_HEADERS CONFIGURE_DEPENDS "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.h")
+    list(LENGTH NR_EMBED_HEADERS NR_EMBED_COUNT)
+    math(EXPR last "${NR_EMBED_COUNT} - 1")
+    foreach(k RANGE 0 ${last})
+      set(symbol "${NR_EMBED_SYMBOL}_${k}")
+      if(NOT EXISTS "${NR_WEIGHTS_DIR}/${symbol}.c" OR NOT EXISTS "${NR_WEIGHTS_DIR}/${symbol}.h")
+        message(FATAL_ERROR "${NR_WEIGHTS_DIR}: slice ${k} of ${NR_EMBED_COUNT} is incomplete (${symbol}.c and .h); regenerate with -DNR_BIN2C_WEIGHTS=ON and the safetensors file, or -DNR_EMBED_WEIGHTS=OFF")
+      endif()
+      set_source_files_properties("${NR_WEIGHTS_DIR}/${symbol}.c" PROPERTIES OBJECT_DEPENDS "${NR_WEIGHTS_DIR}/${symbol}.h")
+      list(APPEND NR_EMBED_SOURCES "${NR_WEIGHTS_DIR}/${symbol}.c")
+    endforeach()
+    message(STATUS "embedding the pre-processed weights in ${NR_WEIGHTS_DIR}: ${NR_EMBED_COUNT} slices, ${NR_EMBED_JOBS} compiled at a time")
+  endif()
+  add_library(nr_weights_blob OBJECT ${NR_EMBED_SOURCES} "${NR_WEIGHTS_DIR}/nr_weights_embedded.c")
+  target_include_directories(nr_weights_blob PRIVATE src/ref "${NR_WEIGHTS_DIR}")
+  target_compile_definitions(nr_weights_blob PRIVATE NR_EMBEDDED_WEIGHTS=1)
+  set_target_properties(nr_weights_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  # each slice costs the compiler ~0.75 GB; the pool keeps a parallel build inside memory
+  set_property(GLOBAL APPEND PROPERTY JOB_POOLS nr_embed=${NR_EMBED_JOBS})
+  set_target_properties(nr_weights_blob PROPERTIES JOB_POOL_COMPILE nr_embed)
+  set(NR_EMBED_OBJECTS $<TARGET_OBJECTS:nr_weights_blob>)
+endif()
+
+add_library(nr_frame SHARED src/ref/nr_frame.c $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS})
+target_include_directories(nr_frame PRIVATE src/ref)
+target_compile_options(nr_frame PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+target_link_libraries(nr_frame PRIVATE ${CMAKE_DL_LIBS})
+if(NR_EMBED_WEIGHTS)
+  target_compile_definitions(nr_frame PRIVATE NR_EMBEDDED_WEIGHTS=1)
+endif()
+if(NOT MSVC)
+  target_link_libraries(nr_frame PRIVATE m)
+endif()
+nr_place(nr_frame)
+
+# nr_frame.py, the command, in C: PNG in and out through libpng.
+if(PNG_FOUND)
+  add_executable(nr_frame_cli src/ref/nr_frame_main.c)
+  set_target_properties(nr_frame_cli PROPERTIES OUTPUT_NAME nr_frame)
+  target_include_directories(nr_frame_cli PRIVATE src/ref)
+  target_compile_options(nr_frame_cli PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+  target_link_libraries(nr_frame_cli PRIVATE nr_frame PNG::PNG ${CMAKE_DL_LIBS})
+  if(NOT MSVC)
+    target_link_libraries(nr_frame_cli PRIVATE m)
+  endif()
+  nr_executable(nr_frame_cli)
+else()
+  message(STATUS "libpng not found: the nr_frame command is not built (the libraries and tests are)")
+endif()
+
+add_executable(test_nr_frame src/ref/test_nr_frame.c)
+target_include_directories(test_nr_frame PRIVATE src/ref)
+target_compile_options(test_nr_frame PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+target_link_libraries(test_nr_frame PRIVATE nr_frame)
+if(NOT MSVC)
+  target_link_libraries(test_nr_frame PRIVATE m)
+endif()
+nr_executable(test_nr_frame)
+
+# ---------------------------------------------------------------------------------------
+# the Vulkan layer and its tests (POSIX)
+# ---------------------------------------------------------------------------------------
+
+if(NR_BUILD_LAYER)
+  add_library(nr_layer SHARED src/layer/nr_layer.c)
+  target_include_directories(nr_layer PRIVATE ${Vulkan_INCLUDE_DIRS})
+  target_link_libraries(nr_layer PRIVATE ${NR_LOADER} Threads::Threads)
+  target_compile_options(nr_layer PRIVATE ${NR_WARN_FLAGS})
+  nr_place(nr_layer)
+
+  foreach(test test_layer_loader test_present)
+    add_executable(${test} src/layer/${test}.c)
+    target_include_directories(${test} PRIVATE ${Vulkan_INCLUDE_DIRS})
+    target_link_libraries(${test} PRIVATE ${NR_LOADER})
+    target_compile_options(${test} PRIVATE ${NR_WARN_FLAGS})
+    nr_executable(${test})
+  endforeach()
+  # these two include nr_layer.c directly
+  foreach(test test_settled test_exchange)
+    add_executable(${test} src/layer/${test}.c)
+    target_include_directories(${test} PRIVATE ${Vulkan_INCLUDE_DIRS} src/layer)
+    target_link_libraries(${test} PRIVATE ${NR_LOADER} Threads::Threads)
+    target_compile_options(${test} PRIVATE ${NR_WARN_FLAGS})
+    nr_executable(${test})
+  endforeach()
+endif()
+
+# ---------------------------------------------------------------------------------------
+# tests: what `make test` runs, for ctest
+# ---------------------------------------------------------------------------------------
+
+if(NR_BUILD_TESTS)
+  enable_testing()
+  # every test is told where this build put things, so a `work/` filled by the Makefile
+  # cannot be what ctest exercises
+  set(NR_TEST_ENV "NR_BUILD_DIR=${NR_OUTPUT_DIR}")
+  if(APPLE AND NR_XMX_LINK_MOLTENVK)
+    list(APPEND NR_TEST_ENV "VK_DRIVER_FILES=${NR_OUTPUT_DIR}/MoltenVK_icd.json")
+  endif()
+  function(nr_ctest name)
+    add_test(NAME ${name} COMMAND ${ARGN} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT "${NR_TEST_ENV}")
+  endfunction()
+  if(NR_BUILD_LAYER)
+    nr_ctest(settled "${NR_OUTPUT_DIR}/test_settled")
+  endif()
+  nr_ctest(nr_frame_c "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference.bin")
+  if(Python3_Interpreter_FOUND)
+    set(PY "${Python3_EXECUTABLE}")
+    set(NR_PY_TESTS
+      src/layer/test_daemon.py src/layer/test_ui_mask.py src/layer/test_present.py
+      src/layer/test_temporal.py src/layer/test_toggle.py src/layer/test_panel.py
+      src/tools/publish_check.py src/tools/claims_check.py
+      src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
+      src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
+      src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
+      src/ref/test_frame_cache.py src/ref/test_native_image.py src/ref/test_nr_model.py
+      src/ref/test_temporal_controls.py)
+    foreach(script ${NR_PY_TESTS})
+      get_filename_component(name "${script}" NAME_WE)
+      if(script MATCHES "src/layer/" AND NOT NR_BUILD_LAYER)
+        continue()
+      endif()
+      nr_ctest(${name} "${PY}" "${PROJECT_SOURCE_DIR}/${script}")
+    endforeach()
+    # the portable GEMM kernels, forced, on a device that has the matrix ones
+    add_test(NAME test_portable_forced COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_portable.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+    set_tests_properties(test_portable_forced PROPERTIES ENVIRONMENT "XMX_PORTABLE=1;${NR_TEST_ENV}")
+    # the Python side of the C frame test writes the reference the C side reads
+    nr_ctest(test_nr_frame_py "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference.bin")
+    set_tests_properties(nr_frame_c PROPERTIES DEPENDS test_nr_frame_py)
+  endif()
+endif()
+
+message(STATUS "outputs -> ${NR_OUTPUT_DIR}; compute runtime links ${NR_XMX_VULKAN}; layer: ${NR_BUILD_LAYER}; nr_frame command: ${PNG_FOUND}; embedded weights: ${NR_EMBED_WEIGHTS} (regenerated: ${NR_REGENERATE_WEIGHTS}); embedded shaders: ${NR_EMBED_SHADERS}")
+message(STATUS "the Python finds this build with NR_BUILD_DIR=${NR_OUTPUT_DIR} (ctest sets it; without it the newest of work/ and build*/ wins)")

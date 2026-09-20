@@ -16,6 +16,7 @@
 #include <wx/wfstream.h>
 #include <wx/msgdlg.h>
 
+#include "components/filters_dlssnr/dlssnr.h"
 #include "components/filters_interframe/interframe.h"
 #include "wx/language-compat.h"
 #include "wx/rpi.h"
@@ -2480,6 +2481,10 @@ EVT_HANDLER_MASK(ChangeFilter, "Change Pixel Filter", CMDEN_NREC_ANY)
         const int old_value = static_cast<int>(current_filter);
         const int max_builtin = static_cast<int>(config::Filter::kPlugin);
         int new_value = old_value + 1;
+        // DLSS NR is only selectable when libnr_frame is part of this build.
+        if (new_value == static_cast<int>(config::Filter::kDlssNr) && !dlssnr::Available()) {
+            new_value++;
+        }
 
         if (new_value >= max_builtin) {
             // Reached kPlugin - check if plugins are available

@@ -860,6 +860,8 @@ void systemClearStatusMessage();
 #include "wx/rpi.h"
 #include <wx/dynlib.h>
 
+#include "components/filters_dlssnr/dlssnr.h"
+
 #include "wx/widgets/render-plugin.h"
 
 class FilterThread;
@@ -887,6 +889,31 @@ public:
     // SupportsInPlaceFilterChange() and the filter is not a plugin. See
     // GameArea's kDispFilter observer.
     void ApplyInPlaceFilterChange();
+
+    // Create or drop the DLSS NR processor to match OPTION(kDispFilter). Called
+    // from the constructor (the filter's initializer) and when a filter change
+    // is adopted in place. The model opens on the processor's own worker
+    // thread, so this never stalls the UI.
+    void SyncDlssNr();
+
+    // Per-frame health check for the DLSS NR processor: log once when the model
+    // is up, and fall back to no filter (with an on-screen message) if opening
+    // the model or a pass failed. Called from every DrawArea(uint8_t**) path.
+    void UpdateDlssNrState();
+
+    // Stop the filter threads and drop the DLSS NR processor now, for a
+    // renderer that is about to destroy the GPU device the model may run on.
+    void ReleaseDlssNr();
+
+    // True while a DLSS NR processor exists (the filter is selected and
+    // compiled in); such a panel filters single-threaded, full frame.
+    bool UsingDlssNr() const {
+#ifdef VBAM_ENABLE_DLSS_NR
+        return dlssnr_ != nullptr;
+#else
+        return false;
+#endif
+    }
 
     // Apply an armed in-place filter change at the start of a frame (called from
     // every DrawArea(uint8_t**) path): recompute the scale, drop the now
@@ -990,6 +1017,13 @@ protected:
     bool rpi_is_mt_ = false; // true if plugin is multi-threaded (name contains " MT")
     int rpi_bpp_ = 4; // bytes per pixel for RPI plugin (4 for 32-bit, 2 for 16-bit)
     int panel_color_depth_ = 16; // Color depth for this panel (may differ from global systemColorDepth)
+#ifdef VBAM_ENABLE_DLSS_NR
+    // The DLSS NR processor, present only while kDispFilter == kDlssNr. Owned
+    // here; the filter threads borrow the pointer and are stopped before it goes.
+    std::unique_ptr<dlssnr::Filter> dlssnr_;
+    bool dlssnr_ready_logged_ = false;
+    uint32_t dlssnr_frame_counter_ = 0;
+#endif
     hdr::Encoding hdr_encoding_ = hdr::Encoding::kNone; // active HDR surface encoding
     std::vector<uint8_t> hdr_buf_;                       // scratch for EncodeHdr()
 #ifdef VBAM_RPI_PROXY_SUPPORT

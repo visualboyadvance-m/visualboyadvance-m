@@ -6,6 +6,7 @@
 #ifndef NO_VULKAN
 
 #include <cstdint>
+#include <mutex>
 #include <vector>
 
 #include <QSize>
@@ -46,6 +47,19 @@ private:
     bool CreateSurface();
     bool PickPhysicalDevice();
     bool CreateLogicalDevice();
+
+    // ── DLSS NR: one Vulkan instance for the renderer and the model ─────────
+    // libxmx (the model's compute runtime) runs on this panel's instance and
+    // device instead of opening a second one (see the wx port for the full
+    // note): CreateInstance() asks for Vulkan 1.3, CreateLogicalDevice()
+    // enables the features the graph needs and takes a compute queue for it,
+    // ShareVulkanWithDlssNr() hands them over, and the destructor withdraws
+    // them (closing the model) before the device goes. queue_mutex_ brackets
+    // every submit, present and idle wait on our queues; libxmx takes it too.
+    void ShareVulkanWithDlssNr();
+    void WithdrawVulkanFromDlssNr();
+    static void LockQueueThunk(void* self);
+    static void UnlockQueueThunk(void* self);
 
     bool CreateSwapchain();
     void DestroySwapchain();
@@ -115,6 +129,16 @@ private:
     VkQueue present_queue_ = VK_NULL_HANDLE;
     uint32_t graphics_family_ = UINT32_MAX;
     uint32_t present_family_ = UINT32_MAX;
+
+    uint32_t instance_api_version_ = 0;         // what CreateInstance asked for
+    std::mutex queue_mutex_;                     // see the DLSS NR block above
+    VkQueue compute_queue_ = VK_NULL_HANDLE;     // lent to libxmx
+    uint32_t compute_family_ = UINT32_MAX;
+    uint32_t compute_queue_index_ = 0;
+    bool compute_is_graphics_queue_ = false;
+    bool dlssnr_share_ok_ = false;               // device has what libxmx needs
+    bool dlssnr_coopmat_ = false;                // VK_KHR_cooperative_matrix enabled
+    bool dlssnr_shared_ = false;                 // we registered a share
 
     VkSwapchainKHR swapchain_ = VK_NULL_HANDLE;
     VkFormat swapchain_format_ = VK_FORMAT_UNDEFINED;

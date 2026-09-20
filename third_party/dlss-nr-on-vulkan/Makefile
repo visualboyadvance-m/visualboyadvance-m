@@ -1,0 +1,208 @@
+# Build the resident Vulkan runtime, game layer and compute shaders.
+# The shaders are plain GLSL compiled to SPIR-V; libxmx keeps the Vulkan context alive
+# across calls so a block records as one command buffer.
+
+GLSL    := glslangValidator --target-env vulkan1.3 -Isrc/gpu
+# The interpreter the tests run under: `make test PYTHON=python3.12` to pick another.
+PYTHON  ?= python3
+# This build lands in work/; CMake lands in its build directory. The Python finds either
+# through `src/nr_build.py`, newest build first, and this pins it for the targets below so
+# `make test` runs what `make` built even when a CMake build is more recent.
+export NR_BUILD_DIR ?= $(CURDIR)/work
+
+# Where the Vulkan headers and the loader are. Linux: the pinned clone in `work/`, or the
+# distribution's. macOS: MoltenVK, which vcpkg or a MoltenVK install put under one of the
+# prefixes below — override VK_PREFIX (or VK_INC / VK_LIBDIR / MVK_LIBDIR one by one).
+UNAME_S := $(shell uname -s)
+# Shared libraries carry the platform's suffix: .dylib on macOS, .so elsewhere. The Python
+# loaders, the layer manifest and the frame library's dlopen make the same choice.
+ifeq ($(UNAME_S),Darwin)
+SO := .dylib
+# an executable finds the dylib through its rpath from any directory, not only the root
+INSTALL_NAME = -Wl,-install_name,@rpath/$(notdir $@)
+else
+SO := .so
+INSTALL_NAME :=
+endif
+ifeq ($(UNAME_S),Darwin)
+VK_PREFIX ?= $(firstword $(foreach d,$(HOME)/Downloads/vcpkg/installed/arm64-osx /usr/local /opt/homebrew $(VULKAN_SDK),$(if $(wildcard $(d)/include/vulkan/vulkan.h),$(d),)))
+VK_INC    ?= $(VK_PREFIX)/include
+VK_LIBDIR ?= $(VK_PREFIX)/lib
+MVK_LIBDIR ?= $(firstword $(foreach d,/usr/local/lib $(VK_LIBDIR) /opt/homebrew/lib,$(if $(wildcard $(d)/libMoltenVK.dylib),$(d),)))
+# The compute runtime talks to MoltenVK directly: no loader, no ICD file, no portability
+# enumeration to arrange. The layer and its tests go through the loader by definition,
+# and the loader finds MoltenVK through the ICD manifest `all` writes into work/.
+XMX_LIBS := -L$(MVK_LIBDIR) -lMoltenVK -Wl,-rpath,$(MVK_LIBDIR)
+VK_LIBS  := -L$(VK_LIBDIR) -lvulkan -Wl,-rpath,$(VK_LIBDIR)
+PLATFORM_EXTRA := work/MoltenVK_icd.json
+DL_LIBS :=
+else
+VK_INC   ?= work/vulkan-headers/include
+XMX_LIBS := -lvulkan
+VK_LIBS  := -lvulkan
+PLATFORM_EXTRA :=
+DL_LIBS := -ldl
+endif
+CFLAGS  := -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -I$(VK_INC)
+SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
+           work/resident.spv work/attention.spv \
+           work/history.spv work/gemm_coopmat.spv work/gemm_batched.spv \
+           work/gemm_f16acc.spv \
+           work/gemm_portable.spv work/gemm_portable_tiled.spv \
+           work/gemm_portable_desc.spv work/gemm_portable_batched.spv
+
+all: work/libxmx$(SO) work/libnr_layer$(SO) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/gemm_runner $(SHADERS) $(PLATFORM_EXTRA)
+
+work:
+	mkdir -p $@
+
+$(SHADERS) work/libxmx$(SO) work/libnr_layer$(SO) work/half_probe.spv work/attention_ab.spv: | work
+work/libnr_image$(SO) work/test_exchange work/test_settled work/libnr_layer32$(SO) work/test_layer_loader work/test_present work/test_layer_loader32: | work
+
+work/libxmx$(SO): src/gpu/libxmx.c
+	$(CC) $(CFLAGS) -shared -o $@ $< $(XMX_LIBS)
+
+# The one-shot runner behind src/gpu/test_gemm.py: its own instance and device per call.
+work/gemm_runner: src/gpu/gemm_runner.c | work
+	$(CC) $(CFLAGS) -o $@ $< $(XMX_LIBS)
+
+# For the Vulkan loader on macOS, which finds no driver on its own: point VK_DRIVER_FILES
+# (older loaders: VK_ICD_FILENAMES) at this file. The tests that go through the loader do.
+work/MoltenVK_icd.json: Makefile | work
+	printf '{\n  "file_format_version": "1.0.0",\n  "ICD": {\n    "library_path": "%s/libMoltenVK.dylib",\n    "api_version": "1.4.0",\n    "is_portability_driver": true\n  }\n}\n' "$(MVK_LIBDIR)" > $@
+
+# The host passes in C. Built for this machine: `-march=native`, so rebuild it rather
+# than copy it. The FP16 casts and the separate multiply and add are the contract —
+# fused multiply-add or fast maths would change the last bit and the output must be
+# byte-identical to the NumPy it replaces (src/ref/test_native_image.py).
+work/libnr_image$(SO): src/ref/nr_image.c Makefile | work
+	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
+	      -shared -o $@ $<
+
+# nr_frame.py as a C library: the feature assembly, the whole graph recorded against
+# libxmx (reached by dlopen from this directory), and the composition. The image passes
+# are the same object as libnr_image; the frame code has the same no-FMA contract.
+work/nr_image.o: src/ref/nr_image.c src/ref/nr_image.h | work
+	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -c -o $@ $<
+work/nr_frame.o: src/ref/nr_frame.c src/ref/nr_frame.h src/ref/nr_image.h | work
+	$(CC) -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fno-fast-math -c -o $@ $<
+work/libnr_frame$(SO): work/nr_frame.o work/nr_image.o
+	$(CC) -shared $(INSTALL_NAME) -o $@ $^ $(DL_LIBS) -lm
+# nr_frame.py, the command, in C: the same flags, PNG in and out through libpng.
+# pkg-config finds libpng where it is; PNG_CFLAGS / PNG_LIBS override it.
+# pkg-config first; then the prefixes a Mac keeps it under (Homebrew, vcpkg, /usr/local);
+# then the plain -lpng a distribution's package gives.
+# vcpkg's .pc files are on no default pkg-config path, so they are added to the search.
+# A prefix counts only if its png.h can be read: a dangling symlink (a Mac after an old
+# build tree was deleted) would otherwise pass $(wildcard) and fail at the #include.
+PNG_PKG_CONFIG := PKG_CONFIG_PATH="$$PKG_CONFIG_PATH:$(HOME)/Downloads/vcpkg/installed/arm64-osx/lib/pkgconfig" pkg-config
+PNG_PREFIX ?= $(firstword $(foreach d,/opt/homebrew /usr/local $(HOME)/Downloads/vcpkg/installed/arm64-osx,$(if $(shell test -r $(d)/include/png.h && echo y),$(d),)))
+PNG_CFLAGS ?= $(or $(shell $(PNG_PKG_CONFIG) --cflags libpng 2>/dev/null),$(if $(PNG_PREFIX),-I$(PNG_PREFIX)/include,))
+PNG_LIBS   ?= $(or $(shell $(PNG_PKG_CONFIG) --libs libpng 2>/dev/null),$(if $(PNG_PREFIX),-L$(PNG_PREFIX)/lib -lpng -lz -Wl$(COMMA)-rpath$(COMMA)$(PNG_PREFIX)/lib,-lpng -lz))
+COMMA := ,
+work/nr_frame: src/ref/nr_frame_main.c work/libnr_frame$(SO) src/ref/nr_frame.h src/ref/nr_image.h
+	$(CC) -O2 -Wall -Wextra -Isrc/ref $(PNG_CFLAGS) -o $@ $< work/libnr_frame$(SO) -Wl,-rpath,$(CURDIR)/work $(PNG_LIBS) $(DL_LIBS) -lm
+# test_nr_frame_c.py in C: the library against its own contract, and against the head the
+# Python test writes with --reference, so the bit-identity check survives without Python
+work/test_nr_frame: src/ref/test_nr_frame.c work/libnr_frame$(SO) src/ref/nr_frame.h
+	$(CC) -O2 -Wall -Wextra -ffp-contract=off -fno-fast-math -Isrc/ref -o $@ $< work/libnr_frame$(SO) -Wl,-rpath,$(CURDIR)/work -lm
+
+# The Vulkan layer that puts the pass inside a running game.
+work/libnr_layer$(SO): src/layer/nr_layer.c
+	$(CC) $(CFLAGS) -shared -o $@ $< $(VK_LIBS)
+
+work/libnr_layer32$(SO): src/layer/nr_layer.c
+	$(CC) $(CFLAGS) -m32 -shared -o $@ $< -lvulkan
+
+work/test_layer_loader: src/layer/test_layer_loader.c
+	$(CC) $(CFLAGS) -o $@ $< $(VK_LIBS)
+
+work/test_present: src/layer/test_present.c
+	$(CC) $(CFLAGS) -o $@ $< $(VK_LIBS)
+
+work/test_layer_loader32: src/layer/test_layer_loader.c
+	$(CC) $(CFLAGS) -m32 -o $@ $< -lvulkan
+
+work/test_settled: src/layer/test_settled.c src/layer/nr_layer.c
+	$(CC) $(CFLAGS) -Isrc/layer -o $@ $< $(VK_LIBS)
+
+work/test_exchange: src/layer/test_exchange.c src/layer/nr_layer.c
+	$(CC) $(CFLAGS) -o $@ $< $(VK_LIBS) -lpthread
+
+work/gemm_resident.spv: src/gpu/gemm_resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -o $@ $<
+# the same source, with a 16x32 block of the output held in one subgroup's registers
+work/gemm_tiled.spv: src/gpu/gemm_resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl Makefile
+	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
+work/gemm_staged.spv: src/gpu/gemm_staged.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -o $@ $<
+work/resident.spv: src/gpu/resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -o $@ $<
+work/attention.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -o $@ $<
+work/attention_ab.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -DSOFTMAX_AB -o $@ $<
+work/history.spv: src/gpu/history.comp
+	$(GLSL) -o $@ $<
+work/gemm_coopmat.spv: src/gpu/gemm_coopmat.comp
+	$(GLSL) -o $@ $<
+work/gemm_batched.spv: src/gpu/gemm_coopmat_batched.comp
+	$(GLSL) -o $@ $<
+work/gemm_f16acc.spv: src/gpu/gemm_coopmat_f16acc.comp
+	$(GLSL) -o $@ $<
+# the same GEMMs without the cooperative matrix, for a device that has none
+work/gemm_portable.spv: src/gpu/gemm_portable.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+	$(GLSL) -o $@ $<
+work/gemm_portable_tiled.spv: src/gpu/gemm_portable.comp src/gpu/publish.glsl src/gpu/specialize.glsl Makefile
+	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
+work/gemm_portable_desc.spv: src/gpu/gemm_portable_desc.comp
+	$(GLSL) -o $@ $<
+work/gemm_portable_batched.spv: src/gpu/gemm_portable_desc.comp
+	$(GLSL) -DBATCHED -o $@ $<
+
+work/half_probe.spv: src/bench/half_probe.comp
+	$(GLSL) -o $@ $<
+
+bench: all work/half_probe.spv
+	$(PYTHON) src/bench/half_probe.py
+	$(PYTHON) src/bench/split_cost.py
+
+test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_present work/test_nr_frame
+	$(PYTHON) src/layer/test_daemon.py
+	work/test_settled
+	$(PYTHON) src/layer/test_ui_mask.py
+	$(PYTHON) src/layer/test_present.py
+	$(PYTHON) src/layer/test_temporal.py
+	$(PYTHON) src/layer/test_toggle.py
+	$(PYTHON) src/layer/test_panel.py
+	$(PYTHON) src/tools/publish_check.py
+	$(PYTHON) src/tools/claims_check.py
+	$(PYTHON) src/gpu/test_portable.py
+	XMX_PORTABLE=1 $(PYTHON) src/gpu/test_portable.py
+	$(PYTHON) src/gpu/test_epilogue.py
+	$(PYTHON) src/gpu/test_specialization.py
+	$(PYTHON) src/gpu/test_softmax_pack.py
+	$(PYTHON) src/gpu/test_qkv_fusion.py
+	$(PYTHON) src/gpu/test_scratch_arena.py
+	$(PYTHON) src/gpu/test_graph.py
+	$(PYTHON) src/gpu/test_frame_execution.py
+	$(PYTHON) src/gpu/test_resident.py
+	$(PYTHON) src/ref/test_frame_cache.py
+	$(PYTHON) src/ref/test_native_image.py
+	$(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference.bin
+	work/test_nr_frame --reference work/nr_frame_reference.bin
+	$(PYTHON) src/ref/test_nr_model.py
+	$(PYTHON) src/ref/test_temporal_controls.py
+
+test-proton: all work/libnr_layer32$(SO) work/test_layer_loader work/test_layer_loader32
+	$(PYTHON) src/layer/test_launcher.py
+	$(PYTHON) src/layer/prepare_layer.py work/layer-check
+	VK_LAYER_PATH=$(CURDIR)/work/layer-check ENABLE_NR_LAYER=1 work/test_layer_loader
+	VK_LAYER_PATH=$(CURDIR)/work/layer-check ENABLE_NR_LAYER=1 work/test_layer_loader32
+
+# Everything the tracked tree must not contain, and — slower — everything the history
+# must not either. `make test` runs the first; run the second before publishing.
+publish-check:
+	$(PYTHON) src/tools/publish_check.py --history
+
+.PHONY: all test test-proton bench publish-check

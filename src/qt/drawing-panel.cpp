@@ -25,6 +25,7 @@
 #include <QtEndian>
 
 #include "components/filters/filters.h"
+#include "components/filters_dlssnr/dlssnr.h"
 #include "components/filters_interframe/interframe.h"
 #include "components/filters_scalefx/scalefx.h"
 #include "core/base/check.h"
@@ -64,6 +65,9 @@ double GetFilterScale() {
             return 9.0;
         case config::Filter::kScaleFX3x:
             return 3.0;
+        case config::Filter::kDlssNr:
+            // Neural rendering keeps the source resolution.
+            return 1.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
             VBAM_NOTREACHED_RETURN(1.0);
@@ -139,6 +143,10 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
             break;
         case config::Filter::kScaleFX9x:
             scalefx9x32(src, instride, delta, dst, outstride, width, height);
+            break;
+        case config::Filter::kDlssNr:
+            // Needs the panel's dlssnr::Filter; dispatched by FilterThread::Filter32(),
+            // and never split into bands (see max_threads in DrawArea).
             break;
         case config::Filter::kPlugin:
         case config::Filter::kNone:
@@ -464,6 +472,9 @@ public:
     const RENDER_PLUGIN_INFO* rpi_ = nullptr;
     int rpi_bpp_ = 4;
     bool rpi_using_rgb565_ = false;
+#ifdef VBAM_ENABLE_DLSS_NR
+    dlssnr::Filter* dlssnr_ = nullptr;  // The panel's DLSS NR processor when kDlssNr is selected
+#endif
     int panel_color_depth_ = 32;
     uint8_t* dst_ = nullptr;
     uint8_t* delta_ = nullptr;
@@ -618,8 +629,7 @@ public:
                     ConvertTo32(src_, instride, width_, height_, panel_color_depth_, src2_);
                 const int dst_offset = scaled_width * scale_int;
                 uint8_t* filter_dst = reinterpret_cast<uint8_t*>(dst2_ + dst_offset);
-                ApplyFilter32(filter_src, instride32, delta_, filter_dst, outstride32, width_,
-                              height_);
+                Filter32(filter_src, instride32, filter_dst, outstride32, filter_option);
 
                 const uint32_t* dst32 = dst2_ + dst_offset;
                 uint8_t* out = dest;
@@ -721,9 +731,31 @@ private:
         }
     }
 
+    // Run the selected built-in filter on a 32bpp band. The channel layout of
+    // the band is whatever systemRedShift & co. describe at this point: the
+    // panel's own for the direct path, ShiftSaver's for the converted one.
+    void Filter32(uint8_t* src, int instride, uint8_t* dst, int outstride,
+                  config::Filter filter_option) {
+#ifdef VBAM_ENABLE_DLSS_NR
+        if (filter_option == config::Filter::kDlssNr) {
+            if (dlssnr_) {
+                dlssnr_->Apply32(src, instride, dst, outstride, width_, height_,
+                                 systemRedShift - 3, systemGreenShift - 3, systemBlueShift - 3);
+            } else {
+                for (int y = 0; y < height_; y++)
+                    memcpy(dst + y * outstride, src + y * instride, width_ * 4);
+            }
+            return;
+        }
+#else
+        (void)filter_option;
+#endif
+        ApplyFilter32(src, instride, delta_, dst, outstride, width_, height_);
+    }
+
     void ApplyFilterOptimized(int instride, int outstride, config::Filter filter_option) {
         if (filter_option != config::Filter::kPlugin) {
-            ApplyFilter32(src_, instride, delta_, dst_, outstride, width_, height_);
+            Filter32(src_, instride, dst_, outstride, filter_option);
             return;
         }
 
@@ -907,11 +939,21 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         }
     }
 
+    if (OPTION(kDispFilter) == config::Filter::kDlssNr && !dlssnr::Available()) {
+        // Not compiled in (no libnr_frame in this build): behave like a missing plugin.
+        vbam::LogWarning(QStringLiteral("The DLSS NR filter is not available in this build; filter disabled."));
+        OPTION(kDispFilter) = config::Filter::kNone;
+    }
+
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
         panel_color_depth_ = (OPTION(kBitDepth) + 1) << 3;
         systemColorDepth = panel_color_depth_;
     }
+
+    // The DLSS NR initializer: create the processor (it opens the model on its
+    // own thread) when that filter is selected. Used by the filter thread.
+    SyncDlssNr();
 
     // Initialize color shifts based on the panel's color depth.
     if (panel_color_depth_ == 24 || panel_color_depth_ == 32) {
@@ -961,6 +1003,7 @@ void DrawingPanelBase::Destroy() {
 
 void DrawingPanelBase::DrawArea(uint8_t** data) {
     ApplyPendingFilterChange();
+    UpdateDlssNrState();
 
     const int outbpp = panel_color_depth_ >> 3;
     const int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2
@@ -987,7 +1030,8 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
         todraw = *data;
     }
 
-    const int max_threads = rpi_is_mt_ ? 1 : GetMaxFilterThreads();
+    // MT plugins and DLSS NR (whose network sees the whole frame) run single-threaded.
+    const int max_threads = (rpi_is_mt_ || UsingDlssNr()) ? 1 : GetMaxFilterThreads();
     const int instride = (width + inrb) * (panel_color_depth_ >> 3);
 
     if (filtering) {
@@ -1001,6 +1045,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
             t.dst_ = todraw;
             t.delta_ = delta;
             t.rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            t.dlssnr_ = dlssnr_.get();
+#endif
             t.rpi_bpp_ = rpi_bpp_;
             t.rpi_using_rgb565_ = rpi_using_rgb565_;
             t.panel_color_depth_ = panel_color_depth_;
@@ -1245,10 +1292,61 @@ void DrawingPanelBase::ApplyPendingFilterChange() {
     pending_filter_change_ = false;
     scale = GetFilterScale();
     StopFilterThreads();
+    // The filter threads are gone, so the DLSS NR processor can come or go.
+    SyncDlssNr();
     if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
         free(pixbuf2);
     pixbuf2 = nullptr;
     memset(delta, 0xff, sizeof(delta));
+}
+
+void DrawingPanelBase::SyncDlssNr() {
+#ifdef VBAM_ENABLE_DLSS_NR
+    const bool want = OPTION(kDispFilter) == config::Filter::kDlssNr;
+    if (want && !dlssnr_) {
+        dlssnr_ = std::make_unique<dlssnr::Filter>();
+        dlssnr_ready_logged_ = false;
+        systemScreenMessage("DLSS NR: loading model...");
+    } else if (!want && dlssnr_) {
+        dlssnr_.reset();
+    }
+#endif
+}
+
+void DrawingPanelBase::ReleaseDlssNr() {
+    StopFilterThreads();
+#ifdef VBAM_ENABLE_DLSS_NR
+    dlssnr_.reset();
+#endif
+}
+
+void DrawingPanelBase::UpdateDlssNrState() {
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_)
+        return;
+    if (dlssnr_->Failed()) {
+        vbam::LogError(QStringLiteral("DLSS NR filter failed: %1")
+                     .arg(QString::fromStdString(dlssnr_->Error())));
+        systemScreenMessage("DLSS NR unavailable, filter disabled");
+        // The option observer adopts this in place; the next DrawArea drops the
+        // processor in SyncDlssNr(). Until then Apply32() passes frames through.
+        OPTION(kDispFilter) = config::Filter::kNone;
+        return;
+    }
+    if (!dlssnr_ready_logged_ && dlssnr_->Ready()) {
+        dlssnr_ready_logged_ = true;
+        vbam::LogDebug(QStringLiteral("DLSS NR model ready on %1")
+                     .arg(QString::fromStdString(dlssnr_->Device())));
+        systemScreenMessage("DLSS NR ready");
+    }
+    // Throughput trace: every 256 emulated frames, how many passes the network
+    // finished and how long the last one took.
+    if (dlssnr_ready_logged_ && (++dlssnr_frame_counter_ & 0xff) == 0) {
+        vbam::LogDebug(QStringLiteral("DLSS NR: %1 passes, last %2 ms")
+                     .arg(static_cast<qulonglong>(dlssnr_->FramesDone()))
+                     .arg(dlssnr_->LastFrameMs(), 0, 'f', 1));
+    }
+#endif
 }
 
 DrawingPanelBase::~DrawingPanelBase() {

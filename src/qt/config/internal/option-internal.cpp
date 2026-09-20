@@ -51,6 +51,7 @@ static const std::array<QString, kNbFilters> kFilterStrings = {
     QStringLiteral("xbrz9x"),
     QStringLiteral("scalefx3x"),
     QStringLiteral("scalefx9x"),
+    QStringLiteral("dlssnr"),
     QStringLiteral("plugin"),
 };
 

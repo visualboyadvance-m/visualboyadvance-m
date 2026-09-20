@@ -1,5 +1,7 @@
 #include "qt/renderers/vulkan-panel.h"
 
+#include "components/filters_dlssnr/dlssnr.h"
+
 #ifndef NO_VULKAN
 
 #include <algorithm>
@@ -122,6 +124,7 @@ PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
     F(vkGetBufferMemoryRequirements) \
     F(vkGetDeviceQueue) \
     F(vkGetImageMemoryRequirements) \
+    F(vkGetPhysicalDeviceFeatures2) \
     F(vkGetPhysicalDeviceMemoryProperties) \
     F(vkGetPhysicalDeviceProperties) \
     F(vkGetPhysicalDeviceQueueFamilyProperties) \
@@ -262,17 +265,26 @@ VKDrawingPanel::VKDrawingPanel(QWidget* parent, int _width, int _height)
                     CreateRenderPass() && CreateDescriptorSetLayout() &&
                     CreateGraphicsPipeline() && CreateFramebuffers() && CreateCommandPool() &&
                     CreateCommandBuffers() && CreateSyncObjects() && CreateDescriptorPoolAndSet();
-    if (ok)
+    if (ok) {
         vbam::LogDebug(QStringLiteral("Vulkan device created successfully"));
+        // The renderer is up: lend its instance and device to the DLSS NR model.
+        ShareVulkanWithDlssNr();
+    }
 
     DrawingPanelInit();
 }
 
 VKDrawingPanel::~VKDrawingPanel() {
-    StopFilterThreads();
+    // The model may be running on our device: stop our filter threads and the
+    // processor, then take the device back (this closes the model) before
+    // anything below is destroyed.
+    ReleaseDlssNr();
+    WithdrawVulkanFromDlssNr();
 
-    if (device_ != VK_NULL_HANDLE)
+    if (device_ != VK_NULL_HANDLE) {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
         vkDeviceWaitIdle(device_);
+    }
 
     DestroyTexture();
 #if defined(Q_OS_ANDROID)
@@ -324,7 +336,20 @@ bool VKDrawingPanel::CreateInstance() {
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pEngineName = "VBA-M";
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion = VK_API_VERSION_1_0;
+    // Vulkan 1.3 when the loader has it: the DLSS NR model's graph (libxmx) needs
+    // 1.3 to run on this instance. 1.0 otherwise, as before; the model then opens
+    // its own instance.
+    instance_api_version_ = VK_API_VERSION_1_0;
+    {
+        auto enumerate_version = reinterpret_cast<PFN_vkEnumerateInstanceVersion>(
+            vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion"));
+        uint32_t supported = 0;
+        if (enumerate_version && enumerate_version(&supported) == VK_SUCCESS &&
+            supported >= VK_API_VERSION_1_3) {
+            instance_api_version_ = VK_API_VERSION_1_3;
+        }
+    }
+    app_info.apiVersion = instance_api_version_;
 
     uint32_t ext_count = 0;
     vkEnumerateInstanceExtensionProperties(nullptr, &ext_count, nullptr);
@@ -538,7 +563,7 @@ bool VKDrawingPanel::PickPhysicalDevice() {
 
 // ─── CreateLogicalDevice ──────────────────────────────────────────────────────
 bool VKDrawingPanel::CreateLogicalDevice() {
-    float priority = 1.0f;
+    static const float priorities[2] = {1.0f, 1.0f};
     std::vector<VkDeviceQueueCreateInfo> queue_cis;
 
     auto add_queue = [&](uint32_t family) {
@@ -546,7 +571,7 @@ bool VKDrawingPanel::CreateLogicalDevice() {
         ci.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         ci.queueFamilyIndex = family;
         ci.queueCount = 1;
-        ci.pQueuePriorities = &priority;
+        ci.pQueuePriorities = priorities;
         queue_cis.push_back(ci);
     };
 
@@ -565,8 +590,109 @@ bool VKDrawingPanel::CreateLogicalDevice() {
         dev_exts.push_back("VK_KHR_portability_subset");
 #endif
 
+    // ── What the DLSS NR model (libxmx) needs to run on this device ───────────
+    // Vulkan 1.3 and these features (see nr_frame_adopt_vulkan). Enabled only
+    // when the device has them all, and only those; otherwise the model opens
+    // its own instance and nothing here changes.
+    dlssnr_share_ok_ = false;
+    dlssnr_coopmat_ = false;
+    compute_family_ = UINT32_MAX;
+    compute_queue_index_ = 0;
+    compute_is_graphics_queue_ = false;
+    VkPhysicalDeviceVulkan12Features enable12{};
+    VkPhysicalDeviceVulkan11Features enable11{};
+    VkPhysicalDeviceFeatures2 enable2{};
+#ifdef VK_KHR_cooperative_matrix
+    VkPhysicalDeviceCooperativeMatrixFeaturesKHR enable_cm{};
+#endif
+    if (instance_api_version_ >= VK_API_VERSION_1_3 && vkGetPhysicalDeviceFeatures2) {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(physical_device_, &props);
+        if (props.apiVersion >= VK_API_VERSION_1_3) {
+            uint32_t n_ext = 0;
+            vkEnumerateDeviceExtensionProperties(physical_device_, nullptr, &n_ext, nullptr);
+            std::vector<VkExtensionProperties> all_exts(n_ext);
+            vkEnumerateDeviceExtensionProperties(physical_device_, nullptr, &n_ext, all_exts.data());
+            bool has_coopmat = false;
+#ifdef VK_KHR_cooperative_matrix
+            for (auto& e : all_exts)
+                if (strcmp(e.extensionName, VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME) == 0)
+                    has_coopmat = true;
+#endif
+            VkPhysicalDeviceVulkan12Features have12{};
+            have12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+            VkPhysicalDeviceVulkan11Features have11{};
+            have11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+            have11.pNext = &have12;
+#ifdef VK_KHR_cooperative_matrix
+            VkPhysicalDeviceCooperativeMatrixFeaturesKHR have_cm{};
+            have_cm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR;
+            if (has_coopmat)
+                have12.pNext = &have_cm;
+#endif
+            VkPhysicalDeviceFeatures2 have2{};
+            have2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+            have2.pNext = &have11;
+            vkGetPhysicalDeviceFeatures2(physical_device_, &have2);
+            if (have11.storageBuffer16BitAccess && have12.vulkanMemoryModel &&
+                have12.vulkanMemoryModelDeviceScope && have12.shaderFloat16 &&
+                have12.bufferDeviceAddress && have12.scalarBlockLayout) {
+                enable12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+                enable12.vulkanMemoryModel = VK_TRUE;
+                enable12.vulkanMemoryModelDeviceScope = VK_TRUE;
+                enable12.shaderFloat16 = VK_TRUE;
+                enable12.bufferDeviceAddress = VK_TRUE;
+                enable12.scalarBlockLayout = VK_TRUE;
+                enable11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+                enable11.storageBuffer16BitAccess = VK_TRUE;
+                enable11.pNext = &enable12;
+#ifdef VK_KHR_cooperative_matrix
+                if (has_coopmat && have_cm.cooperativeMatrix) {
+                    enable_cm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR;
+                    enable_cm.cooperativeMatrix = VK_TRUE;
+                    enable12.pNext = &enable_cm;
+                    dev_exts.push_back(VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME);
+                    dlssnr_coopmat_ = true;
+                }
+#endif
+                enable2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+                enable2.pNext = &enable11;
+                dlssnr_share_ok_ = true;
+            }
+        }
+    }
+
+    // A compute queue for the model: another compute-capable family when the
+    // device has one, else a second queue of our family, else our own graphics
+    // queue, which is what queue_mutex_ is for.
+    if (dlssnr_share_ok_) {
+        uint32_t qcount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_, &qcount, nullptr);
+        std::vector<VkQueueFamilyProperties> qprops(qcount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_, &qcount, qprops.data());
+        for (uint32_t i = 0; i < qcount; ++i) {
+            if ((qprops[i].queueFlags & VK_QUEUE_COMPUTE_BIT) && i != graphics_family_ &&
+                i != present_family_) {
+                compute_family_ = i;
+                add_queue(i);
+                break;
+            }
+        }
+        if (compute_family_ == UINT32_MAX) {
+            compute_family_ = graphics_family_;  // graphics families always have compute
+            if (qprops[graphics_family_].queueCount >= 2) {
+                queue_cis[0].queueCount = 2;
+                compute_queue_index_ = 1;
+            } else {
+                compute_is_graphics_queue_ = true;
+            }
+        }
+    }
+
     VkDeviceCreateInfo ci{};
     ci.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    if (dlssnr_share_ok_)
+        ci.pNext = &enable2;
     ci.queueCreateInfoCount = static_cast<uint32_t>(queue_cis.size());
     ci.pQueueCreateInfos = queue_cis.data();
     ci.enabledExtensionCount = static_cast<uint32_t>(dev_exts.size());
@@ -580,7 +706,58 @@ bool VKDrawingPanel::CreateLogicalDevice() {
 
     vkGetDeviceQueue(device_, graphics_family_, 0, &graphics_queue_);
     vkGetDeviceQueue(device_, present_family_, 0, &present_queue_);
+    if (dlssnr_share_ok_) {
+        if (compute_is_graphics_queue_)
+            compute_queue_ = graphics_queue_;
+        else
+            vkGetDeviceQueue(device_, compute_family_, compute_queue_index_, &compute_queue_);
+        vbam::LogDebug(QStringLiteral("Vulkan: compute queue for DLSS NR: family %1 index %2%3")
+                           .arg(compute_family_)
+                           .arg(compute_queue_index_)
+                           .arg(compute_is_graphics_queue_ ? QStringLiteral(" (shared with graphics)")
+                                                           : QString()));
+    }
     return true;
+}
+
+// ─── DLSS NR sharing ─────────────────────────────────────────────────────────
+void VKDrawingPanel::LockQueueThunk(void* self) {
+    static_cast<VKDrawingPanel*>(self)->queue_mutex_.lock();
+}
+
+void VKDrawingPanel::UnlockQueueThunk(void* self) {
+    static_cast<VKDrawingPanel*>(self)->queue_mutex_.unlock();
+}
+
+void VKDrawingPanel::ShareVulkanWithDlssNr() {
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_share_ok_ || device_ == VK_NULL_HANDLE || compute_queue_ == VK_NULL_HANDLE)
+        return;
+    dlssnr::VulkanShare share;
+    share.instance = instance_;
+    share.physical_device = physical_device_;
+    share.device = device_;
+    share.queue = compute_queue_;
+    share.queue_family = compute_family_;
+    share.cooperative_matrix = dlssnr_coopmat_;
+    share.get_instance_proc_addr = reinterpret_cast<void*>(+vkGetInstanceProcAddr);
+    share.lock = &VKDrawingPanel::LockQueueThunk;
+    share.unlock = &VKDrawingPanel::UnlockQueueThunk;
+    share.lock_context = this;
+    share.owner = this;
+    dlssnr::ShareVulkan(share);
+    dlssnr_shared_ = true;
+    vbam::LogDebug(QStringLiteral("Vulkan instance and device lent to the DLSS NR model"));
+#endif
+}
+
+void VKDrawingPanel::WithdrawVulkanFromDlssNr() {
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_shared_)
+        return;
+    dlssnr::WithdrawVulkanShare(this);
+    dlssnr_shared_ = false;
+#endif
 }
 
 // ─── CreateSwapchain ──────────────────────────────────────────────────────────
@@ -755,7 +932,10 @@ void VKDrawingPanel::DestroySwapchain() {
 }
 
 bool VKDrawingPanel::RecreateSwapchain() {
-    vkDeviceWaitIdle(device_);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        vkDeviceWaitIdle(device_);
+    }
     DestroySwapchain();
     vsync_ = OPTION(kPrefVsync);
 #if defined(Q_OS_MACOS)
@@ -913,6 +1093,10 @@ bool VKDrawingPanel::CreateGraphicsPipeline() {
     VkPipelineInputAssemblyStateCreateInfo ia{};
     ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    // Metal cannot disable primitive restart on strips, and MoltenVK reports that
+    // (VK_ERROR_FEATURE_NOT_PRESENT) on a Vulkan 1.3 instance when it is left off.
+    // The quad's four vertices never use the restart index, so enable it.
+    ia.primitiveRestartEnable = VK_TRUE;
 
     VkPipelineViewportStateCreateInfo vp_state{};
     vp_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -1324,8 +1508,10 @@ bool VKDrawingPanel::UpdateOverlayTexture(VkCommandBuffer cmd) {
         // A frame still in flight may be sampling the old image through the
         // overlay descriptor set, and both are about to be replaced. Resizes are
         // rare (panel geometry changes), so idling here costs nothing.
-        if (osc_image_ != VK_NULL_HANDLE)
+        if (osc_image_ != VK_NULL_HANDLE) {
+            std::lock_guard<std::mutex> queue_lock(queue_mutex_);
             vkDeviceWaitIdle(device_);
+        }
         DestroyOverlayTexture();
 
         VkImageCreateInfo img_ci{};
@@ -1850,7 +2036,10 @@ void VKDrawingPanel::Present() {
     submit.signalSemaphoreCount = 1;
     submit.pSignalSemaphores = &render_finished_sem_[current_frame_];
 
-    vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
+    }
 
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -1860,7 +2049,10 @@ void VKDrawingPanel::Present() {
     present_info.pSwapchains = &swapchain_;
     present_info.pImageIndices = &image_index;
 
-    res = vkQueuePresentKHR(present_queue_, &present_info);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        res = vkQueuePresentKHR(present_queue_, &present_info);
+    }
     if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
         swapchain_dirty_ = true;
     else if (res != VK_SUCCESS)

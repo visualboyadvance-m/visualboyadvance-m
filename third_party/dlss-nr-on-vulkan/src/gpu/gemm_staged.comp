@@ -1,0 +1,174 @@
+#version 450
+#extension GL_GOOGLE_include_directive : require
+/*
+ * gemm_staged — the same GEMM with both operands staged in shared memory.
+ *
+ * The kernel in `gemm_resident.comp` issues four `coopMatLoad`s straight from global
+ * memory per K step and then four dependent multiply-accumulates. At 4.4 % of the
+ * matrix units' peak and 30 GB/s it is bound by neither arithmetic nor bandwidth: it
+ * is waiting on memory with almost nothing in flight.
+ *
+ * This one loads a whole 64x32 block of A and 32x32 of B cooperatively — 128 threads
+ * issuing sixteen independent loads each, which is the memory-level parallelism the
+ * other shape cannot express — and then reads the fragments back out of shared memory,
+ * where the latency is a fraction of the global one. The structure follows llama.cpp's
+ * `mul_mm.comp`, which does the same thing for the same reason.
+ *
+ * Four subgroups stacked along M, one 16x32 slice of the output each.
+ */
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference2 : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_shader_subgroup_basic : require
+
+#include "publish.glsl"
+
+const uint TM = 8, TN = 16, TK = 16;
+const uint WARPS = 4;
+const uint BM = 64, BN = 32, BK = 32;      // the block this workgroup computes
+const uint WM = BM / WARPS, WN = BN;       // and the slice one subgroup takes
+const uint RM = WM / TM, RN = WN / TN;
+
+/* A pad of eight halves keeps successive rows off the same shared-memory banks. */
+const uint SA = BK + 8, SB = BN + 8;
+
+layout(local_size_x = 32 * WARPS) in;
+
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
+
+layout(push_constant, scalar) uniform Push {
+    HalfBuf a, b; FloatBuf c, d;
+    uint m, n, k, batch;
+    uint sa, sb, sc, flags;
+    float p0, p1, p2, p3;
+    uint lda, ldb, ldc, spare;
+} pc;
+
+#include "specialize.glsl"
+
+shared float16_t buf_a[BM * SA];
+shared float16_t buf_b[BK * SB];
+shared float stage[BM * BN];
+
+void main() {
+    uint row = gl_WorkGroupID.y * BM, col = gl_WorkGroupID.x * BN;
+    uint batch = gl_WorkGroupID.z;
+    uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
+    uint lda = pc.lda != 0u ? pc.lda : pc.k;
+    bool transposed = (operation_flags() & 1u) != 0u;
+    uint ldb = pc.ldb != 0u ? pc.ldb : (transposed ? pc.k : pc.n);
+    uint ldc = pc.ldc != 0u ? pc.ldc : pc.n;
+
+    uint thread = gl_LocalInvocationID.x, warp = thread / 32u;
+    /* Four threads to a row of the tile, eight halves each: sixteen bytes per thread
+     * and sixty-four contiguous bytes per row, which is what makes the global read
+     * coalesce. */
+    uint lr = thread / 4u, lc = (thread % 4u) * 8u;
+
+    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> acc[RM][RN];
+    for (uint i = 0; i < RM; i++)
+        for (uint j = 0; j < RN; j++)
+            acc[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
+    coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> fa[RM];
+    coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> fb[RN];
+
+    /* Eight halves per thread as two 64-bit loads rather than eight 16-bit ones: the
+     * point of staging is to have many wide requests in flight, and scalar fills throw
+     * that away. Falls back to scalars when a row stride leaves the base unaligned. */
+    Half4Buf a4 = Half4Buf(uint64_t(pc.a)), b4 = Half4Buf(uint64_t(pc.b));
+    bool wide_a = (uint(uint64_t(pc.a)) & 7u) == 0u && (lda & 3u) == 0u && (ao & 3u) == 0u;
+    bool wide_b = (uint(uint64_t(pc.b)) & 7u) == 0u && (ldb & 3u) == 0u && (bo & 3u) == 0u;
+
+    for (uint k0 = 0; k0 < pc.k; k0 += BK) {
+        barrier();
+        for (uint r = lr; r < BM; r += (32u * WARPS) / 4u) {
+            uint at = ao + (row + r) * lda + k0 + lc;
+            if (wide_a) {
+                f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
+                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
+                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = hi[e];
+            } else {
+                for (uint e = 0; e < 8u; e++) buf_a[r * SA + lc + e] = pc.a.v[at + e];
+            }
+        }
+        if (transposed) {
+            for (uint nn = lr; nn < BN; nn += (32u * WARPS) / 4u) {
+                uint at = bo + (col + nn) * ldb + k0 + lc;
+                if (wide_b) {
+                    f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
+                    for (uint e = 0; e < 4u; e++) buf_b[(lc + e) * SB + nn] = lo[e];
+                    for (uint e = 0; e < 4u; e++) buf_b[(lc + 4u + e) * SB + nn] = hi[e];
+                } else {
+                    for (uint e = 0; e < 8u; e++)
+                        buf_b[(lc + e) * SB + nn] = pc.b.v[at + e];
+                }
+            }
+        } else {
+            for (uint kk = lr; kk < BK; kk += (32u * WARPS) / 4u) {
+                uint at = bo + (k0 + kk) * ldb + col + lc;
+                if (wide_b) {
+                    f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
+                    for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + e] = lo[e];
+                    for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + 4u + e] = hi[e];
+                } else {
+                    for (uint e = 0; e < 8u; e++) buf_b[kk * SB + lc + e] = pc.b.v[at + e];
+                }
+            }
+        }
+        barrier();
+
+        for (uint kk = 0; kk < BK; kk += TK) {
+            for (uint i = 0; i < RM; i++)
+                coopMatLoad(fa[i], buf_a, (warp * WM + i * TM) * SA + kk, SA,
+                            gl_CooperativeMatrixLayoutRowMajor);
+            for (uint j = 0; j < RN; j++)
+                coopMatLoad(fb[j], buf_b, kk * SB + j * TN, SB,
+                            gl_CooperativeMatrixLayoutRowMajor);
+            for (uint i = 0; i < RM; i++)
+                for (uint j = 0; j < RN; j++)
+                    acc[i][j] = coopMatMulAdd(fa[i], fb[j], acc[i][j]);
+        }
+    }
+
+    uint epilogue = (operation_flags() >> 8) & 0xFu;
+    bool narrow = (operation_flags() & 0x1000u) != 0u;
+    if (epilogue == 0u && !narrow) {
+        for (uint i = 0; i < RM; i++)
+            for (uint j = 0; j < RN; j++)
+                coopMatStore(acc[i][j], pc.c.v,
+                             co + (row + warp * WM + i * TM) * ldc + col + j * TN, ldc,
+                             gl_CooperativeMatrixLayoutRowMajor);
+        return;
+    }
+    /* The publish happens on scalars, after an untouched store to shared memory. That
+     * used to be forced by a driver bug which does not exist: the real rule is only that
+     * a matrix must be stored into an array of its own component type
+     * (notes/phase38-there-was-no-bug.md). The detour stays here for the write pattern —
+     * the loop below has each lane write four consecutive elements and the whole
+     * workgroup, not one subgroup, covers the tile. `gemm_resident.comp` dropped it for
+     * float32 outputs; this shader has not been re-measured without it. */
+    for (uint i = 0; i < RM; i++)
+        for (uint j = 0; j < RN; j++)
+            coopMatStore(acc[i][j], stage, (warp * WM + i * TM) * BN + j * TN, BN,
+                         gl_CooperativeMatrixLayoutRowMajor);
+    barrier();
+
+    for (uint e = thread * 4u; e < BM * BN; e += 32u * WARPS * 4u) {
+        vec4 out4;
+        for (uint i = 0; i < 4u; ++i) out4[i] = publish(epilogue, stage[e + i]);
+        uint at = co + (row + e / BN) * ldc + col + e % BN;
+        if (!narrow) {
+            for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
+        } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {
+            Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+        } else {
+            for (uint i = 0; i < 4u; ++i) HalfBuf(uint64_t(pc.c)).v[at + i] = float16_t(out4[i]);
+        }
+    }
+}

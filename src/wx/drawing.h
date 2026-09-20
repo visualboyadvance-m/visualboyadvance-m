@@ -569,6 +569,7 @@ protected:
 #define VK_NO_PROTOTYPES
 #endif
 #include <vulkan/vulkan.h>
+#include <mutex>
 
 #if defined(__WXMSW__)
 #include <vulkan/vulkan_win32.h>
@@ -628,6 +629,21 @@ private:
     // ── Physical / logical device ────────────────────────────────────────────
     bool PickPhysicalDevice();
     bool CreateLogicalDevice();
+
+    // ── DLSS NR: one Vulkan instance for the renderer and the model ─────────
+    // libxmx (the model's compute runtime) runs on this panel's instance and
+    // device instead of opening a second one on the same GPU. CreateInstance()
+    // asks for Vulkan 1.3, CreateLogicalDevice() enables the features the graph
+    // needs and takes a compute queue for it -- another family when there is
+    // one, else a second queue of ours, else our graphics queue behind
+    // queue_mutex_ -- and ShareVulkanWithDlssNr() hands them over. The
+    // destructor withdraws the share (which closes the model) before the
+    // device goes. queue_mutex_ brackets every submit, present and idle wait
+    // on our queues; libxmx takes it around its own submits.
+    void ShareVulkanWithDlssNr();
+    void WithdrawVulkanFromDlssNr();
+    static void LockQueueThunk(void* self);
+    static void UnlockQueueThunk(void* self);
  
     // ── Swapchain ────────────────────────────────────────────────────────────
     bool CreateSwapchain();
@@ -671,6 +687,16 @@ private:
     VkQueue                  present_queue_    = VK_NULL_HANDLE;
     uint32_t                 graphics_family_  = UINT32_MAX;
     uint32_t                 present_family_   = UINT32_MAX;
+
+    uint32_t                 instance_api_version_ = 0;         // what CreateInstance asked for
+    std::mutex               queue_mutex_;                       // see the DLSS NR block above
+    VkQueue                  compute_queue_    = VK_NULL_HANDLE; // lent to libxmx
+    uint32_t                 compute_family_   = UINT32_MAX;
+    uint32_t                 compute_queue_index_ = 0;
+    bool                     compute_is_graphics_queue_ = false;
+    bool                     dlssnr_share_ok_  = false;          // device has what libxmx needs
+    bool                     dlssnr_coopmat_   = false;          // VK_KHR_cooperative_matrix enabled
+    bool                     dlssnr_shared_    = false;          // we registered a share
  
     VkSwapchainKHR           swapchain_        = VK_NULL_HANDLE;
     VkFormat                 swapchain_format_ = VK_FORMAT_UNDEFINED;

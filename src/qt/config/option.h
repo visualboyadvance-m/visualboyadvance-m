@@ -38,6 +38,7 @@ enum class Filter {
     kXbrz9x,
     kScaleFX3x,
     kScaleFX9x,
+    kDlssNr,  // DLSS neural rendering (libnr_frame), scale 1x.
     kPlugin,  // This must always be last.
 
     // Do not add anything under here.

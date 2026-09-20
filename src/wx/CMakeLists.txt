@@ -697,6 +697,11 @@ function(configure_wx_target target)
     _add_link_libraries(${VBAM_SDL_LIBS})
 
     if(ENABLE_VULKAN)
+        # DLSS NR display filter (libnr_frame + libxmx come with the component).
+        if(TARGET vbam-components-filters-dlssnr)
+            _add_link_libraries(vbam-components-filters-dlssnr)
+        endif()
+
         if(APPLE AND ENABLE_MOLTENVK)
             _add_link_libraries($<LINK_LIBRARY:WEAK_LIBRARY,${MOLTENVK}>)
         elseif(APPLE)
@@ -2085,6 +2090,31 @@ endif()
 
 if(WIN32)
     vbam_strip_release_binary(visualboyadvance-m.exe)
+endif()
+
+
+# DLSS NR: libnr_frame and libxmx go into the bundle's Frameworks directory in
+# every configuration (third_party_libs_tool only runs for Release and resolves
+# @rpath libraries against /usr/local/lib, so it would not pick these up).
+# libnr_frame dlopens libxmx from its own directory, so the two must sit side by
+# side. The app links them as @rpath/lib*.dylib; the Frameworks rpath goes
+# first so a relocated bundle (or one whose build tree is gone) loads its own
+# copies. This runs before the Release bundling and codesigning steps below.
+if(APPLE AND TARGET vbam-components-filters-dlssnr)
+    set_property(TARGET visualboyadvance-m APPEND PROPERTY
+        BUILD_RPATH "@loader_path/../Frameworks")
+    set_property(TARGET visualboyadvance-m APPEND PROPERTY
+        INSTALL_RPATH "@loader_path/../Frameworks")
+    add_custom_command(
+        TARGET visualboyadvance-m POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_BUNDLE_DIR:visualboyadvance-m>/Contents/Frameworks"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:nr_frame>" "$<TARGET_FILE:xmx>"
+            "$<TARGET_BUNDLE_DIR:visualboyadvance-m>/Contents/Frameworks/"
+        COMMENT "Bundling libnr_frame and libxmx into Contents/Frameworks"
+        VERBATIM
+    )
 endif()
 
 # Bundle dylibs and relink them for releasing .app, but only in Release mode, also install translations into the .app.

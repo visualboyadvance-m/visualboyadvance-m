@@ -1,0 +1,146 @@
+#version 450
+#extension GL_GOOGLE_include_directive : require
+/*
+ * gemm_portable — `gemm_resident.comp` without the cooperative matrix.
+ *
+ * Same contract in every respect a caller can see: the push constants, the operation
+ * flags (bit 0 a transposed B, bits 8-11 the epilogue, bit 12 a half output), the row
+ * strides, the batch on gl_WorkGroupID.z, an 8x16 output block per 32-lane workgroup
+ * (16x32 with -DRM=2 -DRN=2, matching `gemm_tiled.spv`), and the store: the epilogue's
+ * publish on the accumulator, straight to global. The runtime dispatches it with the
+ * geometry it uses for the cooperative-matrix kernel and nothing else changes.
+ *
+ * What differs is the arithmetic: FP16 operands promoted to FP32 and accumulated with
+ * ordinary multiply-adds, one lane owning four consecutive columns of one row. It exists
+ * for a Vulkan device with no `VK_KHR_cooperative_matrix` — MoltenVK on Apple silicon is
+ * the one it was written for, where SPIRV-Cross cannot translate the matrix opcodes at
+ * all ("Currently no block to insert opcode") — and for testing the same path on the
+ * Xe2 machine through `XMX_PORTABLE=1`. It reaches no matrix unit anywhere; that is
+ * the price of running at all, and the fast path is still the other kernel.
+ *
+ * Numerics: a float16 x float16 product is exact in float32 and the K sum runs in
+ * order, so the result is the float32 dot product to within summation order, which is
+ * the same claim the matrix units make (`notes/phase9-numerics.md`: per-element
+ * agreement is not a property either can promise). -DACC16 accumulates in half, as the
+ * `ACC16` build of the matrix kernel does.
+ */
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference2 : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+#extension GL_KHR_shader_subgroup_basic : require
+
+#include "publish.glsl"
+
+layout(local_size_x = 32) in;
+
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf   { float16_t v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf  { float     v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf  { f16vec4   v4[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Float4Buf { vec4      v4[]; };
+
+layout(push_constant, scalar) uniform Push {
+    HalfBuf a, b; FloatBuf c, d;
+    uint m, n, k, batch;
+    uint sa, sb, sc, flags;
+    float p0, p1, p2, p3;
+    uint lda, ldb, ldc, spare;      // row strides; 0 means the dense default
+} pc;
+
+#include "specialize.glsl"
+
+const uint TM = 8, TN = 16;
+
+#ifdef ACC16
+#define ACC  float16_t
+#define ACC4 f16vec4
+#else
+#define ACC  float
+#define ACC4 vec4
+#endif
+
+#ifndef RM
+#define RM 1
+#endif
+#ifndef RN
+#define RN 1
+#endif
+const uint BM = TM * RM, BN = TN * RN;
+
+void main() {
+    uint row = gl_WorkGroupID.y * BM, col = gl_WorkGroupID.x * BN;
+    if (row >= pc.m || col >= pc.n) return;
+    uint batch = gl_WorkGroupID.z;
+    uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
+    uint lda = pc.lda != 0u ? pc.lda : pc.k;
+    uint ldb = pc.ldb != 0u ? pc.ldb : ((operation_flags() & 1u) != 0u ? pc.k : pc.n);
+    uint ldc = pc.ldc != 0u ? pc.ldc : pc.n;
+
+    /* Lane l owns row l/4 of every 8-row tile and columns 4*(l%4)..+3 of every 16-column
+     * tile: the four lanes of a row share its A element, and a lane's four B elements are
+     * consecutive in a row-major B. */
+    uint r = gl_LocalInvocationID.x >> 2u, cq = (gl_LocalInvocationID.x & 3u) * 4u;
+
+    ACC4 acc[RM][RN];
+    for (uint i = 0; i < RM; i++)
+        for (uint j = 0; j < RN; j++)
+            acc[i][j] = ACC4(0.0);
+
+    if ((operation_flags() & 1u) != 0u) {
+        /* B is stored (N, K): a lane's four columns are four rows of it. */
+        for (uint k = 0; k < pc.k; k++) {
+            ACC4 bv[RN];
+            for (uint j = 0; j < RN; j++) {
+                uint at = bo + (col + cq + j * TN) * ldb + k;
+                bv[j] = ACC4(ACC(pc.b.v[at]), ACC(pc.b.v[at + ldb]),
+                             ACC(pc.b.v[at + 2u * ldb]), ACC(pc.b.v[at + 3u * ldb]));
+            }
+            for (uint i = 0; i < RM; i++) {
+                ACC av = ACC(pc.a.v[ao + (row + r + i * TM) * lda + k]);
+                for (uint j = 0; j < RN; j++)
+                    acc[i][j] += av * bv[j];
+            }
+        }
+    } else {
+        for (uint k = 0; k < pc.k; k++) {
+            ACC4 bv[RN];
+            for (uint j = 0; j < RN; j++) {
+                uint at = bo + k * ldb + col + cq + j * TN;
+                bv[j] = ACC4(ACC(pc.b.v[at]), ACC(pc.b.v[at + 1u]),
+                             ACC(pc.b.v[at + 2u]), ACC(pc.b.v[at + 3u]));
+            }
+            for (uint i = 0; i < RM; i++) {
+                ACC av = ACC(pc.a.v[ao + (row + r + i * TM) * lda + k]);
+                for (uint j = 0; j < RN; j++)
+                    acc[i][j] += av * bv[j];
+            }
+        }
+    }
+
+    uint epilogue = (operation_flags() >> 8) & 0xFu;
+    bool narrow = (operation_flags() & 0x1000u) != 0u;
+    uint64_t base = uint64_t(pc.c);
+    for (uint i = 0; i < RM; i++)
+        for (uint j = 0; j < RN; j++) {
+            vec4 v = vec4(acc[i][j]);
+            if (epilogue != 0u)
+                for (uint e = 0; e < 4u; e++)
+                    v[e] = publish(epilogue, v[e]);
+            uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+            if (narrow) {
+                /* Four consecutive halves per lane, as one 64-bit store when aligned. */
+                if ((at & 3u) == 0u && (uint(base) & 7u) == 0u)
+                    Half4Buf(base).v4[at >> 2] = f16vec4(v);
+                else
+                    for (uint e = 0; e < 4u; e++)
+                        HalfBuf(base).v[at + e] = float16_t(v[e]);
+            } else {
+                if ((at & 3u) == 0u && (uint(base) & 15u) == 0u)
+                    Float4Buf(base).v4[at >> 2] = v;
+                else
+                    for (uint e = 0; e < 4u; e++)
+                        pc.c.v[at + e] = v[e];
+            }
+        }
+}

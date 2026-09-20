@@ -468,6 +468,26 @@ if(APPLE AND NOT COMPILE_ONLY)
     )
     set_source_files_properties(audio/internal/coreaudio.cpp PROPERTIES
         COMPILE_OPTIONS "-Wno-elaborated-enum-base;-Wno-availability")
+
+    # DLSS NR: libnr_frame and libxmx into the bundle's Frameworks directory (see
+    # the wx CMakeLists for why); the Frameworks rpath goes first so a relocated
+    # bundle loads its own copies.
+    if(TARGET vbam-components-filters-dlssnr)
+        set_property(TARGET visualboyadvance-m-qt APPEND PROPERTY
+            BUILD_RPATH "@loader_path/../Frameworks")
+        set_property(TARGET visualboyadvance-m-qt APPEND PROPERTY
+            INSTALL_RPATH "@loader_path/../Frameworks")
+        add_custom_command(
+            TARGET visualboyadvance-m-qt POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_BUNDLE_DIR:visualboyadvance-m-qt>/Contents/Frameworks"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:nr_frame>" "$<TARGET_FILE:xmx>"
+                "$<TARGET_BUNDLE_DIR:visualboyadvance-m-qt>/Contents/Frameworks/"
+            COMMENT "Bundling libnr_frame and libxmx into Contents/Frameworks"
+            VERBATIM
+        )
+    endif()
 endif()
 
 if(WIN32 AND NOT COMPILE_ONLY)
@@ -597,6 +617,10 @@ target_link_libraries(visualboyadvance-m-qt PRIVATE
     vbam-components-user-config
     vbam-sdl-motion
 )
+# DLSS NR display filter (libnr_frame + libxmx come with the component).
+if(TARGET vbam-components-filters-dlssnr)
+    target_link_libraries(visualboyadvance-m-qt PRIVATE vbam-components-filters-dlssnr)
+endif()
 
 if(ENABLE_FFMPEG)
     target_link_libraries(visualboyadvance-m-qt PRIVATE vbam-components-av-recording)

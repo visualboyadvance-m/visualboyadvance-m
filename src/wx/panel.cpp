@@ -61,6 +61,7 @@
 #include "components/filters/filters.h"
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_cgb/filters_cgb.h"
+#include "components/filters_dlssnr/dlssnr.h"
 #include "components/filters_interframe/interframe.h"
 #include "components/filters_scalefx/scalefx.h"
 #include "core/base/check.h"
@@ -142,6 +143,9 @@ double GetFilterScale() {
             return 9.0;
         case config::Filter::kScaleFX3x:
             return 3.0;
+        case config::Filter::kDlssNr:
+            // Neural rendering keeps the source resolution.
+            return 1.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
             VBAM_NOTREACHED_RETURN(1.0);
@@ -228,6 +232,10 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
             break;
         case config::Filter::kPlugin:
             // Plugin filters require RENDER_PLUGIN_INFO, not supported here
+            break;
+        case config::Filter::kDlssNr:
+            // Needs the panel's dlssnr::Filter; dispatched by FilterThread::Filter32(),
+            // and never split into bands (see max_threads in DrawArea).
             break;
         case config::Filter::kNone:
         case config::Filter::kLast:
@@ -2958,12 +2966,22 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         }
     }
 
+    if (OPTION(kDispFilter) == config::Filter::kDlssNr && !dlssnr::Available()) {
+        // Not compiled in (no libnr_frame in this build): behave like a missing plugin.
+        wxLogWarning(_("The DLSS NR filter is not available in this build; filter disabled."));
+        OPTION(kDispFilter) = config::Filter::kNone;
+    }
+
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
         scale *= GetFilterScale();
 
         panel_color_depth_ = (OPTION(kBitDepth) + 1) << 3;
         systemColorDepth = panel_color_depth_;  // Core needs this to output correct format
     }
+
+    // The DLSS NR initializer: create the processor (it opens the model on its
+    // own thread) when that filter is selected. Used by the filter thread below.
+    SyncDlssNr();
 
     // HDR output re-encodes the final RGBA8 image, so force a 32-bit source
     // when it is enabled (unless an RPI plugin has locked us to 16-bit).
@@ -3171,6 +3189,9 @@ public:
     const RENDER_PLUGIN_INFO* rpi_;
     int rpi_bpp_ = 4;  // Bytes per pixel for RPI plugin (default 32-bit = 4)
     bool rpi_using_rgb565_ = false;  // Plugin uses RGB565 (needs 555↔565 conversion)
+#ifdef VBAM_ENABLE_DLSS_NR
+    dlssnr::Filter* dlssnr_ = nullptr;  // The panel's DLSS NR processor when kDlssNr is selected
+#endif
     int panel_color_depth_ = 32;  // Panel's color depth (independent from global systemColorDepth)
     uint8_t* dst_;
     uint8_t* delta_;
@@ -3628,7 +3649,7 @@ public:
                     }
                 } else {
                     // Built-in filter
-                    ApplyFilter32(filter_src, instride32, delta_, filter_dst, outstride32, width_, height_);
+                    Filter32(filter_src, instride32, filter_dst, outstride32, filter_option);
                 }
 
                 // Convert 32bpp output back to original depth
@@ -3891,8 +3912,31 @@ private:
                 }
             }
         } else {
-            ApplyFilter32(src_, instride, delta_, dst_, outstride, width_, height_);
+            Filter32(src_, instride, dst_, outstride, filter_option);
         }
+    }
+
+    // Run the selected built-in filter on a 32bpp band. The channel layout of
+    // the band is whatever systemRedShift & co. describe at this point: the
+    // panel's own for the direct path, the 32bpp staging layout for the
+    // converted one (ScanlinesTV and friends read those shifts the same way).
+    void Filter32(uint8_t* src, int instride, uint8_t* dst, int outstride,
+                  config::Filter filter_option) {
+#ifdef VBAM_ENABLE_DLSS_NR
+        if (filter_option == config::Filter::kDlssNr) {
+            if (dlssnr_) {
+                dlssnr_->Apply32(src, instride, dst, outstride, width_, height_,
+                                 systemRedShift - 3, systemGreenShift - 3, systemBlueShift - 3);
+            } else {
+                for (int y = 0; y < height_; y++)
+                    memcpy(dst + y * outstride, src + y * instride, width_ * 4);
+            }
+            return;
+        }
+#else
+        (void)filter_option;
+#endif
+        ApplyFilter32(src, instride, delta_, dst, outstride, width_, height_);
     }
 };
 
@@ -3900,6 +3944,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 {
     // Adopt a pending in-place filter change before anything reads `scale`.
     ApplyPendingFilterChange();
+    UpdateDlssNrState();
 
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
@@ -3930,8 +3975,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // Use multiple threads for filter processing (up to 8).
     // Force single-threaded for MT plugins - they handle parallelism internally
-    // and their thread decomposition fails on small band sizes.
-    const int max_threads = rpi_is_mt_ ? 1 : GetMaxFilterThreads();
+    // and their thread decomposition fails on small band sizes - and for DLSS NR,
+    // whose network sees the whole frame.
+    const int max_threads = (rpi_is_mt_ || UsingDlssNr()) ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (panel_color_depth_ >> 3);
@@ -3973,6 +4019,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -3994,6 +4043,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+                    threads[i].dlssnr_ = dlssnr_.get();
+#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -4022,6 +4074,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -4329,12 +4384,66 @@ void DrawingPanelBase::ApplyPendingFilterChange()
     // before use further down in DrawArea.
     scale = GetFilterScale();
     StopFilterThreads();
+    // The filter threads are gone, so the DLSS NR processor can come or go.
+    SyncDlssNr();
     extern uint8_t* g_pix;
     if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
         free(pixbuf2);
     pixbuf2 = nullptr;
     // Interframe motion-blur delta history is keyed to the old geometry.
     memset(delta, 0xff, sizeof(delta));
+}
+
+void DrawingPanelBase::SyncDlssNr()
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    const bool want = OPTION(kDispFilter) == config::Filter::kDlssNr;
+    if (want && !dlssnr_) {
+        dlssnr_ = std::make_unique<dlssnr::Filter>();
+        dlssnr_ready_logged_ = false;
+        systemScreenMessage(_("DLSS NR: loading model..."));
+    } else if (!want && dlssnr_) {
+        dlssnr_.reset();
+    }
+#endif
+}
+
+void DrawingPanelBase::ReleaseDlssNr()
+{
+    StopFilterThreads();
+#ifdef VBAM_ENABLE_DLSS_NR
+    dlssnr_.reset();
+#endif
+}
+
+void DrawingPanelBase::UpdateDlssNrState()
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_)
+        return;
+    if (dlssnr_->Failed()) {
+        const wxString err = wxString::FromUTF8(dlssnr_->Error().c_str());
+        wxLogError(_("DLSS NR filter failed: %s"), err);
+        systemScreenMessage(_("DLSS NR unavailable, filter disabled"));
+        // The option observer adopts this in place; the next DrawArea drops the
+        // processor in SyncDlssNr(). Until then Apply32() passes frames through.
+        OPTION(kDispFilter) = config::Filter::kNone;
+        return;
+    }
+    if (!dlssnr_ready_logged_ && dlssnr_->Ready()) {
+        dlssnr_ready_logged_ = true;
+        wxLogDebug(wxT("DLSS NR model ready on %s"),
+                   wxString::FromUTF8(dlssnr_->Device().c_str()));
+        systemScreenMessage(_("DLSS NR ready"));
+    }
+    // Throughput trace: every 256 emulated frames, how many passes the network
+    // finished and how long the last one took (debug builds only).
+    if (dlssnr_ready_logged_ && (++dlssnr_frame_counter_ & 0xff) == 0) {
+        wxLogDebug(wxT("DLSS NR: %llu passes, last %.1f ms"),
+                   static_cast<unsigned long long>(dlssnr_->FramesDone()),
+                   dlssnr_->LastFrameMs());
+    }
+#endif
 }
 
 DrawingPanelBase::~DrawingPanelBase()
@@ -5341,6 +5450,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 {
     // Adopt a pending in-place filter change before anything reads `scale`.
     ApplyPendingFilterChange();
+    UpdateDlssNrState();
 
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
@@ -5350,8 +5460,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing, but force single-threaded
-    // for plugin filters. RPI plugins expect the full frame.
-    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin)
+    // for plugin filters (RPI plugins expect the full frame) and for DLSS NR
+    // (the network sees the whole frame).
+    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin || UsingDlssNr())
         ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
@@ -5414,6 +5525,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -5435,6 +5549,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+                    threads[i].dlssnr_ = dlssnr_.get();
+#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -5462,6 +5579,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -9933,6 +10053,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 {
     // Adopt a pending in-place filter change before anything reads `scale`.
     ApplyPendingFilterChange();
+    UpdateDlssNrState();
 
     // double-buffer buffer:
     //   if filtering, this is filter output, retained for redraws
@@ -9942,8 +10063,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing, but force single-threaded
-    // for plugin filters. RPI plugins expect the full frame.
-    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin)
+    // for plugin filters (RPI plugins expect the full frame) and for DLSS NR
+    // (the network sees the whole frame).
+    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin || UsingDlssNr())
         ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
@@ -10006,6 +10128,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -10027,6 +10152,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+                    threads[i].dlssnr_ = dlssnr_.get();
+#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -10054,6 +10182,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
+#ifdef VBAM_ENABLE_DLSS_NR
+            threads[0].dlssnr_ = dlssnr_.get();
+#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -10539,6 +10670,7 @@ static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
     F(vkGetDeviceProcAddr) \
     F(vkGetDeviceQueue) \
     F(vkGetImageMemoryRequirements) \
+    F(vkGetPhysicalDeviceFeatures2) \
     F(vkGetPhysicalDeviceMemoryProperties) \
     F(vkGetPhysicalDeviceProperties) \
     F(vkGetPhysicalDeviceQueueFamilyProperties) \
@@ -10661,13 +10793,24 @@ VKDrawingPanel::VKDrawingPanel(wxWindow* parent, int _width, int _height)
     if (!CreateDescriptorPoolAndSet())  { return; }
 
     wxLogDebug(_("Vulkan device created successfully"));
+
+    // The renderer is up: lend its instance and device to the DLSS NR model.
+    ShareVulkanWithDlssNr();
 }
  
 // ─── Destructor ───────────────────────────────────────────────────────────────
 VKDrawingPanel::~VKDrawingPanel()
 {
-    if (device_ != VK_NULL_HANDLE)
+    // The model may be running on our device: stop our filter threads and the
+    // processor, then take the device back (this closes the model) before
+    // anything below is destroyed.
+    ReleaseDlssNr();
+    WithdrawVulkanFromDlssNr();
+
+    if (device_ != VK_NULL_HANDLE) {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
         vkDeviceWaitIdle(device_);
+    }
 
     DestroyTexture();
 #if defined(__WXQT__) && defined(__ANDROID__)
@@ -10728,7 +10871,20 @@ bool VKDrawingPanel::CreateInstance()
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pEngineName        = "VBAm";
     app_info.engineVersion      = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion         = VK_API_VERSION_1_0;
+    // Vulkan 1.3 when the loader has it: the DLSS NR model's graph (libxmx) needs
+    // 1.3 to run on this instance. 1.0 otherwise, as before; the model then opens
+    // its own instance.
+    instance_api_version_ = VK_API_VERSION_1_0;
+    {
+        auto enumerate_version = reinterpret_cast<PFN_vkEnumerateInstanceVersion>(
+            vkGetInstanceProcAddr(nullptr, "vkEnumerateInstanceVersion"));
+        uint32_t supported = 0;
+        if (enumerate_version && enumerate_version(&supported) == VK_SUCCESS &&
+            supported >= VK_API_VERSION_1_3) {
+            instance_api_version_ = VK_API_VERSION_1_3;
+        }
+    }
+    app_info.apiVersion         = instance_api_version_;
  
     std::vector<const char*> extensions = { VK_KHR_SURFACE_EXTENSION_NAME };
  
@@ -11190,7 +11346,7 @@ bool VKDrawingPanel::PickPhysicalDevice()
 // ─── CreateLogicalDevice ──────────────────────────────────────────────────────
 bool VKDrawingPanel::CreateLogicalDevice()
 {
-    float priority = 1.0f;
+    static const float priorities[2] = { 1.0f, 1.0f };
     std::vector<VkDeviceQueueCreateInfo> queue_cis;
  
     auto add_queue = [&](uint32_t family) {
@@ -11198,7 +11354,7 @@ bool VKDrawingPanel::CreateLogicalDevice()
         ci.sType            = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         ci.queueFamilyIndex = family;
         ci.queueCount       = 1;
-        ci.pQueuePriorities = &priority;
+        ci.pQueuePriorities = priorities;
         queue_cis.push_back(ci);
     };
  
@@ -11218,9 +11374,111 @@ bool VKDrawingPanel::CreateLogicalDevice()
     // Required by MoltenVK when the portability enumeration layer is active.
     dev_exts.push_back("VK_KHR_portability_subset");
 #endif
+
+    // ── What the DLSS NR model (libxmx) needs to run on this device ───────────
+    // Vulkan 1.3 and these features (see nr_frame_adopt_vulkan). Enabled only
+    // when the device has them all, and only those; otherwise the model opens
+    // its own instance and nothing here changes.
+    dlssnr_share_ok_ = false;
+    dlssnr_coopmat_  = false;
+    compute_family_  = UINT32_MAX;
+    compute_queue_index_ = 0;
+    compute_is_graphics_queue_ = false;
+    VkPhysicalDeviceVulkan12Features enable12{};
+    VkPhysicalDeviceVulkan11Features enable11{};
+    VkPhysicalDeviceFeatures2        enable2{};
+#ifdef VK_KHR_cooperative_matrix
+    VkPhysicalDeviceCooperativeMatrixFeaturesKHR enable_cm{};
+#endif
+    if (instance_api_version_ >= VK_API_VERSION_1_3 && vkGetPhysicalDeviceFeatures2) {
+        VkPhysicalDeviceProperties props;
+        vkGetPhysicalDeviceProperties(physical_device_, &props);
+        if (props.apiVersion >= VK_API_VERSION_1_3) {
+            uint32_t ext_count = 0;
+            vkEnumerateDeviceExtensionProperties(physical_device_, nullptr, &ext_count, nullptr);
+            std::vector<VkExtensionProperties> exts(ext_count);
+            vkEnumerateDeviceExtensionProperties(physical_device_, nullptr, &ext_count, exts.data());
+            bool has_coopmat = false;
+#ifdef VK_KHR_cooperative_matrix
+            for (auto& e : exts)
+                if (strcmp(e.extensionName, VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME) == 0)
+                    has_coopmat = true;
+#endif
+            VkPhysicalDeviceVulkan12Features have12{};
+            have12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+            VkPhysicalDeviceVulkan11Features have11{};
+            have11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+            have11.pNext = &have12;
+#ifdef VK_KHR_cooperative_matrix
+            VkPhysicalDeviceCooperativeMatrixFeaturesKHR have_cm{};
+            have_cm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR;
+            if (has_coopmat)
+                have12.pNext = &have_cm;
+#endif
+            VkPhysicalDeviceFeatures2 have2{};
+            have2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+            have2.pNext = &have11;
+            vkGetPhysicalDeviceFeatures2(physical_device_, &have2);
+            if (have11.storageBuffer16BitAccess && have12.vulkanMemoryModel &&
+                have12.vulkanMemoryModelDeviceScope && have12.shaderFloat16 &&
+                have12.bufferDeviceAddress && have12.scalarBlockLayout) {
+                enable12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+                enable12.vulkanMemoryModel            = VK_TRUE;
+                enable12.vulkanMemoryModelDeviceScope = VK_TRUE;
+                enable12.shaderFloat16                = VK_TRUE;
+                enable12.bufferDeviceAddress          = VK_TRUE;
+                enable12.scalarBlockLayout            = VK_TRUE;
+                enable11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+                enable11.storageBuffer16BitAccess = VK_TRUE;
+                enable11.pNext = &enable12;
+#ifdef VK_KHR_cooperative_matrix
+                if (has_coopmat && have_cm.cooperativeMatrix) {
+                    enable_cm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR;
+                    enable_cm.cooperativeMatrix = VK_TRUE;
+                    enable12.pNext = &enable_cm;
+                    dev_exts.push_back(VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME);
+                    dlssnr_coopmat_ = true;
+                }
+#endif
+                enable2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+                enable2.pNext = &enable11;
+                dlssnr_share_ok_ = true;
+            }
+        }
+    }
+
+    // A compute queue for the model: another compute-capable family when the
+    // device has one (the GPU can then schedule its passes beside our frames),
+    // else a second queue of our family, else our own graphics queue, which is
+    // what queue_mutex_ is for.
+    if (dlssnr_share_ok_) {
+        uint32_t qcount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_, &qcount, nullptr);
+        std::vector<VkQueueFamilyProperties> qprops(qcount);
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device_, &qcount, qprops.data());
+        for (uint32_t i = 0; i < qcount; ++i) {
+            if ((qprops[i].queueFlags & VK_QUEUE_COMPUTE_BIT) && i != graphics_family_ &&
+                i != present_family_) {
+                compute_family_ = i;
+                add_queue(i);
+                break;
+            }
+        }
+        if (compute_family_ == UINT32_MAX) {
+            compute_family_ = graphics_family_;  // graphics families always have compute
+            if (qprops[graphics_family_].queueCount >= 2) {
+                queue_cis[0].queueCount = 2;
+                compute_queue_index_ = 1;
+            } else {
+                compute_is_graphics_queue_ = true;
+            }
+        }
+    }
  
     VkDeviceCreateInfo ci{};
     ci.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    if (dlssnr_share_ok_)
+        ci.pNext               = &enable2;
     ci.queueCreateInfoCount    = (uint32_t)queue_cis.size();
     ci.pQueueCreateInfos       = queue_cis.data();
     ci.enabledExtensionCount   = (uint32_t)dev_exts.size();
@@ -11234,7 +11492,62 @@ bool VKDrawingPanel::CreateLogicalDevice()
  
     vkGetDeviceQueue(device_, graphics_family_, 0, &graphics_queue_);
     vkGetDeviceQueue(device_, present_family_,  0, &present_queue_);
+    if (dlssnr_share_ok_) {
+        if (compute_is_graphics_queue_)
+            compute_queue_ = graphics_queue_;
+        else
+            vkGetDeviceQueue(device_, compute_family_, compute_queue_index_, &compute_queue_);
+        wxLogDebug(wxT("Vulkan: compute queue for DLSS NR: family %u index %u%s"),
+                   compute_family_, compute_queue_index_,
+                   compute_is_graphics_queue_ ? wxT(" (shared with graphics)") : wxT(""));
+    }
     return true;
+}
+
+// ─── DLSS NR sharing ─────────────────────────────────────────────────────────
+void VKDrawingPanel::LockQueueThunk(void* self)
+{
+    static_cast<VKDrawingPanel*>(self)->queue_mutex_.lock();
+}
+
+void VKDrawingPanel::UnlockQueueThunk(void* self)
+{
+    static_cast<VKDrawingPanel*>(self)->queue_mutex_.unlock();
+}
+
+void VKDrawingPanel::ShareVulkanWithDlssNr()
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_share_ok_ || device_ == VK_NULL_HANDLE || compute_queue_ == VK_NULL_HANDLE)
+        return;
+    dlssnr::VulkanShare share;
+    share.instance               = instance_;
+    share.physical_device        = physical_device_;
+    share.device                 = device_;
+    share.queue                  = compute_queue_;
+    share.queue_family           = compute_family_;
+    share.cooperative_matrix     = dlssnr_coopmat_;
+    // The linked symbol on macOS, the loader's pointer elsewhere; `+` yields a
+    // plain function pointer in both cases.
+    share.get_instance_proc_addr = reinterpret_cast<void*>(+vkGetInstanceProcAddr);
+    share.lock                   = &VKDrawingPanel::LockQueueThunk;
+    share.unlock                 = &VKDrawingPanel::UnlockQueueThunk;
+    share.lock_context           = this;
+    share.owner                  = this;
+    dlssnr::ShareVulkan(share);
+    dlssnr_shared_ = true;
+    wxLogDebug(wxT("Vulkan instance and device lent to the DLSS NR model"));
+#endif
+}
+
+void VKDrawingPanel::WithdrawVulkanFromDlssNr()
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_shared_)
+        return;
+    dlssnr::WithdrawVulkanShare(this);
+    dlssnr_shared_ = false;
+#endif
 }
  
 // ─── CreateSwapchain ──────────────────────────────────────────────────────────
@@ -11484,7 +11797,10 @@ void VKDrawingPanel::DestroySwapchain()
 // ─── RecreateSwapchain ────────────────────────────────────────────────────────
 bool VKDrawingPanel::RecreateSwapchain()
 {
-    vkDeviceWaitIdle(device_);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        vkDeviceWaitIdle(device_);
+    }
     DestroySwapchain();
     vsync_ = OPTION(kPrefVsync);
     return CreateSwapchain() && CreateImageViews() && CreateFramebuffers();
@@ -11642,6 +11958,10 @@ bool VKDrawingPanel::CreateGraphicsPipeline()
     VkPipelineInputAssemblyStateCreateInfo ia{};
     ia.sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;
+    // Metal cannot disable primitive restart on strips, and MoltenVK reports that
+    // (VK_ERROR_FEATURE_NOT_PRESENT) on a Vulkan 1.3 instance when it is left off.
+    // The quad's four vertices never use the restart index, so enable it.
+    ia.primitiveRestartEnable = VK_TRUE;
  
     VkPipelineViewportStateCreateInfo vp_state{};
     vp_state.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -12070,8 +12390,10 @@ bool VKDrawingPanel::UpdateOverlayTexture(VkCommandBuffer cmd)
         // A frame still in flight may be sampling the old image through the
         // overlay descriptor set, and both are about to be replaced. Resizes are
         // rare (panel geometry changes), so idling here costs nothing.
-        if (osc_image_ != VK_NULL_HANDLE)
+        if (osc_image_ != VK_NULL_HANDLE) {
+            std::lock_guard<std::mutex> queue_lock(queue_mutex_);
             vkDeviceWaitIdle(device_);
+        }
         DestroyOverlayTexture();
 
         VkImageCreateInfo img_ci{};
@@ -12689,7 +13011,10 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
     submit.signalSemaphoreCount = 1;
     submit.pSignalSemaphores    = &render_finished_sem_[current_frame_];
  
-    vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
+    }
  
     // ── Present ────────────────────────────────────────────────────────────────
     VkPresentInfoKHR present_info{};
@@ -12700,7 +13025,10 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
     present_info.pSwapchains        = &swapchain_;
     present_info.pImageIndices      = &image_index;
  
-    res = vkQueuePresentKHR(present_queue_, &present_info);
+    {
+        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        res = vkQueuePresentKHR(present_queue_, &present_info);
+    }
     if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)
         RecreateSwapchain();
     else if (res != VK_SUCCESS)

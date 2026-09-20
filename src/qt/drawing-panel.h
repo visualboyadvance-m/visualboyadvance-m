@@ -3,6 +3,7 @@
 
 #include <condition_variable>
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -13,6 +14,7 @@
 #include <QString>
 #include <QWidget>
 
+#include "components/filters_dlssnr/dlssnr.h"
 #include "qt/rpi.h"
 
 class QPainter;
@@ -71,6 +73,25 @@ public:
     void ApplyPendingFilterChange();
     bool IsUsingFilterPlugin() const { return rpi_ != nullptr; }
 
+    // Create or drop the DLSS NR processor to match OPTION(kDispFilter). Called
+    // from the constructor (the filter's initializer) and when a filter change
+    // is adopted in place; the model opens on the processor's own thread.
+    void SyncDlssNr();
+    // Per-frame health check: log once when the model is up, fall back to no
+    // filter if opening it or a pass failed. Called from DrawArea(uint8_t**).
+    void UpdateDlssNrState();
+    // Stop the filter threads and drop the DLSS NR processor now, for a
+    // renderer about to destroy the GPU device the model may run on.
+    void ReleaseDlssNr();
+    // True while a DLSS NR processor exists; such a panel filters single-threaded.
+    bool UsingDlssNr() const {
+#ifdef VBAM_ENABLE_DLSS_NR
+        return dlssnr_ != nullptr;
+#else
+        return false;
+#endif
+    }
+
     // Requests a repaint of the widget presenting `todraw`.
     virtual void PresentFrame();
 
@@ -120,6 +141,13 @@ protected:
     bool rpi_is_mt_ = false;
     int rpi_bpp_ = 4;
     int panel_color_depth_ = 16; // Color depth for this panel (may differ from systemColorDepth)
+#ifdef VBAM_ENABLE_DLSS_NR
+    // The DLSS NR processor, present only while kDispFilter == kDlssNr. The
+    // filter threads borrow the pointer and are stopped before it goes.
+    std::unique_ptr<dlssnr::Filter> dlssnr_;
+    bool dlssnr_ready_logged_ = false;
+    uint32_t dlssnr_frame_counter_ = 0;
+#endif
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
 };

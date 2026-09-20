@@ -1,0 +1,799 @@
+#!/usr/bin/env python3
+"""
+nr_daemon — runs DLSS-NR for the Vulkan layer.
+
+The layer is a shared object inside the game's process and the implementation is
+Python, so the frame crosses a Unix socket rather than a function call. For a photo
+mode that costs nothing: the game is meant to stall while the frame is being looked
+at. A per-frame pass would need the graph ported to C.
+
+    python3 src/layer/nr_daemon.py                        # then, to trigger:
+    touch /tmp/nr_trigger        # hold the enhanced frame
+    rm /tmp/nr_trigger           # release it
+
+    ENABLE_NR_LAYER=1 VK_LAYER_PATH=... VK_INSTANCE_LAYERS=VK_LAYER_dlssnr_intel \\
+    NR_LAYER_SOCKET=/tmp/nr_layer.sock NR_LAYER_TRIGGER=/tmp/nr_trigger <game>
+
+Protocol: 16 bytes of header — magic 'NRN0', width, height, VkFormat — then
+width*height*4 bytes of pixels; the same number of bytes come back.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import pathlib
+import re
+import socket
+import stat
+import struct
+import subprocess
+import sys
+import time
+
+import numpy as np
+
+HERE = pathlib.Path(__file__).resolve().parent
+ROOT = HERE.parent.parent
+sys.path.insert(0, str(ROOT / "src" / "ref"))
+sys.path.insert(0, str(ROOT / "src" / "gpu"))
+
+import nr_frame  # noqa: E402
+import xmx  # noqa: E402  (for the device name, once the model is up)
+from xmxres import DeviceLost  # noqa: E402
+try:
+    import nr_image  # the host passes in C, when they are built
+except ImportError:  # pragma: no cover - the NumPy path is the fallback
+    nr_image = None
+
+MAGIC = 0x304E524E
+MASK_COVERAGE_LIMIT = 0.55   # above this the mask is the scene, not the interface
+MAGIC_MASKED = 0x314E524E     # the same, with a one-byte-per-pixel interface mask after the colour
+
+# The swapchain formats a compositor or VKD3D actually hands out. A game writes
+# sRGB-encoded values into a UNORM swapchain just as it does into an SRGB one, so both
+# decode the same way; what differs is only how the display reads them back.
+FORMATS = {
+    37: ("rgba8", "R8G8B8A8_UNORM"),
+    43: ("rgba8", "R8G8B8A8_SRGB"),
+    44: ("bgra8", "B8G8R8A8_UNORM"),
+    50: ("bgra8", "B8G8R8A8_SRGB"),
+    64: ("a2b10g10r10", "A2B10G10R10_UNORM_PACK32"),
+}
+
+
+def decode(raw, width, height, vk_format):
+    kind, _ = FORMATS[vk_format]
+    if kind == "a2b10g10r10":
+        packed = np.frombuffer(raw, dtype=np.uint32).reshape(height, width)
+        channels = [((packed >> shift) & 0x3FF).astype(np.float32) / np.float32(1023.0)
+                    for shift in (0, 10, 20)]
+        return np.stack(channels, axis=-1)
+    if nr_image is not None:
+        native = nr_image.decode8(raw, width, height, kind == "bgra8")
+        if native is not None:
+            return native
+    pixels = np.frombuffer(raw, dtype=np.uint8).reshape(height, width, 4)
+    # `pixels[..., [2, 1, 0]]` gathers into a new array, then `.astype` copies it again,
+    # then the divide copies a third time — 170 ms for a 1080p frame. A reversed slice is
+    # a *view*, and one ufunc does the widening and the scale together: 3 passes to 1.
+    channels = pixels[..., 2::-1] if kind == "bgra8" else pixels[..., :3]
+    # `divide`, not a multiply by 1/255: that reciprocal is not representable and the two
+    # disagree in the last bit, which a test caught.
+    return np.divide(channels, np.float32(255.0), dtype=np.float32)
+
+
+def encode(image, raw, vk_format):
+    """Write `image` back into a copy of `raw`, leaving alpha as the game left it."""
+    kind, _ = FORMATS[vk_format]
+    if kind == "a2b10g10r10":
+        image = np.clip(image, 0.0, 1.0)
+        packed = np.frombuffer(raw, dtype=np.uint32).copy().reshape(image.shape[:2])
+        quantised = (image * np.float32(1023.0) + 0.5).astype(np.uint32)
+        packed &= np.uint32(0xC0000000)
+        for index, shift in enumerate((0, 10, 20)):
+            packed |= np.minimum(quantised[..., index], 1023) << np.uint32(shift)
+        return packed.tobytes()
+    if nr_image is not None:
+        native = nr_image.encode8(image, raw, kind == "bgra8")
+        if native is not None:
+            return native
+    pixels = np.frombuffer(raw, dtype=np.uint8).copy().reshape(*image.shape[:2], 4)
+    # The old form built an int32 intermediate — four bytes a channel for a value that
+    # ends up in one — and then copied each channel separately, seven full-frame passes
+    # for 424 ms at 1080p. In place, into a strided view, is three.
+    quantised = np.multiply(image, np.float32(255.0), dtype=np.float32)
+    np.add(quantised, np.float32(0.5), out=quantised)
+    np.clip(quantised, 0.0, 255.0, out=quantised)
+    target = pixels[..., 2::-1] if kind == "bgra8" else pixels[..., :3]
+    target[:] = quantised.astype(np.uint8)
+    return pixels.tobytes()
+
+
+def receive(connection, count, probe_ok=False):
+    chunks, got = [], 0
+    while got < count:
+        chunk = connection.recv(min(1 << 20, count - got))
+        if not chunk:
+            if probe_ok and not got:
+                # Connected and closed without a byte: that is `nr-ctl` or `nr-toggle`
+                # asking whether anything is listening. Every status line and every press
+                # of the toggle does it, and reporting each as a failed frame buries the
+                # daemon's own log in noise. A truncated frame still reports.
+                return None
+            raise EOFError("the layer closed the connection")
+        chunks.append(chunk)
+        got += len(chunk)
+    return b"".join(chunks)
+
+
+SOLID_RADIUS = 3
+
+
+class Settings:
+    """The knobs, re-read from a JSON file whenever it changes.
+
+    The daemon holds the model, so restarting it to try another profile costs a second
+    and loses the layer's connection. These are all post-network or extent choices —
+    nothing here invalidates the weights — so they can move between frames. `nr-ctl`
+    writes the file; anything may, it is one flat object.
+    """
+
+    KNOBS = ("profile", "intensity", "detail_strength", "colour_strength", "render_scale",
+             "temporal", "cut_limit", "hold")
+
+    def __init__(self, args):
+        self.path = args.settings
+        self.stamp = None
+        for knob in self.KNOBS:
+            setattr(self, knob, getattr(args, knob))
+
+    def refresh(self):
+        if not self.path:
+            return
+        try:
+            stamp = os.stat(self.path).st_mtime_ns
+        except OSError:
+            return
+        if stamp == self.stamp:
+            return
+        self.stamp = stamp
+        try:
+            with open(self.path) as handle:
+                given = json.load(handle)
+        except (OSError, ValueError) as error:
+            print(f"settings: {error}; keeping the current ones", flush=True)
+            return
+        if not isinstance(given, dict):
+            print("settings: expected a JSON object; keeping the current ones", flush=True)
+            return
+        changed = []
+        for knob in self.KNOBS:
+            if knob not in given:
+                continue
+            value = given[knob]
+            if knob == "profile":
+                if value not in nr_frame.PROFILES:
+                    print(f"settings: no profile {value!r}", flush=True)
+                    continue
+            else:
+                try:
+                    value = float(value)
+                except (TypeError, ValueError):
+                    print(f"settings: {knob} is not a number", flush=True)
+                    continue
+                if not math.isfinite(value):
+                    print(f"settings: {knob} must be finite", flush=True)
+                    continue
+                if knob == "render_scale":
+                    if not 0.05 <= value <= 1.0:
+                        print("settings: render_scale must be between 0.05 and 1", flush=True)
+                        continue
+                elif knob in ("temporal", "cut_limit", "hold"):
+                    # `temporal` is the vendor's history confidence, which multiplies a
+                    # gate that is already in [0, 1]; above 1 it would extrapolate past
+                    # the previous frame, which is ringing, not stability.
+                    if not 0.0 <= value <= 1.0:
+                        print(f"settings: {knob} must be between 0 and 1", flush=True)
+                        continue
+                elif not 0.0 <= value <= 2.0:
+                    # the vendor's own panel stops at 2 (notes/phase30-control-atlas.md)
+                    print(f"settings: {knob} must be between 0 and 2", flush=True)
+                    continue
+            if getattr(self, knob) != value:
+                setattr(self, knob, value)
+                changed.append(f"{knob}={value}")
+        if changed:
+            print("settings: " + ", ".join(changed), flush=True)
+
+
+def resample(image, size):
+    """Bilinear resize of (H, W, C) to `size`, area-averaging when it divides evenly.
+
+    Pure numpy because this runs per frame: ImageMagick through a subprocess, which is
+    what `image_io.load` uses, costs more than the network does at these extents.
+
+    Separable — one pass down the rows, then one across the columns. The obvious
+    two-dimensional form, `image[y0][:, x0] * ... + image[y1][:, x1] * ...`, materialises
+    four full-size gathers and measured **193 ms** on an 854x480 head against 20 ms for
+    this, which made it 55 % of the whole frame. Splitting the axes leaves two gathers
+    of the intermediate size instead.
+
+    Downscaling by a whole factor takes the area mean instead of point-sampling, since
+    the alternative feeds the network aliasing it would then try to enhance.
+    """
+    height, width = image.shape[:2]
+    new_height, new_width = int(size[0]), int(size[1])
+    if (new_height, new_width) == (height, width):
+        return image
+    if (new_height and new_width and height % new_height == 0 and width % new_width == 0
+            and height > new_height and width > new_width):
+        fy, fx = height // new_height, width // new_width
+        return image.reshape(new_height, fy, new_width, fx, -1).mean((1, 3)).astype(np.float32)
+
+    if nr_image is not None:
+        # The bilinear branch only: the area mean above is a different filter on purpose,
+        # and is what keeps aliasing out of what the network is asked to enhance.
+        native = nr_image.bilinear(image, (new_height, new_width))
+        if native is not None:
+            return native
+
+    def axis(source, count, along):
+        """One bilinear pass along `along` (0 rows, 1 columns)."""
+        extent = source.shape[along]
+        if extent == count:
+            return source
+        centres = (np.arange(count, dtype=np.float32) + 0.5) * (extent / count) - 0.5
+        low = np.clip(np.floor(centres), 0, extent - 1).astype(np.int32)
+        high = np.clip(low + 1, 0, extent - 1)
+        weight = np.clip(centres - low, 0.0, 1.0).astype(np.float32)
+        weight = weight.reshape((-1, 1, 1) if along == 0 else (1, -1, 1))
+        return (np.take(source, low, along) * (1.0 - weight)
+                + np.take(source, high, along) * weight)
+
+    return axis(axis(np.asarray(image, np.float32), new_height, 0), new_width, 1)
+
+
+LETTERBOX_TOLERANCE = np.float32(2.0 / 255.0)
+
+
+def active_region(colour, tolerance=LETTERBOX_TOLERANCE, limit=0.45):
+    """The rows and columns a letterboxed game did not draw into.
+
+    Dead or Alive 5's smallest window is 1024x768, but it renders 16:9 inside that and
+    leaves two black bars — a quarter of the frame. Every stage downstream is measured at
+    the *output* resolution (`notes/phase51`), so those bars cost feature assembly,
+    composition, the head upscale and the codec for pixels that carry nothing.
+
+    A bar is a run of rows or columns whose brightest channel is at or below `tolerance`
+    everywhere. Scanning stops at `limit` of the extent, so a genuinely dark scene cannot
+    eat the frame, and the bars are only trusted when both sides agree to within a row —
+    a letterbox is symmetric and a dark sky is not.
+    """
+    height, width = colour.shape[:2]
+    rows = colour.max(axis=(1, 2))
+    columns = colour.max(axis=(0, 2))
+
+    def run(values, extent):
+        cap = int(extent * limit)
+        lead = tail = 0
+        while lead < cap and values[lead] <= tolerance:
+            lead += 1
+        while tail < cap and values[extent - 1 - tail] <= tolerance:
+            tail += 1
+        # asymmetric bars are not a letterbox; a single row of slack covers odd extents
+        return (lead, extent - tail) if lead and tail and abs(lead - tail) <= 1 else (0, extent)
+
+    top, bottom = run(rows, height)
+    left, right = run(columns, width)
+    # A black frame — a fade, a loading screen — is bars all the way in from both sides
+    # and would leave a sliver in the middle. 16:9 inside 4:3 keeps 75 %; anything under
+    # half is not a letterbox, it is a dark frame.
+    if (bottom - top) * (right - left) < height * width // 2:
+        return 0, height, 0, width
+    return top, bottom, left, right
+
+
+class Letterbox:
+    """The bars, found once and afterwards only checked.
+
+    `active_region` reduces the whole frame twice, and once everything around it went
+    native that made it the most expensive host pass in the frame — 21 ms of a 233 ms
+    frame, more than the feature assembly, the composition and both resizes together
+    (`notes/phase57`). A letterbox does not move: the game chose it when it opened the
+    swapchain.
+
+    What is checked each frame is eight lines. A bar that stopped being black, or a first
+    active line that started being black, means the answer has changed and the full scan
+    runs again. Either mistake is a slower frame, never a wrong crop.
+    """
+
+    def __init__(self):
+        self.key = None
+        self.bounds = None
+
+    def region(self, colour, key):
+        if self.key == key and self.bounds is not None and self._holds(colour):
+            return self.bounds
+        self.key = key
+        self.bounds = active_region(colour)
+        return self.bounds
+
+    def _holds(self, colour):
+        top, bottom, left, right = self.bounds
+        height, width = colour.shape[:2]
+        # The key is the caller's word that this is the same swapchain; the bounds fitting
+        # is ours. Without this a mismatched key reads other rows and crops to them.
+        if bottom > height or right > width:
+            return False
+
+        def dark(line):
+            return float(line.max()) <= LETTERBOX_TOLERANCE
+
+        for line, wanted_dark in ((colour[top - 1] if top else None, True),
+                                  (colour[bottom] if bottom < height else None, True),
+                                  (colour[:, left - 1] if left else None, True),
+                                  (colour[:, right] if right < width else None, True),
+                                  (colour[top], False), (colour[bottom - 1], False),
+                                  (colour[:, left], False), (colour[:, right - 1], False)):
+            if line is not None and dark(line) != wanted_dark:
+                return False
+        return True
+
+
+def solid_regions(held, radius=SOLID_RADIUS, majority=0.75):
+    """Keep only the parts of the interface mask that sit inside a solid held-still block.
+
+    The layer marks single pixels, and that is right for an interface: a health bar is a
+    slab of pixels that do not move. But a nearly static scene — a round transition, a
+    slow replay — makes the *subject* half-hold too, and the mask comes back as a fine
+    speckle over the character. Composing that interleaves original and re-rendered
+    pixels, and since the pass moves skin by 20-30 levels the two populations differ by
+    up to 100, which reads as mottled crust. Measured in `notes/phase43`.
+
+    A majority filter separates them: an interface keeps ~85% of its pixels across a
+    whole window and survives, speckle at ~60% or less does not. It is a majority rather
+    than an erosion because a real interface does lose scattered pixels — an animated
+    shine, bloom from the fighters — and an all-or-nothing test would erase the bar along
+    with the noise.
+    """
+    r = int(radius)
+    if r < 1:
+        return held
+    height, width = held.shape
+    padded = np.zeros((height + 2 * r, width + 2 * r), np.int32)
+    padded[r:r + height, r:r + width] = held
+    integral = np.pad(padded.cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+    k = 2 * r + 1
+    counted = (integral[k:k + height, k:k + width] - integral[0:height, k:k + width]
+               - integral[k:k + height, 0:width] + integral[0:height, 0:width])
+    return counted >= majority * k * k
+
+
+class History:
+    """The previous frame the game was handed, kept for the network's temporal path.
+
+    The flicker this fixes is not noise in the input: 2.3 % of a live frame is
+    byte-identical between presents, and the network still moves those pixels by 3.3
+    levels of 255, while pixels that actually moved come back amplified 1.01x. The
+    graph is global — five downsamples into a ViT-1D bottleneck whose attention sees
+    the whole frame — so a fighter moving in the middle moves the decoder's answer over
+    a crowd that did not move at all. Vendor stability comes from the temporal path,
+    not from the network (`notes/phase53-why-it-flickers.md`).
+
+    Held at the output extent and resampled down at use, so a render-scale change needs
+    no invalidation. Dropped when the geometry moves or the shot cuts, because identity
+    reprojection is a claim about a *continuing* shot.
+    """
+
+    def __init__(self):
+        self.key = None
+        self.output = None      # (active_h, active_w, 3), what the game last received
+        self.source = None      # (inner_h, inner_w, 3), the game's own last frame
+        self.pixels = None      # (active_h, active_w, 3), the game's own last frame, whole
+        self.frames = 0
+        self.cut = 0.0
+
+    def take(self, key, source, limit):
+        """History for this frame: at the network's extent, at the output's, and the
+        game's own frame behind it. `(None, None, None)` when there is nothing to trust."""
+        previous, self.cut = self.output, 0.0
+        if key != self.key or previous is None or self.source.shape != source.shape:
+            self.key, self.output, self.source, self.pixels, self.frames = key, None, None, None, 0
+            return None, None, None
+        self.cut = float(np.abs(source - self.source).mean())
+        if self.cut > limit:
+            # A round transition, a replay cut or a menu. The gate rejects wrong history
+            # per pixel, but it was characterised at full scale on a pan (phase12); a
+            # whole-frame replacement is the one case worth refusing outright.
+            self.output = self.source = self.pixels = None
+            self.frames = 0
+            return None, None, None
+        inner = previous if previous.shape[:2] == source.shape[:2] else resample(previous, source.shape[:2])
+        return inner, previous, self.pixels
+
+    def keep(self, key, output, source, pixels):
+        self.key, self.output, self.source, self.pixels = key, output, source, pixels
+        self.frames += 1
+
+
+# Over how many levels of 255 the hold lets go. A pixel the game handed back unchanged
+# has provably correct history; one level of change is still almost certainly the same
+# surface, and by four it is something else and the model's own gate decides alone.
+HOLD_RAMP = np.float32(4.0)
+
+
+def hold_floor(current, previous, strength):
+    """Per-pixel lower bound on the history weight, from what the *game* did.
+
+    The gate is not local — on a frame where most things move it reads 0.12 even over
+    pixels that did not move at all, against 0.705 when the history was correct
+    everywhere (`notes/phase12-temporal.md`). Motion vectors would fix that, and a
+    `vkQueuePresentKHR` layer has none; optical flow was measured and does not help,
+    because it corrects the history where things *moved*, which is the ghosting case,
+    not the flicker one (`notes/phase54-flicker-fix.md`).
+
+    What the layer does have is the game's own frame. Where it did not change, the
+    previous output is the right answer for that pixel by construction, and holding it
+    cannot ghost: the moment the game moves the pixel the floor is gone. `decode` is a
+    bijection, so comparing the decoded frames is the same test as comparing the bytes,
+    and it stays exact across the packed 10-bit format too.
+    """
+    # Channel by channel and in place. The obvious `max(abs(a - b), axis=2)` builds two
+    # (h, w, 3) temporaries and runs seven full-frame passes at the *output* resolution,
+    # which is where this frame's time already goes (notes/phase47).
+    floor = np.abs(np.subtract(current[..., 0], previous[..., 0], dtype=np.float32))
+    scratch = np.empty_like(floor)
+    for channel in (1, 2):
+        np.subtract(current[..., channel], previous[..., channel], out=scratch)
+        np.maximum(floor, np.abs(scratch, out=scratch), out=floor)
+    # clip(1 - moved * 255 / ramp, 0, 1) * strength, folded into one multiply-add-clip
+    np.multiply(floor, np.float32(-255.0 * strength / HOLD_RAMP), out=floor)
+    np.add(floor, np.float32(strength), out=floor)
+    return np.clip(floor, 0, strength, out=floor)[..., None]
+
+
+class Meter:
+    """How much the network is inventing, live, over pixels the game did not move.
+
+    The same statistic as `src/bench/flicker.py`, but from inside a running game, because
+    a replay cannot reproduce one thing that matters: `--dump` drops the daemon to about
+    1.28 fps, so consecutive frames in a capture are four times further apart in game time
+    than they are in play, and the history is correspondingly less correct. Keeps its own
+    two frames rather than the temporal path's, so it reads the same with the path off.
+    """
+
+    def __init__(self):
+        self.input = None
+        self.output = None
+        self.seen = 0
+        self.still = 0.0
+        self.invented = 0.0
+        self.moving = 0.0
+
+    def add(self, colour, output):
+        if self.input is not None and self.input.shape == colour.shape:
+            moved = np.max(np.abs(colour - self.input), axis=2)
+            change = np.mean(np.abs(output - self.output), axis=2) * np.float32(255.0)
+            still = moved == 0
+            if still.any():
+                self.seen += 1
+                self.still += float(still.mean())
+                self.invented += float(change[still].mean())
+                self.moving += float(change[~still].mean()) if (~still).any() else 0.0
+        self.input, self.output = np.array(colour), np.array(output)
+
+    def report(self):
+        if not self.seen:
+            return "  meter: no two frames alike yet"
+        return (f"  meter: {100 * self.still / self.seen:.0f}% of the frame held still, "
+                f"invented {self.invented / self.seen:.2f} levels there, "
+                f"{self.moving / self.seen:.2f} where it moved  "
+                f"({self.seen} frames)")
+
+
+DEVICE_LOST = (
+    "GPU lost, stopping: the Vulkan device went away under the model ({error}), normally "
+    "the driver resetting a hung GPU, and nothing on it can run again in this process. "
+    "Turn the effect off and on to start a fresh daemon. If it keeps happening, lower the "
+    "render scale and the game's window size, and look for a hang or reset in `sudo dmesg`.")
+
+
+# Vulkan says what went wrong as a number, and the person playing sees only a frame that did
+# not change. These are the two a knob can cause.
+FAILURES = {
+    -1: ("  — out of host memory. The daemon and the game share one pool on an integrated "
+         "GPU: lower the render scale, or the game's resolution."),
+    -2: ("  — the buffers for this extent do not fit in the GPU's memory. Lower the render "
+         "scale, or the game's resolution; the cost follows the extent."),
+}
+
+
+def explain(error):
+    """A sentence for the failures a player can do something about."""
+    code = re.search(r"\((-\d+)\)\s*$", str(error))
+    return FAILURES.get(int(code.group(1)), "") if code else ""
+
+
+def serve(server, backend, args):
+    """Answer frames until interrupted, or until the GPU is gone.
+
+    A frame that fails costs that frame: the game keeps its own picture and the next one is
+    tried. A lost device is not that. Every frame after it fails the same way, at the full
+    cost of the copy, and the log fills with one line repeated — so it is said once and the
+    daemon exits, which also lets `nr-toggle` and the panel see that there is no model.
+    """
+    while True:
+        connection, _ = server.accept()
+        try:
+            connection.settimeout(args.timeout)
+            process_connection(connection, backend, args)
+        except DeviceLost as error:
+            print(DEVICE_LOST.format(error=error), flush=True)
+            raise SystemExit(1) from error
+        except (EOFError, OSError, ValueError, RuntimeError) as error:
+            print(f"frame rejected/failed; game keeps original: {error}{explain(error)}",
+                  flush=True)
+        finally:
+            connection.close()
+
+
+def process_connection(connection, backend, args):
+    """One request. Reject invalid extents before allocating/receiving the body.
+
+    Closing a rejected exchange makes the Vulkan layer retain its original frame.
+    """
+    header = receive(connection, 16, probe_ok=True)
+    if header is None:
+        return
+    magic, width, height, vk_format = struct.unpack("<4I", header)
+    if magic not in (MAGIC, MAGIC_MASKED):
+        raise ValueError(f"bad magic {magic:#x}")
+    if not width or not height or width * height > args.max_pixels:
+        raise ValueError(f"rejected extent {width}x{height}; limit {args.max_pixels} pixels")
+    payload = receive(connection, width * height * 4)
+    interface = receive(connection, width * height) if magic == MAGIC_MASKED else None
+    if vk_format not in FORMATS:
+        print(f"unsupported VkFormat {vk_format}; passing the frame through",
+              flush=True)
+        connection.sendall(payload)
+        return
+
+    live = args.live
+    live.refresh()
+    clock = time.perf_counter()
+    whole = decode(payload, width, height, vk_format)
+    # A letterboxed game — DoA5's smallest window is 1024x768 with 16:9 inside it — leaves
+    # a quarter of the frame black, and every stage below is measured at the output
+    # resolution (`notes/phase51`). Working on the active region alone skips that, and the
+    # bars are handed back untouched: `encode(decode(v)) == v` for all 256 values, so
+    # leaving them in the output array is byte-exact.
+    top, bottom, left, right = args.letterbox.region(whole, (width, height, vk_format))
+    boxed = (top, bottom, left, right) != (0, height, 0, width)
+    colour = whole[top:bottom, left:right] if boxed else whole
+    active_height, active_width = colour.shape[:2]
+    # The network's cost follows the extent it is given and nothing else, so a smaller
+    # internal frame is the only lever that changes the frame rate (notes/phase37,
+    # phase45). What comes back up is the *head* — the detail the network drew — which
+    # is then composed against the full-resolution original, so the game's own pixels
+    # are never resampled and only the synthesised part is interpolated.
+    inner = colour
+    if live.render_scale < 1.0:
+        inner = resample(colour, (max(64, round(active_height * live.render_scale)),
+                                  max(64, round(active_width * live.render_scale))))
+    geometry = nr_frame.NetworkGeometry.vendor_aligned(inner.shape[1], inner.shape[0])
+    # `inner` is a view of the decoded frame at scale 1; the history keeps it for the next
+    # frame's cut test, and aliasing the decode buffer through it has caused two bugs in
+    # this function already.
+    shot = (width, height, vk_format, top, bottom, left, right, live.profile)
+    history_inner, history_full, history_pixels = args.history.take(
+        shot, inner, live.cut_limit if live.temporal > 0 else -1.0)
+    features = nr_frame.build_features(inner, geometry=geometry, history=history_inner,
+                                       **nr_frame.PROFILES[live.profile])
+    head = geometry.crop(backend.run_features(features))
+    if head.shape[:2] != colour.shape[:2]:
+        # The fourth channel is the temporal gate. Without history it reaches nothing —
+        # carrying it through the upscale would be a quarter of that pass for nothing
+        # (notes/phase48) — and with history it is what decides the blend, per pixel.
+        head = resample(head[..., :4 if history_full is not None else 3], colour.shape[:2])
+    control = None
+    held = None
+    if interface is not None:
+        # Red scales the blend per pixel, so an interface pixel comes back exactly as
+        # the game drew it. The network still runs over the whole frame — masking the
+        # composition rather than the input keeps the numerical path untouched.
+        held = solid_regions(
+            np.frombuffer(interface, np.uint8).reshape(height, width) > 127)
+        if boxed:
+            held = held[top:bottom, left:right]
+        # An interface is a small part of the frame. When the held region is most of it,
+        # the scene itself is standing still — a round transition, a replay pause — and
+        # what is being protected is the subject, not the HUD. Composing that leaves the
+        # character in patches of two different exposures, which is far worse than a
+        # softened health bar. Measured in `notes/phase43`: 43% held gave a clean frame,
+        # 69% and 75% both blotched. So the mask is dropped rather than trusted.
+        if held.mean() > MASK_COVERAGE_LIMIT:
+            print(f"  interface mask covers {100 * held.mean():.0f}% of the frame; "
+                  f"that is the scene holding still, not a HUD — mask dropped",
+                  flush=True)
+            held = None
+    if held is not None:
+        control = np.ones((active_height, active_width, 3), np.float32)
+        control[held, 0] = 0.0
+    # What the game itself did to each pixel — the only motion signal a present-time
+    # layer has, and an exact one.
+    floor = (hold_floor(colour, history_pixels, live.hold)
+             if history_pixels is not None and live.hold > 0 else None)
+    output = nr_frame.compose(head, colour, intensity=live.intensity,
+                              detail_strength=live.detail_strength,
+                              colour_strength=live.colour_strength,
+                              control_mask=control, history=history_full,
+                              history_confidence=live.temporal,
+                              history_floor=floor)
+    # Measure before the write-back: putting the result into `whole` and then differencing
+    # against `whole` compares an array with itself, which reported change 0.00000.
+    changed = float(np.abs(output - colour).mean())
+    if boxed:
+        # A copy, not a write into `whole`: aliasing the input and the output through one
+        # array has now caused two bugs in this function — `change` printed 0.00000, and
+        # a `--dump` saved the composed frame as both the before and the after. One frame
+        # copy is a millisecond against the round's 160.
+        full = whole.copy()
+        full[top:bottom, left:right] = output
+        output = full
+    encoded = encode(output, payload, vk_format)
+    if held is not None:
+        # The control mask reaches `compose_head`, but `compose_detail` runs *after* it
+        # and re-weights the whole frame: with either strength away from 1 it moved 89.6%
+        # of the masked pixels, so the interface protection silently stopped working the
+        # moment a knob was touched. Restoring the original wire bytes here is exact by
+        # construction — it survives every later stage and does not depend on the codec
+        # round-tripping. Taken from the parallel ProjectsCodex tree, which had it.
+        protected = np.frombuffer(encoded, np.uint8).copy().reshape(height, width, 4)
+        original = np.frombuffer(payload, np.uint8).reshape(height, width, 4)
+        if boxed:
+            protected[top:bottom, left:right][held] = original[top:bottom, left:right][held]
+        else:
+            protected[held] = original[held]
+        encoded = protected.tobytes()
+        if boxed:
+            output[top:bottom, left:right][held] = colour[held]
+        else:
+            output[held] = colour[held]          # so a --dump shows what was actually sent
+    connection.sendall(encoded)
+    # After the interface restore, so what is carried forward is what the game was
+    # actually handed. A copy: `output[top:bottom, left:right]` is a view of the frame
+    # buffer that the next decode overwrites.
+    if live.temporal > 0:
+        args.history.keep(shot,
+                          np.array(output[top:bottom, left:right] if boxed else output),
+                          np.array(inner), np.array(colour))
+    if args.dump:
+        import image_io
+        try:
+            destination = pathlib.Path(args.dump)
+            destination.mkdir(parents=True, exist_ok=True)
+            # Numbered, so walking through a game and pressing the trigger repeatedly
+            # keeps every shot instead of overwriting the last one.
+            index = 1 + max((int(path.stem.split("_")[0]) for path in destination.glob("*_in.png")
+                             if path.stem.split("_")[0].isdigit()), default=0)
+            image_io.save(whole, destination / f"{index:03d}_in.png")
+            image_io.save(output, destination / f"{index:03d}_out.png")
+            print(f"  -> {destination}/{index:03d}_{{in,out}}.png", flush=True)
+        except (OSError, subprocess.CalledProcessError, ValueError) as error:
+            print(f"frame returned, but dump failed: {error}", flush=True)
+    if args.meter is not None:
+        args.meter.add(colour, output[top:bottom, left:right] if boxed else output)
+    note = "" if held is None else f"  interface {100 * held.mean():.0f}% left alone"
+    if live.temporal > 0:
+        if history_full is None:
+            note += f"  no history, cut {args.history.cut:.4f}"
+        else:
+            gate = float(nr_frame.history_weight(head[::8, ::8]).mean())
+            hold = "" if floor is None else f", held {100 * float((floor[::8, ::8] > 0).mean()):.0f}%"
+            note += f"  gate {gate:.3f}{hold}, cut {args.history.cut:.4f}"
+    box = "" if not boxed else (f"  letterbox {height - (bottom - top)}px of rows and "
+                               f"{width - (right - left)}px of columns skipped")
+    # in+run+out: the two host transfers around the graph. They are a memcpy where the GPU
+    # shares this memory and a trip across PCIe where it does not, and a single frame time
+    # cannot tell those apart — which is exactly the question on a discrete card.
+    carried, ran, read = getattr(backend, "split", (0.0, 0.0, 0.0))
+    split = f"  gpu {1000 * carried:.0f}+{1000 * ran:.0f}+{1000 * read:.0f}ms" if ran else ""
+    print(f"{width}x{height} {FORMATS[vk_format][1]} in "
+          f"{time.perf_counter() - clock:.2f}s  "
+          f"change {changed:.5f}{note}{split}{box}", flush=True)
+    if args.meter is not None:
+        print(args.meter.report(), flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--socket", default="/tmp/nr_layer.sock")
+    parser.add_argument("--profile", default="standard", choices=sorted(nr_frame.PROFILES))
+    parser.add_argument("--intensity", type=float, default=1.0)
+    parser.add_argument("--detail-strength", type=float, default=1.0)
+    parser.add_argument("--colour-strength", type=float, default=1.0)
+    parser.add_argument("--settings", default=None,
+                        help="a JSON file of knobs, re-read whenever it changes; "
+                             "`nr-ctl` writes it")
+    parser.add_argument("--render-scale", type=float, default=1.0,
+                        help="run the network on this fraction of each side; the head is "
+                             "scaled back and composed against the full-size frame")
+    parser.add_argument("--temporal", type=float, default=1.0,
+                        help="how much of the model's own history gate to trust, 0-1; "
+                             "0 turns the temporal path off entirely")
+    parser.add_argument("--hold", type=float, default=1.0,
+                        help="how hard to hold pixels the game handed back unchanged, "
+                             "0-1; this is the floor under the model's own gate")
+    parser.add_argument("--cut-limit", type=float, default=0.15,
+                        help="mean absolute frame-to-frame change above which the shot is "
+                             "taken to have cut and the history is dropped")
+    parser.add_argument("--max-pixels", type=int, default=1 << 22,
+                        help="refuse frames larger than this, rather than thrash")
+    parser.add_argument("--dump", help="write each frame in and out as PNG, for a look")
+    parser.add_argument("--meter", action="store_true",
+                        help="report, every frame, how much the network invents over "
+                             "pixels the game did not move; costs about 5 ms")
+    parser.add_argument("--timeout", type=float, default=60,
+                        help="socket inactivity timeout in seconds")
+    args = parser.parse_args()
+    if args.max_pixels <= 0 or args.timeout <= 0:
+        parser.error("--max-pixels and --timeout must be positive")
+    if not 0.05 <= args.render_scale <= 1.0:
+        parser.error("--render-scale must be between 0.05 and 1")
+    for knob in ("temporal", "cut_limit", "hold"):
+        if not 0.0 <= getattr(args, knob) <= 1.0:
+            parser.error(f"--{knob.replace('_', '-')} must be between 0 and 1")
+    args.live = Settings(args)
+    args.history = History()
+    args.letterbox = Letterbox()
+    args.meter = Meter() if args.meter else None
+
+    if not nr_frame.WEIGHTS.exists():
+        # The first thing a new clone hits, and a traceback is a poor way to say it.
+        raise SystemExit(
+            f"no weights at {nr_frame.WEIGHTS}.\n"
+            "They are NVIDIA's and are not distributed here: extract them from your own "
+            "copy of nvngx_dlssnr.dll as the README's Build section describes.")
+    started = time.perf_counter()
+    backend = nr_frame.ResidentBackend()
+    # which GPU, because the library takes the first Vulkan device and a machine can
+    # have more than one, or a different one than the person assumes
+    print(f"model ready in {time.perf_counter() - started:.1f}s"
+          f" on {xmx.device_name()}", flush=True)
+    print(f"buffers in {xmx.memory_note()}", flush=True)
+    print(f"gemm on {xmx.path_note()}", flush=True)
+
+    if os.path.lexists(args.socket):
+        if not stat.S_ISSOCK(os.lstat(args.socket).st_mode):
+            backend.close()
+            raise SystemExit(f"socket path is occupied by a non-socket: {args.socket}")
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as probe:
+            probe.settimeout(0.2)
+            try:
+                probe.connect(args.socket)
+            except ConnectionRefusedError:
+                os.unlink(args.socket)
+            else:
+                backend.close()
+                raise SystemExit(f"a daemon is already listening at {args.socket}")
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server.bind(args.socket)
+    server.listen(4)
+    print(f"listening on {args.socket}", flush=True)
+
+    try:
+        serve(server, backend, args)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.close()
+        backend.close()
+        if os.path.exists(args.socket):
+            os.unlink(args.socket)
+
+
+if __name__ == "__main__":
+    main()
