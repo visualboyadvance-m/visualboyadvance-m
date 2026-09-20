@@ -115,6 +115,10 @@ static int own_directory(char *out, size_t cap)
 #include "xmx.h"
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4152)
+#endif
+
 static int xmx_load(void)
 {
     if (X.handle) return 0;
