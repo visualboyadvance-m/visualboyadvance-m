@@ -149,7 +149,7 @@ else()
 endif()
 
 # glslangValidator: the SDK's, or the one on the path.
-find_program(NR_GLSLANG NAMES glslangValidator HINTS "$ENV{VULKAN_SDK}/bin" "$ENV{VULKAN_SDK}/Bin" "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
+find_program(NR_GLSLANG NAMES glslangValidator.exe glslangValidator HINTS "$ENV{VULKAN_SDK}/bin" "$ENV{VULKAN_SDK}/Bin" "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
 if(NOT NR_GLSLANG)
   message(FATAL_ERROR "glslangValidator not found; it comes with the Vulkan SDK (or the glslang package)")
 endif()
