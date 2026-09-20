@@ -617,6 +617,13 @@ if(NOT TRANSLATIONS_ONLY)
 
     if(ENABLE_VULKAN)
         include_directories(third_party/dlss-nr-on-vulkan/src/ref)
+        # The vendored project registers its own ctest suite: a C/Python
+        # reference comparison plus the publish and claims linters of its
+        # source tree. Those check upstream, not us, and they need a Python
+        # environment and reference blobs our build never produces, so they
+        # only ever fail in `ctest` here. A normal variable, so that build
+        # trees configured before this also stop registering them.
+        set(NR_BUILD_TESTS OFF)
         add_subdirectory(third_party/dlss-nr-on-vulkan)
     endif()
 
