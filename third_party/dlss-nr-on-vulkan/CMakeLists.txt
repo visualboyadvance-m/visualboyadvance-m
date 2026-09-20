@@ -148,10 +148,29 @@ else()
   set(NR_XMX_VULKAN ${NR_LOADER})
 endif()
 
-# glslangValidator: the SDK's, or the one on the path.
+# glslangValidator: the SDK's, or the one on the path. It runs on the build machine, and
+# that is the trap in a vcpkg cross build: vcpkg.cmake puts the *target* triplet's tools
+# directory on CMAKE_PROGRAM_PATH, which find_program() searches before any HINTS, and
+# the glslangValidator.exe there is an executable for the target -- Windows refuses the
+# arm64 one on an x64 host ("not compatible with the version of Windows you're
+# running"). So the host triplet's copy is looked for first, on its own, and a find that
+# still lands under the target triplet is refused here rather than at build time.
+set(nr_glslang_host_dirs)
+if(VBAM_VCPKG_HOST_PREFIX)  # VBA-M's name for vcpkg's host-triplet prefix
+  list(APPEND nr_glslang_host_dirs "${VBAM_VCPKG_HOST_PREFIX}/tools/glslang")
+endif()
+if(VCPKG_HOST_TRIPLET AND VCPKG_INSTALLED_DIR)
+  list(APPEND nr_glslang_host_dirs "${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}/tools/glslang")
+endif()
+if(nr_glslang_host_dirs)
+  find_program(NR_GLSLANG NAMES glslangValidator.exe glslangValidator PATHS ${nr_glslang_host_dirs} NO_DEFAULT_PATH)
+endif()
 find_program(NR_GLSLANG NAMES glslangValidator.exe glslangValidator HINTS "$ENV{VULKAN_SDK}/bin" "$ENV{VULKAN_SDK}/Bin" "${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE}")
 if(NOT NR_GLSLANG)
   message(FATAL_ERROR "glslangValidator not found; it comes with the Vulkan SDK (or the glslang package)")
+endif()
+if(CMAKE_CROSSCOMPILING AND VCPKG_TARGET_TRIPLET AND NR_GLSLANG MATCHES "/installed/${VCPKG_TARGET_TRIPLET}/")
+  message(FATAL_ERROR "glslangValidator found only as the target triplet's, ${NR_GLSLANG}, which cannot run on this machine. Install it for the host (vcpkg install glslang[tools] --triplet <host triplet>) or name one with -DNR_GLSLANG=")
 endif()
 
 # libpng, for the nr_frame command only; the libraries need nothing.
@@ -261,8 +280,30 @@ endfunction()
 
 if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS)
   if(CMAKE_CROSSCOMPILING)
-    find_program(NR_BIN2C NAMES bin2c DOC "a host build of src/tools/bin2c.c")
-    find_program(NR_SLICE NAMES slice nr_slice DOC "a host build of src/tools/slice.c")
+    # Under VBA-M, its host_compile() builds a tool for the build machine with a host
+    # compiler (the x86 cl of the same MSVC in an arm64 cross shell, `cc` elsewhere) --
+    # the same way VBA-M builds its own bin2c. Standalone the module is not there and a
+    # host copy has to be named.
+    include(HostCompile OPTIONAL RESULT_VARIABLE nr_host_compile)
+    if(nr_host_compile AND NOT NR_BIN2C AND NOT NR_SLICE)
+      set(nr_host_tools_dir "${CMAKE_CURRENT_BINARY_DIR}/tools")
+      file(MAKE_DIRECTORY "${nr_host_tools_dir}")
+      set(nr_host_exe_suffix "")
+      if(CMAKE_HOST_WIN32)
+        set(nr_host_exe_suffix ".exe")
+      endif()
+      set(NR_BIN2C "${nr_host_tools_dir}/bin2c_dlss${nr_host_exe_suffix}")
+      set(NR_SLICE "${nr_host_tools_dir}/slice_dlss${nr_host_exe_suffix}")
+      host_compile("${PROJECT_SOURCE_DIR}/src/tools/bin2c.c" "${NR_BIN2C}")
+      host_compile("${PROJECT_SOURCE_DIR}/src/tools/slice.c" "${NR_SLICE}")
+      message(STATUS "cross-compiling: bin2c and slice built for the host with host_compile()")
+    endif()
+    if(NOT NR_BIN2C)
+      find_program(NR_BIN2C NAMES bin2c DOC "a host build of src/tools/bin2c.c")
+    endif()
+    if(NOT NR_SLICE)
+      find_program(NR_SLICE NAMES slice nr_slice DOC "a host build of src/tools/slice.c")
+    endif()
     if(NOT NR_BIN2C)
       message(WARNING "cross-compiling and no host bin2c found (NR_BIN2C): the shaders are not embedded and the weights directory is used as it is")
       set(NR_EMBED_SHADERS OFF)

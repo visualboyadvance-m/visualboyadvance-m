@@ -171,7 +171,12 @@ include(FrontendOptions)
 
 # Core dependencies. vbam-core and its file extractors are built for every
 # frontend selection.
-set(VCPKG_DEPS glslang[tools] zlib bzip2 "liblzma[tools]" pthreads)
+set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
+
+# Ports the build *runs* rather than links: glslangValidator compiles the DLSS NR
+# shaders. In a cross build the target triplet's copy is an executable for the
+# target, so these are installed for the host triplet as well.
+set(VCPKG_HOST_DEPS glslang[tools])
 
 # The wxWidgets frontend. Qt is the wx backend on Android (wxQt), and nanosvg
 # is what the vcpkg wxWidgets port wants for SVG art.

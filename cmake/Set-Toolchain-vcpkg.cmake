@@ -228,6 +228,22 @@ if(VCPKG_TARGET_TRIPLET STREQUAL "arm-android")
         "Triplet arm-android rewritten to arm-neon-android: NDK r29 requires Neon on armeabi-v7a")
 endif()
 
+# An arm64 Windows target named on the command line, on an x64 host. The
+# inference above sets the host triplet for the case it infers and no other, and
+# without one vcpkg.cmake puts the *target* triplet's tools directory on
+# CMAKE_PROGRAM_PATH: every find_program() then hands the build an arm64
+# executable to run here, which Windows refuses ("not compatible with the
+# version of Windows you're running"). The build runs glslangValidator, so this
+# is not theoretical. Asked of the environment rather than of
+# CMAKE_HOST_SYSTEM_PROCESSOR, which project() has not set yet at this point.
+if(CMAKE_HOST_WIN32 AND NOT VCPKG_HOST_TRIPLET
+   AND VCPKG_TARGET_TRIPLET MATCHES "^arm64-windows"
+   AND NOT "$ENV{PROCESSOR_ARCHITECTURE}$ENV{PROCESSOR_ARCHITEW6432}" MATCHES "ARM64")
+    set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "Vcpkg host triplet" FORCE)
+    set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
+    message(STATUS "Cross build for ${VCPKG_TARGET_TRIPLET}: host tools come from ${VCPKG_HOST_TRIPLET}")
+endif()
+
 # Remember a toolchain file the caller already selected.
 #
 # vcpkg_set_toolchain() below points CMAKE_TOOLCHAIN_FILE at vcpkg.cmake, which
@@ -1124,6 +1140,13 @@ function(get_host_binary_packages wanted_ports outvar)
 
     string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
     list(FILTER host_deps EXCLUDE REGEX "^ *$")
+
+    # The tools the build runs itself are nobody's declared host dependency, so
+    # listhostdeps never names them; they are wanted for the host all the same.
+    foreach(dep ${VCPKG_HOST_DEPS})
+        string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
+        list(APPEND host_deps "${port_name}")
+    endforeach()
 
     if(NOT host_deps)
         return()
@@ -2225,6 +2248,53 @@ function(vcpkg_set_toolchain)
                 COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_TARGET_TRIPLET} install ${optional_deps}
                 WORKING_DIRECTORY ${VCPKG_ROOT}
             )
+        endif()
+    endif()
+
+    # Tools the build runs on this machine -- glslangValidator compiles the DLSS
+    # NR shaders -- have to exist for the host triplet in a cross build. vcpkg
+    # installs a port's *declared* host dependencies by itself, but a tool the
+    # build invokes directly is nobody's dependency, so it is asked for by name.
+    # Only what is still missing after the binary packages, by port and by
+    # feature: a glslang without [tools] has no glslangValidator in it.
+    vcpkg_host_triplet(vcpkg_host)
+
+    if(VCPKG_HOST_DEPS AND NOT vcpkg_host STREQUAL VCPKG_TARGET_TRIPLET AND NOT NO_VCPKG_UPDATES)
+        set(host_deps_wanted "")
+
+        foreach(dep ${VCPKG_HOST_DEPS})
+            string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
+            vcpkg_ports_not_installed("${port_name}" "${vcpkg_host}" port_absent)
+
+            if(port_absent)
+                list(APPEND host_deps_wanted "${dep}")
+                continue()
+            endif()
+
+            if(POWERSHELL AND EXISTS "${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1")
+                # Reads the status database, which also fills the feature
+                # listing vcpkg_missing_features() consults; the binary-package
+                # step cleared the cached copy when it finished.
+                vcpkg_is_installed(${port_name} 0 ${vcpkg_host} ${POWERSHELL} port_installed)
+                vcpkg_missing_features("${dep}" "${vcpkg_host}" features_absent)
+
+                if(NOT port_installed OR features_absent)
+                    list(APPEND host_deps_wanted "${dep}")
+                endif()
+            endif()
+        endforeach()
+
+        if(host_deps_wanted)
+            message(STATUS "Installing the tools the build runs for ${vcpkg_host}: ${host_deps_wanted}")
+
+            execute_process(
+                COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${vcpkg_host} install ${host_deps_wanted} --allow-unsupported --recurse --keep-going
+                WORKING_DIRECTORY ${VCPKG_ROOT}
+            )
+
+            # The cached listing predates this install.
+            unset(VCPKG_INSTALLED       CACHE)
+            unset(VCPKG_INSTALLED_COUNT CACHE)
         endif()
     endif()
 
