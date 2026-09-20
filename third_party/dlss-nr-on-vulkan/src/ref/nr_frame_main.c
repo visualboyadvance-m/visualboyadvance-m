@@ -154,7 +154,12 @@ static float *load_image(const char *path, int *height, int *width, int resize_h
 /* `image_io.save`: clip, `(a * 255 + 0.5)` to bytes, an 8-bit RGB PNG. */
 static void save_image(const float *image, int height, int width, const char *path)
 {
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    FILE *f = NULL;
+    fopen_s(&f, path, "wb");
+#else
     FILE *f = fopen(path, "wb");
+#endif
     if (!f) { perror(path); exit(1); }
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png) png_version_mismatch();
@@ -183,7 +188,12 @@ static void save_image(const float *image, int height, int width, const char *pa
 
 static int readable(const char *path)
 {
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    FILE *f = NULL;
+    fopen_s(&f, path, "rb");
+#else
     FILE *f = fopen(path, "rb");
+#endif
     if (!f) return 0;
     fclose(f);
     return 1;
@@ -198,12 +208,29 @@ static const char *default_weights(char *buf, size_t cap)
     char dir[1024];
     if (nr_frame_embedded_weights_size()) return NULL;
     if (nr_dl_self_dir((const void *)&default_weights, dir, sizeof dir) == 0) {
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+        sprintf_s(buf, cap, "%s/mlxw/dlssnr-logical.safetensors", dir);
+#else
         snprintf(buf, cap, "%s/mlxw/dlssnr-logical.safetensors", dir);
+#endif
+
         if (readable(buf)) return buf;
+        
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+        sprintf_s(buf, cap, "%s/../work/mlxw/dlssnr-logical.safetensors", dir);
+#else
         snprintf(buf, cap, "%s/../work/mlxw/dlssnr-logical.safetensors", dir);
+#endif
+
         if (readable(buf)) return buf;
     }
+    
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    sprintf_s(buf, cap, "work/mlxw/dlssnr-logical.safetensors");
+#else
     snprintf(buf, cap, "work/mlxw/dlssnr-logical.safetensors");
+#endif
+
     return buf;
 }
 
