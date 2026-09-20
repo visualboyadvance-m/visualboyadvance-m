@@ -218,6 +218,18 @@ if(NR_NO_FLOAT16)
   add_compile_definitions(NR_NO_FLOAT16)
 endif()
 
+# WINDOWS_EXPORT_ALL_SYMBOLS has CMake read every object on the DLL's link line to write the
+# .def file, and that reader does not understand the anonymous objects MSVC's /GL produces
+# ("unrecognized file format in 'libxmx.c.obj, 0'"). A host that builds with
+# CMAKE_INTERPROCEDURAL_OPTIMIZATION (VBA-M's ENABLE_LTO, on in Release) would hand those
+# objects over, so the exported DLLs and the object libraries that feed them opt out of it
+# on the MSVC toolchains; the rest of the build keeps whatever the host asked for.
+function(nr_no_ipo target)
+  if(MSVC OR CMAKE_C_SIMULATE_ID MATCHES "MSVC")
+    set_target_properties(${target} PROPERTIES INTERPROCEDURAL_OPTIMIZATION OFF)
+  endif()
+endfunction()
+
 # Every target lands in the output directory under its plain name: libxmx.so / .dylib / .dll, no
 # per-configuration subdirectory, and the Python's `lib` prefix on Windows too.
 function(nr_place target)
@@ -230,6 +242,7 @@ function(nr_place target)
     INSTALL_RPATH "${NR_OUTPUT_DIR}")
   if(WIN32)
     set_target_properties(${target} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    nr_no_ipo(${target})
   endif()
 endfunction()
 
@@ -346,6 +359,7 @@ const size_t nr_embedded_shader_count = ${NR_SPV_COUNT};
   target_include_directories(nr_shaders_blob PRIVATE src/gpu "${NR_SHADER_EMBED_DIR}")
   target_compile_definitions(nr_shaders_blob PRIVATE NR_EMBEDDED_SHADERS=1)
   set_target_properties(nr_shaders_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  nr_no_ipo(nr_shaders_blob)
   set(NR_SHADER_OBJECTS $<TARGET_OBJECTS:nr_shaders_blob>)
   message(STATUS "embedding ${NR_SPV_COUNT} SPIR-V modules into libxmx and gemm_runner")
 endif()
@@ -379,6 +393,7 @@ add_library(nr_image_objects OBJECT src/ref/nr_image.c)
 target_include_directories(nr_image_objects PRIVATE src/ref)
 target_compile_options(nr_image_objects PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
 set_target_properties(nr_image_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+nr_no_ipo(nr_image_objects)
 
 add_library(nr_image SHARED $<TARGET_OBJECTS:nr_image_objects>)
 nr_place(nr_image)
@@ -494,6 +509,7 @@ const size_t nr_embedded_weights_size = ${NR_WEIGHTS_SIZE};
   target_include_directories(nr_weights_blob PRIVATE src/ref "${NR_WEIGHTS_DIR}")
   target_compile_definitions(nr_weights_blob PRIVATE NR_EMBEDDED_WEIGHTS=1)
   set_target_properties(nr_weights_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  nr_no_ipo(nr_weights_blob)
   # each slice costs the compiler ~0.75 GB; the pool keeps a parallel build inside memory
   set_property(GLOBAL APPEND PROPERTY JOB_POOLS nr_embed=${NR_EMBED_JOBS})
   set_target_properties(nr_weights_blob PROPERTIES JOB_POOL_COMPILE nr_embed)
