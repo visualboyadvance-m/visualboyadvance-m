@@ -171,7 +171,7 @@ include(FrontendOptions)
 
 # Core dependencies. vbam-core and its file extractors are built for every
 # frontend selection.
-set(VCPKG_DEPS glslang zlib bzip2 "liblzma[tools]" pthreads)
+set(VCPKG_DEPS glslang[tools] zlib bzip2 "liblzma[tools]" pthreads)
 
 # The wxWidgets frontend. Qt is the wx backend on Android (wxQt), and nanosvg
 # is what the vcpkg wxWidgets port wants for SVG art.
