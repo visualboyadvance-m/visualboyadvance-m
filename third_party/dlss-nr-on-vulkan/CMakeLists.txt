@@ -512,6 +512,44 @@ if(NOT MSVC)
 endif()
 nr_place(nr_frame)
 
+# ---------------------------------------------------------------------------------------
+# libdlssnr: the compute runtime and the frame library in one static archive, for a host
+# that links the model in (VBA-M). nr_frame calls libxmx directly (NR_STATIC_XMX) instead
+# of dlopen, and libxmx links no Vulkan library: it finds vkGetInstanceProcAddr in the
+# process at run time (XMX_NO_VULKAN_LINK) — the host's, or the adopted instance's. The
+# weights and the shaders are embedded exactly as in the shared libraries.
+# ---------------------------------------------------------------------------------------
+add_library(dlssnr STATIC src/gpu/libxmx.c src/ref/nr_frame.c
+  $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
+target_include_directories(dlssnr
+  PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu
+  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
+target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 XMX_NO_VULKAN_LINK=1)
+if(NR_EMBED_SHADERS)
+  target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_SHADERS=1)
+endif()
+if(NR_EMBED_WEIGHTS)
+  target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_WEIGHTS=1)
+endif()
+target_compile_options(dlssnr PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+target_link_libraries(dlssnr PUBLIC ${CMAKE_DL_LIBS})
+if(NOT MSVC)
+  target_link_libraries(dlssnr PUBLIC m)
+endif()
+set_target_properties(dlssnr PROPERTIES
+  POSITION_INDEPENDENT_CODE ON
+  PREFIX "lib"
+  ARCHIVE_OUTPUT_DIRECTORY "${NR_OUTPUT_DIR}/$<0:>")
+
+# The same C test, against the archive: the static path has to pass what the shared
+# one passes. The archive links no Vulkan library, so the test plays the host and
+# links one (MoltenVK here, the loader elsewhere) for libxmx to find in the process.
+add_executable(test_dlssnr src/ref/test_nr_frame.c)
+target_include_directories(test_dlssnr PRIVATE src/ref)
+target_compile_options(test_dlssnr PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+target_link_libraries(test_dlssnr PRIVATE dlssnr ${NR_XMX_VULKAN})
+nr_executable(test_dlssnr)
+
 # nr_frame.py, the command, in C: PNG in and out through libpng.
 if(PNG_FOUND)
   add_executable(nr_frame_cli src/ref/nr_frame_main.c)

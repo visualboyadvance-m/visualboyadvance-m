@@ -111,12 +111,32 @@ static int own_directory(char *out, size_t cap)
 #define BIND(field, symbol) do { X.field = nr_dl_sym(X.handle, symbol); \
     if (!X.field) FAILF("libxmx has no %s", symbol); } while (0)
 
+#ifdef NR_STATIC_XMX
+#include "xmx.h"
+#endif
+
 static int xmx_load(void)
 {
-    char path[1200];
-
     if (X.handle) return 0;
     if (own_directory(X.dir, sizeof X.dir)) FAILF("cannot locate this library's directory");
+#ifdef NR_STATIC_XMX
+    /* libdlssnr: libxmx's objects are linked into this very library, so there is
+     * nothing to load; the table points straight at them. */
+    X.handle = (nr_dl)1;
+    X.open = xmx_open; X.init = xmx_init; X.res_init = xmx_res_init;
+    X.embedded_shader = xmx_embedded_shader;
+    X.adopt = xmx_adopt; X.close = xmx_close; X.adopted = xmx_adopted;
+    X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
+    X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
+    X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
+    X.buf_zero = xmx_buf_zero; X.buf_destroy = xmx_buf_destroy;
+    X.begin = xmx_begin; X.abort = xmx_abort; X.sync = xmx_sync; X.submit = xmx_submit;
+    X.rec_gemm = xmx_rec_gemm; X.rec_unary = xmx_rec_unary; X.rec_row = xmx_rec_row;
+    X.rec_copy = xmx_rec_copy;
+    X.graph_capture = xmx_graph_capture; X.graph_run = xmx_graph_run; X.graph_destroy = xmx_graph_destroy;
+    return 0;
+#else
+    char path[1200];
 
 #ifdef __APPLE__
     /* As xmx.py does, before MoltenVK is loaded: errors only, and no fast math — with it
@@ -147,6 +167,7 @@ static int xmx_load(void)
     BIND(graph_capture, "xmx_graph_capture"); BIND(graph_run, "xmx_graph_run");
     BIND(graph_destroy, "xmx_graph_destroy");
     return 0;
+#endif
 }
 
 /* The shader `xmx.py` and `xmxres.py` choose, environment overrides included: the bare

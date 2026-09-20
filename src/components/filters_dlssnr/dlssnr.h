@@ -2,7 +2,8 @@
 #define VBAM_COMPONENTS_FILTERS_DLSSNR_DLSSNR_H_
 
 // DLSS NR: the recovered DLSS 5 neural-rendering graph as a VBA-M display
-// filter, through libnr_frame (third_party/dlss-nr-on-vulkan).
+// filter, through libdlssnr (third_party/dlss-nr-on-vulkan): the nr_frame C API
+// with libxmx, the weights and the shaders linked in statically.
 //
 // The filter keeps the source resolution (scale 1x): one RGB frame in, one RGB
 // frame out. A forward pass takes hundreds of milliseconds even on a fast GPU

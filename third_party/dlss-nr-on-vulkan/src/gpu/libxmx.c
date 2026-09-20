@@ -17,6 +17,10 @@
 #define VK_NO_PROTOTYPES
 #include <vulkan/vulkan.h>
 #include "nr_shaders_embedded.h"
+#include "xmx.h"
+#if defined(XMX_NO_VULKAN_LINK) && !defined(_WIN32)
+#include <dlfcn.h>
+#endif
 
 /* Every Vulkan entry point this file calls is a pointer resolved through one
  * vkGetInstanceProcAddr: the linked library's (MoltenVK, or the loader) when libxmx makes
@@ -48,9 +52,36 @@
 XMX_VK_GLOBAL_FUNCS(XMX_VK_DECLARE)
 XMX_VK_INSTANCE_FUNCS(XMX_VK_DECLARE)
 #undef XMX_VK_DECLARE
+static PFN_vkGetInstanceProcAddr xmx_gipa;
+
+#ifdef XMX_NO_VULKAN_LINK
+/* The static build (libdlssnr) links no Vulkan library of its own: the host has one —
+ * linked, or loaded — and an adopted instance brings its own entry point anyway. For a
+ * device libxmx opens itself, look for vkGetInstanceProcAddr in the process first, then
+ * load the loader (or MoltenVK) by name. */
+static PFN_vkGetInstanceProcAddr linked_gipa(void)
+{
+#ifdef _WIN32
+	HMODULE h = GetModuleHandleA("vulkan-1.dll");
+	if (!h) h = LoadLibraryA("vulkan-1.dll");
+	return h ? (PFN_vkGetInstanceProcAddr)(void (*)(void))GetProcAddress(h, "vkGetInstanceProcAddr") : NULL;
+#else
+	void *p = dlsym(RTLD_DEFAULT, "vkGetInstanceProcAddr");
+	if (p) return (PFN_vkGetInstanceProcAddr)p;
+	static const char *const names[] = { "libvulkan.so.1", "libvulkan.so", "libvulkan.1.dylib",
+					      "libvulkan.dylib", "libMoltenVK.dylib" };
+	for (size_t i = 0; i < sizeof names / sizeof *names; i++) {
+		void *h = dlopen(names[i], RTLD_NOW | RTLD_GLOBAL);
+		if (h && (p = dlsym(h, "vkGetInstanceProcAddr"))) return (PFN_vkGetInstanceProcAddr)p;
+	}
+	return NULL;
+#endif
+}
+#else
 /* The linked library's bootstrap symbol; the only one reached by name. */
 extern VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char *name);
-static PFN_vkGetInstanceProcAddr xmx_gipa;
+static PFN_vkGetInstanceProcAddr linked_gipa(void) { return vkGetInstanceProcAddr; }
+#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -576,7 +607,8 @@ int xmx_open(void)
 {
 	if (g.dev) return 0;
 	if (adopt.set) return open_adopted();
-	xmx_gipa = vkGetInstanceProcAddr;
+	xmx_gipa = linked_gipa();
+	if (!xmx_gipa) FAIL("no Vulkan library in the process (vkGetInstanceProcAddr not found)", 0);
 	if (resolve_global()) return -1;
 	uint32_t nie = 0;
 	vkEnumerateInstanceExtensionProperties(NULL, &nie, NULL);

@@ -98,8 +98,10 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 **src/components/** - Reusable components
 - `filters_dlssnr/` - the DLSS NR neural-rendering display filter
   (`config::Filter::kDlssNr`, INI value `dlssnr`, scale 1x) on top of
-  `libnr_frame` from `third_party/dlss-nr-on-vulkan`; only built with
-  `ENABLE_VULKAN` (the parent checks `if(TARGET nr_frame)`), and consumers get
+  `libdlssnr` from `third_party/dlss-nr-on-vulkan` (one static archive: libxmx,
+  nr_frame, embedded weights and shaders; no Vulkan library linked, it finds
+  `vkGetInstanceProcAddr` in the process); only built with
+  `ENABLE_VULKAN` (the parent checks `if(TARGET dlssnr)`), and consumers get
   `VBAM_ENABLE_DLSS_NR`. The panel constructor creates the processor, the
   filter thread calls `Apply32()`; passes run asynchronously on a worker
   (hundreds of ms each), so the picture updates with the newest finished pass
