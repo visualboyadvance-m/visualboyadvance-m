@@ -21,6 +21,9 @@
 #if defined(XMX_NO_VULKAN_LINK) && !defined(_WIN32)
 #include <dlfcn.h>
 #endif
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 /* Every Vulkan entry point this file calls is a pointer resolved through one
  * vkGetInstanceProcAddr: the linked library's (MoltenVK, or the loader) when libxmx makes
