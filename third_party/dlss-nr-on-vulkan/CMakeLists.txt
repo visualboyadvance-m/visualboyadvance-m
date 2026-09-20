@@ -205,9 +205,9 @@ find_package(Python3 COMPONENTS Interpreter QUIET)
 # ---------------------------------------------------------------------------------------
 
 if(MSVC)
-  set(NR_EXACT_FLAGS /fp:precise /W3 /D_CRT_SECURE_NO_WARNINGS)
+  set(NR_EXACT_FLAGS /fp:precise /D_CRT_SECURE_NO_WARNINGS)
   set(NR_NATIVE_FLAGS "")                   # MSVC has no -march=native; /O2 is what there is
-  set(NR_WARN_FLAGS /W3 /D_CRT_SECURE_NO_WARNINGS)
+  set(NR_WARN_FLAGS /D_CRT_SECURE_NO_WARNINGS)
 else()
   set(NR_EXACT_FLAGS -ffp-contract=off -fno-fast-math)
   set(NR_WARN_FLAGS -Wall -Wextra -Wno-unused-parameter)
