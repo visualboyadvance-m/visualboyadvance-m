@@ -18,6 +18,7 @@
 #include <vulkan/vulkan.h>
 #include "nr_shaders_embedded.h"
 #include "xmx.h"
+#include "../ref/nr_portable.h"
 #if defined(XMX_NO_VULKAN_LINK) && !defined(_WIN32)
 #include <dlfcn.h>
 #endif
@@ -955,7 +956,7 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	if (r) FAIL("resident pipeline layout", r);
 	const char *paths[] = { gemm_spv, tiled_spv, staged_spv, unary_spv, row_spv };
 	for (unsigned i = 0; i < 5; i++) {
-		g.rpaths[i] = strdup(paths[i]);
+		g.rpaths[i] = nr_strdup(paths[i]);
 		if (!g.rpaths[i]) FAIL("pipeline path allocation", 0);
 	}
 	const char *spec = getenv("XMX_SPECIALIZE");
