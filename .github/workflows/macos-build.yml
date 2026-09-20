@@ -24,17 +24,44 @@ jobs:
             build_options: translations_only
     runs-on: macos-latest
     env:
-      NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
+      # installdeps drives brew itself, so keep brew from second-guessing
+      # it: no implicit `brew update` before every install (installdeps
+      # runs one explicitly) and no interactive prompts.
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      HOMEBREW_NO_ENV_HINTS: 1
 
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
         with: 
           submodules: recursive
-      - name: Install nix
-        uses: cachix/install-nix-action@v31
+
+      # Cache Homebrew's download directory across runs. brew consults
+      # it before fetching a bottle, so a populated cache turns most of
+      # installdeps' work into local file reads — worth a lot here since
+      # wxwidgets, ffmpeg and the Vulkan bits are the bulk of the job's
+      # setup time. Keyed on the runner image (so an arm64/x86_64 or
+      # macOS-version bump gets its own pool) and on the hash of
+      # installdeps, which invalidates the key whenever the dependency
+      # list changes. installdeps ends with `brew cleanup`, which prunes
+      # superseded downloads, so the cache stays bounded.
+      - name: Cache Homebrew downloads
+        uses: actions/cache@v4
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          path: ~/Library/Caches/Homebrew/downloads
+          key: brew-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('installdeps') }}-v1
+          restore-keys: |
+            brew-${{ runner.os }}-${{ runner.arch }}-
+
+      # Install the dependencies the same way a developer would on a
+      # Mac: ./installdeps detects Homebrew and installs the formulas
+      # the build needs. cmake/MacPackageManagers.cmake then picks up
+      # the Homebrew prefix at configure time, including the keg-only
+      # formulas (zlib, bzip2, gettext, ...) that aren't linked into
+      # the prefix's bin/include/lib.
+      - name: Install dependencies
+        run: ./installdeps
 
       # Best-effort attempt to make Docker available — CMake's
       # auto-fetch path uses the official `devkitpro/devkitarm` image
@@ -72,17 +99,14 @@ jobs:
       # always works since gb-test-roms ships prebuilt .gb files.
       - name: Configure CMake
         run: >-
-          nix-shell --command 'cmake -B build -G Ninja
+          cmake -B build -G Ninja
           ${{ matrix.cmake_build }} -DENABLE_LTO=OFF
           ${{ matrix.cmake_options }}
-          ${{ matrix.build_options == 'default' && '-DVBAM_FETCH_TEST_ROMS=ON' || '' }}'
+          ${{ matrix.build_options == 'default' && '-DVBAM_FETCH_TEST_ROMS=ON' || '' }}
       - name: Build
-        run: >-
-          nix-shell --command 'ninja -C build'
+        run: ninja -C build
 
       # Run tests
       - if: matrix.build_options == 'default'
         name: Run tests
-        run: >-
-          nix-shell --command 'cd build && ctest -j --output-on-failure'
-
+        run: cd build && ctest -j --output-on-failure
