@@ -149,7 +149,12 @@ static int xmx_load(void)
     nr_setenv_default("MVK_CONFIG_FAST_MATH_ENABLED", "0");
 #endif
 
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    sprintf_s(path, sizeof path, "%s/libxmx%s", X.dir, NR_SHARED_SUFFIX);
+#else
     snprintf(path, sizeof path, "%s/libxmx%s", X.dir, NR_SHARED_SUFFIX);
+#endif
+
     X.handle = nr_dl_open(path);
     if (!X.handle) FAILF("cannot load %s: %s", path, nr_dl_error());
 
