@@ -124,8 +124,9 @@ static int xmx_load(void)
     if (X.handle) return 0;
     if (own_directory(X.dir, sizeof X.dir)) FAILF("cannot locate this library's directory");
 #ifdef NR_STATIC_XMX
-    /* libdlssnr: libxmx's objects are linked into this very library, so there is
-     * nothing to load; the table points straight at them. */
+    /* libdlssnr: the runtime's objects — libxmx's, or libmetalmx's on Apple
+     * (NR_STATIC_METAL) — are linked into this very library, so there is nothing to
+     * load; the table points straight at them. */
     X.handle = (nr_dl)1;
     X.open = xmx_open; X.init = xmx_init; X.res_init = xmx_res_init;
     X.embedded_shader = xmx_embedded_shader;
@@ -149,10 +150,24 @@ static int xmx_load(void)
     nr_setenv_default("MVK_CONFIG_FAST_MATH_ENABLED", "0");
 #endif
 
-#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
-    sprintf_s(path, sizeof path, "%s/libxmx%s", X.dir, NR_SHARED_SUFFIX);
+    /* The compute runtime: libxmx (Vulkan) unless, on macOS, NR_GPU_BACKEND=metal asks for
+     * libmetalmx — the same entry points on Metal directly, built on Apple alone. */
+    const char *runtime = "libxmx";
+    const char *backend = getenv("NR_GPU_BACKEND");
+    if (backend && !strcmp(backend, "metal")) {
+#ifdef __APPLE__
+        runtime = "libmetalmx";
 #else
-    snprintf(path, sizeof path, "%s/libxmx%s", X.dir, NR_SHARED_SUFFIX);
+        FAILF("NR_GPU_BACKEND=metal: libmetalmx exists on macOS only");
+#endif
+    } else if (backend && *backend && strcmp(backend, "vulkan")) {
+        FAILF("NR_GPU_BACKEND must be 'vulkan' or 'metal', not '%s'", backend);
+    }
+
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    sprintf_s(path, sizeof path, "%s/%s%s", X.dir, runtime, NR_SHARED_SUFFIX);
+#else
+    snprintf(path, sizeof path, "%s/%s%s", X.dir, runtime, NR_SHARED_SUFFIX);
 #endif
 
     X.handle = nr_dl_open(path);
@@ -1923,6 +1938,18 @@ void nr_frame_defaults(nr_frame_params *p)
     p->normalized_style = 0.0f; p->local_tone = 1.0f; p->local_structure = 1.0f; p->frame_index = 0;
     p->history_confidence = 1.0f; p->blend_scale = 0.73974609375f; p->hold = 0.0f; p->slope = 0.0f;
     p->automatic_mask = 0; p->skin_structure = -1.0f; p->automatic_structure = -1.0f;
+}
+
+const char *nr_frame_runtime(void)
+{
+#if defined(NR_STATIC_METAL)
+    return "metal";
+#elif defined(NR_STATIC_XMX)
+    return "vulkan";
+#else
+    const char *backend = getenv("NR_GPU_BACKEND");
+    return backend && !strcmp(backend, "metal") ? "metal" : "vulkan";
+#endif
 }
 
 int nr_frame_adopt_vulkan(void *instance, void *physical_device, void *device, void *queue,

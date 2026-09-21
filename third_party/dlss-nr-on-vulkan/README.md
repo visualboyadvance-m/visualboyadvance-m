@@ -2,7 +2,7 @@
 
 NVIDIA's DLSS 5 Neural Rendering pass — the one-step pixel-space diffusion model that
 re-renders a frame's detail — running on **Any Vulkan enabled card**
-integrated GPU under macOS, in a real game, through a Vulkan layer.
+integrated GPU under macOS, Android, Linux and Windows in a real game, through a Vulkan layer.
 
 No NVIDIA hardware, no NGX, no CUDA. The graph runs on Intel's XMX matrix units through
 `VK_KHR_cooperative_matrix`, and the pass is injected at `vkQueuePresentKHR`, so it
@@ -174,6 +174,18 @@ compute runtime against MoltenVK directly, and writes `work/MoltenVK_icd.json` s
 tests can reach MoltenVK through the loader. Metal's fast math is switched off by the
 runtime before the library loads; leave `MVK_CONFIG_FAST_MATH_ENABLED` alone, because with
 it on every vendor rounding point in the graph moves (`notes/phase67`).
+
+macOS also gets a **second compute runtime on Metal directly**: `work/libmetalmx.dylib`
+(`src/gpu/libmetalmx.m`) implements the same `xmx_*` entry points as libxmx, with the shaders
+rewritten in the Metal Shading Language (`src/gpu/metal/`) and compiled by Apple's `metal`
+into one `nr_shaders.metallib` that is embedded in the library. Its matrix path is
+`simdgroup_matrix` (half operands, float accumulate; exact on the GEMM contract), where
+MoltenVK has none. `NR_GPU_BACKEND=metal` switches every Python tool and the C frame library
+to it; `make test-metal` runs the GPU tests on it. On an M3 a 1280x720 frame takes 735-746 ms
+through it against 938-948 ms through MoltenVK (`notes/phase74`). It is built on Apple only —
+by `make` under Darwin, by CMake under `NR_BUILD_METAL` — and the Vulkan layer stays Vulkan.
+The static archive a host links, `libdlssnr`, is the Metal one on Apple: no Vulkan in it,
+`nr_frame_runtime()` says `"metal"`, and `nr_frame_adopt_vulkan` is refused there.
 
 The result is 649 named tensors, **145 755 123 parameters**: the large matrices are
 stored in the DLL as FP8 E4M3, one byte each, and decoded to FP16. The reader checks

@@ -1,0 +1,221 @@
+/*
+ * attention — the row-wise operators, `attention.comp` in MSL: the cosine publish and the
+ * bit-affine softmax, one invocation per row, the rows staged through threadgroup memory
+ * so the global traffic is contiguous. The template parameter is the `-DSOFTMAX_AB` build
+ * (`attention_ab`), whose bit-for-bit reference transform is test-only.
+ */
+#include "nr_metal.h"
+
+constant uint COSINE_PUBLISH = 0u, SOFTMAX = 1u;
+constant float COSINE_NORM_FLOOR = 0.00006198883056640625f;
+
+/* `count` consecutive floats from `base`, spread across the 32-wide threadgroup. */
+inline void gather(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
+                   uint base, uint count) {
+    device const float *a = float_ptr(pc.a);
+    if ((flags & 0x20000u) != 0u) {
+        // Q/K directly from (window, token, 3, head, channel)
+        uint part = (flags >> 18) & 1u;
+        if (pc.n % 32u == 0u) {
+            uint row = base / 32u;
+            uint head = (row / pc.n) % pc.batch, token = row % pc.n;
+            uint window = row / (pc.n * pc.batch);
+            uint at = ((window * pc.n + token) * 3u * pc.batch + part * pc.batch + head) * 32u;
+            for (uint i = lid; i < count; i += 32u)
+                stage[i] = a[at + (i / 32u) * pc.batch * 96u + i % 32u];
+        } else {
+            for (uint i = lid; i < count; i += 32u) {
+                uint row = (base + i) / 32u, channel = (base + i) % 32u;
+                uint head = (row / pc.n) % pc.batch, token = row % pc.n;
+                uint window = row / (pc.n * pc.batch);
+                uint at = ((window * pc.n + token) * 3u * pc.batch + part * pc.batch + head) * 32u + channel;
+                stage[i] = a[at];
+            }
+        }
+    } else if ((flags & 0x8000u) != 0u) {
+        device const half *h = half_ptr(pc.a);
+        for (uint i = lid; i < count; i += 32u) stage[i] = float(h[base + i]);
+    } else {
+        for (uint i = lid; i < count; i += 32u) stage[i] = a[base + i];
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+}
+
+inline void scatter(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
+                    uint base, uint count) {
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    if ((flags & 0x1000u) != 0u) {
+        device half *h = half_out(pc.c);
+        for (uint i = lid; i < count; i += 32u) h[base + i] = half(stage[i]);
+    } else {
+        device float *c = float_out(pc.c);
+        for (uint i = lid; i < count; i += 32u) c[base + i] = stage[i];
+    }
+}
+
+/* half(l*r), half(l+r), half(l*r + acc): one float32 expression, one rounding. The build
+ * contracts nothing, so the multiply and the add stay two operations. */
+inline float hmul(float l, float r) { float t = l * r; return half_round(t); }
+inline float hadd(float l, float r) { float t = l + r; return half_round(t); }
+inline float hfma(float l, float r, float acc) { float t = l * r; t = t + acc; return half_round(t); }
+
+inline void store(constant Push &pc, uint flags, uint index, float value) {
+    uint epilogue = (flags >> 8) & 0xFu;
+    if (epilogue == 1u) value = e4m3(value);
+    else if (epilogue == 4u) value = half_round(value);
+    if ((flags & 0x1000u) != 0u) half_out(pc.c)[index] = half(value);
+    else                         float_out(pc.c)[index] = value;
+}
+
+inline void cosine_publish(constant Push &pc, threadgroup float *stage, uint row, uint local) {
+    uint base = local * 32u;
+    float h[32];
+    for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[base + i]);
+
+    float partial[4][2];
+    for (uint lane = 0u; lane < 4u; lane++)
+        for (uint parity = 0u; parity < 2u; parity++) {
+            uint ch = lane * 2u + parity;
+            float first  = hfma(h[ch + 8u],  h[ch + 8u],  hmul(h[ch],       h[ch]));
+            float second = hfma(h[ch + 24u], h[ch + 24u], hmul(h[ch + 16u], h[ch + 16u]));
+            partial[lane][parity] = hadd(first, second);
+        }
+    float two[4][2], one[4][2];
+    for (uint lane = 0u; lane < 4u; lane++)
+        for (uint p = 0u; p < 2u; p++) two[lane][p] = hadd(partial[lane][p], partial[lane ^ 2u][p]);
+    for (uint lane = 0u; lane < 4u; lane++)
+        for (uint p = 0u; p < 2u; p++) one[lane][p] = hadd(two[lane][p], two[lane ^ 1u][p]);
+
+    float norm = max(hadd(one[0][0], one[0][1]), half_round(COSINE_NORM_FLOOR));
+    float reciprocal = half_round(precise::rsqrt(norm));
+    float scale = 1.0f;
+    if (pc.k != 0u) {
+        uint head = (row / pc.n) % pc.batch;      // rows are (batch, head, token)
+        scale = half_round(float_ptr(pc.d)[head]);
+    }
+    for (uint i = 0u; i < 32u; i++) {
+        float value = hmul(h[i], reciprocal);
+        if (pc.k != 0u) value = hmul(value, scale);
+        stage[base + i] = e4m3(value);
+    }
+}
+
+/* One pair of attention weights: the vendor's exp as a bit-affine map on an f16x2 register,
+ * the pair coupled through the shift and the carry (notes/phase5-softmax-found.md). */
+inline void weights_at_fast(constant Push &pc, uint flags, threadgroup const float *stage,
+                            bool staged, uint base, uint bias, uint i,
+                            thread float &w0, thread float &w1) {
+    device const float *a = float_ptr(pc.a);
+    device const float *b = float_ptr(pc.b);
+    float2 affine;
+    for (uint j = 0u; j < 2u; j++) {
+        float logit = staged ? stage[base + i + j] : a[base + i + j];
+        if ((flags & 0x2000u) != 0u) logit += b[bias + i + j];
+        if (pc.p0 != 0.0f) logit = clamp(logit, -pc.p0, pc.p0);
+        float scaled = half_round(logit) * 0.044921875f;
+        scaled += 1.30078125f;
+        affine[j] = clamp(scaled, 1.03125f, 1.5693359375f);
+    }
+    uint transformed = (as_type<uint>(half2(affine)) << 5) + 0x7FF88000u;
+    float2 weights = float2(as_type<half2>(transformed));
+    w0 = weights.x; w1 = weights.y;
+}
+
+inline void weights_at_reference(constant Push &pc, uint flags, threadgroup const float *stage,
+                                 bool staged, uint base, uint bias, uint i,
+                                 thread float &w0, thread float &w1) {
+    device const float *a = float_ptr(pc.a);
+    device const float *b = float_ptr(pc.b);
+    uint bits[2];
+    for (uint j = 0u; j < 2u; j++) {
+        float logit = staged ? stage[base + i + j] : a[base + i + j];
+        if ((flags & 0x2000u) != 0u) logit += b[bias + i + j];
+        if (pc.p0 != 0.0f) logit = clamp(logit, -pc.p0, pc.p0);
+        float scaled = half_round(logit) * 0.044921875f;
+        scaled += 1.30078125f;
+        float affine = clamp(scaled, 1.03125f, 1.5693359375f);
+        int f = as_type<int>(half_round(affine));
+        bits[j] = uint(((f >> 13) & 0x3FF) | (((((f >> 23) & 0xFF) - 112) & 0x1F) << 10)
+                       | ((f < 0) ? 0x8000 : 0));
+    }
+    uint transformed = ((bits[0] | (bits[1] << 16)) << 5) + 0x7FF88000u;
+    float out2[2];
+    for (uint j = 0u; j < 2u; j++) {
+        uint half_bits = (j == 0u) ? (transformed & 0xFFFFu) : ((transformed >> 16) & 0xFFFFu);
+        uint exponent = (half_bits >> 10) & 0x1Fu, mantissa = half_bits & 0x3FFu;
+        float weight = (exponent == 0u)
+            ? float(mantissa) * 5.9604644775390625e-08f
+            : as_type<float>(int(((exponent + 112u) << 23) | (mantissa << 13)));
+        out2[j] = ((half_bits & 0x8000u) != 0u) ? -weight : weight;
+    }
+    w0 = out2[0]; w1 = out2[1];
+}
+
+template <bool AB>
+inline void weights_at(constant Push &pc, uint flags, threadgroup const float *stage,
+                       bool staged, uint base, uint bias, uint i,
+                       thread float &w0, thread float &w1) {
+    if (AB && (flags & 0x40000000u) != 0u) {
+        weights_at_reference(pc, flags, stage, staged, base, bias, i, w0, w1);
+        return;
+    }
+    weights_at_fast(pc, flags, stage, staged, base, bias, i, w0, w1);
+}
+
+template <bool AB>
+inline void softmax(constant Push &pc, uint flags, threadgroup float *stage, uint row, uint local) {
+    uint stride = pc.sa != 0u ? pc.sa : pc.n;
+    bool staged = stride == pc.n && stride <= 64u;
+    uint base = staged ? local * stride : row * stride;
+    uint bias = ((row / pc.n) % max(pc.batch, 1u)) * pc.n * pc.n + (row % pc.n) * pc.n;
+    if (!staged) for (uint i = pc.n; i < stride; i++) store(pc, flags, base + i, 0.0f);
+    float total = 0.0f;
+    float w0, w1;
+    for (uint i = 0u; i < pc.n; i += 2u) {
+        weights_at<AB>(pc, flags, stage, staged, base, bias, i, w0, w1);
+        if (staged) { stage[base + i] = w0; stage[base + i + 1u] = w1; }
+        total += w0;                              // float32 accumulation, as numpy does
+        total += w1;
+    }
+    float reciprocal = half_round(1.0f / half_round(total));
+    if (staged) {
+        for (uint i = 0u; i < pc.n; i++)
+            stage[base + i] = e4m3(hmul(stage[base + i], reciprocal));
+    } else {
+        for (uint i = 0u; i < pc.n; i += 2u) {
+            weights_at<AB>(pc, flags, stage, false, base, bias, i, w0, w1);
+            store(pc, flags, base + i,      e4m3(hmul(w0, reciprocal)));
+            store(pc, flags, base + i + 1u, e4m3(hmul(w1, reciprocal)));
+        }
+    }
+}
+
+template <bool AB>
+kernel void attention_t(constant Push &pc [[buffer(0)]],
+                        uint row [[thread_position_in_grid]],
+                        uint local [[thread_index_in_threadgroup]],
+                        uint group [[threadgroup_position_in_grid]]) {
+    threadgroup float stage[32 * 64];
+    uint flags = operation_flags(pc);
+    uint kind = flags & 0xFFu;
+    if (kind == COSINE_PUBLISH) {
+        uint base = group * 32u * 32u;
+        gather(pc, flags, stage, local, base, min(32u * 32u, pc.m * 32u - base));
+        if (row < pc.m) cosine_publish(pc, stage, row, local);
+        scatter(pc, flags, stage, local, base, min(32u * 32u, pc.m * 32u - base));
+    } else if (kind == SOFTMAX) {
+        uint stride = pc.sa != 0u ? pc.sa : pc.n;
+        if (stride == pc.n && stride <= 64u) {
+            uint base = group * 32u * stride;
+            uint count = min(32u * stride, pc.m * stride - base);
+            gather(pc, flags, stage, local, base, count);
+            if (row < pc.m) softmax<AB>(pc, flags, stage, row, local);
+            scatter(pc, flags, stage, local, base, count);
+        } else {
+            if (row < pc.m) softmax<AB>(pc, flags, stage, row, local);
+        }
+    }
+}
+
+template [[host_name("attention")]]    kernel void attention_t<false>(constant Push &, uint, uint, uint);
+template [[host_name("attention_ab")]] kernel void attention_t<true>(constant Push &, uint, uint, uint);

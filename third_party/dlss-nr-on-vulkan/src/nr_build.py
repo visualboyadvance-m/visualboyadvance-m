@@ -57,8 +57,23 @@ def build_dir(root=ROOT):
 BUILD_DIR = build_dir()
 
 
+def backend():
+    """Which compute runtime the Python loads as `xmx`: `vulkan` (libxmx, the default
+    everywhere) or `metal` (libmetalmx, macOS only — the same entry points on Metal
+    directly, `NR_GPU_BACKEND=metal`). Anything else is refused rather than guessed."""
+    chosen = os.environ.get("NR_GPU_BACKEND", "vulkan").strip().lower() or "vulkan"
+    if chosen not in ("vulkan", "metal"):
+        raise ValueError("NR_GPU_BACKEND must be 'vulkan' or 'metal', not %r" % chosen)
+    if chosen == "metal" and sys.platform != "darwin":
+        raise ValueError("NR_GPU_BACKEND=metal is macOS only; libmetalmx is built on Apple alone")
+    return chosen
+
+
 def library(name):
-    """`libxmx.so`, `libnr_frame.dylib`, `libnr_layer.dll`: the platform's spelling of a library."""
+    """`libxmx.so`, `libnr_frame.dylib`, `libnr_layer.dll`: the platform's spelling of a library.
+    `xmx` is the compute runtime, which on macOS `NR_GPU_BACKEND=metal` redirects to libmetalmx."""
+    if name == "xmx" and backend() == "metal":
+        name = "metalmx"
     return BUILD_DIR / ("lib" + name + SUFFIX)
 
 

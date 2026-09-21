@@ -9,6 +9,40 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
+## Latest: the runtime on Metal — libmetalmx (2026-09-21, later)
+
+**There is a second compute runtime, Apple only.** `src/gpu/libmetalmx.m` implements every
+`xmx_*` entry point of `xmx.h` on Metal directly — no MoltenVK, no SPIRV-Cross — and carries
+the fourteen kernels rewritten in the Metal Shading Language (`src/gpu/metal/`), compiled by
+Apple's `metal` into one `nr_shaders.metallib` that bin2c puts inside the library.
+**`NR_GPU_BACKEND=metal`** makes `nr_build.library("xmx")` and `nr_frame.c` load
+`libmetalmx` instead of `libxmx`; nothing else changes, the shader names included
+(`gemm_coopmat.spv` selects the kernel `gemm_coopmat`). Built by `make` under Darwin and by
+CMake under `NR_BUILD_METAL` (on by default on Apple, a hard error anywhere else); `make
+test-metal` and the `metal_*` ctests run the GPU suite on it. The matrix path is
+`simdgroup_matrix` with half operands into a float accumulator — the GEMM contract is
+**exact** on it, every epilogue and slice at max |d| 0 — and a real 720p frame through the C
+library takes **735-746 ms against 938-948 ms through MoltenVK** on the same M3, the two
+outputs at correlation 0.99987 (mean 0.28 levels, max 5). `notes/phase74`.
+
+Four things the next reader must not undo, three of them learned the hard way in one session:
+the buffer addresses in the push block come from an **`MTLArgumentEncoder`** over one pointer
+argument, not from `[MTLBuffer gpuAddress]` — that property is macOS 13, VBA-M's deployment
+target is 11.0 and warned on it, and the encoder writes the identical value on every buffer
+of both storage modes (400 checked); the Metal compiler runs with **`-fno-fast-math -ffp-contract=off`** (the `phase67` FMA trap,
+now at the compiler rather than in MoltenVK's config); consecutive encoders are ordered by an
+**`MTLFence`**, because the graph's buffers are untracked and without it the skip copies ran
+before the blocks that fed them — every block bit-exact, the whole graph at correlation 0.25;
+and the GEMM epilogue goes **through threadgroup memory, never over `thread_elements()`**,
+which is a 64-wide vector per thread and cost 27x when looped over. **`libdlssnr` on Apple
+is now built from libmetalmx** — no Vulkan symbol in the archive, `-framework Metal` its
+public link interface, `test_dlssnr` bit-identical to the Python path — so a host there
+must not call `nr_frame_adopt_vulkan` (refused: nothing Vulkan to adopt) and can ask
+`nr_frame_runtime()` which runtime it has; `-DNR_BUILD_METAL=OFF` gives the Vulkan archive.
+The Vulkan layer is unchanged and serves a MoltenVK game from either runtime through the
+daemon, untested here. Also fixed: `test_softmax_pack.py` lacked `import sys` and failed on every
+backend.
+
 ## Latest: it builds for Android (2026-09-21)
 
 The CMake build goes through the Android NDK — `-DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake

@@ -17,7 +17,9 @@
 #                   test_nr_frame, every shader
 #   Linux, macOS    the Vulkan layer libnr_layer and its POSIX tests (NR_BUILD_LAYER)
 #   macOS           libxmx and gemm_runner link MoltenVK directly (NR_XMX_LINK_MOLTENVK);
-#                   the layer and its tests link the loader; work/MoltenVK_icd.json is written
+#                   the layer and its tests link the loader; work/MoltenVK_icd.json is written;
+#                   libmetalmx, the same runtime on Metal directly with its shaders compiled
+#                   into it by the Metal compiler (NR_BUILD_METAL; NR_GPU_BACKEND=metal at run time)
 #   Android         the libraries, libdlssnr and the executables against the NDK's libvulkan.so,
 #                   with the NDK's own toolchain file; the layer stays off (there is no game to
 #                   hook and no daemon), bin2c and slice are built for the build machine
@@ -52,6 +54,22 @@ else()
 endif()
 option(NR_BUILD_LAYER "the Vulkan layer that puts the pass inside a game, and its tests (POSIX)" ${NR_LAYER_DEFAULT})
 option(NR_XMX_LINK_MOLTENVK "macOS: link the compute runtime to MoltenVK directly rather than the loader" ${APPLE})
+# libmetalmx: libxmx's entry points on Metal directly (src/gpu/libmetalmx.m), its shaders
+# (src/gpu/metal/*.metal) compiled by the Metal compiler into one metallib that bin2c puts
+# inside the library. Apple only: there is no Metal anywhere else, and the option is
+# refused rather than ignored off Apple. NR_GPU_BACKEND=metal selects it at run time.
+option(NR_BUILD_METAL "macOS: build libmetalmx, the compute runtime on Metal, with the Metal shaders compiled into it" ${APPLE})
+if(NR_BUILD_METAL AND NOT APPLE)
+  message(FATAL_ERROR "NR_BUILD_METAL is on and this is not an Apple build; libmetalmx exists on macOS only")
+endif()
+if(NR_BUILD_METAL)
+  # since Xcode 15 the Metal compiler is a separate download; without it the rest still builds
+  execute_process(COMMAND xcrun -sdk macosx -f metal RESULT_VARIABLE nr_metal_missing OUTPUT_QUIET ERROR_QUIET)
+  if(nr_metal_missing)
+    message(WARNING "no Metal compiler (xcrun -sdk macosx -f metal failed): libmetalmx is not built. Install it with `xcodebuild -downloadComponent MetalToolchain`, or pass -DNR_BUILD_METAL=OFF to silence this")
+    set(NR_BUILD_METAL OFF)
+  endif()
+endif()
 option(NR_NO_FLOAT16 "use the software half conversion even where the compiler has _Float16 (for checking it)" OFF)
 if(CMAKE_CROSSCOMPILING)
   set(NR_TESTS_DEFAULT OFF)                        # the executables cannot run here
@@ -295,7 +313,7 @@ endfunction()
 # tree is also added as a subdirectory of VBA-M, whose build has a bin2c of its own.
 # ---------------------------------------------------------------------------------------
 
-if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS)
+if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS OR NR_BUILD_METAL)
   if(CMAKE_CROSSCOMPILING)
     # Under VBA-M, its host_compile() builds a tool for the build machine with a host
     # compiler (the x86 cl of the same MSVC in an arm64 cross shell, `cc` elsewhere) --
@@ -481,6 +499,55 @@ if(NR_EMBED_SHADERS)
 endif()
 
 # ---------------------------------------------------------------------------------------
+# the compute runtime on Metal (Apple only): libmetalmx
+# ---------------------------------------------------------------------------------------
+#
+# Each .metal compiles to AIR with the Metal compiler from the active Xcode / command line
+# tools, the five link into nr_shaders.metallib in the output directory (kept there for
+# XMX_METALLIB= experiments), bin2c writes the metallib as a C array, and the array is
+# compiled into libmetalmx. The shaders are built with fast math and contraction off: with
+# either on, the vendor's half rounding points move (notes/phase67, notes/phase74).
+
+if(NR_BUILD_METAL)
+  enable_language(OBJC)
+  find_program(NR_XCRUN xcrun DOC "Apple's tool runner, for the Metal compiler")
+  if(NOT NR_XCRUN)
+    message(FATAL_ERROR "xcrun not found; the Metal compiler needs Xcode or the command line tools (or -DNR_BUILD_METAL=OFF)")
+  endif()
+  if(NOT NR_BIN2C)
+    message(FATAL_ERROR "NR_BUILD_METAL needs bin2c to embed the metallib; name a host build with -DNR_BIN2C=")
+  endif()
+  set(NR_METAL_DIR "${CMAKE_CURRENT_BINARY_DIR}/metal")
+  file(MAKE_DIRECTORY "${NR_METAL_DIR}")
+  set(NR_METAL_FLAGS -std=metal3.1 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
+  set(NR_AIR)
+  foreach(stem resident history attention gemm_portable gemm_simd)
+    add_custom_command(OUTPUT "${NR_METAL_DIR}/${stem}.air"
+      COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL_FLAGS} -c -o "${NR_METAL_DIR}/${stem}.air"
+              "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
+      DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_metal.h"
+      COMMENT "metal ${stem}.air" VERBATIM)
+    list(APPEND NR_AIR "${NR_METAL_DIR}/${stem}.air")
+  endforeach()
+  set(NR_METALLIB "${NR_OUTPUT_DIR}/nr_shaders.metallib")
+  add_custom_command(OUTPUT "${NR_METALLIB}"
+    COMMAND "${NR_XCRUN}" -sdk macosx metallib -o "${NR_METALLIB}" ${NR_AIR}
+    DEPENDS ${NR_AIR} COMMENT "metallib nr_shaders.metallib" VERBATIM)
+  add_custom_command(OUTPUT "${NR_METAL_DIR}/nr_metallib.h"
+    COMMAND ${NR_BIN2C} "${NR_METALLIB}" "${NR_METAL_DIR}/nr_metallib.h" nr_metallib
+    DEPENDS "${NR_METALLIB}" ${NR_BIN2C} COMMENT "bin2c nr_metallib.h" VERBATIM)
+  add_custom_target(metal_shaders ALL DEPENDS "${NR_METALLIB}")
+
+  add_library(metalmx SHARED src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h")
+  target_include_directories(metalmx PRIVATE src/gpu "${NR_METAL_DIR}")
+  target_compile_definitions(metalmx PRIVATE NR_EMBEDDED_METALLIB=1)
+  target_compile_options(metalmx PRIVATE -fobjc-arc ${NR_WARN_FLAGS})
+  target_link_libraries(metalmx PRIVATE "-framework Metal" "-framework Foundation")
+  nr_place(metalmx)
+  message(STATUS "libmetalmx: the compute runtime on Metal, shaders compiled into it (NR_GPU_BACKEND=metal selects it)")
+endif()
+
+# ---------------------------------------------------------------------------------------
 # the host passes and the frame library
 # ---------------------------------------------------------------------------------------
 
@@ -631,14 +698,35 @@ nr_place(nr_frame)
 # process at run time (XMX_NO_VULKAN_LINK) — the host's, or the adopted instance's. The
 # weights and the shaders are embedded exactly as in the shared libraries.
 # ---------------------------------------------------------------------------------------
-add_library(dlssnr STATIC src/gpu/libxmx.c src/ref/nr_frame.c
-  $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
-target_include_directories(dlssnr
-  PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
-target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 XMX_NO_VULKAN_LINK=1)
-if(NR_EMBED_SHADERS)
-  target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_SHADERS=1)
+#
+# On Apple the archive carries libmetalmx instead: the same entry points on Metal directly,
+# the metallib compiled in, `-framework Metal -framework Foundation` as its public link
+# interface, and no Vulkan anywhere in it. A host that shares a Vulkan device
+# (`nr_frame_adopt_vulkan`) is refused there, since there is nothing Vulkan to adopt; the
+# host lets the runtime open the Metal device itself. NR_BUILD_METAL=OFF gives the Vulkan
+# archive on Apple as before.
+if(NR_BUILD_METAL)
+  add_library(dlssnr STATIC src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h" src/ref/nr_frame.c
+    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS})
+  target_include_directories(dlssnr
+    PRIVATE src/gpu "${NR_METAL_DIR}"
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
+  target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 NR_STATIC_METAL=1 NR_EMBEDDED_METALLIB=1)
+  set_source_files_properties(src/gpu/libmetalmx.m PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
+  target_link_libraries(dlssnr PUBLIC "-framework Metal" "-framework Foundation")
+  set(NR_DLSSNR_HOST_LIBS)                        # the test plays a host that brings no Vulkan
+  message(STATUS "libdlssnr carries libmetalmx (Metal); -DNR_BUILD_METAL=OFF for the Vulkan archive")
+else()
+  add_library(dlssnr STATIC src/gpu/libxmx.c src/ref/nr_frame.c
+    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
+  target_include_directories(dlssnr
+    PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
+  target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 XMX_NO_VULKAN_LINK=1)
+  if(NR_EMBED_SHADERS)
+    target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_SHADERS=1)
+  endif()
+  set(NR_DLSSNR_HOST_LIBS ${NR_XMX_VULKAN})
 endif()
 if(NR_EMBED_WEIGHTS)
   target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_WEIGHTS=1)
@@ -654,12 +742,13 @@ set_target_properties(dlssnr PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY "${NR_OUTPUT_DIR}/$<0:>")
 
 # The same C test, against the archive: the static path has to pass what the shared
-# one passes. The archive links no Vulkan library, so the test plays the host and
-# links one (MoltenVK here, the loader elsewhere) for libxmx to find in the process.
+# one passes. The Vulkan archive links no Vulkan library, so the test plays the host and
+# links one (MoltenVK here, the loader elsewhere) for libxmx to find in the process; the
+# Metal archive brings its frameworks itself.
 add_executable(test_dlssnr src/ref/test_nr_frame.c)
 target_include_directories(test_dlssnr PRIVATE src/ref)
 target_compile_options(test_dlssnr PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
-target_link_libraries(test_dlssnr PRIVATE dlssnr ${NR_XMX_VULKAN})
+target_link_libraries(test_dlssnr PRIVATE dlssnr ${NR_DLSSNR_HOST_LIBS})
 nr_executable(test_dlssnr)
 
 # nr_frame.py, the command, in C: PNG in and out through libpng.
@@ -758,6 +847,27 @@ if(NR_BUILD_TESTS)
     # the Python side of the C frame test writes the reference the C side reads
     nr_ctest(test_nr_frame_py "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference.bin")
     set_tests_properties(nr_frame_c PROPERTIES DEPENDS test_nr_frame_py)
+    # the same GPU tests on libmetalmx, which every one of them reaches through
+    # NR_GPU_BACKEND=metal; the C frame test writes and reads a reference of its own
+    if(NR_BUILD_METAL)
+      set(NR_METAL_TESTS
+        src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
+        src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
+        src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py)
+      foreach(script ${NR_METAL_TESTS})
+        get_filename_component(name "${script}" NAME_WE)
+        add_test(NAME metal_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+        set_tests_properties(metal_${name} PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}")
+      endforeach()
+      add_test(NAME metal_test_portable_forced COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_portable.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(metal_test_portable_forced PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;XMX_PORTABLE=1;${NR_TEST_ENV}")
+      add_test(NAME metal_test_graph_staging COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_graph.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(metal_test_graph_staging PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;XMX_STAGING=1;${NR_TEST_ENV}")
+      add_test(NAME metal_test_nr_frame_py COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_metal.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(metal_test_nr_frame_py PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}")
+      add_test(NAME metal_nr_frame_c COMMAND "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_metal.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(metal_nr_frame_c PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}" DEPENDS metal_test_nr_frame_py)
+    endif()
   endif()
 endif()
 

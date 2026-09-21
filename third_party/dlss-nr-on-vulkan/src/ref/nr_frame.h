@@ -74,7 +74,11 @@ void nr_frame_close(nr_frame *frame);
  * the host submits on the same queue it passes `lock`/`unlock` (bracketing every
  * submit here) and takes the same lock around its own submits, presents and idle
  * waits. `get_instance_proc_addr` is the host's vkGetInstanceProcAddr. 0 on success;
- * `nr_frame_error()` otherwise, and libxmx keeps making its own device. */
+ * `nr_frame_error()` otherwise, and libxmx keeps making its own device.
+ *
+ * Refused, with a message, when the runtime behind this library is Metal (the Apple
+ * libdlssnr, or NR_GPU_BACKEND=metal): there is nothing Vulkan to adopt, and the runtime
+ * opens the Metal device itself. `nr_frame_runtime()` says which one is behind. */
 int nr_frame_adopt_vulkan(void *instance, void *physical_device, void *device, void *queue,
                           unsigned queue_family, int cooperative_matrix,
                           void *get_instance_proc_addr, void (*lock)(void *),
@@ -88,6 +92,11 @@ void nr_frame_shutdown(void);
 
 /* 1 while an adopted (shared) device is open, 0 for libxmx's own, -1 when none is. */
 int nr_frame_shared_device(void);
+
+/* The compute runtime behind this library: "vulkan" (libxmx) or "metal" (libmetalmx —
+ * the Apple libdlssnr, or a shared build under NR_GPU_BACKEND=metal). Known without
+ * opening a device, so a host can decide whether to share a Vulkan one. */
+const char *nr_frame_runtime(void);
 
 /* The last failure, for the calling thread's most recent call. */
 const char *nr_frame_error(void);

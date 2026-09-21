@@ -1,0 +1,140 @@
+/*
+ * gemm_portable — the GEMMs without a matrix unit, `gemm_portable.comp` and
+ * `gemm_portable_desc.comp` in MSL: FP16 operands promoted to FP32 and accumulated with
+ * ordinary multiply-adds, one lane owning four consecutive columns of one row of an 8x16
+ * block per 32-lane threadgroup (16x32 for the tiled build). Same push block, flags,
+ * strides, batch, epilogues and store as the simdgroup kernels, so the runtime dispatches
+ * both with the same geometry; `XMX_PORTABLE=1` is how they are selected on a device that
+ * has the matrix path.
+ */
+#include "nr_metal.h"
+
+constant uint TM = 8, TN = 16;
+
+template <int RM, int RN>
+kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
+                            uint3 wg [[threadgroup_position_in_grid]],
+                            uint lid [[thread_index_in_threadgroup]]) {
+    const uint BM = TM * RM, BN = TN * RN;
+    uint row = wg.y * BM, col = wg.x * BN;
+    if (row >= pc.m || col >= pc.n) return;
+    uint flags = operation_flags(pc);
+    uint batch = wg.z;
+    uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
+    uint lda = pc.lda != 0u ? pc.lda : pc.k;
+    uint ldb = pc.ldb != 0u ? pc.ldb : ((flags & 1u) != 0u ? pc.k : pc.n);
+    uint ldc = pc.ldc != 0u ? pc.ldc : pc.n;
+    device const half *A = half_ptr(pc.a);
+    device const half *B = half_ptr(pc.b);
+
+    uint r = lid >> 2u, cq = (lid & 3u) * 4u;
+
+    float4 acc[RM][RN];
+    for (int i = 0; i < RM; i++)
+        for (int j = 0; j < RN; j++)
+            acc[i][j] = float4(0.0f);
+
+    if ((flags & 1u) != 0u) {
+        /* B is stored (N, K): a lane's four columns are four rows of it. */
+        for (uint k = 0; k < pc.k; k++) {
+            float4 bv[RN];
+            for (int j = 0; j < RN; j++) {
+                uint at = bo + (col + cq + j * TN) * ldb + k;
+                bv[j] = float4(float(B[at]), float(B[at + ldb]),
+                               float(B[at + 2u * ldb]), float(B[at + 3u * ldb]));
+            }
+            for (int i = 0; i < RM; i++) {
+                float av = float(A[ao + (row + r + i * TM) * lda + k]);
+                for (int j = 0; j < RN; j++)
+                    acc[i][j] += av * bv[j];
+            }
+        }
+    } else {
+        for (uint k = 0; k < pc.k; k++) {
+            float4 bv[RN];
+            for (int j = 0; j < RN; j++) {
+                uint at = bo + k * ldb + col + cq + j * TN;
+                bv[j] = float4(float(B[at]), float(B[at + 1u]),
+                               float(B[at + 2u]), float(B[at + 3u]));
+            }
+            for (int i = 0; i < RM; i++) {
+                float av = float(A[ao + (row + r + i * TM) * lda + k]);
+                for (int j = 0; j < RN; j++)
+                    acc[i][j] += av * bv[j];
+            }
+        }
+    }
+
+    uint epilogue = (flags >> 8) & 0xFu;
+    bool narrow = (flags & 0x1000u) != 0u;
+    for (int i = 0; i < RM; i++)
+        for (int j = 0; j < RN; j++) {
+            float4 v = acc[i][j];
+            if (epilogue != 0u)
+                for (int e = 0; e < 4; e++)
+                    v[e] = publish(epilogue, v[e]);
+            uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+            if (narrow) {
+                /* Four consecutive halves per lane, as one 64-bit store when aligned. */
+                if ((at & 3u) == 0u && (pc.c & 7u) == 0u)
+                    reinterpret_cast<device half4 *>(half_out(pc.c))[at >> 2] = half4(v);
+                else
+                    for (int e = 0; e < 4; e++)
+                        half_out(pc.c)[at + e] = half(v[e]);
+            } else {
+                if ((at & 3u) == 0u && (pc.c & 15u) == 0u)
+                    reinterpret_cast<device float4 *>(float_out(pc.c))[at >> 2] = v;
+                else
+                    for (int e = 0; e < 4; e++)
+                        float_out(pc.c)[at + e] = v[e];
+            }
+        }
+}
+
+template [[host_name("gemm_portable")]]       kernel void gemm_portable_t<1, 1>(constant Push &, uint3, uint);
+template [[host_name("gemm_portable_tiled")]] kernel void gemm_portable_t<2, 2>(constant Push &, uint3, uint);
+
+/* The descriptor-bound benchmark and test path: three buffers and a small push block,
+ * `gemm_portable_desc.comp` (BATCHED for the second). The runtime always hands the seven
+ * words; the plain kernel reads the first three. */
+struct DescPush { uint M, N, K, sa, sb, sc, bt; };
+
+template <bool BATCHED>
+kernel void gemm_portable_desc_t(device const half *A [[buffer(0)]],
+                                 device const half *B [[buffer(1)]],
+                                 device float *C [[buffer(2)]],
+                                 constant DescPush &pc [[buffer(3)]],
+                                 uint3 wg [[threadgroup_position_in_grid]],
+                                 uint lid [[thread_index_in_threadgroup]]) {
+    uint row = wg.y * TM, col = wg.x * TN;
+    if (row >= pc.M || col >= pc.N) return;
+    uint ao = 0u, bo = 0u, co = 0u;
+    bool transposed = false;
+    if (BATCHED) {
+        uint batch = wg.z;
+        ao = batch * pc.sa; bo = batch * pc.sb; co = batch * pc.sc;
+        transposed = pc.bt != 0u;
+    }
+    uint r = lid >> 2u, cq = (lid & 3u) * 4u;
+    float4 acc = float4(0.0f);
+    uint arow = ao + (row + r) * pc.K;
+    if (transposed) {
+        uint b0 = bo + (col + cq) * pc.K;
+        for (uint k = 0; k < pc.K; k++) {
+            float4 bv = float4(float(B[b0 + k]), float(B[b0 + pc.K + k]),
+                               float(B[b0 + 2u * pc.K + k]), float(B[b0 + 3u * pc.K + k]));
+            acc += float(A[arow + k]) * bv;
+        }
+    } else {
+        for (uint k = 0; k < pc.K; k++) {
+            uint at = bo + k * pc.N + col + cq;
+            float4 bv = float4(float(B[at]), float(B[at + 1u]), float(B[at + 2u]), float(B[at + 3u]));
+            acc += float(A[arow + k]) * bv;
+        }
+    }
+    uint at = co + (row + r) * pc.N + col + cq;
+    C[at] = acc.x; C[at + 1u] = acc.y; C[at + 2u] = acc.z; C[at + 3u] = acc.w;
+}
+
+template [[host_name("gemm_portable_desc")]]    kernel void gemm_portable_desc_t<false>(device const half *, device const half *, device float *, constant DescPush &, uint3, uint);
+template [[host_name("gemm_portable_batched")]] kernel void gemm_portable_desc_t<true>(device const half *, device const half *, device float *, constant DescPush &, uint3, uint);

@@ -34,13 +34,30 @@ MVK_LIBDIR ?= $(firstword $(foreach d,/usr/local/lib $(VK_LIBDIR) /opt/homebrew/
 # and the loader finds MoltenVK through the ICD manifest `all` writes into work/.
 XMX_LIBS := -L$(MVK_LIBDIR) -lMoltenVK -Wl,-rpath,$(MVK_LIBDIR)
 VK_LIBS  := -L$(VK_LIBDIR) -lvulkan -Wl,-rpath,$(VK_LIBDIR)
+# libmetalmx: libxmx's entry points on Metal directly, with the shaders compiled by the
+# Metal compiler into one metallib that bin2c puts inside the library. Apple only — the
+# other platforms have no Metal and never see these targets. `NR_GPU_BACKEND=metal`
+# makes the Python and libnr_frame load it instead of libxmx.
+METAL      := xcrun -sdk macosx metal -std=metal3.1 -fno-fast-math -ffp-contract=off -Wall -Isrc/gpu/metal
+METALLIB   := xcrun -sdk macosx metallib
+# Since Xcode 15 the Metal compiler is a separate download (`xcodebuild -downloadComponent
+# MetalToolchain`); without it the Vulkan build still goes through and libmetalmx is skipped.
+HAVE_METAL := $(shell xcrun -sdk macosx -f metal 2>/dev/null)
+ifneq ($(HAVE_METAL),)
+PLATFORM_EXTRA := work/MoltenVK_icd.json work/libmetalmx$(SO) work/nr_shaders.metallib
+PLATFORM_TESTS := test-metal
+else
+$(warning no Metal compiler (xcrun -f metal): libmetalmx is not built; install the Metal toolchain for it)
 PLATFORM_EXTRA := work/MoltenVK_icd.json
+PLATFORM_TESTS :=
+endif
 DL_LIBS :=
 else
 VK_INC   ?= work/vulkan-headers/include
 XMX_LIBS := -lvulkan
 VK_LIBS  := -lvulkan
 PLATFORM_EXTRA :=
+PLATFORM_TESTS :=
 DL_LIBS := -ldl
 endif
 CFLAGS  := -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -I$(VK_INC)
@@ -65,6 +82,41 @@ work/libxmx$(SO): src/gpu/libxmx.c
 # The one-shot runner behind src/gpu/test_gemm.py: its own instance and device per call.
 work/gemm_runner: src/gpu/gemm_runner.c | work
 	$(CC) $(CFLAGS) -o $@ $< $(XMX_LIBS)
+
+# The Metal runtime (Apple only; see PLATFORM_EXTRA). Each .metal compiles to AIR, the
+# five link into one metallib, bin2c writes it as a C array, and the array is compiled into
+# libmetalmx. The metallib file is kept beside it for XMX_METALLIB= experiments.
+METAL_SOURCES := resident history attention gemm_portable gemm_simd
+METAL_AIR     := $(patsubst %,work/metal/%.air,$(METAL_SOURCES))
+work/metal:
+	mkdir -p $@
+work/metal/%.air: src/gpu/metal/%.metal src/gpu/metal/nr_metal.h | work/metal
+	$(METAL) -c -o $@ $<
+work/nr_shaders.metallib: $(METAL_AIR) | work
+	$(METALLIB) -o $@ $(METAL_AIR)
+work/bin2c: src/tools/bin2c.c | work
+	$(CC) -O2 -o $@ $<
+work/metal/nr_metallib.h: work/nr_shaders.metallib work/bin2c | work/metal
+	work/bin2c $< $@ nr_metallib
+work/libmetalmx$(SO): src/gpu/libmetalmx.m src/gpu/xmx.h work/metal/nr_metallib.h | work
+	$(CC) $(CFLAGS) -fobjc-arc -DNR_EMBEDDED_METALLIB=1 -Isrc/gpu -Iwork/metal -shared $(INSTALL_NAME) \
+	      -o $@ $< -framework Metal -framework Foundation
+
+# The GPU tests again, on libmetalmx. Apple only; `make test` runs it there.
+test-metal: work/libmetalmx$(SO)
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_portable.py
+	NR_GPU_BACKEND=metal XMX_PORTABLE=1 $(PYTHON) src/gpu/test_portable.py
+	NR_GPU_BACKEND=metal XMX_STAGING=1 $(PYTHON) src/gpu/test_graph.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_epilogue.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_specialization.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_softmax_pack.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_qkv_fusion.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_scratch_arena.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_graph.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_frame_execution.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_resident.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference_metal.bin
+	NR_GPU_BACKEND=metal work/test_nr_frame --reference work/nr_frame_reference_metal.bin
 
 # For the Vulkan loader on macOS, which finds no driver on its own: point VK_DRIVER_FILES
 # (older loaders: VK_ICD_FILENAMES) at this file. The tests that go through the loader do.
@@ -167,7 +219,7 @@ bench: all work/half_probe.spv
 	$(PYTHON) src/bench/half_probe.py
 	$(PYTHON) src/bench/split_cost.py
 
-test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_present work/test_nr_frame
+test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_present work/test_nr_frame $(PLATFORM_TESTS)
 	$(PYTHON) src/layer/test_daemon.py
 	work/test_settled
 	$(PYTHON) src/layer/test_ui_mask.py
@@ -205,4 +257,4 @@ test-proton: all work/libnr_layer32$(SO) work/test_layer_loader work/test_layer_
 publish-check:
 	$(PYTHON) src/tools/publish_check.py --history
 
-.PHONY: all test test-proton bench publish-check
+.PHONY: all test test-metal test-proton bench publish-check

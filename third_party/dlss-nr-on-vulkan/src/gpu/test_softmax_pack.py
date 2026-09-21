@@ -2,6 +2,8 @@
 """Check the FP16 packing replacement, including all finite FP16 logits."""
 import os
 import pathlib
+import sys
+
 import numpy as np
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
