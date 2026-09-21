@@ -887,7 +887,12 @@ mac_brew_install_core_deps() {
     # target-architecture wxrc into the build root that this machine cannot
     # run, so tools/macOS/builder points the project at the host one.  The
     # library itself still comes from the wxwidgets dist.
-    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext wxwidgets
+    #
+    # glslang answers to the vcpkg glslang[tools] feature that CMakeLists.txt
+    # asks for in VCPKG_HOST_DEPS: the build runs glslangValidator on this
+    # machine to compile the DLSS NR shaders.  vcpkg keeps the binaries behind
+    # that feature, while the formula here carries them with the libraries.
+    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext wxwidgets glslang
 
     ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt'  | head -1)" "$BUILD_ROOT/root/bin/getopt"
     ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'      | head -1)" "$BUILD_ROOT/root/bin/m4"
@@ -920,10 +925,17 @@ mac_macports_install_core_deps() {
     # installed cleanly fails loudly instead of being forced through.  Piping
     # 'yes' in would not change that: port registers its question handlers only
     # when stdin is a tty, so a pipe disables the questions exactly as -N does.
+    #
+    # glslang answers to the vcpkg glslang[tools] feature that CMakeLists.txt
+    # asks for in VCPKG_HOST_DEPS: the build runs glslangValidator on this
+    # machine to compile the DLSS NR shaders.  vcpkg keeps the binaries behind
+    # that feature, while the port here builds them with GLSLANG_ENABLE_INSTALL
+    # and installs glslangValidator as a symlink to glslang.
     sudo "$MACPORTS_PREFIX"/bin/port -N install bzip2 xz 7zip autoconf \
         autoconf-archive automake libtool util-linux bison flex m4 gperf \
         pkgconfig nasm "$mp_python_port" "$mp_python_pip" perl5 p5-xml-parser \
-        meson ninja cmake ccache swig swig-python gettext wxWidgets-3.2
+        meson ninja cmake ccache swig swig-python gettext wxWidgets-3.2 \
+        glslang
 
     # wxWidgets-3.2 is in that list only for its wxrc: a cross build compiles a
     # target-architecture wxrc into the build root that this machine cannot

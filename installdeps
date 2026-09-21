@@ -228,7 +228,9 @@ freebsd_installdeps() {
 
     wx_pkg=$(pkg search wx | grep gtk3 | grep '^wx' | sed -E 's/-[0-9].*//' | sort -Vr | head -1)
 
-    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja"
+    # glslang for glslangValidator, which the build runs to compile the DLSS NR
+    # shaders; it answers the vcpkg glslang[tools] feature.
+    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja glslang vulkan-headers vulkan-loader"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal-soft"
@@ -385,7 +387,9 @@ debian_installdeps() {
 
         faudio_lib=$(apt-cache search libfaudio-dev | grep libfaudio-dev | awk '{ print $1 }')
 
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib"
+        # glslang-tools, not glslang: Debian keeps glslangValidator there, and
+        # the build runs it to compile the DLSS NR shaders.
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib glslang-tools libvulkan-dev"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev libx264-dev libx265-dev"
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
@@ -718,7 +722,7 @@ fedora_installdeps() {
     # $vcpkg_deps is unquoted on purpose: it is a space-separated list built
     # above, and it is installed by default because a vcpkg build is one flag
     # away from a system one.
-    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers $vcpkg_deps
+    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers glslang $vcpkg_deps
 
     # try to install multiarch libgcc, libstdc++, glibc-devel and pkgconfig if
     # available.  libstdc++-devel carries the libstdc++.so the linker resolves
@@ -867,9 +871,11 @@ suse_installdeps() {
     check_cross
     installing
 
-    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja"
+    # glslang-devel, not glslang: openSUSE ships %_bindir/gls* in the devel
+    # subpackage, and the build runs glslangValidator for the DLSS NR shaders.
+    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja glslang-devel"
 
-    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel"
+    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel vulkan-headers vulkan-devel"
 
     # See build_vcpkg_deps().  openSUSE differs from Fedora in three names: GLU
     # is glu-devel, EGL is Mesa-libEGL-devel (capital M), and IPC::Cmd, FindBin
@@ -955,13 +961,13 @@ archlinux_installdeps() {
 
     # common needed dev packages
     # not using the base-devel group because it can break gcc-multilib
-    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip ninja
+    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip ninja glslang
 
     gtk=gtk3
 
     $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
 
-    libs="zlib mesa gettext sdl3 wxgtk3 $gtk"
+    libs="zlib mesa gettext sdl3 wxgtk3 $gtk vulkan-headers vulkan-icd-loader"
 
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && libs="$libs openal"
@@ -1088,7 +1094,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel
+    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel glslang vulkan-devel
 
     [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
@@ -1168,6 +1174,9 @@ gentoo_installdeps() {
       sys-libs/zlib \
       dev-util/pkgconf \
       dev-lang/nasm \
+      dev-util/glslang \
+      dev-util/vulkan-headers \
+      media-libs/vulkan-loader \
       dev-build/ninja"
 
     [ -n "$ENABLE_FFMPEG" ] && ebuilds="$ebuilds media-video/ffmpeg"
@@ -1181,7 +1190,7 @@ gentoo_installdeps() {
 alpine_installdeps() {
     installing
 
-    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl3-dev glu-dev wxwidgets-dev gtk+3.0-dev zip
+    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl3-dev glu-dev wxwidgets-dev gtk+3.0-dev zip glslang vulkan-headers vulkan-loader-dev
 
     build_instructions
 }
@@ -1216,7 +1225,7 @@ windows_installdeps() {
             ;;
     esac
 
-    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache"
+    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache glslang vulkan-headers vulkan-loader"
 
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
 
@@ -1294,7 +1303,7 @@ brew_installdeps() {
 
     # pkg-config is now only an alias for pkgconf.  Unlike the MacPorts one,
     # the Homebrew faudio is built against SDL 3 and so works with our build.
-    brews="nasm cmake ccache gettext libtiff pkgconf ninja zlib bzip2 sdl3 wxwidgets lua faudio molten-vk vulkan-loader vulkan-headers"
+    brews="nasm cmake ccache gettext libtiff pkgconf ninja zlib bzip2 sdl3 wxwidgets lua faudio molten-vk vulkan-loader vulkan-headers glslang"
 
     [ -n "$ENABLE_FFMPEG" ] && brews="$brews ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && brews="$brews openal-soft"
@@ -1326,7 +1335,7 @@ macports_installdeps() {
     # rather than pkgconf: the two conflict, and pkgconfig is what MacPorts
     # installs by default for the path:bin/pkg-config:pkgconfig dependency that
     # glib2, cairo and friends declare, so it is the one already on the system.
-    ports="cmake ccache nasm gettext pkgconfig ninja zlib bzip2 tiff libiconv SDL3 wxWidgets-3.2 lua54 MoltenVK vulkan-loader vulkan-headers"
+    ports="cmake ccache nasm gettext pkgconfig ninja zlib bzip2 tiff libiconv SDL3 wxWidgets-3.2 lua54 MoltenVK vulkan-loader vulkan-headers glslang"
 
     [ -n "$ENABLE_FFMPEG" ] && ports="$ports ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && ports="$ports openal-soft"
