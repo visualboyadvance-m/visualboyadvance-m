@@ -20,8 +20,8 @@
  *
  * Build: cc -O2 -shared -fPIC -o libnr_layer.so nr_layer.c -lvulkan
  */
-#ifdef __linux__
-#define VK_USE_PLATFORM_XLIB_KHR   /* pulls in X11 headers, which macOS does not have */
+#if defined(__linux__) && !defined(__ANDROID__) && !defined(_WIN32)
+#define VK_USE_PLATFORM_XLIB_KHR   /* pulls in X11 headers, which macOS and Android do not have */
 #endif
 #include <stdio.h>
 #include <stdlib.h>

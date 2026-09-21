@@ -233,6 +233,25 @@ Vulkan SDK; the Vulkan layer and its tests are POSIX and stay off there
 `libnr_frame.dll`, `nr_frame.exe`); nobody has yet *run* it on a Windows machine, and the
 MSVC path is configured, not measured (`notes/phase69`).
 
+**Android** builds with the NDK's own toolchain file and nothing else named:
+
+```sh
+cmake -S . -B build-android \
+      -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+      -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=28
+cmake --build build-android
+```
+
+It links the NDK's `libvulkan.so`, builds `bin2c` and `slice` for the machine doing the build
+(a compiler from your `PATH`; `-DNR_HOST_CC=` names one), compiles the weights and shaders in,
+and produces the libraries, `libdlssnr.a` and the executables — `test_dlssnr` runs from
+`/data/local/tmp` over `adb`. The `nr_frame` command needs a libpng for the target (vcpkg's
+`arm64-android` triplet has one); the Vulkan layer stays off, there being no game to hook.
+VBA-M's `tools/android/build-android-qt.sh` links `libdlssnr.a` into its Qt APK the same way.
+Built for arm64-v8a and armeabi-v7a; **not yet run on a device** — a phone has no cooperative
+matrix, so it takes the portable GEMM path, and needs a Vulkan 1.3 driver with `shaderFloat16`,
+`storageBuffer16BitAccess` and `bufferDeviceAddress` (`notes/phase72`).
+
 `make` also builds `work/libnr_image.so` (`.dylib` on macOS, as every library here): the full-frame passes around the network —
 feature assembly, the resizes, the composition, the 8-bit codecs — in C rather than NumPy,
 worth about 2.6x on the host side of a frame. It is built with `-march=native`, so rebuild

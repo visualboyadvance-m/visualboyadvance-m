@@ -1,6 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-20**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-09-21**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -9,7 +9,29 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: the weights compiled into libnr_frame (2026-09-20, later)
+## Latest: it builds for Android (2026-09-21)
+
+The CMake build goes through the Android NDK — `-DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake
+-DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=28` standalone, or inside VBA-M's
+`tools/android/build-android-qt.sh`, which already passes `ENABLE_VULKAN=ON` and now links
+`libdlssnr.a` into the Qt APK. `find_package(Vulkan)` finds the NDK's `libvulkan.so` by itself;
+`bin2c` and `slice` are built for the build machine (VBA-M's `host_compile()`, or this tree's
+own `NR_HOST_CC` fallback, which refuses the cross toolchain's directory); the weights compile
+under the same two-job pool. **Built and linked for arm64-v8a and armeabi-v7a; nothing has
+run on a device.** `notes/phase72`.
+
+Three things a next reader needs. **The layer defaults off on Android** and its X11 define is
+now `__linux__ && !__ANDROID__` — Android is `__linux__` with no `X11/Xlib.h`, which was the
+one compile failure. **VBA-M's Release build hands `-ffast-math` to every target here**, and
+has since the archive was added: the exact flags come later on the line and win — verified on
+the NDK's clang 21, no `fmadd` and no reassociation — so it is a warning, now silenced, not a
+numerics change. And **a phone takes the portable GEMM path** with no cooperative matrix, on a
+subgroup width nobody has measured (Adreno 64, Mali 16, against the 32 of Xe2 and Apple); the
+device must be Vulkan 1.3 with `shaderFloat16`, `storageBuffer16BitAccess`,
+`bufferDeviceAddress`, the memory model and `scalarBlockLayout`, or `xmx_open` fails and the
+filter drops to none. `nr_temp_dir()` now knows `/data/local/tmp`.
+
+## The weights compiled into libnr_frame (2026-09-20, later)
 
 The CMake build now embeds `dlssnr-logical.safetensors` — found in the source root or
 `work/mlxw/`, or named with `-DNR_WEIGHTS_FILE=` — into `libnr_frame` through **bin2c**

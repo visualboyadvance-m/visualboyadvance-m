@@ -9,6 +9,11 @@
 # triplet of the same tree; the NDK's own CMake toolchain file is used and the
 # repository's vcpkg glue (cmake/Set-Toolchain-vcpkg.cmake) chains it.
 #
+# ENABLE_VULKAN=ON also brings third_party/dlss-nr-on-vulkan into the build:
+# libdlssnr.a (the DLSS NR compute runtime, frame library, embedded weights and
+# shaders) is linked into the app module, so the APK grows by the ~290 MB of
+# weights. Pass -DENABLE_VULKAN=OFF as an extra argument to leave it out.
+#
 # Override any of the paths below via the environment before running.
 
 set -euo pipefail

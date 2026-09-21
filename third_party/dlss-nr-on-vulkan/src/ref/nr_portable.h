@@ -187,13 +187,16 @@ static inline void nr_setenv_default(const char *name, const char *value)
 #endif
 }
 
-/* Somewhere writable for a scratch file: TMPDIR, TEMP or TMP if set, else /tmp or `.`. */
+/* Somewhere writable for a scratch file: TMPDIR, TEMP or TMP if set, else /tmp or `.` --
+ * and on Android, which has no /tmp, the directory adb shell can write to. */
 static inline const char *nr_temp_dir(void)
 {
     const char *names[] = { "TMPDIR", "TEMP", "TMP" };
     for (size_t i = 0; i < 3; i++) { const char *v = getenv(names[i]); if (v && *v) return v; }
 #ifdef _WIN32
     return ".";
+#elif defined(__ANDROID__)
+    return "/data/local/tmp";
 #else
     return "/tmp";
 #endif

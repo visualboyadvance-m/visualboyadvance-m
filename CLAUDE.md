@@ -111,6 +111,10 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   (`xmx_adopt` / `nr_frame_adopt_vulkan`); it withdraws the share before
   destroying the device, which closes the model (`xmx_close`), and the next
   pass reopens it standalone
+- The DLSS NR tree cross-builds for Android with the NDK toolchain file (standalone or
+  inside `build-android-qt.sh`, which passes `ENABLE_VULKAN=ON` and links `libdlssnr.a`
+  into the Qt APK); the layer defaults off there, `bin2c`/`slice` are host-compiled, and
+  no device has run it yet (`third_party/dlss-nr-on-vulkan/notes/phase72-android.md`)
 
 ### Key Design Patterns
 

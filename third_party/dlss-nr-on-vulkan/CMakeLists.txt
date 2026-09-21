@@ -18,10 +18,19 @@
 #   Linux, macOS    the Vulkan layer libnr_layer and its POSIX tests (NR_BUILD_LAYER)
 #   macOS           libxmx and gemm_runner link MoltenVK directly (NR_XMX_LINK_MOLTENVK);
 #                   the layer and its tests link the loader; work/MoltenVK_icd.json is written
+#   Android         the libraries, libdlssnr and the executables against the NDK's libvulkan.so,
+#                   with the NDK's own toolchain file; the layer stays off (there is no game to
+#                   hook and no daemon), bin2c and slice are built for the build machine
 #
 # Windows: built and linked as a MinGW-w64 cross-compile from macOS (x86_64-pc-mingw32-gcc,
 # -DCMAKE_SYSTEM_NAME=Windows, libpng and the Vulkan import library under the cross prefix);
 # not yet run on a Windows machine, and MSVC is configured, not measured (notes/phase69).
+#
+# Android: standalone,
+#     cmake -S . -B build-android -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+#           -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=28 && cmake --build build-android
+# or as part of VBA-M's tools/android/build-android-qt.sh, which links libdlssnr into the Qt
+# APK. Built and linked here for arm64-v8a; nothing has run on a device yet (notes/phase72).
 cmake_minimum_required(VERSION 3.21)
 project(dlss_nr_on_vulkan LANGUAGES C)
 
@@ -36,6 +45,8 @@ set(NR_WORK_DIR "${PROJECT_SOURCE_DIR}/work" CACHE PATH "the inputs the build do
 set(NR_OUTPUT_DIR "${CMAKE_BINARY_DIR}" CACHE PATH "where libraries, executables and SPIR-V land; -DNR_OUTPUT_DIR=work reproduces the Makefile layout")
 if(WIN32)
   set(NR_LAYER_DEFAULT OFF)                        # Unix sockets and pthreads; not ported
+elseif(ANDROID)
+  set(NR_LAYER_DEFAULT OFF)                        # compiles, but there is no game to hook and no daemon
 else()
   set(NR_LAYER_DEFAULT ON)
 endif()
@@ -230,6 +241,12 @@ else()
   set(NR_EXACT_FLAGS -ffp-contract=off -fno-fast-math)
   set(NR_WARN_FLAGS -Wall -Wextra -Wno-unused-parameter)
   set(NR_NATIVE_FLAGS "")
+  # A host that compiles everything with -ffast-math (VBA-M's Release build) hands it to
+  # these targets too; the exact flags come after it on the line and win -- checked on the
+  # NDK's clang 21: no fmadd, no reassociation -- but clang says so for every file.
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang")
+    list(APPEND NR_WARN_FLAGS -Wno-overriding-option)
+  endif()
 endif()
 
 if(NR_NO_FLOAT16)
@@ -297,6 +314,45 @@ if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS)
       host_compile("${PROJECT_SOURCE_DIR}/src/tools/bin2c.c" "${NR_BIN2C}")
       host_compile("${PROJECT_SOURCE_DIR}/src/tools/slice.c" "${NR_SLICE}")
       message(STATUS "cross-compiling: bin2c and slice built for the host with host_compile()")
+    endif()
+    if(NOT nr_host_compile AND NOT NR_BIN2C AND NOT NR_SLICE)
+      # Standalone -- an NDK toolchain file, say -- the module is not there, so do the
+      # same thing here: a C compiler from this machine's PATH, and never the cross
+      # toolchain's own, which the toolchain file puts on CMake's program search and
+      # which would quietly build the tools for the target.
+      if(NOT NR_HOST_CC)
+        if(CMAKE_HOST_APPLE AND EXISTS /usr/bin/clang)
+          set(NR_HOST_CC /usr/bin/clang CACHE FILEPATH "C compiler that builds executables for the build host")
+        else()
+          find_program(NR_HOST_CC NAMES cc clang gcc PATHS ENV PATH NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH
+            DOC "C compiler that builds executables for the build host")
+        endif()
+      endif()
+      if(NR_HOST_CC)
+        get_filename_component(nr_host_cc_dir "${NR_HOST_CC}" DIRECTORY)
+        get_filename_component(nr_target_cc_dir "${CMAKE_C_COMPILER}" DIRECTORY)
+        if(nr_host_cc_dir STREQUAL nr_target_cc_dir)
+          message(WARNING "the only C compiler found for this machine, ${NR_HOST_CC}, is the cross toolchain's own; name one with -DNR_HOST_CC= (or -DNR_BIN2C= and -DNR_SLICE=)")
+          unset(NR_HOST_CC CACHE)
+        endif()
+      endif()
+      if(NR_HOST_CC)
+        set(nr_host_tools_dir "${CMAKE_CURRENT_BINARY_DIR}/tools")
+        file(MAKE_DIRECTORY "${nr_host_tools_dir}")
+        set(nr_host_exe_suffix "")
+        if(CMAKE_HOST_WIN32)
+          set(nr_host_exe_suffix ".exe")
+        endif()
+        set(NR_BIN2C "${nr_host_tools_dir}/bin2c_dlss${nr_host_exe_suffix}")
+        set(NR_SLICE "${nr_host_tools_dir}/slice_dlss${nr_host_exe_suffix}")
+        add_custom_command(OUTPUT "${NR_BIN2C}"
+          COMMAND "${NR_HOST_CC}" "${PROJECT_SOURCE_DIR}/src/tools/bin2c.c" -o "${NR_BIN2C}"
+          DEPENDS "${PROJECT_SOURCE_DIR}/src/tools/bin2c.c" COMMENT "host cc bin2c_dlss" VERBATIM)
+        add_custom_command(OUTPUT "${NR_SLICE}"
+          COMMAND "${NR_HOST_CC}" "${PROJECT_SOURCE_DIR}/src/tools/slice.c" -o "${NR_SLICE}"
+          DEPENDS "${PROJECT_SOURCE_DIR}/src/tools/slice.c" COMMENT "host cc slice_dlss" VERBATIM)
+        message(STATUS "cross-compiling: bin2c and slice built for the host with ${NR_HOST_CC}")
+      endif()
     endif()
     if(NOT NR_BIN2C)
       find_program(NR_BIN2C NAMES bin2c DOC "a host build of src/tools/bin2c.c")
