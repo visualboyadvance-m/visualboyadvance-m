@@ -1,6 +1,6 @@
 # Index of the notes
 
-Ninety-two files, sixty-three phases. This is what each one settles, so a reader arriving
+Ninety-three files, sixty-four phases. This is what each one settles, so a reader arriving
 cold can go straight to the answer instead of the archaeology.
 
 **Read `notes/HANDOFF.md` first** — it carries the current state, the standing conclusions and
@@ -110,6 +110,7 @@ disproved.
 | `phase70-cmake-build-directory.md` | the CMake build lands in its own directory rather than `work/`: `src/nr_build.py` as the one place the Python asks where a build put the libraries, executables and SPIR-V (`NR_BUILD_DIR`, else the newest of `work/` and `build*/`), `NR_OUTPUT_DIR` in CMake, ctest told where its build is, the C command finding the weights from `build/`; the two-builds trap |
 | `phase71-embedded-weights.md` | the logical weights compiled into `libnr_frame` by the CMake build: `bin2c` (`src/tools/bin2c.c`) over 8 MB slices cut by `src/tools/slice.c`, one translation unit each under a two-job pool because a compiler holds a byte-array initializer at ~90 bytes per byte; the safetensors reader given a source abstraction so `nr_frame_open(NULL)` reads the slices; the command, the C test and `NativeFrame()` default to them; then the fifteen SPIR-V modules compiled into libxmx and gemm_runner the same way, loaded by name with a file path as the override and the embedded module as the fallback |
 | `phase72-android.md` | the tree cross-builds for Android with the NDK toolchain, standalone and inside VBA-M's Qt APK: what configured on its own, the one failure (`VK_USE_PLATFORM_XLIB_KHR` under `__linux__`), the `-ffast-math` VBA-M hands every target and why the exact flags still win (verified on the NDK's clang), the host-compiler fallback for `bin2c`/`slice`, `/data/local/tmp`; built for arm64-v8a and armeabi-v7a, run on nothing |
+| `phase73-mali.md` | the first device: a Mali-G57 MC2 phone aborted inside `vkCreateComputePipelines` on `attention.spv` (`LLVM ERROR: Cannot select: intrinsic %llvm.bifrost.2556`), because the row pass fenced its shared-memory staging with a *subgroup*-scope barrier on a 32-wide workgroup — and Mali's subgroup is 16, so the barrier was wrong as well as uncompilable; `barrier()` fixes it and all 34 C checks pass on the phone at 6.7 s a pass; how to reproduce with `test_dlssnr` under `adb shell` and `XMX_ROW_SPV`, and the device's Vulkan properties |
 | `phase30-control-atlas.md` | what each vendor slider does, and one that does nothing |
 
 ## Reviews

@@ -17,7 +17,6 @@
 #extension GL_EXT_scalar_block_layout : require
 #extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
 #extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
-#extension GL_KHR_shader_subgroup_basic : require
 
 #include "publish.glsl"
 
@@ -40,7 +39,15 @@ layout(push_constant, scalar) uniform Push {
  * apart and every load instruction spans sixty-four cache lines. Staging the
  * workgroup's rows through shared memory makes the global traffic contiguous — the
  * cosine publish went from 23.7 GB/s to the 80-odd the other passes reach — while each
- * invocation still sees its own row whole, which the vendor's fragment tree requires. */
+ * invocation still sees its own row whole, which the vendor's fragment tree requires.
+ *
+ * The staging is fenced with workgroup-scope barriers, not subgroup ones. The workgroup
+ * is 32 wide and was measured where a subgroup is too (Xe2, Apple), but Mali runs 16-wide
+ * subgroups, so a subgroup barrier would fence only half the rows -- and the Bifrost/
+ * Valhall shader compiler cannot even build a subgroup-scope OpControlBarrier: on a
+ * Mali-G57 it aborts the process with "LLVM ERROR: Cannot select: intrinsic
+ * %llvm.bifrost.2556" from inside vkCreateComputePipelines (notes/phase73-mali.md).
+ * `barrier()` on a single-subgroup workgroup costs the same on the drivers measured. */
 shared float stage[32 * 64];
 
 /* `count` consecutive floats from `base`, spread across the workgroup. */
@@ -74,13 +81,13 @@ void gather(uint base, uint count) {
         for (uint i = gl_LocalInvocationID.x; i < count; i += 32u) stage[i] = float(h.v[base + i]);
     } else
     for (uint i = gl_LocalInvocationID.x; i < count; i += 32u) stage[i] = pc.a.v[base + i];
-    subgroupMemoryBarrierShared();
-    subgroupBarrier();
+    memoryBarrierShared();
+    barrier();
 }
 
 void scatter(uint base, uint count) {
-    subgroupMemoryBarrierShared();
-    subgroupBarrier();
+    memoryBarrierShared();
+    barrier();
     if ((operation_flags() & 0x1000u) != 0u) {
         HalfBuf h = HalfBuf(uint64_t(pc.c));
         for (uint i = gl_LocalInvocationID.x; i < count; i += 32u)

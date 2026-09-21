@@ -17,8 +17,11 @@ The CMake build goes through the Android NDK — `-DCMAKE_TOOLCHAIN_FILE=$NDK/bu
 `libdlssnr.a` into the Qt APK. `find_package(Vulkan)` finds the NDK's `libvulkan.so` by itself;
 `bin2c` and `slice` are built for the build machine (VBA-M's `host_compile()`, or this tree's
 own `NR_HOST_CC` fallback, which refuses the cross toolchain's directory); the weights compile
-under the same two-job pool. **Built and linked for arm64-v8a and armeabi-v7a; nothing has
-run on a device.** `notes/phase72`.
+under the same two-job pool. Built and linked for arm64-v8a and armeabi-v7a; `notes/phase72`. **It has now run on one device**, a
+Mali-G57 MC2 phone, after one fix: the row pass fenced its shared-memory staging with a
+subgroup-scope barrier that Mali's compiler aborts on (and that would fence only half of a
+32-wide workgroup on a 16-lane subgroup); it is a `barrier()` now, all 34 C checks pass on
+the phone, at 6.7 s a pass. `notes/phase73`.
 
 Three things a next reader needs. **The layer defaults off on Android** and its X11 define is
 now `__linux__ && !__ANDROID__` — Android is `__linux__` with no `X11/Xlib.h`, which was the

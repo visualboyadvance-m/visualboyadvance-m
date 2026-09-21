@@ -62,6 +62,9 @@ The weights are the APK. Before this the module was a few tens of MB.
 
 ## What is not claimed
 
+*(Written before any device run. `phase73-mali.md` has the first one: a Mali-G57 needed one
+shader fix, the subgroup barrier in `attention.comp`, and then passed all 34 checks.)*
+
 **Nothing has run on a device.** There is no Android device attached to this build, and the
 owner's phone holds their signed copy that must not be replaced (`memory: reference_android_device_testing`).
 What a device will need, and what is unknown:
