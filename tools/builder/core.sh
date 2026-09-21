@@ -892,7 +892,7 @@ mac_brew_install_core_deps() {
     # asks for in VCPKG_HOST_DEPS: the build runs glslangValidator on this
     # machine to compile the DLSS NR shaders.  vcpkg keeps the binaries behind
     # that feature, while the formula here carries them with the libraries.
-    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext wxwidgets glslang
+    "$BREW_PREFIX"/bin/brew install -q bzip2 xz 7-zip autoconf autoconf-archive automake libtool gnu-getopt bison flex m4 gperf pkgconf nasm python perl perl-xml-parser meson ninja pyenv cmake ccache swig gettext wxwidgets glslang shaderc
 
     ln -sf "$(find "$BREW_PREFIX"/Cellar/gnu-getopt -path '*/bin/getopt'  | head -1)" "$BUILD_ROOT/root/bin/getopt"
     ln -sf "$(find "$BREW_PREFIX"/Cellar/m4         -path '*/bin/m4'      | head -1)" "$BUILD_ROOT/root/bin/m4"
@@ -935,7 +935,7 @@ mac_macports_install_core_deps() {
         autoconf-archive automake libtool util-linux bison flex m4 gperf \
         pkgconfig nasm "$mp_python_port" "$mp_python_pip" perl5 p5-xml-parser \
         meson ninja cmake ccache swig swig-python gettext wxWidgets-3.2 \
-        glslang
+        glslang shaderc
 
     # wxWidgets-3.2 is in that list only for its wxrc: a cross build compiles a
     # target-architecture wxrc into the build root that this machine cannot
