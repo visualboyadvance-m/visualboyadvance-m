@@ -178,14 +178,6 @@ if(NOT DEFINED VCPKG_TARGET_TRIPLET)
             endif()
             if(lib MATCHES "ARM64$")
                 set(VBAM_VCPKG_PLATFORM "arm64-windows-static")
-
-                foreach(path $ENV{PATH})
-                    if(path MATCHES "[Hh]ost[Xx]64")
-                        set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "Vcpkg host triplet" FORCE)
-                        set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
-                    endif()
-                endforeach()
-
                 break()
             endif()
         endforeach()
@@ -228,20 +220,63 @@ if(VCPKG_TARGET_TRIPLET STREQUAL "arm-android")
         "Triplet arm-android rewritten to arm-neon-android: NDK r29 requires Neon on armeabi-v7a")
 endif()
 
-# An arm64 Windows target named on the command line, on an x64 host. The
-# inference above sets the host triplet for the case it infers and no other, and
-# without one vcpkg.cmake puts the *target* triplet's tools directory on
-# CMAKE_PROGRAM_PATH: every find_program() then hands the build an arm64
-# executable to run here, which Windows refuses ("not compatible with the
-# version of Windows you're running"). The build runs glslangValidator, so this
-# is not theoretical. Asked of the environment rather than of
-# CMAKE_HOST_SYSTEM_PROCESSOR, which project() has not set yet at this point.
-if(CMAKE_HOST_WIN32 AND NOT VCPKG_HOST_TRIPLET
-   AND VCPKG_TARGET_TRIPLET MATCHES "^arm64-windows"
-   AND NOT "$ENV{PROCESSOR_ARCHITECTURE}$ENV{PROCESSOR_ARCHITEW6432}" MATCHES "ARM64")
-    set(VCPKG_HOST_TRIPLET "x64-windows" CACHE STRING "Vcpkg host triplet" FORCE)
-    set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
-    message(STATUS "Cross build for ${VCPKG_TARGET_TRIPLET}: host tools come from ${VCPKG_HOST_TRIPLET}")
+# The triplet for the machine running the build, settled here alongside the
+# target one and always set, whatever the target turns out to be.
+#
+# vcpkg.cmake has no host triplet of its own to fall back on: without one it
+# forces VCPKG_USE_HOST_TOOLS off and puts the *target* triplet's tools
+# directory on CMAKE_PROGRAM_PATH, so in a cross build every find_program()
+# hands the build an executable this machine cannot run -- an arm64
+# glslangValidator on an x64 host, which Windows refuses ("not compatible with
+# the version of Windows you're running"), or an Android one, which it cannot
+# make sense of at all. The build does run glslangValidator, so this is not
+# theoretical.
+#
+# This is a property of the machine and nothing else, so it is read off the
+# machine: x64-windows on Windows unless the host really is arm64, and the
+# equivalent elsewhere. The architecture is asked of the environment rather
+# than of CMAKE_HOST_SYSTEM_PROCESSOR, which project() has not set yet at this
+# point.
+if(NOT DEFINED VCPKG_HOST_TRIPLET OR VCPKG_HOST_TRIPLET STREQUAL "")
+    if(CMAKE_HOST_WIN32)
+        set(vbam_host_machine "$ENV{PROCESSOR_ARCHITECTURE}$ENV{PROCESSOR_ARCHITEW6432}")
+        set(vbam_host_os      windows)
+    else()
+        execute_process(
+            COMMAND uname -m
+            OUTPUT_VARIABLE vbam_host_machine
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+
+        if(CMAKE_HOST_APPLE)
+            set(vbam_host_os osx)
+        else()
+            set(vbam_host_os linux)
+        endif()
+    endif()
+
+    if(vbam_host_machine MATCHES "[aA][rR][mM]64|[aA][aA][rR][cC][hH]64")
+        set(vbam_host_arch arm64)
+    else()
+        set(vbam_host_arch x64)
+    endif()
+
+    set(VCPKG_HOST_TRIPLET "${vbam_host_arch}-${vbam_host_os}"
+        CACHE STRING "Vcpkg host triplet" FORCE)
+
+    unset(vbam_host_machine)
+    unset(vbam_host_os)
+    unset(vbam_host_arch)
+endif()
+
+set(VCPKG_USE_HOST_TOOLS ON CACHE BOOL "Use vcpkg host tools" FORCE)
+
+if(VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET)
+    message(STATUS "Native build for ${VCPKG_TARGET_TRIPLET}")
+else()
+    message(STATUS
+        "Building for ${VCPKG_TARGET_TRIPLET}: host tools come from ${VCPKG_HOST_TRIPLET}")
 endif()
 
 # Remember a toolchain file the caller already selected.
@@ -1050,31 +1085,6 @@ function(cleanup_binary_packages)
     unset(VCPKG_INSTALLED_COUNT CACHE)
 endfunction()
 
-# The triplet vcpkg builds host tools for: the machine doing the building, which
-# is only the target triplet when not cross-compiling.
-function(vcpkg_host_triplet outvar)
-    if(VCPKG_HOST_TRIPLET)
-        set(${outvar} "${VCPKG_HOST_TRIPLET}" PARENT_SCOPE)
-        return()
-    endif()
-
-    if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([aA][aA][rR][cC][hH]64|[aA][rR][mM]64)$")
-        set(host_arch arm64)
-    else()
-        set(host_arch x64)
-    endif()
-
-    if(CMAKE_HOST_WIN32)
-        set(host_os windows)
-    elseif(CMAKE_HOST_APPLE)
-        set(host_os osx)
-    else()
-        set(host_os linux)
-    endif()
-
-    set(${outvar} "${host_arch}-${host_os}" PARENT_SCOPE)
-endfunction()
-
 # Install the host tools the target packages ask for from binary packages rather
 # than leaving vcpkg to build them. Cross-compiling for Android needs a host Qt
 # to run moc and androiddeployqt, and building one from source costs more than
@@ -1092,9 +1102,7 @@ endfunction()
 function(get_host_binary_packages wanted_ports outvar)
     set(${outvar} TRUE PARENT_SCOPE)
 
-    vcpkg_host_triplet(host_triplet)
-
-    if(host_triplet STREQUAL VCPKG_TARGET_TRIPLET)
+    if(VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET)
         return()
     endif()
 
@@ -1154,15 +1162,15 @@ function(get_host_binary_packages wanted_ports outvar)
 
     list(REMOVE_DUPLICATES host_deps)
 
-    get_triplet_package_list(${host_triplet})
+    get_triplet_package_list(${VCPKG_HOST_TRIPLET})
 
-    if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${host_triplet}.html")
-        message(STATUS "No binary package list for host triplet '${host_triplet}'; vcpkg will build the host tools.")
+    if(NOT EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_HOST_TRIPLET}.html")
+        message(STATUS "No binary package list for host triplet '${VCPKG_HOST_TRIPLET}'; vcpkg will build the host tools.")
         set(${outvar} FALSE PARENT_SCOPE)
         return()
     endif()
 
-    file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${host_triplet}.html" raw_html)
+    file(READ "${CMAKE_BINARY_DIR}/binary_package_list_${VCPKG_HOST_TRIPLET}.html" raw_html)
 
     vcpkg_package_dates("${raw_html}" host_package_dates)
 
@@ -1174,7 +1182,7 @@ function(get_host_binary_packages wanted_ports outvar)
     set(host_to_install "")
 
     foreach(dep ${host_deps})
-        vcpkg_is_installed(${dep} 0 ${host_triplet} ${POWERSHELL} dep_installed)
+        vcpkg_is_installed(${dep} 0 ${VCPKG_HOST_TRIPLET} ${POWERSHELL} dep_installed)
 
         string(REGEX MATCHALL "<a href=\"${dep}_[^\"]+[.]zip\"" links "${raw_html}")
         list(LENGTH links links_count)
@@ -1183,7 +1191,7 @@ function(get_host_binary_packages wanted_ports outvar)
             # One that is installed and has nothing on offer needs nothing from
             # anybody; one that is not installed has to come from somewhere.
             if(NOT dep_installed)
-                message(STATUS "No single binary package for host dependency '${dep}:${host_triplet}', will build from source.")
+                message(STATUS "No single binary package for host dependency '${dep}:${VCPKG_HOST_TRIPLET}', will build from source.")
                 set(host_all_found FALSE)
             endif()
 
@@ -1203,7 +1211,7 @@ function(get_host_binary_packages wanted_ports outvar)
             endif()
 
             message(STATUS
-                "Host tool '${dep}:${host_triplet}' has been rebuilt on the "
+                "Host tool '${dep}:${VCPKG_HOST_TRIPLET}' has been rebuilt on the "
                 "server, reinstalling it.")
         endif()
 
@@ -2257,14 +2265,12 @@ function(vcpkg_set_toolchain)
     # build invokes directly is nobody's dependency, so it is asked for by name.
     # Only what is still missing after the binary packages, by port and by
     # feature: a glslang without [tools] has no glslangValidator in it.
-    vcpkg_host_triplet(vcpkg_host)
-
-    if(VCPKG_HOST_DEPS AND NOT vcpkg_host STREQUAL VCPKG_TARGET_TRIPLET AND NOT NO_VCPKG_UPDATES)
+    if(VCPKG_HOST_DEPS AND NOT VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET AND NOT NO_VCPKG_UPDATES)
         set(host_deps_wanted "")
 
         foreach(dep ${VCPKG_HOST_DEPS})
             string(REGEX REPLACE "\\[.*\\]" "" port_name "${dep}")
-            vcpkg_ports_not_installed("${port_name}" "${vcpkg_host}" port_absent)
+            vcpkg_ports_not_installed("${port_name}" "${VCPKG_HOST_TRIPLET}" port_absent)
 
             if(port_absent)
                 list(APPEND host_deps_wanted "${dep}")
@@ -2275,8 +2281,8 @@ function(vcpkg_set_toolchain)
                 # Reads the status database, which also fills the feature
                 # listing vcpkg_missing_features() consults; the binary-package
                 # step cleared the cached copy when it finished.
-                vcpkg_is_installed(${port_name} 0 ${vcpkg_host} ${POWERSHELL} port_installed)
-                vcpkg_missing_features("${dep}" "${vcpkg_host}" features_absent)
+                vcpkg_is_installed(${port_name} 0 ${VCPKG_HOST_TRIPLET} ${POWERSHELL} port_installed)
+                vcpkg_missing_features("${dep}" "${VCPKG_HOST_TRIPLET}" features_absent)
 
                 if(NOT port_installed OR features_absent)
                     list(APPEND host_deps_wanted "${dep}")
@@ -2285,10 +2291,10 @@ function(vcpkg_set_toolchain)
         endforeach()
 
         if(host_deps_wanted)
-            message(STATUS "Installing the tools the build runs for ${vcpkg_host}: ${host_deps_wanted}")
+            message(STATUS "Installing the tools the build runs for ${VCPKG_HOST_TRIPLET}: ${host_deps_wanted}")
 
             execute_process(
-                COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${vcpkg_host} install ${host_deps_wanted} --allow-unsupported --recurse --keep-going
+                COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_HOST_TRIPLET} install ${host_deps_wanted} --allow-unsupported --recurse --keep-going
                 WORKING_DIRECTORY ${VCPKG_ROOT}
             )
 
@@ -2331,3 +2337,49 @@ endfunction()
 vcpkg_set_toolchain()
 
 include(${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake)
+
+# vcpkg.cmake registers exactly one tools tree on CMAKE_PROGRAM_PATH, and with
+# host tools turned on that is the host's. The tools the *target* set brings in
+# live in the target tree -- wxrc, msgfmt, the pcre2 and libiconv helpers --
+# and for a vcpkg build that tree is the only place they appear at all, PATH
+# knows nothing about them. A native build used to get them because the target
+# tree was the tree that got registered; drop it and the wx build stops at
+# "Could not find a wxrc executable".
+#
+# So put it back, behind the host's rather than in front of it: a tool that
+# runs here is still found first, and one that exists only for the target is
+# found rather than not found. That is also an improvement on what a cross
+# build had before, where the target tree was the only one on offer and every
+# hit in it was a binary this machine cannot execute.
+if(DEFINED VCPKG_TARGET_TRIPLET AND NOT VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET)
+    if(DEFINED VCPKG_INSTALLED_DIR)
+        set(vbam_target_tools "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/tools")
+    else()
+        set(vbam_target_tools "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools")
+    endif()
+
+    if(IS_DIRECTORY "${vbam_target_tools}")
+        list(APPEND CMAKE_PROGRAM_PATH "${vbam_target_tools}")
+
+        # Each port's own directory, and its bin/ where it has one, the way
+        # vcpkg.cmake lays out the tree it registers itself.
+        file(GLOB vbam_target_tool_dirs LIST_DIRECTORIES true "${vbam_target_tools}/*")
+
+        foreach(vbam_target_tool_dir IN LISTS vbam_target_tool_dirs)
+            if(NOT IS_DIRECTORY "${vbam_target_tool_dir}")
+                continue()
+            endif()
+
+            if(IS_DIRECTORY "${vbam_target_tool_dir}/bin")
+                list(APPEND CMAKE_PROGRAM_PATH "${vbam_target_tool_dir}/bin")
+            else()
+                list(APPEND CMAKE_PROGRAM_PATH "${vbam_target_tool_dir}")
+            endif()
+        endforeach()
+
+        unset(vbam_target_tool_dir)
+        unset(vbam_target_tool_dirs)
+    endif()
+
+    unset(vbam_target_tools)
+endif()

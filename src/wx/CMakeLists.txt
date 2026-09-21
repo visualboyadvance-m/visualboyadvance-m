@@ -1576,11 +1576,10 @@ if(APPLE AND CMAKE_CROSSCOMPILING)
 endif()
 
 # When cross-compiling for Android, the wx-config from the target prefix reports
-# a target (aarch64) wxrc, and a plain find_program() lands on the same binary
-# because vcpkg puts the target triplet's tools directory on CMAKE_PROGRAM_PATH.
-# The host cannot run either: "cannot execute binary file", 150 targets into the
-# build. wxrc compiles the XRC resources during the build, so it has to be a
-# host binary. Collect the candidates -- the vcpkg host triplet's tools
+# a target (aarch64) wxrc, and a plain find_program() can land on the same
+# binary. The host cannot run either: "cannot execute binary file", 150 targets
+# into the build. wxrc compiles the XRC resources during the build, so it has
+# to be a host binary. Collect the candidates -- the vcpkg host triplet's tools
 # directory, then any other installed triplet's, then the host's own PATH with
 # CMake's vcpkg-populated search paths excluded -- and take the first that runs.
 if(ANDROID AND CMAKE_CROSSCOMPILING AND NOT WXRC AND NOT DEFINED ENV{WXRC})
@@ -1594,9 +1593,9 @@ if(ANDROID AND CMAKE_CROSSCOMPILING AND NOT WXRC AND NOT DEFINED ENV{WXRC})
             list(APPEND _wxrc_candidates ${_wxrc_hits})
         endif()
 
-        # VCPKG_HOST_TRIPLET is only set when it was passed in, so fall back to
-        # whatever other triplets have been installed; the target's own tools
-        # directory is the one thing that cannot work.
+        # The host triplet's tools directory is not guaranteed to hold a wxrc,
+        # so fall back to whatever other triplets have been installed; the
+        # target's own tools directory is the one thing that cannot work.
         file(GLOB _wxrc_hits
             "${VCPKG_INSTALLED_DIR}/*/tools/wxwidgets/wxrc-[0-9].[0-9]"
             "${VCPKG_INSTALLED_DIR}/*/tools/wxwidgets/wxrc")
