@@ -16,12 +16,13 @@
 # Emertels, 2021
 # Emertels, 2021
 # erdrsd gfdfd <654654564@64564564.com>, 2017
-# Felipefpl, 2022
+# Felipefpl, 2022,2026
 # Felipefpl, 2022,2026
 # Felipe Nascimento <aoc.anao78@gmail.com>, 2020
 # Gabriel Prado, 2022
 # Gabriel Prado, 2022
 # Gustavo Canedo <gknedo@gmail.com>, 2015
+# João Guilherme, 2026
 # João Guilherme, 2026
 # Marthay Mizover <officialjvgdac@gmail.com>, 2021
 # Josefumi Kujoh, 2021
@@ -46,7 +47,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-20 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: João Guilherme, 2026\n"
+"Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1085,24 +1086,24 @@ msgstr "Sair"
 
 #: panel.cpp:2971
 msgid "The DLSS NR filter is not available in this build; filter disabled."
-msgstr ""
+msgstr "O filtro DLSS NR não está disponível neste build; filtro desativado."
 
 #: panel.cpp:4404
 msgid "DLSS NR: loading model..."
-msgstr ""
+msgstr "DLSS NR: carregando modelo..."
 
 #: panel.cpp:4426
 #, c-format
 msgid "DLSS NR filter failed: %s"
-msgstr ""
+msgstr "O Filtro DLSS NR falhou: %s"
 
 #: panel.cpp:4427
 msgid "DLSS NR unavailable, filter disabled"
-msgstr ""
+msgstr "DLSS NR indisponível, filtro desativado"
 
 #: panel.cpp:4437
 msgid "DLSS NR ready"
-msgstr ""
+msgstr "DLSS NR pronto"
 
 #: panel.cpp:4788
 msgid "Failed to set wayland display"
