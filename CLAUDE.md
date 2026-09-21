@@ -112,9 +112,11 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   destroying the device, which closes the model (`xmx_close`), and the next
   pass reopens it standalone
 - The DLSS NR tree cross-builds for Android with the NDK toolchain file (standalone or
-  inside `build-android-qt.sh`, which passes `ENABLE_VULKAN=ON` and links `libdlssnr.a`
-  into the Qt APK); the layer defaults off there, `bin2c`/`slice` are host-compiled, and
-  no device has run it yet (`third_party/dlss-nr-on-vulkan/notes/phase72-android.md`)
+  inside `tools/android/build-android-qt.sh` and `build-android.sh`, which both pass
+  `ENABLE_VULKAN=ON` and link `libdlssnr.a` into the Qt and wx APKs; on Android
+  `ENABLE_VULKAN` is offered to either GUI port and checks the NDK sysroot for the
+  headers); the layer defaults off there, `bin2c`/`slice` are host-compiled, and no
+  device has run it yet (`third_party/dlss-nr-on-vulkan/notes/phase72-android.md`)
 
 ### Key Design Patterns
 

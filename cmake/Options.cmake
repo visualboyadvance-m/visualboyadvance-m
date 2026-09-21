@@ -404,9 +404,11 @@ option(ENABLE_LZMA "Enable LZMA archive support" ON)
 # only needs the headers: it resolves the loader at run time.
 if(VBAM_NEED_GUI_DEPS AND ANDROID)
     # The NDK sysroot carries the Vulkan headers and the platform loader
-    # (libvulkan.so, resolved at run time by the Qt port); FindVulkan does not
-    # know to look there, so check the sysroot directly. The wx port has no
-    # Android Vulkan surface path, so this only feeds the Qt port.
+    # (libvulkan.so, resolved at run time by both ports: wxDynamicLibrary in the
+    # wx panel, the run-time loader in the Qt one); FindVulkan does not know to
+    # look there, so check the sysroot directly. Both GUI ports have an Android
+    # surface path (VK_KHR_android_surface), and ENABLE_VULKAN also brings the
+    # DLSS NR display filter (third_party/dlss-nr-on-vulkan) into either APK.
     if(EXISTS "${CMAKE_SYSROOT}/usr/include/vulkan/vulkan.h")
         set(Vulkan_FOUND ON)
         set(Vulkan_INCLUDE_DIRS "${CMAKE_SYSROOT}/usr/include")
@@ -414,7 +416,7 @@ if(VBAM_NEED_GUI_DEPS AND ANDROID)
         set(Vulkan_FOUND OFF)
     endif()
 
-    if(ENABLE_QT)
+    if(ENABLE_WX OR ENABLE_QT)
         option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
     else()
         set(ENABLE_VULKAN OFF)
