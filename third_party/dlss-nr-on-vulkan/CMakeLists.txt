@@ -161,6 +161,30 @@ if(APPLE AND NR_XMX_LINK_MOLTENVK)
     message(FATAL_ERROR "NR_XMX_LINK_MOLTENVK is on and libMoltenVK.dylib was not found; set NR_MOLTENVK_LIBRARY or turn the option off")
   endif()
   set(NR_XMX_VULKAN "${NR_MOLTENVK_LIBRARY}")
+
+  # A static MoltenVK leaves its own dependencies to whoever links it, where the
+  # dylib carries them itself.  Two kinds are missing.  The frameworks: without
+  # them xmx and gemm_runner fail on _IOSurface*, _IOService*, _IORegistry*,
+  # NSView and the rest -- what MVKPhysicalDevice::initGPUInfoProperties() and
+  # MVKImage::useIOSurface() reach for.  And the C++ runtime: MoltenVK is C++
+  # and both of those targets are C, so nothing else puts libc++ on the line
+  # and 294 std:: and __cxa_* symbols go unresolved.
+  if(NR_MOLTENVK_LIBRARY MATCHES "\\.a$")
+    list(APPEND NR_XMX_VULKAN c++)
+
+    foreach(nr_fw Metal Foundation QuartzCore CoreFoundation CoreGraphics
+                  IOSurface IOKit AppKit)
+      find_library(NR_MOLTENVK_FW_${nr_fw} ${nr_fw})
+
+      if(NOT NR_MOLTENVK_FW_${nr_fw})
+        message(FATAL_ERROR "a static MoltenVK needs the ${nr_fw} framework and it was not found")
+      endif()
+
+      list(APPEND NR_XMX_VULKAN "${NR_MOLTENVK_FW_${nr_fw}}")
+    endforeach()
+
+    unset(nr_fw)
+  endif()
   get_filename_component(NR_MOLTENVK_DIR "${NR_MOLTENVK_LIBRARY}" DIRECTORY)
   # the loader finds no driver on its own on macOS; the layer tests point VK_DRIVER_FILES here
   file(WRITE "${NR_OUTPUT_DIR}/MoltenVK_icd.json"
