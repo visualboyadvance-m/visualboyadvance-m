@@ -18,6 +18,11 @@
 #include <string.h>
 #include <time.h>
 
+#ifndef _WIN32
+#define __USE_GNU
+#include <dlfcn.h>
+#endif
+
 /* -- half precision ------------------------------------------------------ */
 
 #if !defined(NR_NO_FLOAT16) && (defined(__FLT16_MANT_DIG__) || (defined(__clang__) && defined(__aarch64__)))
