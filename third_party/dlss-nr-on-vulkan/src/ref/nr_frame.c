@@ -124,9 +124,9 @@ static int xmx_load(void)
     if (X.handle) return 0;
     if (own_directory(X.dir, sizeof X.dir)) FAILF("cannot locate this library's directory");
 #ifdef NR_STATIC_XMX
-    /* libdlssnr: the runtime's objects — libxmx's, or libmetalmx's on Apple
-     * (NR_STATIC_METAL) — are linked into this very library, so there is nothing to
-     * load; the table points straight at them. */
+    /* libdlssnr: the runtime's objects — libxmx's, libmetalmx's on Apple (NR_STATIC_METAL)
+     * or libd3dmx's on Windows (NR_STATIC_D3D12) — are linked into this very library, so
+     * there is nothing to load; the table points straight at them. */
     X.handle = (nr_dl)1;
     X.open = xmx_open; X.init = xmx_init; X.res_init = xmx_res_init;
     X.embedded_shader = xmx_embedded_shader;
@@ -150,8 +150,9 @@ static int xmx_load(void)
     nr_setenv_default("MVK_CONFIG_FAST_MATH_ENABLED", "0");
 #endif
 
-    /* The compute runtime: libxmx (Vulkan) unless, on macOS, NR_GPU_BACKEND=metal asks for
-     * libmetalmx — the same entry points on Metal directly, built on Apple alone. */
+    /* The compute runtime: libxmx (Vulkan) unless NR_GPU_BACKEND asks for libmetalmx (Metal
+     * directly, built on Apple alone) or libd3dmx (Direct3D 12, built on Windows alone) —
+     * the same entry points either way. */
     const char *runtime = "libxmx";
     const char *backend = getenv("NR_GPU_BACKEND");
     if (backend && !strcmp(backend, "metal")) {
@@ -160,8 +161,14 @@ static int xmx_load(void)
 #else
         FAILF("NR_GPU_BACKEND=metal: libmetalmx exists on macOS only");
 #endif
+    } else if (backend && !strcmp(backend, "d3d12")) {
+#ifdef _WIN32
+        runtime = "libd3dmx";
+#else
+        FAILF("NR_GPU_BACKEND=d3d12: libd3dmx exists on Windows only");
+#endif
     } else if (backend && *backend && strcmp(backend, "vulkan")) {
-        FAILF("NR_GPU_BACKEND must be 'vulkan' or 'metal', not '%s'", backend);
+        FAILF("NR_GPU_BACKEND must be 'vulkan', 'metal' or 'd3d12', not '%s'", backend);
     }
 
 #if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
@@ -1944,11 +1951,15 @@ const char *nr_frame_runtime(void)
 {
 #if defined(NR_STATIC_METAL)
     return "metal";
+#elif defined(NR_STATIC_D3D12)
+    return "d3d12";
 #elif defined(NR_STATIC_XMX)
     return "vulkan";
 #else
     const char *backend = getenv("NR_GPU_BACKEND");
-    return backend && !strcmp(backend, "metal") ? "metal" : "vulkan";
+    if (backend && !strcmp(backend, "metal")) return "metal";
+    if (backend && !strcmp(backend, "d3d12")) return "d3d12";
+    return "vulkan";
 #endif
 }
 
@@ -1958,10 +1969,28 @@ int nr_frame_adopt_vulkan(void *instance, void *physical_device, void *device, v
                           void (*unlock)(void *), void *lock_context)
 {
     if (xmx_is_ready) FAILF("the device is open; nr_frame_shutdown first");
+    if (!strcmp(nr_frame_runtime(), "d3d12"))
+        FAILF("the runtime behind this library is Direct3D 12 (libd3dmx): nr_frame_adopt_d3d12 is the call");
     if (xmx_load()) return -1;
     if (!X.adopt) FAILF("this libxmx has no xmx_adopt");
     if (X.adopt(instance, physical_device, device, queue, queue_family, cooperative_matrix,
                 get_instance_proc_addr, lock, unlock, lock_context))
+        FAILF("xmx_adopt: %s", X.error());
+    return 0;
+}
+
+int nr_frame_adopt_d3d12(void *device, void *queue, void (*lock)(void *), void (*unlock)(void *),
+                         void *lock_context)
+{
+    if (xmx_is_ready) FAILF("the device is open; nr_frame_shutdown first");
+    if (strcmp(nr_frame_runtime(), "d3d12"))
+        FAILF("the runtime behind this library is %s, not Direct3D 12: nothing to adopt the device into",
+              nr_frame_runtime());
+    if (xmx_load()) return -1;
+    if (!X.adopt) FAILF("this libd3dmx has no xmx_adopt");
+    /* libd3dmx reads the device and the queue from libxmx's argument list and wants the
+     * Vulkan-only arguments NULL */
+    if (X.adopt(NULL, NULL, device, queue, 0, 0, NULL, lock, unlock, lock_context))
         FAILF("xmx_adopt: %s", X.error());
     return 0;
 }

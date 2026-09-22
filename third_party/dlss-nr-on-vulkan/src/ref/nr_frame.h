@@ -77,12 +77,24 @@ void nr_frame_close(nr_frame *frame);
  * `nr_frame_error()` otherwise, and libxmx keeps making its own device.
  *
  * Refused, with a message, when the runtime behind this library is Metal (the Apple
- * libdlssnr, or NR_GPU_BACKEND=metal): there is nothing Vulkan to adopt, and the runtime
- * opens the Metal device itself. `nr_frame_runtime()` says which one is behind. */
+ * libdlssnr, or NR_GPU_BACKEND=metal) or Direct3D 12 (a Windows libdlssnr built with
+ * NR_DLSSNR_D3D12, or NR_GPU_BACKEND=d3d12): there is nothing Vulkan to adopt, and the
+ * runtime opens its own device — or, on Direct3D 12, takes the host's through
+ * `nr_frame_adopt_d3d12`. `nr_frame_runtime()` says which one is behind. */
 int nr_frame_adopt_vulkan(void *instance, void *physical_device, void *device, void *queue,
                           unsigned queue_family, int cooperative_matrix,
                           void *get_instance_proc_addr, void (*lock)(void *),
                           void (*unlock)(void *), void *lock_context);
+
+/* The Direct3D 12 counterpart, for the libd3dmx runtime: share the host's ID3D12Device and
+ * ID3D12CommandQueue (as `void *`, so no D3D header is needed here). Lists are recorded
+ * for the queue's type, direct or compute. The device must offer Shader Model 6.2 and
+ * native 16-bit shader operations. If the host also submits on `queue` it passes
+ * `lock`/`unlock` (bracketing every ExecuteCommandLists here) and takes the same lock
+ * around its own submits and presents. Refused when the runtime behind this library is
+ * not Direct3D 12. 0 on success; `nr_frame_error()` otherwise. */
+int nr_frame_adopt_d3d12(void *device, void *queue, void (*lock)(void *), void (*unlock)(void *),
+                         void *lock_context);
 
 /* Release the device libxmx holds — its own, or an adopted one back to its host,
  * untouched. Every `nr_frame` must have been closed first. The next `nr_frame_open`
@@ -93,9 +105,10 @@ void nr_frame_shutdown(void);
 /* 1 while an adopted (shared) device is open, 0 for libxmx's own, -1 when none is. */
 int nr_frame_shared_device(void);
 
-/* The compute runtime behind this library: "vulkan" (libxmx) or "metal" (libmetalmx —
- * the Apple libdlssnr, or a shared build under NR_GPU_BACKEND=metal). Known without
- * opening a device, so a host can decide whether to share a Vulkan one. */
+/* The compute runtime behind this library: "vulkan" (libxmx), "metal" (libmetalmx — the
+ * Apple libdlssnr, or a shared build under NR_GPU_BACKEND=metal) or "d3d12" (libd3dmx — a
+ * Windows libdlssnr built with NR_DLSSNR_D3D12, or NR_GPU_BACKEND=d3d12). Known without
+ * opening a device, so a host can decide which device, if any, to share. */
 const char *nr_frame_runtime(void);
 
 /* The last failure, for the calling thread's most recent call. */

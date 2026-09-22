@@ -22,7 +22,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 # Extensions that are either the vendor's property, derived from it, or somebody else's
 # copyrighted frames. None of them has any business in a source tree.
 FORBIDDEN_SUFFIXES = {
-    ".dll", ".exe", ".sys", ".so", ".dylib", ".spv", ".air", ".metallib", ".cubin", ".ptx", ".fatbin",
+    ".dll", ".exe", ".sys", ".so", ".dylib", ".spv", ".air", ".metallib", ".dxil", ".cso",
+    ".cubin", ".ptx", ".fatbin",
     ".safetensors", ".pt", ".pth", ".onnx", ".gguf", ".bin", ".npy", ".npz",
     ".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif", ".mp4", ".webm",
     ".7z", ".zip", ".zst", ".tar", ".gz",

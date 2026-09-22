@@ -4,7 +4,9 @@ xmx — host-side interface to the Xe2 cooperative-matrix GEMM.
 
 Backed by `work/libxmx.so` (`.dylib` on macOS), a resident Vulkan context: the instance, device,
 pipeline and buffers are created once and reused, so a call costs a memcpy, a submit
-and a fence wait rather than ~80 ms of setup.
+and a fence wait rather than ~80 ms of setup. `NR_GPU_BACKEND=metal` (macOS) or `=d3d12`
+(Windows) binds libmetalmx or libd3dmx instead — the same entry points on Metal or
+Direct3D 12 (`nr_build.library`).
 
 Two things this layer must do that the kernel does not:
 

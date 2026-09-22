@@ -57,23 +57,31 @@ def build_dir(root=ROOT):
 BUILD_DIR = build_dir()
 
 
+# the compute runtime each backend is: the same `xmx_*` entry points, three libraries
+RUNTIMES = {"vulkan": "xmx", "metal": "metalmx", "d3d12": "d3dmx"}
+
+
 def backend():
     """Which compute runtime the Python loads as `xmx`: `vulkan` (libxmx, the default
-    everywhere) or `metal` (libmetalmx, macOS only — the same entry points on Metal
-    directly, `NR_GPU_BACKEND=metal`). Anything else is refused rather than guessed."""
+    everywhere), `metal` (libmetalmx, macOS only — the same entry points on Metal directly,
+    `NR_GPU_BACKEND=metal`) or `d3d12` (libd3dmx, Windows only — the same entry points on
+    Direct3D 12, `NR_GPU_BACKEND=d3d12`). Anything else is refused rather than guessed."""
     chosen = os.environ.get("NR_GPU_BACKEND", "vulkan").strip().lower() or "vulkan"
-    if chosen not in ("vulkan", "metal"):
-        raise ValueError("NR_GPU_BACKEND must be 'vulkan' or 'metal', not %r" % chosen)
+    if chosen not in RUNTIMES:
+        raise ValueError("NR_GPU_BACKEND must be 'vulkan', 'metal' or 'd3d12', not %r" % chosen)
     if chosen == "metal" and sys.platform != "darwin":
         raise ValueError("NR_GPU_BACKEND=metal is macOS only; libmetalmx is built on Apple alone")
+    if chosen == "d3d12" and sys.platform != "win32":
+        raise ValueError("NR_GPU_BACKEND=d3d12 is Windows only; libd3dmx is built there alone")
     return chosen
 
 
 def library(name):
     """`libxmx.so`, `libnr_frame.dylib`, `libnr_layer.dll`: the platform's spelling of a library.
-    `xmx` is the compute runtime, which on macOS `NR_GPU_BACKEND=metal` redirects to libmetalmx."""
-    if name == "xmx" and backend() == "metal":
-        name = "metalmx"
+    `xmx` is the compute runtime, which `NR_GPU_BACKEND` redirects to libmetalmx (macOS) or
+    libd3dmx (Windows)."""
+    if name == "xmx":
+        name = RUNTIMES[backend()]
     return BUILD_DIR / ("lib" + name + SUFFIX)
 
 

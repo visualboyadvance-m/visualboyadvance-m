@@ -187,6 +187,23 @@ by `make` under Darwin, by CMake under `NR_BUILD_METAL` — and the Vulkan layer
 The static archive a host links, `libdlssnr`, is the Metal one on Apple: no Vulkan in it,
 `nr_frame_runtime()` says `"metal"`, and `nr_frame_adopt_vulkan` is refused there.
 
+Windows gets a **third runtime, on Direct3D 12**: `build/libd3dmx.dll` (`src/gpu/libd3dmx.c`)
+implements the same `xmx_*` entry points, with the kernels rewritten in HLSL (`src/gpu/d3d12/`)
+and compiled by `dxc` to nine DXIL modules that are embedded in the library.
+`NR_GPU_BACKEND=d3d12` switches every Python tool and the C frame library to it, and
+`ctest -R d3d12_` runs the GPU tests on it. It has no matrix path — HLSL ships no matrix-matrix
+operation, so every GEMM is the multiply-add kernel — and it takes the operands as root UAVs
+with byte offsets, splits dispatches at Direct3D's 65535 groups per axis, and keeps every half
+store on `f32tof16` so the half buffers hold what `half_round` gives. CMake builds it under
+`NR_BUILD_D3D12` — on by default for every Windows target but 32-bit x86 (x64 and ARM64) when
+`dxc` is found: the Windows SDK's, the Vulkan SDK's or vcpkg's `directx-dxc` — and wherever it
+is built `libdlssnr` is built from it (`NR_DLSSNR_D3D12`, following `NR_BUILD_D3D12`;
+`-DNR_DLSSNR_D3D12=OFF` keeps the Vulkan archive), with `nr_frame_adopt_d3d12` for a host that
+shares its `ID3D12Device`. **It is written and
+cross-built from macOS, and has not run anywhere yet** — `notes/phase75` says how to make the
+first run, and that a `dxc` without `dxil.dll` beside it writes unsigned DXIL the runtime takes
+only in developer mode.
+
 The result is 649 named tensors, **145 755 123 parameters**: the large matrices are
 stored in the DLL as FP8 E4M3, one byte each, and decoded to FP16. The reader checks
 `fully_logical=true` and refuses anything else — the packed file is **not** a substitute,

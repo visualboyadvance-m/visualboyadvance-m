@@ -1,6 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-21**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-09-22**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -8,6 +8,54 @@ original brief; **this file overrides it wherever they disagree**, and after
 you need the evidence behind a line in this file, rather than reading them in order.
 
 ---
+
+## Latest: the runtime on Direct3D 12 — libd3dmx (2026-09-22; one run, the graph did not come back)
+
+**There is a third compute runtime, Windows only, and it has run once.** The run opened the
+device, built the nine pipelines, uploaded the weights, recorded and captured the graph — and
+the graph's list had not signalled its fence after 60 s, with the device *not* removed, so the
+old fixed timeout turned what is most likely a slow adapter (16.6 s of setup where the M3 takes
+one) into an error that named nothing. The wait now has no timeout by default (one-second slices,
+device-removed checked in each, a stderr note from 10 s on; `XMX_D3D12_TIMEOUT=N` for a limit),
+`XMX_D3D12_STEP=1` runs the recording pass by pass with a name and a time on stderr, the debug
+layer's messages are drained to stderr, and a real bug went with it: `cmd_begin` reset the
+recording's resource-state tracking from the transfer list too. A second attempt then failed
+at `D3D12CreateDevice (0x887a0004)` on the first-listed adapter, where VBA-M's D3D12 panel opens
+a device: adapter selection now *probes* every hardware adapter (device + SM 6.2 + 16-bit ops)
+and falls back to WARP, as `panel.cpp` does. `notes/phase75`, "The first run". The next run is the one with `-v`, then `XMX_D3D12_STEP=1 XMX_D3D12_DEBUG=1`.
+
+`src/gpu/libd3dmx.c`
+implements every `xmx_*` entry point of `xmx.h` on Direct3D 12 in C (COM through `lpVtbl`,
+`d3d12.dll` and `dxgi.dll` loaded by name, nothing linked), and carries the kernels rewritten in
+HLSL under `src/gpu/d3d12/` — nine DXIL modules from five sources, compiled by dxc and embedded
+through bin2c, serving the fourteen names every caller uses. **`NR_GPU_BACKEND=d3d12`** makes
+`nr_build.library("xmx")` and `nr_frame.c` load it; CMake builds it under `NR_BUILD_D3D12` (on by
+default for every Windows target but 32-bit x86, when dxc is found) and `NR_DLSSNR_D3D12`, which
+follows it, builds libdlssnr from it — a Windows x64 or ARM64 host gets the Direct3D 12 archive
+unless it passes `-DNR_DLSSNR_D3D12=OFF` — with `nr_frame_adopt_d3d12` for a host that wants to
+share its device (VBA-M's filter skips its Vulkan share when `nr_frame_runtime()` is not
+`vulkan`, and says so in `Device()`). Verified on the M3: the nine
+modules compile without a warning, the disassembly carries the `precise` marks and the
+round-to-even the E4M3 quantiser needs, the DLL cross-compiles with MinGW exporting all 49
+entry points, and the CMake cross build makes the DLL, the archive and its test. **No kernel
+has been seen to finish on a Direct3D 12 device**; `notes/phase75` says how to make the next run
+(`-v` for the adapter's name, `XMX_D3D12_STEP=1 XMX_D3D12_DEBUG=1` for the pass list and the
+validation messages, and `XMX_D3D12_WARP=1` for the software adapter).
+
+Five things a next reader must not undo. **There is no matrix path**: HLSL has no shipped
+matrix-matrix operation (the SM 6.8 WaveMatrix preview was withdrawn, SM 6.9's `linalg` is
+matrix-vector), so every GEMM is the multiply-add kernel and `gemm_resident` / `gemm_tiled` /
+`gemm_coopmat` / `gemm_batched` / `gemm_staged` resolve to it (`kernel_alias`). **An operand is a
+root UAV plus a byte offset in the push block's address slot**, because HLSL cannot dereference
+a pointer; the GLSL's alignment tests on the address hold on the offset since a resource is 64 KB
+aligned. **A dispatch is split at 65535 groups per axis** and the kernels add the push block's
+`spare` word to their group id — the graph's wide passes exceed the limit by 2x, and Vulkan
+never enforced one. **Narrow stores go through `f32tof16`**, so a half buffer holds exactly what
+`half_round` gives, independent of a driver's `fptrunc`. And **specialization does not exist
+there**: the flags come from the push block and `xmx_specialized_count()` is 0. Also: a dxc
+without `dxil.dll` beside it (every Linux and macOS dxc) writes unsigned DXIL, which the runtime
+takes only with developer mode on; libd3dmx asks for the experimental shader models when it
+finds its modules unsigned and says so in the pipeline error.
 
 ## Latest: the runtime on Metal — libmetalmx (2026-09-21, later)
 

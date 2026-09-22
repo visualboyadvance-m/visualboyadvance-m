@@ -311,7 +311,8 @@ int main(int argc, char **argv)
     double started = now();
     nr_frame *frame = nr_frame_open(weights);
     if (!frame) { fprintf(stderr, "nr_frame_open: %s\n", nr_frame_error()); return 1; }
-    printf("resident backend ready in %.1fs (%s)\n", now() - started, weights ? weights : "embedded weights");
+    printf("resident backend ready in %.1fs (%s) on %s\n", now() - started, weights ? weights : "embedded weights",
+           nr_frame_device(frame));
     fflush(stdout);
 
     int height, width, resize_h = 0, resize_w = 0;

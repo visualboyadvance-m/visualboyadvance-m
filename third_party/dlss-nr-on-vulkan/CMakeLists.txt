@@ -20,6 +20,10 @@
 #                   the layer and its tests link the loader; work/MoltenVK_icd.json is written;
 #                   libmetalmx, the same runtime on Metal directly with its shaders compiled
 #                   into it by the Metal compiler (NR_BUILD_METAL; NR_GPU_BACKEND=metal at run time)
+#   Windows         libd3dmx, the same runtime on Direct3D 12 with the kernels written in HLSL
+#                   and compiled to DXIL by dxc, embedded (NR_BUILD_D3D12, on for every Windows
+#                   target but 32-bit x86; NR_GPU_BACKEND=d3d12 at run time); wherever it is
+#                   built, libdlssnr is built from it instead of libxmx (NR_DLSSNR_D3D12)
 #   Android         the libraries, libdlssnr and the executables against the NDK's libvulkan.so,
 #                   with the NDK's own toolchain file; the layer stays off (there is no game to
 #                   hook and no daemon), bin2c and slice are built for the build machine
@@ -69,6 +73,69 @@ if(NR_BUILD_METAL)
     message(WARNING "no Metal compiler (xcrun -sdk macosx -f metal failed): libmetalmx is not built. Install it with `xcodebuild -downloadComponent MetalToolchain`, or pass -DNR_BUILD_METAL=OFF to silence this")
     set(NR_BUILD_METAL OFF)
   endif()
+endif()
+# libd3dmx: libxmx's entry points on Direct3D 12 (src/gpu/libd3dmx.c), its kernels written in
+# HLSL (src/gpu/d3d12/*.hlsl) and compiled to DXIL by dxc, each module embedded through bin2c.
+# Windows only — there is no Direct3D anywhere else, and the option is refused rather than
+# ignored off Windows. On by default for every Windows target except 32-bit x86 (x64 and
+# ARM64, MSVC or MinGW): the 32-bit build keeps the Vulkan archive, as VBA-M builds no Vulkan
+# there either, and -DNR_BUILD_D3D12=ON still asks for it. NR_GPU_BACKEND=d3d12 selects it at
+# run time. dxc comes with the Windows SDK, the Vulkan SDK and vcpkg's directx-dxc; without
+# one the rest still builds, and the archive stays Vulkan.
+#
+# 32-bit x86 is read three ways, since the tree is configured both standalone and as VBA-M's
+# subdirectory: VBA-M's Architecture.cmake leaves X86 set for it; a vcpkg triplet names it
+# x86-…; and standalone the target has a 4-byte pointer under an x86-family processor name
+# (an MSVC x86 cross shell reports the host's AMD64 for CMAKE_SYSTEM_PROCESSOR).
+set(NR_WIN32_X86 OFF)
+if(WIN32)
+  if(X86 OR VCPKG_TARGET_TRIPLET MATCHES "^[xX]86-"
+     OR (CMAKE_SIZEOF_VOID_P EQUAL 4
+         AND CMAKE_SYSTEM_PROCESSOR MATCHES "^([xX]86|i[3-9]86|[aA][mM][dD]64|[xX]86_64)$"))
+    set(NR_WIN32_X86 ON)
+  endif()
+endif()
+option(NR_BUILD_D3D12 "Windows (x64, ARM64): build libd3dmx, the compute runtime on Direct3D 12, with the HLSL compiled to DXIL and embedded" OFF)
+if(NR_BUILD_D3D12 AND NOT WIN32)
+  message(FATAL_ERROR "NR_BUILD_D3D12 is on and this is not a Windows build; libd3dmx exists on Windows only")
+endif()
+if(WIN32 AND NR_WIN32_X86 AND NOT NR_BUILD_D3D12)
+  message(STATUS "32-bit x86 Windows: libd3dmx is not built and libdlssnr stays the Vulkan archive (-DNR_BUILD_D3D12=ON asks for it anyway)")
+endif()
+if(NR_BUILD_D3D12)
+  # dxc runs on the build machine: the host triplet's copy first in a vcpkg cross build (the
+  # same trap as glslangValidator below), then the SDKs' directories.
+  set(nr_dxc_host_dirs)
+  if(VBAM_VCPKG_HOST_PREFIX)
+    list(APPEND nr_dxc_host_dirs "${VBAM_VCPKG_HOST_PREFIX}/tools/directx-dxc")
+  endif()
+  if(VCPKG_HOST_TRIPLET AND VCPKG_INSTALLED_DIR)
+    list(APPEND nr_dxc_host_dirs "${VCPKG_INSTALLED_DIR}/${VCPKG_HOST_TRIPLET}/tools/directx-dxc")
+  endif()
+  if(nr_dxc_host_dirs)
+    find_program(NR_DXC NAMES dxc.exe dxc PATHS ${nr_dxc_host_dirs} NO_DEFAULT_PATH)
+  endif()
+  set(nr_dxc_sdk_dirs "$ENV{VULKAN_SDK}/Bin" "$ENV{VULKAN_SDK}/bin" "$ENV{WindowsSdkVerBinPath}/x64" "$ENV{WindowsSdkVerBinPath}/arm64")
+  file(GLOB nr_windows_kits_bins "C:/Program Files (x86)/Windows Kits/10/bin/10.*/x64" "C:/Program Files (x86)/Windows Kits/10/bin/10.*/arm64")
+  list(APPEND nr_dxc_sdk_dirs ${nr_windows_kits_bins})
+  find_program(NR_DXC NAMES dxc.exe dxc HINTS ${nr_dxc_sdk_dirs} DOC "the DirectX shader compiler, for the HLSL kernels")
+  if(NOT NR_DXC)
+    message(WARNING "dxc not found (Windows SDK, Vulkan SDK or vcpkg directx-dxc): libd3dmx is not built and libdlssnr stays the Vulkan archive; -DNR_DXC= names one, -DNR_BUILD_D3D12=OFF silences this")
+    set(NR_BUILD_D3D12 OFF)
+  elseif(CMAKE_CROSSCOMPILING AND VCPKG_TARGET_TRIPLET AND NR_DXC MATCHES "/installed/${VCPKG_TARGET_TRIPLET}/")
+    message(FATAL_ERROR "dxc found only as the target triplet's, ${NR_DXC}, which cannot run on this machine. Install it for the host (vcpkg install directx-dxc --triplet <host triplet>) or name one with -DNR_DXC=")
+  endif()
+endif()
+# libdlssnr from libd3dmx rather than libxmx. Follows NR_BUILD_D3D12: wherever the Direct3D 12
+# runtime is built, the static archive a host links carries it — libd3dmx's objects and the
+# DXIL, no Vulkan anywhere in it; nr_frame_adopt_d3d12 is the share, nr_frame_adopt_vulkan is
+# refused and nr_frame_runtime() says "d3d12". -DNR_DLSSNR_D3D12=OFF keeps the Vulkan archive
+# beside libd3dmx.dll, for a host whose renderer lends a Vulkan device. The value is fixed on
+# the first configure, as a cache variable's is: a dxc installed later, or -DNR_BUILD_D3D12
+# changed afterwards, needs -DNR_DLSSNR_D3D12= set to match (or a fresh cache).
+option(NR_DLSSNR_D3D12 "Windows: build libdlssnr, the static archive a host links, from libd3dmx (Direct3D 12) instead of libxmx (Vulkan); follows NR_BUILD_D3D12" ${NR_BUILD_D3D12})
+if(NR_DLSSNR_D3D12 AND NOT NR_BUILD_D3D12)
+  message(FATAL_ERROR "NR_DLSSNR_D3D12 needs NR_BUILD_D3D12 (Windows, with dxc found); pass -DNR_DLSSNR_D3D12=OFF as well to build libdlssnr from libxmx")
 endif()
 option(NR_NO_FLOAT16 "use the software half conversion even where the compiler has _Float16 (for checking it)" OFF)
 if(CMAKE_CROSSCOMPILING)
@@ -337,7 +404,7 @@ endfunction()
 # tree is also added as a subdirectory of VBA-M, whose build has a bin2c of its own.
 # ---------------------------------------------------------------------------------------
 
-if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS OR NR_BUILD_METAL)
+if(NR_REGENERATE_WEIGHTS OR NR_EMBED_SHADERS OR NR_BUILD_METAL OR NR_BUILD_D3D12)
   if(CMAKE_CROSSCOMPILING)
     # Under VBA-M, its host_compile() builds a tool for the build machine with a host
     # compiler (the x86 cl of the same MSVC in an arm64 cross shell, `cc` elsewhere) --
@@ -572,6 +639,88 @@ if(NR_BUILD_METAL)
 endif()
 
 # ---------------------------------------------------------------------------------------
+# the compute runtime on Direct3D 12 (Windows only): libd3dmx
+# ---------------------------------------------------------------------------------------
+#
+# Each HLSL kernel under src/gpu/d3d12/ compiles to DXIL with dxc — nine modules from five
+# sources, the -D variants as the SPIR-V has them — into the output directory (kept there
+# for XMX_DXIL_DIR= experiments), bin2c writes each as a C array, and the arrays with their
+# table are compiled into libd3dmx. dxc signs a module only when dxil.dll sits beside it
+# (the Windows SDK's and vcpkg's do; a cross build's dxc does not): an unsigned module runs
+# only with developer mode on, and libd3dmx asks for the experimental shader models itself
+# when it finds its modules unsigned (notes/phase75).
+
+set(NR_DXIL_OBJECTS)
+if(NR_BUILD_D3D12)
+  if(NOT NR_BIN2C)
+    message(FATAL_ERROR "NR_BUILD_D3D12 needs bin2c to embed the DXIL; name a host build with -DNR_BIN2C=")
+  endif()
+  set(NR_D3D12_DIR "${CMAKE_CURRENT_BINARY_DIR}/d3d12")
+  file(MAKE_DIRECTORY "${NR_D3D12_DIR}")
+  set(NR_DXC_FLAGS -T cs_6_2 -E main -enable-16bit-types -HV 2021 -O3 -Qstrip_reflect -Qstrip_debug
+      "-I${PROJECT_SOURCE_DIR}/src/gpu/d3d12")
+  set(NR_DXIL)
+  set(NR_DXIL_HEADERS)
+  set(NR_DXIL_INCLUDES "")
+  set(NR_DXIL_ROWS "")
+  function(nr_dxil name source)
+    set(out "${NR_OUTPUT_DIR}/${name}.dxil")
+    add_custom_command(OUTPUT "${out}"
+      COMMAND "${NR_DXC}" ${NR_DXC_FLAGS} ${ARGN} -Fo "${out}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}"
+      DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/nr_d3d.hlsli"
+      COMMENT "dxc ${name}.dxil" VERBATIM)
+    set(NR_DXIL ${NR_DXIL} "${out}" PARENT_SCOPE)
+    set(header "${NR_D3D12_DIR}/dxil_${name}.h")
+    add_custom_command(OUTPUT "${header}"
+      COMMAND ${NR_BIN2C} "${out}" "${header}" dxil_${name}
+      DEPENDS "${out}" ${NR_BIN2C}
+      COMMENT "bin2c dxil_${name}.h" VERBATIM)
+    set(NR_DXIL_HEADERS ${NR_DXIL_HEADERS} "${header}" PARENT_SCOPE)
+    set(NR_DXIL_INCLUDES "${NR_DXIL_INCLUDES}#include \"dxil_${name}.h\"\n" PARENT_SCOPE)
+    set(NR_DXIL_ROWS "${NR_DXIL_ROWS}    { \"${name}.dxil\", dxil_${name}, sizeof dxil_${name} },\n" PARENT_SCOPE)
+  endfunction()
+
+  nr_dxil(gemm_portable         gemm_portable.hlsl)
+  nr_dxil(gemm_portable_tiled   gemm_portable.hlsl -DRM=2 -DRN=2)   # the 16x32 block, the gemm_tiled slot
+  nr_dxil(gemm_portable_desc    gemm_portable_desc.hlsl)
+  nr_dxil(gemm_portable_batched gemm_portable_desc.hlsl -DBATCHED)
+  nr_dxil(gemm_f16acc           gemm_portable_desc.hlsl -DACC16)
+  nr_dxil(resident              resident.hlsl)
+  nr_dxil(attention             attention.hlsl)
+  nr_dxil(attention_ab          attention.hlsl -DSOFTMAX_AB)
+  nr_dxil(history               history.hlsl)
+  add_custom_target(dxil_shaders ALL DEPENDS ${NR_DXIL})
+
+  list(LENGTH NR_DXIL_HEADERS NR_DXIL_COUNT)
+  set(dxil_table "${NR_D3D12_DIR}/nr_dxil_embedded.c")
+  file(WRITE "${dxil_table}.in"
+"/* generated by CMake: the ${NR_DXIL_COUNT} DXIL modules, each from bin2c. Do not edit. */
+#include \"nr_dxil_embedded.h\"
+
+${NR_DXIL_INCLUDES}
+const struct nr_embedded_shader nr_embedded_dxil[] = {
+${NR_DXIL_ROWS}};
+const size_t nr_embedded_dxil_count = ${NR_DXIL_COUNT};
+")
+  configure_file("${dxil_table}.in" "${dxil_table}" COPYONLY)
+  set_source_files_properties("${dxil_table}" PROPERTIES OBJECT_DEPENDS "${NR_DXIL_HEADERS}")
+  add_library(nr_dxil_blob OBJECT "${dxil_table}")
+  target_include_directories(nr_dxil_blob PRIVATE src/gpu "${NR_D3D12_DIR}")
+  target_compile_definitions(nr_dxil_blob PRIVATE NR_EMBEDDED_DXIL=1)
+  set_target_properties(nr_dxil_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  nr_no_ipo(nr_dxil_blob)
+  set(NR_DXIL_OBJECTS $<TARGET_OBJECTS:nr_dxil_blob>)
+
+  # d3d12.dll and dxgi.dll are loaded at run time: no import library on the line
+  add_library(d3dmx SHARED src/gpu/libd3dmx.c ${NR_DXIL_OBJECTS})
+  target_include_directories(d3dmx PRIVATE src/gpu)
+  target_compile_definitions(d3dmx PRIVATE NR_EMBEDDED_DXIL=1)
+  target_compile_options(d3dmx PRIVATE ${NR_WARN_FLAGS})
+  nr_place(d3dmx)
+  message(STATUS "libd3dmx: the compute runtime on Direct3D 12, ${NR_DXIL_COUNT} DXIL modules compiled into it by ${NR_DXC} (NR_GPU_BACKEND=d3d12 selects it)")
+endif()
+
+# ---------------------------------------------------------------------------------------
 # the host passes and the frame library
 # ---------------------------------------------------------------------------------------
 
@@ -740,6 +889,18 @@ if(NR_BUILD_METAL)
   target_link_libraries(dlssnr PUBLIC "-framework Metal" "-framework Foundation")
   set(NR_DLSSNR_HOST_LIBS)                        # the test plays a host that brings no Vulkan
   message(STATUS "libdlssnr carries libmetalmx (Metal); -DNR_BUILD_METAL=OFF for the Vulkan archive")
+elseif(NR_DLSSNR_D3D12)
+  # the Direct3D 12 archive: libd3dmx's objects and the DXIL, no Vulkan and no import
+  # library (d3d12.dll and dxgi.dll are loaded at run time); a host shares its device
+  # through nr_frame_adopt_d3d12, and nr_frame_adopt_vulkan is refused
+  add_library(dlssnr STATIC src/gpu/libd3dmx.c src/ref/nr_frame.c
+    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_DXIL_OBJECTS})
+  target_include_directories(dlssnr
+    PRIVATE src/gpu
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
+  target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 NR_STATIC_D3D12=1 NR_EMBEDDED_DXIL=1)
+  set(NR_DLSSNR_HOST_LIBS)                        # the test plays a host that brings no Vulkan
+  message(STATUS "libdlssnr carries libd3dmx (Direct3D 12); -DNR_DLSSNR_D3D12=OFF for the Vulkan archive")
 else()
   add_library(dlssnr STATIC src/gpu/libxmx.c src/ref/nr_frame.c
     $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
@@ -751,6 +912,11 @@ else()
     target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_SHADERS=1)
   endif()
   set(NR_DLSSNR_HOST_LIBS ${NR_XMX_VULKAN})
+  if(NR_BUILD_D3D12)
+    message(STATUS "libdlssnr carries libxmx (Vulkan) beside libd3dmx.dll; -DNR_DLSSNR_D3D12=ON for the Direct3D 12 archive")
+  else()
+    message(STATUS "libdlssnr carries libxmx (Vulkan)")
+  endif()
 endif()
 if(NR_EMBED_WEIGHTS)
   target_compile_definitions(dlssnr PRIVATE NR_EMBEDDED_WEIGHTS=1)
@@ -873,11 +1039,12 @@ if(NR_BUILD_TESTS)
     set_tests_properties(nr_frame_c PROPERTIES DEPENDS test_nr_frame_py)
     # the same GPU tests on libmetalmx, which every one of them reaches through
     # NR_GPU_BACKEND=metal; the C frame test writes and reads a reference of its own
+    set(NR_RUNTIME_TESTS
+      src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
+      src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
+      src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py)
     if(NR_BUILD_METAL)
-      set(NR_METAL_TESTS
-        src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
-        src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
-        src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py)
+      set(NR_METAL_TESTS ${NR_RUNTIME_TESTS})
       foreach(script ${NR_METAL_TESTS})
         get_filename_component(name "${script}" NAME_WE)
         add_test(NAME metal_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
@@ -892,8 +1059,23 @@ if(NR_BUILD_TESTS)
       add_test(NAME metal_nr_frame_c COMMAND "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_metal.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(metal_nr_frame_c PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}" DEPENDS metal_test_nr_frame_py)
     endif()
+    # and on libd3dmx through NR_GPU_BACKEND=d3d12 (Windows; every GEMM there is the
+    # portable kernel already, so the forced-portable run is the same run and is not repeated)
+    if(NR_BUILD_D3D12)
+      foreach(script ${NR_RUNTIME_TESTS})
+        get_filename_component(name "${script}" NAME_WE)
+        add_test(NAME d3d12_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+        set_tests_properties(d3d12_${name} PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
+      endforeach()
+      add_test(NAME d3d12_test_graph_staging COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_graph.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(d3d12_test_graph_staging PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;XMX_STAGING=1;${NR_TEST_ENV}")
+      add_test(NAME d3d12_test_nr_frame_py COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_d3d12.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(d3d12_test_nr_frame_py PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
+      add_test(NAME d3d12_nr_frame_c COMMAND "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_d3d12.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(d3d12_nr_frame_c PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}" DEPENDS d3d12_test_nr_frame_py)
+    endif()
   endif()
 endif()
 
-message(STATUS "outputs -> ${NR_OUTPUT_DIR}; compute runtime links ${NR_XMX_VULKAN}; layer: ${NR_BUILD_LAYER}; nr_frame command: ${PNG_FOUND}; embedded weights: ${NR_EMBED_WEIGHTS} (regenerated: ${NR_REGENERATE_WEIGHTS}); embedded shaders: ${NR_EMBED_SHADERS}")
+message(STATUS "outputs -> ${NR_OUTPUT_DIR}; compute runtime links ${NR_XMX_VULKAN}; layer: ${NR_BUILD_LAYER}; nr_frame command: ${PNG_FOUND}; embedded weights: ${NR_EMBED_WEIGHTS} (regenerated: ${NR_REGENERATE_WEIGHTS}); embedded shaders: ${NR_EMBED_SHADERS}; Metal runtime: ${NR_BUILD_METAL}; Direct3D 12 runtime: ${NR_BUILD_D3D12} (in libdlssnr: ${NR_DLSSNR_D3D12})")
 message(STATUS "the Python finds this build with NR_BUILD_DIR=${NR_OUTPUT_DIR} (ctest sets it; without it the newest of work/ and build*/ wins)")
