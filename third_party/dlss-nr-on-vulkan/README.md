@@ -1,4 +1,4 @@
-# DLSS 5 Neural Rendering on Vulkan
+# DLSS 5 Neural Rendering on Vulkan, Metal and Direct3D12
 
 NVIDIA's DLSS 5 Neural Rendering pass — the one-step pixel-space diffusion model that
 re-renders a frame's detail — running on **Any Vulkan enabled card**
