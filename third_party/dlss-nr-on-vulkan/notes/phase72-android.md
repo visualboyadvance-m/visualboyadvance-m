@@ -88,3 +88,69 @@ What a device will need, and what is unknown:
 - The APK grows by the embedded weights. `-DNR_EMBED_WEIGHTS=OFF` builds an archive whose
   `nr_frame_open(NULL)` refuses, and the filter has no path-loading route, so on Android the
   embedded form is the only one that works today.
+
+---
+
+## riscv64: `_Float16` is not usable there (2026-09-22)
+
+**The riscv64 APK nightly could not compile the tree.** `nr_image.c` killed the compiler
+outright:
+
+```
+fatal error: error in backend: Scalarization of scalable vectors is not supported.
+3.	Running pass 'Function Pass Manager'
+4.	Running pass 'RISC-V DAG->DAG Pattern Instruction Selection' on function '@nr_compose'
+```
+
+It surfaced as a **link** failure — VBA-M's Release build is `-flto=thin`, so codegen runs
+inside `ld.lld` — which makes it look like an LTO bug. It is not. `clang -O3 -c
+nr_image.c` alone reproduces it exactly, and `test_nr_frame.c` dies the same way;
+`nr_frame.c` happens to survive, its half calls not being in a loop the vectorizer takes.
+
+**Cause.** Clang defines `__FLT16_MANT_DIG__` for every riscv64 target, so
+`nr_portable.h` took the `_Float16` path. Android's riscv64 baseline
+(`riscv64-none-linux-android35`) is:
+
+```
+__riscv_v 1000000   __riscv_vector 1   __riscv_v_min_vlen 128   __riscv_zba/zbb/zbs
+no __riscv_zfh                          no __riscv_zvfh
+```
+
+The V extension, and **no half-precision at all** — not in a scalar FP register, not in a
+vector. The loop vectorizer still turns the conversions in `nr_compose` into
+`<vscale x N x half>` `fptrunc`/`fpext`, the backend can only lower those by scalarizing,
+and scalarizing a *scalable* vector is unimplemented. Hence the abort rather than a
+diagnostic. (`-fno-vectorize` also silences it, which is what confirmed the mechanism.)
+
+**Fix**, in `nr_portable.h`: take the software conversion whenever the target has vectors
+that cannot hold a half.
+
+```c
+#if defined(__riscv_vector) && !defined(__riscv_zvfh) && !defined(NR_NO_FLOAT16)
+#define NR_NO_FLOAT16 1
+#endif
+```
+
+Precise on purpose. A riscv64 without V never builds a scalable vector and keeps the type;
+one with Zvfh vectorizes it properly and keeps it; only V-without-Zvfh falls back. arm64
+and x86_64 are untouched — checked by preprocessing the header for all three Android
+triples.
+
+**It costs that target nothing.** Without Zfh the `_Float16` conversions were already
+libcalls there; the fallback is integer bit-twiddling the vectorizer can actually take.
+
+**Byte-identity re-verified on this machine**, both directions, both paths compiled from
+the same header — the `phase69` table reproduced exactly:
+
+| direction | values | differing |
+| --- | --- | --- |
+| half -> float | all 65 536 | 0 |
+| float -> half | all 4 294 967 296 | 0 (16 744 448 NaN payloads differ; both NaN) |
+
+The NaN payloads cannot reach an output byte: `nr_encode8` maps NaN to zero before the
+cast, which is the NumPy behaviour it transcribes.
+
+**Still run on nothing.** The whole tree now builds for `riscv64` (`libnr_image.so`,
+`libxmx.so`, `libnr_frame.so`, `libdlssnr.a`), and no riscv64 device has executed a byte
+of it. Everything under "What is not claimed" above applies here too, with a device class
+even rarer than the phones it was written about.

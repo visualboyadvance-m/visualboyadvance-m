@@ -5,9 +5,10 @@
  *
  * The half conversions are the one place correctness lives. `_Float16` is used where the
  * compiler has it (GCC and Clang, which is every build this project has measured); the
- * fallback is a software round-to-nearest-even conversion for MSVC, checked against the
- * type exhaustively — every one of the 65 536 halves widens to the same float, and every
- * one of the 2^32 floats narrows to the same half, NaN payloads aside (notes/phase69).
+ * fallback is a software round-to-nearest-even conversion for MSVC and for the RISC-V
+ * targets that cannot hold a half in a vector (below), checked against the type
+ * exhaustively — every one of the 65 536 halves widens to the same float, and every one
+ * of the 2^32 floats narrows to the same half, NaN payloads aside (notes/phase69).
  * `NR_NO_FLOAT16` forces the fallback where the type exists, which is how that was run.
  */
 #ifndef NR_PORTABLE_H
@@ -24,6 +25,19 @@
 #endif
 
 /* -- half precision ------------------------------------------------------ */
+
+/* Clang defines __FLT16_MANT_DIG__ for every riscv64 target, Android's included, and that
+ * one has the V extension but neither Zfh nor Zvfh: no half in a scalar FP register and
+ * none in a vector. The loop vectorizer still turns the conversions below into
+ * <vscale x N x half> fptrunc/fpext, which the backend can only lower by scalarizing --
+ * and scalarizing a scalable vector is unimplemented, so the compile dies outright with
+ * "Scalarization of scalable vectors is not supported" (`nr_compose` in nr_image.c, and
+ * the C frame test). Without Zfh the type is a libcall on that target anyway, so the
+ * software path costs it nothing. Vectors that can hold a half keep `_Float16`.
+ */
+#if defined(__riscv_vector) && !defined(__riscv_zvfh) && !defined(NR_NO_FLOAT16)
+#define NR_NO_FLOAT16 1
+#endif
 
 #if !defined(NR_NO_FLOAT16) && (defined(__FLT16_MANT_DIG__) || (defined(__clang__) && defined(__aarch64__)))
 #define NR_HAVE_FLOAT16 1
