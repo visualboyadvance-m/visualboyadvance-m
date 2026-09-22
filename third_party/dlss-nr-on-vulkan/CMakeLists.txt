@@ -45,13 +45,13 @@ endif()
 
 set(NR_WORK_DIR "${PROJECT_SOURCE_DIR}/work" CACHE PATH "the inputs the build does not make: the weights, the Vulkan-Headers clone")
 set(NR_OUTPUT_DIR "${CMAKE_BINARY_DIR}" CACHE PATH "where libraries, executables and SPIR-V land; -DNR_OUTPUT_DIR=work reproduces the Makefile layout")
-if(WIN32)
-  set(NR_LAYER_DEFAULT OFF)                        # Unix sockets and pthreads; not ported
-elseif(ANDROID)
-  set(NR_LAYER_DEFAULT OFF)                        # compiles, but there is no game to hook and no daemon
-else()
-  set(NR_LAYER_DEFAULT ON)
-endif()
+# Off everywhere.  VBA-M links libdlssnr as a display filter and never injects
+# the pass into another process, so nothing here builds the layer: on Windows it
+# is unported (Unix sockets and pthreads), on Android there is no game to hook
+# and no daemon, and elsewhere its tests link the Vulkan loader -- which on a
+# macOS cross build is the host's, for the wrong architecture.  Build it and its
+# tests with -DNR_BUILD_LAYER=ON.
+set(NR_LAYER_DEFAULT OFF)
 option(NR_BUILD_LAYER "the Vulkan layer that puts the pass inside a game, and its tests (POSIX)" ${NR_LAYER_DEFAULT})
 option(NR_XMX_LINK_MOLTENVK "macOS: link the compute runtime to MoltenVK directly rather than the loader" ${APPLE})
 # libmetalmx: libxmx's entry points on Metal directly (src/gpu/libmetalmx.m), its shaders
