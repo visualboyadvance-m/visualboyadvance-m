@@ -590,10 +590,15 @@ static int open_adopted(void)
 	free(qf);
 	if (!compute) FAIL("adopted queue family has no compute", (int)adopt.qi);
 
+	/* deviceName is as wide as g.name, so the suffix has to be reserved:
+	   bound the device name to what is left over, or a long one pushes
+	   " (shared)" out of the buffer -- losing exactly the part worth
+	   keeping, and tripping sprintf_s's truncation handler on Windows. */
+	const int name_max = (int)(sizeof g.name - sizeof " (shared)");
 #if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
-	sprintf_s(g.name, sizeof g.name, "%s (shared)", props.deviceName);
+	sprintf_s(g.name, sizeof g.name, "%.*s (shared)", name_max, props.deviceName);
 #else
-	snprintf(g.name, sizeof g.name, "%s (shared)", props.deviceName);
+	snprintf(g.name, sizeof g.name, "%.*s (shared)", name_max, props.deviceName);
 #endif
 	g.discrete = props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 	g.coopmat = adopt.coopmat;

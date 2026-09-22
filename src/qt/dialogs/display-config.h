@@ -87,6 +87,9 @@ private:
     QLabel* plugin_label_ = nullptr;
     QComboBox* filter_selector_ = nullptr;
     QComboBox* plugin_selector_ = nullptr;
+    QCheckBox* dlss_nr_ = nullptr;   // only built when DLSS NR is available
+    QRadioButton* dlss_nr_pre_ = nullptr;
+    QRadioButton* dlss_nr_post_ = nullptr;
     QComboBox* interframe_selector_ = nullptr;
     QCheckBox* bilinear_ = nullptr;
     QCheckBox* stretch_ = nullptr;

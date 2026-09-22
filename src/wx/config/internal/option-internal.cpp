@@ -51,7 +51,6 @@ static const std::array<wxString, kNbFilters> kFilterStrings = {
     "xbrz9x",
     "scalefx3x",
     "scalefx9x",
-    "dlssnr",
     "plugin",
 };
 
@@ -237,6 +236,8 @@ std::array<Option, kNbOptions>& Option::All() {
 
         double video_scale = 3;
         bool retain_aspect = true;
+        bool dlss_nr = false;
+        uint32_t dlss_nr_stage = 1;  // 0 = before the filter, 1 = after
 
         /// GB
         wxString gb_bios = wxEmptyString;
@@ -356,6 +357,8 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispSDLPixelArt, &g_owned_opts.sdl_pixel_art),
         Option(OptionID::kDispFilter, &g_owned_opts.filter),
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
+        Option(OptionID::kDispDlssNr, &g_owned_opts.dlss_nr),
+        Option(OptionID::kDispDlssNrStage, &g_owned_opts.dlss_nr_stage, 0, 1),
         Option(OptionID::kDispPluginDir, &g_owned_opts.plugin_dir),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
         Option(OptionID::kBitDepth, &g_owned_opts.bitdepth, 0, 3),
@@ -515,6 +518,10 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"Display/SDLPixelArt", "SDLPixelArt", _("Use the SDL pixel art filter with an SDL renderer")},
     OptionData{"Display/Filter", "", _("Full-screen filter to apply")},
     OptionData{"Display/FilterPlugin", "", _("Filter plugin library")},
+    OptionData{"Display/DlssNr", "",
+               _("Run the DLSS NR neural filter alongside the display filter")},
+    OptionData{"Display/DlssNrStage", "",
+               _("Whether DLSS NR runs before or after the display filter")},
     OptionData{"Display/PluginDir", "", _("Directory containing RPI filter plugins")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
     OptionData{"Display/BitDepth", "BitDepth", _("Bit depth")},

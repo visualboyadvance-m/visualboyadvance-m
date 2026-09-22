@@ -454,7 +454,13 @@ if(VBAM_NEED_GUI_DEPS AND APPLE)
    set(_vbam_save_find_framework ${CMAKE_FIND_FRAMEWORK})
    set(CMAKE_FIND_FRAMEWORK LAST)
    find_library(MOLTENVK NAMES MoltenVK)
-   set(CMAKE_FIND_FRAMEWORK ${_vbam_save_find_framework})
+   # Restore by unsetting when it was unset: writing back an empty string is
+   # not the same thing, and a later find_package() can reject an empty value.
+   if(_vbam_save_find_framework)
+      set(CMAKE_FIND_FRAMEWORK ${_vbam_save_find_framework})
+   else()
+      unset(CMAKE_FIND_FRAMEWORK)
+   endif()
    unset(_vbam_save_find_framework)
 
    if(MOLTENVK)

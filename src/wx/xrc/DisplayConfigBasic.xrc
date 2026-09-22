@@ -184,7 +184,6 @@
                     <item translate="0">xBRZ 9x</item>
                     <item translate="0">ScaleFX 3x</item>
                     <item translate="0">ScaleFX 9x</item>
-                    <item translate="0">DLSS NR</item>
                     <item>Plugin</item>
                   </content>
                 </object>
@@ -213,6 +212,33 @@
                     <item>Smart</item>
                     <item>Motion Blur</item>
                   </content>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALIGN_CENTRE_VERTICAL</flag>
+                <object class="wxCheckBox" name="DlssNr">
+                  <label>Apply _DLSS NR:</label>
+                  <tooltip>Run the DLSS NR neural filter alongside the display filter</tooltip>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALIGN_CENTRE_VERTICAL</flag>
+                <object class="wxBoxSizer">
+                  <object class="sizeritem">
+                    <flag>wxRIGHT</flag>
+                    <border>10</border>
+                    <object class="wxRadioButton" name="DlssNrPre">
+                      <label>Pre-process</label>
+                      <style>wxRB_GROUP</style>
+                      <tooltip>Run DLSS NR on the emulated image first, then let the display filter scale the result. Much cheaper, since the network sees the unscaled frame</tooltip>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="DlssNrPost">
+                      <label>Post-process</label>
+                      <tooltip>Run DLSS NR over whatever the display filter produces, at the filtered size</tooltip>
+                    </object>
+                  </object>
                 </object>
               </object>
             </object>

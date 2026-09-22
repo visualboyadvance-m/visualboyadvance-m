@@ -6,17 +6,26 @@
 // with libxmx, the weights and the shaders linked in statically.
 //
 // The filter keeps the source resolution (scale 1x): one RGB frame in, one RGB
-// frame out. A forward pass takes hundreds of milliseconds even on a fast GPU
-// (the network extent is at least 320x320), so the work is asynchronous. The
-// panel creates a Filter when the option is selected (the "initializer"); the
-// filter thread then calls Apply32() every frame, which hands the newest source
-// frame to a worker thread and writes back the most recent finished result,
-// or passes the source through until the first result exists.
+// frame out. A forward pass takes tens to hundreds of milliseconds even on a
+// fast GPU (the network extent is at least 320x320), so the work is
+// asynchronous. The panel creates a Filter when the option is selected (the
+// "initializer"); the filter thread then calls Apply32() every frame, which
+// hands the newest source frame to a worker thread.
 //
-// Each frame gets what the `nr_frame` command gives a picture with no flags:
+// What Apply32() writes back is the newest finished pass laid over the frame it
+// was handed this time -- the pass's output minus its own input, added to the
+// current picture -- not that pass's output on its own. A pass is always
+// several frames stale, so writing it verbatim held the whole image still
+// between passes and then jumped; adding only what the pass changed keeps
+// motion at the emulator's frame rate. Until the first pass finishes the source
+// passes straight through.
+//
+// Each pass gets what the `nr_frame` command gives a picture with no flags:
 // the standard profile, frame index 0, no control mask, and the still path
-// with no history, so a frame's output depends on that frame alone and matches
-// `nr_frame IN.png OUT.png` on the same pixels.
+// with no history, so a pass's output depends on that frame alone and matches
+// `nr_frame IN.png OUT.png` on the same pixels. On a still picture, where the
+// frame on screen is the frame the network was given, that is also exactly what
+// reaches the display.
 //
 // The weights are shared process-wide: the model opens on the first pass a
 // Filter asks for (about two seconds, on the worker, never on the UI thread)
@@ -41,6 +50,14 @@
 namespace dlssnr {
 
 // True when the filter is compiled into this build.
+// Values for the kDispDlssNrStage option: whether the pass runs before the
+// display filter, at the source resolution, or after it, over the filter's
+// scaled output.
+enum Stage : uint32_t {
+    kBeforeFilter = 0,
+    kAfterFilter = 1,
+};
+
 inline constexpr bool Available() {
 #ifdef VBAM_ENABLE_DLSS_NR
     return true;

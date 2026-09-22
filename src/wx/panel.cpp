@@ -143,9 +143,6 @@ double GetFilterScale() {
             return 9.0;
         case config::Filter::kScaleFX3x:
             return 3.0;
-        case config::Filter::kDlssNr:
-            // Neural rendering keeps the source resolution.
-            return 1.0;
         case config::Filter::kPlugin:
         case config::Filter::kLast:
             VBAM_NOTREACHED_RETURN(1.0);
@@ -232,10 +229,6 @@ void ApplyFilter32(uint8_t* src, int instride, uint8_t* delta, uint8_t* dst,
             break;
         case config::Filter::kPlugin:
             // Plugin filters require RENDER_PLUGIN_INFO, not supported here
-            break;
-        case config::Filter::kDlssNr:
-            // Needs the panel's dlssnr::Filter; dispatched by FilterThread::Filter32(),
-            // and never split into bands (see max_threads in DrawArea).
             break;
         case config::Filter::kNone:
         case config::Filter::kLast:
@@ -673,7 +666,10 @@ GameArea::GameArea()
                        std::bind(&GameArea::ReinitPanel, this)),
       // kDispFilter is handled separately: a filter change can often be adopted
       // in place (no panel rebuild / no black flash), unlike the options above.
-      disp_filter_observer_(config::OptionID::kDispFilter,
+      // kDispDlssNr rides along: turning the post-pass on or off changes
+      // whether the frame goes through the filter machinery at all, so it needs
+      // the same rebuild, and SyncDlssNr() runs off the back of it.
+      disp_filter_observer_({config::OptionID::kDispFilter, config::OptionID::kDispDlssNr},
                             std::bind(&GameArea::OnDispFilterChanged, this)),
       color_correction_auto_observer_(config::OptionID::kDispHDR,
                                       std::bind(&GameArea::ApplyAutoColorCorrection, this)),
@@ -2966,10 +2962,11 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
         }
     }
 
-    if (OPTION(kDispFilter) == config::Filter::kDlssNr && !dlssnr::Available()) {
-        // Not compiled in (no libnr_frame in this build): behave like a missing plugin.
-        wxLogWarning(_("The DLSS NR filter is not available in this build; filter disabled."));
-        OPTION(kDispFilter) = config::Filter::kNone;
+    if (OPTION(kDispDlssNr) && !dlssnr::Available()) {
+        // Not compiled in (no libnr_frame in this build), or a stale config
+        // from a build that had it.
+        wxLogWarning(_("DLSS NR is not available in this build; turning it off."));
+        OPTION(kDispDlssNr) = false;
     }
 
     if (OPTION(kDispFilter) != config::Filter::kPlugin) {
@@ -2980,12 +2977,21 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     }
 
     // The DLSS NR initializer: create the processor (it opens the model on its
-    // own thread) when that filter is selected. Used by the filter thread below.
+    // own thread) when the option is on. Used by the filter thread below.
     SyncDlssNr();
 
     // HDR output re-encodes the final RGBA8 image, so force a 32-bit source
     // when it is enabled (unless an RPI plugin has locked us to 16-bit).
     if (hdr::HdrAvailable() && OPTION(kDispHDR) && !(rpi_ && rpi_bpp_ == 2)) {
+        panel_color_depth_ = 32;
+        systemColorDepth = 32;
+    }
+
+    // DLSS NR runs over the whole frame from DrawArea(), so it sees the panel
+    // buffers rather than the filter threads' per-band 32bpp staging copy, and
+    // needs them already in RGBA8. Handing a neural denoiser 16-bit-quantized
+    // colour would be a poor trade anyway.
+    if (UsingDlssNr() && !(rpi_ && rpi_bpp_ == 2)) {
         panel_color_depth_ = 32;
         systemColorDepth = 32;
     }
@@ -3189,9 +3195,6 @@ public:
     const RENDER_PLUGIN_INFO* rpi_;
     int rpi_bpp_ = 4;  // Bytes per pixel for RPI plugin (default 32-bit = 4)
     bool rpi_using_rgb565_ = false;  // Plugin uses RGB565 (needs 555↔565 conversion)
-#ifdef VBAM_ENABLE_DLSS_NR
-    dlssnr::Filter* dlssnr_ = nullptr;  // The panel's DLSS NR processor when kDlssNr is selected
-#endif
     int panel_color_depth_ = 32;  // Panel's color depth (independent from global systemColorDepth)
     uint8_t* dst_;
     uint8_t* delta_;
@@ -3922,20 +3925,7 @@ private:
     // converted one (ScanlinesTV and friends read those shifts the same way).
     void Filter32(uint8_t* src, int instride, uint8_t* dst, int outstride,
                   config::Filter filter_option) {
-#ifdef VBAM_ENABLE_DLSS_NR
-        if (filter_option == config::Filter::kDlssNr) {
-            if (dlssnr_) {
-                dlssnr_->Apply32(src, instride, dst, outstride, width_, height_,
-                                 systemRedShift - 3, systemGreenShift - 3, systemBlueShift - 3);
-            } else {
-                for (int y = 0; y < height_; y++)
-                    memcpy(dst + y * outstride, src + y * instride, width_ * 4);
-            }
-            return;
-        }
-#else
         (void)filter_option;
-#endif
         ApplyFilter32(src, instride, delta_, dst, outstride, width_, height_);
     }
 };
@@ -3954,7 +3944,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
 
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
+    if (OPTION(kDispFilter) != config::Filter::kNone || UsingDlssNr() ||
         OPTION(kDispIFB) != config::Interframe::kNone) {
         if (!pixbuf2) {
             int allocstride = outstride, alloch = height;
@@ -3975,17 +3965,32 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
 
     // Use multiple threads for filter processing (up to 8).
     // Force single-threaded for MT plugins - they handle parallelism internally
-    // and their thread decomposition fails on small band sizes - and for DLSS NR,
-    // whose network sees the whole frame.
-    const int max_threads = (rpi_is_mt_ || UsingDlssNr()) ? 1 : GetMaxFilterThreads();
+    // and their thread decomposition fails on small band sizes.
+    const int max_threads = rpi_is_mt_ ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (panel_color_depth_ >> 3);
 
+    const bool have_filter = OPTION(kDispFilter) != config::Filter::kNone;
+    const bool have_ifb = OPTION(kDispIFB) != config::Interframe::kNone;
+    const bool use_threads = have_filter || have_ifb;
+
+    // Which side of the display filter the DLSS NR pass runs on. With no
+    // filter there is nothing to be before or after, so that folds into the
+    // pre case, where the network sees the frame at its native size.
+    const bool dlss_post = UsingDlssNr() && have_filter &&
+        OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+
+    // The pre-pass hands the filter threads a denoised frame laid out exactly
+    // like g_pix, which they read in place of it. The post-pass runs after
+    // they join, below.
+    uint8_t* const src_frame = (dlss_pre && use_threads)
+        ? DlssNrPreFilter(*data, instride, width, height) : *data;
+
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
-        OPTION(kDispIFB) != config::Interframe::kNone) {
+    if (use_threads) {
         if (nthreads != max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
@@ -4015,13 +4020,10 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -4043,9 +4045,6 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-                    threads[i].dlssnr_ = dlssnr_.get();
-#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -4070,13 +4069,10 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -4092,7 +4088,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 for (int i = 0; i < nthreads; i++) {
                     threads[i].phase_ = FilterThread::Phase::IFB;
                     threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
+                    threads[i].src_ = src_frame;
                     threads[i].sig_.Signal();
                     threads[i].lock_.Unlock();
                 }
@@ -4105,7 +4101,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
-                threads[i].src_ = *data;
+                threads[i].src_ = src_frame;
                 threads[i].sig_.Signal();
                 threads[i].lock_.Unlock();
             }
@@ -4136,7 +4132,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                 // Assign seam bands to threads and run in parallel
                 const int scale_int = static_cast<int>(scale);
                 // Source base: skip 1 border row
-                uint8_t* src_base = *data + instride;
+                uint8_t* src_base = src_frame + instride;
                 // Dest base: skip 1*scale border rows
                 uint8_t* dst_base = todraw + outstride * scale_int;
 
@@ -4163,6 +4159,21 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
                     filt_done.Wait();
             }
         }
+    }
+
+    // The pass runs out here rather than inside the filter threads: a band is
+    // only a slice of the image, so the network would hallucinate across every
+    // seam, and pinning the filter to one thread to avoid that is what made a
+    // 2x filter stutter. By now the threads have joined, so todraw holds one
+    // whole image.
+    if (dlss_post) {
+        uint8_t* const img = todraw + outstride * static_cast<int>(scale);
+        DlssNrApply(img, outstride, img, outstride, static_cast<int>(width * scale),
+            static_cast<int>(height * scale));
+    } else if (dlss_pre && !use_threads) {
+        // Nothing else ran, so this is all that stands between the emulated
+        // frame and the screen.
+        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
 
     // Note: We do NOT modify *data (which is g_pix) here.
@@ -4394,10 +4405,60 @@ void DrawingPanelBase::ApplyPendingFilterChange()
     memset(delta, 0xff, sizeof(delta));
 }
 
+// Run the DLSS NR pass from `src` to `dst`, both pointing at the first image
+// row. Returns false when there is no processor, so callers can fall through
+// to whatever they would do without one. dst may alias src.
+bool DrawingPanelBase::DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst,
+    int dst_stride, int w, int h)
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!dlssnr_)
+        return false;
+
+    dlssnr_->Apply32(src, src_stride, dst, dst_stride, w, h, systemRedShift - 3,
+        systemGreenShift - 3, systemBlueShift - 3);
+    return true;
+#else
+    (void)src; (void)src_stride; (void)dst; (void)dst_stride; (void)w; (void)h;
+    return false;
+#endif
+}
+
+// Denoise the emulated frame before the display filter scales it, which is far
+// cheaper than denoising the output: a 9x filter would otherwise hand the
+// network 81 times the pixels.
+//
+// `frame` points at the buffer's leading border row, the layout the filter
+// threads expect, and so does the return value. Denoising in place is not an
+// option -- that buffer is the core's own -- so this stages a copy, and
+// duplicates the border rows the filter reads above and below the image.
+uint8_t* DrawingPanelBase::DlssNrPreFilter(uint8_t* frame, int instride, int w, int h)
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    const size_t stride = static_cast<size_t>(instride);
+    const size_t need = (static_cast<size_t>(h) + 2) * stride;
+    if (dlssnr_frame_.size() < need)
+        dlssnr_frame_.resize(need);
+
+    uint8_t* const base = dlssnr_frame_.data();
+    uint8_t* const img = base + stride;
+    if (!DlssNrApply(frame + stride, instride, img, instride, w, h))
+        return frame;
+
+    memcpy(base, img, stride);
+    memcpy(img + static_cast<size_t>(h) * stride,
+        img + static_cast<size_t>(h - 1) * stride, stride);
+    return base;
+#else
+    (void)instride; (void)w; (void)h;
+    return frame;
+#endif
+}
+
 void DrawingPanelBase::SyncDlssNr()
 {
 #ifdef VBAM_ENABLE_DLSS_NR
-    const bool want = OPTION(kDispFilter) == config::Filter::kDlssNr;
+    const bool want = OPTION(kDispDlssNr) && dlssnr::Available();
     if (want && !dlssnr_) {
         dlssnr_ = std::make_unique<dlssnr::Filter>();
         dlssnr_ready_logged_ = false;
@@ -5460,16 +5521,32 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing, but force single-threaded
-    // for plugin filters (RPI plugins expect the full frame) and for DLSS NR
-    // (the network sees the whole frame).
-    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin || UsingDlssNr())
+    // for plugin filters (RPI plugins expect the full frame).
+    const int max_threads = OPTION(kDispFilter) == config::Filter::kPlugin
         ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (panel_color_depth_ >> 3);
 
+    const bool have_filter = OPTION(kDispFilter) != config::Filter::kNone;
+    const bool have_ifb = OPTION(kDispIFB) != config::Interframe::kNone;
+    const bool use_threads = have_filter || have_ifb;
+
+    // Which side of the display filter the DLSS NR pass runs on. With no
+    // filter there is nothing to be before or after, so that folds into the
+    // pre case, where the network sees the frame at its native size.
+    const bool dlss_post = UsingDlssNr() && have_filter &&
+        OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+
+    // The pre-pass hands the filter threads a denoised frame laid out exactly
+    // like g_pix, which they read in place of it. The post-pass runs after
+    // they join, below.
+    uint8_t* const src_frame = (dlss_pre && use_threads)
+        ? DlssNrPreFilter(*data, instride, width, height) : *data;
+
     // Only allocate pixbuf2 when filters are used
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
+    if (OPTION(kDispFilter) != config::Filter::kNone || UsingDlssNr() ||
         OPTION(kDispIFB) != config::Interframe::kNone) {
         if (!pixbuf2) {
             int allocstride = outstride, alloch = height;
@@ -5490,8 +5567,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
-        OPTION(kDispIFB) != config::Interframe::kNone) {
+    if (use_threads) {
         if (nthreads != max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
@@ -5521,13 +5597,10 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -5549,9 +5622,6 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-                    threads[i].dlssnr_ = dlssnr_.get();
-#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -5575,13 +5645,10 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -5597,7 +5664,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 for (int i = 0; i < nthreads; i++) {
                     threads[i].phase_ = FilterThread::Phase::IFB;
                     threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
+                    threads[i].src_ = src_frame;
                     threads[i].sig_.Signal();
                     threads[i].lock_.Unlock();
                 }
@@ -5610,7 +5677,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
-                threads[i].src_ = *data;
+                threads[i].src_ = src_frame;
                 threads[i].sig_.Signal();
                 threads[i].lock_.Unlock();
             }
@@ -5641,7 +5708,7 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                 // Assign seam bands to threads and run in parallel
                 const int scale_int = static_cast<int>(scale);
                 // Source base: skip 1 border row
-                uint8_t* src_base = *data + instride;
+                uint8_t* src_base = src_frame + instride;
                 // Dest base: skip 1*scale border rows
                 uint8_t* dst_base = todraw + outstride * scale_int;
 
@@ -5668,6 +5735,21 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
                     filt_done.Wait();
             }
         }
+    }
+
+    // The pass runs out here rather than inside the filter threads: a band is
+    // only a slice of the image, so the network would hallucinate across every
+    // seam, and pinning the filter to one thread to avoid that is what made a
+    // 2x filter stutter. By now the threads have joined, so todraw holds one
+    // whole image.
+    if (dlss_post) {
+        uint8_t* const img = todraw + outstride * static_cast<int>(scale);
+        DlssNrApply(img, outstride, img, outstride, static_cast<int>(width * scale),
+            static_cast<int>(height * scale));
+    } else if (dlss_pre && !use_threads) {
+        // Nothing else ran, so this is all that stands between the emulated
+        // frame and the screen.
+        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
 
     // Note: We do NOT modify *data (which is g_pix) here.
@@ -10063,16 +10145,32 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     int outstride = std::ceil((width + inrb) * outbpp * scale);
 
     // Use multiple threads for filter processing, but force single-threaded
-    // for plugin filters (RPI plugins expect the full frame) and for DLSS NR
-    // (the network sees the whole frame).
-    const int max_threads = (OPTION(kDispFilter) == config::Filter::kPlugin || UsingDlssNr())
+    // for plugin filters (RPI plugins expect the full frame).
+    const int max_threads = OPTION(kDispFilter) == config::Filter::kPlugin
         ? 1 : GetMaxFilterThreads();
 
     // Compute stride for InterframeManager initialization
     int instride = (width + inrb) * (panel_color_depth_ >> 3);
 
+    const bool have_filter = OPTION(kDispFilter) != config::Filter::kNone;
+    const bool have_ifb = OPTION(kDispIFB) != config::Interframe::kNone;
+    const bool use_threads = have_filter || have_ifb;
+
+    // Which side of the display filter the DLSS NR pass runs on. With no
+    // filter there is nothing to be before or after, so that folds into the
+    // pre case, where the network sees the frame at its native size.
+    const bool dlss_post = UsingDlssNr() && have_filter &&
+        OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+
+    // The pre-pass hands the filter threads a denoised frame laid out exactly
+    // like g_pix, which they read in place of it. The post-pass runs after
+    // they join, below.
+    uint8_t* const src_frame = (dlss_pre && use_threads)
+        ? DlssNrPreFilter(*data, instride, width, height) : *data;
+
     // Only allocate pixbuf2 when filters are used
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
+    if (OPTION(kDispFilter) != config::Filter::kNone || UsingDlssNr() ||
         OPTION(kDispIFB) != config::Interframe::kNone) {
         if (!pixbuf2) {
             int allocstride = outstride, alloch = height;
@@ -10093,8 +10191,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
 
     // First, apply filters, if applicable, in parallel, if enabled
     // FIXME: && (gopts.ifb != FF_MOTION_BLUR || !renderer_can_motion_blur)
-    if (OPTION(kDispFilter) != config::Filter::kNone ||
-        OPTION(kDispIFB) != config::Interframe::kNone) {
+    if (use_threads) {
         if (nthreads != max_threads) {
             if (nthreads) {
                 if (nthreads > 1)
@@ -10124,13 +10221,10 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -10152,9 +10246,6 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     threads[i].dst_ = todraw;
                     threads[i].delta_ = delta;
                     threads[i].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-                    threads[i].dlssnr_ = dlssnr_.get();
-#endif
                     threads[i].rpi_bpp_ = rpi_bpp_;
                     threads[i].rpi_using_rgb565_ = rpi_using_rgb565_;
                     threads[i].panel_color_depth_ = panel_color_depth_;
@@ -10178,13 +10269,10 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             threads[0].width_ = width;
             threads[0].height_ = height;
             threads[0].scale_ = scale;
-            threads[0].src_ = *data;
+            threads[0].src_ = src_frame;
             threads[0].dst_ = todraw;
             threads[0].delta_ = delta;
             threads[0].rpi_ = rpi_;
-#ifdef VBAM_ENABLE_DLSS_NR
-            threads[0].dlssnr_ = dlssnr_.get();
-#endif
             threads[0].phase_ = FilterThread::Phase::Filter;
             threads[0].rpi_bpp_ = rpi_bpp_;
             threads[0].rpi_using_rgb565_ = rpi_using_rgb565_;
@@ -10200,7 +10288,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 for (int i = 0; i < nthreads; i++) {
                     threads[i].phase_ = FilterThread::Phase::IFB;
                     threads[i].lock_.Lock();
-                    threads[i].src_ = *data;
+                    threads[i].src_ = src_frame;
                     threads[i].sig_.Signal();
                     threads[i].lock_.Unlock();
                 }
@@ -10213,7 +10301,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
             for (int i = 0; i < nthreads; i++) {
                 threads[i].phase_ = FilterThread::Phase::Filter;
                 threads[i].lock_.Lock();
-                threads[i].src_ = *data;
+                threads[i].src_ = src_frame;
                 threads[i].sig_.Signal();
                 threads[i].lock_.Unlock();
             }
@@ -10244,7 +10332,7 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                 // Assign seam bands to threads and run in parallel
                 const int scale_int = static_cast<int>(scale);
                 // Source base: skip 1 border row
-                uint8_t* src_base = *data + instride;
+                uint8_t* src_base = src_frame + instride;
                 // Dest base: skip 1*scale border rows
                 uint8_t* dst_base = todraw + outstride * scale_int;
 
@@ -10271,6 +10359,21 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
                     filt_done.Wait();
             }
         }
+    }
+
+    // The pass runs out here rather than inside the filter threads: a band is
+    // only a slice of the image, so the network would hallucinate across every
+    // seam, and pinning the filter to one thread to avoid that is what made a
+    // 2x filter stutter. By now the threads have joined, so todraw holds one
+    // whole image.
+    if (dlss_post) {
+        uint8_t* const img = todraw + outstride * static_cast<int>(scale);
+        DlssNrApply(img, outstride, img, outstride, static_cast<int>(width * scale),
+            static_cast<int>(height * scale));
+    } else if (dlss_pre && !use_threads) {
+        // Nothing else ran, so this is all that stands between the emulated
+        // frame and the screen.
+        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
 
     // Note: We do NOT modify *data (which is g_pix) here.

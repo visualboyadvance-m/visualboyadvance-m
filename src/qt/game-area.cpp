@@ -231,8 +231,13 @@ GameArea::GameArea(QWidget* parent) : QWidget(parent) {
         [this](config::Option*) { SchedulePanelReset(); });
     // kDispFilter is handled separately: a filter change can often be adopted
     // in place (no panel rebuild / no black flash), unlike the options above.
+    // kDispDlssNr rides along: turning the post-pass on or off changes whether
+    // the frame goes through the filter machinery at all, so it needs the same
+    // rebuild, and SyncDlssNr() runs off the back of it.
     disp_filter_observer_ = std::make_unique<config::OptionsObserver>(
-        config::OptionID::kDispFilter, [this](config::Option*) { OnDispFilterChanged(); });
+        std::initializer_list<config::OptionID>{config::OptionID::kDispFilter,
+                                                config::OptionID::kDispDlssNr},
+        [this](config::Option*) { OnDispFilterChanged(); });
     scale_observer_ = std::make_unique<config::OptionsObserver>(
         config::OptionID::kDispScale, [this](config::Option*) { AdjustSize(true); });
     gb_border_observer_ = std::make_unique<config::OptionsObserver>(

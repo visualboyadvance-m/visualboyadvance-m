@@ -896,6 +896,15 @@ public:
     // thread, so this never stalls the UI.
     void SyncDlssNr();
 
+    // Run the DLSS NR pass from `src` to `dst`, both pointing at the first
+    // image row; false when the pass is not running. dst may alias src.
+    bool DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst, int dst_stride,
+                     int w, int h);
+
+    // Denoise a whole source frame into scratch and return it, laid out like
+    // the buffer passed in, for the filter threads to read instead.
+    uint8_t* DlssNrPreFilter(uint8_t* frame, int instride, int w, int h);
+
     // Per-frame health check for the DLSS NR processor: log once when the model
     // is up, and fall back to no filter (with an on-screen message) if opening
     // the model or a pass failed. Called from every DrawArea(uint8_t**) path.
@@ -1018,11 +1027,12 @@ protected:
     int rpi_bpp_ = 4; // bytes per pixel for RPI plugin (4 for 32-bit, 2 for 16-bit)
     int panel_color_depth_ = 16; // Color depth for this panel (may differ from global systemColorDepth)
 #ifdef VBAM_ENABLE_DLSS_NR
-    // The DLSS NR processor, present only while kDispFilter == kDlssNr. Owned
+    // The DLSS NR processor, present only while kDispDlssNr is on. Owned
     // here; the filter threads borrow the pointer and are stopped before it goes.
     std::unique_ptr<dlssnr::Filter> dlssnr_;
     bool dlssnr_ready_logged_ = false;
     uint32_t dlssnr_frame_counter_ = 0;
+    std::vector<uint8_t> dlssnr_frame_;  // staging for the pre-filter pass
 #endif
     hdr::Encoding hdr_encoding_ = hdr::Encoding::kNone; // active HDR surface encoding
     std::vector<uint8_t> hdr_buf_;                       // scratch for EncodeHdr()

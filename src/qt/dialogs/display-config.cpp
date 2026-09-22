@@ -29,6 +29,7 @@
 #include "qt/log.h"
 #include "qt/opts.h"
 #include "qt/rpi.h"
+#include "components/filters_dlssnr/dlssnr.h"
 #include "qt/widgets/option-binding.h"
 #include "qt/widgets/render-plugin.h"
 
@@ -167,6 +168,46 @@ QWidget* DisplayConfig::CreateBasicTab() {
     connect(plugin_selector_, QOverload<int>::of(&QComboBox::activated), this,
             &DisplayConfig::OnPluginSelected);
     filters_form->addRow(plugin_label_, plugin_selector_);
+
+    // DLSS NR runs alongside the display filter, on either side of it. The
+    // checkbox only means anything where libnr_frame is part of the build, so
+    // it is left out entirely otherwise rather than offered as a control that
+    // cannot act.
+    if (dlssnr::Available()) {
+        dlss_nr_ = new QCheckBox(tr("Apply &DLSS NR:"), filters_group);
+        dlss_nr_->setToolTip(tr("Run the DLSS NR neural filter alongside the display filter"));
+        bindings().BindCheckBox(dlss_nr_, config::OptionID::kDispDlssNr);
+
+        // Sharing a parent makes the two radios mutually exclusive, and
+        // BindRadioButtons() maps them positionally onto the option's values.
+        auto* stage_row = new QWidget(filters_group);
+        auto* stage_layout = new QHBoxLayout(stage_row);
+        stage_layout->setContentsMargins(0, 0, 0, 0);
+
+        dlss_nr_pre_ = new QRadioButton(tr("Pre-process"), stage_row);
+        dlss_nr_pre_->setToolTip(
+            tr("Run DLSS NR on the emulated image first, then let the display filter scale "
+               "the result. Much cheaper, since the network sees the unscaled frame"));
+        dlss_nr_post_ = new QRadioButton(tr("Post-process"), stage_row);
+        dlss_nr_post_->setToolTip(
+            tr("Run DLSS NR over whatever the display filter produces, at the filtered size"));
+
+        stage_layout->addWidget(dlss_nr_pre_);
+        stage_layout->addWidget(dlss_nr_post_);
+        stage_layout->addStretch(1);
+        bindings().BindRadioButtons({dlss_nr_pre_, dlss_nr_post_},
+                                    config::OptionID::kDispDlssNrStage);
+        filters_form->addRow(dlss_nr_, stage_row);
+
+        // The stage only means anything while the pass is on.
+        const auto sync_stage = [this] {
+            const bool on = dlss_nr_->isChecked();
+            dlss_nr_pre_->setEnabled(on);
+            dlss_nr_post_->setEnabled(on);
+        };
+        connect(dlss_nr_, &QCheckBox::toggled, this, sync_stage);
+        sync_stage();
+    }
 
     interframe_selector_ = new QComboBox(filters_group);
     interframe_selector_->addItems(widgets::InterframeLabels());

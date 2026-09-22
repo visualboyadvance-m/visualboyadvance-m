@@ -11,9 +11,11 @@
 #include "wx/config/option-observer.h"
 
 // Forward declarations.
+class wxCheckBox;
 class wxChoice;
 class wxControl;
 class wxNotebook;
+class wxRadioButton;
 class wxWindow;
 
 namespace config {
@@ -156,6 +158,9 @@ private:
     wxControl* plugin_label_ = nullptr;
     wxChoice* plugin_selector_ = nullptr;
     wxChoice* filter_selector_ = nullptr;
+    wxCheckBox* dlss_nr_ = nullptr;
+    wxRadioButton* dlss_nr_pre_ = nullptr;
+    wxRadioButton* dlss_nr_post_ = nullptr;
     wxChoice* interframe_selector_ = nullptr;
     wxChoice* sdlrenderer_selector_ = nullptr;
     wxControl* sdlrenderer_label_ = nullptr;
@@ -167,6 +172,10 @@ private:
     // hides unconditionally.
     std::vector<std::pair<const char*, config::RenderMethod>> render_method_radios_;
 
+    // Keeps the pre/post radios in step with the DLSS NR checkbox.
+    void SetDlssNrStageEnabled(bool enabled);
+
+    const config::OptionsObserver dlss_nr_observer_;
     const config::OptionsObserver filter_observer_;
     const config::OptionsObserver interframe_observer_;
 };

@@ -77,6 +77,15 @@ public:
     // from the constructor (the filter's initializer) and when a filter change
     // is adopted in place; the model opens on the processor's own thread.
     void SyncDlssNr();
+
+    // Run the DLSS NR pass from `src` to `dst`, both pointing at the first
+    // image row; false when the pass is not running. dst may alias src.
+    bool DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst, int dst_stride,
+                     int w, int h);
+
+    // Denoise a whole source frame into scratch and return it, laid out like
+    // the buffer passed in, for the filter threads to read instead.
+    uint8_t* DlssNrPreFilter(uint8_t* frame, int instride, int w, int h);
     // Per-frame health check: log once when the model is up, fall back to no
     // filter if opening it or a pass failed. Called from DrawArea(uint8_t**).
     void UpdateDlssNrState();
@@ -142,11 +151,12 @@ protected:
     int rpi_bpp_ = 4;
     int panel_color_depth_ = 16; // Color depth for this panel (may differ from systemColorDepth)
 #ifdef VBAM_ENABLE_DLSS_NR
-    // The DLSS NR processor, present only while kDispFilter == kDlssNr. The
+    // The DLSS NR processor, present only while kDispDlssNr is on. The
     // filter threads borrow the pointer and are stopped before it goes.
     std::unique_ptr<dlssnr::Filter> dlssnr_;
     bool dlssnr_ready_logged_ = false;
     uint32_t dlssnr_frame_counter_ = 0;
+    std::vector<uint8_t> dlssnr_frame_;  // staging for the pre-filter pass
 #endif
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];

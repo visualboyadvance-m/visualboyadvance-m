@@ -443,7 +443,6 @@ QStringList FilterLabels() {
         QStringLiteral("xBRZ 9x"),
         QStringLiteral("ScaleFX 3x"),
         QStringLiteral("ScaleFX 9x"),
-        QStringLiteral("DLSS NR"),
         Tr("Plugin"),
     };
 }

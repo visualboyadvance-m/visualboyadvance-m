@@ -137,6 +137,12 @@ inline uint8_t ToByte(float v) {
     return static_cast<uint8_t>(v * 255.0f + 0.5f);
 }
 
+// One channel of a pixel, plus a correction, clamped back into a byte.
+inline uint32_t AddClamp(uint32_t v, int16_t d) {
+    const int r = static_cast<int>(v & 0xffu) + d;
+    return static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r);
+}
+
 // `read_png` in nr_frame_main.c: `byte / 255`, a division rather than a multiply by the
 // reciprocal, so the float the network sees is the one the command gives it.
 inline float FromByte(uint32_t v) {
@@ -155,8 +161,11 @@ struct Filter::Impl {
     int pending_width = 0;
     int pending_height = 0;
     bool has_pending = false;
-    // The newest finished result, RGB8, (height, width, 3).
-    std::vector<uint8_t> result;
+    // What the newest finished pass changed, per channel, (height, width, 3):
+    // its output minus the frame it was given. Held as a correction rather
+    // than as the output itself so that Apply32() can lay it over the frame on
+    // screen now -- see there.
+    std::vector<int16_t> correction;
     int result_width = 0;
     int result_height = 0;
     bool has_result = false;
@@ -239,9 +248,13 @@ void Filter::Impl::Run() {
 
         {
             std::lock_guard<std::mutex> lock(mutex);
-            result.resize(count);
+            correction.resize(count);
+            // FromByte/ToByte round-trips, so ToByte(input[i]) is the source
+            // byte the network was handed, and the difference is purely what
+            // the pass did to it.
             for (size_t i = 0; i < count; i++)
-                result[i] = ToByte(output[i]);
+                correction[i] = static_cast<int16_t>(ToByte(output[i])) -
+                                static_cast<int16_t>(ToByte(input[i]));
             result_width = width;
             result_height = height;
             has_result = true;
@@ -274,22 +287,14 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
     const size_t pixels = static_cast<size_t>(width) * height;
 
     bool wrote_result = false;
+    bool notify_worker = false;
     {
         std::unique_lock<std::mutex> lock(im.mutex);
 
-        if (im.has_result && im.result_width == width && im.result_height == height) {
-            const uint8_t* r = im.result.data();
-            for (int y = 0; y < height; y++) {
-                uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
-                for (int x = 0; x < width; x++, r += 3) {
-                    d[x] = (static_cast<uint32_t>(r[0]) << red_shift) |
-                           (static_cast<uint32_t>(r[1]) << green_shift) |
-                           (static_cast<uint32_t>(r[2]) << blue_shift);
-                }
-            }
-            wrote_result = true;
-        }
-
+        // Read the source before writing the result: as a post-pass over the
+        // display filter's output dst aliases src, and taking the result first
+        // would feed the model its own previous output.
+        //
         // Hand the newest frame to the worker; a frame it never got to is
         // simply replaced, so the emulator is never held back by the network.
         if (!im.failed.load() && !im.quit) {
@@ -308,13 +313,50 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             im.pending_width = width;
             im.pending_height = height;
             im.has_pending = true;
-            lock.unlock();
-            im.cv.notify_one();
+            notify_worker = true;
+        }
+
+        // Lay the newest pass over the frame that is on screen *now*, rather
+        // than writing that pass's own output.
+        //
+        // A pass takes far longer than a frame -- tens of milliseconds even on
+        // a fast GPU, and it runs on whatever the display filter scaled the
+        // picture up to -- so its output is always several frames stale.
+        // Writing it out verbatim froze the whole image between passes and
+        // then jumped, which at 60 Hz reads as a bad stutter however quick the
+        // filter itself is. Adding only what the pass *changed* lets motion
+        // stay live at the emulator's frame rate while the denoising rides on
+        // top and refreshes whenever a pass lands.
+        //
+        // On a still picture the frame here is the frame the network was given,
+        // so this reproduces the pass's output exactly. The further the picture
+        // has moved since, the more the correction is aimed at pixels that have
+        // moved on, which shows up as a faint trail behind fast motion -- a far
+        // better trade than dropping the whole image to a few updates a second.
+        if (im.has_result && im.result_width == width && im.result_height == height) {
+            const int16_t* c = im.correction.data();
+            for (int y = 0; y < height; y++) {
+                const uint32_t* s =
+                    reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
+                uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
+                for (int x = 0; x < width; x++, c += 3) {
+                    // dst may alias src; this reads the pixel before it writes it.
+                    const uint32_t v = s[x];
+                    d[x] = (AddClamp(v >> red_shift, c[0]) << red_shift) |
+                           (AddClamp(v >> green_shift, c[1]) << green_shift) |
+                           (AddClamp(v >> blue_shift, c[2]) << blue_shift);
+                }
+            }
+            wrote_result = true;
         }
     }
 
-    if (!wrote_result) {
+    if (notify_worker)
+        im.cv.notify_one();
+
+    if (!wrote_result && dst != src) {
         // Nothing finished yet (or the model is unavailable): pass through.
+        // Nothing to do when dst aliases src, and memcpy would not allow it.
         const size_t row_bytes = pixels / height * 4;
         for (int y = 0; y < height; y++)
             memcpy(dst + static_cast<size_t>(y) * outstride,

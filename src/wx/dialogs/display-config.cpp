@@ -34,6 +34,7 @@
 #include "wx/dialogs/base-dialog.h"
 #include "wx/rpi.h"
 #include "wx/wayland.h"
+#include "components/filters_dlssnr/dlssnr.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/slider-value-label.h"
 
@@ -392,6 +393,8 @@ DisplayConfig* DisplayConfig::NewInstance(wxWindow* parent) {
 DisplayConfig::DisplayConfig(wxWindow* parent)
     : BaseDialog(parent, "DisplayConfig"),
       tab_loaded_(kTabCount, false),
+      dlss_nr_observer_(config::OptionID::kDispDlssNr,
+                        [this](config::Option* o) { SetDlssNrStageEnabled(o->GetBool()); }),
       filter_observer_(config::OptionID::kDispFilter,
                        std::bind(&DisplayConfig::OnFilterChanged,
                                  this,
@@ -401,6 +404,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
                                      this,
                                      std::placeholders::_1)) {
     notebook_ = GetValidatedChild<wxNotebook>("DisplayConfigNotebook");
+
 
     Bind(wxEVT_SHOW, &DisplayConfig::OnDialogShowEvent, this, GetId());
 
@@ -615,6 +619,32 @@ void DisplayConfig::InitBasicTab() {
 
     // Filter / plugin selectors.
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
+
+    // DLSS NR runs alongside the display filter. The controls only mean
+    // anything where libnr_frame is part of the build, so hide them otherwise
+    // rather than offer controls that cannot do anything.
+    dlss_nr_ = GetValidatedChild<wxCheckBox>("DlssNr");
+    dlss_nr_pre_ = GetValidatedChild<wxRadioButton>("DlssNrPre");
+    dlss_nr_post_ = GetValidatedChild<wxRadioButton>("DlssNrPost");
+    if (dlssnr::Available()) {
+        dlss_nr_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNr));
+        dlss_nr_pre_->SetValidator(widgets::OptionSelectedValidator(
+            config::OptionID::kDispDlssNrStage, dlssnr::kBeforeFilter));
+        dlss_nr_post_->SetValidator(widgets::OptionSelectedValidator(
+            config::OptionID::kDispDlssNrStage, dlssnr::kAfterFilter));
+        // OptionValidator only writes the option on TransferFromWindow (dialog
+        // OK), so the observer alone never fires while the dialog is open.
+        // Track the checkbox itself for the live case.
+        dlss_nr_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& ev) {
+            SetDlssNrStageEnabled(ev.IsChecked());
+            ev.Skip();
+        });
+        SetDlssNrStageEnabled(OPTION(kDispDlssNr));
+    } else {
+        dlss_nr_->Hide();
+        dlss_nr_pre_->Hide();
+        dlss_nr_post_->Hide();
+    }
     filter_selector_->SetValidator(FilterValidator());
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
@@ -1203,6 +1233,18 @@ void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
 
     // Let the event propagate.
     event.Skip();
+}
+
+void DisplayConfig::SetDlssNrStageEnabled(bool enabled) {
+    // The Basic tab owns these. The observer can fire before that tab has been
+    // lazy-loaded, exactly as it can for the filter selectors above.
+    if (!dlssnr::Available() || !dlss_nr_pre_ || !dlss_nr_post_) {
+        return;
+    }
+
+    // The stage only means anything while the pass is on.
+    dlss_nr_pre_->Enable(enabled);
+    dlss_nr_post_->Enable(enabled);
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {
