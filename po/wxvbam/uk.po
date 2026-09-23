@@ -1050,24 +1050,24 @@ msgstr "Вихід"
 
 #: panel.cpp:2968
 msgid "DLSS NR is not available in this build; turning it off."
-msgstr ""
+msgstr "DLSS NR недоступне в цьому випуску; вимкнення."
 
 #: panel.cpp:4465
 msgid "DLSS NR: loading model..."
-msgstr ""
+msgstr "DLSS NR: завантаження моделі..."
 
 #: panel.cpp:4487
 #, c-format
 msgid "DLSS NR filter failed: %s"
-msgstr ""
+msgstr "Не виконано фільтр DLSS NR: %s."
 
 #: panel.cpp:4488
 msgid "DLSS NR unavailable, filter disabled"
-msgstr ""
+msgstr "DLSS NR недоступне, фільтр вимкнено."
 
 #: panel.cpp:4498
 msgid "DLSS NR ready"
-msgstr ""
+msgstr "DLSS NR готове."
 
 #: panel.cpp:4849
 msgid "Failed to set wayland display"
@@ -2048,11 +2048,11 @@ msgstr "Бібліотека плаґінів фільтрів"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 #: xrc/DisplayConfigBasic.xrc:221
 msgid "Run the DLSS NR neural filter alongside the display filter"
-msgstr ""
+msgstr "Запустити нейронний фільтр DLSS NR разом із фільтром відображення"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
 msgid "Whether DLSS NR runs before or after the display filter"
-msgstr ""
+msgstr "Встановити запуск DLSS NR до чи після фільтра відображення"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
 msgid "Directory containing RPI filter plugins"
@@ -3489,26 +3489,26 @@ msgstr "Міжкадрове розмиття"
 
 #: xrc/DisplayConfigBasic.xrc:220
 msgid "Apply &DLSS NR:"
-msgstr ""
+msgstr "Застосувати &DLSS NR:"
 
 #: xrc/DisplayConfigBasic.xrc:231
 msgid "Pre-process"
-msgstr ""
+msgstr "Попереднє опрацювання"
 
 #: xrc/DisplayConfigBasic.xrc:233
 msgid ""
 "Run DLSS NR on the emulated image first, then let the display filter scale "
 "the result. Much cheaper, since the network sees the unscaled frame"
-msgstr ""
+msgstr "Початковий запуск DLSS NR на емульованому зображенні, потім - дозвіл фільтру відображення масштабувати результат. Більш вигідно, оскільки нейромережа бачить кадр без масштабування."
 
 #: xrc/DisplayConfigBasic.xrc:238
 msgid "Post-process"
-msgstr ""
+msgstr "Післяопрацювання"
 
 #: xrc/DisplayConfigBasic.xrc:239
 msgid ""
 "Run DLSS NR over whatever the display filter produces, at the filtered size"
-msgstr ""
+msgstr "Запуск DLSS NR над результатом роботи фільтра відображення у фільтрованому розмірі."
 
 #: xrc/DisplayConfigBitDepth.xrc:11
 msgid "Bit Depth:"
