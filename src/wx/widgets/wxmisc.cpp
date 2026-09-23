@@ -8,6 +8,7 @@
 #include <wx/spinctrl.h>
 
 #include "wx/widgets/wxmisc.h"
+#include "wx/macsandbox.h"
 
 bool wxBoolIntValidator::TransferToWindow()
 {
@@ -133,8 +134,13 @@ bool wxFileDirPickerValidator::TransferFromWindow()
     wxFilePickerCtrl* fp = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 
     if (fp) {
-        *vptr = fp->GetPath();
+        // macOS App Sandbox: a BIOS is copied into the container (the copy
+        // needs no bookmark); any other file is bookmarked so it stays
+        // accessible across launches.
+        *vptr = vbios ? macsandbox::ImportBios(fp->GetPath()) : fp->GetPath();
         if (vlabel) vlabel->SetLabel(*vptr);
+        if (!vbios)
+            macsandbox::RememberPath(*vptr);
         return true;
     }
 
@@ -143,6 +149,7 @@ bool wxFileDirPickerValidator::TransferFromWindow()
     if (dp) {
         *vptr = dp->GetPath();
         if (vlabel) vlabel->SetLabel(*vptr);
+        macsandbox::RememberPath(*vptr);
         return true;
     }
 

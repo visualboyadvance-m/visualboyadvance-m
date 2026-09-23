@@ -85,21 +85,25 @@ protected:
 // wxFilePickerCtrl/wxDirPickerCtrl copy-only vvalidator
 class wxFileDirPickerValidator : public wxValidator {
 public:
-    wxFileDirPickerValidator(wxString* _vptr, wxStaticText* _label = NULL)
+    // is_bios: the picked file is a BIOS image; on a sandboxed macOS build it
+    // is copied into the container and the variable receives the copy's path.
+    wxFileDirPickerValidator(wxString* _vptr, wxStaticText* _label = NULL, bool is_bios = false)
         : wxValidator()
         , vptr(_vptr)
         , vlabel(_label)
+        , vbios(is_bios)
     {
     }
     wxFileDirPickerValidator(const wxFileDirPickerValidator& v)
         : wxValidator()
         , vptr(v.vptr)
         , vlabel(v.vlabel)
+        , vbios(v.vbios)
     {
     }
     wxObject* Clone() const
     {
-        return new wxFileDirPickerValidator(vptr, vlabel);
+        return new wxFileDirPickerValidator(vptr, vlabel, vbios);
     }
     bool TransferToWindow();
     bool TransferFromWindow();
@@ -112,6 +116,7 @@ public:
 protected:
     wxString* vptr;
     wxStaticText* vlabel;
+    bool vbios;
 };
 
 // Copy-only validators for checkboxes and radio buttons that enables a set

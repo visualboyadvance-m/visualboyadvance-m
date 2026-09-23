@@ -1,0 +1,108 @@
+#!/bin/sh
+#
+# Sign a macOS .app bundle inside-out and attach entitlements to the app.
+#
+#   codesign_app [--hardened] [--entitlements FILE] IDENTITY APP
+#
+# IDENTITY is a codesign identity ("-" for an ad-hoc signature, or e.g.
+# "Developer ID Application"). With --hardened the hardened runtime and a
+# secure timestamp are requested on every signature (a notarization
+# requirement; ad-hoc signatures cannot be timestamped, so it is ignored
+# for "-").
+#
+# Why not `codesign --deep`: --deep applies the SAME flags -- including
+# --entitlements -- to every nested code item, so the App Sandbox
+# entitlements meant for the app would land on Sparkle's XPC services and
+# helper executables too, and it skips loose .dylib files altogether. Nested
+# code is therefore signed explicitly first, deepest paths first, keeping
+# whatever entitlements it shipped with, and the app bundle itself last with
+# the requested entitlements and without --deep.
+
+set -e
+
+hardened=
+entitlements=
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --hardened)     hardened=1; shift ;;
+        --entitlements) entitlements="$2"; shift 2 ;;
+        --)             shift; break ;;
+        -)              break ;;  # the ad-hoc identity
+        -*)             echo "codesign_app: unknown option $1" >&2; exit 2 ;;
+        *)              break ;;
+    esac
+done
+
+if [ $# -ne 2 ]; then
+    echo "usage: codesign_app [--hardened] [--entitlements FILE] IDENTITY APP" >&2
+    exit 2
+fi
+
+identity=$1
+app=$2
+
+if [ ! -d "$app" ]; then
+    echo "codesign_app: $app is not a directory" >&2
+    exit 1
+fi
+
+if [ -n "$entitlements" ] && [ ! -f "$entitlements" ]; then
+    echo "codesign_app: entitlements file $entitlements not found" >&2
+    exit 1
+fi
+
+is_macho_executable() {
+    case "$(file -b "$1" 2>/dev/null)" in
+        Mach-O*executable*) return 0 ;;
+    esac
+    return 1
+}
+
+# Extra flags shared by every signature. The identity itself may contain
+# spaces ("Developer ID Application"), so it is always passed quoted and
+# never through this variable.
+common="--force"
+if [ -n "$hardened" ] && [ "$identity" != "-" ]; then
+    common="$common --options runtime --timestamp"
+fi
+
+# Nested code: XPC services, nested app bundles, frameworks, loose dylibs,
+# bundles and Mach-O executables that are not the main executable. Sort
+# deepest first so that, e.g., Sparkle.framework's XPC services are signed
+# before the framework that contains them.
+nested=$(
+    {
+        find "$app/Contents" -mindepth 2 \( -name '*.xpc' -o -name '*.app' -o -name '*.framework' -o -name '*.bundle' -o -name '*.plugin' \) -prune -print
+        find "$app/Contents" -mindepth 2 \( -name '*.dylib' -o -name '*.so' \) -type f -print
+        # Loose executables inside frameworks (Sparkle's Autoupdate).
+        find "$app/Contents/Frameworks" -type f -perm -u+x ! -name '*.dylib' ! -name '*.so' -print 2>/dev/null |
+            while IFS= read -r f; do
+                is_macho_executable "$f" && printf '%s\n' "$f"
+            done
+    } | awk '{ print gsub("/", "/"), $0 }' | sort -rn | cut -d' ' -f2-
+)
+
+if [ -n "$nested" ]; then
+    printf '%s\n' "$nested" | while IFS= read -r item; do
+        [ -n "$item" ] || continue
+        case "$item" in
+            # A framework's Versions/X/... contents are covered by signing the
+            # framework itself, except for the nested code found above.
+            */Versions/*/Resources/*|*/Versions/*/Headers/*) continue ;;
+        esac
+        echo "codesign_app: signing $item"
+        # shellcheck disable=SC2086
+        codesign $common --sign "$identity" --preserve-metadata=entitlements,flags "$item"
+    done
+fi
+
+echo "codesign_app: signing $app"
+if [ -n "$entitlements" ]; then
+    # shellcheck disable=SC2086
+    codesign $common --sign "$identity" --entitlements "$entitlements" "$app"
+else
+    # shellcheck disable=SC2086
+    codesign $common --sign "$identity" "$app"
+fi
+
+codesign --verify --strict "$app"

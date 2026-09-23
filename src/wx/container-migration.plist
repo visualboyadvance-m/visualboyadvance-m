@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App Sandbox container migration manifest. The first time the
+	     sandboxed app launches on a machine (i.e. when its container is
+	     created), macOS moves these paths from the user's real home into
+	     the container, so the config file, the per-game overrides and any
+	     saves kept in the data dir carry over from the unsandboxed build.
+	     It runs only once, at container creation; an already existing
+	     container is left alone. -->
+	<key>Move</key>
+	<array>
+		<string>${ApplicationSupport}/visualboyadvance-m</string>
+	</array>
+</dict>
+</plist>

@@ -4,6 +4,7 @@
 
 #include "core/base/check.h"
 #include "wx/dialogs/base-dialog.h"
+#include "wx/macsandbox.h"
 #include "wx/widgets/option-validator.h"
 
 namespace dialogs {
@@ -39,6 +40,8 @@ private:
         const wxDirPickerCtrl* dir_picker =
             wxDynamicCast(GetWindow(), wxDirPickerCtrl);
         VBAM_CHECK(dir_picker);
+        // macOS App Sandbox: keep access to the chosen folder across launches.
+        macsandbox::RememberPath(dir_picker->GetPath());
         return option()->SetString(dir_picker->GetPath());
     }
 };

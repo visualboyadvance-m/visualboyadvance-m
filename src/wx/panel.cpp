@@ -103,6 +103,7 @@
 #endif
 
 #ifndef NO_WAYLAND
+#include "wx/macsandbox.h"
 #include "wx/wayland.h"
 #endif
 
@@ -825,6 +826,11 @@ void GameArea::LoadGame(const wxString& load_path)
     loaded_game = fnfn;
     loaded_game.ClearExt();
     loaded_game.MakeAbsolute();
+
+    // macOS App Sandbox: the ROM reached us through a file dialog, drag and
+    // drop or Launch Services, which grants access to that one file for this
+    // process only. Bookmark it so the Recent menu can reopen it next launch.
+    macsandbox::RememberPath(fnfn.GetFullPath());
     // load patch, if enabled
     // note that it is difficult to load from archive due to
     // ../common/Patch.cpp depending on opening the file itself and doing
@@ -1304,8 +1310,13 @@ void GameArea::recompute_dirs()
 {
     batdir = ExpandSystemPath(OPTION(kGenBatteryDir), loaded);
 
+    // macOS App Sandbox: the ROM's folder is never accessible (a ROM opened
+    // from a dialog grants access to that file only), so the default and
+    // the fallback are <container home>/Saves instead (see macsandbox.h).
+    const wxString sandbox_saves = macsandbox::SavesDir();
+
     if (batdir.empty()) {
-        batdir = loaded_game.GetPathWithSep();
+        batdir = sandbox_saves.empty() ? loaded_game.GetPathWithSep() : sandbox_saves;
     } else {
         batdir = wxGetApp().GetAbsolutePath(batdir);
         // Try to create the directory if it doesn't exist
@@ -1320,7 +1331,7 @@ void GameArea::recompute_dirs()
     }
 
     if (!wxIsWritable(batdir)) {
-        batdir = wxGetApp().GetDataDir();
+        batdir = sandbox_saves.empty() ? wxGetApp().GetDataDir() : sandbox_saves;
     }
 
     statedir = ExpandSystemPath(OPTION(kGenStateDir), loaded);

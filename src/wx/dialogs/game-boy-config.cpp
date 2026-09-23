@@ -19,6 +19,7 @@
 #include "wx/config/option-observer.h"
 #include "wx/config/option-proxy.h"
 #include "wx/dialogs/base-dialog.h"
+#include "wx/macsandbox.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/utils.h"
 
@@ -158,7 +159,9 @@ private:
         const wxFilePickerCtrl* file_picker =
             wxDynamicCast(GetWindow(), wxFilePickerCtrl);
         VBAM_CHECK(file_picker);
-        return option()->SetString(file_picker->GetPath());
+        // macOS App Sandbox: copy the BIOS into the container and point the
+        // option at the copy.
+        return option()->SetString(macsandbox::ImportBios(file_picker->GetPath()));
     }
 
     wxStaticText* label_;

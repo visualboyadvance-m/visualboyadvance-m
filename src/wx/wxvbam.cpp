@@ -1,6 +1,7 @@
 #include "wx/wxvbam.h"
 
 #include "wx/language-compat.h"
+#include "wx/macsandbox.h"
 
 #if defined(__ANDROID__)
 #include <android/log.h>
@@ -417,6 +418,16 @@ static void get_config_path(wxPathList& path, bool exists = true)
         add_nonstandard_path(old_config);
     }
 #endif
+
+    // macOS App Sandbox: the settings file lives in the container's own
+    // Application Support directory (GetUserDataDir() resolves through the
+    // redirected $HOME) and nowhere else. Bundle-relative and system-wide
+    // candidates are never consulted, so a vbam.ini next to the bundle or in
+    // /Library cannot shadow the container's copy.
+    if (macsandbox::Active()) {
+        path.Add(stdp.GetUserDataDir());
+        return;
+    }
 
     // NOTE: this does not support XDG (freedesktop.org) paths
     add_path(GetUserLocalDataDir());
@@ -895,6 +906,10 @@ bool wxvbamApp::OnInit() {
     // Load the default options.
     const bool first_run = !config_file_.Exists();
     load_opts(first_run);
+
+    // macOS App Sandbox: regain access to the ROMs, folders and BIOS files
+    // the user granted in earlier sessions (see macsandbox.h).
+    macsandbox::RestoreAccess();
 
     // On first launch only (no config file yet), arm the runtime display-filter
     // probe. Once a ROM is running, GameArea cycles candidate filters, measures

@@ -202,6 +202,20 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
 - Requires Xcode
 - Metal shader support available on modern systems
 - Use `./installdeps` with Homebrew/MacPorts
+- The wx `.app` is App Sandboxed (`ENABLE_MAC_SANDBOX`, default ON):
+  `tools/macOS/codesign_app` signs nested code first and the bundle last with
+  `src/wx/visualboyadvance-m.entitlements` (Developer ID + hardened runtime
+  under `UPSTREAM_RELEASE`, ad-hoc otherwise). Sandbox-awareness lives in
+  `src/wx/macsandbox.mm` (security-scoped bookmarks for recent ROMs, picked
+  directories; battery saves default to `<container home>/Saves` and a
+  picked BIOS is copied into `<container home>/BIOS`, because a ROM's folder
+  is never accessible in the sandbox and Apple's related-items mechanism was
+  tried and refused for the `.sav`),
+  `container-migration.plist` moves the unsandboxed config dir into the
+  container on first launch, and the IPC link uses a file-backed segment in
+  the container's `$TMPDIR` (`VBAM_LINK_FILE_SHM` in `gbaLink.cpp`) because
+  sandboxed processes cannot `shm_open`/`sem_open` unprefixed names. Runtime
+  detection is the `APP_SANDBOX_CONTAINER_ID` environment variable.
 
 **Linux**:
 - Supported: Debian/Ubuntu, Fedora, Arch, Solus, OpenSUSE, Gentoo, RHEL/CentOS

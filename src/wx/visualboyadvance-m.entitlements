@@ -2,13 +2,46 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- App Sandbox. The wx port copes with it through security-scoped
+	     bookmarks (src/wx/macsandbox.mm), data-dir fallbacks for
+	     saves/states/screenshots, and a file-backed IPC link segment in
+	     the container's $TMPDIR (src/core/gba/gbaLink.cpp). -->
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
-	<key>com.apple.security.files.user-selected.read-only</key>
+
+	<!-- Files the user picks in open/save dialogs or drops on the window:
+	     ROMs, BIOS images, save/state import and export, screenshots,
+	     recordings, cheat lists. Read-write, since every "Save as" goes
+	     through this. -->
+	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
+
+	<!-- Security-scoped bookmarks, so the Recent menu, the Directories
+	     settings and the BIOS paths keep working across launches. -->
+	<key>com.apple.security.files.bookmarks.app-scope</key>
+	<true/>
+
+	<!-- LAN link (client and listener), RFU, the GDB stub and the Sparkle
+	     appcast fetch. -->
 	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
+
+	<!-- Game controllers: SDL opens them through IOKit HID (USB) and
+	     IOBluetooth, both of which the sandbox gates on these. -->
+	<key>com.apple.security.device.usb</key>
+	<true/>
+	<key>com.apple.security.device.bluetooth</key>
+	<true/>
+
+	<!-- Sparkle 2 in a sandboxed app: the updater talks to its installer
+	     through these two Mach services (Sparkle's documented sandboxing
+	     setup). Harmless when online updates are compiled out. -->
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+	<array>
+		<string>com.visualboyadvance-m.visualboyadvance-m-spks</string>
+		<string>com.visualboyadvance-m.visualboyadvance-m-spki</string>
+	</array>
 </dict>
 </plist>

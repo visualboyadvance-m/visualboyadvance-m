@@ -645,6 +645,12 @@ if(APPLE)
     endif()
 
     option(BUNDLE_DYLIBS "Bundle dylibs into .app" ${bundle_dylibs_default})
+
+    # Sign the wx .app with the App Sandbox entitlements in
+    # src/wx/visualboyadvance-m.entitlements. Release builds use the
+    # Developer ID identity, everything else an ad-hoc signature, which is
+    # enough for the sandbox to be enforced in local builds.
+    option(ENABLE_MAC_SANDBOX "Sign the macOS .app with App Sandbox entitlements" ON)
 endif()
 
 # Direct3D renderers (9 and 12) and the XAudio2 sound backend are shared by

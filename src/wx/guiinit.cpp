@@ -2541,7 +2541,7 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                      wxFilePickerCtrl* fp =
                          SafeXRCCTRL<wxFilePickerCtrl>(d, "BootRom");
                      fp->SetValidator(
-                         wxFileDirPickerValidator(&gopts.gba_bios, label));
+                         wxFileDirPickerValidator(&gopts.gba_bios, label, true));
                      wxControl* boot_rom_lab =
                          SafeXRCCTRL<wxControl>(d, "BootRomLab");
                      (void)boot_rom_lab;

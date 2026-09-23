@@ -191,6 +191,12 @@ void load_opts(bool first_time_launch) {
             continue;
         }
 
+        // ignore the macOS App Sandbox bookmark store (see macsandbox.h); it
+        // is read by macsandbox::RestoreAccess() right after this runs.
+        if (s == "MacSandbox") {
+            continue;
+        }
+
         cfg->SetPath(s);
         int poff = s.size();
         long entry_idx;

@@ -1365,7 +1365,7 @@ if(WIN32)
 endif()
 
 if(APPLE)
-    target_sources(visualboyadvance-m PRIVATE macsupport.mm)
+    target_sources(visualboyadvance-m PRIVATE macsupport.mm macsandbox.mm macsandbox.h)
 
     if(NOT COMPILE_ONLY AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         target_link_libraries(visualboyadvance-m tiff)
@@ -1904,6 +1904,14 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
     set(CCS6 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableAutomaticChecks -bool YES)
     #set(CCS7 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUPublicEDKey -string "${PUBLIC_KEY}")
     set(CCS8 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUFeedURL -string "${APPCAST_URL}")
+    # Sparkle 2 needs its Installer Launcher XPC service when the app is
+    # sandboxed (the mach-lookup exceptions for the installer connection
+    # are in visualboyadvance-m.entitlements).
+    if(ENABLE_MAC_SANDBOX)
+        set(CCS9 defaults write ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Info.plist SUEnableInstallerLauncherService -bool YES)
+    else()
+        set(CCS9 true)
+    endif()
     add_custom_command(TARGET visualboyadvance-m POST_BUILD
         COMMAND ${CCS1}
         COMMAND ${CCS2}
@@ -1911,6 +1919,7 @@ if(APPLE AND ENABLE_ONLINEUPDATES)
         COMMAND ${CCS6}
         #COMMAND ${CCS7}
         COMMAND ${CCS8}
+        COMMAND ${CCS9}
     )
 
     TARGET_LINK_LIBRARIES(visualboyadvance-m $<LINK_LIBRARY:WEAK_FRAMEWORK,${SPARKLE_FRAMEWORK}>)
@@ -2099,6 +2108,13 @@ if(APPLE)
     set_property(TARGET visualboyadvance-m APPEND PROPERTY MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/wxplist.in)
     set_source_files_properties(${VBAM_ICON_PATH} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
+    if(ENABLE_MAC_SANDBOX)
+        # Container migration manifest: on the first sandboxed launch macOS
+        # moves the unsandboxed build's config dir into the new container.
+        target_sources(visualboyadvance-m PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/container-migration.plist)
+        set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/container-migration.plist PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    endif()
+
     if(BUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         add_custom_command(
             TARGET visualboyadvance-m POST_BUILD
@@ -2138,30 +2154,36 @@ if(APPLE)
     vbam_strip_release_binary(visualboyadvance-m.app/Contents/MacOS/visualboyadvance-m)
 endif()
 
-if(APPLE AND UPSTREAM_RELEASE)
-    # Sign bundled dylibs individually before signing the app bundle.
-    # codesign --deep does not sign loose .dylib files, only .framework bundles,
-    # so dylibs in Contents/Frameworks must be signed explicitly at build time.
-    # This must run before signing the app bundle itself.
-    if(BUNDLE_DYLIBS AND CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
-        add_custom_command(
-            TARGET visualboyadvance-m
-            POST_BUILD
-            VERBATIM COMMAND sh -c [=[
-                find ./visualboyadvance-m.app/Contents/Frameworks -name "*.dylib" \
-                    -exec codesign --sign "Developer ID Application" --options runtime --timestamp --force '{}' ';' || :
-            ]=]
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        )
+# Code signing. tools/macOS/codesign_app signs the nested code (bundled
+# dylibs, Sparkle.framework and its XPC services) first and the app bundle
+# last, with the App Sandbox entitlements attached to the app only -- which
+# `codesign --deep` cannot do (it would put the entitlements on every nested
+# item and skips loose dylibs). Release builds sign with the Developer ID
+# identity and the hardened runtime; other builds get an ad-hoc signature,
+# which is all the sandbox needs to be enforced locally.
+if(APPLE AND (UPSTREAM_RELEASE OR ENABLE_MAC_SANDBOX))
+    if(UPSTREAM_RELEASE)
+        set(VBAM_CODESIGN_IDENTITY "Developer ID Application")
+        set(VBAM_CODESIGN_FLAGS --hardened)
+    else()
+        set(VBAM_CODESIGN_IDENTITY "-")
+        set(VBAM_CODESIGN_FLAGS)
+    endif()
+
+    if(ENABLE_MAC_SANDBOX)
+        list(APPEND VBAM_CODESIGN_FLAGS --entitlements ${CMAKE_CURRENT_SOURCE_DIR}/visualboyadvance-m.entitlements)
     endif()
 
     add_custom_command(
         TARGET visualboyadvance-m
         POST_BUILD
-        VERBATIM COMMAND sh -c [=[codesign --sign "Developer ID Application" --options runtime --timestamp --force --deep ./visualboyadvance-m.app || :]=]
+        COMMAND sh ${CMAKE_SOURCE_DIR}/tools/macOS/codesign_app ${VBAM_CODESIGN_FLAGS} ${VBAM_CODESIGN_IDENTITY} ./visualboyadvance-m.app
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        VERBATIM
     )
+endif()
 
+if(APPLE AND UPSTREAM_RELEASE)
     # Zip, notarize, staple to the .app and zip again
 
     if(CMAKE_BUILD_TYPE STREQUAL Debug)
