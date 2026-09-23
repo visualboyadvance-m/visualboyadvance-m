@@ -140,6 +140,11 @@ void WaylandClearWlSurfaceColor(struct wl_surface* surface);
 // via the color-management output image description. 0 when unknown / HDR off.
 // Absolute nits (Wayland HDR is PQ), so used directly as the peak ceiling.
 uint32_t WaylandDisplayPeakNits();
+// The compositor's reported minimum luminance (nits) for that same display: the
+// display's own black floor including ambient flare. Fractional -- hundredths
+// of a nit on an LCD, ten-thousandths on an OLED -- so unlike the peak this is
+// a float. 0 when unknown or genuinely zero.
+float WaylandDisplayMinNits();
 #else
 constexpr bool WaylandHdrPqSupported() { return false; }
 inline bool WaylandSetWlSurfaceHdrPq([[maybe_unused]] struct wl_surface* surface,
@@ -147,6 +152,7 @@ inline bool WaylandSetWlSurfaceHdrPq([[maybe_unused]] struct wl_surface* surface
                                      [[maybe_unused]] float peak_nits) { return false; }
 inline void WaylandClearWlSurfaceColor([[maybe_unused]] struct wl_surface* surface) {}
 constexpr uint32_t WaylandDisplayPeakNits() { return 0; }
+constexpr float WaylandDisplayMinNits() { return 0.0f; }
 #endif
 
 #ifdef HAVE_WAYLAND_HDR

@@ -99,6 +99,18 @@ float PqOetf(float l) {
 // equals the linear slope (reference) and eases to a flat top at peak, so
 // there is no slope discontinuity -- avoiding the brightness inflection a
 // piecewise-linear knee produced during fades.
+// The nits the bottom of the transfer is anchored to. The display's reported
+// black floor, but never more than a small fraction of the below-knee range:
+// a real floor is a fraction of a nit against a `top` of a hundred or more, so
+// this never binds in practice and only keeps a nonsense value from a
+// compositor or a driver from washing the whole picture out.
+float ShadowFloor(float top) {
+    const float m = g_settings.display_min_nits;
+    if (!(m > 0.0f) || top <= 0.0f)
+        return 0.0f;
+    return std::min(m, top * 0.05f);
+}
+
 float LumScale(float L) {
     const float ref = g_settings.sdr_reference_nits;
     const float peak = std::max(ref, g_settings.peak_nits);
@@ -106,18 +118,28 @@ float LumScale(float L) {
     const float sc = g_settings.shadow_contrast;
 
     if (knee >= 1.0f || L <= knee) {
-        // Below the knee the transfer is linear (outL = ref * L). Optionally
-        // shape it with a gamma pivoted at the knee to deepen shadows: at the
-        // pivot the value is unchanged (continuity into the shoulder), and for
-        // L below it sc > 1 pulls the output down, steepening the low end. The
-        // returned value is a per-pixel scale on the channels, so hue is
-        // preserved as with the highlight boost.
-        if (sc != 1.0f && L > 0.0f) {
-            const float pivot = knee > 0.0f ? knee : 1.0f;
-            const float shaped = pivot * std::pow(L / pivot, sc);
-            return ref * shaped / L;
+        if (L <= 0.0f)
+            return ref;  // every channel is 0; the scale cannot matter.
+
+        // Below the knee the transfer runs from the display's black floor at
+        // L = 0 up to ref * pivot at the pivot, where it meets the shoulder.
+        // Optionally shaped by a gamma to deepen shadows: sc > 1 pulls the
+        // output down and steepens the low end. The returned value is a
+        // per-pixel scale on the channels, so hue is preserved as with the
+        // highlight boost.
+        const float pivot = knee > 0.0f ? knee : 1.0f;
+        const float top = ref * pivot;  // nits where the shoulder takes over
+        const float floor_nits = ShadowFloor(top);
+        if (floor_nits <= 0.0f) {
+            // No usable floor reported: the original transfer, anchored at 0.
+            if (sc != 1.0f)
+                return ref * pivot * std::pow(L / pivot, sc) / L;
+            return ref;  // outL = ref * L
         }
-        return ref;  // outL = ref * L
+        const float t = sc != 1.0f ? std::pow(L / pivot, sc) : L / pivot;
+        // t == 1 at the pivot, so this still lands on ref * pivot there and
+        // the shoulder joins without a step.
+        return (floor_nits + (top - floor_nits) * t) / L;
     }
 
     const float dx = 1.0f - knee;

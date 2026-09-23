@@ -36,6 +36,9 @@
 //                             peak, leaving mid-tones at the reference
 //   4. shadow_contrast     -- gamma below the knee that deepens blacks/shadows
 //                             for more contrast, leaving highlights untouched
+//   5. display_min_nits    -- the display's own black floor, which the bottom
+//                             of the transfer is anchored to so dark shades
+//                             land where the panel can still separate them
 // ----------------------------------------------------------------------------
 
 namespace hdr {
@@ -66,6 +69,18 @@ struct Settings {
     // deepens blacks and dark shades and steepens the low end for more
     // contrast. Hue preserving (one scale per pixel, as with the boost).
     float shadow_contrast = 1.0f;
+    // The display's black floor in nits, as the platform reports it (Wayland
+    // wp_image_description_info_v1 luminances.min_lum, Windows
+    // DXGI_OUTPUT_DESC1::MinLuminance). Fractional and usually small: tenths
+    // of a nit on an LCD, ten-thousandths on an OLED.
+    //
+    // The transfer's dark end is anchored here instead of at zero. A display
+    // cannot emit below its floor, so every shade the old transfer mapped
+    // under it arrived as the same black -- the darkest shades of a scene
+    // collapsing into one. Starting the below-knee segment at the floor
+    // spreads them back over the range the panel can actually show. 0 means
+    // unknown, which reproduces the old transfer exactly.
+    float display_min_nits = 0.0f;
     // True if the corrected pixels are already in BT.2020 primaries (i.e. the
     // user picked the Rec2020 color-correction profile). When false the input
     // is assumed to be Rec.709/sRGB primaries and is converted as needed.
@@ -105,6 +120,12 @@ bool DeepColor10Available();
 // their fixed peak default and slider range. Queried live; depends on the
 // reference-white setting. Currently non-zero only on macOS.
 uint32_t DisplayPeakNits();
+
+// The current display's black floor in nits -- the fractional MinLuminance the
+// platform reports (Wayland luminances.min_lum, Windows
+// DXGI_OUTPUT_DESC1::MinLuminance). 0 when unknown, and then the transfer's
+// dark end behaves as it did before. Queried live.
+float DisplayMinNits();
 
 // True if the display supports HDR but the user has it switched off in Windows
 // display settings (so HdrAvailable() is false even though the hardware is

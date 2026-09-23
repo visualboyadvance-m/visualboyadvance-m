@@ -232,25 +232,53 @@ const wp_image_description_v1_listener kDescListener = [] {
     return l;
 }();
 
-// Collect an image description's luminance info to read the display peak. The
-// protocol carries max luminances in whole cd/m² (nits); min/reference are
-// ignored here. target_luminance is the mastering/display target; luminances is
-// the description's own range -- prefer the target, fall back to the range.
+// Collect an image description's luminance info: the display peak, and the
+// black floor the shadow end of the HDR transfer is anchored to.
+//
+// Max luminances come in whole cd/m² (nits). The minima do not -- they are
+// fractional, and the protocol carries them multiplied by 10000, to four
+// decimals, because a display's black is a hundredth of a nit on an LCD and a
+// ten-thousandth on an OLED. Kept scaled here and divided out at the edge.
+//
+// target_luminance is the mastering/display target; luminances is the
+// description's own range. The peak takes the target and falls back to the
+// range, as it always has.
+//
+// The floor takes whichever of the two is higher. Reading the spec, the range
+// looks like the one to trust -- it is defined as the real minimum display
+// emission plus ambient flare, where the target is explicitly theoretical and
+// "may not correspond to the luminance of light emitted on an actual display".
+// In practice a compositor may leave the range's minimum at zero and put the
+// panel's real black in the target (KWin on a 617-nit HDR monitor reports
+// luminances.min_lum 0 and target_luminance.min_lum 50, i.e. 0.005 cd/m²), so
+// trusting the range alone would read a floor of zero and anchor nothing.
+// A zero carries no information -- no display emits nothing -- while the
+// higher of the two is the floor that actually binds.
 struct InfoState {
     uint32_t lum_max        = 0;  // luminances.max_lum
+    uint32_t lum_min        = 0;  // luminances.min_lum, x10000
+    bool     has_lum        = false;
     uint32_t target_lum_max = 0;  // target_luminance.max_lum
+    uint32_t target_lum_min = 0;  // target_luminance.min_lum, x10000
+    bool     has_target_lum = false;
     bool     done           = false;
 };
 void InfoDone(void* d, wp_image_description_info_v1*) {
     static_cast<InfoState*>(d)->done = true;
 }
 void InfoLuminances(void* d, wp_image_description_info_v1*,
-                    uint32_t /*min*/, uint32_t max_lum, uint32_t /*ref*/) {
-    static_cast<InfoState*>(d)->lum_max = max_lum;
+                    uint32_t min_lum, uint32_t max_lum, uint32_t /*ref*/) {
+    InfoState* is = static_cast<InfoState*>(d);
+    is->lum_max = max_lum;
+    is->lum_min = min_lum;
+    is->has_lum = true;
 }
 void InfoTargetLuminance(void* d, wp_image_description_info_v1*,
-                         uint32_t /*min*/, uint32_t max_lum) {
-    static_cast<InfoState*>(d)->target_lum_max = max_lum;
+                         uint32_t min_lum, uint32_t max_lum) {
+    InfoState* is = static_cast<InfoState*>(d);
+    is->target_lum_max = max_lum;
+    is->target_lum_min = min_lum;
+    is->has_target_lum = true;
 }
 
 // The compositor emits one event per property it knows about, so describing an
@@ -391,40 +419,43 @@ void WaylandClearWlSurfaceColor(wl_surface* wls) {
         wl_display_flush(Cm().display);
 }
 
-uint32_t WaylandDisplayPeakNits() {
+// One trip to the compositor for the image description of the output the app
+// is on, filling in whatever luminance events it sends. False when there is no
+// description to read -- no color manager, no monitor, or HDR off.
+bool QueryOutputLuminance(InfoState* out) {
     if (!IsWayland() || !EnsureColorManager())
-        return 0;
+        return false;
     ColorManager& cm = Cm();
 
     // The wl_output for the display (primary, else the first monitor). GDK owns
     // it; we only pass it as an argument, so its event queue is irrelevant.
     GdkDisplay* gd = gdk_display_get_default();
     if (!gd)
-        return 0;
+        return false;
     GdkMonitor* mon = gdk_display_get_primary_monitor(gd);
     if (!mon)
         mon = gdk_display_get_monitor(gd, 0);
     if (!mon || !GDK_IS_WAYLAND_MONITOR(mon))
-        return 0;
+        return false;
     // gdk_wayland_monitor_get_wl_output() takes a GdkMonitor* (the
     // GDK_IS_WAYLAND_MONITOR() check above already confirms the backend);
     // wrapping it in GDK_WAYLAND_MONITOR() yields an incomplete type that
     // does not convert back to GdkMonitor* under C++.
-    wl_output* out = gdk_wayland_monitor_get_wl_output(mon);
-    if (!out)
-        return 0;
+    wl_output* wlout = gdk_wayland_monitor_get_wl_output(mon);
+    if (!wlout)
+        return false;
 
     // Ask the compositor for the output's image description, then its luminance
     // info. All proxies run on our private queue so roundtrips don't reenter
     // GTK's default-queue dispatch.
     wp_color_management_output_v1* cmout =
-        wp_color_manager_v1_get_output(cm.manager, out);
+        wp_color_manager_v1_get_output(cm.manager, wlout);
     wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(cmout), cm.queue);
     wp_image_description_v1* desc =
         wp_color_management_output_v1_get_image_description(cmout);
     wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(desc), cm.queue);
 
-    uint32_t peak = 0;
+    bool got = false;
     DescState ds;
     wp_image_description_v1_add_listener(desc, &kDescListener, &ds);
     while (!ds.done) {
@@ -435,19 +466,35 @@ uint32_t WaylandDisplayPeakNits() {
         wp_image_description_info_v1* info =
             wp_image_description_v1_get_information(desc);
         wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(info), cm.queue);
-        InfoState is;
-        wp_image_description_info_v1_add_listener(info, &kInfoListener, &is);
-        while (!is.done) {
+        wp_image_description_info_v1_add_listener(info, &kInfoListener, out);
+        while (!out->done) {
             if (wl_display_roundtrip_queue(cm.display, cm.queue) < 0)
                 break;
         }
-        peak = is.target_lum_max ? is.target_lum_max : is.lum_max;
+        got = out->done;
         wp_image_description_info_v1_destroy(info);
     }
 
     wp_image_description_v1_destroy(desc);
     wp_color_management_output_v1_destroy(cmout);
-    return peak;
+    return got;
+}
+
+uint32_t WaylandDisplayPeakNits() {
+    InfoState is;
+    if (!QueryOutputLuminance(&is))
+        return 0;
+    return is.target_lum_max ? is.target_lum_max : is.lum_max;
+}
+
+float WaylandDisplayMinNits() {
+    InfoState is;
+    if (!QueryOutputLuminance(&is))
+        return 0.0f;
+    // Scaled by 10000 on the wire; see InfoState.
+    const uint32_t scaled = std::max(is.has_lum ? is.lum_min : 0u,
+                                     is.has_target_lum ? is.target_lum_min : 0u);
+    return static_cast<float>(scaled) / 10000.0f;
 }
 
 #ifdef HAVE_WAYLAND_EGL

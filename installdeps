@@ -231,7 +231,10 @@ freebsd_installdeps() {
     # glslang for glslangValidator, which the build runs to compile the DLSS NR
     # shaders; it answers the vcpkg glslang[tools] feature.  shaderc is for
     # glslc, the other shader compiler CMake's FindVulkan looks for.
-    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja glslang shaderc vulkan-headers vulkan-loader"
+    # wayland-protocols carries the color-management XML that wayland-scanner
+    # turns into the HDR client glue, and wayland carries the scanner itself
+    # and libwayland-client.  Without them Wayland HDR is configured out.
+    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja glslang shaderc wayland wayland-protocols vulkan-headers vulkan-loader"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal-soft"
@@ -392,7 +395,11 @@ debian_installdeps() {
         # the build runs it to compile the DLSS NR shaders.  glslc, the other
         # shader compiler FindVulkan looks for, is its own package rather than
         # shaderc.
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib glslang-tools glslc libvulkan-dev"
+        # wayland-protocols has no -dev suffix: it is architecture-independent
+        # XML.  Debian keeps wayland-scanner out of the headers package, in
+        # libwayland-bin, but libwayland-dev depends on it, so naming the -dev
+        # package brings the scanner along.
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib glslang-tools glslc libwayland-dev wayland-protocols libvulkan-dev"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev libx264-dev libx265-dev"
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
@@ -725,7 +732,7 @@ fedora_installdeps() {
     # $vcpkg_deps is unquoted on purpose: it is a space-separated list built
     # above, and it is installed by default because a vcpkg build is one flag
     # away from a system one.
-    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers glslang glslc $vcpkg_deps
+    check fedora_dnf_install gcc gcc-c++ make "$cmake_pkg" ccache git nasm redhat-rpm-config "$pkgconfig" ninja-build vulkan-headers glslang glslc wayland-devel wayland-protocols-devel $vcpkg_deps
 
     # try to install multiarch libgcc, libstdc++, glibc-devel and pkgconfig if
     # available.  libstdc++-devel carries the libstdc++.so the linker resolves
@@ -877,7 +884,10 @@ suse_installdeps() {
     # glslang-devel, not glslang: openSUSE ships %_bindir/gls* in the devel
     # subpackage, and the build runs glslangValidator for the DLSS NR shaders.
     # shaderc keeps %_bindir/glslc in its main package, so that one is plain.
-    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja glslang-devel shaderc"
+    # wayland-protocols-devel is the color-management XML that wayland-scanner
+    # turns into the HDR client glue, and wayland-devel carries the scanner
+    # itself and libwayland-client.  Without them Wayland HDR is configured out.
+    tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja glslang-devel shaderc wayland-devel wayland-protocols-devel"
 
     libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel vulkan-headers vulkan-devel"
 
@@ -965,7 +975,7 @@ archlinux_installdeps() {
 
     # common needed dev packages
     # not using the base-devel group because it can break gcc-multilib
-    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip ninja glslang shaderc
+    check $pacman --noconfirm --needed -S binutils file grep gawk gzip libtool make patch sed util-linux nasm cmake ccache pkg-config git ccache zip ninja glslang shaderc wayland wayland-protocols
 
     gtk=gtk3
 
@@ -1098,7 +1108,7 @@ solus_installdeps() {
     check sudo eopkg -y install -c system.devel
     check sudo eopkg -y install git ccache ninja
 
-    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel glslang shaderc vulkan-devel
+    set -- sdl3-devel wxwidgets-devel libgtk-2-devel libgtk-3-devel libglu-devel glslang shaderc wayland-devel wayland-protocols-devel vulkan-devel
 
     [ -n "$ENABLE_OPENAL" ] && set -- "$@" openal-soft-devel
 
@@ -1180,6 +1190,8 @@ gentoo_installdeps() {
       dev-lang/nasm \
       dev-util/glslang \
       media-libs/shaderc \
+      dev-libs/wayland \
+      dev-libs/wayland-protocols \
       dev-util/vulkan-headers \
       media-libs/vulkan-loader \
       dev-build/ninja"
@@ -1195,7 +1207,7 @@ gentoo_installdeps() {
 alpine_installdeps() {
     installing
 
-    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl3-dev glu-dev wxwidgets-dev gtk+3.0-dev zip glslang shaderc vulkan-headers vulkan-loader-dev
+    check sudo apk add cmake ninja g++ ccache nasm gettext-dev zlib-dev mesa-dev sdl3-dev glu-dev wxwidgets-dev gtk+3.0-dev zip glslang shaderc wayland-dev wayland-protocols vulkan-headers vulkan-loader-dev
 
     build_instructions
 }

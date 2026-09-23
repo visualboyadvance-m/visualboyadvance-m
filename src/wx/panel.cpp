@@ -3065,6 +3065,10 @@ void DrawingPanelBase::UpdateHdrState()
     // resolve to the display's peak. 0 = unknown, leave the setting as-is.
     if (const uint32_t dp = hdr::DisplayPeakNits())
         s.peak_nits = std::min(s.peak_nits, static_cast<float>(dp));
+    // The display's black floor, which anchors the dark end of the transfer so
+    // shadows land where the panel can still separate them. 0 = unknown, and
+    // then the dark end runs down to zero as it did before.
+    s.display_min_nits = hdr::DisplayMinNits();
     s.highlight_knee = static_cast<float>(OPTION(kDispHDRHighlightKnee)) / 100.0f;
     s.shadow_contrast = static_cast<float>(OPTION(kDispHDRShadowContrast)) / 100.0f;
     s.input_is_rec2020 =
@@ -13211,7 +13215,20 @@ static bool VbamProbeWindowsHdr() {
 // brightest. Falls back to the max over all outputs in HDR mode when the window
 // is not up yet or is not on an HDR output. 0 when no output is in HDR mode
 // (G2084 colorspace) -- callers then keep the fixed default.
-static uint32_t VbamWindowsDisplayPeakNits() {
+// The HDR luminance range DXGI reports for a monitor: the peak in whole nits,
+// which caps what we encode, and MinLuminance -- the display's black floor,
+// fractional, which anchors the dark end of the transfer.
+struct VbamWindowsHdrLuminance {
+    uint32_t peak_nits = 0;
+    float    min_nits  = 0.0f;
+    bool     found     = false;
+};
+
+// The range for the monitor the emulator's window is on, falling back to the
+// brightest HDR output when the window is elsewhere or does not exist yet.
+// Both ends come from one output, so a multi-monitor setup never pairs one
+// display's peak with another's floor.
+static VbamWindowsHdrLuminance VbamWindowsDisplayLuminance() {
     // The monitor the emulator's main window is on (null before the frame
     // exists), matched against each DXGI output's HMONITOR below.
     HMONITOR window_monitor = nullptr;
@@ -13221,18 +13238,18 @@ static uint32_t VbamWindowsDisplayPeakNits() {
             window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
     }
 
-    uint32_t peak_any = 0;     // brightest HDR output (fallback)
-    uint32_t peak_window = 0;  // the HDR output the window is on, if any
+    VbamWindowsHdrLuminance any;     // brightest HDR output (fallback)
+    VbamWindowsHdrLuminance window;  // the HDR output the window is on, if any
 
     typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
     HMODULE hDXGI = LoadLibrary(TEXT("dxgi.dll"));
     if (!hDXGI)
-        return 0;
+        return any;
     auto CreateFactory1 = reinterpret_cast<LPFNCreateDXGIFactory1>(
         reinterpret_cast<void*>(GetProcAddress(hDXGI, "CreateDXGIFactory1")));
     if (!CreateFactory1) {
         FreeLibrary(hDXGI);
-        return 0;
+        return any;
     }
 
     {
@@ -13247,11 +13264,14 @@ static uint32_t VbamWindowsDisplayPeakNits() {
                         DXGI_OUTPUT_DESC1 desc{};
                         if (SUCCEEDED(output6->GetDesc1(&desc)) &&
                             desc.ColorSpace == DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020) {
-                            const uint32_t m = static_cast<uint32_t>(desc.MaxLuminance + 0.5f);
-                            if (m > peak_any)
-                                peak_any = m;
+                            VbamWindowsHdrLuminance lum;
+                            lum.peak_nits = static_cast<uint32_t>(desc.MaxLuminance + 0.5f);
+                            lum.min_nits  = desc.MinLuminance > 0.0f ? desc.MinLuminance : 0.0f;
+                            lum.found     = true;
+                            if (lum.peak_nits > any.peak_nits)
+                                any = lum;
                             if (window_monitor && desc.Monitor == window_monitor)
-                                peak_window = m;
+                                window = lum;
                         }
                     }
                     output.Reset();
@@ -13262,7 +13282,15 @@ static uint32_t VbamWindowsDisplayPeakNits() {
     }
 
     FreeLibrary(hDXGI);
-    return peak_window ? peak_window : peak_any;
+    return window.found ? window : any;
+}
+
+static uint32_t VbamWindowsDisplayPeakNits() {
+    return VbamWindowsDisplayLuminance().peak_nits;
+}
+
+static float VbamWindowsDisplayMinNits() {
+    return VbamWindowsDisplayLuminance().min_nits;
 }
 
 // True if the current display *supports* HDR but the user has it turned off in
@@ -13592,6 +13620,25 @@ bool MacosHdrDisabled() {
     return VbamMacosHdrSupportedButOff();
 #else
     return false;
+#endif
+}
+
+float DisplayMinNits() {
+#if defined(__WXMSW__) && !defined(WINXP)
+    // DXGI reports MinLuminance in nits already, fractional.
+    return VbamWindowsDisplayMinNits();
+#elif defined(__WXGTK__)
+#if !defined(NO_WAYLAND)
+    // Wayland PQ is absolute-nits, so the compositor's per-output minimum is
+    // used directly. X11 has no per-window HDR, so it stays 0.
+    if (IsWayland())
+        return WaylandDisplayMinNits();
+#endif
+    return 0.0f;
+#else
+    // macOS EDR exposes no black-floor equivalent, so the transfer keeps its
+    // old zero-anchored dark end there.
+    return 0.0f;
 #endif
 }
 
