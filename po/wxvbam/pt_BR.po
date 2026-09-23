@@ -1086,7 +1086,7 @@ msgstr "Sair"
 
 #: panel.cpp:2968
 msgid "DLSS NR is not available in this build; turning it off."
-msgstr ""
+msgstr "O DLSS NR não está disponível nesta versão; desligando."
 
 #: panel.cpp:4465
 msgid "DLSS NR: loading model..."
@@ -2084,11 +2084,11 @@ msgstr "Biblioteca dos plugins dos filtros"
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
 #: xrc/DisplayConfigBasic.xrc:221
 msgid "Run the DLSS NR neural filter alongside the display filter"
-msgstr ""
+msgstr "Execute o filtro neural do DLSS NR junto com o filtro de exibição"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
 msgid "Whether DLSS NR runs before or after the display filter"
-msgstr ""
+msgstr "Se o DLSS NR roda antes ou depois do filtro de exibição"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
 msgid "Directory containing RPI filter plugins"
@@ -3525,26 +3525,26 @@ msgstr "Borrão do Movimento"
 
 #: xrc/DisplayConfigBasic.xrc:220
 msgid "Apply &DLSS NR:"
-msgstr ""
+msgstr "Aplicar o &DLSS NR:"
 
 #: xrc/DisplayConfigBasic.xrc:231
 msgid "Pre-process"
-msgstr ""
+msgstr "Pré-processo"
 
 #: xrc/DisplayConfigBasic.xrc:233
 msgid ""
 "Run DLSS NR on the emulated image first, then let the display filter scale "
 "the result. Much cheaper, since the network sees the unscaled frame"
-msgstr ""
+msgstr "Execute o DLSS NR na imagem emulada primeiro, então deixe o filtro de exibição ampliar o resultado. Muito mais barato, já que a rede vê o frame não ampliado"
 
 #: xrc/DisplayConfigBasic.xrc:238
 msgid "Post-process"
-msgstr ""
+msgstr "Pós-processo"
 
 #: xrc/DisplayConfigBasic.xrc:239
 msgid ""
 "Run DLSS NR over whatever the display filter produces, at the filtered size"
-msgstr ""
+msgstr "Execute o DLSS NR sobre o que o filtro de exibição produzir, no tamanho filtrado"
 
 #: xrc/DisplayConfigBitDepth.xrc:11
 msgid "Bit Depth:"
