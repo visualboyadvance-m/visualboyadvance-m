@@ -121,7 +121,15 @@ static unsigned wanted_threads(void)
 }
 
 #ifdef NR_ROWS_WIN32
+/* worker_loop never returns; once MSVC inlines it the return is C4702 under /WX. */
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4702)
+#endif
 static DWORD WINAPI worker_main(LPVOID arg) { worker_loop((unsigned)(uintptr_t)arg); return 0; }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 static INIT_ONCE pool_once = INIT_ONCE_STATIC_INIT;
 static BOOL CALLBACK pool_start(PINIT_ONCE once, PVOID param, PVOID *context)
 {
