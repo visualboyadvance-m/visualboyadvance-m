@@ -129,20 +129,22 @@ work/MoltenVK_icd.json: Makefile | work
 # The host passes in C. Built for this machine: `-march=native`, so rebuild it rather
 # than copy it. The FP16 casts and the separate multiply and add are the contract —
 # fused multiply-add or fast maths would change the last bit and the output must be
-# byte-identical to the NumPy it replaces (src/ref/test_native_image.py).
-work/libnr_image$(SO): src/ref/nr_image.c Makefile | work
+# byte-identical to the NumPy it replaces (src/ref/test_native_image.py). Each pass is
+# split by rows across nr_image.c's own thread pool (upstream uses OpenMP, which Apple's
+# clang lacks); no row reads another's result, so the bytes do not depend on it.
+work/libnr_image$(SO): src/ref/nr_image.c src/ref/nr_image.h Makefile | work
 	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
-	      -shared -o $@ $<
+	      -pthread -shared -o $@ $<
 
 # nr_frame.py as a C library: the feature assembly, the whole graph recorded against
 # libxmx (reached by dlopen from this directory), and the composition. The image passes
 # are the same object as libnr_image; the frame code has the same no-FMA contract.
 work/nr_image.o: src/ref/nr_image.c src/ref/nr_image.h | work
-	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -c -o $@ $<
+	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -pthread -c -o $@ $<
 work/nr_frame.o: src/ref/nr_frame.c src/ref/nr_frame.h src/ref/nr_image.h | work
 	$(CC) -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fno-fast-math -c -o $@ $<
 work/libnr_frame$(SO): work/nr_frame.o work/nr_image.o
-	$(CC) -shared $(INSTALL_NAME) -o $@ $^ $(DL_LIBS) -lm
+	$(CC) -shared $(INSTALL_NAME) -o $@ $^ $(DL_LIBS) -lm -pthread
 # nr_frame.py, the command, in C: the same flags, PNG in and out through libpng.
 # pkg-config finds libpng where it is; PNG_CFLAGS / PNG_LIBS override it.
 # pkg-config first; then the prefixes a Mac keeps it under (Homebrew, vcpkg, /usr/local);
@@ -270,6 +272,8 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/gpu/test_resident.py
 	$(PYTHON) src/ref/test_frame_cache.py
 	$(PYTHON) src/ref/test_native_image.py
+	NR_HOST_THREADS=1 $(PYTHON) src/ref/test_native_image.py
+	NR_HOST_THREADS=3 $(PYTHON) src/ref/test_native_image.py
 	$(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference.bin
 	work/test_nr_frame --reference work/nr_frame_reference.bin
 	$(PYTHON) src/ref/test_nr_model.py
@@ -282,6 +286,7 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/gpu/test_gemm_qkv.py
 	$(PYTHON) src/gpu/test_glue.py
 	$(PYTHON) src/gpu/test_ffn_fused.py
+	$(PYTHON) src/gpu/test_staged_partial.py
 
 # Focused checks for the FFN schedule, including a complete frame with both variants.
 # Repeat with XMX_STAGING=1 to cover device buffers without host mappings.

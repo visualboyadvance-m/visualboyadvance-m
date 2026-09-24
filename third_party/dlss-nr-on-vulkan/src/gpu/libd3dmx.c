@@ -470,6 +470,15 @@ int xmx_specialize(unsigned mask)
 	return 0;
 }
 
+/* There is no staged kernel here to route a partial last 64-row block to; the switch is kept so
+ * a caller can set it on any runtime, and changes nothing. */
+int xmx_staged_partial(unsigned on)
+{
+	if (g.recording) FAIL("cannot change the staged routing during recording", 0);
+	(void)on;
+	return 0;
+}
+
 unsigned xmx_specialized_count(void) { return 0; }
 unsigned xmx_specialization(void) { return g.specialize; }
 

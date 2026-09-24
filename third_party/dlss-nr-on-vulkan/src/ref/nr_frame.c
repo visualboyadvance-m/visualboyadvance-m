@@ -899,6 +899,8 @@ struct nr_frame {
     int32_t *rows, *cols;
     float *composed, *scratch_a, *scratch_b;
     size_t composed_pixels;
+    float *gate_table;                     /* the gate on every half logit, for `gate_scale` */
+    float gate_scale;
 };
 
 static int pad8(int e) { return (e + 7) / 8 * 8; }
@@ -1973,10 +1975,17 @@ static float uniform24(uint32_t v)
     return (float)(bits + 1u) * 5.960464477539063e-8f;
 }
 
-static void deterministic_noise(float *out, int height, int width, int frame_index)
+struct noise_args { float *out; int width, frame_index; };
+
+/* Rows [y0, y1) of the noise; every pixel is its own hash, so the pool's bands do not
+ * change a bit. */
+static void noise_rows(const void *args, size_t y0, size_t y1)
 {
+    const struct noise_args *a = args;
+    float *out = a->out;
+    int width = a->width, frame_index = a->frame_index;
     const float tau = 6.2831854820251465f;
-    for (int y = 0; y < height; y++)
+    for (int y = (int)y0; y < (int)y1; y++)
         for (int x = 0; x < width; x++) {
             uint32_t seed = (uint32_t)y * 0xD8163841u;
             seed ^= (uint32_t)x * 0x8DA6B343u;
@@ -1996,6 +2005,12 @@ static void deterministic_noise(float *out, int height, int width, int frame_ind
             o[1] = half_round(radius_b * sinf(angle_a));
             o[2] = half_round(radius_a * cosf(angle_b));
         }
+}
+
+static void deterministic_noise(float *out, int height, int width, int frame_index)
+{
+    struct noise_args a = { out, width, frame_index };
+    nr_parallel_rows((size_t)height, noise_rows, &a);
 }
 
 /* `make_features`' three ways of filling channels 10-14: a plain recipe, the automatic
@@ -2089,6 +2104,36 @@ double nr_frame_split(const nr_frame *f, int which) { return which >= 0 && which
 
 static float unit(float v) { return v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v; }
 
+/* One axis of the detail blur over rows [y0, y1): along x (`axis` 1) or along y (0).
+ * Rows are independent, so the pool's bands give the same bytes as one thread. */
+struct blur_args { const float *kernel, *in; float *out; int taps, extent, height, width, axis; };
+
+static void blur_rows(const void *args, size_t y0, size_t y1)
+{
+    const struct blur_args *b = args;
+    const float *kernel = b->kernel, *in = b->in;
+    int taps = b->taps, extent = b->extent, height = b->height, width = b->width;
+    for (int y = (int)y0; y < (int)y1; y++)
+        for (int x = 0; x < width; x++)
+            for (int c = 0; c < 3; c++) {
+                float acc = 0.0f;
+                for (int k = 0; k < taps; k++) {
+                    size_t at;
+                    if (b->axis) {
+                        int sx = x + k - extent;
+                        sx = sx < 0 ? 0 : sx >= width ? width - 1 : sx;
+                        at = ((size_t)y * width + sx) * 3 + c;
+                    } else {
+                        int sy = y + k - extent;
+                        sy = sy < 0 ? 0 : sy >= height ? height - 1 : sy;
+                        at = ((size_t)sy * width + x) * 3 + c;
+                    }
+                    acc += kernel[k] * in[at];
+                }
+                b->out[((size_t)y * width + x) * 3 + c] = acc;
+            }
+}
+
 /* `compose_detail`: result = source + colour * lowpass(change) + detail * highpass(change).
  * The kernel is `gaussian_kernel` and the blur the NumPy one (edge replication, one
  * axis then the other, accumulated in kernel order); `expf` stands where NumPy's
@@ -2122,30 +2167,12 @@ static int compose_detail(struct nr_frame *f, const float *source, float *output
     float *change = f->scratch_a, *low = f->scratch_b;
     for (size_t i = 0; i < n; i++) change[i] = output[i] - source[i];
     /* horizontal, into `low`; then vertical, back into `change`'s partner */
-    for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
-            for (int c = 0; c < 3; c++) {
-                float acc = 0.0f;
-                for (int k = 0; k < taps; k++) {
-                    int sx = x + k - extent;
-                    sx = sx < 0 ? 0 : sx >= width ? width - 1 : sx;
-                    acc += kernel[k] * change[((size_t)y * width + sx) * 3 + c];
-                }
-                low[((size_t)y * width + x) * 3 + c] = acc;
-            }
+    struct blur_args across = { kernel, change, low, taps, extent, height, width, 1 };
+    nr_parallel_rows((size_t)height, blur_rows, &across);
     float *vertical = malloc(n * sizeof(float));
     if (!vertical) { free(kernel); FAILF("out of memory"); }
-    for (int y = 0; y < height; y++)
-        for (int x = 0; x < width; x++)
-            for (int c = 0; c < 3; c++) {
-                float acc = 0.0f;
-                for (int k = 0; k < taps; k++) {
-                    int sy = y + k - extent;
-                    sy = sy < 0 ? 0 : sy >= height ? height - 1 : sy;
-                    acc += kernel[k] * low[((size_t)sy * width + x) * 3 + c];
-                }
-                vertical[((size_t)y * width + x) * 3 + c] = acc;
-            }
+    struct blur_args down = { kernel, low, vertical, taps, extent, height, width, 0 };
+    nr_parallel_rows((size_t)height, blur_rows, &down);
     for (size_t i = 0; i < n; i++) {
         float lowpass = vertical[i];
         float term_low = colour_s * lowpass;
@@ -2156,6 +2183,29 @@ static int compose_detail(struct nr_frame *f, const float *source, float *output
     free(vertical);
     free(kernel);
     return 0;
+}
+
+/* `compose_head` with a mask over rows [y0, y1). */
+struct masked_args {
+    const float *head, *colour, *mask; ptrdiff_t hy, hx; int width; float intensity; float *output;
+};
+
+static void masked_rows(const void *args, size_t y0, size_t y1)
+{
+    const struct masked_args *a = args;
+    ptrdiff_t s = (ptrdiff_t)a->width * 3;
+    for (int y = (int)y0; y < (int)y1; y++)
+        for (int x = 0; x < a->width; x++) {
+            const float *h = a->head + (ptrdiff_t)y * a->hy + (ptrdiff_t)x * a->hx;
+            const float *rgb = a->colour + (size_t)y * s + (size_t)x * 3;
+            float blend = a->mask[(size_t)y * s + (size_t)x * 3] * a->intensity;
+            if (a->intensity <= 1.0f) blend = unit(blend);
+            for (int c = 0; c < 3; c++) {
+                float source = rgb[c];
+                float predicted = unit(source + half_round(h[c]) * 0.25f);
+                a->output[((size_t)y * a->width + x) * 3 + c] = unit(source + blend * (predicted - source));
+            }
+        }
 }
 
 /* `nr_frame.compose`. The head arrives with the device's stride of sixteen floats per
@@ -2171,45 +2221,32 @@ static int compose(struct nr_frame *f, const float *head, ptrdiff_t hy, ptrdiff_
         /* `history_weight`: clip(sigmoid(half(logit)) * half(blend_scale), 0, 1), then the
          * confidence. `expf` here against NumPy's exp there: the one place the temporal
          * path can differ from the Python by a last bit. */
-        size_t pixels = (size_t)height * width;
-        if (f->composed_pixels < pixels) {
-            free(f->scratch_a); free(f->scratch_b);
-            f->scratch_a = malloc(pixels * 3 * sizeof(float));
-            f->scratch_b = malloc(pixels * 3 * sizeof(float));
-            f->composed_pixels = pixels;
-            if (!f->scratch_a || !f->scratch_b) FAILF("out of memory");
-        }
-        float *alpha = f->scratch_a;
-        float scale = half_round(p->blend_scale);
-        float confidence = unit(p->history_confidence);
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++) {
-                float logit = half_round(head[(ptrdiff_t)y * hy + (ptrdiff_t)x * hx + 3]);
-                float a = unit(1.0f / (1.0f + expf(-logit)) * scale);
-                if (p->history_confidence != 1.0f) a = a * confidence;
-                alpha[(size_t)y * width + x] = a;
+        /* The logit is rounded to half first, so the gate has 65536 inputs: the table below,
+         * built once per blend scale and indexed in the pass by the half's bits, as
+         * `nr_frame.gate_table` is in the Python — one expf per half value, not per pixel. */
+        if (!f->gate_table || f->gate_scale != p->blend_scale) {
+            if (!f->gate_table && !(f->gate_table = malloc((1u << 16) * sizeof(float))))
+                FAILF("out of memory");
+            float scale = half_round(p->blend_scale);
+            for (uint32_t bits = 0; bits < (1u << 16); bits++) {
+                float logit = half_to_float((uint16_t)bits);
+                f->gate_table[bits] = unit(1.0f / (1.0f + expf(-logit)) * scale);
             }
+            f->gate_scale = p->blend_scale;
+        }
+        float confidence = p->history_confidence != 1.0f ? unit(p->history_confidence) : 1.0f;
         nr_compose_temporal(head, hy, hx, 1, colour, s, 3, 1, history, s, 3, 1,
                             previous, previous ? s : 0, previous ? 3 : 0, previous ? 1 : 0,
-                            alpha, width, 1, mask, mask ? s : 0, mask ? 3 : 0, (size_t)height, (size_t)width,
+                            NULL, 0, 0, f->gate_table, confidence,
+                            mask, mask ? s : 0, mask ? 3 : 0, (size_t)height, (size_t)width,
                             p->intensity, p->blend_scale, previous ? p->hold : 0.0f, previous ? p->slope : 0.0f,
                             output);
     } else if (mask) {
         /* `compose_head` with a mask: blend = clip(red * intensity, 0, 1) — and past
          * intensity 1 `nr_frame.compose` takes its own branch, where the blend is not
          * clamped so that it can extrapolate */
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++) {
-                const float *h = head + (ptrdiff_t)y * hy + (ptrdiff_t)x * hx;
-                const float *rgb = colour + (size_t)y * s + (size_t)x * 3;
-                float blend = mask[(size_t)y * s + (size_t)x * 3] * p->intensity;
-                if (p->intensity <= 1.0f) blend = unit(blend);
-                for (int c = 0; c < 3; c++) {
-                    float source = rgb[c];
-                    float predicted = unit(source + half_round(h[c]) * 0.25f);
-                    output[((size_t)y * width + x) * 3 + c] = unit(source + blend * (predicted - source));
-                }
-            }
+        struct masked_args a = { head, colour, mask, hy, hx, width, p->intensity, output };
+        nr_parallel_rows((size_t)height, masked_rows, &a);
     } else {
         nr_compose(head, hy, hx, 1, colour, s, 3, 1, (size_t)height, (size_t)width, p->intensity, output);
     }
@@ -2402,6 +2439,7 @@ void nr_frame_close(nr_frame *f)
     weights_free(&f->w);
     free(f->features_host); free(f->head_host); free(f->noise); free(f->rows); free(f->cols);
     free(f->scratch_a); free(f->scratch_b);
+    free(f->gate_table);
     free(f);
 }
 

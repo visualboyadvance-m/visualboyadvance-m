@@ -19,7 +19,7 @@
 #   NR_LIVE=1    src/layer/nr-photo ...       a slideshow instead of a photo: every Nth
 #                                             present goes through the network and the
 #                                             frames between hold the last result. Set
-#                                             the game small — 512x288 reaches 10 fps,
+#                                             the game small — Tekken 7 at 640x360 ran 25 fps,
 #                                             the compositor stretches it (notes/phase47).
 #
 #   touch /tmp/nr_trigger     # freeze and enhance

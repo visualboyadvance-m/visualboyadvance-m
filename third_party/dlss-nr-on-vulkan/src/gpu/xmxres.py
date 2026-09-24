@@ -98,6 +98,7 @@ def _load():
             ("xmx_abort", []),
             ("xmx_sync", [ctypes.c_int]),
             ("xmx_specialize", [ctypes.c_uint]),
+            ("xmx_staged_partial", [ctypes.c_uint]),
             ("xmx_specialized_count", []),
             ("xmx_specialization", []),
             ("xmx_graph_capture", []),

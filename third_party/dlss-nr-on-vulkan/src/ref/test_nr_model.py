@@ -175,6 +175,20 @@ def test_composition():
           frame.PROFILES["neutral"]["local_tone_strength"] == 0
           and frame.PROFILES["neutral"]["local_structure_strength"] == 0)
 
+    # The temporal gate is a table over the half logit's 16 bits; it must be the formula on
+    # every one of them, NaN and infinity included, and on logits that are not yet half.
+    every = np.arange(1 << 16, dtype=np.uint32).astype(np.uint16).view(np.float16)
+    grid = np.zeros((256, 256, 4), np.float32)
+    grid[..., 3] = every.astype(np.float32).reshape(256, 256)
+    with np.errstate(over="ignore", invalid="ignore"):
+        want = frame.gate_formula(frame.half(grid[..., 3:4]))
+    check("the gate table is the formula on all 65536 half logits",
+          np.array_equal(want.view(np.uint32), frame.history_weight(grid).view(np.uint32)))
+    logits = (rng.standard_normal((97, 131, 4)) * 4).astype(np.float32)
+    check("... and on logits that are not half yet, through a strided view",
+          np.array_equal(frame.gate_formula(frame.half(logits[::2, :, 3:4])).view(np.uint32),
+                         frame.history_weight(logits[::2]).view(np.uint32)))
+
 
 def test_temporal():
     """The temporal contract, none of which needs a forward pass."""

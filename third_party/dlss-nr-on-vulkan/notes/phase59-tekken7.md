@@ -105,3 +105,23 @@ was readable there, and the measurements above came from it.
 
 `nr-panel` reads the log **by path** and would have shown nothing. Deleting a file another
 process is writing to does not give you a fresh one; it gives that process a private one.
+
+## Re-measured 2026-09-24: 25 fps
+
+The same game in the same arrangement — live, every present through the network — after the
+fusions, the staged GEMM's shared memory and its partial blocks, with the owner playing and the
+daemon's log counting:
+
+| game | network | scale | frames | per frame | graph |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 640x360 | 320x320 | 0.5 | 745 | 40 ms, **25 fps** | 30 ms |
+| 640x360 | 384x320 | 0.6 | 717 | 40 ms, **25 fps** | 33 ms |
+| 640x360 | 320x320 | 0.35 | 1142 | 40 ms, **25 fps** | 31 ms |
+| 800x450 | 320x320 | 0.35 | 1597 | 40 ms, **25 fps** | 32 ms |
+| 640x360 | 512x320 | 0.75-0.8 | 64 | 50 ms, 20 fps | 41 ms |
+| 640x360 | 640x384 | 1.0 | 195 | 70 ms, 14 fps | 59 ms |
+| 800x450 | 832x512 | 1.0 | 243 | 110 ms, 9 fps | 90 ms |
+
+The log rounds a frame to 10 ms, so read 25 as 22-28; the owner saw 25 on screen. Against the
+10.5 fps above: 2.4x. At 640x360 scale 0.6 costs what 0.35 does — the network is the same size
+bar one 64-column step, and it holds three times the real pixels.

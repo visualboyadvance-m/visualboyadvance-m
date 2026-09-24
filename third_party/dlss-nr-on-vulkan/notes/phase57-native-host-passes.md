@@ -34,6 +34,31 @@ passed in rather than recomputed: NumPy evaluates `moved * slope + hold`, and
 `clip(1 - moved * 255 / ramp, 0, 1) * hold` is the same value by algebra and a different
 one in float32.
 
+> **The gate half of that no longer holds, 2026-09-24.** The logit is rounded to half
+> before the sigmoid, so the gate has 65536 possible inputs: `nr_frame.gate_table`
+> evaluates NumPy's own expression on every one of them once, and `nr_compose_temporal`
+> indexes it by the half's sixteen bits. The exponential is still NumPy's, so the
+> contract still holds — `test_nr_model.py` checks the table against the formula on all
+> 65536, `test_native_image.py` the whole native path against NumPy's. The floor went
+> native with it, from the game's previous frame, so the daemon no longer builds it either.
+> Paired on the daemon's own path over 48 frames of a moving sequence with repeats, answers
+> byte-identical: **1280x720 at scale 0.35, 70-73 -> 60-61 ms**; at 640x360, a quarter of
+> the pixels, within noise.
+
+> **And on every core, 2026-09-24.** Each pass's outer row loop is an OpenMP `parallel for`;
+> no row reads another's result, so the bytes are the same at one thread, three or eight
+> (`test_native_image.py` run at each). At 1920x1080, per pass: the temporal composition
+> 15.5 -> 3.3 ms, the plain one 8.7 -> 1.5, encode 4.8 -> 1.6, decode 1.1 -> 0.5. On the
+> daemon's path, answers byte-identical: **1920x1080 at 0.3, 106-122 -> 77-82 ms; 1280x720
+> at 0.35, 61-63 -> 53**; at the live sizes nothing, because there the graph is the frame.
+> `OMP_WAIT_POLICY` defaults to passive: spinning, the threads took 247 ms of CPU a frame.
+>
+> **In this tree the threads are `nr_image.c`'s own pool, not OpenMP** — Apple's clang has no
+> OpenMP, MSVC's is 2.0, and the object goes into libdlssnr and so into VBA-M's sandboxed
+> application. The same contiguous bands of rows, a passive wait on a condition variable, and
+> `NR_HOST_THREADS` (else `OMP_NUM_THREADS`) for the count; `test_native_image.py` runs at 1, 3
+> and the default in ctest. The C frame library uses the pool for its own row loops as well.
+
 ## Measured
 
 Four consecutive DoA5 frames, 1024x768 with a 1024x576 active region, scale 0.55, on

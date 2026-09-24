@@ -52,6 +52,7 @@ int xmx_gemm_batched(unsigned M, unsigned N, unsigned K, unsigned batch,
 int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_spv,
 		 const char *history_spv, const char *tiled_spv, const char *staged_spv);
 int xmx_specialize(unsigned mask);
+int xmx_staged_partial(unsigned on);  /* staged kernel takes a partial last 64-row block (default 1) */
 unsigned xmx_specialized_count(void);
 unsigned xmx_specialization(void);
 int xmx_buf_create_kind(unsigned long long bytes, int kind);

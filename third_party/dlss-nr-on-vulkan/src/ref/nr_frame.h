@@ -13,6 +13,12 @@
  * (height, width, 4). One `nr_frame` holds the weights on the device and the graph for
  * the most recent extent; a new extent rebuilds the graph and keeps the weights.
  *
+ * The host passes around the graph — feature assembly, the composition and its temporal
+ * gate and floor, the detail blur — split their rows across nr_image.c's thread pool, one
+ * thread per core (`NR_HOST_THREADS`, else `OMP_NUM_THREADS`, to change it, 1 for none).
+ * The bytes do not depend on the count. The temporal gate is a 65536-entry table over the
+ * half logit, built once per blend scale, as `nr_frame.gate_table` is in the Python.
+ *
  *     nr_frame *f = nr_frame_open("work/mlxw/dlssnr-logical.safetensors");   // or NULL: the weights compiled in
  *     nr_frame_params p; nr_frame_defaults(&p);
  *     nr_frame_update(f, colour, height, width, NULL, NULL, &p, output, NULL);
@@ -43,7 +49,7 @@ typedef struct nr_frame_params {
     float history_confidence; /* scales the model's own gate: 0 the still path, 1 its answer */
     float blend_scale;        /* half(0.73974609375), the recovered package's */
     float hold;               /* floor under the gate where `previous` matches the colour: */
-    float slope;              /*   max(alpha, clamp(moved * slope + hold, 0, hold) * blend_scale) */
+    float slope;              /*   max(alpha, min(clamp(moved * slope + hold, 0, hold), 1) * blend_scale) */
     /* the automatic mask: skin structure and automatic-mask structure, each -1 to follow
      * `local_structure`; off unless `automatic_mask` is set */
     int   automatic_mask;

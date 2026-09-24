@@ -10,7 +10,42 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: the dlss-nr-on-intel fusions on every runtime (2026-09-24)
+## Latest: five more dlss-nr-on-intel commits, on every runtime (2026-09-24, night)
+
+`3a79933`..`064ffad` of `uzbekunknown/dlss-nr-on-intel` are in: the staged GEMM's partial last
+64-row block, the Tekken 7 25 fps record, the temporal gate and the hold floor inside the native
+composition, the host passes on every core, and their notes. Carried past libxmx:
+
+- **The partial block on Metal**: `gemm_staged` in `metal/gemm_simd.metal` clamps a partial
+  block's A rows to the last real one and `store_staged` skips rows past M; `libmetalmx` routes
+  M that is not whole 64-row blocks to it under the same `XMX_STAGED_PARTIAL` (default 1) and
+  `xmx_staged_partial()`. **Direct3D 12** has no staged kernel, so `xmx_staged_partial()` there
+  accepts the switch and changes nothing. `test_staged_partial.py` skips on a runtime or device
+  without a staged kernel (portable Vulkan, MoltenVK, D3D12) rather than failing.
+- **The gate table in the C frame library**: `nr_frame.c` builds the 65536-entry table once per
+  blend scale (with `expf`, as its per-pixel gate did — still the one place it can differ from
+  NumPy by a last bit) and hands it to `nr_compose_temporal`'s new `table, confidence`
+  arguments, which also clip the floor to 1 as upstream now does.
+- **The threads are not OpenMP here.** Apple's clang has none, MSVC's is 2.0, and `nr_image.c`
+  is linked into libdlssnr and so into VBA-M's sandboxed `.app`. `nr_image.c` has its own pool
+  (pthreads; Win32 condition variables from Vista on; serial where neither exists): contiguous
+  bands of rows as OpenMP's static schedule gives them, passive waits, a job already running
+  sends a second caller serial. `NR_HOST_THREADS` (else `OMP_NUM_THREADS`) sets the count.
+  `nr_parallel_rows()` is public in `nr_image.h`, and `nr_frame.c` puts its own row loops on it
+  too — the detail blur, the masked composition, the noise. ctest runs `test_native_image` at
+  1 and 3 threads beside the default; the Makefile does the same.
+
+Verified on the M3 (a scratch copy with MLX-DLSS cloned and the safetensors rebuilt from
+`weights/`): `test_staged_partial` 34 cases bit-exact on Metal-simdgroup, unmapped memory too
+(skipped on MoltenVK, which is portable); the C frame pair and `test_dlssnr` 36/36 on Vulkan and
+Metal, also at `NR_HOST_THREADS=1`; `test_native_image` at 1, 3 and 8 threads; temporal controls,
+scratch arena, frame execution, input FP16, compact head and joint QKV on both runtimes. At
+1920x1080, 1 thread against 8, same bytes: temporal composition 14.0-14.3 -> 5.3-7.5 ms,
+composition 7.0-8.2 -> 2.5-3.4, encode 4.6-6.9 -> 1.5-2.4. The Win32 pool and libd3dmx compile
+with MinGW-w64, the pool and nr_frame.c with the NDK for arm64-v8a and armeabi-v7a; none of that
+has run. `publish_check` still fails on the committed `weights/*.h`, as before this change.
+
+## The dlss-nr-on-intel fusions on every runtime (2026-09-24)
 
 The 36 commits of `uzbekunknown/dlss-nr-on-intel` from 2026-09-19 to 09-24 are in this tree
 (35 rebased; the 36th is a merge with no changes of its own): the batched FFN groups, the
@@ -270,7 +305,37 @@ layer is. `notes/phase67`.
 ## Latest: over a third of the frame was passes that need not exist (2026-09-23)
 ## Latest: 46 % of the frame was passes, shared memory and pads (2026-09-24)
 ## Latest: 48 % of the frame was passes, shared memory and pads (2026-09-24)
-## Latest: the staged GEMM was on half its threads (2026-09-24, later)
+## The host passes on every core, and a lead in the CPU's idle state (2026-09-24, evening)
+
+**The passes around the network, at the output's resolution, are cheaper.** The temporal gate
+runs natively after all — its logit is half, so a 65536-entry table of NumPy's own sigmoid is
+exact (`phase57`) — and every native pass is split by rows across the eight cores (upstream
+with OpenMP; this tree with `nr_image.c`'s own pool, see the top of this file), which cannot
+change a byte (tested at 1, 3 and 8 threads). The log's change figure is taken on
+every fourth row: over the whole frame it was 5 ms of a 1080p frame. On the daemon's own path,
+answers byte-identical: **1280x720 at 0.35, 70-73 -> 60-61 ms with the gate and -> 53 with the
+cores; 1920x1080 at 0.3, 106-122 -> 77-82 with the cores**; 512x288 and 640x360 unchanged,
+because there the graph is 33 ms of 36-39. README table
+re-measured: 1024x768 at 0.55 84 -> 75 ms, 1920x1080 at 0.55 196 -> 171.
+
+**A lead that needs root.** The 320x320 graph runs **32.1-32.7 ms with every core idle and
+27.3 with any process spinning on a P-core** — a bare `pause` loop does it — and 28.5-29.5 on
+an LP E-core, at the same 1950 MHz GPU clock throughout. So it is the package's idle state, not
+GPU clocks and not work the core does. Polling the fence from the waiting thread gets only
+0.5-1 ms of it, and spinning a core for the length of every graph is not a trade for a laptop,
+so nothing is kept. The next test needs root: hold a PM QoS latency limit open while the graph
+runs, and read the uncore frequency, which is 0400 here —
+
+```
+sudo python3 -c "import os,struct,time; f=os.open('/dev/cpu_dma_latency',os.O_WRONLY); os.write(f,struct.pack('i',50)); time.sleep(600)"
+sudo cat /sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/current_freq_khz
+```
+
+If a 50 us limit is worth the 15 % without a spinning core, the daemon can hold one when it
+is allowed to. Tried and not kept, in `improve-fusions.md`: weights stored as their E4M3 bytes
+(exact, but a proxy put the prize at 0.14 ms a frame) and, again, register prefetch.
+
+## The staged GEMM was on half its threads (2026-09-24, later)
 
 The owner asked why window attention has exactly 2 KB of shared memory and what 1 KB or
 512 B would do. Two separate answers, and only the second cost anything here.
@@ -311,6 +376,18 @@ GEMMs are neither short of blocks (a 64x16 build doubled them: no change) nor of
 (BK = 64: slower): each load sat in its own branch and was waited for before the next. Issuing
 the step's loads together takes the bottleneck's 64x1024x4096 from 0.27 to 0.22 ms and a frame
 1 ms faster at 320x320, 3 ms at 720p, bit-identical. `notes/improve-fusions.md`.
+
+**And the staged kernel now takes a partial last block**, so the deeper levels' GEMMs over 144
+or 400 rows leave the tiled kernel, which ran them at half the speed. Bit-identical
+(`XMX_STAGED_PARTIAL=0` to compare), and it pays where a level is not whole 64-row blocks:
+**live 512x288 at 0.35 42.7 -> 36.7 ms (27 fps)**, the 320x320 graph 36.5 -> 32.7, 1920x1088
+444.6 -> 422.6, and nothing at 1280x768, whose levels all are. Curve **9.4 ms + 196 ms per
+megapixel**; the README table is re-measured with it.
+
+**In a game it is 25 fps.** Tekken 7, live, every present through the network, the owner
+playing: **25 fps at 640x360** at scale 0.35, 0.5 and 0.6 alike (a 320x320 or 384x320 network,
+40 ms a frame, 30-33 ms of it the graph), and 800x450 at 0.35 the same — 10.5 fps on
+2026-09-16. `notes/phase59`.
 
 **The fix is built and tested, not filed.** Mesa 26.2.3 rebuilt with the one line
 (`work/mesa-26.2.3/`, loaded through `VK_DRIVER_FILES`, system driver untouched): every size
@@ -541,10 +618,11 @@ because the graph is 185 ms of it and untouched. `notes/phase57`.
 
 Three things worth carrying forward:
 
-- **The gate and the floor's constant stay in NumPy.** `expf` and NumPy's float32
-  exponential disagree in the last bit, and `clip(1 - moved * 255 / ramp, 0, 1) * hold` is
+- **The floor's constant stays in NumPy**: `clip(1 - moved * 255 / ramp, 0, 1) * hold` is
   the same value as `moved * slope + hold` by algebra and a different one in float32. The
-  contract is byte-identical, not nearly.
+  contract is byte-identical, not nearly. *The gate stayed there too, for `expf`, until
+  2026-09-24: its logit is half, so a 65536-entry table of NumPy's own sigmoid runs it in C
+  bit-exactly (`phase57`).*
 - **`active_region` then became the largest host pass** — 21 ms, reducing the whole frame
   twice to find bars that never move. `Letterbox` finds them once and afterwards checks
   eight lines. 0.2 ms.
@@ -1041,7 +1119,7 @@ What is *not* claimed:
 - **The whole graph is resident on the GPU**: phase27 warm medians were **0.114 s** at
   384x384, **0.536–0.550 s** at 720p and **1.179 s** at 1080p; since the fusions and the
   shared-memory fix (2026-09-24) 1280x720 is about **0.2 s** of GPU time, on the curve
-  `9 ms + 205 ms per megapixel`. The optimization is
+  `9.4 ms + 196 ms per megapixel`. The optimization is
   bit-identical to the generic GPU path. Earlier comparisons reported head correlation
   0.9918 with the CPU reference and visually indistinguishable pictures.
   **2.3 GiB** of device buffers at 720p since the scratch arena (`phase32`); the 5.6 GB
@@ -1052,9 +1130,9 @@ What is *not* claimed:
   a daemon runs the model, and the result goes back into the swapchain. Proven in **Dead
   or Alive 5** (32-bit D3D9 through DXVK) with faces enhanced and measured, and the layer
   proven to attach under **VKD3D-Proton** on a 64-bit D3D12 title. Photo mode is triggered
-  by a file; live mode (`NR_LAYER_LIVE=N`) runs continuously: 42.7 ms a frame at 512x288
-  for the daemon alone (23 fps, `nr_knobs.RATES`, 2026-09-24). In a game it shares the GPU
-  with the game's own rendering — Tekken 7 ran 10.5 fps at 640x360 on 2026-09-16, before the
+  by a file; live mode (`NR_LAYER_LIVE=N`) runs continuously: 36.7 ms a frame at 512x288
+  for the daemon alone (27 fps, `nr_knobs.RATES`, 2026-09-24). In a game it shares the GPU
+  with the game's own rendering — Tekken 7 ran 25 fps at 640x360 on 2026-09-24, against 10.5 on 2026-09-16, before the
   fusions (`phase59`). `src/layer/`, `notes/phase34-doa5.md`, `phase41`, `phase47`.
 - **HDR is handled**: `src/ref/nr_display.py`, the recovered display codec — encode a
   linear-HDR frame to an sRGB proxy with a soft knee, run the model, fold it back by

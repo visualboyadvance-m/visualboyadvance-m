@@ -195,12 +195,36 @@ every load of the step before storing any: 64x1024x4096 0.27 -> 0.22 ms, and pai
 frames at 320x320 39.5 -> 38.5 ms over six rounds (faster in five), 1280x720 199.6 -> 196.3
 over four (faster in all). The same values land in the same places: bit-identical.
 
+## A partial last block on the staged kernel (2026-09-24, later)
+
+The staged kernel took only M in whole 64-row blocks, so every GEMM over a level whose pixel
+count is not — 144 or 400 rows at the live extent's deeper levels — went to the tiled kernel,
+direct loads and no staging. Timed alone, 32 dependent dispatches each, the staged kernel at
+the row count rounded up to 64 was twice as fast: 144x512x512 published 137 -> 54 us, with the
+residual 99 -> 51, 400x128x256 x8 128 -> 64, and 400x256x256 40.9 -> 39.4.
+
+Rather than pad the levels' buffers, the kernel now takes the partial block itself: rows past
+M read the last real row, so nothing is read out of bounds, and the epilogue never stores
+them; the direct store is kept for whole blocks. The QKV epilogue, which finishes a block's
+rows together, stays on whole blocks. A real row's arithmetic is unchanged, so 34 kernel cases
+match the tiled and 8x16 kernels byte for byte with nothing written past M
+(`test_staged_partial.py`, which also reads the profiler to see the staged kernel run, and
+fails at once with the row guard taken out), and the three reference frames are unchanged.
+
+Paired whole frames: **320x320 38.0 -> 34.2 ms** over six rounds, and a 1280x720 extent
+197.5 -> 189.3 over four, faster in every pair. But which extents gain depends on whether a level's pixel count is whole 64-row blocks. The daemon's extents are multiples of 64, so level 4 is (extent / 16)^2: 400 pixels at 320x320 and 8160 at 1920x1088 are partial, while at 1280x768 every level is whole blocks and nothing changes. The replayed graph
+curve: 320x320 36.5 -> 32.7 ms, 1920x1088 444.6 -> 422.6, 1280x768 196.3 -> 196.6; the fit
+is now 9.4 ms + 196 ms per megapixel. Live, through the socket: **512x288 at 0.35 42.7 ->
+36.7 ms**, 27 fps. On by default; `XMX_STAGED_PARTIAL=0` is the comparison.
+
 ## Tried and dropped (2026-09-24)
 
 - **Register-prefetch pipelining in the staged GEMM** — the next K block's global loads
   issued before this block's multiply-adds, the classic way to hide load latency on the
   small-M deep-K GEMMs of the deep levels. 30 % slower: 14.1 -> 20.3 ms of staged GEMM at
   320x320, 83.9 -> 110.5 at 1280x768. Phases 21 and 26 found the same for the K loop.
+  Re-measured by mistake on the bottleneck's shapes alone, where it had the best case: twice
+  as slow, 64x1024x4096 0.19 -> 0.38 ms. Read this list before trying a loop change.
 - **The tiled or base kernel for those GEMMs**, for more workgroups: the frame at 320x320
   went 42.9 -> 53 ms either way. Staged is the best of the three there.
 - **A 64-deep K block in the staged GEMM**, for half the trips round the K loop and its
@@ -226,7 +250,19 @@ over four (faster in all). The same values land in the same places: bit-identica
   weight's upload and every GEMM path. Not taken.
 - **The cost of a pass itself** is small: 1.2 us for an empty dependent pass, 4 us for 64k
   elements. The 577 passes of a frame are under a millisecond of it; at 320x320 the time is
-  the deep levels' GEMMs, latency-bound on 32-200 workgroups.
+  the deep levels' GEMMs, latency-bound on 32-200 workgroups. (Measured again later with a
+  unary pass of 64 elements and its barrier, replayed: 4-4.6 us, against 0.5 us recorded as
+  independent — about 2 ms over the ~515 passes at 320x320. Small either way.)
+- **Weights stored as their E4M3 bytes**, decoded to half in the loader. It would be exact:
+  every one of the bottleneck's 100.7 M weights is an E4M3 value — half of them E4M3
+  subnormals, which a decoder has to get right — and MLX-DLSS's decode has no scale. A proxy
+  that reads half the bytes and decodes nothing moved the bottleneck's four GEMMs 431 -> 414 us
+  a block: 0.14 ms a frame at 320x320 before paying for a decode. Only 64x3072x1024 moved
+  (96 -> 79 us); the K = 4096 one, the slowest, is not waiting on weight bytes. Not built.
+- **Polling the graph's fence instead of sleeping on it** (below, in HANDOFF: a busy core makes
+  the graph faster). From the waiting thread it bought 0.5-1 ms of the 4.5 a separate busy
+  process buys — whether it paused between polls, did integer work, or polled every 1, 42 or
+  680 us. Not kept.
 
 ## Left behind, deliberately
 

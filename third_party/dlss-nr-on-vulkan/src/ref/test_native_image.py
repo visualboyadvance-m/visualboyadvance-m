@@ -169,6 +169,25 @@ def compose_checks(rng):
                                        slope=float(slope)),
              reference)
 
+    # The whole temporal path native: the gate from its table, the confidence and the floor
+    # from the previous frame inside the pass, against the NumPy that computes each of them.
+    for hold, with_previous, control, confidence in (
+            (1.0, True, None, 1.0), (0.5, True, mask, 1.0), (1.0, True, None, 0.6),
+            (0.0, True, None, 1.0), (1.0, False, None, 1.0), (0.25, True, mask, 0.0)):
+        before = previous if with_previous else None
+        with numpy_only():
+            reference = nr_frame.compose(head, colour, intensity=1.0, history=history,
+                                         history_confidence=confidence,
+                                         history_previous=before, history_hold=hold,
+                                         control_mask=control)
+        same(f"native temporal path, hold {hold}, confidence {confidence}"
+             f"{', masked' if control is not None else ''}"
+             f"{'' if with_previous else ', no previous frame'}",
+             nr_frame.compose(head, colour, intensity=1.0, history=history,
+                              history_confidence=confidence, history_previous=before,
+                              history_hold=hold, control_mask=control),
+             reference)
+
 
 def main():
     if nr_image.library() is None:

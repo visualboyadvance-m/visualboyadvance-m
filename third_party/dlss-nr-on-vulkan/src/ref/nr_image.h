@@ -6,6 +6,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* Every pass splits its rows across the host threads (nr_image.c's pool); a caller in C
+ * may hand it its own row loop too. `fn` gets contiguous [y0, y1) bands, one per thread,
+ * and must not depend on which thread runs a band. */
+typedef void (*nr_rows_fn)(const void *args, size_t y0, size_t y1);
+void nr_parallel_rows(size_t rows, nr_rows_fn fn, const void *args);
+unsigned nr_host_threads(void);
+
 void nr_decode8(const uint8_t *source, size_t pixels, int bgra, float *output);
 void nr_encode8(const float *image, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
                 const uint8_t *raw, size_t height, size_t width, int bgra, uint8_t *output);
@@ -26,6 +33,7 @@ void nr_compose_temporal(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_
                          const float *history, ptrdiff_t ry, ptrdiff_t rx, ptrdiff_t rc,
                          const float *previous, ptrdiff_t py, ptrdiff_t px, ptrdiff_t pc,
                          const float *gate, ptrdiff_t gy, ptrdiff_t gx,
+                         const float *table, float confidence,
                          const float *mask, ptrdiff_t my, ptrdiff_t mx,
                          size_t height, size_t width, float intensity,
                          float scale, float hold, float slope, float *output);

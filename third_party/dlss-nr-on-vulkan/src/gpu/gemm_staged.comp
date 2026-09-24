@@ -79,6 +79,10 @@ void qkv_barrier() { barrier(); }
 
 void main() {
     uint row = gl_WorkGroupID.y * BM, col = gl_WorkGroupID.x * BN;
+    /* The last block may be partial: its rows past M read the last real row, so nothing
+     * is read out of bounds, and are never stored. A real row's arithmetic is the same. */
+    bool partial = row + BM > pc.m;
+    uint last = pc.m - 1u;
     uint batch = gl_WorkGroupID.z;
     uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
     uint lda = pc.lda != 0u ? pc.lda : pc.k;
@@ -133,7 +137,7 @@ void main() {
             const uint A_PER = BM / STEP, B_PER = BK / STEP;
             f16vec4 ra[A_PER * 2u], rb[B_PER * 2u];
             for (uint p = 0u; p < A_PER; p++) {
-                uint at = ao + (row + lr + p * STEP) * lda + k0 + lc;
+                uint at = ao + min(row + lr + p * STEP, last) * lda + k0 + lc;
                 ra[2u * p] = a4.v4[at >> 2];
                 ra[2u * p + 1u] = a4.v4[(at >> 2) + 1u];
             }
@@ -175,7 +179,7 @@ void main() {
                     }
                     continue;
                 }
-                uint at = ao + (row + r) * lda + k0 + lc;
+                uint at = ao + min(row + r, last) * lda + k0 + lc;
                 if (wide_a) {
                     f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
                     for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
@@ -228,7 +232,7 @@ void main() {
     bool narrow = (operation_flags() & 0x1000u) != 0u;
     /* A fused residual needs the element's address in the skip and the cosine, so it
      * never takes the raw store below; it goes through shared memory like a publish. */
-    if (epilogue == 0u && !narrow && (operation_flags() & 0x120000u) == 0u) {
+    if (epilogue == 0u && !narrow && (operation_flags() & 0x120000u) == 0u && !partial) {
         for (uint i = 0; i < RM; i++)
             for (uint j = 0; j < RN; j++)
                 coopMatStore(acc[i][j], pc.c.v,
@@ -258,6 +262,7 @@ void main() {
     }
 
     for (uint e = thread * 4u; e < BM * BN; e += 32u * WARPS * 4u) {
+        if (row + e / BN > last) continue;          // a partial block's rows past M
         uint at = co + (row + e / BN) * ldc + col + e % BN;
         /* Window padding has no place in the image and must not touch the skip. */
         if (!residual_output_index(at)) continue;

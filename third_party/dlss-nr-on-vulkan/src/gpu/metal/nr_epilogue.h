@@ -70,12 +70,14 @@ inline float add_gemm_residual(constant Push &pc, uint flags, float branch, uint
  * finished on its own — the window mapping, the residual, the publish — then four
  * consecutive elements a lane, narrow or wide. `lanes` cover the whole block. */
 inline void store_staged(constant Push &pc, uint flags, threadgroup const float *stage, uint BM, uint BN,
-                         uint row, uint col, uint co, uint ldc, uint lane, uint lanes) {
+                         uint row, uint col, uint co, uint ldc, uint lane, uint lanes,
+                         uint last = 0xFFFFFFFFu) {
     uint epilogue = (flags >> 8) & 0xFu;
     bool narrow = (flags & 0x1000u) != 0u;
     device float *C = float_out(pc.c);
     device half *Ch = half_out(pc.c);
     for (uint e = lane * 4u; e < BM * BN; e += lanes * 4u) {
+        if (row + e / BN > last) continue;          // a staged block's rows past M
         uint at = co + (row + e / BN) * ldc + col + e % BN;
         if (!residual_output_index(pc, flags, at)) continue;
         float4 out4;

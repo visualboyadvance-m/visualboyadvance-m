@@ -386,7 +386,7 @@ exist. Eight bit-identical fusions, shared memory kept inside 2 KB and a padded 
 took 1280x720 from 445 to 231 ms and the curve to `10 ms + 230 ms per megapixel`
 (`notes/improve-fusions.md`, `notes/improve-qkv-epilogue.md`, HANDOFF). The staged GEMM
 had been running on half its threads — 15.5 KB of shared memory a workgroup, where a core
-holds 128 KB between them; given all of them it took the curve to `9 ms + 205`
+holds 128 KB between them; given all of them, and a partial last block, it took the curve to `9.4 ms + 196`
 (`notes/improve-shared-memory.md`, which also records a Mesa quirk that makes some *smaller*
 declarations slower and costs this frame nothing). What follows is the
 per-pass record, which still stands.
@@ -400,9 +400,9 @@ handing work to the four E-cores (**-7 %** for a theoretical +2 %). `notes/phase
 `phase46`.
 
 **Both modes run in a real game.** Photo mode holds a frame while a trigger file exists;
-live mode (`NR_LAYER_LIVE=N`) runs continuously — **42.7 ms a frame at 512x288** for the
-daemon alone (2026-09-24), 10.5 fps in Tekken 7 at 640x360 beside the game's own rendering
-(`phase59`, before the fusions) — with the game set to that extent and the compositor
+live mode (`NR_LAYER_LIVE=N`) runs continuously — **36.7 ms a frame at 512x288** for the
+daemon alone (2026-09-24), 25 fps in Tekken 7 at 640x360 beside the game's own rendering
+(`phase59`; 10.5 before the fusions) — with the game set to that extent and the compositor
 doing the stretch. `src/layer/nr-ctl`
 changes profile, intensity, both strengths, the render scale and the temporal knobs
 between frames without reloading the model, and `src/layer/nr-toggle` is the same three

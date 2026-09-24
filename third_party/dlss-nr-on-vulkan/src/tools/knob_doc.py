@@ -47,8 +47,8 @@ def rates():
         lines += ["", nr_knobs.RATES_NOTE]
     lines += ["",
               "That is the daemon's own cost with nothing else on the GPU. A game adds its "
-              "own frame to it: **Tekken 7** measured **10.5 fps at 640x360** in a live "
-              "fight (`notes/phase59`).", ""]
+              "own frame to it: **Tekken 7** ran at **25 fps at 640x360** in a live session "
+              "on 2026-09-24, against 10.5 fps nine days earlier (`notes/phase59`).", ""]
     return lines
 
 

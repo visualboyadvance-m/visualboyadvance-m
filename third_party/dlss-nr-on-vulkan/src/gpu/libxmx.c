@@ -123,6 +123,7 @@ static struct {
 	unsigned tiling, tilem, tilen;
 	int syncing;
 	unsigned staging;
+	unsigned staged_partial;  /* the staged kernel takes M that is not whole 64-row blocks */
 	VkCommandBuffer rcb; VkFence rfence; int recording, recorded, rready;
 	/* transfers have their own command buffer: the weights are created while the
 	 * frame's graph is being recorded, so a staged upload cannot borrow `rcb` */
@@ -493,6 +494,13 @@ static int resident_pipeline(unsigned family, unsigned flags, VkPipeline fallbac
 	specialized[specialized_count].family = family;
 	specialized[specialized_count].flags = flags;
 	specialized[specialized_count++].pipeline = *out;
+	return 0;
+}
+
+int xmx_staged_partial(unsigned on)
+{
+	if (g.recording) FAIL("cannot change the staged routing during recording", 0);
+	g.staged_partial = on != 0;
 	return 0;
 }
 
@@ -1036,6 +1044,13 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
 	g.staging = sk ? (unsigned)atoi(sk) : 128;
+	/* On by default: the live extent's GEMMs whose M is not whole 64-row blocks — 144 or 400
+	 * rows at the deeper levels — ran on the tiled kernel at half the staged one's speed.
+	 * Live, 512x288 at scale 0.35: 42.7 -> 36.7 ms, bit-identical. It pays only where some
+	 * level's pixel count is not whole 64-row blocks: at 320x320 and 1920x1088, not at
+	 * 1280x768. 0 is the comparison. */
+	const char *sp = getenv("XMX_STAGED_PARTIAL");
+	g.staged_partial = sp ? (unsigned)atoi(sp) : 1;
 	VkCommandBufferAllocateInfo cba = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 					    .commandPool = g.cpool, .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 					    .commandBufferCount = 1 };
@@ -1433,7 +1448,11 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	 * ones that dominate this graph, where the output write is the cost and there is
 	 * nothing to reuse; K >= 128 is where it stops losing. Over a whole frame the two
 	 * are indistinguishable — see notes/phase22-staging-and-storage.md. */
-	int staged = M % 64 == 0 && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
+	/* A last, partial 64-row block is the staged kernel's own business (its rows past M are
+	 * neither read out of bounds nor stored), so with `staged_partial` M need not be whole
+	 * blocks — except for the QKV epilogue, which finishes a block's rows together. */
+	int staged = (M % 64 == 0 || (g.staged_partial && !(bt & 0x100000u)))
+		     && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
 	/* The staged kernel has no portable twin — its 128-lane 64x32 geometry exists to feed
 	 * matrix units — and needs VK_KHR_workgroup_memory_explicit_layout; without either,
 	 * every shape goes to the 8x16 and 16x32 kernels, whose portable builds take the
@@ -1480,7 +1499,7 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
 	if (staged) {
-		vkCmdDispatch(g.rcb, N / 32, M / 64, batch ? batch : 1);
+		vkCmdDispatch(g.rcb, N / 32, (M + 63) / 64, batch ? batch : 1);
 	} else {
 		if (tiled) vkCmdDispatch(g.rcb, N / g.tilen, M / g.tilem, batch ? batch : 1);
 		else       vkCmdDispatch(g.rcb, (N + 15) / 16, (M + 7) / 8, batch ? batch : 1);

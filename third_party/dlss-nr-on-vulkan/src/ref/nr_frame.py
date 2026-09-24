@@ -179,9 +179,58 @@ def apply_history(features, history, geometry=None):
 
 
 def history_weight(head, *, blend_scale=BLEND_SCALE):
-    """The per-pixel history weight the model asked for, from head channel 4."""
-    logit = half(np.asarray(head, dtype=np.float32)[..., 3:4])
+    """The per-pixel history weight the model asked for, from head channel 4.
+
+    The logit is rounded to half before anything else, so the gate has 65536 possible
+    inputs. NumPy's own expression — `gate_formula`, below — is evaluated once on every one
+    of them, and each frame indexes that table: the same expression on the same values, so
+    bit-identical, where it used to run an exp, a reciprocal and a clip on every pixel of
+    the output. 3.1 ms of a 1280x720 frame. `test_nr_model.py` checks the table against the
+    formula on all 65536 inputs.
+    """
+    bits = np.asarray(head, dtype=np.float32)[..., 3:4].astype(np.float16).view(np.uint16)
+    return gate_table(float(blend_scale))[bits]
+
+
+def gate_formula(logit, blend_scale=BLEND_SCALE):
+    """The gate as the model defines it, on a logit already rounded to half."""
     return np.clip(1.0 / (1.0 + np.exp(-logit)) * half(blend_scale), 0, 1)
+
+
+HOLD_RAMP = np.float32(4.0)
+
+
+def hold_floor(current, previous, strength):
+    """Per-pixel lower bound on the history weight, from what the *game* did: full where
+    the game handed back the same pixel, gone by `HOLD_RAMP` levels of 255 (notes/phase54).
+
+    Channel by channel and in place — the obvious `max(abs(a - b), axis=2)` builds two
+    temporaries and runs seven full-frame passes at the output resolution — and folded
+    into one multiply-add-clip, which is the order the native composition transcribes.
+    """
+    floor = np.abs(np.subtract(current[..., 0], previous[..., 0], dtype=np.float32))
+    scratch = np.empty_like(floor)
+    for channel in (1, 2):
+        np.subtract(current[..., channel], previous[..., channel], out=scratch)
+        np.maximum(floor, np.abs(scratch, out=scratch), out=floor)
+    # clip(1 - moved * 255 / ramp, 0, 1) * strength, folded into one multiply-add-clip
+    np.multiply(floor, np.float32(-255.0 * strength / HOLD_RAMP), out=floor)
+    np.add(floor, np.float32(strength), out=floor)
+    return np.clip(floor, 0, strength, out=floor)[..., None]
+
+
+_GATE_TABLES = {}
+
+
+def gate_table(blend_scale):
+    """`gate_formula` on every half value, indexed by the value's sixteen bits."""
+    table = _GATE_TABLES.get(blend_scale)
+    if table is None:
+        every = np.arange(1 << 16, dtype=np.uint32).astype(np.uint16).view(np.float16)
+        with np.errstate(over="ignore", invalid="ignore"):
+            table = gate_formula(every.astype(np.float32), blend_scale).astype(np.float32)
+        _GATE_TABLES[blend_scale] = table
+    return table
 
 
 # What the vendor's own panel starts at, which is not what MLX-DLSS's profiles use:
@@ -306,7 +355,8 @@ def run_head(model, color, *, profile="standard", frame_index=0, style_index=Non
 
 def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=1.0,
             detail_radius=4.0, control_mask=None, history=None,
-            history_confidence=1.0, history_floor=None, blend_scale=BLEND_SCALE):
+            history_confidence=1.0, history_floor=None, history_previous=None,
+            history_hold=0.0, blend_scale=BLEND_SCALE):
     """The head over the frame. Post-network and cheap: sweep it without re-running.
 
     With a `history` image this is MLX-DLSS's `compose_temporal` instead of its
@@ -349,16 +399,32 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
             history = np.asarray(history, dtype=np.float32)
             if history.shape != color.shape:
                 raise ValueError("history must match the colour image shape")
-            # The gate stays in NumPy even when the rest goes native: `expf` and NumPy's
-            # float32 exponential disagree in the last bit, and the floor folds into it
-            # here, so what is left for C is the residual, the blend and the clamps.
-            alpha = history_weight(head, blend_scale=blend_scale)
-            if history_confidence != 1.0:
+            previous = (history_previous if history_previous is not None and history_hold > 0
+                        else None)
+            if nr_image is not None and history_floor is None:
+                # Everything temporal in the one native pass: the gate from its table (the
+                # exp that kept it in NumPy is inside the table), the confidence, and the
+                # floor from the game's previous frame in the same folded multiply-add-clip
+                # as `hold_floor`. 7 ms of NumPy at a 1280x720 output.
+                confidence = (float(np.clip(np.float32(history_confidence), 0, 1))
+                              if history_confidence != 1.0 else 1.0)
+                composed = nr_image.compose_temporal(
+                    head, color, history, previous, None, control_mask,
+                    intensity=intensity, blend_scale=blend_scale,
+                    hold=float(history_hold) if previous is not None else 0.0,
+                    slope=(float(np.float32(-255.0 * history_hold / HOLD_RAMP))
+                           if previous is not None else 0.0),
+                    table=gate_table(float(blend_scale)), confidence=confidence)
+            if previous is not None and history_floor is None and composed is None:
+                history_floor = hold_floor(color, previous, history_hold)
+            alpha = (history_weight(head, blend_scale=blend_scale)
+                     if composed is None else None)
+            if composed is None and history_confidence != 1.0:
                 alpha = alpha * np.clip(np.float32(history_confidence), 0, 1)
-            if history_floor is not None:
+            if composed is None and history_floor is not None:
                 floor = np.clip(np.asarray(history_floor, dtype=np.float32), 0, 1)
                 np.maximum(alpha, floor * np.float32(blend_scale), out=alpha)
-            if nr_image is not None:
+            if composed is None and nr_image is not None:
                 composed = nr_image.compose_temporal(
                     head, color, history, None, alpha, control_mask,
                     intensity=intensity, blend_scale=blend_scale, hold=0.0, slope=0.0)

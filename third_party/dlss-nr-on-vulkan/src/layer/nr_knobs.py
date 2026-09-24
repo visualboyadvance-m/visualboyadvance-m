@@ -22,7 +22,7 @@ KNOBS = (
         "much smaller, and what comes back is the *head* — the detail it drew — which is "
         "then scaled up and composed against the full-resolution original, so the game's "
         "own pixels are never resampled and only the synthesised part is interpolated. "
-        "Cost follows the extent and nothing else: about 9 ms + 205 ms per megapixel "
+        "Cost follows the extent and nothing else: about 9 ms + 196 ms per megapixel "
         "of network extent on an Arc 140V. The extent is never below 320 on a side — the "
         "checkpoint's minimum — so small renders are padded up to it: at 512x288 every "
         "scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times "
@@ -109,17 +109,17 @@ DEFAULTS = {knob.name: knob.default for knob in KNOBS}
 # by `src/tools/knob_doc.py`, because the hand-written one went two days out of date the
 # moment the host passes moved to C and then stayed wrong for a week.
 RATES = (
-    (512, 288, 0.35, 42.7),
-    (512, 288, 0.50, 43.0),
-    (640, 360, 0.35, 44.1),
-    (640, 360, 0.50, 44.4),
-    (854, 480, 0.50, 54.2),
-    (1024, 768, 0.55, 91.3),
-    (1920, 1080, 0.55, 205.5),
+    (512, 288, 0.35, 35.7),
+    (512, 288, 0.50, 37.5),
+    (640, 360, 0.35, 37.5),
+    (640, 360, 0.50, 39.2),
+    (854, 480, 0.50, 50.4),
+    (1024, 768, 0.55, 75.1),
+    (1920, 1080, 0.55, 170.9),
 )
 RATES_MEASURED = "2026-09-24"
 # What a reader of the table needs and the numbers cannot say. Empty when there is nothing.
-RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 6 %. On "
+RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 4 %. On "
               "2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures "
               "rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower "
               "for you, look at swap before anything else.")

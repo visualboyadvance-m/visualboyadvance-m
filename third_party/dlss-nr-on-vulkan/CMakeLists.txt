@@ -753,6 +753,11 @@ nr_no_ipo(nr_image_objects)
 
 add_library(nr_image SHARED $<TARGET_OBJECTS:nr_image_objects>)
 nr_place(nr_image)
+# the passes split their rows across nr_image.c's own thread pool (pthreads, or Win32
+# threads on Windows, which need nothing linked)
+if(TARGET Threads::Threads)
+  target_link_libraries(nr_image PRIVATE Threads::Threads)
+endif()
 
 # ---------------------------------------------------------------------------------------
 # the weights, as C: the slices in the weights directory, one object each
@@ -876,6 +881,9 @@ add_library(nr_frame SHARED src/ref/nr_frame.c $<TARGET_OBJECTS:nr_image_objects
 target_include_directories(nr_frame PRIVATE src/ref)
 target_compile_options(nr_frame PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
 target_link_libraries(nr_frame PRIVATE ${CMAKE_DL_LIBS})
+if(TARGET Threads::Threads)
+  target_link_libraries(nr_frame PRIVATE Threads::Threads)
+endif()
 if(NR_EMBED_WEIGHTS)
   target_compile_definitions(nr_frame PRIVATE NR_EMBEDDED_WEIGHTS=1)
 endif()
@@ -943,6 +951,9 @@ if(NR_EMBED_WEIGHTS)
 endif()
 target_compile_options(dlssnr PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
 target_link_libraries(dlssnr PUBLIC ${CMAKE_DL_LIBS})
+if(TARGET Threads::Threads)
+  target_link_libraries(dlssnr PUBLIC Threads::Threads)   # nr_image.c's row pool
+endif()
 if(NOT MSVC)
   target_link_libraries(dlssnr PUBLIC m)
 endif()
@@ -1044,6 +1055,7 @@ if(NR_BUILD_TESTS)
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
       src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
       src/gpu/test_ffn_fused.py
+      src/gpu/test_staged_partial.py
       src/gpu/test_glue.py
       src/gpu/test_gemm_qkv.py
       src/gpu/test_window_attention.py
@@ -1066,6 +1078,12 @@ if(NR_BUILD_TESTS)
       nr_ctest(test_present_negative "${PY}" "${PROJECT_SOURCE_DIR}/src/layer/test_present.py" --negative-control)
       set_tests_properties(test_present_negative PROPERTIES SKIP_RETURN_CODE 77)
     endif()
+    # the host passes at other thread counts: nr_image.c's pool splits rows, so the bytes
+    # must not move with the count (the default run above uses one thread per core)
+    foreach(threads 1 3)
+      add_test(NAME test_native_image_threads${threads} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_native_image.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(test_native_image_threads${threads} PROPERTIES ENVIRONMENT "NR_HOST_THREADS=${threads};${NR_TEST_ENV}")
+    endforeach()
     # the batched feed-forward schedule against the plain one, on the device
     nr_ctest(test_ffn_batch "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_ffn_batch.py" --gpu)
     # the portable GEMM kernels, forced, on a device that has the matrix ones
@@ -1083,7 +1101,7 @@ if(NR_BUILD_TESTS)
       src/gpu/test_gemm_contract.py src/gpu/test_gemm_residual.py src/gpu/test_window_residual.py
       src/gpu/test_window_attention.py src/gpu/test_gemm_qkv.py src/gpu/test_ffn_fused.py
       src/gpu/test_glue.py src/gpu/test_joint_qkv.py src/gpu/test_compact_head.py
-      src/gpu/test_input_fp16.py)
+      src/gpu/test_input_fp16.py src/gpu/test_staged_partial.py)
     if(NR_BUILD_METAL)
       set(NR_METAL_TESTS ${NR_RUNTIME_TESTS})
       foreach(script ${NR_METAL_TESTS})

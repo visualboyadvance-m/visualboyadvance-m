@@ -12,7 +12,12 @@ beside it, and the output is required to be byte-identical: `src/ref/test_native
 runs both and compares.
 
 `make` builds the library for this host, with `-march=native`, so rebuild it rather than
-copying it. `NR_HOST_NATIVE=0` selects the NumPy path for a paired measurement without
+copying it. Every pass is split by rows across the library's own thread pool, one thread
+per core by default (`NR_HOST_THREADS`, else `OMP_NUM_THREADS`, to change it; read once,
+when the library first runs a pass); a row's arithmetic does not depend on which thread
+does it, so the output is the same bytes at any thread count. The pool waits passively,
+as upstream's OpenMP build does with `OMP_WAIT_POLICY=passive`.
+`NR_HOST_NATIVE=0` selects the NumPy path for a paired measurement without
 changing any model or shader setting. With no library at all everything still runs.
 """
 import ctypes as C
@@ -40,7 +45,7 @@ def _library():
     lib.nr_compose_temporal.argtypes = [
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, stride, ptr, stride, stride, stride,
-        ptr, stride, stride, ptr, stride, stride,
+        ptr, stride, stride, ptr, C.c_float, ptr, stride, stride,
         size, size, C.c_float, C.c_float, C.c_float, C.c_float, ptr]
     lib.nr_compose_temporal.restype = None
     lib.nr_resize_axis.argtypes = [ptr, stride, stride, stride, size, size, size,
@@ -135,13 +140,15 @@ def features(colour, rows, columns, noise, controls, history=None):
 
 
 def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
-                     blend_scale, hold, slope):
+                     blend_scale, hold, slope, table=None, confidence=1.0):
     """`nr_frame.compose` with a history, a floor and an optional control mask.
 
-    `gate` is the model's own weight, already through its sigmoid and its confidence in
-    NumPy: `expf` and NumPy's float32 exponential disagree in the last bit, and the
-    contract here is byte-identical output rather than nearly. `slope` is the folded
-    constant of the floor, for the same reason — see the C.
+    With `table` — `nr_frame.gate_table`, NumPy's sigmoid on every half value — the gate
+    and its `confidence` are computed in the pass, and `gate` is not read. Without it,
+    `gate` is the model's own weight already through its sigmoid and its confidence in
+    NumPy. Either way the sigmoid is NumPy's: `expf` and NumPy's float32 exponential
+    disagree in the last bit, and the contract here is byte-identical output rather than
+    nearly. `slope` is the folded constant of the floor, for the same reason — see the C.
     """
     lib = library()
     if lib is None:
@@ -149,11 +156,18 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
     head = np.require(head, dtype=np.float32, requirements=['A'])
     colour = np.require(colour, dtype=np.float32, requirements=['A'])
     history = np.require(history, dtype=np.float32, requirements=['A'])
-    gate = np.require(gate, dtype=np.float32, requirements=['A'])
+    if table is not None:
+        # the gate from its 65536-entry table, in the pass itself (`nr_frame.gate_table`)
+        table = np.require(table, dtype=np.float32, requirements=['C', 'A'])
+        if table.shape != (1 << 16,):
+            raise ValueError('the gate table has one entry for each of the 65536 half values')
+        gate = np.zeros((1, 1, 1), np.float32)          # unread
+    else:
+        gate = np.require(gate, dtype=np.float32, requirements=['A'])
     if (head.ndim != 3 or head.shape[2] < 4 or colour.ndim != 3 or colour.shape[2] != 3
             or history.shape != colour.shape or head.shape[:2] != colour.shape[:2]
-            or gate.shape[:2] != colour.shape[:2] or gate.ndim != 3
-            or gate.shape[2] != 1):
+            or (table is None and (gate.shape[:2] != colour.shape[:2] or gate.ndim != 3
+                                   or gate.shape[2] != 1))):
         raise ValueError('the temporal composition needs a four-channel head, a colour, '
                          'a history of the same shape and a single-channel gate')
     if previous is not None:
@@ -172,6 +186,7 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
         previous.ctypes.data if previous is not None else None,
         *(_strides(previous) if previous is not None else (0, 0, 0)),
         gate.ctypes.data, *_strides(gate)[:2],
+        table.ctypes.data if table is not None else None, confidence,
         mask.ctypes.data if mask is not None else None,
         *(_strides(mask)[:2] if mask is not None else (0, 0)),
         *colour.shape[:2], intensity, blend_scale, hold, slope, output.ctypes.data)

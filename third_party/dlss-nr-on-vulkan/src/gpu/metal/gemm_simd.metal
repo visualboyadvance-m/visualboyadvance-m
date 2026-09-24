@@ -186,6 +186,10 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
     threadgroup float stage[S_BM * S_BN];
 
     uint row = wg.y * S_BM, col = wg.x * S_BN;
+    /* The last block may be partial: its rows past M read the last real row, so nothing
+     * is read out of bounds, and are never stored. A real row's arithmetic is the same. */
+    bool partial = row + S_BM > pc.m;
+    uint last = pc.m - 1u;
     uint flags = operation_flags(pc);
     uint batch = wg.z;
     uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
@@ -227,7 +231,7 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
                 for (uint e = 0; e < 4u; e++) buf_a[r * S_SA + lc + 4u + e] = hi[e];
                 continue;
             }
-            uint at = ao + (row + r) * lda + k0 + lc;
+            uint at = ao + min(row + r, last) * lda + k0 + lc;
             if (wide_a) {
                 half4 lo = a4[at >> 2], hi = a4[(at >> 2) + 1u];
                 for (uint e = 0; e < 4u; e++) buf_a[r * S_SA + lc + e] = lo[e];
@@ -278,7 +282,7 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
     bool narrow = (flags & 0x1000u) != 0u;
     /* A fused residual or the QKV epilogue needs each element's own address, so it never
      * takes the raw store; it goes through the stage like a publish. */
-    if (epilogue == 0u && !narrow && (flags & 0x120000u) == 0u) {
+    if (epilogue == 0u && !narrow && (flags & 0x120000u) == 0u && !partial) {
         for (uint i = 0; i < S_RM; i++)
             for (uint j = 0; j < S_RN; j++)
                 for (int jj = 0; jj < 2; jj++)
@@ -297,7 +301,7 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
         qkv_epilogue<true>(pc, stage, S_BM, S_BN, row, col, thread_id, 32u * S_WARPS);
         return;
     }
-    store_staged(pc, flags, stage, S_BM, S_BN, row, col, co, ldc, thread_id, 32u * S_WARPS);
+    store_staged(pc, flags, stage, S_BM, S_BN, row, col, co, ldc, thread_id, 32u * S_WARPS, last);
 }
 
 /* -- the descriptor-bound GEMMs: gemm_coopmat, gemm_batched, gemm_f16acc --------------- */

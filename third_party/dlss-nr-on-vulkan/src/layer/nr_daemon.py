@@ -433,37 +433,12 @@ class History:
 # Over how many levels of 255 the hold lets go. A pixel the game handed back unchanged
 # has provably correct history; one level of change is still almost certainly the same
 # surface, and by four it is something else and the model's own gate decides alone.
-HOLD_RAMP = np.float32(4.0)
+HOLD_RAMP = nr_frame.HOLD_RAMP
 
 
-def hold_floor(current, previous, strength):
-    """Per-pixel lower bound on the history weight, from what the *game* did.
-
-    The gate is not local — on a frame where most things move it reads 0.12 even over
-    pixels that did not move at all, against 0.705 when the history was correct
-    everywhere (`notes/phase12-temporal.md`). Motion vectors would fix that, and a
-    `vkQueuePresentKHR` layer has none; optical flow was measured and does not help,
-    because it corrects the history where things *moved*, which is the ghosting case,
-    not the flicker one (`notes/phase54-flicker-fix.md`).
-
-    What the layer does have is the game's own frame. Where it did not change, the
-    previous output is the right answer for that pixel by construction, and holding it
-    cannot ghost: the moment the game moves the pixel the floor is gone. `decode` is a
-    bijection, so comparing the decoded frames is the same test as comparing the bytes,
-    and it stays exact across the packed 10-bit format too.
-    """
-    # Channel by channel and in place. The obvious `max(abs(a - b), axis=2)` builds two
-    # (h, w, 3) temporaries and runs seven full-frame passes at the *output* resolution,
-    # which is where this frame's time already goes (notes/phase47).
-    floor = np.abs(np.subtract(current[..., 0], previous[..., 0], dtype=np.float32))
-    scratch = np.empty_like(floor)
-    for channel in (1, 2):
-        np.subtract(current[..., channel], previous[..., channel], out=scratch)
-        np.maximum(floor, np.abs(scratch, out=scratch), out=floor)
-    # clip(1 - moved * 255 / ramp, 0, 1) * strength, folded into one multiply-add-clip
-    np.multiply(floor, np.float32(-255.0 * strength / HOLD_RAMP), out=floor)
-    np.add(floor, np.float32(strength), out=floor)
-    return np.clip(floor, 0, strength, out=floor)[..., None]
+# The floor's definition lives in nr_frame now, beside the gate it bounds, so that the
+# native composition and the NumPy one read the same thing; kept here by name.
+hold_floor = nr_frame.hold_floor
 
 
 class Meter:
@@ -635,17 +610,23 @@ def process_connection(connection, backend, args):
         control[held, 0] = 0.0
     # What the game itself did to each pixel — the only motion signal a present-time
     # layer has, and an exact one.
-    floor = (hold_floor(colour, history_pixels, live.hold)
-             if history_pixels is not None and live.hold > 0 else None)
+    # The floor is computed inside the composition now, from the game's previous frame
+    # (`nr_frame.compose`, `history_previous`); only its share for the log line is taken
+    # here, on every eighth pixel of every eighth row — exactly the values the full floor
+    # has there.
+    previous = history_pixels if history_pixels is not None and live.hold > 0 else None
     output = nr_frame.compose(head, colour, intensity=live.intensity,
                               detail_strength=live.detail_strength,
                               colour_strength=live.colour_strength,
                               control_mask=control, history=history_full,
                               history_confidence=live.temporal,
-                              history_floor=floor)
+                              history_previous=previous, history_hold=live.hold)
     # Measure before the write-back: putting the result into `whole` and then differencing
     # against `whole` compares an array with itself, which reported change 0.00000.
-    changed = float(np.abs(output - colour).mean())
+    # On every fourth row, like the log's other figures: the whole frame took 5 ms of a
+    # 1080p frame for a number printed to five places, and a quarter of the rows moves it
+    # by about a part in five hundred.
+    changed = float(np.abs(output[::4] - colour[::4]).mean())
     if boxed:
         # A copy, not a write into `whole`: aliasing the input and the output through one
         # array has now caused two bugs in this function — `change` printed 0.00000, and
@@ -703,7 +684,8 @@ def process_connection(connection, backend, args):
             note += f"  no history, cut {args.history.cut:.4f}"
         else:
             gate = float(nr_frame.history_weight(head[::8, ::8]).mean())
-            hold = "" if floor is None else f", held {100 * float((floor[::8, ::8] > 0).mean()):.0f}%"
+            hold = "" if previous is None else (
+                f", held {100 * float((hold_floor(colour[::8, ::8], previous[::8, ::8], live.hold) > 0).mean()):.0f}%")
             note += f"  gate {gate:.3f}{hold}, cut {args.history.cut:.4f}"
     box = "" if not boxed else (f"  letterbox {height - (bottom - top)}px of rows and "
                                f"{width - (right - left)}px of columns skipped")

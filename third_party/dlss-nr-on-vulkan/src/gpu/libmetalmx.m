@@ -110,6 +110,7 @@ static struct {
 	unsigned tiling, tilem, tilen;
 	int syncing;
 	unsigned staging;
+	unsigned staged_partial;  /* the staged kernel takes M that is not whole 64-row blocks */
 	int recording, recorded, rready;
 	unsigned prof, prof_n; double ns_per_tick;
 	char name[256]; char err[512]; char memory[256];
@@ -334,6 +335,13 @@ static int resident_pipeline(unsigned family, unsigned flags, void *fallback, vo
 	specialized[specialized_count].family = family;
 	specialized[specialized_count].flags = flags;
 	specialized[specialized_count++].pipeline = *out;
+	return 0;
+}
+
+int xmx_staged_partial(unsigned on)
+{
+	if (g.recording) FAIL("cannot change the staged routing during recording", 0);
+	g.staged_partial = on != 0;
 	return 0;
 }
 
@@ -566,6 +574,11 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
 	g.staging = sk ? (unsigned)atoi(sk) : 128;
+	/* As in libxmx: the staged kernel takes a partial last 64-row block itself, so the
+	 * deeper levels' 144- or 400-row GEMMs need not drop to the tiled kernel. 0 is the
+	 * comparison. */
+	const char *sp = getenv("XMX_STAGED_PARTIAL");
+	g.staged_partial = sp ? (unsigned)atoi(sp) : 1;
 	g.unmapped = want_unmapped();
 	g.rready = 1;
 	return 0;
@@ -855,7 +868,11 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	/* The same three-way choice as libxmx: the 64x32 staged kernel for deep, whole-block
 	 * shapes; the 16x32 register block where both extents allow it; the 8x16 kernel for
 	 * everything else. The staged kernel has no portable twin. */
-	int staged = M % 64 == 0 && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
+	/* A last, partial 64-row block is the staged kernel's own business (its rows past M are
+	 * neither read out of bounds nor stored) — except for the QKV epilogue, which finishes
+	 * a block's rows together. */
+	int staged = (M % 64 == 0 || (g.staged_partial && !(bt & 0x100000u)))
+		     && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
 	if (g.portable) staged = 0;
 	/* the window gather lives in the staged kernel's A loader on the matrix path, and in
 	 * the tiled kernels' (both builds) where there is no staged one */
@@ -888,7 +905,7 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	if (resident_pipeline(staged ? 2 : (tiled ? 1 : 0), bt,
 			      staged ? g.rstaged : (tiled ? g.rtiled : g.rgemm), &pipeline)) return -1;
 	unsigned gz = batch ? batch : 1;
-	if (staged) return dispatch(pipeline, &p, N / 32, M / 64, gz, 128, PK_STAGED, bt);
+	if (staged) return dispatch(pipeline, &p, N / 32, (M + 63) / 64, gz, 128, PK_STAGED, bt);
 	if (tiled)  return dispatch(pipeline, &p, N / g.tilen, M / g.tilem, gz, 32, PK_TILED, bt);
 	return dispatch(pipeline, &p, (N + 15) / 16, (M + 7) / 8, gz, 32, PK_GEMM, bt);
 }
