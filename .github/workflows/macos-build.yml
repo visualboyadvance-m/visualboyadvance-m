@@ -1,9 +1,5 @@
 name: macOS Latest
-# Disabled on push and pull_request: the macOS runners this job needs are
-# not being scheduled, so every run sits queued forever and the commit
-# never gets a verdict. Kept runnable by hand from the Actions tab so the
-# job does not rot while that lasts.
-on: workflow_dispatch
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:

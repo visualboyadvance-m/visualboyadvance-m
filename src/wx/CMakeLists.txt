@@ -1370,8 +1370,18 @@ if(APPLE)
     if(NOT COMPILE_ONLY AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         target_link_libraries(visualboyadvance-m tiff)
 
+        # libtiff may be built against libzstd and libdeflate, which then
+        # have to be linked explicitly; link whichever of them exist, since
+        # not every package manager builds libtiff with both (Homebrew's
+        # libtiff has no libdeflate).
         if(NOT NIX)
-            target_link_libraries(visualboyadvance-m zstd deflate)
+            foreach(lib zstd deflate)
+                find_library(TIFF_DEP_${lib} ${lib})
+
+                if(TIFF_DEP_${lib})
+                    target_link_libraries(visualboyadvance-m ${TIFF_DEP_${lib}})
+                endif()
+            endforeach()
         endif()
     endif()
 endif()
