@@ -35,7 +35,9 @@
 
 #if defined(_WIN32) && (!defined(_WIN32_WINNT) || _WIN32_WINNT >= 0x0600)
 #define NR_ROWS_WIN32 1
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 typedef SRWLOCK nr_lock;
 typedef CONDITION_VARIABLE nr_cond;
