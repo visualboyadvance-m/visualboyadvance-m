@@ -56,19 +56,30 @@ bool VbamMacHostIsAppleSilicon() {
 // the display's usable peak in our luminance model. Uses the window's screen when
 // available, else the brightest connected screen. Returns 1.0 when HDR is off or
 // unsupported. "Potential" (capability) rather than the currently-allocated value.
-double VbamMacosMaxEdrHeadroom() {
+//
+// The screen is chosen by EdrScreen(), which VbamMacosDisplayFloorRatio() shares
+// so the peak and the black floor always describe the same display.
+static NSScreen* EdrScreen() {
     NSScreen* window_screen =
         wxGetApp().frame ? ((NSView*)wxGetApp().frame->GetHandle()).window.screen : nil;
     if (window_screen)
-        return window_screen.maximumPotentialExtendedDynamicRangeColorComponentValue;
+        return window_screen;
 
+    NSScreen* best_screen = nil;
     double best = 1.0;
     for (NSScreen* screen in [NSScreen screens]) {
         double h = screen.maximumPotentialExtendedDynamicRangeColorComponentValue;
-        if (h > best)
+        if (h > best) {
             best = h;
+            best_screen = screen;
+        }
     }
-    return best;
+    return best_screen;
+}
+
+double VbamMacosMaxEdrHeadroom() {
+    NSScreen* screen = EdrScreen();
+    return screen ? screen.maximumPotentialExtendedDynamicRangeColorComponentValue : 1.0;
 }
 
 // SDL, given an external Cocoa view, makes that view the host NSWindow's
@@ -127,14 +138,19 @@ void VbamRemoveSdlMetalViews() {
     }
 }
 
-// Parse an EDID's CTA-861 extension block(s) for the HDR Static Metadata Data
-// Block (extended tag 0x06). Returns true when it advertises a PQ (SMPTE ST.2084)
-// or HLG EOTF -- i.e. the display is intrinsically HDR-capable. This reflects the
-// panel's hardware capability and is independent of the current macOS HDR mode,
-// unlike the NSScreen EDR headroom (which collapses to 1.0 when HDR is off).
-static bool EdidDeclaresHdr(const uint8_t* edid, size_t len) {
+// Find the HDR Static Metadata Data Block (extended tag 0x06) in an EDID's
+// CTA-861 extension block(s). Returns a pointer to the block's payload -- the
+// byte after the extended tag -- and its length in *payload_len, or null when
+// the EDID has no such block.
+//
+// The payload is: [0] the supported-EOTF bitmap (bit0 SDR, bit1 traditional
+// HDR, bit2 PQ (ST.2084), bit3 HLG), [1] the static metadata descriptors, then
+// optionally [2] desired content max luminance, [3] max frame-average and [4]
+// min luminance, each a code value the length says whether is present.
+static const uint8_t* EdidHdrStaticMetadata(const uint8_t* edid, size_t len,
+                                            size_t* payload_len) {
     if (len < 128)
-        return false;
+        return nullptr;
     const int extensions = edid[126];
     for (int e = 1; e <= extensions; ++e) {
         const size_t base = static_cast<size_t>(e) * 128;
@@ -152,17 +168,40 @@ static bool EdidDeclaresHdr(const uint8_t* edid, size_t len) {
             const uint8_t blocklen = ext[i] & 0x1f;
             if (blocklen == 0)
                 break;
-            // Use-Extended-Tag block (tag 7), extended tag 0x06 = HDR Static
-            // Metadata. Byte after the ext tag is the supported-EOTF bitmap:
-            // bit0 SDR, bit1 traditional HDR, bit2 PQ (ST.2084), bit3 HLG.
-            if (tag == 7 && blocklen >= 2 && ext[i + 1] == 0x06) {
-                if (ext[i + 2] & 0x0c)   // PQ or HLG
-                    return true;
+            // Use-Extended-Tag block (tag 7), extended tag 0x06, with at least
+            // the EOTF bitmap after it, and wholly inside the extension.
+            if (tag == 7 && blocklen >= 2 && ext[i + 1] == 0x06 &&
+                i + 1 + blocklen <= 128) {
+                *payload_len = blocklen - 1;
+                return ext + i + 2;
             }
             i += 1 + blocklen;
         }
     }
-    return false;
+    return nullptr;
+}
+
+// True when an EDID advertises a PQ (SMPTE ST.2084) or HLG EOTF -- i.e. the
+// display is intrinsically HDR-capable. This reflects the panel's hardware
+// capability and is independent of the current macOS HDR mode, unlike the
+// NSScreen EDR headroom (which collapses to 1.0 when HDR is off).
+static bool EdidDeclaresHdr(const uint8_t* edid, size_t len) {
+    size_t n = 0;
+    const uint8_t* md = EdidHdrStaticMetadata(edid, len, &n);
+    return md && (md[0] & 0x0c);         // PQ or HLG
+}
+
+// The panel's black floor as a fraction of its peak, from the HDR Static
+// Metadata block: max = 50 * 2^(CV/32) cd/m², and min = max * (CV/255)^2 / 100
+// (CTA-861-G 7.5.13). The min is only defined relative to the max, so the
+// fraction is what the EDID actually states; 0 when either is absent.
+static double EdidMinToMaxLuminance(const uint8_t* edid, size_t len) {
+    size_t n = 0;
+    const uint8_t* md = EdidHdrStaticMetadata(edid, len, &n);
+    if (!md || n < 5 || md[2] == 0 || md[4] == 0)
+        return 0.0;
+    const double cv = md[4] / 255.0;
+    return cv * cv / 100.0;
 }
 
 // True if a connected display is HDR-capable (per its EDID) but macOS is not
@@ -200,6 +239,60 @@ bool VbamMacosHdrSupportedButOff() {
         IOObjectRelease(it);
     }
     return capable;
+}
+
+// The black floor of the EDR screen (EdrScreen(), the one the peak comes from)
+// as a fraction of its peak, or 0 when unknown. EDR exposes no floor, so this
+// reads the display's EDID: the IODisplay whose vendor, product and serial
+// match the screen's CGDirectDisplayID. The caller multiplies it by the peak in
+// the encoder's nits; a panel's contrast ratio is what survives EDR's relative
+// model, where the physical nits behind SDR white move with the brightness
+// setting.
+//
+// Only displays with a CTA-861 HDR block answer. Apple's own panels describe
+// themselves in DisplayID instead, and on Apple Silicon the EDID is not on an
+// IODisplay at all, so both stay at 0 and keep the zero-anchored dark end.
+double VbamMacosDisplayFloorRatio() {
+    NSScreen* screen = EdrScreen();
+    if (!screen)
+        return 0.0;
+    NSNumber* num = screen.deviceDescription[@"NSScreenNumber"];
+    if (!num)
+        return 0.0;
+    const CGDirectDisplayID did = num.unsignedIntValue;
+    const uint32_t vendor = CGDisplayVendorNumber(did);
+    const uint32_t product = CGDisplayModelNumber(did);
+    const uint32_t serial = CGDisplaySerialNumber(did);
+
+    double ratio = 0.0;
+    io_iterator_t it = 0;
+    if (IOServiceGetMatchingServices(kIOMainPortDefault,
+            IOServiceMatching("IODisplay"), &it) != KERN_SUCCESS)
+        return 0.0;
+    io_service_t svc;
+    while ((svc = IOIteratorNext(it))) {
+        CFMutableDictionaryRef props = NULL;
+        if (IORegistryEntryCreateCFProperties(
+                svc, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS && props) {
+            NSDictionary* d = (__bridge NSDictionary*)props;
+            // A missing serial reads as 0, as CGDisplaySerialNumber() reports
+            // for a display without one.
+            if ([d[@"DisplayVendorID"] unsignedIntValue] == vendor &&
+                [d[@"DisplayProductID"] unsignedIntValue] == product &&
+                [d[@"DisplaySerialNumber"] unsignedIntValue] == serial) {
+                NSData* edid = d[@"IODisplayEDID"];
+                if (edid)
+                    ratio = EdidMinToMaxLuminance(
+                        static_cast<const uint8_t*>(edid.bytes), edid.length);
+            }
+            CFRelease(props);
+        }
+        IOObjectRelease(svc);
+        if (ratio > 0.0)
+            break;
+    }
+    IOObjectRelease(it);
+    return ratio;
 }
 
 // macOS version checks. Not Metal-specific: the Vulkan (MoltenVK) path also

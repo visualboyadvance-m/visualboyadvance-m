@@ -13467,6 +13467,7 @@ bool VbamWindowsIsWin10OrGreater() {
 extern bool VbamProbeMacosHdr();
 extern bool VbamMacosHdrSupportedButOff();
 extern double VbamMacosMaxEdrHeadroom();
+extern double VbamMacosDisplayFloorRatio();
 #endif
 
 #if defined(__WXGTK__)
@@ -13679,9 +13680,12 @@ float DisplayMinNits() {
         return WaylandDisplayMinNits();
 #endif
     return 0.0f;
+#elif defined(__WXMAC__)
+    // EDR is relative, so the EDID's absolute floor is not in our nits. Its
+    // ratio to the EDID peak is, applied to the peak in our model (headroom x
+    // reference white), from the same screen DisplayPeakNits() reads.
+    return static_cast<float>(VbamMacosDisplayFloorRatio() * DisplayPeakNits());
 #else
-    // macOS EDR exposes no black-floor equivalent, so the transfer keeps its
-    // old zero-anchored dark end there.
     return 0.0f;
 #endif
 }

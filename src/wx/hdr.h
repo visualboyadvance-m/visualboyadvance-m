@@ -71,8 +71,9 @@ struct Settings {
     float shadow_contrast = 1.0f;
     // The display's black floor in nits, as the platform reports it (Wayland
     // wp_image_description_info_v1 luminances.min_lum, Windows
-    // DXGI_OUTPUT_DESC1::MinLuminance). Fractional and usually small: tenths
-    // of a nit on an LCD, ten-thousandths on an OLED.
+    // DXGI_OUTPUT_DESC1::MinLuminance, macOS the EDID's HDR static metadata
+    // scaled to the EDR peak). Fractional and usually small: tenths of a nit
+    // on an LCD, ten-thousandths on an OLED.
     //
     // The transfer's dark end is anchored here instead of at zero. A display
     // cannot emit below its floor, so every shade the old transfer mapped
@@ -123,8 +124,9 @@ uint32_t DisplayPeakNits();
 
 // The current display's black floor in nits -- the fractional MinLuminance the
 // platform reports (Wayland luminances.min_lum, Windows
-// DXGI_OUTPUT_DESC1::MinLuminance). 0 when unknown, and then the transfer's
-// dark end behaves as it did before. Queried live.
+// DXGI_OUTPUT_DESC1::MinLuminance, macOS the EDID's min/max luminance ratio
+// times DisplayPeakNits()). 0 when unknown, and then the transfer's dark end
+// behaves as it did before. Queried live.
 float DisplayMinNits();
 
 // True if the display supports HDR but the user has it switched off in Windows
