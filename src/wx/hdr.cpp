@@ -227,7 +227,15 @@ static inline uint32_t PackA2B10G10R10(uint32_t r, uint32_t g, uint32_t b) {
 // a source step (using the pixel's Bayer threshold d in [0,1)) and interpolate,
 // so the 8-bit gradient is spread across the higher-precision output. Neutral
 // for equal channels (no color noise).
+//
+// Black is not dithered: there is nothing below it to spread toward, and the
+// half step under 0 would swing every other pixel between negative (clamped
+// to 0 nits) and positive -- which LumScale() lifts to the display's black
+// floor, so a black area came out as a Bayer grid of 0 and floor nits. Code 0
+// stays exactly 0, and the floor starts at code 1.
 static inline float DitherLin(int v, float d) {
+    if (v == 0)
+        return 0.0f;
     const float lo = g_lin_lut[v];
     const float hi = g_lin_lut[v < 255 ? v + 1 : 255];
     return lo + (d - 0.5f) * (hi - lo);
