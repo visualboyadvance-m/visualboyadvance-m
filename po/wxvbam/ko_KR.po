@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-22 16:00+0000\n"
+"POT-Creation-Date: 2026-09-24 20:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: JS OH, 2026\n"
 "Language-Team: Korean (Korea) (http://app.transifex.com/bgk/vba-m/language/ko_KR/)\n"
@@ -46,7 +46,7 @@ msgstr "CoreAudio 버퍼를 할당하는 데 실패했습니다."
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "CoreAudio 대기열(큐)을 시작하는 데 실패했습니다: 오류 발생"
 
-#: cmdevents.cpp:75 wxvbam.cpp:1209
+#: cmdevents.cpp:75 wxvbam.cpp:1224
 msgid "Could not create main window"
 msgstr "메인 윈도우를 생성할 수 없습니다."
 
@@ -108,7 +108,7 @@ msgstr ""
 msgid "Confirm import"
 msgstr "가져오기 확인"
 
-#: cmdevents.cpp:574 panel.cpp:1166
+#: cmdevents.cpp:574 panel.cpp:1181
 #, c-format
 msgid "Loaded battery %s"
 msgstr "%s를 로드한 배터리"
@@ -191,7 +191,7 @@ msgstr "로드중 %s 스넵샷 파일 에러"
 msgid "Wrote battery %s"
 msgstr "%s 배터리가 기록됨"
 
-#: cmdevents.cpp:777 panel.cpp:1536
+#: cmdevents.cpp:777 panel.cpp:1560
 #, c-format
 msgid "Error writing battery %s"
 msgstr "%s 배터리 기록 오류"
@@ -249,7 +249,7 @@ msgstr "스테이트 파일을 선택"
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "비주얼 보이 어드밴스 저장된 게임 파일|*.sgm"
 
-#: cmdevents.cpp:1584 panel.cpp:1508
+#: cmdevents.cpp:1584 panel.cpp:1532
 #, c-format
 msgid "Error saving state %s"
 msgstr "상태 %s 저장 오류"
@@ -413,7 +413,7 @@ msgstr "이렇게 하면 \"%s\"에서 \"%s\"의 할당이 해제됩니다. 확�
 msgid "Failed to load lazy tab '%s'"
 msgstr ""
 
-#: dialogs/directories-config.cpp:49
+#: dialogs/directories-config.cpp:52
 msgid "Browse"
 msgstr "Browse"
 
@@ -465,28 +465,28 @@ msgstr "픽셀 필터 사용: %s"
 msgid "interframe blend: %s"
 msgstr ""
 
-#: dialogs/game-boy-config.cpp:145 xrc/GameBoyAdvanceConfigBootRom.xrc:45
+#: dialogs/game-boy-config.cpp:146 xrc/GameBoyAdvanceConfigBootRom.xrc:45
 #: xrc/GameBoyConfigBootRom.xrc:66 xrc/GameBoyConfigBootRom.xrc:87
 msgid "(None)"
 msgstr "(없음)"
 
-#: dialogs/game-boy-config.cpp:363
+#: dialogs/game-boy-config.cpp:366
 msgid "System"
 msgstr "시스템"
 
-#: dialogs/game-boy-config.cpp:372 guiinit.cpp:2535
+#: dialogs/game-boy-config.cpp:375 guiinit.cpp:2535
 msgid "Boot ROM"
 msgstr "부팅 ROM"
 
-#: dialogs/game-boy-config.cpp:381
+#: dialogs/game-boy-config.cpp:384
 msgid "Custom Colors"
 msgstr "사용자 색상 조합"
 
-#: dialogs/game-boy-config.cpp:429
+#: dialogs/game-boy-config.cpp:432
 msgid "Failed to load GBColorPrefPanel"
 msgstr ""
 
-#: dialogs/game-boy-config.cpp:441
+#: dialogs/game-boy-config.cpp:444
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:45
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:63
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:85
@@ -494,11 +494,11 @@ msgstr ""
 msgid "Default"
 msgstr "기본"
 
-#: dialogs/game-boy-config.cpp:441
+#: dialogs/game-boy-config.cpp:444
 msgid "User 1"
 msgstr "사용자 1"
 
-#: dialogs/game-boy-config.cpp:441
+#: dialogs/game-boy-config.cpp:444
 msgid "User 2"
 msgstr "사용자 2"
 
@@ -762,7 +762,7 @@ msgstr "치트파일 선택"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "VBA 치트 목록 (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 
-#: guiinit.cpp:316 panel.cpp:1224
+#: guiinit.cpp:316 panel.cpp:1239
 msgid "Loaded cheats"
 msgstr "치트 불러오기"
 
@@ -869,64 +869,75 @@ msgid ""
 " values may have been reset."
 msgstr "INI 파일은 최신 버전의 VBA-M용으로 작성되었습니다. 일부 INI 옵션 값이 재설정되었을 수 있습니다."
 
-#: opts.cpp:347 opts.cpp:363 opts.cpp:593
+#: opts.cpp:353 opts.cpp:369 opts.cpp:599
 #, c-format
 msgid "Invalid key binding %s for %s"
 msgstr " %s 키는 %s에 무효한 키 설정입니다."
 
-#: opts.cpp:538 opts.cpp:547 opts.cpp:556 opts.cpp:565
+#: opts.cpp:544 opts.cpp:553 opts.cpp:562 opts.cpp:571
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:516
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/option.cpp:527
 #, c-format
 msgid "Invalid value %s for option %s"
 msgstr "옵션 %s 에 대해 유효하지 않은 값 %s"
 
-#: opts.cpp:599
+#: opts.cpp:605
 #, c-format
 msgid "Unknown option %s with value %s"
 msgstr "값이 %s 알 수 없는 옵션 %s"
 
-#: panel.cpp:800
+#: panel.cpp:765
+#, c-format
+msgid ""
+"VisualBoyAdvance-M needs your permission to open \"%s\". Allow this folder "
+"to open it and any other ROM in it from now on, or choose the file alone."
+msgstr ""
+
+#: panel.cpp:769
+msgid "Allow"
+msgstr ""
+
+#: panel.cpp:810
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "%s 파일은 유효한 ROM파일이 아닙니다."
 
-#: panel.cpp:801 panel.cpp:862 panel.cpp:956
+#: panel.cpp:811 panel.cpp:877 panel.cpp:971
 msgid "Problem loading file"
 msgstr "파일을 불러올 수 없습니다."
 
-#: panel.cpp:861
+#: panel.cpp:876
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "%s 게임보이 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:902
+#: panel.cpp:917
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "컬러라이저 해킹이 활성화된 경우 게임보이 바이오스 파일을 사용할 수 없으므로 게임보이 바이오스 파일을 비활성화합니다."
 
-#: panel.cpp:932 panel.cpp:1060
+#: panel.cpp:947 panel.cpp:1075
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "%s BIOS를 불러올 수 없습니다."
 
-#: panel.cpp:955
+#: panel.cpp:970
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "%s 게임보이 어드밴스 ROM을 불러올 수 없습니다."
 
-#: panel.cpp:1121
+#: panel.cpp:1136
 msgid ""
 "Active link mode does not match this ROM; use Options > Link > Start Link to"
 " reconnect."
 msgstr ""
 
-#: panel.cpp:1267
+#: panel.cpp:1282
 msgid " player "
 msgstr "플레이어"
 
-#: panel.cpp:1315
+#: panel.cpp:1339
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -935,11 +946,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1316 panel.cpp:1337 wxvbam.cpp:1949
+#: panel.cpp:1340 panel.cpp:1361 wxvbam.cpp:1964
 msgid "Directory Error"
 msgstr "디렉터리 오류"
 
-#: panel.cpp:1336
+#: panel.cpp:1360
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -948,774 +959,774 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: panel.cpp:1484
+#: panel.cpp:1508
 #, c-format
 msgid "Loaded state %s"
 msgstr "상태 %s 불러옴"
 
-#: panel.cpp:1484
+#: panel.cpp:1508
 #, c-format
 msgid "Error loading state %s"
 msgstr "상태 %s 불러오기 오류"
 
-#: panel.cpp:1508
+#: panel.cpp:1532
 #, c-format
 msgid "Saved state %s"
 msgstr "상태 %s 저장함"
 
-#: panel.cpp:1914
+#: panel.cpp:1938
 msgid "Done"
 msgstr ""
 
-#: panel.cpp:1951
+#: panel.cpp:1975
 msgid "Running quick first-time performance test"
 msgstr ""
 
-#: panel.cpp:2104
+#: panel.cpp:2128
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음; 다른 것을 찾고 있음"
 
-#: panel.cpp:2142
+#: panel.cpp:2166
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "전체 화면 모드 %d x %d - %d @ %d 지원되지 않음"
 
-#: panel.cpp:2147
+#: panel.cpp:2171
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "유효한 모드: %d x %d - %d @ %d"
 
-#: panel.cpp:2155
+#: panel.cpp:2179
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "선택 모드 %d x %d - %d @ %d"
 
-#: panel.cpp:2159
+#: panel.cpp:2183
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "모드를 %d x %d - %d @ %d로 변경하지 못했음"
 
-#: panel.cpp:2262
+#: panel.cpp:2286
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "유효한 게임보이 어드밴스 카트리지가 아님"
 
-#: panel.cpp:2546
+#: panel.cpp:2570
 msgid "No memory for rewinding"
 msgstr "되감기할 메모리가 없습니다."
 
-#: panel.cpp:2556
+#: panel.cpp:2580
 msgid "Error writing rewind state"
 msgstr "오류 - 되감기 상태 작성을 할 수 없습니다."
 
-#: panel.cpp:2774
+#: panel.cpp:2798
 msgid "Open GBA..."
 msgstr ""
 
-#: panel.cpp:2775
+#: panel.cpp:2799
 msgid "Open Game Boy..."
 msgstr ""
 
-#: panel.cpp:2776
+#: panel.cpp:2800
 msgid "Open Game Boy Color..."
 msgstr ""
 
-#: panel.cpp:2778
+#: panel.cpp:2802
 msgid "Pause"
 msgstr ""
 
-#: panel.cpp:2779
+#: panel.cpp:2803
 msgid "Reset"
 msgstr ""
 
-#: panel.cpp:2780
+#: panel.cpp:2804
 msgid "Save state"
 msgstr ""
 
-#: panel.cpp:2781
+#: panel.cpp:2805
 msgid "Load state"
 msgstr ""
 
-#: panel.cpp:2783
+#: panel.cpp:2807
 msgid "Full screen"
 msgstr ""
 
-#: panel.cpp:2788
+#: panel.cpp:2812
 msgid "Hide menu bar"
 msgstr ""
 
-#: panel.cpp:2803
+#: panel.cpp:2827
 msgid "Settings..."
 msgstr ""
 
-#: panel.cpp:2805
+#: panel.cpp:2829
 msgid "Quit"
 msgstr ""
 
-#: panel.cpp:2968
+#: panel.cpp:2992
 msgid "DLSS NR is not available in this build; turning it off."
 msgstr ""
 
-#: panel.cpp:4465
+#: panel.cpp:4493
 msgid "DLSS NR: loading model..."
 msgstr ""
 
-#: panel.cpp:4487
+#: panel.cpp:4515
 #, c-format
 msgid "DLSS NR filter failed: %s"
 msgstr ""
 
-#: panel.cpp:4488
+#: panel.cpp:4516
 msgid "DLSS NR unavailable, filter disabled"
 msgstr ""
 
-#: panel.cpp:4498
+#: panel.cpp:4526
 msgid "DLSS NR ready"
 msgstr ""
 
-#: panel.cpp:4849
+#: panel.cpp:4877
 msgid "Failed to set wayland display"
 msgstr "Wayland 디스플레이 설정에 실패함"
 
-#: panel.cpp:4891
+#: panel.cpp:4919
 msgid "Failed to create Android video surface"
 msgstr ""
 
-#: panel.cpp:4910
+#: panel.cpp:4938
 msgid "Failed to initialize SDL video subsystem"
 msgstr "SDL 비디오 하위 시스템 초기화 실패함"
 
-#: panel.cpp:4922
+#: panel.cpp:4950
 msgid "Failed to initialize SDL video"
 msgstr "SDL 비디오 초기화 실패함"
 
-#: panel.cpp:4937
+#: panel.cpp:4965
 msgid "Failed to set wayland surface"
 msgstr "Wayland 표면 설정 실패함"
 
-#: panel.cpp:4981
+#: panel.cpp:5009
 msgid "Failed to set parent window"
 msgstr "부모 창 설정 실패함"
 
-#: panel.cpp:4993
+#: panel.cpp:5021
 msgid "Failed to set OpenGL properties"
 msgstr "OpenGL 속성 설정 설패함"
 
-#: panel.cpp:5014 panel.cpp:5207
+#: panel.cpp:5042 panel.cpp:5235
 msgid "Failed to create SDL window"
 msgstr "SDL 창 생성 실패함"
 
-#: panel.cpp:5125 panel.cpp:5236
+#: panel.cpp:5153 panel.cpp:5264
 msgid "Renderer creating failed, using default renderer"
 msgstr "렌더러 생성에 실패하여 기본 렌더러를 사용합니다."
 
-#: panel.cpp:5126
+#: panel.cpp:5154
 #, c-format
 msgid "SDL Error: %s"
 msgstr "SDL 오류: "
 
-#: panel.cpp:5133 panel.cpp:5242
+#: panel.cpp:5161 panel.cpp:5270
 msgid "Failed to create SDL renderer"
 msgstr "SDL 렌더러 생성 실패함"
 
-#: panel.cpp:5192
+#: panel.cpp:5220
 msgid "Failed to set vsync for SDL renderer"
 msgstr ""
 
-#: panel.cpp:5196 panel.cpp:5231
+#: panel.cpp:5224 panel.cpp:5259
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "SDL 렌더러:"
 
-#: panel.cpp:5216
+#: panel.cpp:5244
 msgid "SDL renderer: default"
 msgstr "SDL 렌더러: 기본"
 
-#: panel.cpp:7004
+#: panel.cpp:7032
 msgid "Enabling EGL VSync."
 msgstr "EGL 수직동기화 활성화"
 
-#: panel.cpp:7006
+#: panel.cpp:7034
 msgid "Disabling EGL VSync."
 msgstr "EGL 수직동기화 비활성화"
 
-#: panel.cpp:7014
+#: panel.cpp:7042
 msgid "Enabling GLX VSync."
 msgstr "GLX 수직동기화 활성화"
 
-#: panel.cpp:7016
+#: panel.cpp:7044
 msgid "Disabling GLX VSync."
 msgstr "GLX 수직동기화 비활성화"
 
-#: panel.cpp:7034
+#: panel.cpp:7062
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "glXSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:7043
+#: panel.cpp:7071
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "glXSwapIntervalSGI 설정 실패"
 
-#: panel.cpp:7052
+#: panel.cpp:7080
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "glXSwapIntervalMESA 설정 실패"
 
-#: panel.cpp:7061
+#: panel.cpp:7089
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "wglGetExtensionsStringEXT은 지원하지 않습니다."
 
-#: panel.cpp:7064
+#: panel.cpp:7092
 msgid "No support for WGL_EXT_swap_control"
 msgstr "WGL_EXT_swap_control은 지원하지 않습니다."
 
-#: panel.cpp:7073
+#: panel.cpp:7101
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "wglSwapIntervalEXT 설정 실패"
 
-#: panel.cpp:7079
+#: panel.cpp:7107
 msgid "No VSYNC available on this platform"
 msgstr "이 플랫폼에서는 VSYNC를 사용할 수 없습니다."
 
-#: panel.cpp:7168
+#: panel.cpp:7196
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
 msgstr ""
 
-#: panel.cpp:7417
+#: panel.cpp:7445
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr ""
 
-#: panel.cpp:7443
+#: panel.cpp:7471
 msgid "Failed to get D3D12 function pointers"
 msgstr ""
 
-#: panel.cpp:7448
+#: panel.cpp:7476
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7462
+#: panel.cpp:7490
 msgid "No hardware adapter found, falling back to WARP"
 msgstr ""
 
-#: panel.cpp:7469
+#: panel.cpp:7497
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7470
+#: panel.cpp:7498
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr ""
 
-#: panel.cpp:7477
+#: panel.cpp:7505
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7503
+#: panel.cpp:7531
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7509
+#: panel.cpp:7537
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7540
+#: panel.cpp:7568
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
 msgstr ""
 
-#: panel.cpp:7550
+#: panel.cpp:7578
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7559
+#: panel.cpp:7587
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7566
+#: panel.cpp:7594
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7574
+#: panel.cpp:7602
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7579
+#: panel.cpp:7607
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7618
+#: panel.cpp:7646
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr ""
 
-#: panel.cpp:7625
+#: panel.cpp:7653
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7639
+#: panel.cpp:7667
 #, c-format
 msgid "VS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:7647
+#: panel.cpp:7675
 #, c-format
 msgid "PS compile failed: %s"
 msgstr ""
 
-#: panel.cpp:7676
+#: panel.cpp:7704
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7696
+#: panel.cpp:7724
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7705
+#: panel.cpp:7733
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7708
+#: panel.cpp:7736
 msgid "Failed to create fence event"
 msgstr ""
 
-#: panel.cpp:7710
+#: panel.cpp:7738
 msgid "D3D12 pipeline fully initialized"
 msgstr ""
 
-#: panel.cpp:7742
+#: panel.cpp:7770
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:7764
+#: panel.cpp:7792
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr ""
 
-#: panel.cpp:7775
+#: panel.cpp:7803
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr ""
 
-#: panel.cpp:8041
+#: panel.cpp:8069
 msgid "Texture upload failed"
 msgstr ""
 
-#: panel.cpp:8195
+#: panel.cpp:8223
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
 msgstr ""
 
-#: panel.cpp:8247
+#: panel.cpp:8275
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8313
+#: panel.cpp:8341
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
 msgstr ""
 
-#: panel.cpp:8365
+#: panel.cpp:8393
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
 msgstr ""
 
-#: panel.cpp:8650
+#: panel.cpp:8678
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr ""
 
-#: panel.cpp:8654
+#: panel.cpp:8682
 msgid "Failed to load d3d9.dll"
 msgstr "d3d9.dll 파일을 불러오는 데 실패했습니다."
 
-#: panel.cpp:8663
+#: panel.cpp:8691
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Direct3D 9 인터페이스 생성에 실패했습니다."
 
-#: panel.cpp:8666
+#: panel.cpp:8694
 msgid "Using Direct3D 9"
 msgstr "Direct3D 9를 사용합니다."
 
-#: panel.cpp:8673
+#: panel.cpp:8701
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "어댑터 디스플레이 모드를 가져오는 데 실패했습니다: 0x"
 
-#: panel.cpp:8697
+#: panel.cpp:8725
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx가 지원되지 않아 Discard 스왑 효과로 전환합니다."
 
-#: panel.cpp:8713
+#: panel.cpp:8741
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "하드웨어 버텍스 처리를 사용할 수 없어 소프트웨어 방식으로 전환합니다."
 
-#: panel.cpp:8737
+#: panel.cpp:8765
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8742
+#: panel.cpp:8770
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8778
+#: panel.cpp:8806
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr ""
 
-#: panel.cpp:8800
+#: panel.cpp:8828
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8832
+#: panel.cpp:8860
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8839
+#: panel.cpp:8867
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr ""
 
-#: panel.cpp:8851
+#: panel.cpp:8879
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8856
+#: panel.cpp:8884
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr ""
 
-#: panel.cpp:8924
+#: panel.cpp:8952
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:8936
+#: panel.cpp:8964
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr ""
 
-#: panel.cpp:9128
+#: panel.cpp:9156
 msgid "Memory allocation error"
 msgstr "메모리 할당 오류"
 
-#: panel.cpp:9131
+#: panel.cpp:9159
 msgid "Error initializing codec"
 msgstr "코덱 초기화 오류"
 
-#: panel.cpp:9134 panel.cpp:9199 panel.cpp:9247
+#: panel.cpp:9162 panel.cpp:9227 panel.cpp:9275
 msgid "Error writing to output file"
 msgstr "출력 파일에 쓰는 중 오류"
 
-#: panel.cpp:9137
+#: panel.cpp:9165
 msgid "Can't guess output format from file name"
 msgstr "파일 이름으로 출력 형식을 추측할 수 없음"
 
-#: panel.cpp:9142
+#: panel.cpp:9170
 msgid "Programming error; aborting!"
 msgstr "프로그래밍 오류; 중단합니다!"
 
-#: panel.cpp:9160 panel.cpp:9211
+#: panel.cpp:9188 panel.cpp:9239
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "%s (%s)부터 녹화를 시작할 수 없습니다."
 
-#: panel.cpp:9255
+#: panel.cpp:9283
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "오디오 / 비디오 녹음 중 오류 (%s); 중단 중"
 
-#: panel.cpp:9261
+#: panel.cpp:9289
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "(%s) 에서 오디오 녹음 오류; 종료합니다."
 
-#: panel.cpp:9271
+#: panel.cpp:9299
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "(%s) 에서 비디오 녹화 오류; 종료합니다."
 
-#: panel.cpp:9590
+#: panel.cpp:9618
 msgid "Renderer failed to initialize; trying the next available renderer."
 msgstr ""
 
-#: panel.cpp:9598
+#: panel.cpp:9626
 msgid "No renderer could be initialized."
 msgstr ""
 
-#: panel.cpp:9692
+#: panel.cpp:9720
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
 msgstr ""
 
-#: panel.cpp:9781
+#: panel.cpp:9809
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:9794
+#: panel.cpp:9822
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
 msgstr ""
 
-#: panel.cpp:9818
+#: panel.cpp:9846
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr ""
 
-#: panel.cpp:10111
+#: panel.cpp:10139
 #, c-format
 msgid "Volume: %d %%"
 msgstr "볼륨: %d %%"
 
-#: panel.cpp:10898
+#: panel.cpp:10926
 msgid "Vulkan device created successfully"
 msgstr ""
 
-#: panel.cpp:11048
+#: panel.cpp:11076
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr ""
 
-#: panel.cpp:11093
+#: panel.cpp:11121
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr ""
 
-#: panel.cpp:11096
+#: panel.cpp:11124
 msgid "Vulkan instance created"
 msgstr ""
 
-#: panel.cpp:11115
+#: panel.cpp:11143
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr ""
 
-#: panel.cpp:11138
+#: panel.cpp:11166
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:11149
+#: panel.cpp:11177
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr ""
 
-#: panel.cpp:11174
+#: panel.cpp:11202
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:11184
+#: panel.cpp:11212
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr ""
 
-#: panel.cpp:11194
+#: panel.cpp:11222
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr ""
 
-#: panel.cpp:11211
+#: panel.cpp:11239
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr ""
 
-#: panel.cpp:11267
+#: panel.cpp:11295
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr ""
 
-#: panel.cpp:11276
+#: panel.cpp:11304
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr ""
 
-#: panel.cpp:11314
+#: panel.cpp:11342
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr ""
 
-#: panel.cpp:11353
+#: panel.cpp:11381
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr ""
 
-#: panel.cpp:11371
+#: panel.cpp:11399
 msgid "No supported Vulkan surface extension available"
 msgstr ""
 
-#: panel.cpp:11382
+#: panel.cpp:11410
 msgid "No Vulkan physical devices found"
 msgstr ""
 
-#: panel.cpp:11441
+#: panel.cpp:11469
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr ""
 
-#: panel.cpp:11445
+#: panel.cpp:11473
 msgid "No suitable Vulkan physical device found"
 msgstr ""
 
-#: panel.cpp:11592
+#: panel.cpp:11660
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr ""
 
-#: panel.cpp:11783
+#: panel.cpp:11852
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr ""
 
-#: panel.cpp:11823
+#: panel.cpp:11892
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr ""
 
-#: panel.cpp:11928
+#: panel.cpp:11997
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr ""
 
-#: panel.cpp:11974
+#: panel.cpp:12043
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr ""
 
-#: panel.cpp:11996
+#: panel.cpp:12065
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr ""
 
-#: panel.cpp:12019
+#: panel.cpp:12088
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr ""
 
-#: panel.cpp:12042
+#: panel.cpp:12111
 msgid "Failed to create shader modules"
 msgstr ""
 
-#: panel.cpp:12119
+#: panel.cpp:12188
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr ""
 
-#: panel.cpp:12156
+#: panel.cpp:12225
 msgid "Failed to create overlay pipeline"
 msgstr ""
 
-#: panel.cpp:12166
+#: panel.cpp:12235
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr ""
 
-#: panel.cpp:12182
+#: panel.cpp:12251
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr ""
 
-#: panel.cpp:12200
+#: panel.cpp:12269
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr ""
 
-#: panel.cpp:12220
+#: panel.cpp:12289
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr ""
 
-#: panel.cpp:12244
+#: panel.cpp:12313
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr ""
 
-#: panel.cpp:12256
+#: panel.cpp:12325
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:12264
+#: panel.cpp:12333
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:12303
+#: panel.cpp:12372
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr ""
 
-#: panel.cpp:12317
+#: panel.cpp:12386
 msgid "Failed to allocate texture memory"
 msgstr ""
 
-#: panel.cpp:12333
+#: panel.cpp:12402
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr ""
 
-#: panel.cpp:12351
+#: panel.cpp:12420
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr ""
 
-#: panel.cpp:12385
+#: panel.cpp:12454
 msgid "Failed to create staging buffer"
 msgstr ""
 
-#: panel.cpp:12400
+#: panel.cpp:12469
 msgid "Failed to allocate staging memory"
 msgstr ""
 
-#: panel.cpp:12514
+#: panel.cpp:12583
 msgid "Failed to create overlay image"
 msgstr ""
 
-#: panel.cpp:12528
+#: panel.cpp:12597
 msgid "Failed to allocate overlay image memory"
 msgstr ""
 
-#: panel.cpp:12543
+#: panel.cpp:12612
 msgid "Failed to create overlay image view"
 msgstr ""
 
-#: panel.cpp:12560
+#: panel.cpp:12629
 msgid "Failed to create overlay sampler"
 msgstr ""
 
-#: panel.cpp:12597
+#: panel.cpp:12666
 msgid "Failed to create overlay staging buffer"
 msgstr ""
 
-#: panel.cpp:12611
+#: panel.cpp:12680
 msgid "Failed to allocate overlay staging memory"
 msgstr ""
 
-#: panel.cpp:12689
+#: panel.cpp:12758
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr ""
 
-#: panel.cpp:12785
+#: panel.cpp:12854
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr ""
 
-#: panel.cpp:13138
+#: panel.cpp:13207
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr ""
@@ -1824,80 +1835,80 @@ msgstr "파랑:"
 msgid "Unable to load dialog %s from resources"
 msgstr "리소스로부터 대화 %s을 불러올 수 없습니다."
 
-#: wxvbam.cpp:861 wxvbam.cpp:878
+#: wxvbam.cpp:872 wxvbam.cpp:889
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "제공된 구성 파일이 잘못되었습니다: %s"
 
-#: wxvbam.cpp:1375
+#: wxvbam.cpp:1390
 msgid "Save built-in XRC file and exit"
 msgstr "built-in XRC 파일을 저장하고 종료합니다."
 
-#: wxvbam.cpp:1378
+#: wxvbam.cpp:1393
 msgid "Save built-in vba-over.ini and exit"
 msgstr "built-in vba-over.ini 를 저장하고 종료합니다."
 
-#: wxvbam.cpp:1381
+#: wxvbam.cpp:1396
 msgid "Print configuration path and exit"
 msgstr "설정 경로를 출력하고 종료합니다."
 
-#: wxvbam.cpp:1384
+#: wxvbam.cpp:1399
 msgid "Start in full-screen mode"
 msgstr "전체화면으로 시작합니다."
 
-#: wxvbam.cpp:1387
+#: wxvbam.cpp:1402
 msgid "Mute the audio for this session, without saving to the config"
 msgstr ""
 
-#: wxvbam.cpp:1390
+#: wxvbam.cpp:1405
 msgid "Set a configuration file"
 msgstr "구성 설정 파일을 설정합니다."
 
-#: wxvbam.cpp:1394
+#: wxvbam.cpp:1409
 msgid "Delete shared link state first, if it exists"
 msgstr "shared link state 파일이 존재한다면 삭제합니다."
 
-#: wxvbam.cpp:1401
+#: wxvbam.cpp:1416
 msgid "List all settable options and exit"
 msgstr "설정 가능한 옵션을 나열하고 종료"
 
-#: wxvbam.cpp:1404
+#: wxvbam.cpp:1419
 msgid "ROM file"
 msgstr "ROM 파일"
 
-#: wxvbam.cpp:1406
+#: wxvbam.cpp:1421
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1437
+#: wxvbam.cpp:1452
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "구성 / 빌드 오류: 기본 제공 xrc를 찾을 수 없음"
 
-#: wxvbam.cpp:1445
+#: wxvbam.cpp:1460
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "기본 구성을 %s로 작성했습니다.\n재정의하려면 변경된 루트 노드를 제외한 모든 노드를 제거하세요. 다음 검색 경로에서 .xrc 또는 .xrs 파일에서 올바른 이름의 루트 노드를 처음 발견하면 기본값이 재정의됩니다:"
 
-#: wxvbam.cpp:1459
+#: wxvbam.cpp:1474
 msgid "Configuration is read from, in order:"
 msgstr "설정은 다음으로부터 순서대로 불러옵니다 :"
 
-#: wxvbam.cpp:1473
+#: wxvbam.cpp:1488
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "기본 제공 오버라이드 파일을 %s로 작성했습니다.\n재정의하려면 변경된 섹션을 제외한 모든 섹션을 삭제합니다. 검색 경로에서 처음 찾은 섹션이 사용됩니다:"
 
-#: wxvbam.cpp:1479
+#: wxvbam.cpp:1494
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t빌트인"
 
-#: wxvbam.cpp:1503
+#: wxvbam.cpp:1518
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -1905,21 +1916,21 @@ msgid ""
 "\n"
 msgstr "사용자 인터페이스에서 설정이 변경되면, 명령 줄에서 선택된 옵션이 저장됩니다. \n\n플래그 옵션에서, true와 false는 각각 1과 0으로 지정됩니다.\n\n"
 
-#: wxvbam.cpp:1519
+#: wxvbam.cpp:1534
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "키보드 / * 옵션으로 사용 가능한 수준 :\n\n"
 
-#: wxvbam.cpp:1537
+#: wxvbam.cpp:1552
 msgid "Configuration file not found."
 msgstr "설정 파일을 찾을 수 없습니다."
 
-#: wxvbam.cpp:1572
+#: wxvbam.cpp:1587
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "설정 옵션이 잘못되었거나, 여러 개의 ROM 파일이 주어졌습니다:\n"
 
-#: wxvbam.cpp:1948
+#: wxvbam.cpp:1963
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -1928,7 +1939,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr ""
 
-#: wxvbam.cpp:2233
+#: wxvbam.cpp:2248
 msgid "Failed to load dialog"
 msgstr ""
 
@@ -2993,136 +3004,136 @@ msgstr ""
 msgid "XAudio2: Exception during device enumeration"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1655
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1788
 msgid "Error, link already connected"
 msgstr "오류, 링크가 이미 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1669
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1802
 msgid "Unable to find link driver"
 msgstr "링크 드라이버를 찾을 수 없음"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1724
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1857
 msgid "Link connection does not need updates."
 msgstr "링크 연결에 업데이트가 필요하지 않습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2088
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2747
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3310
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5182
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2221
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2880
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3443
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5321
 #, c-format
 msgid "Player %d disconnected."
 msgstr "플레이어 %d의 연결이 끊어졌습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2150
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2283
 msgid "Player 2 disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2228
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2278
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2345
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2744
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3429
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2361
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2411
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2478
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2877
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3562
 msgid "Server disconnected."
 msgstr "서버 연결이 끊어졌습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2462
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2595
 #, c-format
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2475
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2608
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2620
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2490
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2623
 #, c-format
 msgid "Failed to start link server on port %d: %s"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2516
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2548
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3462
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2681
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3595
 #, c-format
 msgid "Player %d connected"
 msgstr "플레이어 %d 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2564
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3479
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3612
 msgid "All players connected"
 msgstr "모든 플레이어 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
 msgid "Connecting to server..."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2608
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3489
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2741
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3622
 msgid "Network error."
 msgstr "네트워크 오류입니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2620
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3505
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2753
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3638
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "#%d으로 연결됨, %d 플레이어 참여 대기 중"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2634
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3514
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3647
 msgid "All players joined."
 msgstr "모든 플레이어가 참여했습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3422
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3555
 msgid "Server timed out."
 msgstr "서버 시간이 초과되었습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4532
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4549
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4665
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4682
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4732
 msgid "Error creating file mapping"
 msgstr "파일 매핑 생성 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4544
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4677
 msgid "Error mapping file"
 msgstr "매핑 파일 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4664
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4797
 msgid "5 or more GBAs not supported."
 msgstr "5개 이상의 GBA는 지원되지 않습니다."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4694
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4827
 msgid "The GB link supports only 2 players."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4714
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4735
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4853
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4874
 msgid "Error opening event"
 msgstr "이벤트 열기 오류"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4907
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5046
 msgid "Lost link; reinitialize to reconnect"
 msgstr "링크가 끊어짐; 다시 연결하려면 다시 초기화"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4921
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5060
 msgid "Lost link; reconnected"
 msgstr "링크가 끊어짐; 다시 연결됨"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5247
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5386
 msgid "Unknown slave timed out; resetting comm"
 msgstr "알 수 없는 슬레이브 시간 초과; 통신 재설정"
 
