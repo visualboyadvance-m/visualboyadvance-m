@@ -9,9 +9,13 @@
 
 #include "wx/macsandbox.h"
 
+#import <AppKit/AppKit.h>
 #import <Foundation/Foundation.h>
 
+#include <cerrno>
 #include <cstdlib>
+#include <fcntl.h>
+#include <unistd.h>
 #include <vector>
 
 #include <wx/base64.h>
@@ -241,6 +245,56 @@ wxString ImportBios(const wxString& path) {
         return path;
     }
     return dst.GetFullPath();
+}
+
+wxString RequestAccess(const wxString& path, const wxString& message,
+                       const wxString& prompt) {
+    if (!Active() || path.empty())
+        return path;
+
+    wxFileName fn(path);
+    fn.MakeAbsolute();
+    const wxString full = fn.GetFullPath();
+
+    // Try the open itself rather than access(2): EPERM is how the sandbox
+    // says no, EACCES a permission it may be behind too, and anything else
+    // (ENOENT) is left to the loader to report.
+    const int fd = open(full.utf8_str(), O_RDONLY);
+    if (fd >= 0) {
+        close(fd);
+        return path;
+    }
+    if (errno != EPERM && errno != EACCES)
+        return path;
+
+    @autoreleasepool {
+        NSString* dir = [NSString stringWithUTF8String:fn.GetPath().utf8_str()];
+        if (!dir)
+            return path;
+
+        // Opened in the ROM's folder with directories choosable, the button
+        // with nothing selected picks that folder -- the one click that makes
+        // the whole folder, its .sav files included, reachable from now on.
+        NSOpenPanel* panel = [NSOpenPanel openPanel];
+        panel.canChooseDirectories = YES;
+        panel.canChooseFiles = YES;
+        panel.allowsMultipleSelection = NO;
+        panel.directoryURL = [NSURL fileURLWithPath:dir isDirectory:YES];
+        panel.message = [NSString stringWithUTF8String:message.utf8_str()];
+        panel.prompt = [NSString stringWithUTF8String:prompt.utf8_str()];
+
+        if ([panel runModal] != NSModalResponseOK || !panel.URL) {
+            NSLog(@"macsandbox: access to %s not granted", full.utf8_str().data());
+            return path;
+        }
+
+        const wxString chosen = wxString::FromUTF8(panel.URL.fileSystemRepresentation);
+        RememberPath(chosen);
+
+        // A folder: the original path, now reachable if it is inside it. A
+        // file: the one the user picked instead.
+        return wxDirExists(chosen) ? path : chosen;
+    }
 }
 
 }  // namespace macsandbox

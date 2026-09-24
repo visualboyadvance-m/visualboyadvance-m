@@ -209,8 +209,10 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   `src/wx/macsandbox.mm` (security-scoped bookmarks for recent ROMs, picked
   directories; battery saves default to `<container home>/Saves` and a
   picked BIOS is copied into `<container home>/BIOS`, because a ROM's folder
-  is never accessible in the sandbox and Apple's related-items mechanism was
-  tried and refused for the `.sav`),
+  is not accessible in the sandbox unless the user granted the folder itself,
+  and Apple's related-items mechanism was tried and refused for the `.sav`;
+  a ROM passed in argv is unreadable, so `LoadGame()` asks for its folder
+  through `macsandbox::RequestAccess()` and bookmarks the grant),
   `container-migration.plist` moves the unsandboxed config dir into the
   container on first launch, and the IPC link uses a file-backed segment in
   the container's `$TMPDIR` (`VBAM_LINK_FILE_SHM` in `gbaLink.cpp`) because

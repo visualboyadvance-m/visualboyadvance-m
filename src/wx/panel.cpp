@@ -757,7 +757,16 @@ void GameArea::LoadGame(const wxString& load_path)
 {
     // The Android file picker hands back Storage-Access-Framework content://
     // URIs; resolve them to a real local file the stdio ROM loader can open.
-    const wxString name = VbamResolveAndroidContentUri(load_path);
+    wxString name = VbamResolveAndroidContentUri(load_path);
+    // macOS App Sandbox: a ROM named on the command line (or a Recent entry
+    // whose bookmark is gone) is not readable until the user grants it.
+    name = macsandbox::RequestAccess(
+        name,
+        wxString::Format(_("VisualBoyAdvance-M needs your permission to open \"%s\". "
+                           "Allow this folder to open it and any other ROM in it "
+                           "from now on, or choose the file alone."),
+                         wxFileName(name).GetFullName()),
+        _("Allow"));
     rom_scene_rls = "-";
     rom_scene_rls_name = "-";
     rom_name = "";
@@ -1310,13 +1319,17 @@ void GameArea::recompute_dirs()
 {
     batdir = ExpandSystemPath(OPTION(kGenBatteryDir), loaded);
 
-    // macOS App Sandbox: the ROM's folder is never accessible (a ROM opened
-    // from a dialog grants access to that file only), so the default and
-    // the fallback are <container home>/Saves instead (see macsandbox.h).
+    // macOS App Sandbox: the ROM's folder is usually not accessible (a ROM
+    // opened from a dialog grants access to that file only), so the default
+    // and the fallback are <container home>/Saves instead (see macsandbox.h)
+    // -- unless the user granted the folder itself, and then the .sav files
+    // already sitting beside the ROMs are the ones to use.
     const wxString sandbox_saves = macsandbox::SavesDir();
 
     if (batdir.empty()) {
-        batdir = sandbox_saves.empty() ? loaded_game.GetPathWithSep() : sandbox_saves;
+        batdir = sandbox_saves.empty() || wxIsWritable(loaded_game.GetPath())
+                     ? loaded_game.GetPathWithSep()
+                     : sandbox_saves;
     } else {
         batdir = wxGetApp().GetAbsolutePath(batdir);
         // Try to create the directory if it doesn't exist

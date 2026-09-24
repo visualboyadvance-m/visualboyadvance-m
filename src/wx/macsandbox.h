@@ -13,10 +13,17 @@
 //    is what keeps the Recent menu, the Directories settings and the BIOS
 //    paths working across launches.
 //
+//  - Command-line ROMs: a sandboxed process gets no access to the paths in
+//    its argv, so LoadGame() asks through an open dialog at the ROM's folder
+//    (RequestAccess()); granting the folder is bookmarked, and the same
+//    command line works on later launches without asking.
+//
 //  - Battery saves: a ROM opened from a dialog grants access to that file
-//    alone, never to its folder, so the ROM's directory is never a usable
-//    default. When sandboxed, .sav files go to <container home>/Saves
-//    (SavesDir()) unless the user configured a battery directory. Sidecar
+//    alone, not to its folder, so the ROM's directory is not a usable
+//    default unless the folder itself was granted (Directories option,
+//    RequestAccess()) and is writable. Otherwise .sav files go to
+//    <container home>/Saves (SavesDir()) unless the user configured a
+//    battery directory. Sidecar
 //    files next to the ROM (an old .sav, patches, cheats) are only
 //    reachable when the user points the matching Directories option at
 //    that folder, which bookmarks it. (Apple's related-items mechanism,
@@ -66,6 +73,19 @@ wxString SavesDir();
 // `path` already lives in that directory, or when the copy fails.
 wxString ImportBios(const wxString& path);
 
+// Make `path` readable when the sandbox denies it -- a ROM named on the
+// command line (a sandboxed process gets no access to its argv paths, only
+// to what a dialog, drag and drop or Launch Services hands it), or a Recent
+// entry whose bookmark was lost. Asks through an open dialog at the file's
+// folder, showing `message` and with `prompt` on its button: choosing the
+// folder grants every file in it, and is bookmarked, so the same command line
+// works on every later launch without asking. Returns the path to load: `path`
+// itself, or the file the user chose instead. A no-op returning `path` when not
+// sandboxed, when the path is readable, or when it fails for a reason the
+// sandbox is not behind (it does not exist).
+wxString RequestAccess(const wxString& path, const wxString& message,
+                       const wxString& prompt);
+
 #else  // !__WXMAC__
 
 inline bool Active() { return false; }
@@ -73,6 +93,8 @@ inline void RememberPath(const wxString&) {}
 inline void RestoreAccess() {}
 inline wxString SavesDir() { return wxString(); }
 inline wxString ImportBios(const wxString& path) { return path; }
+inline wxString RequestAccess(const wxString& path, const wxString&,
+                              const wxString&) { return path; }
 
 #endif  // __WXMAC__
 
