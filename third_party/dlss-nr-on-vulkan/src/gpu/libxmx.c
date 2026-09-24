@@ -1712,7 +1712,7 @@ int xmx_ffn_init(const char *path)
 	if (!g.rready) FAIL("resident runtime not initialised", 0);
 	if (g.rffn) return 0;
 	free(g.rpaths[5]);
-	if (!(g.rpaths[5] = strdup(path))) FAIL("pipeline path allocation", 0);
+	if (!(g.rpaths[5] = nr_strdup(path))) FAIL("pipeline path allocation", 0);
 	return build_pipeline(path, g.rpl, &g.rffn);
 }
 
