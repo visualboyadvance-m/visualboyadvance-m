@@ -221,9 +221,22 @@ endif()
 # MoltenVK, for the compute runtime on macOS: it exports the whole Vulkan API, so the
 # path needs no loader, no ICD manifest and no portability enumeration.
 if(APPLE AND NR_XMX_LINK_MOLTENVK)
+  # Frameworks last: MacPorts and Homebrew both ship a MoltenVK.xcframework under
+  # Frameworks/ beside lib/libMoltenVK.dylib, and framework-first find_library()
+  # takes the directory.  CMake links the static libMoltenVK.a inside it, which
+  # the .a check below does not see through, and the ICD manifest would name a
+  # libMoltenVK.dylib next to the .xcframework that is not there.
+  set(NR_SAVED_FIND_FRAMEWORK "${CMAKE_FIND_FRAMEWORK}")
+  set(CMAKE_FIND_FRAMEWORK LAST)
   find_library(NR_MOLTENVK_LIBRARY NAMES MoltenVK
     HINTS /usr/local/lib /opt/homebrew/lib "$ENV{VULKAN_SDK}/lib" "$ENV{VULKAN_SDK}/macOS/lib"
           "$ENV{HOME}/Downloads/vcpkg/installed/arm64-osx/lib")
+  if(NR_SAVED_FIND_FRAMEWORK)
+    set(CMAKE_FIND_FRAMEWORK "${NR_SAVED_FIND_FRAMEWORK}")
+  else()
+    unset(CMAKE_FIND_FRAMEWORK)
+  endif()
+  unset(NR_SAVED_FIND_FRAMEWORK)
   if(NOT NR_MOLTENVK_LIBRARY)
     message(FATAL_ERROR "NR_XMX_LINK_MOLTENVK is on and libMoltenVK.dylib was not found; set NR_MOLTENVK_LIBRARY or turn the option off")
   endif()
@@ -236,7 +249,9 @@ if(APPLE AND NR_XMX_LINK_MOLTENVK)
   # MVKImage::useIOSurface() reach for.  And the C++ runtime: MoltenVK is C++
   # and both of those targets are C, so nothing else puts libc++ on the line
   # and 294 std:: and __cxa_* symbols go unresolved.
-  if(NR_MOLTENVK_LIBRARY MATCHES "\\.a$")
+  # An .xcframework still wins when it is the only MoltenVK there is, and
+  # MoltenVK's own is always the static archive.
+  if(NR_MOLTENVK_LIBRARY MATCHES "\\.(a|xcframework)$")
     list(APPEND NR_XMX_VULKAN c++)
 
     foreach(nr_fw Metal Foundation QuartzCore CoreFoundation CoreGraphics
