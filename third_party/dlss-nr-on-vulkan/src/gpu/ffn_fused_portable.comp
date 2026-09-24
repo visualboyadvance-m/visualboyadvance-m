@@ -1,0 +1,132 @@
+#version 450
+#extension GL_GOOGLE_include_directive : require
+/*
+ * ffn_fused_portable — `ffn_fused.comp` without the cooperative matrix.
+ *
+ * A feed-forward in one pass with the hidden layer kept in shared memory, on a device with
+ * no matrix units (MoltenVK, the phones, Xe2 under XMX_PORTABLE=1). Same push block, same
+ * dispatch (M/16 workgroups of 32 lanes on x, one group per row of the grid), same flags,
+ * so libxmx does not know which one it got.
+ *
+ * It must equal *this path's* two-GEMM reference bit for bit (`src/gpu/test_ffn_fused.py`):
+ * the expand through `gemm_portable` with the gate and E4M3 publish into a half hidden
+ * buffer, then the projection through `gemm_portable` with the residual in its epilogue.
+ * So both products are the portable GEMM's arithmetic in its order — the tiled build's
+ * lane layout (row r and r+8 of a 16-row block, four consecutive columns cq and cq+16),
+ * vec4 accumulators taking one K term at a time from zero, written in the same expression
+ * shape — and the projection's accumulator runs across the hidden chunks in order, which
+ * is the order the reference sums the whole hidden width in. The publish and the residual
+ * are `publish.glsl`'s and `residual_epilogue.glsl`'s.
+ */
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference2 : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+
+#include "publish.glsl"
+
+layout(local_size_x = 32) in;
+
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
+
+layout(push_constant, scalar) uniform Push {
+    HalfBuf a, b; FloatBuf c, d;
+    uint m, n, k, batch;
+    uint sa, sb, sc, flags;
+    float p0, p1, p2, p3;
+    uint lda, ldb, ldc, spare;
+    uint64_t residual_cos;                     // per-channel cosine of the skip
+    uint image_h, image_w, window_cols, window_pad;
+    uint64_t projection;                       // offset 120: hidden x 32 per group
+} pc;
+
+#include "specialize.glsl"
+#include "residual_epilogue.glsl"   /* needs operation_flags() from above */
+
+const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, TM = 8u, TN = 16u;
+const uint EPI_GATE_E4M3 = 3u;             // the expand GEMM's publish
+
+/* one chunk of the gated hidden layer, as the half buffer the reference writes holds it */
+shared float16_t hidden[ROWS * CHUNK];
+
+void main() {
+    uint row = gl_WorkGroupID.x * ROWS, group = gl_WorkGroupID.y;
+    if (row >= pc.m) return;
+    uint cin = pc.n, width = pc.k;
+    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+    uint expand_base = group * pc.sa, project_base = group * pc.sb;
+    uint lane = gl_LocalInvocationID.x;
+    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
+    HalfBuf projection = HalfBuf(pc.projection);
+
+    vec4 result[2][2];
+    for (uint i = 0; i < 2u; i++)
+        for (uint j = 0; j < 2u; j++)
+            result[i][j] = vec4(0.0);
+
+    for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
+        /* the expand's 16x32 block for these hidden columns, as the tiled portable GEMM
+         * computes it (B row-major, `width` wide, one group's slab) */
+        vec4 h[2][2];
+        for (uint i = 0; i < 2u; i++)
+            for (uint j = 0; j < 2u; j++)
+                h[i][j] = vec4(0.0);
+        for (uint k = 0; k < cin; k++) {
+            vec4 bv[2];
+            for (uint j = 0; j < 2u; j++) {
+                uint at = expand_base + k * width + chunk + cq + j * TN;
+                bv[j] = vec4(float(pc.b.v[at]), float(pc.b.v[at + 1u]),
+                             float(pc.b.v[at + 2u]), float(pc.b.v[at + 3u]));
+            }
+            for (uint i = 0; i < 2u; i++) {
+                float av = float(pc.a.v[(row + r + i * TM) * cin + k]);
+                for (uint j = 0; j < 2u; j++)
+                    h[i][j] += av * bv[j];
+            }
+        }
+        for (uint i = 0; i < 2u; i++)
+            for (uint j = 0; j < 2u; j++)
+                for (uint e = 0; e < 4u; e++)
+                    hidden[(r + i * TM) * CHUNK + cq + j * TN + e] =
+                        float16_t(publish(EPI_GATE_E4M3, h[i][j][e]));
+        memoryBarrierShared();
+        barrier();
+        /* the projection over these 32 hidden rows, continuing the accumulator */
+        for (uint kk = 0; kk < CHUNK; kk++) {
+            vec4 bv[2];
+            for (uint j = 0; j < 2u; j++) {
+                uint at = project_base + (chunk + kk) * OUT + cq + j * TN;
+                bv[j] = vec4(float(projection.v[at]), float(projection.v[at + 1u]),
+                             float(projection.v[at + 2u]), float(projection.v[at + 3u]));
+            }
+            for (uint i = 0; i < 2u; i++) {
+                float av = float(hidden[(r + i * TM) * CHUNK + kk]);
+                for (uint j = 0; j < 2u; j++)
+                    result[i][j] += av * bv[j];
+            }
+        }
+        memoryBarrierShared();                  // the next chunk overwrites `hidden`
+        barrier();
+    }
+
+    uint epilogue = (operation_flags() >> 8) & 0xFu;
+    bool narrow_out = (operation_flags() & 0x1000u) != 0u;
+    uint64_t base_c = uint64_t(pc.c);
+    for (uint i = 0; i < 2u; i++)
+        for (uint j = 0; j < 2u; j++) {
+            vec4 v = result[i][j];
+            uint at = (row + r + i * TM) * ldc + group * OUT + cq + j * TN;
+            for (uint e = 0; e < 4u; e++)
+                v[e] = publish(epilogue, add_gemm_residual(v[e], at + e));
+            if (!narrow_out) {
+                for (uint e = 0; e < 4u; e++) pc.c.v[at + e] = v[e];
+            } else if ((at & 3u) == 0u && (uint(base_c) & 7u) == 0u) {
+                Half4Buf(base_c).v4[at >> 2] = f16vec4(v);
+            } else {
+                for (uint e = 0; e < 4u; e++) HalfBuf(base_c).v[at + e] = float16_t(v[e]);
+            }
+        }
+}

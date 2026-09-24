@@ -16,7 +16,7 @@
  *   VkBuffer + device address     ID3D12Resource, its GPU virtual address bound as a *root
  *                                 UAV* (no descriptor heap: `SetComputeRootUnorderedAccessView`
  *                                 takes the address), and the operand's byte offset inside
- *                                 it in the same 96-byte push block the SPIR-V takes, folded
+ *                                 it in the same 128-byte push block the SPIR-V takes (six operands: u0..u5), folded
  *                                 element offsets included. HLSL has no pointer to dereference,
  *                                 so the resource and the offset travel apart where Vulkan
  *                                 sends one address; `nr_d3d.hlsli` says how a kernel reads it.
@@ -40,7 +40,7 @@
  *                                 no shader compiler at run time, so the flags always come
  *                                 from the push block. `xmx_specialize` accepts the mask and
  *                                 `xmx_specialized_count()` stays 0.
- *   push constants                `SetComputeRoot32BitConstants`, 24 words at b0.
+ *   push constants                `SetComputeRoot32BitConstants`, 32 words at b0 (128 bytes).
  *   vkCmdPipelineBarrier          a UAV barrier (`D3D12_RESOURCE_BARRIER_TYPE_UAV`, no
  *                                 resource) between passes — the same places, suppressed by
  *                                 `xmx_sync(0)` the same way — and transition barriers around
@@ -89,6 +89,7 @@
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <dxgi1_6.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,16 +123,27 @@ struct buf { ID3D12Resource *r; void *p; UINT64 cap; D3D12_GPU_VIRTUAL_ADDRESS a
 /* A command list and the allocator its memory comes from. `open` while recording. */
 struct cmd { ID3D12CommandAllocator *alloc; ID3D12GraphicsCommandList *list; int open; };
 
-/* The resident push block: `struct push` in libxmx.c byte for byte. Here `a`..`d` are byte
- * offsets into the root UAVs u0..u3 rather than addresses, and `spare` is the first group of
- * a piece of a split dispatch. */
+/* The resident push block: `struct push` in libxmx.c byte for byte, 128 bytes. Here `a`..`d`,
+ * `residual_cos` and `qkv_scale` are byte offsets into the root UAVs u0..u5 rather than
+ * addresses, and `spare` is the first group of a piece of a split dispatch. The fifth and
+ * sixth operands carry what the fused passes need beyond four (notes/improve-fusions.md):
+ * the residual's cosine, a pass's second output, the attention bias, the V target of the
+ * QKV epilogue; the query scale, the fused feed-forward's projection. */
 struct push {
 	uint64_t a, b, c, d;
 	uint32_t m, n, k, batch, sa, sb, sc, flags;
 	float p0, p1, p2, p3;
 	uint32_t lda, ldb, ldc, spare;
+	uint64_t residual_cos;
+	uint32_t image_h, image_w, window_cols, window_pad;
+	uint64_t qkv_scale;
 };
 #define PUSH_WORDS ((unsigned)(sizeof(struct push) / 4))
+#define SPARE_WORD ((unsigned)(offsetof(struct push, spare) / 4))
+#define OPERANDS 6                    /* root UAVs u0..u5, root parameters 1..6 */
+_Static_assert(sizeof(struct push) == 128, "push block matches the HLSL Push");
+_Static_assert(offsetof(struct push, residual_cos) == 96 && offsetof(struct push, qkv_scale) == 120,
+	       "fifth and sixth operand offsets match nr_d3d.hlsli");
 
 /* The descriptor path's block: the SPIR-V's seven words and the group base. */
 struct desc_push { uint32_t M, N, K, sa, sb, sc, bt, base; };
@@ -152,7 +164,8 @@ static struct {
 
 	ID3D12PipelineState *pipe, *pipeb;             /* the descriptor path */
 	ID3D12PipelineState *rgemm, *rtiled, *rstaged, *runary, *rrow, *rhistory;
-	char *rpaths[5];
+	ID3D12PipelineState *rwindow[2], *rffn;        /* fused window attention, fused FFN: on first use */
+	char *rpaths[6];
 	unsigned specialize;
 	unsigned tiling, tilem, tilen;
 	int syncing;
@@ -195,6 +208,9 @@ enum { PK_GEMM = 0, PK_TILED, PK_STAGED, PK_UNARY, PK_ROW, PK_HISTORY, PK_COPY, 
 static unsigned char stamp_kind[MAX_STAMPS];
 static double prof_ms[PROF_KINDS];
 static unsigned prof_hits[PROF_KINDS];
+/* every pass's own duration, in recording order, since the last reset: what the totals sum away */
+static double prof_each[MAX_STAMPS];
+static unsigned prof_each_n;
 
 /* Device-resident buffers. `state` is where this recording last left the buffer: every
  * list starts with every buffer in COMMON (they decay there when a list completes), the
@@ -264,6 +280,8 @@ const char *xmx_device(void) { return g.name; }
 const char *xmx_memory(void) { return g.dev ? g.memory : "not initialised"; }
 int xmx_coopmat(void) { return g.dev ? g.coopmat : -1; }
 int xmx_portable(void) { return g.dev ? g.portable : -1; }
+/* the tiled portable kernel gathers a window-ordered A, and it is the only GEMM here */
+int xmx_window_gather(void) { return g.dev ? 1 : -1; }
 const char *xmx_path(void)
 {
 	if (!g.dev) return "not opened";
@@ -293,6 +311,12 @@ static const struct { const char *name, *blob; } kernel_alias[] = {
 	{ "attention",             "attention" },
 	{ "attention_ab",          "attention_ab" },
 	{ "history",               "history" },
+	/* the fused passes: only their multiply-add twins exist here */
+	{ "window_attention",          "window_attention_portable" },
+	{ "window_attention_portable", "window_attention_portable" },
+	{ "window_attention_portable_merged", "window_attention_portable_merged" },
+	{ "ffn_fused",                 "ffn_fused_portable" },
+	{ "ffn_fused_portable",        "ffn_fused_portable" },
 };
 
 /* `gemm_coopmat.spv`, `C:\dir\attention_ab.spv`, `resident` -> the kernel's name. */
@@ -856,18 +880,19 @@ static int check_device(ID3D12Device *dev)
 	return 0;
 }
 
-/* The root signature every kernel here is written against: the push block as 24 root
- * constants at b0 and the four operands as root UAVs u0..u3. */
+/* The root signature every kernel here is written against: the push block as 32 root
+ * constants at b0 and the six operands as root UAVs u0..u5 — 32 + 6 * 2 = 44 of the 64
+ * DWORDs a root signature may take. */
 static int make_root_signature(void)
 {
-	D3D12_ROOT_PARAMETER params[5];
+	D3D12_ROOT_PARAMETER params[1 + OPERANDS];
 	memset(params, 0, sizeof params);
 	params[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
 	params[0].Constants.ShaderRegister = 0;
 	params[0].Constants.RegisterSpace = 0;
 	params[0].Constants.Num32BitValues = PUSH_WORDS;
 	params[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	for (unsigned i = 1; i < 5; i++) {
+	for (unsigned i = 1; i < 1 + OPERANDS; i++) {
 		params[i].ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
 		params[i].Descriptor.ShaderRegister = i - 1;
 		params[i].Descriptor.RegisterSpace = 0;
@@ -875,7 +900,7 @@ static int make_root_signature(void)
 	}
 	D3D12_ROOT_SIGNATURE_DESC rsd;
 	memset(&rsd, 0, sizeof rsd);
-	rsd.NumParameters = 5;
+	rsd.NumParameters = 1 + OPERANDS;
 	rsd.pParameters = params;
 	rsd.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 	ID3DBlob *blob = NULL, *error = NULL;
@@ -1037,9 +1062,10 @@ void xmx_close(void)
 	for (int i = 0; i < MAX_GRAPHS; i++) xmx_graph_destroy(i);
 	for (int i = 0; i < g.rstep_n; i++) cmd_destroy(&g.rsteps[i]);
 	free(g.rsteps);
-	ID3D12PipelineState **pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory, &g.pipe, &g.pipeb };
+	ID3D12PipelineState **pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory,
+					  &g.rwindow[0], &g.rwindow[1], &g.rffn, &g.pipe, &g.pipeb };
 	for (size_t i = 0; i < sizeof pipes / sizeof *pipes; i++) RELEASE(*pipes[i]);
-	for (int i = 0; i < 5; i++) free(g.rpaths[i]);
+	for (int i = 0; i < 6; i++) free(g.rpaths[i]);
 	cmd_destroy(&g.cb); cmd_destroy(&g.rcb); cmd_destroy(&g.tcb);
 	struct buf *bufs[] = { &g.A, &g.B, &g.C, &g.up, &g.down, &g.zeros, &g.dummy, &g.qread };
 	for (size_t i = 0; i < sizeof bufs / sizeof *bufs; i++) free_buf(bufs[i]);
@@ -1071,6 +1097,7 @@ void xmx_close(void)
 	memset(rbufs, 0, sizeof rbufs);
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
+	prof_each_n = 0;
 	adopt.set = 0;
 }
 
@@ -1140,7 +1167,8 @@ static int run_desc(ID3D12PipelineState *pso, struct desc_push *push, unsigned g
 	ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 1, g.A.addr);
 	ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 2, g.B.addr);
 	ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 3, g.C.addr);
-	ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 4, g.dummy.addr);
+	for (unsigned i = 4; i <= OPERANDS; i++)
+		ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, i, g.dummy.addr);
 	for (unsigned i = 0; i < (iters ? iters : 1); i++) {
 		dispatch_pieces(list, (uint32_t *)push, sizeof *push / 4, 7, gx, gy, gz, 1);
 		if (i + 1 < iters) uav_barrier(list);
@@ -1380,7 +1408,7 @@ int xmx_abort(void)
 	return 0;
 }
 
-static const char *const family_name[] = { "gemm", "gemm_tiled", "gemm_staged", "unary", "row", "history", "copy" };
+static const char *const family_name[] = { "gemm", "gemm_tiled", "gemm_staged", "unary", "row", "history", "copy", "start" };
 
 /* XMX_D3D12_STEP: run what the recording holds since the last step — one pass — now, on
  * the list it was recorded into, say on stderr what it was and how long it took, park the
@@ -1460,17 +1488,17 @@ int xmx_rec_copy(int source, int target, unsigned long long bytes,
 
 /* Record one pass: the operands as root UAVs (brought to the UAV state), the push block,
  * the dispatch in pieces, the barrier and the stamp. */
-static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[4],
+static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[OPERANDS],
 		    unsigned gx, unsigned gy, unsigned gz, int split_y, unsigned family, unsigned subkind)
 {
 	ID3D12GraphicsCommandList *list = g.rcb.list;
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned i = 0; i < OPERANDS; i++)
 		if (live(ids[i])) transition(list, &rbufs[ids[i]], D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	ID3D12GraphicsCommandList_SetPipelineState(list, pso);
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned i = 0; i < OPERANDS; i++)
 		ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 1 + i,
 			live(ids[i]) ? rbufs[ids[i]].addr : g.dummy.addr);
-	dispatch_pieces(list, (uint32_t *)p, PUSH_WORDS, PUSH_WORDS - 1, gx, gy, gz, split_y);
+	dispatch_pieces(list, (uint32_t *)p, PUSH_WORDS, SPARE_WORD, gx, gy, gz, split_y);
 	barrier();
 	stamp(family, subkind);
 	g.recorded++;
@@ -1483,10 +1511,23 @@ static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[4],
 	return 0;
 }
 
-int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
-		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
-		 unsigned lda, unsigned ldb, unsigned ldc,
-		 unsigned oa, unsigned ob, unsigned oc)
+/* The QKV epilogue's other operands: K and V targets, the query scale, and the layout the
+ * three targets share, (window, head, token, 32). */
+struct qkv_targets { int k, v, scale; unsigned tokens, heads; };
+
+/* Every GEMM goes through here, with libxmx's validation and routing (`record_gemm` in
+ * libxmx.c) on a runtime with no staged kernel: the 16x32 register block where both extents
+ * allow it, the 8x16 kernel for the rest. The fused modes pick their kernel as libxmx does
+ * without matrix units: the window-gathered A takes the 16x32 block (gemm_portable.hlsl
+ * gathers in its A loads), the QKV epilogue needs that block to be one head wide, the
+ * compact head and the half copy take what the flags allow. The skip, the cosine, the half
+ * copy and the three QKV targets ride in the fourth to sixth operands. */
+static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
+		       unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		       unsigned lda, unsigned ldb, unsigned ldc,
+		       unsigned oa, unsigned ob, unsigned oc,
+		       int skip, int cosine, const uint32_t *window,
+		       const struct qkv_targets *qkv, int half_copy, const uint32_t *window_a)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	if (!live(a) || !live(b) || !live(c)) FAIL("gemm operand is not a live buffer", 0);
@@ -1498,26 +1539,174 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 	p.m = M; p.n = N; p.k = K; p.batch = batch;
 	p.sa = sa; p.sb = sb; p.sc = sc; p.flags = bt;
 	p.lda = lda; p.ldb = ldb; p.ldc = ldc;
-	/* The same choice as libxmx without matrix units: the staged shape is never taken, the
-	 * 16x32 register block where both extents allow it, the 8x16 kernel for the rest. */
+	int ids[OPERANDS] = { a, b, c, -1, -1, -1 };
+	if (skip >= 0) {
+		if (!live(skip) || !live(cosine)) FAIL("residual operand is not a live buffer", 0);
+		ids[3] = skip; ids[4] = cosine;
+	}
+	if (window) {
+		p.image_h = window[0]; p.image_w = window[1];
+		p.window_cols = window[2]; p.window_pad = window[3];
+	}
+	if (half_copy >= 0) {
+		if (!live(half_copy)) FAIL("GEMM half copy is not a live buffer", 0);
+		ids[3] = half_copy;
+	}
+	if (window_a) {
+		/* A gathered from the image in window order (0x400000): the batch strides have
+		 * no use with one batch, so they carry the geometry */
+		p.sa = window_a[0]; p.sb = window_a[1]; p.sc = window_a[2];
+		p.window_pad = window_a[3];
+	}
+	if (qkv) {
+		/* c is Q; K, V and the scale ride in the operands only the residual modes use */
+		if (!live(qkv->k) || !live(qkv->v) || !live(qkv->scale))
+			FAIL("QKV epilogue operand is not a live buffer", 0);
+		ids[3] = qkv->k; ids[4] = qkv->v; ids[5] = qkv->scale;
+		p.image_h = qkv->tokens; p.image_w = qkv->heads;
+	}
 	int tiled = M % g.tilem == 0 && N % g.tilen == 0 && K >= g.tiling;
-	int ids[4] = { a, b, c, -1 };
+	if (bt & 0x400000u) {
+		if (!window_a || M % 64 || N % 32 || K % 32 || batch > 1 || (bt & 1u))
+			FAIL("a window-gathered A needs its geometry, whole blocks and one batch", 0);
+		if (M % g.tilem || N % g.tilen)
+			FAIL("a window-gathered A without the staged kernel needs the 16x32 block", 0);
+		tiled = 1;
+	}
+	if ((bt & 0x10000u) && (bt & 0x20000u))
+		FAIL("compact head and fused residual are exclusive", 0);
+	if (bt & 0x10000u) {
+		if (N != 16 || ldc != 4 || (bt & 0x1f00u))
+			FAIL("compact head requires N=16, ldc=4 and plain FP32 output", 0);
+		tiled = 0;
+	}
+	/* the QKV epilogue normalises a head inside one group: the column block is one head */
+	if ((bt & 0x100000u) && !(qkv && (bt & ~0x408000u) == 0x100000u && tiled && g.tilen == 32))
+		FAIL("QKV epilogue needs its targets, no other flag, and a 32-column block", 0);
+	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u))
+		FAIL("a GEMM half copy needs its target and no other flag", 0);
 	unsigned gz = batch ? batch : 1;
 	if (tiled) return dispatch(g.rtiled, &p, ids, N / g.tilen, M / g.tilem, gz, 1, PK_TILED, bt);
 	return dispatch(g.rgemm, &p, ids, (N + 15) / 16, (M + 7) / 8, gz, 1, PK_GEMM, bt);
 }
 
-int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
-		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
+		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		 unsigned lda, unsigned ldb, unsigned ldc,
+		 unsigned oa, unsigned ob, unsigned oc)
+{
+	return record_gemm(a, b, c, M, N, K, batch, sa, sb, sc, bt,
+			   lda, ldb, ldc, oa, ob, oc, -1, -1, NULL, NULL, -1, NULL);
+}
+
+/* A projection whose epilogue adds `skip * cosine` before the publish (libxmx.c). A half
+ * skip is the caller's to flag with 0x40000. */
+int xmx_rec_gemm_residual(int a, int b, int c, int skip, int cosine,
+			  unsigned M, unsigned N, unsigned K, unsigned flags)
+{
+	if (skip < 0 || cosine < 0) FAIL("invalid residual buffer", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0x20000u, 0, 0, 0, 0, 0, 0, skip, cosine, NULL, NULL, -1, NULL);
+}
+
+/* The same, for a window block's output projection, written back into the unpadded image:
+ * `across` windows a row, `pad` = (top << 16) | left. */
+int xmx_rec_gemm_window_residual(int a, int b, int c, int skip, int cosine,
+				 unsigned M, unsigned N, unsigned K, unsigned flags,
+				 unsigned height, unsigned width, unsigned across, unsigned pad)
+{
+	if (skip < 0 || cosine < 0 || !height || !width || !across)
+		FAIL("invalid window residual", 0);
+	uint32_t window[] = { height, width, across, pad };
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0xa0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1, NULL);
+}
+
+static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+			   unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			   const uint32_t *window_a, unsigned flags)
+{
+	if (q < 0 || k < 0 || v < 0 || scale < 0 || !heads || !tokens || channels != heads * 32u
+	    || M % tokens)
+		FAIL("invalid QKV projection", 0);
+	struct qkv_targets targets = { k, v, scale, tokens, heads };
+	unsigned N = 3u * channels;
+	return record_gemm(a, weight, q, M, N, channels, 1, M * channels, channels * N, M * N,
+			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a);
+}
+
+/* The QKV projection with Q and K normalised and V published in its own epilogue. */
+int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens)
+{
+	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL, 0u);
+}
+
+/* The same with A gathered from the image in window order: the partition folded in. */
+int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
+			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			    unsigned width, unsigned height, unsigned across, unsigned pad,
+			    unsigned image_half)
+{
+	if (!width || !height || !across || tokens != 64u)
+		FAIL("invalid window-gathered QKV projection", 0);
+	uint32_t window_a[] = { width, height, across, pad };
+	return record_gemm_qkv(image, weight, q, k, v, scale, M, channels, heads, tokens,
+			       window_a, 0x400000u | (image_half ? 0x8000u : 0u));
+}
+
+/* A plain GEMM whose float32 result is also stored as half into `half_copy`. */
+int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K)
+{
+	if (half_copy < 0) FAIL("invalid GEMM half copy", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   0x200000u, 0, 0, 0, 0, 0, 0, -1, -1, NULL, NULL, half_copy, NULL);
+}
+
+static int record_unary(unsigned kind, int a, int b, int c, int d, int second,
+			unsigned n, unsigned channels, float p0, unsigned batch,
+			unsigned sa, unsigned sb, unsigned sc, unsigned k)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	if (!live(a) || !live(c)) FAIL("unary operand is not a live buffer", 0);
+	if (second >= 0 && !live(second)) FAIL("second unary output is not a live buffer", 0);
 	struct push p;
 	memset(&p, 0, sizeof p);
 	p.m = n; p.n = channels; p.flags = kind; p.p0 = p0;
 	p.batch = batch; p.sa = sa; p.sb = sb; p.sc = sc; p.k = k;
-	int ids[4] = { a, b, c, d };
+	/* a pass that writes two outputs finds the second in the fifth operand (u4) */
+	int ids[OPERANDS] = { a, b, c, d, second, -1 };
 	return dispatch(g.runary, &p, ids, (n + 255) / 256, 1, 1, 0, PK_UNARY, kind);
+}
+
+int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
+		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+{
+	return record_unary(kind, a, b, c, d, -1, n, channels, p0, batch, sa, sb, sc, k);
+}
+
+int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsigned n,
+		   unsigned channels, float p0, unsigned batch, unsigned sa, unsigned sb,
+		   unsigned sc, unsigned k)
+{
+	if (second < 0) FAIL("a two-output pass needs its second output", 0);
+	return record_unary(kind, a, b, c, d, second, n, channels, p0, batch, sa, sb, sc, k);
+}
+
+/* Q, K and V prepared from the float32 projection in one row dispatch (attention.hlsl's
+ * QKV_PREPARE): three independent group planes on y, Q/K/V out in b/c/d, the query scale in
+ * the sixth operand (u5; libxmx passes its address in lda/ldb instead). */
+int xmx_rec_qkv(int source, int q, int k, int v, int scale,
+		unsigned rows, unsigned tokens, unsigned heads)
+{
+	if (!g.recording) FAIL("not recording", 0);
+	if (!rows || !tokens || !heads) FAIL("invalid QKV extent", 0);
+	if (!live(source) || !live(q) || !live(k) || !live(v) || !live(scale)) FAIL("QKV operand is not live", 0);
+	struct push p;
+	memset(&p, 0, sizeof p);
+	p.m = rows; p.n = tokens; p.batch = heads; p.flags = 2u | 0x1000u | 0x20000u;
+	int ids[OPERANDS] = { source, q, k, v, -1, scale };
+	return dispatch(g.rrow, &p, ids, (rows + 31) / 32, 3, 1, 0, PK_ROW, 2);
 }
 
 int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsigned width,
@@ -1529,7 +1718,7 @@ int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsign
 	memset(&p, 0, sizeof p);
 	p.m = rows; p.n = width; p.k = scaled; p.batch = heads; p.flags = kind;
 	p.sa = stride; p.p0 = cap;
-	int ids[4] = { a, b, c, d };
+	int ids[OPERANDS] = { a, b, c, d, -1, -1 };
 	return dispatch(g.rrow, &p, ids, (rows + 31) / 32, 1, 1, 0, PK_ROW, kind);
 }
 
@@ -1541,8 +1730,84 @@ int xmx_rec_history(int history, int motion, int out, unsigned pixels, unsigned 
 	struct push p;
 	memset(&p, 0, sizeof p);
 	p.m = pixels; p.n = channels; p.k = height; p.batch = width; p.flags = absolute;
-	int ids[4] = { history, motion, out, -1 };
+	int ids[OPERANDS] = { history, motion, out, -1, -1, -1 };
 	return dispatch(g.rhistory, &p, ids, (pixels + 63) / 64, 1, 1, 0, PK_HISTORY, absolute & 1u);
+}
+
+/* Window attention's QK^T, softmax and PV in one dispatch (window_attention_portable.hlsl):
+ * built on first use, the merged-output module (which also does the head merge) its own
+ * pipeline since DXIL has no specialisation. Q, K, out and V in u0..u3, the bias in u4. */
+int xmx_window_init(const char *path, unsigned merged)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (merged > 1) FAIL("invalid window attention output mode", 0);
+	if (g.rwindow[merged]) return 0;
+	if (!merged) return build_pipeline(path, &g.rwindow[0]);
+	/* The merged module is the same kernel's -DMERGED_OUTPUT=1 build: a name resolves to
+	 * it, and an explicit DXIL file (a path with a directory) names its twin beside it,
+	 * `<stem>_merged.dxil` — never the unmerged file built as if it were merged. */
+	if (strchr(path, '/') || strchr(path, '\\')) {
+		char twin[1200];
+		const char *dot = strrchr(path, '.');
+		int stem_len = dot && dot > strrchr(path, '/') ? (int)(dot - path) : (int)strlen(path);
+		snprintf(twin, sizeof twin, "%.*s_merged%s", stem_len, path, dot && stem_len < (int)strlen(path) ? dot : "");
+		return build_pipeline(twin, &g.rwindow[1]);
+	}
+	return build_pipeline("window_attention_portable_merged", &g.rwindow[1]);
+}
+
+int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
+			     unsigned batches, unsigned heads, unsigned merged)
+{
+	if (merged > 1 || !g.recording || !g.rwindow[merged])
+		FAIL("window attention not ready for recording", 0);
+	if (!batches || !heads || batches % heads) FAIL("invalid attention batch/head count", 0);
+	if (!live(q) || !live(k) || !live(v) || !live(out) || (bias >= 0 && !live(bias)))
+		FAIL("window attention operand is not a live buffer", 0);
+	struct push p;
+	memset(&p, 0, sizeof p);
+	p.n = heads; p.batch = batches; p.flags = bias >= 0;
+	int ids[OPERANDS] = { q, k, out, v, bias, -1 };
+	/* eight groups on x (never split), the batch on y and z as the kernel reads it */
+	return dispatch(g.rwindow[merged], &p, ids, 8, batches < 65535u ? batches : 65535u,
+			1u + (batches - 1u) / 65535u, 0, PK_ROW, 3);
+}
+
+/* A feed-forward in one dispatch (ffn_fused_portable.hlsl): the input, the expand weights,
+ * the output and the residual's skip in u0..u3, its cosine in u4, the projection weights
+ * in u5. One 16-row block a group on x, split in pieces; the feed-forward group on y. */
+int xmx_ffn_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rffn) return 0;
+	free(g.rpaths[5]);
+	if (!(g.rpaths[5] = nr_strdup(path))) FAIL("pipeline path allocation", 0);
+	return build_pipeline(path, &g.rffn);
+}
+
+int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine,
+		unsigned M, unsigned cin, unsigned hidden, unsigned groups, unsigned flags)
+{
+	if (!g.recording || !g.rffn) FAIL("fused feed-forward not ready for recording", 0);
+	if (!cin || cin % 16u || !hidden || hidden % 32u || !M || M % 16u || !groups)
+		FAIL("fused feed-forward needs channels a multiple of 16, hidden of 32, 16-row blocks", 0);
+	if (flags & ~0x41f00u)
+		FAIL("fused feed-forward takes an epilogue, a half output and a half skip only", 0);
+	int residual = skip >= 0 || cosine >= 0;
+	if (residual && (groups != 1u || cin != 32u || skip < 0 || cosine < 0))
+		FAIL("the fused residual is for one group of 32 channels, with skip and cosine", 0);
+	if (!residual && (flags & 0x40000u)) FAIL("a half skip without a residual", 0);
+	if (!live(a) || !live(expand) || !live(projection) || !live(out)
+	    || (residual && (!live(skip) || !live(cosine))))
+		FAIL("fused feed-forward operand is not a live buffer", 0);
+	struct push p;
+	memset(&p, 0, sizeof p);
+	p.m = M; p.n = cin; p.k = hidden; p.batch = groups;
+	p.sa = cin * hidden; p.sb = hidden * 32u;
+	p.ldc = groups > 1u ? groups * 32u : 0u;
+	p.flags = flags | (residual ? 0x20000u : 0u);
+	int ids[OPERANDS] = { a, expand, out, residual ? skip : -1, residual ? cosine : -1, projection };
+	return dispatch(g.rffn, &p, ids, M / 16u, groups, 1, 0, PK_GEMM, 31);
 }
 
 /* -- submission ---------------------------------------------------------------- */
@@ -1554,8 +1819,11 @@ static void collect(unsigned stamps, const unsigned char *kinds)
 	if (!g.prof || !g.qheap || !g.qread.p || stamps < 2) return;
 	const uint64_t *ticks = (const uint64_t *)g.qread.p;
 	for (unsigned i = 1; i < stamps; i++) {
-		if (ticks[i] < ticks[i - 1]) continue;      /* a wrapped counter is not a duration */
-		prof_ms[kinds[i]] += (double)(ticks[i] - ticks[i - 1]) * g.ns_per_tick * 1e-6;
+		/* a wrapped counter is not a duration; -1 keeps the order for the caller */
+		double ms = ticks[i] < ticks[i - 1] ? -1.0 : (double)(ticks[i] - ticks[i - 1]) * g.ns_per_tick * 1e-6;
+		if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+		if (ms < 0) continue;
+		prof_ms[kinds[i]] += ms;
 		prof_hits[kinds[i]]++;
 	}
 }
@@ -1667,7 +1935,11 @@ void xmx_profile_reset(void)
 {
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
+	prof_each_n = 0;
 }
+
+unsigned xmx_profile_each_count(void) { return prof_each_n; }
+double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
 
 double xmx_profile_ms(unsigned kind) { return kind < PROF_KINDS ? prof_ms[kind] : 0.0; }
 unsigned xmx_profile_count(unsigned kind) { return kind < PROF_KINDS ? prof_hits[kind] : 0u; }

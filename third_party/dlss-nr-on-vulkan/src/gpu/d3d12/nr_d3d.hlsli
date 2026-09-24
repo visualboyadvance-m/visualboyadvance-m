@@ -30,6 +30,9 @@
  * The alignment tests the GLSL makes on the address it makes on the offset: a resource's
  * address is 64 KB aligned, so the offset's low bits are the address's.
  *
+ * The fifth and sixth operands (u4, u5) are bound the same way, their offsets at push
+ * offsets 96 and 120; a pass that has no use for one still finds a dummy resource there.
+ *
  * `spare`, unused by the SPIR-V, is the first group of this dispatch along the split axis:
  * D3D12 caps a dispatch at 65535 groups per axis and the graph's widest passes exceed it,
  * so `libd3dmx` issues them in pieces and each kernel adds `pc.spare` to its group id —
@@ -38,9 +41,13 @@
 #ifndef NR_D3D_HLSLI
 #define NR_D3D_HLSLI
 
-/* The resident push block: `struct push` in libxmx.c / libd3dmx.c, byte for byte, the four
- * addresses read as (offset, 0) pairs. A descriptor-path kernel defines NR_D3D_DESC_PUSH
- * and declares its own, smaller block on the same register. */
+/* The resident push block: `struct push` in libxmx.c / libd3dmx.c, byte for byte — 128 bytes,
+ * the six addresses read as (offset, 0) pairs: the four operands at 0..31, the fifth
+ * (`residual_cos` in the SPIR-V: the residual's cosine, a pass's second output, the window
+ * attention's bias, the QKV epilogue's V target) at 96, the sixth (`qkv_scale`: the QKV
+ * epilogue's query scale, the fused feed-forward's projection weights) at 120. A
+ * descriptor-path kernel defines NR_D3D_DESC_PUSH and declares its own, smaller block on the
+ * same register. */
 #ifndef NR_D3D_DESC_PUSH
 struct Push {
     uint2 oa, ob, oc, od;
@@ -48,6 +55,9 @@ struct Push {
     uint sa, sb, sc, flags;
     float p0, p1, p2, p3;
     uint lda, ldb, ldc, spare;
+    uint2 oe;                                   /* offset 96: residual_cos */
+    uint image_h, image_w, window_cols, window_pad;   /* the window residual's geometry */
+    uint2 of;                                   /* offset 120: qkv_scale */
 };
 ConstantBuffer<Push> pc : register(b0);
 
@@ -65,6 +75,8 @@ RWByteAddressBuffer bufA : register(u0);
 RWByteAddressBuffer bufB : register(u1);
 RWByteAddressBuffer bufC : register(u2);
 RWByteAddressBuffer bufD : register(u3);
+RWByteAddressBuffer bufE : register(u4);        /* the operand at push offset 96 */
+RWByteAddressBuffer bufF : register(u5);        /* the operand at push offset 120 */
 
 /* -- publish.glsl -------------------------------------------------------- */
 

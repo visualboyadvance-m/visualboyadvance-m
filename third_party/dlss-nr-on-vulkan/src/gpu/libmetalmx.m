@@ -24,7 +24,7 @@
  *                                 `xmx_coopmat()` says so, and `XMX_PORTABLE=1` still picks
  *                                 the multiply-add kernels.
  *   specialization constant 0     function constant 0 (`MTLFunctionConstantValues`).
- *   push constants                `setBytes` of the same 64-byte struct at buffer index 0.
+ *   push constants                `setBytes` of the same 128-byte struct at buffer index 0.
  *   vkCmdPipelineBarrier          `memoryBarrierWithScope:MTLBarrierScopeBuffers` inside a
  *                                 concurrent-dispatch encoder, one per pass unless
  *                                 `xmx_sync(0)` suppresses it — the same places.
@@ -90,14 +90,22 @@ struct push {
 	uint32_t m, n, k, batch, sa, sb, sc, flags;
 	float p0, p1, p2, p3;
 	uint32_t lda, ldb, ldc, spare;
+	/* The fused passes' operands, appended as in libxmx.c: the residual's cosine (and any
+	 * pass's fifth operand), the window-layout geometry, the QKV scale (the fused
+	 * feed-forward's projection). 128 bytes in all. */
+	uint64_t residual_cos;
+	uint32_t image_h, image_w, window_cols, window_pad;
+	uint64_t qkv_scale;
 };
+_Static_assert(sizeof(struct push) == 128, "push block matches nr_metal.h");
 
 struct desc_push { uint32_t M, N, K, sa, sb, sc, bt; };
 
 static struct {
 	void *pipe, *pipeb;                            /* the descriptor path */
 	void *rgemm, *rtiled, *rstaged, *runary, *rrow, *rhistory;
-	char *rpaths[5];
+	void *rwindow[2], *rffn;                       /* the fused passes, built on first use */
+	char *rpaths[6];
 	unsigned specialize;
 	unsigned tiling, tilem, tilen;
 	int syncing;
@@ -119,6 +127,9 @@ static unsigned specialized_count;
 enum { PK_GEMM = 0, PK_TILED, PK_STAGED, PK_UNARY, PK_ROW, PK_HISTORY, PK_COPY, PK_START = 7 };
 static double prof_ms[PROF_KINDS];
 static unsigned prof_hits[PROF_KINDS];
+/* Every profiled pass's own duration, in recording order, since the last reset. */
+static double prof_each[MAX_STAMPS];
+static unsigned prof_each_n;
 
 /* Device-resident buffers. */
 #define MAX_RBUF 8192
@@ -171,6 +182,9 @@ const char *xmx_memory(void)
 }
 int xmx_coopmat(void) { return dev ? g.coopmat : -1; }
 int xmx_portable(void) { return dev ? g.portable : -1; }
+/* every Metal path gathers a window-ordered A: the staged or tiled simdgroup kernel, or
+ * the tiled portable one */
+int xmx_window_gather(void) { return dev ? 1 : -1; }
 const char *xmx_path(void)
 {
 	if (!dev) return "not opened";
@@ -187,7 +201,18 @@ static const char *const kernel_names[] = {
 	"gemm_resident", "gemm_tiled", "gemm_staged", "resident", "attention", "attention_ab",
 	"history", "gemm_coopmat", "gemm_batched", "gemm_f16acc", "gemm_portable",
 	"gemm_portable_tiled", "gemm_portable_desc", "gemm_portable_batched",
+	"window_attention", "window_attention_portable", "ffn_fused", "ffn_fused_portable",
 };
+
+/* The fused passes have a matrix kernel and a portable twin; a caller that hands over the
+ * matrix name on the portable path (XMX_PORTABLE=1, or no simdgroup matrices) gets the
+ * twin, so the name alone never selects a kernel the path cannot run. */
+static void path_kernel(char *stem, size_t cap)
+{
+	if (!g.portable) return;
+	if (!strcmp(stem, "window_attention") || !strcmp(stem, "ffn_fused"))
+		strncat(stem, "_portable", cap - strlen(stem) - 1);
+}
 
 /* `gemm_coopmat.spv`, `/some/dir/attention_ab.spv`, `resident` -> the kernel's name. */
 static void kernel_name(const char *spv_path, char *out, size_t cap)
@@ -240,11 +265,12 @@ static int load_library(void)
 #endif
 }
 
-static int build_pipeline_spec(const char *spv_path, const unsigned *flags, void **out)
+static int build_pipeline_consts(const char *spv_path, const unsigned *flags, const unsigned *merged, void **out)
 {
 	if (load_library()) return -1;
 	char stem[128];
 	kernel_name(spv_path, stem, sizeof stem);
+	path_kernel(stem, sizeof stem);
 	NSError *error = nil;
 	/* A kernel that reads a function constant is created through this call even with no
 	 * constant set (Metal refuses the plain lookup): an empty table leaves
@@ -252,6 +278,8 @@ static int build_pipeline_spec(const char *spv_path, const unsigned *flags, void
 	MTLFunctionConstantValues *values = [MTLFunctionConstantValues new];
 	unsigned value = flags ? *flags : 0;
 	if (flags) [values setConstantValue:&value type:MTLDataTypeUInt atIndex:0];
+	bool merged_value = merged && *merged;
+	if (merged) [values setConstantValue:&merged_value type:MTLDataTypeBool atIndex:1];
 	id<MTLFunction> fn = [library newFunctionWithName:@(stem) constantValues:values error:&error];
 	if (!fn) {
 		snprintf(g.err, sizeof g.err, "no kernel '%s' in the metallib (from '%s')%s%s", stem, spv_path,
@@ -266,6 +294,11 @@ static int build_pipeline_spec(const char *spv_path, const unsigned *flags, void
 		FAIL("this device's simdgroup is not 32 wide, which the kernels assume", (int)state.threadExecutionWidth);
 	*out = (void *)CFBridgingRetain(state);
 	return 0;
+}
+
+static int build_pipeline_spec(const char *spv_path, const unsigned *flags, void **out)
+{
+	return build_pipeline_consts(spv_path, flags, NULL, out);
 }
 
 static int build_pipeline(const char *path, void **out) { return build_pipeline_spec(path, NULL, out); }
@@ -287,7 +320,8 @@ static unsigned block_size(const char *name, unsigned fallback)
 
 static int resident_pipeline(unsigned family, unsigned flags, void *fallback, void **out)
 {
-	unsigned mask = family < 3 ? 1u : (family == 3 ? 2u : 4u);
+	/* family 5, the fused feed-forward, is a GEMM and specialises with them */
+	unsigned mask = (family < 3 || family == 5) ? 1u : (family == 3 ? 2u : 4u);
 	*out = fallback;
 	if (!(g.specialize & mask)) return 0;
 	for (unsigned i = 0; i < specialized_count; i++)
@@ -367,9 +401,10 @@ void xmx_close(void)
 	op_free(&rec);
 	for (unsigned i = 0; i < specialized_count; i++) release_pipeline(&specialized[i].pipeline);
 	specialized_count = 0;
-	void **pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory, &g.pipe, &g.pipeb };
+	void **pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory, &g.pipe, &g.pipeb,
+			   &g.rwindow[0], &g.rwindow[1], &g.rffn };
 	for (size_t i = 0; i < sizeof pipes / sizeof *pipes; i++) release_pipeline(pipes[i]);
-	for (int i = 0; i < 5; i++) free(g.rpaths[i]);
+	for (int i = 0; i < 6; i++) free(g.rpaths[i]);
 	struct buf *bufs[] = { &g.A, &g.B, &g.C, &g.stage };
 	for (size_t i = 0; i < sizeof bufs / sizeof *bufs; i++) free_buf(bufs[i]);
 	for (unsigned i = 0; i < SAMPLE_BUFFERS; i++) samples[i] = nil;
@@ -383,6 +418,7 @@ void xmx_close(void)
 	memset(&g, 0, sizeof g);
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
+	prof_each_n = 0;
 }
 
 /* -- one-shot command buffers ------------------------------------------ */
@@ -771,10 +807,18 @@ static int dispatch(void *pipeline, const struct push *p, unsigned gx, unsigned 
 	return 0;
 }
 
-int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
-		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
-		 unsigned lda, unsigned ldb, unsigned ldc,
-		 unsigned oa, unsigned ob, unsigned oc)
+/* The QKV epilogue's other operands: K and V targets, the query scale, and the layout the
+ * three targets share, (window, head, token, 32). */
+struct qkv_targets { int k, v, scale; unsigned tokens, heads; };
+
+/* One GEMM, with every fused epilogue libxmx.c's `record_gemm` knows and the same routing
+ * and refusals, so a graph recorded against either runtime is the same graph. */
+static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
+		       unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		       unsigned lda, unsigned ldb, unsigned ldc,
+		       unsigned oa, unsigned ob, unsigned oc,
+		       int skip, int cosine, const uint32_t *window,
+		       const struct qkv_targets *qkv, int half_copy, const uint32_t *window_a)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c),
@@ -782,6 +826,30 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 			  .sa = sa, .sb = sb, .sc = sc, .flags = bt,
 			  .lda = lda, .ldb = ldb, .ldc = ldc };
 	if (!p.a || !p.b || !p.c) FAIL("gemm operand is not a live buffer", 0);
+	if (skip >= 0) {
+		p.d = addr_of(skip); p.residual_cos = addr_of(cosine);
+		if (!p.d || !p.residual_cos) FAIL("residual operand is not a live buffer", 0);
+	}
+	if (window) {
+		p.image_h = window[0]; p.image_w = window[1];
+		p.window_cols = window[2]; p.window_pad = window[3];
+	}
+	if (half_copy >= 0 && !(p.d = addr_of(half_copy)))
+		FAIL("GEMM half copy is not a live buffer", 0);
+	if (window_a) {
+		/* A gathered from the image in window order: the batch strides have no use with
+		 * one batch, so they carry the geometry */
+		p.sa = window_a[0]; p.sb = window_a[1]; p.sc = window_a[2];
+		p.window_pad = window_a[3];
+	}
+	if (qkv) {
+		/* c is Q; K, V and the scale ride in slots only the residual modes use */
+		p.d = addr_of(qkv->k); p.residual_cos = addr_of(qkv->v);
+		p.qkv_scale = addr_of(qkv->scale);
+		p.image_h = qkv->tokens; p.image_w = qkv->heads;
+		if (!p.d || !p.residual_cos || !p.qkv_scale)
+			FAIL("QKV epilogue operand is not a live buffer", 0);
+	}
 	p.a += (uint64_t)oa * 2; p.b += (uint64_t)ob * 2;
 	p.c += (uint64_t)oc * ((bt & 0x1000u) ? 2 : 4);
 	/* The same three-way choice as libxmx: the 64x32 staged kernel for deep, whole-block
@@ -789,7 +857,33 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 	 * everything else. The staged kernel has no portable twin. */
 	int staged = M % 64 == 0 && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
 	if (g.portable) staged = 0;
+	/* the window gather lives in the staged kernel's A loader on the matrix path, and in
+	 * the tiled kernels' (both builds) where there is no staged one */
+	int window_tiled = 0;
+	if (bt & 0x400000u) {
+		if (!window_a || M % 64 || N % 32 || K % 32 || batch > 1 || (bt & 1u))
+			FAIL("a window-gathered A needs its geometry, whole blocks and one batch", 0);
+		if (!g.portable) staged = 1;
+		else window_tiled = 1;
+	}
 	int tiled = M % g.tilem == 0 && N % g.tilen == 0 && K >= g.tiling;
+	if (window_tiled) {
+		if (M % g.tilem || N % g.tilen)
+			FAIL("a window-gathered A without the staged kernel needs the 16x32 block", 0);
+		tiled = 1;
+	}
+	if ((bt & 0x10000u) && (bt & 0x20000u))
+		FAIL("compact head and fused residual are exclusive", 0);
+	if (bt & 0x10000u) {
+		if (N != 16 || ldc != 4 || (bt & 0x1f00u))
+			FAIL("compact head requires N=16, ldc=4 and plain FP32 output", 0);
+		staged = tiled = 0;
+	}
+	if ((bt & 0x100000u) && !(qkv && (bt & ~0x408000u) == 0x100000u
+				  && (staged || (tiled && g.tilen == 32))))
+		FAIL("QKV epilogue needs its targets, no other flag, and a 32-column block", 0);
+	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u && !staged))
+		FAIL("a GEMM half copy needs its target, no other flag, and the resident kernel", 0);
 	void *pipeline;
 	if (resident_pipeline(staged ? 2 : (tiled ? 1 : 0), bt,
 			      staged ? g.rstaged : (tiled ? g.rtiled : g.rgemm), &pipeline)) return -1;
@@ -799,17 +893,185 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 	return dispatch(pipeline, &p, (N + 15) / 16, (M + 7) / 8, gz, 32, PK_GEMM, bt);
 }
 
-int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
-		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
+		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		 unsigned lda, unsigned ldb, unsigned ldc,
+		 unsigned oa, unsigned ob, unsigned oc)
+{
+	return record_gemm(a, b, c, M, N, K, batch, sa, sb, sc, bt,
+			   lda, ldb, ldc, oa, ob, oc, -1, -1, NULL, NULL, -1, NULL);
+}
+
+int xmx_rec_gemm_residual(int a, int b, int c, int skip, int cosine,
+			  unsigned M, unsigned N, unsigned K, unsigned flags)
+{
+	if (skip < 0 || cosine < 0) FAIL("invalid residual buffer", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0x20000u, 0, 0, 0, 0, 0, 0, skip, cosine, NULL, NULL, -1, NULL);
+}
+
+int xmx_rec_gemm_window_residual(int a, int b, int c, int skip, int cosine,
+				 unsigned M, unsigned N, unsigned K, unsigned flags,
+				 unsigned height, unsigned width, unsigned across, unsigned pad)
+{
+	if (skip < 0 || cosine < 0 || !height || !width || !across)
+		FAIL("invalid window residual", 0);
+	uint32_t window[] = { height, width, across, pad };
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0xa0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1, NULL);
+}
+
+static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+			   unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			   const uint32_t *window_a, unsigned flags)
+{
+	if (q < 0 || k < 0 || v < 0 || scale < 0 || !heads || !tokens || channels != heads * 32u
+	    || M % tokens)
+		FAIL("invalid QKV projection", 0);
+	struct qkv_targets targets = { k, v, scale, tokens, heads };
+	unsigned N = 3u * channels;
+	return record_gemm(a, weight, q, M, N, channels, 1, M * channels, channels * N, M * N,
+			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a);
+}
+
+int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens)
+{
+	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL, 0u);
+}
+
+int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
+			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			    unsigned width, unsigned height, unsigned across, unsigned pad,
+			    unsigned image_half)
+{
+	if (!width || !height || !across || tokens != 64u)
+		FAIL("invalid window-gathered QKV projection", 0);
+	uint32_t window_a[] = { width, height, across, pad };
+	return record_gemm_qkv(image, weight, q, k, v, scale, M, channels, heads, tokens,
+			       window_a, 0x400000u | (image_half ? 0x8000u : 0u));
+}
+
+int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K)
+{
+	if (half_copy < 0) FAIL("invalid GEMM half copy", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   0x200000u, 0, 0, 0, 0, 0, 0, -1, -1, NULL, NULL, half_copy, NULL);
+}
+
+static int record_unary(unsigned kind, int a, int b, int c, int d, int second,
+			unsigned n, unsigned channels, float p0, unsigned batch,
+			unsigned sa, unsigned sb, unsigned sc, unsigned k)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c), .d = addr_of(d),
 			  .m = n, .n = channels, .flags = kind, .p0 = p0,
 			  .batch = batch, .sa = sa, .sb = sb, .sc = sc, .k = k };
 	if (!p.a || !p.c) FAIL("unary operand is not a live buffer", 0);
+	/* a pass that writes two outputs finds the second at offset 96 */
+	if (second >= 0 && !(p.residual_cos = addr_of(second)))
+		FAIL("second unary output is not a live buffer", 0);
 	void *pipeline;
 	if (resident_pipeline(3, kind, g.runary, &pipeline)) return -1;
 	return dispatch(pipeline, &p, (n + 255) / 256, 1, 1, 256, PK_UNARY, kind);
+}
+
+int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
+		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+{
+	return record_unary(kind, a, b, c, d, -1, n, channels, p0, batch, sa, sb, sc, k);
+}
+
+int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsigned n,
+		   unsigned channels, float p0, unsigned batch, unsigned sa, unsigned sb,
+		   unsigned sc, unsigned k)
+{
+	if (second < 0) FAIL("a two-output pass needs its second output", 0);
+	return record_unary(kind, a, b, c, d, second, n, channels, p0, batch, sa, sb, sc, k);
+}
+
+/* Q, K and V prepared in one row dispatch, three planes on y (attention.metal,
+ * QKV_PREPARE); the scale's address rides in lda | ldb << 32. */
+int xmx_rec_qkv(int source, int q, int k, int v, int scale,
+		unsigned rows, unsigned tokens, unsigned heads)
+{
+	if (!g.recording) FAIL("not recording", 0);
+	if (!rows || !tokens || !heads) FAIL("invalid QKV extent", 0);
+	const unsigned flags = 2u | 0x1000u | 0x20000u;
+	uint64_t scale_addr = addr_of(scale);
+	struct push p = { .a = addr_of(source), .b = addr_of(q), .c = addr_of(k),
+		.d = addr_of(v), .m = rows, .n = tokens, .batch = heads, .flags = flags,
+		.lda = (uint32_t)scale_addr, .ldb = (uint32_t)(scale_addr >> 32) };
+	if (!p.a || !p.b || !p.c || !p.d || !scale_addr) FAIL("QKV operand is not live", 0);
+	void *pipeline;
+	if (resident_pipeline(4, flags, g.rrow, &pipeline)) return -1;
+	return dispatch(pipeline, &p, (rows + 31) / 32, 3, 1, 32, PK_ROW, 2);
+}
+
+/* Window attention's QK^T, softmax and PV in one dispatch (window_attention.metal); the
+ * portable twin on the portable path. `merged` is function constant 1: the head merge's
+ * work as well. Built on first use. */
+int xmx_window_init(const char *path, unsigned merged)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (merged > 1) FAIL("invalid window attention output mode", 0);
+	if (g.rwindow[merged]) return 0;
+	@autoreleasepool {
+		return build_pipeline_consts(path, NULL, &merged, &g.rwindow[merged]);
+	}
+}
+
+int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
+			     unsigned batches, unsigned heads, unsigned merged)
+{
+	if (merged > 1 || !g.recording || !g.rwindow[merged])
+		FAIL("window attention not ready for recording", 0);
+	if (!batches || !heads || batches % heads) FAIL("invalid attention batch/head count", 0);
+	struct push p = { .a = addr_of(q), .b = addr_of(k), .c = addr_of(out), .d = addr_of(v),
+			  .n = heads, .batch = batches, .flags = bias >= 0,
+			  .residual_cos = bias >= 0 ? addr_of(bias) : 0 };
+	if (!p.a || !p.b || !p.c || !p.d || (bias >= 0 && !p.residual_cos))
+		FAIL("window attention operand is not a live buffer", 0);
+	return dispatch(g.rwindow[merged], &p, 8, batches < 65535u ? batches : 65535u,
+			1u + (batches - 1u) / 65535u, 32, PK_ROW, 3);
+}
+
+/* A feed-forward in one dispatch, the hidden layer on chip (ffn_fused.metal). */
+int xmx_ffn_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rffn) return 0;
+	free(g.rpaths[5]);
+	if (!(g.rpaths[5] = strdup(path))) FAIL("pipeline path allocation", 0);
+	@autoreleasepool {
+		return build_pipeline(path, &g.rffn);
+	}
+}
+
+int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine,
+		unsigned M, unsigned cin, unsigned hidden, unsigned groups, unsigned flags)
+{
+	if (!g.recording || !g.rffn) FAIL("fused feed-forward not ready for recording", 0);
+	if (!cin || cin % 16u || !hidden || hidden % 32u || !M || M % 16u || !groups)
+		FAIL("fused feed-forward needs channels a multiple of 16, hidden of 32, 16-row blocks", 0);
+	if (flags & ~0x41f00u)
+		FAIL("fused feed-forward takes an epilogue, a half output and a half skip only", 0);
+	int residual = skip >= 0 || cosine >= 0;
+	if (residual && (groups != 1u || cin != 32u || skip < 0 || cosine < 0))
+		FAIL("the fused residual is for one group of 32 channels, with skip and cosine", 0);
+	if (!residual && (flags & 0x40000u)) FAIL("a half skip without a residual", 0);
+	struct push p = { .a = addr_of(a), .b = addr_of(expand), .c = addr_of(out),
+			  .m = M, .n = cin, .k = hidden, .batch = groups,
+			  .sa = cin * hidden, .sb = hidden * 32u,
+			  .ldc = groups > 1u ? groups * 32u : 0u,
+			  .flags = flags | (residual ? 0x20000u : 0u),
+			  .qkv_scale = addr_of(projection) };
+	if (residual) { p.d = addr_of(skip); p.residual_cos = addr_of(cosine); }
+	if (!p.a || !p.b || !p.c || !p.qkv_scale || (residual && (!p.d || !p.residual_cos)))
+		FAIL("fused feed-forward operand is not a live buffer", 0);
+	void *pipeline;
+	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
+	return dispatch(pipeline, &p, M / 16u, groups, 1, 32, PK_GEMM, 31);
 }
 
 int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsigned width,
@@ -861,8 +1123,13 @@ static void collect(unsigned stamps)
 		const MTLCounterResultTimestamp *t = resolved.bytes;
 		for (unsigned i = 0; i < count; i++) {
 			uint64_t start = t[2 * i].timestamp, end = t[2 * i + 1].timestamp;
-			if (start == MTLCounterErrorValue || end == MTLCounterErrorValue || end < start) continue;
-			prof_ms[stamp_kind[first + i]] += (double)(end - start) * g.ns_per_tick * 1e-6;
+			if (start == MTLCounterErrorValue || end == MTLCounterErrorValue || end < start) {
+				if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = -1.0;
+				continue;
+			}
+			double ms = (double)(end - start) * g.ns_per_tick * 1e-6;
+			if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+			prof_ms[stamp_kind[first + i]] += ms;
 			prof_hits[stamp_kind[first + i]]++;
 		}
 	}
@@ -1035,7 +1302,11 @@ void xmx_profile_reset(void)
 {
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
+	prof_each_n = 0;
 }
+
+unsigned xmx_profile_each_count(void) { return prof_each_n; }
+double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
 
 double xmx_profile_ms(unsigned kind) { return kind < PROF_KINDS ? prof_ms[kind] : 0.0; }
 unsigned xmx_profile_count(unsigned kind) { return kind < PROF_KINDS ? prof_hits[kind] : 0u; }

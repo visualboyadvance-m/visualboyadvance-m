@@ -16,8 +16,15 @@
  * The transposed B (`flags & 1`, the key's own (N, K) layout) is the `transpose_matrix`
  * argument of `simdgroup_load`, where the SPIR-V uses a column-major `coopMatLoad`: no
  * transpose is copied on either.
+ *
+ * The fused epilogues (nr_epilogue.h) all go through the threadgroup stage: the residual
+ * (0x20000, window layout 0x80000), the QKV projection's own epilogue (0x100000, a
+ * 32-wide block, so the tiled and staged kernels), the half copy (0x200000), the compact
+ * head (0x10000, the base kernel). A window-gathered A (0x400000) is staged through
+ * threadgroup memory K step by K step, in the staged kernel's own operand tile and in the
+ * tiled kernel's stage bytes, and loaded from there.
  */
-#include "nr_metal.h"
+#include "nr_epilogue.h"
 
 constant uint TM = 8, TN = 16, TK = 16;
 
@@ -50,10 +57,12 @@ kernel void gemm_resident_t(constant Push &pc [[buffer(0)]],
                             uint3 wg [[threadgroup_position_in_grid]],
                             uint lid [[thread_index_in_threadgroup]]) {
     const uint BM = TM * RM, BN = TN * RN;
+    threadgroup float stage[TM * RM * TN * RN];
     uint row = wg.y * BM, col = wg.x * BN;
     if (row >= pc.m || col >= pc.n) return;
     uint flags = operation_flags(pc);
     bool transposed = (flags & 1u) != 0u;
+    bool window_a = (flags & 0x400000u) != 0u;
     uint batch = wg.z;
     uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
     uint lda = pc.lda != 0u ? pc.lda : pc.k;
@@ -70,8 +79,30 @@ kernel void gemm_resident_t(constant Push &pc [[buffer(0)]],
     simdgroup_half8x8 a[RM][2];
     simdgroup_half8x8 b[RN][4];
 
-    /* The transposed test stays outside the K loop, as in the GLSL, so the loads hoist. */
-    if (transposed) {
+    if (window_a) {
+        /* A is the image itself, its window rows gathered K step by K step into the
+         * stage's bytes — nothing else uses them until the K loop is done — and loaded
+         * from there. One batch, B not transposed: the runtime checks. */
+        threadgroup half *abuf = reinterpret_cast<threadgroup half *>(stage);
+        const uint STRIDE = TK + 8u;
+        for (uint k = 0; k < pc.k; k += TK) {
+            simdgroup_barrier(mem_flags::mem_threadgroup);
+            for (uint e = lid * 4u; e < BM * TK; e += 128u) {
+                uint r = e / TK, c0 = e % TK;
+                half4 v = window_load4(pc, flags, window_row_base(pc, row + r), k + c0);
+                for (uint q = 0; q < 4u; q++) abuf[r * STRIDE + c0 + q] = v[q];
+            }
+            simdgroup_barrier(mem_flags::mem_threadgroup);
+            for (int i = 0; i < RM; i++)
+                for (int kk = 0; kk < 2; kk++)
+                    simdgroup_load(a[i][kk], abuf + (i * TM) * STRIDE + kk * 8, STRIDE);
+            for (int j = 0; j < RN; j++) load_b_tile(b[j], B, bo + k * ldb + col + j * TN, ldb, false);
+            for (int i = 0; i < RM; i++)
+                for (int j = 0; j < RN; j++) mma_tile(acc[i][j], a[i], b[j]);
+        }
+        simdgroup_barrier(mem_flags::mem_threadgroup);   /* the stage is reused below */
+    } else if (transposed) {
+        /* The transposed test stays outside the K loop, as in the GLSL, so the loads hoist. */
         for (uint k = 0; k < pc.k; k += TK) {
             for (int i = 0; i < RM; i++) load_a_tile(a[i], A, ao + (row + i * TM) * lda + k, lda);
             for (int j = 0; j < RN; j++) load_b_tile(b[j], B, bo + (col + j * TN) * ldb + k, ldb, true);
@@ -89,11 +120,22 @@ kernel void gemm_resident_t(constant Push &pc [[buffer(0)]],
 
     uint epilogue = (flags >> 8) & 0xFu;
     bool narrow = (flags & 0x1000u) != 0u;
-    if (epilogue == 0u && !narrow) {
+    /* A plain float32 result goes straight from the accumulators. The compact head, the
+     * residual and the QKV epilogue need each element's own address, so they take the
+     * stage below even without a publish. */
+    if (epilogue == 0u && !narrow && (flags & 0x130000u) == 0u) {
         for (int i = 0; i < RM; i++)
             for (int j = 0; j < RN; j++)
                 for (int jj = 0; jj < 2; jj++)
                     simdgroup_store(acc[i][j][jj], C + co + (row + i * TM) * ldc + col + j * TN + jj * 8, ldc);
+        if ((flags & 0x200000u) == 0u) return;
+        /* Bit 0x200000: a half copy too, into `d`, for a value the graph needs both ways. */
+        for (int i = 0; i < RM; i++)
+            for (int j = 0; j < RN; j++)
+                for (int jj = 0; jj < 2; jj++)
+                    simdgroup_store(acc[i][j][jj], stage + i * TM * BN + j * TN + jj * 8, BN);
+        simdgroup_barrier(mem_flags::mem_threadgroup);
+        store_half_copy(pc, stage, BM, BN, row, col, co, ldc, lid, 32u);
         return;
     }
     /* The publish runs on scalars, after an untouched store to threadgroup memory. The
@@ -102,29 +144,26 @@ kernel void gemm_resident_t(constant Push &pc [[buffer(0)]],
      * and a per-element loop over it cost 19 ms a pass against 0.7 for the plain store —
      * 27x, and 80 % of a frame (notes/phase74). Through threadgroup memory the same pass
      * is 0.9 ms, and a narrow output gets its four-halves-a-lane store on the way. */
-    threadgroup float stage[TM * RM * TN * RN];
     for (int i = 0; i < RM; i++)
         for (int j = 0; j < RN; j++)
             for (int jj = 0; jj < 2; jj++)
                 simdgroup_store(acc[i][j][jj], stage + i * TM * BN + j * TN + jj * 8, BN);
     simdgroup_barrier(mem_flags::mem_threadgroup);
 
-    device half *Ch = half_out(pc.c);
-    for (uint e = lid * 4u; e < BM * BN; e += 32u * 4u) {
-        float4 out4;
-        for (uint q = 0; q < 4u; ++q) out4[q] = publish(epilogue, stage[e + q]);
-        uint at = co + (row + e / BN) * ldc + col + e % BN;
-        if (!narrow) {
-            if ((at & 3u) == 0u && (pc.c & 15u) == 0u)
-                reinterpret_cast<device float4 *>(C)[at >> 2] = out4;
-            else
-                for (uint q = 0; q < 4u; ++q) C[at + q] = out4[q];
-        } else if ((at & 3u) == 0u && (pc.c & 7u) == 0u) {
-            reinterpret_cast<device half4 *>(Ch)[at >> 2] = half4(out4);
-        } else {
-            for (uint q = 0; q < 4u; ++q) Ch[at + q] = half(out4[q]);
-        }
+    if ((flags & 0x100000u) != 0u) {
+        /* Q and K normalised and V published here, straight into the three
+         * (window, head, token, 32) targets; a 32-wide block, so RN == 2 only. */
+        qkv_epilogue<false>(pc, stage, BM, BN, row, col, lid, 32u);
+        return;
     }
+    if ((flags & 0x10000u) != 0u) {
+        /* The 32->4 head: a legal 8x16 tile of which only four columns are written.
+         * The runtime keeps this to the base kernel, ldc = 4, plain float32. */
+        uint e = lid;
+        C[co + (row + e / 4u) * ldc + e % 4u] = stage[(e / 4u) * BN + e % 4u];
+        return;
+    }
+    store_staged(pc, flags, stage, BM, BN, row, col, co, ldc, lid, 32u);
 }
 
 template [[host_name("gemm_resident")]] kernel void gemm_resident_t<1, 1>(constant Push &, uint3, uint);
@@ -152,6 +191,7 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
     uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
     uint lda = pc.lda != 0u ? pc.lda : pc.k;
     bool transposed = (flags & 1u) != 0u;
+    bool window_a = (flags & 0x400000u) != 0u;
     uint ldb = pc.ldb != 0u ? pc.ldb : (transposed ? pc.k : pc.n);
     uint ldc = pc.ldc != 0u ? pc.ldc : pc.n;
     device const half *A = half_ptr(pc.a);
@@ -177,6 +217,16 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
     for (uint k0 = 0; k0 < pc.k; k0 += S_BK) {
         threadgroup_barrier(mem_flags::mem_threadgroup);
         for (uint r = lr; r < S_BM; r += (32u * S_WARPS) / 4u) {
+            if (window_a) {
+                /* Bit 0x400000: A gathered from the image in window order as it is
+                 * loaded — the shifted-window partition done here rather than in a pass
+                 * of its own; a token outside the image reads zero. */
+                int base = window_row_base(pc, row + r);
+                half4 lo = window_load4(pc, flags, base, k0 + lc), hi = window_load4(pc, flags, base, k0 + lc + 4u);
+                for (uint e = 0; e < 4u; e++) buf_a[r * S_SA + lc + e] = lo[e];
+                for (uint e = 0; e < 4u; e++) buf_a[r * S_SA + lc + 4u + e] = hi[e];
+                continue;
+            }
             uint at = ao + (row + r) * lda + k0 + lc;
             if (wide_a) {
                 half4 lo = a4[at >> 2], hi = a4[(at >> 2) + 1u];
@@ -226,7 +276,9 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
 
     uint epilogue = (flags >> 8) & 0xFu;
     bool narrow = (flags & 0x1000u) != 0u;
-    if (epilogue == 0u && !narrow) {
+    /* A fused residual or the QKV epilogue needs each element's own address, so it never
+     * takes the raw store; it goes through the stage like a publish. */
+    if (epilogue == 0u && !narrow && (flags & 0x120000u) == 0u) {
         for (uint i = 0; i < S_RM; i++)
             for (uint j = 0; j < S_RN; j++)
                 for (int jj = 0; jj < 2; jj++)
@@ -241,20 +293,11 @@ kernel void gemm_staged(constant Push &pc [[buffer(0)]],
             for (int jj = 0; jj < 2; jj++)
                 simdgroup_store(acc[i][j][jj], stage + (warp * S_WM + i * TM) * S_BN + j * TN + jj * 8, S_BN);
     threadgroup_barrier(mem_flags::mem_threadgroup);
-
-    device half *Ch = half_out(pc.c);
-    for (uint e = thread_id * 4u; e < S_BM * S_BN; e += 32u * S_WARPS * 4u) {
-        float4 out4;
-        for (uint q = 0; q < 4u; ++q) out4[q] = publish(epilogue, stage[e + q]);
-        uint at = co + (row + e / S_BN) * ldc + col + e % S_BN;
-        if (!narrow) {
-            for (uint q = 0; q < 4u; ++q) C[at + q] = out4[q];
-        } else if ((at & 3u) == 0u && (pc.c & 7u) == 0u) {
-            reinterpret_cast<device half4 *>(Ch)[at >> 2] = half4(out4);
-        } else {
-            for (uint q = 0; q < 4u; ++q) Ch[at + q] = half(out4[q]);
-        }
+    if ((flags & 0x100000u) != 0u) {
+        qkv_epilogue<true>(pc, stage, S_BM, S_BN, row, col, thread_id, 32u * S_WARPS);
+        return;
     }
+    store_staged(pc, flags, stage, S_BM, S_BN, row, col, co, ldc, thread_id, 32u * S_WARPS);
 }
 
 /* -- the descriptor-bound GEMMs: gemm_coopmat, gemm_batched, gemm_f16acc --------------- */

@@ -216,11 +216,6 @@ def draw(window, panel):
         put(window, row, column, f"{shown(knob, value):<10}",
             pick if selected else (0 if explicit else dim))
         note = knob.summary
-        if knob.name == "render_scale":
-            try:
-                note = f"~{nr_knobs.expected(float(value)):.0f} ms of graph time   " + note
-            except (TypeError, ValueError):
-                pass
         put(window, row, column + 12, note, dim)
 
     # Laid out from what there is, not from a fixed picture: the knob list and the two

@@ -70,7 +70,12 @@ void nr_frame_close(nr_frame *frame);
  * VkQueue) so no Vulkan header is needed here. The device needs Vulkan 1.3 with
  * storageBuffer16BitAccess, vulkanMemoryModel (+DeviceScope), shaderFloat16,
  * bufferDeviceAddress and scalarBlockLayout enabled, plus VK_KHR_portability_subset
- * where offered; `queue` must belong to a compute-capable family `queue_family`. If
+ * where offered; `queue` must belong to a compute-capable family `queue_family`.
+ * `cooperative_matrix` is a flags word: 1 (XMX_ADOPT_COOPMAT) when VK_KHR_cooperative_matrix
+ * is enabled, plus 2 (XMX_ADOPT_EXPLICIT_LAYOUT) when VK_KHR_workgroup_memory_explicit_layout
+ * is enabled with its scalar-block-layout and 16-bit-access features — the staged GEMM needs
+ * it, and without it those shapes run on the smaller kernels and the window partition stays
+ * a pass of its own. If
  * the host submits on the same queue it passes `lock`/`unlock` (bracketing every
  * submit here) and takes the same lock around its own submits, presents and idle
  * waits. `get_instance_proc_addr` is the host's vkGetInstanceProcAddr. 0 on success;

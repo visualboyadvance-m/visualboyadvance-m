@@ -1,0 +1,150 @@
+#version 450
+#extension GL_GOOGLE_include_directive : require
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference2 : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_shuffle : require
+
+#include "publish.glsl"
+
+// Q/K/V are already normalized/published, in (window, head, token, channel)
+// order. One subgroup computes eight query rows. Scores/probabilities stay local.
+layout(local_size_x = 32) in;
+layout(constant_id = 0) const bool MERGED_OUTPUT = false;
+const uint WINDOW_ATTENTION = 3u; // row-family profile kind: attention.comp owns 0-2
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf { float16_t v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 8) buffer Half4Buf { f16vec4 v[]; };
+layout(push_constant, scalar) uniform Push {
+    HalfBuf q, k; FloatBuf output_data; HalfBuf v;
+    uint m, heads, unused, batches;
+    uint sa, sb, sc, flags;
+    float p0, p1, p2, p3;
+    uint lda, ldb, ldc, spare;
+    FloatBuf bias;
+} pc;
+
+/* Exactly 2 KB of shared memory, and that is the point. Workgroup shared memory is
+ * allocated in powers of two here, and this pass is bound by how many workgroups fit on a
+ * core: at 3104 bytes it took 4 KB, and padded to 8 KB it ran 76 % slower. So the logits
+ * are staged 32 keys at a time — a row's 64 never have to be in shared memory at once,
+ * because each becomes its weight in place before the next half is stored — the weights
+ * are kept as halves, which they are exactly, and the row reciprocals travel by shuffle
+ * rather than through shared memory. Every value and every order of summation is the
+ * same as when all 64 logits were staged together. */
+shared float scores[8 * 32];              // one half of the keys' logits, 8 rows
+shared float16_t probabilities[8 * 64];   // weights, then normalised probabilities
+
+// Same coupled half-pair transform as attention.comp, with FP32 bias addition
+// before half rounding. The denominator is summed in FP32 in token order.
+vec2 weights(uint base, uint bias_base, uint i) {
+    vec2 affine;
+    for (uint j = 0u; j < 2u; j++) {
+        float logit = scores[base + i + j];
+        if (pc.flags != 0u) logit += pc.bias.v[bias_base + i + j];
+        precise float scaled = half_round(logit) * 0.044921875;
+        scaled += 1.30078125;
+        affine[j] = clamp(scaled, 1.03125, 1.5693359375);
+    }
+    return unpackHalf2x16((packHalf2x16(affine) << 5) + 0x7ff88000u);
+}
+
+void main() {
+    uint batch = gl_WorkGroupID.y + gl_WorkGroupID.z * 65535u;
+    if (batch >= pc.batches) return; // uniform across the whole workgroup
+    uint row = gl_WorkGroupID.x * 8u;
+    uint offset = batch * 64u * 32u;
+    uint local = gl_LocalInvocationID.x;
+    uint head_bias = (batch % pc.heads) * 4096u + row * 64u;
+    {
+        coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> acc[4];
+        for (uint j = 0u; j < 4u; j++)
+            acc[j] = coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+        for (uint c = 0u; c < 32u; c += 16u) {
+            coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> q;
+            coopMatLoad(q, pc.q.v, offset + row * 32u + c, 32u,
+                        gl_CooperativeMatrixLayoutRowMajor);
+            for (uint j = 0u; j < 4u; j++) {
+                coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> k;
+                coopMatLoad(k, pc.k.v, offset + j * 16u * 32u + c, 32u,
+                            gl_CooperativeMatrixLayoutColumnMajor);
+                acc[j] = coopMatMulAdd(q, k, acc[j]);
+            }
+        }
+        /* Keys 0-31, then 32-63, through the same 1 KB. Lanes 0-15 take one row of a pair
+         * and 16-31 the other, two adjacent keys each: the vendor's pairs never straddle
+         * the halves, since both start on an even key. */
+        for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
+            for (uint j = 0u; j < 2u; j++)
+                coopMatStore(acc[half_keys * 2u + j], scores, j * 16u, 32u,
+                             gl_CooperativeMatrixLayoutRowMajor);
+            subgroupMemoryBarrierShared();
+            subgroupBarrier();
+            for (uint at = local * 2u; at < 8u * 32u; at += 64u) {
+                uint r = at / 32u, key = half_keys * 32u + at % 32u;
+                vec2 w = weights(r * 32u, head_bias + r * 64u + half_keys * 32u, at % 32u);
+                probabilities[r * 64u + key] = float16_t(w.x);       // exact: a half value
+                probabilities[r * 64u + key + 1u] = float16_t(w.y);
+            }
+            subgroupMemoryBarrierShared();
+            subgroupBarrier();
+        }
+    }
+    float reciprocal = 0.0;
+    if (local < 8u) {
+        float total = 0.0;
+        for (uint i = 0u; i < 64u; i += 2u) {
+            total += float(probabilities[local * 64u + i]);
+            total += float(probabilities[local * 64u + i + 1u]);
+        }
+        reciprocal = half_round(1.0 / half_round(total));
+    }
+    /* the sums above read every weight of a row; the loop below overwrites them */
+    subgroupMemoryBarrierShared();
+    subgroupBarrier();
+    for (uint at = local; at < 8u * 64u; at += 32u) {
+        /* every lane of an iteration is on the same row, so this is a broadcast */
+        precise float product = float(probabilities[at]) * subgroupShuffle(reciprocal, at / 64u);
+        probabilities[at] = float16_t(e4m3(half_round(product)));
+    }
+    subgroupMemoryBarrierShared();
+    subgroupBarrier();
+    {
+        coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> acc[2];
+        for (uint j = 0u; j < 2u; j++)
+            acc[j] = coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+        for (uint c = 0u; c < 64u; c += 16u) {
+            coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> p;
+            coopMatLoad(p, probabilities, c, 64u, gl_CooperativeMatrixLayoutRowMajor);
+            for (uint j = 0u; j < 2u; j++) {
+                coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> v;
+                coopMatLoad(v, pc.v.v, offset + c * 32u + j * 16u, 32u,
+                            gl_CooperativeMatrixLayoutRowMajor);
+                acc[j] = coopMatMulAdd(p, v, acc[j]);
+            }
+        }
+        for (uint j = 0u; j < 2u; j++) {
+            if (MERGED_OUTPUT)
+                coopMatStore(acc[j], scores, j * 16u, 32u, gl_CooperativeMatrixLayoutRowMajor);
+            else
+                coopMatStore(acc[j], pc.output_data.v, offset + row * 32u + j * 16u, 32u,
+                             gl_CooperativeMatrixLayoutRowMajor);
+        }
+    }
+    if (MERGED_OUTPUT) {
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        for (uint at = local * 4u; at < 8u * 32u; at += 128u) {
+            uint target = ((batch / pc.heads) * 64u + row + at / 32u) * pc.heads * 32u
+                        + (batch % pc.heads) * 32u + at % 32u;
+            vec4 values;
+            for (uint j = 0u; j < 4u; j++) values[j] = e4m3(scores[at + j]);
+            Half4Buf(uint64_t(pc.output_data)).v[target / 4u] = f16vec4(values);
+        }
+    }
+}

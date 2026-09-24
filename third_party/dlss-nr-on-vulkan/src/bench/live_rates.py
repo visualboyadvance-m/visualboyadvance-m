@@ -80,8 +80,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("cases", nargs="*", help="WxH@scale; the published table if none")
-    parser.add_argument("--frames", type=int, default=5, help="timed frames per case")
-    parser.add_argument("--warmup", type=int, default=2,
+    # Nine and three, not five and two: on 2026-09-23 five frames after two put the 1080p
+    # case at 467 ms (451-518) and nine after three at 354 (327-358), run to run.
+    parser.add_argument("--frames", type=int, default=9, help="timed frames per case")
+    parser.add_argument("--warmup", type=int, default=3,
                         help="frames to discard while the extent's buffers are built")
     args = parser.parse_args()
 

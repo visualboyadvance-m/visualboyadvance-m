@@ -86,19 +86,30 @@ if [ "${1:-}" = "--proton" ] || [ "${1:-}" = "--check-proton" ]; then
     fi
     proton="${NR_PROTON:-}"
     if [ -z "$proton" ]; then
+        proton_count=0
         shopt -s nullglob
         for library in "${libraries[@]}"; do
             for candidate in "$library"/steamapps/common/Proton*/proton; do
-                [ -x "$candidate" ] && proton="$candidate"
+                if [ -x "$candidate" ]; then
+                    proton="$candidate"
+                    proton_count=$((proton_count + 1))
+                fi
             done
         done
         shopt -u nullglob
+        if [ "$proton_count" -gt 1 ]; then
+            printf 'Multiple Proton installs found; selected %s. Set NR_PROTON to choose explicitly.\n' "$proton" >&2
+        fi
     fi
     if [ ! -x "$proton" ]; then
         echo "no Proton runtime found in Steam libraries; set NR_PROTON to its proton executable" >&2
         exit 1
     fi
-    export STEAM_COMPAT_CLIENT_INSTALL_PATH="$steam" STEAM_COMPAT_DATA_PATH="$prefix"
+    # Direct Proton runs do not inherit the per-game environment Steam normally
+    # supplies. Steam API initialization, game-specific Proton fixes and PROTON_LOG
+    # all use these IDs; the prefix directory alone does not supply them.
+    export STEAM_COMPAT_CLIENT_INSTALL_PATH="$steam" STEAM_COMPAT_DATA_PATH="$prefix" \
+           SteamAppId="$appid" SteamGameId="$appid" STEAM_COMPAT_APP_ID="$appid"
     exe="${1:?usage: nr-photo --proton <appid> <exe> [args]}"; shift
     if [ ! -f "$exe" ]; then
         echo "game executable not found: $exe" >&2
@@ -111,6 +122,12 @@ if [ "${1:-}" = "--proton" ] || [ "${1:-}" = "--check-proton" ]; then
     if [ "$check_only" = 1 ]; then
         printf 'Prefix: %s\nProton: %s\nGame: %s\nSocket: %s\n' "$prefix" "$proton" "$exe" "$socket"
         exit 0
+    fi
+    printf 'Starting Steam app %s with %s\n' "$appid" "$proton" >&2
+    if [ "${PROTON_LOG:-0}" != 0 ]; then
+        export PROTON_LOG_DIR="${PROTON_LOG_DIR:-$root/work/proton-logs}"
+        mkdir -p "$PROTON_LOG_DIR"
+        printf 'Proton log: %s/steam-%s.log\n' "$PROTON_LOG_DIR" "$appid" >&2
     fi
     cd "$(dirname "$exe")"
     exec "$proton" run "./$(basename "$exe")" "$@"

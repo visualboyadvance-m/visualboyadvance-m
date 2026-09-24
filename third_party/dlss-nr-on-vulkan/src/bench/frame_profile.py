@@ -11,7 +11,11 @@ recorded pass, so a pass costs `ts[i] - ts[i-1]` on the device's own clock. The 
 already between passes makes that attribution exact. The frame measured is the frame
 that would have run.
 
-    python3 src/bench/frame_profile.py [--size H W] [--runs N]
+    python3 src/bench/frame_profile.py [--size H W] [--runs N] [--calls N]
+
+`--calls` also lists the N most expensive call sites — each pass labelled by the entry
+point that recorded it and its shape — because a total per kind cannot say which GEMM of
+the hundreds in a frame is the expensive one.
 """
 import argparse
 import pathlib
@@ -39,6 +43,15 @@ def _kinds(path, pattern):
 
 UNARY = _kinds("src/gpu/resident.comp", r"([A-Z][A-Z0-9_]*)\s*=\s*(\d+)u")
 ROW = _kinds("src/gpu/attention.comp", r"([A-Z][A-Z0-9_]*)\s*=\s*(\d+)u")
+# The fused window attention is a row-family pass too, and names its own kind. Two
+# shaders sharing one kind number is how it hid as "qkv prepare" for a while: both said
+# 2, and only one of them was read. So both are read, and a shared number is an error.
+_WINDOW = _kinds("src/gpu/window_attention.comp", r"(WINDOW_[A-Z0-9_]*)\s*=\s*(\d+)u")
+_CLASH = set(ROW) & set(_WINDOW)
+if _CLASH:
+    raise SystemExit(f"row profile kinds collide between attention.comp and "
+                     f"window_attention.comp: {sorted(_CLASH)}")
+ROW.update(_WINDOW)
 
 
 def label(family, sub):
@@ -46,15 +59,73 @@ def label(family, sub):
         return "unary: %s" % UNARY.get(sub, "kind %d" % sub)
     if family == "row":
         return "row: %s" % ROW.get(sub, "kind %d" % sub)
+    if family == "gemm" and sub == 31:
+        return "ffn fused"          # libxmx stamps the fused feed-forward as kind 31
     if family.startswith("gemm"):
         return "%s (flags %d)" % (family, sub)
     return family
+
+
+def _describe(name, args):
+    """One recorded pass, as the entry point and the arguments that shape it."""
+    if name == "xmx_rec_gemm":
+        m, n, k, batch, bt = args[3], args[4], args[5], args[6], args[10]
+        return "gemm %dx%dx%d%s flags %#x" % (m, n, k, " x%d" % batch if batch > 1 else "", bt)
+    if name == "xmx_rec_gemm_residual":
+        return "gemm+residual %dx%dx%d flags %#x" % args[5:9]
+    if name == "xmx_rec_gemm_window_residual":
+        return "gemm+window residual %dx%dx%d flags %#x" % args[5:9]
+    if name == "xmx_rec_gemm_qkv":
+        m, c = args[6], args[7]
+        return "gemm+qkv epilogue %dx%dx%d" % (m, 3 * c, c)
+    if name == "xmx_rec_gemm_qkv_window":
+        m, c = args[6], args[7]
+        return "gemm+qkv epilogue %dx%dx%d, window gather%s" % (
+            m, 3 * c, c, " (half image)" if args[14] else "")
+    if name == "xmx_rec_ffn":
+        return "ffn fused %dx%dx%d x%d flags %#x" % (args[6], args[7], args[8], args[9], args[10])
+    if name == "xmx_rec_gemm_dual":
+        return "gemm+half copy %dx%dx%d" % args[4:7]
+    if name == "xmx_rec_unary2":
+        return "unary %s n=%d C=%d, two outputs" % (
+            UNARY.get(args[0] & 0xFF, "kind %d" % (args[0] & 0xFF)), args[6], args[7])
+    if name == "xmx_rec_unary":
+        return "unary %s n=%d C=%d" % (UNARY.get(args[0] & 0xFF, "kind %d" % (args[0] & 0xFF)),
+                                       args[5], args[6])
+    if name == "xmx_rec_row":
+        return "row %s rows=%d" % (ROW.get(args[0] & 0xFF, "kind %d" % (args[0] & 0xFF)), args[5])
+    if name == "xmx_rec_window_attention":
+        return "window attention %d batches, %d heads%s" % (
+            args[5], args[6], ", merged" if len(args) > 7 and args[7] else "")
+    return name[len("xmx_rec_"):]
+
+
+def record_calls(lib):
+    """Label every pass as it is recorded. Each `xmx_rec_*` entry point stamps exactly one
+    pass, so the labels line up one for one with `xmxres.profile_each()`."""
+    log = []
+    for name in [n for n in dir(lib) if n.startswith("xmx_rec_")] + [
+            n for n in ("xmx_rec_gemm", "xmx_rec_gemm_residual", "xmx_rec_gemm_window_residual",
+                        "xmx_rec_gemm_qkv", "xmx_rec_unary", "xmx_rec_row", "xmx_rec_qkv",
+                        "xmx_rec_window_attention", "xmx_rec_copy", "xmx_rec_history")
+            if n not in dir(lib)]:
+        real = getattr(lib, name)
+
+        def call(*args, _real=real, _name=name):
+            status = _real(*args)
+            if status == 0:
+                log.append(_describe(_name, args))
+            return status
+        setattr(lib, name, call)
+    return log
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--size", nargs=2, type=int, default=(768, 1280))
     parser.add_argument("--runs", type=int, default=3)
+    parser.add_argument("--calls", type=int, default=0, metavar="N",
+                        help="also list the N most expensive call sites")
     args = parser.parse_args()
     height, width = args.size
 
@@ -67,6 +138,7 @@ def main():
                 * 0.3).astype(np.float32)
 
     frame.run(features, execution="single")          # record and warm
+    log = record_calls(runtime.lib) if args.calls else None
     xmxres.profile_reset()
     started = time.perf_counter()
     for _ in range(args.runs):
@@ -89,6 +161,19 @@ def main():
     gemm = sum(ms for ms, _, name in rows if name.startswith("gemm"))
     print("\n  GEMM %.1f ms of %.1f (%.0f%%); everything else %.1f ms (%.0f%%)"
           % (gemm, device, 100 * gemm / device, device - gemm, 100 * (device - gemm) / device))
+    if log is not None:
+        each = xmxres.profile_each()
+        if len(each) != len(log):
+            raise SystemExit("%d passes timed against %d recorded: the labels would not line "
+                             "up, so none are printed" % (len(each), len(log)))
+        sites = {}
+        for name, ms in zip(log, each):
+            total, count = sites.get(name, (0.0, 0))
+            sites[name] = (total + max(ms, 0.0), count + 1)
+        print("\n  %-58s %8s %6s %8s" % ("call site", "ms", "calls", "ms each"))
+        for name, (total, count) in sorted(sites.items(), key=lambda s: -s[1][0])[:args.calls]:
+            print("  %-58s %8.2f %6.0f %8.3f"
+                  % (name, total / args.runs, count / args.runs, total / count))
 
 
 if __name__ == "__main__":

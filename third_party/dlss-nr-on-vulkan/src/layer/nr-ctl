@@ -52,7 +52,6 @@ ALIAS = {"p": "profile", "i": "intensity", "d": "detail_strength",
 # the numpy either side of it — feature assembly and composition, both at the output
 # resolution — is the larger half, so the swapchain size matters as much as the scale.
 RATES = nr_knobs.RATES                # measured; see src/bench/live_rates.py
-expected = nr_knobs.expected          # graph time against render scale, measured
 
 
 def _opencv():
@@ -72,14 +71,11 @@ def status():
     print("  daemon    %s  (%s)" % ("listening" if alive() else "not answering", SOCKET))
     print("  effect    %s  (%s)" % ("ON" if TRIGGER.exists() else "off", TRIGGER))
     print("  settings  %s" % (SETTINGS if SETTINGS.exists() else "%s — not written yet" % SETTINGS))
-    print("  blur      %s" % ("OpenCV fast path" if _opencv()
-                              else "numpy fallback — the strength knobs cost 7x, not 2x"))
+    print("  blur      %s; only used when detail/colour strength differs from 1" %
+          ("OpenCV available in this interpreter" if _opencv() else "NumPy fallback in this interpreter"))
     for knob in KNOBS:
         shown = values.get(knob, "(daemon default)")
         note = ""
-        if knob == "render_scale" and isinstance(shown, (int, float)):
-            ms = expected(float(shown))
-            note = "   ~%.0f ms, ~%.1f fps of graph time" % (ms, 1000.0 / ms)
         if knob == "temporal" and isinstance(shown, (int, float)):
             note = "   off — every frame is drawn alone" if not float(shown) else \
                    "   the previous frame is carried forward, gated per pixel"
@@ -109,14 +105,18 @@ def report(lines=8):
               % log)
         return
     text = log.read_text(errors="replace").splitlines()
-    device = [l for l in text if l.startswith(("model ready", "buffers in"))]
+    # Logs append across restarts. Do not combine an old device/config with new frames.
+    starts = [i for i, line in enumerate(text) if line.startswith("model ready")]
+    if starts:
+        text = text[starts[-1]:]
+    device = [l for l in text if l.startswith(("model ready", "buffers in", "runtime options"))]
     frames = [l for l in text if FIELDS_EXTENT.match(l)]
     refused = [l for l in text if "rejected/failed" in l or "GPU lost" in l]
     print("  log       %s  (%d frames, %d refused)" % (log, len(frames), len(refused)))
-    for line in device[-2:]:
-        print("    %s" % line[:110])
+    for line in device:
+        print("    %s" % line)
     for line in frames[-lines:]:
-        print("    %s" % line[:110])
+        print("    %s" % line)
     if refused:
         print("  refused, most recent last:")
         for line in refused[-3:]:
@@ -147,23 +147,12 @@ def apply(knob, value):
     write(values)
     extra = ""
     if knob == "render_scale":
-        ms = expected(value)
-        extra = "   ~%.0f ms, ~%.1f fps of graph time" % (ms, 1000.0 / ms)
+        extra = "   use report for measured frame times and network extent"
     print("  %s = %s%s" % (knob, value, extra))
     if knob in ("detail_strength", "colour_strength") and value != 1.0:
-        # `compose_detail` returns early when both strengths are 1 and otherwise splits
-        # the change into bands with a radius-4 Gaussian. The vendored blur takes
-        # `cv2.sepFilter2D` when OpenCV is importable and an 18-pass numpy fallback when
-        # it is not, and the difference is large enough to be worth reporting honestly.
-        if _opencv():
-            print("     note: away from 1 this adds a full-frame blur — 15 -> 32 ms at")
-            print("     854x480, 2x the composition. OpenCV is installed, so this is")
-            print("     the fast path already.")
-        else:
-            print("     note: away from 1 this adds a full-frame blur — 15 -> 110 ms at")
-            print("     854x480, 7x the composition. Installing OpenCV takes that to")
-            print("     32 ms; the vendored blur has the fast path and only needs it")
-            print("     importable.")
+        print("     note: away from 1 this adds a full-frame blur; check the daemon's")
+        print("     measured frame times. OpenCV is %s in this interpreter."
+              % ("available" if _opencv() else "not available"))
 
 
 def explain(name):
@@ -208,7 +197,8 @@ def command(words):
     elif head in ("report", "bug"):
         report()
     elif head in ("rates", "fps"):
-        print("  measured end to end, whole round trip (%s):\n" % nr_knobs.RATES_MEASURED)
+        print("  Arc 140V reference, whole round trip (%s); not a prediction for this GPU:\n"
+              % nr_knobs.RATES_MEASURED)
         print("    %-14s %8s %9s %8s" % ("swapchain", "scale", "ms", "fps"))
         for width, height, scale, ms in RATES:
             print("    %-14s %8.2f %9.1f %8.2f"

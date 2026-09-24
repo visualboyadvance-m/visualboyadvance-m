@@ -696,6 +696,7 @@ private:
     bool                     compute_is_graphics_queue_ = false;
     bool                     dlssnr_share_ok_  = false;          // device has what libxmx needs
     bool                     dlssnr_coopmat_   = false;          // VK_KHR_cooperative_matrix enabled
+    bool                     dlssnr_explicit_layout_ = false;    // VK_KHR_workgroup_memory_explicit_layout enabled
     bool                     dlssnr_shared_    = false;          // we registered a share
  
     VkSwapchainKHR           swapchain_        = VK_NULL_HANDLE;

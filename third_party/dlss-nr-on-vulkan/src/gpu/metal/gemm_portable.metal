@@ -6,8 +6,13 @@
  * strides, batch, epilogues and store as the simdgroup kernels, so the runtime dispatches
  * both with the same geometry; `XMX_PORTABLE=1` is how they are selected on a device that
  * has the matrix path.
+ *
+ * The fused epilogues are all here too (nr_epilogue.h): the residual, the window layout,
+ * the QKV epilogue (16x32 build), the half copy, the compact head (8x16 build) and the
+ * window-gathered A (16x32 build), so the graph a device without simdgroup matrices
+ * records is the one the matrix path records.
  */
-#include "nr_metal.h"
+#include "nr_epilogue.h"
 
 constant uint TM = 8, TN = 16;
 
@@ -16,6 +21,7 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                             uint3 wg [[threadgroup_position_in_grid]],
                             uint lid [[thread_index_in_threadgroup]]) {
     const uint BM = TM * RM, BN = TN * RN;
+    threadgroup float stage[TM * RM * TN * RN];
     uint row = wg.y * BM, col = wg.x * BN;
     if (row >= pc.m || col >= pc.n) return;
     uint flags = operation_flags(pc);
@@ -34,7 +40,25 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
         for (int j = 0; j < RN; j++)
             acc[i][j] = float4(0.0f);
 
-    if ((flags & 1u) != 0u) {
+    if ((flags & 0x400000u) != 0u) {
+        /* A gathered from the image in window order (the 16x32 build; the runtime routes
+         * it here without the matrix path): zero outside the image, a float32 image
+         * rounded to half on the way in, as the partition's narrow store did. */
+        int base[RM];
+        for (int i = 0; i < RM; i++) base[i] = window_row_base(pc, row + r + i * TM);
+        for (uint k = 0; k < pc.k; k++) {
+            float4 bv[RN];
+            for (int j = 0; j < RN; j++) {
+                uint at = k * ldb + col + cq + j * TN;
+                bv[j] = float4(float(B[at]), float(B[at + 1u]), float(B[at + 2u]), float(B[at + 3u]));
+            }
+            for (int i = 0; i < RM; i++) {
+                float av = window_load(pc, flags, base[i], k);
+                for (int j = 0; j < RN; j++)
+                    acc[i][j] += av * bv[j];
+            }
+        }
+    } else if ((flags & 1u) != 0u) {
         /* B is stored (N, K): a lane's four columns are four rows of it. */
         for (uint k = 0; k < pc.k; k++) {
             float4 bv[RN];
@@ -67,13 +91,37 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
 
     uint epilogue = (flags >> 8) & 0xFu;
     bool narrow = (flags & 0x1000u) != 0u;
+
+    if (RN == 2 && (flags & 0x100000u) != 0u) {
+        /* The QKV projection's epilogue: the raw block row-major on the stage, as the
+         * matrix kernels stage it, then the same epilogue they finish through. */
+        for (int i = 0; i < RM; i++)
+            for (int j = 0; j < RN; j++)
+                for (uint e = 0; e < 4u; e++)
+                    stage[(i * TM + r) * BN + j * TN + cq + e] = acc[i][j][e];
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        qkv_epilogue<true>(pc, stage, BM, BN, row, col, lid, 32u);
+        return;
+    }
+    if (RM == 1 && RN == 1 && (flags & 0x10000u) != 0u) {
+        /* The 32->4 head: only the four useful columns, at a row stride of 4. */
+        if (cq == 0u)
+            for (uint e = 0; e < 4u; e++)
+                float_out(pc.c)[co + (row + r) * ldc + e] = acc[0][0][e];
+        return;
+    }
+
+    bool residual = (flags & 0x20000u) != 0u;
+    bool half_copy = (flags & 0x200000u) != 0u;
     for (int i = 0; i < RM; i++)
         for (int j = 0; j < RN; j++) {
             float4 v = acc[i][j];
-            if (epilogue != 0u)
-                for (int e = 0; e < 4; e++)
-                    v[e] = publish(epilogue, v[e]);
             uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+            if (residual && !residual_output_index(pc, flags, at)) continue;
+            for (int e = 0; e < 4; e++) {
+                if (residual) v[e] = add_gemm_residual(pc, flags, v[e], at + e);
+                if (epilogue != 0u) v[e] = publish(epilogue, v[e]);
+            }
             if (narrow) {
                 /* Four consecutive halves per lane, as one 64-bit store when aligned. */
                 if ((at & 3u) == 0u && (pc.c & 7u) == 0u)
@@ -87,6 +135,13 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                 else
                     for (int e = 0; e < 4; e++)
                         float_out(pc.c)[at + e] = v[e];
+            }
+            if (half_copy) {
+                if ((at & 3u) == 0u && (pc.d & 7u) == 0u)
+                    reinterpret_cast<device half4 *>(half_out(pc.d))[at >> 2] = half4(v);
+                else
+                    for (int e = 0; e < 4; e++)
+                        half_out(pc.d)[at + e] = half(v[e]);
             }
         }
 }

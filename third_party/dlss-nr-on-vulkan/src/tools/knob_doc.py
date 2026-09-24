@@ -39,10 +39,12 @@ def knobs():
 def rates():
     lines = [f"Measured through the socket on {nr_knobs.RATES_MEASURED} by "
              "`python3 src/bench/live_rates.py` — the whole round trip a game waits for, "
-             "median of five frames, not graph time alone:", "",
+             "median of nine frames, not graph time alone:", "",
              "| swapchain | render scale | ms | fps |", "| --- | ---: | ---: | ---: |"]
     for width, height, scale, ms in nr_knobs.RATES:
         lines.append(f"| {width}x{height} | {scale:.2f} | {ms:.0f} | {1000 / ms:.1f} |")
+    if nr_knobs.RATES_NOTE:
+        lines += ["", nr_knobs.RATES_NOTE]
     lines += ["",
               "That is the daemon's own cost with nothing else on the GPU. A game adds its "
               "own frame to it: **Tekken 7** measured **10.5 fps at 640x360** in a live "

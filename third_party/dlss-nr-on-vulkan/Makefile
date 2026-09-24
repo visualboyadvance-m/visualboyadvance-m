@@ -64,7 +64,10 @@ CFLAGS  := -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -I$(VK_INC)
 SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
            work/resident.spv work/attention.spv \
            work/history.spv work/gemm_coopmat.spv work/gemm_batched.spv \
-           work/gemm_f16acc.spv \
+           work/window_attention.spv work/window_attention_portable.spv \
+           work/attention_ab.spv \
+           work/ffn_fused.spv work/ffn_fused_portable.spv \
+           work/gemm_f16acc.spv work/gemm_coopmat_int8.spv \
            work/gemm_portable.spv work/gemm_portable_tiled.spv \
            work/gemm_portable_desc.spv work/gemm_portable_batched.spv
 
@@ -84,13 +87,13 @@ work/gemm_runner: src/gpu/gemm_runner.c | work
 	$(CC) $(CFLAGS) -o $@ $< $(XMX_LIBS)
 
 # The Metal runtime (Apple only; see PLATFORM_EXTRA). Each .metal compiles to AIR, the
-# five link into one metallib, bin2c writes it as a C array, and the array is compiled into
+# seven link into one metallib, bin2c writes it as a C array, and the array is compiled into
 # libmetalmx. The metallib file is kept beside it for XMX_METALLIB= experiments.
-METAL_SOURCES := resident history attention gemm_portable gemm_simd
+METAL_SOURCES := resident history attention gemm_portable gemm_simd window_attention ffn_fused
 METAL_AIR     := $(patsubst %,work/metal/%.air,$(METAL_SOURCES))
 work/metal:
 	mkdir -p $@
-work/metal/%.air: src/gpu/metal/%.metal src/gpu/metal/nr_metal.h | work/metal
+work/metal/%.air: src/gpu/metal/%.metal src/gpu/metal/nr_metal.h src/gpu/metal/nr_epilogue.h | work/metal
 	$(METAL) -c -o $@ $<
 work/nr_shaders.metallib: $(METAL_AIR) | work
 	$(METALLIB) -o $@ $(METAL_AIR)
@@ -181,20 +184,41 @@ work/test_settled: src/layer/test_settled.c src/layer/nr_layer.c
 work/test_exchange: src/layer/test_exchange.c src/layer/nr_layer.c
 	$(CC) $(CFLAGS) -o $@ $< $(VK_LIBS) -lpthread
 
-work/gemm_resident.spv: src/gpu/gemm_resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+GEMM_GLSL := src/gpu/publish.glsl src/gpu/specialize.glsl src/gpu/residual_epilogue.glsl \
+             src/gpu/cosine_tree.glsl src/gpu/qkv_epilogue.glsl
+work/gemm_resident.spv: src/gpu/gemm_resident.comp $(GEMM_GLSL)
 	$(GLSL) -o $@ $<
 # the same source, with a 16x32 block of the output held in one subgroup's registers
-work/gemm_tiled.spv: src/gpu/gemm_resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl Makefile
+work/gemm_tiled.spv: src/gpu/gemm_resident.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
-work/gemm_staged.spv: src/gpu/gemm_staged.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+work/gemm_staged.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL)
 	$(GLSL) -o $@ $<
 work/resident.spv: src/gpu/resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
 	$(GLSL) -o $@ $<
-work/attention.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+work/attention.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
+                    src/gpu/cosine_tree.glsl
 	$(GLSL) -o $@ $<
-work/attention_ab.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+work/attention_ab.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
+                       src/gpu/cosine_tree.glsl
 	$(GLSL) -DSOFTMAX_AB -o $@ $<
 work/history.spv: src/gpu/history.comp
+	$(GLSL) -o $@ $<
+# Configuration 4, the integer twin. Built always; used only where
+# notes/improve-int8-bottleneck.md measured the trade as worth taking.
+work/gemm_coopmat_int8.spv: src/gpu/gemm_coopmat_int8.comp
+	$(GLSL) -o $@ $<
+
+# A 32-channel block's feed-forward in one pass, the hidden layer kept on chip.
+work/ffn_fused.spv: src/gpu/ffn_fused.comp $(GEMM_GLSL)
+	$(GLSL) -o $@ $<
+work/ffn_fused_portable.spv: src/gpu/ffn_fused_portable.comp $(GEMM_GLSL)
+	$(GLSL) -o $@ $<
+
+# Window attention's QK^T, softmax and PV in one pass (ProjectsCodex's phase42), and its
+# twin for a device without matrix units.
+work/window_attention.spv: src/gpu/window_attention.comp src/gpu/publish.glsl
+	$(GLSL) -o $@ $<
+work/window_attention_portable.spv: src/gpu/window_attention_portable.comp src/gpu/publish.glsl
 	$(GLSL) -o $@ $<
 work/gemm_coopmat.spv: src/gpu/gemm_coopmat.comp
 	$(GLSL) -o $@ $<
@@ -203,9 +227,9 @@ work/gemm_batched.spv: src/gpu/gemm_coopmat_batched.comp
 work/gemm_f16acc.spv: src/gpu/gemm_coopmat_f16acc.comp
 	$(GLSL) -o $@ $<
 # the same GEMMs without the cooperative matrix, for a device that has none
-work/gemm_portable.spv: src/gpu/gemm_portable.comp src/gpu/publish.glsl src/gpu/specialize.glsl
+work/gemm_portable.spv: src/gpu/gemm_portable.comp $(GEMM_GLSL)
 	$(GLSL) -o $@ $<
-work/gemm_portable_tiled.spv: src/gpu/gemm_portable.comp src/gpu/publish.glsl src/gpu/specialize.glsl Makefile
+work/gemm_portable_tiled.spv: src/gpu/gemm_portable.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
 work/gemm_portable_desc.spv: src/gpu/gemm_portable_desc.comp
 	$(GLSL) -o $@ $<
@@ -220,6 +244,11 @@ bench: all work/half_probe.spv
 	$(PYTHON) src/bench/split_cost.py
 
 test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_present work/test_nr_frame $(PLATFORM_TESTS)
+	$(PYTHON) src/gpu/test_ffn_batch.py --gpu
+	$(PYTHON) src/gpu/test_gemm_contract.py
+	$(PYTHON) src/gpu/test_input_fp16.py
+	$(PYTHON) src/gpu/test_compact_head.py
+	$(PYTHON) src/gpu/test_joint_qkv.py
 	$(PYTHON) src/layer/test_daemon.py
 	work/test_settled
 	$(PYTHON) src/layer/test_ui_mask.py
@@ -245,6 +274,20 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	work/test_nr_frame --reference work/nr_frame_reference.bin
 	$(PYTHON) src/ref/test_nr_model.py
 	$(PYTHON) src/ref/test_temporal_controls.py
+	$(PYTHON) src/gpu/test_gemm_int8.py
+	$(PYTHON) src/gpu/test_int8_quant.py
+	$(PYTHON) src/gpu/test_gemm_residual.py
+	$(PYTHON) src/gpu/test_window_residual.py
+	$(PYTHON) src/gpu/test_window_attention.py
+	$(PYTHON) src/gpu/test_gemm_qkv.py
+	$(PYTHON) src/gpu/test_glue.py
+	$(PYTHON) src/gpu/test_ffn_fused.py
+
+# Focused checks for the FFN schedule, including a complete frame with both variants.
+# Repeat with XMX_STAGING=1 to cover device buffers without host mappings.
+test-ffn: all
+	$(PYTHON) src/gpu/test_ffn_batch.py --gpu
+	$(PYTHON) src/gpu/test_frame_execution.py
 
 test-proton: all work/libnr_layer32$(SO) work/test_layer_loader work/test_layer_loader32
 	$(PYTHON) src/layer/test_launcher.py
@@ -257,4 +300,4 @@ test-proton: all work/libnr_layer32$(SO) work/test_layer_loader work/test_layer_
 publish-check:
 	$(PYTHON) src/tools/publish_check.py --history
 
-.PHONY: all test test-metal test-proton bench publish-check
+.PHONY: all test test-metal test-ffn test-proton bench publish-check

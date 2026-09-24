@@ -32,6 +32,13 @@ struct Push {
     uint sa, sb, sc, flags;
     float p0, p1, p2, p3;
     uint lda, ldb, ldc, spare;
+    /* Appended with the fusions, as in libxmx.c: the residual's per-channel cosine (and
+     * the fifth operand of any pass that needs one: a second output, the attention bias,
+     * the V target), the window-layout geometry, and the QKV epilogue's query scale (the
+     * fused feed-forward's projection weights). 128 bytes in all. */
+    ulong residual_cos;
+    uint image_h, image_w, window_cols, window_pad;
+    ulong qkv_scale;
 };
 
 /* Function constant 0 fixes the operation flags at pipeline creation, as specialization

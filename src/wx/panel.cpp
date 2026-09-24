@@ -11499,6 +11499,7 @@ bool VKDrawingPanel::CreateLogicalDevice()
     // its own instance and nothing here changes.
     dlssnr_share_ok_ = false;
     dlssnr_coopmat_  = false;
+    dlssnr_explicit_layout_ = false;
     compute_family_  = UINT32_MAX;
     compute_queue_index_ = 0;
     compute_is_graphics_queue_ = false;
@@ -11507,6 +11508,12 @@ bool VKDrawingPanel::CreateLogicalDevice()
     VkPhysicalDeviceFeatures2        enable2{};
 #ifdef VK_KHR_cooperative_matrix
     VkPhysicalDeviceCooperativeMatrixFeaturesKHR enable_cm{};
+#endif
+#ifdef VK_KHR_workgroup_memory_explicit_layout
+    // The model's staged GEMM aliases its operand tiles and output stage in one
+    // shared-memory block, which needs this extension; without it libxmx runs
+    // those shapes on its smaller kernels.
+    VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR enable_wm{};
 #endif
     if (instance_api_version_ >= VK_API_VERSION_1_3 && vkGetPhysicalDeviceFeatures2) {
         VkPhysicalDeviceProperties props;
@@ -11522,6 +11529,12 @@ bool VKDrawingPanel::CreateLogicalDevice()
                 if (strcmp(e.extensionName, VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME) == 0)
                     has_coopmat = true;
 #endif
+            bool has_wm = false;
+#ifdef VK_KHR_workgroup_memory_explicit_layout
+            for (auto& e : exts)
+                if (strcmp(e.extensionName, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME) == 0)
+                    has_wm = true;
+#endif
             VkPhysicalDeviceVulkan12Features have12{};
             have12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
             VkPhysicalDeviceVulkan11Features have11{};
@@ -11532,6 +11545,12 @@ bool VKDrawingPanel::CreateLogicalDevice()
             have_cm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR;
             if (has_coopmat)
                 have12.pNext = &have_cm;
+#ifdef VK_KHR_workgroup_memory_explicit_layout
+            VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR have_wm{};
+            have_wm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR;
+            if (has_coopmat && has_wm)
+                have_cm.pNext = &have_wm;
+#endif
 #endif
             VkPhysicalDeviceFeatures2 have2{};
             have2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -11556,6 +11575,19 @@ bool VKDrawingPanel::CreateLogicalDevice()
                     enable12.pNext = &enable_cm;
                     dev_exts.push_back(VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME);
                     dlssnr_coopmat_ = true;
+#ifdef VK_KHR_workgroup_memory_explicit_layout
+                    if (has_wm && have_wm.workgroupMemoryExplicitLayout &&
+                        have_wm.workgroupMemoryExplicitLayoutScalarBlockLayout &&
+                        have_wm.workgroupMemoryExplicitLayout16BitAccess) {
+                        enable_wm.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR;
+                        enable_wm.workgroupMemoryExplicitLayout = VK_TRUE;
+                        enable_wm.workgroupMemoryExplicitLayoutScalarBlockLayout = VK_TRUE;
+                        enable_wm.workgroupMemoryExplicitLayout16BitAccess = VK_TRUE;
+                        enable_cm.pNext = &enable_wm;
+                        dev_exts.push_back(VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME);
+                        dlssnr_explicit_layout_ = true;
+                    }
+#endif
                 }
 #endif
                 enable2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -11645,6 +11677,7 @@ void VKDrawingPanel::ShareVulkanWithDlssNr()
     share.queue                  = compute_queue_;
     share.queue_family           = compute_family_;
     share.cooperative_matrix     = dlssnr_coopmat_;
+    share.workgroup_memory_explicit_layout = dlssnr_explicit_layout_;
     // The linked symbol on macOS, the loader's pointer elsewhere; `+` yields a
     // plain function pointer in both cases.
     share.get_instance_proc_addr = reinterpret_cast<void*>(+vkGetInstanceProcAddr);

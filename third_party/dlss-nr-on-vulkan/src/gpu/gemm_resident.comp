@@ -49,10 +49,14 @@ layout(push_constant, scalar) uniform Push {
     uint m, n, k, batch;
     uint sa, sb, sc, flags;
     float p0, p1, p2, p3;
-    uint lda, ldb, ldc, spare;      // row strides; 0 means the dense default
+    uint lda, ldb, ldc, spare;
+    uint64_t residual_cos;                     // per-channel cosine of the skip
+    uint image_h, image_w, window_cols, window_pad;   // window residual geometry
+    uint64_t qkv_scale;                        // the QKV epilogue's query scale
 } pc;
 
 #include "specialize.glsl"
+#include "residual_epilogue.glsl"   /* needs operation_flags() from above */
 
 const uint TM = 8, TN = 16, TK = 16;
 
@@ -88,6 +92,15 @@ const uint BM = TM * RM, BN = TN * RN;
  * shared memory lets each lane write four consecutive halves as one 64-bit store. That
  * is worth about 20 ms of a 720p frame. */
 shared ACC stage[BM * BN];
+
+/* The QKV projection's epilogue needs a column block of exactly one head, 32 wide, so it
+ * exists in the register-tiled build only; libxmx never routes it anywhere else. */
+#if RN == 2
+void qkv_barrier() { subgroupMemoryBarrierShared(); subgroupBarrier(); }
+#define QKV_STAGE ACC
+#include "cosine_tree.glsl"
+#include "qkv_epilogue.glsl"
+#endif
 
 
 
@@ -141,17 +154,88 @@ void main() {
 
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow = (operation_flags() & 0x1000u) != 0u;
+    // The 32->4 head still computes a legal 8x16 cooperative-matrix tile, but
+    // only writes its four useful columns. Runtime restricts this to the base
+    // kernel, FP32 output, N=16 and ldc=4.
+    bool compact_head = (operation_flags() & 0x10000u) != 0u;
+    /* A fused residual (`branch + skip * cosine`, notes/improve-fusions.md) cannot use
+     * the publish-on-the-accumulator path below: the residual has to land *before* the
+     * publish, as the two-pass path adds it before rounding, and it needs each element's
+     * own address in the skip buffer and the cosine vector. So the raw accumulator goes
+     * through shared memory and every element is finished on its own. Bits 0x20000
+     * (residual), 0x40000 (half skip) and 0x80000 (window layout) are clear of
+     * compact_head's 0x10000. */
+#if RN == 2
+    /* Bit 0x100000: Q and K normalised and V published here, straight into the three
+     * (window, head, token, 32) targets (qkv_epilogue.glsl). */
+    if ((operation_flags() & 0x100000u) != 0u) {
+        for (uint i = 0; i < RM; i++)
+            for (uint j = 0; j < RN; j++)
+                coopMatStore(acc[i][j], stage, i * TM * BN + j * TN, BN,
+                             gl_CooperativeMatrixLayoutRowMajor);
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        qkv_epilogue(row, col, gl_LocalInvocationID.x, 32u);
+        return;
+    }
+#endif
+    if ((operation_flags() & 0x20000u) != 0u) {
+        for (uint i = 0; i < RM; i++)
+            for (uint j = 0; j < RN; j++)
+                coopMatStore(acc[i][j], stage, i * TM * BN + j * TN, BN,
+                             gl_CooperativeMatrixLayoutRowMajor);
+        /* One subgroup per workgroup, so a subgroup barrier is the whole barrier. */
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        for (uint e = gl_LocalInvocationID.x * 4u; e < BM * BN; e += 32u * 4u) {
+            uint at = co + (row + e / BN) * ldc + col + e % BN;
+            if (!residual_output_index(at)) continue;
+            vec4 out4;
+            for (uint i = 0; i < 4u; ++i)
+                out4[i] = publish(epilogue, add_gemm_residual(float(stage[e + i]), at + i));
+            if (!narrow) {
+                for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
+            } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {
+                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+            } else {
+                for (uint i = 0; i < 4u; ++i)
+                    HalfBuf(uint64_t(pc.c)).v[at + i] = float16_t(out4[i]);
+            }
+        }
+        return;
+    }
     /* A float16 accumulator cannot take the direct store, and this is the one thing
      * that genuinely does not work: `pc.c` is a `float[]`, so storing a float16 matrix
      * into it is the component-type mismatch itself
      * (notes/phase38-there-was-no-bug.md). The path below converts to a float32 matrix
      * first and stores that — no shared memory involved. */
 #ifndef ACC16
-    if (epilogue == 0u && !narrow) {
+    if (epilogue == 0u && !narrow && !compact_head) {
         for (uint i = 0; i < RM; i++)
             for (uint j = 0; j < RN; j++)
                 coopMatStore(acc[i][j], pc.c.v, co + (row + i * TM) * ldc + col + j * TN,
                              ldc, gl_CooperativeMatrixLayoutRowMajor);
+        /* Bit 0x200000: a half copy too, into `d`, written the way the narrow path below
+         * writes one. For a result the graph needs twice — as a float32 residual and as a
+         * half GEMM operand — so that no to_half pass reads the float32 back. */
+        if ((operation_flags() & 0x200000u) == 0u) return;
+        for (uint i = 0; i < RM; i++)
+            for (uint j = 0; j < RN; j++)
+                coopMatStore(acc[i][j], stage, i * TM * BN + j * TN, BN,
+                             gl_CooperativeMatrixLayoutRowMajor);
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        for (uint e = gl_LocalInvocationID.x * 4u; e < BM * BN; e += 32u * 4u) {
+            uint at = co + (row + e / BN) * ldc + col + e % BN;
+            if ((at & 3u) == 0u && (uint(uint64_t(pc.d)) & 7u) == 0u) {
+                Half4Buf(uint64_t(pc.d)).v4[at >> 2] =
+                    f16vec4(float(stage[e]), float(stage[e + 1]),
+                            float(stage[e + 2]), float(stage[e + 3]));
+            } else {
+                for (uint i = 0; i < 4u; ++i)
+                    HalfBuf(uint64_t(pc.d)).v[at + i] = float16_t(stage[e + i]);
+            }
+        }
         return;
     }
 #endif
@@ -166,7 +250,7 @@ void main() {
         for (uint j = 0; j < RN; j++) {
             for (uint e = 0; e < acc[i][j].length(); e++)
                 acc[i][j][e] = ACC(publish(epilogue, float(acc[i][j][e])));
-            if (narrow) {
+            if (narrow || compact_head) {
                 coopMatStore(acc[i][j], stage, i * TM * BN + j * TN, BN,
                              gl_CooperativeMatrixLayoutRowMajor);
                 continue;
@@ -180,10 +264,15 @@ void main() {
             coopMatStore(acc[i][j], pc.c.v, at, ldc, gl_CooperativeMatrixLayoutRowMajor);
 #endif
         }
-    if (!narrow) return;
+    if (!narrow && !compact_head) return;
 
-    subgroupMemoryBarrierShared();
-    subgroupBarrier();
+    memoryBarrierShared();
+    barrier();
+    if (compact_head) {
+        uint e = gl_LocalInvocationID.x;
+        pc.c.v[co + (row + e / 4u) * ldc + e % 4u] = float(stage[(e / 4u) * BN + e % 4u]);
+        return;
+    }
     /* Four consecutive elements per lane, so the stores coalesce. */
     for (uint e = gl_LocalInvocationID.x * 4u; e < BM * BN; e += 32u * 4u) {
         uint at = co + (row + e / BN) * ldc + col + e % BN;

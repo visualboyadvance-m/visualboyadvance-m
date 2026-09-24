@@ -36,7 +36,7 @@ TM, TN, TK = 8, 16, 16
 
 (E4M3, GATE, HALF, TO_HALF, SCALE, RESIDUAL, FROM_HALF, PARTITION, REVERSE, ADD_BIAS,
  SPLIT_HEADS, MERGE_HEADS, POOL2, UPSAMPLE2, SCALE_CHANNEL, ADD, PAD_END,
- GATE_E4M3_HALF, E4M3_HALF, GATE_HALF) = range(20)
+ GATE_E4M3_HALF, E4M3_HALF, GATE_HALF, UPSAMPLE_MERGE) = range(21)
 COSINE_PUBLISH, SOFTMAX = 0, 1
 
 # GEMM epilogues, applied to the accumulator on its way out of the kernel
@@ -106,10 +106,22 @@ def _load():
             ("xmx_rec_copy", [ctypes.c_int] * 2 + [ctypes.c_ulonglong] * 3),
             ("xmx_submit", []),
             ("xmx_rec_gemm", [ctypes.c_int] * 3 + [ctypes.c_uint] * 14),
+            ("xmx_rec_gemm_residual", [ctypes.c_int] * 5 + [ctypes.c_uint] * 4),
+            ("xmx_rec_gemm_window_residual", [ctypes.c_int] * 5 + [ctypes.c_uint] * 8),
+            ("xmx_window_init", [ctypes.c_char_p, ctypes.c_uint]),
+            ("xmx_rec_gemm_qkv", [ctypes.c_int] * 6 + [ctypes.c_uint] * 4),
+            ("xmx_rec_gemm_qkv_window", [ctypes.c_int] * 6 + [ctypes.c_uint] * 9),
+            ("xmx_rec_gemm_dual", [ctypes.c_int] * 4 + [ctypes.c_uint] * 3),
+            ("xmx_ffn_init", [ctypes.c_char_p]),
+            ("xmx_rec_ffn", [ctypes.c_int] * 6 + [ctypes.c_uint] * 5),
+            ("xmx_rec_unary2", [ctypes.c_uint] + [ctypes.c_int] * 5
+             + [ctypes.c_uint, ctypes.c_uint, ctypes.c_float] + [ctypes.c_uint] * 5),
+            ("xmx_rec_window_attention", [ctypes.c_int] * 5 + [ctypes.c_uint] * 3),
             ("xmx_rec_unary", [ctypes.c_uint] + [ctypes.c_int] * 4
              + [ctypes.c_uint, ctypes.c_uint, ctypes.c_float] + [ctypes.c_uint] * 5),
             ("xmx_rec_row", [ctypes.c_uint] + [ctypes.c_int] * 4 + [ctypes.c_uint] * 5
              + [ctypes.c_float]),
+            ("xmx_rec_qkv", [ctypes.c_int] * 5 + [ctypes.c_uint] * 3),
             ("xmx_profile", [ctypes.c_int]),
             ("xmx_rec_history", [ctypes.c_int] * 3 + [ctypes.c_uint] * 5),
             ("xmx_device_lost", [])):
@@ -127,6 +139,10 @@ def _load():
     lib.xmx_profile_ms.restype = ctypes.c_double
     lib.xmx_profile_count.argtypes = [ctypes.c_uint]
     lib.xmx_profile_count.restype = ctypes.c_uint
+    lib.xmx_profile_each_count.argtypes = []
+    lib.xmx_profile_each_count.restype = ctypes.c_uint
+    lib.xmx_profile_each_ms.argtypes = [ctypes.c_uint]
+    lib.xmx_profile_each_ms.restype = ctypes.c_double
     # The shader paths take an environment override so a variant can be measured
     # against the shipped one without editing the tree. The GEMM kernels follow the
     # device: without VK_KHR_cooperative_matrix (or with XMX_PORTABLE=1) the portable
@@ -147,6 +163,16 @@ def _load():
         raise failure(lib, "xmx_res_init")
     _lib = lib
     return lib
+
+
+def fused_shader(lib, name):
+    """The fused passes' kernel: `name`, or its `_portable` twin on a device without matrix
+    units (or under XMX_PORTABLE=1), which sums in the portable GEMM's order and so stays
+    bit-identical to the passes it replaces on that path. Embedded when the runtime carries
+    it, else the file this build wrote — `nr_build.shader_arg`, as every other shader."""
+    if lib.xmx_portable():
+        name += "_portable"
+    return nr_build.shader_arg(lib, name)
 
 
 def align(value, multiple):
@@ -302,13 +328,16 @@ class ScratchArena:
     # runs between blocks and reuses those same allocations. Keep FFN residuals
     # separate: they stay live until the closing attention residual.
     ALIASES = {
-        **dict.fromkeys(("hidden16", "proj", "attended", "attention",
+        # key16 is K when the projection's own epilogue writes it: k16's role is the
+        # projection's input, which other workgroups are still reading at that moment
+        **dict.fromkeys(("hidden16", "proj", "key16", "attended", "attention",
                          "transition.padded", "transition.projected"), "projection"),
         **dict.fromkeys(("branch", "v16"), "branch_value"),
         **dict.fromkeys(("value16", "win16", "ffn16", "k16",
                          "transition.pooled16", "transition.projected16"), "input_key"),
         **dict.fromkeys(("heads16", "core16", "q16", "probs16", "merged16"), "query_probability"),
-        **dict.fromkeys(("scores", "context", "transition.upsampled"), "scores_context"),
+        **dict.fromkeys(("scores", "context", "context16", "transition.upsampled"),
+                        "scores_context"),
         **dict.fromkeys(("ffn", "transition.scaled"), "residual"),
     }
 
@@ -410,6 +439,13 @@ def profile_reset():
     _load().xmx_profile_reset()
 
 
+def profile_each():
+    """Every pass's milliseconds since the last reset, in recording order; -1 where the
+    device counter wrapped. What `profile_totals` sums away."""
+    lib = _load()
+    return [lib.xmx_profile_each_ms(i) for i in range(lib.xmx_profile_each_count())]
+
+
 def profile_totals():
     """Milliseconds and pass count per kind, as {(family, subkind): (ms, passes)}.
 
@@ -435,9 +471,52 @@ class Runtime:
         self.lib = _load()
         self.recorded = 0
         self.fuse_qk = os.environ.get("NR_FUSE_QK", "1") != "0"
+        self.batch_ffn = os.environ.get("NR_BATCH_FFN", "1") != "0"
+        self.input_fp16 = os.environ.get("NR_INPUT_FP16", "0") != "0"
+        self.compact_head = os.environ.get("NR_COMPACT_HEAD", "0") != "0"
+        self.joint_qkv = os.environ.get("NR_JOINT_QKV", "0") != "0"
+        # ProjectsCodex's fusions (notes/improve-fusions.md). On by default where they
+        # were measured exact; each keeps its two-pass path behind a switch.
+        self.fuse_residual = os.environ.get("NR_FUSE_RESIDUAL", "1") != "0"
+        self.fuse_window_residual = os.environ.get("NR_FUSE_WINDOW_RESIDUAL", "1") != "0"
+        self.fuse_window_attention = os.environ.get("NR_FUSE_WINDOW_ATTENTION", "1") != "0"
+        # The head merge folded into the fused attention's store: Codex's
+        # NR_FUSE_ATTENTION_MERGE, which it left off and unmeasured. Measured here,
+        # bit-identical and 3.6-4.4 % of the frame at 720p.
+        self.fuse_attention_merge = os.environ.get("NR_FUSE_ATTENTION_MERGE", "1") != "0"
+        # Q/K normalised and V published in the QKV projection's own epilogue, so the
+        # float32 projection never goes to memory (qkv_epilogue.glsl).
+        self.qkv_epilogue = os.environ.get("NR_QKV_EPILOGUE", "1") != "0"
+        # The full-resolution glue around blocks 0 and 70 in fewer passes: the stem's
+        # GEMM also stores the half copy block 0's feed-forward reads, and block 70's
+        # input is upsampled, scaled and merged in one pass that stores both widths.
+        self.fuse_glue = os.environ.get("NR_FUSE_GLUE", "1") != "0"
+        # A 32-channel block's feed-forward in one pass, the hidden layer on chip.
+        self.fuse_ffn = os.environ.get("NR_FUSE_FFN", "1") != "0"
+        # The branched blocks' per-group expand and projection, the same way.
+        self.fuse_branched_ffn = os.environ.get("NR_FUSE_BRANCHED_FFN", "0") != "0"
+        # The window partition folded into the QKV projection's own loads.
+        # Off where the runtime cannot gather (a lent matrix device without the staged
+        # kernel's extension): the partition is then its own pass, as it always was.
+        self.fuse_partition = (os.environ.get("NR_FUSE_PARTITION", "1") != "0"
+                               and self.lib.xmx_window_gather() == 1)
 
     def graph_key(self):
-        return self.lib.xmx_specialization() | (int(self.fuse_qk) << 3)
+        return (self.lib.xmx_specialization() | (int(self.fuse_qk) << 3)
+                | (int(self.batch_ffn) << 4) | (int(self.input_fp16) << 5)
+                | (int(self.compact_head) << 6) | (int(self.joint_qkv) << 7)
+                # Bits 8 and up. ProjectsCodex keys these at 5-7, which here are
+                # input_fp16, compact_head and joint_qkv: carried over as they were, a
+                # graph captured with one setting would replay for the other, and the
+                # picture would be wrong without an error anywhere.
+                | (int(self.fuse_residual) << 8) | (int(self.fuse_window_residual) << 9)
+                | (int(self.fuse_window_attention) << 10)
+                | (int(self.fuse_attention_merge) << 11)
+                | (int(self.qkv_epilogue) << 12)
+                | (int(self.fuse_glue) << 13)
+                | (int(self.fuse_ffn) << 14)
+                | (int(self.fuse_branched_ffn) << 15)
+                | (int(self.fuse_partition) << 16))
 
     @property
     def buffer_bytes(self):
@@ -487,6 +566,22 @@ class Runtime:
         self.recorded = 0
         return self
 
+    def prepare_qkv(self, source, q, k, v, scale, windows, tokens, heads):
+        if min(windows, tokens, heads) <= 0:
+            raise ValueError('QKV extents must be positive')
+        if (len({q.id, k.id, v.id}) != 3 or source.id in (q.id, k.id, v.id)
+                or scale.id in (q.id, k.id, v.id)):
+            raise ValueError('QKV outputs must be separate from each other and the input')
+        rows = windows * tokens * heads
+        if source.nbytes < rows * 3 * 32 * 4 or scale.nbytes < heads * 4:
+            raise ValueError('QKV input or scale buffer is too small')
+        if any(buf.nbytes < rows * 32 * 2 for buf in (q, k, v)):
+            raise ValueError('QKV output buffer is too small')
+        if self.lib.xmx_rec_qkv(source.id, q.id, k.id, v.id, scale.id, rows, tokens, heads):
+            raise failure(self.lib, 'xmx_rec_qkv')
+        self.recorded += 1
+        return self
+
     def independent(self):
         """A `with` block whose dispatches are known not to depend on one another.
 
@@ -525,14 +620,223 @@ class Runtime:
             raise RuntimeError("xmx_specialize: " + self.lib.xmx_error().decode())
         return self
 
+    def gemm_residual(self, a, b, skip, cosine, target, rows, cols, inner, *,
+                      epilogue=0, narrow=False, skip_half=False, reverse=None):
+        """A @ B + skip * cosine, the residual folded into the GEMM's epilogue.
+
+        The two-pass path writes the float32 branch out and reads it back in a residual
+        pass of its own; this adds `skip * cosine` before the publish instead, so the
+        branch never touches memory and the result is bit-identical
+        (`src/gpu/test_gemm_residual.py`). With `reverse=(height, width, 8, origin)` the
+        rows are a window block's, padded and in window order, and the output lands
+        straight back in the unpadded image. Ported from ProjectsCodex's phases 38-39.
+        """
+        for extent, multiple, name in ((rows, TM, "rows"), (cols, TN, "cols"), (inner, TK, "inner")):
+            if extent <= 0 or extent % multiple:
+                raise ValueError(f"{name}={extent} must be a positive multiple of {multiple}")
+        output_rows = rows
+        window = ()
+        if reverse is not None:
+            height, width, size, origin = reverse
+            if height <= 0 or width <= 0 or size != 8 or any(not -65535 <= v <= 0 for v in origin):
+                raise ValueError("window residual needs positive extents, 8x8 windows "
+                                 "and nonpositive origins")
+            ph, pw, (top, left) = self.window_extent(height, width, origin, size)
+            if rows != ph * pw:
+                raise ValueError("window residual rows must match the padded image")
+            output_rows = height * width
+            window = (height, width, pw // size, (top << 16) | left)
+        if target.id in (a.id, b.id) or target.id == cosine.id:
+            raise ValueError("GEMM residual output must not alias matrix inputs or cosine")
+        if target.id == skip.id and narrow != skip_half:
+            raise ValueError("in-place residual requires matching skip and output widths")
+        for buf, size in ((a, rows * inner * 2), (b, inner * cols * 2),
+                          (skip, output_rows * cols * (2 if skip_half else 4)), (cosine, cols * 4),
+                          (target, output_rows * cols * (2 if narrow else 4))):
+            if buf.nbytes < size:
+                raise ValueError("GEMM residual buffer is too small")
+        flags = _publish(epilogue, narrow) | (0x40000 if skip_half else 0)
+        record = (self.lib.xmx_rec_gemm_window_residual if window
+                  else self.lib.xmx_rec_gemm_residual)
+        if record(a.id, b.id, target.id, skip.id, cosine.id,
+                  rows, cols, inner, flags, *window) != 0:
+            raise RuntimeError("xmx_rec_gemm_residual: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def gemm_qkv(self, a, weight, q, k, v, scale, rows, channels, heads, tokens, *,
+                 window=None, image_half=False):
+        """The QKV projection, finished in its own epilogue: Q and K cosine-normalised
+        (Q times its head's scale), V published, all three as E4M3 halves in
+        (window, head, token, 32) order — what the projection into float32 followed by
+        two `cosine_publish` and one `split_heads` would write, bit for bit
+        (`src/gpu/test_gemm_qkv.py`). `rows` is windows * tokens.
+
+        With `window=(height, width, origin)`, `a` is the image itself (float32, or half
+        with `image_half`) and the shifted-window partition happens in the projection's
+        own loads: what `partition` into a half buffer then this would write, bit for bit.
+        """
+        if (min(rows, heads, tokens) <= 0 or channels != heads * 32 or rows % tokens
+                or rows % TM or channels % TK):
+            raise ValueError("QKV projection needs 32 channels per head, whole windows "
+                             "and tile-aligned extents")
+        if len({q.id, k.id, v.id}) != 3 or {q.id, k.id, v.id} & {a.id, weight.id, scale.id}:
+            raise ValueError("QKV targets must be distinct from each other and the inputs")
+        if window is not None:
+            height, width, origin = window
+            ph, pw, (top, left) = self.window_extent(height, width, origin, 8)
+            if tokens != 64 or rows != ph * pw or rows % 64 or channels % 32:
+                raise ValueError("a window-gathered QKV projection takes whole 8x8 windows")
+            if a.nbytes < height * width * channels * (2 if image_half else 4):
+                raise ValueError("QKV projection image is too small")
+            for buf in (q, k, v):
+                if buf.nbytes < rows * channels * 2:
+                    raise ValueError("QKV projection buffer is too small")
+            if self.lib.xmx_rec_gemm_qkv_window(a.id, weight.id, q.id, k.id, v.id, scale.id,
+                                                rows, channels, heads, tokens, width, height,
+                                                pw // 8, (top << 16) | left,
+                                                int(image_half)) != 0:
+                raise RuntimeError("xmx_rec_gemm_qkv_window: " + self.lib.xmx_error().decode())
+            self.recorded += 1
+            return self
+        for buf, size in ((a, rows * channels * 2), (weight, channels * 3 * channels * 2),
+                          (q, rows * channels * 2), (k, rows * channels * 2),
+                          (v, rows * channels * 2), (scale, heads * 4)):
+            if buf.nbytes < size:
+                raise ValueError("QKV projection buffer is too small")
+        if self.lib.xmx_rec_gemm_qkv(a.id, weight.id, q.id, k.id, v.id, scale.id,
+                                     rows, channels, heads, tokens) != 0:
+            raise RuntimeError("xmx_rec_gemm_qkv: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def gemm_dual(self, a, b, c, half_copy, rows, cols, inner):
+        """C = A @ B in float32, and the same values as half into `half_copy`: what a
+        GEMM then a `to_half` of its output would write, in one pass."""
+        for extent, multiple, name in ((rows, TM, "rows"), (cols, TN, "cols"), (inner, TK, "inner")):
+            if extent <= 0 or extent % multiple:
+                raise ValueError(f"{name}={extent} must be a positive multiple of {multiple}")
+        if len({a.id, b.id, c.id, half_copy.id}) != 4:
+            raise ValueError("GEMM outputs must not alias each other or the inputs")
+        for buf, size in ((a, rows * inner * 2), (b, inner * cols * 2), (c, rows * cols * 4),
+                          (half_copy, rows * cols * 2)):
+            if buf.nbytes < size:
+                raise ValueError("GEMM buffer is too small")
+        if self.lib.xmx_rec_gemm_dual(a.id, b.id, c.id, half_copy.id, rows, cols, inner) != 0:
+            raise RuntimeError("xmx_rec_gemm_dual: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def ffn_fused(self, a, expand, projection, target, rows, channels, hidden, *, groups=1,
+                  skip=None, cosine=None, epilogue=0, narrow=False, skip_half=False):
+        """A feed-forward in one pass, the hidden layer never leaving the chip.
+
+        With one group of 32 channels and a `skip`, the narrow blocks' whole feed-forward:
+        what `gemm(..., EPI_GATE_E4M3, narrow)` into a hidden buffer and `gemm_residual` out
+        of it write, bit for bit. With `groups`, the branched blocks' per-group expand and
+        projection into `target`'s column slices — what their two grouped GEMMs write —
+        and no residual. `src/gpu/test_ffn_fused.py`.
+        """
+        out = groups * 32
+        if (channels <= 0 or channels % 16 or hidden <= 0 or hidden % 32 or rows <= 0
+                or rows % 16 or groups <= 0):
+            raise ValueError("fused feed-forward needs channels a multiple of 16, hidden of "
+                             "32 and 16-row blocks")
+        if (skip is None) != (cosine is None) or (skip is not None and (groups != 1
+                                                                           or channels != 32)):
+            raise ValueError("the fused residual is for one group of 32 channels")
+        inputs = {a.id, expand.id, projection.id} | ({cosine.id} if cosine is not None else set())
+        if target.id in inputs or (skip is not None and target.id == skip.id
+                                   and narrow != skip_half):
+            raise ValueError("fused feed-forward output must not alias its inputs")
+        sizes = [(a, rows * channels * 2), (expand, groups * channels * hidden * 2),
+                 (projection, groups * hidden * 32 * 2), (target, rows * out * (2 if narrow else 4))]
+        if skip is not None:
+            sizes += [(cosine, channels * 4), (skip, rows * channels * (2 if skip_half else 4))]
+        if any(buf.nbytes < size for buf, size in sizes):
+            raise ValueError("fused feed-forward buffer is too small")
+        path = os.environ.get("XMX_FFN_SPV") or fused_shader(self.lib, "ffn_fused")
+        if self.lib.xmx_ffn_init(path.encode()) != 0:
+            raise RuntimeError("fused feed-forward pipeline: " + self.lib.xmx_error().decode())
+        flags = _publish(epilogue, narrow) | (0x40000 if skip_half else 0)
+        if self.lib.xmx_rec_ffn(a.id, expand.id, projection.id, target.id,
+                                skip.id if skip is not None else -1,
+                                cosine.id if cosine is not None else -1,
+                                rows, channels, hidden, groups, flags) != 0:
+            raise RuntimeError("xmx_rec_ffn: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def upsample_merge(self, source, skip, sincos, merged, merged16, height, width,
+                       source_width, channels):
+        """merged = upsample2(source) * sin + skip * cos, stored float32 and as half.
+
+        `source` (half) is the level above at half the extent, `skip` (half) the
+        full-resolution skip, `sincos` the per-channel sin then cos. The same values the
+        upsample2, scale_channel, residual and to_half passes produce, in one pass
+        (`src/gpu/test_glue.py`).
+        """
+        count = height * width * channels
+        if len({source.id, skip.id, sincos.id, merged.id, merged16.id}) != 5:
+            raise ValueError("upsample merge operands must be distinct")
+        for buf, size in ((skip, count * 2), (sincos, channels * 8), (merged, count * 4),
+                          (merged16, count * 2),
+                          (source, -(-height // 2) * source_width * channels * 2)):
+            if buf.nbytes < size:
+                raise ValueError("upsample merge buffer is too small")
+        if self.lib.xmx_rec_unary2(UPSAMPLE_MERGE | _reads(True, True), source.id, skip.id,
+                                   merged.id, sincos.id, merged16.id, int(count),
+                                   int(channels), 1.0, 0, int(width), int(source_width),
+                                   0, 0) != 0:
+            raise RuntimeError("xmx_rec_unary2: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def window_attention(self, q, k, v, target, batches, heads, *, bias=None, merged=False):
+        """QK^T, softmax and PV for full 8x8 windows, in one dispatch, into `target`.
+
+        The scores and probabilities never leave shared memory. The result is the same
+        FP32 context the three-pass path writes, bit for bit
+        (`src/gpu/test_window_attention.py`). ProjectsCodex's phase42.
+
+        `merged` does the head merge in the same dispatch: `target` then receives what
+        `merge_heads(context, ..., epilogue=EPI_E4M3, narrow=True)` would have written —
+        float16 E4M3 values in (window, token, head, channel) order — also bit for bit.
+        """
+        if (batches <= 0 or heads <= 0 or batches % heads
+                or batches * 2048 > 0xffffffff or heads * 4096 > 0xffffffff):
+            raise ValueError("invalid window attention batch/head count")
+        operands = (q, k, v) + ((bias,) if bias is not None else ())
+        if any(target.id == buf.id for buf in operands):
+            raise ValueError("window attention output must not alias an input")
+        sizes = [(q, batches * 4096), (k, batches * 4096), (v, batches * 4096),
+                 (target, batches * (4096 if merged else 8192))]
+        if bias is not None:
+            sizes.append((bias, heads * 4096 * 4))
+        if any(buf.nbytes < size for buf, size in sizes):
+            raise ValueError("window attention buffer is too small")
+        path = os.environ.get("XMX_WINDOW_SPV") or fused_shader(self.lib, "window_attention")
+        if self.lib.xmx_window_init(path.encode(), int(merged)) != 0:
+            raise RuntimeError("window attention pipeline: " + self.lib.xmx_error().decode())
+        if self.lib.xmx_rec_window_attention(q.id, k.id, v.id,
+                                             bias.id if bias is not None else -1,
+                                             target.id, batches, heads, int(merged)) != 0:
+            raise RuntimeError("window attention: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
     def gemm(self, a, b, c, rows, cols, inner, *, batch=1, strides=None, transpose_b=False,
-             leading=None, offsets=(0, 0, 0), epilogue=0, narrow=False):
+             leading=None, offsets=(0, 0, 0), epilogue=0, narrow=False,
+             compact_output=False):
         """C = A @ B for tile-aligned extents; A and B are float16, C float32.
 
         `strides` are element counts per batch item, defaulting to the dense packing;
         `leading` overrides the row strides of A, B and C, and `offsets` shifts each
         operand's base in elements, so a GEMM can read or write a slice of a wider
         buffer — which is how the branched and split feed-forwards place their heads.
+        `compact_output` stores only the first four of sixteen columns in FP32,
+        using the base kernel's shared-memory scatter. Batch output stride defaults
+        to rows*4; custom leading/offsets and epilogues are deliberately excluded.
         Extents must already be multiples of 8 / 16 / 16: cooperative-matrix loads are
         not bounds-checked on this device (`cooperativeMatrixRobustBufferAccess` is
         false), so the padding has to be in the buffer, not in a guard.
@@ -540,10 +844,16 @@ class Runtime:
         for extent, multiple, name in ((rows, TM, "rows"), (cols, TN, "cols"), (inner, TK, "inner")):
             if extent % multiple:
                 raise ValueError(f"{name}={extent} must be a multiple of {multiple}")
+        if compact_output:
+            if cols != 16 or narrow or epilogue or leading is not None or offsets != (0, 0, 0):
+                raise ValueError('compact output requires 16 columns, plain FP32 and no custom leading/offsets')
+            leading = (0, 0, 4)
         if strides is None:
-            strides = (rows * inner, cols * inner if transpose_b else inner * cols, rows * cols)
+            strides = (rows * inner, cols * inner if transpose_b else inner * cols,
+                       rows * (4 if compact_output else cols))
         lda, ldb, ldc = leading or (0, 0, 0)
-        flags = (1 if transpose_b else 0) | _publish(epilogue, narrow)
+        flags = ((1 if transpose_b else 0) | _publish(epilogue, narrow)
+                 | (0x10000 if compact_output else 0))
         if self.lib.xmx_rec_gemm(a.id, b.id, c.id, rows, cols, inner, batch,
                                  strides[0], strides[1], strides[2], flags,
                                  lda, ldb, ldc, *offsets) != 0:

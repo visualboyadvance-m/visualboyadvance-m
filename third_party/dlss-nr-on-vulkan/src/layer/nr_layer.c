@@ -43,33 +43,21 @@
 #include <windows.h>
 #endif
 
-/* How the layer knows the game's frame is finished, and the game knows ours is.
- *
- * `idle` is what this started as: `vkQueueWaitIdle` around the transfer, which is a
- * sledgehammer — it waits for everything the game has submitted, not for the one copy we
- * care about, and it ignores the present's own semaphores entirely, so a game that renders
- * on one queue and presents on another can hand over an unfinished image. It was written
- * for a photo mode, where the stall is the point.
- *
- * `semaphore` is the proper route the comment on `transfer` has asked for since: our submit
- * waits on the present's semaphores, the present waits on ours instead, and only the
- * readback — which the host has to look at — waits on a fence of its own.
- *
- * Default `idle` until somebody has run `semaphore` through a real game on both a discrete
- * card and this iGPU. One environment variable either way. */
-#define SYNC_SLOTS 4
-/* How many of a present's wait semaphores this layer is prepared to take over. Taking
- * *some* of them is not an option: the ones left behind would stay signalled with nothing
- * left to consume them, since the present is redirected onto ours. A present that brings
- * more than this keeps all of its own and is handled the old way. */
-#define NR_MAX_WAITS 16
-static int sync_semaphores;
+/* Capture and writeback consume the game's waits once, complete on private
+ * fences, then present with no remaining waits. Legacy NR_LAYER_SYNC values are
+ * accepted for launcher compatibility; both use this single verified path. */
 
 struct device_data {
 	VkDevice device;
 	VkPhysicalDevice physical;
 	VkQueue queue;
 	uint32_t queue_family;
+	pthread_mutex_t present_lock;
+	unsigned long frame_counter;
+	VkResult transfer_error, device_error;
+	VkFence stalled_fence;
+	VkSwapchainKHR result_chain;
+	int queues_announced;           /* the one-time queue inventory has been logged */
 	VkCommandPool pool;
 	VkDeviceMemory staging_memory;
 	VkBuffer staging;
@@ -84,21 +72,9 @@ struct device_data {
 	 * game that never triggers pays nothing for this. */
 	unsigned char *earlier;
 	VkDeviceSize earlier_size;
-	/* Present-time synchronisation, when `NR_LAYER_SYNC=semaphore`. A ring, because the
-	 * write-back is never waited for: its command buffer, its fence and the semaphore it
-	 * signals all have to stay untouched until the present that consumes them is through.
-	 * Four is enough for any swapchain we have seen and costs three objects each. */
-	VkCommandBuffer ring_commands[SYNC_SLOTS];
-	VkFence ring_fence[SYNC_SLOTS];
-	VkSemaphore ring_done[SYNC_SLOTS];
-	int ring_used[SYNC_SLOTS];
-	unsigned ring_next;
-	int ring_ready;
-	/* what the present being handled has handed over, and what it must wait on instead */
 	const VkSemaphore *present_wait;
 	uint32_t present_wait_count;
-	VkSemaphore present_signal;
-	int present_plain;                     /* this present keeps its own semaphores */
+	int waits_consumed;
 	int have_earlier;
 	unsigned char *outgoing;        /* colour followed by the mask, for one send */
 	VkDeviceSize outgoing_size;
@@ -127,7 +103,6 @@ static struct swapchain_data swapchains[MAX_SWAPCHAINS];
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 static PFN_vkGetInstanceProcAddr next_instance_proc;
 static VkInstance layer_instance;
-static unsigned long frame_counter;
 static const char *capture_path;
 static long capture_every;
 static long live_every;
@@ -241,6 +216,29 @@ static int family_can_capture(struct device_data *data, uint32_t family)
 	return ok;
 }
 
+static void announce_queues(VkDevice device, VkQueue presenting, uint32_t present_family)
+{
+	uint32_t families[MAX_QUEUES];
+	int count = 0, others = 0;
+	pthread_mutex_lock(&lock);
+	for (int i = 0; i < MAX_QUEUES; i++)
+		if (queues[i].queue && queues[i].device == device) {
+			families[count++] = queues[i].family;
+			if (queues[i].queue != presenting && queues[i].family != present_family)
+				others++;
+		}
+	pthread_mutex_unlock(&lock);
+	char list[128] = { 0 };
+	size_t used = 0;
+	for (int i = 0; i < count && used + 8 < sizeof list; i++)
+		used += (size_t)snprintf(list + used, sizeof list - used, "%s%u",
+					 used ? "," : "", families[i]);
+	fprintf(stderr, "[nr_layer] queues: %d handed out, families {%s}; presenting on "
+		"family %u. %s\n", count, list, present_family,
+		others ? "Multiple families: capture waits on the present's semaphores."
+		       : "Capture waits on the present's semaphores; copies finish on private fences.");
+}
+
 static void remember_queue(VkDevice device, uint32_t family, VkQueue queue, int capture_ok)
 {
 	if (!queue) return;
@@ -289,7 +287,6 @@ static int format_is_four_bytes(VkFormat format)
 	case VK_FORMAT_B8G8R8A8_UNORM:
 	case VK_FORMAT_B8G8R8A8_SRGB:
 	case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
-	case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
 		return 1;
 	default:
 		return 0;
@@ -346,7 +343,7 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_CreateInstance(const VkInstanceCreateInfo *inf
 		const char *every = getenv("NR_LAYER_EVERY");
 		capture_every = every ? strtol(every, NULL, 10) : 0;
 		const char *sync = getenv("NR_LAYER_SYNC");
-		sync_semaphores = sync && !strcmp(sync, "semaphore");
+		(void)sync;
 		const char *live = getenv("NR_LAYER_LIVE");
 		live_every = live ? strtol(live, NULL, 10) : 0;
 		if (live_every < 0) live_every = 0;
@@ -357,9 +354,7 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_CreateInstance(const VkInstanceCreateInfo *inf
 		if (live_every > 0 && getenv("NR_LAYER_TRIGGER"))
 			fprintf(stderr, "[nr_layer] live runs while the trigger exists; "
 				"remove it to hand the game back\n");
-		if (sync_semaphores)
-			fprintf(stderr, "[nr_layer] sync: the present's own semaphores, not a "
-				"queue idle\n");
+		fprintf(stderr, "[nr_layer] sync: present waits + private fences (readback and writeback)\n");
 		fprintf(stderr, "[nr_layer] active; socket=%s trigger=%s capture=%s every=%ld\n",
 			socket_path ? socket_path : "(none)",
 			trigger_path ? trigger_path : "(none)",
@@ -391,6 +386,7 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_CreateDevice(VkPhysicalDevice physical,
 	for (int i = 0; i < 8; i++) if (!devices[i].device) { data = &devices[i]; break; }
 	if (data) {
 		memset(data, 0, sizeof *data);
+		pthread_mutex_init(&data->present_lock, NULL);
 		data->device = *device;
 		data->physical = physical;
 		data->get_device_proc = next_device;
@@ -517,6 +513,11 @@ static void release_device(struct device_data *data)
 			data->get_device_proc(data->device, "vkDestroyCommandPool");
 		if (destroy) destroy(data->device, data->pool, NULL);
 	}
+	if (data->stalled_fence) {
+        PFN_vkDestroyFence destroy = (PFN_vkDestroyFence)data->get_device_proc(data->device, "vkDestroyFence");
+        destroy(data->device, data->stalled_fence, NULL);
+    }
+	pthread_mutex_destroy(&data->present_lock);
 	free(data->result);
 	free(data->earlier);
 	free(data->outgoing);
@@ -550,6 +551,11 @@ VKAPI_ATTR void VKAPI_CALL nr_DestroySwapchainKHR(VkDevice device, VkSwapchainKH
 						  const VkAllocationCallbacks *allocator)
 {
 	struct device_data *data = find_device(device);
+    if (data) pthread_mutex_lock(&data->present_lock);
+    if (data && data->result_chain == swapchain) {
+        data->result_chain = VK_NULL_HANDLE;
+        data->holding = data->have_earlier = 0;
+    }
 	pthread_mutex_lock(&lock);
 	for (int i = 0; i < MAX_SWAPCHAINS; i++)
 		if (swapchains[i].swapchain == swapchain)
@@ -557,6 +563,7 @@ VKAPI_ATTR void VKAPI_CALL nr_DestroySwapchainKHR(VkDevice device, VkSwapchainKH
 	pthread_mutex_unlock(&lock);
 	if (data && data->destroy_swapchain)
 		data->destroy_swapchain(device, swapchain, allocator);
+    if (data) pthread_mutex_unlock(&data->present_lock);
 }
 
 static uint32_t memory_type(struct device_data *data, uint32_t bits,
@@ -575,14 +582,18 @@ static uint32_t memory_type(struct device_data *data, uint32_t bits,
 	return UINT32_MAX;
 }
 
-/* Move the presented frame between the swapchain image and a host-visible buffer.
- *
- * `vkQueueWaitIdle` around the transfer is the blunt way to know the frame is
- * finished: the proper route waits on the present's own semaphores, which means taking
- * them over from the application. For a photo mode the game is meant to stall anyway,
- * so the stall is the point rather than a cost. It has to change before the pass runs
- * every frame.
- */
+/* Grow host-visible storage only after the previous private copy fence completed. */
+static void release_staging(struct device_data *data)
+{
+    if (data->mapped) ((PFN_vkUnmapMemory)data->get_device_proc(data->device, "vkUnmapMemory"))(data->device, data->staging_memory);
+    if (data->staging) ((PFN_vkDestroyBuffer)data->get_device_proc(data->device, "vkDestroyBuffer"))(data->device, data->staging, NULL);
+    if (data->staging_memory) ((PFN_vkFreeMemory)data->get_device_proc(data->device, "vkFreeMemory"))(data->device, data->staging_memory, NULL);
+    data->mapped = NULL;
+    data->staging = VK_NULL_HANDLE;
+    data->staging_memory = VK_NULL_HANDLE;
+    data->staging_size = 0;
+}
+
 static int ensure_resources(struct device_data *data, VkDeviceSize needed)
 {
 	if (!data->pool) {
@@ -594,7 +605,12 @@ static int ensure_resources(struct device_data *data, VkDeviceSize needed)
 			data->get_device_proc(data->device, "vkCreateCommandPool");
 		if (create(data->device, &info, NULL, &data->pool) != VK_SUCCESS) return -1;
 	}
-	if (data->staging_size >= needed) return 0;
+	if (data->staging_size >= needed && data->result) {
+        data->result_size = needed;
+        return 0;
+    }
+    release_staging(data);
+    data->holding = data->have_earlier = 0;
 
 	PFN_vkCreateBuffer create_buffer = (PFN_vkCreateBuffer)
 		data->get_device_proc(data->device, "vkCreateBuffer");
@@ -621,13 +637,16 @@ static int ensure_resources(struct device_data *data, VkDeviceSize needed)
 		type = memory_type(data, mr.memoryTypeBits,
 				   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
 				   | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	if (type == UINT32_MAX) return -1;
+	if (type == UINT32_MAX) { release_staging(data); return -1; }
 	VkMemoryAllocateInfo allocation = { .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
 					    .allocationSize = mr.size, .memoryTypeIndex = type };
-	if (allocate(data->device, &allocation, NULL, &data->staging_memory) != VK_SUCCESS)
-		return -1;
-	bind(data->device, data->staging, data->staging_memory, 0);
-	map(data->device, data->staging_memory, 0, VK_WHOLE_SIZE, 0, &data->mapped);
+	if (allocate(data->device, &allocation, NULL, &data->staging_memory) != VK_SUCCESS) {
+        release_staging(data); return -1;
+    }
+    if (bind(data->device, data->staging, data->staging_memory, 0) != VK_SUCCESS ||
+        map(data->device, data->staging_memory, 0, VK_WHOLE_SIZE, 0, &data->mapped) != VK_SUCCESS) {
+        release_staging(data); return -1;
+    }
 	data->staging_size = needed;
 	free(data->result);
 	data->result = malloc((size_t)needed);
@@ -635,173 +654,118 @@ static int ensure_resources(struct device_data *data, VkDeviceSize needed)
 	return data->result ? 0 : -1;
 }
 
-static int ensure_ring(struct device_data *data)
-{
-	if (data->ring_ready) return 0;
-	if (!data->pool) return -1;
-	PFN_vkAllocateCommandBuffers allocate_commands = (PFN_vkAllocateCommandBuffers)
-		data->get_device_proc(data->device, "vkAllocateCommandBuffers");
-	PFN_vkCreateFence create_fence = (PFN_vkCreateFence)
-		data->get_device_proc(data->device, "vkCreateFence");
-	PFN_vkCreateSemaphore create_semaphore = (PFN_vkCreateSemaphore)
-		data->get_device_proc(data->device, "vkCreateSemaphore");
-	if (!allocate_commands || !create_fence || !create_semaphore) return -1;
-	VkCommandBufferAllocateInfo alloc = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		.commandPool = data->pool, .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		.commandBufferCount = SYNC_SLOTS };
-	if (allocate_commands(data->device, &alloc, data->ring_commands) != VK_SUCCESS)
-		return -1;
-	VkFenceCreateInfo fi = { .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
-	VkSemaphoreCreateInfo si = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO };
-	for (int i = 0; i < SYNC_SLOTS; i++) {
-		if (create_fence(data->device, &fi, NULL, &data->ring_fence[i]) != VK_SUCCESS
-		    || create_semaphore(data->device, &si, NULL, &data->ring_done[i]) != VK_SUCCESS)
-			return -1;
-		data->ring_used[i] = 0;
-	}
-	data->ring_ready = 1;
-	return 0;
-}
-
+/* All copy submissions wait only on the current present's semaphores and on their
+ * own fence. No foreign queue is touched and no semaphore is recycled behind WSI.
+ * The synchronous daemon already requires host readback; completing writeback too
+ * keeps the lifetime contract explicit until an asynchronous path is separately proven. */
 static int transfer(struct device_data *data, struct swapchain_data *chain, VkQueue queue,
-		    uint32_t index, int to_image)
+                    uint32_t index, int to_image)
 {
-	PFN_vkAllocateCommandBuffers allocate_commands = (PFN_vkAllocateCommandBuffers)
-		data->get_device_proc(data->device, "vkAllocateCommandBuffers");
-	PFN_vkBeginCommandBuffer begin = (PFN_vkBeginCommandBuffer)
-		data->get_device_proc(data->device, "vkBeginCommandBuffer");
-	PFN_vkCmdPipelineBarrier barrier = (PFN_vkCmdPipelineBarrier)
-		data->get_device_proc(data->device, "vkCmdPipelineBarrier");
-	PFN_vkCmdCopyImageToBuffer copy_out = (PFN_vkCmdCopyImageToBuffer)
-		data->get_device_proc(data->device, "vkCmdCopyImageToBuffer");
-	PFN_vkCmdCopyBufferToImage copy_in = (PFN_vkCmdCopyBufferToImage)
-		data->get_device_proc(data->device, "vkCmdCopyBufferToImage");
-	PFN_vkEndCommandBuffer end = (PFN_vkEndCommandBuffer)
-		data->get_device_proc(data->device, "vkEndCommandBuffer");
-	PFN_vkQueueSubmit submit = (PFN_vkQueueSubmit)
-		data->get_device_proc(data->device, "vkQueueSubmit");
-	PFN_vkQueueWaitIdle wait = (PFN_vkQueueWaitIdle)
-		data->get_device_proc(data->device, "vkQueueWaitIdle");
-	PFN_vkFreeCommandBuffers free_commands = (PFN_vkFreeCommandBuffers)
-		data->get_device_proc(data->device, "vkFreeCommandBuffers");
-
-	int ringed = sync_semaphores && !data->present_plain && ensure_ring(data) == 0;
-	unsigned slot = data->ring_next % SYNC_SLOTS;
-	VkCommandBuffer commands;
-	if (ringed) {
-		/* The slot comes back round; whatever it was doing four presents ago is over
-		 * by now, but saying so is the difference between reusing a command buffer and
-		 * overwriting one still in flight. */
-		if (data->ring_used[slot]) {
-			PFN_vkWaitForFences wait_fences = (PFN_vkWaitForFences)
-				data->get_device_proc(data->device, "vkWaitForFences");
-			PFN_vkResetFences reset_fences = (PFN_vkResetFences)
-				data->get_device_proc(data->device, "vkResetFences");
-			wait_fences(data->device, 1, &data->ring_fence[slot], VK_TRUE,
-				    10ull * 1000000000ull);
-			reset_fences(data->device, 1, &data->ring_fence[slot]);
-		}
-		commands = data->ring_commands[slot];
-		data->ring_next++;
-	} else {
-		VkCommandBufferAllocateInfo alloc = {
-			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-			.commandPool = data->pool, .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			.commandBufferCount = 1 };
-		if (allocate_commands(data->device, &alloc, &commands) != VK_SUCCESS) return -1;
-	}
-	VkCommandBufferBeginInfo beginning = {
-		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
-	begin(commands, &beginning);
-
-	VkImageLayout working = to_image ? VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-					 : VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-	VkImageMemoryBarrier into = {
-		.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-		.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT,
-		.dstAccessMask = to_image ? VK_ACCESS_TRANSFER_WRITE_BIT
-					  : VK_ACCESS_TRANSFER_READ_BIT,
-		.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-		.newLayout = working,
-		.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-		.image = chain->images[index],
-		.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 } };
-	barrier(commands, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-		VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &into);
-
-	VkBufferImageCopy region = {
-		.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 },
-		.imageExtent = { chain->extent.width, chain->extent.height, 1 } };
-	if (to_image)
-		copy_in(commands, data->staging, chain->images[index], working, 1, &region);
-	else
-		copy_out(commands, chain->images[index], working, data->staging, 1, &region);
-
-	VkImageMemoryBarrier back = into;
-	back.srcAccessMask = into.dstAccessMask;
-	back.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-	back.oldLayout = working;
-	back.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-	barrier(commands, VK_PIPELINE_STAGE_TRANSFER_BIT,
-		VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0, NULL, 1, &back);
-	end(commands);
-
-	if (!ringed) {
-		wait(queue);
-		VkSubmitInfo submission = { .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-					    .commandBufferCount = 1, .pCommandBuffers = &commands };
-		submit(queue, 1, &submission, VK_NULL_HANDLE);
-		wait(queue);
-		free_commands(data->device, data->pool, 1, &commands);
-		return 0;
-	}
-
-	/* The first submit of a present inherits the semaphores the game gave the present,
-	 * so this copy happens after the frame is drawn rather than after the queue is
-	 * empty.
-	 *
-	 * Only the write-back signals. A binary semaphore may not be signalled while it is
-	 * already signalled, and nothing waits on a readback's: the host waits on its fence
-	 * here, so by the time anything else runs that copy is finished and a semaphore
-	 * would only be a signal nobody consumes — left standing until the ring came round
-	 * and signalled it a second time, which is exactly what the spec forbids
-	 * (`VUID-vkQueueSubmit-pSignalSemaphores-00067`). Drivers let it pass in silence,
-	 * which is worse rather than better: three games and a headless test had nothing to
-	 * say about it. */
-	VkSemaphore signal = to_image ? data->ring_done[slot] : VK_NULL_HANDLE;
-	VkPipelineStageFlags stages[NR_MAX_WAITS];
-	uint32_t waits = data->present_wait_count;
-	for (uint32_t i = 0; i < waits; i++) stages[i] = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	VkSubmitInfo submission = { .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-				    .waitSemaphoreCount = waits,
-				    .pWaitSemaphores = waits ? data->present_wait : NULL,
-				    .pWaitDstStageMask = waits ? stages : NULL,
-				    .commandBufferCount = 1, .pCommandBuffers = &commands,
-				    .signalSemaphoreCount = signal ? 1 : 0,
-				    .pSignalSemaphores = signal ? &signal : NULL };
-	if (submit(queue, 1, &submission, data->ring_fence[slot]) != VK_SUCCESS) {
-		data->ring_used[slot] = 0;
-		return -1;
-	}
-	data->ring_used[slot] = 1;
-	data->present_wait_count = 0;          /* consumed; the present must not wait again */
-	/* A present with nothing to wait on is correct when only the readback ran: its fence
-	 * is waited below, so the copy — and the game's own drawing, which it waited on — are
-	 * finished before the present is even called. */
-	if (signal) data->present_signal = signal;
-	if (!to_image) {
-		/* Only this direction stalls the host, and only on its own work: the pixels
-		 * are about to be read out of the staging buffer. */
-		PFN_vkWaitForFences wait_fences = (PFN_vkWaitForFences)
-			data->get_device_proc(data->device, "vkWaitForFences");
-		if (wait_fences(data->device, 1, &data->ring_fence[slot], VK_TRUE,
-				10ull * 1000000000ull) != VK_SUCCESS)
-			return -1;
-	}
-	return 0;
+    if (data->device_error || data->transfer_error) return -1;
+#define FN(type, name) type name = (type)data->get_device_proc(data->device, "vk" #name)
+    FN(PFN_vkAllocateCommandBuffers, AllocateCommandBuffers);
+    FN(PFN_vkBeginCommandBuffer, BeginCommandBuffer);
+    FN(PFN_vkEndCommandBuffer, EndCommandBuffer);
+    FN(PFN_vkCmdPipelineBarrier, CmdPipelineBarrier);
+    FN(PFN_vkCmdCopyImageToBuffer, CmdCopyImageToBuffer);
+    FN(PFN_vkCmdCopyBufferToImage, CmdCopyBufferToImage);
+    FN(PFN_vkQueueSubmit, QueueSubmit);
+    FN(PFN_vkWaitForFences, WaitForFences);
+    FN(PFN_vkCreateFence, CreateFence);
+    FN(PFN_vkDestroyFence, DestroyFence);
+    FN(PFN_vkFreeCommandBuffers, FreeCommandBuffers);
+#undef FN
+    VkCommandBuffer commands = VK_NULL_HANDLE;
+    VkFence fence = VK_NULL_HANDLE;
+    VkPipelineStageFlags *stages = NULL;
+    VkResult r;
+    VkCommandBufferAllocateInfo alloc = {
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .commandPool = data->pool, .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1 };
+    r = AllocateCommandBuffers(data->device, &alloc, &commands);
+    if (r != VK_SUCCESS) goto failed;
+    VkFenceCreateInfo fi = { .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+    r = CreateFence(data->device, &fi, NULL, &fence);
+    if (r != VK_SUCCESS) goto failed;
+    VkCommandBufferBeginInfo bi = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        .flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT };
+    r = BeginCommandBuffer(commands, &bi);
+    if (r != VK_SUCCESS) goto failed;
+    VkImageLayout working = to_image ? VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+                                    : VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    VkImageMemoryBarrier into = {
+        .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+        .srcAccessMask = 0,
+        .dstAccessMask = to_image ? VK_ACCESS_TRANSFER_WRITE_BIT : VK_ACCESS_TRANSFER_READ_BIT,
+        .oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, .newLayout = working,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .image = chain->images[index],
+        .subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 } };
+    CmdPipelineBarrier(commands, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &into);
+    VkBufferMemoryBarrier host = { .sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+        .srcAccessMask = VK_ACCESS_HOST_WRITE_BIT, .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+        .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+        .buffer = data->staging, .offset = 0, .size = VK_WHOLE_SIZE };
+    if (to_image)
+        CmdPipelineBarrier(commands, VK_PIPELINE_STAGE_HOST_BIT,
+            VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 1, &host, 0, NULL);
+    VkBufferImageCopy region = {
+        .imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 },
+        .imageExtent = { chain->extent.width, chain->extent.height, 1 } };
+    if (to_image) CmdCopyBufferToImage(commands, data->staging, chain->images[index], working, 1, &region);
+    else CmdCopyImageToBuffer(commands, chain->images[index], working, data->staging, 1, &region);
+    VkImageMemoryBarrier back = into;
+    back.srcAccessMask = into.dstAccessMask;
+    back.dstAccessMask = 0;
+    back.oldLayout = working;
+    back.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    CmdPipelineBarrier(commands, VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0, NULL, 1, &back);
+    if (!to_image) {
+        host.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        host.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
+        CmdPipelineBarrier(commands, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            VK_PIPELINE_STAGE_HOST_BIT, 0, 0, NULL, 1, &host, 0, NULL);
+    }
+    r = EndCommandBuffer(commands);
+    if (r != VK_SUCCESS) goto failed;
+    uint32_t waits = data->present_wait_count;
+    if (waits) {
+        stages = malloc((size_t)waits * sizeof *stages);
+        if (!stages) { r = VK_ERROR_OUT_OF_HOST_MEMORY; goto failed; }
+        for (uint32_t i = 0; i < waits; i++) stages[i] = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    VkSubmitInfo si = { .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .waitSemaphoreCount = waits, .pWaitSemaphores = waits ? data->present_wait : NULL,
+        .pWaitDstStageMask = stages, .commandBufferCount = 1, .pCommandBuffers = &commands };
+    r = QueueSubmit(queue, 1, &si, fence);
+    if (r != VK_SUCCESS) goto failed;
+    data->waits_consumed = 1;
+    data->present_wait_count = 0;
+    r = WaitForFences(data->device, 1, &fence, VK_TRUE, UINT64_MAX);
+    if (r != VK_SUCCESS) {
+        /* Keep potentially pending commands/fence until device teardown. Never recycle
+         * their memory after an unsuccessful wait, or continue presenting this device. */
+        data->device_error = r;
+        data->stalled_fence = fence;
+        free(stages);
+        return -1;
+    }
+    free(stages);
+    DestroyFence(data->device, fence, NULL);
+    FreeCommandBuffers(data->device, data->pool, 1, &commands);
+    return 0;
+failed:
+    free(stages);
+    if (fence) DestroyFence(data->device, fence, NULL);
+    if (commands) FreeCommandBuffers(data->device, data->pool, 1, &commands);
+    data->transfer_error = r;
+    fprintf(stderr, "[nr_layer] transfer failed (%d)\n", (int)r);
+    return -1;
 }
 
 /* Which pixels are the interface.
@@ -895,24 +859,23 @@ static int process_frame(struct device_data *data, struct swapchain_data *chain,
 	return 0;
 }
 
-/* The present, with its waits replaced by ours if a transfer consumed them. A semaphore
- * wait is a consume: having taken the game's, we must not hand them to the present as
- * well, and the present must wait on the copy that took them. */
+/* A completed private fence covers the consumed waits and all copies. Forward the
+ * original wait list only when no copy submission has taken ownership of it. */
 static VkResult present_now(struct device_data *data, VkQueue queue,
-			    const VkPresentInfoKHR *info)
+                            const VkPresentInfoKHR *info)
 {
-	if (!sync_semaphores || !data || !data->present_signal)
-		return data->present(queue, info);
-	VkPresentInfoKHR patched = *info;
-	patched.waitSemaphoreCount = 1;
-	patched.pWaitSemaphores = &data->present_signal;
-	return data->present(queue, &patched);
+    if (data->device_error) return data->device_error;
+    if (data->transfer_error) return data->transfer_error;
+    if (!data->waits_consumed) return data->present(queue, info);
+    VkPresentInfoKHR patched = *info;
+    patched.waitSemaphoreCount = 0;
+    patched.pWaitSemaphores = NULL;
+    return data->present(queue, &patched);
 }
 
-VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue,
+static VkResult present_locked(VkQueue queue,
 						  const VkPresentInfoKHR *info)
 {
-	frame_counter++;
 	struct device_data *data = NULL;
 	/* Resolve the queue rather than taking the first live device: with two devices the
 	 * first is not necessarily this one, and the family decides which pool is legal. */
@@ -941,14 +904,18 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue,
 	if (!data)
 		for (int i = 0; i < 8; i++) if (devices[i].device) { data = &devices[i]; break; }
 	if (!data) return VK_ERROR_INITIALIZATION_FAILED;
+	data->frame_counter++;
+	if (!data->queues_announced) {
+		data->queues_announced = 1;
+		announce_queues(data->device, queue, owner ? owner->family : data->queue_family);
+	}
 
 	/* Offered, not yet taken: a transfer claims them, and if none runs this present goes
 	 * through untouched with its own. */
-	data->present_plain = info->waitSemaphoreCount > NR_MAX_WAITS;
 	data->present_wait = info->pWaitSemaphores;
-	data->present_wait_count = (sync_semaphores && !data->present_plain)
-		? info->waitSemaphoreCount : 0;
-	data->present_signal = VK_NULL_HANDLE;
+	data->present_wait_count = info->waitSemaphoreCount;
+	data->waits_consumed = 0;
+	data->transfer_error = VK_SUCCESS;
 
 	/* Live mode is a slideshow rather than a photo: every Nth present goes through the
 	 * network and the frames between re-blit the last result, so the picture is steady
@@ -966,16 +933,21 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue,
 		int on = !trigger_path || access(trigger_path, F_OK) == 0;
 		if (!on) data->holding = 0;
 		for (uint32_t i = 0; on && i < info->swapchainCount; i++) {
+			if (data->device_error || data->transfer_error) return present_now(data, queue, info);
 			struct swapchain_data *chain = find_swapchain(info->pSwapchains[i]);
 			if (!chain || info->pImageIndices[i] >= chain->image_count) continue;
+            if (data->result_chain != chain->swapchain) {
+                data->holding = data->have_earlier = 0;
+                data->result_chain = chain->swapchain;
+            }
 			uint32_t index = info->pImageIndices[i];
 			VkDeviceSize want = (VkDeviceSize)chain->extent.width
 					  * chain->extent.height * 4;
-			if (frame_counter % (unsigned long)live_every == 0) {
+			if (data->frame_counter % (unsigned long)live_every == 0) {
 				if (process_frame(data, chain, queue, index) == 0) {
 					data->holding = 1;
 					transfer(data, chain, queue, index, 1);
-				}
+				} else data->holding = 0; /* never replay a partially received reply */
 			} else if (data->holding && data->result_size == want) {
 				memcpy(data->mapped, data->result, (size_t)data->result_size);
 				transfer(data, chain, queue, index, 1);
@@ -989,11 +961,16 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue,
 	 * or a hotkey daemon. While it exists the processed frame is held on screen. */
 	int wanted = trigger_path && access(trigger_path, F_OK) == 0;
 	if (!wanted && capture_every > 0)
-		wanted = frame_counter % (unsigned long)capture_every == 0;
+		wanted = data->frame_counter % (unsigned long)capture_every == 0;
 
 	for (uint32_t i = 0; i < info->swapchainCount; i++) {
+		if (data->device_error || data->transfer_error) return present_now(data, queue, info);
 		struct swapchain_data *chain = find_swapchain(info->pSwapchains[i]);
 		if (!chain || info->pImageIndices[i] >= chain->image_count) continue;
+            if (data->result_chain != chain->swapchain) {
+                data->holding = data->have_earlier = 0;
+                data->result_chain = chain->swapchain;
+            }
 		uint32_t index = info->pImageIndices[i];
 		if (wanted && ui_mask && !data->holding && !data->have_earlier) {
 			/* Spend the first present after the trigger keeping the frame, and
@@ -1029,6 +1006,18 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue,
 		}
 	}
 	return present_now(data, queue, info);
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL nr_QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR *info)
+{
+    struct queue_data *owner = find_queue(queue);
+    struct device_data *data = owner ? find_device(owner->device) : NULL;
+    if (!data) for (int i = 0; i < 8; i++) if (devices[i].device) { data = &devices[i]; break; }
+    if (!data) return VK_ERROR_INITIALIZATION_FAILED;
+    pthread_mutex_lock(&data->present_lock);
+    VkResult result = data->device_error ? data->device_error : present_locked(queue, info);
+    pthread_mutex_unlock(&data->present_lock);
+    return result;
 }
 
 #define INTERCEPT(name) if (!strcmp(pName, "vk" #name)) return (PFN_vkVoidFunction)nr_##name

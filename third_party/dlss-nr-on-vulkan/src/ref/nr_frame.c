@@ -62,6 +62,7 @@ struct xmx {
     int (*init)(const char *);
     int (*res_init)(const char *, const char *, const char *, const char *, const char *, const char *);
     int (*portable)(void);
+    int (*window_gather)(void);   /* optional: a runtime without it cannot gather */
     const char *(*error)(void);
     const char *(*device)(void);
     const char *(*path)(void);
@@ -82,6 +83,21 @@ struct xmx {
                      unsigned, unsigned, unsigned);
     int (*rec_row)(unsigned, int, int, int, int, unsigned, unsigned, unsigned, unsigned, unsigned, float);
     int (*rec_copy)(int, int, unsigned long long, unsigned long long, unsigned long long);
+    /* the fused passes (xmx.h): every runtime exports them */
+    int (*rec_gemm_residual)(int, int, int, int, int, unsigned, unsigned, unsigned, unsigned);
+    int (*rec_gemm_window_residual)(int, int, int, int, int, unsigned, unsigned, unsigned, unsigned,
+                                    unsigned, unsigned, unsigned, unsigned);
+    int (*rec_gemm_qkv)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned);
+    int (*rec_gemm_qkv_window)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned,
+                               unsigned, unsigned, unsigned, unsigned, unsigned);
+    int (*rec_gemm_dual)(int, int, int, int, unsigned, unsigned, unsigned);
+    int (*rec_unary2)(unsigned, int, int, int, int, int, unsigned, unsigned, float, unsigned, unsigned,
+                      unsigned, unsigned, unsigned);
+    int (*rec_qkv)(int, int, int, int, int, unsigned, unsigned, unsigned);
+    int (*window_init)(const char *, unsigned);
+    int (*rec_window_attention)(int, int, int, int, int, unsigned, unsigned, unsigned);
+    int (*ffn_init)(const char *);
+    int (*rec_ffn)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned, unsigned);
     int (*graph_capture)(void);
     int (*graph_run)(int);
     int (*graph_destroy)(int);
@@ -131,6 +147,7 @@ static int xmx_load(void)
     X.open = xmx_open; X.init = xmx_init; X.res_init = xmx_res_init;
     X.embedded_shader = xmx_embedded_shader;
     X.adopt = xmx_adopt; X.close = xmx_close; X.adopted = xmx_adopted;
+    X.window_gather = xmx_window_gather;
     X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
     X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
     X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
@@ -138,6 +155,11 @@ static int xmx_load(void)
     X.begin = xmx_begin; X.abort = xmx_abort; X.sync = xmx_sync; X.submit = xmx_submit;
     X.rec_gemm = xmx_rec_gemm; X.rec_unary = xmx_rec_unary; X.rec_row = xmx_rec_row;
     X.rec_copy = xmx_rec_copy;
+    X.rec_gemm_residual = xmx_rec_gemm_residual; X.rec_gemm_window_residual = xmx_rec_gemm_window_residual;
+    X.rec_gemm_qkv = xmx_rec_gemm_qkv; X.rec_gemm_qkv_window = xmx_rec_gemm_qkv_window;
+    X.rec_gemm_dual = xmx_rec_gemm_dual; X.rec_unary2 = xmx_rec_unary2; X.rec_qkv = xmx_rec_qkv;
+    X.window_init = xmx_window_init; X.rec_window_attention = xmx_rec_window_attention;
+    X.ffn_init = xmx_ffn_init; X.rec_ffn = xmx_rec_ffn;
     X.graph_capture = xmx_graph_capture; X.graph_run = xmx_graph_run; X.graph_destroy = xmx_graph_destroy;
     return 0;
 #else
@@ -182,6 +204,7 @@ static int xmx_load(void)
 
     BIND(open, "xmx_open"); BIND(init, "xmx_init"); BIND(res_init, "xmx_res_init");
     X.embedded_shader = nr_dl_sym(X.handle, "xmx_embedded_shader");
+    X.window_gather = nr_dl_sym(X.handle, "xmx_window_gather");
     X.adopt = nr_dl_sym(X.handle, "xmx_adopt");
     X.close = nr_dl_sym(X.handle, "xmx_close");
     X.adopted = nr_dl_sym(X.handle, "xmx_adopted");
@@ -195,6 +218,13 @@ static int xmx_load(void)
     BIND(submit, "xmx_submit");
     BIND(rec_gemm, "xmx_rec_gemm"); BIND(rec_unary, "xmx_rec_unary"); BIND(rec_row, "xmx_rec_row");
     BIND(rec_copy, "xmx_rec_copy");
+    BIND(rec_gemm_residual, "xmx_rec_gemm_residual");
+    BIND(rec_gemm_window_residual, "xmx_rec_gemm_window_residual");
+    BIND(rec_gemm_qkv, "xmx_rec_gemm_qkv"); BIND(rec_gemm_qkv_window, "xmx_rec_gemm_qkv_window");
+    BIND(rec_gemm_dual, "xmx_rec_gemm_dual"); BIND(rec_unary2, "xmx_rec_unary2");
+    BIND(rec_qkv, "xmx_rec_qkv");
+    BIND(window_init, "xmx_window_init"); BIND(rec_window_attention, "xmx_rec_window_attention");
+    BIND(ffn_init, "xmx_ffn_init"); BIND(rec_ffn, "xmx_rec_ffn");
     BIND(graph_capture, "xmx_graph_capture"); BIND(graph_run, "xmx_graph_run");
     BIND(graph_destroy, "xmx_graph_destroy");
     return 0;
@@ -238,6 +268,14 @@ static int xmx_ready(void)
                    spv(b[4], sizeof b[4], "XMX_TILED_SPV", portable ? "gemm_portable_tiled.spv" : "gemm_tiled.spv"),
                    spv(b[5], sizeof b[5], "XMX_STAGED_SPV", portable ? "gemm_portable.spv" : "gemm_staged.spv")))
         FAILF("xmx_res_init: %s", X.error());
+    /* the fused window attention (both output layouts) and the fused feed-forward, as
+     * `xmxres.Runtime` names them: the `_portable` twins on a device without matrix units */
+    const char *window = spv(b[0], sizeof b[0], "XMX_WINDOW_SPV",
+                             portable ? "window_attention_portable.spv" : "window_attention.spv");
+    if (X.window_init(window, 0) || X.window_init(window, 1))
+        FAILF("xmx_window_init: %s", X.error());
+    if (X.ffn_init(spv(b[1], sizeof b[1], "XMX_FFN_SPV", portable ? "ffn_fused_portable.spv" : "ffn_fused.spv")))
+        FAILF("xmx_ffn_init: %s", X.error());
     xmx_is_ready = 1;
     return 0;
 }
@@ -831,7 +869,7 @@ struct named { char name[24]; int id; size_t bytes; };
 struct nr_frame {
     struct weights w;
     /* device weights, shared across extents */
-    int adapter, merge_sin, merge_cos, head;
+    int adapter, merge_sin, merge_cos, merge_sincos, head;
     struct edge_w bottleneck, decoder_input, edges[71];
     struct block_w blocks[71];
     /* the graph for one extent */
@@ -843,7 +881,15 @@ struct nr_frame {
     struct named named[MAX_NAMED];
     int named_count;
     int graph;                             /* captured commands, or -1 */
-    int fuse_qk;
+    /* `xmxres.Runtime.__init__`: the environment switches, read once, the same defaults.
+     * Each one changes which passes are recorded, and the Python and this file must agree
+     * on every one of them for the head to be bit-identical. */
+    struct {
+        int fuse_qk, batch_ffn, joint_qkv, fuse_residual, fuse_window_residual,
+            fuse_window_attention, fuse_attention_merge, qkv_epilogue, fuse_glue, fuse_ffn,
+            fuse_branched_ffn, fuse_partition, input_fp16, compact_head;
+    } opt;
+    int head_stride;                       /* floats per pixel in what run_graph returns */
     double split[3];
     /* host scratch */
     float *features_host;                  /* (H, W, 16) at the network extent */
@@ -857,6 +903,7 @@ struct nr_frame {
 
 static int pad8(int e) { return (e + 7) / 8 * 8; }
 static int align16(int e) { return (e + 15) / 16 * 16; }
+static int align64(int e) { return (e + 63) / 64 * 64; }
 
 /* -- the arena ---------------------------------------------------------- */
 
@@ -902,7 +949,8 @@ static int arena(struct nr_frame *f, enum role r, size_t bytes)
  * Two of them are the host's: the features go in, the head comes back. */
 static int named_buffer(struct nr_frame *f, const char *name, size_t bytes)
 {
-    int kind = !strcmp(name, "features") ? HOST_WRITE : !strcmp(name, "head") ? HOST_READ : GRAPH;
+    int kind = (!strcmp(name, "features") || !strcmp(name, "features_host16")) ? HOST_WRITE
+             : (!strcmp(name, "head") || !strcmp(name, "head4")) ? HOST_READ : GRAPH;
     for (int i = 0; i < f->named_count; i++) {
         struct named *n = &f->named[i];
         if (strcmp(n->name, name)) continue;
@@ -958,7 +1006,7 @@ static int named_bufferf(struct nr_frame *f, const char *fmt, int i, size_t byte
 
 enum { E4M3 = 0, GATE, HALF, TO_HALF, SCALE, RESIDUAL, FROM_HALF, PARTITION, REVERSE, ADD_BIAS,
        SPLIT_HEADS, MERGE_HEADS, POOL2, UPSAMPLE2, SCALE_CHANNEL, ADD, PAD_END,
-       GATE_E4M3_HALF, E4M3_HALF, GATE_HALF };
+       GATE_E4M3_HALF, E4M3_HALF, GATE_HALF, UPSAMPLE_MERGE };
 enum { COSINE_PUBLISH = 0, SOFTMAX = 1 };
 enum { EPI_NONE = 0, EPI_E4M3 = 1, EPI_GATE = 2, EPI_GATE_E4M3 = 3, EPI_HALF = 4 };
 
@@ -1014,13 +1062,13 @@ static int residual(struct nr_frame *f, int branch, int skip, int cosine, int ta
 }
 
 static int partition(struct nr_frame *f, int source, int target, int height, int width, unsigned channels,
-                     int oy, int ox, int narrow)
+                     int oy, int ox, int narrow, int a_half)
 {
     int ph, pw, top, left;
     window_extent(height, width, oy, ox, 8, &ph, &pw, &top, &left);
     struct dims d = { 8, (unsigned)height, (unsigned)width, (unsigned)(pw / 8) };
     return unary(f, PARTITION, source, -1, target, -1, (size_t)ph * pw * channels, channels, 1.0f,
-                 0, narrow, 0, 0, d, ((unsigned)top << 16) | (unsigned)left);
+                 0, narrow, a_half, 0, d, ((unsigned)top << 16) | (unsigned)left);
 }
 
 static int split_heads(struct nr_frame *f, int source, int target, unsigned windows, unsigned tokens,
@@ -1100,6 +1148,7 @@ struct gemm_opt {
     unsigned lda, ldb, ldc;
     unsigned oa, ob, oc;
     int epilogue, narrow;
+    unsigned extra;                 /* further flag bits: 0x10000 the compact head */
 };
 
 static int gemm(struct nr_frame *f, int a, int b, int c, unsigned rows, unsigned cols, unsigned inner,
@@ -1115,7 +1164,7 @@ static int gemm(struct nr_frame *f, int a, int b, int c, unsigned rows, unsigned
         sb = o->transpose_b ? (unsigned long long)cols * inner : (unsigned long long)inner * cols;
         sc = (unsigned long long)rows * cols;
     }
-    unsigned flags = (o->transpose_b ? 1u : 0u) | publish(o->epilogue, o->narrow);
+    unsigned flags = (o->transpose_b ? 1u : 0u) | publish(o->epilogue, o->narrow) | o->extra;
     REC(f, X.rec_gemm(a, b, c, rows, cols, inner, batch, (unsigned)sa, (unsigned)sb, (unsigned)sc, flags,
                       o->lda, o->ldb, o->ldc, o->oa, o->ob, o->oc));
     return 0;
@@ -1134,6 +1183,95 @@ static int independent(struct nr_frame *f, int on)
     return 0;
 }
 
+/* -- the fused passes: xmxres.Runtime, flag for flag (notes/improve-fusions.md) --------- */
+
+/* `Runtime.gemm_residual`: target = a @ b + skip * cosine, the residual in the GEMM's own
+ * epilogue; with `reverse` the rows are a window block's, padded and in window order, and
+ * the output lands straight back in the unpadded image. */
+static int gemm_residual(struct nr_frame *f, int a, int b, int skip, int cosine, int target,
+                         unsigned rows, unsigned cols, unsigned inner, int epilogue, int narrow,
+                         int skip_half, int reverse, int height, int width, int oy, int ox)
+{
+    unsigned flags = publish(epilogue, narrow) | (skip_half ? 0x40000u : 0u);
+    if (reverse) {
+        int ph, pw, top, left;
+        window_extent(height, width, oy, ox, 8, &ph, &pw, &top, &left);
+        REC(f, X.rec_gemm_window_residual(a, b, target, skip, cosine, rows, cols, inner, flags,
+                                          (unsigned)height, (unsigned)width, (unsigned)(pw / 8),
+                                          ((unsigned)top << 16) | (unsigned)left));
+        return 0;
+    }
+    REC(f, X.rec_gemm_residual(a, b, target, skip, cosine, rows, cols, inner, flags));
+    return 0;
+}
+
+/* `Runtime.gemm_qkv`: the QKV projection finished in its own epilogue — Q and K
+ * normalised, V published, (window, head, token, 32) halves out. With `window` the
+ * operand is the image itself and the partition happens in the projection's loads. */
+static int gemm_qkv(struct nr_frame *f, int a, int weight, int q, int k, int v, int scale,
+                    unsigned rows, unsigned channels, unsigned heads, unsigned tokens,
+                    int window, int height, int width, int oy, int ox, int image_half)
+{
+    if (window) {
+        int ph, pw, top, left;
+        window_extent(height, width, oy, ox, 8, &ph, &pw, &top, &left);
+        REC(f, X.rec_gemm_qkv_window(a, weight, q, k, v, scale, rows, channels, heads, tokens,
+                                     (unsigned)width, (unsigned)height, (unsigned)(pw / 8),
+                                     ((unsigned)top << 16) | (unsigned)left, image_half ? 1u : 0u));
+        return 0;
+    }
+    REC(f, X.rec_gemm_qkv(a, weight, q, k, v, scale, rows, channels, heads, tokens));
+    return 0;
+}
+
+/* `Runtime.gemm_dual`: c = a @ b in float32, and the same values as half into `half_copy`. */
+static int gemm_dual(struct nr_frame *f, int a, int b, int c, int half_copy, unsigned rows,
+                     unsigned cols, unsigned inner)
+{
+    REC(f, X.rec_gemm_dual(a, b, c, half_copy, rows, cols, inner));
+    return 0;
+}
+
+/* `Runtime.ffn_fused`: a feed-forward in one pass. One group of 32 channels with a skip is
+ * the narrow blocks' whole feed-forward; `groups` without a skip is the branched blocks'
+ * per-group expand and projection into `target`'s column slices. */
+static int ffn_fused(struct nr_frame *f, int a, int expand, int projection, int target,
+                     unsigned rows, unsigned channels, unsigned hidden, unsigned groups,
+                     int skip, int cosine, int epilogue, int narrow, int skip_half)
+{
+    unsigned flags = publish(epilogue, narrow) | (skip_half ? 0x40000u : 0u);
+    REC(f, X.rec_ffn(a, expand, projection, target, skip, cosine, rows, channels, hidden, groups, flags));
+    return 0;
+}
+
+/* `Runtime.upsample_merge`: merged = upsample2(source) * sin + skip * cos, stored float32
+ * and as half; `sincos` is the per-channel sin then cos. */
+static int upsample_merge(struct nr_frame *f, int source, int skip, int sincos, int merged, int merged16,
+                          int height, int width, int source_width, unsigned channels)
+{
+    REC(f, X.rec_unary2(UPSAMPLE_MERGE | reads(1, 1), source, skip, merged, sincos, merged16,
+                        (unsigned)((size_t)height * width * channels), channels, 1.0f, 0,
+                        (unsigned)width, (unsigned)source_width, 0, 0));
+    return 0;
+}
+
+/* `Runtime.window_attention`: QK^T, softmax and PV for full 8x8 windows in one dispatch;
+ * `merged` also does the head merge and publishes into `target` as half. */
+static int window_attention(struct nr_frame *f, int q, int k, int v, int target, unsigned batches,
+                            unsigned heads, int bias, int merged)
+{
+    REC(f, X.rec_window_attention(q, k, v, bias, target, batches, heads, merged ? 1u : 0u));
+    return 0;
+}
+
+/* `Runtime.prepare_qkv`: Q, K and V from the float32 projection in one row dispatch. */
+static int prepare_qkv(struct nr_frame *f, int source, int q, int k, int v, int scale,
+                       unsigned windows, unsigned tokens, unsigned heads)
+{
+    REC(f, X.rec_qkv(source, q, k, v, scale, windows * tokens * heads, tokens, heads));
+    return 0;
+}
+
 /* ------------------------------------------------------------------------- */
 /* blocks: nr_resident.py, transcribed                                          */
 /* ------------------------------------------------------------------------- */
@@ -1145,6 +1283,10 @@ struct scratch {
     size_t pixels, windowed;
     int value, value16, hidden16, heads16, branch, ffn, win16, proj, q16, k16, v16,
         scores, probs16, context, merged16, attended, out, core16;
+    /* key16: K when the projection's own epilogue writes it — k16's role is the projection's
+     * input, still being read. context16: the fused attention's merged output, in the
+     * scores' and context's role, which the fused path leaves unused. */
+    int key16, context16;
 };
 
 #define ROLE(field, role, bytes) do { s->field = arena(f, role, bytes); if (s->field == -2) return -1; } while (0)
@@ -1174,10 +1316,12 @@ static int block_scratch(struct nr_frame *f, const struct block_w *w, int height
     ROLE(q16, R_QUERY_PROB, s->windowed * 2);
     ROLE(k16, R_INPUT_KEY, s->windowed * 2);
     ROLE(v16, R_BRANCH_VALUE, s->windowed * 2);
+    ROLE(key16, R_PROJECTION, s->windowed * 2);
     ROLE(scores, R_SCORES_CONTEXT, (size_t)s->batch * 64 * 64 * 4);
     ROLE(probs16, R_QUERY_PROB, (size_t)s->batch * 64 * 64 * 2);
     ROLE(context, R_SCORES_CONTEXT, (size_t)s->batch * 64 * 32 * 4);
     ROLE(merged16, R_QUERY_PROB, s->windowed * 2);
+    ROLE(context16, R_SCORES_CONTEXT, s->windowed * 2);
     ROLE(attended, R_PROJECTION, s->windowed * 4);
     ROLE(out, R_OUT, s->pixels * C * 4);
     if (w->family == SPLIT) ROLE(core16, R_QUERY_PROB, s->pixels * C * 2); else s->core16 = -1;
@@ -1187,7 +1331,7 @@ static int block_scratch(struct nr_frame *f, const struct block_w *w, int height
 /* `GlobalScratch`: a bottleneck block over `tokens` tokens, padded to the tile. */
 struct gscratch {
     int tokens, padded;
-    int value, value16, hidden16, branch, ffn, ffn16, proj, q16, k16, v16, scores, probs16,
+    int value, value16, hidden16, branch, ffn, ffn16, proj, q16, k16, v16, key16, scores, probs16,
         context, merged16, attention, out;
 };
 
@@ -1196,7 +1340,12 @@ struct gscratch {
 static int global_scratch(struct nr_frame *f, const struct block_w *w, int tokens, struct gscratch *s)
 {
     memset(s, 0, sizeof *s);
-    s->tokens = tokens; s->padded = align16(tokens);
+    /* `GlobalScratch`: whole 64-row blocks where the pad stays under an eighth, so the
+     * bottleneck's deep-K GEMMs take the staged kernel; pad rows are zero and excluded from
+     * the softmax, so every real row is bit-identical either way */
+    int padded = align16(tokens);
+    if (align64(tokens) * 8 <= padded * 9) padded = align64(tokens);
+    s->tokens = tokens; s->padded = padded;
     size_t P = (size_t)s->padded, C = (size_t)w->channels, H = (size_t)w->hidden_width, heads = (size_t)w->heads;
     GROLE(value, R_GLOBAL_VALUE, P * C * 4);
     GROLE(value16, R_INPUT_KEY, P * C * 2);
@@ -1208,6 +1357,7 @@ static int global_scratch(struct nr_frame *f, const struct block_w *w, int token
     GROLE(q16, R_QUERY_PROB, P * C * 2);
     GROLE(k16, R_INPUT_KEY, P * C * 2);
     GROLE(v16, R_BRANCH_VALUE, P * C * 2);
+    GROLE(key16, R_PROJECTION, P * C * 2);
     GROLE(scores, R_SCORES_CONTEXT, heads * P * P * 4);
     GROLE(probs16, R_QUERY_PROB, heads * P * P * 2);
     GROLE(context, R_SCORES_CONTEXT, heads * P * 32 * 4);
@@ -1242,7 +1392,9 @@ static int record_qkv(struct nr_frame *f, const struct block_w *w, int proj, int
 {
     unsigned C = (unsigned)w->channels, heads = (unsigned)w->heads;
     size_t rows = (size_t)windows * heads * tokens;
-    if (f->fuse_qk) {
+    if (f->opt.fuse_qk && f->opt.joint_qkv)
+        return prepare_qkv(f, proj, q16, k16, v16, w->scale, windows, tokens, heads);
+    if (f->opt.fuse_qk) {
         TRY(independent(f, 1));
         TRY(cosine_publish(f, proj, q16, rows, tokens, heads, w->scale, 1, 0, 0));
         TRY(cosine_publish(f, proj, k16, rows, tokens, heads, -1, 1, 0, 1));
@@ -1262,41 +1414,113 @@ static int record_qkv(struct nr_frame *f, const struct block_w *w, int proj, int
     return 0;
 }
 
-/* `record_feed_forward`: branched or plain, into `s->ffn`. */
+/* `record_qkv_projection`: the QKV projection and everything that prepares Q, K and V
+ * after it. `*key` is the buffer K ended up in: `key16` under the epilogue, `k16` when the
+ * projection went to memory as float32 and `record_qkv` read it back. With `window`, `a`
+ * is the image (float32, or half with `image_half`) and the epilogue GEMM gathers its
+ * window rows itself; without the epilogue the partition is recorded as it always was. */
+static int record_qkv_projection(struct nr_frame *f, const struct block_w *w, int a,
+                                 int proj, int q16, int k16, int v16, int key16, int win16,
+                                 unsigned windows, unsigned tokens, int window, int height, int width,
+                                 int image_half, int *key)
+{
+    unsigned C = (unsigned)w->channels, heads = (unsigned)w->heads;
+    unsigned rows = windows * tokens;
+    if (window) {
+        if (f->opt.qkv_epilogue && rows % 64 == 0) {
+            TRY(gemm_qkv(f, a, w->qkv, q16, key16, v16, w->scale, rows, C, heads, tokens,
+                         1, height, width, w->oy, w->ox, image_half));
+            *key = key16;
+            return 0;
+        }
+        TRY(partition(f, a, win16, height, width, C, w->oy, w->ox, 1, image_half));
+        a = win16;
+    }
+    if (f->opt.qkv_epilogue && rows % 16 == 0) {
+        TRY(gemm_qkv(f, a, w->qkv, q16, key16, v16, w->scale, rows, C, heads, tokens, 0, 0, 0, 0, 0, 0));
+        *key = key16;
+        return 0;
+    }
+    TRY(gemm(f, a, w->qkv, proj, rows, 3 * C, C, NULL));
+    TRY(record_qkv(f, w, proj, q16, k16, v16, windows, tokens));
+    *key = k16;
+    return 0;
+}
+
+/* `record_project_residual`: target = a @ weight + skip * cosine — fused into the GEMM's
+ * epilogue, or the two passes the graph always had (`NR_FUSE_RESIDUAL=0`). */
+static int record_project_residual(struct nr_frame *f, int a, int weight, int branch, int skip, int cosine,
+                                   int target, unsigned rows, unsigned channels, unsigned inner,
+                                   int epilogue, int skip_half, int narrow)
+{
+    if (f->opt.fuse_residual)
+        return gemm_residual(f, a, weight, skip, cosine, target, rows, channels, inner, epilogue, narrow,
+                             skip_half, 0, 0, 0, 0, 0);
+    TRY(gemm(f, a, weight, branch, rows, channels, inner, NULL));
+    return residual(f, branch, skip, cosine, target, (size_t)rows * channels, channels, epilogue, narrow,
+                    0, skip_half, 0, 0, 0, 0, 0);
+}
+
+/* `_ffn_groups`: independent group products — one batched GEMM whose batch strides advance
+ * the group (`NR_BATCH_FFN`), or one GEMM per group with the same tiles and rounding. */
+static int ffn_groups(struct nr_frame *f, int a, int b, int c, unsigned rows, unsigned cols, unsigned inner,
+                      unsigned groups, unsigned lda, unsigned ldb, unsigned ldc,
+                      unsigned sa, unsigned sb, unsigned sc, int epilogue)
+{
+    if (f->opt.batch_ffn) {
+        struct gemm_opt o = { .batch = groups, .sa = sa, .sb = sb, .sc = sc, .lda = lda, .ldb = ldb, .ldc = ldc,
+                              .epilogue = epilogue, .narrow = 1 };
+        return gemm(f, a, b, c, rows, cols, inner, &o);
+    }
+    TRY(independent(f, 1));
+    for (unsigned g = 0; g < groups; g++) {
+        struct gemm_opt o = { .lda = lda, .ldb = ldb, .ldc = ldc, .oa = g * sa, .ob = g * sb, .oc = g * sc,
+                              .epilogue = epilogue, .narrow = 1 };
+        TRY(gemm(f, a, b, c, rows, cols, inner, &o));
+    }
+    TRY(independent(f, 0));
+    return 0;
+}
+
+/* `record_feed_forward`: branched or plain, into `s->ffn`. `source16` is a half copy of a
+ * float32 input already written by the pass that produced it (the glue), so no to_half is
+ * needed. `*ffn_half` says whether `s->ffn` was stored as half: the branched blocks publish
+ * it as E4M3, which half holds exactly, so they store it narrow. */
 static int record_feed_forward(struct nr_frame *f, const struct block_w *w, const struct scratch *s,
-                               int source, int source_half)
+                               int source, int source_half, int source16, int *ffn_half)
 {
     unsigned pixels = (unsigned)s->pixels, C = (unsigned)w->channels;
-    int value16 = source_half ? source : s->value16;
-    if (!source_half) TRY(to_half(f, source, s->value16, s->pixels * C));
+    unsigned hidden = (unsigned)s->hidden_width, groups = (unsigned)w->groups;
+    int value16 = source_half ? source : (source16 >= 0 ? source16 : s->value16);
+    if (!source_half && source16 < 0) TRY(to_half(f, source, s->value16, s->pixels * C));
+    *ffn_half = 0;
     if (w->branched) {
-        TRY(independent(f, 1));
-        for (int head = 0; head < w->groups; head++) {
-            struct gemm_opt o = { .ldc = (unsigned)s->hidden_width,
-                                  .ob = (unsigned)head * C * 128, .oc = (unsigned)head * 128,
-                                  .epilogue = EPI_GATE_E4M3, .narrow = 1 };
-            TRY(gemm(f, value16, w->expand, s->hidden16, pixels, 128, C, &o));
+        if (f->opt.fuse_branched_ffn && pixels % 16 == 0 && C % 16 == 0 && C == groups * 32) {
+            /* every group's expand and projection in one pass, the hidden layer on chip */
+            TRY(ffn_fused(f, value16, w->expand, w->branch, s->heads16, pixels, C, 128, groups,
+                          -1, -1, EPI_E4M3, 1, 0));
+        } else {
+            TRY(ffn_groups(f, value16, w->expand, s->hidden16, pixels, 128, C, groups,
+                           0, 0, hidden, 0, C * 128, 128, EPI_GATE_E4M3));
+            TRY(ffn_groups(f, s->hidden16, w->branch, s->heads16, pixels, 32, 128, groups,
+                           hidden, 0, C, 128, 128 * 32, 32, EPI_E4M3));
         }
-        TRY(independent(f, 0));
-        TRY(independent(f, 1));
-        for (int head = 0; head < w->groups; head++) {
-            struct gemm_opt o = { .lda = (unsigned)s->hidden_width, .ldc = C,
-                                  .oa = (unsigned)head * 128, .ob = (unsigned)head * 128 * 32,
-                                  .oc = (unsigned)head * 32, .epilogue = EPI_E4M3, .narrow = 1 };
-            TRY(gemm(f, s->hidden16, w->branch, s->heads16, pixels, 32, 128, &o));
-        }
-        TRY(independent(f, 0));
-        TRY(gemm(f, s->heads16, w->ffn_out, s->branch, pixels, C, C, NULL));
-        TRY(residual(f, s->branch, source, w->ffn_cos, s->ffn, s->pixels * C, C, EPI_E4M3, 0, 0,
-                     source_half, 0, 0, 0, 0, 0));
-    } else {
-        struct gemm_opt o = { .epilogue = EPI_GATE_E4M3, .narrow = 1 };
-        TRY(gemm(f, value16, w->expand, s->hidden16, pixels, (unsigned)s->hidden_width, C, &o));
-        TRY(gemm(f, s->hidden16, w->branch, s->branch, pixels, C, (unsigned)s->hidden_width, NULL));
-        TRY(residual(f, s->branch, source, w->ffn_cos, s->ffn, s->pixels * C, C, 0, 0, 0, source_half,
-                     0, 0, 0, 0, 0));
+        /* the fused multi-head kernels publish the residual before attention reads it,
+         * which the residual now does on its way out — as half, which holds it exactly */
+        TRY(record_project_residual(f, s->heads16, w->ffn_out, s->branch, source, w->ffn_cos, s->ffn,
+                                    pixels, C, C, EPI_E4M3, source_half, 1));
+        *ffn_half = 1;
+        return 0;
     }
-    return 0;
+    if (f->opt.fuse_ffn && C == 32 && hidden % 32 == 0 && pixels % 16 == 0) {
+        /* both GEMMs in one pass, the hidden layer never written (ffn_fused.comp) */
+        return ffn_fused(f, value16, w->expand, w->branch, s->ffn, pixels, C, hidden, 1,
+                         source, w->ffn_cos, 0, 0, source_half);
+    }
+    struct gemm_opt o = { .epilogue = EPI_GATE_E4M3, .narrow = 1 };
+    TRY(gemm(f, value16, w->expand, s->hidden16, pixels, hidden, C, &o));
+    return record_project_residual(f, s->hidden16, w->branch, s->branch, source, w->ffn_cos, s->ffn,
+                                   pixels, C, hidden, 0, source_half, 0);
 }
 
 /* `record_split_feed_forward`: e4m3(x @ first), then a per-64-group 64 -> 256 -> 64 MLP. */
@@ -1309,61 +1533,83 @@ static int record_split_feed_forward(struct nr_frame *f, const struct block_w *w
     if (!source_half) TRY(to_half(f, source, s->value16, s->pixels * C));
     struct gemm_opt first = { .epilogue = EPI_E4M3, .narrow = 1 };
     TRY(gemm(f, value16, w->first, s->heads16, pixels, C, C, &first));
-    TRY(independent(f, 1));
-    for (unsigned g = 0; g < groups; g++) {
-        struct gemm_opt o = { .lda = C, .ldc = wide, .oa = g * 64, .ob = g * 64 * 256, .oc = g * 256,
-                              .epilogue = EPI_GATE, .narrow = 1 };
-        TRY(gemm(f, s->heads16, w->expand, s->hidden16, pixels, 256, 64, &o));
-    }
-    TRY(independent(f, 0));
-    TRY(independent(f, 1));
-    for (unsigned g = 0; g < groups; g++) {
-        struct gemm_opt o = { .lda = wide, .ldc = C, .oa = g * 256, .ob = g * 256 * 64, .oc = g * 64,
-                              .epilogue = EPI_E4M3, .narrow = 1 };
-        TRY(gemm(f, s->hidden16, w->project, s->core16, pixels, 64, 256, &o));
-    }
-    TRY(independent(f, 0));
-    TRY(gemm(f, s->core16, w->weight3, s->branch, pixels, C, C, NULL));
-    TRY(residual(f, s->branch, source, w->ffn_cos, s->ffn, s->pixels * C, C, 0, 0, 0, source_half,
-                 0, 0, 0, 0, 0));
-    return 0;
+    TRY(ffn_groups(f, s->heads16, w->expand, s->hidden16, pixels, 256, 64, groups,
+                   C, 0, wide, 64, 64 * 256, 256, EPI_GATE));
+    TRY(ffn_groups(f, s->hidden16, w->project, s->core16, pixels, 64, 256, groups,
+                   wide, 0, C, 256, 256 * 64, 64, EPI_E4M3));
+    return record_project_residual(f, s->core16, w->weight3, s->branch, source, w->ffn_cos, s->ffn,
+                                   pixels, C, C, 0, source_half, 0);
 }
 
-/* `record_window_attention`: over `source`, into `s->attended`, in window order. */
-static int record_window_attention(struct nr_frame *f, const struct block_w *w, const struct scratch *s, int source)
+/* `record_window_attention`: over `source`, in window order. With `to_target` the
+ * output projection finishes the block — it adds `source * attn_cos` and writes straight
+ * back into the unpadded image; otherwise the result goes to `s->attended` and the
+ * closing residual's own gather reverses the windows. */
+static int record_window_attention(struct nr_frame *f, const struct block_w *w, const struct scratch *s,
+                                   int source, int to_target, int target, int publish_epilogue,
+                                   int target_half, int source_half)
 {
     unsigned C = (unsigned)w->channels, heads = (unsigned)w->heads, tokens = 64;
     int ph, pw, top, left;
     window_extent(s->height, s->width, w->oy, w->ox, 8, &ph, &pw, &top, &left);
     unsigned windows = (unsigned)((ph / 8) * (pw / 8));
     unsigned batch = windows * heads;
-    TRY(partition(f, source, s->win16, s->height, s->width, C, w->oy, w->ox, 1));
-    TRY(gemm(f, s->win16, w->qkv, s->proj, windows * tokens, 3 * C, C, NULL));
-    TRY(record_qkv(f, w, s->proj, s->q16, s->k16, s->v16, windows, tokens));
-    struct gemm_opt qk = { .batch = batch, .sa = tokens * 32, .sb = tokens * 32, .sc = tokens * tokens,
-                           .transpose_b = 1 };
-    TRY(gemm(f, s->q16, s->k16, s->scores, tokens, tokens, 32, &qk));
-    TRY(softmax(f, s->scores, s->probs16, (size_t)batch * tokens, tokens, 0, 0.0f, 1, w->bias, heads));
-    struct gemm_opt pv = { .batch = batch, .sa = tokens * tokens, .sb = tokens * 32, .sc = tokens * 32 };
-    TRY(gemm(f, s->probs16, s->v16, s->context, tokens, 32, tokens, &pv));
-    TRY(merge_heads(f, s->context, s->merged16, windows, tokens, C, heads, EPI_E4M3, 1));
-    TRY(gemm(f, s->merged16, w->out, s->attended, windows * tokens, C, C, NULL));
-    return 0;
+    int key;
+    if (f->opt.fuse_partition) {
+        /* the projection gathers its window rows from the image itself */
+        TRY(record_qkv_projection(f, w, source, s->proj, s->q16, s->k16, s->v16, s->key16, s->win16,
+                                  windows, tokens, 1, s->height, s->width, source_half, &key));
+    } else {
+        TRY(partition(f, source, s->win16, s->height, s->width, C, w->oy, w->ox, 1, source_half));
+        TRY(record_qkv_projection(f, w, s->win16, s->proj, s->q16, s->k16, s->v16, s->key16, s->win16,
+                                  windows, tokens, 0, 0, 0, 0, &key));
+    }
+    int fused = f->opt.fuse_window_attention && tokens == 64;
+    int merged = fused && f->opt.fuse_attention_merge;
+    int attended = merged ? s->context16 : s->merged16;
+    if (fused) {
+        TRY(window_attention(f, s->q16, key, s->v16, merged ? attended : s->context, batch, heads,
+                             w->bias, merged));
+    } else {
+        struct gemm_opt qk = { .batch = batch, .sa = tokens * 32, .sb = tokens * 32, .sc = tokens * tokens,
+                               .transpose_b = 1 };
+        TRY(gemm(f, s->q16, key, s->scores, tokens, tokens, 32, &qk));
+        TRY(softmax(f, s->scores, s->probs16, (size_t)batch * tokens, tokens, 0, 0.0f, 1, w->bias, heads));
+        struct gemm_opt pv = { .batch = batch, .sa = tokens * tokens, .sb = tokens * 32, .sc = tokens * 32 };
+        TRY(gemm(f, s->probs16, s->v16, s->context, tokens, 32, tokens, &pv));
+    }
+    if (!merged) TRY(merge_heads(f, s->context, s->merged16, windows, tokens, C, heads, EPI_E4M3, 1));
+    if (to_target)
+        return gemm_residual(f, attended, w->out, source, w->attn_cos, target, windows * tokens, C, C,
+                             publish_epilogue, target_half, source_half, 1, s->height, s->width, w->oy, w->ox);
+    return gemm(f, attended, w->out, s->attended, windows * tokens, C, C, NULL);
 }
 
-/* `record_block`: feed-forward, attention, both residuals; the window reverse is the
- * closing residual's own gather. */
+/* `record_block`: feed-forward, attention, both residuals. `prepared` is the block's
+ * scratch when the caller allocated it first (the glue writes into its `value16` before the
+ * block runs); `source16` is that half copy. */
 static int record_block(struct nr_frame *f, const struct block_w *w, int height, int width, int source,
-                        int target, int publish_epilogue, int source_half, int target_half)
+                        int target, int publish_epilogue, int source_half, int target_half,
+                        int source16, const struct scratch *prepared)
 {
-    struct scratch s;
-    TRY(block_scratch(f, w, height, width, &s));
-    if (w->family == SPLIT) TRY(record_split_feed_forward(f, w, &s, source, source_half));
-    else TRY(record_feed_forward(f, w, &s, source, source_half));
-    TRY(record_window_attention(f, w, &s, s.ffn));
-    TRY(residual(f, s.attended, s.ffn, w->attn_cos, target, s.pixels * (size_t)w->channels,
-                 (unsigned)w->channels, publish_epilogue, target_half, 0, 0, 1, height, width, w->oy, w->ox));
-    return 0;
+    struct scratch own;
+    const struct scratch *s = prepared;
+    if (!s) { TRY(block_scratch(f, w, height, width, &own)); s = &own; }
+    int ffn_half = 0;
+    if (w->family == SPLIT) {
+        if (source16 >= 0) FAILF("the split feed-forward takes no prepared half copy");
+        TRY(record_split_feed_forward(f, w, s, source, source_half));
+    } else {
+        TRY(record_feed_forward(f, w, s, source, source_half, source16, &ffn_half));
+    }
+    if (f->opt.fuse_window_residual) {
+        return record_window_attention(f, w, s, s->ffn, 1, target, publish_epilogue, target_half,
+                                       ffn_half);
+    }
+    TRY(record_window_attention(f, w, s, s->ffn, 0, -1, 0, 0, ffn_half));
+    return residual(f, s->attended, s->ffn, w->attn_cos, target, s->pixels * (size_t)w->channels,
+                    (unsigned)w->channels, publish_epilogue, target_half, 0, ffn_half, 1, height, width,
+                    w->oy, w->ox);
 }
 
 /* `record_global_block`: the wide feed-forward, then attention over every token. */
@@ -1375,22 +1621,23 @@ static int record_global_block(struct nr_frame *f, const struct block_w *w, cons
     TRY(to_half(f, s->value, s->value16, PC));
     struct gemm_opt gate = { .epilogue = EPI_GATE_E4M3, .narrow = 1 };
     TRY(gemm(f, s->value16, w->expand, s->hidden16, P, hidden, C, &gate));
-    TRY(gemm(f, s->hidden16, w->ffn_proj, s->branch, P, C, hidden, NULL));
-    TRY(residual(f, s->branch, s->value, w->ffn_cos, s->ffn, PC, C, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    TRY(record_project_residual(f, s->hidden16, w->ffn_proj, s->branch, s->value, w->ffn_cos, s->ffn,
+                                P, C, hidden, 0, 0, 0));
     TRY(to_half(f, s->ffn, s->ffn16, PC));
-    TRY(gemm(f, s->ffn16, w->qkv, s->proj, P, 3 * C, C, NULL));
-    TRY(record_qkv(f, w, s->proj, s->q16, s->k16, s->v16, 1, P));
+    int key;
+    TRY(record_qkv_projection(f, w, s->ffn16, s->proj, s->q16, s->k16, s->v16, s->key16, -1, 1, P,
+                              0, 0, 0, 0, &key));
     struct gemm_opt qk = { .batch = heads, .sa = (unsigned long long)P * 32, .sb = (unsigned long long)P * 32,
                            .sc = (unsigned long long)P * P, .transpose_b = 1 };
-    TRY(gemm(f, s->q16, s->k16, s->scores, P, P, 32, &qk));
+    TRY(gemm(f, s->q16, key, s->scores, P, P, 32, &qk));
+    /* no attention bias here, and the logits are clamped symmetrically */
     TRY(softmax(f, s->scores, s->probs16, (size_t)heads * P, (unsigned)s->tokens, P, w->logit_cap, 1, -1, 0));
     struct gemm_opt pv = { .batch = heads, .sa = (unsigned long long)P * P, .sb = (unsigned long long)P * 32,
                            .sc = (unsigned long long)P * 32 };
     TRY(gemm(f, s->probs16, s->v16, s->context, P, 32, P, &pv));
     TRY(merge_heads(f, s->context, s->merged16, 1, P, C, heads, EPI_E4M3, 1));
-    TRY(gemm(f, s->merged16, w->out, s->attention, P, C, C, NULL));
-    TRY(residual(f, s->attention, s->ffn, w->attn_cos, s->out, PC, C, 0, 0, 0, 0, 0, 0, 0, 0, 0));
-    return 0;
+    return record_project_residual(f, s->merged16, w->out, s->attention, s->ffn, w->attn_cos, s->out,
+                                   P, C, C, 0, 0, 0);
 }
 
 /* `record_downsample`: pool the unpublished output, publish it, then project. */
@@ -1498,21 +1745,37 @@ static int build(struct nr_frame *f)
     int (*L)[3] = f->levels;
 
     NAMED(stem, "stem", pixels * 32 * 4);
-    NAMED(source, "features", pixels * 16 * 4);
-    NAMED(features16, "features16", pixels * 16 * 2);
-    if (!f->planning && X.begin()) FAILF("xmx_begin: %s", X.error());
-    TRY(to_half(f, source, features16, pixels * 16));
-    TRY(gemm(f, features16, f->adapter, stem, (unsigned)pixels, 32, 16, NULL));
-
+    /* separate names keep a captured graph's addresses valid across NR_INPUT_FP16 */
+    int source16;
+    if (f->opt.input_fp16) {
+        NAMED(half_in, "features_host16", pixels * 16 * 2);
+        source16 = half_in;
+    } else {
+        NAMED(source, "features", pixels * 16 * 4);
+        NAMED(features16, "features16", pixels * 16 * 2);
+        source16 = features16;
+        if (!f->planning && X.begin()) FAILF("xmx_begin: %s", X.error());
+        TRY(to_half(f, source, features16, pixels * 16));
+    }
+    if (f->opt.input_fp16 && !f->planning && X.begin()) FAILF("xmx_begin: %s", X.error());
     /* block 0 at full resolution: the skip the post block merges and, pooled, the
-     * encoder's input; every published buffer is stored narrow */
+     * encoder's input; every published buffer is stored narrow. Its scratch is taken
+     * first, because under the glue the stem's GEMM also writes its `value16`. */
     BLOCK(block0, 0, 1, WINDOW);
+    struct scratch scratch0;
+    TRY(block_scratch(f, block0, H, W, &scratch0));
+    if (f->opt.fuse_glue)
+        TRY(gemm_dual(f, source16, f->adapter, stem, scratch0.value16, (unsigned)pixels, 32, 16));
+    else
+        TRY(gemm(f, source16, f->adapter, stem, (unsigned)pixels, 32, 16, NULL));
+
     NAMED(raw, "block0", pixels * 32 * 4);
     NAMED(full_skip, "full_skip", pixels * 32 * 2);
     int h = L[1][0], w = L[1][1], C = L[1][2];
     NAMED(l1, "l1", (size_t)h * w * 32 * 2);
     int value = l1;
-    TRY(record_block(f, block0, H, W, stem, raw, 0, 0, 0));
+    TRY(record_block(f, block0, H, W, stem, raw, 0, 0, 0,
+                     f->opt.fuse_glue ? scratch0.value16 : -1, &scratch0));
     TRY(independent(f, 1));
     TRY(e4m3_half(f, raw, full_skip, pixels * 32));
     TRY(pool2(f, raw, value, H, W, 32, EPI_E4M3, 1, 0));
@@ -1524,7 +1787,7 @@ static int build(struct nr_frame *f)
         h = L[level][0]; w = L[level][1]; C = L[level][2];
         for (int index = ENCODER[e].first; index <= ENCODER[e].last; index++) {
             BLOCK(b, index, ENCODER[e].heads, WINDOW);
-            TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1));
+            TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
         }
         NAMEDF(skip, "skip%d", level, (size_t)h * w * C * 2);
         skips[level] = skip;
@@ -1536,7 +1799,7 @@ static int build(struct nr_frame *f)
         NAMEDF(nxt, "l%d", level + 1, (size_t)nh * nw * nC * 2);
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)pad8(h) * pad8(w) * C, &t));
-        TRY(record_block(f, tb, h, w, value, unpublished, 0, 1, 0));
+        TRY(record_block(f, tb, h, w, value, unpublished, 0, 1, 0, -1, NULL));
         TRY(record_downsample(f, down, &t, unpublished, nxt, h, w, (unsigned)C,
                               ENCODER[e].transition == 22 ? 8 : 0, 0, 1));
         value = nxt;
@@ -1547,7 +1810,7 @@ static int build(struct nr_frame *f)
     h = L[5][0]; w = L[5][1]; C = L[5][2];
     for (int index = 23; index <= 30; index++) {
         BLOCK(b, index, 16, SPLIT);
-        TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1));
+        TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
     }
     NAMED(split_skip, "split_skip", (size_t)h * w * C * 2);
     TRY(copy(f, value, split_skip, (size_t)h * w * C * 2));
@@ -1579,7 +1842,7 @@ static int build(struct nr_frame *f)
     }
     for (int index = 40; index <= 47; index++) {
         BLOCK(b, index, 16, SPLIT);
-        TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1));
+        TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
     }
 
     for (int d = 0; d < 4; d++) {
@@ -1592,27 +1855,41 @@ static int build(struct nr_frame *f)
         TRY(record_upsample_merge(f, up, &t, value, skips[sl], target, h, w, sh, sw, (unsigned)C,
                                   (unsigned)sC, 1, 1, 1));
         BLOCK(tb, DECODER[d].transition, DECODER[d].heads, WINDOW);
-        TRY(record_block(f, tb, sh, sw, target, target, EPI_E4M3, 1, 1));
+        TRY(record_block(f, tb, sh, sw, target, target, EPI_E4M3, 1, 1, -1, NULL));
         value = target; h = sh; w = sw; C = sC;
         for (int index = DECODER[d].first; index <= DECODER[d].last; index++) {
             BLOCK(b, index, DECODER[d].heads, WINDOW);
-            TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1));
+            TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
         }
     }
 
     /* back to full resolution, merged with block 0's output, then the head */
     NAMED(merged, "merged", pixels * 32 * 4);
-    NAMED(upsampled, "upsampled", pixels * 32 * 4);
     BLOCK(block70, 70, 1, WINDOW);
-    NAMED(out, "out", pixels * 32 * 4);
+    struct scratch scratch70;
+    TRY(block_scratch(f, block70, H, W, &scratch70));
+    /* The head reads block 70's output as half and nothing reads it as float32, so the
+     * block's closing residual stores half itself. */
     NAMED(out16, "out16", pixels * 32 * 2);
-    NAMED(head, "head", pixels * 16 * 4);
-    TRY(upsample2(f, value, upsampled, w, H, W, 32, 1));
-    TRY(scale_channel(f, upsampled, f->merge_sin, merged, pixels * 32, 32, 0));
-    TRY(residual(f, merged, full_skip, f->merge_cos, merged, pixels * 32, 32, 0, 0, 0, 1, 0, 0, 0, 0, 0));
-    TRY(record_block(f, block70, H, W, merged, out, 0, 0, 0));
-    TRY(to_half(f, out, out16, pixels * 32));
-    TRY(gemm(f, out16, f->head, head, (unsigned)pixels, 16, 32, NULL));
+    if (f->opt.fuse_glue) {
+        TRY(upsample_merge(f, value, full_skip, f->merge_sincos, merged, scratch70.value16, H, W, w, 32));
+    } else {
+        NAMED(upsampled, "upsampled", pixels * 32 * 4);
+        TRY(upsample2(f, value, upsampled, w, H, W, 32, 1));
+        TRY(scale_channel(f, upsampled, f->merge_sin, merged, pixels * 32, 32, 0));
+        TRY(residual(f, merged, full_skip, f->merge_cos, merged, pixels * 32, 32, 0, 0, 0, 1, 0, 0, 0, 0, 0));
+    }
+    TRY(record_block(f, block70, H, W, merged, out16, 0, 0, 1,
+                     f->opt.fuse_glue ? scratch70.value16 : -1, &scratch70));
+    if (f->opt.compact_head) {
+        /* only the four useful columns, at a row stride of four */
+        NAMED(head4, "head4", pixels * 4 * 4);
+        struct gemm_opt o = { .sa = pixels * 32, .sb = 32 * 16, .sc = pixels * 4, .ldc = 4, .extra = 0x10000u };
+        TRY(gemm(f, out16, f->head, head4, (unsigned)pixels, 16, 32, &o));
+    } else {
+        NAMED(head, "head", pixels * 16 * 4);
+        TRY(gemm(f, out16, f->head, head, (unsigned)pixels, 16, 32, NULL));
+    }
 
     if (!f->planning) {
         f->graph = X.graph_capture();
@@ -1773,27 +2050,33 @@ static double now(void) { return nr_now(); }
 static const float *run_graph(struct nr_frame *f, const float *features)
 {
     size_t pixels = (size_t)f->height * f->width;
-    int source = named_buffer(f, "features", pixels * 16 * 4);
-    int head = named_buffer(f, "head", pixels * 16 * 4);
-    
-#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
-    if (source < 0 || head < 0) { sprintf_s(last_error, sizeof last_error, "graph buffers are missing"); return NULL; }
-#else
-    if (source < 0 || head < 0) { snprintf(last_error, sizeof last_error, "graph buffers are missing"); return NULL; }
-#endif
-
+    int fp16 = f->opt.input_fp16, compact = f->opt.compact_head;
+    int source = fp16 ? named_buffer(f, "features_host16", pixels * 16 * 2)
+                      : named_buffer(f, "features", pixels * 16 * 4);
+    int head = compact ? named_buffer(f, "head4", pixels * 4 * 4) : named_buffer(f, "head", pixels * 16 * 4);
+    if (source < 0 || head < 0) {
+        snprintf(last_error, sizeof last_error, "graph buffers are missing");
+        return NULL;
+    }
     double t0 = now();
-    if (host_write(source, features, pixels * 16 * 4)) return NULL;
+    if (fp16) {
+        /* NR_INPUT_FP16: the features rounded to half on the host, as NumPy's astype does,
+         * straight into the mapped input when it is mapped; no to_half pass on the device */
+        size_t n = pixels * 16;
+        uint16_t *dst = X.buf_host_visible(source) ? (uint16_t *)X.buf_ptr(source) : (uint16_t *)f->head_host;
+        for (size_t i = 0; i < n; i++) dst[i] = float_to_half(features[i]);
+        if (!X.buf_host_visible(source) && host_write(source, dst, n * 2)) return NULL;
+    } else if (host_write(source, features, pixels * 16 * 4)) {
+        return NULL;
+    }
     double t1 = now();
-    
-#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
-    if (X.graph_run(f->graph) < 0) { sprintf_s(last_error, sizeof last_error, "xmx_graph_run: %s", X.error()); return NULL; }
-#else
-    if (X.graph_run(f->graph) < 0) { snprintf(last_error, sizeof last_error, "xmx_graph_run: %s", X.error()); return NULL; }
-#endif
-
+    if (X.graph_run(f->graph) < 0) {
+        snprintf(last_error, sizeof last_error, "xmx_graph_run: %s", X.error());
+        return NULL;
+    }
     double t2 = now();
-    const float *out = host_read(head, f->head_host, pixels * 16 * 4);
+    f->head_stride = compact ? 4 : 16;
+    const float *out = host_read(head, f->head_host, pixels * (size_t)f->head_stride * 4);
     f->split[0] = t1 - t0; f->split[1] = t2 - t1; f->split[2] = now() - t2;
     return out;
 }
@@ -2006,6 +2289,14 @@ int nr_frame_shared_device(void)
     return (X.handle && X.adopted) ? X.adopted() : -1;
 }
 
+/* An NR_* switch as `os.environ.get(name, default) != "0"` reads it. */
+static int env_switch(const char *name, int fallback)
+{
+    const char *value = getenv(name);
+    if (!value) return fallback;
+    return strcmp(value, "0") != 0;
+}
+
 nr_frame *nr_frame_open(const char *weights_path)
 {
     if (xmx_ready()) return NULL;
@@ -2014,11 +2305,27 @@ nr_frame *nr_frame_open(const char *weights_path)
     f->graph = -1;
     for (int r = 0; r < R_COUNT; r++) f->role_id[r] = -1;
     /* buffer ids start at zero, so "none" has to be -1 from the start */
-    f->adapter = f->merge_sin = f->merge_cos = f->head = -1;
+    f->adapter = f->merge_sin = f->merge_cos = f->merge_sincos = f->head = -1;
+    f->head_stride = 16;
     f->bottleneck.weight0 = f->bottleneck.sine = -1;
     f->decoder_input.weight0 = f->decoder_input.sine = -1;
-    const char *fuse = getenv("NR_FUSE_QK");
-    f->fuse_qk = !(fuse && !strcmp(fuse, "0"));
+    /* `xmxres.Runtime.__init__`, switch for switch and default for default */
+    f->opt.fuse_qk = env_switch("NR_FUSE_QK", 1);
+    f->opt.batch_ffn = env_switch("NR_BATCH_FFN", 1);
+    f->opt.input_fp16 = env_switch("NR_INPUT_FP16", 0);
+    f->opt.compact_head = env_switch("NR_COMPACT_HEAD", 0);
+    f->opt.joint_qkv = env_switch("NR_JOINT_QKV", 0);
+    f->opt.fuse_residual = env_switch("NR_FUSE_RESIDUAL", 1);
+    f->opt.fuse_window_residual = env_switch("NR_FUSE_WINDOW_RESIDUAL", 1);
+    f->opt.fuse_window_attention = env_switch("NR_FUSE_WINDOW_ATTENTION", 1);
+    f->opt.fuse_attention_merge = env_switch("NR_FUSE_ATTENTION_MERGE", 1);
+    f->opt.qkv_epilogue = env_switch("NR_QKV_EPILOGUE", 1);
+    f->opt.fuse_glue = env_switch("NR_FUSE_GLUE", 1);
+    f->opt.fuse_ffn = env_switch("NR_FUSE_FFN", 1);
+    f->opt.fuse_branched_ffn = env_switch("NR_FUSE_BRANCHED_FFN", 0);
+    /* off where the runtime cannot gather a window-ordered A, as xmxres.py decides it */
+    f->opt.fuse_partition = env_switch("NR_FUSE_PARTITION", 1)
+                            && X.window_gather && X.window_gather() == 1;
     if (weights_load(&f->w, weights_path)) { free(f); return NULL; }
     /* the six named weights `DeviceWeights` uploads before any block */
     const struct tensor *adapter = weight(&f->w, "block0.layer0.input_adapter_weight");
@@ -2041,6 +2348,16 @@ nr_frame *nr_frame_open(const char *weights_path)
     f->decoder_input.out_channels = (int)conv->shape[1]; f->decoder_input.loaded = 1;
     if ((f->merge_sin = buffer_f32(msin->data, msin->count)) < 0) goto fail;
     if ((f->merge_cos = buffer_f32(mcos->data, mcos->count)) < 0) goto fail;
+    {
+        /* both, one after the other, for the pass that applies them together */
+        float *sincos = malloc((msin->count + mcos->count) * sizeof(float));
+        if (!sincos) { snprintf(last_error, sizeof last_error, "out of memory"); goto fail; }
+        memcpy(sincos, msin->data, msin->count * sizeof(float));
+        memcpy(sincos + msin->count, mcos->data, mcos->count * sizeof(float));
+        f->merge_sincos = buffer_f32(sincos, msin->count + mcos->count);
+        free(sincos);
+        if (f->merge_sincos < 0) goto fail;
+    }
     /* the head is 32 -> 4 in a (32, 16) matrix padded to the tile: gain over the first
      * sixteen rows, the convolution over the second, the first four columns the head */
 
@@ -2125,7 +2442,7 @@ int nr_frame_run_features(nr_frame *f, const float *features, int network_height
     const float *wide = run_graph(f, features);
     if (!wide) return -1;
     size_t pixels = (size_t)network_height * network_width;
-    for (size_t p = 0; p < pixels; p++) memcpy(head + p * 4, wide + p * 16, 4 * sizeof(float));
+    for (size_t p = 0; p < pixels; p++) memcpy(head + p * 4, wide + p * f->head_stride, 4 * sizeof(float));
     return 0;
 }
 
@@ -2146,10 +2463,10 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
     if (features_into(f, colour, height, width, history, control_mask, params, f->features_host)) return -1;
     const float *wide = run_graph(f, f->features_host);
     if (!wide) return -1;
-    ptrdiff_t hy = (ptrdiff_t)f->width * 16;
+    ptrdiff_t hx = f->head_stride, hy = (ptrdiff_t)f->width * hx;
     if (head_out)
         for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
-                memcpy(head_out + ((size_t)y * width + x) * 4, wide + (size_t)y * hy + (size_t)x * 16, 4 * sizeof(float));
-    return compose(f, wide, hy, 16, colour, height, width, history, previous, control_mask, params, output);
+                memcpy(head_out + ((size_t)y * width + x) * 4, wide + (size_t)y * hy + (size_t)x * hx, 4 * sizeof(float));
+    return compose(f, wide, hy, hx, colour, height, width, history, previous, control_mask, params, output);
 }

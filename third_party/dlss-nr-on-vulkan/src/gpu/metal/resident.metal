@@ -9,7 +9,8 @@ constant uint E4M3 = 0u, GATE = 1u, HALF = 2u, TO_HALF = 3u,
               RESIDUAL = 5u, FROM_HALF = 6u, PARTITION = 7u, REVERSE = 8u, ADD_BIAS = 9u,
               SPLIT_HEADS = 10u, MERGE_HEADS = 11u, POOL2 = 12u, UPSAMPLE2 = 13u,
               SCALE_CHANNEL = 14u, ADD = 15u, PAD_END = 16u,
-              GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u;
+              GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u,
+              UPSAMPLE_MERGE = 20u;
 
 /* An operand held as float16 (bit 15 marks `a`, bit 16 marks `b`); a published value is
  * E4M3 and exact in half, so nothing is lost by the narrow read. */
@@ -104,6 +105,22 @@ kernel void resident(constant Push &pc [[buffer(0)]],
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         store(pc, flags, index, load_a(pc, flags, ((y / 2u) * source + (x / 2u)) * channels + c));
+        return;
+    }
+    if (kind == UPSAMPLE_MERGE) {
+        /* Block 70's input in one pass: the level above upsampled 2x (nearest), times the
+         * per-channel sin, plus the skip times the per-channel cos, stored float32 and, as
+         * the second output (offset 96), half. The steps are upsample2, scale_channel,
+         * residual and to_half, each rounded where they round: the scale on its own, the
+         * residual in RESIDUAL's own `a + b * d` (nothing is contracted in this build).
+         * n=channels, sa=target width, sb=source width; d holds sin then cos. */
+        uint channels = pc.n, target = pc.sa, source = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % target, y = rest / target;
+        float scaled = load_a(pc, flags, ((y / 2u) * source + (x / 2u)) * channels + c) * d[c];
+        float merged = scaled + load_b(pc, flags, index) * d[channels + c];
+        float_out(pc.c)[index] = merged;
+        half_out(pc.residual_cos)[index] = half(merged);
         return;
     }
     if (kind == PAD_END) {

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define VK_NO_PROTOTYPES
+#include <stddef.h>
 #include <vulkan/vulkan.h>
 #include "nr_shaders_embedded.h"
 #include "xmx.h"
@@ -47,7 +48,8 @@
 	F(vkDestroyQueryPool) F(vkDestroyShaderModule) F(vkDeviceWaitIdle) F(vkEndCommandBuffer) \
 	F(vkEnumerateDeviceExtensionProperties) F(vkEnumeratePhysicalDevices) \
 	F(vkFreeCommandBuffers) F(vkFreeMemory) F(vkGetBufferDeviceAddress) \
-	F(vkGetBufferMemoryRequirements) F(vkGetDeviceQueue) F(vkGetPhysicalDeviceMemoryProperties) \
+	F(vkGetBufferMemoryRequirements) F(vkGetDeviceQueue) F(vkGetPhysicalDeviceFeatures2) \
+	F(vkGetPhysicalDeviceMemoryProperties) \
 	F(vkGetPhysicalDeviceProperties) F(vkGetPhysicalDeviceQueueFamilyProperties) \
 	F(vkGetQueryPoolResults) F(vkMapMemory) F(vkQueueSubmit) F(vkQueueWaitIdle) \
 	F(vkResetCommandBuffer) F(vkResetFences) F(vkUnmapMemory) F(vkUpdateDescriptorSets) \
@@ -114,8 +116,9 @@ static struct {
 	VkCommandPool cpool; VkCommandBuffer cb; VkFence fence;
 	struct buf A, B, C;
 	/* resident path */
-	VkPipelineLayout rpl; VkPipeline rgemm, rtiled, rstaged, runary, rrow, rhistory;
-	char *rpaths[5];
+	VkPipelineLayout rpl; VkPipeline rgemm, rtiled, rstaged, runary, rrow, rhistory, rwindow[2];
+	VkPipeline rffn;          /* the fused feed-forward, built on first use */
+	char *rpaths[6];
 	unsigned specialize;
 	unsigned tiling, tilem, tilen;
 	int syncing;
@@ -133,6 +136,12 @@ static struct {
 	 * the plain multiply-add kernels instead — because the device has no matrix path
 	 * (MoltenVK on Apple silicon), or because XMX_PORTABLE=1 asked for it here. */
 	int coopmat, portable;
+	/* `explicit_layout`: VK_KHR_workgroup_memory_explicit_layout is enabled on the device,
+	 * which `gemm_staged.comp` needs since its operand tiles and output stage alias one
+	 * shared-memory block. `staged_ok`: that kernel is built and may be chosen — matrix
+	 * units, the extension, and not forced portable. Without it every shape goes to the
+	 * 8x16 and 16x32 kernels, and a window-gathered A (which only it can load) is refused. */
+	int explicit_layout, staged_ok;
 	struct buf stage;
 	/* An adopted device belongs to the host: never destroyed here, and every submit on
 	 * its queue is bracketed by the host's lock when one was given. */
@@ -171,6 +180,10 @@ enum { PK_GEMM = 0, PK_TILED, PK_STAGED, PK_UNARY, PK_ROW, PK_HISTORY, PK_COPY, 
 static unsigned char stamp_kind[MAX_STAMPS];
 static double prof_ms[PROF_KINDS];
 static unsigned prof_hits[PROF_KINDS];
+/* Every pass's own duration, in recording order, since the last reset: what the totals
+ * above sum away. `frame_profile.py --calls` pairs it with the calls that recorded them. */
+static double prof_each[MAX_STAMPS];
+static unsigned prof_each_n;
 
 /* Device-resident buffers. The graph's activations live here between blocks instead
  * of being read back to the host after every GEMM; on a shared-memory APU the mapping
@@ -185,7 +198,19 @@ struct push {
 	uint32_t m, n, k, batch, sa, sb, sc, flags;
 	float p0, p1, p2, p3;
 	uint32_t lda, ldb, ldc, spare;
+	/* The fused residual (`gemm_resident.comp`, `residual_epilogue.glsl`): the skip
+	 * travels in `d`, its per-channel cosine here, and a window-layout projection also
+	 * needs the image it writes back into. Appended, so no earlier offset moves. */
+	uint64_t residual_cos;
+	uint32_t image_h, image_w, window_cols, window_pad;
+	/* The QKV projection's epilogue (`qkv_epilogue.glsl`): the query's per-head scale.
+	 * 128 bytes in all, the push-constant size every Vulkan device must support. */
+	uint64_t qkv_scale;
 };
+_Static_assert(offsetof(struct push, lda) == 80, "attention QKV scale pointer ABI");
+_Static_assert(offsetof(struct push, residual_cos) == 96, "residual epilogue ABI");
+_Static_assert(offsetof(struct push, qkv_scale) == 120, "QKV epilogue ABI");
+_Static_assert(sizeof(struct push) == 128, "push block matches the GEMM shaders");
 
 const char *xmx_error(void) { return g.err; }
 int xmx_device_lost(void) { return g.lost; }
@@ -450,7 +475,8 @@ static unsigned block_size(const char *name, unsigned fallback)
 static int resident_pipeline(unsigned family, unsigned flags, VkPipeline fallback,
 			     VkPipeline *out)
 {
-	unsigned mask = family < 3 ? 1u : (family == 3 ? 2u : 4u);
+	/* family 5, the fused feed-forward, is a GEMM and specialises with them */
+	unsigned mask = (family < 3 || family == 5) ? 1u : (family == 3 ? 2u : 4u);
 	*out = fallback;
 	if (!(g.specialize & mask)) return 0;
 	for (unsigned i = 0; i < specialized_count; i++) {
@@ -601,9 +627,11 @@ static int open_adopted(void)
 	snprintf(g.name, sizeof g.name, "%.*s (shared)", name_max, props.deviceName);
 #endif
 	g.discrete = props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
-	g.coopmat = adopt.coopmat;
+	g.coopmat = (adopt.coopmat & XMX_ADOPT_COOPMAT) != 0;
+	g.explicit_layout = g.coopmat && (adopt.coopmat & XMX_ADOPT_EXPLICIT_LAYOUT) != 0;
 	const char *forced = getenv("XMX_PORTABLE");
 	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
+	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
 	g.inst = adopt.inst; g.pd = adopt.pd; g.q = adopt.q; g.qi = adopt.qi;
 	g.lock = adopt.lock; g.unlock = adopt.unlock; g.lock_ctx = adopt.ctx;
 	g.adopted = 1;
@@ -676,20 +704,44 @@ int xmx_open(void)
 	vkEnumerateDeviceExtensionProperties(g.pd, NULL, &nde, de);
 	g.coopmat = has_extension(de, nde, VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME);
 	int subset = has_extension(de, nde, "VK_KHR_portability_subset");
+	int explicit_ext = has_extension(de, nde, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME);
 	free(de);
 	const char *forced = getenv("XMX_PORTABLE");
 	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
-	const char *ext[2]; uint32_t next = 0;
+	/* The staged kernel is only ever dispatched on the matrix path, so the aliasing
+	 * extension is asked for only there — and only with all three of its features, which
+	 * is what the shader declares. */
+	g.explicit_layout = 0;
+	if (g.coopmat && explicit_ext) {
+		VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR have_wm = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR };
+		VkPhysicalDeviceFeatures2 have2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &have_wm };
+		vkGetPhysicalDeviceFeatures2(g.pd, &have2);
+		g.explicit_layout = have_wm.workgroupMemoryExplicitLayout
+				    && have_wm.workgroupMemoryExplicitLayoutScalarBlockLayout
+				    && have_wm.workgroupMemoryExplicitLayout16BitAccess;
+	}
+	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
+	const char *ext[3]; uint32_t next = 0;
 	if (g.coopmat) ext[next++] = VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME;
+	if (g.explicit_layout) ext[next++] = VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME;
 	if (subset) ext[next++] = "VK_KHR_portability_subset";   /* required when offered */
 
 	VkPhysicalDeviceCooperativeMatrixFeaturesKHR cm = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR, .cooperativeMatrix = VK_TRUE };
+	/* Shared-memory blocks that alias: gemm_staged.comp puts its operand tiles and its
+	 * output stage in the same bytes, which is what fits sixteen of its workgroups in a
+	 * core's 128 KB (notes/improve-shared-memory.md). */
+	VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR wm = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR, .pNext = &cm,
+		.workgroupMemoryExplicitLayout = VK_TRUE, .workgroupMemoryExplicitLayoutScalarBlockLayout = VK_TRUE,
+		.workgroupMemoryExplicitLayout16BitAccess = VK_TRUE };
 	/* bufferDeviceAddress lets the resident path pass operands as 64-bit pointers in
 	 * push constants, so a whole block of dispatches records into one command buffer
 	 * without a descriptor pool. scalarBlockLayout matches the shaders' layout. */
 	VkPhysicalDeviceVulkan12Features v12 = {
-		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES, .pNext = g.coopmat ? (void *)&cm : NULL,
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+		.pNext = g.explicit_layout ? (void *)&wm : (g.coopmat ? (void *)&cm : NULL),
 		.vulkanMemoryModel = VK_TRUE, .vulkanMemoryModelDeviceScope = VK_TRUE, .shaderFloat16 = VK_TRUE,
 		.bufferDeviceAddress = VK_TRUE, .scalarBlockLayout = VK_TRUE };
 	VkPhysicalDeviceVulkan11Features v11 = {
@@ -757,6 +809,11 @@ void xmx_close(void)
 
 int xmx_coopmat(void) { return g.dev ? g.coopmat : -1; }
 int xmx_portable(void) { return g.dev ? g.portable : -1; }
+/* Whether a GEMM may gather its A from the image in window order (0x400000): the staged
+ * kernel does it on the matrix path, the tiled portable kernel on the other. A device with
+ * matrix units but no VK_KHR_workgroup_memory_explicit_layout — a host that lent its device
+ * without enabling it — has neither, and the caller records the partition pass instead. */
+int xmx_window_gather(void) { return g.dev ? (g.staged_ok || g.portable) : -1; }
 /* One line for a log: which GEMM kernels this device runs, and why. */
 const char *xmx_path(void)
 {
@@ -971,7 +1028,7 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	    || build_pipeline(row_spv, g.rpl, &g.rrow)
 	    || build_pipeline(history_spv, g.rpl, &g.rhistory)
 	    || build_pipeline(tiled_spv, g.rpl, &g.rtiled)
-	    || build_pipeline(staged_spv, g.rpl, &g.rstaged))
+	    || (g.staged_ok && build_pipeline(staged_spv, g.rpl, &g.rstaged)))
 		return -1;
 	const char *tile = getenv("XMX_TILE_K");
 	g.tiling = tile ? atoi(tile) : 1;
@@ -1317,10 +1374,16 @@ int xmx_sync(int on)
 	return 0;
 }
 
-int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
-		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
-		 unsigned lda, unsigned ldb, unsigned ldc,
-		 unsigned oa, unsigned ob, unsigned oc)
+/* The QKV epilogue's other operands: K and V targets, the query scale, and the layout
+ * the three targets share, (window, head, token, 32). */
+struct qkv_targets { int k, v, scale; unsigned tokens, heads; };
+
+static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
+		       unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		       unsigned lda, unsigned ldb, unsigned ldc,
+		       unsigned oa, unsigned ob, unsigned oc,
+		       int skip, int cosine, const uint32_t *window,
+		       const struct qkv_targets *qkv, int half_copy, const uint32_t *window_a)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c),
@@ -1328,6 +1391,30 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 			  .sa = sa, .sb = sb, .sc = sc, .flags = bt,
 			  .lda = lda, .ldb = ldb, .ldc = ldc };
 	if (!p.a || !p.b || !p.c) FAIL("gemm operand is not a live buffer", 0);
+	if (skip >= 0) {
+		p.d = addr_of(skip); p.residual_cos = addr_of(cosine);
+		if (!p.d || !p.residual_cos) FAIL("residual operand is not a live buffer", 0);
+	}
+	if (window) {
+		p.image_h = window[0]; p.image_w = window[1];
+		p.window_cols = window[2]; p.window_pad = window[3];
+	}
+	if (half_copy >= 0 && !(p.d = addr_of(half_copy)))
+		FAIL("GEMM half copy is not a live buffer", 0);
+	if (window_a) {
+		/* A gathered from the image in window order (gemm_staged.comp, 0x400000):
+		 * the batch strides have no use with one batch, so they carry the geometry */
+		p.sa = window_a[0]; p.sb = window_a[1]; p.sc = window_a[2];
+		p.window_pad = window_a[3];
+	}
+	if (qkv) {
+		/* c is Q; K, V and the scale ride in slots only the residual modes use */
+		p.d = addr_of(qkv->k); p.residual_cos = addr_of(qkv->v);
+		p.qkv_scale = addr_of(qkv->scale);
+		p.image_h = qkv->tokens; p.image_w = qkv->heads;
+		if (!p.d || !p.residual_cos || !p.qkv_scale)
+			FAIL("QKV epilogue operand is not a live buffer", 0);
+	}
 	/* Element offsets are folded into the addresses, so a sub-matrix needs no shader
 	 * support: A and B are half, and C is float unless the epilogue narrows it. */
 	p.a += (uint64_t)oa * 2; p.b += (uint64_t)ob * 2;
@@ -1348,10 +1435,45 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 	 * are indistinguishable — see notes/phase22-staging-and-storage.md. */
 	int staged = M % 64 == 0 && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
 	/* The staged kernel has no portable twin — its 128-lane 64x32 geometry exists to feed
-	 * matrix units — so without them every shape goes to the 8x16 and 16x32 kernels,
-	 * whose portable builds take the same dispatch. */
-	if (g.portable) staged = 0;
+	 * matrix units — and needs VK_KHR_workgroup_memory_explicit_layout; without either,
+	 * every shape goes to the 8x16 and 16x32 kernels, whose portable builds take the
+	 * same dispatch. */
+	if (!g.staged_ok) staged = 0;
+	/* The window gather lives in the staged kernel's A loader, at any depth of K. Without
+	 * matrix units the tiled portable kernel gathers in its own scalar A loads instead;
+	 * the cooperative-matrix tiled kernel cannot, so a matrix device without the staged
+	 * kernel refuses it (`xmx_window_gather()` tells the caller beforehand). */
+	int window_tiled = 0;
+	if (bt & 0x400000u) {
+		if (!window_a || M % 64 || N % 32 || K % 32 || batch > 1 || (bt & 1u))
+			FAIL("a window-gathered A needs its geometry, whole blocks and one batch", 0);
+		if (g.staged_ok) staged = 1;
+		else if (g.portable) window_tiled = 1;
+		else FAIL("a window-gathered A needs the staged kernel, and this matrix device lacks "
+			  "VK_KHR_workgroup_memory_explicit_layout (xmx_window_gather() is 0)", 0);
+	}
 	int tiled = M % g.tilem == 0 && N % g.tilen == 0 && K >= g.tiling;
+	if (window_tiled) {
+		if (M % g.tilem || N % g.tilen)
+			FAIL("a window-gathered A without the staged kernel needs the 16x32 block", 0);
+		tiled = 1;
+	}
+	if ((bt & 0x10000u) && (bt & 0x20000u))
+		FAIL("compact head and fused residual are exclusive", 0);
+	if (bt & 0x10000u) {
+		if (N != 16 || ldc != 4 || (bt & 0x1f00u))
+			FAIL("compact head requires N=16, ldc=4 and plain FP32 output", 0);
+		staged = tiled = 0;  /* its shared-memory scatter is one 8x16 tile */
+	}
+	/* The QKV epilogue normalises a head inside one workgroup, so the column block must
+	 * be one head exactly: 32 wide, which the staged block always is and the tiled one
+	 * is unless XMX_TILE_N moved it. The 8x16 kernel never qualifies. */
+	if ((bt & 0x100000u) && !(qkv && (bt & ~0x408000u) == 0x100000u
+				  && (staged || (tiled && g.tilen == 32))))
+		FAIL("QKV epilogue needs its targets, no other flag, and a 32-column block", 0);
+	/* the half copy lives in gemm_resident.comp's plain-store path only */
+	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u && !staged))
+		FAIL("a GEMM half copy needs its target, no other flag, and the resident kernel", 0);
 	VkPipeline pipeline;
 	if (resident_pipeline(staged ? 2 : (tiled ? 1 : 0), bt,
 			      staged ? g.rstaged : (tiled ? g.rtiled : g.rgemm), &pipeline)) return -1;
@@ -1369,14 +1491,103 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 	return 0;
 }
 
-int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
-		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
+		 unsigned sa, unsigned sb, unsigned sc, unsigned bt,
+		 unsigned lda, unsigned ldb, unsigned ldc,
+		 unsigned oa, unsigned ob, unsigned oc)
+{
+	return record_gemm(a, b, c, M, N, K, batch, sa, sb, sc, bt,
+			   lda, ldb, ldc, oa, ob, oc, -1, -1, NULL, NULL, -1, NULL);
+}
+
+/* A dense projection whose epilogue adds `skip * cosine` before the publish: the
+ * `branch + skip * per_channel_cosine` of the residual, without writing the float32
+ * branch out and reading it back in a pass of its own. Ported from ProjectsCodex's
+ * phase38; bit-identical to the two-pass path (`src/gpu/test_gemm_residual.py`).
+ * A half skip is the caller's to flag with 0x40000. */
+int xmx_rec_gemm_residual(int a, int b, int c, int skip, int cosine,
+			  unsigned M, unsigned N, unsigned K, unsigned flags)
+{
+	if (skip < 0 || cosine < 0) FAIL("invalid residual buffer", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0x20000u, 0, 0, 0, 0, 0, 0, skip, cosine, NULL, NULL, -1, NULL);
+}
+
+/* The same, for a window block's output projection: its rows are in window order,
+ * padded, and the result is written straight back into the unpadded image, which is
+ * where the residual stream lives. `across` is windows per row, `pad` packs the top
+ * and left padding as (top << 16) | left. ProjectsCodex's phase39. */
+int xmx_rec_gemm_window_residual(int a, int b, int c, int skip, int cosine,
+				 unsigned M, unsigned N, unsigned K, unsigned flags,
+				 unsigned height, unsigned width, unsigned across, unsigned pad)
+{
+	if (skip < 0 || cosine < 0 || !height || !width || !across)
+		FAIL("invalid window residual", 0);
+	uint32_t window[] = { height, width, across, pad };
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0xa0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1, NULL);
+}
+
+/* The QKV projection with Q and K normalised and V published in its own epilogue
+ * (`qkv_epilogue.glsl`), so the float32 projection never goes to memory and the two
+ * cosine publishes and the V split that read it back are not recorded at all. `M` rows
+ * of `channels` in, (window, head, token, 32) E4M3 halves out, `tokens` per window. */
+static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+			   unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			   const uint32_t *window_a, unsigned flags)
+{
+	if (q < 0 || k < 0 || v < 0 || scale < 0 || !heads || !tokens || channels != heads * 32u
+	    || M % tokens)
+		FAIL("invalid QKV projection", 0);
+	struct qkv_targets targets = { k, v, scale, tokens, heads };
+	unsigned N = 3u * channels;
+	return record_gemm(a, weight, q, M, N, channels, 1, M * channels, channels * N, M * N,
+			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a);
+}
+
+int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens)
+{
+	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL, 0u);
+}
+
+/* The same, with A gathered from the image — `width` x `height`, `channels` deep, float32
+ * or (`image_half`) half — in the window order of `across` windows a row and `pad` as
+ * (top << 16) | left: the partition folded into the projection's own loads. */
+int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
+			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
+			    unsigned width, unsigned height, unsigned across, unsigned pad,
+			    unsigned image_half)
+{
+	if (!width || !height || !across || tokens != 64u)
+		FAIL("invalid window-gathered QKV projection", 0);
+	uint32_t window_a[] = { width, height, across, pad };
+	return record_gemm_qkv(image, weight, q, k, v, scale, M, channels, heads, tokens,
+			       window_a, 0x400000u | (image_half ? 0x8000u : 0u));
+}
+
+/* A plain GEMM whose float32 result is also stored as half into `half_copy`: for a
+ * value the graph needs both ways, as a residual and as the next GEMM's operand. */
+int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K)
+{
+	if (half_copy < 0) FAIL("invalid GEMM half copy", 0);
+	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
+			   0x200000u, 0, 0, 0, 0, 0, 0, -1, -1, NULL, NULL, half_copy, NULL);
+}
+
+static int record_unary(unsigned kind, int a, int b, int c, int d, int second,
+			unsigned n, unsigned channels, float p0, unsigned batch,
+			unsigned sa, unsigned sb, unsigned sc, unsigned k)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c), .d = addr_of(d),
 			  .m = n, .n = channels, .flags = kind, .p0 = p0,
 			  .batch = batch, .sa = sa, .sb = sb, .sc = sc, .k = k };
 	if (!p.a || !p.c) FAIL("unary operand is not a live buffer", 0);
+	/* a pass that writes two outputs finds the second at offset 96, which only the
+	 * GEMMs' residual epilogue uses otherwise */
+	if (second >= 0 && !(p.residual_cos = addr_of(second)))
+		FAIL("second unary output is not a live buffer", 0);
 	VkPipeline pipeline;
 	if (resident_pipeline(3, kind, g.runary, &pipeline)) return -1;
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
@@ -1388,8 +1599,46 @@ int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigne
 	return 0;
 }
 
+int xmx_rec_unary(unsigned kind, int a, int b, int c, int d, unsigned n, unsigned channels,
+		  float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
+{
+	return record_unary(kind, a, b, c, d, -1, n, channels, p0, batch, sa, sb, sc, k);
+}
+
+int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsigned n,
+		   unsigned channels, float p0, unsigned batch, unsigned sa, unsigned sb,
+		   unsigned sc, unsigned k)
+{
+	if (second < 0) FAIL("a two-output pass needs its second output", 0);
+	return record_unary(kind, a, b, c, d, second, n, channels, p0, batch, sa, sb, sc, k);
+}
+
 /* Row-wise passes: the cosine publish reduces 32 channels through the kernel's own
  * fragment tree, the softmax reduces a window's tokens. One invocation per row. */
+/* One dispatch for independent Q, K and V workgroup planes. The fifth pointer
+ * occupies byte offset 80, the lda/ldb fields unused by attention.comp. */
+int xmx_rec_qkv(int source, int q, int k, int v, int scale,
+		unsigned rows, unsigned tokens, unsigned heads)
+{
+	if (!g.recording) FAIL("not recording", 0);
+	if (!rows || !tokens || !heads) FAIL("invalid QKV extent", 0);
+	const unsigned flags = 2u | 0x1000u | 0x20000u;
+	VkDeviceAddress scale_addr = addr_of(scale);
+	struct push p = { .a = addr_of(source), .b = addr_of(q), .c = addr_of(k),
+		.d = addr_of(v), .m = rows, .n = tokens, .batch = heads, .flags = flags,
+		.lda = (uint32_t)scale_addr, .ldb = (uint32_t)(scale_addr >> 32) };
+	if (!p.a || !p.b || !p.c || !p.d || !scale_addr) FAIL("QKV operand is not live", 0);
+	VkPipeline pipeline;
+	if (resident_pipeline(4, flags, g.rrow, &pipeline)) return -1;
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, (rows + 31) / 32, 3, 1);
+	barrier();
+	stamp(PK_ROW, 2);
+	g.recorded++;
+	return 0;
+}
+
 int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsigned width,
 		unsigned heads, unsigned scaled, unsigned stride, float cap)
 {
@@ -1405,6 +1654,98 @@ int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsign
 	vkCmdDispatch(g.rcb, (rows + 31) / 32, 1, 1);
 	barrier();
 	stamp(PK_ROW, kind);
+	g.recorded++;
+	return 0;
+}
+
+/* Window attention's QK^T, softmax and PV in one dispatch (ProjectsCodex's phase42,
+ * `window_attention.comp`): one subgroup takes eight query rows against a window's 64
+ * keys, and the scores and probabilities stay in shared memory instead of making two
+ * round trips through device buffers. Built on first use, so a graph that keeps the
+ * three-pass path never compiles it. The bias pointer rides in the residual epilogue's
+ * slot, `residual_cos` at offset 96, which is why that field was appended rather than
+ * inserted.
+ *
+ * `merged` selects the same shader with `MERGED_OUTPUT` specialised on: it also does the
+ * head merge's work, publishing E4M3 in (window, token, C) order, so neither the FP32
+ * context nor the merge_heads pass that read it back is needed. */
+int xmx_window_init(const char *path, unsigned merged)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (merged > 1) FAIL("invalid window attention output mode", 0);
+	if (g.rwindow[merged]) return 0;
+	/* a bool specialization constant is a VkBool32, which is what `merged` already is */
+	VkSpecializationMapEntry entry = { .constantID = 0, .offset = 0, .size = sizeof merged };
+	VkSpecializationInfo info = { .mapEntryCount = 1, .pMapEntries = &entry,
+				      .dataSize = sizeof merged, .pData = &merged };
+	return build_pipeline_spec(path, g.rpl, &g.rwindow[merged], &info);
+}
+
+int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
+			     unsigned batches, unsigned heads, unsigned merged)
+{
+	if (merged > 1 || !g.recording || !g.rwindow[merged])
+		FAIL("window attention not ready for recording", 0);
+	if (!batches || !heads || batches % heads) FAIL("invalid attention batch/head count", 0);
+	struct push p = { .a = addr_of(q), .b = addr_of(k), .c = addr_of(out), .d = addr_of(v),
+			  .n = heads, .batch = batches, .flags = bias >= 0,
+			  .residual_cos = bias >= 0 ? addr_of(bias) : 0 };
+	if (!p.a || !p.b || !p.c || !p.d || (bias >= 0 && !p.residual_cos))
+		FAIL("window attention operand is not a live buffer", 0);
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, g.rwindow[merged]);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, 8, batches < 65535u ? batches : 65535u,
+		      1u + (batches - 1u) / 65535u);
+	barrier();
+	stamp(PK_ROW, 3);        /* WINDOW_ATTENTION, as window_attention.comp names it */
+	g.recorded++;
+	return 0;
+}
+
+/* A 32-channel block's whole feed-forward in one dispatch (`ffn_fused.comp`): the expand,
+ * its gate and publish, the projection and the residual, with the hidden layer kept in
+ * shared memory instead of written out as half and read back. One subgroup per 16 rows,
+ * on the x axis of the grid, whose limit is 2^31-1 rather than y's 65535. Its profile
+ * stamp is the base GEMM family's kind 31, which no plain GEMM's flags can reach. */
+int xmx_ffn_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rffn) return 0;
+	free(g.rpaths[5]);
+	if (!(g.rpaths[5] = strdup(path))) FAIL("pipeline path allocation", 0);
+	return build_pipeline(path, g.rpl, &g.rffn);
+}
+
+int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine,
+		unsigned M, unsigned cin, unsigned hidden, unsigned groups, unsigned flags)
+{
+	if (!g.recording || !g.rffn) FAIL("fused feed-forward not ready for recording", 0);
+	if (!cin || cin % 16u || !hidden || hidden % 32u || !M || M % 16u || !groups)
+		FAIL("fused feed-forward needs channels a multiple of 16, hidden of 32, 16-row blocks", 0);
+	if (flags & ~0x41f00u)
+		FAIL("fused feed-forward takes an epilogue, a half output and a half skip only", 0);
+	/* The residual reads its skip in the output's own layout, which is only the dense
+	 * one when there is a single group of 32 channels. */
+	int residual = skip >= 0 || cosine >= 0;
+	if (residual && (groups != 1u || cin != 32u || skip < 0 || cosine < 0))
+		FAIL("the fused residual is for one group of 32 channels, with skip and cosine", 0);
+	if (!residual && (flags & 0x40000u)) FAIL("a half skip without a residual", 0);
+	struct push p = { .a = addr_of(a), .b = addr_of(expand), .c = addr_of(out),
+			  .m = M, .n = cin, .k = hidden, .batch = groups,
+			  .sa = cin * hidden, .sb = hidden * 32u,
+			  .ldc = groups > 1u ? groups * 32u : 0u,
+			  .flags = flags | (residual ? 0x20000u : 0u),
+			  .qkv_scale = addr_of(projection) };
+	if (residual) { p.d = addr_of(skip); p.residual_cos = addr_of(cosine); }
+	if (!p.a || !p.b || !p.c || !p.qkv_scale || (residual && (!p.d || !p.residual_cos)))
+		FAIL("fused feed-forward operand is not a live buffer", 0);
+	VkPipeline pipeline;
+	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, M / 16u, groups, 1);
+	barrier();
+	stamp(PK_GEMM, 31);
 	g.recorded++;
 	return 0;
 }
@@ -1439,8 +1780,12 @@ static void collect(unsigned stamps, const unsigned char *kinds)
 				  VK_QUERY_RESULT_64_BIT | VK_QUERY_RESULT_WAIT_BIT) != VK_SUCCESS)
 		return;
 	for (unsigned i = 1; i < stamps; i++) {
-		if (ticks[i] < ticks[i - 1]) continue;      /* a wrapped counter is not a duration */
-		prof_ms[kinds[i]] += (double)(ticks[i] - ticks[i - 1]) * g.ts_period * 1e-6;
+		/* a wrapped counter is not a duration; -1 keeps the order for the caller */
+		double ms = ticks[i] < ticks[i - 1] ? -1.0
+			  : (double)(ticks[i] - ticks[i - 1]) * g.ts_period * 1e-6;
+		if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+		if (ms < 0) continue;
+		prof_ms[kinds[i]] += ms;
 		prof_hits[kinds[i]]++;
 	}
 }
@@ -1551,10 +1896,14 @@ void xmx_profile_reset(void)
 {
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
+	prof_each_n = 0;
 }
 
 /* Milliseconds and pass count for one kind, where a kind is `family * 32 + subkind`.
  * Reading a kind that never ran gives 0, which is the honest answer. */
+unsigned xmx_profile_each_count(void) { return prof_each_n; }
+double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
+
 double xmx_profile_ms(unsigned kind)
 {
 	return kind < PROF_KINDS ? prof_ms[kind] : 0.0;

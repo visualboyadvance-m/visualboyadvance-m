@@ -143,7 +143,7 @@ def compose_checks(rng):
     mask = np.ones((height, width, 3), np.float32)
     mask[30:40, 10:30, 0] = 0.0
 
-    for intensity in (1.0, 0.6, 1.66):
+    for intensity in (1.0, 0.6, 0.0, 1.66):
         with numpy_only():
             reference = nr_frame.compose(head, colour, intensity=intensity)
         same(f"still composition, intensity {intensity}",

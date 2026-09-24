@@ -24,6 +24,7 @@
 #extension GL_KHR_memory_scope_semantics : require
 #extension GL_KHR_cooperative_matrix : require
 #extension GL_KHR_shader_subgroup_basic : require
+#extension GL_EXT_shared_memory_block : require
 
 #include "publish.glsl"
 
@@ -41,6 +42,7 @@ layout(local_size_x = 32 * WARPS) in;
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Float4Buf { vec4     v4[]; };
 
 layout(push_constant, scalar) uniform Push {
     HalfBuf a, b; FloatBuf c, d;
@@ -48,13 +50,32 @@ layout(push_constant, scalar) uniform Push {
     uint sa, sb, sc, flags;
     float p0, p1, p2, p3;
     uint lda, ldb, ldc, spare;
+    uint64_t residual_cos;                     // per-channel cosine of the skip
+    uint image_h, image_w, window_cols, window_pad;   // window residual geometry
+    uint64_t qkv_scale;                        // the QKV epilogue's query scale
 } pc;
 
 #include "specialize.glsl"
+#include "residual_epilogue.glsl"   /* needs operation_flags() from above */
 
-shared float16_t buf_a[BM * SA];
-shared float16_t buf_b[BK * SB];
-shared float stage[BM * BN];
+/* The operand tiles and the output stage are never live at once — the stage is written
+ * only after the last K step has read its fragments — so the two blocks share their bytes:
+ * 8 KB where they took 15.5. That is what sets how many of these workgroups a core holds:
+ * 128 KB of shared memory between them, each share rounded up to an allocation size. At
+ * 15.5 KB — 16 once rounded — eight fit, half the core's threads; at 8 KB sixteen fit, all
+ * of them. 90 -> 71 ms of a 720p frame, bit-identical. notes/improve-shared-memory.md. */
+layout(scalar) shared Operands {
+    float16_t buf_a[BM * SA];
+    float16_t buf_b[BK * SB];
+};
+layout(scalar) shared Staging {
+    float stage[BM * BN];
+};
+
+void qkv_barrier() { barrier(); }
+#define QKV_STAGE float
+#include "cosine_tree.glsl"
+#include "qkv_epilogue.glsl"
 
 void main() {
     uint row = gl_WorkGroupID.y * BM, col = gl_WorkGroupID.x * BN;
@@ -85,39 +106,106 @@ void main() {
     bool wide_a = (uint(uint64_t(pc.a)) & 7u) == 0u && (lda & 3u) == 0u && (ao & 3u) == 0u;
     bool wide_b = (uint(uint64_t(pc.b)) & 7u) == 0u && (ldb & 3u) == 0u && (bo & 3u) == 0u;
 
+    /* Bit 0x400000: A is a window block's rows, gathered from the image as they are
+     * loaded — the shifted-window partition done here instead of in a pass of its own,
+     * which read the whole image and wrote it back in window order. `sa` and `sb` are the
+     * image's width and height, `sc` the windows per row, `window_pad` the pad as
+     * (top << 16) | left; a token outside the image reads zero, as the partition wrote,
+     * and a float32 image is rounded to half on the way in, as the partition's narrow
+     * store did. Bit 0x8000 says the image is half already. */
+    bool window_a = (operation_flags() & 0x400000u) != 0u;
+    bool image_half = (operation_flags() & 0x8000u) != 0u;
+
     for (uint k0 = 0; k0 < pc.k; k0 += BK) {
         barrier();
-        for (uint r = lr; r < BM; r += (32u * WARPS) / 4u) {
-            uint at = ao + (row + r) * lda + k0 + lc;
-            if (wide_a) {
-                f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
-                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
-                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = hi[e];
-            } else {
-                for (uint e = 0; e < 8u; e++) buf_a[r * SA + lc + e] = pc.a.v[at + e];
+        /* The common case — A read straight, B not transposed, both aligned — issues every
+         * global load of the step before storing any. The general loaders below keep each
+         * load inside its own `window_a` / `wide_a` branch, and there the compiler waits for
+         * one before issuing the next: a step cost two or three memory latencies in a row.
+         * Where the machine is full that hides behind other workgroups; where a GEMM has few
+         * blocks — the bottleneck's 64x1024x4096 at the live extent makes 32 for 128 places —
+         * it was the time: that call 0.27 -> 0.22 ms, and a frame 1 ms faster at 320x320 and
+         * 3 ms at 720p. Neither more blocks nor a deeper K step touched it: 64x16 blocks
+         * doubled the blocks and left the call at 0.275 ms, and BK = 64 halved the steps and
+         * made it slower. Same values in the same places, so bit-identical. */
+        if (!window_a && wide_a && wide_b && !transposed) {
+            const uint STEP = (32u * WARPS) / 4u;
+            const uint A_PER = BM / STEP, B_PER = BK / STEP;
+            f16vec4 ra[A_PER * 2u], rb[B_PER * 2u];
+            for (uint p = 0u; p < A_PER; p++) {
+                uint at = ao + (row + lr + p * STEP) * lda + k0 + lc;
+                ra[2u * p] = a4.v4[at >> 2];
+                ra[2u * p + 1u] = a4.v4[(at >> 2) + 1u];
             }
-        }
-        if (transposed) {
-            for (uint nn = lr; nn < BN; nn += (32u * WARPS) / 4u) {
-                uint at = bo + (col + nn) * ldb + k0 + lc;
-                if (wide_b) {
-                    f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
-                    for (uint e = 0; e < 4u; e++) buf_b[(lc + e) * SB + nn] = lo[e];
-                    for (uint e = 0; e < 4u; e++) buf_b[(lc + 4u + e) * SB + nn] = hi[e];
-                } else {
-                    for (uint e = 0; e < 8u; e++)
-                        buf_b[(lc + e) * SB + nn] = pc.b.v[at + e];
-                }
+            for (uint p = 0u; p < B_PER; p++) {
+                uint at = bo + (k0 + lr + p * STEP) * ldb + col + lc;
+                rb[2u * p] = b4.v4[at >> 2];
+                rb[2u * p + 1u] = b4.v4[(at >> 2) + 1u];
+            }
+            for (uint p = 0u; p < A_PER; p++) {
+                uint r = lr + p * STEP;
+                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = ra[2u * p][e];
+                for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = ra[2u * p + 1u][e];
+            }
+            for (uint p = 0u; p < B_PER; p++) {
+                uint kk = lr + p * STEP;
+                for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + e] = rb[2u * p][e];
+                for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + 4u + e] = rb[2u * p + 1u][e];
             }
         } else {
-            for (uint kk = lr; kk < BK; kk += (32u * WARPS) / 4u) {
-                uint at = bo + (k0 + kk) * ldb + col + lc;
-                if (wide_b) {
-                    f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
-                    for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + e] = lo[e];
-                    for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + 4u + e] = hi[e];
+            for (uint r = lr; r < BM; r += (32u * WARPS) / 4u) {
+                if (window_a) {
+                    uint token_row = row + r, window = token_row / 64u, token = token_row % 64u;
+                    int y = int((window / pc.sc) * 8u + token / 8u) - int(pc.window_pad >> 16);
+                    int x = int((window % pc.sc) * 8u + token % 8u) - int(pc.window_pad & 0xffffu);
+                    if (y < 0 || x < 0 || y >= int(pc.sb) || x >= int(pc.sa)) {
+                        for (uint e = 0; e < 8u; e++) buf_a[r * SA + lc + e] = float16_t(0.0);
+                        continue;
+                    }
+                    uint at = (uint(y) * pc.sa + uint(x)) * pc.k + k0 + lc;
+                    if (image_half) {
+                        f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
+                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
+                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = hi[e];
+                    } else {
+                        Float4Buf image = Float4Buf(uint64_t(pc.a));
+                        vec4 lo = image.v4[at >> 2], hi = image.v4[(at >> 2) + 1u];
+                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = float16_t(lo[e]);
+                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = float16_t(hi[e]);
+                    }
+                    continue;
+                }
+                uint at = ao + (row + r) * lda + k0 + lc;
+                if (wide_a) {
+                    f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
+                    for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
+                    for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = hi[e];
                 } else {
-                    for (uint e = 0; e < 8u; e++) buf_b[kk * SB + lc + e] = pc.b.v[at + e];
+                    for (uint e = 0; e < 8u; e++) buf_a[r * SA + lc + e] = pc.a.v[at + e];
+                }
+            }
+            if (transposed) {
+                for (uint nn = lr; nn < BN; nn += (32u * WARPS) / 4u) {
+                    uint at = bo + (col + nn) * ldb + k0 + lc;
+                    if (wide_b) {
+                        f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
+                        for (uint e = 0; e < 4u; e++) buf_b[(lc + e) * SB + nn] = lo[e];
+                        for (uint e = 0; e < 4u; e++) buf_b[(lc + 4u + e) * SB + nn] = hi[e];
+                    } else {
+                        for (uint e = 0; e < 8u; e++)
+                            buf_b[(lc + e) * SB + nn] = pc.b.v[at + e];
+                    }
+                }
+            } else {
+                for (uint kk = lr; kk < BK; kk += (32u * WARPS) / 4u) {
+                    uint at = bo + (k0 + kk) * ldb + col + lc;
+                    if (wide_b) {
+                        f16vec4 lo = b4.v4[at >> 2], hi = b4.v4[(at >> 2) + 1u];
+                        for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + e] = lo[e];
+                        for (uint e = 0; e < 4u; e++) buf_b[kk * SB + lc + 4u + e] = hi[e];
+                    } else {
+                        for (uint e = 0; e < 8u; e++) buf_b[kk * SB + lc + e] = pc.b.v[at + e];
+                    }
                 }
             }
         }
@@ -138,7 +226,9 @@ void main() {
 
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow = (operation_flags() & 0x1000u) != 0u;
-    if (epilogue == 0u && !narrow) {
+    /* A fused residual needs the element's address in the skip and the cosine, so it
+     * never takes the raw store below; it goes through shared memory like a publish. */
+    if (epilogue == 0u && !narrow && (operation_flags() & 0x120000u) == 0u) {
         for (uint i = 0; i < RM; i++)
             for (uint j = 0; j < RN; j++)
                 coopMatStore(acc[i][j], pc.c.v,
@@ -152,17 +242,30 @@ void main() {
      * (notes/phase38-there-was-no-bug.md). The detour stays here for the write pattern —
      * the loop below has each lane write four consecutive elements and the whole
      * workgroup, not one subgroup, covers the tile. `gemm_resident.comp` dropped it for
-     * float32 outputs; this shader has not been re-measured without it. */
+     * float32 outputs; this shader has not been re-measured without it.
+     * The barrier is the price of the shared bytes: another subgroup may still be reading
+     * the operand tiles for its last K step. */
+    barrier();
     for (uint i = 0; i < RM; i++)
         for (uint j = 0; j < RN; j++)
             coopMatStore(acc[i][j], stage, (warp * WM + i * TM) * BN + j * TN, BN,
                          gl_CooperativeMatrixLayoutRowMajor);
     barrier();
+    /* Bit 0x100000: the QKV projection's epilogue (qkv_epilogue.glsl). */
+    if ((operation_flags() & 0x100000u) != 0u) {
+        qkv_epilogue(row, col, thread, 32u * WARPS);
+        return;
+    }
 
     for (uint e = thread * 4u; e < BM * BN; e += 32u * WARPS * 4u) {
-        vec4 out4;
-        for (uint i = 0; i < 4u; ++i) out4[i] = publish(epilogue, stage[e + i]);
         uint at = co + (row + e / BN) * ldc + col + e % BN;
+        /* Window padding has no place in the image and must not touch the skip. */
+        if (!residual_output_index(at)) continue;
+        vec4 out4;
+        /* The residual lands before the publish, exactly as the two-pass path adds it
+         * before rounding — which is what keeps the fused head bit-identical. */
+        for (uint i = 0; i < 4u; ++i)
+            out4[i] = publish(epilogue, add_gemm_residual(stage[e + i], at + i));
         if (!narrow) {
             for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
         } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {

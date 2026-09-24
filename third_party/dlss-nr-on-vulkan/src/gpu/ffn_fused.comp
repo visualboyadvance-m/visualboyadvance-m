@@ -1,0 +1,164 @@
+#version 450
+#extension GL_GOOGLE_include_directive : require
+/*
+ * ffn_fused — a narrow block's whole feed-forward, with the hidden layer kept on chip.
+ *
+ * The feed-forward of the 32-channel blocks was two GEMMs: the expand wrote a gated,
+ * published 128-wide hidden layer as half, and the projection read it back and added the
+ * residual. At block 0 of a 720p frame that hidden layer is 252 MB written and 252 MB read,
+ * and both GEMMs ran at the memory ceiling. Here one subgroup takes 16 rows through both,
+ * 32 hidden columns at a time: the expand's block for those columns, its publish on the
+ * accumulator exactly as the expand GEMM did it, then into shared memory as the next
+ * GEMM's operand — so it never leaves the chip.
+ *
+ * Bit-identical to the two GEMMs by construction: each accumulator takes the same
+ * multiply-accumulates in the same K order (the expand over the 32 channels in two steps,
+ * the projection over the 128 hidden columns in eight), the publish is `publish.glsl`'s,
+ * and the residual is `residual_epilogue.glsl`'s. `src/gpu/test_ffn_fused.py`.
+ *
+ * Exactly 2 KB of shared memory: one 32-column chunk of the hidden layer as half, and half
+ * of the output block as float32 for the residual. Workgroup shared memory is allocated in
+ * powers of two here, and a byte more would halve how many workgroups fit on a core.
+ *
+ * The branched blocks' per-group feed-forward is the same shape of work — every group
+ * expands all C input channels to 128, gates, and projects to its own 32 — so it runs here
+ * too, one group per row of the grid, without the residual (the block's C x C projection
+ * adds that afterwards).
+ *
+ * Operands, in the resident push block: a input (half, rows x n), b the expand weights
+ * (groups x n x hidden), c the output (row stride ldc, group g at columns 32g), d the
+ * residual's skip and residual_cos its per-channel cosine (only with flag 0x20000), and the
+ * projection weights (groups x hidden x 32) in the last slot. m rows, n input channels,
+ * k hidden per group, sa and sb the two weights' group strides.
+ */
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference2 : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_shader_subgroup_basic : require
+
+#include "publish.glsl"
+
+layout(local_size_x = 32) in;
+
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
+
+layout(push_constant, scalar) uniform Push {
+    HalfBuf a, b; FloatBuf c, d;
+    uint m, n, k, batch;
+    uint sa, sb, sc, flags;
+    float p0, p1, p2, p3;
+    uint lda, ldb, ldc, spare;
+    uint64_t residual_cos;                     // per-channel cosine of the skip
+    uint image_h, image_w, window_cols, window_pad;
+    uint64_t projection;                       // offset 120: hidden x channels
+} pc;
+
+#include "specialize.glsl"
+#include "residual_epilogue.glsl"   /* needs operation_flags() from above */
+
+const uint TM = 8, TN = 16, TK = 16;
+const uint ROWS = 16u, CHUNK = 32u, OUT = 32u;
+const uint EPI_GATE_E4M3 = 3u;             // the expand GEMM's publish
+
+shared float16_t hidden[ROWS * CHUNK];     // 1 KB: one chunk of the gated hidden layer
+shared float stage[ROWS * TN];             // 1 KB: half the output block, for the residual
+
+void main() {
+    uint row = gl_WorkGroupID.x * ROWS, group = gl_WorkGroupID.y;
+    if (row >= pc.m) return;
+    uint cin = pc.n, width = pc.k;
+    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+    uint expand_base = group * pc.sa, project_base = group * pc.sb;
+    uint lane = gl_LocalInvocationID.x;
+    HalfBuf projection = HalfBuf(pc.projection);
+
+    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result[2][2];
+    for (uint i = 0; i < 2u; i++)
+        for (uint j = 0; j < 2u; j++)
+            result[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
+
+    for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
+        // the expand's 16x32 block for these hidden columns: K = 32 in two steps
+        coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> h[2][2];
+        for (uint i = 0; i < 2u; i++)
+            for (uint j = 0; j < 2u; j++)
+                h[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
+        /* The input rows are read again for each chunk, from cache, rather than held
+         * across all four: that is fewer registers for the same time. Narrower chunks
+         * were measured too — 16 columns, no spills at all — and were 9 % slower: twice
+         * the barriers and shared-memory round trips for the same arithmetic. */
+        for (uint kk = 0; kk < cin; kk += TK) {
+            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> x[2];
+            for (uint i = 0; i < 2u; i++)
+                coopMatLoad(x[i], pc.a.v, (row + i * TM) * cin + kk, cin,
+                            gl_CooperativeMatrixLayoutRowMajor);
+            coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> w[2];
+            for (uint j = 0; j < 2u; j++)
+                coopMatLoad(w[j], pc.b.v, expand_base + kk * width + chunk + j * TN, width,
+                            gl_CooperativeMatrixLayoutRowMajor);
+            for (uint i = 0; i < 2u; i++)
+                for (uint j = 0; j < 2u; j++)
+                    h[i][j] = coopMatMulAdd(x[i], w[j], h[i][j]);
+        }
+        // its publish on the accumulator, then into shared memory as the projection's A
+        for (uint i = 0; i < 2u; i++)
+            for (uint j = 0; j < 2u; j++) {
+                for (uint e = 0; e < h[i][j].length(); e++)
+                    h[i][j][e] = publish(EPI_GATE_E4M3, h[i][j][e]);
+                coopmat<float16_t, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> narrow =
+                    coopmat<float16_t, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(h[i][j]);
+                coopMatStore(narrow, hidden, i * TM * CHUNK + j * TN, CHUNK,
+                             gl_CooperativeMatrixLayoutRowMajor);
+            }
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        // the projection over these 32 hidden rows, in two steps of 16
+        for (uint kk = 0; kk < 2u; kk++) {
+            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> g[2];
+            for (uint i = 0; i < 2u; i++)
+                coopMatLoad(g[i], hidden, i * TM * CHUNK + kk * TK, CHUNK,
+                            gl_CooperativeMatrixLayoutRowMajor);
+            coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> p[2];
+            for (uint j = 0; j < 2u; j++)
+                coopMatLoad(p[j], projection.v, project_base + (chunk + kk * TK) * OUT + j * TN,
+                            OUT, gl_CooperativeMatrixLayoutRowMajor);
+            for (uint i = 0; i < 2u; i++)
+                for (uint j = 0; j < 2u; j++)
+                    result[i][j] = coopMatMulAdd(g[i], p[j], result[i][j]);
+        }
+        subgroupMemoryBarrierShared();          // the next chunk overwrites `hidden`
+        subgroupBarrier();
+    }
+
+    // The residual and the publish, 16 columns at a time through 1 KB, exactly as the
+    // projection GEMM's residual epilogue finishes each element.
+    uint epilogue = (operation_flags() >> 8) & 0xFu;
+    bool narrow_out = (operation_flags() & 0x1000u) != 0u;
+    for (uint j = 0; j < 2u; j++) {
+        for (uint i = 0; i < 2u; i++)
+            coopMatStore(result[i][j], stage, i * TM * TN, TN, gl_CooperativeMatrixLayoutRowMajor);
+        subgroupMemoryBarrierShared();
+        subgroupBarrier();
+        for (uint e = lane * 4u; e < ROWS * TN; e += 32u * 4u) {
+            uint at = (row + e / TN) * ldc + group * OUT + j * TN + e % TN;
+            vec4 out4;
+            for (uint q = 0; q < 4u; q++)
+                out4[q] = publish(epilogue, add_gemm_residual(stage[e + q], at + q));
+            if (!narrow_out) {
+                for (uint q = 0; q < 4u; q++) pc.c.v[at + q] = out4[q];
+            } else if ((uint(uint64_t(pc.c)) & 7u) == 0u) {
+                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+            } else {
+                for (uint q = 0; q < 4u; q++) HalfBuf(uint64_t(pc.c)).v[at + q] = float16_t(out4[q]);
+            }
+        }
+        subgroupMemoryBarrierShared();          // the next half overwrites `stage`
+        subgroupBarrier();
+    }
+}

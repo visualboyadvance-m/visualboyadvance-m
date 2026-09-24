@@ -511,7 +511,8 @@ set(NR_SPV_HEADERS)
 set(NR_SPV_INCLUDES "")
 set(NR_SPV_ROWS "")
 
-set(NR_SHADER_INCLUDES "${PROJECT_SOURCE_DIR}/src/gpu/publish.glsl" "${PROJECT_SOURCE_DIR}/src/gpu/specialize.glsl")
+set(NR_SHADER_INCLUDES "${PROJECT_SOURCE_DIR}/src/gpu/publish.glsl" "${PROJECT_SOURCE_DIR}/src/gpu/specialize.glsl" "${PROJECT_SOURCE_DIR}/src/gpu/residual_epilogue.glsl"
+    "${PROJECT_SOURCE_DIR}/src/gpu/cosine_tree.glsl" "${PROJECT_SOURCE_DIR}/src/gpu/qkv_epilogue.glsl")
 set(NR_SPV)
 function(nr_shader output source)          # extra arguments are -D defines
   set(out "${NR_OUTPUT_DIR}/${output}")
@@ -544,11 +545,18 @@ nr_shader(history.spv              src/gpu/history.comp)
 nr_shader(gemm_coopmat.spv         src/gpu/gemm_coopmat.comp)
 nr_shader(gemm_batched.spv         src/gpu/gemm_coopmat_batched.comp)
 nr_shader(gemm_f16acc.spv          src/gpu/gemm_coopmat_f16acc.comp)
+nr_shader(gemm_coopmat_int8.spv    src/gpu/gemm_coopmat_int8.comp)   # configuration 4, sint8 x sint8 -> sint32
 # the same GEMMs without the cooperative matrix, for a device that has none (MoltenVK)
 nr_shader(gemm_portable.spv        src/gpu/gemm_portable.comp)
 nr_shader(gemm_portable_tiled.spv  src/gpu/gemm_portable.comp -DRM=2 -DRN=2)
 nr_shader(gemm_portable_desc.spv   src/gpu/gemm_portable_desc.comp)
 nr_shader(gemm_portable_batched.spv src/gpu/gemm_portable_desc.comp -DBATCHED)
+# the fused passes (notes/improve-fusions.md), each with a twin for a device without
+# matrix units that sums in the portable GEMM's order
+nr_shader(window_attention.spv     src/gpu/window_attention.comp)
+nr_shader(window_attention_portable.spv src/gpu/window_attention_portable.comp)
+nr_shader(ffn_fused.spv            src/gpu/ffn_fused.comp)
+nr_shader(ffn_fused_portable.spv   src/gpu/ffn_fused_portable.comp)
 nr_shader(half_probe.spv           src/bench/half_probe.comp)
 add_custom_target(shaders ALL DEPENDS ${NR_SPV})
 
@@ -619,11 +627,11 @@ if(NR_BUILD_METAL)
   file(MAKE_DIRECTORY "${NR_METAL_DIR}")
   set(NR_METAL_FLAGS -std=metal3.1 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
   set(NR_AIR)
-  foreach(stem resident history attention gemm_portable gemm_simd)
+  foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused)
     add_custom_command(OUTPUT "${NR_METAL_DIR}/${stem}.air"
       COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL_FLAGS} -c -o "${NR_METAL_DIR}/${stem}.air"
               "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
-      DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_metal.h"
+      DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_metal.h" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_epilogue.h"
       COMMENT "metal ${stem}.air" VERBATIM)
     list(APPEND NR_AIR "${NR_METAL_DIR}/${stem}.air")
   endforeach()
@@ -675,6 +683,7 @@ if(NR_BUILD_D3D12)
     add_custom_command(OUTPUT "${out}"
       COMMAND "${NR_DXC}" ${NR_DXC_FLAGS} ${ARGN} -Fo "${out}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}"
       DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/nr_d3d.hlsli"
+              "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/nr_epilogue.hlsli"
       COMMENT "dxc ${name}.dxil" VERBATIM)
     set(NR_DXIL ${NR_DXIL} "${out}" PARENT_SCOPE)
     set(header "${NR_D3D12_DIR}/dxil_${name}.h")
@@ -696,6 +705,10 @@ if(NR_BUILD_D3D12)
   nr_dxil(attention             attention.hlsl)
   nr_dxil(attention_ab          attention.hlsl -DSOFTMAX_AB)
   nr_dxil(history               history.hlsl)
+  # the fused passes (notes/improve-fusions.md): only their multiply-add twins exist here
+  nr_dxil(window_attention_portable        window_attention_portable.hlsl)
+  nr_dxil(window_attention_portable_merged window_attention_portable.hlsl -DMERGED_OUTPUT=1)
+  nr_dxil(ffn_fused_portable               ffn_fused_portable.hlsl)
   add_custom_target(dxil_shaders ALL DEPENDS ${NR_DXIL})
 
   list(LENGTH NR_DXIL_HEADERS NR_DXIL_COUNT)
@@ -1026,9 +1039,19 @@ if(NR_BUILD_TESTS)
       src/layer/test_daemon.py src/layer/test_ui_mask.py src/layer/test_present.py
       src/layer/test_temporal.py src/layer/test_toggle.py src/layer/test_panel.py
       src/tools/publish_check.py src/tools/claims_check.py
-      src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
+      src/gpu/test_portable.py src/gpu/test_gemm_contract.py src/gpu/test_input_fp16.py
+      src/gpu/test_compact_head.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
       src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
+      src/gpu/test_ffn_fused.py
+      src/gpu/test_glue.py
+      src/gpu/test_gemm_qkv.py
+      src/gpu/test_window_attention.py
+      src/gpu/test_gemm_residual.py
+      src/gpu/test_window_residual.py
+      src/gpu/test_int8_quant.py
+      src/gpu/test_gemm_int8.py
+      src/gpu/test_joint_qkv.py
       src/ref/test_frame_cache.py src/ref/test_native_image.py src/ref/test_nr_model.py
       src/ref/test_temporal_controls.py)
     foreach(script ${NR_PY_TESTS})
@@ -1038,6 +1061,13 @@ if(NR_BUILD_TESTS)
       endif()
       nr_ctest(${name} "${PY}" "${PROJECT_SOURCE_DIR}/${script}")
     endforeach()
+    if(NR_BUILD_LAYER)
+      # the present test's negative controls: each disables one wait and expects the check to fail
+      nr_ctest(test_present_negative "${PY}" "${PROJECT_SOURCE_DIR}/src/layer/test_present.py" --negative-control)
+      set_tests_properties(test_present_negative PROPERTIES SKIP_RETURN_CODE 77)
+    endif()
+    # the batched feed-forward schedule against the plain one, on the device
+    nr_ctest(test_ffn_batch "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_ffn_batch.py" --gpu)
     # the portable GEMM kernels, forced, on a device that has the matrix ones
     add_test(NAME test_portable_forced COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_portable.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
     set_tests_properties(test_portable_forced PROPERTIES ENVIRONMENT "XMX_PORTABLE=1;${NR_TEST_ENV}")
@@ -1049,7 +1079,11 @@ if(NR_BUILD_TESTS)
     set(NR_RUNTIME_TESTS
       src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
-      src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py)
+      src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
+      src/gpu/test_gemm_contract.py src/gpu/test_gemm_residual.py src/gpu/test_window_residual.py
+      src/gpu/test_window_attention.py src/gpu/test_gemm_qkv.py src/gpu/test_ffn_fused.py
+      src/gpu/test_glue.py src/gpu/test_joint_qkv.py src/gpu/test_compact_head.py
+      src/gpu/test_input_fp16.py)
     if(NR_BUILD_METAL)
       set(NR_METAL_TESTS ${NR_RUNTIME_TESTS})
       foreach(script ${NR_METAL_TESTS})

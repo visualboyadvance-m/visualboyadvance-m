@@ -113,16 +113,18 @@ already have. See [Build](#build).
 
 ## What you need
 
-- An Intel GPU that exposes `VK_KHR_cooperative_matrix` with a `fp16 x fp16 -> fp32`
-  configuration. Developed and measured on **Arc 140V / Xe2, Mesa ANV**; an Arc B580
-  (discrete Battlemage) reports the same six configurations. A Vulkan device alone is not
-  enough, and the probe needs neither weights nor the rest of the build:
+- An Intel **Xe2** GPU: `VK_KHR_cooperative_matrix` with an `fp16 x fp16 -> fp32`
+  configuration of **M=8, N=16, K=16**, which every XMX kernel here is written for.
+  Developed and measured on **Arc 140V (Lunar Lake), Mesa ANV**; an Arc B580 (discrete
+  Battlemage) reports the same six configurations. **Arc A-series (Alchemist, Xe-HPG) does
+  not qualify**: its matrix units report 8x8x16, so these kernels do not run there. A Vulkan
+  device alone is not enough, and the probe needs neither weights nor the rest of the build:
 
   ```sh
   gcc -Iwork/vulkan-headers/include src/probe/coopmat_probe.c -o /tmp/probe -lvulkan
   /tmp/probe      # drop the -I if your distribution installs the Vulkan headers
   ```
-- A **discrete** Arc works too, and does not need resizable BAR: where the card's memory
+- A **discrete** Xe2 card (Battlemage, B570/B580) works too, and does not need resizable BAR: where the card's memory
   cannot be mapped, the graph keeps its operands there anyway and the host reaches them by
   copies. Turn resizable BAR on if you can — it is the faster of the two paths and Arc wants
   it for everything else — but it is no longer the difference between working and crawling.
@@ -314,6 +316,21 @@ kernel use the C library's transcendentals and can differ from NumPy's by a last
 the test measures. `work/nr_frame` is `nr_frame.py` itself in C — the same flags (`--profile`, `--style-index`, `--local-tone`, `--local-structure`, `--skin-structure`, `--auto-mask`, `--control-mask`, `--intensity`, `--intensity-ladder`, `--detail-strength`, `--colour-strength`, `--detail-radius`, `--frame-index`, `--size`, `--weights`, `-v`), the same printed lines, PNG in and out through **libpng** rather than ImageMagick (any PNG in, 8-bit RGB out, the same byte codec; `--size` is this project's own bilinear resample rather than ImageMagick's filter, so a resized run differs from the Python's in the resampled pixels and nowhere else). `src/ref/nr_frame_native.py` binds the library for NumPy callers, and `work/test_nr_frame` is the frame test in C (`--reference` takes the head the Python test writes, so the byte-for-byte check runs without Python too). On an Apple M3
 through MoltenVK a 1280x720 frame takes 0.90 s (`notes/phase68`).
 
+Two optional I/O experiments are available on this branch: `NR_INPUT_FP16=1` halves
+the network input buffer and removes its GPU conversion pass; `NR_COMPACT_HEAD=1`
+writes only the four useful output channels, reducing that buffer to a quarter of
+its size without another dispatch. **Both default off.** The first was slower on
+140V, and the second saved less than 1% of warm frame time in the measured pairs.
+B570/B580 results are still needed. Set these in the daemon's environment, not only
+the game's. For exact checks and paired benchmarks, see
+[the I/O experiment notes](notes/improve-compact-io.md).
+
+`NR_JOINT_QKV=1` is another optional experiment: it combines preparation of Q, K
+and V into one dispatch, removing 140 passes per frame. It is **off by default**:
+on 140V at network extent 448x320 it increased warm frame time from 79.1 to 83.2 ms.
+See [the QKV experiment and diagnostic notes](notes/improve-joint-qkv.md) for exact
+checks, the paired benchmark and profiling commands for B570/B580.
+
 ## Run it in a game
 
 Two processes: a **daemon** that holds the model, and a **Vulkan layer** inside the game
@@ -345,7 +362,7 @@ run it again. Leave out `NR_LIVE=1` for photo mode. For a native Vulkan game,
 | `NR_LAYER_TRIGGER` | the file that means "do it". **Required for the toggle** — without it, live mode captures every frame whether the effect is on or not. The tools use `/tmp/nr_trigger` |
 | `NR_LAYER_LIVE=N` | live mode: every Nth present goes through the network |
 | `NR_LAYER_UI_MASK=1` | mark pixels that held still and leave them as the game drew them |
-| `NR_LAYER_SYNC=semaphore` | wait on the present's own semaphores instead of draining the queue twice a frame — **for discrete cards, and still experimental**, see below |
+| `NR_LAYER_SYNC` | accepted for old launchers and ignored: there is one synchronisation path, described under **Capture synchronization** below |
 
 **If your frame rate drops as soon as the game starts and the daemon's log shows no frames**,
 one of the first four is missing or wrong: the layer is capturing and has nowhere to send it.
@@ -421,7 +438,7 @@ all of them move between frames. Only `profile` costs a forward pass.
 
 `0.05` to `1`, step `0.05`, default `1`
 
-The only knob that changes the frame rate. The network runs on a frame this much smaller, and what comes back is the *head* — the detail it drew — which is then scaled up and composed against the full-resolution original, so the game's own pixels are never resampled and only the synthesised part is interpolated. Cost follows the extent and nothing else: about 15 ms + 450 ms per megapixel. 0.55 is the measured compromise, but the *sign* of its effect on quality depends on how dark the scene is rather than on the number: on a bright frame 0.55 adds 15 % of local contrast to a kimono, on a dark crowd it takes 21 % away.
+The only knob that changes the frame rate. The network runs on a frame this much smaller, and what comes back is the *head* — the detail it drew — which is then scaled up and composed against the full-resolution original, so the game's own pixels are never resampled and only the synthesised part is interpolated. Cost follows the extent and nothing else: about 9 ms + 205 ms per megapixel of network extent on an Arc 140V. The extent is never below 320 on a side — the checkpoint's minimum — so small renders are padded up to it: at 512x288 every scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times the real pixels in it. 0.55 is the measured compromise, but the *sign* of its effect on quality depends on how dark the scene is rather than on the number: on a bright frame 0.55 adds 15 % of local contrast to a kimono, on a dark crowd it takes 21 % away.
 
 ### `profile` — which way to trade skin texture against speculars
 
@@ -439,7 +456,7 @@ Blends the model's answer against the source, per pixel where an interface mask 
 
 `0` to `2`, step `0.05`, default `1`
 
-After the blend, the difference the pass made is split into bands and each is re-weighted. This is the fine half — pores, strands, grain. Away from 1 it costs a Gaussian over the whole frame, about 7x more without OpenCV than with it.
+After the blend, the difference the pass made is split into bands and each is re-weighted. This is the fine half — pores, strands, grain. Away from 1 it costs a Gaussian over the whole frame. OpenCV provides a faster blur implementation; the cost depends on the machine and frame size.
 
 ### `colour_strength` — the low-frequency half — and it runs backwards from its name
 
@@ -471,17 +488,19 @@ Mean absolute change between two presents above which the shot is taken to have 
 
 <!-- rates:begin -->
 
-Measured through the socket on 2026-09-18 by `python3 src/bench/live_rates.py` — the whole round trip a game waits for, median of five frames, not graph time alone:
+Measured through the socket on 2026-09-24 by `python3 src/bench/live_rates.py` — the whole round trip a game waits for, median of nine frames, not graph time alone:
 
 | swapchain | render scale | ms | fps |
 | --- | ---: | ---: | ---: |
-| 512x288 | 0.35 | 72 | 13.9 |
-| 512x288 | 0.50 | 72 | 14.0 |
-| 640x360 | 0.35 | 74 | 13.5 |
-| 640x360 | 0.50 | 80 | 12.5 |
-| 854x480 | 0.50 | 105 | 9.5 |
-| 1024x768 | 0.55 | 168 | 6.0 |
-| 1920x1080 | 0.55 | 412 | 2.4 |
+| 512x288 | 0.35 | 43 | 23.4 |
+| 512x288 | 0.50 | 43 | 23.3 |
+| 640x360 | 0.35 | 44 | 22.7 |
+| 640x360 | 0.50 | 44 | 22.5 |
+| 854x480 | 0.50 | 54 | 18.5 |
+| 1024x768 | 0.55 | 91 | 11.0 |
+| 1920x1080 | 0.55 | 206 | 4.9 |
+
+Medians of three runs with swap empty, which agreed within 6 %. On 2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower for you, look at swap before anything else.
 
 That is the daemon's own cost with nothing else on the GPU. A game adds its own frame to it: **Tekken 7** measured **10.5 fps at 640x360** in a live fight (`notes/phase59`).
 
@@ -492,11 +511,23 @@ at the *output* resolution regardless of the render scale, so the swapchain size
 as much as the scale does. A game at 512x288 with the compositor stretching to the panel
 is the fastest arrangement there is.
 
-The graph itself is finished as an optimisation target: GEMM is 216 ms of 488 at 720p and
-is register-bound, and every pass that only moves data already runs at the machine's
-memory ceiling. Tiling, operand staging, integer weights, the accumulator format, OpenCL,
-shared-memory bank padding and handing work to the E-cores have all been measured and all
-are closed. `notes/phase45`, `notes/phase46`.
+Inside the graph, the passes themselves are done: GEMM is register-bound, and every pass
+that only moves data runs at the machine's memory ceiling. Tiling, operand staging, integer
+weights, the accumulator format, OpenCL, shared-memory bank padding and handing work to the
+E-cores have all been measured and all are closed (`notes/phase45`, `notes/phase46`). What
+did move the graph was deleting passes: a pass at the memory ceiling that need not exist is
+all waste. Folding the residuals into the projections, attention into one pass with its
+head merge, Q/K normalisation and the window partition into the QKV projection's own
+epilogue and loads, the narrow blocks' feed-forward into one kernel and the full-resolution
+glue into fewer passes took a 1280x720 frame from 445 to 231 ms, 48 %, with every output
+bit-identical
+(`notes/improve-fusions.md`, `notes/improve-qkv-epilogue.md`). The other thing that moved it
+was shared memory, which decides how many workgroups a core holds: 128 KB between them,
+each share rounded up to 1, 2, 4 ... KB. Window attention at 3104 bytes took 4 KB and so half
+the core's threads, and at exactly 2 KB is 18 % faster; the staged GEMM at 15.5 KB took 16
+and half the threads too — with its tiles and its stage sharing 8 KB, the 1280x720 frame
+went from 228 to 208 ms (`notes/improve-shared-memory.md`, which also has a driver quirk
+that makes some *smaller* declarations slower).
 
 ## How it works
 
@@ -551,8 +582,8 @@ library; `make work/libnr_layer32.so` builds it and `prepare_layer.py` writes bo
 manifests.
 
 **It is unbearably slow.** Look at the swapchain size before the render scale. See the
-table above; 1920x1080 is 2.4 fps in the daemon alone and nothing will fix that but a
-smaller window.
+table above; at 1920x1080 the daemon alone manages about 4 fps, and nothing will fix that
+but a smaller window.
 
 **`GPU lost, stopping` in the daemon's log** — or, from a clone older than 2026-09-17,
 `frame rejected/failed ... xmx_graph_run: resident submit (-4)` on every frame. `-4` is
@@ -582,16 +613,31 @@ should not happen any more, so report it. Each frame line then ends with
 dominate, the traffic is the problem; if the middle one does, the graph is. `XMX_STAGING=1`
 and `=0` force the two memory paths for a comparison.
 
-**You have a discrete card and want to help.** `NR_LAYER_SYNC=semaphore` is the reason that
-switch exists. By default the layer drains the whole queue twice per present to know the
-frame is finished — a sledgehammer that also ignores the semaphores the present brought, so a
-game that renders on one queue and presents from another can hand over an unfinished image.
-The semaphore path does it properly. On the integrated chip this was built on it measures
-**exactly the same** — 210 ms a frame either way in Tekken 7 — because the game's own work is
-nothing beside the network. On a card fast enough for the game to matter, it should be the
-difference; nobody has measured that yet. It is tested here on a headless swapchain and in
-two games (D3D11 and D3D9 under DXVK), which is why it is a switch rather than the default.
-Turn it on, play, and say whether anything tore, stalled or looked stale.
+**Capture synchronization.** The layer waits on all semaphores supplied to the current
+present, then waits for its own copy fences before the CPU reads or reuses the staging
+buffer. It never waits on other application queues or recycles a semaphore still owned by
+presentation. `NR_LAYER_SYNC=idle` and `=semaphore` remain accepted as legacy aliases for
+this single path. The headless test uses separate queues and delayed writes; its negative
+control must detect a layer with the wait deliberately removed. See
+[the synchronization and MK1 check](notes/improve-present-fences.md).
+
+**Direct Proton launch exits before rendering.** `nr-photo --proton` now supplies
+`SteamAppId`, `SteamGameId` and `STEAM_COMPAT_APP_ID`, as Steam normally does. For a log:
+
+```sh
+PROTON_LOG=1 NR_PROTON=/path/to/Proton/proton src/layer/nr-photo --proton <appid> /path/to/game.exe
+```
+
+The launcher prints the runtime and log path (`work/proton-logs` by default).
+`--check-proton` verifies paths, not a successful game launch. If several Proton installs
+are found, select the one wanted with `NR_PROTON`, or launch through Steam.
+
+**The game vanishes when loading characters or a level.** Check the kernel journal for
+an OOM kill before diagnosing a GPU error. On a shared-memory iGPU, the game and every
+resident daemon compete for the same RAM. During the MK1 check, a second daemon and a
+1920x1200 swapchain exhausted memory; stopping the duplicate and using a smaller window
+allowed real frames to be processed. A small render scale reduces the network's buffers,
+but does not shrink the game's textures or all full-resolution host passes.
 
 **The interface is being re-rendered.** `NR_LAYER_UI_MASK=1` marks pixels that did not
 move between two presents and gives them back byte-identical. It drops itself when it

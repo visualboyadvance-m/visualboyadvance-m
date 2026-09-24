@@ -79,6 +79,10 @@ struct VulkanShare {
     uint32_t queue_family = 0;
     // Whether VK_KHR_cooperative_matrix was enabled on `device`.
     bool cooperative_matrix = false;
+    // Whether VK_KHR_workgroup_memory_explicit_layout was enabled with its
+    // scalar-block-layout and 16-bit-access features. The model's staged GEMM
+    // needs it; without it those shapes run on the smaller kernels.
+    bool workgroup_memory_explicit_layout = false;
     // The renderer's vkGetInstanceProcAddr: the library that made `instance`.
     void* get_instance_proc_addr = nullptr;
     void (*lock)(void*) = nullptr;

@@ -119,15 +119,25 @@ def report_checks(control, paths, scratch):
     check("report survives a machine with nothing running", "log" in spoken.getvalue(),
           "no daemon, no log")
     log.write_text(
+        "model ready in 1s on OLD_DEVICE\n"
+        "100x100 old frame\n"
         "model ready in 0.4s on Intel(R) Graphics (LNL)\n"
         "buffers in shared memory (one pool): type 2, heap 11.5 GiB\n"
-        "1280x720 B8G8R8A8_UNORM in 0.21s  change 0.03  gpu 1+176+1ms\n"
+        "runtime options NR_JOINT_QKV=1 NR_BATCH_FFN=1\n"
+        "1280x720 B8G8R8A8_UNORM in 0.21s  change 0.03  "
+        "gate 0.69 held 90% cut 0.001  gpu 1+176+1ms  network 704x448 scale 0.55\n"
         "frame rejected/failed; game keeps original: xmx_buf_create: "
         "vkAllocateMemory (resident) (-2)  — the buffers for this extent do not fit\n")
     spoken = io.StringIO()
     with contextlib.redirect_stdout(spoken):
         control.report()
     said = spoken.getvalue()
+    check("report preserves real geometry and runtime options",
+          'network 704x448 scale 0.55' in said and 'NR_JOINT_QKV=1' in said,
+          'long frame lines are not truncated')
+    check("report uses only the latest daemon session", 'OLD_DEVICE' not in said and '100x100' not in said)
+    check("status has no hardware-independent FPS guess", 'fps of graph time' not in said
+          and '7x' not in said)
     check("report carries the GPU, a frame and the refusal",
           "Intel(R) Graphics" in said and "gpu 1+176+1ms" in said and "(-2)" in said
           and "1 refused" in said,

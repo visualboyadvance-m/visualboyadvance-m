@@ -12,7 +12,8 @@ static const uint E4M3 = 0u, GATE = 1u, HALF = 2u, TO_HALF = 3u,
                   SCALE_CHANNEL = 14u, ADD = 15u, PAD_END = 16u,
                   /* fused: one read of float32 and one write of float16 where the graph
                    * otherwise makes three round trips over the same buffer */
-                  GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u;
+                  GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u,
+                  UPSAMPLE_MERGE = 20u;
 
 /* An operand held as float16 (bit 15 marks `a`, bit 16 marks `b`); a published value is
  * E4M3 and exact in half, so nothing is lost by the narrow read. */
@@ -120,6 +121,25 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         store(flags, index, load_a(flags, ((y / 2u) * source + (x / 2u)) * channels + c));
+        return;
+    }
+    if (kind == UPSAMPLE_MERGE) {
+        /* Block 70's input in one pass (resident.comp's UPSAMPLE_MERGE): the level above,
+         * upsampled 2x (nearest), times the per-channel sin, plus the full-resolution skip
+         * times the per-channel cos; float32 to c, the same value as half to the second
+         * output (the fifth operand, push offset 96). The steps are the UPSAMPLE2,
+         * SCALE_CHANNEL, RESIDUAL and TO_HALF passes', in their shapes: the scale rounded
+         * on its own (`precise`), then `scaled + skip * cos` exactly as RESIDUAL writes
+         * `a + b * d` here, so the driver treats the two alike.
+         * n=channels, sa=target width, sb=source width; d holds sin then cos. */
+        uint channels = pc.n, target = pc.sa, source = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % target, y = rest / target;
+        precise float scaled = load_a(flags, ((y / 2u) * source + (x / 2u)) * channels + c)
+                             * load_d(c);
+        float merged = scaled + load_b(flags, index) * load_d(channels + c);
+        st_f32(bufC, pc.oc.x, index, merged);
+        st_f16(bufE, pc.oe.x, index, merged);
         return;
     }
     if (kind == PAD_END) {

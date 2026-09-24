@@ -10,19 +10,18 @@
  * The staging is fenced with group-wide barriers, as the GLSL is since `phase73`.
  */
 #include "nr_d3d.hlsli"
+#include "nr_epilogue.hlsli"      /* hmul/hadd/hfma and cosine_reciprocal: one definition */
 
-static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u;
-static const float COSINE_NORM_FLOOR = 0.00006198883056640625;
+static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u;
 
 groupshared float stage[32 * 64];
 
 /* `count` consecutive floats from `base`, spread across the 32-wide group. */
-void gather(uint flags, uint lid, uint base, uint count) {
+void gather_part(uint flags, uint lid, uint base, uint count, uint part) {
     uint A = pc.oa.x;
     if ((flags & 0x20000u) != 0u) {
         // Q/K directly from (window, token, 3, head, channel). The cosine operation
         // performs the split's half rounding before its reduction.
-        uint part = (flags >> 18) & 1u;
         if (pc.n % 32u == 0u) {
             // A group's 32 rows stay in one head: compute its base once.
             uint row = base / 32u;
@@ -50,22 +49,29 @@ void gather(uint flags, uint lid, uint base, uint count) {
     GroupMemoryBarrierWithGroupSync();
 }
 
-void scatter(uint flags, uint lid, uint base, uint count) {
-    GroupMemoryBarrierWithGroupSync();
-    if ((flags & 0x1000u) != 0u) {
-        for (uint i = lid; i < count; i += 32u) st_f16(bufC, pc.oc.x, base + i, stage[i]);
+void gather(uint flags, uint lid, uint base, uint count) {
+    gather_part(flags, lid, base, count, (flags >> 18) & 1u);
+}
+
+/* `stage` to one of the operand resources: 1 = b, 2 = c, 3 = d. The target is uniform
+ * over the group, so each branch names one resource, as HLSL wants it. */
+void scatter_rows(RWByteAddressBuffer target, uint offset, bool narrow, uint lid, uint count, uint base) {
+    if (narrow) {
+        for (uint i = lid; i < count; i += 32u) st_f16(target, offset, base + i, stage[i]);
     } else {
-        for (uint i = lid; i < count; i += 32u) st_f32(bufC, pc.oc.x, base + i, stage[i]);
+        for (uint i = lid; i < count; i += 32u) st_f32(target, offset, base + i, stage[i]);
     }
 }
 
-/* half(l*r), half(l+r), half(l*r + acc) — each a float32 expression with one rounding
- * at the end, matching `_half_multiply` / `_half_add` / `_half_fma`. `precise` stops an
- * FMA contraction, which would drop the float32 rounding between the multiply and the
- * add and give a different answer. */
-float hmul(float l, float r) { precise float t = l * r; return half_round(t); }
-float hadd(float l, float r) { precise float t = l + r; return half_round(t); }
-float hfma(float l, float r, float acc) { precise float t = l * r + acc; return half_round(t); }
+void scatter_to(uint flags, uint lid, uint base, uint count, uint which) {
+    GroupMemoryBarrierWithGroupSync();
+    bool narrow = (flags & 0x1000u) != 0u;
+    if (which == 1u)      scatter_rows(bufB, pc.ob.x, narrow, lid, count, base);
+    else if (which == 3u) scatter_rows(bufD, pc.od.x, narrow, lid, count, base);
+    else                  scatter_rows(bufC, pc.oc.x, narrow, lid, count, base);
+}
+
+void scatter(uint flags, uint lid, uint base, uint count) { scatter_to(flags, lid, base, count, 2u); }
 
 /* The publish this pass ends with: bits 8-11 of `flags` pick the transform and bit 12
  * narrows the output to float16. Both of these rows end in an E4M3 value, which is exact
@@ -78,36 +84,20 @@ void store(uint flags, uint index, float value) {
     else                         st_f32(bufC, pc.oc.x, index, value);
 }
 
-void cosine_publish(uint row, uint local) {
+/* `scale_from`: 0 none, 1 the scale in d (the plain cosine publish, `pc.k != 0`), 2 the
+ * scale at push offset 120 (QKV_PREPARE, where d is the V target). */
+void cosine_publish(uint row, uint local, uint scale_from) {
     uint base = local * 32u;
     float h[32];
     [unroll] for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[base + i]);
-
-    float partial[4][2];
-    [unroll] for (uint lane = 0u; lane < 4u; lane++)
-        [unroll] for (uint parity = 0u; parity < 2u; parity++) {
-            uint ch = lane * 2u + parity;
-            float first  = hfma(h[ch + 8u],  h[ch + 8u],  hmul(h[ch],       h[ch]));
-            float second = hfma(h[ch + 24u], h[ch + 24u], hmul(h[ch + 16u], h[ch + 16u]));
-            partial[lane][parity] = hadd(first, second);
-        }
-    float two[4][2], one[4][2];
-    [unroll] for (uint lane = 0u; lane < 4u; lane++)
-        [unroll] for (uint p = 0u; p < 2u; p++) two[lane][p] = hadd(partial[lane][p], partial[lane ^ 2u][p]);
-    [unroll] for (uint lane = 0u; lane < 4u; lane++)
-        [unroll] for (uint p = 0u; p < 2u; p++) one[lane][p] = hadd(two[lane][p], two[lane ^ 1u][p]);
-
-    float norm = max(hadd(one[0][0], one[0][1]), half_round(COSINE_NORM_FLOOR));
-    float reciprocal = half_round(rsqrt(norm));
-    // pc.k != 0 selects the query path, which also multiplies by its head's scale
+    float reciprocal = cosine_reciprocal(h);          // nr_epilogue.hlsli, cosine_tree.glsl
     float scale = 1.0;
-    if (pc.k != 0u) {
-        uint head = (row / pc.n) % pc.batch;      // rows are (batch, head, token)
-        scale = half_round(ld_f32(bufD, pc.od.x, head));
-    }
+    uint head = (row / pc.n) % pc.batch;              // rows are (batch, head, token)
+    if (scale_from == 1u) scale = half_round(ld_f32(bufD, pc.od.x, head));
+    else if (scale_from == 2u) scale = half_round(ld_f32(bufF, pc.of.x, head));
     [unroll] for (uint i = 0u; i < 32u; i++) {
         float value = hmul(h[i], reciprocal);
-        if (pc.k != 0u) value = hmul(value, scale);
+        if (scale_from != 0u) value = hmul(value, scale);
         stage[base + i] = e4m3(value);
     }
 }
@@ -226,10 +216,24 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
     uint row = group * 32u + lid;
     uint flags = operation_flags();
     uint kind = flags & 0xFFu;
-    if (kind == COSINE_PUBLISH) {
+    if (kind == QKV_PREPARE) {
+        /* attention.comp's QKV_PREPARE: three independent group planes on y — Q and K
+         * normalised (Q scaled), V published — the arithmetic of the two cosine
+         * publishes and the V split, recorded as one dispatch. Targets b, c, d. */
+        uint part = gid.y;
+        uint base = group * 32u * 32u;
+        uint count = min(32u * 32u, pc.m * 32u - base);
+        gather_part(flags, lid, base, count, part);
+        if (part < 2u) {
+            if (row < pc.m) cosine_publish(row, lid, part == 0u ? 2u : 0u);
+        } else {
+            for (uint i = lid; i < count; i += 32u) stage[i] = e4m3(stage[i]);
+        }
+        scatter_to(flags, lid, base, count, part + 1u);
+    } else if (kind == COSINE_PUBLISH) {
         uint base = group * 32u * 32u;
         gather(flags, lid, base, min(32u * 32u, pc.m * 32u - base));
-        if (row < pc.m) cosine_publish(row, lid);
+        if (row < pc.m) cosine_publish(row, lid, pc.k != 0u ? 1u : 0u);
         scatter(flags, lid, base, min(32u * 32u, pc.m * 32u - base));
     } else if (kind == SOFTMAX) {
         uint stride = pc.sa != 0u ? pc.sa : pc.n;

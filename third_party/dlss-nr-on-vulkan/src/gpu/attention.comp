@@ -19,6 +19,7 @@
 #extension GL_EXT_shader_explicit_arithmetic_types_float16 : require
 
 #include "publish.glsl"
+#include "cosine_tree.glsl"
 
 layout(local_size_x = 32) in;
 
@@ -30,6 +31,7 @@ layout(push_constant, scalar) uniform Push {
     uint m, n, k, batch;
     uint sa, sb, sc, flags;
     float p0, p1, p2, p3;
+    FloatBuf qkv_scale; // offset 80: shares the GEMM-only lda/ldb slots in the C push ABI
 } pc;
 
 #include "specialize.glsl"
@@ -51,13 +53,12 @@ layout(push_constant, scalar) uniform Push {
 shared float stage[32 * 64];
 
 /* `count` consecutive floats from `base`, spread across the workgroup. */
-void gather(uint base, uint count) {
+void gather_part(uint base, uint count, uint part) {
     /* Bit 15: the input is float16. The cosine publish rounds its input to half as its
      * first act, so a producer that already wrote half loses nothing by it. */
     if ((operation_flags() & 0x20000u) != 0u) {
         // Q/K directly from (window, token, 3, head, channel). The cosine
         // operation performs the split's half rounding before its reduction.
-        uint part = (operation_flags() >> 18) & 1u;
         if (pc.n % 32u == 0u) {
             // A workgroup's 32 rows stay in one head. Compute its base once,
             // instead of repeating integer division for every gathered element.
@@ -85,30 +86,25 @@ void gather(uint base, uint count) {
     barrier();
 }
 
-void scatter(uint base, uint count) {
+void gather(uint base, uint count) {
+    gather_part(base, count, (operation_flags() >> 18) & 1u);
+}
+
+void scatter_to(uint base, uint count, uint64_t target) {
     memoryBarrierShared();
     barrier();
     if ((operation_flags() & 0x1000u) != 0u) {
-        HalfBuf h = HalfBuf(uint64_t(pc.c));
+        HalfBuf h = HalfBuf(target);
         for (uint i = gl_LocalInvocationID.x; i < count; i += 32u)
             h.v[base + i] = float16_t(stage[i]);
     } else {
-        for (uint i = gl_LocalInvocationID.x; i < count; i += 32u) pc.c.v[base + i] = stage[i];
+        for (uint i = gl_LocalInvocationID.x; i < count; i += 32u) FloatBuf(target).v[base + i] = stage[i];
     }
 }
 
-const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u;
-const float COSINE_NORM_FLOOR = 0.00006198883056640625;
+void scatter(uint base, uint count) { scatter_to(base, count, uint64_t(pc.c)); }
 
-
-
-/* half(l*r), half(l+r), half(l*r + acc) — each a float32 expression with one rounding
- * at the end, matching `_half_multiply` / `_half_add` / `_half_fma`. `precise` stops an
- * FMA contraction, which would drop the float32 rounding between the multiply and the
- * add and give a different answer. */
-float hmul(float l, float r) { precise float t = l * r; return half_round(t); }
-float hadd(float l, float r) { precise float t = l + r; return half_round(t); }
-float hfma(float l, float r, float acc) { precise float t = l * r + acc; return half_round(t); }
+const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u;
 
 /* The publish this pass ends with: bits 8-11 of `flags` pick the transform and bit 12
  * narrows the output to float16, so the row passes can feed a GEMM directly instead of
@@ -122,36 +118,20 @@ void store(uint index, float value) {
     else                            pc.c.v[index] = value;
 }
 
-void cosine_publish(uint row, uint local) {
+void cosine_publish(uint row, uint local, bool scaled, FloatBuf scales) {
     uint base = local * 32u;
     float h[32];
     for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[base + i]);
-
-    float partial[4][2];
-    for (uint lane = 0u; lane < 4u; lane++)
-        for (uint parity = 0u; parity < 2u; parity++) {
-            uint ch = lane * 2u + parity;
-            float first  = hfma(h[ch + 8u],  h[ch + 8u],  hmul(h[ch],       h[ch]));
-            float second = hfma(h[ch + 24u], h[ch + 24u], hmul(h[ch + 16u], h[ch + 16u]));
-            partial[lane][parity] = hadd(first, second);
-        }
-    float two[4][2], one[4][2];
-    for (uint lane = 0u; lane < 4u; lane++)
-        for (uint p = 0u; p < 2u; p++) two[lane][p] = hadd(partial[lane][p], partial[lane ^ 2u][p]);
-    for (uint lane = 0u; lane < 4u; lane++)
-        for (uint p = 0u; p < 2u; p++) one[lane][p] = hadd(two[lane][p], two[lane ^ 1u][p]);
-
-    float norm = max(hadd(one[0][0], one[0][1]), half_round(COSINE_NORM_FLOOR));
-    float reciprocal = half_round(inversesqrt(norm));
+    float reciprocal = cosine_reciprocal(h);   // cosine_tree.glsl
     // pc.k != 0 selects the query path, which also multiplies by its head's scale
     float scale = 1.0;
-    if (pc.k != 0u) {
+    if (scaled) {
         uint head = (row / pc.n) % pc.batch;      // rows are (batch, head, token)
-        scale = half_round(pc.d.v[head]);
+        scale = half_round(scales.v[head]);
     }
     for (uint i = 0u; i < 32u; i++) {
         float value = hmul(h[i], reciprocal);
-        if (pc.k != 0u) value = hmul(value, scale);
+        if (scaled) value = hmul(value, scale);
         stage[base + i] = e4m3(value);
     }
 }
@@ -268,10 +248,25 @@ void softmax(uint row, uint local) {
 void main() {
     uint row = gl_GlobalInvocationID.x;
     uint kind = operation_flags() & 0xFFu, local = gl_LocalInvocationID.x;
-    if (kind == COSINE_PUBLISH) {
+    if (kind == QKV_PREPARE) {
+        // Three independent workgroup planes: identical arithmetic to the old
+        // Q/K normalizations and V split, recorded as one dispatch and one barrier.
+        uint part = gl_WorkGroupID.y;
+        uint base = gl_WorkGroupID.x * 32u * 32u;
+        uint count = min(32u * 32u, pc.m * 32u - base);
+        gather_part(base, count, part);
+        if (part < 2u) {
+            if (row < pc.m) cosine_publish(row, local, part == 0u, pc.qkv_scale);
+        } else {
+            for (uint i = local; i < count; i += 32u) stage[i] = e4m3(stage[i]);
+        }
+        uint64_t target = part == 0u ? uint64_t(pc.b) :
+                          (part == 1u ? uint64_t(pc.c) : uint64_t(pc.d));
+        scatter_to(base, count, target);
+    } else if (kind == COSINE_PUBLISH) {
         uint base = gl_WorkGroupID.x * 32u * 32u;
         gather(base, min(32u * 32u, pc.m * 32u - base));
-        if (row < pc.m) cosine_publish(row, local);
+        if (row < pc.m) cosine_publish(row, local, pc.k != 0u, pc.d);
         scatter(base, min(32u * 32u, pc.m * 32u - base));
     } else if (kind == SOFTMAX) {
         uint stride = pc.sa != 0u ? pc.sa : pc.n;

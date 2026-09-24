@@ -134,14 +134,23 @@ int main(int argc, char **argv)
 	if (qi == UINT32_MAX) { fprintf(stderr, "no compute queue\n"); return 1; }
 
 	/* Feature chain: cooperative matrix needs the memory model, fp16 arithmetic
-	 * and 16-bit storage buffers all switched on explicitly. */
+	 * and 16-bit storage buffers all switched on explicitly. The integer twin
+	 * (`gemm_coopmat_int8.comp`, configuration 4) needs the 8-bit pair as well; asking
+	 * for both costs nothing and lets one runner check either kernel. */
 	VkPhysicalDeviceCooperativeMatrixFeaturesKHR cm = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR,
 		.cooperativeMatrix = VK_TRUE };
+	/* The 8-bit pair is asked for only where the device has it (MoltenVK and the phones
+	 * do not all): without it the float kernels are unaffected and the integer one fails
+	 * to load, which is the caller's business. */
+	VkPhysicalDeviceVulkan12Features have12 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+	VkPhysicalDeviceFeatures2 have2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &have12 };
+	vkGetPhysicalDeviceFeatures2(pd, &have2);
 	VkPhysicalDeviceVulkan12Features v12 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
 		.pNext = coopmat ? (void *)&cm : NULL, .vulkanMemoryModel = VK_TRUE,
-		.vulkanMemoryModelDeviceScope = VK_TRUE, .shaderFloat16 = VK_TRUE };
+		.vulkanMemoryModelDeviceScope = VK_TRUE, .shaderFloat16 = VK_TRUE,
+		.shaderInt8 = have12.shaderInt8, .storageBuffer8BitAccess = have12.storageBuffer8BitAccess };
 	VkPhysicalDeviceVulkan11Features v11 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES,
 		.pNext = &v12, .storageBuffer16BitAccess = VK_TRUE };
@@ -161,16 +170,23 @@ int main(int argc, char **argv)
 	VkQueue queue;
 	vkGetDeviceQueue(dev, qi, 0, &queue);
 
-	struct buf A = make_buf(dev, pd, (VkDeviceSize)M * K * 2);
-	struct buf B = make_buf(dev, pd, (VkDeviceSize)K * N * 2);
-	struct buf C = make_buf(dev, pd, (VkDeviceSize)M * N * 4);
+	/* The operand width comes from the files, not from a flag: two bytes an element is
+	 * the float kernel, one byte the integer one, and a file that is neither size is a
+	 * caller error worth naming rather than a buffer overrun worth debugging. The
+	 * accumulator is four bytes either way — float for config 1, int32 for config 4. */
 	size_t la, lb;
 	void *pa = slurp(argv[5], &la), *pb = slurp(argv[6], &lb);
-	if (la != A.size || lb != B.size) {
-		fprintf(stderr, "input size mismatch: A %zu want %llu, B %zu want %llu\n",
-			la, (unsigned long long)A.size, lb, (unsigned long long)B.size);
+	size_t wanted_a = (size_t)M * K, wanted_b = (size_t)K * N;
+	size_t width = la == wanted_a ? 1 : (la == wanted_a * 2 ? 2 : 0);
+	if (!width || lb != wanted_b * width) {
+		fprintf(stderr, "input size mismatch: A %zu, B %zu; expected %zu and %zu "
+			"(int8) or %zu and %zu (fp16)\n", la, lb, wanted_a, wanted_b,
+			wanted_a * 2, wanted_b * 2);
 		return 1;
 	}
+	struct buf A = make_buf(dev, pd, (VkDeviceSize)la);
+	struct buf B = make_buf(dev, pd, (VkDeviceSize)lb);
+	struct buf C = make_buf(dev, pd, (VkDeviceSize)M * N * 4);
 	memcpy(A.p, pa, la); memcpy(B.p, pb, lb); memset(C.p, 0, C.size);
 
 	VkDescriptorSetLayoutBinding bind[3];

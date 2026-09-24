@@ -123,8 +123,17 @@ class GlobalScratch:
 
     def __init__(self, runtime, weights, tokens, arena=None):
         channels, heads = weights.channels, weights.heads
-        # the token count is the bottleneck's pixel count and need not be tile-aligned
-        self.tokens, self.padded = tokens, xmxres.align(tokens, 16)
+        # the token count is the bottleneck's pixel count and need not be tile-aligned.
+        # Whole 64-row blocks put its deep-K GEMMs (K up to 4096) on the staged kernel,
+        # which is faster there: 240 -> 256 tokens at 720p took the frame from 240.6 to
+        # 235.4 ms on the GPU, three alternating runs each. Pad rows are zero, are excluded
+        # from the softmax, and leave every real row bit-identical. The eighth is a guard,
+        # not a measurement: at 384x384 (64 tokens) and 1024x576 (192) the question does
+        # not arise, and a large pad would pay for rows nobody needs.
+        padded = xmxres.align(tokens, 16)
+        if xmxres.align(tokens, 64) * 8 <= padded * 9:
+            padded = xmxres.align(tokens, 64)
+        self.tokens, self.padded = tokens, padded
         padded, hidden = self.padded, weights.hidden_width
         make = (arena.buffer if arena is not None else
                 lambda name, count, dtype=np.float32: runtime.buffer(count, dtype))
@@ -136,6 +145,7 @@ class GlobalScratch:
         self.ffn16 = make("ffn16", padded * channels, np.float16)
         self.proj = make("proj", padded * channels * 3)
         self.q16, self.k16, self.v16 = (make(name, padded * channels, np.float16) for name in ("q16", "k16", "v16"))
+        self.key16 = make("key16", padded * channels, np.float16)   # see record_qkv_projection
         self.scores = make("scores", heads * padded * padded)
         self.probs16 = make("probs16", heads * padded * padded, np.float16)
         self.context = make("context", heads * padded * 32)
@@ -152,6 +162,9 @@ class GlobalScratch:
 
 def record_qkv(runtime, w, s, windows, tokens, channels, heads):
     """Split V; optionally normalize Q/K directly from the projection buffer."""
+    if runtime.fuse_qk and runtime.joint_qkv:
+        runtime.prepare_qkv(s.proj, s.q16, s.k16, s.v16, w.scale, windows, tokens, heads)
+        return
     if runtime.fuse_qk:
         with runtime.independent():
             runtime.cosine_publish(s.proj, s.q16, windows * heads * tokens,
@@ -176,6 +189,58 @@ def record_qkv(runtime, w, s, windows, tokens, channels, heads):
                                tokens=tokens, heads=heads, narrow=True, from_half=True)
 
 
+def record_qkv_projection(runtime, a, w, s, windows, tokens, channels, heads, *,
+                          window=None, image_half=False):
+    """The QKV projection and everything that prepares Q, K and V after it.
+
+    Returns the buffer K ended up in. With `qkv_epilogue` it is one GEMM whose epilogue
+    normalises Q and K and publishes V (`qkv_epilogue.glsl`), and K goes to `s.key16`
+    rather than `s.k16`: k16 shares the arena role of the projection's input, which other
+    workgroups are still reading while this one's epilogue writes. Otherwise the
+    projection goes to memory in float32 and `record_qkv` reads it back, as it always did.
+
+    With `window=(height, width, origin)` `a` is the image, not its partition: the epilogue
+    GEMM gathers the window rows itself. Without the epilogue that gather has nowhere to
+    live, so the partition is recorded here as it always was.
+    """
+    rows = windows * tokens
+    if window is not None:
+        if runtime.qkv_epilogue and rows % 64 == 0:
+            runtime.gemm_qkv(a, w.qkv, s.q16, s.key16, s.v16, w.scale, rows, channels, heads,
+                             tokens, window=window, image_half=image_half)
+            return s.key16
+        height, width, origin = window
+        runtime.partition(a, s.win16, height, width, channels, origin=origin, narrow=True,
+                          a_half=image_half)
+        a = s.win16
+    if runtime.qkv_epilogue and rows % 16 == 0:
+        runtime.gemm_qkv(a, w.qkv, s.q16, s.key16, s.v16, w.scale, rows, channels, heads,
+                         tokens)
+        return s.key16
+    runtime.gemm(a, w.qkv, s.proj, rows, 3 * channels, channels)
+    record_qkv(runtime, w, s, windows, tokens, channels, heads)
+    return s.k16
+
+
+def record_project_residual(runtime, a, weight, branch, skip, cosine, target,
+                            rows, channels, inner, *, epilogue=0, skip_half=False,
+                            narrow=False):
+    """A projection and its residual: `target = a @ weight + skip * cosine`.
+
+    Fused, the residual is the GEMM's own epilogue and the float32 branch never goes
+    to memory (ProjectsCodex's phase38, `notes/improve-fusions.md`). Unfused it is the
+    two passes this graph always had, kept for paired comparison and as the reference
+    the fused path is bit-identical to. `NR_FUSE_RESIDUAL=0` selects them.
+    """
+    if runtime.fuse_residual:
+        runtime.gemm_residual(a, weight, skip, cosine, target, rows, channels, inner,
+                              epilogue=epilogue, skip_half=skip_half, narrow=narrow)
+    else:
+        runtime.gemm(a, weight, branch, rows, channels, inner)
+        runtime.residual(branch, skip, cosine, target, rows * channels, channels,
+                         epilogue=epilogue, b_half=skip_half, narrow=narrow)
+
+
 def record_global_block(runtime, w, s, source=None, target=None):
     """A bottleneck block: the wide feed-forward, then attention over every token."""
     source = source or s.value
@@ -184,13 +249,12 @@ def record_global_block(runtime, w, s, source=None, target=None):
     runtime.to_half(source, s.value16, padded * channels)
     runtime.gemm(s.value16, w.expand, s.hidden16, padded, w.hidden_width, channels,
                  epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
-    runtime.gemm(s.hidden16, w.ffn_proj, s.branch, padded, channels, w.hidden_width)
-    runtime.residual(s.branch, source, w.ffn_cos, s.ffn, padded * channels, channels)
+    record_project_residual(runtime, s.hidden16, w.ffn_proj, s.branch, source, w.ffn_cos,
+                            s.ffn, padded, channels, w.hidden_width)
 
     runtime.to_half(s.ffn, s.ffn16, padded * channels)
-    runtime.gemm(s.ffn16, w.qkv, s.proj, padded, 3 * channels, channels)
-    record_qkv(runtime, w, s, 1, padded, channels, heads)
-    runtime.gemm(s.q16, s.k16, s.scores, padded, padded, 32, batch=heads,
+    key = record_qkv_projection(runtime, s.ffn16, w, s, 1, padded, channels, heads)
+    runtime.gemm(s.q16, key, s.scores, padded, padded, 32, batch=heads,
                  strides=(padded * 32, padded * 32, padded * padded), transpose_b=True)
     # no attention bias here, and the logits are clamped symmetrically
     runtime.softmax(s.scores, s.probs16, heads * padded, s.tokens,
@@ -199,8 +263,8 @@ def record_global_block(runtime, w, s, source=None, target=None):
                  strides=(padded * padded, padded * 32, padded * 32))
     runtime.merge_heads(s.context, s.merged16, 1, padded, channels, heads,
                         epilogue=xmxres.EPI_E4M3, narrow=True)
-    runtime.gemm(s.merged16, w.out, s.attention, padded, channels, channels)
-    runtime.residual(s.attention, s.ffn, w.attn_cos, target, padded * channels, channels)
+    record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
+                            target, padded, channels, channels)
 
 
 def run_global_block(runtime, w, s, value):
@@ -247,10 +311,13 @@ class BlockScratch:
         self.win16 = make("win16", windowed, np.float16)
         self.proj = make("proj", windowed * 3)
         self.q16, self.k16, self.v16 = (make(name, windowed, np.float16) for name in ("q16", "k16", "v16"))
+        self.key16 = make("key16", windowed, np.float16)   # see record_qkv_projection
         self.scores = make("scores", self.batch * self.tokens * self.tokens)
         self.probs16 = make("probs16", self.batch * self.tokens * self.tokens, np.float16)
         self.context = make("context", self.batch * self.tokens * 32)
         self.merged16 = make("merged16", windowed, np.float16)
+        # the fused attention's merged output: scores' and context's role, unused by then
+        self.context16 = make("context16", windowed, np.float16)
         self.attended = make("attended", windowed)
         self.out = make("out", pixels * channels)
         self.core16 = (make("core16", pixels * channels, np.float16)
@@ -264,41 +331,76 @@ class BlockScratch:
                 value.free()
 
 
-def record_feed_forward(runtime, w, s, source, source_half=False):
+def _ffn_groups(runtime, a, b, c, rows, cols, inner, groups, *, leading, strides,
+                epilogue):
+    """Independent group products, with the same tiles and rounding in either mode.
+
+    Batch strides advance the group, row strides advance the pixel within that group.
+    In particular, a zero A batch stride broadcasts the branched FFN input; output
+    groups occupy disjoint column slices, not consecutive dense matrices.
+    """
+    if runtime.batch_ffn:
+        runtime.gemm(a, b, c, rows, cols, inner, batch=groups, strides=strides,
+                     leading=leading, epilogue=epilogue, narrow=True)
+    else:
+        with runtime.independent():
+            for group in range(groups):
+                runtime.gemm(a, b, c, rows, cols, inner, leading=leading,
+                             offsets=tuple(group * step for step in strides),
+                             epilogue=epilogue, narrow=True)
+
+
+def record_feed_forward(runtime, w, s, source, source_half=False, source16=None):
     """The block's feed-forward, into `s.ffn`. Branched or plain, as the block is.
 
     `source_half` says the block's input is already float16 — true whenever it is an
     E4M3 publish, which is exact in half — so the widening pass in front of the first
-    GEMM is not needed and the residual reads the narrow buffer directly.
+    GEMM is not needed and the residual reads the narrow buffer directly. `source16`
+    says a float32 input's half copy has already been written there, by the pass that
+    produced the input, so the to_half pass is not needed either.
+
+    Returns whether `s.ffn` was stored as half: the branched blocks publish it as E4M3,
+    which half holds exactly, so they store it narrow and every pass after reads half the
+    bytes; the plain blocks' output is unpublished float32 and stays that.
     """
     pixels, channels = s.height * s.width, w.channels
-    value16 = source if source_half else s.value16
-    if not source_half:
+    value16 = source if source_half else (source16 or s.value16)
+    if not source_half and source16 is None:
         runtime.to_half(source, s.value16, pixels * channels)
     if w.branched:
-        with runtime.independent():
-            for head in range(w.groups):
-                runtime.gemm(value16, w.expand, s.hidden16, pixels, 128, channels,
-                             leading=(0, 0, s.hidden_width),
-                             offsets=(0, head * channels * 128, head * 128),
-                             epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
-        with runtime.independent():
-            for head in range(w.groups):
-                runtime.gemm(s.hidden16, w.branch, s.heads16, pixels, 32, 128,
-                             leading=(s.hidden_width, 0, channels),
-                             offsets=(head * 128, head * 128 * 32, head * 32),
-                             epilogue=xmxres.EPI_E4M3, narrow=True)
-        runtime.gemm(s.heads16, w.ffn_out, s.branch, pixels, channels, channels)
+        if (runtime.fuse_branched_ffn and pixels % 16 == 0 and channels % 16 == 0
+                and channels == w.groups * 32):
+            # every group's expand and projection in one pass, the hidden layer on chip
+            runtime.ffn_fused(value16, w.expand, w.branch, s.heads16, pixels, channels, 128,
+                              groups=w.groups, epilogue=xmxres.EPI_E4M3, narrow=True)
+        else:
+            _ffn_groups(runtime, value16, w.expand, s.hidden16, pixels, 128, channels,
+                        w.groups, leading=(0, 0, s.hidden_width),
+                        strides=(0, channels * 128, 128), epilogue=xmxres.EPI_GATE_E4M3)
+            _ffn_groups(runtime, s.hidden16, w.branch, s.heads16, pixels, 32, 128,
+                        w.groups, leading=(s.hidden_width, 0, channels),
+                        strides=(128, 128 * 32, 32), epilogue=xmxres.EPI_E4M3)
         # the fused multi-head kernels publish the residual before attention reads it,
-        # which the residual now does on its way out
-        runtime.residual(s.branch, source, w.ffn_cos, s.ffn, pixels * channels, channels,
-                         epilogue=xmxres.EPI_E4M3, b_half=source_half)
+        # which the residual now does on its way out — as half, which holds it exactly
+        record_project_residual(runtime, s.heads16, w.ffn_out, s.branch, source, w.ffn_cos,
+                                s.ffn, pixels, channels, channels,
+                                epilogue=xmxres.EPI_E4M3, skip_half=source_half,
+                                narrow=True)
+        return True
+    elif (runtime.fuse_ffn and channels == 32 and s.hidden_width % 32 == 0
+          and pixels % 16 == 0):
+        # both GEMMs in one pass, the hidden layer never written (ffn_fused.comp)
+        runtime.ffn_fused(value16, w.expand, w.branch, s.ffn, pixels, channels,
+                          s.hidden_width, skip=source, cosine=w.ffn_cos,
+                          skip_half=source_half)
+        return False
     else:
         runtime.gemm(value16, w.expand, s.hidden16, pixels, s.hidden_width, channels,
                      epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
-        runtime.gemm(s.hidden16, w.branch, s.branch, pixels, channels, s.hidden_width)
-        runtime.residual(s.branch, source, w.ffn_cos, s.ffn, pixels * channels, channels,
-                         b_half=source_half)
+        record_project_residual(runtime, s.hidden16, w.branch, s.branch, source, w.ffn_cos,
+                                s.ffn, pixels, channels, s.hidden_width,
+                                skip_half=source_half)
+        return False
 
 
 def record_split_feed_forward(runtime, w, s, source, source_half=False):
@@ -314,25 +416,24 @@ def record_split_feed_forward(runtime, w, s, source, source_half=False):
         runtime.to_half(source, s.value16, pixels * channels)
     runtime.gemm(value16, w.first, s.heads16, pixels, channels, channels,
                  epilogue=xmxres.EPI_E4M3, narrow=True)
-    with runtime.independent():
-        for group in range(groups):
-            runtime.gemm(s.heads16, w.expand, s.hidden16, pixels, 256, 64,
-                         leading=(channels, 0, wide),
-                         offsets=(group * 64, group * 64 * 256, group * 256),
-                         epilogue=xmxres.EPI_GATE, narrow=True)
-    with runtime.independent():
-        for group in range(groups):
-            runtime.gemm(s.hidden16, w.project, s.core16, pixels, 64, 256,
-                         leading=(wide, 0, channels),
-                         offsets=(group * 256, group * 256 * 64, group * 64),
-                         epilogue=xmxres.EPI_E4M3, narrow=True)
-    runtime.gemm(s.core16, w.weight3, s.branch, pixels, channels, channels)
-    runtime.residual(s.branch, source, w.ffn_cos, s.ffn, pixels * channels, channels,
-                     b_half=source_half)
+    _ffn_groups(runtime, s.heads16, w.expand, s.hidden16, pixels, 256, 64,
+                groups, leading=(channels, 0, wide),
+                strides=(64, 64 * 256, 256), epilogue=xmxres.EPI_GATE)
+    _ffn_groups(runtime, s.hidden16, w.project, s.core16, pixels, 64, 256,
+                groups, leading=(wide, 0, channels),
+                strides=(256, 256 * 64, 64), epilogue=xmxres.EPI_E4M3)
+    record_project_residual(runtime, s.core16, w.weight3, s.branch, source, w.ffn_cos,
+                            s.ffn, pixels, channels, channels, skip_half=source_half)
 
 
-def record_window_attention(runtime, w, s, source):
+def record_window_attention(runtime, w, s, source, target=None, publish=0,
+                            target_half=False, source_half=False):
     """Window attention over `source`, into `s.attended` — in window order.
+
+    With a `target`, the output projection finishes the block instead: it adds
+    `source * attn_cos` and writes straight back into the unpadded image, so neither
+    `s.attended` nor the residual's own window-reversing pass is needed
+    (ProjectsCodex's phase39). `source` is then the residual's skip, as it always was.
 
     The reverse back to image order is the following residual's own gather, so nothing
     is written in image order here. The window count follows this block's own origin,
@@ -343,23 +444,47 @@ def record_window_attention(runtime, w, s, source):
     windows = (padded_height // 8) * (padded_width // 8)
     batch = windows * heads
     windowed = windows * tokens * channels
-    runtime.partition(source, s.win16, s.height, s.width, channels, origin=w.origin,
-                      narrow=True)
-    runtime.gemm(s.win16, w.qkv, s.proj, windows * tokens, 3 * channels, channels)
-    record_qkv(runtime, w, s, windows, tokens, channels, heads)
-    runtime.gemm(s.q16, s.k16, s.scores, tokens, tokens, 32, batch=batch,
-                 strides=(tokens * 32, tokens * 32, tokens * tokens), transpose_b=True)
-    runtime.softmax(s.scores, s.probs16, batch * tokens, tokens, narrow=True,
-                    bias=w.bias, heads=heads)
-    runtime.gemm(s.probs16, s.v16, s.context, tokens, 32, tokens, batch=batch,
-                 strides=(tokens * tokens, tokens * 32, tokens * 32))
-    runtime.merge_heads(s.context, s.merged16, windows, tokens, channels, heads,
-                        epilogue=xmxres.EPI_E4M3, narrow=True)
-    runtime.gemm(s.merged16, w.out, s.attended, windows * tokens, channels, channels)
+    if runtime.fuse_partition:
+        # the projection gathers its window rows from the image itself
+        key = record_qkv_projection(runtime, source, w, s, windows, tokens, channels, heads,
+                                    window=(s.height, s.width, w.origin),
+                                    image_half=source_half)
+    else:
+        runtime.partition(source, s.win16, s.height, s.width, channels, origin=w.origin,
+                          narrow=True, a_half=source_half)
+        key = record_qkv_projection(runtime, s.win16, w, s, windows, tokens, channels, heads)
+    fused = runtime.fuse_window_attention and tokens == 64
+    merged = fused and runtime.fuse_attention_merge
+    attended = s.context16 if merged else s.merged16
+    if fused:
+        # One dispatch for QK^T, softmax and PV (ProjectsCodex's phase42). Never into
+        # `merged16`: it shares q16's arena role, and another workgroup may still be
+        # reading Q while this one stores. Merged, the same dispatch also does the head
+        # merge and writes the published result into `context16`, whose role (the
+        # scores') the fused path leaves unused.
+        runtime.window_attention(s.q16, key, s.v16, attended if merged else s.context,
+                                 batch, heads, bias=w.bias, merged=merged)
+    else:
+        runtime.gemm(s.q16, key, s.scores, tokens, tokens, 32, batch=batch,
+                     strides=(tokens * 32, tokens * 32, tokens * tokens), transpose_b=True)
+        runtime.softmax(s.scores, s.probs16, batch * tokens, tokens, narrow=True,
+                        bias=w.bias, heads=heads)
+        runtime.gemm(s.probs16, s.v16, s.context, tokens, 32, tokens, batch=batch,
+                     strides=(tokens * tokens, tokens * 32, tokens * 32))
+    if not merged:
+        runtime.merge_heads(s.context, s.merged16, windows, tokens, channels, heads,
+                            epilogue=xmxres.EPI_E4M3, narrow=True)
+    if target is not None:
+        runtime.gemm_residual(attended, w.out, source, w.attn_cos, target,
+                              windows * tokens, channels, channels,
+                              reverse=(s.height, s.width, 8, w.origin),
+                              epilogue=publish, narrow=target_half, skip_half=source_half)
+    else:
+        runtime.gemm(attended, w.out, s.attended, windows * tokens, channels, channels)
 
 
 def record_block(runtime, w, s, source=None, target=None, publish=0, source_half=False,
-                 target_half=False):
+                 target_half=False, source16=None):
     """A whole window block: feed-forward, attention, both residuals.
 
     `source` and `target` default to the scratch's own buffers; passing them lets one
@@ -371,14 +496,21 @@ def record_block(runtime, w, s, source=None, target=None, publish=0, source_half
     target = target or s.out
     pixels = s.height * s.width
     if getattr(w, "split", False):
+        if source16 is not None:
+            raise ValueError("the split feed-forward takes no prepared half copy")
         record_split_feed_forward(runtime, w, s, source, source_half)
+        ffn_half = False
     else:
-        record_feed_forward(runtime, w, s, source, source_half)
-    record_window_attention(runtime, w, s, s.ffn)
+        ffn_half = record_feed_forward(runtime, w, s, source, source_half, source16=source16)
+    if runtime.fuse_window_residual:
+        record_window_attention(runtime, w, s, s.ffn, target=target, publish=publish,
+                                target_half=target_half, source_half=ffn_half)
+        return
+    record_window_attention(runtime, w, s, s.ffn, source_half=ffn_half)
     # the window reverse is the residual's own gather, not a pass of its own
     runtime.residual(s.attended, s.ffn, w.attn_cos, target, pixels * w.channels,
                      w.channels, reverse=(s.height, s.width, 8, w.origin),
-                     epilogue=publish, narrow=target_half)
+                     epilogue=publish, narrow=target_half, b_half=ffn_half)
 
 
 def run_block(runtime, w, s, value):

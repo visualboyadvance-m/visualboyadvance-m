@@ -374,8 +374,15 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
                 blend = np.asarray(control_mask, dtype=np.float32)[..., :1] * blend
             composed = np.clip(color + blend * (predicted - color), 0, 1).astype(np.float32)
     else:
-        composed = compose_head(head, color, control_mask=control_mask,
-                                intensity=intensity)
+        # The still frame natively too: nr_compose clamps the blend to [0, 1] below 1 as
+        # compose_head does, and is byte-identical to it (test_native_image.py). It was
+        # only reached above 1, so photo mode and every cut paid 3.9 ms of NumPy at
+        # 512x288 for the same bytes.
+        if nr_image is not None and control_mask is None:
+            composed = nr_image.compose(head, color, intensity)
+        if composed is None:
+            composed = compose_head(head, color, control_mask=control_mask,
+                                    intensity=intensity)
     return compose_detail(color, composed, detail_strength=detail_strength,
                           colour_strength=colour_strength, radius=detail_radius)
 

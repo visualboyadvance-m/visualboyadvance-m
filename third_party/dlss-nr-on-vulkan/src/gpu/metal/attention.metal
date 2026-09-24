@@ -6,16 +6,15 @@
  */
 #include "nr_metal.h"
 
-constant uint COSINE_PUBLISH = 0u, SOFTMAX = 1u;
+constant uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u;
 constant float COSINE_NORM_FLOOR = 0.00006198883056640625f;
 
 /* `count` consecutive floats from `base`, spread across the 32-wide threadgroup. */
-inline void gather(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
-                   uint base, uint count) {
+inline void gather_part(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
+                        uint base, uint count, uint part) {
     device const float *a = float_ptr(pc.a);
     if ((flags & 0x20000u) != 0u) {
-        // Q/K directly from (window, token, 3, head, channel)
-        uint part = (flags >> 18) & 1u;
+        // Q/K (and, for QKV_PREPARE, V) directly from (window, token, 3, head, channel)
         if (pc.n % 32u == 0u) {
             uint row = base / 32u;
             uint head = (row / pc.n) % pc.batch, token = row % pc.n;
@@ -41,16 +40,25 @@ inline void gather(constant Push &pc, uint flags, threadgroup float *stage, uint
     threadgroup_barrier(mem_flags::mem_threadgroup);
 }
 
-inline void scatter(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
-                    uint base, uint count) {
+inline void gather(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
+                   uint base, uint count) {
+    gather_part(pc, flags, stage, lid, base, count, (flags >> 18) & 1u);
+}
+
+inline void scatter_to(uint flags, threadgroup float *stage, uint lid, uint base, uint count, ulong target) {
     threadgroup_barrier(mem_flags::mem_threadgroup);
     if ((flags & 0x1000u) != 0u) {
-        device half *h = half_out(pc.c);
+        device half *h = half_out(target);
         for (uint i = lid; i < count; i += 32u) h[base + i] = half(stage[i]);
     } else {
-        device float *c = float_out(pc.c);
+        device float *c = float_out(target);
         for (uint i = lid; i < count; i += 32u) c[base + i] = stage[i];
     }
+}
+
+inline void scatter(constant Push &pc, uint flags, threadgroup float *stage, uint lid,
+                    uint base, uint count) {
+    scatter_to(flags, stage, lid, base, count, pc.c);
 }
 
 /* half(l*r), half(l+r), half(l*r + acc): one float32 expression, one rounding. The build
@@ -67,7 +75,8 @@ inline void store(constant Push &pc, uint flags, uint index, float value) {
     else                         float_out(pc.c)[index] = value;
 }
 
-inline void cosine_publish(constant Push &pc, threadgroup float *stage, uint row, uint local) {
+inline void cosine_publish(constant Push &pc, threadgroup float *stage, uint row, uint local,
+                           bool scaled, ulong scales) {
     uint base = local * 32u;
     float h[32];
     for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[base + i]);
@@ -89,13 +98,13 @@ inline void cosine_publish(constant Push &pc, threadgroup float *stage, uint row
     float norm = max(hadd(one[0][0], one[0][1]), half_round(COSINE_NORM_FLOOR));
     float reciprocal = half_round(precise::rsqrt(norm));
     float scale = 1.0f;
-    if (pc.k != 0u) {
+    if (scaled) {
         uint head = (row / pc.n) % pc.batch;      // rows are (batch, head, token)
-        scale = half_round(float_ptr(pc.d)[head]);
+        scale = half_round(float_ptr(scales)[head]);
     }
     for (uint i = 0u; i < 32u; i++) {
         float value = hmul(h[i], reciprocal);
-        if (pc.k != 0u) value = hmul(value, scale);
+        if (scaled) value = hmul(value, scale);
         stage[base + i] = e4m3(value);
     }
 }
@@ -192,16 +201,33 @@ inline void softmax(constant Push &pc, uint flags, threadgroup float *stage, uin
 
 template <bool AB>
 kernel void attention_t(constant Push &pc [[buffer(0)]],
-                        uint row [[thread_position_in_grid]],
                         uint local [[thread_index_in_threadgroup]],
-                        uint group [[threadgroup_position_in_grid]]) {
+                        uint3 group3 [[threadgroup_position_in_grid]]) {
     threadgroup float stage[32 * 64];
+    uint group = group3.x;
+    uint row = group * 32u + local;
     uint flags = operation_flags(pc);
     uint kind = flags & 0xFFu;
-    if (kind == COSINE_PUBLISH) {
+    if (kind == QKV_PREPARE) {
+        /* Three independent planes on y: Q and K normalised (Q by its head's scale, read
+         * from the 64-bit address in lda | ldb << 32), V published; each into its own
+         * target — b, c, d. The arithmetic is the two cosine publishes' and the split's. */
+        uint part = group3.y;
+        uint base = group * 32u * 32u;
+        uint count = min(32u * 32u, pc.m * 32u - base);
+        gather_part(pc, flags, stage, local, base, count, part);
+        if (part < 2u) {
+            ulong scales = ulong(pc.lda) | (ulong(pc.ldb) << 32);
+            if (row < pc.m) cosine_publish(pc, stage, row, local, part == 0u, scales);
+        } else {
+            for (uint i = local; i < count; i += 32u) stage[i] = e4m3(stage[i]);
+        }
+        ulong target = part == 0u ? pc.b : (part == 1u ? pc.c : pc.d);
+        scatter_to(flags, stage, local, base, count, target);
+    } else if (kind == COSINE_PUBLISH) {
         uint base = group * 32u * 32u;
         gather(pc, flags, stage, local, base, min(32u * 32u, pc.m * 32u - base));
-        if (row < pc.m) cosine_publish(pc, stage, row, local);
+        if (row < pc.m) cosine_publish(pc, stage, row, local, pc.k != 0u, pc.d);
         scatter(pc, flags, stage, local, base, min(32u * 32u, pc.m * 32u - base));
     } else if (kind == SOFTMAX) {
         uint stride = pc.sa != 0u ? pc.sa : pc.n;
@@ -217,5 +243,5 @@ kernel void attention_t(constant Push &pc [[buffer(0)]],
     }
 }
 
-template [[host_name("attention")]]    kernel void attention_t<false>(constant Push &, uint, uint, uint);
-template [[host_name("attention_ab")]] kernel void attention_t<true>(constant Push &, uint, uint, uint);
+template [[host_name("attention")]]    kernel void attention_t<false>(constant Push &, uint, uint3);
+template [[host_name("attention_ab")]] kernel void attention_t<true>(constant Push &, uint, uint3);

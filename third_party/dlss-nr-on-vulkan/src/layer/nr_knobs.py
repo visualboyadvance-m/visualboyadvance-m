@@ -22,7 +22,11 @@ KNOBS = (
         "much smaller, and what comes back is the *head* — the detail it drew — which is "
         "then scaled up and composed against the full-resolution original, so the game's "
         "own pixels are never resampled and only the synthesised part is interpolated. "
-        "Cost follows the extent and nothing else: about 15 ms + 450 ms per megapixel. "
+        "Cost follows the extent and nothing else: about 9 ms + 205 ms per megapixel "
+        "of network extent on an Arc 140V. The extent is never below 320 on a side — the "
+        "checkpoint's minimum — so small renders are padded up to it: at 512x288 every "
+        "scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times "
+        "the real pixels in it. "
         "0.55 is the measured compromise, but the *sign* of its effect on quality depends "
         "on how dark the scene is rather than on the number: on a bright frame 0.55 adds "
         "15 % of local contrast to a kimono, on a dark crowd it takes 21 % away.",
@@ -52,7 +56,8 @@ KNOBS = (
         "re-weights the high-frequency half of the change",
         "After the blend, the difference the pass made is split into bands and each is "
         "re-weighted. This is the fine half — pores, strands, grain. Away from 1 it costs "
-        "a Gaussian over the whole frame, about 7x more without OpenCV than with it.",
+        "a Gaussian over the whole frame. OpenCV provides a faster blur implementation; "
+        "the cost depends on the machine and frame size.",
     ),
     Knob(
         "colour_strength", "colour strength", "number", 0.0, 2.0, 0.05, 1.0,
@@ -98,37 +103,26 @@ BY_NAME = {knob.name: knob for knob in KNOBS}
 # is worse than one that shows none.
 DEFAULTS = {knob.name: knob.default for knob in KNOBS}
 
-# Graph time alone against render scale, measured on this machine. Used for the estimate
-# shown when a scale is set; the round trip through the socket is larger and depends on
-# the swapchain size as much as on the scale.
-COST = ((1.00, 490), (0.70, 233), (0.60, 188), (0.50, 146), (0.35, 78))
-
-# The whole round trip, median of five frames each, measured by `src/bench/live_rates.py`
-# on 2026-09-18 — the daemon's own cost, with no game competing for the GPU. `nr-ctl rates`,
+# The whole round trip, median of nine frames each, measured by `src/bench/live_rates.py`
+# on 2026-09-24 — the daemon's own cost, with no game competing for the GPU. `nr-ctl rates`,
 # the panel and the README all read this one table; the README's copy is generated from it
 # by `src/tools/knob_doc.py`, because the hand-written one went two days out of date the
 # moment the host passes moved to C and then stayed wrong for a week.
 RATES = (
-    (512, 288, 0.35, 72.2),
-    (512, 288, 0.50, 71.6),
-    (640, 360, 0.35, 74.3),
-    (640, 360, 0.50, 80.0),
-    (854, 480, 0.50, 105.2),
-    (1024, 768, 0.55, 167.9),
-    (1920, 1080, 0.55, 412.3),
+    (512, 288, 0.35, 42.7),
+    (512, 288, 0.50, 43.0),
+    (640, 360, 0.35, 44.1),
+    (640, 360, 0.50, 44.4),
+    (854, 480, 0.50, 54.2),
+    (1024, 768, 0.55, 91.3),
+    (1920, 1080, 0.55, 205.5),
 )
-RATES_MEASURED = "2026-09-18"
-
-
-def expected(scale):
-    """Rough milliseconds for a render scale, interpolated between measurements."""
-    points = sorted(COST)
-    if scale <= points[0][0]:
-        return points[0][1]
-    for (low, at_low), (high, at_high) in zip(points, points[1:]):
-        if low <= scale <= high:
-            return at_low + (at_high - at_low) * (scale - low) / (high - low)
-    return points[-1][1]
+RATES_MEASURED = "2026-09-24"
+# What a reader of the table needs and the numbers cannot say. Empty when there is nothing.
+RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 6 %. On "
+              "2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures "
+              "rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower "
+              "for you, look at swap before anything else.")
 
 
 def clamp(knob, value):

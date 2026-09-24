@@ -64,9 +64,12 @@ disproved.
 | --- | --- |
 | `phase20-machine-limits.md` | 70-91 GB/s of 136.5, the clock ceiling held, 64 XMX engines |
 | `phase26-the-register-ceiling.md` | every engine busy, each ~90 % idle; the register file is the wall |
-| `phase45-frame-profile.md` | per-pass timings; everything that moves data is at the memory ceiling |
+| `phase45-frame-profile.md` | per-pass timings; everything that moves data is at the memory ceiling — which did not make the graph finished |
+| `improve-fusions.md` | residuals, attention and its head merge, the glue, the narrow feed-forward folded into fewer passes; window attention in 2 KB; the staged loader's loads issued together; what was measured and dropped |
+| `improve-shared-memory.md` | a Mesa quirk — the core's shared-memory partition sized from the declared bytes, each workgroup's share rounded up — that makes some smaller declarations slower and costs this frame nothing; and the 128 KB cap that had the staged GEMM on half its threads, 10 % of a frame |
+| `improve-qkv-epilogue.md` | Q/K normalised in the QKV projection's own epilogue, 22 %; all fusions together 38 %; why joint QKV was slower; shared memory comes in powers of two; measure with empty swap |
 | `phase21`, `phase22`, `phase23`, `phase31`, `phase33` | tiling, staging, integer weights, the accumulator, OpenCL — all measured, all closed |
-| `phase25-the-frame-rate-wall.md` | `17 ms + 488 ms per megapixel`, and what that forbids |
+| `phase25-the-frame-rate-wall.md` | `17 ms + 488 ms per megapixel`, and what that forbids — `9 + 205` since the fusions and the shared-memory fix |
 | `phase51-output-resolution-costs.md` | what costs the output extent rather than the network's, and a profile that was measuring swap |
 | `phase50-what-the-model-computes-in.md` | 36 % of the shipped model's mma is already FP8; what FP4 would and would not change |
 | `phase37-neural-upstream.md` | half the extent is 3x faster and keeps 62 % of the high band |
@@ -103,6 +106,9 @@ disproved.
 | `phase63-a-discrete-gpu.md` | the first report from other hardware: an Arc B580 runs 50x slower than this iGPU because `memtype()` preferred host-cached memory, which on a discrete card is system RAM; and a benchmark that never checked its calls printed 495 TFLOP/s for a dispatch that failed |
 | `phase64-auditing-the-readme.md` | seven wrong claims on the published page, including a pinned commit that never existed and a frame-time table a third too slow; the rates table and the file references are now generated and checked |
 | `phase65-the-discrete-memory-path.md` | the graph's buffers no longer have to be addressable by the host, so a card without resizable BAR keeps its operands in its own memory; forced on this iGPU by `XMX_STAGING=1`, and the frame is bit-identical |
+| `improve-present-fences.md` | **how the layer synchronises now**: one path — the present's own semaphores consumed once, copies finished on private fences, no queue drained — and the real MK1 check |
+| `phase69-the-stand-that-discriminates.md` | the present test rebuilt so it can fail — frames in flight, a semaphore per image, a real stall, a present queue of another family — and what it found first: the old default waited on the presenting queue, not the drawing one. Its fix never shipped; `improve-present-fences.md` replaced both paths |
+| `phase68-what-validation-settles.md` | the present test under the Khronos validation layer: both old sync modes clean, two real bugs in the harness fixed, and a negative control showing the test could not yet prove the wait load-bearing |
 | `phase66-the-present-has-a-test.md` | the present's own semaphores instead of a queue idle, behind `NR_LAYER_SYNC`; a headless swapchain makes the layer's copy out and back testable without a game, and the first run found `present_now` calling itself |
 | `phase67-moltenvk-and-the-portable-gemm.md` | the build and the GEMM contract on an Apple M3 through MoltenVK, which has no `VK_KHR_cooperative_matrix`: a portable multiply-add kernel behind the same dispatches, the runtime asking the device, `XMX_PORTABLE=1` to test it on Xe2, and Metal's fast math moving every vendor rounding point until `MVK_CONFIG_FAST_MATH_ENABLED=0` |
 | `phase68-nr-frame-in-c.md` | `nr_frame.py` as a C library — the weights, the graph recorded call for call against libxmx, the frame around it — with the head bit-identical to the Python path; a first real 720p frame on an Apple M3 at 0.90 s; where C and NumPy differ by a last bit and why; the committed `work/` tree that now fails `publish_check` |

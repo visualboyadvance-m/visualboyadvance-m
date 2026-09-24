@@ -42,6 +42,16 @@ def main():
         result = subprocess.run(command, env=env | {'NR_PROTON': str(override)},
                                 capture_output=True, text=True, check=True)
         assert str(override) in result.stdout
+        # A real direct launch (with a stand-in Proton) must supply the same app IDs
+        # Steam normally supplies. A prefix path alone is not that environment.
+        override.write_text('#!/usr/bin/env python3\nimport json, os\n'
+                            'print(json.dumps({k: os.environ.get(k) for k in '
+                            '("SteamAppId", "SteamGameId", "STEAM_COMPAT_APP_ID")}))\n')
+        direct = [str(ROOT/'src/layer/nr-photo'), '--proton', '311730', str(game)]
+        result = subprocess.run(direct, env=env | {'NR_PROTON': str(override)},
+                                capture_output=True, text=True, check=True)
+        ids = json.loads(result.stdout.splitlines()[-1])
+        assert set(ids.values()) == {'311730'}, ids
         missing = subprocess.run(command[:-1] + [str(base/'missing.exe')], env=env,
                                  capture_output=True, text=True)
         assert missing.returncode != 0 and 'not found' in missing.stderr

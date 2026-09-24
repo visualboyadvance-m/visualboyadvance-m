@@ -81,6 +81,10 @@ class DeviceWeights:
                                   take("block39.layer0.inp_upsample_sin"))
         self.merge_sin = self.rt.buffer_from(take("block70.layer0.inp_merge_sin"))
         self.merge_cos = self.rt.buffer_from(take("block70.layer0.inp_merge_cos"))
+        # both, one after the other, for the pass that applies them together
+        self.merge_sincos = self.rt.buffer_from(np.concatenate([
+            np.asarray(take("block70.layer0.inp_merge_sin"), np.float32).reshape(-1),
+            np.asarray(take("block70.layer0.inp_merge_cos"), np.float32).reshape(-1)]))
         # the head is 32 -> 4, and the cooperative matrix wants a multiple of 16
         # columns; both halves go into one padded matrix and the first four columns
         # of the product are the head
@@ -119,7 +123,8 @@ class ResidentFrame:
 
     # the six named weight buffers live on `DeviceWeights` now; the body of a frame still
     # says `self.adapter`, because where they are kept is not that code's business
-    WEIGHT_NAMES = ("adapter", "bottleneck", "decoder_input", "merge_sin", "merge_cos", "head")
+    WEIGHT_NAMES = ("adapter", "bottleneck", "decoder_input", "merge_sin", "merge_cos",
+                    "merge_sincos", "head")
 
     def __getattr__(self, name):
         if name in ResidentFrame.WEIGHT_NAMES:
@@ -174,7 +179,17 @@ class ResidentFrame:
     # features go in and the head comes back. They are named here so they can be put where
     # the host can reach them — cached for the strided read of the head — while everything
     # else follows the device, which on a discrete card means the card's own memory.
-    HOST_SIDE = {"features": xmxres.HOST_WRITE, "head": xmxres.HOST_READ}
+    HOST_SIDE = {"features": xmxres.HOST_WRITE, "features_host16": xmxres.HOST_WRITE,
+                 "head": xmxres.HOST_READ, "head4": xmxres.HOST_READ}
+
+    def head_buffer(self):
+        return self.buffer("head4" if self.rt.compact_head else "head",
+                           self.height * self.width * (4 if self.rt.compact_head else 16))
+
+    def read_head(self):
+        channels = 4 if self.rt.compact_head else 16
+        return np.array(xmxres.host_view(self.head_buffer(),
+                        shape=(self.height, self.width, channels))[..., :4], copy=True)
 
     def buffer(self, name, elements, dtype=np.float32):
         existing = self._buffers.get(name)
@@ -293,11 +308,20 @@ class ResidentFrame:
                 timing[stage[0]][1] += 1
 
         stem = self.buffer("stem", pixels * 32)
-        source = self.buffer("features", pixels * 16)
-        # the three parts of a frame, timed separately: on a card the two transfers are
-        # PCIe and the middle one is the GPU, and a single total cannot tell them apart
+        # Separate names keep captured graphs' addresses valid when switching modes.
+        # HOST_WRITE is always mapped, including when graph buffers use staging.
+        source = self.buffer("features_host16" if rt.input_fp16 else "features",
+                             pixels * 16, np.float16 if rt.input_fp16 else np.float32)
+        # Wall times around host writes, graph completion and host reads. They are
+        # not PCIe counters: GPU access to mapped host memory occurs during the graph.
         mark = _time.perf_counter()
-        xmxres.host_write(source, features.reshape(-1, 16), rows=(pixels, 16))
+        if rt.input_fp16:
+            # Convert directly into the mapped input: no temporary half array and no
+            # FP32 buffer crosses the host/device boundary before a GPU to_half pass.
+            np.copyto(source.view(np.float16, (pixels, 16)), features.reshape(pixels, 16),
+                      casting="unsafe")
+        else:
+            xmxres.host_write(source, features.reshape(-1, 16), rows=(pixels, 16))
         carried = _time.perf_counter() - mark
         if execution == "replay" and key in self._graphs:
             mark = _time.perf_counter()
@@ -306,20 +330,27 @@ class ResidentFrame:
             if submits is not None:
                 submits.append(passes)
             mark = _time.perf_counter()
-            out = np.array(xmxres.host_view(self.buffer("head", pixels * 16),
-                                            shape=(pixels, 16))[:, :4], copy=True)
+            out = self.read_head()
             self.split = (carried, ran, _time.perf_counter() - mark)
             return out.reshape(height, width, 4)
         begin()
-        rt.to_half(source, self.buffer("features16", pixels * 16, np.float16), pixels * 16)
-        rt.gemm(self.buffer("features16", pixels * 16, np.float16), self.adapter, stem,
-                pixels, 32, 16)
+        if rt.input_fp16:
+            source16 = source
+        else:
+            source16 = self.buffer("features16", pixels * 16, np.float16)
+            rt.to_half(source, source16, pixels * 16)
+        block0 = self.block(0, 1)
+        scratch0 = self.scratch(block0, height, width)
+        if rt.fuse_glue:
+            # the stem as block 0's residual needs it and as its first GEMM reads it
+            rt.gemm_dual(source16, self.adapter, stem, scratch0.value16, pixels, 32, 16)
+        else:
+            rt.gemm(source16, self.adapter, stem, pixels, 32, 16)
         submit()
 
         # block 0 runs at full resolution; its output is both the skip the post block
         # merges and, pooled, the encoder's input
         stage[0] = "block0 + pool"
-        block0 = self.block(0, 1)
         raw = self.buffer("block0", pixels * 32)
         # Everything the graph publishes is E4M3, which is exact in float16, so every
         # published buffer is stored narrow: half the traffic, and the widening pass in
@@ -328,8 +359,8 @@ class ResidentFrame:
         h, w, channels = self.levels[1]
         value = self.buffer("l1", h * w * 32, np.float16)
         begin()
-        R.record_block(rt, block0, self.scratch(block0, height, width),
-                       source=stem, target=raw)
+        R.record_block(rt, block0, scratch0, source=stem, target=raw,
+                       source16=scratch0.value16 if rt.fuse_glue else None)
         # the post block's skip is block 0 published; the encoder pools the
         # *unpublished* output, so both come from `raw` and neither from the other
         with rt.independent():
@@ -473,19 +504,26 @@ class ResidentFrame:
         # back to full resolution, merged with block 0's output, then the head
         stage[0] = "block70 + head"
         merged = self.buffer("merged", pixels * 32)
-        upsampled = self.buffer("upsampled", pixels * 32)
         block70 = self.block(70, 1)
-        out = self.buffer("out", pixels * 32)
+        scratch70 = self.scratch(block70, height, width)
+        # The head reads block 70's output as half, and nothing reads it as float32, so
+        # the block's closing residual stores half itself: the same rounding the separate
+        # to_half pass applied, without 126 MB of float32 written at 720p to be read once.
+        out16 = self.buffer("out16", pixels * 32, np.float16)
         begin()
-        rt.upsample2(value, upsampled, w, height, width, 32, a_half=True)
-        rt.scale_channel(upsampled, self.merge_sin, merged, pixels * 32, 32)
-        rt.residual(merged, full_skip, self.merge_cos, merged, pixels * 32, 32,
-                    b_half=True)
-        R.record_block(rt, block70, self.scratch(block70, height, width),
-                       source=merged, target=out)
-        rt.to_half(out, self.buffer("out16", pixels * 32, np.float16), pixels * 32)
-        rt.gemm(self.buffer("out16", pixels * 32, np.float16), self.head,
-                self.buffer("head", pixels * 16), pixels, 16, 32)
+        if rt.fuse_glue:
+            rt.upsample_merge(value, full_skip, self.merge_sincos, merged,
+                              scratch70.value16, height, width, w, 32)
+        else:
+            upsampled = self.buffer("upsampled", pixels * 32)
+            rt.upsample2(value, upsampled, w, height, width, 32, a_half=True)
+            rt.scale_channel(upsampled, self.merge_sin, merged, pixels * 32, 32)
+            rt.residual(merged, full_skip, self.merge_cos, merged, pixels * 32, 32,
+                        b_half=True)
+        R.record_block(rt, block70, scratch70, source=merged, target=out16, target_half=True,
+                       source16=scratch70.value16 if rt.fuse_glue else None)
+        rt.gemm(out16, self.head, self.head_buffer(), pixels, 16, 32,
+                compact_output=rt.compact_head)
         submit()
 
         if execution == "replay":
@@ -495,6 +533,4 @@ class ResidentFrame:
             counter[0] = rt.submit()
         if submits is not None:
             submits.append(counter[0])
-        return np.array(xmxres.host_view(self.buffer("head", pixels * 16),
-                                        shape=(pixels, 16))[:, :4],
-                        copy=True).reshape(height, width, 4)
+        return self.read_head()

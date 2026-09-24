@@ -52,6 +52,10 @@ Vulkan-Headers — https://github.com/KhronosGroup/Vulkan-Headers
 Provenance within this repository
 --------------------------------------------------------------------------------
 
+src/gpu/test_gemm_contract.py came back from uzbekunknown/dlss-nr-on-intel, which
+adapted this tree's CMake build and GEMM checks (commit 74bc1f7) and strengthened the
+epilogue and destination-guard tests.
+
 This project was written by AI agents: Claude Opus 5 in this tree, and Astra in a parallel
 one by the same owner. `src/ref/nr_image.c` began in that parallel tree and was extended
 here; its file header and `notes/phase57-native-host-passes.md` record what came from

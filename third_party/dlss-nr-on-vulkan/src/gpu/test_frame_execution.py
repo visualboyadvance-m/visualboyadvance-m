@@ -48,6 +48,20 @@ def main():
         recordings.clear()
         np.testing.assert_array_equal(frame.run(features, execution='single'), head)
         assert len(recordings) == 1
+        # Both FFN schedules must produce the same complete frame and keep distinct
+        # cached recordings. All 52 grouped blocks together remove 536 dispatches.
+        counts = {}
+        original_batch = rt.batch_ffn
+        for mode in (False, True):
+            rt.batch_ffn = mode
+            passes = []
+            np.testing.assert_array_equal(frame.run(features, execution='replay', submits=passes), head)
+            counts[mode] = passes[0]
+            recordings.clear()
+            np.testing.assert_array_equal(frame.run(features, execution='replay'), head)
+            assert not recordings
+        assert counts[False] - counts[True] == 536, counts
+        rt.batch_ffn = original_batch
         changed = features.copy()
         changed[..., 4:7] *= np.float32(0.75)
         changed_head = frame.run(changed, execution='block')

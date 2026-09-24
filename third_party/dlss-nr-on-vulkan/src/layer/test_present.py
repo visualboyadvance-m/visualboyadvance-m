@@ -15,16 +15,17 @@ the chain; this drives it against a stand-in daemon and checks both directions:
   - the second pass records nothing, so each image still holds what the layer wrote into it
     last time round, and the daemon must be handed its own answer back.
 
-Both are run twice: with `vkQueueWaitIdle` (the default) and with `NR_LAYER_SYNC=semaphore`.
-
-**What this does not prove.** Dropping the wait on the game's own semaphores from the
-semaphore path leaves every check here passing: on this machine the clear has finished long
-before the copy is submitted, so the race does not show. It catches a present that never
-returns, a copy that goes nowhere and an answer that never lands — not a missing wait. That
-needs hardware where the copy can outrun the draw, or a game.
+The default and legacy `NR_LAYER_SYNC=semaphore` alias now both use present waits
+and private copy fences. A separate draw queue and delayed final clear expose a
+missing wait. --negative-control builds a temporary faulty layer and requires
+incorrect captured pixels in three runs of each alias; the production library is
+never changed. A device without separate presentation support cannot run that control.
 """
 import os
+import json
 import pathlib
+import re
+import shlex
 import socket
 import struct
 import subprocess
@@ -41,6 +42,49 @@ BINARY = nr_build.executable("test_present")
 LAYER = nr_build.BUILD_DIR / "layer-check"      # the manifests, beside the library they name
 REPLY = bytes((17, 34, 51, 255))          # B G R A, nothing a clear in this test produces
 FAILURES = []
+# Where a distribution keeps the Khronos validation layer's manifest. The loader takes a
+# list, so ours stays first and the system one is only searched after it.
+VALIDATION_DIRS = ("/usr/share/vulkan/explicit_layer.d",
+                   "/usr/local/share/vulkan/explicit_layer.d")
+VALIDATION_LAYER = "VK_LAYER_KHRONOS_validation"
+
+
+def validation_environment(environment):
+    """Turn on the validation layer, with synchronization validation, or say why not.
+
+    Returns (environment, reason-it-is-off). Opt-in through `NR_TEST_VALIDATION=1`,
+    because it needs a package this project does not require
+    (`vulkan-validation-layers`) and roughly doubles the time each present takes.
+
+    One wrinkle worth knowing: the validation layer sits **above** this one in the
+    loader's chain, so it sees the application's `imageUsage` and never the
+    TRANSFER_SRC/DST this layer patches into it. Every transfer barrier on a swapchain
+    image then reads as invalid usage. `NR_TEST_TRANSFER_USAGE` makes the test ask for
+    those bits itself, which is the only way to tell that artefact from a real finding —
+    so validation implies it.
+    """
+    if os.environ.get("NR_TEST_VALIDATION", "") in ("", "0"):
+        return environment, "not asked for (NR_TEST_VALIDATION=1)"
+    found = [d for d in VALIDATION_DIRS
+             if pathlib.Path(d, "VkLayer_khronos_validation.json").exists()]
+    if not found:
+        return environment, "the Khronos validation layer is not installed"
+    environment = dict(environment)
+    environment["VK_LAYER_PATH"] = os.pathsep.join([environment["VK_LAYER_PATH"], *found])
+    environment["VK_LOADER_LAYERS_ENABLE"] = VALIDATION_LAYER
+    environment["VK_LAYER_VALIDATE_SYNC"] = "1"          # hazards, not only VUIDs
+    environment["NR_TEST_TRANSFER_USAGE"] = "1"          # see the docstring
+    return environment, None
+
+
+def validation_messages(text):
+    """The validation layer's own complaints, one line each, deduplicated."""
+    seen = {}
+    for line in (text or "").splitlines():
+        match = re.search(r"Validation (?:Error|Warning): \[ ([A-Za-z0-9_-]+) \]", line)
+        if match:
+            seen[match.group(1)] = seen.get(match.group(1), 0) + 1
+    return seen
 
 
 def check(name, ok, detail=""):
@@ -72,13 +116,21 @@ def stand_in(path, seen, stop):
                 if not piece:
                     break
                 body += piece
-            seen.append(body[:4])
+            # A partly completed clear can have a correct first pixel and stale
+            # pixels elsewhere. Validate the whole uniform image, not just its prefix.
+            seen.append(body[:4] if len(body) == want and body == body[:4] * (width * height)
+                        else b'mixed')
             connection.sendall(REPLY * (width * height))
     server.close()
 
 
-def present(mode, rounds=2):
-    """Run the C binary once, with the layer live, and return what the daemon saw."""
+def present(mode, rounds=2, layered=True):
+    """Run the C binary once and return what the daemon saw.
+
+    `layered=False` is the baseline: the same frames with no layer in the chain at all,
+    which is how a failure of the layer is told apart from a failure of this harness.
+    Nothing reaches the daemon then, by construction.
+    """
     with tempfile.TemporaryDirectory() as room:
         path = str(pathlib.Path(room) / "d.sock")
         seen, stop = [], threading.Event()
@@ -88,8 +140,14 @@ def present(mode, rounds=2):
                            ENABLE_NR_LAYER="1", NR_LAYER_SOCKET=path, NR_LAYER_LIVE="1")
         environment.pop("NR_LAYER_TRIGGER", None)
         environment.pop("NR_TEST_NO_LAYER", None)
+        if not layered:
+            environment["NR_TEST_NO_LAYER"] = "1"
+            # With no layer nothing patches the usage in, and the test's own transfer
+            # barriers would then be invalid against what validation recorded.
+            environment["NR_TEST_TRANSFER_USAGE"] = "1"
         if mode:
             environment["NR_LAYER_SYNC"] = mode
+        environment, _ = validation_environment(environment)
         got = subprocess.run([str(BINARY), str(rounds)], capture_output=True, text=True,
                              env=environment, timeout=300)
         stop.set()
@@ -102,14 +160,16 @@ def present(mode, rounds=2):
     return got, seen
 
 
-def run(mode):
-    label = mode or "queue idle"
+def run(mode, attempt=1, attempts=1):
+    label = (mode or "queue idle") + (f" #{attempt}" if attempts > 1 else "")
     got, seen = present(mode)
     if got.returncode != 0:
         check(f"{label}: the frames present", False,
               (got.stderr.strip().splitlines() or ["no output"])[-1][:120])
         return
-    images = sum(1 for line in got.stdout.splitlines() if "drawn" in line)
+    # `state=drawn`, not just "drawn": with validation on, the layer's own messages land
+    # on this same stream and a looser match would count them as frames.
+    images = sum(1 for line in got.stdout.splitlines() if "state=drawn" in line)
     check(f"{label}: the frames present", images > 0 and len(seen) >= images,
           f"{images} drawn, {len(seen)} reached the daemon")
     drawn = seen[:images]
@@ -121,12 +181,51 @@ def run(mode):
           seen_tuples == expected,
           f"{seen_tuples[:3]} against {expected[:3]}")
     held = [tuple(pixel) for pixel in seen[images:]]
-    # the second pass draws nothing, so what the layer wrote last time is what is there —
-    # except an image this run never reached, which is still black
-    answered = [pixel for pixel in held if pixel != (0, 0, 0, 0)]
+    # Every image was initialized and processed before entering the untouched phase.
+    answered = [pixel for pixel in held if pixel == tuple(REPLY)]
     check(f"{label}: what the layer wrote is in the image next time round",
-          bool(answered) and all(pixel == tuple(REPLY) for pixel in answered),
+          bool(held) and len(answered) == len(held),
           f"{len(answered)} of {len(held)} untouched frames carry the daemon's answer")
+    _, off = validation_environment({"VK_LAYER_PATH": ""})
+    if not off:
+        # The layer's default output is stdout, not stderr; read both so a change of
+        # default cannot quietly turn this into a check that can never fail.
+        complaints = validation_messages(got.stdout + "\n" + got.stderr)
+        check(f"{label}: the validation layer has nothing to say", not complaints,
+              ", ".join(f"{n}x {name}" for name, n in complaints.items()) or
+              "no errors or warnings, synchronization validation included")
+
+
+def baseline():
+    """The same frames with no layer: the harness on its own must be valid."""
+    got, _ = present(None, layered=False)
+    drew = sum(1 for line in got.stdout.splitlines() if "state=drawn" in line)
+    check("baseline (no layer): the frames present", got.returncode == 0 and drew > 0,
+          f"exit {got.returncode}, {drew} drawn")
+    _, off = validation_environment({"VK_LAYER_PATH": ""})
+    if not off:
+        complaints = validation_messages(got.stdout + "\n" + got.stderr)
+        check("baseline (no layer): the validation layer has nothing to say", not complaints,
+              ", ".join(f"{n}x {name}" for name, n in complaints.items()) or "clean")
+
+
+def validation_is_live():
+    """Prove the validation layer is in the chain, rather than infer it from silence.
+
+    A run with nothing to say looks exactly like a run with no validation layer loaded.
+    So the binary is asked to make one deliberate, harmless mistake and the message for it
+    has to come back. Without this the whole validation mode is a check that cannot fail.
+    """
+    environment, off = validation_environment(dict(os.environ, VK_LAYER_PATH=str(LAYER)))
+    if off:
+        return
+    environment["NR_TEST_VALIDATION_PROBE"] = "1"
+    got = subprocess.run([str(BINARY), "1"], capture_output=True, text=True,
+                         env=environment, timeout=300)
+    complaints = validation_messages(got.stdout + "\n" + got.stderr)
+    check("validation is actually in the chain",
+          "VUID-VkBufferCreateInfo-size-00912" in complaints,
+          ", ".join(complaints) or "the deliberate mistake produced no message")
 
 
 def main():
@@ -143,8 +242,19 @@ def main():
         print("present: skipped (no headless surface here: "
               f"{(probe.stderr.strip().splitlines() or ['?'])[-1][:60]}) — a skip is not a pass")
         return 0
+    _, off = validation_environment({"VK_LAYER_PATH": ""})
+    print(f"  validation layer: {off if off else 'on, with synchronization validation'}")
+    if os.environ.get("NR_TEST_VALIDATION", "") not in ("", "0") and off:
+        print("FAILED: validation was requested but is unavailable: " + off)
+        return 1
+    validation_is_live()
+    baseline()
+    # One clean run is not evidence: the thing being tested is a race, and a race that
+    # does not happen looks like a race that cannot.
+    attempts = max(1, int(os.environ.get("NR_TEST_REPEAT", "2")))
     for mode in (None, "semaphore"):
-        run(mode)
+        for attempt in range(1, attempts + 1):
+            run(mode, attempt, attempts)
     if FAILURES:
         print("FAILED: " + ", ".join(FAILURES))
         return 1
@@ -152,5 +262,56 @@ def main():
     return 0
 
 
+def negative_control():
+    """Prove a missing wait is detected, without changing the working library."""
+    global LAYER
+    result = main()
+    if result:
+        return result
+    got, _ = present(None)
+    if "present queue: separate" not in got.stdout:
+        print("negative control: skipped (a separate presentation queue is unavailable)")
+        return 77
+    original = LAYER
+    source = (ROOT / 'src/layer/nr_layer.c').read_text()
+    needle = 'uint32_t waits = data->present_wait_count;'
+    if source.count(needle) != 1:
+        raise RuntimeError('negative control injection point changed; review the test')
+    with tempfile.TemporaryDirectory(prefix='nr-missing-wait-') as room:
+        room = pathlib.Path(room)
+        faulty = room / 'faulty.c'
+        faulty.write_text(source.replace(needle, 'uint32_t waits = 0; /* intentional test fault */'))
+        library = room / 'libnr_missing_wait.so'
+        compiler = shlex.split(os.environ.get('CC', 'cc'))
+        command = compiler + ['-O2', '-fPIC', '-shared',
+                             '-I' + str(ROOT / 'work/vulkan-headers/include')]
+        if os.environ.get('VULKAN_SDK'):
+            command += ['-I' + str(pathlib.Path(os.environ['VULKAN_SDK']) / 'include')]
+        subprocess.run(command + [str(faulty), '-o', str(library), '-lvulkan', '-pthread'], check=True)
+        manifest = json.loads((ROOT / 'src/layer/VkLayer_dlss_nr.json').read_text())
+        manifest['layer']['library_path'] = str(library)
+        manifest['layer']['library_arch'] = str(struct.calcsize('P') * 8)
+        (room / 'VkLayer_dlss_nr.json').write_text(json.dumps(manifest))
+        try:
+            LAYER = room
+            for mode in (None, 'semaphore'):
+                for attempt in range(3):
+                    got, seen = present(mode)
+                    drawn = sum('state=drawn' in line for line in got.stdout.splitlines())
+                    expected = [(i + 1, 128, 64, 255) for i in range(drawn)]
+                    actual = [tuple(pixel) for pixel in seen[:drawn]]
+                    if got.returncode != 0 or not drawn or len(seen) < drawn:
+                        print('FAILED: faulty layer must reach the data check, not fail for another reason')
+                        print(got.stdout + '\n' + got.stderr)
+                        return 1
+                    if actual == expected:
+                        print('FAILED: missing-wait layer escaped the data check')
+                        return 1
+                    print(f'negative control {mode or "default"} #{attempt + 1}: wrong pixels detected')
+        finally:
+            LAYER = original
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(negative_control() if '--negative-control' in sys.argv else main())
