@@ -46,6 +46,14 @@ target_sources(vbam-wx-widgets
     wxmisc.h
 )
 
+# The directory and BIOS pickers' validator in wxmisc.cpp records what the
+# user picked for the App Sandbox, so the sandbox glue lives here rather than
+# in the app, where anything linking the widgets without it (the tests) would
+# be left with undefined macsandbox:: symbols.
+if(APPLE)
+    target_sources(vbam-wx-widgets PRIVATE ../macsandbox.mm PUBLIC ../macsandbox.h)
+endif()
+
 target_link_libraries(vbam-wx-widgets PUBLIC vbam-wx-config vbam-sdl-motion)
 configure_wx_target(vbam-wx-widgets)
 

@@ -11515,7 +11515,15 @@ bool VKDrawingPanel::CreateLogicalDevice()
     // those shapes on its smaller kernels.
     VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR enable_wm{};
 #endif
-    if (instance_api_version_ >= VK_API_VERSION_1_3 && vkGetPhysicalDeviceFeatures2) {
+    // With the run-time loader vkGetPhysicalDeviceFeatures2 is a pointer that
+    // stays null if the loader lacks it; linked, it is a function and always
+    // there.
+#if defined(VBAM_VULKAN_DYNAMIC_LOADER)
+    const bool have_features2 = vkGetPhysicalDeviceFeatures2 != nullptr;
+#else
+    const bool have_features2 = true;
+#endif
+    if (instance_api_version_ >= VK_API_VERSION_1_3 && have_features2) {
         VkPhysicalDeviceProperties props;
         vkGetPhysicalDeviceProperties(physical_device_, &props);
         if (props.apiVersion >= VK_API_VERSION_1_3) {

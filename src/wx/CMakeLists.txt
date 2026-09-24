@@ -1365,7 +1365,7 @@ if(WIN32)
 endif()
 
 if(APPLE)
-    target_sources(visualboyadvance-m PRIVATE macsupport.mm macsandbox.mm macsandbox.h)
+    target_sources(visualboyadvance-m PRIVATE macsupport.mm)
 
     if(NOT COMPILE_ONLY AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
         target_link_libraries(visualboyadvance-m tiff)

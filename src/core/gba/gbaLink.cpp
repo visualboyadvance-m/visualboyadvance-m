@@ -901,6 +901,9 @@ static const std::string& LinkNamespaceSuffix()
 #define LINK_NAME_PREFIX "/"
 #endif
 
+// The named-object backends (Windows, and POSIX outside VBAM_LINK_FILE_SHM).
+// The file-backed one keeps everything in one mapping and names nothing.
+#if !defined(VBAM_LINK_FILE_SHM)
 static std::string LinkShmName()
 {
     return LINK_NAME_PREFIX LOCAL_LINK_NAME + LinkNamespaceSuffix();
@@ -920,6 +923,7 @@ static std::string LinkLockSemName()
 {
     return LINK_NAME_PREFIX "VBA link lock" + LinkNamespaceSuffix();
 }
+#endif  // !defined(VBAM_LINK_FILE_SHM)
 
 #if !(defined __WIN32__ || defined _WIN32) && !defined(VBAM_LINK_FILE_SHM)
 // The POSIX backend pairs the named objects above with two flock(2)-based
