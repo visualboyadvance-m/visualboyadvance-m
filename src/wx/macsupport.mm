@@ -241,29 +241,10 @@ bool VbamMacosHdrSupportedButOff() {
     return capable;
 }
 
-// The black floor of the EDR screen (EdrScreen(), the one the peak comes from)
-// as a fraction of its peak, or 0 when unknown. EDR exposes no floor, so this
-// reads the display's EDID: the IODisplay whose vendor, product and serial
-// match the screen's CGDirectDisplayID. The caller multiplies it by the peak in
-// the encoder's nits; a panel's contrast ratio is what survives EDR's relative
-// model, where the physical nits behind SDR white move with the brightness
-// setting.
-//
-// Only displays with a CTA-861 HDR block answer. Apple's own panels describe
-// themselves in DisplayID instead, and on Apple Silicon the EDID is not on an
-// IODisplay at all, so both stay at 0 and keep the zero-anchored dark end.
-double VbamMacosDisplayFloorRatio() {
-    NSScreen* screen = EdrScreen();
-    if (!screen)
-        return 0.0;
-    NSNumber* num = screen.deviceDescription[@"NSScreenNumber"];
-    if (!num)
-        return 0.0;
-    const CGDirectDisplayID did = num.unsignedIntValue;
-    const uint32_t vendor = CGDisplayVendorNumber(did);
-    const uint32_t product = CGDisplayModelNumber(did);
-    const uint32_t serial = CGDisplaySerialNumber(did);
-
+// The black floor over the peak from the EDID of the IODisplay whose vendor,
+// product and serial match -- where Intel Macs keep a display's EDID. 0 when
+// there is no such display, or its EDID has no CTA-861 HDR block.
+static double IODisplayFloorRatio(uint32_t vendor, uint32_t product, uint32_t serial) {
     double ratio = 0.0;
     io_iterator_t it = 0;
     if (IOServiceGetMatchingServices(kIOMainPortDefault,
@@ -293,6 +274,81 @@ double VbamMacosDisplayFloorRatio() {
     }
     IOObjectRelease(it);
     return ratio;
+}
+
+// The same from the framebuffer, where Apple Silicon keeps it instead: no
+// IODisplay and no raw EDID there, but the display coprocessor's decode of it
+// in each framebuffer's DisplayAttributes -- ProductAttributes for the match
+// (LegacyManufacturerID is the EDID vendor CGDisplayVendorNumber() reports) and
+// Luminance for the range, in 16.16 fixed point: an LG HDR 4K reads Max
+// 22526287 and Min 23290, 343.7 and 0.3554 nits, what its EDID says. Matched
+// by IOMobileFramebuffer, which AppleCLCD2 on the M1 derives from, so later
+// chips' framebuffer classes answer too (IOMobileFramebufferShim, which ioreg
+// -c also shows it under, matches nothing through IOServiceMatching()). Only
+// the framebuffer driving a display carries DisplayAttributes.
+static double FramebufferFloorRatio(uint32_t vendor, uint32_t product, uint32_t serial) {
+    double ratio = 0.0;
+    io_iterator_t it = 0;
+    if (IOServiceGetMatchingServices(kIOMainPortDefault,
+            IOServiceMatching("IOMobileFramebuffer"), &it) != KERN_SUCCESS)
+        return 0.0;
+    io_service_t svc;
+    while ((svc = IOIteratorNext(it))) {
+        CFTypeRef attrs = IORegistryEntryCreateCFProperty(
+            svc, CFSTR("DisplayAttributes"), kCFAllocatorDefault, 0);
+        if (attrs) {
+            NSDictionary* d = (__bridge NSDictionary*)attrs;
+            if ([d isKindOfClass:[NSDictionary class]]) {
+                NSDictionary* pa = d[@"ProductAttributes"];
+                NSDictionary* lum = d[@"Luminance"];
+                if ([pa isKindOfClass:[NSDictionary class]] &&
+                    [lum isKindOfClass:[NSDictionary class]] &&
+                    [pa[@"LegacyManufacturerID"] unsignedIntValue] == vendor &&
+                    [pa[@"ProductID"] unsignedIntValue] == product &&
+                    [pa[@"SerialNumber"] unsignedIntValue] == serial) {
+                    // Both in the same fixed point, so the ratio needs no scale.
+                    const double max = [lum[@"Max"] doubleValue];
+                    const double min = [lum[@"Min"] doubleValue];
+                    if (max > 0.0 && min > 0.0 && min < max)
+                        ratio = min / max;
+                }
+            }
+            CFRelease(attrs);
+        }
+        IOObjectRelease(svc);
+        if (ratio > 0.0)
+            break;
+    }
+    IOObjectRelease(it);
+    return ratio;
+}
+
+// The black floor of the EDR screen (EdrScreen(), the one the peak comes from)
+// as a fraction of its peak, or 0 when unknown. EDR exposes no floor, so this
+// reads what the display reports of itself, matched to the screen's
+// CGDirectDisplayID by vendor, product and serial: the EDID on an IODisplay
+// (Intel), else the framebuffer's decoded DisplayAttributes (Apple Silicon).
+// The caller multiplies it by the peak in the encoder's nits; a panel's
+// contrast ratio is what survives EDR's relative model, where the physical
+// nits behind SDR white move with the brightness setting.
+//
+// On Intel only displays with a CTA-861 HDR block answer; Apple's own panels
+// describe themselves in DisplayID instead and stay at 0, keeping the
+// zero-anchored dark end.
+double VbamMacosDisplayFloorRatio() {
+    NSScreen* screen = EdrScreen();
+    if (!screen)
+        return 0.0;
+    NSNumber* num = screen.deviceDescription[@"NSScreenNumber"];
+    if (!num)
+        return 0.0;
+    const CGDirectDisplayID did = num.unsignedIntValue;
+    const uint32_t vendor = CGDisplayVendorNumber(did);
+    const uint32_t product = CGDisplayModelNumber(did);
+    const uint32_t serial = CGDisplaySerialNumber(did);
+
+    const double ratio = IODisplayFloorRatio(vendor, product, serial);
+    return ratio > 0.0 ? ratio : FramebufferFloorRatio(vendor, product, serial);
 }
 
 // macOS version checks. Not Metal-specific: the Vulkan (MoltenVK) path also
