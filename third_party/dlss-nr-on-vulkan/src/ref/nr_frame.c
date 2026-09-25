@@ -1172,12 +1172,6 @@ static int gemm(struct nr_frame *f, int a, int b, int c, unsigned rows, unsigned
     return 0;
 }
 
-static int copy(struct nr_frame *f, int source, int target, size_t bytes)
-{
-    REC(f, X.rec_copy(source, target, bytes, 0, 0));
-    return 0;
-}
-
 /* `Runtime.independent()`: no barrier between the dispatches inside. */
 static int independent(struct nr_frame *f, int on)
 {
@@ -1791,9 +1785,10 @@ static int build(struct nr_frame *f)
             BLOCK(b, index, ENCODER[e].heads, WINDOW);
             TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
         }
-        NAMEDF(skip, "skip%d", level, (size_t)h * w * C * 2);
-        skips[level] = skip;
-        TRY(copy(f, value, skip, (size_t)h * w * C * 2));
+        /* The level's own buffer is its skip. The decoder writes d1-d4 and nothing writes
+         * l1-l4 again in the frame, so a copy would move the same bytes into a second
+         * buffer for nothing. */
+        skips[level] = value;
         BLOCK(tb, ENCODER[e].transition, ENCODER[e].heads, WINDOW);
         EDGE(down, ENCODER[e].transition, 0);
         int nh = L[level + 1][0], nw = L[level + 1][1], nC = L[level + 1][2];
@@ -1814,8 +1809,9 @@ static int build(struct nr_frame *f)
         BLOCK(b, index, 16, SPLIT);
         TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
     }
-    NAMED(split_skip, "split_skip", (size_t)h * w * C * 2);
-    TRY(copy(f, value, split_skip, (size_t)h * w * C * 2));
+    /* l5 itself is the skip, as for the levels above: the decoder input merge below
+     * writes d5 rather than l5, which is what a copy would protect. */
+    int split_skip = value;
     int gh = L[6][0], gw = L[6][1], gC = L[6][2];
     NAMED(deep, "l6", (size_t)gh * gw * gC * 2);
     {
@@ -1837,6 +1833,8 @@ static int build(struct nr_frame *f)
 
     /* the decoder input merge, then the split family again */
     {
+        NAMED(d5, "d5", (size_t)h * w * C * 2);
+        value = d5;
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)h * w * C, &t));
         TRY(record_upsample_merge(f, &f->decoder_input, &t, deep, split_skip, value, gh, gw, h, w,
@@ -2018,7 +2016,7 @@ static void deterministic_noise(float *out, int height, int width, int frame_ind
  * per-pixel control mask, whose green and blue scale tone and structure per pixel and
  * zero the three structure scalars. */
 static int features_into(struct nr_frame *f, const float *colour, int height, int width, const float *history,
-                         const float *mask, const nr_frame_params *p, float *out)
+                         const float *mask, const nr_frame_params *p, float *out, uint16_t *out16)
 {
     int H = f->height, W = f->width;
     if (f->noise_index != p->frame_index) {
@@ -2037,10 +2035,26 @@ static int features_into(struct nr_frame *f, const float *colour, int height, in
         controls[3] = half_round(enabled ? (p->skin_structure >= 0.0f ? p->skin_structure : p->local_structure) : -1.0f);
         controls[4] = half_round(enabled ? (p->automatic_structure >= 0.0f ? p->automatic_structure : p->local_structure) : -1.0f);
     }
-    nr_features(colour, (ptrdiff_t)width * 3, 3, 1,
-                history, history ? (ptrdiff_t)width * 3 : 0, history ? 3 : 0, history ? 1 : 0,
-                f->rows, f->cols, (size_t)H, (size_t)W, f->noise, controls, out);
-    if (mask) {
+    /* `out16`, when given, takes the features as half — the graph's own input under
+     * NR_INPUT_FP16. Every feature is a half value already, so this is the float32 build
+     * rounded, bit for bit (test_native_image.py). */
+    if (out16)
+        nr_features_half(colour, (ptrdiff_t)width * 3, 3, 1,
+                         history, history ? (ptrdiff_t)width * 3 : 0, history ? 3 : 0, history ? 1 : 0,
+                         f->rows, f->cols, (size_t)H, (size_t)W, f->noise, controls, out16);
+    else
+        nr_features(colour, (ptrdiff_t)width * 3, 3, 1,
+                    history, history ? (ptrdiff_t)width * 3 : 0, history ? 3 : 0, history ? 1 : 0,
+                    f->rows, f->cols, (size_t)H, (size_t)W, f->noise, controls, out);
+    if (mask && out16) {
+        for (int y = 0; y < H; y++)
+            for (int x = 0; x < W; x++) {
+                const float *m = mask + ((size_t)f->rows[y] * width + f->cols[x]) * 3;
+                uint16_t *o = out16 + ((size_t)y * W + x) * 16;
+                o[11] = float_to_half(m[1] * p->local_tone);
+                o[12] = float_to_half(m[2] * p->local_structure);
+            }
+    } else if (mask) {
         /* `half(mask[..., 1] * np.float32(local_tone_strength))`: the raw strength, not the
          * half-rounded one the scalar path uses */
         for (int y = 0; y < H; y++)
@@ -2060,8 +2074,18 @@ static int features_into(struct nr_frame *f, const float *colour, int height, in
 
 static double now(void) { return nr_now(); }
 
+/* NR_INPUT_FP16's input: where the half features go — the mapped input itself when it is
+ * mapped, else the host scratch `run_graph` then writes across. */
+static uint16_t *input_half(struct nr_frame *f)
+{
+    int source = named_buffer(f, "features_host16", (size_t)f->height * f->width * 16 * 2);
+    if (source < 0) return NULL;
+    return X.buf_host_visible(source) ? (uint16_t *)X.buf_ptr(source) : (uint16_t *)f->head_host;
+}
+
 /* features (H, W, 16) at the network extent -> the head (H, W, 16) as the device holds
- * it: the first four channels of each sixteen are the head. */
+ * it: the first four channels of each sixteen are the head. `features` NULL means they
+ * were built as half by `input_half` already (NR_INPUT_FP16 only). */
 static const float *run_graph(struct nr_frame *f, const float *features)
 {
     size_t pixels = (size_t)f->height * f->width;
@@ -2069,17 +2093,19 @@ static const float *run_graph(struct nr_frame *f, const float *features)
     int source = fp16 ? named_buffer(f, "features_host16", pixels * 16 * 2)
                       : named_buffer(f, "features", pixels * 16 * 4);
     int head = compact ? named_buffer(f, "head4", pixels * 4 * 4) : named_buffer(f, "head", pixels * 16 * 4);
-    if (source < 0 || head < 0) {
+    if (source < 0 || head < 0 || (!features && !fp16)) {
         snprintf(last_error, sizeof last_error, "graph buffers are missing");
         return NULL;
     }
     double t0 = now();
     if (fp16) {
         /* NR_INPUT_FP16: the features rounded to half on the host, as NumPy's astype does,
-         * straight into the mapped input when it is mapped; no to_half pass on the device */
+         * straight into the mapped input when it is mapped; no to_half pass on the device.
+         * Built there already by the caller, nothing is left but the upload of an unmapped
+         * one. */
         size_t n = pixels * 16;
-        uint16_t *dst = X.buf_host_visible(source) ? (uint16_t *)X.buf_ptr(source) : (uint16_t *)f->head_host;
-        for (size_t i = 0; i < n; i++) dst[i] = float_to_half(features[i]);
+        uint16_t *dst = input_half(f);
+        if (features) nr_to_half(features, n, dst);
         if (!X.buf_host_visible(source) && host_write(source, dst, n * 2)) return NULL;
     } else if (host_write(source, features, pixels * 16 * 4)) {
         return NULL;
@@ -2349,8 +2375,11 @@ nr_frame *nr_frame_open(const char *weights_path)
     /* `xmxres.Runtime.__init__`, switch for switch and default for default */
     f->opt.fuse_qk = env_switch("NR_FUSE_QK", 1);
     f->opt.batch_ffn = env_switch("NR_BATCH_FFN", 1);
-    f->opt.input_fp16 = env_switch("NR_INPUT_FP16", 0);
-    f->opt.compact_head = env_switch("NR_COMPACT_HEAD", 0);
+    /* Both on since 2026-09-25, as in xmxres.Runtime: the features are built as half
+     * straight into the mapped input, and the last GEMM stores only the four head columns
+     * the host reads. The same bytes; =0 restores the float32 input and sixteen columns. */
+    f->opt.input_fp16 = env_switch("NR_INPUT_FP16", 1);
+    f->opt.compact_head = env_switch("NR_COMPACT_HEAD", 1);
     f->opt.joint_qkv = env_switch("NR_JOINT_QKV", 0);
     f->opt.fuse_residual = env_switch("NR_FUSE_RESIDUAL", 1);
     f->opt.fuse_window_residual = env_switch("NR_FUSE_WINDOW_RESIDUAL", 1);
@@ -2453,7 +2482,7 @@ int nr_frame_features_masked(nr_frame *f, const float *colour, int height, int w
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !features) FAILF("features need a colour image and an output");
     if (prepare_extent(f, aligned_extent(height), aligned_extent(width))) return -1;
-    return features_into(f, colour, height, width, history, control_mask, params, features);
+    return features_into(f, colour, height, width, history, control_mask, params, features, NULL);
 }
 
 int nr_frame_features(nr_frame *f, const float *colour, int height, int width, const float *history,
@@ -2498,8 +2527,13 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !output) FAILF("update needs a colour image and an output");
     if (prepare_extent(f, aligned_extent(height), aligned_extent(width))) return -1;
-    if (features_into(f, colour, height, width, history, control_mask, params, f->features_host)) return -1;
-    const float *wide = run_graph(f, f->features_host);
+    /* Under NR_INPUT_FP16 the features are built as half in the graph's own input, so
+     * neither a float32 copy nor a conversion stands between them and the first GEMM. */
+    uint16_t *half_in = f->opt.input_fp16 ? input_half(f) : NULL;
+    if (f->opt.input_fp16 && !half_in) FAILF("graph buffers are missing");
+    if (features_into(f, colour, height, width, history, control_mask, params,
+                      half_in ? NULL : f->features_host, half_in)) return -1;
+    const float *wide = run_graph(f, half_in ? NULL : f->features_host);
     if (!wide) return -1;
     ptrdiff_t hx = f->head_stride, hy = (ptrdiff_t)f->width * hx;
     if (head_out)

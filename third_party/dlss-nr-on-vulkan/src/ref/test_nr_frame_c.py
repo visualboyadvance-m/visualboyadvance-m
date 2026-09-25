@@ -172,6 +172,17 @@ def main():
             py_m = nr_frame.compose(py_head_c, colour, control_mask=mask, intensity=intensity)
             check(f"compose: control mask at intensity {intensity} bit-identical",
                   np.array_equal(c_m, py_m), f"max |d| {np.abs(c_m - py_m).max():.3e}")
+        # update builds its features straight into the graph's half input under
+        # NR_INPUT_FP16, the mask channels included: the head must be the graph's on the
+        # float32 features the Python recipe gives
+        _, c_m_head = native.update(colour, control_mask=mask, local_tone=1.3,
+                                    local_structure=0.7, want_head=True)
+        check("update: with a control mask, the head is the graph's on its features",
+              np.array_equal(c_m_head, geometry.crop(backend.run_features(c_masked))))
+        _, c_a_head = native.update(colour, automatic_mask=1, skin_structure=2.0,
+                                    automatic_structure=-1.0, want_head=True)
+        check("update: with the automatic mask, the head is the graph's on its features",
+              np.array_equal(c_a_head, geometry.crop(backend.run_features(c_auto))))
         check("compose: the standalone composition is update's", np.array_equal(
             native.compose(py_head_c, colour, intensity=0.5), native.update(colour, intensity=0.5)))
 

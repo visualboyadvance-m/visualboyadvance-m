@@ -35,6 +35,15 @@ sys.path.insert(0, str(HERE.parent / "ref"))
 import nr_model  # noqa: E402
 import nr_resident as R  # noqa: E402
 import xmxres  # noqa: E402
+try:
+    import nr_image  # noqa: E402  the host passes in C, when they are built
+except ImportError:  # pragma: no cover
+    nr_image = None
+
+
+def _native_half(source, target):
+    """float32 into a half array natively; None when the library is not there."""
+    return None if nr_image is None else nr_image.to_half(source, target)
 
 
 host_copy = xmxres.host_view          # diagnostics read buffers the graph never returns
@@ -182,6 +191,21 @@ class ResidentFrame:
     HOST_SIDE = {"features": xmxres.HOST_WRITE, "features_host16": xmxres.HOST_WRITE,
                  "head": xmxres.HOST_READ, "head4": xmxres.HOST_READ}
 
+    def input_buffer(self):
+        if self.rt.input_fp16:
+            return self.buffer("features_host16", self.height * self.width * 16, np.float16)
+        return self.buffer("features", self.height * self.width * 16)
+
+    def input_view(self):
+        """The mapped input itself, (height, width, 16): features built here need no copy.
+        The buffer is HOST_WRITE, which is mapped in every memory mode — a downloaded copy
+        would take the features and drop them, so an unmapped one is refused."""
+        buffer = self.input_buffer()
+        if not getattr(buffer, "mapped", True):
+            raise RuntimeError("the input buffer is not mapped")
+        return buffer.view(np.float16 if self.rt.input_fp16 else np.float32,
+                           (self.height, self.width, 16))
+
     def head_buffer(self):
         return self.buffer("head4" if self.rt.compact_head else "head",
                            self.height * self.width * (4 if self.rt.compact_head else 16))
@@ -310,16 +334,20 @@ class ResidentFrame:
         stem = self.buffer("stem", pixels * 32)
         # Separate names keep captured graphs' addresses valid when switching modes.
         # HOST_WRITE is always mapped, including when graph buffers use staging.
-        source = self.buffer("features_host16" if rt.input_fp16 else "features",
-                             pixels * 16, np.float16 if rt.input_fp16 else np.float32)
+        source = self.input_buffer()
         # Wall times around host writes, graph completion and host reads. They are
         # not PCIe counters: GPU access to mapped host memory occurs during the graph.
         mark = _time.perf_counter()
-        if rt.input_fp16:
+        view = self.input_view()
+        if features.ctypes.data == view.ctypes.data and features.dtype == view.dtype:
+            pass                     # built in place (`input_view`): nothing to copy
+        elif rt.input_fp16:
             # Convert directly into the mapped input: no temporary half array and no
             # FP32 buffer crosses the host/device boundary before a GPU to_half pass.
-            np.copyto(source.view(np.float16, (pixels, 16)), features.reshape(pixels, 16),
-                      casting="unsafe")
+            # Natively where it can — NumPy's cast was slower than the pass it saved.
+            flat = np.ascontiguousarray(features, dtype=np.float32).reshape(pixels, 16)
+            if _native_half(flat, view.reshape(pixels, 16)) is None:
+                np.copyto(view.reshape(pixels, 16), flat, casting="unsafe")
         else:
             xmxres.host_write(source, features.reshape(-1, 16), rows=(pixels, 16))
         carried = _time.perf_counter() - mark
@@ -384,14 +412,10 @@ class ResidentFrame:
                                source_half=True, target_half=True)
                 submit()
             keep(f"l{level}", value, h * w * channels, (1, h, w, channels), np.float16)
-            skips[level] = self.buffer(f"skip{level}", h * w * channels, np.float16)
-            if batched or staged:
-                begin()
-                rt.copy(value, skips[level], h * w * channels * 2)
-                submit()
-            else:
-                skips[level].view(np.float16)[:h * w * channels] = \
-                    value.view(np.float16)[:h * w * channels]
+            # The level's own buffer is its skip. The decoder writes d1-d4 and nothing
+            # writes l1-l4 again in the frame, so the copy it used to read from moved the
+            # same bytes into a second buffer for nothing.
+            skips[level] = value
 
             block = self.block(transition, heads)
             edge = self.edge(transition, "down")
@@ -422,14 +446,9 @@ class ResidentFrame:
                            source_half=True, target_half=True)
             submit()
         keep("l5", value, h * w * channels, (1, h, w, channels), np.float16)
-        split_skip = self.buffer("split_skip", h * w * channels, np.float16)
-        if batched or staged:
-            begin()
-            rt.copy(value, split_skip, h * w * channels * 2)
-            submit()
-        else:
-            split_skip.view(np.float16)[:h * w * channels] = \
-                value.view(np.float16)[:h * w * channels]
+        # l5 itself is the skip, as for the levels above: the decoder input merge below
+        # writes d5 rather than l5, which is what the copy was protecting.
+        split_skip = value
 
         gh, gw, gchannels = self.levels[6]
         deep = self.buffer("l6", gh * gw * gchannels, np.float16)
@@ -462,6 +481,7 @@ class ResidentFrame:
                     scratch.out.view()[:tokens * gchannels]
 
         # the decoder input merge, then the split family again
+        value = self.buffer("d5", h * w * channels, np.float16)
         begin()
         R.record_upsample_merge(rt, self.decoder_input, self.transition_scratch(
             h * w * channels), deep, split_skip, value, gh, gw, h, w, gchannels, channels,

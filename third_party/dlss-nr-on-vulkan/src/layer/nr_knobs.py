@@ -109,17 +109,17 @@ DEFAULTS = {knob.name: knob.default for knob in KNOBS}
 # by `src/tools/knob_doc.py`, because the hand-written one went two days out of date the
 # moment the host passes moved to C and then stayed wrong for a week.
 RATES = (
-    (512, 288, 0.35, 35.7),
-    (512, 288, 0.50, 37.5),
-    (640, 360, 0.35, 37.5),
-    (640, 360, 0.50, 39.2),
-    (854, 480, 0.50, 50.4),
-    (1024, 768, 0.55, 75.1),
-    (1920, 1080, 0.55, 170.9),
+    (512, 288, 0.35, 35.2),
+    (512, 288, 0.50, 34.9),
+    (640, 360, 0.35, 35.8),
+    (640, 360, 0.50, 35.9),
+    (854, 480, 0.50, 44.8),
+    (1024, 768, 0.55, 67.9),
+    (1920, 1080, 0.55, 160.4),
 )
-RATES_MEASURED = "2026-09-24"
+RATES_MEASURED = "2026-09-25"
 # What a reader of the table needs and the numbers cannot say. Empty when there is nothing.
-RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 4 %. On "
+RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 10 %. On "
               "2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures "
               "rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower "
               "for you, look at swap before anything else.")

@@ -120,7 +120,7 @@ BLEND_SCALE = 0.73974609375
 
 def build_features(colour, *, geometry, history=None, frame_index=0,
                    normalized_style=0.0, local_tone_strength=1.0,
-                   local_structure_strength=1.0):
+                   local_structure_strength=1.0, out=None):
     """`make_features` with the history folded in, natively where that is available.
 
     The two steps are one pass in C: the mirror onto the network extent, the three FP16
@@ -130,6 +130,9 @@ def build_features(colour, *, geometry, history=None, frame_index=0,
 
     Only the plain recipe goes native — no control mask and no automatic mask — which is
     the one a game uses; anything else falls back and is bit-identical either way.
+
+    `out`, when given, is where the features are written — the graph's own mapped input
+    (`ResidentBackend.input_view`), float32 or half — and is returned.
     """
     values = dict(normalized_style=normalized_style,
                   local_tone_strength=local_tone_strength,
@@ -142,12 +145,16 @@ def build_features(colour, *, geometry, history=None, frame_index=0,
             colour, geometry.source_rows(), geometry.source_columns(),
             deterministic_noise(geometry.network_height, geometry.network_width,
                                 frame_index),
-            controls, history=history)
+            controls, history=history, out=out)
     if native is not None:
         return native
     features = make_features(colour, geometry=geometry, frame_index=frame_index, **values)
     if history is not None:
         apply_history(features, history, geometry)
+    if out is not None:
+        # NumPy's half rounding is the GPU's to_half, to the bit (test_input_fp16.py)
+        np.copyto(out, features, casting="unsafe")
+        return out
     return features
 
 
@@ -309,6 +316,11 @@ class ResidentBackend:
         if self.device_weights is not None:
             self.device_weights.close()
             self.device_weights = None
+
+    def input_view(self, height, width):
+        """The mapped input of the frame at this extent, to build the features in: then
+        `run_features` has nothing to copy."""
+        return self.frame(height, width).input_view()
 
     def run_features(self, features):
         height, width = features.shape[:2]

@@ -488,19 +488,19 @@ Mean absolute change between two presents above which the shot is taken to have 
 
 <!-- rates:begin -->
 
-Measured through the socket on 2026-09-24 by `python3 src/bench/live_rates.py` — the whole round trip a game waits for, median of nine frames, not graph time alone:
+Measured through the socket on 2026-09-25 by `python3 src/bench/live_rates.py` — the whole round trip a game waits for, median of nine frames, not graph time alone:
 
 | swapchain | render scale | ms | fps |
 | --- | ---: | ---: | ---: |
-| 512x288 | 0.35 | 36 | 28.0 |
-| 512x288 | 0.50 | 38 | 26.7 |
-| 640x360 | 0.35 | 38 | 26.7 |
-| 640x360 | 0.50 | 39 | 25.5 |
-| 854x480 | 0.50 | 50 | 19.8 |
-| 1024x768 | 0.55 | 75 | 13.3 |
-| 1920x1080 | 0.55 | 171 | 5.9 |
+| 512x288 | 0.35 | 35 | 28.4 |
+| 512x288 | 0.50 | 35 | 28.7 |
+| 640x360 | 0.35 | 36 | 27.9 |
+| 640x360 | 0.50 | 36 | 27.9 |
+| 854x480 | 0.50 | 45 | 22.3 |
+| 1024x768 | 0.55 | 68 | 14.7 |
+| 1920x1080 | 0.55 | 160 | 6.2 |
 
-Medians of three runs with swap empty, which agreed within 4 %. On 2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower for you, look at swap before anything else.
+Medians of three runs with swap empty, which agreed within 10 %. On 2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower for you, look at swap before anything else.
 
 That is the daemon's own cost with nothing else on the GPU. A game adds its own frame to it: **Tekken 7** ran at **25 fps at 640x360** in a live session on 2026-09-24, against 10.5 fps nine days earlier (`notes/phase59`).
 

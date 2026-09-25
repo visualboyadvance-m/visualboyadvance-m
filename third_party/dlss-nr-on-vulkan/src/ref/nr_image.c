@@ -321,8 +321,26 @@ void nr_compose(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_t hc,
 struct features_args {
     const float *colour; ptrdiff_t sy, sx, sc; const float *history; ptrdiff_t ty, tx, tc;
     const int32_t *rows, *columns; size_t width; const float *noise, *controls;
-    float *output;
+    float *output; uint16_t *output_half;
 };
+
+/* The sixteen channels of one pixel, as float. Both stores below are this. */
+static inline void feature_pixel(const float *rgb, ptrdiff_t sc, const float *was,
+                                 ptrdiff_t tc, const float *noise, const float *controls,
+                                 float out[16])
+{
+    for (size_t c = 0; c < 3; ++c) {
+        float scaled = half(half(half(rgb[(ptrdiff_t)c * sc]) - 0.5f) * 0.125f);
+        out[c] = noise[c];
+        out[4 + c] = scaled;
+        out[7 + c] = was
+            ? half(half(half(was[(ptrdiff_t)c * tc]) - 0.5f) * 0.125f)
+            : scaled;
+    }
+    out[3] = 1.0f;
+    for (size_t c = 0; c < 5; ++c) out[10 + c] = controls[c];
+    out[15] = 0.0f;
+}
 
 static void features_rows(const void *args, size_t y0, size_t y1)
 {
@@ -332,7 +350,6 @@ static void features_rows(const void *args, size_t y0, size_t y1)
     ptrdiff_t sy = a->sy, sx = a->sx, sc = a->sc, ty = a->ty, tx = a->tx, tc = a->tc;
     const int32_t *rows = a->rows, *columns = a->columns;
     size_t width = a->width;
-    float *output = a->output;
     for (size_t y = y0; y < y1; ++y) {
         const float *row = colour + rows[y] * sy;
         const float *old = history ? history + rows[y] * ty : 0;
@@ -340,18 +357,15 @@ static void features_rows(const void *args, size_t y0, size_t y1)
             size_t pixel = y * width + x;
             const float *rgb = row + columns[x] * sx;
             const float *was = old ? old + columns[x] * tx : 0;
-            float *out = output + pixel * 16;
-            for (size_t c = 0; c < 3; ++c) {
-                float scaled = half(half(half(rgb[(ptrdiff_t)c * sc]) - 0.5f) * 0.125f);
-                out[c] = noise[pixel * 3 + c];
-                out[4 + c] = scaled;
-                out[7 + c] = was
-                    ? half(half(half(was[(ptrdiff_t)c * tc]) - 0.5f) * 0.125f)
-                    : scaled;
+            if (a->output) {
+                feature_pixel(rgb, sc, was, tc, noise + pixel * 3, controls,
+                              a->output + pixel * 16);
+            } else {
+                float values[16];
+                feature_pixel(rgb, sc, was, tc, noise + pixel * 3, controls, values);
+                uint16_t *out = a->output_half + pixel * 16;
+                for (size_t c = 0; c < 16; ++c) out[c] = nr_float_to_half(values[c]);
             }
-            out[3] = 1.0f;
-            for (size_t c = 0; c < 5; ++c) out[10 + c] = controls[c];
-            out[15] = 0.0f;
         }
     }
 }
@@ -363,8 +377,84 @@ void nr_features(const float *colour, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
                  const float *controls, float *output)
 {
     struct features_args a = { colour, sy, sx, sc, history, ty, tx, tc, rows, columns,
-                               width, noise, controls, output };
+                               width, noise, controls, output, NULL };
     nr_parallel_rows(height, features_rows, &a);
+}
+
+/* The same features stored as half, which is what the graph's first GEMM reads: the
+ * to_half pass the GPU ran over them goes, and so do half the bytes written here. Every
+ * rounding is to nearest even, as that pass's, so the half values are its values
+ * (test_native_image.py, test_input_fp16.py). The output is half bit patterns, since
+ * `_Float16` is not in every compiler this is built with (nr_portable.h). */
+void nr_features_half(const float *colour, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
+                      const float *history, ptrdiff_t ty, ptrdiff_t tx, ptrdiff_t tc,
+                      const int32_t *rows, const int32_t *columns,
+                      size_t height, size_t width, const float *noise,
+                      const float *controls, uint16_t *output)
+{
+    struct features_args a = { colour, sy, sx, sc, history, ty, tx, tc, rows, columns,
+                               width, noise, controls, NULL, output };
+    nr_parallel_rows(height, features_rows, &a);
+}
+
+/* float32 to half, rounding to nearest even — for features a caller built as float.
+ * "Rows" here are 4096-element runs, so the pool splits a long buffer into bands. */
+struct to_half_args { const float *source; size_t count; uint16_t *target; };
+enum { TO_HALF_RUN = 4096 };
+
+static void to_half_rows(const void *args, size_t r0, size_t r1)
+{
+    const struct to_half_args *a = args;
+    size_t end = r1 * TO_HALF_RUN < a->count ? r1 * TO_HALF_RUN : a->count;
+    for (size_t i = r0 * TO_HALF_RUN; i < end; ++i)
+        a->target[i] = nr_float_to_half(a->source[i]);
+}
+
+void nr_to_half(const float *source, size_t count, uint16_t *target)
+{
+    struct to_half_args a = { source, count, target };
+    nr_parallel_rows((count + TO_HALF_RUN - 1) / TO_HALF_RUN, to_half_rows, &a);
+}
+
+/* The area mean of a downscale by whole factors — `nr_daemon.resample`'s other branch,
+ * which averages instead of sampling so the network is not handed aliasing to enhance.
+ * The order is that NumPy code's: a block's first sample, each other one added in
+ * row-major order, then one division by the count. */
+struct area_args {
+    const float *source; ptrdiff_t sy, sx, sc; size_t width, channels, fy, fx;
+    float *output;
+};
+
+static void area_rows(const void *args, size_t y0, size_t y1)
+{
+    const struct area_args *a = args;
+    ptrdiff_t sy = a->sy, sx = a->sx, sc = a->sc;
+    size_t width = a->width, channels = a->channels, fy = a->fy, fx = a->fx;
+    float count = (float)(fy * fx);
+    for (size_t y = y0; y < y1; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            const float *block = a->source + (ptrdiff_t)(y * fy) * sy
+                               + (ptrdiff_t)(x * fx) * sx;
+            float *out = a->output + (y * width + x) * channels;
+            for (size_t c = 0; c < channels; ++c) {
+                const float *first = block + (ptrdiff_t)c * sc;
+                float total = first[0];
+                for (size_t dy = 0; dy < fy; ++dy)
+                    for (size_t dx = 0; dx < fx; ++dx)
+                        if (dy || dx)
+                            total += first[(ptrdiff_t)dy * sy + (ptrdiff_t)dx * sx];
+                out[c] = total / count;
+            }
+        }
+    }
+}
+
+void nr_area_mean(const float *source, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
+                  size_t height, size_t width, size_t channels, size_t fy, size_t fx,
+                  float *output)
+{
+    struct area_args a = { source, sy, sx, sc, width, channels, fy, fx, output };
+    nr_parallel_rows(height, area_rows, &a);
 }
 
 /* One axis at a time: the intermediate is deliberately rounded to FP32 before

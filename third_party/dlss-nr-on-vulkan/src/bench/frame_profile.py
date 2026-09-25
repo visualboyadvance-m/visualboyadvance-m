@@ -166,8 +166,14 @@ def main():
         if len(each) != len(log):
             raise SystemExit("%d passes timed against %d recorded: the labels would not line "
                              "up, so none are printed" % (len(each), len(log)))
+        # which kernel ran each GEMM: routing is by shape, and a label from the recording
+        # side cannot say whether the tiled, the staged or the 8x16 kernel took it
+        kinds = xmxres.profile_each_kinds()
         sites = {}
-        for name, ms in zip(log, each):
+        for name, ms, kind in zip(log, each, kinds):
+            family = xmxres.PROFILE_FAMILIES[kind // 32]
+            if family.startswith("gemm") and not name.startswith("ffn"):
+                name = "%s [%s]" % (name, family.replace("gemm", "").strip() or "8x16")
             total, count = sites.get(name, (0.0, 0))
             sites[name] = (total + max(ms, 0.0), count + 1)
         print("\n  %-58s %8s %6s %8s" % ("call site", "ms", "calls", "ms each"))

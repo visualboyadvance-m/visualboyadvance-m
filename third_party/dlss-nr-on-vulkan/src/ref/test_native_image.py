@@ -86,6 +86,11 @@ def codec_checks(rng):
          np.frombuffer(nr_image.encode8(image, raw, 1), np.uint8), reference)
 
 
+def _numpy_resample(image, size):
+    with numpy_only():
+        return nr_daemon.resample(image, size)
+
+
 def resize_checks(rng):
     source = rng.random((57, 91, 3), dtype=np.float32)
     for size in ((31, 50), (120, 200), (57, 33), (57, 91)):
@@ -107,9 +112,23 @@ def resize_checks(rng):
         reference = nr_daemon.resample(crop, (25, 41))
         averaged = nr_daemon.resample(crop, (24, 44))
     same("resize a padded crop", nr_image.bilinear(crop, (25, 41)), reference)
-    check("the area mean is not bilinear, and stays NumPy's",
+    check("the area mean is not bilinear",
           not np.array_equal(nr_image.bilinear(crop, (24, 44)), averaged),
           "48x88 -> 24x44 divides evenly, so `resample` averages instead of sampling")
+    # The area mean itself, natively, against the NumPy adds it transcribes: the live
+    # extent's 2x2, uneven factors, four channels, tiny and large values, and the same
+    # reversed view and padded crop as above.
+    for shape, factors, scale in (((360, 640, 3), (2, 2), 1.0), ((90, 160, 3), (3, 2), 1e-3),
+                                  ((96, 128, 4), (4, 4), 255.0), ((64, 96, 3), (1, 2), 1.0)):
+        frame = (rng.random(shape, dtype=np.float32) * np.float32(scale))
+        size = (shape[0] // factors[0], shape[1] // factors[1])
+        with numpy_only():
+            reference = nr_daemon.resample(frame, size)
+        same(f"area mean {shape[1]}x{shape[0]} by {factors[1]}x{factors[0]}",
+             nr_image.area_mean(frame, factors), reference)
+    same("area mean of a reversed view", nr_image.area_mean(whole[..., 2::-1], (2, 2)),
+         _numpy_resample(whole[..., 2::-1], (32, 48)))
+    same("area mean of a padded crop", nr_image.area_mean(crop, (2, 2)), averaged)
 
 
 def feature_checks(rng):
@@ -130,6 +149,43 @@ def feature_checks(rng):
         same("features with a history in channels 7-9",
              nr_image.features(colour, rows, columns, noise, controls, history=history),
              reference)
+        # Built as half, in place: NumPy's float16 rounding of the same float32 features,
+        # which is the GPU's to_half to the bit (test_input_fp16.py). No rounding happens at
+        # all: every feature value is a half value already — the colour and the history are
+        # rounded to half as they are scaled, and the noise is quantised — so the half input
+        # cannot move one. That is checked first, since it is what makes the input exact.
+        check("every feature value is a half value",
+              np.array_equal(reference, reference.astype(np.float16).astype(np.float32)),
+              "the half input would round what is not")
+        into = np.full((geometry.network_height, geometry.network_width, 16), np.nan,
+                       np.float16)
+        built = nr_image.features(colour, rows, columns, noise, controls, history=history,
+                                  out=into)
+        check("features built into a half array are that array", built is into, "")
+        same("features as half, with a history", built, reference.astype(np.float16))
+        # and build_features writes the same into a given array without the library
+        with numpy_only():
+            fallback = nr_frame.build_features(
+                colour, geometry=geometry, history=history,
+                out=np.empty_like(into), **nr_frame.PROFILES["standard"])
+        same("build_features into half, NumPy fallback", fallback, into)
+
+
+def half_checks():
+    # Every half value, and both sides of every positive finite rounding boundary and
+    # their negatives — the set test_input_fp16.py checks the GPU's to_half on.
+    half = np.arange(65536, dtype=np.uint16).view(np.float16).astype(np.float32)
+    positive = np.arange(0x7c00, dtype=np.uint16).view(np.float16).astype(np.float32)
+    mid = (positive[:-1] + positive[1:]) * np.float32(.5)
+    boundary = np.concatenate((mid, np.nextafter(mid, np.float32(-np.inf)),
+                               np.nextafter(mid, np.float32(np.inf))))
+    values = np.concatenate((half[~np.isnan(half)], boundary, -boundary,
+                             np.array([65519, 65520, 65521, -65519, -65520, -65521],
+                                      np.float32)))
+    target = np.empty(values.size, np.float16)
+    with np.errstate(over="ignore"):
+        want = values.astype(np.float16)
+    same("to_half at every rounding boundary", nr_image.to_half(values, target), want)
 
 
 def compose_checks(rng):
@@ -197,6 +253,7 @@ def main():
     codec_checks(rng)
     resize_checks(rng)
     feature_checks(rng)
+    half_checks()
     compose_checks(rng)
     if FAILURES:
         print(f"\n{len(FAILURES)} FAILED: " + ", ".join(FAILURES), flush=True)

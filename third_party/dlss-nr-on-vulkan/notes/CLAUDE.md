@@ -400,10 +400,10 @@ handing work to the four E-cores (**-7 %** for a theoretical +2 %). `notes/phase
 `phase46`.
 
 **Both modes run in a real game.** Photo mode holds a frame while a trigger file exists;
-live mode (`NR_LAYER_LIVE=N`) runs continuously — **36.7 ms a frame at 512x288** for the
-daemon alone (2026-09-24), 25 fps in Tekken 7 at 640x360 beside the game's own rendering
-(`phase59`; 10.5 before the fusions) — with the game set to that extent and the compositor
-doing the stretch. `src/layer/nr-ctl`
+live mode (`NR_LAYER_LIVE=N`) runs continuously — **35-36 ms a frame at 512x288 and at
+640x360** for the daemon alone (2026-09-25), 25 fps in Tekken 7 at 640x360 beside the game's
+own rendering and 17.3 at 1280x720 (`phase59`; 10.5 before the fusions) — with the game set to
+that extent and the compositor doing the stretch. `src/layer/nr-ctl`
 changes profile, intensity, both strengths, the render scale and the temporal knobs
 between frames without reloading the model, and `src/layer/nr-toggle` is the same three
 files on a key, because on Wayland only the compositor sees a key while a fullscreen game

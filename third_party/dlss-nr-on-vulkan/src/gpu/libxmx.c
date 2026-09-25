@@ -184,6 +184,7 @@ static unsigned prof_hits[PROF_KINDS];
 /* Every pass's own duration, in recording order, since the last reset: what the totals
  * above sum away. `frame_profile.py --calls` pairs it with the calls that recorded them. */
 static double prof_each[MAX_STAMPS];
+static unsigned char prof_each_kind[MAX_STAMPS];   /* the kind each timed pass was stamped with */
 static unsigned prof_each_n;
 
 /* Device-resident buffers. The graph's activations live here between blocks instead
@@ -1043,7 +1044,7 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilem = block_size("XMX_TILE_M", 16);
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
-	g.staging = sk ? (unsigned)atoi(sk) : 128;
+	g.staging = sk ? (unsigned)atoi(sk) : 32;
 	/* On by default: the live extent's GEMMs whose M is not whole 64-row blocks — 144 or 400
 	 * rows at the deeper levels — ran on the tiled kernel at half the staged one's speed.
 	 * Live, 512x288 at scale 0.35: 42.7 -> 36.7 ms, bit-identical. It pays only where some
@@ -1447,7 +1448,11 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	 * 24 % on a deep-K shape in isolation and loses half as much again on the shallow-K
 	 * ones that dominate this graph, where the output write is the cost and there is
 	 * nothing to reuse; K >= 128 is where it stops losing. Over a whole frame the two
-	 * are indistinguishable — see notes/phase22-staging-and-storage.md. */
+	 * are indistinguishable — see notes/phase22-staging-and-storage.md.
+	 * That was the staged kernel on half its threads, waiting on its loads one at a time.
+	 * Given all of them (notes/improve-shared-memory.md, improve-fusions.md) it wins at
+	 * every depth it takes: K >= 32 is 1 ms of the 320x320 graph (32.2 -> 31.2) and 4 ms at
+	 * 1280x720, the same bytes. What stays tiled is K = 16, the stem. */
 	/* A last, partial 64-row block is the staged kernel's own business (its rows past M are
 	 * neither read out of bounds nor stored), so with `staged_partial` M need not be whole
 	 * blocks — except for the QKV epilogue, which finishes a block's rows together. */
@@ -1802,7 +1807,10 @@ static void collect(unsigned stamps, const unsigned char *kinds)
 		/* a wrapped counter is not a duration; -1 keeps the order for the caller */
 		double ms = ticks[i] < ticks[i - 1] ? -1.0
 			  : (double)(ticks[i] - ticks[i - 1]) * g.ts_period * 1e-6;
-		if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+		if (prof_each_n < MAX_STAMPS) {
+			prof_each_kind[prof_each_n] = kinds[i];
+			prof_each[prof_each_n++] = ms;
+		}
 		if (ms < 0) continue;
 		prof_ms[kinds[i]] += ms;
 		prof_hits[kinds[i]]++;
@@ -1922,6 +1930,7 @@ void xmx_profile_reset(void)
  * Reading a kind that never ran gives 0, which is the honest answer. */
 unsigned xmx_profile_each_count(void) { return prof_each_n; }
 double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
+unsigned xmx_profile_each_kind(unsigned i) { return i < prof_each_n ? prof_each_kind[i] : 0u; }
 
 double xmx_profile_ms(unsigned kind)
 {

@@ -144,6 +144,8 @@ def _load():
     lib.xmx_profile_each_count.restype = ctypes.c_uint
     lib.xmx_profile_each_ms.argtypes = [ctypes.c_uint]
     lib.xmx_profile_each_ms.restype = ctypes.c_double
+    lib.xmx_profile_each_kind.argtypes = [ctypes.c_uint]
+    lib.xmx_profile_each_kind.restype = ctypes.c_uint
     # The shader paths take an environment override so a variant can be measured
     # against the shipped one without editing the tree. The GEMM kernels follow the
     # device: without VK_KHR_cooperative_matrix (or with XMX_PORTABLE=1) the portable
@@ -447,6 +449,13 @@ def profile_each():
     return [lib.xmx_profile_each_ms(i) for i in range(lib.xmx_profile_each_count())]
 
 
+def profile_each_kinds():
+    """The kind of every pass `profile_each` timed, in the same order: which family —
+    GEMM base, tiled or staged, unary, row — actually ran it."""
+    lib = _load()
+    return [lib.xmx_profile_each_kind(i) for i in range(lib.xmx_profile_each_count())]
+
+
 def profile_totals():
     """Milliseconds and pass count per kind, as {(family, subkind): (ms, passes)}.
 
@@ -473,8 +482,14 @@ class Runtime:
         self.recorded = 0
         self.fuse_qk = os.environ.get("NR_FUSE_QK", "1") != "0"
         self.batch_ffn = os.environ.get("NR_BATCH_FFN", "1") != "0"
-        self.input_fp16 = os.environ.get("NR_INPUT_FP16", "0") != "0"
-        self.compact_head = os.environ.get("NR_COMPACT_HEAD", "0") != "0"
+        # On since 2026-09-25: the features are built as half, in the mapped input itself
+        # (`ResidentFrame.input_view`), so the GPU's to_half pass and the host's copy both
+        # go. The same bytes (test_input_fp16.py); NR_INPUT_FP16=0 is the float32 input.
+        self.input_fp16 = os.environ.get("NR_INPUT_FP16", "1") != "0"
+        # On since 2026-09-25: the last GEMM stores only the four useful head columns, so
+        # the host reads 4 of 16 — 3.6 -> 0.75 ms at 1280x720, 4 ms of the frame, the same
+        # bytes (notes/improve-compact-io.md). NR_COMPACT_HEAD=0 is the old sixteen.
+        self.compact_head = os.environ.get("NR_COMPACT_HEAD", "1") != "0"
         self.joint_qkv = os.environ.get("NR_JOINT_QKV", "0") != "0"
         # ProjectsCodex's fusions (notes/improve-fusions.md). On by default where they
         # were measured exact; each keeps its two-pass path behind a switch.

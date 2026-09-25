@@ -1,7 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-22**. notes/CLAUDE.md holds the
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-24**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-09-25**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -10,7 +9,62 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: five more dlss-nr-on-intel commits, on every runtime (2026-09-24, night)
+## Latest: ten more dlss-nr-on-intel commits, on every runtime (2026-09-25)
+
+`7a6f338`..`5636456` of `uzbekunknown/dlss-nr-on-intel` are in: the idle-CPU lead closed, Tekken
+7 at 1280x720, scale 0.5's area mean in C, the staged kernel from K = 32, the skips as their level
+buffers, the compact head and the half input on by default, the history kept without copies, the
+re-measured rate table, and their notes (next section). Carried past libxmx and the Python:
+
+- **`nr_area_mean`, `nr_features_half` and `nr_to_half` are in `nr_image.c` on its own pool**,
+  not OpenMP, and public in `nr_image.h`. The half stores are bit patterns (`uint16_t`, through
+  `nr_float_to_half`), because MSVC has no `_Float16`; `nr_to_half` bands a buffer in 4096-element
+  runs so the pool can split it.
+- **The C frame library records the skips as the level buffers**, `l1`-`l5` read by the decoder
+  and the decoder input merge writing a new `d5`, so its `copy` passes and `skip*`/`split_skip`
+  are gone. It too defaults to **`NR_INPUT_FP16=1` and `NR_COMPACT_HEAD=1`**, and
+  `nr_frame_update` builds the features as half **directly in the mapped input**
+  (`nr_features_half`, the control-mask channels included), so no float32 feature array and no
+  conversion stand before the first GEMM. `nr_frame_run_features` with float32 features converts
+  on the pool. Unmapped input (`XMX_STAGING=1`) builds into host scratch and uploads, as before.
+- **`xmx_profile_each_kind()`** is in `xmx.h` and all three runtimes.
+- **The staging threshold is 32 on libxmx and libd3dmx, and stays 128 on libmetalmx.** Upstream
+  lowered it for the Xe2 kernel's occupancy fix; the M3's simdgroup kernel is not that kernel,
+  and paired through the C library at 1280x720 K >= 32 was the same bytes and **1.5 % slower**
+  (399-403 against 405-406 ms, three pairs). `XMX_STAGE_K=32` to try it on another Apple GPU.
+  libd3dmx has no staged kernel, so its value only keeps the two in step.
+
+Verified on the M3 against the real weights: the whole ctest suite green on Vulkan and Metal
+but `publish_check`, still failing on the committed `weights/*.h`; the C frame test pair at the
+defaults, `NR_INPUT_FP16=0`, `NR_COMPACT_HEAD=0`, both off, `XMX_STAGING=1` and
+`NR_HOST_THREADS=1` on both runtimes, with two new checks that `nr_frame_update`'s head with a
+control mask or the automatic mask is the graph's on the float32 features; `test_dlssnr` on
+both. The new defaults on Metal through the C library at 1280x720: 408-410 -> 406-408 ms, the
+same head (`ff78b88715c96a3c`). libd3dmx compiles for x86_64 Windows against the MinGW-w64
+headers, exporting `xmx_profile_each_kind`, and `nr_image.c` and `nr_frame.c` build with the NDK
+for arm64-v8a and armeabi-v7a; none of that has run.
+
+## Latest: the frame around the network, taken apart again (2026-09-25, night)
+
+Five small steps on the daemon's own path, each byte-identical and each its own commit, and
+together **640x360 at 0.5 from 39-41 ms yesterday morning to ~35 ms; 1280x720 at 0.35 from
+70-73 to ~48; 1920x1080 at 0.3 from 106-122 to ~71**. README table re-measured with them:
+
+- the staged kernel for every K from 32 (`phase22`'s 128 predated its occupancy fix);
+- the five skip connections are their level buffers — no copies, 28-60 MiB less;
+- scale 0.5's area mean in C (`nr_area_mean`);
+- **the compact head on by default** — the host reads 4 of 16 columns, 4 ms at 1280x720;
+- **the features built as half, in the mapped input itself** (`ResidentFrame.input_view`):
+  no host copy and no GPU `to_half`. Every feature is a half value already, so this cannot
+  move one — `test_native_image.py` checks that before anything else;
+- **the history holds this frame's arrays instead of copies of them** — three fresh
+  multi-megabyte arrays a frame, and their page faults, gone.
+
+Measured and not kept, in `improve-fusions.md`: the bottleneck publishing straight into
+`deep`, the fused FFN's publish from a table (2.7x slower), window attention's bias hoisted or
+paired, and `encode8` returning a view. At 640x360 the graph is now 31 of the 35 ms.
+
+## Five more dlss-nr-on-intel commits, on every runtime (2026-09-24, night)
 
 `3a79933`..`064ffad` of `uzbekunknown/dlss-nr-on-intel` are in: the staged GEMM's partial last
 64-row block, the Tekken 7 25 fps record, the temporal gate and the hold floor inside the native
@@ -318,21 +372,35 @@ cores; 1920x1080 at 0.3, 106-122 -> 77-82 with the cores**; 512x288 and 640x360 
 because there the graph is 33 ms of 36-39. README table
 re-measured: 1024x768 at 0.55 84 -> 75 ms, 1920x1080 at 0.55 196 -> 171.
 
-**A lead that needs root.** The 320x320 graph runs **32.1-32.7 ms with every core idle and
-27.3 with any process spinning on a P-core** — a bare `pause` loop does it — and 28.5-29.5 on
-an LP E-core, at the same 1950 MHz GPU clock throughout. So it is the package's idle state, not
-GPU clocks and not work the core does. Polling the fence from the waiting thread gets only
-0.5-1 ms of it, and spinning a core for the length of every graph is not a trade for a laptop,
-so nothing is kept. The next test needs root: hold a PM QoS latency limit open while the graph
-runs, and read the uncore frequency, which is 0400 here —
+**Scale 0.5's area mean is in C too.** At exactly half, `resample` took NumPy's five strided
+passes — a copy, three adds, a divide — 1.5 ms of a 640x360 frame, and again inside the history
+take. One pass now, the same adds in the same order, byte-identical (`test_native_image.py`, and
+`test_daemon.py`'s check against `mean((1, 3))`): **640x360 at 0.5, 39.3-41.0 -> 36.5-38.1 ms;
+1280x720 at 0.5, 79-84 -> 73.** In the game at 1280x720 and scale 0.35 the threaded passes
+measured +18 % (`phase59`).
 
-```
-sudo python3 -c "import os,struct,time; f=os.open('/dev/cpu_dma_latency',os.O_WRONLY); os.write(f,struct.pack('i',50)); time.sleep(600)"
-sudo cat /sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/current_freq_khz
-```
+**The staged kernel now takes every K from 32 up.** The threshold of 128 was `phase22`'s,
+measured when that kernel ran on half its threads and waited on its loads one at a time; since
+those fixes it wins at every depth it takes: **1 ms of the 320x320 graph (32.2 -> 31.2), 4 ms
+at 1280x720**, same bytes. Only the stem, K = 16, stays tiled. And the five skip connections
+are their level buffers now — the decoder writes `d1`-`d5`, so nothing had to be copied: the
+same bytes, 28-60 MiB less device memory. `frame_profile.py --calls` labels each GEMM with the
+kernel that ran it.
 
-If a 50 us limit is worth the 15 % without a spinning core, the daemon can hold one when it
-is allowed to. Tried and not kept, in `improve-fusions.md`: weights stored as their E4M3 bytes
+**Deferred: an asynchronous live mode.** Overlapping the game, the layer and the daemon's CPU
+work with the graph, estimated from measured stages: **+7 % at 640x360, +18 % at 1280x720**,
+for one more frame of latency. The history is why it is so little: frame N+1's features need
+frame N's composed output, so only the decode, the downscale, the encode and the socket can
+move off the critical path. The owner deferred it until nothing else is left to take.
+
+**A lead, tested and closed.** Before a reboot, with zram in heavy use, the 320x320 graph ran
+**32.1-32.7 ms with every core idle and 27.3 with any process spinning on a P-core** — a bare
+`pause` loop did it — at the same 1950 MHz GPU clock. After a fresh boot the same spinner bought
+**5 %** (32.4 -> 30.7 ms), and a 50 us PM QoS latency limit (`/dev/cpu_dma_latency`, held by the
+owner as root) bought **nothing**: 32.3 ms idle, and it damped the spinner's gain to 0.7 ms. So
+it is not the package's deep C-states, it moves with the machine's state, and a core spinning for
+every graph is not worth 5 %. Nothing kept; the uncore frequency (0400 here) was never read.
+Tried and not kept, in `improve-fusions.md`: weights stored as their E4M3 bytes
 (exact, but a proxy put the prize at 0.14 ms a frame) and, again, register prefetch.
 
 ## The staged GEMM was on half its threads (2026-09-24, later)
@@ -1130,8 +1198,8 @@ What is *not* claimed:
   a daemon runs the model, and the result goes back into the swapchain. Proven in **Dead
   or Alive 5** (32-bit D3D9 through DXVK) with faces enhanced and measured, and the layer
   proven to attach under **VKD3D-Proton** on a 64-bit D3D12 title. Photo mode is triggered
-  by a file; live mode (`NR_LAYER_LIVE=N`) runs continuously: 36.7 ms a frame at 512x288
-  for the daemon alone (27 fps, `nr_knobs.RATES`, 2026-09-24). In a game it shares the GPU
+  by a file; live mode (`NR_LAYER_LIVE=N`) runs continuously: 35-36 ms a frame at 512x288
+  and 640x360 for the daemon alone (28 fps, `nr_knobs.RATES`, 2026-09-25). In a game it shares the GPU
   with the game's own rendering — Tekken 7 ran 25 fps at 640x360 on 2026-09-24, against 10.5 on 2026-09-16, before the
   fusions (`phase59`). `src/layer/`, `notes/phase34-doa5.md`, `phase41`, `phase47`.
 - **HDR is handled**: `src/ref/nr_display.py`, the recovered display codec — encode a

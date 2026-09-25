@@ -130,6 +130,7 @@ static double prof_ms[PROF_KINDS];
 static unsigned prof_hits[PROF_KINDS];
 /* Every profiled pass's own duration, in recording order, since the last reset. */
 static double prof_each[MAX_STAMPS];
+static unsigned char prof_each_kind[MAX_STAMPS];   /* the kind each timed pass was stamped with */
 static unsigned prof_each_n;
 
 /* Device-resident buffers. */
@@ -573,6 +574,10 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilem = block_size("XMX_TILE_M", 16);
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
+	/* 128, not libxmx's 32: libxmx lowered it once its staged kernel had all its threads
+	 * on Xe2, and this kernel is not that one. On the M3, paired at 1280x720 through the C
+	 * library, K >= 32 is the same bytes and 1.5 % slower (399-403 against 405-406 ms),
+	 * so the stem and the shallow GEMMs stay tiled here. XMX_STAGE_K=32 to compare. */
 	g.staging = sk ? (unsigned)atoi(sk) : 128;
 	/* As in libxmx: the staged kernel takes a partial last 64-row block itself, so the
 	 * deeper levels' 144- or 400-row GEMMs need not drop to the tiled kernel. 0 is the
@@ -1141,11 +1146,17 @@ static void collect(unsigned stamps)
 		for (unsigned i = 0; i < count; i++) {
 			uint64_t start = t[2 * i].timestamp, end = t[2 * i + 1].timestamp;
 			if (start == MTLCounterErrorValue || end == MTLCounterErrorValue || end < start) {
-				if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = -1.0;
+				if (prof_each_n < MAX_STAMPS) {
+					prof_each_kind[prof_each_n] = stamp_kind[first + i];
+					prof_each[prof_each_n++] = -1.0;
+				}
 				continue;
 			}
 			double ms = (double)(end - start) * g.ns_per_tick * 1e-6;
-			if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+			if (prof_each_n < MAX_STAMPS) {
+				prof_each_kind[prof_each_n] = stamp_kind[first + i];
+				prof_each[prof_each_n++] = ms;
+			}
 			prof_ms[stamp_kind[first + i]] += ms;
 			prof_hits[stamp_kind[first + i]]++;
 		}
@@ -1324,6 +1335,7 @@ void xmx_profile_reset(void)
 
 unsigned xmx_profile_each_count(void) { return prof_each_n; }
 double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
+unsigned xmx_profile_each_kind(unsigned i) { return i < prof_each_n ? prof_each_kind[i] : 0u; }
 
 double xmx_profile_ms(unsigned kind) { return kind < PROF_KINDS ? prof_ms[kind] : 0.0; }
 unsigned xmx_profile_count(unsigned kind) { return kind < PROF_KINDS ? prof_hits[kind] : 0u; }

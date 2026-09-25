@@ -123,6 +123,9 @@ double xmx_profile_ms(unsigned kind);
 unsigned xmx_profile_count(unsigned kind);
 unsigned xmx_profile_each_count(void);
 double xmx_profile_each_ms(unsigned i);
+/* the kind each pass xmx_profile_each_ms timed was stamped with: which family, the GEMM
+ * kernel included, actually ran it */
+unsigned xmx_profile_each_kind(unsigned i);
 
 #ifdef __cplusplus
 }

@@ -235,6 +235,11 @@ def resample(image, size):
         # where the multi-axis reduction took 4.8 — 1.9 against 16.5 at 1024x768 — which
         # every scale of exactly 0.5 paid.
         fy, fx = height // new_height, width // new_width
+        if nr_image is not None:
+            # The same adds in C, one pass instead of five: 1.5 -> 0.2 ms at 640x360.
+            native = nr_image.area_mean(image, (fy, fx))
+            if native is not None:
+                return native
         blocks = np.asarray(image, np.float32).reshape(new_height, fy, new_width, fx, -1)
         total = blocks[:, 0, :, 0].copy()
         for dy in range(fy):
@@ -576,8 +581,13 @@ def process_connection(connection, backend, args):
     shot = (width, height, vk_format, top, bottom, left, right, live.profile)
     history_inner, history_full, history_pixels = args.history.take(
         shot, inner, live.cut_limit if live.temporal > 0 else -1.0)
-    features = nr_frame.build_features(inner, geometry=geometry, history=history_inner,
-                                       **nr_frame.PROFILES[live.profile])
+    # Built in the graph's own mapped input where the backend offers it, so nothing is
+    # copied on the way in.
+    input_view = getattr(backend, "input_view", None)
+    features = nr_frame.build_features(
+        inner, geometry=geometry, history=history_inner,
+        out=input_view(geometry.network_height, geometry.network_width) if input_view else None,
+        **nr_frame.PROFILES[live.profile])
     head = geometry.crop(backend.run_features(features))
     if head.shape[:2] != colour.shape[:2]:
         # The fourth channel is the temporal gate. Without history it reaches nothing —
@@ -656,12 +666,14 @@ def process_connection(connection, backend, args):
             output[held] = colour[held]          # so a --dump shows what was actually sent
     connection.sendall(encoded)
     # After the interface restore, so what is carried forward is what the game was
-    # actually handed. A copy: `output[top:bottom, left:right]` is a view of the frame
-    # buffer that the next decode overwrites.
+    # actually handed.
     if live.temporal > 0:
-        args.history.keep(shot,
-                          np.array(output[top:bottom, left:right] if boxed else output),
-                          np.array(inner), np.array(colour))
+        # Kept as they are, not copied: each is this frame's own — decode, the resample and
+        # the composition all hand back fresh arrays, nothing writes them from here on, and
+        # History only reads what it holds. Three frame copies a frame were 0.4 ms at
+        # 640x360 and 2-3 at 1280x720.
+        args.history.keep(shot, output[top:bottom, left:right] if boxed else output,
+                          inner, colour)
     if args.dump:
         import image_io
         try:

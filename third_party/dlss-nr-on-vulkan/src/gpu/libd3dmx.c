@@ -210,6 +210,7 @@ static double prof_ms[PROF_KINDS];
 static unsigned prof_hits[PROF_KINDS];
 /* every pass's own duration, in recording order, since the last reset: what the totals sum away */
 static double prof_each[MAX_STAMPS];
+static unsigned char prof_each_kind[MAX_STAMPS];   /* the kind each timed pass was stamped with */
 static unsigned prof_each_n;
 
 /* Device-resident buffers. `state` is where this recording last left the buffer: every
@@ -1237,7 +1238,7 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilem = block_size("XMX_TILE_M", 16);
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
-	g.staging = sk ? (unsigned)atoi(sk) : 128;
+	g.staging = sk ? (unsigned)atoi(sk) : 32;   /* libxmx's default; there is no staged kernel here */
 	if (cmd_create(&g.rcb) || cmd_create(&g.tcb)) return -1;
 	g.rready = 1;
 	return 0;
@@ -1830,7 +1831,10 @@ static void collect(unsigned stamps, const unsigned char *kinds)
 	for (unsigned i = 1; i < stamps; i++) {
 		/* a wrapped counter is not a duration; -1 keeps the order for the caller */
 		double ms = ticks[i] < ticks[i - 1] ? -1.0 : (double)(ticks[i] - ticks[i - 1]) * g.ns_per_tick * 1e-6;
-		if (prof_each_n < MAX_STAMPS) prof_each[prof_each_n++] = ms;
+		if (prof_each_n < MAX_STAMPS) {
+			prof_each_kind[prof_each_n] = kinds[i];
+			prof_each[prof_each_n++] = ms;
+		}
 		if (ms < 0) continue;
 		prof_ms[kinds[i]] += ms;
 		prof_hits[kinds[i]]++;
@@ -1949,6 +1953,7 @@ void xmx_profile_reset(void)
 
 unsigned xmx_profile_each_count(void) { return prof_each_n; }
 double xmx_profile_each_ms(unsigned i) { return i < prof_each_n ? prof_each[i] : -1.0; }
+unsigned xmx_profile_each_kind(unsigned i) { return i < prof_each_n ? prof_each_kind[i] : 0u; }
 
 double xmx_profile_ms(unsigned kind) { return kind < PROF_KINDS ? prof_ms[kind] : 0.0; }
 unsigned xmx_profile_count(unsigned kind) { return kind < PROF_KINDS ? prof_hits[kind] : 0u; }

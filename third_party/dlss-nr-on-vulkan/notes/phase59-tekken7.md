@@ -125,3 +125,20 @@ daemon's log counting:
 The log rounds a frame to 10 ms, so read 25 as 22-28; the owner saw 25 on screen. Against the
 10.5 fps above: 2.4x. At 640x360 scale 0.6 costs what 0.35 does — the network is the same size
 bar one 64-column step, and it holds three times the real pixels.
+
+## A larger window, 2026-09-25
+
+Tekken at **1280x720**, render scale 0.35 (a 448x320 network), practice mode, the owner
+playing, counted from the daemon's log in 15-second windows. The daemon was restarted twice
+mid-session, to take the host passes' threads away and give them back:
+
+| host passes | fps | daemon | graph |
+| --- | ---: | ---: | ---: |
+| eight cores (OpenMP) | 17.3-17.4 | 50 ms | 41 ms |
+| one core (`OMP_NUM_THREADS=1`) | 14.6-14.7 | 60 ms | 41 ms |
+| eight again | 17.2-17.5 | 50 ms | 41 ms |
+
+**+18 % in the game**, all of it in the passes around the network: the graph is the same
+41 ms (mean 39.8-40.0) in all three legs. At 640x360 the same change moved nothing, because
+there the graph is the frame. The log rounds the daemon's time to 10 ms; the frame counts do
+not round.

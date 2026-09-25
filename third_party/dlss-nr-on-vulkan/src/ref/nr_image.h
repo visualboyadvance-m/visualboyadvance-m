@@ -24,6 +24,19 @@ void nr_features(const float *colour, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
                  const int32_t *rows, const int32_t *columns,
                  size_t height, size_t width, const float *noise,
                  const float *controls, float *output);
+/* nr_features stored as half bit patterns — what the graph's first GEMM reads — and
+ * float32 to half on its own; both round to nearest even, as the GPU's to_half does. */
+void nr_features_half(const float *colour, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
+                      const float *history, ptrdiff_t ty, ptrdiff_t tx, ptrdiff_t tc,
+                      const int32_t *rows, const int32_t *columns,
+                      size_t height, size_t width, const float *noise,
+                      const float *controls, uint16_t *output);
+void nr_to_half(const float *source, size_t count, uint16_t *target);
+/* The area mean of a downscale by whole factors fy x fx, summed as nr_daemon.resample's
+ * NumPy does; height and width are the output's. */
+void nr_area_mean(const float *source, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
+                  size_t height, size_t width, size_t channels, size_t fy, size_t fx,
+                  float *output);
 void nr_resize_axis(const float *source, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
                     size_t height, size_t width, size_t channels, int axis,
                     const int32_t *low, const int32_t *high,

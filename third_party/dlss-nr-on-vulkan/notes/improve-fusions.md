@@ -247,7 +247,11 @@ is now 9.4 ms + 196 ms per megapixel. Live, through the socket: **512x288 at 0.3
 - **Weights stored in 32-column slabs**, so a workgroup streams its K x 32 block instead of
   64 bytes from every 2 KB row: identical results, 14 % on 64x1024x4096 and 10 % on
   64x4096x1024, nothing on the rest — about 0.6 ms at 320x320 for a layout change at every
-  weight's upload and every GEMM path. Not taken.
+  weight's upload and every GEMM path. Not taken. Re-measured 2026-09-25 on the fixed staged
+  kernel: 4096x1024 -17 %, 3072x1024 -14 %, 1024x1024 -3 %, 1024x4096 noise either way — and
+  the QKV projection, one of the two that gain, cannot always take the staged kernel (its
+  epilogue wants whole 64-row blocks; at 384x384 the bottleneck is 144 rows), so its slab
+  weights would need a second, row-major copy. Without it, about 0.2 ms. Still not taken.
 - **The cost of a pass itself** is small: 1.2 us for an empty dependent pass, 4 us for 64k
   elements. The 577 passes of a frame are under a millisecond of it; at 320x320 the time is
   the deep levels' GEMMs, latency-bound on 32-200 workgroups. (Measured again later with a
@@ -263,6 +267,25 @@ is now 9.4 ms + 196 ms per megapixel. Live, through the socket: **512x288 at 0.3
   the graph faster). From the waiting thread it bought 0.5-1 ms of the 4.5 a separate busy
   process buys — whether it paused between polls, did integer work, or polled every 1, 42 or
   680 us. Not kept.
+
+- **The bottleneck blocks publishing straight into `deep`** — the E4M3 pass and the to_half
+  after each global block folded into its closing residual, 16 passes fewer. Bit-identical,
+  a padded bottleneck included (1920x1088, 2040 tokens on 2048 rows), and no measurable change
+  at 320x320 or 1280x720: those passes were 7-10 us each, and a publishing epilogue sends the
+  staged kernel through its stage instead of the direct store. Not kept (2026-09-25).
+
+- **The fused FFN's hidden-layer publish from a table.** `e4m3(gate(x))` depends only on
+  `half(x)`, so 65536 halves hold it exactly. Without the publish at all the kernel is 21-35 %
+  faster (983040 rows 5.8 -> 4.56 ms), which is what made it worth a try; looked up from a
+  table in the weights buffer it is 2.7x *slower* (15.9 ms) — sixteen scattered loads a lane
+  a chunk cost far more than the thirty instructions they replace. Not kept (2026-09-25).
+
+- **Window attention's bias loaded earlier or in pairs.** All sixteen of a lane's bias values
+  loaded before the QK multiply: 5-28 % slower (register pressure). Read as `vec2` pairs,
+  eight loads instead of sixteen: level with the scalar loads, 3 % slower at 1600 batches.
+  The bias loads are not what this kernel waits on. Not kept (2026-09-25).
+- **`encode8` handing back a view instead of `tobytes()`**: a frame's copy fewer, and no
+  measurable change at 640x360, 1280x720 or 1920x1080. Not kept.
 
 ## Left behind, deliberately
 
