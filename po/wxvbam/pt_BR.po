@@ -923,11 +923,11 @@ msgstr "Opção desconhecida %s com o valor %s"
 msgid ""
 "VisualBoyAdvance-M needs your permission to open \"%s\". Allow this folder "
 "to open it and any other ROM in it from now on, or choose the file alone."
-msgstr ""
+msgstr "O VisualBoyAdvance-M precisa da sua permissão para abrir o \"%s\". Permita que esta pasta abra ela e qualquer outra ROM nela a partir de agora, ou escolha o arquivo sozinho."
 
 #: panel.cpp:769
 msgid "Allow"
-msgstr ""
+msgstr "Permitir"
 
 #: panel.cpp:810
 #, c-format
