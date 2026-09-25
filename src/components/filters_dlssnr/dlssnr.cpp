@@ -103,7 +103,6 @@ void ReleaseModel() {
         CloseLocked(s);
 }
 
-// `save_image` in nr_frame_main.c: clip to [0, 1], then `v * 255 + 0.5` to a byte.
 }  // namespace
 
 void ShareVulkan(const VulkanShare& share) {
@@ -134,15 +133,10 @@ bool UsingSharedVulkan() {
 
 namespace {
 
+// `save_image` in nr_frame_main.c: clip to [0, 1], then `v * 255 + 0.5` to a byte.
 inline uint8_t ToByte(float v) {
     v = v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
     return static_cast<uint8_t>(v * 255.0f + 0.5f);
-}
-
-// One channel of a pixel, plus a correction, clamped back into a byte.
-inline uint32_t AddClamp(uint32_t v, int16_t d) {
-    const int r = static_cast<int>(v & 0xffu) + d;
-    return static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r);
 }
 
 // `read_png` in nr_frame_main.c: `byte / 255`, a division rather than a multiply by the
@@ -163,11 +157,9 @@ struct Filter::Impl {
     int pending_width = 0;
     int pending_height = 0;
     bool has_pending = false;
-    // What the newest finished pass changed, per channel, (height, width, 3):
-    // its output minus the frame it was given. Held as a correction rather
-    // than as the output itself so that Apply32() can lay it over the frame on
-    // screen now -- see there.
-    std::vector<int16_t> correction;
+    // The newest finished pass's output, RGB8, (height, width, 3): the bytes
+    // `nr_frame IN.png OUT.png` writes for the frame that pass was given.
+    std::vector<uint8_t> result;
     int result_width = 0;
     int result_height = 0;
     bool has_result = false;
@@ -250,13 +242,9 @@ void Filter::Impl::Run() {
 
         {
             std::lock_guard<std::mutex> lock(mutex);
-            correction.resize(count);
-            // FromByte/ToByte round-trips, so ToByte(input[i]) is the source
-            // byte the network was handed, and the difference is purely what
-            // the pass did to it.
+            result.resize(count);
             for (size_t i = 0; i < count; i++)
-                correction[i] = static_cast<int16_t>(ToByte(output[i])) -
-                                static_cast<int16_t>(ToByte(input[i]));
+                result[i] = ToByte(output[i]);
             result_width = width;
             result_height = height;
             has_result = true;
@@ -318,36 +306,18 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             notify_worker = true;
         }
 
-        // Lay the newest pass over the frame that is on screen *now*, rather
-        // than writing that pass's own output.
-        //
-        // A pass takes far longer than a frame -- tens of milliseconds even on
-        // a fast GPU, and it runs on whatever the display filter scaled the
-        // picture up to -- so its output is always several frames stale.
-        // Writing it out verbatim froze the whole image between passes and
-        // then jumped, which at 60 Hz reads as a bad stutter however quick the
-        // filter itself is. Adding only what the pass *changed* lets motion
-        // stay live at the emulator's frame rate while the denoising rides on
-        // top and refreshes whenever a pass lands.
-        //
-        // On a still picture the frame here is the frame the network was given,
-        // so this reproduces the pass's output exactly. The further the picture
-        // has moved since, the more the correction is aimed at pixels that have
-        // moved on, which shows up as a faint trail behind fast motion -- a far
-        // better trade than dropping the whole image to a few updates a second.
+        // Write the newest finished pass as it came out of the network, the
+        // picture `nr_frame` would save for the frame that pass was given. A
+        // pass takes longer than a frame, so this is a few frames behind the
+        // emulator and refreshes whenever a pass lands.
         if (im.has_result && im.result_width == width && im.result_height == height) {
-            const int16_t* c = im.correction.data();
+            const uint8_t* r = im.result.data();
             for (int y = 0; y < height; y++) {
-                const uint32_t* s =
-                    reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
                 uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
-                for (int x = 0; x < width; x++, c += 3) {
-                    // dst may alias src; this reads the pixel before it writes it.
-                    const uint32_t v = s[x];
-                    d[x] = (AddClamp(v >> red_shift, c[0]) << red_shift) |
-                           (AddClamp(v >> green_shift, c[1]) << green_shift) |
-                           (AddClamp(v >> blue_shift, c[2]) << blue_shift);
-                }
+                for (int x = 0; x < width; x++, r += 3)
+                    d[x] = (static_cast<uint32_t>(r[0]) << red_shift) |
+                           (static_cast<uint32_t>(r[1]) << green_shift) |
+                           (static_cast<uint32_t>(r[2]) << blue_shift);
             }
             wrote_result = true;
         }

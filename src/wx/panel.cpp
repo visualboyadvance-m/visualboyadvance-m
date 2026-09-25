@@ -4516,7 +4516,7 @@ void DrawingPanelBase::UpdateDlssNrState()
         systemScreenMessage(_("DLSS NR unavailable, filter disabled"));
         // The option observer adopts this in place; the next DrawArea drops the
         // processor in SyncDlssNr(). Until then Apply32() passes frames through.
-        OPTION(kDispFilter) = config::Filter::kNone;
+        OPTION(kDispDlssNr) = false;
         return;
     }
     if (!dlssnr_ready_logged_ && dlssnr_->Ready()) {

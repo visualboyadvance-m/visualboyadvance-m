@@ -12,20 +12,16 @@
 // "initializer"); the filter thread then calls Apply32() every frame, which
 // hands the newest source frame to a worker thread.
 //
-// What Apply32() writes back is the newest finished pass laid over the frame it
-// was handed this time -- the pass's output minus its own input, added to the
-// current picture -- not that pass's output on its own. A pass is always
-// several frames stale, so writing it verbatim held the whole image still
-// between passes and then jumped; adding only what the pass changed keeps
-// motion at the emulator's frame rate. Until the first pass finishes the source
-// passes straight through.
+// What Apply32() writes back is the newest finished pass's output as it is:
+// the network's picture of the frame that pass was given, a few frames behind
+// the emulator, refreshed whenever a pass lands. Until the first pass finishes
+// the source passes straight through.
 //
 // Each pass gets what the `nr_frame` command gives a picture with no flags:
 // the standard profile, frame index 0, no control mask, and the still path
 // with no history, so a pass's output depends on that frame alone and matches
-// `nr_frame IN.png OUT.png` on the same pixels. On a still picture, where the
-// frame on screen is the frame the network was given, that is also exactly what
-// reaches the display.
+// `nr_frame IN.png OUT.png` on the same pixels, and those are the bytes that
+// reach the display.
 //
 // The weights are shared process-wide: the model opens on the first pass a
 // Filter asks for (about two seconds, on the worker, never on the UI thread)
