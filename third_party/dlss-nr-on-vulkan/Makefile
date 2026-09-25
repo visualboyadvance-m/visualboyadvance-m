@@ -71,7 +71,7 @@ SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
            work/gemm_portable.spv work/gemm_portable_tiled.spv \
            work/gemm_portable_desc.spv work/gemm_portable_batched.spv
 
-all: work/libxmx$(SO) work/libnr_layer$(SO) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/gemm_runner $(SHADERS) $(PLATFORM_EXTRA)
+all: work/libxmx$(SO) work/libnr_layer$(SO) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/nr_frame_rates work/gemm_runner $(SHADERS) $(PLATFORM_EXTRA)
 
 work:
 	mkdir -p $@
@@ -159,6 +159,9 @@ PNG_LIBS   ?= $(or $(shell $(PNG_PKG_CONFIG) --libs libpng 2>/dev/null),$(if $(P
 COMMA := ,
 work/nr_frame: src/ref/nr_frame_main.c work/libnr_frame$(SO) src/ref/nr_frame.h src/ref/nr_image.h
 	$(CC) -O2 -Wall -Wextra -Isrc/ref $(PNG_CFLAGS) -o $@ $< work/libnr_frame$(SO) -Wl,-rpath,$(CURDIR)/work $(PNG_LIBS) $(DL_LIBS) -lm
+# live_rates.py for the C library: the daemon's frame, end to end, in one process
+work/nr_frame_rates: src/bench/nr_frame_rates.c work/libnr_frame$(SO) src/ref/nr_frame.h src/ref/nr_image.h
+	$(CC) -O2 -Wall -Wextra -Isrc/ref -o $@ $< work/libnr_frame$(SO) -Wl,-rpath,$(CURDIR)/work -lm
 # test_nr_frame_c.py in C: the library against its own contract, and against the head the
 # Python test writes with --reference, so the bit-identity check survives without Python
 work/test_nr_frame: src/ref/test_nr_frame.c work/libnr_frame$(SO) src/ref/nr_frame.h

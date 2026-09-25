@@ -49,5 +49,6 @@ void nr_compose_temporal(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_
                          const float *table, float confidence,
                          const float *mask, ptrdiff_t my, ptrdiff_t mx,
                          size_t height, size_t width, float intensity,
-                         float scale, float hold, float slope, float *output);
+                         float scale, float hold, float slope, float release,
+                         float *output);
 #endif

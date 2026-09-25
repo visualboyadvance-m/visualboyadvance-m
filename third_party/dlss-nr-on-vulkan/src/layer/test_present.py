@@ -41,6 +41,12 @@ import nr_build  # noqa: E402
 BINARY = nr_build.executable("test_present")
 LAYER = nr_build.BUILD_DIR / "layer-check"      # the manifests, beside the library they name
 REPLY = bytes((17, 34, 51, 255))          # B G R A, nothing a clear in this test produces
+
+
+def reply(sequence):
+    """The stand-in's answer to its `sequence`th request: green 34 marks an answer, which
+    no clear produces, and blue says which request it answered."""
+    return bytes((sequence % 256, REPLY[1], REPLY[2], REPLY[3]))
 FAILURES = []
 # Where a distribution keeps the Khronos validation layer's manifest. The loader takes a
 # list, so ours stays first and the system one is only searched after it.
@@ -120,11 +126,14 @@ def stand_in(path, seen, stop):
             # pixels elsewhere. Validate the whole uniform image, not just its prefix.
             seen.append(body[:4] if len(body) == want and body == body[:4] * (width * height)
                         else b'mixed')
-            connection.sendall(REPLY * (width * height))
+            try:
+                connection.sendall(reply(len(seen) - 1) * (width * height))
+            except OSError:
+                pass          # a layer that stopped listening costs this frame, as the daemon's does
     server.close()
 
 
-def present(mode, rounds=2, layered=True):
+def present(mode, rounds=2, layered=True, pipelined=False):
     """Run the C binary once and return what the daemon saw.
 
     `layered=False` is the baseline: the same frames with no layer in the chain at all,
@@ -140,6 +149,9 @@ def present(mode, rounds=2, layered=True):
                            ENABLE_NR_LAYER="1", NR_LAYER_SOCKET=path, NR_LAYER_LIVE="1")
         environment.pop("NR_LAYER_TRIGGER", None)
         environment.pop("NR_TEST_NO_LAYER", None)
+        environment.pop("NR_LAYER_ASYNC", None)
+        if pipelined:
+            environment["NR_LAYER_ASYNC"] = "1"
         if not layered:
             environment["NR_TEST_NO_LAYER"] = "1"
             # With no layer nothing patches the usage in, and the test's own transfer
@@ -160,9 +172,10 @@ def present(mode, rounds=2, layered=True):
     return got, seen
 
 
-def run(mode, attempt=1, attempts=1):
-    label = (mode or "queue idle") + (f" #{attempt}" if attempts > 1 else "")
-    got, seen = present(mode)
+def run(mode, attempt=1, attempts=1, pipelined=False):
+    label = ((mode or "queue idle") + (", async" if pipelined else "")
+             + (f" #{attempt}" if attempts > 1 else ""))
+    got, seen = present(mode, pipelined=pipelined)
     if got.returncode != 0:
         check(f"{label}: the frames present", False,
               (got.stderr.strip().splitlines() or ["no output"])[-1][:120])
@@ -180,12 +193,31 @@ def run(mode, attempt=1, attempts=1):
     check(f"{label}: the daemon is handed the frame the game drew",
           seen_tuples == expected,
           f"{seen_tuples[:3]} against {expected[:3]}")
-    held = [tuple(pixel) for pixel in seen[images:]]
-    # Every image was initialized and processed before entering the untouched phase.
-    answered = [pixel for pixel in held if pixel == tuple(REPLY)]
+    # Every present is one request, in order. An untouched image holds what the layer wrote
+    # into it at its previous present: the answer to that present's own request, or — async —
+    # to the request before it, which is the one-frame delay the mode is for. An image
+    # whose previous present had no answer yet still holds the frame the game drew there.
+    order = [(int(m.group(1)), int(m.group(2)), m.group(3)) for m in
+             (re.search(r"frame (\d+) image (\d+) state=(\w+)", line)
+              for line in got.stdout.splitlines()) if m]
+    last, wrong, untouched = {}, [], 0
+    for present_index, (frame, image, state) in enumerate(order):
+        if state == "untouched" and present_index < len(seen):
+            untouched += 1
+            earlier = last.get(image)
+            answered = earlier - 1 if pipelined else earlier
+            want = (tuple(reply(answered)) if answered is not None and answered >= 0
+                    else (earlier + 1, 128, 64, 255))
+            if tuple(seen[present_index]) != want:
+                wrong.append((present_index, tuple(seen[present_index]), want))
+        last[image] = present_index
     check(f"{label}: what the layer wrote is in the image next time round",
-          bool(held) and len(answered) == len(held),
-          f"{len(answered)} of {len(held)} untouched frames carry the daemon's answer")
+          untouched > 0 and not wrong,
+          f"{untouched - len(wrong)} of {untouched} untouched frames hold the answer to request "
+          f"{'n-1' if pipelined else 'n'}" + (f"; first wrong {wrong[0]}" if wrong else ""))
+    if pipelined:
+        check(f"{label}: the layer says it is pipelined", "[nr_layer] async:" in got.stderr,
+              "its own announcement, not the environment it was given")
     _, off = validation_environment({"VK_LAYER_PATH": ""})
     if not off:
         # The layer's default output is stdout, not stderr; read both so a change of
@@ -255,6 +287,8 @@ def main():
     for mode in (None, "semaphore"):
         for attempt in range(1, attempts + 1):
             run(mode, attempt, attempts)
+    for attempt in range(1, attempts + 1):
+        run(None, attempt, attempts, pipelined=True)
     if FAILURES:
         print("FAILED: " + ", ".join(FAILURES))
         return 1

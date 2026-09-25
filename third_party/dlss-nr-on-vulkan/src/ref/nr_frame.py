@@ -207,6 +207,26 @@ def gate_formula(logit, blend_scale=BLEND_SCALE):
 HOLD_RAMP = np.float32(4.0)
 
 
+def release_slope(levels):
+    """The folded constant of the release: the gate's share falls from all of it at no
+    change to none by `levels` of 255. 0 turns it off."""
+    return float(np.float32(-255.0 / levels)) if levels > 0 else 0.0
+
+
+def release_factor(current, previous, slope):
+    """How much of the model's gate a pixel keeps, from what the game did to it: the
+    largest step of its three channels, `clip(1 + moved * slope, 0, 1)` in the order the
+    native composition computes it."""
+    moved = np.abs(np.subtract(current[..., 0], previous[..., 0], dtype=np.float32))
+    scratch = np.empty_like(moved)
+    for channel in (1, 2):
+        np.subtract(current[..., channel], previous[..., channel], out=scratch)
+        np.maximum(moved, np.abs(scratch, out=scratch), out=moved)
+    np.multiply(moved, np.float32(slope), out=moved)
+    np.add(moved, np.float32(1.0), out=moved)
+    return np.clip(moved, 0, 1, out=moved)[..., None]
+
+
 def hold_floor(current, previous, strength):
     """Per-pixel lower bound on the history weight, from what the *game* did: full where
     the game handed back the same pixel, gone by `HOLD_RAMP` levels of 255 (notes/phase54).
@@ -368,7 +388,7 @@ def run_head(model, color, *, profile="standard", frame_index=0, style_index=Non
 def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=1.0,
             detail_radius=4.0, control_mask=None, history=None,
             history_confidence=1.0, history_floor=None, history_previous=None,
-            history_hold=0.0, blend_scale=BLEND_SCALE):
+            history_hold=0.0, history_release=0.0, blend_scale=BLEND_SCALE):
     """The head over the frame. Post-network and cheap: sweep it without re-running.
 
     With a `history` image this is MLX-DLSS's `compose_temporal` instead of its
@@ -388,6 +408,13 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
     that can prove the history is correct for a pixel — because the game handed back the
     same bytes — can say so here. The floor is still bounded by `blend_scale`, so no
     pixel is held harder than the model itself ever holds one.
+
+    `history_release` is the other half of the same signal: where the game's pixel changed
+    by `history_release` levels of 255 or more, none of the gate survives, and by less, a
+    share that falls linearly with the change. Without motion vectors the history at a
+    pixel something moved across is what was there before, and a gate that reads 0.6 over
+    a whole Tekken frame kept a trail of it behind everything that moved. It lowers only
+    the gate — never the floor, which is zero wherever the game changed a pixel anyway.
 
     `intensity` blends the model's picture against the source, per pixel when a
     ControlMask supplies its red channel. `detail_strength` and `colour_strength`
@@ -411,8 +438,9 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
             history = np.asarray(history, dtype=np.float32)
             if history.shape != color.shape:
                 raise ValueError("history must match the colour image shape")
-            previous = (history_previous if history_previous is not None and history_hold > 0
-                        else None)
+            previous = (history_previous if history_previous is not None
+                        and (history_hold > 0 or history_release > 0) else None)
+            slope_release = release_slope(history_release)
             if nr_image is not None and history_floor is None:
                 # Everything temporal in the one native pass: the gate from its table (the
                 # exp that kept it in NumPy is inside the table), the confidence, and the
@@ -426,13 +454,16 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
                     hold=float(history_hold) if previous is not None else 0.0,
                     slope=(float(np.float32(-255.0 * history_hold / HOLD_RAMP))
                            if previous is not None else 0.0),
-                    table=gate_table(float(blend_scale)), confidence=confidence)
+                    table=gate_table(float(blend_scale)), confidence=confidence,
+                    release=slope_release if previous is not None else 0.0)
             if previous is not None and history_floor is None and composed is None:
                 history_floor = hold_floor(color, previous, history_hold)
             alpha = (history_weight(head, blend_scale=blend_scale)
                      if composed is None else None)
             if composed is None and history_confidence != 1.0:
                 alpha = alpha * np.clip(np.float32(history_confidence), 0, 1)
+            if composed is None and previous is not None and slope_release != 0.0:
+                alpha = alpha * release_factor(color, previous, slope_release)
             if composed is None and history_floor is not None:
                 floor = np.clip(np.asarray(history_floor, dtype=np.float32), 0, 1)
                 np.maximum(alpha, floor * np.float32(blend_scale), out=alpha)

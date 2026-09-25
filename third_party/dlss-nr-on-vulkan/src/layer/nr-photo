@@ -21,6 +21,10 @@
 #                                             frames between hold the last result. Set
 #                                             the game small — Tekken 7 at 640x360 ran 25 fps,
 #                                             the compositor stretches it (notes/phase47).
+#   NR_ASYNC=1   with NR_LIVE: the daemon works on this frame while the game draws the
+#                                             next, and each present shows the answer
+#                                             for the one before — more frames a second
+#                                             for one more frame of latency.
 #
 #   touch /tmp/nr_trigger     # freeze and enhance
 #   rm    /tmp/nr_trigger     # back to the game
@@ -60,6 +64,9 @@ fi
 # Live mode is a rate, not a flag: N presents per rendered frame.
 if [ -n "${NR_LIVE:-}" ]; then
     export NR_LAYER_LIVE="$NR_LIVE"
+fi
+if [ -n "${NR_ASYNC:-}" ] && [ "${NR_ASYNC}" != 0 ]; then
+    export NR_LAYER_ASYNC=1
 fi
 
 if [ "${1:-}" = "--proton" ] || [ "${1:-}" = "--check-proton" ]; then
@@ -145,6 +152,9 @@ if [ "${1:-}" = "--steam" ]; then
     fi
     if [ -n "${NR_LAYER_LIVE:-}" ]; then
         mask="${mask}NR_LAYER_LIVE=${NR_LAYER_LIVE} "
+    fi
+    if [ -n "${NR_LAYER_ASYNC:-}" ]; then
+        mask="${mask}NR_LAYER_ASYNC=1 "
     fi
     printf '  VK_LAYER_PATH=%q VK_INSTANCE_LAYERS=VK_LAYER_dlssnr_intel ENABLE_NR_LAYER=1 NR_LAYER_SOCKET=%q NR_LAYER_TRIGGER=%q %s%%command%%\n\n' \
            "$layer_dir" "$socket" "$trigger" "$mask"

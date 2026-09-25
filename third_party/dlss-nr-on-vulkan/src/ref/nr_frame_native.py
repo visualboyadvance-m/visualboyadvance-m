@@ -28,7 +28,7 @@ class Params(C.Structure):
                 ("normalized_style", C.c_float), ("local_tone", C.c_float),
                 ("local_structure", C.c_float), ("frame_index", C.c_int),
                 ("history_confidence", C.c_float), ("blend_scale", C.c_float),
-                ("hold", C.c_float), ("slope", C.c_float),
+                ("hold", C.c_float), ("slope", C.c_float), ("release", C.c_float),
                 ("automatic_mask", C.c_int), ("skin_structure", C.c_float),
                 ("automatic_structure", C.c_float)]
 

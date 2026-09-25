@@ -50,6 +50,9 @@ typedef struct nr_frame_params {
     float blend_scale;        /* half(0.73974609375), the recovered package's */
     float hold;               /* floor under the gate where `previous` matches the colour: */
     float slope;              /*   max(alpha, min(clamp(moved * slope + hold, 0, hold), 1) * blend_scale) */
+    float release;            /* where `previous` does not match: alpha *= clamp(moved * release + 1, 0, 1),
+                               * before the floor; folded like `slope`, -255 / levels (`nr_frame.release_slope`),
+                               * 0 off */
     /* the automatic mask: skin structure and automatic-mask structure, each -1 to follow
      * `local_structure`; off unless `automatic_mask` is set */
     int   automatic_mask;
@@ -158,6 +161,15 @@ int nr_frame_features(nr_frame *frame, const float *colour, int height, int widt
 int nr_frame_run_features(nr_frame *frame, const float *features,
                           int network_height, int network_width,
                           float *head /* (network_height, network_width, 4) */);
+
+/* The network half of `nr_frame_update`, as the daemon runs it under a render scale:
+ * the features built as the update builds them (as half in the graph's own input under
+ * NR_INPUT_FP16), the graph, and the head cropped to (h, w, 4). No float32 feature array
+ * and no composition, so the caller can resample the head and compose it at another
+ * extent with `nr_frame_compose`. `history` (h, w, 3) or NULL, `control_mask` likewise. */
+int nr_frame_head(nr_frame *frame, const float *colour, int height, int width,
+                  const float *history, const float *control_mask,
+                  const nr_frame_params *params, float *head);
 
 /* Seconds spent, in the last run, writing the input, running the graph, reading the
  * head: 0, 1, 2. On a discrete card the outer two are the bus. */

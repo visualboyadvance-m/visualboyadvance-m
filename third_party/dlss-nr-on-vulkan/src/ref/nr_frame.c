@@ -2266,6 +2266,7 @@ static int compose(struct nr_frame *f, const float *head, ptrdiff_t hy, ptrdiff_
                             NULL, 0, 0, f->gate_table, confidence,
                             mask, mask ? s : 0, mask ? 3 : 0, (size_t)height, (size_t)width,
                             p->intensity, p->blend_scale, previous ? p->hold : 0.0f, previous ? p->slope : 0.0f,
+                            previous ? p->release : 0.0f,
                             output);
     } else if (mask) {
         /* `compose_head` with a mask: blend = clip(red * intensity, 0, 1) — and past
@@ -2290,6 +2291,7 @@ void nr_frame_defaults(nr_frame_params *p)
     p->intensity = 1.0f; p->detail_strength = 1.0f; p->colour_strength = 1.0f; p->detail_radius = 4.0f;
     p->normalized_style = 0.0f; p->local_tone = 1.0f; p->local_structure = 1.0f; p->frame_index = 0;
     p->history_confidence = 1.0f; p->blend_scale = 0.73974609375f; p->hold = 0.0f; p->slope = 0.0f;
+    p->release = 0.0f;
     p->automatic_mask = 0; p->skin_structure = -1.0f; p->automatic_structure = -1.0f;
 }
 
@@ -2541,4 +2543,26 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
             for (int x = 0; x < width; x++)
                 memcpy(head_out + ((size_t)y * width + x) * 4, wide + (size_t)y * hy + (size_t)x * hx, 4 * sizeof(float));
     return compose(f, wide, hy, hx, colour, height, width, history, previous, control_mask, params, output);
+}
+
+int nr_frame_head(nr_frame *f, const float *colour, int height, int width, const float *history,
+                  const float *control_mask, const nr_frame_params *params, float *head)
+{
+    nr_frame_params d;
+    if (!params) { nr_frame_defaults(&d); params = &d; }
+    if (height <= 0 || width <= 0 || !colour || !head) FAILF("head needs a colour image and an output");
+    if (prepare_extent(f, aligned_extent(height), aligned_extent(width))) return -1;
+    /* nr_frame_update's first half: the features as half in the graph's own input under
+     * NR_INPUT_FP16, the graph, and the head cropped to the colour's extent. */
+    uint16_t *half_in = f->opt.input_fp16 ? input_half(f) : NULL;
+    if (f->opt.input_fp16 && !half_in) FAILF("graph buffers are missing");
+    if (features_into(f, colour, height, width, history, control_mask, params,
+                      half_in ? NULL : f->features_host, half_in)) return -1;
+    const float *wide = run_graph(f, half_in ? NULL : f->features_host);
+    if (!wide) return -1;
+    ptrdiff_t hx = f->head_stride, hy = (ptrdiff_t)f->width * hx;
+    for (int y = 0; y < height; y++)
+        for (int x = 0; x < width; x++)
+            memcpy(head + ((size_t)y * width + x) * 4, wide + (size_t)y * hy + (size_t)x * hx, 4 * sizeof(float));
+    return 0;
 }

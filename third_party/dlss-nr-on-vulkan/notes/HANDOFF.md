@@ -9,7 +9,84 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: three more dlss-nr-on-intel commits, on every runtime (2026-09-25, evening)
+## Latest: six more dlss-nr-on-intel commits, on every runtime (2026-09-25, night)
+
+`bd9e13a`..`2f23eff` of `uzbekunknown/dlss-nr-on-intel` are in: the README's I/O paragraph,
+the `release` knob, render scale 0.9 for screenshots (`src/bench/scale_spectrum.py`), the async
+live mode and its two HANDOFF entries (next sections). Carried past them:
+
+- **`release` is in the C frame library.** `nr_frame_params` has a `release` field after
+  `slope`, folded the same way — `-255 / levels`, `nr_frame.release_slope` — and 0, the default,
+  is off; `nr_frame_compose` / `nr_frame_update` hand it to `nr_compose_temporal`'s new `release`
+  argument when a `previous` frame is given. `nr_frame_native.Params` carries it. The struct grew
+  by one float, so a host built against the old header must be rebuilt (VBA-M's filter uses
+  `nr_frame_defaults` and the still path, so it compiles unchanged and the release stays off).
+- **`nr_compose_temporal` runs the release on `nr_image.c`'s own pool**, not OpenMP, like the
+  rest of that pass; the per-pixel `moved` is taken once for the release and the floor.
+- **Every runtime has both.** The release is host code after the graph, and the async mode is
+  the layer's socket protocol with the daemon, so neither touches libxmx, libmetalmx or
+  libd3dmx: a daemon on `NR_GPU_BACKEND=metal` or `d3d12` serves an async layer as it serves a
+  synchronous one. The layer itself is still POSIX-only, so on Windows the async mode has no
+  client yet.
+
+Verified on the M3: `test_native_image` (12 release cases against NumPy, and released pixels
+the still frame bit for bit) at the default, 1 and 3 threads; the C frame test pair on Vulkan
+and Metal with two new release checks each — within 2e-6 of NumPy's release through the C
+library, and released pixels exactly the confidence-0 frame; `test_present` and
+`test_present_negative` with `NR_BUILD_LAYER=ON` through MoltenVK, the async cases included (every
+untouched frame holds the answer to request n-1). No Xe2, phone or Windows run.
+
+Also new beside them: **`nr_frame_rates`** (`src/bench/nr_frame_rates.c`, CMake and Makefile), a C
+`live_rates.py` — the daemon's whole frame through `libnr_frame` in one process, the history, hold
+and release included, printing the same table and the `nr_knobs.RATES` literal; `--pan N` keeps the
+history alive, which fresh random frames (the default, like `live_rates.py`) never do. It needed
+**`nr_frame_head()`** in `nr_frame.h`: the network half of `nr_frame_update` — features as half in
+the mapped input, the graph, the head cropped — with no composition, so a host can run the network
+at a render scale and compose at full size.
+
+## Latest: the async live mode exists, and is off by default for a reason (2026-09-25, night)
+
+`NR_LAYER_ASYNC=1` (with live mode): on each processed present the layer sends this frame
+and shows the answer to the previous one, so the daemon works while the game draws. Correct
+and tested — `test_present.py` checks which answer every image holds, n synchronously and
+n-1 async, and the async expectation fails against a synchronous layer.
+
+**In Tekken 7 it did not pay.** 640x360: 29-31 fps against 25-32 synchronous; 1280x720 at
+0.3: 21-22 against 20-22 — and the graph itself **3 ms slower** (28 against 25 ms at
+320x320), because the game's rendering now runs beside it on the same iGPU. What it hides
+is CPU time, and there is little of it left; what it adds is a frame of latency, which the
+owner felt at once and more at larger scales and resolutions. His threshold: under ~15 ms
+of added latency or not at all. So it stays an option, off. It is kept for machines where
+the work around the network is a large share of the frame — the Windows run in PR #3 spent
+0.3 s of 2.3 s on the GPU — since that work is what the overlap hides.
+
+## At 30 fps a trail appeared, and a `release` knob drops it (2026-09-25, evening)
+
+In Tekken 7 with the new kernels — **640x360 25-32 fps, 1280x720 20-22, 1920x1080 10-13**,
+the owner playing — the owner saw ghosting behind everything that moved, which 10 fps had
+hidden. The cause is the model's history gate, not our hold floor: with identity
+reprojection a moving pixel's history is what used to be there, and the gate read 0.63 over
+the whole session. `release` fades the gate out where the game's own pixel changed — full
+at no change, none by 24 levels of 255 — and leaves the floor alone. 24 is the owner's
+choice from 4/8/16/24 in the game; 0 restores the old behaviour. `notes/phase54`.
+
+The knob descriptions were rewritten at the owner's request: general, no scene a user
+cannot see (a kimono, an iris). The measurements they used to quote are in the notes.
+
+**Render scale 0.9 looks better than 1.0, and it is not arithmetic.** The owner saw it in
+DoA5 at 720p (0.9 over 0.95 and 1.0) and it measures (`src/bench/scale_spectrum.py`, three
+DoA5 frames cropped to a native 1280x720, temporal off): at 1.0 the pass's change is
+**1.5-1.7x smaller** (mean |Δ luma| 0.025-0.026 against 0.039-0.043 at 0.9), and **3-4x
+more of it is pixel-level** — 3 % of the added energy above half Nyquist against 0.9 %,
+on two of the frames. At the display size the network is handed the game's raw pixels,
+jagged edges included, and turns part of them into grain; bilinear to 0.9 smooths them
+first, and the upscale of what it draws cannot make pixel-level content. That fits the
+vendor's own arrangement, where the pass runs at the render resolution and DLSS upscales
+after it. Padding is not it: the extents are 1280x768, 1216x704 and 1152x704, and 0.95,
+with the least padding, looked worse than 0.9. The render scale's text now says 0.9 for
+screenshots.
+
+## Three more dlss-nr-on-intel commits, on every runtime (2026-09-25, evening)
 
 `3e2688d`..`3a6bb27` of `uzbekunknown/dlss-nr-on-intel` are in: window attention in one
 workgroup a window, the fused feed-forward sixteen subgroups a workgroup with the narrow blocks'

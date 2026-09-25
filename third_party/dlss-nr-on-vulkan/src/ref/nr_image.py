@@ -50,7 +50,7 @@ def _library():
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, ptr, C.c_float, ptr, stride, stride,
-        size, size, C.c_float, C.c_float, C.c_float, C.c_float, ptr]
+        size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float, ptr]
     lib.nr_compose_temporal.restype = None
     lib.nr_resize_axis.argtypes = [ptr, stride, stride, stride, size, size, size,
                                   C.c_int, ptr, ptr, ptr, ptr]
@@ -171,7 +171,7 @@ def to_half(source, target):
 
 
 def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
-                     blend_scale, hold, slope, table=None, confidence=1.0):
+                     blend_scale, hold, slope, table=None, confidence=1.0, release=0.0):
     """`nr_frame.compose` with a history, a floor and an optional control mask.
 
     With `table` — `nr_frame.gate_table`, NumPy's sigmoid on every half value — the gate
@@ -180,6 +180,7 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
     NumPy. Either way the sigmoid is NumPy's: `expf` and NumPy's float32 exponential
     disagree in the last bit, and the contract here is byte-identical output rather than
     nearly. `slope` is the folded constant of the floor, for the same reason — see the C.
+    `release`, folded the same way, fades the gate where the game's pixel changed; 0 is off.
     """
     lib = library()
     if lib is None:
@@ -220,7 +221,7 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
         table.ctypes.data if table is not None else None, confidence,
         mask.ctypes.data if mask is not None else None,
         *(_strides(mask)[:2] if mask is not None else (0, 0)),
-        *colour.shape[:2], intensity, blend_scale, hold, slope, output.ctypes.data)
+        *colour.shape[:2], intensity, blend_scale, hold, slope, release, output.ctypes.data)
     return output
 
 

@@ -219,6 +219,21 @@ def main():
               float(np.abs(c_t - history)[1::3].mean()) < float(np.abs(py_no_floor - history)[1::3].mean()))
         check("temporal: shared composition is the NumPy contract",
               shared is not None and np.array_equal(shared, py_t))
+        # the release through the C library: the folded slope in the parameters, against
+        # NumPy's release on the same head, the floor and the gate as above
+        slope_r = nr_frame.release_slope(16.0)
+        c_r = native.update(colour, history=history, previous=previous,
+                            hold=0.6, slope=-0.6 * 255 / 4, release=slope_r)
+        py_r = nr_frame.compose(py_t_head, colour, history=history, history_previous=previous,
+                                history_hold=0.6, history_release=16.0)
+        r = np.abs(c_r - py_r)
+        check("temporal: the release within 2e-6 of the Python (gate exp)",
+              float(r.max()) <= 2e-6, f"max |d| {r.max():.3e}, {int((r > 0).sum())} of {r.size} differ")
+        gone = nr_frame.release_factor(colour, previous, slope_r)[..., 0] == 0
+        c_still = native.update(colour, history=history, history_confidence=0.0)
+        check("temporal: released pixels are the confidence-0 frame, bit for bit",
+              int(gone.sum()) > gone.size // 10 and np.array_equal(c_r[gone], c_still[gone]),
+              f"{int(gone.sum())} of {gone.size} released")
 
         # 6. a second extent rebuilds the graph and keeps the weights
         small = rng.uniform(0, 1, (96, 128, 3)).astype(np.float32)

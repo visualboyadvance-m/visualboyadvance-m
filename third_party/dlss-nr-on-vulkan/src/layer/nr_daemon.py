@@ -141,7 +141,7 @@ class Settings:
     """
 
     KNOBS = ("profile", "intensity", "detail_strength", "colour_strength", "render_scale",
-             "temporal", "cut_limit", "hold")
+             "temporal", "cut_limit", "hold", "release")
 
     def __init__(self, args):
         self.path = args.settings
@@ -196,6 +196,11 @@ class Settings:
                     # the previous frame, which is ringing, not stability.
                     if not 0.0 <= value <= 1.0:
                         print(f"settings: {knob} must be between 0 and 1", flush=True)
+                        continue
+                elif knob == "release":
+                    # levels of 255; 0 is off
+                    if not 0.0 <= value <= 255.0:
+                        print("settings: release must be between 0 and 255", flush=True)
                         continue
                 elif not 0.0 <= value <= 2.0:
                     # the vendor's own panel stops at 2 (notes/phase30-control-atlas.md)
@@ -624,13 +629,15 @@ def process_connection(connection, backend, args):
     # (`nr_frame.compose`, `history_previous`); only its share for the log line is taken
     # here, on every eighth pixel of every eighth row — exactly the values the full floor
     # has there.
-    previous = history_pixels if history_pixels is not None and live.hold > 0 else None
+    previous = (history_pixels if history_pixels is not None
+                and (live.hold > 0 or live.release > 0) else None)
     output = nr_frame.compose(head, colour, intensity=live.intensity,
                               detail_strength=live.detail_strength,
                               colour_strength=live.colour_strength,
                               control_mask=control, history=history_full,
                               history_confidence=live.temporal,
-                              history_previous=previous, history_hold=live.hold)
+                              history_previous=previous, history_hold=live.hold,
+                              history_release=live.release)
     # Measure before the write-back: putting the result into `whole` and then differencing
     # against `whole` compares an array with itself, which reported change 0.00000.
     # On every fourth row, like the log's other figures: the whole frame took 5 ms of a
@@ -698,6 +705,10 @@ def process_connection(connection, backend, args):
             gate = float(nr_frame.history_weight(head[::8, ::8]).mean())
             hold = "" if previous is None else (
                 f", held {100 * float((hold_floor(colour[::8, ::8], previous[::8, ::8], live.hold) > 0).mean()):.0f}%")
+            if previous is not None and live.release > 0:
+                kept = nr_frame.release_factor(colour[::8, ::8], previous[::8, ::8],
+                                               nr_frame.release_slope(live.release))
+                hold += f", released {100 * float((kept == 0).mean()):.0f}%"
             note += f"  gate {gate:.3f}{hold}, cut {args.history.cut:.4f}"
     box = "" if not boxed else (f"  letterbox {height - (bottom - top)}px of rows and "
                                f"{width - (right - left)}px of columns skipped")
@@ -735,6 +746,9 @@ def main():
     parser.add_argument("--hold", type=float, default=1.0,
                         help="how hard to hold pixels the game handed back unchanged, "
                              "0-1; this is the floor under the model's own gate")
+    parser.add_argument("--release", type=float, default=24.0,
+                        help="levels of 255 of change in the game's own pixel by which none "
+                             "of the model's history gate survives there, 0-255; 0 is off")
     parser.add_argument("--cut-limit", type=float, default=0.15,
                         help="mean absolute frame-to-frame change above which the shot is "
                              "taken to have cut and the history is dropped")
@@ -754,6 +768,8 @@ def main():
     for knob in ("temporal", "cut_limit", "hold"):
         if not 0.0 <= getattr(args, knob) <= 1.0:
             parser.error(f"--{knob.replace('_', '-')} must be between 0 and 1")
+    if not 0.0 <= args.release <= 255.0:
+        parser.error("--release must be between 0 and 255")
     args.live = Settings(args)
     args.history = History()
     args.letterbox = Letterbox()

@@ -145,8 +145,8 @@ def main():
             check("every knob is on the screen", not missing,
                   f"{len(nr_knobs.KNOBS)} of them" if not missing else f"missing {missing}")
             flat = squashed(drawn)
-            check("the selected knob explains itself",
-                  squashed("only the synthesised part is interpolated") in flat,
+            opening = nr_knobs.BY_NAME["render_scale"].detail.split(". ")[0]
+            check("the selected knob explains itself", squashed(opening) in flat,
                   "the detail text of `render scale`, which starts selected")
             missing = [text for text in ("1024x768", "held 65%", "gate 0.429", "5.0 fps")
                        if squashed(text) not in flat]

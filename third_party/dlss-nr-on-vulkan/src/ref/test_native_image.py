@@ -225,24 +225,40 @@ def compose_checks(rng):
                                        slope=float(slope)),
              reference)
 
-    # The whole temporal path native: the gate from its table, the confidence and the floor
-    # from the previous frame inside the pass, against the NumPy that computes each of them.
-    for hold, with_previous, control, confidence in (
-            (1.0, True, None, 1.0), (0.5, True, mask, 1.0), (1.0, True, None, 0.6),
-            (0.0, True, None, 1.0), (1.0, False, None, 1.0), (0.25, True, mask, 0.0)):
+    # The whole temporal path native: the gate from its table, the confidence, the floor and
+    # the release from the previous frame inside the pass, against the NumPy that computes
+    # each of them.
+    for hold, with_previous, control, confidence, release in (
+            (1.0, True, None, 1.0, 0.0), (0.5, True, mask, 1.0, 0.0), (1.0, True, None, 0.6, 0.0),
+            (0.0, True, None, 1.0, 0.0), (1.0, False, None, 1.0, 0.0), (0.25, True, mask, 0.0, 0.0),
+            (1.0, True, None, 1.0, 16.0), (0.0, True, None, 1.0, 16.0), (0.5, True, mask, 0.6, 8.0),
+            (1.0, True, None, 1.0, 1.0), (1.0, False, None, 1.0, 16.0), (1.0, True, None, 1.0, 64.0)):
         before = previous if with_previous else None
         with numpy_only():
             reference = nr_frame.compose(head, colour, intensity=1.0, history=history,
                                          history_confidence=confidence,
                                          history_previous=before, history_hold=hold,
-                                         control_mask=control)
-        same(f"native temporal path, hold {hold}, confidence {confidence}"
+                                         history_release=release, control_mask=control)
+        same(f"native temporal path, hold {hold}, confidence {confidence}, release {release:g}"
              f"{', masked' if control is not None else ''}"
              f"{'' if with_previous else ', no previous frame'}",
              nr_frame.compose(head, colour, intensity=1.0, history=history,
                               history_confidence=confidence, history_previous=before,
-                              history_hold=hold, control_mask=control),
+                              history_hold=hold, history_release=release,
+                              control_mask=control),
              reference)
+
+    # What the release is for: where the game's pixel moved by the release or more, nothing
+    # of the previous output is left — the frame is the still one there, bit for bit.
+    released = nr_frame.release_factor(colour, previous, nr_frame.release_slope(16.0))[..., 0] == 0
+    temporal = nr_frame.compose(head, colour, intensity=1.0, history=history,
+                                history_previous=previous, history_hold=1.0,
+                                history_release=16.0)
+    still = nr_frame.compose(head, colour, intensity=1.0)
+    same(f"released pixels carry no history ({int(released.sum())} of them)",
+         temporal[released], still[released])
+    if not 100 < int(released.sum()) < released.size // 2:
+        FAILURES.append("the release test's moving band does not move")
 
 
 def main():

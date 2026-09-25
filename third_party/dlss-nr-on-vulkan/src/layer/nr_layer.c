@@ -78,6 +78,11 @@ struct device_data {
 	int have_earlier;
 	unsigned char *outgoing;        /* colour followed by the mask, for one send */
 	VkDeviceSize outgoing_size;
+	/* NR_LAYER_ASYNC: the frame sent on the last processed present, whose answer is read
+	 * on the next one. Zero-initialised devices must not read fd 0 as a request. */
+	int inflight;
+	int inflight_fd;
+	VkDeviceSize inflight_size;
 	PFN_vkGetDeviceProcAddr get_device_proc;
 	PFN_vkQueuePresentKHR present;
 	PFN_vkCreateSwapchainKHR create_swapchain;
@@ -106,6 +111,7 @@ static VkInstance layer_instance;
 static const char *capture_path;
 static long capture_every;
 static long live_every;
+static int async_live;
 static const char *socket_path;
 static const char *trigger_path;
 static int ui_mask;
@@ -117,8 +123,8 @@ static int ui_mask;
 /* `reply_size` is deliberately separate from `payload_size`: the interface mask makes
  * the request larger than the answer, and reusing one size meant asking for bytes the
  * daemon never sends — the read hit EOF and every masked frame came back unchanged. */
-static int exchange(const void *header, size_t header_size, const void *payload,
-		    size_t payload_size, void *reply, size_t reply_size)
+static int exchange_send(const void *header, size_t header_size, const void *payload,
+			 size_t payload_size)
 {
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd < 0) return -1;
@@ -153,6 +159,12 @@ static int exchange(const void *header, size_t header_size, const void *payload,
 		if (n <= 0) { close(fd); return -1; }
 		sent += (size_t)n;
 	}
+	return fd;
+}
+
+/* Reads the whole answer and closes the connection, whichever way it ends. */
+static int exchange_receive(int fd, void *reply, size_t reply_size)
+{
 	unsigned char *in = reply;
 	for (size_t got = 0; got < reply_size; ) {
 		ssize_t n = read(fd, in + got, reply_size - got);
@@ -162,6 +174,33 @@ static int exchange(const void *header, size_t header_size, const void *payload,
 	}
 	close(fd);
 	return 0;
+}
+
+static int exchange(const void *header, size_t header_size, const void *payload,
+		    size_t payload_size, void *reply, size_t reply_size)
+{
+	int fd = exchange_send(header, header_size, payload, payload_size);
+	return fd < 0 ? -1 : exchange_receive(fd, reply, reply_size);
+}
+
+/* An answer still on its way is read to the end and thrown away rather than cut off: the
+ * daemon is single-file and would log a broken pipe for it, and the panel reads that log.
+ * It costs at most one frame of the daemon's, and only when the effect is switched off,
+ * the swapchain changes or the device goes. */
+static void drop_inflight(struct device_data *data)
+{
+	if (!data->inflight) return;
+	data->inflight = 0;
+	unsigned char sink[65536];
+	for (VkDeviceSize got = 0; got < data->inflight_size; ) {
+		size_t want = data->inflight_size - got < sizeof sink
+			      ? (size_t)(data->inflight_size - got) : sizeof sink;
+		ssize_t n = read(data->inflight_fd, sink, want);
+		if (n < 0 && errno == EINTR) continue;
+		if (n <= 0) break;
+		got += (VkDeviceSize)n;
+	}
+	close(data->inflight_fd);
 }
 
 static struct device_data *find_device(VkDevice device)
@@ -347,6 +386,11 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_CreateInstance(const VkInstanceCreateInfo *inf
 		const char *live = getenv("NR_LAYER_LIVE");
 		live_every = live ? strtol(live, NULL, 10) : 0;
 		if (live_every < 0) live_every = 0;
+		const char *pipelined = getenv("NR_LAYER_ASYNC");
+		async_live = live_every > 0 && pipelined && strcmp(pipelined, "0") != 0;
+		if (async_live)
+			fprintf(stderr, "[nr_layer] async: each processed present shows the answer "
+				"for the one before it, and the daemon works while the game draws\n");
 		if (live_every > 0)
 			fprintf(stderr, "[nr_layer] live: every %ld%s present goes through the "
 				"network, the frames between hold the last result\n",
@@ -493,6 +537,7 @@ VKAPI_ATTR VkResult VKAPI_CALL nr_CreateSwapchainKHR(VkDevice device,
  * parallel ProjectsCodex tree. */
 static void release_device(struct device_data *data)
 {
+	drop_inflight(data);
 	if (data->mapped) {
 		PFN_vkUnmapMemory unmap =
 			(PFN_vkUnmapMemory)data->get_device_proc(data->device, "vkUnmapMemory");
@@ -859,6 +904,44 @@ static int process_frame(struct device_data *data, struct swapchain_data *chain,
 	return 0;
 }
 
+/* NR_LAYER_ASYNC: the frame goes out and the answer for the one before it comes back, so
+ * the daemon works while the game draws its next frame instead of the game waiting for the
+ * daemon; what is on screen is one processed present behind. The old answer is read before
+ * the new frame is sent. The other order deadlocks: an answer is larger than a socket's
+ * buffer, and the daemon, which takes one connection at a time, cannot accept the new frame
+ * until the old answer has been read. */
+static int process_frame_async(struct device_data *data, struct swapchain_data *chain,
+			       VkQueue queue, uint32_t index)
+{
+	VkDeviceSize needed = (VkDeviceSize)chain->extent.width * chain->extent.height * 4;
+	if (ensure_resources(data, needed) || transfer(data, chain, queue, index, 0)) {
+		drop_inflight(data);
+		return -1;
+	}
+	int answered = 0;
+	if (data->inflight && data->inflight_size == needed) {
+		data->inflight = 0;
+		answered = exchange_receive(data->inflight_fd, data->result, (size_t)needed) == 0;
+		if (!answered)
+			fprintf(stderr, "[nr_layer] the daemon did not answer; frame unchanged\n");
+	} else {
+		drop_inflight(data);          /* the extent changed under it: it fits nothing */
+	}
+	if (socket_path) {
+		uint32_t header[4] = { 0x304E524Eu, chain->extent.width, chain->extent.height,
+				       (uint32_t)chain->format };
+		int fd = exchange_send(header, sizeof header, data->mapped, (size_t)needed);
+		if (fd >= 0) {
+			data->inflight = 1;
+			data->inflight_fd = fd;
+			data->inflight_size = needed;
+		}
+	}
+	if (!answered) return -1;
+	memcpy(data->mapped, data->result, (size_t)needed);
+	return 0;
+}
+
 /* A completed private fence covers the consumed waits and all copies. Forward the
  * original wait list only when no copy submission has taken ownership of it. */
 static VkResult present_now(struct device_data *data, VkQueue queue,
@@ -931,7 +1014,10 @@ static VkResult present_locked(VkQueue queue,
 		 * turned on and off mid-game without restarting it. With no trigger
 		 * configured, live mode simply always runs. */
 		int on = !trigger_path || access(trigger_path, F_OK) == 0;
-		if (!on) data->holding = 0;
+		if (!on) {
+			data->holding = 0;
+			drop_inflight(data);
+		}
 		for (uint32_t i = 0; on && i < info->swapchainCount; i++) {
 			if (data->device_error || data->transfer_error) return present_now(data, queue, info);
 			struct swapchain_data *chain = find_swapchain(info->pSwapchains[i]);
@@ -939,12 +1025,15 @@ static VkResult present_locked(VkQueue queue,
             if (data->result_chain != chain->swapchain) {
                 data->holding = data->have_earlier = 0;
                 data->result_chain = chain->swapchain;
+                drop_inflight(data);
             }
 			uint32_t index = info->pImageIndices[i];
 			VkDeviceSize want = (VkDeviceSize)chain->extent.width
 					  * chain->extent.height * 4;
 			if (data->frame_counter % (unsigned long)live_every == 0) {
-				if (process_frame(data, chain, queue, index) == 0) {
+				int done = async_live ? process_frame_async(data, chain, queue, index)
+						      : process_frame(data, chain, queue, index);
+				if (done == 0) {
 					data->holding = 1;
 					transfer(data, chain, queue, index, 1);
 				} else data->holding = 0; /* never replay a partially received reply */

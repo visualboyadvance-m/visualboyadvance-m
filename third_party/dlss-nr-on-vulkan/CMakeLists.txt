@@ -1002,6 +1002,16 @@ else()
   message(STATUS "libpng not found: the nr_frame command is not built (the libraries and tests are)")
 endif()
 
+# live_rates.py for the C library: the daemon's frame, end to end, in one process.
+add_executable(nr_frame_rates src/bench/nr_frame_rates.c)
+target_include_directories(nr_frame_rates PRIVATE src/ref)
+target_compile_options(nr_frame_rates PRIVATE ${NR_WARN_FLAGS})
+target_link_libraries(nr_frame_rates PRIVATE nr_frame)
+if(NOT MSVC)
+  target_link_libraries(nr_frame_rates PRIVATE m)
+endif()
+nr_executable(nr_frame_rates)
+
 add_executable(test_nr_frame src/ref/test_nr_frame.c)
 target_include_directories(test_nr_frame PRIVATE src/ref)
 target_compile_options(test_nr_frame PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})

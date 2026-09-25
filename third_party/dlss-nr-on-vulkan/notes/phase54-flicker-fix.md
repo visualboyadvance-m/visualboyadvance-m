@@ -161,3 +161,26 @@ of the work and no less faithful.
   to about 1.28 fps, so consecutive frames in `work/good` are ~0.8 s apart rather than
   ~0.2 s. That makes this measurement pessimistic: in live play less of the frame has
   moved between presents, so the hold covers more of it.
+
+## And the trail it left, once the frame rate could show one (2026-09-25)
+
+At 25-32 fps in Tekken 7 the owner saw what 10 fps had hidden: **ghosting — a trail behind
+everything that moved**. The hold floor was not the cause; it cannot be, since the frame
+that changes a pixel releases it. The model's own gate was. Without motion vectors the
+history at a pixel something moved across is whatever used to be there, and the gate is
+not local enough to refuse it: over the Tekken session it read **0.63** as a whole-frame
+median (p10 0.57, p90 0.68) — so a moving pixel kept most of the frame before it, and that
+frame most of the one before.
+
+The fix uses the same exact signal as the floor, from the other side. Where the game's own
+pixel changed by `release` levels of 255 or more, none of the gate survives; by less, a
+share that falls linearly with the change: `alpha = max(gate * confidence * clip(1 - moved
+* 255 / release, 0, 1), floor)`. It lowers only the gate, never the floor, which is zero
+wherever the game changed a pixel anyway. Native and NumPy byte-identical
+(`test_native_image.py`, twelve combinations, and a check that a released pixel is the
+still frame exactly).
+
+Tuned by eye in the game, the owner at the controls: at 4 the shimmer over moving things
+came back; 8 still showed some trail; **16 and 24 both looked right, 24 preferred** — the
+default. `nr-ctl set release 0` is the old behaviour. The daemon's line reports
+`released N%`, the share of pixels the release dropped entirely.

@@ -469,6 +469,31 @@ int main(int argc, char **argv)
                 if (floored[k] != temporal[k]) moved_rows_same = 0;
             }
         check("temporal: rows the game changed by 0.1 take no floor", moved_rows_same, "the floor is gone by four levels of 255");
+        /* the release: where the game's pixel moved by 16 levels of 255 or more none of the
+         * gate survives, so the pixel is the confidence-0 frame exactly; where it did not
+         * move the release keeps all of the gate, and the floor's frame is untouched */
+        float *still = malloc(pixels * 3 * sizeof(float)), *released = malloc(pixels * 3 * sizeof(float));
+        nr_frame_update(frame, colour, height, width, history, NULL, &z, still, NULL);
+        nr_frame_params rl = fl; rl.release = (float)(-255.0 / 16.0);
+        nr_frame_update(frame, colour, height, width, history, previous, &rl, released, NULL);
+        int dropped = 1, kept = 1; size_t gone = 0;
+        for (size_t px = 0; px < pixels; px++) {
+            float moved = 0.0f;
+            for (int c = 0; c < 3; c++) {
+                float step = fabsf(colour[px * 3 + c] - previous[px * 3 + c]);
+                if (step > moved) moved = step;
+            }
+            for (int c = 0; c < 3; c++) {
+                size_t k = px * 3 + c;
+                if (moved == 0.0f && released[k] != floored[k]) kept = 0;
+                if (moved * rl.release + 1.0f <= 0.0f && released[k] != still[k]) dropped = 0;
+            }
+            gone += moved * rl.release + 1.0f <= 0.0f;
+        }
+        snprintf(detail, sizeof detail, "%zu of %zu pixels released", gone, pixels);
+        check("temporal: released pixels are the confidence-0 frame, bit for bit", dropped && gone > pixels / 10, detail);
+        check("temporal: the release leaves unchanged pixels to the gate and the floor", kept, NULL);
+        free(still); free(released);
         free(hist_features); free(hist_head); free(temporal); free(floored); free(t_head); free(want);
     }
 
