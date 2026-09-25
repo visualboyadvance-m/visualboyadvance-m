@@ -9,7 +9,79 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: ten more dlss-nr-on-intel commits, on every runtime (2026-09-25)
+## Latest: three more dlss-nr-on-intel commits, on every runtime (2026-09-25, evening)
+
+`3e2688d`..`3a6bb27` of `uzbekunknown/dlss-nr-on-intel` are in: window attention in one
+workgroup a window, the fused feed-forward sixteen subgroups a workgroup with the narrow blocks'
+weights shared, and the notes and re-measured rates (next section). The GLSL matrix kernels are
+upstream's, unchanged. Carried past them:
+
+- **libxmx** takes upstream's dispatches (window `1` workgroup a window-head, FFN
+  `ceil(M/256)`, flag `0x800000` for 32 x 128) and three things upstream did not need. The two
+  matrix kernels now declare `GL_EXT_shared_memory_block`, so on a matrix device **without
+  `VK_KHR_workgroup_memory_explicit_layout`** (or an adopting host that did not pass
+  `XMX_ADOPT_EXPLICIT_LAYOUT`) `xmx_window_init`/`xmx_ffn_init` build the `_portable` twin
+  instead and say so on stderr — correct, not bit-identical to that path's unfused passes. Each
+  fused workgroup is checked against `maxComputeSharedMemorySize` and
+  `maxComputeWorkGroupInvocations` at init (matrix FFN 32 KB / 512 lanes, portable FFN 24 KB /
+  256, window 16 KB / 256), so a device that cannot hold one says which. And the dispatch
+  follows which kernel was built (`rwindow_twin`, `rffn_twin`).
+- **The Vulkan portable twins.** `ffn_fused_portable.comp` is eight 16-row blocks a 256-lane
+  workgroup, the staged weights in 16 KB of shared memory, 24 KB in all; every barrier is the
+  workgroup's (a phone's subgroup may be narrower than a slice), so a surplus slice idles
+  through them. **`window_attention_portable.comp` keeps its old form** — one 32-lane workgroup
+  per eight rows. The one-workgroup-a-window form was built (K transposed in shared memory, the
+  weights made in registers from the lane's own accumulators, exactly 16 KB) and was bit-exact,
+  but on MoltenVK, the only portable Vulkan device here, a 1280x768 frame took **614 ms against
+  602**; a packed-word version 660, a 128-lane one 614.
+- **Metal** (`window_attention.metal`, `ffn_fused.metal`, `libmetalmx`): both kernels 256
+  threads a threadgroup. Window attention is 16 KB on both paths — the simdgroup kernel stages
+  its logits half the keys at a time, as upstream does; **32 KB with separate logit and
+  probability tiles made it 30 % slower** (39.4 -> 51.0 ms), 24 KB 36.7, 16 KB 31.1. The fused
+  FFN is eight simdgroups at 32 KB (a `simdgroup_float8x8` has no cheap per-element access, so
+  each keeps a 2 KB stage and writes the gated hidden chunk over it from registers); a 1 KB
+  stage in 16-column halves was slower, 36.8. The portable kernels mirror the GLSL layouts,
+  window attention included, because on Metal it pays. Surplus simdgroups leave after the
+  weights' barrier; only simdgroup barriers follow. A pipeline allowing fewer than 256 threads
+  is refused at record time with the number.
+- **Direct3D 12** (`d3d12/*_portable.hlsl`, `libd3dmx`): the portable layouts, window attention
+  in the one-workgroup form (16 KB, packed words), the FFN 24 KB; the FFN dispatch
+  `ceil(M/128)` still splits at 65535 with `spare`. Compiled by dxc (both window builds) and
+  libd3dmx by MinGW-w64; **not run**.
+- **The C frame library** records these passes through `xmx_rec_window_attention` /
+  `xmx_rec_ffn` and needed no change; `test_nr_frame` and `test_dlssnr` pass against the Python
+  head on Vulkan and Metal with the new kernels.
+
+Measured on the M3, 1280x768, paired against the previous commit on the same build: **Metal
+simdgroup window attention 39.4 -> 31.1 ms, fused FFN 32.9 -> 30.7, device total 401.9 ->
+~390**; Metal portable 64.4 -> 55.5 and 70.1 -> 56.2, total 585 -> 566; **MoltenVK wall time
+622 -> 603 ms**, the gain the FFN twin's. At 320x320 on Metal the passes go 5.06 -> 4.29 and
+3.50 -> 3.31 ms. Verified: every window and FFN kernel case bit-exact on Vulkan-portable,
+Metal-simdgroup and Metal-portable, mapped and `XMX_STAGING=1`; the whole ctest suite green but
+`publish_check` (the committed `weights/*.h`, as before). No Xe2, phone or Windows run.
+
+## Window attention and the feed-forward loaded their operands once per subgroup (2026-09-25, afternoon)
+
+The owner asked for window attention — 19-21 % of the graph at every extent — to be solved.
+It ran one 32-lane subgroup to a workgroup with 2 KB of shared memory, and at 64 x 2 KB
+shared memory is the whole L1/SLM array: **no L1, so the eight workgroups of a window each
+fetched its K and V from L2, tile by tile**. The narrow blocks' fused feed-forward had the
+same shape of waste — each workgroup fetched both 8 KB weight matrices for its 16 rows,
+sixteen times its activations. Both now load once and share through shared memory, at the
+same threads a core, bit-identical: window attention at 0.48x its time, the feed-forward at
+0.6x. `notes/improve-shared-memory.md`, which also lists what was tried on the way.
+
+On the daemon's path, paired, answers byte-identical: **640x360 at 0.5 34.8 -> 30.6 ms,
+512x288 at 0.35 34.2 -> 29.7, 1280x720 at 0.35 49.1 -> 43.7, 1920x1080 at 0.3 71.6 -> 63.5,
+1920x1080 at full scale 433 -> 370**. Graph curve **8.9 ms + 162 ms per megapixel**; README
+table re-measured (medians of three).
+
+**How it was found matters more than the fix.** Instruction counts pointed the wrong way
+twice — a V load with 17 % fewer instructions was 9 % slower, and deleting 230 instructions of
+row sums changed nothing. Taking each load out in turn, with a constant in its place, found it
+in two runs. Next: the same question for every kernel that runs one subgroup to a workgroup.
+
+## Ten more dlss-nr-on-intel commits, on every runtime (2026-09-25)
 
 `7a6f338`..`5636456` of `uzbekunknown/dlss-nr-on-intel` are in: the idle-CPU lead closed, Tekken
 7 at 1280x720, scale 0.5's area mean in C, the staged kernel from K = 32, the skips as their level
@@ -44,7 +116,7 @@ same head (`ff78b88715c96a3c`). libd3dmx compiles for x86_64 Windows against the
 headers, exporting `xmx_profile_each_kind`, and `nr_image.c` and `nr_frame.c` build with the NDK
 for arm64-v8a and armeabi-v7a; none of that has run.
 
-## Latest: the frame around the network, taken apart again (2026-09-25, night)
+## The frame around the network, taken apart again (2026-09-25, night)
 
 Five small steps on the daemon's own path, each byte-identical and each its own commit, and
 together **640x360 at 0.5 from 39-41 ms yesterday morning to ~35 ms; 1280x720 at 0.35 from
@@ -400,6 +472,13 @@ move off the critical path. The owner deferred it until nothing else is left to 
 owner as root) bought **nothing**: 32.3 ms idle, and it damped the spinner's gain to 0.7 ms. So
 it is not the package's deep C-states, it moves with the machine's state, and a core spinning for
 every graph is not worth 5 %. Nothing kept; the uncore frequency (0400 here) was never read.
+*Re-measured 2026-09-25, afternoon, and closed for the daemon:* a spinning thread took the bare
+graph loop from 31 to 26.5 ms again — on a P-core or an LP E-core alike, wherever the waiting
+thread sat — but only when it spun all along; spinning just for the length of each graph bought
+nothing. And on the daemon's own path it bought nothing at all, because the host passes' OpenMP
+threads cancel it: with `OMP_NUM_THREADS=1` the spinner's 4.5 ms came back, with two or more
+threads — on other P-cores or on the LP E-cores — it was gone. A game's own threads will do the
+same. It is also why `upsample merge` measured three times its stand-alone time inside a frame.
 Tried and not kept, in `improve-fusions.md`: weights stored as their E4M3 bytes
 (exact, but a proxy put the prize at 0.14 ms a frame) and, again, register prefetch.
 

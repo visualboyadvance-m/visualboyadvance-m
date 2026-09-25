@@ -66,7 +66,7 @@ disproved.
 | `phase26-the-register-ceiling.md` | every engine busy, each ~90 % idle; the register file is the wall |
 | `phase45-frame-profile.md` | per-pass timings; everything that moves data is at the memory ceiling — which did not make the graph finished |
 | `improve-fusions.md` | residuals, attention and its head merge, the glue, the narrow feed-forward folded into fewer passes; window attention in 2 KB; the staged loader's loads issued together; what was measured and dropped |
-| `improve-shared-memory.md` | a Mesa quirk — the core's shared-memory partition sized from the declared bytes, each workgroup's share rounded up — that makes some smaller declarations slower and costs this frame nothing; and the 128 KB cap that had the staged GEMM on half its threads, 10 % of a frame |
+| `improve-shared-memory.md` | a Mesa quirk — the core's shared-memory partition sized from the declared bytes, each workgroup's share rounded up — that makes some smaller declarations slower and costs this frame nothing; the 128 KB cap that had the staged GEMM on half its threads, 10 % of a frame; and why window attention and the fused feed-forward, with no L1, fetched the same operands once per subgroup from L2 — and ran at 2x and 1.5x once they shared them |
 | `improve-qkv-epilogue.md` | Q/K normalised in the QKV projection's own epilogue, 22 %; all fusions together 38 %; why joint QKV was slower; shared memory comes in powers of two; measure with empty swap |
 | `phase21`, `phase22`, `phase23`, `phase31`, `phase33` | tiling, staging, integer weights, the accumulator, OpenCL — all measured, all closed |
 | `phase25-the-frame-rate-wall.md` | `17 ms + 488 ms per megapixel`, and what that forbids — `9 + 205` since the fusions and the shared-memory fix |

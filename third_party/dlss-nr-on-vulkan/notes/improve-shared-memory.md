@@ -133,6 +133,53 @@ Getting it back was tried on the kernels that sit at 2 KB, and did not pay:
 - the tiled GEMM's stage cut to 1 KB, on the float32 path that never touches it: 2-6 % on a
   few memory-bound shapes, the same on the rest.
 
+## What the missing L1 did cost: loads every subgroup made for itself (2026-09-25)
+
+The section above asked whether a kernel *wants* the L1 back, and for these kernels the
+answer is still no. The right question was what each of them fetches from L2 because it has
+none — and two of them fetched the same bytes many times over:
+
+- **window attention**, one 32-lane subgroup and eight query rows to a workgroup: the eight
+  workgroups of a window each loaded its K and V, tile by tile, into their own registers;
+- **the narrow blocks' fused feed-forward**, one subgroup and 16 rows to a workgroup: each
+  loaded both 8 KB weight matrices, sixteen times the bytes of its own activations.
+
+Taking loads out one at a time — a constant in place of the tile, the output wrong, the
+instructions otherwise the same — located it. In window attention K cost 27 % of the pass
+and V 17 %; the feed-forward's weights were 45 % of its own (12.3 -> 6.8 ms at level 0 of
+1920x1088). Instruction counts pointed elsewhere and were wrong twice: a V load with 17 %
+fewer instructions ran 9 % *slower*, and deleting the row sums, 230 instructions, changed
+nothing.
+
+Giving the L1 back barely helps: window attention rebuilt into 1 KB — its softmax weights
+held in registers while the logits use the kilobyte — gained 1-2 %. **Loading once is what
+pays.** Window attention now runs one 256-lane workgroup a window and head: K and V arrive
+once, a 16-byte load a lane, and eight subgroups read their tiles from shared memory — 16 KB,
+eight workgroups a core. The feed-forward runs sixteen subgroups and 256 rows a workgroup
+with its weights staged — 32 KB, four a core. The same 64 threads a core either way:
+occupancy was never the trade. Level 0 alone, bit-identical:
+
+| pass | 320x320 | 1920x1088 |
+| --- | ---: | ---: |
+| window attention | 705 -> 340 us | 13.8 -> 6.6 ms |
+| fused feed-forward | 638 -> 430 us | 12.3 -> 7.3 ms |
+
+On the daemon's path, paired, answers byte-identical: 640x360 at 0.5 34.8 -> 30.6 ms,
+512x288 at 0.35 34.2 -> 29.7, 1280x720 at 0.35 49.1 -> 43.7, 1920x1080 at 0.3 71.6 -> 63.5,
+and 1920x1080 at full scale 433 -> 370. The graph's curve is **8.9 ms + 162 ms per
+megapixel** (9.4 + 190 before, measured the same day).
+
+Tried on the way and not kept:
+
+- V stored transposed, so its tiles would load as words like K's: slower, 11.16 -> 11.32 ms;
+- V's eight tiles loaded before the softmax, to hide their latency: spills, 10 % slower;
+- K's four tiles loaded together before their multiplies: no change;
+- the feed-forward's weights transposed as they are staged, for word-sized tile loads:
+  60 % slower — every lane of a column-major load on the same shared-memory banks;
+- the bias as half, which every one of the model's 62 bias tensors exactly is: 2-4 % of the
+  attention pass, for a second copy of every bias and a change to the pass's interface.
+  Left for later, not dropped.
+
 ## Also measured and dropped
 
 - **The softmax pipeline** (`attention.comp`) declares 8 KB for 32 lanes, a quarter of the

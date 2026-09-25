@@ -13,11 +13,42 @@
  * Push: a input (half, m x n), b expand (groups x n x k, group stride sa), qkv_scale slot
  * the projection (groups x k x 32, group stride sb), c output (row stride ldc, or 32;
  * group g at columns 32g), d skip and residual_cos cosine with 0x20000. Grid
- * (m/16, groups), 32 threads.
+ * (ceil(m/128), groups), 256 threads: eight 16-row blocks a threadgroup, one to each
+ * simdgroup (on the portable kernel, each 32-thread slice). Flag 0x800000 — the narrow
+ * blocks' shape, 32 channels and 128 hidden, set by libmetalmx — loads both 8 KB weight
+ * matrices into threadgroup memory once for the eight blocks, `ffn_fused.comp`'s change,
+ * rather than every 16 rows fetching them for itself. Other shapes read their weights
+ * from device memory as before.
+ *
+ * Threadgroup memory: the simdgroup kernel 32 KB (16 KB of weights, then 2 KB a
+ * simdgroup that holds its expand stage, the gated hidden chunk over the stage's first
+ * kilobyte once every value is in registers, and at the end its output stage), the
+ * portable one 24 KB (the weights, and a kilobyte of hidden chunk a slice; it stores its
+ * output from registers). A surplus block past m leaves the simdgroup kernel after the
+ * weights' barrier — everything after is a simdgroup barrier — and idles through the
+ * portable kernel's threadgroup barriers.
+ *
+ * Eight blocks, not the matrix kernel's sixteen: Apple's threadgroup memory is 32 KB, and
+ * a simdgroup_float8x8 cannot be published element by element without a trip through
+ * threadgroup memory, so each simdgroup needs its 2 KB stage. Measured on an M3 at
+ * 1280x768: 32.9 -> 30.7 ms a frame (portable 70.1 -> 56.2). Staging the expand and the
+ * output 16 columns at a time, for 1 KB a simdgroup and 24 KB in all, was slower: 36.8.
  */
 #include "nr_epilogue.h"
 
-constant uint F_ROWS = 16u, F_CHUNK = 32u, F_OUT = 32u;
+constant uint F_ROWS = 16u, F_CHUNK = 32u, F_OUT = 32u, F_BLOCKS = 8u;
+constant uint F_STAGED = 0x800000u;           /* one group of 32 x 128: weights shared */
+
+/* Both staged weight matrices into threadgroup memory, 2 x 16 bytes of each a thread of
+ * 256: the expand's 32 x 128 halves at 0, the projection's 128 x 32 at 4096. */
+inline void ffn_load_weights(constant Push &pc, uint group, threadgroup uint4 *w, uint lid) {
+    device const uint4 *E = reinterpret_cast<device const uint4 *>(half_ptr(pc.b) + group * pc.sa);
+    device const uint4 *P = reinterpret_cast<device const uint4 *>(half_ptr(pc.qkv_scale) + group * pc.sb);
+    for (uint t = 0u; t < 2u; t++) {
+        w[lid + t * 256u] = E[lid + t * 256u];
+        w[512u + lid + t * 256u] = P[lid + t * 256u];
+    }
+}
 
 /* The output block, raw on `stage` (16 x 32, row-major): the residual and the publish per
  * element, the store four at a time. */
@@ -41,16 +72,26 @@ inline void ffn_store(constant Push &pc, uint flags, threadgroup const float *st
 
 kernel void ffn_fused(constant Push &pc [[buffer(0)]],
                       uint3 wg [[threadgroup_position_in_grid]],
-                      uint lid [[thread_index_in_threadgroup]]) {
-    threadgroup float stage[F_ROWS * F_CHUNK];
-    threadgroup half hidden[F_ROWS * F_CHUNK];
-    uint row = wg.x * F_ROWS, group = wg.y;
-    if (row >= pc.m) return;
+                      uint lid [[thread_index_in_threadgroup]],
+                      uint sg [[simdgroup_index_in_threadgroup]],
+                      uint sl [[thread_index_in_simdgroup]]) {
+    threadgroup float mem[8192];                  /* 32 KB, see the header */
+    uint group = wg.y;
     uint flags = operation_flags(pc);
-    uint cin = pc.n, width = pc.k, ldc = pc.ldc != 0u ? pc.ldc : F_OUT;
+    bool staged = (flags & F_STAGED) != 0u;
+    if (staged) ffn_load_weights(pc, group, reinterpret_cast<threadgroup uint4 *>(mem), lid);
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    uint row = wg.x * (F_ROWS * F_BLOCKS) + sg * F_ROWS;
+    if (row >= pc.m) return;                      /* only simdgroup barriers follow */
+    uint cin = staged ? 32u : pc.n, width = staged ? 128u : pc.k;
+    uint ldc = pc.ldc != 0u ? pc.ldc : F_OUT;
     device const half *A = half_ptr(pc.a);
     device const half *E = half_ptr(pc.b) + group * pc.sa;
     device const half *P = half_ptr(pc.qkv_scale) + group * pc.sb;
+    threadgroup const half *SE = reinterpret_cast<threadgroup const half *>(mem);
+    threadgroup const half *SP = SE + 4096u;
+    threadgroup float *stage = mem + 4096u + sg * 512u;           /* 16 x 32 float */
+    threadgroup half *hidden = reinterpret_cast<threadgroup half *>(stage);
 
     simdgroup_float8x8 result[2][4];
     for (int i = 0; i < 2; i++)
@@ -62,84 +103,121 @@ kernel void ffn_fused(constant Push &pc [[buffer(0)]],
         for (uint kk = 0u; kk < cin; kk += 8u) {
             simdgroup_half8x8 x[2], w[4];
             for (uint i = 0u; i < 2u; i++) simdgroup_load(x[i], A + (row + i * 8u) * cin + kk, cin);
-            for (uint j = 0u; j < 4u; j++) simdgroup_load(w[j], E + kk * width + chunk + j * 8u, width);
+            for (uint j = 0u; j < 4u; j++) {
+                if (staged) simdgroup_load(w[j], SE + kk * width + chunk + j * 8u, width);
+                else        simdgroup_load(w[j], E + kk * width + chunk + j * 8u, width);
+            }
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 4; j++) simdgroup_multiply_accumulate(h[i][j], x[i], w[j], h[i][j]);
         }
         for (uint i = 0u; i < 2u; i++)
             for (uint j = 0u; j < 4u; j++) simdgroup_store(h[i][j], stage + i * 8u * F_CHUNK + j * 8u, F_CHUNK);
-        threadgroup_barrier(mem_flags::mem_threadgroup);
-        for (uint e = lid; e < F_ROWS * F_CHUNK; e += 32u) hidden[e] = half(publish(3u, stage[e]));
-        threadgroup_barrier(mem_flags::mem_threadgroup);
+        simdgroup_barrier(mem_flags::mem_threadgroup);
+        /* the gate and publish, every value into registers before the halves overwrite the
+         * stage's first kilobyte */
+        half gated[F_ROWS * F_CHUNK / 32u];
+        for (uint t = 0u; t < F_ROWS * F_CHUNK / 32u; t++) gated[t] = half(publish(3u, stage[sl + t * 32u]));
+        simdgroup_barrier(mem_flags::mem_threadgroup);
+        for (uint t = 0u; t < F_ROWS * F_CHUNK / 32u; t++) hidden[sl + t * 32u] = gated[t];
+        simdgroup_barrier(mem_flags::mem_threadgroup);
         for (uint kk = 0u; kk < F_CHUNK; kk += 8u) {
             simdgroup_half8x8 g[2], p[4];
             for (uint i = 0u; i < 2u; i++) simdgroup_load(g[i], hidden + i * 8u * F_CHUNK + kk, F_CHUNK);
-            for (uint j = 0u; j < 4u; j++) simdgroup_load(p[j], P + (chunk + kk) * F_OUT + j * 8u, F_OUT);
+            for (uint j = 0u; j < 4u; j++) {
+                if (staged) simdgroup_load(p[j], SP + (chunk + kk) * F_OUT + j * 8u, F_OUT);
+                else        simdgroup_load(p[j], P + (chunk + kk) * F_OUT + j * 8u, F_OUT);
+            }
             for (int i = 0; i < 2; i++)
                 for (int j = 0; j < 4; j++) simdgroup_multiply_accumulate(result[i][j], g[i], p[j], result[i][j]);
         }
-        threadgroup_barrier(mem_flags::mem_threadgroup);   /* the next chunk overwrites both */
+        simdgroup_barrier(mem_flags::mem_threadgroup);    /* the next chunk overwrites the stage */
     }
     for (uint i = 0u; i < 2u; i++)
         for (uint j = 0u; j < 4u; j++) simdgroup_store(result[i][j], stage + i * 8u * F_OUT + j * 8u, F_OUT);
-    threadgroup_barrier(mem_flags::mem_threadgroup);
-    ffn_store(pc, flags, stage, row, group, ldc, lid);
+    simdgroup_barrier(mem_flags::mem_threadgroup);
+    ffn_store(pc, flags, stage, row, group, ldc, sl);
 }
 
 kernel void ffn_fused_portable(constant Push &pc [[buffer(0)]],
                                uint3 wg [[threadgroup_position_in_grid]],
                                uint lid [[thread_index_in_threadgroup]]) {
-    threadgroup float stage[F_ROWS * F_CHUNK];
-    uint row = wg.x * F_ROWS, group = wg.y;
-    if (row >= pc.m) return;
+    threadgroup uint weights[4096];               /* 16 KB: the staged shape's weights */
+    threadgroup half hidden[F_BLOCKS * F_ROWS * F_CHUNK];   /* 8 KB: a chunk a slice */
+    uint group = wg.y;
     uint flags = operation_flags(pc);
-    uint cin = pc.n, width = pc.k, ldc = pc.ldc != 0u ? pc.ldc : F_OUT;
+    bool staged = (flags & F_STAGED) != 0u;
+    if (staged) ffn_load_weights(pc, group, reinterpret_cast<threadgroup uint4 *>(weights), lid);
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    uint slice = lid >> 5u, lane = lid & 31u;
+    uint row = wg.x * (F_ROWS * F_BLOCKS) + slice * F_ROWS;
+    bool live_rows = row < pc.m;                  /* uniform across the slice only */
+    uint cin = staged ? 32u : pc.n, width = staged ? 128u : pc.k;
+    uint ldc = pc.ldc != 0u ? pc.ldc : F_OUT;
     device const half *A = half_ptr(pc.a);
     device const half *E = half_ptr(pc.b) + group * pc.sa;
     device const half *P = half_ptr(pc.qkv_scale) + group * pc.sb;
+    threadgroup const half *SE = reinterpret_cast<threadgroup const half *>(weights);
+    threadgroup const half *SP = SE + 4096u;
+    threadgroup half *mine = hidden + slice * F_ROWS * F_CHUNK;
     /* the portable 16x32 GEMM's lane: rows r and r + 8, columns cq.. and 16 + cq.. */
-    uint r = lid >> 2u, cq = (lid & 3u) * 4u;
+    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
 
     float4 result[2][2];
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++) result[i][j] = float4(0.0f);
     for (uint chunk = 0u; chunk < width; chunk += F_CHUNK) {
-        float4 h[2][2];
-        for (int i = 0; i < 2; i++)
-            for (int j = 0; j < 2; j++) h[i][j] = float4(0.0f);
-        for (uint k = 0u; k < cin; k++) {
-            float4 bv[2];
-            for (uint j = 0u; j < 2u; j++) {
-                uint at = k * width + chunk + cq + j * 16u;
-                bv[j] = float4(float(E[at]), float(E[at + 1u]), float(E[at + 2u]), float(E[at + 3u]));
+        if (live_rows) {
+            float4 h[2][2];
+            for (int i = 0; i < 2; i++)
+                for (int j = 0; j < 2; j++) h[i][j] = float4(0.0f);
+            for (uint k = 0u; k < cin; k++) {
+                float4 bv[2];
+                for (uint j = 0u; j < 2u; j++) {
+                    uint at = k * width + chunk + cq + j * 16u;
+                    bv[j] = staged ? float4(float(SE[at]), float(SE[at + 1u]), float(SE[at + 2u]), float(SE[at + 3u]))
+                                   : float4(float(E[at]), float(E[at + 1u]), float(E[at + 2u]), float(E[at + 3u]));
+                }
+                for (uint i = 0u; i < 2u; i++) {
+                    float av = float(A[(row + r + i * 8u) * cin + k]);
+                    for (uint j = 0u; j < 2u; j++) h[i][j] += av * bv[j];
+                }
             }
-            for (uint i = 0u; i < 2u; i++) {
-                float av = float(A[(row + r + i * 8u) * cin + k]);
-                for (uint j = 0u; j < 2u; j++) h[i][j] += av * bv[j];
-            }
-        }
-        for (uint i = 0u; i < 2u; i++)
-            for (uint j = 0u; j < 2u; j++)
-                for (uint e = 0u; e < 4u; e++)
-                    stage[(r + i * 8u) * F_CHUNK + cq + j * 16u + e] = float(half(publish(3u, h[i][j][e])));
-        threadgroup_barrier(mem_flags::mem_threadgroup);
-        for (uint k = 0u; k < F_CHUNK; k++) {
-            float4 bv[2];
-            for (uint j = 0u; j < 2u; j++) {
-                uint at = (chunk + k) * F_OUT + cq + j * 16u;
-                bv[j] = float4(float(P[at]), float(P[at + 1u]), float(P[at + 2u]), float(P[at + 3u]));
-            }
-            for (uint i = 0u; i < 2u; i++) {
-                float av = stage[(r + i * 8u) * F_CHUNK + k];
-                for (uint j = 0u; j < 2u; j++) result[i][j] += av * bv[j];
-            }
+            for (uint i = 0u; i < 2u; i++)
+                for (uint j = 0u; j < 2u; j++)
+                    for (uint e = 0u; e < 4u; e++)
+                        mine[(r + i * 8u) * F_CHUNK + cq + j * 16u + e] = half(publish(3u, h[i][j][e]));
         }
         threadgroup_barrier(mem_flags::mem_threadgroup);
+        if (live_rows) {
+            for (uint k = 0u; k < F_CHUNK; k++) {
+                float4 bv[2];
+                for (uint j = 0u; j < 2u; j++) {
+                    uint at = (chunk + k) * F_OUT + cq + j * 16u;
+                    bv[j] = staged ? float4(float(SP[at]), float(SP[at + 1u]), float(SP[at + 2u]), float(SP[at + 3u]))
+                                   : float4(float(P[at]), float(P[at + 1u]), float(P[at + 2u]), float(P[at + 3u]));
+                }
+                for (uint i = 0u; i < 2u; i++) {
+                    float av = float(mine[(r + i * 8u) * F_CHUNK + k]);
+                    for (uint j = 0u; j < 2u; j++) result[i][j] += av * bv[j];
+                }
+            }
+        }
+        threadgroup_barrier(mem_flags::mem_threadgroup);   /* the next chunk overwrites it */
     }
+    if (!live_rows) return;
+    uint epilogue = (flags >> 8) & 0xFu;
+    bool narrow = (flags & 0x1000u) != 0u;
     for (uint i = 0u; i < 2u; i++)
-        for (uint j = 0u; j < 2u; j++)
-            for (uint e = 0u; e < 4u; e++)
-                stage[(r + i * 8u) * F_OUT + cq + j * 16u + e] = result[i][j][e];
-    threadgroup_barrier(mem_flags::mem_threadgroup);
-    ffn_store(pc, flags, stage, row, group, ldc, lid);
+        for (uint j = 0u; j < 2u; j++) {
+            float4 v = result[i][j];
+            uint at = (row + r + i * 8u) * ldc + group * F_OUT + cq + j * 16u;
+            for (uint q = 0u; q < 4u; q++) v[q] = publish(epilogue, add_gemm_residual(pc, flags, v[q], at + q));
+            if (!narrow) {
+                for (uint q = 0u; q < 4u; q++) float_out(pc.c)[at + q] = v[q];
+            } else if ((at & 3u) == 0u && (pc.c & 7u) == 0u) {
+                reinterpret_cast<device half4 *>(half_out(pc.c))[at >> 2] = half4(v);
+            } else {
+                for (uint q = 0u; q < 4u; q++) half_out(pc.c)[at + q] = half(v[q]);
+            }
+        }
 }

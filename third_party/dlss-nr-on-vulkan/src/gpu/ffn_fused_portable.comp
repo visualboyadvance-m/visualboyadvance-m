@@ -4,9 +4,18 @@
  * ffn_fused_portable — `ffn_fused.comp` without the cooperative matrix.
  *
  * A feed-forward in one pass with the hidden layer kept in shared memory, on a device with
- * no matrix units (MoltenVK, the phones, Xe2 under XMX_PORTABLE=1). Same push block, same
- * dispatch (M/16 workgroups of 32 lanes on x, one group per row of the grid), same flags,
- * so libxmx does not know which one it got.
+ * no matrix units (MoltenVK, the phones, Xe2 under XMX_PORTABLE=1). Same push block and
+ * flags, one group per row of the grid; libxmx dispatches it with 128 rows a workgroup
+ * where the matrix kernel takes 256.
+ *
+ * Eight 16-row blocks share a 256-lane workgroup, one to each 32-lane slice, and for the
+ * narrow blocks' shape (32 channels, 128 hidden; flag 0x800000) both 8 KB weight matrices
+ * arrive in its shared memory once, a 16-byte load a lane, instead of once for every 16
+ * rows — the matrix kernel's change, at half its row count so the whole is 24 KB: 16 KB of
+ * weights and a kilobyte of hidden chunk a slice. Other shapes read their weights from
+ * device memory as before. Every barrier is the workgroup's (a phone's subgroup may be
+ * narrower than a slice), so a surplus slice past M idles through them rather than
+ * returning.
  *
  * It must equal *this path's* two-GEMM reference bit for bit (`src/gpu/test_ffn_fused.py`):
  * the expand through `gemm_portable` with the gate and E4M3 publish into a half hidden
@@ -26,11 +35,12 @@
 
 #include "publish.glsl"
 
-layout(local_size_x = 32) in;
+layout(local_size_x = 256) in;
 
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Uvec4Buf { uvec4     u4[]; };
 
 layout(push_constant, scalar) uniform Push {
     HalfBuf a, b; FloatBuf c, d;
@@ -46,21 +56,53 @@ layout(push_constant, scalar) uniform Push {
 #include "specialize.glsl"
 #include "residual_epilogue.glsl"   /* needs operation_flags() from above */
 
-const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, TM = 8u, TN = 16u;
+const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, TM = 8u, TN = 16u, SLICES = 8u;
 const uint EPI_GATE_E4M3 = 3u;             // the expand GEMM's publish
 
-/* one chunk of the gated hidden layer, as the half buffer the reference writes holds it */
-shared float16_t hidden[ROWS * CHUNK];
+/* the staged shape's weights as words, two halves each: the expand's 32 x 128 at 0, the
+ * projection's 128 x 32 at 2048 */
+shared uint weights[4096];
+const uint PROJECTION = 2048u;
+/* each slice's chunk of the gated hidden layer, as the half buffer the reference writes
+ * holds it */
+shared float16_t hidden[SLICES * ROWS * CHUNK];
+
+/* Flag 0x800000: one group of 32 channels and 128 hidden, its weights in shared memory. */
+bool staged() { return (operation_flags() & 0x800000u) != 0u; }
+
+/* four consecutive staged weights from an even index: two words */
+vec4 staged4(uint at) {
+    return vec4(unpackHalf2x16(weights[at >> 1u]), unpackHalf2x16(weights[(at >> 1u) + 1u]));
+}
 
 void main() {
-    uint row = gl_WorkGroupID.x * ROWS, group = gl_WorkGroupID.y;
-    if (row >= pc.m) return;
-    uint cin = pc.n, width = pc.k;
-    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+    uint group = gl_WorkGroupID.y;
     uint expand_base = group * pc.sa, project_base = group * pc.sb;
-    uint lane = gl_LocalInvocationID.x;
-    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
     HalfBuf projection = HalfBuf(pc.projection);
+    uint index = gl_LocalInvocationIndex;
+    if (staged()) {
+        uvec4 e[2], q[2];
+        for (uint t = 0u; t < 2u; t++) {
+            e[t] = Uvec4Buf(uint64_t(pc.b) + uint64_t(expand_base) * 2ul).u4[index + t * 256u];
+            q[t] = Uvec4Buf(pc.projection + uint64_t(project_base) * 2ul).u4[index + t * 256u];
+        }
+        for (uint t = 0u; t < 2u; t++)
+            for (uint w = 0u; w < 4u; w++) {
+                weights[(index + t * 256u) * 4u + w] = e[t][w];
+                weights[PROJECTION + (index + t * 256u) * 4u + w] = q[t][w];
+            }
+    }
+    memoryBarrierShared();
+    barrier();
+
+    uint slice = index >> 5u, lane = index & 31u;
+    uint row = gl_WorkGroupID.x * (ROWS * SLICES) + slice * ROWS;
+    bool live_rows = row < pc.m;                  // uniform across the slice, not the workgroup
+    // the staged shape as constants, so a specialised pipeline unrolls both K loops
+    uint cin = staged() ? 32u : pc.n, width = staged() ? 128u : pc.k;
+    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
+    uint mine = slice * ROWS * CHUNK;          // this slice's hidden chunk
 
     vec4 result[2][2];
     for (uint i = 0; i < 2u; i++)
@@ -68,49 +110,62 @@ void main() {
             result[i][j] = vec4(0.0);
 
     for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
-        /* the expand's 16x32 block for these hidden columns, as the tiled portable GEMM
-         * computes it (B row-major, `width` wide, one group's slab) */
-        vec4 h[2][2];
-        for (uint i = 0; i < 2u; i++)
-            for (uint j = 0; j < 2u; j++)
-                h[i][j] = vec4(0.0);
-        for (uint k = 0; k < cin; k++) {
-            vec4 bv[2];
-            for (uint j = 0; j < 2u; j++) {
-                uint at = expand_base + k * width + chunk + cq + j * TN;
-                bv[j] = vec4(float(pc.b.v[at]), float(pc.b.v[at + 1u]),
-                             float(pc.b.v[at + 2u]), float(pc.b.v[at + 3u]));
-            }
-            for (uint i = 0; i < 2u; i++) {
-                float av = float(pc.a.v[(row + r + i * TM) * cin + k]);
+        if (live_rows) {
+            /* the expand's 16x32 block for these hidden columns, as the tiled portable
+             * GEMM computes it (B row-major, `width` wide, one group's slab) */
+            vec4 h[2][2];
+            for (uint i = 0; i < 2u; i++)
                 for (uint j = 0; j < 2u; j++)
-                    h[i][j] += av * bv[j];
+                    h[i][j] = vec4(0.0);
+            for (uint k = 0; k < cin; k++) {
+                vec4 bv[2];
+                for (uint j = 0; j < 2u; j++) {
+                    if (staged()) {
+                        bv[j] = staged4(k * width + chunk + cq + j * TN);
+                    } else {
+                        uint at = expand_base + k * width + chunk + cq + j * TN;
+                        bv[j] = vec4(float(pc.b.v[at]), float(pc.b.v[at + 1u]),
+                                     float(pc.b.v[at + 2u]), float(pc.b.v[at + 3u]));
+                    }
+                }
+                for (uint i = 0; i < 2u; i++) {
+                    float av = float(pc.a.v[(row + r + i * TM) * cin + k]);
+                    for (uint j = 0; j < 2u; j++)
+                        h[i][j] += av * bv[j];
+                }
             }
+            for (uint i = 0; i < 2u; i++)
+                for (uint j = 0; j < 2u; j++)
+                    for (uint e = 0; e < 4u; e++)
+                        hidden[mine + (r + i * TM) * CHUNK + cq + j * TN + e] =
+                            float16_t(publish(EPI_GATE_E4M3, h[i][j][e]));
         }
-        for (uint i = 0; i < 2u; i++)
-            for (uint j = 0; j < 2u; j++)
-                for (uint e = 0; e < 4u; e++)
-                    hidden[(r + i * TM) * CHUNK + cq + j * TN + e] =
-                        float16_t(publish(EPI_GATE_E4M3, h[i][j][e]));
         memoryBarrierShared();
         barrier();
-        /* the projection over these 32 hidden rows, continuing the accumulator */
-        for (uint kk = 0; kk < CHUNK; kk++) {
-            vec4 bv[2];
-            for (uint j = 0; j < 2u; j++) {
-                uint at = project_base + (chunk + kk) * OUT + cq + j * TN;
-                bv[j] = vec4(float(projection.v[at]), float(projection.v[at + 1u]),
-                             float(projection.v[at + 2u]), float(projection.v[at + 3u]));
-            }
-            for (uint i = 0; i < 2u; i++) {
-                float av = float(hidden[(r + i * TM) * CHUNK + kk]);
-                for (uint j = 0; j < 2u; j++)
-                    result[i][j] += av * bv[j];
+        if (live_rows) {
+            /* the projection over these 32 hidden rows, continuing the accumulator */
+            for (uint kk = 0; kk < CHUNK; kk++) {
+                vec4 bv[2];
+                for (uint j = 0; j < 2u; j++) {
+                    if (staged()) {
+                        bv[j] = staged4(PROJECTION * 2u + (chunk + kk) * OUT + cq + j * TN);
+                    } else {
+                        uint at = project_base + (chunk + kk) * OUT + cq + j * TN;
+                        bv[j] = vec4(float(projection.v[at]), float(projection.v[at + 1u]),
+                                     float(projection.v[at + 2u]), float(projection.v[at + 3u]));
+                    }
+                }
+                for (uint i = 0; i < 2u; i++) {
+                    float av = float(hidden[mine + (r + i * TM) * CHUNK + kk]);
+                    for (uint j = 0; j < 2u; j++)
+                        result[i][j] += av * bv[j];
+                }
             }
         }
-        memoryBarrierShared();                  // the next chunk overwrites `hidden`
+        memoryBarrierShared();                  // the next chunk overwrites the hidden chunk
         barrier();
     }
+    if (!live_rows) return;                       // no barrier follows
 
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow_out = (operation_flags() & 0x1000u) != 0u;

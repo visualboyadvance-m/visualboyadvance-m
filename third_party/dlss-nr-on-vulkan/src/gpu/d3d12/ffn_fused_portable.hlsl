@@ -14,27 +14,62 @@
  * sa), u5 the projection weights (groups x k x 32, group stride sb; push offset 120), u2
  * the output (float32, half with 0x1000; row stride ldc, 32 when 0; group g at columns
  * 32g), u3 the residual's skip and u4 its per-channel cosine (flag 0x20000; a half skip
- * with 0x40000). One 16-row block a group on x, split by libd3dmx with pc.spare; the
- * feed-forward group on y.
+ * with 0x40000). Eight 16-row blocks a 256-lane group on x, one to each 32-lane slice,
+ * split by libd3dmx with pc.spare; the feed-forward group on y.
+ *
+ * As `ffn_fused_portable.comp`: for the narrow blocks' shape (32 channels, 128 hidden;
+ * flag 0x800000, set by libd3dmx) both 8 KB weight matrices are loaded into groupshared
+ * memory once for the eight blocks instead of once for every 16 rows; other shapes read
+ * them from their buffers as before. 16 KB of weights and a kilobyte of hidden chunk a
+ * slice, 24 KB. A surplus slice past m idles through the group's barriers.
  */
 #include "nr_d3d.hlsli"
 #include "nr_epilogue.hlsli"
 
-static const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, TM = 8u, TN = 16u;
+static const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, TM = 8u, TN = 16u, SLICES = 8u;
 static const uint EPI_GATE_E4M3 = 3u;              // the expand GEMM's publish
 
-/* one chunk of the gated hidden layer: half values, held exactly as floats */
-groupshared float hidden[ROWS * CHUNK];
+/* as words, two halves each: the staged expand's 32 x 128 at 0, the projection's 128 x 32
+ * at 2048; then each slice's chunk of the gated hidden layer, 16 x 32 halves */
+groupshared uint weights[4096];
+groupshared uint hidden[SLICES * ROWS * CHUNK / 2u];
+static const uint PROJECTION = 2048u;
 
-[numthreads(32, 1, 1)]
-void main(uint3 gid : SV_GroupID, uint lane : SV_GroupIndex) {
-    uint row = (gid.x + pc.spare) * ROWS, group = gid.y;
-    if (row >= pc.m) return;
-    uint cin = pc.n, width = pc.k;
-    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+float lo(uint w) { return f16tof32(w & 0xFFFFu); }
+float hi(uint w) { return f16tof32(w >> 16); }
+/* four consecutive staged weights from an even half index: two words */
+float4 staged4(uint at) {
+    uint w0 = weights[at >> 1u], w1 = weights[(at >> 1u) + 1u];
+    return float4(lo(w0), hi(w0), lo(w1), hi(w1));
+}
+
+[numthreads(256, 1, 1)]
+void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
+    uint group = gid.y;
+    uint cin_all = pc.n, width_all = pc.k;
     uint expand_base = group * pc.sa, project_base = group * pc.sb;
-    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
     uint A = pc.oa.x, Bx = pc.ob.x, P = pc.of.x, C = pc.oc.x;
+    bool staged = (operation_flags() & 0x800000u) != 0u;
+    if (staged) {
+        [unroll] for (uint t = 0u; t < 2u; t++) {
+            uint at = (index + t * 256u) * 16u;
+            uint4 e4 = bufB.Load4(Bx + expand_base * 2u + at);
+            uint4 p4 = bufF.Load4(P + project_base * 2u + at);
+            [unroll] for (uint w = 0u; w < 4u; w++) {
+                weights[at / 4u + w] = e4[w];
+                weights[PROJECTION + at / 4u + w] = p4[w];
+            }
+        }
+    }
+    GroupMemoryBarrierWithGroupSync();
+
+    uint slice = index >> 5u, lane = index & 31u;
+    uint row = ((gid.x + pc.spare) * SLICES + slice) * ROWS;
+    bool live_rows = row < pc.m;                 // uniform across the slice, not the group
+    uint cin = staged ? 32u : cin_all, width = staged ? 128u : width_all;
+    uint ldc = pc.ldc != 0u ? pc.ldc : OUT;
+    uint r = lane >> 2u, cq = (lane & 3u) * 4u;
+    uint mine = slice * ROWS * CHUNK / 2u;       // this slice's hidden chunk, in words
 
     float4 result[2][2];
     [unroll] for (uint i0 = 0; i0 < 2u; i0++)
@@ -42,47 +77,63 @@ void main(uint3 gid : SV_GroupID, uint lane : SV_GroupIndex) {
             result[i0][j0] = float4(0.0, 0.0, 0.0, 0.0);
 
     for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
-        /* the expand's 16x32 block for these hidden columns, as the tiled portable GEMM */
-        float4 h[2][2];
-        [unroll] for (uint i1 = 0; i1 < 2u; i1++)
-            [unroll] for (uint j1 = 0; j1 < 2u; j1++)
-                h[i1][j1] = float4(0.0, 0.0, 0.0, 0.0);
-        for (uint k = 0; k < cin; k++) {
-            float4 bv[2];
-            [unroll] for (uint j = 0; j < 2u; j++) {
-                uint at = expand_base + k * width + chunk + cq + j * TN;
-                bv[j] = float4(ld_f16(bufB, Bx, at), ld_f16(bufB, Bx, at + 1u),
-                               ld_f16(bufB, Bx, at + 2u), ld_f16(bufB, Bx, at + 3u));
+        if (live_rows) {
+            /* the expand's 16x32 block for these hidden columns, as the tiled portable GEMM */
+            float4 h[2][2];
+            [unroll] for (uint i1 = 0; i1 < 2u; i1++)
+                [unroll] for (uint j1 = 0; j1 < 2u; j1++)
+                    h[i1][j1] = float4(0.0, 0.0, 0.0, 0.0);
+            for (uint k = 0; k < cin; k++) {
+                float4 bv[2];
+                [unroll] for (uint j = 0; j < 2u; j++) {
+                    uint at = k * width + chunk + cq + j * TN;
+                    if (staged)
+                        bv[j] = staged4(at);
+                    else
+                        bv[j] = float4(ld_f16(bufB, Bx, expand_base + at), ld_f16(bufB, Bx, expand_base + at + 1u),
+                                       ld_f16(bufB, Bx, expand_base + at + 2u), ld_f16(bufB, Bx, expand_base + at + 3u));
+                }
+                [unroll] for (uint i = 0; i < 2u; i++) {
+                    float av = ld_f16(bufA, A, (row + r + i * TM) * cin + k);
+                    [unroll] for (uint j2 = 0; j2 < 2u; j2++)
+                        h[i][j2] += av * bv[j2];
+                }
             }
-            [unroll] for (uint i = 0; i < 2u; i++) {
-                float av = ld_f16(bufA, A, (row + r + i * TM) * cin + k);
-                [unroll] for (uint j2 = 0; j2 < 2u; j2++)
-                    h[i][j2] += av * bv[j2];
-            }
+            /* the expand's publish, stored as the half buffer the reference writes holds it */
+            [unroll] for (uint i2 = 0; i2 < 2u; i2++)
+                [unroll] for (uint j3 = 0; j3 < 2u; j3++)
+                    [unroll] for (uint e = 0; e < 4u; e += 2u) {
+                        uint at = (r + i2 * TM) * CHUNK + cq + j3 * TN + e;
+                        hidden[mine + at / 2u] =
+                            f32tof16(publish(EPI_GATE_E4M3, h[i2][j3][e]))
+                            | (f32tof16(publish(EPI_GATE_E4M3, h[i2][j3][e + 1u])) << 16);
+                    }
         }
-        /* the expand's publish, stored as the half buffer the reference writes holds it */
-        [unroll] for (uint i2 = 0; i2 < 2u; i2++)
-            [unroll] for (uint j3 = 0; j3 < 2u; j3++)
-                [unroll] for (uint e = 0; e < 4u; e++)
-                    hidden[(r + i2 * TM) * CHUNK + cq + j3 * TN + e] =
-                        half_round(publish(EPI_GATE_E4M3, h[i2][j3][e]));
         GroupMemoryBarrierWithGroupSync();
-        /* the projection over these 32 hidden rows, continuing the accumulator */
-        for (uint kk = 0; kk < CHUNK; kk++) {
-            float4 pv[2];
-            [unroll] for (uint j = 0; j < 2u; j++) {
-                uint at = project_base + (chunk + kk) * OUT + cq + j * TN;
-                pv[j] = float4(ld_f16(bufF, P, at), ld_f16(bufF, P, at + 1u),
-                               ld_f16(bufF, P, at + 2u), ld_f16(bufF, P, at + 3u));
-            }
-            [unroll] for (uint i = 0; i < 2u; i++) {
-                float av = hidden[(r + i * TM) * CHUNK + kk];
-                [unroll] for (uint j4 = 0; j4 < 2u; j4++)
-                    result[i][j4] += av * pv[j4];
+        if (live_rows) {
+            /* the projection over these 32 hidden rows, continuing the accumulator */
+            for (uint kk = 0; kk < CHUNK; kk++) {
+                float4 pv[2];
+                [unroll] for (uint j = 0; j < 2u; j++) {
+                    uint at = (chunk + kk) * OUT + cq + j * TN;
+                    if (staged)
+                        pv[j] = staged4(PROJECTION * 2u + at);
+                    else
+                        pv[j] = float4(ld_f16(bufF, P, project_base + at), ld_f16(bufF, P, project_base + at + 1u),
+                                       ld_f16(bufF, P, project_base + at + 2u), ld_f16(bufF, P, project_base + at + 3u));
+                }
+                [unroll] for (uint i = 0; i < 2u; i++) {
+                    uint at = (r + i * TM) * CHUNK + kk;
+                    uint w = hidden[mine + at / 2u];
+                    float av = (at & 1u) ? hi(w) : lo(w);
+                    [unroll] for (uint j4 = 0; j4 < 2u; j4++)
+                        result[i][j4] += av * pv[j4];
+                }
             }
         }
-        GroupMemoryBarrierWithGroupSync();       // the next chunk overwrites `hidden`
+        GroupMemoryBarrierWithGroupSync();       // the next chunk overwrites the hidden chunk
     }
+    if (!live_rows) return;                      // no barrier follows
 
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow_out = (operation_flags() & 0x1000u) != 0u;

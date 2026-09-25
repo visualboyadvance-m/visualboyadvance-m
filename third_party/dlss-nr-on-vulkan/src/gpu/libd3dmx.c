@@ -1778,14 +1778,17 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 	memset(&p, 0, sizeof p);
 	p.n = heads; p.batch = batches; p.flags = bias >= 0;
 	int ids[OPERANDS] = { q, k, out, v, bias, -1 };
-	/* eight groups on x (never split), the batch on y and z as the kernel reads it */
-	return dispatch(g.rwindow[merged], &p, ids, 8, batches < 65535u ? batches : 65535u,
+	/* one 256-lane group a window and head (its slices share K and V), the batch on y and
+	 * z as the kernel reads it */
+	return dispatch(g.rwindow[merged], &p, ids, 1, batches < 65535u ? batches : 65535u,
 			1u + (batches - 1u) / 65535u, 0, PK_ROW, 3);
 }
 
 /* A feed-forward in one dispatch (ffn_fused_portable.hlsl): the input, the expand weights,
  * the output and the residual's skip in u0..u3, its cosine in u4, the projection weights
- * in u5. One 16-row block a group on x, split in pieces; the feed-forward group on y. */
+ * in u5. Eight 16-row blocks a 256-lane group on x, split in pieces; the feed-forward
+ * group on y. The narrow blocks' shape (32 channels, 128 hidden) sets flag 0x800000, and
+ * the group loads both weight matrices into groupshared memory once. */
 int xmx_ffn_init(const char *path)
 {
 	if (!g.rready) FAIL("resident runtime not initialised", 0);
@@ -1815,9 +1818,9 @@ int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine
 	p.m = M; p.n = cin; p.k = hidden; p.batch = groups;
 	p.sa = cin * hidden; p.sb = hidden * 32u;
 	p.ldc = groups > 1u ? groups * 32u : 0u;
-	p.flags = flags | (residual ? 0x20000u : 0u);
+	p.flags = flags | (residual ? 0x20000u : 0u) | (cin == 32u && hidden == 128u ? 0x800000u : 0u);
 	int ids[OPERANDS] = { a, expand, out, residual ? skip : -1, residual ? cosine : -1, projection };
-	return dispatch(g.rffn, &p, ids, M / 16u, groups, 1, 0, PK_GEMM, 31);
+	return dispatch(g.rffn, &p, ids, (M + 127u) / 128u, groups, 1, 0, PK_GEMM, 31);
 }
 
 /* -- submission ---------------------------------------------------------------- */

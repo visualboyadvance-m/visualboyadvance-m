@@ -22,7 +22,7 @@ KNOBS = (
         "much smaller, and what comes back is the *head* — the detail it drew — which is "
         "then scaled up and composed against the full-resolution original, so the game's "
         "own pixels are never resampled and only the synthesised part is interpolated. "
-        "Cost follows the extent and nothing else: about 9 ms + 196 ms per megapixel "
+        "Cost follows the extent and nothing else: about 9 ms + 162 ms per megapixel "
         "of network extent on an Arc 140V. The extent is never below 320 on a side — the "
         "checkpoint's minimum — so small renders are padded up to it: at 512x288 every "
         "scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times "
@@ -109,13 +109,13 @@ DEFAULTS = {knob.name: knob.default for knob in KNOBS}
 # by `src/tools/knob_doc.py`, because the hand-written one went two days out of date the
 # moment the host passes moved to C and then stayed wrong for a week.
 RATES = (
-    (512, 288, 0.35, 35.2),
-    (512, 288, 0.50, 34.9),
-    (640, 360, 0.35, 35.8),
-    (640, 360, 0.50, 35.9),
-    (854, 480, 0.50, 44.8),
-    (1024, 768, 0.55, 67.9),
-    (1920, 1080, 0.55, 160.4),
+    (512, 288, 0.35, 30.2),
+    (512, 288, 0.50, 30.0),
+    (640, 360, 0.35, 31.1),
+    (640, 360, 0.50, 31.8),
+    (854, 480, 0.50, 37.9),
+    (1024, 768, 0.55, 60.1),
+    (1920, 1080, 0.55, 140.5),
 )
 RATES_MEASURED = "2026-09-25"
 # What a reader of the table needs and the numbers cannot say. Empty when there is nothing.

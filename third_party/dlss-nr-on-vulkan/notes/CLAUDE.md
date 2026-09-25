@@ -388,7 +388,10 @@ took 1280x720 from 445 to 231 ms and the curve to `10 ms + 230 ms per megapixel`
 had been running on half its threads — 15.5 KB of shared memory a workgroup, where a core
 holds 128 KB between them; given all of them, and a partial last block, it took the curve to `9.4 ms + 196`
 (`notes/improve-shared-memory.md`, which also records a Mesa quirk that makes some *smaller*
-declarations slower and costs this frame nothing). What follows is the
+declarations slower and costs this frame nothing). And window attention and the fused
+feed-forward, with no L1 at their shared-memory size, fetched the same operands from L2 once
+per subgroup; sharing them took those passes to 0.48x and 0.6x and the curve to
+`8.9 ms + 162` (2026-09-25, same note). What follows is the
 per-pass record, which still stands.
 `xmx_profile()` timestamps every pass (`src/bench/frame_profile.py`): GEMM is 216 ms of
 488 at 720p and is register-bound; of the other 272 ms, every pass that only moves data
@@ -400,7 +403,7 @@ handing work to the four E-cores (**-7 %** for a theoretical +2 %). `notes/phase
 `phase46`.
 
 **Both modes run in a real game.** Photo mode holds a frame while a trigger file exists;
-live mode (`NR_LAYER_LIVE=N`) runs continuously — **35-36 ms a frame at 512x288 and at
+live mode (`NR_LAYER_LIVE=N`) runs continuously — **30-32 ms a frame at 512x288 and at
 640x360** for the daemon alone (2026-09-25), 25 fps in Tekken 7 at 640x360 beside the game's
 own rendering and 17.3 at 1280x720 (`phase59`; 10.5 before the fusions) — with the game set to
 that extent and the compositor doing the stretch. `src/layer/nr-ctl`
@@ -449,5 +452,5 @@ src/     our code
 
 ---
 
-*Last updated 2026-09-24 (the fusions, the staged GEMM's shared memory, a Mesa quirk found and a fix measured, and the documents brought back in line with the layer that replaced the queue drains). **Read `notes/HANDOFF.md` first** — it carries the current state and the traps. Owner runs Arch Linux, is comfortable at kernel/driver level,
+*Last updated 2026-09-25 (window attention and the fused feed-forward sharing their operands across subgroups; before that the fusions, the staged GEMM's shared memory, and a Mesa quirk found and a fix measured). **Read `notes/HANDOFF.md` first** — it carries the current state and the traps. Owner runs Arch Linux, is comfortable at kernel/driver level,
 prefers C for low-level work, and does not need concepts explained from scratch.*

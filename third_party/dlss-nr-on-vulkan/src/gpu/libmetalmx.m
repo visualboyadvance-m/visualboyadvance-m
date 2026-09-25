@@ -1030,6 +1030,17 @@ int xmx_rec_qkv(int source, int q, int k, int v, int scale,
 	return dispatch(pipeline, &p, (rows + 31) / 32, 3, 1, 32, PK_ROW, 2);
 }
 
+/* The fused passes run 256 threads a threadgroup; a pipeline whose registers leave it
+ * fewer says so here rather than failing at dispatch. */
+static int fused_fits(const char *what, void *pipeline)
+{
+	NSUInteger most = ((__bridge id<MTLComputePipelineState>)pipeline).maxTotalThreadsPerThreadgroup;
+	if (most >= 256) return 0;
+	snprintf(g.err, sizeof g.err, "%s needs 256 threads a threadgroup; the pipeline allows %lu",
+		 what, (unsigned long)most);
+	return -1;
+}
+
 /* Window attention's QK^T, softmax and PV in one dispatch (window_attention.metal); the
  * portable twin on the portable path. `merged` is function constant 1: the head merge's
  * work as well. Built on first use. */
@@ -1054,8 +1065,10 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 			  .residual_cos = bias >= 0 ? addr_of(bias) : 0 };
 	if (!p.a || !p.b || !p.c || !p.d || (bias >= 0 && !p.residual_cos))
 		FAIL("window attention operand is not a live buffer", 0);
-	return dispatch(g.rwindow[merged], &p, 8, batches < 65535u ? batches : 65535u,
-			1u + (batches - 1u) / 65535u, 32, PK_ROW, 3);
+	if (fused_fits("window attention", g.rwindow[merged])) return -1;
+	/* one 256-thread threadgroup a window and head: its eight simdgroups share K and V */
+	return dispatch(g.rwindow[merged], &p, 1, batches < 65535u ? batches : 65535u,
+			1u + (batches - 1u) / 65535u, 256, PK_ROW, 3);
 }
 
 /* A feed-forward in one dispatch, the hidden layer on chip (ffn_fused.metal). */
@@ -1082,18 +1095,22 @@ int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine
 	if (residual && (groups != 1u || cin != 32u || skip < 0 || cosine < 0))
 		FAIL("the fused residual is for one group of 32 channels, with skip and cosine", 0);
 	if (!residual && (flags & 0x40000u)) FAIL("a half skip without a residual", 0);
+	/* the narrow blocks' shape: both weight matrices fit the threadgroup's memory */
+	int staged = cin == 32u && hidden == 128u;
 	struct push p = { .a = addr_of(a), .b = addr_of(expand), .c = addr_of(out),
 			  .m = M, .n = cin, .k = hidden, .batch = groups,
 			  .sa = cin * hidden, .sb = hidden * 32u,
 			  .ldc = groups > 1u ? groups * 32u : 0u,
-			  .flags = flags | (residual ? 0x20000u : 0u),
+			  .flags = flags | (residual ? 0x20000u : 0u) | (staged ? 0x800000u : 0u),
 			  .qkv_scale = addr_of(projection) };
 	if (residual) { p.d = addr_of(skip); p.residual_cos = addr_of(cosine); }
 	if (!p.a || !p.b || !p.c || !p.qkv_scale || (residual && (!p.d || !p.residual_cos)))
 		FAIL("fused feed-forward operand is not a live buffer", 0);
 	void *pipeline;
 	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
-	return dispatch(pipeline, &p, M / 16u, groups, 1, 32, PK_GEMM, 31);
+	if (fused_fits("the fused feed-forward", pipeline)) return -1;
+	/* eight 16-row blocks a 256-thread threadgroup; the last one's surplus blocks idle */
+	return dispatch(pipeline, &p, (M + 127u) / 128u, groups, 1, 256, PK_GEMM, 31);
 }
 
 int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsigned width,

@@ -438,7 +438,7 @@ all of them move between frames. Only `profile` costs a forward pass.
 
 `0.05` to `1`, step `0.05`, default `1`
 
-The only knob that changes the frame rate. The network runs on a frame this much smaller, and what comes back is the *head* — the detail it drew — which is then scaled up and composed against the full-resolution original, so the game's own pixels are never resampled and only the synthesised part is interpolated. Cost follows the extent and nothing else: about 9 ms + 196 ms per megapixel of network extent on an Arc 140V. The extent is never below 320 on a side — the checkpoint's minimum — so small renders are padded up to it: at 512x288 every scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times the real pixels in it. 0.55 is the measured compromise, but the *sign* of its effect on quality depends on how dark the scene is rather than on the number: on a bright frame 0.55 adds 15 % of local contrast to a kimono, on a dark crowd it takes 21 % away.
+The only knob that changes the frame rate. The network runs on a frame this much smaller, and what comes back is the *head* — the detail it drew — which is then scaled up and composed against the full-resolution original, so the game's own pixels are never resampled and only the synthesised part is interpolated. Cost follows the extent and nothing else: about 9 ms + 162 ms per megapixel of network extent on an Arc 140V. The extent is never below 320 on a side — the checkpoint's minimum — so small renders are padded up to it: at 512x288 every scale up to 0.62 runs the same 320x320 network as 0.35 does, with three times the real pixels in it. 0.55 is the measured compromise, but the *sign* of its effect on quality depends on how dark the scene is rather than on the number: on a bright frame 0.55 adds 15 % of local contrast to a kimono, on a dark crowd it takes 21 % away.
 
 ### `profile` — which way to trade skin texture against speculars
 
@@ -492,13 +492,13 @@ Measured through the socket on 2026-09-25 by `python3 src/bench/live_rates.py` �
 
 | swapchain | render scale | ms | fps |
 | --- | ---: | ---: | ---: |
-| 512x288 | 0.35 | 35 | 28.4 |
-| 512x288 | 0.50 | 35 | 28.7 |
-| 640x360 | 0.35 | 36 | 27.9 |
-| 640x360 | 0.50 | 36 | 27.9 |
-| 854x480 | 0.50 | 45 | 22.3 |
-| 1024x768 | 0.55 | 68 | 14.7 |
-| 1920x1080 | 0.55 | 160 | 6.2 |
+| 512x288 | 0.35 | 30 | 33.1 |
+| 512x288 | 0.50 | 30 | 33.3 |
+| 640x360 | 0.35 | 31 | 32.2 |
+| 640x360 | 0.50 | 32 | 31.4 |
+| 854x480 | 0.50 | 38 | 26.4 |
+| 1024x768 | 0.55 | 60 | 16.6 |
+| 1920x1080 | 0.55 | 140 | 7.1 |
 
 Medians of three runs with swap empty, which agreed within 10 %. On 2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures rising, 1920x1080 ran anywhere from 322 to 463 ms: if that row is much slower for you, look at swap before anything else.
 

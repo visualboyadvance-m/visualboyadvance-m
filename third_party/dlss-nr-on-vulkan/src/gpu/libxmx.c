@@ -118,6 +118,11 @@ static struct {
 	/* resident path */
 	VkPipelineLayout rpl; VkPipeline rgemm, rtiled, rstaged, runary, rrow, rhistory, rwindow[2];
 	VkPipeline rffn;          /* the fused feed-forward, built on first use */
+	/* the fused passes were built from their `_portable` twins, whose workgroups are
+	 * shaped differently from the matrix kernels' (xmx_rec_window_attention, xmx_rec_ffn) */
+	int rwindow_twin[2], rffn_twin;
+	/* the device's compute limits the fused passes' workgroups are checked against */
+	uint32_t max_shared, max_invocations;
 	char *rpaths[6];
 	unsigned specialize;
 	unsigned tiling, tilem, tilen;
@@ -617,6 +622,8 @@ static int open_adopted(void)
 	vkGetPhysicalDeviceProperties(adopt.pd, &props);
 	if (props.apiVersion < VK_API_VERSION_1_3)
 		FAIL("adopted device is below Vulkan 1.3", (int)props.apiVersion);
+	g.max_shared = props.limits.maxComputeSharedMemorySize;
+	g.max_invocations = props.limits.maxComputeWorkGroupInvocations;
 	uint32_t nq = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(adopt.pd, &nq, NULL);
 	VkQueueFamilyProperties *qf = calloc(nq ? nq : 1, sizeof *qf);
@@ -685,6 +692,8 @@ int xmx_open(void)
 	free(pds);
 	VkPhysicalDeviceProperties props;
 	vkGetPhysicalDeviceProperties(g.pd, &props);
+	g.max_shared = props.limits.maxComputeSharedMemorySize;
+	g.max_invocations = props.limits.maxComputeWorkGroupInvocations;
     
 #if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
     sprintf_s(g.name, sizeof g.name, "%s", props.deviceName);
@@ -1682,10 +1691,62 @@ int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsign
 	return 0;
 }
 
+/* The fused passes' matrix kernels alias their shared memory as several typed blocks
+ * (GL_EXT_shared_memory_block), which needs VK_KHR_workgroup_memory_explicit_layout. A
+ * matrix device without it — or an adopting host that did not pass
+ * XMX_ADOPT_EXPLICIT_LAYOUT — runs the `_portable` twin instead: the same arithmetic in
+ * the portable GEMM's summation order, so correct, but not bit-identical to the matrix
+ * path's unfused passes. Returns a malloc'd path, and whether it is the twin. */
+static char *fused_path(const char *path, int *twin)
+{
+	if (g.portable || g.explicit_layout || strstr(path, "_portable")) {
+		*twin = g.portable || strstr(path, "_portable") != NULL;
+		return nr_strdup(path);
+	}
+	size_t n = strlen(path), stem = n;
+	if (n >= 4 && !strcmp(path + n - 4, ".spv")) stem = n - 4;
+	char *out = malloc(n + sizeof "_portable");
+	if (!out) return NULL;
+	memcpy(out, path, stem);
+	memcpy(out + stem, "_portable", sizeof "_portable" - 1);
+	memcpy(out + stem + sizeof "_portable" - 1, path + stem, n - stem + 1);
+	*twin = 1;
+	fprintf(stderr, "libxmx: no VK_KHR_workgroup_memory_explicit_layout; %s runs as %s\n",
+		path, out);
+	return out;
+}
+
+/* A fused pass's workgroup against the device's limits, so a device that cannot hold it
+ * says so at build time rather than failing pipeline creation with a bare VkResult. */
+static int fused_fits(const char *what, uint32_t bytes, uint32_t lanes)
+{
+	if (g.max_shared && g.max_shared < bytes) {
+		snprintf(g.err, sizeof g.err, "%s needs %u bytes of shared memory a workgroup; the "
+			 "device has %u", what, bytes, g.max_shared);
+		return -1;
+	}
+	if (g.max_invocations && g.max_invocations < lanes) {
+		snprintf(g.err, sizeof g.err, "%s needs %u invocations a workgroup; the device "
+			 "allows %u", what, lanes, g.max_invocations);
+		return -1;
+	}
+	return 0;
+}
+
 /* Window attention's QK^T, softmax and PV in one dispatch (ProjectsCodex's phase42,
- * `window_attention.comp`): one subgroup takes eight query rows against a window's 64
- * keys, and the scores and probabilities stay in shared memory instead of making two
- * round trips through device buffers. Built on first use, so a graph that keeps the
+ * `window_attention.comp`): one 256-lane workgroup takes a window and head, its K and V
+ * loaded once into 16 KB of shared memory, and each of its eight subgroups eight query
+ * rows; the scores and probabilities stay in shared memory instead of making two round
+ * trips through device buffers.
+ *
+ * The portable twin keeps one 32-lane workgroup for each eight rows, K and V read from
+ * device memory. The one-workgroup-a-window form was built for it too (K transposed in
+ * shared memory, the weights made in registers, bit-exact) and measured on the only
+ * portable Vulkan device here, an M3 through MoltenVK: a 1280x768 frame 614 ms against
+ * 602 with this kernel — the reverse of Metal, whose own portable kernel does gain from
+ * it (window_attention.metal).
+ *
+ * Built on first use, so a graph that keeps the
  * three-pass path never compiles it. The bias pointer rides in the residual epilogue's
  * slot, `residual_cos` at offset 96, which is why that field was appended rather than
  * inserted.
@@ -1698,11 +1759,19 @@ int xmx_window_init(const char *path, unsigned merged)
 	if (!g.rready) FAIL("resident runtime not initialised", 0);
 	if (merged > 1) FAIL("invalid window attention output mode", 0);
 	if (g.rwindow[merged]) return 0;
+	/* the twin is 32 lanes and 2 KB; the matrix kernel's workgroup is the one to check */
+	if (!g.portable && fused_fits("window attention", 16384u, 256u)) return -1;
+	int twin;
+	char *use = fused_path(path, &twin);
+	if (!use) FAIL("pipeline path allocation", 0);
 	/* a bool specialization constant is a VkBool32, which is what `merged` already is */
 	VkSpecializationMapEntry entry = { .constantID = 0, .offset = 0, .size = sizeof merged };
 	VkSpecializationInfo info = { .mapEntryCount = 1, .pMapEntries = &entry,
 				      .dataSize = sizeof merged, .pData = &merged };
-	return build_pipeline_spec(path, g.rpl, &g.rwindow[merged], &info);
+	int r = build_pipeline_spec(use, g.rpl, &g.rwindow[merged], &info);
+	free(use);
+	g.rwindow_twin[merged] = twin;
+	return r;
 }
 
 int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
@@ -1718,7 +1787,9 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 		FAIL("window attention operand is not a live buffer", 0);
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, g.rwindow[merged]);
 	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
-	vkCmdDispatch(g.rcb, 8, batches < 65535u ? batches : 65535u,
+	/* one 256-lane workgroup a window and head, its eight subgroups sharing K and V; the
+	 * portable twin keeps eight 32-lane workgroups of eight rows (see xmx_window_init) */
+	vkCmdDispatch(g.rcb, g.rwindow_twin[merged] ? 8u : 1u, batches < 65535u ? batches : 65535u,
 		      1u + (batches - 1u) / 65535u);
 	barrier();
 	stamp(PK_ROW, 3);        /* WINDOW_ATTENTION, as window_attention.comp names it */
@@ -1728,16 +1799,28 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 
 /* A 32-channel block's whole feed-forward in one dispatch (`ffn_fused.comp`): the expand,
  * its gate and publish, the projection and the residual, with the hidden layer kept in
- * shared memory instead of written out as half and read back. One subgroup per 16 rows,
- * on the x axis of the grid, whose limit is 2^31-1 rather than y's 65535. Its profile
+ * shared memory instead of written out as half and read back. One subgroup per 16 rows —
+ * sixteen of them a 512-lane workgroup on the matrix kernel (32 KB), eight 32-lane slices
+ * a 256-lane one on the portable twin (24 KB) — and for the narrow blocks' shape (32
+ * channels, 128 hidden; flag 0x800000) both weight matrices loaded once into the
+ * workgroup's shared memory. The blocks are on the x axis of the grid, whose limit is
+ * 2^31-1 rather than y's 65535. Its profile
  * stamp is the base GEMM family's kind 31, which no plain GEMM's flags can reach. */
 int xmx_ffn_init(const char *path)
 {
 	if (!g.rready) FAIL("resident runtime not initialised", 0);
 	if (g.rffn) return 0;
+	int twin;
+	char *use = fused_path(path, &twin);
+	if (!use) FAIL("pipeline path allocation", 0);
+	if (fused_fits("the fused feed-forward", twin ? 24576u : 32768u, twin ? 256u : 512u)) {
+		free(use);
+		return -1;
+	}
 	free(g.rpaths[5]);
-	if (!(g.rpaths[5] = nr_strdup(path))) FAIL("pipeline path allocation", 0);
-	return build_pipeline(path, g.rpl, &g.rffn);
+	g.rpaths[5] = use;
+	g.rffn_twin = twin;
+	return build_pipeline(use, g.rpl, &g.rffn);
 }
 
 int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine,
@@ -1754,11 +1837,13 @@ int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine
 	if (residual && (groups != 1u || cin != 32u || skip < 0 || cosine < 0))
 		FAIL("the fused residual is for one group of 32 channels, with skip and cosine", 0);
 	if (!residual && (flags & 0x40000u)) FAIL("a half skip without a residual", 0);
+	/* the narrow blocks' shape: both weight matrices fit the workgroup's shared memory */
+	int staged = cin == 32u && hidden == 128u;
 	struct push p = { .a = addr_of(a), .b = addr_of(expand), .c = addr_of(out),
 			  .m = M, .n = cin, .k = hidden, .batch = groups,
 			  .sa = cin * hidden, .sb = hidden * 32u,
 			  .ldc = groups > 1u ? groups * 32u : 0u,
-			  .flags = flags | (residual ? 0x20000u : 0u),
+			  .flags = flags | (residual ? 0x20000u : 0u) | (staged ? 0x800000u : 0u),
 			  .qkv_scale = addr_of(projection) };
 	if (residual) { p.d = addr_of(skip); p.residual_cos = addr_of(cosine); }
 	if (!p.a || !p.b || !p.c || !p.qkv_scale || (residual && (!p.d || !p.residual_cos)))
@@ -1767,7 +1852,10 @@ int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine
 	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
-	vkCmdDispatch(g.rcb, M / 16u, groups, 1);
+	/* sixteen subgroups of 16 rows a workgroup (eight on the portable twin); the last
+	 * one's surplus row blocks return, or on the twin idle through its barriers */
+	unsigned rows = g.rffn_twin ? 128u : 256u;
+	vkCmdDispatch(g.rcb, (M + rows - 1u) / rows, groups, 1);
 	barrier();
 	stamp(PK_GEMM, 31);
 	g.recorded++;
