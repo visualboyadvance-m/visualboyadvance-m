@@ -234,9 +234,17 @@
                     </object>
                   </object>
                   <object class="sizeritem">
+                    <flag>wxRIGHT</flag>
+                    <border>10</border>
                     <object class="wxRadioButton" name="DlssNrPost">
                       <label>Post-process</label>
                       <tooltip>Run DLSS NR over whatever the display filter produces, at the filtered size</tooltip>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <object class="wxRadioButton" name="DlssNrDisplay">
+                      <label>At display size</label>
+                      <tooltip>Scale the display filter's output up to the size it is shown at and run DLSS NR over that, as on a screenshot of the game. Slowest by far: the network sees every displayed pixel</tooltip>
                     </object>
                   </object>
                 </object>

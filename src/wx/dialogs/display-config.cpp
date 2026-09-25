@@ -626,12 +626,15 @@ void DisplayConfig::InitBasicTab() {
     dlss_nr_ = GetValidatedChild<wxCheckBox>("DlssNr");
     dlss_nr_pre_ = GetValidatedChild<wxRadioButton>("DlssNrPre");
     dlss_nr_post_ = GetValidatedChild<wxRadioButton>("DlssNrPost");
+    dlss_nr_display_ = GetValidatedChild<wxRadioButton>("DlssNrDisplay");
     if (dlssnr::Available()) {
         dlss_nr_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNr));
         dlss_nr_pre_->SetValidator(widgets::OptionSelectedValidator(
             config::OptionID::kDispDlssNrStage, dlssnr::kBeforeFilter));
         dlss_nr_post_->SetValidator(widgets::OptionSelectedValidator(
             config::OptionID::kDispDlssNrStage, dlssnr::kAfterFilter));
+        dlss_nr_display_->SetValidator(widgets::OptionSelectedValidator(
+            config::OptionID::kDispDlssNrStage, dlssnr::kAtDisplay));
         // OptionValidator only writes the option on TransferFromWindow (dialog
         // OK), so the observer alone never fires while the dialog is open.
         // Track the checkbox itself for the live case.
@@ -644,6 +647,7 @@ void DisplayConfig::InitBasicTab() {
         dlss_nr_->Hide();
         dlss_nr_pre_->Hide();
         dlss_nr_post_->Hide();
+        dlss_nr_display_->Hide();
     }
     filter_selector_->SetValidator(FilterValidator());
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
@@ -1238,13 +1242,14 @@ void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
 void DisplayConfig::SetDlssNrStageEnabled(bool enabled) {
     // The Basic tab owns these. The observer can fire before that tab has been
     // lazy-loaded, exactly as it can for the filter selectors above.
-    if (!dlssnr::Available() || !dlss_nr_pre_ || !dlss_nr_post_) {
+    if (!dlssnr::Available() || !dlss_nr_pre_ || !dlss_nr_post_ || !dlss_nr_display_) {
         return;
     }
 
     // The stage only means anything while the pass is on.
     dlss_nr_pre_->Enable(enabled);
     dlss_nr_post_->Enable(enabled);
+    dlss_nr_display_->Enable(enabled);
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {

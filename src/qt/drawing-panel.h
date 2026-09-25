@@ -86,6 +86,23 @@ public:
     // Denoise a whole source frame into scratch and return it, laid out like
     // the buffer passed in, for the filter threads to read instead.
     uint8_t* DlssNrPreFilter(uint8_t* frame, int instride, int w, int h);
+
+    // The display-size stage (dlssnr::kAtDisplay); see the wx port.
+    // True while the pass runs at display size.
+    bool DlssNrAtDisplay() const;
+    // The whole factor the filter's output is scaled up by: the most copies
+    // that fit the panel in device pixels, 1 when the stage is off.
+    int DlssNrDisplayFactor();
+    // Take `scale` from the filter's scale to filter_scale_ times `factor`.
+    void SetDlssNrDisplayScale(int factor);
+    // Start of DrawArea(uint8_t**): arm a rebuild when the panel's size calls
+    // for another factor, adopt any pending change, and put `scale` at the
+    // filter's own scale for the filter stage.
+    void BeginDlssNrFrame();
+    // End of the filter stage: put `scale` back to the full factor and, at
+    // display size, scale the frame up into dlssnr_display_, run the pass there
+    // and point `todraw` and `*outstride` at it.
+    void DlssNrDisplayStage(uint8_t* data, int instride, bool filtered, int* outstride);
     // Per-frame health check: log once when the model is up, fall back to no
     // filter if opening it or a pass failed. Called from DrawArea(uint8_t**).
     void UpdateDlssNrState();
@@ -157,7 +174,12 @@ protected:
     bool dlssnr_ready_logged_ = false;
     uint32_t dlssnr_frame_counter_ = 0;
     std::vector<uint8_t> dlssnr_frame_;  // staging for the pre-filter pass
+    std::vector<uint8_t> dlssnr_display_;  // the display-size frame, drawn from
 #endif
+    // The display filter's own scale; `scale` is this times dlssnr_display_k_
+    // (1 unless DLSS NR runs at display size) and is what the renderers draw.
+    double filter_scale_ = 1.0;
+    int dlssnr_display_k_ = 1;
     // largest buffer required is 32-bit * (max width + 1) * (max height + 2)
     uint8_t delta[257 * 4 * 226];
 };

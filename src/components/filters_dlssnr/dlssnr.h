@@ -45,15 +45,19 @@
 
 namespace dlssnr {
 
-// True when the filter is compiled into this build.
 // Values for the kDispDlssNrStage option: whether the pass runs before the
-// display filter, at the source resolution, or after it, over the filter's
-// scaled output.
+// display filter, at the source resolution; after it, over the filter's scaled
+// output; or at display size, over the filter's output scaled up (nearest
+// neighbour) by the largest whole factor that fits the panel in physical
+// pixels, so the network sees the picture as it is shown -- what `nr_frame`
+// gets from a screenshot of the game area -- and the renderer draws it 1:1.
 enum Stage : uint32_t {
     kBeforeFilter = 0,
     kAfterFilter = 1,
+    kAtDisplay = 2,
 };
 
+// True when the filter is compiled into this build.
 inline constexpr bool Available() {
 #ifdef VBAM_ENABLE_DLSS_NR
     return true;

@@ -161,6 +161,7 @@ private:
     wxCheckBox* dlss_nr_ = nullptr;
     wxRadioButton* dlss_nr_pre_ = nullptr;
     wxRadioButton* dlss_nr_post_ = nullptr;
+    wxRadioButton* dlss_nr_display_ = nullptr;
     wxChoice* interframe_selector_ = nullptr;
     wxChoice* sdlrenderer_selector_ = nullptr;
     wxControl* sdlrenderer_label_ = nullptr;

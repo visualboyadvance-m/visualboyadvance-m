@@ -669,8 +669,10 @@ GameArea::GameArea()
       // in place (no panel rebuild / no black flash), unlike the options above.
       // kDispDlssNr rides along: turning the post-pass on or off changes
       // whether the frame goes through the filter machinery at all, so it needs
-      // the same rebuild, and SyncDlssNr() runs off the back of it.
-      disp_filter_observer_({config::OptionID::kDispFilter, config::OptionID::kDispDlssNr},
+      // the same rebuild, and SyncDlssNr() runs off the back of it. So does
+      // kDispDlssNrStage, since the display-size stage changes the scale.
+      disp_filter_observer_({config::OptionID::kDispFilter, config::OptionID::kDispDlssNr,
+                             config::OptionID::kDispDlssNrStage},
                             std::bind(&GameArea::OnDispFilterChanged, this)),
       color_correction_auto_observer_(config::OptionID::kDispHDR,
                                       std::bind(&GameArea::ApplyAutoColorCorrection, this)),
@@ -3004,6 +3006,11 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     // own thread) when the option is on. Used by the filter thread below.
     SyncDlssNr();
 
+    // The window has no size yet, so the display-size factor starts at 1; the
+    // first frame works out the real one and adopts it in place.
+    filter_scale_ = scale;
+    dlssnr_display_k_ = 1;
+
     // HDR output re-encodes the final RGBA8 image, so force a 32-bit source
     // when it is enabled (unless an RPI plugin has locked us to 16-bit).
     if (hdr::HdrAvailable() && OPTION(kDispHDR) && !(rpi_ && rpi_bpp_ == 2)) {
@@ -3960,8 +3967,9 @@ private:
 
 void DrawingPanelBase::DrawArea(uint8_t** data)
 {
-    // Adopt a pending in-place filter change before anything reads `scale`.
-    ApplyPendingFilterChange();
+    // Adopt a pending in-place filter change before anything reads `scale`,
+    // which holds the filter's own scale until DlssNrDisplayStage() below.
+    BeginDlssNrFrame();
     UpdateDlssNrState();
 
     // double-buffer buffer:
@@ -4006,9 +4014,12 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     // Which side of the display filter the DLSS NR pass runs on. With no
     // filter there is nothing to be before or after, so that folds into the
     // pre case, where the network sees the frame at its native size.
-    const bool dlss_post = UsingDlssNr() && have_filter &&
+    // At display size the pass runs after everything else, in
+    // DlssNrDisplayStage().
+    const bool dlss_display = DlssNrAtDisplay();
+    const bool dlss_post = UsingDlssNr() && have_filter && !dlss_display &&
         OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
-    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post && !dlss_display;
 
     // The pre-pass hands the filter threads a denoised frame laid out exactly
     // like g_pix, which they read in place of it. The post-pass runs after
@@ -4203,6 +4214,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
         // frame and the screen.
         DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
+
+    // Back to the full scale; at display size, the pass and the frame drawn.
+    DlssNrDisplayStage(*data, instride, use_threads, &outstride);
 
     // Note: We do NOT modify *data (which is g_pix) here.
     // g_pix must always point to the emulator's allocated buffer.
@@ -4425,6 +4439,10 @@ void DrawingPanelBase::ApplyPendingFilterChange()
     StopFilterThreads();
     // The filter threads are gone, so the DLSS NR processor can come or go.
     SyncDlssNr();
+    // Whether the pass runs at display size, and at what factor, depends on
+    // the processor, the stage and the panel's size, all settled by now.
+    filter_scale_ = scale;
+    SetDlssNrDisplayScale(DlssNrDisplayFactor());
     extern uint8_t* g_pix;
     if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
         free(pixbuf2);
@@ -4480,6 +4498,108 @@ uint8_t* DrawingPanelBase::DlssNrPreFilter(uint8_t* frame, int instride, int w, 
 #else
     (void)instride; (void)w; (void)h;
     return frame;
+#endif
+}
+
+bool DrawingPanelBase::DlssNrAtDisplay() const
+{
+#ifdef VBAM_ENABLE_DLSS_NR
+    // A plugin filter has its own formats and strides; the pass then runs
+    // before it, as it always has.
+    return UsingDlssNr() && !rpi_ && panel_color_depth_ == 32 &&
+        OPTION(kDispDlssNrStage) == dlssnr::kAtDisplay;
+#else
+    return false;
+#endif
+}
+
+int DrawingPanelBase::DlssNrDisplayFactor()
+{
+    if (!DlssNrAtDisplay())
+        return 1;
+    wxWindow* const win = GetWindow();
+    const double fw = width * filter_scale_;
+    const double fh = height * filter_scale_;
+    if (!win || fw <= 0 || fh <= 0 || filter_scale_ != std::floor(filter_scale_))
+        return 1;
+    // The client size is in logical pixels; the network should see physical
+    // ones, which is what a screenshot of the window holds.
+    const wxSize size = win->GetClientSize();
+    const double dpr = win->GetContentScaleFactor();
+    const int kx = static_cast<int>(size.GetWidth() * dpr / fw + 1e-3);
+    const int ky = static_cast<int>(size.GetHeight() * dpr / fh + 1e-3);
+    return std::max(1, std::min(kx, ky));
+}
+
+void DrawingPanelBase::SetDlssNrDisplayScale(int factor)
+{
+    dlssnr_display_k_ = factor;
+    scale = filter_scale_ * factor;
+}
+
+void DrawingPanelBase::BeginDlssNrFrame()
+{
+    // A resize, fullscreen or a move to a screen of another density changes
+    // the factor, and with it every buffer size: the same in-place rebuild a
+    // filter change goes through, so the renderer never sees a frame whose
+    // size disagrees with `scale`.
+    if (!pending_filter_change_ && DlssNrDisplayFactor() != dlssnr_display_k_)
+        pending_filter_change_ = true;
+    ApplyPendingFilterChange();
+    scale = filter_scale_;
+}
+
+// The display-size stage. The frame is scaled up by repeating pixels, which is
+// what the renderer would do with it (a whole factor, bilinear off), so the
+// network sees the picture the window shows; the renderer then draws the result
+// at 1:1, or stretches the remainder of a factor that did not divide the panel.
+void DrawingPanelBase::DlssNrDisplayStage(uint8_t* data, int instride, bool filtered,
+    int* outstride)
+{
+    scale = filter_scale_ * dlssnr_display_k_;
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!DlssNrAtDisplay())
+        return;
+
+    const int fs = static_cast<int>(filter_scale_);
+    const int k = dlssnr_display_k_;
+    // The filter threads start their output `fs` rows in; the core's frame
+    // starts one row in.
+    const uint8_t* const src = filtered
+        ? todraw + static_cast<size_t>(*outstride) * fs
+        : data + instride;
+    const size_t src_stride = filtered ? static_cast<size_t>(*outstride)
+                                       : static_cast<size_t>(instride);
+    const int fw = width * fs;
+    const int fh = height * fs;
+    const int dw = fw * k;
+    const int dh = fh * k;
+
+    // The layout every renderer reads: 32bpp, rows (width + 1) * scale pixels
+    // apart, the image one row in.
+    const size_t stride = static_cast<size_t>(std::ceil((width + 1) * 4 * scale));
+    if (dlssnr_display_.size() < stride * (dh + 2))
+        dlssnr_display_.resize(stride * (dh + 2));
+    uint8_t* const img = dlssnr_display_.data() + stride;
+
+    for (int y = 0; y < fh; y++) {
+        const uint32_t* s = reinterpret_cast<const uint32_t*>(src + src_stride * y);
+        uint8_t* const first = img + stride * static_cast<size_t>(y) * k;
+        uint32_t* d = reinterpret_cast<uint32_t*>(first);
+        for (int x = 0; x < fw; x++) {
+            const uint32_t v = s[x];
+            for (int i = 0; i < k; i++)
+                *d++ = v;
+        }
+        for (int i = 1; i < k; i++)
+            memcpy(first + stride * i, first, static_cast<size_t>(dw) * 4);
+    }
+
+    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh);
+    todraw = dlssnr_display_.data();
+    *outstride = static_cast<int>(stride);
+#else
+    (void)data; (void)instride; (void)filtered; (void)outstride;
 #endif
 }
 
@@ -5537,8 +5657,9 @@ void SDLDrawingPanel::DrawArea()
         
 void SDLDrawingPanel::DrawArea(uint8_t** data)
 {
-    // Adopt a pending in-place filter change before anything reads `scale`.
-    ApplyPendingFilterChange();
+    // Adopt a pending in-place filter change before anything reads `scale`,
+    // which holds the filter's own scale until DlssNrDisplayStage() below.
+    BeginDlssNrFrame();
     UpdateDlssNrState();
 
     // double-buffer buffer:
@@ -5563,9 +5684,12 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
     // Which side of the display filter the DLSS NR pass runs on. With no
     // filter there is nothing to be before or after, so that folds into the
     // pre case, where the network sees the frame at its native size.
-    const bool dlss_post = UsingDlssNr() && have_filter &&
+    // At display size the pass runs after everything else, in
+    // DlssNrDisplayStage().
+    const bool dlss_display = DlssNrAtDisplay();
+    const bool dlss_post = UsingDlssNr() && have_filter && !dlss_display &&
         OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
-    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post && !dlss_display;
 
     // The pre-pass hands the filter threads a denoised frame laid out exactly
     // like g_pix, which they read in place of it. The post-pass runs after
@@ -5779,6 +5903,9 @@ void SDLDrawingPanel::DrawArea(uint8_t** data)
         // frame and the screen.
         DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
+
+    // Back to the full scale; at display size, the pass and the frame drawn.
+    DlssNrDisplayStage(*data, instride, use_threads, &outstride);
 
     // Note: We do NOT modify *data (which is g_pix) here.
     // g_pix must always point to the emulator's allocated buffer.
@@ -10161,8 +10288,9 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
 
 void MetalDrawingPanel::DrawArea(uint8_t** data)
 {
-    // Adopt a pending in-place filter change before anything reads `scale`.
-    ApplyPendingFilterChange();
+    // Adopt a pending in-place filter change before anything reads `scale`,
+    // which holds the filter's own scale until DlssNrDisplayStage() below.
+    BeginDlssNrFrame();
     UpdateDlssNrState();
 
     // double-buffer buffer:
@@ -10187,9 +10315,12 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
     // Which side of the display filter the DLSS NR pass runs on. With no
     // filter there is nothing to be before or after, so that folds into the
     // pre case, where the network sees the frame at its native size.
-    const bool dlss_post = UsingDlssNr() && have_filter &&
+    // At display size the pass runs after everything else, in
+    // DlssNrDisplayStage().
+    const bool dlss_display = DlssNrAtDisplay();
+    const bool dlss_post = UsingDlssNr() && have_filter && !dlss_display &&
         OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
-    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post && !dlss_display;
 
     // The pre-pass hands the filter threads a denoised frame laid out exactly
     // like g_pix, which they read in place of it. The post-pass runs after
@@ -10403,6 +10534,9 @@ void MetalDrawingPanel::DrawArea(uint8_t** data)
         // frame and the screen.
         DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
+
+    // Back to the full scale; at display size, the pass and the frame drawn.
+    DlssNrDisplayStage(*data, instride, use_threads, &outstride);
 
     // Note: We do NOT modify *data (which is g_pix) here.
     // g_pix must always point to the emulator's allocated buffer.

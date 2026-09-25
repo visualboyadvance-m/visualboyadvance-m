@@ -191,11 +191,18 @@ QWidget* DisplayConfig::CreateBasicTab() {
         dlss_nr_post_ = new QRadioButton(tr("Post-process"), stage_row);
         dlss_nr_post_->setToolTip(
             tr("Run DLSS NR over whatever the display filter produces, at the filtered size"));
+        dlss_nr_display_ = new QRadioButton(tr("At display size"), stage_row);
+        dlss_nr_display_->setToolTip(
+            tr("Scale the display filter's output up to the size it is shown at and run "
+               "DLSS NR over that, as on a screenshot of the game. Slowest by far: the "
+               "network sees every displayed pixel"));
 
         stage_layout->addWidget(dlss_nr_pre_);
         stage_layout->addWidget(dlss_nr_post_);
+        stage_layout->addWidget(dlss_nr_display_);
         stage_layout->addStretch(1);
-        bindings().BindRadioButtons({dlss_nr_pre_, dlss_nr_post_},
+        // In dlssnr::Stage order: kBeforeFilter, kAfterFilter, kAtDisplay.
+        bindings().BindRadioButtons({dlss_nr_pre_, dlss_nr_post_, dlss_nr_display_},
                                     config::OptionID::kDispDlssNrStage);
         filters_form->addRow(dlss_nr_, stage_row);
 
@@ -204,6 +211,7 @@ QWidget* DisplayConfig::CreateBasicTab() {
             const bool on = dlss_nr_->isChecked();
             dlss_nr_pre_->setEnabled(on);
             dlss_nr_post_->setEnabled(on);
+            dlss_nr_display_->setEnabled(on);
         };
         connect(dlss_nr_, &QCheckBox::toggled, this, sync_stage);
         sync_stage();

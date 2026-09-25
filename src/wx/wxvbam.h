@@ -905,6 +905,31 @@ public:
     // the buffer passed in, for the filter threads to read instead.
     uint8_t* DlssNrPreFilter(uint8_t* frame, int instride, int w, int h);
 
+    // True while the DLSS NR pass runs at display size (kDispDlssNrStage is
+    // dlssnr::kAtDisplay and the pass can run there).
+    bool DlssNrAtDisplay() const;
+
+    // The whole factor the display-size stage scales the filter's output by:
+    // the most copies that fit the panel in physical pixels, 1 when the stage
+    // is off.
+    int DlssNrDisplayFactor();
+
+    // Take `scale` from the filter's scale (in it on entry) to the full factor
+    // the renderer draws at, filter_scale_ times the display-size factor.
+    void SetDlssNrDisplayScale(int factor);
+
+    // Start of every DrawArea(uint8_t**): arm an in-place rebuild when the
+    // panel's size calls for another display-size factor, adopt any pending
+    // change, and put `scale` at the filter's own scale for the filter stage.
+    void BeginDlssNrFrame();
+
+    // End of the filter stage of every DrawArea(uint8_t**): put `scale` back
+    // to the full factor and, for the display-size stage, scale the finished
+    // frame up into dlssnr_display_, run the pass over it there and point
+    // `todraw` (and `*outstride`) at it. `filtered` says whether the filter
+    // threads wrote `todraw`; otherwise the frame is `data`'s, `instride` apart.
+    void DlssNrDisplayStage(uint8_t* data, int instride, bool filtered, int* outstride);
+
     // Per-frame health check for the DLSS NR processor: log once when the model
     // is up, and fall back to no filter (with an on-screen message) if opening
     // the model or a pass failed. Called from every DrawArea(uint8_t**) path.
@@ -1033,7 +1058,14 @@ protected:
     bool dlssnr_ready_logged_ = false;
     uint32_t dlssnr_frame_counter_ = 0;
     std::vector<uint8_t> dlssnr_frame_;  // staging for the pre-filter pass
+    std::vector<uint8_t> dlssnr_display_;  // the display-size frame, drawn from
 #endif
+    // The display filter's own scale. `scale` is this times
+    // dlssnr_display_k_, the display-size factor (1 unless DLSS NR runs at
+    // display size), and is what the renderers draw at; the filter stage of
+    // DrawArea(uint8_t**) runs at filter_scale_.
+    double filter_scale_ = 1.0;
+    int dlssnr_display_k_ = 1;
     hdr::Encoding hdr_encoding_ = hdr::Encoding::kNone; // active HDR surface encoding
     std::vector<uint8_t> hdr_buf_;                       // scratch for EncodeHdr()
 #ifdef VBAM_RPI_PROXY_SUPPORT

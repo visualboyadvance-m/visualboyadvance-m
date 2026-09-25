@@ -935,6 +935,11 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     // own thread) when that filter is selected. Used by the filter thread.
     SyncDlssNr();
 
+    // The widget has no size yet, so the display-size factor starts at 1; the
+    // first frame works out the real one and adopts it in place.
+    filter_scale_ = scale;
+    dlssnr_display_k_ = 1;
+
     // DLSS NR runs over the whole frame from DrawArea(), so it sees the panel
     // buffers rather than the filter threads' per-band 32bpp staging copy, and
     // needs them already in RGBA8. Handing a neural denoiser 16-bit-quantized
@@ -991,13 +996,15 @@ void DrawingPanelBase::Destroy() {
 }
 
 void DrawingPanelBase::DrawArea(uint8_t** data) {
-    ApplyPendingFilterChange();
+    // Adopt a pending in-place filter change before anything reads `scale`,
+    // which holds the filter's own scale until DlssNrDisplayStage() below.
+    BeginDlssNrFrame();
     UpdateDlssNrState();
 
     const int outbpp = panel_color_depth_ >> 3;
     const int inrb = (panel_color_depth_ == 8) ? 4 : (panel_color_depth_ == 16) ? 2
                      : (panel_color_depth_ == 24) ? 0 : 1;
-    const int outstride = static_cast<int>(std::ceil((width + inrb) * outbpp * scale));
+    int outstride = static_cast<int>(std::ceil((width + inrb) * outbpp * scale));
 
     const bool have_filter = OPTION(kDispFilter) != config::Filter::kNone;
     const bool have_ifb = OPTION(kDispIFB) != config::Interframe::kNone;
@@ -1027,9 +1034,12 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
     // Which side of the display filter the DLSS NR pass runs on. With no
     // filter there is nothing to be before or after, so that folds into the
     // pre case, where the network sees the frame at its native size.
-    const bool dlss_post = UsingDlssNr() && have_filter &&
+    // At display size the pass runs after everything else, in
+    // DlssNrDisplayStage().
+    const bool dlss_display = DlssNrAtDisplay();
+    const bool dlss_post = UsingDlssNr() && have_filter && !dlss_display &&
                            OPTION(kDispDlssNrStage) == dlssnr::kAfterFilter;
-    const bool dlss_pre = UsingDlssNr() && !dlss_post;
+    const bool dlss_pre = UsingDlssNr() && !dlss_post && !dlss_display;
 
     // The pre-pass hands the filter threads a denoised frame laid out exactly
     // like g_pix, which they read in place of it. The post-pass runs after
@@ -1151,6 +1161,9 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
         // frame and the screen.
         DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
+
+    // Back to the full scale; at display size, the pass and the frame drawn.
+    DlssNrDisplayStage(*data, instride, use_threads, &outstride);
 
     // Draw OSD text directly into the output buffer.
     MainWindow* mf = vbamApp().frame;
@@ -1309,6 +1322,10 @@ void DrawingPanelBase::ApplyPendingFilterChange() {
     StopFilterThreads();
     // The filter threads are gone, so the DLSS NR processor can come or go.
     SyncDlssNr();
+    // Whether the pass runs at display size, and at what factor, depends on
+    // the processor, the stage and the panel's size, all settled by now.
+    filter_scale_ = scale;
+    SetDlssNrDisplayScale(DlssNrDisplayFactor());
     if (pixbuf2 && pixbuf2 != g_pix && pixbuf1 != pixbuf2)
         free(pixbuf2);
     pixbuf2 = nullptr;
@@ -1360,6 +1377,99 @@ uint8_t* DrawingPanelBase::DlssNrPreFilter(uint8_t* frame, int instride, int w, 
 #else
     (void)instride; (void)w; (void)h;
     return frame;
+#endif
+}
+
+bool DrawingPanelBase::DlssNrAtDisplay() const {
+#ifdef VBAM_ENABLE_DLSS_NR
+    // A plugin filter has its own formats and strides; the pass then runs
+    // before it, as it always has.
+    return UsingDlssNr() && !rpi_ && panel_color_depth_ == 32 &&
+           OPTION(kDispDlssNrStage) == dlssnr::kAtDisplay;
+#else
+    return false;
+#endif
+}
+
+int DrawingPanelBase::DlssNrDisplayFactor() {
+    if (!DlssNrAtDisplay())
+        return 1;
+    QWidget* const win = GetWindow();
+    const double fw = width * filter_scale_;
+    const double fh = height * filter_scale_;
+    if (!win || fw <= 0 || fh <= 0 || filter_scale_ != std::floor(filter_scale_))
+        return 1;
+    // The widget size is in logical pixels; the network should see device
+    // ones, which is what a screenshot of the window holds.
+    const double dpr = win->devicePixelRatioF();
+    const int kx = static_cast<int>(win->width() * dpr / fw + 1e-3);
+    const int ky = static_cast<int>(win->height() * dpr / fh + 1e-3);
+    return std::max(1, std::min(kx, ky));
+}
+
+void DrawingPanelBase::SetDlssNrDisplayScale(int factor) {
+    dlssnr_display_k_ = factor;
+    scale = filter_scale_ * factor;
+}
+
+void DrawingPanelBase::BeginDlssNrFrame() {
+    // A resize, fullscreen or a move to a screen of another density changes
+    // the factor, and with it every buffer size: the same in-place rebuild a
+    // filter change goes through.
+    if (!pending_filter_change_ && DlssNrDisplayFactor() != dlssnr_display_k_)
+        pending_filter_change_ = true;
+    ApplyPendingFilterChange();
+    scale = filter_scale_;
+}
+
+// The display-size stage: the frame is scaled up by repeating pixels, which is
+// what the renderer would do with it, so the network sees the picture the
+// window shows; the renderer then draws the result at 1:1.
+void DrawingPanelBase::DlssNrDisplayStage(uint8_t* data, int instride, bool filtered,
+                                          int* outstride) {
+    scale = filter_scale_ * dlssnr_display_k_;
+#ifdef VBAM_ENABLE_DLSS_NR
+    if (!DlssNrAtDisplay())
+        return;
+
+    const int fs = static_cast<int>(filter_scale_);
+    const int k = dlssnr_display_k_;
+    // The filter threads start their output `fs` rows in; the core's frame
+    // starts one row in.
+    const uint8_t* const src = filtered ? todraw + static_cast<size_t>(*outstride) * fs
+                                        : data + instride;
+    const size_t src_stride = filtered ? static_cast<size_t>(*outstride)
+                                       : static_cast<size_t>(instride);
+    const int fw = width * fs;
+    const int fh = height * fs;
+    const int dw = fw * k;
+    const int dh = fh * k;
+
+    // The layout every renderer reads: 32bpp, rows (width + 1) * scale pixels
+    // apart, the image one row in.
+    const size_t stride = static_cast<size_t>(std::ceil((width + 1) * 4 * scale));
+    if (dlssnr_display_.size() < stride * (dh + 2))
+        dlssnr_display_.resize(stride * (dh + 2));
+    uint8_t* const img = dlssnr_display_.data() + stride;
+
+    for (int y = 0; y < fh; y++) {
+        const uint32_t* s = reinterpret_cast<const uint32_t*>(src + src_stride * y);
+        uint8_t* const first = img + stride * static_cast<size_t>(y) * k;
+        uint32_t* d = reinterpret_cast<uint32_t*>(first);
+        for (int x = 0; x < fw; x++) {
+            const uint32_t v = s[x];
+            for (int i = 0; i < k; i++)
+                *d++ = v;
+        }
+        for (int i = 1; i < k; i++)
+            memcpy(first + stride * i, first, static_cast<size_t>(dw) * 4);
+    }
+
+    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh);
+    todraw = dlssnr_display_.data();
+    *outstride = static_cast<int>(stride);
+#else
+    (void)data; (void)instride; (void)filtered; (void)outstride;
 #endif
 }
 
