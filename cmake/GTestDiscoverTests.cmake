@@ -56,10 +56,8 @@ function(vbam_gtest_discover_tests TARGET)
         )
     endif()
 
-    if(CMAKE_CROSSCOMPILING_EMULATOR)
-        # Discovery runs the binary; the 5s default is not enough under wine.
-        gtest_discover_tests(${TARGET} DISCOVERY_TIMEOUT 120)
-    else()
-        gtest_discover_tests(${TARGET})
-    endif()
+    # Discovery runs the binary as a post-build step, and the 5s default is
+    # not enough under wine, nor for a freshly linked executable on a loaded
+    # CI host, where Windows also scans it on first launch.
+    gtest_discover_tests(${TARGET} DISCOVERY_TIMEOUT 120)
 endfunction()

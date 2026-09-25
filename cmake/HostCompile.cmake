@@ -74,11 +74,14 @@ function(host_compile src dst_cmd)
             get_filename_component(host_cc_name "${VBAM_HOST_CC}" NAME_WE)
 
             if(host_cc_name STREQUAL "cl")
-                # The MSVC driver spells its output option differently.
+                # The MSVC driver spells its output option differently, and
+                # names the object after the source in the working directory
+                # unless told otherwise, where tools built from sources of the
+                # same name would collide (see MSVC_x86_Host_Compile.cmake).
                 add_custom_command(
                     OUTPUT ${dst}
                     DEPENDS ${src}
-                    COMMAND ${VBAM_HOST_CC} /nologo ${src} /Fe:${dst}
+                    COMMAND ${VBAM_HOST_CC} /nologo ${src} /Fo:${dst}.obj /Fe:${dst}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 )
             else()

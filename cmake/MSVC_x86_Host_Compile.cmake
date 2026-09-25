@@ -35,8 +35,13 @@ set(ENV{LIB} "${new_lib}")
 # Output is kept rather than thrown away so that a failure can be reported with
 # it. Discarding it along with the exit status left a failed compile silent, to
 # be discovered later on as a missing ${dst} and a much less obvious error.
+#
+# The object file is named after ${dst}: cl.exe otherwise drops it in the
+# working directory named after ${src}, and two tools built from sources of the
+# same name at the same time (VBA-M's bin2c and the DLSS NR tree's) then fight
+# over it and one fails with "Cannot open compiler generated file".
 execute_process(
-    COMMAND ${cl_x86_path} /nologo ${src} /Fe:${dst}
+    COMMAND ${cl_x86_path} /nologo ${src} /Fo:${dst}.obj /Fe:${dst}
     OUTPUT_VARIABLE cl_output
     ERROR_VARIABLE  cl_output
     RESULT_VARIABLE cl_result
