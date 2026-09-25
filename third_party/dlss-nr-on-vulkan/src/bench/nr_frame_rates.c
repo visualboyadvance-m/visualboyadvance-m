@@ -347,7 +347,9 @@ int main(int argc, char **argv)
 {
     options o = { 9, 3, 0, 0, 0, 1.0f, 1.0f, 24.0f, 0.15f };
     const char *weights = NULL;
-    plan_case *plan = alloc((size_t)argc * sizeof *plan);
+    /* room for every argument as a case, or for the default table when there are none */
+    size_t room = (size_t)argc > sizeof PLAN / sizeof *PLAN ? (size_t)argc : sizeof PLAN / sizeof *PLAN;
+    plan_case *plan = alloc(room * sizeof *plan);
     int count = 0;
 
 #define NEXT() (i + 1 < argc ? argv[++i] : (usage(), (char *)0))
