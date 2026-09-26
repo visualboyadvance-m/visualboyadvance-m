@@ -25,13 +25,17 @@ network is there to produce.
     python3 src/bench/int8_bottleneck.py IMAGE [IMAGE ...]
     python3 src/bench/int8_bottleneck.py --write-crops         # also the worst-pixel crops
 
-**Weights only.** A real config-4 kernel also quantises the activations; this simulates
-the weight half on the resident path, which is exact, deterministic and takes seconds.
-The activation half was measured separately on the CPU reference at a small extent and
-came to +0.4 points of the effect (15.3 % -> 15.7 %). It has **not** been measured at
-1080p, and cannot be until the kernel exists.
+**Weights only** by default. A real config-4 kernel also quantises the activations, and
+`--activations` simulates that half too: before each of the four weight GEMMs of blocks
+31-38 the frame stops, and the host rounds the GEMM's A operand onto an int8 grid per row
+(per token) and back — what `int8_quant.quantise(a, axis=1)` feeds the integer kernel.
+The dequantised values are rounded to half on the way back, 2^-11 against the grid's
+2^-8, so this is the integer kernel's answer to within an eighth of its own error, at any
+extent. `--size WxH` resamples each frame first, to the network extent a live game sees
+(640x360 at render scale 0.5 is a 320x180 frame on a 320x320 network).
 """
 import argparse
+import os
 import pathlib
 import sys
 
@@ -41,6 +45,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "src" / "ref"), str(ROOT / "src" / "gpu")]
 import image_io                                                        # noqa: E402
 import nr_frame                                                        # noqa: E402
+import nr_resident                                                     # noqa: E402
+import xmxres                                                          # noqa: E402
 
 GLOBAL_BLOCKS = tuple(f"block{i}." for i in range(31, 39))
 LIMIT = 127                          # symmetric int8: -128..127, the negative end unused
@@ -72,32 +78,104 @@ def quantise_global_blocks(weights):
     return matrices, elements
 
 
-def render(colour, quantised):
+def quantise_rows(buffer, rows, width):
+    """Round a (rows, width) half buffer onto an int8 grid per row and back, in place."""
+    view = xmxres.host_view(buffer, np.float16)[:rows * width].reshape(rows, width)
+    wide = view.astype(np.float32)
+    peak = np.max(np.abs(wide), axis=1, keepdims=True)
+    scale = np.where(peak == 0, 1.0, peak / LIMIT)
+    view[...] = (np.round(wide / scale).clip(-LIMIT, LIMIT) * scale).astype(np.float16)
+
+
+OPERANDS = [0]
+_RECORD_GLOBAL_BLOCK = nr_resident.record_global_block
+
+
+def global_block_int8(runtime, w, s, source=None, target=None):
+    """`record_global_block` with every weight GEMM's A operand on an int8 grid per row.
+
+    The same passes in the same order; before each of the four weight GEMMs — the
+    expand, the feed-forward projection, the QKV projection and the output projection —
+    the frame is submitted, the operand rounded on the host, and recording resumed. The
+    attention GEMMs multiply activations by activations and stay in half, as a kernel
+    that put only the weight GEMMs on config 4 would leave them.
+    """
+    R = nr_resident
+
+    def int8_rows(buffer, width):
+        runtime.submit()
+        quantise_rows(buffer, s.padded, width)
+        OPERANDS[0] += 1
+        runtime.begin()
+
+    source = source or s.value
+    target = target or s.out
+    channels, heads, padded = w.channels, w.heads, s.padded
+    runtime.to_half(source, s.value16, padded * channels)
+    int8_rows(s.value16, channels)
+    runtime.gemm(s.value16, w.expand, s.hidden16, padded, w.hidden_width, channels,
+                 epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
+    int8_rows(s.hidden16, w.hidden_width)
+    R.record_project_residual(runtime, s.hidden16, w.ffn_proj, s.branch, source, w.ffn_cos,
+                              s.ffn, padded, channels, w.hidden_width)
+    runtime.to_half(s.ffn, s.ffn16, padded * channels)
+    int8_rows(s.ffn16, channels)
+    key = R.record_qkv_projection(runtime, s.ffn16, w, s, 1, padded, channels, heads)
+    runtime.gemm(s.q16, key, s.scores, padded, padded, 32, batch=heads,
+                 strides=(padded * 32, padded * 32, padded * padded), transpose_b=True)
+    runtime.softmax(s.scores, s.probs16, heads * padded, s.tokens,
+                    stride=padded, cap=w.logit_cap, narrow=True)
+    runtime.gemm(s.probs16, s.v16, s.context, padded, 32, padded, batch=heads,
+                 strides=(padded * padded, padded * 32, padded * 32))
+    runtime.merge_heads(s.context, s.merged16, 1, padded, channels, heads,
+                        epilogue=xmxres.EPI_E4M3, narrow=True)
+    int8_rows(s.merged16, channels)
+    R.record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
+                              target, padded, channels, channels)
+
+
+def render(colour, weights, activations):
     backend = nr_frame.ResidentBackend()
+    OPERANDS[0] = 0
+    nr_resident.record_global_block = (global_block_int8 if activations
+                                       else _RECORD_GLOBAL_BLOCK)
     try:
-        counts = quantise_global_blocks(backend.weights) if quantised else (0, 0)
+        counts = quantise_global_blocks(backend.weights) if weights else (0, 0)
         head, _ = nr_frame.run_head(backend, colour)
         return np.asarray(nr_frame.compose(head, colour), np.float32), counts
     finally:
+        nr_resident.record_global_block = _RECORD_GLOBAL_BLOCK
         backend.close()
 
 
-def frames(paths):
+def resampled(colour, size):
+    """The frame at `size` (width, height), resampled the way the daemon does it."""
+    sys.path.insert(0, str(ROOT / "src" / "layer"))
+    import nr_daemon
+    width, height = size
+    return np.ascontiguousarray(nr_daemon.resample(colour, (height, width)), np.float32)
+
+
+def frames(paths, size=None):
     for path in paths:
         path = pathlib.Path(path)
         if not path.exists():
             print(f"  {path.name}: not here — skipped, and a skip is not a pass")
             continue
-        yield path, image_io.load(str(path))[:, :, :3].astype(np.float32)
+        colour = image_io.load(str(path))[:, :, :3].astype(np.float32)
+        yield path, (resampled(colour, size) if size else colour)
 
 
-def measure(path, colour, write_crops):
-    reference, _ = render(colour, False)
-    repeat, _ = render(colour, False)
+def measure(path, colour, write_crops, activations):
+    reference, _ = render(colour, False, False)
+    repeat, _ = render(colour, False, False)
     drift = float(np.abs(repeat - reference).max()) * 255
-    quantised, (matrices, elements) = render(colour, True)
+    quantised, (matrices, elements) = render(colour, True, activations)
     if not matrices:
         print(f"  {path.name}: nothing was quantised — the filter matched no weight")
+        return None
+    if activations and not OPERANDS[0]:
+        print(f"  {path.name}: no activation was quantised — the hook never ran")
         return None
 
     effect = np.abs(reference - colour).max(axis=2) * 255
@@ -105,7 +183,7 @@ def measure(path, colour, write_crops):
     mean_effect = float((np.abs(reference - colour).mean()) * 255)
     mean_damage = float((np.abs(quantised - reference).mean()) * 255)
     row = dict(name=path.name, width=colour.shape[1], height=colour.shape[0],
-               matrices=matrices, elements=elements, drift=drift,
+               matrices=matrices, elements=elements, drift=drift, operands=OPERANDS[0],
                effect=mean_effect, damage=mean_damage,
                share=mean_damage / mean_effect * 100 if mean_effect else float("nan"),
                median=float(np.median(damage)), p99=float(np.percentile(damage, 99)),
@@ -129,7 +207,15 @@ def main():
     parser.add_argument("images", nargs="*", help="frames to measure; default: pngs/ then work/")
     parser.add_argument("--write-crops", action="store_true",
                         help="save input | fp16 | int8 around each frame's worst pixel")
+    parser.add_argument("--activations", action="store_true",
+                        help="the weight GEMMs' activations on an int8 grid per row too")
+    parser.add_argument("--size", metavar="WxH",
+                        help="resample each frame to this extent first, as the daemon would")
     args = parser.parse_args()
+    size = tuple(int(v) for v in args.size.split("x")) if args.size else None
+    if args.activations:
+        # the hook submits and resumes inside a block, which a captured graph cannot
+        os.environ["NR_FRAME_MODE"] = "block"
     paths = args.images or sorted(
         p for p in list((ROOT / "pngs").glob("*.[jp][pn]g")) + [ROOT / "work" / "frame_in.png"]
         if p.exists())
@@ -137,11 +223,14 @@ def main():
         print("no frames to measure — pass one; a skip is not a pass")
         return 0
 
-    rows = [r for r in (measure(p, c, args.write_crops) for p, c in frames(paths)) if r]
+    rows = [r for r in (measure(p, c, args.write_crops, args.activations)
+                        for p, c in frames(paths, size)) if r]
     if not rows:
         return 1
     print(f"\n  {rows[0]['matrices']} matrices, {rows[0]['elements']:,} weights"
           f" ({rows[0]['elements'] / MODEL_PARAMETERS * 100:.1f} % of the model) on the int8 grid")
+    if args.activations:
+        print(f"  and {rows[0]['operands']} GEMM operands a frame on an int8 grid per row")
     print(f"\n  {'frame':26} {'extent':>11} {'effect':>8} {'damage':>8} {'share':>7}"
           f" {'median':>8} {'p99':>7} {'worst':>7} {'repeat':>8}")
     for r in rows:

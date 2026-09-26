@@ -156,6 +156,7 @@ struct Filter::Impl {
     std::vector<float> pending;
     int pending_width = 0;
     int pending_height = 0;
+    float pending_intensity = kDisplayIntensity;
     bool has_pending = false;
     // The newest finished pass's output, RGB8, (height, width, 3): the bytes
     // `nr_frame IN.png OUT.png` writes for the frame that pass was given.
@@ -186,6 +187,7 @@ void Filter::Impl::Run() {
     // frame index 0 for the noise channels, no control mask, and the *still* path — no
     // history in the feature channels and no temporal composition — so every frame stands
     // alone and the output for a given input is the same as `nr_frame IN.png OUT.png`.
+    // The one exception is the intensity, which each frame brings along (Apply32()).
     nr_frame_params params;
     nr_frame_defaults(&params);
 
@@ -202,6 +204,7 @@ void Filter::Impl::Run() {
             has_pending = false;
             width = pending_width;
             height = pending_height;
+            params.intensity = pending_intensity;
         }
 
         const size_t count = static_cast<size_t>(width) * height * 3;
@@ -270,7 +273,8 @@ Filter::~Filter() {
 }
 
 void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstride, int width,
-                     int height, int red_shift, int green_shift, int blue_shift) {
+                     int height, int red_shift, int green_shift, int blue_shift,
+                     float intensity) {
     if (width <= 0 || height <= 0)
         return;
     Impl& im = *impl_;
@@ -302,6 +306,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             }
             im.pending_width = width;
             im.pending_height = height;
+            im.pending_intensity = intensity;
             im.has_pending = true;
             notify_worker = true;
         }

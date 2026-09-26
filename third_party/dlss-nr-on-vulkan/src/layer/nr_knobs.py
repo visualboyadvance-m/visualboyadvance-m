@@ -31,6 +31,17 @@ KNOBS = (
         "Cost on an Arc 140V: about 9 ms plus 162 ms per megapixel of network frame.",
     ),
     Knob(
+        "min_extent", "min extent", "number", 128.0, 320.0, 64.0, 320.0,
+        "the smallest side the network's frame is padded to",
+        "The network's frame is padded, by mirroring the picture, to at least this many "
+        "pixels on a side. 320 is what NVIDIA's own driver does; the network itself runs "
+        "down to 128. At small live sizes most of a 320 frame is padding, so a lower floor "
+        "is much faster — on an Arc 140V, 512x288 at scale 0.35 takes 29 ms a frame at "
+        "320 and 15 at 128 — and draws a somewhat different picture, since the network no "
+        "longer sees a mirrored copy of the scene around it. Neither is wrong; compare them "
+        "in a game. It changes nothing once the scaled frame is larger than this anyway.",
+    ),
+    Knob(
         "profile", "profile", "choice", None, None, None, "standard",
         "which way to trade skin texture against highlights and colour",
         "The style the network is asked for. The profiles are a trade, not a quality "
@@ -110,20 +121,20 @@ BY_NAME = {knob.name: knob for knob in KNOBS}
 DEFAULTS = {knob.name: knob.default for knob in KNOBS}
 
 # The whole round trip, median of nine frames each, measured by `src/bench/live_rates.py`
-# on 2026-09-24 — the daemon's own cost, with no game competing for the GPU. `nr-ctl rates`,
+# on 2026-09-26 — the daemon's own cost, with no game competing for the GPU. `nr-ctl rates`,
 # the panel and the README all read this one table; the README's copy is generated from it
 # by `src/tools/knob_doc.py`, because the hand-written one went two days out of date the
 # moment the host passes moved to C and then stayed wrong for a week.
 RATES = (
-    (512, 288, 0.35, 30.2),
-    (512, 288, 0.50, 30.0),
-    (640, 360, 0.35, 31.1),
-    (640, 360, 0.50, 31.8),
-    (854, 480, 0.50, 37.9),
-    (1024, 768, 0.55, 60.1),
-    (1920, 1080, 0.55, 140.5),
+    (512, 288, 0.35, 25.5),
+    (512, 288, 0.50, 26.0),
+    (640, 360, 0.35, 25.8),
+    (640, 360, 0.50, 26.5),
+    (854, 480, 0.50, 32.3),
+    (1024, 768, 0.55, 48.5),
+    (1920, 1080, 0.55, 110.8),
 )
-RATES_MEASURED = "2026-09-25"
+RATES_MEASURED = "2026-09-26"
 # What a reader of the table needs and the numbers cannot say. Empty when there is nothing.
 RATES_NOTE = ("Medians of three runs with swap empty, which agreed within 10 %. On "
               "2026-09-23, with 5.5 GiB in zram and the kernel's memory-pressure figures "

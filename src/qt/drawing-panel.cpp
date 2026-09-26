@@ -1155,11 +1155,12 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
     if (dlss_post) {
         uint8_t* const img = todraw + outstride * static_cast<int>(scale);
         DlssNrApply(img, outstride, img, outstride, static_cast<int>(width * scale),
-                    static_cast<int>(height * scale));
+                    static_cast<int>(height * scale), dlssnr::kFilterStageIntensity);
     } else if (dlss_pre && !use_threads) {
         // Nothing else ran, so this is all that stands between the emulated
         // frame and the screen.
-        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
+        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height,
+                    dlssnr::kFilterStageIntensity);
     }
 
     // Back to the full scale; at display size, the pass and the frame drawn.
@@ -1333,19 +1334,21 @@ void DrawingPanelBase::ApplyPendingFilterChange() {
 }
 
 // Run the DLSS NR pass from `src` to `dst`, both pointing at the first image
-// row. Returns false when there is no processor, so callers can fall through
+// row, composed at `intensity` (dlssnr::kFilterStageIntensity before or after
+// the display filter, kDisplayIntensity at display size). Returns false when there is no processor, so callers can fall through
 // to whatever they would do without one. dst may alias src.
 bool DrawingPanelBase::DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst,
-                                   int dst_stride, int w, int h) {
+                                   int dst_stride, int w, int h, float intensity) {
 #ifdef VBAM_ENABLE_DLSS_NR
     if (!dlssnr_)
         return false;
 
     dlssnr_->Apply32(src, src_stride, dst, dst_stride, w, h, systemRedShift - 3,
-                     systemGreenShift - 3, systemBlueShift - 3);
+                     systemGreenShift - 3, systemBlueShift - 3, intensity);
     return true;
 #else
     (void)src; (void)src_stride; (void)dst; (void)dst_stride; (void)w; (void)h;
+    (void)intensity;
     return false;
 #endif
 }
@@ -1367,7 +1370,8 @@ uint8_t* DrawingPanelBase::DlssNrPreFilter(uint8_t* frame, int instride, int w, 
 
     uint8_t* const base = dlssnr_frame_.data();
     uint8_t* const img = base + stride;
-    if (!DlssNrApply(frame + stride, instride, img, instride, w, h))
+    if (!DlssNrApply(frame + stride, instride, img, instride, w, h,
+                     dlssnr::kFilterStageIntensity))
         return frame;
 
     memcpy(base, img, stride);
@@ -1465,7 +1469,8 @@ void DrawingPanelBase::DlssNrDisplayStage(uint8_t* data, int instride, bool filt
             memcpy(first + stride * i, first, static_cast<size_t>(dw) * 4);
     }
 
-    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh);
+    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh,
+                dlssnr::kDisplayIntensity);
     todraw = dlssnr_display_.data();
     *outstride = static_cast<int>(stride);
 #else

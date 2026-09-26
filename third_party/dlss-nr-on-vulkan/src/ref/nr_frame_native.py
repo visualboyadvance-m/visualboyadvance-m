@@ -30,7 +30,7 @@ class Params(C.Structure):
                 ("history_confidence", C.c_float), ("blend_scale", C.c_float),
                 ("hold", C.c_float), ("slope", C.c_float), ("release", C.c_float),
                 ("automatic_mask", C.c_int), ("skin_structure", C.c_float),
-                ("automatic_structure", C.c_float)]
+                ("automatic_structure", C.c_float), ("min_extent", C.c_int)]
 
 
 _lib = None
@@ -58,6 +58,14 @@ def library():
         lib.nr_frame_defaults.restype = None
         lib.nr_frame_geometry.argtypes = [C.c_int, C.c_int, C.POINTER(C.c_int), C.POINTER(C.c_int)]
         lib.nr_frame_geometry.restype = None
+        lib.nr_frame_geometry_min.argtypes = [C.c_int, C.c_int, C.c_int, C.POINTER(C.c_int),
+                                              C.POINTER(C.c_int)]
+        lib.nr_frame_geometry_min.restype = None
+        lib.nr_frame_compose_encode.argtypes = [
+            C.c_void_p, C.c_void_p, C.c_int, C.c_int, C.c_void_p, C.c_int, C.c_int, C.c_void_p,
+            C.c_void_p, C.c_void_p, C.POINTER(Params), C.c_void_p, C.c_void_p, C.c_int, C.c_int,
+            C.c_int, C.c_int]
+        lib.nr_frame_compose_encode.restype = C.c_int
         lib.nr_frame_update.argtypes = [C.c_void_p, C.c_void_p, C.c_int, C.c_int, C.c_void_p,
                                         C.c_void_p, C.POINTER(Params), C.c_void_p, C.c_void_p]
         lib.nr_frame_update.restype = C.c_int
@@ -82,10 +90,10 @@ def library():
     return _lib
 
 
-def geometry(height, width):
-    """The network extent for an output extent."""
+def geometry(height, width, min_extent=320):
+    """The network extent for an output extent, at the floor `min_extent`."""
     h, w = C.c_int(), C.c_int()
-    library().nr_frame_geometry(height, width, C.byref(h), C.byref(w))
+    library().nr_frame_geometry_min(height, width, min_extent, C.byref(h), C.byref(w))
     return h.value, w.value
 
 
@@ -179,9 +187,9 @@ class NativeFrame:
         height, width = colour.shape[:2]
         history, hp = self._optional(history, colour, "history")
         control_mask, mp = self._optional(control_mask, colour, "control_mask")
-        H, W = geometry(height, width)
-        out = np.empty((H, W, 16), np.float32)
         p = params(**values)
+        H, W = geometry(height, width, p.min_extent)
+        out = np.empty((H, W, 16), np.float32)
         if self.lib.nr_frame_features_masked(self.handle, colour.ctypes.data, height, width, hp, mp,
                                              C.byref(p), out.ctypes.data):
             self._fail("nr_frame_features_masked")
@@ -202,6 +210,29 @@ class NativeFrame:
         if self.lib.nr_frame_compose(self.handle, head.ctypes.data, colour.ctypes.data, height, width,
                                      hp, pp, mp, C.byref(p), output.ctypes.data):
             self._fail("nr_frame_compose")
+        return output
+
+    def compose_encode(self, head, colour, encoded, top=0, left=0, bgra=True, history=None,
+                       previous=None, control_mask=None, **values):
+        """`nr_frame.compose_encode` in C: the (hh, hw, 4) head brought up to the colour's
+        extent, composed and encoded into `encoded` (a writable (H, W, 4) uint8 copy of the
+        request) at (top, left). Returns the composition."""
+        colour = _image(colour, "colour", 3)
+        head = _image(head, "head", 4)
+        height, width = colour.shape[:2]
+        if (not isinstance(encoded, np.ndarray) or encoded.dtype != np.uint8 or encoded.ndim != 3
+                or encoded.shape[2] != 4 or not encoded.flags.c_contiguous):
+            raise ValueError("encoded must be a C-contiguous (H, W, 4) uint8 array")
+        history, hp = self._optional(history, colour, "history")
+        previous, pp = self._optional(previous, colour, "previous")
+        control_mask, mp = self._optional(control_mask, colour, "control_mask")
+        output = np.empty((height, width, 3), np.float32)
+        p = params(**values)
+        if self.lib.nr_frame_compose_encode(self.handle, head.ctypes.data, head.shape[0], head.shape[1],
+                                            colour.ctypes.data, height, width, hp, pp, mp, C.byref(p),
+                                            output.ctypes.data, encoded.ctypes.data, encoded.shape[1],
+                                            top, left, int(bool(bgra))):
+            self._fail("nr_frame_compose_encode")
         return output
 
     def run_features(self, features):

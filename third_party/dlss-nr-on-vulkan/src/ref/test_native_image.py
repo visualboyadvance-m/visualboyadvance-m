@@ -261,6 +261,62 @@ def compose_checks(rng):
         FAILURES.append("the release test's moving band does not move")
 
 
+def fused_checks(rng):
+    """The head's upscale, the composition and the codec in one pass (`nr_compose_encode`)
+    against the three separate passes the daemon runs otherwise: the same composition, and
+    the same bytes in the answer — inside a letterbox too, where everything outside the
+    active region must come back as the game sent it."""
+    frame_h, frame_w = 40, 56
+    cases = 0
+    for (top, bottom, left, right), (head_h, head_w), bgra in (
+            ((0, 40, 0, 56), (14, 20), True), ((6, 34, 0, 56), (10, 20), True),
+            ((0, 40, 4, 52), (40, 16), False), ((3, 37, 2, 54), (34, 52), True),
+            ((0, 40, 0, 56), (40, 56), False), ((5, 35, 8, 48), (11, 13), False)):
+        raw = rng.integers(0, 256, (frame_h, frame_w, 4), dtype=np.uint8)
+        fmt = 44 if bgra else 37
+        whole = nr_daemon.decode(raw.tobytes(), frame_w, frame_h, fmt)
+        colour = whole[top:bottom, left:right]
+        height, width = colour.shape[:2]
+        history = rng.random((height, width, 3), dtype=np.float32)
+        previous = colour.copy()
+        previous[: height // 3] = rng.random((height // 3, width, 3), dtype=np.float32)
+        previous[height // 3: height // 3 + 2] += np.float32(1.0 / 255)
+        # the head as the daemon holds it: a crop of a wider, deeper network output
+        network = ((rng.random((head_h + 6, head_w + 4, 16), dtype=np.float32) - 0.5) * 2)
+        head = network[3:3 + head_h, 1:1 + head_w]
+        mask = np.ones((height, width, 3), np.float32)
+        mask[height // 2:, : width // 3, 0] = 0.0
+        for temporal, hold, release, confidence, control, intensity in (
+                (True, 1.0, 24.0, 1.0, None, 1.0), (True, 1.0, 0.0, 1.0, None, 1.0),
+                (True, 0.0, 0.0, 0.6, None, 1.0), (True, 0.5, 8.0, 1.0, mask, 1.0),
+                (True, 1.0, 24.0, 1.0, None, 1.66), (False, 0.0, 0.0, 1.0, None, 1.0),
+                (False, 0.0, 0.0, 1.0, None, 0.6), (False, 0.0, 0.0, 1.0, None, 1.66)):
+            channels = 4 if temporal else 3
+            up = nr_daemon.resample(head[..., :channels], (height, width))
+            options = dict(intensity=intensity, control_mask=control)
+            if temporal:
+                options.update(history=history, history_confidence=confidence,
+                               history_previous=previous, history_hold=hold,
+                               history_release=release)
+            reference = nr_frame.compose(up, colour, **options)
+            full = whole.copy()
+            full[top:bottom, left:right] = reference
+            expected = nr_daemon.encode(full, raw.tobytes(), fmt)
+            encoded = raw.copy()
+            fused, samples = nr_frame.compose_encode(head[..., :channels], colour, encoded,
+                                                     top=top, left=left, bgra=bgra, samples=8,
+                                                     **options)
+            name = (f"fused pass, region {top}:{bottom}x{left}:{right}, head {head_h}x{head_w}, "
+                    + (f"hold {hold:g}, release {release:g}, confidence {confidence:g}"
+                       if temporal else "still") + f", intensity {intensity:g}"
+                    + (", masked" if control is not None else ""))
+            same(name + ", composition", fused, reference)
+            same(name + ", bytes", encoded.tobytes(), expected)
+            same(name + ", head samples", samples, up[::8, ::8])
+            cases += 1
+    check(f"fused pass: {cases} cases", cases == 48)
+
+
 def main():
     if nr_image.library() is None:
         print("  no work/libnr_image.so (.dylib on macOS) — `make` builds it; the NumPy path still runs")
@@ -271,6 +327,7 @@ def main():
     feature_checks(rng)
     half_checks()
     compose_checks(rng)
+    fused_checks(rng)
     if FAILURES:
         print(f"\n{len(FAILURES)} FAILED: " + ", ".join(FAILURES), flush=True)
         return 1

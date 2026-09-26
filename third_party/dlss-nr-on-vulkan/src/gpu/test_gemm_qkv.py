@@ -31,12 +31,14 @@ def main():
     rng = np.random.default_rng(1729)
     cases, paths = 0, set()
     # (windows, tokens, channels): window blocks at every width, then the bottleneck's
-    # single window of all tokens, tile-aligned but not a whole 64-row block
+    # single window of all tokens, tile-aligned but not a whole 64-row block — now the
+    # staged kernel's partial last block, 96 tokens being a 576x352 network's — and a
+    # bottleneck of 32 tokens, the 32-row staged build's whole block
     shapes = ((6, 64, 32), (3, 64, 64), (2, 64, 128), (2, 64, 256), (1, 64, 512),
-              (1, 240, 1024), (3, 16, 256), (1, 256, 128))
+              (1, 240, 1024), (1, 96, 1024), (3, 16, 256), (1, 256, 128), (1, 32, 1024))
     for windows, tokens, channels in shapes:
         heads, rows = channels // 32, windows * tokens
-        paths.add("staged" if channels >= 128 and rows % 64 == 0 else "tiled")
+        paths.add("staged" if channels >= 128 and (rows % 64 == 0 or rows == 32) else "tiled")
         buffers = []
 
         def alloc(count, dtype):

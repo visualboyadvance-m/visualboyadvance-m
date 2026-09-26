@@ -62,13 +62,17 @@ DL_LIBS := -ldl
 endif
 CFLAGS  := -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -I$(VK_INC)
 SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
+           work/gemm_staged32.spv work/gemm_staged32_deep.spv work/attention_rows.spv \
            work/resident.spv work/attention.spv \
            work/history.spv work/gemm_coopmat.spv work/gemm_batched.spv \
            work/window_attention.spv work/window_attention_portable.spv \
            work/attention_ab.spv \
            work/ffn_fused.spv work/ffn_fused_portable.spv \
-           work/gemm_f16acc.spv work/gemm_coopmat_int8.spv \
-           work/gemm_portable.spv work/gemm_portable_tiled.spv \
+           work/gemm_f16acc.spv work/gemm_coopmat_int8.spv work/gemm_staged_int8.spv \
+           work/gemm_staged_int8_portable.spv \
+           work/window_block.spv work/window_block_portable.spv \
+           work/global_attention.spv work/global_attention_portable.spv \
+           work/gemm_portable.spv work/gemm_portable_tiled.spv work/gemm_portable_wide.spv \
            work/gemm_portable_desc.spv work/gemm_portable_batched.spv
 
 all: work/libxmx$(SO) work/libnr_layer$(SO) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/nr_frame_rates work/gemm_runner $(SHADERS) $(PLATFORM_EXTRA)
@@ -89,7 +93,8 @@ work/gemm_runner: src/gpu/gemm_runner.c | work
 # The Metal runtime (Apple only; see PLATFORM_EXTRA). Each .metal compiles to AIR, the
 # seven link into one metallib, bin2c writes it as a C array, and the array is compiled into
 # libmetalmx. The metallib file is kept beside it for XMX_METALLIB= experiments.
-METAL_SOURCES := resident history attention gemm_portable gemm_simd window_attention ffn_fused
+METAL_SOURCES := resident history attention gemm_portable gemm_simd window_attention ffn_fused \
+                 window_block global_attention gemm_int8
 METAL_AIR     := $(patsubst %,work/metal/%.air,$(METAL_SOURCES))
 work/metal:
 	mkdir -p $@
@@ -101,8 +106,26 @@ work/bin2c: src/tools/bin2c.c | work
 	$(CC) -O2 -o $@ $<
 work/metal/nr_metallib.h: work/nr_shaders.metallib work/bin2c | work/metal
 	work/bin2c $< $@ nr_metallib
-work/libmetalmx$(SO): src/gpu/libmetalmx.m src/gpu/xmx.h work/metal/nr_metallib.h | work
-	$(CC) $(CFLAGS) -fobjc-arc -DNR_EMBEDDED_METALLIB=1 -Isrc/gpu -Iwork/metal -shared $(INSTALL_NAME) \
+# The same sources as Metal 4 (NR_METAL4: the GEMMs' K loop on matmul2d), a second library
+# libmetalmx loads where the device and OS have Metal 4 — when this SDK's compiler takes
+# -std=metal4.0. METAL4=0 builds the Metal 3.1 library alone.
+METAL4     ?= $(shell printf '\043include <metal_stdlib>\nkernel void p(device float *a [[buffer(0)]]) { a[0] = 1; }\n' \
+                | xcrun -sdk macosx metal -std=metal4.0 -x metal -c -o /dev/null - 2>/dev/null && echo 1)
+ifeq ($(METAL4),1)
+METAL4_AIR    := $(patsubst %,work/metal4/%.air,$(METAL_SOURCES))
+METAL4_HEADER := work/metal4/nr_metallib4.h
+METAL4_FLAGS  := -DNR_EMBEDDED_METALLIB4=1 -Iwork/metal4
+work/metal4:
+	mkdir -p $@
+work/metal4/%.air: src/gpu/metal/%.metal src/gpu/metal/nr_metal.h src/gpu/metal/nr_epilogue.h | work/metal4
+	xcrun -sdk macosx metal -std=metal4.0 -DNR_METAL4 -fno-fast-math -ffp-contract=off -Wall -Isrc/gpu/metal -c -o $@ $<
+work/nr_shaders4.metallib: $(METAL4_AIR) | work
+	$(METALLIB) -o $@ $(METAL4_AIR)
+work/metal4/nr_metallib4.h: work/nr_shaders4.metallib work/bin2c | work/metal4
+	work/bin2c $< $@ nr_metallib4
+endif
+work/libmetalmx$(SO): src/gpu/libmetalmx.m src/gpu/xmx.h work/metal/nr_metallib.h $(METAL4_HEADER) | work
+	$(CC) $(CFLAGS) -fobjc-arc -DNR_EMBEDDED_METALLIB=1 $(METAL4_FLAGS) -Isrc/gpu -Iwork/metal -shared $(INSTALL_NAME) \
 	      -o $@ $< -framework Metal -framework Foundation
 
 # The GPU tests again, on libmetalmx. Apple only; `make test` runs it there.
@@ -132,15 +155,18 @@ work/MoltenVK_icd.json: Makefile | work
 # byte-identical to the NumPy it replaces (src/ref/test_native_image.py). Each pass is
 # split by rows across nr_image.c's own thread pool (upstream uses OpenMP, which Apple's
 # clang lacks); no row reads another's result, so the bytes do not depend on it.
+# `-fno-trapping-math` changes no value — only whether a comparison may raise a floating-
+# point exception flag nobody reads — and it is what lets the compiler turn the clamps into
+# selects and vectorise the fused composition's pixels (`compose_encode_row`).
 work/libnr_image$(SO): src/ref/nr_image.c src/ref/nr_image.h Makefile | work
 	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
-	      -pthread -shared -o $@ $<
+	      -fno-trapping-math -pthread -shared -o $@ $<
 
 # nr_frame.py as a C library: the feature assembly, the whole graph recorded against
 # libxmx (reached by dlopen from this directory), and the composition. The image passes
 # are the same object as libnr_image; the frame code has the same no-FMA contract.
 work/nr_image.o: src/ref/nr_image.c src/ref/nr_image.h | work
-	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -pthread -c -o $@ $<
+	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -fno-trapping-math -pthread -c -o $@ $<
 work/nr_frame.o: src/ref/nr_frame.c src/ref/nr_frame.h src/ref/nr_image.h | work
 	$(CC) -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fno-fast-math -c -o $@ $<
 work/libnr_frame$(SO): work/nr_frame.o work/nr_image.o
@@ -198,11 +224,20 @@ work/gemm_tiled.spv: src/gpu/gemm_resident.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
 work/gemm_staged.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL)
 	$(GLSL) -o $@ $<
+# 32-row blocks for a bottleneck of 32 tokens or fewer, with a 32- and a 64-deep K step
+work/gemm_staged32.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DSTAGED_BM=32 -o $@ $<
+work/gemm_staged32_deep.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DSTAGED_BM=32 -DSTAGED_BK=64 -o $@ $<
 work/resident.spv: src/gpu/resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
 	$(GLSL) -o $@ $<
 work/attention.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
                     src/gpu/cosine_tree.glsl
 	$(GLSL) -o $@ $<
+# the whole-row softmax on 256 lanes (attention.comp, softmax_rows)
+work/attention_rows.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
+                         src/gpu/cosine_tree.glsl Makefile
+	$(GLSL) -DROW_LANES=256 -o $@ $<
 work/attention_ab.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
                        src/gpu/cosine_tree.glsl
 	$(GLSL) -DSOFTMAX_AB -o $@ $<
@@ -211,6 +246,23 @@ work/history.spv: src/gpu/history.comp
 # Configuration 4, the integer twin. Built always; used only where
 # notes/improve-int8-bottleneck.md measured the trade as worth taking.
 work/gemm_coopmat_int8.spv: src/gpu/gemm_coopmat_int8.comp
+	$(GLSL) -o $@ $<
+work/gemm_staged_int8.spv: src/gpu/gemm_staged_int8.comp
+	$(GLSL) -o $@ $<
+work/window_block.spv: src/gpu/window_block.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
+                       src/gpu/cosine_tree.glsl
+	$(GLSL) -o $@ $<
+work/global_attention.spv: src/gpu/global_attention.comp src/gpu/publish.glsl \
+                           src/gpu/specialize.glsl src/gpu/cosine_tree.glsl
+	$(GLSL) -o $@ $<
+# their twins for a device without matrix units (or without the integer features)
+work/gemm_staged_int8_portable.spv: src/gpu/gemm_staged_int8_portable.comp
+	$(GLSL) -o $@ $<
+work/window_block_portable.spv: src/gpu/window_block_portable.comp src/gpu/publish.glsl \
+                                src/gpu/specialize.glsl src/gpu/cosine_tree.glsl
+	$(GLSL) -o $@ $<
+work/global_attention_portable.spv: src/gpu/global_attention_portable.comp src/gpu/publish.glsl \
+                                    src/gpu/specialize.glsl src/gpu/cosine_tree.glsl
 	$(GLSL) -o $@ $<
 
 # A 32-channel block's feed-forward in one pass, the hidden layer kept on chip.
@@ -236,6 +288,9 @@ work/gemm_portable.spv: src/gpu/gemm_portable.comp $(GEMM_GLSL)
 	$(GLSL) -o $@ $<
 work/gemm_portable_tiled.spv: src/gpu/gemm_portable.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DRM=2 -DRN=2 -o $@ $<
+# 16x64: libxmx finds it beside the tiled build and routes the wide-N GEMMs to it
+work/gemm_portable_wide.spv: src/gpu/gemm_portable.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DRM=2 -DRN=4 -o $@ $<
 work/gemm_portable_desc.spv: src/gpu/gemm_portable_desc.comp
 	$(GLSL) -o $@ $<
 work/gemm_portable_batched.spv: src/gpu/gemm_portable_desc.comp
@@ -282,6 +337,9 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/ref/test_nr_model.py
 	$(PYTHON) src/ref/test_temporal_controls.py
 	$(PYTHON) src/gpu/test_gemm_int8.py
+	$(PYTHON) src/gpu/test_gemm_int8_staged.py
+	$(PYTHON) src/gpu/test_window_block.py
+	$(PYTHON) src/gpu/test_global_attention.py
 	$(PYTHON) src/gpu/test_int8_quant.py
 	$(PYTHON) src/gpu/test_gemm_residual.py
 	$(PYTHON) src/gpu/test_window_residual.py
@@ -290,6 +348,7 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/gpu/test_glue.py
 	$(PYTHON) src/gpu/test_ffn_fused.py
 	$(PYTHON) src/gpu/test_staged_partial.py
+	$(PYTHON) src/gpu/test_staged32.py
 
 # Focused checks for the FFN schedule, including a complete frame with both variants.
 # Repeat with XMX_STAGING=1 to cover device buffers without host mappings.

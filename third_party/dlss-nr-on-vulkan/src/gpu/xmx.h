@@ -53,6 +53,14 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 		 const char *history_spv, const char *tiled_spv, const char *staged_spv);
 int xmx_specialize(unsigned mask);
 int xmx_staged_partial(unsigned on);  /* staged kernel takes a partial last 64-row block (default 1) */
+/* the 32-row staged builds, for a bottleneck of 32 tokens or fewer and the 64-token one's
+ * N <= 1024 GEMMs (default on, XMX_STAGED32=0 off); `shallow` a 32-deep K step, `deep` 64.
+ * A runtime without a staged kernel accepts both and changes nothing. */
+int xmx_staged32_init(const char *shallow, const char *deep);
+int xmx_staged32(unsigned on);
+unsigned xmx_staged32_calls(void);    /* GEMMs the 32-row build recorded: tests check routing */
+/* the row passes' 256-lane build, for the whole-row softmax (attention_rows) */
+int xmx_rows_init(const char *path);
 unsigned xmx_specialized_count(void);
 unsigned xmx_specialization(void);
 int xmx_buf_create_kind(unsigned long long bytes, int kind);
@@ -112,6 +120,29 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 int xmx_ffn_init(const char *path);
 int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine,
 		unsigned M, unsigned cin, unsigned hidden, unsigned groups, unsigned flags);
+/* (improve-b.md) block 70's feed-forward making its own merged input, and block 0's making
+ * its own stem; block 0's window residual pooling and publishing its output in the
+ * epilogue; a 32-channel window block's attention half in one pass a window (the head or
+ * the pool too); a bottleneck block's attention in one pass; the integer staged GEMM. */
+int xmx_rec_ffn_merge(int source, int skip, int sincos, int expand, int projection, int out,
+		      int cosine, unsigned height, unsigned width, unsigned source_width,
+		      unsigned flags);
+int xmx_rec_ffn_stem(int features, int adapter, int expand, int projection, int out,
+		     int cosine, unsigned M, unsigned flags);
+int xmx_rec_gemm_window_residual_pool(int a, int b, int skip_out, int skip, int cosine,
+				      int pooled, unsigned M, unsigned N, unsigned K,
+				      unsigned flags, unsigned height, unsigned width,
+				      unsigned across, unsigned pad);
+int xmx_window_block_init(const char *path);
+int xmx_rec_window_block(int image, int qkv, int projection, int target, int bias,
+			 int cosine, int scale, int pooled, unsigned windows, unsigned height,
+			 unsigned width, unsigned across, unsigned pad, unsigned flags);
+int xmx_global_attention_init(const char *path);
+int xmx_rec_global_attention(int q, int k, int v, int merged, unsigned rows,
+			     unsigned tokens, unsigned heads, float cap);
+int xmx_int8_init(const char *path);
+int xmx_rec_gemm_int8(int a, int b, int c, int a_scale, int b_scale,
+		      unsigned M, unsigned N, unsigned K, unsigned flags);
 int xmx_graph_capture(void);
 int xmx_graph_run(int id);
 int xmx_graph_destroy(int id);

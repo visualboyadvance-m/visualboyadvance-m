@@ -8,7 +8,6 @@
 #extension GL_KHR_memory_scope_semantics : require
 #extension GL_KHR_cooperative_matrix : require
 #extension GL_KHR_shader_subgroup_basic : require
-#extension GL_KHR_shader_subgroup_shuffle : require
 #extension GL_EXT_shared_memory_block : require
 
 #include "publish.glsl"
@@ -125,30 +124,32 @@ void main() {
                 u32[scratch + ((at / 32u) * 64u + half_keys * 32u + at % 32u) / 2u] =
                     kept[half_keys * 4u + t];            // exact: two half values
             }
-        subgroupMemoryBarrierShared();
-        subgroupBarrier();
     }
-    /* The denominator, summed in float32 in token order, eight weights to a load. */
-    float reciprocal = 0.0;
-    if (local < 8u) {
+    /* The denominator, summed in float32 in token order, eight weights to a load — a chain
+     * of 64 dependent adds a row that no lane can share. Each subgroup summing its own eight
+     * rows kept 8 lanes of 32 busy and was a fifth of the pass; so every subgroup parks its
+     * weights first, and two subgroups sum all 64 rows, a lane a row, in the same order.
+     * The reciprocals go where K was: every subgroup is past its QK^T by the barrier. */
+    barrier();
+    if (sub < 2u) {
+        uint r = sub * 32u + local;
+        uint weights_at = (2048u + 256u * (r / 8u)) / 4u + (r % 8u) * 8u;
         float total = 0.0;
         for (uint i = 0u; i < 8u; i++) {
-            uvec4 eight = u4[scratch / 4u + local * 8u + i];
+            uvec4 eight = u4[weights_at + i];
             for (uint w = 0u; w < 4u; w++) {
                 vec2 two = unpackHalf2x16(eight[w]);
                 total += two.x;
                 total += two.y;
             }
         }
-        reciprocal = half_round(1.0 / half_round(total));
+        f32[r] = half_round(1.0 / half_round(total));
     }
-    /* the sums above read every weight of a row; the loop below overwrites them */
-    subgroupMemoryBarrierShared();
-    subgroupBarrier();
+    /* the sums above read every weight; the loop below overwrites them */
+    barrier();
     for (uint at = local * 2u; at < 8u * 64u; at += 64u) {
-        /* two neighbours of one row a lane, every lane of an iteration on the same row,
-         * so the reciprocal is a broadcast */
-        float scale = subgroupShuffle(reciprocal, at / 64u);
+        /* two neighbours of one row a lane, every lane of an iteration on the same row */
+        float scale = f32[row + at / 64u];
         vec2 pair = unpackHalf2x16(u32[scratch + at / 2u]);
         precise float first = pair.x * scale;
         precise float second = pair.y * scale;

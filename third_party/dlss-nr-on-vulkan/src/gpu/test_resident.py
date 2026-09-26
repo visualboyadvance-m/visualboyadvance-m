@@ -288,12 +288,15 @@ def test_blocks(runtime, weights):
     cases = [("window", index, heads) for index, heads in
              ((1, 1), (2, 1), (6, 2), (9, 4), (20, 8))]
     cases += [("split", 23, 16), ("split", 44, 16)]
-    cases += [("global", 31, 32), ("global", 38, 32)]
+    # 60 tokens pad to 64 rows; 16 and 30 to 32, the small networks' bottleneck (a 128x128
+    # network has 16), whose softmax once came out zero in most of its rows
+    cases += [("global", 31, 32, (6, 10)), ("global", 38, 32, (6, 10)),
+              ("global", 31, 32, (4, 4)), ("global", 35, 32, (5, 6))]
     rng = np.random.default_rng(4)
-    for family, index, heads in cases:
+    for family, index, heads, *extent in cases:
         if family == "global":
             block = nr_resident.GlobalBlockWeights(runtime, weights, index)
-            height, width = 6, 10
+            height, width = extent[0]
             scratch = nr_resident.GlobalScratch(runtime, block, height * width)
         elif family == "split":
             block = nr_resident.SplitBlockWeights(runtime, weights, index)

@@ -63,7 +63,31 @@ def main():
                                           M.vendor_approximate_softmax(logits).reshape(-1).astype(dtype))
             np.testing.assert_array_equal(
                 xmxres.host_view(out, dtype)[rows*width:], -11)
-    print(f'QKV fusion: {cases} exact cases; partial cosine/softmax workgroups match CPU')
+    # Rows too wide to stage 32 at a time: whole rows in shared memory on the 256-lane build,
+    # a partial last workgroup among them, and past 2015 columns one row a lane. A stride
+    # under 62 fits more than 32 rows in the stage, but the reciprocals have room for 32:
+    # the bottleneck's 16 tokens on 32 rows (a 128x128 network) took 61 a workgroup, and
+    # rows 32-60 of each came out zero.
+    wide = 0
+    for rows, width, stride in ((100, 240, 256), (37, 96, 96), (15, 510, 512), (3, 2048, 2048),
+                                (160, 16, 32), (100, 40, 48)):
+        logits = rng.normal(0, 2, (rows, stride)).astype(np.float32)
+        source = rt.buffer_from(logits)
+        want = M.vendor_approximate_softmax(logits[:, :width])
+        for narrow in (False, True):
+            dtype = np.float16 if narrow else np.float32
+            out = rt.buffer(rows * stride + 32, dtype)
+            xmxres.host_write(out, np.full(out.nbytes // np.dtype(dtype).itemsize, -11, dtype))
+            rt.begin()
+            rt.softmax(source, out, rows, width, stride=stride, narrow=narrow)
+            rt.submit()
+            got = xmxres.host_view(out, dtype, count=rows * stride).reshape(rows, stride)
+            np.testing.assert_array_equal(got[:, :width], want.astype(dtype))
+            np.testing.assert_array_equal(got[:, width:], 0)
+            np.testing.assert_array_equal(xmxres.host_view(out, dtype)[rows * stride:], -11)
+            wide += 1
+    print(f'QKV fusion: {cases} exact cases; partial cosine/softmax workgroups and {wide} '
+          f'wide-row softmax cases match CPU')
 
 
 if __name__ == '__main__':

@@ -34,7 +34,8 @@ def main():
         # The first-ever run must work without warming buffers in block mode.
         recordings.clear()
         head = frame.run(features, execution='replay')
-        assert len(recordings) == 1
+        # the scratch plan's discovery, recorded and never run, then the graph itself
+        assert len(recordings) == 2, len(recordings)
         recordings.clear()
         np.testing.assert_array_equal(frame.run(features, execution='replay'), head)
         assert not recordings

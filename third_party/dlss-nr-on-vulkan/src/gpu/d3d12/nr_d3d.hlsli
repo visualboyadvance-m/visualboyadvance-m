@@ -30,6 +30,8 @@
  * The alignment tests the GLSL makes on the address it makes on the offset: a resource's
  * address is 64 KB aligned, so the offset's low bits are the address's.
  *
+ * The fifth to eighth operands (u4..u7) are bound the same way, the fifth's and sixth's
+ * offsets at push offsets 96 and 120 and the seventh's and eighth's in p0 and p2; see below.
  * The fifth and sixth operands (u4, u5) are bound the same way, their offsets at push
  * offsets 96 and 120; a pass that has no use for one still finds a dummy resource there.
  *
@@ -77,6 +79,13 @@ RWByteAddressBuffer bufC : register(u2);
 RWByteAddressBuffer bufD : register(u3);
 RWByteAddressBuffer bufE : register(u4);        /* the operand at push offset 96 */
 RWByteAddressBuffer bufF : register(u5);        /* the operand at push offset 120 */
+/* The seventh and eighth (u6, u7), for the passes that take more than six (improve-b.md):
+ * the SPIR-V reads 64-bit addresses at push offsets 64 and 72 (p0-p1, p2-p3) there, so here
+ * those words carry their byte offsets — `asuint(pc.p0)` and `asuint(pc.p2)`. The merged
+ * and stem feed-forward's sin-cos table or adapter in u6; the window block's output
+ * projection in u6 and its pool or head weights in u7. */
+RWByteAddressBuffer bufG : register(u6);
+RWByteAddressBuffer bufH : register(u7);
 
 /* -- publish.glsl -------------------------------------------------------- */
 
@@ -125,6 +134,13 @@ void st_f32(RWByteAddressBuffer buf, uint base, uint index, float value) {
 }
 void st_f16(RWByteAddressBuffer buf, uint base, uint index, float value) {
     buf.Store<uint16_t>(base + index * 2u, (uint16_t)f32tof16(value));
+}
+/* Four consecutive halves from a byte address the caller has checked is 8-aligned: one
+ * 64-bit load where four 16-bit ones went, the same four values. */
+float4 ld_f16x4(RWByteAddressBuffer buf, uint byte_address) {
+    uint2 w = buf.Load2(byte_address);
+    return float4(f16tof32(w.x & 0xffffu), f16tof32(w.x >> 16), f16tof32(w.y & 0xffffu),
+                  f16tof32(w.y >> 16));
 }
 /* Four consecutive elements at a byte address the caller has checked the alignment of. */
 void st_f32x4(RWByteAddressBuffer buf, uint byte_address, float4 value) {

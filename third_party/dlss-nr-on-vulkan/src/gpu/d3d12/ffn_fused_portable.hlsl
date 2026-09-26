@@ -22,6 +22,19 @@
  * memory once for the eight blocks instead of once for every 16 rows; other shapes read
  * them from their buffers as before. 16 KB of weights and a kilobyte of hidden chunk a
  * slice, 24 KB. A surplus slice past m idles through the group's barriers.
+ *
+ * Block 70's input can be made here too (flag 0x1000000, the staged shape with the
+ * residual), as `ffn_fused_portable.comp` makes it: the level above upsampled 2x times the
+ * sin plus the skip times the cos, in resident.hlsl's UPSAMPLE_MERGE shapes, which this
+ * backend's reference stored as float32 for the residual and as half for the expand. Each
+ * lane makes the sixty-four half values of A it reads — rows r and r + 8, all 32 channels —
+ * once, into registers, and each merged value again where its residual needs it. And block
+ * 0's stem (flag 0x2000000): the features times the adapter, the tiled portable GEMM's
+ * sixteen multiply-adds from zero four columns at a time. u0 is then the level above (half)
+ * or the features (half, rows x 16), u3 the skip (half), u6 the sin then cos (float32) or
+ * the adapter (16 x 32 half) at the byte offset in p0, lda the width and ldb the level
+ * above's. The residual is then `branch + skip * cosine`, add_gemm_residual's shape with the
+ * float32 skip the reference's residual read.
  */
 #include "nr_d3d.hlsli"
 #include "nr_epilogue.hlsli"
@@ -37,6 +50,39 @@ static const uint PROJECTION = 2048u;
 
 float lo(uint w) { return f16tof32(w & 0xFFFFu); }
 float hi(uint w) { return f16tof32(w >> 16); }
+bool merging() { return (operation_flags() & 0x1000000u) != 0u; }
+bool stemming() { return (operation_flags() & 0x2000000u) != 0u; }
+
+/* Four channels of the merge at one pixel, as UPSAMPLE_MERGE makes each: the scale its own
+ * rounded product (`precise`), then `scaled + skip * cos`. `c` is a multiple of four. */
+float4 merged4(uint pixel, uint c) {
+    uint x = pixel % pc.lda, y = pixel / pc.lda;
+    uint above = ((y / 2u) * pc.ldb + x / 2u) * 32u + c;
+    uint G = asuint(pc.p0);
+    float4 out4;
+    [unroll] for (uint e = 0u; e < 4u; e++) {
+        precise float scaled = ld_f16(bufA, pc.oa.x, above + e) * ld_f32(bufG, G, c + e);
+        out4[e] = scaled + ld_f16(bufD, pc.od.x, pixel * 32u + c + e) * ld_f32(bufG, G, 32u + c + e);
+    }
+    return out4;
+}
+
+/* Four channels of the stem at one pixel, as the tiled portable GEMM sums them. */
+float4 stem4(uint pixel, uint c) {
+    uint G = asuint(pc.p0);
+    float4 acc = float4(0.0, 0.0, 0.0, 0.0);
+    for (uint k = 0u; k < 16u; k++) {
+        uint at = k * 32u + c;
+        float4 bv = float4(ld_f16(bufG, G, at), ld_f16(bufG, G, at + 1u),
+                           ld_f16(bufG, G, at + 2u), ld_f16(bufG, G, at + 3u));
+        float av = ld_f16(bufA, pc.oa.x, pixel * 16u + k);
+        acc += av * bv;
+    }
+    return acc;
+}
+
+float4 made4(uint pixel, uint c) { return merging() ? merged4(pixel, c) : stem4(pixel, c); }
+
 /* four consecutive staged weights from an even half index: two words */
 float4 staged4(uint at) {
     uint w0 = weights[at >> 1u], w1 = weights[(at >> 1u) + 1u];
@@ -76,6 +122,20 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
         [unroll] for (uint j0 = 0; j0 < 2u; j0++)
             result[i0][j0] = float4(0.0, 0.0, 0.0, 0.0);
 
+    /* an input made here: this lane's rows of A, rounded to half, two to a word */
+    bool made = merging() || stemming();
+    uint held[2][16];
+    [unroll] for (uint ih = 0; ih < 2u; ih++)
+        [unroll] for (uint wh = 0; wh < 16u; wh++) held[ih][wh] = 0u;
+    if (made && live_rows) {
+        [unroll] for (uint im = 0; im < 2u; im++)
+            [unroll] for (uint cm = 0; cm < 32u; cm += 4u) {
+                float4 v = made4(row + r + im * TM, cm);
+                held[im][cm / 2u] = f32tof16(v.x) | (f32tof16(v.y) << 16);
+                held[im][cm / 2u + 1u] = f32tof16(v.z) | (f32tof16(v.w) << 16);
+            }
+    }
+
     for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
         if (live_rows) {
             /* the expand's 16x32 block for these hidden columns, as the tiled portable GEMM */
@@ -94,7 +154,8 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
                                        ld_f16(bufB, Bx, expand_base + at + 2u), ld_f16(bufB, Bx, expand_base + at + 3u));
                 }
                 [unroll] for (uint i = 0; i < 2u; i++) {
-                    float av = ld_f16(bufA, A, (row + r + i * TM) * cin + k);
+                    float av = made ? ((k & 1u) ? hi(held[i][k >> 1u]) : lo(held[i][k >> 1u]))
+                                    : ld_f16(bufA, A, (row + r + i * TM) * cin + k);
                     [unroll] for (uint j2 = 0; j2 < 2u; j2++)
                         h[i][j2] += av * bv[j2];
                 }
@@ -141,8 +202,15 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
         [unroll] for (uint j5 = 0; j5 < 2u; j5++) {
             float4 v = result[i3][j5];
             uint at = (row + r + i3 * TM) * ldc + group * OUT + cq + j5 * TN;
-            [unroll] for (uint e = 0; e < 4u; e++)
-                v[e] = publish(epilogue, add_gemm_residual(v[e], at + e));
+            if (made) {
+                /* the made input again as the residual's float32 skip */
+                float4 skip = made4(row + r + i3 * TM, cq + j5 * TN);
+                [unroll] for (uint e = 0; e < 4u; e++)
+                    v[e] = publish(epilogue, v[e] + skip[e] * ld_f32(bufE, pc.oe.x, cq + j5 * TN + e));
+            } else {
+                [unroll] for (uint e = 0; e < 4u; e++)
+                    v[e] = publish(epilogue, add_gemm_residual(v[e], at + e));
+            }
             if (!narrow_out) {
                 [unroll] for (uint q = 0; q < 4u; q++) st_f32(bufC, C, at + q, v[q]);
             } else if ((at & 3u) == 0u && (C & 7u) == 0u) {

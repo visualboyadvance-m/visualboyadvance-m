@@ -44,7 +44,7 @@ const uint E4M3 = 0u, GATE = 1u, HALF = 2u, TO_HALF = 3u, SCALE = 4u,
            /* fused: one read of float32 and one write of float16 where the graph
             * otherwise makes three round trips over the same buffer */
            GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u,
-           UPSAMPLE_MERGE = 20u;
+           UPSAMPLE_MERGE = 20u, UPSAMPLE_ADD = 21u, POOL2_SKIP = 22u;
 
 
 
@@ -178,6 +178,45 @@ void main() {
         float merged = fma(load_b(index), pc.d.v[channels + c], scaled);
         pc.c.v[index] = merged;
         HalfBuf(pc.second).v[index] = float16_t(merged);
+        return;
+    }
+    if (kind == POOL2_SKIP) {
+        /* Block 0's output into both its consumers in one read: the 2x2 pool into the
+         * encoder, published (POOL2 with the E4M3 epilogue), and every pixel published to
+         * half as the post block's skip (E4M3_HALF) — two passes over a full-resolution
+         * float32 frame, 126 MB each at 720p. Their roundings are theirs: the pool adds its
+         * four taps column-first (`precise`), the skip publishes each tap alone.
+         * n=channels, sb=source width; `second` takes the skip. */
+        uint channels = pc.n, width = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % (width / 2u), y = rest / (width / 2u);
+        uint base = ((2u * y) * width + 2u * x) * channels + c;
+        uint taps[4] = uint[4](base, base + width * channels, base + channels,
+                                base + (width + 1u) * channels);
+        float value[4];
+        for (uint t = 0u; t < 4u; t++) value[t] = load_a(taps[t]);
+        precise float total = value[0] + value[1];
+        total += value[2];
+        total += value[3];
+        store(index, total * 0.25);
+        for (uint t = 0u; t < 4u; t++)
+            HalfBuf(pc.second).v[taps[t]] = float16_t(e4m3(value[t]));
+        return;
+    }
+    if (kind == UPSAMPLE_ADD) {
+        /* A decoder transition's merge in one pass: the projected level below upsampled 2x
+         * (nearest), plus the skip times the per-channel sine, then the publish. That was
+         * upsample2, scale_channel and add — three passes, two of them writing float32 for
+         * the next to read back. Their roundings are kept: the product is rounded on its
+         * own, as scale_channel stored it, and then added, so neither may become a fused
+         * multiply-add (`precise`). n=channels, sa=target width, sb=source width, d=sine,
+         * b=the skip. */
+        uint channels = pc.n, target = pc.sa, source = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % target, y = rest / target;
+        precise float scaled = load_b(index) * pc.d.v[c];
+        precise float merged = load_a(((y / 2u) * source + (x / 2u)) * channels + c) + scaled;
+        store(index, merged);
         return;
     }
     if (kind == PAD_END) {

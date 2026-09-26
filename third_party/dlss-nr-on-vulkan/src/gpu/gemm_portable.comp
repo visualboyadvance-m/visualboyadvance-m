@@ -6,7 +6,9 @@
  * Same contract in every respect a caller can see: the push constants, the operation
  * flags (bit 0 a transposed B, bits 8-11 the epilogue, bit 12 a half output, and the
  * fused epilogues below), the row strides, the batch on gl_WorkGroupID.z, an 8x16 output
- * block per 32-lane workgroup (16x32 with -DRM=2 -DRN=2, matching `gemm_tiled.spv`), and
+ * block per 32-lane workgroup (16x32 with -DRM=2 -DRN=2, matching `gemm_tiled.spv`; and
+ * 16x64 with -DRM=2 -DRN=4, `gemm_portable_wide.spv`, which libxmx gives the GEMMs whose N
+ * is whole 64-column blocks on this path — the same sums, twice as many per lane), and
  * the store: the epilogue's publish on the accumulator, straight to global. The runtime
  * dispatches it with the geometry it uses for the cooperative-matrix kernel and nothing
  * else changes.
@@ -26,7 +28,8 @@
  * (0x100000, the 16x32 build only — a column block must be one head), the half copy of a
  * float32 result (0x200000), the compact head (0x10000, the 8x16 build only), and A
  * gathered from the image in window order (0x400000, the 16x32 build: on a device without
- * the staged kernel the runtime routes the window-gathered projection here). Where the
+ * the staged kernel the runtime routes the window-gathered projection here), and block 0's
+ * window residual pooled and published in its epilogue (0x800000, the 16x32 build). Where the
  * matrix kernels take those through a shared-memory stage, this one has every element in
  * a lane's own registers already; the arithmetic per element is theirs.
  *
@@ -141,12 +144,14 @@ void main() {
         for (uint i = 0; i < RM; i++) base[i] = window_row_base(row + r + i * TM);
         Float4Buf unused = Float4Buf(uint64_t(pc.a));   /* silences a no-use warning on some compilers */
         FloatBuf image = FloatBuf(uint64_t(pc.a));
+        bool wide_b = (ldb & 3u) == 0u && (uint(uint64_t(pc.b)) & 7u) == 0u;
         for (uint k = 0; k < pc.k; k++) {
             ACC4 bv[RN];
             for (uint j = 0; j < RN; j++) {
                 uint at = k * ldb + col + cq + j * TN;
-                bv[j] = ACC4(ACC(pc.b.v[at]), ACC(pc.b.v[at + 1u]),
-                             ACC(pc.b.v[at + 2u]), ACC(pc.b.v[at + 3u]));
+                bv[j] = wide_b ? ACC4(Half4Buf(uint64_t(pc.b)).v4[at >> 2])
+                               : ACC4(ACC(pc.b.v[at]), ACC(pc.b.v[at + 1u]),
+                                      ACC(pc.b.v[at + 2u]), ACC(pc.b.v[at + 3u]));
             }
             for (uint i = 0; i < RM; i++) {
                 ACC av = ACC(0.0);
@@ -154,6 +159,29 @@ void main() {
                     av = image_half ? ACC(pc.a.v[base[i] + k]) : ACC(half_round(image.v[base[i] + k]));
                 for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if ((flags & 1u) != 0u && (ldb & 3u) == 0u && (lda & 3u) == 0u
+               && (pc.k & 3u) == 0u && ((bo | ao) & 3u) == 0u
+               && ((uint(uint64_t(pc.a)) | uint(uint64_t(pc.b))) & 7u) == 0u) {
+        /* The transposed form with the operands fetched eight bytes at a time along K,
+         * the same terms added in the same order (see the plain form below). */
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            ACC4 as4[RM], bt[RN][4];
+            for (uint i = 0; i < RM; i++)
+                as4[i] = ACC4(Half4Buf(uint64_t(pc.a)).v4[(ao + (row + r + i * TM) * lda + k0) >> 2]);
+            for (uint j = 0; j < RN; j++)
+                for (uint q = 0; q < 4u; q++)
+                    bt[j][q] = ACC4(Half4Buf(uint64_t(pc.b)).v4[(bo + (col + cq + j * TN + q) * ldb + k0) >> 2]);
+            for (uint kk = 0; kk < 4u; kk++) {
+                ACC4 bv[RN];
+                for (uint j = 0; j < RN; j++)
+                    bv[j] = ACC4(bt[j][0][kk], bt[j][1][kk], bt[j][2][kk], bt[j][3][kk]);
+                for (uint i = 0; i < RM; i++) {
+                    ACC av = as4[i][kk];
+                    for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else if ((flags & 1u) != 0u) {
@@ -169,6 +197,29 @@ void main() {
                 ACC av = ACC(pc.a.v[ao + (row + r + i * TM) * lda + k]);
                 for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if ((ldb & 3u) == 0u && (lda & 3u) == 0u && (pc.k & 3u) == 0u
+               && ((bo | ao) & 3u) == 0u
+               && ((uint(uint64_t(pc.a)) | uint(uint64_t(pc.b))) & 7u) == 0u) {
+        /* The same sums, the operands fetched eight bytes at a time: a lane's four B
+         * columns are adjacent in a row-major B, and its A row's next four K terms are
+         * adjacent too. Nothing about the arithmetic or its order changes — each K term
+         * still goes into the accumulator alone, in order — only how many loads bring
+         * the halves in (1.15-1.2x on the graph's shapes through MoltenVK on an M3). */
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            ACC4 as4[RM];
+            for (uint i = 0; i < RM; i++)
+                as4[i] = ACC4(Half4Buf(uint64_t(pc.a)).v4[(ao + (row + r + i * TM) * lda + k0) >> 2]);
+            for (uint kk = 0; kk < 4u; kk++) {
+                ACC4 bv[RN];
+                for (uint j = 0; j < RN; j++)
+                    bv[j] = ACC4(Half4Buf(uint64_t(pc.b)).v4[(bo + (k0 + kk) * ldb + col + cq + j * TN) >> 2]);
+                for (uint i = 0; i < RM; i++) {
+                    ACC av = as4[i][kk];
+                    for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else {
@@ -203,6 +254,43 @@ void main() {
                     stage[(i * TM + r) * BN + j * TN + cq + e] = float(acc[i][j][e]);
         qkv_barrier();
         qkv_epilogue(row, col, gl_LocalInvocationID.x, 32u);
+        return;
+    }
+    /* Bit 0x800000 (with the window residual): block 0's output, read only pooled 2x2 and
+     * published into the encoder or published as the last block's skip — both made here,
+     * as gemm_staged.comp makes them on the matrix path. A 16-row block is two rows of one
+     * 8x8 window across all 32 channels, so each value goes out published as half and into
+     * the stage as it is, and after the barrier its four pooled pixels are summed from the
+     * stage in POOL2_SKIP's order. `c` takes the published skip, `qkv_scale` the pool. */
+    if ((flags & 0x800000u) != 0u) {
+        for (uint i = 0; i < RM; i++)
+            for (uint j = 0; j < RN; j++) {
+                uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+                if (!residual_output_index(at)) continue;
+                vec4 v = vec4(acc[i][j]), published;
+                for (uint e = 0; e < 4u; e++) {
+                    v[e] = add_gemm_residual(v[e], at + e);
+                    stage[(i * TM + r) * BN + j * TN + cq + e] = v[e];
+                    published[e] = e4m3(v[e]);
+                }
+                Half4Buf(base_c).v4[at >> 2] = f16vec4(published);
+            }
+        qkv_barrier();
+        uint pixel = gl_LocalInvocationID.x / 8u, c = (gl_LocalInvocationID.x % 8u) * 4u;
+        uint window = row / 64u, pair = (row % 64u) / 8u;      // the block's first window row
+        uint top = pc.window_pad >> 16, left = pc.window_pad & 0xffffu;
+        uint y = (window / pc.window_cols) * 8u + pair, x = (window % pc.window_cols) * 8u + 2u * pixel;
+        if (y < top || x < left || y - top >= pc.image_h || x - left >= pc.image_w) return;
+        uint at = (((y - top) / 2u) * (pc.image_w / 2u) + (x - left) / 2u) * BN + c;
+        uint upper = (2u * pixel) * BN + c, lower = upper + 8u * BN;
+        vec4 pooled;
+        for (uint e = 0; e < 4u; e++) {
+            precise float total = stage[upper + e] + stage[lower + e];
+            total += stage[upper + BN + e];
+            total += stage[lower + BN + e];
+            pooled[e] = e4m3(total * 0.25);
+        }
+        Half4Buf(pc.qkv_scale).v4[at >> 2] = f16vec4(pooled);
         return;
     }
 #endif

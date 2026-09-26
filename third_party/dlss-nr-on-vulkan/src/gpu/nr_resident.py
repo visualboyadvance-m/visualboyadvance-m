@@ -129,15 +129,26 @@ class GlobalScratch:
         # 235.4 ms on the GPU, three alternating runs each. Pad rows are zero, are excluded
         # from the softmax, and leave every real row bit-identical. The eighth is a guard,
         # not a measurement: at 384x384 (64 tokens) and 1024x576 (192) the question does
-        # not arise, and a large pad would pay for rows nobody needs.
+        # not arise, and a large pad would pay for rows nobody needs. Below 64 tokens —
+        # the small network frames `min_extent` allows — the pad is taken outright: those
+        # GEMMs wait on their K loop, not on rows, so 64 cost what 16 do, and a whole block
+        # lets the QKV projection's epilogue leave the tiled kernel (0.22 -> 0.14 ms a call,
+        # about 0.6 ms of a 192x128 frame). At 32 tokens or fewer — 16 at 256x128; 320x320
+        # has 64 — a 32-row build of the staged kernel does better still: half of each K
+        # step's work on the 64-row block was the pad (libxmx.c, `small`).
         padded = xmxres.align(tokens, 16)
-        if xmxres.align(tokens, 64) * 8 <= padded * 9:
+        if tokens <= 32:
+            padded = 32
+        elif tokens <= 64 or xmxres.align(tokens, 64) * 8 <= padded * 9:
             padded = xmxres.align(tokens, 64)
         self.tokens, self.padded = tokens, padded
         padded, hidden = self.padded, weights.hidden_width
         make = (arena.buffer if arena is not None else
                 lambda name, count, dtype=np.float32: runtime.buffer(count, dtype))
         self.value = make("global.value", padded * channels).zero()
+        # The chain's value as half, between the blocks and through them (`chain` in
+        # record_global_block). Its pad rows are zero from here on and never written.
+        self.io16 = make("global.io16", padded * channels, np.float16).zero()
         self.value16 = make("value16", padded * channels, np.float16)
         self.hidden16 = make("hidden16", padded * hidden, np.float16)
         self.branch = make("branch", padded * channels)
@@ -150,6 +161,8 @@ class GlobalScratch:
         self.probs16 = make("probs16", heads * padded * padded, np.float16)
         self.context = make("context", heads * padded * 32)
         self.merged16 = make("merged16", padded * channels, np.float16)
+        # the fused attention's output: merged16 shares q16's role, which it still reads
+        self.context16 = make("context16", padded * channels, np.float16)
         self.attention = make("attention", padded * channels)
         self.out = make("global.out", padded * channels)
 
@@ -241,30 +254,54 @@ def record_project_residual(runtime, a, weight, branch, skip, cosine, target,
                          epilogue=epilogue, b_half=skip_half, narrow=narrow)
 
 
-def record_global_block(runtime, w, s, source=None, target=None):
-    """A bottleneck block: the wide feed-forward, then attention over every token."""
-    source = source or s.value
-    target = target or s.out
+def record_global_block(runtime, w, s, source=None, target=None, *, chain=False):
+    """A bottleneck block: the wide feed-forward, then attention over every token.
+
+    With `chain` the block reads and writes `s.io16`, the value as half. Between the
+    blocks it is published E4M3, so the half is exact, and the float32 copy each block
+    went through — widened on the way in, narrowed again for the feed-forward, published
+    and narrowed on the way out, four passes — is not needed: the feed-forward reads the
+    half, its residual widens it, and the output projection publishes into it. Only the
+    real rows are stored, so the pad rows stay the zeros the float32 input's were.
+    """
     channels, heads, padded = w.channels, w.heads, s.padded
-    runtime.to_half(source, s.value16, padded * channels)
-    runtime.gemm(s.value16, w.expand, s.hidden16, padded, w.hidden_width, channels,
+    if chain:
+        source = value16 = s.io16
+    else:
+        source = source or s.value
+        value16 = s.value16
+        runtime.to_half(source, value16, padded * channels)
+    target = s.io16 if chain else (target or s.out)
+    runtime.gemm(value16, w.expand, s.hidden16, padded, w.hidden_width, channels,
                  epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
     record_project_residual(runtime, s.hidden16, w.ffn_proj, s.branch, source, w.ffn_cos,
-                            s.ffn, padded, channels, w.hidden_width)
+                            s.ffn, padded, channels, w.hidden_width, skip_half=chain)
 
     runtime.to_half(s.ffn, s.ffn16, padded * channels)
     key = record_qkv_projection(runtime, s.ffn16, w, s, 1, padded, channels, heads)
-    runtime.gemm(s.q16, key, s.scores, padded, padded, 32, batch=heads,
-                 strides=(padded * 32, padded * 32, padded * padded), transpose_b=True)
-    # no attention bias here, and the logits are clamped symmetrically
-    runtime.softmax(s.scores, s.probs16, heads * padded, s.tokens,
-                    stride=padded, cap=w.logit_cap, narrow=True)
-    runtime.gemm(s.probs16, s.v16, s.context, padded, 32, padded, batch=heads,
-                 strides=(padded * padded, padded * 32, padded * 32))
-    runtime.merge_heads(s.context, s.merged16, 1, padded, channels, heads,
-                        epilogue=xmxres.EPI_E4M3, narrow=True)
-    record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
-                            target, padded, channels, channels)
+    if runtime.fuse_global_attention:
+        # QK^T, the softmax, PV and the head merge in one pass, and no score stored
+        merged = s.context16
+        runtime.global_attention(s.q16, key, s.v16, merged, padded, s.tokens, heads,
+                                 w.logit_cap)
+    else:
+        merged = s.merged16
+        runtime.gemm(s.q16, key, s.scores, padded, padded, 32, batch=heads,
+                     strides=(padded * 32, padded * 32, padded * padded), transpose_b=True)
+        # no attention bias here, and the logits are clamped symmetrically
+        runtime.softmax(s.scores, s.probs16, heads * padded, s.tokens,
+                        stride=padded, cap=w.logit_cap, narrow=True)
+        runtime.gemm(s.probs16, s.v16, s.context, padded, 32, padded, batch=heads,
+                     strides=(padded * padded, padded * 32, padded * 32))
+        runtime.merge_heads(s.context, merged, 1, padded, channels, heads,
+                            epilogue=xmxres.EPI_E4M3, narrow=True)
+    if chain:
+        record_project_residual(runtime, merged, w.out, s.attention, s.ffn, w.attn_cos,
+                                target, s.tokens, channels, channels,
+                                epilogue=xmxres.EPI_E4M3, narrow=True)
+    else:
+        record_project_residual(runtime, merged, w.out, s.attention, s.ffn, w.attn_cos,
+                                target, padded, channels, channels)
 
 
 def run_global_block(runtime, w, s, value):
@@ -350,7 +387,25 @@ def _ffn_groups(runtime, a, b, c, rows, cols, inner, groups, *, leading, strides
                              epilogue=epilogue, narrow=True)
 
 
-def record_feed_forward(runtime, w, s, source, source_half=False, source16=None):
+def _can_make_input(runtime, w, s):
+    """Whether this block's feed-forward is the fused kernel's staged shape."""
+    return (runtime.fuse_ffn and not w.branched and not getattr(w, "split", False)
+            and w.channels == 32 and s.hidden_width == 128 and (s.height * s.width) % 16 == 0)
+
+
+def can_merge_input(runtime, w, s):
+    """Whether this block's feed-forward can make block 70's merged input itself."""
+    return (runtime.fuse_merge_ffn and _can_make_input(runtime, w, s)
+            and s.height % 2 == 0 and s.width % 2 == 0)
+
+
+def can_make_stem(runtime, w, s):
+    """Whether this block's feed-forward can make block 0's stem itself."""
+    return runtime.fuse_stem_ffn and _can_make_input(runtime, w, s)
+
+
+def record_feed_forward(runtime, w, s, source, source_half=False, source16=None,
+                        merge=None, stem=None):
     """The block's feed-forward, into `s.ffn`. Branched or plain, as the block is.
 
     `source_half` says the block's input is already float16 — true whenever it is an
@@ -359,11 +414,29 @@ def record_feed_forward(runtime, w, s, source, source_half=False, source16=None)
     says a float32 input's half copy has already been written there, by the pass that
     produced the input, so the to_half pass is not needed either.
 
+    `merge` is block 70's input still unmade — the level above, the skip, the sin-cos
+    table and the level above's width — for the feed-forward to make itself
+    (`can_merge_input`); `stem` is block 0's, the features and the adapter
+    (`can_make_stem`). `source` is then unused.
+
     Returns whether `s.ffn` was stored as half: the branched blocks publish it as E4M3,
     which half holds exactly, so they store it narrow and every pass after reads half the
     bytes; the plain blocks' output is unpublished float32 and stays that.
     """
     pixels, channels = s.height * s.width, w.channels
+    if merge is not None:
+        if not can_merge_input(runtime, w, s):
+            raise ValueError("this block's feed-forward cannot make its own input")
+        above, skip, sincos, above_width = merge
+        runtime.ffn_fused_merge(above, skip, sincos, w.expand, w.branch, s.ffn, w.ffn_cos,
+                                s.height, s.width, above_width)
+        return False
+    if stem is not None:
+        if not can_make_stem(runtime, w, s):
+            raise ValueError("this block's feed-forward cannot make its own stem")
+        features, adapter = stem
+        runtime.ffn_fused_stem(features, adapter, w.expand, w.branch, s.ffn, w.ffn_cos, pixels)
+        return False
     value16 = source if source_half else (source16 or s.value16)
     if not source_half and source16 is None:
         runtime.to_half(source, s.value16, pixels * channels)
@@ -426,8 +499,16 @@ def record_split_feed_forward(runtime, w, s, source, source_half=False):
                             s.ffn, pixels, channels, channels, skip_half=source_half)
 
 
+def can_fuse_window_block(runtime, w, s):
+    """Whether this block's attention half runs as one pass a window (window_block.comp)."""
+    return (w.channels == 32 and w.heads == 1 and s.tokens == 64 and runtime.fuse_window_block
+            and runtime.qkv_epilogue and runtime.fuse_partition
+            and runtime.fuse_window_attention and runtime.fuse_attention_merge
+            and runtime.fuse_window_residual)
+
+
 def record_window_attention(runtime, w, s, source, target=None, publish=0,
-                            target_half=False, source_half=False):
+                            target_half=False, source_half=False, pool=None, head=None):
     """Window attention over `source`, into `s.attended` — in window order.
 
     With a `target`, the output projection finishes the block instead: it adds
@@ -440,6 +521,25 @@ def record_window_attention(runtime, w, s, source, target=None, publish=0,
     not the scratch's worst case.
     """
     channels, heads, tokens = w.channels, w.heads, s.tokens
+    if ((target is not None or pool is not None or head is not None)
+            and can_fuse_window_block(runtime, w, s)):
+        # the three fused passes below in one, a window a workgroup (window_block.comp);
+        # only on top of them, so that turning one of them off still compares its own path
+        if head is not None:
+            weights, head_target, columns = head
+            runtime.window_block(source, w.qkv, w.out, head_target, w.bias, w.attn_cos,
+                                 w.scale, s.height, s.width, w.origin,
+                                 image_half=source_half, head=weights, head_columns=columns)
+        elif pool is not None:
+            pooled, published = pool
+            runtime.window_block(source, w.qkv, w.out, published, w.bias, w.attn_cos, w.scale,
+                                 s.height, s.width, w.origin, narrow=True,
+                                 image_half=source_half, pooled=pooled)
+        else:
+            runtime.window_block(source, w.qkv, w.out, target, w.bias, w.attn_cos, w.scale,
+                                 s.height, s.width, w.origin, epilogue=publish,
+                                 narrow=target_half, image_half=source_half)
+        return
     padded_height, padded_width, _ = runtime.window_extent(s.height, s.width, w.origin)
     windows = (padded_height // 8) * (padded_width // 8)
     batch = windows * heads
@@ -474,7 +574,13 @@ def record_window_attention(runtime, w, s, source, target=None, publish=0,
     if not merged:
         runtime.merge_heads(s.context, s.merged16, windows, tokens, channels, heads,
                             epilogue=xmxres.EPI_E4M3, narrow=True)
-    if target is not None:
+    if pool is not None:
+        # block 0: the output only ever read pooled or published, both made here
+        pooled, published = pool
+        runtime.gemm_residual_pool(attended, w.out, source, w.attn_cos, published, pooled,
+                                   windows * tokens, channels,
+                                   (s.height, s.width, 8, w.origin), skip_half=source_half)
+    elif target is not None:
         runtime.gemm_residual(attended, w.out, source, w.attn_cos, target,
                               windows * tokens, channels, channels,
                               reverse=(s.height, s.width, 8, w.origin),
@@ -483,14 +589,25 @@ def record_window_attention(runtime, w, s, source, target=None, publish=0,
         runtime.gemm(attended, w.out, s.attended, windows * tokens, channels, channels)
 
 
+def can_pool_output(runtime, w, s):
+    """Whether this block's window residual can pool and publish its own output."""
+    _, _, (top, left) = runtime.window_extent(s.height, s.width, w.origin)
+    return (runtime.fuse_pool and runtime.fuse_window_residual and w.channels == 32
+            and not getattr(w, "split", False) and s.tokens == 64
+            and s.height % 2 == 0 and s.width % 2 == 0 and top % 2 == 0 and left % 2 == 0)
+
+
 def record_block(runtime, w, s, source=None, target=None, publish=0, source_half=False,
-                 target_half=False, source16=None):
+                 target_half=False, source16=None, merge=None, stem=None, pool=None,
+                 head=None):
     """A whole window block: feed-forward, attention, both residuals.
 
     `source` and `target` default to the scratch's own buffers; passing them lets one
     level's blocks chain into the next without a copy. `publish` is the epilogue the
     closing residual applies, which is how a block's output is published without a
-    second pass over it.
+    second pass over it. `pool=(pooled, published)` is block 0's: its output is written
+    only pooled and published, both by the closing residual (`can_pool_output`), and
+    `target` is unused.
     """
     source = source or s.value
     target = target or s.out
@@ -501,10 +618,16 @@ def record_block(runtime, w, s, source=None, target=None, publish=0, source_half
         record_split_feed_forward(runtime, w, s, source, source_half)
         ffn_half = False
     else:
-        ffn_half = record_feed_forward(runtime, w, s, source, source_half, source16=source16)
+        ffn_half = record_feed_forward(runtime, w, s, source, source_half, source16=source16,
+                                       merge=merge, stem=stem)
+    if pool is not None and not can_pool_output(runtime, w, s):
+        raise ValueError("this block's window residual cannot pool its own output")
+    if head is not None and not can_fuse_window_block(runtime, w, s):
+        raise ValueError("only a fused window block computes the head itself")
     if runtime.fuse_window_residual:
         record_window_attention(runtime, w, s, s.ffn, target=target, publish=publish,
-                                target_half=target_half, source_half=ffn_half)
+                                target_half=target_half, source_half=ffn_half, pool=pool,
+                                head=head)
         return
     record_window_attention(runtime, w, s, s.ffn, source_half=ffn_half)
     # the window reverse is the residual's own gather, not a pass of its own
@@ -578,6 +701,12 @@ def record_upsample_merge(runtime, transition, scratch, source, skip, target,
         runtime.to_half(source, scratch.projected16, source_pixels * channels)
     runtime.gemm(projected16, transition.weight0, scratch.projected,
                  source_pixels, out_channels, channels)
+    if runtime.fuse_transition:
+        # the upsample, the scaled skip and the add in one pass (resident.comp UPSAMPLE_ADD)
+        runtime.upsample_add(scratch.projected, skip, transition.sine, target, height, width,
+                             source_width, out_channels, skip_half=skip_half,
+                             epilogue=xmxres.EPI_E4M3, narrow=target_half)
+        return
     with runtime.independent():
         runtime.upsample2(scratch.projected, scratch.upsampled, source_width, height,
                           width, out_channels)

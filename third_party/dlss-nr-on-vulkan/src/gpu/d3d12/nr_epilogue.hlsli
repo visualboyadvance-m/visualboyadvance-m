@@ -118,6 +118,7 @@ void qkv_epilogue(uint row, uint col, uint lane, uint lanes) {
      * coalesce: a row is one head's 32 channels, contiguous in the target. */
     for (uint e = lane * 4u; e < QKV_BM * QKV_BN; e += lanes * 4u) {
         uint r = row + e / QKV_BN, window = r / tokens, token = r % tokens;
+        if (r >= pc.m) continue;                 // a partial last block's rows past M
         uint at = ((window * heads + head) * tokens + token) * 32u + e % QKV_BN;
         float4 out4;
         [unroll] for (uint i = 0u; i < 4u; i++) out4[i] = e4m3(qkv_stage[e + i]);

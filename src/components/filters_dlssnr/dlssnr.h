@@ -21,7 +21,8 @@
 // the standard profile, frame index 0, no control mask, and the still path
 // with no history, so a pass's output depends on that frame alone and matches
 // `nr_frame IN.png OUT.png` on the same pixels, and those are the bytes that
-// reach the display.
+// reach the display -- except that the stages before and after the display
+// filter raise the intensity (kFilterStageIntensity).
 //
 // The weights are shared process-wide: the model opens on the first pass a
 // Filter asks for (about two seconds, on the worker, never on the UI thread)
@@ -56,6 +57,17 @@ enum Stage : uint32_t {
     kAfterFilter = 1,
     kAtDisplay = 2,
 };
+
+// The blend of the network's picture against the source (nr_frame_params'
+// `intensity`; > 1 extrapolates). The network redraws a picture at the size it
+// is given, so at display size its change is plain to see, while at a source
+// or filter-output size -- a few hundred pixels a side, each emulated pixel one
+// or two of them -- it moves each pixel only a few levels (4/255 on average on
+// a GBA frame at 240x160, 6/255 after a 2x filter), which the renderer's
+// upscale then hides. The stages before and after the filter extrapolate the
+// change by this much instead, so it shows; at display size it is left alone.
+inline constexpr float kDisplayIntensity = 1.0f;
+inline constexpr float kFilterStageIntensity = 3.0f;
 
 // True when the filter is compiled into this build.
 inline constexpr bool Available() {
@@ -121,10 +133,13 @@ public:
     // data pixel of `height` rows, `instride`/`outstride` bytes apart; the
     // 8-bit channels sit at bit positions `red_shift`, `green_shift` and
     // `blue_shift` of each uint32 (VBA-M's systemRedShift - 3 and friends).
-    // Writes the newest finished result when it matches the frame size,
-    // otherwise copies the source through. Never blocks on the network.
+    // `intensity` is the blend the pass over this frame composes with (see
+    // kFilterStageIntensity). Writes the newest finished result when it matches
+    // the frame size, otherwise copies the source through. Never blocks on the
+    // network.
     void Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstride,
-                 int width, int height, int red_shift, int green_shift, int blue_shift);
+                 int width, int height, int red_shift, int green_shift, int blue_shift,
+                 float intensity = kDisplayIntensity);
 
     // The model opened and at least one frame can be processed.
     bool Ready() const;

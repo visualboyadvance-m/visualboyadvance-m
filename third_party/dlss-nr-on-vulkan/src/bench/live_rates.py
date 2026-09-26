@@ -12,6 +12,7 @@ and the temporal path has no history yet.
 
     python3 src/bench/live_rates.py                       # the published table
     python3 src/bench/live_rates.py 800x600@0.5 --frames 9
+    python3 src/bench/live_rates.py 640x360@0.5 --set min_extent=128
 
 Prints the table and the literal for `nr_knobs.RATES`, so the number in the README has a
 program behind it rather than a memory of one.
@@ -64,8 +65,8 @@ def round_trip(path, payload, header, want):
     return time.perf_counter() - started
 
 
-def measure(daemon_socket, settings, width, height, scale, frames, warmup):
-    settings.write_text(json.dumps({"render_scale": scale}))
+def measure(daemon_socket, settings, width, height, scale, frames, warmup, extra=None):
+    settings.write_text(json.dumps(dict(extra or {}, render_scale=scale)))
     payload_bytes = 4 * width * height
     header = struct.pack("<4I", MAGIC, width, height, FORMAT_B8G8R8A8)
     times = []
@@ -85,7 +86,13 @@ def main():
     parser.add_argument("--frames", type=int, default=9, help="timed frames per case")
     parser.add_argument("--warmup", type=int, default=3,
                         help="frames to discard while the extent's buffers are built")
+    parser.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE",
+                        help="any other setting for the daemon, e.g. min_extent=128")
     args = parser.parse_args()
+    extra = {}
+    for item in args.set:
+        knob, _, value = item.partition("=")
+        extra[knob] = float(value) if value.replace(".", "", 1).isdigit() else value
 
     plan = []
     for case in args.cases:
@@ -114,7 +121,7 @@ def main():
             measured = []
             for width, height, scale in plan:
                 middle, low, high = measure(daemon_socket, settings, width, height, scale,
-                                            args.frames, args.warmup)
+                                            args.frames, args.warmup, extra)
                 measured.append((width, height, scale, 1000 * middle))
                 print("  %-14s %6.2f %8.0f %8.1f %18s"
                       % ("%dx%d" % (width, height), scale, 1000 * middle, 1 / middle,

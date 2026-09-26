@@ -512,6 +512,77 @@ int main(int argc, char **argv)
         free(first); free(small); free(out1); free(out2);
     }
 
+    /* 7b. min_extent: the graph's own floor, where the bottleneck is 16 tokens */
+    {
+        int mh, mw;
+        nr_frame_geometry_min(height, width, 128, &mh, &mw);
+        snprintf(detail, sizeof detail, "%dx%d", mw, mh);
+        check("min_extent 128: the network extent is 256x192", mh == 256 && mw == 192, detail);
+        nr_frame_geometry_min(height, width, 0, &mh, &mw);
+        check("min_extent 0: the vendor's 320", mh == 320 && mw == 320, NULL);
+        nr_frame_params q = p;
+        q.min_extent = 128;
+        float *out1 = malloc(pixels * 3 * sizeof(float)), *out2 = malloc(pixels * 3 * sizeof(float));
+        if (nr_frame_update(frame, colour, height, width, NULL, NULL, &q, out1, NULL)) { fprintf(stderr, "%s\n", nr_frame_error()); return 1; }
+        nr_frame_update(frame, colour, height, width, NULL, NULL, &q, out2, NULL);
+        check("min_extent 128: renders, finite, and replays the same bytes",
+              all_finite(out1, pixels * 3) && same(out1, out2, pixels * 3), NULL);
+        free(out1); free(out2);
+    }
+
+    /* 7c. the daemon's end of a frame in one pass: a smaller head brought up, composed and
+     * encoded, against the upscale, nr_frame_compose and nr_encode8 one after the other */
+    {
+        int hh = height * 3 / 5, hw = width * 3 / 5, fw = width + 10;
+        float *head = malloc((size_t)hh * hw * 4 * sizeof(float)), *up = malloc(pixels * 4 * sizeof(float));
+        float *middle = malloc((size_t)height * hw * 4 * sizeof(float));
+        float *fused = malloc(pixels * 3 * sizeof(float)), *want = malloc(pixels * 3 * sizeof(float));
+        for (size_t i = 0; i < (size_t)hh * hw * 4; i++) head[i] = normal();
+        int32_t *ly = malloc(height * sizeof(int32_t)), *hy = malloc(height * sizeof(int32_t));
+        int32_t *lx = malloc(width * sizeof(int32_t)), *hx = malloc(width * sizeof(int32_t));
+        float *wy = malloc(height * sizeof(float)), *wx = malloc(width * sizeof(float));
+        for (int axis = 0; axis < 2; axis++) {
+            int extent = axis ? hw : hh, count = axis ? width : height;
+            int32_t *lo = axis ? lx : ly, *hi = axis ? hx : hy;
+            float *wt = axis ? wx : wy, ratio = (float)((double)extent / (double)count);
+            for (int i = 0; i < count; i++) {
+                float centre = ((float)i + 0.5f) * ratio - 0.5f, fl = floorf(centre);
+                int l = fl < 0.0f ? 0 : fl > (float)(extent - 1) ? extent - 1 : (int)fl;
+                lo[i] = l; hi[i] = l + 1 > extent - 1 ? extent - 1 : l + 1;
+                float fr = centre - (float)l;
+                wt[i] = fr < 0.0f ? 0.0f : fr > 1.0f ? 1.0f : fr;
+            }
+        }
+        nr_resize_axis(head, (ptrdiff_t)hw * 4, 4, 1, (size_t)height, (size_t)hw, 4, 0, ly, hy, wy, middle);
+        nr_resize_axis(middle, (ptrdiff_t)hw * 4, 4, 1, (size_t)height, (size_t)width, 4, 1, lx, hx, wx, up);
+        size_t frame_bytes = (size_t)(height + 6) * fw * 4;
+        uint8_t *request = malloc(frame_bytes), *got = malloc(frame_bytes), *expect = malloc(frame_bytes);
+        for (size_t i = 0; i < frame_bytes; i++) request[i] = (uint8_t)(i * 2654435761u >> 24);
+        const char *names[3] = { "still", "history", "history, floor and release" };
+        int all = 1;
+        for (int c = 0; c < 3; c++) {
+            nr_frame_params q = p;
+            const float *hist = c ? history : NULL, *prev = c == 2 ? previous : NULL;
+            if (c == 2) { q.hold = 0.6f; q.slope = -0.6f * 255.0f / 4.0f; q.release = -255.0f / 16.0f; }
+            memcpy(got, request, frame_bytes);
+            memcpy(expect, request, frame_bytes);
+            int bad = nr_frame_compose_encode(frame, head, hh, hw, colour, height, width, hist, prev, NULL, &q,
+                                              fused, got, fw, 3, 5, 1)
+                      || nr_frame_compose(frame, up, colour, height, width, hist, prev, NULL, &q, want);
+            for (int y = 0; y < height && !bad; y++) {
+                uint8_t *row = expect + ((size_t)(3 + y) * fw + 5) * 4;
+                nr_encode8(want + (size_t)y * width * 3, (ptrdiff_t)width * 3, 3, 1, row, 1, (size_t)width, 1, row);
+            }
+            int ok = !bad && same(fused, want, pixels * 3) && !memcmp(got, expect, frame_bytes);
+            all &= ok;
+            snprintf(detail, sizeof detail, "%s", names[c]);
+            check("compose_encode: one pass, the separate passes' composition and bytes", ok, detail);
+        }
+        (void)all;
+        free(head); free(up); free(middle); free(fused); free(want); free(ly); free(hy); free(lx); free(hx);
+        free(wy); free(wx); free(request); free(got); free(expect);
+    }
+
     /* 8. the other side, when Python wrote it down: the same features, the same head */
     if (reference) {
         FILE *f = fopen(reference, "rb");

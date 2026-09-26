@@ -52,6 +52,13 @@ def _library():
         ptr, stride, stride, ptr, C.c_float, ptr, stride, stride,
         size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float, ptr]
     lib.nr_compose_temporal.restype = None
+    lib.nr_compose_encode.argtypes = [
+        ptr, stride, stride, stride, size, size, ptr, ptr, ptr, ptr, ptr, ptr,
+        ptr, stride, stride, stride, ptr, stride, stride, stride,
+        ptr, stride, stride, stride, ptr, C.c_float, ptr, stride, stride,
+        size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float,
+        ptr, ptr, size, size, size, C.c_int, ptr, size]
+    lib.nr_compose_encode.restype = None
     lib.nr_resize_axis.argtypes = [ptr, stride, stride, stride, size, size, size,
                                   C.c_int, ptr, ptr, ptr, ptr]
     lib.nr_resize_axis.restype = None
@@ -223,6 +230,71 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
         *(_strides(mask)[:2] if mask is not None else (0, 0)),
         *colour.shape[:2], intensity, blend_scale, hold, slope, release, output.ctypes.data)
     return output
+
+
+def compose_encode(head, colour, history, previous, mask, encoded, *, top, left, bgra,
+                   intensity, blend_scale=0.0, hold=0.0, slope=0.0, table=None,
+                   confidence=1.0, release=0.0, samples=None):
+    """`bilinear` of the head to the colour's extent, then `compose_temporal` — or, with
+    no history, `compose` — then `encode8` into `encoded` at (`top`, `left`), in one pass.
+
+    `encoded` is a writable copy of the request, (frame_height, frame_width, 4) bytes: its
+    alpha and everything outside the colour's region are left as they are, which is what
+    encoding the whole frame would have written there. Returns the composition, which is
+    what the separate passes return; the bytes they would have encoded are in `encoded`.
+    `samples`, a step: the upscaled head on every step-th row and column comes back too,
+    as `(composition, samples)` — what `bilinear(head)[::step, ::step]` would hold.
+    """
+    lib = library()
+    if lib is None:
+        return None
+    head = np.require(head, dtype=np.float32, requirements=['A'])
+    colour = np.require(colour, dtype=np.float32, requirements=['A'])
+    channels = 4 if history is not None else 3
+    height, width = colour.shape[:2]
+    if (head.ndim != 3 or head.shape[2] < channels or colour.ndim != 3 or colour.shape[2] != 3
+            or head.shape[0] > height or head.shape[1] > width):
+        raise ValueError('the fused composition upscales a head to the colour it composes')
+    if history is not None:
+        history = np.require(history, dtype=np.float32, requirements=['A'])
+        table = np.require(table, dtype=np.float32, requirements=['C', 'A'])
+        if history.shape != colour.shape or table.shape != (1 << 16,):
+            raise ValueError('the temporal composition needs a history of the colour\'s '
+                             'shape and the gate table')
+    elif mask is not None or previous is not None:
+        raise ValueError('a still frame is composed without a mask or a previous frame')
+    if previous is not None:
+        previous = np.require(previous, dtype=np.float32, requirements=['A'])
+        if previous.shape != colour.shape:
+            raise ValueError('the previous frame must match the colour')
+    if mask is not None:
+        mask = np.require(mask, dtype=np.float32, requirements=['A'])
+        if mask.ndim != 3 or mask.shape[:2] != colour.shape[:2]:
+            raise ValueError('the control mask must match the colour')
+    if (not isinstance(encoded, np.ndarray) or encoded.dtype != np.uint8 or encoded.ndim != 3
+            or encoded.shape[2] != 4 or not encoded.flags.c_contiguous
+            or not encoded.flags.writeable
+            or top + height > encoded.shape[0] or left + width > encoded.shape[1]):
+        raise ValueError('the encoded frame must be writable HxWx4 bytes around the colour')
+    plans = [(_axis_plan(head.shape[axis], count) if head.shape[axis] != count else (None,) * 3)
+             for axis, count in enumerate((height, width))]
+    pointer = lambda array: array.ctypes.data if array is not None else None
+    output = np.empty(colour.shape, np.float32)
+    step = int(samples or 0)
+    sampled = (np.empty((-(-height // step), -(-width // step), channels), np.float32)
+               if step else None)
+    lib.nr_compose_encode(
+        head.ctypes.data, *_strides(head), head.shape[1], channels,
+        *(pointer(array) for array in plans[0]), *(pointer(array) for array in plans[1]),
+        colour.ctypes.data, *_strides(colour),
+        pointer(history), *(_strides(history) if history is not None else (0, 0, 0)),
+        pointer(previous), *(_strides(previous) if previous is not None else (0, 0, 0)),
+        pointer(table), confidence,
+        pointer(mask), *(_strides(mask)[:2] if mask is not None else (0, 0)),
+        height, width, intensity, blend_scale, hold, slope, release,
+        output.ctypes.data, encoded.ctypes.data, encoded.shape[1], top, left, int(bool(bgra)),
+        pointer(sampled), step)
+    return (output, sampled) if step else output
 
 
 @lru_cache(maxsize=32)

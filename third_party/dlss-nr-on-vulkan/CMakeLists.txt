@@ -553,9 +553,13 @@ endfunction()
 nr_shader(gemm_resident.spv        src/gpu/gemm_resident.comp)
 nr_shader(gemm_tiled.spv           src/gpu/gemm_resident.comp -DRM=2 -DRN=2)   # a 16x32 block in one subgroup
 nr_shader(gemm_staged.spv          src/gpu/gemm_staged.comp)
+# 32-row blocks for a bottleneck of 32 tokens or fewer, with a 32- and a 64-deep K step
+nr_shader(gemm_staged32.spv        src/gpu/gemm_staged.comp -DSTAGED_BM=32)
+nr_shader(gemm_staged32_deep.spv   src/gpu/gemm_staged.comp -DSTAGED_BM=32 -DSTAGED_BK=64)
 nr_shader(resident.spv             src/gpu/resident.comp)
 nr_shader(attention.spv            src/gpu/attention.comp)
 nr_shader(attention_ab.spv         src/gpu/attention.comp -DSOFTMAX_AB)
+nr_shader(attention_rows.spv       src/gpu/attention.comp -DROW_LANES=256)   # the whole-row softmax
 nr_shader(history.spv              src/gpu/history.comp)
 nr_shader(gemm_coopmat.spv         src/gpu/gemm_coopmat.comp)
 nr_shader(gemm_batched.spv         src/gpu/gemm_coopmat_batched.comp)
@@ -564,6 +568,7 @@ nr_shader(gemm_coopmat_int8.spv    src/gpu/gemm_coopmat_int8.comp)   # configura
 # the same GEMMs without the cooperative matrix, for a device that has none (MoltenVK)
 nr_shader(gemm_portable.spv        src/gpu/gemm_portable.comp)
 nr_shader(gemm_portable_tiled.spv  src/gpu/gemm_portable.comp -DRM=2 -DRN=2)
+nr_shader(gemm_portable_wide.spv   src/gpu/gemm_portable.comp -DRM=2 -DRN=4)   # 16x64, found by libxmx beside the tiled build
 nr_shader(gemm_portable_desc.spv   src/gpu/gemm_portable_desc.comp)
 nr_shader(gemm_portable_batched.spv src/gpu/gemm_portable_desc.comp -DBATCHED)
 # the fused passes (notes/improve-fusions.md), each with a twin for a device without
@@ -572,6 +577,14 @@ nr_shader(window_attention.spv     src/gpu/window_attention.comp)
 nr_shader(window_attention_portable.spv src/gpu/window_attention_portable.comp)
 nr_shader(ffn_fused.spv            src/gpu/ffn_fused.comp)
 nr_shader(ffn_fused_portable.spv   src/gpu/ffn_fused_portable.comp)
+# improve-b.md: a 32-channel window block's attention half and a bottleneck block's
+# attention in one pass each, and the integer staged GEMM, each with its portable twin
+nr_shader(window_block.spv                src/gpu/window_block.comp)
+nr_shader(window_block_portable.spv       src/gpu/window_block_portable.comp)
+nr_shader(global_attention.spv            src/gpu/global_attention.comp)
+nr_shader(global_attention_portable.spv   src/gpu/global_attention_portable.comp)
+nr_shader(gemm_staged_int8.spv            src/gpu/gemm_staged_int8.comp)
+nr_shader(gemm_staged_int8_portable.spv   src/gpu/gemm_staged_int8_portable.comp)
 nr_shader(half_probe.spv           src/bench/half_probe.comp)
 add_custom_target(shaders ALL DEPENDS ${NR_SPV})
 
@@ -642,7 +655,8 @@ if(NR_BUILD_METAL)
   file(MAKE_DIRECTORY "${NR_METAL_DIR}")
   set(NR_METAL_FLAGS -std=metal3.1 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
   set(NR_AIR)
-  foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused)
+  foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused
+               window_block global_attention gemm_int8)
     add_custom_command(OUTPUT "${NR_METAL_DIR}/${stem}.air"
       COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL_FLAGS} -c -o "${NR_METAL_DIR}/${stem}.air"
               "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
@@ -659,9 +673,55 @@ if(NR_BUILD_METAL)
     DEPENDS "${NR_METALLIB}" ${NR_BIN2C} COMMENT "bin2c nr_metallib.h" VERBATIM)
   add_custom_target(metal_shaders ALL DEPENDS "${NR_METALLIB}")
 
-  add_library(metalmx SHARED src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h")
-  target_include_directories(metalmx PRIVATE src/gpu "${NR_METAL_DIR}")
-  target_compile_definitions(metalmx PRIVATE NR_EMBEDDED_METALLIB=1)
+  # The same sources as Metal 4 (NR_METAL4: the GEMMs' K loop on Metal Performance
+  # Primitives' matmul2d), a second library libmetalmx loads on a device and OS in
+  # MTLGPUFamilyMetal4 and keeps the Metal 3.1 one for everything else. Built only when this
+  # SDK's compiler takes -std=metal4.0 (Xcode 26 and later); an older SDK builds the Metal 3
+  # library alone, and the runtime then has nothing else to choose.
+  set(NR_METAL4_HEADER)
+  set(NR_METAL4_DEFINES)
+  option(NR_METAL4 "libmetalmx: also embed a Metal 4 metallib, used where the device and OS have Metal 4" ON)
+  if(NR_METAL4)
+    set(probe_dir "${CMAKE_CURRENT_BINARY_DIR}/metal4_probe")
+    file(MAKE_DIRECTORY "${probe_dir}")
+    file(WRITE "${probe_dir}/probe.metal"
+      "#include <metal_stdlib>\n#include <metal_tensor>\n#include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>\nkernel void probe(device float *a [[buffer(0)]]) { a[0] = 1.0f; }\n")
+    execute_process(COMMAND "${NR_XCRUN}" -sdk macosx metal -std=metal4.0 -c -o "${probe_dir}/probe.air" "${probe_dir}/probe.metal"
+                    RESULT_VARIABLE metal4_rc OUTPUT_QUIET ERROR_QUIET)
+    if(NOT metal4_rc EQUAL 0)
+      message(STATUS "libmetalmx: this SDK's Metal compiler has no -std=metal4.0; the Metal 3.1 library alone")
+      set(NR_METAL4 OFF CACHE BOOL "" FORCE)
+    endif()
+  endif()
+  if(NR_METAL4)
+    set(NR_METAL4_DIR "${CMAKE_CURRENT_BINARY_DIR}/metal4")
+    file(MAKE_DIRECTORY "${NR_METAL4_DIR}")
+    set(NR_METAL4_FLAGS -std=metal4.0 -DNR_METAL4 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
+    set(NR_AIR4)
+    foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused
+                 window_block global_attention gemm_int8)
+      add_custom_command(OUTPUT "${NR_METAL4_DIR}/${stem}.air"
+        COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL4_FLAGS} -c -o "${NR_METAL4_DIR}/${stem}.air"
+                "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
+        DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_metal.h" "${PROJECT_SOURCE_DIR}/src/gpu/metal/nr_epilogue.h"
+        COMMENT "metal (Metal 4) ${stem}.air" VERBATIM)
+      list(APPEND NR_AIR4 "${NR_METAL4_DIR}/${stem}.air")
+    endforeach()
+    set(NR_METALLIB4 "${NR_OUTPUT_DIR}/nr_shaders4.metallib")
+    add_custom_command(OUTPUT "${NR_METALLIB4}"
+      COMMAND "${NR_XCRUN}" -sdk macosx metallib -o "${NR_METALLIB4}" ${NR_AIR4}
+      DEPENDS ${NR_AIR4} COMMENT "metallib nr_shaders4.metallib" VERBATIM)
+    add_custom_command(OUTPUT "${NR_METAL4_DIR}/nr_metallib4.h"
+      COMMAND ${NR_BIN2C} "${NR_METALLIB4}" "${NR_METAL4_DIR}/nr_metallib4.h" nr_metallib4
+      DEPENDS "${NR_METALLIB4}" ${NR_BIN2C} COMMENT "bin2c nr_metallib4.h" VERBATIM)
+    add_custom_target(metal4_shaders ALL DEPENDS "${NR_METALLIB4}")
+    set(NR_METAL4_HEADER "${NR_METAL4_DIR}/nr_metallib4.h")
+    set(NR_METAL4_DEFINES NR_EMBEDDED_METALLIB4=1)
+  endif()
+
+  add_library(metalmx SHARED src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h" ${NR_METAL4_HEADER})
+  target_include_directories(metalmx PRIVATE src/gpu "${NR_METAL_DIR}" "${NR_METAL4_DIR}")
+  target_compile_definitions(metalmx PRIVATE NR_EMBEDDED_METALLIB=1 ${NR_METAL4_DEFINES})
   target_compile_options(metalmx PRIVATE -fobjc-arc ${NR_WARN_FLAGS})
   target_link_libraries(metalmx PRIVATE "-framework Metal" "-framework Foundation")
   nr_place(metalmx)
@@ -713,6 +773,7 @@ if(NR_BUILD_D3D12)
 
   nr_dxil(gemm_portable         gemm_portable.hlsl)
   nr_dxil(gemm_portable_tiled   gemm_portable.hlsl -DRM=2 -DRN=2)   # the 16x32 block, the gemm_tiled slot
+  nr_dxil(gemm_portable_wide    gemm_portable.hlsl -DRM=2 -DRN=4)   # 16x64, found by libd3dmx beside the tiled build
   nr_dxil(gemm_portable_desc    gemm_portable_desc.hlsl)
   nr_dxil(gemm_portable_batched gemm_portable_desc.hlsl -DBATCHED)
   nr_dxil(gemm_f16acc           gemm_portable_desc.hlsl -DACC16)
@@ -724,6 +785,10 @@ if(NR_BUILD_D3D12)
   nr_dxil(window_attention_portable        window_attention_portable.hlsl)
   nr_dxil(window_attention_portable_merged window_attention_portable.hlsl -DMERGED_OUTPUT=1)
   nr_dxil(ffn_fused_portable               ffn_fused_portable.hlsl)
+  nr_dxil(attention_rows                   attention.hlsl -DROW_LANES=256)   # the whole-row softmax
+  nr_dxil(window_block_portable            window_block_portable.hlsl)
+  nr_dxil(global_attention_portable        global_attention_portable.hlsl)
+  nr_dxil(gemm_staged_int8_portable        gemm_staged_int8_portable.hlsl)
   add_custom_target(dxil_shaders ALL DEPENDS ${NR_DXIL})
 
   list(LENGTH NR_DXIL_HEADERS NR_DXIL_COUNT)
@@ -763,6 +828,12 @@ endif()
 add_library(nr_image_objects OBJECT src/ref/nr_image.c)
 target_include_directories(nr_image_objects PRIVATE src/ref)
 target_compile_options(nr_image_objects PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+# `-fno-trapping-math` changes no value, only whether a comparison may raise an exception
+# flag nobody reads; it lets GCC turn the fused composition's clamps into selects and
+# vectorise its pixels (`compose_encode_row`).
+if(NOT MSVC)
+  target_compile_options(nr_image_objects PRIVATE -fno-trapping-math)
+endif()
 set_target_properties(nr_image_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
 nr_no_ipo(nr_image_objects)
 
@@ -922,12 +993,13 @@ nr_place(nr_frame)
 # host lets the runtime open the Metal device itself. NR_BUILD_METAL=OFF gives the Vulkan
 # archive on Apple as before.
 if(NR_BUILD_METAL)
-  add_library(dlssnr STATIC src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h" src/ref/nr_frame.c
-    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS})
+  add_library(dlssnr STATIC src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h" ${NR_METAL4_HEADER}
+    src/ref/nr_frame.c $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS})
   target_include_directories(dlssnr
-    PRIVATE src/gpu "${NR_METAL_DIR}"
+    PRIVATE src/gpu "${NR_METAL_DIR}" "${NR_METAL4_DIR}"
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
-  target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 NR_STATIC_METAL=1 NR_EMBEDDED_METALLIB=1)
+  target_compile_definitions(dlssnr PRIVATE NR_STATIC_XMX=1 NR_STATIC_METAL=1 NR_EMBEDDED_METALLIB=1
+                             ${NR_METAL4_DEFINES})
   set_source_files_properties(src/gpu/libmetalmx.m PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
   target_link_libraries(dlssnr PUBLIC "-framework Metal" "-framework Foundation")
   set(NR_DLSSNR_HOST_LIBS)                        # the test plays a host that brings no Vulkan
@@ -1088,6 +1160,10 @@ if(NR_BUILD_TESTS)
       src/gpu/test_window_residual.py
       src/gpu/test_int8_quant.py
       src/gpu/test_gemm_int8.py
+      src/gpu/test_gemm_int8_staged.py
+      src/gpu/test_window_block.py
+      src/gpu/test_global_attention.py
+      src/gpu/test_staged32.py
       src/gpu/test_joint_qkv.py
       src/ref/test_frame_cache.py src/ref/test_native_image.py src/ref/test_nr_model.py
       src/ref/test_temporal_controls.py)
@@ -1126,7 +1202,9 @@ if(NR_BUILD_TESTS)
       src/gpu/test_gemm_contract.py src/gpu/test_gemm_residual.py src/gpu/test_window_residual.py
       src/gpu/test_window_attention.py src/gpu/test_gemm_qkv.py src/gpu/test_ffn_fused.py
       src/gpu/test_glue.py src/gpu/test_joint_qkv.py src/gpu/test_compact_head.py
-      src/gpu/test_input_fp16.py src/gpu/test_staged_partial.py)
+      src/gpu/test_input_fp16.py src/gpu/test_staged_partial.py
+      src/gpu/test_window_block.py src/gpu/test_global_attention.py src/gpu/test_staged32.py
+      src/gpu/test_gemm_int8_staged.py)
     if(NR_BUILD_METAL)
       set(NR_METAL_TESTS ${NR_RUNTIME_TESTS})
       foreach(script ${NR_METAL_TESTS})
@@ -1136,6 +1214,13 @@ if(NR_BUILD_TESTS)
       endforeach()
       add_test(NAME metal_test_portable_forced COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_portable.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(metal_test_portable_forced PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;XMX_PORTABLE=1;${NR_TEST_ENV}")
+      # the fused passes on the Metal runtime's portable kernels, which have twins of their own
+      foreach(script src/gpu/test_window_block.py src/gpu/test_global_attention.py
+                     src/gpu/test_glue.py src/gpu/test_ffn_fused.py src/gpu/test_window_attention.py)
+        get_filename_component(name "${script}" NAME_WE)
+        add_test(NAME metal_portable_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+        set_tests_properties(metal_portable_${name} PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;XMX_PORTABLE=1;${NR_TEST_ENV}")
+      endforeach()
       add_test(NAME metal_test_graph_staging COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_graph.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(metal_test_graph_staging PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;XMX_STAGING=1;${NR_TEST_ENV}")
       add_test(NAME metal_test_nr_frame_py COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_metal.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

@@ -14,6 +14,13 @@
 
 static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u;
 
+/* ROW_LANES: 32 for every row pass; the `attention_rows` build takes 256, for the
+ * whole-row softmax alone — the same 8 KB of shared memory serving eight times the lanes
+ * (attention.comp, softmax_rows). */
+#ifndef ROW_LANES
+#define ROW_LANES 32
+#endif
+
 groupshared float stage[32 * 64];
 
 /* `count` consecutive floats from `base`, spread across the 32-wide group. */
@@ -102,19 +109,25 @@ void cosine_publish(uint row, uint local, uint scale_from) {
     }
 }
 
-/* One pair of attention weights. The vendor's exp is a bit-affine map on an `f16x2`
- * register, so the pair is coupled — the shift moves bits across the halves and the add
- * can carry between them — and the two elements cannot be computed apart
- * (notes/phase5-softmax-found.md). The clamped affine values encode as 0x3c20..0x3e47,
- * and for every pair the transform below yields finite normal half values, so the native
- * pack and unpack reproduce the bit reconstruction exactly, carry included. */
-void weights_at_fast(uint flags, bool staged, uint base, uint bias, uint i, out float w0, out float w1) {
+/* A logit as the transform takes it: the per-head attention bias added here rather than
+ * by a pass of its own — it is a few tens of kilobytes and stays in cache, so folding it
+ * in saves a whole read-modify-write of the scores — then the symmetric clamp. */
+float prepared(uint flags, float logit, uint bias_index) {
+    if ((flags & 0x2000u) != 0u) logit += ld_f32(bufB, pc.ob.x, bias_index);
+    if (pc.p0 != 0.0) logit = clamp(logit, -pc.p0, pc.p0);
+    return logit;
+}
+
+/* One pair of attention weights from two prepared logits. The vendor's exp is a
+ * bit-affine map on an `f16x2` register, so the pair is coupled — the shift moves bits
+ * across the halves and the add can carry between them — and the two elements cannot be
+ * computed apart (notes/phase5-softmax-found.md). The clamped affine values encode as
+ * 0x3c20..0x3e47, and for every pair the transform below yields finite normal half values,
+ * so the native pack and unpack reproduce the bit reconstruction exactly, carry included. */
+void pair_fast(float l0, float l1, out float w0, out float w1) {
     float affine[2];
     [unroll] for (uint j = 0u; j < 2u; j++) {
-        float logit = staged ? stage[base + i + j] : ld_f32(bufA, pc.oa.x, base + i + j);
-        if ((flags & 0x2000u) != 0u) logit += ld_f32(bufB, pc.ob.x, bias + i + j);
-        if (pc.p0 != 0.0) logit = clamp(logit, -pc.p0, pc.p0);
-        precise float scaled = half_round(logit) * 0.044921875;
+        precise float scaled = half_round(j == 0u ? l0 : l1) * 0.044921875;
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
     }
@@ -125,16 +138,10 @@ void weights_at_fast(uint flags, bool staged, uint base, uint bias, uint i, out 
 }
 
 #ifdef SOFTMAX_AB
-void weights_at_reference(uint flags, bool staged, uint base, uint bias, uint i, out float w0, out float w1) {
+void pair_reference(float l0, float l1, out float w0, out float w1) {
     uint bits[2];
     [unroll] for (uint j = 0u; j < 2u; j++) {
-        float logit = staged ? stage[base + i + j] : ld_f32(bufA, pc.oa.x, base + i + j);
-        /* The per-head attention bias, added here rather than by a pass of its own:
-         * it is a few tens of kilobytes and stays in cache, so folding it in costs
-         * nothing and saves a whole read-modify-write of the scores. */
-        if ((flags & 0x2000u) != 0u) logit += ld_f32(bufB, pc.ob.x, bias + i + j);
-        if (pc.p0 != 0.0) logit = clamp(logit, -pc.p0, pc.p0);
-        precise float scaled = half_round(logit) * 0.044921875;
+        precise float scaled = half_round(j == 0u ? l0 : l1) * 0.044921875;
         scaled += 1.30078125;
         float affine = clamp(scaled, 1.03125, 1.5693359375);
         // the float16 bit pattern of the affine value
@@ -156,66 +163,125 @@ void weights_at_reference(uint flags, bool staged, uint base, uint bias, uint i,
 }
 #endif
 
-void weights_at(uint flags, bool staged, uint base, uint bias, uint i, out float w0, out float w1) {
+void pair_weights(uint flags, float l0, float l1, out float w0, out float w1) {
 #ifdef SOFTMAX_AB
     // Test-only specialization bit; removed entirely from the shipped shader.
     if ((flags & 0x40000000u) != 0u) {
-        weights_at_reference(flags, staged, base, bias, i, w0, w1);
+        pair_reference(l0, l1, w0, w1);
         return;
     }
 #endif
-    weights_at_fast(flags, staged, base, bias, i, w0, w1);
+    pair_fast(l0, l1, w0, w1);
 }
 
+void weights_at(uint flags, bool staged, uint base, uint bias, uint i, out float w0, out float w1) {
+    float l0 = staged ? stage[base + i] : ld_f32(bufA, pc.oa.x, base + i);
+    float l1 = staged ? stage[base + i + 1u] : ld_f32(bufA, pc.oa.x, base + i + 1u);
+    pair_weights(flags, prepared(flags, l0, bias + i), prepared(flags, l1, bias + i + 1u), w0, w1);
+}
+
+/* scores are (windows*heads, tokens, tokens) and the bias (heads, tokens, tokens) */
+uint bias_offset(uint row) {
+    return ((row / pc.n) % max(pc.batch, 1u)) * pc.n * pc.n + (row % pc.n) * pc.n;
+}
+
+/* A row short enough to stage whole — every window's, 64 tokens — one row a lane, out of
+ * the rows the group gathered into shared memory. */
 void softmax(uint flags, uint row, uint local) {
-    /* `n` is the real token count and `sa` the row stride, which differ for the
-     * global blocks: their token count is the bottleneck's pixel count and need not
-     * be a multiple of the GEMM tile, so the scores are padded. The pad must not enter
-     * the sum, and is zeroed so the following P@V contributes nothing. `p0` is the
-     * symmetric logit clamp the vit_1d kernels apply; 0 means none.
-     *
-     * The weights are computed twice rather than parked in the output buffer between
-     * the sum and the normalise: that buffer is the one being narrowed, and reading a
-     * half value back would round the total. */
-    uint stride = pc.sa != 0u ? pc.sa : pc.n;
-    bool staged = stride == pc.n && stride <= 64u;
-    uint base = staged ? local * stride : row * stride;
-    /* scores are (windows*heads, tokens, tokens) and the bias (heads, tokens, tokens) */
-    uint bias = ((row / pc.n) % max(pc.batch, 1u)) * pc.n * pc.n + (row % pc.n) * pc.n;
-    if (!staged) for (uint z = pc.n; z < stride; z++) store(flags, base + z, 0.0);
+    uint base = local * pc.n;
+    uint bias = bias_offset(row);
     float total = 0.0;
     float w0, w1;
     for (uint i = 0u; i < pc.n; i += 2u) {
-        weights_at(flags, staged, base, bias, i, w0, w1);
-        /* The weights are parked where the logits were, so the normalising pass does
-         * not repeat the bit-affine transform. Only shared memory can hold them: the
-         * output buffer is the one being narrowed to float16, and a rounded weight
-         * would give a different product. The rows too wide to stage pay the transform
-         * twice instead. */
-        if (staged) { stage[base + i] = w0; stage[base + i + 1u] = w1; }
+        weights_at(flags, true, base, bias, i, w0, w1);
+        /* The weights are parked where the logits were, so the normalising pass does not
+         * repeat the bit-affine transform: the output buffer is the one being narrowed,
+         * and a rounded weight would give a different product. */
+        stage[base + i] = w0; stage[base + i + 1u] = w1;
         total += w0;                              // float32 accumulation, as numpy does
         total += w1;
     }
     precise float reciprocal = 1.0 / half_round(total);
     reciprocal = half_round(reciprocal);
-    if (staged) {
-        for (uint i = 0u; i < pc.n; i++)
-            stage[base + i] = e4m3(hmul(stage[base + i], reciprocal));
-    } else {
-        for (uint i = 0u; i < pc.n; i += 2u) {
-            weights_at(flags, false, base, bias, i, w0, w1);
-            store(flags, base + i,      e4m3(hmul(w0, reciprocal)));
-            store(flags, base + i + 1u, e4m3(hmul(w1, reciprocal)));
-        }
+    for (uint i = 0u; i < pc.n; i++)
+        stage[base + i] = e4m3(hmul(stage[base + i], reciprocal));
+}
+
+/* The rows too wide to stage 32 at a time — the global blocks', as many columns as the
+ * bottleneck has tokens, padded in `sa` — attention.comp's softmax_rows: a group takes as
+ * many whole rows as fit in its shared memory, `stride + 1` floats apart, reads them once
+ * along the rows, turns them into weights in place, and each of its first lanes adds its
+ * own row in index order — the same weights in the same order as the one-row-a-lane loop,
+ * so the same total — then the whole group normalises and stores along the rows again. A
+ * pair that starts below `n` counts both halves, and the pad past it is zeroed. The last 32
+ * floats hold the reciprocals, so a group takes at most 32 rows; libd3dmx dispatches one per
+ * `min(32, WHOLE / (stride + 1))` to match. */
+static const uint WHOLE = 2016u;
+
+void softmax_rows(uint flags, uint group, uint local) {
+    uint stride = pc.sa != 0u ? pc.sa : pc.n, pitch = stride + 1u;
+    uint per = min(32u, WHOLE / pitch), first = group * per;
+    uint rows = min(per, pc.m - first);
+    uint paired = (pc.n + 1u) & ~1u, pairs = paired / 2u;
+    for (uint q = local; q < rows * stride; q += ROW_LANES)
+        stage[(q / stride) * pitch + q % stride] = ld_f32(bufA, pc.oa.x, first * stride + q);
+    GroupMemoryBarrierWithGroupSync();
+    for (uint q2 = local; q2 < rows * pairs; q2 += ROW_LANES) {
+        uint r = q2 / pairs, j = (q2 % pairs) * 2u, at = r * pitch + j;
+        uint bias = bias_offset(first + r) + j;
+        float w0, w1;
+        pair_weights(flags, prepared(flags, stage[at], bias), prepared(flags, stage[at + 1u], bias + 1u),
+                     w0, w1);
+        stage[at] = w0;
+        stage[at + 1u] = w1;
+    }
+    GroupMemoryBarrierWithGroupSync();
+    if (local < rows) {
+        float total = 0.0;
+        uint base = local * pitch;
+        for (uint j = 0u; j < paired; j++) total += stage[base + j];   // index order
+        precise float reciprocal = 1.0 / half_round(total);
+        stage[WHOLE + local] = half_round(reciprocal);
+    }
+    GroupMemoryBarrierWithGroupSync();
+    for (uint q3 = local; q3 < rows * stride; q3 += ROW_LANES) {
+        uint r = q3 / stride, j = q3 % stride;
+        store(flags, first * stride + q3,
+              j < paired ? e4m3(hmul(stage[r * pitch + j], stage[WHOLE + r])) : 0.0);
     }
 }
 
-[numthreads(32, 1, 1)]
+/* Rows wider than shared memory holds whole: one row a lane, each row read twice. */
+void softmax_long(uint flags, uint row) {
+    uint stride = pc.sa != 0u ? pc.sa : pc.n;
+    uint base = row * stride, bias = bias_offset(row);
+    for (uint z = pc.n; z < stride; z++) store(flags, base + z, 0.0);
+    float total = 0.0;
+    float w0, w1;
+    for (uint i = 0u; i < pc.n; i += 2u) {
+        weights_at(flags, false, base, bias, i, w0, w1);
+        total += w0;
+        total += w1;
+    }
+    precise float reciprocal = 1.0 / half_round(total);
+    reciprocal = half_round(reciprocal);
+    for (uint i2 = 0u; i2 < pc.n; i2 += 2u) {
+        weights_at(flags, false, base, bias, i2, w0, w1);
+        store(flags, base + i2,      e4m3(hmul(w0, reciprocal)));
+        store(flags, base + i2 + 1u, e4m3(hmul(w1, reciprocal)));
+    }
+}
+
+[numthreads(ROW_LANES, 1, 1)]
 void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
     uint group = gid.x + pc.spare;
-    uint row = group * 32u + lid;
     uint flags = operation_flags();
     uint kind = flags & 0xFFu;
+#if ROW_LANES != 32
+    /* the 256-lane build serves the whole-row softmax only (libd3dmx routes nothing else) */
+    if (kind == SOFTMAX) softmax_rows(flags, group, lid);
+#else
+    uint row = group * 32u + lid;
     if (kind == QKV_PREPARE) {
         /* attention.comp's QKV_PREPARE: three independent group planes on y — Q and K
          * normalised (Q scaled), V published — the arithmetic of the two cosine
@@ -243,8 +309,11 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
             gather(flags, lid, base, count);
             if (row < pc.m) softmax(flags, row, lid);
             scatter(flags, lid, base, count);
-        } else {
-            if (row < pc.m) softmax(flags, row, lid);
+        } else if (stride + 1u <= WHOLE) {
+            softmax_rows(flags, group, lid);
+        } else if (row < pc.m) {
+            softmax_long(flags, row);
         }
     }
+#endif
 }

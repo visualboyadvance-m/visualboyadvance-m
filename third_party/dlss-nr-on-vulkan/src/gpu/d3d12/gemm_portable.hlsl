@@ -2,7 +2,9 @@
  * gemm_portable — the resident GEMM without a matrix unit, `gemm_portable.comp` in HLSL:
  * FP16 operands promoted to FP32 and accumulated with ordinary multiply-adds, one lane
  * owning four consecutive columns of one row of an 8x16 block per 32-lane group (16x32
- * with -DRM=2 -DRN=2, the `gemm_tiled` slot). Same push block, flags (bit 0 a transposed
+ * with -DRM=2 -DRN=2, the `gemm_tiled` slot; 16x64 with -DRM=2 -DRN=4, `gemm_portable_wide`,
+ * which libd3dmx gives the GEMMs whose N is whole 64-column blocks — the same sums, twice
+ * as many a lane). Same push block, flags (bit 0 a transposed
  * B, bits 8-11 the epilogue, bit 12 a half output), strides, batch on SV_GroupID.z,
  * epilogue and store as the SPIR-V, so the runtime dispatches it with the geometry it uses
  * there. This is the only GEMM on Direct3D 12: HLSL has no shipped cooperative matrix
@@ -20,6 +22,8 @@
  *   0x200000 a half copy of the plain FP32 result into d as well
  *   0x400000 A gathered from the image in window order as it is loaded (tiled build),
  *            half already with 0x8000, else float32 rounded to half on the way in
+ *   0x800000 block 0's window residual pooled and published in the epilogue (tiled
+ *            build): the published skip into c as half, the pool into the sixth operand
  * Where the SPIR-V stages the accumulator through shared memory for these, this kernel
  * need not: every lane knows which elements it holds, and the residual and the publish
  * are per element. The QKV epilogue normalises whole rows, so it alone stages.
@@ -107,14 +111,20 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
         [unroll] for (uint j1 = 0; j1 < RN; j1++)
             acc[i1][j1] = float4(0.0, 0.0, 0.0, 0.0);
 
+    /* Eight-byte operand fetches where the strides and offsets allow: the same halves, fewer
+     * loads, and every K term still goes into the accumulator alone and in order, so the
+     * sums are bit for bit the four-load paths' (gemm_portable.comp, the same change). */
+    bool wide_b = ((bo | ldb) & 3u) == 0u && (B & 7u) == 0u;
+    bool wide_ab = wide_b && ((ao | lda | pc.k) & 3u) == 0u && (A & 7u) == 0u;
     if (window_a) {
         /* the same multiply-adds as the plain path below, the A element gathered */
         for (uint k = 0; k < pc.k; k++) {
             float4 bv[RN];
             [unroll] for (uint j = 0; j < RN; j++) {
                 uint at = bo + k * ldb + col + cq + j * TN;
-                bv[j] = float4(ld_f16(bufB, B, at), ld_f16(bufB, B, at + 1u),
-                               ld_f16(bufB, B, at + 2u), ld_f16(bufB, B, at + 3u));
+                bv[j] = wide_b ? ld_f16x4(bufB, B + at * 2u)
+                               : float4(ld_f16(bufB, B, at), ld_f16(bufB, B, at + 1u),
+                                        ld_f16(bufB, B, at + 2u), ld_f16(bufB, B, at + 3u));
             }
             [unroll] for (uint i = 0; i < RM; i++) {
                 float av = !inside[i] ? 0.0
@@ -122,6 +132,26 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                                        : half_round(ld_f32(bufA, A, abase[i] + k)));
                 [unroll] for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if (transposed && wide_ab) {
+        /* the transposed form, both operands fetched four K terms at a time */
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            float4 as4[RM], bt[RN][4];
+            [unroll] for (uint i = 0; i < RM; i++)
+                as4[i] = ld_f16x4(bufA, A + (abase[i] + k0) * 2u);
+            [unroll] for (uint j = 0; j < RN; j++)
+                [unroll] for (uint q = 0; q < 4u; q++)
+                    bt[j][q] = ld_f16x4(bufB, B + (bo + (col + cq + j * TN + q) * ldb + k0) * 2u);
+            [unroll] for (uint kk = 0; kk < 4u; kk++) {
+                float4 bv[RN];
+                [unroll] for (uint j = 0; j < RN; j++)
+                    bv[j] = float4(bt[j][0][kk], bt[j][1][kk], bt[j][2][kk], bt[j][3][kk]);
+                [unroll] for (uint i = 0; i < RM; i++) {
+                    float av = as4[i][kk];
+                    [unroll] for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else if (transposed) {
@@ -137,6 +167,24 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                 float av = ld_f16(bufA, A, abase[i] + k);
                 [unroll] for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if (wide_ab) {
+        /* the plain form, a lane's A row four K terms at a time and its four B columns as
+         * one load */
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            float4 as4[RM];
+            [unroll] for (uint i = 0; i < RM; i++)
+                as4[i] = ld_f16x4(bufA, A + (abase[i] + k0) * 2u);
+            [unroll] for (uint kk = 0; kk < 4u; kk++) {
+                float4 bv[RN];
+                [unroll] for (uint j = 0; j < RN; j++)
+                    bv[j] = ld_f16x4(bufB, B + (bo + (k0 + kk) * ldb + col + cq + j * TN) * 2u);
+                [unroll] for (uint i = 0; i < RM; i++) {
+                    float av = as4[i][kk];
+                    [unroll] for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else {
@@ -168,6 +216,43 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                     qkv_stage[(r + i * TM) * BN + cq + j * TN + q] = acc[i][j][q];
         GroupMemoryBarrierWithGroupSync();
         qkv_epilogue(row, col, lid, 32u);
+        return;
+    }
+    /* Bit 0x800000 (with the window residual): block 0's output, read only pooled 2x2 and
+     * published into the encoder or published as the last block's skip — both made here, as
+     * gemm_portable.comp's 16x32 build makes them. The 16-row block is two rows of one 8x8
+     * window across all 32 channels: each value goes out published as half into c and into
+     * the stage as it is, and after the barrier its four pooled pixels are summed from the
+     * stage in POOL2_SKIP's order, into the sixth operand. */
+    if ((flags & 0x800000u) != 0u) {
+        [unroll] for (uint i = 0; i < RM; i++)
+            [unroll] for (uint j = 0; j < RN; j++) {
+                uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+                if (!residual_output_index(at)) continue;
+                float4 published;
+                [unroll] for (uint q = 0; q < 4u; q++) {
+                    float v = add_gemm_residual(acc[i][j][q], at + q);
+                    qkv_stage[(i * TM + r) * BN + j * TN + cq + q] = v;
+                    published[q] = e4m3(v);
+                }
+                st_f16x4(bufC, C + at * 2u, published);
+            }
+        GroupMemoryBarrierWithGroupSync();
+        uint pixel = lid / 8u, c = (lid % 8u) * 4u;
+        uint window = row / 64u, pair = (row % 64u) / 8u;     // the block's first window row
+        uint top = pc.window_pad >> 16, left = pc.window_pad & 0xffffu;
+        uint y = (window / pc.window_cols) * 8u + pair, x = (window % pc.window_cols) * 8u + 2u * pixel;
+        if (y < top || x < left || y - top >= pc.image_h || x - left >= pc.image_w) return;
+        uint at = (((y - top) / 2u) * (pc.image_w / 2u) + (x - left) / 2u) * BN + c;
+        uint upper = (2u * pixel) * BN + c, lower = upper + 8u * BN;
+        float4 pooled;
+        [unroll] for (uint e = 0; e < 4u; e++) {
+            precise float total = qkv_stage[upper + e] + qkv_stage[lower + e];
+            total += qkv_stage[upper + BN + e];
+            total += qkv_stage[lower + BN + e];
+            pooled[e] = e4m3(total * 0.25);
+        }
+        st_f16x4(bufF, pc.of.x + at * 2u, pooled);
         return;
     }
 #endif

@@ -58,6 +58,11 @@ typedef struct nr_frame_params {
     int   automatic_mask;
     float skin_structure;
     float automatic_structure;
+    /* the network's floor: the frame is padded by mirroring to at least this a side and to a
+     * multiple of 64 (`nr_frame.network_geometry`). 320, the default, is the vendor's; the
+     * graph runs down to 128, and a small live frame is then mostly picture, not padding.
+     * Appended last, so a host built against the older header must be rebuilt. */
+    int   min_extent;
 } nr_frame_params;
 
 /* The values `nr_frame.py` uses when nothing is asked: the `standard` profile. */
@@ -132,6 +137,8 @@ const char *nr_frame_gemm_path(nr_frame *frame);
 
 /* The network extent for an output extent: at least 320, a multiple of 64. */
 void nr_frame_geometry(int height, int width, int *network_height, int *network_width);
+/* The same at the floor `minimum` (`nr_frame_params.min_extent`), never below 128. */
+void nr_frame_geometry_min(int height, int width, int minimum, int *network_height, int *network_width);
 
 /* colour (h, w, 3) -> output (h, w, 3). `history` is the previous output or NULL;
  * `previous` the previous *input* or NULL, for the floor. `head_out` (h, w, 4) optional.
@@ -170,6 +177,20 @@ int nr_frame_run_features(nr_frame *frame, const float *features,
 int nr_frame_head(nr_frame *frame, const float *colour, int height, int width,
                   const float *history, const float *control_mask,
                   const nr_frame_params *params, float *head);
+
+/* The daemon's end of a frame (`nr_frame.compose_encode`): the head (head_height,
+ * head_width, 4) — at a render scale, smaller than the colour — brought up bilinearly to
+ * (h, w) as `nr_daemon.resample` does, composed as `nr_frame_compose` composes it into
+ * `output` (h, w, 3), and encoded to 8 bits into `encoded` at (top, left) of a frame
+ * `frame_width` pixels wide, RGBA or with `bgra` BGRA. `encoded` is a copy of the request:
+ * its alpha and everything outside the region stay as they came. Where the composition's
+ * detail split is a no-op (detail and colour strength 1) all of it is one pass over the
+ * output (nr_compose_encode); otherwise the separate passes, the same bytes either way. */
+int nr_frame_compose_encode(nr_frame *frame, const float *head, int head_height, int head_width,
+                            const float *colour, int height, int width, const float *history,
+                            const float *previous, const float *control_mask,
+                            const nr_frame_params *params, float *output, unsigned char *encoded,
+                            int frame_width, int top, int left, int bgra);
 
 /* Seconds spent, in the last run, writing the input, running the graph, reading the
  * head: 0, 1, 2. On a discrete card the outer two are the bus. */

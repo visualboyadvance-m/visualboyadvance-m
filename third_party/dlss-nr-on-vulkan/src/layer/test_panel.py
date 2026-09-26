@@ -160,7 +160,13 @@ def main():
                   settings.exists() and json.loads(settings.read_text()).get("render_scale") == 0.95,
                   json.dumps(json.loads(settings.read_text())) if settings.exists() else "not written")
 
-            screen.press(DOWN)                     # profile
+            order = [knob.name for knob in nr_knobs.KNOBS]
+
+            def walk(start, to):                   # the table's order, not a count of it
+                for _ in range(order.index(to) - order.index(start)):
+                    screen.press(DOWN)
+
+            walk("render_scale", "profile")
             screen.press(RIGHT)
             check("a choice knob cycles rather than counts",
                   json.loads(settings.read_text()).get("profile") in nr_knobs.PROFILES,
@@ -172,7 +178,7 @@ def main():
             profile = json.loads(settings.read_text()).get("profile")
             check("cycling never leaves the list", profile in nr_knobs.PROFILES, str(profile))
 
-            screen.press(DOWN)                     # intensity
+            walk("profile", "intensity")
             for _ in range(60):
                 screen.press(RIGHT, settle=0.03)
             screen.pump(0.5)
@@ -199,7 +205,8 @@ def main():
               "no traceback on the terminal" if alive else "it crashed")
         # A short window must lose the explanation, not the knobs, and must never write
         # over its own footer. Laid out from the height available rather than a picture.
-        for rows, want_all in ((13, True), (10, False)):
+        # four rows of frame around the list: header, status and footer
+        for rows, want_all in ((len(nr_knobs.KNOBS) + 4, True), (len(nr_knobs.KNOBS) + 1, False)):
             small = Screen(environment, rows=rows, columns=70)
             try:
                 small.pump(1.5)

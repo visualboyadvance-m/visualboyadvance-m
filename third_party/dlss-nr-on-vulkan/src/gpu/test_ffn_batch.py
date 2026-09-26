@@ -30,6 +30,13 @@ class Recorder:
         self.fuse_ffn = False
         self.fuse_branched_ffn = False
         self.fuse_partition = False
+        self.fuse_transition = False
+        self.fuse_merge_ffn = False
+        self.fuse_stem_ffn = False
+        self.fuse_pool = False
+        self.fuse_window_block = False
+        self.fuse_head = False
+        self.fuse_global_attention = False
         self.calls = []
 
     def independent(self):
@@ -80,29 +87,37 @@ def host_checks():
             np.testing.assert_array_equal(np.sort(written), np.arange(8 * n * groups))
             cases += 1
     # A toggle must invalidate the captured graph for every existing specialization
-    # and Q/K fusion combination, not reuse commands from the other FFN mode.
+    # and Q/K fusion combination, not reuse commands from the other FFN mode. Every
+    # combination is walked, one switch a level, and each key marked in a bitmap: a set
+    # of 2^24 Python ints was a gigabyte.
+    switches = ("fuse_qk", "batch_ffn", "input_fp16", "compact_head", "joint_qkv",
+                # the fusions take bits 8 and up. ProjectsCodex's own 5-9 would land on
+                # input_fp16, compact_head, joint_qkv and the residuals
+                "fuse_residual", "fuse_window_residual", "fuse_window_attention",
+                "fuse_attention_merge", "qkv_epilogue", "fuse_glue", "fuse_ffn",
+                "fuse_branched_ffn", "fuse_partition", "fuse_transition", "fuse_merge_ffn",
+                "fuse_stem_ffn", "fuse_pool", "fuse_window_block", "fuse_head",
+                "fuse_global_attention")
     rt = object.__new__(xmxres.Runtime)
-    keys = set()
+    seen = bytearray(1 << 22)
+    walked = 0
+
+    def walk(level):
+        nonlocal walked
+        if level == len(switches):
+            key = rt.graph_key()
+            assert not seen[key >> 3] & (1 << (key & 7)), f"graph key collides: {key:#x}"
+            seen[key >> 3] |= 1 << (key & 7)
+            walked += 1
+            return
+        for value in (False, True):
+            setattr(rt, switches[level], value)
+            walk(level + 1)
+
     for mask in range(8):
         rt.lib = SimpleNamespace(xmx_specialization=lambda: mask)
-        for rt.fuse_qk in (False, True):
-            for rt.batch_ffn in (False, True):
-                for rt.input_fp16 in (False, True):
-                    for rt.compact_head in (False, True):
-                        for rt.joint_qkv in (False, True):
-                            # the fusions take bits 8-16. ProjectsCodex's own 5-9 would
-                            # land on input_fp16, compact_head, joint_qkv and the residuals
-                            for rt.fuse_residual in (False, True):
-                                for rt.fuse_window_residual in (False, True):
-                                    for rt.fuse_window_attention in (False, True):
-                                        for rt.fuse_attention_merge in (False, True):
-                                            for rt.qkv_epilogue in (False, True):
-                                                for rt.fuse_glue in (False, True):
-                                                    for rt.fuse_ffn in (False, True):
-                                                        for rt.fuse_branched_ffn in (False, True):
-                                                            for rt.fuse_partition in (False, True):
-                                                                keys.add(rt.graph_key())
-    assert len(keys) == 131072, f"graph key collides: {len(keys)} of 131072 distinct"
+        walk(0)
+    assert walked == 8 << len(switches), walked
     # Exercise the production recorders too, not just the batching helper. Multiplicity
     # is the current 71-block model's grouped FFN inventory; no weights are needed.
     savings = 0

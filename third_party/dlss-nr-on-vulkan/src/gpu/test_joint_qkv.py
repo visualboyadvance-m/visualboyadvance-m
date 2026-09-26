@@ -86,6 +86,9 @@ def frames():
                 np.testing.assert_array_equal(
                     frame.run(features, execution='replay', submits=passes), expected)
                 folded = 62 if rt.fuse_partition else 0
+                # and the ten one-head blocks take all three of their attention passes as
+                # one (window_block.comp), block 70's with the head in it
+                folded += (20 + (1 if rt.fuse_head else 0)) if rt.fuse_window_block else 0
                 assert counts[False] - passes[0] == 210 + folded, (counts, passes)
             changed = features.copy()
             changed[..., 4:7] *= np.float32(.75)

@@ -69,7 +69,20 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
     uint batch = wg.y + wg.z * 65535u;
     if (batch >= pc.batch) return;
     uint offset = batch * 2048u;
-    wa_load_kv(pc, offset, reinterpret_cast<threadgroup uint4 *>(words), lid);
+    /* K transposed on its way in, (32 channels, 64 keys), so QK^T's B tiles are plain
+     * loads rather than transposed ones; V as it is */
+    {
+        threadgroup half *KT = reinterpret_cast<threadgroup half *>(words);
+        uint4 k8 = reinterpret_cast<device const uint4 *>(half_ptr(pc.b) + offset)[lid];
+        uint token = lid / 4u, c0 = (lid % 4u) * 8u;
+        for (uint w = 0u; w < 4u; w++) {
+            half2 two = as_type<half2>(k8[w]);
+            KT[(c0 + 2u * w) * 64u + token] = two.x;
+            KT[(c0 + 2u * w + 1u) * 64u + token] = two.y;
+        }
+        reinterpret_cast<threadgroup uint4 *>(words)[256u + lid] =
+            reinterpret_cast<device const uint4 *>(half_ptr(pc.d) + offset)[lid];
+    }
     threadgroup_barrier(mem_flags::mem_threadgroup);
     threadgroup const half *K = reinterpret_cast<threadgroup const half *>(words);
     threadgroup const half *V = K + 2048u;
@@ -91,7 +104,7 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
         simdgroup_load(q, Q + row * 32u + c, 32);
         for (uint j = 0u; j < 8u; j++) {
             simdgroup_half8x8 k;
-            simdgroup_load(k, K + (j * 8u) * 32u + c, 32, ulong2(0, 0), true);
+            simdgroup_load(k, K + c * 64u + j * 8u, 64);
             simdgroup_multiply_accumulate(acc[j], q, k, acc[j]);
         }
     }

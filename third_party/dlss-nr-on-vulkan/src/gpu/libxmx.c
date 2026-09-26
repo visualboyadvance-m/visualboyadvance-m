@@ -119,16 +119,31 @@ static struct {
 	VkPipelineLayout rpl; VkPipeline rgemm, rtiled, rstaged, runary, rrow, rhistory, rwindow[2];
 	VkPipeline rffn;          /* the fused feed-forward, built on first use */
 	/* the fused passes were built from their `_portable` twins, whose workgroups are
-	 * shaped differently from the matrix kernels' (xmx_rec_window_attention, xmx_rec_ffn) */
-	int rwindow_twin[2], rffn_twin;
+	 * shaped differently from the matrix kernels' (xmx_rec_window_attention, xmx_rec_ffn,
+	 * xmx_rec_gemm_int8) */
+	int rwindow_twin[2], rffn_twin, rint8_twin;
 	/* the device's compute limits the fused passes' workgroups are checked against */
 	uint32_t max_shared, max_invocations;
-	char *rpaths[6];
+	/* the staged kernel on 32-row blocks, with a 32- and a 64-deep K step */
+	VkPipeline rstaged32[2];
+	VkPipeline rrows;         /* the whole-row softmax on 256 lanes */
+	VkPipeline rint8;         /* the staged GEMM on the integer path, built on first use */
+	VkPipeline rblock;        /* a 32-channel window block's attention half, likewise */
+	VkPipeline rglobal;       /* a bottleneck block's attention in one pass, likewise */
+	/* the portable GEMM's 16x64 build (family 12): on a device without matrix units, the
+	 * plain, transposed and residual GEMMs whose N is whole 64-column blocks take it */
+	VkPipeline rwide;
+	unsigned wide_calls;
+	/* portable path: the 16x32 build only where a 32-column block is required */
+	unsigned portable_tiled;
+	char *rpaths[13];
 	unsigned specialize;
 	unsigned tiling, tilem, tilen;
 	int syncing;
 	unsigned staging;
 	unsigned staged_partial;  /* the staged kernel takes M that is not whole 64-row blocks */
+	unsigned staged32;        /* M of 32 or fewer takes the 32-row staged build */
+	unsigned staged32_calls;  /* how many GEMMs it has recorded: tests check the routing */
 	VkCommandBuffer rcb; VkFence rfence; int recording, recorded, rready;
 	/* transfers have their own command buffer: the weights are created while the
 	 * frame's graph is being recorded, so a staged upload cannot borrow `rcb` */
@@ -148,6 +163,10 @@ static struct {
 	 * units, the extension, and not forced portable. Without it every shape goes to the
 	 * 8x16 and 16x32 kernels, and a window-gathered A (which only it can load) is refused. */
 	int explicit_layout, staged_ok;
+	/* `int8`: the device has shaderInt8, 8-bit storage and the explicit layout's 8-bit
+	 * access, which the integer staged GEMM needs; without them (or without matrix units)
+	 * `xmx_int8_init` builds its portable twin, which reads the bytes as words. */
+	int int8;
 	struct buf stage;
 	/* An adopted device belongs to the host: never destroyed here, and every submit on
 	 * its queue is bracketed by the host's lock when one was given. */
@@ -217,6 +236,7 @@ struct push {
 _Static_assert(offsetof(struct push, lda) == 80, "attention QKV scale pointer ABI");
 _Static_assert(offsetof(struct push, residual_cos) == 96, "residual epilogue ABI");
 _Static_assert(offsetof(struct push, qkv_scale) == 120, "QKV epilogue ABI");
+_Static_assert(offsetof(struct push, p0) == 64, "the merged feed-forward reads p0-p1 as an address");
 _Static_assert(sizeof(struct push) == 128, "push block matches the GEMM shaders");
 
 const char *xmx_error(void) { return g.err; }
@@ -482,8 +502,10 @@ static unsigned block_size(const char *name, unsigned fallback)
 static int resident_pipeline(unsigned family, unsigned flags, VkPipeline fallback,
 			     VkPipeline *out)
 {
-	/* family 5, the fused feed-forward, is a GEMM and specialises with them */
-	unsigned mask = (family < 3 || family == 5) ? 1u : (family == 3 ? 2u : 4u);
+	/* families 5-7 — the fused feed-forward and the 32-row staged builds — are GEMMs and
+	 * specialise with them; 8, the 256-lane row build, with the row passes */
+	unsigned mask = family == 8 ? 4u
+		      : (family < 3 || family >= 5) ? 1u : (family == 3 ? 2u : 4u);
 	*out = fallback;
 	if (!(g.specialize & mask)) return 0;
 	for (unsigned i = 0; i < specialized_count; i++) {
@@ -507,6 +529,44 @@ int xmx_staged_partial(unsigned on)
 {
 	if (g.recording) FAIL("cannot change the staged routing during recording", 0);
 	g.staged_partial = on != 0;
+	return 0;
+}
+
+unsigned xmx_staged32_calls(void) { return g.staged32_calls; }
+
+int xmx_staged32(unsigned on)
+{
+	if (g.recording) FAIL("cannot change the staged routing during recording", 0);
+	g.staged32 = on != 0;
+	return 0;
+}
+
+/* The row passes' 256-lane build, for the whole-row softmax. */
+int xmx_rows_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rrows) return 0;
+	free(g.rpaths[8]);
+	if (!(g.rpaths[8] = nr_strdup(path))) FAIL("pipeline path allocation", 0);
+	return build_pipeline(path, g.rpl, &g.rrows);
+}
+
+/* The 32-row staged builds, `shallow` with the default 32-deep K step and `deep` with 64.
+ * Where the staged kernel is not built (no matrix units, or no explicit layout) nothing is
+ * built and the routing never picks them: accepted, so a caller need not ask first. */
+int xmx_staged32_init(const char *shallow, const char *deep)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rstaged32[0] || !g.staged_ok) return 0;
+	const char *paths[2] = { shallow, deep };
+	for (unsigned i = 0; i < 2; i++) {
+		free(g.rpaths[6 + i]);
+		if (!(g.rpaths[6 + i] = nr_strdup(paths[i]))) FAIL("pipeline path allocation", 0);
+		if (build_pipeline(paths[i], g.rpl, &g.rstaged32[i])) {
+			g.rstaged32[0] = VK_NULL_HANDLE;
+			return -1;
+		}
+	}
 	return 0;
 }
 
@@ -738,6 +798,14 @@ int xmx_open(void)
 		g.explicit_layout = have_wm.workgroupMemoryExplicitLayout
 				    && have_wm.workgroupMemoryExplicitLayoutScalarBlockLayout
 				    && have_wm.workgroupMemoryExplicitLayout16BitAccess;
+		g.int8 = g.explicit_layout && have_wm.workgroupMemoryExplicitLayout8BitAccess;
+	}
+	if (g.int8) {
+		VkPhysicalDeviceVulkan12Features have12 = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES };
+		VkPhysicalDeviceFeatures2 have2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &have12 };
+		vkGetPhysicalDeviceFeatures2(g.pd, &have2);
+		g.int8 = have12.shaderInt8 && have12.storageBuffer8BitAccess;
 	}
 	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
 	const char *ext[3]; uint32_t next = 0;
@@ -753,7 +821,9 @@ int xmx_open(void)
 	VkPhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR wm = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_FEATURES_KHR, .pNext = &cm,
 		.workgroupMemoryExplicitLayout = VK_TRUE, .workgroupMemoryExplicitLayoutScalarBlockLayout = VK_TRUE,
-		.workgroupMemoryExplicitLayout16BitAccess = VK_TRUE };
+		.workgroupMemoryExplicitLayout16BitAccess = VK_TRUE,
+		/* the integer path's int8 tiles (gemm_staged_int8.comp), where the device has them */
+		.workgroupMemoryExplicitLayout8BitAccess = g.int8 ? VK_TRUE : VK_FALSE };
 	/* bufferDeviceAddress lets the resident path pass operands as 64-bit pointers in
 	 * push constants, so a whole block of dispatches records into one command buffer
 	 * without a descriptor pool. scalarBlockLayout matches the shaders' layout. */
@@ -761,7 +831,9 @@ int xmx_open(void)
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
 		.pNext = g.explicit_layout ? (void *)&wm : (g.coopmat ? (void *)&cm : NULL),
 		.vulkanMemoryModel = VK_TRUE, .vulkanMemoryModelDeviceScope = VK_TRUE, .shaderFloat16 = VK_TRUE,
-		.bufferDeviceAddress = VK_TRUE, .scalarBlockLayout = VK_TRUE };
+		.bufferDeviceAddress = VK_TRUE, .scalarBlockLayout = VK_TRUE,
+		.storageBuffer8BitAccess = g.int8 ? VK_TRUE : VK_FALSE,
+		.shaderInt8 = g.int8 ? VK_TRUE : VK_FALSE };
 	VkPhysicalDeviceVulkan11Features v11 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, .pNext = &v12,
 		.storageBuffer16BitAccess = VK_TRUE };
@@ -794,13 +866,15 @@ void xmx_close(void)
 	for (int i = 0; i < MAX_GRAPHS; i++) xmx_graph_destroy(i);
 	for (unsigned i = 0; i < specialized_count; i++) vkDestroyPipeline(g.dev, specialized[i].pipeline, NULL);
 	specialized_count = 0;
-	VkPipeline *pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory, &g.pipe, &g.pipeb };
+	VkPipeline *pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory,
+				&g.rwindow[0], &g.rwindow[1], &g.rffn, &g.rstaged32[0], &g.rstaged32[1],
+				&g.rrows, &g.rint8, &g.rblock, &g.rglobal, &g.rwide, &g.pipe, &g.pipeb };
 	for (size_t i = 0; i < sizeof pipes / sizeof *pipes; i++) if (*pipes[i]) vkDestroyPipeline(g.dev, *pipes[i], NULL);
 	if (g.rpl) vkDestroyPipelineLayout(g.dev, g.rpl, NULL);
 	if (g.plb) vkDestroyPipelineLayout(g.dev, g.plb, NULL);
 	if (g.pl) vkDestroyPipelineLayout(g.dev, g.pl, NULL);
 	if (g.dsl) vkDestroyDescriptorSetLayout(g.dev, g.dsl, NULL);
-	for (int i = 0; i < 5; i++) free(g.rpaths[i]);
+	for (int i = 0; i < 13; i++) free(g.rpaths[i]);
 	if (g.qpool) vkDestroyQueryPool(g.dev, g.qpool, NULL);
 	if (g.fence) vkDestroyFence(g.dev, g.fence, NULL);
 	if (g.rfence) vkDestroyFence(g.dev, g.rfence, NULL);
@@ -1061,6 +1135,41 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	 * 1280x768. 0 is the comparison. */
 	const char *sp = getenv("XMX_STAGED_PARTIAL");
 	g.staged_partial = sp ? (unsigned)atoi(sp) : 1;
+	/* the 32-row staged builds, once `xmx_staged32_init` has them; 0 is the comparison */
+	const char *s32 = getenv("XMX_STAGED32");
+	g.staged32 = s32 ? (unsigned)atoi(s32) : 1;
+	/* Without matrix units, the portable GEMM's 16x64 build: two rows and sixteen columns a
+	 * lane where the 16x32 build has eight, the same sums in the same order, so the same
+	 * bytes — and about twice as fast on the graph's large shapes through MoltenVK on an M3
+	 * (1600x1024x1024 5.5 -> 2.5 ms). It is found beside the 16x32 build (its name with
+	 * `_tiled` made `_wide`, embedded or on disk) and is optional: without it, or with
+	 * XMX_PORTABLE_WIDE=0, nothing changes. */
+	/* And without matrix units the 16x32 build is slower than the 8x16 one on every shape
+	 * measured through MoltenVK on an M3 (N = 32: 245760x32x128 3.33 -> 1.87 ms, 61440x32x64
+	 * 0.65 -> 0.47; N = 96: 0.82 -> 0.55), the same sums either way; so it keeps only what
+	 * needs a 32-column block — the QKV epilogue, the pool, the window gather.
+	 * XMX_PORTABLE_TILED=1 gives it every shape it takes, as before. */
+	const char *tiled_env = getenv("XMX_PORTABLE_TILED");
+	g.portable_tiled = tiled_env ? (unsigned)atoi(tiled_env) : 0;
+	const char *wide_env = getenv("XMX_PORTABLE_WIDE");
+	if (g.portable && (!wide_env || atoi(wide_env) != 0) && strstr(tiled_spv, "_tiled")) {
+		size_t n = strlen(tiled_spv), at = (size_t)(strstr(tiled_spv, "_tiled") - tiled_spv);
+		char *wide = malloc(n + 1);
+		if (wide) {
+			memcpy(wide, tiled_spv, at);
+			memcpy(wide + at, "_wide", 5);
+			memcpy(wide + at + 5, tiled_spv + at + 6, n - at - 6 + 1);
+			char saved[sizeof g.err];
+			memcpy(saved, g.err, sizeof saved);
+			if (build_pipeline(wide, g.rpl, &g.rwide)) {
+				g.rwide = VK_NULL_HANDLE;     /* not there: the 16x32 build serves */
+				memcpy(g.err, saved, sizeof saved);
+				free(wide);
+			} else {
+				g.rpaths[12] = wide;
+			}
+		}
+	}
 	VkCommandBufferAllocateInfo cba = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 					    .commandPool = g.cpool, .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
 					    .commandBufferCount = 1 };
@@ -1408,7 +1517,8 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 		       unsigned lda, unsigned ldb, unsigned ldc,
 		       unsigned oa, unsigned ob, unsigned oc,
 		       int skip, int cosine, const uint32_t *window,
-		       const struct qkv_targets *qkv, int half_copy, const uint32_t *window_a)
+		       const struct qkv_targets *qkv, int half_copy, const uint32_t *window_a,
+		       int pooled)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c),
@@ -1431,6 +1541,17 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 		 * the batch strides have no use with one batch, so they carry the geometry */
 		p.sa = window_a[0]; p.sb = window_a[1]; p.sc = window_a[2];
 		p.window_pad = window_a[3];
+	}
+	/* Bit 0x800000 (gemm_staged.comp): block 0's window residual pooled and published in
+	 * its own epilogue — `c` takes the published skip as half, and the pool rides in the
+	 * slot only the QKV epilogue uses. A block is one window across all its channels. */
+	if (bt & 0x800000u) {
+		if (!window || N != 32u || (bt & ~0x8e0000u) || pooled < 0
+		    || window[0] % 2u || window[1] % 2u || (window[3] >> 16) % 2u
+		    || (window[3] & 0xffffu) % 2u)
+			FAIL("a pooled window residual needs even geometry, 32 channels, no publish", 0);
+		if (!(p.qkv_scale = addr_of(pooled)))
+			FAIL("pooled output is not a live buffer", 0);
 	}
 	if (qkv) {
 		/* c is Q; K, V and the scale ride in slots only the residual modes use */
@@ -1464,8 +1585,24 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	 * 1280x720, the same bytes. What stays tiled is K = 16, the stem. */
 	/* A last, partial 64-row block is the staged kernel's own business (its rows past M are
 	 * neither read out of bounds nor stored), so with `staged_partial` M need not be whole
-	 * blocks — except for the QKV epilogue, which finishes a block's rows together. */
-	int staged = (M % 64 == 0 || (g.staged_partial && !(bt & 0x100000u)))
+	 * blocks. The QKV epilogue was the exception until its store learned to skip them too:
+	 * the bottleneck's projection at 96 tokens (a 576x352 network, 1920x1080 at 0.3) ran on
+	 * the tiled kernel at 0.255 ms a call. */
+	/* A bottleneck of 32 tokens or fewer — 16 at 256x128, 32 at 320x192, network extents
+	 * only `min_extent` below 320 reaches — is padded to 32 rows, not 64, and takes a
+	 * 32-row build of the same kernel: its GEMMs wait on the K loop, so the pad was half of
+	 * every step's work for nothing. Where N is 1024 or less there are 32 blocks or fewer,
+	 * and a 64-deep step halves the trips round the loop. Bit-identical — a row's sums are
+	 * its own — and 0.7-1.2 ms of a 12-20 ms graph (notes/improve-b.md). */
+	int small = g.staged32 && g.rstaged32[0] && M <= 32 && !(bt & 0x400000u)
+		    && (M == 32 || g.staged_partial);
+	/* A bottleneck of 64 tokens — 320x320, the vendor's minimum — has two GEMMs with
+	 * N = 1024 and 32 blocks of 64 rows between eight cores; two 32-row blocks with the
+	 * 64-deep step each take them from 184 to 160 us and from 50 to 46 (improve-b.md). */
+	if (g.staged32 && g.rstaged32[1] && M == 64 && N <= 1024 && K % 64 == 0 && K >= 1024
+	    && !(bt & 0x500000u))
+		small = 1;
+	int staged = (M % 64 == 0 || small || g.staged_partial)
 		     && N % 32 == 0 && K % 32 == 0 && K >= g.staging;
 	/* The staged kernel has no portable twin — its 128-lane 64x32 geometry exists to feed
 	 * matrix units — and needs VK_KHR_workgroup_memory_explicit_layout; without either,
@@ -1486,6 +1623,7 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 			  "VK_KHR_workgroup_memory_explicit_layout (xmx_window_gather() is 0)", 0);
 	}
 	int tiled = M % g.tilem == 0 && N % g.tilen == 0 && K >= g.tiling;
+	if (g.portable && !g.portable_tiled && !(bt & 0x900000u)) tiled = 0;
 	if (window_tiled) {
 		if (M % g.tilem || N % g.tilen)
 			FAIL("a window-gathered A without the staged kernel needs the 16x32 block", 0);
@@ -1507,19 +1645,46 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	/* the half copy lives in gemm_resident.comp's plain-store path only */
 	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u && !staged))
 		FAIL("a GEMM half copy needs its target, no other flag, and the resident kernel", 0);
+	/* The pool is the 64-row staged kernel's epilogue on the matrix path; without it, the
+	 * tiled portable kernel's, whose 16-row block is two rows of one window (the same
+	 * condition `xmx_window_gather()` reports). */
+	if ((bt & 0x800000u) && staged && small)
+		FAIL("a pooled window residual runs on the 64-row staged kernel", 0);
+	if ((bt & 0x800000u) && !staged) {
+		if (!g.portable || !tiled || g.tilem != 16u || g.tilen != 32u)
+			FAIL("a pooled window residual needs the staged kernel, or the portable 16x32 "
+			     "block (xmx_window_gather() is 0)", 0);
+	}
+	small = small && staged;
+	int deep = small && N <= 1024 && K % 64 == 0;
+	/* the portable 16x64 build, for what its generic store takes: not the QKV epilogue or
+	 * the pool (both need a 32-column block) nor the compact head */
+	int wide = g.rwide && !staged && M % 16u == 0 && N % 64u == 0 && K >= g.tiling
+		   && !(bt & 0x910000u);
 	VkPipeline pipeline;
-	if (resident_pipeline(staged ? 2 : (tiled ? 1 : 0), bt,
-			      staged ? g.rstaged : (tiled ? g.rtiled : g.rgemm), &pipeline)) return -1;
+	if (small) {
+		if (resident_pipeline(6 + deep, bt, g.rstaged32[deep], &pipeline)) return -1;
+	} else if (wide) {
+		if (resident_pipeline(12, bt, g.rwide, &pipeline)) return -1;
+	} else if (resident_pipeline(staged ? 2 : (tiled ? 1 : 0), bt,
+				     staged ? g.rstaged : (tiled ? g.rtiled : g.rgemm), &pipeline)) {
+		return -1;
+	}
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	g.staged32_calls += small;
 	if (staged) {
-		vkCmdDispatch(g.rcb, N / 32, (M + 63) / 64, batch ? batch : 1);
+		unsigned rows = small ? 32u : 64u;
+		vkCmdDispatch(g.rcb, N / 32, (M + rows - 1) / rows, batch ? batch : 1);
+	} else if (wide) {
+		vkCmdDispatch(g.rcb, N / 64u, M / 16u, batch ? batch : 1);
 	} else {
 		if (tiled) vkCmdDispatch(g.rcb, N / g.tilen, M / g.tilem, batch ? batch : 1);
 		else       vkCmdDispatch(g.rcb, (N + 15) / 16, (M + 7) / 8, batch ? batch : 1);
 	}
+	g.wide_calls += wide;
 	barrier();
-	stamp(staged ? PK_STAGED : (tiled ? PK_TILED : PK_GEMM), bt);
+	stamp(staged ? PK_STAGED : ((tiled || wide) ? PK_TILED : PK_GEMM), bt);
 	g.recorded++;
 	return 0;
 }
@@ -1530,7 +1695,7 @@ int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsign
 		 unsigned oa, unsigned ob, unsigned oc)
 {
 	return record_gemm(a, b, c, M, N, K, batch, sa, sb, sc, bt,
-			   lda, ldb, ldc, oa, ob, oc, -1, -1, NULL, NULL, -1, NULL);
+			   lda, ldb, ldc, oa, ob, oc, -1, -1, NULL, NULL, -1, NULL, -1);
 }
 
 /* A dense projection whose epilogue adds `skip * cosine` before the publish: the
@@ -1543,7 +1708,7 @@ int xmx_rec_gemm_residual(int a, int b, int c, int skip, int cosine,
 {
 	if (skip < 0 || cosine < 0) FAIL("invalid residual buffer", 0);
 	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
-			   flags | 0x20000u, 0, 0, 0, 0, 0, 0, skip, cosine, NULL, NULL, -1, NULL);
+			   flags | 0x20000u, 0, 0, 0, 0, 0, 0, skip, cosine, NULL, NULL, -1, NULL, -1);
 }
 
 /* The same, for a window block's output projection: its rows are in window order,
@@ -1558,7 +1723,25 @@ int xmx_rec_gemm_window_residual(int a, int b, int c, int skip, int cosine,
 		FAIL("invalid window residual", 0);
 	uint32_t window[] = { height, width, across, pad };
 	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
-			   flags | 0xa0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1, NULL);
+			   flags | 0xa0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1, NULL, -1);
+}
+
+/* The same for block 0, whose output has exactly two readers: the encoder, which pools
+ * it 2x2 and publishes the pool, and the last block, which reads it published. Both come
+ * out of this epilogue (gemm_staged.comp, 0x800000) — `skip_out` takes every value
+ * published, as half, `pooled` the published pool — so the float32 output itself is
+ * never stored, nor read back by a pass of its own. */
+int xmx_rec_gemm_window_residual_pool(int a, int b, int skip_out, int skip, int cosine,
+				      int pooled, unsigned M, unsigned N, unsigned K,
+				      unsigned flags, unsigned height, unsigned width,
+				      unsigned across, unsigned pad)
+{
+	if (skip < 0 || cosine < 0 || !height || !width || !across)
+		FAIL("invalid window residual", 0);
+	uint32_t window[] = { height, width, across, pad };
+	return record_gemm(a, b, skip_out, M, N, K, 1, M * K, K * N, M * N,
+			   flags | 0x8a0000u, 0, 0, 0, 0, 0, 0, skip, cosine, window, NULL, -1,
+			   NULL, pooled);
 }
 
 /* The QKV projection with Q and K normalised and V published in its own epilogue
@@ -1575,7 +1758,7 @@ static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
 	struct qkv_targets targets = { k, v, scale, tokens, heads };
 	unsigned N = 3u * channels;
 	return record_gemm(a, weight, q, M, N, channels, 1, M * channels, channels * N, M * N,
-			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a);
+			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a, -1);
 }
 
 int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
@@ -1605,7 +1788,7 @@ int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N
 {
 	if (half_copy < 0) FAIL("invalid GEMM half copy", 0);
 	return record_gemm(a, b, c, M, N, K, 1, M * K, K * N, M * N,
-			   0x200000u, 0, 0, 0, 0, 0, 0, -1, -1, NULL, NULL, half_copy, NULL);
+			   0x200000u, 0, 0, 0, 0, 0, 0, -1, -1, NULL, NULL, half_copy, NULL, -1);
 }
 
 static int record_unary(unsigned kind, int a, int b, int c, int d, int second,
@@ -1680,11 +1863,26 @@ int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsign
 			  .m = rows, .n = width, .k = scaled, .batch = heads, .flags = kind,
 			  .sa = stride, .p0 = cap };
 	if (!p.a || !p.c) FAIL("row operand is not a live buffer", 0);
+	/* A softmax over rows too wide to stage 32 at a time takes as many whole rows as fit in
+	 * the pass's 8 KB of shared memory, `stride + 1` floats apart below the last 32, on the
+	 * 256-lane build (attention.comp, softmax_rows); anything wider keeps one row a lane. */
+	unsigned row_stride = stride ? stride : width, groups = (rows + 31) / 32;
+	int whole = (kind & 0xFFu) == 1u && (row_stride != width || row_stride > 64u)
+		    && row_stride + 1u <= 2016u;
+	if (whole) {
+		unsigned per = 2016u / (row_stride + 1u);
+		if (per > 32u) per = 32u;       /* the last 32 floats hold one reciprocal a row */
+		groups = (rows + per - 1u) / per;
+	}
 	VkPipeline pipeline;
-	if (resident_pipeline(4, kind, g.rrow, &pipeline)) return -1;
+	if (whole && g.rrows) {
+		if (resident_pipeline(8, kind, g.rrows, &pipeline)) return -1;
+	} else if (resident_pipeline(4, kind, g.rrow, &pipeline)) {
+		return -1;
+	}
 	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
 	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
-	vkCmdDispatch(g.rcb, (rows + 31) / 32, 1, 1);
+	vkCmdDispatch(g.rcb, groups, 1, 1);
 	barrier();
 	stamp(PK_ROW, kind);
 	g.recorded++;
@@ -1797,6 +1995,161 @@ int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 	return 0;
 }
 
+/* A 32-channel window block's attention half in one pass a window (`window_block.comp`):
+ * eight subgroups, a window row each, 16 KB of shared memory; the portable twin eight
+ * 32-lane slices and 28.25 KB, the same dispatch. Built on first use, from the twin where
+ * `fused_path` says so. The whole-block variants — block 0 with its pool, block 70 with
+ * the head — are specialisations of the same pipeline. */
+int xmx_window_block_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rblock) return 0;
+	int twin;
+	char *use = fused_path(path, &twin);
+	if (!use) FAIL("pipeline path allocation", 0);
+	if (fused_fits("the window block", twin ? 28928u : 16384u, 256u)) {
+		free(use);
+		return -1;
+	}
+	free(g.rpaths[10]);
+	g.rpaths[10] = use;
+	return build_pipeline(use, g.rpl, &g.rblock);
+}
+
+/* A 32-channel window block's attention half, one 8x8 window a workgroup
+ * (window_block.comp): the QKV projection gathering its rows from `image`, window
+ * attention, and the output projection with the residual into `target`. `image` is also
+ * the residual's skip, as it is in the graph. */
+int xmx_rec_window_block(int image, int qkv, int projection, int target, int bias,
+			 int cosine, int scale, int pooled, unsigned windows, unsigned height,
+			 unsigned width, unsigned across, unsigned pad, unsigned flags)
+{
+	if (!g.recording || !g.rblock) FAIL("window block not ready for recording", 0);
+	if (!windows || !height || !width || !across || windows % across)
+		FAIL("invalid window block geometry", 0);
+	if (flags & ~0x3809f00u)
+		FAIL("the window block takes a publish, a half target, a half image, a pool or a head", 0);
+	if ((flags & 0x2000000u) && !(flags & 0x1000000u))
+		FAIL("all sixteen head columns without the head", 0);
+	/* the head (0x1000000) is block 70's: `pooled` carries the head's weights, and the
+	 * target is the compact head, four float32 columns a pixel */
+	if ((flags & 0x1000000u) && (pooled < 0 || (flags & 0x801f00u)))
+		FAIL("a window block with the head needs its weights, no publish and no pool", 0);
+	/* the pool (0x800000) is block 0's: the target takes the published skip as half */
+	if ((flags & 0x800000u) && (pooled < 0 || (flags & 0x1f00u) || height % 2u || width % 2u
+				    || (pad >> 16) % 2u || (pad & 0xffffu) % 2u))
+		FAIL("a pooled window block needs its pool, no publish, even extents and pads", 0);
+	struct push p = { .a = addr_of(image), .b = addr_of(qkv), .c = addr_of(target),
+			  .d = addr_of(bias), .m = windows, .n = 32u, .k = 32u, .batch = 1u,
+			  .flags = flags, .residual_cos = addr_of(cosine), .image_h = height,
+			  .image_w = width, .window_cols = across, .window_pad = pad,
+			  .qkv_scale = addr_of(scale) };
+	/* the shader reads p0-p1 and p2-p3 as 64-bit addresses: the output projection and
+	 * the pool */
+	uint64_t weights = addr_of(projection), pool = pooled >= 0 ? addr_of(pooled) : 0;
+	memcpy(&p.p0, &weights, sizeof weights);
+	memcpy(&p.p2, &pool, sizeof pool);
+	if (!p.a || !p.b || !p.c || !p.d || !weights || !p.residual_cos || !p.qkv_scale
+	    || ((flags & 0x1800000u) && !pool))
+		FAIL("window block operand is not a live buffer", 0);
+	VkPipeline pipeline;
+	if (resident_pipeline(10, flags, g.rblock, &pipeline)) return -1;
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, windows < 65535u ? windows : 65535u, (windows + 65534u) / 65535u, 1);
+	barrier();
+	stamp(PK_ROW, 4);        /* WINDOW_BLOCK, as window_block.comp names it */
+	g.recorded++;
+	return 0;
+}
+
+int xmx_global_attention_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rglobal) return 0;
+	int twin;
+	char *use = fused_path(path, &twin);
+	if (!use) FAIL("pipeline path allocation", 0);
+	if (fused_fits("global attention", twin ? 24832u : 16384u, 256u)) {
+		free(use);
+		return -1;
+	}
+	free(g.rpaths[11]);
+	g.rpaths[11] = use;
+	return build_pipeline(use, g.rpl, &g.rglobal);
+}
+
+/* A bottleneck block's attention in one pass (global_attention.comp): Q, K and V as the
+ * QKV epilogue leaves them, (heads, rows, 32) half, into the merged (rows, heads * 32)
+ * half — what QK^T, the softmax over `tokens` of `rows` columns, PV and merge_heads write.
+ * A 256-lane workgroup a head and 64 query rows, on the matrix kernel and its twin alike. */
+int xmx_rec_global_attention(int q, int k, int v, int merged, unsigned rows,
+			     unsigned tokens, unsigned heads, float cap)
+{
+	if (!g.recording || !g.rglobal) FAIL("global attention not ready for recording", 0);
+	if (!rows || rows % 16u || !tokens || tokens > rows || !heads)
+		FAIL("global attention needs rows a multiple of 16, at least the tokens", 0);
+	struct push p = { .a = addr_of(q), .b = addr_of(k), .c = addr_of(merged), .d = addr_of(v),
+			  .m = rows, .n = tokens, .batch = heads, .p0 = cap };
+	if (!p.a || !p.b || !p.c || !p.d) FAIL("global attention operand is not a live buffer", 0);
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, g.rglobal);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, (rows + 63u) / 64u, heads, 1);
+	barrier();
+	stamp(PK_ROW, 5);        /* GLOBAL_ATTENTION, as global_attention.comp names it */
+	g.recorded++;
+	return 0;
+}
+
+int xmx_int8_init(const char *path)
+{
+	if (!g.rready) FAIL("resident runtime not initialised", 0);
+	if (g.rint8) return 0;
+	/* The integer matrix path needs matrix units, the explicit layout and the 8-bit
+	 * features; anything else builds the twin, which reads the bytes as words. */
+	int twin = !(g.staged_ok && g.int8) || strstr(path, "_portable") != NULL;
+	char *use;
+	if (twin && !strstr(path, "_portable")) {
+		size_t n = strlen(path), stem = n;
+		if (n >= 4 && !strcmp(path + n - 4, ".spv")) stem = n - 4;
+		if (!(use = malloc(n + sizeof "_portable"))) FAIL("pipeline path allocation", 0);
+		memcpy(use, path, stem);
+		memcpy(use + stem, "_portable", sizeof "_portable" - 1);
+		memcpy(use + stem + sizeof "_portable" - 1, path + stem, n - stem + 1);
+	} else if (!(use = nr_strdup(path))) {
+		FAIL("pipeline path allocation", 0);
+	}
+	free(g.rpaths[9]);
+	g.rpaths[9] = use;
+	g.rint8_twin = twin;
+	return build_pipeline(use, g.rpl, &g.rint8);
+}
+
+/* C = (A @ B^T) * a_scale[row] * b_scale[column] on configuration 4: A int8 M x K, B the
+ * weights stored transposed, int8 N x K, the scales float32 (gemm_staged_int8.comp). */
+int xmx_rec_gemm_int8(int a, int b, int c, int a_scale, int b_scale,
+		      unsigned M, unsigned N, unsigned K, unsigned flags)
+{
+	if (!g.recording || !g.rint8) FAIL("integer GEMM not ready for recording", 0);
+	if (!M || !N || N % 32u || !K || K % 64u)
+		FAIL("the integer GEMM needs N a multiple of 32 and K of 64", 0);
+	if (flags) FAIL("the integer GEMM takes no flags yet", 0);
+	struct push p = { .a = addr_of(a), .b = addr_of(b), .c = addr_of(c), .d = addr_of(a_scale),
+			  .m = M, .n = N, .k = K, .batch = 1u, .flags = flags,
+			  .residual_cos = addr_of(b_scale) };
+	if (!p.a || !p.b || !p.c || !p.d || !p.residual_cos)
+		FAIL("integer GEMM operand is not a live buffer", 0);
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, g.rint8);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	/* the matrix kernel's 64x32 block, or the twin's 8x16 */
+	if (g.rint8_twin) vkCmdDispatch(g.rcb, N / 16u, (M + 7u) / 8u, 1);
+	else              vkCmdDispatch(g.rcb, N / 32u, (M + 63u) / 64u, 1);
+	barrier();
+	stamp(PK_GEMM, 30);
+	g.recorded++;
+	return 0;
+}
+
 /* A 32-channel block's whole feed-forward in one dispatch (`ffn_fused.comp`): the expand,
  * its gate and publish, the projection and the residual, with the hidden layer kept in
  * shared memory instead of written out as half and read back. One subgroup per 16 rows —
@@ -1856,6 +2209,73 @@ int xmx_rec_ffn(int a, int expand, int projection, int out, int skip, int cosine
 	 * one's surplus row blocks return, or on the twin idle through its barriers */
 	unsigned rows = g.rffn_twin ? 128u : 256u;
 	vkCmdDispatch(g.rcb, (M + rows - 1u) / rows, groups, 1);
+	barrier();
+	stamp(PK_GEMM, 31);
+	g.recorded++;
+	return 0;
+}
+
+/* Block 70's feed-forward with its input made in the same pass (ffn_fused.comp, flag
+ * 0x1000000): `source` is the level above at half the extent (half), `skip` the
+ * full-resolution skip (half), `sincos` the merge's sin then cos, `cosine` the feed-
+ * forward residual's. What `UPSAMPLE_MERGE` followed by `xmx_rec_ffn` with a float32
+ * skip writes, without the merge ever being stored. */
+int xmx_rec_ffn_merge(int source, int skip, int sincos, int expand, int projection, int out,
+		      int cosine, unsigned height, unsigned width, unsigned source_width,
+		      unsigned flags)
+{
+	if (!g.recording || !g.rffn) FAIL("fused feed-forward not ready for recording", 0);
+	unsigned M = height * width;
+	if (!M || M % 16u || height % 2u || width % 2u || source_width < width / 2u)
+		FAIL("the merged feed-forward needs an even extent in 16-row blocks", 0);
+	if (flags & ~0x1f00u)
+		FAIL("the merged feed-forward takes an epilogue and a half output only", 0);
+	struct push p = { .a = addr_of(source), .b = addr_of(expand), .c = addr_of(out),
+			  .d = addr_of(skip), .m = M, .n = 32u, .k = 128u, .batch = 1u,
+			  .sa = 32u * 128u, .sb = 128u * 32u, .lda = width, .ldb = source_width,
+			  .flags = flags | 0x20000u | 0x800000u | 0x1000000u,
+			  .residual_cos = addr_of(cosine), .qkv_scale = addr_of(projection) };
+	/* the shader reads p0 and p1 as one 64-bit address, the merge's sin-cos table */
+	uint64_t table = addr_of(sincos);
+	memcpy(&p.p0, &table, sizeof table);
+	if (!p.a || !p.b || !p.c || !p.d || !table || !p.residual_cos || !p.qkv_scale)
+		FAIL("merged feed-forward operand is not a live buffer", 0);
+	VkPipeline pipeline;
+	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, (M + (g.rffn_twin ? 127u : 255u)) / (g.rffn_twin ? 128u : 256u), 1, 1);
+	barrier();
+	stamp(PK_GEMM, 31);
+	g.recorded++;
+	return 0;
+}
+
+/* Block 0's feed-forward with its input made in the same pass (ffn_fused.comp, flag
+ * 0x2000000): the stem, `features` (half, rows x 16) times `adapter` (16 x 32), which
+ * `xmx_rec_gemm_dual` wrote as float32 and half for this pass to read back. */
+int xmx_rec_ffn_stem(int features, int adapter, int expand, int projection, int out,
+		     int cosine, unsigned M, unsigned flags)
+{
+	if (!g.recording || !g.rffn) FAIL("fused feed-forward not ready for recording", 0);
+	if (!M || M % 16u) FAIL("the stem feed-forward needs 16-row blocks", 0);
+	if (flags & ~0x1f00u)
+		FAIL("the stem feed-forward takes an epilogue and a half output only", 0);
+	struct push p = { .a = addr_of(features), .b = addr_of(expand), .c = addr_of(out),
+			  .m = M, .n = 32u, .k = 128u, .batch = 1u,
+			  .sa = 32u * 128u, .sb = 128u * 32u,
+			  .flags = flags | 0x20000u | 0x800000u | 0x2000000u,
+			  .residual_cos = addr_of(cosine), .qkv_scale = addr_of(projection) };
+	/* the shader reads p0 and p1 as one 64-bit address, the adapter */
+	uint64_t weights = addr_of(adapter);
+	memcpy(&p.p0, &weights, sizeof weights);
+	if (!p.a || !p.b || !p.c || !weights || !p.residual_cos || !p.qkv_scale)
+		FAIL("stem feed-forward operand is not a live buffer", 0);
+	VkPipeline pipeline;
+	if (resident_pipeline(5, p.flags, g.rffn, &pipeline)) return -1;
+	vkCmdBindPipeline(g.rcb, VK_PIPELINE_BIND_POINT_COMPUTE, pipeline);
+	vkCmdPushConstants(g.rcb, g.rpl, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof p, &p);
+	vkCmdDispatch(g.rcb, (M + (g.rffn_twin ? 127u : 255u)) / (g.rffn_twin ? 128u : 256u), 1, 1);
 	barrier();
 	stamp(PK_GEMM, 31);
 	g.recorded++;

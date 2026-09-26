@@ -146,6 +146,7 @@ inline void qkv_epilogue(constant Push &pc, threadgroup float *stage, uint BM, u
     bool wide = (target & 7u) == 0u;
     for (uint e = lane * 4u; e < BM * BN; e += lanes * 4u) {
         uint r = row + e / BN, window = r / tokens, token = r % tokens;
+        if (r >= pc.m) continue;                 // a partial last block's rows past M
         uint at = ((window * heads + head) * tokens + token) * 32u + e % BN;
         float4 out4;
         for (uint i = 0u; i < 4u; i++) out4[i] = e4m3(stage[e + i]);

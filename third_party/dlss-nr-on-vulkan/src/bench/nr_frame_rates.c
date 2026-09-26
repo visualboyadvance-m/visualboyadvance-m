@@ -6,7 +6,9 @@
  * render scale (the area mean when the scale divides the extent, else the separable
  * bilinear), the features and the graph at that extent, the head brought back up, the
  * composition at the *swapchain's* resolution with the history, its floor and its release,
- * and the 8-bit encode. What it leaves out is the socket and the Python between the
+ * and the 8-bit encode — the last three in one pass (`nr_frame_compose_encode`), as the
+ * daemon runs them since upstream's `nr_compose_encode`; `--separate` measures them as three
+ * passes, the same bytes. `--min-extent N` is the daemon's `min_extent` knob. What it leaves out is the socket and the Python between the
  * stages, so the difference from `live_rates.py` on the same machine is what those cost.
  *
  *     nr_frame_rates                                   # the published table's cases
@@ -164,6 +166,7 @@ static void resample(const resampler *r, const float *source, float *out)
 typedef struct {
     int frames, warmup, verbose, pan, still;
     float temporal, hold, release, cut_limit;
+    int min_extent, separate;
 } options;
 
 static int compare(const void *a, const void *b)
@@ -203,6 +206,7 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
     p.slope = (float)(-255.0f * o->hold / 4.0f);               /* nr_frame.HOLD_RAMP */
     p.release = o->release > 0.0f ? (float)(-255.0f / o->release) : 0.0f;  /* release_slope */
     int want_previous = o->hold > 0.0f || o->release > 0.0f;
+    p.min_extent = o->min_extent;
 
     /* Frames are made before the clock starts, as live_rates builds its payload before it
      * connects. One base frame, wider by the whole pan, for --pan and --still. */
@@ -278,18 +282,30 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
             exit(1);
         }
         t[3] = nr_now();
-        /* All four channels come up: the fourth is the gate, needed with history. Without
-         * it the daemon brings up three; here the upscale then costs a quarter more. */
-        const float *full_head = head_inner;
-        if (ih != height || iw != width) { resample(&up, head_inner, head); full_head = head; }
-        t[4] = nr_now();
-        if (nr_frame_compose(frame, full_head, colour, height, width, h_full, h_prev, NULL, &p, output)) {
-            fprintf(stderr, "nr_frame_compose: %s\n", nr_frame_error());
-            exit(1);
+        if (!o->separate) {
+            /* the daemon's end of the frame in one pass: the head brought up, composed and
+             * encoded into a copy of the request ("up" is that copy) */
+            memcpy(encoded, payloads[i], pixels * 4);
+            t[4] = nr_now();
+            if (nr_frame_compose_encode(frame, head_inner, ih, iw, colour, height, width, h_full, h_prev,
+                                        NULL, &p, output, encoded, width, 0, 0, 1)) {
+                fprintf(stderr, "nr_frame_compose_encode: %s\n", nr_frame_error());
+                exit(1);
+            }
+            t[5] = t[6] = nr_now();
+        } else {
+            /* All four channels come up: the fourth is the gate, needed with history. */
+            const float *full_head = head_inner;
+            if (ih != height || iw != width) { resample(&up, head_inner, head); full_head = head; }
+            t[4] = nr_now();
+            if (nr_frame_compose(frame, full_head, colour, height, width, h_full, h_prev, NULL, &p, output)) {
+                fprintf(stderr, "nr_frame_compose: %s\n", nr_frame_error());
+                exit(1);
+            }
+            t[5] = nr_now();
+            nr_encode8(output, (ptrdiff_t)width * 3, 3, 1, payloads[i], (size_t)height, (size_t)width, 1, encoded);
+            t[6] = nr_now();
         }
-        t[5] = nr_now();
-        nr_encode8(output, (ptrdiff_t)width * 3, 3, 1, payloads[i], (size_t)height, (size_t)width, 1, encoded);
-        t[6] = nr_now();
         if (temporal) {
             /* History.keep; the daemon keeps references, a copy here is outside the clock */
             memcpy(kept_output, output, pixels * 3 * sizeof(float));
@@ -313,7 +329,7 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
     r.low = low; r.high = high; r.with_history = with_history;
     if (o->verbose) {
         int nh, nw;
-        nr_frame_geometry(ih, iw, &nh, &nw);
+        nr_frame_geometry_min(ih, iw, o->min_extent, &nh, &nw);
         printf("      %dx%d render extent (network %dx%d), %d of %d timed frames with history;",
                iw, ih, nw, nh, with_history, o->frames);
         for (int s = 0; s < STAGES; s++) printf(" %s %.1f", STAGE_NAMES[s], 1e3 * median(stages[s], o->frames));
@@ -336,7 +352,7 @@ static void usage(void)
     fprintf(stderr,
         "usage: nr_frame_rates [WxH@scale ...] [--frames N] [--warmup N] [--weights W]\n"
         "                      [--pan N | --still] [--temporal F] [--hold F] [--release F]\n"
-        "                      [--cut-limit F] [-v]\n"
+        "                      [--cut-limit F] [--min-extent N] [--separate] [-v]\n"
         "  cases default to live_rates.py's table; scale defaults to 0.55 as there\n"
         "  --frames 9 --warmup 3 --temporal 1 --hold 1 --release 24 --cut-limit 0.15, the daemon's\n"
         "  W defaults to the weights compiled into libnr_frame, else work/mlxw/dlssnr-logical.safetensors\n");
@@ -345,7 +361,7 @@ static void usage(void)
 
 int main(int argc, char **argv)
 {
-    options o = { 9, 3, 0, 0, 0, 1.0f, 1.0f, 24.0f, 0.15f };
+    options o = { 9, 3, 0, 0, 0, 1.0f, 1.0f, 24.0f, 0.15f, 320, 0 };
     const char *weights = NULL;
     /* room for every argument as a case, or for the default table when there are none */
     size_t room = (size_t)argc > sizeof PLAN / sizeof *PLAN ? (size_t)argc : sizeof PLAN / sizeof *PLAN;
@@ -364,6 +380,8 @@ int main(int argc, char **argv)
         else if (!strcmp(a, "--hold")) o.hold = (float)atof(NEXT());
         else if (!strcmp(a, "--release")) o.release = (float)atof(NEXT());
         else if (!strcmp(a, "--cut-limit")) o.cut_limit = (float)atof(NEXT());
+        else if (!strcmp(a, "--min-extent")) o.min_extent = atoi(NEXT());
+        else if (!strcmp(a, "--separate")) o.separate = 1;
         else if (!strcmp(a, "-v") || !strcmp(a, "--verbose")) o.verbose = 1;
         else if (a[0] == '-') usage();
         else {
@@ -377,6 +395,7 @@ int main(int argc, char **argv)
         }
     }
     if (o.frames < 1 || o.warmup < 0 || o.pan < 0) usage();
+    if (o.min_extent < 128 || o.min_extent > 4096) die("--min-extent is 128-4096, as the daemon takes it");
     if (!(o.temporal >= 0.0f && o.temporal <= 1.0f) || !(o.hold >= 0.0f && o.hold <= 1.0f)
         || !(o.cut_limit >= 0.0f && o.cut_limit <= 1.0f)) die("--temporal, --hold and --cut-limit are 0-1");
     if (!(o.release >= 0.0f && o.release <= 255.0f)) die("--release is 0-255");

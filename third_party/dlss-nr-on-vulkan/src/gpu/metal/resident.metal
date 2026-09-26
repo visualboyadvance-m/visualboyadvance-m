@@ -10,7 +10,7 @@ constant uint E4M3 = 0u, GATE = 1u, HALF = 2u, TO_HALF = 3u,
               SPLIT_HEADS = 10u, MERGE_HEADS = 11u, POOL2 = 12u, UPSAMPLE2 = 13u,
               SCALE_CHANNEL = 14u, ADD = 15u, PAD_END = 16u,
               GATE_E4M3_HALF = 17u, E4M3_HALF = 18u, GATE_HALF = 19u,
-              UPSAMPLE_MERGE = 20u;
+              UPSAMPLE_MERGE = 20u, UPSAMPLE_ADD = 21u, POOL2_SKIP = 22u;
 
 /* An operand held as float16 (bit 15 marks `a`, bit 16 marks `b`); a published value is
  * E4M3 and exact in half, so nothing is lost by the narrow read. */
@@ -121,6 +121,40 @@ kernel void resident(constant Push &pc [[buffer(0)]],
         float merged = scaled + load_b(pc, flags, index) * d[channels + c];
         float_out(pc.c)[index] = merged;
         half_out(pc.residual_cos)[index] = half(merged);
+        return;
+    }
+    if (kind == POOL2_SKIP) {
+        /* Block 0's output into both its consumers in one read: the 2x2 pool, published
+         * (POOL2 with the E4M3 epilogue), and every tap published to half as the post
+         * block's skip (E4M3_HALF), the second output at offset 96. Their roundings are
+         * theirs: the pool adds its taps column-first, the skip publishes each tap alone.
+         * n=channels, sb=source width. */
+        uint channels = pc.n, width = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % (width / 2u), y = rest / (width / 2u);
+        uint base = ((2u * y) * width + 2u * x) * channels + c;
+        uint taps[4] = { base, base + width * channels, base + channels, base + (width + 1u) * channels };
+        float value[4];
+        for (uint t = 0u; t < 4u; t++) value[t] = load_a(pc, flags, taps[t]);
+        float total = value[0] + value[1];
+        total += value[2];
+        total += value[3];
+        store(pc, flags, index, total * 0.25f);
+        for (uint t = 0u; t < 4u; t++) half_out(pc.residual_cos)[taps[t]] = half(e4m3(value[t]));
+        return;
+    }
+    if (kind == UPSAMPLE_ADD) {
+        /* A decoder transition's merge in one pass: the projected level below upsampled 2x
+         * (nearest), plus the skip times the per-channel sine, then the publish — what
+         * upsample2, scale_channel and add wrote. The product is rounded on its own and then
+         * added (nothing is contracted in this build). n=channels, sa=target width, sb=source
+         * width, d=sine, b=the skip. */
+        uint channels = pc.n, target = pc.sa, source = pc.sb;
+        uint c = index % channels, rest = index / channels;
+        uint x = rest % target, y = rest / target;
+        float scaled = load_b(pc, flags, index) * d[c];
+        float merged = load_a(pc, flags, ((y / 2u) * source + (x / 2u)) * channels + c) + scaled;
+        store(pc, flags, index, merged);
         return;
     }
     if (kind == PAD_END) {

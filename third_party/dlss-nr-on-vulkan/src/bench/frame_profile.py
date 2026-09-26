@@ -47,6 +47,13 @@ ROW = _kinds("src/gpu/attention.comp", r"([A-Z][A-Z0-9_]*)\s*=\s*(\d+)u")
 # shaders sharing one kind number is how it hid as "qkv prepare" for a while: both said
 # 2, and only one of them was read. So both are read, and a shared number is an error.
 _WINDOW = _kinds("src/gpu/window_attention.comp", r"(WINDOW_[A-Z0-9_]*)\s*=\s*(\d+)u")
+_BLOCK = _kinds("src/gpu/window_block.comp", r"(WINDOW_BLOCK)\s*=\s*(\d+)u")
+_GLOBAL = _kinds("src/gpu/global_attention.comp", r"(GLOBAL_ATTENTION)\s*=\s*(\d+)u")
+if set(_WINDOW) & set(_BLOCK) or set(_GLOBAL) & (set(_WINDOW) | set(_BLOCK)):
+    raise SystemExit("row profile kinds collide between window_attention.comp, "
+                     "window_block.comp and global_attention.comp")
+_WINDOW.update(_BLOCK)
+_WINDOW.update(_GLOBAL)
 _CLASH = set(ROW) & set(_WINDOW)
 if _CLASH:
     raise SystemExit(f"row profile kinds collide between attention.comp and "
@@ -73,6 +80,8 @@ def _describe(name, args):
         return "gemm %dx%dx%d%s flags %#x" % (m, n, k, " x%d" % batch if batch > 1 else "", bt)
     if name == "xmx_rec_gemm_residual":
         return "gemm+residual %dx%dx%d flags %#x" % args[5:9]
+    if name == "xmx_rec_gemm_window_residual_pool":
+        return "gemm+window residual %dx%dx%d, pooled and published" % args[6:9]
     if name == "xmx_rec_gemm_window_residual":
         return "gemm+window residual %dx%dx%d flags %#x" % args[5:9]
     if name == "xmx_rec_gemm_qkv":
@@ -84,6 +93,14 @@ def _describe(name, args):
             m, 3 * c, c, " (half image)" if args[14] else "")
     if name == "xmx_rec_ffn":
         return "ffn fused %dx%dx%d x%d flags %#x" % (args[6], args[7], args[8], args[9], args[10])
+    if name == "xmx_rec_ffn_merge":
+        return "ffn fused %dx32x128, input merged from %dx%d" % (
+            args[7] * args[8], args[7] // 2, args[9])
+    if name == "xmx_rec_ffn_stem":
+        return "ffn fused %dx32x128, stem made from the features" % args[6]
+    if name == "xmx_rec_window_block":
+        return "window block %d windows%s%s" % (args[8], ", half image" if args[13] & 0x8000 else "",
+                                                ", pooled" if args[13] & 0x800000 else "")
     if name == "xmx_rec_gemm_dual":
         return "gemm+half copy %dx%dx%d" % args[4:7]
     if name == "xmx_rec_unary2":
@@ -94,6 +111,8 @@ def _describe(name, args):
                                        args[5], args[6])
     if name == "xmx_rec_row":
         return "row %s rows=%d" % (ROW.get(args[0] & 0xFF, "kind %d" % (args[0] & 0xFF)), args[5])
+    if name == "xmx_rec_global_attention":
+        return "global attention %d rows, %d tokens, %d heads" % args[4:7]
     if name == "xmx_rec_window_attention":
         return "window attention %d batches, %d heads%s" % (
             args[5], args[6], ", merged" if len(args) > 7 and args[7] else "")

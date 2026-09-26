@@ -79,9 +79,10 @@ public:
     void SyncDlssNr();
 
     // Run the DLSS NR pass from `src` to `dst`, both pointing at the first
-    // image row; false when the pass is not running. dst may alias src.
+    // image row, at the blend `intensity`; false when the pass is not running.
+    // dst may alias src.
     bool DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst, int dst_stride,
-                     int w, int h);
+                     int w, int h, float intensity);
 
     // Denoise a whole source frame into scratch and return it, laid out like
     // the buffer passed in, for the filter threads to read instead.

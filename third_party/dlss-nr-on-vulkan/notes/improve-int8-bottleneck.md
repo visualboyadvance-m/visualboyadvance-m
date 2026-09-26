@@ -85,6 +85,49 @@ nobody renders.
   GEMM becomes a larger share of the frame, so a GEMM-only optimisation should pay more
   there. There is no discrete GPU here to show it.
 
+## Measured again, 2026-09-26: the activations, the live extent, the kernel
+
+**The activations cost almost nothing, at every extent.** `int8_bottleneck.py
+--activations` rounds the A operand of each of the four weight GEMMs of blocks 31-38 onto
+an int8 grid per row before the GEMM — config 4's input, to within half's 2^-11 — on top
+of the weights:
+
+| frame | extent | weights only | weights and activations |
+|---|---|---|---|
+| Cyberpunk 2077 | 1920x1080 | 4.8 % | 5.0 % |
+| Cyberpunk 2077 | 1280x720 | 6.9 % | 6.7 % |
+| a test image | 256x512 | 15.0 % | 15.5 % |
+
+**The live extent is where it costs most.** 640x360 at render scale 0.5 hands the network
+a 320x180 frame, padded to 320x320 (`--size 320x180`). Eleven frames — six DoA5 fights at
+1080p, three at 720p, both Cyberpunk frames — with weights and activations on int8: **5.5
+to 15.1 % of the effect, 9-13 % on most**; 0.2-1.0 levels of 255 on average, a p99 of 1.6-5
+levels, the worst pixel 5-14. Weights alone, 5.6-13.1 %. The trend above holds at the small
+end too: the smaller the frame, the larger the share — and the live extent is the smallest
+frame there is.
+
+**The kernel, `gemm_staged_int8.comp`**: the staged GEMM with int8 tiles and a 64-deep K
+step (two config-4 multiply-adds), the weights stored transposed so a B fragment is read by
+column, the scales applied to the exact int32 accumulator in the epilogue — bit-exact
+against numpy on six shapes (`test_gemm_int8_staged.py`). Against the FP16 staged kernel on
+the bottleneck's shapes, eight copies of the weights rotated so they come from memory as in
+a frame:
+
+| tokens | FP16, a block's four GEMMs | int8 | |
+|---|---|---|---|
+| 64 (a 320x320 network) | 824 us | 546 us | 1.51x |
+| 256 (1280x768) | 1857 us | 1309 us | 1.42x |
+
+Per shape 1.23x to 1.75x, the most on the feed-forward's projection (K = 4096). Applied to
+the in-frame FP16 times, that is about 1.5 ms of a 25 ms graph at 320x320 and 2.8 ms of
+145 at 1280x768, before the activations are quantised — a pass per GEMM operand, or a
+per-row maximum carried by the pass before. Not in the graph yet: its epilogues (the gate
+and E4M3 publish, the residual, the QKV epilogue) are the FP16 kernel's and would have to
+be shared with it.
+
+So the trade at the live extent, where speed matters most, is about 5 % of the graph for
+about a tenth of the effect.
+
 ## Two silent no-ops, and what caught them
 
 Both attempts at this experiment first produced a perfect result from doing nothing. The

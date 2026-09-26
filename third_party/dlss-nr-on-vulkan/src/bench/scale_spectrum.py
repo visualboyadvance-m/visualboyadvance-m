@@ -25,7 +25,7 @@ class Conn:
 def run(scale):
     args = argparse.Namespace(settings=None, profile="standard", intensity=1.0, detail_strength=1.0,
                               colour_strength=1.0, render_scale=scale, temporal=0.0, cut_limit=0.15,
-                              hold=1.0, release=24.0, max_pixels=1 << 22, dump=None, meter=None)
+                              hold=1.0, release=24.0, min_extent=320.0, max_pixels=1 << 22, dump=None, meter=None)
     args.live, args.history, args.letterbox = d.Settings(args), d.History(), d.Letterbox()
     for _ in range(2):
         c = Conn(struct.pack("<4I", d.MAGIC, W, H, 44) + wire)

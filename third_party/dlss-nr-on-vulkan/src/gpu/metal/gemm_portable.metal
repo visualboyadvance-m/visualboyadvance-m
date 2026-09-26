@@ -21,7 +21,8 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                             uint3 wg [[threadgroup_position_in_grid]],
                             uint lid [[thread_index_in_threadgroup]]) {
     const uint BM = TM * RM, BN = TN * RN;
-    threadgroup float stage[TM * RM * TN * RN];
+    /* only the 16x32 build's QKV epilogue and pool read it */
+    threadgroup float stage[RN == 2 ? TM * RM * TN * RN : 1];
     uint row = wg.y * BM, col = wg.x * BN;
     if (row >= pc.m || col >= pc.n) return;
     uint flags = operation_flags(pc);
@@ -46,16 +47,42 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
          * rounded to half on the way in, as the partition's narrow store did. */
         int base[RM];
         for (int i = 0; i < RM; i++) base[i] = window_row_base(pc, row + r + i * TM);
+        bool wide_b = (ldb & 3u) == 0u && (pc.b & 7u) == 0u;
         for (uint k = 0; k < pc.k; k++) {
             float4 bv[RN];
             for (int j = 0; j < RN; j++) {
                 uint at = k * ldb + col + cq + j * TN;
-                bv[j] = float4(float(B[at]), float(B[at + 1u]), float(B[at + 2u]), float(B[at + 3u]));
+                bv[j] = wide_b ? float4(reinterpret_cast<device const half4 *>(B)[at >> 2])
+                               : float4(float(B[at]), float(B[at + 1u]), float(B[at + 2u]), float(B[at + 3u]));
             }
             for (int i = 0; i < RM; i++) {
                 float av = window_load(pc, flags, base[i], k);
                 for (int j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if ((flags & 1u) != 0u && (ldb & 3u) == 0u && (lda & 3u) == 0u && (pc.k & 3u) == 0u
+               && ((bo | ao) & 3u) == 0u && ((pc.a | pc.b) & 7u) == 0u) {
+        /* The transposed form with the operands fetched eight bytes at a time along K:
+         * the same terms added one at a time in the same order (gemm_portable.comp). */
+        device const half4 *A4 = reinterpret_cast<device const half4 *>(A);
+        device const half4 *B4 = reinterpret_cast<device const half4 *>(B);
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            float4 as4[RM], bt[RN][4];
+            for (int i = 0; i < RM; i++)
+                as4[i] = float4(A4[(ao + (row + r + i * TM) * lda + k0) >> 2]);
+            for (int j = 0; j < RN; j++)
+                for (uint q = 0; q < 4u; q++)
+                    bt[j][q] = float4(B4[(bo + (col + cq + j * TN + q) * ldb + k0) >> 2]);
+            for (uint kk = 0; kk < 4u; kk++) {
+                float4 bv[RN];
+                for (int j = 0; j < RN; j++)
+                    bv[j] = float4(bt[j][0][kk], bt[j][1][kk], bt[j][2][kk], bt[j][3][kk]);
+                for (int i = 0; i < RM; i++) {
+                    float av = as4[i][kk];
+                    for (int j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else if ((flags & 1u) != 0u) {
@@ -71,6 +98,28 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                 float av = float(A[ao + (row + r + i * TM) * lda + k]);
                 for (int j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if ((ldb & 3u) == 0u && (lda & 3u) == 0u && (pc.k & 3u) == 0u
+               && ((bo | ao) & 3u) == 0u && ((pc.a | pc.b) & 7u) == 0u) {
+        /* The same sums with the operands fetched eight bytes at a time: a lane's four B
+         * columns are adjacent in a row-major B and its A row's next four K terms too.
+         * Each K term still goes into the accumulator alone, in order. */
+        device const half4 *A4 = reinterpret_cast<device const half4 *>(A);
+        device const half4 *B4 = reinterpret_cast<device const half4 *>(B);
+        for (uint k0 = 0; k0 < pc.k; k0 += 4u) {
+            float4 as4[RM];
+            for (int i = 0; i < RM; i++)
+                as4[i] = float4(A4[(ao + (row + r + i * TM) * lda + k0) >> 2]);
+            for (uint kk = 0; kk < 4u; kk++) {
+                float4 bv[RN];
+                for (int j = 0; j < RN; j++)
+                    bv[j] = float4(B4[(bo + (k0 + kk) * ldb + col + cq + j * TN) >> 2]);
+                for (int i = 0; i < RM; i++) {
+                    float av = as4[i][kk];
+                    for (int j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else {
@@ -101,6 +150,44 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                     stage[(i * TM + r) * BN + j * TN + cq + e] = acc[i][j][e];
         threadgroup_barrier(mem_flags::mem_threadgroup);
         qkv_epilogue<true>(pc, stage, BM, BN, row, col, lid, 32u);
+        return;
+    }
+    if (RN == 2 && (flags & 0x800000u) != 0u) {
+        /* Bit 0x800000 (with the window residual): block 0's output, read only pooled 2x2
+         * and published, both made here as gemm_simd's staged kernel makes them. A 16-row
+         * block is two rows of one 8x8 window across all 32 channels: each value goes out
+         * published as half into `c` and into the stage as it is, and after the barrier the
+         * block's four pooled pixels are summed from the stage in POOL2_SKIP's order into
+         * `qkv_scale` (gemm_portable.comp). */
+        for (int i = 0; i < RM; i++)
+            for (int j = 0; j < RN; j++) {
+                uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
+                if (!residual_output_index(pc, flags, at)) continue;
+                float4 v = acc[i][j];
+                half4 published;
+                for (uint e = 0; e < 4u; e++) {
+                    v[e] = publish(epilogue, add_gemm_residual(pc, flags, v[e], at + e));
+                    stage[(i * TM + r) * BN + j * TN + cq + e] = v[e];
+                    published[e] = half(e4m3(v[e]));
+                }
+                reinterpret_cast<device half4 *>(half_out(pc.c))[at >> 2] = published;
+            }
+        threadgroup_barrier(mem_flags::mem_threadgroup);
+        uint pixel = lid / 8u, c = (lid % 8u) * 4u;
+        uint window = row / 64u, pair = (row % 64u) / 8u;     /* the block's first window row */
+        uint top = pc.window_pad >> 16, left = pc.window_pad & 0xffffu;
+        uint y = (window / pc.window_cols) * 8u + pair, x = (window % pc.window_cols) * 8u + 2u * pixel;
+        if (y < top || x < left || y - top >= pc.image_h || x - left >= pc.image_w) return;
+        uint at = (((y - top) / 2u) * (pc.image_w / 2u) + (x - left) / 2u) * BN + c;
+        uint upper = (2u * pixel) * BN + c, lower = upper + 8u * BN;
+        half4 pooled;
+        for (uint e = 0; e < 4u; e++) {
+            float total = stage[upper + e] + stage[lower + e];
+            total += stage[upper + BN + e];
+            total += stage[lower + BN + e];
+            pooled[e] = half(e4m3(total * 0.25f));
+        }
+        reinterpret_cast<device half4 *>(half_out(pc.qkv_scale))[at >> 2] = pooled;
         return;
     }
     if (RM == 1 && RN == 1 && (flags & 0x10000u) != 0u) {
@@ -148,6 +235,8 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
 
 template [[host_name("gemm_portable")]]       kernel void gemm_portable_t<1, 1>(constant Push &, uint3, uint);
 template [[host_name("gemm_portable_tiled")]] kernel void gemm_portable_t<2, 2>(constant Push &, uint3, uint);
+/* 16x64, for the GEMMs whose N is a multiple of 64 and whose store is the generic one */
+template [[host_name("gemm_portable_wide")]]  kernel void gemm_portable_t<2, 4>(constant Push &, uint3, uint);
 
 /* The descriptor-bound benchmark and test path: three buffers and a small push block,
  * `gemm_portable_desc.comp` (BATCHED for the second). The runtime always hands the seven

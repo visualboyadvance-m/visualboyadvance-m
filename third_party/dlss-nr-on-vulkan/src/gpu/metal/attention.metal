@@ -199,6 +199,95 @@ inline void softmax(constant Push &pc, uint flags, threadgroup float *stage, uin
     }
 }
 
+/* -- the rows too wide to stage 32 at a time (attention.comp softmax_rows) ------------ */
+
+/* A logit as the transform takes it: the per-head bias added (bit 13), then the clamp. */
+inline float prepared(constant Push &pc, uint flags, float logit, uint bias_index) {
+    if ((flags & 0x2000u) != 0u) logit += float_ptr(pc.b)[bias_index];
+    if (pc.p0 != 0.0f) logit = clamp(logit, -pc.p0, pc.p0);
+    return logit;
+}
+
+/* weights_at_fast / _reference on two prepared logits */
+template <bool AB>
+inline float2 pair_weights(uint flags, float l0, float l1) {
+    if (AB && (flags & 0x40000000u) != 0u) {
+        uint bits[2];
+        for (uint j = 0u; j < 2u; j++) {
+            float scaled = half_round(j == 0u ? l0 : l1) * 0.044921875f;
+            scaled += 1.30078125f;
+            float affine = clamp(scaled, 1.03125f, 1.5693359375f);
+            int f = as_type<int>(half_round(affine));
+            bits[j] = uint(((f >> 13) & 0x3FF) | (((((f >> 23) & 0xFF) - 112) & 0x1F) << 10)
+                           | ((f < 0) ? 0x8000 : 0));
+        }
+        uint transformed = ((bits[0] | (bits[1] << 16)) << 5) + 0x7FF88000u;
+        float out2[2];
+        for (uint j = 0u; j < 2u; j++) {
+            uint half_bits = (j == 0u) ? (transformed & 0xFFFFu) : ((transformed >> 16) & 0xFFFFu);
+            uint exponent = (half_bits >> 10) & 0x1Fu, mantissa = half_bits & 0x3FFu;
+            float weight = (exponent == 0u)
+                ? float(mantissa) * 5.9604644775390625e-08f
+                : as_type<float>(int(((exponent + 112u) << 23) | (mantissa << 13)));
+            out2[j] = ((half_bits & 0x8000u) != 0u) ? -weight : weight;
+        }
+        return float2(out2[0], out2[1]);
+    }
+    float2 affine;
+    for (uint j = 0u; j < 2u; j++) {
+        float scaled = half_round(j == 0u ? l0 : l1) * 0.044921875f;
+        scaled += 1.30078125f;
+        affine[j] = clamp(scaled, 1.03125f, 1.5693359375f);
+    }
+    uint transformed = (as_type<uint>(half2(affine)) << 5) + 0x7FF88000u;
+    return float2(as_type<half2>(transformed));
+}
+
+inline uint bias_offset(constant Push &pc, uint row) {
+    return ((row / pc.n) % max(pc.batch, 1u)) * pc.n * pc.n + (row % pc.n) * pc.n;
+}
+
+/* The global blocks' rows, as many columns as the bottleneck has tokens: a threadgroup
+ * takes as many whole rows as fit in its 8 KB, `stride + 1` floats apart, reads them once
+ * along the rows, makes the weights in place, and each of its first lanes adds its own row
+ * in index order — the one-row loop's order, so the same total bit for bit. The last 32
+ * floats hold the reciprocals, so at most 32 rows a threadgroup, as libmetalmx
+ * dispatches it. A pair starting below `n` counts both halves; the pad past it is zeroed. */
+constant uint WHOLE = 2016u;
+
+template <bool AB, uint LANES>
+inline void softmax_rows(constant Push &pc, uint flags, threadgroup float *stage, uint local, uint group) {
+    uint stride = pc.sa != 0u ? pc.sa : pc.n, pitch = stride + 1u;
+    uint per = min(32u, WHOLE / pitch), first = group * per;
+    uint rows = min(per, pc.m - first);
+    uint paired = (pc.n + 1u) & ~1u, pairs = paired / 2u;
+    device const float *a = float_ptr(pc.a);
+    for (uint q = local; q < rows * stride; q += LANES)
+        stage[(q / stride) * pitch + q % stride] = a[first * stride + q];
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    for (uint q = local; q < rows * pairs; q += LANES) {
+        uint r = q / pairs, j = (q % pairs) * 2u, at = r * pitch + j;
+        uint bias = bias_offset(pc, first + r) + j;
+        float2 w = pair_weights<AB>(flags, prepared(pc, flags, stage[at], bias),
+                                    prepared(pc, flags, stage[at + 1u], bias + 1u));
+        stage[at] = w.x;
+        stage[at + 1u] = w.y;
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    if (local < rows) {
+        float total = 0.0f;
+        uint base = local * pitch;
+        for (uint j = 0u; j < paired; j++) total += stage[base + j];
+        stage[WHOLE + local] = half_round(1.0f / half_round(total));
+    }
+    threadgroup_barrier(mem_flags::mem_threadgroup);
+    for (uint q = local; q < rows * stride; q += LANES) {
+        uint r = q / stride, j = q % stride;
+        store(pc, flags, first * stride + q,
+              j < paired ? e4m3(hmul(stage[r * pitch + j], stage[WHOLE + r])) : 0.0f);
+    }
+}
+
 template <bool AB>
 kernel void attention_t(constant Push &pc [[buffer(0)]],
                         uint local [[thread_index_in_threadgroup]],
@@ -237,10 +326,21 @@ kernel void attention_t(constant Push &pc [[buffer(0)]],
             gather(pc, flags, stage, local, base, count);
             if (row < pc.m) softmax<AB>(pc, flags, stage, row, local);
             scatter(pc, flags, stage, local, base, count);
-        } else {
-            if (row < pc.m) softmax<AB>(pc, flags, stage, row, local);
+        } else if (stride + 1u <= WHOLE) {
+            softmax_rows<AB, 32u>(pc, flags, stage, local, group);
+        } else if (row < pc.m) {
+            softmax<AB>(pc, flags, stage, row, local);     /* the one-row loop, softmax_long */
         }
     }
+}
+
+/* The whole-row softmax on 256 threads (attention.comp built with ROW_LANES=256): the same
+ * 8 KB serving eight simdgroups instead of one. libmetalmx routes only those rows here. */
+kernel void attention_rows(constant Push &pc [[buffer(0)]],
+                           uint local [[thread_index_in_threadgroup]],
+                           uint3 group3 [[threadgroup_position_in_grid]]) {
+    threadgroup float stage[32 * 64];
+    softmax_rows<false, 256u>(pc, operation_flags(pc), stage, local, group3.x);
 }
 
 template [[host_name("attention")]]    kernel void attention_t<false>(constant Push &, uint, uint3);

@@ -243,6 +243,62 @@ def main():
         check("second extent: bit-identical after the rebuild", np.array_equal(c_small, py_small))
         c_again = native.update(colour)
         check("back to the first extent: bit-identical again", np.array_equal(c_again, py_out))
+        # 7. min_extent: the graph's own floor, 128, where the bottleneck is 16 tokens on the
+        #    32-row paths (the staged 32-row builds, the 32-row pad, global attention)
+        for floor in (128, 256):
+            g3 = nr_frame.network_geometry(width, height, minimum=floor)
+            H3, W3 = g3.network_height, g3.network_width
+            check(f"min_extent {floor}: network extent",
+                  nr_frame_native.geometry(height, width, floor) == (H3, W3), f"{H3}x{W3}")
+            c3 = native.features(colour, min_extent=floor)
+            py3 = nr_frame.build_features(colour, geometry=g3, **values)
+            check(f"min_extent {floor}: features channels 3-15 bit-identical",
+                  c3.shape == py3.shape and np.array_equal(c3[..., 3:], py3[..., 3:]))
+            _, c3_head = native.update(colour, want_head=True, min_extent=floor)
+            check(f"min_extent {floor}: head bit-identical to the Python resident path",
+                  np.array_equal(c3_head, g3.crop(backend.run_features(c3))))
+        check("min_extent 0 is the vendor's 320", nr_frame_native.geometry(height, width, 0) == (H, W))
+
+        # 8. the daemon's end of a frame: the head at a render scale brought up, composed and
+        #    encoded in one pass, against nr_frame.compose_encode
+        small_head = rng.normal(0, 1, (height * 3 // 5, width * 3 // 5, 4)).astype(np.float32)
+        request = rng.integers(0, 256, (height + 6, width + 10, 4), dtype=np.uint8)
+        hold, levels = 0.6, 16.0
+        cases = [("still", {}, {}),
+                 ("still, intensity 1.66", {"intensity": 1.66}, {"intensity": 1.66}),
+                 ("history", {"history": history}, {"history": history}),
+                 ("history, floor and release",
+                  {"history": history, "previous": previous, "hold": hold,
+                   "slope": float(np.float32(-255.0 * hold / nr_frame.HOLD_RAMP)),
+                   "release": nr_frame.release_slope(levels)},
+                  {"history": history, "history_previous": previous, "history_hold": hold,
+                   "history_release": levels}),
+                 ("history, control mask, confidence 0.5",
+                  {"history": history, "control_mask": mask, "history_confidence": 0.5},
+                  {"history": history, "control_mask": mask, "history_confidence": 0.5})]
+        for name, c_args, py_args in cases:
+            c_enc, py_enc = request.copy(), request.copy()
+            c_args = dict(c_args)
+            c_hist, c_prev, c_mask = (c_args.pop(k, None) for k in ("history", "previous", "control_mask"))
+            c_out = native.compose_encode(small_head, colour, c_enc, top=3, left=5, bgra=True,
+                                          history=c_hist, previous=c_prev, control_mask=c_mask, **c_args)
+            py_out = nr_frame.compose_encode(small_head, colour, py_enc, top=3, left=5, bgra=True,
+                                             **py_args)
+            check(f"compose_encode, {name}: composition and bytes bit-identical",
+                  py_out is not None and np.array_equal(c_out, py_out) and np.array_equal(c_enc, py_enc))
+        # where the detail split is not a no-op, the separate passes, the same bytes
+        c_enc = request.copy()
+        c_out = native.compose_encode(small_head, colour, c_enc, top=3, left=5, bgra=True,
+                                      detail_strength=1.5, colour_strength=0.0)
+        up = nr_image.bilinear(small_head, (height, width))
+        want = native.compose(up, colour, detail_strength=1.5, colour_strength=0.0)
+        want_enc = request.copy()
+        want_enc[3:3 + height, 5:5 + width] = np.frombuffer(
+            nr_image.encode8(want, request[3:3 + height, 5:5 + width].tobytes(), True),
+            np.uint8).reshape(height, width, 4)
+        check("compose_encode with the detail split: the separate passes, bit for bit",
+              np.array_equal(c_out, want) and np.array_equal(c_enc, want_enc))
+
         split = native.split
         print(f"  last run: write {split[0] * 1e3:.1f} ms, graph {split[1] * 1e3:.1f} ms, "
               f"read {split[2] * 1e3:.1f} ms")
