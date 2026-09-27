@@ -125,6 +125,45 @@ def network_geometry(width, height, minimum=VENDOR_MINIMUM_EXTENT):
 # MLX-DLSS's own pipeline and temporal session ask `vendor_aligned` for their field, and their
 # answer — a multiple of 64 — is theirs, not the vendor's; in this tree it is the vendor's.
 NetworkGeometry.vendor_aligned = classmethod(lambda cls, width, height: network_geometry(width, height))
+
+
+_EXTENTS: dict = {}
+
+
+def render_extent(width, height, scale, minimum=VENDOR_MINIMUM_EXTENT):
+    """The frame the network is handed for a `width` x `height` picture at render `scale`, as
+    (width, height): of all the frames at least the scale's own, aspect kept, the one on the
+    cheapest network field — and of those the largest.
+
+    The graph runs on the field, not on the frame: a frame smaller than the field is mirrored
+    out to it, and every frame on the same field costs the same. On a small window the field
+    is held at `minimum` a side, and there a low scale bought no speed and handed the network
+    mostly its own mirror image — 640x360 at 0.35 is 224x126 in a 320x320 field, 28 % of it
+    the picture, and the pass came out a quarter weaker than at 0.5, on the same field in the
+    same time. And the vendor's field is not monotonic in the frame: 800x450 at 0.35 is
+    280x158, whose width aligns to 384, where 0.4's 320x180 lands on 320x320 — the lower scale
+    was the slower. Now 640x360 runs as 0.5 for any scale up to it and 800x450 at 0.35 as 0.4,
+    a lower scale is never the slower, and where a scale already fills its field — 1280x720
+    and up — nothing moves.
+    """
+    key = (int(width), int(height), float(scale), int(minimum))
+    if key in _EXTENTS:
+        return _EXTENTS[key]
+    if scale >= 1.0:
+        best = (int(width), int(height))
+    else:
+        def cost(w, h):
+            geometry = network_geometry(w, h, minimum=minimum)
+            return geometry.network_width * geometry.network_height
+        best = (max(64, round(width * scale)), max(64, round(height * scale)))
+        cheapest = cost(*best)
+        for w in range(best[0] + 1, int(width) + 1):
+            candidate = (w, max(64, round(height * w / width)))
+            price = cost(*candidate)
+            if price <= cheapest:
+                best, cheapest = candidate, price
+    _EXTENTS[key] = best
+    return best
 # The three noise channels depend on the extent and the frame index and on nothing else,
 # and both callers copy the result into a slice rather than writing through it. In a live
 # mode the frame index does not move — the daemon never sets one — so the same array was
@@ -336,6 +375,90 @@ def controls(profile="standard", style_index=None, local_tone=None,
     return values
 
 
+# The colour grade the vendor applies after the network for each style: an exposure in
+# EV, a smoothstep contrast and a saturation offset, each the preset times the local tone
+# strength clamped to [0, 1]. Read out of the DLL itself — the per-style table at
+# 0x1800b0de4 (style 1's mask 0x34 is exposure, contrast and saturation, style 2's 0x20
+# saturation alone), its lerp from neutral at 0x18001d5f0, and the operator in
+# `cg2r_post_process_kernel` (`notes/phase70-post-process.md`). Style 0 has no entry and
+# no grade. The hosts that name the styles call 1 `natural` and 2 `cinematic`.
+STYLE_GRADES = {1: (-0.1, -0.25, -0.1), 2: (0.0, 0.0, -0.15)}
+
+
+def grade_for(normalized_style=0.0, local_tone_strength=1.0, **_):
+    """The grade a set of conditioning scalars asks for, as the three float32 factors
+    `style_grade` takes — the exposure as a multiplier, the contrast, the saturation as a
+    multiplier — or None where there is none. The vendor scales the preset in float32 and
+    skips its pass when every value is neutral, which is a tone of 0."""
+    preset = STYLE_GRADES.get(int(round(float(normalized_style) * 128)))
+    tone = np.float32(min(max(float(local_tone_strength), 0.0), 1.0))
+    if preset is None or tone == 0:
+        return None
+    exposure, contrast, saturation = (np.float32(value) * tone for value in preset)
+    return (np.float32(2.0 ** float(exposure)), np.float32(contrast),
+            saturation + np.float32(1.0))
+
+
+_THIRD, _SIXTH, _TWO_THIRDS = np.float32(1 / 3), np.float32(1 / 6), np.float32(2 / 3)
+
+
+def _hue_channel(p, q, t):
+    t = np.where(t < 0, t + np.float32(1), t)
+    t = np.where(t > 1, t - np.float32(1), t)
+    rising = p + t * ((q - p) * np.float32(6))
+    falling = p + (_TWO_THIRDS - t) * (q - p) * np.float32(6)
+    return np.where(t < _SIXTH, rising,
+                    np.where(t < np.float32(0.5), q, np.where(t < _TWO_THIRDS, falling, p)))
+
+
+def style_grade(rgb, grade):
+    """`cg2r_post_process_kernel`'s grade on RGB in [0, 1], for the parameters a style
+    sets. Per channel an exposure and a smoothstep contrast; then in HSL a saturation
+    multiplier. The kernel's other stages — levels, temperature and tint, a five-zone tone
+    curve, a gamma and a saturation power — are identities at the values no style changes
+    and are left out; the vendor evaluates two of them as `ex2(lg2(x))`, which the
+    hardware's approximations make a 1e-7 wobble rather than an identity. The operations
+    and their order are `nr_image.c`'s `style_grade`, so the two are the same bytes."""
+    exposure, contrast, saturation = grade
+    c = np.clip(np.asarray(rgb, dtype=np.float32), 0, 1)
+    c = np.clip(c * exposure, 0, 1)
+    c = np.clip(c + contrast * (c * c * (np.float32(3) - (c + c)) - c), 0, 1)
+    r, g, b = c[..., 0], c[..., 1], c[..., 2]
+    high = np.maximum(np.maximum(r, g), b)
+    low = np.minimum(np.minimum(r, g), b)
+    light = (high + low) * np.float32(0.5)
+    delta = high - low
+    grey = ~(high > low)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        chroma = np.where(light > np.float32(0.5), delta / ((np.float32(2) - high) - low),
+                          delta / (high + low))
+        hue = np.where(high == r,
+                       ((g - b) / delta + np.where(g < b, np.float32(6), np.float32(0)))
+                       / np.float32(6),
+                       np.where(high == g, ((b - r) / delta + np.float32(2)) / np.float32(6),
+                                ((r - g) / delta + np.float32(4)) / np.float32(6)))
+    chroma = np.clip(np.where(grey, np.float32(0), chroma) * saturation, 0, 1)
+    hue = np.where(grey, np.float32(0), hue)
+    q = np.where(light < np.float32(0.5), light * (chroma + np.float32(1)),
+                 (light + chroma) - light * chroma)
+    p = (light + light) - q
+    out = np.stack((_hue_channel(p, q, hue + _THIRD), _hue_channel(p, q, hue),
+                    _hue_channel(p, q, hue - _THIRD)), axis=-1)
+    out = np.where((chroma <= 0)[..., None], light[..., None], out)
+    return np.clip(out, 0, 1).astype(np.float32)
+
+
+def truncate_half(value):
+    """float32 toward zero onto the half grid: what the vendor's RGBA16F history keeps of
+    the prediction, as OpenDLSS-NR captured it — truncated, not rounded."""
+    value = np.asarray(value, dtype=np.float32)
+    bits = value.view(np.uint32)
+    kept = (bits & np.uint32(0xFFFFE000)).view(np.float32)
+    small = np.floor(np.abs(value) * np.float32(2 ** 24)) / np.float32(2 ** 24)
+    return np.where((bits & np.uint32(0x7FFFFFFF)) >= np.uint32(0x38800000), kept,
+                    np.copysign(small, value)).astype(np.float32)
+
+
 class ResidentBackend:
     """Runs the graph on the GPU, keeping activations in device buffers.
 
@@ -434,10 +557,22 @@ def run_head(model, color, *, profile="standard", frame_index=0, style_index=Non
     return geometry.crop(head), time.perf_counter() - started
 
 
+def _vendor_prediction(predicted, grade, neural):
+    """The prediction after the history's blend, as the vendor goes on with it: kept in
+    `neural` truncated to half, and that half graded — or untouched without either."""
+    if grade is None and neural is None:
+        return predicted
+    kept = truncate_half(predicted)
+    if neural is not None:
+        np.copyto(neural, kept)
+    return predicted if grade is None else style_grade(kept, grade)
+
+
 def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=1.0,
             detail_radius=4.0, control_mask=None, history=None,
             history_confidence=1.0, history_floor=None, history_previous=None,
-            history_hold=0.0, history_release=0.0, blend_scale=BLEND_SCALE):
+            history_hold=0.0, history_release=0.0, blend_scale=BLEND_SCALE,
+            grade=None, neural=None):
     """The head over the frame. Post-network and cheap: sweep it without re-running.
 
     With a `history` image this is MLX-DLSS's `compose_temporal` instead of its
@@ -475,6 +610,13 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
     (`notes/phase30-control-atlas.md`). At or below 1 this is bit-identical to the
     clamped path — the extrapolation only replaces the final blend, and the residual,
     its half rounding and the [0,1] clamp on the result are unchanged.
+
+    `grade`, from `grade_for`, is the vendor's colour grade for a style, and `neural`, an
+    array of the colour's shape, receives what the vendor keeps as the next frame's
+    history: the prediction after the history's blend and before the grade, the intensity
+    or anything else, truncated to half. The grade reads that same half value, as the
+    vendor's post-process reads it back out of its RGBA16F scratch
+    (`notes/phase70-post-process.md`). With neither, nothing here changes by a bit.
     """
     composed = None
     if history is not None or intensity > 1.0:
@@ -504,7 +646,8 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
                     slope=(float(np.float32(-255.0 * history_hold / HOLD_RAMP))
                            if previous is not None else 0.0),
                     table=gate_table(float(blend_scale)), confidence=confidence,
-                    release=slope_release if previous is not None else 0.0)
+                    release=slope_release if previous is not None else 0.0,
+                    grade=grade, neural=neural)
             if previous is not None and history_floor is None and composed is None:
                 history_floor = hold_floor(color, previous, history_hold)
             alpha = (history_weight(head, blend_scale=blend_scale)
@@ -519,14 +662,16 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
             if composed is None and nr_image is not None:
                 composed = nr_image.compose_temporal(
                     head, color, history, None, alpha, control_mask,
-                    intensity=intensity, blend_scale=blend_scale, hold=0.0, slope=0.0)
+                    intensity=intensity, blend_scale=blend_scale, hold=0.0, slope=0.0,
+                    grade=grade, neural=neural)
         elif nr_image is not None and control_mask is None:
-            composed = nr_image.compose(head, color, intensity)
+            composed = nr_image.compose(head, color, intensity, grade=grade, neural=neural)
         if composed is None:
             residual = features_mod.half(head[..., :3]) * np.float32(0.25)
             predicted = np.clip(color + residual, 0, 1)
             if history is not None:
                 predicted += alpha * (history - predicted)
+            predicted = _vendor_prediction(predicted, grade, neural)
             blend = np.float32(intensity)
             if control_mask is not None:
                 blend = np.asarray(control_mask, dtype=np.float32)[..., :1] * blend
@@ -537,7 +682,19 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
         # only reached above 1, so photo mode and every cut paid 3.9 ms of NumPy at
         # 512x288 for the same bytes.
         if nr_image is not None and control_mask is None:
-            composed = nr_image.compose(head, color, intensity)
+            composed = nr_image.compose(head, color, intensity, grade=grade, neural=neural)
+        if composed is None and (grade is not None or neural is not None):
+            # compose_head, with the prediction the vendor keeps and grades in the middle
+            head = np.asarray(head, dtype=np.float32)
+            color = np.asarray(color, dtype=np.float32)
+            predicted = np.clip(color + features_mod.half(head[..., :3]) * np.float32(0.25),
+                                0, 1)
+            predicted = _vendor_prediction(predicted, grade, neural)
+            blend = np.float32(intensity)
+            if control_mask is not None:
+                blend = np.asarray(control_mask, dtype=np.float32)[..., :1] * blend
+            blend = np.clip(blend, 0, 1)
+            composed = np.clip(color + blend * (predicted - color), 0, 1).astype(np.float32)
         if composed is None:
             composed = compose_head(head, color, control_mask=control_mask,
                                     intensity=intensity)
@@ -548,7 +705,7 @@ def compose(head, color, *, intensity=1.0, detail_strength=1.0, colour_strength=
 def compose_encode(head, color, encoded, *, top=0, left=0, bgra=True, intensity=1.0,
                    control_mask=None, history=None, history_confidence=1.0,
                    history_previous=None, history_hold=0.0, history_release=0.0,
-                   blend_scale=BLEND_SCALE, samples=None):
+                   blend_scale=BLEND_SCALE, samples=None, grade=None, neural=None):
     """`compose` of the head brought up to the colour's size, encoded into `encoded` at
     (`top`, `left`), in one native pass; `None` where that pass does not apply, and then
     nothing has been written.
@@ -558,14 +715,15 @@ def compose_encode(head, color, encoded, *, top=0, left=0, bgra=True, intensity=
     without a control mask, or a still frame without one, at detail and colour strength 1
     — where `compose_detail` hands the composition back untouched. The parameters are
     derived exactly as `compose`'s native branches derive them. With `samples`, a step,
-    returns `(composition, head samples)` — see `nr_image.compose_encode`.
+    returns `(composition, head samples)` — see `nr_image.compose_encode`. `grade` and
+    `neural` are `compose`'s.
     """
     if nr_image is None or (history is None and control_mask is not None):
         return None
     if history is None:
         return nr_image.compose_encode(head, color, None, None, None, encoded, top=top,
                                        left=left, bgra=bgra, intensity=intensity,
-                                       samples=samples)
+                                       samples=samples, grade=grade, neural=neural)
     previous = (history_previous if history_previous is not None
                 and (history_hold > 0 or history_release > 0) else None)
     confidence = (float(np.clip(np.float32(history_confidence), 0, 1))
@@ -578,16 +736,19 @@ def compose_encode(head, color, encoded, *, top=0, left=0, bgra=True, intensity=
                if previous is not None else 0.0),
         table=gate_table(float(blend_scale)), confidence=confidence,
         release=release_slope(history_release) if previous is not None else 0.0,
-        samples=samples)
+        samples=samples, grade=grade, neural=neural)
 
 
 def run_frame(model, color, *, intensity=1.0, detail_strength=1.0, colour_strength=1.0,
               detail_radius=4.0, control_mask=None, **head_options):
-    """color: (H, W, 3) float32 in [0,1] -> (H, W, 3) float32."""
+    """color: (H, W, 3) float32 in [0,1] -> (H, W, 3) float32, with the style's grade."""
     head, elapsed = run_head(model, color, control_mask=control_mask, **head_options)
+    grade = grade_for(**controls(head_options.get("profile", "standard"),
+                                 head_options.get("style_index"), head_options.get("local_tone"),
+                                 head_options.get("local_structure")))
     output = compose(head, color, intensity=intensity, detail_strength=detail_strength,
                      colour_strength=colour_strength, detail_radius=detail_radius,
-                     control_mask=control_mask)
+                     control_mask=control_mask, grade=grade)
     return output, head, elapsed
 
 
@@ -679,12 +840,17 @@ def main():
     if backend is not None:
         print(backend.report())
     print(f"head    min {head.min():+.4f} max {head.max():+.4f} sd {head.std():.4f}")
+    grade = grade_for(**controls(args.profile, args.style_index, args.local_tone,
+                                 args.local_structure))
+    if grade is not None:
+        print(f"style grade: exposure x{grade[0]:.4f}, contrast {grade[1]:+.3f}, "
+              f"saturation x{grade[2]:.3f}")
 
     def emit(path, intensity):
         output = compose(head, color, intensity=intensity,
                          detail_strength=args.detail_strength,
                          colour_strength=args.colour_strength,
-                         detail_radius=args.detail_radius, control_mask=mask)
+                         detail_radius=args.detail_radius, control_mask=mask, grade=grade)
         residual = output - color
         print(f"intensity {intensity:5.2f}  change mean|d| {np.abs(residual).mean():.5f} "
               f"max|d| {np.abs(residual).max():.5f}")

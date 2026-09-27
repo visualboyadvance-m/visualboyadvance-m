@@ -144,9 +144,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--size", nargs=2, type=int, default=(768, 1280))
     parser.add_argument("--runs", type=int, default=3)
+    parser.add_argument("--tables", action="store_true",
+                        help="print the kind tables read from the shaders and stop; `make test` "
+                             "runs this, so a kind two shaders share fails there, not at the "
+                             "next profile")
     parser.add_argument("--calls", type=int, default=0, metavar="N",
                         help="also list the N most expensive call sites")
     args = parser.parse_args()
+    if args.tables:
+        for family, table in (("unary", UNARY), ("row", ROW)):
+            print(family + ": " + ", ".join(f"{k} {v}" for k, v in sorted(table.items())))
+        return
     height, width = args.size
 
     model = nr_model.NeuralRenderingModel.from_safetensors(

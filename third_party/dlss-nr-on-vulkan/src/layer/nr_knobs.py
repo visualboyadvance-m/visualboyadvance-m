@@ -22,13 +22,15 @@ KNOBS = (
         "The only knob that changes the frame rate. The network draws its detail on a "
         "frame this much smaller; the detail is then scaled up and laid over the game's "
         "full-resolution frame, so the game's own pixels are never resampled. Lower is "
-        "faster and draws coarser detail. The network never runs below 320 pixels on a "
-        "side, so on a small window the low scales all cost the same: at 512x288, "
-        "everything up to about 0.6 runs the same 320x320 network. For play, 0.35-0.6 is "
-        "the useful range. For screenshots, 1.0 hands the network the game's raw pixels, "
-        "jagged edges and all, and it turns a little of them into pixel-level grain; 0.9 "
-        "smooths them first and draws the same strength of effect. "
-        "Cost on an Arc 140V: about 9 ms plus 162 ms per megapixel of network frame.",
+        "faster and draws coarser detail, at about the same strength. The network's frame "
+        "is never smaller than 320 pixels a side (`min_extent`), so on a small window a low "
+        "scale is raised, at no cost, to fill the cheapest frame it lands on: 640x360 runs "
+        "as 0.5 for anything up to 0.5, 800x450 as 0.4 for anything up to 0.4, and a lower "
+        "scale is never the slower one. For play, 0.35-0.6 is the useful range. For "
+        "screenshots, 1.0 hands the network the game's raw pixels, jagged edges and all, "
+        "and it turns a little of them into pixel-level grain; 0.9 smooths them first and "
+        "draws the same strength of effect. Cost on an Arc 140V: about 130 ms per megapixel "
+        "of network frame, plus 10-20 ms that grows with the game's own resolution.",
     ),
     Knob(
         "min_extent", "min extent", "number", 128.0, 320.0, 64.0, 320.0,
@@ -43,14 +45,16 @@ KNOBS = (
     ),
     Knob(
         "profile", "profile", "choice", None, None, None, "standard",
-        "which way to trade skin texture against highlights and colour",
-        "The style the network is asked for. The profiles are a trade, not a quality "
-        "ladder: what one adds to skin and surface texture it takes from highlights and "
-        "colour. `standard` is the default and adds the most texture; `natural` and "
-        "`cinematic` keep more of the highlights and colour, and on very bright scenes "
-        "`cinematic` can smooth fine detail rather than add it. `neutral` all but switches "
-        "the effect off. The profile is an input to the network, so it takes effect on the "
-        "next frame the network draws; the knobs below act after it.",
+        "which way to trade skin texture against highlights, and its colour grade",
+        "The style the network is asked for, and the colour grade that comes with it. The "
+        "profiles are a trade, not a quality ladder: what one adds to skin and surface "
+        "texture it takes from highlights. `standard` is the default and adds the most "
+        "texture; `natural` and `cinematic` keep more of the highlights, and on very bright "
+        "scenes `cinematic` can smooth fine detail rather than add it. After the network, "
+        "as NVIDIA grades them, `natural` comes out a little darker, flatter and less "
+        "saturated and `cinematic` less saturated. `neutral` all but switches the effect "
+        "off. The profile is an input to the network, so it takes effect on the next frame "
+        "the network draws; the knobs below act after it.",
     ),
     Knob(
         "intensity", "intensity", "number", 0.0, 2.0, 0.05, 1.0,

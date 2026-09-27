@@ -317,6 +317,111 @@ def fused_checks(rng):
     check(f"fused pass: {cases} cases", cases == 48)
 
 
+def grade_checks(rng):
+    """The vendor's style grade and the history it keeps (`nr_frame.compose`'s `grade` and
+    `neural`), native against NumPy: the grade's own edge cases — greys, primaries, hues
+    on the boundaries of its six segments, 0 and 1 — through a head of zero, then random
+    frames still and temporal, masked, at three intensities and three grades."""
+    grades = [nr_frame.grade_for(1 / 128, 1.0), nr_frame.grade_for(2 / 128, 1.0),
+              nr_frame.grade_for(1 / 128, 0.37)]
+    check("grades: natural and cinematic from the DLL's table, none for style 0 or tone 0",
+          grades[0] is not None and grades[1] is not None
+          and nr_frame.grade_for(0.0, 1.0) is None and nr_frame.grade_for(1 / 128, 0.0) is None)
+    special = [(0, 0, 0), (1, 1, 1), (0.5, 0.5, 0.5), (1, 0, 0), (0, 1, 0), (0, 0, 1),
+               (1, 1, 0), (0, 1, 1), (1, 0, 1), (1, 0.5, 0), (0.5, 1, 0), (0, 1, 0.5),
+               (0, 0.5, 1), (0.5, 0, 1), (1, 0, 0.5), (0.2, 0.2, 0.2001), (0.9, 0.3, 0.3),
+               (0.25, 0.75, 0.5), (1.0, 0.999, 0.998), (0.001, 0.0, 0.0005)]
+    edge = np.array(special, np.float32)
+    edge = np.concatenate([edge, rng.random((236, 3), dtype=np.float32)]).reshape(16, 16, 3)
+    zero = np.zeros((16, 16, 3), np.float32)
+    for grade in grades:
+        kept = np.empty(edge.shape, np.float32)
+        wanted = np.empty(edge.shape, np.float32)
+        with numpy_only():
+            reference = nr_frame.compose(zero, edge, grade=grade, neural=wanted)
+        same(f"grade {tuple(float(v) for v in grade)} on its edge cases",
+             nr_image.compose(zero, edge, 1.0, grade=grade, neural=kept), reference)
+        same("  and the history it keeps", kept, wanted)
+        same("  the grade itself", nr_frame.style_grade(nr_frame.truncate_half(edge), grade),
+             nr_frame.style_grade(nr_frame.truncate_half(edge), grade))
+    height, width = 40, 64
+    colour = rng.random((height, width, 3), dtype=np.float32)
+    history = nr_frame.truncate_half(rng.random((height, width, 3), dtype=np.float32))
+    previous = colour.copy()
+    previous[8:16] = rng.random((8, width, 3), dtype=np.float32)
+    head = (rng.random((height, width, 4), dtype=np.float32) - 0.5).astype(np.float32) * 2
+    mask = np.ones((height, width, 3), np.float32)
+    mask[20:30, 5:25, 0] = 0.0
+    cases = 0
+    for grade in (None, *grades):
+        for temporal in (False, True):
+            for intensity, control in ((1.0, None), (0.6, None), (1.66, None), (1.0, mask)):
+                options = dict(intensity=intensity, control_mask=control, grade=grade)
+                if temporal:
+                    options.update(history=history, history_previous=previous,
+                                   history_hold=1.0, history_release=24.0)
+                kept = np.empty(colour.shape, np.float32)
+                wanted = np.empty(colour.shape, np.float32)
+                with numpy_only():
+                    reference = nr_frame.compose(head, colour, neural=wanted, **options)
+                name = (f"{'temporal' if temporal else 'still'} composition, grade "
+                        f"{'none' if grade is None else tuple(float(v) for v in grade)}, "
+                        f"intensity {intensity:g}{', masked' if control is not None else ''}")
+                same(name, nr_frame.compose(head, colour, neural=kept, **options), reference)
+                same(name + ", history kept", kept, wanted)
+                cases += 1
+                if grade is None:
+                    # nothing asked of the history, the composition is what it always was
+                    with numpy_only():
+                        plain = nr_frame.compose(head, colour, **dict(options, grade=None))
+                    same(name + ", unchanged by keeping the history", reference, plain)
+    check(f"grade and history: {cases} cases", cases == 32)
+
+
+def fused_grade_checks(rng):
+    """The fused pass keeps the history on its fast rows and grades on its general loop;
+    both against the separate passes."""
+    frame_h, frame_w = 36, 52
+    cases = 0
+    for (top, bottom, left, right), (head_h, head_w), bgra in (
+            ((0, 36, 0, 52), (12, 18), True), ((4, 32, 2, 50), (28, 48), False)):
+        raw = rng.integers(0, 256, (frame_h, frame_w, 4), dtype=np.uint8)
+        fmt = 44 if bgra else 37
+        whole = nr_daemon.decode(raw.tobytes(), frame_w, frame_h, fmt)
+        colour = whole[top:bottom, left:right]
+        height, width = colour.shape[:2]
+        history = nr_frame.truncate_half(rng.random((height, width, 3), dtype=np.float32))
+        previous = colour.copy()
+        previous[: height // 3] = rng.random((height // 3, width, 3), dtype=np.float32)
+        network = ((rng.random((head_h + 4, head_w + 4, 16), dtype=np.float32) - 0.5) * 2)
+        head = network[2:2 + head_h, 1:1 + head_w]
+        for grade in (None, nr_frame.grade_for(1 / 128, 1.0), nr_frame.grade_for(2 / 128, 1.0)):
+            for temporal, intensity in ((True, 1.0), (True, 0.6), (False, 1.0), (False, 1.66)):
+                channels = 4 if temporal else 3
+                up = nr_daemon.resample(head[..., :channels], (height, width))
+                options = dict(intensity=intensity, grade=grade)
+                if temporal:
+                    options.update(history=history, history_previous=previous,
+                                   history_hold=1.0, history_release=24.0)
+                wanted = np.empty(colour.shape, np.float32)
+                reference = nr_frame.compose(up, colour, neural=wanted, **options)
+                full = whole.copy()
+                full[top:bottom, left:right] = reference
+                expected = nr_daemon.encode(full, raw.tobytes(), fmt)
+                encoded = raw.copy()
+                kept = np.empty(colour.shape, np.float32)
+                fused = nr_frame.compose_encode(head[..., :channels], colour, encoded, top=top,
+                                                left=left, bgra=bgra, neural=kept, **options)
+                name = (f"fused pass with the history kept, region {top}:{bottom}x{left}:{right},"
+                        f" {'temporal' if temporal else 'still'}, intensity {intensity:g}, grade "
+                        f"{'none' if grade is None else tuple(float(v) for v in grade)}")
+                same(name + ", composition", fused, reference)
+                same(name + ", bytes", encoded.tobytes(), expected)
+                same(name + ", history", kept, wanted)
+                cases += 1
+    check(f"fused pass with grade and history: {cases} cases", cases == 24)
+
+
 def main():
     if nr_image.library() is None:
         print("  no work/libnr_image.so (.dylib on macOS) — `make` builds it; the NumPy path still runs")
@@ -328,6 +433,8 @@ def main():
     half_checks()
     compose_checks(rng)
     fused_checks(rng)
+    grade_checks(rng)
+    fused_grade_checks(rng)
     if FAILURES:
         print(f"\n{len(FAILURES)} FAILED: " + ", ".join(FAILURES), flush=True)
         return 1

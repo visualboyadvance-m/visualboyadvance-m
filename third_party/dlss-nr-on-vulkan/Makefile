@@ -160,7 +160,7 @@ work/MoltenVK_icd.json: Makefile | work
 # selects and vectorise the fused composition's pixels (`compose_encode_row`).
 work/libnr_image$(SO): src/ref/nr_image.c src/ref/nr_image.h Makefile | work
 	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
-	      -fno-trapping-math -pthread -shared -o $@ $<
+	      -fno-trapping-math -pthread -shared -o $@ $< -lm
 
 # nr_frame.py as a C library: the feature assembly, the whole graph recorded against
 # libxmx (reached by dlopen from this directory), and the composition. The image passes
@@ -318,6 +318,8 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/layer/test_panel.py
 	$(PYTHON) src/tools/publish_check.py
 	$(PYTHON) src/tools/claims_check.py
+	$(PYTHON) src/tools/build_check.py
+	$(PYTHON) src/bench/frame_profile.py --tables
 	$(PYTHON) src/gpu/test_portable.py
 	XMX_PORTABLE=1 $(PYTHON) src/gpu/test_portable.py
 	$(PYTHON) src/gpu/test_epilogue.py

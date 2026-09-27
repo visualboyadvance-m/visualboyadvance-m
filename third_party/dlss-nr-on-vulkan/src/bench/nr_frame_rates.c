@@ -181,20 +181,15 @@ static double median(double *values, int count)
     return values[count / 2];
 }
 
-/* The daemon's `max(64, round(extent * scale))`; Python rounds half to even, as rint does. */
-static int scaled(int extent, float scale)
-{
-    int v = (int)rint((double)extent * (double)scale);
-    return v < 64 ? 64 : v;
-}
-
 typedef struct { double middle, low, high; int with_history; } result;
 
 static result measure(nr_frame *frame, const plan_case *pc, const options *o)
 {
     int width = pc->width, height = pc->height;
     int iw = width, ih = height;
-    if (pc->scale < 1.0f) { iw = scaled(width, pc->scale); ih = scaled(height, pc->scale); }
+    /* the daemon's inner frame: the scale's own, or the largest on the same network field
+     * (`nr_frame.render_extent`) */
+    if (pc->scale < 1.0f) nr_frame_render_extent(width, height, pc->scale, o->min_extent, &iw, &ih);
     size_t pixels = (size_t)width * height, inner_pixels = (size_t)iw * ih;
     int total = o->frames + o->warmup;
 
@@ -238,9 +233,11 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
     float *head = alloc(pixels * 4 * sizeof(float));
     float *output = alloc(pixels * 3 * sizeof(float));
     float *history_inner = alloc(inner_pixels * 3 * sizeof(float));
-    /* what History keeps: the output the game was handed, the inner source for the cut
-     * test, the game's own frame for the floor and the release */
+    /* what History keeps: the vendor's history — the prediction before the grade and the
+     * intensity, truncated to half (`nr_frame_compose_encode_neural`) — the inner source for
+     * the cut test, the game's own frame for the floor and the release */
     float *kept_output = alloc(pixels * 3 * sizeof(float));
+    float *neural = alloc(pixels * 3 * sizeof(float));
     float *kept_source = alloc(inner_pixels * 3 * sizeof(float));
     float *kept_pixels = alloc(pixels * 3 * sizeof(float));
     int have_history = 0;
@@ -287,8 +284,9 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
              * encoded into a copy of the request ("up" is that copy) */
             memcpy(encoded, payloads[i], pixels * 4);
             t[4] = nr_now();
-            if (nr_frame_compose_encode(frame, head_inner, ih, iw, colour, height, width, h_full, h_prev,
-                                        NULL, &p, output, encoded, width, 0, 0, 1)) {
+            if (nr_frame_compose_encode_neural(frame, head_inner, ih, iw, colour, height, width, h_full,
+                                               h_prev, NULL, &p, output, encoded, width, 0, 0, 1,
+                                               temporal ? neural : NULL)) {
                 fprintf(stderr, "nr_frame_compose_encode: %s\n", nr_frame_error());
                 exit(1);
             }
@@ -298,7 +296,8 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
             const float *full_head = head_inner;
             if (ih != height || iw != width) { resample(&up, head_inner, head); full_head = head; }
             t[4] = nr_now();
-            if (nr_frame_compose(frame, full_head, colour, height, width, h_full, h_prev, NULL, &p, output)) {
+            if (nr_frame_compose_neural(frame, full_head, colour, height, width, h_full, h_prev, NULL, &p,
+                                        output, temporal ? neural : NULL)) {
                 fprintf(stderr, "nr_frame_compose: %s\n", nr_frame_error());
                 exit(1);
             }
@@ -308,7 +307,7 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
         }
         if (temporal) {
             /* History.keep; the daemon keeps references, a copy here is outside the clock */
-            memcpy(kept_output, output, pixels * 3 * sizeof(float));
+            memcpy(kept_output, neural, pixels * 3 * sizeof(float));
             memcpy(kept_source, net_in, inner_pixels * 3 * sizeof(float));
             memcpy(kept_pixels, colour, pixels * 3 * sizeof(float));
             have_history = 1;
@@ -343,7 +342,7 @@ static result measure(nr_frame *frame, const plan_case *pc, const options *o)
     free(payloads); free(times);
     free_resampler(&down); free_resampler(&up); free_resampler(&history_down);
     free(colour); free(inner); free(head_inner); free(head); free(output); free(history_inner);
-    free(kept_output); free(kept_source); free(kept_pixels); free(encoded);
+    free(kept_output); free(neural); free(kept_source); free(kept_pixels); free(encoded);
     return r;
 }
 

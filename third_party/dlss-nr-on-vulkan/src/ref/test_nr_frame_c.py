@@ -299,6 +299,95 @@ def main():
         check("compose_encode with the detail split: the separate passes, bit for bit",
               np.array_equal(c_out, want) and np.array_equal(c_enc, want_enc))
 
+        # 9. the vendor's post-process (notes/phase70): the style's grade, which the C takes
+        #    from the parameters, and the history it keeps, through each composition path
+        grades_agree = True
+        for style in (0, 1, 2, 3):
+            for tone in (1.0, 0.37, 1.8, 0.0, -0.5):
+                c_g = nr_frame_native.grade(normalized_style=style / 128, local_tone=tone)
+                py_g = nr_frame.grade_for(normalized_style=style / 128, local_tone_strength=tone)
+                grades_agree &= (c_g is None) == (py_g is None) and (
+                    c_g is None or all(np.float32(a) == np.float32(b) for a, b in zip(c_g, py_g)))
+        check("grade: the C's factors are grade_for's, every style and tone", grades_agree)
+        check("grade: grade_off turns it off",
+              nr_frame_native.grade(normalized_style=1 / 128, grade_off=1) is None)
+        for style in (1, 2):
+            grade = nr_frame.grade_for(normalized_style=style / 128, local_tone_strength=0.8)
+            styled = {"normalized_style": style / 128, "local_tone": 0.8}
+            for name, c_args, py_args in (
+                    ("still", {}, {}),
+                    ("intensity 0.6", {"intensity": 0.6}, {"intensity": 0.6}),
+                    ("intensity 1.66", {"intensity": 1.66}, {"intensity": 1.66}),
+                    ("control mask", {"control_mask": mask}, {"control_mask": mask}),
+                    ("detail split", {"detail_strength": 1.5, "colour_strength": 0.0},
+                     {"detail_strength": 1.5, "colour_strength": 0.0})):
+                c_n, py_n = np.empty_like(colour), np.empty_like(colour)
+                c_o = native.compose(py_head_c, colour, neural=c_n, **styled, **c_args)
+                py_o = nr_frame.compose(py_head_c, colour, grade=grade, neural=py_n, **py_args)
+                exact = name != "detail split"      # the blur's expf, as in 4.
+                d = float(np.abs(c_o - py_o).max())
+                check(f"style {style}, {name}: graded composition "
+                      + ("bit-identical" if exact else "within 1e-6"),
+                      (d == 0.0) if exact else d <= 1e-6, f"max |d| {d:.3e}")
+                check(f"style {style}, {name}: the kept history bit-identical",
+                      np.array_equal(c_n, py_n))
+            # the temporal path: the gate's exp, so a tolerance, as in 5.
+            c_n, py_n = np.empty_like(colour), np.empty_like(colour)
+            c_o = native.compose(py_t_head, colour, history=history, previous=previous,
+                                 neural=c_n, hold=0.6, slope=-0.6 * 255 / 4,
+                                 release=slope_r, **styled)
+            py_o = nr_frame.compose(py_t_head, colour, history=history, history_previous=previous,
+                                    history_hold=0.6, history_release=16.0, grade=grade,
+                                    neural=py_n)
+            check(f"style {style}, temporal: graded composition and history within 1e-5",
+                  float(np.abs(c_o - py_o).max()) <= 1e-5 and float(np.abs(c_n - py_n).max()) <= 1e-5,
+                  f"max |d| {np.abs(c_o - py_o).max():.3e} / {np.abs(c_n - py_n).max():.3e}")
+            # update, which grades as run_frame does, and hands back the vendor's history
+            c_n, py_n = np.empty_like(colour), np.empty_like(colour)
+            c_u, c_u_head = native.update(colour, want_head=True, neural=c_n, **styled)
+            py_u = nr_frame.compose(c_u_head, colour, grade=grade, neural=py_n)
+            check(f"style {style}, update: graded and its history bit-identical",
+                  np.array_equal(c_u, py_u) and np.array_equal(c_n, py_n))
+            check(f"style {style}, update: grade_off is the ungraded frame", np.array_equal(
+                native.update(colour, grade_off=1, **styled),
+                nr_frame.compose(c_u_head, colour)))
+            # the daemon's end of the frame with a grade: fused and separate, still and temporal
+            for name, c_args, py_args in (
+                    ("still", {}, {}),
+                    ("history, floor and release",
+                     {"history": history, "previous": previous, "hold": hold,
+                      "slope": float(np.float32(-255.0 * hold / nr_frame.HOLD_RAMP)),
+                      "release": nr_frame.release_slope(levels)},
+                     {"history": history, "history_previous": previous, "history_hold": hold,
+                      "history_release": levels})):
+                c_enc, py_enc = request.copy(), request.copy()
+                c_n, py_n = np.empty_like(colour), np.empty_like(colour)
+                c_args = dict(c_args)
+                c_hist, c_prev = c_args.pop("history", None), c_args.pop("previous", None)
+                c_o = native.compose_encode(small_head, colour, c_enc, top=3, left=5, bgra=True,
+                                            history=c_hist, previous=c_prev, neural=c_n,
+                                            **styled, **c_args)
+                py_o = nr_frame.compose_encode(small_head, colour, py_enc, top=3, left=5, bgra=True,
+                                               grade=grade, neural=py_n, **py_args)
+                check(f"style {style}, compose_encode, {name}: bytes and history bit-identical",
+                      py_o is not None and np.array_equal(c_o, py_o)
+                      and np.array_equal(c_enc, py_enc) and np.array_equal(c_n, py_n))
+
+        # 10. render_extent: the network's frame at a render scale, as the daemon picks it.
+        #     The C takes the scale as float32, so the Python is handed the same value.
+        disagree = []
+        for w, h in ((640, 360), (800, 450), (512, 288), (1280, 720), (1920, 1080), (1024, 768),
+                     (854, 480), (320, 180), (1366, 768)):
+            for scale in (0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.75, 0.9, 1.0):
+                for floor in (320, 192, 128):
+                    s32 = float(np.float32(scale))
+                    want = nr_frame.render_extent(w, h, s32, floor)
+                    got = nr_frame_native.render_extent(w, h, s32, floor)
+                    if want != got:
+                        disagree.append(f"{w}x{h}@{scale}/{floor}: {got} for {want}")
+        check("render_extent: the C picks the Python's frame at 297 sizes, scales and floors",
+              not disagree, "; ".join(disagree[:4]))
+
         split = native.split
         print(f"  last run: write {split[0] * 1e3:.1f} ms, graph {split[1] * 1e3:.1f} ms, "
               f"read {split[2] * 1e3:.1f} ms")

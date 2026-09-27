@@ -1160,7 +1160,8 @@ static int named_bufferf(struct nr_frame *f, const char *fmt, int i, size_t byte
 enum { E4M3 = 0, GATE, HALF, TO_HALF, SCALE, RESIDUAL, FROM_HALF, PARTITION, REVERSE, ADD_BIAS,
        SPLIT_HEADS, MERGE_HEADS, POOL2, UPSAMPLE2, SCALE_CHANNEL, ADD, PAD_END,
        GATE_E4M3_HALF, E4M3_HALF, GATE_HALF, UPSAMPLE_MERGE, UPSAMPLE_ADD, POOL2_SKIP };
-enum { COSINE_PUBLISH = 0, SOFTMAX = 1, VIT_SOFTMAX = 3 };
+/* VIT_SOFTMAX is 6: 3-5 are the fused attention kernels' profile kinds */
+enum { COSINE_PUBLISH = 0, SOFTMAX = 1, VIT_SOFTMAX = 6 };
 enum { EPI_NONE = 0, EPI_E4M3 = 1, EPI_GATE = 2, EPI_GATE_E4M3 = 3, EPI_HALF = 4 };
 
 static unsigned publish(int epilogue, int narrow) { return ((unsigned)epilogue << 8) | (narrow ? 0x1000u : 0u); }
@@ -2464,6 +2465,34 @@ void nr_frame_geometry_min(int height, int width, int minimum, int *network_heig
     if (network_width) *network_width = nw;
 }
 
+/* `nr_frame.render_extent`. The graph runs on the field, not the frame: a frame smaller than
+ * its field is mirrored out to it, and every frame on one field costs the same. So of the
+ * frames from the scale's own up to the picture, aspect kept, the one on the cheapest field,
+ * and of those the largest. Python's `round` is half to even, as `rint` is, and the aspect is
+ * `height * w / width` in double as Python's true division computes it. */
+void nr_frame_render_extent(int width, int height, float scale, int minimum,
+                            int *render_width, int *render_height)
+{
+    int bw = width, bh = height;
+    if (width > 0 && height > 0 && scale < 1.0f) {
+        int nh, nw;
+        bw = (int)rint((double)width * (double)scale);
+        bh = (int)rint((double)height * (double)scale);
+        if (bw < 64) bw = 64;
+        if (bh < 64) bh = 64;
+        network_extent(bh, bw, minimum, &nh, &nw);
+        long long cheapest = (long long)nh * nw;
+        for (int w = bw + 1; w <= width; w++) {
+            int h = (int)rint((double)((long long)height * w) / (double)width);
+            if (h < 64) h = 64;
+            network_extent(h, w, minimum, &nh, &nw);
+            if ((long long)nh * nw <= cheapest) { bw = w; bh = h; cheapest = (long long)nh * nw; }
+        }
+    }
+    if (render_width) *render_width = bw;
+    if (render_height) *render_height = bh;
+}
+
 static void extended_indices(int32_t *out, int count, int extent)
 {
     for (int i = 0; i < count; i++) {
@@ -2761,7 +2790,8 @@ static int compose_detail(struct nr_frame *f, const float *source, float *output
 
 /* `compose_head` with a mask over rows [y0, y1). */
 struct masked_args {
-    const float *head, *colour, *mask; ptrdiff_t hy, hx; int width; float intensity; float *output;
+    const float *head, *colour, *mask; ptrdiff_t hy, hx; int width; float intensity;
+    const float *grade; float *neural; float *output;
 };
 
 static void masked_rows(const void *args, size_t y0, size_t y1)
@@ -2774,12 +2804,33 @@ static void masked_rows(const void *args, size_t y0, size_t y1)
             const float *rgb = a->colour + (size_t)y * s + (size_t)x * 3;
             float blend = a->mask[(size_t)y * s + (size_t)x * 3] * a->intensity;
             if (a->intensity <= 1.0f) blend = unit(blend);
-            for (int c = 0; c < 3; c++) {
-                float source = rgb[c];
-                float predicted = unit(source + half_round(h[c]) * 0.25f);
-                a->output[((size_t)y * a->width + x) * 3 + c] = unit(source + blend * (predicted - source));
-            }
+            size_t at = ((size_t)y * a->width + x) * 3;
+            float predicted[3];
+            for (int c = 0; c < 3; c++) predicted[c] = unit(rgb[c] + half_round(h[c]) * 0.25f);
+            nr_finish_pixel(predicted, rgb, blend, a->grade, a->neural ? a->neural + at : NULL,
+                            a->output + at);
         }
+}
+
+/* `nr_frame.grade_for`: the style's preset (STYLE_GRADES, read out of the DLL's table at
+ * 0x1800b0de4) times the local tone clamped to [0, 1], in float32 as NumPy scales it; the
+ * exposure 2^EV in double, as Python's `2.0 ** float(...)`. None at a tone of 0. */
+int nr_frame_grade(const nr_frame_params *p, float grade[3])
+{
+    if (!p || p->grade_off || !isfinite(p->normalized_style) || !(p->local_tone == p->local_tone))
+        return 0;
+    int style = (int)rint((double)p->normalized_style * 128.0);   /* Python's round: half to even */
+    float exposure, contrast, saturation;
+    if (style == 1) { exposure = -0.1f; contrast = -0.25f; saturation = -0.1f; }
+    else if (style == 2) { exposure = 0.0f; contrast = 0.0f; saturation = -0.15f; }
+    else return 0;
+    float tone = (float)fmin(fmax((double)p->local_tone, 0.0), 1.0);
+    if (tone == 0.0f) return 0;
+    exposure *= tone; contrast *= tone; saturation *= tone;
+    grade[0] = (float)exp2((double)exposure);
+    grade[1] = contrast;
+    grade[2] = saturation + 1.0f;
+    return 1;
 }
 
 /* `nr_frame.gate_table` for the blend scale in `p`, built once per scale. */
@@ -2801,11 +2852,14 @@ static int gate_table(struct nr_frame *f, const nr_frame_params *p)
  * pixel over the network extent, and is read through it: no crop copy. */
 /* `head` has `hy` floats per row and `hx` per pixel: 16 straight off the device, 4 for a
  * cropped head a caller hands back. `mask` is the control mask's RGB, its red the blend. */
+/* `grade` follows the params (`nr_frame_grade`); `neural` is `nr_frame_update_neural`'s. */
 static int compose(struct nr_frame *f, const float *head, ptrdiff_t hy, ptrdiff_t hx, const float *colour,
                    int height, int width, const float *history, const float *previous, const float *mask,
-                   const nr_frame_params *p, float *output)
+                   const nr_frame_params *p, float *output, float *neural)
 {
     ptrdiff_t s = (ptrdiff_t)width * 3;
+    float grade_values[3];
+    const float *grade = nr_frame_grade(p, grade_values) ? grade_values : NULL;
     if (history) {
         /* `history_weight`: clip(sigmoid(half(logit)) * half(blend_scale), 0, 1), then the
          * confidence. `expf` here against NumPy's exp there: the one place the temporal
@@ -2821,15 +2875,17 @@ static int compose(struct nr_frame *f, const float *head, ptrdiff_t hy, ptrdiff_
                             mask, mask ? s : 0, mask ? 3 : 0, (size_t)height, (size_t)width,
                             p->intensity, p->blend_scale, previous ? p->hold : 0.0f, previous ? p->slope : 0.0f,
                             previous ? p->release : 0.0f,
-                            output);
+                            grade, neural, output);
     } else if (mask) {
         /* `compose_head` with a mask: blend = clip(red * intensity, 0, 1) — and past
          * intensity 1 `nr_frame.compose` takes its own branch, where the blend is not
          * clamped so that it can extrapolate */
-        struct masked_args a = { head, colour, mask, hy, hx, width, p->intensity, output };
+        struct masked_args a = { head, colour, mask, hy, hx, width, p->intensity, grade, neural,
+                                 output };
         nr_parallel_rows((size_t)height, masked_rows, &a);
     } else {
-        nr_compose(head, hy, hx, 1, colour, s, 3, 1, (size_t)height, (size_t)width, p->intensity, output);
+        nr_compose(head, hy, hx, 1, colour, s, 3, 1, (size_t)height, (size_t)width, p->intensity,
+                   grade, neural, output);
     }
     return compose_detail(f, colour, output, height, width, p->detail_strength, p->colour_strength,
                           p->detail_radius);
@@ -3062,11 +3118,19 @@ int nr_frame_compose(nr_frame *f, const float *head, const float *colour, int he
                      const float *history, const float *previous, const float *control_mask,
                      const nr_frame_params *params, float *output)
 {
+    return nr_frame_compose_neural(f, head, colour, height, width, history, previous, control_mask,
+                                   params, output, NULL);
+}
+
+int nr_frame_compose_neural(nr_frame *f, const float *head, const float *colour, int height, int width,
+                            const float *history, const float *previous, const float *control_mask,
+                            const nr_frame_params *params, float *output, float *neural)
+{
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !head || !colour || !output) FAILF("compose needs a head, a colour image and an output");
     return compose(f, head, (ptrdiff_t)width * 4, 4, colour, height, width, history, previous, control_mask,
-                   params, output);
+                   params, output, neural);
 }
 
 /* `nr_image._axis_plan`: pixel centres onto the source, the floor and its neighbour
@@ -3090,6 +3154,17 @@ int nr_frame_compose_encode(nr_frame *f, const float *head, int head_height, int
                             const float *previous, const float *control_mask,
                             const nr_frame_params *params, float *output, unsigned char *encoded,
                             int frame_width, int top, int left, int bgra)
+{
+    return nr_frame_compose_encode_neural(f, head, head_height, head_width, colour, height, width,
+                                          history, previous, control_mask, params, output, encoded,
+                                          frame_width, top, left, bgra, NULL);
+}
+
+int nr_frame_compose_encode_neural(nr_frame *f, const float *head, int head_height, int head_width,
+                                   const float *colour, int height, int width, const float *history,
+                                   const float *previous, const float *control_mask,
+                                   const nr_frame_params *params, float *output, unsigned char *encoded,
+                                   int frame_width, int top, int left, int bgra, float *neural)
 {
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
@@ -3116,6 +3191,8 @@ int nr_frame_compose_encode(nr_frame *f, const float *head, int head_height, int
         if (history && gate_table(f, params)) { free(plan); return -1; }
         float confidence = params->history_confidence != 1.0f ? unit(params->history_confidence) : 1.0f;
         size_t channels = history ? 4 : 3;
+        float grade_values[3];
+        const float *grade = nr_frame_grade(params, grade_values) ? grade_values : NULL;
         nr_compose_encode(head, (ptrdiff_t)head_width * 4, 4, 1, (size_t)head_width, channels,
                           rows_plan ? low_y : NULL, rows_plan ? high_y : NULL, rows_plan ? weight_y : NULL,
                           cols_plan ? low_x : NULL, cols_plan ? high_x : NULL, cols_plan ? weight_x : NULL,
@@ -3128,7 +3205,8 @@ int nr_frame_compose_encode(nr_frame *f, const float *head, int head_height, int
                           (size_t)height, (size_t)width, params->intensity,
                           params->blend_scale, previous ? params->hold : 0.0f,
                           previous ? params->slope : 0.0f, previous ? params->release : 0.0f,
-                          output, encoded, (size_t)frame_width, (size_t)top, (size_t)left, bgra, NULL, 0);
+                          output, grade, neural, encoded, (size_t)frame_width, (size_t)top,
+                          (size_t)left, bgra, NULL, 0);
     } else {
         /* the separate passes: the head brought up an axis at a time, composed, encoded */
         const float *full = head;
@@ -3150,7 +3228,7 @@ int nr_frame_compose_encode(nr_frame *f, const float *head, int head_height, int
             full = up;
         }
         rc = compose(f, full, (ptrdiff_t)width * 4, 4, colour, height, width, history, previous, control_mask,
-                     params, output);
+                     params, output, neural);
         if (!rc)
             for (int y = 0; y < height; y++) {
                 unsigned char *row = encoded + ((size_t)(top + y) * frame_width + left) * 4;
@@ -3201,6 +3279,14 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
                            const float *previous, const float *control_mask, const nr_frame_params *params,
                            float *output, float *head_out)
 {
+    return nr_frame_update_neural(f, colour, height, width, history, previous, control_mask, params,
+                                  output, head_out, NULL);
+}
+
+int nr_frame_update_neural(nr_frame *f, const float *colour, int height, int width, const float *history,
+                           const float *previous, const float *control_mask, const nr_frame_params *params,
+                           float *output, float *head_out, float *neural)
+{
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !output) FAILF("update needs a colour image and an output");
@@ -3215,7 +3301,8 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
     if (!wide) return -1;
     ptrdiff_t hx = f->head_stride, hy = (ptrdiff_t)f->width * hx;
     if (head_out) crop_head(wide, hy, hx, height, width, head_out);
-    return compose(f, wide, hy, hx, colour, height, width, history, previous, control_mask, params, output);
+    return compose(f, wide, hy, hx, colour, height, width, history, previous, control_mask, params, output,
+                   neural);
 }
 
 int nr_frame_head(nr_frame *f, const float *colour, int height, int width, const float *history,

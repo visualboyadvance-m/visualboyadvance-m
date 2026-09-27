@@ -63,7 +63,7 @@ implementation's exact halvings cannot follow, and it rounds up there.
 | 0–2 | deterministic noise for this extent and frame index |
 | 3 | constant 1 |
 | 4–6 | the current frame, scaled |
-| 7–9 | the **previous output**, reprojected along motion, scaled the same way |
+| 7–9 | the **previous prediction** — the composed head before the grade and the intensity, in half — reprojected along motion, scaled the same way |
 | 10 | normalised style index |
 | 11 | local tone strength |
 | 12 | local structure strength |
@@ -100,20 +100,32 @@ alpha     = clamp(sigmoid(half(head.a)) * half(0.73974609375), 0, 1)
 output    = predicted + alpha * (history - predicted)
 ```
 
-`history` here is channels 7–9 recovered as `channels * 8 + 0.5`. An `intensity` control
-then blends the result against the untouched frame — above 1 it extrapolates past the
-model's own picture, which the vendor's panel allows up to 2.
+`history` here is channels 7–9 recovered as `channels * 8 + 0.5`. `output` is also what
+the next frame gets as its history — before anything below — held in RGBA16F, truncated
+toward zero. A post-process of its own (`cg2r_post_process_kernel`) then grades that half
+for the style and blends it against the untouched frame by `intensity` and the masks:
+
+```
+graded = style_grade(half(output))            # natural and cinematic only
+result = frame + intensity * mask * (graded - frame)
+```
+
+Ours extrapolates above an intensity of 1, which the vendor's pass does only when something
+else — a grade, a mask — makes it run. `notes/phase70-post-process.md`.
 
 ### The controls
 
-Four profiles, which are three scalars and nothing more:
+Four profiles: three scalars for the network, and for two of them a colour grade after it,
+read out of the DLL's own style table — each value times the tone clamped to [0, 1]:
 
-| profile | style | tone | structure |
-| --- | --- | --- | --- |
-| `standard` | 0 | 1 | 1 |
-| `natural` | 1/128 | 1 | 1 |
-| `cinematic` | 2/128 | 1 | 1 |
-| `neutral` | 0 | 0 | 0 |
+| profile | style | tone | structure | the grade after the network |
+| --- | --- | --- | --- | --- |
+| `standard` | 0 | 1 | 1 | none |
+| `natural` | 1/128 | 1 | 1 | exposure -0.1 EV, contrast -0.25, saturation -10 % |
+| `cinematic` | 2/128 | 1 | 1 | saturation -15 % |
+| `neutral` | 0 | 0 | 0 | none |
+
+The contrast is a smoothstep blend, `c + k * (c²(3 - 2c) - c)`, and the saturation is HSL's.
 
 They are a trade, not a quality ladder: everything the pass adds to skin texture it takes
 out of speculars and colour. `notes/phase44-profile-tradeoff.md` measures the curve.
@@ -212,7 +224,7 @@ levels of 255 apart, about what two arithmetics of one graph make (`notes/opendl
 
 ## 6. The temporal path
 
-The previous output, reprojected along motion vectors into channels 7–9, blended back
+The previous prediction, reprojected along motion vectors into channels 7–9, blended back
 through the head's fourth channel. The gate is learned and it discriminates:
 
 | history given | gate |
@@ -255,6 +267,7 @@ measures this and what to do about it when you have no motion vectors.
 | the 16 input channels | `notes/phase48-feature-inputs.md` |
 | the controls | `notes/phase30-control-atlas.md` |
 | the temporal path | `notes/phase12-temporal.md`, `phase54-flicker-fix.md` |
+| the grade after the network, what the history holds | `notes/phase70-post-process.md` |
 | why bit-exactness is impossible | `notes/phase9-numerics.md` |
 
 `notes/INDEX.md` maps all of them.

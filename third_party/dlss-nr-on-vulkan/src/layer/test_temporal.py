@@ -221,12 +221,19 @@ def daemon_checks():
     path = SOCKET + ".on"
     process = daemon(path)
     try:
-        frames = [request(still, header, path) for _ in range(4)]
+        frames = [request(still, header, path) for _ in range(8)]
         steps = [float(np.abs(b.astype(np.int16) - a).mean()) for a, b in zip(frames, frames[1:])]
         check("the history reaches the picture",
               steps[0] > 0, f"the second frame moves {steps[0]:.3f} levels off the first")
-        check("a held scene settles rather than ringing",
-              steps[-1] < steps[0],
+        # After the step the history makes, a held scene keeps moving by the network's own
+        # floor — its answer to a history one rounding different, 0.06-0.2 levels a frame
+        # whatever the history's precision (float, rounded or truncated half, measured
+        # 2026-09-27) — and never by more. The old test compared the fourth step with the
+        # first, which that floor decides by chance: the old history's own fifth step was
+        # 0.204 against a first of 0.168. Ringing would be steps that grow.
+        later = steps[1:]
+        check("a held scene settles to the network's floor rather than ringing",
+              sum(later) / len(later) <= steps[0] and max(steps) < 0.5,
               "steps " + " -> ".join(f"{s:.3f}" for s in steps))
 
         # A cut must not smear the old shot over the new one. Cutting away and back leaves
@@ -242,9 +249,10 @@ def daemon_checks():
         process.terminate(); process.wait(timeout=30)
         pathlib.Path(path).unlink(missing_ok=True)
 
-    # The control mask reaches the composition before the history does, and the wire-byte
-    # restore after it is exact by construction — but the history is stored *after* that
-    # restore, so a leak would compound frame over frame rather than stay put.
+    # The control mask reaches the composition, and the wire-byte restore after it is exact
+    # by construction. The history is the prediction before either, as the vendor keeps it
+    # (`notes/phase70-post-process.md`), so under the mask it holds the network's picture —
+    # which must still never reach the answer there, on any frame.
     path = SOCKET + ".mask"
     process = daemon(path)
     try:

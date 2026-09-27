@@ -6,7 +6,8 @@
  */
 #include "nr_metal.h"
 
-constant uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 3u;
+// VIT_SOFTMAX is 6: 3-5 are the fused attention kernels' profile kinds
+constant uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 6u;
 constant float COSINE_NORM_FLOOR = 0.00006198883056640625f;
 
 /* `count` consecutive floats from `base`, spread across the 32-wide threadgroup. */

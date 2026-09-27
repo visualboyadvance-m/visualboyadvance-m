@@ -63,6 +63,12 @@ typedef struct nr_frame_params {
      * graph runs down to 128, and a small live frame is then mostly picture, not padding.
      * Appended last, so a host built against the older header must be rebuilt. */
     int   min_extent;
+    /* The vendor's colour grade after the network (`nr_frame.grade_for`, notes/phase70):
+     * style 1 (natural) an exposure of -0.1 EV, a contrast of -0.25 and a saturation of
+     * -0.1, style 2 (cinematic) a saturation of -0.15, each times clamp(local_tone, 0, 1);
+     * style 0 none. It follows `normalized_style` and `local_tone` unless this is set.
+     * Appended last, like `min_extent`. */
+    int   grade_off;
 } nr_frame_params;
 
 /* The values `nr_frame.py` uses when nothing is asked: the `standard` profile. */
@@ -142,6 +148,19 @@ void nr_frame_geometry(int height, int width, int *network_height, int *network_
 /* The same at the floor `minimum` (`nr_frame_params.min_extent`), never below 128. */
 void nr_frame_geometry_min(int height, int width, int minimum, int *network_height, int *network_width);
 
+/* The frame the network is handed for a width x height picture at render `scale`
+ * (`nr_frame.render_extent`): of all frames at least the scale's own, aspect kept, the one on
+ * the cheapest network field at the floor `minimum`, and of those the largest — so a low
+ * scale on a small window fills its field instead of paying for mirror padding (640x360 runs
+ * as 0.5 for any scale up to it), and a lower scale is never the slower. From 1.0 up, the
+ * picture itself. */
+void nr_frame_render_extent(int width, int height, float scale, int minimum,
+                            int *render_width, int *render_height);
+
+/* The grade `params` asks for, as the three factors nr_image.c takes (exposure multiplier,
+ * contrast, saturation multiplier); 0 when there is none. */
+int nr_frame_grade(const nr_frame_params *params, float grade[3]);
+
 /* colour (h, w, 3) -> output (h, w, 3). `history` is the previous output or NULL;
  * `previous` the previous *input* or NULL, for the floor. `head_out` (h, w, 4) optional.
  * 0 on success. */
@@ -155,6 +174,17 @@ int nr_frame_update_masked(nr_frame *frame, const float *colour, int height, int
                            const float *history, const float *previous, const float *control_mask,
                            const nr_frame_params *params, float *output, float *head_out);
 
+/* The same, keeping the vendor's history: `neural` (h, w, 3), when not NULL, receives the
+ * prediction after the history's blend and before the grade, the intensity, the mask and
+ * the detail split, truncated to half — what the vendor carries to the next frame in
+ * RGBA16F. Hand it back as the next frame's `history` to follow the vendor's temporal
+ * path (as nr_daemon.py and nr_temporal.VendorSession do); handing back `output` instead is
+ * MLX-DLSS's. Every entry point without `neural` is its `_neural` twin with NULL. */
+int nr_frame_update_neural(nr_frame *frame, const float *colour, int height, int width,
+                           const float *history, const float *previous, const float *control_mask,
+                           const nr_frame_params *params, float *output, float *head_out,
+                           float *neural);
+
 /* The halves, for a caller that wants to sit between them: features, the network, and
  * the composition of a cropped (h, w, 4) head — free to repeat at another intensity. */
 int nr_frame_features_masked(nr_frame *frame, const float *colour, int height, int width,
@@ -163,6 +193,10 @@ int nr_frame_features_masked(nr_frame *frame, const float *colour, int height, i
 int nr_frame_compose(nr_frame *frame, const float *head, const float *colour, int height, int width,
                      const float *history, const float *previous, const float *control_mask,
                      const nr_frame_params *params, float *output);
+int nr_frame_compose_neural(nr_frame *frame, const float *head, const float *colour, int height,
+                            int width, const float *history, const float *previous,
+                            const float *control_mask, const nr_frame_params *params,
+                            float *output, float *neural);
 
 int nr_frame_features(nr_frame *frame, const float *colour, int height, int width,
                       const float *history, const nr_frame_params *params,
@@ -193,6 +227,12 @@ int nr_frame_compose_encode(nr_frame *frame, const float *head, int head_height,
                             const float *previous, const float *control_mask,
                             const nr_frame_params *params, float *output, unsigned char *encoded,
                             int frame_width, int top, int left, int bgra);
+int nr_frame_compose_encode_neural(nr_frame *frame, const float *head, int head_height,
+                                   int head_width, const float *colour, int height, int width,
+                                   const float *history, const float *previous,
+                                   const float *control_mask, const nr_frame_params *params,
+                                   float *output, unsigned char *encoded, int frame_width,
+                                   int top, int left, int bgra, float *neural);
 
 /* Seconds spent, in the last run, writing the input, running the graph, reading the
  * head: 0, 1, 2. On a discrete card the outer two are the bus. */

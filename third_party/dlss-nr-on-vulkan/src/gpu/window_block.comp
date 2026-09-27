@@ -77,7 +77,7 @@ layout(scalar) shared AsUvec4 { uvec4 u4[1024]; };
 layout(scalar) shared AsHalf4 { f16vec4 h4[2048]; };
 
 const uint VALUES = 2048u;   // where V starts, in halves; K is at 0
-const uint WINDOW_BLOCK = 4u; // row-family profile kind: attention.comp owns 0-2, window attention 3
+const uint WINDOW_BLOCK = 4u; // row-family profile kind: attention.comp owns 0-2 and 6, window attention 3
 
 bool image_half() { return (operation_flags() & 0x8000u) != 0u; }
 

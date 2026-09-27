@@ -223,6 +223,32 @@ def test_geometry():
           all(frame.NetworkGeometry.vendor_aligned(w, h) == frame.network_geometry(w, h)
               for w, h in sizes))
 
+    # the render scale's frame: the cheapest field among frames at least the scale's own,
+    # and the largest frame on it
+    def area(w, h, m=320):
+        g = frame.network_geometry(w, h, minimum=m)
+        return g.network_width * g.network_height
+    grown = {(640, 360, 0.35): (320, 180), (800, 450, 0.35): (320, 180),
+             (800, 450, 0.6): (512, 288), (1280, 720, 0.35): (448, 252),
+             (1920, 1080, 1.0): (1920, 1080)}
+    got = {key: frame.render_extent(*key) for key in grown}
+    check("a small window's low scale fills the cheapest field, a large window's is left alone",
+          got == grown, ", ".join(f"{k} -> {got[k]}" for k in grown if got[k] != grown[k]))
+    cases = [(w, h, s, m) for w, h in ((640, 360), (800, 450), (854, 480), (1024, 576),
+                                       (1280, 720), (1920, 1080), (1920, 1200))
+             for s in (0.2, 0.35, 0.5, 0.6, 0.75, 0.9) for m in (128, 320)]
+    ok = True
+    for w, h, s, m in cases:
+        grown_w, grown_h = frame.render_extent(w, h, s, m)
+        own = (max(64, round(w * s)), max(64, round(h * s)))
+        ok &= grown_w >= own[0] and area(grown_w, grown_h, m) <= area(*own, m)
+    check(f"never a smaller frame, never a dearer field ({len(cases)} cases)", ok)
+    steps = [area(*frame.render_extent(w, h, s, 320)) for w, h in ((800, 450), (854, 480))
+             for s in (0.3, 0.35, 0.4, 0.45, 0.5, 0.6)]
+    check("and a lower scale never the slower",
+          all(a <= b for a, b in zip(steps[:6], steps[1:6])) and
+          all(a <= b for a, b in zip(steps[6:], steps[7:])))
+
 
 def test_temporal():
     """The temporal contract, none of which needs a forward pass."""

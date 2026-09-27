@@ -110,7 +110,8 @@ void scatter_to(uint base, uint count, uint64_t target) {
 
 void scatter(uint base, uint count) { scatter_to(base, count, uint64_t(pc.c)); }
 
-const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 3u;
+// VIT_SOFTMAX is 6: 3-5 are the fused attention kernels' profile kinds
+const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 6u;
 
 /* The publish this pass ends with: bits 8-11 of `flags` pick the transform and bit 12
  * narrows the output to float16, so the row passes can feed a GEMM directly instead of

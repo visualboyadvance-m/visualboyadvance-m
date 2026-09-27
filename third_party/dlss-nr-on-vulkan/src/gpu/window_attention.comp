@@ -17,7 +17,7 @@
 // rows, and their scores and probabilities never leave shared memory.
 layout(local_size_x = 256) in;
 layout(constant_id = 0) const bool MERGED_OUTPUT = false;
-const uint WINDOW_ATTENTION = 3u; // row-family profile kind: attention.comp owns 0-2
+const uint WINDOW_ATTENTION = 3u; // row-family profile kind: attention.comp owns 0-2 and 6
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf { float16_t v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 8) buffer Half4Buf { f16vec4 v[]; };

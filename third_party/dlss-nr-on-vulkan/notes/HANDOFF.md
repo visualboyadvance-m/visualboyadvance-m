@@ -9,7 +9,52 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: six more dlss-nr-on-intel commits — the vendor's graph — on every runtime (2026-09-27)
+## Latest: six more dlss-nr-on-intel commits — the vendor's post-process — on every runtime (2026-09-27, late)
+
+`a72a79b`..`59c21fb` of `uzbekunknown/dlss-nr-on-intel` are in (merged file by file against
+`04ff144`): the styles' colour grade and the vendor's history (`notes/phase70-post-process.md` —
+a second `phase70`, beside this tree's `phase70-cmake-build-directory.md`), CMake catching up with
+the Makefile and `src/tools/build_check.py`, the render scale's text, `VIT_SOFTMAX` moved to row
+kind 6 so the profiler runs again, `nr_frame.render_extent`, and Xe2's large-GRF experiment
+(`notes/improve-large-grf.md`, `src/probe/mesa-xe2-large-grf.patch`). Their entries are below,
+verbatim. Carried past them:
+
+- **`nr_image.c`**: the grade (`style_grade`, `truncate_half`, `finish_pixel`, `grade_row`) is
+  upstream's arithmetic in this tree's structure — the row pool, `NR_ALWAYS_INLINE`, and the
+  fast row forms. `nr_compose`, `nr_compose_temporal` and `nr_compose_encode` take `grade` and
+  `neural` as upstream's do. The fast rows (`still_rows_fast`, `temporal_rows_fast`,
+  `compose_encode_row`) keep the history (truncated to half) in the composition's loop, and a
+  grading row then runs its grade and its blend-and-encode each in a loop of its own, as upstream
+  does. The hex float `0x1p-24f` is spelled in decimal for MSVC, and `nr_finish_pixel` is public
+  for nr_frame.c's masked still path. `test_native_image.py` (153 checks, the grades and the
+  kept history on every path) is byte-identical at 1, 3 and 8 threads.
+- **The C frame library** grades as `run_frame` and the daemon do: from `normalized_style` and
+  `local_tone` (`nr_frame_grade()`, the DLL's table), unless `nr_frame_params.grade_off`
+  (appended after `min_extent`; rebuild hosts). Style 0, the default and VBA-M's filter, has no
+  grade, so nothing moves there. `nr_frame_update_neural`, `nr_frame_compose_neural` and
+  `nr_frame_compose_encode_neural` take a `neural` (h, w, 3) that receives the vendor's history;
+  hand it back as the next frame's `history` to follow the vendor's temporal path — the older
+  entry points are these with NULL, which is MLX-DLSS's. `nr_frame_render_extent()` is
+  `nr_frame.render_extent` (the scale taken as float32; the Python given the same value agrees at
+  297 sizes, scales and floors). `nr_frame_rates` picks its inner frame with it and carries the
+  neural history, as the daemon now does. `nr_frame_native.py` has all of it (`neural=`,
+  `render_extent`, `grade`), and `test_nr_frame_c.py` checks it: grades at every style and tone,
+  the graded composition and its history bit-identical still, masked, at 0.6 and 1.66,
+  through `update` and through `compose_encode` fused with history, floor and release.
+- **Metal and Direct3D 12**: the grade and the history are host code, so no kernel changes; the
+  runtimes take `VIT_SOFTMAX = 6` in `attention.metal` / `attention.hlsl` (only the branch
+  selector — the bytes are unchanged), as does `nr_frame.c`.
+- **Builds**: this tree's CMake already built every shader, so of `25ca9a4` only the checks came
+  over — `build_check` and `frame_profile.py --tables` in CTest and `make test`. `build_check.py`
+  reads this tree's `$(PYTHON)`, `$(SO)` and `NR_PY_TESTS`, and checks the row pool's threads
+  where upstream checks OpenMP. libnr_image links libm (`floorf`).
+
+Verified on the M3: `test_native_image` at 1, 3 and 8 threads; the C frame test on MoltenVK,
+Metal 4 and Metal 3.1 (`XMX_METAL4=0`), all checks, the graded temporal composition exact;
+the three attention HLSL builds under dxc; `nr_image.c` and `nr_frame.c` under MinGW GCC with no
+new warnings (GCC takes the `no-thread-jumps` path clang never sees). No Xe2, phone or Windows run.
+
+## Six more dlss-nr-on-intel commits — the vendor's graph — on every runtime (2026-09-27)
 
 `380e214`..`04ff144` of `uzbekunknown/dlss-nr-on-intel` are in (merged file by file against
 `f478901`): OpenDLSS-NR as a reference and its tooling (`src/bench/opendlss_*`,
@@ -192,9 +237,83 @@ No Xe2, phone or Windows run: the matrix-path GLSL is upstream's.
   have no upscaler, so it needs a newer game.
 - **A FAQ** in the README, for the questions that keep coming back. Later.
 
-## The reference was not rounding on this GPU; the vendor's GEMM in numpy (2026-09-27, night)
+## Xe2's 256-register mode: reachable, correct, and slower (2026-09-27, late night)
 
-**Not published — the owner asked to hold pushes; this and everything after it are local commits.**
+The owner asked to try lifting the register ceiling `phase26` found. **Lunar Lake has the mode**
+(`STATE_COMPUTE_MODE`'s `Large GRF Mode`, never set by Mesa), Xe2's encoding already reaches
+r255, and three changes to Mesa 26.2.3 behind `INTEL_XE2_LARGE_GRF=1` turn it on
+(`src/probe/mesa-xe2-large-grf.patch`): Xe3's 256 allocator slots, the SIMD32 pressure threshold
+raised, the mode bit in anv's queue inits. Shaders use r128-r255 and the daemon's answers come out
+byte for byte at four sizes. **But every frame is slower** — 640x360 at 0.5 25.3 -> 28.7 ms, 1080p
+at full scale 300 -> 378 — because the mode halves the threads an EU runs and the staged GEMM is
+tuned for full occupancy (51 -> 60 us a call). Isolated, starved kernels gain up to 3x (16x64
+blocks 1289 -> 4153 GFLOP/s), which is not what the frame runs. A win needs the mode per dispatch
+and a staged GEMM written for 256 registers; about 6 % on big shapes at best, not built.
+`notes/improve-large-grf.md`.
+
+## A low render scale on a small window was paying for mirror padding (2026-09-27, night)
+
+The owner's Tekken 7 at 800x450: **30 fps at render scale 0.35, 27 at 0.6**. On a window that
+small the network's field is held at 320 a side, and the frames it was handed were mostly its own
+mirror image: 640x360 at 0.35 is 224x126 in a 320x320 field, 28 % picture, and the pass came out
+a quarter weaker than at 0.5 (8.4 against 11.1 levels of 255) on the same field in the same 25 ms.
+Worse, the vendor's field is not monotonic in the frame: 800x450 at 0.35 is 280x158, whose width
+aligns to 384, where 0.4's 320x180 lands on 320x320 — the lower scale was the slower (27.9 against
+25.7 ms).
+
+`nr_frame.render_extent` now hands the network, of all frames at least the scale's own (aspect
+kept), the one on the cheapest field and of those the largest; the daemon uses it and its log
+line says `scale 0.35 (runs as 0.4)`. 640x360 runs as 0.5 for any scale up to it, 800x450 as 0.4
+(26.0 ms where 0.35 took 27.9, and the full-strength pass), a lower scale is never the slower, and
+from 1280x720 up nothing moves. Scale swept on the daemon's path, DoA5 frames: the strength holds
+at 9-11 levels from 0.35 to 1.0 on 720p and 1080p windows; the cost is about 130 ms per megapixel of
+field plus 10-20 ms at the window's resolution — the render scale text says both now.
+
+And a trap: **`frame_profile.py` had been failing at import since the ViT's softmax took row kind
+3**, which window attention's profile stamps already used — the profiler reads the kind tables out
+of the shaders and refuses a clash, but nothing ran it. `VIT_SOFTMAX` is 6, and `make test` (and
+CTest) run `frame_profile.py --tables`. At 320x320 now: GEMM 16.6 ms of 24.5 on the device, the
+bottleneck's four GEMMs 4.2 of it on 16-64 workgroups. The vendor itself splits exactly those
+(contract 4096/1024, QKV 1024/512, projection 1024/256, OpenDLSS-NR's `numerics.md`), so a split-K
+there would be its structure rather than a departure — **measured and not worth it**: the
+partitions run as a batch of the same GEMM, contract 169 -> 171 us at 64 rows, QKV 91 -> 104,
+projection 42 -> 34, so the four are not short of workgroups either (and `improve-b.md` found
+them not short of weight bytes). And `min_extent` is the lever on a small window: 800x450 at 0.35
+takes 26.0 ms at 320, 23.1 at 256 (320x256, 10.6 levels against 11.0) and 18.9 at 192 (320x192,
+9.7) — the owner's to judge in a game.
+
+## What the vendor does after the network: the styles' grade, and the history (2026-09-27, late)
+
+**`natural` and `cinematic` were missing NVIDIA's own colour grade.** The vendor runs a post-process
+after the network, `cg2r_post_process_kernel` (PTX module 13): a whole grading chain — levels,
+temperature and tint, exposure, a smoothstep contrast, a five-zone tone curve, a gamma, HSL
+saturation and a saturation power — then `frame + intensity * mask * (graded - frame)`. The styles
+set three of its values from a table in the DLL (`0x1800b0de4`): **style 1 exposure -0.1 EV,
+contrast -0.25, saturation -0.1; style 2 saturation -0.15; style 0 nothing**, each times
+`clamp(LocalToneStrength, 0, 1)` (`0x18001d5f0`). Read from the PTX and the x86 code, not taken
+on trust; OpenDLSS-NR has the same values. Now in `nr_frame.grade_for` / `style_grade` and in
+`nr_image.c`, byte-identical to each other. On DoA5 at 1080p it moves `natural` 6.2 levels of 255
+— the pass itself moves the frame 9 — and `cinematic` 1.65. Cost 0.7 / 2.1 / 3.7 ms at the three
+live sizes, in a loop of its own: inside the fused pixel it kept the whole row from vectorising,
++19 ms at 1080p, because GCC's jump threading turns its clamps into branches — off for that loop.
+
+**And the history is the prediction, not the answer.** The vendor carries the composed head after
+its history blend and before the grade, the intensity and the masks, in RGBA16F (truncated toward
+zero, per OpenDLSS-NR's captures). This tree carried what the game received — after the intensity,
+the strengths and the interface restore. Changed in the daemon, both compositions (`neural=`) and
+`nr_temporal`'s session. Every answer after the first moves a little, at the same time; the
+daemon's references over 48 panning frames (standard): `f29ffcfaee77c496` / `23f59257381d0b3b` /
+`cba8fc4f60fd907d`. Heads and graph hashes are untouched.
+
+Also read out of it: in 310.8.0.0 the network always runs at the output's extent —
+`DLSSNR.ScalingRatio` is overwritten with 1.0 — so the kernel's Oklab transfer from a smaller
+network picture is unused. Left different: an intensity above 1 extrapolates here always, where the
+vendor's pass does not run for it alone; detail and colour strength are MLX-DLSS's. And a trap:
+`test_temporal.py`'s "a held scene settles" compared the fourth step with the first, which the
+network's own 0.06-0.2-level floor decides by chance — the old history's fifth step was the
+largest. `notes/phase70-post-process.md`.
+
+## The reference was not rounding on this GPU; the vendor's GEMM in numpy (2026-09-27, night)
 
 OpenDLSS-NR's WebGPU port rounds its GEMMs' f16 accumulator with WGSL's `f32(f16(x))`, which Mesa
 folds away: on this GPU the port was not rounding between its groups of 16 products at all. With the

@@ -126,14 +126,67 @@ def blend_alpha(head, blend_scale=BLEND_SCALE):
     return np.clip(1.0 / (1.0 + np.exp(-logit)) * features_mod.half(blend_scale), 0, 1)
 
 
+class VendorSession(temporal_mod.TemporalSession):
+    """MLX-DLSS's session with the vendor's two steps after the network
+    (`notes/phase70-post-process.md`): the history carried to the next frame is the
+    prediction after the history's blend, truncated to half — MLX-DLSS carried the
+    composition after the intensity — and the style's colour grade reads that half before
+    the intensity blends it back towards the frame. With intensity 1, no mask and no grade
+    the output is MLX-DLSS's to the bit; only what is carried changes."""
+
+    def _process_prepared(self, prepared, control_mask=None):
+        frame, processing, confidence = prepared.source, prepared.color, prepared.confidence
+        if prepared.reset:
+            self.reset()
+            self.scene_cuts += 1
+        height, width = processing.shape[:2]
+        geometry = NetworkGeometry.vendor_aligned(width, height)
+        controls = self._controls()
+        if self.history is None:
+            network = features_mod.make_features(processing, frame_index=self.frame_index,
+                                                 geometry=geometry, control_mask=control_mask,
+                                                 **controls)
+            head = geometry.crop(self.pipeline.run_features(network))
+            temporal = np.clip(processing + features_mod.half(head[..., :3]) * np.float32(0.25),
+                               0, 1).astype(np.float32)
+        else:
+            features = temporal_mod.make_temporal_features(
+                processing, self.history, prepared.motion, frame_index=self.frame_index,
+                history_confidence=confidence, control_mask=control_mask, **controls)
+            network = temporal_mod.extend_features(features, geometry, self.frame_index)
+            head = geometry.crop(self.pipeline.run_features(network))
+            # at intensity 1 without a mask MLX-DLSS hands back the prediction itself
+            temporal = temporal_mod.compose_temporal(
+                head, processing, features, blend_scale=self.options.blend_scale,
+                history_confidence=confidence)
+        grade = nr_frame.grade_for(**controls)
+        kept = nr_frame.truncate_half(temporal)
+        intensity = self.options.intensity
+        if control_mask is None and intensity == 1 and grade is None:
+            output = temporal if self.history is not None else composition_mod.compose_head(
+                head, processing, intensity=1.0)
+        else:
+            predicted = temporal if grade is None else nr_frame.style_grade(kept, grade)
+            blend = (np.float32(intensity) if control_mask is None
+                     else np.asarray(control_mask, np.float32)[..., :1] * np.float32(intensity))
+            blend = np.clip(blend, 0, 1)
+            output = np.clip(processing + blend * (predicted - processing), 0, 1).astype(np.float32)
+        self.history = kept
+        self.previous = frame.copy()
+        self.frame_index += 1
+        return composition_mod.compose_detail(
+            frame, composition_mod.resample(output, frame.shape[1], frame.shape[0]),
+            detail_strength=self.options.detail_strength,
+            colour_strength=self.options.colour_strength, radius=self.options.detail_radius)
+
+
 def session(model, *, motion="zero", **options):
-    """A `TemporalSession` over our model.
+    """A `VendorSession` over our model.
 
     `motion` is 'zero', 'flow' (needs OpenCV) or a callable `(current, previous)`.
     Engine motion is better still: pass it per frame to `process`.
     """
-    return temporal_mod.TemporalSession(Pipeline(model),
-                                        options=TemporalOptions(**options), motion=motion)
+    return VendorSession(Pipeline(model), options=TemporalOptions(**options), motion=motion)
 
 
 # --------------------------------------------------------------------------

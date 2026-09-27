@@ -32,6 +32,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 
 #include "nr_image.h"
@@ -253,6 +254,137 @@ static float unit(float value)
     return value;
 }
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#define NR_RESTRICT __restrict
+#define NR_ALWAYS_INLINE static __forceinline
+#define NR_IVDEP __pragma(loop(ivdep))
+#else
+#define NR_RESTRICT __restrict__
+#define NR_ALWAYS_INLINE static inline __attribute__((always_inline))
+#if defined(__clang__)
+#define NR_IVDEP     /* clang vectorises what it can without being asked, and warns if asked */
+#else
+#define NR_IVDEP _Pragma("GCC ivdep")
+#endif
+#endif
+
+/* Toward zero onto the half grid, which is what the vendor's RGBA16F history keeps of the
+ * prediction (`nr_frame.truncate_half`): a normal half keeps ten mantissa bits, a subnormal
+ * one is a multiple of 2^-24. Selects rather than branches, so the fused pass vectorises. */
+static inline float truncate_half(float x)
+{
+    uint32_t f, t;
+    memcpy(&f, &x, sizeof f);
+    t = f & 0xffffe000u;
+    float kept, small = floorf(fabsf(x) * 16777216.0f) * 5.9604644775390625e-8f;
+    memcpy(&kept, &t, sizeof kept);
+    small = x < 0.0f ? -small : small;
+    return (f & 0x7fffffffu) >= 0x38800000u ? kept : small;
+}
+
+static inline float grade_unit(float value)
+{
+    value = value < 0.0f ? 0.0f : value;
+    return value > 1.0f ? 1.0f : value;
+}
+
+NR_ALWAYS_INLINE float hue_channel(float p, float q, float t)
+{
+    float up = t + 1.0f;
+    t = t < 0.0f ? up : t;
+    float down = t - 1.0f;
+    t = t > 1.0f ? down : t;
+    float rising = p + t * ((q - p) * 6.0f);
+    float falling = p + (2.0f / 3.0f - t) * (q - p) * 6.0f;
+    return t < 1.0f / 6.0f ? rising : t < 0.5f ? q : t < 2.0f / 3.0f ? falling : p;
+}
+
+/* The vendor's colour grade for a style on one pixel, `nr_frame.style_grade` operation for
+ * operation: per channel an exposure and a smoothstep contrast, then a saturation
+ * multiplier in HSL. `grade` is `nr_frame.grade_for`'s three factors. The stages of
+ * `cg2r_post_process_kernel` no style moves are identities and are not here
+ * (`notes/phase70-post-process.md`). Every branch is a select, as NumPy's `where` computes
+ * both sides — the unused one on a stand-in divisor — so the fused rows vectorise it. */
+NR_ALWAYS_INLINE void style_grade(float c[3], const float *grade)
+{
+    const float exposure = grade[0], contrast = grade[1], saturation = grade[2];
+    for (int i = 0; i < 3; ++i) {
+        float v = grade_unit(grade_unit(c[i]) * exposure);
+        c[i] = grade_unit(v + contrast * (v * v * (3.0f - (v + v)) - v));
+    }
+    float r = c[0], g = c[1], b = c[2];
+    float high = r > g ? r : g, low = r < g ? r : g;
+    high = high > b ? high : b;
+    low = low < b ? low : b;
+    float light = (high + low) * 0.5f;
+    float delta = high - low;
+    int grey = !(high > low);
+    float spread = grey ? 1.0f : delta;
+    float bright = (2.0f - high) - low, dark = high + low;
+    float by_bright = delta / (grey ? 1.0f : bright), by_dark = delta / (grey ? 1.0f : dark);
+    float chroma = light > 0.5f ? by_bright : by_dark;
+    float from_r = ((g - b) / spread + (g < b ? 6.0f : 0.0f)) / 6.0f;
+    float from_g = ((b - r) / spread + 2.0f) / 6.0f;
+    float from_b = ((r - g) / spread + 4.0f) / 6.0f;
+    float hue = grey ? 0.0f : high == r ? from_r : high == g ? from_g : from_b;
+    chroma = grade_unit((grey ? 0.0f : chroma) * saturation);
+    float q_dark = light * (chroma + 1.0f), q_bright = (light + chroma) - light * chroma;
+    float q = light < 0.5f ? q_dark : q_bright;
+    float p = (light + light) - q;
+    int flat = chroma <= 0.0f;
+    float lit = grade_unit(light);
+    c[0] = flat ? lit : grade_unit(hue_channel(p, q, hue + 1.0f / 3.0f));
+    c[1] = flat ? lit : grade_unit(hue_channel(p, q, hue));
+    c[2] = flat ? lit : grade_unit(hue_channel(p, q, hue - 1.0f / 3.0f));
+}
+
+/* The prediction after the history's blend, as the vendor goes on with it
+ * (`nr_frame._vendor_prediction`): kept in `neural` truncated to half, the next frame's
+ * history, and that half through the style's grade; then the blend back towards the frame.
+ * With neither `grade` nor `neural` it is the blend alone, as it always was. */
+static inline void finish_pixel(float predicted[3], const float *rgb, ptrdiff_t sc,
+                                float blend, const float *grade, float *neural, float *out)
+{
+    if (grade || neural) {
+        float kept[3];
+        for (int c = 0; c < 3; ++c) kept[c] = truncate_half(predicted[c]);
+        if (neural)
+            for (int c = 0; c < 3; ++c) neural[c] = kept[c];
+        if (grade) {
+            style_grade(kept, grade);
+            for (int c = 0; c < 3; ++c) predicted[c] = kept[c];
+        }
+    }
+    for (int c = 0; c < 3; ++c) {
+        float source = rgb[(ptrdiff_t)c * sc];
+        out[c] = unit(source + blend * (predicted[c] - source));
+    }
+}
+
+void nr_finish_pixel(float predicted[3], const float *rgb, float blend, const float *grade,
+                     float *neural, float *out)
+{
+    finish_pixel(predicted, rgb, 1, blend, grade, neural, out);
+}
+
+/* A grading row's grade, over the row in a loop of its own: inside the composition's pixel
+ * it would not vectorise, and took the whole row's composition down to one pixel at a time
+ * with it (upstream: 47 -> 66 ms a 1080p frame). GCC's jump threading turns the grade's
+ * chain of clamps into branches its vectoriser cannot take back, so it is off for this loop
+ * alone; it moves no arithmetic, and the bytes are checked (`test_native_image.py`). */
+#if defined(__GNUC__) && !defined(__clang__)
+__attribute__((optimize("no-thread-jumps")))
+#endif
+static void grade_row(const float *NR_RESTRICT kept, float *NR_RESTRICT graded, int width,
+                      const float *NR_RESTRICT grade)
+{
+    for (int x = 0; x < width; ++x) {
+        float c[3] = { kept[3 * x], kept[3 * x + 1], kept[3 * x + 2] };
+        style_grade(c, grade);
+        for (int i = 0; i < 3; ++i) graded[3 * x + i] = c[i];
+    }
+}
+
 struct decode8_args { const uint8_t *source; int bgra; float *output; };
 
 static void decode8_rows(const void *args, size_t p0, size_t p1)
@@ -316,13 +448,14 @@ void nr_encode8(const float *image, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
  * composition below, whose helpers they share. Each returns 0, having done nothing, when
  * its scratch cannot be had, and the caller takes the general loop. */
 static int still_rows_fast(const float *head, ptrdiff_t hy, const float *colour, ptrdiff_t sy,
-                           size_t y0, size_t y1, size_t width, float still, float *output);
+                           size_t y0, size_t y1, size_t width, float still,
+                           const float *grade, float *neural, float *output);
 struct temporal_args;
 static int temporal_rows_fast(const struct temporal_args *a, size_t y0, size_t y1);
 
 struct compose_args {
     const float *head; ptrdiff_t hy, hx, hc; const float *colour; ptrdiff_t sy, sx, sc;
-    size_t width; float blend; float *output;
+    size_t width; float blend; const float *grade; float *neural; float *output;
 };
 
 static void compose_rows(const void *args, size_t y0, size_t y1)
@@ -330,7 +463,7 @@ static void compose_rows(const void *args, size_t y0, size_t y1)
     const struct compose_args *a = args;
     if (a->hx == 4 && a->hc == 1 && a->sx == 3 && a->sc == 1 && a->width < (1u << 24)
         && still_rows_fast(a->head, a->hy, a->colour, a->sy, y0, y1, a->width, a->blend,
-                           a->output))
+                           a->grade, a->neural, a->output))
         return;
     const float *head = a->head, *colour = a->colour;
     ptrdiff_t hy = a->hy, hx = a->hx, hc = a->hc, sy = a->sy, sx = a->sx, sc = a->sc;
@@ -341,25 +474,31 @@ static void compose_rows(const void *args, size_t y0, size_t y1)
         for (size_t x = 0; x < width; ++x) {
             const float *h = head + (ptrdiff_t)y * hy + (ptrdiff_t)x * hx;
             const float *rgb = colour + (ptrdiff_t)y * sy + (ptrdiff_t)x * sx;
-            for (size_t c = 0; c < 3; ++c) {
-                float source = rgb[(ptrdiff_t)c * sc];
-                float predicted = unit(source + half(h[(ptrdiff_t)c * hc]) * 0.25f);
-                output[(y * width + x) * 3 + c] = unit(source + blend * (predicted - source));
-            }
+            float predicted[3];
+            for (size_t c = 0; c < 3; ++c)
+                predicted[c] = unit(rgb[(ptrdiff_t)c * sc] + half(h[(ptrdiff_t)c * hc]) * 0.25f);
+            finish_pixel(predicted, rgb, sc, blend, a->grade,
+                         a->neural ? a->neural + (y * width + x) * 3 : NULL,
+                         output + (y * width + x) * 3);
         }
     }
 }
 
+/* `grade` is `nr_frame.grade_for`'s three factors or NULL, and `neural`, RGB triples of the
+ * output's extent or NULL, receives the prediction truncated to half — the vendor's
+ * history for the next frame (`nr_frame._vendor_prediction`). */
 void nr_compose(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_t hc,
                 const float *colour, ptrdiff_t sy, ptrdiff_t sx, ptrdiff_t sc,
-                size_t height, size_t width, float intensity, float *output)
+                size_t height, size_t width, float intensity,
+                const float *grade, float *neural, float *output)
 {
     /* Our intensity > 1 extrapolates; the vendor recipe clamps negative intensity.
      * Keep both subtract/add operations even at intensity 1: simplifying to the
      * prediction would remove an FP32 rounding and can change encoded pixels.
      */
     float blend = intensity > 1.0f ? intensity : unit(intensity);
-    struct compose_args a = { head, hy, hx, hc, colour, sy, sx, sc, width, blend, output };
+    struct compose_args a = { head, hy, hx, hc, colour, sy, sx, sc, width, blend,
+                              grade, neural, output };
     nr_parallel_rows(height, compose_rows, &a);
 }
 
@@ -571,7 +710,7 @@ static inline void temporal_pixel(const float *h, ptrdiff_t hc,
                                   const float *gate_at, const float *table, float confidence,
                                   const float *mask_at, float intensity,
                                   float scale, float hold, float slope, float release,
-                                  float *out)
+                                  const float *grade, float *neural, float *out)
 {
     /* What the game itself did to this pixel since its previous frame: the
      * largest step of the three channels. Both the floor and the release read it. */
@@ -622,12 +761,12 @@ static inline void temporal_pixel(const float *h, ptrdiff_t hc,
      * deliberately drops so that intensity above 1 can extrapolate. */
     float blend = intensity;
     if (mask_at) blend *= *mask_at;
+    float predicted[3];
     for (size_t c = 0; c < 3; ++c) {
-        float source = rgb[(ptrdiff_t)c * sc];
-        float predicted = unit(source + half(h[(ptrdiff_t)c * hc]) * 0.25f);
-        predicted += alpha * (was[(ptrdiff_t)c * rc] - predicted);
-        out[c] = unit(source + blend * (predicted - source));
+        predicted[c] = unit(rgb[(ptrdiff_t)c * sc] + half(h[(ptrdiff_t)c * hc]) * 0.25f);
+        predicted[c] += alpha * (was[(ptrdiff_t)c * rc] - predicted[c]);
     }
+    finish_pixel(predicted, rgb, sc, blend, grade, neural, out);
 }
 
 /* The temporal composition, which this tree has and the other does not.
@@ -653,7 +792,8 @@ struct temporal_args {
     const float *gate; ptrdiff_t gy, gx;
     const float *table; float confidence;
     const float *mask; ptrdiff_t my, mx;
-    size_t width; float intensity, scale, hold, slope, release; float *output;
+    size_t width; float intensity, scale, hold, slope, release;
+    const float *grade; float *neural; float *output;
 };
 
 static void temporal_rows(const void *args, size_t y0, size_t y1)
@@ -672,7 +812,8 @@ static void temporal_rows(const void *args, size_t y0, size_t y1)
                            a->table, a->confidence,
                            a->mask ? a->mask + (ptrdiff_t)y * a->my
                                              + (ptrdiff_t)x * a->mx : NULL,
-                           a->intensity, a->scale, a->hold, a->slope, a->release,
+                           a->intensity, a->scale, a->hold, a->slope, a->release, a->grade,
+                           a->neural ? a->neural + (y * a->width + x) * 3 : NULL,
                            a->output + (y * a->width + x) * 3);
         }
     }
@@ -687,29 +828,16 @@ void nr_compose_temporal(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_
                          const float *mask, ptrdiff_t my, ptrdiff_t mx,
                          size_t height, size_t width, float intensity,
                          float scale, float hold, float slope, float release,
-                         float *output)
+                         const float *grade, float *neural, float *output)
 {
     struct temporal_args a = { head, hy, hx, hc, colour, sy, sx, sc, history, ry, rx, rc,
                                previous, py, px, pc, gate, gy, gx, table, confidence,
-                               mask, my, mx, width, intensity, scale, hold, slope, release, output };
+                               mask, my, mx, width, intensity, scale, hold, slope, release,
+                               grade, neural, output };
     nr_parallel_rows(height, temporal_rows, &a);
 }
 
 /* -- the fused composition ------------------------------------------------ */
-
-#if defined(_MSC_VER) && !defined(__clang__)
-#define NR_RESTRICT __restrict
-#define NR_ALWAYS_INLINE static __forceinline
-#define NR_IVDEP __pragma(loop(ivdep))
-#else
-#define NR_RESTRICT __restrict__
-#define NR_ALWAYS_INLINE static inline __attribute__((always_inline))
-#if defined(__clang__)
-#define NR_IVDEP     /* clang vectorises what it can without being asked, and warns if asked */
-#else
-#define NR_IVDEP _Pragma("GCC ivdep")
-#endif
-#endif
 
 /* A float rounded to half and back, and the half's sixteen bits, with no `_Float16`: a CPU
  * without vector half arithmetic cannot vectorise a loop around the conversion. Normal
@@ -758,6 +886,25 @@ static inline float clamp01(float value)
     return value > 1.0f ? 1.0f : value;
 }
 
+/* The encoder's rounding of one composed pixel, all four bytes: the request's alpha written
+ * back as it was, so the store is one whole interleaved group rather than three lanes of
+ * four. */
+NR_ALWAYS_INLINE void encode_pixel(const float o[3], uint8_t *NR_RESTRICT pixel, int x,
+                                   const int bgra)
+{
+    uint8_t bytes[3];
+    for (int c = 0; c < 3; ++c) {
+        /* NumPy's byte cast maps NaN to zero; do not cast NaN in C. */
+        float value = o[c] == o[c] ? clamp01(o[c]) : 0.0f;
+        bytes[c] = (uint8_t)(value * 255.0f + 0.5f);
+    }
+    uint8_t alpha = pixel[4 * x + 3];
+    pixel[4 * x] = bytes[bgra ? 2 : 0];
+    pixel[4 * x + 1] = bytes[1];
+    pixel[4 * x + 2] = bytes[bgra ? 0 : 2];
+    pixel[4 * x + 3] = alpha;
+}
+
 /* `nr_compose_encode`'s pixel after the head's upscale, in two passes over a row so that
  * each is a loop the compiler can vectorise: first the gate — the table lookup, the one
  * gather, alone in its loop (no vector gather on NEON, and a gather in the loop kept clang
@@ -765,39 +912,65 @@ static inline float clamp01(float value)
  * the encoder, written as selects rather than branches. Each pixel's arithmetic is
  * `temporal_pixel`'s (or `nr_compose`'s without a history), operation for operation and in
  * the same order; only which loop it sits in moved. `confidence` multiplies
- * unconditionally: at 1 that is exact for every value the table holds. */
+ * unconditionally: at 1 that is exact for every value the table holds.
+ *
+ * `finish_pixel` is split the same way: with `keeping` the prediction goes into `kept`
+ * truncated to half, and a `grading` row stops there — `grade_row` and `grade_blend_row`
+ * take it on from the kept half, each in a loop of its own. */
 NR_ALWAYS_INLINE void
 compose_encode_colour(const float *NR_RESTRICT hq, const float *NR_RESTRICT rgb,
                       const float *NR_RESTRICT was, const float *NR_RESTRICT alphas,
                       float intensity, float still, float *NR_RESTRICT out,
-                      uint8_t *NR_RESTRICT pixel, int x, const int temporal, const int bgra)
+                      float *NR_RESTRICT kept, uint8_t *NR_RESTRICT pixel, int x,
+                      const int temporal, const int keeping, const int grading, const int bgra)
 {
     const float *p = rgb + 3 * x;
+    float predicted[3], o[3];
+    for (int c = 0; c < 3; ++c) {
+        predicted[c] = clamp01(p[c] + half_value(hq[4 * x + c]) * 0.25f);
+        if (temporal) predicted[c] += alphas[x] * (was[3 * x + c] - predicted[c]);
+    }
+    if (keeping)
+        for (int c = 0; c < 3; ++c) kept[3 * x + c] = truncate_half(predicted[c]);
+    if (grading) return;
+    const float blend = temporal ? intensity : still;
+    for (int c = 0; c < 3; ++c) o[c] = clamp01(p[c] + blend * (predicted[c] - p[c]));
+    for (int c = 0; c < 3; ++c) out[3 * x + c] = o[c];
+    encode_pixel(o, pixel, x, bgra);
+}
+
+/* The blend back towards the frame from a graded row, and the encoder when `pixel` is
+ * given, as `finish_pixel` and `compose_encode_colour` end. */
+NR_ALWAYS_INLINE void
+grade_blend_pixel(const float *NR_RESTRICT rgb, const float *NR_RESTRICT graded, float blend,
+                  float *NR_RESTRICT out, uint8_t *NR_RESTRICT pixel, int x,
+                  const int encoding, const int bgra)
+{
     float o[3];
     for (int c = 0; c < 3; ++c) {
-        float source = p[c];
-        float predicted = clamp01(source + half_value(hq[4 * x + c]) * 0.25f);
-        if (temporal) {
-            predicted += alphas[x] * (was[3 * x + c] - predicted);
-            o[c] = clamp01(source + intensity * (predicted - source));
-        } else {
-            o[c] = clamp01(source + still * (predicted - source));
-        }
+        float source = rgb[3 * x + c];
+        o[c] = clamp01(source + blend * (graded[3 * x + c] - source));
     }
     for (int c = 0; c < 3; ++c) out[3 * x + c] = o[c];
-    uint8_t bytes[3];
-    for (int c = 0; c < 3; ++c) {
-        /* NumPy's byte cast maps NaN to zero; do not cast NaN in C. */
-        float value = o[c] == o[c] ? clamp01(o[c]) : 0.0f;
-        bytes[c] = (uint8_t)(value * 255.0f + 0.5f);
+    if (encoding) encode_pixel(o, pixel, x, bgra);
+}
+
+static void grade_blend_row(const float *NR_RESTRICT rgb, const float *NR_RESTRICT kept,
+                            float *NR_RESTRICT graded, const float *NR_RESTRICT grade,
+                            float blend, int width, float *NR_RESTRICT out,
+                            uint8_t *NR_RESTRICT pixel, int bgra)
+{
+    grade_row(kept, graded, width, grade);
+    if (!pixel) {
+        NR_IVDEP
+        for (int x = 0; x < width; ++x) grade_blend_pixel(rgb, graded, blend, out, NULL, x, 0, 0);
+    } else if (bgra) {
+        NR_IVDEP
+        for (int x = 0; x < width; ++x) grade_blend_pixel(rgb, graded, blend, out, pixel, x, 1, 1);
+    } else {
+        NR_IVDEP
+        for (int x = 0; x < width; ++x) grade_blend_pixel(rgb, graded, blend, out, pixel, x, 1, 0);
     }
-    /* all four bytes, the request's alpha written back as it was, so the store is one
-     * whole interleaved group rather than three lanes of four */
-    uint8_t kept = pixel[4 * x + 3];
-    pixel[4 * x] = bytes[bgra ? 2 : 0];
-    pixel[4 * x + 1] = bytes[1];
-    pixel[4 * x + 2] = bytes[bgra ? 0 : 2];
-    pixel[4 * x + 3] = kept;
 }
 
 /* The release and the floor on the gates already looked up, where the game's previous
@@ -836,12 +1009,19 @@ compose_encode_moved(const float *NR_RESTRICT rgb, const float *NR_RESTRICT befo
  * (`test_native_image.py`). Upstream's general loop spent 22.7 ms of one core on a 1080p
  * frame, all of it arithmetic; with the gather in a loop of its own clang on an M3 goes
  * from 24.9 ms to the figure in notes, and GCC keeps the vector code it had. `rows` holds
- * five floats a pixel: the head's four, then the gate. */
-#define COMPOSE_COLOUR(temporal, bgra)                                                       \
+ * five floats a pixel: the head's four, then the gate; with a grade, six more after them —
+ * the kept half where `kept` is NULL, and the graded row. */
+#define COMPOSE_COLOUR(temporal, keeping, grading, bgra)                                     \
     NR_IVDEP                                                                                 \
     for (int x = 0; x < width; ++x)                                                          \
-        compose_encode_colour(rows, rgb, was, alphas, intensity, still, out, pixel, x,       \
-                              temporal, bgra)
+        compose_encode_colour(rows, rgb, was, alphas, intensity, still, out, kept, pixel, x, \
+                              temporal, keeping, grading, bgra)
+#define COMPOSE_COLOURS(temporal)                                                            \
+    if (grade) COMPOSE_COLOUR(temporal, 1, 1, 0);                                            \
+    else if (kept && bgra) COMPOSE_COLOUR(temporal, 1, 0, 1);                                \
+    else if (kept) COMPOSE_COLOUR(temporal, 1, 0, 0);                                        \
+    else if (bgra) COMPOSE_COLOUR(temporal, 0, 0, 1);                                        \
+    else COMPOSE_COLOUR(temporal, 0, 0, 0)
 #define COMPOSE_MOVED(releasing)                                                             \
     NR_IVDEP                                                                                 \
     for (int x = 0; x < width; ++x)                                                          \
@@ -854,11 +1034,15 @@ static void compose_encode_row(const float *NR_RESTRICT line, int lx,
                                const float *NR_RESTRICT before,
                                const float *NR_RESTRICT table,
                                float confidence, float intensity, float still, float scale,
-                               float hold, float slope, float release, int width,
+                               float hold, float slope, float release,
+                               const float *NR_RESTRICT grade, int width,
                                float *NR_RESTRICT rows, float *NR_RESTRICT out,
+                               float *NR_RESTRICT kept,
                                uint8_t *NR_RESTRICT pixel, int bgra)
 {
     float *NR_RESTRICT alphas = rows + 4 * (size_t)width;
+    float *NR_RESTRICT graded = rows + 8 * (size_t)width;
+    if (grade && !kept) kept = rows + 5 * (size_t)width;
     /* the head's second axis, its channels side by side — one vector a tap with a history,
      * whose four channels the head row holds; three without, which is all it holds then */
     if (was)
@@ -874,50 +1058,90 @@ static void compose_encode_row(const float *NR_RESTRICT line, int lx,
             for (int c = 0; c < 3; ++c) rows[4 * x + c] = a[c] * other + b[c] * w;
         }
     if (!was) {
-        if (bgra) COMPOSE_COLOUR(0, 1);
-        else COMPOSE_COLOUR(0, 0);
-        return;
+        COMPOSE_COLOURS(0);
+    } else {
+        for (int x = 0; x < width; ++x)
+            alphas[x] = table[half_bits(rows[4 * x + 3])] * confidence;
+        if (before) {
+            if (release != 0.0f) COMPOSE_MOVED(1);
+            else COMPOSE_MOVED(0);
+        }
+        COMPOSE_COLOURS(1);
     }
-    for (int x = 0; x < width; ++x)
-        alphas[x] = table[half_bits(rows[4 * x + 3])] * confidence;
-    if (before) {
-        if (release != 0.0f) COMPOSE_MOVED(1);
-        else COMPOSE_MOVED(0);
-    }
-    if (bgra) COMPOSE_COLOUR(1, 1);
-    else COMPOSE_COLOUR(1, 0);
+    if (grade)
+        grade_blend_row(rgb, kept, graded, grade, was ? intensity : still, width, out, pixel,
+                        bgra);
 }
+#undef COMPOSE_COLOURS
 #undef COMPOSE_COLOUR
 #undef COMPOSE_MOVED
 
 /* nr_compose's and nr_compose_temporal's pixel in the same loops as the fused pass: the
  * composition alone, no encoder. The arithmetic is `compose_rows`' and `temporal_pixel`'s,
  * operation for operation (`half_value` is `half`, `half_bits` the table's index, `clamp01`
- * `unit`); only the loop shape moved, so the compiler can vectorise it. */
+ * `unit`); only the loop shape moved, so the compiler can vectorise it. `keeping` and
+ * `grading` are `compose_encode_colour`'s. */
 NR_ALWAYS_INLINE void
 compose_colour(const float *NR_RESTRICT hq, const float *NR_RESTRICT rgb,
                const float *NR_RESTRICT was, const float *NR_RESTRICT alphas,
-               float blend, float *NR_RESTRICT out, int x, const int temporal)
+               float blend, float *NR_RESTRICT out, float *NR_RESTRICT kept, int x,
+               const int temporal, const int keeping, const int grading)
 {
+    float predicted[3];
+    for (int c = 0; c < 3; ++c) {
+        predicted[c] = clamp01(rgb[3 * x + c] + half_value(hq[4 * x + c]) * 0.25f);
+        if (temporal) predicted[c] += alphas[x] * (was[3 * x + c] - predicted[c]);
+    }
+    if (keeping)
+        for (int c = 0; c < 3; ++c) kept[3 * x + c] = truncate_half(predicted[c]);
+    if (grading) return;
     for (int c = 0; c < 3; ++c) {
         float source = rgb[3 * x + c];
-        float predicted = clamp01(source + half_value(hq[4 * x + c]) * 0.25f);
-        if (temporal) predicted += alphas[x] * (was[3 * x + c] - predicted);
-        out[3 * x + c] = clamp01(source + blend * (predicted - source));
+        out[3 * x + c] = clamp01(source + blend * (predicted[c] - source));
     }
 }
 
+#define COLOUR_ROW(temporal, keeping, grading)                                               \
+    do {                                                                                     \
+        NR_IVDEP                                                                             \
+        for (int x = 0; x < w; ++x)                                                          \
+            compose_colour(hq, rgb, was, alphas, blend, out, kept, x, temporal, keeping,     \
+                           grading);                                                         \
+    } while (0)
+/* One composed row in the fast layout: the colour, then the grade where there is one. */
+NR_ALWAYS_INLINE void
+colour_row(const float *NR_RESTRICT hq, const float *NR_RESTRICT rgb,
+           const float *NR_RESTRICT was, const float *NR_RESTRICT alphas, float blend,
+           float *NR_RESTRICT out, float *NR_RESTRICT kept, float *NR_RESTRICT scratch,
+           const float *NR_RESTRICT grade, int w, const int temporal)
+{
+    if (grade) {
+        if (!kept) kept = scratch;
+        COLOUR_ROW(temporal, 1, 1);
+        grade_blend_row(rgb, kept, scratch + 3 * (size_t)w, grade, blend, w, out, NULL, 0);
+    } else if (kept) {
+        COLOUR_ROW(temporal, 1, 0);
+    } else {
+        COLOUR_ROW(temporal, 0, 0);
+    }
+}
+#undef COLOUR_ROW
+
 static int still_rows_fast(const float *head, ptrdiff_t hy, const float *colour, ptrdiff_t sy,
-                           size_t y0, size_t y1, size_t width, float still, float *output)
+                           size_t y0, size_t y1, size_t width, float still,
+                           const float *grade, float *neural, float *output)
 {
     int w = (int)width;
+    float *scratch = grade ? malloc(6 * width * sizeof *scratch) : NULL;
+    if (grade && !scratch) return 0;
     for (size_t y = y0; y < y1; ++y) {
         const float *NR_RESTRICT hq = head + (ptrdiff_t)y * hy;
         const float *NR_RESTRICT rgb = colour + (ptrdiff_t)y * sy;
         float *NR_RESTRICT out = output + y * width * 3;
-        NR_IVDEP
-        for (int x = 0; x < w; ++x) compose_colour(hq, rgb, NULL, NULL, still, out, x, 0);
+        colour_row(hq, rgb, NULL, NULL, still, out, neural ? neural + y * width * 3 : NULL,
+                   scratch, grade, w, 0);
     }
+    free(scratch);
     return 1;
 }
 
@@ -928,8 +1152,9 @@ static int temporal_rows_fast(const struct temporal_args *a, size_t y0, size_t y
           && a->width < (1u << 24)))
         return 0;
     int width = (int)a->width, releasing = a->previous && a->release != 0.0f;
-    float *NR_RESTRICT alphas = malloc(a->width * sizeof *alphas);
+    float *NR_RESTRICT alphas = malloc((a->grade ? 7 : 1) * a->width * sizeof *alphas);
     if (!alphas) return 0;
+    float *NR_RESTRICT scratch = alphas + a->width;
     const float *NR_RESTRICT table = a->table;
     float confidence = a->confidence, scale = a->scale, hold = a->hold, slope = a->slope;
     float release = a->release, intensity = a->intensity;
@@ -954,8 +1179,8 @@ static int temporal_rows_fast(const struct temporal_args *a, size_t y0, size_t y
                     compose_encode_moved(rgb, before, alphas, scale, hold, slope, release, x, 0);
             }
         }
-        NR_IVDEP
-        for (int x = 0; x < width; ++x) compose_colour(hq, rgb, was, alphas, intensity, out, x, 1);
+        colour_row(hq, rgb, was, alphas, intensity, out,
+                   a->neural ? a->neural + y * a->width * 3 : NULL, scratch, a->grade, width, 1);
     }
     free(alphas);
     return 1;
@@ -971,7 +1196,7 @@ struct compose_encode_args {
     const float *table; float confidence;
     const float *mask; ptrdiff_t my, mx;
     size_t width; float intensity, still, scale, hold, slope, release;
-    float *output; uint8_t *encoded; size_t frame_width, top, left; int bgra;
+    float *output; const float *grade; float *neural; uint8_t *encoded; size_t frame_width, top, left; int bgra;
     float *samples; size_t step, sampled; int fast;
 };
 
@@ -984,7 +1209,7 @@ static void compose_encode_rows(const void *args, size_t y0, size_t y1)
     /* each band's own scratch: the head row after the first axis, and the fast path's row
      * after the second */
     float *row = a->low_y ? malloc(a->head_width * channels * sizeof *row) : NULL;
-    float *rows = a->fast ? malloc(5 * width * sizeof *rows) : NULL;
+    float *rows = a->fast ? malloc((a->grade ? 11 : 5) * width * sizeof *rows) : NULL;
     if ((a->low_y && !row) || (a->fast && !rows)) { free(row); free(rows); return; }
     for (size_t y = y0; y < y1; ++y) {
         const float *line;
@@ -1012,8 +1237,9 @@ static void compose_encode_rows(const void *args, size_t y0, size_t y1)
                                a->history ? a->history + (ptrdiff_t)y * a->ry : NULL,
                                a->previous ? a->previous + (ptrdiff_t)y * a->py : NULL,
                                a->table, a->confidence, a->intensity, a->still, a->scale,
-                               a->hold, a->slope, a->release, (int)width, rows,
+                               a->hold, a->slope, a->release, a->grade, (int)width, rows,
                                a->output + y * width * 3,
+                               a->neural ? a->neural + y * width * 3 : NULL,
                                a->encoded + ((a->top + y) * a->frame_width + a->left) * 4,
                                a->bgra);
             if (sampled && y % step == 0) {
@@ -1052,13 +1278,15 @@ static void compose_encode_rows(const void *args, size_t y0, size_t y1)
                                a->pc, NULL, a->table, a->confidence,
                                a->mask ? a->mask + (ptrdiff_t)y * a->my
                                                  + (ptrdiff_t)x * a->mx : NULL,
-                               a->intensity, a->scale, a->hold, a->slope, a->release, out);
+                               a->intensity, a->scale, a->hold, a->slope, a->release,
+                               a->grade, a->neural ? a->neural + (y * width + x) * 3 : NULL,
+                               out);
             } else {
-                for (size_t c = 0; c < 3; ++c) {
-                    float source = rgb[(ptrdiff_t)c * a->sc];
-                    float predicted = unit(source + half(h[c]) * 0.25f);
-                    out[c] = unit(source + a->still * (predicted - source));
-                }
+                float predicted[3];
+                for (size_t c = 0; c < 3; ++c)
+                    predicted[c] = unit(rgb[(ptrdiff_t)c * a->sc] + half(h[c]) * 0.25f);
+                finish_pixel(predicted, rgb, a->sc, a->still, a->grade,
+                             a->neural ? a->neural + (y * width + x) * 3 : NULL, out);
             }
             uint8_t *pixel = a->encoded + ((a->top + y) * a->frame_width + a->left + x) * 4;
             for (size_t c = 0; c < 3; ++c) {
@@ -1088,7 +1316,7 @@ static void compose_encode_rows(const void *args, size_t y0, size_t y1)
  * axis already at the output's extent; `channels` is the head's, 4 with a history and 3
  * without. The composition is still written to `output`, for the history and the log, and
  * the upscaled head itself on every `step`-th row and column into `samples` when given —
- * the values the log's gate figure reads.
+ * the values the log's gate figure reads. `grade` and `neural` are `nr_compose`'s.
  */
 void nr_compose_encode(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_t hc,
                        size_t head_width, size_t channels,
@@ -1101,7 +1329,8 @@ void nr_compose_encode(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_t 
                        const float *mask, ptrdiff_t my, ptrdiff_t mx,
                        size_t height, size_t width, float intensity,
                        float scale, float hold, float slope, float release,
-                       float *output, uint8_t *encoded, size_t frame_width,
+                       float *output, const float *grade, float *neural,
+                       uint8_t *encoded, size_t frame_width,
                        size_t top, size_t left, int bgra, float *samples, size_t step)
 {
     struct compose_encode_args a = {
@@ -1111,7 +1340,8 @@ void nr_compose_encode(const float *head, ptrdiff_t hy, ptrdiff_t hx, ptrdiff_t 
         width, intensity,
         /* nr_compose's blend: below 1 clamped to [0, 1], above it extrapolating */
         intensity > 1.0f ? intensity : unit(intensity),
-        scale, hold, slope, release, output, encoded, frame_width, top, left, bgra,
+        scale, hold, slope, release, output, grade, neural, encoded, frame_width, top, left,
+        bgra,
         samples, step, samples && step ? (width + step - 1) / step : 0,
         /* the daemon's layout, which `compose_encode_row` takes with its strides fixed */
         low_x && sx == 3 && sc == 1 && !mask && channels == (history ? 4u : 3u)

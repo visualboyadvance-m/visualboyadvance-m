@@ -844,6 +844,10 @@ nr_place(nr_image)
 if(TARGET Threads::Threads)
   target_link_libraries(nr_image PRIVATE Threads::Threads)
 endif()
+# the style grade's truncation to half (floorf, fabsf)
+if(UNIX AND NOT APPLE)
+  target_link_libraries(nr_image PRIVATE m)
+endif()
 
 # ---------------------------------------------------------------------------------------
 # the weights, as C: the slices in the weights directory, one object each
@@ -1146,7 +1150,7 @@ if(NR_BUILD_TESTS)
     set(NR_PY_TESTS
       src/layer/test_daemon.py src/layer/test_ui_mask.py src/layer/test_present.py
       src/layer/test_temporal.py src/layer/test_toggle.py src/layer/test_panel.py
-      src/tools/publish_check.py src/tools/claims_check.py
+      src/tools/publish_check.py src/tools/claims_check.py src/tools/build_check.py
       src/gpu/test_portable.py src/gpu/test_gemm_contract.py src/gpu/test_input_fp16.py
       src/gpu/test_compact_head.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
@@ -1185,6 +1189,8 @@ if(NR_BUILD_TESTS)
       add_test(NAME test_native_image_threads${threads} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_native_image.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(test_native_image_threads${threads} PROPERTIES ENVIRONMENT "NR_HOST_THREADS=${threads};${NR_TEST_ENV}")
     endforeach()
+    # the profiler's kind tables, read out of the shaders: two passes sharing a number fail
+    nr_ctest(profile_tables "${PY}" "${PROJECT_SOURCE_DIR}/src/bench/frame_profile.py" --tables)
     # the batched feed-forward schedule against the plain one, on the device
     nr_ctest(test_ffn_batch "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_ffn_batch.py" --gpu)
     # the portable GEMM kernels, forced, on a device that has the matrix ones

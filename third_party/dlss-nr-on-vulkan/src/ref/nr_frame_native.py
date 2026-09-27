@@ -30,7 +30,8 @@ class Params(C.Structure):
                 ("history_confidence", C.c_float), ("blend_scale", C.c_float),
                 ("hold", C.c_float), ("slope", C.c_float), ("release", C.c_float),
                 ("automatic_mask", C.c_int), ("skin_structure", C.c_float),
-                ("automatic_structure", C.c_float), ("min_extent", C.c_int)]
+                ("automatic_structure", C.c_float), ("min_extent", C.c_int),
+                ("grade_off", C.c_int)]
 
 
 _lib = None
@@ -84,6 +85,17 @@ def library():
         lib.nr_frame_compose.argtypes = [C.c_void_p, C.c_void_p, C.c_void_p, C.c_int, C.c_int, C.c_void_p,
                                          C.c_void_p, C.c_void_p, C.POINTER(Params), C.c_void_p]
         lib.nr_frame_compose.restype = C.c_int
+        lib.nr_frame_update_neural.argtypes = lib.nr_frame_update_masked.argtypes + [C.c_void_p]
+        lib.nr_frame_update_neural.restype = C.c_int
+        lib.nr_frame_compose_neural.argtypes = lib.nr_frame_compose.argtypes + [C.c_void_p]
+        lib.nr_frame_compose_neural.restype = C.c_int
+        lib.nr_frame_compose_encode_neural.argtypes = lib.nr_frame_compose_encode.argtypes + [C.c_void_p]
+        lib.nr_frame_compose_encode_neural.restype = C.c_int
+        lib.nr_frame_render_extent.argtypes = [C.c_int, C.c_int, C.c_float, C.c_int,
+                                               C.POINTER(C.c_int), C.POINTER(C.c_int)]
+        lib.nr_frame_render_extent.restype = None
+        lib.nr_frame_grade.argtypes = [C.POINTER(Params), C.POINTER(C.c_float * 3)]
+        lib.nr_frame_grade.restype = C.c_int
         lib.nr_frame_split.argtypes = [C.c_void_p, C.c_int]
         lib.nr_frame_split.restype = C.c_double
         _lib = lib
@@ -95,6 +107,22 @@ def geometry(height, width, min_extent=320):
     h, w = C.c_int(), C.c_int()
     library().nr_frame_geometry_min(height, width, min_extent, C.byref(h), C.byref(w))
     return h.value, w.value
+
+
+def render_extent(width, height, scale, min_extent=320):
+    """`nr_frame.render_extent` in C: the (width, height) the network is handed."""
+    w, h = C.c_int(), C.c_int()
+    library().nr_frame_render_extent(width, height, scale, min_extent, C.byref(w), C.byref(h))
+    return w.value, h.value
+
+
+def grade(**values):
+    """`nr_frame.grade_for` in C, for the parameters `params` would make: three float32
+    factors, or None."""
+    out = (C.c_float * 3)()
+    if not library().nr_frame_grade(C.byref(params(**values)), C.byref(out)):
+        return None
+    return tuple(np.float32(v) for v in out)
 
 
 def params(**values):
@@ -112,6 +140,18 @@ def _image(array, name, channels):
     if array.ndim != 3 or array.shape[2] != channels:
         raise ValueError(f"{name} must be (height, width, {channels})")
     return array
+
+
+def _neural(neural, colour):
+    """Where the C keeps the vendor's history: None, or a writable C-contiguous float32
+    array of the colour's shape, filled in place."""
+    if neural is None:
+        return None
+    if (not isinstance(neural, np.ndarray) or neural.dtype != np.float32
+            or neural.shape != colour.shape or not neural.flags.c_contiguous
+            or not neural.flags.writeable):
+        raise ValueError("neural must be writable C-contiguous float32 of the colour's shape")
+    return neural.ctypes.data
 
 
 def embedded_weights_size():
@@ -166,7 +206,9 @@ class NativeFrame:
         return image, image.ctypes.data
 
     def update(self, colour, history=None, previous=None, control_mask=None, want_head=False,
-               **values):
+               neural=None, **values):
+        """`neural`, an array of the colour's shape, receives the vendor's history
+        (`nr_frame_update_neural`)."""
         colour = _image(colour, "colour", 3)
         height, width = colour.shape[:2]
         history, hp = self._optional(history, colour, "history")
@@ -175,11 +217,11 @@ class NativeFrame:
         output = np.empty((height, width, 3), np.float32)
         head = np.empty((height, width, 4), np.float32) if want_head else None
         p = params(**values)
-        if self.lib.nr_frame_update_masked(
+        if self.lib.nr_frame_update_neural(
                 self.handle, colour.ctypes.data, height, width, hp, pp, mp,
                 C.byref(p), output.ctypes.data,
-                head.ctypes.data if head is not None else None):
-            self._fail("nr_frame_update_masked")
+                head.ctypes.data if head is not None else None, _neural(neural, colour)):
+            self._fail("nr_frame_update_neural")
         return (output, head) if want_head else output
 
     def features(self, colour, history=None, control_mask=None, **values):
@@ -195,8 +237,10 @@ class NativeFrame:
             self._fail("nr_frame_features_masked")
         return out
 
-    def compose(self, head, colour, history=None, previous=None, control_mask=None, **values):
-        """The composition of a cropped (h, w, 4) head, at any intensity, without the network."""
+    def compose(self, head, colour, history=None, previous=None, control_mask=None, neural=None,
+                **values):
+        """The composition of a cropped (h, w, 4) head, at any intensity, without the network.
+        `neural` is `update`'s."""
         colour = _image(colour, "colour", 3)
         head = _image(head, "head", 4)
         height, width = colour.shape[:2]
@@ -207,13 +251,14 @@ class NativeFrame:
         control_mask, mp = self._optional(control_mask, colour, "control_mask")
         output = np.empty((height, width, 3), np.float32)
         p = params(**values)
-        if self.lib.nr_frame_compose(self.handle, head.ctypes.data, colour.ctypes.data, height, width,
-                                     hp, pp, mp, C.byref(p), output.ctypes.data):
-            self._fail("nr_frame_compose")
+        if self.lib.nr_frame_compose_neural(self.handle, head.ctypes.data, colour.ctypes.data, height,
+                                            width, hp, pp, mp, C.byref(p), output.ctypes.data,
+                                            _neural(neural, colour)):
+            self._fail("nr_frame_compose_neural")
         return output
 
     def compose_encode(self, head, colour, encoded, top=0, left=0, bgra=True, history=None,
-                       previous=None, control_mask=None, **values):
+                       previous=None, control_mask=None, neural=None, **values):
         """`nr_frame.compose_encode` in C: the (hh, hw, 4) head brought up to the colour's
         extent, composed and encoded into `encoded` (a writable (H, W, 4) uint8 copy of the
         request) at (top, left). Returns the composition."""
@@ -228,11 +273,12 @@ class NativeFrame:
         control_mask, mp = self._optional(control_mask, colour, "control_mask")
         output = np.empty((height, width, 3), np.float32)
         p = params(**values)
-        if self.lib.nr_frame_compose_encode(self.handle, head.ctypes.data, head.shape[0], head.shape[1],
-                                            colour.ctypes.data, height, width, hp, pp, mp, C.byref(p),
-                                            output.ctypes.data, encoded.ctypes.data, encoded.shape[1],
-                                            top, left, int(bool(bgra))):
-            self._fail("nr_frame_compose_encode")
+        if self.lib.nr_frame_compose_encode_neural(
+                self.handle, head.ctypes.data, head.shape[0], head.shape[1],
+                colour.ctypes.data, height, width, hp, pp, mp, C.byref(p),
+                output.ctypes.data, encoded.ctypes.data, encoded.shape[1],
+                top, left, int(bool(bgra)), _neural(neural, colour)):
+            self._fail("nr_frame_compose_encode_neural")
         return output
 
     def run_features(self, features):

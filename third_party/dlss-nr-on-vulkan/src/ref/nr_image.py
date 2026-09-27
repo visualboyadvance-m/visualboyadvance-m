@@ -50,14 +50,14 @@ def _library():
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, ptr, C.c_float, ptr, stride, stride,
-        size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float, ptr]
+        size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float, ptr, ptr, ptr]
     lib.nr_compose_temporal.restype = None
     lib.nr_compose_encode.argtypes = [
         ptr, stride, stride, stride, size, size, ptr, ptr, ptr, ptr, ptr, ptr,
         ptr, stride, stride, stride, ptr, stride, stride, stride,
         ptr, stride, stride, stride, ptr, C.c_float, ptr, stride, stride,
         size, size, C.c_float, C.c_float, C.c_float, C.c_float, C.c_float,
-        ptr, ptr, size, size, size, C.c_int, ptr, size]
+        ptr, ptr, ptr, ptr, size, size, size, C.c_int, ptr, size]
     lib.nr_compose_encode.restype = None
     lib.nr_resize_axis.argtypes = [ptr, stride, stride, stride, size, size, size,
                                   C.c_int, ptr, ptr, ptr, ptr]
@@ -66,7 +66,7 @@ def _library():
                                  ptr]
     lib.nr_area_mean.restype = None
     lib.nr_compose.argtypes = [ptr, stride, stride, stride, ptr, stride, stride, stride,
-                              size, size, C.c_float, ptr]
+                              size, size, C.c_float, ptr, ptr, ptr]
     lib.nr_compose.restype = None
     lib.nr_decode8.argtypes = [ptr, size, C.c_int, ptr]
     lib.nr_decode8.restype = None
@@ -108,7 +108,23 @@ def encode8(image, raw, bgra):
     return output.tobytes()
 
 
-def compose(head, colour, intensity):
+def _grade(grade):
+    """`nr_frame.grade_for`'s three factors as the C reads them, or None."""
+    return None if grade is None else np.array(grade, np.float32)
+
+
+def _neural(neural, shape):
+    """Where the composition keeps the vendor's history: `neural` itself, which must be
+    C-contiguous float32 of the colour's shape, or None."""
+    if neural is not None and (not isinstance(neural, np.ndarray) or neural.dtype != np.float32
+                               or neural.shape != shape or not neural.flags.c_contiguous
+                               or not neural.flags.writeable):
+        raise ValueError('neural must be writable C-contiguous float32 of the colour\'s shape')
+    return neural
+
+
+def compose(head, colour, intensity, *, grade=None, neural=None):
+    """`nr_frame.compose` of a still frame without a mask; `grade` and `neural` are its."""
     lib = library()
     if lib is None:
         return None
@@ -117,9 +133,12 @@ def compose(head, colour, intensity):
     if (head.ndim != 3 or colour.ndim != 3 or head.shape[:2] != colour.shape[:2]
             or head.shape[2] < 3 or colour.shape[2] != 3):
         raise ValueError('head and colour must share height and width')
+    grade, neural = _grade(grade), _neural(neural, colour.shape)
     output = np.empty(colour.shape, np.float32)
     lib.nr_compose(head.ctypes.data, *_strides(head), colour.ctypes.data, *_strides(colour),
-                   *colour.shape[:2], intensity, output.ctypes.data)
+                   *colour.shape[:2], intensity,
+                   grade.ctypes.data if grade is not None else None,
+                   neural.ctypes.data if neural is not None else None, output.ctypes.data)
     return output
 
 
@@ -178,7 +197,8 @@ def to_half(source, target):
 
 
 def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
-                     blend_scale, hold, slope, table=None, confidence=1.0, release=0.0):
+                     blend_scale, hold, slope, table=None, confidence=1.0, release=0.0,
+                     grade=None, neural=None):
     """`nr_frame.compose` with a history, a floor and an optional control mask.
 
     With `table` — `nr_frame.gate_table`, NumPy's sigmoid on every half value — the gate
@@ -188,6 +208,7 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
     disagree in the last bit, and the contract here is byte-identical output rather than
     nearly. `slope` is the folded constant of the floor, for the same reason — see the C.
     `release`, folded the same way, fades the gate where the game's pixel changed; 0 is off.
+    `grade` and `neural` are `nr_frame.compose`'s.
     """
     lib = library()
     if lib is None:
@@ -217,6 +238,7 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
         mask = np.require(mask, dtype=np.float32, requirements=['A'])
         if mask.ndim != 3 or mask.shape[:2] != colour.shape[:2]:
             raise ValueError('the control mask must match the colour')
+    grade, neural = _grade(grade), _neural(neural, colour.shape)
     output = np.empty(colour.shape, np.float32)
     lib.nr_compose_temporal(
         head.ctypes.data, *_strides(head),
@@ -228,13 +250,15 @@ def compose_temporal(head, colour, history, previous, gate, mask, *, intensity,
         table.ctypes.data if table is not None else None, confidence,
         mask.ctypes.data if mask is not None else None,
         *(_strides(mask)[:2] if mask is not None else (0, 0)),
-        *colour.shape[:2], intensity, blend_scale, hold, slope, release, output.ctypes.data)
+        *colour.shape[:2], intensity, blend_scale, hold, slope, release,
+        grade.ctypes.data if grade is not None else None,
+        neural.ctypes.data if neural is not None else None, output.ctypes.data)
     return output
 
 
 def compose_encode(head, colour, history, previous, mask, encoded, *, top, left, bgra,
                    intensity, blend_scale=0.0, hold=0.0, slope=0.0, table=None,
-                   confidence=1.0, release=0.0, samples=None):
+                   confidence=1.0, release=0.0, samples=None, grade=None, neural=None):
     """`bilinear` of the head to the colour's extent, then `compose_temporal` — or, with
     no history, `compose` — then `encode8` into `encoded` at (`top`, `left`), in one pass.
 
@@ -244,6 +268,7 @@ def compose_encode(head, colour, history, previous, mask, encoded, *, top, left,
     what the separate passes return; the bytes they would have encoded are in `encoded`.
     `samples`, a step: the upscaled head on every step-th row and column comes back too,
     as `(composition, samples)` — what `bilinear(head)[::step, ::step]` would hold.
+    `grade` and `neural` are `nr_frame.compose`'s; a grade takes the per-pixel loop.
     """
     lib = library()
     if lib is None:
@@ -279,6 +304,7 @@ def compose_encode(head, colour, history, previous, mask, encoded, *, top, left,
     plans = [(_axis_plan(head.shape[axis], count) if head.shape[axis] != count else (None,) * 3)
              for axis, count in enumerate((height, width))]
     pointer = lambda array: array.ctypes.data if array is not None else None
+    grade, neural = _grade(grade), _neural(neural, colour.shape)
     output = np.empty(colour.shape, np.float32)
     step = int(samples or 0)
     sampled = (np.empty((-(-height // step), -(-width // step), channels), np.float32)
@@ -292,7 +318,8 @@ def compose_encode(head, colour, history, previous, mask, encoded, *, top, left,
         pointer(table), confidence,
         pointer(mask), *(_strides(mask)[:2] if mask is not None else (0, 0)),
         height, width, intensity, blend_scale, hold, slope, release,
-        output.ctypes.data, encoded.ctypes.data, encoded.shape[1], top, left, int(bool(bgra)),
+        output.ctypes.data, pointer(grade), pointer(neural),
+        encoded.ctypes.data, encoded.shape[1], top, left, int(bool(bgra)),
         pointer(sampled), step)
     return (output, sampled) if step else output
 

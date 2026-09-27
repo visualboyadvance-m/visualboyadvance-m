@@ -12,7 +12,8 @@
 #include "nr_d3d.hlsli"
 #include "nr_epilogue.hlsli"      /* hmul/hadd/hfma and cosine_reciprocal: one definition */
 
-static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 3u;
+// VIT_SOFTMAX is 6: 3-5 are the fused attention kernels' profile kinds
+static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 6u;
 
 /* ROW_LANES: 32 for every row pass; the `attention_rows` build takes 256, for the
  * whole-row softmax alone — the same 8 KB of shared memory serving eight times the lanes
