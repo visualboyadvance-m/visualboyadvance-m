@@ -6,13 +6,17 @@
 #include <QComboBox>
 #include <QDir>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QLibrary>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QScreen>
 #include <QSlider>
@@ -169,54 +173,6 @@ QWidget* DisplayConfig::CreateBasicTab() {
             &DisplayConfig::OnPluginSelected);
     filters_form->addRow(plugin_label_, plugin_selector_);
 
-    // DLSS NR runs alongside the display filter, on either side of it. The
-    // checkbox only means anything where libnr_frame is part of the build, so
-    // it is left out entirely otherwise rather than offered as a control that
-    // cannot act.
-    if (dlssnr::Available()) {
-        dlss_nr_ = new QCheckBox(tr("Apply &DLSS NR:"), filters_group);
-        dlss_nr_->setToolTip(tr("Run the DLSS NR neural filter alongside the display filter"));
-        bindings().BindCheckBox(dlss_nr_, config::OptionID::kDispDlssNr);
-
-        // Sharing a parent makes the two radios mutually exclusive, and
-        // BindRadioButtons() maps them positionally onto the option's values.
-        auto* stage_row = new QWidget(filters_group);
-        auto* stage_layout = new QHBoxLayout(stage_row);
-        stage_layout->setContentsMargins(0, 0, 0, 0);
-
-        dlss_nr_pre_ = new QRadioButton(tr("Pre-process"), stage_row);
-        dlss_nr_pre_->setToolTip(
-            tr("Run DLSS NR on the emulated image first, then let the display filter scale "
-               "the result. Much cheaper, since the network sees the unscaled frame"));
-        dlss_nr_post_ = new QRadioButton(tr("Post-process"), stage_row);
-        dlss_nr_post_->setToolTip(
-            tr("Run DLSS NR over whatever the display filter produces, at the filtered size"));
-        dlss_nr_display_ = new QRadioButton(tr("At display size"), stage_row);
-        dlss_nr_display_->setToolTip(
-            tr("Scale the display filter's output up to the size it is shown at and run "
-               "DLSS NR over that, as on a screenshot of the game. Slowest by far: the "
-               "network sees every displayed pixel"));
-
-        stage_layout->addWidget(dlss_nr_pre_);
-        stage_layout->addWidget(dlss_nr_post_);
-        stage_layout->addWidget(dlss_nr_display_);
-        stage_layout->addStretch(1);
-        // In dlssnr::Stage order: kBeforeFilter, kAfterFilter, kAtDisplay.
-        bindings().BindRadioButtons({dlss_nr_pre_, dlss_nr_post_, dlss_nr_display_},
-                                    config::OptionID::kDispDlssNrStage);
-        filters_form->addRow(dlss_nr_, stage_row);
-
-        // The stage only means anything while the pass is on.
-        const auto sync_stage = [this] {
-            const bool on = dlss_nr_->isChecked();
-            dlss_nr_pre_->setEnabled(on);
-            dlss_nr_post_->setEnabled(on);
-            dlss_nr_display_->setEnabled(on);
-        };
-        connect(dlss_nr_, &QCheckBox::toggled, this, sync_stage);
-        sync_stage();
-    }
-
     interframe_selector_ = new QComboBox(filters_group);
     interframe_selector_->addItems(widgets::InterframeLabels());
     connect(interframe_selector_, QOverload<int>::of(&QComboBox::activated), this,
@@ -228,12 +184,222 @@ QWidget* DisplayConfig::CreateBasicTab() {
             });
     filters_form->addRow(tr("Interframe blending:"), interframe_selector_);
     layout->addWidget(filters_group);
+    // DLSS NR runs alongside the display filter. The group only means anything
+    // where libnr_frame is part of the build, so it is left out entirely
+    // otherwise rather than offered as controls that cannot act.
+    if (dlssnr::Available())
+        layout->addWidget(CreateDlssNrGroup(page));
     layout->addStretch(1);
 
     // The filter and interframe selectors are applied live; loading them from
     // the options happens in OnDialogShown() (the plugin list has to be
     // populated first).
     return page;
+}
+
+// The same group as PCSX2's DLSS-NR settings: nr_frame's command line, with
+// Profile / Off (the spin boxes' special value) standing for a value left to
+// the profile or unset.
+QWidget* DisplayConfig::CreateDlssNrGroup(QWidget* parent) {
+    auto* group = new QGroupBox(tr("DLSS-NR (Experimental)"), parent);
+    auto* grid = new QGridLayout(group);
+
+    // A double option whose negative values mean "not set": the box's minimum
+    // shows `special` and writes -1.
+    const auto bind_special = [this](QDoubleSpinBox* spin, config::OptionID id) {
+        config::Option* option = config::Option::ByID(id);
+        bindings().Add(
+            [spin, option] {
+                const double v = option->GetDouble();
+                spin->setValue(v < 0 ? spin->minimum() : v);
+            },
+            [spin, option] {
+                spin->interpretText();
+                const double v = spin->value();
+                return option->SetDouble(v <= spin->minimum() ? -1.0 : v);
+            });
+    };
+    const auto double_spin = [group](double min, double max, double step, int decimals,
+                                     const QString& suffix, const QString& special,
+                                     const QString& tip) {
+        auto* spin = new QDoubleSpinBox(group);
+        spin->setDecimals(decimals);
+        spin->setRange(min, max);
+        spin->setSingleStep(step);
+        spin->setSuffix(suffix);
+        spin->setSpecialValueText(special);
+        spin->setToolTip(tip);
+        return spin;
+    };
+    const auto int_spin = [this, group](config::OptionID id, const QString& suffix,
+                                        const QString& special, const QString& tip) {
+        auto* spin = new QSpinBox(group);
+        bindings().BindSpinBox(spin, id);
+        spin->setSuffix(suffix);
+        spin->setSpecialValueText(special);
+        spin->setToolTip(tip);
+        return spin;
+    };
+
+    // Enable DLSS-NR, Use Frame History.
+    dlss_nr_ = new QCheckBox(tr("Enable &DLSS-NR"), group);
+    dlss_nr_->setToolTip(tr("Runs every frame through the DLSS-NR neural rendering model. Very "
+                            "slow and experimental."));
+    bindings().BindCheckBox(dlss_nr_, config::OptionID::kDispDlssNr);
+    auto* history = new QCheckBox(tr("Use Frame &History"), group);
+    history->setToolTip(tr("Feeds the previous filtered frame back into the model, for steadier "
+                           "motion. Unchecked, every frame is filtered on its own exactly as the "
+                           "nr_frame command filters a picture, and the filter runs faster."));
+    bindings().BindCheckBox(history, config::OptionID::kDispDlssNrHistory);
+    grid->addWidget(dlss_nr_, 0, 0, 1, 3);
+    grid->addWidget(history, 0, 3, 1, 3);
+
+    // Apply: Pre-filter / Post-filter / At display size -- which side of the
+    // display filter the pass runs on (VBA-M's own; PCSX2 has one place).
+    auto* apply_row = new QWidget(group);
+    auto* apply_layout = new QHBoxLayout(apply_row);
+    apply_layout->setContentsMargins(0, 0, 0, 0);
+    auto* pre = new QRadioButton(tr("&Pre-filter"), apply_row);
+    pre->setToolTip(tr("Run DLSS-NR on the emulated image, then let the display filter scale "
+                       "the result. The cheapest: the model sees the unscaled frame."));
+    auto* post = new QRadioButton(tr("P&ost-filter"), apply_row);
+    post->setToolTip(tr("Run DLSS-NR over the display filter's output, at the filtered size."));
+    auto* at_display = new QRadioButton(tr("At display si&ze"), apply_row);
+    at_display->setToolTip(tr("Scale the display filter's output up to the size it is shown at "
+                              "and run DLSS-NR over that, as over a screenshot of the game. "
+                              "Maximum Height bounds the cost."));
+    apply_layout->addWidget(new QLabel(tr("Apply:"), apply_row));
+    apply_layout->addWidget(pre);
+    apply_layout->addWidget(post);
+    apply_layout->addWidget(at_display);
+    apply_layout->addStretch(1);
+    // In dlssnr::Stage order: kBeforeFilter, kAfterFilter, kAtDisplay.
+    bindings().BindRadioButtons({pre, post, at_display}, config::OptionID::kDispDlssNrStage);
+    grid->addWidget(apply_row, 1, 0, 1, 6);
+
+    // Profile, Intensity, Maximum Height.
+    auto* profile = new QComboBox(group);
+    profile->addItems({tr("Standard"), tr("Natural"), tr("Cinematic"), tr("Neutral"), tr("Vendor")});
+    profile->setToolTip(tr("The style, local tone and local structure the model is conditioned "
+                           "on. Neutral turns local tone and structure off, Vendor raises "
+                           "structure."));
+    bindings().BindComboBoxInt(profile, config::OptionID::kDispDlssNrProfile);
+    QSpinBox* intensity =
+        int_spin(config::OptionID::kDispDlssNrIntensity, QStringLiteral("%"), QString(),
+                 tr("Blend of the model's picture against the game's. Above 100% extrapolates."));
+    QSpinBox* max_height =
+        int_spin(config::OptionID::kDispDlssNrMaxHeight, tr("px"), QString(),
+                 tr("Frames taller than this are scaled down before the model runs, and back "
+                    "up after. Lower is faster."));
+    auto* top = new QHBoxLayout();
+    top->addWidget(new QLabel(tr("Profile:"), group));
+    top->addWidget(profile, 1);
+    top->addWidget(new QLabel(tr("Intensity:"), group));
+    top->addWidget(intensity, 1);
+    top->addWidget(new QLabel(tr("Maximum Height:"), group));
+    top->addWidget(max_height, 1);
+    grid->addLayout(top, 2, 0, 1, 6);
+
+    // The explicit overrides, two to a row.
+    const QString keep = tr("Profile");
+    const QString off = tr("Off");
+    int cell = 0;
+    const auto add = [&](const QString& label, QWidget* field) {
+        const int row = 3 + cell / 2;
+        const int column = (cell % 2) * 3;
+        grid->addWidget(new QLabel(label, group), row, column);
+        grid->addWidget(field, row, column + 1, 1, 2);
+        cell++;
+    };
+    add(tr("Style Index:"),
+        int_spin(config::OptionID::kDispDlssNrStyleIndex, QString(), keep,
+                 tr("The vendor style index the model is conditioned on (nr_frame "
+                    "--style-index). Profile keeps the profile's.")));
+    const struct {
+        const char* label;
+        config::OptionID id;
+        bool special_off;
+        const char* tip;
+    } kConditioning[] = {
+        {QT_TR_NOOP("Local Tone:"), config::OptionID::kDispDlssNrLocalTone, false,
+         QT_TR_NOOP("Local tone the model is conditioned on (nr_frame --local-tone). Profile "
+                    "keeps the profile's.")},
+        {QT_TR_NOOP("Local Structure:"), config::OptionID::kDispDlssNrLocalStructure, false,
+         QT_TR_NOOP("Local structure the model is conditioned on (nr_frame --local-structure). "
+                    "Profile keeps the profile's.")},
+        {QT_TR_NOOP("Skin Structure:"), config::OptionID::kDispDlssNrSkinStructure, true,
+         QT_TR_NOOP("Structure on skin, through the automatic mask (nr_frame --skin-structure). "
+                    "Setting this or Automatic Mask turns the automatic mask on.")},
+        {QT_TR_NOOP("Automatic Mask:"), config::OptionID::kDispDlssNrAutoMask, true,
+         QT_TR_NOOP("Structure through the automatic mask outside skin (nr_frame --auto-mask).")},
+    };
+    for (const auto& c : kConditioning) {
+        QDoubleSpinBox* spin =
+            double_spin(-0.05, 4.0, 0.05, 2, QString(), c.special_off ? off : keep, tr(c.tip));
+        bind_special(spin, c.id);
+        add(tr(c.label), spin);
+    }
+    add(tr("Frame Index:"),
+        int_spin(config::OptionID::kDispDlssNrFrameIndex, QString(), QString(),
+                 tr("Seeds the model's noise channels (nr_frame --frame-index).")));
+    const struct {
+        const char* label;
+        config::OptionID id;
+        double min, max, step;
+        int decimals;
+        bool px;
+        const char* tip;
+    } kComposition[] = {
+        {QT_TR_NOOP("Detail Strength:"), config::OptionID::kDispDlssNrDetailStrength, 0.0, 4.0,
+         0.05, 2, false,
+         QT_TR_NOOP("High-frequency weight of the model's change (nr_frame --detail-strength).")},
+        {QT_TR_NOOP("Colour Strength:"), config::OptionID::kDispDlssNrColourStrength, 0.0, 4.0,
+         0.05, 2, false,
+         QT_TR_NOOP("Low-frequency weight of the model's change (nr_frame --colour-strength).")},
+        {QT_TR_NOOP("Detail Radius:"), config::OptionID::kDispDlssNrDetailRadius, 0.1, 32.0,
+         0.5, 1, true,
+         QT_TR_NOOP("Radius of the split between detail and colour (nr_frame --detail-radius).")},
+    };
+    for (const auto& c : kComposition) {
+        QDoubleSpinBox* spin = double_spin(c.min, c.max, c.step, c.decimals,
+                                           c.px ? tr("px") : QString(), QString(), tr(c.tip));
+        bindings().BindDoubleSpinBox(spin, c.id);
+        add(tr(c.label), spin);
+    }
+
+    // Control Mask: [path] Browse... Clear
+    const int mask_row = 3 + (cell + 1) / 2;
+    auto* mask = new QLineEdit(group);
+    mask->setToolTip(tr("A PNG control mask (nr_frame --control-mask): red scales the blend, "
+                        "green the tone and blue the structure. It is resized to the filtered "
+                        "frame."));
+    bindings().BindLineEdit(mask, config::OptionID::kDispDlssNrControlMask);
+    auto* browse = new QPushButton(tr("Browse..."), group);
+    auto* clear = new QPushButton(tr("Clear"), group);
+    connect(browse, &QPushButton::clicked, this, [this, mask] {
+        const QString path = QFileDialog::getOpenFileName(
+            this, tr("Select a DLSS-NR control mask"), mask->text(), tr("PNG Images (*.png)"));
+        if (!path.isEmpty())
+            mask->setText(QDir::toNativeSeparators(path));
+    });
+    connect(clear, &QPushButton::clicked, mask, &QLineEdit::clear);
+    auto* mask_layout = new QHBoxLayout();
+    mask_layout->addWidget(new QLabel(tr("Control Mask:"), group));
+    mask_layout->addWidget(mask, 1);
+    mask_layout->addWidget(browse);
+    mask_layout->addWidget(clear);
+    grid->addLayout(mask_layout, mask_row, 0, 1, 6);
+
+    // The settings only mean anything while the pass is on.
+    const auto sync = [this, group] {
+        const bool on = dlss_nr_->isChecked();
+        for (QWidget* child : group->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly))
+            if (child != dlss_nr_)
+                child->setEnabled(on);
+    };
+    connect(dlss_nr_, &QCheckBox::toggled, this, sync);
+    sync();
+    return group;
 }
 
 QWidget* DisplayConfig::CreateBitDepthTab() {

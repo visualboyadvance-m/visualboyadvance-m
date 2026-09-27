@@ -237,7 +237,21 @@ std::array<Option, kNbOptions>& Option::All() {
         double video_scale = 3;
         bool retain_aspect = true;
         bool dlss_nr = false;
-        uint32_t dlss_nr_stage = 1;  // 0 = before the filter, 1 = after
+        uint32_t dlss_nr_stage = 1;  // dlssnr::Stage: pre-filter, post-filter, at display size
+        uint32_t dlss_nr_intensity = 100;
+        uint32_t dlss_nr_profile = 0;  // standard, natural, cinematic, neutral, vendor
+        uint32_t dlss_nr_max_height = 480;
+        bool dlss_nr_history = true;
+        int32_t dlss_nr_style_index = -1;  // negative keeps the profile's
+        double dlss_nr_local_tone = -1.0;  // negative keeps the profile's
+        double dlss_nr_local_structure = -1.0;  // negative keeps the profile's
+        double dlss_nr_skin_structure = -1.0;  // negative leaves it off
+        double dlss_nr_auto_mask = -1.0;  // negative leaves it off
+        double dlss_nr_detail_strength = 1.0;
+        double dlss_nr_colour_strength = 1.0;
+        double dlss_nr_detail_radius = 4.0;
+        uint32_t dlss_nr_frame_index = 0;
+        wxString dlss_nr_control_mask = wxEmptyString;
 
         /// GB
         wxString gb_bios = wxEmptyString;
@@ -359,6 +373,20 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispFilterPlugin, &g_owned_opts.filter_plugin),
         Option(OptionID::kDispDlssNr, &g_owned_opts.dlss_nr),
         Option(OptionID::kDispDlssNrStage, &g_owned_opts.dlss_nr_stage, 0, 2),
+        Option(OptionID::kDispDlssNrIntensity, &g_owned_opts.dlss_nr_intensity, 0, 400),
+        Option(OptionID::kDispDlssNrProfile, &g_owned_opts.dlss_nr_profile, 0, 4),
+        Option(OptionID::kDispDlssNrMaxHeight, &g_owned_opts.dlss_nr_max_height, 128, 2160),
+        Option(OptionID::kDispDlssNrHistory, &g_owned_opts.dlss_nr_history),
+        Option(OptionID::kDispDlssNrStyleIndex, &g_owned_opts.dlss_nr_style_index, -1, 127),
+        Option(OptionID::kDispDlssNrLocalTone, &g_owned_opts.dlss_nr_local_tone, -1, 4),
+        Option(OptionID::kDispDlssNrLocalStructure, &g_owned_opts.dlss_nr_local_structure, -1, 4),
+        Option(OptionID::kDispDlssNrSkinStructure, &g_owned_opts.dlss_nr_skin_structure, -1, 4),
+        Option(OptionID::kDispDlssNrAutoMask, &g_owned_opts.dlss_nr_auto_mask, -1, 4),
+        Option(OptionID::kDispDlssNrDetailStrength, &g_owned_opts.dlss_nr_detail_strength, 0, 4),
+        Option(OptionID::kDispDlssNrColourStrength, &g_owned_opts.dlss_nr_colour_strength, 0, 4),
+        Option(OptionID::kDispDlssNrDetailRadius, &g_owned_opts.dlss_nr_detail_radius, 0.1, 32),
+        Option(OptionID::kDispDlssNrFrameIndex, &g_owned_opts.dlss_nr_frame_index, 0, 1000000),
+        Option(OptionID::kDispDlssNrControlMask, &g_owned_opts.dlss_nr_control_mask),
         Option(OptionID::kDispPluginDir, &g_owned_opts.plugin_dir),
         Option(OptionID::kDispIFB, &g_owned_opts.interframe),
         Option(OptionID::kBitDepth, &g_owned_opts.bitdepth, 0, 3),
@@ -522,6 +550,34 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                _("Run the DLSS NR neural filter alongside the display filter")},
     OptionData{"Display/DlssNrStage", "",
                _("Whether DLSS NR runs before or after the display filter, or at display size")},
+    OptionData{"Display/DlssNrIntensity", "",
+               _("Blend of the DLSS NR picture against the source, in percent; above 100 extrapolates")},
+    OptionData{"Display/DlssNrProfile", "",
+               _("DLSS NR profile: 0 standard, 1 natural, 2 cinematic, 3 neutral, 4 vendor")},
+    OptionData{"Display/DlssNrMaxHeight", "",
+               _("Frames taller than this are scaled down before DLSS NR runs, and back up after")},
+    OptionData{"Display/DlssNrHistory", "",
+               _("Feed the previous DLSS NR output back into the model")},
+    OptionData{"Display/DlssNrStyleIndex", "",
+               _("DLSS NR style index; -1 keeps the profile's")},
+    OptionData{"Display/DlssNrLocalTone", "",
+               _("DLSS NR local tone; negative keeps the profile's")},
+    OptionData{"Display/DlssNrLocalStructure", "",
+               _("DLSS NR local structure; negative keeps the profile's")},
+    OptionData{"Display/DlssNrSkinStructure", "",
+               _("DLSS NR structure on skin through the automatic mask; negative is off")},
+    OptionData{"Display/DlssNrAutoMask", "",
+               _("DLSS NR structure through the automatic mask outside skin; negative is off")},
+    OptionData{"Display/DlssNrDetailStrength", "",
+               _("High-frequency weight of the DLSS NR change")},
+    OptionData{"Display/DlssNrColourStrength", "",
+               _("Low-frequency weight of the DLSS NR change")},
+    OptionData{"Display/DlssNrDetailRadius", "",
+               _("Radius of the DLSS NR split between detail and colour, in pixels")},
+    OptionData{"Display/DlssNrFrameIndex", "",
+               _("Seeds the DLSS NR model's noise channels")},
+    OptionData{"Display/DlssNrControlMask", "",
+               _("PNG control mask for DLSS NR: red scales the blend, green the tone, blue the structure")},
     OptionData{"Display/PluginDir", "", _("Directory containing RPI filter plugins")},
     OptionData{"Display/IFB", "", _("Interframe blending function")},
     OptionData{"Display/BitDepth", "BitDepth", _("Bit depth")},

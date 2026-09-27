@@ -158,10 +158,9 @@ private:
     wxControl* plugin_label_ = nullptr;
     wxChoice* plugin_selector_ = nullptr;
     wxChoice* filter_selector_ = nullptr;
+    // The DLSS-NR group: the enable box and everything it enables.
     wxCheckBox* dlss_nr_ = nullptr;
-    wxRadioButton* dlss_nr_pre_ = nullptr;
-    wxRadioButton* dlss_nr_post_ = nullptr;
-    wxRadioButton* dlss_nr_display_ = nullptr;
+    std::vector<wxWindow*> dlss_nr_controls_;
     wxChoice* interframe_selector_ = nullptr;
     wxChoice* sdlrenderer_selector_ = nullptr;
     wxControl* sdlrenderer_label_ = nullptr;
@@ -173,8 +172,10 @@ private:
     // hides unconditionally.
     std::vector<std::pair<const char*, config::RenderMethod>> render_method_radios_;
 
-    // Keeps the pre/post radios in step with the DLSS NR checkbox.
-    void SetDlssNrStageEnabled(bool enabled);
+    // Builds the DLSS-NR group into the Basic tab's DlssNrPanel.
+    void InitDlssNr();
+    // Keeps the DLSS-NR settings in step with the enable box.
+    void SetDlssNrControlsEnabled(bool enabled);
 
     const config::OptionsObserver dlss_nr_observer_;
     const config::OptionsObserver filter_observer_;

@@ -6,28 +6,31 @@
 // with libxmx, the weights and the shaders linked in statically.
 //
 // The filter keeps the source resolution (scale 1x): one RGB frame in, one RGB
-// frame out. A forward pass takes tens to hundreds of milliseconds even on a
-// fast GPU (the network extent is at least 320x320), so the work is
-// asynchronous. The panel creates a Filter when the option is selected (the
-// "initializer"); the filter thread then calls Apply32() every frame, which
-// hands the newest source frame to a worker thread.
+// frame out, driven the way PCSX2's GSDLSSNR drives libframe, which is the way
+// src/ref/nr_frame_main.c does: the same parameters (the profile, then the
+// explicit overrides -- Settings is nr_frame's command line), the optional
+// control mask, the features, the network at the vendor's extent, the head
+// cropped, then the composition. Without history a pass's output is
+// nr_frame's for the same picture, byte for byte. With history the previous
+// output (and, for the composition's floor, the previous input) goes into the
+// features and the composition as well.
 //
-// What Apply32() writes back is the newest finished pass's output as it is:
-// the network's picture of the frame that pass was given, a few frames behind
-// the emulator, refreshed whenever a pass lands. Until the first pass finishes
-// the source passes straight through.
+// Frames taller than Settings::max_height are scaled down (bilinear) before
+// the model runs and the result is scaled back up (bilinear), as PCSX2 does on
+// the GPU, so the cost of a pass is bounded whatever size the frame is.
 //
-// Each pass gets what the `nr_frame` command gives a picture with no flags:
-// the standard profile, frame index 0, no control mask, and the still path
-// with no history, so a pass's output depends on that frame alone and matches
-// `nr_frame IN.png OUT.png` on the same pixels, and those are the bytes that
-// reach the display -- except that the stages before and after the display
-// filter raise the intensity (kFilterStageIntensity).
+// The three steps run on three threads per Filter (features, network,
+// composition), so the caller never waits. With history a frame's features
+// wait for the previous frame's composition, so only one frame is in the
+// network or composition at a time; without it up to three frames are in
+// flight. Frames arriving while the pipeline is full are skipped, and
+// Apply32() writes the newest finished result, a few frames behind the
+// emulator. Until the first pass finishes the source passes straight through.
 //
 // The weights are shared process-wide: the model opens on the first pass a
-// Filter asks for (about two seconds, on the worker, never on the UI thread)
-// and closes when the last Filter goes. All libnr_frame calls are serialized,
-// since libxmx is one device.
+// Filter asks for (about two seconds, on the features thread, never on the UI
+// thread) and closes when the last Filter goes. libxmx is one device, so one
+// Filter's frames are in the model at a time; another Filter's wait for them.
 //
 // A Vulkan renderer can lend its instance and device (ShareVulkan): the model
 // then runs on the renderer's device and a queue the renderer hands over,
@@ -43,6 +46,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace dlssnr {
 
@@ -58,16 +62,41 @@ enum Stage : uint32_t {
     kAtDisplay = 2,
 };
 
-// The blend of the network's picture against the source (nr_frame_params'
-// `intensity`; > 1 extrapolates). The network redraws a picture at the size it
-// is given, so at display size its change is plain to see, while at a source
-// or filter-output size -- a few hundred pixels a side, each emulated pixel one
-// or two of them -- it moves each pixel only a few levels (4/255 on average on
-// a GBA frame at 240x160, 6/255 after a 2x filter), which the renderer's
-// upscale then hides. The stages before and after the filter extrapolate the
-// change by this much instead, so it shows; at display size it is left alone.
-inline constexpr float kDisplayIntensity = 1.0f;
-inline constexpr float kFilterStageIntensity = 3.0f;
+// nr_frame's --profile values, in the order of its PROFILES table.
+enum Profile : uint32_t {
+    kProfileStandard = 0,
+    kProfileNatural = 1,
+    kProfileCinematic = 2,
+    kProfileNeutral = 3,
+    kProfileVendor = 4,
+    kProfileCount
+};
+
+// nr_frame's command line, as settings (PCSX2's GSDLSSNR::Settings).
+struct Settings {
+    float intensity = 1.0f;          // --intensity
+    uint32_t profile = kProfileStandard;  // --profile
+    int style_index = -1;            // --style-index, negative keeps the profile's
+    float local_tone = -1.0f;        // --local-tone, negative keeps the profile's
+    float local_structure = -1.0f;   // --local-structure, negative keeps the profile's
+    float skin_structure = -1.0f;    // --skin-structure, negative leaves it unset
+    float auto_mask = -1.0f;         // --auto-mask, negative leaves it unset
+    float detail_strength = 1.0f;    // --detail-strength
+    float colour_strength = 1.0f;    // --colour-strength
+    float detail_radius = 4.0f;      // --detail-radius
+    int frame_index = 0;             // --frame-index
+    std::string control_mask;        // --control-mask, a PNG, resized to the frame
+    bool history = true;             // not nr_frame's: feed the previous output back in
+    int max_height = 480;            // frames taller than this are filtered scaled down; 0 never
+};
+
+// Reads the control mask for Settings::control_mask: `rgb` receives the
+// picture as 8-bit RGB, (height, width, 3). The component has no image
+// library of its own, so the frontend registers one (wxImage, QImage). Called
+// from the features thread. Without a loader the mask is ignored.
+using ImageLoader = bool (*)(const std::string& path, int* width, int* height,
+                             std::vector<uint8_t>* rgb);
+void SetImageLoader(ImageLoader loader);
 
 // True when the filter is compiled into this build.
 inline constexpr bool Available() {
@@ -133,13 +162,15 @@ public:
     // data pixel of `height` rows, `instride`/`outstride` bytes apart; the
     // 8-bit channels sit at bit positions `red_shift`, `green_shift` and
     // `blue_shift` of each uint32 (VBA-M's systemRedShift - 3 and friends).
-    // `intensity` is the blend the pass over this frame composes with (see
-    // kFilterStageIntensity). Writes the newest finished result when it matches
-    // the frame size, otherwise copies the source through. Never blocks on the
-    // network.
+    // Hands the frame to the pipeline with `settings` if it has room, then
+    // writes the newest finished result when it matches the frame size,
+    // otherwise copies the source through. Never blocks on the network.
     void Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstride,
                  int width, int height, int red_shift, int green_shift, int blue_shift,
-                 float intensity = kDisplayIntensity);
+                 const Settings& settings);
+
+    // Forgets the temporal history (the next pass starts afresh).
+    void ResetHistory();
 
     // The model opened and at least one frame can be processed.
     bool Ready() const;
@@ -150,7 +181,8 @@ public:
 
     // The Vulkan device name and GEMM path reported by libnr_frame, once Ready().
     std::string Device() const;
-    // Wall-clock time of the most recent pass, in milliseconds (0 before one).
+    // Wall-clock time of the most recent frame through the pipeline, from its
+    // features to its composition, in milliseconds (0 before one).
     double LastFrameMs() const;
     // Number of finished passes.
     uint64_t FramesDone() const;

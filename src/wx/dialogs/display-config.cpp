@@ -1,20 +1,28 @@
 #include "wx/dialogs/display-config.h"
 
+#include <algorithm>
+#include <cmath>
 #include <memory>
 #include <vector>
 
 #include <wx/arrstr.h>
+#include <wx/button.h>
+#include <wx/checkbox.h>
 #include <wx/choice.h>
 #include <wx/clntdata.h>
 #include <wx/dir.h>
 #include <wx/dynlib.h>
+#include <wx/filedlg.h>
 #include <wx/filepicker.h>
 #include <wx/log.h>
 #include <wx/notebook.h>
 #include <wx/object.h>
 #include <wx/panel.h>
 #include <wx/radiobut.h>
+#include <wx/sizer.h>
 #include <wx/slider.h>
+#include <wx/statbox.h>
+#include <wx/stattext.h>
 #include <wx/textctrl.h>
 
 #ifdef __clang__
@@ -37,6 +45,8 @@
 #include "components/filters_dlssnr/dlssnr.h"
 #include "wx/widgets/option-validator.h"
 #include "wx/widgets/slider-value-label.h"
+#include "wx/widgets/spin-value-ctrl.h"
+#include "wx/macsandbox.h"
 
 #include "components/filters_agb/filters_agb.h"
 #include "components/filters_cgb/filters_cgb.h"
@@ -382,6 +392,83 @@ private:
     }
 };
 
+// Validator for a widgets::SpinValueCtrl with a kDouble, kInt or kUnsigned
+// Option. A box showing its special text ("Profile", "Off") writes
+// `special_value`, and any option value below the box's minimum shows it.
+class SpinValueValidator : public widgets::OptionValidator {
+public:
+    SpinValueValidator(config::OptionID option_id, double special_value)
+        : widgets::OptionValidator(option_id), special_value_(special_value) {
+        VBAM_CHECK(option()->is_double() || option()->is_int() || option()->is_unsigned());
+    }
+    ~SpinValueValidator() override = default;
+
+private:
+    // widgets::OptionValidator implementation.
+    wxObject* Clone() const override {
+        return new SpinValueValidator(option()->id(), special_value_);
+    }
+
+    bool IsWindowValueValid() override { return true; }
+
+    bool WriteToWindow() override {
+        widgets::SpinValueCtrl* ctrl = dynamic_cast<widgets::SpinValueCtrl*>(GetWindow());
+        VBAM_CHECK(ctrl);
+        double value;
+        if (option()->is_double())
+            value = option()->GetDouble();
+        else if (option()->is_int())
+            value = option()->GetInt();
+        else
+            value = option()->GetUnsigned();
+        ctrl->SetValue(value < ctrl->GetMin() ? ctrl->GetMin() : value);
+        return true;
+    }
+
+    bool WriteToOption() override {
+        const widgets::SpinValueCtrl* ctrl =
+            dynamic_cast<const widgets::SpinValueCtrl*>(GetWindow());
+        VBAM_CHECK(ctrl);
+        const double value = ctrl->IsSpecialValue() ? special_value_ : ctrl->GetValue();
+        if (option()->is_double())
+            return option()->SetDouble(value);
+        if (option()->is_int())
+            return option()->SetInt(static_cast<int32_t>(std::lround(value)));
+        return option()->SetUnsigned(static_cast<uint32_t>(std::lround(std::max(value, 0.0))));
+    }
+
+    const double special_value_;
+};
+
+// Validator for a wxTextCtrl with a kString Option.
+class StringTextValidator : public widgets::OptionValidator {
+public:
+    explicit StringTextValidator(config::OptionID option_id)
+        : widgets::OptionValidator(option_id) {
+        VBAM_CHECK(option()->is_string());
+    }
+    ~StringTextValidator() override = default;
+
+private:
+    // widgets::OptionValidator implementation.
+    wxObject* Clone() const override { return new StringTextValidator(option()->id()); }
+
+    bool IsWindowValueValid() override { return true; }
+
+    bool WriteToWindow() override {
+        wxTextCtrl* text = wxDynamicCast(GetWindow(), wxTextCtrl);
+        VBAM_CHECK(text);
+        text->ChangeValue(option()->GetString());
+        return true;
+    }
+
+    bool WriteToOption() override {
+        const wxTextCtrl* text = wxDynamicCast(GetWindow(), wxTextCtrl);
+        VBAM_CHECK(text);
+        return option()->SetString(text->GetValue().Strip(wxString::both));
+    }
+};
+
 }  // namespace
 
 // static
@@ -394,7 +481,7 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     : BaseDialog(parent, "DisplayConfig"),
       tab_loaded_(kTabCount, false),
       dlss_nr_observer_(config::OptionID::kDispDlssNr,
-                        [this](config::Option* o) { SetDlssNrStageEnabled(o->GetBool()); }),
+                        [this](config::Option* o) { SetDlssNrControlsEnabled(o->GetBool()); }),
       filter_observer_(config::OptionID::kDispFilter,
                        std::bind(&DisplayConfig::OnFilterChanged,
                                  this,
@@ -620,35 +707,7 @@ void DisplayConfig::InitBasicTab() {
     // Filter / plugin selectors.
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
 
-    // DLSS NR runs alongside the display filter. The controls only mean
-    // anything where libnr_frame is part of the build, so hide them otherwise
-    // rather than offer controls that cannot do anything.
-    dlss_nr_ = GetValidatedChild<wxCheckBox>("DlssNr");
-    dlss_nr_pre_ = GetValidatedChild<wxRadioButton>("DlssNrPre");
-    dlss_nr_post_ = GetValidatedChild<wxRadioButton>("DlssNrPost");
-    dlss_nr_display_ = GetValidatedChild<wxRadioButton>("DlssNrDisplay");
-    if (dlssnr::Available()) {
-        dlss_nr_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNr));
-        dlss_nr_pre_->SetValidator(widgets::OptionSelectedValidator(
-            config::OptionID::kDispDlssNrStage, dlssnr::kBeforeFilter));
-        dlss_nr_post_->SetValidator(widgets::OptionSelectedValidator(
-            config::OptionID::kDispDlssNrStage, dlssnr::kAfterFilter));
-        dlss_nr_display_->SetValidator(widgets::OptionSelectedValidator(
-            config::OptionID::kDispDlssNrStage, dlssnr::kAtDisplay));
-        // OptionValidator only writes the option on TransferFromWindow (dialog
-        // OK), so the observer alone never fires while the dialog is open.
-        // Track the checkbox itself for the live case.
-        dlss_nr_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& ev) {
-            SetDlssNrStageEnabled(ev.IsChecked());
-            ev.Skip();
-        });
-        SetDlssNrStageEnabled(OPTION(kDispDlssNr));
-    } else {
-        dlss_nr_->Hide();
-        dlss_nr_pre_->Hide();
-        dlss_nr_post_->Hide();
-        dlss_nr_display_->Hide();
-    }
+    InitDlssNr();
     filter_selector_->SetValidator(FilterValidator());
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
@@ -1239,17 +1298,190 @@ void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
     event.Skip();
 }
 
-void DisplayConfig::SetDlssNrStageEnabled(bool enabled) {
-    // The Basic tab owns these. The observer can fire before that tab has been
-    // lazy-loaded, exactly as it can for the filter selectors above.
-    if (!dlssnr::Available() || !dlss_nr_pre_ || !dlss_nr_post_ || !dlss_nr_display_) {
+void DisplayConfig::InitDlssNr() {
+    wxPanel* panel = GetValidatedChild<wxPanel>("DlssNrPanel");
+    // The controls only mean anything where libnr_frame is part of the build,
+    // so leave the group out otherwise rather than offer controls that cannot
+    // do anything.
+    if (!dlssnr::Available()) {
+        panel->Hide();
         return;
     }
 
-    // The stage only means anything while the pass is on.
-    dlss_nr_pre_->Enable(enabled);
-    dlss_nr_post_->Enable(enabled);
-    dlss_nr_display_->Enable(enabled);
+    // The same group as PCSX2's DLSS-NR settings: nr_frame's command line,
+    // with Profile / Off standing for a value left to the profile or unset.
+    wxStaticBoxSizer* group = new wxStaticBoxSizer(wxVERTICAL, panel, _("DLSS-NR (Experimental)"));
+    wxWindow* box = group->GetStaticBox();
+    const int gap = panel->FromDIP(5);
+
+    auto label = [box](const wxString& text) {
+        return new wxStaticText(box, wxID_ANY, text);
+    };
+    auto spin = [this, box](double min, double max, double step, int decimals,
+                            const wxString& suffix, const wxString& special,
+                            config::OptionID id, double special_value, const wxString& tip) {
+        widgets::SpinValueCtrl* ctrl =
+            new widgets::SpinValueCtrl(box, wxID_ANY, min, max, step, decimals, suffix, special);
+        ctrl->SetValidator(SpinValueValidator(id, special_value));
+        ctrl->SetToolTip(tip);
+        dlss_nr_controls_.push_back(ctrl);
+        return ctrl;
+    };
+
+    // Enable DLSS-NR, Use Frame History.
+    dlss_nr_ = new wxCheckBox(box, wxID_ANY, _("Enable &DLSS-NR"));
+    dlss_nr_->SetToolTip(_("Runs every frame through the DLSS-NR neural rendering model. Very slow and experimental."));
+    dlss_nr_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNr));
+    wxCheckBox* history = new wxCheckBox(box, wxID_ANY, _("Use Frame &History"));
+    history->SetToolTip(_("Feeds the previous filtered frame back into the model, for steadier motion. Unchecked, every frame is filtered on its own exactly as the nr_frame command filters a picture, and the filter runs faster."));
+    history->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNrHistory));
+    dlss_nr_controls_.push_back(history);
+    wxGridSizer* checks = new wxGridSizer(2, 0, gap * 2);
+    checks->Add(dlss_nr_, 0, wxALIGN_CENTER_VERTICAL);
+    checks->Add(history, 0, wxALIGN_CENTER_VERTICAL);
+    group->Add(checks, 0, wxEXPAND | wxALL, gap);
+
+    // Apply: Pre-filter / Post-filter / At display size -- which side of the
+    // display filter the pass runs on (VBA-M's own; PCSX2 has one place).
+    // In dlssnr::Stage order: kBeforeFilter, kAfterFilter, kAtDisplay.
+    wxRadioButton* pre = new wxRadioButton(box, wxID_ANY, _("&Pre-filter"), wxDefaultPosition,
+                                           wxDefaultSize, wxRB_GROUP);
+    pre->SetToolTip(_("Run DLSS-NR on the emulated image, then let the display filter scale the result. The cheapest: the model sees the unscaled frame."));
+    pre->SetValidator(widgets::OptionSelectedValidator(config::OptionID::kDispDlssNrStage,
+                                                       dlssnr::kBeforeFilter));
+    wxRadioButton* post = new wxRadioButton(box, wxID_ANY, _("P&ost-filter"));
+    post->SetToolTip(_("Run DLSS-NR over the display filter's output, at the filtered size."));
+    post->SetValidator(widgets::OptionSelectedValidator(config::OptionID::kDispDlssNrStage,
+                                                        dlssnr::kAfterFilter));
+    wxRadioButton* at_display = new wxRadioButton(box, wxID_ANY, _("At display si&ze"));
+    at_display->SetToolTip(_("Scale the display filter's output up to the size it is shown at and run DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds the cost."));
+    at_display->SetValidator(widgets::OptionSelectedValidator(config::OptionID::kDispDlssNrStage,
+                                                              dlssnr::kAtDisplay));
+    wxStaticText* apply_label = label(_("Apply:"));
+    dlss_nr_controls_.push_back(apply_label);
+    dlss_nr_controls_.push_back(pre);
+    dlss_nr_controls_.push_back(post);
+    dlss_nr_controls_.push_back(at_display);
+    wxBoxSizer* apply = new wxBoxSizer(wxHORIZONTAL);
+    apply->Add(apply_label, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 2);
+    apply->Add(pre, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 3);
+    apply->Add(post, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 3);
+    apply->Add(at_display, 0, wxALIGN_CENTER_VERTICAL);
+    group->Add(apply, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+
+    // Profile, Intensity, Maximum Height.
+    wxChoice* profile = new wxChoice(box, wxID_ANY);
+    profile->Append(_("Standard"));
+    profile->Append(_("Natural"));
+    profile->Append(_("Cinematic"));
+    profile->Append(_("Neutral"));
+    profile->Append(_("Vendor"));
+    profile->SetToolTip(_("The style, local tone and local structure the model is conditioned on. Neutral turns local tone and structure off, Vendor raises structure."));
+    profile->SetValidator(widgets::OptionChoiceValidator(config::OptionID::kDispDlssNrProfile));
+    dlss_nr_controls_.push_back(profile);
+
+    wxFlexGridSizer* top = new wxFlexGridSizer(6, gap, gap * 2);
+    top->AddGrowableCol(1);
+    top->AddGrowableCol(3);
+    top->AddGrowableCol(5);
+    top->Add(label(_("Profile:")), 0, wxALIGN_CENTER_VERTICAL);
+    top->Add(profile, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    top->Add(label(_("Intensity:")), 0, wxALIGN_CENTER_VERTICAL);
+    top->Add(spin(0, 400, 1, 0, wxT("%"), wxEmptyString, config::OptionID::kDispDlssNrIntensity, 0,
+                  _("Blend of the model's picture against the game's. Above 100% extrapolates.")),
+             0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    top->Add(label(_("Maximum Height:")), 0, wxALIGN_CENTER_VERTICAL);
+    top->Add(spin(128, 2160, 1, 0, _("px"), wxEmptyString, config::OptionID::kDispDlssNrMaxHeight, 0,
+                  _("Frames taller than this are scaled down before the model runs, and back up after. Lower is faster.")),
+             0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    group->Add(top, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+
+    // The explicit overrides, two to a row.
+    const wxString keep = _("Profile");
+    const wxString off = _("Off");
+    wxFlexGridSizer* grid = new wxFlexGridSizer(4, gap, gap * 2);
+    grid->AddGrowableCol(1);
+    grid->AddGrowableCol(3);
+    auto row = [&](const wxString& text, wxWindow* ctrl) {
+        grid->Add(label(text), 0, wxALIGN_CENTER_VERTICAL);
+        grid->Add(ctrl, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    };
+    row(_("Style Index:"),
+        spin(-1, 127, 1, 0, wxEmptyString, keep, config::OptionID::kDispDlssNrStyleIndex, -1,
+             _("The vendor style index the model is conditioned on (nr_frame --style-index). Profile keeps the profile's.")));
+    row(_("Local Tone:"),
+        spin(-0.05, 4, 0.05, 2, wxEmptyString, keep, config::OptionID::kDispDlssNrLocalTone, -1,
+             _("Local tone the model is conditioned on (nr_frame --local-tone). Profile keeps the profile's.")));
+    row(_("Local Structure:"),
+        spin(-0.05, 4, 0.05, 2, wxEmptyString, keep, config::OptionID::kDispDlssNrLocalStructure, -1,
+             _("Local structure the model is conditioned on (nr_frame --local-structure). Profile keeps the profile's.")));
+    row(_("Skin Structure:"),
+        spin(-0.05, 4, 0.05, 2, wxEmptyString, off, config::OptionID::kDispDlssNrSkinStructure, -1,
+             _("Structure on skin, through the automatic mask (nr_frame --skin-structure). Setting this or Automatic Mask turns the automatic mask on.")));
+    row(_("Automatic Mask:"),
+        spin(-0.05, 4, 0.05, 2, wxEmptyString, off, config::OptionID::kDispDlssNrAutoMask, -1,
+             _("Structure through the automatic mask outside skin (nr_frame --auto-mask).")));
+    row(_("Frame Index:"),
+        spin(0, 1000000, 1, 0, wxEmptyString, wxEmptyString, config::OptionID::kDispDlssNrFrameIndex, 0,
+             _("Seeds the model's noise channels (nr_frame --frame-index).")));
+    row(_("Detail Strength:"),
+        spin(0, 4, 0.05, 2, wxEmptyString, wxEmptyString, config::OptionID::kDispDlssNrDetailStrength, 0,
+             _("High-frequency weight of the model's change (nr_frame --detail-strength).")));
+    row(_("Colour Strength:"),
+        spin(0, 4, 0.05, 2, wxEmptyString, wxEmptyString, config::OptionID::kDispDlssNrColourStrength, 0,
+             _("Low-frequency weight of the model's change (nr_frame --colour-strength).")));
+    row(_("Detail Radius:"),
+        spin(0.1, 32, 0.5, 1, _("px"), wxEmptyString, config::OptionID::kDispDlssNrDetailRadius, 0,
+             _("Radius of the split between detail and colour (nr_frame --detail-radius).")));
+
+    group->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+
+    // Control Mask: [path] Browse... Clear
+    wxTextCtrl* mask = new wxTextCtrl(box, wxID_ANY);
+    mask->SetToolTip(_("A PNG control mask (nr_frame --control-mask): red scales the blend, green the tone and blue the structure. It is resized to the filtered frame."));
+    mask->SetValidator(StringTextValidator(config::OptionID::kDispDlssNrControlMask));
+    wxButton* browse = new wxButton(box, wxID_ANY, _("Browse..."));
+    wxButton* clear = new wxButton(box, wxID_ANY, _("Clear"));
+    browse->Bind(wxEVT_BUTTON, [this, mask](wxCommandEvent&) {
+        wxFileDialog dialog(this, _("Select a DLSS-NR control mask"), wxEmptyString,
+                            mask->GetValue(), _("PNG Images (*.png)|*.png;*.PNG"),
+                            wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        if (dialog.ShowModal() != wxID_OK)
+            return;
+        // Keep the sandboxed build's access to the picked file across launches.
+        macsandbox::RememberPath(dialog.GetPath());
+        mask->ChangeValue(dialog.GetPath());
+    });
+    clear->Bind(wxEVT_BUTTON, [mask](wxCommandEvent&) { mask->ChangeValue(wxEmptyString); });
+    dlss_nr_controls_.push_back(mask);
+    dlss_nr_controls_.push_back(browse);
+    dlss_nr_controls_.push_back(clear);
+    wxBoxSizer* mask_row = new wxBoxSizer(wxHORIZONTAL);
+    mask_row->Add(label(_("Control Mask:")), 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 2);
+    mask_row->Add(mask, 1, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 2);
+    mask_row->Add(browse, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, gap * 2);
+    mask_row->Add(clear, 0, wxALIGN_CENTER_VERTICAL);
+    group->Add(mask_row, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
+
+    wxBoxSizer* outer = new wxBoxSizer(wxVERTICAL);
+    outer->Add(group, 1, wxEXPAND);
+    panel->SetSizer(outer);
+
+    // OptionValidator only writes the option on TransferFromWindow (dialog
+    // OK), so the observer alone never fires while the dialog is open.
+    // Track the checkbox itself for the live case.
+    dlss_nr_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& ev) {
+        SetDlssNrControlsEnabled(ev.IsChecked());
+        ev.Skip();
+    });
+    SetDlssNrControlsEnabled(OPTION(kDispDlssNr));
+}
+
+void DisplayConfig::SetDlssNrControlsEnabled(bool enabled) {
+    // The Basic tab owns these. The observer can fire before that tab has been
+    // lazy-loaded, exactly as it can for the filter selectors above.
+    for (wxWindow* control : dlss_nr_controls_)
+        control->Enable(enabled);
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {

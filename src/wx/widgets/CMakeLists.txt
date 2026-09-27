@@ -17,6 +17,7 @@ target_sources(vbam-wx-widgets
     pulse-action-dialog.cpp
     render-plugin.cpp
     slider-value-label.cpp
+    spin-value-ctrl.cpp
     user-input-ctrl.cpp
     user-input-event.cpp
     sdl-poller.cpp
@@ -38,6 +39,7 @@ target_sources(vbam-wx-widgets
     pulse-action-dialog.h
     render-plugin.h
     slider-value-label.h
+    spin-value-ctrl.h
     user-input-ctrl.h
     user-input-event.h
     sdl-poller.h

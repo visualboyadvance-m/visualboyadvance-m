@@ -17,6 +17,7 @@
 #include <QCoreApplication>
 #include <QFont>
 #include <QFontMetrics>
+#include <QImage>
 #include <QOpenGLContext>
 #include <QOpenGLShaderProgram>
 #include <QPaintEvent>
@@ -1155,12 +1156,11 @@ void DrawingPanelBase::DrawArea(uint8_t** data) {
     if (dlss_post) {
         uint8_t* const img = todraw + outstride * static_cast<int>(scale);
         DlssNrApply(img, outstride, img, outstride, static_cast<int>(width * scale),
-                    static_cast<int>(height * scale), dlssnr::kFilterStageIntensity);
+                    static_cast<int>(height * scale));
     } else if (dlss_pre && !use_threads) {
         // Nothing else ran, so this is all that stands between the emulated
         // frame and the screen.
-        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height,
-                    dlssnr::kFilterStageIntensity);
+        DlssNrApply(*data + instride, instride, todraw + outstride, outstride, width, height);
     }
 
     // Back to the full scale; at display size, the pass and the frame drawn.
@@ -1333,22 +1333,64 @@ void DrawingPanelBase::ApplyPendingFilterChange() {
     memset(delta, 0xff, sizeof(delta));
 }
 
+#ifdef VBAM_ENABLE_DLSS_NR
+namespace {
+
+// The DLSS NR settings, as the options have them (PCSX2's GSDLSSNR::Settings
+// from its DLSSNR_* options).
+dlssnr::Settings DlssNrSettings() {
+    dlssnr::Settings s;
+    s.intensity = static_cast<float>(OPTION(kDispDlssNrIntensity).Get()) / 100.0f;
+    s.profile = OPTION(kDispDlssNrProfile).Get();
+    s.style_index = OPTION(kDispDlssNrStyleIndex).Get();
+    s.local_tone = static_cast<float>(OPTION(kDispDlssNrLocalTone).Get());
+    s.local_structure = static_cast<float>(OPTION(kDispDlssNrLocalStructure).Get());
+    s.skin_structure = static_cast<float>(OPTION(kDispDlssNrSkinStructure).Get());
+    s.auto_mask = static_cast<float>(OPTION(kDispDlssNrAutoMask).Get());
+    s.detail_strength = static_cast<float>(OPTION(kDispDlssNrDetailStrength).Get());
+    s.colour_strength = static_cast<float>(OPTION(kDispDlssNrColourStrength).Get());
+    s.detail_radius = static_cast<float>(OPTION(kDispDlssNrDetailRadius).Get());
+    s.frame_index = static_cast<int>(OPTION(kDispDlssNrFrameIndex).Get());
+    s.control_mask = OPTION(kDispDlssNrControlMask).Get().toStdString();
+    s.history = OPTION(kDispDlssNrHistory).Get();
+    s.max_height = static_cast<int>(OPTION(kDispDlssNrMaxHeight).Get());
+    return s;
+}
+
+// Reads the DLSS NR control mask for the features thread (dlssnr::SetImageLoader).
+// QImage is safe to use off the GUI thread.
+bool LoadDlssNrImage(const std::string& path, int* width, int* height, std::vector<uint8_t>* rgb) {
+    QImage image(QString::fromStdString(path));
+    if (image.isNull())
+        return false;
+    image = image.convertToFormat(QImage::Format_RGB888);
+    *width = image.width();
+    *height = image.height();
+    rgb->resize(static_cast<size_t>(*width) * *height * 3);
+    for (int y = 0; y < *height; y++)
+        memcpy(rgb->data() + static_cast<size_t>(y) * *width * 3, image.constScanLine(y),
+               static_cast<size_t>(*width) * 3);
+    return true;
+}
+
+}  // namespace
+#endif
+
 // Run the DLSS NR pass from `src` to `dst`, both pointing at the first image
-// row, composed at `intensity` (dlssnr::kFilterStageIntensity before or after
-// the display filter, kDisplayIntensity at display size). Returns false when there is no processor, so callers can fall through
-// to whatever they would do without one. dst may alias src.
+// row, with the settings the options hold. Returns false when there is no
+// processor, so callers can fall through to whatever they would do without
+// one. dst may alias src.
 bool DrawingPanelBase::DlssNrApply(uint8_t* src, int src_stride, uint8_t* dst,
-                                   int dst_stride, int w, int h, float intensity) {
+                                   int dst_stride, int w, int h) {
 #ifdef VBAM_ENABLE_DLSS_NR
     if (!dlssnr_)
         return false;
 
     dlssnr_->Apply32(src, src_stride, dst, dst_stride, w, h, systemRedShift - 3,
-                     systemGreenShift - 3, systemBlueShift - 3, intensity);
+                     systemGreenShift - 3, systemBlueShift - 3, DlssNrSettings());
     return true;
 #else
     (void)src; (void)src_stride; (void)dst; (void)dst_stride; (void)w; (void)h;
-    (void)intensity;
     return false;
 #endif
 }
@@ -1370,8 +1412,7 @@ uint8_t* DrawingPanelBase::DlssNrPreFilter(uint8_t* frame, int instride, int w, 
 
     uint8_t* const base = dlssnr_frame_.data();
     uint8_t* const img = base + stride;
-    if (!DlssNrApply(frame + stride, instride, img, instride, w, h,
-                     dlssnr::kFilterStageIntensity))
+    if (!DlssNrApply(frame + stride, instride, img, instride, w, h))
         return frame;
 
     memcpy(base, img, stride);
@@ -1469,8 +1510,7 @@ void DrawingPanelBase::DlssNrDisplayStage(uint8_t* data, int instride, bool filt
             memcpy(first + stride * i, first, static_cast<size_t>(dw) * 4);
     }
 
-    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh,
-                dlssnr::kDisplayIntensity);
+    DlssNrApply(img, static_cast<int>(stride), img, static_cast<int>(stride), dw, dh);
     todraw = dlssnr_display_.data();
     *outstride = static_cast<int>(stride);
 #else
@@ -1482,6 +1522,7 @@ void DrawingPanelBase::SyncDlssNr() {
 #ifdef VBAM_ENABLE_DLSS_NR
     const bool want = OPTION(kDispDlssNr) && dlssnr::Available();
     if (want && !dlssnr_) {
+        dlssnr::SetImageLoader(&LoadDlssNrImage);
         dlssnr_ = std::make_unique<dlssnr::Filter>();
         dlssnr_ready_logged_ = false;
         systemScreenMessage("DLSS NR: loading model...");

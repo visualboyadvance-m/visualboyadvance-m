@@ -102,9 +102,15 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   nr_frame, embedded weights and shaders; no Vulkan library linked, it finds
   `vkGetInstanceProcAddr` in the process); only built with
   `ENABLE_VULKAN` (the parent checks `if(TARGET dlssnr)`), and consumers get
-  `VBAM_ENABLE_DLSS_NR`. The panel constructor creates the processor, the
-  filter thread calls `Apply32()`; passes run asynchronously on a worker
-  (hundreds of ms each), so the picture updates with the newest finished pass
+  `VBAM_ENABLE_DLSS_NR`. It is driven like PCSX2's `GSDLSSNR`: `dlssnr::Settings`
+  is nr_frame's command line (profile, then the explicit overrides, control
+  mask, frame history, maximum height), the `Display/DlssNr*` options feed it,
+  and the display dialogs show PCSX2's "DLSS-NR (Experimental)" group. The
+  panel constructor creates the processor, the filter thread calls
+  `Apply32()`, and each frame goes through three threads (features, network,
+  composition); frames taller than the maximum height are filtered scaled
+  down (bilinear) and scaled back up, and the picture updates with the newest
+  finished frame
 - With the Vulkan renderer the model runs on the renderer's own instance and
   device: `VKDrawingPanel` asks for Vulkan 1.3, enables the features libxmx
   needs, takes a compute queue for it and lends them via `dlssnr::ShareVulkan`
