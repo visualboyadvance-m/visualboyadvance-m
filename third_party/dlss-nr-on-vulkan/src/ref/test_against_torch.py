@@ -18,6 +18,10 @@ It needs torch, which the system Python does not have:
 
 Chunking is disabled on both sides so any difference is the arithmetic, not the row
 count a BLAS was handed.
+
+Our graph is not theirs everywhere: where MLX-DLSS's recovery and the vendor's own differ,
+this tree follows the vendor's (`nr_model.MLX_DLSS_GRAPH`, notes/opendlss-reference.md).
+The switch restores theirs, and this check runs with it on: it is a check of the port.
 """
 from __future__ import annotations
 
@@ -33,6 +37,9 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 
 import nr_model as ours  # noqa: E402
+
+# the port check compares like with like: MLX-DLSS's graph on both sides
+ours.MLX_DLSS_GRAPH = True
 
 try:
     import torch
@@ -300,9 +307,9 @@ def synthetic_features(extent, rng):
 
 
 def run_theirs(weights, features):
+    model = theirs.NeuralRenderingModel({name: t(value) for name, value in weights.items()}).eval()
     with torch.no_grad():
-        return n(theirs.NeuralRenderingModel(
-            {name: t(value) for name, value in weights.items()}).eval()(t(features)))
+        return n(model(t(features)))
 
 
 def check_graph_shared_gemm(weights, extent=320):

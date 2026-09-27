@@ -30,6 +30,27 @@ GLOBAL_ATTENTION_LOGIT_CAP = 3.0
 # tokens so temporaries scale with the chunk, not the frame.
 CHUNK_TOKENS = int(os.environ.get("NR_CHUNK_TOKENS", str(1 << 13)))
 
+# The graph MLX-DLSS recovered, where it and the vendor's own differ. The vendor's is the
+# default: OpenDLSS-NR is bit-exact against captures of the original at every block
+# boundary, and one block or one step at a time on its inputs ours agrees with it only
+# its way (`src/bench/opendlss_blocks.py`, notes/opendlss-reference.md). Six places:
+#   * every feed-forward GEMM reads its input published, its residual the input as it
+#     came — which differ only where the input arrives raw: block 0's stem, the merges
+#     into 66 and 70;
+#   * the 32-channel blocks' QKV projection reads the feed-forward's output published,
+#     while the attention's skip keeps it raw;
+#   * so block 66 takes its merge raw, where the branched decoder entries take theirs
+#     published, as both input and skip;
+#   * the 512 split blocks and the ViT publish their feed-forward output, as the 64-256
+#     channel blocks do;
+#   * the ViT's attention is its own (`vendor_vit_attention`), not the window blocks'
+#     with the logits capped;
+#   * each level's skip is its transition block's output, and the bottleneck pools block
+#     30's raw output, published before its GEMM.
+# True restores MLX-DLSS's graph exactly: `test_against_torch.py` compares that one with
+# its PyTorch original, bit for bit.
+MLX_DLSS_GRAPH = os.environ.get("NR_MLX_DLSS_GRAPH", "0") not in ("0", "", "no")
+
 # --------------------------------------------------------------------------
 # the one GEMM
 # --------------------------------------------------------------------------
@@ -450,7 +471,9 @@ def reverse_windows(windows, *, batch_count, height, width, window_size):
 
 def window_attention(value, *, qkv_weight, attention_scale, attention_bias,
                      projection_weight, head_count, window_size,
-                     window_origin=(0, 0), logit_cap=None):
+                     window_origin=(0, 0), logit_cap=None, publish_input=False):
+    """`publish_input`: the QKV projection reads `value` published — the 32-channel
+    blocks', whose feed-forward output is otherwise kept raw for the residual."""
     if len(window_origin) != 2 or any(o > 0 or o <= -window_size for o in window_origin):
         raise ValueError("window origin must lie within one non-positive window")
     pad_top, pad_left = -window_origin[0], -window_origin[1]
@@ -464,6 +487,8 @@ def window_attention(value, *, qkv_weight, attention_scale, attention_bias,
 
     def attend(strip):
         windows = np.ascontiguousarray(partition_windows(strip, window_size))
+        if publish_input:
+            windows = e4m3(windows)
         attended = cosine_attention(
             windows, qkv_weight=qkv_weight, attention_scale=attention_scale,
             attention_bias=attention_bias, projection_weight=projection_weight,
@@ -499,8 +524,11 @@ def window_block(value, *, expansion_weight, feed_forward_projection_weight,
                  attention_projection_weight, attention_cosine, head_count,
                  window_size, window_origin=(0, 0)):
     def feed_forward(tokens):
+        # The GEMM reads the input published and the skip takes it as it came: the two
+        # differ only for block 0's stem and the merges into blocks 66 and 70.
         branch = matmul(
-            e4m3(quadratic_gate_activation(matmul(tokens, expansion_weight))),
+            e4m3(quadratic_gate_activation(matmul(
+                tokens if MLX_DLSS_GRAPH else e4m3(tokens), expansion_weight))),
             feed_forward_projection_weight)
         return cosine_residual(tokens, branch, feed_forward_cosine)
 
@@ -508,7 +536,8 @@ def window_block(value, *, expansion_weight, feed_forward_projection_weight,
     attention_branch = window_attention(
         feed_forward_output, qkv_weight=qkv_weight, attention_scale=attention_scale,
         attention_bias=attention_bias, projection_weight=attention_projection_weight,
-        head_count=head_count, window_size=window_size, window_origin=window_origin)
+        head_count=head_count, window_size=window_size, window_origin=window_origin,
+        publish_input=not MLX_DLSS_GRAPH)
     return _residual_per_token(feed_forward_output, attention_branch, attention_cosine)
 
 
@@ -612,7 +641,7 @@ def branched_window_block(value, *, expansion_weight, branch_projection_weight,
                           window_origin=(0, 0)):
     def feed_forward(tokens):
         branch = branched_feed_forward(
-            tokens, expansion_weight=expansion_weight,
+            tokens if MLX_DLSS_GRAPH else e4m3(tokens), expansion_weight=expansion_weight,
             branch_projection_weight=branch_projection_weight,
             output_projection_weight=output_projection_weight)
         return e4m3(cosine_residual(tokens, branch, feed_forward_cosine))
@@ -631,12 +660,13 @@ def split_window_block(value, *, first_projection_weight, expand_weight, project
                        attention_cosine, head_count, window_size, window_origin=(0, 0)):
     def feed_forward(tokens):
         branch = matmul(
-            split_group_feed_forward(tokens,
+            split_group_feed_forward(tokens if MLX_DLSS_GRAPH else e4m3(tokens),
                                      first_projection_weight=first_projection_weight,
                                      expand_weight=expand_weight,
                                      project_weight=project_weight),
             feed_forward_projection_weight)
-        return cosine_residual(tokens, branch, feed_forward_cosine)
+        output = cosine_residual(tokens, branch, feed_forward_cosine)
+        return output if MLX_DLSS_GRAPH else e4m3(output)
 
     feed_forward_output = _per_token(feed_forward, value)
     attention_branch = window_attention(
@@ -644,6 +674,110 @@ def split_window_block(value, *, first_projection_weight, expand_weight, project
         attention_bias=attention_bias, projection_weight=attention_projection_weight,
         head_count=head_count, window_size=window_size, window_origin=window_origin)
     return _residual_per_token(feed_forward_output, attention_branch, attention_cosine)
+
+
+# The ViT's attention as OpenDLSS-NR specifies it (its `vit.wgsl`), where MLX-DLSS's graph
+# ran the window blocks' with the logits capped at +/-3 (`MLX_DLSS_GRAPH`).
+
+
+def _vit_norm(value):
+    """The ViT's reciprocal norm of each 32-channel head, (..., 32) half values -> (...).
+
+    Unlike the window blocks' fused tree, each pair square is summed in float32 — the low
+    one exact, the high one rounded to half first — and rounded once; then a stride-8,
+    4 and 2 tree of half adds, and the reciprocal square root rounded to half. The floor is
+    the window blocks' own: it keeps a zero head zero, which the vendor's `0 * inf`
+    publishing as +0 does, and is the GPU path's (`vit_reciprocal` in cosine_tree.glsl).
+    """
+    low, high = value[..., :16], value[..., 16:]
+    squares = _half_rounded(low * low + _half_rounded(high * high))
+    eight = _half_rounded(squares[..., :8] + squares[..., 8:])
+    four = _half_rounded(eight[..., :4] + eight[..., 4:])
+    total = _half_rounded(_half_rounded(four[..., 0] + four[..., 2])
+                          + _half_rounded(four[..., 1] + four[..., 3]))
+    total = np.maximum(total, np.float32(np.float16(COSINE_NORM_FLOOR)))
+    return _half_rounded(np.float32(1.0) / np.sqrt(total))
+
+
+def _vit_exp_weight(score):
+    """The ViT's exponential: the window blocks' bit trick with its own constants and a
+    4-bit shift, `2^(1.4326 s - 3.6502)` over s in about [-3, 3]."""
+    affine = _half_rounded(np.asarray(score, np.float32) * np.float32(0.08953857421875)
+                           + np.float32(1.708984375))
+    affine = np.clip(affine, np.float32(1.439453125), np.float32(1.9775390625))
+    bits = affine.astype(np.float16).view(np.uint16).astype(np.uint32)
+    return (((bits << np.uint32(4)) + np.uint32(0x4000)) & np.uint32(0xFFFF)).astype(
+        np.uint16).view(np.float16).astype(np.float32)
+
+
+def _vit_denominator(weights, tokens):
+    """The half sum of each row of `weights` (..., padded) in the vendor's order, less the
+    padding rows' own weight: per 64 keys, eight columns of eight (keys c, c+8, ..., c+56)
+    summed pairwise, the even and the odd columns apart, then the blocks in order."""
+    padded = weights.shape[-1]
+    total = np.zeros(weights.shape[:-1], np.float32)
+    for base in range(0, padded, 64):
+        block = weights[..., base:base + 64]
+
+        def column(key):
+            a = _half_rounded(block[..., key] + block[..., key + 8])
+            b = _half_rounded(block[..., key + 16] + block[..., key + 24])
+            c = _half_rounded(block[..., key + 32] + block[..., key + 40])
+            d = _half_rounded(block[..., key + 48] + block[..., key + 56])
+            return _half_rounded(_half_rounded(_half_rounded(a + b) + c) + d)
+
+        sums = []
+        for parity in (0, 1):
+            running = _half_rounded(column(parity) + column(2 + parity))
+            running = _half_rounded(running + column(4 + parity))
+            sums.append(_half_rounded(running + column(6 + parity)))
+        total = _half_rounded(total + _half_rounded(sums[0] + sums[1]))
+    if padded > tokens:
+        correction = _half_rounded(_vit_exp_weight(np.float32(0.0)) * np.float32(padded - tokens))
+        total = _half_rounded(total - correction)
+    return total
+
+
+def vendor_vit_attention(value, *, qkv_weight, attention_scale, projection_weight, head_count):
+    """The ViT's attention, as OpenDLSS-NR specifies it: the query scaled by its norm, sqrt(32)
+    and the learned scale in three half multiplies; the ViT's own norm and exponential;
+    the weights published unnormalised and the reciprocal applied to the value sum after
+    it, with the padding keys' weight taken off the denominator. The GEMMs are still this
+    module's float32 ones, not the tensor cores' fixed point."""
+    batch_count, token_count, channels = value.shape
+    projected = _half_rounded(matmul(value, qkv_weight))
+    query, key, head_value = np.split(projected, 3, axis=-1)
+    shape = (batch_count, token_count, head_count, 32)
+    query, key, head_value = (x.reshape(shape) for x in (query, key, head_value))
+    learned = _half_rounded(np.asarray(attention_scale, np.float32)).reshape(1, 1, head_count, 1)
+    root = _half_rounded(np.float32(math.sqrt(32)))
+    query = e4m3(_half_rounded(_half_rounded(
+        _half_rounded(query * _vit_norm(query)[..., None]) * root) * learned))
+    key = e4m3(_half_rounded(key * _vit_norm(key)[..., None]))
+    head_value = e4m3(head_value)
+    # (batch, heads, tokens, 32)
+    query, key, head_value = (np.ascontiguousarray(x.transpose(0, 2, 1, 3))
+                              for x in (query, key, head_value))
+    attended = vit_attend(query, key, head_value)
+    attended = np.ascontiguousarray(attended.transpose(0, 2, 1, 3)).reshape(
+        batch_count, token_count, channels)
+    return matmul(attended, projection_weight)
+
+
+def vit_attend(query, key, head_value):
+    """The ViT's attention from its published Q, K and V, (..., tokens, 32) each: the
+    attended values, published. The keys are padded with zero rows to a whole 64, whose
+    weight the denominator then gives back; the weights are published unnormalised, and
+    the value sum, rounded to half, takes the reciprocal."""
+    token_count = key.shape[-2]
+    padded = -(-token_count // 64) * 64
+    pad = [(0, 0)] * (key.ndim - 2) + [(0, padded - token_count), (0, 0)]
+    key, head_value = np.pad(key, pad), np.pad(head_value, pad)
+    scores = _half_rounded(matmul_nt(query, key))
+    weights = _vit_exp_weight(scores)
+    reciprocal = _half_rounded(np.float32(1.0) / _vit_denominator(weights, token_count))
+    summed = _half_rounded(matmul(e4m3(weights), head_value))
+    return e4m3(_half_rounded(summed * reciprocal[..., None]))
 
 
 def global_block(value, *, expansion_weight, feed_forward_projection_weight,
@@ -656,13 +790,19 @@ def global_block(value, *, expansion_weight, feed_forward_projection_weight,
         e4m3(quadratic_gate_activation(matmul(tokens, expansion_weight))),
         feed_forward_projection_weight)
     feed_forward_output = cosine_residual(tokens, feed_forward_branch, feed_forward_cosine)
-    attention_branch = cosine_attention(
-        feed_forward_output, qkv_weight=qkv_weight,
-        attention_scale=attention_scale * np.float32(
-            math.sqrt(feed_forward_output.shape[-1] // head_count)),
-        attention_bias=None,
-        projection_weight=attention_projection_weight, head_count=head_count,
-        logit_cap=logit_cap, symmetric_logit_cap=True)
+    if not MLX_DLSS_GRAPH:
+        feed_forward_output = e4m3(feed_forward_output)
+        attention_branch = vendor_vit_attention(
+            feed_forward_output, qkv_weight=qkv_weight, attention_scale=attention_scale,
+            projection_weight=attention_projection_weight, head_count=head_count)
+    else:
+        attention_branch = cosine_attention(
+            feed_forward_output, qkv_weight=qkv_weight,
+            attention_scale=attention_scale * np.float32(
+                math.sqrt(feed_forward_output.shape[-1] // head_count)),
+            attention_bias=None,
+            projection_weight=attention_projection_weight, head_count=head_count,
+            logit_cap=logit_cap, symmetric_logit_cap=True)
     return cosine_residual(feed_forward_output, attention_branch,
                            attention_cosine).reshape(shape)
 
@@ -810,12 +950,12 @@ class NeuralRenderingModel:
         # Block 0 is pooled before its publication and block 70 feeds the head.
         return output if index in (0, 70) or not publish else e4m3(output)
 
-    def _split_window(self, value, index):
+    def _split_window(self, value, index, publish=True):
         prefix = f"block{index}"
         attention_bias = self.weight(f"{prefix}.layer2.attn_bias")
         if uses_fragment_swizzle(index, 16):
             attention_bias = recover_attention_bias_layout(attention_bias)
-        return e4m3(split_window_block(
+        output = split_window_block(
             value,
             first_projection_weight=self.weight(f"{prefix}.layer0.first_projection_weight"),
             expand_weight=self.weight(f"{prefix}.layer0.group_expand_weight"),
@@ -828,7 +968,8 @@ class NeuralRenderingModel:
             attention_projection_weight=self.weight(f"{prefix}.layer3.projection_weight"),
             attention_cosine=self.weight(f"{prefix}.layer3.attn_cos_skip"),
             head_count=16, window_size=8,
-            window_origin=recovered_window_origin(index)))
+            window_origin=recovered_window_origin(index))
+        return e4m3(output) if publish else output
 
     def _global(self, value, index):
         prefix = f"block{index}"
@@ -844,11 +985,14 @@ class NeuralRenderingModel:
             head_count=32))
 
     def _downsample_window(self, value, index, *, head_count):
+        """A transition block: its own output published — the skip the decoder merges at
+        this level — and that output pooled and projected into the next level."""
         transformed = self._window(value, index, head_count=head_count, publish=False)
+        skip = e4m3(transformed)
         if index == 22:
             transformed = pad_spatial_end(transformed, 8)
-        return e4m3(matmul(e4m3(average_pool2(transformed)),
-                           self.weight(f"block{index}.layer0.weight0")))
+        return skip, e4m3(matmul(e4m3(average_pool2(transformed)),
+                                 self.weight(f"block{index}.layer0.weight0")))
 
     def _upsample_window(self, value, skip, index, *, head_count):
         prefix = f"block{index}.layer0"
@@ -856,7 +1000,13 @@ class NeuralRenderingModel:
         skip_path = skip * self.weight(f"{prefix}.sin")
         upsampled = nearest_upsample2_crop(projected, height=skip.shape[1],
                                            width=skip.shape[2])
-        return self._window(e4m3(upsampled + skip_path), index, head_count=head_count)
+        merged = upsampled + skip_path
+        # The 32-channel block takes the merge raw — its feed-forward publishes it for the
+        # GEMM and keeps it raw as the skip — and the branched ones published, as both.
+        branched = f"{prefix}.ffn_expand_weight" in self.weights
+        if MLX_DLSS_GRAPH or branched:
+            merged = e4m3(merged)
+        return self._window(merged, index, head_count=head_count)
 
     # -- forward ----------------------------------------------------------
 
@@ -874,29 +1024,36 @@ class NeuralRenderingModel:
         full_resolution_skip = e4m3(block0_output)
         value = e4m3(average_pool2(block0_output))
         del block0_output
-        for index in range(1, 4):
-            value = self._window(value, index, head_count=1)
-            step(f"block{index}")
-        skips = [value]
-        value = self._downsample_window(value, 4, head_count=1)
-        step("block4")
-
-        for regular, transition, head_count in ((range(5, 8), 8, 2),
+        # Each level's skip is its transition block's own output (4, 8, 14, 22); MLX-DLSS's
+        # graph took the block before it. Run on OpenDLSS-NR's inputs, our first decoder
+        # blocks agree with it 18-25 % with that skip and 61-69 % with this one.
+        skips = []
+        for regular, transition, head_count in ((range(1, 4), 4, 1), (range(5, 8), 8, 2),
                                                 (range(9, 14), 14, 4),
                                                 (range(15, 22), 22, 8)):
             for index in regular:
                 value = self._window(value, index, head_count=head_count)
                 step(f"block{index}")
-            skips.append(value)
-            value = self._downsample_window(value, transition, head_count=head_count)
+            before = value
+            skip, value = self._downsample_window(value, transition, head_count=head_count)
+            skips.append(before if MLX_DLSS_GRAPH else skip)
             step(f"block{transition}")
 
-        for index in range(23, 31):
+        for index in range(23, 30):
             value = self._split_window(value, index)
             step(f"block{index}")
-        split_skip = value
-        value = downsample(pad_spatial_end(value, 8),
-                           weight=self.weight("block30.layer4.weight"))
+        if MLX_DLSS_GRAPH:
+            split_skip = value = self._split_window(value, 30)
+            value = downsample(pad_spatial_end(value, 8),
+                               weight=self.weight("block30.layer4.weight"))
+        else:
+            # the bottleneck pools block 30's raw output, and publishes it for its GEMM
+            raw = self._split_window(value, 30, publish=False)
+            split_skip = e4m3(raw)
+            value = matmul(e4m3(average_pool2(pad_spatial_end(raw, 8))),
+                           self.weight("block30.layer4.weight"))
+            del raw
+        step("block30")
         value = e4m3(value)
         step("block30.ds")
         for index in range(31, 39):

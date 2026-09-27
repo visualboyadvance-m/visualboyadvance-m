@@ -460,10 +460,6 @@ class ResidentFrame:
                                source_half=True, target_half=True)
                 submit()
             keep(f"l{level}", value, h * w * channels, (1, h, w, channels), np.float16)
-            # The level's own buffer is its skip. The decoder writes d1-d4 and nothing
-            # writes l1-l4 again in the frame, so the copy it used to read from moved the
-            # same bytes into a second buffer for nothing.
-            skips[level] = value
 
             block = self.block(transition, heads)
             edge = self.edge(transition, "down")
@@ -475,6 +471,12 @@ class ResidentFrame:
             begin()
             R.record_block(rt, block, self.scratch(block, h, w), source=value,
                            target=unpublished, source_half=True)
+            # The level's skip is the transition block's own output, published — not the
+            # block before it, which is what MLX-DLSS's graph merged (notes/opendlss-
+            # reference.md). It goes into the level's buffer, which nothing reads again
+            # once the transition block has: the decoder writes d1-d4, never l1-l4.
+            rt.e4m3_half(unpublished, value, h * w * channels)
+            skips[level] = value
             R.record_downsample(rt, edge, self.transition_scratch(padded), unpublished,
                                 nxt, h, w, channels, pad_to=8 if transition == 22 else 0,
                                 target_half=True)
@@ -486,12 +488,19 @@ class ResidentFrame:
         # the split family, then the bottleneck
         h, w, channels = self.levels[5]
         stage[0] = "split blocks 23-30 (C=512)"
+        # Block 30's output has two readers: the decoder's skip takes it published, the
+        # bottleneck's pool raw (notes/opendlss-reference.md).
+        raw30 = self.buffer("raw30", h * w * channels)
         for index in range(23, 31):
             block = self.block(index, 16, "split")
+            last = index == 30
             begin()
             R.record_block(rt, block, self.scratch(block, h, w), source=value,
-                           target=value, publish=xmxres.EPI_E4M3,
-                           source_half=True, target_half=True)
+                           target=raw30 if last else value,
+                           publish=0 if last else xmxres.EPI_E4M3,
+                           source_half=True, target_half=not last)
+            if last:
+                rt.e4m3_half(raw30, value, h * w * channels)
             submit()
         keep("l5", value, h * w * channels, (1, h, w, channels), np.float16)
         # l5 itself is the skip, as for the levels above: the decoder input merge below
@@ -506,9 +515,10 @@ class ResidentFrame:
         deep = (self.scratch(self.block(31, 32, "global"), gh, gw, tokens=tokens).io16
                 if chain else self.buffer("l6", gh * gw * gchannels, np.float16))
         begin()
-        R.record_plain_downsample(rt, self.bottleneck, self.transition_scratch(
-            pad8(h) * pad8(w) * channels), value, deep, h, w, channels, pad_to=8,
-            source_half=True, target_half=True)
+        # pooled raw and published before its GEMM, as the encoder's transitions are
+        R.record_downsample(rt, self.bottleneck, self.transition_scratch(
+            pad8(h) * pad8(w) * channels), raw30, deep, h, w, channels, pad_to=8,
+            target_half=True)
         submit()
 
         stage[0] = "global blocks 31-38 (C=1024)"
@@ -536,6 +546,8 @@ class ResidentFrame:
                 deep.view(np.float16)[:tokens * gchannels] = \
                     scratch.out.view()[:tokens * gchannels]
 
+        keep("l6", deep, tokens * gchannels, (1, gh, gw, gchannels), np.float16)
+
         # the decoder input merge, then the split family again
         value = self.buffer("d5", h * w * channels, np.float16)
         begin()
@@ -551,21 +563,30 @@ class ResidentFrame:
                            target=value, publish=xmxres.EPI_E4M3,
                            source_half=True, target_half=True)
             submit()
+        keep("d5", value, h * w * channels, (1, h, w, channels), np.float16)
 
         for transition, regular, skip_level, heads in DECODER:
             stage[0] = f"decoder upsample -> L{skip_level}"
             sh, sw, schannels = self.levels[skip_level]
             edge = self.edge(transition, "up")
             target = self.buffer(f"d{skip_level}", sh * sw * schannels, np.float16)
+            block = self.block(transition, heads)
+            # The 32-channel block takes its merge raw — its feed-forward's GEMM reads the
+            # publication, its residual the raw value — where the branched ones take it
+            # published as both (notes/opendlss-reference.md). The raw merge goes into the
+            # level-1 transition's buffer, its size and long dead by now.
+            raw = None if block.branched else self.buffer("unpublished", sh * sw * schannels)
             begin()
             R.record_upsample_merge(rt, edge, self.transition_scratch(
-                sh * sw * max(channels, schannels)), value, skips[skip_level], target,
-                h, w, sh, sw, channels, schannels,
-                source_half=True, skip_half=True, target_half=True)
-            block = self.block(transition, heads)
-            R.record_block(rt, block, self.scratch(block, sh, sw), source=target,
+                sh * sw * max(channels, schannels)), value, skips[skip_level],
+                target if raw is None else raw, h, w, sh, sw, channels, schannels,
+                source_half=True, skip_half=True, target_half=raw is None,
+                published=None if raw is None else target)
+            R.record_block(rt, block, self.scratch(block, sh, sw),
+                           source=target if raw is None else raw,
+                           source16=None if raw is None else target,
                            target=target, publish=xmxres.EPI_E4M3,
-                           source_half=True, target_half=True)
+                           source_half=raw is None, target_half=True)
             submit()
             value, h, w, channels = target, sh, sw, schannels
             for index in regular:
@@ -576,6 +597,7 @@ class ResidentFrame:
                                target=value, publish=xmxres.EPI_E4M3,
                                source_half=True, target_half=True)
                 submit()
+            keep(f"d{skip_level}", value, h * w * channels, (1, h, w, channels), np.float16)
 
         # back to full resolution, merged with block 0's output, then the head
         stage[0] = "block70 + head"

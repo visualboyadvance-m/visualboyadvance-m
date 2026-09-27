@@ -191,26 +191,37 @@ def test_composition():
 
 
 def test_geometry():
-    """The network's extent: the vendor's floor by default, the graph's on request."""
+    """The network's extent: the vendor's field by default, the graph's floor on request."""
     print("network geometry")
     import nr_frame as frame
+    # the vendor's own fields (OpenDLSS-NR's `geometryFromValid`): 1280x720 and 1024x768 take
+    # a column of windows more, because their fields would pool to a bottleneck with no
+    # padding token; 1920x1080 aligns to 128, level 0 not being whole windows at 1080
+    known = {(320, 180): (320, 320), (448, 252): (448, 320), (576, 324): (576, 384),
+             (1056, 594): (1088, 640), (1152, 648): (1152, 768), (1280, 720): (1344, 768),
+             (1024, 768): (1088, 768), (512, 512): (576, 512), (1920, 1080): (1920, 1152),
+             (1153, 642): (1280, 768)}
+    got = {size: (g.network_width, g.network_height)
+           for size, g in ((size, frame.network_geometry(*size)) for size in known)}
+    check("the vendor's field at ten sizes", got == known,
+          ", ".join(f"{w}x{h} -> {got[(w, h)]}" for (w, h) in known if got[(w, h)] != known[(w, h)]))
     sizes = [(w, h) for w in (64, 101, 179, 256, 320, 321, 640, 1280, 1920)
              for h in (64, 101, 180, 288, 320, 704, 720, 1080)]
-    same = all(frame.network_geometry(w, h) == frame.NetworkGeometry.vendor_aligned(w, h)
-               for w, h in sizes)
-    check("the default floor is NetworkGeometry.vendor_aligned, on 72 sizes", same)
     small = frame.network_geometry(320, 180, minimum=128)
-    check("at the graph's floor a 320x180 frame runs at 320x192",
-          (small.network_width, small.network_height) == (320, 192),
+    check("at the graph's floor a 320x180 frame runs at 320x256 — 180 aligns to 128",
+          (small.network_width, small.network_height) == (320, 256),
           f"{small.network_width}x{small.network_height}")
     floor = frame.network_geometry(100, 60, minimum=64)
     check("no floor below the graph's 128", (floor.network_width, floor.network_height) == (128, 128),
           f"{floor.network_width}x{floor.network_height}")
-    extents = [frame.network_geometry(w, h, minimum=m) for w, h in sizes for m in (128, 192, 256)]
+    extents = [frame.network_geometry(w, h, minimum=m) for w, h in sizes for m in (128, 192, 256, 320)]
     check("every extent a multiple of 64 that covers the frame",
           all(g.network_width % 64 == 0 and g.network_height % 64 == 0
               and g.network_width >= g.output_width and g.network_height >= g.output_height
               for g in extents))
+    check("MLX-DLSS's own pipeline takes the same field",
+          all(frame.NetworkGeometry.vendor_aligned(w, h) == frame.network_geometry(w, h)
+              for w, h in sizes))
 
 
 def test_temporal():

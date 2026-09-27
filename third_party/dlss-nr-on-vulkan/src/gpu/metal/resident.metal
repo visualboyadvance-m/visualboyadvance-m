@@ -110,17 +110,19 @@ kernel void resident(constant Push &pc [[buffer(0)]],
     if (kind == UPSAMPLE_MERGE) {
         /* Block 70's input in one pass: the level above upsampled 2x (nearest), times the
          * per-channel sin, plus the skip times the per-channel cos, stored float32 and, as
-         * the second output (offset 96), half. The steps are upsample2, scale_channel,
-         * residual and to_half, each rounded where they round: the scale on its own, the
-         * residual in RESIDUAL's own `a + b * d` (nothing is contracted in this build).
-         * n=channels, sa=target width, sb=source width; d holds sin then cos. */
+         * the second output (offset 96), published to E4M3 as halves — the float32 is the
+         * feed-forward's residual, the publication its GEMM's input. The steps are
+         * upsample2, scale_channel, residual and e4m3_half, each rounded where they round:
+         * the scale on its own, the residual in RESIDUAL's own `a + b * d` (nothing is
+         * contracted in this build). n=channels, sa=target width, sb=source width; d holds
+         * sin then cos. */
         uint channels = pc.n, target = pc.sa, source = pc.sb;
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         float scaled = load_a(pc, flags, ((y / 2u) * source + (x / 2u)) * channels + c) * d[c];
         float merged = scaled + load_b(pc, flags, index) * d[channels + c];
         float_out(pc.c)[index] = merged;
-        half_out(pc.residual_cos)[index] = half(merged);
+        half_out(pc.residual_cos)[index] = half(e4m3(merged));
         return;
     }
     if (kind == POOL2_SKIP) {
@@ -148,13 +150,16 @@ kernel void resident(constant Push &pc [[buffer(0)]],
          * (nearest), plus the skip times the per-channel sine, then the publish — what
          * upsample2, scale_channel and add wrote. The product is rounded on its own and then
          * added (nothing is contracted in this build). n=channels, sa=target width, sb=source
-         * width, d=sine, b=the skip. */
+         * width, d=sine, b=the skip. With a second output (offset 96) the merge goes there
+         * published as well: the 32-channel block's, whose feed-forward reads it published
+         * and its residual raw (notes/opendlss-reference.md). */
         uint channels = pc.n, target = pc.sa, source = pc.sb;
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         float scaled = load_b(pc, flags, index) * d[c];
         float merged = load_a(pc, flags, ((y / 2u) * source + (x / 2u)) * channels + c) + scaled;
         store(pc, flags, index, merged);
+        if (pc.residual_cos != 0ul) half_out(pc.residual_cos)[index] = half(e4m3(merged));
         return;
     }
     if (kind == PAD_END) {
@@ -182,7 +187,13 @@ kernel void resident(constant Push &pc [[buffer(0)]],
         uint channels = pc.n, heads = pc.batch, tokens = pc.sa;
         uint c = index % channels, rest = index / channels;
         uint token = rest % tokens, window = rest / tokens;
-        store(pc, flags, index, load_a(pc, flags, ((window * heads + c / 32u) * tokens + token) * 32u + c % 32u));
+        uint at = (window * heads + c / 32u) * tokens + token;
+        float value = load_a(pc, flags, at * 32u + c % 32u);
+        /* Flag 0x20000: the ViT's value sum, rounded to half, times its row's reciprocal
+         * from `d` — the softmax's normalisation, which the ViT applies here rather than
+         * to the weights (attention.metal, vit_softmax). */
+        if ((flags & 0x20000u) != 0u) value = half_round(half_round(value) * d[at]);
+        store(pc, flags, index, value);
         return;
     }
     if (kind == ADD_BIAS) {

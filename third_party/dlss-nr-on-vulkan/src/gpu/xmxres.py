@@ -38,7 +38,7 @@ TM, TN, TK = 8, 16, 16
 (E4M3, GATE, HALF, TO_HALF, SCALE, RESIDUAL, FROM_HALF, PARTITION, REVERSE, ADD_BIAS,
  SPLIT_HEADS, MERGE_HEADS, POOL2, UPSAMPLE2, SCALE_CHANNEL, ADD, PAD_END,
  GATE_E4M3_HALF, E4M3_HALF, GATE_HALF, UPSAMPLE_MERGE, UPSAMPLE_ADD, POOL2_SKIP) = range(23)
-COSINE_PUBLISH, SOFTMAX = 0, 1
+COSINE_PUBLISH, SOFTMAX, VIT_SOFTMAX = 0, 1, 3
 
 # GEMM epilogues, applied to the accumulator on its way out of the kernel
 EPI_NONE, EPI_E4M3, EPI_GATE, EPI_GATE_E4M3, EPI_HALF = 0, 1, 2, 3, 4
@@ -115,7 +115,7 @@ def _load():
             ("xmx_rec_gemm_residual", [ctypes.c_int] * 5 + [ctypes.c_uint] * 4),
             ("xmx_rec_gemm_window_residual", [ctypes.c_int] * 5 + [ctypes.c_uint] * 8),
             ("xmx_window_init", [ctypes.c_char_p, ctypes.c_uint]),
-            ("xmx_rec_gemm_qkv", [ctypes.c_int] * 6 + [ctypes.c_uint] * 4),
+            ("xmx_rec_gemm_qkv", [ctypes.c_int] * 6 + [ctypes.c_uint] * 5),
             ("xmx_rec_gemm_qkv_window", [ctypes.c_int] * 6 + [ctypes.c_uint] * 9),
             ("xmx_rec_gemm_dual", [ctypes.c_int] * 4 + [ctypes.c_uint] * 3),
             ("xmx_ffn_init", [ctypes.c_char_p]),
@@ -126,7 +126,7 @@ def _load():
             ("xmx_window_block_init", [ctypes.c_char_p]),
             ("xmx_rec_window_block", [ctypes.c_int] * 8 + [ctypes.c_uint] * 6),
             ("xmx_global_attention_init", [ctypes.c_char_p]),
-            ("xmx_rec_global_attention", [ctypes.c_int] * 4 + [ctypes.c_uint] * 3 + [ctypes.c_float]),
+            ("xmx_rec_global_attention", [ctypes.c_int] * 4 + [ctypes.c_uint] * 3),
             ("xmx_int8_init", [ctypes.c_char_p]),
             ("xmx_rec_gemm_int8", [ctypes.c_int] * 5 + [ctypes.c_uint] * 4),
             ("xmx_rec_unary2", [ctypes.c_uint] + [ctypes.c_int] * 5
@@ -136,7 +136,7 @@ def _load():
              + [ctypes.c_uint, ctypes.c_uint, ctypes.c_float] + [ctypes.c_uint] * 5),
             ("xmx_rec_row", [ctypes.c_uint] + [ctypes.c_int] * 4 + [ctypes.c_uint] * 5
              + [ctypes.c_float]),
-            ("xmx_rec_qkv", [ctypes.c_int] * 5 + [ctypes.c_uint] * 3),
+            ("xmx_rec_qkv", [ctypes.c_int] * 5 + [ctypes.c_uint] * 4),
             ("xmx_profile", [ctypes.c_int]),
             ("xmx_rec_history", [ctypes.c_int] * 3 + [ctypes.c_uint] * 5),
             ("xmx_device_lost", [])):
@@ -716,7 +716,7 @@ class Runtime:
         self.recorded = 0
         return self
 
-    def prepare_qkv(self, source, q, k, v, scale, windows, tokens, heads):
+    def prepare_qkv(self, source, q, k, v, scale, windows, tokens, heads, *, vit=False):
         if min(windows, tokens, heads) <= 0:
             raise ValueError('QKV extents must be positive')
         if (len({q.id, k.id, v.id}) != 3 or source.id in (q.id, k.id, v.id)
@@ -727,7 +727,8 @@ class Runtime:
             raise ValueError('QKV input or scale buffer is too small')
         if any(buf.nbytes < rows * 32 * 2 for buf in (q, k, v)):
             raise ValueError('QKV output buffer is too small')
-        if self.lib.xmx_rec_qkv(source.id, q.id, k.id, v.id, scale.id, rows, tokens, heads):
+        if self.lib.xmx_rec_qkv(source.id, q.id, k.id, v.id, scale.id, rows, tokens, heads,
+                                int(vit)):
             raise failure(self.lib, 'xmx_rec_qkv')
         self.recorded += 1
         return self
@@ -876,17 +877,19 @@ class Runtime:
         self.recorded += 1
         return self
 
-    def global_attention(self, q, k, v, merged, rows, tokens, heads, cap):
+    def global_attention(self, q, k, v, merged, rows, tokens, heads):
         """A bottleneck block's attention in one pass (global_attention.comp).
 
-        What `gemm(q, k, scores, rows, rows, 32, batch=heads, transpose_b=True)`, the
-        softmax over `tokens` of `rows` columns clamped at `cap`, `gemm(probs, v, context,
-        ...)` and `merge_heads(context, merged, 1, rows, 32 * heads, heads, EPI_E4M3,
-        narrow)` write into `merged`, bit for bit, with no score stored
-        (`src/gpu/test_global_attention.py`).
+        What `gemm(q, k, scores, rows, rows, 32, batch=heads, transpose_b=True)`,
+        `vit_softmax(scores, probs, reciprocal, heads * rows, tokens, stride=rows)`,
+        `gemm(probs, v, context, ...)` and `merge_heads(context, merged, 1, rows, 32 * heads,
+        heads, epilogue=EPI_E4M3, narrow=True, scale=reciprocal)` write into `merged`, bit
+        for bit, with no score stored (`src/gpu/test_global_attention.py`).
         """
-        if rows <= 0 or rows % 16 or not 0 < tokens <= rows or heads <= 0:
-            raise ValueError("global attention needs rows a multiple of 16, at least the tokens")
+        if (rows <= 0 or rows % 16 or not 0 < tokens <= rows or heads <= 0
+                or -(-rows // 64) != -(-tokens // 64)):
+            raise ValueError("global attention needs rows a multiple of 16 within the "
+                             "tokens' 64-block")
         if merged.id in {q.id, k.id, v.id}:
             raise ValueError("global attention's output must not alias its inputs")
         for buf in (q, k, v, merged):
@@ -896,8 +899,8 @@ class Runtime:
                 or fused_shader(self.lib, "global_attention"))
         if self.lib.xmx_global_attention_init(path.encode()) != 0:
             raise RuntimeError("global attention pipeline: " + self.lib.xmx_error().decode())
-        if self.lib.xmx_rec_global_attention(q.id, k.id, v.id, merged.id, rows, tokens, heads,
-                                             float(cap)) != 0:
+        if self.lib.xmx_rec_global_attention(q.id, k.id, v.id, merged.id, rows, tokens,
+                                             heads) != 0:
             raise RuntimeError("xmx_rec_global_attention: " + self.lib.xmx_error().decode())
         self.recorded += 1
         return self
@@ -959,7 +962,7 @@ class Runtime:
         return self
 
     def gemm_qkv(self, a, weight, q, k, v, scale, rows, channels, heads, tokens, *,
-                 window=None, image_half=False):
+                 window=None, image_half=False, publish_image=False, vit=False):
         """The QKV projection, finished in its own epilogue: Q and K cosine-normalised
         (Q times its head's scale), V published, all three as E4M3 halves in
         (window, head, token, 32) order — what the projection into float32 followed by
@@ -969,6 +972,8 @@ class Runtime:
         With `window=(height, width, origin)`, `a` is the image itself (float32, or half
         with `image_half`) and the shifted-window partition happens in the projection's
         own loads: what `partition` into a half buffer then this would write, bit for bit.
+        `publish_image` rounds the image to E4M3 on the way in, as a partition with that
+        epilogue would. `vit` normalises as the ViT does (`cosine_publish(vit=True)`).
         """
         if (min(rows, heads, tokens) <= 0 or channels != heads * 32 or rows % tokens
                 or rows % TM or channels % TK):
@@ -977,6 +982,8 @@ class Runtime:
         if len({q.id, k.id, v.id}) != 3 or {q.id, k.id, v.id} & {a.id, weight.id, scale.id}:
             raise ValueError("QKV targets must be distinct from each other and the inputs")
         if window is not None:
+            if vit:
+                raise ValueError("the ViT's projection has no windows")
             height, width, origin = window
             ph, pw, (top, left) = self.window_extent(height, width, origin, 8)
             if tokens != 64 or rows != ph * pw or rows % 64 or channels % 32:
@@ -989,24 +996,27 @@ class Runtime:
             if self.lib.xmx_rec_gemm_qkv_window(a.id, weight.id, q.id, k.id, v.id, scale.id,
                                                 rows, channels, heads, tokens, width, height,
                                                 pw // 8, (top << 16) | left,
-                                                int(image_half)) != 0:
+                                                int(image_half) | 2 * int(publish_image)) != 0:
                 raise RuntimeError("xmx_rec_gemm_qkv_window: " + self.lib.xmx_error().decode())
             self.recorded += 1
             return self
+        if publish_image:
+            raise ValueError("only a window-gathered projection publishes its image")
         for buf, size in ((a, rows * channels * 2), (weight, channels * 3 * channels * 2),
                           (q, rows * channels * 2), (k, rows * channels * 2),
                           (v, rows * channels * 2), (scale, heads * 4)):
             if buf.nbytes < size:
                 raise ValueError("QKV projection buffer is too small")
         if self.lib.xmx_rec_gemm_qkv(a.id, weight.id, q.id, k.id, v.id, scale.id,
-                                     rows, channels, heads, tokens) != 0:
+                                     rows, channels, heads, tokens, int(vit)) != 0:
             raise RuntimeError("xmx_rec_gemm_qkv: " + self.lib.xmx_error().decode())
         self.recorded += 1
         return self
 
     def gemm_dual(self, a, b, c, half_copy, rows, cols, inner):
-        """C = A @ B in float32, and the same values as half into `half_copy`: what a
-        GEMM then a `to_half` of its output would write, in one pass."""
+        """C = A @ B in float32, and the same values published into `half_copy`: what a
+        GEMM then an `e4m3_half` of its output would write, in one pass — block 0's stem,
+        raw for its feed-forward's residual and published for its GEMM."""
         for extent, multiple, name in ((rows, TM, "rows"), (cols, TN, "cols"), (inner, TK, "inner")):
             if extent <= 0 or extent % multiple:
                 raise ValueError(f"{name}={extent} must be a positive multiple of {multiple}")
@@ -1120,11 +1130,11 @@ class Runtime:
 
     def upsample_merge(self, source, skip, sincos, merged, merged16, height, width,
                        source_width, channels):
-        """merged = upsample2(source) * sin + skip * cos, stored float32 and as half.
+        """merged = upsample2(source) * sin + skip * cos, stored float32 and published.
 
         `source` (half) is the level above at half the extent, `skip` (half) the
         full-resolution skip, `sincos` the per-channel sin then cos. The same values the
-        upsample2, scale_channel, residual and to_half passes produce, in one pass
+        upsample2, scale_channel, residual and e4m3_half passes produce, in one pass
         (`src/gpu/test_glue.py`).
         """
         count = height * width * channels
@@ -1313,10 +1323,18 @@ class Runtime:
                           _dims=(heads, tokens, part, 0))
 
     def merge_heads(self, source, target, windows, tokens, channels, heads,
-                    *, epilogue=0, narrow=False):
-        """(windows, heads, tokens, 32) -> (windows, tokens, C)."""
-        return self.unary(MERGE_HEADS, source, target, windows * tokens * channels,
-                          channels=channels, epilogue=epilogue, narrow=narrow,
+                    *, epilogue=0, narrow=False, scale=None):
+        """(windows, heads, tokens, 32) -> (windows, tokens, C). With `scale` — a
+        reciprocal a (window, head, token) row, as `vit_softmax` writes them — each value is
+        rounded to half and multiplied by its row's: the ViT's normalisation."""
+        if scale is None:
+            return self.unary(MERGE_HEADS, source, target, windows * tokens * channels,
+                              channels=channels, epilogue=epilogue, narrow=narrow,
+                              _dims=(heads, tokens, 0, 0))
+        if scale.nbytes < windows * heads * tokens * 4 or scale.id in (source.id, target.id):
+            raise ValueError("the head merge's reciprocals need a buffer of their own")
+        return self.unary(MERGE_HEADS | 0x20000, source, target, windows * tokens * channels,
+                          channels=channels, third=scale, epilogue=epilogue, narrow=narrow,
                           _dims=(heads, tokens, 0, 0))
 
     def pool2_skip(self, source, pooled, skip, height, width, channels):
@@ -1361,14 +1379,26 @@ class Runtime:
                           a_half=a_half, narrow=narrow, _dims=(0, height, width, padded_width))
 
     def upsample_add(self, source, skip, factors, target, height, width, source_width,
-                     channels, *, skip_half=False, epilogue=0, narrow=False):
+                     channels, *, skip_half=False, epilogue=0, narrow=False, published=None):
         """target = upsample2(source) + skip * factors, published: what upsample2, then
         scale_channel of the skip, then add with the epilogue write, in one pass
-        (`src/gpu/test_glue.py`). `source` is float32, cropped to (height, width)."""
-        return self.unary(UPSAMPLE_ADD, source, target, height * width * channels,
-                          channels=channels, second=skip, third=factors, epilogue=epilogue,
-                          narrow=narrow, b_half=skip_half,
-                          _dims=(0, width, source_width, 0))
+        (`src/gpu/test_glue.py`). `source` is float32, cropped to (height, width).
+        `published` takes the same values published to E4M3 as halves, besides `target`."""
+        if published is None:
+            return self.unary(UPSAMPLE_ADD, source, target, height * width * channels,
+                              channels=channels, second=skip, third=factors, epilogue=epilogue,
+                              narrow=narrow, b_half=skip_half,
+                              _dims=(0, width, source_width, 0))
+        count = height * width * channels
+        if published.id in {source.id, skip.id, factors.id, target.id} or published.nbytes < count * 2:
+            raise ValueError("the published merge needs a buffer of its own")
+        if self.lib.xmx_rec_unary2(UPSAMPLE_ADD | _publish(epilogue, narrow) | _reads(False, skip_half),
+                                   source.id, skip.id, target.id, factors.id, published.id,
+                                   int(count), int(channels), 1.0, 0, int(width),
+                                   int(source_width), 0, 0) != 0:
+            raise RuntimeError("xmx_rec_unary2: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
 
     def scale_channel(self, source, factors, target, count, channels, *, a_half=False):
         """target = source * factors, one factor per channel."""
@@ -1386,14 +1416,16 @@ class Runtime:
                           third=bias, _dims=(heads, 0, 0, 0))
 
     def cosine_publish(self, source, target, rows, *, tokens=0, heads=0, scale=None,
-                       narrow=False, from_half=False, qkv_part=None):
+                       narrow=False, from_half=False, qkv_part=None, vit=False):
         """Normalise rows of 32 through the kernel's fragment tree, then publish as E4M3.
 
         With `scale` the query path also multiplies by its head's `attn_scale`; rows are
-        ordered (batch, head, token), so the head follows from the row index.
+        ordered (batch, head, token), so the head follows from the row index. `vit` takes
+        the ViT's tree instead, and its query half(sqrt(32)) before the scale.
         """
         third = scale if scale is not None else source
-        flags = COSINE_PUBLISH | _publish(0, narrow) | (0x8000 if from_half else 0)
+        flags = (COSINE_PUBLISH | _publish(0, narrow) | (0x8000 if from_half else 0)
+                 | (0x80000 if vit else 0))
         if qkv_part is not None:
             if qkv_part not in (0, 1) or tokens <= 0 or heads <= 0 or from_half:
                 raise ValueError("QKV gather needs part 0/1, positive tokens/heads and float32 input")
@@ -1402,6 +1434,23 @@ class Runtime:
                                 source.id, source.id, target.id, third.id,
                                 int(rows), int(tokens), int(heads),
                                 1 if scale is not None else 0, 0, 0.0) != 0:
+            raise RuntimeError("xmx_rec_row: " + self.lib.xmx_error().decode())
+        self.recorded += 1
+        return self
+
+    def vit_softmax(self, source, target, reciprocal, rows, tokens, *, stride=0,
+                    narrow=True):
+        """The ViT's softmax (attention.comp, `vit_softmax`): each row's weights
+        published unnormalised into `target`, and its reciprocal, the vendor's denominator,
+        into `reciprocal` (float32, one a row) for `merge_heads(scale=...)` to apply."""
+        width = stride or tokens
+        if rows <= 0 or not 0 < tokens <= width:
+            raise ValueError("the ViT softmax needs rows and at least one token a row")
+        if reciprocal.nbytes < rows * 4 or reciprocal.id in (source.id, target.id):
+            raise ValueError("the ViT softmax's reciprocals need a buffer of their own")
+        if self.lib.xmx_rec_row(VIT_SOFTMAX | _publish(0, narrow), source.id, source.id,
+                                target.id, reciprocal.id, int(rows), int(tokens), 0, 0,
+                                int(stride), 0.0) != 0:
             raise RuntimeError("xmx_rec_row: " + self.lib.xmx_error().decode())
         self.recorded += 1
         return self

@@ -5,7 +5,8 @@ Reference: the GEMM into float32, `cosine_publish` for Q (with its head's scale)
 `split_heads` with the E4M3 publish for V — the graph's own path. Fused: `gemm_qkv`. The
 three targets must match byte for byte, and the guard values past their ends must
 survive. Both GEMM paths the epilogue lives in are exercised: the register-tiled one
-(C below 128, or rows that are not whole 64-row blocks) and the staged one.
+(C below 128, or rows that are not whole 64-row blocks) and the staged one; and both
+normalisations, the window blocks' and the ViT's (`vit`).
 """
 import numpy as np
 import xmxres as X
@@ -15,13 +16,13 @@ GUARD = 64
 FILL = np.float16(-11.1)
 
 
-def reference(rt, a, weight, scale, proj, q, k, v, windows, tokens, channels, heads):
+def reference(rt, a, weight, scale, proj, q, k, v, windows, tokens, channels, heads, vit):
     rows = windows * tokens
     rt.gemm(a, weight, proj, rows, 3 * channels, channels)
     rt.cosine_publish(proj, q, windows * heads * tokens, tokens=tokens, heads=heads,
-                      scale=scale, narrow=True, qkv_part=0)
+                      scale=scale, narrow=True, qkv_part=0, vit=vit)
     rt.cosine_publish(proj, k, windows * heads * tokens, tokens=tokens, heads=heads,
-                      narrow=True, qkv_part=1)
+                      narrow=True, qkv_part=1, vit=vit)
     rt.split_heads(proj, v, windows, tokens, channels, heads, 2, epilogue=X.EPI_E4M3,
                    narrow=True)
 
@@ -60,14 +61,15 @@ def main():
                 values[1] = 0
                 values[-1] = values[-1] * np.float16(4)
                 X.host_write(a, values.reshape(-1))
-                for mask in (0, 7):
+                for mask, vit in ((0, False), (7, False), (0, True), (7, True)):
                     rt.specialize(mask)
                     for buf in targets:
                         X.host_write(buf, np.full(rows * channels + GUARD, FILL, np.float16))
                     rt.begin()
                     reference(rt, a, weight, scale, proj, *targets[:3], windows, tokens,
-                              channels, heads)
-                    rt.gemm_qkv(a, weight, *targets[3:], scale, rows, channels, heads, tokens)
+                              channels, heads, vit)
+                    rt.gemm_qkv(a, weight, *targets[3:], scale, rows, channels, heads, tokens,
+                                vit=vit)
                     rt.submit()
                     for name, want, got in zip("QKV", targets[:3], targets[3:]):
                         want = X.host_view(want, np.float16)
@@ -78,7 +80,7 @@ def main():
                                 f"{name} differs at {bad.size} of {got.size} "
                                 f"(first {bad[0]}: {got[bad[0]]} against {want[bad[0]]}) "
                                 f"windows={windows} tokens={tokens} C={channels} "
-                                f"spread={spread} mask={mask}")
+                                f"spread={spread} mask={mask} vit={vit}")
                         assert (got[rows * channels:] == FILL).all(), f"{name} guard overwritten"
                         # and every element was written, so matching is not two untouched fills
                         assert not (got[:rows * channels] == FILL).any(), f"{name} left unwritten"

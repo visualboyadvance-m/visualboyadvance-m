@@ -3,8 +3,11 @@
 The daemon's own path over a fake socket, temporal off, on one frame given as a path — a
 crop of a real capture keeps its native pixels. Prints, per scale, the mean absolute change
 to luma and the share of the added energy in each band of spatial frequency, 1.0 being
-Nyquist on either axis. notes/HANDOFF.md, 2026-09-25: at 1.0 about 3 % of it sits in the
-upper half of the band, against under 1 % at 0.9, and the change is 1.5x smaller.
+Nyquist on either axis. Three 1280x720 DoA5 frames, 2026-09-27: the change is the same at
+1.0 as at 0.9, and 1.5-3x more of it sits in the upper half of the band at 1.0 (0.9-9.7 %
+against 0.3-6.1 %). A weaker change at 1.0, measured on 2026-09-25, was the padded field:
+1280x720 then ran on 1280x768, a field with no padding token in its bottleneck
+(notes/opendlss-reference.md).
 
     python3 src/bench/scale_spectrum.py FRAME.png
 """

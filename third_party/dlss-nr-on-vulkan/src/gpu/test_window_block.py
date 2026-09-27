@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """A 32-channel window block's attention half in one pass, against the three it replaces.
 
-`window_block` must write what the window-gathered QKV projection with its epilogue,
-merged window attention and the window residual write, byte for byte: whole and cropped
+`window_block` must write what the window-gathered QKV projection with its epilogue — the
+image published on the way in, as a 32-channel block's projection reads its feed-forward's
+output — merged window attention and the window residual write, byte for byte: whole and cropped
 windows, both window origins, a float32 and a half image, and the three publishes the
 graph uses — a float32 output, a half one, and E4M3 published as half. Nothing outside the
 image may be written.
@@ -67,7 +68,8 @@ def pool_cases(rt, rng):
                                                 image_half=image_half, pooled=pooled)
                             else:
                                 rt.gemm_qkv(image, qkv, q, k, v, scale, rows, 32, 1, 64,
-                                            window=(height, width, origin), image_half=image_half)
+                                            window=(height, width, origin), image_half=image_half,
+                                            publish_image=True)
                                 rt.window_attention(q, k, v, attended, windows, 1, bias=bias,
                                                     merged=True)
                                 rt.gemm_residual_pool(attended, projection, image, cosine,
@@ -139,7 +141,8 @@ def head_cases(rt, rng):
                                                     head_columns=columns)
                                 else:
                                     rt.gemm_qkv(image, qkv, q, k, v, scale, rows, 32, 1, 64,
-                                                window=(height, width, origin), image_half=image_half)
+                                                window=(height, width, origin), image_half=image_half,
+                                            publish_image=True)
                                     rt.window_attention(q, k, v, attended, windows, 1, bias=bias,
                                                         merged=True)
                                     rt.gemm_residual(attended, projection, image, cosine, out16, rows,
@@ -203,7 +206,8 @@ def main():
                                     X.host_write(b, np.full(pixels * 32 + GUARD, fill(dtype), dtype))
                                 rt.begin()
                                 rt.gemm_qkv(image, qkv, q, k, v, scale, rows, 32, 1, 64,
-                                            window=(height, width, origin), image_half=image_half)
+                                            window=(height, width, origin), image_half=image_half,
+                                            publish_image=True)
                                 rt.window_attention(q, k, v, attended, windows, 1, bias=bias,
                                                     merged=True)
                                 rt.gemm_residual(attended, projection, image, cosine, want, rows,

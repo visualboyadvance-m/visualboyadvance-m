@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """The full-resolution glue in fewer passes, against the passes it replaces.
 
-`upsample_merge` against upsample2, scale_channel, residual and to_half; `upsample_add`
+`upsample_merge` against upsample2, scale_channel, residual and e4m3_half; `upsample_add`
 against a decoder transition's upsample2, scale_channel and add; `pool2_skip` against
-block 0's e4m3_half and pool2; `gemm_dual` against a GEMM and a to_half of its output; and
+block 0's e4m3_half and pool2; `gemm_dual` against a GEMM and an e4m3_half of its output; and
 `ffn_fused_merge` against `upsample_merge` and the fused feed-forward reading both of its
 outputs; `ffn_fused_stem` against `gemm_dual` and the same; and `gemm_residual_pool`
 against a window residual into float32 and `pool2_skip` of it. Every output must match
@@ -79,7 +79,7 @@ def upsample_cases(rt, rng):
                     rt.upsample2(source, upsampled, sw, height, width, channels, a_half=True)
                     rt.scale_channel(upsampled, sin, merged_ref, count, channels)
                     rt.residual(merged_ref, skip, cos, merged_ref, count, channels, b_half=True)
-                    rt.to_half(merged_ref, half_ref, count)
+                    rt.e4m3_half(merged_ref, half_ref, count)
                     rt.upsample_merge(source, skip, sincos, merged, half, height, width, sw,
                                       channels)
                     rt.submit()
@@ -122,7 +122,7 @@ def gemm_cases(rt, rng):
                         X.host_write(buf, np.full(rows * cols + GUARD, fill(dtype), dtype))
                     rt.begin()
                     rt.gemm(a, b, out_ref, rows, cols, inner)
-                    rt.to_half(out_ref, half_ref, rows * cols)
+                    rt.e4m3_half(out_ref, half_ref, rows * cols)
                     rt.gemm_dual(a, b, out, half, rows, cols, inner)
                     rt.submit()
                     check(f"gemm {rows}x{cols}x{inner} float32", X.host_view(out), X.host_view(out_ref))
@@ -148,7 +148,8 @@ def gemm_cases(rt, rng):
 def transition_cases(rt, rng):
     """`upsample_add` against the decoder transition's own three passes: upsample2 of the
     float32 projection, scale_channel of the skip, and add with the publish on its way
-    out — wide and narrow, a half and a float32 skip, odd extents cropped."""
+    out — wide and narrow, a half and a float32 skip, odd extents cropped; and block 66's
+    form, the merge raw and a published copy beside it, against the add and e4m3_half."""
     cases = 0
     for channels, height, width in ((64, 16, 24), (32, 13, 21), (128, 10, 10), (512, 6, 4),
                                     (256, 9, 7)):
@@ -200,6 +201,28 @@ def transition_cases(rt, rng):
                         assert filled(X.host_view(fused, dtype)[count:], dtype).all(), name
                         assert not filled(X.host_view(fused, dtype)[:count], dtype).any(), name
                         cases += 1
+                raw_ref, raw = alloc(count + GUARD, np.float32), alloc(count + GUARD, np.float32)
+                pub_ref, pub = alloc(count + GUARD, np.float16), alloc(count + GUARD, np.float16)
+                for mask in (0, 7):
+                    rt.specialize(mask)
+                    for b, dtype in ((raw_ref, np.float32), (raw, np.float32),
+                                     (pub_ref, np.float16), (pub, np.float16)):
+                        X.host_write(b, np.full(count + GUARD, fill(dtype), dtype))
+                    rt.begin()
+                    rt.upsample2(source, upsampled, sw, height, width, channels)
+                    rt.scale_channel(skip16, sine, scaled, count, channels, a_half=True)
+                    rt.add(upsampled, scaled, raw_ref, count)
+                    rt.e4m3_half(raw_ref, pub_ref, count)
+                    rt.upsample_add(source, skip16, sine, raw, height, width, sw, channels,
+                                    skip_half=True, published=pub)
+                    rt.submit()
+                    name = f"transition C={channels} {height}x{width} spread {spread} raw and published mask {mask}"
+                    check(name + " (raw)", X.host_view(raw), X.host_view(raw_ref))
+                    check(name + " (published)", X.host_view(pub, np.float16),
+                          X.host_view(pub_ref, np.float16))
+                    assert filled(X.host_view(pub, np.float16)[count:], np.float16).all(), name
+                    assert not filled(X.host_view(pub, np.float16)[:count], np.float16).any(), name
+                    cases += 1
         finally:
             for b in buffers:
                 b.free()

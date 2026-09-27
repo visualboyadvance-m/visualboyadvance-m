@@ -91,7 +91,9 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
     bool row_in = y >= 0 && y < int(pc.image_h);
 
     /* the row, gathered as the staged kernel's loader gathers it: a lane eight channels of
-     * one token, a float32 image rounded to half, zero outside the image */
+     * one token, published to E4M3 (flag 0x4000 there) — the projection reads the
+     * feed-forward output published and only the residual takes it raw — zero outside the
+     * image */
     {
         uint t = sl / 4u, c0 = (sl % 4u) * 8u;
         int x = x0 + int(t);
@@ -100,13 +102,16 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
         half4 lo = half4(0.0h), hi = half4(0.0h);
         if (in) {
             uint at = (uint(y) * pc.image_w + uint(x)) * 32u + c0;
+            float4 wlo, whi;
             if ((flags & 0x8000u) != 0u) {
                 device const half4 *src = reinterpret_cast<device const half4 *>(half_ptr(pc.a) + at);
-                lo = src[0]; hi = src[1];
+                wlo = float4(src[0]); whi = float4(src[1]);
             } else {
                 device const float4 *src = reinterpret_cast<device const float4 *>(float_ptr(pc.a) + at);
-                lo = half4(src[0]); hi = half4(src[1]);
+                wlo = src[0]; whi = src[1];
             }
+            for (uint e = 0u; e < 4u; e++) { wlo[e] = e4m3(wlo[e]); whi[e] = e4m3(whi[e]); }
+            lo = half4(wlo); hi = half4(whi);
         }
         reinterpret_cast<threadgroup half4 *>(mine_h + t * 32u + c0)[0] = lo;
         reinterpret_cast<threadgroup half4 *>(mine_h + t * 32u + c0)[1] = hi;
@@ -341,7 +346,8 @@ kernel void window_block_portable(constant Push &pc [[buffer(0)]],
     bool inside = y >= 0 && y < int(pc.image_h) && x >= 0 && x < int(pc.image_w);
     uint pixel = inside ? (uint(y) * pc.image_w + uint(x)) * 32u : 0u;
 
-    /* Q, K and V as the tiled portable GEMM computes the gathered projection */
+    /* Q, K and V as the tiled portable GEMM computes the gathered projection, the image
+     * published on the way in */
     {
         device const half *W = half_ptr(pc.b);
         float4 acc[6];
@@ -354,8 +360,8 @@ kernel void window_block_portable(constant Push &pc [[buffer(0)]],
             }
             float av = 0.0f;
             if (inside)
-                av = (flags & 0x8000u) != 0u ? float(half_ptr(pc.a)[pixel + k])
-                                             : float(half(float_ptr(pc.a)[pixel + k]));
+                av = e4m3((flags & 0x8000u) != 0u ? float(half_ptr(pc.a)[pixel + k])
+                                                  : float_ptr(pc.a)[pixel + k]);
             for (uint j = 0u; j < 6u; j++) acc[j] += av * bv[j];
         }
         float scale = half_round(float_ptr(pc.qkv_scale)[0]);

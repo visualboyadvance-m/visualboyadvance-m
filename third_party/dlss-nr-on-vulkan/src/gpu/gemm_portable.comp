@@ -26,7 +26,7 @@
  * improve-qkv-epilogue.md): the residual (0x20000, half skip 0x40000, written back
  * through a window layout 0x80000), the QKV projection finished in its own epilogue
  * (0x100000, the 16x32 build only — a column block must be one head), the half copy of a
- * float32 result (0x200000), the compact head (0x10000, the 8x16 build only), and A
+ * float32 result, published (0x200000), the compact head (0x10000, the 8x16 build only), and A
  * gathered from the image in window order (0x400000, the 16x32 build: on a device without
  * the staged kernel the runtime routes the window-gathered projection here), and block 0's
  * window residual pooled and published in its epilogue (0x800000, the 16x32 build). Where the
@@ -138,8 +138,11 @@ void main() {
         /* A gathered from the image in window order: what the partition pass wrote into a
          * half buffer, read here instead — a float32 image rounded to half on the way in,
          * as the partition's narrow store did, and zero outside the image. Never a
-         * transposed B, never a batch (the runtime says so). */
+         * transposed B, never a batch (the runtime says so). Bit 0x4000 publishes it to
+         * E4M3 on the way in instead: a 32-channel block's feed-forward output, which the
+         * projection reads published and the residual raw (notes/opendlss-reference.md). */
         bool image_half = (flags & 0x8000u) != 0u;
+        bool image_publish = (flags & 0x4000u) != 0u;
         uint base[RM];
         for (uint i = 0; i < RM; i++) base[i] = window_row_base(row + r + i * TM);
         Float4Buf unused = Float4Buf(uint64_t(pc.a));   /* silences a no-use warning on some compilers */
@@ -155,8 +158,10 @@ void main() {
             }
             for (uint i = 0; i < RM; i++) {
                 ACC av = ACC(0.0);
-                if (base[i] != NOWHERE)
-                    av = image_half ? ACC(pc.a.v[base[i] + k]) : ACC(half_round(image.v[base[i] + k]));
+                if (base[i] != NOWHERE) {
+                    float x = image_half ? float(pc.a.v[base[i] + k]) : image.v[base[i] + k];
+                    av = ACC(image_publish ? e4m3(x) : half_round(x));
+                }
                 for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
             }
@@ -336,15 +341,16 @@ void main() {
                     for (uint e = 0; e < 4u; e++)
                         pc.c.v[at + e] = v[e];
             }
-            /* Bit 0x200000: a half copy too, into `d`, for a result the graph needs both
-             * as a float32 residual and as a half GEMM operand. */
+            /* Bit 0x200000: a published copy too, into `d`, as E4M3 halves: block 0's stem,
+             * which its feed-forward's residual takes raw and its GEMM published. */
             if (half_copy) {
                 uint64_t base_d = uint64_t(pc.d);
+                vec4 p = vec4(e4m3(v[0]), e4m3(v[1]), e4m3(v[2]), e4m3(v[3]));
                 if ((at & 3u) == 0u && (uint(base_d) & 7u) == 0u)
-                    Half4Buf(base_d).v4[at >> 2] = f16vec4(v);
+                    Half4Buf(base_d).v4[at >> 2] = f16vec4(p);
                 else
                     for (uint e = 0; e < 4u; e++)
-                        HalfBuf(base_d).v[at + e] = float16_t(v[e]);
+                        HalfBuf(base_d).v[at + e] = float16_t(p[e]);
             }
         }
 }

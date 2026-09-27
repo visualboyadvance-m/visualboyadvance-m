@@ -77,23 +77,54 @@ def load_mlx_numpy_modules(names=MLX_NUMPY_MODULES):
 features_mod, composition_mod = load_mlx_numpy_modules(("features", "composition"))
 NetworkGeometry = features_mod.NetworkGeometry
 
-# The network's frame is padded, by mirroring, to at least this on a side and to a multiple
-# of 64. 320 is what NVIDIA's own driver does (`NetworkGeometry.vendor_aligned`); the graph
-# itself runs down to 128 — a window of 8 at a sixteenth of the extent, MLX-DLSS's graph
-# contract. At a small live size most of a 320x320 frame is mirror padding: 44 % of it for a
-# 320x180 frame, 82 % for 179x101.
+# The network's frame is padded, by mirroring, to at least this on a side. 320 is what
+# NVIDIA's own driver does; the graph itself runs down to 128 — a window of 8 at a sixteenth
+# of the extent, MLX-DLSS's graph contract. At a small live size most of a 320x320 frame is
+# mirror padding: 44 % of it for a 320x180 frame, 82 % for 179x101.
 VENDOR_MINIMUM_EXTENT = 320
 GRAPH_MINIMUM_EXTENT = 128
 
 
-def network_geometry(width, height, minimum=VENDOR_MINIMUM_EXTENT):
-    """The network extent for a `width` x `height` frame: at least `minimum` a side (never
-    below the graph's 128), rounded up to 64. At 320 it is `NetworkGeometry.vendor_aligned`."""
-    floor = max(GRAPH_MINIMUM_EXTENT, int(minimum))
+def _field_alignment(extent):
+    """Two to the number of times the graph reduces an axis of `extent` pixels: six halvings,
+    each rounded up to 4, that shrink it, and a seventh when level 0 is not whole 8-pixel
+    windows. The field is aligned to that, so every halving is exact."""
+    reductions, size = 0, extent
+    for level in range(6):
+        half = -(-((size + 1) // 2) // 4) * 4
+        reductions += half < size
+        reductions += level == 0 and half % 8 != 0
+        size = half
+    return 1 << reductions
 
-    def aligned(extent):
-        return -(-max(floor, extent) // 64) * 64
-    return NetworkGeometry(width, height, aligned(width), aligned(height))
+
+def network_geometry(width, height, minimum=VENDOR_MINIMUM_EXTENT):
+    """The network extent for a `width` x `height` frame, as the vendor pads it (OpenDLSS-NR's
+    `geometryFromValid`, bit-exact against captures of the original at eleven sizes): each
+    side aligned to the graph's own reductions (`_field_alignment`) and at least `minimum`
+    (never below the graph's 128), and the width one alignment more when both sides are
+    four alignments.
+
+    That last step is not cosmetic. Such a field — 1280x768, 1024x768, 512x512 — pools down
+    to a bottleneck with no padding token in it, and there the pass comes out 25-30 % weaker
+    than on any field around it (notes/opendlss-reference.md). MLX-DLSS's rule, a multiple
+    of 64, ran a 1280x720 frame on exactly such a field.
+
+    Below 129 pixels a side the vendor's field need not be a multiple of 64, which this graph
+    — exact halvings down to level 3 — cannot follow; there it is rounded up to 64.
+    """
+    floor = max(GRAPH_MINIMUM_EXTENT, int(minimum))
+    align_width, align_height = _field_alignment(width), _field_alignment(height)
+    field_width = max(floor, -(-width // align_width) * align_width)
+    field_height = max(floor, -(-height // align_height) * align_height)
+    if field_width % (4 * align_width) == 0 and field_height % (4 * align_height) == 0:
+        field_width += align_width
+    return NetworkGeometry(width, height, -(-field_width // 64) * 64, -(-field_height // 64) * 64)
+
+
+# MLX-DLSS's own pipeline and temporal session ask `vendor_aligned` for their field, and their
+# answer — a multiple of 64 — is theirs, not the vendor's; in this tree it is the vendor's.
+NetworkGeometry.vendor_aligned = classmethod(lambda cls, width, height: network_geometry(width, height))
 # The three noise channels depend on the extent and the frame index and on nothing else,
 # and both callers copy the result into a slice rather than writing through it. In a live
 # mode the frame index does not move — the daemon never sets one — so the same array was
@@ -378,7 +409,7 @@ def run_head(model, color, *, profile="standard", frame_index=0, style_index=Non
     The head can then be composed at any `intensity` for free.
     """
     height, width = color.shape[:2]
-    geometry = NetworkGeometry.vendor_aligned(width, height)
+    geometry = network_geometry(width, height)
     values = controls(profile, style_index, local_tone, local_structure)
     features = make_features(color, frame_index=frame_index, geometry=geometry,
                              automatic_mask=automatic_mask, control_mask=control_mask,

@@ -42,6 +42,23 @@ inline float cosine_reciprocal(thread const float *h) {
     return half_round(precise::rsqrt(norm));
 }
 
+/* The ViT's own (OpenDLSS-NR's `vit.wgsl`, notes/opendlss-reference.md): each pair square
+ * summed in float32 — the low one exact, the high one rounded to half first — and rounded
+ * once, then a stride 8, 4 and 2 tree of half adds, the last two pairs apart, and the
+ * reciprocal square root as a divide. The floor keeps a zero head zero. */
+inline float vit_reciprocal(thread const float *h) {
+    float r[16];
+    for (uint c = 0u; c < 16u; c++) r[c] = hfma(h[c], h[c], hmul(h[c + 16u], h[c + 16u]));
+    for (uint c = 0u; c < 8u; c++) r[c] = hadd(r[c], r[c + 8u]);
+    for (uint c = 0u; c < 4u; c++) r[c] = hadd(r[c], r[c + 4u]);
+    float norm = max(hadd(hadd(r[0], r[2]), hadd(r[1], r[3])), half_round(COSINE_NORM_FLOOR));
+    return half_round(1.0f / precise::sqrt(norm));
+}
+
+/* half(sqrt(32)): the ViT's query takes it as a half multiply of its own, between the norm
+ * and the learned scale. */
+constant float VIT_ROOT = 5.65625f;
+
 /* -- residual_epilogue.glsl ------------------------------------------------ */
 
 /* Bit 0x80000: the rows are a window block's, padded and in window order, and the first
@@ -95,14 +112,15 @@ inline void store_staged(constant Push &pc, uint flags, threadgroup const float 
     }
 }
 
-/* Bit 0x200000: the same block, raw, also as half into `d` (what a to_half of the float32
- * output would write). */
+/* Bit 0x200000: the same block also published into `d`, as E4M3 halves (what an e4m3_half
+ * of the float32 output would write): block 0's stem, which its feed-forward's residual
+ * takes raw and its GEMM published. */
 inline void store_half_copy(constant Push &pc, threadgroup const float *stage, uint BM, uint BN,
                             uint row, uint col, uint co, uint ldc, uint lane, uint lanes) {
     device half *Dh = half_out(pc.d);
     for (uint e = lane * 4u; e < BM * BN; e += lanes * 4u) {
         uint at = co + (row + e / BN) * ldc + col + e % BN;
-        float4 v = float4(stage[e], stage[e + 1], stage[e + 2], stage[e + 3]);
+        float4 v = float4(e4m3(stage[e]), e4m3(stage[e + 1]), e4m3(stage[e + 2]), e4m3(stage[e + 3]));
         if ((at & 3u) == 0u && (pc.d & 7u) == 0u)
             reinterpret_cast<device half4 *>(Dh)[at >> 2] = half4(v);
         else
@@ -129,14 +147,17 @@ inline void qkv_epilogue(constant Push &pc, threadgroup float *stage, uint BM, u
     uint channels = pc.n / 3u, tokens = pc.image_h, heads = pc.image_w;
     uint part = col / channels, head = (col % channels) / 32u;
     if (part < 2u) {
+        /* flag 0x2000: the ViT's normalisation, its query taking half(sqrt(32)) and then
+         * its learned scale, two half multiplies */
+        bool vit = (operation_flags(pc) & 0x2000u) != 0u;
         float scale = part == 0u ? half_round(float_ptr(pc.qkv_scale)[head]) : 1.0f;
         for (uint r = lane; r < BM; r += lanes) {
             float h[32];
             for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[r * BN + i]);
-            float reciprocal = cosine_reciprocal(h);
+            float reciprocal = vit ? vit_reciprocal(h) : cosine_reciprocal(h);
             for (uint i = 0u; i < 32u; i++) {
                 float value = hmul(h[i], reciprocal);
-                if (part == 0u) value = hmul(value, scale);
+                if (part == 0u) value = hmul(vit ? hmul(value, VIT_ROOT) : value, scale);
                 stage[r * BN + i] = value;                 // a half value: exact in float
             }
         }
@@ -169,18 +190,25 @@ inline int window_row_base(constant Push &pc, uint r) {
 }
 
 /* Four consecutive channels of a gathered row: zero outside the image, the half values
- * inside, a float32 image rounded to half on the way in as the partition's store did. */
+ * inside, a float32 image rounded to half on the way in as the partition's store did —
+ * or, with bit 0x4000, published to E4M3 as it is loaded: a 32-channel block's
+ * feed-forward output, which the projection reads published and the residual raw
+ * (notes/opendlss-reference.md). */
 inline half4 window_load4(constant Push &pc, uint flags, int base, uint k) {
     if (base < 0) return half4(0.0h);
-    if ((flags & 0x8000u) != 0u)
-        return reinterpret_cast<device const half4 *>(half_ptr(pc.a) + uint(base) + k)[0];
-    return half4(reinterpret_cast<device const float4 *>(float_ptr(pc.a) + uint(base) + k)[0]);
+    float4 v = (flags & 0x8000u) != 0u
+        ? float4(reinterpret_cast<device const half4 *>(half_ptr(pc.a) + uint(base) + k)[0])
+        : reinterpret_cast<device const float4 *>(float_ptr(pc.a) + uint(base) + k)[0];
+    if ((flags & 0x4000u) != 0u)
+        for (uint e = 0u; e < 4u; e++) v[e] = e4m3(v[e]);
+    return half4(v);
 }
 
 inline float window_load(constant Push &pc, uint flags, int base, uint k) {
     if (base < 0) return 0.0f;
-    if ((flags & 0x8000u) != 0u) return float(half_ptr(pc.a)[uint(base) + k]);
-    return float(half(float_ptr(pc.a)[uint(base) + k]));
+    float v = (flags & 0x8000u) != 0u ? float(half_ptr(pc.a)[uint(base) + k])
+                                      : float_ptr(pc.a)[uint(base) + k];
+    return (flags & 0x4000u) != 0u ? e4m3(v) : float(half(v));
 }
 
 #endif

@@ -38,3 +38,21 @@ float cosine_reciprocal(float h[32]) {
     float norm = max(hadd(one[0][0], one[0][1]), half_round(COSINE_NORM_FLOOR));
     return half_round(inversesqrt(norm));
 }
+
+/* The ViT's own (OpenDLSS-NR's `vit.wgsl`, notes/opendlss-reference.md): each pair square
+ * summed in float32 — the low one exact, the high one rounded to half first — and rounded
+ * once, then a stride 8, 4 and 2 tree of half adds, the last two pairs apart, and the
+ * reciprocal square root as a divide. The floor keeps a zero head zero, as the vendor's
+ * NaN publishing as +0 does. `nr_model._vit_norm`. */
+float vit_reciprocal(float h[32]) {
+    float r[16];
+    for (uint c = 0u; c < 16u; c++) r[c] = hfma(h[c], h[c], hmul(h[c + 16u], h[c + 16u]));
+    for (uint c = 0u; c < 8u; c++) r[c] = hadd(r[c], r[c + 8u]);
+    for (uint c = 0u; c < 4u; c++) r[c] = hadd(r[c], r[c + 4u]);
+    float norm = max(hadd(hadd(r[0], r[2]), hadd(r[1], r[3])), half_round(COSINE_NORM_FLOOR));
+    return half_round(1.0 / sqrt(norm));
+}
+
+/* half(sqrt(32)): the ViT's query takes it as a half multiply of its own, between the norm
+ * and the learned scale. */
+const float VIT_ROOT = 5.65625;

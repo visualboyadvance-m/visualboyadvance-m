@@ -19,7 +19,7 @@
  *            padded window block straight back into the unpadded image
  *   0x100000 the QKV projection's epilogue (tiled build: a 32-wide column block is one
  *            head), see nr_epilogue.hlsli
- *   0x200000 a half copy of the plain FP32 result into d as well
+ *   0x200000 a published (E4M3) half copy of the plain FP32 result into d as well
  *   0x400000 A gathered from the image in window order as it is loaded (tiled build),
  *            half already with 0x8000, else float32 rounded to half on the way in
  *   0x800000 block 0's window residual pooled and published in the epilogue (tiled
@@ -86,10 +86,13 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
      * (gemm_staged.comp's WINDOW_A loader). `sa` and `sb` are the image's width and
      * height, `sc` the windows per row, `window_pad` the pad as (top << 16) | left; a
      * token outside the image reads zero, as the partition wrote, and a float32 image is
-     * rounded to half on the way in, as the partition's narrow store did. The batch
-     * strides have no other use with the one batch this mode allows. */
+     * rounded to half on the way in, as the partition's narrow store did — or, with bit
+     * 0x4000, published to E4M3 as it is loaded: a 32-channel block's feed-forward output,
+     * which the projection reads published and the residual raw. The batch strides have
+     * no other use with the one batch this mode allows. */
     bool window_a = (flags & 0x400000u) != 0u;
     bool image_half = (flags & 0x8000u) != 0u;
+    bool image_publish = (flags & 0x4000u) != 0u;
     uint abase[RM];
     bool inside[RM];
     [unroll] for (uint i0 = 0; i0 < RM; i0++) {
@@ -127,9 +130,9 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                                         ld_f16(bufB, B, at + 2u), ld_f16(bufB, B, at + 3u));
             }
             [unroll] for (uint i = 0; i < RM; i++) {
-                float av = !inside[i] ? 0.0
-                         : (image_half ? ld_f16(bufA, A, abase[i] + k)
-                                       : half_round(ld_f32(bufA, A, abase[i] + k)));
+                float x = !inside[i] ? 0.0
+                        : (image_half ? ld_f16(bufA, A, abase[i] + k) : ld_f32(bufA, A, abase[i] + k));
+                float av = image_publish ? e4m3(x) : half_round(x);
                 [unroll] for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
             }
@@ -289,15 +292,17 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                     v[e] = publish(epilogue, v[e]);
             uint at = co + (row + r + i * TM) * ldc + col + cq + j * TN;
             store4(C, at, v, narrow);
-            /* Bit 0x200000: a half copy too, into `d`, for a result the graph needs twice —
-             * as a float32 residual and as a half GEMM operand. Plain FP32 output only. */
+            /* Bit 0x200000: a published copy too, into `d`, as E4M3 halves — block 0's
+             * stem, which its feed-forward's residual takes raw and its GEMM published.
+             * Plain FP32 output only. */
             if ((flags & 0x200000u) != 0u) {
                 uint D = pc.od.x;
+                float4 p = float4(e4m3(v.x), e4m3(v.y), e4m3(v.z), e4m3(v.w));
                 if ((at & 3u) == 0u && (D & 7u) == 0u)
-                    st_f16x4(bufD, D + at * 2u, v);
+                    st_f16x4(bufD, D + at * 2u, p);
                 else
                     [unroll] for (uint e = 0; e < 4u; e++)
-                        st_f16(bufD, D, at + e, v[e]);
+                        st_f16(bufD, D, at + e, p[e]);
             }
         }
 }

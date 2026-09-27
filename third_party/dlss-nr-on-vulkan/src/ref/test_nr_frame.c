@@ -265,9 +265,12 @@ int main(int argc, char **argv)
     nr_frame_geometry(height, width, &H, &W);
     char detail[256];
     snprintf(detail, sizeof detail, "%dx%d", W, H);
-    check("network extent: at least 320, a multiple of 64", H == 320 && W == 320, detail);
+    check("network extent: at least 320, the vendor's field", H == 320 && W == 320, detail);
     nr_frame_geometry(720, 1280, &H, &W);
-    check("network extent: 1280x720 -> 1280x768", H == 768 && W == 1280, NULL);
+    /* the vendor's field: 1280x768 would pool to a bottleneck with no padding token */
+    check("network extent: 1280x720 -> 1344x768", H == 768 && W == 1344, NULL);
+    nr_frame_geometry(1080, 1920, &H, &W);
+    check("network extent: 1920x1080 -> 1920x1152", H == 1152 && W == 1920, NULL);
     nr_frame_geometry(height, width, &H, &W);
     size_t pixels = (size_t)height * width, net = (size_t)H * W;
 
@@ -462,11 +465,21 @@ int main(int argc, char **argv)
             }
         snprintf(detail, sizeof detail, "mean |out - history| %.5f with the floor, %.5f without", held / n, loose / n);
         check("temporal: the floor holds unchanged rows closer to the history than the gate alone", held < loose, detail);
+        /* Where colour + 0.1 clipped at 1 in all three channels the game moved the pixel
+         * by less than the ramp, and the floor holds it rightly; those pixels are not what
+         * this check is about (one of them decides it on the vendor's graph). */
         int moved_rows_same = 1;
         for (int y = 0; y < height; y += 3)
-            for (int i = 0; i < width * 3; i++) {
-                size_t k = (size_t)y * width * 3 + i;
-                if (floored[k] != temporal[k]) moved_rows_same = 0;
+            for (int x = 0; x < width; x++) {
+                size_t k = ((size_t)y * width + x) * 3;
+                float moved = 0.0f;
+                for (int c = 0; c < 3; c++) {
+                    float step = fabsf(previous[k + c] - colour[k + c]);
+                    if (step > moved) moved = step;
+                }
+                if (moved * 255.0f < 4.0f) continue;
+                for (int c = 0; c < 3; c++)
+                    if (floored[k + c] != temporal[k + c]) moved_rows_same = 0;
             }
         check("temporal: rows the game changed by 0.1 take no floor", moved_rows_same, "the floor is gone by four levels of 255");
         /* the release: where the game's pixel moved by 16 levels of 255 or more none of the

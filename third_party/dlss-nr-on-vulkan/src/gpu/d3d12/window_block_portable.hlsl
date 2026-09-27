@@ -85,8 +85,10 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
             bv[j] = float4(ld_f16(bufB, Bq, at), ld_f16(bufB, Bq, at + 1u),
                            ld_f16(bufB, Bq, at + 2u), ld_f16(bufB, Bq, at + 3u));
         }
-        float av = !inside ? 0.0 : (image_half() ? ld_f16(bufA, pc.oa.x, pixel + k)
-                                                 : half_round(ld_f32(bufA, pc.oa.x, pixel + k)));
+        /* published to E4M3 on the way in, as the gathered projection's 0x4000 does: the
+         * projection reads the feed-forward output published, the residual raw */
+        float av = !inside ? 0.0 : e4m3(image_half() ? ld_f16(bufA, pc.oa.x, pixel + k)
+                                                     : ld_f32(bufA, pc.oa.x, pixel + k));
         [unroll] for (uint j1 = 0u; j1 < 6u; j1++)
             acc[j1] += av * bv[j1];
     }

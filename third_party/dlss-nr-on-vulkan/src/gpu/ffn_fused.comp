@@ -35,18 +35,22 @@
  * Block 70's input can be made here too (flag 0x1000000, the staged shape with the
  * residual): the level above upsampled 2x (nearest) times the per-channel sin, plus the
  * full-resolution skip times the cos — what `UPSAMPLE_MERGE` in resident.comp computes
- * and stored twice, as float32 for this pass's residual and as half for its GEMM, so this
- * pass could read both back. Each subgroup makes its sixteen rows once, rounds them to
- * half through its kilobyte into the four A fragments every chunk reuses, and makes each
- * value again where the residual needs it: the same operations in the same order, so the
- * same bits (`src/gpu/test_glue.py`). a is then the level above (half, rows / 4 x n), d
- * the skip (half), `aux` the sin then cos, lda the width and ldb the level above's.
+ * and stored twice, as float32 for this pass's residual and published for its GEMM, so
+ * this pass could read both back. Each subgroup makes its sixteen rows once, publishes
+ * them to E4M3 through its kilobyte into the four A fragments every chunk reuses, and
+ * makes each value again where the residual needs it raw: the same operations in the same
+ * order, so the same bits (`src/gpu/test_glue.py`). a is then the level above (half,
+ * rows / 4 x n), d the skip (half), `aux` the sin then cos, lda the width and ldb the
+ * level above's.
  *
  * And block 0's (flag 0x2000000): the stem, the 16 feature channels times the adapter,
- * which the stem GEMM wrote as float32 and as half for the same two readers. Here it is
- * that GEMM's one K step — the same multiply-add of the same operands onto zero — made
- * once into the A fragments and again for the residual. a is then the features (half,
- * rows x 16) and `aux` the adapter (16 x 32).
+ * which the stem GEMM wrote as float32 and published for the same two readers. Here it
+ * is that GEMM's one K step — the same multiply-add of the same operands onto zero — made
+ * once into the A fragments, published, and again for the residual. a is then the
+ * features (half, rows x 16) and `aux` the adapter (16 x 32).
+ *
+ * Both publish because every feed-forward GEMM reads its input published, and these two
+ * are the only blocks whose input arrives raw (notes/opendlss-reference.md).
  *
  * Operands, in the resident push block: a input (half, rows x n), b the expand weights
  * (groups x n x hidden), c the output (row stride ldc, group g at columns 32g), d the
@@ -161,8 +165,11 @@ void main() {
         if (merging()) {
             // a lane a half row: sixteen channels, four at a time
             uint r = lane >> 1, c0 = (lane & 1u) * 16u;
-            for (uint q = 0; q < 16u; q += 4u)
-                h4[(hidden + r * 32u + c0 + q) >> 2] = f16vec4(merged4(row + r, c0 + q));
+            for (uint q = 0; q < 16u; q += 4u) {
+                vec4 merged = merged4(row + r, c0 + q);
+                for (uint e = 0u; e < 4u; e++) merged[e] = e4m3(merged[e]);
+                h4[(hidden + r * 32u + c0 + q) >> 2] = f16vec4(merged);
+            }
         } else {
             for (uint j = 0; j < 2u; j++) {
                 coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> adapter;
@@ -172,6 +179,7 @@ void main() {
                     coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> stem =
                         coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
                     stem = coopMatMulAdd(features[i], adapter, stem);
+                    for (uint e = 0u; e < stem.length(); e++) stem[e] = e4m3(stem[e]);
                     coopmat<float16_t, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> narrow =
                         coopmat<float16_t, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(stem);
                     coopMatStore(narrow, h16, hidden + i * TM * 32u + j * TN, 32u,

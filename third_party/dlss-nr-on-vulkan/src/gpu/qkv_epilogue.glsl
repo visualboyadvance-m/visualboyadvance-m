@@ -20,6 +20,8 @@
  *   c    Q target        d    K target        residual_cos    V target
  *   qkv_scale   the query's per-head scale (float32)
  *   image_h     tokens per window             image_w         heads
+ * Flag 0x2000 is the ViT's normalisation (`vit_reciprocal`), whose query takes half(sqrt(32))
+ * and then its learned scale, two half multiplies (notes/opendlss-reference.md).
  */
 
 /* No shared memory of its own, and that is load-bearing. Workgroup shared memory is
@@ -34,14 +36,15 @@ void qkv_epilogue(uint row, uint col, uint lane, uint lanes) {
     /* Q and K: one invocation per row, as the row pass does — the reciprocal norm through
      * the fragment tree, then the row scaled by it (and Q by its head's scale). */
     if (part < 2u) {
+        bool vit = (operation_flags() & 0x2000u) != 0u;
         float scale = part == 0u ? half_round(FloatBuf(pc.qkv_scale).v[head]) : 1.0;
         for (uint r = lane; r < BM; r += lanes) {
             float h[32];
             for (uint i = 0u; i < 32u; i++) h[i] = half_round(float(stage[r * BN + i]));
-            float reciprocal = cosine_reciprocal(h);
+            float reciprocal = vit ? vit_reciprocal(h) : cosine_reciprocal(h);
             for (uint i = 0u; i < 32u; i++) {
                 float value = hmul(h[i], reciprocal);
-                if (part == 0u) value = hmul(value, scale);
+                if (part == 0u) value = hmul(vit ? hmul(value, VIT_ROOT) : value, scale);
                 stage[r * BN + i] = QKV_STAGE(value);   // a half value: exact in either type
             }
         }

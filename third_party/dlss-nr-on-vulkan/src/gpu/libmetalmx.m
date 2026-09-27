@@ -1045,9 +1045,12 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 			FAIL("compact head requires N=16, ldc=4 and plain FP32 output", 0);
 		staged = tiled = 0;
 	}
-	if ((bt & 0x100000u) && !(qkv && (bt & ~0x408000u) == 0x100000u
+	/* 0x2000 is the ViT's normalisation, 0x4000 a window-gathered A published on the way in */
+	if ((bt & 0x100000u) && !(qkv && (bt & ~0x40e000u) == 0x100000u
 				  && (staged || (tiled && g.tilen == 32))))
 		FAIL("QKV epilogue needs its targets, no other flag, and a 32-column block", 0);
+	if ((bt & 0x4000u) && !(bt & 0x400000u))
+		FAIL("an A published on the way in is a window-gathered one", 0);
 	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u && !staged))
 		FAIL("a GEMM half copy needs its target, no other flag, and the resident kernel", 0);
 	/* The pool is the 64-row staged kernel's epilogue on the simdgroup path — at any depth
@@ -1147,22 +1150,27 @@ static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
 			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a, -1);
 }
 
+/* `vit`: the ViT's normalisation and query scale (nr_epilogue.h, flag 0x2000). */
 int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
-		     unsigned M, unsigned channels, unsigned heads, unsigned tokens)
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens, unsigned vit)
 {
-	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL, 0u);
+	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL,
+			       vit ? 0x2000u : 0u);
 }
 
+/* `image_mode`: bit 0 a half image (0x8000), bit 1 the image published to E4M3 as it is
+ * loaded (0x4000). */
 int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
 			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
 			    unsigned width, unsigned height, unsigned across, unsigned pad,
-			    unsigned image_half)
+			    unsigned image_mode)
 {
-	if (!width || !height || !across || tokens != 64u)
+	if (!width || !height || !across || tokens != 64u || image_mode > 3u)
 		FAIL("invalid window-gathered QKV projection", 0);
 	uint32_t window_a[] = { width, height, across, pad };
 	return record_gemm_qkv(image, weight, q, k, v, scale, M, channels, heads, tokens,
-			       window_a, 0x400000u | (image_half ? 0x8000u : 0u));
+			       window_a, 0x400000u | ((image_mode & 1u) ? 0x8000u : 0u)
+			       | ((image_mode & 2u) ? 0x4000u : 0u));
 }
 
 int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K)
@@ -1206,11 +1214,12 @@ int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsign
 /* Q, K and V prepared in one row dispatch, three planes on y (attention.metal,
  * QKV_PREPARE); the scale's address rides in lda | ldb << 32. */
 int xmx_rec_qkv(int source, int q, int k, int v, int scale,
-		unsigned rows, unsigned tokens, unsigned heads)
+		unsigned rows, unsigned tokens, unsigned heads, unsigned vit)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	if (!rows || !tokens || !heads) FAIL("invalid QKV extent", 0);
-	const unsigned flags = 2u | 0x1000u | 0x20000u;
+	/* 0x80000: the ViT's normalisation and query scale (attention.metal) */
+	const unsigned flags = 2u | 0x1000u | 0x20000u | (vit ? 0x80000u : 0u);
 	uint64_t scale_addr = addr_of(scale);
 	struct push p = { .a = addr_of(source), .b = addr_of(q), .c = addr_of(k),
 		.d = addr_of(v), .m = rows, .n = tokens, .batch = heads, .flags = flags,
@@ -1423,16 +1432,18 @@ int xmx_global_attention_init(const char *path)
 }
 
 /* A bottleneck block's attention in one pass (global_attention.metal): Q, K and V
- * (heads, rows, 32) half into the merged (rows, heads * 32) half. A 256-thread
- * threadgroup a head and 64 query rows. */
+ * (heads, rows, 32) half into the merged (rows, heads * 32) half — QK^T, the ViT's
+ * softmax, PV and the scaled head merge. A 256-thread threadgroup a head and 64 query
+ * rows; the rows reach no further than the tokens' last 64-block. */
 int xmx_rec_global_attention(int q, int k, int v, int merged, unsigned rows,
-			     unsigned tokens, unsigned heads, float cap)
+			     unsigned tokens, unsigned heads)
 {
 	if (!g.recording || !g.rglobal) FAIL("global attention not ready for recording", 0);
-	if (!rows || rows % 16u || !tokens || tokens > rows || !heads)
-		FAIL("global attention needs rows a multiple of 16, at least the tokens", 0);
+	if (!rows || rows % 16u || !tokens || tokens > rows || !heads
+	    || (rows + 63u) / 64u != (tokens + 63u) / 64u)
+		FAIL("global attention needs rows a multiple of 16 within the tokens' 64-block", 0);
 	struct push p = { .a = addr_of(q), .b = addr_of(k), .c = addr_of(merged), .d = addr_of(v),
-			  .m = rows, .n = tokens, .batch = heads, .p0 = cap };
+			  .m = rows, .n = tokens, .batch = heads };
 	if (!p.a || !p.b || !p.c || !p.d) FAIL("global attention operand is not a live buffer", 0);
 	return dispatch(g.rglobal, &p, (rows + 63u) / 64u, heads, 1, 256, PK_ROW, 5);
 }

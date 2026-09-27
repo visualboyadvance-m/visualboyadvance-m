@@ -47,6 +47,23 @@ float cosine_reciprocal(float h[32]) {
     return half_round(rsqrt(norm));
 }
 
+/* The ViT's own (OpenDLSS-NR's `vit.wgsl`, notes/opendlss-reference.md): each pair square
+ * summed in float32 — the low one exact, the high one rounded to half first — and rounded
+ * once, then a stride 8, 4 and 2 tree of half adds, the last two pairs apart, and the
+ * reciprocal square root as a divide. The floor keeps a zero head zero. */
+float vit_reciprocal(float h[32]) {
+    float r[16];
+    [unroll] for (uint c = 0u; c < 16u; c++) r[c] = hfma(h[c], h[c], hmul(h[c + 16u], h[c + 16u]));
+    [unroll] for (uint c1 = 0u; c1 < 8u; c1++) r[c1] = hadd(r[c1], r[c1 + 8u]);
+    [unroll] for (uint c2 = 0u; c2 < 4u; c2++) r[c2] = hadd(r[c2], r[c2 + 4u]);
+    float norm = max(hadd(hadd(r[0], r[2]), hadd(r[1], r[3])), half_round(COSINE_NORM_FLOOR));
+    return half_round(1.0 / sqrt(norm));
+}
+
+/* half(sqrt(32)): the ViT's query takes it as a half multiply of its own, between the norm
+ * and the learned scale. */
+static const float VIT_ROOT = 5.65625;
+
 #ifndef NR_D3D_DESC_PUSH
 /* -- residual_epilogue.glsl -------------------------------------------------- */
 
@@ -101,14 +118,17 @@ void qkv_epilogue(uint row, uint col, uint lane, uint lanes) {
     /* Q and K: one invocation per row, as the row pass does — the reciprocal norm through
      * the fragment tree, then the row scaled by it (and Q by its head's scale). */
     if (part < 2u) {
+        /* flag 0x2000: the ViT's normalisation, its query taking half(sqrt(32)) and then
+         * its learned scale, two half multiplies */
+        bool vit = (operation_flags() & 0x2000u) != 0u;
         float scale = part == 0u ? half_round(ld_f32(bufF, pc.of.x, head)) : 1.0;
         for (uint r = lane; r < QKV_BM; r += lanes) {
             float h[32];
             [unroll] for (uint i = 0u; i < 32u; i++) h[i] = half_round(qkv_stage[r * QKV_BN + i]);
-            float reciprocal = cosine_reciprocal(h);
+            float reciprocal = vit ? vit_reciprocal(h) : cosine_reciprocal(h);
             [unroll] for (uint i = 0u; i < 32u; i++) {
                 float value = hmul(h[i], reciprocal);
-                if (part == 0u) value = hmul(value, scale);
+                if (part == 0u) value = hmul(vit ? hmul(value, VIT_ROOT) : value, scale);
                 qkv_stage[r * QKV_BN + i] = value;    // a half value: exact in float
             }
         }

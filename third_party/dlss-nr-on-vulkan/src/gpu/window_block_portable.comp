@@ -106,7 +106,9 @@ void main() {
     uint pixel = inside ? (uint(y) * pc.image_w + uint(x)) * 32u : 0u;
 
     /* Q, K and V as the tiled portable GEMM computes the projection with a gathered A:
-     * the image rounded to half on the way in, zero outside it, six 16-column tiles. */
+     * the image published to E4M3 on the way in (flag 0x4000 there) — the projection reads
+     * the feed-forward output published and only the residual takes it raw — zero outside
+     * it, six 16-column tiles. */
     {
         vec4 acc[6];
         for (uint j = 0u; j < 6u; j++) acc[j] = vec4(0.0);
@@ -119,8 +121,8 @@ void main() {
             }
             float av = 0.0;
             if (inside)
-                av = image_half() ? float(HalfBuf(uint64_t(pc.a)).v[pixel + k])
-                                  : half_round(FloatBuf(uint64_t(pc.a)).v[pixel + k]);
+                av = e4m3(image_half() ? float(HalfBuf(uint64_t(pc.a)).v[pixel + k])
+                                       : FloatBuf(uint64_t(pc.a)).v[pixel + k]);
             for (uint j = 0u; j < 6u; j++)
                 acc[j] += av * bv[j];
         }

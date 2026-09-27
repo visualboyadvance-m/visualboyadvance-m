@@ -49,6 +49,11 @@ WITHDRAWN = (
     Claim("27 % FP16 subnormals", r"27(\.22)?\s*%[^.\n]{0,40}subnormal|subnormal[^.\n]{0,40}27",
           "the real weights hold 7 subnormals; 27 % was measured on the misread decode",
           "notes/phase61"),
+    Claim("a weaker pass at render scale 1.0", r"effect comes out weaker|"
+          r"(change|effect)[^.\n]{0,40}1\.5(-1\.7)?x\s+smaller",
+          "1280x720 at 1.0 ran on a 1280x768 field, which has no padding token in its bottleneck; "
+          "on the vendor's 1344x768 the pass is as strong as at 0.9",
+          "notes/opendlss-reference.md"),
 )
 
 

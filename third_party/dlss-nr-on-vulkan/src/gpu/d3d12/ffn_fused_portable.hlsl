@@ -122,7 +122,8 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
         [unroll] for (uint j0 = 0; j0 < 2u; j0++)
             result[i0][j0] = float4(0.0, 0.0, 0.0, 0.0);
 
-    /* an input made here: this lane's rows of A, rounded to half, two to a word */
+    /* an input made here: this lane's rows of A, published to E4M3 as every feed-forward
+     * GEMM reads its input (the residual takes it raw, made again), two to a word */
     bool made = merging() || stemming();
     uint held[2][16];
     [unroll] for (uint ih = 0; ih < 2u; ih++)
@@ -131,6 +132,7 @@ void main(uint3 gid : SV_GroupID, uint index : SV_GroupIndex) {
         [unroll] for (uint im = 0; im < 2u; im++)
             [unroll] for (uint cm = 0; cm < 32u; cm += 4u) {
                 float4 v = made4(row + r + im * TM, cm);
+                v = float4(e4m3(v.x), e4m3(v.y), e4m3(v.z), e4m3(v.w));
                 held[im][cm / 2u] = f32tof16(v.x) | (f32tof16(v.y) << 16);
                 held[im][cm / 2u + 1u] = f32tof16(v.z) | (f32tof16(v.w) << 16);
             }

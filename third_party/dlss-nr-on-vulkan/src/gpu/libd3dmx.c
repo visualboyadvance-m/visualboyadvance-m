@@ -1681,8 +1681,11 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 		tiled = 0;
 	}
 	/* the QKV epilogue normalises a head inside one group: the column block is one head */
-	if ((bt & 0x100000u) && !(qkv && (bt & ~0x408000u) == 0x100000u && tiled && g.tilen == 32))
+	/* 0x2000 is the ViT's normalisation, 0x4000 a window-gathered A published on the way in */
+	if ((bt & 0x100000u) && !(qkv && (bt & ~0x40e000u) == 0x100000u && tiled && g.tilen == 32))
 		FAIL("QKV epilogue needs its targets, no other flag, and a 32-column block", 0);
+	if ((bt & 0x4000u) && !(bt & 0x400000u))
+		FAIL("an A published on the way in is a window-gathered one", 0);
 	if ((bt & 0x200000u) && !(half_copy >= 0 && bt == 0x200000u))
 		FAIL("a GEMM half copy needs its target and no other flag", 0);
 	if ((bt & 0x800000u) && (!tiled || g.tilem != 16u || g.tilen != 32u))
@@ -1760,27 +1763,33 @@ static int record_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
 			   0x100000u | flags, 0, 0, 0, 0, 0, 0, -1, -1, NULL, &targets, -1, window_a, -1);
 }
 
-/* The QKV projection with Q and K normalised and V published in its own epilogue. */
+/* The QKV projection with Q and K normalised and V published in its own epilogue; `vit`
+ * the ViT's normalisation and query scale (nr_epilogue.hlsli, flag 0x2000). */
 int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
-		     unsigned M, unsigned channels, unsigned heads, unsigned tokens)
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens, unsigned vit)
 {
-	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL, 0u);
+	return record_gemm_qkv(a, weight, q, k, v, scale, M, channels, heads, tokens, NULL,
+			       vit ? 0x2000u : 0u);
 }
 
-/* The same with A gathered from the image in window order: the partition folded in. */
+/* The same with A gathered from the image in window order: the partition folded in.
+ * `image_mode` bit 0 a half image (0x8000), bit 1 the image published to E4M3 as it is
+ * loaded (0x4000). */
 int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
 			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
 			    unsigned width, unsigned height, unsigned across, unsigned pad,
-			    unsigned image_half)
+			    unsigned image_mode)
 {
-	if (!width || !height || !across || tokens != 64u)
+	if (!width || !height || !across || tokens != 64u || image_mode > 3u)
 		FAIL("invalid window-gathered QKV projection", 0);
 	uint32_t window_a[] = { width, height, across, pad };
 	return record_gemm_qkv(image, weight, q, k, v, scale, M, channels, heads, tokens,
-			       window_a, 0x400000u | (image_half ? 0x8000u : 0u));
+			       window_a, 0x400000u | ((image_mode & 1u) ? 0x8000u : 0u)
+			       | ((image_mode & 2u) ? 0x4000u : 0u));
 }
 
-/* A plain GEMM whose float32 result is also stored as half into `half_copy`. */
+/* A plain GEMM whose float32 result is also stored published, as E4M3 halves, into
+ * `half_copy`. */
 int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K)
 {
 	if (half_copy < 0) FAIL("invalid GEMM half copy", 0);
@@ -1799,7 +1808,10 @@ static int record_unary(unsigned kind, int a, int b, int c, int d, int second,
 	memset(&p, 0, sizeof p);
 	p.m = n; p.n = channels; p.flags = kind; p.p0 = p0;
 	p.batch = batch; p.sa = sa; p.sb = sb; p.sc = sc; p.k = k;
-	/* a pass that writes two outputs finds the second in the fifth operand (u4) */
+	/* a pass that writes two outputs finds the second in the fifth operand (u4), and bit
+	 * 0x40000000 says it is there — HLSL has no null address to test, where the SPIR-V
+	 * tests `pc.second != 0` (resident.hlsl, UPSAMPLE_ADD) */
+	if (second >= 0) p.flags |= 0x40000000u;
 	int ids[OPERANDS] = { a, b, c, d, second, -1, -1, -1 };
 	return dispatch(g.runary, &p, ids, (n + 255) / 256, 1, 1, 0, PK_UNARY, kind);
 }
@@ -1822,14 +1834,16 @@ int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsign
  * QKV_PREPARE): three independent group planes on y, Q/K/V out in b/c/d, the query scale in
  * the sixth operand (u5; libxmx passes its address in lda/ldb instead). */
 int xmx_rec_qkv(int source, int q, int k, int v, int scale,
-		unsigned rows, unsigned tokens, unsigned heads)
+		unsigned rows, unsigned tokens, unsigned heads, unsigned vit)
 {
 	if (!g.recording) FAIL("not recording", 0);
 	if (!rows || !tokens || !heads) FAIL("invalid QKV extent", 0);
 	if (!live(source) || !live(q) || !live(k) || !live(v) || !live(scale)) FAIL("QKV operand is not live", 0);
 	struct push p;
 	memset(&p, 0, sizeof p);
-	p.m = rows; p.n = tokens; p.batch = heads; p.flags = 2u | 0x1000u | 0x20000u;
+	/* 0x80000: the ViT's normalisation and query scale (attention.hlsl) */
+	p.m = rows; p.n = tokens; p.batch = heads;
+	p.flags = 2u | 0x1000u | 0x20000u | (vit ? 0x80000u : 0u);
 	int ids[OPERANDS] = { source, q, k, v, -1, scale, -1, -1 };
 	return dispatch(g.rrow, &p, ids, (rows + 31) / 32, 3, 1, 0, PK_ROW, 2);
 }
@@ -2051,19 +2065,21 @@ int xmx_global_attention_init(const char *path)
 }
 
 /* A bottleneck block's attention in one pass (global_attention_portable.hlsl): Q, K, V
- * (heads, rows, 32) half in u0, u1, u3, the merged (rows, heads * 32) half in u2. A 256-lane
- * group a head (y) and 64 query rows (x, in pieces). */
+ * (heads, rows, 32) half in u0, u1, u3, the merged (rows, heads * 32) half in u2 — QK^T,
+ * the ViT's softmax, PV and the scaled head merge. A 256-lane group a head (y) and 64 query
+ * rows (x, in pieces); the rows reach no further than the tokens' last 64-block. */
 int xmx_rec_global_attention(int q, int k, int v, int merged, unsigned rows,
-			     unsigned tokens, unsigned heads, float cap)
+			     unsigned tokens, unsigned heads)
 {
 	if (!g.recording || !g.rglobal) FAIL("global attention not ready for recording", 0);
-	if (!rows || rows % 16u || !tokens || tokens > rows || !heads)
-		FAIL("global attention needs rows a multiple of 16, at least the tokens", 0);
+	if (!rows || rows % 16u || !tokens || tokens > rows || !heads
+	    || (rows + 63u) / 64u != (tokens + 63u) / 64u)
+		FAIL("global attention needs rows a multiple of 16 within the tokens' 64-block", 0);
 	if (!live(q) || !live(k) || !live(v) || !live(merged))
 		FAIL("global attention operand is not a live buffer", 0);
 	struct push p;
 	memset(&p, 0, sizeof p);
-	p.m = rows; p.n = tokens; p.batch = heads; p.p0 = cap;
+	p.m = rows; p.n = tokens; p.batch = heads;
 	int ids[OPERANDS] = { q, k, merged, v, -1, -1, -1, -1 };
 	return dispatch(g.rglobal, &p, ids, (rows + 63u) / 64u, heads, 1, 0, PK_ROW, 5);
 }

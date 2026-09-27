@@ -135,7 +135,9 @@ const char *nr_frame_error(void);
 const char *nr_frame_device(nr_frame *frame);
 const char *nr_frame_gemm_path(nr_frame *frame);
 
-/* The network extent for an output extent: at least 320, a multiple of 64. */
+/* The network extent for an output extent, as the vendor pads it: each side aligned to the
+ * graph's own reductions, at least 320, one alignment wider when both sides are four
+ * alignments (`nr_frame.network_geometry`; 1280x720 -> 1344x768), a multiple of 64. */
 void nr_frame_geometry(int height, int width, int *network_height, int *network_width);
 /* The same at the floor `minimum` (`nr_frame_params.min_extent`), never below 128. */
 void nr_frame_geometry_min(int height, int width, int minimum, int *network_height, int *network_width);

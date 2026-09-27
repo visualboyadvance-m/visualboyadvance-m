@@ -12,7 +12,7 @@
 #include "nr_d3d.hlsli"
 #include "nr_epilogue.hlsli"      /* hmul/hadd/hfma and cosine_reciprocal: one definition */
 
-static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u;
+static const uint COSINE_PUBLISH = 0u, SOFTMAX = 1u, QKV_PREPARE = 2u, VIT_SOFTMAX = 3u;
 
 /* ROW_LANES: 32 for every row pass; the `attention_rows` build takes 256, for the
  * whole-row softmax alone — the same 8 KB of shared memory serving eight times the lanes
@@ -92,19 +92,21 @@ void store(uint flags, uint index, float value) {
 }
 
 /* `scale_from`: 0 none, 1 the scale in d (the plain cosine publish, `pc.k != 0`), 2 the
- * scale at push offset 120 (QKV_PREPARE, where d is the V target). */
+ * scale at push offset 120 (QKV_PREPARE, where d is the V target). Flag 0x80000: the ViT's
+ * normalisation and query scale (`vit_reciprocal`, VIT_ROOT). */
 void cosine_publish(uint row, uint local, uint scale_from) {
     uint base = local * 32u;
+    bool vit = (operation_flags() & 0x80000u) != 0u;
     float h[32];
     [unroll] for (uint i = 0u; i < 32u; i++) h[i] = half_round(stage[base + i]);
-    float reciprocal = cosine_reciprocal(h);          // nr_epilogue.hlsli, cosine_tree.glsl
+    float reciprocal = vit ? vit_reciprocal(h) : cosine_reciprocal(h);   // nr_epilogue.hlsli
     float scale = 1.0;
     uint head = (row / pc.n) % pc.batch;              // rows are (batch, head, token)
     if (scale_from == 1u) scale = half_round(ld_f32(bufD, pc.od.x, head));
     else if (scale_from == 2u) scale = half_round(ld_f32(bufF, pc.of.x, head));
     [unroll] for (uint i = 0u; i < 32u; i++) {
         float value = hmul(h[i], reciprocal);
-        if (scale_from != 0u) value = hmul(value, scale);
+        if (scale_from != 0u) value = hmul(vit ? hmul(value, VIT_ROOT) : value, scale);
         stage[base + i] = e4m3(value);
     }
 }
@@ -272,6 +274,48 @@ void softmax_long(uint flags, uint row) {
     }
 }
 
+/* The ViT's exponential (OpenDLSS-NR's `vit_exp_weight`): its own affine, evaluated in
+ * half, and a 4-bit shift where the window blocks' is 5 (attention.comp, vit_weight). */
+float vit_weight(float logit) {
+    precise float affine = half_round(logit) * 0.08953857421875;
+    affine += 1.708984375;
+    affine = clamp(half_round(affine), 1.439453125, 1.9775390625);
+    uint bits = f32tof16(affine) & 0xFFFFu;
+    return f16tof32(((bits << 4) + 0x4000u) & 0xFFFFu);
+}
+
+/* The ViT's softmax, one row a lane (attention.comp, `vit_softmax`): the weights published
+ * unnormalised into c, the row's reciprocal into d for the head merge; the denominator in
+ * the vendor's tree order over 64-key blocks padded with zero keys, whose weight is taken
+ * off at the end. Columns past the tokens count as padding and publish zero. */
+void vit_softmax(uint flags, uint row) {
+    uint stride = pc.sa != 0u ? pc.sa : pc.n, tokens = pc.n, base = row * stride;
+    uint blocks = (tokens + 63u) / 64u;
+    uint A = pc.oa.x;
+    float zero = vit_weight(0.0), total = 0.0;
+    for (uint b = 0u; b < blocks; b++) {
+        float column[8];
+        [unroll] for (uint c = 0u; c < 8u; c++) {
+            float pair[4];
+            [unroll] for (uint j = 0u; j < 4u; j++) {
+                uint k0 = b * 64u + c + 16u * j, k1 = k0 + 8u;
+                float w0 = k0 < tokens ? vit_weight(ld_f32(bufA, A, base + k0)) : zero;
+                float w1 = k1 < tokens ? vit_weight(ld_f32(bufA, A, base + k1)) : zero;
+                pair[j] = hadd(w0, w1);
+            }
+            column[c] = hadd(hadd(hadd(pair[0], pair[1]), pair[2]), pair[3]);
+        }
+        float even = hadd(hadd(hadd(column[0], column[2]), column[4]), column[6]);
+        float odd = hadd(hadd(hadd(column[1], column[3]), column[5]), column[7]);
+        total = hadd(total, hadd(even, odd));
+    }
+    uint padding = blocks * 64u - tokens;
+    if (padding > 0u) total = hadd(total, -hmul(zero, float(padding)));
+    st_f32(bufD, pc.od.x, row, half_round(1.0 / total));
+    for (uint k = 0u; k < stride; k++)
+        store(flags, base + k, k < tokens ? e4m3(vit_weight(ld_f32(bufA, A, base + k))) : 0.0);
+}
+
 [numthreads(ROW_LANES, 1, 1)]
 void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
     uint group = gid.x + pc.spare;
@@ -301,6 +345,8 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
         gather(flags, lid, base, min(32u * 32u, pc.m * 32u - base));
         if (row < pc.m) cosine_publish(row, lid, pc.k != 0u ? 1u : 0u);
         scatter(flags, lid, base, min(32u * 32u, pc.m * 32u - base));
+    } else if (kind == VIT_SOFTMAX) {
+        if (row < pc.m) vit_softmax(flags, row);
     } else if (kind == SOFTMAX) {
         uint stride = pc.sa != 0u ? pc.sa : pc.n;
         if (stride == pc.n && stride <= 64u) {

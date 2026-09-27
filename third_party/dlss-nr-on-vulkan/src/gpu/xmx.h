@@ -102,18 +102,21 @@ int xmx_rec_gemm_residual(int a, int b, int c, int skip, int cosine,
 int xmx_rec_gemm_window_residual(int a, int b, int c, int skip, int cosine,
 				 unsigned M, unsigned N, unsigned K, unsigned flags,
 				 unsigned height, unsigned width, unsigned across, unsigned pad);
+/* `vit` (here and in xmx_rec_qkv): the ViT's normalisation and query scale. `image_mode`:
+ * bit 0 a half image, bit 1 the image published to E4M3 as it is gathered — a 32-channel
+ * block's raw feed-forward output (notes/opendlss-reference.md). */
 int xmx_rec_gemm_qkv(int a, int weight, int q, int k, int v, int scale,
-		     unsigned M, unsigned channels, unsigned heads, unsigned tokens);
+		     unsigned M, unsigned channels, unsigned heads, unsigned tokens, unsigned vit);
 int xmx_rec_gemm_qkv_window(int image, int weight, int q, int k, int v, int scale,
 			    unsigned M, unsigned channels, unsigned heads, unsigned tokens,
 			    unsigned width, unsigned height, unsigned across, unsigned pad,
-			    unsigned image_half);
+			    unsigned image_mode);
 int xmx_rec_gemm_dual(int a, int b, int c, int half_copy, unsigned M, unsigned N, unsigned K);
 int xmx_rec_unary2(unsigned kind, int a, int b, int c, int d, int second, unsigned n,
 		   unsigned channels, float p0, unsigned batch, unsigned sa, unsigned sb,
 		   unsigned sc, unsigned k);
 int xmx_rec_qkv(int source, int q, int k, int v, int scale,
-		unsigned rows, unsigned tokens, unsigned heads);
+		unsigned rows, unsigned tokens, unsigned heads, unsigned vit);
 int xmx_window_init(const char *path, unsigned merged);
 int xmx_rec_window_attention(int q, int k, int v, int bias, int out,
 			     unsigned batches, unsigned heads, unsigned merged);
@@ -138,8 +141,9 @@ int xmx_rec_window_block(int image, int qkv, int projection, int target, int bia
 			 int cosine, int scale, int pooled, unsigned windows, unsigned height,
 			 unsigned width, unsigned across, unsigned pad, unsigned flags);
 int xmx_global_attention_init(const char *path);
+/* the ViT's attention: rows a multiple of 16 within the tokens' last 64-block */
 int xmx_rec_global_attention(int q, int k, int v, int merged, unsigned rows,
-			     unsigned tokens, unsigned heads, float cap);
+			     unsigned tokens, unsigned heads);
 int xmx_int8_init(const char *path);
 int xmx_rec_gemm_int8(int a, int b, int c, int a_scale, int b_scale,
 		      unsigned M, unsigned N, unsigned K, unsigned flags);

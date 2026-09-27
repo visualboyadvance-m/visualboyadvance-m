@@ -132,9 +132,12 @@ void main() {
      * image's width and height, `sc` the windows per row, `window_pad` the pad as
      * (top << 16) | left; a token outside the image reads zero, as the partition wrote,
      * and a float32 image is rounded to half on the way in, as the partition's narrow
-     * store did. Bit 0x8000 says the image is half already. */
+     * store did. Bit 0x8000 says the image is half already, and bit 0x4000 that the
+     * projection reads it published: a 32-channel block's feed-forward output, which its
+     * residual keeps raw (notes/opendlss-reference.md). */
     bool window_a = (operation_flags() & 0x400000u) != 0u;
     bool image_half = (operation_flags() & 0x8000u) != 0u;
+    bool image_publish = (operation_flags() & 0x4000u) != 0u;
 
     for (uint k0 = 0; k0 < pc.k; k0 += BK) {
         barrier();
@@ -187,16 +190,19 @@ void main() {
                         continue;
                     }
                     uint at = (uint(y) * pc.sa + uint(x)) * pc.k + k0 + lc;
+                    vec4 lo, hi;
                     if (image_half) {
-                        f16vec4 lo = a4.v4[at >> 2], hi = a4.v4[(at >> 2) + 1u];
-                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = lo[e];
-                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = hi[e];
+                        lo = vec4(a4.v4[at >> 2]);
+                        hi = vec4(a4.v4[(at >> 2) + 1u]);
                     } else {
                         Float4Buf image = Float4Buf(uint64_t(pc.a));
-                        vec4 lo = image.v4[at >> 2], hi = image.v4[(at >> 2) + 1u];
-                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = float16_t(lo[e]);
-                        for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = float16_t(hi[e]);
+                        lo = image.v4[at >> 2];
+                        hi = image.v4[(at >> 2) + 1u];
                     }
+                    if (image_publish)
+                        for (uint e = 0; e < 4u; e++) { lo[e] = e4m3(lo[e]); hi[e] = e4m3(hi[e]); }
+                    for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + e] = float16_t(lo[e]);
+                    for (uint e = 0; e < 4u; e++) buf_a[r * SA + lc + 4u + e] = float16_t(hi[e]);
                     continue;
                 }
                 uint at = ao + min(row + r, last) * lda + k0 + lc;

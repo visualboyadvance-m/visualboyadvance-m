@@ -118,8 +118,10 @@ void main() {
     if (gl_LocalInvocationIndex < 128u)
         u4[256u + gl_LocalInvocationIndex] = Uvec4Buf(uint64_t(pc.b)).v[256u + gl_LocalInvocationIndex];
 
-    /* The row, gathered: a lane eight channels of one token, rounded to half as the
-     * projection's loader rounds them, zero outside the image as the partition was. */
+    /* The row, gathered: a lane eight channels of one token, published to E4M3 as the
+     * projection's loader publishes them — the projection reads the feed-forward output
+     * published and only the residual takes it raw — and zero outside the image as the
+     * partition was. */
     {
         uint t = local / 4u, c0 = (local % 4u) * 8u;
         int x = x0 + int(t);
@@ -128,6 +130,7 @@ void main() {
             uint at = (uint(y) * pc.image_w + uint(x)) * 32u + c0;
             lo = image4(at);
             hi = image4(at + 4u);
+            for (uint e = 0u; e < 4u; e++) { lo[e] = e4m3(lo[e]); hi[e] = e4m3(hi[e]); }
         }
         h4[(scratch * 2u + t * 32u + c0) >> 2] = f16vec4(lo);
         h4[((scratch * 2u + t * 32u + c0) >> 2) + 1u] = f16vec4(hi);

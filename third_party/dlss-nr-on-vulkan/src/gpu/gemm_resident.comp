@@ -215,9 +215,9 @@ void main() {
             for (uint j = 0; j < RN; j++)
                 coopMatStore(acc[i][j], pc.c.v, co + (row + i * TM) * ldc + col + j * TN,
                              ldc, gl_CooperativeMatrixLayoutRowMajor);
-        /* Bit 0x200000: a half copy too, into `d`, written the way the narrow path below
-         * writes one. For a result the graph needs twice — as a float32 residual and as a
-         * half GEMM operand — so that no to_half pass reads the float32 back. */
+        /* Bit 0x200000: a published copy too, into `d`, as E4M3 halves. For a result the
+         * graph needs twice — block 0's stem, which its feed-forward's residual takes raw
+         * and its GEMM published — so that no pass reads the float32 back. */
         if ((operation_flags() & 0x200000u) == 0u) return;
         for (uint i = 0; i < RM; i++)
             for (uint j = 0; j < RN; j++)
@@ -229,11 +229,11 @@ void main() {
             uint at = co + (row + e / BN) * ldc + col + e % BN;
             if ((at & 3u) == 0u && (uint(uint64_t(pc.d)) & 7u) == 0u) {
                 Half4Buf(uint64_t(pc.d)).v4[at >> 2] =
-                    f16vec4(float(stage[e]), float(stage[e + 1]),
-                            float(stage[e + 2]), float(stage[e + 3]));
+                    f16vec4(e4m3(float(stage[e])), e4m3(float(stage[e + 1])),
+                            e4m3(float(stage[e + 2])), e4m3(float(stage[e + 3])));
             } else {
                 for (uint i = 0; i < 4u; ++i)
-                    HalfBuf(uint64_t(pc.d)).v[at + i] = float16_t(stage[e + i]);
+                    HalfBuf(uint64_t(pc.d)).v[at + i] = float16_t(e4m3(float(stage[e + i])));
             }
         }
         return;

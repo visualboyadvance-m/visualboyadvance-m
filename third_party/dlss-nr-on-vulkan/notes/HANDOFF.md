@@ -1,6 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-26**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-09-27**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -9,7 +9,62 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: 45 more dlss-nr-on-intel commits, on every runtime, and speedups (2026-09-26, night)
+## Latest: six more dlss-nr-on-intel commits — the vendor's graph — on every runtime (2026-09-27)
+
+`380e214`..`04ff144` of `uzbekunknown/dlss-nr-on-intel` are in (merged file by file against
+`f478901`): OpenDLSS-NR as a reference and its tooling (`src/bench/opendlss_*`,
+`src/tools/opendlss_model.py`, `src/bench/vendor_fp8.py`), **the skips from each level's
+transition block**, **six more places where the graph is now the vendor's** (every GEMM operand
+E4M3, block 30 into the bottleneck raw, the ViT's own attention), **the vendor's padded field**
+(1280x720 -> 1344x768) and the 32-lane subgroup pin where the driver has it. Their entries are
+below, verbatim. **The picture changes on purpose, and every reference hash with it.** Carried
+past them:
+
+- **Portable Vulkan twins**, each still equal to this path's unfused passes: the published
+  window gather (`0x4000`) and the published half copy (`0x200000`) in `gemm_portable.comp`, the
+  published gather in `window_block_portable.comp`, the published made input (stem, merge) in
+  `ffn_fused_portable.comp`, and `global_attention_portable.comp` rewritten as the ViT's
+  attention in one trip through the keys (weights, tree over each 64-key block, publish, PV,
+  the reciprocal on the value sum). The ViT normalisation and query scale come free through
+  `qkv_epilogue.glsl` / `cosine_tree.glsl`, which the portable GEMM includes.
+- **Metal**, simdgroup, Metal 4 and portable: `vit_reciprocal`/`VIT_ROOT` and the QKV epilogue's
+  `0x2000` in `nr_epilogue.h`, the published half copy and window loads there too (every GEMM
+  kernel finishes through them), `VIT_SOFTMAX` and the ViT cosine publish in `attention.metal`,
+  the published second outputs and the scaled head merge in `resident.metal`, the published
+  gather in `window_block.metal` (both kernels), the published made input in `ffn_fused.metal`
+  (Metal 4, simdgroup and portable), and `global_attention.metal` rewritten on both paths.
+  libmetalmx takes the new signatures.
+- **Direct3D 12**: the same in HLSL (`nr_epilogue.hlsli`, `gemm_portable`, `attention`,
+  `resident`, `window_block_portable`, `ffn_fused_portable`, `global_attention_portable`), and
+  libd3dmx. HLSL has no null address, so `UPSAMPLE_ADD`'s second output is announced by flag
+  `0x40000000`, which `record_unary` sets whenever one is bound. Compiled (dxc) and cross-linked
+  (MinGW); **not run**.
+- **`xmx.h` changed**: `xmx_rec_gemm_qkv` and `xmx_rec_qkv` take `vit`,
+  `xmx_rec_gemm_qkv_window`'s last argument is `image_mode` (bit 0 half, bit 1 published), and
+  `xmx_rec_global_attention` has no `cap`. All three runtimes and `nr_frame.c` agree.
+- **The C frame library** records the new graph call for call: the transition blocks' published
+  skips, `raw30` and the bottleneck's `record_downsample` (`record_plain_downsample` is gone), the
+  published raw inputs (`e4m3_half` where `to_half` was), the split blocks' published half
+  feed-forward, `publish_image` in the window projection, block 66's raw merge with its published
+  copy, the ViT's attention (fused, or `vit_softmax` plus the scaled merge on a new
+  `R_RECIPROCAL` role), the unfolded query scale, and `nr_frame_geometry*` as the vendor's field
+  rule — checked against `nr_frame.network_geometry` on 131 532 sizes and floors.
+- **libxmx's pin**: `vkGetPhysicalDeviceProperties2` added to the resolved entry points, and the
+  1.3 feature block chained only when it asks for something (a 1.2 device does not know it).
+  MoltenVK on the M3 cannot pin, so every open there says so on stderr and builds unpinned; an
+  adopted device (VBA-M's Vulkan panel) is never pinned.
+
+Verified on the M3: every kernel and frame test on Vulkan-portable (MoltenVK), Metal 4,
+Metal 3.1 (`XMX_METAL4=0`) and Metal-portable, and in `XMX_STAGING=1`; the C frame test pair on
+Vulkan and Metal, **head bit-identical to the Python resident path** (0 of 409 600 values differ).
+One C check, "rows the game changed by 0.1 take no floor", failed on the new head for a reason in
+the test: where all three channels clipped at 1 the game moved a pixel by less than the ramp, and
+the floor holds it rightly; the check now skips those pixels. ctest's other failures are the old
+ones: `publish_check` on the committed `weights/*.h`, and `test_present_negative` (and
+`claims_check`) only outside a git tree with `work/vulkan-headers`. The two `src/bench/*.patch`
+files are caught by VBA-M's `*.patch` ignore and need `git add -f`. No Xe2, phone or Windows run.
+
+## 45 more dlss-nr-on-intel commits, on every runtime, and speedups (2026-09-26, night)
 
 `d0fb63c`..`f478901` of `uzbekunknown/dlss-nr-on-intel` are in (merged file by file against
 `2f23eff`): `min_extent`, the small-bottleneck pads and the 32-row staged builds, the whole-row
@@ -136,6 +191,126 @@ No Xe2, phone or Windows run: the matrix-path GLSL is upstream's.
   game's motion-vector convention); deferred by the owner on 2026-09-26. Tekken 7 and DoA5
   have no upscaler, so it needs a newer game.
 - **A FAQ** in the README, for the questions that keep coming back. Later.
+
+## The reference was not rounding on this GPU; the vendor's GEMM in numpy (2026-09-27, night)
+
+**Not published — the owner asked to hold pushes; this and everything after it are local commits.**
+
+OpenDLSS-NR's WebGPU port rounds its GEMMs' f16 accumulator with WGSL's `f32(f16(x))`, which Mesa
+folds away: on this GPU the port was not rounding between its groups of 16 products at all. With the
+round trips unfoldable (`src/bench/opendlss_rounding.patch`) a numpy transcription of its
+specification, `src/bench/vendor_fp8.py` — FP8 products in groups of 16, 13-bit truncation, the
+accumulator rounded to half each group, the residual seeding it — matches the port's own steps on
+**100 %** of values (block 1's QKV and its whole feed-forward). Structural findings unaffected; the
+patched port against our GPU path is 0.47-1.99 levels apart, as before.
+
+**XMX's half accumulator** is 2-6x closer per GEMM to that arithmetic than our float32 one (E4M3
+mismatches 0.32 % -> 0.05 % at K = 32), and **moves the picture a tenth of the way** (numpy graph:
+0.78 -> 0.70, 2.09 -> 1.91 levels from the reference) — noise, for rewriting every GEMM kernel. Not
+done. And the subgroup width is now pinned only where the driver can pin it: a driver without
+subgroup size control — any desktop Arc's might be one — got no device at all before.
+
+## The padded field is the vendor's, and 1280x720 had been drawing a weaker pass (2026-09-27, evening)
+
+**Every network field whose sides are both multiples of 256 draws a pass 25-30 % weaker** than any
+field around it — 1280x768, 1024x768, 768x512, 512x512, 1536x768, 1280x1024, each 7.7-8.6 levels of
+255 on a DoA5 frame against 9.8-11.6 beside it. Such a field pools to a bottleneck with no padding
+token. MLX-DLSS's field rule (a multiple of 64, at least 320) put **1280x720 on 1280x768**, one of
+them; the vendor's, as OpenDLSS-NR reproduces it from captures, aligns each side to the graph's own
+reductions and adds a column of windows when both sides are four alignments — 1344x768. Ours on our
+field against the reference on its own was **4.3-8.4 levels apart, head corr 0.41-0.76**; on its field,
+0.5-0.75 and 0.996. The weakness is the network's, not ours: where the vendor's rule itself lands on
+1280x768 (a 1153x642 frame) the reference is just as weak, 7.44 against our 7.42 levels.
+
+`nr_frame.network_geometry` is the vendor's rule now — `min_extent` its floor, rounded to 64 only
+below 129 pixels a side — and MLX-DLSS's pipeline takes it too. **It corrects "0.9 looks better than
+1.0" below**: the 1.5-1.7x weaker change at 1.0 was the field. Re-measured on the same three frames,
+1.0 changes the picture as much as 0.9; what is left is 1.5-3x more pixel-level grain at 1.0, and
+whether 0.9 still looks better is the owner's to see again. Fields that grew: 1280x720 -> 1344x768,
+1920x1080 -> 1920x1152, 1152x648 (0.9 at 720p) -> 1152x768, 1024x768 at 0.55 -> 640x512 (48.5 ->
+56.5 ms, the one rate row that changed; the table is re-measured, medians of six); at the graph's
+floor 320x180 now runs at 320x256 (13.5-14.6 ms at 512x288 and 0.35, 25 at 320). The live sizes'
+fields are unchanged. `notes/opendlss-reference.md`, "The padded field".
+
+## The graph is the vendor's now, as far as a head can tell (2026-09-27, later)
+
+**Six more places where MLX-DLSS's graph — which this tree ported — computed something the vendor's
+does not**, found by running OpenDLSS-NR's port with captures inside its blocks and each of our
+steps on its own input to that step (`src/bench/opendlss_steps.py`, a capture-only patch to their
+clone beside it). A structural difference shows as a step agreeing on almost no values; rounding as
+one agreeing on most. The rule under them is the reference's: **every GEMM operand is E4M3**, and
+MLX-DLSS fed four GEMMs a raw value.
+
+- the 32-channel blocks' **QKV projection reads the feed-forward output published**, the attention's
+  residual keeps it raw — 0.8 % of values equal the old way, 92.8 % this way;
+- **every feed-forward reads its input published**, its residual the input as it came: block 0's
+  stem and block 70's merge were read raw (2 % -> 51 %, 1.5 % -> 48 %), and block 66 takes its merge
+  raw as the skip where it took it published (2 % -> 54 %);
+- **the bottleneck pools block 30's raw output** and publishes the pool before its GEMM (the pool
+  86.6 % -> 100.00 % equal, the ViT's input 76 % -> 99.8 %);
+- **the 512 split blocks and the ViT publish their feed-forward output**, as the 64-256 channel
+  blocks did — a block at a time, 55-81 % -> 60-96 % and 52-56 % -> 60-65 %;
+- **the ViT's attention is its own**: its normalisation tree, its query taking half(sqrt 32) and the
+  learned scale as two multiplies, its exponential (another affine, a 4-bit shift), the weights
+  published unnormalised, the reciprocal on the value sum, the keys padded to 64 and their weight
+  taken off — the window blocks' attention with the logits capped at 3 was MLX-DLSS's stand-in.
+
+All of it in the numpy reference — `nr_model.MLX_DLSS_GRAPH` restores MLX-DLSS's graph, which
+`test_against_torch.py` still compares with its PyTorch original bit for bit — and on the GPU path,
+every fused and unfused route. The ViT's attention is one pass through the keys now, the
+normalisation coming after the value sum; its four unfused passes (`vit_softmax` in attention.comp,
+the head merge scaled) are what `global_attention.comp` is bit-identical to. **The picture changes,
+deliberately**: against the reference, same four frames, the composed pictures **1.04-2.52 -> 0.53-1.85
+levels of 255 apart**, head RGB corr 0.974-0.993 -> **0.984-0.997**, the gate 0.89-0.93 -> 0.89-0.96,
+and the pass's own size now the reference's to the level (5.80 against 5.80 on one frame). That is
+about the distance our own two arithmetics make of one graph; what is left is arithmetic, listed in
+`notes/opendlss-reference.md`. **Speed unchanged**: graph 320x320 23.5 ms, 1920x1088 270; the daemon
+25 / 32 / 47 ms at the three live sizes.
+
+Every switch still gives the default's head, at five extents and in both memory modes, and `make
+test` is green in both. New references: heads (noise 384x384, noise 1280x720, Cyberpunk 1280x720)
+`e33f401ecfc1c911` / `91fa8f8478fa0123` / `f3b8841cb18aeae2`; graph 320x320 `c886c425`, 640x384
+`9772b707`, 1280x768 `d099400f`, 1920x1088 `db975dcc`; small networks 192x128 `a6e1751a`, 256x128
+`79c8cd3c`, 320x192 `da29acc7`; the daemon's answers `4b1a690ed745c3bb` / `adf5f2f46c6c015c` /
+`8e1cea1ac4a9dddb`.
+
+**Two traps from the work.** The subgroup width was never pinned: the shaders are SPIR-V 1.6, where
+the driver may choose it, and ANV takes SIMD16 where SIMD32 would spill. Every kernel here is written
+for 32-lane subgroups; the row passes order their shared memory with subgroup barriers, and when the
+ViT's softmax tipped attention.comp's unspecialised build over, a handful of cosine publishes a run
+came out unpublished — nondeterministically, in the one test that compared that build. Every
+pipeline now requires 32 and full subgroups (`build_pipeline_spec`); nothing got slower. And the
+scratch arena's roles alias across a block: `ffn16` is K's role (`ScratchArena.ALIASES`), so a
+value that must outlive the QKV projection's passes cannot live there — the ViT's published
+feed-forward output lives in `ffn`, the residual role, as the split blocks' does.
+
+## A reference that claims the vendor's arithmetic, and how far we are from it (2026-09-27)
+
+*The distances below are before the entry above; the skips are fixed and so are six more places.*
+
+`maanHimself/OpenDLSS-NR` claims the network bit-exact against captures of the original on an NVIDIA
+GPU — every block boundary — and its WebGPU port the same bytes with no FP8. That port runs here, in
+headless Chromium on the Arc 140V, from a model directory written out of our DLL
+(`src/tools/opendlss_model.py`, `src/bench/opendlss_reference.py`). Their specification says where our
+graph — MLX-DLSS's recovery — computes differently: the padded field at 1280x720 and 1920x1080 (not
+at the live sizes), FP8 fixed-point GEMMs on an f16 accumulator the residual seeds, the softmax's
+half-add tree, the ViT's own exponential and normalisation, E4M3 always via half.
+
+On the same features our head is **RGB corr 0.97 at 320x320, 0.99 at 1088x640; the composed pictures
+1.1-2.7 levels of 255 apart** where the pass moves them 4-12, and the temporal gate the least alike
+(0.65-0.86). Our own GPU path against our numpy reference is about half that distance. Side by side
+the pictures look the same; the difference is fine texture. `notes/opendlss-reference.md`.
+
+**Block by block it found a real error, and it is fixed** (`src/bench/opendlss_blocks.py`, our
+blocks on the reference's inputs one at a time): **the decoder merged the wrong skip.** At every
+level ours — MLX-DLSS's graph, ported — took the block before the transition block (3, 7, 13, 21);
+the reference takes the transition block's own output (4, 8, 14, 22). The first decoder blocks
+agreed with it 18-25 % of bytes that way, 61-69 % the right way, like every other block. Fixed in the
+numpy reference and the GPU path (one publish of the transition block's output a level): **the
+picture changes, deliberately** — every reference hash below this entry is from the old graph. The
+temporal gate moved towards the reference's most, corr 0.65-0.86 -> 0.89-0.93. The repository as it
+was is backed up: branch `backup-20260927-before-skip-fix`, `~/ProjectsClaude-backup-20260927.git`
+and `.bundle`.
 
 ## The bottleneck's attention in one pass, and a bug under `min_extent` (2026-09-26, evening)
 
@@ -334,7 +509,7 @@ of the extent. At live sizes most of a 320x320 frame was mirror padding: 44 % of
 
 | game size, scale | network at 320 | network at 128 | ms a frame |
 | --- | --- | --- | --- |
-| 640x360, 0.5 | 320x320 | 320x192 | 30.3 -> 22.7 |
+| 640x360, 0.5 | 320x320 | 320x192 (320x256 since 2026-09-27) | 30.3 -> 22.7 |
 | 640x360, 0.35 | 320x320 | 256x128 | 29.4 -> 16.1 |
 | 512x288, 0.35 | 320x320 | 192x128 | 28.6 -> 14.7 |
 
@@ -423,6 +598,10 @@ choice from 4/8/16/24 in the game; 0 restores the old behaviour. `notes/phase54`
 
 The knob descriptions were rewritten at the owner's request: general, no scene a user
 cannot see (a kimono, an iris). The measurements they used to quote are in the notes.
+
+> **Corrected 2026-09-27**: the weaker change at 1.0 below was the padded field — 1280x720 ran on
+> 1280x768, a field that draws a 25-30 % weaker pass. On the vendor's field 1.0 changes the picture as
+> much as 0.9; the extra grain at 1.0 remains. See the entry at the top.
 
 **Render scale 0.9 looks better than 1.0, and it is not arithmetic.** The owner saw it in
 DoA5 at 720p (0.9 over 0.95 and 1.0) and it measures (`src/bench/scale_spectrum.py`, three
@@ -1616,6 +1795,10 @@ followed from the wrong gate form), the leading-region projection, and "1.01x pa
 - **External write-ups are summaries, not sources.** A WebFetch of `weight_spec.json`
   returned plausible-looking shapes with a confabulated label (`block31` as "final
   output stage"). Clone the repo and read the file.
+- **Nothing pinned the subgroup width.** SPIR-V 1.6 lets the driver pick it, and ANV picks SIMD16
+  where SIMD32 spills; code written for 32 lanes then races, only in the build that spills. Every
+  pipeline now requires 32 (`build_pipeline_spec`, 2026-09-27). A kernel that is right only
+  sometimes, and only unspecialised, was this.
 - **A reset to the remote drops whatever was never pushed.** On 2026-09-23 `master` was
   reset to `origin/master`, and three commits kept on purpose the day before went with it;
   `test_present.c` cited two notes that no longer existed until they were restored on

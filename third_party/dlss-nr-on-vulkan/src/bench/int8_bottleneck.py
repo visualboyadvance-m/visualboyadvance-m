@@ -91,50 +91,68 @@ OPERANDS = [0]
 _RECORD_GLOBAL_BLOCK = nr_resident.record_global_block
 
 
-def global_block_int8(runtime, w, s, source=None, target=None):
+def global_block_int8(runtime, w, s, source=None, target=None, *, chain=False):
     """`record_global_block` with every weight GEMM's A operand on an int8 grid per row.
 
     The same passes in the same order; before each of the four weight GEMMs — the
     expand, the feed-forward projection, the QKV projection and the output projection —
     the frame is submitted, the operand rounded on the host, and recording resumed. The
     attention GEMMs multiply activations by activations and stay in half, as a kernel
-    that put only the weight GEMMs on config 4 would leave them.
+    that put only the weight GEMMs on config 4 would leave them. The residuals read the
+    values the GEMMs' operands were copied from, not the rounded copies.
     """
     R = nr_resident
 
     def int8_rows(buffer, width):
+        # the scratch plan's discovery records the frame once and never runs it
+        if getattr(buffer, "_stand_ins", [None])[0] is not None:
+            return
         runtime.submit()
         quantise_rows(buffer, s.padded, width)
         OPERANDS[0] += 1
         runtime.begin()
 
-    source = source or s.value
-    target = target or s.out
+    def half_copy(source16, target16, count):
+        runtime.unary(xmxres.E4M3, source16, target16, count, a_half=True, narrow=True)
+
     channels, heads, padded = w.channels, w.heads, s.padded
-    runtime.to_half(source, s.value16, padded * channels)
+    if chain:
+        source = s.io16
+        half_copy(source, s.value16, padded * channels)
+    else:
+        source = source or s.value
+        runtime.to_half(source, s.value16, padded * channels)
     int8_rows(s.value16, channels)
     runtime.gemm(s.value16, w.expand, s.hidden16, padded, w.hidden_width, channels,
                  epilogue=xmxres.EPI_GATE_E4M3, narrow=True)
     int8_rows(s.hidden16, w.hidden_width)
     R.record_project_residual(runtime, s.hidden16, w.ffn_proj, s.branch, source, w.ffn_cos,
-                              s.ffn, padded, channels, w.hidden_width)
-    runtime.to_half(s.ffn, s.ffn16, padded * channels)
+                              s.ffn, padded, channels, w.hidden_width, skip_half=chain,
+                              epilogue=xmxres.EPI_E4M3, narrow=True)
+    half_copy(s.ffn, s.ffn16, padded * channels)
     int8_rows(s.ffn16, channels)
-    key = R.record_qkv_projection(runtime, s.ffn16, w, s, 1, padded, channels, heads)
+    key = R.record_qkv_projection(runtime, s.ffn16, w, s, 1, padded, channels, heads, vit=True)
     runtime.gemm(s.q16, key, s.scores, padded, padded, 32, batch=heads,
                  strides=(padded * 32, padded * 32, padded * padded), transpose_b=True)
-    runtime.softmax(s.scores, s.probs16, heads * padded, s.tokens,
-                    stride=padded, cap=w.logit_cap, narrow=True)
+    runtime.vit_softmax(s.scores, s.probs16, s.reciprocal, heads * padded, s.tokens,
+                        stride=padded)
     runtime.gemm(s.probs16, s.v16, s.context, padded, 32, padded, batch=heads,
                  strides=(padded * padded, padded * 32, padded * 32))
     runtime.merge_heads(s.context, s.merged16, 1, padded, channels, heads,
-                        epilogue=xmxres.EPI_E4M3, narrow=True)
+                        epilogue=xmxres.EPI_E4M3, narrow=True, scale=s.reciprocal)
     int8_rows(s.merged16, channels)
-    R.record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
-                              target, padded, channels, channels)
+    if chain:
+        R.record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
+                                  s.io16, s.tokens, channels, channels,
+                                  epilogue=xmxres.EPI_E4M3, narrow=True, skip_half=True)
+    else:
+        R.record_project_residual(runtime, s.merged16, w.out, s.attention, s.ffn, w.attn_cos,
+                                  target or s.out, padded, channels, channels, skip_half=True)
 
 
 def render(colour, weights, activations):
+    # the operands are rounded between submits, which a replayed graph has none of
+    os.environ["NR_FRAME_MODE"] = "block" if activations else os.environ.get("NR_FRAME_MODE", "replay")
     backend = nr_frame.ResidentBackend()
     OPERANDS[0] = 0
     nr_resident.record_global_block = (global_block_int8 if activations

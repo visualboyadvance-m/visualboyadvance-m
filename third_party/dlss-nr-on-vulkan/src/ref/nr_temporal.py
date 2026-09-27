@@ -197,7 +197,7 @@ def run_sequence(model, sequence, motions, *, verbose=True, **options):
         started = time.perf_counter()
         supplied = None if index == 0 else motions[index]
         output = live.process(frame, motion=supplied)
-        geometry = NetworkGeometry.vendor_aligned(frame.shape[1], frame.shape[0])
+        geometry = nr_frame.network_geometry(frame.shape[1], frame.shape[0])
         alpha = geometry.crop(blend_alpha(live.pipeline.head))
         record = {
             "frame": index,

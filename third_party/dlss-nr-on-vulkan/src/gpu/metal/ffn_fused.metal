@@ -36,12 +36,13 @@
  *
  * Block 70's input can be made here (flag 0x1000000, the staged shape with the residual):
  * the level above upsampled 2x times the sin plus the skip times the cos, UPSAMPLE_MERGE's
- * expression, which this runtime's reference stored as float32 for the residual and as
- * half for the expand; and block 0's stem (0x2000000), the features times the adapter, as
+ * expression, which this runtime's reference stored as float32 for the residual and
+ * published for the expand; and block 0's stem (0x2000000), the features times the adapter, as
  * the reference's 16x32 GEMM makes it (the simdgroup kernel's two 8-wide K slices from
  * zero, the portable kernel's sixteen multiply-adds). Each simdgroup (slice) makes its
- * sixteen rows once, rounded to half, into the A it reads for every chunk, and each value
- * again where its residual needs it. a is then the level above (half) or the features
+ * sixteen rows once, published to E4M3 (every feed-forward GEMM reads its input
+ * published, notes/opendlss-reference.md), into the A it reads for every chunk, and each
+ * value again, raw, where its residual needs it. a is then the level above (half) or the features
  * (half, rows x 16), d the skip (half), the 64-bit address in p0-p1 the sin then cos or
  * the adapter (16 x 32), lda the width and ldb the level above's.
  */
@@ -182,7 +183,7 @@ kernel void ffn_fused(constant Push &pc [[buffer(0)]],
                 for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) values[t] = stage[sl + t * 32u];
                 simdgroup_barrier(mem_flags::mem_threadgroup);
             }
-            for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) input[sl + t * 32u] = half(values[t]);
+            for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) input[sl + t * 32u] = half(e4m3(values[t]));
             simdgroup_barrier(mem_flags::mem_threadgroup);
         }
         tensor<device half, extents<int32_t, 32, 16>, tensor_inline> tA(
@@ -226,8 +227,8 @@ kernel void ffn_fused(constant Push &pc [[buffer(0)]],
     } else
 #endif
     {
-    /* an input made here: its sixteen rows, rounded to half, through the stage into the
-     * fragments every chunk reads them from */
+    /* an input made here: its sixteen rows, published to E4M3 as every feed-forward GEMM
+     * reads its input, through the stage into the fragments every chunk reads them from */
     simdgroup_half8x8 held[4][2];
     if (made) {
         float values[F_ROWS * F_OUT / 32u];
@@ -242,7 +243,7 @@ kernel void ffn_fused(constant Push &pc [[buffer(0)]],
             for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) values[t] = stage[sl + t * 32u];
             simdgroup_barrier(mem_flags::mem_threadgroup);
         }
-        for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) hidden[sl + t * 32u] = half(values[t]);
+        for (uint t = 0u; t < F_ROWS * F_OUT / 32u; t++) hidden[sl + t * 32u] = half(e4m3(values[t]));
         simdgroup_barrier(mem_flags::mem_threadgroup);
         for (uint s = 0u; s < 4u; s++)
             for (uint i = 0u; i < 2u; i++) simdgroup_load(held[s][i], hidden + i * 8u * F_OUT + s * 8u, F_OUT);
@@ -357,7 +358,7 @@ kernel void ffn_fused_portable(constant Push &pc [[buffer(0)]],
     float4 result[2][2];
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++) result[i][j] = float4(0.0f);
-    /* an input made here: this lane's rows of A, rounded to half, two to a word */
+    /* an input made here: this lane's rows of A, published to E4M3, two to a word */
     bool made = (flags & (F_MERGE | F_STEM)) != 0u;
     uint held[2][16];
     if (made && live_rows) {
@@ -368,6 +369,7 @@ kernel void ffn_fused_portable(constant Push &pc [[buffer(0)]],
                     for (uint q = 0u; q < 4u; q++) v[q] = ffn_merged(pc, row + r + i * 8u, c + q);
                 else
                     v = ffn_stem4(pc, row + r + i * 8u, c);
+                for (uint q = 0u; q < 4u; q++) v[q] = e4m3(v[q]);
                 held[i][c / 2u] = as_type<uint>(half2(v.xy));
                 held[i][c / 2u + 1u] = as_type<uint>(half2(v.zw));
             }

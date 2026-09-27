@@ -20,6 +20,7 @@ disproved.
 | `phase47-live-mode.md` | the live mode, 10.6 fps at 512x288, and the bottleneck leaving the graph |
 | `phase38-there-was-no-bug.md` | the "driver bug" that shaped three phases does not exist |
 | `phase9-numerics.md` | why bit-identical agreement with a CPU reference is impossible here |
+| `opendlss-reference.md` | a second implementation that claims the vendor's own arithmetic, runnable here: where ours differs from it by specification; the decoder skips a block early and six more places MLX-DLSS's graph computed something else — a raw value into four GEMMs, block 30's pool, the wide blocks' and the ViT's publishes, the ViT's own attention — found step by step and fixed; our head against its now RGB corr 0.98-0.997, 0.5-1.9 levels of 255, and what is left is arithmetic; and the padded field — every field with both sides a multiple of 256 draws a 25-30 % weaker pass, 1280x720 ran on one, and the vendor's rule steps around it |
 | `reviewing.md` | how to run `/ultrareview` on this repo without wasting a run |
 | `reproduce.md` | how to run the resident path from a clean checkout |
 

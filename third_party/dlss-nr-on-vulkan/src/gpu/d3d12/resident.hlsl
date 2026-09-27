@@ -126,8 +126,9 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
     if (kind == UPSAMPLE_MERGE) {
         /* Block 70's input in one pass (resident.comp's UPSAMPLE_MERGE): the level above,
          * upsampled 2x (nearest), times the per-channel sin, plus the full-resolution skip
-         * times the per-channel cos; float32 to c, the same value as half to the second
-         * output (the fifth operand, push offset 96). The steps are the UPSAMPLE2,
+         * times the per-channel cos; float32 to c, the same value published to E4M3 as
+         * half to the second output (the fifth operand, push offset 96) — the float32 is
+         * the feed-forward's residual, the publication its GEMM's input. The steps are the UPSAMPLE2,
          * SCALE_CHANNEL, RESIDUAL and TO_HALF passes', in their shapes: the scale rounded
          * on its own (`precise`), then `scaled + skip * cos` exactly as RESIDUAL writes
          * `a + b * d` here, so the driver treats the two alike.
@@ -139,7 +140,7 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                              * load_d(c);
         float merged = scaled + load_b(flags, index) * load_d(channels + c);
         st_f32(bufC, pc.oc.x, index, merged);
-        st_f16(bufE, pc.oe.x, index, merged);
+        st_f16(bufE, pc.oe.x, index, e4m3(merged));
         return;
     }
     if (kind == POOL2_SKIP) {
@@ -170,13 +171,17 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
          * sine, then the publish — upsample2, scale_channel and add, with their roundings:
          * the product rounded on its own, as scale_channel stored it, then added, neither
          * contracted (`precise`). n=channels, sa=target width, sb=source width, d=sine,
-         * b=the skip. */
+         * b=the skip. With a second output (bit 0x40000000, which libd3dmx sets when the
+         * fifth operand is bound: HLSL has no null address to test) the merge goes there
+         * published as well — the 32-channel block's, whose feed-forward reads it published
+         * and its residual raw (notes/opendlss-reference.md). */
         uint channels = pc.n, target = pc.sa, source = pc.sb;
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         precise float scaled = load_b(flags, index) * load_d(c);
         precise float merged = load_a(flags, ((y / 2u) * source + (x / 2u)) * channels + c) + scaled;
         store(flags, index, merged);
+        if ((flags & 0x40000000u) != 0u) st_f16(bufE, pc.oe.x, index, e4m3(merged));
         return;
     }
     if (kind == PAD_END) {
@@ -206,7 +211,16 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
         uint channels = pc.n, heads = pc.batch, tokens = pc.sa;
         uint c = index % channels, rest = index / channels;
         uint token = rest % tokens, window = rest / tokens;
-        store(flags, index, load_a(flags, ((window * heads + c / 32u) * tokens + token) * 32u + c % 32u));
+        uint at = (window * heads + c / 32u) * tokens + token;
+        float value = load_a(flags, at * 32u + c % 32u);
+        /* Flag 0x20000: the ViT's value sum, rounded to half, times its row's reciprocal
+         * from `d` — the softmax's normalisation, which the ViT applies here rather than
+         * to the weights (attention.hlsl, vit_softmax). */
+        if ((flags & 0x20000u) != 0u) {
+            precise float scaled = half_round(value) * load_d(at);
+            value = half_round(scaled);
+        }
+        store(flags, index, value);
         return;
     }
     if (kind == ADD_BIAS) {

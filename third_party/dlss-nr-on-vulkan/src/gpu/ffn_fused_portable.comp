@@ -157,13 +157,15 @@ void main() {
         for (uint j = 0; j < 2u; j++)
             result[i][j] = vec4(0.0);
 
-    /* an input made here: this lane's rows of A, rounded to half, two to a word */
+    /* an input made here: this lane's rows of A, published to E4M3 as every feed-forward
+     * GEMM reads its input (the residual takes it raw, made again), two to a word */
     bool made = merging() || stemming();
     uint held[2][16];
     if (made && live_rows) {
         for (uint i = 0; i < 2u; i++)
             for (uint c = 0; c < 32u; c += 4u) {
                 vec4 v = made4(row + r + i * TM, c);
+                for (uint e = 0u; e < 4u; e++) v[e] = e4m3(v[e]);
                 held[i][c / 2u] = packHalf2x16(v.xy);
                 held[i][c / 2u + 1u] = packHalf2x16(v.zw);
             }

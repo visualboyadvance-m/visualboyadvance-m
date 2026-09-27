@@ -169,15 +169,15 @@ void main() {
          * it is deliberately *not* `precise`: SPIRV-Cross spells a precise multiply as
          * fma(l, r, 0.0), which turns a -0 product into +0 and so disagrees with
          * scale_channel's -0 wherever sin or the source is a signed zero.
-         * The float32 result is the feed-forward's residual; the half copy is its GEMM's
-         * input. n=channels, sa=target width, sb=source width; d holds sin then cos. */
+         * The float32 result is the feed-forward's residual; the copy, published to E4M3,
+         * is its GEMM's input. n=channels, sa=target width, sb=source width; d holds sin then cos. */
         uint channels = pc.n, target = pc.sa, source = pc.sb;
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         float scaled = load_a(((y / 2u) * source + (x / 2u)) * channels + c) * pc.d.v[c];
         float merged = fma(load_b(index), pc.d.v[channels + c], scaled);
         pc.c.v[index] = merged;
-        HalfBuf(pc.second).v[index] = float16_t(merged);
+        HalfBuf(pc.second).v[index] = float16_t(e4m3(merged));
         return;
     }
     if (kind == POOL2_SKIP) {
@@ -210,13 +210,15 @@ void main() {
          * the next to read back. Their roundings are kept: the product is rounded on its
          * own, as scale_channel stored it, and then added, so neither may become a fused
          * multiply-add (`precise`). n=channels, sa=target width, sb=source width, d=sine,
-         * b=the skip. */
+         * b=the skip. With a second output the merge goes there published as well: the
+         * 32-channel block's, whose feed-forward reads it published and its residual raw. */
         uint channels = pc.n, target = pc.sa, source = pc.sb;
         uint c = index % channels, rest = index / channels;
         uint x = rest % target, y = rest / target;
         precise float scaled = load_b(index) * pc.d.v[c];
         precise float merged = load_a(((y / 2u) * source + (x / 2u)) * channels + c) + scaled;
         store(index, merged);
+        if (pc.second != 0ul) HalfBuf(pc.second).v[index] = float16_t(e4m3(merged));
         return;
     }
     if (kind == PAD_END) {
@@ -246,7 +248,16 @@ void main() {
         uint channels = pc.n, heads = pc.batch, tokens = pc.sa;
         uint c = index % channels, rest = index / channels;
         uint token = rest % tokens, window = rest / tokens;
-        store(index, load_a(((window * heads + c / 32u) * tokens + token) * 32u + c % 32u));
+        uint at = (window * heads + c / 32u) * tokens + token;
+        float value = load_a(at * 32u + c % 32u);
+        /* Flag 0x20000: the ViT's value sum, rounded to half, times its row's reciprocal
+         * from `d` — the softmax's normalisation, which the ViT applies here rather than
+         * to the weights (attention.comp, vit_softmax). */
+        if ((operation_flags() & 0x20000u) != 0u) {
+            precise float scaled = half_round(value) * pc.d.v[at];
+            value = half_round(scaled);
+        }
+        store(index, value);
         return;
     }
     if (kind == ADD_BIAS) {

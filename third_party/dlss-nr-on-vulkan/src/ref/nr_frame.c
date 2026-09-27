@@ -87,13 +87,13 @@ struct xmx {
     int (*rec_gemm_residual)(int, int, int, int, int, unsigned, unsigned, unsigned, unsigned);
     int (*rec_gemm_window_residual)(int, int, int, int, int, unsigned, unsigned, unsigned, unsigned,
                                     unsigned, unsigned, unsigned, unsigned);
-    int (*rec_gemm_qkv)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned);
+    int (*rec_gemm_qkv)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned, unsigned);
     int (*rec_gemm_qkv_window)(int, int, int, int, int, int, unsigned, unsigned, unsigned, unsigned,
                                unsigned, unsigned, unsigned, unsigned, unsigned);
     int (*rec_gemm_dual)(int, int, int, int, unsigned, unsigned, unsigned);
     int (*rec_unary2)(unsigned, int, int, int, int, int, unsigned, unsigned, float, unsigned, unsigned,
                       unsigned, unsigned, unsigned);
-    int (*rec_qkv)(int, int, int, int, int, unsigned, unsigned, unsigned);
+    int (*rec_qkv)(int, int, int, int, int, unsigned, unsigned, unsigned, unsigned);
     int (*window_init)(const char *, unsigned);
     int (*rec_window_attention)(int, int, int, int, int, unsigned, unsigned, unsigned);
     int (*ffn_init)(const char *);
@@ -110,7 +110,7 @@ struct xmx {
     int (*rec_window_block)(int, int, int, int, int, int, int, int, unsigned, unsigned, unsigned,
                             unsigned, unsigned, unsigned);
     int (*global_attention_init)(const char *);
-    int (*rec_global_attention)(int, int, int, int, unsigned, unsigned, unsigned, float);
+    int (*rec_global_attention)(int, int, int, int, unsigned, unsigned, unsigned);
     unsigned long long (*buf_total_bytes)(void);   /* optional: for the memory figure */
     int (*graph_capture)(void);
     int (*graph_run)(int);
@@ -709,7 +709,6 @@ struct block_w {
     int index, heads, channels, groups, hidden_width;
     int branched;
     int oy, ox;
-    float logit_cap;
     /* device buffers; -1 where the family has none */
     int qkv, out, bias, scale, attn_cos, ffn_cos;
     int expand, branch, ffn_out;          /* window: feed-forward */
@@ -848,15 +847,11 @@ static int load_global_block(struct block_w *b, const struct weights *w, int ind
     if ((b->ffn_proj = buffer_f16(ffn_proj->data, ffn_proj->count)) < 0) return -1;
     if ((b->ffn_cos = buffer_f32(fcos->data, fcos->count)) < 0) return -1;
     if ((b->qkv = buffer_f16(qkv->data, qkv->count)) < 0) return -1;
-    /* the global kernels fold sqrt(head_dim) into the per-head scale, in float32 */
-    float folded[64];
-    float root = (float)sqrt((double)(b->channels / b->heads));
-    if (scale->count > 64) FAILF("block%d: too many heads", index);
-    for (size_t i = 0; i < scale->count; i++) folded[i] = scale->data[i] * root;
-    if ((b->scale = buffer_f32(folded, scale->count)) < 0) return -1;
+    /* the learned scale alone: the ViT's query takes half(sqrt(32)) as a multiply of its
+     * own before it (VIT_ROOT in cosine_tree.glsl) */
+    if ((b->scale = buffer_f32(scale->data, scale->count)) < 0) return -1;
     if ((b->out = buffer_f16(proj->data, proj->count)) < 0) return -1;
     if ((b->attn_cos = buffer_f32(acos->data, acos->count)) < 0) return -1;
-    b->logit_cap = 3.0f;                  /* nr_model.GLOBAL_ATTENTION_LOGIT_CAP */
     b->bias = b->branch = b->ffn_out = b->first = b->project = b->weight3 = -1;
     b->groups = 0; b->branched = 0;
     b->loaded = 1;
@@ -895,6 +890,7 @@ enum role {
     R_GLOBAL_IO16,     /* the bottleneck chain's value as half, zero in its padding rows */
     R_GLOBAL_OUT,
     R_OUT,
+    R_RECIPROCAL,      /* the ViT softmax's reciprocals, a row each (unfused bottleneck only) */
     R_COUNT
 };
 
@@ -1030,11 +1026,11 @@ static int sh_gemm_window_residual(int a, int b, int c, int skip, int cosine, un
                                    unsigned pad)
 { mark4(a, b, c, skip); mark(cosine); return 0; }
 static int sh_gemm_qkv(int a, int weight, int q, int k, int v, int scale, unsigned m, unsigned ch,
-                       unsigned heads, unsigned tokens)
+                       unsigned heads, unsigned tokens, unsigned vit)
 { mark4(a, weight, q, k); mark(v); mark(scale); return 0; }
 static int sh_gemm_qkv_window(int a, int weight, int q, int k, int v, int scale, unsigned m, unsigned ch,
                               unsigned heads, unsigned tokens, unsigned w, unsigned h, unsigned across,
-                              unsigned pad, unsigned image_half)
+                              unsigned pad, unsigned image_mode)
 { mark4(a, weight, q, k); mark(v); mark(scale); return 0; }
 static int sh_gemm_dual(int a, int b, int c, int half_copy, unsigned m, unsigned n, unsigned k)
 { mark4(a, b, c, half_copy); return 0; }
@@ -1042,7 +1038,7 @@ static int sh_unary2(unsigned kind, int a, int b, int c, int d, int second, unsi
                      float p0, unsigned batch, unsigned sa, unsigned sb, unsigned sc, unsigned k)
 { mark4(a, b, c, d); mark(second); return 0; }
 static int sh_qkv(int source, int q, int k, int v, int scale, unsigned rows, unsigned tokens,
-                  unsigned heads)
+                  unsigned heads, unsigned vit)
 { mark4(source, q, k, v); mark(scale); return 0; }
 static int sh_window_attention(int q, int k, int v, int bias, int out, unsigned batches, unsigned heads,
                                unsigned merged)
@@ -1065,7 +1061,7 @@ static int sh_window_block(int image, int qkv, int projection, int target, int b
                            unsigned pad, unsigned flags)
 { mark4(image, qkv, projection, target); mark4(bias, cosine, scale, pooled); return 0; }
 static int sh_global_attention(int q, int k, int v, int merged, unsigned rows, unsigned tokens,
-                               unsigned heads, float cap)
+                               unsigned heads)
 { mark4(q, k, v, merged); return 0; }
 static int sh_sync(int on) { return 0; }
 
@@ -1164,7 +1160,7 @@ static int named_bufferf(struct nr_frame *f, const char *fmt, int i, size_t byte
 enum { E4M3 = 0, GATE, HALF, TO_HALF, SCALE, RESIDUAL, FROM_HALF, PARTITION, REVERSE, ADD_BIAS,
        SPLIT_HEADS, MERGE_HEADS, POOL2, UPSAMPLE2, SCALE_CHANNEL, ADD, PAD_END,
        GATE_E4M3_HALF, E4M3_HALF, GATE_HALF, UPSAMPLE_MERGE, UPSAMPLE_ADD, POOL2_SKIP };
-enum { COSINE_PUBLISH = 0, SOFTMAX = 1 };
+enum { COSINE_PUBLISH = 0, SOFTMAX = 1, VIT_SOFTMAX = 3 };
 enum { EPI_NONE = 0, EPI_E4M3 = 1, EPI_GATE = 2, EPI_GATE_E4M3 = 3, EPI_HALF = 4 };
 
 static unsigned publish(int epilogue, int narrow) { return ((unsigned)epilogue << 8) | (narrow ? 0x1000u : 0u); }
@@ -1220,13 +1216,13 @@ static int residual(struct nr_frame *f, int branch, int skip, int cosine, int ta
 }
 
 static int partition(struct nr_frame *f, int source, int target, int height, int width, unsigned channels,
-                     int oy, int ox, int narrow, int a_half)
+                     int oy, int ox, int narrow, int a_half, int epilogue)
 {
     int ph, pw, top, left;
     window_extent(height, width, oy, ox, 8, &ph, &pw, &top, &left);
     struct dims d = { 8, (unsigned)height, (unsigned)width, (unsigned)(pw / 8) };
     return unary(f, PARTITION, source, -1, target, -1, (size_t)ph * pw * channels, channels, 1.0f,
-                 0, narrow, a_half, 0, d, ((unsigned)top << 16) | (unsigned)left);
+                 epilogue, narrow, a_half, 0, d, ((unsigned)top << 16) | (unsigned)left);
 }
 
 static int split_heads(struct nr_frame *f, int source, int target, unsigned windows, unsigned tokens,
@@ -1237,12 +1233,15 @@ static int split_heads(struct nr_frame *f, int source, int target, unsigned wind
                  1.0f, epilogue, narrow, 0, 0, d, 0);
 }
 
+/* With `scale` (>= 0) — a reciprocal a (window, head, token) row, as `vit_softmax` writes
+ * them — each value is rounded to half and multiplied by its row's: the ViT's normalisation
+ * (`Runtime.merge_heads(scale=...)`, flag 0x20000). */
 static int merge_heads(struct nr_frame *f, int source, int target, unsigned windows, unsigned tokens,
-                       unsigned channels, unsigned heads, int epilogue, int narrow)
+                       unsigned channels, unsigned heads, int epilogue, int narrow, int scale)
 {
     struct dims d = { heads, tokens, 0, 0 };
-    return unary(f, MERGE_HEADS, source, -1, target, -1, (size_t)windows * tokens * channels, channels,
-                 1.0f, epilogue, narrow, 0, 0, d, 0);
+    return unary(f, MERGE_HEADS | (scale >= 0 ? 0x20000u : 0u), source, -1, target, scale,
+                 (size_t)windows * tokens * channels, channels, 1.0f, epilogue, narrow, 0, 0, d, 0);
 }
 
 static int pool2(struct nr_frame *f, int source, int target, int height, int width, unsigned channels,
@@ -1281,9 +1280,10 @@ static int add(struct nr_frame *f, int left, int right, int target, size_t count
 }
 
 static int cosine_publish(struct nr_frame *f, int source, int target, size_t rows, unsigned tokens,
-                          unsigned heads, int scale, int narrow, int from_half_in, int qkv_part)
+                          unsigned heads, int scale, int narrow, int from_half_in, int qkv_part, int vit)
 {
-    unsigned flags = COSINE_PUBLISH | publish(0, narrow) | (from_half_in ? 0x8000u : 0u);
+    unsigned flags = COSINE_PUBLISH | publish(0, narrow) | (from_half_in ? 0x8000u : 0u)
+                   | (vit ? 0x80000u : 0u);
     if (qkv_part >= 0) flags |= 0x20000u | ((unsigned)qkv_part << 18);
     REC(f, X.rec_row(flags, source, source, target, scale >= 0 ? scale : source, (unsigned)rows, tokens,
                      heads, scale >= 0 ? 1u : 0u, 0, 0.0f));
@@ -1296,6 +1296,17 @@ static int softmax(struct nr_frame *f, int source, int target, size_t rows, unsi
     unsigned flags = SOFTMAX | publish(0, narrow) | (bias >= 0 ? 0x2000u : 0u);
     REC(f, X.rec_row(flags, source, bias >= 0 ? bias : source, target, source, (unsigned)rows, width, heads,
                      0, stride, cap));
+    return 0;
+}
+
+/* `Runtime.vit_softmax`: the ViT's softmax (attention.comp, `vit_softmax`) — each row's
+ * weights published unnormalised into `target`, its reciprocal into `reciprocal` for
+ * `merge_heads` to apply. */
+static int vit_softmax(struct nr_frame *f, int source, int target, int reciprocal, size_t rows,
+                       unsigned tokens, unsigned stride)
+{
+    REC(f, X.rec_row(VIT_SOFTMAX | publish(0, 1), source, source, target, reciprocal, (unsigned)rows,
+                     tokens, 0, 0, stride, 0.0f));
     return 0;
 }
 
@@ -1360,23 +1371,30 @@ static int gemm_residual(struct nr_frame *f, int a, int b, int skip, int cosine,
 /* `Runtime.gemm_qkv`: the QKV projection finished in its own epilogue — Q and K
  * normalised, V published, (window, head, token, 32) halves out. With `window` the
  * operand is the image itself and the partition happens in the projection's loads. */
+/* `publish_image` rounds the gathered image to E4M3 on the way in (a 32-channel block's
+ * raw feed-forward output); `vit` normalises as the ViT does. */
 static int gemm_qkv(struct nr_frame *f, int a, int weight, int q, int k, int v, int scale,
                     unsigned rows, unsigned channels, unsigned heads, unsigned tokens,
-                    int window, int height, int width, int oy, int ox, int image_half)
+                    int window, int height, int width, int oy, int ox, int image_half,
+                    int publish_image, int vit)
 {
     if (window) {
+        if (vit) FAILF("the ViT's projection has no windows");
         int ph, pw, top, left;
         window_extent(height, width, oy, ox, 8, &ph, &pw, &top, &left);
         REC(f, X.rec_gemm_qkv_window(a, weight, q, k, v, scale, rows, channels, heads, tokens,
                                      (unsigned)width, (unsigned)height, (unsigned)(pw / 8),
-                                     ((unsigned)top << 16) | (unsigned)left, image_half ? 1u : 0u));
+                                     ((unsigned)top << 16) | (unsigned)left,
+                                     (image_half ? 1u : 0u) | (publish_image ? 2u : 0u)));
         return 0;
     }
-    REC(f, X.rec_gemm_qkv(a, weight, q, k, v, scale, rows, channels, heads, tokens));
+    if (publish_image) FAILF("only a window-gathered projection publishes its image");
+    REC(f, X.rec_gemm_qkv(a, weight, q, k, v, scale, rows, channels, heads, tokens, vit ? 1u : 0u));
     return 0;
 }
 
-/* `Runtime.gemm_dual`: c = a @ b in float32, and the same values as half into `half_copy`. */
+/* `Runtime.gemm_dual`: c = a @ b in float32, and the same values published into `half_copy`
+ * — block 0's stem, raw for its feed-forward's residual and published for its GEMM. */
 static int gemm_dual(struct nr_frame *f, int a, int b, int c, int half_copy, unsigned rows,
                      unsigned cols, unsigned inner)
 {
@@ -1397,7 +1415,7 @@ static int ffn_fused(struct nr_frame *f, int a, int expand, int projection, int 
 }
 
 /* `Runtime.upsample_merge`: merged = upsample2(source) * sin + skip * cos, stored float32
- * and as half; `sincos` is the per-channel sin then cos. */
+ * and published; `sincos` is the per-channel sin then cos. */
 static int upsample_merge(struct nr_frame *f, int source, int skip, int sincos, int merged, int merged16,
                           int height, int width, int source_width, unsigned channels)
 {
@@ -1417,14 +1435,21 @@ static int window_attention(struct nr_frame *f, int q, int k, int v, int target,
 }
 
 /* `Runtime.upsample_add`: target = upsample2(source) + skip * factors, published, in one
- * pass; `source` is float32. */
+ * pass; `source` is float32. `published` (>= 0) takes the same values published to E4M3 as
+ * halves, besides `target`. */
 static int upsample_add(struct nr_frame *f, int source, int skip, int factors, int target, int height,
                         int width, int source_width, unsigned channels, int skip_half, int epilogue,
-                        int narrow)
+                        int narrow, int published)
 {
     struct dims d = { 0, (unsigned)width, (unsigned)source_width, 0 };
-    return unary(f, UPSAMPLE_ADD, source, skip, target, factors, (size_t)height * width * channels,
-                 channels, 1.0f, epilogue, narrow, 0, skip_half, d, 0);
+    size_t count = (size_t)height * width * channels;
+    if (published < 0)
+        return unary(f, UPSAMPLE_ADD, source, skip, target, factors, count, channels, 1.0f, epilogue,
+                     narrow, 0, skip_half, d, 0);
+    REC(f, X.rec_unary2(UPSAMPLE_ADD | publish(epilogue, narrow) | reads(0, skip_half), source, skip,
+                        target, factors, published, (unsigned)count, channels, 1.0f, 0, (unsigned)width,
+                        (unsigned)source_width, 0, 0));
+    return 0;
 }
 
 /* `Runtime.pool2_skip`: the published pool into `pooled` and the published source into
@@ -1492,12 +1517,13 @@ static int window_block(struct nr_frame *f, int image, int qkv, int projection, 
     return 0;
 }
 
-/* `Runtime.global_attention`: QK^T, the softmax, PV and the head merge in one pass. */
+/* `Runtime.global_attention`: QK^T, the ViT's softmax, PV and the scaled head merge in one
+ * pass. */
 static int global_attention(struct nr_frame *f, int q, int k, int v, int merged, unsigned rows,
-                            unsigned tokens, unsigned heads, float cap)
+                            unsigned tokens, unsigned heads)
 {
     TRY(global_attention_ready());
-    REC(f, X.rec_global_attention(q, k, v, merged, rows, tokens, heads, cap));
+    REC(f, X.rec_global_attention(q, k, v, merged, rows, tokens, heads));
     return 0;
 }
 
@@ -1520,9 +1546,9 @@ static int ffn_fused_stem(struct nr_frame *f, int features, int adapter, int exp
 
 /* `Runtime.prepare_qkv`: Q, K and V from the float32 projection in one row dispatch. */
 static int prepare_qkv(struct nr_frame *f, int source, int q, int k, int v, int scale,
-                       unsigned windows, unsigned tokens, unsigned heads)
+                       unsigned windows, unsigned tokens, unsigned heads, int vit)
 {
-    REC(f, X.rec_qkv(source, q, k, v, scale, windows * tokens * heads, tokens, heads));
+    REC(f, X.rec_qkv(source, q, k, v, scale, windows * tokens * heads, tokens, heads, vit ? 1u : 0u));
     return 0;
 }
 
@@ -1587,7 +1613,7 @@ struct gscratch {
     int tokens, padded;
     int io16, context16;
     int value, value16, hidden16, branch, ffn, ffn16, proj, q16, k16, v16, key16, scores, probs16,
-        context, merged16, attention, out;
+        context, reciprocal, merged16, attention, out;
 };
 
 #define GROLE(field, role, bytes) do { s->field = arena(f, role, bytes); if (s->field == -2) return -1; } while (0)
@@ -1623,6 +1649,7 @@ static int global_scratch(struct nr_frame *f, const struct block_w *w, int token
     GROLE(scores, R_SCORES_CONTEXT, heads * P * P * 4);
     GROLE(probs16, R_QUERY_PROB, heads * P * P * 2);
     GROLE(context, R_SCORES_CONTEXT, heads * P * 32 * 4);
+    GROLE(reciprocal, R_RECIPROCAL, heads * P * 4);      /* the ViT softmax's, a row each */
     GROLE(merged16, R_QUERY_PROB, P * C * 2);
     /* the fused attention's output: merged16 shares q16's role, which it still reads */
     GROLE(context16, R_SCORES_CONTEXT, P * C * 2);
@@ -1651,16 +1678,16 @@ static int transition_scratch(struct nr_frame *f, size_t elements, struct tscrat
 
 /* `record_qkv`: split V; normalise Q and K straight out of the projection buffer. */
 static int record_qkv(struct nr_frame *f, const struct block_w *w, int proj, int q16, int k16, int v16,
-                      unsigned windows, unsigned tokens)
+                      unsigned windows, unsigned tokens, int vit)
 {
     unsigned C = (unsigned)w->channels, heads = (unsigned)w->heads;
     size_t rows = (size_t)windows * heads * tokens;
     if (f->opt.fuse_qk && f->opt.joint_qkv)
-        return prepare_qkv(f, proj, q16, k16, v16, w->scale, windows, tokens, heads);
+        return prepare_qkv(f, proj, q16, k16, v16, w->scale, windows, tokens, heads, vit);
     if (f->opt.fuse_qk) {
         TRY(independent(f, 1));
-        TRY(cosine_publish(f, proj, q16, rows, tokens, heads, w->scale, 1, 0, 0));
-        TRY(cosine_publish(f, proj, k16, rows, tokens, heads, -1, 1, 0, 1));
+        TRY(cosine_publish(f, proj, q16, rows, tokens, heads, w->scale, 1, 0, 0, vit));
+        TRY(cosine_publish(f, proj, k16, rows, tokens, heads, -1, 1, 0, 1, vit));
         TRY(split_heads(f, proj, v16, windows, tokens, C, heads, 2, EPI_E4M3, 1));
         TRY(independent(f, 0));
         return 0;
@@ -1671,8 +1698,8 @@ static int record_qkv(struct nr_frame *f, const struct block_w *w, int proj, int
     TRY(split_heads(f, proj, v16, windows, tokens, C, heads, 2, EPI_E4M3, 1));
     TRY(independent(f, 0));
     TRY(independent(f, 1));
-    TRY(cosine_publish(f, q16, q16, rows, tokens, heads, w->scale, 1, 1, -1));
-    TRY(cosine_publish(f, k16, k16, rows, tokens, heads, -1, 1, 1, -1));
+    TRY(cosine_publish(f, q16, q16, rows, tokens, heads, w->scale, 1, 1, -1, vit));
+    TRY(cosine_publish(f, k16, k16, rows, tokens, heads, -1, 1, 1, -1, vit));
     TRY(independent(f, 0));
     return 0;
 }
@@ -1685,27 +1712,31 @@ static int record_qkv(struct nr_frame *f, const struct block_w *w, int proj, int
 static int record_qkv_projection(struct nr_frame *f, const struct block_w *w, int a,
                                  int proj, int q16, int k16, int v16, int key16, int win16,
                                  unsigned windows, unsigned tokens, int window, int height, int width,
-                                 int image_half, int *key)
+                                 int image_half, int publish_image, int vit, int *key)
 {
     unsigned C = (unsigned)w->channels, heads = (unsigned)w->heads;
     unsigned rows = windows * tokens;
     if (window) {
         if (f->opt.qkv_epilogue && rows % 64 == 0) {
             TRY(gemm_qkv(f, a, w->qkv, q16, key16, v16, w->scale, rows, C, heads, tokens,
-                         1, height, width, w->oy, w->ox, image_half));
+                         1, height, width, w->oy, w->ox, image_half, publish_image, 0));
             *key = key16;
             return 0;
         }
-        TRY(partition(f, a, win16, height, width, C, w->oy, w->ox, 1, image_half));
+        TRY(partition(f, a, win16, height, width, C, w->oy, w->ox, 1, image_half,
+                      publish_image ? EPI_E4M3 : 0));
         a = win16;
+    } else if (publish_image) {
+        FAILF("only a window-gathered projection publishes its image");
     }
     if (f->opt.qkv_epilogue && rows % 16 == 0) {
-        TRY(gemm_qkv(f, a, w->qkv, q16, key16, v16, w->scale, rows, C, heads, tokens, 0, 0, 0, 0, 0, 0));
+        TRY(gemm_qkv(f, a, w->qkv, q16, key16, v16, w->scale, rows, C, heads, tokens, 0, 0, 0, 0, 0, 0,
+                     0, vit));
         *key = key16;
         return 0;
     }
     TRY(gemm(f, a, w->qkv, proj, rows, 3 * C, C, NULL));
-    TRY(record_qkv(f, w, proj, q16, k16, v16, windows, tokens));
+    TRY(record_qkv(f, w, proj, q16, k16, v16, windows, tokens, vit));
     *key = k16;
     return 0;
 }
@@ -1802,8 +1833,10 @@ static int record_feed_forward(struct nr_frame *f, const struct block_w *w, cons
         return ffn_fused_stem(f, stem->features, stem->adapter, w->expand, w->branch, s->ffn, w->ffn_cos,
                               pixels);
     }
+    /* a float32 input is raw — block 0's stem, the merges into blocks 66 and 70 — and the
+     * GEMM reads it published while the residual takes it as it came */
     int value16 = source_half ? source : (source16 >= 0 ? source16 : s->value16);
-    if (!source_half && source16 < 0) TRY(to_half(f, source, s->value16, s->pixels * C));
+    if (!source_half && source16 < 0) TRY(e4m3_half(f, source, s->value16, s->pixels * C));
     *ffn_half = 0;
     if (w->branched) {
         if (f->opt.fuse_branched_ffn && pixels % 16 == 0 && C % 16 == 0 && C == groups * 32) {
@@ -1834,22 +1867,25 @@ static int record_feed_forward(struct nr_frame *f, const struct block_w *w, cons
                                    pixels, C, hidden, 0, source_half, 0);
 }
 
-/* `record_split_feed_forward`: e4m3(x @ first), then a per-64-group 64 -> 256 -> 64 MLP. */
+/* `record_split_feed_forward`: e4m3(x @ first), then a per-64-group 64 -> 256 -> 64 MLP,
+ * its output published into `s->ffn` as half. */
 static int record_split_feed_forward(struct nr_frame *f, const struct block_w *w, const struct scratch *s,
                                      int source, int source_half)
 {
     unsigned pixels = (unsigned)s->pixels, C = (unsigned)w->channels, groups = (unsigned)w->groups;
     unsigned wide = groups * 256;
     int value16 = source_half ? source : s->value16;
-    if (!source_half) TRY(to_half(f, source, s->value16, s->pixels * C));
+    if (!source_half) TRY(e4m3_half(f, source, s->value16, s->pixels * C));
     struct gemm_opt first = { .epilogue = EPI_E4M3, .narrow = 1 };
     TRY(gemm(f, value16, w->first, s->heads16, pixels, C, C, &first));
     TRY(ffn_groups(f, s->heads16, w->expand, s->hidden16, pixels, 256, 64, groups,
                    C, 0, wide, 64, 64 * 256, 256, EPI_GATE));
     TRY(ffn_groups(f, s->hidden16, w->project, s->core16, pixels, 64, 256, groups,
                    wide, 0, C, 256, 256 * 64, 64, EPI_E4M3));
+    /* published too, as the 64-256 channel blocks' is, and stored as half: the QKV
+     * projection and the attention's residual both read the publication */
     return record_project_residual(f, s->core16, w->weight3, s->branch, source, w->ffn_cos, s->ffn,
-                                   pixels, C, C, 0, source_half, 0);
+                                   pixels, C, C, EPI_E4M3, source_half, 1);
 }
 
 /* `record_window_attention`: over `source`, in window order. With `to_target` the
@@ -1879,14 +1915,19 @@ static int record_window_attention(struct nr_frame *f, const struct block_w *w, 
     unsigned windows = (unsigned)((ph / 8) * (pw / 8));
     unsigned batch = windows * heads;
     int key;
+    /* A raw source is a 32-channel block's feed-forward output, which the residual reads as
+     * it is and the projection published; the wider blocks' is published already. */
+    int publish_image = !source_half;
     if (f->opt.fuse_partition) {
         /* the projection gathers its window rows from the image itself */
         TRY(record_qkv_projection(f, w, source, s->proj, s->q16, s->k16, s->v16, s->key16, s->win16,
-                                  windows, tokens, 1, s->height, s->width, source_half, &key));
+                                  windows, tokens, 1, s->height, s->width, source_half, publish_image, 0,
+                                  &key));
     } else {
-        TRY(partition(f, source, s->win16, s->height, s->width, C, w->oy, w->ox, 1, source_half));
+        TRY(partition(f, source, s->win16, s->height, s->width, C, w->oy, w->ox, 1, source_half,
+                      publish_image ? EPI_E4M3 : 0));
         TRY(record_qkv_projection(f, w, s->win16, s->proj, s->q16, s->k16, s->v16, s->key16, s->win16,
-                                  windows, tokens, 0, 0, 0, 0, &key));
+                                  windows, tokens, 0, 0, 0, 0, 0, 0, &key));
     }
     int fused = f->opt.fuse_window_attention && tokens == 64;
     int merged = fused && f->opt.fuse_attention_merge;
@@ -1902,7 +1943,7 @@ static int record_window_attention(struct nr_frame *f, const struct block_w *w, 
         struct gemm_opt pv = { .batch = batch, .sa = tokens * tokens, .sb = tokens * 32, .sc = tokens * 32 };
         TRY(gemm(f, s->probs16, s->v16, s->context, tokens, 32, tokens, &pv));
     }
-    if (!merged) TRY(merge_heads(f, s->context, s->merged16, windows, tokens, C, heads, EPI_E4M3, 1));
+    if (!merged) TRY(merge_heads(f, s->context, s->merged16, windows, tokens, C, heads, EPI_E4M3, 1, -1));
     if (pool)
         /* block 0: the output only ever read pooled or published, both made here */
         return gemm_residual_pool(f, attended, w->out, source, w->attn_cos, pool[1], pool[0],
@@ -1928,6 +1969,7 @@ static int record_block_made(struct nr_frame *f, const struct block_w *w, int he
     if (w->family == SPLIT) {
         if (source16 >= 0) FAILF("the split feed-forward takes no prepared half copy");
         TRY(record_split_feed_forward(f, w, s, source, source_half));
+        ffn_half = 1;
     } else {
         TRY(record_feed_forward(f, w, s, source, source_half, source16, &ffn_half, merge, stem));
     }
@@ -1954,7 +1996,11 @@ static int record_block(struct nr_frame *f, const struct block_w *w, int height,
 /* `record_global_block`: the wide feed-forward, then attention over every token. With
  * `chain` the block reads and writes `s->io16`, the value as half: published E4M3 between
  * the blocks, so exact, and the feed-forward reads it, its residual widens it and the
- * output projection publishes into it over the real rows only — the pad rows stay zero. */
+ * output projection publishes into it over the real rows only — the pad rows stay zero.
+ * The block is the vendor's (notes/opendlss-reference.md): the feed-forward's output
+ * published, as the QKV projection's input and the attention's skip, and the ViT's own
+ * attention — its normalisation, its exponential, the weights unnormalised and the
+ * reciprocal on the value sum. */
 static int record_global_block(struct nr_frame *f, const struct block_w *w, const struct gscratch *s,
                                int chain)
 {
@@ -1965,34 +2011,34 @@ static int record_global_block(struct nr_frame *f, const struct block_w *w, cons
     if (!chain) TRY(to_half(f, s->value, s->value16, PC));
     struct gemm_opt gate = { .epilogue = EPI_GATE_E4M3, .narrow = 1 };
     TRY(gemm(f, value16, w->expand, s->hidden16, P, hidden, C, &gate));
+    /* published, as half, in `ffn` — the residual role, live until the attention's residual
+     * has read it: `ffn16`'s role is K's too, which the projection's passes write */
     TRY(record_project_residual(f, s->hidden16, w->ffn_proj, s->branch, source, w->ffn_cos, s->ffn,
-                                P, C, hidden, 0, chain, 0));
-    TRY(to_half(f, s->ffn, s->ffn16, PC));
+                                P, C, hidden, EPI_E4M3, chain, 1));
     int key;
-    TRY(record_qkv_projection(f, w, s->ffn16, s->proj, s->q16, s->k16, s->v16, s->key16, -1, 1, P,
-                              0, 0, 0, 0, &key));
+    TRY(record_qkv_projection(f, w, s->ffn, s->proj, s->q16, s->k16, s->v16, s->key16, -1, 1, P,
+                              0, 0, 0, 0, 0, 1, &key));
     int merged;
     if (f->opt.fuse_global_attention) {
         /* QK^T, the softmax, PV and the head merge in one pass, and no score stored */
         merged = s->context16;
-        TRY(global_attention(f, s->q16, key, s->v16, merged, P, (unsigned)s->tokens, heads, w->logit_cap));
+        TRY(global_attention(f, s->q16, key, s->v16, merged, P, (unsigned)s->tokens, heads));
     } else {
         merged = s->merged16;
         struct gemm_opt qk = { .batch = heads, .sa = (unsigned long long)P * 32, .sb = (unsigned long long)P * 32,
                                .sc = (unsigned long long)P * P, .transpose_b = 1 };
         TRY(gemm(f, s->q16, key, s->scores, P, P, 32, &qk));
-        /* no attention bias here, and the logits are clamped symmetrically */
-        TRY(softmax(f, s->scores, s->probs16, (size_t)heads * P, (unsigned)s->tokens, P, w->logit_cap, 1, -1, 0));
+        TRY(vit_softmax(f, s->scores, s->probs16, s->reciprocal, (size_t)heads * P, (unsigned)s->tokens, P));
         struct gemm_opt pv = { .batch = heads, .sa = (unsigned long long)P * P, .sb = (unsigned long long)P * 32,
                                .sc = (unsigned long long)P * 32 };
         TRY(gemm(f, s->probs16, s->v16, s->context, P, 32, P, &pv));
-        TRY(merge_heads(f, s->context, merged, 1, P, C, heads, EPI_E4M3, 1));
+        TRY(merge_heads(f, s->context, merged, 1, P, C, heads, EPI_E4M3, 1, s->reciprocal));
     }
     if (chain)
         return record_project_residual(f, merged, w->out, s->attention, s->ffn, w->attn_cos, s->io16,
-                                       (unsigned)s->tokens, C, C, EPI_E4M3, 0, 1);
+                                       (unsigned)s->tokens, C, C, EPI_E4M3, 1, 1);
     return record_project_residual(f, merged, w->out, s->attention, s->ffn, w->attn_cos, s->out,
-                                   P, C, C, 0, 0, 0);
+                                   P, C, C, 0, 1, 0);
 }
 
 /* `record_downsample`: pool the unpublished output, publish it, then project. */
@@ -2012,29 +2058,16 @@ static int record_downsample(struct nr_frame *f, const struct edge_w *e, const s
     return 0;
 }
 
-/* `record_plain_downsample`: block 30's bridge into the bottleneck, no publish between. */
-static int record_plain_downsample(struct nr_frame *f, const struct edge_w *e, const struct tscratch *t,
-                                   int source, int target, int height, int width, unsigned C, int pad_to,
-                                   int source_half, int target_half)
-{
-    if (pad_to) {
-        int ph = (height + pad_to - 1) / pad_to * pad_to, pw = (width + pad_to - 1) / pad_to * pad_to;
-        TRY(pad_end(f, source, t->padded, height, width, ph, pw, C, source_half, source_half));
-        source = t->padded; height = ph; width = pw;
-    }
-    unsigned pixels = (unsigned)((height / 2) * (width / 2));
-    TRY(pool2(f, source, t->pooled16, height, width, C, EPI_HALF, 1, source_half));
-    struct gemm_opt o = { .epilogue = EPI_E4M3, .narrow = target_half };
-    TRY(gemm(f, t->pooled16, e->weight0, target, pixels, (unsigned)e->out_channels, C, &o));
-    return 0;
-}
-
 /* `record_upsample_merge`: project, nearest-upsample onto the skip, add the scaled skip,
  * publish. */
+/* With `published` (>= 0), `target` takes the merge raw and `published` the publication:
+ * block 66's input, which its feed-forward's GEMM reads published and its residual raw. */
 static int record_upsample_merge(struct nr_frame *f, const struct edge_w *e, const struct tscratch *t,
                                  int source, int skip, int target, int sh, int sw, int height, int width,
-                                 unsigned C, unsigned out_C, int source_half, int skip_half, int target_half)
+                                 unsigned C, unsigned out_C, int source_half, int skip_half, int target_half,
+                                 int published)
 {
+    int epilogue = published < 0 ? EPI_E4M3 : 0;
     unsigned source_pixels = (unsigned)(sh * sw);
     int projected16 = source_half ? source : t->projected16;
     if (!source_half) TRY(to_half(f, source, t->projected16, (size_t)source_pixels * C));
@@ -2043,12 +2076,13 @@ static int record_upsample_merge(struct nr_frame *f, const struct edge_w *e, con
     if (f->opt.fuse_transition)
         /* the upsample, the scaled skip and the add in one pass (resident.comp UPSAMPLE_ADD) */
         return upsample_add(f, t->projected, skip, e->sine, target, height, width, sw, out_C, skip_half,
-                            EPI_E4M3, target_half);
+                            epilogue, target_half, published);
     TRY(independent(f, 1));
     TRY(upsample2(f, t->projected, t->upsampled, sw, height, width, out_C, 0));
     TRY(scale_channel(f, skip, e->sine, t->scaled, count, out_C, skip_half));
     TRY(independent(f, 0));
-    TRY(add(f, t->upsampled, t->scaled, target, count, EPI_E4M3, target_half));
+    TRY(add(f, t->upsampled, t->scaled, target, count, epilogue, target_half));
+    if (published >= 0) TRY(e4m3_half(f, target, published, count));
     return 0;
 }
 
@@ -2169,10 +2203,6 @@ static int build(struct nr_frame *f)
             BLOCK(b, index, ENCODER[e].heads, WINDOW);
             TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
         }
-        /* The level's own buffer is its skip. The decoder writes d1-d4 and nothing writes
-         * l1-l4 again in the frame, so a copy would move the same bytes into a second
-         * buffer for nothing. */
-        skips[level] = value;
         BLOCK(tb, ENCODER[e].transition, ENCODER[e].heads, WINDOW);
         EDGE(down, ENCODER[e].transition, 0);
         int nh = L[level + 1][0], nw = L[level + 1][1], nC = L[level + 1][2];
@@ -2181,6 +2211,12 @@ static int build(struct nr_frame *f)
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)pad8(h) * pad8(w) * C, &t));
         TRY(record_block(f, tb, h, w, value, unpublished, 0, 1, 0, -1, NULL));
+        /* The level's skip is the transition block's own output, published — not the block
+         * before it, which is what MLX-DLSS's graph merged (notes/opendlss-reference.md). It
+         * goes into the level's buffer, which nothing reads again once the transition block
+         * has: the decoder writes d1-d4, never l1-l4. */
+        TRY(e4m3_half(f, unpublished, value, (size_t)h * w * C));
+        skips[level] = value;
         TRY(record_downsample(f, down, &t, unpublished, nxt, h, w, (unsigned)C,
                               ENCODER[e].transition == 22 ? 8 : 0, 0, 1));
         value = nxt;
@@ -2189,9 +2225,14 @@ static int build(struct nr_frame *f)
 
     /* the split family, then the bottleneck */
     h = L[5][0]; w = L[5][1]; C = L[5][2];
+    /* Block 30's output has two readers: the decoder's skip takes it published, the
+     * bottleneck's pool raw (notes/opendlss-reference.md). */
+    NAMED(raw30, "raw30", (size_t)h * w * C * 4);
     for (int index = 23; index <= 30; index++) {
         BLOCK(b, index, 16, SPLIT);
-        TRY(record_block(f, b, h, w, value, value, EPI_E4M3, 1, 1, -1, NULL));
+        int last = index == 30;
+        TRY(record_block(f, b, h, w, value, last ? raw30 : value, last ? 0 : EPI_E4M3, 1, !last, -1, NULL));
+        if (last) TRY(e4m3_half(f, raw30, value, (size_t)h * w * C));
     }
     /* l5 itself is the skip, as for the levels above: the decoder input merge below
      * writes d5 rather than l5, which is what a copy would protect. */
@@ -2214,7 +2255,8 @@ static int build(struct nr_frame *f)
     {
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)pad8(h) * pad8(w) * C, &t));
-        TRY(record_plain_downsample(f, &f->bottleneck, &t, value, deep, h, w, (unsigned)C, 8, 1, 1));
+        /* pooled raw and published before its GEMM, as the encoder's transitions are */
+        TRY(record_downsample(f, &f->bottleneck, &t, raw30, deep, h, w, (unsigned)C, 8, 0, 1));
     }
 
     for (int index = 31; index <= 38; index++) {
@@ -2235,7 +2277,7 @@ static int build(struct nr_frame *f)
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)h * w * C, &t));
         TRY(record_upsample_merge(f, &f->decoder_input, &t, deep, split_skip, value, gh, gw, h, w,
-                                  (unsigned)gC, (unsigned)C, 1, 1, 1));
+                                  (unsigned)gC, (unsigned)C, 1, 1, 1, -1));
     }
     for (int index = 40; index <= 47; index++) {
         BLOCK(b, index, 16, SPLIT);
@@ -2247,12 +2289,23 @@ static int build(struct nr_frame *f)
         int sh = L[sl][0], sw = L[sl][1], sC = L[sl][2];
         EDGE(up, DECODER[d].transition, 1);
         NAMEDF(target, "d%d", sl, (size_t)sh * sw * sC * 2);
+        BLOCK(tb, DECODER[d].transition, DECODER[d].heads, WINDOW);
+        /* The 32-channel block takes its merge raw — its feed-forward's GEMM reads the
+         * publication, its residual the raw value — where the branched ones take it published
+         * as both (notes/opendlss-reference.md). The raw merge goes into the level-1
+         * transition's buffer, its size and long dead by now. */
+        int raw_merge = -1;
+        if (!tb->branched) {
+            NAMED(unpublished, "unpublished", (size_t)sh * sw * sC * 4);
+            raw_merge = unpublished;
+        }
         struct tscratch t;
         TRY(transition_scratch(f, (size_t)sh * sw * (C > sC ? C : sC), &t));
-        TRY(record_upsample_merge(f, up, &t, value, skips[sl], target, h, w, sh, sw, (unsigned)C,
-                                  (unsigned)sC, 1, 1, 1));
-        BLOCK(tb, DECODER[d].transition, DECODER[d].heads, WINDOW);
-        TRY(record_block(f, tb, sh, sw, target, target, EPI_E4M3, 1, 1, -1, NULL));
+        TRY(record_upsample_merge(f, up, &t, value, skips[sl], raw_merge < 0 ? target : raw_merge, h, w,
+                                  sh, sw, (unsigned)C, (unsigned)sC, 1, 1, raw_merge < 0,
+                                  raw_merge < 0 ? -1 : target));
+        TRY(record_block(f, tb, sh, sw, raw_merge < 0 ? target : raw_merge, target, EPI_E4M3,
+                         raw_merge < 0, 1, raw_merge < 0 ? -1 : target, NULL));
         value = target; h = sh; w = sw; C = sC;
         for (int index = DECODER[d].first; index <= DECODER[d].last; index++) {
             BLOCK(b, index, DECODER[d].heads, WINDOW);
@@ -2318,6 +2371,17 @@ static void release_extent(struct nr_frame *f)
     f->height = f->width = 0;
 }
 
+static int prepare_extent(struct nr_frame *f, int H, int W);
+static void network_extent(int height, int width, int minimum, int *network_height, int *network_width);
+
+/* The graph for an output extent's network field. */
+static int prepare_extent_for(struct nr_frame *f, int height, int width, int minimum)
+{
+    int H, W;
+    network_extent(height, width, minimum, &H, &W);
+    return prepare_extent(f, H, W);
+}
+
 /* The graph for a network extent: planned, then recorded and captured once. */
 static int prepare_extent(struct nr_frame *f, int H, int W)
 {
@@ -2352,14 +2416,39 @@ static int prepare_extent(struct nr_frame *f, int H, int W)
 /* features: nr_frame.build_features, on nr_image's pass                        */
 /* ------------------------------------------------------------------------- */
 
-/* `nr_frame.network_geometry`: at least `minimum` a side — never below the graph's own
- * 128 — rounded up to 64. 320 is the vendor's floor (`NetworkGeometry.vendor_aligned`). */
-static int aligned_extent(int extent, int minimum)
+/* `nr_frame._field_alignment`: two to the number of times the graph reduces an axis of
+ * `extent` pixels — six halvings, each rounded up to 4, that shrink it, and a seventh when
+ * level 0 is not whole 8-pixel windows. The field is aligned to that. */
+static int field_alignment(int extent)
 {
-    /* 0 is a zeroed struct that never saw nr_frame_defaults: the vendor's 320, as before */
+    int reductions = 0, size = extent;
+    for (int level = 0; level < 6; level++) {
+        int half = ((size + 1) / 2 + 3) / 4 * 4;
+        reductions += half < size;
+        reductions += level == 0 && half % 8 != 0;
+        size = half;
+    }
+    return 1 << reductions;
+}
+
+/* `nr_frame.network_geometry`: the network extent as the vendor pads it (OpenDLSS-NR's
+ * `geometryFromValid`, bit-exact against captures of the original): each side aligned to
+ * the graph's own reductions and at least `minimum` (never below the graph's 128; 0, a
+ * zeroed struct that never saw nr_frame_defaults, is the vendor's 320), and the width one
+ * alignment more when both sides are four alignments — such a field (1280x768, 1024x768,
+ * 512x512) pools to a bottleneck with no padding token, where the pass comes out 25-30 %
+ * weaker (notes/opendlss-reference.md). Rounded up to 64, which only moves a field below
+ * 129 pixels a side. */
+static void network_extent(int height, int width, int minimum, int *network_height, int *network_width)
+{
     int floor = minimum <= 0 ? 320 : minimum > 128 ? minimum : 128;
-    int least = extent > floor ? extent : floor;
-    return (least + 63) / 64 * 64;
+    int aw = field_alignment(width), ah = field_alignment(height);
+    int fw = (width + aw - 1) / aw * aw, fh = (height + ah - 1) / ah * ah;
+    if (fw < floor) fw = floor;
+    if (fh < floor) fh = floor;
+    if (fw % (4 * aw) == 0 && fh % (4 * ah) == 0) fw += aw;
+    *network_height = (fh + 63) / 64 * 64;
+    *network_width = (fw + 63) / 64 * 64;
 }
 
 void nr_frame_geometry(int height, int width, int *network_height, int *network_width)
@@ -2369,12 +2458,12 @@ void nr_frame_geometry(int height, int width, int *network_height, int *network_
 
 void nr_frame_geometry_min(int height, int width, int minimum, int *network_height, int *network_width)
 {
-    if (network_height) *network_height = aligned_extent(height, minimum);
-    if (network_width) *network_width = aligned_extent(width, minimum);
+    int nh, nw;
+    network_extent(height, width, minimum, &nh, &nw);
+    if (network_height) *network_height = nh;
+    if (network_width) *network_width = nw;
 }
 
-/* `NetworkGeometry.extended_indices`: the image at the origin, the extension mirroring
- * it without repeating the edge. */
 static void extended_indices(int32_t *out, int count, int extent)
 {
     for (int i = 0; i < count; i++) {
@@ -2959,7 +3048,7 @@ int nr_frame_features_masked(nr_frame *f, const float *colour, int height, int w
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !features) FAILF("features need a colour image and an output");
-    if (prepare_extent(f, aligned_extent(height, params->min_extent), aligned_extent(width, params->min_extent))) return -1;
+    if (prepare_extent_for(f, height, width, params->min_extent)) return -1;
     return features_into(f, colour, height, width, history, control_mask, params, features, NULL);
 }
 
@@ -3115,7 +3204,7 @@ int nr_frame_update_masked(nr_frame *f, const float *colour, int height, int wid
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !output) FAILF("update needs a colour image and an output");
-    if (prepare_extent(f, aligned_extent(height, params->min_extent), aligned_extent(width, params->min_extent))) return -1;
+    if (prepare_extent_for(f, height, width, params->min_extent)) return -1;
     /* Under NR_INPUT_FP16 the features are built as half in the graph's own input, so
      * neither a float32 copy nor a conversion stands between them and the first GEMM. */
     uint16_t *half_in = f->opt.input_fp16 ? input_half(f) : NULL;
@@ -3135,7 +3224,7 @@ int nr_frame_head(nr_frame *f, const float *colour, int height, int width, const
     nr_frame_params d;
     if (!params) { nr_frame_defaults(&d); params = &d; }
     if (height <= 0 || width <= 0 || !colour || !head) FAILF("head needs a colour image and an output");
-    if (prepare_extent(f, aligned_extent(height, params->min_extent), aligned_extent(width, params->min_extent))) return -1;
+    if (prepare_extent_for(f, height, width, params->min_extent)) return -1;
     /* nr_frame_update's first half: the features as half in the graph's own input under
      * NR_INPUT_FP16, the graph, and the head cropped to the colour's extent. */
     uint16_t *half_in = f->opt.input_fp16 ? input_half(f) : NULL;

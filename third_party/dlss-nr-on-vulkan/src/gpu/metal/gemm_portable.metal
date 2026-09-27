@@ -223,12 +223,15 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                     for (int e = 0; e < 4; e++)
                         float_out(pc.c)[at + e] = v[e];
             }
+            /* the half copy, published: block 0's stem, raw for the residual, published
+             * for the feed-forward's GEMM */
             if (half_copy) {
+                float4 p = float4(e4m3(v[0]), e4m3(v[1]), e4m3(v[2]), e4m3(v[3]));
                 if ((at & 3u) == 0u && (pc.d & 7u) == 0u)
-                    reinterpret_cast<device half4 *>(half_out(pc.d))[at >> 2] = half4(v);
+                    reinterpret_cast<device half4 *>(half_out(pc.d))[at >> 2] = half4(p);
                 else
                     for (int e = 0; e < 4; e++)
-                        half_out(pc.d)[at + e] = half(v[e]);
+                        half_out(pc.d)[at + e] = half(p[e]);
             }
         }
 }
