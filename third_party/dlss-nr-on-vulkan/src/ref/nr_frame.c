@@ -998,6 +998,10 @@ static int arena(struct nr_frame *f, enum role r, size_t bytes)
     return f->role_id[r];
 }
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4100)
+#endif
+
 /* the shadow recorders: every buffer id a pass is handed, marked used */
 static void mark(int id)
 {
