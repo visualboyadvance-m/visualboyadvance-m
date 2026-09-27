@@ -635,14 +635,17 @@ fedora_installdeps() {
             fi
             # rpm will not install a package whose signature it cannot check,
             # and the RPM Fusion signing key ships in the release packages
-            # themselves, so unpack it and import it before installing them
-            rm -rf ./etc
+            # themselves, so unpack it and import it before installing them.
+            # Older releases keep the keys in /etc/pki/rpm-gpg, newer ones in
+            # /usr/share/pki/rpm-gpg, so unpack everything and search for them.
+            rm -rf ./unpacked
+            mkdir ./unpacked
             for fusion_rpm in ./rpmfusion-*.rpm; do
-                rpm2archive - < "$fusion_rpm" | tar -xzf - --wildcards './etc/pki/rpm-gpg/RPM-GPG-KEY-*'
+                rpm2archive - < "$fusion_rpm" | tar -C ./unpacked -xzf -
             done
 
             # -type f skips the per-release symlinks to the one real key
-            fusion_keys=$(find ./etc/pki/rpm-gpg -type f 2>/dev/null)
+            fusion_keys=$(find ./unpacked -path '*/pki/rpm-gpg/RPM-GPG-KEY-*' -type f 2>/dev/null)
 
             if [ -z "$fusion_keys" ] || ! sudo rpm --import $fusion_keys; then
                 tries=0
