@@ -554,7 +554,8 @@ int main(int argc, char **argv)
         if (head) {
             free(head);
         }
-        head = malloc((size_t)hh * hw * 4 * sizeof(float)), *up = malloc(pixels * 4 * sizeof(float));
+        head = malloc((size_t)hh * hw * 4 * sizeof(float));
+        float *up = malloc(pixels * 4 * sizeof(float));
         float *middle = malloc((size_t)height * hw * 4 * sizeof(float));
         float *fused = malloc(pixels * 3 * sizeof(float)), *want = malloc(pixels * 3 * sizeof(float));
         for (size_t i = 0; i < (size_t)hh * hw * 4; i++) head[i] = normal();
