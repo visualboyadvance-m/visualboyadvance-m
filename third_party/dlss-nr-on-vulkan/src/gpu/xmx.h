@@ -152,6 +152,21 @@ int xmx_graph_run(int id);
 int xmx_graph_destroy(int id);
 
 /* profiling */
+/* Abandon a pipeline build in progress.
+ *
+ * Opening the model compiles every pipeline, which a driver can take tens of seconds over,
+ * and a caller that has decided it no longer wants the model -- a renderer about to destroy
+ * the device it lent, say -- would otherwise have to wait the whole of it out. Set from any
+ * thread: the build checks it before each pipeline, so the wait becomes one pipeline rather
+ * than all of them, and fails with "cancelled". Clear it before opening again.
+ *
+ * A build that ends this way leaves nothing open; `xmx_close` is not needed and the next
+ * `xmx_init` starts over. */
+void xmx_cancel(int on);
+/* Whether the flag is set. A caller distinguishes its own cancellation from a real failure
+ * with this rather than by matching the message. */
+int xmx_cancelled(void);
+
 int xmx_profile(int on);
 void xmx_profile_reset(void);
 double xmx_profile_ms(unsigned kind);

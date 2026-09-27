@@ -10055,11 +10055,20 @@ void GameArea::ProbeOutputCapabilities() {
     const bool saved_deep = OPTION(kDispDeepColor);
     const config::Filter saved_filter = OPTION(kDispFilter);
     const config::Interframe saved_ifb = OPTION(kDispIFB);
+    const bool saved_dlss_nr = OPTION(kDispDlssNr);
     const config::ColorCorrectionProfile saved_profile =
         OPTION(kDispColorCorrectionProfile);
 
     OPTION(kDispFilter) = config::Filter::kNone;
     OPTION(kDispIFB)    = config::Interframe::kNone;
+    // DLSS NR too, and for a stronger reason than the simple draw path. Every
+    // panel built here creates a dlssnr::Filter, whose worker opens the model
+    // on the first frame -- and opening it compiles every compute pipeline,
+    // which on some drivers takes many seconds. tear_down() then destroys the
+    // panel, and ~Filter() joins that worker; the join cannot interrupt a
+    // model open, so the probe would sit on the UI thread until the driver
+    // finished, once per renderer tried. Windows reports that as a hang.
+    OPTION(kDispDlssNr) = false;
 
     // Bring `method` up on this panel, render one black frame so DrawingPanelInit()
     // creates the real swapchain/visual and latches its capability flags, and
@@ -10177,6 +10186,7 @@ void GameArea::ProbeOutputCapabilities() {
     OPTION(kDispDeepColor)             = saved_deep;
     OPTION(kDispFilter)                = saved_filter;
     OPTION(kDispIFB)                   = saved_ifb;
+    OPTION(kDispDlssNr)                = saved_dlss_nr;
     OPTION(kDispColorCorrectionProfile) = saved_profile;
     pending_panel_reset_ = false;
 

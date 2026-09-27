@@ -63,6 +63,8 @@ struct xmx {
     int (*res_init)(const char *, const char *, const char *, const char *, const char *, const char *);
     int (*portable)(void);
     int (*window_gather)(void);   /* optional: a runtime without it cannot gather */
+    void (*cancel)(int);          /* optional: a runtime without it cannot be cancelled */
+    int (*cancelled)(void);
     const char *(*error)(void);
     const char *(*device)(void);
     const char *(*path)(void);
@@ -149,6 +151,9 @@ static int own_directory(char *out, size_t cap)
 #pragma warning(disable : 4152)
 #endif
 
+/* nr_frame_cancel_open() before the runtime is bound; applied by xmx_load(). */
+static int g_cancel_open;
+
 static int xmx_load(void)
 {
     if (X.handle) return 0;
@@ -162,6 +167,8 @@ static int xmx_load(void)
     X.embedded_shader = xmx_embedded_shader;
     X.adopt = xmx_adopt; X.close = xmx_close; X.adopted = xmx_adopted;
     X.window_gather = xmx_window_gather;
+    X.cancel = xmx_cancel; X.cancelled = xmx_cancelled;
+    X.cancel(g_cancel_open);
     X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
     X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
     X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
@@ -226,6 +233,11 @@ static int xmx_load(void)
     BIND(open, "xmx_open"); BIND(init, "xmx_init"); BIND(res_init, "xmx_res_init");
     X.embedded_shader = nr_dl_sym(X.handle, "xmx_embedded_shader");
     X.window_gather = nr_dl_sym(X.handle, "xmx_window_gather");
+    /* Optional, like the gather: an older runtime simply cannot be cancelled. */
+    X.cancel = nr_dl_sym(X.handle, "xmx_cancel");
+    X.cancelled = nr_dl_sym(X.handle, "xmx_cancelled");
+    if (X.cancel)
+        X.cancel(g_cancel_open);
     X.adopt = nr_dl_sym(X.handle, "xmx_adopt");
     X.close = nr_dl_sym(X.handle, "xmx_close");
     X.adopted = nr_dl_sym(X.handle, "xmx_adopted");
@@ -2908,6 +2920,22 @@ void nr_frame_defaults(nr_frame_params *p)
     p->release = 0.0f;
     p->min_extent = 320;
     p->automatic_mask = 0; p->skin_structure = -1.0f; p->automatic_structure = -1.0f;
+}
+
+void nr_frame_cancel_open(int on)
+{
+    /* Remembered here as well as pushed down, because this can arrive before the runtime is
+     * bound -- loading it just to set a flag would cost more than the wait it saves. The
+     * binding applies whatever is remembered, so an early cancel still stops the open that
+     * follows it rather than being lost. */
+    g_cancel_open = on ? 1 : 0;
+    if (X.handle && X.cancel)
+        X.cancel(g_cancel_open);
+}
+
+int nr_frame_open_cancelled(void)
+{
+    return (X.handle && X.cancelled) ? X.cancelled() : g_cancel_open;
 }
 
 const char *nr_frame_runtime(void)

@@ -445,8 +445,17 @@ static int dxil_signed(const unsigned char *code, size_t len)
 	return 0;
 }
 
+/* Set from another thread to abandon a build in progress; see xmx.h. A plain flag: the
+ * build reads it between pipelines and only ever cares whether it is set. */
+static volatile int g_cancel;
+
+void xmx_cancel(int on) { g_cancel = on ? 1 : 0; }
+int xmx_cancelled(void) { return g_cancel; }
+
 static int build_pipeline(const char *spv_path, ID3D12PipelineState **out)
 {
+	/* One check for every pipeline this library builds; see xmx.h. */
+	if (g_cancel) FAIL("cancelled", 0);
 	size_t len = 0;
 	void *owned = NULL;
 	char why[1400];

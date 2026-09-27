@@ -134,6 +134,22 @@ int nr_frame_shared_device(void);
  * Apple libdlssnr, or a shared build under NR_GPU_BACKEND=metal) or "d3d12" (libd3dmx — a
  * Windows libdlssnr built with NR_DLSSNR_D3D12, or NR_GPU_BACKEND=d3d12). Known without
  * opening a device, so a host can decide which device, if any, to share. */
+/* Abandon a model open in progress (nr_frame_open), from another thread.
+ *
+ * The open compiles every pipeline, which a driver can take tens of seconds over. A caller
+ * that has decided it no longer wants the model -- a renderer about to destroy the device it
+ * lent, say -- sets this, and the open fails after whatever pipeline is already being built
+ * rather than after all of them. Clear it before opening again. Nothing is left open by an
+ * open that ends this way.
+ *
+ * Set before the runtime is loaded, it still applies to the open that loads it.
+ *
+ * Harmless where the runtime does not support it (an older libxmx): the open then runs to
+ * completion as it always did. */
+void nr_frame_cancel_open(int on);
+/* Whether the flag is set, so a caller can tell its own cancellation from a real failure. */
+int nr_frame_open_cancelled(void);
+
 const char *nr_frame_runtime(void);
 
 /* The last failure, for the calling thread's most recent call. */

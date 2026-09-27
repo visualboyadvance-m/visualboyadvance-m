@@ -307,8 +307,17 @@ static int load_library(void)
 #endif
 }
 
+/* Set from another thread to abandon a build in progress; see xmx.h. A plain flag: the
+ * build reads it between pipelines and only ever cares whether it is set. */
+static volatile int g_cancel;
+
+void xmx_cancel(int on) { g_cancel = on ? 1 : 0; }
+int xmx_cancelled(void) { return g_cancel; }
+
 static int build_pipeline_consts(const char *spv_path, const unsigned *flags, const unsigned *merged, void **out)
 {
+	/* One check for every pipeline this library builds; see xmx.h. */
+	if (g_cancel) FAIL("cancelled", 0);
 	if (load_library()) return -1;
 	char stem[128];
 	kernel_name(spv_path, stem, sizeof stem);

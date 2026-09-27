@@ -133,15 +133,23 @@ struct VulkanShare {
     const void* owner = nullptr;
 };
 
-// Registers the device the model should run on from its next open. A model
-// already open is closed (waiting for a pass in flight), so the next pass
-// reopens it on the shared device. The device must satisfy the requirements
-// documented for nr_frame_adopt_vulkan(); if adopting fails, the model falls
-// back to its own instance and Filter::Device() says so.
+// Registers the device the model should run on from its next open, and does
+// not block: a renderer lends its device while it is being constructed, on the
+// UI thread. A model already open predates the share, so the pipeline closes
+// it and reopens on the lent device at its next frame. The device
+// must satisfy the requirements documented for nr_frame_adopt_vulkan(); if
+// adopting fails, the model falls back to its own instance and
+// Filter::Device() says so.
 void ShareVulkan(const VulkanShare& share);
 
-// Drops the share registered by `owner` (a no-op for anyone else), closing the
-// model first if it runs on that device. Call before destroying the device.
+// Drops the share registered by `owner` (a no-op, and immediate, for anyone
+// else), closing the model first if it runs on that device. Call before
+// destroying the device.
+//
+// This is the one call here that waits, and it has to: the model may be on
+// that device at this instant, and neither a pass nor a model open can be
+// interrupted. Everything else is arranged so the wait is rare -- only the
+// renderer that actually lent the device reaches it.
 void WithdrawVulkanShare(const void* owner);
 
 // True while the open model runs on a lent device.
@@ -149,10 +157,20 @@ bool UsingSharedVulkan();
 
 class Filter {
 public:
-    // Starts the worker thread, which opens (or shares) the model.
+    // Starts the stage threads, the first of which opens (or shares) the model.
     Filter();
-    // Stops the worker and releases the model. Blocks while a pass in flight
-    // finishes.
+    // Retires the stages and lets go of the model. Does not block. A frame, or
+    // a model open, already running is left to finish on its own stage thread;
+    // the last stage to go releases the model and disposes of the state behind
+    // this object. Opening the model compiles every compute pipeline, which
+    // some drivers take many seconds over and nothing can interrupt, so
+    // waiting for it here would freeze whichever thread destroys a panel --
+    // the UI thread, every time.
+    //
+    // A renderer that lent its device must still call WithdrawVulkanShare()
+    // before destroying it: that one does wait, because a retiring stage may
+    // be using the device at this instant. It waits only for work already
+    // begun -- a stage asked to quit starts no more.
     ~Filter();
 
     Filter(const Filter&) = delete;
@@ -189,7 +207,9 @@ public:
 
 private:
     struct Impl;
-    std::unique_ptr<Impl> impl_;
+    // Shared with the stage threads, which outlive this object when they are
+    // retired mid-frame; the last one out drops the final reference.
+    std::shared_ptr<Impl> impl_;
 };
 
 }  // namespace dlssnr

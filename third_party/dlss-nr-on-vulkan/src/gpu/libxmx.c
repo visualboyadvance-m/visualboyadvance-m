@@ -450,9 +450,20 @@ static const void *shader_code(const char *spv_path, size_t *len, void **owned)
 	return code;
 }
 
+
+/* Set from another thread to abandon a build in progress; see xmx.h. A plain flag: the
+ * build reads it between pipelines and only ever cares whether it is set. */
+static volatile int g_cancel;
+
+void xmx_cancel(int on) { g_cancel = on ? 1 : 0; }
+int xmx_cancelled(void) { return g_cancel; }
+
 static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, VkPipeline *out,
 			      const VkSpecializationInfo *specialization)
 {
+	/* Every pipeline this library builds comes through here, so one check bounds an
+	 * abandoned open to whatever vkCreateComputePipelines is already inside. */
+	if (g_cancel) FAIL("cancelled", 0);
 	size_t len = 0;
 	void *owned = NULL;
 	const void *code = shader_code(spv_path, &len, &owned);

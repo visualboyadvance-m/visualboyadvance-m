@@ -7,6 +7,7 @@
 #include <cmath>
 #include <condition_variable>
 #include <cstring>
+#include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
@@ -30,6 +31,9 @@ namespace {
 // Lock order: a Filter's own mutex, then `mutex`, then `use`. A thread holding
 // `use` takes neither of the others until it lets `use` go.
 struct SharedModel {
+    // Serializes every libnr_frame call and guards `frame`, `users`, `device`,
+    // `opened_shared` and `share_error`. Held for the length of a pass, and of
+    // a model open -- seconds, on a driver that compiles pipelines slowly.
     std::mutex mutex;
     std::condition_variable cv;  // `owner` changed
     std::shared_mutex use;
@@ -37,15 +41,28 @@ struct SharedModel {
     // Bumped whenever the model closes, so a frame claimed on the old one is
     // dropped instead of meeting a graph that never saw its features.
     uint64_t generation = 0;
-    int users = 0;
     std::string device;
+    // The renderer's Vulkan objects to adopt, under `share_mutex` alone. That
+    // lock is only ever held across a few assignments, so a renderer can
+    // register or look up a share while a pass or an open holds `mutex`.
+    // Taken inside `mutex` where both are needed; never the other way round.
+    std::mutex share_mutex;
     // A renderer's Vulkan objects to adopt at the next open, if any.
     bool has_share = false;
     VulkanShare share;
+    // A share registered since the model opened: the open one predates it and
+    // has to be closed and reopened before it takes effect.
+    bool share_pending = false;
     // The open model runs on the shared device.
     bool opened_shared = false;
+    // `frame && opened_shared`, readable without the lock. UsingSharedVulkan()
+    // is a query on the render path, and `mutex` is held for a whole pass.
+    std::atomic<bool> shared_live{false};
     // Why the last adoption attempt fell back to libxmx's own instance, if it did.
     std::string share_error;
+    // How many Filters exist. Bumped without `mutex`, which a model open holds
+    // for many seconds and a Filter is constructed on the UI thread.
+    std::atomic<int> users{0};
     // The Filter whose frames are in the pipeline, and how many.
     const void* owner = nullptr;
     int owner_frames = 0;
@@ -55,8 +72,11 @@ struct SharedModel {
 };
 
 SharedModel& Shared() {
-    static SharedModel model;
-    return model;
+    // Deliberately never destroyed. A worker retired mid-pass outlives the
+    // Filter that started it and touches this on its way out, which can land
+    // after static destructors would have run.
+    static SharedModel* const model = new SharedModel();
+    return *model;
 }
 
 std::atomic<ImageLoader> g_image_loader{nullptr};
@@ -74,6 +94,7 @@ void CloseLocked(SharedModel& s) {
     s.generation++;
     s.prepared_width = 0;
     s.prepared_height = 0;
+    s.shared_live.store(false, std::memory_order_release);
 }
 
 // Opens the model, on the shared device when one is registered. Caller holds
@@ -81,8 +102,15 @@ void CloseLocked(SharedModel& s) {
 bool OpenLocked(SharedModel& s, std::string* error) {
     s.share_error.clear();
     bool adopted = false;
-    if (s.has_share) {
-        const VulkanShare& v = s.share;
+    VulkanShare v;
+    bool has_share;
+    {
+        std::lock_guard<std::mutex> share_lock(s.share_mutex);
+        has_share = s.has_share;
+        v = s.share;
+        s.share_pending = false;
+    }
+    if (has_share) {
         if (nr_frame_adopt_vulkan(v.instance, v.physical_device, v.device, v.queue,
                                   v.queue_family,
                                   (v.cooperative_matrix ? 1 : 0) |
@@ -111,6 +139,7 @@ bool OpenLocked(SharedModel& s, std::string* error) {
         return false;
     }
     s.opened_shared = adopted && nr_frame_shared_device() == 1;
+    s.shared_live.store(s.frame != nullptr && s.opened_shared, std::memory_order_release);
     s.device = std::string(nr_frame_device(s.frame)) + " (" + nr_frame_runtime() + " runtime, " +
                nr_frame_gemm_path(s.frame) + ")";
     if (s.opened_shared)
@@ -123,15 +152,17 @@ bool OpenLocked(SharedModel& s, std::string* error) {
 }
 
 void AcquireModel() {
-    SharedModel& s = Shared();
-    std::lock_guard<std::mutex> lock(s.mutex);
-    s.users++;
+    Shared().users.fetch_add(1, std::memory_order_relaxed);
 }
 
 void ReleaseModel() {
     SharedModel& s = Shared();
     std::lock_guard<std::mutex> lock(s.mutex);
-    if (s.users > 0 && --s.users == 0)
+    // A Filter constructed between the decrement and the close just reopens on
+    // its first Claim(); it cannot have claimed anything yet, since Claim()
+    // takes `mutex`, which is held here.
+    if (s.users.load(std::memory_order_acquire) > 0 &&
+        s.users.fetch_sub(1, std::memory_order_acq_rel) == 1)
         CloseLocked(s);
 }
 
@@ -143,28 +174,51 @@ void SetImageLoader(ImageLoader loader) {
 
 void ShareVulkan(const VulkanShare& share) {
     SharedModel& s = Shared();
-    std::lock_guard<std::mutex> lock(s.mutex);
-    // Whatever is open runs elsewhere; close it so the next pass reopens here.
-    CloseLocked(s);
+    // Registration only, under the short lock: a renderer lends its device
+    // while it is being constructed, on the UI thread, and `mutex` may be held
+    // by a model open for many seconds. Whatever is open runs elsewhere; the
+    // worker closes it at the start of its next pass and reopens here.
+    std::lock_guard<std::mutex> share_lock(s.share_mutex);
     s.share = share;
     s.has_share = true;
+    s.share_pending = true;
 }
 
 void WithdrawVulkanShare(const void* owner) {
     SharedModel& s = Shared();
+    {
+        // Not the lender: say so without touching `mutex`, so a renderer that
+        // never lent anything is never held up by a pass.
+        std::lock_guard<std::mutex> share_lock(s.share_mutex);
+        if (!s.has_share || s.share.owner != owner)
+            return;
+    }
+    // The lender is about to destroy the device. This is the one place that
+    // has to wait: the model may be running on it right now, and taking
+    // `mutex` is what proves it has stopped.
+    //
+    // A pass is bounded, but an open compiles every pipeline and would hold
+    // this for tens of seconds, so ask the runtime to abandon one in progress.
+    // It stops after the pipeline it is already building; the frame that asked
+    // for it is dropped and the next one opens again, on whatever device is
+    // shared by then.
+    nr_frame_cancel_open(1);
     std::lock_guard<std::mutex> lock(s.mutex);
+    nr_frame_cancel_open(0);
+    std::lock_guard<std::mutex> share_lock(s.share_mutex);
     if (!s.has_share || s.share.owner != owner)
         return;
     if (s.opened_shared)
         CloseLocked(s);
     s.has_share = false;
+    s.share_pending = false;
     s.share = VulkanShare();
 }
 
 bool UsingSharedVulkan() {
-    SharedModel& s = Shared();
-    std::lock_guard<std::mutex> lock(s.mutex);
-    return s.frame && s.opened_shared;
+    // No lock: `mutex` is held for the length of a pass (and of a model open),
+    // and callers ask this from the render path.
+    return Shared().shared_live.load(std::memory_order_acquire);
 }
 
 namespace {
@@ -390,6 +444,11 @@ struct Filter::Impl {
     bool PassPacket(std::unique_lock<std::mutex>& lock, int stage, Packet* p);
     void DropPacket(Packet* p);
 
+    // Runs on whichever thread lets go of the last reference -- a stage on its
+    // way out, once ~Filter() has detached it. What ~Filter() used to do after
+    // joining, which it can no longer wait to do.
+    ~Impl();
+
     bool Claim(Packet* p, std::string* why);
     void Unclaim(Packet* p);
     nr_frame* Borrow(Packet* p, std::shared_lock<std::shared_mutex>* use, bool prepare);
@@ -455,12 +514,24 @@ void Filter::Impl::DropPacket(Packet* p) {
 bool Filter::Impl::Claim(Packet* p, std::string* why) {
     SharedModel& s = Shared();
     std::unique_lock<std::mutex> lock(s.mutex);
-    s.cv.wait(lock, [&] { return quit.load() || !s.owner || s.owner == this; });
+    // Timed, so that ~Filter() can set `quit` and go without taking `mutex` to
+    // notify: it runs on the UI thread, and `mutex` is held for the length of
+    // a model open. Unclaim() still notifies, so the wait for another Filter to
+    // leave the model ends as promptly as it ever did; the timeout is only the
+    // backstop that retires a stage nobody will notify again.
+    while (!quit.load() && s.owner && s.owner != this)
+        s.cv.wait_for(lock, std::chrono::milliseconds(50));
     if (quit.load())
         return false;
 
-    if (!s.frame && !OpenLocked(s, why))
+    if (!s.frame && !OpenLocked(s, why)) {
+        // Cancelled by WithdrawVulkanShare() rather than broken. Say nothing,
+        // so the stage drops this frame and the next one opens again instead
+        // of the filter disabling itself.
+        if (nr_frame_open_cancelled())
+            why->clear();
         return false;
+    }
 
     s.owner = this;
     s.owner_frames++;
@@ -780,14 +851,23 @@ void Filter::Impl::ComposeStage() {
     cv.notify_all();
 }
 
-Filter::Filter() : impl_(new Impl) {
+Filter::Filter() : impl_(std::make_shared<Impl>()) {
     AcquireModel();
-    Impl* im = impl_.get();
+    const std::shared_ptr<Impl>& im = impl_;
     for (Packet& p : im->packets)
         im->free_packets.push_back(&p);
+    // Each stage holds a reference of its own, so the state outlives this
+    // object while a stage is still retiring -- see ~Filter().
     im->threads[kStageFeatures] = std::thread([im] { im->FeaturesStage(); });
     im->threads[kStageNetwork] = std::thread([im] { im->NetworkStage(); });
     im->threads[kStageCompose] = std::thread([im] { im->ComposeStage(); });
+}
+
+Filter::Impl::~Impl() {
+    // Frames that were queued between stages still hold the model.
+    for (Packet& p : packets)
+        Unclaim(&p);
+    ReleaseModel();
 }
 
 Filter::~Filter() {
@@ -797,20 +877,26 @@ Filter::~Filter() {
         im.quit.store(true);
     }
     im.cv.notify_all();
-    {
-        // A features stage may be waiting for another Filter to leave the model.
-        SharedModel& s = Shared();
-        std::lock_guard<std::mutex> lock(s.mutex);
-        s.cv.notify_all();
-    }
-    for (std::thread& t : im.threads)
-        if (t.joinable())
-            t.join();
+    // A features stage waiting for another Filter to leave the model wakes on
+    // `quit` by itself; see the wait in Claim(). Notifying it here would mean
+    // taking the model lock, which is held for the length of a model open.
 
-    // Frames that were queued between stages still hold the model.
-    for (Packet& p : im.packets)
-        im.Unclaim(&p);
-    ReleaseModel();
+    // Detach rather than join. A stage may be inside a model open, which
+    // compiles every compute pipeline and cannot be interrupted; joining would
+    // hold up whoever destroys the panel for as long as the driver takes. An
+    // idle stage is gone at once; a busy one finishes what it started, sees
+    // `quit`, and drops its reference to `impl_`. The last one to go disposes
+    // of it -- ~Impl() unclaims the packets and releases the model, which is
+    // what this destructor used to do once the threads had joined.
+    //
+    // Moving each thread out first leaves Impl::threads empty, so that later
+    // disposal destroys thread objects that own nothing.
+    for (std::thread& t : im.threads) {
+        std::thread stage = std::move(t);
+        if (stage.joinable())
+            stage.detach();
+    }
+    impl_.reset();
 }
 
 void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstride, int width,
