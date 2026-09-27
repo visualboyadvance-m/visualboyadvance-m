@@ -521,16 +521,21 @@ void MetalDrawingPanel::CreateMetalView()
 
     _device = [metalView.device retain];
 
+    // The quad covers the whole view whatever the frame size: positions are
+    // in units of the viewport size passed with them (_viewportSize, 1 x 1), not in
+    // pixels of width * scale, which goes stale when `scale` changes after the
+    // view is made -- as it does when DLSS NR runs at display size and a
+    // resize or fullscreen changes the display factor.
     const AAPLVertex quadVertices[] =
     {
-        // Pixel positions, Texture coordinates
-        { { (float)(width * scale),  (float)-(height * scale) },  { 1.f, 1.f } },
-        { { (float)-(width * scale), (float)-(height * scale) },  { 0.f, 1.f } },
-        { { (float)-(width * scale), (float)(height * scale) },  { 0.f, 0.f } },
+        // Positions, Texture coordinates
+        { {  1.f, -1.f },  { 1.f, 1.f } },
+        { { -1.f, -1.f },  { 0.f, 1.f } },
+        { { -1.f,  1.f },  { 0.f, 0.f } },
 
-        { { (float)(width * scale), (float)-(height * scale) },  { 1.f, 1.f } },
-        { { (float)-(width * scale), (float)(height * scale) },  { 0.f, 0.f } },
-        { { (float)(width * scale), (float)(height * scale) },  { 1.f, 0.f } },
+        { {  1.f, -1.f },  { 1.f, 1.f } },
+        { { -1.f,  1.f },  { 0.f, 0.f } },
+        { {  1.f,  1.f },  { 1.f, 0.f } },
     };
 
     // Create a vertex buffer, and initialize it with the quadVertices array
@@ -626,8 +631,8 @@ void MetalDrawingPanel::CreateMetalView()
 
     _contentSize.x = drawablePx.width;
     _contentSize.y = drawablePx.height;
-    _viewportSize.x = width * scale;
-    _viewportSize.y = height * scale;
+    _viewportSize.x = 1;  // see quadVertices in CreateMetalView()
+    _viewportSize.y = 1;
 
     [view addSubview:metalView];
 }
@@ -718,8 +723,8 @@ void MetalDrawingPanel::OnSize(wxSizeEvent& ev)
 
     _contentSize.x = drawablePx.width;
     _contentSize.y = drawablePx.height;
-    _viewportSize.x = width * scale;
-    _viewportSize.y = height * scale;
+    _viewportSize.x = 1;  // see quadVertices in CreateMetalView()
+    _viewportSize.y = 1;
 
     if (todraw) {
         DrawArea();
