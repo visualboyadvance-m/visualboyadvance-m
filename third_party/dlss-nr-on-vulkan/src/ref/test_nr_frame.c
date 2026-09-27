@@ -551,14 +551,11 @@ int main(int argc, char **argv)
      * encoded, against the upscale, nr_frame_compose and nr_encode8 one after the other */
     {
         int hh = height * 3 / 5, hw = width * 3 / 5, fw = width + 10;
-        if (head) {
-            free(head);
-        }
-        head = malloc((size_t)hh * hw * 4 * sizeof(float));
+        float *low_head = malloc((size_t)hh * hw * 4 * sizeof(float));
         float *up = malloc(pixels * 4 * sizeof(float));
         float *middle = malloc((size_t)height * hw * 4 * sizeof(float));
         float *fused = malloc(pixels * 3 * sizeof(float)), *want = malloc(pixels * 3 * sizeof(float));
-        for (size_t i = 0; i < (size_t)hh * hw * 4; i++) head[i] = normal();
+        for (size_t i = 0; i < (size_t)hh * hw * 4; i++) low_head[i] = normal();
         int32_t *ly = malloc(height * sizeof(int32_t)), *hy = malloc(height * sizeof(int32_t));
         int32_t *lx = malloc(width * sizeof(int32_t)), *hx = malloc(width * sizeof(int32_t));
         float *wy = malloc(height * sizeof(float)), *wx = malloc(width * sizeof(float));
@@ -574,7 +571,7 @@ int main(int argc, char **argv)
                 wt[i] = fr < 0.0f ? 0.0f : fr > 1.0f ? 1.0f : fr;
             }
         }
-        nr_resize_axis(head, (ptrdiff_t)hw * 4, 4, 1, (size_t)height, (size_t)hw, 4, 0, ly, hy, wy, middle);
+        nr_resize_axis(low_head, (ptrdiff_t)hw * 4, 4, 1, (size_t)height, (size_t)hw, 4, 0, ly, hy, wy, middle);
         nr_resize_axis(middle, (ptrdiff_t)hw * 4, 4, 1, (size_t)height, (size_t)width, 4, 1, lx, hx, wx, up);
         size_t frame_bytes = (size_t)(height + 6) * fw * 4;
         uint8_t *request = malloc(frame_bytes), *got = malloc(frame_bytes), *expect = malloc(frame_bytes);
@@ -587,7 +584,7 @@ int main(int argc, char **argv)
             if (c == 2) { q.hold = 0.6f; q.slope = -0.6f * 255.0f / 4.0f; q.release = -255.0f / 16.0f; }
             memcpy(got, request, frame_bytes);
             memcpy(expect, request, frame_bytes);
-            int bad = nr_frame_compose_encode(frame, head, hh, hw, colour, height, width, hist, prev, NULL, &q,
+            int bad = nr_frame_compose_encode(frame, low_head, hh, hw, colour, height, width, hist, prev, NULL, &q,
                                               fused, got, fw, 3, 5, 1)
                       || nr_frame_compose(frame, up, colour, height, width, hist, prev, NULL, &q, want);
             for (int y = 0; y < height && !bad; y++) {
@@ -600,7 +597,7 @@ int main(int argc, char **argv)
             check("compose_encode: one pass, the separate passes' composition and bytes", ok, detail);
         }
         (void)all;
-        free(head); free(up); free(middle); free(fused); free(want); free(ly); free(hy); free(lx); free(hx);
+        free(low_head); free(up); free(middle); free(fused); free(want); free(ly); free(hy); free(lx); free(hx);
         free(wy); free(wx); free(request); free(got); free(expect);
     }
 
