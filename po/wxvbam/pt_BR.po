@@ -45,7 +45,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-25 15:00+0000\n"
+"POT-Creation-Date: 2026-09-27 14:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
@@ -140,7 +140,7 @@ msgstr "Importar um arquivo de bateria sobrescreverá o arquivo .sav atual e res
 msgid "Confirm import"
 msgstr "Confirmar a importação"
 
-#: cmdevents.cpp:574 panel.cpp:1183
+#: cmdevents.cpp:574 panel.cpp:1185
 #, c-format
 msgid "Loaded battery %s"
 msgstr "Bateria carregada %s"
@@ -223,7 +223,7 @@ msgstr "Erro ao carregar o arquivo do snapshot %s"
 msgid "Wrote battery %s"
 msgstr "Gravou a bateria em %s"
 
-#: cmdevents.cpp:777 panel.cpp:1562
+#: cmdevents.cpp:777 panel.cpp:1564
 #, c-format
 msgid "Error writing battery %s"
 msgstr "Erro ao gravar a bateria %s"
@@ -281,7 +281,7 @@ msgstr "Selecionar o arquivo do state"
 msgid "Visual Boy Advance saved game files|*.sgm"
 msgstr "Arquivos dos jogos salvos do Visual Boy Advance|*.sgm"
 
-#: cmdevents.cpp:1584 panel.cpp:1534
+#: cmdevents.cpp:1584 panel.cpp:1536
 #, c-format
 msgid "Error saving state %s"
 msgstr "Erro ao salvar o state %s"
@@ -449,27 +449,27 @@ msgstr "Falhou em carregar a aba preguiçosa '%s'"
 msgid "Browse"
 msgstr "Explorar"
 
-#: dialogs/display-config.cpp:137 dialogs/display-config.cpp:146
-#: dialogs/display-config.cpp:165 dialogs/display-config.cpp:170
+#: dialogs/display-config.cpp:147 dialogs/display-config.cpp:156
+#: dialogs/display-config.cpp:175 dialogs/display-config.cpp:180
 msgid "Invalid value for Default magnification."
 msgstr "Valor inválido pra ampliação padrão."
 
-#: dialogs/display-config.cpp:458
+#: dialogs/display-config.cpp:545
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
 msgstr "Falhou em carregar a aba '%s' do DisplayConfig"
 
-#: dialogs/display-config.cpp:718
+#: dialogs/display-config.cpp:777
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
 msgstr "Nem HDR nem SDR de 10 bits estão disponíveis: nenhum renderizador nativo de Wayland (Vulkan) foi achado, então a tela voltou pro XWayland (só no SDR de 8 bits)."
 
-#: dialogs/display-config.cpp:909
+#: dialogs/display-config.cpp:968
 msgid "Invalid color correction profile"
 msgstr "Perfil inválido de correção das cores"
 
-#: dialogs/display-config.cpp:1132 xrc/DisplayConfigBasic.xrc:171
+#: dialogs/display-config.cpp:1191 xrc/DisplayConfigBasic.xrc:171
 #: xrc/DisplayConfigBasic.xrc:211 xrc/DisplayConfigOSD.xrc:20
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
@@ -477,22 +477,252 @@ msgstr "Perfil inválido de correção das cores"
 msgid "None"
 msgstr "Nenhum"
 
-#: dialogs/display-config.cpp:1194
+#: dialogs/display-config.cpp:1253
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Nenhum plugin rpi usável foi encontrado em %s"
 
-#: dialogs/display-config.cpp:1288 dialogs/display-config.cpp:1676
+#: dialogs/display-config.cpp:1313
+msgid "DLSS-NR (Experimental)"
+msgstr ""
+
+#: dialogs/display-config.cpp:1332
+msgid "Enable &DLSS-NR"
+msgstr ""
+
+#: dialogs/display-config.cpp:1333
+msgid ""
+"Runs every frame through the DLSS-NR neural rendering model. Very slow and "
+"experimental."
+msgstr ""
+
+#: dialogs/display-config.cpp:1335
+msgid "Use Frame &History"
+msgstr ""
+
+#: dialogs/display-config.cpp:1336
+msgid ""
+"Feeds the previous filtered frame back into the model, for steadier motion. "
+"Unchecked, every frame is filtered on its own exactly as the nr_frame "
+"command filters a picture, and the filter runs faster."
+msgstr ""
+
+#: dialogs/display-config.cpp:1347
+msgid "&Pre-filter"
+msgstr ""
+
+#: dialogs/display-config.cpp:1349
+msgid ""
+"Run DLSS-NR on the emulated image, then let the display filter scale the "
+"result. The cheapest: the model sees the unscaled frame."
+msgstr ""
+
+#: dialogs/display-config.cpp:1352
+msgid "P&ost-filter"
+msgstr ""
+
+#: dialogs/display-config.cpp:1353
+msgid "Run DLSS-NR over the display filter's output, at the filtered size."
+msgstr ""
+
+#: dialogs/display-config.cpp:1356
+msgid "At display si&ze"
+msgstr ""
+
+#: dialogs/display-config.cpp:1357
+msgid ""
+"Scale the display filter's output up to the size it is shown at and run "
+"DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds "
+"the cost."
+msgstr ""
+
+#: dialogs/display-config.cpp:1360
+msgid "Apply:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1374 dialogs/joypad-config.cpp:195
+#: xrc/GBColorPrefPanel.xrc:10
+msgid "Standard"
+msgstr "Padrão"
+
+#: dialogs/display-config.cpp:1375
+msgid "Natural"
+msgstr ""
+
+#: dialogs/display-config.cpp:1376
+msgid "Cinematic"
+msgstr ""
+
+#: dialogs/display-config.cpp:1377
+msgid "Neutral"
+msgstr ""
+
+#: dialogs/display-config.cpp:1378
+msgid "Vendor"
+msgstr ""
+
+#: dialogs/display-config.cpp:1379
+msgid ""
+"The style, local tone and local structure the model is conditioned on. "
+"Neutral turns local tone and structure off, Vendor raises structure."
+msgstr ""
+
+#: dialogs/display-config.cpp:1387 xrc/DisplayConfigColorCorrection.xrc:11
+msgid "Profile:"
+msgstr "Perfil:"
+
+#: dialogs/display-config.cpp:1389
+msgid "Intensity:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1391
+msgid ""
+"Blend of the model's picture against the game's. Above 100% extrapolates."
+msgstr ""
+
+#: dialogs/display-config.cpp:1393
+msgid "Maximum Height:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1394 dialogs/display-config.cpp:1434
+msgid "px"
+msgstr ""
+
+#: dialogs/display-config.cpp:1395
+msgid ""
+"Frames taller than this are scaled down before the model runs, and back up "
+"after. Lower is faster."
+msgstr ""
+
+#: dialogs/display-config.cpp:1400
+msgid "Profile"
+msgstr ""
+
+#: dialogs/display-config.cpp:1401
+msgid "Off"
+msgstr ""
+
+#: dialogs/display-config.cpp:1409
+msgid "Style Index:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1411
+msgid ""
+"The vendor style index the model is conditioned on (nr_frame --style-index)."
+" Profile keeps the profile's."
+msgstr ""
+
+#: dialogs/display-config.cpp:1412
+msgid "Local Tone:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1414
+msgid ""
+"Local tone the model is conditioned on (nr_frame --local-tone). Profile "
+"keeps the profile's."
+msgstr ""
+
+#: dialogs/display-config.cpp:1415
+msgid "Local Structure:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1417
+msgid ""
+"Local structure the model is conditioned on (nr_frame --local-structure). "
+"Profile keeps the profile's."
+msgstr ""
+
+#: dialogs/display-config.cpp:1418
+msgid "Skin Structure:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1420
+msgid ""
+"Structure on skin, through the automatic mask (nr_frame --skin-structure). "
+"Setting this or Automatic Mask turns the automatic mask on."
+msgstr ""
+
+#: dialogs/display-config.cpp:1421
+msgid "Automatic Mask:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1423
+msgid ""
+"Structure through the automatic mask outside skin (nr_frame --auto-mask)."
+msgstr ""
+
+#: dialogs/display-config.cpp:1424
+msgid "Frame Index:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1426
+msgid "Seeds the model's noise channels (nr_frame --frame-index)."
+msgstr ""
+
+#: dialogs/display-config.cpp:1427
+msgid "Detail Strength:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1429
+msgid ""
+"High-frequency weight of the model's change (nr_frame --detail-strength)."
+msgstr ""
+
+#: dialogs/display-config.cpp:1430
+msgid "Colour Strength:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1432
+msgid ""
+"Low-frequency weight of the model's change (nr_frame --colour-strength)."
+msgstr ""
+
+#: dialogs/display-config.cpp:1433
+msgid "Detail Radius:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1435
+msgid ""
+"Radius of the split between detail and colour (nr_frame --detail-radius)."
+msgstr ""
+
+#: dialogs/display-config.cpp:1441
+msgid ""
+"A PNG control mask (nr_frame --control-mask): red scales the blend, green "
+"the tone and blue the structure. It is resized to the filtered frame."
+msgstr ""
+
+#: dialogs/display-config.cpp:1443
+msgid "Browse..."
+msgstr ""
+
+#: dialogs/display-config.cpp:1444
+msgid "Clear"
+msgstr ""
+
+#: dialogs/display-config.cpp:1446
+msgid "Select a DLSS-NR control mask"
+msgstr ""
+
+#: dialogs/display-config.cpp:1447
+msgid "PNG Images (*.png)|*.png;*.PNG"
+msgstr ""
+
+#: dialogs/display-config.cpp:1460
+msgid "Control Mask:"
+msgstr ""
+
+#: dialogs/display-config.cpp:1520 dialogs/display-config.cpp:1908
 #: xrc/DisplayConfigBasic.xrc:187
 msgid "Plugin"
 msgstr "Plugin"
 
-#: dialogs/display-config.cpp:1297
+#: dialogs/display-config.cpp:1529
 #, c-format
 msgid "Using pixel filter: %s"
 msgstr "Usando o filtro dos pixels: %s"
 
-#: dialogs/display-config.cpp:1307
+#: dialogs/display-config.cpp:1539
 #, c-format
 msgid "interframe blend: %s"
 msgstr "Mistura dos interframes: %s"
@@ -690,10 +920,6 @@ msgstr "Falhou em carregar o JoyPanel"
 msgid "Player %u"
 msgstr "Jogador %u"
 
-#: dialogs/joypad-config.cpp:195 xrc/GBColorPrefPanel.xrc:10
-msgid "Standard"
-msgstr "Padrão"
-
 #: dialogs/joypad-config.cpp:195
 msgid "Special"
 msgstr "Especial"
@@ -794,7 +1020,7 @@ msgstr "Selecionar o arquivo das trapaças"
 msgid "VBA cheat lists (*.clt)|*.clt|CHT cheat lists (*.cht)|*.cht"
 msgstr "Listas de trapaças do VBA (*.clt)|*.clt| Listas de trapaças do CHT (*.cht)|*.cht"
 
-#: guiinit.cpp:316 panel.cpp:1241
+#: guiinit.cpp:316 panel.cpp:1243
 msgid "Loaded cheats"
 msgstr "Trapaças carregadas"
 
@@ -918,58 +1144,58 @@ msgstr "Valor inválido %s pra opção %s"
 msgid "Unknown option %s with value %s"
 msgstr "Opção desconhecida %s com o valor %s"
 
-#: panel.cpp:767
+#: panel.cpp:769
 #, c-format
 msgid ""
 "VisualBoyAdvance-M needs your permission to open \"%s\". Allow this folder "
 "to open it and any other ROM in it from now on, or choose the file alone."
 msgstr "O VisualBoyAdvance-M precisa da sua permissão para abrir o \"%s\". Permita que esta pasta abra ela e qualquer outra ROM nela a partir de agora, ou escolha o arquivo sozinho."
 
-#: panel.cpp:771
+#: panel.cpp:773
 msgid "Allow"
 msgstr "Permitir"
 
-#: panel.cpp:812
+#: panel.cpp:814
 #, c-format
 msgid "%s is not a valid ROM file"
 msgstr "O %s não é um arquivo de ROM válido"
 
-#: panel.cpp:813 panel.cpp:879 panel.cpp:973
+#: panel.cpp:815 panel.cpp:881 panel.cpp:975
 msgid "Problem loading file"
 msgstr "Problema ao carregar o arquivo"
 
-#: panel.cpp:878
+#: panel.cpp:880
 #, c-format
 msgid "Unable to load Game Boy ROM %s"
 msgstr "Incapaz de carregar a ROM do Game Boy %s"
 
-#: panel.cpp:919
+#: panel.cpp:921
 msgid ""
 "Cannot use Game Boy BIOS file when Colorizer Hack is enabled, disabling Game"
 " Boy BIOS file."
 msgstr "Não pode usar a BIOS do Game Boy quando o Hack Colorizador estiver ativado, desativando o arquivo da BIOS do Game Boy."
 
-#: panel.cpp:949 panel.cpp:1077
+#: panel.cpp:951 panel.cpp:1079
 #, c-format
 msgid "Could not load BIOS %s"
 msgstr "Não pôde carregar a BIOS %s"
 
-#: panel.cpp:972
+#: panel.cpp:974
 #, c-format
 msgid "Unable to load Game Boy Advance ROM %s"
 msgstr "Incapaz de carregar a ROM do Game Boy Advance %s"
 
-#: panel.cpp:1138
+#: panel.cpp:1140
 msgid ""
 "Active link mode does not match this ROM; use Options > Link > Start Link to"
 " reconnect."
 msgstr "O modo do link ativo não combina com esta ROM, use Opções > Link > Iniciar Link pra reconectar."
 
-#: panel.cpp:1284
+#: panel.cpp:1286
 msgid " player "
 msgstr " jogador "
 
-#: panel.cpp:1341
+#: panel.cpp:1343
 #, c-format
 msgid ""
 "Could not create Native Saves directory:\n"
@@ -978,11 +1204,11 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório de Salvamentos Nativos:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: panel.cpp:1342 panel.cpp:1363 wxvbam.cpp:1964
+#: panel.cpp:1344 panel.cpp:1365 wxvbam.cpp:1964
 msgid "Directory Error"
 msgstr "Erro do Diretório"
 
-#: panel.cpp:1362
+#: panel.cpp:1364
 #, c-format
 msgid ""
 "Could not create Emulator Saves directory:\n"
@@ -991,774 +1217,774 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "Não pôde criar o diretório dos Salvamentos do Emulador:\n%s\n\nPor favor verifique seu caminho configurado em Opções > Diretórios."
 
-#: panel.cpp:1510
+#: panel.cpp:1512
 #, c-format
 msgid "Loaded state %s"
 msgstr "Carregou o state %s"
 
-#: panel.cpp:1510
+#: panel.cpp:1512
 #, c-format
 msgid "Error loading state %s"
 msgstr "Erro ao carregar o state %s"
 
-#: panel.cpp:1534
+#: panel.cpp:1536
 #, c-format
 msgid "Saved state %s"
 msgstr "State salvo %s"
 
-#: panel.cpp:1940
+#: panel.cpp:1942
 msgid "Done"
 msgstr "Feito"
 
-#: panel.cpp:1977
+#: panel.cpp:1979
 msgid "Running quick first-time performance test"
 msgstr "Executando um teste rápido de performance pela primeira vez"
 
-#: panel.cpp:2130
+#: panel.cpp:2132
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported; looking for another"
 msgstr "O modo de tela cheia %d x %d - %d @ %d não é suportado; procurando por outro"
 
-#: panel.cpp:2168
+#: panel.cpp:2170
 #, c-format
 msgid "Fullscreen mode %d x %d - %d @ %d not supported"
 msgstr "O modo de tela cheia %d x %d - %d @ %d não é suportado"
 
-#: panel.cpp:2173
+#: panel.cpp:2175
 #, c-format
 msgid "Valid mode: %d x %d - %d @ %d"
 msgstr "Modo válido: %d x %d - %d @ %d"
 
-#: panel.cpp:2181
+#: panel.cpp:2183
 #, c-format
 msgid "Chose mode %d x %d - %d @ %d"
 msgstr "Escolher o modo %d x %d - %d @ %d"
 
-#: panel.cpp:2185
+#: panel.cpp:2187
 #, c-format
 msgid "Failed to change mode to %d x %d - %d @ %d"
 msgstr "Falhou em mudar o modo pra %d x %d - %d @ %d"
 
-#: panel.cpp:2288
+#: panel.cpp:2290
 msgid "Not a valid Game Boy Advance cartridge"
 msgstr "Não é um cartucho de Game Boy Advance válido"
 
-#: panel.cpp:2572
+#: panel.cpp:2574
 msgid "No memory for rewinding"
 msgstr "Não há memória pra retroceder"
 
-#: panel.cpp:2582
+#: panel.cpp:2584
 msgid "Error writing rewind state"
 msgstr "Erro ao gravar o estado do retrocesso"
 
-#: panel.cpp:2800
+#: panel.cpp:2802
 msgid "Open GBA..."
 msgstr "Abrir GBA..."
 
-#: panel.cpp:2801
+#: panel.cpp:2803
 msgid "Open Game Boy..."
 msgstr "Abrir Game Boy..."
 
-#: panel.cpp:2802
+#: panel.cpp:2804
 msgid "Open Game Boy Color..."
 msgstr "Abrir Game Boy Color..."
 
-#: panel.cpp:2804
+#: panel.cpp:2806
 msgid "Pause"
 msgstr "Pausar"
 
-#: panel.cpp:2805
+#: panel.cpp:2807
 msgid "Reset"
 msgstr "Resetar"
 
-#: panel.cpp:2806
+#: panel.cpp:2808
 msgid "Save state"
 msgstr "Salvar o state"
 
-#: panel.cpp:2807
+#: panel.cpp:2809
 msgid "Load state"
 msgstr "Carregar o state"
 
-#: panel.cpp:2809
+#: panel.cpp:2811
 msgid "Full screen"
 msgstr "Tela cheia"
 
-#: panel.cpp:2814
+#: panel.cpp:2816
 msgid "Hide menu bar"
 msgstr "Esconder a Barra do Menu"
 
-#: panel.cpp:2829
+#: panel.cpp:2831
 msgid "Settings..."
 msgstr "Configurações..."
 
-#: panel.cpp:2831
+#: panel.cpp:2833
 msgid "Quit"
 msgstr "Sair"
 
-#: panel.cpp:2994
+#: panel.cpp:2996
 msgid "DLSS NR is not available in this build; turning it off."
 msgstr "O DLSS NR não está disponível nesta versão; desligando."
 
-#: panel.cpp:4613
+#: panel.cpp:4657
 msgid "DLSS NR: loading model..."
 msgstr "DLSS NR: carregando modelo..."
 
-#: panel.cpp:4635
+#: panel.cpp:4679
 #, c-format
 msgid "DLSS NR filter failed: %s"
 msgstr "O Filtro DLSS NR falhou: %s"
 
-#: panel.cpp:4636
+#: panel.cpp:4680
 msgid "DLSS NR unavailable, filter disabled"
 msgstr "DLSS NR indisponível, filtro desativado"
 
-#: panel.cpp:4646
+#: panel.cpp:4690
 msgid "DLSS NR ready"
 msgstr "DLSS NR pronto"
 
-#: panel.cpp:4997
+#: panel.cpp:5041
 msgid "Failed to set wayland display"
 msgstr "Falhou em definir a exibição do wayland"
 
-#: panel.cpp:5039
+#: panel.cpp:5083
 msgid "Failed to create Android video surface"
 msgstr "Falhou em criar a superfície de vídeo do Android"
 
-#: panel.cpp:5058
+#: panel.cpp:5102
 msgid "Failed to initialize SDL video subsystem"
 msgstr "Falhou em inicializar o sub-sistema de vídeo do SDL"
 
-#: panel.cpp:5070
+#: panel.cpp:5114
 msgid "Failed to initialize SDL video"
 msgstr "Falhou em inicializar o vídeo do SDL"
 
-#: panel.cpp:5085
+#: panel.cpp:5129
 msgid "Failed to set wayland surface"
 msgstr "Falhou em definir a superfície do wayland"
 
-#: panel.cpp:5129
+#: panel.cpp:5173
 msgid "Failed to set parent window"
 msgstr "Falhou em definir a janela pai"
 
-#: panel.cpp:5141
+#: panel.cpp:5185
 msgid "Failed to set OpenGL properties"
 msgstr "Falhou em definir as propriedades do OpenGL"
 
-#: panel.cpp:5162 panel.cpp:5355
+#: panel.cpp:5206 panel.cpp:5399
 msgid "Failed to create SDL window"
 msgstr "Falhou em criar a janela SDL"
 
-#: panel.cpp:5273 panel.cpp:5384
+#: panel.cpp:5317 panel.cpp:5428
 msgid "Renderer creating failed, using default renderer"
 msgstr "A criação do renderizador falhou, usando o renderizador padrão"
 
-#: panel.cpp:5274
+#: panel.cpp:5318
 #, c-format
 msgid "SDL Error: %s"
 msgstr "Erro do SDL: %s"
 
-#: panel.cpp:5281 panel.cpp:5390
+#: panel.cpp:5325 panel.cpp:5434
 msgid "Failed to create SDL renderer"
 msgstr "Falhou em criar o renderizador SDL"
 
-#: panel.cpp:5340
+#: panel.cpp:5384
 msgid "Failed to set vsync for SDL renderer"
 msgstr "Falhou em definir o vsync no renderizador SDL"
 
-#: panel.cpp:5344 panel.cpp:5379
+#: panel.cpp:5388 panel.cpp:5423
 #, c-format
 msgid "SDL renderer: %s"
 msgstr "Renderizador SDL: %s"
 
-#: panel.cpp:5364
+#: panel.cpp:5408
 msgid "SDL renderer: default"
 msgstr "Renderizador SDL: padrão"
 
-#: panel.cpp:7159
+#: panel.cpp:7203
 msgid "Enabling EGL VSync."
 msgstr "Ativando o VSync do EGL."
 
-#: panel.cpp:7161
+#: panel.cpp:7205
 msgid "Disabling EGL VSync."
 msgstr "Desativando o VSync do EGL."
 
-#: panel.cpp:7169
+#: panel.cpp:7213
 msgid "Enabling GLX VSync."
 msgstr "Ativando o VSync do GLX."
 
-#: panel.cpp:7171
+#: panel.cpp:7215
 msgid "Disabling GLX VSync."
 msgstr "Desativando o VSync do GLX."
 
-#: panel.cpp:7189
+#: panel.cpp:7233
 msgid "Failed to set glXSwapIntervalEXT"
 msgstr "Falhou em definir o glXSwapIntervalEXT"
 
-#: panel.cpp:7198
+#: panel.cpp:7242
 msgid "Failed to set glXSwapIntervalSGI"
 msgstr "Falhou em definir o glXSwapIntervalSGI"
 
-#: panel.cpp:7207
+#: panel.cpp:7251
 msgid "Failed to set glXSwapIntervalMESA"
 msgstr "Falhou em definir o glXSwapIntervalMESA"
 
-#: panel.cpp:7216
+#: panel.cpp:7260
 msgid "No support for wglGetExtensionsStringEXT"
 msgstr "Não há suporte pro 'wglGetExtensionsStringEXT'"
 
-#: panel.cpp:7219
+#: panel.cpp:7263
 msgid "No support for WGL_EXT_swap_control"
 msgstr "Não há suporte pro WGL_EXT_swap_control"
 
-#: panel.cpp:7228
+#: panel.cpp:7272
 msgid "Failed to set wglSwapIntervalEXT"
 msgstr "Falhou em definir o wglSwapIntervalEXT"
 
-#: panel.cpp:7234
+#: panel.cpp:7278
 msgid "No VSYNC available on this platform"
 msgstr "Não há VSYNC disponível nesta plataforma"
 
-#: panel.cpp:7323
+#: panel.cpp:7367
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
 msgstr "HDR: falhou em criar a superfície PQ BT.2020; Voltando pro SDR."
 
-#: panel.cpp:7572
+#: panel.cpp:7616
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr "Falhou em carregar as DLLs D3D12 ou D3DCompiler"
 
-#: panel.cpp:7598
+#: panel.cpp:7642
 msgid "Failed to get D3D12 function pointers"
 msgstr "Falhou em obter os ponteiros da função D3D12"
 
-#: panel.cpp:7603
+#: panel.cpp:7647
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr "Falhou em criar a fábrica do DXGI: 0x%08X"
 
-#: panel.cpp:7617
+#: panel.cpp:7661
 msgid "No hardware adapter found, falling back to WARP"
 msgstr "Nenhum adaptador de hardware foi achado, voltando pro WARP"
 
-#: panel.cpp:7624
+#: panel.cpp:7668
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr "Falhou em criar o dispositivo D3D12: 0x%08X"
 
-#: panel.cpp:7625
+#: panel.cpp:7669
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr "Dispositivo D3D12 criado (%s)"
 
-#: panel.cpp:7632
+#: panel.cpp:7676
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr "Falhou em criar a fila de comando: 0x%08X"
 
-#: panel.cpp:7658
+#: panel.cpp:7702
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr "Falhou em criar a cadeia de troca: 0x%08X"
 
-#: panel.cpp:7664
+#: panel.cpp:7708
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr "Falhou em obter o IDXGISwapChain3: 0x%08X"
 
-#: panel.cpp:7695
+#: panel.cpp:7739
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
 msgstr "HDR: a tela/cadeia de troca não suporta BT.2020 PQ; A saída será SDR."
 
-#: panel.cpp:7705
+#: panel.cpp:7749
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr "Falhou em criar a pilha do RTV: 0x%08X"
 
-#: panel.cpp:7714
+#: panel.cpp:7758
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr "Falhou em criar a pilha do SRV: 0x%08X"
 
-#: panel.cpp:7721
+#: panel.cpp:7765
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr "Falhou em obter de volta o buffer %u: 0x%08X"
 
-#: panel.cpp:7729
+#: panel.cpp:7773
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr "Falhou em criar o alocador de comando: 0x%08X"
 
-#: panel.cpp:7734
+#: panel.cpp:7778
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr "Falhou em criar a lista de comandos: 0x%08X"
 
-#: panel.cpp:7773
+#: panel.cpp:7817
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr "Falhou em serializar a assinatura raiz: %s"
 
-#: panel.cpp:7780
+#: panel.cpp:7824
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr "Falhou em criar a assinatura raiz: 0x%08X"
 
-#: panel.cpp:7794
+#: panel.cpp:7838
 #, c-format
 msgid "VS compile failed: %s"
 msgstr "A compilação do VS falhou: %s"
 
-#: panel.cpp:7802
+#: panel.cpp:7846
 #, c-format
 msgid "PS compile failed: %s"
 msgstr "A compilação do PS falhou: %s"
 
-#: panel.cpp:7831
+#: panel.cpp:7875
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr "Falhou em criar o PSO: 0x%08X"
 
-#: panel.cpp:7851
+#: panel.cpp:7895
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr "Falhou em criar o buffer do vértice: 0x%08X"
 
-#: panel.cpp:7860
+#: panel.cpp:7904
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr "Falhou em criar a cerca: 0x%08X"
 
-#: panel.cpp:7863
+#: panel.cpp:7907
 msgid "Failed to create fence event"
 msgstr "Falhou em criar o evento da cerca"
 
-#: panel.cpp:7865
+#: panel.cpp:7909
 msgid "D3D12 pipeline fully initialized"
 msgstr "Pipeline do D3D12 totalmente inicializado"
 
-#: panel.cpp:7897
+#: panel.cpp:7941
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX12DrawingPanel inicializado: %dx%d (escala: %f)"
 
-#: panel.cpp:7919
+#: panel.cpp:7963
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr "Os Buffers do Redimensionamento falharam: 0x%08X"
 
-#: panel.cpp:7930
+#: panel.cpp:7974
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr "A cadeia de troca foi redimensionada pra %dx%d"
 
-#: panel.cpp:8196
+#: panel.cpp:8240
 msgid "Texture upload failed"
 msgstr "O upload da textura falhou"
 
-#: panel.cpp:8350
+#: panel.cpp:8394
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11: falhou em criar o dispositivo; O renderizador simples usará o caminho do software (wx)."
 
-#: panel.cpp:8402
+#: panel.cpp:8446
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
 msgstr "D3D11: falhou em criar a cadeia de troca: 0x%08X"
 
-#: panel.cpp:8468
+#: panel.cpp:8512
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
 msgstr "D3D11: o d3dcompiler_47.dll não foi achado; O renderizador simples usará o caminho do software (wx)."
 
-#: panel.cpp:8520
+#: panel.cpp:8564
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11: a configuração do shader dos blits falhou; O renderizador simples usará o caminho do software (wx)."
 
-#: panel.cpp:8805
+#: panel.cpp:8849
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "Usando o Direct3D 9Ex (carregado dinamicamente)"
 
-#: panel.cpp:8809
+#: panel.cpp:8853
 msgid "Failed to load d3d9.dll"
 msgstr "Falhou em carregar o d3d9.dll"
 
-#: panel.cpp:8818
+#: panel.cpp:8862
 msgid "Failed to create Direct3D 9 interface"
 msgstr "Falhou em criar a interface do Direct3D 9"
 
-#: panel.cpp:8821
+#: panel.cpp:8865
 msgid "Using Direct3D 9"
 msgstr "Usando o Direct3D 9"
 
-#: panel.cpp:8828
+#: panel.cpp:8872
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "Falhou em obter o modo de exibição do adaptador: 0x%08X"
 
-#: panel.cpp:8852
+#: panel.cpp:8896
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx não suportado, voltando ao efeito de troca do descarte"
 
-#: panel.cpp:8868
+#: panel.cpp:8912
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "Processamento de vértice do hardware não disponível, voltando pro software"
 
-#: panel.cpp:8892
+#: panel.cpp:8936
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "Falhou em criar o dispositivo Direct3D: 0x%08X"
 
-#: panel.cpp:8897
+#: panel.cpp:8941
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Dispositivo Direct3D 9%s criado com sucesso (SwapEffect: %s)"
 
-#: panel.cpp:8933
+#: panel.cpp:8977
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DXDrawingPanel inicializado: %dx%d (escala: %f)"
 
-#: panel.cpp:8955
+#: panel.cpp:8999
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "Falhou em obter o modo de exibição do adaptador pro reset: 0x%08X"
 
-#: panel.cpp:8987
+#: panel.cpp:9031
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "Tentando resetar o dispositivo Direct3D (SwapEffect: %s)"
 
-#: panel.cpp:8994
+#: panel.cpp:9038
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "O reset com o FlipEx falhou, tentando de novo com o efeito de troca do descarte"
 
-#: panel.cpp:9006
+#: panel.cpp:9050
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "Falhou em resetar o dispositivo Direct3D: 0x%08X"
 
-#: panel.cpp:9011
+#: panel.cpp:9055
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Dispositivo Direct3D resetado com sucesso (SwapEffect Final: %s)"
 
-#: panel.cpp:9079
+#: panel.cpp:9123
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "Falhou em criar a textura: 0x%08X"
 
-#: panel.cpp:9091
+#: panel.cpp:9135
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "Falhou em trancar a textura: 0x%08X"
 
-#: panel.cpp:9283
+#: panel.cpp:9327
 msgid "Memory allocation error"
 msgstr "Erro de alocação da memória"
 
-#: panel.cpp:9286
+#: panel.cpp:9330
 msgid "Error initializing codec"
 msgstr "Erro ao inicializar o codec"
 
-#: panel.cpp:9289 panel.cpp:9354 panel.cpp:9402
+#: panel.cpp:9333 panel.cpp:9398 panel.cpp:9446
 msgid "Error writing to output file"
 msgstr "Erro ao gravar no arquivo de saída"
 
-#: panel.cpp:9292
+#: panel.cpp:9336
 msgid "Can't guess output format from file name"
 msgstr "Não pôde adivinhar o formato de saída a partir do nome do arquivo"
 
-#: panel.cpp:9297
+#: panel.cpp:9341
 msgid "Programming error; aborting!"
 msgstr "Erro de programação; abortando!"
 
-#: panel.cpp:9315 panel.cpp:9366
+#: panel.cpp:9359 panel.cpp:9410
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "Incapaz de começar a gravar em %s (%s)"
 
-#: panel.cpp:9410
+#: panel.cpp:9454
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "Erro na gravação do áudio/vídeo (%s); abortando"
 
-#: panel.cpp:9416
+#: panel.cpp:9460
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "Erro na gravação do áudio (%s); abortando"
 
-#: panel.cpp:9426
+#: panel.cpp:9470
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "Erro na gravação do vídeo (%s); abortando"
 
-#: panel.cpp:9745
+#: panel.cpp:9789
 msgid "Renderer failed to initialize; trying the next available renderer."
 msgstr "O renderizador falhou em inicializar; Tentando o próximo renderizador disponível."
 
-#: panel.cpp:9753
+#: panel.cpp:9797
 msgid "No renderer could be initialized."
 msgstr "Nenhum renderizador pôde ser inicializado."
 
-#: panel.cpp:9847
+#: panel.cpp:9891
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
 msgstr "Nenhum renderizador pôde apresentar cor de 10 bits de profundidade; Usando 8 bits pra esta sessão."
 
-#: panel.cpp:9936
+#: panel.cpp:9980
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "O Metal não está disponível, revertendo pro padrão OpenGL"
 
-#: panel.cpp:9949
+#: panel.cpp:9993
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
 msgstr "O OpenGL não está disponível no Wayland sem o EGL, usando o Vulkan"
 
-#: panel.cpp:9973
+#: panel.cpp:10017
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "O Vulkan está indisponível, usando por padrão OpenGL"
 
-#: panel.cpp:10266
+#: panel.cpp:10310
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volume: %d %%"
 
-#: panel.cpp:11060
+#: panel.cpp:11104
 msgid "Vulkan device created successfully"
 msgstr "Dispositivo Vulkan criado com sucesso"
 
-#: panel.cpp:11210
+#: panel.cpp:11254
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "Nem VK_KHR_wayland_surface e nem o VK_KHR_xlib_surface estão disponíveis — não pôde criar uma superfície do Vulkan neste sistema"
 
-#: panel.cpp:11255
+#: panel.cpp:11299
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "Falhou em criar a instância do Vulkan: %d"
 
-#: panel.cpp:11258
+#: panel.cpp:11302
 msgid "Vulkan instance created"
 msgstr "Instância do Vulkan criada"
 
-#: panel.cpp:11277
+#: panel.cpp:11321
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "Falhou em criar o dispositivo Win32 do Vulkan: %d"
 
-#: panel.cpp:11300
+#: panel.cpp:11344
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "Falhou em obter a alavanca do NSView pra superfície do Vulkan"
 
-#: panel.cpp:11311
+#: panel.cpp:11355
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "Falhou em criar a superfície do Vulkan pro Metal: %d"
 
-#: panel.cpp:11336
+#: panel.cpp:11380
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr "Falhou em obter a alavanca do QWidget pra superfície do Vulkan"
 
-#: panel.cpp:11346
+#: panel.cpp:11390
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr "Falhou em obter ANativeWindow para o painel"
 
-#: panel.cpp:11356
+#: panel.cpp:11400
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr "Falhou em criar a superfície do Android pro Vulkan : %d"
 
-#: panel.cpp:11373
+#: panel.cpp:11417
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "Falhou em criar a superfície do Vulkan pro Xlib: %d"
 
-#: panel.cpp:11429
+#: panel.cpp:11473
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr "Wayland: wl_compositor/wl_subcompositor indisponível; não consegue criar a sub-superfície do Vulkan"
 
-#: panel.cpp:11438
+#: panel.cpp:11482
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr "Wayland: falhou em criar a superfície do Vulkan pro Xlib: %d"
 
-#: panel.cpp:11476
+#: panel.cpp:11520
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "Falhou em criar a superfície do Vulkan pro Wayland: %d"
 
-#: panel.cpp:11515
+#: panel.cpp:11559
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "Falhou em obter as alavancas de exibição/superfície do Wayland"
 
-#: panel.cpp:11533
+#: panel.cpp:11577
 msgid "No supported Vulkan surface extension available"
 msgstr "Nenhuma extensão de superfície do Vulkan suportada disponível"
 
-#: panel.cpp:11544
+#: panel.cpp:11588
 msgid "No Vulkan physical devices found"
 msgstr "Nenhum dispositivo físico do Vulkan foi achado"
 
-#: panel.cpp:11603
+#: panel.cpp:11647
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "Dispositivo Vulkan selecionado: %s"
 
-#: panel.cpp:11607
+#: panel.cpp:11651
 msgid "No suitable Vulkan physical device found"
 msgstr "Nenhum dispositivo físico adequado do Vulkan foi achado"
 
-#: panel.cpp:11794
+#: panel.cpp:11838
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "Falhou em criar o dispositivo lógico do Vulkan: %d"
 
-#: panel.cpp:11986
+#: panel.cpp:12030
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "Falhou em criar a troca de cadeia do Vulkan: %d"
 
-#: panel.cpp:12026
+#: panel.cpp:12070
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr "Cadeia de troca criada: %ux%u, %u imagens, vsync=%s, pré-transformação=0x%x"
 
-#: panel.cpp:12131
+#: panel.cpp:12175
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "Falhou em criar a visualização de imagem da cadeia de troca %zu: %d"
 
-#: panel.cpp:12177
+#: panel.cpp:12221
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "Falhou em criar o passe da renderização: %d"
 
-#: panel.cpp:12199
+#: panel.cpp:12243
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "Falhou em criar o framebuffer %zu: %d"
 
-#: panel.cpp:12222
+#: panel.cpp:12266
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "Falhou em criar o esquema do conjunto de descritores: %d"
 
-#: panel.cpp:12245
+#: panel.cpp:12289
 msgid "Failed to create shader modules"
 msgstr "Falhou em criar os módulos do shader"
 
-#: panel.cpp:12322
+#: panel.cpp:12366
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "Falhou em criar o esquema do pipeline: %d"
 
-#: panel.cpp:12359
+#: panel.cpp:12403
 msgid "Failed to create overlay pipeline"
 msgstr "Falhou em criar o pipeline da sobreposição"
 
-#: panel.cpp:12369
+#: panel.cpp:12413
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "Falhou em criar o pipeline gráfico: %d"
 
-#: panel.cpp:12385
+#: panel.cpp:12429
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "Falhou em criar o agrupamento dos comandos: %d"
 
-#: panel.cpp:12403
+#: panel.cpp:12447
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "Falhou em alocar os buffers de comando: %d"
 
-#: panel.cpp:12423
+#: panel.cpp:12467
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "Falhou em criar os objetos de sincronização pro frame %d"
 
-#: panel.cpp:12447
+#: panel.cpp:12491
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "Falhou em criar o agrupamento dos descritores: %d"
 
-#: panel.cpp:12459
+#: panel.cpp:12503
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "Falhou em alocar o agrupamento dos descritores: %d"
 
-#: panel.cpp:12467
+#: panel.cpp:12511
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr "Falhou em alocar o conjunto de descritores da sobreposição: %d"
 
-#: panel.cpp:12506
+#: panel.cpp:12550
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "Falhou em criar a imagem da textura: %d"
 
-#: panel.cpp:12520
+#: panel.cpp:12564
 msgid "Failed to allocate texture memory"
 msgstr "Falhou em alocar a memória das texturas"
 
-#: panel.cpp:12536
+#: panel.cpp:12580
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "Falhou em criar a visualização da imagem da textura: %d"
 
-#: panel.cpp:12554
+#: panel.cpp:12598
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "Falhou em criar o coletor de amostra das texturas: %d"
 
-#: panel.cpp:12588
+#: panel.cpp:12632
 msgid "Failed to create staging buffer"
 msgstr "Falhou em criar o buffer de testes"
 
-#: panel.cpp:12603
+#: panel.cpp:12647
 msgid "Failed to allocate staging memory"
 msgstr "Falhou em alocar a memória dos testes"
 
-#: panel.cpp:12717
+#: panel.cpp:12761
 msgid "Failed to create overlay image"
 msgstr "Falhou em criar a imagem da sobreposição"
 
-#: panel.cpp:12731
+#: panel.cpp:12775
 msgid "Failed to allocate overlay image memory"
 msgstr "Falhou em alocar a memória da imagem da sobreposição"
 
-#: panel.cpp:12746
+#: panel.cpp:12790
 msgid "Failed to create overlay image view"
 msgstr "Falhou em criar a visualização da imagem da sobreposição"
 
-#: panel.cpp:12763
+#: panel.cpp:12807
 msgid "Failed to create overlay sampler"
 msgstr "Falhou em criar o coletor de amostras da sobreposição"
 
-#: panel.cpp:12800
+#: panel.cpp:12844
 msgid "Failed to create overlay staging buffer"
 msgstr "Falhou em criar o buffer de testes da sobreposição"
 
-#: panel.cpp:12814
+#: panel.cpp:12858
 msgid "Failed to allocate overlay staging memory"
 msgstr "Falhou em alocar a memória dos testes da sobreposição"
 
-#: panel.cpp:12892
+#: panel.cpp:12936
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VKDrawingPanel inicializado: %ux%u (escala: %f)"
 
-#: panel.cpp:12988
+#: panel.cpp:13032
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "Falhou em adquirir a imagem da cadeia de troca: %d"
 
-#: panel.cpp:13341
+#: panel.cpp:13385
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "Falhou em apresentar a imagem da cadeia de troca: %d"
@@ -2076,250 +2302,313 @@ msgstr "GameShark"
 msgid "Joypad %zu %s"
 msgstr "Joypad %zu %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:517
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
 msgid "Use bilinear filter with 3d renderer"
 msgstr "Usar o filtro bilinear com renderizador 3D"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:518
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:546
 msgid "Use the SDL pixel art filter with an SDL renderer"
 msgstr "Usar o filtro da arte dos pixels do SDL com um renderizador SDL"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:519
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
 msgid "Full-screen filter to apply"
 msgstr "Filtro de tela cheia a aplicar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:520
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:548
 msgid "Filter plugin library"
 msgstr "Biblioteca dos plugins dos filtros"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:522
-#: xrc/DisplayConfigBasic.xrc:221
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
 msgid "Run the DLSS NR neural filter alongside the display filter"
 msgstr "Execute o filtro neural do DLSS NR junto com o filtro de exibição"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:524
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid ""
 "Whether DLSS NR runs before or after the display filter, or at display size"
 msgstr "Seja o DLSS NR rodando antes ou depois do filtro de exibição, ou no tamanho da tela"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:525
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
+msgid ""
+"Blend of the DLSS NR picture against the source, in percent; above 100 "
+"extrapolates"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
+msgid ""
+"DLSS NR profile: 0 standard, 1 natural, 2 cinematic, 3 neutral, 4 vendor"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
+msgid ""
+"Frames taller than this are scaled down before DLSS NR runs, and back up "
+"after"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
+msgid "Feed the previous DLSS NR output back into the model"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
+msgid "DLSS NR style index; -1 keeps the profile's"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+msgid "DLSS NR local tone; negative keeps the profile's"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
+msgid "DLSS NR local structure; negative keeps the profile's"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
+msgid "DLSS NR structure on skin through the automatic mask; negative is off"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
+msgid ""
+"DLSS NR structure through the automatic mask outside skin; negative is off"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+msgid "High-frequency weight of the DLSS NR change"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
+msgid "Low-frequency weight of the DLSS NR change"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
+msgid "Radius of the DLSS NR split between detail and colour, in pixels"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
+msgid "Seeds the DLSS NR model's noise channels"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
+msgid ""
+"PNG control mask for DLSS NR: red scales the blend, green the tone, blue the"
+" structure"
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Directory containing RPI filter plugins"
 msgstr "Diretório contendo plugins de filtro RPI"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:526
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:582
 msgid "Interframe blending function"
 msgstr "Função de mistura dos interframes"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:527
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
 msgid "Bit depth"
 msgstr "Profundidade dos bits"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:528
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Keep window on top"
 msgstr "Manter a janela no topo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:530
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid "Maximum number of threads to run filters in"
 msgstr "Número máximo de threads pra executar os filtros"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:532
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
 msgid "Render method; if unsupported, simple method will be used"
 msgstr "Método de renderização; se não for suportado o método simples será usado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:533
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:589
 msgid "Default scale factor"
 msgstr "Fator de escala padrão"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:534
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
 msgid "Retain aspect ratio when resizing"
 msgstr "Reter a proporção do aspecto quando redimensionar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:535
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:591
 msgid "SDL renderer"
 msgstr "Renderizador SDL"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:536
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
 msgid "Color correction profile"
 msgstr "Perfil de correção das cores"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:538
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:594
 msgid "Auto-select color correction profile (sRGB for SDR, Rec2020 for HDR)"
 msgstr "Auto-selecionar o perfil de correção das cores (sRGB pra SDR, Rec2020 pra HDR)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:539
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:595
 msgid "Output HDR on supported displays and renderers"
 msgstr "HDR de saída nas telas e renderizadores suportados"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:541
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
 msgid "HDR diffuse (paper) white luminance, in nits"
 msgstr "HDR difusa (papel), luminância branca, em nível de brilho"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:543
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
 msgid "HDR peak/highlight luminance, in nits"
 msgstr "Luminância de pico/destaque do HDR, em nível de brilho"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:545
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
 msgid "Input level percentage above which HDR highlights ramp to peak"
 msgstr "Percentual do nível de entrada acima do qual os destaques do HDR aumentam para o pico"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:547
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
 msgid ""
 "HDR shadow contrast as a percentage gamma (100 = neutral; higher deepens "
 "blacks)"
 msgstr "Contraste da sombra do HDR como uma porcentagem do gama (100 = neutro; maior aprofunda os pretos)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
 msgid "Use a 10-bit deep color SDR visual for OpenGL (X11; reduces banding)"
 msgstr "Usar um visual SDR colorido profundo de 10 bits pro OpenGL (X11; reduz as faixas)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:553
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:609
 msgid "BIOS file to use for Game Boy, if enabled"
 msgstr "O arquivo da BIOS a usar pro Game Boy se ativado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
 msgid "Enable DX Colorization Hacks"
 msgstr "Ativar os hacks de colorização do DX"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:555
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:583
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:611
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:639
 msgid "Apply LCD filter, if enabled"
 msgstr "Aplicar o filtro LCD, se ativado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:557
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:613
 msgid "LCD panel the GBC color correction emulates (0 = GBC, 1 = NSO)"
 msgstr "Painel LCD que a correção das cores do GBC emula (0 = GBC, 1 = NSO)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:559
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:615
 msgid "BIOS file to use for Game Boy Color, if enabled"
 msgstr "O arquivo da BIOS a usar pro Game Boy Color se ativado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:561
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:617
 msgid ""
 "The default palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "A paleta padrão, como 8 inteiros hexadecimais de 4 dígitos separados por vírgula (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:620
 msgid ""
 "The first user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "A primeira paleta de usuário, como 8 inteiros hexadecimais de 4 dígitos separados por vírgula (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:567
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:623
 msgid ""
 "The second user palette, as 8 comma-separated 4-digit hex integers (rgb555)."
 msgstr "A segunda paleta do usuário, como 8 inteiros hexadecimais de 4 dígitos separados por vírgula (rgb555)."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
 msgid "Automatically gather a full page before printing"
 msgstr "Reunir automaticamente uma página completa antes de imprimir"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:628
 msgid "Automatically save printouts as screen captures with -print suffix"
 msgstr "Salvar automaticamente as impressões como capturas de tela com o sufixo -print"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:606
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:630
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:662
 msgid "Directory to look for ROM files"
 msgstr "Diretório a vasculhar por arquivos de ROMs"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:575
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
 msgid "Directory to look for Game Boy Color ROM files"
 msgstr "Diretório a vasculhar por arquivos de ROMs do Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:632
 msgid "Color lightness factor"
 msgstr "Fator de luminosidade das cores"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:579
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:635
 msgid "BIOS file to use, if enabled"
 msgstr "O arquivo da BIOS a usar, se ativado"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:642
 msgid ""
 "LCD panel the GBA color correction emulates (0 = GBA, 1 = GBASP Backlit, 2 ="
 " Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
 msgstr "Painel LCD que a correção das cores do GBA emula (0 = GBA, 1 = GBASP Backlight, 2 = Micro, 3 = DS, 4 = DS-Lite, 5 = NSO)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:648
 msgid "Enable link at boot"
 msgstr "Ativar o link ao inicializar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:653
 msgid "Enable faster network protocol by default"
 msgstr "Ativar o protocolo de rede mais rápido por padrão"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:599
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:655
 msgid "Default network link client host"
 msgstr "Hospedeiro do cliente do link padrão da rede"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:600
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:656
 msgid "Default network link server IP to bind"
 msgstr "IP do servidor do link padrão da rede a vincular"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:601
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:657
 msgid "Default network link port (server and client)"
 msgstr "Porta do link padrão da rede (servidor e cliente)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:602
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:658
 msgid "Default network protocol"
 msgstr "Protocolo padrão da rede"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:603
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:659
 msgid "Link timeout (ms)"
 msgstr "Tempo pra esgotar o link (ms)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:604
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:660
 msgid "Link cable type"
 msgstr "Tipo de cabo do link"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:607
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:663
 msgid "Color darkness factor"
 msgstr "Fator de escuridão das cores"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:610
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:666
 msgid "Automatically load last saved state"
 msgstr "Carregar automaticamente o último state salvo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:668
 msgid ""
 "Directory to store game save files (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "Diretório pra armazenar os arquivos dos saves dos jogos (os caminhos relativos são relativos ao executável; em branco é o diretório das ROMs)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:614
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:670
 msgid "Freeze recent load list"
 msgstr "Congelar a lista dos carregados recentes"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:616
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:672
 msgid ""
 "Directory to store A / V and game recordings (relative paths paths are "
 "relative to the executable; blank is ROM dir)"
 msgstr "Diretório pra armazenar as gravações dos jogos e A/V (os caminhos relativos são relativos ao executável, em branco é o diretório das ROMs)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:619
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:675
 msgid "Number of seconds between rewind snapshots (0 to disable)"
 msgstr "Número de segundos entre snapshots de rebobinamento (0 pra desativar)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:621
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:677
 msgid ""
 "Directory to store screenshots (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "Diretório pra armazenar as screenshots (os caminhos relativos são relativos ao executável, em branco é o diretório das ROMs)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:624
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:680
 msgid ""
 "Directory to store saved state files (relative paths are relative to the "
 "executable; blank is ROM dir)"
 msgstr "Diretório pra armazenar os arquivos dos states salvos (os caminhos relativos são relativos ao executável; em branco é o diretório das ROMs)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:626
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:682
 msgid "Enable status bar"
 msgstr "Ativar a barra de status"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:627
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:683
 msgid "INI file version (DO NOT MODIFY)"
 msgstr "Versão do arquivo INI (NÃO MODIFICAR)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:631
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:687
 msgid ""
 "The parameter Joypad/<n>/<button> contains a comma-separated list of key "
 "names which map to joypad #<n> button <button>. Button is one of Up, Down, "
@@ -2327,279 +2616,279 @@ msgid ""
 "MotionRight, AutoA, AutoB, Speed, Capture, GS"
 msgstr "O parâmetro Joypad/<n>/<button> contém uma lista separada por vírgula dos nomes-chave os quais mapeiam pro joypad #<n> botão <button>.  O botão é um de Pra Cima, Pra Baixo, Esquerda, Direita, A, B, L, R, Select, Start, MotionUp, MotionDown, MotionLeft, MotionRight, AutoA, AutoB, Velocidade, Captura, GS"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:636
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:692
 msgid "The autofire toggle period, in frames (1/60 s)"
 msgstr "O período de alternância do auto-disparo, em quadros (1/60 s)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:637
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:693
 msgid "The number of the stick to use in single-player mode"
 msgstr "O número do direcional a usar no modo de um jogador"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:639
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:695
 msgid "Whether to enable SDL GameController mode"
 msgstr "Se deve ativar o modo GameController do SDL"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:643
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:699
 msgid ""
 "The parameter Keyboard/<cmd> contains a comma-separated list of key names "
 "(e.g. Alt-Shift-F1).  When the named key is pressed, the command <cmd> is "
 "executed."
 msgstr "O parâmetro Teclado/<cmd> contém uma lista separada por vírgula dos nomes-chave (ex: Alt-Shift-F1).  Quando a tecla nomeada é pressionada o comando <cmd> é executado."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:648
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:704
 msgid "Enable AGB debug print"
 msgstr "Ativar a impressão do debug do AGB"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:649
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:705
 msgid "Auto skip frames"
 msgstr "Auto Frameskip"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:651
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:707
 msgid "Apply IPS / UPS / IPF patches if found"
 msgstr "Aplicar os patches IPS/UPS/IPF se forem achados"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:653
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:709
 msgid "Automatically save and load cheat list"
 msgstr "Salvar e carregar a lista de trapaças automaticamente"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:657
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:713
 msgid "Automatically enable border for Super Game Boy games"
 msgstr "Ativar automaticamente a borda pra jogos do Super Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:659
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:715
 msgid "Always enable border"
 msgstr "Sempre ativar a borda"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:660
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:716
 msgid "Screen capture file format"
 msgstr "Formato do arquivo de captura de tela"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:661
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:717
 msgid "Enable cheats"
 msgstr "Ativar trapaças"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:662
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:718
 msgid "Disable on-screen status messages"
 msgstr "Desativar mensagens de status na tela"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:663
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:719
 msgid "Type of system to emulate"
 msgstr "Tipo de sistema a emular"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:664
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:720
 msgid "Flash size 0 = 64 KB 1 = 128 KB"
 msgstr "Tamanho do flash 0 = 64 KBs 1 = 128 KBs"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:666
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:722
 msgid "Skip frames. Values are 0-9 or -1 to skip automatically based on time."
 msgstr "Pular frames. Os valores são 0-9 ou -1 pra pular automaticamente baseado no tempo."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:668
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:724
 msgid "The palette to use"
 msgstr "A paleta a usar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:669
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:725
 msgid "Enable printer emulation"
 msgstr "Ativar a emulação da impressora"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:671
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:727
 msgid "Break into GDB after loading the game."
 msgstr "Entrar no GDB após carregar o jogo."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:672
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:728
 msgid "Port to connect GDB to"
 msgstr "Porta pra conectar o GDB a"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:674
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:730
 msgid "Number of players in network"
 msgstr "Número de jogadores na rede"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:676
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:732
 msgid "Maximum scale factor (0 = no limit)"
 msgstr "Fator de escala máxima (0 = sem limite)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:678
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:734
 msgid "Pause game when main window loses focus"
 msgstr "Pausar o jogo quando a janela principal perde o foco"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:680
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:736
 msgid "Enable RTC (vba-over.ini override is rtcEnabled"
 msgstr "Ativar RTC (A substituição do vba-over.ini é rtcEnabled)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:681
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:737
 msgid "Native save (\"battery\") hardware type"
 msgstr "Tipo de hardware de salvamento nativo (\"bateria\")"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:682
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:738
 msgid "Show speed indicator"
 msgstr "Mostrar indicador de velocidade"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:683
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:739
 msgid "Skip BIOS initialization"
 msgstr "Pular a inicialização do BIOS"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:685
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:741
 msgid "Do not overwrite cheat list when loading state"
 msgstr "Não sobrescrever a lista de trapaças quando carregar o state"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:687
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:743
 msgid "Do not overwrite native (battery) save when loading state"
 msgstr "Não sobrescrever o save nativo (bateria) quando carregar o state"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:689
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:745
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
 msgstr "Sufocar a velocidade do jogo mesmo quando acelerado (0-450%, 0 = sem acelerador)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:692
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:748
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
 msgstr "Definir o acelerador pra tecla de aceleração (0-3000%, 0 = sem acelerador)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:694
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:750
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
 msgstr "Número de quadros a pular com aceleração (ao invés de sufocamento da aceleração)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:697
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:753
 msgid "Use frame skip for speedup throttle"
 msgstr "Use o pulo de quadros pra sufocar a aceleração"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:699
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:755
 msgid "Mute sound during speedup"
 msgstr "Silenciar o som durante a aceleração"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:700
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:756
 msgid "Use the specified BIOS file for Game Boy"
 msgstr "Usar o arquivo da BIOS especificada pro Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:701
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:757
 msgid "Use the specified BIOS file"
 msgstr "Usar o arquivo da BIOS especificada"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:703
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:759
 msgid "Use the specified BIOS file for Game Boy Color"
 msgstr "Usar o arquivo da BIOS especificada pro Game Boy Color"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:704
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:760
 msgid "Wait for vertical sync"
 msgstr "Esperar a sincronização vertical"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:707
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:763
 msgid "Enter fullscreen mode at startup"
 msgstr "Entrar no modo de tela cheia na inicialização"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:708
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:764
 msgid "Window maximized"
 msgstr "Janela maximizada"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:709
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:765
 msgid "Window height at startup"
 msgstr "A altura da janela na inicialização"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:710
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:766
 msgid "Window width at startup"
 msgstr "Largura da janela na inicialização"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:711
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:767
 msgid "Window axis X position at startup"
 msgstr "Posição do eixo X da janela na inicialização"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:712
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:768
 msgid "Window axis Y position at startup"
 msgstr "Posição do eixo Y da janela na inicialização"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:716
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:772
 msgid "Capture key events while on background"
 msgstr "Capturar os eventos-chave enquanto em segundo plano"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:718
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:774
 msgid "Capture joy events while on background"
 msgstr "Capture eventos de alegria enquanto em segundo plano"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:719
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:775
 msgid "Hide menu bar when mouse is inactive"
 msgstr "Esconder a barra do menu quando o mouse está inativo"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:721
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:777
 msgid "Show the on-screen touch controller"
 msgstr "Mostrar o controle sensível ao toque na tela"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:723
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:779
 msgid "Suspend screensaver when game is running"
 msgstr "Suspender o protetor de tela quando o jogo estiver em execução"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:726
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:782
 msgid "Sound API; if unsupported, default API will be used"
 msgstr "API de som; se não for suportada, a API padrão será usada"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:727
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:783
 msgid "Device ID of chosen audio device for chosen driver"
 msgstr "ID do dispositivo de áudio escolhido pro driver escolhido"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:728
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:784
 msgid "Number of sound buffers"
 msgstr "Número de buffers do som"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:729
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:785
 msgid "Bit mask of sound channels to enable"
 msgstr "A máscara do bit dos canais de som a ativar"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:730
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:786
 msgid "Game Boy Advance sound filtering (%)"
 msgstr "Filtragem de som do Game Boy Advance (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:788
 msgid "Game Boy Advance sound interpolation"
 msgstr "Interpolação de som do Game Boy Advance"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:733
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:789
 msgid "Game Boy sound declicking"
 msgstr "Declicking do som do Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:734
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:790
 msgid "Game Boy echo effect (%)"
 msgstr "Efeito de eco do Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:735
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:791
 msgid "Enable Game Boy sound effects"
 msgstr "Ativar efeitos sonoros do Game Boy"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:736
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:792
 msgid "Game Boy stereo effect (%)"
 msgstr "Efeito estéreo do Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:737
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:793
 msgid "Game Boy surround sound effect (%)"
 msgstr "Efeito de som surround do Game Boy (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:738
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:794
 msgid "Sound sample rate (kHz)"
 msgstr "Taxa de amostra do som (kHz)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:739
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:795
 msgid "Use DirectSound hardware acceleration"
 msgstr "Usar aceleração do hardware pro DirectSound"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:740
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:796
 msgid "Upmix stereo to surround"
 msgstr "Aumentar número de canais de estéreo pra surroun"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:741
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:797
 msgid "Sound volume (%)"
 msgstr "Volume do som (%)"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:742
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:798
 msgid "Language"
 msgstr "Idioma"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:743
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:799
 msgid "External translations"
 msgstr "Traduções externas"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:818
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:838
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:859
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:880
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:900
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:920
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:874
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:894
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:915
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:936
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:956
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:976
 #, c-format
 msgid "Invalid value %s for option %s; valid values are %s"
 msgstr "Valor inválido %s pra opção %s; os valores válidos são %s"
@@ -3535,40 +3824,6 @@ msgstr "Inteligente"
 msgid "Motion Blur"
 msgstr "Borrão do Movimento"
 
-#: xrc/DisplayConfigBasic.xrc:220
-msgid "Apply &DLSS NR:"
-msgstr "Aplicar o &DLSS NR:"
-
-#: xrc/DisplayConfigBasic.xrc:231
-msgid "Pre-process"
-msgstr "Pré-processo"
-
-#: xrc/DisplayConfigBasic.xrc:233
-msgid ""
-"Run DLSS NR on the emulated image first, then let the display filter scale "
-"the result. Much cheaper, since the network sees the unscaled frame"
-msgstr "Execute o DLSS NR na imagem emulada primeiro, então deixe o filtro de exibição ampliar o resultado. Muito mais barato, já que a rede vê o frame não ampliado"
-
-#: xrc/DisplayConfigBasic.xrc:240
-msgid "Post-process"
-msgstr "Pós-processo"
-
-#: xrc/DisplayConfigBasic.xrc:241
-msgid ""
-"Run DLSS NR over whatever the display filter produces, at the filtered size"
-msgstr "Execute o DLSS NR sobre o que o filtro de exibição produzir, no tamanho filtrado"
-
-#: xrc/DisplayConfigBasic.xrc:246
-msgid "At display size"
-msgstr "No tamanho da tela"
-
-#: xrc/DisplayConfigBasic.xrc:247
-msgid ""
-"Scale the display filter's output up to the size it is shown at and run DLSS"
-" NR over that, as on a screenshot of the game. Slowest by far: the network "
-"sees every displayed pixel"
-msgstr "Amplie a saída do filtro de exibição até o tamanho em que ele é mostrado e execute o DLSS NR sobre isso, como em uma screenshot do jogo. O mais lento de longe: a rede vê cada pixel exibido"
-
 #: xrc/DisplayConfigBitDepth.xrc:11
 msgid "Bit Depth:"
 msgstr "Profundidade dos Bits:"
@@ -3588,10 +3843,6 @@ msgstr "24"
 #: xrc/DisplayConfigBitDepth.xrc:22
 msgid "32"
 msgstr "32"
-
-#: xrc/DisplayConfigColorCorrection.xrc:11
-msgid "Profile:"
-msgstr "Perfil:"
 
 #: xrc/DisplayConfigColorCorrection.xrc:45
 msgid "LCD Correction for GBA:"
