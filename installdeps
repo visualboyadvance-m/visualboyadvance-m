@@ -589,6 +589,13 @@ fedora_installdeps() {
     # -devel packages below would only shadow what it installs, and the
     # rpmfusion repo setup for ffmpeg is wasted work.
     if [ -n "$vcpkg_only" ]; then
+        # PowerShell runs on .NET, which only loads OpenSSL 3 or 1.1, so it
+        # aborts on any crypto with "No usable version of libssl was found"
+        # on Fedora 46 and newer, where openssl-libs is OpenSSL 4.  Those
+        # releases ship OpenSSL 3 as openssl3-libs; older ones have no such
+        # package and need none, so it is not worth a warning there.
+        fedora_have_pkg openssl3-libs && vcpkg_deps="$vcpkg_deps openssl3-libs"
+
         [ -n "$vcpkg_deps" ] && check fedora_dnf_install $vcpkg_deps
         return 0
     fi
