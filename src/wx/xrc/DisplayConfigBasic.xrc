@@ -216,12 +216,6 @@
               </object>
             </object>
           </object>
-          <object class="sizeritem">
-            <flag>wxTOP|wxEXPAND</flag>
-            <border>10</border>
-            <!-- The DLSS-NR group, built by DisplayConfig::InitDlssNr(). -->
-            <object class="wxPanel" name="DlssNrPanel"/>
-          </object>
         </object>
       </object>
     </object>

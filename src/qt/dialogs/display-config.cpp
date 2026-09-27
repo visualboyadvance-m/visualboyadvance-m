@@ -71,6 +71,11 @@ DisplayConfig::DisplayConfig(QWidget* parent) : BaseDialog(parent, "DisplayConfi
     notebook_->addTab(CreateSpeedTab(), tr("Speed"));
     notebook_->addTab(CreateOSDTab(), tr("On-Screen Display"));
     notebook_->addTab(CreateZoomTab(), tr("Zoom"));
+    // DLSS NR runs alongside the display filter. The tab only means anything
+    // where libnr_frame is part of the build, so it is left out entirely
+    // otherwise rather than offered as controls that cannot act.
+    if (dlssnr::Available())
+        notebook_->addTab(CreateDlssNrTab(), tr("DLSS-NR"));
     layout->addWidget(notebook_);
     layout->addWidget(CreateOkCancel());
 
@@ -184,11 +189,6 @@ QWidget* DisplayConfig::CreateBasicTab() {
             });
     filters_form->addRow(tr("Interframe blending:"), interframe_selector_);
     layout->addWidget(filters_group);
-    // DLSS NR runs alongside the display filter. The group only means anything
-    // where libnr_frame is part of the build, so it is left out entirely
-    // otherwise rather than offered as controls that cannot act.
-    if (dlssnr::Available())
-        layout->addWidget(CreateDlssNrGroup(page));
     layout->addStretch(1);
 
     // The filter and interframe selectors are applied live; loading them from
@@ -200,8 +200,12 @@ QWidget* DisplayConfig::CreateBasicTab() {
 // The same group as PCSX2's DLSS-NR settings: nr_frame's command line, with
 // Profile / Off (the spin boxes' special value) standing for a value left to
 // the profile or unset.
-QWidget* DisplayConfig::CreateDlssNrGroup(QWidget* parent) {
-    auto* group = new QGroupBox(tr("DLSS-NR (Experimental)"), parent);
+QWidget* DisplayConfig::CreateDlssNrTab() {
+    auto* page = new QWidget(notebook_);
+    auto* layout = new QVBoxLayout(page);
+    auto* group = new QGroupBox(tr("DLSS-NR (Experimental)"), page);
+    layout->addWidget(group);
+    layout->addStretch(1);
     auto* grid = new QGridLayout(group);
 
     // A double option whose negative values mean "not set": the box's minimum
@@ -399,7 +403,7 @@ QWidget* DisplayConfig::CreateDlssNrGroup(QWidget* parent) {
     };
     connect(dlss_nr_, &QCheckBox::toggled, this, sync);
     sync();
-    return group;
+    return page;
 }
 
 QWidget* DisplayConfig::CreateBitDepthTab() {

@@ -537,7 +537,16 @@ bool DisplayConfig::LoadLazyTab(int index) {
         {wxT("DisplayConfigSpeedPanel"),           wxT("Speed"),           &DisplayConfig::InitSpeedTab},
         {wxT("DisplayConfigOSDPanel"),             wxT("On-Screen Display"),&DisplayConfig::InitOSDTab},
         {wxT("DisplayConfigZoomPanel"),            wxT("Zoom"),            &DisplayConfig::InitZoomTab},
+        {wxT("DisplayConfigDlssNrPanel"),          wxT("DLSS-NR"),         &DisplayConfig::InitDlssNrTab},
     };
+
+    // The DLSS-NR controls only mean anything where libnr_frame is part of the
+    // build, so leave the tab out otherwise rather than offer controls that
+    // cannot do anything.
+    if (index == kTabDlssNr && !dlssnr::Available()) {
+        tab_loaded_[index] = true;
+        return true;
+    }
 
     const TabSpec& spec = kSpecs[index];
     wxPanel* panel = wxXmlResource::Get()->LoadPanel(notebook_, spec.xrc_name);
@@ -706,8 +715,6 @@ void DisplayConfig::InitBasicTab() {
 
     // Filter / plugin selectors.
     filter_selector_ = GetValidatedChild<wxChoice>("Filter");
-
-    InitDlssNr();
     filter_selector_->SetValidator(FilterValidator());
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::UpdatePlugin, this);
     filter_selector_->Bind(wxEVT_CHOICE, &DisplayConfig::ApplyLive, this);
@@ -1298,15 +1305,8 @@ void DisplayConfig::OnPluginSelected(wxCommandEvent& event) {
     event.Skip();
 }
 
-void DisplayConfig::InitDlssNr() {
+void DisplayConfig::InitDlssNrTab() {
     wxPanel* panel = GetValidatedChild<wxPanel>("DlssNrPanel");
-    // The controls only mean anything where libnr_frame is part of the build,
-    // so leave the group out otherwise rather than offer controls that cannot
-    // do anything.
-    if (!dlssnr::Available()) {
-        panel->Hide();
-        return;
-    }
 
     // The same group as PCSX2's DLSS-NR settings: nr_frame's command line,
     // with Profile / Off standing for a value left to the profile or unset.
@@ -1478,7 +1478,7 @@ void DisplayConfig::InitDlssNr() {
 }
 
 void DisplayConfig::SetDlssNrControlsEnabled(bool enabled) {
-    // The Basic tab owns these. The observer can fire before that tab has been
+    // The DLSS-NR tab owns these. The observer can fire before that tab has been
     // lazy-loaded, exactly as it can for the filter selectors above.
     for (wxWindow* control : dlss_nr_controls_)
         control->Enable(enabled);

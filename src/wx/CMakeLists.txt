@@ -1723,6 +1723,7 @@ set(
     xrc/DisplayConfigBasic.xrc
     xrc/DisplayConfigBitDepth.xrc
     xrc/DisplayConfigColorCorrection.xrc
+    xrc/DisplayConfigDlssNr.xrc
     xrc/DisplayConfigOSD.xrc
     xrc/DisplayConfigSpeed.xrc
     xrc/DisplayConfigZoom.xrc

@@ -46,6 +46,9 @@ private:
         kTabSpeed,
         kTabOSD,
         kTabZoom,
+        // Last, so that leaving it out when DLSS-NR is not built in does not
+        // shift the notebook page of any other tab.
+        kTabDlssNr,
         kTabCount,
     };
 
@@ -62,6 +65,7 @@ private:
     void InitSpeedTab();
     void InitOSDTab();
     void InitZoomTab();
+    void InitDlssNrTab();
 
     // Handler for the wxEVT_SHOW event.
     void OnDialogShowEvent(wxShowEvent& event);
@@ -172,8 +176,6 @@ private:
     // hides unconditionally.
     std::vector<std::pair<const char*, config::RenderMethod>> render_method_radios_;
 
-    // Builds the DLSS-NR group into the Basic tab's DlssNrPanel.
-    void InitDlssNr();
     // Keeps the DLSS-NR settings in step with the enable box.
     void SetDlssNrControlsEnabled(bool enabled);
 
