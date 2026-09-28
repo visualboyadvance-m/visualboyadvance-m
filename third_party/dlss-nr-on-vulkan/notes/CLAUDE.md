@@ -299,7 +299,8 @@ Treat all of the above as *reported*, not verified. Verifying it is Phase 1's jo
   which needs an NVIDIA GPU, but through a **Vulkan layer** at `vkQueuePresentKHR`: it
   attaches to any Vulkan application including a Windows game under Proton, copies the
   presented frame to a daemon holding the model, and writes the result back into the
-  swapchain. A file is the trigger, so it is a photo mode rather than a per-frame pass.
+  swapchain. A file is the trigger, so it began as a photo mode; the live mode that runs
+  every present came after (`phase47`, `phase59`).
   Proven on **Dead or Alive 5 Last Round** — 32-bit D3D9 through DXVK, which needs a
   32-bit layer library; `src/layer/prepare_layer.py` writes both manifests.
   `src/layer/`, `notes/phase17`, `phase19`, `phase24`, `phase34`.
@@ -406,16 +407,17 @@ handing work to the four E-cores (**-7 %** for a theoretical +2 %). `notes/phase
 
 **Both modes run in a real game.** Photo mode holds a frame while a trigger file exists;
 live mode (`NR_LAYER_LIVE=N`) runs continuously — **26-27 ms a frame at 512x288 and at
-640x360** for the daemon alone (2026-09-26), 25 fps in Tekken 7 at 640x360 beside the game's
-own rendering and 17.3 at 1280x720 (`phase59`; 10.5 before the fusions) — with the game set to
-that extent and the compositor doing the stretch. `src/layer/nr-ctl`
+640x360** for the daemon alone (2026-09-26), and in Tekken 7 beside the game's own rendering
+**30 fps at 800x450** with the render scale at 0.35 and 27 at 0.6 (the owner, 2026-09-27;
+10.5 at 640x360 before the fusions, `phase59`) — with the game set to that extent and the
+compositor doing the stretch. `src/layer/nr-ctl`
 changes profile, intensity, both strengths, the render scale and the temporal knobs
 between frames without reloading the model, and `src/layer/nr-toggle` is the same three
 files on a key, because on Wayland only the compositor sees a key while a fullscreen game
 has focus. The binding is made in System Settings and **must not** be made by us: doing it
 over kglobalaccel's D-Bus interface crashed KWin on the first keypress, because in Plasma
 6.7 that registry lives inside KWin and `plasma-kglobalaccel.service` is not even running.
-`notes/phase55`. `src/layer/nr-panel` is all eight knobs on one screen, and
+`notes/phase55`. `src/layer/nr-panel` is all ten knobs on one screen, and
 `src/layer/nr_knobs.py` is the one definition that it, `nr-ctl` and `README.md` all
 render, checked by `make test`. `notes/phase56`.
 
@@ -454,5 +456,5 @@ src/     our code
 
 ---
 
-*Last updated 2026-09-25 (window attention and the fused feed-forward sharing their operands across subgroups; before that the fusions, the staged GEMM's shared memory, and a Mesa quirk found and a fix measured). **Read `notes/HANDOFF.md` first** — it carries the current state and the traps. Owner runs Arch Linux, is comfortable at kernel/driver level,
+*Last updated 2026-09-27 (the graph aligned with the vendor's in eight more places, the styles' colour grade and the history read out of the DLL, the render scale filling the cheapest network field, CMake brought level with make, and Xe2's 256-register mode tried; before that window attention and the fused feed-forward sharing their operands, the fusions, the staged GEMM's shared memory). **Read `notes/HANDOFF.md` first** — it carries the current state and the traps. Owner runs Arch Linux, is comfortable at kernel/driver level,
 prefers C for low-level work, and does not need concepts explained from scratch.*

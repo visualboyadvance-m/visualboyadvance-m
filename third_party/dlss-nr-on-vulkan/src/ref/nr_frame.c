@@ -3328,3 +3328,325 @@ int nr_frame_head(nr_frame *f, const float *colour, int height, int width, const
     crop_head(wide, hy, hx, height, width, head);
     return 0;
 }
+
+/* ------------------------------------------------------------------------- */
+/* the daemon's frame, stateful: nr_frame_live                                 */
+/* ------------------------------------------------------------------------- */
+
+/* `nr_daemon.process_connection` on its default path, in the daemon's order: decode, the
+ * letterbox, the render scale's frame, History.take, the network, compose_encode with the
+ * vendor's history, History.keep. Each piece names the Python it transcribes. */
+
+struct nr_frame_live {
+    nr_frame *frame;
+    /* Letterbox: the key (the swapchain) and the bounds found for it */
+    int box_known, box_width, box_height, box_bgra;
+    int top, bottom, left, right;
+    /* History: the shot it belongs to, and what it keeps */
+    int have, key[7];
+    float key_style, key_tone, key_structure;
+    int source_width, source_height;
+    float *output, *source, *pixels;      /* the vendor's history, the network's input, the game's frame */
+    float *neural;                         /* this frame's history, swapped with `output` on keep */
+    /* scratch, grown as the extents need */
+    float *whole, *colour, *inner, *history_inner, *head, *composed;
+    size_t whole_cap, colour_cap, inner_cap, history_cap, head_cap, composed_cap;
+    size_t output_cap, neural_cap, source_cap, pixels_cap;
+};
+
+void nr_frame_live_defaults(nr_frame_live_settings *s)
+{
+    memset(s, 0, sizeof *s);
+    s->render_scale = 1.0f; s->temporal = 1.0f; s->cut_limit = 0.15f; s->hold = 1.0f;
+    s->release = 24.0f; s->letterbox = 1;
+}
+
+static int live_grow(float **buffer, size_t *cap, size_t count)
+{
+    if (count <= *cap) return 0;
+    float *grown = realloc(*buffer, count * sizeof(float));
+    if (!grown) return -1;
+    *buffer = grown;
+    *cap = count;
+    return 0;
+}
+
+nr_frame_live *nr_frame_live_open(nr_frame *frame)
+{
+    if (!frame) FAILP("a live session needs an open nr_frame");
+    nr_frame_live *live = calloc(1, sizeof *live);
+    if (!live) FAILP("out of memory");
+    live->frame = frame;
+    return live;
+}
+
+void nr_frame_live_reset(nr_frame_live *live)
+{
+    if (!live) return;
+    live->have = 0;
+    live->box_known = 0;
+}
+
+void nr_frame_live_close(nr_frame_live *live)
+{
+    if (!live) return;
+    free(live->output); free(live->source); free(live->pixels); free(live->neural);
+    free(live->whole); free(live->colour); free(live->inner); free(live->history_inner);
+    free(live->head); free(live->composed);
+    free(live);
+}
+
+/* nr_daemon.LETTERBOX_TOLERANCE, np.float32(2 / 255) */
+#define LIVE_BAR ((float)(2.0 / 255.0))
+
+static float live_row_max(const float *image, int width, int y)
+{
+    const float *row = image + (size_t)y * width * 3;
+    float top = row[0];
+    for (size_t i = 1; i < (size_t)width * 3; i++) if (row[i] > top) top = row[i];
+    return top;
+}
+
+static float live_column_max(const float *image, int height, int width, int x)
+{
+    float top = image[(size_t)x * 3];
+    for (int y = 0; y < height; y++)
+        for (int c = 0; c < 3; c++) {
+            float v = image[((size_t)y * width + x) * 3 + c];
+            if (v > top) top = v;
+        }
+    return top;
+}
+
+/* `active_region.run`: the bars from both ends, trusted only when they agree to a line */
+static void live_bars(const float *values, int extent, int *lead_out, int *end_out)
+{
+    int cap = (int)(extent * 0.45), lead = 0, tail = 0;
+    while (lead < cap && values[lead] <= LIVE_BAR) lead++;
+    while (tail < cap && values[extent - 1 - tail] <= LIVE_BAR) tail++;
+    int agree = lead && tail && abs(lead - tail) <= 1;
+    *lead_out = agree ? lead : 0;
+    *end_out = agree ? extent - tail : extent;
+}
+
+/* `nr_daemon.active_region` */
+static int live_active_region(nr_frame_live *live, const float *image, int height, int width)
+{
+    float *rows = malloc((size_t)(height + width) * sizeof(float));
+    if (!rows) return -1;
+    float *columns = rows + height;
+    for (int y = 0; y < height; y++) rows[y] = live_row_max(image, width, y);
+    for (int x = 0; x < width; x++) columns[x] = live_column_max(image, height, width, x);
+    int top, bottom, left, right;
+    live_bars(rows, height, &top, &bottom);
+    live_bars(columns, width, &left, &right);
+    free(rows);
+    if ((long long)(bottom - top) * (right - left) < (long long)height * width / 2) {
+        top = 0; bottom = height; left = 0; right = width;
+    }
+    live->top = top; live->bottom = bottom; live->left = left; live->right = right;
+    return 0;
+}
+
+/* `Letterbox._holds`: the eight lines either side of each edge still what they were */
+static int live_box_holds(const nr_frame_live *live, const float *image, int height, int width)
+{
+    int top = live->top, bottom = live->bottom, left = live->left, right = live->right;
+    if (bottom > height || right > width) return 0;
+    if (top && !(live_row_max(image, width, top - 1) <= LIVE_BAR)) return 0;
+    if (bottom < height && !(live_row_max(image, width, bottom) <= LIVE_BAR)) return 0;
+    if (left && !(live_column_max(image, height, width, left - 1) <= LIVE_BAR)) return 0;
+    if (right < width && !(live_column_max(image, height, width, right) <= LIVE_BAR)) return 0;
+    if (live_row_max(image, width, top) <= LIVE_BAR) return 0;
+    if (live_row_max(image, width, bottom - 1) <= LIVE_BAR) return 0;
+    if (live_column_max(image, height, width, left) <= LIVE_BAR) return 0;
+    if (live_column_max(image, height, width, right - 1) <= LIVE_BAR) return 0;
+    return 1;
+}
+
+/* `nr_daemon.resample` for RGB: the area mean when the target divides the source and is
+ * smaller, else the separable bilinear, rows first (`nr_image.bilinear`). */
+static int live_resample(const float *source, int height, int width, int th, int tw, float *out)
+{
+    if (th == height && tw == width) {
+        memcpy(out, source, (size_t)height * width * 3 * sizeof(float));
+        return 0;
+    }
+    if (height % th == 0 && width % tw == 0 && height > th && width > tw) {
+        nr_area_mean(source, (ptrdiff_t)width * 3, 3, 1, (size_t)th, (size_t)tw, 3,
+                     (size_t)(height / th), (size_t)(width / tw), out);
+        return 0;
+    }
+    int count = th > tw ? th : tw;
+    int32_t *low = malloc((size_t)count * 2 * sizeof(int32_t));
+    float *weight = malloc((size_t)count * sizeof(float));
+    float *middle = th != height && tw != width ? malloc((size_t)th * width * 3 * sizeof(float)) : NULL;
+    if (!low || !weight || (th != height && tw != width && !middle)) {
+        free(low); free(weight); free(middle);
+        return -1;
+    }
+    int32_t *high = low + count;
+    const float *current = source;
+    if (th != height) {
+        axis_plan(height, th, low, high, weight);
+        float *target = tw != width ? middle : out;
+        nr_resize_axis(current, (ptrdiff_t)width * 3, 3, 1, (size_t)th, (size_t)width, 3, 0, low, high,
+                       weight, target);
+        current = target;
+    }
+    if (tw != width) {
+        axis_plan(width, tw, low, high, weight);
+        nr_resize_axis(current, (ptrdiff_t)width * 3, 3, 1, (size_t)th, (size_t)tw, 3, 1, low, high,
+                       weight, out);
+    }
+    free(low); free(weight); free(middle);
+    return 0;
+}
+
+int nr_frame_live_run(nr_frame_live *live, const nr_frame_params *params,
+                      const nr_frame_live_settings *settings, const unsigned char *pixels,
+                      int width, int height, int bgra, unsigned char *answer,
+                      nr_frame_live_report *report)
+{
+    nr_frame_params p;
+    nr_frame_live_settings s;
+    if (params) p = *params; else nr_frame_defaults(&p);
+    if (settings) s = *settings; else nr_frame_live_defaults(&s);
+    if (!live || !pixels || !answer || width <= 0 || height <= 0)
+        FAILF("live_run needs a session, the pixels and somewhere to answer");
+    if (!(s.render_scale >= 0.05f && s.render_scale <= 1.0f)) FAILF("render_scale must be between 0.05 and 1");
+    bgra = bgra != 0;
+    size_t pixels_whole = (size_t)width * height;
+    if (live_grow(&live->whole, &live->whole_cap, pixels_whole * 3)) FAILF("out of memory");
+    nr_decode8(pixels, pixels_whole, bgra, live->whole);
+
+    /* Letterbox.region, keyed on the swapchain */
+    if (s.letterbox) {
+        if (!(live->box_known && live->box_width == width && live->box_height == height
+              && live->box_bgra == bgra && live_box_holds(live, live->whole, height, width))) {
+            if (live_active_region(live, live->whole, height, width)) FAILF("out of memory");
+            live->box_known = 1; live->box_width = width; live->box_height = height; live->box_bgra = bgra;
+        }
+    } else {
+        live->top = 0; live->bottom = height; live->left = 0; live->right = width;
+        live->box_known = 0;
+    }
+    int top = live->top, left = live->left;
+    int active_height = live->bottom - top, active_width = live->right - left;
+    int boxed = active_height != height || active_width != width;
+    size_t active = (size_t)active_height * active_width;
+    const float *colour = live->whole;
+    if (boxed) {
+        if (live_grow(&live->colour, &live->colour_cap, active * 3)) FAILF("out of memory");
+        for (int y = 0; y < active_height; y++)
+            memcpy(live->colour + (size_t)y * active_width * 3,
+                   live->whole + ((size_t)(top + y) * width + left) * 3, (size_t)active_width * 3 * sizeof(float));
+        colour = live->colour;
+    }
+
+    /* the render scale's frame, or the largest on the same network field */
+    int inner_width = active_width, inner_height = active_height;
+    if (s.render_scale < 1.0f)
+        nr_frame_render_extent(active_width, active_height, s.render_scale, p.min_extent,
+                               &inner_width, &inner_height);
+    size_t inner_pixels = (size_t)inner_width * inner_height;
+    const float *inner = colour;
+    if (inner_width != active_width || inner_height != active_height) {
+        if (live_grow(&live->inner, &live->inner_cap, inner_pixels * 3)
+            || live_resample(colour, active_height, active_width, inner_height, inner_width, live->inner))
+            FAILF("out of memory");
+        inner = live->inner;
+    }
+
+    /* History.take: the shot is the swapchain, the bars and the profile */
+    int temporal = s.temporal > 0.0f;
+    int key[7] = { width, height, bgra, top, live->bottom, left, live->right };
+    double cut = 0.0;
+    const float *history_inner = NULL, *history_full = NULL, *history_previous = NULL;
+    if (!live->have || memcmp(key, live->key, sizeof key) || live->key_style != p.normalized_style
+        || live->key_tone != p.local_tone || live->key_structure != p.local_structure
+        || live->source_width != inner_width || live->source_height != inner_height) {
+        live->have = 0;
+    } else {
+        for (size_t k = 0; k < inner_pixels * 3; k++) cut += fabs((double)inner[k] - (double)live->source[k]);
+        cut /= (double)(inner_pixels * 3);
+        if (cut > (temporal ? (double)s.cut_limit : -1.0)) {
+            live->have = 0;
+        } else {
+            history_full = live->output;
+            if (inner_width != active_width || inner_height != active_height) {
+                if (live_grow(&live->history_inner, &live->history_cap, inner_pixels * 3)
+                    || live_resample(live->output, active_height, active_width, inner_height, inner_width,
+                                     live->history_inner))
+                    FAILF("out of memory");
+                history_inner = live->history_inner;
+            } else {
+                history_inner = live->output;
+            }
+            if (s.hold > 0.0f || s.release > 0.0f) history_previous = live->pixels;
+        }
+    }
+
+    /* the daemon's knobs into the composition's folded parameters (nr_frame.compose_encode) */
+    p.history_confidence = s.temporal;
+    p.hold = history_previous ? s.hold : 0.0f;
+    p.slope = history_previous ? (float)(-255.0 * (double)s.hold / 4.0) : 0.0f;    /* HOLD_RAMP */
+    p.release = history_previous && s.release > 0.0f ? (float)(-255.0 / (double)s.release) : 0.0f;
+
+    if (live_grow(&live->head, &live->head_cap, inner_pixels * 4)
+        || live_grow(&live->composed, &live->composed_cap, active * 3)
+        || (temporal && live_grow(&live->neural, &live->neural_cap, active * 3)))
+        FAILF("out of memory");
+    if (nr_frame_head(live->frame, inner, inner_height, inner_width, history_inner, NULL, &p, live->head)) {
+        live->have = 0;
+        return -1;
+    }
+    if (answer != pixels) memcpy(answer, pixels, pixels_whole * 4);
+    if (nr_frame_compose_encode_neural(live->frame, live->head, inner_height, inner_width, colour,
+                                       active_height, active_width, history_full, history_previous, NULL,
+                                       &p, live->composed, answer, width, top, left, bgra,
+                                       temporal ? live->neural : NULL)) {
+        live->have = 0;
+        return -1;
+    }
+
+    if (report) {
+        double change = 0.0;
+        size_t counted = 0;
+        for (int y = 0; y < active_height; y += 4)
+            for (size_t k = 0; k < (size_t)active_width * 3; k++, counted++)
+                change += fabs((double)live->composed[(size_t)y * active_width * 3 + k]
+                               - (double)colour[(size_t)y * active_width * 3 + k]);
+        memset(report, 0, sizeof *report);
+        report->top = top; report->bottom = live->bottom; report->left = left; report->right = live->right;
+        report->render_width = inner_width; report->render_height = inner_height;
+        nr_frame_geometry_min(inner_height, inner_width, p.min_extent, &report->network_height,
+                              &report->network_width);
+        report->with_history = history_full != NULL;
+        report->cut = cut;
+        report->change = counted ? change / (double)counted : 0.0;
+    }
+
+    /* History.keep: the vendor's history, the network's input, the game's own frame */
+    if (temporal) {
+        if (live_grow(&live->source, &live->source_cap, inner_pixels * 3)
+            || live_grow(&live->pixels, &live->pixels_cap, active * 3)) {
+            live->have = 0;
+            FAILF("out of memory");
+        }
+        /* this frame's history becomes the kept one, and the old one its next buffer */
+        float *swap = live->output;
+        size_t swap_cap = live->output_cap;
+        live->output = live->neural; live->output_cap = live->neural_cap;
+        live->neural = swap; live->neural_cap = swap_cap;
+        memcpy(live->source, inner, inner_pixels * 3 * sizeof(float));
+        memcpy(live->pixels, colour, active * 3 * sizeof(float));
+        memcpy(live->key, key, sizeof key);
+        live->key_style = p.normalized_style; live->key_tone = p.local_tone; live->key_structure = p.local_structure;
+        live->source_width = inner_width; live->source_height = inner_height;
+        live->have = 1;
+    } else {
+        live->have = 0;
+    }
+    return 0;
+}

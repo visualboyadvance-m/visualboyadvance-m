@@ -8,6 +8,8 @@ the two can be run side by side. Images are float32 (height, width, 3) in [0, 1]
     output, head = frame.update(colour, want_head=True) # head (h, w, 4)
     features = frame.features(colour)                   # (H, W, 16) at the network extent
     head = frame.run_features(features)                 # (H, W, 4)
+    live = NativeLive(frame)                            # the daemon's frame, stateful
+    answer, report = live.run(bgra, render_scale=0.5)   # (h, w, 4) uint8 in, the same out
 """
 import ctypes as C
 import os
@@ -32,6 +34,18 @@ class Params(C.Structure):
                 ("automatic_mask", C.c_int), ("skin_structure", C.c_float),
                 ("automatic_structure", C.c_float), ("min_extent", C.c_int),
                 ("grade_off", C.c_int)]
+
+
+class LiveSettings(C.Structure):
+    _fields_ = [("render_scale", C.c_float), ("temporal", C.c_float), ("cut_limit", C.c_float),
+                ("hold", C.c_float), ("release", C.c_float), ("letterbox", C.c_int)]
+
+
+class LiveReport(C.Structure):
+    _fields_ = [("top", C.c_int), ("bottom", C.c_int), ("left", C.c_int), ("right", C.c_int),
+                ("render_width", C.c_int), ("render_height", C.c_int),
+                ("network_width", C.c_int), ("network_height", C.c_int),
+                ("with_history", C.c_int), ("cut", C.c_double), ("change", C.c_double)]
 
 
 _lib = None
@@ -98,6 +112,21 @@ def library():
         lib.nr_frame_grade.restype = C.c_int
         lib.nr_frame_split.argtypes = [C.c_void_p, C.c_int]
         lib.nr_frame_split.restype = C.c_double
+        lib.nr_frame_head.argtypes = [C.c_void_p, C.c_void_p, C.c_int, C.c_int, C.c_void_p,
+                                      C.c_void_p, C.c_void_p, C.c_void_p]
+        lib.nr_frame_head.restype = C.c_int
+        lib.nr_frame_live_defaults.argtypes = [C.POINTER(LiveSettings)]
+        lib.nr_frame_live_defaults.restype = None
+        lib.nr_frame_live_open.argtypes = [C.c_void_p]
+        lib.nr_frame_live_open.restype = C.c_void_p
+        lib.nr_frame_live_reset.argtypes = [C.c_void_p]
+        lib.nr_frame_live_reset.restype = None
+        lib.nr_frame_live_close.argtypes = [C.c_void_p]
+        lib.nr_frame_live_close.restype = None
+        lib.nr_frame_live_run.argtypes = [C.c_void_p, C.POINTER(Params), C.POINTER(LiveSettings),
+                                          C.c_void_p, C.c_int, C.c_int, C.c_int, C.c_void_p,
+                                          C.POINTER(LiveReport)]
+        lib.nr_frame_live_run.restype = C.c_int
         _lib = lib
     return _lib
 
@@ -288,3 +317,68 @@ class NativeFrame:
         if self.lib.nr_frame_run_features(self.handle, features.ctypes.data, H, W, head.ctypes.data):
             self._fail("nr_frame_run_features")
         return head
+
+    def head(self, colour, history=None, control_mask=None, **values):
+        """`nr_frame_head`: the network half of `update`, the head cropped to (h, w, 4)."""
+        colour = _image(colour, "colour", 3)
+        height, width = colour.shape[:2]
+        history, hp = self._optional(history, colour, "history")
+        control_mask, mp = self._optional(control_mask, colour, "control_mask")
+        head = np.empty((height, width, 4), np.float32)
+        p = params(**values)
+        if self.lib.nr_frame_head(self.handle, colour.ctypes.data, height, width, hp, mp,
+                                  C.byref(p), head.ctypes.data):
+            self._fail("nr_frame_head")
+        return head
+
+
+def live_settings(**values):
+    s = LiveSettings()
+    library().nr_frame_live_defaults(C.byref(s))
+    for name, value in values.items():
+        if not hasattr(s, name):
+            raise TypeError(f"no such live setting: {name}")
+        setattr(s, name, value)
+    return s
+
+
+class NativeLive:
+    """`nr_frame_live`: the daemon's frame through C, history and letterbox kept between
+    calls. `run` takes an (h, w, 4) uint8 request and returns the answer and the report as a
+    dict; keyword arguments are `nr_frame_live_settings` fields or `nr_frame_params` ones."""
+
+    def __init__(self, frame):
+        self.frame = frame
+        self.lib = frame.lib
+        self.handle = self.lib.nr_frame_live_open(frame.handle)
+        if not self.handle:
+            raise RuntimeError("nr_frame_live_open: " + self.lib.nr_frame_error().decode())
+
+    def close(self):
+        if self.handle:
+            self.lib.nr_frame_live_close(self.handle)
+            self.handle = None
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
+
+    def reset(self):
+        self.lib.nr_frame_live_reset(self.handle)
+
+    def run(self, pixels, bgra=True, **values):
+        pixels = np.ascontiguousarray(pixels, dtype=np.uint8)
+        if pixels.ndim != 3 or pixels.shape[2] != 4:
+            raise ValueError("pixels must be (height, width, 4) uint8")
+        live = {k: v for k, v in values.items() if k in dict(LiveSettings._fields_)}
+        rest = {k: v for k, v in values.items() if k not in live}
+        s, p, report = live_settings(**live), params(**rest), LiveReport()
+        answer = np.empty_like(pixels)
+        height, width = pixels.shape[:2]
+        if self.lib.nr_frame_live_run(self.handle, C.byref(p), C.byref(s), pixels.ctypes.data,
+                                      width, height, int(bool(bgra)), answer.ctypes.data,
+                                      C.byref(report)):
+            raise RuntimeError("nr_frame_live_run: " + self.lib.nr_frame_error().decode())
+        return answer, {name: getattr(report, name) for name, _ in LiveReport._fields_}

@@ -238,6 +238,59 @@ int nr_frame_compose_encode_neural(nr_frame *frame, const float *head, int head_
  * head: 0, 1, 2. On a discrete card the outer two are the bus. */
 double nr_frame_split(const nr_frame *frame, int which);
 
+/* The daemon's frame, stateful, in one call: `nr_daemon.process_connection` on its default
+ * path — 8-bit pixels in, 8-bit pixels out, the letterbox found once and afterwards checked
+ * (`Letterbox`), the render scale's frame (`nr_frame_render_extent`), the history taken and
+ * dropped as `History` takes it (on a new geometry or profile, or a cut past `cut_limit`),
+ * the network, and the head brought up, composed and encoded in one pass, keeping the
+ * vendor's history for the next frame. So a host drives the whole live pass through C with
+ * no daemon and no socket, on whichever runtime is behind the library, and a `--dump`
+ * capture replayed through it in its order gets the history the daemon gave it
+ * (`nr_frame --replay`, `src/bench/restill.py --native`). The interface mask is not taken.
+ *
+ *     nr_frame_live *live = nr_frame_live_open(frame);
+ *     nr_frame_live_settings s; nr_frame_live_defaults(&s);
+ *     nr_frame_live_run(live, &params, &s, bgra, width, height, 1, answer, &report);
+ *
+ * `params` carries the conditioning and the composition (a profile, the intensity, the two
+ * strengths, `min_extent`); its temporal fields are overwritten from `settings`, which are
+ * the daemon's knobs in its own units. One session holds one shot's history; the frame
+ * must outlive it. */
+typedef struct nr_frame_live nr_frame_live;
+
+typedef struct nr_frame_live_settings {
+    float render_scale;       /* 0.05-1: the network's frame, as a share of the picture's */
+    float temporal;           /* the history's confidence, 0-1; 0 turns the history off */
+    float cut_limit;          /* mean change of the network's input above which the history goes */
+    float hold;               /* the floor where the game handed back the same pixel, 0-1 */
+    float release;            /* levels of 255 over which the gate lets go of a changed pixel; 0 off */
+    int   letterbox;          /* 1: work on the region inside symmetric black bars */
+} nr_frame_live_settings;
+
+typedef struct nr_frame_live_report {
+    int    top, bottom, left, right;          /* the active region worked on */
+    int    render_width, render_height;       /* the frame the network was handed */
+    int    network_width, network_height;     /* and the field it ran on */
+    int    with_history;                      /* 1 when the previous frame's history was used */
+    double cut;                               /* mean |change| of the network's input, 0 without history */
+    double change;                            /* mean |composition - colour| on every fourth row */
+} nr_frame_live_report;
+
+/* nr_daemon.py's: scale 1, temporal 1, cut limit 0.15, hold 1, release 24, letterbox on. */
+void nr_frame_live_defaults(nr_frame_live_settings *settings);
+nr_frame_live *nr_frame_live_open(nr_frame *frame);
+/* Forget the history and the letterbox; the next frame starts a shot. */
+void nr_frame_live_reset(nr_frame_live *live);
+void nr_frame_live_close(nr_frame_live *live);
+/* `pixels` and `answer` are (height, width, 4) bytes, BGRA with `bgra` else RGBA; alpha and
+ * the bars come back as they went in. `answer` may be `pixels`. `params` NULL for the
+ * `standard` profile, `settings` NULL for the defaults, `report` NULL for none. 0 on
+ * success; `nr_frame_error()` otherwise, and the history is dropped. */
+int nr_frame_live_run(nr_frame_live *live, const nr_frame_params *params,
+                      const nr_frame_live_settings *settings, const unsigned char *pixels,
+                      int width, int height, int bgra, unsigned char *answer,
+                      nr_frame_live_report *report);
+
 #ifdef __cplusplus
 }
 #endif

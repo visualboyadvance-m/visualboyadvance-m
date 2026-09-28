@@ -143,6 +143,7 @@ test-metal: work/libmetalmx$(SO)
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_resident.py
 	NR_GPU_BACKEND=metal $(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference_metal.bin
 	NR_GPU_BACKEND=metal work/test_nr_frame --reference work/nr_frame_reference_metal.bin
+	NR_GPU_BACKEND=metal $(PYTHON) src/ref/test_nr_frame_live.py
 
 # For the Vulkan loader on macOS, which finds no driver on its own: point VK_DRIVER_FILES
 # (older loaders: VK_ICD_FILENAMES) at this file. The tests that go through the loader do.
@@ -336,6 +337,7 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	NR_HOST_THREADS=3 $(PYTHON) src/ref/test_native_image.py
 	$(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference.bin
 	work/test_nr_frame --reference work/nr_frame_reference.bin
+	$(PYTHON) src/ref/test_nr_frame_live.py
 	$(PYTHON) src/ref/test_nr_model.py
 	$(PYTHON) src/ref/test_temporal_controls.py
 	$(PYTHON) src/gpu/test_gemm_int8.py

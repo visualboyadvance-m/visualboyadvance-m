@@ -1,6 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-27**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-09-28**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -9,7 +9,53 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: six more dlss-nr-on-intel commits — the vendor's post-process — on every runtime (2026-09-27, late)
+## Latest: seven more dlss-nr-on-intel commits — the stills re-rendered — and the daemon's frame in C (2026-09-28)
+
+`5f9d92b`..`72a7440` of `uzbekunknown/dlss-nr-on-intel` are in (applied against `59c21fb`): the
+README and the brief brought up to date (playable, 30 fps at 800x450 in Tekken 7, about 570
+checks, 1.3 GiB at 1080p), `src/bench/restill.py` (a `--dump` capture replayed through a fresh
+daemon in its order, history and all), `src/tools/comparisons.py` (which frame and which pixels
+each published still is, and the table under them), `src/tools/contact_sheet.py`, a
+`.gitattributes` that keeps every checkout LF, and their HANDOFF entry (below, verbatim). No kernel
+changed, so nothing moved on Metal or Direct3D 12. Four README hunks were merged by hand: this
+tree's README differs where it describes the platforms and the build, and upstream's line about
+andyvand's fork has no counterpart here — its `build_check.py` sentence went into the CMake
+paragraph instead. Carried past them:
+
+- **`nr_frame_live` in the C frame library** (`nr_frame.h`): `nr_daemon.process_connection` on its
+  default path as one stateful call — 8-bit pixels in and out, the letterbox found once and
+  afterwards checked in eight lines (`Letterbox`), the render scale's frame
+  (`nr_frame_render_extent`), the history taken and dropped as `History` takes it (a new
+  swapchain, bars or profile, or a cut past `cut_limit`), `nr_frame_head`, and
+  `nr_frame_compose_encode_neural` keeping the vendor's history. `nr_frame_live_settings` are the
+  daemon's knobs in its own units (scale, temporal, cut limit, hold, release in levels, letterbox);
+  `nr_frame_params` carries the profile and the composition, and its temporal fields are folded
+  from the settings as `nr_frame.compose_encode` folds them. A report gives the bars, the render and
+  network extents, whether history was used, the cut and the change. The interface mask is not
+  taken. It is host code over the existing entry points, so it runs on every runtime.
+- **`nr_frame --replay DUMP OUT`**: restill without the daemon — a capture's NNN_in.png through
+  `nr_frame_live` in order, into OUT as NNN_in/NNN_out numbered from 001, one log line a frame
+  in the daemon's words. `restill.py --native` runs it and checks each NNN_in, so a capture can be
+  re-rendered on Metal or Direct3D 12 and where the daemon's Unix socket does not exist. The
+  directory walk is `_findfirst` on Windows, `opendir` elsewhere.
+- **`src/ref/test_nr_frame_live.py`** (ctest `test_nr_frame_live`, `metal_` and `d3d12_` twins, and
+  `make test` / `test-metal`): the daemon's own `Letterbox`, `History`, `resample` and
+  `nr_frame.render_extent` driving `nr_frame_head` and the fused composition, against the session,
+  on a letterboxed pan with a cut, at scales 1, 0.5 (the area mean) and 0.6 (the bilinear), with the
+  detail split, and with the history off: every answer byte-identical on MoltenVK, Metal 4 and Metal
+  3.1. `nr_frame_native.NativeLive` and `NativeFrame.head` are the bindings. `test_nr_frame_c.py`
+  gained a `__main__` guard so its `synthetic_weights` can be imported.
+
+Measured on the M3 with the real weights (rebuilt from `weights/`): `nr_frame --replay` against the
+daemon's socket answers on the same seven frames, **0.66-0.93 levels of 255 apart, max 6-10**,
+where the pass moves the picture 3.3-4.4 — the noise channels, which C and NumPy compute a last bit
+apart (`phase68`), through a chaotic graph; the cuts, the history decisions and the bars agree
+with the daemon's log line for line. `test_nr_frame_c`, `test_nr_frame` and `test_dlssnr` pass
+unchanged; `nr_frame.c` and the command compile clean for arm64-v8a and armeabi-v7a. No
+Windows compiler here: the Win32 branch of the directory walk is written, not built. No Xe2 or
+Windows run.
+
+## Six more dlss-nr-on-intel commits — the vendor's post-process — on every runtime (2026-09-27, late)
 
 `a72a79b`..`59c21fb` of `uzbekunknown/dlss-nr-on-intel` are in (merged file by file against
 `04ff144`): the styles' colour grade and the vendor's history (`notes/phase70-post-process.md` —
@@ -236,6 +282,35 @@ No Xe2, phone or Windows run: the matrix-path GLSL is upstream's.
   game's motion-vector convention); deferred by the owner on 2026-09-26. Tekken 7 and DoA5
   have no upscaler, so it needs a newer game.
 - **A FAQ** in the README, for the questions that keep coming back. Later.
+
+## PR #3 run on Linux; the bands it reports not explained here; the stills rendered again (2026-09-28, night)
+
+**PR #3** (the Windows link between layer and daemon, an outside contributor on a B580) was run
+here and reviewed on the PR. It did not build on Linux — two one-line errors — and with those
+fixed its own `make test` passed and the layer's daemon spawn worked from `make`'s layout. Its
+setup scripts fetch a third-party pack carrying NVIDIA's DLL, which cannot be merged in any form.
+It turns `NR_QKV_EPILOGUE` off for everyone after horizontal bands on the B580; here that costs
+**143 -> 257 ms** of graph at 1344x768 and 23.3 -> 34.8 at 320x320, for the same head.
+
+**The bands are not explained from here.** The subgroup width, forced with `XMX_SUBGROUP_WIDTH`
+(local branch `subgroup-width`, not merged): every pipeline at 16 lanes makes the head wrong and
+different on every run, epilogue on or off — the row passes in `attention.comp`, one subgroup a
+workgroup and ordered by subgroup barriers, race; any single other family at 16, both GEMMs
+included, leaves `test_gemm_qkv.py` and the frame's head bit for bit. And no QKV epilogue dispatch
+writes memory it reads: every call at four extents checked, buffer by buffer. **A driver that
+cannot pin 32 lanes gets a wrong picture from the row passes, and libxmx's one-line warning is
+the only sign of it.**
+
+**The README's five stills rendered again** from the same captured frames through today's graph:
+`src/bench/restill.py` replays a `--dump` capture through a fresh daemon in its order, history
+and all; `src/tools/comparisons.py` is the record of which frame and which pixels each published
+image is, and rebuilds the old ones exactly from the old captures (the table to the digit). More
+texture than on 2026-09-16 (Tekken's weave +50 -> +61 %), the same kind of change. Published
+on 2026-09-28 with the owner's approval — the images on `media`, the table in the README.
+
+And the local `windows` branch (CMake for the compute side with MSYS2's gcc, `docs/WINDOWS.md`)
+overlaps PR #3, which does the layer and the daemon with MSVC: the two are to be reconciled
+before a Windows session starts from either.
 
 ## Xe2's 256-register mode: reachable, correct, and slower (2026-09-27, late night)
 
@@ -1791,9 +1866,11 @@ value:
 5041 to 2303 MiB and 1080p now fits without swapping (phase 32) — and 701 MiB since the
 scratch is sized by what the recording touches (2026-09-26).
 
-**Real time is still not on the table.** At `17 ms + 488 ms/Mpixel`, 30 fps needs about
+~~**Real time is still not on the table.** At `17 ms + 488 ms/Mpixel`, 30 fps needs about
 a 243x137 extent and 15 fps about 425x239. On this hardware with this graph, DLSS-NR is
-a photo mode — which is what the Vulkan layer delivers.
+a photo mode — which is what the Vulkan layer delivers.~~ **Withdrawn** — written at 488 ms a
+megapixel. Live mode runs every present: Tekken 7 at 30 fps at 800x450 beside the game
+(2026-09-27), the daemon alone 25-27 ms at the live sizes.
 
 ---
 

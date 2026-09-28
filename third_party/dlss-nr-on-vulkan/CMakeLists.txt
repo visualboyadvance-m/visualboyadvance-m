@@ -1199,6 +1199,8 @@ if(NR_BUILD_TESTS)
     # the Python side of the C frame test writes the reference the C side reads
     nr_ctest(test_nr_frame_py "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference.bin")
     set_tests_properties(nr_frame_c PROPERTIES DEPENDS test_nr_frame_py)
+    # the daemon's stateful frame through nr_frame_live, against the daemon's own pieces
+    nr_ctest(test_nr_frame_live "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_live.py")
     # the same GPU tests on libmetalmx, which every one of them reaches through
     # NR_GPU_BACKEND=metal; the C frame test writes and reads a reference of its own
     set(NR_RUNTIME_TESTS
@@ -1233,6 +1235,8 @@ if(NR_BUILD_TESTS)
       set_tests_properties(metal_test_nr_frame_py PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}")
       add_test(NAME metal_nr_frame_c COMMAND "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_metal.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(metal_nr_frame_c PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}" DEPENDS metal_test_nr_frame_py)
+      add_test(NAME metal_test_nr_frame_live COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_live.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(metal_test_nr_frame_live PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}")
     endif()
     # and on libd3dmx through NR_GPU_BACKEND=d3d12 (Windows; every GEMM there is the
     # portable kernel already, so the forced-portable run is the same run and is not repeated)
@@ -1248,6 +1252,8 @@ if(NR_BUILD_TESTS)
       set_tests_properties(d3d12_test_nr_frame_py PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
       add_test(NAME d3d12_nr_frame_c COMMAND "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_d3d12.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(d3d12_nr_frame_c PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}" DEPENDS d3d12_test_nr_frame_py)
+      add_test(NAME d3d12_test_nr_frame_live COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_live.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(d3d12_test_nr_frame_live PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
     endif()
   endif()
 endif()

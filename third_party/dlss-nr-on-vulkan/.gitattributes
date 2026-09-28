@@ -1,0 +1,6 @@
+# LF in the repository and in every checkout, Windows included. A CRLF checkout of
+# nr_daemon.py once made a 200-line change read as a 2,000-line rewrite and every later
+# change to the file a conflict. cmd.exe is the exception: batch files keep CRLF.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf

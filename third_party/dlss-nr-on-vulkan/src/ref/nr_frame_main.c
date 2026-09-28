@@ -15,6 +15,16 @@
  * `--gpu`, `--resident` and `--accel` are accepted and mean nothing here: this program has
  * one backend, the resident graph in `libnr_frame`. The network runs once; the ladder
  * composes the head at each intensity as the Python does.
+ *
+ *     nr_frame --replay DUMP OUT [--render-scale F] [--temporal F] [--hold F] [--release F]
+ *              [--cut-limit F] [--min-extent N] [--no-letterbox] [--profile P] [--intensity F] ...
+ *
+ * `src/bench/restill.py` without the daemon: a `nr_daemon.py --dump` capture's NNN_in.png
+ * frames, in their order, through `nr_frame_live` — the daemon's frame, its letterbox, its
+ * render scale and its history — into OUT as NNN_in.png and NNN_out.png, numbered from 001
+ * as the daemon's own dump numbers them. The render scale is 1 unless set, as restill's is;
+ * the other knobs are the daemon's defaults. It runs on whichever runtime is behind
+ * libnr_frame (NR_GPU_BACKEND), so a capture can be re-rendered on Metal or Direct3D 12.
  */
 #include "nr_frame.h"
 #include "nr_image.h"
@@ -27,6 +37,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+#else
+#include <dirent.h>
+#endif
 
 static double now(void) { return nr_now(); }
 
@@ -52,7 +70,7 @@ static void png_version_mismatch(void)
         exit(1);
     }
 }
-static float *read_png(const char *path, int *height, int *width)
+static unsigned char *read_png_bytes(const char *path, int *height, int *width)
 {
 #if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
     FILE *f = NULL;
@@ -91,12 +109,18 @@ static float *read_png(const char *path, int *height, int *width)
     png_destroy_read_struct(&png, &info, NULL);
     fclose(f);
     free(rows);
-    size_t n = (size_t)w * h * 3;
+    *height = (int)h; *width = (int)w;
+    return raw;
+}
+
+static float *read_png(const char *path, int *height, int *width)
+{
+    unsigned char *raw = read_png_bytes(path, height, width);
+    size_t n = (size_t)*width * *height * 3;
     float *out = malloc(n * sizeof(float));
     if (!out) die("out of memory");
     for (size_t i = 0; i < n; i++) out[i] = (float)raw[i] / 255.0f;
     free(raw);
-    *height = (int)h; *width = (int)w;
     return out;
 }
 
@@ -151,8 +175,8 @@ static float *load_image(const char *path, int *height, int *width, int resize_h
     return image;
 }
 
-/* `image_io.save`: clip, `(a * 255 + 0.5)` to bytes, an 8-bit RGB PNG. */
-static void save_image(const float *image, int height, int width, const char *path)
+/* An 8-bit RGB PNG of (height, width, 3) bytes. */
+static void save_png_bytes(const unsigned char *raw, int height, int width, const char *path)
 {
 #if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
     FILE *f = NULL;
@@ -169,21 +193,29 @@ static void save_image(const float *image, int height, int width, const char *pa
     png_set_IHDR(png, info, (png_uint_32)width, (png_uint_32)height, 8, PNG_COLOR_TYPE_RGB,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
     png_write_info(png, info);
+    png_bytep *rows = malloc((size_t)height * sizeof *rows);
+    if (!rows) die("out of memory");
+    for (int y = 0; y < height; y++) rows[y] = (png_bytep)raw + (size_t)y * width * 3;
+    png_write_image(png, rows);
+    png_write_end(png, NULL);
+    png_destroy_write_struct(&png, &info);
+    fclose(f);
+    free(rows);
+}
+
+/* `image_io.save`: clip, `(a * 255 + 0.5)` to bytes, an 8-bit RGB PNG. */
+static void save_image(const float *image, int height, int width, const char *path)
+{
     size_t n = (size_t)height * width * 3;
     unsigned char *raw = malloc(n);
-    png_bytep *rows = malloc((size_t)height * sizeof *rows);
-    if (!raw || !rows) die("out of memory");
+    if (!raw) die("out of memory");
     for (size_t i = 0; i < n; i++) {
         float v = image[i];
         v = v < 0.0f ? 0.0f : v > 1.0f ? 1.0f : v;
         raw[i] = (unsigned char)(v * 255.0f + 0.5f);
     }
-    for (int y = 0; y < height; y++) rows[y] = raw + (size_t)y * width * 3;
-    png_write_image(png, rows);
-    png_write_end(png, NULL);
-    png_destroy_write_struct(&png, &info);
-    fclose(f);
-    free(raw); free(rows);
+    save_png_bytes(raw, height, width, path);
+    free(raw);
 }
 
 static int readable(const char *path)
@@ -247,6 +279,171 @@ static int profile(const char *name, nr_frame_params *p)
     return -1;
 }
 
+/* ------------------------------------------------------------------------- */
+/* --replay: a --dump capture through nr_frame_live, in its order             */
+/* ------------------------------------------------------------------------- */
+
+static void join(char *out, size_t cap, const char *dir, const char *name)
+{
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    sprintf_s(out, cap, "%s/%s", dir, name);
+#else
+    snprintf(out, cap, "%s/%s", dir, name);
+#endif
+}
+
+/* The number of a daemon's NNN_in.png, or -1 for anything else in the folder. */
+static long dump_number(const char *name)
+{
+    const char *p = name;
+    if (*p < '0' || *p > '9') return -1;
+    long n = 0;
+    while (*p >= '0' && *p <= '9') { n = n * 10 + (*p - '0'); p++; if (n > 100000000L) return -1; }
+    return strcmp(p, "_in.png") ? -1 : n;
+}
+
+static int compare_long(const void *a, const void *b)
+{
+    long x = *(const long *)a, y = *(const long *)b;
+    return (x > y) - (x < y);
+}
+
+/* Each entry of `dir` through `visit`; 0 when the folder could be read. */
+static int list_dir(const char *dir, void (*visit)(const char *name, void *context), void *context)
+{
+#ifdef _WIN32
+    char pattern[1200];
+    join(pattern, sizeof pattern, dir, "*");
+    struct _finddata_t found;
+    intptr_t handle = _findfirst(pattern, &found);
+    if (handle == -1) return errno == ENOENT ? 0 : -1;
+    do visit(found.name, context); while (_findnext(handle, &found) == 0);
+    _findclose(handle);
+#else
+    DIR *d = opendir(dir);
+    if (!d) return -1;
+    for (struct dirent *e; (e = readdir(d));) visit(e->d_name, context);
+    closedir(d);
+#endif
+    return 0;
+}
+
+struct numbers { long *values; size_t count, cap; int others; };
+
+static void collect(const char *name, void *context)
+{
+    struct numbers *n = context;
+    if (!strcmp(name, ".") || !strcmp(name, "..")) return;
+    long number = dump_number(name);
+    if (number < 0) { n->others++; return; }
+    if (n->count == n->cap) {
+        n->cap = n->cap ? n->cap * 2 : 64;
+        n->values = realloc(n->values, n->cap * sizeof *n->values);
+        if (!n->values) die("out of memory");
+    }
+    n->values[n->count++] = number;
+}
+
+static void make_dir(const char *dir)
+{
+#ifdef _WIN32
+    int rc = _mkdir(dir);
+#else
+    int rc = mkdir(dir, 0777);
+#endif
+    if (rc && errno != EEXIST) { perror(dir); exit(1); }
+}
+
+static int replay(nr_frame *frame, const nr_frame_params *p, const nr_frame_live_settings *s,
+                  const char *source, const char *out)
+{
+    struct numbers frames = { 0 };
+    if (list_dir(source, collect, &frames)) { perror(source); return 1; }
+    if (!frames.count) { fprintf(stderr, "no NNN_in.png in %s\n", source); return 1; }
+    qsort(frames.values, frames.count, sizeof *frames.values, compare_long);
+    for (size_t k = 1; k < frames.count; k++)
+        if (frames.values[k] != frames.values[0] + (long)k) {
+            /* a gap means frames the daemon saw and this replay would not: its history differs */
+            fprintf(stderr, "%s: the frames are not consecutive (%ld-%ld, %u of them)\n", source,
+                    frames.values[0], frames.values[frames.count - 1], (unsigned)frames.count);
+            return 1;
+        }
+    make_dir(out);
+    struct numbers there = { 0 };
+    if (list_dir(out, collect, &there)) { perror(out); return 1; }
+    if (there.count || there.others) {
+        fprintf(stderr, "%s is not empty: the dump is numbered from 001, as the daemon's is\n", out);
+        return 1;
+    }
+    free(there.values);
+
+    nr_frame_live *live = nr_frame_live_open(frame);
+    if (!live) { fprintf(stderr, "nr_frame_live_open: %s\n", nr_frame_error()); return 1; }
+    printf("  %s -> %s, %u frames, render scale %g, temporal %g, hold %g, release %g, cut limit %g\n",
+           source, out, (unsigned)frames.count, (double)s->render_scale, (double)s->temporal, (double)s->hold,
+           (double)s->release, (double)s->cut_limit);
+    fflush(stdout);
+    for (size_t k = 0; k < frames.count; k++) {
+        char name[64], path[1200];
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+        sprintf_s(name, sizeof name, "%03ld_in.png", frames.values[k]);
+#else
+        snprintf(name, sizeof name, "%03ld_in.png", frames.values[k]);
+#endif
+        join(path, sizeof path, source, name);
+        int height, width;
+        unsigned char *rgb = read_png_bytes(path, &height, &width);
+        size_t pixels = (size_t)height * width;
+        /* every swapchain behind the captures so far was B8G8R8A8, and the dumps are 8-bit,
+         * so the bytes sent are the bytes the game sent */
+        unsigned char *bgra = malloc(pixels * 4), *answer = malloc(pixels * 4), *shown = malloc(pixels * 3);
+        if (!bgra || !answer || !shown) die("out of memory");
+        for (size_t i = 0; i < pixels; i++) {
+            bgra[i * 4 + 0] = rgb[i * 3 + 2]; bgra[i * 4 + 1] = rgb[i * 3 + 1];
+            bgra[i * 4 + 2] = rgb[i * 3 + 0]; bgra[i * 4 + 3] = 255;
+        }
+        nr_frame_live_report r;
+        double started = now();
+        if (nr_frame_live_run(live, p, s, bgra, width, height, 1, answer, &r)) {
+            fprintf(stderr, "%s: nr_frame_live_run: %s\n", path, nr_frame_error());
+            return 1;
+        }
+        double elapsed = now() - started;
+        for (size_t i = 0; i < pixels; i++) {
+            shown[i * 3 + 0] = answer[i * 4 + 2]; shown[i * 3 + 1] = answer[i * 4 + 1];
+            shown[i * 3 + 2] = answer[i * 4 + 0];
+        }
+        char in_path[1200], out_path[1200], in_name[64], out_name[64];
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+        sprintf_s(in_name, sizeof in_name, "%03u_in.png", (unsigned)(k + 1));
+        sprintf_s(out_name, sizeof out_name, "%03u_out.png", (unsigned)(k + 1));
+#else
+        snprintf(in_name, sizeof in_name, "%03u_in.png", (unsigned)(k + 1));
+        snprintf(out_name, sizeof out_name, "%03u_out.png", (unsigned)(k + 1));
+#endif
+        join(in_path, sizeof in_path, out, in_name);
+        join(out_path, sizeof out_path, out, out_name);
+        save_png_bytes(rgb, height, width, in_path);
+        save_png_bytes(shown, height, width, out_path);
+        int active_width = r.right - r.left, active_height = r.bottom - r.top;
+        printf("  %s -> %s  %dx%d in %.2fs  change %.5f  %s %.4f  network %dx%d scale %g",
+               name, out_name, width, height, elapsed, r.change,
+               r.with_history ? "history, cut" : "no history, cut", r.cut, r.network_width,
+               r.network_height, (double)s->render_scale);
+        if (s->render_scale < 1.0f && r.render_width != (int)lround((double)active_width * s->render_scale))
+            printf(" (runs as %.3g)", (double)r.render_width / (double)active_width);
+        if (active_width != width || active_height != height)
+            printf("  letterbox %dpx of rows and %dpx of columns skipped", height - active_height,
+                   width - active_width);
+        printf("\n");
+        fflush(stdout);
+        free(rgb); free(bgra); free(answer); free(shown);
+    }
+    nr_frame_live_close(live);
+    free(frames.values);
+    return 0;
+}
+
 static void usage(void)
 {
     fprintf(stderr,
@@ -254,7 +451,11 @@ static void usage(void)
         "                (W defaults to the weights compiled into libnr_frame, else work/mlxw/dlssnr-logical.safetensors)\n"
         "                [--style-index N] [--local-tone F] [--local-structure F] [--skin-structure F]\n"
         "                [--auto-mask F] [--control-mask MASK] [--intensity F] [--intensity-ladder A,B,..]\n"
-        "                [--detail-strength F] [--colour-strength F] [--detail-radius F] [--frame-index N] [-v]\n");
+        "                [--detail-strength F] [--colour-strength F] [--detail-radius F] [--frame-index N] [-v]\n"
+        "       nr_frame --replay DUMP OUT [--render-scale F] [--temporal F] [--hold F] [--release F]\n"
+        "                [--cut-limit F] [--min-extent N] [--no-letterbox] [--profile P] [--intensity F] ...\n"
+        "                (a nr_daemon.py --dump capture through the daemon's frame, history and all;\n"
+        "                 render scale 1 unless set, the other knobs the daemon's defaults)\n");
     exit(2);
 }
 
@@ -268,6 +469,9 @@ int main(int argc, char **argv)
     float skin = -1.0f, automatic = -1.0f;
     nr_frame_params p;
     nr_frame_defaults(&p);
+    int replaying = 0;
+    nr_frame_live_settings live;
+    nr_frame_live_defaults(&live);
 
 #define NEXT() (i + 1 < argc ? argv[++i] : (usage(), (char *)0))
     for (int i = 1; i < argc; i++) {
@@ -287,6 +491,14 @@ int main(int argc, char **argv)
         else if (!strcmp(a, "--colour-strength")) p.colour_strength = (float)atof(NEXT());
         else if (!strcmp(a, "--detail-radius")) p.detail_radius = (float)atof(NEXT());
         else if (!strcmp(a, "--frame-index")) p.frame_index = atoi(NEXT());
+        else if (!strcmp(a, "--replay")) replaying = 1;
+        else if (!strcmp(a, "--render-scale")) live.render_scale = (float)atof(NEXT());
+        else if (!strcmp(a, "--temporal")) live.temporal = (float)atof(NEXT());
+        else if (!strcmp(a, "--hold")) live.hold = (float)atof(NEXT());
+        else if (!strcmp(a, "--release")) live.release = (float)atof(NEXT());
+        else if (!strcmp(a, "--cut-limit")) live.cut_limit = (float)atof(NEXT());
+        else if (!strcmp(a, "--min-extent")) p.min_extent = atoi(NEXT());
+        else if (!strcmp(a, "--no-letterbox")) live.letterbox = 0;
         else if (!strcmp(a, "--gpu") || !strcmp(a, "--resident") || !strcmp(a, "--accel"))
             ;   /* one backend here: the resident graph */
         else if (!strcmp(a, "-v") || !strcmp(a, "--verbose")) verbose = 1;
@@ -314,6 +526,17 @@ int main(int argc, char **argv)
     printf("resident backend ready in %.1fs (%s) on %s\n", now() - started, weights ? weights : "embedded weights",
            nr_frame_device(frame));
     fflush(stdout);
+
+    if (replaying) {
+        if (!(live.render_scale >= 0.05f && live.render_scale <= 1.0f)) die("--render-scale is 0.05-1");
+        if (!(live.temporal >= 0.0f && live.temporal <= 1.0f) || !(live.hold >= 0.0f && live.hold <= 1.0f)
+            || !(live.cut_limit >= 0.0f && live.cut_limit <= 1.0f)) die("--temporal, --hold and --cut-limit are 0-1");
+        if (!(live.release >= 0.0f && live.release <= 255.0f)) die("--release is 0-255");
+        if (p.min_extent < 128 || p.min_extent > 4096) die("--min-extent is 128-4096, as the daemon takes it");
+        int rc = replay(frame, &p, &live, input, output);
+        nr_frame_close(frame);
+        return rc;
+    }
 
     int height, width, resize_h = 0, resize_w = 0;
     if (size && sscanf(size, "%dx%d", &resize_h, &resize_w) != 2) usage();
