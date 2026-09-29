@@ -31,6 +31,7 @@ endif()
 set(VBAM_TARGET_ANDROID OFF)
 set(VBAM_TARGET_WIN32   ${WIN32})
 set(VBAM_TARGET_APPLE   ${APPLE})
+set(VBAM_TARGET_WINXP   OFF)
 
 if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android"
         OR VCPKG_TARGET_TRIPLET MATCHES "-android$")
@@ -42,6 +43,14 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows"
         OR CMAKE_TOOLCHAIN_FILE MATCHES "[Mm]in[Gg][Ww]|mxe")
     set(VBAM_TARGET_WIN32 ON)
     set(VBAM_TARGET_APPLE OFF)
+
+    # 32 bit Windows built with MinGW, which is the one configuration
+    # Architecture.cmake later sets WINXP for. Derived here as well because the
+    # vcpkg dependency list is settled before project(), where there is no
+    # compiler to ask about pointer size -- only the triplet, as above.
+    if(VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
+        set(VBAM_TARGET_WINXP ON)
+    endif()
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS"
         OR VCPKG_TARGET_TRIPLET MATCHES "-(osx|ios)")
     set(VBAM_TARGET_WIN32 OFF)

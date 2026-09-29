@@ -216,12 +216,22 @@ unset(VCPKG_DEPS_OPTIONAL)
 # backend, so either frontend pulls it in.
 #
 # libusb is SDL_HIDAPI_LIBUSB, the controller backend that talks to the device
-# over raw USB. Android does not take it: the HID backend there is the Java one
-# under org/libsdl/app that the APK carries itself, and the port is not
-# platform-gated, so asking for it there builds libusb for a target that never
-# links it.
+# over raw USB. Two targets do not take it.
+#
+# Android: the HID backend there is the Java one under org/libsdl/app that the
+# APK carries itself, and the port is not platform-gated, so asking for it
+# there builds libusb for a target that never links it.
+#
+# Windows XP: libusb imports CancelIoEx and the condition variable API
+# statically -- InitializeConditionVariable, SleepConditionVariableCS,
+# WakeAllConditionVariable -- and all four are Vista or later. A static import
+# of a missing function stops the binary loading at all rather than failing
+# when it is called, so the XP build died on startup naming CancelIoEx. They
+# are the only Vista-or-later imports in the whole link, and libusb is the only
+# thing that asks for them. Without the feature SDL keeps its native Windows
+# HID backend, so what goes is the raw USB path and not controller support.
 if(VBAM_NEED_SDL)
-    if(VBAM_TARGET_ANDROID)
+    if(VBAM_TARGET_ANDROID OR VBAM_TARGET_WINXP)
         list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan]"        ENABLE_SDL3)
     else()
         list(APPEND VCPKG_DEPS_OPTIONAL "sdl3[vulkan,libusb]" ENABLE_SDL3)
