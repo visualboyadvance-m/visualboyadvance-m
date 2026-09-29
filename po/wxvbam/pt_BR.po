@@ -47,7 +47,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-27 14:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Felipefpl, 2022,2026\n"
+"Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -494,51 +494,51 @@ msgstr "Ativar &DLSS-NR"
 msgid ""
 "Runs every frame through the DLSS-NR neural rendering model. Very slow and "
 "experimental."
-msgstr ""
+msgstr "Executa cada frame através do modelo de renderização neural do DLSS-NR. Muito lento e experimental."
 
 #: dialogs/display-config.cpp:1335
 msgid "Use Frame &History"
-msgstr ""
+msgstr "Usar Histórico dos &Frames"
 
 #: dialogs/display-config.cpp:1336
 msgid ""
 "Feeds the previous filtered frame back into the model, for steadier motion. "
 "Unchecked, every frame is filtered on its own exactly as the nr_frame "
 "command filters a picture, and the filter runs faster."
-msgstr ""
+msgstr "Alimenta o frame filtrado anterior de volta para o modelo, pra um movimento mais estável. Desmarcado, cada frame é filtrado por conta própria exatamente como o comando nr_frame filtra uma imagem, e o filtro executa mais rápido."
 
 #: dialogs/display-config.cpp:1347
 msgid "&Pre-filter"
-msgstr ""
+msgstr "& Pré-filtro"
 
 #: dialogs/display-config.cpp:1349
 msgid ""
 "Run DLSS-NR on the emulated image, then let the display filter scale the "
 "result. The cheapest: the model sees the unscaled frame."
-msgstr ""
+msgstr "Executa o DLSS-NR na imagem emulada, então deixa o filtro de exibição ampliar o resultado. O mais barato: o modelo vê o frame não ampliado."
 
 #: dialogs/display-config.cpp:1352
 msgid "P&ost-filter"
-msgstr ""
+msgstr "P&ós-filtro"
 
 #: dialogs/display-config.cpp:1353
 msgid "Run DLSS-NR over the display filter's output, at the filtered size."
-msgstr ""
+msgstr "Execute o DLSS-NR na saída do filtro de exibição, no tamanho filtrado."
 
 #: dialogs/display-config.cpp:1356
 msgid "At display si&ze"
-msgstr ""
+msgstr "No tamanho da te&la"
 
 #: dialogs/display-config.cpp:1357
 msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
 "DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds "
 "the cost."
-msgstr ""
+msgstr "Escale a saída do filtro de exibição para o tamanho em que ele é mostrado e execute o DLSS-NR sobre isso, como em uma screenshot do jogo. A Altura Máxima limita o custo."
 
 #: dialogs/display-config.cpp:1360
 msgid "Apply:"
-msgstr ""
+msgstr "Aplicar:"
 
 #: dialogs/display-config.cpp:1374 dialogs/joypad-config.cpp:195
 #: xrc/GBColorPrefPanel.xrc:10
@@ -547,25 +547,25 @@ msgstr "Padrão"
 
 #: dialogs/display-config.cpp:1375
 msgid "Natural"
-msgstr ""
+msgstr "Natural"
 
 #: dialogs/display-config.cpp:1376
 msgid "Cinematic"
-msgstr ""
+msgstr "Cinematográfico"
 
 #: dialogs/display-config.cpp:1377
 msgid "Neutral"
-msgstr ""
+msgstr "Neutro"
 
 #: dialogs/display-config.cpp:1378
 msgid "Vendor"
-msgstr ""
+msgstr "Vendedor"
 
 #: dialogs/display-config.cpp:1379
 msgid ""
 "The style, local tone and local structure the model is conditioned on. "
 "Neutral turns local tone and structure off, Vendor raises structure."
-msgstr ""
+msgstr "O estilo, tom local e a estrutura local em que o modelo é condicionado. Neutro desliga o tom local e a estrutura, o fornecedor aumenta a estrutura."
 
 #: dialogs/display-config.cpp:1387 xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
@@ -573,38 +573,38 @@ msgstr "Perfil:"
 
 #: dialogs/display-config.cpp:1389
 msgid "Intensity:"
-msgstr ""
+msgstr "Intensidade:"
 
 #: dialogs/display-config.cpp:1391
 msgid ""
 "Blend of the model's picture against the game's. Above 100% extrapolates."
-msgstr ""
+msgstr "Mistura da imagem do modelo contra a imagem do jogo. Acima de 100% extrapola."
 
 #: dialogs/display-config.cpp:1393
 msgid "Maximum Height:"
-msgstr ""
+msgstr "Altura Máxima:"
 
 #: dialogs/display-config.cpp:1394 dialogs/display-config.cpp:1434
 msgid "px"
-msgstr ""
+msgstr "px"
 
 #: dialogs/display-config.cpp:1395
 msgid ""
 "Frames taller than this are scaled down before the model runs, and back up "
 "after. Lower is faster."
-msgstr ""
+msgstr "Frames mais altos do que isto são reduzidos antes do modelo executar e voltam a subir depois. Mais baixo é mais rápido."
 
 #: dialogs/display-config.cpp:1400
 msgid "Profile"
-msgstr ""
+msgstr "Perfil"
 
 #: dialogs/display-config.cpp:1401
 msgid "Off"
-msgstr ""
+msgstr "Desligado"
 
 #: dialogs/display-config.cpp:1409
 msgid "Style Index:"
-msgstr ""
+msgstr "Índice do Estilo:"
 
 #: dialogs/display-config.cpp:1411
 msgid ""
@@ -614,7 +614,7 @@ msgstr ""
 
 #: dialogs/display-config.cpp:1412
 msgid "Local Tone:"
-msgstr ""
+msgstr "Tom Local:"
 
 #: dialogs/display-config.cpp:1414
 msgid ""
@@ -624,7 +624,7 @@ msgstr ""
 
 #: dialogs/display-config.cpp:1415
 msgid "Local Structure:"
-msgstr ""
+msgstr "Estrutura Local:"
 
 #: dialogs/display-config.cpp:1417
 msgid ""
@@ -634,83 +634,83 @@ msgstr ""
 
 #: dialogs/display-config.cpp:1418
 msgid "Skin Structure:"
-msgstr ""
+msgstr "Estrutura da Skin:"
 
 #: dialogs/display-config.cpp:1420
 msgid ""
 "Structure on skin, through the automatic mask (nr_frame --skin-structure). "
 "Setting this or Automatic Mask turns the automatic mask on."
-msgstr ""
+msgstr "Estrutura na skin, através da máscara automática (nr_frame --estrutura da pele). Configurar isto ou a Máscara Automática ativa a máscara automática."
 
 #: dialogs/display-config.cpp:1421
 msgid "Automatic Mask:"
-msgstr ""
+msgstr "Máscara Automática:"
 
 #: dialogs/display-config.cpp:1423
 msgid ""
 "Structure through the automatic mask outside skin (nr_frame --auto-mask)."
-msgstr ""
+msgstr "Estrutura através da máscara automática fora da skin (nr_frame --auto-máscara)."
 
 #: dialogs/display-config.cpp:1424
 msgid "Frame Index:"
-msgstr ""
+msgstr "Índice do Frame:"
 
 #: dialogs/display-config.cpp:1426
 msgid "Seeds the model's noise channels (nr_frame --frame-index)."
-msgstr ""
+msgstr "Espalha os canais de ruído do modelo (nr_frame --frame-index)."
 
 #: dialogs/display-config.cpp:1427
 msgid "Detail Strength:"
-msgstr ""
+msgstr "Força dos Detalhes:"
 
 #: dialogs/display-config.cpp:1429
 msgid ""
 "High-frequency weight of the model's change (nr_frame --detail-strength)."
-msgstr ""
+msgstr "Peso da alta frequência da mudança do modelo (nr_frame --detail-strength)."
 
 #: dialogs/display-config.cpp:1430
 msgid "Colour Strength:"
-msgstr ""
+msgstr "Força da Cores:"
 
 #: dialogs/display-config.cpp:1432
 msgid ""
 "Low-frequency weight of the model's change (nr_frame --colour-strength)."
-msgstr ""
+msgstr "Peso da baixa frequência da mudança do modelo (nr_frame --colour-strength)."
 
 #: dialogs/display-config.cpp:1433
 msgid "Detail Radius:"
-msgstr ""
+msgstr "Raio do Detalhe:"
 
 #: dialogs/display-config.cpp:1435
 msgid ""
 "Radius of the split between detail and colour (nr_frame --detail-radius)."
-msgstr ""
+msgstr "Raio da divisão entre o detalhe e a cor (nr_frame --detail-radius)."
 
 #: dialogs/display-config.cpp:1441
 msgid ""
 "A PNG control mask (nr_frame --control-mask): red scales the blend, green "
 "the tone and blue the structure. It is resized to the filtered frame."
-msgstr ""
+msgstr "Uma máscara de controle PNG (nr_frame --control-mask): o vermelho amplia a mistura, o verde o tom e o azul a estrutura. Ela é redimensionada para o quadro filtrado."
 
 #: dialogs/display-config.cpp:1443
 msgid "Browse..."
-msgstr ""
+msgstr "Explorar..."
 
 #: dialogs/display-config.cpp:1444
 msgid "Clear"
-msgstr ""
+msgstr "Limpar"
 
 #: dialogs/display-config.cpp:1446
 msgid "Select a DLSS-NR control mask"
-msgstr ""
+msgstr "Selecionar uma máscara de controle do DLSS-NR"
 
 #: dialogs/display-config.cpp:1447
 msgid "PNG Images (*.png)|*.png;*.PNG"
-msgstr ""
+msgstr "Imagens PNG (*.png)|*.png;*.PNG"
 
 #: dialogs/display-config.cpp:1460
 msgid "Control Mask:"
-msgstr ""
+msgstr "Máscara do Controle:"
 
 #: dialogs/display-config.cpp:1520 dialogs/display-config.cpp:1908
 #: xrc/DisplayConfigBasic.xrc:187
@@ -2331,65 +2331,65 @@ msgstr "Seja o DLSS NR rodando antes ou depois do filtro de exibição, ou no ta
 msgid ""
 "Blend of the DLSS NR picture against the source, in percent; above 100 "
 "extrapolates"
-msgstr ""
+msgstr "Mistura da imagem do NR do DLSS contra a fonte, em porcentagem acima de 100 extrapola"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid ""
 "DLSS NR profile: 0 standard, 1 natural, 2 cinematic, 3 neutral, 4 vendor"
-msgstr ""
+msgstr "Perfil do DLSS NR: 0 padrão, 1 natural, 2 cinematográfico, 3 neutro, 4 fornecedor"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid ""
 "Frames taller than this are scaled down before DLSS NR runs, and back up "
 "after"
-msgstr ""
+msgstr "Frames mais altos do que isto são reduzidos antes do DLSS NR executar, e voltam a aumentar depois"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
 msgid "Feed the previous DLSS NR output back into the model"
-msgstr ""
+msgstr "Alimente a saída anterior do DLSS NR de volta para o modelo"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "DLSS NR style index; -1 keeps the profile's"
-msgstr ""
+msgstr "Índice do estilo do DLSS NR; -1 mantém o perfil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "DLSS NR local tone; negative keeps the profile's"
-msgstr ""
+msgstr "Tom local do DLSS NR; o negativo mantém o perfil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid "DLSS NR local structure; negative keeps the profile's"
-msgstr ""
+msgstr "Estrutura local do DLSS NR; o negativo mantém o perfil"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "DLSS NR structure on skin through the automatic mask; negative is off"
-msgstr ""
+msgstr "Estrutura do DLSS NR na pele através da máscara automática; o negativo está desligado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
 msgid ""
 "DLSS NR structure through the automatic mask outside skin; negative is off"
-msgstr ""
+msgstr "Estrutura do DLSS NR através da máscara automática fora da skin; o negativo está desligado"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "High-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Peso da alta frequência da mudança do DLSS NR"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Low-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Peso da baixa frequência da mudança do DLSS NR"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Radius of the DLSS NR split between detail and colour, in pixels"
-msgstr ""
+msgstr "O raio do DLSS NR dividido entre o detalhe e a cor, em pixels"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "Seeds the DLSS NR model's noise channels"
-msgstr ""
+msgstr "Espalha os canais de ruído do modelo do DLSS NR"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
 msgid ""
 "PNG control mask for DLSS NR: red scales the blend, green the tone, blue the"
 " structure"
-msgstr ""
+msgstr "Máscara de controle PNG pro DLSS NR: vermelho amplia a mistura, verde o tom, azul a estrutura"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Directory containing RPI filter plugins"
