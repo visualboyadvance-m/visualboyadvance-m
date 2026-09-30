@@ -448,6 +448,10 @@ struct Packet {
     std::vector<float> wide;      // network head, (network_height, network_width, 4)
     std::vector<float> head;      // the head cropped to (filter_height, filter_width, 4)
     std::vector<float> output;    // (filter_height, filter_width, 3)
+    // The prediction before the intensity, the mask and the detail split, which is what
+    // the next frame's history is (nr_frame.h): `output` carries those, and carrying them
+    // back round puts them inside the loop.
+    std::vector<float> neural;    // (filter_height, filter_width, 3)
     std::vector<float> mask;      // the control mask at the filter extent, when use_mask
     std::vector<float> scratch;
 };
@@ -782,6 +786,7 @@ bool Filter::Impl::RunNetwork(Packet* p) {
 bool Filter::Impl::Compose(Packet* p) {
     const size_t filter_count = static_cast<size_t>(p->filter_width) * p->filter_height * 3;
     p->output.resize(filter_count);
+    p->neural.resize(filter_count);
     {
         std::shared_lock<std::shared_mutex> use;
         nr_frame* frame = Borrow(p, &use, false);
@@ -790,10 +795,12 @@ bool Filter::Impl::Compose(Packet* p) {
         const float* hist = p->use_history ? history.data() : nullptr;
         const float* prev = p->use_history ? previous.data() : nullptr;
         const float* mask = p->use_mask ? p->mask.data() : nullptr;
-        if (nr_frame_compose(frame, p->head.data(), p->colour.data(), p->filter_height,
-                             p->filter_width, hist, prev, mask, &p->params,
-                             p->output.data()) != 0) {
-            Fail(std::string("nr_frame_compose() failed: ") + nr_frame_error());
+        // `_neural` for the prediction as well as the picture: the picture is what goes
+        // on screen, the prediction is what the next frame's history has to be.
+        if (nr_frame_compose_neural(frame, p->head.data(), p->colour.data(), p->filter_height,
+                                    p->filter_width, hist, prev, mask, &p->params,
+                                    p->output.data(), p->neural.data()) != 0) {
+            Fail(std::string("nr_frame_compose_neural() failed: ") + nr_frame_error());
             return false;
         }
     }
@@ -925,7 +932,11 @@ void Filter::Impl::ComposeStage() {
             if (!p->want_history) {
                 have_history = false;
             } else {
-                history.swap(p->output);
+                // The prediction, not the picture. The picture carries the intensity,
+                // and the history goes to the next frame's features as well as its
+                // blend, so carrying the intensity round would have it compound: the
+                // vendor's own path keeps this value (nr_frame.h on `neural`).
+                history.swap(p->neural);
                 previous.swap(p->colour);
                 history_width = p->filter_width;
                 history_height = p->filter_height;
