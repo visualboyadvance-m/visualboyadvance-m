@@ -12,7 +12,9 @@
 #
 # Inputs:
 #   EXE        the binary to check
-#   FORBIDDEN  the name list, see cmake/xp-forbidden-imports.txt
+#   FORBIDDEN  the generated name list, see cmake/xp-forbidden-imports.txt
+#   EXTRA      the hand kept one beside it, see
+#              cmake/xp-forbidden-imports-extra.txt
 #   OBJDUMP    the toolchain's objdump
 
 if(NOT EXE OR NOT EXISTS "${EXE}")
@@ -42,6 +44,22 @@ if(NOT dump_rc EQUAL 0)
 endif()
 
 file(STRINGS "${FORBIDDEN}" forbidden)
+
+# The names no derivation from the headers can produce. An API the headers
+# declare unconditionally is declared at 0x0501 too, so it cancels out of the
+# two-pass diff however new it is -- ShutdownBlockReasonCreate is one, and it
+# stopped the binary loading at all. In a file of its own so regenerating the
+# other one cannot quietly drop them.
+#
+# Named but missing is a mistake, not a licence to skip it: see above.
+if(EXTRA)
+    if(NOT EXISTS "${EXTRA}")
+        message(FATAL_ERROR "CheckXPImports: no supplementary list at '${EXTRA}'")
+    endif()
+
+    file(STRINGS "${EXTRA}" extra)
+    list(APPEND forbidden ${extra})
+endif()
 
 # The import table rows are "<vma> <ordinal> <hint> <name>", one per line and
 # each starting with a tab. Take the trailing name off each; rows that are

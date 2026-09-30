@@ -2046,6 +2046,7 @@ if(WINXP)
         COMMAND ${CMAKE_COMMAND}
                 -DEXE=$<TARGET_FILE:visualboyadvance-m>
                 -DFORBIDDEN=${CMAKE_SOURCE_DIR}/cmake/xp-forbidden-imports.txt
+                -DEXTRA=${CMAKE_SOURCE_DIR}/cmake/xp-forbidden-imports-extra.txt
                 -DOBJDUMP=${CMAKE_OBJDUMP}
                 -P ${CMAKE_SOURCE_DIR}/cmake/CheckXPImports.cmake
         VERBATIM

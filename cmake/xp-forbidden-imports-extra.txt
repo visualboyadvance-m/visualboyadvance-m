@@ -1,0 +1,25 @@
+# Win32 APIs that Windows XP has not got and the generated list cannot see.
+#
+# Hand maintained, unlike cmake/xp-forbidden-imports.txt beside it, which is
+# derived by preprocessing the Windows headers at _WIN32_WINNT=0x0501 and at
+# 0x0600 and keeping the names only the second run declares. That derivation is
+# right about everything the headers guard on _WIN32_WINNT and blind to
+# everything they do not: an API declared unconditionally is declared by both
+# runs, so it cancels out of the diff and never reaches the list, however new
+# it is.
+#
+# Add a name here only with the evidence for it: something failed to load on XP
+# naming that entry point, and the header was read and found to put no
+# _WIN32_WINNT guard on it. Both halves matter. A guess belongs in neither file,
+# which is the whole reason the other one is generated.
+#
+# CheckXPImports.cmake reads this together with the generated list.
+
+# Vista. mingw-w64 and the Windows SDK both guard these with
+# WINAPI_PARTITION_DESKTOP alone, so compiling at 0x0501 neither hides them nor
+# warns about them. wxWidgets called them from src/msw/power.cpp and the
+# emulator died on startup with "the procedure entry point
+# ShutdownBlockReasonCreate could not be located in USER32.dll"; the overlay's
+# win-backcompat.patch resolves both through GetProcAddress now.
+ShutdownBlockReasonCreate
+ShutdownBlockReasonDestroy

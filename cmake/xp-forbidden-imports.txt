@@ -7,6 +7,10 @@
 # is wrong in both directions, missing what nobody thought of and naming things
 # like GetModuleHandleExW that have been there since XP.
 #
+# It can only answer for an API the headers guard on _WIN32_WINNT. One declared
+# unconditionally is declared by both runs and cancels out however new it is,
+# so those are kept by hand in xp-forbidden-imports-extra.txt beside this.
+#
 # CheckXPImports.cmake fails the build when an XP-targeted binary imports one.
 AcquireSRWLockExclusive
 AcquireSRWLockShared
