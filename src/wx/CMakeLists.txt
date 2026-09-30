@@ -2025,6 +2025,33 @@ function(vbam_strip_release_binary path)
     endif()
 endfunction()
 
+# Nothing in an XP build may import an API that XP has not got.
+#
+# A static import of a missing function stops the binary loading at all rather
+# than failing when it is called, so this is not a runtime problem to find
+# later: the emulator dies on startup with nothing to say. libusb came in
+# through SDL3's libusb feature and imported CancelIoEx and three condition
+# variable calls that way, and finding it meant disassembling the import table.
+#
+# Nothing in this tree can call one of these -- the XP build compiles at
+# _WIN32_WINNT=0x0501, where they are not declared -- so what this catches is a
+# dependency built against a newer baseline, which is the only way they arrive.
+#
+# Before the signing and zipping below, so a binary that cannot start is not
+# signed and not published.
+if(WINXP)
+    add_custom_command(
+        TARGET visualboyadvance-m
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+                -DEXE=$<TARGET_FILE:visualboyadvance-m>
+                -DFORBIDDEN=${CMAKE_SOURCE_DIR}/cmake/xp-forbidden-imports.txt
+                -DOBJDUMP=${CMAKE_OBJDUMP}
+                -P ${CMAKE_SOURCE_DIR}/cmake/CheckXPImports.cmake
+        VERBATIM
+    )
+endif()
+
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
