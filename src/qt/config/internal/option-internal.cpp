@@ -190,7 +190,7 @@ std::array<Option, kNbOptions>& Option::All() {
         bool retain_aspect = true;
         bool dlss_nr = false;
         uint32_t dlss_nr_stage = 1;  // dlssnr::Stage: pre-filter, post-filter, at display size
-        uint32_t dlss_nr_intensity = 100;
+        uint32_t dlss_nr_intensity = 150;
         uint32_t dlss_nr_profile = 0;  // standard, natural, cinematic, neutral, vendor
         uint32_t dlss_nr_max_height = 480;
         bool dlss_nr_history = true;
