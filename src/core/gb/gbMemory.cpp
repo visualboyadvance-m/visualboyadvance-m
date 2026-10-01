@@ -1582,6 +1582,19 @@ void mapperMMM01RAM(uint16_t address, uint8_t value)
 
 void memoryUpdateMapMMM01()
 {
+    // These values are restored verbatim from save states. Normalize the
+    // register fields before using them in shifts or host pointer arithmetic,
+    // and rebuild the derived RAM address instead of trusting its serialized
+    // value.
+    gbDataMMM01.mapperRAMEnable = gbDataMMM01.mapperRAMEnable == 1;
+    gbDataMMM01.mapperROMBank &= 0xff;
+    if (gbDataMMM01.mapperROMBank == 0)
+        gbDataMMM01.mapperROMBank = 1;
+    gbDataMMM01.mapperRAMBank &= 0x03;
+    gbDataMMM01.mapperMemoryModel = gbDataMMM01.mapperMemoryModel == 1;
+    gbDataMMM01.mapperROMHighAddress &= 0x03;
+    gbDataMMM01.mapperRomBank0Remapping &= 0xff;
+
     int tmpAddress = gbDataMMM01.mapperROMBank << 14;
 
     // check current model
@@ -1604,8 +1617,11 @@ void memoryUpdateMapMMM01()
     gbMemoryMap[0x03] = &gbRom[tmpAddress + 0x3000];
 
     if (g_gbCartData.HasRam()) {
-        gbMemoryMap[0x0a] = &gbRam[gbDataMMM01.mapperRAMAddress];
-        gbMemoryMap[0x0b] = &gbRam[gbDataMMM01.mapperRAMAddress + 0x1000];
+        const int ramAddress = (gbDataMMM01.mapperRAMBank << 13) &
+                               (int)g_gbCartData.ram_mask();
+        gbDataMMM01.mapperRAMAddress = ramAddress;
+        gbMemoryMap[0x0a] = &gbRam[ramAddress];
+        gbMemoryMap[0x0b] = &gbRam[ramAddress + 0x1000];
     }
 }
 
