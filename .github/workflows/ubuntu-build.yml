@@ -299,4 +299,6 @@ jobs:
       # Run tests
       - if: matrix.build_options == 'default'
         name: Run tests
-        run: cd build && xvfb-run ctest -j --output-on-failure
+        # -a picks a free server number instead of insisting on one, so a
+        # display left behind by an earlier job cannot fail the whole step.
+        run: cd build && xvfb-run -a ctest -j --output-on-failure

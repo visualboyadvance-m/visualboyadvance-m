@@ -653,7 +653,7 @@ if(BUILD_TESTING AND NOT COMPILE_ONLY)
     configure_qt_target(vbam-qt-config-tests)
 
     if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
-        vbam_gtest_discover_tests(vbam-qt-config-tests)
+        vbam_gtest_discover_tests(vbam-qt-config-tests NEEDS_DISPLAY)
     endif()
 endif()
 

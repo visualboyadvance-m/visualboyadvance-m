@@ -25,9 +25,17 @@ endif()
 # environment for MinGW builds.
 #
 # Usage:
-#   vbam_gtest_discover_tests(<target>)
+#   vbam_gtest_discover_tests(<target> [NEEDS_DISPLAY])
 #
+# NEEDS_DISPLAY marks a target whose cases open a window server connection, so
+# ctest runs them one at a time rather than in parallel with each other. On CI
+# that server is a single Xvfb shared by every job `ctest -j` starts at once,
+# and a case that fails to reach it dies in GTK before gtest can report
+# anything -- `Can't create a GtkStyleContext without a display connection`,
+# ctest showing SIGTRAP. Serialising the cases that need it keeps the number of
+# clients arriving together down to one.
 function(vbam_gtest_discover_tests TARGET)
+    cmake_parse_arguments(ARG "NEEDS_DISPLAY" "" "" ${ARGN})
     if(WIN32)
         # Both gtest_discover_tests() -- which runs the binary to enumerate its
         # cases -- and ctest read the test's stdout, and a GUI subsystem
@@ -59,5 +67,10 @@ function(vbam_gtest_discover_tests TARGET)
     # Discovery runs the binary as a post-build step, and the 5s default is
     # not enough under wine, nor for a freshly linked executable on a loaded
     # CI host, where Windows also scans it on first launch.
-    gtest_discover_tests(${TARGET} DISCOVERY_TIMEOUT 120)
+    if(ARG_NEEDS_DISPLAY)
+        gtest_discover_tests(${TARGET} DISCOVERY_TIMEOUT 120
+                             PROPERTIES RESOURCE_LOCK vbam-display)
+    else()
+        gtest_discover_tests(${TARGET} DISCOVERY_TIMEOUT 120)
+    endif()
 endfunction()
