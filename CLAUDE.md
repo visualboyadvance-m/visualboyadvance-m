@@ -147,6 +147,17 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - Write in imperative mood (e.g., "fix", not "fixes" or "fixed")
 - Always include a body; it must be independent of the title
 - Sign commits with GPG (`git commit -S`)
+- Always sign off (`git commit --signoff`), so the message ends with a
+  `Signed-off-by:` line
+- Attribute AI assistance with `Assisted-By:`, never `Co-Authored-By:`, using the
+  model name and `<noreply@anthropic.com>`
+
+Trailer order at the end of the message:
+
+```
+Assisted-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+Signed-off-by: Rafael Kitover <rkitover@gmail.com>
+```
 
 **Commit prefixes** (only for non-wxWidgets GUI commits):
 - `doc:` - Documentation changes
@@ -237,8 +248,6 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
 ## Branch Workflow
 
 - Main branch: `master`
-- Never push directly to `master` without CI validation
-- Test commits on a branch first, check CI status on GitHub
 - Use `git merge --ff-only` when merging to master
 - Never `git push -f` on `master`
 - Keep work branches rebased on `master` during active development
