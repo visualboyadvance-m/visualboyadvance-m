@@ -318,6 +318,11 @@ constexpr int kResultFadePerFrame = 16;
 // uncorrected picture following the sprite.
 constexpr int kCastBits = 5;
 constexpr size_t kCastEntries = size_t{1} << (3 * kCastBits);
+// The neighbourhood a colour falls back to, two bits coarser a channel. At namespace scope
+// rather than inside BuildCast(): the lambda there reads them without capturing, which is
+// allowed for a constant expression and which MSVC rejects for a function-local one.
+constexpr int kCoarseBits = kCastBits - 2;
+constexpr size_t kCoarseEntries = size_t{1} << (3 * kCoarseBits);
 
 inline size_t CastIndex(int r, int g, int b) {
     constexpr int shift = 8 - kCastBits;
@@ -335,8 +340,6 @@ inline size_t CastIndex(int r, int g, int b) {
 // exactly where the picture moves, and the correction flickers off with it.
 void BuildCast(const uint8_t* in, const uint8_t* out, size_t pixels, std::vector<int16_t>* cast,
                std::vector<int64_t>* sums) {
-    constexpr int kCoarseBits = kCastBits - 2;
-    constexpr size_t kCoarseEntries = size_t{1} << (3 * kCoarseBits);
     const auto coarse_of = [](size_t k) {
         const size_t r = k >> (2 * kCastBits), g = (k >> kCastBits) & ((1u << kCastBits) - 1),
                      b = k & ((1u << kCastBits) - 1);
