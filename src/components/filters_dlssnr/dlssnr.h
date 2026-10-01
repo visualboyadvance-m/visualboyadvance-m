@@ -12,8 +12,9 @@
 // control mask, the features, the network at the vendor's extent, the head
 // cropped, then the composition. Without history a pass's output is
 // nr_frame's for the same picture, byte for byte. With history the previous
-// output (and, for the composition's floor, the previous input) goes into the
-// features and the composition as well.
+// prediction goes into the composition as well -- not the features, where it
+// would feed back on itself -- released wherever the picture changed nearby, so
+// nothing that moves leaves a copy of itself behind.
 //
 // Frames taller than Settings::max_height are scaled down (bilinear) before
 // the model runs and the result is scaled back up (bilinear), as PCSX2 does on

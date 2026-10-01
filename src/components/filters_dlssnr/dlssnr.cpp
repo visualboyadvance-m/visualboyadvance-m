@@ -246,12 +246,17 @@ constexpr int kFadeLevels = 20;
 // correction belonging to an edge that has gone. Taking the largest move in a small
 // neighbourhood instead of the pixel's own drops those with the edge that made them; a
 // radius of 2 covers the width a sharpened edge occupies.
+//
+// Wider does not help: a pass's correction also carries a halo around a sprite, but that
+// came from the history, and kReleaseRadius keeps it out of the pass in the first place.
+// Spread wider here, the correction is dropped to the cast (kCastBits) over a box around
+// anything that moves, and the box shows.
 constexpr int kMotionRadius = 2;
 
 // When the picture as a whole is moving, how much of it has to be moving before the
-// correction is wound down everywhere, as a percentage of the frame. A pixel counts as
-// moving when it is past kHoldLevels -- the question here is how much of the frame is not
-// standing still, not how much of it changed beyond recognition.
+// correction beyond the cast (kCastBits) is wound down everywhere, as a percentage of the
+// frame. A pixel counts as moving when it is past kHoldLevels -- the question here is how
+// much of the frame is not standing still, not how much of it changed beyond recognition.
 //
 // Weighing a pixel on its own surroundings cannot see a scroll through a soft gradient:
 // there each pixel's colour changes by a level or two, under kHoldLevels, so the gate reads
@@ -298,6 +303,270 @@ constexpr int kSceneFallPerFrame = 32;
 // there is nothing to cross and this costs nothing. What it does cost is a fade-up over
 // the first quarter second, the opening correction arriving out of nothing.
 constexpr int kResultFadePerFrame = 16;
+
+// A pass's correction comes in two parts, and only one of them belongs to where things were.
+// One is a colour cast: at intensity 150 the model shifts each colour by a few levels
+// wherever it stands, so what the pass did to a colour it can do to the same colour anywhere.
+// The other is the detail -- the edges it sharpened, and the halo they spread over the next
+// few pixels -- which is tied to the picture the pass was given and turns into an outline of
+// a sprite that has since walked off.
+//
+// So each pass also records the cast, as the mean change of each colour over the whole frame
+// at kCastBits a channel (a GBA colour is five), and Apply32() lays that down wherever the
+// picture has moved, keeping the pass's own correction for what stood still. Dropping the
+// correction outright instead leaves the cast missing around anything that moves: a box of
+// uncorrected picture following the sprite.
+constexpr int kCastBits = 5;
+constexpr size_t kCastEntries = size_t{1} << (3 * kCastBits);
+
+inline size_t CastIndex(int r, int g, int b) {
+    constexpr int shift = 8 - kCastBits;
+    return (static_cast<size_t>(r >> shift) << (2 * kCastBits)) |
+           (static_cast<size_t>(g >> shift) << kCastBits) | static_cast<size_t>(b >> shift);
+}
+
+// The cast of a pass that turned `in` into `out` (RGB8, `pixels` long): for each colour the
+// mean change, three values an entry.
+//
+// A colour the frame did not have takes the mean over its neighbourhood of colours instead
+// (kCastBits - 2 a channel), and failing that the frame's. The live picture is not limited
+// to the pass's colours: a scroll brings in what was off screen, and interframe blending
+// mixes two frames into colours neither had. Leaving those at no change drops the cast
+// exactly where the picture moves, and the correction flickers off with it.
+void BuildCast(const uint8_t* in, const uint8_t* out, size_t pixels, std::vector<int16_t>* cast,
+               std::vector<int64_t>* sums) {
+    constexpr int kCoarseBits = kCastBits - 2;
+    constexpr size_t kCoarseEntries = size_t{1} << (3 * kCoarseBits);
+    const auto coarse_of = [](size_t k) {
+        const size_t r = k >> (2 * kCastBits), g = (k >> kCastBits) & ((1u << kCastBits) - 1),
+                     b = k & ((1u << kCastBits) - 1);
+        constexpr int drop = kCastBits - kCoarseBits;
+        return ((r >> drop) << (2 * kCoarseBits)) | ((g >> drop) << kCoarseBits) | (b >> drop);
+    };
+    sums->assign((kCastEntries + kCoarseEntries + 1) * 4, 0);
+    int64_t* const fine = sums->data();
+    int64_t* const coarse = fine + kCastEntries * 4;
+    int64_t* const all = coarse + kCoarseEntries * 4;
+    for (size_t i = 0; i < pixels; i++, in += 3, out += 3) {
+        int64_t* e = fine + CastIndex(in[0], in[1], in[2]) * 4;
+        for (int c = 0; c < 3; c++)
+            e[c] += out[c] - in[c];
+        e[3]++;
+    }
+    for (size_t k = 0; k < kCastEntries; k++) {
+        const int64_t* e = fine + k * 4;
+        int64_t* g = coarse + coarse_of(k) * 4;
+        for (int c = 0; c < 4; c++) {
+            g[c] += e[c];
+            all[c] += e[c];
+        }
+    }
+    const auto mean = [](const int64_t* e, int c) {
+        return static_cast<int16_t>(std::lround(static_cast<double>(e[c]) / e[3]));
+    };
+    cast->resize(kCastEntries * 3);
+    for (size_t k = 0; k < kCastEntries; k++) {
+        const int64_t* e = fine + k * 4;
+        if (!e[3])
+            e = coarse + coarse_of(k) * 4;
+        if (!e[3])
+            e = all;
+        for (int c = 0; c < 3; c++)
+            (*cast)[3 * k + c] = e[3] ? mean(e, c) : 0;
+    }
+}
+
+// How much of a pass's own correction a pixel keeps, out of 256, once the picture has moved
+// by `moved` levels there since the pass was given it.
+inline int MotionWeight(int moved) {
+    return moved <= kHoldLevels
+               ? 256
+               : (moved >= kFadeLevels
+                      ? 0
+                      : 256 - (moved - kHoldLevels) * 256 / (kFadeLevels - kHoldLevels));
+}
+
+// The largest value within `r` of each pixel, in place, separably: across each row, then
+// down, a whole row at a time so both passes run along memory.
+void Dilate(std::vector<uint8_t>* image, int width, int height, int r,
+            std::vector<uint8_t>* scratch) {
+    scratch->resize(static_cast<size_t>(width) * height);
+    uint8_t* const im = image->data();
+    uint8_t* const across = scratch->data();
+    for (int y = 0; y < height; y++) {
+        const uint8_t* row = im + static_cast<size_t>(y) * width;
+        uint8_t* out = across + static_cast<size_t>(y) * width;
+        std::memcpy(out, row, static_cast<size_t>(width));
+        for (int o = 1; o <= r; o++) {
+            for (int x = 0; x + o < width; x++)
+                out[x] = std::max(out[x], row[x + o]);
+            for (int x = o; x < width; x++)
+                out[x] = std::max(out[x], row[x - o]);
+        }
+    }
+    for (int y = 0; y < height; y++) {
+        uint8_t* out = im + static_cast<size_t>(y) * width;
+        const int y0 = std::max(0, y - r), y1 = std::min(height - 1, y + r);
+        std::memcpy(out, across + static_cast<size_t>(y0) * width, static_cast<size_t>(width));
+        for (int k = y0 + 1; k <= y1; k++) {
+            const uint8_t* in = across + static_cast<size_t>(k) * width;
+            for (int x = 0; x < width; x++)
+                out[x] = std::max(out[x], in[x]);
+        }
+    }
+}
+
+// How far the picture may scroll between a pass's input and the frame it is laid over, in
+// GBA pixels -- scaled to the frame -- before Apply32() stops following it. A game's camera
+// follows its hero, so while Link walks the whole background shifts by a pixel or two every
+// few frames, and a pass is several frames old by the time it is shown. Compared where it
+// stands, every edge of the background then reads as moved, the frame as a whole as
+// scrolling, and the correction is wound down to the cast until the picture holds still
+// again -- the denoising flickering off and back on as he walks. A scroll is a whole-pixel
+// shift of the background, though, so Apply32() finds it and takes the pass's correction
+// from where each pixel was, keeping the unshifted one where that fits better (the HUD,
+// anything that stayed put).
+constexpr int kScrollReach = 24;
+
+// A luminance pyramid, each level half the one before, for finding the scroll.
+struct Pyramid {
+    static constexpr int kMaxLevels = 6;
+    std::array<std::vector<uint8_t>, kMaxLevels> level;
+    std::array<int, kMaxLevels> width{};
+    std::array<int, kMaxLevels> height{};
+    int levels = 0;
+};
+
+// Levels enough for kScrollReach: the top level is searched four pixels each way.
+int PyramidLevels(int width, int height) {
+    const int reach = kScrollReach * height / 160;
+    int levels = 1;
+    while (levels < Pyramid::kMaxLevels && (4 << (levels - 1)) < reach &&
+           (width >> levels) >= 16 && (height >> levels) >= 16)
+        levels++;
+    return levels;
+}
+
+void BuildPyramid(const uint8_t* rgb, int width, int height, int levels, Pyramid* p) {
+    p->levels = levels;
+    p->width[0] = width;
+    p->height[0] = height;
+    std::vector<uint8_t>& base = p->level[0];
+    base.resize(static_cast<size_t>(width) * height);
+    for (size_t i = 0; i < base.size(); i++)
+        base[i] = static_cast<uint8_t>((rgb[3 * i] + 2 * rgb[3 * i + 1] + rgb[3 * i + 2] + 2) >> 2);
+    for (int l = 1; l < levels; l++) {
+        const int uw = p->width[l - 1];
+        const int w = uw / 2;
+        const int h = p->height[l - 1] / 2;
+        p->width[l] = w;
+        p->height[l] = h;
+        const uint8_t* up = p->level[l - 1].data();
+        std::vector<uint8_t>& out = p->level[l];
+        out.resize(static_cast<size_t>(w) * h);
+        for (int y = 0; y < h; y++) {
+            const uint8_t* r0 = up + static_cast<size_t>(2 * y) * uw;
+            const uint8_t* r1 = r0 + uw;
+            for (int x = 0; x < w; x++)
+                out[static_cast<size_t>(y) * w + x] = static_cast<uint8_t>(
+                    (r0[2 * x] + r0[2 * x + 1] + r1[2 * x] + r1[2 * x + 1] + 2) >> 2);
+        }
+    }
+}
+
+// The mean difference between `live` and `pass` shifted by (dx, dy) at level `l`, every
+// `step`th pixel of where they overlap; huge when they hardly do.
+double ShiftCost(const Pyramid& live, const Pyramid& pass, int l, int dx, int dy, int step) {
+    const int w = live.width[l];
+    const int h = live.height[l];
+    const int x0 = std::max(0, dx), x1 = std::min(w, w + dx);
+    const int y0 = std::max(0, dy), y1 = std::min(h, h + dy);
+    if ((x1 - x0) * 2 < w || (y1 - y0) * 2 < h)
+        return 1e9;
+    const uint8_t* a = live.level[l].data();
+    const uint8_t* b = pass.level[l].data();
+    uint64_t sum = 0, n = 0;
+    for (int y = y0; y < y1; y += step) {
+        const uint8_t* ar = a + static_cast<size_t>(y) * w;
+        const uint8_t* br = b + static_cast<size_t>(y - dy) * w - dx;
+        for (int x = x0; x < x1; x += step, n++)
+            sum += static_cast<uint64_t>(std::abs(ar[x] - br[x]));
+    }
+    return n ? static_cast<double>(sum) / static_cast<double>(n) : 1e9;
+}
+
+// The scroll from a pass's input to the live frame, live(x, y) ~ pass(x - dx, y - dy):
+// searched at the top of the pyramid, then refined a level at a time.
+void EstimateScroll(const Pyramid& live, const Pyramid& pass, int* dx, int* dy) {
+    *dx = 0;
+    *dy = 0;
+    if (live.levels == 0 || live.levels != pass.levels || live.width[0] != pass.width[0] ||
+        live.height[0] != pass.height[0])
+        return;
+    int bx = 0, by = 0;
+    double best = 1e18;
+    for (int l = live.levels - 1; l >= 0; l--) {
+        const bool top = l == live.levels - 1;
+        const int reach = top ? 4 : 2;
+        const int cx = top ? 0 : 2 * bx;
+        const int cy = top ? 0 : 2 * by;
+        const int step = l == 0 ? 4 : l == 1 ? 2 : 1;
+        best = 1e18;
+        for (int y = cy - reach; y <= cy + reach; y++)
+            for (int x = cx - reach; x <= cx + reach; x++) {
+                const double cost = ShiftCost(live, pass, l, x, y, step);
+                if (cost < best) {
+                    best = cost;
+                    bx = x;
+                    by = y;
+                }
+            }
+    }
+    // Standing still wins a tie, so a still picture never wanders.
+    if ((bx || by) && ShiftCost(live, pass, 0, 0, 0, 4) <= best + 0.5)
+        bx = by = 0;
+    *dx = bx;
+    *dy = by;
+}
+
+// One way to line a pass up with the live frame: the mean of the pass shifted by (ax, ay)
+// and by (bx, by), live(x, y) ~ (pass(x - ax, y - ay) + pass(x - bx, y - by)) / 2 -- a plain
+// shift when the two are the same.
+struct Hypothesis {
+    int ax = 0, ay = 0, bx = 0, by = 0;
+};
+
+// The ways Apply32() tries for one pass, each with its motion mask, one byte a pixel.
+struct Alignment {
+    int count = 0;
+    std::array<Hypothesis, 3> h;
+    std::array<std::vector<uint8_t>, 3> motion;
+};
+
+// The temporal gate's knobs, nr_frame_live's defaults (nr_frame_live_defaults(), which are
+// nr_daemon.py's). nr_frame_defaults() leaves the release and the floor off, and the
+// model's own gate is not local: it keeps about 0.6 of the previous prediction across the
+// whole frame, so wherever a sprite has just been, that much of it stays in the history --
+// a dark trail behind Link as he walks, behind his sword as he swings it. The release lets go of the history where the game's own pixel changed
+// since the frame before, all of it by kReleaseLevels; the floor holds it where nothing
+// changed, falling away by kHoldRampLevels.
+constexpr float kHold = 1.0f;
+constexpr float kHoldRampLevels = 4.0f;
+constexpr float kReleaseLevels = 24.0f;
+
+// How far, in pixels of the filter extent, a change to the picture lets go of the history
+// around it. The network works from a pixel's surroundings, so its prediction for the sand
+// beside a sprite carries a halo of the sprite's edges, and that goes into the history with
+// it. When the sprite walks on, those pixels have not changed -- they were sand and still are
+// -- so a release that looks only at the pixel itself keeps the halo, and the floor holds it
+// there pass after pass: a pale outline left behind everything that moves. Releasing by the
+// largest change nearby instead lets the halo go with the sprite that made it.
+constexpr int kReleaseRadius = 8;
+
+// The mean change of the network's input, 0-1, above which the history is dropped rather
+// than released pixel by pixel (nr_frame_live's cut limit): a cut, a screen transition, or
+// a scroll so fast that nothing in the history is still where it was.
+constexpr double kCutLimit = 0.15;
 
 // `read_png` in nr_frame_main.c: `byte / 255`, a division rather than a multiply by the
 // reciprocal, so the float the network sees is the one the command gives it.
@@ -346,6 +615,9 @@ void BuildParams(nr_frame_params* p, const Settings& settings) {
     p->colour_strength = settings.colour_strength;
     p->detail_radius = settings.detail_radius;
     p->frame_index = settings.frame_index;
+    p->hold = kHold;
+    p->slope = -255.0f * kHold / kHoldRampLevels;
+    p->release = -255.0f / kReleaseLevels;
     ApplyProfile(p, settings.profile);
     if (settings.style_index >= 0)
         p->normalized_style = static_cast<float>(settings.style_index) / 128.0f;
@@ -452,8 +724,15 @@ struct Packet {
     // the next frame's history is (nr_frame.h): `output` carries those, and carrying them
     // back round puts them inside the loop.
     std::vector<float> neural;    // (filter_height, filter_width, 3)
+    // The previous input as the composition's gate sees it (ReleaseHistory()).
+    std::vector<float> gate_previous;  // (filter_height, filter_width, 3), when use_history
+    std::vector<uint8_t> moved;        // (filter_height, filter_width), ReleaseHistory()'s
+    std::vector<uint8_t> dilate;
     std::vector<float> mask;      // the control mask at the filter extent, when use_mask
     std::vector<float> scratch;
+    // The pass's colour cast (BuildCast()), from `src_rgb` to `rgb`.
+    std::vector<int16_t> cast;
+    std::vector<int64_t> cast_sums;
 };
 
 // The control mask, loaded and resized by the features stage only.
@@ -500,21 +779,30 @@ struct Filter::Impl {
     std::vector<uint8_t> result;
     // The frame that pass was given, the same size as `result`; Apply32() needs both.
     std::vector<uint8_t> result_src;
+    std::vector<int16_t> result_cast;
     int result_width = 0;
     int result_height = 0;
     std::vector<uint8_t> display;
     std::vector<uint8_t> display_src;
+    std::vector<int16_t> display_cast;
+    std::vector<int16_t> display_delta;  // display - display_src, what the pass changed
+    Pyramid display_pyramid;  // of display_src, for finding the scroll
     // The pass before it, and how far across the two the composition currently is: a new
     // pass arrives at 0 and takes over as this reaches 256.
     std::vector<uint8_t> previous_display;
     std::vector<uint8_t> previous_display_src;
+    std::vector<int16_t> previous_cast;
+    std::vector<int16_t> previous_delta;
+    Pyramid previous_pyramid;
     int previous_width = 0;
     int previous_height = 0;
     int blend = 256;
-    // Apply32()'s motion mask and its horizontal dilation, one byte a pixel. Members so
-    // the frame does not allocate.
-    std::vector<uint8_t> motion;
-    std::vector<uint8_t> motion_wide;
+    // Apply32()'s live frame as RGB8 and its pyramid; how it lines up with the pass on
+    // screen and the one before it; and the dilation's scratch. Members so the frame does not allocate.
+    std::vector<uint8_t> live;
+    Pyramid live_pyramid;
+    std::array<Alignment, 2> alignment;  // the pass on screen, the one before it
+    std::vector<uint8_t> dilate;
     // The frame weight actually in use, carried between frames so it can only climb back
     // gradually -- see kSceneRisePerFrame.
     int scene_weight = 256;
@@ -550,6 +838,7 @@ struct Filter::Impl {
 
     void ConvertColour(Packet* p);
     bool PrepareControlMask(Packet* p);
+    void ReleaseHistory(Packet* p);
     bool BuildFeatures(Packet* p);
     bool RunNetwork(Packet* p);
     bool Compose(Packet* p);
@@ -741,16 +1030,67 @@ bool Filter::Impl::PrepareControlMask(Packet* p) {
     return true;
 }
 
+// Drops the history on a cut, and otherwise lets go of it where the game's own picture
+// changed nearby (kReleaseRadius) since the frame before.
+//
+// The history goes to the composition only, never to the features, though nr_frame takes it
+// in both. Handed to the network, it closes a loop: the network darkens and sharpens what it
+// is shown, the result is the next history, and on a picture holding still the darkening
+// compounds pass after pass -- measured on Minish Cap at intensity 150, the mean shift of the
+// picture crept from 2.7 to 5.1 levels over six seconds of standing still, and up to three
+// times that on the cliffs, while without the history it stays put. Wherever something then
+// moves, the history there is let go and the picture there comes back light, so a light
+// patch follows every sprite and darkens slowly back in behind it: a trail of its own. The
+// composition alone only averages the model's successive answers, which is what the history
+// is for -- the denoising holding steady from one pass to the next -- and cannot drift.
+//
+// The composition releases and floors its blend by the change at each pixel alone, measured
+// against `previous` -- the one thing it reads `previous` for. So it is handed a stand-in
+// that differs from the colour by the change nearby instead, and its gate then lets go of
+// the halo around a sprite as well as the sprite.
+void Filter::Impl::ReleaseHistory(Packet* p) {
+    const int w = p->filter_width;
+    const int hgt = p->filter_height;
+    const size_t pixels = static_cast<size_t>(w) * hgt;
+    const float* const c = p->colour.data();
+    const float* const b = previous.data();
+    double cut = 0.0;
+    for (size_t i = 0; i < pixels * 3; i++)
+        cut += std::fabs(static_cast<double>(c[i]) - b[i]);
+    if (pixels && cut / static_cast<double>(pixels * 3) > kCutLimit) {
+        p->use_history = false;
+        return;
+    }
+
+    p->moved.resize(pixels);
+    for (size_t i = 0; i < pixels; i++) {
+        float m = 0.0f;
+        for (int k = 0; k < 3; k++)
+            m = std::max(m, std::fabs(c[3 * i + k] - b[3 * i + k]));
+        p->moved[i] = ToByte(m);
+    }
+    Dilate(&p->moved, w, hgt, kReleaseRadius, &p->dilate);
+
+    p->gate_previous.resize(pixels * 3);
+    for (size_t i = 0; i < pixels; i++) {
+        const float m = FromByte(p->moved[i]);
+        for (int k = 0; k < 3; k++) {
+            const float ci = c[3 * i + k];
+            p->gate_previous[3 * i + k] = ci >= m ? ci - m : ci + m;
+        }
+    }
+}
+
 bool Filter::Impl::BuildFeatures(Packet* p) {
     std::shared_lock<std::shared_mutex> use;
     nr_frame* frame = Borrow(p, &use, true);
     if (!frame)
         return false;
 
-    const float* hist = p->use_history ? history.data() : nullptr;
+    // No history: see ReleaseHistory().
     const float* mask = p->use_mask ? p->mask.data() : nullptr;
     if (nr_frame_features_masked(frame, p->colour.data(), p->filter_height, p->filter_width,
-                                 hist, mask, &p->params, p->features.data()) != 0) {
+                                 nullptr, mask, &p->params, p->features.data()) != 0) {
         Fail(std::string("nr_frame_features_masked() failed: ") + nr_frame_error());
         use.unlock();
         Unprepare(p);
@@ -793,7 +1133,7 @@ bool Filter::Impl::Compose(Packet* p) {
         if (!frame)
             return false;
         const float* hist = p->use_history ? history.data() : nullptr;
-        const float* prev = p->use_history ? previous.data() : nullptr;
+        const float* prev = p->use_history ? p->gate_previous.data() : nullptr;
         const float* mask = p->use_mask ? p->mask.data() : nullptr;
         // `_neural` for the prediction as well as the picture: the picture is what goes
         // on screen, the prediction is what the next frame's history has to be.
@@ -877,6 +1217,11 @@ void Filter::Impl::FeaturesStage() {
         p->use_history = want_history && have_history;
         lock.unlock();
 
+        // `history` and `previous` are the compose stage's, which is idle until this frame
+        // passes on (the wait above), so they are read unlocked.
+        if (p->use_history)
+            ReleaseHistory(p);
+
         const bool ok = BuildFeatures(p);
 
         lock.lock();
@@ -916,12 +1261,16 @@ void Filter::Impl::ComposeStage() {
     while (Packet* p = TakePacket(lock, kStageCompose)) {
         lock.unlock();
         const bool ok = Compose(p);
+        if (ok)
+            BuildCast(p->src_rgb.data(), p->rgb.data(), static_cast<size_t>(p->width) * p->height,
+                      &p->cast, &p->cast_sums);
         lock.lock();
 
         if (ok) {
             // The shown buffer comes back as this packet's, for a later frame.
             result.swap(p->rgb);
             result_src.swap(p->src_rgb);
+            result_cast.swap(p->cast);
             result_width = p->width;
             result_height = p->height;
             result_ready = true;
@@ -1060,14 +1409,28 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // What is on screen becomes what the new pass crosses over from.
             im.previous_display.swap(im.display);
             im.previous_display_src.swap(im.display_src);
+            im.previous_cast.swap(im.display_cast);
+            std::swap(im.previous_pyramid, im.display_pyramid);
+            im.previous_delta.swap(im.display_delta);
             im.previous_width = im.display_width;
             im.previous_height = im.display_height;
             im.blend = 0;
             im.display.swap(im.result);
             im.display_src.swap(im.result_src);
+            im.display_cast.swap(im.result_cast);
             im.display_width = im.result_width;
             im.display_height = im.result_height;
             im.result_ready = false;
+            if (im.display_src.size() ==
+                static_cast<size_t>(im.display_width) * im.display_height * 3)
+            {
+                BuildPyramid(im.display_src.data(), im.display_width, im.display_height,
+                             PyramidLevels(im.display_width, im.display_height),
+                             &im.display_pyramid);
+                im.display_delta.resize(im.display_src.size());
+                for (size_t i = 0; i < im.display_src.size(); i++)
+                    im.display_delta[i] = static_cast<int16_t>(im.display[i] - im.display_src[i]);
+            }
         }
 
         // Lay the newest finished pass over the frame on screen *now*, by what it
@@ -1083,44 +1446,113 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         // What the pass changed is only meaningful where the picture still looks like what
         // the pass was given, though; added blind, an old frame's edges land on top of the
         // new one's and read as a double image. So each pixel's correction is weighted by
-        // how far the picture has moved since: full where nothing has changed, nothing
-        // where it has. On a still picture every pixel is untouched, the weights are all
-        // one, and this reproduces the pass's output exactly.
+        // how far the picture has moved since -- where it stands, or where the background
+        // scrolled to (kScrollReach), whichever fits: the pass's own where nothing has
+        // changed, its cast for the colour now there where it has (see kCastBits). On a
+        // still picture every pixel is untouched, the weights are all one, and this
+        // reproduces the pass's output exactly.
+        const size_t px = static_cast<size_t>(width) * height;
         if (!im.display.empty() && im.display.size() == im.display_src.size() &&
-            im.display_width == width && im.display_height == height) {
-            const uint8_t* const out = im.display.data();
+            im.display_width == width && im.display_height == height &&
+            im.display_cast.size() == kCastEntries * 3 &&
+            im.display_delta.size() == im.display.size()) {
             const uint8_t* const in = im.display_src.data();
-            const size_t px = static_cast<size_t>(width) * height;
-            im.motion.resize(px);
-            im.motion_wide.resize(px);
-            size_t moved_pixels = 0;
+            const int16_t* const cast = im.display_cast.data();
 
-            // How far each pixel has moved since the pass was given the frame.
+            // The live frame, read in full before anything is written: dst may alias src.
+            im.live.resize(px * 3);
             for (int y = 0; y < height; y++) {
                 const uint32_t* s =
                     reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
-                const uint8_t* a = in + static_cast<size_t>(y) * width * 3;
-                uint8_t* mv = im.motion.data() + static_cast<size_t>(y) * width;
-                for (int x = 0; x < width; x++, a += 3) {
+                uint8_t* o = im.live.data() + static_cast<size_t>(y) * width * 3;
+                for (int x = 0; x < width; x++, o += 3) {
                     const uint32_t v = s[x];
-                    const int live[3] = { static_cast<int>((v >> red_shift) & 0xffu),
-                                          static_cast<int>((v >> green_shift) & 0xffu),
-                                          static_cast<int>((v >> blue_shift) & 0xffu) };
-                    int m = 0;
-                    for (int c = 0; c < 3; c++) {
-                        const int d = live[c] > a[c] ? live[c] - a[c] : a[c] - live[c];
-                        if (d > m)
-                            m = d;
-                    }
-                    if (m > kHoldLevels)
-                        moved_pixels++;
-                    mv[x] = static_cast<uint8_t>(m);
+                    o[0] = static_cast<uint8_t>(v >> red_shift);
+                    o[1] = static_cast<uint8_t>(v >> green_shift);
+                    o[2] = static_cast<uint8_t>(v >> blue_shift);
                 }
             }
+            const uint8_t* const live = im.live.data();
 
-            // How much of the frame is unmistakably moving, and so how much of the
-            // correction is worth laying down at all. Nothing, when it is all moving:
-            // the source then goes through untouched and the spreading below is skipped.
+            // How far each pixel has moved since the pass was given the frame, if the pass
+            // is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
+            // when they are the same: the largest step of the three channels, or all of it
+            // where a shift takes the pixel off the pass's edge.
+            const auto measure = [&](const uint8_t* given, const Hypothesis& h,
+                                     uint8_t* motion) {
+                for (int y = 0; y < height; y++) {
+                    const int ay = y - h.ay, by = y - h.by;
+                    const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
+                    uint8_t* mv = motion + static_cast<size_t>(y) * width;
+                    for (int x = 0; x < width; x++, l += 3) {
+                        const int ax = x - h.ax, bx = x - h.bx;
+                        int m = 255;
+                        if (ay >= 0 && ay < height && ax >= 0 && ax < width && by >= 0 &&
+                            by < height && bx >= 0 && bx < width) {
+                            const uint8_t* a = given + (static_cast<size_t>(ay) * width + ax) * 3;
+                            const uint8_t* b = given + (static_cast<size_t>(by) * width + bx) * 3;
+                            m = 0;
+                            for (int c = 0; c < 3; c++) {
+                                const int g = (a[c] + b[c] + 1) >> 1;
+                                const int d = l[c] > g ? l[c] - g : g - l[c];
+                                if (d > m)
+                                    m = d;
+                            }
+                        }
+                        mv[x] = static_cast<uint8_t>(m);
+                    }
+                }
+            };
+            // The ways to take one pass: where it stands, and, when that leaves enough of
+            // the frame moving to be worth asking, where the scroll took it -- and the mean
+            // of the two shifts either side of that, which is what interframe blending makes
+            // of the frame in the middle of a scroll step: the background half where it was
+            // and half where it went, matching neither. Returns how many pixels moved
+            // unmistakably whichever way they are taken.
+            bool have_live_pyramid = false;
+            const auto track = [&](const uint8_t* given, const Pyramid& pyramid,
+                                   Alignment* al) {
+                al->count = 1;
+                al->h[0] = Hypothesis();
+                std::vector<uint8_t>& still = al->motion[0];
+                still.resize(px);
+                measure(given, al->h[0], still.data());
+                size_t count = 0;
+                for (size_t i = 0; i < px; i++)
+                    count += still[i] > kHoldLevels;
+                if (count * 100 <= px * kScenePercentHold)
+                    return count;
+                if (!have_live_pyramid) {
+                    BuildPyramid(live, width, height, PyramidLevels(width, height),
+                                 &im.live_pyramid);
+                    have_live_pyramid = true;
+                }
+                int dx = 0, dy = 0;
+                EstimateScroll(im.live_pyramid, pyramid, &dx, &dy);
+                if (dx == 0 && dy == 0)
+                    return count;
+                const int ux = (dx > 0) - (dx < 0), uy = (dy > 0) - (dy < 0);
+                al->h[1] = Hypothesis{ dx, dy, dx, dy };
+                al->h[2] = Hypothesis{ dx - ux, dy - uy, dx + ux, dy + uy };
+                al->count = 3;
+                for (int k = 1; k < al->count; k++) {
+                    al->motion[k].resize(px);
+                    measure(given, al->h[k], al->motion[k].data());
+                }
+                count = 0;
+                for (size_t i = 0; i < px; i++)
+                    count += std::min({ al->motion[0][i], al->motion[1][i], al->motion[2][i] }) >
+                             kHoldLevels;
+                return count;
+            };
+            Alignment& now_al = im.alignment[0];
+            Alignment& was_al = im.alignment[1];
+            was_al.count = 0;
+            const size_t moved_pixels = track(in, im.display_pyramid, &now_al);
+
+            // How much of the frame is unmistakably moving, and so how much of the pass's
+            // own correction is worth laying down at all beyond the cast. None of it, when
+            // the frame is all moving.
             const int scene = static_cast<int>(moved_pixels * 100 / px);
             const int target =
                 scene <= kScenePercentHold
@@ -1142,76 +1574,110 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const bool crossing = blend < 256;
             const bool have_previous =
                 crossing && im.previous_display.size() == im.display.size() &&
-                im.previous_width == width && im.previous_height == height;
+                im.previous_display_src.size() == im.display.size() &&
+                im.previous_cast.size() == kCastEntries * 3 &&
+                im.previous_delta.size() == im.display.size() && im.previous_width == width &&
+                im.previous_height == height;
 
+            // Spread the motion (kMotionRadius), and weigh the pass before by the same rule
+            // against the frame it was given. Passes land faster than they cross over, so
+            // much of what is on screen is the older of the two, made where things stood a
+            // pass earlier still; laid down unweighed, it leaves what it corrected behind
+            // as a trail.
             if (scene_weight > 0) {
-                // Spread it, separably: across, then down as the composition reads it.
-                for (int y = 0; y < height; y++) {
-                    const uint8_t* mv = im.motion.data() + static_cast<size_t>(y) * width;
-                    uint8_t* wide = im.motion_wide.data() + static_cast<size_t>(y) * width;
-                    for (int x = 0; x < width; x++) {
-                        const int x0 = x > kMotionRadius ? x - kMotionRadius : 0;
-                        const int x1 = x + kMotionRadius < width - 1 ? x + kMotionRadius : width - 1;
-                        int m = 0;
-                        for (int k = x0; k <= x1; k++)
-                            if (mv[k] > m)
-                                m = mv[k];
-                        wide[x] = static_cast<uint8_t>(m);
-                    }
-                }
-
-                const int shift[3] = { red_shift, green_shift, blue_shift };
-                for (int y = 0; y < height; y++) {
-                    const int y0 = y > kMotionRadius ? y - kMotionRadius : 0;
-                    const int y1 = y + kMotionRadius < height - 1 ? y + kMotionRadius : height - 1;
-                    const uint32_t* s =
-                        reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
-                    uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
-                    const uint8_t* a = in + static_cast<size_t>(y) * width * 3;
-                    const uint8_t* b = out + static_cast<size_t>(y) * width * 3;
-                    const size_t row = static_cast<size_t>(y) * width * 3;
-                    const uint8_t* pa =
-                        have_previous ? im.previous_display_src.data() + row : nullptr;
-                    const uint8_t* pb =
-                        have_previous ? im.previous_display.data() + row : nullptr;
-                    for (int x = 0; x < width; x++, a += 3, b += 3) {
-                        int moved = 0;
-                        for (int k = y0; k <= y1; k++) {
-                            const uint8_t m = im.motion_wide[static_cast<size_t>(k) * width + x];
-                            if (m > moved)
-                                moved = m;
-                        }
-                        // dst may alias src; this reads the pixel before it writes it.
-                        const uint32_t v = s[x];
-                        const int local = moved <= kHoldLevels
-                                              ? 256
-                                              : (moved >= kFadeLevels
-                                                     ? 0
-                                                     : 256 - (moved - kHoldLevels) * 256 /
-                                                                 (kFadeLevels - kHoldLevels));
-                        const int w = local * scene_weight / 256;
-                        if (w == 0) {
-                            d[x] = v;
-                            continue;
-                        }
-                        uint32_t p = 0;
-                        for (int c = 0; c < 3; c++) {
-                            const int live = static_cast<int>((v >> shift[c]) & 0xffu);
-                            int delta = b[c] - a[c];
-                            if (crossing) {
-                                // Nothing to come from before the first pass, or after a
-                                // resize: the correction then fades up out of nothing.
-                                const int was = have_previous ? pb[3 * x + c] - pa[3 * x + c] : 0;
-                                delta = was + (delta - was) * blend / 256;
-                            }
-                            const int r = live + delta * w / 256;
-                            p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << shift[c];
-                        }
-                        d[x] = p;
-                    }
-                }
-                wrote_result = true;
+                if (have_previous)
+                    track(im.previous_display_src.data(), im.previous_pyramid, &was_al);
+                for (Alignment* al : { &now_al, &was_al })
+                    for (int k = 0; k < al->count; k++)
+                        Dilate(&al->motion[k], width, height, kMotionRadius, &im.dilate);
             }
+
+            // Which way a pixel takes a pass -- the one its motion fits best -- and how much of
+            // the pass's own correction it keeps: it reads the mean of the pass's pixels at
+            // the hypothesis's two offsets. A weight of 0 reads nothing, so the offsets need
+            // no check when a shift took the pixel off the pass's edge: that motion is 255.
+            std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
+            for (int m = 0; m < 256; m++)
+                weight[m] = MotionWeight(m) * scene_weight / 256;
+            struct Lookup {
+                int count = 0;
+                const uint8_t* motion[3] = {};
+                ptrdiff_t a[3] = {}, b[3] = {};
+            };
+            const auto lookup = [&](const Alignment& al, bool use) {
+                Lookup l;
+                l.count = use ? al.count : 0;
+                for (int k = 0; k < l.count; k++) {
+                    l.motion[k] = al.motion[k].data();
+                    l.a[k] = -(static_cast<ptrdiff_t>(al.h[k].ay) * width + al.h[k].ax);
+                    l.b[k] = -(static_cast<ptrdiff_t>(al.h[k].by) * width + al.h[k].bx);
+                }
+                return l;
+            };
+            const Lookup now_l = lookup(now_al, scene_weight > 0);
+            const Lookup was_l = lookup(was_al, scene_weight > 0 && have_previous);
+            const auto choose = [&weight](const Lookup& l, size_t i, size_t* a, size_t* b) {
+                if (l.count == 0)
+                    return 0;
+                int best = 0;
+                uint8_t m = l.motion[0][i];
+                for (int k = 1; k < l.count; k++)
+                    if (l.motion[k][i] < m) {
+                        m = l.motion[k][i];
+                        best = k;
+                    }
+                *a = i + l.a[best];
+                *b = i + l.b[best];
+                return weight[m];
+            };
+
+            const int shift[3] = { red_shift, green_shift, blue_shift };
+            // Shifts rather than divisions below: at a full weight of 256 they are exact, so
+            // a still picture still gets the pass's own output.
+            const int16_t* const now_delta = im.display_delta.data();
+            const int16_t* const was_cast = have_previous ? im.previous_cast.data() : nullptr;
+            const int16_t* const was_delta = have_previous ? im.previous_delta.data() : nullptr;
+            for (int y = 0; y < height; y++) {
+                uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
+                const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
+                const size_t row = static_cast<size_t>(y) * width;
+                for (int x = 0; x < width; x++, l += 3) {
+                    const size_t i = row + x;
+                    const int16_t* const now_cast = cast + CastIndex(l[0], l[1], l[2]) * 3;
+                    size_t now_a = 0, now_b = 0, was_a = 0, was_b = 0;
+                    const int w = choose(now_l, i, &now_a, &now_b);
+                    const int was_w = choose(was_l, i, &was_a, &was_b);
+                    uint32_t p = 0;
+                    for (int c = 0; c < 3; c++) {
+                        int delta = now_cast[c];
+                        if (w > 0)
+                            delta += (((now_delta[3 * now_a + c] + now_delta[3 * now_b + c]) >> 1) -
+                                      delta) *
+                                         w >>
+                                     8;
+                        if (crossing) {
+                            // Nothing to come from before the first pass, or after a
+                            // resize: the correction then fades up out of nothing.
+                            int was = 0;
+                            if (have_previous) {
+                                was = was_cast[(now_cast - cast) + c];
+                                if (was_w > 0)
+                                    was += (((was_delta[3 * was_a + c] +
+                                              was_delta[3 * was_b + c]) >>
+                                             1) -
+                                            was) *
+                                               was_w >>
+                                           8;
+                            }
+                            delta = was + ((delta - was) * blend >> 8);
+                        }
+                        const int r = l[c] + delta;
+                        p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << shift[c];
+                    }
+                    d[x] = p;
+                }
+            }
+            wrote_result = true;
         }
     }
 
