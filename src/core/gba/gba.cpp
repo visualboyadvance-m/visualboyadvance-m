@@ -945,6 +945,21 @@ static void _remapMatrix(GBAMatrix_t *matrix)
         log("Invalid Matrix mapping end: %08X", matrix->vaddr + matrix->size);
         return;
     }
+
+    const uint32_t romAllocationSize = SIZE_ROM * 4;
+    if (matrix->paddr > romAllocationSize ||
+        matrix->size > romAllocationSize - matrix->paddr) {
+        log("Invalid Matrix physical range: %08X+%08X", matrix->paddr,
+            matrix->size);
+        return;
+    }
+    if (matrix->vaddr > romAllocationSize ||
+        matrix->size > romAllocationSize - matrix->vaddr) {
+        log("Invalid Matrix virtual range: %08X+%08X", matrix->vaddr,
+            matrix->size);
+        return;
+    }
+
     int start = matrix->vaddr >> 9;
     int size = (matrix->size >> 9) & MAPPING_MASK;
     int i;
@@ -2459,7 +2474,7 @@ int CPULoadRom(const char* szFile)
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            g_rom2 = (uint8_t*)malloc(SIZE_ROM * 4);
+            g_rom2 = (uint8_t*)calloc(SIZE_ROM * 4, 1);
             if (!utilLoad(szFile,
                     utilIsGBAImage,
                     g_rom2,
@@ -2582,7 +2597,7 @@ int CPULoadRomData(const char* data, int size)
         memcpy(&ident, &g_rom[0xAC], 1);
 
         if (ident == 'M') {
-            g_rom2 = (uint8_t *)malloc(SIZE_ROM * 4);
+            g_rom2 = (uint8_t *)calloc(SIZE_ROM * 4, 1);
             if (g_rom2 == NULL) {
                 systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"), "ROM2");
                 CPUCleanUp();
