@@ -654,6 +654,15 @@ static uint8_t cable_gb_data[5];
 static CableServer ls;
 static CableClient lc;
 
+static bool IsValidClientTopology(uint16_t playerId, uint16_t numSlaves)
+{
+    // The server is player 0 and the fixed-size link arrays hold at most
+    // three clients.  A client must therefore receive an ID in [1, 3]
+    // which is also present in the announced topology.
+    return numSlaves >= 1 && numSlaves <= 3 &&
+           playerId >= 1 && playerId <= numSlaves;
+}
+
 // time to end of single GBA's transfer, in 16.78 MHz clock ticks
 // first index is GBA #
 [[maybe_unused]] static const int trtimedata[4][4] = {
@@ -2746,13 +2755,17 @@ static ConnectionState ConnectUpdateSocket(char* const message, size_t size)
                 uint16_t receivedId, receivedSlaves;
                 packet >> receivedId >> receivedSlaves;
 
-                if (packet) {
-                    linkid = receivedId;
-                    lanlink.numslaves = receivedSlaves;
-
-                    snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
-                        linkid + 1, lanlink.numslaves - linkid);
+                if (!packet || !IsValidClientTopology(receivedId, receivedSlaves)) {
+                    snprintf(message, size, N_("Invalid link server response."));
+                    lanlink.tcpsocket.disconnect();
+                    return LINK_ERROR;
                 }
+
+                linkid = receivedId;
+                lanlink.numslaves = receivedSlaves;
+
+                snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
+                    linkid + 1, lanlink.numslaves - linkid);
             } else {
                 bool gameReady;
                 packet >> gameReady;
@@ -3631,13 +3644,17 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
                 uint16_t receivedId, receivedSlaves;
                 packet >> receivedId >> receivedSlaves;
 
-                if (packet) {
-                    linkid = receivedId;
-                    lanlink.numslaves = receivedSlaves;
-
-                    snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
-                        linkid + 1, lanlink.numslaves - linkid);
+                if (!packet || !IsValidClientTopology(receivedId, receivedSlaves)) {
+                    snprintf(message, size, N_("Invalid link server response."));
+                    lanlink.tcpsocket.disconnect();
+                    return LINK_ERROR;
                 }
+
+                linkid = receivedId;
+                lanlink.numslaves = receivedSlaves;
+
+                snprintf(message, size, N_("Connected as #%d, Waiting for %d players to join"),
+                    linkid + 1, lanlink.numslaves - linkid);
             } else {
                 bool gameReady;
                 packet >> gameReady;
