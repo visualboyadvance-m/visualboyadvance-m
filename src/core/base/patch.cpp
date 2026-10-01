@@ -136,6 +136,36 @@ static int64_t readVarPtr(FILE* f)
     return offset;
 }
 
+static bool readUpsVarPtr(FILE* f, uint64_t* value)
+{
+    uint64_t offset = 0;
+    uint64_t shift = 1;
+
+    for (;;) {
+        int c = fgetc(f);
+        if (c == EOF)
+            return false;
+
+        const uint64_t digit = c & 0x7f;
+        if (digit > (UINT64_MAX - offset) / shift)
+            return false;
+        offset += digit * shift;
+
+        if (c & 0x80)
+            break;
+
+        if (shift > (UINT64_MAX >> 7))
+            return false;
+        shift <<= 7;
+        if (offset > UINT64_MAX - shift)
+            return false;
+        offset += shift;
+    }
+
+    *value = offset;
+    return true;
+}
+
 static uint32_t readSignVarPtr(FILE* f)
 {
     int64_t offset = readVarPtr(f);
@@ -279,50 +309,94 @@ static bool patchApplyUPS(const char* patchname, uint8_t** rom, int* size)
     crc = crc32(crc, *rom, *size);
 
     fseeko64(f, 4, SEEK_SET);
-    int64_t dataSize;
-    int64_t srcSize = readVarPtr(f);
-    int64_t dstSize = readVarPtr(f);
+    uint64_t srcSize;
+    uint64_t dstSize;
+    if (!readUpsVarPtr(f, &srcSize) || !readUpsVarPtr(f, &dstSize) ||
+        srcSize > INT_MAX || dstSize > INT_MAX) {
+        fclose(f);
+        return false;
+    }
+
+    uint64_t dataSize;
+    uint32_t outputCRC;
 
     if (crc == srcCRC) {
-        if (srcSize != *size) {
+        if (srcSize != (uint64_t)*size) {
             fclose(f);
             return false;
         }
         dataSize = dstSize;
+        outputCRC = (uint32_t)dstCRC;
     } else if (crc == dstCRC) {
-        if (dstSize != *size) {
+        if (dstSize != (uint64_t)*size) {
             fclose(f);
             return false;
         }
         dataSize = srcSize;
+        outputCRC = (uint32_t)srcCRC;
     } else {
         fclose(f);
         return false;
     }
-    if (dataSize > *size) {
-        *rom = (uint8_t*)realloc(*rom, (size_t)dataSize);
-        memset(*rom + *size, 0, (size_t)(dataSize - *size));
-        *size = (int)(dataSize);
-    }
 
-    int64_t relative = 0;
-    uint8_t* mem;
-    while (ftello64(f) < patchSize - 12) {
-        relative += readVarPtr(f);
-        if (relative > dataSize)
-            continue;
-        mem = *rom + relative;
-        for (int64_t i = relative; i < dataSize; i++) {
-            int x = fgetc(f);
-            relative++;
-            if (!x)
-                break;
-            if (i < dataSize) {
-                *mem++ ^= x;
-            }
+    uint8_t* patchedRom = (uint8_t*)calloc((size_t)(dataSize ? dataSize : 1), 1);
+    if (patchedRom == NULL) {
+        fclose(f);
+        return false;
+    }
+    memcpy(patchedRom, *rom, (size_t)MIN(dataSize, (uint64_t)*size));
+
+    const __off64_t dataEnd = patchSize - 12;
+    uint64_t relative = 0;
+    bool valid = true;
+    while (ftello64(f) < dataEnd) {
+        uint64_t delta;
+        if (!readUpsVarPtr(f, &delta) || relative > dataSize ||
+            delta > dataSize - relative) {
+            valid = false;
+            break;
         }
+        relative += delta;
+
+        for (;;) {
+            if (ftello64(f) >= dataEnd) {
+                valid = false;
+                break;
+            }
+            int x = fgetc(f);
+            if (x == EOF) {
+                valid = false;
+                break;
+            }
+            if (x == 0) {
+                relative++;
+                break;
+            }
+            if (relative >= dataSize) {
+                valid = false;
+                break;
+            }
+            patchedRom[relative++] ^= (uint8_t)x;
+        }
+        if (!valid)
+            break;
     }
 
+    if (valid) {
+        crc = crc32(0L, Z_NULL, 0);
+        crc = crc32(crc, patchedRom, (uInt)dataSize);
+        valid = crc == outputCRC;
+    }
+
+    if (!valid) {
+        free(patchedRom);
+        fclose(f);
+        return false;
+    }
+
+    free(*rom);
+    *rom = patchedRom;
+    *size = (int)dataSize;
     fclose(f);
     return true;
 }
