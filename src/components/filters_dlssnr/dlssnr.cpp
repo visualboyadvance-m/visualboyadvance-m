@@ -1459,9 +1459,27 @@ Filter::Impl::~Impl() {
     for (Packet& p : packets)
         Unclaim(&p);
     ReleaseModel();
+    // Paired with the request in ~Filter(). Cleared here rather than there
+    // because this is the end of the open's own lifetime: ReleaseModel() has
+    // just taken the model lock, which an open holds, so by now there is no
+    // open of ours left to abandon and the next Filter may open freely.
+    nr_frame_cancel_open(0);
 }
 
 Filter::~Filter() {
+    // Before anything else, and before any lock: a stage may be inside a model
+    // open, which compiles every compute pipeline and takes tens of seconds
+    // cold. Whoever ends up waiting on the model lock -- ReleaseModel() here,
+    // or the panel, or the next Filter -- waits for that open unless it is
+    // asked to stop. WithdrawVulkanShare() asks when the renderer takes its
+    // device back; nothing asked when the filter simply goes away, so closing
+    // the window during a cold open waited out the whole compile.
+    //
+    // The open stops after the pipeline it is already building. Claim() treats
+    // a cancelled open as a dropped frame rather than a failure, so a Filter
+    // that outlives this one reopens on its next pass instead of disabling
+    // itself.
+    nr_frame_cancel_open(1);
     Impl& im = *impl_;
     {
         std::lock_guard<std::mutex> lock(im.mutex);
