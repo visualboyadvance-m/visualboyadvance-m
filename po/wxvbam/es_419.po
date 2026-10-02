@@ -27,7 +27,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 14:00+0000\n"
+"POT-Creation-Date: 2026-10-02 15:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Uriel Sánchez, 2026\n"
 "Language-Team: Spanish (Latin America) (http://app.transifex.com/bgk/vba-m/language/es_419/)\n"
@@ -436,22 +436,22 @@ msgstr "Browse"
 msgid "Invalid value for Default magnification."
 msgstr "Valor no válido para ampliación predeterminada."
 
-#: dialogs/display-config.cpp:545
+#: dialogs/display-config.cpp:554
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
 msgstr ""
 
-#: dialogs/display-config.cpp:777
+#: dialogs/display-config.cpp:784
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
 msgstr ""
 
-#: dialogs/display-config.cpp:968
+#: dialogs/display-config.cpp:975
 msgid "Invalid color correction profile"
 msgstr "Perfil de corrección de color inválido"
 
-#: dialogs/display-config.cpp:1191 xrc/DisplayConfigBasic.xrc:171
+#: dialogs/display-config.cpp:1198 xrc/DisplayConfigBasic.xrc:171
 #: xrc/DisplayConfigBasic.xrc:211 xrc/DisplayConfigOSD.xrc:20
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
@@ -459,7 +459,7 @@ msgstr "Perfil de corrección de color inválido"
 msgid "None"
 msgstr "Ninguno"
 
-#: dialogs/display-config.cpp:1253
+#: dialogs/display-config.cpp:1260
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "No usable rpi plugins found in %s"
@@ -1730,243 +1730,243 @@ msgstr ""
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "Vulkan no esta disponible, desde ahora se usará OpenGL por defecto"
 
-#: panel.cpp:10310
+#: panel.cpp:10320
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volumen: %d %%"
 
-#: panel.cpp:11104
+#: panel.cpp:11114
 msgid "Vulkan device created successfully"
 msgstr ""
 
-#: panel.cpp:11254
+#: panel.cpp:11264
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr ""
 
-#: panel.cpp:11299
+#: panel.cpp:11309
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr ""
 
-#: panel.cpp:11302
+#: panel.cpp:11312
 msgid "Vulkan instance created"
 msgstr ""
 
-#: panel.cpp:11321
+#: panel.cpp:11331
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr ""
 
-#: panel.cpp:11344
+#: panel.cpp:11354
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:11355
+#: panel.cpp:11365
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr ""
 
-#: panel.cpp:11380
+#: panel.cpp:11390
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr ""
 
-#: panel.cpp:11390
+#: panel.cpp:11400
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr ""
 
-#: panel.cpp:11400
+#: panel.cpp:11410
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr ""
 
-#: panel.cpp:11417
+#: panel.cpp:11427
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr ""
 
-#: panel.cpp:11473
+#: panel.cpp:11483
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr ""
 
-#: panel.cpp:11482
+#: panel.cpp:11492
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr ""
 
-#: panel.cpp:11520
+#: panel.cpp:11530
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr ""
 
-#: panel.cpp:11559
+#: panel.cpp:11569
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr ""
 
-#: panel.cpp:11577
+#: panel.cpp:11587
 msgid "No supported Vulkan surface extension available"
 msgstr ""
 
-#: panel.cpp:11588
+#: panel.cpp:11598
 msgid "No Vulkan physical devices found"
 msgstr ""
 
-#: panel.cpp:11647
+#: panel.cpp:11657
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr ""
 
-#: panel.cpp:11651
+#: panel.cpp:11661
 msgid "No suitable Vulkan physical device found"
 msgstr ""
 
-#: panel.cpp:11838
+#: panel.cpp:11848
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr ""
 
-#: panel.cpp:12030
+#: panel.cpp:12040
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr ""
 
-#: panel.cpp:12070
+#: panel.cpp:12080
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr ""
 
-#: panel.cpp:12175
+#: panel.cpp:12185
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr ""
 
-#: panel.cpp:12221
+#: panel.cpp:12231
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr ""
 
-#: panel.cpp:12243
+#: panel.cpp:12253
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr ""
 
-#: panel.cpp:12266
+#: panel.cpp:12276
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr ""
 
-#: panel.cpp:12289
+#: panel.cpp:12299
 msgid "Failed to create shader modules"
 msgstr ""
 
-#: panel.cpp:12366
+#: panel.cpp:12376
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr ""
 
-#: panel.cpp:12403
+#: panel.cpp:12413
 msgid "Failed to create overlay pipeline"
 msgstr ""
 
-#: panel.cpp:12413
+#: panel.cpp:12423
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr ""
 
-#: panel.cpp:12429
+#: panel.cpp:12439
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr ""
 
-#: panel.cpp:12447
+#: panel.cpp:12457
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr ""
 
-#: panel.cpp:12467
+#: panel.cpp:12477
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr ""
 
-#: panel.cpp:12491
+#: panel.cpp:12501
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr ""
 
-#: panel.cpp:12503
+#: panel.cpp:12513
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:12511
+#: panel.cpp:12521
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr ""
 
-#: panel.cpp:12550
+#: panel.cpp:12560
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr ""
 
-#: panel.cpp:12564
+#: panel.cpp:12574
 msgid "Failed to allocate texture memory"
 msgstr ""
 
-#: panel.cpp:12580
+#: panel.cpp:12590
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr ""
 
-#: panel.cpp:12598
+#: panel.cpp:12608
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr ""
 
-#: panel.cpp:12632
+#: panel.cpp:12642
 msgid "Failed to create staging buffer"
 msgstr ""
 
-#: panel.cpp:12647
+#: panel.cpp:12657
 msgid "Failed to allocate staging memory"
 msgstr ""
 
-#: panel.cpp:12761
+#: panel.cpp:12771
 msgid "Failed to create overlay image"
 msgstr ""
 
-#: panel.cpp:12775
+#: panel.cpp:12785
 msgid "Failed to allocate overlay image memory"
 msgstr ""
 
-#: panel.cpp:12790
+#: panel.cpp:12800
 msgid "Failed to create overlay image view"
 msgstr ""
 
-#: panel.cpp:12807
+#: panel.cpp:12817
 msgid "Failed to create overlay sampler"
 msgstr ""
 
-#: panel.cpp:12844
+#: panel.cpp:12854
 msgid "Failed to create overlay staging buffer"
 msgstr ""
 
-#: panel.cpp:12858
+#: panel.cpp:12868
 msgid "Failed to allocate overlay staging memory"
 msgstr ""
 
-#: panel.cpp:12936
+#: panel.cpp:12946
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr ""
 
-#: panel.cpp:13032
+#: panel.cpp:13042
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr ""
 
-#: panel.cpp:13385
+#: panel.cpp:13395
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr ""
@@ -3308,136 +3308,141 @@ msgstr ""
 msgid "XAudio2: Exception during device enumeration"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1788
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1797
 msgid "Error, link already connected"
 msgstr "Error, link already connected"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1802
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1811
 msgid "Unable to find link driver"
 msgstr "Unable to find link driver"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1857
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1866
 msgid "Link connection does not need updates."
 msgstr "Link connection does not need updates."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2221
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2880
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3443
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5321
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2230
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2893
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3456
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5338
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Player %d disconnected."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2283
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2292
 msgid "Player 2 disconnected."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2361
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2411
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2478
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2877
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2370
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2420
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2890
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3575
 msgid "Server disconnected."
 msgstr "Server disconnected."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2604
 #, c-format
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2617
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2620
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2629
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2623
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2632
 #, c-format
 msgid "Failed to start link server on port %d: %s"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2658
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2681
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2690
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3608
 #, c-format
 msgid "Player %d connected"
 msgstr "Player %d connected"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2706
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3625
 msgid "All players connected"
 msgstr "All players connected"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2741
 msgid "Connecting to server..."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2741
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3622
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2750
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3635
 msgid "Network error."
 msgstr "Network error."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2753
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3638
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2759
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3648
+msgid "Invalid link server response."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3656
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "Connected as #%d, Waiting for %d players to join"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3647
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2780
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3664
 msgid "All players joined."
 msgstr "All players joined."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3555
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3568
 msgid "Server timed out."
 msgstr "Server timed out."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4665
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4682
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4699
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4749
 msgid "Error creating file mapping"
 msgstr "Error creating file mapping"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4677
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4694
 msgid "Error mapping file"
 msgstr "Error mapping file"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4797
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4814
 msgid "5 or more GBAs not supported."
 msgstr "5 or more GBAs not supported."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4827
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4844
 msgid "The GB link supports only 2 players."
 msgstr ""
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4853
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4874
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4870
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4891
 msgid "Error opening event"
 msgstr "Error opening event"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5046
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5063
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Lost link; reinitialize to reconnect"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5060
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5077
 msgid "Lost link; reconnected"
 msgstr "Lost link; reconnected"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5386
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5403
 msgid "Unknown slave timed out; resetting comm"
 msgstr "Unknown slave timed out; resetting comm"
 

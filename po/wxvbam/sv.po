@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 14:00+0000\n"
+"POT-Creation-Date: 2026-10-02 15:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/bgk/vba-m/language/sv/)\n"
@@ -425,22 +425,22 @@ msgstr "Bläddra"
 msgid "Invalid value for Default magnification."
 msgstr "Ogiltigt värde för standardförstoring."
 
-#: dialogs/display-config.cpp:545
+#: dialogs/display-config.cpp:554
 #, c-format
 msgid "Failed to load DisplayConfig tab '%s'"
 msgstr "Det gick inte att läsa in fliken DisplayConfig ”%s”"
 
-#: dialogs/display-config.cpp:777
+#: dialogs/display-config.cpp:784
 msgid ""
 "Neither HDR nor 10-bit SDR is available: no native Wayland (Vulkan) renderer"
 " was found, so the display fell back to XWayland (8-bit SDR only)."
 msgstr "Varken HDR eller 10-bitars SDR är tillgängligt: ingen inbyggd Wayland-renderare (Vulkan) hittades, så skärmen återgick till XWayland (endast 8-bitars SDR)."
 
-#: dialogs/display-config.cpp:968
+#: dialogs/display-config.cpp:975
 msgid "Invalid color correction profile"
 msgstr "Ogiltig färgkorrigeringsprofil"
 
-#: dialogs/display-config.cpp:1191 xrc/DisplayConfigBasic.xrc:171
+#: dialogs/display-config.cpp:1198 xrc/DisplayConfigBasic.xrc:171
 #: xrc/DisplayConfigBasic.xrc:211 xrc/DisplayConfigOSD.xrc:20
 #: xrc/GameBoyAdvanceConfigGameOverrides.xrc:69
 #: xrc/GameBoyAdvanceConfigSaveType.xrc:25 xrc/SoundConfigGameBoy.xrc:21
@@ -448,7 +448,7 @@ msgstr "Ogiltig färgkorrigeringsprofil"
 msgid "None"
 msgstr "Inga"
 
-#: dialogs/display-config.cpp:1253
+#: dialogs/display-config.cpp:1260
 #, c-format
 msgid "No usable rpi plugins found in %s"
 msgstr "Inga användbara rpi plugins funna i %s"
@@ -1719,243 +1719,243 @@ msgstr "OpenGL är inte tillgängligt på Wayland utan EGL, använder Vulkan"
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "Vulkan är inte tillgängligt, använder OpenGL som standard"
 
-#: panel.cpp:10310
+#: panel.cpp:10320
 #, c-format
 msgid "Volume: %d %%"
 msgstr "Volym: %d %%"
 
-#: panel.cpp:11104
+#: panel.cpp:11114
 msgid "Vulkan device created successfully"
 msgstr "Vulkan-enhet skapades"
 
-#: panel.cpp:11254
+#: panel.cpp:11264
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "Varken VK_KHR_wayland_surface eller VK_KHR_xlib_surface är tillgängliga — kan inte skapa Vulkan-yta på detta system"
 
-#: panel.cpp:11299
+#: panel.cpp:11309
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "Det gick inte att skapa Vulkan-instans: %d"
 
-#: panel.cpp:11302
+#: panel.cpp:11312
 msgid "Vulkan instance created"
 msgstr "Vulkan-instans skapades"
 
-#: panel.cpp:11321
+#: panel.cpp:11331
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "Det gick inte att skapa Vulkan Win32-yta: %d"
 
-#: panel.cpp:11344
+#: panel.cpp:11354
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "Det gick inte att hämta NSView-handtag för Vulkan-yta"
 
-#: panel.cpp:11355
+#: panel.cpp:11365
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "Det gick inte att skapa Vulkan Metal-yta: %d"
 
-#: panel.cpp:11380
+#: panel.cpp:11390
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr "Det gick inte att hämta QWidget-handtag för Vulkan-yta"
 
-#: panel.cpp:11390
+#: panel.cpp:11400
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr "Det gick inte att hämta ANativeWindow för panelen"
 
-#: panel.cpp:11400
+#: panel.cpp:11410
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr "Det gick inte att skapa Vulkan Android-yta: %d"
 
-#: panel.cpp:11417
+#: panel.cpp:11427
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "Det gick inte att skapa Vulkan Xlib-yta: %d"
 
-#: panel.cpp:11473
+#: panel.cpp:11483
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr "Wayland: wl_compositor/wl_subcompositor är inte tillgänglig; kan inte skapa Vulkan-underyta"
 
-#: panel.cpp:11482
+#: panel.cpp:11492
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr "Wayland: det gick inte att skapa Vulkan-underyta"
 
-#: panel.cpp:11520
+#: panel.cpp:11530
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "Det gick inte att skapa Vulkan Wayland-yta: %d"
 
-#: panel.cpp:11559
+#: panel.cpp:11569
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "Det gick inte att hämta Wayland-visnings-/ythandtag"
 
-#: panel.cpp:11577
+#: panel.cpp:11587
 msgid "No supported Vulkan surface extension available"
 msgstr "Ingen Vulkan-ytutökning som stöds är tillgänglig"
 
-#: panel.cpp:11588
+#: panel.cpp:11598
 msgid "No Vulkan physical devices found"
 msgstr "Inga fysiska Vulkan-enheter hittades"
 
-#: panel.cpp:11647
+#: panel.cpp:11657
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "Vald Vulkan-enhet: %s"
 
-#: panel.cpp:11651
+#: panel.cpp:11661
 msgid "No suitable Vulkan physical device found"
 msgstr "Ingen lämplig fysisk Vulkan-enhet hittades"
 
-#: panel.cpp:11838
+#: panel.cpp:11848
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "Det gick inte att skapa logisk Vulkan-enhet: %d"
 
-#: panel.cpp:12030
+#: panel.cpp:12040
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "Det gick inte att skapa Vulkan-växlingskedja: %d"
 
-#: panel.cpp:12070
+#: panel.cpp:12080
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr "Växlingskedja skapad: %ux%u, %u bilder, vsync=%s, förtransformering=0x%x"
 
-#: panel.cpp:12175
+#: panel.cpp:12185
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "Det gick inte att skapa växlingskedjebildvy %zu: %d"
 
-#: panel.cpp:12221
+#: panel.cpp:12231
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "Det gick inte att skapa renderingspass: %d"
 
-#: panel.cpp:12243
+#: panel.cpp:12253
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "Det gick inte att skapa bildbuffert %zu: %d"
 
-#: panel.cpp:12266
+#: panel.cpp:12276
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "Det gick inte att skapa layout för deskriptoruppsättning: %d"
 
-#: panel.cpp:12289
+#: panel.cpp:12299
 msgid "Failed to create shader modules"
 msgstr "Det gick inte att skapa shader-moduler"
 
-#: panel.cpp:12366
+#: panel.cpp:12376
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "Det gick inte att skapa pipelinelayout: %d"
 
-#: panel.cpp:12403
+#: panel.cpp:12413
 msgid "Failed to create overlay pipeline"
 msgstr "Det gick inte att skapa överlagringspipeline"
 
-#: panel.cpp:12413
+#: panel.cpp:12423
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "Det gick inte att skapa grafikpipeline: %d"
 
-#: panel.cpp:12429
+#: panel.cpp:12439
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "Det gick inte att skapa kommandopool: %d"
 
-#: panel.cpp:12447
+#: panel.cpp:12457
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "Det gick inte att allokera kommandobuffertar: %d"
 
-#: panel.cpp:12467
+#: panel.cpp:12477
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "Det gick inte att skapa synkroniseringsobjekt för bildruta %d"
 
-#: panel.cpp:12491
+#: panel.cpp:12501
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "Det gick inte att skapa deskriptorpool: %d"
 
-#: panel.cpp:12503
+#: panel.cpp:12513
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "Det gick inte att allokera deskriptoruppsättning: %d"
 
-#: panel.cpp:12511
+#: panel.cpp:12521
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr "Det gick inte att allokera överlagringsdeskriptoruppsättning: %d"
 
-#: panel.cpp:12550
+#: panel.cpp:12560
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "Det gick inte att skapa texturbild: %d"
 
-#: panel.cpp:12564
+#: panel.cpp:12574
 msgid "Failed to allocate texture memory"
 msgstr "Det gick inte att allokera texturminne"
 
-#: panel.cpp:12580
+#: panel.cpp:12590
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "Det gick inte att skapa texturbildvy: %d"
 
-#: panel.cpp:12598
+#: panel.cpp:12608
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "Det gick inte att skapa textursamplare: %d"
 
-#: panel.cpp:12632
+#: panel.cpp:12642
 msgid "Failed to create staging buffer"
 msgstr "Det gick inte att skapa stagingbuffert"
 
-#: panel.cpp:12647
+#: panel.cpp:12657
 msgid "Failed to allocate staging memory"
 msgstr "Det gick inte att allokera stagingminne"
 
-#: panel.cpp:12761
+#: panel.cpp:12771
 msgid "Failed to create overlay image"
 msgstr "Det gick inte att skapa överlagringsbild"
 
-#: panel.cpp:12775
+#: panel.cpp:12785
 msgid "Failed to allocate overlay image memory"
 msgstr "Det gick inte att allokera minne för överlagringsbild"
 
-#: panel.cpp:12790
+#: panel.cpp:12800
 msgid "Failed to create overlay image view"
 msgstr "Det gick inte att skapa överlagringsbildvy"
 
-#: panel.cpp:12807
+#: panel.cpp:12817
 msgid "Failed to create overlay sampler"
 msgstr "Det gick inte att skapa överlagringssamplare"
 
-#: panel.cpp:12844
+#: panel.cpp:12854
 msgid "Failed to create overlay staging buffer"
 msgstr "Det gick inte att skapa stagingbuffert för överlagring"
 
-#: panel.cpp:12858
+#: panel.cpp:12868
 msgid "Failed to allocate overlay staging memory"
 msgstr "Det gick inte att allokera stagingminne för överlagring"
 
-#: panel.cpp:12936
+#: panel.cpp:12946
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VKDrawingPanel har initierats: %ux%u (skala: %f)"
 
-#: panel.cpp:13032
+#: panel.cpp:13042
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "Det gick inte att hämta växlingskedjebild: %d"
 
-#: panel.cpp:13385
+#: panel.cpp:13395
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "Det gick inte att visa växlingskedjebild: %d"
@@ -3297,136 +3297,141 @@ msgstr "XAudio2: XAudio2-instansen verkar vara ogiltig"
 msgid "XAudio2: Exception during device enumeration"
 msgstr "XAudio2: undantag under enhetsuppräkning"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1788
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1797
 msgid "Error, link already connected"
 msgstr "Fel, länk redan ansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1802
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1811
 msgid "Unable to find link driver"
 msgstr "Kunde inte hitta länkdrivrutin"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1857
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:1866
 msgid "Link connection does not need updates."
 msgstr "Länkanslutning behöver inte uppdateras."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2221
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2880
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3443
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5321
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2230
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2893
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3456
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5338
 #, c-format
 msgid "Player %d disconnected."
 msgstr "Spelare %d kopplade från."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2283
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2292
 msgid "Player 2 disconnected."
 msgstr "Spelare 2 kopplades från."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2361
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2411
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2478
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2877
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3562
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2370
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2420
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2487
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2890
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3575
 msgid "Server disconnected."
 msgstr "Servern kopplade från."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2604
 #, c-format
 msgid ""
 "Could not resolve link server bind address \"%s\".\n"
 "Use \"*\" to listen on all interfaces."
 msgstr "Kunde inte slå upp bindningsadressen \"%s\" för länkservern.\nAnvänd \"*\" för att lyssna på alla gränssnitt."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2608
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2617
 #, c-format
 msgid ""
 "Bind address \"%s\" is not a local address; listening on all interfaces "
 "instead."
 msgstr "Bindningsadressen \"%s\" är inte lokal; lyssnar i stället på alla gränssnitt."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2620
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2629
 #, c-format
 msgid ""
 "Port %d is already in use by another program (or another emulator instance acting as server).\n"
 "Close it or change the link port."
 msgstr "Port %d används redan av ett annat program (eller en annan emulatorinstans som fungerar som server).\nStäng det eller ändra länkporten."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2623
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2632
 #, c-format
 msgid "Failed to start link server on port %d: %s"
 msgstr "Det gick inte att starta länkserver på port %d: %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2649
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2658
 #, c-format
 msgid "Could not initiate connection to %s port %d: %s"
 msgstr "Kunde inte initiera anslutning till %s port %d: %s"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2681
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3595
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2690
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3608
 #, c-format
 msgid "Player %d connected"
 msgstr "Spelare %d ansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2697
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3612
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2706
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3625
 msgid "All players connected"
 msgstr "Alla spelare anslutna"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2741
 msgid "Connecting to server..."
 msgstr "Ansluter till server ..."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2741
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3622
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2750
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3635
 msgid "Network error."
 msgstr "Nätverksfel."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2753
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3638
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2759
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3648
+msgid "Invalid link server response."
+msgstr ""
+
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3656
 #, c-format
 msgid "Connected as #%d, Waiting for %d players to join"
 msgstr "Ansluten som #%d, Väntar på att %d spelare ska gå med"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3647
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2780
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3664
 msgid "All players joined."
 msgstr "Alla spelare har gått med."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3555
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3568
 msgid "Server timed out."
 msgstr "Servern har överskridit tidsgränsen."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4665
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4682
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4732
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4699
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4749
 msgid "Error creating file mapping"
 msgstr "Fel vid skapande av filmappning"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4677
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4694
 msgid "Error mapping file"
 msgstr "Fel vid mappning av fil"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4797
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4814
 msgid "5 or more GBAs not supported."
 msgstr "5 eller fler GBA stöds inte."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4827
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4844
 msgid "The GB link supports only 2 players."
 msgstr "GB-länken stöder endast 2 spelare."
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4853
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4874
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4870
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4891
 msgid "Error opening event"
 msgstr "Fel vid öppning av händelsen"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5046
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5063
 msgid "Lost link; reinitialize to reconnect"
 msgstr "Förlorade länk; återinitiera för att återansluta"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5060
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5077
 msgid "Lost link; reconnected"
 msgstr "Förlorade länk; återansluten"
 
-#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5386
+#: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:5403
 msgid "Unknown slave timed out; resetting comm"
 msgstr "Okänd slav översteg tidsgränsen; återställer komm"
 
