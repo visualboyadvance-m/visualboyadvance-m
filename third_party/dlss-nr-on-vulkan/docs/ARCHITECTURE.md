@@ -195,12 +195,18 @@ dense FP16 instead and the values correlate **−0.02** with the truth — and, 
 headers say `data_len == 2 * n_elem`, the parameter count comes out at 73.8 M, half the real
 one. This project made both mistakes, and published the second.
 
-### Subnormals: a real hardware trap that these weights do not trigger
+### Subnormals: a driver's mode, declared here
 
-Intel's XMX units flush subnormal FP16 operands to zero. That is real, and a per-tensor
-`2^k` rescale guards against it exactly. But **the real weights hold 7 subnormal values in
-145.8 M**: E4M3's smallest non-zero magnitude sits far above FP16's normal threshold, so
-decoded FP8 cannot land there. An earlier figure of 27 % was measured on the misread
+Whether FP16 subnormal operands survive the cooperative-matrix GEMM is the driver's
+float-controls mode, not the XMX units': Mesa flushes them unless a shader declares a mode,
+and Intel's Windows driver keeps them. Left undeclared, the same graph draws a different
+picture on each. libxmx declares `DenormPreserve 16` on every module where the device reports
+`shaderDenormPreserveFloat16` and lets the 16-bit mode differ from the other widths'
+(`denormBehaviorIndependence = ALL`, as both report), so both keep them and compute the graph
+bit for bit alike (`notes/phase71`) — as NVIDIA's tensor cores keep them; `XMX_DENORM16=driver`
+leaves it to the driver. **The real weights hold 7 subnormal values in 145.8 M**: E4M3's
+smallest non-zero magnitude sits far above FP16's normal threshold, so decoded FP8 cannot land
+there. An earlier figure of 27 % was measured on the misread
 container bytes and says nothing about the model. If your weights arrive in another format,
 count before assuming either way.
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Exercise request bounds, codecs and the native layer's disconnect behavior."""
 import contextlib
-import ctypes
 import sys
 import io
 import pathlib
@@ -212,7 +211,8 @@ def device_lost_tests():
     """
     import xmxres
     assert daemon.DeviceLost is xmxres.DeviceLost
-    library = ctypes.CDLL(str(nr_build.library('xmx')))
+    import xmx
+    library = xmx.native_library('xmx')
     assert library.xmx_device_lost() == 0, "a device nobody has lost is not lost"
     message = lambda: b'resident submit (-4)'
     lost = xmxres.failure(SimpleNamespace(xmx_error=message, xmx_device_lost=lambda: 1),

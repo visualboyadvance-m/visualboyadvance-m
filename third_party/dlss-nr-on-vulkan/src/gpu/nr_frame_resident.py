@@ -58,6 +58,28 @@ def pad8(extent):
     return -(-extent // 8) * 8
 
 
+class _HeadLease:
+    """A block of host memory lent out as one head's buffer (`ResidentFrame.read_head`).
+
+    Every array over it holds the buffer, views included, and NumPy releases it only when the
+    last of them is gone. Then the block goes back to the frame for the next head: what the
+    caller can still see is never written again, and nothing has to say when it is done.
+    """
+
+    def __init__(self, block, free):
+        self.block, self.free = block, free
+
+    def __buffer__(self, flags):
+        return memoryview(self.block)
+
+    def __release_buffer__(self, view):
+        view.release()
+        self.free.append(self.block)
+
+
+_LEASES = sys.version_info >= (3, 12)       # PEP 688: a buffer exporter written in Python
+
+
 class Edge:
     """A transition's weights: a projection and, for the decoder, a skip scale."""
 
@@ -154,6 +176,7 @@ class ResidentFrame:
         self._arena = xmxres.ScratchArena(runtime) if os.environ.get("NR_SCRATCH_ARENA", "1") != "0" else None
         self._planned = None      # what the arena was planned for: `_prepare_scratch`
         self._closed = False
+        self._head_free = []      # host blocks a returned head was in and nobody holds now
 
     @staticmethod
     def _plan(height, width):
@@ -213,8 +236,18 @@ class ResidentFrame:
 
     def read_head(self):
         channels = 4 if self.rt.compact_head else 16
-        return np.array(xmxres.host_view(self.head_buffer(),
-                        shape=(self.height, self.width, channels))[..., :4], copy=True)
+        view = xmxres.host_view(self.head_buffer(),
+                                shape=(self.height, self.width, channels))[..., :4]
+        if not _LEASES:
+            return np.array(view, copy=True)
+        # A fresh array a frame costs a page fault every 4 KB on Windows, whose heap gives
+        # memory this size back to the system when it is freed: 15 ms of a 720p frame, of
+        # which the copy is 2.4. So a head is lent from a block the frame keeps, and a block
+        # goes out again only once every array and view over the last head in it is gone.
+        block = self._head_free.pop() if self._head_free else np.empty(view.size, view.dtype)
+        head = np.frombuffer(_HeadLease(block, self._head_free), view.dtype).reshape(view.shape)
+        np.copyto(head, view)
+        return head
 
     def buffer(self, name, elements, dtype=np.float32):
         existing = self._buffers.get(name)
@@ -282,6 +315,7 @@ class ResidentFrame:
             graph.free()
         self._graphs.clear()
         self._closed = True
+        self._head_free.clear()
         for cache in (self._scratch, self._blocks, self._buffers, self._edges):
             cache.clear()
         if self._arena is not None:

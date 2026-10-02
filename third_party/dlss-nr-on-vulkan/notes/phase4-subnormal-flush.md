@@ -1,6 +1,14 @@
 # Phase 4 — the GPU path runs, and it found a real hardware trap
 2026-09-08
 
+> **Corrected 2026-10-01** (`phase71`): the flush measured here is real on Mesa, but it is
+> Mesa's default float-controls mode, not the XMX units'. Our shaders declare no denorm mode,
+> so `cr0`'s float16 denorm bit stays clear and the multiply flushes. The same units keep
+> float16 subnormals under Intel's Windows driver, and `DenormFlushToZero 16` declared there
+> reproduces Mesa's stem bit for bit. libxmx has declared `DenormPreserve 16` since, so Mesa
+> keeps them too. The 27 % below was withdrawn earlier: it counted the misread decode, and the
+> real weights hold 7 subnormals (`phase61`).
+
 ## The path works
 
 `src/gpu/gemm_coopmat.comp` + `src/gpu/gemm_runner.c` execute an FP16 x FP16 -> FP32

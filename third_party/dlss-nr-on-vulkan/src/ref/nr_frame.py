@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import os
 import pathlib
 import sys
 import time
@@ -22,7 +23,9 @@ import types
 import numpy as np
 
 HERE = pathlib.Path(__file__).resolve().parent
-ROOT = HERE.parent.parent
+# NR_ROOT lets a deployed tree (or a launcher) point at the directory the daemon's
+# work/ lives under; the in-tree default is two levels up from this file.
+ROOT = pathlib.Path(os.environ.get("NR_ROOT") or HERE.parent.parent)
 sys.path.insert(0, str(HERE))
 
 import nr_model  # noqa: E402

@@ -76,12 +76,31 @@ def backend():
     return chosen
 
 
+_dll_directories = []          # the handles keep the directories on Windows' search path
+
+
+def dll_directories():
+    """Windows: the directories a library's own dependencies are found in. Python since 3.8
+    looks only in the system folders and the ones added through `os.add_dll_directory`, so
+    the build directory (vulkan-1 is a system DLL, but libnr_frame finds libxmx beside it) and
+    `NR_DLL_PATH` — a toolchain's runtime, MinGW's libwinpthread or libgomp, wherever it is
+    installed — are added once, the first time a library is asked for. Elsewhere a no-op."""
+    if os.name != "nt" or _dll_directories:
+        return _dll_directories
+    extra = [p for p in os.environ.get("NR_DLL_PATH", "").split(os.pathsep) if p]
+    for directory in [str(BUILD_DIR), *extra]:
+        if os.path.isdir(directory):
+            _dll_directories.append(os.add_dll_directory(directory))
+    return _dll_directories
+
+
 def library(name):
     """`libxmx.so`, `libnr_frame.dylib`, `libnr_layer.dll`: the platform's spelling of a library.
     `xmx` is the compute runtime, which `NR_GPU_BACKEND` redirects to libmetalmx (macOS) or
-    libd3dmx (Windows)."""
+    libd3dmx (Windows). On Windows the DLL search path is set up on the way (`dll_directories`)."""
     if name == "xmx":
         name = RUNTIMES[backend()]
+    dll_directories()
     return BUILD_DIR / ("lib" + name + SUFFIX)
 
 

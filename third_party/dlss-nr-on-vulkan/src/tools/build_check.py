@@ -32,7 +32,8 @@ def loaded_shaders():
     """The SPIR-V the runtime opens: the device path's modules and libxmx itself."""
     names = set()
     for path in ("src/gpu/xmxres.py", "src/gpu/xmx.py", "src/gpu/libxmx.c"):
-        names |= set(re.findall(r"([A-Za-z0-9_]+\.spv)", (ROOT / path).read_text()))
+        names |= set(re.findall(r"([A-Za-z0-9_]+\.spv)",
+                                (ROOT / path).read_text(encoding="utf-8")))
     return names
 
 
@@ -75,8 +76,8 @@ def cmake_tests(text):
 
 
 def main():
-    make = (ROOT / "Makefile").read_text()
-    cmake = (ROOT / "CMakeLists.txt").read_text()
+    make = (ROOT / "Makefile").read_text(encoding="utf-8")
+    cmake = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
     loaded = loaded_shaders()
     in_make, in_cmake = make_shaders(make), cmake_shaders(cmake)
     check(f"the runtime's {len(loaded)} shaders are all built by make",

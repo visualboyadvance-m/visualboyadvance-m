@@ -9,8 +9,9 @@ weights it reads are the wrong decode, kept only for the findings the surroundin
 encode. `notes/reviewing.md` says which tests are the live ones.
 
 **It does not pass, and cannot.** Worst relative error 0.22. The dense-FP16 decode
-produces values including FP16 subnormals, XMX flushes subnormal operands to zero
-and the float64 reference does not, so the two disagree by the size of that gap.
+produces values including FP16 subnormals, Mesa's default flushed subnormal operands to
+zero (phase71: a driver's mode, not the XMX units') and the float64 reference does not,
+so the two disagree by the size of that gap.
 The premise it was written under — `notes/phase4-subnormal-flush.md`, '27 % of this
 model's parameters are subnormal' — was itself an artefact of the same wrong decode;
 the real figure is 0.00006 %. Kept as the record of a measurement that was real at

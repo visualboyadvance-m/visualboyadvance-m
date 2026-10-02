@@ -2,7 +2,7 @@
 """
 xmx — host-side interface to the Xe2 cooperative-matrix GEMM.
 
-Backed by `work/libxmx.so` (`.dylib` on macOS), a resident Vulkan context: the instance, device,
+Backed by `work/libxmx.so` (`.dylib` on macOS, `.dll` on Windows), a resident Vulkan context: the instance, device,
 pipeline and buffers are created once and reused, so a call costs a memcpy, a submit
 and a fence wait rather than ~80 ms of setup. `NR_GPU_BACKEND=metal` (macOS) or `=d3d12`
 (Windows) binds libmetalmx or libd3dmx instead — the same entry points on Metal or
@@ -10,11 +10,13 @@ Direct3D 12 (`nr_build.library`).
 
 Two things this layer must do that the kernel does not:
 
-  1. **Rescale both operands by a power of two.** XMX flushes subnormal FP16 operands to
-     zero (notes/phase4-subnormal-flush.md), and an activation can land there whatever the
-     weights hold. A power-of-two scale is exact, so this is lossless. (That note's "27 %
-     of this model" was measured on the dense-FP16 misreading of the container and is
-     withdrawn: the real weights hold 7 subnormals, notes/phase61.)
+  1. **Rescale both operands by a power of two.** Mesa flushes subnormal FP16 operands to
+     zero in the GEMM unless a float-controls mode is declared (notes/phase71). libxmx
+     declares `DenormPreserve 16` where the driver can; where it cannot, an activation can
+     land there whatever the weights hold. A power-of-two scale is exact, so this is
+     lossless. (notes/phase4-subnormal-flush.md's "27 % of this model" was measured on the
+     dense-FP16 misreading of the container and is withdrawn: the real weights hold 7
+     subnormals, notes/phase61.)
   2. **Pad to the tile shape.** The only float configuration is M=8 N=16 K=16.
 """
 import ctypes
@@ -31,6 +33,16 @@ FP16_MAX = 65504.0
 TM, TN, TK = 8, 16, 16
 
 _lib = None
+
+
+def native_library(name):
+    """`lib<name>` from the build this tree runs (`nr_build.library`): `.so`, `.dylib` or
+    `.dll`. On Windows, where Python since 3.8 finds a DLL's own dependencies only in the
+    system folders and the directories added to its search path, the build directory and
+    `NR_DLL_PATH` — a toolchain's runtime, MinGW's libwinpthread for one — are added first
+    (`nr_build.dll_directories`). `xmx` is the compute runtime, which `NR_GPU_BACKEND`
+    redirects to libmetalmx or libd3dmx."""
+    return ctypes.CDLL(str(nr_build.library(name)))
 
 
 def _load(spv=None):
@@ -55,7 +67,7 @@ def _load(spv=None):
         # softmax and cosine check is exact on an M3, same as on Xe2.
         os.environ.setdefault("MVK_CONFIG_LOG_LEVEL", "1")       # errors only
         os.environ.setdefault("MVK_CONFIG_FAST_MATH_ENABLED", "0")
-    lib = ctypes.CDLL(str(nr_build.library("xmx")))
+    lib = native_library("xmx")
     lib.xmx_init.argtypes = [ctypes.c_char_p]
     lib.xmx_init.restype = ctypes.c_int
     for name in ("xmx_open", "xmx_coopmat", "xmx_portable"):
@@ -109,10 +121,11 @@ def memory_note():
 def _shift(x):
     """The exact 2^k that lifts |x| just under the FP16 ceiling.
 
-    XMX flushes subnormal FP16 operands to zero (notes/phase4-subnormal-flush.md);
-    a power of two is lossless. The "27 %" that note reports is withdrawn — it counted
-    the misread decode, notes/phase61 — but the flush is real and an activation can
-    reach it at any time.
+    A driver that cannot be told to keep FP16 subnormals may flush them (Mesa's default
+    does, notes/phase71); a power of two is lossless. The "27 %" that
+    notes/phase4-subnormal-flush.md reports is withdrawn — it counted the misread decode,
+    notes/phase61 — but where a flush happens it is real, and an activation can reach it
+    at any time.
     Two reductions rather than `abs(x).max()`, which allocates a whole temporary.
     """
     x = np.asarray(x)

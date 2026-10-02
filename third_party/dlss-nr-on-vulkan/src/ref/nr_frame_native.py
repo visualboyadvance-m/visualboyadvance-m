@@ -69,6 +69,11 @@ def library():
         lib.nr_frame_device.restype = C.c_char_p
         lib.nr_frame_gemm_path.argtypes = [C.c_void_p]
         lib.nr_frame_gemm_path.restype = C.c_char_p
+        for name in ("nr_frame_discrete", "nr_frame_preserve16", "nr_frame_half_by_cast"):
+            getattr(lib, name).argtypes = []
+            getattr(lib, name).restype = C.c_int
+        lib.nr_frame_input_view.argtypes = [C.c_void_p]
+        lib.nr_frame_input_view.restype = C.c_int
         lib.nr_frame_defaults.argtypes = [C.POINTER(Params)]
         lib.nr_frame_defaults.restype = None
         lib.nr_frame_geometry.argtypes = [C.c_int, C.c_int, C.POINTER(C.c_int), C.POINTER(C.c_int)]
@@ -216,6 +221,27 @@ class NativeFrame:
     @property
     def gemm_path(self):
         return self.lib.nr_frame_gemm_path(self.handle).decode()
+
+    @property
+    def discrete(self):
+        """1 on a card with memory of its own, 0 on a shared-memory device, -1 unknown."""
+        return self.lib.nr_frame_discrete()
+
+    @property
+    def preserve16(self):
+        """Whether the GEMMs keep float16 subnormals (`nr_frame_preserve16`): libxmx's declared
+        `DenormPreserve 16` where the driver takes it, Metal's and Direct3D 12's own."""
+        return self.lib.nr_frame_preserve16()
+
+    @property
+    def half_by_cast(self):
+        """Which `half_round` the pipelines compile: 1 the cast, 0 the pack round trip."""
+        return self.lib.nr_frame_half_by_cast()
+
+    @property
+    def input_view(self):
+        """Whether the features are built in the graph's mapped input (NR_INPUT_VIEW)."""
+        return self.lib.nr_frame_input_view(self.handle)
 
     @property
     def split(self):

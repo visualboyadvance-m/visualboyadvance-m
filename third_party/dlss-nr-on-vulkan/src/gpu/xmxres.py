@@ -603,7 +603,24 @@ class Runtime:
         # bit-identical and 3.6-4.4 % of the frame at 720p.
         self.fuse_attention_merge = os.environ.get("NR_FUSE_ATTENTION_MERGE", "1") != "0"
         # Q/K normalised and V published in the QKV projection's own epilogue, so the
-        # float32 projection never goes to memory (qkv_epilogue.glsl).
+        # float32 projection never goes to memory (qkv_epilogue.glsl). On everywhere: it
+        # is 22 % of a 720p frame (`notes/improve-qkv-epilogue.md`), and 143 -> 257 ms of
+        # graph at 1344x768 when it is off.
+        #
+        # Fusing moves the epilogue's writes into the projection's own dispatch, and the
+        # projection's input shares a scratch-arena role with `k16`; HANDOFF.md records
+        # that the role table was built for passes that finish before the next starts, and
+        # this one does not. The epilogue therefore writes K to `key16` instead.
+        #
+        # This was off on Windows for a while, after horizontal bands on the B580, and
+        # that is withdrawn: the bands were the probe resetting the graph's Vulkan state
+        # in the daemon's own process (fixed - the probe runs in a child now), and every
+        # frame measured since is clean with this on, including with the NumPy host
+        # passes. The owner measured the same frame byte-identical with it on and off over
+        # 60 frames from three games. `test_gemm_qkv.py` does still differ by the sign of
+        # a zero on that driver, with the switch on or off; -0 and +0 are equal in
+        # everything downstream, and the test compares bytes deliberately, so it does not
+        # implicate the fusion.
         self.qkv_epilogue = os.environ.get("NR_QKV_EPILOGUE", "1") != "0"
         # The full-resolution glue around blocks 0 and 70 in fewer passes: the stem's
         # GEMM also stores the half copy block 0's feed-forward reads, and block 70's

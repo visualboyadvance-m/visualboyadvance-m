@@ -79,6 +79,7 @@ static id<MTLCommandQueue> queue;
  * waits on it on its way in. */
 static id<MTLFence> fence;
 static id<MTLLibrary> library;
+static id<MTLBinaryArchive> archive;           /* XMX_PIPELINE_IR: the compiled pipelines */
 /* The address of a buffer, without `gpuAddress`: encode it as the one pointer argument of
  * this encoder into `addr_scratch` and read the 8 bytes back. Argument buffers hold real
  * device addresses, the same value `gpuAddress` reports, on every macOS with Metal 2. */
@@ -135,6 +136,10 @@ static struct {
 	char name[256]; char err[512]; char memory[256];
 	int ready, lost, discrete, unmapped, coopmat, portable;
 	int metal4;               /* the Metal 4 library is the one loaded (or to be loaded) */
+	/* XMX_PIPELINE_STATS=FILE: what Metal says of each pipeline it compiled, appended to FILE;
+	 * XMX_PIPELINE_IR=DIR: the compiled pipelines serialised there as one binary archive */
+	FILE *stats;
+	const char *ir_dir;
 	struct buf A, B, C, stage;
 } g;
 
@@ -217,6 +222,25 @@ const char *xmx_path(void)
 			 : "portable multiply-add (the device has no simdgroup matrix support)";
 }
 int xmx_staging_mode(void) { return g.unmapped; }
+int xmx_discrete(void) { return g.discrete; }
+
+/* Half subnormals through the GEMMs (xmx.h). Metal has no float-controls mode to declare:
+ * the compiler runs with fast math off (nr_metal.h), under which the Metal Shading Language
+ * keeps half denormals, and `simdgroup_matrix` multiplies them as the ALUs do — measured on
+ * an M3 by `src/gpu/test_denorm.py`, which is the check on any other Apple GPU. So the answer
+ * is what the device does, and `XMX_DENORM16=driver` changes nothing here. */
+int xmx_preserve16(void) { return dev ? 1 : 0; }
+
+/* `half_round` in nr_metal.h is the cast, `float(half(x))`, a real conversion pair with fast
+ * math off; Metal has no packHalf2x16 to spell the other one with. `XMX_HALF_ROUND=pack` is
+ * refused with a note rather than honoured. */
+int xmx_half_by_cast(void)
+{
+	const char *half = getenv("XMX_HALF_ROUND");
+	if (half && *half && strcmp(half, "cast"))
+		fprintf(stderr, "libmetalmx: XMX_HALF_ROUND=%s: Metal has one spelling, the cast; keeping it\n", half);
+	return 1;
+}
 
 /* -- shaders --------------------------------------------------------------- */
 
@@ -229,6 +253,7 @@ static const char *const kernel_names[] = {
 	"gemm_staged32", "gemm_staged32_deep", "attention_rows",
 	"window_block", "window_block_portable", "global_attention", "global_attention_portable",
 	"gemm_staged_int8", "gemm_staged_int8_portable",
+	"half_probe",             /* the daemon's start-up probe (src/gpu/metal/half_probe.metal) */
 };
 
 /* The fused passes have a matrix kernel and a portable twin; a caller that hands over the
@@ -343,6 +368,27 @@ static int build_pipeline_consts(const char *spv_path, const unsigned *flags, co
 	 * subgroup; the row pass's staging and the GEMM lane mapping both assume it. */
 	if (state.threadExecutionWidth != 32)
 		FAIL("this device's simdgroup is not 32 wide, which the kernels assume", (int)state.threadExecutionWidth);
+	if (g.stats) {
+		/* What Metal tells of a compiled pipeline (there is no register or spill count
+		 * outside Xcode's tools): the occupancy it allows and its static threadgroup
+		 * memory, on the line libxmx writes for a Vulkan pipeline. */
+		fprintf(g.stats, "%s\tflags=%ld\t%s\tmax_threads=%lu\twidth=%lu\tstatic_shared=%lu\n",
+			stem, flags ? (long)*flags : -1L,
+			g.metal4 ? "metal4" : (g.portable ? "metal3.1-portable" : "metal3.1"),
+			(unsigned long)state.maxTotalThreadsPerThreadgroup,
+			(unsigned long)state.threadExecutionWidth,
+			(unsigned long)state.staticThreadgroupMemoryLength);
+		fflush(g.stats);
+		if (archive) {
+			/* the compiled code itself, kept in the binary archive xmx_close writes out */
+			MTLComputePipelineDescriptor *desc = [MTLComputePipelineDescriptor new];
+			desc.computeFunction = fn;
+			NSError *add_error = nil;
+			if (![archive addComputePipelineFunctionsWithDescriptor:desc error:&add_error])
+				fprintf(stderr, "libmetalmx: XMX_PIPELINE_IR: %s not archived: %s\n", stem,
+					add_error ? [[add_error localizedDescription] UTF8String] : "unknown error");
+		}
+	}
 	*out = (void *)CFBridgingRetain(state);
 	return 0;
 }
@@ -502,6 +548,21 @@ int xmx_open(void)
 		queue = [dev newCommandQueue];
 		if (!queue) { dev = nil; FAIL("no command queue", 0); }
 		fence = [dev newFence];
+		/* XMX_PIPELINE_STATS / XMX_PIPELINE_IR, as libxmx reads them (build_pipeline_consts) */
+		const char *stats_path = getenv("XMX_PIPELINE_STATS");
+		if (stats_path && *stats_path) {
+			g.stats = fopen(stats_path, "a");
+			if (!g.stats) fprintf(stderr, "libmetalmx: cannot write pipeline statistics to %s\n", stats_path);
+			const char *ir = getenv("XMX_PIPELINE_IR");
+			if (g.stats && ir && *ir) {
+				NSError *error = nil;
+				archive = [dev newBinaryArchiveWithDescriptor:[MTLBinaryArchiveDescriptor new] error:&error];
+				if (!archive)
+					fprintf(stderr, "libmetalmx: XMX_PIPELINE_IR: no binary archive: %s\n",
+						error ? [[error localizedDescription] UTF8String] : "unknown error");
+				g.ir_dir = archive ? ir : NULL;
+			}
+		}
 	}
 	return 0;
 }
@@ -529,6 +590,19 @@ void xmx_close(void)
 	for (size_t i = 0; i < sizeof bufs / sizeof *bufs; i++) free_buf(bufs[i]);
 	for (unsigned i = 0; i < SAMPLE_BUFFERS; i++) samples[i] = nil;
 	sample_buffers = 0;
+	if (archive && g.ir_dir) {
+		/* every pipeline this runtime compiled, as Metal's own binary archive */
+		char path[1200];
+		snprintf(path, sizeof path, "%s/nr_pipelines.metallib", g.ir_dir);
+		NSError *error = nil;
+		if (![archive serializeToURL:[NSURL fileURLWithPath:@(path)] error:&error])
+			fprintf(stderr, "libmetalmx: XMX_PIPELINE_IR: %s not written: %s\n", path,
+				error ? [[error localizedDescription] UTF8String] : "unknown error");
+		else if (g.stats)
+			fprintf(g.stats, "\t\tbinary archive: %s\n", path);
+	}
+	archive = nil;
+	if (g.stats) fclose(g.stats);
 	library = nil;
 	addr_encoder = nil;
 	addr_scratch = nil;

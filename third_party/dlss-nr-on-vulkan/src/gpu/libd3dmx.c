@@ -196,6 +196,11 @@ static struct {
 
 	char name[256]; char err[512]; char memory[320];
 	int ready, lost, discrete, uma, coherent, unmapped, coopmat, portable;
+	/* XMX_PIPELINE_STATS=FILE: what the driver made of each pipeline — the size of its cached
+	 * blob, the one account Direct3D 12 gives — appended to FILE; XMX_PIPELINE_IR=DIR: the
+	 * blobs themselves, a file each */
+	FILE *stats;
+	const char *ir_dir;
 	struct buf A, B, C, up, down, zeros, dummy;
 
 	/* An adopted device belongs to the host: never released here, and every submit on its
@@ -303,6 +308,27 @@ const char *xmx_path(void)
 	       "multiply-add kernel; the matrix-path names resolve to it)";
 }
 int xmx_staging_mode(void) { return g.unmapped; }
+int xmx_discrete(void) { return g.discrete; }
+
+/* Half subnormals through the GEMMs (xmx.h). Direct3D 12 has no 16-bit denorm mode to
+ * declare: with native 16-bit shader operations (checked at open) a `half` keeps its
+ * subnormals by the API's contract — dxc's `-denorm` switch names float32 alone, and the
+ * build passes `preserve` there too — so the answer is what the API promises, and
+ * `XMX_DENORM16=driver` changes nothing here. `src/gpu/test_denorm.py` is the check on a
+ * device; none has run yet. */
+int xmx_preserve16(void) { return g.dev ? 1 : 0; }
+
+/* `half_round` in nr_d3d.hlsli is `f16tof32(f32tof16(x))`, the pack-and-unpack round trip
+ * (two DXIL conversions, which no driver has been seen to fold); the cast through the
+ * native 16-bit type is the probe's third output only. `XMX_HALF_ROUND=cast` is refused
+ * with a note rather than honoured. */
+int xmx_half_by_cast(void)
+{
+	const char *half = getenv("XMX_HALF_ROUND");
+	if (half && *half && strcmp(half, "pack"))
+		fprintf(stderr, "libd3dmx: XMX_HALF_ROUND=%s: the HLSL has one spelling, the round trip; keeping it\n", half);
+	return 0;
+}
 
 /* -- shaders --------------------------------------------------------------- */
 
@@ -342,6 +368,8 @@ static const struct { const char *name, *blob; } kernel_alias[] = {
 	{ "global_attention_portable", "global_attention_portable" },
 	{ "gemm_staged_int8",          "gemm_staged_int8_portable" },
 	{ "gemm_staged_int8_portable", "gemm_staged_int8_portable" },
+	/* the daemon's start-up probe (src/gpu/d3d12/half_probe.hlsl) */
+	{ "half_probe",                "half_probe" },
 };
 
 /* `gemm_coopmat.spv`, `C:\dir\attention_ab.spv`, `resident` -> the kernel's name. */
@@ -480,6 +508,30 @@ static int build_pipeline(const char *spv_path, ID3D12PipelineState **out)
 		else
 			snprintf(g.err, sizeof g.err, "pipeline for '%s' (0x%08lx)", spv_path, (unsigned long)hr);
 		return -1;
+	}
+	if (g.stats) {
+		/* The driver's compiled pipeline is the cached blob; its size is the one figure the
+		 * API gives of it, on the line libxmx writes for a Vulkan pipeline (flags=-1: there
+		 * is no specialisation here, the flags ride in the push block). */
+		char stem[128];
+		kernel_name(spv_path, stem, sizeof stem);
+		ID3DBlob *blob = NULL;
+		size_t bytes = 0;
+		if (SUCCEEDED(ID3D12PipelineState_GetCachedBlob(*out, &blob)) && blob)
+			bytes = ID3D10Blob_GetBufferSize(blob);
+		fprintf(g.stats, "%s\tflags=-1\td3d12\tdxil=%zu\tcached_blob=%zu\n", stem, len, bytes);
+		if (g.ir_dir && blob) {
+			char file[1200];
+			snprintf(file, sizeof file, "%s/%s-cached.bin", g.ir_dir, stem);
+			FILE *o = fopen(file, "wb");
+			if (o) {
+				fwrite(ID3D10Blob_GetBufferPointer(blob), 1, bytes, o);
+				fclose(o);
+				fprintf(g.stats, "\t\trepresentation cached blob (the driver's compiled pipeline): %zu bytes\n", bytes);
+			}
+		}
+		fflush(g.stats);
+		RELEASE(blob);
 	}
 	return 0;
 }
@@ -1009,6 +1061,14 @@ static int finish_open(const DXGI_ADAPTER_DESC1 *desc)
 	if (g.iq) fprintf(stderr, "libd3dmx: the Direct3D 12 debug layer is on; its messages follow on stderr\n");
 	const char *step = getenv("XMX_D3D12_STEP");
 	g.step = step && *step && atoi(step) != 0;
+	/* XMX_PIPELINE_STATS / XMX_PIPELINE_IR, as libxmx reads them (build_pipeline) */
+	const char *stats_path = getenv("XMX_PIPELINE_STATS");
+	if (stats_path && *stats_path) {
+		g.stats = fopen(stats_path, "a");
+		if (!g.stats) fprintf(stderr, "libd3dmx: cannot write pipeline statistics to %s\n", stats_path);
+		const char *ir = getenv("XMX_PIPELINE_IR");
+		g.ir_dir = g.stats && ir && *ir ? ir : NULL;
+	}
 	if (make_root_signature()) return -1;
 	/* an operand a pass does not use still needs an address in its root slot */
 	if (ensure(&g.dummy, 256, MEM_WRITEBACK, 1, "dummy operand")) return -1;
@@ -1158,6 +1218,7 @@ void xmx_close(void)
 	d3dmx_get_debug_fn gd = g.get_debug; d3dmx_experimental_fn ex = g.experimental;
 	d3dmx_create_factory_fn cf = g.create_factory; d3dmx_create_factory1_fn cf1 = g.create_factory1;
 	int tried = g.experimental_tried; HRESULT ehr = g.experimental_hr;
+	if (g.stats) fclose(g.stats);
 	memset(&g, 0, sizeof g);
 	/* the DLLs stay loaded (a host may be using them too) and the experimental switch is
 	 * process-wide, so both survive a close */

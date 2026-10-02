@@ -36,8 +36,21 @@ import numpy as np
 
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
+# --root has to be honoured before nr_frame is imported (it reads NR_ROOT at import
+# time to find work/), so scan argv here and let the parser accept the flag later.
+for _i, _arg in enumerate(sys.argv):
+    if _arg == "--root" and _i + 1 < len(sys.argv):
+        os.environ["NR_ROOT"] = sys.argv[_i + 1]
+        break
+    if _arg.startswith("--root="):
+        os.environ["NR_ROOT"] = _arg.split("=", 1)[1]
+        break
+if os.environ.get("NR_ROOT"):
+    ROOT = pathlib.Path(os.environ["NR_ROOT"])
 sys.path.insert(0, str(ROOT / "src" / "ref"))
 sys.path.insert(0, str(ROOT / "src" / "gpu"))
+sys.path.insert(0, str(ROOT / "src"))
+import nr_build  # noqa: E402
 
 import nr_frame  # noqa: E402
 import xmx  # noqa: E402  (for the device name, once the model is up)
@@ -618,8 +631,22 @@ def process_connection(connection, backend, args):
     history_inner, history_full, history_pixels = args.history.take(
         shot, inner, live.cut_limit if live.temporal > 0 else -1.0)
     # Built in the graph's own mapped input where the backend offers it, so nothing is
-    # copied on the way in.
-    input_view = getattr(backend, "input_view", None)
+    # copied on the way in — on Linux that is measured and clean (test_input_fp16.py).
+    #
+    # Off on a discrete card under Windows: on the B580 the features built into the mapped
+    # half buffer come back through the graph as NaN - every frame, reproducibly, while the
+    # same features built on the host and copied in give a correct picture (measured
+    # through the deployed layer: 163 clean frames with the host path, an all-black answer
+    # through the mapped one, at the same resolution and scale). Discrete-card memory on
+    # that driver is not behaving like the integrated one this was written on, and until
+    # that is pinned down the host copy is the choice that works there. The Arc 140V under
+    # Intel's own driver builds into it cleanly (notes/phase71), and there it also spares a
+    # fresh features array a frame, which on Windows is page faults. NR_INPUT_VIEW=1 or 0
+    # decides either way.
+    discrete = getattr(getattr(getattr(backend, "runtime", None), "lib", None), "xmx_discrete", None)
+    default = "0" if os.name == "nt" and discrete is not None and discrete() else "1"
+    input_view = (getattr(backend, "input_view", None)
+                  if os.environ.get("NR_INPUT_VIEW", default) == "1" else None)
     features = nr_frame.build_features(
         inner, geometry=geometry, history=history_inner,
         out=input_view(geometry.network_height, geometry.network_width) if input_view else None,
@@ -807,10 +834,146 @@ def process_connection(connection, backend, args):
         print(args.meter.report(), flush=True)
 
 
+def check_half_rounding(tolerance=0):
+    """Fail loudly if the driver stopped rounding float32 to half where the graph needs it.
+
+    `float(float16_t(x))` is correct only while the compiler keeps the conversion. Mesa
+    folds it away - 360 428 of 360 704 values came back unrounded when this was written
+    (src/bench/half_probe.py) - and every vendor rounding point in publish.glsl then moves,
+    silently, per frame. The graph has been through that once; a driver update must not be
+    able to put it back without anyone noticing.
+
+    Three spellings are compared against numpy's float16 on values that cover ordinary
+    numbers, half subnormals, overflow and the edges, and the one libxmx compiles into
+    `half_round` for this driver (`xmx_half_by_cast`, `XMX_HALF_ROUND` to override) has to
+    match exactly. `NR_SKIP_HALF_CHECK=1` skips it for a machine where the probe
+    itself misbehaves, and says so in the log.
+
+    Runs on whatever XMX_UNARY_SPV names, the same entry point the graph's own unary
+    passes use, so it exercises the real path rather than a special case.
+    """
+    if os.environ.get("NR_SKIP_HALF_CHECK") == "1":
+        print("half rounding: NOT CHECKED (NR_SKIP_HALF_CHECK=1)", flush=True)
+        return
+    spv = probe_shader()
+    if spv is None:
+        # Not fatal: a deployment that left the probe out still runs the graph.
+        print(f"half rounding: NOT CHECKED (no {nr_build.shader('half_probe.spv')})", flush=True)
+        return
+    # In a child process, deliberately. libxmx.c keeps its Vulkan state in process
+    # globals, so a probe that builds a runtime inside this one resets state the graph is
+    # about to build on - on the B580 every frame then comes back NaN (measured here:
+    # all-black answers through the daemon, clean with NR_SKIP_HALF_CHECK=1, which is how
+    # this was found). A child keeps the probe's Vulkan lifetime out of the graph's.
+    # Its stdin is NUL: a daemon the layer spawned has no valid one, and asking Windows for
+    # the parent's then fails with WinError 6 before the probe starts.
+    r = subprocess.run(
+        [sys.executable, str(pathlib.Path(__file__).resolve()), "--half-probe"],
+        env={**os.environ, "NR_ROOT": str(ROOT),
+             # the same build as this process (NR_BUILD_DIR, else the newest: nr_build)
+             "NR_BUILD_DIR": str(nr_build.BUILD_DIR),
+             "PYTHONPATH": os.pathsep.join([str(ROOT / "src" / "gpu"),
+                                            str(ROOT / "src" / "ref"),
+                                            str(ROOT / "src" / "layer"),
+                                            str(ROOT / "src")])},
+        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=180)
+    for line in (r.stdout or "").splitlines():
+        print(line, flush=True)
+    if r.returncode != 0:
+        raise SystemExit((r.stderr or "the half-rounding probe failed").strip())
+
+
+# What the probe's three outputs are on each runtime (src/bench/half_probe.comp,
+# src/gpu/metal/half_probe.metal, src/gpu/d3d12/half_probe.hlsl): the bit-twiddled rounding,
+# the pack-and-unpack round trip, and the cast. `xmx_half_by_cast()` says which of the last
+# two the runtime's `half_round` is.
+PROBE_SPELLINGS = {
+    "vulkan": ("bit-twiddled", "packHalf2x16", "float16_t"),
+    "metal": ("bit-twiddled", "as_type<half2>", "float(half(x))"),
+    "d3d12": ("bit-twiddled", "f32tof16", "float(half(x))"),
+}
+
+
+def probe_shader():
+    """The half probe as libxmx takes a shader: its bare name when the runtime carries the
+    module compiled in (the CMake build; libmetalmx and libd3dmx always), else the file this
+    build wrote, or None where there is neither."""
+    import ctypes
+    import xmx
+    lib = xmx.native_library("xmx")
+    embedded = getattr(lib, "xmx_embedded_shader", None)
+    if embedded is not None:
+        embedded.argtypes = [ctypes.c_char_p]
+        embedded.restype = ctypes.c_size_t
+        if embedded(b"half_probe.spv") > 0:
+            return "half_probe.spv"
+    path = nr_build.shader("half_probe.spv")
+    return str(path) if path.exists() else None
+
+
+def half_probe_child():
+    """The probe as its own process: compare, print, exit 0 or 1."""
+    spv = probe_shader()
+    if spv is None:
+        print(f"half rounding: NOT CHECKED (no {nr_build.shader('half_probe.spv')})", flush=True)
+        return 0
+    import xmxres
+    os.environ["XMX_UNARY_SPV"] = spv
+    probe = xmxres.Runtime()
+    rng = np.random.default_rng(3)
+    values = np.concatenate([
+        rng.standard_normal(1 << 16).astype(np.float32) * 4.0,      # ordinary
+        rng.standard_normal(1 << 14).astype(np.float32) * 1e-5,     # half subnormals
+        rng.standard_normal(1 << 12).astype(np.float32) * 1e-7,     # far below
+        rng.standard_normal(1 << 12).astype(np.float32) * 1e5,      # overflow range
+        np.float32([0.0, -0.0, 65504.0, 65520.0, 65519.0, 6.09e-05, 5.96e-08, 2.98e-08]),
+    ]).astype(np.float32)
+    n = (values.size + 255) // 256 * 256
+    padded = np.zeros(n, np.float32)
+    padded[:values.size] = values
+    src = probe.buffer_from(padded)
+    outs = [probe.buffer(n) for _ in range(3)]
+    probe.begin()
+    probe.unary(0, src, outs[1], n, second=outs[0], third=outs[2])
+    probe.submit()
+    with np.errstate(over="ignore"):
+        want = padded.astype(np.float16).astype(np.float32)
+    names = PROBE_SPELLINGS[nr_build.backend()]
+    mismatches = {}
+    for name, buf in zip(names, outs):
+        got = buf.view()[:n]
+        bad = ~((got == want) | (np.isnan(got) & np.isnan(want)))
+        mismatches[name] = int(bad.sum())
+    print("half rounding: " + ", ".join(f"{k} {v}/{n}" for k, v in mismatches.items()),
+          flush=True)
+    # What the runtime's half_round runs on this driver: libxmx chose it when it built the
+    # runtime above, from the driver (xmx_init); libmetalmx and libd3dmx each have one.
+    used = names[2] if probe.lib.xmx_half_by_cast() else names[1]
+    if mismatches[used] > 0:
+        print(f"FAIL: {used} disagrees with float16 on {mismatches[used]} of {n} values; "
+              "every rounding point in publish.glsl would move, per frame, silently.",
+              flush=True)
+        return 1
+    if mismatches[names[1]] > 0 and used != names[1]:
+        # The round trip is folded on this driver, and half_round uses the cast here. The
+        # attention shaders' softmax uses packHalf2x16 only as a bit trick on the packed
+        # word, which the fold does not touch (publish.glsl).
+        print(f"  note: {names[1]}'s round trip is folded on this driver "
+              f"({mismatches[names[1]]}/{n} values); half_round uses {used} here",
+              flush=True)
+    return 0
+
+
 def main():
+    if len(sys.argv) == 2 and sys.argv[1] == "--half-probe":
+        sys.exit(half_probe_child())
+
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--socket", default="/tmp/nr_layer.sock")
+    parser.add_argument("--root", default=None,
+                        help="deployment root: work/ and src/ are looked for under it "
+                             "(also read from NR_ROOT before this parser runs)")
     parser.add_argument("--profile", default="standard", choices=sorted(nr_frame.PROFILES))
     parser.add_argument("--intensity", type=float, default=1.0)
     parser.add_argument("--detail-strength", type=float, default=1.0)
@@ -868,6 +1031,10 @@ def main():
             "They are NVIDIA's and are not distributed here: extract them from your own "
             "copy of nvngx_dlssnr.dll as the README's Build section describes.")
     started = time.perf_counter()
+    # Check the rounding the graph depends on before any frame is processed. Runs first,
+    # while XMX_UNARY_SPV can still select the probe shader - the graph's own runtime is
+    # built below and picks its shader then.
+    check_half_rounding()
     backend = nr_frame.ResidentBackend()
     # which GPU, because the library takes the first Vulkan device and a machine can
     # have more than one, or a different one than the person assumes
@@ -893,6 +1060,22 @@ def main():
             ("NR_FUSE_HEAD", "fuse_head"),
             ("NR_FUSE_GLOBAL_ATTENTION", "fuse_global_attention"))),
           flush=True)
+
+    if os.name == "nt":
+        # Windows has no AF_UNIX in CPython, so the layer and the daemon meet on a
+        # named pipe instead. nr_pipe gives the same accept/recv/sendall shape a
+        # socket has, so serve() below does not care which one it got.
+        import nr_pipe
+        server = nr_pipe.NamedPipeServer(args.socket, backlog=4, timeout=None)
+        print(f"listening on {args.socket}", flush=True)
+        try:
+            serve(server, backend, args)
+        except KeyboardInterrupt:
+            pass
+        finally:
+            server.close()
+            backend.close()
+        return
 
     if os.path.lexists(args.socket):
         if not stat.S_ISSOCK(os.lstat(args.socket).st_mode):

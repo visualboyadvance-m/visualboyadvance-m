@@ -1,0 +1,14 @@
+; nr_layer.def — the symbols the Vulkan loader asks a layer DLL for.
+;
+; The Linux build exports everything (a shared object exports by default); MSVC
+; exports nothing unless told. The loader needs three entry points:
+;   - vkNegotiateLoaderLayerInterfaceVersion (version negotiation)
+;   - vkGetInstanceProcAddr (instance-level command routing, e.g. vkGetDeviceProcAddr)
+;   - vkGetDeviceProcAddr   (device-level command routing, e.g. vkQueuePresentKHR)
+; Without the two proc-addr exports the loader has no way to reach the intercepted
+; commands even though negotiation succeeds.
+LIBRARY nr_layer
+EXPORTS
+    vkNegotiateLoaderLayerInterfaceVersion
+    vkGetInstanceProcAddr
+    vkGetDeviceProcAddr

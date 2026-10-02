@@ -317,7 +317,10 @@ def negative_control():
         faulty.write_text(source.replace(needle, 'uint32_t waits = 0; /* intentional test fault */'))
         library = room / 'libnr_missing_wait.so'
         compiler = shlex.split(os.environ.get('CC', 'cc'))
+        # The copy is built away from src/layer, so the headers beside nr_layer.c
+        # (nr_transport.h) come in by path.
         command = compiler + ['-O2', '-fPIC', '-shared',
+                             '-I' + str(ROOT / 'src/layer'),
                              '-I' + str(ROOT / 'work/vulkan-headers/include')]
         if os.environ.get('VULKAN_SDK'):
             command += ['-I' + str(pathlib.Path(os.environ['VULKAN_SDK']) / 'include')]

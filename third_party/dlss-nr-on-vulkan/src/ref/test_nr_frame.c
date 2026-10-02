@@ -263,6 +263,13 @@ int main(int argc, char **argv)
     nr_frame *frame = nr_frame_open(weights);
     if (!frame) { fprintf(stderr, "nr_frame_open: %s\n", nr_frame_error()); return 1; }
     printf("C library on %s: %s\n", nr_frame_device(frame), nr_frame_gemm_path(frame));
+    printf("  discrete %d, float16 subnormals kept %d, half_round by cast %d, features in the mapped input %d\n",
+           nr_frame_discrete(), nr_frame_preserve16(), nr_frame_half_by_cast(), nr_frame_input_view(frame));
+    check("runtime: the three answers about it are a yes or a no once a frame is open",
+          (nr_frame_discrete() == 0 || nr_frame_discrete() == 1)
+          && (nr_frame_preserve16() == 0 || nr_frame_preserve16() == 1)
+          && (nr_frame_half_by_cast() == 0 || nr_frame_half_by_cast() == 1), NULL);
+    check("runtime: the input view is a yes or a no", nr_frame_input_view(frame) == 0 || nr_frame_input_view(frame) == 1, NULL);
 
     int height = 200, width = 176;                       /* network extent 320x320, both mirrored */
     int H, W;

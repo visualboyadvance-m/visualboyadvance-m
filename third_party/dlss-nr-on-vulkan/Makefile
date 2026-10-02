@@ -75,7 +75,24 @@ SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
            work/gemm_portable.spv work/gemm_portable_tiled.spv work/gemm_portable_wide.spv \
            work/gemm_portable_desc.spv work/gemm_portable_batched.spv
 
-all: work/libxmx$(SO) work/libnr_layer$(SO) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/nr_frame_rates work/gemm_runner $(SHADERS) $(PLATFORM_EXTRA)
+# half_probe.spv is built by `all` because the daemon needs it: check_half_rounding()
+# runs it at start-up and refuses to run the graph if the driver's float16 conversion is
+# not what the build compiled in. It was only reachable through `bench`, so a plain
+# `make` left the daemon to start with the probe skipped.
+#
+# The 32-bit layer is for 32-bit games under Proton (Dead or Alive 5 is one). Only
+# `nr-photo` used to build it, so a game started from Steam kept running whatever layer was
+# built last. `all` builds it wherever a 32-bit compiler and a 32-bit Vulkan loader are
+# installed (Linux; macOS has had no 32-bit toolchain since 10.15). LAYER32=0 leaves it out;
+# LAYER32=1 builds it regardless, and fails loudly where it cannot.
+LAYER32 ?= auto
+ifeq ($(LAYER32),auto)
+LAYER32_TARGET := $(shell printf 'int main(void) { return 0; }' | $(CC) -m32 -x c - -o /dev/null -lvulkan >/dev/null 2>&1 && echo work/libnr_layer32$(SO))
+else ifeq ($(LAYER32),1)
+LAYER32_TARGET := work/libnr_layer32$(SO)
+endif
+
+all: work/libxmx$(SO) work/libnr_layer$(SO) $(LAYER32_TARGET) work/libnr_image$(SO) work/libnr_frame$(SO) work/nr_frame work/nr_frame_rates work/gemm_runner work/half_probe.spv $(SHADERS) $(PLATFORM_EXTRA)
 
 work:
 	mkdir -p $@
@@ -94,7 +111,7 @@ work/gemm_runner: src/gpu/gemm_runner.c | work
 # seven link into one metallib, bin2c writes it as a C array, and the array is compiled into
 # libmetalmx. The metallib file is kept beside it for XMX_METALLIB= experiments.
 METAL_SOURCES := resident history attention gemm_portable gemm_simd window_attention ffn_fused \
-                 window_block global_attention gemm_int8
+                 window_block global_attention gemm_int8 half_probe
 METAL_AIR     := $(patsubst %,work/metal/%.air,$(METAL_SOURCES))
 work/metal:
 	mkdir -p $@
@@ -131,6 +148,7 @@ work/libmetalmx$(SO): src/gpu/libmetalmx.m src/gpu/xmx.h work/metal/nr_metallib.
 # The GPU tests again, on libmetalmx. Apple only; `make test` runs it there.
 test-metal: work/libmetalmx$(SO)
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_portable.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_denorm.py
 	NR_GPU_BACKEND=metal XMX_PORTABLE=1 $(PYTHON) src/gpu/test_portable.py
 	NR_GPU_BACKEND=metal XMX_STAGING=1 $(PYTHON) src/gpu/test_graph.py
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_epilogue.py
@@ -195,10 +213,10 @@ work/test_nr_frame: src/ref/test_nr_frame.c work/libnr_frame$(SO) src/ref/nr_fra
 	$(CC) -O2 -Wall -Wextra -ffp-contract=off -fno-fast-math -Isrc/ref -o $@ $< work/libnr_frame$(SO) -Wl,-rpath,$(CURDIR)/work -lm
 
 # The Vulkan layer that puts the pass inside a running game.
-work/libnr_layer$(SO): src/layer/nr_layer.c
+work/libnr_layer$(SO): src/layer/nr_layer.c src/layer/nr_transport.h
 	$(CC) $(CFLAGS) -shared -o $@ $< $(VK_LIBS)
 
-work/libnr_layer32$(SO): src/layer/nr_layer.c
+work/libnr_layer32$(SO): src/layer/nr_layer.c src/layer/nr_transport.h
 	$(CC) $(CFLAGS) -m32 -shared -o $@ $< -lvulkan
 
 work/test_layer_loader: src/layer/test_layer_loader.c
@@ -210,10 +228,10 @@ work/test_present: src/layer/test_present.c
 work/test_layer_loader32: src/layer/test_layer_loader.c
 	$(CC) $(CFLAGS) -m32 -o $@ $< -lvulkan
 
-work/test_settled: src/layer/test_settled.c src/layer/nr_layer.c
+work/test_settled: src/layer/test_settled.c src/layer/nr_layer.c src/layer/nr_transport.h
 	$(CC) $(CFLAGS) -Isrc/layer -o $@ $< $(VK_LIBS)
 
-work/test_exchange: src/layer/test_exchange.c src/layer/nr_layer.c
+work/test_exchange: src/layer/test_exchange.c src/layer/nr_layer.c src/layer/nr_transport.h
 	$(CC) $(CFLAGS) -o $@ $< $(VK_LIBS) -lpthread
 
 GEMM_GLSL := src/gpu/publish.glsl src/gpu/specialize.glsl src/gpu/residual_epilogue.glsl \
@@ -307,6 +325,7 @@ bench: all work/half_probe.spv
 test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_present work/test_nr_frame $(PLATFORM_TESTS)
 	$(PYTHON) src/gpu/test_ffn_batch.py --gpu
 	$(PYTHON) src/gpu/test_gemm_contract.py
+	$(PYTHON) src/gpu/test_denorm.py
 	$(PYTHON) src/gpu/test_input_fp16.py
 	$(PYTHON) src/gpu/test_compact_head.py
 	$(PYTHON) src/gpu/test_joint_qkv.py

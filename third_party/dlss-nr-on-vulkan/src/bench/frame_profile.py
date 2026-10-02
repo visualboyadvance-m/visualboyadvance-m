@@ -11,11 +11,16 @@ recorded pass, so a pass costs `ts[i] - ts[i-1]` on the device's own clock. The 
 already between passes makes that attribution exact. The frame measured is the frame
 that would have run.
 
-    python3 src/bench/frame_profile.py [--size H W] [--runs N] [--calls N]
+    python3 src/bench/frame_profile.py [--size H W] [--runs N] [--warm N] [--calls N]
 
 `--calls` also lists the N most expensive call sites — each pass labelled by the entry
 point that recorded it and its shape — because a total per kind cannot say which GEMM of
 the hundreds in a frame is the expensive one.
+
+`--warm` runs that many frames before the timed ones. On Linux the GPU's clock is still
+climbing through the first frames, and five timed 320x320 frames after one warm one read
+31.7 ms of device time where thirty warm frames first read 24.4. Compare across machines
+warm.
 """
 import argparse
 import pathlib
@@ -36,7 +41,9 @@ import xmxres
 # copy silently mislabels every row the moment a kind is added, and this file
 # shipped one such mistake before the tables were generated.
 def _kinds(path, pattern):
-    text = (ROOT / path).read_text()
+    # encoding is explicit: the shaders are not ASCII, and on Windows the default is
+    # the ANSI code page rather than UTF-8.
+    text = (ROOT / path).read_text(encoding="utf-8")
     return {int(v): n.lower().replace("_", " ")
             for n, v in re.findall(pattern, text)}
 
@@ -144,6 +151,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--size", nargs=2, type=int, default=(768, 1280))
     parser.add_argument("--runs", type=int, default=3)
+    parser.add_argument("--warm", type=int, default=1, metavar="N",
+                        help="frames run before the timed ones, so the GPU's clock has "
+                             "settled (the first also records)")
     parser.add_argument("--tables", action="store_true",
                         help="print the kind tables read from the shaders and stop; `make test` "
                              "runs this, so a kind two shaders share fails there, not at the "
@@ -165,7 +175,8 @@ def main():
     features = (np.random.default_rng(11).standard_normal((height, width, 16))
                 * 0.3).astype(np.float32)
 
-    frame.run(features, execution="single")          # record and warm
+    for _ in range(max(1, args.warm)):              # record, and warm
+        frame.run(features, execution="single")
     log = record_calls(runtime.lib) if args.calls else None
     xmxres.profile_reset()
     started = time.perf_counter()

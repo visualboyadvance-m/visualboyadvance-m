@@ -1,2 +1,6 @@
 build*/
 *.safetensors
+
+# The daemon's own log, written beside the tree.
+nr_daemon.log
+*.obj

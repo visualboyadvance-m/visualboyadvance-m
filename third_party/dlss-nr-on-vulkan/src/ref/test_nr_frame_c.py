@@ -13,6 +13,7 @@ graph on random weights is still the graph: every dispatch, every layout, every 
 and the bit-identity claim is about those. What it cannot check is a picture.
 """
 import json
+import os
 import pathlib
 import struct
 import sys
@@ -103,6 +104,19 @@ def main():
         native = nr_frame_native.NativeFrame(weights)
         print(f"C library on {native.device}: {native.gemm_path}")
         backend = nr_frame.ResidentBackend(weights)
+
+        # 0. what the library says of its runtime agrees with the runtime's own exports
+        # (the same library instance, loaded by both), and is a yes or a no
+        lib = backend.runtime.lib
+        for name, got in (("discrete", native.discrete), ("preserve16", native.preserve16),
+                          ("half_by_cast", native.half_by_cast)):
+            want = int(getattr(lib, "xmx_" + name)())
+            check(f"runtime: nr_frame_{name} is the runtime's {want}", got == want and got in (0, 1),
+                  f"got {got}")
+        check("runtime: the features go into the mapped input unless NR_INPUT_VIEW says not",
+              native.input_view == (0 if os.environ.get("NR_INPUT_VIEW") == "0" else 1)
+              or (sys.platform == "win32" and native.discrete == 1),
+              f"input_view {native.input_view}")
 
         # 1. features: the same recipe, NumPy against C
         geometry = nr_frame.NetworkGeometry.vendor_aligned(width, height)

@@ -622,6 +622,12 @@ target_link_libraries(xmx PRIVATE ${NR_XMX_VULKAN})
 target_compile_options(xmx PRIVATE ${NR_WARN_FLAGS})
 nr_place(xmx)
 
+# What the GPU's cooperative matrix offers — the first thing to run on a new machine or driver.
+add_executable(coopmat_probe src/probe/coopmat_probe.c)
+target_include_directories(coopmat_probe PRIVATE ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(coopmat_probe PRIVATE ${NR_XMX_VULKAN})
+nr_executable(coopmat_probe)
+
 add_executable(gemm_runner src/gpu/gemm_runner.c ${NR_SHADER_OBJECTS})
 target_include_directories(gemm_runner PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu)
 target_link_libraries(gemm_runner PRIVATE ${NR_XMX_VULKAN})
@@ -656,7 +662,7 @@ if(NR_BUILD_METAL)
   set(NR_METAL_FLAGS -std=metal3.1 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
   set(NR_AIR)
   foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused
-               window_block global_attention gemm_int8)
+               window_block global_attention gemm_int8 half_probe)
     add_custom_command(OUTPUT "${NR_METAL_DIR}/${stem}.air"
       COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL_FLAGS} -c -o "${NR_METAL_DIR}/${stem}.air"
               "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
@@ -699,7 +705,7 @@ if(NR_BUILD_METAL)
     set(NR_METAL4_FLAGS -std=metal4.0 -DNR_METAL4 -fno-fast-math -ffp-contract=off -Wall "-I${PROJECT_SOURCE_DIR}/src/gpu/metal")
     set(NR_AIR4)
     foreach(stem resident history attention gemm_portable gemm_simd window_attention ffn_fused
-                 window_block global_attention gemm_int8)
+                 window_block global_attention gemm_int8 half_probe)
       add_custom_command(OUTPUT "${NR_METAL4_DIR}/${stem}.air"
         COMMAND "${NR_XCRUN}" -sdk macosx metal ${NR_METAL4_FLAGS} -c -o "${NR_METAL4_DIR}/${stem}.air"
                 "${PROJECT_SOURCE_DIR}/src/gpu/metal/${stem}.metal"
@@ -747,8 +753,11 @@ if(NR_BUILD_D3D12)
   endif()
   set(NR_D3D12_DIR "${CMAKE_CURRENT_BINARY_DIR}/d3d12")
   file(MAKE_DIRECTORY "${NR_D3D12_DIR}")
+  # -denorm preserve: float32 subnormals kept, as Mesa and Intel's Windows driver keep them
+  # on the Vulkan path (notes/phase71); 16-bit floats keep theirs on Direct3D 12 regardless
+  # (the native 16-bit shader ops' contract), which `xmx_preserve16()` reports there.
   set(NR_DXC_FLAGS -T cs_6_2 -E main -enable-16bit-types -HV 2021 -O3 -Qstrip_reflect -Qstrip_debug
-      "-I${PROJECT_SOURCE_DIR}/src/gpu/d3d12")
+      -denorm preserve "-I${PROJECT_SOURCE_DIR}/src/gpu/d3d12")
   set(NR_DXIL)
   set(NR_DXIL_HEADERS)
   set(NR_DXIL_INCLUDES "")
@@ -789,6 +798,7 @@ if(NR_BUILD_D3D12)
   nr_dxil(window_block_portable            window_block_portable.hlsl)
   nr_dxil(global_attention_portable        global_attention_portable.hlsl)
   nr_dxil(gemm_staged_int8_portable        gemm_staged_int8_portable.hlsl)
+  nr_dxil(half_probe                       half_probe.hlsl)   # the daemon's start-up probe
   add_custom_target(dxil_shaders ALL DEPENDS ${NR_DXIL})
 
   list(LENGTH NR_DXIL_HEADERS NR_DXIL_COUNT)
@@ -1102,12 +1112,45 @@ nr_executable(test_nr_frame)
 # ---------------------------------------------------------------------------------------
 
 if(NR_BUILD_LAYER)
+  # The layer talks to the daemon over a Unix socket on POSIX and a named pipe on Windows
+  # (src/layer/nr_transport.h), and spawns the daemon itself under NR_LAYER_SPAWN=1 (posix_spawn,
+  # CreateProcess). On Windows the loader asks a layer DLL for three exports, which MSVC gives
+  # only when told: src/layer/nr_layer.def. The tests beside it are POSIX.
   add_library(nr_layer SHARED src/layer/nr_layer.c)
   target_include_directories(nr_layer PRIVATE ${Vulkan_INCLUDE_DIRS})
-  target_link_libraries(nr_layer PRIVATE ${NR_LOADER} Threads::Threads)
+  target_link_libraries(nr_layer PRIVATE ${NR_LOADER})
+  if(NOT WIN32)
+    target_link_libraries(nr_layer PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+  elseif(MSVC OR CMAKE_C_SIMULATE_ID MATCHES "MSVC")
+    target_sources(nr_layer PRIVATE src/layer/nr_layer.def)
+  endif()
   target_compile_options(nr_layer PRIVATE ${NR_WARN_FLAGS})
   nr_place(nr_layer)
 
+  # The 32-bit layer, for 32-bit games under Proton, wherever a 32-bit compiler and a 32-bit
+  # Vulkan loader are installed: the Makefile's LAYER32, with NR_BUILD_LAYER32 to override.
+  if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+    include(CheckCSourceCompiles)
+    set(CMAKE_REQUIRED_FLAGS -m32)
+    set(CMAKE_REQUIRED_LINK_OPTIONS -m32)
+    set(CMAKE_REQUIRED_LIBRARIES vulkan)
+    check_c_source_compiles("int main(void) { return 0; }" NR_HAVE_VULKAN32)
+    unset(CMAKE_REQUIRED_FLAGS)
+    unset(CMAKE_REQUIRED_LINK_OPTIONS)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+    option(NR_BUILD_LAYER32 "Build the 32-bit layer too, for 32-bit games under Proton"
+           ${NR_HAVE_VULKAN32})
+    if(NR_BUILD_LAYER32)
+      add_library(nr_layer32 SHARED src/layer/nr_layer.c)
+      target_include_directories(nr_layer32 PRIVATE ${Vulkan_INCLUDE_DIRS})
+      target_compile_options(nr_layer32 PRIVATE ${NR_WARN_FLAGS} -m32)
+      target_link_options(nr_layer32 PRIVATE -m32)
+      target_link_libraries(nr_layer32 PRIVATE vulkan ${CMAKE_DL_LIBS})
+      nr_place(nr_layer32)
+    endif()
+  endif()
+endif()
+if(NR_BUILD_LAYER AND NOT WIN32)
   foreach(test test_layer_loader test_present)
     add_executable(${test} src/layer/${test}.c)
     target_include_directories(${test} PRIVATE ${Vulkan_INCLUDE_DIRS})
@@ -1134,6 +1177,11 @@ if(NR_BUILD_TESTS)
   # every test is told where this build put things, so a `work/` filled by the Makefile
   # cannot be what ctest exercises
   set(NR_TEST_ENV "NR_BUILD_DIR=${NR_OUTPUT_DIR}")
+  if(WIN32)
+    # Windows' Python opens text in the ANSI code page, and the notes and the README the
+    # checks read are UTF-8.
+    list(APPEND NR_TEST_ENV "PYTHONUTF8=1")
+  endif()
   if(APPLE AND NR_XMX_LINK_MOLTENVK)
     list(APPEND NR_TEST_ENV "VK_DRIVER_FILES=${NR_OUTPUT_DIR}/MoltenVK_icd.json")
   endif()
@@ -1141,7 +1189,7 @@ if(NR_BUILD_TESTS)
     add_test(NAME ${name} COMMAND ${ARGN} WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
     set_tests_properties(${name} PROPERTIES ENVIRONMENT "${NR_TEST_ENV}")
   endfunction()
-  if(NR_BUILD_LAYER)
+  if(NR_BUILD_LAYER AND NOT WIN32)
     nr_ctest(settled "${NR_OUTPUT_DIR}/test_settled")
   endif()
   nr_ctest(nr_frame_c "${NR_OUTPUT_DIR}/test_nr_frame" --reference "${NR_OUTPUT_DIR}/nr_frame_reference.bin")
@@ -1151,7 +1199,8 @@ if(NR_BUILD_TESTS)
       src/layer/test_daemon.py src/layer/test_ui_mask.py src/layer/test_present.py
       src/layer/test_temporal.py src/layer/test_toggle.py src/layer/test_panel.py
       src/tools/publish_check.py src/tools/claims_check.py src/tools/build_check.py
-      src/gpu/test_portable.py src/gpu/test_gemm_contract.py src/gpu/test_input_fp16.py
+      src/gpu/test_portable.py src/gpu/test_gemm_contract.py src/gpu/test_denorm.py
+      src/gpu/test_input_fp16.py
       src/gpu/test_compact_head.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
       src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
@@ -1173,12 +1222,12 @@ if(NR_BUILD_TESTS)
       src/ref/test_temporal_controls.py)
     foreach(script ${NR_PY_TESTS})
       get_filename_component(name "${script}" NAME_WE)
-      if(script MATCHES "src/layer/" AND NOT NR_BUILD_LAYER)
-        continue()
+      if(script MATCHES "src/layer/" AND (NOT NR_BUILD_LAYER OR WIN32))
+        continue()      # the layer's tests are POSIX: a stand-in daemon on a Unix socket
       endif()
       nr_ctest(${name} "${PY}" "${PROJECT_SOURCE_DIR}/${script}")
     endforeach()
-    if(NR_BUILD_LAYER)
+    if(NR_BUILD_LAYER AND NOT WIN32)
       # the present test's negative controls: each disables one wait and expects the check to fail
       nr_ctest(test_present_negative "${PY}" "${PROJECT_SOURCE_DIR}/src/layer/test_present.py" --negative-control)
       set_tests_properties(test_present_negative PROPERTIES SKIP_RETURN_CODE 77)
@@ -1207,7 +1256,8 @@ if(NR_BUILD_TESTS)
       src/gpu/test_portable.py src/gpu/test_epilogue.py src/gpu/test_specialization.py
       src/gpu/test_softmax_pack.py src/gpu/test_qkv_fusion.py src/gpu/test_scratch_arena.py
       src/gpu/test_graph.py src/gpu/test_frame_execution.py src/gpu/test_resident.py
-      src/gpu/test_gemm_contract.py src/gpu/test_gemm_residual.py src/gpu/test_window_residual.py
+      src/gpu/test_gemm_contract.py src/gpu/test_denorm.py
+      src/gpu/test_gemm_residual.py src/gpu/test_window_residual.py
       src/gpu/test_window_attention.py src/gpu/test_gemm_qkv.py src/gpu/test_ffn_fused.py
       src/gpu/test_glue.py src/gpu/test_joint_qkv.py src/gpu/test_compact_head.py
       src/gpu/test_input_fp16.py src/gpu/test_staged_partial.py

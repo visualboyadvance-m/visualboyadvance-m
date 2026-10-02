@@ -157,6 +157,22 @@ const char *nr_frame_error(void);
 const char *nr_frame_device(nr_frame *frame);
 const char *nr_frame_gemm_path(nr_frame *frame);
 
+/* Three answers about the compute runtime, once a frame has been opened (-1 before, or on a
+ * runtime too old to say): whether the device is a card with memory of its own; whether the
+ * GEMMs keep float16 subnormals — libxmx declares `DenormPreserve 16` on every module where
+ * the driver reports it can, so Mesa and Intel's Windows driver compute one graph bit for
+ * bit (notes/phase71), and Metal and Direct3D 12 keep them without a declaration; and which
+ * spelling of `half_round` the pipelines compile, 1 the cast `float(float16_t(x))` and 0 the
+ * pack-and-unpack round trip, chosen per driver because each driver's compiler folds one of
+ * them away (`xmx_half_by_cast`, `XMX_HALF_ROUND` to override on Vulkan). */
+int nr_frame_discrete(void);
+int nr_frame_preserve16(void);
+int nr_frame_half_by_cast(void);
+/* Whether this frame builds its half features in the graph's mapped input itself (1) or on
+ * the host and copies them in (0): NR_INPUT_VIEW, defaulting to 0 only on a discrete card
+ * under Windows, where one driver returned NaN for the mapped path (HANDOFF, 2026-10-02). */
+int nr_frame_input_view(const nr_frame *frame);
+
 /* The network extent for an output extent, as the vendor pads it: each side aligned to the
  * graph's own reductions, at least 320, one alignment wider when both sides are four
  * alignments (`nr_frame.network_geometry`; 1280x720 -> 1344x768), a multiple of 64. */

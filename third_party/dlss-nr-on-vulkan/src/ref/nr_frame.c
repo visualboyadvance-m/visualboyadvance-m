@@ -63,6 +63,11 @@ struct xmx {
     int (*res_init)(const char *, const char *, const char *, const char *, const char *, const char *);
     int (*portable)(void);
     int (*window_gather)(void);   /* optional: a runtime without it cannot gather */
+    /* optional, three answers about the runtime (xmx.h): a card with memory of its own,
+     * float16 subnormals kept through the GEMMs, and half_round's spelling */
+    int (*discrete)(void);
+    int (*preserve16)(void);
+    int (*half_by_cast)(void);
     void (*cancel)(int);          /* optional: a runtime without it cannot be cancelled */
     int (*cancelled)(void);
     const char *(*error)(void);
@@ -170,6 +175,7 @@ static int xmx_load(void)
     X.cancel = xmx_cancel; X.cancelled = xmx_cancelled;
     X.cancel(g_cancel_open);
     X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
+    X.discrete = xmx_discrete; X.preserve16 = xmx_preserve16; X.half_by_cast = xmx_half_by_cast;
     X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
     X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
     X.buf_zero = xmx_buf_zero; X.buf_destroy = xmx_buf_destroy;
@@ -243,6 +249,9 @@ static int xmx_load(void)
     X.adopted = nr_dl_sym(X.handle, "xmx_adopted");
     BIND(portable, "xmx_portable"); BIND(error, "xmx_error"); BIND(device, "xmx_device");
     BIND(path, "xmx_path");
+    X.discrete = nr_dl_sym(X.handle, "xmx_discrete");
+    X.preserve16 = nr_dl_sym(X.handle, "xmx_preserve16");
+    X.half_by_cast = nr_dl_sym(X.handle, "xmx_half_by_cast");
     BIND(buf_create_kind, "xmx_buf_create_kind"); BIND(buf_host_visible, "xmx_buf_host_visible");
     BIND(buf_ptr, "xmx_buf_ptr"); BIND(buf_upload, "xmx_buf_upload");
     BIND(buf_download, "xmx_buf_download"); BIND(buf_zero, "xmx_buf_zero");
@@ -940,6 +949,9 @@ struct nr_frame {
             fuse_branched_ffn, fuse_partition, input_fp16, compact_head,
             fuse_transition, fuse_merge_ffn, fuse_stem_ffn, fuse_pool, fuse_window_block,
             fuse_head, fuse_global_attention;
+        /* NR_INPUT_VIEW: the half features built in the graph's mapped input itself (1), or
+         * on the host and copied in (0) — `nr_daemon.process_connection`'s choice */
+        int input_view;
     } opt;
     int min_extent;                        /* the network's floor for this extent's plan */
     int head_stride;                       /* floats per pixel in what run_graph returns */
@@ -2646,12 +2658,13 @@ static int features_into(struct nr_frame *f, const float *colour, int height, in
 static double now(void) { return nr_now(); }
 
 /* NR_INPUT_FP16's input: where the half features go — the mapped input itself when it is
- * mapped, else the host scratch `run_graph` then writes across. */
+ * mapped and NR_INPUT_VIEW allows it, else the host scratch `run_graph` then writes across. */
 static uint16_t *input_half(struct nr_frame *f)
 {
     int source = named_buffer(f, "features_host16", (size_t)f->height * f->width * 16 * 2);
     if (source < 0) return NULL;
-    return X.buf_host_visible(source) ? (uint16_t *)X.buf_ptr(source) : (uint16_t *)f->head_host;
+    return f->opt.input_view && X.buf_host_visible(source) ? (uint16_t *)X.buf_ptr(source)
+                                                           : (uint16_t *)f->head_host;
 }
 
 /* features (H, W, 16) at the network extent -> the head (H, W, 16) as the device holds
@@ -2677,7 +2690,10 @@ static const float *run_graph(struct nr_frame *f, const float *features)
         size_t n = pixels * 16;
         uint16_t *dst = input_half(f);
         if (features) nr_to_half(features, n, dst);
-        if (!X.buf_host_visible(source) && host_write(source, dst, n * 2)) return NULL;
+        /* built in the mapped input itself: nothing to move; else the host scratch goes
+         * across — a memcpy into a mapped input (NR_INPUT_VIEW=0), an upload otherwise */
+        int in_place = X.buf_host_visible(source) && (void *)dst == X.buf_ptr(source);
+        if (!in_place && host_write(source, dst, n * 2)) return NULL;
     } else if (host_write(source, features, pixels * 16 * 4)) {
         return NULL;
     }
@@ -3025,6 +3041,20 @@ nr_frame *nr_frame_open(const char *weights_path)
      * the host reads. The same bytes; =0 restores the float32 input and sixteen columns. */
     f->opt.input_fp16 = env_switch("NR_INPUT_FP16", 1);
     f->opt.compact_head = env_switch("NR_COMPACT_HEAD", 1);
+    /* As the daemon decides it: into the mapped input wherever it is mapped — measured and
+     * clean on the integrated GPU — except on a discrete card under Windows, where on the
+     * B580 the features built into the mapped half buffer came back through the graph as
+     * NaN on every frame while the same features built on the host and copied in gave a
+     * correct picture (notes/phase71, HANDOFF). NR_INPUT_VIEW=1 or 0 decides either way. */
+    {
+        int on_card = X.discrete && X.discrete() > 0;
+#ifdef _WIN32
+        f->opt.input_view = env_switch("NR_INPUT_VIEW", !on_card);
+#else
+        (void)on_card;
+        f->opt.input_view = env_switch("NR_INPUT_VIEW", 1);
+#endif
+    }
     f->opt.joint_qkv = env_switch("NR_JOINT_QKV", 0);
     f->opt.fuse_residual = env_switch("NR_FUSE_RESIDUAL", 1);
     f->opt.fuse_window_residual = env_switch("NR_FUSE_WINDOW_RESIDUAL", 1);
@@ -3129,6 +3159,10 @@ void nr_frame_close(nr_frame *f)
 
 const char *nr_frame_device(nr_frame *f) { (void)f; return X.device ? X.device() : "not opened"; }
 const char *nr_frame_gemm_path(nr_frame *f) { (void)f; return X.path ? X.path() : "not opened"; }
+int nr_frame_discrete(void) { return X.handle && X.discrete ? X.discrete() : -1; }
+int nr_frame_preserve16(void) { return X.handle && X.preserve16 ? X.preserve16() : -1; }
+int nr_frame_half_by_cast(void) { return X.handle && X.half_by_cast ? X.half_by_cast() : -1; }
+int nr_frame_input_view(const nr_frame *f) { return f ? f->opt.input_view : -1; }
 
 int nr_frame_features_masked(nr_frame *f, const float *colour, int height, int width, const float *history,
                              const float *control_mask, const nr_frame_params *params, float *features)

@@ -1,6 +1,6 @@
 # HANDOFF — read this first
 
-State of the DLSS-NR on Intel Xe2 project as of **2026-09-28**. notes/CLAUDE.md holds the
+State of the DLSS-NR on Intel Xe2 project as of **2026-10-02**. notes/CLAUDE.md holds the
 original brief; **this file overrides it wherever they disagree**, and after
 2026-09-09 they disagree about something foundational.
 
@@ -8,6 +8,83 @@ original brief; **this file overrides it wherever they disagree**, and after
 you need the evidence behind a line in this file, rather than reading them in order.
 
 ---
+
+## Latest: 34 more dlss-nr-on-intel commits — Windows, one graph on both drivers — on every runtime (2026-10-02)
+
+`8f8e5bd`..`3d8951c` of `uzbekunknown/dlss-nr-on-intel` are in (applied against `72a7440`, one
+merge commit among them): the compute side on Windows under Intel's own driver, PR #3's layer and
+daemon on a named pipe with the layer spawning the daemon, `DenormPreserve 16`, `half_round`
+chosen per driver, the pipeline statistics, the head lease, `capture_compare.py` /
+`block0_probe.py` / `denorm_mode.py`, `frame_profile.py --warm`, the 32-bit layer from `all`,
+`notes/phase71-intel-windows-driver.md`, `docs/WINDOWS*.md`, `docs/PERF-WINDOWS.md`, the deploy
+scripts (`tools/`, `dist-tools/`, `scripts/get_weights.py` — upstream's MSVC-into-`work/` route,
+kept verbatim; `docs/WINDOWS.md` carries a preface saying where this tree's build differs), and
+their thirteen HANDOFF entries (below, after this tree's, verbatim). Twelve files took upstream's
+patch as it was; the rest were merged by hand against this tree's own versions (libxmx's
+embedded shaders and adopted devices, the layer's macOS and Android guards, the Python's
+`nr_build`, the Makefile's `$(SO)` and Metal targets, the CMake). Carried past them:
+
+- **libxmx**: `detect_driver_modes()` reads the driver id and the float-controls properties off
+  the physical device, so an adopted device (VBA-M's Vulkan panel) gets the same `half_by_cast`
+  and `preserve16` as libxmx's own; the SPIR-V is patched on its way into `vkCreateShaderModule`
+  whether it came from a file or from the embedded table; `vkGetDeviceProcAddr` joined the
+  resolved entry points for the statistics. **MoltenVK reports `denormBehaviorIndependence =
+  NONE`**, so nothing is declared there and libxmx says so once on stderr — and the M3 keeps
+  float16 subnormals anyway (`test_denorm.py`: 2^-20 through every GEMM kernel, Vulkan and Metal,
+  simdgroup and portable). The heads are the same bytes as before the merge on both runtimes
+  (`test_nr_frame` against the 2026-09-27 references: 0 of 409 600 values differ).
+- **The three exports on every runtime** (`xmx.h`): `xmx_discrete()`, `xmx_preserve16()`,
+  `xmx_half_by_cast()`. libmetalmx answers 1 and 1 — Metal has no mode to declare, the compiler
+  runs with fast math off, and the subnormals are measured kept; its `half_round` is the cast,
+  and `XMX_HALF_ROUND=pack` is refused with a note. libd3dmx answers 1 and 0 — native 16-bit ops
+  keep half subnormals by the API's contract, dxc's `-denorm` names float32 alone and the build
+  now passes `preserve` there; its `half_round` is `f16tof32(f32tof16(x))`. **Neither has a
+  second spelling to switch to**, so the per-driver choice is libxmx's alone.
+- **`XMX_PIPELINE_STATS` / `XMX_PIPELINE_IR` on Metal and Direct3D 12**: Metal writes each
+  pipeline's `maxTotalThreadsPerThreadgroup`, `threadExecutionWidth` and static threadgroup
+  memory (there is no register or spill count outside Xcode's tools) and, with the IR directory,
+  every compiled pipeline into one `MTLBinaryArchive` serialised at `xmx_close`; Direct3D 12
+  writes the cached blob's size and the blob itself, a file a pipeline. Compiled, not exercised.
+- **The daemon's start-up probe runs on every backend**: `half_probe` exists as
+  `src/gpu/metal/half_probe.metal` and `src/gpu/d3d12/half_probe.hlsl` (bit-twiddled, a pack
+  round trip — `as_type<half2>` on Metal, `f32tof16` on HLSL — and the cast), the probe shader is
+  found through `nr_build` (the embedded module's name, else the file), the labels follow the
+  backend, and the child inherits `NR_BUILD_DIR`. On the M3: Vulkan 0/90368 mismatches on all
+  three spellings, Metal the same, and the overrides behave.
+- **The C frame library**: `nr_frame_discrete()`, `nr_frame_preserve16()`,
+  `nr_frame_half_by_cast()` (-1 before a frame is open or on a runtime too old to say) and
+  `nr_frame_input_view()`: **`NR_INPUT_VIEW`** is the daemon's rule — the half features built in
+  the graph's mapped input itself, except on a discrete card under Windows (the B580 returned
+  NaN through the mapped half buffer, `phase71`), where they are built in the host scratch and
+  copied in; `run_graph` now uploads whenever the scratch is not the mapping. `test_nr_frame_c.py`
+  checks the four against the runtime's exports, `test_nr_frame.c` prints and checks them.
+  `nr_frame_native.NativeFrame` has them as properties. The head lease is Python-side and serves
+  every backend as it is; the C library already keeps its head block across frames.
+- **The layer** builds on macOS with `nr_transport.h` (its `environ` comes from
+  `_NSGetEnviron()`: a dylib has no symbol of its own) and keeps this tree's Android and macOS
+  platform guards; `test_present`, its negative control and `test_daemon` pass through the new
+  transport on MoltenVK. CMake builds the layer on Windows too now (`nr_layer.def` under MSVC,
+  the tests stay POSIX), and `nr_layer.c`, `test_nr_link_win.c`, `libd3dmx.c`, `nr_frame.c`,
+  `nr_image.c` and `libxmx.c` compile for Windows x64 under MinGW (not run).
+- **Builds**: `make all` builds `half_probe.spv` and, where `-m32 -lvulkan` links, the 32-bit
+  layer (`LAYER32`), CMake has `coopmat_probe`, `NR_BUILD_LAYER32`, `test_denorm` on every
+  runtime's list and `PYTHONUTF8=1` for ctest on Windows. `xmx.native_library()` exists as
+  upstream's name and goes through `nr_build.library`, which on Windows adds the build directory
+  and `NR_DLL_PATH` to the DLL search path once.
+
+**Two traps from the work.** `git apply` run from inside this subtree applies *nothing* and
+says nothing: the paths resolve against VBA-M's root, fall outside the directory and are
+skipped — `--directory=third_party/dlss-nr-on-vulkan`, and look at `git status` afterwards. And
+this Mac's `work/` had gone: MLX-DLSS and the pinned Vulkan-Headers were cloned again, and the
+weights file came back out of `libnr_frame.dylib` through a twenty-line C dump of
+`nr_embedded_weights_chunks` (291 576 650 bytes, 649 tensors, `fully_logical=true`) — there is
+still no tool for that in the tree. No Python 3.12 with NumPy here, so `read_head`'s lease (PEP
+688) runs only upstream; on 3.9 it takes the copying branch. Verified on the M3 with the real
+weights: the focused ctest set — `test_denorm`, `test_graph`, `test_input_fp16`,
+`test_frame_execution`, the C frame pair, `test_nr_frame_live`, `test_present` and its negative
+control, `test_daemon`, `test_ui_mask`, `test_temporal`, `settled`, `build_check`,
+`claims_check`, `profile_tables` — 21 of 21 green on MoltenVK and on Metal; `publish_check`
+still fails on the committed `weights/*.h`, as before. No Xe2, Windows or phone run.
 
 ## Latest: seven more dlss-nr-on-intel commits — the stills re-rendered — and the daemon's frame in C (2026-09-28)
 
@@ -283,6 +360,419 @@ No Xe2, phone or Windows run: the matrix-path GLSL is upstream's.
   have no upscaler, so it needs a newer game.
 - **A FAQ** in the README, for the questions that keep coming back. Later.
 
+## PR #3 merged with the button (2026-10-02)
+
+The owner wanted the pull request to end merged, not closed. So its author rebased his four
+newer commits onto master as one, `afb2a65`, under his GitHub noreply address, and fixed the two
+things the last review found: ten `-Wsign-compare` warnings in `nr_image.c`, and four comment
+lines in `build_win.bat` that had lost their `r`. The owner merged it as `1ac11f8`.
+
+It brings MSVC's OpenMP. `nr_image.c` goes through the C++ front end on Windows (`/TP /openmp`),
+because MSVC rejects `#pragma omp parallel for` in C mode, and its loops count with `ptrdiff_t`.
+The author measured the fused pass at 18.6 -> 4.1 ms. It also gives a daemon the layer spawns an
+inheritable `NUL` for stdin.
+
+On Linux at `afb2a65`: no warnings, `make test` green (570), CTest 43 of 43, the host passes
+byte-identical and the live rates unchanged. Not yet run here on Windows: `build_win.bat` at
+`1ac11f8`, where `libnr_image.dll` should now depend on `VCOMP140.DLL`.
+
+## `pr3-integration` on Linux: green after one test fix, and where Intel's compiler loses time (2026-10-02)
+
+The Windows session's list, run on Linux at `fcde1ce`:
+
+- `make` and CMake build it, and `nr_layer.c` has no warnings left. `half_probe.spv` is in `all`.
+- **`make test` green (570). CTest 42 of 43.** `layer_present_negative` could not compile its
+  faulty copy of the layer. The copy is built in a temporary folder, and since PR #3
+  `nr_layer.c` includes `nr_transport.h`, which sits beside it. `make test` does not run that
+  control and Windows' CTest has no layer, so nothing had. Fixed in `010cb9d` (`-I src/layer`).
+  The control catches the missing wait 6 times of 6 again, and CTest is 43 of 43.
+- The daemon's probe: `half rounding: bit-twiddled 0/90368, packHalf2x16 0/90368, float16_t
+  90109/90368`, no FAIL. libxmx chose `packHalf2x16`. Mesa folds the cast on 90 109 of the
+  90 368 values, the count Intel's driver gives for the round trip.
+- Heads `e62005b80145b97a` / `c217fd2fdbbe6b79`, replayed in 23.4 / 144.0 ms.
+- `live_rates.py` paired with master: no regression. Two whole tables, then three rounds of 40
+  frames: 512x288 at 0.35 26.3 against 26.3 ms, 640x360 at 0.5 27.8 against 28.0.
+- **The PR's install scripts, run on Linux for the first time.** `tools/deploy.sh` installed a
+  layer that could not load. Its manifest named the library bare, and the loader hands a bare
+  name to `dlopen`, which does not look beside the manifest (`create instance: -6`). The
+  launcher, which asks for the layer by name, would have kept the game from starting. Fixed in
+  `6083140`, where the manifest names `./NAME`: installed into a throwaway game folder, the layer
+  loads from there. `dist-tools/setup.sh` cannot run from the repository at all. It expects a
+  release folder holding `nr_layer.so` and `work/`, and nothing here builds one; the Linux
+  build's layer is `libnr_layer.so`. Left as it is: what a release is, is the owner's call.
+- The layer's own daemon spawn (`NR_LAYER_SPAWN=1`), which no test covers: on Linux it starts
+  the daemon, which runs the probe and listens, and a second launch connects to it. The 32-bit
+  layer builds without warnings and loads (`make test-proton`).
+- Publishing: `origin/master..pr3-integration` carries only the two noreply identities.
+  `publish_check --history` flags the original commits of PR #1 and PR #3, which live only in
+  local refs that are never pushed (`refs/pr/1`, `refs/pr/3`, `origin/pr3-head`).
+
+**Where Intel's compiler loses the time.** Profiled with `frame_profile.py --warm`, which is new:
+on Linux the GPU's clock is still climbing through the first frames. The default five timed
+320x320 frames after one warm one read 31.7 ms of device time, where thirty warm frames first
+read 24.4. The files are in `NRonWindows`: `linux-profile-*-warm.txt`, the requested runs
+without the warm-up, `linux-stats.tsv`, and `linux-vs-windows-callsites.txt` with the tables.
+
+- **Per pass, only the staged GEMM is slower on Windows.** At 320x320 it takes 20.3 ms against
+  16.9 (1.20x), and at 1344x768 126.0 against 81.7 (1.54x). Every other pass is the same or
+  faster there: the window block 0.80x, global attention 0.69x.
+- **Per call site at 1344x768**:
+  - the N = 32 contracts (`0x1100`, batched) run at 0.84-1.17x;
+  - every other GEMM runs at 1.3-2.2x;
+  - the worst are short K loops with a heavy epilogue. At K = 64 the gate activation takes
+    2.09x, the residual 2.16x and the QKV epilogue 2.03-2.05x. The same epilogues at K = 256-512
+    take 1.29-1.50x;
+  - also 1.76x: the bottleneck's contract, 320x1024x4096, a long K loop on 80 workgroups.
+- **Mesa's account of the same kernels** (`XMX_PIPELINE_STATS`). Every specialised staged GEMM
+  is SIMD32, with 0 spills, 0 scratch, 246-250 live registers and 8 KB of shared memory. Its
+  instruction count runs from 1 367 with no epilogue, through 1 621 (E4M3), 1 981 (the gate
+  activation) and 2 220-2 559 (the residual), to 2 896-3 394 (the QKV epilogue).
+
+So the gap scales with the work per output element: the stage through shared memory, the
+epilogue's scalar loop and the stores. A starved long K loop shows it too. Next on Windows:
+the same shape with each epilogue in turn, and Intel's five numbers set beside Mesa's for the
+specialisations above.
+
+## PR #3 joins the main line, squashed and on the main line's mechanisms (2026-10-02)
+
+**Branch `pr3-integration`, on `windows` at `a526db9`:** the pull request in one commit, then
+ours on top. It is not merged into `windows` or `master` yet: that, closing PR #3 and a word
+to its author are the owner's to give, after Linux's `make test`.
+
+- **Why squashed.** The history carries a setup script that fetched a third-party pack with
+  NVIDIA's DLL: added in `52b3e55`, removed in `c22b6f5` within the same pull request. The
+  project carries that in no form. The commits are also authored `paimon@local`, which
+  `publish_check --history` refuses. So the pull request is one commit (`c443fd2`), authored by
+  its author's GitHub noreply address, with the history left behind at 4b95863.
+- **Three conflicts went the main line's way.** `half_round` is the per-driver constant, not
+  `-DHALF_ROUND_FLOAT16`. The libraries load through `xmx.native_library`; its `nr_build` hooks
+  pointed at a module neither tree has. `publish.glsl` keeps its note on the attention shaders'
+  `packHalf2x16` bit trick.
+- **Ours on top (`c20a70f`, and the docs in `fcde1ce`):**
+  - the daemon's probe asks libxmx which spelling to check (`xmx_half_by_cast`), so there is no
+    `half_round.txt` stamp;
+  - the probe's child gets `NUL` for stdin (WinError 6 in a spawned daemon);
+  - `build_win.bat` builds `half_probe.spv` from `src/bench`;
+  - the mapped input is off only on a discrete card under Windows (`xmx_discrete`), not on
+    every Windows machine;
+  - `nr_layer.c`'s eighteen em dashes are back from GBK, and its default paths can no longer
+    be cut short;
+  - README, `docs/WINDOWS.md` and a merge note on `docs/WINDOWS-PORT.md`.
+- **Run on Windows** (Arc 140V, 101.9033):
+  - CMake/MinGW: CTest 34 of 34.
+  - MSVC `build_win.bat`: the same 34, `gpu_denorm` included. Heads `e62005b8` and
+    `c217fd2f`, Linux's.
+  - vkcube through the MSVC layer to the daemon on a named pipe: 30 frames answered.
+  - The layer spawning its own daemon: 90 frames, and the probe's `float16_t 0/90368`.
+
+**Left:**
+- Linux's `make test` on the branch.
+- MSVC's OpenMP. Under `/openmp` the host loops want signed indices, so `libnr_image` runs on
+  one core in that build, about 10 % at 720p.
+- A game on this machine.
+
+## Where Windows' time goes: page faults on the host, GEMMs on the device (2026-10-01, late night)
+
+Measured on Windows while the owner was away and Linux was not reachable. `phase71`, last
+section, has the numbers.
+
+- **On the host, every fresh large array pays page faults.** Windows' heap returns freed blocks of
+  that size to the system. Reading the 720p head took 15 ms, and the copy was 2.4 of them.
+  **`f7a801a`**: `read_head` now lends a block the frame keeps, through the buffer protocol. A
+  block goes out again only once every array and view over the last head in it is gone. Heads
+  unchanged, CTest 34 of 34; before Python 3.12 it copies as it did.
+- The daemon does the same for every full-frame array. Its frame costs 36 478 page faults at
+  1920x1080 (25-35 ms of ~42 on the host) and 2 031 at 640x360. **Windows' live rates are
+  1.28-1.52x Linux's**, from 34.2 ms at 512x288 to 165.7 at 1080p.
+  `work/tools-win/live_rates_win.py` runs the daemon in-process, on loopback TCP. The general
+  fix is NumPy's allocator keeping large blocks, or the daemon keeping its own buffers. A
+  prototype of the first is in `work/tools-win/nr_alloc.c` and `keep_blocks.py`: a
+  `PyDataMem_Handler` installed through NumPy's C API. With it, 640x360 at 0.5 goes from 35.2 to
+  32.5 ms (Linux 27.0) and 1024x768 from 71.1 to 62.5, and the page faults go to 0 at the live
+  sizes. **Whether it goes into the daemon on Windows is the owner's call.**
+- **On the device the gap is GEMM**: at 320x320, 20.3 ms against Linux's 16.6, while the other
+  passes are faster here (7.0 against 7.9). It is not spills, not a 256-register mode, and not
+  bandwidth: a copy runs 94 GB/s. Four bit-identical variants of the staged GEMM were no faster.
+  **`7d61047`**: `XMX_PIPELINE_STATS=FILE` writes what the driver's compiler reports for each
+  pipeline. Intel reports five numbers; Mesa reports registers, SIMD width, spills and cycles.
+
+**On Linux next, in order:**
+
+1. `make test` on `7d61047` and `f7a801a` (after the push).
+2. `frame_profile.py --size 320 320 --runs 5 --calls 25` and `--size 768 1344 --runs 3 --calls 40`,
+   on a quiet machine, set beside `NRonWindows/windows-profile-320x320-9033.txt` and
+   `windows-profile-1344x768-9033.txt`. Which call sites are slower on Intel, and by how much.
+3. The same 1344x768 run under `XMX_PIPELINE_STATS=<NR>/linux-stats.tsv`, with Mesa's registers,
+   spills and SIMD width for the slow kernels.
+
+## On Windows at 2deb0d9: the declared mode holds, and the last three failures are gone (2026-10-01, night)
+
+Linux's five checks, run on Intel's 101.9033:
+
+1. `windows` at `2deb0d9` builds with CMake and UCRT64's gcc.
+2. **CTest without `gpu_window_attention`: 34 of 34.** The three failures Windows always had are
+   gone: `test_gemm_qkv.py`'s zero sign, `test_gemm_residual.py`'s sign byte and the ViT
+   attention's 378 values, all at specialization mask 7. With `XMX_DENORM16=driver` all three
+   fail again, with the same counts. Why the declaration moves them is not known (`phase71`,
+   "What still differs").
+3. `test_denorm.py`: declared, and 2^-20 kept on all three forms. Under `driver` it is kept too,
+   because Intel's default keeps it in the GEMMs.
+4. `frame_replay.py`: heads unchanged, `e62005b80145b97a` and `c217fd2fdbbe6b79`.
+5. The validation layer reports nothing on `frame_replay.py` at 320x320. The loader's log
+   confirms it was inserted.
+
+**Where the 720p graph's time goes on Intel's compiler.** Measured with
+`frame_profile.py --size 768 1344 --runs 3 --calls 40` on 101.9033, checked quiet before and
+after (mains, best performance, CPU 10 %). The device total is **179.5 ms**, against 194.5 of
+wall:
+
+| pass | ms |
+| --- | ---: |
+| staged GEMM (318 passes) | 126.0 (70 %) |
+| window block | 22.0 |
+| fused feed-forward | 16.6 |
+| window attention | 10.0 |
+| everything else | 5 |
+
+The per-pass comparison needs the same command on Linux. Windows' output, call sites included, is
+`NRonWindows/windows-profile-1344x768-9033.txt`. `--size` is the network's field, and the
+default, 768x1280, is no longer 720p's.
+
+Not run: **the unmerged window attention's hang**, because each try resets the GPU. That waits
+for the owner's word.
+
+A trap from the run: CTest's `publish_check` and `claims_check` call `git`. A UCRT64 shell started
+from Git Bash maps `/mingw64` to MSYS2's own folder and loses Git, and both then fail with
+`FileNotFoundError`. Start it from PowerShell, or run the two checks directly.
+
+## The `windows` branch is on master (2026-10-01, night)
+
+Merged with the owner's OK as a fast-forward. It brings the compute side's Windows build (CMake
+with MSYS2's gcc, `docs/WINDOWS.md`), `half_round`'s spelling chosen per driver, `shaderInt64`,
+`DenormPreserve 16`, and the tools that found where the drivers part (`capture_compare.py`,
+`denorm_mode.py`, `block0_probe.py`). On Linux only the picture changes, by the declared mode in
+the entry below. Windows work goes on from the same branch.
+
+**PR #3 conflicts with it now**, in `publish.glsl`, `xmx.py` and `nr_image.py`. Its compile-time
+`half_round` switch, its `half_round.txt` stamp and its own DLL loading meet the per-driver
+constant and `native_library` here, and it has to take ours.
+
+## `DenormPreserve 16` is declared: one graph on both drivers (2026-10-01, night)
+
+The owner's decision on step 3 below. libxmx adds the `DenormPreserve` capability and
+`OpExecutionMode DenormPreserve 16` to every module it loads, where the device reports
+`shaderDenormPreserveFloat16` and lets the 16-bit mode differ from the other widths'
+(`denormBehaviorIndependence = ALL`; ANV and Intel's 101.9033 both do). The built shaders are not
+touched, only the copy handed to the driver. A module that declares a 16-bit mode of its own
+keeps it, so `denorm_mode.py flush` still flushes. `XMX_DENORM16=driver` leaves it to the driver
+again, and a driver that cannot declare it gets a one-line warning, as for the subgroup width.
+
+**New references, the same on Linux and on Windows**: `frame_replay.py` 320x320
+`e62005b80145b97a`, 720p (1344x768) `c217fd2fdbbe6b79`. Under `XMX_DENORM16=driver` Mesa gives
+the old `2beef230a33a120a` / `b3e91f68c1e9e718`. **Every reference hash in this file older than
+this entry is from the flushed graph** (heads, graph hashes, the daemon's answers), and the
+pictures move by the old Linux-Windows gap: 0.47-0.62 levels of 255 on Tekken's capture.
+
+- `src/gpu/test_denorm.py` puts 2^-20 through an identity on each GEMM kernel the graph uses (the
+  tiled one at K = 16, the staged one, a partial last block). It must come out 2^-20; under
+  `driver` it shows Mesa flushing it. It runs in `make test` (green, 570 checks) and in CTest
+  (43 of 43).
+- The validation layer reports nothing for the patched modules, in either mode.
+- Speed, replayed graph, paired, three rounds, on battery: 320x320 24.7 / 23.3 / 23.6 ms declared
+  against 23.4 / 23.0 / 24.2 left to the driver; 720p 151.4 / 146.6 / 152.1 against
+  149.8 / 150.6 / 151.3. The same.
+
+The flush is called Mesa's default now wherever it was called the XMX units': `docs/ARCHITECTURE.md`,
+`src/gpu/xmx.py`, `phase4`'s correction, the brief.
+
+## Linux ran it: with `DenormPreserve 16` Mesa computes Windows' graph bit for bit (2026-10-01, evening)
+
+**Step 1, the reverse check, holds.** Under `denorm_mode.py preserve`, Linux on Windows' recorded
+input equals Windows' default capture at every point, the head included (`e62005b8…`).
+`frame_replay.py` under the mode gives Windows' heads at both sizes: 320x320 `e62005b80145b97a`,
+720p `c217fd2fdbbe6b79`. So Mesa honours the mode, and the float16 flush was the whole
+difference between the two drivers on these frames.
+
+**Step 2, block 0.** On Linux, block 0 fused and unfused are the same bits, by default and under
+the mode. Windows with the flush declared against Linux's default parts first at Q's
+normalisation (`u.q16`): 534 values, up to 0.031, besides 734 that differ only in a zero's sign.
+K follows with 32, then the scores. Before that, the hidden layer differs only in 1 226 zeros'
+signs. So a declared flush and Mesa's undeclared default are not the same mode in the half
+arithmetic of the cosine tree. Under `preserve` on Linux against Windows' default, every point is
+the same bits except 20 zeros' signs in the unfused reference's Q. That is the sign-of-zero class
+PR #3's B580 shows in `test_gemm_qkv.py`, and it is not on the graph's path.
+
+**Step 3, for the owner's decision.** No shader is changed; these are all under
+`denorm_mode.py preserve --` on Linux:
+
+- `make test`: all 41 lines pass. No test pins a head, though: the pinned references live in
+  this file, so the suite cannot tell the modes apart.
+- Speed, paired: 320x320 23.1 and 23.2 ms by default against 23.2 and 23.9 with the mode; 720p
+  144.0 and 143.6 against 143.3 and 143.5. The same.
+- Against OpenDLSS-NR's port on `opendlss-reference.md`'s four frames, the composed pictures move
+  0.91 -> 0.84, 1.99 -> 2.05, 0.80 -> 0.79 and 0.76 -> 0.83 levels of 255 apart. Head RGB corr
+  moves by up to 0.007 either way. No direction, and their port runs through Mesa too.
+- The picture: Tekken's capture through the daemon, default against the mode, is 0.47-0.62 levels
+  of 255 apart (99th percentile 3-4), where the pass moves the frame 8.8-9.0. That is the
+  Linux-Windows gap of 2026-09-30, as it should be.
+
+So declaring `DenormPreserve 16` buys one graph on both drivers, bit for bit, at no cost. It
+moves the picture by the size of the old gap, and no nearer to the reference or further from it.
+It is also what NVIDIA's tensor cores do (reported: arXiv:2512.07004, via `phase71`). **The
+owner's call**; the reference hashes in this file move with it. The captures are in `NRonWindows`:
+`linux-preserve16-winput.npz`, `linux-probe-default.npz` and `linux-probe-preserve16.npz`.
+
+## Mesa flushes float16 subnormals and Intel's driver keeps them; what Linux runs next (2026-10-01, later)
+
+**Why the stem parts.** Mesa flushes float16 subnormal operands to zero in the cooperative-matrix
+GEMM, and Intel's Windows driver keeps them. The XMX units are the same. The two captures below,
+held against the stem's exact float64 sum, show it. The adapter holds exactly two float16
+subnormals, at [9, 21] and [14, 7], and columns 21 and 7 are 204 447 of the 205 254 differing
+values. The rest are the 27 pixel rows whose features hold one. Windows equals the exact sum on
+98.96 %, and Linux equals it with both operands flushed on 98.98 %. The rest is the same
+accumulator truncation on both.
+
+The cause is Mesa's default. brw writes `cr0` only for a declared float-controls mode, and our
+shaders declare none, so its FP16 denorm bit stays clear. On Windows, all 14 graph shaders with
+`DenormFlushToZero 16` declared give **Linux's stem bit for bit**. With `DenormPreserve 16` they
+give Windows' own graph unchanged. NVIDIA's tensor cores keep subnormals (arXiv:2512.07004), so
+on this point Windows computes what the vendor's GEMM computes. This corrects `phase4`'s "XMX
+flushes" for the hardware, though not for Mesa. Only 7 of the model's weights are float16
+subnormals. `notes/phase71`, last section.
+
+**Where they part next: block 0.** With the flush aligned, 3 526 values differ, in 118 of
+102 400 pixels, each with 30-32 of its 32 channels. That is a per-pixel step, and it is not a
+denormal. Block 0 is two fused passes with nothing stored between them.
+
+Two new tools: `src/bench/denorm_mode.py` runs any command with every graph shader declaring
+`preserve` or `flush` (patched copies in `work/denorm-*`, the built shaders untouched).
+`src/bench/block0_probe.py` runs block 0 fused, then with every fusion off, and keeps each
+pass. The comparison is `capture_compare.py --compare`.
+
+**On Linux next.** `<NR>` is the folder on the Windows disk that holds the captures, beside the
+Windows checkout. In it: `windows-capture-320x320.npz` (the input and Windows' graph), and
+`windows-probe-ftz16.npz` and `windows-probe-default.npz` (Windows' block 0 with the flush and
+without).
+
+1. **The reverse check.** Run
+   `python3 src/bench/denorm_mode.py preserve -- python3 src/bench/capture_compare.py --save <NR>/linux-preserve16-winput.npz --features <NR>/windows-capture-320x320.npz`,
+   then `capture_compare.py --compare <NR>/windows-capture-320x320.npz <NR>/linux-preserve16-winput.npz`.
+   If Mesa honours the mode, the stem is 100 % the same and the first point that parts is
+   block0, as on Windows the other way round. If the stem still differs, Mesa's DPAS ignores
+   the mode, and that is the finding.
+2. **Block 0's pass.** Run
+   `python3 src/bench/block0_probe.py --features <NR>/windows-capture-320x320.npz --save <NR>/linux-probe-default.npz`
+   (Mesa's default, which flushes), then
+   `capture_compare.py --compare <NR>/windows-probe-ftz16.npz <NR>/linux-probe-default.npz`.
+   The probe must say block 0 fused and unfused are the same bits on Linux too. The first `u.*`
+   point that parts names the pass: hidden layer, branch, Q, K, V, scores, probabilities,
+   context. If step 1 held, `denorm_mode.py preserve --` on the probe against
+   `windows-probe-default.npz` should part at the same place.
+3. **For the owner's decision on declaring `DenormPreserve 16` in the shaders.** It is not
+   decided; change no shader. Under `denorm_mode.py preserve --`, collect four things:
+   - `make test`, and which checks fail: a pinned hash is expected to move, a correctness check
+     is not;
+   - `frame_replay.py --size 320 320` and `--size 720 1280`, with and without the mode, paired on
+     a quiet machine: heads and times;
+   - `opendlss_reference.py` on `opendlss-reference.md`'s four frames, with and without the
+     mode. Their port runs through Mesa too, so its own float16 arithmetic may flush;
+   - whether the picture moves at all.
+
+Still saying "the XMX units flush", to be corrected once step 1 is in: `docs/ARCHITECTURE.md`
+("Subnormals"), `src/gpu/xmx.py` (its docstring and `_shift`), and `src/gpu/test_layer.py`.
+
+## The Linux run of this branch, and where the two drivers part: the first GEMM (2026-10-01)
+
+**This branch is a no-op on Mesa.** `make test` is green at `5ab7590` (570 checks), and
+`frame_replay.py` gives the same head on this branch (`53460f6`) as on `master`: 320x320
+`2beef230a33a120a`, 1280x720 on 1344x768 `b3e91f68c1e9e718`. Speed is the same within the
+machine's run-to-run spread: 320x320 23.0-24.9 ms against master's 23.1-23.8, 720p 146.2 against
+143.5-147.4, over five runs a side, two of them paired.
+
+**The input was never the difference.** The synthetic frame's features on Linux are Windows'
+bit for bit (`b1b4ff264c858e3f`): they are half values, and an ulp in NumPy's float32 sin or cos
+rarely survives the rounding to half. Linux run on Windows' recorded input gives Linux's own
+head, `2beef230…`.
+
+**On the same input bits the graphs part at the stem — the first GEMM.**
+`capture_compare.py --compare windows-capture-320x320.npz linux-capture-320x320-winput.npz`
+(both in `NRonWindows`, beside the working folder):
+
+| point | same bits | differ | max abs diff | mean abs diff over mean abs value |
+| --- | ---: | ---: | ---: | ---: |
+| stem | 93.7 % | 205 254 | 4.7e-5 | 6e-5 |
+| block0 | 93.4 % | 217 185 | 0.26 | 1.1e-3 |
+| l1 | 81.7 % | 150 240 | 2 | 0.059 |
+| l2 | 31.8 % | 279 209 | 18.8 | 0.20 |
+| l6 (bottleneck) | 15.8 % | 55 183 | 1.44 | 0.21 |
+| d1 | 24.5 % | 618 419 | 12 | 0.12 |
+| head | 0 % | 409 600 | 1.47 | 0.050 |
+
+The stem is a K = 16 GEMM on the tiled kernel, its fp16 operands the same on both machines, its
+float32 output a few parts in 10^5 apart on 6 % of values. So the two drivers' cooperative-matrix
+arithmetic differs on the very first GEMM; the E4M3 publishes then amplify it, as they amplify any
+change in a GEMM's rounding (`phase9`), into the 47-49 dB the composed pictures show. Not the
+input, and not `half_round`. **Next:** one GEMM of the stem's shape on both machines against an
+exact float64 sum, to see which driver accumulates in exact float32 and which does not.
+
+## PR #3 on Windows, and what the Linux run of this branch has to show (2026-09-30, night)
+
+**PR #3 at 4b95863** is the author's answer to the second review: all five items, and the
+spawn's log handle made inheritable. It was built and run here under Windows on Intel's
+101.9033:
+
+- `tools/build_win.bat` builds with 0 errors. The test list passes 30 of 33, with the same three
+  failures as this branch's CMake build down to the element (phase71). `test_window_attention`
+  was not run, because it hangs the engine here.
+- **Its head is this branch's, bit for bit**, at 320x320 and 720p. Its compile-time
+  `-DHALF_ROUND_FLOAT16` and this branch's per-driver constant are the same fix.
+- vkcube went through its layer to its daemon on a named pipe, and every frame was answered.
+  The layer was found through `VK_ADD_IMPLICIT_LAYER_PATH`, with nothing registered. The
+  auto-spawn works too, once the probe's subprocess gets a stdin (item 2 below).
+
+Five findings for the PR, posted on 2026-10-01 with the owner's OK (issuecomment-5930434822):
+
+1. The unmerged window attention hangs the engine. That is master's kernel.
+2. A spawned daemon dies at start once `half_probe.spv` exists. The layer hands it no stdin, and
+   the probe's `subprocess.run` asks for one. `stdin=subprocess.DEVNULL` fixes it; that was
+   tested.
+3. `build_win.bat` never builds `half_probe.spv`, whose source is in `src/bench`.
+4. It runs about 10 % slower at 720p than the gcc build. All of it is `libnr_image` running its
+   host passes on one core, because MSVC compiles `NR_PARALLEL_FOR` out.
+5. `nr_layer.c`'s fifteen em dashes went through GBK.
+
+**What the Linux run has to show.** This branch's two runtime changes must be no-ops on Mesa.
+There `half_round`'s constant keeps `packHalf2x16`, and `shaderInt64` only enables what the
+shaders already declared. So `make test` should be green, and `frame_replay.py --size 320 320`
+and `--size 720 1280` should give the same `head_sha256` on this branch as on master. Windows
+gives `e62005b80145b97a…` and `c217fd2fdbbe6b79…` on 101.9033. Where Linux's differ from those,
+per-block hashes on both machines find the first block that parts.
+
+## On Windows, measured: Intel's compiler differs, and the picture is 47-49 dB from Linux's (2026-09-30)
+
+The first Windows session ran the `windows` branch on this machine under Windows 11, with Intel's
+own driver: 101.8991, then 101.9033 (WHQL, released 2026-09-29). The evidence is in
+`notes/phase71-intel-windows-driver.md`. **The fp16 cooperative-matrix configuration is there.**
+What differs is the compiler:
+
+- **It folds `unpackHalf2x16(packHalf2x16(x))` to x.** So `half_round` rounded nothing and every
+  vendor rounding point vanished, and 17 of 34 CTest checks failed. It keeps
+  `float(float16_t(x))`, the spelling Mesa folds. `half_round` now takes its spelling from a
+  specialization constant that libxmx sets per driver, and `XMX_HALF_ROUND` overrides it. **This
+  has not yet run on Mesa**, so run `make test` there before it goes anywhere.
+- **The unmerged window attention hangs the engine** from 32 windows up: a TDR, then
+  `VK_ERROR_DEVICE_LOST`. The graph uses the merged variant, which does not hang. Leave
+  `gpu_window_attention` out of CTest on this driver.
+- Two failures remain. A zero's sign differs in two GEMMs, which is PR #3's B580 failure and so
+  the driver's. And 378 of 65 536 values differ in the ViT attention's unfused reference. CTest
+  passes 30 of 33.
+
+Against Linux on the same frames (Tekken 7's restill capture, 1080p, history and all), the
+composed picture is **0.47-0.62 levels of 255 apart, at PSNR 47.5-49.4 dB**. The head differs,
+as it would with any operation computed differently. The graph is slower here: **199.6 ms at
+720p against 143 on Linux, and 28.1 ms at 320x320 against 23.3**, on a machine checked quiet.
+`shaderInt64` is now enabled where the device has it, as the validation layer asked.
+
 ## PR #3 run on Linux; the bands it reports not explained here; the stills rendered again (2026-09-28, night)
 
 **PR #3** (the Windows link between layer and daemon, an outside contributor on a B580) was run
@@ -311,6 +801,34 @@ on 2026-09-28 with the owner's approval — the images on `media`, the table in 
 And the local `windows` branch (CMake for the compute side with MSYS2's gcc, `docs/WINDOWS.md`)
 overlaps PR #3, which does the layer and the daemon with MSVC: the two are to be reconciled
 before a Windows session starts from either.
+
+## On Windows: the `windows` branch (2026-09-27, late night)
+
+**If this is being read on Windows, the hardware facts in this file and in the brief are not
+facts there.** The brief's "do not re-probe, trust these values" is about Mesa's ANV on Linux;
+Intel's Windows driver is another driver with another shader compiler. Run `work/coopmat_probe`
+first — every kernel here needs the `fp16 x fp16 -> fp32` configuration at M=8 N=16 K=16 — and
+measure every speed rather than quote one. The checklist, in order, is `docs/WINDOWS.md`.
+
+What the branch has: CMake builds the compute side there with MSYS2's UCRT64 gcc (MSVC is refused,
+for `_Float16`), `xmx.native_library` finds `work/lib<name>.dll` and its MinGW runtime, CTest runs
+in UTF-8 mode, and the layer is off. Written on Linux and never compiled on Windows; on Linux both
+build systems still build it and pass (`make test`, CTest 42 of 42). Live mode in a game is the
+second milestone: the layer's threads and socket, the daemon's transport, DXVK for D3D9-11.
+
+**The first Windows session starts from a checkout prepared on Linux** (2026-09-30) on the NTFS
+disk the owner boots Windows from, with the weights in `work/mlxw` and MLX-DLSS in `work/mlx-dlss`,
+and Claude's memory from the Linux sessions in `..\claude-memory` beside it — copy it into this
+project's memory folder first. Two routes, both local branches of it:
+
+- `windows`, this one: CMake with MSYS2's gcc, the compute side only, never compiled on Windows.
+- `pr3`, PR #3's head: an MSVC build of everything (`tools/build_win.bat` — `libxmx.dll`,
+  `nr_layer.dll`, `libnr_image.dll`, the shaders), the layer and the daemon over a named pipe,
+  run on a B580 by its author. Not merged — its review on GitHub lists what is left. It turns
+  `NR_QKV_EPILOGUE` off on Windows by default: set it to 1. Off costs 143 -> 257 ms of graph at
+  1344x768 here, and the author's own runs show it was not what drew the bands.
+
+`coopmat_probe` first, on either. If the configuration is there, `pr3` builds the whole thing today.
 
 ## Xe2's 256-register mode: reachable, correct, and slower (2026-09-27, late night)
 
@@ -1886,7 +2404,7 @@ megapixel. Live mode runs every present: Tekken 7 at 30 fps at 800x450 beside th
 | **Input is five optional 2D textures**, `tex.2d.v4.f32`; only colour is required | `notes/phase5-input-contract.md` |
 | **16-channel packing order**: ch4-6 colour, ch7-9 reprojected history (same affine `(x−a)·b`), ch12-14 sign-encoded validity. MLX-DLSS agrees independently | `notes/phase5-channel-order.md` |
 | Output head is **32 → 4**; three channels become display RGB | `notes/phase5-output-head.md` |
-| XMX flushes subnormal FP16 to zero; fixed by a per-tensor 2^k rescale | `notes/phase4-subnormal-flush.md` |
+| Under **Mesa's default** float controls the XMX multiply flushes subnormal FP16 operands to zero; a per-tensor 2^k rescale guards against it. It is the driver's mode, not the units': Intel's Windows driver keeps them, and since 2026-10-01 libxmx declares `DenormPreserve 16`, so Mesa does too | `notes/phase4-subnormal-flush.md`, `phase71` |
 | **Each precision regime has a sharp threshold**: below it a perturbation is annihilated exactly, above it the head jumps to 9-12 % of its sd. float32 ~1e-07, half ~1e-04. The half path is the **more stable** of the two | `notes/phase9-numerics.md` |
 | The whole CPU/XMX gap is the FP16 rounding of GEMM *activations*, and **97.3 % of them are already half-valued** — only 186 of 6987 calls are touched. Weights change nothing: 579 of 649 tensors are stored F16, the other 70 are `attn_scale`, not a GEMM operand | `notes/phase9-numerics.md` |
 | Batched attention and the folded branched FFN are **bit-identical** to the plain GEMM hook; the two 720p renders are pixel-identical | `notes/phase9-numerics.md` |

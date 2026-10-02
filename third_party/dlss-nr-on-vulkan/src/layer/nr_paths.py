@@ -13,15 +13,20 @@ import pathlib
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "src"))
 import nr_build  # noqa: E402
 
-SETTINGS = pathlib.Path(os.environ.get("NR_SETTINGS", "/tmp/nr_settings.json"))
-TRIGGER = pathlib.Path(os.environ.get("NR_LAYER_TRIGGER", "/tmp/nr_trigger"))
-SOCKET = pathlib.Path(os.environ.get("NR_LAYER_SOCKET", "/tmp/nr_layer.sock"))
-LOG = pathlib.Path(os.environ.get("NR_LAYER_LOG", "/tmp/nr_daemon.log"))
+# /tmp is where these live on Linux and macOS; Windows has no such directory, so the
+# defaults land in the user's temp folder there instead. The env overrides above them are
+# how a launcher names the same endpoints for both the layer and the daemon.
+_TMP = pathlib.Path(tempfile.gettempdir()) if os.name == "nt" else pathlib.Path("/tmp")
+SETTINGS = pathlib.Path(os.environ.get("NR_SETTINGS", str(_TMP / "nr_settings.json")))
+TRIGGER = pathlib.Path(os.environ.get("NR_LAYER_TRIGGER", str(_TMP / "nr_trigger")))
+SOCKET = pathlib.Path(os.environ.get("NR_LAYER_SOCKET", str(_TMP / "nr_layer.sock")))
+LOG = pathlib.Path(os.environ.get("NR_LAYER_LOG", str(_TMP / "nr_daemon.log")))
 DAEMON = pathlib.Path(__file__).resolve().parent / "nr_daemon.py"
 
 # The compromise this project measured: below it the picture is not worth the frame, above
@@ -73,6 +78,16 @@ def write(values):
 
 def alive():
     """Whether a daemon is listening. A stale socket file is not a daemon."""
+    if os.name == "nt":
+        # Windows: the endpoint is a named pipe, not a filesystem object, and CPython
+        # has no socket.AF_UNIX there. Opening the pipe namespace is the probe: it
+        # succeeds only while a server is listening, and a missing server surfaces as
+        # FileNotFoundError rather than a hang.
+        try:
+            with open(str(SOCKET), "r+b", buffering=0):
+                return True
+        except OSError:
+            return False
     if not SOCKET.exists():
         return False
     try:

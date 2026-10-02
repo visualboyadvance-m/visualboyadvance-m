@@ -48,7 +48,8 @@
 	F(vkDestroyQueryPool) F(vkDestroyShaderModule) F(vkDeviceWaitIdle) F(vkEndCommandBuffer) \
 	F(vkEnumerateDeviceExtensionProperties) F(vkEnumeratePhysicalDevices) \
 	F(vkFreeCommandBuffers) F(vkFreeMemory) F(vkGetBufferDeviceAddress) \
-	F(vkGetBufferMemoryRequirements) F(vkGetDeviceQueue) F(vkGetPhysicalDeviceFeatures2) \
+	F(vkGetBufferMemoryRequirements) F(vkGetDeviceProcAddr) F(vkGetDeviceQueue) \
+	F(vkGetPhysicalDeviceFeatures2) \
 	F(vkGetPhysicalDeviceMemoryProperties) \
 	F(vkGetPhysicalDeviceProperties) F(vkGetPhysicalDeviceProperties2) \
 	F(vkGetPhysicalDeviceQueueFamilyProperties) \
@@ -155,6 +156,15 @@ static struct {
 	char name[256]; char err[256]; char memory[256]; char memory_read[256];
 	int ready, lost, discrete, unmapped;
 	int pin32;                /* pipelines require 32-lane subgroups (build_pipeline_spec) */
+	int half_by_cast;         /* half_round's spelling, constant 1 on every pipeline (xmx_init) */
+	int preserve16;           /* float16 subnormals kept: DenormPreserve 16 on every module (xmx_init) */
+	/* XMX_PIPELINE_STATS=FILE: what the driver's compiler made of each pipeline, appended to
+	 * FILE through VK_KHR_pipeline_executable_properties, where the device has it */
+	FILE *stats;
+	PFN_vkGetPipelineExecutablePropertiesKHR stats_props;
+	PFN_vkGetPipelineExecutableStatisticsKHR stats_values;
+	PFN_vkGetPipelineExecutableInternalRepresentationsKHR stats_ir;
+	const char *ir_dir;       /* XMX_PIPELINE_IR: a folder for the compiled code, with the stats */
 	/* `coopmat`: the device has VK_KHR_cooperative_matrix. `portable`: the GEMMs run on
 	 * the plain multiply-add kernels instead — because the device has no matrix path
 	 * (MoltenVK on Apple silicon), or because XMX_PORTABLE=1 asked for it here. */
@@ -458,20 +468,94 @@ static volatile int g_cancel;
 void xmx_cancel(int on) { g_cancel = on ? 1 : 0; }
 int xmx_cancelled(void) { return g_cancel; }
 
+/* `words` with DenormPreserve declared for 16-bit floats on every entry point, or NULL when
+ * there is nothing to add: a module that already declares a 16-bit denorm mode keeps its own
+ * (src/bench/denorm_mode.py's copies do), and SPIR-V before 1.4 would need
+ * SPV_KHR_float_controls, which this does not add. The caller frees the result. */
+static uint32_t *declare_preserve16(const uint32_t *words, size_t n, size_t *out_n)
+{
+	enum { CAPABILITY = 17, ENTRY_POINT = 15, EXECUTION_MODE = 16, EXECUTION_MODE_ID = 331,
+	       DENORM_PRESERVE = 4459, DENORM_FLUSH = 4460, CAP_DENORM_PRESERVE = 4464 };
+	if (n < 5 || words[0] != 0x07230203u || words[1] < 0x00010400u) return NULL;
+	size_t cap_end = 0, mode_end = 0, entries = 0;
+	int has_cap = 0;
+	for (size_t i = 5; i < n;) {
+		uint32_t count = words[i] >> 16, op = words[i] & 0xffffu;
+		if (count == 0 || i + count > n) return NULL;
+		if (op == CAPABILITY) {
+			cap_end = i + count;
+			if (count > 1 && words[i + 1] == CAP_DENORM_PRESERVE) has_cap = 1;
+		}
+		if (op == ENTRY_POINT) entries++;
+		if (op == ENTRY_POINT || op == EXECUTION_MODE || op == EXECUTION_MODE_ID) mode_end = i + count;
+		if (op == EXECUTION_MODE && count >= 4 && words[i + 3] == 16
+		    && (words[i + 2] == DENORM_PRESERVE || words[i + 2] == DENORM_FLUSH))
+			return NULL;
+		i += count;
+	}
+	if (!cap_end || !mode_end || !entries || cap_end > mode_end) return NULL;
+	size_t m = n + (has_cap ? 0 : 2) + 4 * entries;
+	uint32_t *out = malloc(m * sizeof *out);
+	if (!out) return NULL;
+	size_t o = 0;
+	memcpy(out, words, cap_end * sizeof *out); o = cap_end;
+	if (!has_cap) { out[o++] = (2u << 16) | CAPABILITY; out[o++] = CAP_DENORM_PRESERVE; }
+	memcpy(out + o, words + cap_end, (mode_end - cap_end) * sizeof *out); o += mode_end - cap_end;
+	for (size_t i = 5; i < n;) {
+		uint32_t count = words[i] >> 16;
+		if ((words[i] & 0xffffu) == ENTRY_POINT) {
+			out[o++] = (4u << 16) | EXECUTION_MODE; out[o++] = words[i + 2];
+			out[o++] = DENORM_PRESERVE; out[o++] = 16;
+		}
+		i += count;
+	}
+	memcpy(out + o, words + mode_end, (n - mode_end) * sizeof *out); o += n - mode_end;
+	*out_n = o;
+	return out;
+}
+
 static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, VkPipeline *out,
 			      const VkSpecializationInfo *specialization)
 {
 	/* Every pipeline this library builds comes through here, so one check bounds an
 	 * abandoned open to whatever vkCreateComputePipelines is already inside. */
 	if (g_cancel) FAIL("cancelled", 0);
+	/* Every pipeline also gets constant 1, half_round's spelling (publish.glsl, xmx_init);
+	 * a shader that does not declare it ignores the entry. */
+	VkSpecializationMapEntry entries[4];
+	unsigned char data[32];
+	uint32_t count = 0, size = 0;
+	if (specialization) {
+		if (specialization->mapEntryCount >= sizeof entries / sizeof *entries
+		    || specialization->dataSize > sizeof data - sizeof(VkBool32))
+			FAIL("specialization too large", 0);
+		count = specialization->mapEntryCount;
+		size = (uint32_t)specialization->dataSize;
+		memcpy(entries, specialization->pMapEntries, count * sizeof *entries);
+		memcpy(data, specialization->pData, size);
+	}
+	VkBool32 cast = g.half_by_cast ? VK_TRUE : VK_FALSE;
+	entries[count++] = (VkSpecializationMapEntry){ .constantID = 1, .offset = size, .size = sizeof cast };
+	memcpy(data + size, &cast, sizeof cast);
+	size += sizeof cast;
+	VkSpecializationInfo constants = { .mapEntryCount = count, .pMapEntries = entries,
+					   .dataSize = size, .pData = data };
 	size_t len = 0;
 	void *owned = NULL;
 	const void *code = shader_code(spv_path, &len, &owned);
 	if (!code) FAIL("cannot open spv (no such file, and no embedded module of that name)", 0);
+	/* Float16 subnormals are kept where the driver can be told to (xmx_init): Mesa flushes them
+	 * in the cooperative-matrix GEMMs unless a mode is declared, Intel's Windows driver keeps
+	 * them, and with the mode declared the two compute the same graph bit for bit
+	 * (notes/phase71). The built shaders are not touched; the copy given to the driver is. */
+	size_t patched_n = 0;
+	uint32_t *patched = g.preserve16 ? declare_preserve16(code, len / 4, &patched_n) : NULL;
 	VkShaderModuleCreateInfo smi = { .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-					 .codeSize = len, .pCode = code };
+					 .codeSize = patched ? patched_n * 4 : len,
+					 .pCode = patched ? patched : code };
 	VkShaderModule sm;
 	VkResult r = vkCreateShaderModule(g.dev, &smi, NULL, &sm);
+	free(patched);
 	free(owned);
 	if (r) FAIL("shader module", r);
 	/* Every kernel here is written for 32-lane subgroups — a row pass's workgroup is one
@@ -489,10 +573,91 @@ static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, Vk
 			   .pNext = (g.pin32 & 1) ? &width : NULL,
 			   .flags = (g.pin32 & 2) ? VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT : 0,
 			   .stage = VK_SHADER_STAGE_COMPUTE_BIT, .module = sm, .pName = "main",
-			   .pSpecializationInfo = specialization }, .layout = layout };
+			   .pSpecializationInfo = &constants }, .layout = layout };
+	if (g.stats) cpi.flags |= VK_PIPELINE_CREATE_CAPTURE_STATISTICS_BIT_KHR;
+	if (g.stats && g.ir_dir) cpi.flags |= VK_PIPELINE_CREATE_CAPTURE_INTERNAL_REPRESENTATIONS_BIT_KHR;
 	r = vkCreateComputePipelines(g.dev, VK_NULL_HANDLE, 1, &cpi, NULL, out);
 	vkDestroyShaderModule(g.dev, sm, NULL);
 	if (r) FAIL("pipeline", r);
+	if (g.stats) {
+		/* constant 0, where given, is the specialisation flags (resident_pipeline) */
+		long flags = -1;
+		for (uint32_t i = 0; specialization && i < specialization->mapEntryCount; i++)
+			if (specialization->pMapEntries[i].constantID == 0
+			    && specialization->pMapEntries[i].size == sizeof(uint32_t))
+				flags = *(const uint32_t *)((const char *)specialization->pData
+							    + specialization->pMapEntries[i].offset);
+		const char *base = spv_path;
+		for (const char *p = spv_path; *p; p++)
+			if (*p == '/' || *p == '\\') base = p + 1;
+		VkPipelineInfoKHR info = { .sType = VK_STRUCTURE_TYPE_PIPELINE_INFO_KHR, .pipeline = *out };
+		VkPipelineExecutablePropertiesKHR props[4];
+		uint32_t executables = 4;
+		for (uint32_t i = 0; i < executables; i++)
+			props[i] = (VkPipelineExecutablePropertiesKHR){
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_PROPERTIES_KHR };
+		if (g.stats_props(g.dev, &info, &executables, props) < 0) executables = 0;
+		for (uint32_t e = 0; e < executables; e++) {
+			VkPipelineExecutableInfoKHR which = {
+				.sType = VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_INFO_KHR,
+				.pipeline = *out, .executableIndex = e };
+			VkPipelineExecutableStatisticKHR values[64];
+			uint32_t n = 64;
+			for (uint32_t i = 0; i < n; i++)
+				values[i] = (VkPipelineExecutableStatisticKHR){
+					.sType = VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_STATISTIC_KHR };
+			if (g.stats_values(g.dev, &which, &n, values) < 0) n = 0;
+			fprintf(g.stats, "%s\tflags=%ld\t%s\tsubgroup=%u", base, flags, props[e].name,
+				props[e].subgroupSize);
+			for (uint32_t i = 0; i < n; i++) {
+				fprintf(g.stats, "\t%s=", values[i].name);
+				switch (values[i].format) {
+				case VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_BOOL32_KHR:
+					fprintf(g.stats, "%u", values[i].value.b32); break;
+				case VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_INT64_KHR:
+					fprintf(g.stats, "%lld", (long long)values[i].value.i64); break;
+				case VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR:
+					fprintf(g.stats, "%llu", (unsigned long long)values[i].value.u64); break;
+				default:
+					fprintf(g.stats, "%g", values[i].value.f64); break;
+				}
+			}
+			fputc('\n', g.stats);
+			/* XMX_PIPELINE_IR=DIR: whatever the driver shows of the compiled code, a file
+			 * per representation, named after the shader and its flags */
+			uint32_t reps = 0;
+			if (!g.ir_dir || g.stats_ir(g.dev, &which, &reps, NULL) < 0) reps = 0;
+			VkPipelineExecutableInternalRepresentationKHR *rep = calloc(reps ? reps : 1, sizeof *rep);
+			for (uint32_t i = 0; rep && i < reps; i++)
+				rep[i].sType = VK_STRUCTURE_TYPE_PIPELINE_EXECUTABLE_INTERNAL_REPRESENTATION_KHR;
+			if (rep && reps && g.stats_ir(g.dev, &which, &reps, rep) >= 0) {
+				for (uint32_t i = 0; i < reps; i++)
+					rep[i].pData = malloc(rep[i].dataSize ? rep[i].dataSize : 1);
+				g.stats_ir(g.dev, &which, &reps, rep);
+				for (uint32_t i = 0; i < reps; i++) {
+					char file[1024], tag[VK_MAX_DESCRIPTION_SIZE];
+					snprintf(tag, sizeof tag, "%s", rep[i].name);
+					for (char *c = tag; *c; c++)
+						if (!((*c >= 'a' && *c <= 'z') || (*c >= 'A' && *c <= 'Z')
+						      || (*c >= '0' && *c <= '9'))) *c = '_';
+					snprintf(file, sizeof file, "%s/%s-%ld-%u-%s.%s", g.ir_dir, base, flags, e,
+						 tag, rep[i].isText ? "txt" : "bin");
+					FILE *o = rep[i].pData ? fopen(file, "wb") : NULL;
+					if (o) {
+						size_t bytes = rep[i].dataSize;
+						if (rep[i].isText && bytes && !((char *)rep[i].pData)[bytes - 1]) bytes--;
+						fwrite(rep[i].pData, 1, bytes, o);
+						fclose(o);
+					}
+					fprintf(g.stats, "\t\trepresentation %s (%s): %zu bytes\n", rep[i].name,
+						rep[i].description, rep[i].dataSize);
+					free(rep[i].pData);
+				}
+			}
+			free(rep);
+		}
+		fflush(g.stats);
+	}
 	return 0;
 }
 
@@ -699,6 +864,60 @@ int xmx_adopt(void *inst, void *pd, void *dev, void *q, unsigned qi, int coopmat
 /* 1 while an adopted device is open, 0 for libxmx's own, -1 when nothing is open. */
 int xmx_adopted(void) { return g.dev ? g.adopted : -1; }
 
+/* Two things about the driver that decide what the pipelines compile, read from the
+ * physical device so an adopted one (xmx_adopt) gets the same answer as libxmx's own.
+ *
+ * half_round's spelling (publish.glsl) is the compiler's to decide, not ours: Mesa folds
+ * `float(float16_t(x))` away and keeps packHalf2x16's round trip, and Intel's Windows
+ * compiler folds the round trip and keeps the cast. Whichever is folded, every vendor
+ * rounding point in the graph silently vanishes. `XMX_HALF_ROUND=pack` or `cast` overrides,
+ * to measure the other one on either driver.
+ *
+ * And float16 subnormals are kept wherever the driver can declare it. NVIDIA's tensor cores
+ * keep them (notes/phase71), Mesa's undeclared default flushes them in the GEMMs, and without
+ * one mode on every driver the same graph gives a different picture on each.
+ * `XMX_DENORM16=driver` leaves the choice to the driver again, to measure what it does. */
+static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
+{
+	g.half_by_cast = 0;
+	if (api_version >= VK_API_VERSION_1_2) {
+		VkPhysicalDeviceDriverProperties driver = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES };
+		VkPhysicalDeviceProperties2 query = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, .pNext = &driver };
+		vkGetPhysicalDeviceProperties2(pd, &query);
+		g.half_by_cast = driver.driverID == VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS;
+	}
+	const char *half = getenv("XMX_HALF_ROUND");
+	if (half && *half) {
+		if (!strcmp(half, "cast")) g.half_by_cast = 1;
+		else if (!strcmp(half, "pack")) g.half_by_cast = 0;
+		else fprintf(stderr, "libxmx: XMX_HALF_ROUND=%s is neither pack nor cast; keeping %s\n",
+			     half, g.half_by_cast ? "cast" : "pack");
+	}
+	g.preserve16 = 0;
+	if (api_version >= VK_API_VERSION_1_2) {
+		VkPhysicalDeviceFloatControlsProperties controls = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES };
+		VkPhysicalDeviceProperties2 query = {
+			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, .pNext = &controls };
+		vkGetPhysicalDeviceProperties2(pd, &query);
+		/* Only the 16-bit mode is declared, which a driver must allow to differ from the
+		 * other widths' (VUID-RuntimeSpirv-denormBehaviorIndependence-06289 and -06290).
+		 * ANV and Intel's Windows driver both report ALL; MoltenVK reports NONE. */
+		g.preserve16 = controls.shaderDenormPreserveFloat16 == VK_TRUE
+			&& controls.denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL;
+	}
+	const char *denorm = getenv("XMX_DENORM16");
+	if (denorm && !strcmp(denorm, "driver")) g.preserve16 = 0;
+	else if (denorm && *denorm && strcmp(denorm, "preserve"))
+		fprintf(stderr, "libxmx: XMX_DENORM16=%s is neither preserve nor driver; keeping %s\n",
+			denorm, g.preserve16 ? "preserve" : "driver");
+	if (!g.preserve16 && !(denorm && !strcmp(denorm, "driver")))
+		fprintf(stderr, "libxmx: %s cannot keep float16 subnormals by declaration; its own default "
+			"decides, and the picture may differ from other drivers'\n", g.name);
+}
+
 static int open_adopted(void)
 {
 	xmx_gipa = adopt.gipa;
@@ -733,6 +952,7 @@ static int open_adopted(void)
 	const char *forced = getenv("XMX_PORTABLE");
 	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
 	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
+	detect_driver_modes(adopt.pd, props.apiVersion);
 	g.inst = adopt.inst; g.pd = adopt.pd; g.q = adopt.q; g.qi = adopt.qi;
 	g.lock = adopt.lock; g.unlock = adopt.unlock; g.lock_ctx = adopt.ctx;
 	g.adopted = 1;
@@ -808,6 +1028,16 @@ int xmx_open(void)
 	g.coopmat = has_extension(de, nde, VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME);
 	int subset = has_extension(de, nde, "VK_KHR_portability_subset");
 	int explicit_ext = has_extension(de, nde, VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME);
+	/* XMX_PIPELINE_STATS: the compiler's own account of each pipeline (build_pipeline_spec),
+	 * through VK_KHR_pipeline_executable_properties where the device has it */
+	const char *stats_path = getenv("XMX_PIPELINE_STATS");
+	int stats = 0;
+	if (stats_path && *stats_path) {
+		stats = has_extension(de, nde, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME);
+		if (!stats)
+			fprintf(stderr, "libxmx: XMX_PIPELINE_STATS is set, but %s has no %s\n",
+				g.name, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME);
+	}
 	free(de);
 	const char *forced = getenv("XMX_PORTABLE");
 	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
@@ -833,10 +1063,11 @@ int xmx_open(void)
 		g.int8 = have12.shaderInt8 && have12.storageBuffer8BitAccess;
 	}
 	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
-	const char *ext[3]; uint32_t next = 0;
+	const char *ext[4]; uint32_t next = 0;
 	if (g.coopmat) ext[next++] = VK_KHR_COOPERATIVE_MATRIX_EXTENSION_NAME;
 	if (g.explicit_layout) ext[next++] = VK_KHR_WORKGROUP_MEMORY_EXPLICIT_LAYOUT_EXTENSION_NAME;
 	if (subset) ext[next++] = "VK_KHR_portability_subset";   /* required when offered */
+	if (stats) ext[next++] = VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME;
 
 	VkPhysicalDeviceCooperativeMatrixFeaturesKHR cm = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_COOPERATIVE_MATRIX_FEATURES_KHR, .cooperativeMatrix = VK_TRUE };
@@ -859,6 +1090,7 @@ int xmx_open(void)
 	if (!(g.pin32 & 1))
 		fprintf(stderr, "libxmx: %s cannot fix the subgroup width at 32; the kernels are written "
 			"for 32 lanes, and a driver that picks another width can make them race\n", g.name);
+	detect_driver_modes(g.pd, props.apiVersion);
 	VkPhysicalDeviceVulkan13Features v13 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES,
 		.pNext = g.coopmat ? (void *)&cm : NULL,
@@ -889,7 +1121,17 @@ int xmx_open(void)
 	VkPhysicalDeviceVulkan11Features v11 = {
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES, .pNext = &v12,
 		.storageBuffer16BitAccess = VK_TRUE };
-	VkPhysicalDeviceFeatures2 f2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &v11 };
+	/* The shaders do their address arithmetic in uint64_t, which declares SPIR-V's Int64
+	 * capability, and that needs shaderInt64 on: the validation layer says so for nine of
+	 * them. Mesa never minded. Asked for only where the device has it. */
+	VkPhysicalDeviceFeatures2 base = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2 };
+	vkGetPhysicalDeviceFeatures2(g.pd, &base);
+	VkPhysicalDevicePipelineExecutablePropertiesFeaturesKHR executables = {
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PIPELINE_EXECUTABLE_PROPERTIES_FEATURES_KHR,
+		.pNext = &v11, .pipelineExecutableInfo = VK_TRUE };
+	VkPhysicalDeviceFeatures2 f2 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+					 .pNext = stats ? (void *)&executables : (void *)&v11,
+					 .features.shaderInt64 = base.features.shaderInt64 };
 	float prio = 1.0f;
 	VkDeviceQueueCreateInfo qci = { .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
 					.queueFamilyIndex = g.qi, .queueCount = 1, .pQueuePriorities = &prio };
@@ -899,6 +1141,18 @@ int xmx_open(void)
 	r = vkCreateDevice(g.pd, &dci, NULL, &g.dev);
 	if (r) { g.dev = VK_NULL_HANDLE; FAIL("vkCreateDevice", r); }
 	vkGetDeviceQueue(g.dev, g.qi, 0, &g.q);
+	if (stats) {
+		g.stats_props = (PFN_vkGetPipelineExecutablePropertiesKHR)
+			vkGetDeviceProcAddr(g.dev, "vkGetPipelineExecutablePropertiesKHR");
+		g.stats_values = (PFN_vkGetPipelineExecutableStatisticsKHR)
+			vkGetDeviceProcAddr(g.dev, "vkGetPipelineExecutableStatisticsKHR");
+		g.stats_ir = (PFN_vkGetPipelineExecutableInternalRepresentationsKHR)
+			vkGetDeviceProcAddr(g.dev, "vkGetPipelineExecutableInternalRepresentationsKHR");
+		const char *ir = getenv("XMX_PIPELINE_IR");
+		g.ir_dir = ir && *ir && g.stats_ir ? ir : NULL;
+		if (g.stats_props && g.stats_values) g.stats = fopen(stats_path, "a");
+		if (!g.stats) fprintf(stderr, "libxmx: cannot write pipeline statistics to %s\n", stats_path);
+	}
 	return 0;
 }
 
@@ -944,12 +1198,24 @@ void xmx_close(void)
 		vkDestroyDevice(g.dev, NULL);
 		vkDestroyInstance(g.inst, NULL);
 	}
+	if (g.stats) fclose(g.stats);
 	memset(&g, 0, sizeof g);
 	memset(graphs, 0, sizeof graphs);
 	memset(prof_ms, 0, sizeof prof_ms);
 	memset(prof_hits, 0, sizeof prof_hits);
 	adopt.set = 0;
 }
+
+/* Whether the pipelines declare DenormPreserve 16 (detect_driver_modes). */
+int xmx_preserve16(void) { return g.preserve16; }
+
+/* Which half_round the pipelines compile, constant 1 (detect_driver_modes): 1 is
+ * `float(float16_t(x))`, 0 the packHalf2x16 round trip. The daemon's start-up probe checks
+ * the one in use. */
+int xmx_half_by_cast(void) { return g.half_by_cast; }
+
+/* Whether the device is a card with memory of its own rather than the host's (memtype). */
+int xmx_discrete(void) { return g.discrete; }
 
 int xmx_coopmat(void) { return g.dev ? g.coopmat : -1; }
 int xmx_portable(void) { return g.dev ? g.portable : -1; }
