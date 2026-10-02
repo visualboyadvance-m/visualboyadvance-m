@@ -25,8 +25,11 @@
 // wait for the previous frame's composition, so only one frame is in the
 // network or composition at a time; without it up to three frames are in
 // flight. Frames arriving while the pipeline is full are skipped, and
-// Apply32() writes the newest finished result, a few frames behind the
-// emulator. Until the first pass finishes the source passes straight through.
+// Apply32() lays the newest finished pass over the frame on screen by what
+// it changed, weighed by how far each pixel has moved since (with the camera's
+// scroll followed), falling back to what earlier passes made of the background
+// there and then to the pass's colour cast. Until the first pass finishes the
+// source passes straight through.
 //
 // The weights are shared process-wide: the model opens on the first pass a
 // Filter asks for (about two seconds, on the features thread, never on the UI

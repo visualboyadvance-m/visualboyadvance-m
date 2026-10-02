@@ -272,6 +272,44 @@ constexpr int kMotionRadius = 2;
 constexpr int kScenePercentHold = 3;
 constexpr int kScenePercentDrop = 25;
 
+// Up to how far a pixel may have moved, in levels, and still count towards the scene's
+// motion. The scene weight is for a scroll the tracking below did not find -- there the
+// gradients move by a level or two and the detail by a few tens -- and what counts is how
+// much of the frame shows that kind of residue once the picture is lined up. A pixel that
+// changed beyond this is something else: a sprite walking, a HUD element coming and going,
+// water animating. Those are local, the pass is simply wrong there and the correction
+// memory or the cast stands in for it, and they say nothing about the frame as a whole;
+// counted in, a hero and a few pools wound the whole picture's denoising down by a fifth
+// every time the camera followed him (measured on Minish Cap: 7% "moving", 2% mild), the
+// picture pumping darker as he walked and back as he stopped. Nor does the strip of fresh
+// picture a scroll brings in at the frame's edge count, which the pass never saw at all.
+constexpr int kSceneMildLevels = 60;
+
+// How many consecutive frames a pixel has to hold still (within kHoldLevels) before a
+// pass's correction of it goes into the correction memory as background. A pass alone
+// cannot tell background from a sprite standing on it; the live frames can: a sprite that
+// walks changes its pixels every frame or two (it moves, and its walk cycle turns), while
+// the ground does not change at all. Agreement between two consecutive passes was tried
+// first and fails for exactly the sprite that matters, the slow walker -- his flat tunic
+// overlaps itself from one pass to the next, so he became background and his own
+// correction was remembered where he had been. Twelve frames is longer than a pass is
+// old, so what has stood that long is also what the pass was given there.
+constexpr int kMemoryStillFrames = 12;
+
+// The passes' correction of the background, kept from one pass to the next: see
+// Filter::Impl::memory_*. A pass has no correction for what was behind a sprite, so when
+// the sprite walks on, the pixels it uncovers can only take the cast -- flat, where the
+// sand around them keeps the pass's sharpening of every grain, and a few levels off --
+// and a dull copy of the sprite follows it across the screen at the pass's latency,
+// measured at 2 to 4 levels darker than the pass itself would make it. The background
+// behind him was on screen before he got there, though, and some earlier pass corrected
+// it. So the correction of every pixel that has held still for kMemoryStillFrames is
+// remembered, carried along with the scroll between the passes, and where the pass on
+// screen no longer matches the live picture, this memory is tried before the cast. A
+// sprite standing still long enough becomes memory too, which costs nothing: when it
+// leaves, the live colour no longer matches what is remembered, and the cast takes over
+// as before.
+
 // How fast the frame's weight may climb back, per frame, out of 256.
 //
 // The weight scales the whole correction, and the correction is a colour shift as much as a
@@ -800,6 +838,22 @@ struct Filter::Impl {
     int previous_width = 0;
     int previous_height = 0;
     int blend = 256;
+    // The background's correction (see the note above kMemoryStillFrames): the frame a
+    // correction was taken from, the correction, and whether a pixel holds one, in the
+    // coordinates of the pass on screen (`display_src`). The scratch set is for shifting it.
+    std::vector<uint8_t> memory_src;
+    std::vector<int16_t> memory_delta;
+    std::vector<uint8_t> memory_valid;
+    std::vector<uint8_t> memory_src_scratch;
+    std::vector<int16_t> memory_delta_scratch;
+    std::vector<uint8_t> memory_valid_scratch;
+    int memory_width = 0;
+    int memory_height = 0;
+    Alignment memory_alignment;  // the memory's motion masks, under the pass's hypotheses
+    // How long each live pixel has held still (kMemoryStillFrames), and the live frame
+    // before this one to tell; screen coordinates, reset wherever the picture changes.
+    std::vector<uint8_t> age;
+    std::vector<uint8_t> live_previous;
     // Apply32()'s live frame as RGB8 and its pyramid; how it lines up with the pass on
     // screen and the one before it; and the dilation's scratch. Members so the frame does not allocate.
     std::vector<uint8_t> live;
@@ -849,6 +903,11 @@ struct Filter::Impl {
     void FeaturesStage();
     void NetworkStage();
     void ComposeStage();
+
+    // Brings the correction memory up to date with the pass that just reached the
+    // screen (`display_*`), the one before it still in `previous_*`, given the live frame
+    // (RGB8, the frame's size) and `age`. Caller holds `mutex`.
+    void UpdateMemory(const uint8_t* live);
 };
 
 void Filter::Impl::Fail(const std::string& why) {
@@ -1308,6 +1367,81 @@ void Filter::Impl::ComposeStage() {
     cv.notify_all();
 }
 
+// The pass that just landed is remembered wherever the live picture has held still for
+// kMemoryStillFrames and still shows what the pass was given (so the pixel is background,
+// and the pass's correction is a correction of it). The memory keeps its old entry under
+// anything that moves, so the background's correction survives under a sprite walking
+// over it. A pixel with nothing remembered yet takes the new pass as it is. The memory
+// lives in the coordinates of the pass before, and moves with the scroll between the two
+// passes first; `live` is the frame on screen now, screen coordinates, which the pass's
+// are too once nothing has moved for that long.
+void Filter::Impl::UpdateMemory(const uint8_t* live) {
+    const int w = display_width;
+    const int h = display_height;
+    const size_t px = static_cast<size_t>(w) * h;
+    if (display_src.size() != px * 3 || display_delta.size() != px * 3)
+        return;
+    const bool fresh = memory_width != w || memory_height != h || memory_valid.size() != px ||
+                       memory_src.size() != px * 3 || memory_delta.size() != px * 3;
+    if (fresh) {
+        memory_width = w;
+        memory_height = h;
+        memory_src.assign(px * 3, 0);
+        memory_delta.assign(px * 3, 0);
+        memory_valid.assign(px, 0);
+    }
+    const bool have_prev = !fresh && previous_width == w && previous_height == h &&
+                           previous_display_src.size() == px * 3;
+    // display(x, y) ~ previous(x - dx, y - dy): the memory was in the previous pass's
+    // coordinates, so it moves by the same shift, and what shifts off the frame is gone.
+    int dx = 0, dy = 0;
+    if (have_prev) {
+        EstimateScroll(display_pyramid, previous_pyramid, &dx, &dy);
+        if (dx || dy) {
+            memory_src_scratch.resize(px * 3);
+            memory_delta_scratch.resize(px * 3);
+            memory_valid_scratch.assign(px, 0);
+            for (int y = 0; y < h; y++) {
+                const int sy = y - dy;
+                if (sy < 0 || sy >= h)
+                    continue;
+                const int x0 = std::max(0, dx), x1 = std::min(w, w + dx);
+                if (x1 <= x0)
+                    continue;
+                const size_t to = static_cast<size_t>(y) * w + x0;
+                const size_t from = static_cast<size_t>(sy) * w + (x0 - dx);
+                const size_t n = static_cast<size_t>(x1 - x0);
+                std::memcpy(memory_src_scratch.data() + to * 3, memory_src.data() + from * 3, n * 3);
+                std::memcpy(memory_delta_scratch.data() + to * 3, memory_delta.data() + from * 3,
+                            n * 3 * sizeof(int16_t));
+                std::memcpy(memory_valid_scratch.data() + to, memory_valid.data() + from, n);
+            }
+            memory_src.swap(memory_src_scratch);
+            memory_delta.swap(memory_delta_scratch);
+            memory_valid.swap(memory_valid_scratch);
+        }
+    }
+    const uint8_t* const now = display_src.data();
+    const int16_t* const delta = display_delta.data();
+    const bool have_age = live && age.size() == px;
+    for (size_t i = 0; i < px; i++) {
+        bool take = !memory_valid[i];
+        if (!take && have_age && age[i] >= kMemoryStillFrames) {
+            const uint8_t* a = now + i * 3;
+            const uint8_t* b = live + i * 3;
+            take = std::abs(a[0] - b[0]) <= kHoldLevels && std::abs(a[1] - b[1]) <= kHoldLevels &&
+                   std::abs(a[2] - b[2]) <= kHoldLevels;
+        }
+        if (take) {
+            std::memcpy(memory_src.data() + i * 3, now + i * 3, 3);
+            memory_delta[3 * i] = delta[3 * i];
+            memory_delta[3 * i + 1] = delta[3 * i + 1];
+            memory_delta[3 * i + 2] = delta[3 * i + 2];
+            memory_valid[i] = 1;
+        }
+    }
+}
+
 Filter::Filter() : impl_(std::make_shared<Impl>()) {
     AcquireModel();
     const std::shared_ptr<Impl>& im = impl_;
@@ -1373,6 +1507,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
 
     bool wrote_result = false;
     bool notify = false;
+    bool landed = false;  // a new pass reached the screen this frame
     {
         std::lock_guard<std::mutex> lock(im.mutex);
 
@@ -1433,6 +1568,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 im.display_delta.resize(im.display_src.size());
                 for (size_t i = 0; i < im.display_src.size(); i++)
                     im.display_delta[i] = static_cast<int16_t>(im.display[i] - im.display_src[i]);
+                landed = true;
             }
         }
 
@@ -1477,12 +1613,34 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             }
             const uint8_t* const live = im.live.data();
 
+            // How long each pixel has held still, for the correction memory.
+            if (im.age.size() != px || im.live_previous.size() != px * 3) {
+                im.age.assign(px, 0);
+                im.live_previous.assign(live, live + px * 3);
+            } else {
+                const uint8_t* lp = im.live_previous.data();
+                for (size_t i = 0; i < px; i++) {
+                    const uint8_t* a = live + 3 * i;
+                    const uint8_t* b = lp + 3 * i;
+                    const bool still = std::abs(a[0] - b[0]) <= kHoldLevels &&
+                                       std::abs(a[1] - b[1]) <= kHoldLevels &&
+                                       std::abs(a[2] - b[2]) <= kHoldLevels;
+                    im.age[i] = still ? static_cast<uint8_t>(std::min(255, im.age[i] + 1)) : 0;
+                }
+                std::memcpy(im.live_previous.data(), live, px * 3);
+            }
+            if (landed)
+                im.UpdateMemory(live);
+
             // How far each pixel has moved since the pass was given the frame, if the pass
             // is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
             // when they are the same: the largest step of the three channels, or all of it
             // where a shift takes the pixel off the pass's edge.
-            const auto measure = [&](const uint8_t* given, const Hypothesis& h,
-                                     uint8_t* motion) {
+            //
+            // `valid`, when given, says which of `given`'s pixels hold anything (the
+            // correction memory's); a pixel reading one that does not has moved all of it.
+            const auto measure = [&](const uint8_t* given, const uint8_t* valid,
+                                     const Hypothesis& h, uint8_t* motion) {
                 for (int y = 0; y < height; y++) {
                     const int ay = y - h.ay, by = y - h.by;
                     const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
@@ -1491,7 +1649,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                         const int ax = x - h.ax, bx = x - h.bx;
                         int m = 255;
                         if (ay >= 0 && ay < height && ax >= 0 && ax < width && by >= 0 &&
-                            by < height && bx >= 0 && bx < width) {
+                            by < height && bx >= 0 && bx < width &&
+                            (!valid || (valid[static_cast<size_t>(ay) * width + ax] &&
+                                        valid[static_cast<size_t>(by) * width + bx]))) {
                             const uint8_t* a = given + (static_cast<size_t>(ay) * width + ax) * 3;
                             const uint8_t* b = given + (static_cast<size_t>(by) * width + bx) * 3;
                             m = 0;
@@ -1519,12 +1679,18 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 al->h[0] = Hypothesis();
                 std::vector<uint8_t>& still = al->motion[0];
                 still.resize(px);
-                measure(given, al->h[0], still.data());
+                measure(given, nullptr, al->h[0], still.data());
+                // Whether anything is worth lining up at all: any motion counts here.
                 size_t count = 0;
                 for (size_t i = 0; i < px; i++)
                     count += still[i] > kHoldLevels;
                 if (count * 100 <= px * kScenePercentHold)
                     return count;
+                // What the scene is weighed by: the mild residue (kSceneMildLevels).
+                const auto mild = [&](uint8_t m) { return m > kHoldLevels && m <= kSceneMildLevels; };
+                count = 0;
+                for (size_t i = 0; i < px; i++)
+                    count += mild(still[i]);
                 if (!have_live_pyramid) {
                     BuildPyramid(live, width, height, PyramidLevels(width, height),
                                  &im.live_pyramid);
@@ -1540,12 +1706,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 al->count = 3;
                 for (int k = 1; k < al->count; k++) {
                     al->motion[k].resize(px);
-                    measure(given, al->h[k], al->motion[k].data());
+                    measure(given, nullptr, al->h[k], al->motion[k].data());
                 }
                 count = 0;
                 for (size_t i = 0; i < px; i++)
-                    count += std::min({ al->motion[0][i], al->motion[1][i], al->motion[2][i] }) >
-                             kHoldLevels;
+                    count += mild(std::min({ al->motion[0][i], al->motion[1][i], al->motion[2][i] }));
                 return count;
             };
             Alignment& now_al = im.alignment[0];
@@ -1587,10 +1752,28 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // much of what is on screen is the older of the two, made where things stood a
             // pass earlier still; laid down unweighed, it leaves what it corrected behind
             // as a trail.
+            // And the correction memory (Impl::memory_*), kept in the coordinates of the pass
+            // on screen, so lined up the same ways it is; with its own motion, since it
+            // remembers what the picture was when each correction was made.
+            Alignment& mem_al = im.memory_alignment;
+            mem_al.count = 0;
+            const bool have_memory = scene_weight > 0 && im.memory_width == width &&
+                                     im.memory_height == height && im.memory_valid.size() == px &&
+                                     im.memory_src.size() == px * 3 &&
+                                     im.memory_delta.size() == px * 3;
             if (scene_weight > 0) {
                 if (have_previous)
                     track(im.previous_display_src.data(), im.previous_pyramid, &was_al);
-                for (Alignment* al : { &now_al, &was_al })
+                if (have_memory) {
+                    mem_al.count = now_al.count;
+                    for (int k = 0; k < now_al.count; k++) {
+                        mem_al.h[k] = now_al.h[k];
+                        mem_al.motion[k].resize(px);
+                        measure(im.memory_src.data(), im.memory_valid.data(), mem_al.h[k],
+                                mem_al.motion[k].data());
+                    }
+                }
+                for (Alignment* al : { &now_al, &was_al, &mem_al })
                     for (int k = 0; k < al->count; k++)
                         Dilate(&al->motion[k], width, height, kMotionRadius, &im.dilate);
             }
@@ -1619,6 +1802,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             };
             const Lookup now_l = lookup(now_al, scene_weight > 0);
             const Lookup was_l = lookup(was_al, scene_weight > 0 && have_previous);
+            const Lookup mem_l = lookup(mem_al, have_memory);
             const auto choose = [&weight](const Lookup& l, size_t i, size_t* a, size_t* b) {
                 if (l.count == 0)
                     return 0;
@@ -1638,6 +1822,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // Shifts rather than divisions below: at a full weight of 256 they are exact, so
             // a still picture still gets the pass's own output.
             const int16_t* const now_delta = im.display_delta.data();
+            const int16_t* const mem_delta = have_memory ? im.memory_delta.data() : nullptr;
             const int16_t* const was_cast = have_previous ? im.previous_cast.data() : nullptr;
             const int16_t* const was_delta = have_previous ? im.previous_delta.data() : nullptr;
             for (int y = 0; y < height; y++) {
@@ -1647,12 +1832,24 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 for (int x = 0; x < width; x++, l += 3) {
                     const size_t i = row + x;
                     const int16_t* const now_cast = cast + CastIndex(l[0], l[1], l[2]) * 3;
-                    size_t now_a = 0, now_b = 0, was_a = 0, was_b = 0;
+                    size_t now_a = 0, now_b = 0, was_a = 0, was_b = 0, mem_a = 0, mem_b = 0;
                     const int w = choose(now_l, i, &now_a, &now_b);
                     const int was_w = choose(was_l, i, &was_a, &was_b);
+                    // The memory only matters where the pass on screen (or the one
+                    // before, while crossing) does not fit the live picture itself.
+                    const int mem_w = (w < 256 || (crossing && was_w < 256))
+                                          ? choose(mem_l, i, &mem_a, &mem_b)
+                                          : 0;
                     uint32_t p = 0;
                     for (int c = 0; c < 3; c++) {
+                        // The cast for the colour now there, then what is remembered of the
+                        // background here as far as the live picture still matches it,
+                        // then the pass's own correction as far as it does.
                         int delta = now_cast[c];
+                        const int remembered =
+                            mem_w > 0 ? (mem_delta[3 * mem_a + c] + mem_delta[3 * mem_b + c]) >> 1 : 0;
+                        if (mem_w > 0)
+                            delta += (remembered - delta) * mem_w >> 8;
                         if (w > 0)
                             delta += (((now_delta[3 * now_a + c] + now_delta[3 * now_b + c]) >> 1) -
                                       delta) *
@@ -1664,6 +1861,8 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                             int was = 0;
                             if (have_previous) {
                                 was = was_cast[(now_cast - cast) + c];
+                                if (mem_w > 0)
+                                    was += (remembered - was) * mem_w >> 8;
                                 if (was_w > 0)
                                     was += (((was_delta[3 * was_a + c] +
                                               was_delta[3 * was_b + c]) >>
