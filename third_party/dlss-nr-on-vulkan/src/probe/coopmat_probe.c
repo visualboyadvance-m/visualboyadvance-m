@@ -17,13 +17,64 @@
 #include <windows.h>
 #endif
 
+/*
+ * The probe prints what three newer extensions add to the component-type table, but
+ * it must build against whatever vulkan_core.h a distribution ships (Ubuntu 24.04 has
+ * 1.3.275). Where the header predates an extension, its enum values, struct and
+ * extension name are given here as the registry defines them; a header that has
+ * them defines the VK_<ext> macro and its definitions are used instead. The values are
+ * the registry's, so the device's answer is read correctly either way.
+ */
+#ifndef VK_KHR_shader_bfloat16
+#define VK_KHR_SHADER_BFLOAT16_EXTENSION_NAME "VK_KHR_shader_bfloat16"
+#define VK_COMPONENT_TYPE_BFLOAT16_KHR ((VkComponentTypeKHR)1000141000)
+#define VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_BFLOAT16_FEATURES_KHR ((VkStructureType)1000141000)
+typedef struct VkPhysicalDeviceShaderBfloat16FeaturesKHR {
+	VkStructureType sType;
+	void *pNext;
+	VkBool32 shaderBFloat16Type;
+	VkBool32 shaderBFloat16DotProduct;
+	VkBool32 shaderBFloat16CooperativeMatrix;
+} VkPhysicalDeviceShaderBfloat16FeaturesKHR;
+#endif
+
+#ifndef VK_EXT_shader_float8
+#define VK_COMPONENT_TYPE_FLOAT8_E4M3_EXT ((VkComponentTypeKHR)1000491002)
+#define VK_COMPONENT_TYPE_FLOAT8_E5M2_EXT ((VkComponentTypeKHR)1000491003)
+#endif
+
+#ifndef VK_NV_cooperative_matrix2
+#define VK_NV_COOPERATIVE_MATRIX_2_EXTENSION_NAME "VK_NV_cooperative_matrix2"
+#define VK_COMPONENT_TYPE_SINT8_PACKED_NV ((VkComponentTypeKHR)1000491000)
+#define VK_COMPONENT_TYPE_UINT8_PACKED_NV ((VkComponentTypeKHR)1000491001)
+#define VK_STRUCTURE_TYPE_COOPERATIVE_MATRIX_FLEXIBLE_DIMENSIONS_PROPERTIES_NV ((VkStructureType)1000593001)
+typedef struct VkCooperativeMatrixFlexibleDimensionsPropertiesNV {
+	VkStructureType sType;
+	void *pNext;
+	uint32_t MGranularity;
+	uint32_t NGranularity;
+	uint32_t KGranularity;
+	VkComponentTypeKHR AType;
+	VkComponentTypeKHR BType;
+	VkComponentTypeKHR CType;
+	VkComponentTypeKHR ResultType;
+	VkBool32 saturatingAccumulation;
+	VkScopeKHR scope;
+	uint32_t workgroupInvocations;
+} VkCooperativeMatrixFlexibleDimensionsPropertiesNV;
+typedef VkResult (VKAPI_PTR *PFN_vkGetPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV)(
+	VkPhysicalDevice physicalDevice, uint32_t *pPropertyCount,
+	VkCooperativeMatrixFlexibleDimensionsPropertiesNV *pProperties);
+#endif
+
 /* Rotating buffers: several ctype() results are live in one printf call. */
 static const char *ctype(VkComponentTypeKHR t)
 {
 	static char pool[8][24];
 	static int slot;
 
-	switch (t) {
+	/* On an int: the fallback values above are not enumerators of an older header's type. */
+	switch ((int)t) {
 	case VK_COMPONENT_TYPE_FLOAT16_KHR:  return "fp16";
 	case VK_COMPONENT_TYPE_FLOAT32_KHR:  return "fp32";
 	case VK_COMPONENT_TYPE_FLOAT64_KHR:  return "fp64";
