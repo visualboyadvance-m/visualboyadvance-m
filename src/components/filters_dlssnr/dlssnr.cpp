@@ -1375,7 +1375,7 @@ void Filter::Impl::ComposeStage() {
 // lives in the coordinates of the pass before, and moves with the scroll between the two
 // passes first; `live` is the frame on screen now, screen coordinates, which the pass's
 // are too once nothing has moved for that long.
-void Filter::Impl::UpdateMemory(const uint8_t* live) {
+void Filter::Impl::UpdateMemory(const uint8_t* liveb) {
     const int w = display_width;
     const int h = display_height;
     const size_t px = static_cast<size_t>(w) * h;
@@ -1423,12 +1423,12 @@ void Filter::Impl::UpdateMemory(const uint8_t* live) {
     }
     const uint8_t* const now = display_src.data();
     const int16_t* const delta = display_delta.data();
-    const bool have_age = live && age.size() == px;
+    const bool have_age = liveb && age.size() == px;
     for (size_t i = 0; i < px; i++) {
         bool take = !memory_valid[i];
         if (!take && have_age && age[i] >= kMemoryStillFrames) {
             const uint8_t* a = now + i * 3;
-            const uint8_t* b = live + i * 3;
+            const uint8_t* b = liveb + i * 3;
             take = std::abs(a[0] - b[0]) <= kHoldLevels && std::abs(a[1] - b[1]) <= kHoldLevels &&
                    std::abs(a[2] - b[2]) <= kHoldLevels;
         }
