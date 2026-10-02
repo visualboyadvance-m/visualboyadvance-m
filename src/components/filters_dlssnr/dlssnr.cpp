@@ -907,7 +907,7 @@ struct Filter::Impl {
     // Brings the correction memory up to date with the pass that just reached the
     // screen (`display_*`), the one before it still in `previous_*`, given the live frame
     // (RGB8, the frame's size) and `age`. Caller holds `mutex`.
-    void UpdateMemory(const uint8_t* live);
+    void UpdateMemory(const uint8_t* liveb);
 };
 
 void Filter::Impl::Fail(const std::string& why) {
