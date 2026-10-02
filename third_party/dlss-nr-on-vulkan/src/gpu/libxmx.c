@@ -159,6 +159,7 @@ static struct {
 	int pin32;                /* pipelines require 32-lane subgroups (build_pipeline_spec) */
 	int half_by_cast;         /* half_round's spelling, constant 1 on every pipeline (xmx_init) */
 	int preserve16;           /* float16 subnormals kept: DenormPreserve 16 on every module (xmx_init) */
+	int preserve64;           /* DenormPreserve 64 goes with it, which 32_BIT_ONLY requires (xmx_init) */
 	/* XMX_PIPELINE_STATS=FILE: what the driver's compiler made of each pipeline, appended to
 	 * FILE through VK_KHR_pipeline_executable_properties, where the device has it */
 	FILE *stats;
@@ -469,11 +470,18 @@ static volatile int g_cancel;
 void xmx_cancel(int on) { g_cancel = on ? 1 : 0; }
 int xmx_cancelled(void) { return g_cancel; }
 
-/* `words` with DenormPreserve declared for 16-bit floats on every entry point, or NULL when
- * there is nothing to add: a module that already declares a 16-bit denorm mode keeps its own
- * (src/bench/denorm_mode.py's copies do), and SPIR-V before 1.4 would need
- * SPV_KHR_float_controls, which this does not add. The caller frees the result. */
-static uint32_t *declare_preserve16(const uint32_t *words, size_t n, size_t *out_n)
+/* `words` with DenormPreserve declared on every entry point for each width in `widths`, or
+ * NULL when there is nothing to add: a module that already declares a 16-bit denorm mode keeps
+ * its own (src/bench/denorm_mode.py's copies do), and SPIR-V before 1.4 would need
+ * SPV_KHR_float_controls, which this does not add. The caller frees the result.
+ *
+ * `widths` is 16 alone where the driver reports its denorm behaviour independent per width,
+ * and 16 and 64 together under VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY, which
+ * requires the same mode on every width other than 32 and would make a 16-only module invalid
+ * (VUID-RuntimeSpirv-denormBehaviorIndependence-06289). Declaring 64 needs no Float64
+ * capability, since no 64-bit type appears; it is the execution mode's literal operand. */
+static uint32_t *declare_preserve16(const uint32_t *words, size_t n, size_t *out_n,
+				    const uint32_t *widths, size_t n_widths)
 {
 	enum { CAPABILITY = 17, ENTRY_POINT = 15, EXECUTION_MODE = 16, EXECUTION_MODE_ID = 331,
 	       DENORM_PRESERVE = 4459, DENORM_FLUSH = 4460, CAP_DENORM_PRESERVE = 4464 };
@@ -489,13 +497,16 @@ static uint32_t *declare_preserve16(const uint32_t *words, size_t n, size_t *out
 		}
 		if (op == ENTRY_POINT) entries++;
 		if (op == ENTRY_POINT || op == EXECUTION_MODE || op == EXECUTION_MODE_ID) mode_end = i + count;
-		if (op == EXECUTION_MODE && count >= 4 && words[i + 3] == 16
+		/* A width this would declare already has a mode of its own: leave the module
+		 * alone rather than contradict it (src/bench/denorm_mode.py's copies land here). */
+		if (op == EXECUTION_MODE && count >= 4
 		    && (words[i + 2] == DENORM_PRESERVE || words[i + 2] == DENORM_FLUSH))
-			return NULL;
+			for (size_t w = 0; w < n_widths; w++)
+				if (words[i + 3] == widths[w]) return NULL;
 		i += count;
 	}
 	if (!cap_end || !mode_end || !entries || cap_end > mode_end) return NULL;
-	size_t m = n + (has_cap ? 0 : 2) + 4 * entries;
+	size_t m = n + (has_cap ? 0 : 2) + 4 * entries * n_widths;
 	uint32_t *out = malloc(m * sizeof *out);
 	if (!out) return NULL;
 	size_t o = 0;
@@ -505,8 +516,10 @@ static uint32_t *declare_preserve16(const uint32_t *words, size_t n, size_t *out
 	for (size_t i = 5; i < n;) {
 		uint32_t count = words[i] >> 16;
 		if ((words[i] & 0xffffu) == ENTRY_POINT) {
-			out[o++] = (4u << 16) | EXECUTION_MODE; out[o++] = words[i + 2];
-			out[o++] = DENORM_PRESERVE; out[o++] = 16;
+			for (size_t w = 0; w < n_widths; w++) {
+				out[o++] = (4u << 16) | EXECUTION_MODE; out[o++] = words[i + 2];
+				out[o++] = DENORM_PRESERVE; out[o++] = widths[w];
+			}
 		}
 		i += count;
 	}
@@ -550,7 +563,9 @@ static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, Vk
 	 * them, and with the mode declared the two compute the same graph bit for bit
 	 * (notes/phase71). The built shaders are not touched; the copy given to the driver is. */
 	size_t patched_n = 0;
-	uint32_t *patched = g.preserve16 ? declare_preserve16(code, len / 4, &patched_n) : NULL;
+	const uint32_t widths[2] = { 16, 64 };
+	uint32_t *patched = g.preserve16
+		? declare_preserve16(code, len / 4, &patched_n, widths, g.preserve64 ? 2 : 1) : NULL;
 	VkShaderModuleCreateInfo smi = { .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 					 .codeSize = patched ? patched_n * 4 : len,
 					 .pCode = patched ? patched : code };
@@ -899,26 +914,45 @@ static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 			     half, g.half_by_cast ? "cast" : "pack");
 	}
 	g.preserve16 = 0;
+	g.preserve64 = 0;
 	if (api_version >= VK_API_VERSION_1_2) {
 		VkPhysicalDeviceFloatControlsProperties controls = {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FLOAT_CONTROLS_PROPERTIES };
 		VkPhysicalDeviceProperties2 query = {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, .pNext = &controls };
 		vkGetPhysicalDeviceProperties2(pd, &query);
-		/* Only the 16-bit mode is declared, which a driver must allow to differ from the
-		 * other widths' (VUID-RuntimeSpirv-denormBehaviorIndependence-06289 and -06290).
-		 * ANV and Intel's Windows driver both report ALL; MoltenVK reports NONE. */
-		g.preserve16 = controls.shaderDenormPreserveFloat16 == VK_TRUE
-			&& controls.denormBehaviorIndependence == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL;
+		/* What a module may declare follows denormBehaviorIndependence
+		 * (VUID-RuntimeSpirv-denormBehaviorIndependence-06289 and -06290):
+		 *
+		 *   ALL          every width is its own; declare 16 alone. ANV and Intel's
+		 *                Windows driver report this.
+		 *   32_BIT_ONLY  32 is its own and the rest share one mode, so 16 obliges 64 to
+		 *                match. AMD's proprietary driver reports this, with preserve
+		 *                available on both widths; declare the pair.
+		 *   NONE         one mode for every width, so 16 would drag 32 in with it. That
+		 *                changes the float32 arithmetic for the sake of the halves, so
+		 *                leave the driver to it. MoltenVK reports this.
+		 *
+		 * Declaring 64 costs an execution mode per entry point and nothing else: no
+		 * 64-bit type appears in these modules, so no Float64 capability comes with it. */
+		const int ind = (int)controls.denormBehaviorIndependence;
+		if (controls.shaderDenormPreserveFloat16 == VK_TRUE) {
+			if (ind == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_ALL)
+				g.preserve16 = 1;
+			else if (ind == VK_SHADER_FLOAT_CONTROLS_INDEPENDENCE_32_BIT_ONLY
+				 && controls.shaderDenormPreserveFloat64 == VK_TRUE)
+				g.preserve16 = g.preserve64 = 1;
+		}
 	}
 	const char *denorm = getenv("XMX_DENORM16");
-	if (denorm && !strcmp(denorm, "driver")) g.preserve16 = 0;
+	if (denorm && !strcmp(denorm, "driver")) g.preserve16 = g.preserve64 = 0;
 	else if (denorm && *denorm && strcmp(denorm, "preserve"))
 		fprintf(stderr, "libxmx: XMX_DENORM16=%s is neither preserve nor driver; keeping %s\n",
 			denorm, g.preserve16 ? "preserve" : "driver");
 	if (!g.preserve16 && !(denorm && !strcmp(denorm, "driver")))
-		fprintf(stderr, "libxmx: %s cannot keep float16 subnormals by declaration; its own default "
-			"decides, and the picture may differ from other drivers'\n", g.name);
+		fprintf(stderr, "libxmx: %s reports one denorm mode for every float width, so float16 "
+			"subnormals cannot be declared kept without also changing float32; "
+			"its own default decides, and the picture may differ from other drivers'\n", g.name);
 }
 
 static int open_adopted(void)

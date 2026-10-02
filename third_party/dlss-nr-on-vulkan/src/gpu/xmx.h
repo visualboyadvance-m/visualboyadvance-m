@@ -40,9 +40,12 @@ int xmx_staging_mode(void);
  * copies), 0 on a shared-memory device. */
 int xmx_discrete(void);
 /* Whether the GEMMs keep float16 subnormals: libxmx declares `DenormPreserve 16` on every
- * SPIR-V module where the driver reports `shaderDenormPreserveFloat16` (Mesa flushes them by
- * default, Intel's Windows driver keeps them, and with the mode declared the two compute one
- * graph bit for bit, notes/phase71; `XMX_DENORM16=driver` leaves it to the driver). Metal
+ * SPIR-V module where the driver reports `shaderDenormPreserveFloat16` and allows that width a
+ * mode of its own (Mesa flushes them by default, Intel's Windows driver keeps them, and with
+ * the mode declared the two compute one graph bit for bit, notes/phase71; `XMX_DENORM16=driver`
+ * leaves it to the driver). Where a driver ties the non-32-bit widths to one mode, as AMD's
+ * does, `DenormPreserve 64` is declared alongside; where one mode covers every width, as on
+ * MoltenVK, nothing is declared, since float16 would drag float32 along with it. Metal
  * and Direct3D 12 have no mode to declare: libmetalmx and libd3dmx answer what their half
  * arithmetic does, which `test_denorm.py` checks on each. */
 int xmx_preserve16(void);
