@@ -11001,6 +11001,7 @@ static PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = nullptr;
     F(vkMapMemory) \
     F(vkQueuePresentKHR) \
     F(vkQueueSubmit) \
+    F(vkQueueWaitIdle) \
     F(vkResetCommandBuffer) \
     F(vkResetFences) \
     F(vkSetHdrMetadataEXT) \
@@ -11124,11 +11125,25 @@ VKDrawingPanel::~VKDrawingPanel()
     // processor, then take the device back (this closes the model) before
     // anything below is destroyed.
     ReleaseDlssNr();
-    WithdrawVulkanFromDlssNr();
+    // True when the model is still on our device and could not be waited for.
+    // Everything below still runs: Vulkan asks for external synchronisation
+    // per object, so our own pipelines, pools and swapchain can go while the
+    // model builds pipelines of its own. Only the device and the instance stay
+    // behind, for DeferredVulkanTeardown::Finish() to destroy.
+    const bool device_handed_over = WithdrawVulkanFromDlssNr();
 
     if (device_ != VK_NULL_HANDLE) {
-        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
-        vkDeviceWaitIdle(device_);
+        std::lock_guard<std::mutex> queue_lock(*queue_mutex_);
+        if (device_handed_over) {
+            // vkDeviceWaitIdle synchronises every queue on the device, the
+            // model's included, and the model is using it. Wait on ours alone;
+            // the lock is what keeps that honest where the two share a queue.
+            if (graphics_queue_ != VK_NULL_HANDLE) vkQueueWaitIdle(graphics_queue_);
+            if (present_queue_ != VK_NULL_HANDLE && present_queue_ != graphics_queue_)
+                vkQueueWaitIdle(present_queue_);
+        } else {
+            vkDeviceWaitIdle(device_);
+        }
     }
 
     DestroyTexture();
@@ -11155,9 +11170,15 @@ VKDrawingPanel::~VKDrawingPanel()
     if (desc_set_layout_) vkDestroyDescriptorSetLayout (device_, desc_set_layout_, nullptr);
     if (render_pass_)     vkDestroyRenderPass          (device_, render_pass_,     nullptr);
  
-    if (device_)   vkDestroyDevice      (device_,            nullptr);
+    // The surface goes either way -- it is the window's, not the model's, and
+    // it must go before the instance that made it.
     if (surface_)  vkDestroySurfaceKHR  (instance_, surface_, nullptr);
-    if (instance_) vkDestroyInstance    (instance_,           nullptr);
+    if (!device_handed_over) {
+        if (device_)   vkDestroyDevice   (device_,   nullptr);
+        if (instance_) vkDestroyInstance (instance_, nullptr);
+    }
+    device_ = VK_NULL_HANDLE;
+    instance_ = VK_NULL_HANDLE;
 
 #if defined(__WXGTK__) && !defined(NO_WAYLAND)
     // Tear down the Wayland subsurface after the Vulkan surface that used it.
@@ -11866,12 +11887,12 @@ bool VKDrawingPanel::CreateLogicalDevice()
 // ─── DLSS NR sharing ─────────────────────────────────────────────────────────
 void VKDrawingPanel::LockQueueThunk(void* self)
 {
-    static_cast<VKDrawingPanel*>(self)->queue_mutex_.lock();
+    static_cast<std::mutex*>(self)->lock();
 }
 
 void VKDrawingPanel::UnlockQueueThunk(void* self)
 {
-    static_cast<VKDrawingPanel*>(self)->queue_mutex_.unlock();
+    static_cast<std::mutex*>(self)->unlock();
 }
 
 void VKDrawingPanel::ShareVulkanWithDlssNr()
@@ -11892,7 +11913,7 @@ void VKDrawingPanel::ShareVulkanWithDlssNr()
     share.get_instance_proc_addr = reinterpret_cast<void*>(+vkGetInstanceProcAddr);
     share.lock                   = &VKDrawingPanel::LockQueueThunk;
     share.unlock                 = &VKDrawingPanel::UnlockQueueThunk;
-    share.lock_context           = this;
+    share.lock_context           = queue_mutex_.get();
     share.owner                  = this;
     dlssnr::ShareVulkan(share);
     dlssnr_shared_ = true;
@@ -11900,13 +11921,53 @@ void VKDrawingPanel::ShareVulkanWithDlssNr()
 #endif
 }
 
-void VKDrawingPanel::WithdrawVulkanFromDlssNr()
+namespace {
+
+#ifdef VBAM_ENABLE_DLSS_NR
+// What is left of a lent device once the panel that lent it has gone: the two
+// handles nobody else can destroy, and a reference to the lock the model is
+// still taking. dlssnr calls Finish() from a thread of its own once the model
+// has stopped and been closed.
+struct DeferredVulkanTeardown {
+    VkDevice device = VK_NULL_HANDLE;
+    VkInstance instance = VK_NULL_HANDLE;
+    std::shared_ptr<std::mutex> queue_mutex;
+
+    static void Finish(void* context) {
+        std::unique_ptr<DeferredVulkanTeardown> self(
+            static_cast<DeferredVulkanTeardown*>(context));
+        if (self->device)   vkDestroyDevice  (self->device,   nullptr);
+        if (self->instance) vkDestroyInstance(self->instance, nullptr);
+        // `queue_mutex` goes with it: the model has stopped taking it.
+    }
+};
+#endif
+
+}  // namespace
+
+bool VKDrawingPanel::WithdrawVulkanFromDlssNr()
 {
 #ifdef VBAM_ENABLE_DLSS_NR
     if (!dlssnr_shared_)
-        return;
-    dlssnr::WithdrawVulkanShare(this);
+        return false;
+    // Hand the device over rather than stand still for a cold model open: on
+    // this hardware two of the attention pipelines take about a minute each to
+    // compile, nothing can interrupt the one the driver is inside, and the
+    // window being closed would stay on screen for all of it.
+    auto pending = std::make_unique<DeferredVulkanTeardown>();
+    pending->device = device_;
+    pending->instance = instance_;
+    pending->queue_mutex = queue_mutex_;
+    const bool deferred = dlssnr::WithdrawVulkanShareDeferred(
+        this, &DeferredVulkanTeardown::Finish, pending.get());
     dlssnr_shared_ = false;
+    if (deferred) {
+        pending.release();   // Finish() owns it now
+        wxLogDebug(wxT("DLSS NR still on the device; its teardown follows the model"));
+    }
+    return deferred;
+#else
+    return false;
 #endif
 }
  
@@ -12158,7 +12219,7 @@ void VKDrawingPanel::DestroySwapchain()
 bool VKDrawingPanel::RecreateSwapchain()
 {
     {
-        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        std::lock_guard<std::mutex> queue_lock(*queue_mutex_);
         vkDeviceWaitIdle(device_);
     }
     DestroySwapchain();
@@ -12751,7 +12812,7 @@ bool VKDrawingPanel::UpdateOverlayTexture(VkCommandBuffer cmd)
         // overlay descriptor set, and both are about to be replaced. Resizes are
         // rare (panel geometry changes), so idling here costs nothing.
         if (osc_image_ != VK_NULL_HANDLE) {
-            std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+            std::lock_guard<std::mutex> queue_lock(*queue_mutex_);
             vkDeviceWaitIdle(device_);
         }
         DestroyOverlayTexture();
@@ -13372,7 +13433,7 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
     submit.pSignalSemaphores    = &render_finished_sem_[current_frame_];
  
     {
-        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        std::lock_guard<std::mutex> queue_lock(*queue_mutex_);
         vkQueueSubmit(graphics_queue_, 1, &submit, in_flight_fence_[current_frame_]);
     }
  
@@ -13386,7 +13447,7 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
     present_info.pImageIndices      = &image_index;
  
     {
-        std::lock_guard<std::mutex> queue_lock(queue_mutex_);
+        std::lock_guard<std::mutex> queue_lock(*queue_mutex_);
         res = vkQueuePresentKHR(present_queue_, &present_info);
     }
     if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR)

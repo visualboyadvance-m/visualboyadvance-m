@@ -569,6 +569,7 @@ protected:
 #define VK_NO_PROTOTYPES
 #endif
 #include <vulkan/vulkan.h>
+#include <memory>
 #include <mutex>
 
 #if defined(__WXMSW__)
@@ -641,7 +642,9 @@ private:
     // device goes. queue_mutex_ brackets every submit, present and idle wait
     // on our queues; libxmx takes it around its own submits.
     void ShareVulkanWithDlssNr();
-    void WithdrawVulkanFromDlssNr();
+    // True when the model was still on the device and its teardown was deferred:
+    // the caller must not destroy the device or the instance.
+    bool WithdrawVulkanFromDlssNr();
     static void LockQueueThunk(void* self);
     static void UnlockQueueThunk(void* self);
  
@@ -689,7 +692,13 @@ private:
     uint32_t                 present_family_   = UINT32_MAX;
 
     uint32_t                 instance_api_version_ = 0;         // what CreateInstance asked for
-    std::mutex               queue_mutex_;                       // see the DLSS NR block above
+    // Heap-allocated and shared rather than held by value, because the DLSS NR
+    // model keeps the bare pointer it was lent and goes on taking it until it
+    // stops -- which, for a model open abandoned at the window's close, is
+    // after this panel is gone. WithdrawVulkanFromDlssNr() hands a reference to
+    // whoever finishes the teardown, so the lock outlives the panel exactly as
+    // long as the model needs it.
+    std::shared_ptr<std::mutex> queue_mutex_{std::make_shared<std::mutex>()};
     VkQueue                  compute_queue_    = VK_NULL_HANDLE; // lent to libxmx
     uint32_t                 compute_family_   = UINT32_MAX;
     uint32_t                 compute_queue_index_ = 0;

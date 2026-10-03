@@ -215,6 +215,63 @@ void WithdrawVulkanShare(const void* owner) {
     s.share = VulkanShare();
 }
 
+bool WithdrawVulkanShareDeferred(const void* owner, void (*finish)(void*), void* context,
+                                 unsigned grace_ms) {
+    SharedModel& s = Shared();
+    {
+        std::lock_guard<std::mutex> share_lock(s.share_mutex);
+        if (!s.has_share || s.share.owner != owner)
+            return false;
+    }
+    // As above: ask first, so an open in progress stops after the pipeline it
+    // is already building rather than after all of them.
+    nr_frame_cancel_open(1);
+    std::unique_lock<std::mutex> lock(s.mutex, std::defer_lock);
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(grace_ms);
+    while (!lock.try_lock()) {
+        if (std::chrono::steady_clock::now() >= deadline)
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    if (lock.owns_lock()) {
+        // It let go in time, so there is nothing to defer and the caller keeps
+        // the teardown it already had.
+        nr_frame_cancel_open(0);
+        std::lock_guard<std::mutex> share_lock(s.share_mutex);
+        if (s.has_share && s.share.owner == owner) {
+            if (s.opened_shared)
+                CloseLocked(s);
+            s.has_share = false;
+            s.share_pending = false;
+            s.share = VulkanShare();
+        }
+        return false;
+    }
+    // Still inside a pipeline. Drop the share so nothing adopts the device
+    // again, and let a thread of its own do the waiting. `share` itself is
+    // left alone: the model holds the lock context it was given and goes on
+    // calling it until it stops, which is exactly what the caller is being
+    // told to keep alive until `finish`.
+    {
+        std::lock_guard<std::mutex> share_lock(s.share_mutex);
+        s.has_share = false;
+        s.share_pending = false;
+    }
+    std::thread([&s, finish, context] {
+        {
+            std::lock_guard<std::mutex> lock(s.mutex);
+            nr_frame_cancel_open(0);
+            if (s.opened_shared)
+                CloseLocked(s);
+            std::lock_guard<std::mutex> share_lock(s.share_mutex);
+            s.share = VulkanShare();
+        }
+        // The model is closed and off the device: everything it was lent can go.
+        finish(context);
+    }).detach();
+    return true;
+}
+
 bool UsingSharedVulkan() {
     // No lock: `mutex` is held for the length of a pass (and of a model open),
     // and callers ask this from the render path.

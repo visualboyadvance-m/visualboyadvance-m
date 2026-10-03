@@ -156,6 +156,28 @@ void ShareVulkan(const VulkanShare& share);
 // renderer that actually lent the device reaches it.
 void WithdrawVulkanShare(const void* owner);
 
+// WithdrawVulkanShare() without the wait, for a lender that would rather hand
+// the device over than stand still for it. A cold model open compiles every
+// pipeline and nothing can interrupt the one the driver is already inside, so
+// on this hardware the wait runs to tens of seconds and the window it is
+// closing stays on screen for all of them.
+//
+// Returns false when the model let go within `grace_ms` (or never had the
+// device): the share is gone, and the caller destroys the device itself as it
+// always did. Returns true when it did not: the share is dropped, the caller
+// must NOT destroy the device or the instance, and `finish(context)` is called
+// from a background thread once the model has stopped and been closed. Destroy
+// them there, and anything the share pointed at -- `lock_context` above
+// especially, which the model goes on calling until it stops.
+//
+// Objects of the caller's own may still be destroyed either way: Vulkan asks
+// for external synchronisation per object, not per device, so a renderer's
+// pipelines and pools can go while the model builds its own. A device-wide
+// wait cannot -- vkDeviceWaitIdle synchronises every queue, including the
+// model's -- so wait on the lender's own queues instead.
+bool WithdrawVulkanShareDeferred(const void* owner, void (*finish)(void*), void* context,
+                                 unsigned grace_ms = 50);
+
 // True while the open model runs on a lent device.
 bool UsingSharedVulkan();
 
