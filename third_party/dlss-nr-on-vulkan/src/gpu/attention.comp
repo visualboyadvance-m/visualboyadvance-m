@@ -126,7 +126,15 @@ void store(uint index, float value) {
 }
 
 /* Flag 0x80000: the ViT's normalisation and query scale (`vit_reciprocal`, VIT_ROOT). */
-void cosine_publish(uint row, uint local, bool scaled, FloatBuf scales) {
+/* `scales` arrives as a plain address rather than as a FloatBuf, because AMD's
+ * compiler takes about a minute over a buffer reference that crosses a call
+ * boundary. An empty function with a FloatBuf parameter, called once, compiles
+ * in 68.9 s on a Radeon iGPU; the same function taking the same address as a
+ * uint64_t -- a larger module -- compiles in 0.3 s. That one call was ~64 s of
+ * this shader's compile and, with attention_rows.spv, most of a cold model
+ * open. The reference is rebuilt here, which costs nothing. */
+void cosine_publish(uint row, uint local, bool scaled, uint64_t scales_address) {
+    FloatBuf scales = FloatBuf(scales_address);
     uint base = local * 32u;
     bool vit = (operation_flags() & 0x80000u) != 0u;
     float h[32];
@@ -377,7 +385,7 @@ void main() {
         uint count = min(32u * 32u, pc.m * 32u - base);
         gather_part(base, count, part);
         if (part < 2u) {
-            if (row < pc.m) cosine_publish(row, local, part == 0u, pc.qkv_scale);
+            if (row < pc.m) cosine_publish(row, local, part == 0u, uint64_t(pc.qkv_scale));
         } else {
             for (uint i = local; i < count; i += 32u) stage[i] = e4m3(stage[i]);
         }
@@ -387,7 +395,7 @@ void main() {
     } else if (kind == COSINE_PUBLISH) {
         uint base = gl_WorkGroupID.x * 32u * 32u;
         gather(base, min(32u * 32u, pc.m * 32u - base));
-        if (row < pc.m) cosine_publish(row, local, pc.k != 0u, pc.d);
+        if (row < pc.m) cosine_publish(row, local, pc.k != 0u, uint64_t(pc.d));
         scatter(base, min(32u * 32u, pc.m * 32u - base));
     } else if (kind == VIT_SOFTMAX) {
         if (row < pc.m) vit_softmax(row);
