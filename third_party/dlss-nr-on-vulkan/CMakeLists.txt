@@ -1098,6 +1098,17 @@ if(NOT MSVC)
 endif()
 nr_executable(nr_frame_rates)
 
+# The weights compiled into libnr_frame, back out as the file the Python graph reads
+# (`work/mlxw/dlssnr-logical.safetensors`): a checkout without `work/` has them nowhere else.
+# Not on Windows: the chunk table is data, which WINDOWS_EXPORT_ALL_SYMBOLS does not export.
+if(NR_EMBED_WEIGHTS AND NOT WIN32)
+  add_executable(dump_embedded_weights src/tools/dump_embedded_weights.c)
+  target_include_directories(dump_embedded_weights PRIVATE src/ref)
+  target_compile_options(dump_embedded_weights PRIVATE ${NR_WARN_FLAGS})
+  target_link_libraries(dump_embedded_weights PRIVATE nr_frame)
+  nr_executable(dump_embedded_weights)
+endif()
+
 add_executable(test_nr_frame src/ref/test_nr_frame.c)
 target_include_directories(test_nr_frame PRIVATE src/ref)
 target_compile_options(test_nr_frame PRIVATE ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})

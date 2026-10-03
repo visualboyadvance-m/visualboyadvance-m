@@ -148,6 +148,11 @@ void main() {
         Float4Buf unused = Float4Buf(uint64_t(pc.a));   /* silences a no-use warning on some compilers */
         FloatBuf image = FloatBuf(uint64_t(pc.a));
         bool wide_b = (ldb & 3u) == 0u && (uint(uint64_t(pc.b)) & 7u) == 0u;
+        /* A is fetched one term at a time on purpose. A pixel's channels are consecutive,
+         * so four K terms could come as one 8-byte load as the plain forms below take
+         * theirs; tried, through MoltenVK on an M3, and the window-gathered QKV GEMMs ran
+         * 1.4x slower (256x1536x512 0.46 -> 0.64 ms, 576x768x256 0.27 -> 0.38), same bytes
+         * (notes/improve-portable-precise.md). */
         for (uint k = 0; k < pc.k; k++) {
             ACC4 bv[RN];
             for (uint j = 0; j < RN; j++) {
@@ -288,9 +293,17 @@ void main() {
         if (y < top || x < left || y - top >= pc.image_h || x - left >= pc.image_w) return;
         uint at = (((y - top) / 2u) * (pc.image_w / 2u) + (x - left) / 2u) * BN + c;
         uint upper = (2u * pixel) * BN + c, lower = upper + 8u * BN;
+        /* No `precise` on this sum, and that is load-bearing. glslang propagates `precise`
+         * backwards at the object level: a precise read of `stage` makes every store into
+         * `stage` precise, and through them the accumulators and the K loop's own
+         * multiply-adds and index arithmetic (54 NoContraction decorations against 8).
+         * SPIRV-Cross then spells each one as an `[[clang::optnone]]` helper, and through
+         * MoltenVK this whole build ran at 337 GFLOP/s against 1290 without it — on every
+         * GEMM it took, pooled or not. The qualifier protected nothing here: a chain of
+         * adds has no multiply to contract. Same bits, measured (notes/improve-portable-precise.md). */
         vec4 pooled;
         for (uint e = 0; e < 4u; e++) {
-            precise float total = stage[upper + e] + stage[lower + e];
+            float total = stage[upper + e] + stage[lower + e];
             total += stage[upper + BN + e];
             total += stage[lower + BN + e];
             pooled[e] = e4m3(total * 0.25);

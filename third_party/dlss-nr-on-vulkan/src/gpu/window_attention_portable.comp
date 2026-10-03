@@ -52,12 +52,13 @@ shared float scores[8 * 64];
 shared float reciprocal[8];
 
 /* Same coupled half-pair transform as attention.comp and window_attention.comp, with the
- * FP32 bias addition before half rounding. */
-vec2 weights(uint base, uint bias_base, uint i) {
+ * FP32 bias addition before half rounding. The logits come in as values, not as indices
+ * into `scores`: read inside this function, the `precise` below would mark every store
+ * into `scores` — the QK^T loop with them — NoContraction (see probability()). */
+vec2 weights(float l0, float l1) {
     vec2 affine;
     for (uint j = 0u; j < 2u; j++) {
-        float logit = scores[base + i + j];
-        if (pc.flags != 0u) logit += pc.bias.v[bias_base + i + j];
+        float logit = j == 0u ? l0 : l1;
         precise float scaled = half_round(logit) * 0.044921875;
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
@@ -66,6 +67,18 @@ vec2 weights(uint base, uint bias_base, uint i) {
 }
 
 void sync() { memoryBarrierShared(); barrier(); }
+
+/* The weight scaled by its row's reciprocal, then published, as the row pass does it. A
+ * function on purpose: glslang propagates `precise` backwards at the object level, so
+ * `precise float product = scores[at] * reciprocal[..]` written in main marks every store
+ * into `scores` — the QK^T loop included — NoContraction, which SPIRV-Cross
+ * spells as `[[clang::optnone]]` helpers (23 decorations against 4). A parameter is a
+ * fresh object, so the qualifier stays on the one multiply it is for.
+ * notes/improve-portable-precise.md. */
+float probability(float weight, float reciprocal_norm) {
+    precise float product = weight * reciprocal_norm;
+    return e4m3(half_round(product));
+}
 
 void main() {
     uint batch = gl_WorkGroupID.y + gl_WorkGroupID.z * 65535u;
@@ -103,7 +116,12 @@ void main() {
      * vendor's pairs never straddling, since every pair starts on an even key */
     for (uint at = local * 2u; at < 8u * 64u; at += 64u) {
         uint rr = at / 64u, key = at % 64u;
-        vec2 w = weights(rr * 64u, head_bias + rr * 64u, key);
+        float l0 = scores[at], l1 = scores[at + 1u];
+        if (pc.flags != 0u) {
+            l0 += pc.bias.v[head_bias + at];
+            l1 += pc.bias.v[head_bias + at + 1u];
+        }
+        vec2 w = weights(l0, l1);
         scores[at] = w.x;                                  // exact: a half value
         scores[at + 1u] = w.y;
     }
@@ -118,10 +136,8 @@ void main() {
         reciprocal[local] = half_round(1.0 / half_round(total));
     }
     sync();
-    for (uint at = local; at < 8u * 64u; at += 32u) {
-        precise float product = scores[at] * reciprocal[at / 64u];
-        scores[at] = e4m3(half_round(product));
-    }
+    for (uint at = local; at < 8u * 64u; at += 32u)
+        scores[at] = probability(scores[at], reciprocal[at / 64u]);
     sync();
     /* PV as the plain portable GEMM computes it: acc[col] += p[row][key] * v[key][col]
      * over key = 0..63 in order, four consecutive columns a lane, two 16-column tiles. */

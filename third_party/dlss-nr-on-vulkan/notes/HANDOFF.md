@@ -9,6 +9,51 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
+## Latest: the portable path a third faster — one `precise`, spread by glslang (2026-10-03)
+
+On the M3 through MoltenVK, the path every device without cooperative matrix takes.
+`notes/improve-portable-precise.md`. **Heads unchanged** (`e80b25dbbadfb76d` at 320x320,
+`5eb7742929a13f98` at 1344x768, the same before and after), every fused-kernel test bit-exact.
+
+- **`frame_profile.py` had never worked on MoltenVK**: libxmx's 8192-query timestamp pool is
+  over Metal's 32 KB counter-buffer cap, MoltenVK "reverts to emulated behavior" and every
+  stamp reads zero. libxmx asks for 4096 on `VK_DRIVER_ID_MOLTENVK` now (`XMX_STAMPS=N` by
+  hand). The first portable profile: 320x320 **99.6 ms** of device time, 65 % GEMMs on the
+  16x32 build, 20 % the one-head window block.
+- **The 16x32 portable build ran at a third of its speed on every shape** — 337 GFLOP/s where
+  the same build without one line runs 1290 — and it is the build the window-gathered QKV
+  projections must use. The line is `precise float total = stage[a] + stage[b]; ...` in the
+  pooled epilogue, which block 0's residual GEMM alone executes. glslang propagates `precise`
+  at the object level: a precise read of the shared `stage` marks every store into it, the
+  accumulators behind them and the K loop's own multiply-adds and index arithmetic
+  NoContraction (54 decorations against 8), and SPIRV-Cross spells each as an
+  `[[clang::optnone]]` helper in MSL. `window_block_portable.comp` and
+  `window_attention_portable.comp` had the same spread from their probability products and
+  pooled sums (49 and 23 decorations). **Fix**: no `precise` on a pure chain of adds (nothing
+  to contract), and the probability's multiply in a function, `probability()`, with
+  `weights()` taking logit values — a parameter is a fresh object, which is why `hmul()`
+  never contaminated anything. Same bits on six shapes and three builds, measured.
+- **The routing findings were that bug.** "16x32 slower than 8x16 on every shape" and
+  "16x64 twice as fast on the large ones" (2026-09-26) are withdrawn: fixed, the 16x32 build
+  wins everywhere tried, small and large, against both (64x1024x4096 3.33 / 4.87 / 6.43 ms,
+  1600x1024x1024 7.39 / 11.0 / 9.1). libxmx's portable defaults are `XMX_PORTABLE_TILED=1`
+  and `XMX_PORTABLE_WIDE=0` now; both still settable.
+- **Result**: 320x320 device time 99.6 -> 70.8 (the qualifier) -> **60.7 ms** (the routing);
+  replayed 124.9 -> 84.1 ms, 1344x768 709 -> 473. `nr_frame_rates` on MoltenVK: 512x288 at
+  0.35 **123 -> 84.5 ms**, 1024x768 at 0.55 223 -> 154, 1920x1080 at 0.55 507 -> 344. Metal
+  untouched, 31 ms at the live sizes.
+- **Measured and dropped**: the window-gathered A as 8-byte loads (1.4x slower), the window
+  block's weights as quads (+22 %), a 32x32 block (slower everywhere), a 32x16 block (5 % on
+  large plain shapes only, cannot take the QKV epilogue). Details in the note.
+- **For Xe2**: the matrix-path builds carry the same spread (`gemm_staged.spv` 28 decorations,
+  `window_block.spv` 44, `ffn_fused.spv` 27, `resident.spv` 71); Mesa has no `optnone`, and
+  what NoContraction costs it on scalar adds is unmeasured. Count with `spirv-dis | grep -c
+  NoContraction`, apply the same two moves, check heads and times there.
+- `src/tools/dump_embedded_weights.c` (target `dump_embedded_weights`, not on Windows) writes
+  the compiled-in weights back out as `work/mlxw/dlssnr-logical.safetensors` — the tool the
+  2026-10-02 entry said did not exist. This Mac's `work/` had gone again; MLX-DLSS was cloned
+  again beside it.
+
 ## Latest: 34 more dlss-nr-on-intel commits — Windows, one graph on both drivers — on every runtime (2026-10-02)
 
 `8f8e5bd`..`3d8951c` of `uzbekunknown/dlss-nr-on-intel` are in (applied against `72a7440`, one

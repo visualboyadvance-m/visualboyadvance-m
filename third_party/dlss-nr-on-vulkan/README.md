@@ -145,8 +145,9 @@ already have. See [Build](#build).
 - **Without cooperative matrix** the runtime falls back to a portable multiply-add GEMM
   behind the same dispatches, with every epilogue and store the matrix kernel has. Tested
   on an **Apple M3 under macOS through MoltenVK 1.4.2**: `make test` is green there and the
-  GEMM runs at 480-570 GFLOP/s against the Xe2 matrix kernel's 1348-3828 — no frame has
-  been rendered on a Mac yet, only the contract checked (`notes/phase67`). Any Vulkan 1.3
+  GEMM runs at 1300-1900 GFLOP/s against the Xe2 matrix kernel's 1348-3828 (480-570 until a
+  `precise` qualifier was found spread over its whole K loop, `notes/improve-portable-precise.md`);
+  a 1280x720 frame's graph is 0.47 s there, 320x320 is 84 ms. Any Vulkan 1.3
   device with `shaderFloat16`, `storageBuffer16BitAccess`, `bufferDeviceAddress` and the
   Vulkan memory model should take the same path; `XMX_PORTABLE=1` forces it anywhere.
 - Linux, or macOS with MoltenVK. Python 3 with NumPy. A C compiler, `glslangValidator`,
@@ -203,8 +204,9 @@ rewritten in the Metal Shading Language (`src/gpu/metal/`) and compiled by Apple
 into one `nr_shaders.metallib` that is embedded in the library. Its matrix path is
 `simdgroup_matrix` (half operands, float accumulate; exact on the GEMM contract), where
 MoltenVK has none. `NR_GPU_BACKEND=metal` switches every Python tool and the C frame library
-to it; `make test-metal` runs the GPU tests on it. On an M3 a 1280x720 frame takes 735-746 ms
-through it against 938-948 ms through MoltenVK (`notes/phase74`). It is built on Apple only —
+to it; `make test-metal` runs the GPU tests on it. On an M3 a 1280x720 frame's graph replays in
+218 ms through it against 473 ms through MoltenVK (2026-10-03; 735-746 against 938-948 when
+it was written, `notes/phase74`). It is built on Apple only —
 by `make` under Darwin, by CMake under `NR_BUILD_METAL` — and the Vulkan layer stays Vulkan.
 The static archive a host links, `libdlssnr`, is the Metal one on Apple: no Vulkan in it,
 `nr_frame_runtime()` says `"metal"`, and `nr_frame_adopt_vulkan` is refused there.
@@ -346,7 +348,8 @@ produces is **bit-identical** to the Python resident path on the same features
 (`src/ref/test_nr_frame_c.py`); the noise channels, the gate's sigmoid and the detail blur's
 kernel use the C library's transcendentals and can differ from NumPy's by a last bit, which
 the test measures. `work/nr_frame` is `nr_frame.py` itself in C — the same flags (`--profile`, `--style-index`, `--local-tone`, `--local-structure`, `--skin-structure`, `--auto-mask`, `--control-mask`, `--intensity`, `--intensity-ladder`, `--detail-strength`, `--colour-strength`, `--detail-radius`, `--frame-index`, `--size`, `--weights`, `-v`), the same printed lines, PNG in and out through **libpng** rather than ImageMagick (any PNG in, 8-bit RGB out, the same byte codec; `--size` is this project's own bilinear resample rather than ImageMagick's filter, so a resized run differs from the Python's in the resampled pixels and nowhere else). `src/ref/nr_frame_native.py` binds the library for NumPy callers, and `work/test_nr_frame` is the frame test in C (`--reference` takes the head the Python test writes, so the byte-for-byte check runs without Python too). On an Apple M3
-through MoltenVK a 1280x720 frame takes 0.90 s (`notes/phase68`).
+through MoltenVK a 1280x720 frame took 0.90 s when this was written (`notes/phase68`); the graph
+alone replays in 0.47 s since `notes/improve-portable-precise.md`.
 
 Two I/O switches, **both on by default since 2026-09-25**, in the Python path and in the C
 frame library alike: `NR_INPUT_FP16` builds the

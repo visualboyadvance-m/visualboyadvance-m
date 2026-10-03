@@ -152,7 +152,8 @@ static struct {
 	VkCommandBuffer tcb; VkFence tfence;
 	/* GPU-side profiling. One timestamp after each recorded pass, so pass i costs
 	 * ts[i+1]-ts[i]; the barrier between passes makes that attribution exact. */
-	VkQueryPool qpool; unsigned prof, prof_n; float ts_period;
+	VkQueryPool qpool; unsigned prof, prof_n, qcount; float ts_period;
+	int moltenvk;             /* VK_DRIVER_ID_MOLTENVK: a 4096-query timestamp pool at most (xmx_profile) */
 	char name[256]; char err[256]; char memory[256]; char memory_read[256];
 	int ready, lost, discrete, unmapped;
 	int pin32;                /* pipelines require 32-lane subgroups (build_pipeline_spec) */
@@ -880,6 +881,7 @@ int xmx_adopted(void) { return g.dev ? g.adopted : -1; }
 static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 {
 	g.half_by_cast = 0;
+	g.moltenvk = 0;
 	if (api_version >= VK_API_VERSION_1_2) {
 		VkPhysicalDeviceDriverProperties driver = {
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES };
@@ -887,6 +889,7 @@ static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 			.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, .pNext = &driver };
 		vkGetPhysicalDeviceProperties2(pd, &query);
 		g.half_by_cast = driver.driverID == VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS;
+		g.moltenvk = driver.driverID == VK_DRIVER_ID_MOLTENVK;
 	}
 	const char *half = getenv("XMX_HALF_ROUND");
 	if (half && *half) {
@@ -1456,21 +1459,21 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	/* the 32-row staged builds, once `xmx_staged32_init` has them; 0 is the comparison */
 	const char *s32 = getenv("XMX_STAGED32");
 	g.staged32 = s32 ? (unsigned)atoi(s32) : 1;
-	/* Without matrix units, the portable GEMM's 16x64 build: two rows and sixteen columns a
-	 * lane where the 16x32 build has eight, the same sums in the same order, so the same
-	 * bytes — and about twice as fast on the graph's large shapes through MoltenVK on an M3
-	 * (1600x1024x1024 5.5 -> 2.5 ms). It is found beside the 16x32 build (its name with
-	 * `_tiled` made `_wide`, embedded or on disk) and is optional: without it, or with
-	 * XMX_PORTABLE_WIDE=0, nothing changes. */
-	/* And without matrix units the 16x32 build is slower than the 8x16 one on every shape
-	 * measured through MoltenVK on an M3 (N = 32: 245760x32x128 3.33 -> 1.87 ms, 61440x32x64
-	 * 0.65 -> 0.47; N = 96: 0.82 -> 0.55), the same sums either way; so it keeps only what
-	 * needs a 32-column block — the QKV epilogue, the pool, the window gather.
-	 * XMX_PORTABLE_TILED=1 gives it every shape it takes, as before. */
+	/* Without matrix units the 16x32 build takes every shape it fits (M % 16, N % 32), and
+	 * the 16x64 `_wide` build is off. Both measured through MoltenVK on an M3 once the
+	 * 16x32 build's pooled epilogue lost a `precise` that glslang had spread over its whole
+	 * K loop (notes/improve-portable-precise.md): 16x32 against 8x16 and 16x64, 64x1024x4096
+	 * 3.33 against 4.87 and 6.43 ms, 256x512x512 1.52 / 2.24 / 2.06, 1600x1024x1024
+	 * 7.39 / 11.0 / 9.1, 6400x2048x512 14.3 / 21.7 / 17.4 — the same bytes on all three, and
+	 * N = 32 and 96 within 3 % of the 8x16 build. The earlier findings this replaces ("16x32
+	 * slower than 8x16 on every shape", "16x64 twice as fast on the large ones") were that
+	 * one qualifier. XMX_PORTABLE_TILED=0 restores the 8x16 routing, XMX_PORTABLE_WIDE=1
+	 * builds the 16x64 kernel (found beside the 16x32 build, `_tiled` made `_wide`) and
+	 * gives it the shapes whose N is whole 64-column blocks, for a device where it wins. */
 	const char *tiled_env = getenv("XMX_PORTABLE_TILED");
-	g.portable_tiled = tiled_env ? (unsigned)atoi(tiled_env) : 0;
+	g.portable_tiled = tiled_env ? (unsigned)atoi(tiled_env) : 1;
 	const char *wide_env = getenv("XMX_PORTABLE_WIDE");
-	if (g.portable && (!wide_env || atoi(wide_env) != 0) && strstr(tiled_spv, "_tiled")) {
+	if (g.portable && wide_env && atoi(wide_env) != 0 && strstr(tiled_spv, "_tiled")) {
 		size_t n = strlen(tiled_spv), at = (size_t)(strstr(tiled_spv, "_tiled") - tiled_spv);
 		char *wide = malloc(n + 1);
 		if (wide) {
@@ -1732,7 +1735,7 @@ static VkDeviceAddress addr_of(int id)
  * when profiling is off, which is why it can live on the hot path. */
 static void stamp(unsigned family, unsigned subkind)
 {
-	if (!g.prof || !g.qpool || g.prof_n >= MAX_STAMPS) return;
+	if (!g.prof || !g.qpool || g.prof_n >= g.qcount) return;
 	stamp_kind[g.prof_n] = (unsigned char)(family * 32u + (subkind & 31u));
 	vkCmdWriteTimestamp(g.rcb, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, g.qpool, g.prof_n);
 	g.prof_n++;
@@ -1752,7 +1755,7 @@ int xmx_begin(void)
 	g.syncing = 1;
 	g.prof_n = 0;
 	if (g.prof && g.qpool) {
-		vkCmdResetQueryPool(g.rcb, g.qpool, 0, MAX_STAMPS);
+		vkCmdResetQueryPool(g.rcb, g.qpool, 0, g.qcount);
 		stamp(PK_START, 0);       /* the zero point every later stamp is measured from */
 	}
 	return 0;
@@ -2744,9 +2747,21 @@ int xmx_profile(int on)
 		free(qf);
 		if (!bits) FAIL("this queue family cannot write timestamps", 0);
 		g.ts_period = props.limits.timestampPeriod;
+		/* MoltenVK backs a timestamp pool with one MTLCounterSampleBuffer, which Metal caps
+		 * at 32 KB — 4096 queries. Asked for more it logs an error, "reverts to emulated
+		 * behavior" and every stamp reads zero, so the profile is a table of noughts. A
+		 * frame is 300-600 passes, so 4096 loses nothing; `XMX_STAMPS` sets it by hand. */
+		g.qcount = g.moltenvk ? 4096u : MAX_STAMPS;
+		const char *stamps_env = getenv("XMX_STAMPS");
+		if (stamps_env && *stamps_env) {
+			unsigned want = (unsigned)atoi(stamps_env);
+			if (want >= 2u && want <= MAX_STAMPS) g.qcount = want;
+			else fprintf(stderr, "libxmx: XMX_STAMPS=%s is not 2-%u; keeping %u\n",
+				     stamps_env, (unsigned)MAX_STAMPS, g.qcount);
+		}
 		VkQueryPoolCreateInfo qi = { .sType = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO,
 					     .queryType = VK_QUERY_TYPE_TIMESTAMP,
-					     .queryCount = MAX_STAMPS };
+					     .queryCount = g.qcount };
 		VkResult r = vkCreateQueryPool(g.dev, &qi, NULL, &g.qpool);
 		if (r) FAIL("timestamp query pool", r);
 	}

@@ -71,7 +71,23 @@ shared float reciprocal[64];
 
 void sync() { memoryBarrierShared(); barrier(); }
 
+/* The weight scaled by its row's reciprocal, then published, as the row pass does it. A
+ * function on purpose: glslang propagates `precise` backwards at the object level, so
+ * `precise float product = region[at] * reciprocal[..]` written in main marks every store
+ * into `region` — all four multiply-accumulate loops — NoContraction, which SPIRV-Cross
+ * spells as `[[clang::optnone]]` helpers (49 decorations against 12). A parameter is a
+ * fresh object, so the qualifier stays on the one multiply it is for.
+ * notes/improve-portable-precise.md. */
+float probability(float weight, float reciprocal_norm) {
+    precise float product = weight * reciprocal_norm;
+    return e4m3(half_round(product));
+}
+
 bool image_half() { return (operation_flags() & 0x8000u) != 0u; }
+
+/* The weights are read a half at a time on purpose: fetched as aligned 8-byte quads
+ * instead (QKV, projection and head alike) this kernel ran 22 % slower through MoltenVK
+ * on an M3, 11.1 -> 13.6 ms of a 320x320 frame, same bytes (notes/improve-portable-precise.md). */
 
 /* One channel of the image at a pixel's first channel `at`, as float. */
 float image1(uint at) {
@@ -191,10 +207,8 @@ void main() {
         reciprocal[slice * 8u + lane] = half_round(1.0 / half_round(total));
     }
     sync();
-    for (uint at = lane; at < 512u; at += 32u) {
-        precise float product = region[mine + at] * reciprocal[slice * 8u + at / 64u];
-        region[mine + at] = e4m3(half_round(product));
-    }
+    for (uint at = lane; at < 512u; at += 32u)
+        region[mine + at] = probability(region[mine + at], reciprocal[slice * 8u + at / 64u]);
     sync();
     /* PV as the plain portable GEMM computes it, then the merged store's publish */
     vec4 context[2];
@@ -299,7 +313,9 @@ void main() {
         int xx = int((window % pc.window_cols) * 8u + 2u * px) - int(left);
         if (yy < 0 || xx < 0 || yy >= int(pc.image_h) || xx >= int(pc.image_w)) continue;
         uint upper = (2u * py) * 512u + (2u * px) * 32u + c, lower = upper + 512u;
-        precise float total = region[upper] + region[lower];
+        /* no `precise`: a chain of adds has nothing to contract, and the qualifier would
+         * mark every store into `region` (see probability()) */
+        float total = region[upper] + region[lower];
         total += region[upper + 32u];
         total += region[lower + 32u];
         uint at = ((uint(yy) / 2u) * (pc.image_w / 2u) + uint(xx) / 2u) * 32u + c;
