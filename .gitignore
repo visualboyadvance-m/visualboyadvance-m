@@ -23,3 +23,6 @@ compile_commands.json
 # online updates header
 src/wx/winsparkle-path.h
 *.patch
+
+third_party/dlss-nr-on-vulkan/src/__pycache__/
+third_party/dlss-nr-on-vulkan/src/gpu/__pycache__/
