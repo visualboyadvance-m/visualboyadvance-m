@@ -307,6 +307,14 @@ endif()
 if(CMAKE_CROSSCOMPILING AND VCPKG_TARGET_TRIPLET AND NR_GLSLANG MATCHES "/installed/${VCPKG_TARGET_TRIPLET}/")
   message(FATAL_ERROR "glslangValidator found only as the target triplet's, ${NR_GLSLANG}, which cannot run on this machine. Install it for the host (vcpkg install glslang[tools] --triplet <host triplet>) or name one with -DNR_GLSLANG=")
 endif()
+# It prints each source's name on stdout as it compiles it, one line per shader in the
+# build's output. --quiet drops that and keeps errors and warnings; older glslang has no
+# such flag and refuses it, so it is passed only when the help lists it.
+set(NR_GLSLANG_QUIET)
+execute_process(COMMAND "${NR_GLSLANG}" -h OUTPUT_VARIABLE nr_glslang_help ERROR_VARIABLE nr_glslang_help)
+if(nr_glslang_help MATCHES "--quiet")
+  set(NR_GLSLANG_QUIET --quiet)
+endif()
 
 # libpng, for the nr_frame command only; the libraries need nothing.
 #
@@ -532,7 +540,7 @@ set(NR_SPV)
 function(nr_shader output source)          # extra arguments are -D defines
   set(out "${NR_OUTPUT_DIR}/${output}")
   add_custom_command(OUTPUT "${out}"
-    COMMAND "${NR_GLSLANG}" --target-env vulkan1.3 -I${PROJECT_SOURCE_DIR}/src/gpu ${ARGN} -o "${out}" "${PROJECT_SOURCE_DIR}/${source}"
+    COMMAND "${NR_GLSLANG}" ${NR_GLSLANG_QUIET} --target-env vulkan1.3 -I${PROJECT_SOURCE_DIR}/src/gpu ${ARGN} -o "${out}" "${PROJECT_SOURCE_DIR}/${source}"
     DEPENDS "${PROJECT_SOURCE_DIR}/${source}" ${NR_SHADER_INCLUDES}
     COMMENT "glslangValidator ${output}" VERBATIM)
   set(NR_SPV ${NR_SPV} "${out}" PARENT_SCOPE)
