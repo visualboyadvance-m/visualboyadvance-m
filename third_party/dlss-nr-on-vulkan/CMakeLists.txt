@@ -970,7 +970,10 @@ const size_t nr_embedded_weights_size = ${NR_WEIGHTS_SIZE};
   target_include_directories(nr_weights_blob PRIVATE src/ref "${NR_WEIGHTS_DIR}")
   target_compile_definitions(nr_weights_blob PRIVATE NR_EMBEDDED_WEIGHTS=1)
   set_target_properties(nr_weights_blob PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  nr_no_ipo(nr_weights_blob)
+  # The slices are nothing but byte arrays, which gain nothing from LTO, and as ~240 MB of
+  # bitcode they crash Apple's linker (ld-1230, signal 11) at the host's final link; they are
+  # compiled to plain objects on every toolchain, not only on MSVC as nr_no_ipo does.
+  set_target_properties(nr_weights_blob PROPERTIES INTERPROCEDURAL_OPTIMIZATION OFF)
   # each slice costs the compiler ~0.75 GB; the pool keeps a parallel build inside memory
   set_property(GLOBAL APPEND PROPERTY JOB_POOLS nr_embed=${NR_EMBED_JOBS})
   set_target_properties(nr_weights_blob PROPERTIES JOB_POOL_COMPILE nr_embed)
