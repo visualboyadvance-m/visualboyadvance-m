@@ -6,7 +6,13 @@
 #include <chrono>
 #include <cmath>
 #include <condition_variable>
+#include <cstdlib>
 #include <cstring>
+#include <functional>
+#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#include <emmintrin.h>
+#endif
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
@@ -486,32 +492,178 @@ inline int MotionWeight(int moved) {
 
 // The largest value within `r` of each pixel, in place, separably: across each row, then
 // down, a whole row at a time so both passes run along memory.
+
+// The overlay's per-frame work -- the motion sweeps, the dilation and the
+// composition -- is row-independent: every band writes only its own rows and
+// reads inputs that no band writes. Splitting it across a small persistent pool
+// is therefore exact, not an approximation; the output is the same bytes.
+//
+// A pool rather than threads per frame: this runs sixty times a second, and
+// creating threads that often costs more than the work.
+class RowPool {
+public:
+    static RowPool& Get() {
+        static RowPool pool;
+        return pool;
+    }
+    int bands() const { return static_cast<int>(workers_.size()) + 1; }
+
+    // Calls fn(y0, y1) over half-open row bands covering [0, height), the
+    // caller taking one of them. Returns once every band has finished.
+    //
+    // `limit` caps the split for work too small to be worth spreading wide.
+    // Measured on two 8-core/16-thread Ryzen APUs, one Linux/gcc and one
+    // Windows/MSVC, over 400 runs of Dilate at 480x320: four bands is the best
+    // either machine does, and eight is slower than not splitting at all on the
+    // Windows one -- a Dilate call is a few tens of microseconds, and waking
+    // seven threads costs more than the rows save.
+    void Run(int height, const std::function<void(int, int)>& fn, int limit = 0) {
+        int n = bands();
+        if (limit > 0)
+            n = std::min(n, limit);
+        // Not worth waking anyone for a handful of rows.
+        if (n <= 1 || height < 2 * n) {
+            fn(0, height);
+            return;
+        }
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            fn_ = &fn;
+            height_ = height;
+            bands_ = n;
+            // A few rows at a time, taken as each thread comes free, rather than
+            // one fixed slice each: the rows are not equally dear. measure()
+            // leaves a row early where the hypothesis puts it off the pass's
+            // edge, so a scroll makes the first or last rows nearly free, and a
+            // fixed slice leaves whoever drew them idle while the rest finish.
+            chunk_ = std::max(1, height / (n * chunk_divisor_));
+            next_row_.store(0, std::memory_order_relaxed);
+            // Every worker wakes and reports back, including the ones this job
+            // is too small to use: they skip the work but still count down, so
+            // the tally has to be all of them, not just the bands in use.
+            remaining_ = static_cast<int>(workers_.size());
+            ++generation_;
+        }
+        start_.notify_all();
+        Take(fn, height);
+        std::unique_lock<std::mutex> lock(mutex_);
+        done_.wait(lock, [this] { return remaining_ == 0; });
+        fn_ = nullptr;
+    }
+
+private:
+    // Draws chunks until the rows run out. One atomic per chunk, not per row.
+    void Take(const std::function<void(int, int)>& fn, int height) {
+        const int chunk = chunk_;
+        for (;;) {
+            const int y = next_row_.fetch_add(chunk, std::memory_order_relaxed);
+            if (y >= height)
+                return;
+            fn(y, std::min(height, y + chunk));
+        }
+    }
+    RowPool() {
+        const unsigned hw = std::thread::hardware_concurrency();
+        // The frames here are small; past a handful of bands the waking costs
+        // more than the rows save.
+        int n = std::min(hw ? static_cast<int>(hw) : 1, 8);
+        for (int i = 1; i < n; i++)
+            workers_.emplace_back([this, i] { Work(i); });
+    }
+    ~RowPool() {
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            quit_ = true;
+            ++generation_;
+        }
+        start_.notify_all();
+        for (std::thread& t : workers_)
+            if (t.joinable())
+                t.join();
+    }
+    void Work(int index) {
+        unsigned long long seen = 0;
+        for (;;) {
+            std::unique_lock<std::mutex> lock(mutex_);
+            start_.wait(lock, [this, seen] { return quit_ || generation_ != seen; });
+            if (quit_)
+                return;
+            seen = generation_;
+            const std::function<void(int, int)>* fn = fn_;
+            const int height = height_, n = bands_;
+            lock.unlock();
+            if (fn && index < n)
+                Take(*fn, height);
+            lock.lock();
+            if (--remaining_ == 0) {
+                lock.unlock();
+                done_.notify_one();
+            }
+        }
+    }
+    std::vector<std::thread> workers_;
+    std::mutex mutex_;
+    std::condition_variable start_, done_;
+    const std::function<void(int, int)>* fn_ = nullptr;
+    int height_ = 0, bands_ = 0, remaining_ = 0, chunk_ = 1;
+    // chunks per band; NR_CHUNK_DIV only so the choice can be measured
+    int chunk_divisor_ = [] {
+        const char* e = getenv("NR_CHUNK_DIV");
+        const int v = e ? atoi(e) : 0;
+        return v > 0 ? v : 4;
+    }();
+    std::atomic<int> next_row_{0};
+    unsigned long long generation_ = 0;
+    bool quit_ = false;
+};
+
+// out[i] = max(out[i], in[i]) over n bytes. SSE2 is baseline on x86-64, so the
+// sixteen-at-a-time form needs no run-time check; elsewhere the scalar loop is
+// what the compiler was already making of it.
+
+// See RowPool::Run: measured, not guessed.
+constexpr int kDilateBands = 4;
+
+inline void MaxInto(uint8_t* out, const uint8_t* in, int n) {
+    int i = 0;
+#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) ||     (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+    for (; i + 16 <= n; i += 16) {
+        const __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(out + i));
+        const __m128i b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i));
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(out + i), _mm_max_epu8(a, b));
+    }
+#endif
+    for (; i < n; i++)
+        out[i] = std::max(out[i], in[i]);
+}
+
 void Dilate(std::vector<uint8_t>* image, int width, int height, int r,
             std::vector<uint8_t>* scratch) {
     scratch->resize(static_cast<size_t>(width) * height);
     uint8_t* const im = image->data();
     uint8_t* const across = scratch->data();
-    for (int y = 0; y < height; y++) {
-        const uint8_t* row = im + static_cast<size_t>(y) * width;
-        uint8_t* out = across + static_cast<size_t>(y) * width;
-        std::memcpy(out, row, static_cast<size_t>(width));
-        for (int o = 1; o <= r; o++) {
-            for (int x = 0; x + o < width; x++)
-                out[x] = std::max(out[x], row[x + o]);
-            for (int x = o; x < width; x++)
-                out[x] = std::max(out[x], row[x - o]);
+    // Across, then down. The second pass reads what the first wrote for rows it
+    // does not own, so the two cannot overlap -- hence two Run()s, not one.
+    RowPool::Get().Run(height, [&](int ya, int yb) {
+        for (int y = ya; y < yb; y++) {
+            const uint8_t* row = im + static_cast<size_t>(y) * width;
+            uint8_t* out = across + static_cast<size_t>(y) * width;
+            std::memcpy(out, row, static_cast<size_t>(width));
+            for (int o = 1; o <= r; o++) {
+                MaxInto(out, row + o, width - o);
+                MaxInto(out + o, row, width - o);
+            }
         }
-    }
-    for (int y = 0; y < height; y++) {
-        uint8_t* out = im + static_cast<size_t>(y) * width;
-        const int y0 = std::max(0, y - r), y1 = std::min(height - 1, y + r);
-        std::memcpy(out, across + static_cast<size_t>(y0) * width, static_cast<size_t>(width));
-        for (int k = y0 + 1; k <= y1; k++) {
-            const uint8_t* in = across + static_cast<size_t>(k) * width;
-            for (int x = 0; x < width; x++)
-                out[x] = std::max(out[x], in[x]);
+    }, kDilateBands);
+    RowPool::Get().Run(height, [&](int ya, int yb) {
+        for (int y = ya; y < yb; y++) {
+            uint8_t* out = im + static_cast<size_t>(y) * width;
+            const int y0 = std::max(0, y - r), y1 = std::min(height - 1, y + r);
+            std::memcpy(out, across + static_cast<size_t>(y0) * width, static_cast<size_t>(width));
+            for (int k = y0 + 1; k <= y1; k++)
+                MaxInto(out, across + static_cast<size_t>(k) * width, width);
         }
-    }
+    }, kDilateBands);
 }
 
 // How far the picture may scroll between a pass's input and the frame it is laid over, in
@@ -633,6 +785,64 @@ void EstimateScroll(const Pyramid& live, const Pyramid& pass, int* dx, int* dy) 
 struct Hypothesis {
     int ax = 0, ay = 0, bx = 0, by = 0;
 };
+
+// How far each pixel has moved since the pass was given the frame, if the pass
+// is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
+// when they are the same: the largest step of the three channels, or all of it
+// where a shift takes the pixel off the pass's edge.
+//
+// `valid`, when given, says which of `given`'s pixels hold anything (the
+// correction memory's); a pixel reading one that does not has moved all of it.
+//
+// Whether a pixel is reachable at all depends only on its row, its column and
+// the hypothesis -- never on what the pixels hold. So the rows that no shift
+// can reach are filled whole, and in the rest the reachable span is computed
+// once and the loop between its edges needs no checking at all.
+void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid,
+                 const Hypothesis& h, int width, int height, int y_begin, int y_end,
+                 uint8_t* motion) {
+    for (int y = y_begin; y < y_end; y++) {
+        uint8_t* mv = motion + static_cast<size_t>(y) * width;
+        const int ay = y - h.ay, by = y - h.by;
+        if (ay < 0 || ay >= height || by < 0 || by >= height) {
+            std::memset(mv, 255, static_cast<size_t>(width));
+            continue;
+        }
+        // ax = x - h.ax and bx = x - h.bx both inside [0, width)
+        const int x0 = std::max(0, std::max(h.ax, h.bx));
+        const int x1 = std::min(width, std::min(h.ax, h.bx) + width);
+        if (x1 <= x0) {
+            std::memset(mv, 255, static_cast<size_t>(width));
+            continue;
+        }
+        if (x0 > 0)
+            std::memset(mv, 255, static_cast<size_t>(x0));
+        if (x1 < width)
+            std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
+        const uint8_t* l = live + (static_cast<size_t>(y) * width + x0) * 3;
+        const uint8_t* arow = given + static_cast<size_t>(ay) * width * 3;
+        const uint8_t* brow = given + static_cast<size_t>(by) * width * 3;
+        const uint8_t* av = valid ? valid + static_cast<size_t>(ay) * width : nullptr;
+        const uint8_t* bv = valid ? valid + static_cast<size_t>(by) * width : nullptr;
+        for (int x = x0; x < x1; x++, l += 3) {
+            const int ax = x - h.ax, bx = x - h.bx;
+            int m = 255;
+            if (!valid || (av[ax] && bv[bx])) {
+                const uint8_t* a = arow + static_cast<size_t>(ax) * 3;
+                const uint8_t* b = brow + static_cast<size_t>(bx) * 3;
+                m = 0;
+                for (int c = 0; c < 3; c++) {
+                    const int g = (a[c] + b[c] + 1) >> 1;
+                    const int d = l[c] > g ? l[c] - g : g - l[c];
+                    if (d > m)
+                        m = d;
+                }
+            }
+            mv[x] = static_cast<uint8_t>(m);
+        }
+    }
+}
+
 
 // The ways Apply32() tries for one pass, each with its motion mask, one byte a pixel.
 struct Alignment {
@@ -1716,30 +1926,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // correction memory's); a pixel reading one that does not has moved all of it.
             const auto measure = [&](const uint8_t* given, const uint8_t* valid,
                                      const Hypothesis& h, uint8_t* motion) {
-                for (int y = 0; y < height; y++) {
-                    const int ay = y - h.ay, by = y - h.by;
-                    const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
-                    uint8_t* mv = motion + static_cast<size_t>(y) * width;
-                    for (int x = 0; x < width; x++, l += 3) {
-                        const int ax = x - h.ax, bx = x - h.bx;
-                        int m = 255;
-                        if (ay >= 0 && ay < height && ax >= 0 && ax < width && by >= 0 &&
-                            by < height && bx >= 0 && bx < width &&
-                            (!valid || (valid[static_cast<size_t>(ay) * width + ax] &&
-                                        valid[static_cast<size_t>(by) * width + bx]))) {
-                            const uint8_t* a = given + (static_cast<size_t>(ay) * width + ax) * 3;
-                            const uint8_t* b = given + (static_cast<size_t>(by) * width + bx) * 3;
-                            m = 0;
-                            for (int c = 0; c < 3; c++) {
-                                const int g = (a[c] + b[c] + 1) >> 1;
-                                const int d = l[c] > g ? l[c] - g : g - l[c];
-                                if (d > m)
-                                    m = d;
-                            }
-                        }
-                        mv[x] = static_cast<uint8_t>(m);
-                    }
-                }
+                RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                    MeasureRows(live, given, valid, h, width, height, y_begin, y_end, motion);
+                });
             };
             // The ways to take one pass: where it stands, and, when that leaves enough of
             // the frame moving to be worth asking, where the scroll took it -- and the mean
@@ -1900,7 +2089,8 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const int16_t* const mem_delta = have_memory ? im.memory_delta.data() : nullptr;
             const int16_t* const was_cast = have_previous ? im.previous_cast.data() : nullptr;
             const int16_t* const was_delta = have_previous ? im.previous_delta.data() : nullptr;
-            for (int y = 0; y < height; y++) {
+            RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+            for (int y = y_begin; y < y_end; y++) {
                 uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
                 const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
                 const size_t row = static_cast<size_t>(y) * width;
@@ -1954,6 +2144,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     d[x] = p;
                 }
             }
+            });
             wrote_result = true;
         }
     }
