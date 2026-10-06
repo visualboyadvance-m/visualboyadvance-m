@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <vector>
 
+#include <wx/app.h>
 #include <wx/base64.h>
 #include <wx/buffer.h>
 #include <wx/config.h>
@@ -295,6 +296,134 @@ wxString RequestAccess(const wxString& path, const wxString& message,
         // file: the one the user picked instead.
         return wxDirExists(chosen) ? path : chosen;
     }
+}
+
+namespace {
+
+// The hand-over of a sandboxed relaunch's arguments: in the container's own
+// temporary directory, which the old and the new instance share.
+NSString* const kRelaunchArgs = @"Arguments";
+NSString* const kRelaunchTime = @"Time";
+const NSTimeInterval kRelaunchMaxAge = 60;
+
+NSURL* RelaunchFile() {
+    return [NSURL fileURLWithPath:[NSTemporaryDirectory()
+                                      stringByAppendingPathComponent:@"vbam-relaunch-args.plist"]];
+}
+
+}  // namespace
+
+void LaunchNewInstance(const wxArrayString& args, std::function<void(bool)> done) {
+    // Always answered from the event loop, so the caller sees the same order
+    // of events whether the launch is synchronous or not.
+    auto answer = [done](bool launched) {
+        if (!launched && Active())
+            [[NSFileManager defaultManager] removeItemAtURL:RelaunchFile() error:nil];
+        wxTheApp->CallAfter([done, launched] { done(launched); });
+    };
+
+    @autoreleasepool {
+        NSURL* bundle = [[NSBundle mainBundle] bundleURL];
+        if (!bundle || ![bundle.pathExtension isEqualToString:@"app"]) {
+            answer(false);
+            return;
+        }
+
+        NSMutableArray<NSString*>* arguments = [NSMutableArray array];
+        for (const wxString& arg : args) {
+            // The process serial number Launch Services gave this launch on
+            // older systems; the new one gets its own.
+            if (arg.StartsWith("-psn_"))
+                continue;
+            wxString out = arg;
+            if (!arg.StartsWith("-")) {
+                wxFileName fn(arg);
+                if (fn.Exists()) {
+                    fn.MakeAbsolute();
+                    out = fn.GetFullPath();
+                    RememberPath(out);
+                }
+            }
+            NSString* s = [NSString stringWithUTF8String:out.utf8_str()];
+            if (s)
+                [arguments addObject:s];
+        }
+
+        if (Active() && arguments.count != 0) {
+            NSDictionary* handover = @{kRelaunchArgs : arguments, kRelaunchTime : [NSDate date]};
+            NSError* error = nil;
+            NSData* data = [NSPropertyListSerialization dataWithPropertyList:handover
+                                                                      format:NSPropertyListBinaryFormat_v1_0
+                                                                     options:0
+                                                                       error:&error];
+            if (!data || ![data writeToURL:RelaunchFile() options:NSDataWritingAtomic error:&error])
+                NSLog(@"macsandbox: cannot hand the arguments over: %@", error);
+        }
+
+        NSWorkspace* ws = [NSWorkspace sharedWorkspace];
+        if (@available(macOS 10.15, *)) {
+            NSWorkspaceOpenConfiguration* config = [NSWorkspaceOpenConfiguration configuration];
+            config.createsNewApplicationInstance = YES;
+            config.arguments = arguments;
+            [ws openApplicationAtURL:bundle
+                       configuration:config
+                   completionHandler:^(NSRunningApplication* app, NSError* error) {
+                       if (error)
+                           NSLog(@"macsandbox: relaunch failed: %@", error);
+                       answer(app != nil);
+                   }];
+            return;
+        }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        NSError* error = nil;
+        NSRunningApplication* app =
+            [ws launchApplicationAtURL:bundle
+                               options:NSWorkspaceLaunchNewInstance
+                         configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments}
+                                 error:&error];
+#pragma clang diagnostic pop
+        if (!app)
+            NSLog(@"macsandbox: relaunch failed: %@", error);
+        answer(app != nil);
+    }
+}
+
+std::vector<std::string> TakeRelaunchArguments() {
+    std::vector<std::string> out;
+    if (!Active())
+        return out;
+
+    @autoreleasepool {
+        NSURL* file = RelaunchFile();
+        NSData* data = [NSData dataWithContentsOfURL:file];
+        if (!data)
+            return out;
+        [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+
+        NSDictionary* handover = [NSPropertyListSerialization propertyListWithData:data
+                                                                           options:NSPropertyListImmutable
+                                                                            format:nil
+                                                                             error:nil];
+        if (![handover isKindOfClass:[NSDictionary class]])
+            return out;
+        NSDate* time = handover[kRelaunchTime];
+        NSArray* args = handover[kRelaunchArgs];
+        if (![time isKindOfClass:[NSDate class]] || ![args isKindOfClass:[NSArray class]])
+            return out;
+        const NSTimeInterval age = -[time timeIntervalSinceNow];
+        if (age < 0 || age > kRelaunchMaxAge) {
+            NSLog(@"macsandbox: ignoring a relaunch hand-over %.0f s old", age);
+            return out;
+        }
+
+        for (id arg in args) {
+            if ([arg isKindOfClass:[NSString class]])
+                out.push_back([arg UTF8String]);
+        }
+    }
+    return out;
 }
 
 }  // namespace macsandbox

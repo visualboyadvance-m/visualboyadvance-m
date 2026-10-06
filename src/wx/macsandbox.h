@@ -43,6 +43,11 @@
 // APP_SANDBOX_CONTAINER_ID environment variable is absent) and on every
 // other platform.
 
+#include <functional>
+#include <string>
+#include <vector>
+
+#include <wx/arrstr.h>
 #include <wx/string.h>
 
 namespace macsandbox {
@@ -86,6 +91,31 @@ wxString ImportBios(const wxString& path);
 wxString RequestAccess(const wxString& path, const wxString& message,
                        const wxString& prompt);
 
+// Start a new instance of this application bundle through Launch Services,
+// for a restart, with `args` as its command line (argv[1] on). Executing the
+// bundle's binary directly (wxExecute) makes it a child of this process: it
+// inherits the sandbox, and libsecinit kills it with SIGILL before main() when
+// its own entitlement asks for the sandbox again. A Launch Services launch
+// starts in "/", so relative arguments naming existing files are made
+// absolute. The launch finishes asynchronously, and needs the main thread to
+// do it, so the result comes to `done` on the main thread: true when the new
+// instance is running, false when the launch failed or this is not an
+// application bundle.
+//
+// Launch Services ignores the arguments of a sandboxed caller, so when
+// sandboxed they go through a file in the container instead, which the new
+// instance reads with TakeRelaunchArguments(); and every file argument this
+// process can reach is bookmarked again (RememberPath()), so the new instance
+// can open it even after a factory reset deleted the stored bookmarks.
+void LaunchNewInstance(const wxArrayString& args, std::function<void(bool)> done);
+
+// In a sandboxed process started by LaunchNewInstance(): the arguments the old
+// instance handed over, read once and removed. Empty when there are none, when
+// the hand-over is more than a minute old, or when not sandboxed. Call from
+// main(), before wx parses the command line, and only when the process was
+// started without arguments of its own.
+std::vector<std::string> TakeRelaunchArguments();
+
 #else  // !__WXMAC__
 
 inline bool Active() { return false; }
@@ -95,6 +125,10 @@ inline wxString SavesDir() { return wxString(); }
 inline wxString ImportBios(const wxString& path) { return path; }
 inline wxString RequestAccess(const wxString& path, const wxString&,
                               const wxString&) { return path; }
+inline void LaunchNewInstance(const wxArrayString&, std::function<void(bool)> done) {
+    done(false);
+}
+inline std::vector<std::string> TakeRelaunchArguments() { return {}; }
 
 #endif  // __WXMAC__
 

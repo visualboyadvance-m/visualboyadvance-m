@@ -34,6 +34,7 @@
 #endif
 
 #include <stdio.h>
+#include <cstring>
 
 #include <wx/cmdline.h>
 #include <wx/display.h>
@@ -338,6 +339,27 @@ int main(int argc, char** argv) {
     }
 #endif
 #endif
+#endif
+
+#ifdef __WXMAC__
+    // A restart from a sandboxed instance comes through Launch Services, which
+    // drops the arguments; the old instance handed them over separately.
+    // (Older macOS passes a process serial number, which is not an argument.)
+    std::vector<std::string> relaunch_args;
+    std::vector<char*> relaunch_argv;
+    bool own_args = false;
+    for (int i = 1; i < argc; i++)
+        own_args = own_args || strncmp(argv[i], "-psn_", 5) != 0;
+    if (!own_args)
+        relaunch_args = macsandbox::TakeRelaunchArguments();
+    if (!relaunch_args.empty()) {
+        relaunch_argv.push_back(argv[0]);
+        for (std::string& arg : relaunch_args)
+            relaunch_argv.push_back(&arg[0]);
+        relaunch_argv.push_back(nullptr);
+        argc = static_cast<int>(relaunch_argv.size()) - 1;
+        argv = relaunch_argv.data();
+    }
 #endif
 
     // This will be freed on wxEntry exit.
@@ -903,8 +925,22 @@ bool wxvbamApp::OnInit() {
        config_file_.Mkdir(wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
     }
 
-    // Load the default options.
-    const bool first_run = !config_file_.Exists();
+    // Load the default options. A config holding nothing but the App Sandbox's
+    // bookmarks is a first run too: a factory reset deletes the file, and the
+    // relaunch bookmarks again the files it hands over
+    // (macsandbox::LaunchNewInstance()).
+    bool first_run = !config_file_.Exists();
+    if (!first_run) {
+        wxConfigBase* cfg = wxConfigBase::Get();
+        cfg->SetPath("/");
+        first_run = cfg->GetNumberOfEntries(false) == 0;
+        wxString group;
+        long idx;
+        for (bool cont = cfg->GetFirstGroup(group, idx); first_run && cont;
+             cont = cfg->GetNextGroup(group, idx)) {
+            first_run = group == "MacSandbox";
+        }
+    }
     load_opts(first_run);
 
     // macOS App Sandbox: regain access to the ROMs, folders and BIOS files

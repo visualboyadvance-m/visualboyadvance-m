@@ -39,6 +39,7 @@
 #include "wx/config/option.h"
 #include "wx/dialogs/base-dialog.h"
 #include "wx/dialogs/game-maker.h"
+#include "wx/macsandbox.h"
 #include "wx/wxvbam.h"
 #include "wx/widgets/group-check-box.h"
 #include "wx/widgets/user-input-ctrl.h"
@@ -2562,8 +2563,28 @@ EVT_HANDLER(FactoryReset, "Factory Reset...")
 
     if (dlg.ShowModal() == wxID_YES) {
         wxConfigBase::Get()->DeleteAll();
-        wxExecute(wxStandardPaths::Get().GetExecutablePath(), wxEXEC_ASYNC);
-        Close(true);
+
+        // The new instance gets this one's command line.
+        wxArrayString args = wxTheApp->argv.GetArguments();
+        if (!args.empty())
+            args.RemoveAt(0);
+
+        // On macOS it goes through Launch Services: executed directly it would
+        // be a child of this sandboxed process, and die.
+        macsandbox::LaunchNewInstance(args, [this, args](bool launched) {
+            if (!launched && !macsandbox::Active()) {
+                std::vector<wxWCharBuffer> strings;
+                strings.push_back(wxStandardPaths::Get().GetExecutablePath().wc_str());
+                for (const wxString& arg : args)
+                    strings.push_back(arg.wc_str());
+                std::vector<const wchar_t*> argv;
+                for (const wxWCharBuffer& s : strings)
+                    argv.push_back(s.data());
+                argv.push_back(nullptr);
+                wxExecute(argv.data(), wxEXEC_ASYNC);
+            }
+            Close(true);
+        });
     }
 }
 
