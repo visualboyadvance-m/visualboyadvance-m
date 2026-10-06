@@ -1300,7 +1300,9 @@ void MainWindow::OnFactoryReset() {
     if (ret == QMessageBox::Yes) {
         vbamApp().config()->clear();
         vbamApp().config()->sync();
-        QProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList());
+        // The new instance gets this one's command line.
+        QProcess::startDetached(QCoreApplication::applicationFilePath(),
+                                QCoreApplication::arguments().mid(1));
         // Do not let the close handler write the geometry back.
         QFile::remove(vbamApp().GetConfigurationPath() + "/vbam-qt.ini");
         QApplication::exit(0);
