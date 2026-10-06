@@ -448,61 +448,61 @@ msgstr "Не знайдено придатних rpi-плаґінів у %s."
 
 #: dialogs/display-config.cpp:1313
 msgid "DLSS-NR (Experimental)"
-msgstr ""
+msgstr "DLSS-NR (експериментально)"
 
 #: dialogs/display-config.cpp:1332
 msgid "Enable &DLSS-NR"
-msgstr ""
+msgstr "Увімкнути &DLSS-NR"
 
 #: dialogs/display-config.cpp:1333
 msgid ""
 "Runs every frame through the DLSS-NR neural rendering model. Very slow and "
 "experimental."
-msgstr ""
+msgstr "Пропускання кожного кадру через модель нейронного опрацювання DLSS-NR. Дуже повільно й експериментально."
 
 #: dialogs/display-config.cpp:1335
 msgid "Use Frame &History"
-msgstr ""
+msgstr "Використовувати історію &кадрів"
 
 #: dialogs/display-config.cpp:1336
 msgid ""
 "Feeds the previous filtered frame back into the model, for steadier motion. "
 "Unchecked, every frame is filtered on its own exactly as the nr_frame "
 "command filters a picture, and the filter runs faster."
-msgstr ""
+msgstr "Подання попереднього фільтрованого кадру до моделі для рівномірнішого руху. При знятті позначки кожен кадр фільтровано окремо - так само, як команда nr_frame фільтрує зображення, і фільтр прискорено."
 
 #: dialogs/display-config.cpp:1347
 msgid "&Pre-filter"
-msgstr ""
+msgstr "П&опереднє фільтрування"
 
 #: dialogs/display-config.cpp:1349
 msgid ""
 "Run DLSS-NR on the emulated image, then let the display filter scale the "
 "result. The cheapest: the model sees the unscaled frame."
-msgstr ""
+msgstr "Початковий запуск DLSS NR на емульованому зображенні, потім - дозвіл фільтру відображення масштабувати результат. Найвигідніше: модель бачить кадр без масштабування."
 
 #: dialogs/display-config.cpp:1352
 msgid "P&ost-filter"
-msgstr ""
+msgstr "П&ісляфільтрування"
 
 #: dialogs/display-config.cpp:1353
 msgid "Run DLSS-NR over the display filter's output, at the filtered size."
-msgstr ""
+msgstr "Запуск DLSS NR для показу фільтра відображення у фільтрованому розмірі."
 
 #: dialogs/display-config.cpp:1356
 msgid "At display si&ze"
-msgstr ""
+msgstr "За розміром &дисплея"
 
 #: dialogs/display-config.cpp:1357
 msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
 "DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds "
 "the cost."
-msgstr ""
+msgstr "Масштабування показу фільтра відображення до вказаного розміру та застосування DLSS-NR, як до екранного кадру гри. Максимальна висота покращує продуктивність."
 
 #: dialogs/display-config.cpp:1360
 msgid "Apply:"
-msgstr ""
+msgstr "Встановити:"
 
 #: dialogs/display-config.cpp:1374 dialogs/joypad-config.cpp:195
 #: xrc/GBColorPrefPanel.xrc:10
@@ -511,25 +511,25 @@ msgstr "Типова"
 
 #: dialogs/display-config.cpp:1375
 msgid "Natural"
-msgstr ""
+msgstr "Звичайний"
 
 #: dialogs/display-config.cpp:1376
 msgid "Cinematic"
-msgstr ""
+msgstr "Кінематографічний"
 
 #: dialogs/display-config.cpp:1377
 msgid "Neutral"
-msgstr ""
+msgstr "Нейтральний"
 
 #: dialogs/display-config.cpp:1378
 msgid "Vendor"
-msgstr ""
+msgstr "Постачальник"
 
 #: dialogs/display-config.cpp:1379
 msgid ""
 "The style, local tone and local structure the model is conditioned on. "
 "Neutral turns local tone and structure off, Vendor raises structure."
-msgstr ""
+msgstr "Стиль, локальний тон і локальна структура, за якими зумовлено модель. Нейтральний режим вимикає локальний тон і структуру, Постачальник посилює структуру."
 
 #: dialogs/display-config.cpp:1387 xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
@@ -537,144 +537,144 @@ msgstr "Профіль:"
 
 #: dialogs/display-config.cpp:1389
 msgid "Intensity:"
-msgstr ""
+msgstr "Інтенсивність:"
 
 #: dialogs/display-config.cpp:1391
 msgid ""
 "Blend of the model's picture against the game's. Above 100% extrapolates."
-msgstr ""
+msgstr "Суміш зображення моделі з зображенням гри. Понад 100 % - екстраполяція."
 
 #: dialogs/display-config.cpp:1393
 msgid "Maximum Height:"
-msgstr ""
+msgstr "Максимальна висота:"
 
 #: dialogs/display-config.cpp:1394 dialogs/display-config.cpp:1434
 msgid "px"
-msgstr ""
+msgstr "пікс"
 
 #: dialogs/display-config.cpp:1395
 msgid ""
 "Frames taller than this are scaled down before the model runs, and back up "
 "after. Lower is faster."
-msgstr ""
+msgstr "Зменшення кадрів вищого розміру перед запуском моделі та збільшення після нього. Менше - швидше."
 
 #: dialogs/display-config.cpp:1400
 msgid "Profile"
-msgstr ""
+msgstr "Профіль"
 
 #: dialogs/display-config.cpp:1401
 msgid "Off"
-msgstr ""
+msgstr "Вимкнути"
 
 #: dialogs/display-config.cpp:1409
 msgid "Style Index:"
-msgstr ""
+msgstr "Індекс стилю:"
 
 #: dialogs/display-config.cpp:1411
 msgid ""
 "The vendor style index the model is conditioned on (nr_frame --style-index)."
 " Profile keeps the profile's."
-msgstr ""
+msgstr "Індекс стилю постачальника, за яким зумовлено модель (nr_frame --style-index). \"Профіль\" зберігає профіль."
 
 #: dialogs/display-config.cpp:1412
 msgid "Local Tone:"
-msgstr ""
+msgstr "Локальний тон:"
 
 #: dialogs/display-config.cpp:1414
 msgid ""
 "Local tone the model is conditioned on (nr_frame --local-tone). Profile "
 "keeps the profile's."
-msgstr ""
+msgstr "Локальний тон, за яким зумовлено модель (nr_frame --local-tone). \"Профіль\" зберігає профіль."
 
 #: dialogs/display-config.cpp:1415
 msgid "Local Structure:"
-msgstr ""
+msgstr "Локальна структура:"
 
 #: dialogs/display-config.cpp:1417
 msgid ""
 "Local structure the model is conditioned on (nr_frame --local-structure). "
 "Profile keeps the profile's."
-msgstr ""
+msgstr "Локальна структура, за якою зумовлено модель (nr_frame --local-structure). \"Профіль\" зберігає профіль."
 
 #: dialogs/display-config.cpp:1418
 msgid "Skin Structure:"
-msgstr ""
+msgstr "Структура оформлення:"
 
 #: dialogs/display-config.cpp:1420
 msgid ""
 "Structure on skin, through the automatic mask (nr_frame --skin-structure). "
 "Setting this or Automatic Mask turns the automatic mask on."
-msgstr ""
+msgstr "Структура оформлення за автоматичною маскою (nr_frame --skin-structure). Встановлення параметра чи \"Автоматична маска\" вмикає автоматичну маску."
 
 #: dialogs/display-config.cpp:1421
 msgid "Automatic Mask:"
-msgstr ""
+msgstr "Автоматична маска:"
 
 #: dialogs/display-config.cpp:1423
 msgid ""
 "Structure through the automatic mask outside skin (nr_frame --auto-mask)."
-msgstr ""
+msgstr "Структура поза оформленням за автоматичною маскою (nr_frame --auto-mask)."
 
 #: dialogs/display-config.cpp:1424
 msgid "Frame Index:"
-msgstr ""
+msgstr "Індекс кадру:"
 
 #: dialogs/display-config.cpp:1426
 msgid "Seeds the model's noise channels (nr_frame --frame-index)."
-msgstr ""
+msgstr "Встановлення каналів шуму моделі (nr_frame --frame-index)."
 
 #: dialogs/display-config.cpp:1427
 msgid "Detail Strength:"
-msgstr ""
+msgstr "Рівень уточнення:"
 
 #: dialogs/display-config.cpp:1429
 msgid ""
 "High-frequency weight of the model's change (nr_frame --detail-strength)."
-msgstr ""
+msgstr "Високочастотна важливість зміни моделі (nr_frame --detail-strength)."
 
 #: dialogs/display-config.cpp:1430
 msgid "Colour Strength:"
-msgstr ""
+msgstr "Рівень кольору:"
 
 #: dialogs/display-config.cpp:1432
 msgid ""
 "Low-frequency weight of the model's change (nr_frame --colour-strength)."
-msgstr ""
+msgstr "Низькочастотна важливість зміни моделі (nr_frame --colour-strength)."
 
 #: dialogs/display-config.cpp:1433
 msgid "Detail Radius:"
-msgstr ""
+msgstr "Радіус уточнення:"
 
 #: dialogs/display-config.cpp:1435
 msgid ""
 "Radius of the split between detail and colour (nr_frame --detail-radius)."
-msgstr ""
+msgstr "Радіус розділення між уточненням і кольором (nr_frame --detail-radius)."
 
 #: dialogs/display-config.cpp:1441
 msgid ""
 "A PNG control mask (nr_frame --control-mask): red scales the blend, green "
 "the tone and blue the structure. It is resized to the filtered frame."
-msgstr ""
+msgstr "Керівна маска PNG (nr_frame --control-mask): червоний канал регулює накладання, зелений - тональність, синій - структуру. Розмір як у фільтрованого кадру."
 
 #: dialogs/display-config.cpp:1443
 msgid "Browse..."
-msgstr ""
+msgstr "Огляд..."
 
 #: dialogs/display-config.cpp:1444
 msgid "Clear"
-msgstr ""
+msgstr "Очистити"
 
 #: dialogs/display-config.cpp:1446
 msgid "Select a DLSS-NR control mask"
-msgstr ""
+msgstr "Вибір керівної маски DLSS-NR"
 
 #: dialogs/display-config.cpp:1447
 msgid "PNG Images (*.png)|*.png;*.PNG"
-msgstr ""
+msgstr "PNG-зображення|*.png;*.PNG"
 
 #: dialogs/display-config.cpp:1460
 msgid "Control Mask:"
-msgstr ""
+msgstr "Керівна маска:"
 
 #: dialogs/display-config.cpp:1520 dialogs/display-config.cpp:1908
 #: xrc/DisplayConfigBasic.xrc:187
@@ -1113,11 +1113,11 @@ msgstr "Невідома опція %s зі значенням %s."
 msgid ""
 "VisualBoyAdvance-M needs your permission to open \"%s\". Allow this folder "
 "to open it and any other ROM in it from now on, or choose the file alone."
-msgstr ""
+msgstr "Visual Boy Advance-M потребує дозволу відкриття \"%s\". Дозволь відкриття теки, а також будь-яких інших її ROM'ів, або вибери лише сам файл."
 
 #: panel.cpp:773
 msgid "Allow"
-msgstr ""
+msgstr "Дозволити"
 
 #: panel.cpp:814
 #, c-format
@@ -1588,7 +1588,7 @@ msgstr "Використання Direct 3D 9"
 #: panel.cpp:8872
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
-msgstr "Не вдалося отримати режим відображення адаптера: 0x%08X."
+msgstr "Не вдалось отримати режим відображення адаптера: 0x%08X."
 
 #: panel.cpp:8896
 msgid "FlipEx not supported, falling back to Discard swap effect"
@@ -1616,7 +1616,7 @@ msgstr "DX Drawing Panel визначено: %d * %d (масштаб: %f)."
 #: panel.cpp:8999
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
-msgstr "Не вдалося отримати режим відображення адаптера для перезавантаження: 0x%08X."
+msgstr "Не вдалось отримати режим відображення адаптера для перезавантаження: 0x%08X."
 
 #: panel.cpp:9031
 #, c-format
@@ -1986,7 +1986,7 @@ msgstr "Відтворення завершено."
 #: sys.cpp:601
 #, c-format
 msgid "%d %% (%d, %d fps)"
-msgstr "%d %% (%d, %d Гц)"
+msgstr "%d %% (%d, %d Гц)"
 
 #: sys.cpp:1063 xrc/GBPrinter.xrc:65
 msgid "&Discard"
@@ -2284,76 +2284,76 @@ msgstr "Бібліотека плаґінів фільтрів"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:550
 msgid "Run the DLSS NR neural filter alongside the display filter"
-msgstr "Запустити нейронний фільтр DLSS NR разом із фільтром відображення"
+msgstr "Запуск нейронного фільтра DLSS NR разом із фільтром відображення."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:552
 msgid ""
 "Whether DLSS NR runs before or after the display filter, or at display size"
-msgstr ""
+msgstr "Встановлення запуску DLSS NR до чи після фільтра відображення, чи за розміром дисплея."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:554
 msgid ""
 "Blend of the DLSS NR picture against the source, in percent; above 100 "
 "extrapolates"
-msgstr ""
+msgstr "Накладати зображення DLSS NR на початкове (у процентах); понад 100 % - екстраполяція."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:556
 msgid ""
 "DLSS NR profile: 0 standard, 1 natural, 2 cinematic, 3 neutral, 4 vendor"
-msgstr ""
+msgstr "Профіль DLSS NR: 0: типовий, 1: природний, 2: кінематографічний, 3: нейтральний, 4: постачальник."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:558
 msgid ""
 "Frames taller than this are scaled down before DLSS NR runs, and back up "
 "after"
-msgstr ""
+msgstr "Зменшення кадрів вищого розміру перед запуском DLSS NR і збільшення після нього."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:560
 msgid "Feed the previous DLSS NR output back into the model"
-msgstr ""
+msgstr "Подання попереднього DLSS NR до моделі. "
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "DLSS NR style index; -1 keeps the profile's"
-msgstr ""
+msgstr "Індекс стилю DLSS NR; -1 залишає профільний."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid "DLSS NR local tone; negative keeps the profile's"
-msgstr ""
+msgstr "Локальний тон DLSS NR; заперечення залишає профільний."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid "DLSS NR local structure; negative keeps the profile's"
-msgstr ""
+msgstr "Локальна структура DLSS NR; заперечення залишає профільну."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid "DLSS NR structure on skin through the automatic mask; negative is off"
-msgstr ""
+msgstr "Структура оформлення DLSS NR за автоматичною маскою; заперечення - вимкнення."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
 msgid ""
 "DLSS NR structure through the automatic mask outside skin; negative is off"
-msgstr ""
+msgstr "Структура поза оформленням DLSS NR за автоматичною маскою; заперечення - вимкнення."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "High-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Високочастотна важливість зміни DLSS NR."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "Low-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Низькочастотна важливість зміни DLSS NR."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid "Radius of the DLSS NR split between detail and colour, in pixels"
-msgstr ""
+msgstr "Радіус розділення DLSS NR між уточненням і кольором, у пікселях."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "Seeds the DLSS NR model's noise channels"
-msgstr ""
+msgstr "Встановлення каналів шуму моделі DLSS NR"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
 msgid ""
 "PNG control mask for DLSS NR: red scales the blend, green the tone, blue the"
 " structure"
-msgstr ""
+msgstr "Керівна маска PNG для DLSS NR: червоний канал регулює накладання, зелений - тональність, синій - структуру."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:581
 msgid "Directory containing RPI filter plugins"
@@ -2369,7 +2369,7 @@ msgstr "Бітова глибина"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "Keep window on top"
-msgstr "Зберігати вікно над усіма вікнами"
+msgstr "Залишати вікно над усіма вікнами"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid "Maximum number of threads to run filters in"
@@ -2701,11 +2701,11 @@ msgstr "Не перезаписувати рідні збереження (ба�
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:745
 msgid "Throttle game speed, even when accelerated (0-450 %, 0 = no throttle)"
-msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
+msgstr "Прискорення швидкості гри (0-450 %, 0: без прискорення)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:748
 msgid "Set throttle for speedup key (0-3000 %, 0 = no throttle)"
-msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
+msgstr "Встановити прискорення для кнопки (0-3000 %, 0: без прискорення)"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:750
 msgid "Number of frames to skip with speedup (instead of speedup throttle)"
@@ -3376,7 +3376,7 @@ msgstr "Помилка мережі."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2759
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3648
 msgid "Invalid link server response."
-msgstr ""
+msgstr "Недійсна відповідь посилання сервера."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2767
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3656
