@@ -17,6 +17,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
+#include <type_traits>
 #include <vector>
 
 #include "nr_frame.h"
@@ -518,6 +519,10 @@ public:
     // Windows one -- a Dilate call is a few tens of microseconds, and waking
     // seven threads costs more than the rows save.
     void Run(int height, const std::function<void(int, int)>& fn, int limit = 0) {
+        // One job at a time: Apply32() runs here on the emulation thread and
+        // ReleaseHistory() on the features stage's, and a second job started over a
+        // running one would reset its row counter and its tally under it.
+        std::lock_guard<std::mutex> one(run_mutex_);
         int n = bands();
         if (limit > 0)
             n = std::min(n, limit);
@@ -602,6 +607,7 @@ private:
         }
     }
     std::vector<std::thread> workers_;
+    std::mutex run_mutex_;  // held for a whole Run()
     std::mutex mutex_;
     std::condition_variable start_, done_;
     const std::function<void(int, int)>* fn_ = nullptr;
@@ -637,33 +643,45 @@ inline void MaxInto(uint8_t* out, const uint8_t* in, int n) {
         out[i] = std::max(out[i], in[i]);
 }
 
-void Dilate(std::vector<uint8_t>* image, int width, int height, int r,
-            std::vector<uint8_t>* scratch) {
-    scratch->resize(static_cast<size_t>(width) * height);
-    uint8_t* const im = image->data();
-    uint8_t* const across = scratch->data();
+// Dilates `count` images of one size together: each row as Dilate() always did it, in two
+// Run()s for all of them rather than two each -- a scrolling frame dilates up to nine masks,
+// and waking the pool costs more than one mask's rows.
+void DilateAll(uint8_t* const* images, uint8_t* const* scratch, int count, int width,
+               int height, int r) {
+    const int rows = height * count;
     // Across, then down. The second pass reads what the first wrote for rows it
     // does not own, so the two cannot overlap -- hence two Run()s, not one.
-    RowPool::Get().Run(height, [&](int ya, int yb) {
-        for (int y = ya; y < yb; y++) {
-            const uint8_t* row = im + static_cast<size_t>(y) * width;
-            uint8_t* out = across + static_cast<size_t>(y) * width;
+    RowPool::Get().Run(rows, [&](int ya, int yb) {
+        for (int j = ya; j < yb; j++) {
+            const int k = j / height, y = j % height;
+            const uint8_t* row = images[k] + static_cast<size_t>(y) * width;
+            uint8_t* out = scratch[k] + static_cast<size_t>(y) * width;
             std::memcpy(out, row, static_cast<size_t>(width));
             for (int o = 1; o <= r; o++) {
                 MaxInto(out, row + o, width - o);
                 MaxInto(out + o, row, width - o);
             }
         }
-    }, kDilateBands);
-    RowPool::Get().Run(height, [&](int ya, int yb) {
-        for (int y = ya; y < yb; y++) {
-            uint8_t* out = im + static_cast<size_t>(y) * width;
+    }, count == 1 ? kDilateBands : 0);
+    RowPool::Get().Run(rows, [&](int ya, int yb) {
+        for (int j = ya; j < yb; j++) {
+            const int k = j / height, y = j % height;
+            const uint8_t* across = scratch[k];
+            uint8_t* out = images[k] + static_cast<size_t>(y) * width;
             const int y0 = std::max(0, y - r), y1 = std::min(height - 1, y + r);
             std::memcpy(out, across + static_cast<size_t>(y0) * width, static_cast<size_t>(width));
-            for (int k = y0 + 1; k <= y1; k++)
-                MaxInto(out, across + static_cast<size_t>(k) * width, width);
+            for (int q = y0 + 1; q <= y1; q++)
+                MaxInto(out, across + static_cast<size_t>(q) * width, width);
         }
-    }, kDilateBands);
+    }, count == 1 ? kDilateBands : 0);
+}
+
+void Dilate(std::vector<uint8_t>* image, int width, int height, int r,
+            std::vector<uint8_t>* scratch) {
+    scratch->resize(static_cast<size_t>(width) * height);
+    uint8_t* im = image->data();
+    uint8_t* across = scratch->data();
+    DilateAll(&im, &across, 1, width, height, r);
 }
 
 // How far the picture may scroll between a pass's input and the frame it is laid over, in
@@ -739,7 +757,27 @@ double ShiftCost(const Pyramid& live, const Pyramid& pass, int l, int dx, int dy
     for (int y = y0; y < y1; y += step) {
         const uint8_t* ar = a + static_cast<size_t>(y) * w;
         const uint8_t* br = b + static_cast<size_t>(y - dy) * w - dx;
-        for (int x = x0; x < x1; x += step, n++)
+        int x = x0;
+#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+        if (step == 1 || step == 2 || step == 4) {
+            // Sixteen bytes at a time, the ones between samples zeroed in both, so they add
+            // nothing: the same integer total as the loop below.
+            const __m128i keep = step == 1 ? _mm_set1_epi8(-1)
+                               : step == 2 ? _mm_set1_epi16(0x00FF)
+                                           : _mm_set1_epi32(0x000000FF);
+            __m128i acc = _mm_setzero_si128();
+            for (; x + 16 <= x1; x += 16)
+                acc = _mm_add_epi64(acc, _mm_sad_epu8(
+                    _mm_and_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(ar + x)), keep),
+                    _mm_and_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(br + x)), keep)));
+            alignas(16) uint64_t lanes[2];
+            _mm_store_si128(reinterpret_cast<__m128i*>(lanes), acc);
+            sum += lanes[0] + lanes[1];
+            n += static_cast<uint64_t>((x - x0) / step);
+        }
+#endif
+        for (; x < x1; x += step, n++)
             sum += static_cast<uint64_t>(std::abs(ar[x] - br[x]));
     }
     return n ? static_cast<double>(sum) / static_cast<double>(n) : 1e9;
@@ -786,6 +824,28 @@ struct Hypothesis {
     int ax = 0, ay = 0, bx = 0, by = 0;
 };
 
+// |l - (a + b + 1) / 2| a byte at a time over n bytes: what MeasureRows asks of every
+// channel, without looking at which channel a byte is. `_mm_avg_epu8` is that very mean, and
+// the two saturating differences are the absolute one.
+inline void AbsDiffMean(const uint8_t* l, const uint8_t* a, const uint8_t* b, uint8_t* out,
+                        size_t n) {
+    size_t i = 0;
+#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+    for (; i + 16 <= n; i += 16) {
+        const __m128i lv = _mm_loadu_si128(reinterpret_cast<const __m128i*>(l + i));
+        const __m128i g = _mm_avg_epu8(_mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i)),
+                                       _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i)));
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(out + i),
+                         _mm_or_si128(_mm_subs_epu8(lv, g), _mm_subs_epu8(g, lv)));
+    }
+#endif
+    for (; i < n; i++) {
+        const int g = (a[i] + b[i] + 1) >> 1;
+        out[i] = static_cast<uint8_t>(l[i] > g ? l[i] - g : g - l[i]);
+    }
+}
+
 // How far each pixel has moved since the pass was given the frame, if the pass
 // is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
 // when they are the same: the largest step of the three channels, or all of it
@@ -801,6 +861,9 @@ struct Hypothesis {
 void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid,
                  const Hypothesis& h, int width, int height, int y_begin, int y_end,
                  uint8_t* motion) {
+    // the channels' differences for one row, then the largest of each pixel's three
+    thread_local std::vector<uint8_t> diff;
+    diff.resize(static_cast<size_t>(width) * 3);
     for (int y = y_begin; y < y_end; y++) {
         uint8_t* mv = motion + static_cast<size_t>(y) * width;
         const int ay = y - h.ay, by = y - h.by;
@@ -819,26 +882,21 @@ void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid
             std::memset(mv, 255, static_cast<size_t>(x0));
         if (x1 < width)
             std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
-        const uint8_t* l = live + (static_cast<size_t>(y) * width + x0) * 3;
-        const uint8_t* arow = given + static_cast<size_t>(ay) * width * 3;
-        const uint8_t* brow = given + static_cast<size_t>(by) * width * 3;
-        const uint8_t* av = valid ? valid + static_cast<size_t>(ay) * width : nullptr;
-        const uint8_t* bv = valid ? valid + static_cast<size_t>(by) * width : nullptr;
-        for (int x = x0; x < x1; x++, l += 3) {
-            const int ax = x - h.ax, bx = x - h.bx;
-            int m = 255;
-            if (!valid || (av[ax] && bv[bx])) {
-                const uint8_t* a = arow + static_cast<size_t>(ax) * 3;
-                const uint8_t* b = brow + static_cast<size_t>(bx) * 3;
-                m = 0;
-                for (int c = 0; c < 3; c++) {
-                    const int g = (a[c] + b[c] + 1) >> 1;
-                    const int d = l[c] > g ? l[c] - g : g - l[c];
-                    if (d > m)
-                        m = d;
-                }
-            }
-            mv[x] = static_cast<uint8_t>(m);
+        const size_t n = static_cast<size_t>(x1 - x0);
+        AbsDiffMean(live + (static_cast<size_t>(y) * width + x0) * 3,
+                    given + (static_cast<size_t>(ay) * width + (x0 - h.ax)) * 3,
+                    given + (static_cast<size_t>(by) * width + (x0 - h.bx)) * 3, diff.data(),
+                    n * 3);
+        const uint8_t* d = diff.data();
+        uint8_t* out = mv + x0;
+        for (size_t i = 0; i < n; i++, d += 3)
+            out[i] = std::max(d[0], std::max(d[1], d[2]));
+        if (valid) {
+            const uint8_t* av = valid + static_cast<size_t>(ay) * width + (x0 - h.ax);
+            const uint8_t* bv = valid + static_cast<size_t>(by) * width + (x0 - h.bx);
+            // all ones where either is empty, as a mask, so it vectorises
+            for (size_t i = 0; i < n; i++)
+                out[i] |= static_cast<uint8_t>(-static_cast<int>((av[i] == 0) | (bv[i] == 0)));
         }
     }
 }
@@ -1120,13 +1178,14 @@ struct Filter::Impl {
     // How long each live pixel has held still (kMemoryStillFrames), and the live frame
     // before this one to tell; screen coordinates, reset wherever the picture changes.
     std::vector<uint8_t> age;
+    std::vector<uint8_t> age_diff;  // the channels' change since the last frame, for `age`
     std::vector<uint8_t> live_previous;
     // Apply32()'s live frame as RGB8 and its pyramid; how it lines up with the pass on
     // screen and the one before it; and the dilation's scratch. Members so the frame does not allocate.
     std::vector<uint8_t> live;
     Pyramid live_pyramid;
     std::array<Alignment, 2> alignment;  // the pass on screen, the one before it
-    std::vector<uint8_t> dilate;
+    std::vector<std::vector<uint8_t>> dilate_scratch;  // one per motion mask (DilateAll)
     // The frame weight actually in use, carried between frames so it can only climb back
     // gradually -- see kSceneRisePerFrame.
     int scene_weight = 256;
@@ -1903,14 +1962,16 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 im.age.assign(px, 0);
                 im.live_previous.assign(live, live + px * 3);
             } else {
+                // Each channel's change sixteen at a time (the mean of the previous frame with
+                // itself is the previous frame), then a pixel is still if none moved.
                 const uint8_t* lp = im.live_previous.data();
-                for (size_t i = 0; i < px; i++) {
-                    const uint8_t* a = live + 3 * i;
-                    const uint8_t* b = lp + 3 * i;
-                    const bool still = std::abs(a[0] - b[0]) <= kHoldLevels &&
-                                       std::abs(a[1] - b[1]) <= kHoldLevels &&
-                                       std::abs(a[2] - b[2]) <= kHoldLevels;
-                    im.age[i] = still ? static_cast<uint8_t>(std::min(255, im.age[i] + 1)) : 0;
+                im.age_diff.resize(px * 3);
+                AbsDiffMean(live, lp, lp, im.age_diff.data(), px * 3);
+                const uint8_t* d = im.age_diff.data();
+                uint8_t* age = im.age.data();
+                for (size_t i = 0; i < px; i++, d += 3) {
+                    const bool still = std::max(d[0], std::max(d[1], d[2])) <= kHoldLevels;
+                    age[i] = still ? static_cast<uint8_t>(age[i] + (age[i] < 255)) : 0;
                 }
                 std::memcpy(im.live_previous.data(), live, px * 3);
             }
@@ -2037,9 +2098,19 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                                 mem_al.motion[k].data());
                     }
                 }
+                uint8_t* masks[9];
+                uint8_t* across[9];
+                int n_masks = 0;
                 for (Alignment* al : { &now_al, &was_al, &mem_al })
                     for (int k = 0; k < al->count; k++)
-                        Dilate(&al->motion[k], width, height, kMotionRadius, &im.dilate);
+                        masks[n_masks++] = al->motion[k].data();
+                if (im.dilate_scratch.size() < static_cast<size_t>(n_masks))
+                    im.dilate_scratch.resize(static_cast<size_t>(n_masks));
+                for (int k = 0; k < n_masks; k++) {
+                    im.dilate_scratch[k].resize(px);
+                    across[k] = im.dilate_scratch[k].data();
+                }
+                DilateAll(masks, across, n_masks, width, height, kMotionRadius);
             }
 
             // Which way a pixel takes a pass -- the one its motion fits best -- and how much of
@@ -2089,7 +2160,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const int16_t* const mem_delta = have_memory ? im.memory_delta.data() : nullptr;
             const int16_t* const was_cast = have_previous ? im.previous_cast.data() : nullptr;
             const int16_t* const was_delta = have_previous ? im.previous_delta.data() : nullptr;
-            RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+            // The two frame-wide choices as constants, so each case compiles to a loop of its
+            // own without the other's work. have_previous is only ever set while crossing.
+            const auto rows = [&](auto crossing_c, auto previous_c, int y_begin, int y_end) {
+            constexpr bool kCrossing = decltype(crossing_c)::value;
+            constexpr bool kPrevious = decltype(previous_c)::value;
             for (int y = y_begin; y < y_end; y++) {
                 uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
                 const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
@@ -2099,10 +2174,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     const int16_t* const now_cast = cast + CastIndex(l[0], l[1], l[2]) * 3;
                     size_t now_a = 0, now_b = 0, was_a = 0, was_b = 0, mem_a = 0, mem_b = 0;
                     const int w = choose(now_l, i, &now_a, &now_b);
-                    const int was_w = choose(was_l, i, &was_a, &was_b);
+                    const int was_w = kPrevious ? choose(was_l, i, &was_a, &was_b) : 0;
                     // The memory only matters where the pass on screen (or the one
                     // before, while crossing) does not fit the live picture itself.
-                    const int mem_w = (w < 256 || (crossing && was_w < 256))
+                    const int mem_w = (w < 256 || (kCrossing && was_w < 256))
                                           ? choose(mem_l, i, &mem_a, &mem_b)
                                           : 0;
                     uint32_t p = 0;
@@ -2120,11 +2195,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                                       delta) *
                                          w >>
                                      8;
-                        if (crossing) {
+                        if (kCrossing) {
                             // Nothing to come from before the first pass, or after a
                             // resize: the correction then fades up out of nothing.
                             int was = 0;
-                            if (have_previous) {
+                            if (kPrevious) {
                                 was = was_cast[(now_cast - cast) + c];
                                 if (mem_w > 0)
                                     was += (remembered - was) * mem_w >> 8;
@@ -2144,6 +2219,14 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     d[x] = p;
                 }
             }
+            };
+            RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                if (have_previous)
+                    rows(std::true_type{}, std::true_type{}, y_begin, y_end);
+                else if (crossing)
+                    rows(std::true_type{}, std::false_type{}, y_begin, y_end);
+                else
+                    rows(std::false_type{}, std::false_type{}, y_begin, y_end);
             });
             wrote_result = true;
         }
