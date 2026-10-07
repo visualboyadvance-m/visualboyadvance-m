@@ -3,6 +3,16 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <functional>
+#ifdef __APPLE__
+#include <dispatch/dispatch.h>
+#else
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+#include <vector>
+#endif
 
 namespace hdr {
 
@@ -249,12 +259,127 @@ static inline uint32_t PqCode(float nits) {
     return g_pq_lut[idx];
 }
 
+#ifndef __APPLE__
+// The worker threads for ForRowBands() where there is no GCD. They sleep on a
+// condition variable between frames, and the calling thread takes rows too.
+class RowBandPool {
+public:
+    // Never destroyed: the workers sleep until the process exits, so nothing
+    // has to join them from a static destructor, where Windows can deadlock.
+    static RowBandPool& Get() {
+        static RowBandPool* pool = new RowBandPool;
+        return *pool;
+    }
+
+    // Calls fn over chunks of [0, rows), each drawn by whichever thread comes
+    // free first, and returns once all of them have finished.
+    void Run(int rows, const std::function<void(int, int)>& fn) {
+        if (workers_ == 0 || rows < 2 * (workers_ + 1)) {
+            fn(0, rows);
+            return;
+        }
+        // One frame at a time; a second caller waits for the first.
+        std::lock_guard<std::mutex> one(run_mutex_);
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            fn_ = &fn;
+            rows_ = rows;
+            // Four chunks a thread, so a thread that starts late, or whose rows
+            // are dearer, does not hold up the rest.
+            chunk_ = std::max(1, rows / ((workers_ + 1) * 4));
+            next_row_.store(0, std::memory_order_relaxed);
+            remaining_ = workers_;
+            ++generation_;
+        }
+        start_.notify_all();
+        Take();
+        std::unique_lock<std::mutex> lock(mutex_);
+        done_.wait(lock, [this] { return remaining_ == 0; });
+        fn_ = nullptr;
+    }
+
+private:
+    RowBandPool() {
+        const unsigned hw = std::thread::hardware_concurrency();
+        // As many bands as GCD runs on macOS, at most: past that, waking the
+        // threads costs more than a 480x320 frame's rows save.
+        workers_ = std::min(hw ? static_cast<int>(hw) : 1, 16) - 1;
+        for (int i = 0; i < workers_; ++i)
+            std::thread([this] { Work(); }).detach();
+    }
+
+    void Take() {
+        for (;;) {
+            const int y = next_row_.fetch_add(chunk_, std::memory_order_relaxed);
+            if (y >= rows_)
+                return;
+            (*fn_)(y, std::min(rows_, y + chunk_));
+        }
+    }
+
+    void Work() {
+        unsigned seen = 0;
+        for (;;) {
+            {
+                std::unique_lock<std::mutex> lock(mutex_);
+                start_.wait(lock, [&] { return generation_ != seen; });
+                seen = generation_;
+            }
+            Take();
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (--remaining_ == 0)
+                    done_.notify_one();
+            }
+        }
+    }
+
+    int workers_ = 0;
+    std::mutex run_mutex_;
+    std::mutex mutex_;
+    std::condition_variable start_;
+    std::condition_variable done_;
+    unsigned generation_ = 0;
+    int remaining_ = 0;
+    // Written under mutex_ before generation_ moves, read by the workers after
+    // they have seen it move, so the mutex orders them.
+    const std::function<void(int, int)>* fn_ = nullptr;
+    int rows_ = 0;
+    int chunk_ = 1;
+    std::atomic<int> next_row_{0};
+};
+#endif
+
+// Calls fn(y0, y1) over bands of rows covering [0, rows). The encoders run once a
+// frame on the emulation thread, and at the curve's settings LumScale() takes a
+// pow() a pixel: about 8 ms for a 480x320 frame on a 2018 Intel Mac mini, half a
+// 60 Hz frame. Every row depends only on its own input, so the bands write exactly
+// what one loop would. GCD's pool on macOS, RowBandPool elsewhere.
+static void ForRowBands(int rows, const std::function<void(int, int)>& fn) {
+#ifdef __APPLE__
+    const int bands = std::min(rows, 16);
+    if (bands > 1) {
+        const std::function<void(int, int)>* f = &fn;
+        dispatch_apply(static_cast<size_t>(bands), DISPATCH_APPLY_AUTO, ^(size_t i) {
+            const int y0 = static_cast<int>(static_cast<long long>(rows) * i / bands);
+            const int y1 = static_cast<int>(static_cast<long long>(rows) * (i + 1) / bands);
+            (*f)(y0, y1);
+        });
+        return;
+    }
+    fn(0, rows);
+#else
+    RowBandPool::Get().Run(rows, fn);
+#endif
+}
+
 void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
                 uint32_t* dst, int dst_stride) {
     // Output is BT.2020 PQ. Convert Rec.709/sRGB input to BT.2020 in linear
     // light first; then a luminance-based boost (hue-preserving) and PQ encode.
     const bool convert = !g_settings.input_is_rec2020;
-    for (int y = 0; y < rows; ++y) {
+    ForRowBands(rows, [&](int y_begin, int y_end) {
+    for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint32_t* dp = reinterpret_cast<uint32_t*>(
             reinterpret_cast<uint8_t*>(dst) + static_cast<size_t>(y) * dst_stride);
@@ -274,6 +399,7 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
             dp[x] = PackA2B10G10R10(PqCode(r * s), PqCode(g * s), PqCode(b * s));
         }
     }
+    });
 }
 
 void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int rows,
@@ -290,7 +416,8 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
         m = kRec2020ToRec709;
     const float* lw = g_settings.scrgb_target_p3 ? kLumaP3 : kLumaRec709;
 
-    for (int y = 0; y < rows; ++y) {
+    ForRowBands(rows, [&](int y_begin, int y_end) {
+    for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint16_t* dp = reinterpret_cast<uint16_t*>(
             reinterpret_cast<uint8_t*>(dst) + static_cast<size_t>(y) * dst_stride);
@@ -316,6 +443,7 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
             px[3] = FloatToHalf(1.0f);
         }
     }
+    });
 }
 
 }  // namespace hdr
