@@ -9976,7 +9976,7 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
 #ifndef NO_METAL
         case config::RenderMethod::kMetal:
             if (is_macosx_1012_or_newer())
-                return new MetalDrawingPanel(this, basic_width, basic_height);
+                return NewMetalDrawingPanel(this, basic_width, basic_height);
             wxLogInfo(_("Metal is unavailable, defaulting to OpenGL"));
             return new GLDrawingPanel(this, basic_width, basic_height);
 #endif
@@ -10322,23 +10322,8 @@ void GameArea::OnVolumeChanged(config::Option* option) {
         
 #ifdef __WXMAC__
 #ifndef NO_METAL
-MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
-        : DrawingPanel(parent, _width, _height)
-{
-    memset(delta, 0xff, sizeof(delta));
-
-    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
-    // 16 or 32, though
-    if (OPTION(kDispFilter) == config::Filter::kNone &&
-        OPTION(kDispIFB) == config::Interframe::kNone &&
-        !(hdr::HdrAvailable() && OPTION(kDispHDR))) {
-        // changing from 32 to 24 does not require regenerating color tables.
-        // HDR needs a 32-bit source for the encoder, so leave it forced to 32.
-        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
-    }
-
-    DrawingPanelInit();
-}
+// The constructor and destructor are in macsupport.mm: only there does the class have
+// its Objective-C members, and a constructor compiled here would not construct them.
 
 void MetalDrawingPanel::DrawArea(uint8_t** data)
 {

@@ -467,6 +467,9 @@ void VbamRemoveSdlMetalViews();
 #endif
 
 #include <simd/simd.h>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 typedef enum AAPLVertexInputIndex
 {
@@ -494,6 +497,12 @@ typedef struct
     // 2D texture coordinate
     vector_float2 textureCoordinate;
 } AAPLVertex;
+
+// Makes a MetalDrawingPanel. Only macsupport.mm sees the whole class -- the Objective-C
+// members below exist only where __OBJC__ is defined -- so only it can size the object:
+// a `new MetalDrawingPanel` in a C++ file allocates too little, and the panel then
+// writes its Metal objects past the end of the allocation.
+DrawingPanel* NewMetalDrawingPanel(wxWindow* parent, int width, int height);
 
 class MetalDrawingPanel : public DrawingPanel {
 public:
@@ -534,6 +543,25 @@ private:
     vector_uint2 _contentSize;
     uint32_t *_conversion_buffer;
     size_t _conversion_buffer_size;
+
+    // With vsync off, a thread of its own presents the newest frame (PresentLoop): a
+    // drawable comes back only when the compositor has shown a newer one, and while DLSS
+    // NR runs that took 15 ms a frame and more, which the emulation thread spent waiting.
+    // The thread waits instead; a frame that arrives before the last was presented
+    // replaces it, as a Vulkan mailbox swapchain does. With vsync on the wait is the
+    // pacing asked for, and DrawArea presents itself.
+    void RenderToDrawable(id<MTLTexture> texture, vector_uint2 content_size);
+    id metal_layer_ = nil;                   // the view's CAMetalLayer, retained
+    void StartPresenter();
+    void StopPresenter();
+    void PresentLoop();
+    void Present(id<MTLTexture> texture, vector_uint2 content_size);
+    std::thread present_thread_;
+    std::mutex present_mutex_;
+    std::condition_variable present_cv_;
+    id<MTLTexture> present_pending_ = nil;   // retained, under present_mutex_
+    vector_uint2 present_size_;              // the drawable size it was made for
+    bool present_quit_ = false;
 #endif
 };
 #endif

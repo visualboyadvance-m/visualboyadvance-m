@@ -384,8 +384,31 @@ bool is_macosx_11_or_newer()
 }
 
 #ifndef NO_METAL
+// Here rather than in panel.cpp with the rest of the panel: only this file sees the
+// Objective-C members (drawing.h), and a constructor compiled where they are hidden leaves
+// them unconstructed -- the present thread's std::thread and mutex included.
+MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
+        : DrawingPanel(parent, _width, _height)
+{
+    memset(delta, 0xff, sizeof(delta));
+
+    // wxImage is 24-bit RGB, so 24-bit is preferred.  Filters require
+    // 16 or 32, though
+    if (OPTION(kDispFilter) == config::Filter::kNone &&
+        OPTION(kDispIFB) == config::Interframe::kNone &&
+        !(hdr::HdrAvailable() && OPTION(kDispHDR))) {
+        // changing from 32 to 24 does not require regenerating color tables.
+        // HDR needs a 32-bit source for the encoder, so leave it forced to 32.
+        systemColorDepth = (OPTION(kBitDepth) + 1) << 3;
+    }
+
+    DrawingPanelInit();
+}
+
 MetalDrawingPanel::~MetalDrawingPanel()
 {
+    // Before anything it draws with goes.
+    StopPresenter();
     if (did_init)
     {
         // Wait for all pending GPU work to complete before releasing resources
@@ -436,6 +459,11 @@ MetalDrawingPanel::~MetalDrawingPanel()
         if (_device != nil) {
             [_device release];
             _device = nil;
+        }
+
+        if (metal_layer_ != nil) {
+            [metal_layer_ release];
+            metal_layer_ = nil;
         }
 
         did_init = false;
@@ -515,6 +543,7 @@ void MetalDrawingPanel::CreateMetalView()
 
     CAMetalLayer *metalLayer = (CAMetalLayer *)metalView.layer;
     metalLayer.device = metalView.device;
+    metal_layer_ = [metalLayer retain];   // for RenderToDrawable(), off the main thread too
 
     // Enable VSync based on user preference
     metalLayer.displaySyncEnabled = OPTION(kPrefVsync);
@@ -651,6 +680,8 @@ void MetalDrawingPanel::DrawingPanelInit()
     _conversion_buffer_size = 0;
 
     CreateMetalView();
+    if (!OPTION(kPrefVsync))
+        StartPresenter();
 
     // CreateMetalView() has decided metal_is_hdr_; fold the brightness settings
     // into the encoder and activate the scRGB encoding if HDR is on.
@@ -658,6 +689,7 @@ void MetalDrawingPanel::DrawingPanelInit()
 
     did_init = true;
 }
+
 
 id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger bytesPerRow)
 {
@@ -905,13 +937,25 @@ void MetalDrawingPanel::DrawArea()
             _texture = CreateTextureWithData(todraw + srcPitch, srcPitch);
         }
 
+        if (present_thread_.joinable())
+            Present(_texture, _contentSize);
+        else
+            RenderToDrawable(_texture, _contentSize);
+    }
+}
+
+// Draws `texture` into the next drawable and presents it. On the emulation thread with
+// vsync on, on PresentLoop()'s otherwise.
+void MetalDrawingPanel::RenderToDrawable(id<MTLTexture> texture, vector_uint2 content_size)
+{
+    @autoreleasepool {
         // Acquire the drawable straight from the CAMetalLayer rather than
         // MTKView.currentDrawable: with the view paused (no internal draw loop)
         // currentDrawable is only vended inside MTKView's own draw cycle and would
         // be nil here. nextDrawable gives us a fresh drawable per manual present,
-        // with no contention from the view's vsync timer.
-        CAMetalLayer* metalLayer = (CAMetalLayer*)metalView.layer;
-        id<CAMetalDrawable> drawable = [metalLayer nextDrawable];
+        // with no contention from the view's vsync timer. The layer was taken when
+        // the view was made, so the present thread need not touch the view.
+        id<CAMetalDrawable> drawable = [(CAMetalLayer*)metal_layer_ nextDrawable];
         if (drawable == nil) {
             return;  // No drawable available, skip this frame
         }
@@ -931,7 +975,7 @@ void MetalDrawingPanel::DrawArea()
         id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:renderPassDescriptor];
         renderEncoder.label = @"VBAMRenderEncoder";
 
-        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(_contentSize.x), (double)(_contentSize.y), 0.0, 1.0 }];
+        [renderEncoder setViewport:(MTLViewport){0.0, 0.0, (double)(content_size.x), (double)(content_size.y), 0.0, 1.0 }];
         [renderEncoder setRenderPipelineState:_pipelineState];
 
         [renderEncoder setVertexBuffer:_vertices
@@ -942,7 +986,7 @@ void MetalDrawingPanel::DrawArea()
                                length:sizeof(_viewportSize)
                               atIndex:AAPLVertexInputIndexViewportSize];
 
-        [renderEncoder setFragmentTexture:_texture
+        [renderEncoder setFragmentTexture:texture
                                   atIndex:AAPLTextureIndexBaseColor];
 
         // Set the sampler for texture filtering
@@ -960,6 +1004,69 @@ void MetalDrawingPanel::DrawArea()
         [commandBuffer presentDrawable:drawable];
         [commandBuffer commit];
     }
+}
+
+void MetalDrawingPanel::StartPresenter()
+{
+    if (present_thread_.joinable())
+        return;
+    present_quit_ = false;
+    present_thread_ = std::thread([this] { PresentLoop(); });
+}
+
+void MetalDrawingPanel::StopPresenter()
+{
+    if (!present_thread_.joinable())
+        return;
+    {
+        std::lock_guard<std::mutex> lock(present_mutex_);
+        present_quit_ = true;
+    }
+    present_cv_.notify_one();
+    present_thread_.join();
+    if (present_pending_ != nil) {
+        [present_pending_ release];
+        present_pending_ = nil;
+    }
+}
+
+// Hands the frame to PresentLoop(), replacing one it has not taken yet.
+void MetalDrawingPanel::Present(id<MTLTexture> texture, vector_uint2 content_size)
+{
+    id<MTLTexture> dropped = nil;
+    {
+        std::lock_guard<std::mutex> lock(present_mutex_);
+        dropped = present_pending_;
+        present_pending_ = [texture retain];
+        present_size_ = content_size;
+    }
+    if (dropped != nil)
+        [dropped release];
+    present_cv_.notify_one();
+}
+
+void MetalDrawingPanel::PresentLoop()
+{
+    for (;;) {
+        id<MTLTexture> texture = nil;
+        vector_uint2 size;
+        {
+            std::unique_lock<std::mutex> lock(present_mutex_);
+            present_cv_.wait(lock, [this] { return present_quit_ || present_pending_ != nil; });
+            if (present_quit_)
+                return;
+            texture = present_pending_;   // the reference passes to this thread
+            present_pending_ = nil;
+            size = present_size_;
+        }
+        RenderToDrawable(texture, size);
+        [texture release];
+    }
+}
+
+DrawingPanel* NewMetalDrawingPanel(wxWindow* parent, int width, int height)
+{
+    return new MetalDrawingPanel(parent, width, height);
 }
 #endif
 
