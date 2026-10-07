@@ -21,6 +21,9 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <mutex>
+#include <condition_variable>
+#include <algorithm>
+#include <vector>
 
 #include <wx/arrstr.h>
 #include <wx/log.h>
@@ -102,10 +105,9 @@ public:
     int current_buffer = 0;
     int filled_buffers = 0;
     int soundBufferLen = 0;
-    AudioTimeStamp starttime;
-    AudioTimeStamp timestamp;
-    AudioQueueTimelineRef timeline = NULL;
     std::mutex buffer_mutex;
+    std::condition_variable buffer_ready;
+    std::vector<bool> buffer_pending;
 
 private:
     AudioDeviceID GetCoreAudioDevice(wxString name);
@@ -116,36 +118,19 @@ private:
 
 static void PlaybackBufferReadyCallback(void *inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
-    int curbuf = 0;
-    CoreAudioAudio *cadevice = (CoreAudioAudio *)inUserData;
+    auto* cadevice = static_cast<CoreAudioAudio*>(inUserData);
     (void)inAQ;
-
-    // Safety check: if buffers is NULL, we're shutting down - just return
-    if (cadevice->buffers == NULL) {
-        wxLogDebug(wxT("PlaybackBufferReadyCallback - buffers is NULL (shutting down)"));
-        return;
-    }
-
-    // Find which buffer this is
-    for (curbuf = 0; curbuf < OPTION(kSoundBuffers); curbuf++) {
-        if (cadevice->buffers[curbuf] == inBuffer) {
-            break;
-        }
-    }
-
-    if (curbuf >= OPTION(kSoundBuffers)) {
-        wxLogError(wxT("PlaybackBufferReadyCallback - buffer not found in array"));
-        return;
-    }
-
-    // Idiomatic CoreAudio: just reset the buffer size to mark it as empty
-    // The buffer is reused, not freed and reallocated
-    cadevice->buffers[curbuf]->mAudioDataByteSize = 0;
-
-    // Decrement filled buffers count so write() knows this buffer is available
     std::lock_guard<std::mutex> lock(cadevice->buffer_mutex);
-    if (cadevice->filled_buffers > 0) {
-        cadevice->filled_buffers--;
+    if (!cadevice->buffers) return;
+    for (size_t i = 0; i < cadevice->buffer_pending.size(); ++i) {
+        if (cadevice->buffers[i] != inBuffer) continue;
+        if (cadevice->buffer_pending[i]) {
+            inBuffer->mAudioDataByteSize = 0;
+            cadevice->buffer_pending[i] = false;
+            --cadevice->filled_buffers;
+            cadevice->buffer_ready.notify_one();
+        }
+        return;
     }
 }
 
@@ -267,8 +252,7 @@ void CoreAudioAudio::deinit() {
     // Idiomatic CoreAudio cleanup order:
     // 1. Stop the queue (blocks until callbacks complete)
     // 2. Free buffers explicitly
-    // 3. Dispose timeline
-    // 4. Dispose queue
+    // 3. Dispose queue
 
     // Stop the audio queue first and wait for all callbacks to complete
     if (audioQueue != NULL) {
@@ -281,19 +265,13 @@ void CoreAudioAudio::deinit() {
 
     // Free all allocated buffers
     if (buffers_to_free != NULL) {
-        for (int i = 0; i < OPTION(kSoundBuffers); i++) {
+        for (size_t i = 0; i < buffer_pending.size(); i++) {
             if (buffers_to_free[i] != NULL) {
                 AudioQueueFreeBuffer(audioQueue, buffers_to_free[i]);
                 buffers_to_free[i] = NULL;
             }
         }
         free(buffers_to_free);
-    }
-
-    // Dispose timeline if it exists
-    if (timeline != NULL) {
-        AudioQueueDisposeTimeline(audioQueue, timeline);
-        timeline = NULL;
     }
 
     // Finally dispose the queue itself
@@ -304,6 +282,8 @@ void CoreAudioAudio::deinit() {
 
     current_buffer = 0;
     filled_buffers = 0;
+    buffer_pending.clear();
+    buffer_ready.notify_all();
 }
 
 CoreAudioAudio::~CoreAudioAudio() {
@@ -431,9 +411,10 @@ bool CoreAudioAudio::init(long sampleRate) {
         return false;
     }
 
-    buffers = (AudioQueueBufferRef *)calloc(OPTION(kSoundBuffers), sizeof(AudioQueueBufferRef));
+    buffer_pending.assign(OPTION(kSoundBuffers), false);
+    buffers = (AudioQueueBufferRef *)calloc(buffer_pending.size(), sizeof(AudioQueueBufferRef));
 
-    for (int i = 0; i < OPTION(kSoundBuffers); i++) {
+    for (size_t i = 0; i < buffer_pending.size(); i++) {
         result = AudioQueueAllocateBuffer(audioQueue, soundBufferLen, &buffers[i]);
 
         if (result != noErr) {
@@ -495,92 +476,63 @@ void CoreAudioAudio::reset() {
 }
 
 void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
-    AudioQueueBufferRef this_buf = NULL;
-    OSStatus status = 0;
-
-    this_buf = buffers[current_buffer];
-
-    if (this_buf == NULL) {
-        return;
-    }
-
-    // Bounds checking: ensure we don't write past buffer capacity
-    if (this_buf->mAudioDataByteSize + length > this_buf->mAudioDataBytesCapacity) {
-        length = this_buf->mAudioDataBytesCapacity - this_buf->mAudioDataByteSize;
-        if (length <= 0) {
-            return;
+    AudioQueueBufferRef this_buf = nullptr;
+    size_t index = 0;
+    bool enqueue = false;
+    {
+        std::lock_guard<std::mutex> lock(buffer_mutex);
+        index = current_buffer;
+        this_buf = buffers[index];
+        const int available = this_buf->mAudioDataBytesCapacity - this_buf->mAudioDataByteSize;
+        length = std::min(length, available);
+        if (length <= 0) return;
+        memcpy(static_cast<uint8_t*>(this_buf->mAudioData) + this_buf->mAudioDataByteSize,
+               finalWave, length);
+        this_buf->mAudioDataByteSize += length;
+        if (this_buf->mAudioDataByteSize == this_buf->mAudioDataBytesCapacity) {
+            // Register ownership BEFORE enqueue: a fast callback can otherwise
+            // complete before the producer increments its pending-buffer count.
+            buffer_pending[index] = true;
+            ++filled_buffers;
+            current_buffer = (current_buffer + 1) % buffer_pending.size();
+            enqueue = true;
         }
     }
-
-    memcpy((uint8_t *)this_buf->mAudioData + this_buf->mAudioDataByteSize, finalWave, length);
-    this_buf->mAudioDataByteSize += (UInt32)length;
-
-    if (this_buf->mAudioDataByteSize == this_buf->mAudioDataBytesCapacity) {
-        status = AudioQueueCreateTimeline(audioQueue, &timeline);
-        if(status == noErr) {
-            AudioQueueGetCurrentTime(audioQueue, timeline, &starttime, NULL);
-            AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, &starttime, &timestamp);
-        } else {
-            AudioQueueEnqueueBufferWithParameters(audioQueue, this_buf, 0, NULL, 0, 0, 0, NULL, NULL, &timestamp);
+    if (enqueue) {
+        // Plain FIFO playback is sufficient. Scheduling at a cached AudioTimeStamp
+        // from the previous-rate queue can put new buffers seconds into the future.
+        const OSStatus status = AudioQueueEnqueueBuffer(audioQueue, this_buf, 0, nullptr);
+        if (status != noErr) {
+            std::lock_guard<std::mutex> lock(buffer_mutex);
+            if (buffer_pending[index]) {
+                buffer_pending[index] = false;
+                --filled_buffers;
+            }
+            this_buf->mAudioDataByteSize = 0;
+            buffer_ready.notify_one();
         }
     }
 }
 
 void CoreAudioAudio::write(uint16_t* finalWave, int length) {
-    std::size_t samples = length / (description.mBitsPerChannel / 8);
-    std::size_t avail = 0;
-
-    if (!initialized)
-        return;
-
-    while ((avail = ((buffers[current_buffer]->mAudioDataBytesCapacity - buffers[current_buffer]->mAudioDataByteSize) / (description.mBitsPerChannel / 8))) < samples)
-    {
-        setBuffer(finalWave, (avail * (description.mBitsPerChannel / 8)));
-
-        finalWave += avail;
-        samples -= avail;
-
-        if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
-            std::lock_guard<std::mutex> lock(buffer_mutex);
-            current_buffer++;
-            filled_buffers++;
-        }
-
-        if (current_buffer >= OPTION(kSoundBuffers)) {
-            current_buffer = 0;
-        }
-
-        while (true) {
-            {
-                std::lock_guard<std::mutex> lock(buffer_mutex);
-                if (filled_buffers < OPTION(kSoundBuffers)) {
-                    break;
-                }
-            }
-            wxMilliSleep(((soundGetSampleRate() / 60) * 4) / (soundGetSampleRate() >> 7));
-        }
-    }
-
-    setBuffer(finalWave, samples * (description.mBitsPerChannel / 8));
-
-    if (buffers[current_buffer]->mAudioDataByteSize >= buffers[current_buffer]->mAudioDataBytesCapacity) {
-        std::lock_guard<std::mutex> lock(buffer_mutex);
-        current_buffer++;
-        filled_buffers++;
-    }
-
-    if (current_buffer >= OPTION(kSoundBuffers)) {
-        current_buffer = 0;
-    }
-
-    while (true) {
+    if (!initialized) return;
+    auto* source = reinterpret_cast<uint8_t*>(finalWave);
+    while (length > 0) {
+        int chunk = 0;
         {
-            std::lock_guard<std::mutex> lock(buffer_mutex);
-            if (filled_buffers < OPTION(kSoundBuffers)) {
-                break;
-            }
+            std::unique_lock<std::mutex> lock(buffer_mutex);
+            buffer_ready.wait(lock, [this] {
+                return !initialized || !buffer_pending[current_buffer];
+            });
+            if (!initialized) return;
+            const auto buffer = buffers[current_buffer];
+            chunk = std::min(length, static_cast<int>(
+                buffer->mAudioDataBytesCapacity - buffer->mAudioDataByteSize));
         }
-        wxMilliSleep(((soundGetSampleRate() / 60) * 4) / (soundGetSampleRate() >> 7));
+        if (chunk <= 0) return;
+        setBuffer(reinterpret_cast<uint16_t*>(source), chunk);
+        source += chunk;
+        length -= chunk;
     }
 }
 
