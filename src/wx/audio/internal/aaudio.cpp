@@ -1,4 +1,5 @@
 #include "wx/audio/internal/aaudio.h"
+#include "wx/audio/internal/stall-detector.h"
 
 #if defined(VBAM_ENABLE_AAUDIO)
 
@@ -97,6 +98,9 @@ private:
     // Producer -> consumer request to drop everything queued. The consumer owns
     // read_, so the producer must never move it itself.
     std::atomic<bool> flush_{false};
+    std::vector<int16_t> silence_;  // for topping a drained queue up
+    StallDetector stall_;
+    bool stall_pending_ = false;  // a stall seen while a flush was pending
     // Consumer is waiting for the queue to refill after running dry.
     std::atomic<bool> priming_{true};
 
@@ -479,6 +483,26 @@ void AAudioDriver::write(uint16_t* finalWave, int length) {
                 break;
             }
             std::this_thread::sleep_for(std::chrono::microseconds(500));
+        }
+    }
+
+    // The queue paces the emulator. When the emulator has not run for a while and the
+    // queue played on -- the activity in the background, anything that holds the frame
+    // loop -- or resume() has dropped it, it is empty when the emulator comes back, and
+    // refilling it from the game runs the game at full speed until it is past target_
+    // again: a burst of fast-forward. The gap is in the sound already, so fill it with
+    // silence instead, target_ at the stream's rate in the core's samples. Not while a
+    // flush is still pending: the consumer would drop the silence with the rest, so a stall
+    // seen then is kept for the next write. And only after a stall (StallDetector): a
+    // frame or two that ran late is made up by catching up, as it always was.
+    stall_pending_ = pace && (stall_.Stalled() || stall_pending_);
+    if (stall_pending_ && !flush_.load(std::memory_order_acquire)) {
+        stall_pending_ = false;
+        if (Queued() == 0) {
+            size_t quiet = static_cast<size_t>(static_cast<double>(target_) * resample_ratio_);
+            quiet -= quiet % kChannels;
+            silence_.assign(quiet, 0);
+            PushSamples(silence_.data(), quiet, pace);
         }
     }
 

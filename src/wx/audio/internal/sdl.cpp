@@ -1,4 +1,5 @@
 #include "wx/audio/internal/sdl.h"
+#include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
 // #define LOGALL
@@ -24,6 +25,8 @@
 #else
 #include <SDL.h>
 #endif
+
+#include <vector>
 
 #include <wx/arrstr.h>
 #include <wx/log.h>
@@ -71,6 +74,8 @@ public:
 private:
     SDL_AudioDeviceID sound_device = 0;
     SDL_AudioSpec audio;
+    std::vector<uint8_t> silence_;  // for topping a drained queue up
+    StallDetector stall_;
 
 #ifdef ENABLE_SDL3
     SDL_AudioStream *sound_stream = NULL;
@@ -311,6 +316,33 @@ void SDLAudio::write(uint16_t* finalWave, int length) {
         SDL_PauseAudioDevice(sound_device, 0);
     }
 #endif
+
+    {
+        // The queue paces the emulator. When the emulator has not run for a while and the
+        // queue played on -- a live window resize, the fullscreen animation, anything that
+        // holds the event loop -- it is empty when the emulator comes back, and refilling it
+        // from the game runs the game at full speed until it is full again: a burst of
+        // fast-forward. The gap is in the sound already, so fill it with silence instead.
+        // Here that is the depth the loops below hold it at. Only after a stall, though
+        // (StallDetector): a frame or two that ran late is made up by catching up, as it
+        // always was.
+        const bool stalled = stall_.Stalled();
+#ifdef ENABLE_SDL3
+        const size_t pace_bytes = 2048 * audio.channels * sizeof(uint16_t);
+        const bool drained = SDL_GetAudioStreamQueued(sound_stream) == 0;
+#else
+        const size_t pace_bytes = audio.samples * audio.channels * sizeof(uint16_t);
+        const bool drained = SDL_GetQueuedAudioSize(sound_device) == 0;
+#endif
+        if (drained && stalled && !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
+            silence_.assign(pace_bytes, 0);
+#ifdef ENABLE_SDL3
+            SDL_PutAudioStreamData(sound_stream, silence_.data(), (int)pace_bytes);
+#else
+            SDL_QueueAudio(sound_device, silence_.data(), (Uint32)pace_bytes);
+#endif
+        }
+    }
 
 #ifdef ENABLE_SDL3
     res = (int)SDL_PutAudioStreamData(sound_stream, finalWave, length) == true;

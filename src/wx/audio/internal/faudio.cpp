@@ -15,6 +15,7 @@
 #include <wx/string.h>
 
 #include "wx/audio/internal/faudio.h"
+#include "wx/audio/internal/stall-detector.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -149,6 +150,8 @@ private:
     uint32_t freq_;
     const uint32_t buffer_count_;
     std::vector<uint8_t> buffers_;
+    std::vector<uint8_t> silence_;  // a buffer of it, for topping a drained queue up
+    StallDetector stall_;
     int currentBuffer;
     int sound_buffer_len_;
 
@@ -354,6 +357,7 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
     uint32_t flags = 0;
     if (!initialized || failed)
         return;
+    const bool stalled = stall_.Stalled();
 
     while (true) {
         if (device_changed) {
@@ -372,6 +376,26 @@ void FAudio_Output::write(uint16_t* finalWave, int) {
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
                     static unsigned int i = 0;
                     log("FAudio: Buffers were not refilled fast enough (i=%i)\n", i++);
+                }
+
+                // The queue paces the emulator. When the emulator has not run for a while and the
+                // queue played on -- a live window resize, the fullscreen animation, anything that
+                // holds the event loop -- it is empty when the emulator comes back, and refilling it
+                // from the game runs the game at full speed until it is full again: a burst of
+                // fast-forward. The gap is in the sound already, so fill it with silence instead,
+                // all but the buffer this frame submits. Nothing is queued now, so the silence may
+                // be reallocated.
+                // Only after a stall, though (StallDetector): a frame or two that ran late is
+                // made up by catching up, as it always was.
+                if (stalled && !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
+                    silence_.assign(sound_buffer_len_, 0);
+                    for (uint32_t i = 0; i + 1 < buffer_count_; i++) {
+                        FAudioBuffer quiet = buf;
+                        quiet.AudioBytes = sound_buffer_len_;
+                        quiet.pAudioData = silence_.data();
+                        [[maybe_unused]] uint32_t hr = FAudioSourceVoice_SubmitSourceBuffer(sVoice, &quiet, NULL);
+                        VBAM_CHECK(hr == 0);
+                    }
                 }
             }
 

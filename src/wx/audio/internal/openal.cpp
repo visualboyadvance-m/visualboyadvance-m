@@ -1,4 +1,5 @@
 #include "wx/audio/internal/openal.h"
+#include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
 // #define LOGALL
@@ -36,6 +37,8 @@ typedef ALCboolean(ALC_APIENTRY* LPALCISEXTENSIONPRESENT)(ALCdevice* device,
                                                           const ALCchar* extname);
 typedef const ALCchar*(ALC_APIENTRY* LPALCGETSTRING)(ALCdevice* device, ALCenum param);
 #endif
+
+#include <vector>
 
 #include <wx/arrstr.h>
 #include <wx/log.h>
@@ -90,6 +93,8 @@ private:
     ALuint* buffer;
     ALuint tempBuffer;
     ALuint source;
+    std::vector<uint8_t> silence_;  // a buffer of it, for topping a drained queue up
+    StallDetector stall_;
     int freq;
     int soundBufferLen;
 
@@ -296,6 +301,7 @@ void OpenAL::write(uint16_t* finalWave, int length) {
 
     winlog("OpenAL::write\n");
     debugState();
+    const bool stalled = stall_.Stalled();
     ALint sourceState = 0;
     ALint nBuffersProcessed = 0;
 
@@ -325,6 +331,27 @@ void OpenAL::write(uint16_t* finalWave, int length) {
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
                     static unsigned int i = 0;
                     log("OpenAL: Buffers were not refilled fast enough (i=%i)\n", i++);
+                }
+            }
+
+            // The queue paces the emulator. When the emulator has not run for a while and the
+            // queue played on -- a live window resize, the fullscreen animation, anything that
+            // holds the event loop -- it is empty when the emulator comes back, and refilling it
+            // from the game runs the game at full speed until it is full again: a burst of
+            // fast-forward. The gap is in the sound already, so fill it with silence instead.
+            // All but the one this frame refills go back with silence. Only after a stall,
+            // though (StallDetector): a frame or two that ran late is made up by catching up,
+            // as it always was.
+            if (stalled && !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
+                silence_.assign(soundBufferLen, 0);
+                for (; nBuffersProcessed > 1; nBuffersProcessed--) {
+                    ALuint drained = 0;
+                    alSourceUnqueueBuffers(source, 1, &drained);
+                    ASSERT_SUCCESS;
+                    alBufferData(drained, AL_FORMAT_STEREO16, silence_.data(), soundBufferLen, freq);
+                    ASSERT_SUCCESS;
+                    alSourceQueueBuffers(source, 1, &drained);
+                    ASSERT_SUCCESS;
                 }
             }
         }

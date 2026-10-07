@@ -1,5 +1,6 @@
 #ifdef __APPLE__
 #include "wx/audio/internal/coreaudio.h"
+#include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
 // #define LOGALL
@@ -112,6 +113,9 @@ public:
 private:
     AudioDeviceID GetCoreAudioDevice(wxString name);
     void setBuffer(uint16_t* finalWave, int length);
+    void primeSilence();
+    std::vector<uint16_t> silence_;
+    StallDetector stall_;
 
     bool initialized = false;
 };
@@ -514,8 +518,44 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
     }
 }
 
+// Tops the queue up with silence to one buffer short of full: where write() keeps it.
+void CoreAudioAudio::primeSilence() {
+    for (;;) {
+        int room = 0;
+        {
+            std::lock_guard<std::mutex> lock(buffer_mutex);
+            if (!buffers || filled_buffers + 1 >= static_cast<int>(buffer_pending.size()) ||
+                buffer_pending[current_buffer])
+                return;
+            const AudioQueueBufferRef buf = buffers[current_buffer];
+            room = static_cast<int>(buf->mAudioDataBytesCapacity - buf->mAudioDataByteSize);
+        }
+        if (room <= 0)
+            return;
+        silence_.assign(room / sizeof(uint16_t) + 1, 0);
+        setBuffer(silence_.data(), room);  // fills the buffer, which enqueues it
+    }
+}
+
 void CoreAudioAudio::write(uint16_t* finalWave, int length) {
     if (!initialized) return;
+
+    // The queue paces the emulator: write() waits while every buffer is pending. When the
+    // emulator has not run for a while and the queue played on -- a live window resize,
+    // the fullscreen animation, anything that holds the event loop -- it is empty when the
+    // emulator comes back, and refilling it from the game runs the game at full speed
+    // until it is full again: a burst of fast-forward. The gap is in the sound already,
+    // so fill it with silence instead, and the game goes on at its own rate. Only after a
+    // stall, though (StallDetector): a frame or two that ran late is made up by catching
+    // up, as it always was.
+    const bool stalled = stall_.Stalled();
+    bool drained;
+    {
+        std::lock_guard<std::mutex> lock(buffer_mutex);
+        drained = filled_buffers == 0;
+    }
+    if (drained && stalled)
+        primeSilence();
     auto* source = reinterpret_cast<uint8_t*>(finalWave);
     while (length > 0) {
         int chunk = 0;

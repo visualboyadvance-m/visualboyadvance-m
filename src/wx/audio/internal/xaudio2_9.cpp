@@ -16,6 +16,7 @@
 #include <wx/app.h>
 
 #include "wx/audio/internal/xaudio2.h"
+#include "wx/audio/internal/stall-detector.h"
 
 // MMDevice API
 #include <mmdeviceapi.h>
@@ -63,6 +64,8 @@ private:
     UINT32 freq = 0;
     UINT32 bufferCount = 0;
     BYTE* buffers = nullptr;
+    std::vector<BYTE> silence;  // a buffer of it, for topping a drained queue up
+    StallDetector stall_;
     int currentBuffer = 0;
     int soundBufferLen = 0;
     volatile bool device_changed = false;
@@ -356,6 +359,7 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
     
     if (!initialized)
         return;
+    const bool stalled = stall_.Stalled();
 
     while (true) {
         sVoice->GetState(&vState, XAUDIO2_VOICE_NOSAMPLESPLAYED);
@@ -370,6 +374,26 @@ void XAudio2_9_Output::write(uint16_t* finalWave, int) {
                 if (systemVerbose & VERBOSE_SOUNDOUTPUT) {
                     static unsigned int i = 0;
                     log("XAudio2: Buffers were not refilled fast enough (i=%i)\n", i++);
+                }
+
+                // The queue paces the emulator. When the emulator has not run for a while and the
+                // queue played on -- a live window resize, the fullscreen animation, anything that
+                // holds the event loop -- it is empty when the emulator comes back, and refilling it
+                // from the game runs the game at full speed until it is full again: a burst of
+                // fast-forward. The gap is in the sound already, so fill it with silence instead,
+                // all but the buffer this frame submits. Nothing is queued now, so the silence may
+                // be reallocated.
+                // Only after a stall, though (StallDetector): a frame or two that ran late is
+                // made up by catching up, as it always was.
+                if (stalled && !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
+                    silence.assign(soundBufferLen, 0);
+                    for (UINT32 i = 0; i + 1 < bufferCount; i++) {
+                        XAUDIO2_BUFFER quiet = {};
+                        quiet.AudioBytes = soundBufferLen;
+                        quiet.pAudioData = silence.data();
+                        if (FAILED(sVoice->SubmitSourceBuffer(&quiet)))
+                            break;
+                    }
                 }
             }
             break;
