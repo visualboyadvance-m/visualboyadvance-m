@@ -9,7 +9,76 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: the portable path a third faster — one `precise`, spread by glslang (2026-10-03)
+## Latest: libmetalmx on an AMD GPU — a Vega 64 in an Intel Mac (2026-10-06)
+
+The first Metal GPU here that is not Apple's: an RX Vega 64 (eGPU, Mac mini 2018, macOS 15.8),
+through VBA-M's DLSS NR filter, which refused it (`simdgroup is not 32 wide (64)`). It takes the
+portable path (no `simdgroup_matrix` before Apple7). Four things stood between it and a right
+frame, each found with a probe on the card itself:
+
+- **The width check was the matrix path's.** The simdgroup kernels assume 32 lanes (barriers,
+  shuffles, lane maps); the portable ones order threadgroup memory with threadgroup barriers
+  only. The check now applies only off the portable path, and AMD's 64 runs.
+- **AMD's Metal compiler crashes** ("Compiler encountered an internal error") on any kernel
+  that loads through an address joined from two 32-bit push fields — `ulong(lda) | ulong(ldb)
+  << 32` or `as_type<ulong>(float2(p0, p1))`; one load through it is enough. Three kernels did
+  (`attention`, `ffn_fused_portable`, `window_block_portable`). `push_address()` in nr_metal.h
+  reads the pair as the one aligned 8-byte value it is, with a static_assert on the offsets.
+  Pipeline errors now name the kernel.
+- **AMD's Metal compiler folds `float(half(x))` to `x`** — and every other spelling of the round
+  trip: through half2, the bits, a volatile. 99.8 % of a million values came back unrounded,
+  so every rounding point of the graph vanished. `half_round` now has a second spelling on the
+  float's bits (`half_round_bits`, equal to the CPU's conversion on all 2^32 floats on the card),
+  chosen by function constant 2, which libmetalmx sets from a start-up probe (`half_cast_probe`)
+  or `XMX_HALF_ROUND=cast|bits`; `xmx_half_by_cast()` reports it. Apple GPUs keep the cast.
+  Two raw `float(half(...))` (the window gather's load, the fused head) are `half_round` now:
+  **round to half through `half_round`, never with a cast of one's own.**
+- **AMD's driver does not order dispatches at a memory barrier** inside a concurrent encoder
+  when the buffers are reached through GPU addresses — neither the scoped barrier nor one
+  listing every resource, even after every dispatch. Below the 320 floor (`min_extent`) a frame
+  came out different on every run, the scratch arena's aliased roles racing from level 5 on;
+  encoder splits at the recorded barriers fixed it (so the recording's barriers are complete)
+  but tripled the frame, and a serial encoder fixed it at no cost (640x360 79.6 ms against
+  79.7). Non-Apple GPUs dispatch serially (`XMX_METAL_DISPATCH=serial|concurrent`).
+
+On the Vega after all four: `test_dlssnr` 45 of 45, the frame deterministic at every
+`min_extent`, all 24 GPU test scripts on `NR_GPU_BACKEND=metal` (the real weights for those that
+need them), `test_nr_frame_live`, and the C head **bit-identical to the Python resident path**
+(0 of 409 600). Rates through the C library: 640x360@0.5 79.7 ms, 1280x720@0.55 168.4 ms. Not
+run on an Apple GPU after the change: there the cast and the concurrent encoder are what they
+were, and the new constant is false.
+
+Then, for speed and for the Vulkan path on the same card:
+
+- **The portable GEMM packs two 32-lane blocks a threadgroup** where the SIMD group is 64 wide
+  (`portable_pack()`, `XMX_PORTABLE_PACK=N`): a lone block left half of AMD's wavefront idle.
+  The kernel takes its block from `threads_per_threadgroup`, so no pipeline is added; the QKV
+  epilogue and the pool get a stage a block and are packed only where every block is real
+  (they meet barriers together). 1.3-2.4x on isolated shapes, four a threadgroup no faster;
+  the frame 104 -> 92 ms at 480x320, 82 -> 74 at 640x360@0.5, 176 -> 157 at 1280x720@0.55.
+  Bit-exact through every GEMM, QKV, glue and residual test.
+- **`xmx_profile` on AMD and Intel GPUs**: they sample timestamps between dispatches, not at
+  encoder boundaries, so a profiled pass is bracketed inside the one encoder there
+  (`g.prof_dispatch`). The first profile of the Vega at 512x320: GEMMs 65 % of 95 ms, window
+  blocks 19 %, fused FFN 11 %. The frame's GEMMs run 2-3x slower than the same shapes alone
+  (64x4096x1024: 0.97 against 0.36 ms, same flags, alignment and private memory), cause not
+  found -- the next lever on this card, with register tiling of the portable kernel.
+- **libxmx has `half_round` on the bits too** (`publish.glsl`, constant 1 is now a uint:
+  0 pack, 1 cast, 2 bits; `XMX_HALF_ROUND=bits`), chosen under MoltenVK on any vendor but
+  Apple's: AMD's and Intel's Metal compilers fold both other spellings (a UHD 630 as well as the
+  Vega, measured). `test_resident`, `test_epilogue` and `test_gemm_contract` pass on Vulkan
+  there now. **Still failing on MoltenVK/AMD**, deterministically and with every spelling:
+  `test_gemm_qkv` (the fused QKV epilogue writes values that are neither raw nor E4M3),
+  `test_glue`, `test_window_block`, `test_frame_execution`, `test_joint_qkv`,
+  `test_compact_head` -- most likely more AMD-compiler miscompiles of the SPIRV-Cross MSL, not
+  bisected. libmetalmx is the runtime to use on an AMD Mac (VBA-M's default there); MoltenVK
+  also runs this card ~8x slower.
+
+Found on the way and not fixed: on this Mac's x86_64 CPU, `test_nr_frame_c.py`'s three
+`compose_encode, history ...` checks fail — the fused composition is not bit-identical to the
+separate passes — on Vulkan (MoltenVK) as on Metal, so in `nr_image.c`'s host code, not a GPU's.
+
+## The portable path a third faster — one `precise`, spread by glslang (2026-10-03)
 
 On the M3 through MoltenVK, the path every device without cooperative matrix takes.
 `notes/improve-portable-precise.md`. **Heads unchanged** (`e80b25dbbadfb76d` at 320x320,

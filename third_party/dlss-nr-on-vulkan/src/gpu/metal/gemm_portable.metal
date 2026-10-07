@@ -16,14 +16,21 @@
 
 constant uint TM = 8, TN = 16;
 
+/* A threadgroup is one 32-lane block, or two stacked along M where the device's SIMD group is
+ * wider than 32 (AMD's 64: a lone 32-lane block leaves half of it idle). Each block computes
+ * exactly what it would alone, the QKV epilogue and the pool in a stage of its own; the
+ * runtime packs those two only where both blocks are whole, so both meet every barrier. */
 template <int RM, int RN>
 kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                             uint3 wg [[threadgroup_position_in_grid]],
-                            uint lid [[thread_index_in_threadgroup]]) {
+                            uint3 tpg [[threads_per_threadgroup]],
+                            uint tid [[thread_index_in_threadgroup]]) {
     const uint BM = TM * RM, BN = TN * RN;
-    /* only the 16x32 build's QKV epilogue and pool read it */
-    threadgroup float stage[RN == 2 ? TM * RM * TN * RN : 1];
-    uint row = wg.y * BM, col = wg.x * BN;
+    /* only the 16x32 build's QKV epilogue and pool read it: a stage a block */
+    threadgroup float stages[RN == 2 ? 2 * TM * RM * TN * RN : 1];
+    threadgroup float *stage = stages + (RN == 2 ? (tid >> 5) * (TM * RM * TN * RN) : 0u);
+    uint lid = tid & 31u;
+    uint row = (wg.y * (tpg.x >> 5) + (tid >> 5)) * BM, col = wg.x * BN;
     if (row >= pc.m || col >= pc.n) return;
     uint flags = operation_flags(pc);
     uint batch = wg.z;
@@ -236,10 +243,10 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
         }
 }
 
-template [[host_name("gemm_portable")]]       kernel void gemm_portable_t<1, 1>(constant Push &, uint3, uint);
-template [[host_name("gemm_portable_tiled")]] kernel void gemm_portable_t<2, 2>(constant Push &, uint3, uint);
+template [[host_name("gemm_portable")]]       kernel void gemm_portable_t<1, 1>(constant Push &, uint3, uint3, uint);
+template [[host_name("gemm_portable_tiled")]] kernel void gemm_portable_t<2, 2>(constant Push &, uint3, uint3, uint);
 /* 16x64, for the GEMMs whose N is a multiple of 64 and whose store is the generic one */
-template [[host_name("gemm_portable_wide")]]  kernel void gemm_portable_t<2, 4>(constant Push &, uint3, uint);
+template [[host_name("gemm_portable_wide")]]  kernel void gemm_portable_t<2, 4>(constant Push &, uint3, uint3, uint);
 
 /* The descriptor-bound benchmark and test path: three buffers and a small push block,
  * `gemm_portable_desc.comp` (BATCHED for the second). The runtime always hands the seven

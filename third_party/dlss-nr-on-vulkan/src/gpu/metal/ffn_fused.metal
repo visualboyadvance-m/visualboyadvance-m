@@ -59,7 +59,7 @@ constant uint F_STAGED = 0x800000u;           /* one group of 32 x 128: weights 
  * 256: the expand's 32 x 128 halves at 0, the projection's 128 x 32 at 4096. */
 constant uint F_MERGE = 0x1000000u, F_STEM = 0x2000000u;
 
-inline ulong ffn_aux(constant Push &pc) { return as_type<ulong>(float2(pc.p0, pc.p1)); }
+inline ulong ffn_aux(constant Push &pc) { return push_address(pc.p0); }
 
 /* One channel of the merge at one pixel, as resident.metal's UPSAMPLE_MERGE makes it. */
 inline float ffn_merged(constant Push &pc, uint pixel, uint c) {

@@ -31,8 +31,6 @@
 constant uint KT_STRIDE = 64u;                /* K transposed: (32 channels, 64 keys) */
 constant uint WB_POOL = 0x800000u, WB_HEAD = 0x1000000u, WB_HEAD16 = 0x2000000u;
 
-inline ulong wb_address(float lo, float hi) { return as_type<ulong>(float2(lo, hi)); }
-
 inline float wb_image(constant Push &pc, uint flags, uint at) {
     return (flags & 0x8000u) != 0u ? float(half_ptr(pc.a)[at]) : float_ptr(pc.a)[at];
 }
@@ -64,7 +62,7 @@ inline void wb_pool(constant Push &pc, threadgroup const float *rows, uint pitch
         total += rows[upper + 32u];
         total += rows[lower + 32u];
         uint at = ((uint(yy) / 2u) * (pc.image_w / 2u) + uint(xx) / 2u) * 32u + c;
-        half_out(wb_address(pc.p2, pc.p3))[at] = half(e4m3(total * 0.25f));
+        half_out(push_address(pc.p2))[at] = half(e4m3(total * 0.25f));
     }
 }
 
@@ -251,7 +249,7 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
     /* the output projection as the tiled GEMM takes it */
     simdgroup_half8x8 attended[4];
     for (uint s = 0u; s < 4u; s++) simdgroup_load(attended[s], mine_h + s * 8u, 32);
-    device const half *P = half_ptr(wb_address(pc.p0, pc.p1));
+    device const half *P = half_ptr(push_address(pc.p0));
     simdgroup_float8x8 projected[4];
     for (uint j = 0u; j < 4u; j++) projected[j] = simdgroup_float8x8(0.0f);
     for (uint s = 0u; s < 4u; s++)
@@ -293,7 +291,7 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
         simdgroup_barrier(mem_flags::mem_threadgroup);
         simdgroup_half8x8 block_out[4];
         for (uint s = 0u; s < 4u; s++) simdgroup_load(block_out[s], mine_h + s * 8u, 32);
-        device const half *H = half_ptr(wb_address(pc.p2, pc.p3));
+        device const half *H = half_ptr(push_address(pc.p2));
         simdgroup_float8x8 acc[2];
         for (uint j = 0u; j < 2u; j++) acc[j] = simdgroup_float8x8(0.0f);
         for (uint s = 0u; s < 4u; s++)
@@ -442,7 +440,7 @@ kernel void window_block_portable(constant Push &pc [[buffer(0)]],
     /* the output projection as the tiled portable GEMM computes it */
     float4 projected[2];
     for (uint j = 0u; j < 2u; j++) projected[j] = float4(0.0f);
-    device const half *P = half_ptr(wb_address(pc.p0, pc.p1));
+    device const half *P = half_ptr(push_address(pc.p0));
     for (uint k = 0u; k < 32u; k++) {
         float4 bv[2];
         for (uint j = 0u; j < 2u; j++) {
@@ -465,7 +463,7 @@ kernel void window_block_portable(constant Push &pc [[buffer(0)]],
         for (uint e = 0u; e < 4u; e++)
             out4[e] = publish(epilogue, projected[j][e] + wb_image(pc, flags, at + e) * cosine[c0 + e]);
         if (head) {
-            for (uint e = 0u; e < 4u; e++) mine[r * 32u + c0 + e] = float(half(out4[e]));
+            for (uint e = 0u; e < 4u; e++) mine[r * 32u + c0 + e] = half_round(out4[e]);
         } else if (pooling) {
             half4 published;
             for (uint e = 0u; e < 4u; e++) { mine[r * 32u + c0 + e] = out4[e]; published[e] = half(e4m3(out4[e])); }
@@ -479,7 +477,7 @@ kernel void window_block_portable(constant Push &pc [[buffer(0)]],
     if (head) {
         threadgroup_barrier(mem_flags::mem_threadgroup);
         /* the head as the base portable GEMM computes it: 32 -> 16 columns */
-        device const half *H = half_ptr(wb_address(pc.p2, pc.p3));
+        device const half *H = half_ptr(push_address(pc.p2));
         float4 acc = float4(0.0f);
         for (uint k = 0u; k < 32u; k++) {
             uint at = k * 16u + cq;

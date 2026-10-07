@@ -6,20 +6,14 @@
  *
  * Three answers, one buffer each: `b` the rounding done by hand on the bits, `c` a pack-and-
  * unpack round trip (`as_type` through a `half2`, the nearest thing Metal has to
- * packHalf2x16), `d` the cast `float(half(x))` — which is what `half_round` in nr_metal.h is,
- * and `xmx_half_by_cast()` says so. Without fast math neither conversion is foldable
- * (notes/phase67, phase74).
+ * packHalf2x16), `d` the cast `float(half(x))` — which is what `half_round` in nr_metal.h is
+ * where the device rounds it, as `xmx_half_by_cast()` says. Without fast math neither
+ * conversion is foldable on Apple GPUs (notes/phase67, phase74); AMD's compiler folds both,
+ * and there `half_round` is the bits (`half_cast_probe` below decides).
  */
 #include "nr_metal.h"
 
-inline float bit_round(float x) {
-    float magnitude = abs(x);
-    if (magnitude >= 65520.0f) return x < 0.0f ? -INFINITY : INFINITY;
-    if (magnitude < 6.103515625e-05f) return rint(x * 16777216.0f) * 5.9604644775390625e-08f;
-    int bits = as_type<int>(x);
-    bits = (bits + (0x0FFF + ((bits >> 13) & 1))) & ~0x1FFF;
-    return as_type<float>(bits);
-}
+inline float bit_round(float x) { return half_round_bits(x); }
 inline float pack_round(float x) {
     uint packed = as_type<uint>(half2(x, 0.0h));
     return float(as_type<half2>(packed).x);
@@ -33,4 +27,11 @@ kernel void half_probe(constant Push &pc [[buffer(0)]],
     float_out(pc.b)[i] = bit_round(x);
     float_out(pc.c)[i] = pack_round(x);
     float_out(pc.d)[i] = cast_round(x);
+}
+
+/* libmetalmx's own start-up question (`probe_half_rounding`): does the cast round on this
+ * device, or does the compiler fold it away? */
+kernel void half_cast_probe(device const float *x [[buffer(0)]], device float *y [[buffer(1)]],
+                            uint i [[thread_position_in_grid]]) {
+    y[i] = float(half(x[i]));
 }

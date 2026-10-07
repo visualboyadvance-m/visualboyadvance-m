@@ -27,7 +27,11 @@
  *   push constants                `setBytes` of the same 128-byte struct at buffer index 0.
  *   vkCmdPipelineBarrier          `memoryBarrierWithScope:MTLBarrierScopeBuffers` inside a
  *                                 concurrent-dispatch encoder, one per pass unless
- *                                 `xmx_sync(0)` suppresses it — the same places.
+ *                                 `xmx_sync(0)` suppresses it — the same places. On a GPU
+ *                                 that is not Apple's the encoder dispatches serially too:
+ *                                 AMD's driver does not order passes at those barriers.
+ *   specialization constant       function constant 2: `half_round` on the bits, where the
+ *     (`half_round`'s spelling)   compiler folds the cast away (AMD's; `xmx_half_by_cast`).
  *   vkCmdCopyBuffer               a blit encoder between two compute encoders.
  *   a recorded command buffer     a host-side op list. A MTLCommandBuffer cannot be
  *                                 submitted twice, so a graph is the recorded list and
@@ -136,6 +140,10 @@ static struct {
 	char name[256]; char err[512]; char memory[256];
 	int ready, lost, discrete, unmapped, coopmat, portable;
 	int metal4;               /* the Metal 4 library is the one loaded (or to be loaded) */
+	int half_bits;            /* half_round on the bits (function constant 2): the cast does not round */
+	int serial;               /* compute encoders dispatch serially: a barrier does not order them */
+	int prof_dispatch;        /* timestamps between dispatches: the device has none at encoder boundaries */
+	unsigned simd_width;      /* the widest threadExecutionWidth a pipeline has reported */
 	/* XMX_PIPELINE_STATS=FILE: what Metal says of each pipeline it compiled, appended to FILE;
 	 * XMX_PIPELINE_IR=DIR: the compiled pipelines serialised there as one binary archive */
 	FILE *stats;
@@ -231,15 +239,11 @@ int xmx_discrete(void) { return g.discrete; }
  * is what the device does, and `XMX_DENORM16=driver` changes nothing here. */
 int xmx_preserve16(void) { return dev ? 1 : 0; }
 
-/* `half_round` in nr_metal.h is the cast, `float(half(x))`, a real conversion pair with fast
- * math off; Metal has no packHalf2x16 to spell the other one with. `XMX_HALF_ROUND=pack` is
- * refused with a note rather than honoured. */
+/* `half_round` in nr_metal.h is the cast, `float(half(x))`, where the device rounds it, and
+ * the bits otherwise (`probe_half_rounding`); -1 before the library is loaded. */
 int xmx_half_by_cast(void)
 {
-	const char *half = getenv("XMX_HALF_ROUND");
-	if (half && *half && strcmp(half, "cast"))
-		fprintf(stderr, "libmetalmx: XMX_HALF_ROUND=%s: Metal has one spelling, the cast; keeping it\n", half);
-	return 1;
+	return library ? !g.half_bits : -1;
 }
 
 /* -- shaders --------------------------------------------------------------- */
@@ -299,9 +303,10 @@ size_t xmx_embedded_shader(const char *name)
 	return 0;
 }
 
-static int load_library(void)
+static int probe_half_rounding(void);
+
+static int load_metallib(void)
 {
-	if (library) return 0;
 	NSError *error = nil;
 	const char *forced = getenv("XMX_METALLIB");
 	if (forced && *forced) {
@@ -332,6 +337,14 @@ static int load_library(void)
 #endif
 }
 
+static int load_library(void)
+{
+	if (library) return 0;
+	if (load_metallib()) return -1;
+	if (probe_half_rounding()) { library = nil; return -1; }
+	return 0;
+}
+
 /* Set from another thread to abandon a build in progress; see xmx.h. A plain flag: the
  * build reads it between pipelines and only ever cares whether it is set. */
 static volatile int g_cancel;
@@ -356,6 +369,8 @@ static int build_pipeline_consts(const char *spv_path, const unsigned *flags, co
 	if (flags) [values setConstantValue:&value type:MTLDataTypeUInt atIndex:0];
 	bool merged_value = merged && *merged;
 	if (merged) [values setConstantValue:&merged_value type:MTLDataTypeBool atIndex:1];
+	bool half_bits = g.half_bits;
+	[values setConstantValue:&half_bits type:MTLDataTypeBool atIndex:2];
 	id<MTLFunction> fn = [library newFunctionWithName:@(stem) constantValues:values error:&error];
 	if (!fn) {
 		snprintf(g.err, sizeof g.err, "no kernel '%s' in the metallib (from '%s')%s%s", stem, spv_path,
@@ -363,10 +378,17 @@ static int build_pipeline_consts(const char *spv_path, const unsigned *flags, co
 		return -1;
 	}
 	id<MTLComputePipelineState> state = [dev newComputePipelineStateWithFunction:fn error:&error];
-	if (!state) FAILNS("pipeline", error);
-	/* Every kernel here is written for a 32-wide simdgroup, as the GLSL is for a 32-wide
-	 * subgroup; the row pass's staging and the GEMM lane mapping both assume it. */
-	if (state.threadExecutionWidth != 32)
+	if (!state) {
+		snprintf(g.err, sizeof g.err, "pipeline '%s' (flags %ld): %s", stem, flags ? (long)*flags : -1L,
+			 error ? [[error localizedDescription] UTF8String] : "unknown error");
+		return -1;
+	}
+	/* The simdgroup kernels are written for a 32-wide simdgroup, as the GLSL is for a
+	 * 32-wide subgroup: their simdgroup barriers, shuffles and lane mapping assume it. The
+	 * portable kernels order their threadgroup memory with threadgroup barriers only, so
+	 * they run at any width -- AMD's 64 (a Vega 64 on an Intel Mac) included. */
+	if (state.threadExecutionWidth > g.simd_width) g.simd_width = (unsigned)state.threadExecutionWidth;
+	if (!g.portable && state.threadExecutionWidth != 32)
 		FAIL("this device's simdgroup is not 32 wide, which the kernels assume", (int)state.threadExecutionWidth);
 	if (g.stats) {
 		/* What Metal tells of a compiled pipeline (there is no register or spill count
@@ -545,6 +567,22 @@ int xmx_open(void)
 		const char *forced = getenv("XMX_PORTABLE");
 		g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
 		g.metal4 = metal4_wanted();
+		/* The recording orders its passes with memory barriers inside a concurrent encoder,
+		 * as the Vulkan one does with pipeline barriers. AMD's driver (a Vega 64 on macOS 15)
+		 * does not honour them for buffers reached through their GPU addresses -- neither the
+		 * scoped barrier nor one naming every resource -- so consecutive passes raced there
+		 * and a small frame came out different on every run. A serial encoder orders them, and
+		 * cost nothing measured on that card (640x360 79.6 ms against 79.7). Apple GPUs keep
+		 * the concurrent encoder, whose barriers they honour. XMX_METAL_DISPATCH=serial or
+		 * concurrent decides instead. */
+		g.serial = 1;
+		if (@available(macOS 10.15, *)) g.serial = ![dev supportsFamily:MTLGPUFamilyApple1];
+		const char *dispatch = getenv("XMX_METAL_DISPATCH");
+		if (dispatch && !strcmp(dispatch, "serial")) g.serial = 1;
+		else if (dispatch && !strcmp(dispatch, "concurrent")) g.serial = 0;
+		else if (dispatch && *dispatch)
+			fprintf(stderr, "libmetalmx: XMX_METAL_DISPATCH=%s is neither serial nor concurrent; %s for this device\n",
+				dispatch, g.serial ? "serial" : "concurrent");
 		queue = [dev newCommandQueue];
 		if (!queue) { dev = nil; FAIL("no command queue", 0); }
 		fence = [dev newFence];
@@ -617,6 +655,10 @@ void xmx_close(void)
 
 /* -- one-shot command buffers ------------------------------------------ */
 
+/* How the compute encoders dispatch: concurrently, ordered by the recorded barriers, except
+ * where those do not order anything (`g.serial`, xmx_open). */
+static MTLDispatchType dispatch_type(void) { return g.serial ? MTLDispatchTypeSerial : MTLDispatchTypeConcurrent; }
+
 /* Commit and wait. A failed command buffer is reported with Metal's own description; a
  * fault the device will not recover from on this queue is recorded as lost. */
 static int finish(id<MTLCommandBuffer> cb, const char *what)
@@ -632,6 +674,56 @@ static int finish(id<MTLCommandBuffer> cb, const char *what)
 			 error ? [[error localizedDescription] UTF8String] : "command buffer failed");
 		return -1;
 	}
+	return 0;
+}
+
+/* Whether float(half(x)) rounds on this device (nr_metal.h, `half_round`): values that must
+ * round -- ties both ways, a subnormal, the overflow -- through the cast on the GPU, against
+ * the float16 conversion worked out ahead (NumPy's). AMD's Metal compiler folds the round
+ * trip away (a Vega 64 on macOS 15 returned 99.8 % of a million values unrounded), and there
+ * every pipeline takes the bit-twiddled spelling instead, through function constant 2.
+ * XMX_HALF_ROUND=cast or bits decides without asking. */
+static int probe_half_rounding(void)
+{
+	const char *forced = getenv("XMX_HALF_ROUND");
+	if (forced && (!strcmp(forced, "cast") || !strcmp(forced, "bits"))) {
+		g.half_bits = forced[0] == 'b';
+		return 0;
+	}
+	if (forced && *forced)
+		fprintf(stderr, "libmetalmx: XMX_HALF_ROUND=%s is neither cast nor bits; asking the device\n", forced);
+	static const float probe[8] = {
+		0x1.001p+0f, 0x1.003p+0f, -0x1.002p+1f, 0x1.0c6f7ap-20f,
+		0x1.8p-25f, 0x1.ffdep+15f, 0x1.117p+16f, 0x1.99999ap-4f,
+	};
+	static const float rounded[8] = {
+		0x1p+0f, 0x1.004p+0f, -0x1p+1f, 0x1.1p-20f,
+		0x1p-24f, 0x1.ffcp+15f, INFINITY, 0x1.998p-4f,
+	};
+	@autoreleasepool {
+		NSError *error = nil;
+		id<MTLFunction> fn = [library newFunctionWithName:@"half_cast_probe"];
+		if (!fn) FAIL("no kernel 'half_cast_probe' in the metallib", 0);
+		id<MTLComputePipelineState> state = [dev newComputePipelineStateWithFunction:fn error:&error];
+		if (!state) FAILNS("pipeline 'half_cast_probe'", error);
+		id<MTLBuffer> in = [dev newBufferWithBytes:probe length:sizeof probe options:MTLResourceStorageModeShared];
+		id<MTLBuffer> out = [dev newBufferWithLength:sizeof probe options:MTLResourceStorageModeShared];
+		id<MTLCommandBuffer> cb = [queue commandBuffer];
+		if (!in || !out || !cb) FAIL("half rounding probe: no buffer", 0);
+		id<MTLComputeCommandEncoder> enc = [cb computeCommandEncoder];
+		[enc setComputePipelineState:state];
+		[enc setBuffer:in offset:0 atIndex:0];
+		[enc setBuffer:out offset:0 atIndex:1];
+		[enc dispatchThreadgroups:MTLSizeMake(1, 1, 1) threadsPerThreadgroup:MTLSizeMake(8, 1, 1)];
+		[enc endEncoding];
+		if (finish(cb, "half rounding probe")) return -1;
+		const float *got = [out contents];
+		g.half_bits = 0;
+		for (int i = 0; i < 8; i++)
+			if (got[i] != rounded[i]) g.half_bits = 1;
+	}
+	if (g.half_bits)
+		fprintf(stderr, "libmetalmx: %s does not round float(half(x)); half_round takes the bit-twiddled spelling\n", g.name);
 	return 0;
 }
 
@@ -688,7 +780,7 @@ static int run_desc(void *pipeline, const struct desc_push *push, unsigned gx, u
 	@autoreleasepool {
 		id<MTLCommandBuffer> cb = [queue commandBuffer];
 		if (!cb) FAIL("command buffer", 0);
-		id<MTLComputeCommandEncoder> enc = [cb computeCommandEncoderWithDispatchType:MTLDispatchTypeConcurrent];
+		id<MTLComputeCommandEncoder> enc = [cb computeCommandEncoderWithDispatchType:dispatch_type()];
 		[enc setComputePipelineState:(__bridge id<MTLComputePipelineState>)pipeline];
 		[enc setBuffer:(__bridge id<MTLBuffer>)g.A.b offset:0 atIndex:0];
 		[enc setBuffer:(__bridge id<MTLBuffer>)g.B.b offset:0 atIndex:1];
@@ -1018,6 +1110,20 @@ int xmx_rec_copy(int source, int target, unsigned long long bytes,
 	return 0;
 }
 
+/* How many 32-lane blocks a portable GEMM's threadgroup stacks (gemm_portable.metal): enough
+ * to fill the device's SIMD group, two at most (measured), XMX_PORTABLE_PACK=N to try others.
+ * One on the simdgroup path, whose kernels are another shape. */
+static unsigned portable_pack(void)
+{
+	if (!g.portable) return 1;
+	const char *env = getenv("XMX_PORTABLE_PACK");
+	if (env && *env) {
+		int n = atoi(env);
+		return n >= 1 && n <= 32 ? (unsigned)n : 1;
+	}
+	return g.simd_width >= 64 ? 2 : 1;
+}
+
 static int dispatch(void *pipeline, const struct push *p, unsigned gx, unsigned gy, unsigned gz,
 		    unsigned tg, unsigned family, unsigned subkind)
 {
@@ -1171,9 +1277,18 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 		return dispatch(pipeline, &p, N / 32, (M + rows - 1) / rows, gz, 128, PK_STAGED, bt);
 	}
 	g.wide_calls += wide;
-	if (wide)   return dispatch(pipeline, &p, N / 64u, M / 16u, gz, 32, PK_TILED, bt);
-	if (tiled)  return dispatch(pipeline, &p, N / g.tilen, M / g.tilem, gz, 32, PK_TILED, bt);
-	return dispatch(pipeline, &p, (N + 15) / 16, (M + 7) / 8, gz, 32, PK_GEMM, bt);
+	/* The portable kernels are a 32-lane block a threadgroup; where the SIMD group is wider
+	 * (AMD's 64), blocks are stacked along M to fill it (gemm_portable.metal). Two a
+	 * threadgroup on a Vega 64: 1.3-2.4x on the frame's shapes; four was no faster. The two
+	 * epilogues that keep threadgroup memory, the QKV one and the pool, have a stage a block
+	 * and barriers both blocks must meet, so they are packed only where every block is real. */
+	unsigned pack = portable_pack();
+	unsigned gx, gy, kind = PK_TILED;
+	if (wide)       gx = N / 64u, gy = M / 16u;
+	else if (tiled) gx = N / g.tilen, gy = M / g.tilem;
+	else            gx = (N + 15) / 16, gy = (M + 7) / 8, kind = PK_GEMM;
+	if ((bt & 0x900000u) && (pack > 2u || gy % pack)) pack = 1;
+	return dispatch(pipeline, &p, gx, (gy + pack - 1) / pack, gz, 32 * pack, kind, bt);
 }
 
 int xmx_rec_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K, unsigned batch,
@@ -1668,30 +1783,51 @@ static int run_ops(const struct oplist *l)
 			if (op->kind == OP_COPY) {
 				if (enc) { [enc updateFence:fence]; [enc endEncoding]; enc = nil; }
 				id<MTLBlitCommandEncoder> blit;
-				if (profiling && stamps < stamp_limit) {
+				unsigned blit_stamp = stamps;
+				int blit_sampled = profiling && stamps < stamp_limit;
+				if (blit_sampled && g.prof_dispatch) {
+					stamp_kind[stamps++] = op->stamp;
+					blit = [cb blitCommandEncoder];
+					[blit waitForFence:fence];
+					[blit sampleCountersInBuffer:sample_buffer(blit_stamp) atSampleIndex:sample_index(blit_stamp) withBarrier:YES];
+				} else if (blit_sampled) {
 					MTLBlitPassDescriptor *d = [MTLBlitPassDescriptor blitPassDescriptor];
 					d.sampleBufferAttachments[0].sampleBuffer = sample_buffer(stamps);
 					d.sampleBufferAttachments[0].startOfEncoderSampleIndex = sample_index(stamps);
 					d.sampleBufferAttachments[0].endOfEncoderSampleIndex = sample_index(stamps) + 1;
 					stamp_kind[stamps++] = op->stamp;
 					blit = [cb blitCommandEncoderWithDescriptor:d];
+					[blit waitForFence:fence];
 				} else {
 					blit = [cb blitCommandEncoder];
+					[blit waitForFence:fence];
 				}
-				[blit waitForFence:fence];
 				[blit copyFromBuffer:(__bridge id<MTLBuffer>)rbufs[op->src].b sourceOffset:(NSUInteger)op->so
 					    toBuffer:(__bridge id<MTLBuffer>)rbufs[op->dst].b destinationOffset:(NSUInteger)op->to
 						size:(NSUInteger)op->bytes];
+				if (blit_sampled && g.prof_dispatch)
+					[blit sampleCountersInBuffer:sample_buffer(blit_stamp) atSampleIndex:sample_index(blit_stamp) + 1 withBarrier:YES];
 				[blit updateFence:fence];
 				[blit endEncoding];
 				continue;
 			}
-			if (profiling && stamps < stamp_limit) {
-				/* Metal samples timestamps at encoder boundaries, not between dispatches,
+			unsigned pass_stamp = stamps;
+			int pass_sampled = profiling && stamps < stamp_limit;
+			if (pass_sampled && g.prof_dispatch) {
+				/* AMD's and Intel's Macs sample between dispatches, inside the one encoder */
+				if (!enc) {
+					enc = [cb computeCommandEncoderWithDispatchType:dispatch_type()];
+					[enc waitForFence:fence];
+					use_all(enc, list, live);
+				}
+				stamp_kind[stamps++] = op->stamp;
+				[enc sampleCountersInBuffer:sample_buffer(pass_stamp) atSampleIndex:sample_index(pass_stamp) withBarrier:YES];
+			} else if (pass_sampled) {
+				/* Apple GPUs sample timestamps at encoder boundaries, not between dispatches,
 				 * so a profiled pass is an encoder of its own. */
 				if (enc) { [enc updateFence:fence]; [enc endEncoding]; enc = nil; }
 				MTLComputePassDescriptor *d = [MTLComputePassDescriptor computePassDescriptor];
-				d.dispatchType = MTLDispatchTypeConcurrent;
+				d.dispatchType = dispatch_type();
 				d.sampleBufferAttachments[0].sampleBuffer = sample_buffer(stamps);
 				d.sampleBufferAttachments[0].startOfEncoderSampleIndex = sample_index(stamps);
 				d.sampleBufferAttachments[0].endOfEncoderSampleIndex = sample_index(stamps) + 1;
@@ -1700,7 +1836,7 @@ static int run_ops(const struct oplist *l)
 				[enc waitForFence:fence];
 				use_all(enc, list, live);
 			} else if (!enc) {
-				enc = [cb computeCommandEncoderWithDispatchType:MTLDispatchTypeConcurrent];
+				enc = [cb computeCommandEncoderWithDispatchType:dispatch_type()];
 				[enc waitForFence:fence];
 				use_all(enc, list, live);
 			}
@@ -1708,7 +1844,9 @@ static int run_ops(const struct oplist *l)
 			[enc setBytes:&op->p length:sizeof op->p atIndex:0];
 			[enc dispatchThreadgroups:MTLSizeMake(op->gx, op->gy, op->gz)
 			    threadsPerThreadgroup:MTLSizeMake(op->tg, 1, 1)];
-			if (profiling) { [enc updateFence:fence]; [enc endEncoding]; enc = nil; }
+			if (pass_sampled && g.prof_dispatch)
+				[enc sampleCountersInBuffer:sample_buffer(pass_stamp) atSampleIndex:sample_index(pass_stamp) + 1 withBarrier:YES];
+			else if (profiling) { [enc updateFence:fence]; [enc endEncoding]; enc = nil; }
 		}
 		if (enc) { [enc updateFence:fence]; [enc endEncoding]; }
 		free(list);
@@ -1766,7 +1904,8 @@ static double now_ns(void)
 
 /* Timestamps at encoder boundaries, which is where Apple GPUs can take them; a profiled
  * frame therefore runs one encoder per pass rather than one per block, and its total is
- * not the frame that would have run. Off by default and free when off. Returns -1 when
+ * not the frame that would have run. A device that samples between dispatches instead (the
+ * AMD and Intel GPUs of Intel Macs) keeps its encoders and brackets each pass. Off by default and free when off. Returns -1 when
  * the device cannot sample, and says why. */
 int xmx_profile(int on)
 {
@@ -1774,8 +1913,11 @@ int xmx_profile(int on)
 	if (!dev) FAIL("profiling needs an initialised device", 0);
 	if (!sample_buffers) {
 		@autoreleasepool {
-			if (![dev supportsCounterSampling:MTLCounterSamplingPointAtStageBoundary])
-				FAIL("this device cannot sample timestamps at encoder boundaries", 0);
+			/* Apple GPUs sample at encoder boundaries; AMD's and Intel's between dispatches */
+			g.prof_dispatch = ![dev supportsCounterSampling:MTLCounterSamplingPointAtStageBoundary];
+			if (g.prof_dispatch && (![dev supportsCounterSampling:MTLCounterSamplingPointAtDispatchBoundary]
+						|| ![dev supportsCounterSampling:MTLCounterSamplingPointAtBlitBoundary]))
+				FAIL("this device cannot sample timestamps at encoder or dispatch boundaries", 0);
 			id<MTLCounterSet> timestamps = nil;
 			for (id<MTLCounterSet> set in dev.counterSets)
 				if ([set.name isEqualToString:MTLCommonCounterSetTimestamp]) timestamps = set;

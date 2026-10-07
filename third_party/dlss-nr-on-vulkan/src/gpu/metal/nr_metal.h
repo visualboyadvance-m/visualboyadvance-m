@@ -13,7 +13,9 @@
  *     MoltenVK: 3e-03 on the gate epilogue, a quantum on every E4M3 publish after it).
  *     Every `precise` in the GLSL is therefore the default here and needs no spelling.
  *   - `half_round` is `float(half(x))`: a real conversion instruction pair, not foldable
- *     without fast math, and round-to-nearest-even like `packHalf2x16` on Xe2.
+ *     without fast math on Apple GPUs, and round-to-nearest-even like `packHalf2x16` on
+ *     Xe2. AMD's compiler folds it anyway, and there it is the bits (function constant 2).
+ *     Round to half through `half_round`, never with a cast of one's own.
  *   - Buffers arrive as 64-bit GPU addresses in the push block (the buffer's device
  *     address, read back through an `MTLArgumentEncoder` so a macOS 11 SDK suffices,
  *     plus an element offset the runtime folds in), exactly as the SPIR-V takes
@@ -50,7 +52,30 @@ inline uint operation_flags(constant Push &pc) { return specialized ? SPECIALIZE
 
 /* -- publish.glsl -------------------------------------------------------- */
 
-inline float half_round(float x) { return float(half(x)); }
+/* Function constant 2, set by libmetalmx where the cast does not round (its start-up probe,
+ * `probe_half_rounding`): half_round on the float's bits. AMD's Metal compiler folds
+ * float(half(x)) -- and every other spelling of the round trip, through half2, the bits or
+ * a volatile -- to x, so every rounding point of the graph vanishes there; integer
+ * arithmetic it cannot fold. Round to nearest even, half subnormals in steps of 2^-24,
+ * 65520 and up to infinity, NaN kept. */
+constant bool HALF_BY_BITS [[function_constant(2)]];
+constant bool half_by_bits = is_function_constant_defined(HALF_BY_BITS) && HALF_BY_BITS;
+
+inline float half_round_bits(float x) {
+    uint bits = as_type<uint>(x), magnitude = bits & 0x7FFFFFFFu, sign = bits & 0x80000000u;
+    if (magnitude > 0x7F800000u) return x;                                     // NaN
+    if (magnitude >= 0x477FF000u) return as_type<float>(sign | 0x7F800000u);   // to infinity
+    if (magnitude >= 0x38800000u)                                              // a normal half
+        return as_type<float>(sign | ((magnitude + 0x0FFFu + ((magnitude >> 13) & 1u)) & ~0x1FFFu));
+    uint exponent = magnitude >> 23;
+    if (exponent < 101u) return as_type<float>(sign);                          // under 2^-25
+    /* a subnormal half: the mantissa, its implicit bit included, in whole 2^-24 steps */
+    uint mantissa = (magnitude & 0x7FFFFFu) | 0x800000u, drop = 126u - exponent;
+    uint steps = (mantissa + ((1u << (drop - 1u)) - 1u) + ((mantissa >> drop) & 1u)) >> drop;
+    return as_type<float>(sign | as_type<uint>(float(steps) * 5.9604644775390625e-08f));
+}
+
+inline float half_round(float x) { return half_by_bits ? half_round_bits(x) : float(half(x)); }
 
 inline float e4m3(float x) {
     float magnitude = min(abs(x), 448.0f);
@@ -87,5 +112,15 @@ inline device const half  *half_ptr(ulong address)  { return reinterpret_cast<de
 inline device const float *float_ptr(ulong address) { return reinterpret_cast<device const float *>(address); }
 inline device half  *half_out(ulong address)  { return reinterpret_cast<device half *>(address); }
 inline device float *float_out(ulong address) { return reinterpret_cast<device float *>(address); }
+
+/* An address carried in two adjacent 32-bit push fields, low half first (p0/p1, p2/p3,
+ * lda/ldb), read as the one aligned 8-byte value it is. Joined from its halves instead --
+ * `ulong(lo) | ulong(hi) << 32`, or `as_type<ulong>` of a two-element vector -- the
+ * address makes AMD's Metal compiler fail ("Compiler encountered an internal error", a
+ * Vega 64 on macOS 15) in any kernel that loads through it. */
+template <typename T>
+inline ulong push_address(constant T &low) { return *reinterpret_cast<constant ulong *>(&low); }
+static_assert(__builtin_offsetof(Push, p0) % 8 == 0 && __builtin_offsetof(Push, p2) % 8 == 0
+              && __builtin_offsetof(Push, lda) % 8 == 0, "push_address() reads 8 aligned bytes");
 
 #endif

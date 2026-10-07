@@ -208,7 +208,7 @@ inline float window_load(constant Push &pc, uint flags, int base, uint k) {
     if (base < 0) return 0.0f;
     float v = (flags & 0x8000u) != 0u ? float(half_ptr(pc.a)[uint(base) + k])
                                       : float_ptr(pc.a)[uint(base) + k];
-    return (flags & 0x4000u) != 0u ? e4m3(v) : float(half(v));
+    return (flags & 0x4000u) != 0u ? e4m3(v) : half_round(v);
 }
 
 #endif

@@ -370,14 +370,14 @@ kernel void attention_t(constant Push &pc [[buffer(0)]],
     uint kind = flags & 0xFFu;
     if (kind == QKV_PREPARE) {
         /* Three independent planes on y: Q and K normalised (Q by its head's scale, read
-         * from the 64-bit address in lda | ldb << 32), V published; each into its own
+         * from the 64-bit address in lda and ldb), V published; each into its own
          * target — b, c, d. The arithmetic is the two cosine publishes' and the split's. */
         uint part = group3.y;
         uint base = group * 32u * 32u;
         uint count = min(32u * 32u, pc.m * 32u - base);
         gather_part(pc, flags, stage, local, base, count, part);
         if (part < 2u) {
-            ulong scales = ulong(pc.lda) | (ulong(pc.ldb) << 32);
+            ulong scales = push_address(pc.lda);
             if (row < pc.m) cosine_publish(pc, stage, row, local, part == 0u, scales);
         } else {
             for (uint i = local; i < count; i += 32u) stage[i] = e4m3(stage[i]);
