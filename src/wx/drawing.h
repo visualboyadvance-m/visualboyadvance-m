@@ -629,11 +629,16 @@ protected:
     void DrawArea(wxWindowDC& dc) override;
     void DrawingPanelInit() override;
     void OnSize(wxSizeEvent& ev) override;
-    // HDR is available when we obtained an HDR10 PQ swapchain (set in
-    // CreateSwapchain). Works on any platform whose surface advertises it.
+    // HDR is available when we obtained an HDR swapchain (set in
+    // CreateSwapchain): HDR10 PQ, or on macOS the extended-linear Display P3
+    // float one the Metal renderer uses. Works on any platform whose surface
+    // advertises it.
     bool SupportsHdr() const override { return swapchain_is_hdr_; }
     bool DeepColorActive() const override { return vk_deep_color_; }
-    hdr::Encoding PreferredHdrEncoding() const override { return hdr::Encoding::kPQ10; }
+    hdr::Encoding PreferredHdrEncoding() const override {
+        return swapchain_hdr_scrgb_ ? hdr::Encoding::kScRGBFp16 : hdr::Encoding::kPQ10;
+    }
+    bool HdrScRgbUsesP3() const override { return swapchain_hdr_scrgb_; }
 
 private:
     // ── Instance / surface ───────────────────────────────────────────────────
@@ -738,7 +743,8 @@ private:
  
     VkSwapchainKHR           swapchain_        = VK_NULL_HANDLE;
     VkFormat                 swapchain_format_ = VK_FORMAT_UNDEFINED;
-    bool                     swapchain_is_hdr_ = false;  // HDR10 PQ swapchain
+    bool                     swapchain_is_hdr_ = false;  // HDR10 PQ or scRGB swapchain
+    bool                     swapchain_hdr_scrgb_ = false;  // the scRGB one (macOS)
     bool                     vk_deep_color_    = false;  // 10-bit SDR swapchain (X11 deep color)
     bool                     hdr_metadata_ext_ = false;  // VK_EXT_hdr_metadata enabled
     VkExtent2D               swapchain_extent_ = {};

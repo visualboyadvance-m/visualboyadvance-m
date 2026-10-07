@@ -11969,10 +11969,31 @@ bool VKDrawingPanel::CreateSwapchain()
  
     VkSurfaceFormatKHR chosen_fmt = formats[0];
     swapchain_is_hdr_ = false;
+    swapchain_hdr_scrgb_ = false;
+
+#ifdef __WXMAC__
+    // On macOS, the float EDR layer the Metal renderer draws into: MoltenVK
+    // makes this pair a CAMetalLayer in extended-linear Display P3. EDR is a
+    // relative model -- 1.0 is the system's SDR white -- and the scRGB encoder
+    // puts the reference white there, so the picture matches Metal's. Through
+    // PQ, macOS places absolute nits against a reference of its own, and white
+    // came out brighter than Metal's.
+    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+        for (auto& f : formats) {
+            if (f.format     == VK_FORMAT_R16G16B16A16_SFLOAT &&
+                f.colorSpace == VK_COLOR_SPACE_DISPLAY_P3_LINEAR_EXT) {
+                chosen_fmt = f;
+                swapchain_is_hdr_ = true;
+                swapchain_hdr_scrgb_ = true;
+                break;
+            }
+        }
+    }
+#endif
 
     // Prefer a 10-bit BT.2020 PQ (HDR10) swapchain when HDR is requested and the
     // surface advertises it; the encoder produces matching A2B10G10R10 PQ data.
-    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+    if (!swapchain_is_hdr_ && hdr::HdrAvailable() && OPTION(kDispHDR)) {
         for (auto& f : formats) {
             if (f.format     == VK_FORMAT_A2B10G10R10_UNORM_PACK32 &&
                 f.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT) {
@@ -12101,7 +12122,7 @@ bool VKDrawingPanel::CreateSwapchain()
     // our real highlights -- which only reach peak_nits -- back near reference
     // white, making the luminance settings invisible. Matches the Wayland
     // wp_color_manager_v1 and D3D12 SetHDRMetaData paths.
-    if (swapchain_is_hdr_ && hdr_metadata_ext_) {
+    if (swapchain_is_hdr_ && !swapchain_hdr_scrgb_ && hdr_metadata_ext_) {
         auto set_md = reinterpret_cast<PFN_vkSetHdrMetadataEXT>(
             vkGetDeviceProcAddr(device_, "vkSetHdrMetadataEXT"));
         if (set_md) {
@@ -12670,7 +12691,8 @@ bool VKDrawingPanel::CreateTexture(uint32_t tex_w, uint32_t tex_h, VkFormat fmt)
  
     vkUpdateDescriptorSets(device_, 1, &write, 0, nullptr);
  
-    VkDeviceSize needed = (VkDeviceSize)tex_w * tex_h * 4;
+    const VkDeviceSize bpp = fmt == VK_FORMAT_R16G16B16A16_SFLOAT ? 8 : 4;
+    VkDeviceSize needed = (VkDeviceSize)tex_w * tex_h * bpp;
     if (needed > staging_size_) {
         if (staging_buffer_) {
             vkDestroyBuffer(device_, staging_buffer_, nullptr);
@@ -13130,11 +13152,13 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
  
     } else {
         // ── Pixel data present: upload and draw ───────────────────────────────
-        // HDR uploads 10-bit BT.2020 PQ to match the HDR10 swapchain. Only the
-        // 32-bit source path feeds the encoder.
+        // HDR uploads 10-bit BT.2020 PQ to match the HDR10 swapchain, or scRGB
+        // half floats to match the macOS float one. Only the 32-bit source path
+        // feeds the encoder.
         const bool hdr = HdrActive() && swapchain_is_hdr_ &&
                          !out_8 && !out_16 && !out_24;
-        VkFormat vk_fmt = hdr     ? VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        VkFormat vk_fmt = hdr && swapchain_hdr_scrgb_ ? VK_FORMAT_R16G16B16A16_SFLOAT
+                        : hdr     ? VK_FORMAT_A2B10G10R10_UNORM_PACK32
                         : out_16  ? VK_FORMAT_R5G6B5_UNORM_PACK16
                                   : VK_FORMAT_B8G8R8A8_UNORM;
  
@@ -13168,10 +13192,15 @@ void VKDrawingPanel::DrawArea(wxWindowDC& dc)
 
         if (hdr) {
             // Skip the top border row, then encode the scaled region directly
-            // into the staging buffer as A2B10G10R10 PQ (4 bytes/pixel).
+            // into the staging buffer: A2B10G10R10 PQ (4 bytes/pixel) or scRGB
+            // RGBA half floats (8).
             const uint8_t* tex_ptr = src + src_pitch;
-            hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
-                            reinterpret_cast<uint32_t*>(stg), scaled_width * 4);
+            if (swapchain_hdr_scrgb_)
+                hdr::EncodeScRGBFp16(tex_ptr, src_pitch, scaled_width, scaled_height,
+                                     reinterpret_cast<uint16_t*>(stg), scaled_width * 8);
+            else
+                hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
+                                reinterpret_cast<uint32_t*>(stg), scaled_width * 4);
         } else if (out_8) {
             src += src_pitch;
             for (int y = 0; y < scaled_height; ++y) {
