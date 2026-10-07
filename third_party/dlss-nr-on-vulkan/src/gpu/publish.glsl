@@ -14,11 +14,28 @@
  * it folds the round trip to x and keeps the cast. Where it survives, each is bit-exact
  * against numpy's float16 over ordinary values, half subnormals and overflow to infinity
  * (`src/bench/half_probe.py`), in two instructions and no branches, where doing the
- * exponent and mantissa by hand took ten and two branches. libxmx sets constant 1 from
- * the driver (`xmx_init`, `XMX_HALF_ROUND`). */
-layout(constant_id = 1) const bool HALF_BY_CAST = false;
+ * exponent and mantissa by hand took ten and two branches. Through MoltenVK on a GPU that
+ * is not Apple's, though, the Metal compiler under it folds both (AMD's and Intel's, on an
+ * Intel Mac): there it is done by hand after all, on the float's bits, round to nearest
+ * even like the others (`half_round_bits`, metal/nr_metal.h's). libxmx sets constant 1
+ * from the driver (`xmx_init`, `XMX_HALF_ROUND`): 0 the round trip, 1 the cast, 2 the bits. */
+layout(constant_id = 1) const uint HALF_ROUND = 0u;
+float half_round_bits(float x) {
+    uint bits = floatBitsToUint(x), magnitude = bits & 0x7FFFFFFFu, sign = bits & 0x80000000u;
+    if (magnitude > 0x7F800000u) return x;                                     // NaN
+    if (magnitude >= 0x477FF000u) return uintBitsToFloat(sign | 0x7F800000u);  // to infinity
+    if (magnitude >= 0x38800000u)                                              // a normal half
+        return uintBitsToFloat(sign | ((magnitude + 0x0FFFu + ((magnitude >> 13) & 1u)) & ~0x1FFFu));
+    uint exponent = magnitude >> 23;
+    if (exponent < 101u) return uintBitsToFloat(sign);                         // under 2^-25
+    /* a subnormal half: the mantissa, its implicit bit included, in whole 2^-24 steps */
+    uint mantissa = (magnitude & 0x7FFFFFu) | 0x800000u, drop = 126u - exponent;
+    uint steps = (mantissa + ((1u << (drop - 1u)) - 1u) + ((mantissa >> drop) & 1u)) >> drop;
+    return uintBitsToFloat(sign | floatBitsToUint(float(steps) * 5.9604644775390625e-08));
+}
 float half_round(float x) {
-    return HALF_BY_CAST ? float(float16_t(x)) : unpackHalf2x16(packHalf2x16(vec2(x, 0.0))).x;
+    return HALF_ROUND == 2u ? half_round_bits(x)
+         : HALF_ROUND == 1u ? float(float16_t(x)) : unpackHalf2x16(packHalf2x16(vec2(x, 0.0))).x;
 }
 
 /* `packHalf2x16` is not only a rounding point: the softmax's exponential in the four

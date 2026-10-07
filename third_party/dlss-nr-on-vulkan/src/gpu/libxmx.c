@@ -158,6 +158,7 @@ static struct {
 	int ready, lost, discrete, unmapped;
 	int pin32;                /* pipelines require 32-lane subgroups (build_pipeline_spec) */
 	int half_by_cast;         /* half_round's spelling, constant 1 on every pipeline (xmx_init) */
+	int half_bits;            /* ... or the bits by hand, where both spellings are folded */
 	int preserve16;           /* float16 subnormals kept: DenormPreserve 16 on every module (xmx_init) */
 	int preserve64;           /* DenormPreserve 64 goes with it, which 32_BIT_ONLY requires (xmx_init) */
 	int rte16, rte64;         /* RoundingModeRTE likewise: AMD truncates float16 undeclared (xmx_init) */
@@ -566,10 +567,10 @@ static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, Vk
 		memcpy(entries, specialization->pMapEntries, count * sizeof *entries);
 		memcpy(data, specialization->pData, size);
 	}
-	VkBool32 cast = g.half_by_cast ? VK_TRUE : VK_FALSE;
-	entries[count++] = (VkSpecializationMapEntry){ .constantID = 1, .offset = size, .size = sizeof cast };
-	memcpy(data + size, &cast, sizeof cast);
-	size += sizeof cast;
+	uint32_t spelling = g.half_bits ? 2u : g.half_by_cast ? 1u : 0u;   /* publish.glsl's HALF_ROUND */
+	entries[count++] = (VkSpecializationMapEntry){ .constantID = 1, .offset = size, .size = sizeof spelling };
+	memcpy(data + size, &spelling, sizeof spelling);
+	size += sizeof spelling;
 	VkSpecializationInfo constants = { .mapEntryCount = count, .pMapEntries = entries,
 					   .dataSize = size, .pData = data };
 	size_t len = 0;
@@ -918,8 +919,9 @@ int xmx_adopted(void) { return g.dev ? g.adopted : -1; }
  * half_round's spelling (publish.glsl) is the compiler's to decide, not ours: Mesa folds
  * `float(float16_t(x))` away and keeps packHalf2x16's round trip, and Intel's Windows
  * compiler folds the round trip and keeps the cast. Whichever is folded, every vendor
- * rounding point in the graph silently vanishes. `XMX_HALF_ROUND=pack` or `cast` overrides,
- * to measure the other one on either driver.
+ * rounding point in the graph silently vanishes; through MoltenVK on an AMD or Intel GPU
+ * both are folded, and the bits are rounded by hand. `XMX_HALF_ROUND=pack`, `cast` or `bits`
+ * overrides, to measure another one on any driver.
  *
  * And float16 subnormals are kept wherever the driver can declare it. NVIDIA's tensor cores
  * keep them (notes/phase71), Mesa's undeclared default flushes them in the GEMMs, and without
@@ -928,6 +930,7 @@ int xmx_adopted(void) { return g.dev ? g.adopted : -1; }
 static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 {
 	g.half_by_cast = 0;
+	g.half_bits = 0;
 	g.moltenvk = 0;
 	if (api_version >= VK_API_VERSION_1_2) {
 		VkPhysicalDeviceDriverProperties driver = {
@@ -952,13 +955,22 @@ static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 			|| driver.driverID == VK_DRIVER_ID_AMD_PROPRIETARY
 			|| driver.driverID == VK_DRIVER_ID_AMD_OPEN_SOURCE;
 		g.moltenvk = driver.driverID == VK_DRIVER_ID_MOLTENVK;
+		/* Under MoltenVK the Metal compiler of the GPU beneath decides, and on an Intel Mac's
+		 * AMD or Intel GPU it folds both spellings to x (a Vega 64 and a UHD 630, macOS 15:
+		 * 99.8 % of a million values unrounded either way), so the rounding is done on the
+		 * bits there. Apple's keeps the round trip, as measured on an M3. */
+		if (g.moltenvk && query.properties.vendorID != 0x106Bu) {
+			g.half_by_cast = 0;
+			g.half_bits = 1;
+		}
 	}
 	const char *half = getenv("XMX_HALF_ROUND");
 	if (half && *half) {
-		if (!strcmp(half, "cast")) g.half_by_cast = 1;
-		else if (!strcmp(half, "pack")) g.half_by_cast = 0;
-		else fprintf(stderr, "libxmx: XMX_HALF_ROUND=%s is neither pack nor cast; keeping %s\n",
-			     half, g.half_by_cast ? "cast" : "pack");
+		if (!strcmp(half, "cast")) g.half_by_cast = 1, g.half_bits = 0;
+		else if (!strcmp(half, "pack")) g.half_by_cast = 0, g.half_bits = 0;
+		else if (!strcmp(half, "bits")) g.half_by_cast = 0, g.half_bits = 1;
+		else fprintf(stderr, "libxmx: XMX_HALF_ROUND=%s is neither pack, cast nor bits; keeping %s\n",
+			     half, g.half_bits ? "bits" : g.half_by_cast ? "cast" : "pack");
 	}
 	g.preserve16 = 0;
 	g.preserve64 = 0;
