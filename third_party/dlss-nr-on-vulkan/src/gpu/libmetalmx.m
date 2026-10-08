@@ -557,7 +557,19 @@ int xmx_open(void)
 {
 	if (dev) return 0;
 	@autoreleasepool {
-		dev = MTLCreateSystemDefaultDevice();
+		/* XMX_METAL_DEVICE=NAME takes the first device whose name contains NAME, ignoring
+		 * case -- the iGPU beside an eGPU, say, to check one against the other. */
+		const char *want = getenv("XMX_METAL_DEVICE");
+		if (want && *want) {
+			NSArray<id<MTLDevice>> *all = MTLCopyAllDevices();
+			for (id<MTLDevice> d in all)
+				if ([[d name] rangeOfString:@(want) options:NSCaseInsensitiveSearch].location != NSNotFound) {
+					dev = d;
+					break;
+				}
+			if (!dev) FAIL("XMX_METAL_DEVICE: no Metal device by that name", 0);
+		} else
+			dev = MTLCreateSystemDefaultDevice();
 		if (!dev) FAIL("no Metal device", 0);
 		snprintf(g.name, sizeof g.name, "%s", [[dev name] UTF8String]);
 		g.discrete = ![dev hasUnifiedMemory];
