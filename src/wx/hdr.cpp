@@ -121,7 +121,9 @@ float ShadowFloor(float top) {
     return std::min(m, top * 0.05f);
 }
 
-float LumScale(float L) {
+// `top` is the pixel's largest channel, linear: it decides how much of the
+// display's black floor the pixel gets (see below).
+float LumScale(float L, float top_channel) {
     const float ref = g_settings.sdr_reference_nits;
     const float peak = std::max(ref, g_settings.peak_nits);
     const float knee = std::max(0.0f, std::min(1.0f, g_settings.highlight_knee));
@@ -147,9 +149,17 @@ float LumScale(float L) {
             return ref;  // outL = ref * L
         }
         const float t = sc != 1.0f ? std::pow(L / pivot, sc) : L / pivot;
+        // The floor fades in over the darkest step a 5-bit source has (8 of
+        // 255) in the pixel's largest channel, not at the first value above 0.
+        // Lifted at once, the faint values a filter such as DLSS NR leaves in
+        // a black background -- 1 or 2 of 255 in one channel -- each became a
+        // dot at the floor, in that channel's colour, since the scale applies
+        // to every channel. By the largest channel rather than the luminance,
+        // so the game's darkest blue gets the whole floor as before.
+        const float ramp = std::min(1.0f, top_channel / g_lin_lut[8]);
         // t == 1 at the pivot, so this still lands on ref * pivot there and
         // the shoulder joins without a step.
-        return (floor_nits + (top - floor_nits) * t) / L;
+        return (floor_nits * ramp + (top - floor_nits) * t) / L;
     }
 
     const float dx = 1.0f - knee;
@@ -242,13 +252,31 @@ static inline uint32_t PackA2B10G10R10(uint32_t r, uint32_t g, uint32_t b) {
 // half step under 0 would swing every other pixel between negative (clamped
 // to 0 nits) and positive -- which LumScale() lifts to the display's black
 // floor, so a black area came out as a Bayer grid of 0 and floor nits. Code 0
-// stays exactly 0, and the floor starts at code 1.
+// stays exactly 0, and the floor starts at code 1. Code 1's half step reaches
+// below 0 too, so the result is clamped there.
 static inline float DitherLin(int v, float d) {
     if (v == 0)
         return 0.0f;
     const float lo = g_lin_lut[v];
     const float hi = g_lin_lut[v < 255 ? v + 1 : 255];
-    return lo + (d - 0.5f) * (hi - lo);
+    return std::max(0.0f, lo + (d - 0.5f) * (hi - lo));
+}
+
+// The scale LumScale() gives a pixel, from its undithered linear channels after
+// the primaries' matrix m (null for none). Taken from the dither, the scale --
+// floor / L at the dark end -- followed each pixel's dithered L, and a dark
+// pixel whose channels the Bayer threshold pulled to 0 or near it was blown up
+// into a dot at the floor, in whatever hue the dither left: a grid of coloured
+// dots over the near-black a filter such as DLSS NR leaves.
+static inline float PixelScale(const uint8_t* sp, const float (*m)[3], const float* lw) {
+    float r = g_lin_lut[sp[0]], g = g_lin_lut[sp[1]], b = g_lin_lut[sp[2]];
+    if (m) {
+        const float nr = m[0][0] * r + m[0][1] * g + m[0][2] * b;
+        const float ng = m[1][0] * r + m[1][1] * g + m[1][2] * b;
+        const float nb = m[2][0] * r + m[2][1] * g + m[2][2] * b;
+        r = nr; g = ng; b = nb;
+    }
+    return LumScale(lw[0] * r + lw[1] * g + lw[2] * b, std::max(r, std::max(g, b)));
 }
 
 // nits -> 10-bit PQ code via the precomputed LUT (nits clamped to 0..10000).
@@ -394,8 +422,7 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
                 const float nb = kRec709ToRec2020[2][0] * r + kRec709ToRec2020[2][1] * g + kRec709ToRec2020[2][2] * b;
                 r = nr; g = ng; b = nb;
             }
-            const float L = kLumaRec2020[0] * r + kLumaRec2020[1] * g + kLumaRec2020[2] * b;
-            const float s = LumScale(L);
+            const float s = PixelScale(sp, convert ? kRec709ToRec2020 : nullptr, kLumaRec2020);
             dp[x] = PackA2B10G10R10(PqCode(r * s), PqCode(g * s), PqCode(b * s));
         }
     }
@@ -435,7 +462,7 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
             }
 
             // Hue-preserving luminance boost -> nits, then scRGB (1.0 == white).
-            const float s = LumScale(lw[0] * r + lw[1] * g + lw[2] * b);
+            const float s = PixelScale(sp, m, lw);
             uint16_t* px = dp + static_cast<size_t>(x) * 4;
             px[0] = FloatToHalf(r * s / white);
             px[1] = FloatToHalf(g * s / white);
