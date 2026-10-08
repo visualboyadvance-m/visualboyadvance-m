@@ -609,19 +609,27 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
     // so fill it with silence instead, and the game goes on at its own rate. Only after a
     // stall, though (StallDetector): a frame or two that ran late is made up by catching
     // up, as it always was.
+    //
+    // Fast-forward, an unthrottled speed and a GBA joybus link are not paced by the
+    // queue, as in the other drivers: write() takes what fits and drops the rest, and
+    // the emulator runs on. Waiting here held a fast-forward to the queue's rate, the
+    // nine frames in ten it skips included: 5 fps on the screen and no faster.
+    const bool paced = !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active;
     const bool stalled = stall_.Stalled();
     bool drained;
     {
         std::lock_guard<std::mutex> lock(buffer_mutex);
         drained = filled_buffers == 0;
     }
-    if (drained && stalled)
+    if (drained && stalled && paced)
         primeSilence();
     auto* source = reinterpret_cast<uint8_t*>(finalWave);
     while (length > 0) {
         int chunk = 0;
         {
             std::unique_lock<std::mutex> lock(buffer_mutex);
+            if (!paced && buffer_pending[current_buffer])
+                return;
             buffer_ready.wait(lock, [this] {
                 return !initialized || !buffer_pending[current_buffer];
             });
