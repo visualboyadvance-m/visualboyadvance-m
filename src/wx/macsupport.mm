@@ -680,8 +680,8 @@ void MetalDrawingPanel::DrawingPanelInit()
     _conversion_buffer_size = 0;
 
     CreateMetalView();
-    if (!OPTION(kPrefVsync))
-        StartPresenter();
+    present_fifo_ = OPTION(kPrefVsync);
+    StartPresenter();
 
     // CreateMetalView() has decided metal_is_hdr_; fold the brightness settings
     // into the encoder and activate the scRGB encoding if HDR is on.
@@ -944,8 +944,8 @@ void MetalDrawingPanel::DrawArea()
     }
 }
 
-// Draws `texture` into the next drawable and presents it. On the emulation thread with
-// vsync on, on PresentLoop()'s otherwise.
+// Draws `texture` into the next drawable and presents it. On PresentLoop()'s thread, or
+// on the emulation thread if that thread is not running.
 void MetalDrawingPanel::RenderToDrawable(id<MTLTexture> texture, vector_uint2 content_size)
 {
     @autoreleasepool {
@@ -1024,21 +1024,24 @@ void MetalDrawingPanel::StopPresenter()
     }
     present_cv_.notify_one();
     present_thread_.join();
-    if (present_pending_ != nil) {
-        [present_pending_ release];
-        present_pending_ = nil;
-    }
+    for (PendingFrame& f : present_pending_)
+        [f.texture release];
+    present_pending_.clear();
 }
 
-// Hands the frame to PresentLoop(), replacing one it has not taken yet.
+// Hands the frame to PresentLoop(). With vsync off it replaces one not taken yet; with
+// vsync on it queues behind them, dropping the oldest past kPresentQueue.
 void MetalDrawingPanel::Present(id<MTLTexture> texture, vector_uint2 content_size)
 {
     id<MTLTexture> dropped = nil;
     {
         std::lock_guard<std::mutex> lock(present_mutex_);
-        dropped = present_pending_;
-        present_pending_ = [texture retain];
-        present_size_ = content_size;
+        if (!present_pending_.empty() &&
+            (!present_fifo_ || present_pending_.size() >= kPresentQueue)) {
+            dropped = present_pending_.front().texture;
+            present_pending_.pop_front();
+        }
+        present_pending_.push_back({[texture retain], content_size});
     }
     if (dropped != nil)
         [dropped release];
@@ -1052,12 +1055,12 @@ void MetalDrawingPanel::PresentLoop()
         vector_uint2 size;
         {
             std::unique_lock<std::mutex> lock(present_mutex_);
-            present_cv_.wait(lock, [this] { return present_quit_ || present_pending_ != nil; });
+            present_cv_.wait(lock, [this] { return present_quit_ || !present_pending_.empty(); });
             if (present_quit_)
                 return;
-            texture = present_pending_;   // the reference passes to this thread
-            present_pending_ = nil;
-            size = present_size_;
+            texture = present_pending_.front().texture;   // the reference passes to this thread
+            size = present_pending_.front().size;
+            present_pending_.pop_front();
         }
         RenderToDrawable(texture, size);
         [texture release];

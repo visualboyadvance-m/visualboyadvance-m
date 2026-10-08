@@ -468,6 +468,7 @@ void VbamRemoveSdlMetalViews();
 
 #include <simd/simd.h>
 #include <condition_variable>
+#include <deque>
 #include <mutex>
 #include <thread>
 
@@ -544,12 +545,15 @@ private:
     uint32_t *_conversion_buffer;
     size_t _conversion_buffer_size;
 
-    // With vsync off, a thread of its own presents the newest frame (PresentLoop): a
-    // drawable comes back only when the compositor has shown a newer one, and while DLSS
-    // NR runs that took 15 ms a frame and more, which the emulation thread spent waiting.
-    // The thread waits instead; a frame that arrives before the last was presented
-    // replaces it, as a Vulkan mailbox swapchain does. With vsync on the wait is the
-    // pacing asked for, and DrawArea presents itself.
+    // A thread of its own presents the frames (PresentLoop), so the emulation thread
+    // never waits on a drawable. With vsync off a drawable comes back only when the
+    // compositor has shown a newer one, and while DLSS NR runs that took 15 ms a frame
+    // and more; a frame that arrives before the last was presented replaces it, as a
+    // Vulkan mailbox swapchain does. With vsync on, presenting on the emulation thread
+    // made it wait for the refresh as well as for the sound queue, which already paces
+    // it: the two waits fell out of step and held the game at 30 fps. There the thread
+    // keeps up to kPresentQueue frames and shows each in turn, one a refresh, so frames
+    // the sound queue releases a millisecond early or late still land one to a refresh.
     void RenderToDrawable(id<MTLTexture> texture, vector_uint2 content_size);
     id metal_layer_ = nil;                   // the view's CAMetalLayer, retained
     void StartPresenter();
@@ -559,8 +563,13 @@ private:
     std::thread present_thread_;
     std::mutex present_mutex_;
     std::condition_variable present_cv_;
-    id<MTLTexture> present_pending_ = nil;   // retained, under present_mutex_
-    vector_uint2 present_size_;              // the drawable size it was made for
+    struct PendingFrame {
+        id<MTLTexture> texture;              // retained
+        vector_uint2 size;                   // the drawable size it was made for
+    };
+    static constexpr size_t kPresentQueue = 2;
+    std::deque<PendingFrame> present_pending_;   // under present_mutex_
+    bool present_fifo_ = false;              // vsync on: show every frame, in order
     bool present_quit_ = false;
 #endif
 };
