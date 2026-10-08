@@ -21,6 +21,7 @@
 #include <AudioToolbox/AudioToolbox.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <cmath>
 #include <mutex>
 #include <condition_variable>
 #include <algorithm>
@@ -318,6 +319,52 @@ static bool AssignDeviceToAudioQueue(CoreAudioAudio *cadevice)
     return (bool)(result == noErr);
 }
 
+// Sets this process's I/O cycle on `devid` to a whole fraction of a 60 Hz
+// frame's worth of samples.
+//
+// write() waits for the queue to hand a buffer back, and that wait paces the
+// emulator. The queue hands buffers back only at the end of a device I/O cycle,
+// though, and at the usual 512 frames -- 10.7 ms at 48 kHz -- a buffer of 1/60 s
+// (800 frames) ends on alternate cycles, one and then two apart: frames came out
+// 10.7 and 21.3 ms apart instead of 16.7, a steady judder at a full 60 fps.
+// With a cycle that divides the frame, every buffer ends exactly a frame after
+// the one before. The size is per process; other clients of the device keep theirs.
+static void SetFrameDividingIoCycle(AudioObjectID devid)
+{
+    AudioObjectPropertyAddress addr = {kAudioDevicePropertyNominalSampleRate,
+                                       kAudioObjectPropertyScopeGlobal,
+                                       kAudioObjectPropertyElementMain};
+    Float64 rate = 0;
+    UInt32 size = sizeof(rate);
+    if (AudioObjectGetPropertyData(devid, &addr, 0, nullptr, &size, &rate) != noErr || rate <= 0)
+        return;
+    const UInt32 frame = static_cast<UInt32>(rate / 60.0 + 0.5);
+    if (std::fabs(frame * 60.0 - rate) > 0.5)
+        return;  // no whole number of samples in a frame: nothing divides it
+
+    AudioValueRange range = {0, 0};
+    addr.mSelector = kAudioDevicePropertyBufferFrameSizeRange;
+    size = sizeof(range);
+    if (AudioObjectGetPropertyData(devid, &addr, 0, nullptr, &size, &range) != noErr)
+        return;
+
+    // The largest divisor of the frame up to about 5 ms: short enough to keep
+    // the wake-ups cheap and long enough to stay well clear of underruns.
+    const UInt32 limit = static_cast<UInt32>(rate * 0.005);
+    UInt32 cycle = 0;
+    for (UInt32 d = 1; d <= frame; ++d) {
+        const UInt32 c = frame / d;
+        if (frame % d == 0 && c <= limit && c >= range.mMinimum && c <= range.mMaximum) {
+            cycle = c;
+            break;
+        }
+    }
+    if (!cycle)
+        return;
+    addr.mSelector = kAudioDevicePropertyBufferFrameSize;
+    AudioObjectSetPropertyData(devid, &addr, 0, nullptr, sizeof(cycle), &cycle);
+}
+
 static bool PrepareDevice(CoreAudioAudio *cadevice)
 {
     const AudioDeviceID devid = cadevice->device;
@@ -429,6 +476,20 @@ bool CoreAudioAudio::init(long sampleRate) {
         // Initialize buffer with silence and set size to 0 (empty, ready for write())
         memset(buffers[i]->mAudioData, 0x00, buffers[i]->mAudioDataBytesCapacity);
         buffers[i]->mAudioDataByteSize = 0;
+    }
+
+    {
+        AudioObjectID out = device;
+        if (use_default_device) {
+            UInt32 sz = sizeof(out);
+            const AudioObjectPropertyAddress a = {kAudioHardwarePropertyDefaultOutputDevice,
+                                                  kAudioObjectPropertyScopeGlobal,
+                                                  kAudioObjectPropertyElementMain};
+            if (AudioObjectGetPropertyData(kAudioObjectSystemObject, &a, 0, nullptr, &sz, &out) != noErr)
+                out = 0;
+        }
+        if (out)
+            SetFrameDividingIoCycle(out);
     }
 
     result = AudioQueueStart(audioQueue, NULL);
