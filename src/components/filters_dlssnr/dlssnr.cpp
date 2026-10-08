@@ -1887,7 +1887,16 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             notify = true;
         }
 
-        if (im.result_ready) {
+        // A pass that lands while the one before is still crossing over waits for the
+        // crossing to finish, and the newest pass by then is the one that goes up. Landing
+        // at once, it made the pass on screen the one to cross from -- dropping the part of
+        // the picture that was still the pass before it -- so every pass that came sooner
+        // than kResultFadePerFrame allows was a step in the picture: on a card where passes
+        // land every six frames, a face fading in on Advance Wars' intro went from 28 levels
+        // darker to 44 in one frame and back to 6 in another. A resized frame does not wait.
+        const bool crossing_done = im.blend >= 256 || im.result_width != im.display_width ||
+                                   im.result_height != im.display_height;
+        if (im.result_ready && crossing_done) {
             // What is on screen becomes what the new pass crosses over from.
             im.previous_display.swap(im.display);
             im.previous_display_src.swap(im.display_src);
