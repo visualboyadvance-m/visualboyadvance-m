@@ -293,7 +293,15 @@ std::array<Option, kNbOptions>& Option::All() {
         bool use_bios_file_gb = false;
         bool use_bios_file_gba = false;
         bool use_bios_file_gbc = false;
+#if defined(__WXMAC__)
+        // On by default on macOS: the compositor shows the newest frame at each
+        // refresh whatever this says, so vsync off cannot tear and only trades
+        // smooth motion -- a frame dropped or repeated whenever one arrives near
+        // a refresh -- for a frame or so of latency.
+        bool vsync = true;
+#else
         bool vsync = false;
+#endif
 
         /// General
         bool autoload_state = false;
