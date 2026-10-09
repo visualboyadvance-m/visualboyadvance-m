@@ -377,6 +377,8 @@ public:
             wxDialog* subdlg = GetXRCDialog("CheatEdit");
             dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
+            // Clear the code the last close left: wxMSW refuses to show a dialog whose return code is non-zero (wxWidgets 2c91688252), and this is a reused instance.
+            subdlg->SetReturnCode(0);
             subdlg->ShowModal();
             AddCheat();
             Reload(ncheats);
@@ -595,6 +597,8 @@ public:
         wxDialog* subdlg = GetXRCDialog("CheatEdit");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
+        // Clear the code the last close left: wxMSW refuses to show a dialog whose return code is non-zero (wxWidgets 2c91688252), and this is a reused instance.
+        subdlg->SetReturnCode(0);
         if (subdlg->ShowModal() != wxID_OK)
             return;
 
@@ -1137,6 +1141,8 @@ public:
         wxDialog* subdlg = GetXRCDialog("CheatAdd");
         dlg->SetWindowStyle(wxCAPTION | wxRESIZE_BORDER);
 
+        // Clear the code the last close left: wxMSW refuses to show a dialog whose return code is non-zero (wxWidgets 2c91688252), and this is a reused instance.
+        subdlg->SetReturnCode(0);
         if (subdlg->ShowModal() != wxID_OK)
             return;
 

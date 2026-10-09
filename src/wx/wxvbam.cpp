@@ -2293,6 +2293,14 @@ int MainFrame::ShowModal(wxDialog* dlg)
     // function, whatever class it is and however its own Show() is routed, so
     // this is the one place that cannot be bypassed.
     widgets::AdaptDialogToScreen(dlg);
+    // Every dialog here is a persistent instance that LoadDialog() hands back
+    // on each open, so the return code its last close left behind is still set.
+    // wxMSW's Show() refuses to show a dialog whose return code is not zero --
+    // its way of not showing one whose InitDialog() handler called EndModal()
+    // -- and nothing resets it, so a reused dialog opens exactly once and every
+    // later ShowModal() returns the old code without showing anything
+    // (wxWidgets 2c91688252, in master since 2026-10-08).
+    dlg->SetReturnCode(0);
     StartModal();
     int ret = dlg->ShowModal();
     StopModal();
