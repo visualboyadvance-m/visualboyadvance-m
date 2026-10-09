@@ -1,4 +1,6 @@
 #include "wx/audio/internal/sdl.h"
+#include "wx/audio/internal/dividing-period.h"
+#include "wx/audio/internal/macos-io-cycle.h"
 #include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
@@ -26,6 +28,7 @@
 #include <SDL.h>
 #endif
 
+#include <string>
 #include <vector>
 
 #include <wx/arrstr.h>
@@ -72,6 +75,15 @@ public:
     void write(uint16_t* finalWave, int length) override;  // write the emulated sound to a sound buffer
 
 private:
+    // How many frames write() lets the queue hold before it waits: the depth that paces
+    // the emulator, whatever period the device runs at (`audio.samples` on SDL 2).
+    static constexpr int kQueueFrames = 2048;
+
+    // Sets the device period to one dividing the buffers (DividingPeriod), before the
+    // device opens, and on macOS this process's I/O cycle too, for the rate the buffers
+    // are fed at: `rate`, the throttle included.
+    void SetDividingPeriod(int rate);
+
     SDL_AudioDeviceID sound_device = 0;
     SDL_AudioSpec audio;
     std::vector<uint8_t> silence_;  // for topping a drained queue up
@@ -161,7 +173,7 @@ bool SDLAudio::init(long sampleRate) {
 #ifdef ENABLE_SDL3
     if (SDL_InitSubSystem(SDL_INIT_AUDIO) == false) {
 #else
-    audio.samples  = 2048;
+    audio.samples  = kQueueFrames;
     audio.callback = NULL;
     audio.userdata = NULL;
 
@@ -177,7 +189,15 @@ bool SDLAudio::init(long sampleRate) {
 #endif
         return false;
     }
-    
+
+    // SDL 3's device runs at audio.freq and the throttle is a ratio on the stream
+    // (setThrottle); SDL 2's device runs at the throttled rate.
+#ifdef ENABLE_SDL3
+    SetDividingPeriod(audio.freq * (coreOptions.throttle ? coreOptions.throttle : 100) / 100);
+#else
+    SetDividingPeriod(audio.freq);
+#endif
+
 #ifdef ENABLE_SDL3
 #ifdef ONLY_DEFAULT_AUDIO_DEVICE
     sound_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio, NULL, NULL);
@@ -237,6 +257,36 @@ bool SDLAudio::init(long sampleRate) {
     return initialized = true;
 }
 
+void SDLAudio::SetDividingPeriod(int rate) {
+    // A buffer is one write(): 1/60 s of the emulator's sound at the unthrottled rate,
+    // played at `rate`.
+    const uint32_t buffer_frames = static_cast<uint32_t>(soundGetSampleRate() / 60);
+#if defined(_WIN32)
+    // winmm, which Windows XP gets (init), wants its buffers long.
+    if (!IsWindowsVistaOrGreater())
+        return;
+#endif
+    const uint32_t period = DividingPeriod(buffer_frames, static_cast<uint32_t>(rate),
+                                           static_cast<uint32_t>(audio.freq));
+#ifdef ENABLE_SDL3
+    // A hint is process-wide: a rate nothing divides goes back to SDL's own size.
+    if (period)
+        SDL_SetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES, std::to_string(period).c_str());
+    else
+        SDL_ResetHint(SDL_HINT_AUDIO_DEVICE_SAMPLE_FRAMES);
+#else
+    if (period)
+        audio.samples = static_cast<Uint16>(period);
+#endif
+#if defined(__APPLE__)
+    // The device period above is SDL's buffer size; CoreAudio still hands SDL's buffers
+    // back on this process's I/O cycle, which has to divide them as well (measured:
+    // 147-frame buffers on the default 512-frame cycle came back 10 and 21 ms apart).
+    SetMacosIoCycle(MacosOutputDevice(OPTION(kSoundAudioDevice)), buffer_frames,
+                    static_cast<uint32_t>(rate));
+#endif
+}
+
 void SDLAudio::setThrottle(unsigned short throttle_) {
     if (!initialized)
         return;
@@ -246,6 +296,12 @@ void SDLAudio::setThrottle(unsigned short throttle_) {
 
 #ifdef ENABLE_SDL3
     SDL_SetAudioStreamFrequencyRatio(sound_stream, (float)throttle_ / 100.0f);
+    // The device stays open, so only the macOS I/O cycle can follow the new rate.
+#if defined(__APPLE__)
+    SetMacosIoCycle(MacosOutputDevice(OPTION(kSoundAudioDevice)),
+                    static_cast<uint32_t>(soundGetSampleRate() / 60),
+                    static_cast<uint32_t>(audio.freq * throttle_ / 100));
+#endif
 #else
     current_rate = throttle_;
 
@@ -328,10 +384,10 @@ void SDLAudio::write(uint16_t* finalWave, int length) {
         // always was.
         const bool stalled = stall_.Stalled();
 #ifdef ENABLE_SDL3
-        const size_t pace_bytes = 2048 * audio.channels * sizeof(uint16_t);
+        const size_t pace_bytes = kQueueFrames * audio.channels * sizeof(uint16_t);
         const bool drained = SDL_GetAudioStreamQueued(sound_stream) == 0;
 #else
-        const size_t pace_bytes = audio.samples * audio.channels * sizeof(uint16_t);
+        const size_t pace_bytes = kQueueFrames * audio.channels * sizeof(uint16_t);
         const bool drained = SDL_GetQueuedAudioSize(sound_device) == 0;
 #endif
         if (drained && stalled && !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active) {
@@ -347,13 +403,13 @@ void SDLAudio::write(uint16_t* finalWave, int length) {
 #ifdef ENABLE_SDL3
     res = (int)SDL_PutAudioStreamData(sound_stream, finalWave, length) == true;
 
-    while (res && ((size_t)SDL_GetAudioStreamQueued(sound_stream) > (size_t)(2048 * audio.channels * sizeof(uint16_t)))) {
+    while (res && ((size_t)SDL_GetAudioStreamQueued(sound_stream) > (size_t)(kQueueFrames * audio.channels * sizeof(uint16_t)))) {
         SDL_Delay(1);
     }
 #else
     res = SDL_QueueAudio(sound_device, finalWave, length) == 0;
 
-    while (res && ((size_t)SDL_GetQueuedAudioSize(sound_device) > (size_t)(audio.samples * audio.channels * sizeof(uint16_t)))) {
+    while (res && ((size_t)SDL_GetQueuedAudioSize(sound_device) > (size_t)(kQueueFrames * audio.channels * sizeof(uint16_t)))) {
         SDL_Delay(1);
     }
 #endif

@@ -1,4 +1,6 @@
 #include "wx/audio/internal/openal.h"
+#include "wx/audio/internal/dividing-period.h"
+#include "wx/audio/internal/macos-io-cycle.h"
 #include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
@@ -203,6 +205,33 @@ bool OpenAL::init(long sampleRate) {
 
     context = alcCreateContext(device, NULL);
     VBAM_CHECK(context != NULL);
+
+    // Mix in periods that divide the buffers (DividingPeriod), so they come back evenly
+    // spaced: one write() is 1/60 s at sampleRate, played at the throttle's pitch. The
+    // period is the refresh rate the context is made with, which OpenAL Soft takes as
+    // its update size; the mixing rate has to be known first, so the context is made
+    // again with it. Apple's OpenAL mixes on CoreAudio's cycle instead (below).
+    {
+        const uint32_t buffer_frames = static_cast<uint32_t>(sampleRate / 60);
+        const uint32_t rate =
+            static_cast<uint32_t>(sampleRate * (coreOptions.throttle ? coreOptions.throttle : 100) / 100);
+        ALCint mix = 0;
+        alcGetIntegerv(device, ALC_FREQUENCY, 1, &mix);
+        const uint32_t period =
+            mix > 0 ? DividingPeriod(buffer_frames, rate, static_cast<uint32_t>(mix)) : 0;
+        if (period && mix % static_cast<ALCint>(period) == 0) {
+            const ALCint attrs[] = {ALC_FREQUENCY, mix, ALC_REFRESH,
+                                    mix / static_cast<ALCint>(period), 0};
+            alcDestroyContext(context);
+            context = alcCreateContext(device, attrs);
+            if (!context)
+                context = alcCreateContext(device, NULL);
+            VBAM_CHECK(context != NULL);
+        }
+#if defined(__APPLE__)
+        SetMacosIoCycle(MacosOutputDevice(OPTION(kSoundAudioDevice)), buffer_frames, rate);
+#endif
+    }
     ALCboolean retVal = alcMakeContextCurrent(context);
     VBAM_CHECK(ALC_TRUE == retVal);
     alGenBuffers(OPTION(kSoundBuffers), buffer);
@@ -226,6 +255,12 @@ void OpenAL::setThrottle(unsigned short throttle_) {
 
     alSourcef(source, AL_PITCH, throttle_ / 100.0);
     ASSERT_SUCCESS;
+
+    // The context's mixing period stays as made (init); CoreAudio's cycle can follow.
+#if defined(__APPLE__)
+    SetMacosIoCycle(MacosOutputDevice(OPTION(kSoundAudioDevice)),
+                    static_cast<uint32_t>(freq / 60), static_cast<uint32_t>(freq * throttle_ / 100));
+#endif
 }
 
 void OpenAL::resume() {
@@ -360,9 +395,12 @@ void OpenAL::write(uint16_t* finalWave, int length) {
             // wait until at least one buffer has finished
             while (nBuffersProcessed == 0) {
                 winlog(" waiting...\n");
-                // wait for about half the time one buffer needs to finish
-                // unoptimized: ( sourceBufferLen * 1000 ) / ( freq * 2 * 2 ) * 1/2
-                wxMilliSleep(soundBufferLen / (freq >> 7));
+                // A millisecond at a time: the buffer comes back at the end of a mixing
+                // period that divides it (init), and sleeping half a buffer between looks
+                // added up to 8 ms more to when the emulator saw it, unevenly -- measured
+                // with Apple's OpenAL on a dividing cycle, frames 9 to 20 ms apart (5th to
+                // 95th percentile), and 15.9 to 17.5 polling.
+                wxMilliSleep(1);
                 alGetSourcei(source, AL_BUFFERS_PROCESSED, &nBuffersProcessed);
                 ASSERT_SUCCESS;
             }

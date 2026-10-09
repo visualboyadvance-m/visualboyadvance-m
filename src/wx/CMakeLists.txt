@@ -13,6 +13,8 @@ set(VBAM_WX_COMMON
     audio/internal/aaudio.cpp
     audio/internal/aaudio.h
     audio/internal/coreaudio.cpp
+    audio/internal/macos-io-cycle.cpp
+    audio/internal/macos-io-cycle.h
     audio/internal/sdl.cpp
     audio/internal/sdl.h
     background-input.cpp
