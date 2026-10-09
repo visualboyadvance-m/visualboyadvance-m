@@ -416,7 +416,27 @@ bool CoreAudioAudio::init(long sampleRate) {
         return false;
     }
 
-    buffer_pending.assign(OPTION(kSoundBuffers), false);
+    // A buffer is one write(), 1/60 s of the emulator's sound, which plays faster when the
+    // throttle is up: at 200 % the configured three buffers were 25 ms of real time instead
+    // of 50, and a frame or two that ran late at 120 fps drained the queue, which then
+    // never caught up -- seconds of sound cut to pieces, where SDL and OpenAL, which buffer
+    // more behind their queues, played on. So the count grows with the throttle, keeping
+    // the queue as long in real time as the option says; the buffers stay a frame each,
+    // so the emulator is still paced a frame at a time.
+    //
+    // Above full speed the queue is also never shorter than 100 ms. There the emulator has
+    // less time a frame -- 8.3 ms at 200 %, nearly all of it taken with DLSS NR -- and a
+    // heavy second falls behind: 50 ms still ran dry for a second at a time, where SDL and
+    // OpenAL, with their mixers' buffering behind the queue, did not. At full speed and
+    // below the option alone decides, so the sound's latency there is what it was.
+    {
+        const int buffers = OPTION(kSoundBuffers);
+        const int rate = current_rate > 100 ? current_rate : 100;
+        int count = (buffers * rate + 99) / 100;
+        if (rate > 100)
+            count = std::max(count, (6 * rate + 99) / 100);  // 100 ms of 1/60 s buffers
+        buffer_pending.assign(static_cast<size_t>(count), false);
+    }
     buffers = (AudioQueueBufferRef *)calloc(buffer_pending.size(), sizeof(AudioQueueBufferRef));
 
     for (size_t i = 0; i < buffer_pending.size(); i++) {
