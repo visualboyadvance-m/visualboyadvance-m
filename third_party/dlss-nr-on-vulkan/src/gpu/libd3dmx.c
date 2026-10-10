@@ -183,6 +183,7 @@ static struct {
 	unsigned wide_calls, portable_tiled;
 	int syncing;
 	unsigned staging;
+	int portable_packed;      /* flag 0x8000000 on every GEMM: A fetched 16 bytes at a time (off) */
 	struct cmd cb, rcb, tcb;                       /* plain GEMMs, the recording, transfers */
 	int recording, recorded, rready;
 	/* XMX_D3D12_STEP=1: every recorded pass runs at once on a list of its own, timed and
@@ -329,6 +330,12 @@ int xmx_half_by_cast(void)
 		fprintf(stderr, "libd3dmx: XMX_HALF_ROUND=%s: the HLSL has one spelling, the round trip; keeping it\n", half);
 	return 0;
 }
+
+/* There is no staged kernel here, so no packed staged loader: 0, as `xmx_staged_partial`
+ * changes nothing. The portable GEMM's packed A fetch is flag 0x8000000 on every GEMM dispatch
+ * (xmx_res_init; `XMX_PORTABLE_PACKED=1` turns it on). */
+int xmx_staged_packed(void) { return 0; }
+int xmx_portable_packed(void) { return g.portable_packed; }
 
 /* -- shaders --------------------------------------------------------------- */
 
@@ -1362,6 +1369,21 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	g.tilen = block_size("XMX_TILE_N", 32);
 	const char *sk = getenv("XMX_STAGE_K");
 	g.staging = sk ? (unsigned)atoi(sk) : 32;   /* libxmx's default; there is no staged kernel here */
+	/* libxmx's packed staged loader (gemm_staged.comp, constant 2) as the one GEMM here can
+	 * take it: flag 0x8000000 on every GEMM dispatch, under which gemm_portable.hlsl fetches
+	 * A sixteen bytes at a time where the addresses allow. The same terms in the same order,
+	 * so the bytes are the same. Off by default, as on the other runtimes' portable paths —
+	 * on an M3 both measured slower with it, the compiler combining the eight-byte fetches
+	 * already — and not measured on a Direct3D 12 device (none has run a frame yet):
+	 * `XMX_PORTABLE_PACKED=1` is how the first one will. */
+	g.portable_packed = 0;
+	const char *ppacked = getenv("XMX_PORTABLE_PACKED");
+	if (ppacked && *ppacked) {
+		if (!strcmp(ppacked, "1")) g.portable_packed = 1;
+		else if (!strcmp(ppacked, "0")) g.portable_packed = 0;
+		else fprintf(stderr, "libd3dmx: XMX_PORTABLE_PACKED=%s is neither 0 nor 1; keeping %d\n",
+			     ppacked, g.portable_packed);
+	}
 	/* As libxmx's portable path: the 16x32 build only where a 32-column block is needed
 	 * (the QKV epilogue, the pool, the window gather) — the 8x16 kernel measured 1.3-1.8x
 	 * faster on the N = 32 and 96 shapes through MoltenVK — and the 16x64 build, found
@@ -1761,6 +1783,9 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	if ((bt & 0x800000u) && (!tiled || g.tilem != 16u || g.tilen != 32u))
 		FAIL("a pooled window residual needs the portable 16x32 block (xmx_window_gather() is 0)", 0);
 	unsigned gz = batch ? batch : 1;
+	/* after the checks on `bt` above, which name every flag a caller may set: the packed A
+	 * fetch (gemm_portable.hlsl, 0x8000000) is this runtime's own, not a caller's */
+	if (g.portable_packed) p.flags |= 0x8000000u;
 	/* the 16x64 build, for what its generic store takes: not the QKV epilogue or the pool
 	 * (both need a 32-column block) nor the compact head */
 	if (g.rwide && M % 16u == 0 && N % 64u == 0 && K >= g.tiling && !(bt & 0x910000u)) {

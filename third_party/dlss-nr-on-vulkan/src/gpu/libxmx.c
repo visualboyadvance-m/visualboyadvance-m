@@ -158,6 +158,8 @@ static struct {
 	int ready, lost, discrete, unmapped;
 	int pin32;                /* pipelines require 32-lane subgroups (build_pipeline_spec) */
 	int half_by_cast;         /* half_round's spelling, constant 1 on every pipeline (xmx_init) */
+	int staged_packed;        /* raw 128-bit staged operand copies, constant 2 (detect_driver_modes) */
+	int portable_packed;      /* the portable GEMM's 16-byte A fetch, constant 3 (detect_driver_modes) */
 	int half_bits;            /* ... or the bits by hand, where both spellings are folded */
 	int preserve16;           /* float16 subnormals kept: DenormPreserve 16 on every module (xmx_init) */
 	int preserve64;           /* DenormPreserve 64 goes with it, which 32_BIT_ONLY requires (xmx_init) */
@@ -553,14 +555,16 @@ static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, Vk
 	/* Every pipeline this library builds comes through here, so one check bounds an
 	 * abandoned open to whatever vkCreateComputePipelines is already inside. */
 	if (g_cancel) FAIL("cancelled", 0);
-	/* Every pipeline also gets constant 1, half_round's spelling (publish.glsl, xmx_init);
-	 * a shader that does not declare it ignores the entry. */
-	VkSpecializationMapEntry entries[4];
-	unsigned char data[32];
+	/* Every pipeline also gets constant 1, half_round's spelling (publish.glsl), constant 2,
+	 * the staged kernel's packed operand copies (gemm_staged.comp), and constant 3, the
+	 * portable GEMM's packed A fetch (gemm_portable.comp). All three are fixed in
+	 * detect_driver_modes; a shader that does not declare one ignores its entry. */
+	VkSpecializationMapEntry entries[6];
+	unsigned char data[48];
 	uint32_t count = 0, size = 0;
 	if (specialization) {
-		if (specialization->mapEntryCount >= sizeof entries / sizeof *entries
-		    || specialization->dataSize > sizeof data - sizeof(VkBool32))
+		if (specialization->mapEntryCount > sizeof entries / sizeof *entries - 3
+		    || specialization->dataSize > sizeof data - 3 * sizeof(VkBool32))
 			FAIL("specialization too large", 0);
 		count = specialization->mapEntryCount;
 		size = (uint32_t)specialization->dataSize;
@@ -571,6 +575,14 @@ static int build_pipeline_spec(const char *spv_path, VkPipelineLayout layout, Vk
 	entries[count++] = (VkSpecializationMapEntry){ .constantID = 1, .offset = size, .size = sizeof spelling };
 	memcpy(data + size, &spelling, sizeof spelling);
 	size += sizeof spelling;
+	VkBool32 packed = g.staged_packed ? VK_TRUE : VK_FALSE;
+	entries[count++] = (VkSpecializationMapEntry){ .constantID = 2, .offset = size, .size = sizeof packed };
+	memcpy(data + size, &packed, sizeof packed);
+	size += sizeof packed;
+	VkBool32 ppacked = g.portable_packed ? VK_TRUE : VK_FALSE;
+	entries[count++] = (VkSpecializationMapEntry){ .constantID = 3, .offset = size, .size = sizeof ppacked };
+	memcpy(data + size, &ppacked, sizeof ppacked);
+	size += sizeof ppacked;
 	VkSpecializationInfo constants = { .mapEntryCount = count, .pMapEntries = entries,
 					   .dataSize = size, .pData = data };
 	size_t len = 0;
@@ -972,6 +984,31 @@ static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 		else fprintf(stderr, "libxmx: XMX_HALF_ROUND=%s is neither pack, cast nor bits; keeping %s\n",
 			     half, g.half_bits ? "bits" : g.half_by_cast ? "cast" : "pack");
 	}
+	/* Raw 128-bit global/shared copies in the staged GEMM's loader, on every driver: 6-9 %
+	 * of the graph on Intel's Windows driver, about 2 % at 720p and 1080p on Mesa and nothing
+	 * at 320x320, the same bits on both (upstream, 2026-10-07). `XMX_STAGED_PACKED=0` keeps
+	 * the half-vector loader, to compare them with identical SPIR-V. Fixed before any
+	 * pipeline is created, for an adopted device as for libxmx's own. */
+	g.staged_packed = 1;
+	const char *packed = getenv("XMX_STAGED_PACKED");
+	if (packed && *packed) {
+		if (!strcmp(packed, "1")) g.staged_packed = 1;
+		else if (!strcmp(packed, "0")) g.staged_packed = 0;
+		else fprintf(stderr, "libxmx: XMX_STAGED_PACKED=%s is neither 0 nor 1; keeping %d\n",
+			     packed, g.staged_packed);
+	}
+	/* The same idea in the portable GEMM — A fetched sixteen bytes at a time — is off by
+	 * default: through MoltenVK on an M3 the compiler already combines the eight-byte fetches
+	 * and the sixteen-byte path measured slower (HANDOFF, 2026-10-10). Kept to try on another
+	 * device without matrix units; the bytes are the same either way. */
+	g.portable_packed = 0;
+	const char *ppacked = getenv("XMX_PORTABLE_PACKED");
+	if (ppacked && *ppacked) {
+		if (!strcmp(ppacked, "1")) g.portable_packed = 1;
+		else if (!strcmp(ppacked, "0")) g.portable_packed = 0;
+		else fprintf(stderr, "libxmx: XMX_PORTABLE_PACKED=%s is neither 0 nor 1; keeping %d\n",
+			     ppacked, g.portable_packed);
+	}
 	g.preserve16 = 0;
 	g.preserve64 = 0;
 	g.rte16 = 0;
@@ -1341,6 +1378,13 @@ int xmx_preserve16(void) { return g.preserve16; }
  * `float(float16_t(x))`, 0 the packHalf2x16 round trip. The daemon's start-up probe checks
  * the one in use. */
 int xmx_half_by_cast(void) { return g.half_by_cast; }
+
+/* Whether the staged GEMM copies its operands as raw 128-bit vectors, constant 2
+ * (detect_driver_modes; `XMX_STAGED_PACKED=0` restores the half-vector loader). */
+int xmx_staged_packed(void) { return g.staged_packed; }
+/* And whether the portable GEMM fetches A as raw 128-bit vectors, constant 3
+ * (`XMX_PORTABLE_PACKED=1`; off by default, see detect_driver_modes). */
+int xmx_portable_packed(void) { return g.portable_packed; }
 
 /* Whether the device is a card with memory of its own rather than the host's (memtype). */
 int xmx_discrete(void) { return g.discrete; }

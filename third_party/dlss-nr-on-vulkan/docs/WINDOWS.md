@@ -12,6 +12,10 @@
 > `DenormPreserve 16` — hold on both; `tools/build_win.bat` and `tools/deploy.*` are upstream's
 > MSVC-into-`work/` route and assume that layout.
 
+For installation and a first game test, start with the
+[Windows user quick start](WINDOWS-QUICKSTART.md). This file records the port's
+status, driver findings and alternative build paths.
+
 **Experimental; first run on Windows on 2026-09-29/30** (Arc 140V, Intel's driver 101.8991,
 then 101.9033). The compute side builds and runs there, and since PR #3 joined (2026-10-02) the
 layer and the daemon do too, from an MSVC build (`docs/WINDOWS-PORT.md`). What
@@ -98,6 +102,23 @@ compute tests and the tree's own checks, not the layer's. The layer, the daemon'
 everything else build with MSVC instead: `tools\build_win.bat`, into the same `work/`, so keep
 one build per checkout (`docs/WINDOWS-PORT.md`). Both give the same heads.
 
+Both builds also make `work/libnr_alloc.dll`, the daemon's NumPy allocator on Windows. Windows'
+heap gives a freed block of about a megabyte or more straight back to the system, so every
+frame's full-frame arrays started on fresh pages and paid a page fault for each 4 KB: 12 700 a
+1280x720 frame, 30 000 at 1080p. The daemon now keeps those blocks from one frame to the next,
+and gives back whatever a whole frame did not take again. That is 7-8 ms off a 1280x720 frame
+and 12-21 ms off a 1080p one. `NR_KEEP_BLOCKS=0` turns it off, and without the library the
+daemon runs as before. Linux does not build it.
+
+The staged GEMM uses raw 128-bit operand copies on Intel's Windows driver. On Arc 140V
+with driver 101.9033 this reduced warm graph time by about 6% at 320x320 and 9% at 720p,
+with the same output bytes (`notes/improve-shared-memory.md`). Set `XMX_STAGED_PACKED=0`
+before starting the daemon to compare the old loader; `=1` forces the new one. Since
+2026-10-07 Mesa takes it too: about 2 % at 720p and 1080p, nothing at 320x320, the same
+output bytes. Rebuild both `libxmx` and the three staged shaders
+in the checkout named by the game's `NR_ROOT`; changing another checkout does not update
+an already running daemon or a separate MSVC build.
+
 On Intel's driver, leave `gpu_window_attention` out: `ctest --test-dir work/cmake -E
 gpu_window_attention`. Its unmerged variant, which the graph does not use by default, hangs the
 engine from 32 windows up (phase71). Everything else passes, now that libxmx declares
@@ -137,5 +158,86 @@ unfused reference differed here.
 
 PR #3, an outside contributor's port of exactly this part — the layer's threads and transport, a
 named pipe for the daemon, an MSVC build, deploy scripts — run on a B580, joined the main line on
-2026-10-02. What is left of the milestone is a game on this machine: a D3D9-11 one through
-DXVK, with the layer from `build_win.bat` and `tools\deploy.bat`.
+2026-10-02.
+
+**The first game on this machine is Mortal Kombat 11** (2026-10-02). It is 64-bit D3D11 and ran
+through DXVK 3.1.1 with the layer from `build_win.bat` in live mode. At 1280x720 the daemon
+answered every frame in 60 ms at render scale 0.35 and in 80 ms at 0.5. The game's own counter
+showed 10 fps at 0.5. **Dead or Alive 5 Last Round** followed the same evening. It is 32-bit
+D3D9, and ran with `work\nr_layer32.dll`, which `build_win.bat` now builds beside the 64-bit
+layer. The daemon stays 64-bit, on the same kind of pipe.
+
+To run a game with nothing installed or registered, as those tests did:
+
+- put DXVK's DLLs for the game's API beside its executable: `x64\d3d11.dll` and `x64\dxgi.dll`
+  for a 64-bit D3D11 game, `x32\d3d9.dll` for a 32-bit D3D9 one;
+- put a copy of `src\layer\VkLayer_dlss_nr.json` in a folder of its own, its `library_path` the
+  absolute path of `work\nr_layer.dll`. For a 32-bit game it is `work\nr_layer32.dll`, and
+  `library_arch` is `"32"`;
+- start the game from a shell with these set:
+  - `VK_ADD_IMPLICIT_LAYER_PATH`: that folder;
+  - `ENABLE_NR_LAYER=1`;
+  - `NR_LAYER_LIVE=1`;
+  - `NR_LAYER_SPAWN=1`;
+  - `NR_LAYER_SOCKET=\\.\pipe\<name>`;
+  - `NR_ROOT`: the checkout;
+  - `NR_PYTHON`: the interpreter with NumPy.
+
+**A Steam game that calls `SteamAPI_RestartAppIfNecessary` restarts itself through Steam when it
+is started this way, and loses the environment.** The call need not be in the executable:
+Dead or Alive 5's imports only `SteamAPI_Init`, and the Steam API library beside it restarted
+the game all the same. The sign is DXVK's log, which then lands beside the game rather than in
+`DXVK_LOG_PATH`. A `steam_appid.txt` holding the game's app id, beside the executable, keeps it
+in place. The daemon the layer starts ends with the game, whose process id the layer hands it.
+And a game in a Steam library that Proton also runs gets its folder back as it was: a DLL left
+beside the executable is found there before Proton's own.
+
+**A release's setup needs none of that: it puts a `vulkan-1.dll` beside the game**
+(`src/layer/nr_vulkan_proxy.c`). Windows looks for `vulkan-1.dll` in the executable's folder
+before System32, for a game's own import and for DXVK's `LoadLibrary` alike. The proxy reads
+`dlss-nr\nr-env.txt`, and in the process of the executable named there, compared as a file and
+not by its spelling, it sets those variables, records the launch for setup's status and lists
+the folder the game was started in. All 265 of the loader's exports go on to System32's loader,
+or to the game's own copy, set aside. `DISABLE_NR_PROXY=1` turns it off. On 2026-10-09 these
+ran with NR, with nothing set in Steam: Mortal Kombat 11 and Dead or Alive 5 from Steam's Play
+button, Mortal Kombat Komplete Edition from its own executable, and DOOM through Steam's
+`DOOMx64.exe`, which starts `DOOMx64vk.exe`. Three things they showed:
+
+- DXVK opens its first log before it loads `vulkan-1.dll`, so before `DXVK_LOG_PATH` is set,
+  and in the folder the game was started in: Steam starts Mortal Kombat 11 in its root, above
+  the executable. Remove NR deletes the DXVK logs written there since the installation.
+- Once DXVK frees its first instance the proxy can be unloaded, and a later
+  `LoadLibrary("vulkan-1.dll")` gets the loader of that name already in the process, System32's.
+  So everything the proxy does, it does at its first load.
+- A game that loads System32's loader by its path, or keeps its DLL search to System32, never
+  loads the proxy. Setup's **Launch game** still starts such a game with the variables.
+
+## Shipping it to someone without a compiler
+
+Two scripts, and the split between them is the point:
+
+- **`tools\deploy.bat --release <folder>`** runs here, on a machine with MSVC and the Vulkan
+  SDK. It builds and assembles a distributable in a new or empty folder. The shared
+  assembler requires the layer, `libxmx.dll`, `libnr_image.dll`, **`libnr_alloc.dll`**,
+  the runtime shaders, startup probe and MLX-DLSS modules/tools before copying.
+  The output contains neither the model weights nor NVIDIA's DLL. A build that already
+  has the MLX-DLSS modules can use `--skip-weights`; users extract their own weights later.
+- **`dist-tools\setup.bat`** runs on the *other* machine, from inside that folder, with
+  Python but no compiler. It finds the user's own `nvngx_dlssnr.dll` (beside the script, a
+  `--dll` path, or a prompt), extracts the 649 tensors from it, installs the layer into the
+  game folder under a name they choose, writes the manifest with an absolute `library_path`,
+  and writes a launcher that sets `VK_LAYER_PATH`, `NR_LAYER_SPAWN`, the pipe name and
+  `NR_ROOT`.
+
+    tools\deploy.bat --release dist\dlss-nr-windows --dll X:\path\nvngx_dlssnr.dll
+
+  then the user unpacks `dist\dlss-nr-windows` anywhere and runs `setup.bat`.
+
+The weights stay in the release folder on the user's machine; the launcher points `NR_ROOT`
+at it rather than copying 278 MB into the game. Nothing NVIDIA's is redistributed by either
+script — the DLL is the user's, and the weights are derived from it locally.
+
+The folder includes [a release quick start](RELEASE-QUICKSTART.md), licenses and
+initial settings at render scale 0.4. Setup writes a launcher with release-local
+settings, log and trigger paths; the effect starts off until the trigger is created.
+This first release route is x64. The source setup above remains the route for x86 games.

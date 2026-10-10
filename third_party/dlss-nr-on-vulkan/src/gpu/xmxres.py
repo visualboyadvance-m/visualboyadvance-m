@@ -102,6 +102,8 @@ def _load():
             ("xmx_staged_partial", [ctypes.c_uint]),
             ("xmx_staged32", [ctypes.c_uint]),
             ("xmx_staged32_calls", []),
+            ("xmx_staged_packed", []),
+            ("xmx_portable_packed", []),
             ("xmx_staged32_init", [ctypes.c_char_p, ctypes.c_char_p]),
             ("xmx_rows_init", [ctypes.c_char_p]),
             ("xmx_specialized_count", []),

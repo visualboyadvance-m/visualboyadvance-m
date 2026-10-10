@@ -46,7 +46,9 @@ try:
 except ImportError:
     raise SystemExit("this check needs torch; see the module docstring")
 
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+WEIGHTS = next((p for p in (ROOT / "work" / "mlxw" / "dlssnr-prepared.safetensors",
+                            ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors") if p.exists()),
+               ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors")
 _MLX_MODEL = ROOT / "work" / "mlx-dlss" / "python" / "mlxdlss" / "model.py"
 
 FAILURES = []

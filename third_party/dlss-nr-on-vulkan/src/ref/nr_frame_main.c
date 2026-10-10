@@ -455,7 +455,10 @@ static void usage(void)
         "       nr_frame --replay DUMP OUT [--render-scale F] [--temporal F] [--hold F] [--release F]\n"
         "                [--cut-limit F] [--min-extent N] [--no-letterbox] [--profile P] [--intensity F] ...\n"
         "                (a nr_daemon.py --dump capture through the daemon's frame, history and all;\n"
-        "                 render scale 1 unless set, the other knobs the daemon's defaults)\n");
+        "                 render scale 1 unless set, the other knobs the daemon's defaults)\n"
+        "       nr_frame --prepare OUT.safetensors [--weights W]\n"
+        "                (the weights written with the loaders' layout work done, for faster opens;\n"
+        "                 derived from NVIDIA's weights, so never committed or redistributed)\n");
     exit(2);
 }
 
@@ -470,6 +473,7 @@ int main(int argc, char **argv)
     nr_frame_params p;
     nr_frame_defaults(&p);
     int replaying = 0;
+    const char *prepare_out = NULL;
     nr_frame_live_settings live;
     nr_frame_live_defaults(&live);
 
@@ -492,6 +496,7 @@ int main(int argc, char **argv)
         else if (!strcmp(a, "--detail-radius")) p.detail_radius = (float)atof(NEXT());
         else if (!strcmp(a, "--frame-index")) p.frame_index = atoi(NEXT());
         else if (!strcmp(a, "--replay")) replaying = 1;
+        else if (!strcmp(a, "--prepare")) prepare_out = NEXT();
         else if (!strcmp(a, "--render-scale")) live.render_scale = (float)atof(NEXT());
         else if (!strcmp(a, "--temporal")) live.temporal = (float)atof(NEXT());
         else if (!strcmp(a, "--hold")) live.hold = (float)atof(NEXT());
@@ -506,6 +511,15 @@ int main(int argc, char **argv)
         else if (!input) input = a;
         else if (!output) output = a;
         else usage();
+    }
+    if (prepare_out) {
+        /* no device: the weights in, the prepared file out */
+        if (nr_frame_prepare(weights, prepare_out)) {
+            fprintf(stderr, "nr_frame_prepare: %s\n", nr_frame_error());
+            return 1;
+        }
+        fprintf(stderr, "prepared weights written to %s\n", prepare_out);
+        return 0;
     }
     if (!input || !output) usage();
     if (profile(profile_name, &p)) { fprintf(stderr, "unknown profile %s; one of", profile_name);

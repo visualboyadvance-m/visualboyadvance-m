@@ -154,18 +154,26 @@ option(NR_BUILD_TESTS "register the tests with ctest" ${NR_TESTS_DEFAULT})
 # `dlssnr-logical.safetensors` — in the source root, under work/mlxw/, or named in
 # NR_WEIGHTS_FILE — is cut into slices and each is run through bin2c into the directory.
 # Without the file the regeneration is skipped and the directory is used as it is.
-option(NR_EMBED_WEIGHTS "compile the logical weights from the weights directory into libnr_frame" ON)
+# Since 2026-10-10 the directory holds the *prepared* weights (`nr_frame_prepare`,
+# `prepared: v2`): the logical tensors with the loaders' derived tensors beside them, F32
+# first then F16 so every offset is aligned, and the slices cut at tensor boundaries so the
+# reader points at every tensor inside the library instead of copying it. Regenerating looks
+# for `dlssnr-prepared.safetensors` first; `cmake --build . --target prepare_weights` writes it
+# from the logical file with the `nr_frame` command this build makes, then reconfigure with
+# -DNR_BIN2C_WEIGHTS=ON. A logical file still regenerates a working (unprepared) directory.
+option(NR_EMBED_WEIGHTS "compile the weights from the weights directory into libnr_frame" ON)
 set(NR_WEIGHTS_DIR "${PROJECT_SOURCE_DIR}/weights" CACHE PATH "the weights as C: the bin2c slices and their table, compiled into libnr_frame")
-option(NR_BIN2C_WEIGHTS "regenerate the weights directory from dlssnr-logical.safetensors with slice and bin2c (skipped when the file is absent)" OFF)
-set(NR_WEIGHTS_FILE "" CACHE FILEPATH "the logical weights NR_BIN2C_WEIGHTS regenerates from (dlssnr-logical.safetensors); empty looks in the source root and work/mlxw/")
-set(NR_EMBED_CHUNK_MB 8 CACHE STRING "size of each slice the weights are regenerated as; the compiler needs ~90 bytes of memory per byte of a slice")
+option(NR_BIN2C_WEIGHTS "regenerate the weights directory from dlssnr-prepared.safetensors (else dlssnr-logical.safetensors) with slice and bin2c (skipped when neither file is there)" OFF)
+set(NR_WEIGHTS_FILE "" CACHE FILEPATH "the weights NR_BIN2C_WEIGHTS regenerates from (dlssnr-prepared.safetensors, or the logical file); empty looks in the source root and work/mlxw/")
+set(NR_EMBED_CHUNK_MB 8 CACHE STRING "the most a slice holds when the weights are regenerated (the compiler needs ~90 bytes of memory per byte of a slice); slices are cut at tensor boundaries under it")
 set(NR_EMBED_JOBS 2 CACHE STRING "how many slices Ninja compiles at once (a job pool; ~0.75 GB each at 8 MB)")
 option(NR_EMBED_SHADERS "compile every SPIR-V module into libxmx and gemm_runner with bin2c, so shaders are loaded by name from the binary" ON)
 set(NR_EMBED_SYMBOL dlssnr_logical_safetensors)       # the slice arrays are ${NR_EMBED_SYMBOL}_<k>
 set(NR_REGENERATE_WEIGHTS OFF)                          # NR_BIN2C_WEIGHTS, and the file exists
 if(NR_EMBED_WEIGHTS AND NR_BIN2C_WEIGHTS)
   if(NOT NR_WEIGHTS_FILE)
-    foreach(candidate "${PROJECT_SOURCE_DIR}/dlssnr-logical.safetensors" "${NR_WORK_DIR}/mlxw/dlssnr-logical.safetensors")
+    foreach(candidate "${PROJECT_SOURCE_DIR}/dlssnr-prepared.safetensors" "${NR_WORK_DIR}/mlxw/dlssnr-prepared.safetensors"
+                      "${PROJECT_SOURCE_DIR}/dlssnr-logical.safetensors" "${NR_WORK_DIR}/mlxw/dlssnr-logical.safetensors")
       if(EXISTS "${candidate}")
         set(NR_WEIGHTS_FILE "${candidate}")
         break()
@@ -175,7 +183,7 @@ if(NR_EMBED_WEIGHTS AND NR_BIN2C_WEIGHTS)
   if(EXISTS "${NR_WEIGHTS_FILE}")
     set(NR_REGENERATE_WEIGHTS ON)
   else()
-    message(STATUS "NR_BIN2C_WEIGHTS: no dlssnr-logical.safetensors (source root, work/mlxw/, or -DNR_WEIGHTS_FILE=); bin2c skipped, using the weights directory as it is")
+    message(STATUS "NR_BIN2C_WEIGHTS: no dlssnr-prepared.safetensors or dlssnr-logical.safetensors (source root, work/mlxw/, or -DNR_WEIGHTS_FILE=); bin2c skipped, using the weights directory as it is")
   endif()
 endif()
 if(NR_EMBED_WEIGHTS AND NOT NR_REGENERATE_WEIGHTS)
@@ -386,6 +394,52 @@ else()
   if(CMAKE_C_COMPILER_ID MATCHES "Clang")
     list(APPEND NR_WARN_FLAGS -Wno-overriding-option)
   endif()
+endif()
+
+# The host passes' CPU floor (the Makefile's NR_IMAGE_ARCH): x86-64-v3 on x86-64 — every CPU
+# since Haswell and Zen 1 — whose F16C makes each half conversion one instruction instead of a
+# call into libgcc, and AVX2 is there for the loops; measured upstream at 5-13 % of a frame,
+# byte-identical, and as fast as -march=native on Lunar Lake. A release copies the library to
+# other machines, so neither build system may build it for this one. On arm64 and the other
+# targets the flag means nothing and the hardware conversion comes through `_Float16` anyway
+# (FCVT between half and single is base ARMv8.0, so arm64 needs no floor from any -march),
+# so the floor is empty there; so it is for a 32-bit x86 build. MSVC gets NR_F16C instead on
+# x86-64, under which nr_portable.h converts through the F16C intrinsics (build_win.bat does
+# the same); MSVC for ARM64 takes the NEON conversions by itself (nr_portable.h, `_M_ARM64`).
+# -DNR_IMAGE_ARCH= overrides it (an empty value builds for the generic CPU).
+include(CheckCCompilerFlag)
+if(NOT DEFINED NR_IMAGE_ARCH)
+  set(nr_image_arch_default "")
+  # a universal macOS build compiles every file for each slice: an x86-64 flag on an arm64
+  # slice is an error, so such a build takes no floor (its x86-64 slice converts through
+  # `_Float16`, one instruction from any -march where the compiler has F16C, a libcall else)
+  set(nr_image_arch_one_slice ON)
+  if(CMAKE_OSX_ARCHITECTURES AND NOT CMAKE_OSX_ARCHITECTURES MATCHES "^[xX]86_64$")
+    set(nr_image_arch_one_slice OFF)
+  endif()
+  if(nr_image_arch_one_slice AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$"
+     AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+    if(MSVC)
+      set(nr_image_arch_default "NR_F16C")
+    else()
+      check_c_compiler_flag(-march=x86-64-v3 NR_HAS_X86_64_V3)
+      if(NR_HAS_X86_64_V3)
+        set(nr_image_arch_default "-march=x86-64-v3")
+      else()
+        message(WARNING "the compiler takes no -march=x86-64-v3: the host passes will convert "
+                        "every half through libgcc, several times slower")
+      endif()
+    endif()
+  endif()
+  set(NR_IMAGE_ARCH "${nr_image_arch_default}" CACHE STRING
+      "the CPU the host passes (nr_image.c) are built for: a -march flag, NR_F16C for MSVC, or empty")
+endif()
+set(NR_IMAGE_ARCH_FLAGS "")
+set(NR_IMAGE_ARCH_DEFINES "")
+if(NR_IMAGE_ARCH STREQUAL "NR_F16C")
+  set(NR_IMAGE_ARCH_DEFINES NR_F16C)
+elseif(NR_IMAGE_ARCH)
+  separate_arguments(NR_IMAGE_ARCH_FLAGS NATIVE_COMMAND "${NR_IMAGE_ARCH}")
 endif()
 
 if(NR_NO_FLOAT16)
@@ -846,6 +900,9 @@ endif()
 add_library(nr_image_objects OBJECT src/ref/nr_image.c)
 target_include_directories(nr_image_objects PRIVATE src/ref)
 target_compile_options(nr_image_objects PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+# the CPU floor above: `-march=x86-64-v3` on x86-64, NR_F16C under MSVC (the F16C intrinsics)
+target_compile_options(nr_image_objects PRIVATE ${NR_IMAGE_ARCH_FLAGS})
+target_compile_definitions(nr_image_objects PRIVATE ${NR_IMAGE_ARCH_DEFINES})
 # `-fno-trapping-math` changes no value, only whether a comparison may raise an exception
 # flag nobody reads; it lets GCC turn the fused composition's clamps into selects and
 # vectorise its pixels (`compose_encode_row`).
@@ -865,6 +922,15 @@ endif()
 # the style grade's truncation to half (floorf, fabsf)
 if(UNIX AND NOT APPLE)
   target_link_libraries(nr_image PRIVATE m)
+endif()
+
+# The daemon's NumPy allocator on Windows, whose heap returns a frame's large blocks to the
+# system for the next frame to fault in again (src/layer/nr_alloc.py): a PyDataMem_Handler
+# that keeps them, installed by nr_daemon.py through NumPy's C API. Win32 only, by its code.
+if(WIN32)
+  add_library(nr_alloc SHARED src/layer/nr_alloc.c)
+  target_compile_options(nr_alloc PRIVATE ${NR_WARN_FLAGS})
+  nr_place(nr_alloc)
 endif()
 
 # ---------------------------------------------------------------------------------------
@@ -895,18 +961,57 @@ if(NR_EMBED_WEIGHTS)
     file(MAKE_DIRECTORY "${NR_EMBED_SCRATCH}")
     file(SIZE "${NR_WEIGHTS_FILE}" NR_WEIGHTS_SIZE)
     math(EXPR NR_EMBED_CHUNK "${NR_EMBED_CHUNK_MB} * 1024 * 1024")
-    math(EXPR NR_EMBED_COUNT "(${NR_WEIGHTS_SIZE} + ${NR_EMBED_CHUNK} - 1) / ${NR_EMBED_CHUNK}")
+    # The cut plan: the safetensors header's tensor ends, in order, and a slice closes before
+    # the tensor that would take it past NR_EMBED_CHUNK (a tensor larger than that is a slice
+    # of its own). No tensor straddles two slices, so the reader in nr_frame.c aliases every
+    # one in place (`source_view`). The header is read here, at configure time, with a regex
+    # over its JSON — the 8-byte length prefix first, little-endian.
+    file(READ "${NR_WEIGHTS_FILE}" nr_hlen_hex OFFSET 0 LIMIT 8 HEX)
+    set(nr_hlen 0)
+    foreach(i RANGE 7 0 -1)
+      math(EXPR pos "${i} * 2")
+      string(SUBSTRING "${nr_hlen_hex}" ${pos} 2 byte)
+      math(EXPR nr_hlen "${nr_hlen} * 256 + 0x${byte}")
+    endforeach()
+    file(READ "${NR_WEIGHTS_FILE}" nr_header OFFSET 8 LIMIT ${nr_hlen})
+    math(EXPR nr_base "8 + ${nr_hlen}")
+    string(REGEX MATCHALL "\"data_offsets\":\\[[0-9]+,[0-9]+\\]" nr_ranges "${nr_header}")
+    set(nr_ends)
+    foreach(range ${nr_ranges})
+      string(REGEX REPLACE ".*,([0-9]+)\\]" "\\1" end "${range}")
+      math(EXPR end "${nr_base} + ${end}")
+      list(APPEND nr_ends ${end})
+    endforeach()
+    list(SORT nr_ends COMPARE NATURAL)
+    list(REMOVE_DUPLICATES nr_ends)
+    string(REGEX MATCH "\"prepared\":\"v[0-9]+\"" nr_prepared_tag "${nr_header}")
+    if(NOT nr_prepared_tag)
+      message(WARNING "${NR_WEIGHTS_FILE} is not a prepared file: the directory will work, but without the derived tensors nr_frame_prepare adds (cmake --build . --target prepare_weights, then reconfigure)")
+    endif()
+    # the plan: [start, end) per slice, greedy over whole tensors
+    set(nr_cuts)
+    set(slice_start 0)
+    set(prev_end ${nr_base})
+    foreach(end ${nr_ends})
+      math(EXPR span "${end} - ${slice_start}")
+      math(EXPR have "${prev_end} - ${slice_start}")
+      if(span GREATER NR_EMBED_CHUNK AND have GREATER 0)
+        list(APPEND nr_cuts ${prev_end})
+        set(slice_start ${prev_end})
+      endif()
+      set(prev_end ${end})
+    endforeach()
+    if(NOT prev_end EQUAL NR_WEIGHTS_SIZE)
+      message(FATAL_ERROR "${NR_WEIGHTS_FILE}: the header's tensors end at byte ${prev_end}, the file at ${NR_WEIGHTS_SIZE}; not a safetensors file this build understands")
+    endif()
+    list(APPEND nr_cuts ${NR_WEIGHTS_SIZE})
+    list(LENGTH nr_cuts NR_EMBED_COUNT)
     set(NR_EMBED_TABLE_EXTERNS "")
     set(NR_EMBED_TABLE_ROWS "")
     set(offset 0)
-    foreach(index RANGE 1 ${NR_EMBED_COUNT})
-      math(EXPR k "${index} - 1")
-      math(EXPR remaining "${NR_WEIGHTS_SIZE} - ${offset}")
-      if(remaining LESS NR_EMBED_CHUNK)
-        set(length ${remaining})
-      else()
-        set(length ${NR_EMBED_CHUNK})
-      endif()
+    set(k 0)
+    foreach(cut ${nr_cuts})
+      math(EXPR length "${cut} - ${offset}")
       set(symbol "${NR_EMBED_SYMBOL}_${k}")
       set(bin "${NR_EMBED_SCRATCH}/${symbol}.bin")
       set(header "${NR_WEIGHTS_DIR}/${symbol}.h")
@@ -934,6 +1039,7 @@ typedef char ${symbol}_size_check[sizeof ${symbol} == ${length} ? 1 : -1];
       string(APPEND NR_EMBED_TABLE_EXTERNS "extern const unsigned char ${symbol}[];\n")
       string(APPEND NR_EMBED_TABLE_ROWS "    { ${symbol}, ${length} },\n")
       math(EXPR offset "${offset} + ${length}")
+      math(EXPR k "${k} + 1")
     endforeach()
     # a shorter file leaves slices behind; they would still compile and confuse a reader
     file(GLOB stale "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.c" "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.h")
@@ -946,8 +1052,9 @@ typedef char ${symbol}_size_check[sizeof ${symbol} == ${length} ? 1 : -1];
     endforeach()
     get_filename_component(NR_WEIGHTS_FILE_NAME "${NR_WEIGHTS_FILE}" NAME)
     file(WRITE "${NR_EMBED_SCRATCH}/nr_weights_embedded.c.in"
-"/* generated by CMake: the ${NR_EMBED_COUNT} slices of the embedded weights, in file order.
- * Source: ${NR_WEIGHTS_FILE_NAME} (${NR_WEIGHTS_SIZE} bytes), ${NR_EMBED_CHUNK_MB} MB slices. Do not edit. */
+"/* generated by CMake: the ${NR_EMBED_COUNT} slices of the embedded weights, in file order,
+ * each closed at a tensor boundary (no tensor straddles two: nr_frame.c reads every one in place).
+ * Source: ${NR_WEIGHTS_FILE_NAME} (${NR_WEIGHTS_SIZE} bytes, ${nr_prepared_tag}), slices of at most ${NR_EMBED_CHUNK_MB} MB. Do not edit. */
 #include \"nr_weights_embedded.h\"
 
 ${NR_EMBED_TABLE_EXTERNS}
@@ -958,7 +1065,7 @@ const size_t nr_embedded_weights_size = ${NR_WEIGHTS_SIZE};
 ")
     configure_file("${NR_EMBED_SCRATCH}/nr_weights_embedded.c.in" "${NR_WEIGHTS_DIR}/nr_weights_embedded.c" COPYONLY)
     math(EXPR NR_WEIGHTS_MB "${NR_WEIGHTS_SIZE} / 1048576")
-    message(STATUS "regenerating ${NR_WEIGHTS_DIR} from ${NR_WEIGHTS_FILE} (${NR_WEIGHTS_MB} MB): ${NR_EMBED_COUNT} slices of ${NR_EMBED_CHUNK_MB} MB, ${NR_EMBED_JOBS} compiled at a time")
+    message(STATUS "regenerating ${NR_WEIGHTS_DIR} from ${NR_WEIGHTS_FILE} (${NR_WEIGHTS_MB} MB, ${nr_prepared_tag}): ${NR_EMBED_COUNT} slices of at most ${NR_EMBED_CHUNK_MB} MB cut at tensor boundaries, ${NR_EMBED_JOBS} compiled at a time")
   else()
     # the pre-processed directory as it is: every slice that has a header, in order
     file(GLOB NR_EMBED_HEADERS CONFIGURE_DEPENDS "${NR_WEIGHTS_DIR}/${NR_EMBED_SYMBOL}_*.h")
@@ -1110,7 +1217,8 @@ endif()
 nr_executable(nr_frame_rates)
 
 # The weights compiled into libnr_frame, back out as the file the Python graph reads
-# (`work/mlxw/dlssnr-logical.safetensors`): a checkout without `work/` has them nowhere else.
+# (`work/mlxw/dlssnr-prepared.safetensors`, since the compiled-in weights are the prepared
+# format): a checkout without `work/` has them nowhere else.
 # Not on Windows: the chunk table is data, which WINDOWS_EXPORT_ALL_SYMBOLS does not export.
 if(NR_EMBED_WEIGHTS AND NOT WIN32)
   add_executable(dump_embedded_weights src/tools/dump_embedded_weights.c)
@@ -1119,6 +1227,22 @@ if(NR_EMBED_WEIGHTS AND NOT WIN32)
   target_link_libraries(dump_embedded_weights PRIVATE nr_frame)
   nr_executable(dump_embedded_weights)
 endif()
+
+# `prepare_weights`: the prepared file from the logical one (or from the compiled-in weights
+# when there is no logical file), where NR_BIN2C_WEIGHTS looks for it first. Not built by
+# default; a reconfigure with -DNR_BIN2C_WEIGHTS=ON afterwards regenerates the directory.
+set(NR_PREPARED_FILE "${NR_WORK_DIR}/mlxw/dlssnr-prepared.safetensors")
+set(nr_prepare_source)
+foreach(candidate "${PROJECT_SOURCE_DIR}/dlssnr-logical.safetensors" "${NR_WORK_DIR}/mlxw/dlssnr-logical.safetensors")
+  if(EXISTS "${candidate}" AND NOT nr_prepare_source)
+    set(nr_prepare_source --weights "${candidate}")
+  endif()
+endforeach()
+add_custom_target(prepare_weights
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${NR_WORK_DIR}/mlxw"
+  COMMAND $<TARGET_FILE:nr_frame_cli> --prepare "${NR_PREPARED_FILE}" ${nr_prepare_source}
+  DEPENDS nr_frame_cli
+  COMMENT "nr_frame --prepare ${NR_PREPARED_FILE} ${nr_prepare_source}" VERBATIM)
 
 add_executable(test_nr_frame src/ref/test_nr_frame.c)
 target_include_directories(test_nr_frame PRIVATE src/ref)
@@ -1239,7 +1363,9 @@ if(NR_BUILD_TESTS)
       src/gpu/test_window_block.py
       src/gpu/test_global_attention.py
       src/gpu/test_staged32.py
+      src/gpu/test_staged_packed.py
       src/gpu/test_joint_qkv.py
+      src/tools/test_release.py
       src/ref/test_frame_cache.py src/ref/test_native_image.py src/ref/test_nr_model.py
       src/ref/test_temporal_controls.py)
     foreach(script ${NR_PY_TESTS})
@@ -1253,6 +1379,14 @@ if(NR_BUILD_TESTS)
       # the present test's negative controls: each disables one wait and expects the check to fail
       nr_ctest(test_present_negative "${PY}" "${PROJECT_SOURCE_DIR}/src/layer/test_present.py" --negative-control)
       set_tests_properties(test_present_negative PROPERTIES SKIP_RETURN_CODE 77)
+    endif()
+    if(WIN32)
+      # the Windows link between layer and daemon: the allocator, the named pipe, a daemon
+      # that ends with its game, and the vulkan-1.dll proxy (each skips where it cannot run)
+      foreach(name alloc pipe spawn_exit vulkan_proxy)
+        nr_ctest(test_${name} "${PY}" "${PROJECT_SOURCE_DIR}/src/layer/test_${name}.py")
+        set_tests_properties(test_${name} PROPERTIES SKIP_RETURN_CODE 77)
+      endforeach()
     endif()
     # the host passes at other thread counts: nr_image.c's pool splits rows, so the bytes
     # must not move with the count (the default run above uses one thread per core)
@@ -1284,6 +1418,7 @@ if(NR_BUILD_TESTS)
       src/gpu/test_glue.py src/gpu/test_joint_qkv.py src/gpu/test_compact_head.py
       src/gpu/test_input_fp16.py src/gpu/test_staged_partial.py
       src/gpu/test_window_block.py src/gpu/test_global_attention.py src/gpu/test_staged32.py
+      src/gpu/test_staged_packed.py
       src/gpu/test_gemm_int8_staged.py)
     if(NR_BUILD_METAL)
       set(NR_METAL_TESTS ${NR_RUNTIME_TESTS})

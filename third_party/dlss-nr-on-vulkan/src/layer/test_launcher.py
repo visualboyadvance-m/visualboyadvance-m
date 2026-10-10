@@ -6,13 +6,48 @@ import pathlib
 import shlex
 import subprocess
 import tempfile
+import prepare_layer
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+
+
+def windows_manifest_checks(base):
+    """Check Windows file names and absolute paths without loading Windows DLLs."""
+    fake = base / 'Windows checkout'
+    (fake / 'work').mkdir(parents=True)
+    (fake / 'src/layer').mkdir(parents=True)
+    (fake / 'src/layer/VkLayer_dlss_nr.json').write_bytes(
+        (ROOT / 'src/layer/VkLayer_dlss_nr.json').read_bytes())
+    old_root = prepare_layer.ROOT
+    prepare_layer.ROOT = fake
+    try:
+        (fake / 'work/nr_layer.dll').touch()
+        destination = base / 'Windows manifests'
+        written = prepare_layer.prepare(destination, 'windows')
+        assert written == [destination / 'VkLayer_dlss_nr.json']
+        manifest = json.loads((destination / 'VkLayer_dlss_nr.json').read_text())
+        assert manifest['layer']['library_arch'] == '64'
+        assert manifest['layer']['library_path'] == str(fake / 'work/nr_layer.dll')
+        assert manifest['layer']['name'] == 'VK_LAYER_dlssnr_intel'
+        assert not (destination / 'VkLayer_dlss_nr32.json').exists()
+        (fake / 'work/nr_layer32.dll').touch()
+        written = prepare_layer.prepare(destination, 'windows')
+        assert len(written) == 2
+        manifest = json.loads((destination / 'VkLayer_dlss_nr32.json').read_text())
+        assert manifest['layer']['library_arch'] == '32'
+        assert manifest['layer']['library_path'] == str(fake / 'work/nr_layer32.dll')
+        # A Windows DLL must not become a Linux manifest when the platform is explicit.
+        linux = base / 'Linux manifests without SOs'
+        assert prepare_layer.prepare(linux, 'linux') == []
+        assert not list(linux.glob('*.json'))
+    finally:
+        prepare_layer.ROOT = old_root
 
 
 def main():
     with tempfile.TemporaryDirectory(prefix='nr-launcher-') as temporary:
         base = pathlib.Path(temporary)
+        windows_manifest_checks(base)
         steam = base / 'Steam root'
         library = base / 'External game library'
         (steam / 'steamapps').mkdir(parents=True)
@@ -60,7 +95,7 @@ def main():
         option = next(line.strip() for line in result.stdout.splitlines() if '%command%' in line)
         words = shlex.split(option)
         assert words[0] == f'VK_LAYER_PATH={layer}' and words[-1] == '%command%'
-    print('launcher: external library, spaces, Proton override and dual-architecture manifests OK')
+    print('launcher: external library, spaces, Proton override and Linux/Windows manifests OK')
 
 
 if __name__ == '__main__':

@@ -31,7 +31,8 @@ sys.path.insert(0, str(HERE))
 import nr_model  # noqa: E402
 import image_io  # noqa: E402
 
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+# the prepared file when it is there, else the logical one (nr_build.weights_file)
+WEIGHTS = nr_model.default_weights()
 _MLX = ROOT / "work" / "mlx-dlss" / "python" / "mlxdlss"
 
 
@@ -478,7 +479,8 @@ class ResidentBackend:
         import nr_frame_resident
         self._module = nr_frame_resident
         self.runtime = xmxres.Runtime()
-        self.weights, _ = nr_model.load_logical(weights_path or WEIGHTS)
+        # halves stay halves: the device takes them as they are, and nothing is widened
+        self.weights, _ = nr_model.load_logical(weights_path or WEIGHTS, keep_half=True)
         # one upload for as long as the backend is open: the extent changes under a knob
         # and the weights do not depend on it. Built on the first frame, not here, so that
         # constructing a backend still allocates nothing on the device.

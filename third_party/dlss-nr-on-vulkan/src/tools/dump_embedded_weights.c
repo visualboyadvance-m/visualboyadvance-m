@@ -5,10 +5,11 @@
  *     dump_embedded_weights OUT.safetensors
  *
  * The Python graph (`nr_frame.py`, `frame_profile.py`, every test under src/gpu) reads
- * `work/mlxw/dlssnr-logical.safetensors`, and a checkout without `work/` has the weights
- * only inside the library (`weights/`, through bin2c). This walks the chunk table the
- * library exports and concatenates it, which is the file byte for byte: the slices are
- * contiguous and in order (`nr_weights_embedded.h`). Linked against libnr_frame.
+ * `work/mlxw/dlssnr-prepared.safetensors` (else the logical file), and a checkout without
+ * `work/` has the weights only inside the library (`weights/`, through bin2c) — since
+ * 2026-10-10 in the prepared form, so write them to the prepared name. This walks the chunk
+ * table the library exports and concatenates it, which is the file byte for byte: the slices
+ * are contiguous and in order (`nr_weights_embedded.h`). Linked against libnr_frame.
  */
 #include <stdio.h>
 #include <stdlib.h>

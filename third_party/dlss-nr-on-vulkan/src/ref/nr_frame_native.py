@@ -65,15 +65,25 @@ def library():
         lib.nr_frame_error.restype = C.c_char_p
         lib.nr_frame_embedded_weights_size.argtypes = []
         lib.nr_frame_embedded_weights_size.restype = C.c_size_t
+        if hasattr(lib, "nr_frame_prepare"):          # a library older than 2026-10-10 has none
+            lib.nr_frame_prepare.argtypes = [C.c_char_p, C.c_char_p]
+            lib.nr_frame_prepare.restype = C.c_int
         lib.nr_frame_device.argtypes = [C.c_void_p]
         lib.nr_frame_device.restype = C.c_char_p
         lib.nr_frame_gemm_path.argtypes = [C.c_void_p]
         lib.nr_frame_gemm_path.restype = C.c_char_p
-        for name in ("nr_frame_discrete", "nr_frame_preserve16", "nr_frame_half_by_cast"):
+        for name in ("nr_frame_discrete", "nr_frame_preserve16", "nr_frame_half_by_cast",
+                     "nr_frame_staged_packed", "nr_frame_portable_packed"):
             getattr(lib, name).argtypes = []
             getattr(lib, name).restype = C.c_int
         lib.nr_frame_input_view.argtypes = [C.c_void_p]
         lib.nr_frame_input_view.restype = C.c_int
+        if hasattr(lib, "nr_frame_prepared"):          # 2026-10-10
+            lib.nr_frame_prepared.argtypes = [C.c_void_p]
+            lib.nr_frame_prepared.restype = C.c_int
+            for name in ("nr_frame_weights_aliased", "nr_frame_weights_count"):
+                getattr(lib, name).argtypes = [C.c_void_p]
+                getattr(lib, name).restype = C.c_size_t
         lib.nr_frame_defaults.argtypes = [C.POINTER(Params)]
         lib.nr_frame_defaults.restype = None
         lib.nr_frame_geometry.argtypes = [C.c_int, C.c_int, C.POINTER(C.c_int), C.POINTER(C.c_int)]
@@ -239,6 +249,32 @@ class NativeFrame:
         return self.lib.nr_frame_half_by_cast()
 
     @property
+    def staged_packed(self):
+        """Whether the staged kernel copies its operands as raw 128-bit vectors
+        (`nr_frame_staged_packed`): 1 by default on Vulkan and Metal, 0 under XMX_STAGED_PACKED=0
+        and on Direct3D 12, which has no staged kernel; the same bits either way."""
+        return self.lib.nr_frame_staged_packed()
+
+    @property
+    def portable_packed(self):
+        """Whether the portable GEMM fetches A sixteen bytes at a time (`nr_frame_portable_packed`):
+        0 by default, 1 under XMX_PORTABLE_PACKED=1; the same bits either way."""
+        return self.lib.nr_frame_portable_packed()
+
+    @property
+    def prepared(self):
+        """Whether the weights this frame opened were prepared (`nr_frame_prepared`): the
+        derived tensors in, and from v2 every tensor read in place; -1 on an older library."""
+        return self.lib.nr_frame_prepared(self.handle) if hasattr(self.lib, "nr_frame_prepared") else -1
+
+    @property
+    def weights_aliased(self):
+        """(tensors read in place out of the slices or the file's mapping, tensors in all)."""
+        if not hasattr(self.lib, "nr_frame_weights_aliased"):
+            return (0, 0)
+        return (self.lib.nr_frame_weights_aliased(self.handle), self.lib.nr_frame_weights_count(self.handle))
+
+    @property
     def input_view(self):
         """Whether the features are built in the graph's mapped input (NR_INPUT_VIEW)."""
         return self.lib.nr_frame_input_view(self.handle)
@@ -356,6 +392,19 @@ class NativeFrame:
                                   C.byref(p), head.ctypes.data):
             self._fail("nr_frame_head")
         return head
+
+
+def prepare(out_path, weights_path=None):
+    """`nr_frame_prepare`: write the weights (a logical safetensors, or None for the compiled-in
+    ones) as a prepared file, the loaders' layout work done; `NativeFrame(out_path)` opens it.
+    Raises on a library without it or on failure."""
+    lib = library()
+    if not hasattr(lib, "nr_frame_prepare"):
+        raise RuntimeError("this libnr_frame has no nr_frame_prepare; rebuild it")
+    weights = None if weights_path is None else str(weights_path).encode()
+    if lib.nr_frame_prepare(weights, str(out_path).encode()):
+        raise RuntimeError("nr_frame_prepare: " + lib.nr_frame_error().decode())
+    return out_path
 
 
 def live_settings(**values):

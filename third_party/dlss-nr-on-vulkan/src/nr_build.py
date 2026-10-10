@@ -31,6 +31,20 @@ EXE = ".exe" if sys.platform == "win32" else ""
 MARKER = "libxmx" + SUFFIX
 
 
+def weights_file(root=ROOT):
+    """The weights the Python graph reads: `work/mlxw/dlssnr-prepared.safetensors` when it is
+    there (the logical weights with the loaders' derived tensors, F32 first then F16 — what
+    `nr_frame --prepare` writes and what the compiled-in weights are), else the logical file.
+    NR_WEIGHTS names another. The path is returned whether or not it exists, so a caller can
+    say which one is missing."""
+    named = os.environ.get("NR_WEIGHTS")
+    if named:
+        return pathlib.Path(named)
+    mlxw = pathlib.Path(root) / "work" / "mlxw"
+    prepared, logical = mlxw / "dlssnr-prepared.safetensors", mlxw / "dlssnr-logical.safetensors"
+    return prepared if prepared.exists() else logical
+
+
 def candidates(root=ROOT):
     """The directories a build may have filled, `work/` first."""
     yield root / "work"

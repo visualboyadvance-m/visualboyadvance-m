@@ -68,6 +68,8 @@ struct xmx {
     int (*discrete)(void);
     int (*preserve16)(void);
     int (*half_by_cast)(void);
+    int (*staged_packed)(void);   /* optional: raw 128-bit operand copies in the staged kernel */
+    int (*portable_packed)(void); /* optional: the portable GEMM's 16-byte A fetch */
     void (*cancel)(int);          /* optional: a runtime without it cannot be cancelled */
     int (*cancelled)(void);
     const char *(*error)(void);
@@ -176,6 +178,7 @@ static int xmx_load(void)
     X.cancel(g_cancel_open);
     X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
     X.discrete = xmx_discrete; X.preserve16 = xmx_preserve16; X.half_by_cast = xmx_half_by_cast;
+    X.staged_packed = xmx_staged_packed; X.portable_packed = xmx_portable_packed;
     X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
     X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
     X.buf_zero = xmx_buf_zero; X.buf_destroy = xmx_buf_destroy;
@@ -252,6 +255,8 @@ static int xmx_load(void)
     X.discrete = nr_dl_sym(X.handle, "xmx_discrete");
     X.preserve16 = nr_dl_sym(X.handle, "xmx_preserve16");
     X.half_by_cast = nr_dl_sym(X.handle, "xmx_half_by_cast");
+    X.staged_packed = nr_dl_sym(X.handle, "xmx_staged_packed");
+    X.portable_packed = nr_dl_sym(X.handle, "xmx_portable_packed");
     BIND(buf_create_kind, "xmx_buf_create_kind"); BIND(buf_host_visible, "xmx_buf_host_visible");
     BIND(buf_ptr, "xmx_buf_ptr"); BIND(buf_upload, "xmx_buf_upload");
     BIND(buf_download, "xmx_buf_download"); BIND(buf_zero, "xmx_buf_zero");
@@ -353,12 +358,20 @@ struct tensor {
     int ndim;
     long shape[8];
     size_t count;
-    float *data;            /* float32, as `load_logical` hands them over */
+    int is16;               /* stored F16 (`half`) or F32 (`data`) */
+    uint16_t *half;         /* an F16 tensor's bits as stored: what the GEMMs read, uploaded as they are */
+    float *data;            /* float32: an F32 tensor's values, or an F16 one's widened on first use
+                             * (`tensor_f32`) — the small tensors the float passes read */
+    int owned_half, owned_data;   /* malloc'd here, or a view into the source (freed with it) */
 };
 
 struct weights {
     struct tensor *t;
     size_t n;
+    int prepared;           /* the metadata said `prepared` (nr_frame_prepare's derived tensors are in) */
+    size_t aliased;         /* tensors read in place, out of the slices or the block, not copied */
+    struct nr_mapping map;  /* a file source, mapped (the default), stays mapped under its tensors */
+    unsigned char *block;   /* a file source read whole into one block (NR_WEIGHTS_FILE=read), likewise */
 };
 
 /* A JSON scanner for exactly what a safetensors header holds: an object of objects with
@@ -426,26 +439,67 @@ static int tensor_compare(const void *a, const void *b)
 
 static void weights_free(struct weights *w)
 {
-    for (size_t i = 0; i < w->n; i++) { free(w->t[i].name); free(w->t[i].data); }
+    for (size_t i = 0; i < w->n; i++) {
+        free(w->t[i].name);
+        if (w->t[i].owned_data) free(w->t[i].data);
+        if (w->t[i].owned_half) free(w->t[i].half);
+    }
     free(w->t);
-    w->t = NULL; w->n = 0;
+    nr_file_unmap(&w->map);
+    free(w->block);
+    w->t = NULL; w->n = 0; w->prepared = 0; w->aliased = 0; w->block = NULL;
 }
 
 /* Where the safetensors bytes come from: a file, or the slices CMake compiled into this
- * library (nr_weights_embedded.h). The reader below asks for ranges and never for the
- * whole, so the 292 MB is converted tensor by tensor either way. */
+ * library (nr_weights_embedded.h). A tensor that lies inside one slice, or anywhere in a
+ * file's bytes, is not copied: the reader points at it (`source_view`), and the upload is the
+ * one copy the device needs. The slices are cut at tensor boundaries when the directory is
+ * regenerated (CMakeLists.txt), so with the compiled-in weights every tensor is a view; a
+ * straddling one, or one the slice array leaves misaligned, is copied (`source_read`) as
+ * every tensor used to be.
+ *
+ * A file is mapped whole and asked for at once (`nr_prefault`, MADV_WILLNEED): left to the
+ * uploads' first touch a mapping costs macOS 0.9-1.3 s of scattered page faults over 291 MB,
+ * asked for it costs 190 ms, and read into a block of its own (`NR_WEIGHTS_FILE=read`) it
+ * measured slower still through the block's own first faults — open + first 320x320 frame
+ * 247 ms mapped against 367 read on MoltenVK, 92 against 246 on Metal (HANDOFF, 2026-10-10).
+ * The compiled-in slices are the library's own pages, which the same scattered first touch
+ * made 2-4x slower than a sequential read of them had been: they are brought in at open too
+ * (`NR_WEIGHTS_PREFAULT=0` leaves them to the uploads). */
 struct source {
-    FILE *f;                                    /* a file, or NULL for the embedded slices */
+    struct nr_mapping map;                      /* a mapped file; `map.data` NULL otherwise */
+    unsigned char *block;                       /* a file read whole; NULL for a mapping or the slices */
+    size_t block_size;
     const struct nr_embedded_chunk *chunks;
     size_t chunk_count;
     const char *label;                          /* the path, or "embedded weights" */
 };
 
+/* The bytes [offset, offset + n) if they sit contiguous and `align`-aligned in the source. */
+static const void *source_view(struct source *s, size_t offset, size_t n, size_t align)
+{
+    if (s->map.data || s->block) {
+        size_t size = s->block ? s->block_size : s->map.size;
+        const unsigned char *base = s->block ? s->block : s->map.data;
+        if (offset + n > size) return NULL;
+        const unsigned char *at = base + offset;
+        return ((uintptr_t)at % align) ? NULL : at;
+    }
+    size_t k = 0, start = 0;
+    while (k < s->chunk_count && start + s->chunks[k].size <= offset) start += s->chunks[k++].size;
+    if (k == s->chunk_count || offset - start + n > s->chunks[k].size) return NULL;
+    const unsigned char *at = s->chunks[k].data + (offset - start);
+    return ((uintptr_t)at % align) ? NULL : at;
+}
+
 static int source_read(struct source *s, size_t offset, void *dst, size_t n)
 {
-    if (s->f) {
-        if (fseek(s->f, (long)offset, SEEK_SET)) return -1;
-        return fread(dst, 1, n, s->f) == n ? 0 : -1;
+    if (s->map.data || s->block || !s->chunk_count) {
+        size_t size = s->block ? s->block_size : s->map.size;
+        const unsigned char *base = s->block ? s->block : s->map.data;
+        if (!base || offset + n > size) return -1;
+        memcpy(dst, base + offset, n);
+        return 0;
     }
     unsigned char *out = dst;
     size_t k = 0, start = 0;
@@ -462,7 +516,7 @@ static int source_read(struct source *s, size_t offset, void *dst, size_t n)
     return 0;
 }
 
-static void source_close(struct source *s) { if (s->f) fclose(s->f); s->f = NULL; }
+static void source_close(struct source *s) { nr_file_unmap(&s->map); free(s->block); s->block = NULL; }
 
 static int source_open(struct source *s, const char *path)
 {
@@ -472,17 +526,23 @@ static int source_open(struct source *s, const char *path)
         s->chunks = nr_embedded_weights_chunks;
         s->chunk_count = nr_embedded_weights_chunk_count;
         s->label = "embedded weights";
+        const char *prefault = getenv("NR_WEIGHTS_PREFAULT");
+        if (!prefault || strcmp(prefault, "0"))
+            for (size_t k = 0; k < s->chunk_count; k++) nr_prefault(s->chunks[k].data, s->chunks[k].size);
         return 0;
 #else
         FAILF("no weights path, and this build of libnr_frame has no embedded weights (NR_EMBED_WEIGHTS with a weights directory, or NR_BIN2C_WEIGHTS and the safetensors)");
 #endif
     }
-#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
-    fopen_s(&s->f, path, "rb");
-#else
-    s->f = fopen(path, "rb");
-#endif
-    if (!s->f) FAILF("cannot open %s: %s", path, strerror(errno));
+    const char *how = getenv("NR_WEIGHTS_FILE");
+    if (how && !strcmp(how, "read")) {
+        s->block = nr_file_read(path, &s->block_size);
+        if (!s->block) FAILF("cannot open %s: %s", path, strerror(errno));
+    } else {
+        if (nr_file_map(path, &s->map)) FAILF("cannot open %s: %s", path, strerror(errno));
+        const char *prefault = getenv("NR_WEIGHTS_PREFAULT");
+        if (!prefault || strcmp(prefault, "0")) nr_prefault(s->map.data, s->map.size);
+    }
     s->label = path;
     return 0;
 }
@@ -515,8 +575,10 @@ static int weights_load(struct weights *w, const char *path_or_null)
 
     struct js j = { header, header + hlen };
     if (!js_ch(&j, '{')) { free(header); source_close(f); FAILF("%s: header is not an object", path); }
-    size_t cap = 700;
+    size_t cap = 800;
     w->t = calloc(cap, sizeof *w->t); w->n = 0;
+    w->prepared = 0; w->aliased = 0;
+    memset(&w->map, 0, sizeof w->map);
     int logical = 0, entries = 0;
     char name[256], key[64], sval[128];
     while (!js_ch(&j, '}')) {
@@ -532,6 +594,7 @@ static int weights_load(struct weights *w, const char *path_or_null)
                 if (*j.p == '"') {
                     if (js_string(&j, sval, sizeof sval)) goto bad;
                     if (!strcmp(key, "fully_logical") && !strcmp(sval, "true")) logical = 1;
+                    if (!strcmp(key, "prepared") && *sval) w->prepared = 1;
                 } else if (js_skip(&j)) goto bad;
             }
             continue;
@@ -578,18 +641,34 @@ static int weights_load(struct weights *w, const char *path_or_null)
         if (bytes != t->count * (is16 ? 2 : 4)) { snprintf(last_error, sizeof last_error, "%s: %zu bytes for %zu elements", name, bytes, t->count); goto fail; }
 #endif
 
-        t->data = malloc(t->count * sizeof(float) + 4);
-        if (!t->data) goto bad;
-        if (is16) {
-            uint16_t *raw = malloc(bytes + 2);
-            if (!raw || source_read(f, base + (size_t)off0, raw, bytes)) { free(raw); goto bad; }
-            for (size_t i = 0; i < t->count; i++) t->data[i] = half_to_float(raw[i]);
-            free(raw);
-        } else if (source_read(f, base + (size_t)off0, t->data, bytes)) goto bad;
+        /* An F16 tensor stays half: 579 of the 649 are, 291 MB that used to be widened to
+         * 583 MB of float32 here and narrowed again at every upload (145 M conversions each
+         * way, and the float32 copy resident for the frame's life). The few float passes
+         * read widen their small tensors on first use (`tensor_f32`). And a tensor that sits
+         * whole in one slice or in the mapping is not even copied: it is read in place, and
+         * the upload to the device is its one copy. */
+        t->is16 = is16;
+        const void *view = source_view(f, base + (size_t)off0, bytes, is16 ? 2 : 4);
+        if (view) {
+            if (is16) t->half = (uint16_t *)view; else t->data = (float *)view;
+            w->aliased++;
+        } else if (is16) {
+            t->half = malloc(bytes + 2);
+            t->owned_half = 1;
+            if (!t->half || source_read(f, base + (size_t)off0, t->half, bytes)) goto bad;
+        } else {
+            t->data = malloc(t->count * sizeof(float) + 4);
+            t->owned_data = 1;
+            if (!t->data || source_read(f, base + (size_t)off0, t->data, bytes)) goto bad;
+        }
         w->n++;
     }
     free(header);
-    source_close(f);
+    /* a file's bytes stay under the tensors that point into them; the slices are the library's */
+    w->map = f->map;
+    memset(&f->map, 0, sizeof f->map);
+    w->block = f->block;
+    f->block = NULL;
     if (!logical) { weights_free(w); FAILF("%s: weights must declare fully_logical=true (the packed file is not a substitute)", path); }
     qsort(w->t, w->n, sizeof *w->t, tensor_compare);
     return 0;
@@ -606,6 +685,20 @@ fail:
     source_close(f);
     weights_free(w);
     return -1;
+}
+
+/* A tensor's values as float32: an F32 tensor's own, an F16 tensor's widened once and
+ * kept (the small ones the float passes read: biases, scales, cosines, sines, the head).
+ * NULL out of memory. */
+static const float *tensor_f32(const struct tensor *t)
+{
+    if (t->data) return t->data;
+    float *data = malloc(t->count * sizeof(float) + 4);
+    if (!data) return NULL;
+    for (size_t i = 0; i < t->count; i++) data[i] = half_to_float(t->half[i]);
+    ((struct tensor *)t)->data = data;
+    ((struct tensor *)t)->owned_data = 1;
+    return data;
 }
 
 static const struct tensor *weight(const struct weights *w, const char *name)
@@ -661,6 +754,21 @@ static int buffer_f16(const float *data, size_t count)
 static int buffer_f32(const float *data, size_t count)
 {
     return buffer_with(data, count * 4, GRAPH);
+}
+
+/* A tensor as a half buffer — its stored bits when it is F16, no conversion — and as a
+ * float32 one. */
+static int buffer_half(const struct tensor *t)
+{
+    if (t->half) return buffer_with(t->half, t->count * 2, GRAPH);
+    return buffer_f16(t->data, t->count);
+}
+
+static int buffer_float(const struct tensor *t)
+{
+    const float *data = tensor_f32(t);
+    if (!data) FAILF("out of memory");
+    return buffer_f32(data, t->count);
 }
 
 /* Host write into a HOST_WRITE buffer, host read out of a HOST_READ one:
@@ -743,16 +851,34 @@ struct edge_w { int loaded; int weight0, sine, out_channels; };
     if (!t) FAILF("missing weight " fmt, i)
 
 /* `recover_attention_bias_layout` where `uses_fragment_swizzle` says so, then upload. */
+static int upload_bias(const struct tensor *bias, int heads);
+
+/* `attn_bias` of a block: a prepared file (`nr_frame_prepare`) carries it already in logical
+ * order under `<name>_unswizzled` as F32; else it is recovered here. */
+static int upload_bias_named(const struct weights *w, const char *fmt, int index, int heads)
+{
+    char name[128];
+    snprintf(name, sizeof name, fmt, index);
+    const struct tensor *bias = weightf(w, fmt, index);
+    if (!bias) FAILF("missing weight %s", name);
+    strncat(name, "_unswizzled", sizeof name - strlen(name) - 1);
+    const struct tensor *ready = weight(w, name);
+    if (ready) return buffer_float(ready);
+    return upload_bias(bias, heads);
+}
+
 static int upload_bias(const struct tensor *bias, int heads)
 {
     if (bias->ndim != 3 || bias->shape[1] != 64 || bias->shape[2] != 64)
         FAILF("attention bias must be [heads, 64, 64]");
-    if (!(heads == 1 || heads == 16)) return buffer_f32(bias->data, bias->count);
+    if (!(heads == 1 || heads == 16)) return buffer_float(bias);
+    const float *data = tensor_f32(bias);
+    if (!data) FAILF("out of memory");
     float *fixed = malloc(bias->count * sizeof(float));
     if (!fixed) FAILF("out of memory");
     for (long h = 0; h < bias->shape[0]; h++)
         for (int e = 0; e < 4096; e++)
-            fixed[h * 4096 + e] = bias->data[h * 4096 + fragment_index(e)];
+            fixed[h * 4096 + e] = data[h * 4096 + fragment_index(e)];
     int id = buffer_f32(fixed, bias->count);
     free(fixed);
     return id;
@@ -764,17 +890,16 @@ static int load_window_block(struct block_w *b, const struct weights *w, int ind
     window_origin(index, &b->oy, &b->ox);
     NEED(proj, w, "block%d.layer0.projection_weight", index);
     b->channels = (int)proj->shape[0];
-    NEED(bias, w, "block%d.layer0.attn_bias", index);
     NEED(qkv, w, "block%d.layer0.qkv_weight", index);
     NEED(scale, w, "block%d.layer0.attn_scale", index);
     NEED(acos, w, "block%d.layer0.attn_cos_skip", index);
     NEED(fcos, w, "block%d.layer0.ffn_cos_skip", index);
-    if ((b->qkv = buffer_f16(qkv->data, qkv->count)) < 0) return -1;
-    if ((b->out = buffer_f16(proj->data, proj->count)) < 0) return -1;
-    if ((b->bias = upload_bias(bias, heads)) < 0) return -1;
-    if ((b->scale = buffer_f32(scale->data, scale->count)) < 0) return -1;
-    if ((b->attn_cos = buffer_f32(acos->data, acos->count)) < 0) return -1;
-    if ((b->ffn_cos = buffer_f32(fcos->data, fcos->count)) < 0) return -1;
+    if ((b->qkv = buffer_half(qkv)) < 0) return -1;
+    if ((b->out = buffer_half(proj)) < 0) return -1;
+    if ((b->bias = upload_bias_named(w, "block%d.layer0.attn_bias", index, heads)) < 0) return -1;
+    if ((b->scale = buffer_float(scale)) < 0) return -1;
+    if ((b->attn_cos = buffer_float(acos)) < 0) return -1;
+    if ((b->ffn_cos = buffer_float(fcos)) < 0) return -1;
     const struct tensor *expand = weightf(w, "block%d.layer0.ffn_expand_weight", index);
     b->branched = expand != NULL;
     if (b->branched) {
@@ -791,27 +916,35 @@ static int load_window_block(struct block_w *b, const struct weights *w, int ind
         b->hidden_width = G * 128;
         if (b->channels != G * 32) FAILF("block%d: branched feed-forward does not match C", index);
         size_t n = (size_t)G * (G * 32) * 128;
-        float *fused = malloc(n * sizeof(float));
-        if (!fused) FAILF("out of memory");
-        for (int oh = 0; oh < G; oh++)
-            for (int br = 0; br < 4; br++)
-                for (int ih = 0; ih < G; ih++)
-                    for (int k = 0; k < 32; k++)
-                        for (int j = 0; j < 32; j++)
-                            fused[((size_t)oh * (G * 32) + ih * 32 + k) * 128 + br * 32 + j] =
-                                expand->data[((((size_t)oh * 4 + br) * G + ih) * 32 + k) * 32 + j];
-        b->expand = buffer_f16(fused, n);
-        free(fused);
-        if (b->expand < 0) return -1;
-        if ((b->branch = buffer_f16(branch->data, branch->count)) < 0) return -1;
-        if ((b->ffn_out = buffer_f16(ffn_out->data, ffn_out->count)) < 0) return -1;
+        const struct tensor *ready = weightf(w, "block%d.layer0.ffn_expand_fused", index);
+        if (ready && ready->count == n) {
+            /* a prepared file carries the permutation done (`nr_frame_prepare`) */
+            if ((b->expand = buffer_half(ready)) < 0) return -1;
+        } else {
+            uint16_t *fused = malloc(n * sizeof(uint16_t));
+            if (!fused) FAILF("out of memory");
+            for (int oh = 0; oh < G; oh++)
+                for (int br = 0; br < 4; br++)
+                    for (int ih = 0; ih < G; ih++)
+                        for (int k = 0; k < 32; k++)
+                            for (int j = 0; j < 32; j++) {
+                                size_t from = ((((size_t)oh * 4 + br) * G + ih) * 32 + k) * 32 + j;
+                                fused[((size_t)oh * (G * 32) + ih * 32 + k) * 128 + br * 32 + j] =
+                                    expand->half ? expand->half[from] : float_to_half(expand->data[from]);
+                            }
+            b->expand = buffer_with(fused, n * 2, GRAPH);
+            free(fused);
+            if (b->expand < 0) return -1;
+        }
+        if ((b->branch = buffer_half(branch)) < 0) return -1;
+        if ((b->ffn_out = buffer_half(ffn_out)) < 0) return -1;
     } else {
         NEED(w1, w, "block%d.layer0.weight1", index);
         NEED(w2, w, "block%d.layer0.weight2", index);
         b->groups = 0;
         b->hidden_width = (int)w1->shape[1];
-        if ((b->expand = buffer_f16(w1->data, w1->count)) < 0) return -1;
-        if ((b->branch = buffer_f16(w2->data, w2->count)) < 0) return -1;
+        if ((b->expand = buffer_half(w1)) < 0) return -1;
+        if ((b->branch = buffer_half(w2)) < 0) return -1;
         b->ffn_out = -1;
     }
     b->first = b->project = b->weight3 = b->ffn_proj = -1;
@@ -827,7 +960,6 @@ static int load_split_block(struct block_w *b, const struct weights *w, int inde
     b->channels = (int)proj->shape[0];
     b->groups = b->channels / 64;
     b->hidden_width = b->groups * 256;
-    NEED(bias, w, "block%d.layer2.attn_bias", index);
     NEED(first, w, "block%d.layer0.first_projection_weight", index);
     NEED(expand, w, "block%d.layer0.group_expand_weight", index);
     NEED(project, w, "block%d.layer0.group_project_weight", index);
@@ -836,16 +968,16 @@ static int load_split_block(struct block_w *b, const struct weights *w, int inde
     NEED(qkv, w, "block%d.layer2.qkv_weight", index);
     NEED(scale, w, "block%d.layer2.attn_scale", index);
     NEED(acos, w, "block%d.layer3.attn_cos_skip", index);
-    if ((b->first = buffer_f16(first->data, first->count)) < 0) return -1;
-    if ((b->expand = buffer_f16(expand->data, expand->count)) < 0) return -1;
-    if ((b->project = buffer_f16(project->data, project->count)) < 0) return -1;
-    if ((b->weight3 = buffer_f16(w3->data, w3->count)) < 0) return -1;
-    if ((b->ffn_cos = buffer_f32(fcos->data, fcos->count)) < 0) return -1;
-    if ((b->qkv = buffer_f16(qkv->data, qkv->count)) < 0) return -1;
-    if ((b->scale = buffer_f32(scale->data, scale->count)) < 0) return -1;
-    if ((b->bias = upload_bias(bias, 16)) < 0) return -1;
-    if ((b->out = buffer_f16(proj->data, proj->count)) < 0) return -1;
-    if ((b->attn_cos = buffer_f32(acos->data, acos->count)) < 0) return -1;
+    if ((b->first = buffer_half(first)) < 0) return -1;
+    if ((b->expand = buffer_half(expand)) < 0) return -1;
+    if ((b->project = buffer_half(project)) < 0) return -1;
+    if ((b->weight3 = buffer_half(w3)) < 0) return -1;
+    if ((b->ffn_cos = buffer_float(fcos)) < 0) return -1;
+    if ((b->qkv = buffer_half(qkv)) < 0) return -1;
+    if ((b->scale = buffer_float(scale)) < 0) return -1;
+    if ((b->bias = upload_bias_named(w, "block%d.layer2.attn_bias", index, 16)) < 0) return -1;
+    if ((b->out = buffer_half(proj)) < 0) return -1;
+    if ((b->attn_cos = buffer_float(acos)) < 0) return -1;
     b->branch = b->ffn_out = b->ffn_proj = -1;
     b->branched = 0;
     b->loaded = 1;
@@ -864,15 +996,15 @@ static int load_global_block(struct block_w *b, const struct weights *w, int ind
     NEED(scale, w, "block%d.layer2.attn_scale", index);
     NEED(acos, w, "block%d.layer4.attn_cos_skip", index);
     b->hidden_width = (int)expand->shape[1];
-    if ((b->expand = buffer_f16(expand->data, expand->count)) < 0) return -1;
-    if ((b->ffn_proj = buffer_f16(ffn_proj->data, ffn_proj->count)) < 0) return -1;
-    if ((b->ffn_cos = buffer_f32(fcos->data, fcos->count)) < 0) return -1;
-    if ((b->qkv = buffer_f16(qkv->data, qkv->count)) < 0) return -1;
+    if ((b->expand = buffer_half(expand)) < 0) return -1;
+    if ((b->ffn_proj = buffer_half(ffn_proj)) < 0) return -1;
+    if ((b->ffn_cos = buffer_float(fcos)) < 0) return -1;
+    if ((b->qkv = buffer_half(qkv)) < 0) return -1;
     /* the learned scale alone: the ViT's query takes half(sqrt(32)) as a multiply of its
      * own before it (VIT_ROOT in cosine_tree.glsl) */
-    if ((b->scale = buffer_f32(scale->data, scale->count)) < 0) return -1;
-    if ((b->out = buffer_f16(proj->data, proj->count)) < 0) return -1;
-    if ((b->attn_cos = buffer_f32(acos->data, acos->count)) < 0) return -1;
+    if ((b->scale = buffer_float(scale)) < 0) return -1;
+    if ((b->out = buffer_half(proj)) < 0) return -1;
+    if ((b->attn_cos = buffer_float(acos)) < 0) return -1;
     b->bias = b->branch = b->ffn_out = b->first = b->project = b->weight3 = -1;
     b->groups = 0; b->branched = 0;
     b->loaded = 1;
@@ -882,15 +1014,241 @@ static int load_global_block(struct block_w *b, const struct weights *w, int ind
 static int load_edge(struct edge_w *e, const struct weights *w, int index, int up)
 {
     NEED(w0, w, "block%d.layer0.weight0", index);
-    if ((e->weight0 = buffer_f16(w0->data, w0->count)) < 0) return -1;
+    if ((e->weight0 = buffer_half(w0)) < 0) return -1;
     e->out_channels = (int)w0->shape[1];
     e->sine = -1;
     if (up) {
         NEED(sine, w, "block%d.layer0.sin", index);
-        if ((e->sine = buffer_f32(sine->data, sine->count)) < 0) return -1;
+        if ((e->sine = buffer_float(sine)) < 0) return -1;
     }
     e->loaded = 1;
     return 0;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* a prepared file: the logical weights with the loaders' layout work done     */
+/* ------------------------------------------------------------------------- */
+
+/* `nr_frame_prepare`: the logical safetensors written out again with the derived tensors the
+ * loaders above would otherwise make on every open and every first frame of an extent — the
+ * branched blocks' fused expansion (`block%d.layer0.ffn_expand_fused`, F16), the window biases
+ * in logical order (`<name>_unswizzled`, F32), the head matrix (`block70.layer0.head_matrix`,
+ * F16) and the merge's sine and cosine joined (`block70.layer0.inp_merge_sincos`, F32). The
+ * originals stay, with their dtypes, so the file is still a logical safetensors; the metadata
+ * says `prepared`. The same functions make the bytes here and in the loaders, so what the
+ * device receives is the same either way.
+ *
+ * `prepared: v2` (2026-10-10) orders the tensors F32 first, then F16, derived ones among
+ * them: every F32 offset is then a multiple of 4 and every F16 one of 2 from the padded
+ * header, so a reader aliasing the file or the compiled-in slices (`source_view`) can point
+ * at every tensor. Preparing a prepared file is a no-op on the content: a derived tensor
+ * already present is kept, not made again. The Python graph reads the file too
+ * (`nr_model.load_logical`), taking the derived tensors where it would make the same. */
+/* The names `nr_frame_prepare` adds: what a logical file never has, and what the Python
+ * side (`nr_model.is_derived`) counts out of the 649. */
+static int derived_name(const char *name)
+{
+    size_t n = strlen(name);
+    static const char *const tails[] = { "_fused", "_unswizzled", ".head_matrix", ".inp_merge_sincos" };
+    for (size_t i = 0; i < sizeof tails / sizeof *tails; i++) {
+        size_t m = strlen(tails[i]);
+        if (n >= m && !strcmp(name + n - m, tails[i])) return 1;
+    }
+    return 0;
+}
+
+struct prep_entry {
+    char name[160];
+    const char *dtype;
+    int ndim;
+    long shape[8];
+    const void *bytes;
+    size_t nbytes;
+    void *owned;
+};
+
+static int prep_entry_f32_first(const void *a, const void *b)
+{
+    const struct prep_entry *x = a, *y = b;
+    int fx = strcmp(x->dtype, "F32") == 0, fy = strcmp(y->dtype, "F32") == 0;
+    if (fx != fy) return fy - fx;               /* F32 before F16 */
+    return strcmp(x->name, y->name);            /* then by name: a stable, readable order */
+}
+
+static int prep_add(struct prep_entry **list, size_t *n, size_t *cap, const char *name, const char *dtype,
+                    int ndim, const long *shape, const void *bytes, size_t nbytes, void *owned)
+{
+    if (*n == *cap) {
+        size_t more = *cap ? *cap * 2 : 800;
+        struct prep_entry *grown = realloc(*list, more * sizeof **list);
+        if (!grown) { free(owned); return -1; }
+        *list = grown; *cap = more;
+    }
+    struct prep_entry *e = &(*list)[(*n)++];
+    memset(e, 0, sizeof *e);
+    snprintf(e->name, sizeof e->name, "%s", name);
+    e->dtype = dtype; e->ndim = ndim;
+    for (int d = 0; d < ndim; d++) e->shape[d] = shape[d];
+    e->bytes = bytes; e->nbytes = nbytes; e->owned = owned;
+    return 0;
+}
+
+int nr_frame_prepare(const char *weights_path, const char *out_path)
+{
+    struct weights w;
+    if (!out_path) FAILF("nr_frame_prepare: no output path");
+    if (weights_load(&w, weights_path)) return -1;
+    struct prep_entry *list = NULL;
+    size_t n = 0, cap = 0;
+    int rc = -1;
+    FILE *out = NULL;
+    char *header = NULL;
+    for (size_t i = 0; i < w.n; i++) {
+        const struct tensor *t = &w.t[i];
+        if (prep_add(&list, &n, &cap, t->name, t->is16 ? "F16" : "F32", t->ndim, t->shape,
+                     t->is16 ? (const void *)t->half : (const void *)t->data, t->count * (t->is16 ? 2 : 4), NULL))
+            goto done;
+    }
+    for (int index = 0; index < 71; index++) {
+        char name[160];
+        /* the branched window blocks' expansion, permuted as `load_window_block` permutes it */
+        const struct tensor *expand = weightf(&w, "block%d.layer0.ffn_expand_weight", index);
+        if (expand && !weightf(&w, "block%d.layer0.ffn_expand_fused", index)
+            && expand->ndim == 5 && expand->shape[1] == 4 && expand->shape[3] == 32 && expand->shape[4] == 32
+            && expand->shape[0] == expand->shape[2]) {
+            int G = (int)expand->shape[0];
+            size_t count = (size_t)G * (G * 32) * 128;
+            uint16_t *fused = malloc(count * sizeof *fused);
+            if (!fused) goto done;
+            for (int oh = 0; oh < G; oh++)
+                for (int br = 0; br < 4; br++)
+                    for (int ih = 0; ih < G; ih++)
+                        for (int k = 0; k < 32; k++)
+                            for (int j = 0; j < 32; j++) {
+                                size_t from = ((((size_t)oh * 4 + br) * G + ih) * 32 + k) * 32 + j;
+                                fused[((size_t)oh * (G * 32) + ih * 32 + k) * 128 + br * 32 + j] =
+                                    expand->half ? expand->half[from] : float_to_half(expand->data[from]);
+                            }
+            long shape[2] = { (long)G * (G * 32), 128 };
+            snprintf(name, sizeof name, "block%d.layer0.ffn_expand_fused", index);
+            if (prep_add(&list, &n, &cap, name, "F16", 2, shape, fused, count * 2, fused)) goto done;
+        }
+        /* the window biases of the one- and sixteen-head blocks, in logical order */
+        static const char *const bias_names[2] = { "block%d.layer0.attn_bias", "block%d.layer2.attn_bias" };
+        for (int which = 0; which < 2; which++) {
+            const struct tensor *bias = weightf(&w, bias_names[which], index);
+            if (!bias || bias->ndim != 3 || bias->shape[1] != 64 || bias->shape[2] != 64) continue;
+            int heads = (int)bias->shape[0];
+            if (!(heads == 1 || heads == 16)) continue;
+            snprintf(name, sizeof name, bias_names[which], index);
+            strncat(name, "_unswizzled", sizeof name - strlen(name) - 1);
+            if (weight(&w, name)) continue;     /* already prepared */
+            const float *data = tensor_f32(bias);
+            if (!data) goto done;
+            float *fixed = malloc(bias->count * sizeof *fixed);
+            if (!fixed) goto done;
+            for (int h = 0; h < heads; h++)
+                for (int e = 0; e < 4096; e++)
+                    fixed[h * 4096 + e] = data[h * 4096 + fragment_index(e)];
+            if (prep_add(&list, &n, &cap, name, "F32", 3, bias->shape, fixed, bias->count * 4, fixed)) goto done;
+        }
+    }
+    {
+        /* the head matrix and the merge's sine and cosine, as `nr_frame_open` builds them */
+        const struct tensor *gain = weight(&w, "block70.layer0.out_gain");
+        const struct tensor *oconv = weight(&w, "block70.layer0.out_conv_weight");
+        const struct tensor *msin = weight(&w, "block70.layer0.inp_merge_sin");
+        const struct tensor *mcos = weight(&w, "block70.layer0.inp_merge_cos");
+        if (!gain || !oconv || !msin || !mcos || gain->count != 64 || oconv->count != 64) {
+            snprintf(last_error, sizeof last_error, "%s: the edge weights are missing; is this the logical file?",
+                     weights_path ? weights_path : "embedded weights");
+            goto done;
+        }
+        const float *gainv = tensor_f32(gain), *oconvv = tensor_f32(oconv);
+        const float *sinv = tensor_f32(msin), *cosv = tensor_f32(mcos);
+        if (!gainv || !oconvv || !sinv || !cosv) goto done;
+        if (!weight(&w, "block70.layer0.head_matrix")) {
+            uint16_t *headm = calloc(32 * 16, sizeof *headm);
+            if (!headm) goto done;
+            for (int r = 0; r < 16; r++)
+                for (int c = 0; c < 4; c++) {
+                    headm[r * 16 + c] = float_to_half(gainv[r * 4 + c]);
+                    headm[(16 + r) * 16 + c] = float_to_half(oconvv[r * 4 + c]);
+                }
+            long hshape[2] = { 32, 16 };
+            if (prep_add(&list, &n, &cap, "block70.layer0.head_matrix", "F16", 2, hshape, headm, 32 * 16 * 2, headm)) goto done;
+        }
+        if (!weight(&w, "block70.layer0.inp_merge_sincos")) {
+            float *sincos = malloc((msin->count + mcos->count) * sizeof *sincos);
+            if (!sincos) goto done;
+            memcpy(sincos, sinv, msin->count * sizeof *sincos);
+            memcpy(sincos + msin->count, cosv, mcos->count * sizeof *sincos);
+            long sshape[1] = { (long)(msin->count + mcos->count) };
+            if (prep_add(&list, &n, &cap, "block70.layer0.inp_merge_sincos", "F32", 1, sshape, sincos,
+                         (msin->count + mcos->count) * 4, sincos)) goto done;
+        }
+    }
+    /* F32 tensors first, then F16, each group by name: every offset aligned to its element
+     * (the header is padded to 8), which is what lets a reader alias the file or the slices */
+    qsort(list, n, sizeof *list, prep_entry_f32_first);
+    /* the header: metadata first, then every tensor with its byte range; padded to 8 with
+     * spaces as safetensors writers do */
+    {
+        size_t hcap = 256 + n * 220, hlen = 0;
+        size_t derived = 0;
+        for (size_t i = 0; i < n; i++) if (derived_name(list[i].name)) derived++;
+        header = malloc(hcap);
+        if (!header) goto done;
+        hlen += (size_t)snprintf(header + hlen, hcap - hlen,
+                                 "{\"__metadata__\":{\"format\":\"dlssnr-logical-prepared-v2\",\"fully_logical\":\"true\","
+                                 "\"prepared\":\"v2\",\"derived\":\"%zu\",\"layout\":\"f32 first, then f16, by name\","
+                                 "\"source\":\"%s\"}",
+                                 derived, weights_path ? "file" : "embedded");
+        size_t offset = 0;
+        for (size_t i = 0; i < n; i++) {
+            struct prep_entry *e = &list[i];
+            if (hcap - hlen < 300) {
+                hcap *= 2;
+                char *grown = realloc(header, hcap);
+                if (!grown) goto done;
+                header = grown;
+            }
+            hlen += (size_t)snprintf(header + hlen, hcap - hlen, ",\"%s\":{\"dtype\":\"%s\",\"shape\":[", e->name, e->dtype);
+            for (int d = 0; d < e->ndim; d++)
+                hlen += (size_t)snprintf(header + hlen, hcap - hlen, "%s%ld", d ? "," : "", e->shape[d]);
+            hlen += (size_t)snprintf(header + hlen, hcap - hlen, "],\"data_offsets\":[%llu,%llu]}",
+                                     (unsigned long long)offset, (unsigned long long)(offset + e->nbytes));
+            offset += e->nbytes;
+        }
+        hlen += (size_t)snprintf(header + hlen, hcap - hlen, "}");
+        while (hlen % 8) header[hlen++] = ' ';
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+        fopen_s(&out, out_path, "wb");
+#else
+        out = fopen(out_path, "wb");
+#endif
+        if (!out) { snprintf(last_error, sizeof last_error, "cannot write %s: %s", out_path, strerror(errno)); goto done; }
+        uint8_t lenb[8];
+        for (int i = 0; i < 8; i++) lenb[i] = (uint8_t)((unsigned long long)hlen >> (8 * i));
+        if (fwrite(lenb, 1, 8, out) != 8 || fwrite(header, 1, hlen, out) != hlen) goto write_failed;
+        for (size_t i = 0; i < n; i++)
+            if (list[i].nbytes && fwrite(list[i].bytes, 1, list[i].nbytes, out) != list[i].nbytes) goto write_failed;
+        if (fclose(out)) { out = NULL; goto write_failed; }
+        out = NULL;
+        rc = 0;
+        goto done;
+write_failed:
+        snprintf(last_error, sizeof last_error, "short write to %s: %s", out_path, strerror(errno));
+    }
+done:
+    if (rc && !last_error[0]) snprintf(last_error, sizeof last_error, "nr_frame_prepare: out of memory");
+    if (out) fclose(out);
+    free(header);
+    for (size_t i = 0; i < n; i++) free(list[i].owned);
+    free(list);
+    weights_free(&w);
+    return rc;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -3090,22 +3448,29 @@ nr_frame *nr_frame_open(const char *weights_path)
         nr_frame_close(f);
         FAILP("%s: the edge weights are missing; is this the logical file?", weights_path ? weights_path : "embedded weights");
     }
-    if ((f->adapter = buffer_f16(adapter->data, adapter->count)) < 0) goto fail;
-    if ((f->bottleneck.weight0 = buffer_f16(bottleneck->data, bottleneck->count)) < 0) goto fail;
+    if ((f->adapter = buffer_half(adapter)) < 0) goto fail;
+    if ((f->bottleneck.weight0 = buffer_half(bottleneck)) < 0) goto fail;
     f->bottleneck.out_channels = (int)bottleneck->shape[1]; f->bottleneck.sine = -1; f->bottleneck.loaded = 1;
-    if ((f->decoder_input.weight0 = buffer_f16(conv->data, conv->count)) < 0) goto fail;
-    if ((f->decoder_input.sine = buffer_f32(upsine->data, upsine->count)) < 0) goto fail;
+    if ((f->decoder_input.weight0 = buffer_half(conv)) < 0) goto fail;
+    if ((f->decoder_input.sine = buffer_float(upsine)) < 0) goto fail;
     f->decoder_input.out_channels = (int)conv->shape[1]; f->decoder_input.loaded = 1;
-    if ((f->merge_sin = buffer_f32(msin->data, msin->count)) < 0) goto fail;
-    if ((f->merge_cos = buffer_f32(mcos->data, mcos->count)) < 0) goto fail;
+    if ((f->merge_sin = buffer_float(msin)) < 0) goto fail;
+    if ((f->merge_cos = buffer_float(mcos)) < 0) goto fail;
     {
-        /* both, one after the other, for the pass that applies them together */
-        float *sincos = malloc((msin->count + mcos->count) * sizeof(float));
-        if (!sincos) { snprintf(last_error, sizeof last_error, "out of memory"); goto fail; }
-        memcpy(sincos, msin->data, msin->count * sizeof(float));
-        memcpy(sincos + msin->count, mcos->data, mcos->count * sizeof(float));
-        f->merge_sincos = buffer_f32(sincos, msin->count + mcos->count);
-        free(sincos);
+        /* both, one after the other, for the pass that applies them together: a prepared
+         * file carries them so, else they are joined here */
+        const struct tensor *ready = weight(&f->w, "block70.layer0.inp_merge_sincos");
+        if (ready && ready->count == msin->count + mcos->count) {
+            f->merge_sincos = buffer_float(ready);
+        } else {
+            const float *sinv = tensor_f32(msin), *cosv = tensor_f32(mcos);
+            float *sincos = malloc((msin->count + mcos->count) * sizeof(float));
+            if (!sincos || !sinv || !cosv) { free(sincos); snprintf(last_error, sizeof last_error, "out of memory"); goto fail; }
+            memcpy(sincos, sinv, msin->count * sizeof(float));
+            memcpy(sincos + msin->count, cosv, mcos->count * sizeof(float));
+            f->merge_sincos = buffer_f32(sincos, msin->count + mcos->count);
+            free(sincos);
+        }
         if (f->merge_sincos < 0) goto fail;
     }
     /* the head is 32 -> 4 in a (32, 16) matrix padded to the tile: gain over the first
@@ -3117,13 +3482,23 @@ nr_frame *nr_frame_open(const char *weights_path)
     if (gain->count != 64 || oconv->count != 64) { snprintf(last_error, sizeof last_error, "head weights are not (16, 4)"); goto fail; }
 #endif
 
-    float headm[32 * 16] = { 0 };
-    for (int r = 0; r < 16; r++)
-        for (int c = 0; c < 4; c++) {
-            headm[r * 16 + c] = gain->data[r * 4 + c];
-            headm[(16 + r) * 16 + c] = oconv->data[r * 4 + c];
+    {
+        const struct tensor *ready = weight(&f->w, "block70.layer0.head_matrix");
+        if (ready && ready->count == 32 * 16) {
+            f->head = buffer_half(ready);
+        } else {
+            const float *gainv = tensor_f32(gain), *oconvv = tensor_f32(oconv);
+            if (!gainv || !oconvv) { snprintf(last_error, sizeof last_error, "out of memory"); goto fail; }
+            float headm[32 * 16] = { 0 };
+            for (int r = 0; r < 16; r++)
+                for (int c = 0; c < 4; c++) {
+                    headm[r * 16 + c] = gainv[r * 4 + c];
+                    headm[(16 + r) * 16 + c] = oconvv[r * 4 + c];
+                }
+            f->head = buffer_f16(headm, 32 * 16);
         }
-    if ((f->head = buffer_f16(headm, 32 * 16)) < 0) goto fail;
+        if (f->head < 0) goto fail;
+    }
     return f;
 fail:
     nr_frame_close(f);
@@ -3162,7 +3537,12 @@ const char *nr_frame_gemm_path(nr_frame *f) { (void)f; return X.path ? X.path() 
 int nr_frame_discrete(void) { return X.handle && X.discrete ? X.discrete() : -1; }
 int nr_frame_preserve16(void) { return X.handle && X.preserve16 ? X.preserve16() : -1; }
 int nr_frame_half_by_cast(void) { return X.handle && X.half_by_cast ? X.half_by_cast() : -1; }
+int nr_frame_staged_packed(void) { return X.handle && X.staged_packed ? X.staged_packed() : -1; }
+int nr_frame_portable_packed(void) { return X.handle && X.portable_packed ? X.portable_packed() : -1; }
 int nr_frame_input_view(const nr_frame *f) { return f ? f->opt.input_view : -1; }
+int nr_frame_prepared(const nr_frame *f) { return f ? f->w.prepared : -1; }
+size_t nr_frame_weights_aliased(const nr_frame *f) { return f ? f->w.aliased : 0; }
+size_t nr_frame_weights_count(const nr_frame *f) { return f ? f->w.n : 0; }
 
 int nr_frame_features_masked(nr_frame *f, const float *colour, int height, int width, const float *history,
                              const float *control_mask, const nr_frame_params *params, float *features)

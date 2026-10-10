@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal
 rem ===========================================================================
 rem  deploy.bat  -  run DLSS-NR on Intel against a game (Windows)
@@ -35,12 +35,14 @@ rem  Usage:
 rem    deploy.bat --game "C:\Games\MyGame" --dll X:\path\nvngx_dlssnr.dll
 rem              [--name nr_layer.dll] [--exe "C:\Games\MyGame\game.exe"]
 rem              [--skip-weights] [--skip-build]
+rem    deploy.bat --release "dist\dlss-nr-windows" [--skip-weights] [--skip-build]
 rem ===========================================================================
 
 set "GAME="
 set "DLL="
 set "NAME=nr_layer.dll"
 set "EXE="
+set "RELEASE="
 set "SKIP_WEIGHTS=0"
 set "SKIP_BUILD=0"
 rem Capture the script directory BEFORE any shift: shift moves %0 and %~dp0 with it.
@@ -54,6 +56,7 @@ if /i "%~1"=="--name"         ( set "NAME=%~2" & shift & shift & goto :parse )
 if /i "%~1"=="--exe"          ( set "EXE=%~2"  & shift & shift & goto :parse )
 if /i "%~1"=="--skip-weights" ( set "SKIP_WEIGHTS=1" & shift & goto :parse )
 if /i "%~1"=="--skip-build"   ( set "SKIP_BUILD=1" & shift & goto :parse )
+if /i "%~1"=="--release"      ( set "RELEASE=%~2" & shift & shift & goto :parse )
 echo Unknown argument: %~1
 exit /b 2
 :done_parse
@@ -65,14 +68,19 @@ set "REPO=%CD%"
 popd
 set "WORK=%REPO%\work"
 
+rem --release assembles a folder for other people and installs into nobody's game, so it
+rem is the one mode that does not need --game.
+if not "%RELEASE%"=="" goto :release_ok
 if "%GAME%"=="" (
   echo ERROR: --game is required, the game directory to install into
+  echo        ^(or --release ^<folder^> to assemble a distributable instead^)
   exit /b 2
 )
 if not exist "%GAME%" (
-  echo ERROR: game directory not found: %GAME%
+  echo ERROR: game directory not found: "%GAME%"
   exit /b 2
 )
+:release_ok
 
 rem ---- weights: delegated to scripts/get_weights.py ----
 rem It clones MLX-DLSS at the pinned commit, runs its extractor against your DLL, and
@@ -89,13 +97,15 @@ if "%DLL%"=="" (
   exit /b 2
 )
 if not exist "%DLL%" (
-  echo ERROR: DLL not found: %DLL%
+  echo ERROR: DLL not found: "%DLL%"
   exit /b 2
 )
 echo [1/3] extracting weights with scripts\get_weights.py ...
 set "PY="
-where /q py && set "PY=py"
+if defined NR_PYTHON set "PY=%NR_PYTHON%"
+if not defined PY ( where /q py && set "PY=py" )
 if not defined PY ( where /q python3 && set "PY=python3" )
+if not defined PY ( where /q python && set "PY=python" )
 if not defined PY (
   echo ERROR: python3 not found on PATH
   exit /b 3
@@ -130,13 +140,22 @@ if not exist "%WORK%\libxmx.dll" (
   echo WARNING: %WORK%\libxmx.dll is missing - the daemon cannot start without it
 )
 
+rem ---- release folder, or the game ----
+rem A release is the same assembly as a game install without the game: everything
+rem dist-tools/setup.bat needs to run on a machine that has no compiler, no Vulkan SDK and
+rem no clone. The one thing that differs is where the layer goes - a release folder carries
+rem nr_layer.dll at its top level, because that is what setup.bat looks for, and the game
+rem install puts it in dlss-nr\ under the name the user chose.
+if not "%RELEASE%"=="" goto :release
+
 rem ---- install into the game folder ----
-echo [3/3] installing into %GAME% ...
+echo [3/3] installing into "%GAME%" ...
 set "DEPLOY=%GAME%\dlss-nr"
+set "DEST_NOTE="
 if not exist "%DEPLOY%" mkdir "%DEPLOY%"
 
 copy /Y "%WORK%\nr_layer.dll" "%DEPLOY%\%NAME%" >nul || exit /b 3
-echo   layer:      %DEPLOY%\%NAME%
+echo   layer:      "%DEPLOY%\%NAME%"
 
 set "MANIFEST_SRC=%REPO%\src\layer\VkLayer_dlss_nr.json"
 set "MANIFEST_DST=%DEPLOY%\VkLayer_dlss_nr.json"
@@ -148,7 +167,7 @@ rem An ABSOLUTE library_path. A bare name makes the loader fail with error 87
 rem (ERROR_INVALID_PARAMETER) when the layer is found through VK_LAYER_PATH: measured
 rem here, the same manifest loads with the full path and not without it.
 powershell -NoProfile -Command "$lib = (Join-Path '%DEPLOY%' '%NAME%'); (Get-Content '%MANIFEST_SRC%') -replace 'LIBRARY_PATH_PLACEHOLDER', $lib.Replace('\','\\') | Set-Content '%MANIFEST_DST%'"
-echo   manifest:   %MANIFEST_DST%  library_path = %DEPLOY%\%NAME%
+echo   manifest:   "%MANIFEST_DST%"  library_path = "%DEPLOY%\%NAME%"
 
 rem The runtime the daemon needs at start: the MLX extractor it imports, the resident
 rem Vulkan runtime, and the shaders. Without these the daemon stops before it listens.
@@ -169,8 +188,9 @@ if exist "%WORK%\mlx-dlss" (
 )
 if exist "%WORK%\libxmx.dll"    copy /Y "%WORK%\libxmx.dll"    "%DEPLOY%\work\" >nul
 if exist "%WORK%\libnr_image.dll" copy /Y "%WORK%\libnr_image.dll" "%DEPLOY%\work\" >nul
+if exist "%WORK%\libnr_alloc.dll" copy /Y "%WORK%\libnr_alloc.dll" "%DEPLOY%\work\" >nul
 copy /Y "%WORK%\*.spv" "%DEPLOY%\work\" >nul 2>&1
-echo   runtime:    libxmx.dll, libnr_image.dll, shaders
+echo   runtime:    libxmx.dll, libnr_image.dll, libnr_alloc.dll, shaders
 
 rem Keep local junk out of the deployed tree
 for /d /r "%DEPLOY%\src" %%J in (__pycache__) do @if exist "%%J" rmdir /S /Q "%%J" 2>nul
@@ -193,7 +213,7 @@ set "LAUNCH=%DEPLOY%\launch-nr.bat"
   echo rem Launcher for DLSS-NR on Intel.
   echo rem The loader finds the layer through VK_LAYER_PATH plus the manifest, so the
   echo rem library name above does not matter; the manifest names it.
-  echo set "VK_LAYER_PATH=%DEPLOY%"
+  echo set "VK_LAYER_PATH=%DEPLOY:^)=^)%"
   echo set "VK_INSTANCE_LAYERS=VK_LAYER_dlssnr_intel"
   echo set "ENABLE_NR_LAYER=1"
   echo set "NR_LAYER_SPAWN=1"
@@ -214,7 +234,7 @@ if defined EXE (
 echo   launcher:   %LAUNCH%
 
 echo.
-echo Done. Install folder: %DEPLOY%
+echo Done. Install folder: "%DEPLOY%"
 echo   %NAME%, VkLayer_dlss_nr.json, src\, work\ (runtime only - no weights)
 echo.
 echo Weights stay in %WORK%\mlxw; the launcher points NR_ROOT at the checkout.
@@ -222,5 +242,26 @@ echo Run the game through %LAUNCH% so VK_LAYER_PATH is set.
 echo.
 echo COMPLIANCE: nothing NVIDIA's is shipped. The weights come from a DLL you own and
 echo are never copied into the game folder.
+endlocal
+exit /b 0
+
+rem ==== :release - common checked assembly; no game installation ====
+:release
+echo [3/3] assembling a release into "%RELEASE%" ...
+set "PY="
+if defined NR_PYTHON set "PY=%NR_PYTHON%"
+if not defined PY ( where /q py && set "PY=py" )
+if not defined PY ( where /q python3 && set "PY=python3" )
+if not defined PY ( where /q python && set "PY=python" )
+if not defined PY (
+  echo ERROR: Python 3 is required to assemble the release
+  exit /b 3
+)
+rem DXVK for DirectX 8-11 games: the pinned release, downloaded once into work\dxvk and
+rem checked against its SHA-256 (dist-tools\dxvk.json).
+"%PY%" "%REPO%\scripts\fetch_dxvk.py"
+if errorlevel 1 exit /b 3
+"%PY%" "%REPO%\scripts\build_release.py" "%RELEASE%" --platform windows
+if errorlevel 1 exit /b 3
 endlocal
 exit /b 0

@@ -8,6 +8,7 @@ Nothing here imports anything but the standard library, so a tool can be a singl
 with a shebang and still share this.
 """
 import json
+import math
 import os
 import pathlib
 import socket
@@ -86,8 +87,10 @@ def alive():
         try:
             with open(str(SOCKET), "r+b", buffering=0):
                 return True
-        except OSError:
-            return False
+        except OSError as error:
+            # A one-instance pipe stays present while the game's frame exchange owns
+            # it. Opening that existing endpoint then reports ERROR_PIPE_BUSY.
+            return getattr(error, "winerror", None) == 231
     if not SOCKET.exists():
         return False
     try:
@@ -110,19 +113,45 @@ def start_daemon(wait=10.0):
     """
     if not DAEMON.exists():
         return f"no daemon at {DAEMON}"
-    values = read()
-    if "render_scale" not in values:
-        values["render_scale"] = FIRST_SCALE
-        write(values)
+    interpreter = os.environ.get("NR_PYTHON")
+    if not interpreter:
+        # A frozen control application is not a Python interpreter. Re-running it
+        # with nr_daemon.py would reopen the GUI instead of starting the daemon.
+        if getattr(sys, "frozen", False):
+            return "set NR_PYTHON to the Python interpreter for the daemon"
+        interpreter = sys.executable
     try:
-        with LOG.open("a") as log:
-            subprocess.Popen(
+        wait = float(wait)
+    except (TypeError, ValueError):
+        return "daemon wait must be a finite, non-negative number"
+    if not math.isfinite(wait) or wait < 0:
+        return "daemon wait must be a finite, non-negative number"
+    if os.name == "nt":
+        wait = min(wait, 60.0)
+    root = os.environ.get("NR_ROOT") or str(DAEMON.resolve().parents[2])
+    environment = os.environ.copy()
+    removed = {"VK_LAYER_PATH", "VK_ADD_LAYER_PATH", "VK_IMPLICIT_LAYER_PATH",
+               "VK_ADD_IMPLICIT_LAYER_PATH", "VK_INSTANCE_LAYERS", "VK_LAYER_SETTINGS_PATH",
+               "ENABLE_NR_LAYER", "NR_DAEMON"}
+    for key in list(environment):
+        if key.upper() in removed:
+            environment.pop(key)
+    environment.update(NR_ROOT=root, DISABLE_NR_LAYER="1", NR_LAYER_SPAWN="0")
+    try:
+        values = read()
+        if "render_scale" not in values:
+            values["render_scale"] = FIRST_SCALE
+            write(values)
+        LOG.parent.mkdir(parents=True, exist_ok=True)
+        with LOG.open("a", encoding="utf-8") as log:
+            process = subprocess.Popen(
                 # the socket too, not just the settings: with `NR_LAYER_SOCKET` set, a
                 # daemon started on the default path is one nothing else is talking to
-                [sys.executable, str(DAEMON), "--settings", str(SETTINGS),
-                 "--socket", str(SOCKET)],
+                [interpreter, str(DAEMON), "--settings", str(SETTINGS),
+                 "--socket", str(SOCKET), "--root", root],
                 stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
-                start_new_session=True, cwd=str(DAEMON.parent))
+                start_new_session=True, cwd=str(DAEMON.parent), env=environment,
+                **({"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}))
     except OSError as error:
         return f"could not start it: {error}"
     # It refuses to start if one is already listening, so a second attempt is harmless.
@@ -130,5 +159,10 @@ def start_daemon(wait=10.0):
     while time.monotonic() < deadline:
         if alive():
             return None
-        time.sleep(0.25)
+        code = process.poll()
+        if code is not None:
+            return f"daemon exited with code {code} - {LOG}"
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(0.25, remaining))
     return f"started, still loading - {LOG}"

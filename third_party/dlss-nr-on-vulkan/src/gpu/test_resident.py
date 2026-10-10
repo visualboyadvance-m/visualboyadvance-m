@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT / "src" / "ref"))
 import nr_model as M  # noqa: E402
 import xmxres  # noqa: E402
 
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+WEIGHTS = M.default_weights()               # the prepared file when it is there
 FAILURES = []
 
 

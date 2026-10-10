@@ -17,9 +17,9 @@ import numpy as np
 import nr_daemon
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
 sys.path.insert(0, str(ROOT / "src" / "ref"))
 import nr_frame  # noqa: E402
+WEIGHTS = nr_frame.WEIGHTS                   # the prepared file when it is there
 
 MAGIC, MAGIC_MASKED = 0x304E524E, 0x314E524E
 FORMAT_B8G8R8A8 = 44

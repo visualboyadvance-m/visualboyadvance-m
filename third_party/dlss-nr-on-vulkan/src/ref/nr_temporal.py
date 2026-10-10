@@ -47,7 +47,7 @@ TemporalOptions = temporal_mod.TemporalOptions
 normalize_pixel_motion = temporal_mod.normalize_pixel_motion
 sample_history = temporal_mod.sample_history
 
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+WEIGHTS = nr_model.default_weights()        # the prepared file when it is there
 
 
 class Pipeline:

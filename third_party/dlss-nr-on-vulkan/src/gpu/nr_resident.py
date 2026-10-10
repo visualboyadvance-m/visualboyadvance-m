@@ -36,9 +36,7 @@ class SplitBlockWeights:
         self.projection = weights[f"block{index}.layer3.projection_weight"]
         self.channels = self.projection.shape[0]
         self.groups = self.channels // 64
-        bias = weights[f"block{index}.layer2.attn_bias"]
-        if nr_model.uses_fragment_swizzle(index, 16):
-            bias = nr_model.recover_attention_bias_layout(bias)
+        bias = nr_model.attention_bias(weights, f"block{index}.layer2.attn_bias", index, 16)
         self.first = runtime.buffer_from(weights[f"block{index}.layer0.first_projection_weight"],
                                          np.float16)
         self.expand = runtime.buffer_from(weights[f"block{index}.layer0.group_expand_weight"],
@@ -67,9 +65,7 @@ class BlockWeights:
         self.projection = weights[f"{prefix}.projection_weight"]
         self.channels = self.projection.shape[0]
 
-        bias = weights[f"{prefix}.attn_bias"]
-        if nr_model.uses_fragment_swizzle(index, heads):
-            bias = nr_model.recover_attention_bias_layout(bias)
+        bias = nr_model.attention_bias(weights, f"{prefix}.attn_bias", index, heads)
 
         take = lambda name, dtype=np.float16: runtime.buffer_from(
             weights[f"{prefix}.{name}"], dtype)
@@ -82,9 +78,8 @@ class BlockWeights:
 
         self.branched = f"{prefix}.ffn_expand_weight" in weights
         if self.branched:
-            expansion, branch = nr_model._fused_branched_weights(
-                weights[f"{prefix}.ffn_expand_weight"],
-                weights[f"{prefix}.ffn_branch_projection_weight"])
+            # a prepared file carries the permutation done (nr_frame_prepare)
+            expansion, branch = nr_model.fused_expansion(weights, prefix)
             self.groups = expansion.shape[0]
             self.expand = runtime.buffer_from(expansion, np.float16)
             self.branch = runtime.buffer_from(branch, np.float16)

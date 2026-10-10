@@ -629,10 +629,18 @@ static void ensure_daemon(void)
 		/* The child's environment, built from ours with two entries dropped and one
 		 * added. Sized from what is actually there rather than a fixed 8 KB: an
 		 * environment larger than the guess would have been truncated silently, and
-		 * the daemon would start with a partial environment and no sign of why. */
-		const char marker[] = "NR_LAYER_SPAWNED=1";
+		 * the daemon would start with a partial environment and no sign of why.
+		 *
+		 * The marker carries the game's process id, and the daemon ends when that
+		 * process does (nr_daemon.end_with_game). Steam counts every process a game
+		 * starts as the game: a daemon that outlived it kept the game running for Steam,
+		 * so Restore Steam refused, and kept the model in memory until it was killed. */
+		char marker[48];
+		snprintf(marker, sizeof marker, "NR_LAYER_SPAWNED=%lu",
+			 (unsigned long)GetCurrentProcessId());
+		size_t marker_size = strlen(marker) + 1;
 		char *env = GetEnvironmentStringsA();
-		size_t need = sizeof marker + 1;
+		size_t need = marker_size + 1;
 		if (env)
 			for (char *e = env; *e; e += strlen(e) + 1)
 				need += strlen(e) + 1;
@@ -654,11 +662,16 @@ static void ensure_daemon(void)
 			}
 			FreeEnvironmentStringsA(env);
 		}
-		memcpy(env_block + used, marker, sizeof marker);
-		used += sizeof marker;
+		memcpy(env_block + used, marker, marker_size);
+		used += marker_size;
 		env_block[used] = '\0';
 
-		BOOL ok = CreateProcessA(NULL, cmd, NULL, NULL, TRUE, DETACHED_PROCESS,
+		/* A console without a window, not DETACHED_PROCESS: a virtual environment's
+		 * python.exe is a launcher that starts the real interpreter as its own child, and a
+		 * console child of a process with no console gets a new, visible one - over the game,
+		 * which loses the focus and, full screen, stops presenting. Children of a
+		 * CREATE_NO_WINDOW process share its hidden console instead. */
+		BOOL ok = CreateProcessA(NULL, cmd, NULL, NULL, TRUE, CREATE_NO_WINDOW,
 					 env_block, NULL, &si, &pi);
 		free(env_block);
 		if (si.hStdInput != INVALID_HANDLE_VALUE &&

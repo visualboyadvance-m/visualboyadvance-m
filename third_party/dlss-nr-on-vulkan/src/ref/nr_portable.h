@@ -4,15 +4,19 @@
  * loading, a clock, and the string and file odds and ends MSVC spells differently.
  *
  * The half conversions are the one place correctness lives. `_Float16` is used where the
- * compiler has it (GCC and Clang, which is every build this project has measured); the
- * fallback is a software round-to-nearest-even conversion for MSVC and for the RISC-V
- * targets that cannot hold a half in a vector (below), checked against the type
+ * compiler has it (GCC and Clang, which is every build this project has measured); MSVC,
+ * which has no such type, converts through the hardware's own instruction where the build
+ * says the CPU has it — F16C on x86-64 (`NR_F16C`, the x86-64-v3 floor), NEON on ARM64 —
+ * and the fallback is a software round-to-nearest-even conversion for the rest and for the
+ * RISC-V targets that cannot hold a half in a vector (below), checked against the type
  * exhaustively — every one of the 65 536 halves widens to the same float, and every one
  * of the 2^32 floats narrows to the same half, NaN payloads aside (notes/phase69).
- * `NR_NO_FLOAT16` forces the fallback where the type exists, which is how that was run.
+ * `NR_NO_FLOAT16` forces the fallback where the type exists, which is how that was run;
+ * `NR_NEON_HALF` forces the NEON path the same way.
  */
 #ifndef NR_PORTABLE_H
 #define NR_PORTABLE_H
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,8 +43,42 @@
 #define NR_NO_FLOAT16 1
 #endif
 
-#if !defined(NR_NO_FLOAT16) && (defined(__FLT16_MANT_DIG__) || (defined(__clang__) && defined(__aarch64__)))
+#if !defined(NR_NO_FLOAT16) && !defined(NR_NEON_HALF) \
+    && (defined(__FLT16_MANT_DIG__) || (defined(__clang__) && defined(__aarch64__)))
 #define NR_HAVE_FLOAT16 1
+#endif
+
+/* Without `_Float16` — MSVC — the conversion is F16C's `vcvtps2ph` / `vcvtph2ps` where the
+ * build says the CPU has it: NR_F16C from CMake's x86-64 floor or build_win.bat, or a build
+ * for AVX2, whose level (x86-64-v3) includes F16C. One instruction each way, the hardware's
+ * rounding, and the same bits as the software path below on every float but a signalling
+ * NaN, which F16C quiets and `nr_float_to_half` never makes (upstream, 2026-10-07). MSVC
+ * declares only the vector forms, so the scalar is lane 0 of them. A compiler with
+ * `_Float16` emits the same instructions from the cast under -march=x86-64-v3. */
+#if !defined(NR_HAVE_FLOAT16) && !defined(NR_NO_FLOAT16) && defined(_MSC_VER) && !defined(__clang__) \
+    && (defined(NR_F16C) || defined(__AVX2__)) && (defined(_M_X64) || defined(_M_IX86))
+#define NR_HAVE_F16C 1
+#include <immintrin.h>
+#endif
+
+/* The same on ARM64 without `_Float16` — MSVC for ARM64 (and ARM64EC), or a GCC too old for
+ * the type — through NEON's `fcvtl` / `fcvtn`, the F16C block's twin: lane 0 of the vector
+ * conversions, rounding to nearest even under the default FPCR, overflow to infinity, a NaN
+ * quieted. FCVT between half and single is base ARMv8.0 floating point (only half
+ * *arithmetic* needs ARMv8.2's FP16 extension), so no `-march` floor is needed for it, and
+ * GCC and Clang emit the very same instruction from the `_Float16` cast above — which is why
+ * the floor is empty on arm64 (Makefile, CMakeLists.txt). `NR_NEON_HALF` forces this path on
+ * a compiler that has `_Float16`, which is how it was checked against the type exhaustively
+ * on an Apple M3 (every float, every half, NaN payloads aside). */
+#if !defined(NR_HAVE_FLOAT16) && !defined(NR_NO_FLOAT16) && !defined(NR_HAVE_F16C) \
+    && (defined(NR_NEON_HALF) || defined(_M_ARM64) || defined(_M_ARM64EC) \
+        || (defined(__aarch64__) && defined(__ARM_NEON)))
+#define NR_HAVE_NEON_HALF 1
+#  if defined(_MSC_VER) && !defined(__clang__)
+#    include <arm64_neon.h>
+#  else
+#    include <arm_neon.h>
+#  endif
 #endif
 
 static inline float nr_half_to_float(uint16_t h)
@@ -49,6 +87,10 @@ static inline float nr_half_to_float(uint16_t h)
     _Float16 v;
     memcpy(&v, &h, 2);
     return (float)v;
+#elif defined(NR_HAVE_F16C)
+    return _mm_cvtss_f32(_mm_cvtph_ps(_mm_cvtsi32_si128((int)h)));
+#elif defined(NR_HAVE_NEON_HALF)
+    return vgetq_lane_f32(vcvt_f32_f16(vreinterpret_f16_u16(vdup_n_u16(h))), 0);
 #else
     uint32_t sign = (uint32_t)(h & 0x8000u) << 16;
     uint32_t exponent = (h >> 10) & 0x1Fu, mantissa = h & 0x3FFu, bits;
@@ -78,6 +120,10 @@ static inline uint16_t nr_float_to_half(float f)
     uint16_t h;
     memcpy(&h, &v, 2);
     return h;
+#elif defined(NR_HAVE_F16C)
+    return (uint16_t)_mm_cvtsi128_si32(_mm_cvtps_ph(_mm_set_ss(f), _MM_FROUND_TO_NEAREST_INT));
+#elif defined(NR_HAVE_NEON_HALF)
+    return vget_lane_u16(vreinterpret_u16_f16(vcvt_f16_f32(vdupq_n_f32(f))), 0);
 #else
     uint32_t bits;
     memcpy(&bits, &f, 4);
@@ -193,6 +239,136 @@ static inline int nr_dl_self_dir(const void *symbol, char *out, size_t cap)
     return 0;
 }
 #endif
+
+/* -- a read-only file mapping ---------------------------------------------- */
+
+/* The whole of a file mapped read-only, so a reader can point into it instead of copying:
+ * the weights (nr_frame.c's safetensors reader aliases every tensor into the mapping, as it
+ * aliases the compiled-in slices). `nr_file_map` fills `m` and returns 0, or -1 with errno
+ * set; `nr_file_unmap` releases it. An empty file maps to NULL with size 0. */
+struct nr_mapping {
+    const unsigned char *data;
+    size_t size;
+    void *file, *mapping;       /* the two handles Win32 keeps open under a view */
+};
+
+#ifdef _WIN32
+static inline int nr_file_map(const char *path, struct nr_mapping *m)
+{
+    memset(m, 0, sizeof *m);
+    HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                              FILE_ATTRIBUTE_NORMAL, NULL);
+    if (file == INVALID_HANDLE_VALUE) { errno = ENOENT; return -1; }
+    LARGE_INTEGER size;
+    if (!GetFileSizeEx(file, &size)) { CloseHandle(file); errno = EIO; return -1; }
+    m->file = file;
+    m->size = (size_t)size.QuadPart;
+    if (!m->size) return 0;
+    HANDLE mapping = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, NULL);
+    if (!mapping) { CloseHandle(file); m->file = NULL; errno = ENOMEM; return -1; }
+    m->mapping = mapping;
+    m->data = MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, 0);
+    if (!m->data) { CloseHandle(mapping); CloseHandle(file); memset(m, 0, sizeof *m); errno = ENOMEM; return -1; }
+    return 0;
+}
+static inline void nr_file_unmap(struct nr_mapping *m)
+{
+    if (m->data) UnmapViewOfFile((LPCVOID)m->data);
+    if (m->mapping) CloseHandle((HANDLE)m->mapping);
+    if (m->file) CloseHandle((HANDLE)m->file);
+    memset(m, 0, sizeof *m);
+}
+#else
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+static inline int nr_file_map(const char *path, struct nr_mapping *m)
+{
+    memset(m, 0, sizeof *m);
+    int fd = open(path, O_RDONLY);
+    if (fd < 0) return -1;
+    struct stat st;
+    if (fstat(fd, &st)) { int e = errno; close(fd); errno = e; return -1; }
+    m->size = (size_t)st.st_size;
+    if (m->size) {
+        void *data = mmap(NULL, m->size, PROT_READ, MAP_PRIVATE, fd, 0);
+        if (data == MAP_FAILED) { int e = errno; close(fd); errno = e; m->size = 0; return -1; }
+        m->data = data;
+    }
+    close(fd);
+    return 0;
+}
+static inline void nr_file_unmap(struct nr_mapping *m)
+{
+    if (m->data) munmap((void *)m->data, m->size);
+    memset(m, 0, sizeof *m);
+}
+#endif
+
+/* A whole file read into one malloc'd block (`*size` its length), or NULL with errno. The
+ * alternative to a mapping where faulting one in is the slow part (macOS: 0.9-1.3 s of page
+ * faults over 291 MB, against a 46 ms read). The block is 16-byte aligned, as malloc gives. */
+static inline unsigned char *nr_file_read(const char *path, size_t *size)
+{
+    *size = 0;
+    FILE *f;
+#if defined(_WIN32) && __STDC_WANT_SECURE_LIB__
+    if (fopen_s(&f, path, "rb")) return NULL;
+#else
+    f = fopen(path, "rb");
+    if (!f) return NULL;
+#endif
+    struct nr_mapping probe;
+    unsigned char *block = NULL;
+    size_t n = 0;
+    /* the length without seeking past 2 GB on a 32-bit long: a mapping says it */
+    if (nr_file_map(path, &probe) == 0) { n = probe.size; nr_file_unmap(&probe); }
+    else { fclose(f); return NULL; }
+    block = malloc(n ? n : 1);
+    if (!block) { fclose(f); errno = ENOMEM; return NULL; }
+    size_t got = 0;
+    while (got < n) {
+        size_t r = fread(block + got, 1, n - got, f);
+        if (!r) break;
+        got += r;
+    }
+    fclose(f);
+    if (got != n) { free(block); errno = EIO; return NULL; }
+    *size = n;
+    return block;
+}
+
+/* Ask the system to bring a mapped range in before it is touched: a frame's first uploads
+ * copy ~300 MB out of the weights in block order, and a page fault per 16 KB page, scattered,
+ * costs macOS 0.9-1.3 s where `madvise(MADV_WILLNEED)` costs 190 ms (HANDOFF, 2026-10-10).
+ * Windows has PrefetchVirtualMemory from 8 on, resolved at run time; elsewhere nothing. The
+ * range is rounded out to page bounds, which madvise requires. */
+static inline void nr_prefault(const void *data, size_t size)
+{
+    if (!data || !size) return;
+#ifdef _WIN32
+    typedef struct { PVOID VirtualAddress; SIZE_T NumberOfBytes; } nr_win32_range;
+    typedef BOOL (WINAPI *nr_prefetch_fn)(HANDLE, ULONG_PTR, nr_win32_range *, ULONG);
+    static nr_prefetch_fn prefetch;
+    static int looked;
+    if (!looked) {
+        looked = 1;
+        HMODULE k32 = GetModuleHandleA("kernel32.dll");
+        if (k32) prefetch = (nr_prefetch_fn)(void *)GetProcAddress(k32, "PrefetchVirtualMemory");
+    }
+    if (prefetch) {
+        nr_win32_range range = { (PVOID)data, (SIZE_T)size };
+        prefetch(GetCurrentProcess(), 1, &range, 0);
+    }
+#else
+    long page = sysconf(_SC_PAGESIZE);
+    if (page <= 0) page = 4096;
+    uintptr_t start = (uintptr_t)data & ~((uintptr_t)page - 1);
+    uintptr_t end = ((uintptr_t)data + size + (uintptr_t)page - 1) & ~((uintptr_t)page - 1);
+    madvise((void *)start, (size_t)(end - start), MADV_WILLNEED);
+#endif
+}
 
 /* -- environment and scratch files ---------------------------------------- */
 

@@ -877,9 +877,42 @@ def decoder_input_merge(value, *, skip, skip_sine):
 
 _ST_DTYPES = {"F16": np.float16, "F32": np.float32, "BF16": None}
 
+# The tensors `nr_frame_prepare` (nr_frame.c) adds beside the 649 logical ones: the branched
+# blocks' fused expansion, the one- and sixteen-head window biases in logical order, the head
+# matrix and the merge's joined sine and cosine. `nr_frame.c`'s `derived_name` is the same list.
+DERIVED_SUFFIXES = ("_fused", "_unswizzled", ".head_matrix", ".inp_merge_sincos")
 
-def load_logical(path):
-    """Read the logical safetensors into a dict of float32 arrays."""
+
+def is_derived(name):
+    return name.endswith(DERIVED_SUFFIXES)
+
+
+def logical_count(weights):
+    """How many of the loaded tensors are logical weights (649), the derived ones left out."""
+    return sum(1 for name in weights if not is_derived(name))
+
+
+def default_weights():
+    """`work/mlxw/dlssnr-prepared.safetensors` when it exists, else the logical file
+    (nr_build.weights_file; NR_WEIGHTS overrides)."""
+    import pathlib
+    import sys
+    root = pathlib.Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(root / "src"))
+    import nr_build
+    return nr_build.weights_file(root)
+
+
+def load_logical(path, keep_half=False):
+    """Read a logical or a prepared safetensors into a dict of arrays.
+
+    By default every tensor comes back as float32 — the CPU reference's arithmetic, which
+    must not become half arithmetic by a weight's dtype. With `keep_half` an F16 tensor stays
+    float16, as a view into the file's mapping: nothing is widened, nothing is copied until a
+    device buffer takes it (`nr_resident`, `nr_frame_resident`, which upload halves as they
+    are). A prepared file's derived tensors come along under their own names (`is_derived`);
+    `logical_count` counts them out.
+    """
     with open(path, "rb") as source:
         header_length = struct.unpack("<Q", source.read(8))[0]
         header = json.loads(source.read(header_length))
@@ -895,9 +928,39 @@ def load_logical(path):
             raise ValueError(f"{name}: unsupported dtype {entry['dtype']}")
         start, stop = entry["data_offsets"]
         raw = blob[base + start:base + stop].view(dtype)
-        weights[name] = np.ascontiguousarray(raw.reshape(entry["shape"]),
-                                             dtype=np.float32)
+        if keep_half:
+            weights[name] = raw.reshape(entry["shape"])
+        else:
+            weights[name] = np.ascontiguousarray(raw.reshape(entry["shape"]),
+                                                 dtype=np.float32)
     return weights, metadata
+
+
+def attention_bias(weights, name, index, head_count):
+    """A block's window bias in logical order: a prepared file's `<name>_unswizzled` as it
+    is, else the stored one with the fused kernel's fragment order undone where
+    `uses_fragment_swizzle` says so. The same values either way."""
+    ready = weights.get(name + "_unswizzled")
+    if ready is not None:
+        return ready
+    bias = weights[name]
+    if uses_fragment_swizzle(index, head_count):
+        bias = recover_attention_bias_layout(bias)
+    return bias
+
+
+def fused_expansion(weights, prefix):
+    """The branched blocks' fused (expansion, projection) pair: a prepared file's
+    `<prefix>.ffn_expand_fused` reshaped to (groups, groups * 32, 128), else
+    `_fused_branched_weights` of the stored tensors. The same bytes either way."""
+    projection_weight = weights[f"{prefix}.ffn_branch_projection_weight"]
+    groups = projection_weight.shape[0]
+    ready = weights.get(f"{prefix}.ffn_expand_fused")
+    if ready is not None:
+        expansion = np.ascontiguousarray(ready).reshape(groups, groups * 32, 4 * 32)
+        projection = np.ascontiguousarray(projection_weight.reshape(groups, 4 * 32, 32))
+        return expansion, projection
+    return _fused_branched_weights(weights[f"{prefix}.ffn_expand_weight"], projection_weight)
 
 
 class NeuralRenderingModel:
@@ -921,9 +984,8 @@ class NeuralRenderingModel:
 
     def _window(self, value, index, *, head_count, publish=True):
         prefix = f"block{index}.layer0"
-        attention_bias = self.weight(f"{prefix}.attn_bias")
-        if uses_fragment_swizzle(index, head_count):
-            attention_bias = recover_attention_bias_layout(attention_bias)
+        self.weight(f"{prefix}.attn_bias")
+        attention_bias = globals()["attention_bias"](self.weights, f"{prefix}.attn_bias", index, head_count)
         common = dict(
             feed_forward_cosine=self.weight(f"{prefix}.ffn_cos_skip"),
             qkv_weight=self.weight(f"{prefix}.qkv_weight"),
@@ -952,9 +1014,8 @@ class NeuralRenderingModel:
 
     def _split_window(self, value, index, publish=True):
         prefix = f"block{index}"
-        attention_bias = self.weight(f"{prefix}.layer2.attn_bias")
-        if uses_fragment_swizzle(index, 16):
-            attention_bias = recover_attention_bias_layout(attention_bias)
+        self.weight(f"{prefix}.layer2.attn_bias")
+        attention_bias = globals()["attention_bias"](self.weights, f"{prefix}.layer2.attn_bias", index, 16)
         output = split_window_block(
             value,
             first_projection_weight=self.weight(f"{prefix}.layer0.first_projection_weight"),

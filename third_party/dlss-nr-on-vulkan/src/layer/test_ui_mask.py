@@ -12,7 +12,9 @@ import numpy as np
 import nr_daemon
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+WEIGHTS = next((p for p in (ROOT / "work" / "mlxw" / "dlssnr-prepared.safetensors",
+                            ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors") if p.exists()),
+               ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors")
 MAGIC, MAGIC_MASKED = 0x304E524E, 0x314E524E
 FORMAT_B8G8R8A8 = 44
 SOCKET = "/tmp/nr_ui_mask_test.sock"

@@ -112,16 +112,22 @@ class DeviceWeights:
                                   take("block39.layer0.inp_upsample_sin"))
         self.merge_sin = self.rt.buffer_from(take("block70.layer0.inp_merge_sin"))
         self.merge_cos = self.rt.buffer_from(take("block70.layer0.inp_merge_cos"))
-        # both, one after the other, for the pass that applies them together
-        self.merge_sincos = self.rt.buffer_from(np.concatenate([
-            np.asarray(take("block70.layer0.inp_merge_sin"), np.float32).reshape(-1),
-            np.asarray(take("block70.layer0.inp_merge_cos"), np.float32).reshape(-1)]))
+        # both, one after the other, for the pass that applies them together: a prepared
+        # file carries them joined (nr_frame_prepare), else they are joined here
+        sincos = self.weights.get("block70.layer0.inp_merge_sincos")
+        if sincos is None:
+            sincos = np.concatenate([
+                np.asarray(take("block70.layer0.inp_merge_sin"), np.float32).reshape(-1),
+                np.asarray(take("block70.layer0.inp_merge_cos"), np.float32).reshape(-1)])
+        self.merge_sincos = self.rt.buffer_from(sincos)
         # the head is 32 -> 4, and the cooperative matrix wants a multiple of 16
         # columns; both halves go into one padded matrix and the first four columns
-        # of the product are the head
-        head = np.zeros((32, 16), dtype=np.float32)
-        head[:16, :4] = take("block70.layer0.out_gain")
-        head[16:, :4] = take("block70.layer0.out_conv_weight")
+        # of the product are the head — a prepared file carries the matrix
+        head = self.weights.get("block70.layer0.head_matrix")
+        if head is None:
+            head = np.zeros((32, 16), dtype=np.float32)
+            head[:16, :4] = take("block70.layer0.out_gain")
+            head[16:, :4] = take("block70.layer0.out_conv_weight")
         self.head = self.rt.buffer_from(head, np.float16)
 
     def block(self, index, heads, family="window"):

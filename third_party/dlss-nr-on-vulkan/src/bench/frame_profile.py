@@ -167,8 +167,7 @@ def main():
         return
     height, width = args.size
 
-    model = nr_model.NeuralRenderingModel.from_safetensors(
-        ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors")
+    model = nr_model.NeuralRenderingModel.from_safetensors(nr_model.default_weights())
     runtime = xmxres.Runtime()
     xmxres.profile(True)
     frame = F.ResidentFrame(runtime, model.weights, height, width)

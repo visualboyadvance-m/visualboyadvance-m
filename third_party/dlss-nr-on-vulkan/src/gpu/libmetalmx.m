@@ -141,6 +141,8 @@ static struct {
 	int ready, lost, discrete, unmapped, coopmat, portable;
 	int metal4;               /* the Metal 4 library is the one loaded (or to be loaded) */
 	int half_bits;            /* half_round on the bits (function constant 2): the cast does not round */
+	int staged_packed;        /* the staged kernel's raw 128-bit operand copies (function constant 3) */
+	int portable_packed;      /* the portable GEMM's 16-byte A fetch (function constant 4), off */
 	int serial;               /* compute encoders dispatch serially: a barrier does not order them */
 	int prof_dispatch;        /* timestamps between dispatches: the device has none at encoder boundaries */
 	unsigned simd_width;      /* the widest threadExecutionWidth a pipeline has reported */
@@ -245,6 +247,12 @@ int xmx_half_by_cast(void)
 {
 	return library ? !g.half_bits : -1;
 }
+
+/* Whether the staged kernel copies its operands as raw 128-bit vectors, function constant 3
+ * (xmx_init; `XMX_STAGED_PACKED=0` restores the half4 loader), and whether the portable GEMM
+ * fetches A that way, function constant 4 (`XMX_PORTABLE_PACKED=1`; off by default). */
+int xmx_staged_packed(void) { return g.staged_packed; }
+int xmx_portable_packed(void) { return g.portable_packed; }
 
 /* -- shaders --------------------------------------------------------------- */
 
@@ -371,6 +379,10 @@ static int build_pipeline_consts(const char *spv_path, const unsigned *flags, co
 	if (merged) [values setConstantValue:&merged_value type:MTLDataTypeBool atIndex:1];
 	bool half_bits = g.half_bits;
 	[values setConstantValue:&half_bits type:MTLDataTypeBool atIndex:2];
+	bool packed = g.staged_packed != 0;
+	[values setConstantValue:&packed type:MTLDataTypeBool atIndex:3];
+	bool ppacked = g.portable_packed != 0;
+	[values setConstantValue:&ppacked type:MTLDataTypeBool atIndex:4];
 	id<MTLFunction> fn = [library newFunctionWithName:@(stem) constantValues:values error:&error];
 	if (!fn) {
 		snprintf(g.err, sizeof g.err, "no kernel '%s' in the metallib (from '%s')%s%s", stem, spv_path,
@@ -852,6 +864,33 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	const char *spec = getenv("XMX_SPECIALIZE");
 	g.specialize = spec ? (unsigned)atoi(spec) : 7;
 	if (g.specialize > 7) FAIL("XMX_SPECIALIZE must be in 0..7", 0);
+	/* libxmx's packed staged loader (gemm_staged.comp, constant 2) on Metal: the staged
+	 * kernel copies each operand global-to-threadgroup as one uint4 where the addresses allow
+	 * it (gemm_simd.metal, function constant 3). The same halves land in the same places, so
+	 * the bytes are the same; on an M3's Metal 3.1 path the 320x320 graph replays 51.4 -> 49.2
+	 * ms with it (the Metal 4 library's matmul2d GEMMs stage nothing and are untouched).
+	 * `XMX_STAGED_PACKED=0` keeps the half4 loader, to compare. Fixed here, before any
+	 * pipeline is built. */
+	g.staged_packed = 1;
+	const char *packed = getenv("XMX_STAGED_PACKED");
+	if (packed && *packed) {
+		if (!strcmp(packed, "1")) g.staged_packed = 1;
+		else if (!strcmp(packed, "0")) g.staged_packed = 0;
+		else fprintf(stderr, "libmetalmx: XMX_STAGED_PACKED=%s is neither 0 nor 1; keeping %d\n",
+			     packed, g.staged_packed);
+	}
+	/* The portable GEMM's A fetched sixteen bytes at a time (gemm_portable.metal, function
+	 * constant 4) is off: on the M3 it replayed 320x320 70.5 -> 79.8 ms, the compiler
+	 * combining the eight-byte fetches already. `XMX_PORTABLE_PACKED=1` to try it on another
+	 * device without simdgroup matrices; the bytes are the same either way. */
+	g.portable_packed = 0;
+	const char *ppacked = getenv("XMX_PORTABLE_PACKED");
+	if (ppacked && *ppacked) {
+		if (!strcmp(ppacked, "1")) g.portable_packed = 1;
+		else if (!strcmp(ppacked, "0")) g.portable_packed = 0;
+		else fprintf(stderr, "libmetalmx: XMX_PORTABLE_PACKED=%s is neither 0 nor 1; keeping %d\n",
+			     ppacked, g.portable_packed);
+	}
 	@autoreleasepool {
 		if (build_pipeline(gemm_spv, &g.rgemm) || build_pipeline(unary_spv, &g.runary)
 		    || build_pipeline(row_spv, &g.rrow) || build_pipeline(history_spv, &g.rhistory)

@@ -24,6 +24,13 @@
  *            half already with 0x8000, else float32 rounded to half on the way in
  *   0x800000 block 0's window residual pooled and published in the epilogue (tiled
  *            build): the published skip into c as half, the pool into the sixth operand
+ *   0x8000000 libxmx's packed staged loader (gemm_staged.comp's STAGED_PACKED, a
+ *            specialization constant there) as this kernel can take it: the plain form
+ *            fetches A sixteen bytes — eight K terms — at a time where the addresses
+ *            allow. libd3dmx sets it on every GEMM it dispatches under
+ *            XMX_PORTABLE_PACKED=1 (off by default: an M3's two portable paths measured
+ *            slower with it, and no Direct3D 12 device has measured it); the sums are the
+ *            eight-byte path's bit for bit.
  * Where the SPIR-V stages the accumulator through shared memory for these, this kernel
  * need not: every lane knows which elements it holds, and the residual and the publish
  * are per element. The QKV epilogue normalises whole rows, so it alone stages.
@@ -119,6 +126,8 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
      * sums are bit for bit the four-load paths' (gemm_portable.comp, the same change). */
     bool wide_b = ((bo | ldb) & 3u) == 0u && (B & 7u) == 0u;
     bool wide_ab = wide_b && ((ao | lda | pc.k) & 3u) == 0u && (A & 7u) == 0u;
+    bool packed_a = (flags & 0x8000000u) != 0u && wide_b && ((ao | lda | pc.k) & 7u) == 0u
+                    && (A & 15u) == 0u;
     if (window_a) {
         /* the same multiply-adds as the plain path below, the A element gathered */
         for (uint k = 0; k < pc.k; k++) {
@@ -170,6 +179,25 @@ void main(uint3 gid : SV_GroupID, uint lid : SV_GroupIndex) {
                 float av = ld_f16(bufA, A, abase[i] + k);
                 [unroll] for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if (!transposed && packed_a) {
+        /* the plain form with A fetched eight K terms at a time (0x8000000), a lane's four B
+         * columns one eight-byte load as below; each K term still goes into the accumulator
+         * alone and in order */
+        for (uint k0 = 0; k0 < pc.k; k0 += 8u) {
+            float4 as8[RM][2];
+            [unroll] for (uint i = 0; i < RM; i++)
+                ld_f16x8(bufA, A + (abase[i] + k0) * 2u, as8[i][0], as8[i][1]);
+            [unroll] for (uint kk = 0; kk < 8u; kk++) {
+                float4 bv[RN];
+                [unroll] for (uint j = 0; j < RN; j++)
+                    bv[j] = ld_f16x4(bufB, B + (bo + (k0 + kk) * ldb + col + cq + j * TN) * 2u);
+                [unroll] for (uint i = 0; i < RM; i++) {
+                    float av = as8[i][kk >> 2][kk & 3u];
+                    [unroll] for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else if (wide_ab) {

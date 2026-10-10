@@ -6,7 +6,8 @@ integrated GPU under macOS, Android, Linux and Windows in a real game, through a
 
 No NVIDIA hardware, no NGX, no CUDA. The graph runs on Intel's XMX matrix units through
 `VK_KHR_cooperative_matrix`, and the pass is injected at `vkQueuePresentKHR`, so it
-attaches to anything that presents with Vulkan — including a Windows game under Proton.
+attaches to anything that presents with Vulkan: a Windows game under Proton on Linux, and on
+Windows a Vulkan game or a DirectX 8–11 one through DXVK.
 Where there is no cooperative matrix at all — an Apple M3 through MoltenVK is the case
 that was built and tested — the same graph runs on a plain multiply-add GEMM, slower and
 with the same numbers.
@@ -20,6 +21,53 @@ two is rounding, not structure (`notes/opendlss-reference.md`).
 Read "What to expect" before deciding it is broken.
 
 **All breakdowns and analysis are written by AI.**
+
+---
+
+## How to test it
+
+| Platform | Instructions |
+| --- | --- |
+| Windows | **[Download the Windows release](https://github.com/Uzbekunknown/dlss-nr-on-intel/releases/latest)**, extract it and run `NR-Setup.exe`: the [release quick start](docs/RELEASE-QUICKSTART.md). It needs Python and your own DLL, no compiler or Vulkan SDK. To build it yourself: the [Windows quick start](docs/WINDOWS-QUICKSTART.md). |
+| Linux | [Build](#build), then [Run it in a game](#run-it-in-a-game). Windows games can use the Proton launcher. |
+
+You need a supported **Intel Xe2 GPU** and the logical weights extracted from your
+own `nvngx_dlssnr.dll`. The repository supplies code, not the DLL or model weights;
+see [You supply the weights](#you-supply-the-weights) and [What you need](#what-you-need).
+
+For the first live test, use a small game window — **640x360 to 800x450** — and
+start around **render_scale 0.4**. Choose a Vulkan renderer, or a documented
+translation path; loading a Vulkan layer does not enable it in every DirectX game.
+Compare the same scene with the effect off and on.
+
+Confirm that the daemon reports processed frames and check for refused frames.
+An unchanged picture can be the game's fallback after a failed request. On Linux,
+run `src/layer/nr-ctl report`; on Windows, **Save report** in the setup window.
+Include the commit, GPU/CPU, OS/driver, game/API, resolution, render scale,
+`min_extent`, and FPS off/on in an [Issue](https://github.com/Uzbekunknown/dlss-nr-on-intel/issues).
+
+The effect adds work to each frame. The optimizations reduce its overhead; the
+rates below describe particular hardware and settings, not a guaranteed FPS increase.
+
+### Windows and Linux
+
+The pass is the same on both: the same weights, the same graph and the same ten settings,
+and since 2026-10-01 Intel's Windows driver and Mesa compute the graph bit for bit alike
+(`notes/phase71-intel-windows-driver.md`). What differs is everything around it:
+
+| | Windows | Linux |
+| --- | --- | --- |
+| Install | the release ZIP and its setup window, in English, Russian or Spanish | built from source with `make` or CMake |
+| GPU driver | Intel's own; tested with 32.0.101.9033 | Mesa ANV |
+| Games | native Vulkan, and DirectX 8–11 through the DXVK 3.1.1 that setup puts beside the game; 64- and 32-bit; **no DirectX 12 yet** | whatever Proton runs, since DXVK and VKD3D-Proton come with it: DirectX 12 too (Mortal Kombat 1) |
+| Starting the game | any way at all — Steam, a shortcut, another launcher: setup puts a `vulkan-1.dll` beside the game that gives it NR | with NR's environment: the Steam launch option `nr-photo --steam` prints, or `nr-photo` itself |
+| Controls | the setup window: Enable NR and the ten settings, while the game runs | `nr-panel`, `nr-ctl`, and `nr-toggle` on a key |
+| Modes | live | live, and the photo mode |
+| Taking it out | **Remove NR** puts the game's folder back as it was | remove the launch option |
+
+The network runs slower on Intel's Windows compiler at large frames — about 170 ms against
+140 at 1344x768 — and as fast at the live sizes, about 24 ms at 320x320 on both
+(`src/bench/frame_replay.py`). Around the network the two are level.
 
 ---
 
@@ -150,15 +198,13 @@ already have. See [Build](#build).
   a 1280x720 frame's graph is 0.47 s there, 320x320 is 84 ms. Any Vulkan 1.3
   device with `shaderFloat16`, `storageBuffer16BitAccess`, `bufferDeviceAddress` and the
   Vulkan memory model should take the same path; `XMX_PORTABLE=1` forces it anywhere.
-- Linux, or macOS with MoltenVK. Python 3 with NumPy. A C compiler, `glslangValidator`,
-  the Vulkan loader. On Windows the compute side builds and runs with Intel's own driver —
-  CMake with MSVC, clang-cl or MinGW, or `tools/build_win.bat` for an MSVC build of the
-  runtime, the layer and the shaders into `work/` — and the network's output is the same as
-  on Linux, bit for bit: libxmx declares `DenormPreserve 16` on every module and picks
-  `half_round`'s spelling per driver (`notes/phase71`). The layer and the daemon run there
-  too, on a named pipe: run in games by their author on an Arc B580, and upstream so far only
-  under vkcube ([docs/WINDOWS.md](docs/WINDOWS.md)). Direct3D 12 is the other runtime there
-  (below).
+- On Linux, or macOS with MoltenVK: Python 3 with NumPy, a C compiler, `glslangValidator`
+  and the Vulkan loader. On Windows the release needs only a 64-bit Python and your DLL;
+  building it needs MSVC and the Vulkan SDK (`tools/build_win.bat`,
+  [docs/WINDOWS.md](docs/WINDOWS.md)), or CMake with MSVC, clang-cl or MinGW for the compute
+  side. The network's output is the same on both, bit for bit: libxmx declares
+  `DenormPreserve 16` on every module and picks `half_round`'s spelling per driver
+  (`notes/phase71`). Direct3D 12 is the other runtime there (below).
 - **ImageMagick** for the still-frame tools, which read and write pictures through
   `magick`. The game path does not touch it.
 - **libpng** for the C command `work/nr_frame`, which reads and writes PNG with it and
@@ -171,6 +217,11 @@ already have. See [Build](#build).
   (`notes/phase48`). Everything else is the same without it.
 
 ## Build
+
+**Windows users** need no build: the release carries everything ([How to test it](#how-to-test-it)).
+To build it yourself, the [Windows quick start](docs/WINDOWS-QUICKSTART.md) covers the MSVC
+build, the first Vulkan launch, the effect toggle and a diagnostic report. The commands below
+are the Linux setup.
 
 ```sh
 mkdir -p work
@@ -319,9 +370,9 @@ matrix, so it takes the portable GEMM path, and needs a Vulkan 1.3 driver with `
 
 `make` also builds `work/libnr_image.so` (`.dylib` on macOS, as every library here): the full-frame passes around the network —
 feature assembly, the resizes, the composition, the 8-bit codecs — in C rather than NumPy,
-worth about 2.6x on the host side of a frame. It is built with `-march=native`, so rebuild
-it on the machine that runs it rather than copying it. Everything still works without it;
-`NR_HOST_NATIVE=0` selects the NumPy path for a paired measurement.
+worth about 2.6x on the host side of a frame. It is built for `x86-64-v3` — AVX2 and F16C,
+every CPU since Haswell and Zen 1 — and `NR_IMAGE_ARCH` changes that. Everything still works
+without it; `NR_HOST_NATIVE=0` selects the NumPy path for a paired measurement.
 
 ```sh
 make test                                        # about 570 checks, fewer without weights
@@ -370,7 +421,9 @@ checks, the paired benchmark and profiling commands for B570/B580.
 ## Run it in a game
 
 Two processes: a **daemon** that holds the model, and a **Vulkan layer** inside the game
-that hands it each frame. They meet over a unix socket.
+that hands it each frame. They meet over a Unix socket on Linux and a named pipe
+on Windows, where the setup window does all of what follows
+([release quick start](docs/RELEASE-QUICKSTART.md)).
 
 ```sh
 python3 src/layer/nr_daemon.py --settings /tmp/nr_settings.json
@@ -410,10 +463,13 @@ With `NR_LAYER_SPAWN=1` set next to the variables above, and `NR_LAYER_SOCKET` n
 layer starts the daemon on that socket if nothing is listening there when the game creates
 its instance. Without the variable nothing happens and nothing prints, which is the
 default: `vulkaninfo` and every other Vulkan process that loads the layer must not each
-bring up a model. A daemon started this way **outlives the game** — it keeps its buffers
-and the weights resident, **0.7 GiB at 720p and 1.2 GiB at 1920x1088, weights included**
-— so the next launch connects instead of paying the load again. It ends on its own when
-the GPU is lost, and otherwise runs until you end the process. Its settings and log follow
+bring up a model. On Linux a daemon started this way **outlives the game** — it keeps its
+buffers and the weights resident, **0.7 GiB at 720p and 1.2 GiB at 1920x1088, weights
+included** — so the next launch connects instead of paying the load again. It ends on its
+own when the GPU is lost, and otherwise runs until you end the process. **On Windows it
+ends with the game that started it**: the layer hands it the game's process id. Steam counts
+every process a game starts as part of the game, and a daemon that stayed kept the game
+running for Steam after it had closed. Its settings and log follow
 `src/layer/nr_paths.py` (`/tmp/nr_settings.json`, `NR_LAYER_LOG`), the same files `nr-ctl`
 and `nr-panel` write, so the knobs reach a daemon started this way too.
 
@@ -731,7 +787,10 @@ src/bench/    measurement programs; every number in the notes came from one
 src/probe/    what your GPU can do, answered before anything else is built
 src/tools/    the DLL and weight-container readers, and the checks that keep this
               page honest: what may be published, and what may still be claimed
-docs/         the recovered architecture, written as a specification
+docs/         the recovered architecture, written as a specification, and the setup guides
+dist-tools/   what a release sets up with: the Windows setup window, setup.bat, setup.sh
+scripts/      the release builder, DXVK's fetcher and the weight extractor
+tools/        the Windows build (build_win.bat) and the release scripts (deploy.bat, deploy.sh)
 notes/        what was measured, including the measurements that turned out wrong,
               and the working briefs the agents building this were given
 work/         builds, checkouts and your weights. Ignored, and stays that way.
@@ -766,6 +825,9 @@ values the GEMMs read published, the bottleneck's own attention — it follows
 [OpenDLSS-NR](https://github.com/maanHimself/OpenDLSS-NR) (MIT), which claims its network
 bit-exact against captures of the original: `src/bench/opendlss_*` run its WebGPU port here
 and compare, block by block and step by step (`notes/opendlss-reference.md`).
+
+The Windows release carries [DXVK](https://github.com/doitsujin/dxvk) 3.1.1 under its zlib
+licence (`dxvk\LICENSE` in the release), which setup puts beside DirectX 8–11 games.
 
 DLSS, Neural Rendering and `nvngx_dlssnr.dll` are NVIDIA Corporation's. This is an
 independent reimplementation of the inference pass, not affiliated with or endorsed by

@@ -60,6 +60,16 @@ inline uint operation_flags(constant Push &pc) { return specialized ? SPECIALIZE
  * 65520 and up to infinity, NaN kept. */
 constant bool HALF_BY_BITS [[function_constant(2)]];
 constant bool half_by_bits = is_function_constant_defined(HALF_BY_BITS) && HALF_BY_BITS;
+/* Function constant 3, libxmx's `STAGED_PACKED` (gemm_staged.comp, specialization constant 2):
+ * the staged kernel copies its operands global-to-threadgroup as raw 128-bit vectors where the
+ * addresses allow it. The same halves in the same places, so the bytes are the same;
+ * libmetalmx sets it on every pipeline (XMX_STAGED_PACKED=0 to compare). Function constant 4,
+ * `PORTABLE_PACKED` (gemm_portable.comp's constant 3): the portable GEMM fetches A eight K
+ * terms at a time — off by default, slower on an M3 (XMX_PORTABLE_PACKED=1 to try). */
+constant bool STAGED_PACKED [[function_constant(3)]];
+constant bool staged_packed = is_function_constant_defined(STAGED_PACKED) && STAGED_PACKED;
+constant bool PORTABLE_PACKED [[function_constant(4)]];
+constant bool portable_packed = is_function_constant_defined(PORTABLE_PACKED) && PORTABLE_PACKED;
 
 inline float half_round_bits(float x) {
     uint bits = as_type<uint>(x), magnitude = bits & 0x7FFFFFFFu, sign = bits & 0x80000000u;

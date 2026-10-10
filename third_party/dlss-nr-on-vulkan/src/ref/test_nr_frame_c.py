@@ -26,6 +26,7 @@ sys.path.insert(0, str(ROOT / "src" / "ref"))
 sys.path.insert(0, str(ROOT / "src" / "gpu"))
 
 import nr_frame  # noqa: E402
+import nr_model  # noqa: E402
 import nr_frame_native  # noqa: E402
 import nr_image  # noqa: E402
 
@@ -109,7 +110,8 @@ def main():
         # (the same library instance, loaded by both), and is a yes or a no
         lib = backend.runtime.lib
         for name, got in (("discrete", native.discrete), ("preserve16", native.preserve16),
-                          ("half_by_cast", native.half_by_cast)):
+                          ("half_by_cast", native.half_by_cast), ("staged_packed", native.staged_packed),
+                          ("portable_packed", native.portable_packed)):
             want = int(getattr(lib, "xmx_" + name)())
             check(f"runtime: nr_frame_{name} is the runtime's {want}", got == want and got in (0, 1),
                   f"got {got}")
@@ -117,6 +119,59 @@ def main():
               native.input_view == (0 if os.environ.get("NR_INPUT_VIEW") == "0" else 1)
               or (sys.platform == "win32" and native.discrete == 1),
               f"input_view {native.input_view}")
+
+        # 0b. a prepared file: the layout work done once, and an open from it gives the same
+        # head bytes as an open from the logical file
+        if hasattr(native.lib, "nr_frame_prepare"):
+            prepared = pathlib.Path(room) / "prepared.safetensors"
+            nr_frame_native.prepare(prepared, weights)
+            with open(prepared, "rb") as fh:
+                header = json.loads(fh.read(struct.unpack("<Q", fh.read(8))[0]))
+            derived = [k for k in header if k.endswith("_fused") or k.endswith("_unswizzled")
+                       or k.endswith("head_matrix") or k.endswith("inp_merge_sincos")]
+            check("prepared: the file carries the derived tensors and says so",
+                  header.get("__metadata__", {}).get("prepared") == "v2" and len(derived) >= 4
+                  and header["block70.layer0.head_matrix"]["dtype"] == "F16", f"{len(derived)} derived")
+            # v2: F32 tensors first, then F16, so every offset is aligned to its element
+            offsets = [(entry["data_offsets"][0], entry["dtype"]) for key, entry in header.items()
+                       if key != "__metadata__"]
+            check("prepared: every offset is aligned to its element (F32 first, then F16)",
+                  all(off % (4 if dtype == "F32" else 2) == 0 for off, dtype in offsets)
+                  and [d for _, d in sorted(offsets)] == sorted((d for _, d in offsets), reverse=True))
+            plain_head = native.head(colour)
+            from_prepared = nr_frame_native.NativeFrame(str(prepared))
+            check("prepared: the head from a prepared open is the logical open's bit for bit",
+                  np.array_equal(plain_head, from_prepared.head(colour)))
+            aliased, count = from_prepared.weights_aliased
+            check("prepared: the reader aliases every tensor of a prepared file, none copied",
+                  from_prepared.prepared == 1 and count > 0 and aliased == count, f"{aliased} of {count}")
+            from_prepared.close()
+            del from_prepared
+            # preparing the prepared file keeps what is there: the same tensors, no more
+            again = pathlib.Path(room) / "prepared-again.safetensors"
+            nr_frame_native.prepare(again, prepared)
+            with open(again, "rb") as fh:
+                header2 = json.loads(fh.read(struct.unpack("<Q", fh.read(8))[0]))
+            check("prepared: preparing a prepared file is idempotent",
+                  sorted(k for k in header2 if k != "__metadata__") == sorted(k for k in header if k != "__metadata__"))
+            # the compiled-in weights are this format, read in place
+            if native.lib.nr_frame_embedded_weights_size() > 8:
+                embedded = nr_frame_native.NativeFrame()
+                aliased, count = embedded.weights_aliased
+                check("prepared: the compiled-in weights are prepared and every tensor is read in place",
+                      embedded.prepared == 1 and count > 0 and aliased == count,
+                      f"prepared {embedded.prepared}, {aliased} of {count} in place")
+                check("prepared: the compiled-in open gives the logical file's head bit for bit",
+                      np.array_equal(plain_head, embedded.head(colour)))
+                embedded.close()
+                del embedded
+            # the Python side reads the prepared file too, and derives nothing it carries
+            pw, pm = nr_model.load_logical(prepared, keep_half=True)
+            check("prepared: the Python loader takes the prepared file, 649 logical tensors among its own",
+                  nr_model.logical_count(pw) == 649 and pm.get("prepared") == "v2"
+                  and pw["block70.layer0.head_matrix"].dtype == np.float16)
+        else:
+            print("  [skip] prepared file: this libnr_frame has no nr_frame_prepare")
 
         # 1. features: the same recipe, NumPy against C
         geometry = nr_frame.NetworkGeometry.vendor_aligned(width, height)

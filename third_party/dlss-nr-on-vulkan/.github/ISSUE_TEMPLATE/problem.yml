@@ -1,0 +1,84 @@
+name: Something does not work
+description: NR does not install, the game does not start with it, or the picture is wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing. Each field below answers a question that would otherwise come back to you.
+        **Do not attach `nvngx_dlssnr.dll` or any weights.**
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows, the release and its setup window
+        - Windows, built from source
+        - Linux
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Release or commit
+      description: The release you downloaded, or `git rev-parse --short HEAD` in your clone.
+      placeholder: "0.0.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: step
+    attributes:
+      label: Where it goes wrong
+      options:
+        - Install NR
+        - Starting the game
+        - Enable NR shows no processed frames
+        - The picture in the game
+        - Remove NR
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: window
+    attributes:
+      label: What the setup window says
+      description: |
+        The line at the bottom of the window. Then open **Check details**, select all its text and paste it here.
+      render: text
+  - type: textarea
+    id: report
+    attributes:
+      label: Report
+      description: |
+        In the setup window press **Save report** and drag the `.json` file into this box. It holds versions,
+        settings and the daemon's log; no DLL and no weights. On Linux, paste what `src/layer/nr-ctl report` prints.
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and driver
+      placeholder: "Intel Arc B580, 32.0.101.9033"
+    validations:
+      required: true
+  - type: input
+    id: dll
+    attributes:
+      label: Version of your nvngx_dlssnr.dll
+      description: Right-click the file, Properties, Details, File version. 310.8.0.0 is the one tested.
+      placeholder: "310.8.0.0"
+  - type: input
+    id: game
+    attributes:
+      label: Game and its graphics API
+      placeholder: "DOOM (2016), Vulkan"
+  - type: input
+    id: size
+    attributes:
+      label: Game window size and render scale
+      placeholder: "800x450, 0.4"

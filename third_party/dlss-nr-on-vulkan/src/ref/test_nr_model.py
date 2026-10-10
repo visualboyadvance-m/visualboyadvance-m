@@ -19,7 +19,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import nr_model as M  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-WEIGHTS = ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
+WEIGHTS = M.default_weights() if hasattr(M, "default_weights") else ROOT / "work" / "mlxw" / "dlssnr-logical.safetensors"
 
 FAILURES = []
 
@@ -86,7 +86,8 @@ def test_primitives():
 def test_weights(path):
     print("weights")
     weights, metadata = M.load_logical(path)
-    check("649 logical tensors", len(weights) == 649, str(len(weights)))
+    check("649 logical tensors", M.logical_count(weights) == 649,
+          f"{M.logical_count(weights)} logical, {len(weights) - M.logical_count(weights)} derived")
     check("format is a logical export",
           str(metadata.get("format", "")).startswith("dlssnr-logical"),
           metadata.get("format", "?"))

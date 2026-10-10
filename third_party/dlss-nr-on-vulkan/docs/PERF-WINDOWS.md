@@ -109,3 +109,18 @@ I did not implement it. It changes the arithmetic path of the one file whose con
 byte-identity with NumPy, it needs a CPU-feature check to be correct on a machine without
 F16C, and this branch is in review with a reviewer who can time it against the gcc build on
 the same laptop. The numbers above are what that decision should rest on.
+
+## Done since, on the Arc 140V (2026-10-07)
+
+With `x86-64-v3` the floor of every build, it went in without a runtime check: `build_win.bat`
+defines `NR_F16C`, and `nr_image.c`'s MSVC arm converts with `vcvtps2ph` and `vcvtph2ps` on
+lane 0, since MSVC declares only their vector forms. For every one of the 2^32 floats the
+half's bits and the rounded value are the arithmetic's, and `test_native_image.py` (353
+checks now) stays byte-identical.
+
+`daemon_stages.py` at 1280x720 (0.3 and 0.5) and 1920x1080 (0.3), fresh and held frames, in
+alternation with the old build on a Lunar Lake laptop: `features` goes from 1.0-2.9 ms to
+0.4-0.8, within 0.1-0.3 of gcc's, and the daemon's own time a frame drops by 0.6-2.0 ms, most
+on held frames. Not `/arch:AVX2`: MSVC takes the intrinsics without it, and under it the
+composition, which MSVC vectorises in neither build, was 0.1-0.4 ms slower. The composition is
+where MSVC still trails gcc's vectorised one, by 0.5-1.8 ms.

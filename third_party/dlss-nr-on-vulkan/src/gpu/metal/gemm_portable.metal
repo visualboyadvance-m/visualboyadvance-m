@@ -68,6 +68,35 @@ kernel void gemm_portable_t(constant Push &pc [[buffer(0)]],
                     acc[i][j] += av * bv[j];
             }
         }
+    } else if (portable_packed && (flags & 1u) == 0u && (ldb & 3u) == 0u && (lda & 7u) == 0u
+               && (pc.k & 7u) == 0u && (bo & 3u) == 0u && (ao & 7u) == 0u
+               && (pc.a & 15u) == 0u && (pc.b & 7u) == 0u) {
+        /* The plain form with A fetched sixteen bytes at a time — eight K terms, libxmx's
+         * packed staged loader as this kernel can take it (PORTABLE_PACKED, nr_metal.h); a
+         * lane's four B columns stay one eight-byte fetch. Each K term still goes into the
+         * accumulator alone and in order, so the sums are the eight-byte path's bit for bit.
+         * Off by default: on an M3 it was 13 % slower at 320x320, the compiler combining the
+         * eight-byte fetches already (HANDOFF, 2026-10-10). */
+        device const uint4 *A8 = reinterpret_cast<device const uint4 *>(A);
+        device const half4 *B4 = reinterpret_cast<device const half4 *>(B);
+        for (uint k0 = 0; k0 < pc.k; k0 += 8u) {
+            float4 as8[RM][2];
+            for (int i = 0; i < RM; i++) {
+                uint4 w = A8[(ao + (row + r + i * TM) * lda + k0) >> 3];
+                as8[i][0] = float4(as_type<half4>(w.xy));
+                as8[i][1] = float4(as_type<half4>(w.zw));
+            }
+            for (uint kk = 0; kk < 8u; kk++) {
+                float4 bv[RN];
+                for (int j = 0; j < RN; j++)
+                    bv[j] = float4(B4[(bo + (k0 + kk) * ldb + col + cq + j * TN) >> 2]);
+                for (int i = 0; i < RM; i++) {
+                    float av = as8[i][kk >> 2][kk & 3u];
+                    for (int j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
+            }
+        }
     } else if ((flags & 1u) != 0u && (ldb & 3u) == 0u && (lda & 3u) == 0u && (pc.k & 3u) == 0u
                && ((bo | ao) & 3u) == 0u && ((pc.a | pc.b) & 7u) == 0u) {
         /* The transposed form with the operands fetched eight bytes at a time along K:

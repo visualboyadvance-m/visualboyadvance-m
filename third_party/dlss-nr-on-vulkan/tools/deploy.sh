@@ -31,15 +31,18 @@
 #    ./deploy.sh --game /path/to/Game --dll /path/to/nvngx_dlssnr.dll
 #                [--name libnr_layer.so] [--exe /path/to/Game/game]
 #                [--skip-weights] [--skip-build]
+#    ./deploy.sh --release dist/dlss-nr-linux [--skip-weights] [--skip-build]
 # ============================================================================
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="$REPO/work"
+NR_DEPLOY_PYTHON="${NR_PYTHON:-python3}"
 GAME=""
 DLL=""
 NAME="libnr_layer.so"
 EXE=""
+RELEASE=""
 SKIP_WEIGHTS=0
 SKIP_BUILD=0
 
@@ -49,14 +52,19 @@ while [[ $# -gt 0 ]]; do
     --dll)          DLL="$2";  shift 2 ;;
     --name)         NAME="$2"; shift 2 ;;
     --exe)          EXE="$2";  shift 2 ;;
+    --release)      RELEASE="$2"; shift 2 ;;
     --skip-weights) SKIP_WEIGHTS=1; shift ;;
     --skip-build)   SKIP_BUILD=1; shift ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
 done
 
-[[ -n "$GAME" ]] || { echo "ERROR: --game is required" >&2; exit 2; }
-[[ -d "$GAME" ]] || { echo "ERROR: game directory not found: $GAME" >&2; exit 2; }
+# --release assembles a folder for other people and installs into nobody's game, so it is
+# the one mode that does not need --game.
+if [[ -z "$RELEASE" ]]; then
+  [[ -n "$GAME" ]] || { echo "ERROR: --game is required (or --release <folder>)" >&2; exit 2; }
+  [[ -d "$GAME" ]] || { echo "ERROR: game directory not found: $GAME" >&2; exit 2; }
+fi
 
 # ---- weights, delegated to scripts/get_weights.py ----
 # It clones MLX-DLSS at the pinned commit, runs its extractor against your DLL and
@@ -74,7 +82,7 @@ else
   }
   [[ -f "$DLL" ]] || { echo "ERROR: DLL not found: $DLL" >&2; exit 2; }
   echo "[1/3] extracting weights with scripts/get_weights.py ..."
-  python3 "$REPO/scripts/get_weights.py" "$DLL"
+  "$NR_DEPLOY_PYTHON" "$REPO/scripts/get_weights.py" "$DLL"
 fi
 
 # ---- build ----
@@ -83,8 +91,19 @@ if [[ $SKIP_BUILD -eq 1 ]]; then
 else
   echo "[2/3] building the layer ..."
   ( cd "$REPO" && make )
+  if [[ -n "$RELEASE" ]]; then
+    # The release's CPU floor, whatever NR_IMAGE_ARCH this shell carries. It is also the
+    # default, and make rebuilds the library whenever its flags change.
+    ( cd "$REPO" && make work/libnr_image.so NR_IMAGE_ARCH=-march=x86-64-v3 )
+  fi
 fi
 [[ -f "$WORK/libnr_layer.so" ]] || { echo "ERROR: $WORK/libnr_layer.so missing; build it first" >&2; exit 3; }
+
+# ---- checked release assembly, or installation into a game ----
+if [[ -n "$RELEASE" ]]; then
+  "$NR_DEPLOY_PYTHON" "$REPO/scripts/build_release.py" "$RELEASE" --platform linux
+  exit 0
+fi
 
 # ---- install into the game folder ----
 echo "[3/3] installing into $GAME ..."

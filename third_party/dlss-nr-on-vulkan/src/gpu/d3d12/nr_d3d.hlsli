@@ -142,6 +142,16 @@ float4 ld_f16x4(RWByteAddressBuffer buf, uint byte_address) {
     return float4(f16tof32(w.x & 0xffffu), f16tof32(w.x >> 16), f16tof32(w.y & 0xffffu),
                   f16tof32(w.y >> 16));
 }
+/* Eight consecutive halves from a byte address the caller has checked is 16-aligned: one
+ * 128-bit load, the same eight values as two `ld_f16x4` (libxmx's packed staged loader,
+ * flag 0x8000000 in gemm_portable.hlsl). */
+void ld_f16x8(RWByteAddressBuffer buf, uint byte_address, out float4 lo, out float4 hi) {
+    uint4 w = buf.Load4(byte_address);
+    lo = float4(f16tof32(w.x & 0xffffu), f16tof32(w.x >> 16), f16tof32(w.y & 0xffffu),
+                f16tof32(w.y >> 16));
+    hi = float4(f16tof32(w.z & 0xffffu), f16tof32(w.z >> 16), f16tof32(w.w & 0xffffu),
+                f16tof32(w.w >> 16));
+}
 /* Four consecutive elements at a byte address the caller has checked the alignment of. */
 void st_f32x4(RWByteAddressBuffer buf, uint byte_address, float4 value) {
     buf.Store4(byte_address, asuint(value));

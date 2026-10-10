@@ -195,3 +195,77 @@ uint pad[N]` touched by every lane and either the FMA chain or a pointer chase, 
 `Runtime.window_attention` with `XMX_WINDOW_SPV` pointing at each build. Variants of the
 real kernels go in through `XMX_STAGED_SPV`, `XMX_ROW_SPV`, `XMX_GEMM_SPV` and
 `XMX_FFN_SPV`; `src/bench/frame_profile.py` times them in a frame.
+
+## Intel Windows: copy the operand bits in 128-bit vectors (2026-10-03)
+
+The interrupted Windows session at 6987c02 had measured the K-loop knockouts requested
+by Linux. Those runs suggested looking at the global-to-shared copies: removing the
+fragment loads or barriers barely changed the timing, removing the copies did. They are
+not a clean additive cost model. In particular, the replacement values `k0 & 7` and
+`k0 & 3` are always zero with BK=32, and other variants read uninitialized shared memory
+or deliberately race. No wrong-output variant was installed.
+
+Three correct-output loader spellings were tried, leaving the fragment order and all
+epilogues alone:
+
+- Eight lanes per 32-half row, four halves per lane: some GEMMs improved, but a 720p
+  frame was 182.6 ms against 186.4 ms for the old shader.
+- Sixteen lanes per row, two halves per lane: slower on the measured large shapes.
+- Four lanes per row, eight halves per lane as one `uvec4`: the retained variant.
+  The global vector and an aliased shared `uvec4` view move the bits without conversion.
+  `coopMatLoad` still sees the original half array. Both views have the same size and
+  B offset, including the BM32/BK64 build.
+
+The last variant improved 4032x256x256 float output from 145-146 to 95-97 us and
+320x1024x4096 from 955-1034 to 648-666 us. It is not universally faster: the half output
+at 64512x128x64 went from 531-534 to 588 us. Keeping the old loader for K<128 did not
+win at frame level (174.9 ms against 169.3), so that hybrid was discarded.
+
+The final shader retains all three loader paths. Specialization constant 2 selects
+the packed path only on Intel's proprietary Windows driver by default. It additionally
+requires 16-byte pointers and the row stride and current batch offset aligned to eight
+halves. Eight-byte
+alignment keeps the previous half4 path; other alignment keeps the scalar one. Window
+gathers and B transposes are unchanged. `XMX_STAGED_PACKED=0|1`, read once before pipeline
+creation, permits an A/B using the same binaries. Linux defaulted to 0 until 2026-10-07; it
+is on for every driver since, after Mesa measured the same heads and about 2 % at 720p and
+1080p (`notes/HANDOFF.md`, that day).
+
+**Final implementation, off/on/on/off in separate processes, twelve warm replay samples
+per process.** Arc 140V, Intel 101.9033, AC, performance power mode, quiet checks before
+and after (CPU mean 4-5%; GPU idle before, 3D 1% after). The median of each process, ms:
+
+| output / network | off, first | on, first | on, second | off, second |
+|---|---:|---:|---:|---:|
+| 320x320 / 320x320 | 26.596 | 24.692 | 24.222 | 25.739 |
+| 1280x720 / 1344x768 | 199.634 | 170.151 | 169.133 | 186.464 |
+
+The faster median of each mode is 5.9% and 9.3% lower with packed copies. Earlier runs
+of the standalone candidate at 720p were 167.97/169.33 against 186.35/188.40 ms.
+These are graph timings with no game running. The full Windows/Mesa K-loop gap remains;
+the data do not identify every remaining compiler cost.
+
+Both inputs and all three submission modes keep the pre-change head hashes:
+
+| output | initial head SHA-256 | changed-input head SHA-256 |
+|---|---|---|
+| 320x320 | e62005b80145b97afe06a0db595c306d0137c83e2278be52f1c909018213bcf5 | e7c7278936c65d9cec9f826ac3da1c3ea985c5aca7b6bc48a31e8fbfca90c157 |
+| 1280x720 | c217fd2fdbbe6b79330a7b22990f2c335b75f8c8133a12d9626b83c15ea978c7 | 95f46f6783f34cf106d93408e32735fdaa95bb4698465dba5ea59401e88b70bc |
+
+`test_staged_packed.py` compares 960 output buffers byte for byte with the switch off
+and on: dense and padded operands, scalar/64-bit/128-bit alignment (including a branch
+change between batches), transpose, all simple epilogues and both output widths, changed
+inputs, generic and specialized pipelines, partial rows, and BM64/BK32, BM32/BK32 and
+BM32/BK64. It checks guards and verifies dispatches used the staged family. The earlier
+standalone candidate comparison covered 452 outputs including fused residuals, QKV,
+gathered windows and pooled residuals. SPIR-V validation passed for all candidate builds.
+The final CMake/MinGW build passed all 37 CTest checks, excluding the documented
+`gpu_window_attention` driver hang. That includes denormal, fused residual/QKV, full
+graph, native image, allocator and pipe regressions. The runtime also built with MSVC;
+its staged32 regression passed all 62 cases using the final shaders.
+
+Reproduce after building: run `python src/gpu/test_staged_packed.py`, then run
+`python src/bench/frame_replay.py --size 720 1280 --pairs 12 --json work/replay.json`
+in separate processes with `XMX_STAGED_PACKED=0` and `=1`. Compare both head hashes,
+not just time. Local raw logs and generators are in `work/gemm-windows/`; the final
+measurements are `integrated-*.json`. A game with the new runtime has not been measured.

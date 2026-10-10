@@ -124,11 +124,25 @@ def encode(image, raw, vk_format):
     return pixels.tobytes()
 
 
-def receive(connection, count, probe_ok=False):
+# The buffers a frame arrives in, kept for the next frame of the same size. A fresh one every
+# frame is fresh pages every frame — 3.7 MB at 1280x720, page faults on Windows and a new mmap
+# on Linux — and nothing holds a request past its answer: the daemon answers one frame at a
+# time, decode and encode make arrays of their own, and the answer written into the request's
+# bytes is gone, sent, before the next frame arrives.
+_INBOX = {}
+
+
+def receive(connection, count, probe_ok=False, keep=None):
     # Straight into one buffer where the socket allows it: collecting the chunks and
     # joining them copied the whole frame once more, 0.3 ms at 1280x720.
     into = getattr(connection, "recv_into", None)
-    buffer = bytearray(count) if into is not None else None
+    buffer = None
+    if into is not None:
+        buffer = _INBOX.get(keep)
+        if buffer is None or len(buffer) != count:
+            buffer = bytearray(count)
+            if keep is not None:
+                _INBOX[keep] = buffer
     view = memoryview(buffer) if buffer is not None else None
     chunks, got = [], 0
     while got < count:
@@ -560,6 +574,16 @@ def serve(server, backend, args):
     cost of the copy, and the log fills with one line repeated — so it is said once and the
     daemon exits, which also lets `nr-toggle` and the panel see that there is no model.
     """
+    # On Windows a frame's large arrays go back to the system as they are freed, and the next
+    # frame pays a page fault for every 4 KB of them again; this keeps them (nr_alloc.py).
+    # Here, in the thread that runs the frames, because NumPy's allocator is per context.
+    keeping = None
+    if os.name == "nt":
+        import nr_alloc
+        keeping = nr_alloc if nr_alloc.install() else None
+    if keeping:
+        print("keeping NumPy's large blocks from frame to frame (NR_KEEP_BLOCKS=0 to stop)",
+              flush=True)
     while True:
         connection, _ = server.accept()
         try:
@@ -573,6 +597,8 @@ def serve(server, backend, args):
                   flush=True)
         finally:
             connection.close()
+            if keeping:
+                keeping.frame_done()
 
 
 def process_connection(connection, backend, args):
@@ -588,8 +614,9 @@ def process_connection(connection, backend, args):
         raise ValueError(f"bad magic {magic:#x}")
     if not width or not height or width * height > args.max_pixels:
         raise ValueError(f"rejected extent {width}x{height}; limit {args.max_pixels} pixels")
-    payload = receive(connection, width * height * 4)
-    interface = receive(connection, width * height) if magic == MAGIC_MASKED else None
+    payload = receive(connection, width * height * 4, keep="frame")
+    interface = (receive(connection, width * height, keep="interface")
+                 if magic == MAGIC_MASKED else None)
     if vk_format not in FORMATS:
         print(f"unsupported VkFormat {vk_format}; passing the frame through",
               flush=True)
@@ -876,7 +903,8 @@ def check_half_rounding(tolerance=0):
                                             str(ROOT / "src" / "ref"),
                                             str(ROOT / "src" / "layer"),
                                             str(ROOT / "src")])},
-        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=180)
+        stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=180,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     for line in (r.stdout or "").splitlines():
         print(line, flush=True)
     if r.returncode != 0:
@@ -941,7 +969,9 @@ def half_probe_child():
     names = PROBE_SPELLINGS[nr_build.backend()]
     mismatches = {}
     for name, buf in zip(names, outs):
-        got = buf.view()[:n]
+        # download, not view: on a card whose memory the host cannot map (XMX_STAGING=1
+        # here) a graph buffer has no view, and the daemon died at its first start
+        got = buf.download(np.float32, n)
         bad = ~((got == want) | (np.isnan(got) & np.isnan(want)))
         mismatches[name] = int(bad.sum())
     print("half rounding: " + ", ".join(f"{k} {v}/{n}" for k, v in mismatches.items()),
@@ -962,6 +992,55 @@ def half_probe_child():
               f"({mismatches[names[1]]}/{n} values); half_round uses {used} here",
               flush=True)
     return 0
+
+
+def end_with_game():
+    """End this daemon when the game that started it exits.
+
+    On Windows the layer starts the daemon from inside the game and puts the game's process
+    id in NR_LAYER_SPAWNED. Steam counts every process a game starts as the game, so a daemon
+    that outlived it kept the game running for Steam: Restore Steam refused, and the model
+    stayed in memory until something killed the daemon. A daemon started any other way has
+    no id there and runs until it is stopped, as before; so does Linux's, whose layer marks
+    its child with 1.
+    """
+    try:
+        pid = int(os.environ.get("NR_LAYER_SPAWNED", ""))
+    except ValueError:
+        return None
+    if os.name != "nt" or pid <= 1:
+        return None
+    import ctypes
+    import threading
+    from ctypes import wintypes
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+    kernel32.WaitForSingleObject.restype = wintypes.DWORD
+    kernel32.WaitForSingleObject.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+    synchronize, infinite, no_such_process = 0x00100000, 0xFFFFFFFF, 87
+    # The handle is held from here on, so the id cannot be reused under it.
+    handle = kernel32.OpenProcess(synchronize, False, pid)
+    if not handle:
+        error = ctypes.get_last_error()
+        if error == no_such_process:
+            print(f"the game that started this daemon (process {pid}) has already exited; "
+                  "stopping", flush=True)
+            os._exit(0)
+        print(f"cannot watch the game that started this daemon (process {pid}, WinError "
+              f"{error}); it runs until it is stopped", flush=True)
+        return None
+
+    def wait():
+        kernel32.WaitForSingleObject(handle, infinite)
+        print(f"the game that started this daemon (process {pid}) has exited; stopping",
+              flush=True)
+        os._exit(0)
+
+    print(f"ends with the game that started it (process {pid})", flush=True)
+    thread = threading.Thread(target=wait, name="end-with-game", daemon=True)
+    thread.start()
+    return thread
 
 
 def main():
@@ -1019,6 +1098,8 @@ def main():
         parser.error("--release must be between 0 and 255")
     if not 128.0 <= args.min_extent <= 4096.0:
         parser.error("--min-extent must be between 128 and 4096")
+    # Before the model loads: a game that is closed during the load takes the daemon with it.
+    end_with_game()
     args.live = Settings(args)
     args.history = History()
     args.letterbox = Letterbox()

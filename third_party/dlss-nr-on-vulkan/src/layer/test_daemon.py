@@ -3,6 +3,7 @@
 import contextlib
 import sys
 import io
+import importlib.util
 import pathlib
 import socket
 import struct
@@ -10,12 +11,62 @@ import subprocess
 import tempfile
 import threading
 from types import SimpleNamespace
+from unittest import mock
 import numpy as np
 import nr_daemon as daemon
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 import nr_build  # noqa: E402
+
+
+def pipe_handle_tests():
+    """EOF/read and write failures must still release the owned Win32 handle once.
+
+    Fake kernel calls make the lifetime check run on Linux too; real pipe transport
+    and buffer-copy behavior are covered by test_pipe.py on Windows.
+    """
+    import ctypes
+    closed = []
+
+    class Call:
+        def __init__(self, result):
+            self.result = result
+
+        def __call__(self, *args):
+            return self.result(*args) if callable(self.result) else self.result
+
+    class Kernel:
+        def __init__(self):
+            self.CloseHandle = Call(lambda handle: closed.append(handle) or True)
+
+        def __getattr__(self, name):
+            value = Call(False)
+            setattr(self, name, value)
+            return value
+
+    kernel = Kernel()
+    with mock.patch.object(ctypes, 'WinDLL', return_value=kernel, create=True), \
+            mock.patch.object(ctypes, 'get_last_error', return_value=109, create=True):
+        spec = importlib.util.spec_from_file_location('nr_pipe_lifetime_test', ROOT/'src/layer/nr_pipe.py')
+        pipe = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(pipe)
+        connection = pipe.NamedPipeConnection(101)
+        assert connection.recv_into(bytearray(8)) == 0
+        connection.close()
+        connection.close()
+        assert closed == [101], closed
+        connection = pipe.NamedPipeConnection(102)
+        try:
+            connection.sendall(b'header')
+        except BrokenPipeError:
+            pass
+        else:
+            raise AssertionError('broken write accepted')
+        connection.close()
+        connection.close()
+        assert closed == [101, 102], closed
+    print('named pipe: EOF/broken write still close the handle exactly once')
 
 
 class Request:
@@ -269,6 +320,7 @@ def device_lost_tests():
 
 
 if __name__ == '__main__':
+    pipe_handle_tests()
     request_tests()
     resample_tests()
     letterbox_tests()

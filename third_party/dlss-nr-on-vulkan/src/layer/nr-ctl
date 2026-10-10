@@ -22,6 +22,8 @@ be changed while the effect is off.
 `nr-toggle` is the same three files bound to a key, for when the game has the screen and
 a terminal would mean alt-tabbing out of it.
 """
+import json
+import os
 import pathlib
 import sys
 import textwrap
@@ -85,6 +87,27 @@ def status():
         print("    %-16s %s%s" % (knob, shown, note))
 
 
+def _version(root):
+    """A packaged release does not need Git installed or a checkout beside it."""
+    import subprocess
+    try:
+        metadata = json.loads((root / "release-metadata.json").read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError):
+        metadata = None
+    if isinstance(metadata, dict):
+        commit = metadata.get("source_commit")
+        if isinstance(commit, str) and commit:
+            branch = metadata.get("source_branch")
+            return "release %s%s" % (commit[:12], " (%s)" % branch if isinstance(branch, str) and branch else "")
+        return "packaged release (commit not recorded)"
+    try:
+        version = subprocess.run(["git", "-C", str(root), "log", "--format=%h %cs", "-1"],
+                                 capture_output=True, text=True, timeout=2.0)
+    except (OSError, subprocess.TimeoutExpired):
+        return "not a git clone (Git unavailable or timed out)"
+    return version.stdout.strip() if version.returncode == 0 and version.stdout.strip() else "not a git clone"
+
+
 def report(lines=8):
     """Everything a bug report needs, in one paste.
 
@@ -93,18 +116,19 @@ def report(lines=8):
     running, on which GPU, with which knobs, and what the daemon said about the last frames
     — including the ones it refused.
     """
-    import subprocess
-    here = pathlib.Path(__file__).resolve().parents[2]
-    version = subprocess.run(["git", "-C", str(here), "log", "--format=%h %cs", "-1"],
-                             capture_output=True, text=True)
-    print("  version   %s" % (version.stdout.strip() or "not a git clone"))
+    here = pathlib.Path(os.environ.get("NR_ROOT") or pathlib.Path(__file__).resolve().parents[2])
+    print("  version   %s" % _version(here))
     status()
     log = nr_paths.LOG
     if not log.exists():
         print("  log       %s — nothing yet; the daemon writes it when started by these tools"
               % log)
         return
-    text = log.read_text(errors="replace").splitlines()
+    try:
+        text = log.read_text(encoding="utf-8-sig", errors="replace").splitlines()
+    except OSError as error:
+        print("  log       %s — could not read it: %s" % (log, error))
+        return
     # Logs append across restarts. Do not combine an old device/config with new frames.
     starts = [i for i, line in enumerate(text) if line.startswith("model ready")]
     if starts:

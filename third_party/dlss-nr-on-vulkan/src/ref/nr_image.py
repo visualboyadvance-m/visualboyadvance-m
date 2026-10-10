@@ -11,8 +11,10 @@ temporal composition — are added here. Every function is a transcription of th
 beside it, and the output is required to be byte-identical: `src/ref/test_native_image.py`
 runs both and compares.
 
-`make` builds the library for this host, with `-march=native`, so rebuild it rather than
-copying it. Every pass is split by rows across the library's own thread pool, one thread
+`make` and CMake build the library for `x86-64-v3` on x86-64 (`NR_IMAGE_ARCH`), whose F16C
+turns each half conversion into one instruction rather than a call into libgcc, and for the
+plain architecture elsewhere (arm64 converts through `_Float16` in hardware regardless).
+Every pass is split by rows across the library's own thread pool, one thread
 per core by default (`NR_HOST_THREADS`, else `OMP_NUM_THREADS`, to change it; read once,
 when the library first runs a pass); a row's arithmetic does not depend on which thread
 does it, so the output is the same bytes at any thread count. The pool waits passively,

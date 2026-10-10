@@ -9,7 +9,7 @@ the suite instead:
 
 - every shader the runtime loads is built by both, from the same source with the same defines;
 - every script `make test` runs is registered with CTest;
-- the native passes get the flags their contract rests on in both.
+- the native passes get the flags their contract rests on in both, and the same CPU floor.
 
 In this tree the native passes split their rows on `nr_image.c`'s own thread pool, not
 OpenMP (Apple's clang has none, MSVC's is 2.0), so the check is for the pool's threads.
@@ -96,6 +96,14 @@ def main():
         check(f"the native passes get {flag} from both", flag in rule and flag in cmake)
     check("and the row pool's threads from both",
           "-pthread" in rule and "target_link_libraries(nr_image PRIVATE Threads::Threads)" in cmake)
+    # A release copies the library to other machines, so neither may build it for this one:
+    # the Makefile's x86-64 floor is a named level, the rule compiles with it, and CMake's
+    # default for x86-64 is the same level (its NR_IMAGE_ARCH cache variable, empty elsewhere).
+    floor = re.search(r"^NR_IMAGE_ARCH \?= (-march=\S+)$", make, re.M)
+    floor = floor.group(1) if floor else None
+    check("and the same CPU floor from both", bool(floor) and "$(NR_IMAGE_ARCH)" in rule
+          and f'set(nr_image_arch_default "{floor}")' in cmake and floor != "-march=native"
+          and "-march=native" not in rule, floor or "none")
     if FAILURES:
         print(f"\n{len(FAILURES)} FAILED: " + ", ".join(FAILURES), flush=True)
         return 1

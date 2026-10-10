@@ -59,6 +59,12 @@ layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { 
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float     v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf { f16vec4   v4[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Float4Buf { vec4     v4[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Packed8Buf { uvec4    v8[]; };
+
+/* Raw 128-bit operand copies: faster on Intel's Windows compiler and, where the graph is
+ * large, on Mesa. libxmx sets this on every driver (XMX_STAGED_PACKED=0 to compare); the
+ * loaders below stay for the operands they cannot take. */
+layout(constant_id = 2) const bool STAGED_PACKED = false;
 
 layout(push_constant, scalar) uniform Push {
     HalfBuf a, b; FloatBuf c, d;
@@ -83,6 +89,12 @@ layout(push_constant, scalar) uniform Push {
 layout(scalar) shared Operands {
     float16_t buf_a[BM * SA];
     float16_t buf_b[BK * SB];
+};
+/* The same operand bytes as above, eight halves per vector. SA and SB are multiples
+ * of eight, so both arrays retain exactly the half view's size and byte offset. */
+layout(scalar) shared PackedOperands {
+    uvec4 packed_a[BM * SA / 8u];
+    uvec4 packed_b[BK * SB / 8u];
 };
 layout(scalar) shared Staging {
     float stage[BM * BN];
@@ -123,6 +135,9 @@ void main() {
      * point of staging is to have many wide requests in flight, and scalar fills throw
      * that away. Falls back to scalars when a row stride leaves the base unaligned. */
     Half4Buf a4 = Half4Buf(uint64_t(pc.a)), b4 = Half4Buf(uint64_t(pc.b));
+    Packed8Buf a8 = Packed8Buf(uint64_t(pc.a)), b8 = Packed8Buf(uint64_t(pc.b));
+    bool packed_a_ok = (uint(uint64_t(pc.a)) & 15u) == 0u && (lda & 7u) == 0u && (ao & 7u) == 0u;
+    bool packed_b_ok = (uint(uint64_t(pc.b)) & 15u) == 0u && (ldb & 7u) == 0u && (bo & 7u) == 0u;
     bool wide_a = (uint(uint64_t(pc.a)) & 7u) == 0u && (lda & 3u) == 0u && (ao & 3u) == 0u;
     bool wide_b = (uint(uint64_t(pc.b)) & 7u) == 0u && (ldb & 3u) == 0u && (bo & 3u) == 0u;
 
@@ -151,7 +166,29 @@ void main() {
          * 3 ms at 720p. Neither more blocks nor a deeper K step touched it: 64x16 blocks
          * doubled the blocks and left the call at 0.275 ms, and BK = 64 halved the steps and
          * made it slower. Same values in the same places, so bit-identical. */
-        if (!window_a && wide_a && wide_b && !transposed) {
+        if (STAGED_PACKED && !window_a && packed_a_ok && packed_b_ok && !transposed) {
+            const uint STEP = (32u * WARPS) / 4u;
+            const uint A_PER = BM / STEP, B_PER = BK / STEP;
+            uvec4 ra[A_PER * KC], rb[B_PER];
+            for (uint p = 0u; p < A_PER; p++)
+                for (uint q = 0u; q < KC; q++) {
+                    uint at = ao + min(row + lr + p * STEP, last) * lda + k0 + q * 32u + lc;
+                    ra[p * KC + q] = a8.v8[at >> 3];
+                }
+            for (uint p = 0u; p < B_PER; p++) {
+                uint at = bo + (k0 + lr + p * STEP) * ldb + col + lc;
+                rb[p] = b8.v8[at >> 3];
+            }
+            for (uint p = 0u; p < A_PER; p++)
+                for (uint q = 0u; q < KC; q++) {
+                    uint r = lr + p * STEP, c = q * 32u + lc;
+                    packed_a[(r * SA + c) >> 3] = ra[p * KC + q];
+                }
+            for (uint p = 0u; p < B_PER; p++) {
+                uint kk = lr + p * STEP;
+                packed_b[(kk * SB + lc) >> 3] = rb[p];
+            }
+        } else if (!window_a && wide_a && wide_b && !transposed) {
             const uint STEP = (32u * WARPS) / 4u;
             const uint A_PER = BM / STEP, B_PER = BK / STEP;
             f16vec4 ra[A_PER * KC * 2u], rb[B_PER * 2u];

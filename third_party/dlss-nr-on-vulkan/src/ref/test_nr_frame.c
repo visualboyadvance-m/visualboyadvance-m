@@ -263,13 +263,44 @@ int main(int argc, char **argv)
     nr_frame *frame = nr_frame_open(weights);
     if (!frame) { fprintf(stderr, "nr_frame_open: %s\n", nr_frame_error()); return 1; }
     printf("C library on %s: %s\n", nr_frame_device(frame), nr_frame_gemm_path(frame));
-    printf("  discrete %d, float16 subnormals kept %d, half_round by cast %d, features in the mapped input %d\n",
-           nr_frame_discrete(), nr_frame_preserve16(), nr_frame_half_by_cast(), nr_frame_input_view(frame));
-    check("runtime: the three answers about it are a yes or a no once a frame is open",
+    printf("  discrete %d, float16 subnormals kept %d, half_round by cast %d, packed staged copies %d, "
+           "packed portable fetch %d, features in the mapped input %d\n",
+           nr_frame_discrete(), nr_frame_preserve16(), nr_frame_half_by_cast(), nr_frame_staged_packed(),
+           nr_frame_portable_packed(), nr_frame_input_view(frame));
+    check("runtime: the five answers about it are a yes or a no once a frame is open",
           (nr_frame_discrete() == 0 || nr_frame_discrete() == 1)
           && (nr_frame_preserve16() == 0 || nr_frame_preserve16() == 1)
-          && (nr_frame_half_by_cast() == 0 || nr_frame_half_by_cast() == 1), NULL);
+          && (nr_frame_half_by_cast() == 0 || nr_frame_half_by_cast() == 1)
+          && (nr_frame_staged_packed() == 0 || nr_frame_staged_packed() == 1)
+          && (nr_frame_portable_packed() == 0 || nr_frame_portable_packed() == 1), NULL);
+    {
+        /* on by default where there is a staged kernel (Vulkan, Metal), off under the switch
+         * and on Direct3D 12, which has none; the portable fetch is off unless asked for */
+        const char *staged = getenv("XMX_STAGED_PACKED"), *portable = getenv("XMX_PORTABLE_PACKED");
+        int d3d12 = !strcmp(nr_frame_runtime(), "d3d12");
+        check("runtime: the packed staged copies follow XMX_STAGED_PACKED, on by default",
+              nr_frame_staged_packed() == (d3d12 || (staged && !strcmp(staged, "0")) ? 0 : 1), NULL);
+        check("runtime: the packed portable fetch follows XMX_PORTABLE_PACKED, off by default",
+              nr_frame_portable_packed() == (portable && !strcmp(portable, "1") ? 1 : 0), NULL);
+    }
     check("runtime: the input view is a yes or a no", nr_frame_input_view(frame) == 0 || nr_frame_input_view(frame) == 1, NULL);
+    {
+        /* the weights this open read: prepared (the derived tensors in) and, prepared or a
+         * plain logical file, every tensor read in place rather than copied — the compiled-in
+         * slices are cut at tensor boundaries and a file is mapped whole */
+        char detail[128];
+        snprintf(detail, sizeof detail, "prepared %d, %zu of %zu tensors read in place",
+                 nr_frame_prepared(frame), nr_frame_weights_aliased(frame), nr_frame_weights_count(frame));
+        /* a logical file's F32 tensors may sit at an offset only 2-aligned, and those are
+         * copied; a prepared file (F32 first) and the compiled-in slices alias every one */
+        int all = nr_frame_weights_aliased(frame) == nr_frame_weights_count(frame);
+        check("weights: the open says whether they were prepared, and reads them in place",
+              (nr_frame_prepared(frame) == 0 || nr_frame_prepared(frame) == 1)
+              && nr_frame_weights_count(frame) > 0 && nr_frame_weights_aliased(frame) > 0
+              && (all || !nr_frame_prepared(frame)), detail);
+        if (!weights)
+            check("weights: the compiled-in weights are the prepared format", nr_frame_prepared(frame) == 1, detail);
+    }
 
     int height = 200, width = 176;                       /* network extent 320x320, both mirrored */
     int H, W;

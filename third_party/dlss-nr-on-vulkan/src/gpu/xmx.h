@@ -56,6 +56,21 @@ int xmx_preserve16(void);
  * has one spelling, the cast; libd3dmx one, `f16tof32(f32tof16(x))`. The daemon's start-up
  * probe checks the one in use. */
 int xmx_half_by_cast(void);
+/* Whether the staged GEMM's loader copies its operands global-to-shared as raw 128-bit
+ * vectors (1, the default: 6-9 % of the graph on Intel's Windows compiler, ~2 % at 720p on
+ * Mesa, 4 % on an M3's Metal 3.1 path, the same bits) or as pairs of half4 (0,
+ * `XMX_STAGED_PACKED=0`, the comparison). libxmx's constant 2 on gemm_staged.comp,
+ * libmetalmx's function constant 3 on its staged kernel; libd3dmx has no staged kernel and
+ * answers 0. Fixed before the pipelines are built, so a runtime answers the same for its
+ * whole life. */
+int xmx_staged_packed(void);
+/* The same idea in the portable GEMM — the plain form's A fetched sixteen bytes, eight K
+ * terms, at a time (gemm_portable.comp constant 3, gemm_portable.metal function constant 4,
+ * gemm_portable.hlsl flag 0x8000000 set by libd3dmx on every GEMM): the same sums in the same
+ * order, and off by default, `XMX_PORTABLE_PACKED=1` to try it — on an M3 both portable paths
+ * measured slower with it, since the compiler already combines the eight-byte fetches, and
+ * no Direct3D 12 device has measured it. */
+int xmx_portable_packed(void);
 size_t xmx_embedded_shader(const char *name);
 
 /* the plain GEMM path */

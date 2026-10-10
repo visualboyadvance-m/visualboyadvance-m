@@ -56,6 +56,15 @@ layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf   {
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf  { float     v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 8)  buffer Half4Buf  { f16vec4   v4[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Float4Buf { vec4      v4[]; };
+layout(buffer_reference, scalar, buffer_reference_align = 16) buffer Packed8Buf { uvec4    v8[]; };
+
+/* The staged kernel's packed loader (gemm_staged.comp, specialization constant 2) as this
+ * kernel can take it: the plain form fetches A sixteen bytes — eight K terms — at a time
+ * where the addresses allow; the sums are the eight-byte path's bit for bit. Its own
+ * constant, 3, and off by default: through MoltenVK on an M3 the compiler already combines
+ * the eight-byte fetches, and this path measured slower (XMX_PORTABLE_PACKED=1 to try it on
+ * another device). */
+layout(constant_id = 3) const bool PORTABLE_PACKED = false;
 
 layout(push_constant, scalar) uniform Push {
     HalfBuf a, b; FloatBuf c, d;
@@ -207,6 +216,30 @@ void main() {
                 ACC av = ACC(pc.a.v[ao + (row + r + i * TM) * lda + k]);
                 for (uint j = 0; j < RN; j++)
                     acc[i][j] += av * bv[j];
+            }
+        }
+    } else if (PORTABLE_PACKED && (ldb & 3u) == 0u && (lda & 7u) == 0u && (pc.k & 7u) == 0u
+               && (bo & 3u) == 0u && (ao & 7u) == 0u
+               && (uint(uint64_t(pc.a)) & 15u) == 0u && (uint(uint64_t(pc.b)) & 7u) == 0u) {
+        /* The plain form with A fetched sixteen bytes at a time (PORTABLE_PACKED above), a
+         * lane's four B columns one eight-byte fetch as below; each K term still goes into
+         * the accumulator alone and in order, so the sums are the eight-byte path's. */
+        for (uint k0 = 0; k0 < pc.k; k0 += 8u) {
+            ACC4 as8[RM][2];
+            for (uint i = 0; i < RM; i++) {
+                uvec4 w = Packed8Buf(uint64_t(pc.a)).v8[(ao + (row + r + i * TM) * lda + k0) >> 3];
+                as8[i][0] = ACC4(f16vec4(unpackFloat2x16(w.x), unpackFloat2x16(w.y)));
+                as8[i][1] = ACC4(f16vec4(unpackFloat2x16(w.z), unpackFloat2x16(w.w)));
+            }
+            for (uint kk = 0; kk < 8u; kk++) {
+                ACC4 bv[RN];
+                for (uint j = 0; j < RN; j++)
+                    bv[j] = ACC4(Half4Buf(uint64_t(pc.b)).v4[(bo + (k0 + kk) * ldb + col + cq + j * TN) >> 2]);
+                for (uint i = 0; i < RM; i++) {
+                    ACC av = as8[i][kk >> 2][kk & 3u];
+                    for (uint j = 0; j < RN; j++)
+                        acc[i][j] += av * bv[j];
+                }
             }
         }
     } else if ((ldb & 3u) == 0u && (lda & 3u) == 0u && (pc.k & 3u) == 0u

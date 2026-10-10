@@ -28,6 +28,7 @@ DLL=""
 NAME="libnr_layer.so"
 SKIP_WEIGHTS=0
 DRY_RUN=0
+NR_SETUP_PYTHON="${NR_PYTHON:-python3}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -142,15 +143,15 @@ if [[ $SKIP_WEIGHTS -eq 0 ]]; then
   fi
 
   # ---- 2. Python ----
-  command -v python3 >/dev/null || { echo "ERROR: python3 not found on PATH." >&2; exit 3; }
-  if ! python3 -c "import numpy, safetensors" >/dev/null 2>&1; then
+  command -v "$NR_SETUP_PYTHON" >/dev/null || { echo "ERROR: Python 3 not found: $NR_SETUP_PYTHON" >&2; exit 3; }
+  if ! "$NR_SETUP_PYTHON" -c "import numpy, safetensors" >/dev/null 2>&1; then
     echo "ERROR: Python is missing the packages the extractor needs." >&2
     echo "       Run:  python3 -m pip install numpy safetensors" >&2
     exit 3
   fi
   echo "[2/4] extracting weights from $DLL"
   echo "      (a few minutes; the DLL is read, nothing is written back to it)"
-  python3 "$HERE/scripts/get_weights.py" "$DLL" --work-dir "$HERE/work"
+  "$NR_SETUP_PYTHON" "$HERE/scripts/get_weights.py" "$DLL" --work-dir "$HERE/work"
   [[ -f "$weights" ]] || { echo "ERROR: extraction reported success but $weights is missing." >&2; exit 3; }
   echo
 fi
@@ -171,7 +172,7 @@ if [[ ${DRY_RUN:-0} -eq 1 ]]; then
   echo
   echo "[dry run] nothing was written"
   echo "  would install $HERE/nr_layer.so to $GAME/dlss-nr/$NAME"
-  echo "  would write $GAME/dlss-nr/VkLayer_dlss_nr.json with an absolute library_path"
+  echo "  would write $GAME/dlss-nr/VkLayer_dlss_nr.json with library_path ./$NAME"
   echo "  would copy the runtime: work/mlx-dlss, work/*.spv, work/*.so"
   if [[ -f "$weights" ]]; then
     echo "  weights: present, and are NOT copied - the layer points at this folder"
@@ -191,8 +192,13 @@ echo "  layer:      $DEST/$NAME"
 MANIFEST="$HERE/VkLayer_dlss_nr.json"
 [[ -f "$MANIFEST" ]] || MANIFEST="$HERE/src/layer/VkLayer_dlss_nr.json"
 [[ -f "$MANIFEST" ]] || { echo "ERROR: no VkLayer_dlss_nr.json in the release." >&2; exit 3; }
-sed "s|LIBRARY_PATH_PLACEHOLDER|$DEST/$NAME|g" "$MANIFEST" > "$DEST/VkLayer_dlss_nr.json"
-echo "  manifest:   $DEST/VkLayer_dlss_nr.json"
+# `./NAME`, not an absolute path and not a bare name. A bare name goes to dlopen, which
+# searches the system library path rather than the manifest's own folder, and the layer
+# then fails to load with `create instance: -6` (6083140, measured on Linux). An absolute
+# path also works, but `./NAME` is what tools/deploy.sh installs with and what was verified
+# there, so both scripts write the same thing for the same platform.
+sed "s|LIBRARY_PATH_PLACEHOLDER|./$NAME|g" "$MANIFEST" > "$DEST/VkLayer_dlss_nr.json"
+echo "  manifest:   $DEST/VkLayer_dlss_nr.json  library_path = ./$NAME"
 
 for d in layer ref gpu bench; do
   [[ -d "$HERE/src/$d" ]] && cp -r "$HERE/src/$d" "$DEST/src/$d"
@@ -208,18 +214,21 @@ LAUNCH="$DEST/launch-nr.sh"
   echo '#!/usr/bin/env bash'
   echo 'set -e'
   echo '# The loader finds the layer through VK_LAYER_PATH plus the manifest.'
-  echo "export VK_LAYER_PATH=\"$DEST\""
+  printf 'export VK_LAYER_PATH=%q\n' "$DEST"
   echo 'export VK_INSTANCE_LAYERS=VK_LAYER_dlssnr_intel'
   echo 'export ENABLE_NR_LAYER=1'
   echo 'export NR_LAYER_SPAWN=1'
   echo 'export NR_LAYER_LIVE=1'
   echo 'export NR_LAYER_SOCKET="${NR_LAYER_SOCKET:-/tmp/nr_layer.sock}"'
   echo '# The weights stay in the release folder.'
-  echo "export NR_ROOT=\"$HERE\""
+  printf 'export NR_ROOT=%q\n' "$HERE"
+  printf 'export NR_SETTINGS=%q\n' "$HERE/work/nr_settings.json"
+  printf 'export NR_LAYER_LOG=%q\n' "$HERE/work/nr_daemon.log"
+  printf 'export NR_LAYER_TRIGGER=%q\n' "$HERE/work/nr_trigger"
   echo ''
   echo 'GAME_EXE="${GAME_EXE:-}"'
   echo 'if [[ -z "$GAME_EXE" ]]; then'
-  echo "  GAME_EXE=\$(find '$GAME' -maxdepth 1 -type f -perm -u+x ! -name '*.so' ! -name '*.dll' | head -1)"
+  printf '  GAME_EXE=$(find %q -maxdepth 1 -type f -perm -u+x ! -name "*.so" ! -name "*.dll" | head -1)\n' "$GAME"
   echo 'fi'
   echo 'if [[ -z "$GAME_EXE" ]]; then echo "Set GAME_EXE in this file" >&2; exit 1; fi'
   echo 'exec "$GAME_EXE" "$@"'

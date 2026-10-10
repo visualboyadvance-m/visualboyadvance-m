@@ -82,6 +82,28 @@ nr_frame *nr_frame_open(const char *weights_path);
 
 /* The size of the embedded safetensors, or 0 when this build carries none. */
 size_t nr_frame_embedded_weights_size(void);
+
+/* Write the weights as a prepared file: the logical safetensors (from `weights_path`, or the
+ * compiled-in weights for NULL) with the loaders' layout work already done — the branched
+ * blocks' fused expansion, the window biases in logical order, the head matrix, the merge's
+ * sine and cosine joined — so an open from it, on any runtime, uploads what it reads. The
+ * originals are kept, so `nr_frame_open` takes either file and the device receives the same
+ * bytes from both, and the Python graph reads either too (`nr_model.load_logical`). Since v2
+ * the tensors are written F32 first, then F16, so every offset is aligned to its element and a
+ * reader points into the file (or the compiled-in slices) instead of copying. Preparing a
+ * prepared file keeps what is there. Needs no device. 0, or -1 with `nr_frame_error()`.
+ * `nr_frame --prepare OUT [--weights IN]` is this. The file derives from NVIDIA's weights and
+ * is never committed or redistributed, as the logical one is not; the compiled-in weights
+ * (`weights/`, regenerated from `dlssnr-prepared.safetensors`) are this format. */
+int nr_frame_prepare(const char *weights_path, const char *out_path);
+/* Whether the weights this frame opened were prepared (the metadata says so: the derived
+ * tensors are in, and from `v2` the layout lets the reader alias every tensor); -1 for NULL.
+ * The compiled-in weights are prepared since 2026-10-10. And how many of the tensors were
+ * read in place — out of the compiled-in slices or the file's mapping — rather than copied,
+ * of how many there are: with prepared weights and slices cut at tensor boundaries, all. */
+int nr_frame_prepared(const nr_frame *frame);
+size_t nr_frame_weights_aliased(const nr_frame *frame);
+size_t nr_frame_weights_count(const nr_frame *frame);
 void nr_frame_close(nr_frame *frame);
 
 /* Share a host's Vulkan instance and device instead of letting libxmx create its own.
@@ -168,6 +190,13 @@ const char *nr_frame_gemm_path(nr_frame *frame);
 int nr_frame_discrete(void);
 int nr_frame_preserve16(void);
 int nr_frame_half_by_cast(void);
+/* And two more: whether the staged kernel copies its operands global-to-shared as raw 128-bit
+ * vectors (`xmx_staged_packed`: 1 by default on Vulkan and Metal, 0 under
+ * `XMX_STAGED_PACKED=0`, always 0 on Direct3D 12, which has no staged kernel), and whether
+ * the portable GEMM fetches A that way (`xmx_portable_packed`: 0 by default on every runtime,
+ * 1 under `XMX_PORTABLE_PACKED=1`). The same bits either way. */
+int nr_frame_staged_packed(void);
+int nr_frame_portable_packed(void);
 /* Whether this frame builds its half features in the graph's mapped input itself (1) or on
  * the host and copies them in (0): NR_INPUT_VIEW, defaulting to 0 only on a discrete card
  * under Windows, where one driver returned NaN for the mapped path (HANDOFF, 2026-10-02). */

@@ -9,8 +9,8 @@ both sides can reach (see the t15 build notes, section A.7).
 The bytes are unchanged: 16-byte header, then the colour, then the mask for a
 masked frame. Only the endpoint changes, so this module reproduces just enough
 of the `socket` interface for `nr_daemon` — `.accept()` on the server, and
-`.recv()` / `.sendall()` / `.settimeout()` / `.close()` on a connection — so the
-daemon's frame loop stays as it is.
+`.recv()` / `.recv_into()` / `.sendall()` / `.settimeout()` / `.close()` on a
+connection — so the daemon's frame loop stays as it is.
 
 `CreateNamedPipe` is reached through `ctypes` on kernel32: the machine has no
 `pywin32`, and the standard library is enough (measured in section A.7.9).
@@ -65,32 +65,57 @@ class NamedPipeConnection:
 
     def recv(self, count):
         """Read up to `count` bytes; b'' when the peer closed cleanly."""
+        buf = bytearray(count)
+        return bytes(buf[:self.recv_into(buf, count)])
+
+    def recv_into(self, buffer, count=0):
+        """Read up to `count` bytes (all `buffer` holds when 0) straight into `buffer`, as a
+        socket's `recv_into` does; 0 when the peer closed cleanly. `nr_daemon.receive` takes
+        this path: a frame then lands in its buffer with no copy on the way, where reading
+        each megabyte into a fresh buffer of its own, copying it out and joining the pieces
+        took 3.5 ms of a 1280x720 frame against Linux's 0.9."""
         if not self._open:
-            return b""
-        while True:
-            buf = ctypes.create_string_buffer(count)
-            got = wintypes.DWORD(0)
-            ok = _k32.ReadFile(self._handle, buf, count, ctypes.byref(got), None)
-            if ok:
-                return buf.raw[:got.value]
-            err = ctypes.get_last_error()
-            if err in (ERROR_BROKEN_PIPE, ERROR_NO_DATA):
-                # The layer closed its end: clean EOF, not a failure.
-                self._open = False
-                return b""
-            # A byte-mode pipe on a blocking ReadFile returns only when data
-            # arrives or the peer closes; this path is unexpected rather than a
-            # timeout, so it surfaces as an error the daemon's frame loop can
-            # already swallow ("frame rejected/failed").
-            raise OSError(err, "ReadFile")
+            return 0
+        view = memoryview(buffer).cast("B")
+        count = min(count or len(view), len(view))
+        if not count:
+            return 0
+        target = (ctypes.c_char * count).from_buffer(view)
+        got = wintypes.DWORD(0)
+        if _k32.ReadFile(self._handle, target, count, ctypes.byref(got), None):
+            return got.value
+        err = ctypes.get_last_error()
+        if err in (ERROR_BROKEN_PIPE, ERROR_NO_DATA):
+            # The layer closed its end: clean EOF, not a failure.
+            self._open = False
+            return 0
+        # A byte-mode pipe on a blocking ReadFile returns only when data
+        # arrives or the peer closes; this path is unexpected rather than a
+        # timeout, so it surfaces as an error the daemon's frame loop can
+        # already swallow ("frame rejected/failed").
+        raise OSError(err, "ReadFile")
 
     def sendall(self, data):
-        view = memoryview(data)
+        """Write all of `data` from where it lies. A writable buffer — the answer the daemon
+        composes into the request's own bytes — is handed to WriteFile as it is, and so is
+        `bytes`; copying the frame twice on the way out took 2.7 ms of a 1280x720 frame
+        against Linux's 0.75. WriteFile on this blocking pipe returns once the bytes are the
+        pipe's, so the caller may reuse its buffer straight after."""
+        view = memoryview(data).cast("B")
+        total = len(view)
+        if not total:
+            return
+        if view.readonly:
+            whole = data if isinstance(data, bytes) else view.tobytes()
+            holder = ctypes.c_char_p(whole)
+            base = ctypes.cast(holder, ctypes.c_void_p).value
+        else:
+            holder = (ctypes.c_char * total).from_buffer(view)
+            base = ctypes.addressof(holder)
         sent = 0
-        while sent < len(view):
-            buf = ctypes.create_string_buffer(bytes(view[sent:]))
+        while sent < total:
             written = wintypes.DWORD(0)
-            ok = _k32.WriteFile(self._handle, buf, len(view) - sent,
+            ok = _k32.WriteFile(self._handle, ctypes.c_void_p(base + sent), total - sent,
                                 ctypes.byref(written), None)
             if not ok:
                 err = ctypes.get_last_error()
@@ -101,11 +126,16 @@ class NamedPipeConnection:
             if written.value == 0:
                 raise OSError(errno.EPIPE, "WriteFile wrote nothing")
             sent += written.value
+        del holder
 
     def close(self):
-        if self._open:
+        # EOF/broken-pipe marks the stream unusable but does not release its handle.
+        # Status probes close without sending a header, so this distinction matters
+        # even when every real frame succeeds. Release once, independent of _open.
+        if self._handle is not None:
             _k32.CloseHandle(self._handle)
-            self._open = False
+            self._handle = None
+        self._open = False
 
     def __enter__(self):
         return self

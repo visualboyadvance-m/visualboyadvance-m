@@ -5,6 +5,22 @@
 GLSL    := glslangValidator --target-env vulkan1.3 -Isrc/gpu
 # The interpreter the tests run under: `make test PYTHON=python3.12` to pick another.
 PYTHON  ?= python3
+# The CPU the host passes are built for. Upstream's floor is x86-64-v3 — every CPU since
+# Haswell and Zen 1 — whose F16C makes each `_Float16` conversion one instruction; without it
+# each is a call into libgcc, and a frame was 5-13 % slower. On Lunar Lake v3 is as fast as
+# -march=native and byte-identical, and a release built with it runs on other machines. This
+# tree also builds on arm64 (Apple silicon, Android), where that flag means nothing, so the
+# floor is the host's architecture: v3 on x86-64, and nothing on the rest. arm64 needs none:
+# FCVT between half and single is base ARMv8.0, so `_Float16` is one instruction there from
+# any -march, and a compiler without the type takes NEON's by hand (nr_portable.h).
+# CMakeLists.txt uses the same rule (build_check.py); `make NR_IMAGE_ARCH=-march=native`
+# overrides it.
+UNAME_M := $(shell uname -m)
+ifneq ($(filter x86_64 amd64,$(UNAME_M)),)
+NR_IMAGE_ARCH ?= -march=x86-64-v3
+else
+NR_IMAGE_ARCH ?=
+endif
 # This build lands in work/; CMake lands in its build directory. The Python finds either
 # through `src/nr_build.py`, newest build first, and this pins it for the targets below so
 # `make test` runs what `make` built even when a CMake build is more recent.
@@ -159,6 +175,8 @@ test-metal: work/libmetalmx$(SO)
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_graph.py
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_frame_execution.py
 	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_resident.py
+	NR_GPU_BACKEND=metal $(PYTHON) src/gpu/test_staged_packed.py
+	NR_GPU_BACKEND=metal XMX_PORTABLE=1 $(PYTHON) src/gpu/test_staged_packed.py
 	NR_GPU_BACKEND=metal $(PYTHON) src/ref/test_nr_frame_c.py --reference work/nr_frame_reference_metal.bin
 	NR_GPU_BACKEND=metal work/test_nr_frame --reference work/nr_frame_reference_metal.bin
 	NR_GPU_BACKEND=metal $(PYTHON) src/ref/test_nr_frame_live.py
@@ -168,24 +186,30 @@ test-metal: work/libmetalmx$(SO)
 work/MoltenVK_icd.json: Makefile | work
 	printf '{\n  "file_format_version": "1.0.0",\n  "ICD": {\n    "library_path": "%s/libMoltenVK.dylib",\n    "api_version": "1.4.0",\n    "is_portability_driver": true\n  }\n}\n' "$(MVK_LIBDIR)" > $@
 
-# The host passes in C. Built for this machine: `-march=native`, so rebuild it rather
-# than copy it. The FP16 casts and the separate multiply and add are the contract —
-# fused multiply-add or fast maths would change the last bit and the output must be
-# byte-identical to the NumPy it replaces (src/ref/test_native_image.py). Each pass is
-# split by rows across nr_image.c's own thread pool (upstream uses OpenMP, which Apple's
-# clang lacks); no row reads another's result, so the bytes do not depend on it.
+# The host passes in C, for `NR_IMAGE_ARCH` above. The FP16 casts and the separate multiply
+# and add are the contract — fused multiply-add or fast maths would change the last bit and
+# the output must be byte-identical to the NumPy it replaces (src/ref/test_native_image.py).
+# Each pass is split by rows across nr_image.c's own thread pool (upstream uses OpenMP, which
+# Apple's clang lacks); no row reads another's result, so the bytes do not depend on it.
 # `-fno-trapping-math` changes no value — only whether a comparison may raise a floating-
 # point exception flag nobody reads — and it is what lets the compiler turn the clamps into
 # selects and vectorise the fused composition's pixels (`compose_encode_row`).
-work/libnr_image$(SO): src/ref/nr_image.c src/ref/nr_image.h Makefile | work
-	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
+#
+# `work/nr_image.arch` holds the flags the library was last built with, so one built with
+# other flags (NR_IMAGE_ARCH given by hand) is rebuilt by the next `make` rather than called
+# up to date by its time. That is how a release build left a checkout's library without F16C.
+work/nr_image.arch: FORCE | work
+	@echo '$(NR_IMAGE_ARCH)' | cmp -s - $@ || echo '$(NR_IMAGE_ARCH)' > $@
+FORCE:
+work/libnr_image$(SO): src/ref/nr_image.c src/ref/nr_image.h Makefile work/nr_image.arch | work
+	$(CC) -O3 $(NR_IMAGE_ARCH) -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math \
 	      -fno-trapping-math -pthread -shared -o $@ $< -lm
 
 # nr_frame.py as a C library: the feature assembly, the whole graph recorded against
 # libxmx (reached by dlopen from this directory), and the composition. The image passes
 # are the same object as libnr_image; the frame code has the same no-FMA contract.
-work/nr_image.o: src/ref/nr_image.c src/ref/nr_image.h | work
-	$(CC) -O3 -march=native -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -fno-trapping-math -pthread -c -o $@ $<
+work/nr_image.o: src/ref/nr_image.c src/ref/nr_image.h work/nr_image.arch | work
+	$(CC) -O3 $(NR_IMAGE_ARCH) -fPIC -Wall -Wextra -ffp-contract=off -fno-fast-math -fno-trapping-math -pthread -c -o $@ $<
 work/nr_frame.o: src/ref/nr_frame.c src/ref/nr_frame.h src/ref/nr_image.h | work
 	$(CC) -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -ffp-contract=off -fno-fast-math -c -o $@ $<
 work/libnr_frame$(SO): work/nr_frame.o work/nr_image.o
@@ -339,6 +363,7 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/tools/publish_check.py
 	$(PYTHON) src/tools/claims_check.py
 	$(PYTHON) src/tools/build_check.py
+	$(PYTHON) src/tools/test_release.py
 	$(PYTHON) src/bench/frame_profile.py --tables
 	$(PYTHON) src/gpu/test_portable.py
 	XMX_PORTABLE=1 $(PYTHON) src/gpu/test_portable.py
@@ -372,6 +397,7 @@ test: all work/attention_ab.spv work/test_exchange work/test_settled work/test_p
 	$(PYTHON) src/gpu/test_ffn_fused.py
 	$(PYTHON) src/gpu/test_staged_partial.py
 	$(PYTHON) src/gpu/test_staged32.py
+	$(PYTHON) src/gpu/test_staged_packed.py
 
 # Focused checks for the FFN schedule, including a complete frame with both variants.
 # Repeat with XMX_STAGING=1 to cover device buffers without host mappings.
@@ -390,4 +416,11 @@ test-proton: all work/libnr_layer32$(SO) work/test_layer_loader work/test_layer_
 publish-check:
 	$(PYTHON) src/tools/publish_check.py --history
 
-.PHONY: all test test-metal test-ffn test-proton bench publish-check
+# The prepared weights (`nr_frame --prepare`): the logical file with the loaders' derived
+# tensors, F32 first then F16, which the Python graph and the C library both read and which
+# the CMake build compiles in (weights/). make embeds nothing itself.
+prepare-weights: work/nr_frame
+	mkdir -p work/mlxw
+	work/nr_frame --prepare work/mlxw/dlssnr-prepared.safetensors $(if $(wildcard work/mlxw/dlssnr-logical.safetensors),--weights work/mlxw/dlssnr-logical.safetensors,)
+
+.PHONY: all test test-metal test-ffn test-proton bench publish-check prepare-weights

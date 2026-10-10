@@ -325,8 +325,9 @@ kernel void gemm_staged_t(constant Push &pc [[buffer(0)]],
     const uint S_RM = S_WM / TM, S_RN = S_WN / TN;
     const uint S_SA = S_BK + 8, S_SB = S_BN + 8;     /* eight halves of pad against bank conflicts */
     const uint KC = S_BK / 32u;                       /* 32-column chunks of an A row per K step */
-    threadgroup half buf_a[S_BM * S_SA];
-    threadgroup half buf_b[S_BK * S_SB];
+    /* 16-byte aligned: the packed loader below stores into them as uint4 */
+    alignas(16) threadgroup half buf_a[S_BM * S_SA];
+    alignas(16) threadgroup half buf_b[S_BK * S_SB];
     threadgroup float stage[S_BM * S_BN];
 
     uint row = wg.y * S_BM, col = wg.x * S_BN;
@@ -439,6 +440,17 @@ kernel void gemm_staged_t(constant Push &pc [[buffer(0)]],
     device const half4 *b4 = reinterpret_cast<device const half4 *>(B);
     bool wide_a = (pc.a & 7u) == 0u && (lda & 3u) == 0u && (ao & 3u) == 0u;
     bool wide_b = (pc.b & 7u) == 0u && (ldb & 3u) == 0u && (bo & 3u) == 0u;
+    /* Or as one 128-bit load and one 128-bit threadgroup store, libxmx's packed staged loader
+     * (gemm_staged.comp, STAGED_PACKED): the thread's eight halves are one uint4 in global
+     * memory and one in the tile, since S_SA and S_SB are multiples of eight and the thread's
+     * column is. The same bits in the same places, so bit-identical to the loops below. */
+    device const uint4 *a8 = reinterpret_cast<device const uint4 *>(A);
+    device const uint4 *b8 = reinterpret_cast<device const uint4 *>(B);
+    threadgroup uint4 *packed_a = reinterpret_cast<threadgroup uint4 *>(buf_a);
+    threadgroup uint4 *packed_b = reinterpret_cast<threadgroup uint4 *>(buf_b);
+    bool packed_a_ok = (pc.a & 15u) == 0u && (lda & 7u) == 0u && (ao & 7u) == 0u;
+    bool packed_b_ok = (pc.b & 15u) == 0u && (ldb & 7u) == 0u && (bo & 7u) == 0u;
+    bool packed = staged_packed && !window_a && !transposed && packed_a_ok && packed_b_ok;
     /* a window-gathered A's row bases, found once rather than at every K step */
     const uint ROWS_PER = S_BM / ((32u * S_WARPS) / 4u);
     int bases[ROWS_PER];
@@ -447,6 +459,31 @@ kernel void gemm_staged_t(constant Push &pc [[buffer(0)]],
 
     for (uint k0 = 0; k0 < pc.k; k0 += S_BK) {
         threadgroup_barrier(mem_flags::mem_threadgroup);
+        if (packed) {
+            /* every global load of the step issued before any store, as the GLSL does */
+            const uint STEP = (32u * S_WARPS) / 4u;
+            const uint A_PER = S_BM / STEP, B_PER = S_BK / STEP;
+            uint4 ra[A_PER * KC], rb[B_PER];
+            for (uint p = 0; p < A_PER; p++)
+                for (uint q = 0; q < KC; q++) {
+                    uint at = ao + min(row + lr + p * STEP, last) * lda + k0 + q * 32u + lc;
+                    ra[p * KC + q] = a8[at >> 3];
+                }
+            for (uint p = 0; p < B_PER; p++) {
+                uint at = bo + (k0 + lr + p * STEP) * ldb + col + lc;
+                rb[p] = b8[at >> 3];
+            }
+            for (uint p = 0; p < A_PER; p++)
+                for (uint q = 0; q < KC; q++) {
+                    uint r = lr + p * STEP, c = q * 32u + lc;
+                    packed_a[(r * S_SA + c) >> 3] = ra[p * KC + q];
+                }
+            for (uint p = 0; p < B_PER; p++) {
+                uint kk = lr + p * STEP;
+                packed_b[(kk * S_SB + lc) >> 3] = rb[p];
+            }
+            threadgroup_barrier(mem_flags::mem_threadgroup);
+        } else {
         for (uint q = 0; q < KC; q++)
         for (uint r = lr, t = 0; r < S_BM; r += (32u * S_WARPS) / 4u, t++) {
             uint c0 = q * 32u + lc;                  /* this chunk's columns */
@@ -495,6 +532,7 @@ kernel void gemm_staged_t(constant Push &pc [[buffer(0)]],
             }
         }
         threadgroup_barrier(mem_flags::mem_threadgroup);
+        }   /* !packed */
 
         for (uint kk = 0; kk < S_BK; kk += TK) {
             for (uint i = 0; i < S_RM; i++)

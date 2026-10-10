@@ -71,6 +71,14 @@ OpenDLSS-NR — https://github.com/maanHimself/OpenDLSS-NR
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+DXVK — https://github.com/doitsujin/dxvk
+  Copyright (c) 2017 Philip Rebohle, (c) 2019 Joshua Ashton, (c) 2019 Robin Kertels,
+  (c) 2023 Jeffrey Ellison; licensed under the zlib/libpng licence.
+  Windows releases carry its unmodified release binaries in `dxvk/`, with its licence as
+  `dxvk/LICENSE` (version and SHA-256 pinned in `dist-tools/dxvk.json`); the setup window
+  puts them beside a DirectX 8-11 game and takes them away again. They are fetched at
+  release time and are not in this repository.
+
 Vulkan-Headers — https://github.com/KhronosGroup/Vulkan-Headers
   Copyright the Khronos Group, licensed under the Apache License 2.0.
   Fetched into `work/` at build time and not redistributed here.

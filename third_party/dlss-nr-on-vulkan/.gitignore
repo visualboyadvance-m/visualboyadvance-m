@@ -1,6 +1,16 @@
+# NVIDIA's property and the local inputs — never committed (notes/CLAUDE.md "Rules"):
+# the DLL, the weights, the MLX-DLSS clone, the headers clone, the builds.
+/ref/
+/work/
 build*/
+/dist/
+.venv/
 *.safetensors
 
 # The daemon's own log, written beside the tree.
 nr_daemon.log
 *.obj
+
+# Python bytecode caches.
+__pycache__/
+*.pyc
