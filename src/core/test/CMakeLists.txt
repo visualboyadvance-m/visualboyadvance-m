@@ -61,6 +61,21 @@ if(APPLE)
         "-framework CoreFoundation" ${LIBICONV_LIB})
 endif()
 
+# frame_dump: headless GBA frame dumper, for chasing rendering artifacts. Runs
+# a ROM with no GUI and writes the visible frames as raw RGBA and/or PNGs, so
+# the pixels a renderer would be handed can be diffed against a screen capture
+# or bisected by frame. Like the suite runners it needs a ROM, so it is built
+# but not registered with ctest.
+add_executable(frame_dump frame_dump.cpp)
+target_link_libraries(frame_dump PRIVATE vbam-core vbam-components-filters-agb)
+if(APPLE)
+    if(NOT LIBICONV_LIB)
+        find_library(LIBICONV_LIB NAMES libiconv iconv)
+    endif()
+    target_link_libraries(frame_dump PRIVATE
+        "-framework CoreFoundation" ${LIBICONV_LIB})
+endif()
+
 # gb_suite_runner: headless driver for Blargg's Game Boy / Game Boy Color
 # test ROMs. Captures pass/fail via the GB serial port (SB/SC).
 add_executable(gb_suite_runner gb_suite_runner.cpp)
