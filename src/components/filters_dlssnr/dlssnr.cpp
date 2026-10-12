@@ -121,7 +121,9 @@ bool OpenLocked(SharedModel& s, std::string* error) {
         if (nr_frame_adopt_vulkan(v.instance, v.physical_device, v.device, v.queue,
                                   v.queue_family,
                                   (v.cooperative_matrix ? 1 : 0) |
-                                      (v.cooperative_matrix && v.workgroup_memory_explicit_layout ? 2 : 0),
+                                      (v.cooperative_matrix && v.workgroup_memory_explicit_layout ? 2 : 0) |
+                                      (v.subgroup_size_control ? 4 : 0) |
+                                      (v.subgroup_size_control && v.compute_full_subgroups ? 8 : 0),
                                   v.get_instance_proc_addr, v.lock, v.unlock,
                                   v.lock_context) == 0) {
             adopted = true;

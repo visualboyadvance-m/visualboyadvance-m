@@ -11707,12 +11707,16 @@ bool VKDrawingPanel::CreateLogicalDevice()
     dlssnr_share_ok_ = false;
     dlssnr_coopmat_  = false;
     dlssnr_explicit_layout_ = false;
+    dlssnr_subgroup_size_ = false;
+    dlssnr_full_subgroups_ = false;
     compute_family_  = UINT32_MAX;
     compute_queue_index_ = 0;
     compute_is_graphics_queue_ = false;
     VkPhysicalDeviceVulkan12Features enable12{};
     VkPhysicalDeviceVulkan11Features enable11{};
     VkPhysicalDeviceFeatures2        enable2{};
+    // Subgroup size control, so the model can pin its kernels to 32 lanes.
+    VkPhysicalDeviceVulkan13Features enable13{};
 #ifdef VK_KHR_cooperative_matrix
     VkPhysicalDeviceCooperativeMatrixFeaturesKHR enable_cm{};
 #endif
@@ -11767,9 +11771,12 @@ bool VKDrawingPanel::CreateLogicalDevice()
                 have_cm.pNext = &have_wm;
 #endif
 #endif
+            VkPhysicalDeviceVulkan13Features have13{};
+            have13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+            have13.pNext = &have11;
             VkPhysicalDeviceFeatures2 have2{};
             have2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-            have2.pNext = &have11;
+            have2.pNext = &have13;
             vkGetPhysicalDeviceFeatures2(physical_device_, &have2);
             if (have11.storageBuffer16BitAccess && have12.vulkanMemoryModel &&
                 have12.vulkanMemoryModelDeviceScope && have12.shaderFloat16 &&
@@ -11806,7 +11813,21 @@ bool VKDrawingPanel::CreateLogicalDevice()
                 }
 #endif
                 enable2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-                enable2.pNext = &enable11;
+                // The model's kernels are written for 32-lane subgroups and pin that
+                // width where it can vary: RADV computes in 64 lanes by default, and
+                // unpinned every frame came out inf and NaN. Without these the model
+                // refuses a device whose width varies and makes its own.
+                if (have13.subgroupSizeControl) {
+                    enable13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+                    enable13.subgroupSizeControl = VK_TRUE;
+                    enable13.computeFullSubgroups = have13.computeFullSubgroups;
+                    enable13.pNext = &enable11;
+                    enable2.pNext = &enable13;
+                    dlssnr_subgroup_size_ = true;
+                    dlssnr_full_subgroups_ = have13.computeFullSubgroups == VK_TRUE;
+                } else {
+                    enable2.pNext = &enable11;
+                }
                 dlssnr_share_ok_ = true;
             }
         }
@@ -11893,6 +11914,8 @@ void VKDrawingPanel::ShareVulkanWithDlssNr()
     share.queue_family           = compute_family_;
     share.cooperative_matrix     = dlssnr_coopmat_;
     share.workgroup_memory_explicit_layout = dlssnr_explicit_layout_;
+    share.subgroup_size_control = dlssnr_subgroup_size_;
+    share.compute_full_subgroups = dlssnr_full_subgroups_;
     // The linked symbol on macOS, the loader's pointer elsewhere; `+` yields a
     // plain function pointer in both cases.
     share.get_instance_proc_addr = reinterpret_cast<void*>(+vkGetInstanceProcAddr);

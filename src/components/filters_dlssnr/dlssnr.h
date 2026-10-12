@@ -128,6 +128,13 @@ struct VulkanShare {
     // scalar-block-layout and 16-bit-access features. The model's staged GEMM
     // needs it; without it those shapes run on the smaller kernels.
     bool workgroup_memory_explicit_layout = false;
+    // Whether Vulkan 1.3's subgroupSizeControl and computeFullSubgroups were
+    // enabled. The model's kernels are written for 32-lane subgroups and pin
+    // that width; on a device whose width varies (RADV computes in 64 lanes by
+    // default) a share without them is refused and the model makes its own
+    // device, since unpinned the kernels return garbage.
+    bool subgroup_size_control = false;
+    bool compute_full_subgroups = false;
     // The renderer's vkGetInstanceProcAddr: the library that made `instance`.
     void* get_instance_proc_addr = nullptr;
     void (*lock)(void*) = nullptr;

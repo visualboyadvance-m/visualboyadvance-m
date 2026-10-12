@@ -139,6 +139,8 @@ private:
     bool dlssnr_share_ok_ = false;               // device has what libxmx needs
     bool dlssnr_coopmat_ = false;                // VK_KHR_cooperative_matrix enabled
     bool dlssnr_explicit_layout_ = false;        // VK_KHR_workgroup_memory_explicit_layout enabled
+    bool dlssnr_subgroup_size_ = false;   // Vulkan 1.3 subgroupSizeControl enabled
+    bool dlssnr_full_subgroups_ = false;  // and computeFullSubgroups
     bool dlssnr_shared_ = false;                 // we registered a share
 
     VkSwapchainKHR swapchain_ = VK_NULL_HANDLE;
