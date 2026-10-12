@@ -13,11 +13,15 @@ bool residual_output_index(inout uint index) {
     return true;
 }
 
-/* GEMM residual, before the existing publication/rounding step.
- * Match resident.comp's expression, including its compiler contraction policy. */
+/* GEMM residual, before the existing publication/rounding step: resident.comp's residual,
+ * a fused multiply-add of the skip and its cosine onto the branch. Written out rather than
+ * left to the compiler's contraction, which RADV applies to this expression in some
+ * pipelines and not others (test_gemm_residual: one float32 in 4128 an ulp apart). Mesa's
+ * ANV and Intel's Windows compiler contracted the plain form, so there it is the same. */
 float add_gemm_residual(float branch, uint index) {
     if ((operation_flags() & 0x20000u) == 0u) return branch;
     float skip = (operation_flags() & 0x40000u) != 0u
         ? float(HalfBuf(uint64_t(pc.d)).v[index]) : pc.d.v[index];
-    return branch + skip * FloatBuf(pc.residual_cos).v[index % pc.n];
+    precise float total = fma(skip, FloatBuf(pc.residual_cos).v[index % pc.n], branch);
+    return total;
 }

@@ -90,7 +90,7 @@ vec2 weights(uint pair) {
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
     }
-    return unpackHalf2x16((packHalf2x16(affine) << 5) + 0x7ff88000u);
+    return unpackHalf2x16((pack_half_rte(affine) << 5) + 0x7ff88000u);
 }
 
 /* Four consecutive channels of the image at one pixel, as float. */
@@ -380,7 +380,7 @@ void main() {
             out4[i] = publish(epilogue, total);
         }
         if (head) {
-            kept[e / 128u] = f16vec4(out4);
+            kept[e / 128u] = to_half4(out4);
             continue;
         }
         if (pooling) {
@@ -392,7 +392,7 @@ void main() {
             Half4Buf(uint64_t(pc.c)).v4[at >> 2] = published;
             continue;
         }
-        if (narrow) Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+        if (narrow) Half4Buf(uint64_t(pc.c)).v4[at >> 2] = to_half4(out4);
         else        Vec4Buf(uint64_t(pc.c)).v4[at >> 2] = out4;
     }
     if (head) {

@@ -111,6 +111,10 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   composition); frames taller than the maximum height are filtered scaled
   down (bilinear) and scaled back up, and the picture updates with the newest
   finished frame
+- libxmx picks its kernels from the device's cooperative-matrix shapes: the Xe
+  8x16x16 kernels where listed, else `_m16` builds on 16x16x16 tiles (RADV on
+  RDNA3; `third_party/dlss-nr-on-vulkan/notes/phase76-rdna3.md`), else the
+  portable multiply-add path
 - With the Vulkan renderer the model runs on the renderer's own instance and
   device: `VKDrawingPanel` asks for Vulkan 1.3, enables the features libxmx
   needs, takes a compute queue for it and lends them via `dlssnr::ShareVulkan`

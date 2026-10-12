@@ -79,6 +79,10 @@ endif
 CFLAGS  := -O2 -fPIC -Wall -Wextra -Wno-unused-parameter -I$(VK_INC)
 SHADERS := work/gemm_resident.spv work/gemm_tiled.spv work/gemm_staged.spv \
            work/gemm_staged32.spv work/gemm_staged32_deep.spv work/attention_rows.spv \
+           work/gemm_resident_m16.spv work/gemm_tiled_m16.spv work/gemm_staged_m16.spv \
+           work/gemm_staged32_m16.spv work/gemm_staged32_deep_m16.spv \
+           work/window_attention_m16.spv work/ffn_fused_m16.spv work/window_block_m16.spv \
+           work/global_attention_m16.spv \
            work/resident.spv work/attention.spv \
            work/history.spv work/gemm_coopmat.spv work/gemm_batched.spv \
            work/window_attention.spv work/window_attention_portable.spv \
@@ -272,6 +276,28 @@ work/gemm_staged32.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DSTAGED_BM=32 -o $@ $<
 work/gemm_staged32_deep.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
 	$(GLSL) -DSTAGED_BM=32 -DSTAGED_BK=64 -o $@ $<
+# The same GEMMs on 16x16x16 matrix tiles, for a device that has no 8x16x16 shape (AMD's
+# RDNA3 under RADV); libxmx loads them in place of the builds above by name
+work/gemm_resident_m16.spv: src/gpu/gemm_resident.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -DHALF_TILE -o $@ $<
+work/gemm_tiled_m16.spv: src/gpu/gemm_resident.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -DRM=1 -DRN=2 -o $@ $<
+work/gemm_staged_m16.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -o $@ $<
+work/gemm_staged32_m16.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -DSTAGED_BM=32 -o $@ $<
+work/gemm_staged32_deep_m16.spv: src/gpu/gemm_staged.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -DSTAGED_BM=32 -DSTAGED_BK=64 -o $@ $<
+work/window_attention_m16.spv: src/gpu/window_attention.comp src/gpu/publish.glsl Makefile
+	$(GLSL) -DTM16 -o $@ $<
+work/ffn_fused_m16.spv: src/gpu/ffn_fused.comp $(GEMM_GLSL) Makefile
+	$(GLSL) -DTM16 -o $@ $<
+work/global_attention_m16.spv: src/gpu/global_attention.comp src/gpu/publish.glsl \
+                               src/gpu/specialize.glsl src/gpu/cosine_tree.glsl Makefile
+	$(GLSL) -DTM16 -o $@ $<
+work/window_block_m16.spv: src/gpu/window_block_m16.comp src/gpu/publish.glsl src/gpu/specialize.glsl \
+                           src/gpu/cosine_tree.glsl
+	$(GLSL) -o $@ $<
 work/resident.spv: src/gpu/resident.comp src/gpu/publish.glsl src/gpu/specialize.glsl
 	$(GLSL) -o $@ $<
 work/attention.spv: src/gpu/attention.comp src/gpu/publish.glsl src/gpu/specialize.glsl \

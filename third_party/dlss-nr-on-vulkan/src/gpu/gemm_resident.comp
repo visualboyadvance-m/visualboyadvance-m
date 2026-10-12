@@ -58,7 +58,17 @@ layout(push_constant, scalar) uniform Push {
 #include "specialize.glsl"
 #include "residual_epilogue.glsl"   /* needs operation_flags() from above */
 
+/* TM16: the build for a device whose cooperative matrix has only the 16x16x16 shape (AMD's
+ * RDNA3 under RADV, `_m16.spv`), which libxmx loads in place of this one by name. The tiled
+ * build becomes one 16x32 tile row (RM = 1), the same block. The base build keeps its 8-row
+ * block (HALF_TILE): a 16-row tile of which only the top eight rows are kept, its A read
+ * straight where sixteen rows are in the matrix and from a zero-padded copy in shared memory
+ * where they are not, and every output going through the stage. */
+#ifdef TM16
+const uint TM = 16, TN = 16, TK = 16;
+#else
 const uint TM = 8, TN = 16, TK = 16;
+#endif
 
 /* The accumulator's type. Config 1 (`fp16 x fp16 -> fp32`) is what this project has
  * always used and is 400-800x more accurate than the original; config 0
@@ -84,6 +94,10 @@ const uint TM = 8, TN = 16, TK = 16;
 #define RN 1
 #endif
 const uint BM = TM * RM, BN = TN * RN;
+#ifdef HALF_TILE
+const uint OM = TM / 2u;          // the rows this workgroup owns
+shared float16_t atile[TM * TK];  // A's eight rows over eight of zeros, where 16 overrun M
+#endif
 
 /* A narrow output is still written through shared memory, and not because anything
  * forbids the direct store — phase 38 established that a matrix stored into an array of
@@ -105,8 +119,63 @@ void qkv_barrier() { subgroupMemoryBarrierShared(); subgroupBarrier(); }
 
 
 
+#ifdef HALF_TILE
+/* The base build's whole epilogue on a half-used 16-row tile: every output goes through the
+ * stage and only the top OM rows leave it, with the same arithmetic as the 8-row paths in
+ * main() — the residual before the publish, the publish, then the narrow, compact, plain or
+ * published-copy store. */
+void half_tile_epilogue(coopmat<ACC, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> acc,
+                        uint row, uint col, uint co, uint ldc, uint epilogue, bool narrow)
+{
+    bool compact_head = (operation_flags() & 0x10000u) != 0u;
+    bool residual = (operation_flags() & 0x20000u) != 0u;
+    bool copy = (operation_flags() & 0x200000u) != 0u;
+    coopMatStore(acc, stage, 0, BN, gl_CooperativeMatrixLayoutRowMajor);
+    subgroupMemoryBarrierShared();
+    subgroupBarrier();
+    if (compact_head && !residual) {
+        uint e = gl_LocalInvocationID.x;
+        pc.c.v[co + (row + e / 4u) * ldc + e % 4u] =
+            publish(epilogue, float(stage[(e / 4u) * BN + e % 4u]));
+        return;
+    }
+    for (uint e = gl_LocalInvocationID.x * 4u; e < OM * BN; e += 32u * 4u) {
+        uint at = co + (row + e / BN) * ldc + col + e % BN;
+        vec4 out4;
+        if (residual) {
+            if (!residual_output_index(at)) continue;
+            for (uint i = 0; i < 4u; ++i)
+                out4[i] = publish(epilogue, add_gemm_residual(float(stage[e + i]), at + i));
+        } else {
+            for (uint i = 0; i < 4u; ++i) out4[i] = publish(epilogue, float(stage[e + i]));
+        }
+        if (!narrow) {
+            for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
+        } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {
+            Half4Buf(uint64_t(pc.c)).v4[at >> 2] = to_half4(out4);
+        } else {
+            for (uint i = 0; i < 4u; ++i) HalfBuf(uint64_t(pc.c)).v[at + i] = to_half(out4[i]);
+        }
+        /* Bit 0x200000: the published copy beside a plain float32 output. */
+        if (copy && epilogue == 0u && !narrow && !residual) {
+            if ((at & 3u) == 0u && (uint(uint64_t(pc.d)) & 7u) == 0u) {
+                Half4Buf(uint64_t(pc.d)).v4[at >> 2] =
+                    f16vec4(e4m3(out4[0]), e4m3(out4[1]), e4m3(out4[2]), e4m3(out4[3]));
+            } else {
+                for (uint i = 0; i < 4u; ++i)
+                    HalfBuf(uint64_t(pc.d)).v[at + i] = float16_t(e4m3(out4[i]));
+            }
+        }
+    }
+}
+#endif
+
 void main() {
+#ifdef HALF_TILE
+    uint row = gl_WorkGroupID.y * OM, col = gl_WorkGroupID.x * BN;
+#else
     uint row = gl_WorkGroupID.y * BM, col = gl_WorkGroupID.x * BN;
+#endif
     if (row >= pc.m || col >= pc.n) return;
     uint batch = gl_WorkGroupID.z;
     uint ao = batch * pc.sa, bo = batch * pc.sb, co = batch * pc.sc;
@@ -124,13 +193,34 @@ void main() {
     coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> a[RM];
     coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> b[RN];
 
+#ifdef HALF_TILE
+    bool a_direct = row + TM <= pc.m;
+    if (!a_direct)
+        for (uint e = OM * TK + gl_LocalInvocationID.x; e < TM * TK; e += 32u)
+            atile[e] = float16_t(0.0);
+#define A_LOAD(i, k) \
+    if (a_direct) { \
+        coopMatLoad(a[i], pc.a.v, ao + row * lda + (k), lda, gl_CooperativeMatrixLayoutRowMajor); \
+    } else { \
+        subgroupBarrier(); \
+        for (uint e = gl_LocalInvocationID.x; e < OM * TK; e += 32u) \
+            atile[e] = pc.a.v[ao + (row + e / TK) * lda + (k) + e % TK]; \
+        subgroupMemoryBarrierShared(); \
+        subgroupBarrier(); \
+        coopMatLoad(a[i], atile, 0, TK, gl_CooperativeMatrixLayoutRowMajor); \
+    }
+#else
+#define A_LOAD(i, k) \
+    coopMatLoad(a[i], pc.a.v, ao + (row + i * TM) * lda + (k), lda, \
+                gl_CooperativeMatrixLayoutRowMajor)
+#endif
+
     /* The transposed test stays outside the K loop. Inside it, the loads stop being
      * hoisted and the loop stops pipelining — worth 30 % of a frame when it was there. */
     if ((operation_flags() & 1u) != 0u) {
         for (uint k = 0; k < pc.k; k += TK) {
             for (uint i = 0; i < RM; i++)
-                coopMatLoad(a[i], pc.a.v, ao + (row + i * TM) * lda + k, lda,
-                            gl_CooperativeMatrixLayoutRowMajor);
+                A_LOAD(i, k);
             for (uint j = 0; j < RN; j++)
                 coopMatLoad(b[j], pc.b.v, bo + (col + j * TN) * ldb + k, ldb,
                             gl_CooperativeMatrixLayoutColumnMajor);
@@ -141,8 +231,7 @@ void main() {
     } else {
         for (uint k = 0; k < pc.k; k += TK) {
             for (uint i = 0; i < RM; i++)
-                coopMatLoad(a[i], pc.a.v, ao + (row + i * TM) * lda + k, lda,
-                            gl_CooperativeMatrixLayoutRowMajor);
+                A_LOAD(i, k);
             for (uint j = 0; j < RN; j++)
                 coopMatLoad(b[j], pc.b.v, bo + k * ldb + col + j * TN, ldb,
                             gl_CooperativeMatrixLayoutRowMajor);
@@ -154,6 +243,10 @@ void main() {
 
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow = (operation_flags() & 0x1000u) != 0u;
+#ifdef HALF_TILE
+    half_tile_epilogue(acc[0][0], row, col, co, ldc, epilogue, narrow);
+    return;
+#endif
     // The 32->4 head still computes a legal 8x16 cooperative-matrix tile, but
     // only writes its four useful columns. Runtime restricts this to the base
     // kernel, FP32 output, N=16 and ldc=4.
@@ -196,10 +289,10 @@ void main() {
             if (!narrow) {
                 for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
             } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {
-                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = to_half4(out4);
             } else {
                 for (uint i = 0; i < 4u; ++i)
-                    HalfBuf(uint64_t(pc.c)).v[at + i] = float16_t(out4[i]);
+                    HalfBuf(uint64_t(pc.c)).v[at + i] = to_half(out4[i]);
             }
         }
         return;

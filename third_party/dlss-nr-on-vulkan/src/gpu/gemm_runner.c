@@ -124,6 +124,56 @@ int main(int argc, char **argv)
 	free(de);
 	fprintf(stderr, "path: %s\n", coopmat ? "cooperative matrix" : "portable multiply-add (no VK_KHR_cooperative_matrix)");
 
+	/* The matrix kernels are fixed to Xe's 8x16 tile, and a device runs only the shapes it
+	 * lists: RADV on RDNA3 lists 16x16x16 alone, and there the 8x16 kernels return garbage.
+	 * As libxmx does, the fp16 kernel gives way to its portable twin where its shape is
+	 * missing; the int8 and fp16-accumulate kernels have none, so their run is skipped. */
+	const char *spv_arg = argv[1];
+	char *swapped = NULL;
+	if (coopmat) {
+		int f32acc = 0, f16acc = 0, int8 = 0;
+		PFN_vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR shapes =
+			(PFN_vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR)vkGetInstanceProcAddr(inst,
+				"vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR");
+		uint32_t ns = 0;
+		if (shapes && shapes(pd, &ns, NULL) == VK_SUCCESS && ns) {
+			VkCooperativeMatrixPropertiesKHR *cp = calloc(ns, sizeof *cp);
+			for (uint32_t i = 0; i < ns; i++) cp[i].sType = VK_STRUCTURE_TYPE_COOPERATIVE_MATRIX_PROPERTIES_KHR;
+			VkResult got = shapes(pd, &ns, cp);
+			for (uint32_t i = 0; (got == VK_SUCCESS || got == VK_INCOMPLETE) && i < ns; i++) {
+				if (cp[i].scope != VK_SCOPE_SUBGROUP_KHR || cp[i].MSize != 8 || cp[i].NSize != 16)
+					continue;
+				if (cp[i].KSize == 16 && cp[i].AType == VK_COMPONENT_TYPE_FLOAT16_KHR
+				    && cp[i].BType == VK_COMPONENT_TYPE_FLOAT16_KHR) {
+					if (cp[i].CType == VK_COMPONENT_TYPE_FLOAT32_KHR) f32acc = 1;
+					if (cp[i].CType == VK_COMPONENT_TYPE_FLOAT16_KHR) f16acc = 1;
+				}
+				if (cp[i].KSize == 32 && cp[i].AType == VK_COMPONENT_TYPE_SINT8_KHR
+				    && cp[i].CType == VK_COMPONENT_TYPE_SINT32_KHR)
+					int8 = 1;
+			}
+			free(cp);
+		}
+		const char *name = argv[1];
+		for (const char *q = argv[1]; *q; q++)
+			if (*q == '/' || *q == '\\') name = q + 1;
+		if (!strcmp(name, "gemm_coopmat.spv") && !f32acc) {
+			size_t dir = (size_t)(name - argv[1]);
+			swapped = malloc(dir + sizeof "gemm_portable_desc.spv");
+			memcpy(swapped, argv[1], dir);
+			memcpy(swapped + dir, "gemm_portable_desc.spv", sizeof "gemm_portable_desc.spv");
+			spv_arg = swapped;
+			fprintf(stderr, "path: portable multiply-add (the device's cooperative matrix has no "
+				"8x16x16 fp16 -> fp32 shape)\n");
+		}
+		if ((!strcmp(name, "gemm_coopmat_int8.spv") && !int8)
+		    || (!strcmp(name, "gemm_f16acc.spv") && !f16acc)) {
+			fprintf(stderr, "skipped: the device's cooperative matrix has no 8x16 shape for %s\n",
+				name);
+			return 77;
+		}
+	}
+
 	uint32_t nq = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(pd, &nq, NULL);
 	VkQueueFamilyProperties *qf = calloc(nq, sizeof *qf);
@@ -211,19 +261,19 @@ int main(int argc, char **argv)
 	size_t spvlen = 0;
 	const void *spv = NULL;
 	const struct nr_embedded_shader *embedded = NULL;
-	const char *base = argv[1];
-	for (const char *q = argv[1]; *q; q++)
+	const char *base = spv_arg;
+	for (const char *q = spv_arg; *q; q++)
 		if (*q == '/' || *q == '\\') base = q + 1;
 #ifdef NR_EMBEDDED_SHADERS
 	for (size_t i = 0; i < nr_embedded_shader_count; i++)
 		if (!strcmp(nr_embedded_shaders[i].name, base)) embedded = &nr_embedded_shaders[i];
 #endif
-	if (embedded && base == argv[1]) { spv = embedded->data; spvlen = embedded->size; }
+	if (embedded && base == spv_arg) { spv = embedded->data; spvlen = embedded->size; }
 	else if (embedded) {
-		FILE *probe = fopen(argv[1], "rb");
+		FILE *probe = fopen(spv_arg, "rb");
 		if (probe) fclose(probe); else { spv = embedded->data; spvlen = embedded->size; }
 	}
-	if (!spv) spv = slurp(argv[1], &spvlen);
+	if (!spv) spv = slurp(spv_arg, &spvlen);
 	VkShaderModuleCreateInfo smi = { .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 					 .codeSize = spvlen, .pCode = spv };
 	VkShaderModule sm;

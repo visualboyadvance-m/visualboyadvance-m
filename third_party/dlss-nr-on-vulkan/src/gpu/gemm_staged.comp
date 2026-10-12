@@ -28,7 +28,14 @@
 
 #include "publish.glsl"
 
+/* TM16: the build for a device whose cooperative matrix has only the 16x16x16 shape (AMD's
+ * RDNA3 under RADV, `_m16.spv`), which libxmx loads in place of this one by name. The block
+ * and the loaders are the same; only how the four subgroups divide the block changes. */
+#ifdef TM16
+const uint TM = 16, TN = 16, TK = 16;
+#else
 const uint TM = 8, TN = 16, TK = 16;
+#endif
 const uint WARPS = 4;
 /* STAGED_BK: the K step. 32 everywhere by default; the deep variant (gemm_staged_deep.spv)
  * takes a longer one for small-M, deep-K GEMMs, whose time is the number of trips round
@@ -47,7 +54,19 @@ const uint WARPS = 4;
 #endif
 const uint BM = STAGED_BM, BN = 32, BK = STAGED_BK;   // the block this workgroup computes
 const uint KC = BK / 32;                   // 32-column chunks of an A row per K step
+#ifdef TM16
+/* Sixteen-row tiles: a 64-row block still stacks the four subgroups along M, one 16x32
+ * slice each; a 32-row block has two 16-row tiles to share, so its subgroups take a 16x16
+ * quarter each, two along M and two along N. */
+const uint WARPS_M = BM / TM < WARPS ? BM / TM : WARPS, WARPS_N = WARPS / WARPS_M;
+const uint WM = BM / WARPS_M, WN = BN / WARPS_N;
+#define WROW ((warp / WARPS_N) * WM)
+#define WCOL(j) ((warp % WARPS_N) * WN + (j) * TN)
+#else
 const uint WM = BM / WARPS, WN = BN;       // and the slice one subgroup takes
+#define WROW (warp * WM)
+#define WCOL(j) ((j) * TN)
+#endif
 const uint RM = WM / TM, RN = WN / TN;
 
 /* A pad of eight halves keeps successive rows off the same shared-memory banks. */
@@ -282,10 +301,10 @@ void main() {
 
         for (uint kk = 0; kk < BK; kk += TK) {
             for (uint i = 0; i < RM; i++)
-                coopMatLoad(fa[i], buf_a, (warp * WM + i * TM) * SA + kk, SA,
+                coopMatLoad(fa[i], buf_a, (WROW + i * TM) * SA + kk, SA,
                             gl_CooperativeMatrixLayoutRowMajor);
             for (uint j = 0; j < RN; j++)
-                coopMatLoad(fb[j], buf_b, kk * SB + j * TN, SB,
+                coopMatLoad(fb[j], buf_b, kk * SB + WCOL(j), SB,
                             gl_CooperativeMatrixLayoutRowMajor);
             for (uint i = 0; i < RM; i++)
                 for (uint j = 0; j < RN; j++)
@@ -301,7 +320,7 @@ void main() {
         for (uint i = 0; i < RM; i++)
             for (uint j = 0; j < RN; j++)
                 coopMatStore(acc[i][j], pc.c.v,
-                             co + (row + warp * WM + i * TM) * ldc + col + j * TN, ldc,
+                             co + (row + WROW + i * TM) * ldc + col + WCOL(j), ldc,
                              gl_CooperativeMatrixLayoutRowMajor);
         return;
     }
@@ -317,7 +336,7 @@ void main() {
     barrier();
     for (uint i = 0; i < RM; i++)
         for (uint j = 0; j < RN; j++)
-            coopMatStore(acc[i][j], stage, (warp * WM + i * TM) * BN + j * TN, BN,
+            coopMatStore(acc[i][j], stage, (WROW + i * TM) * BN + WCOL(j), BN,
                          gl_CooperativeMatrixLayoutRowMajor);
     barrier();
     /* Bit 0x100000: the QKV projection's epilogue (qkv_epilogue.glsl). */
@@ -355,9 +374,9 @@ void main() {
         if (!narrow) {
             for (uint i = 0; i < 4u; ++i) pc.c.v[at + i] = out4[i];
         } else if ((at & 3u) == 0u && (uint(uint64_t(pc.c)) & 7u) == 0u) {
-            Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+            Half4Buf(uint64_t(pc.c)).v4[at >> 2] = to_half4(out4);
         } else {
-            for (uint i = 0; i < 4u; ++i) HalfBuf(uint64_t(pc.c)).v[at + i] = float16_t(out4[i]);
+            for (uint i = 0; i < 4u; ++i) HalfBuf(uint64_t(pc.c)).v[at + i] = to_half(out4[i]);
         }
     }
     if (!pooling) return;

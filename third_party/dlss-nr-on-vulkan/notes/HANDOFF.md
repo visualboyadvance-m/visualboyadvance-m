@@ -9,6 +9,41 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
+## Latest: AMD RDNA3 on the matrix path, and RADV's rounding (2026-10-12)
+
+VBA-M on a Radeon 780M (RADV, Mesa 26.2.4) drew DLSS NR as rainbow bands: RADV lists only
+16x16x16 cooperative matrices, libxmx never asked, and the 8x16 kernels returned a head of
+1e36. Now (`notes/phase76-rdna3.md`):
+
+- **libxmx reads the shapes** (`coopmat_shapes`, `choose_matrix_path`): 8x16x16 -> the
+  kernels as they were; else 16x16x16 -> the `_m16` builds, swapped by name in
+  `shader_code()` (callers unchanged); else portable. `xmx_path()` says which.
+- **`_m16` builds of every matrix kernel**: the GEMMs (`-DTM16`, plus `-DHALF_TILE` for the
+  8-row base block), `ffn_fused`, `window_attention`, `global_attention` (macros, the 8-row
+  SPIR-V unchanged) and `window_block_m16.comp` (its own file; keep it in step with
+  `window_block.comp`). Same blocks and dispatches. Every fused pass bit-identical to its
+  passes on RADV; 640x360 @0.5 34.5 ms (portable 110), 1280x720 @0.55 87.6.
+- **RDNA3's matrix sums are not IEEE-exact** (an ulp or two on exact sums), so
+  `test_gemm_contract`, `test_portable` and three `test_resident` checks fail on the matrix
+  path there by design and pass with `XMX_PORTABLE=1`.
+- **RADV rounding, fixed on every path**: `half_round` takes the bits on RADV (its round trip
+  truncates, its cast folds; `xmx_half_bits()`, the daemon's probe follows); the softmax's
+  pack trick goes through `pack_half_rte()`; narrow stores that can take an fma go through
+  `to_half()`/`to_half4()`, because RADV fuses an fma into its half conversion despite
+  `precise`; the GEMM residual and `resident.comp`'s are explicit `precise fma()`.
+- `gemm_runner` follows the same shape rule (portable twin for `gemm_coopmat.spv`, exit 77 for
+  a missing int8 or fp16-accumulate shape), and the int8 tests report that as a skip.
+
+**Not run on Xe2**: the 8-row kernels whose text changed outside `TM16` (`to_half4`,
+`pack_half_rte`, the explicit fma) are the same arithmetic there by construction — run the
+Xe2 suite and compare heads (`e62005b80145b97a` / `c217fd2fdbbe6b79`) before relying on it.
+**The shared device is pinned now.** VBA-M's Vulkan panel lends its device and never enabled
+`subgroupSizeControl`, so on RADV (64-lane compute by default) the kernels ran unpinned and the
+whole frame came out inf/NaN. The panels enable it, `XMX_ADOPT_SUBGROUP_SIZE` /
+`XMX_ADOPT_FULL_SUBGROUPS` say so, and libxmx refuses a lent device that could pin but was not
+set up to, so the host falls back to libxmx's own (`phase76`). Checked with a harness that
+makes the panel's device, and confirmed in VBA-M's wx GUI by the owner.
+
 ## Latest: the compiled-in weights are the prepared format, read in place, on every runtime (2026-10-10, later)
 
 The owner asked for the integrated weights in a form made for the three runtimes, for loading

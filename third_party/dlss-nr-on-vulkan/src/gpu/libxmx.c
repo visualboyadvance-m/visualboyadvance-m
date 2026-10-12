@@ -175,6 +175,13 @@ static struct {
 	 * the plain multiply-add kernels instead — because the device has no matrix path
 	 * (MoltenVK on Apple silicon), or because XMX_PORTABLE=1 asked for it here. */
 	int coopmat, portable;
+	/* `coopmat_shape`: the device lists the 8x16x16 fp16 -> fp32 subgroup shape every
+	 * matrix kernel is written for; `int8_shape`: the 8x16x32 sint8 -> sint32 one the
+	 * integer kernels use; `m16_shape`: 16x16x16 fp16 -> fp32, all AMD's RDNA3 has under
+	 * RADV. `m16`: the matrix path runs on that shape — the GEMMs from their `_m16`
+	 * builds (shader_code), the fused passes from their portable twins (fused_path).
+	 * With neither shape the device runs portable (coopmat_shapes). */
+	int coopmat_shape, int8_shape, m16_shape, m16;
 	/* `explicit_layout`: VK_KHR_workgroup_memory_explicit_layout is enabled on the device,
 	 * which `gemm_staged.comp` needs since its operand tiles and output stage alias one
 	 * shared-memory block. `staged_ok`: that kernel is built and may be chosen — matrix
@@ -439,7 +446,49 @@ size_t xmx_embedded_shader(const char *name)
 /* The SPIR-V for `spv_path`: a bare name is the embedded module (nr_shaders_embedded.h);
  * a path opens that file; a path whose file is missing falls back to the embedded module
  * of the same base name. `*owned` is what to free, if anything. */
+static const void *shader_code_named(const char *spv_path, size_t *len, void **owned);
+
+/* On a 16x16x16 device (`g.m16`) the 8x16 matrix kernels are swapped for their `_m16`
+ * builds — the same block, bindings and dispatch — and the descriptor-bound benchmark
+ * kernels for their portable twins, by name, so no caller has to know. A fused pass
+ * without an `_m16` build would take its portable twin (fused_path); none is left. A file path is
+ * swapped beside itself, and falls back to the embedded module as any path does. */
+static const struct { const char *from, *to; } m16_names[] = {
+	{ "gemm_resident.spv",      "gemm_resident_m16.spv" },
+	{ "gemm_tiled.spv",         "gemm_tiled_m16.spv" },
+	{ "gemm_staged.spv",        "gemm_staged_m16.spv" },
+	{ "gemm_staged32.spv",      "gemm_staged32_m16.spv" },
+	{ "gemm_staged32_deep.spv", "gemm_staged32_deep_m16.spv" },
+	{ "window_attention.spv",   "window_attention_m16.spv" },
+	{ "ffn_fused.spv",          "ffn_fused_m16.spv" },
+	{ "window_block.spv",       "window_block_m16.spv" },
+	{ "global_attention.spv",   "global_attention_m16.spv" },
+	{ "gemm_coopmat.spv",       "gemm_portable_desc.spv" },
+	{ "gemm_batched.spv",       "gemm_portable_batched.spv" },
+};
+
 static const void *shader_code(const char *spv_path, size_t *len, void **owned)
+{
+	if (g.m16) {
+		const char *base = spv_path;
+		for (const char *q = spv_path; *q; q++)
+			if (*q == '/' || *q == '\\') base = q + 1;
+		for (size_t i = 0; i < sizeof m16_names / sizeof m16_names[0]; i++) {
+			if (strcmp(base, m16_names[i].from)) continue;
+			size_t dir = (size_t)(base - spv_path), n = strlen(m16_names[i].to);
+			char *swapped = malloc(dir + n + 1);
+			if (!swapped) return NULL;
+			memcpy(swapped, spv_path, dir);
+			memcpy(swapped + dir, m16_names[i].to, n + 1);
+			const void *code = shader_code_named(swapped, len, owned);
+			free(swapped);
+			return code;
+		}
+	}
+	return shader_code_named(spv_path, len, owned);
+}
+
+static const void *shader_code_named(const char *spv_path, size_t *len, void **owned)
 {
 	*owned = NULL;
 	const char *base = spv_path;
@@ -869,6 +918,60 @@ static int has_extension(const VkExtensionProperties *list, uint32_t count, cons
 	return 0;
 }
 
+/* Whether the device lists the shapes the matrix kernels are written for, into
+ * `g.coopmat_shape` and `g.int8_shape`. VK_KHR_cooperative_matrix promises only the
+ * shapes a device enumerates, and the kernels are fixed to Xe's 8x16 tile; RADV on RDNA3
+ * lists 16x16x16 alone, and there the 8x16 kernels compile, run and return garbage
+ * (a head of 1e36, the picture in bands of saturated colour). */
+static void coopmat_shapes(VkInstance inst, VkPhysicalDevice pd)
+{
+	g.coopmat_shape = g.int8_shape = g.m16_shape = 0;
+	PFN_vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR get =
+		(PFN_vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR)xmx_gipa(inst,
+			"vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR");
+	uint32_t n = 0;
+	if (!get || get(pd, &n, NULL) != VK_SUCCESS || !n) return;
+	VkCooperativeMatrixPropertiesKHR *p = calloc(n, sizeof *p);
+	if (!p) return;
+	for (uint32_t i = 0; i < n; i++) p[i].sType = VK_STRUCTURE_TYPE_COOPERATIVE_MATRIX_PROPERTIES_KHR;
+	const VkResult r = get(pd, &n, p);
+	if (r == VK_SUCCESS || r == VK_INCOMPLETE)
+		for (uint32_t i = 0; i < n; i++) {
+			const VkCooperativeMatrixPropertiesKHR *c = &p[i];
+			if (c->scope != VK_SCOPE_SUBGROUP_KHR) continue;
+			if (c->MSize == 16 && c->NSize == 16 && c->KSize == 16
+			    && c->AType == VK_COMPONENT_TYPE_FLOAT16_KHR
+			    && c->BType == VK_COMPONENT_TYPE_FLOAT16_KHR
+			    && c->CType == VK_COMPONENT_TYPE_FLOAT32_KHR
+			    && c->ResultType == VK_COMPONENT_TYPE_FLOAT32_KHR)
+				g.m16_shape = 1;
+			if (c->MSize != 8 || c->NSize != 16) continue;
+			if (c->KSize == 16 && c->AType == VK_COMPONENT_TYPE_FLOAT16_KHR
+			    && c->BType == VK_COMPONENT_TYPE_FLOAT16_KHR
+			    && c->CType == VK_COMPONENT_TYPE_FLOAT32_KHR
+			    && c->ResultType == VK_COMPONENT_TYPE_FLOAT32_KHR)
+				g.coopmat_shape = 1;
+			if (c->KSize == 32 && c->AType == VK_COMPONENT_TYPE_SINT8_KHR
+			    && c->BType == VK_COMPONENT_TYPE_SINT8_KHR
+			    && c->CType == VK_COMPONENT_TYPE_SINT32_KHR
+			    && c->ResultType == VK_COMPONENT_TYPE_SINT32_KHR)
+				g.int8_shape = 1;
+		}
+	free(p);
+}
+
+/* Whether the matrix path runs, and on which shape, once coopmat_shapes() has looked:
+ * the 8x16x16 kernels where the device has their shape, else the 16x16x16 builds where it
+ * has that one, else the portable path, as XMX_PORTABLE=1 also asks. */
+static void choose_matrix_path(void)
+{
+	const char *forced = getenv("XMX_PORTABLE");
+	int matrix = g.coopmat && (g.coopmat_shape || g.m16_shape)
+		     && !(forced && *forced && atoi(forced) != 0);
+	g.portable = !matrix;
+	g.m16 = matrix && !g.coopmat_shape;
+}
+
 /* The instance, the device and the queue — everything that decides which shaders can
  * run, and nothing that needs a shader. Split from `xmx_init` so a caller can ask
  * `xmx_coopmat()` before it chooses which SPIR-V to hand over. Idempotent. */
@@ -966,6 +1069,12 @@ static void detect_driver_modes(VkPhysicalDevice pd, uint32_t api_version)
 		g.half_by_cast = driver.driverID == VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS
 			|| driver.driverID == VK_DRIVER_ID_AMD_PROPRIETARY
 			|| driver.driverID == VK_DRIVER_ID_AMD_OPEN_SOURCE;
+		/* RADV keeps neither: its packHalf2x16 truncates as AMD's own drivers' does, and it
+		 * folds the cast to x. src/bench/half_probe.py on a Radeon 780M, Mesa 26.2.4: the
+		 * round trip misses numpy on 183147 of 360704 values, the cast on 360428, the bits
+		 * on none. So the bits are rounded by hand there, as under MoltenVK below. */
+		if (driver.driverID == VK_DRIVER_ID_MESA_RADV)
+			g.half_bits = 1;
 		g.moltenvk = driver.driverID == VK_DRIVER_ID_MOLTENVK;
 		/* Under MoltenVK the Metal compiler of the GPU beneath decides, and on an Intel Mac's
 		 * AMD or Intel GPU it folds both spellings to x (a Vega 64 and a UHD 630, macOS 15:
@@ -1114,9 +1223,29 @@ static int open_adopted(void)
 	g.discrete = props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
 	g.coopmat = (adopt.coopmat & XMX_ADOPT_COOPMAT) != 0;
 	g.explicit_layout = g.coopmat && (adopt.coopmat & XMX_ADOPT_EXPLICIT_LAYOUT) != 0;
-	const char *forced = getenv("XMX_PORTABLE");
-	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
+	if (g.coopmat) coopmat_shapes(adopt.inst, adopt.pd);
+	choose_matrix_path();
 	g.staged_ok = g.coopmat && !g.portable && g.explicit_layout;
+	/* The width pin (build_pipeline_spec) on a lent device, where the host enabled it. Where
+	 * the device could pin a width it may vary and the host did not enable it, refuse: the
+	 * kernels race at another width, and libxmx's own device, the host's fallback, pins. */
+	g.pin32 = 0;
+	{
+		VkPhysicalDeviceVulkan13Features have13 = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES };
+		VkPhysicalDeviceFeatures2 fq = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2, .pNext = &have13 };
+		vkGetPhysicalDeviceFeatures2(adopt.pd, &fq);
+		VkPhysicalDeviceVulkan13Properties sizes = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES };
+		VkPhysicalDeviceProperties2 pq = { .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2, .pNext = &sizes };
+		vkGetPhysicalDeviceProperties2(adopt.pd, &pq);
+		int can = have13.subgroupSizeControl && sizes.minSubgroupSize <= 32 && sizes.maxSubgroupSize >= 32
+			  && (sizes.requiredSubgroupSizeStages & VK_SHADER_STAGE_COMPUTE_BIT);
+		if (can && (adopt.coopmat & XMX_ADOPT_SUBGROUP_SIZE))
+			g.pin32 = 1 | ((adopt.coopmat & XMX_ADOPT_FULL_SUBGROUPS) && have13.computeFullSubgroups ? 2 : 0);
+		else if (can && sizes.minSubgroupSize != sizes.maxSubgroupSize)
+			FAIL("the lent device can fix the subgroup width at 32 but the host did not enable "
+			     "subgroupSizeControl (XMX_ADOPT_SUBGROUP_SIZE); its width varies, and the kernels "
+			     "are written for 32 lanes", (int)sizes.maxSubgroupSize);
+	}
 	detect_driver_modes(adopt.pd, props.apiVersion);
 	g.inst = adopt.inst; g.pd = adopt.pd; g.q = adopt.q; g.qi = adopt.qi;
 	g.lock = adopt.lock; g.unlock = adopt.unlock; g.lock_ctx = adopt.ctx;
@@ -1204,8 +1333,8 @@ int xmx_open(void)
 				g.name, VK_KHR_PIPELINE_EXECUTABLE_PROPERTIES_EXTENSION_NAME);
 	}
 	free(de);
-	const char *forced = getenv("XMX_PORTABLE");
-	g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
+	if (g.coopmat) coopmat_shapes(g.inst, g.pd);
+	choose_matrix_path();
 	/* The staged kernel is only ever dispatched on the matrix path, so the aliasing
 	 * extension is asked for only there — and only with all three of its features, which
 	 * is what the shader declares. */
@@ -1378,6 +1507,7 @@ int xmx_preserve16(void) { return g.preserve16; }
  * `float(float16_t(x))`, 0 the packHalf2x16 round trip. The daemon's start-up probe checks
  * the one in use. */
 int xmx_half_by_cast(void) { return g.half_by_cast; }
+int xmx_half_bits(void) { return g.half_bits; }
 
 /* Whether the staged GEMM copies its operands as raw 128-bit vectors, constant 2
  * (detect_driver_modes; `XMX_STAGED_PACKED=0` restores the half-vector loader). */
@@ -1400,7 +1530,11 @@ int xmx_window_gather(void) { return g.dev ? (g.staged_ok || g.portable) : -1; }
 const char *xmx_path(void)
 {
 	if (!g.dev) return "not opened";
+	if (g.m16) return "cooperative matrix, 16x16x16 (VK_KHR_cooperative_matrix, fp16 x fp16 -> fp32)";
 	if (!g.portable) return "cooperative matrix (VK_KHR_cooperative_matrix, fp16 x fp16 -> fp32)";
+	if (g.coopmat && !g.coopmat_shape)
+		return "portable multiply-add (the device's cooperative matrix has neither the 8x16x16 nor "
+		       "the 16x16x16 fp16 -> fp32 shape)";
 	return g.coopmat ? "portable multiply-add (XMX_PORTABLE=1; the device has cooperative matrix)"
 			 : "portable multiply-add (the device has no VK_KHR_cooperative_matrix)";
 }
@@ -2392,9 +2526,20 @@ int xmx_rec_row(unsigned kind, int a, int b, int c, int d, unsigned rows, unsign
  * XMX_ADOPT_EXPLICIT_LAYOUT — runs the `_portable` twin instead: the same arithmetic in
  * the portable GEMM's summation order, so correct, but not bit-identical to the matrix
  * path's unfused passes. Returns a malloc'd path, and whether it is the twin. */
+static int has_m16_build(const char *path)
+{
+	const char *base = path;
+	for (const char *q = path; *q; q++)
+		if (*q == '/' || *q == '\\') base = q + 1;
+	for (size_t i = 0; i < sizeof m16_names / sizeof m16_names[0]; i++)
+		if (!strcmp(base, m16_names[i].from)) return 1;
+	return 0;
+}
+
 static char *fused_path(const char *path, int *twin)
 {
-	if (g.portable || g.explicit_layout || strstr(path, "_portable")) {
+	if (g.portable || (g.explicit_layout && (!g.m16 || has_m16_build(path)))
+	    || strstr(path, "_portable")) {
 		*twin = g.portable || strstr(path, "_portable") != NULL;
 		return nr_strdup(path);
 	}
@@ -2406,8 +2551,9 @@ static char *fused_path(const char *path, int *twin)
 	memcpy(out + stem, "_portable", sizeof "_portable" - 1);
 	memcpy(out + stem + sizeof "_portable" - 1, path + stem, n - stem + 1);
 	*twin = 1;
-	fprintf(stderr, "libxmx: no VK_KHR_workgroup_memory_explicit_layout; %s runs as %s\n",
-		path, out);
+	if (!g.m16)
+		fprintf(stderr, "libxmx: no VK_KHR_workgroup_memory_explicit_layout; %s runs as %s\n",
+			path, out);
 	return out;
 }
 
@@ -2606,7 +2752,7 @@ int xmx_int8_init(const char *path)
 	if (g.rint8) return 0;
 	/* The integer matrix path needs matrix units, the explicit layout and the 8-bit
 	 * features; anything else builds the twin, which reads the bytes as words. */
-	int twin = !(g.staged_ok && g.int8) || strstr(path, "_portable") != NULL;
+	int twin = !(g.staged_ok && g.int8 && g.int8_shape) || strstr(path, "_portable") != NULL;
 	char *use;
 	if (twin && !strstr(path, "_portable")) {
 		size_t n = strlen(path), stem = n;

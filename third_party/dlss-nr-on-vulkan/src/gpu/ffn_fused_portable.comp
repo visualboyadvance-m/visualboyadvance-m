@@ -252,9 +252,9 @@ void main() {
             if (!narrow_out) {
                 for (uint e = 0; e < 4u; e++) pc.c.v[at + e] = v[e];
             } else if ((at & 3u) == 0u && (uint(base_c) & 7u) == 0u) {
-                Half4Buf(base_c).v4[at >> 2] = f16vec4(v);
+                Half4Buf(base_c).v4[at >> 2] = to_half4(v);
             } else {
-                for (uint e = 0; e < 4u; e++) HalfBuf(base_c).v[at + e] = float16_t(v[e]);
+                for (uint e = 0; e < 4u; e++) HalfBuf(base_c).v[at + e] = to_half(v[e]);
             }
         }
 }

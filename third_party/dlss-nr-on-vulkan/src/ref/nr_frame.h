@@ -117,7 +117,10 @@ void nr_frame_close(nr_frame *frame);
  * is enabled, plus 2 (XMX_ADOPT_EXPLICIT_LAYOUT) when VK_KHR_workgroup_memory_explicit_layout
  * is enabled with its scalar-block-layout and 16-bit-access features — the staged GEMM needs
  * it, and without it those shapes run on the smaller kernels and the window partition stays
- * a pass of its own. If
+ * a pass of its own; plus 4 (XMX_ADOPT_SUBGROUP_SIZE) when Vulkan 1.3's subgroupSizeControl
+ * is enabled and 8 (XMX_ADOPT_FULL_SUBGROUPS) when computeFullSubgroups is, so the pipelines
+ * can be pinned to 32 lanes. A device whose width varies, that could pin and was not set up
+ * to, is refused at the open and libxmx makes its own (the kernels race at another width). If
  * the host submits on the same queue it passes `lock`/`unlock` (bracketing every
  * submit here) and takes the same lock around its own submits, presents and idle
  * waits. `get_instance_proc_addr` is the host's vkGetInstanceProcAddr. 0 on success;

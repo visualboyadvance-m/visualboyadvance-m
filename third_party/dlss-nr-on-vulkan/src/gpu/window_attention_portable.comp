@@ -63,7 +63,7 @@ vec2 weights(float l0, float l1) {
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
     }
-    return unpackHalf2x16((packHalf2x16(affine) << 5) + 0x7ff88000u);
+    return unpackHalf2x16((pack_half_rte(affine) << 5) + 0x7ff88000u);
 }
 
 void sync() { memoryBarrierShared(); barrier(); }

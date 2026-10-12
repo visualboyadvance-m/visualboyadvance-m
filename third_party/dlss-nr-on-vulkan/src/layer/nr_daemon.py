@@ -978,7 +978,13 @@ def half_probe_child():
           flush=True)
     # What the runtime's half_round runs on this driver: libxmx chose it when it built the
     # runtime above, from the driver (xmx_init); libmetalmx and libd3dmx each have one.
-    used = names[2] if probe.lib.xmx_half_by_cast() else names[1]
+    # libxmx's third spelling, the bits, where the driver keeps neither of the others
+    # (MoltenVK on a GPU not Apple's, RADV); the other runtimes have no xmx_half_bits.
+    half_bits = getattr(probe.lib, "xmx_half_bits", None)
+    if half_bits is not None and half_bits():
+        used = names[0]
+    else:
+        used = names[2] if probe.lib.xmx_half_by_cast() else names[1]
     if mismatches[used] > 0:
         print(f"FAIL: {used} disagrees with float16 on {mismatches[used]} of {n} values; "
               "every rounding point in publish.glsl would move, per frame, silently.",

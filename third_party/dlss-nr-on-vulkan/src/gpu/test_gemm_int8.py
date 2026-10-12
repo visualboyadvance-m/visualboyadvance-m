@@ -52,6 +52,12 @@ def run(a, b):
         done = subprocess.run([str(RUNNER), str(SPV), str(m), str(n), str(k),
                                str(room / "a"), str(room / "b"), str(room / "c")],
                               capture_output=True, text=True, timeout=300)
+        if done.returncode == 77:
+            # the device's cooperative matrix has no 8x16x32 integer shape (RADV on RDNA3
+            # lists 16x16x16 alone), which the runner checks before it dispatches
+            print("gemm int8: " + (done.stderr.strip().splitlines() or ["skipped"])[-1]
+                  + " — a skip is not a pass")
+            sys.exit(0)
         if done.returncode != 0:
             raise RuntimeError((done.stderr.strip().splitlines() or ["no output"])[-1])
         return np.frombuffer((room / "c").read_bytes(), np.int32).reshape(m, n)

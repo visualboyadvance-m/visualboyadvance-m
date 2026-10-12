@@ -23,6 +23,14 @@ void xmx_close(void);
  * built and its shapes take the 8x16 and 16x32 kernels. */
 #define XMX_ADOPT_COOPMAT 1
 #define XMX_ADOPT_EXPLICIT_LAYOUT 2
+/* XMX_ADOPT_SUBGROUP_SIZE: the host enabled Vulkan 1.3's subgroupSizeControl, and
+ * XMX_ADOPT_FULL_SUBGROUPS its computeFullSubgroups, so every pipeline can be pinned to the
+ * 32 lanes the kernels are written for, as on libxmx's own device. A lent device that could
+ * pin but was not set up to (RADV, whose compute defaults to 64 lanes) is refused, so the
+ * host falls back to libxmx's own device rather than racing: on the 780M every frame came
+ * out inf and NaN. */
+#define XMX_ADOPT_SUBGROUP_SIZE 4
+#define XMX_ADOPT_FULL_SUBGROUPS 8
 int xmx_adopt(void *instance, void *physical_device, void *device, void *queue, unsigned queue_family,
 	      int cooperative_matrix, void *get_instance_proc_addr,
 	      void (*lock)(void *), void (*unlock)(void *), void *lock_context);
@@ -56,6 +64,11 @@ int xmx_preserve16(void);
  * has one spelling, the cast; libd3dmx one, `f16tof32(f32tof16(x))`. The daemon's start-up
  * probe checks the one in use. */
 int xmx_half_by_cast(void);
+/* libxmx only: 1 where neither spelling survives and `half_round` rounds the float's bits by
+ * hand (constant 1 = 2; `XMX_HALF_ROUND=bits`) — under MoltenVK on a GPU not Apple's, and on
+ * RADV, whose round trip truncates and whose cast is folded. xmx_half_by_cast() is 0 then.
+ * The daemon's probe asks for it where the runtime has it. */
+int xmx_half_bits(void);
 /* Whether the staged GEMM's loader copies its operands global-to-shared as raw 128-bit
  * vectors (1, the default: 6-9 % of the graph on Intel's Windows compiler, ~2 % at 720p on
  * Mesa, 4 % on an M3's Metal 3.1 path, the same bits) or as pairs of half4 (0,

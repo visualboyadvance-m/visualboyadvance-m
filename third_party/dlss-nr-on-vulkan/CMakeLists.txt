@@ -618,6 +618,17 @@ nr_shader(gemm_staged.spv          src/gpu/gemm_staged.comp)
 # 32-row blocks for a bottleneck of 32 tokens or fewer, with a 32- and a 64-deep K step
 nr_shader(gemm_staged32.spv        src/gpu/gemm_staged.comp -DSTAGED_BM=32)
 nr_shader(gemm_staged32_deep.spv   src/gpu/gemm_staged.comp -DSTAGED_BM=32 -DSTAGED_BK=64)
+# The same GEMMs on 16x16x16 matrix tiles, for a device that has no 8x16x16 shape (AMD's
+# RDNA3 under RADV); libxmx loads them in place of the builds above by name
+nr_shader(gemm_resident_m16.spv    src/gpu/gemm_resident.comp -DTM16 -DHALF_TILE)
+nr_shader(gemm_tiled_m16.spv       src/gpu/gemm_resident.comp -DTM16 -DRM=1 -DRN=2)
+nr_shader(gemm_staged_m16.spv      src/gpu/gemm_staged.comp -DTM16)
+nr_shader(gemm_staged32_m16.spv    src/gpu/gemm_staged.comp -DTM16 -DSTAGED_BM=32)
+nr_shader(gemm_staged32_deep_m16.spv src/gpu/gemm_staged.comp -DTM16 -DSTAGED_BM=32 -DSTAGED_BK=64)
+nr_shader(window_attention_m16.spv src/gpu/window_attention.comp -DTM16)
+nr_shader(ffn_fused_m16.spv        src/gpu/ffn_fused.comp -DTM16)
+nr_shader(window_block_m16.spv     src/gpu/window_block_m16.comp)
+nr_shader(global_attention_m16.spv src/gpu/global_attention.comp -DTM16)
 nr_shader(resident.spv             src/gpu/resident.comp)
 nr_shader(attention.spv            src/gpu/attention.comp)
 nr_shader(attention_ab.spv         src/gpu/attention.comp -DSOFTMAX_AB)

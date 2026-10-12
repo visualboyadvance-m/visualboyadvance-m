@@ -15,7 +15,24 @@
 // Q/K/V are already normalized/published, in (window, head, token, channel) order. One
 // workgroup takes one window and head; each of its eight subgroups computes eight query
 // rows, and their scores and probabilities never leave shared memory.
+/* TM16: the build for a device whose cooperative matrix has only the 16x16x16 shape (AMD's
+ * RDNA3 under RADV, `_m16.spv`), which libxmx loads in place of this one by name: four
+ * subgroups of sixteen query rows, each with two kilobytes, in the same 16 KB. QR is a
+ * subgroup's rows as a matrix dimension and QRU as a number, SUBS the subgroups and SCR a
+ * subgroup's floats of scratch. */
+#ifdef TM16
+#define QR 16
+#define QRU 16u
+#define SUBS 4u
+#define SCR 512u
+layout(local_size_x = 128) in;
+#else
+#define QR 8
+#define QRU 8u
+#define SUBS 8u
+#define SCR 256u
 layout(local_size_x = 256) in;
+#endif
 layout(constant_id = 0) const bool MERGED_OUTPUT = false;
 const uint WINDOW_ATTENTION = 3u; // row-family profile kind: attention.comp owns 0-2 and 6
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf { float16_t v[]; };
@@ -61,7 +78,7 @@ vec2 weights(uint pair) {
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
     }
-    return unpackHalf2x16((packHalf2x16(affine) << 5) + 0x7ff88000u);
+    return unpackHalf2x16((pack_half_rte(affine) << 5) + 0x7ff88000u);
 }
 
 void main() {
@@ -69,20 +86,27 @@ void main() {
     if (batch >= pc.batches) return; // uniform across the whole workgroup
     uint offset = batch * 64u * 32u;
     uint lane = gl_LocalInvocationIndex;
+#ifdef TM16
+    for (uint i = lane; i < 256u; i += 32u * SUBS) {
+        u4[i] = Uvec4Buf(uint64_t(pc.k) + uint64_t(offset) * 2ul).v[i];
+        u4[256u + i] = Uvec4Buf(uint64_t(pc.v) + uint64_t(offset) * 2ul).v[i];
+    }
+#else
     u4[lane] = Uvec4Buf(uint64_t(pc.k) + uint64_t(offset) * 2ul).v[lane];
     u4[256u + lane] = Uvec4Buf(uint64_t(pc.v) + uint64_t(offset) * 2ul).v[lane];
+#endif
     barrier();
 
     uint sub = gl_SubgroupID, local = gl_SubgroupInvocationID;
-    uint row = sub * 8u;
-    uint scratch = 2048u + 256u * sub;   // this subgroup's kilobyte, in floats and words
+    uint row = sub * QRU;
+    uint scratch = 2048u + SCR * sub;   // this subgroup's kilobyte, in floats and words
     uint head_bias = (batch % pc.heads) * 4096u + row * 64u;
     {
-        coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> acc[4];
+        coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc[4];
         for (uint j = 0u; j < 4u; j++)
-            acc[j] = coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+            acc[j] = coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
         for (uint c = 0u; c < 32u; c += 16u) {
-            coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> q;
+            coopmat<float16_t, gl_ScopeSubgroup, QR, 16, gl_MatrixUseA> q;
             coopMatLoad(q, pc.q.v, offset + row * 32u + c, 32u,
                         gl_CooperativeMatrixLayoutRowMajor);
             for (uint j = 0u; j < 4u; j++) {
@@ -95,7 +119,7 @@ void main() {
          * softmax used to make element by element, sixteen scattered loads a lane. */
         if (pc.flags != 0u) {
             for (uint j = 0u; j < 4u; j++) {
-                coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> b;
+                coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> b;
                 coopMatLoad(b, pc.bias.v, head_bias + j * 16u, 64u,
                             gl_CooperativeMatrixLayoutRowMajor);
                 acc[j] = acc[j] + b;
@@ -104,25 +128,25 @@ void main() {
         /* Keys 0-31, then 32-63, through the same kilobyte. Lanes 0-15 take one row of a
          * pair and 16-31 the other, two adjacent keys each: the vendor's pairs never
          * straddle the halves, since both start on an even key. */
-        uint kept[8];
+        uint kept[QRU];
         for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
             for (uint j = 0u; j < 2u; j++)
                 coopMatStore(acc[half_keys * 2u + j], f32, scratch + j * 16u, 32u,
                              gl_CooperativeMatrixLayoutRowMajor);
             subgroupMemoryBarrierShared();
             subgroupBarrier();
-            for (uint t = 0u; t < 4u; t++) {
+            for (uint t = 0u; t < QRU / 2u; t++) {
                 uint at = local * 2u + t * 64u;          // row at / 32, keys at % 32 and one more
-                kept[half_keys * 4u + t] = packHalf2x16(weights(scratch / 2u + at / 2u));
+                kept[half_keys * (QRU / 2u) + t] = packHalf2x16(weights(scratch / 2u + at / 2u));
             }
             subgroupMemoryBarrierShared();
             subgroupBarrier();
         }
         for (uint half_keys = 0u; half_keys < 2u; half_keys++)
-            for (uint t = 0u; t < 4u; t++) {
+            for (uint t = 0u; t < QRU / 2u; t++) {
                 uint at = local * 2u + t * 64u;
                 u32[scratch + ((at / 32u) * 64u + half_keys * 32u + at % 32u) / 2u] =
-                    kept[half_keys * 4u + t];            // exact: two half values
+                    kept[half_keys * (QRU / 2u) + t];    // exact: two half values
             }
     }
     /* The denominator, summed in float32 in token order, eight weights to a load — a chain
@@ -133,7 +157,7 @@ void main() {
     barrier();
     if (sub < 2u) {
         uint r = sub * 32u + local;
-        uint weights_at = (2048u + 256u * (r / 8u)) / 4u + (r % 8u) * 8u;
+        uint weights_at = (2048u + SCR * (r / QRU)) / 4u + (r % QRU) * 8u;
         float total = 0.0;
         for (uint i = 0u; i < 8u; i++) {
             uvec4 eight = u4[weights_at + i];
@@ -147,7 +171,7 @@ void main() {
     }
     /* the sums above read every weight; the loop below overwrites them */
     barrier();
-    for (uint at = local * 2u; at < 8u * 64u; at += 64u) {
+    for (uint at = local * 2u; at < QRU * 64u; at += 64u) {
         /* two neighbours of one row a lane, every lane of an iteration on the same row */
         float scale = f32[row + at / 64u];
         vec2 pair = unpackHalf2x16(u32[scratch + at / 2u]);
@@ -159,11 +183,11 @@ void main() {
     subgroupMemoryBarrierShared();
     subgroupBarrier();
     {
-        coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> acc[2];
+        coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc[2];
         for (uint j = 0u; j < 2u; j++)
-            acc[j] = coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+            acc[j] = coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
         for (uint c = 0u; c < 64u; c += 16u) {
-            coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> p;
+            coopmat<float16_t, gl_ScopeSubgroup, QR, 16, gl_MatrixUseA> p;
             coopMatLoad(p, h16, scratch * 2u + c, 64u, gl_CooperativeMatrixLayoutRowMajor);
             for (uint j = 0u; j < 2u; j++) {
                 coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> v;
@@ -186,7 +210,7 @@ void main() {
     if (MERGED_OUTPUT) {
         subgroupMemoryBarrierShared();
         subgroupBarrier();
-        for (uint at = local * 4u; at < 8u * 32u; at += 128u) {
+        for (uint at = local * 4u; at < QRU * 32u; at += 128u) {
             uint target = ((batch / pc.heads) * 64u + row + at / 32u) * pc.heads * 32u
                         + (batch % pc.heads) * 32u + at % 32u;
             vec4 values = v4[scratch / 4u + at / 4u];

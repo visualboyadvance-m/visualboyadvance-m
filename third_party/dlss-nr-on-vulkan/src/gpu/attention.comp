@@ -177,7 +177,7 @@ void pair_fast(float l0, float l1, out float w0, out float w1) {
         scaled += 1.30078125;
         affine[j] = clamp(scaled, 1.03125, 1.5693359375);
     }
-    uint transformed = (packHalf2x16(affine) << 5) + 0x7FF88000u;
+    uint transformed = (pack_half_rte(affine) << 5) + 0x7FF88000u;
     vec2 weights = unpackHalf2x16(transformed);
     w0 = weights.x; w1 = weights.y;
 }

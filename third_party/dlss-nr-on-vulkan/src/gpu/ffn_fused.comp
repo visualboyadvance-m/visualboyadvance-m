@@ -93,7 +93,16 @@ layout(push_constant, scalar) uniform Push {
 #include "specialize.glsl"
 #include "residual_epilogue.glsl"   /* needs operation_flags() from above */
 
+/* TM16: the build for a device whose cooperative matrix has only the 16x16x16 shape (AMD's
+ * RDNA3 under RADV, `_m16.spv`), which libxmx loads in place of this one by name. A
+ * subgroup's sixteen rows are then one tile instead of two (RI), in the same bytes. */
+#ifdef TM16
+const uint TM = 16, TN = 16, TK = 16;
+#define RI 1u
+#else
 const uint TM = 8, TN = 16, TK = 16;
+#define RI 2u
+#endif
 const uint ROWS = 16u, CHUNK = 32u, OUT = 32u, SUBGROUPS = 16u;
 const uint EPI_GATE_E4M3 = 3u;             // the expand GEMM's publish
 
@@ -147,17 +156,17 @@ void main() {
     uint hidden = 8192u + 512u * sub;          // this subgroup's kilobyte, in halves
     uint stage = 4096u + 256u * sub;           // the same kilobyte, in floats
 
-    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result[2][2];
-    for (uint i = 0; i < 2u; i++)
+    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result[RI][2];
+    for (uint i = 0; i < RI; i++)
         for (uint j = 0; j < 2u; j++)
             result[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
 
     // an input made here: its sixteen rows, rounded to half, through the kilobyte into
     // the registers every chunk reads them from
-    coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> held[2][2];
-    coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> features[2];
+    coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> held[2][RI];
+    coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> features[RI];
     if (stemming()) {
-        for (uint i = 0; i < 2u; i++)
+        for (uint i = 0; i < RI; i++)
             coopMatLoad(features[i], pc.a.v, (row + i * TM) * 16u, 16u,
                         gl_CooperativeMatrixLayoutRowMajor);
     }
@@ -175,7 +184,7 @@ void main() {
                 coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> adapter;
                 coopMatLoad(adapter, HalfBuf(pc.aux).v, j * TN, OUT,
                             gl_CooperativeMatrixLayoutRowMajor);
-                for (uint i = 0; i < 2u; i++) {
+                for (uint i = 0; i < RI; i++) {
                     coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> stem =
                         coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
                     stem = coopMatMulAdd(features[i], adapter, stem);
@@ -190,7 +199,7 @@ void main() {
         subgroupMemoryBarrierShared();
         subgroupBarrier();
         for (uint s = 0; s < 2u; s++)
-            for (uint i = 0; i < 2u; i++)
+            for (uint i = 0; i < RI; i++)
                 coopMatLoad(held[s][i], h16, hidden + i * TM * 32u + s * TK, 32u,
                             gl_CooperativeMatrixLayoutRowMajor);
         subgroupMemoryBarrierShared();          // the first chunk overwrites the kilobyte
@@ -199,8 +208,8 @@ void main() {
 
     for (uint chunk = 0u; chunk < width; chunk += CHUNK) {
         // the expand's 16x32 block for these hidden columns: K = 32 in two steps
-        coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> h[2][2];
-        for (uint i = 0; i < 2u; i++)
+        coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> h[RI][2];
+        for (uint i = 0; i < RI; i++)
             for (uint j = 0; j < 2u; j++)
                 h[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
         /* The input rows are read again for each chunk, from cache, rather than held
@@ -208,8 +217,8 @@ void main() {
          * were measured too — 16 columns, no spills at all — and were 9 % slower: twice
          * the barriers and shared-memory round trips for the same arithmetic. */
         for (uint kk = 0; kk < cin; kk += TK) {
-            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> x[2];
-            for (uint i = 0; i < 2u; i++) {
+            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> x[RI];
+            for (uint i = 0; i < RI; i++) {
                 if (merging() || stemming())
                     x[i] = held[kk / TK][i];
                 else
@@ -225,12 +234,12 @@ void main() {
                     coopMatLoad(w[j], pc.b.v, expand_base + kk * width + chunk + j * TN, width,
                                 gl_CooperativeMatrixLayoutRowMajor);
             }
-            for (uint i = 0; i < 2u; i++)
+            for (uint i = 0; i < RI; i++)
                 for (uint j = 0; j < 2u; j++)
                     h[i][j] = coopMatMulAdd(x[i], w[j], h[i][j]);
         }
         // its publish on the accumulator, then into shared memory as the projection's A
-        for (uint i = 0; i < 2u; i++)
+        for (uint i = 0; i < RI; i++)
             for (uint j = 0; j < 2u; j++) {
                 for (uint e = 0; e < h[i][j].length(); e++)
                     h[i][j][e] = publish(EPI_GATE_E4M3, h[i][j][e]);
@@ -243,8 +252,8 @@ void main() {
         subgroupBarrier();
         // the projection over these 32 hidden rows, in two steps of 16
         for (uint kk = 0; kk < 2u; kk++) {
-            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> g[2];
-            for (uint i = 0; i < 2u; i++)
+            coopmat<float16_t, gl_ScopeSubgroup, TM, TK, gl_MatrixUseA> g[RI];
+            for (uint i = 0; i < RI; i++)
                 coopMatLoad(g[i], h16, hidden + i * TM * CHUNK + kk * TK, CHUNK,
                             gl_CooperativeMatrixLayoutRowMajor);
             coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> p[2];
@@ -256,7 +265,7 @@ void main() {
                     coopMatLoad(p[j], projection.v, project_base + (chunk + kk * TK) * OUT + j * TN,
                                 OUT, gl_CooperativeMatrixLayoutRowMajor);
             }
-            for (uint i = 0; i < 2u; i++)
+            for (uint i = 0; i < RI; i++)
                 for (uint j = 0; j < 2u; j++)
                     result[i][j] = coopMatMulAdd(g[i], p[j], result[i][j]);
         }
@@ -275,7 +284,7 @@ void main() {
             coopmat<float16_t, gl_ScopeSubgroup, TK, TN, gl_MatrixUseB> adapter;
             coopMatLoad(adapter, HalfBuf(pc.aux).v, j * TN, OUT,
                         gl_CooperativeMatrixLayoutRowMajor);
-            for (uint i = 0; i < 2u; i++) {
+            for (uint i = 0; i < RI; i++) {
                 coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> stem =
                     coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
                 stem = coopMatMulAdd(features[i], adapter, stem);
@@ -292,7 +301,7 @@ void main() {
             subgroupMemoryBarrierShared();      // the result overwrites the stage
             subgroupBarrier();
         }
-        for (uint i = 0; i < 2u; i++)
+        for (uint i = 0; i < RI; i++)
             coopMatStore(result[i][j], f32, stage + i * TM * TN, TN, gl_CooperativeMatrixLayoutRowMajor);
         subgroupMemoryBarrierShared();
         subgroupBarrier();
@@ -324,9 +333,9 @@ void main() {
             if (!narrow_out) {
                 for (uint q = 0; q < 4u; q++) pc.c.v[at + q] = out4[q];
             } else if ((uint(uint64_t(pc.c)) & 7u) == 0u) {
-                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = f16vec4(out4);
+                Half4Buf(uint64_t(pc.c)).v4[at >> 2] = to_half4(out4);
             } else {
-                for (uint q = 0; q < 4u; q++) HalfBuf(uint64_t(pc.c)).v[at + q] = float16_t(out4[q]);
+                for (uint q = 0; q < 4u; q++) HalfBuf(uint64_t(pc.c)).v[at + q] = to_half(out4[q]);
             }
         }
         subgroupMemoryBarrierShared();          // the next half overwrites the stage

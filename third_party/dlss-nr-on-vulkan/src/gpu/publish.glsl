@@ -45,7 +45,33 @@ float half_round(float x) {
  * whose bits land where its bias expects, and it gets one on every driver measured,
  * Intel's Windows compiler included, which folds only the round trip above; replacing
  * the instruction there with hand-packed half bits is what broke the picture on the B580
- * (Paimon, PR #3). */
+ * (Paimon, PR #3).
+ *
+ * Except that the packing must round as float16 does, and RADV's truncates (src/bench/
+ * half_probe.py: 183147 of 360704 values below numpy's, the same as AMD's own drivers): the
+ * exponent trick then comes out a step low wherever the affine value is not a half already.
+ * So where libxmx rounds the bits by hand (HALF_ROUND == 2, which RADV gets), the values are
+ * rounded to half first and the instruction packs them — a half value packs the same under
+ * any rounding, and the instruction stays the one doing the packing. */
+/* A float32 result stored as half, rounded from its float32 value. Where the only use of an
+ * fma is its conversion to half, RADV fuses the two into one mixed-precision fma rounded
+ * straight to half — `precise` does not stop it — and a value on a half tie after the
+ * float32 rounding comes out a half step off: test_gemm_residual's and test_window_block's
+ * specialised narrow cases, one value in a few thousand. Where libxmx rounds by hand
+ * (HALF_ROUND == 2, which RADV gets), so do the stores; elsewhere this is the conversion. */
+float16_t to_half(float x) {
+    return HALF_ROUND == 2u ? float16_t(half_round_bits(x)) : float16_t(x);
+}
+f16vec4 to_half4(vec4 v) {
+    return HALF_ROUND == 2u ? f16vec4(half_round_bits(v.x), half_round_bits(v.y),
+                                      half_round_bits(v.z), half_round_bits(v.w))
+                            : f16vec4(v);
+}
+
+uint pack_half_rte(vec2 v) {
+    return HALF_ROUND == 2u ? packHalf2x16(vec2(half_round_bits(v.x), half_round_bits(v.y)))
+                            : packHalf2x16(v);
+}
 
 float e4m3(float x) {
     float magnitude = min(abs(x), 448.0);

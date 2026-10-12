@@ -184,6 +184,16 @@ already have. See [Build](#build).
   gcc -Iwork/vulkan-headers/include src/probe/coopmat_probe.c -o /tmp/probe -lvulkan
   /tmp/probe      # drop the -I if your distribution installs the Vulkan headers
   ```
+- An AMD **RDNA3** GPU under **RADV**, whose cooperative matrix lists only **16x16x16**
+  (`fp16 x fp16 -> fp32` among them): the runtime asks the device which shapes it has and
+  loads `_m16` builds of the matrix kernels, the same blocks and dispatches on 16-row tiles.
+  Measured on a **Radeon 780M (Phoenix), Mesa 26.2.4**: every fused pass bit-identical to
+  the passes it replaces, the C head bit-identical to the Python resident path, and the
+  daemon-sized frames at 640x360 (scale 0.5) in 34.5 ms against 110 on the portable path.
+  RDNA3's matrix units are not IEEE-exact (a float32 ulp or two on sums that are exact in
+  any order), so the checks that ask the GEMM for exact sums fail there by design.
+  `notes/phase76-rdna3.md`. A device that lists neither shape — Arc A-series, with 8x8x16 —
+  takes the portable path rather than the matrix kernels.
 - A **discrete** Xe2 card (Battlemage, B570/B580) works too, and does not need resizable BAR: where the card's memory
   cannot be mapped, the graph keeps its operands there anyway and the host reaches them by
   copies. Turn resizable BAR on if you can — it is the faster of the two paths and Arc wants

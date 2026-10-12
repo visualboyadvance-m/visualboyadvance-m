@@ -41,7 +41,24 @@
 
 #include "publish.glsl"
 
+/* TM16: the build for a device whose cooperative matrix has only the 16x16x16 shape (AMD's
+ * RDNA3 under RADV, `_m16.spv`), which libxmx loads in place of this one by name: four
+ * subgroups of sixteen queries, each with two kilobytes (logits, then probabilities at PROB
+ * floats in), in the same 16 KB; the rows are a multiple of 16, so no tile is partial. QR is
+ * a subgroup's rows as a matrix dimension, QRU as a number, SCR its floats of scratch. */
+#ifdef TM16
+#define QR 16
+#define QRU 16u
+#define SCR 512u
+#define PROB 256u
+layout(local_size_x = 128) in;
+#else
+#define QR 8
+#define QRU 8u
+#define SCR 256u
+#define PROB 128u
 layout(local_size_x = 256) in;
+#endif
 
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer HalfBuf  { float16_t v[]; };
 layout(buffer_reference, scalar, buffer_reference_align = 16) buffer FloatBuf { float v[]; };
@@ -86,12 +103,12 @@ float vit_weight(float logit) {
 void main() {
     uint rows = pc.m, tokens = pc.n, heads = pc.batch, head = gl_WorkGroupID.y;
     uint sub = gl_SubgroupID, local = gl_SubgroupInvocationID, lane = gl_LocalInvocationIndex;
-    uint row = gl_WorkGroupID.x * 64u + sub * 8u;          // this subgroup's eight queries
+    uint row = gl_WorkGroupID.x * 64u + sub * QRU;         // this subgroup's queries
     bool busy = row < rows;                               // a partial last block's idle
-    uint scratch = 2048u + 256u * sub;                      // its kilobyte, in floats
+    uint scratch = 2048u + SCR * sub;                       // its scratch, in floats
     uint plane = head * rows * 32u;                         // this head's (rows, 32)
 
-    coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> query[2];
+    coopmat<float16_t, gl_ScopeSubgroup, QR, 16, gl_MatrixUseA> query[2];
     if (busy)
         for (uint c = 0u; c < 2u; c++)
             coopMatLoad(query[c], pc.a.v, plane + row * 32u + c * 16u, 32u,
@@ -100,14 +117,24 @@ void main() {
     uint blocks = (rows + 63u) / 64u;                       // the tokens' 64-blocks too
     float total = 0.0;                                      // lane r < 8: row r's sum
     float column[8];                                        // and its block's columns
-    coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> context[2];
+    coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> context[2];
     for (uint j = 0u; j < 2u; j++)
-        context[j] = coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+        context[j] = coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
 
     for (uint block = 0u; block < blocks; block++) {
         uint first = block * 64u, keys = min(64u, rows - first);
         /* The block's keys and values, 16 bytes a lane; the rows past the last are zero. */
         barrier();                                          // the last block is done with
+#ifdef TM16
+        for (uint i = lane; i < 256u; i += 128u) {
+            uint key = i / 4u, part = i % 4u;
+            uvec4 zero = uvec4(0u);
+            u4[i] = key < keys
+                ? Uvec4Buf(uint64_t(pc.b)).v[(plane + (first + key) * 32u) / 8u + part] : zero;
+            u4[256u + i] = key < keys
+                ? Uvec4Buf(uint64_t(pc.d)).v[(plane + (first + key) * 32u) / 8u + part] : zero;
+        }
+#else
         {
             uint key = lane / 4u, part = lane % 4u;
             uvec4 zero = uvec4(0u);
@@ -116,6 +143,7 @@ void main() {
             u4[256u + lane] = key < keys
                 ? Uvec4Buf(uint64_t(pc.d)).v[(plane + (first + key) * 32u) / 8u + part] : zero;
         }
+#endif
         barrier();
         if (!busy) continue;
 
@@ -124,8 +152,8 @@ void main() {
             /* Sixteen keys' logits in; the weights back in their place, two neighbours a
              * lane, for each row's lane to add in the tree's order, and the published
              * weights beside them as the PV's A. */
-            coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator> acc =
-                coopmat<float, gl_ScopeSubgroup, 8, 16, gl_MatrixUseAccumulator>(0.0);
+            coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc =
+                coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
             if (start < rows)
                 for (uint c = 0u; c < 2u; c++) {
                     coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> key;
@@ -136,7 +164,7 @@ void main() {
             coopMatStore(acc, f32, scratch, 16u, gl_CooperativeMatrixLayoutRowMajor);
             subgroupMemoryBarrierShared();
             subgroupBarrier();
-            for (uint t = 0u; t < 2u; t++) {
+            for (uint t = 0u; t < QRU / 4u; t++) {
                 uint at = local * 2u + t * 64u;              // row at / 16, keys at % 16 and + 1
                 vec2 logits = v2[(scratch + at) / 2u];
                 uint k0 = start + at % 16u, k1 = k0 + 1u;
@@ -145,11 +173,11 @@ void main() {
                 v2[(scratch + at) / 2u] = vec2(w0, w1);
                 float p0 = k0 < tokens ? e4m3(w0) : 0.0;
                 float p1 = k1 < tokens ? e4m3(w1) : 0.0;
-                u32[scratch + 128u + at / 2u] = packHalf2x16(vec2(p0, p1));
+                u32[scratch + PROB + at / 2u] = packHalf2x16(vec2(p0, p1));
             }
             subgroupMemoryBarrierShared();
             subgroupBarrier();
-            if (local < 8u) {
+            if (local < QRU) {
                 uint base = scratch + local * 16u;
                 for (uint c = 0u; c < 8u; c++) {
                     float pair = hadd(f32[base + c], f32[base + c + 8u]);
@@ -157,8 +185,8 @@ void main() {
                 }
             }
             if (start < rows) {
-                coopmat<float16_t, gl_ScopeSubgroup, 8, 16, gl_MatrixUseA> p;
-                coopMatLoad(p, h16, (scratch + 128u) * 2u, 16u, gl_CooperativeMatrixLayoutRowMajor);
+                coopmat<float16_t, gl_ScopeSubgroup, QR, 16, gl_MatrixUseA> p;
+                coopMatLoad(p, h16, (scratch + PROB) * 2u, 16u, gl_CooperativeMatrixLayoutRowMajor);
                 for (uint j = 0u; j < 2u; j++) {
                     coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> v;
                     coopMatLoad(v, h16, VALUES + chunk * 16u * 32u + j * 16u, 32u,
@@ -169,7 +197,7 @@ void main() {
             subgroupMemoryBarrierShared();
             subgroupBarrier();
         }
-        if (local < 8u) {
+        if (local < QRU) {
             float even = hadd(hadd(hadd(column[0], column[2]), column[4]), column[6]);
             float odd = hadd(hadd(hadd(column[1], column[3]), column[5]), column[7]);
             total = hadd(total, hadd(even, odd));
@@ -178,7 +206,7 @@ void main() {
     if (!busy) return;
 
     float reciprocal = 0.0;
-    if (local < 8u) {
+    if (local < QRU) {
         uint padding = blocks * 64u - tokens;
         if (padding > 0u) total = hadd(total, -hmul(vit_weight(0.0), float(padding)));
         reciprocal = half_round(1.0 / total);
@@ -191,7 +219,7 @@ void main() {
     subgroupMemoryBarrierShared();
     subgroupBarrier();
     uint channels = heads * 32u;
-    for (uint e = local * 4u; e < 256u; e += 128u) {
+    for (uint e = local * 4u; e < QRU * 32u; e += 128u) {
         uint r = row + e / 32u, d = e % 32u;
         float scale = subgroupShuffle(reciprocal, e / 32u);
         vec4 values;

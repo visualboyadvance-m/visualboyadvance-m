@@ -68,7 +68,7 @@ void store(uint index, float value) {
     if (epilogue == 2u || epilogue == 3u) value = gate_activation(value);
     if (epilogue == 1u || epilogue == 3u) value = e4m3(value);
     if (epilogue == 4u) value = half_round(value);
-    if ((operation_flags() & 0x1000u) != 0u) HalfBuf(uint64_t(pc.c)).v[index] = float16_t(value);
+    if ((operation_flags() & 0x1000u) != 0u) HalfBuf(uint64_t(pc.c)).v[index] = to_half(value);
     else                            pc.c.v[index] = value;
 }
 
@@ -106,7 +106,9 @@ void main() {
             at = (((py / size) * across + px / size) * size * size
                   + (py % size) * size + px % size) * channels + c;
         }
-        store(index, load_a(at) + load_b(index) * pc.d.v[index % pc.n]);
+        /* written as the fused multiply-add it is, as residual_epilogue.glsl's */
+        precise float total = fma(load_b(index), pc.d.v[index % pc.n], load_a(at));
+        store(index, total);
         return;
     }
     if (kind == PARTITION || kind == REVERSE) {
