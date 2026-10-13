@@ -638,6 +638,27 @@ void drawTextWx(uint8_t* buffer, int pitch, int x, int y, const wxString& text,
     }
 }
 
+#ifdef __WXGTK__
+// Keeps a window that takes game keys out of the desktop's input method. wxGTK gives
+// every custom-drawn window a GTK input method context, and on Wayland GTK's default
+// one turns on text input for the focused surface, so the compositor hands its keys
+// to the input method first. KDE Plasma 6's (plasma-keyboard) shows accented letters
+// when a key is held, and to tell a hold from a tap it keeps back the press of every
+// letter that has accents -- A, D, S, K, L, I, O -- until the key is released, then
+// sends the press and the release together. The joypad saw each such key for no time
+// at all: Down, Left, Right, A and B did nothing on the default bindings, while W and
+// Enter worked. GTK's simple context composes dead keys itself and asks for no text
+// input, so the keys arrive as they happen. Native controls (a dialog's text fields)
+// have contexts of their own and keep the input method.
+void KeepOutOfInputMethod(wxWindow* window) {
+    if (!window)
+        return;
+    GtkIMContext* const context = window->m_imContext;
+    if (context && GTK_IS_IM_MULTICONTEXT(context))
+        gtk_im_multicontext_set_context_id(GTK_IM_MULTICONTEXT(context), "gtk-im-context-simple");
+}
+#endif
+
 }  // namespace
 
 int emulating;
@@ -2378,6 +2399,11 @@ void GameArea::OnIdle(wxIdleEvent& event)
         wxWindow* w = NULL;
 
         w = panel->GetWindow();
+
+#ifdef __WXGTK__
+        KeepOutOfInputMethod(w);
+        KeepOutOfInputMethod(this);
+#endif
 
         // set up event handlers
         w->Bind(VBAM_EVT_USER_INPUT, &GameArea::OnUserInput, this);
