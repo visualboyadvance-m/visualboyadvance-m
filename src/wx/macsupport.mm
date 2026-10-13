@@ -51,19 +51,44 @@ bool VbamMacHostIsAppleSilicon() {
     return is_arm64 != 0;
 }
 
+// The screens the emulator's window covers: every one its frame overlaps, so a
+// window spanning two displays gets both. Empty when there is no window yet; the
+// window's own screen when it is minimized (its frame is then the Dock's).
+static NSArray<NSScreen*>* WindowScreens() {
+    NSWindow* window =
+        wxGetApp().frame ? ((NSView*)wxGetApp().frame->GetHandle()).window : nil;
+    if (!window)
+        return @[];
+    NSMutableArray<NSScreen*>* screens = [NSMutableArray array];
+    if (!window.miniaturized) {
+        for (NSScreen* screen in [NSScreen screens]) {
+            if (NSIntersectsRect(screen.frame, window.frame))
+                [screens addObject:screen];
+        }
+    }
+    if (screens.count == 0 && window.screen)
+        [screens addObject:window.screen];
+    return screens;
+}
+
 // The display's EDR headroom -- a multiplier over SDR white (1.0 == no HDR). The
 // EDR path clips content above this, so the headroom times our SDR-white nits is
-// the display's usable peak in our luminance model. Uses the window's screen when
-// available, else the brightest connected screen. Returns 1.0 when HDR is off or
+// the display's usable peak in our luminance model. Uses the screen with the
+// least headroom of those the window covers -- content brighter than that clips
+// there -- else the brightest connected screen. Returns 1.0 when HDR is off or
 // unsupported. "Potential" (capability) rather than the currently-allocated value.
 //
 // The screen is chosen by EdrScreen(), which VbamMacosDisplayFloorRatio() shares
 // so the peak and the black floor always describe the same display.
 static NSScreen* EdrScreen() {
-    NSScreen* window_screen =
-        wxGetApp().frame ? ((NSView*)wxGetApp().frame->GetHandle()).window.screen : nil;
-    if (window_screen)
-        return window_screen;
+    NSScreen* least = nil;
+    for (NSScreen* screen in WindowScreens()) {
+        if (!least || screen.maximumPotentialExtendedDynamicRangeColorComponentValue <
+                          least.maximumPotentialExtendedDynamicRangeColorComponentValue)
+            least = screen;
+    }
+    if (least)
+        return least;
 
     NSScreen* best_screen = nil;
     double best = 1.0;
@@ -75,6 +100,20 @@ static NSScreen* EdrScreen() {
         }
     }
     return best_screen;
+}
+
+// Whether every screen the window covers can show EDR; `count` gets how many it
+// covers (0: no window yet, nothing known).
+bool VbamMacosWindowOnEdrScreens(int* count) {
+    NSArray<NSScreen*>* screens = WindowScreens();
+    *count = static_cast<int>(screens.count);
+    if (screens.count == 0)
+        return false;
+    for (NSScreen* screen in screens) {
+        if (screen.maximumPotentialExtendedDynamicRangeColorComponentValue <= 1.0)
+            return false;
+    }
+    return true;
 }
 
 double VbamMacosMaxEdrHeadroom() {
@@ -396,7 +435,7 @@ MetalDrawingPanel::MetalDrawingPanel(wxWindow* parent, int _width, int _height)
     // 16 or 32, though
     if (OPTION(kDispFilter) == config::Filter::kNone &&
         OPTION(kDispIFB) == config::Interframe::kNone &&
-        !(hdr::HdrAvailable() && OPTION(kDispHDR))) {
+        !(hdr::HdrForWindow() && OPTION(kDispHDR))) {
         // changing from 32 to 24 does not require regenerating color tables.
         // HDR needs a 32-bit source for the encoder, so leave it forced to 32.
         systemColorDepth = (OPTION(kBitDepth) + 1) << 3;

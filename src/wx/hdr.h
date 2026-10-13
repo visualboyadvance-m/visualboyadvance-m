@@ -116,17 +116,40 @@ bool HdrAvailable();
 // true on X11 (Linux/BSD); used for the banding-reduction option there.
 bool DeepColor10Available();
 
-// The current display's usable HDR peak in nits, for our luminance model (EDR
-// headroom x SDR-reference white on macOS). 0 when unknown -- then callers keep
-// their fixed peak default and slider range. Queried live; depends on the
-// reference-white setting. Currently non-zero only on macOS.
+// The displays the emulator's window is on -- every one of them where it spans
+// several -- as the platform reports them now. GameArea::RecheckWindowDisplays()
+// reads it when the window is moved, resized, restored or maximized.
+struct WindowDisplays {
+    bool known = false;    // false where the platform cannot tell (X11, no window yet)
+    bool all_hdr = false;  // every one of them is in HDR mode
+    int count = 0;
+};
+WindowDisplays QueryWindowDisplays();
+
+// Whether every display the window is on was in HDR mode at the last check.
+// True until the first check, and where it cannot be known, so it never vetoes
+// HDR on its own. HdrAvailable() says whether this system can present HDR at all
+// and decides whether the option is offered; this decides whether a panel made
+// now presents it.
+bool WindowOnHdrDisplays();
+void SetWindowOnHdrDisplays(bool on_hdr);
+
+// HdrAvailable() and WindowOnHdrDisplays(): what a renderer asks when it sets up
+// its output.
+bool HdrForWindow();
+
+// The usable HDR peak in nits of the displays the window is on, the lowest where
+// it spans several (content above it clips on that one), for our luminance model
+// (EDR headroom x SDR-reference white on macOS). 0 when unknown -- then callers
+// keep their fixed peak default and slider range. Queried live; depends on the
+// reference-white setting.
 uint32_t DisplayPeakNits();
 
-// The current display's black floor in nits -- the fractional MinLuminance the
-// platform reports (Wayland luminances.min_lum, Windows
-// DXGI_OUTPUT_DESC1::MinLuminance, macOS the EDID's min/max luminance ratio
-// times DisplayPeakNits()). 0 when unknown, and then the transfer's dark end
-// behaves as it did before. Queried live.
+// The black floor in nits of the displays the window is on, the highest where it
+// spans several -- the fractional MinLuminance the platform reports (Wayland
+// luminances.min_lum, Windows DXGI_OUTPUT_DESC1::MinLuminance, macOS the EDID's
+// min/max luminance ratio times DisplayPeakNits()). 0 when unknown, and then the
+// transfer's dark end behaves as it did before. Queried live.
 float DisplayMinNits();
 
 // True if the display supports HDR but the user has it switched off in Windows

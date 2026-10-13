@@ -94,6 +94,8 @@ class wxGLCanvasEGL;
 // constexpr stub, so there is zero runtime cost on builds without support.
 // ----------------------------------------------------------------------------
 
+struct wl_surface;
+
 #ifdef HAVE_WAYLAND_SUPPORT
 bool IsWayland();
 // True only when this is a KDE/Plasma (KWin) Wayland session whose display HDR
@@ -101,9 +103,20 @@ bool IsWayland();
 // unavailable -- and suppress the "no effect" warning -- when the user has
 // turned HDR off in KDE, rather than offering an HDR toggle that does nothing.
 bool KdeHdrDisabled();
+// The outputs (monitors) the compositor shows a surface of ours on, from its
+// wl_surface enter/leave events: a Wayland client is never told where its window
+// is, only which outputs it is on. Track a surface we created (a renderer's
+// subsurface) right after creating it, untrack it before destroying it.
+void WaylandTrackSurfaceOutputs(struct wl_surface* surface);
+void WaylandUntrackSurfaceOutputs(struct wl_surface* surface);
+// Called on the GUI thread whenever a tracked surface enters or leaves an output.
+void WaylandSetOutputsChangedHandler(void (*handler)());
 #else
 constexpr bool IsWayland() { return false; }
 constexpr bool KdeHdrDisabled() { return false; }
+inline void WaylandTrackSurfaceOutputs([[maybe_unused]] struct wl_surface* surface) {}
+inline void WaylandUntrackSurfaceOutputs([[maybe_unused]] struct wl_surface* surface) {}
+inline void WaylandSetOutputsChangedHandler([[maybe_unused]] void (*handler)()) {}
 #endif
 
 #ifdef WAYLAND_MOVE_SUBSURFACE_BACKPORT
@@ -126,7 +139,14 @@ inline void MoveWaylandSubsurface([[maybe_unused]] wxGLCanvas* win) {}
 //   WaylandClearSurfaceColor(...) drop any tag previously set on the surface.
 // ----------------------------------------------------------------------------
 
-struct wl_surface;
+#include <vector>
+
+// One output the window is on, as the compositor describes it.
+struct WaylandOutputColor {
+    bool hdr = false;        // its transfer function is ST2084 PQ: in HDR mode
+    uint32_t peak_nits = 0;  // 0 when not reported
+    float min_nits = 0.0f;
+};
 
 #ifdef HAVE_WAYLAND_CM
 // Compositor supports parametric BT.2020 + ST2084 PQ image descriptions. Usable
@@ -136,23 +156,32 @@ bool WaylandHdrPqSupported();
 // subsurface). ref/peak are luminance hints in nits (<= 0 skips the hint).
 bool WaylandSetWlSurfaceHdrPq(struct wl_surface* surface, float ref_white_nits, float peak_nits);
 void WaylandClearWlSurfaceColor(struct wl_surface* surface);
-// The compositor's reported peak luminance (nits) for the display the app is on,
-// via the color-management output image description. 0 when unknown / HDR off.
-// Absolute nits (Wayland HDR is PQ), so used directly as the peak ceiling.
-uint32_t WaylandDisplayPeakNits();
-// The compositor's reported minimum luminance (nits) for that same display: the
-// display's own black floor including ambient flare. Fractional -- hundredths
-// of a nit on an LCD, ten-thousandths on an OLED -- so unlike the peak this is
-// a float. 0 when unknown or genuinely zero.
-float WaylandDisplayMinNits();
+// Every output the window is on -- those the tracked surfaces are shown on, else
+// the monitor GDK puts `gdk_window` (a GdkWindow*) on -- with whether each is in
+// HDR mode and its luminance range, from the color-management output image
+// description. False when it cannot tell (no color manager, no output known).
+bool WaylandWindowOutputs(void* gdk_window, std::vector<WaylandOutputColor>* out);
+// The compositor's reported peak luminance (nits) for the displays the window is
+// on, the lowest where it spans several: content above it clips on one of them.
+// 0 when unknown / HDR off. Absolute nits (Wayland HDR is PQ), so used directly
+// as the peak ceiling.
+uint32_t WaylandDisplayPeakNits(void* gdk_window);
+// The compositor's reported minimum luminance (nits) for those same displays,
+// the highest where it spans several: the display's own black floor including
+// ambient flare. Fractional -- hundredths of a nit on an LCD, ten-thousandths on
+// an OLED -- so unlike the peak this is a float. 0 when unknown or genuinely
+// zero.
+float WaylandDisplayMinNits(void* gdk_window);
 #else
 constexpr bool WaylandHdrPqSupported() { return false; }
 inline bool WaylandSetWlSurfaceHdrPq([[maybe_unused]] struct wl_surface* surface,
                                      [[maybe_unused]] float ref_white_nits,
                                      [[maybe_unused]] float peak_nits) { return false; }
 inline void WaylandClearWlSurfaceColor([[maybe_unused]] struct wl_surface* surface) {}
-constexpr uint32_t WaylandDisplayPeakNits() { return 0; }
-constexpr float WaylandDisplayMinNits() { return 0.0f; }
+inline bool WaylandWindowOutputs([[maybe_unused]] void* gdk_window,
+                                 [[maybe_unused]] std::vector<WaylandOutputColor>* out) { return false; }
+constexpr uint32_t WaylandDisplayPeakNits([[maybe_unused]] void* gdk_window) { return 0; }
+constexpr float WaylandDisplayMinNits([[maybe_unused]] void* gdk_window) { return 0.0f; }
 #endif
 
 #ifdef HAVE_WAYLAND_HDR

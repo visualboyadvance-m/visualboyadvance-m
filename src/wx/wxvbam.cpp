@@ -1358,8 +1358,11 @@ bool wxvbamApp::OnInit() {
     // window is mapped (the renderers need a realized surface) and before a ROM
     // is loaded.
     CallAfter([this] {
-        if (frame && frame->GetPanel())
+        if (frame && frame->GetPanel()) {
             frame->GetPanel()->ProbeOutputCapabilities();
+            // Then whether the monitors the window opened on are in HDR mode.
+            frame->GetPanel()->RecheckWindowDisplays();
+        }
     });
 
     return true;
@@ -1747,6 +1750,7 @@ EVT_MOVE_START(MainFrame::OnMoveStart)
 EVT_MOVE_END(MainFrame::OnMoveEnd)
 EVT_SIZE(MainFrame::OnSize)
 EVT_ICONIZE(MainFrame::OnIconize)
+EVT_MAXIMIZE(MainFrame::OnMaximize)
 
 // For tracking menubar state on all platforms.
 EVT_MENU_OPEN(MainFrame::MenuPopped)
@@ -1914,6 +1918,9 @@ void MainFrame::OnMove(wxMoveEvent&) {
         OPTION(kGeomWindowX) = window_pos.x;
         OPTION(kGeomWindowY) = window_pos.y;
     }
+    // It may now be on another monitor, or across two.
+    if (panel)
+        panel->ScheduleWindowDisplaysCheck();
 }
 
 // On Windows pause sound when moving and resizing the window to prevent dsound
@@ -1950,14 +1957,28 @@ void MainFrame::OnSize(wxSizeEvent& event)
 
     OPTION(kGeomIsMaximized) = IsMaximized();
     OPTION(kGeomFullScreen) = IsFullScreen();
+
+    // Grown onto another monitor, or back off one.
+    if (panel)
+        panel->ScheduleWindowDisplaysCheck();
+}
+
+void MainFrame::OnMaximize(wxMaximizeEvent& event)
+{
+    event.Skip();
+    if (init_complete_ && panel)
+        panel->ScheduleWindowDisplaysCheck();
 }
 
 void MainFrame::OnIconize(wxIconizeEvent& event)
 {
-    (void)event; // unused
     if (!init_complete_) {
         return;
     }
+
+    // Restored, maybe onto a different monitor than it left.
+    if (!event.IsIconized() && panel)
+        panel->ScheduleWindowDisplaysCheck();
 
     if (OPTION(kPrefPauseWhenInactive)) {
 #ifndef NO_LINK

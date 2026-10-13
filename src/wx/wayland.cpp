@@ -3,9 +3,12 @@
 #ifdef HAVE_WAYLAND_SUPPORT
 #include <gdk/gdkwayland.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <map>
+#include <vector>
 #include <iterator>
 #include <string>
 
@@ -57,6 +60,75 @@ bool KdeHdrDisabled() {
         pos = colon + 1;
     }
     return any_key && !any_on;
+}
+
+namespace {
+
+// The outputs each tracked surface is on, in the order it entered them.
+std::map<wl_surface*, std::vector<wl_output*>>& TrackedSurfaces() {
+    static std::map<wl_surface*, std::vector<wl_output*>> m;
+    return m;
+}
+
+void (*g_outputs_changed)() = nullptr;
+
+void SurfaceEnter(void*, wl_surface* surface, wl_output* output) {
+    auto it = TrackedSurfaces().find(surface);
+    if (it == TrackedSurfaces().end())
+        return;
+    if (std::find(it->second.begin(), it->second.end(), output) == it->second.end())
+        it->second.push_back(output);
+    if (g_outputs_changed)
+        g_outputs_changed();
+}
+
+void SurfaceLeave(void*, wl_surface* surface, wl_output* output) {
+    auto it = TrackedSurfaces().find(surface);
+    if (it == TrackedSurfaces().end())
+        return;
+    it->second.erase(std::remove(it->second.begin(), it->second.end(), output),
+                     it->second.end());
+    if (g_outputs_changed)
+        g_outputs_changed();
+}
+
+// The renderers bind wl_compositor at version 1, so their surfaces only ever get
+// enter and leave; the rest stays null.
+const wl_surface_listener kSurfaceListener = [] {
+    wl_surface_listener l = {};
+    l.enter = SurfaceEnter;
+    l.leave = SurfaceLeave;
+    return l;
+}();
+
+}  // namespace
+
+void WaylandTrackSurfaceOutputs(wl_surface* surface) {
+    if (!surface || TrackedSurfaces().count(surface))
+        return;
+    TrackedSurfaces()[surface];
+    wl_surface_add_listener(surface, &kSurfaceListener, nullptr);
+}
+
+void WaylandUntrackSurfaceOutputs(wl_surface* surface) {
+    if (TrackedSurfaces().erase(surface) && g_outputs_changed)
+        g_outputs_changed();
+}
+
+void WaylandSetOutputsChangedHandler(void (*handler)()) {
+    g_outputs_changed = handler;
+}
+
+// The outputs the tracked surfaces are on, every one once.
+static std::vector<wl_output*> TrackedOutputs() {
+    std::vector<wl_output*> outputs;
+    for (const auto& entry : TrackedSurfaces()) {
+        for (wl_output* output : entry.second) {
+            if (std::find(outputs.begin(), outputs.end(), output) == outputs.end())
+                outputs.push_back(output);
+        }
+    }
+    return outputs;
 }
 #endif // HAVE_WAYLAND_SUPPORT
 
@@ -257,20 +329,23 @@ const wp_image_description_v1_listener kDescListener = [] {
 struct InfoState {
     uint32_t lum_max        = 0;  // luminances.max_lum
     uint32_t lum_min        = 0;  // luminances.min_lum, x10000
+    uint32_t lum_ref        = 0;  // luminances.reference_lum: SDR white
     bool     has_lum        = false;
     uint32_t target_lum_max = 0;  // target_luminance.max_lum
     uint32_t target_lum_min = 0;  // target_luminance.min_lum, x10000
     bool     has_target_lum = false;
+    uint32_t tf_named       = 0;      // tf_named, 0 when not sent
     bool     done           = false;
 };
 void InfoDone(void* d, wp_image_description_info_v1*) {
     static_cast<InfoState*>(d)->done = true;
 }
 void InfoLuminances(void* d, wp_image_description_info_v1*,
-                    uint32_t min_lum, uint32_t max_lum, uint32_t /*ref*/) {
+                    uint32_t min_lum, uint32_t max_lum, uint32_t ref_lum) {
     InfoState* is = static_cast<InfoState*>(d);
     is->lum_max = max_lum;
     is->lum_min = min_lum;
+    is->lum_ref = ref_lum;
     is->has_lum = true;
 }
 void InfoTargetLuminance(void* d, wp_image_description_info_v1*,
@@ -298,7 +373,9 @@ void InfoPrimaries(void*, wp_image_description_info_v1*,
                    int32_t, int32_t, int32_t, int32_t) {}
 void InfoPrimariesNamed(void*, wp_image_description_info_v1*, uint32_t) {}
 void InfoTfPower(void*, wp_image_description_info_v1*, uint32_t) {}
-void InfoTfNamed(void*, wp_image_description_info_v1*, uint32_t) {}
+void InfoTfNamed(void* d, wp_image_description_info_v1*, uint32_t tf) {
+    static_cast<InfoState*>(d)->tf_named = tf;
+}
 void InfoTargetPrimaries(void*, wp_image_description_info_v1*,
                          int32_t, int32_t, int32_t, int32_t,
                          int32_t, int32_t, int32_t, int32_t) {}
@@ -419,35 +496,19 @@ void WaylandClearWlSurfaceColor(wl_surface* wls) {
         wl_display_flush(Cm().display);
 }
 
-// One trip to the compositor for the image description of the output the app
-// is on, filling in whatever luminance events it sends. False when there is no
-// description to read -- no color manager, no monitor, or HDR off.
-bool QueryOutputLuminance(InfoState* out) {
-    if (!IsWayland() || !EnsureColorManager())
+namespace {
+
+// One trip to the compositor for the image description of `wlout`, filling in
+// whatever events it sends. False when there is no description to read.
+bool QueryOutputInfo(wl_output* wlout, InfoState* out) {
+    if (!wlout || !IsWayland() || !EnsureColorManager())
         return false;
     ColorManager& cm = Cm();
 
-    // The wl_output for the display (primary, else the first monitor). GDK owns
-    // it; we only pass it as an argument, so its event queue is irrelevant.
-    GdkDisplay* gd = gdk_display_get_default();
-    if (!gd)
-        return false;
-    GdkMonitor* mon = gdk_display_get_primary_monitor(gd);
-    if (!mon)
-        mon = gdk_display_get_monitor(gd, 0);
-    if (!mon || !GDK_IS_WAYLAND_MONITOR(mon))
-        return false;
-    // gdk_wayland_monitor_get_wl_output() takes a GdkMonitor* (the
-    // GDK_IS_WAYLAND_MONITOR() check above already confirms the backend);
-    // wrapping it in GDK_WAYLAND_MONITOR() yields an incomplete type that
-    // does not convert back to GdkMonitor* under C++.
-    wl_output* wlout = gdk_wayland_monitor_get_wl_output(mon);
-    if (!wlout)
-        return false;
-
-    // Ask the compositor for the output's image description, then its luminance
-    // info. All proxies run on our private queue so roundtrips don't reenter
-    // GTK's default-queue dispatch.
+    // Ask the compositor for the output's image description, then its info.
+    // All proxies run on our private queue so roundtrips don't reenter GTK's
+    // default-queue dispatch. The wl_output is GDK's; we only pass it as an
+    // argument, so its event queue is irrelevant.
     wp_color_management_output_v1* cmout =
         wp_color_manager_v1_get_output(cm.manager, wlout);
     wl_proxy_set_queue(reinterpret_cast<wl_proxy*>(cmout), cm.queue);
@@ -480,21 +541,84 @@ bool QueryOutputLuminance(InfoState* out) {
     return got;
 }
 
-uint32_t WaylandDisplayPeakNits() {
-    InfoState is;
-    if (!QueryOutputLuminance(&is))
-        return 0;
-    return is.target_lum_max ? is.target_lum_max : is.lum_max;
+// The wl_output of the monitor GDK puts `gdk_window` on, else the primary
+// monitor's, else the first one's.
+wl_output* FallbackOutput(void* gdk_window) {
+    GdkDisplay* gd = gdk_display_get_default();
+    if (!gd)
+        return nullptr;
+    GdkMonitor* mon = gdk_window
+        ? gdk_display_get_monitor_at_window(gd, static_cast<GdkWindow*>(gdk_window))
+        : nullptr;
+    if (!mon)
+        mon = gdk_display_get_primary_monitor(gd);
+    if (!mon)
+        mon = gdk_display_get_monitor(gd, 0);
+    if (!mon || !GDK_IS_WAYLAND_MONITOR(mon))
+        return nullptr;
+    // gdk_wayland_monitor_get_wl_output() takes a GdkMonitor* (the
+    // GDK_IS_WAYLAND_MONITOR() check above already confirms the backend);
+    // wrapping it in GDK_WAYLAND_MONITOR() yields an incomplete type that
+    // does not convert back to GdkMonitor* under C++.
+    return gdk_wayland_monitor_get_wl_output(mon);
 }
 
-float WaylandDisplayMinNits() {
-    InfoState is;
-    if (!QueryOutputLuminance(&is))
+}  // namespace
+
+bool WaylandWindowOutputs(void* gdk_window, std::vector<WaylandOutputColor>* out) {
+    out->clear();
+    if (!IsWayland() || !EnsureColorManager())
+        return false;
+    // The tracked surfaces give every output the window is on; without one (the
+    // OpenGL renderer draws to wx's surface, and nothing is up before the first
+    // panel) only the monitor GDK places the window on is known.
+    std::vector<wl_output*> outputs = TrackedOutputs();
+    if (outputs.empty()) {
+        if (wl_output* output = FallbackOutput(gdk_window))
+            outputs.push_back(output);
+    }
+    for (wl_output* output : outputs) {
+        InfoState is;
+        if (!QueryOutputInfo(output, &is))
+            continue;
+        WaylandOutputColor color;
+        color.peak_nits = is.target_lum_max ? is.target_lum_max : is.lum_max;
+        // In HDR mode where the output can go brighter than its SDR white. Not
+        // the transfer function: KWin describes an output in its blending space,
+        // gamma 2.2 with the luminance range extended (a laptop panel in HDR
+        // mode: 617 nits over an SDR white of 281), never as PQ; a compositor
+        // that does say PQ is in HDR mode by that alone.
+        color.hdr = is.tf_named == WP_COLOR_MANAGER_V1_TRANSFER_FUNCTION_ST2084_PQ ||
+                    (is.has_lum && is.lum_ref > 0 && color.peak_nits > is.lum_ref);
+        // Scaled by 10000 on the wire; see InfoState.
+        const uint32_t scaled = std::max(is.has_lum ? is.lum_min : 0u,
+                                         is.has_target_lum ? is.target_lum_min : 0u);
+        color.min_nits = static_cast<float>(scaled) / 10000.0f;
+        out->push_back(color);
+    }
+    return !out->empty();
+}
+
+uint32_t WaylandDisplayPeakNits(void* gdk_window) {
+    std::vector<WaylandOutputColor> outputs;
+    if (!WaylandWindowOutputs(gdk_window, &outputs))
+        return 0;
+    uint32_t peak = 0;
+    for (const WaylandOutputColor& o : outputs) {
+        if (o.peak_nits && (!peak || o.peak_nits < peak))
+            peak = o.peak_nits;
+    }
+    return peak;
+}
+
+float WaylandDisplayMinNits(void* gdk_window) {
+    std::vector<WaylandOutputColor> outputs;
+    if (!WaylandWindowOutputs(gdk_window, &outputs))
         return 0.0f;
-    // Scaled by 10000 on the wire; see InfoState.
-    const uint32_t scaled = std::max(is.has_lum ? is.lum_min : 0u,
-                                     is.has_target_lum ? is.target_lum_min : 0u);
-    return static_cast<float>(scaled) / 10000.0f;
+    float floor_nits = 0.0f;
+    for (const WaylandOutputColor& o : outputs)
+        floor_nits = std::max(floor_nits, o.min_nits);
+    return floor_nits;
 }
 
 #ifdef HAVE_WAYLAND_EGL

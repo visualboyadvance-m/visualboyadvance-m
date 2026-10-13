@@ -734,6 +734,16 @@ GameArea::GameArea()
     // OnSize to fire N times after N filter changes.
     this->Bind(wxEVT_SIZE, &GameArea::OnSize, this);
 
+    window_displays_timer_.SetOwner(this);
+    Bind(wxEVT_TIMER, [this](wxTimerEvent&) { RecheckWindowDisplays(); },
+         window_displays_timer_.GetId());
+    // A renderer's Wayland surface entering or leaving an output is the window
+    // moving onto or off a monitor; the compositor never says where it is.
+    WaylandSetOutputsChangedHandler([] {
+        if (wxGetApp().frame && wxGetApp().frame->GetPanel())
+            wxGetApp().frame->GetPanel()->ScheduleWindowDisplaysCheck();
+    });
+
     // React to the on-screen controller option being toggled at runtime.
     osc_observer_ = std::make_unique<config::OptionsObserver>(
         config::OptionID::kUIShowOnScreenController,
@@ -2218,6 +2228,7 @@ void GameArea::ShowFullScreen(bool full)
 
 GameArea::~GameArea()
 {
+    WaylandSetOutputsChangedHandler(nullptr);
     UnloadGame(true);
 
     if (rewind_mem)
@@ -3041,7 +3052,7 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
 
     // HDR output re-encodes the final RGBA8 image, so force a 32-bit source
     // when it is enabled (unless an RPI plugin has locked us to 16-bit).
-    if (hdr::HdrAvailable() && OPTION(kDispHDR) && !(rpi_ && rpi_bpp_ == 2)) {
+    if (hdr::HdrForWindow() && OPTION(kDispHDR) && !(rpi_ && rpi_bpp_ == 2)) {
         panel_color_depth_ = 32;
         systemColorDepth = 32;
     }
@@ -5182,7 +5193,7 @@ void SDLDrawingPanel::DrawingPanelInit()
         // "default" backend picks opengl on Wayland, so it needs the EGL window
         // too -- except when HDR makes us force the vulkan backend instead.
         const bool wl_force_vulkan = (renderer_name == wxString("default")) &&
-                                     hdr::HdrAvailable() && OPTION(kDispHDR);
+                                     hdr::HdrForWindow() && OPTION(kDispHDR);
         const bool wl_gl_renderer =
             renderer_name == wxString("opengl") ||
             renderer_name == wxString("opengles2") ||
@@ -5272,7 +5283,7 @@ void SDLDrawingPanel::DrawingPanelInit()
     // When HDR is available and on, ask SDL for a linear scRGB output so it can
     // present HDR; we then upload a float (scRGB fp16) texture. Otherwise create
     // an ordinary SDR renderer.
-    const bool sdl_want_hdr = hdr::HdrAvailable() && OPTION(kDispHDR);
+    const bool sdl_want_hdr = hdr::HdrForWindow() && OPTION(kDispHDR);
     // On native Wayland, SDL's own HDR path does not work for our borrowed
     // child subsurface: SDL never sees the output's HDR headroom (it reports
     // SDR), so SDL_PROP_RENDERER_HDR_ENABLED stays false. Instead we drive HDR
@@ -6598,7 +6609,7 @@ void WaylandDrawingPanel::EnsureSetup()
     // compositor can present BT.2020 PQ; otherwise behave exactly like the plain
     // wx software panel. The panel is recreated when kDispHDR changes (render
     // observer -> ReinitPanel), so this is re-evaluated on toggle.
-    if (!OPTION(kDispHDR) || !hdr::HdrAvailable() || !WaylandHdrPqSupported())
+    if (!OPTION(kDispHDR) || !hdr::HdrForWindow() || !WaylandHdrPqSupported())
         return;
     if (!IsWayland())
         return;
@@ -6687,6 +6698,10 @@ void WaylandDrawingPanel::EnsureSetup()
     wl_shm_            = g.shm;
     wl_child_surface_  = child;
     wl_subsurface_     = sub;
+    // The outputs it is shown on are where the window is (GameArea::
+    // RecheckWindowDisplays()); its enter/leave events come with the private
+    // queue's dispatch at each present.
+    WaylandTrackSurfaceOutputs(child);
 #ifdef HAVE_WAYLAND_VIEWPORTER
     // Optional: when the compositor offers viewporter, scale a source-resolution
     // buffer to the window on its side so we PQ-encode only source pixels per
@@ -6929,6 +6944,7 @@ void WaylandDrawingPanel::Teardown()
         wl_subsurface_ = nullptr;
     }
     if (wl_child_surface_) {
+        WaylandUntrackSurfaceOutputs(static_cast<wl_surface*>(wl_child_surface_));
         wl_surface_destroy(static_cast<wl_surface*>(wl_child_surface_));
         wl_child_surface_ = nullptr;
     }
@@ -7717,7 +7733,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     // --- 4. Swap Chain ---
     // For HDR use a 10-bit back buffer; the BT.2020 PQ color space is set on
     // the swapchain below once we have an IDXGISwapChain3.
-    rt_format_ = (hdr::HdrAvailable() && OPTION(kDispHDR)) ? DXGI_FORMAT_R10G10B10A2_UNORM
+    rt_format_ = (hdr::HdrForWindow() && OPTION(kDispHDR)) ? DXGI_FORMAT_R10G10B10A2_UNORM
                                                           : DXGI_FORMAT_B8G8R8A8_UNORM;
 
     wxSize win_size = GetClientSize();
@@ -7748,7 +7764,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
     frame_index = swap_chain->GetCurrentBackBufferIndex();
 
     // --- 4b. HDR10 BT.2020 PQ color space (if requested and supported) ---
-    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+    if (hdr::HdrForWindow() && OPTION(kDispHDR)) {
         const DXGI_COLOR_SPACE_TYPE pq_cs =
             DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020;
         UINT cs_support = 0;
@@ -8459,7 +8475,7 @@ bool DX11DrawingPanel::CreateDeviceAndSwapchain()
     }
 
     // 10-bit back buffer for HDR (tagged PQ below), 8-bit for SDR.
-    rt_format_ = (hdr::HdrAvailable() && OPTION(kDispHDR))
+    rt_format_ = (hdr::HdrForWindow() && OPTION(kDispHDR))
                      ? DXGI_FORMAT_R10G10B10A2_UNORM
                      : DXGI_FORMAT_B8G8R8A8_UNORM;
 
@@ -8503,7 +8519,7 @@ bool DX11DrawingPanel::CreateDeviceAndSwapchain()
     // renderer as SDR and bounce the user off Simple to Direct3D 12 on every
     // launch. Apply the color space best-effort here and, if it has not taken yet,
     // keep retrying it per-frame in PresentFrame (ApplyHdrColorSpace).
-    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+    if (hdr::HdrForWindow() && OPTION(kDispHDR)) {
         hdr_swapchain_ = true;
         ApplyHdrColorSpace();
     }
@@ -9627,7 +9643,8 @@ void GameArea::ApplyAutoColorCorrection() {
         return;
     // Follow the effective output, not the raw preference: HDR may be enabled in
     // the options but unavailable on this display, in which case we output SDR.
-    const bool hdr_effective = HdrEffectivelyAvailable() && OPTION(kDispHDR);
+    const bool hdr_effective =
+        hdr::HdrForWindow() && !hdr_reverted_to_sdr_ && OPTION(kDispHDR);
     const auto wanted = hdr_effective
                             ? config::ColorCorrectionProfile::kRec2020
                             : config::ColorCorrectionProfile::kSRGB;
@@ -9678,8 +9695,41 @@ bool GameArea::RenderMethodHiddenForHdr(config::RenderMethod m) const {
     return !IsHdrCapableRenderer(m) || hdr_failed_renderers_.count(m) != 0;
 }
 
+void GameArea::ScheduleWindowDisplaysCheck() {
+    window_displays_timer_.StartOnce(250);
+}
+
+void GameArea::RecheckWindowDisplays() {
+    const hdr::WindowDisplays displays = hdr::QueryWindowDisplays();
+    if (!displays.known)
+        return;  // X11, or no window yet: nothing to go on, keep what we have
+
+    const bool was_hdr = hdr::WindowOnHdrDisplays();
+    hdr::SetWindowOnHdrDisplays(displays.all_hdr);
+    const uint32_t peak = hdr::DisplayPeakNits();
+    const float min_nits = hdr::DisplayMinNits();
+    const bool range_changed = peak != window_peak_nits_ || min_nits != window_min_nits_;
+    window_peak_nits_ = peak;
+    window_min_nits_ = min_nits;
+
+    // The color-correction profile follows the effective output (Rec.2020 into
+    // HDR, sRGB into SDR).
+    ApplyAutoColorCorrection();
+
+    if (!panel || !OPTION(kDispHDR) || !hdr::HdrAvailable())
+        return;
+    if (was_hdr != displays.all_hdr) {
+        // The renderers choose an HDR or SDR surface when the panel is made.
+        wxLogDebug(wxT("Window moved %s HDR display(s); recreating the panel."),
+                   displays.all_hdr ? wxT("onto") : wxT("off"));
+        ReinitPanel();
+    } else if (range_changed && panel->HdrActive()) {
+        panel->UpdateHdrState();
+    }
+}
+
 void GameArea::EvaluateHdrRenderer() {
-    if (!OPTION(kDispHDR) || !hdr::HdrAvailable() || !panel)
+    if (!OPTION(kDispHDR) || !hdr::HdrForWindow() || !panel)
         return;
     if (panel->HdrActive()) {
         hdr_reverted_to_sdr_ = false;  // working -- clear any stale session revert
@@ -11559,13 +11609,21 @@ struct wl_surface* VKDrawingPanel::CreateWaylandSubsurface(struct wl_display* dp
     wl_region_destroy(empty);
     wl_surface_commit(wl_child_surface_);
 
+    // The outputs it is shown on are where the window is (GameArea::
+    // RecheckWindowDisplays()); it is on GTK's queue, so the events arrive.
+    WaylandTrackSurfaceOutputs(wl_child_surface_);
+
     return wl_child_surface_;
 }
 
 void VKDrawingPanel::DestroyWaylandSubsurface()
 {
     if (wl_subsurface_)    { wl_subsurface_destroy(wl_subsurface_);    wl_subsurface_ = nullptr; }
-    if (wl_child_surface_) { wl_surface_destroy(wl_child_surface_);    wl_child_surface_ = nullptr; }
+    if (wl_child_surface_) {
+        WaylandUntrackSurfaceOutputs(wl_child_surface_);
+        wl_surface_destroy(wl_child_surface_);
+        wl_child_surface_ = nullptr;
+    }
     if (wl_subcompositor_) { wl_subcompositor_destroy(wl_subcompositor_); wl_subcompositor_ = nullptr; }
     if (wl_compositor_)    { wl_compositor_destroy(wl_compositor_);    wl_compositor_ = nullptr; }
 }
@@ -12050,7 +12108,7 @@ bool VKDrawingPanel::CreateSwapchain()
     // puts the reference white there, so the picture matches Metal's. Through
     // PQ, macOS places absolute nits against a reference of its own, and white
     // came out brighter than Metal's.
-    if (hdr::HdrAvailable() && OPTION(kDispHDR)) {
+    if (hdr::HdrForWindow() && OPTION(kDispHDR)) {
         for (auto& f : formats) {
             if (f.format     == VK_FORMAT_R16G16B16A16_SFLOAT &&
                 f.colorSpace == VK_COLOR_SPACE_DISPLAY_P3_LINEAR_EXT) {
@@ -12065,7 +12123,7 @@ bool VKDrawingPanel::CreateSwapchain()
 
     // Prefer a 10-bit BT.2020 PQ (HDR10) swapchain when HDR is requested and the
     // surface advertises it; the encoder produces matching A2B10G10R10 PQ data.
-    if (!swapchain_is_hdr_ && hdr::HdrAvailable() && OPTION(kDispHDR)) {
+    if (!swapchain_is_hdr_ && hdr::HdrForWindow() && OPTION(kDispHDR)) {
         for (auto& f : formats) {
             if (f.format     == VK_FORMAT_A2B10G10R10_UNORM_PACK32 &&
                 f.colorSpace == VK_COLOR_SPACE_HDR10_ST2084_EXT) {
@@ -13616,37 +13674,63 @@ static bool VbamProbeWindowsHdr() {
 // absolute-nits, so this is the display peak directly (no reference-white
 // scaling, unlike macOS EDR).
 //
-// Mirrors the macOS EDR probe (VbamMacosMaxEdrHeadroom): prefer the output the
-// emulator window is currently on, so a multi-monitor setup reports the peak of
-// the panel actually showing the game rather than whichever attached panel is
-// brightest. Falls back to the max over all outputs in HDR mode when the window
-// is not up yet or is not on an HDR output. 0 when no output is in HDR mode
-// (G2084 colorspace) -- callers then keep the fixed default.
-// The HDR luminance range DXGI reports for a monitor: the peak in whole nits,
-// which caps what we encode, and MinLuminance -- the display's black floor,
-// fractional, which anchors the dark end of the transfer.
+// Mirrors the macOS EDR probe (VbamMacosMaxEdrHeadroom): the outputs the
+// emulator window is currently on, so a multi-monitor setup reports the panels
+// actually showing the game rather than whichever attached panel is brightest.
+// Falls back to the max over all outputs in HDR mode when the window is not up
+// yet or is not on an HDR output. 0 when no output is in HDR mode (G2084
+// colorspace) -- callers then keep the fixed default.
+//
+// The HDR luminance range DXGI reports for the monitors the window is on: the
+// peak in whole nits, which caps what we encode, and MinLuminance -- the display's
+// black floor, fractional, which anchors the dark end of the transfer.
 struct VbamWindowsHdrLuminance {
     uint32_t peak_nits = 0;
     float    min_nits  = 0.0f;
     bool     found     = false;
+    bool     all_hdr   = false;  // every monitor the window is on is in HDR mode
+    int      monitors  = 0;      // how many it is on; 0 before the window exists
 };
 
-// The range for the monitor the emulator's window is on, falling back to the
-// brightest HDR output when the window is elsewhere or does not exist yet.
-// Both ends come from one output, so a multi-monitor setup never pairs one
-// display's peak with another's floor.
-static VbamWindowsHdrLuminance VbamWindowsDisplayLuminance() {
-    // The monitor the emulator's main window is on (null before the frame
-    // exists), matched against each DXGI output's HMONITOR below.
-    HMONITOR window_monitor = nullptr;
-    if (wxGetApp().frame) {
-        HWND hwnd = reinterpret_cast<HWND>(wxGetApp().frame->GetHWND());
-        if (hwnd)
-            window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+static BOOL CALLBACK VbamCollectMonitor(HMONITOR monitor, HDC, LPRECT, LPARAM data) {
+    reinterpret_cast<std::vector<HMONITOR>*>(data)->push_back(monitor);
+    return TRUE;
+}
+
+// The monitors the emulator's window shows on: every one its client area
+// overlaps, so a window spanning two gets both. The client area rather than the
+// window rect, whose invisible resize borders reach a few pixels onto the next
+// monitor. The nearest monitor when minimized; empty before the frame exists.
+static std::vector<HMONITOR> VbamWindowMonitors() {
+    std::vector<HMONITOR> monitors;
+    if (!wxGetApp().frame)
+        return monitors;
+    HWND hwnd = reinterpret_cast<HWND>(wxGetApp().frame->GetHWND());
+    if (!hwnd)
+        return monitors;
+    RECT client;
+    if (!IsIconic(hwnd) && GetClientRect(hwnd, &client)) {
+        MapWindowPoints(hwnd, nullptr, reinterpret_cast<POINT*>(&client), 2);
+        EnumDisplayMonitors(nullptr, &client, VbamCollectMonitor,
+                            reinterpret_cast<LPARAM>(&monitors));
     }
+    if (monitors.empty())
+        monitors.push_back(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST));
+    return monitors;
+}
+
+// The range of the monitors the emulator's window is on -- the lowest peak and
+// the highest floor where it spans several, so nothing is encoded that one of
+// them cannot show -- falling back to the brightest HDR output when the window
+// is on none or does not exist yet. Both ends come from the same outputs, so a
+// multi-monitor setup never pairs one display's peak with an unrelated floor.
+static VbamWindowsHdrLuminance VbamWindowsDisplayLuminance() {
+    const std::vector<HMONITOR> monitors = VbamWindowMonitors();
+    std::vector<bool> monitor_hdr(monitors.size(), false);
 
     VbamWindowsHdrLuminance any;     // brightest HDR output (fallback)
-    VbamWindowsHdrLuminance window;  // the HDR output the window is on, if any
+    VbamWindowsHdrLuminance window;  // the HDR outputs the window is on
+    window.monitors = static_cast<int>(monitors.size());
 
     typedef HRESULT(WINAPI* LPFNCreateDXGIFactory1)(REFIID, void**);
     HMODULE hDXGI = LoadLibrary(TEXT("dxgi.dll"));
@@ -13667,18 +13751,24 @@ static VbamWindowsHdrLuminance VbamWindowsDisplayLuminance() {
                 ComPtr<IDXGIOutput> output;
                 for (UINT o = 0; adapter->EnumOutputs(o, &output) != DXGI_ERROR_NOT_FOUND; ++o) {
                     ComPtr<IDXGIOutput6> output6;
-                    if (SUCCEEDED(output.As(&output6))) {
-                        DXGI_OUTPUT_DESC1 desc{};
-                        if (SUCCEEDED(output6->GetDesc1(&desc)) &&
-                            desc.ColorSpace == DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020) {
-                            VbamWindowsHdrLuminance lum;
-                            lum.peak_nits = static_cast<uint32_t>(desc.MaxLuminance + 0.5f);
-                            lum.min_nits  = desc.MinLuminance > 0.0f ? desc.MinLuminance : 0.0f;
-                            lum.found     = true;
-                            if (lum.peak_nits > any.peak_nits)
-                                any = lum;
-                            if (window_monitor && desc.Monitor == window_monitor)
-                                window = lum;
+                    DXGI_OUTPUT_DESC1 desc{};
+                    if (SUCCEEDED(output.As(&output6)) && SUCCEEDED(output6->GetDesc1(&desc)) &&
+                        desc.ColorSpace == DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020) {
+                        VbamWindowsHdrLuminance lum;
+                        lum.peak_nits = static_cast<uint32_t>(desc.MaxLuminance + 0.5f);
+                        lum.min_nits  = desc.MinLuminance > 0.0f ? desc.MinLuminance : 0.0f;
+                        lum.found     = true;
+                        if (lum.peak_nits > any.peak_nits)
+                            any = lum;
+                        for (size_t i = 0; i < monitors.size(); ++i) {
+                            if (desc.Monitor != monitors[i])
+                                continue;
+                            monitor_hdr[i] = true;
+                            window.peak_nits = window.found
+                                                   ? std::min(window.peak_nits, lum.peak_nits)
+                                                   : lum.peak_nits;
+                            window.min_nits = std::max(window.min_nits, lum.min_nits);
+                            window.found = true;
                         }
                     }
                     output.Reset();
@@ -13689,7 +13779,12 @@ static VbamWindowsHdrLuminance VbamWindowsDisplayLuminance() {
     }
 
     FreeLibrary(hDXGI);
-    return window.found ? window : any;
+    window.all_hdr = !monitors.empty() &&
+                     std::find(monitor_hdr.begin(), monitor_hdr.end(), false) == monitor_hdr.end();
+    VbamWindowsHdrLuminance result = window.found ? window : any;
+    result.all_hdr = window.all_hdr;
+    result.monitors = window.monitors;
+    return result;
 }
 
 static uint32_t VbamWindowsDisplayPeakNits() {
@@ -13831,6 +13926,7 @@ extern bool VbamProbeMacosHdr();
 extern bool VbamMacosHdrSupportedButOff();
 extern double VbamMacosMaxEdrHeadroom();
 extern double VbamMacosDisplayFloorRatio();
+extern bool VbamMacosWindowOnEdrScreens(int* count);
 #endif
 
 #if defined(__WXGTK__)
@@ -13979,6 +14075,16 @@ bool VbamVulkanRuntimeAvailable() {
 #endif
 }
 
+#if defined(__WXGTK__)
+// The main frame's GdkWindow, for asking GDK which monitor the window is on; null
+// before the frame exists.
+static void* VbamMainGdkWindow() {
+    if (!wxGetApp().frame || !wxGetApp().frame->GetHandle())
+        return nullptr;
+    return gtk_widget_get_window(wxGetApp().frame->GetHandle());
+}
+#endif
+
 namespace hdr {
 void DetectAvailability() {
     static bool done = false;
@@ -14015,6 +14121,27 @@ void DetectAvailability() {
     hdr::SetAvailability(hdr_avail, deep10);
 }
 
+WindowDisplays QueryWindowDisplays() {
+    WindowDisplays d;
+#if defined(__WXMSW__) && !defined(WINXP)
+    const VbamWindowsHdrLuminance lum = VbamWindowsDisplayLuminance();
+    d.count = lum.monitors;
+    d.all_hdr = lum.all_hdr;
+#elif defined(__WXMAC__)
+    d.all_hdr = VbamMacosWindowOnEdrScreens(&d.count);
+#elif defined(__WXGTK__) && !defined(NO_WAYLAND)
+    // X11 cannot present HDR per window, so there is nothing to know there.
+    std::vector<WaylandOutputColor> outputs;
+    if (IsWayland() && WaylandWindowOutputs(VbamMainGdkWindow(), &outputs)) {
+        d.count = static_cast<int>(outputs.size());
+        d.all_hdr = std::all_of(outputs.begin(), outputs.end(),
+                                [](const WaylandOutputColor& o) { return o.hdr; });
+    }
+#endif
+    d.known = d.count > 0;
+    return d;
+}
+
 bool WindowsHdrDisabled() {
 #if defined(__WXMSW__) && !defined(WINXP)
     return VbamWindowsHdrSupportedButOff();
@@ -14040,7 +14167,7 @@ float DisplayMinNits() {
     // Wayland PQ is absolute-nits, so the compositor's per-output minimum is
     // used directly. X11 has no per-window HDR, so it stays 0.
     if (IsWayland())
-        return WaylandDisplayMinNits();
+        return WaylandDisplayMinNits(VbamMainGdkWindow());
 #endif
     return 0.0f;
 #elif defined(__WXMAC__)
@@ -14071,7 +14198,7 @@ uint32_t DisplayPeakNits() {
     // Wayland PQ is absolute-nits too; query the compositor's per-output max
     // luminance. X11 has no per-window HDR, so it stays 0.
     if (IsWayland())
-        return WaylandDisplayPeakNits();
+        return WaylandDisplayPeakNits(VbamMainGdkWindow());
 #endif
     return 0;
 #else

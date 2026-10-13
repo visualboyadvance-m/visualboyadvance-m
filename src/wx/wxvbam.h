@@ -424,6 +424,7 @@ private:
     void OnMoveEnd(wxMoveEvent& event);
     void OnSize(wxSizeEvent& event);
     void OnIconize(wxIconizeEvent& event);
+    void OnMaximize(wxMaximizeEvent& event);
 
     // Load a named wxDialog from the XRC file
     wxDialog* LoadXRCDialog(const char* name);
@@ -644,6 +645,14 @@ public:
     // destroyed to be re-created rather than created for the first time.
     void ReinitPanel();
 
+    // Re-reads the displays the window is on (hdr::QueryWindowDisplays()) and,
+    // with HDR on, rebuilds the panel when they stop or start being all in HDR
+    // mode, or refreshes the encoder when only their luminance range changed.
+    // ScheduleWindowDisplaysCheck() runs it once things settle: a window being
+    // dragged sends a stream of moves.
+    void ScheduleWindowDisplaysCheck();
+    void RecheckWindowDisplays();
+
     void ShowFullScreen(bool full);
     bool IsFullScreen()
     {
@@ -805,6 +814,11 @@ private:
     std::set<config::RenderMethod> hdr_retried_renderers_;
     bool hdr_evaluated_ = false;        // current panel's HDR/deep-color checked
     bool hdr_reverted_to_sdr_ = false;  // every HDR renderer failed this session
+    // RecheckWindowDisplays()'s: the settle timer, and the window's displays'
+    // luminance range at the last check.
+    wxTimer window_displays_timer_;
+    uint32_t window_peak_nits_ = 0;
+    float window_min_nits_ = 0.0f;
     bool deep_color_reverted_ = false;  // no renderer could present 10-bit
     // Deep-color renderer fallback state, mirroring the HDR set above: a capable
     // renderer that fails to actually present 10-bit this session is recorded

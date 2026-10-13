@@ -27,6 +27,7 @@ std::atomic<unsigned> g_generation{0};
 
 bool g_hdr_available = false;
 bool g_deep10_available = false;
+bool g_window_on_hdr = true;
 
 // 8-bit gamma-2.2 input -> linear [0,1].
 float g_lin_lut[256];
@@ -238,6 +239,18 @@ void SetAvailability(bool hdr_available, bool deep10_available) {
 
 bool HdrAvailable() {
     return g_hdr_available;
+}
+
+bool WindowOnHdrDisplays() {
+    return g_window_on_hdr;
+}
+
+void SetWindowOnHdrDisplays(bool on_hdr) {
+    g_window_on_hdr = on_hdr;
+}
+
+bool HdrForWindow() {
+    return g_hdr_available && g_window_on_hdr;
 }
 
 bool DeepColor10Available() {
