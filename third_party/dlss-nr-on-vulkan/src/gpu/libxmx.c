@@ -1306,9 +1306,14 @@ int xmx_open(void)
 	vkGetPhysicalDeviceQueueFamilyProperties(g.pd, &nq, NULL);
 	VkQueueFamilyProperties *qf = calloc(nq, sizeof *qf);
 	vkGetPhysicalDeviceQueueFamilyProperties(g.pd, &nq, qf);
+	/* A compute-only family where there is one: its queues run beside the graphics
+	 * queue, so a pass does not hold up the host's frames for its whole length. */
 	g.qi = UINT32_MAX;
-	for (uint32_t i = 0; i < nq; i++)
-		if (qf[i].queueFlags & VK_QUEUE_COMPUTE_BIT) { g.qi = i; break; }
+	for (uint32_t i = 0; i < nq && g.qi == UINT32_MAX; i++)
+		if ((qf[i].queueFlags & VK_QUEUE_COMPUTE_BIT) && !(qf[i].queueFlags & VK_QUEUE_GRAPHICS_BIT))
+			g.qi = i;
+	for (uint32_t i = 0; i < nq && g.qi == UINT32_MAX; i++)
+		if (qf[i].queueFlags & VK_QUEUE_COMPUTE_BIT) g.qi = i;
 	free(qf);
 	if (g.qi == UINT32_MAX) FAIL("no compute queue", 0);
 
