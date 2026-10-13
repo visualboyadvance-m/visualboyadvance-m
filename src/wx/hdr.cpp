@@ -4,10 +4,11 @@
 #include <cmath>
 #include <cstring>
 #include <functional>
+#include <atomic>
+#include <memory>
 #ifdef __APPLE__
 #include <dispatch/dispatch.h>
 #else
-#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
@@ -19,6 +20,10 @@ namespace hdr {
 namespace {
 
 Settings g_settings;
+
+// Moves on every Configure(), so the encoders' remembered scales (ScaleCache) are
+// dropped when what they were computed from changes.
+std::atomic<unsigned> g_generation{0};
 
 bool g_hdr_available = false;
 bool g_deep10_available = false;
@@ -210,6 +215,7 @@ uint16_t FloatToHalf(float f) {
 
 void Configure(const Settings& s) {
     g_settings = s;
+    g_generation.fetch_add(1, std::memory_order_relaxed);
     for (int v = 0; v < 256; ++v)
         g_lin_lut[v] = std::pow(v / 255.0f, kSourceGamma);
     for (int i = 0; i <= kPqLutSize; ++i) {
@@ -278,6 +284,49 @@ static inline float PixelScale(const uint8_t* sp, const float (*m)[3], const flo
     }
     return LumScale(lw[0] * r + lw[1] * g + lw[2] * b, std::max(r, std::max(g, b)));
 }
+
+// PixelScale() by colour, one table a thread and encoder. The scale depends only on the
+// pixel's three 8-bit channels and the settings, and a frame has far fewer colours than
+// pixels: at xBRZ 6x a 1440x960 frame was 63 ms of CPU time to encode, a third of it in
+// LumScale()'s pow(); remembered, half that. The output is the same but where the compiler
+// rounds the inlined scale differently: none of 1.38 million pixels on a Mario 3 frame at
+// three shadow contrasts, one on an Advance Wars frame, by 2 of 1023 in one channel.
+class ScaleCache {
+public:
+    // Ready for an encode under the current settings.
+    void Begin() {
+        const unsigned gen = g_generation.load(std::memory_order_relaxed);
+        if (!keys_) {
+            keys_.reset(new uint32_t[kEntries]);
+            scales_.reset(new float[kEntries]);
+            generation_ = gen + 1;
+        }
+        if (generation_ != gen) {
+            std::memset(keys_.get(), 0, sizeof(uint32_t) * kEntries);
+            generation_ = gen;
+        }
+    }
+
+    float Get(const uint8_t* sp, const float (*m)[3], const float* lw) {
+        // + 1 so that no colour's key is the empty slot's 0.
+        const uint32_t key =
+            (static_cast<uint32_t>(sp[0]) | (static_cast<uint32_t>(sp[1]) << 8) |
+             (static_cast<uint32_t>(sp[2]) << 16)) + 1;
+        const uint32_t i = (key * 2654435761u) >> (32 - kBits);
+        if (keys_[i] != key) {
+            keys_[i] = key;
+            scales_[i] = PixelScale(sp, m, lw);
+        }
+        return scales_[i];
+    }
+
+private:
+    static constexpr int kBits = 15;
+    static constexpr uint32_t kEntries = 1u << kBits;
+    std::unique_ptr<uint32_t[]> keys_;
+    std::unique_ptr<float[]> scales_;
+    unsigned generation_ = 0;
+};
 
 // nits -> 10-bit PQ code via the precomputed LUT (nits clamped to 0..10000).
 static inline uint32_t PqCode(float nits) {
@@ -407,6 +456,8 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
     // light first; then a luminance-based boost (hue-preserving) and PQ encode.
     const bool convert = !g_settings.input_is_rec2020;
     ForRowBands(rows, [&](int y_begin, int y_end) {
+    thread_local ScaleCache cache;
+    cache.Begin();
     for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint32_t* dp = reinterpret_cast<uint32_t*>(
@@ -422,7 +473,7 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
                 const float nb = kRec709ToRec2020[2][0] * r + kRec709ToRec2020[2][1] * g + kRec709ToRec2020[2][2] * b;
                 r = nr; g = ng; b = nb;
             }
-            const float s = PixelScale(sp, convert ? kRec709ToRec2020 : nullptr, kLumaRec2020);
+            const float s = cache.Get(sp, convert ? kRec709ToRec2020 : nullptr, kLumaRec2020);
             dp[x] = PackA2B10G10R10(PqCode(r * s), PqCode(g * s), PqCode(b * s));
         }
     }
@@ -444,6 +495,8 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
     const float* lw = g_settings.scrgb_target_p3 ? kLumaP3 : kLumaRec709;
 
     ForRowBands(rows, [&](int y_begin, int y_end) {
+    thread_local ScaleCache cache;
+    cache.Begin();
     for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint16_t* dp = reinterpret_cast<uint16_t*>(
@@ -462,7 +515,7 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
             }
 
             // Hue-preserving luminance boost -> nits, then scRGB (1.0 == white).
-            const float s = PixelScale(sp, m, lw);
+            const float s = cache.Get(sp, m, lw);
             uint16_t* px = dp + static_cast<size_t>(x) * 4;
             px[0] = FloatToHalf(r * s / white);
             px[1] = FloatToHalf(g * s / white);
