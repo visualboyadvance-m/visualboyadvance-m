@@ -1011,6 +1011,13 @@ public:
     // are final.
     bool DrawingInitialized() const { return did_init; }
 
+    // Runs DrawingPanelInit() if no draw has yet, for a caller that needs the
+    // flags above latched without waiting for a paint.
+    void EnsureInitialized() {
+        if (!did_init)
+            DrawingPanelInit();
+    }
+
     // True if this renderer failed to come up (no GPU device/context/renderer).
     // The panel object still exists but cannot present; GameArea uses this to
     // fall back to the next renderer in the platform priority list. Set by each

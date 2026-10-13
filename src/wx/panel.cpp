@@ -10130,6 +10130,16 @@ void GameArea::ProbeOutputCapabilities() {
         // On Wayland the draw path only queues a paint; force it now so init runs
         // synchronously before we read the flags.
         w->Update();
+#ifndef NO_VULKAN
+        // The Vulkan panel presents to a surface of its own (a Wayland subsurface)
+        // and gets no paint from Update(), so it never initialized here and never
+        // reported HDR: the probe only found HDR because the software renderer was
+        // tried after it, and where that renderer cannot present HDR the option was
+        // hidden although Vulkan could. Its init needs no paint -- the swapchain,
+        // and with it the HDR answer, comes from the constructor.
+        if (dynamic_cast<VKDrawingPanel*>(p))
+            p->EnsureInitialized();
+#endif
         return p;
     };
 
@@ -12205,6 +12215,13 @@ bool VKDrawingPanel::CreateSwapchain()
             set_md(device_, 1, &swapchain_, &md);
         }
     }
+
+    // The panel latches HDR from the swapchain at init (UpdateHdrState()); a
+    // swapchain made since -- a resize, the window moving to another output, the
+    // compositor offering HDR10 again -- would otherwise be drawn as before for
+    // the rest of the session, SDR into an HDR swapchain or the other way round.
+    if (did_init && HdrActive() != (OPTION(kDispHDR) && swapchain_is_hdr_))
+        UpdateHdrState();
 
     wxLogDebug(_("Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"),
                extent.width, extent.height, sc_count,
