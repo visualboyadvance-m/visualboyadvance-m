@@ -17,6 +17,7 @@ enum class OptionID {
     kDispDlssNrProfile,
     kDispDlssNrMaxHeight,
     kDispDlssNrHistory,
+    kDispDlssNrAdaptiveFrameRate,
     kDispDlssNrStyleIndex,
     kDispDlssNrLocalTone,
     kDispDlssNrLocalStructure,

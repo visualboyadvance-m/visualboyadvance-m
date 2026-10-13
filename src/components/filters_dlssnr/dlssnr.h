@@ -92,6 +92,9 @@ struct Settings {
     std::string control_mask;        // --control-mask, a PNG, resized to the frame
     bool history = true;             // not nr_frame's: feed the previous output back in
     int max_height = 480;            // frames taller than this are filtered scaled down; 0 never
+    // The adaptive frame rate: the frames a second the host means to draw, which the filter
+    // holds by spacing its passes out while the calls to Apply32() come slower; 0 off.
+    double target_fps = 0.0;
 };
 
 // Reads the control mask for Settings::control_mask: `rgb` receives the
@@ -237,6 +240,10 @@ public:
     double LastFrameMs() const;
     // Number of finished passes.
     uint64_t FramesDone() const;
+    // The adaptive frame rate's least time between the starts of two passes, in
+    // milliseconds; 0 when it is off, has not had to back off, or stood down because
+    // backing off did not raise the frame rate.
+    double PassGapMs() const;
 
 private:
     struct Impl;

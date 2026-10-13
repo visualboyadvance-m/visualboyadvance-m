@@ -4456,6 +4456,18 @@ void DrawingPanelBase::ApplyPendingFilterChange()
 #ifdef VBAM_ENABLE_DLSS_NR
 namespace {
 
+// The frames a second the emulator means to draw, for DLSS NR's adaptive frame rate: 60 at
+// the throttle, less a fixed frame skip's share (an automatic one is what the filter makes
+// room for). None while sped up or unthrottled, where there is no rate to hold.
+double DlssNrTargetFps() {
+    if (!OPTION(kDispDlssNrAdaptiveFrameRate) || coreOptions.speedup || coreOptions.throttle == 0)
+        return 0.0;
+    double fps = 60.0 * coreOptions.throttle / 100.0;
+    if (OPTION(kPrefFrameSkip) >= 0)
+        fps /= systemFrameSkip + 1;
+    return fps;
+}
+
 // The DLSS NR settings, as the options have them (PCSX2's GSDLSSNR::Settings
 // from its DLSSNR_* options).
 dlssnr::Settings DlssNrSettings() {
@@ -4474,6 +4486,7 @@ dlssnr::Settings DlssNrSettings() {
     s.control_mask = std::string(OPTION(kDispDlssNrControlMask).Get().utf8_str());
     s.history = OPTION(kDispDlssNrHistory).Get();
     s.max_height = static_cast<int>(OPTION(kDispDlssNrMaxHeight).Get());
+    s.target_fps = DlssNrTargetFps();
     return s;
 }
 

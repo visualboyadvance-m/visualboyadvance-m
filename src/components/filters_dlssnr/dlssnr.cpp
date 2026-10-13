@@ -408,6 +408,201 @@ constexpr int kSceneFallPerFrame = 32;
 // the first quarter second, the opening correction arriving out of nothing.
 constexpr int kResultFadePerFrame = 16;
 
+// The adaptive frame rate (Settings::target_fps). The pipeline starts a pass as soon as the
+// one before lets it, so the GPU is busy however little the picture needs: on a Radeon 780M
+// twenty passes a second, the GPU 90% busy and the package at 50 W against 14 idle, which a
+// laptop sheds by slowing the CPU and the emulator with it. So the frame rate the host
+// shows is measured here, by the calls to Apply32() -- one a drawn frame -- and the passes
+// are spaced out while it falls short. Each frame still gets the newest pass laid over it
+// (see Apply32()), so fewer passes means the denoising refreshes less often, not a slower
+// picture.
+//
+// Every kGovernorWindowMs the rate over the window is held against the target: under
+// kGovernorLowRatio the least time between the starts of two passes grows by a half (and
+// by at least kGovernorStepMs), at kGovernorHighRatio or over for kGovernorRelaxWindows
+// windows running it shrinks by a fifth, between the two it holds. The low mark keeps the
+// rate within 5% of the target, inside the 7% asked of it, and the gap between the marks
+// keeps the spacing from hunting.
+//
+// The edge is sharp -- a frame either fits its 16.7 ms or it does not -- so shrinking freely
+// walked the spacing back over it every few seconds and lost a second each time (17 of 150
+// under 93% in a five minute run on a hot laptop). So the spacing that fell short is
+// remembered, kGovernorMarginRatio over it, and the shrinking stops there; the mark itself
+// comes down by kGovernorForgetRatio a window, to find the room a cooling laptop gives back.
+//
+// A gap of kGovernorMaxGapMs, a pass a second, is the most it backs off. A rate held down by
+// something else -- a display slower than the target under vsync, an emulator slow on its
+// own, the host's drawing -- gains nothing from that and loses the denoising. So a rate
+// still short after kGovernorTrialWindows windows at the most spacing is put to the test:
+// the spacing is lifted for a window to settle and kGovernorTrialWindows more, and unless
+// the rate without it is kGovernorGainRatio of the target lower, the governor stands down
+// and lets the passes run freely for kGovernorRetryMs before it tries again, or sooner if
+// the rate falls twice kGovernorGainRatio under what the test measured. Where it does
+// help it goes back to the spacing and tests again after kGovernorRetestMs, twice that the
+// time after, up to kGovernorMaxRetestMs; where the spacing matters the test is a stutter,
+// so one window clearly worse without it ends the test there. A rate measured
+// earlier would not do as the comparison: the first windows include the start-up, and a
+// game's load changes from scene to scene. The spacing can matter a lot -- xBRZ 6x with the
+// layer after the filter, on a hot 780M with 7 ms of stand-in GUI work: 38 fps unspaced,
+// 57 at a pass a second -- since the filter's own work on the CPU each frame doubles when
+// passes land often, on top of the GPU's heat.
+//
+// A call kGovernorPauseMs after the one before (a pause, a menu, a load) starts a new
+// window rather than counting as a slow frame.
+constexpr int kGovernorWindowMs = 500;
+constexpr double kGovernorLowRatio = 0.95;
+constexpr double kGovernorHighRatio = 0.985;
+constexpr int kGovernorRelaxWindows = 2;
+constexpr double kGovernorStepMs = 20.0;
+constexpr double kGovernorMaxGapMs = 1000.0;
+constexpr double kGovernorMinGapMs = 5.0;
+constexpr double kGovernorMarginRatio = 1.2;
+constexpr double kGovernorForgetRatio = 0.99;
+constexpr int kGovernorPauseMs = 250;
+constexpr int kGovernorTrialWindows = 4;
+constexpr double kGovernorGainRatio = 0.02;
+constexpr int kGovernorRetryMs = 60000;
+constexpr int kGovernorRetestMs = 120000;
+constexpr int kGovernorMaxRetestMs = 960000;
+
+class Governor {
+public:
+    using Clock = std::chrono::steady_clock;
+
+    // Counts a drawn frame at `now` against `target` frames a second; 0 turns it off.
+    void Frame(Clock::time_point now, double target) {
+        if (target <= 0.0) {
+            *this = Governor();
+            return;
+        }
+        if (frames_ < 0 || now - last_ > std::chrono::milliseconds(kGovernorPauseMs)) {
+            start_ = now;
+            frames_ = 0;
+        } else {
+            frames_++;
+        }
+        last_ = now;
+        const double elapsed = std::chrono::duration<double, std::milli>(now - start_).count();
+        if (elapsed < kGovernorWindowMs)
+            return;
+        const double ratio = frames_ * 1000.0 / elapsed / target;
+        start_ = now;
+        frames_ = 0;
+
+        switch (state_) {
+        case State::kStandingDown:
+            // Over, or cut short by a rate fallen below the one the test measured: the
+            // conditions it was made in (a cool chip, a light scene) are gone.
+            trial_sum_ += ratio;
+            if (++trial_windows_ >= kGovernorTrialWindows) {
+                const bool fell =
+                    trial_sum_ / trial_windows_ < unspaced_ratio_ - 2 * kGovernorGainRatio;
+                trial_sum_ = 0.0;
+                trial_windows_ = 0;
+                if (fell)
+                    until_ = now;
+            }
+            if (now < until_)
+                return;
+            state_ = State::kSpacing;
+            break;
+        case State::kTesting:
+            // The first window after lifting the spacing lets the pipeline fill. One clearly
+            // worse window settles it: where the spacing matters the test is a stutter.
+            if (test_windows_++ > 0)
+                test_sum_ += ratio;
+            if (test_windows_ <= kGovernorTrialWindows &&
+                !(test_windows_ > 1 && ratio + 2 * kGovernorGainRatio <= spaced_ratio_))
+                return;
+            unspaced_ratio_ = test_sum_ / (test_windows_ - 1);
+            if (unspaced_ratio_ + kGovernorGainRatio <= spaced_ratio_) {
+                gap_ms_ = saved_gap_ms_;
+                floor_ms_ = saved_floor_ms_;
+                state_ = State::kSpacing;
+                until_ = now + retest_;
+                retest_ = std::min(retest_ * 2, std::chrono::milliseconds(kGovernorMaxRetestMs));
+            } else {
+                retest_ = std::chrono::milliseconds(kGovernorRetestMs);
+                floor_ms_ = 0.0;
+                state_ = State::kStandingDown;
+                until_ = now + std::chrono::milliseconds(kGovernorRetryMs);
+            }
+            trial_sum_ = 0.0;
+            trial_windows_ = 0;
+            relax_ = 0;
+            return;
+        case State::kSpacing:
+            break;
+        }
+
+        // Short at the most spacing for long enough: test whether the spacing buys anything.
+        if (gap_ms_ >= kGovernorMaxGapMs && ratio < kGovernorLowRatio) {
+            trial_sum_ += ratio;
+            if (++trial_windows_ >= kGovernorTrialWindows && now >= until_) {
+                spaced_ratio_ = trial_sum_ / trial_windows_;
+                saved_gap_ms_ = gap_ms_;
+                saved_floor_ms_ = floor_ms_;
+                gap_ms_ = 0.0;
+                test_sum_ = 0.0;
+                test_windows_ = 0;
+                state_ = State::kTesting;
+                return;
+            }
+        } else {
+            trial_sum_ = 0.0;
+            trial_windows_ = 0;
+        }
+
+        floor_ms_ *= kGovernorForgetRatio;
+        if (ratio < kGovernorLowRatio) {
+            floor_ms_ = std::min(kGovernorMaxGapMs,
+                                 std::max(floor_ms_, gap_ms_ * kGovernorMarginRatio));
+            gap_ms_ = std::min(kGovernorMaxGapMs,
+                               std::max(gap_ms_ * 1.5, gap_ms_ + kGovernorStepMs));
+            relax_ = 0;
+        } else if (ratio >= kGovernorHighRatio) {
+            if (++relax_ >= kGovernorRelaxWindows) {
+                gap_ms_ = std::max(gap_ms_ * 0.8, floor_ms_);
+                if (gap_ms_ < kGovernorMinGapMs)
+                    gap_ms_ = 0.0;
+                relax_ = 0;
+            }
+        } else {
+            relax_ = 0;
+        }
+    }
+
+    // Whether a pass may start at `now`, and that one did.
+    bool MayStart(Clock::time_point now) const {
+        return gap_ms_ <= 0.0 ||
+               std::chrono::duration<double, std::milli>(now - started_).count() >= gap_ms_;
+    }
+    void Started(Clock::time_point now) { started_ = now; }
+
+    double gap_ms() const { return gap_ms_; }
+
+private:
+    enum class State { kSpacing, kTesting, kStandingDown };
+
+    Clock::time_point start_, last_, started_;
+    int frames_ = -1;  // frames counted in the window, -1 before the first
+    int relax_ = 0;
+    double gap_ms_ = 0.0;
+    double floor_ms_ = 0.0;  // the remembered edge, kGovernorMarginRatio over it
+    State state_ = State::kSpacing;
+    // kSpacing: no test before it; kStandingDown: the end of it.
+    Clock::time_point until_;
+    double trial_sum_ = 0.0;  // the rate over the windows short at the most spacing
+    int trial_windows_ = 0;
+    double spaced_ratio_ = 0.0;  // their mean, for the test
+    double saved_gap_ms_ = 0.0, saved_floor_ms_ = 0.0;
+    double test_sum_ = 0.0;  // the rate over the test's windows, the first left out
+    int test_windows_ = 0;
+    double unspaced_ratio_ = 0.0;  // their mean
+    // How long the spacing is kept before the next test, doubling each time it holds up.
+    std::chrono::milliseconds retest_{ kGovernorRetestMs };
+};
+
 // A pass's correction comes in two parts, and only one of them belongs to where things were.
 // One is a colour cast: at intensity 150 the model shifts each colour by a few levels
 // wherever it stands, so what the pass did to a colour it can do to the same colour anywhere.
@@ -1194,6 +1389,27 @@ struct Filter::Impl {
     int display_width = 0;
     int display_height = 0;
 
+    // Whether passes have stopped changing anything: the last pass was given the same
+    // frame, settings and mask as the one before it and gave the same picture, so another
+    // on that frame would too (the network is deterministic, and with history the pass is
+    // at its fixed point). Apply32() then queues none until something changes. Set by the
+    // compose stage, read by Apply32(), under `mutex`; the copies are the compose stage's
+    // and change only under `mutex`.
+    bool settled = false;
+    std::vector<uint8_t> settled_src;  // what the last pass was given
+    std::vector<uint8_t> settled_out;  // and what it gave
+    std::vector<float> settled_neural;  // and the history it left, when it kept one
+    nr_frame_params settled_params{};
+    std::string settled_mask;
+    bool settled_history = false;
+    int settled_width = 0;
+    int settled_height = 0;
+    int settled_filter_width = 0;
+    int settled_filter_height = 0;
+    std::vector<uint8_t> incoming;  // Apply32()'s frame, to compare with `settled_src`
+
+    Governor governor;  // Apply32()'s, under `mutex`
+
     // Status, readable without the pipeline lock.
     std::atomic<bool> ready{false};
     std::atomic<bool> failed{false};
@@ -1654,7 +1870,30 @@ void Filter::Impl::ComposeStage() {
         if (ok)
             BuildCast(p->src_rgb.data(), p->rgb.data(), static_cast<size_t>(p->width) * p->height,
                       &p->cast, &p->cast_sums);
+        // Only this stage writes the settled copies, so it reads them unlocked.
+        const bool same = ok && p->width == settled_width && p->height == settled_height &&
+                          p->filter_width == settled_filter_width &&
+                          p->filter_height == settled_filter_height &&
+                          p->want_history == settled_history && p->control_mask == settled_mask &&
+                          std::memcmp(&p->params, &settled_params, sizeof p->params) == 0 &&
+                          p->src_rgb == settled_src && p->rgb == settled_out &&
+                          (!p->want_history || p->neural == settled_neural);
         lock.lock();
+
+        settled = same;
+        if (ok && !same) {
+            settled_src = p->src_rgb;
+            settled_out = p->rgb;
+            if (p->want_history)
+                settled_neural = p->neural;
+            settled_params = p->params;
+            settled_mask = p->control_mask;
+            settled_history = p->want_history;
+            settled_width = p->width;
+            settled_height = p->height;
+            settled_filter_width = p->filter_width;
+            settled_filter_height = p->filter_height;
+        }
 
         if (ok) {
             // The shown buffer comes back as this packet's, for a later frame.
@@ -1861,13 +2100,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         // filter's output dst aliases src, and taking the result first would feed the
         // model its own previous output.
         //
-        // A frame arriving while the pipeline is full is skipped.
-        if (!im.failed.load() && !im.quit.load() && !im.free_packets.empty() &&
-            !im.queued[kStageFeatures]) {
-            Packet* p = im.free_packets.back();
-            im.free_packets.pop_back();
-            p->rgb.resize(static_cast<size_t>(width) * height * 3);
-            uint8_t* o = p->rgb.data();
+        const auto to_rgb = [&](std::vector<uint8_t>* rgb) {
+            rgb->resize(static_cast<size_t>(width) * height * 3);
+            uint8_t* o = rgb->data();
             for (int y = 0; y < height; y++) {
                 const uint32_t* s =
                     reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
@@ -1878,11 +2113,39 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     o[2] = static_cast<uint8_t>(v >> blue_shift);
                 }
             }
+        };
+
+        // Once the passes have settled (see `settled`), the same frame with the same
+        // settings gets no more of them. On a still picture the network ran flat out for
+        // nothing: twenty passes a second on a Radeon 780M, a package drawing 50 W instead
+        // of 14, and a laptop that heats up and throttles the emulator with it.
+        nr_frame_params params;
+        BuildParams(&params, settings);
+        bool unchanged = false;
+        if (im.settled && !im.reset_history.load() && width == im.settled_width &&
+            height == im.settled_height && filter_width == im.settled_filter_width &&
+            filter_height == im.settled_filter_height &&
+            settings.history == im.settled_history && settings.control_mask == im.settled_mask &&
+            std::memcmp(&params, &im.settled_params, sizeof params) == 0) {
+            to_rgb(&im.incoming);
+            unchanged = im.incoming == im.settled_src;
+        }
+
+        const auto now = std::chrono::steady_clock::now();
+        im.governor.Frame(now, settings.target_fps);
+
+        // A frame arriving while the pipeline is full is skipped.
+        if (!unchanged && im.governor.MayStart(now) && !im.failed.load() && !im.quit.load() &&
+            !im.free_packets.empty() && !im.queued[kStageFeatures]) {
+            im.governor.Started(now);
+            Packet* p = im.free_packets.back();
+            im.free_packets.pop_back();
+            to_rgb(&p->rgb);
             p->width = width;
             p->height = height;
             p->filter_width = filter_width;
             p->filter_height = filter_height;
-            BuildParams(&p->params, settings);
+            p->params = params;
             p->want_history = settings.history;
             p->control_mask = settings.control_mask;
             im.queued[kStageFeatures] = p;
@@ -2259,6 +2522,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
 void Filter::ResetHistory() {
     // Taken by the features stage before the next frame's features.
     impl_->reset_history.store(true);
+}
+
+double Filter::PassGapMs() const {
+    std::lock_guard<std::mutex> lock(impl_->mutex);
+    return impl_->governor.gap_ms();
 }
 
 bool Filter::Ready() const {

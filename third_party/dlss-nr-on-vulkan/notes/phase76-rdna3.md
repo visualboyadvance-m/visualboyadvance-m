@@ -137,6 +137,39 @@ Checked with a harness that makes the panel's device and lends it (`nr_frame_ado
 enabled, the shared device runs the `_m16` path with a finite head; not enabled, the share is
 refused with the message and libxmx's own device gives the same head to four digits.
 
+## Load on a laptop
+
+The owner's report after the fix: 50 fps once the laptop warms up, 45 on still scenes, under
+40 at worst. The pipeline runs a pass as soon as the one before lets it, so the GPU is busy
+whatever the picture does: 19 passes a second at 480x320 (27 at 240x160, padded to 320), the
+GPU 87-91% busy, the APU's package (amdgpu's PPT) at 42-50 W against 14 W idle, Tctl from 47
+to 77 C in half a minute.
+
+- libxmx's own device took the first compute family, the graphics one on RADV, and a pass
+  held a renderer's frame for its whole length: a 60 Hz graphics submit waited 45 ms twenty
+  times a second. It now takes a compute-only family where there is one (graphics waits
+  0.4 ms, passes 19/s as before). VBA-M's Vulkan panel already lent family 1.
+- On a still picture a pass is a fixed point after about five: the same frame and settings
+  give the same picture and the same float history. VBA-M's filter now queues no pass
+  once one comes back identical to the one before, until the frame or a setting changes;
+  the GPU drops to idle and the picture is byte-identical to before (four frames, two games).
+- In motion nothing is skipped, so VBA-M's filter has an adaptive frame rate (the
+  `Display/DlssNrAdaptiveFrameRate` option, on by default): it counts the frames the host
+  draws, holds them against 60 x the throttle, and spaces the passes out while they fall
+  short, remembering the spacing that fell short so it does not walk back over it. A
+  real-time harness (the core, xbrz2x, the filter, and 7 ms of fixed CPU work standing in
+  for the GUI) over five minutes on the 780M, second half: off 54.0 fps, 84 of 150 seconds
+  under 93%; on 60.0 fps, 1 of 150, at 13 passes a second. At 150% it held 90 at 8.
+- Where even a pass a second leaves the rate short, it tests whether the spacing helps at
+  all: two seconds without it, against the two before, cut to one where the first is
+  clearly worse. Not 2% of the target better with it, it stands down (the passes run
+  freely) for a minute, or until the rate falls under what the test saw; better, it keeps
+  the spacing and tests again after 2, 4, 8, then every 16 minutes. It mostly does help: xBRZ 6x with the layer after the filter, 7 ms of
+  stand-in GUI work, hot: 38 fps unspaced, 57 at a pass a second -- the filter's own work
+  on the CPU each frame (lining the pass up with the live 1440x960 picture) goes from 6 to
+  13 ms when passes land often. The layer before the filter does the same at 240x160:
+  0.5 ms a frame, 60 fps at 20 passes a second.
+
 ## Not done
 
 - Confirmed in VBA-M's GUI by the owner (wx, Vulkan renderer, 2026-10-12): the bands are

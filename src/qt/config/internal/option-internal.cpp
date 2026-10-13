@@ -194,6 +194,7 @@ std::array<Option, kNbOptions>& Option::All() {
         uint32_t dlss_nr_profile = 0;  // standard, natural, cinematic, neutral, vendor
         uint32_t dlss_nr_max_height = 480;
         bool dlss_nr_history = true;
+        bool dlss_nr_adaptive_frame_rate = true;
         int32_t dlss_nr_style_index = -1;  // negative keeps the profile's
         double dlss_nr_local_tone = -1.0;  // negative keeps the profile's
         double dlss_nr_local_structure = -1.0;  // negative keeps the profile's
@@ -330,6 +331,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kDispDlssNrProfile, &g_owned_opts.dlss_nr_profile, 0, 4),
         Option(OptionID::kDispDlssNrMaxHeight, &g_owned_opts.dlss_nr_max_height, 128, 2160),
         Option(OptionID::kDispDlssNrHistory, &g_owned_opts.dlss_nr_history),
+        Option(OptionID::kDispDlssNrAdaptiveFrameRate, &g_owned_opts.dlss_nr_adaptive_frame_rate),
         Option(OptionID::kDispDlssNrStyleIndex, &g_owned_opts.dlss_nr_style_index, -1, 127),
         Option(OptionID::kDispDlssNrLocalTone, &g_owned_opts.dlss_nr_local_tone, -1, 4),
         Option(OptionID::kDispDlssNrLocalStructure, &g_owned_opts.dlss_nr_local_structure, -1, 4),
@@ -515,6 +517,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
                H("Frames taller than this are scaled down before DLSS NR runs, and back up after")},
     OptionData{"Display/DlssNrHistory", "",
                H("Feed the previous DLSS NR output back into the model")},
+    OptionData{"Display/DlssNrAdaptiveFrameRate", "",
+               H("Run DLSS NR less often while the frame rate falls short of the throttle's")},
     OptionData{"Display/DlssNrStyleIndex", "",
                H("DLSS NR style index; -1 keeps the profile's")},
     OptionData{"Display/DlssNrLocalTone", "",

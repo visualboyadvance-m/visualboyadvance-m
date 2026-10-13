@@ -110,7 +110,10 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   `Apply32()`, and each frame goes through three threads (features, network,
   composition); frames taller than the maximum height are filtered scaled
   down (bilinear) and scaled back up, and the picture updates with the newest
-  finished frame
+  finished frame; it queues no pass once one comes back identical to the one before
+  (a still picture), and with `Display/DlssNrAdaptiveFrameRate` (default on) it spaces
+  the passes out while the drawn frame rate falls short of 60 x the throttle,
+  and stands down for a while when a test shows the spacing does not raise it
 - libxmx picks its kernels from the device's cooperative-matrix shapes: the Xe
   8x16x16 kernels where listed, else `_m16` builds on 16x16x16 tiles (RADV on
   RDNA3; `third_party/dlss-nr-on-vulkan/notes/phase76-rdna3.md`), else the

@@ -1328,7 +1328,7 @@ void DisplayConfig::InitDlssNrTab() {
         return ctrl;
     };
 
-    // Enable DLSS-NR, Use Frame History.
+    // Enable DLSS-NR, Use Frame History, Adaptive Frame Rate.
     dlss_nr_ = new wxCheckBox(box, wxID_ANY, _("Enable &DLSS-NR"));
     dlss_nr_->SetToolTip(_("Runs every frame through the DLSS-NR neural rendering model. Very slow and experimental."));
     dlss_nr_->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNr));
@@ -1336,9 +1336,14 @@ void DisplayConfig::InitDlssNrTab() {
     history->SetToolTip(_("Feeds the previous filtered frame back into the model, for steadier motion. Unchecked, every frame is filtered on its own exactly as the nr_frame command filters a picture, and the filter runs faster."));
     history->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNrHistory));
     dlss_nr_controls_.push_back(history);
-    wxGridSizer* checks = new wxGridSizer(2, 0, gap * 2);
+    wxCheckBox* adaptive = new wxCheckBox(box, wxID_ANY, _("Adaptive &Frame Rate"));
+    adaptive->SetToolTip(_("Runs the model less often while the game falls short of its full frame rate at the current throttle, so a laptop that heats up keeps the game at speed. The picture keeps its frame rate; the filtering refreshes less often."));
+    adaptive->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNrAdaptiveFrameRate));
+    dlss_nr_controls_.push_back(adaptive);
+    wxGridSizer* checks = new wxGridSizer(3, 0, gap * 2);
     checks->Add(dlss_nr_, 0, wxALIGN_CENTER_VERTICAL);
     checks->Add(history, 0, wxALIGN_CENTER_VERTICAL);
+    checks->Add(adaptive, 0, wxALIGN_CENTER_VERTICAL);
     group->Add(checks, 0, wxEXPAND | wxALL, gap);
 
     // Apply: Pre-filter / Post-filter / At display size -- which side of the

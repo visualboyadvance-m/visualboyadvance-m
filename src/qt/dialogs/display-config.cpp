@@ -245,7 +245,7 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
         return spin;
     };
 
-    // Enable DLSS-NR, Use Frame History.
+    // Enable DLSS-NR, Use Frame History, Adaptive Frame Rate.
     dlss_nr_ = new QCheckBox(tr("Enable &DLSS-NR"), group);
     dlss_nr_->setToolTip(tr("Runs every frame through the DLSS-NR neural rendering model. Very "
                             "slow and experimental."));
@@ -255,8 +255,15 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
                            "motion. Unchecked, every frame is filtered on its own exactly as the "
                            "nr_frame command filters a picture, and the filter runs faster."));
     bindings().BindCheckBox(history, config::OptionID::kDispDlssNrHistory);
-    grid->addWidget(dlss_nr_, 0, 0, 1, 3);
-    grid->addWidget(history, 0, 3, 1, 3);
+    auto* adaptive = new QCheckBox(tr("Adaptive &Frame Rate"), group);
+    adaptive->setToolTip(tr("Runs the model less often while the game falls short of its full "
+                            "frame rate at the current throttle, so a laptop that heats up keeps "
+                            "the game at speed. The picture keeps its frame rate; the filtering "
+                            "refreshes less often."));
+    bindings().BindCheckBox(adaptive, config::OptionID::kDispDlssNrAdaptiveFrameRate);
+    grid->addWidget(dlss_nr_, 0, 0, 1, 2);
+    grid->addWidget(history, 0, 2, 1, 2);
+    grid->addWidget(adaptive, 0, 4, 1, 2);
 
     // Apply: Pre-filter / Post-filter / At display size -- which side of the
     // display filter the pass runs on (VBA-M's own; PCSX2 has one place).
