@@ -47,6 +47,12 @@ const std::unordered_map<Command, std::unordered_set<UserInput>>& DefaultInputs(
             {
                 KeyboardInput('W', wxMOD_CMD)
             }},
+        // GTK's stock accelerator used to give Open this; the bindings fire every
+        // shortcut now, so it has to be one of them.
+        {ShortcutCommand(wxID_OPEN),
+            {
+                KeyboardInput('O', wxMOD_CMD)
+            }},
         // load most recent is more commonly used than load state
         // {ShortcutCommand(XRCID("Load")),
         //     {

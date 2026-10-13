@@ -1844,6 +1844,17 @@ bool MainFrame::PreloadOneDialog() {
 void MainFrame::OnActivate(wxActivateEvent& event) {
     const bool focused = event.GetActive();
 
+    if (!focused) {
+        // Another window takes the keyboard -- one of ours, such as the file dialog
+        // Ctrl+O opens, so the app as a whole stays active and wxvbamApp's reset on
+        // wxEVT_ACTIVATE_APP does not happen. The releases of the keys held now go
+        // to that window, and the handler went on believing them down: the next
+        // Ctrl+O read as auto-repeat of the O it never saw released and did nothing.
+        // Start the main window clean, the joypad with it.
+        wxGetApp().keyboard_input_handler().Reset();
+        wxGetApp().emulated_gamepad()->Reset();
+    }
+
     if (!panel) {
         // Nothing more to do if no game is active.
         return;
@@ -2141,6 +2152,37 @@ int MainFrame::newest_state_slot()
     return ns + 1;
 }
 
+#ifdef __WXGTK__
+// wxGTK gives every menu a GTK accelerator group, made from the shortcut in each item's
+// label, and adds it to the frame's window when the menu bar is attached, so GTK fires a
+// menu item's shortcut itself -- before the key reaches FilterEvent(), which fires the
+// same command again from the bindings. Most commands survive running twice; a toggle
+// does not: Ctrl+P paused and unpaused in one press. ShortcutMenuBar already refuses the
+// menu bar's wx accelerator table for this reason; this takes the GTK groups away from
+// the window as well. The items keep their groups, so the menus still show the keys.
+static void DetachMenuAccelGroups(wxMenu* menu, GtkWindow* window) {
+    if (!menu)
+        return;
+    if (menu->m_accel) {
+        GSList* attached = gtk_accel_groups_from_object(G_OBJECT(window));
+        if (g_slist_find(attached, menu->m_accel))
+            gtk_window_remove_accel_group(window, menu->m_accel);
+    }
+    for (wxMenuItem* item : menu->GetMenuItems()) {
+        if (item->IsSubMenu())
+            DetachMenuAccelGroups(item->GetSubMenu(), window);
+    }
+}
+
+static void DetachMenuBarAccelGroups(wxFrame* frame) {
+    wxMenuBar* menu_bar = frame->GetMenuBar();
+    if (!menu_bar || !frame->m_widget || !GTK_IS_WINDOW(frame->m_widget))
+        return;
+    for (size_t i = 0; i < menu_bar->GetMenuCount(); i++)
+        DetachMenuAccelGroups(menu_bar->GetMenu(i), GTK_WINDOW(frame->m_widget));
+}
+#endif
+
 void MainFrame::ResetRecentAccelerators() {
     for (int i = wxID_FILE1; i <= wxID_FILE10; i++) {
         wxMenuItem* menu_item = recent->FindItem(i);
@@ -2149,6 +2191,9 @@ void MainFrame::ResetRecentAccelerators() {
         }
         ResetMenuItemAccelerator(menu_item);
     }
+#ifdef __WXGTK__
+    DetachMenuBarAccelGroups(this);
+#endif
 }
 
 void MainFrame::ResetMenuAccelerators() {
