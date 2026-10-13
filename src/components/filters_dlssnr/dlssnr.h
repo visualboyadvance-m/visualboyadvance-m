@@ -157,8 +157,10 @@ struct VulkanShare {
 void ShareVulkan(const VulkanShare& share);
 
 // Drops the share registered by `owner` (a no-op, and immediate, for anyone
-// else), closing the model first if it runs on that device. Call before
-// destroying the device.
+// else), closing the model first if it runs on that device -- also when a newer
+// share has been registered since, as a renderer rebuilt in place registers its
+// new device before tearing down the old one. Call before destroying the
+// device.
 //
 // This is the one call here that waits, and it has to: the model may be on
 // that device at this instant, and neither a pass nor a model open can be

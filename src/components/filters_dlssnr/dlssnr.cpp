@@ -62,6 +62,13 @@ struct SharedModel {
     bool share_pending = false;
     // The open model runs on the shared device.
     bool opened_shared = false;
+    // Whose device that is: the lender the open model adopted, which need not be
+    // the one registered now. A renderer rebuilt in place (GameArea::
+    // ReinitPanel()) lends its new device before the old one is torn down, so
+    // the share changes hands while a pass is still running on the old device;
+    // withdrawing must wait for that pass whatever is registered by then. Set
+    // under `mutex`; read without it to decide whether to take it.
+    std::atomic<const void*> opened_owner{nullptr};
     // `frame && opened_shared`, readable without the lock. UsingSharedVulkan()
     // is a query on the render path, and `mutex` is held for a whole pass.
     std::atomic<bool> shared_live{false};
@@ -98,6 +105,7 @@ void CloseLocked(SharedModel& s) {
     }
     nr_frame_shutdown();
     s.opened_shared = false;
+    s.opened_owner.store(nullptr, std::memory_order_release);
     s.generation++;
     s.prepared_width = 0;
     s.prepared_height = 0;
@@ -148,6 +156,7 @@ bool OpenLocked(SharedModel& s, std::string* error) {
         return false;
     }
     s.opened_shared = adopted && nr_frame_shared_device() == 1;
+    s.opened_owner.store(s.opened_shared ? v.owner : nullptr, std::memory_order_release);
     s.shared_live.store(s.frame != nullptr && s.opened_shared, std::memory_order_release);
     s.device = std::string(nr_frame_device(s.frame)) + " (" + nr_frame_runtime() + " runtime, " +
                nr_frame_gemm_path(s.frame) + ")";
@@ -193,15 +202,39 @@ void ShareVulkan(const VulkanShare& share) {
     s.share_pending = true;
 }
 
+namespace {
+
+// Whether `owner` lent the registered share or the device the open model runs
+// on -- either way it has something to take back.
+bool LentBy(SharedModel& s, const void* owner) {
+    if (s.opened_owner.load(std::memory_order_acquire) == owner)
+        return true;
+    std::lock_guard<std::mutex> share_lock(s.share_mutex);
+    return s.has_share && s.share.owner == owner;
+}
+
+// With `mutex` held: close the model if it runs on `owner`'s device, and drop
+// `owner`'s share if it is still the registered one. A newer lender's share is
+// left alone.
+void TakeBackLocked(SharedModel& s, const void* owner) {
+    if (s.opened_shared && s.opened_owner.load(std::memory_order_acquire) == owner)
+        CloseLocked(s);
+    std::lock_guard<std::mutex> share_lock(s.share_mutex);
+    if (s.has_share && s.share.owner == owner) {
+        s.has_share = false;
+        s.share_pending = false;
+        s.share = VulkanShare();
+    }
+}
+
+}  // namespace
+
 void WithdrawVulkanShare(const void* owner) {
     SharedModel& s = Shared();
-    {
-        // Not the lender: say so without touching `mutex`, so a renderer that
-        // never lent anything is never held up by a pass.
-        std::lock_guard<std::mutex> share_lock(s.share_mutex);
-        if (!s.has_share || s.share.owner != owner)
-            return;
-    }
+    // Not the lender: say so without touching `mutex`, so a renderer that
+    // never lent anything is never held up by a pass.
+    if (!LentBy(s, owner))
+        return;
     // The lender is about to destroy the device. This is the one place that
     // has to wait: the model may be running on it right now, and taking
     // `mutex` is what proves it has stopped.
@@ -214,24 +247,14 @@ void WithdrawVulkanShare(const void* owner) {
     nr_frame_cancel_open(1);
     std::lock_guard<std::mutex> lock(s.mutex);
     nr_frame_cancel_open(0);
-    std::lock_guard<std::mutex> share_lock(s.share_mutex);
-    if (!s.has_share || s.share.owner != owner)
-        return;
-    if (s.opened_shared)
-        CloseLocked(s);
-    s.has_share = false;
-    s.share_pending = false;
-    s.share = VulkanShare();
+    TakeBackLocked(s, owner);
 }
 
 bool WithdrawVulkanShareDeferred(const void* owner, void (*finish)(void*), void* context,
                                  unsigned grace_ms) {
     SharedModel& s = Shared();
-    {
-        std::lock_guard<std::mutex> share_lock(s.share_mutex);
-        if (!s.has_share || s.share.owner != owner)
-            return false;
-    }
+    if (!LentBy(s, owner))
+        return false;
     // As above: ask first, so an open in progress stops after the pipeline it
     // is already building rather than after all of them.
     nr_frame_cancel_open(1);
@@ -246,14 +269,7 @@ bool WithdrawVulkanShareDeferred(const void* owner, void (*finish)(void*), void*
         // It let go in time, so there is nothing to defer and the caller keeps
         // the teardown it already had.
         nr_frame_cancel_open(0);
-        std::lock_guard<std::mutex> share_lock(s.share_mutex);
-        if (s.has_share && s.share.owner == owner) {
-            if (s.opened_shared)
-                CloseLocked(s);
-            s.has_share = false;
-            s.share_pending = false;
-            s.share = VulkanShare();
-        }
+        TakeBackLocked(s, owner);
         return false;
     }
     // Still inside a pipeline. Drop the share so nothing adopts the device
@@ -263,17 +279,16 @@ bool WithdrawVulkanShareDeferred(const void* owner, void (*finish)(void*), void*
     // told to keep alive until `finish`.
     {
         std::lock_guard<std::mutex> share_lock(s.share_mutex);
-        s.has_share = false;
-        s.share_pending = false;
+        if (s.has_share && s.share.owner == owner) {
+            s.has_share = false;
+            s.share_pending = false;
+        }
     }
-    std::thread([&s, finish, context] {
+    std::thread([&s, owner, finish, context] {
         {
             std::lock_guard<std::mutex> lock(s.mutex);
             nr_frame_cancel_open(0);
-            if (s.opened_shared)
-                CloseLocked(s);
-            std::lock_guard<std::mutex> share_lock(s.share_mutex);
-            s.share = VulkanShare();
+            TakeBackLocked(s, owner);
         }
         // The model is closed and off the device: everything it was lent can go.
         finish(context);
