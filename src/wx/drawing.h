@@ -643,6 +643,9 @@ protected:
     // float one the Metal renderer uses. Works on any platform whose surface
     // advertises it.
     bool SupportsHdr() const override { return swapchain_is_hdr_; }
+#if defined(__WXGTK__) && !defined(NO_WAYLAND)
+    bool PresentsDirectly() const override { return wl_child_surface_ != nullptr; }
+#endif
     bool DeepColorActive() const override { return vk_deep_color_; }
     hdr::Encoding PreferredHdrEncoding() const override {
         return swapchain_hdr_scrgb_ ? hdr::Encoding::kScRGBFp16 : hdr::Encoding::kPQ10;

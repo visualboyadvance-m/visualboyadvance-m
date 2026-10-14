@@ -4300,7 +4300,11 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     }
 
     // next, draw the frame (queue a PaintEv) Refresh must be used under
-    // Wayland or nothing is drawn.
+    // Wayland or nothing is drawn -- for a panel GTK paints. One presenting to a
+    // surface of its own presents now: GTK delivers a paint only every few of
+    // its frame-clock ticks while the emulator holds the main loop, and on a
+    // 90 Hz laptop panel that showed 28-37 of 60 frames a second whatever the
+    // filter.
 #if defined(__WXQT__)
     // Qt only paints inside paint events; drawing via wxClientDC outside a
     // paint handler is silently dropped (black screen). The default PresentFrame
@@ -4309,7 +4313,7 @@ void DrawingPanelBase::DrawArea(uint8_t** data)
     PresentFrame();
 #else
 #ifndef NO_WAYLAND
-    if (wxGetApp().UsingWayland())
+    if (wxGetApp().UsingWayland() && !PresentsDirectly())
         GetWindow()->Refresh();
     else {
 #endif

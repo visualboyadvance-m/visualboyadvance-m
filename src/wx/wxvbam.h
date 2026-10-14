@@ -994,6 +994,11 @@ public:
     // (e.g. only on Wayland).
     virtual bool SupportsHdr() const { return false; }
 
+    // True for a panel that presents to a surface of its own (the Vulkan panel's
+    // Wayland subsurface) and so needs no paint event to show a frame:
+    // DrawArea(uint8_t**) then presents it at once instead of Refresh()ing.
+    virtual bool PresentsDirectly() const { return false; }
+
     // Surface encoding this renderer wants when HDR is active. PQ10 for the
     // 10-bit platforms (OpenGL/Vulkan/D3D12), scRGB fp16 for macOS EDR.
     virtual hdr::Encoding PreferredHdrEncoding() const { return hdr::Encoding::kPQ10; }
