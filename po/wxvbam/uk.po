@@ -473,14 +473,14 @@ msgstr "Подання попереднього фільтрованого ка�
 
 #: dialogs/display-config.cpp:1339
 msgid "Adaptive &Frame Rate"
-msgstr ""
+msgstr "Адаптивна &частота кадрів"
 
 #: dialogs/display-config.cpp:1340
 msgid ""
 "Runs the model less often while the game falls short of its full frame rate "
 "at the current throttle, so a laptop that heats up keeps the game at speed. "
 "The picture keeps its frame rate; the filtering refreshes less often."
-msgstr ""
+msgstr "Рідше оновлення моделі при недосягенні грою максимальної частоти кадрів, тож швидкість гри буде збережено на нагрітому ноутбуці. Частота кадрів зображення незмінна; рідше оновлення фільтрації."
 
 #: dialogs/display-config.cpp:1352
 msgid "&Pre-filter"
@@ -2326,7 +2326,7 @@ msgstr "Подання попереднього DLSS NR до моделі. "
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid ""
 "Run DLSS NR less often while the frame rate falls short of the throttle's"
-msgstr ""
+msgstr "Рідший запуск DLSS NR при недосягненні частоти кадрів для прискорення."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid "DLSS NR style index; -1 keeps the profile's"
@@ -3413,11 +3413,11 @@ msgstr "Час очікування сервера минув."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4699
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4749
 msgid "Error creating file mapping"
-msgstr "Помилка створення відображення файлів."
+msgstr "Помилка створення призначення файлів."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4694
 msgid "Error mapping file"
-msgstr "Помилка відображення файлу."
+msgstr "Помилка призначення файлу."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4814
 msgid "5 or more GBAs not supported."
@@ -5041,7 +5041,7 @@ msgstr "Переглядач &пам'яті..."
 
 #: xrc/MainMenu.xrc:634
 msgid "L&ua scripting"
-msgstr "Створення Lua-сценаріїв"
+msgstr "&Створення Lua-сценаріїв"
 
 #: xrc/MainMenu.xrc:636
 msgid "&Run script..."
