@@ -127,20 +127,29 @@ if(ENABLE_LINK AND (UNIX OR WIN32) AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
         endif()
     endforeach()
 
+    # MinGW: through the wrapper vbam_gtest_discover_tests() uses, which puts
+    # the toolchain's bin directory first on PATH. Otherwise the runtime DLLs
+    # (libwinpthread-1.dll) come from whatever is first on PATH -- another
+    # architecture's on CI -- and the loader's error dialog holds the test
+    # until it times out. The child the test starts inherits the PATH.
+    set(_link_ipc_test link_ipc_test)
+    if(MINGW AND MINGW_TEST_WRAPPER)
+        set(_link_ipc_test "${MINGW_TEST_WRAPPER}" $<TARGET_FILE:link_ipc_test>)
+    endif()
     foreach(_t role_assignment stale_recovery gb_exchange gb_third_instance
             idle_overflow)
-        add_test(NAME link.ipc.${_t} COMMAND link_ipc_test --test ${_t})
+        add_test(NAME link.ipc.${_t} COMMAND ${_link_ipc_test} --test ${_t})
         set_tests_properties(link.ipc.${_t} PROPERTIES
             LABELS "link" TIMEOUT 120)
     endforeach()
     # The 2-player GBA cable exchange is the most timing-coupled scenario;
     # it gets its own name so the deterministic tests above stay the gate
     # if it ever needs to be excluded on a loaded CI runner.
-    add_test(NAME link.ipc.cable COMMAND link_ipc_test --test gba_cable_2p)
+    add_test(NAME link.ipc.cable COMMAND ${_link_ipc_test} --test gba_cable_2p)
     set_tests_properties(link.ipc.cable PROPERTIES
         LABELS "link" TIMEOUT 120)
     # General-Purpose (RCNT GPIO) pin exchange over the IPC cable.
-    add_test(NAME link.ipc.gp COMMAND link_ipc_test --test gp_exchange)
+    add_test(NAME link.ipc.gp COMMAND ${_link_ipc_test} --test gp_exchange)
     set_tests_properties(link.ipc.gp PROPERTIES
         LABELS "link" TIMEOUT 120)
 
