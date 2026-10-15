@@ -9,9 +9,15 @@
 #include <cstdlib>
 #include <cstring>
 #include <functional>
+// SSE2 is baseline on x86-64 and NEON on AArch64, so the vector loops below need no run-time
+// check; elsewhere the scalar loops are all there is.
 #if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
     (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#define VBAM_DLSSNR_SSE2 1
 #include <emmintrin.h>
+#elif defined(__aarch64__) || defined(_M_ARM64)
+#define VBAM_DLSSNR_NEON 1
+#include <arm_neon.h>
 #endif
 #include <memory>
 #include <mutex>
@@ -835,21 +841,22 @@ private:
     bool quit_ = false;
 };
 
-// out[i] = max(out[i], in[i]) over n bytes. SSE2 is baseline on x86-64, so the
-// sixteen-at-a-time form needs no run-time check; elsewhere the scalar loop is
-// what the compiler was already making of it.
-
 // See RowPool::Run: measured, not guessed.
 constexpr int kDilateBands = 4;
 
+// out[i] = max(out[i], in[i]) over n bytes, sixteen at a time where the vector loop is
+// built; the scalar loop is what the compiler was already making of it.
 inline void MaxInto(uint8_t* out, const uint8_t* in, int n) {
     int i = 0;
-#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) ||     (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#if defined(VBAM_DLSSNR_SSE2)
     for (; i + 16 <= n; i += 16) {
         const __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(out + i));
         const __m128i b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(in + i));
         _mm_storeu_si128(reinterpret_cast<__m128i*>(out + i), _mm_max_epu8(a, b));
     }
+#elif defined(VBAM_DLSSNR_NEON)
+    for (; i + 16 <= n; i += 16)
+        vst1q_u8(out + i, vmaxq_u8(vld1q_u8(out + i), vld1q_u8(in + i)));
 #endif
     for (; i < n; i++)
         out[i] = std::max(out[i], in[i]);
@@ -933,8 +940,13 @@ void BuildPyramid(const uint8_t* rgb, int width, int height, int levels, Pyramid
     p->height[0] = height;
     std::vector<uint8_t>& base = p->level[0];
     base.resize(static_cast<size_t>(width) * height);
-    for (size_t i = 0; i < base.size(); i++)
-        base[i] = static_cast<uint8_t>((rgb[3 * i] + 2 * rgb[3 * i + 1] + rgb[3 * i + 2] + 2) >> 2);
+    // The full-size level is most of the work: a frame's worth of pixels, on the pool.
+    uint8_t* const b = base.data();
+    RowPool::Get().Run(height, [&](int ya, int yb) {
+        const size_t end = static_cast<size_t>(yb) * width;
+        for (size_t i = static_cast<size_t>(ya) * width; i < end; i++)
+            b[i] = static_cast<uint8_t>((rgb[3 * i] + 2 * rgb[3 * i + 1] + rgb[3 * i + 2] + 2) >> 2);
+    });
     for (int l = 1; l < levels; l++) {
         const int uw = p->width[l - 1];
         const int w = uw / 2;
@@ -970,8 +982,7 @@ double ShiftCost(const Pyramid& live, const Pyramid& pass, int l, int dx, int dy
         const uint8_t* ar = a + static_cast<size_t>(y) * w;
         const uint8_t* br = b + static_cast<size_t>(y - dy) * w - dx;
         int x = x0;
-#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
-    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#if defined(VBAM_DLSSNR_SSE2)
         if (step == 1 || step == 2 || step == 4) {
             // Sixteen bytes at a time, the ones between samples zeroed in both, so they add
             // nothing: the same integer total as the loop below.
@@ -986,6 +997,19 @@ double ShiftCost(const Pyramid& live, const Pyramid& pass, int l, int dx, int dy
             alignas(16) uint64_t lanes[2];
             _mm_store_si128(reinterpret_cast<__m128i*>(lanes), acc);
             sum += lanes[0] + lanes[1];
+            n += static_cast<uint64_t>((x - x0) / step);
+        }
+#elif defined(VBAM_DLSSNR_NEON)
+        if (step == 1 || step == 2 || step == 4) {
+            // As above: the absolute differences, those between samples masked off, summed.
+            const uint8x16_t keep = step == 1 ? vdupq_n_u8(0xFF)
+                                  : step == 2 ? vreinterpretq_u8_u16(vdupq_n_u16(0x00FF))
+                                              : vreinterpretq_u8_u32(vdupq_n_u32(0x000000FF));
+            uint32x4_t acc = vdupq_n_u32(0);
+            for (; x + 16 <= x1; x += 16)
+                acc = vpadalq_u16(
+                    acc, vpaddlq_u8(vandq_u8(vabdq_u8(vld1q_u8(ar + x), vld1q_u8(br + x)), keep)));
+            sum += vaddvq_u32(acc);
             n += static_cast<uint64_t>((x - x0) / step);
         }
 #endif
@@ -1011,15 +1035,21 @@ void EstimateScroll(const Pyramid& live, const Pyramid& pass, int* dx, int* dy) 
         const int cx = top ? 0 : 2 * bx;
         const int cy = top ? 0 : 2 * by;
         const int step = l == 0 ? 4 : l == 1 ? 2 : 1;
+        // Every candidate's cost on the pool, then the choice in the order the loop always
+        // made it, so the same one wins.
+        const int side = 2 * reach + 1;
+        std::array<double, 81> costs;
+        RowPool::Get().Run(side * side, [&](int ka, int kb) {
+            for (int k = ka; k < kb; k++)
+                costs[k] = ShiftCost(live, pass, l, cx - reach + k % side, cy - reach + k / side,
+                                     step);
+        });
         best = 1e18;
-        for (int y = cy - reach; y <= cy + reach; y++)
-            for (int x = cx - reach; x <= cx + reach; x++) {
-                const double cost = ShiftCost(live, pass, l, x, y, step);
-                if (cost < best) {
-                    best = cost;
-                    bx = x;
-                    by = y;
-                }
+        for (int k = 0; k < side * side; k++)
+            if (costs[k] < best) {
+                best = costs[k];
+                bx = cx - reach + k % side;
+                by = cy - reach + k / side;
             }
     }
     // Standing still wins a tie, so a still picture never wanders.
@@ -1037,13 +1067,12 @@ struct Hypothesis {
 };
 
 // |l - (a + b + 1) / 2| a byte at a time over n bytes: what MeasureRows asks of every
-// channel, without looking at which channel a byte is. `_mm_avg_epu8` is that very mean, and
-// the two saturating differences are the absolute one.
+// channel, without looking at which channel a byte is. `_mm_avg_epu8` (NEON's `vrhaddq_u8`) is
+// that very mean, and the two saturating differences are the absolute one.
 inline void AbsDiffMean(const uint8_t* l, const uint8_t* a, const uint8_t* b, uint8_t* out,
                         size_t n) {
     size_t i = 0;
-#if defined(__SSE2__) || (defined(_M_X64) && !defined(_M_ARM64EC)) || \
-    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#if defined(VBAM_DLSSNR_SSE2)
     for (; i + 16 <= n; i += 16) {
         const __m128i lv = _mm_loadu_si128(reinterpret_cast<const __m128i*>(l + i));
         const __m128i g = _mm_avg_epu8(_mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i)),
@@ -1051,11 +1080,86 @@ inline void AbsDiffMean(const uint8_t* l, const uint8_t* a, const uint8_t* b, ui
         _mm_storeu_si128(reinterpret_cast<__m128i*>(out + i),
                          _mm_or_si128(_mm_subs_epu8(lv, g), _mm_subs_epu8(g, lv)));
     }
+#elif defined(VBAM_DLSSNR_NEON)
+    for (; i + 16 <= n; i += 16)
+        vst1q_u8(out + i, vabdq_u8(vld1q_u8(l + i), vrhaddq_u8(vld1q_u8(a + i), vld1q_u8(b + i))));
 #endif
     for (; i < n; i++) {
         const int g = (a[i] + b[i] + 1) >> 1;
         out[i] = static_cast<uint8_t>(l[i] > g ? l[i] - g : g - l[i]);
     }
+}
+
+// Over a motion mask -- or the least of two or three, a pixel at a time, where `b` and `c`
+// are given -- how many pixels moved at all (past kHoldLevels) and how many of those only
+// mildly (kSceneMildLevels at most). On the pool, sixteen pixels at a time.
+void CountMotion(const uint8_t* a, const uint8_t* b, const uint8_t* c, size_t n,
+                 size_t* moving, size_t* mild) {
+    std::atomic<size_t> total_moving{0}, total_mild{0};
+    constexpr int kRows = 64;  // pixels go to the pool in rows of n / kRows
+    const size_t row = (n + kRows - 1) / kRows;
+    RowPool::Get().Run(kRows, [&](int ya, int yb) {
+        size_t i = std::min(n, static_cast<size_t>(ya) * row);
+        const size_t end = std::min(n, static_cast<size_t>(yb) * row);
+        size_t mv = 0, ml = 0;
+#if defined(VBAM_DLSSNR_SSE2)
+        const __m128i zero = _mm_setzero_si128();
+        const __m128i one = _mm_set1_epi8(1);
+        const __m128i hold = _mm_set1_epi8(static_cast<char>(kHoldLevels));
+        const __m128i mild_top = _mm_set1_epi8(static_cast<char>(kSceneMildLevels));
+        __m128i acc_moving = zero, acc_mild = zero;
+        for (; i + 16 <= end; i += 16) {
+            __m128i m = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+            if (b)
+                m = _mm_min_epu8(m, _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i)));
+            if (c)
+                m = _mm_min_epu8(m, _mm_loadu_si128(reinterpret_cast<const __m128i*>(c + i)));
+            // all ones where m <= kHoldLevels, and where m <= kSceneMildLevels
+            const __m128i still = _mm_cmpeq_epi8(_mm_subs_epu8(m, hold), zero);
+            const __m128i within = _mm_cmpeq_epi8(_mm_subs_epu8(m, mild_top), zero);
+            acc_moving = _mm_add_epi64(acc_moving,
+                                       _mm_sad_epu8(_mm_andnot_si128(still, one), zero));
+            acc_mild = _mm_add_epi64(
+                acc_mild, _mm_sad_epu8(_mm_and_si128(_mm_andnot_si128(still, within), one), zero));
+        }
+        alignas(16) uint64_t lanes[2];
+        _mm_store_si128(reinterpret_cast<__m128i*>(lanes), acc_moving);
+        mv += lanes[0] + lanes[1];
+        _mm_store_si128(reinterpret_cast<__m128i*>(lanes), acc_mild);
+        ml += lanes[0] + lanes[1];
+#elif defined(VBAM_DLSSNR_NEON)
+        const uint8x16_t hold = vdupq_n_u8(kHoldLevels);
+        const uint8x16_t mild_top = vdupq_n_u8(kSceneMildLevels);
+        uint32x4_t acc_moving = vdupq_n_u32(0), acc_mild = vdupq_n_u32(0);
+        for (; i + 16 <= end; i += 16) {
+            uint8x16_t m = vld1q_u8(a + i);
+            if (b)
+                m = vminq_u8(m, vld1q_u8(b + i));
+            if (c)
+                m = vminq_u8(m, vld1q_u8(c + i));
+            // 1 where m > kHoldLevels, and where it is kSceneMildLevels at most as well
+            const uint8x16_t moved = vshrq_n_u8(vcgtq_u8(m, hold), 7);
+            const uint8x16_t mildly = vandq_u8(moved, vcleq_u8(m, mild_top));
+            acc_moving = vpadalq_u16(acc_moving, vpaddlq_u8(moved));
+            acc_mild = vpadalq_u16(acc_mild, vpaddlq_u8(mildly));
+        }
+        mv += vaddvq_u32(acc_moving);
+        ml += vaddvq_u32(acc_mild);
+#endif
+        for (; i < end; i++) {
+            uint8_t m = a[i];
+            if (b)
+                m = std::min(m, b[i]);
+            if (c)
+                m = std::min(m, c[i]);
+            mv += m > kHoldLevels;
+            ml += m > kHoldLevels && m <= kSceneMildLevels;
+        }
+        total_moving.fetch_add(mv, std::memory_order_relaxed);
+        total_mild.fetch_add(ml, std::memory_order_relaxed);
+    });
+    *moving = total_moving.load();
+    *mild = total_mild.load();
 }
 
 // How far each pixel has moved since the pass was given the frame, if the pass
@@ -1120,6 +1224,478 @@ struct Alignment {
     std::array<Hypothesis, 3> h;
     std::array<std::vector<uint8_t>, 3> motion;
 };
+
+// One pass's alignment as the composition reads it: each way's motion mask and the pixel
+// offsets of its two shifts. `count` 0 takes nothing of the pass.
+struct Lookup {
+    int count = 0;
+    const uint8_t* motion[3] = {};
+    ptrdiff_t a[3] = {}, b[3] = {};
+};
+
+// Everything ComposeRows() reads, for the frame on screen (`width` x `height`, RGB8 `live`)
+// and up to three passes: the one on screen (`now_*`), the one before it while crossing
+// over (`was_*`, `previous`) and the correction memory (`mem_*`). Deltas are RGB int16 a
+// pixel, casts kCastEntries x 3. `weight` is MotionWeight() times the scene's, by motion.
+struct ComposeInput {
+    int width = 0, height = 0;
+    const uint8_t* live = nullptr;
+    uint8_t* dst = nullptr;
+    int outstride = 0;
+    int shift[3] = {};
+    const int16_t* cast = nullptr;
+    const int16_t* was_cast = nullptr;
+    const int16_t* now_delta = nullptr;
+    const int16_t* was_delta = nullptr;
+    const int16_t* mem_delta = nullptr;
+    Lookup now_l, was_l, mem_l;
+    const int* weight = nullptr;
+    int scene = 256;  // the scene's weight, which `weight` is MotionWeight() times
+    int blend = 256;
+    bool crossing = false;  // blend < 256
+    bool previous = false;  // and the pass before is there to cross from
+    bool detail = false;    // the scene's weight is above nothing
+};
+
+// Which way a pixel takes a pass -- the one its motion fits best, the first of equals --
+// and how much of the pass's own correction it keeps: it reads the mean of the pass's
+// pixels at that way's two offsets. A weight of 0 reads nothing, so the offsets need no
+// check when a shift took the pixel off the pass's edge: that motion is 255.
+inline int Choose(const Lookup& l, const int* weight, size_t i, int* best) {
+    *best = 0;
+    if (l.count == 0)
+        return 0;
+    uint8_t m = l.motion[0][i];
+    for (int k = 1; k < l.count; k++)
+        if (l.motion[k][i] < m) {
+            m = l.motion[k][i];
+            *best = k;
+        }
+    return weight[m];
+}
+
+// The composition of pixels [x_begin, x_end) of row y, a pixel at a time.
+template <bool kCrossing, bool kPrevious, bool kDetail>
+void ComposePixels(const ComposeInput& in, int y, int x_begin, int x_end) {
+    const int width = in.width;
+    const int16_t* const cast = in.cast;
+    uint32_t* d = reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const uint8_t* l = in.live + (static_cast<size_t>(y) * width + x_begin) * 3;
+    const size_t row = static_cast<size_t>(y) * width;
+    for (int x = x_begin; x < x_end; x++, l += 3) {
+        const size_t i = row + x;
+        const int16_t* const now_cast = cast + CastIndex(l[0], l[1], l[2]) * 3;
+        int now_k = 0, was_k = 0, mem_k = 0;
+        const int w = kDetail ? Choose(in.now_l, in.weight, i, &now_k) : 0;
+        const int was_w = kDetail && kPrevious ? Choose(in.was_l, in.weight, i, &was_k) : 0;
+        // The memory only matters where the pass on screen (or the one
+        // before, while crossing) does not fit the live picture itself.
+        const int mem_w = kDetail && (w < 256 || (kCrossing && was_w < 256))
+                              ? Choose(in.mem_l, in.weight, i, &mem_k)
+                              : 0;
+        const size_t now_a = i + in.now_l.a[now_k], now_b = i + in.now_l.b[now_k];
+        const size_t was_a = i + in.was_l.a[was_k], was_b = i + in.was_l.b[was_k];
+        const size_t mem_a = i + in.mem_l.a[mem_k], mem_b = i + in.mem_l.b[mem_k];
+        uint32_t p = 0;
+        for (int c = 0; c < 3; c++) {
+            // The cast for the colour now there, then what is remembered of the
+            // background here as far as the live picture still matches it,
+            // then the pass's own correction as far as it does.
+            int delta = now_cast[c];
+            const int remembered =
+                mem_w > 0 ? (in.mem_delta[3 * mem_a + c] + in.mem_delta[3 * mem_b + c]) >> 1 : 0;
+            if (mem_w > 0)
+                delta += (remembered - delta) * mem_w >> 8;
+            if (w > 0)
+                delta += (((in.now_delta[3 * now_a + c] + in.now_delta[3 * now_b + c]) >> 1) -
+                          delta) *
+                             w >>
+                         8;
+            if (kCrossing) {
+                // Nothing to come from before the first pass, or after a
+                // resize: the correction then fades up out of nothing.
+                int was = 0;
+                if (kPrevious) {
+                    was = in.was_cast[(now_cast - cast) + c];
+                    if (mem_w > 0)
+                        was += (remembered - was) * mem_w >> 8;
+                    if (was_w > 0)
+                        was += (((in.was_delta[3 * was_a + c] + in.was_delta[3 * was_b + c]) >>
+                                 1) -
+                                was) *
+                                   was_w >>
+                               8;
+                }
+                delta = was + ((delta - was) * in.blend >> 8);
+            }
+            const int r = l[c] + delta;
+            p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << in.shift[c];
+        }
+        d[x] = p;
+    }
+}
+
+// Whether every way of every pass the composition may read reaches only pixels of the frame
+// from row y -- the eight-at-a-time loads read a way's pixels whether or not a pixel takes
+// it. Rows near the frame's top and bottom under a vertical scroll do not, and go a pixel at
+// a time.
+inline bool RowInBounds(const ComposeInput& in, int y) {
+    const ptrdiff_t row = static_cast<ptrdiff_t>(y) * in.width;
+    const ptrdiff_t px = static_cast<ptrdiff_t>(in.width) * in.height;
+    for (const Lookup* l : { &in.now_l, &in.was_l, &in.mem_l })
+        for (int k = 0; k < l->count; k++)
+            for (const ptrdiff_t o : { l->a[k], l->b[k] })
+                if (row + o < 0 || row + o + in.width > px)
+                    return false;
+    return true;
+}
+
+// The composition's weight table, MotionWeight(m) * scene / 256, worked out for eight lanes
+// of motion rather than looked up: MotionWeight() clamps the motion to
+// [kHoldLevels, kFadeLevels] and falls by 256 over the span between them, and the division
+// by that span is a multiply by its reciprocal, exact for every multiple of 256 up to it.
+static_assert(kFadeLevels - kHoldLevels == 17, "the reciprocal below is 1/17's");
+
+#if defined(VBAM_DLSSNR_SSE2)
+// floor(x * w / 256) in each of eight int16 lanes, |x * w| < 2^23: bits 8-23 of the 32-bit
+// product, which is what `x * w >> 8` gives in int.
+inline __m128i MulShift8(__m128i x, __m128i w) {
+    return _mm_or_si128(_mm_slli_epi16(_mm_mulhi_epi16(x, w), 8),
+                        _mm_srli_epi16(_mm_mullo_epi16(x, w), 8));
+}
+
+// Each of eight int16 lanes repeated for its pixel's three channels: lanes 0-7 of `w` to
+// three vectors of eight channels, RGB a pixel.
+inline void Expand3(__m128i w, __m128i out[3]) {
+    out[0] = _mm_unpacklo_epi64(_mm_shufflelo_epi16(w, _MM_SHUFFLE(1, 0, 0, 0)),
+                                _mm_shufflelo_epi16(w, _MM_SHUFFLE(2, 2, 1, 1)));
+    out[1] = _mm_unpacklo_epi64(_mm_shufflelo_epi16(w, _MM_SHUFFLE(3, 3, 3, 2)),
+                                _mm_unpackhi_epi64(_mm_shufflehi_epi16(w, _MM_SHUFFLE(1, 0, 0, 0)),
+                                                   _mm_setzero_si128()));
+    out[2] = _mm_unpackhi_epi64(_mm_shufflehi_epi16(w, _MM_SHUFFLE(2, 2, 1, 1)),
+                                _mm_shufflehi_epi16(w, _MM_SHUFFLE(3, 3, 3, 2)));
+}
+
+// The weight table's entries for eight int16 lanes of motion; see above.
+inline __m128i Weight8(__m128i motion, __m128i scene) {
+    const __m128i t = _mm_min_epi16(_mm_max_epi16(motion, _mm_set1_epi16(kHoldLevels)),
+                                    _mm_set1_epi16(kFadeLevels));
+    const __m128i x = _mm_slli_epi16(_mm_sub_epi16(t, _mm_set1_epi16(kHoldLevels)), 8);
+    // floor(x / 17) for x <= 17 * 256: x * ceil(2^20 / 17) >> 20
+    const __m128i q =
+        _mm_srli_epi16(_mm_mulhi_epu16(x, _mm_set1_epi16(static_cast<int16_t>(61681))), 4);
+    const __m128i full = _mm_sub_epi16(_mm_set1_epi16(256), q);
+    // full * scene >> 8, both at most 256: bits 8-23 of the unsigned product
+    return _mm_or_si128(_mm_slli_epi16(_mm_mulhi_epu16(full, scene), 8),
+                        _mm_srli_epi16(_mm_mullo_epi16(full, scene), 8));
+}
+
+// Choose() for eight pixels from `i`: the weight of the way each takes (int16 lanes) and which
+// way that is (`k`, int16 lanes), the first of equals as Choose() takes it.
+inline __m128i Choose8(const Lookup& l, __m128i scene, size_t i, __m128i* k) {
+    const __m128i zero = _mm_setzero_si128();
+    *k = zero;
+    if (l.count == 0)
+        return zero;
+    __m128i m = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[0] + i));
+    __m128i best = zero;
+    for (int q = 1; q < l.count; q++) {
+        const __m128i mq = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[q] + i));
+        // mq < m: the smaller of the two is mq, and they differ
+        const __m128i less =
+            _mm_andnot_si128(_mm_cmpeq_epi8(mq, m), _mm_cmpeq_epi8(_mm_min_epu8(mq, m), mq));
+        m = _mm_min_epu8(m, mq);
+        best = _mm_or_si128(_mm_andnot_si128(less, best),
+                            _mm_and_si128(less, _mm_set1_epi8(static_cast<char>(q))));
+    }
+    *k = _mm_unpacklo_epi8(best, zero);
+    return Weight8(_mm_unpacklo_epi8(m, zero), scene);
+}
+
+// The composition of row y eight pixels at a time, ComposePixels()'s arithmetic channel by
+// channel in int16 lanes; returns how far it got, a multiple of eight. Which way each pixel
+// takes and its weights are found eight pixels at a time and repeated for each pixel's three
+// channels; the cast, a table lookup by colour, a pixel at a time.
+template <bool kCrossing, bool kPrevious, bool kDetail>
+int ComposeRowSse2(const ComposeInput& in, int y) {
+    const int width = in.width;
+    const int end = width & ~7;
+    const size_t row = static_cast<size_t>(y) * width;
+    const uint8_t* const live = in.live + row * 3;
+    uint32_t* const d = reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i blend = _mm_set1_epi16(static_cast<int16_t>(in.blend));
+    const __m128i scene = _mm_set1_epi16(static_cast<int16_t>(in.scene));
+    const __m128i full = _mm_set1_epi16(256);
+    alignas(16) int16_t cast_now[24], cast_was[24];
+    alignas(16) uint8_t out[32];
+    // The mean of a pass's pixels at the way each lane's pixel takes: every way's mean,
+    // eight lanes at a time from where that way puts them, and each lane keeps its own.
+    const auto mean = [&](const Lookup& l, const int16_t* delta, __m128i ks, size_t j) {
+        __m128i r = zero;
+        for (int k = 0; k < l.count; k++) {
+            const __m128i a =
+                _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.a[k]));
+            const __m128i b =
+                _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.b[k]));
+            const __m128i m = _mm_srai_epi16(_mm_add_epi16(a, b), 1);
+            r = _mm_or_si128(
+                r, _mm_and_si128(_mm_cmpeq_epi16(ks, _mm_set1_epi16(static_cast<int16_t>(k))), m));
+        }
+        return r;
+    };
+    for (int x = 0; x < end; x += 8) {
+        const uint8_t* const l = live + static_cast<size_t>(x) * 3;
+        const size_t i = row + x;
+        for (int q = 0; q < 8; q++) {
+            const size_t ci = CastIndex(l[3 * q], l[3 * q + 1], l[3 * q + 2]) * 3;
+            for (int c = 0; c < 3; c++) {
+                cast_now[3 * q + c] = in.cast[ci + c];
+                if (kPrevious)
+                    cast_was[3 * q + c] = in.was_cast[ci + c];
+            }
+        }
+        __m128i w_now[3], w_was[3], w_mem[3], k_now[3], k_was[3], k_mem[3];
+        if (kDetail) {
+            __m128i kn, kw = zero, km;
+            const __m128i wn = Choose8(in.now_l, scene, i, &kn);
+            const __m128i ww = kPrevious ? Choose8(in.was_l, scene, i, &kw) : zero;
+            // The memory only where the pass on screen (or the one before, while crossing)
+            // does not fit the live picture itself.
+            __m128i misfit = _mm_cmplt_epi16(wn, full);
+            if (kCrossing)
+                misfit = _mm_or_si128(misfit, _mm_cmplt_epi16(ww, full));
+            const __m128i wm = _mm_and_si128(misfit, Choose8(in.mem_l, scene, i, &km));
+            Expand3(wn, w_now);
+            Expand3(ww, w_was);
+            Expand3(wm, w_mem);
+            Expand3(kn, k_now);
+            Expand3(kw, k_was);
+            Expand3(km, k_mem);
+        }
+        __m128i r[3];
+        for (int v = 0; v < 3; v++) {
+            const size_t j = i * 3 + 8 * v;  // the first channel of these eight lanes
+            __m128i delta = _mm_load_si128(reinterpret_cast<const __m128i*>(cast_now + 8 * v));
+            __m128i remembered = zero;
+            if (kDetail) {
+                remembered = mean(in.mem_l, in.mem_delta, k_mem[v], j);
+                delta = _mm_add_epi16(delta, MulShift8(_mm_sub_epi16(remembered, delta), w_mem[v]));
+                delta = _mm_add_epi16(
+                    delta, MulShift8(_mm_sub_epi16(mean(in.now_l, in.now_delta, k_now[v], j), delta),
+                                     w_now[v]));
+            }
+            if (kCrossing) {
+                __m128i was = zero;
+                if (kPrevious) {
+                    was = _mm_load_si128(reinterpret_cast<const __m128i*>(cast_was + 8 * v));
+                    if (kDetail) {
+                        was = _mm_add_epi16(was, MulShift8(_mm_sub_epi16(remembered, was), w_mem[v]));
+                        was = _mm_add_epi16(
+                            was, MulShift8(_mm_sub_epi16(mean(in.was_l, in.was_delta, k_was[v], j), was),
+                                           w_was[v]));
+                    }
+                }
+                delta = _mm_add_epi16(was, MulShift8(_mm_sub_epi16(delta, was), blend));
+            }
+            r[v] = delta;
+        }
+        // The live channels widened to int16, the deltas added, clamped to a byte by the pack.
+        const __m128i lo = _mm_loadu_si128(reinterpret_cast<const __m128i*>(l));
+        const __m128i hi = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l + 16));
+        _mm_store_si128(reinterpret_cast<__m128i*>(out),
+                        _mm_packus_epi16(_mm_add_epi16(_mm_unpacklo_epi8(lo, zero), r[0]),
+                                         _mm_add_epi16(_mm_unpackhi_epi8(lo, zero), r[1])));
+        _mm_store_si128(reinterpret_cast<__m128i*>(out + 16),
+                        _mm_packus_epi16(_mm_add_epi16(_mm_unpacklo_epi8(hi, zero), r[2]), zero));
+        for (int q = 0; q < 8; q++)
+            d[x + q] = static_cast<uint32_t>(out[3 * q]) << in.shift[0] |
+                       static_cast<uint32_t>(out[3 * q + 1]) << in.shift[1] |
+                       static_cast<uint32_t>(out[3 * q + 2]) << in.shift[2];
+    }
+    return end;
+}
+#elif defined(VBAM_DLSSNR_NEON)
+// floor(x * w / 256) in each of eight int16 lanes, |x * w| < 2^23: the 32-bit products
+// narrowed from bit 8, which is what `x * w >> 8` gives in int.
+inline int16x8_t MulShift8(int16x8_t x, int16x8_t w) {
+    return vcombine_s16(vshrn_n_s32(vmull_s16(vget_low_s16(x), vget_low_s16(w)), 8),
+                        vshrn_n_s32(vmull_s16(vget_high_s16(x), vget_high_s16(w)), 8));
+}
+
+// The weight table's entries for eight lanes of motion; see above.
+inline int16x8_t Weight8(uint16x8_t motion, uint16x8_t scene) {
+    const uint16x8_t t =
+        vminq_u16(vmaxq_u16(motion, vdupq_n_u16(static_cast<uint16_t>(kHoldLevels))),
+                  vdupq_n_u16(static_cast<uint16_t>(kFadeLevels)));
+    const uint16x8_t x =
+        vshlq_n_u16(vsubq_u16(t, vdupq_n_u16(static_cast<uint16_t>(kHoldLevels))), 8);
+    // floor(x / 17) for x <= 17 * 256: x * ceil(2^20 / 17) >> 20
+    const uint16x4_t r = vdup_n_u16(61681);
+    const uint16x8_t q = vshrq_n_u16(vcombine_u16(vshrn_n_u32(vmull_u16(vget_low_u16(x), r), 16),
+                                                  vshrn_n_u32(vmull_u16(vget_high_u16(x), r), 16)),
+                                     4);
+    const uint16x8_t full = vsubq_u16(vdupq_n_u16(256), q);
+    // full * scene >> 8, both at most 256
+    return vreinterpretq_s16_u16(
+        vcombine_u16(vshrn_n_u32(vmull_u16(vget_low_u16(full), vget_low_u16(scene)), 8),
+                     vshrn_n_u32(vmull_u16(vget_high_u16(full), vget_high_u16(scene)), 8)));
+}
+
+// Choose() for eight pixels from `i`: the weight of the way each takes and which way that is
+// (`k`), the first of equals as Choose() takes it.
+inline int16x8_t Choose8(const Lookup& l, uint16x8_t scene, size_t i, uint16x8_t* k) {
+    *k = vdupq_n_u16(0);
+    if (l.count == 0)
+        return vdupq_n_s16(0);
+    uint8x8_t m = vld1_u8(l.motion[0] + i);
+    uint8x8_t best = vdup_n_u8(0);
+    for (int q = 1; q < l.count; q++) {
+        const uint8x8_t mq = vld1_u8(l.motion[q] + i);
+        best = vbsl_u8(vclt_u8(mq, m), vdup_n_u8(static_cast<uint8_t>(q)), best);
+        m = vmin_u8(m, mq);
+    }
+    *k = vmovl_u8(best);
+    return Weight8(vmovl_u8(m), scene);
+}
+
+// The composition of row y eight pixels at a time, ComposePixels()'s arithmetic in int16
+// lanes; returns how far it got, a multiple of eight. NEON's structured loads split the
+// pixels into their channels, so each vector holds one channel of eight pixels and the ways
+// and weights, found per pixel, apply to all three as they are; the cast, a table lookup by
+// colour, goes a pixel at a time.
+template <bool kCrossing, bool kPrevious, bool kDetail>
+int ComposeRowNeon(const ComposeInput& in, int y) {
+    const int width = in.width;
+    const int end = width & ~7;
+    const size_t row = static_cast<size_t>(y) * width;
+    const uint8_t* const live = in.live + row * 3;
+    uint32_t* const d = reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const int16x8_t zero = vdupq_n_s16(0);
+    const int16x8_t blend = vdupq_n_s16(static_cast<int16_t>(in.blend));
+    const uint16x8_t scene = vdupq_n_u16(static_cast<uint16_t>(in.scene));
+    const int16x8_t full = vdupq_n_s16(256);
+    const int32x4_t shift[3] = { vdupq_n_s32(in.shift[0]), vdupq_n_s32(in.shift[1]),
+                                 vdupq_n_s32(in.shift[2]) };
+    alignas(16) int16_t cast_now[3][8], cast_was[3][8];
+    // The mean of a pass's pixels at the way each pixel takes, channel by channel: every
+    // way's mean, eight pixels at a time from where that way puts them, and each lane keeps
+    // its own. The halving add is `(a + b) >> 1` in int.
+    const auto mean = [&](const Lookup& l, const int16_t* delta, uint16x8_t ks, size_t i) {
+        int16x8x3_t r = { { zero, zero, zero } };
+        const int16_t* const p = delta + 3 * i;
+        for (int k = 0; k < l.count; k++) {
+            const int16x8x3_t a = vld3q_s16(p + 3 * l.a[k]);
+            const int16x8x3_t b = vld3q_s16(p + 3 * l.b[k]);
+            const uint16x8_t sel = vceqq_u16(ks, vdupq_n_u16(static_cast<uint16_t>(k)));
+            for (int c = 0; c < 3; c++)
+                r.val[c] = vbslq_s16(sel, vhaddq_s16(a.val[c], b.val[c]), r.val[c]);
+        }
+        return r;
+    };
+    for (int x = 0; x < end; x += 8) {
+        const uint8_t* const l = live + static_cast<size_t>(x) * 3;
+        const size_t i = row + x;
+        for (int q = 0; q < 8; q++) {
+            const size_t ci = CastIndex(l[3 * q], l[3 * q + 1], l[3 * q + 2]) * 3;
+            for (int c = 0; c < 3; c++) {
+                cast_now[c][q] = in.cast[ci + c];
+                if (kPrevious)
+                    cast_was[c][q] = in.was_cast[ci + c];
+            }
+        }
+        int16x8_t w_now = zero, w_was = zero, w_mem = zero;
+        int16x8x3_t remembered = { { zero, zero, zero } }, now_mean = remembered,
+                    was_mean = remembered;
+        if (kDetail) {
+            uint16x8_t k_now, k_was = vdupq_n_u16(0), k_mem;
+            w_now = Choose8(in.now_l, scene, i, &k_now);
+            if (kPrevious)
+                w_was = Choose8(in.was_l, scene, i, &k_was);
+            // The memory only where the pass on screen (or the one before, while crossing)
+            // does not fit the live picture itself.
+            uint16x8_t misfit = vcltq_s16(w_now, full);
+            if (kCrossing)
+                misfit = vorrq_u16(misfit, vcltq_s16(w_was, full));
+            w_mem = vandq_s16(vreinterpretq_s16_u16(misfit), Choose8(in.mem_l, scene, i, &k_mem));
+            remembered = mean(in.mem_l, in.mem_delta, k_mem, i);
+            now_mean = mean(in.now_l, in.now_delta, k_now, i);
+            if (kPrevious)
+                was_mean = mean(in.was_l, in.was_delta, k_was, i);
+        }
+        const uint8x8x3_t lv = vld3_u8(l);
+        uint32x4_t lo = vdupq_n_u32(0), hi = vdupq_n_u32(0);
+        for (int c = 0; c < 3; c++) {
+            int16x8_t delta = vld1q_s16(cast_now[c]);
+            if (kDetail) {
+                delta = vaddq_s16(delta, MulShift8(vsubq_s16(remembered.val[c], delta), w_mem));
+                delta = vaddq_s16(delta, MulShift8(vsubq_s16(now_mean.val[c], delta), w_now));
+            }
+            if (kCrossing) {
+                int16x8_t was = zero;
+                if (kPrevious) {
+                    was = vld1q_s16(cast_was[c]);
+                    if (kDetail) {
+                        was = vaddq_s16(was, MulShift8(vsubq_s16(remembered.val[c], was), w_mem));
+                        was = vaddq_s16(was, MulShift8(vsubq_s16(was_mean.val[c], was), w_was));
+                    }
+                }
+                delta = vaddq_s16(was, MulShift8(vsubq_s16(delta, was), blend));
+            }
+            // The live channel widened to int16, the delta added, clamped to a byte, and put
+            // where the channel goes in the 32-bit pixel.
+            const uint16x8_t v = vmovl_u8(
+                vqmovun_s16(vaddq_s16(vreinterpretq_s16_u16(vmovl_u8(lv.val[c])), delta)));
+            lo = vorrq_u32(lo, vshlq_u32(vmovl_u16(vget_low_u16(v)), shift[c]));
+            hi = vorrq_u32(hi, vshlq_u32(vmovl_u16(vget_high_u16(v)), shift[c]));
+        }
+        vst1q_u32(d + x, lo);
+        vst1q_u32(d + x + 4, hi);
+    }
+    return end;
+}
+#endif
+
+// The composition of rows [y_begin, y_end): ComposeRowSse2() or ComposeRowNeon() where it
+// can, ComposePixels() for the rest, the same bytes either way; `simd` false is
+// ComposePixels() alone.
+template <bool kCrossing, bool kPrevious, bool kDetail>
+void ComposeRowsAs(const ComposeInput& in, int y_begin, int y_end, bool simd) {
+    for (int y = y_begin; y < y_end; y++) {
+        int x = 0;
+#if defined(VBAM_DLSSNR_SSE2)
+        if (simd && RowInBounds(in, y))
+            x = ComposeRowSse2<kCrossing, kPrevious, kDetail>(in, y);
+#elif defined(VBAM_DLSSNR_NEON)
+        if (simd && RowInBounds(in, y))
+            x = ComposeRowNeon<kCrossing, kPrevious, kDetail>(in, y);
+#else
+        (void)simd;
+#endif
+        ComposePixels<kCrossing, kPrevious, kDetail>(in, y, x, in.width);
+    }
+}
+
+// The frame-wide choices as constants, so each case compiles to a loop of its own without
+// the others' work. `previous` is only ever set while crossing. With the scene's weight at
+// nothing (the whole frame moving), no pixel keeps any of a pass's own correction or the
+// memory's -- every weight is 0 -- and the cast is all there is to lay down.
+void ComposeRows(const ComposeInput& in, int y_begin, int y_end, bool simd = true) {
+    const auto by_detail = [&](auto crossing_c, auto previous_c) {
+        constexpr bool kCrossing = decltype(crossing_c)::value;
+        constexpr bool kPrevious = decltype(previous_c)::value;
+        if (in.detail)
+            ComposeRowsAs<kCrossing, kPrevious, true>(in, y_begin, y_end, simd);
+        else
+            ComposeRowsAs<kCrossing, kPrevious, false>(in, y_begin, y_end, simd);
+    };
+    if (in.previous)
+        by_detail(std::true_type{}, std::true_type{});
+    else if (in.crossing)
+        by_detail(std::true_type{}, std::false_type{});
+    else
+        by_detail(std::false_type{}, std::false_type{});
+}
 
 // The temporal gate's knobs, nr_frame_live's defaults (nr_frame_live_defaults(), which are
 // nr_daemon.py's). nr_frame_defaults() leaves the release and the floor off, and the
@@ -2006,22 +2582,25 @@ void Filter::Impl::UpdateMemory(const uint8_t* liveb) {
     const uint8_t* const now = display_src.data();
     const int16_t* const delta = display_delta.data();
     const bool have_age = liveb && age.size() == px;
-    for (size_t i = 0; i < px; i++) {
-        bool take = !memory_valid[i];
-        if (!take && have_age && age[i] >= kMemoryStillFrames) {
-            const uint8_t* a = now + i * 3;
-            const uint8_t* b = liveb + i * 3;
-            take = std::abs(a[0] - b[0]) <= kHoldLevels && std::abs(a[1] - b[1]) <= kHoldLevels &&
-                   std::abs(a[2] - b[2]) <= kHoldLevels;
+    RowPool::Get().Run(h, [&](int ya, int yb) {
+        for (size_t i = static_cast<size_t>(ya) * w; i < static_cast<size_t>(yb) * w; i++) {
+            bool take = !memory_valid[i];
+            if (!take && have_age && age[i] >= kMemoryStillFrames) {
+                const uint8_t* a = now + i * 3;
+                const uint8_t* b = liveb + i * 3;
+                take = std::abs(a[0] - b[0]) <= kHoldLevels &&
+                       std::abs(a[1] - b[1]) <= kHoldLevels &&
+                       std::abs(a[2] - b[2]) <= kHoldLevels;
+            }
+            if (take) {
+                std::memcpy(memory_src.data() + i * 3, now + i * 3, 3);
+                memory_delta[3 * i] = delta[3 * i];
+                memory_delta[3 * i + 1] = delta[3 * i + 1];
+                memory_delta[3 * i + 2] = delta[3 * i + 2];
+                memory_valid[i] = 1;
+            }
         }
-        if (take) {
-            std::memcpy(memory_src.data() + i * 3, now + i * 3, 3);
-            memory_delta[3 * i] = delta[3 * i];
-            memory_delta[3 * i + 1] = delta[3 * i + 1];
-            memory_delta[3 * i + 2] = delta[3 * i + 2];
-            memory_valid[i] = 1;
-        }
-    }
+    });
 }
 
 Filter::Filter() : impl_(std::make_shared<Impl>()) {
@@ -2199,8 +2778,12 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                              PyramidLevels(im.display_width, im.display_height),
                              &im.display_pyramid);
                 im.display_delta.resize(im.display_src.size());
-                for (size_t i = 0; i < im.display_src.size(); i++)
-                    im.display_delta[i] = static_cast<int16_t>(im.display[i] - im.display_src[i]);
+                const size_t row = static_cast<size_t>(im.display_width) * 3;
+                RowPool::Get().Run(im.display_height, [&](int ya, int yb) {
+                    for (size_t i = ya * row; i < yb * row; i++)
+                        im.display_delta[i] =
+                            static_cast<int16_t>(im.display[i] - im.display_src[i]);
+                });
                 landed = true;
             }
         }
@@ -2232,38 +2815,46 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const int16_t* const cast = im.display_cast.data();
 
             // The live frame, read in full before anything is written: dst may alias src.
+            // And how long each pixel has held still, for the correction memory: each
+            // channel's change sixteen at a time (the mean of the previous frame with itself
+            // is the previous frame), then a pixel is still if none moved. Both a row at a
+            // time on the pool, each row's own.
             im.live.resize(px * 3);
-            for (int y = 0; y < height; y++) {
-                const uint32_t* s =
-                    reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
-                uint8_t* o = im.live.data() + static_cast<size_t>(y) * width * 3;
-                for (int x = 0; x < width; x++, o += 3) {
-                    const uint32_t v = s[x];
-                    o[0] = static_cast<uint8_t>(v >> red_shift);
-                    o[1] = static_cast<uint8_t>(v >> green_shift);
-                    o[2] = static_cast<uint8_t>(v >> blue_shift);
-                }
-            }
-            const uint8_t* const live = im.live.data();
-
-            // How long each pixel has held still, for the correction memory.
-            if (im.age.size() != px || im.live_previous.size() != px * 3) {
+            const bool fresh_age = im.age.size() != px || im.live_previous.size() != px * 3;
+            if (fresh_age) {
                 im.age.assign(px, 0);
-                im.live_previous.assign(live, live + px * 3);
-            } else {
-                // Each channel's change sixteen at a time (the mean of the previous frame with
-                // itself is the previous frame), then a pixel is still if none moved.
-                const uint8_t* lp = im.live_previous.data();
-                im.age_diff.resize(px * 3);
-                AbsDiffMean(live, lp, lp, im.age_diff.data(), px * 3);
-                const uint8_t* d = im.age_diff.data();
-                uint8_t* age = im.age.data();
-                for (size_t i = 0; i < px; i++, d += 3) {
-                    const bool still = std::max(d[0], std::max(d[1], d[2])) <= kHoldLevels;
-                    age[i] = still ? static_cast<uint8_t>(age[i] + (age[i] < 255)) : 0;
-                }
-                std::memcpy(im.live_previous.data(), live, px * 3);
+                im.live_previous.resize(px * 3);
             }
+            im.age_diff.resize(px * 3);
+            RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                for (int y = y_begin; y < y_end; y++) {
+                    const uint32_t* s =
+                        reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
+                    const size_t first = static_cast<size_t>(y) * width;
+                    uint8_t* const row = im.live.data() + first * 3;
+                    uint8_t* o = row;
+                    for (int x = 0; x < width; x++, o += 3) {
+                        const uint32_t v = s[x];
+                        o[0] = static_cast<uint8_t>(v >> red_shift);
+                        o[1] = static_cast<uint8_t>(v >> green_shift);
+                        o[2] = static_cast<uint8_t>(v >> blue_shift);
+                    }
+                    uint8_t* const lp = im.live_previous.data() + first * 3;
+                    if (!fresh_age) {
+                        uint8_t* const diff = im.age_diff.data() + first * 3;
+                        AbsDiffMean(row, lp, lp, diff, static_cast<size_t>(width) * 3);
+                        const uint8_t* d = diff;
+                        uint8_t* age = im.age.data() + first;
+                        for (int x = 0; x < width; x++, d += 3) {
+                            const bool still =
+                                std::max(d[0], std::max(d[1], d[2])) <= kHoldLevels;
+                            age[x] = still ? static_cast<uint8_t>(age[x] + (age[x] < 255)) : 0;
+                        }
+                    }
+                    std::memcpy(lp, row, static_cast<size_t>(width) * 3);
+                }
+            });
+            const uint8_t* const live = im.live.data();
             if (landed)
                 im.UpdateMemory(live);
 
@@ -2295,16 +2886,12 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 still.resize(px);
                 measure(given, nullptr, al->h[0], still.data());
                 // Whether anything is worth lining up at all: any motion counts here.
-                size_t count = 0;
-                for (size_t i = 0; i < px; i++)
-                    count += still[i] > kHoldLevels;
+                size_t count = 0, mild = 0;
+                CountMotion(still.data(), nullptr, nullptr, px, &count, &mild);
                 if (count * 100 <= px * kScenePercentHold)
                     return count;
                 // What the scene is weighed by: the mild residue (kSceneMildLevels).
-                const auto mild = [&](uint8_t m) { return m > kHoldLevels && m <= kSceneMildLevels; };
-                count = 0;
-                for (size_t i = 0; i < px; i++)
-                    count += mild(still[i]);
+                count = mild;
                 if (!have_live_pyramid) {
                     BuildPyramid(live, width, height, PyramidLevels(width, height),
                                  &im.live_pyramid);
@@ -2322,9 +2909,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     al->motion[k].resize(px);
                     measure(given, nullptr, al->h[k], al->motion[k].data());
                 }
-                count = 0;
-                for (size_t i = 0; i < px; i++)
-                    count += mild(std::min({ al->motion[0][i], al->motion[1][i], al->motion[2][i] }));
+                size_t moving = 0;
+                CountMotion(al->motion[0].data(), al->motion[1].data(), al->motion[2].data(), px,
+                            &moving, &count);
                 return count;
             };
             Alignment& now_al = im.alignment[0];
@@ -2402,18 +2989,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 DilateAll(masks, across, n_masks, width, height, kMotionRadius);
             }
 
-            // Which way a pixel takes a pass -- the one its motion fits best -- and how much of
-            // the pass's own correction it keeps: it reads the mean of the pass's pixels at
-            // the hypothesis's two offsets. A weight of 0 reads nothing, so the offsets need
-            // no check when a shift took the pixel off the pass's edge: that motion is 255.
             std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
             for (int m = 0; m < 256; m++)
                 weight[m] = MotionWeight(m) * scene_weight / 256;
-            struct Lookup {
-                int count = 0;
-                const uint8_t* motion[3] = {};
-                ptrdiff_t a[3] = {}, b[3] = {};
-            };
             const auto lookup = [&](const Alignment& al, bool use) {
                 Lookup l;
                 l.count = use ? al.count : 0;
@@ -2424,99 +3002,33 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 }
                 return l;
             };
-            const Lookup now_l = lookup(now_al, scene_weight > 0);
-            const Lookup was_l = lookup(was_al, scene_weight > 0 && have_previous);
-            const Lookup mem_l = lookup(mem_al, have_memory);
-            const auto choose = [&weight](const Lookup& l, size_t i, size_t* a, size_t* b) {
-                if (l.count == 0)
-                    return 0;
-                int best = 0;
-                uint8_t m = l.motion[0][i];
-                for (int k = 1; k < l.count; k++)
-                    if (l.motion[k][i] < m) {
-                        m = l.motion[k][i];
-                        best = k;
-                    }
-                *a = i + l.a[best];
-                *b = i + l.b[best];
-                return weight[m];
-            };
-
-            const int shift[3] = { red_shift, green_shift, blue_shift };
-            // Shifts rather than divisions below: at a full weight of 256 they are exact, so
-            // a still picture still gets the pass's own output.
-            const int16_t* const now_delta = im.display_delta.data();
-            const int16_t* const mem_delta = have_memory ? im.memory_delta.data() : nullptr;
-            const int16_t* const was_cast = have_previous ? im.previous_cast.data() : nullptr;
-            const int16_t* const was_delta = have_previous ? im.previous_delta.data() : nullptr;
-            // The two frame-wide choices as constants, so each case compiles to a loop of its
-            // own without the other's work. have_previous is only ever set while crossing.
-            const auto rows = [&](auto crossing_c, auto previous_c, int y_begin, int y_end) {
-            constexpr bool kCrossing = decltype(crossing_c)::value;
-            constexpr bool kPrevious = decltype(previous_c)::value;
-            for (int y = y_begin; y < y_end; y++) {
-                uint32_t* d = reinterpret_cast<uint32_t*>(dst + static_cast<size_t>(y) * outstride);
-                const uint8_t* l = live + static_cast<size_t>(y) * width * 3;
-                const size_t row = static_cast<size_t>(y) * width;
-                for (int x = 0; x < width; x++, l += 3) {
-                    const size_t i = row + x;
-                    const int16_t* const now_cast = cast + CastIndex(l[0], l[1], l[2]) * 3;
-                    size_t now_a = 0, now_b = 0, was_a = 0, was_b = 0, mem_a = 0, mem_b = 0;
-                    const int w = choose(now_l, i, &now_a, &now_b);
-                    const int was_w = kPrevious ? choose(was_l, i, &was_a, &was_b) : 0;
-                    // The memory only matters where the pass on screen (or the one
-                    // before, while crossing) does not fit the live picture itself.
-                    const int mem_w = (w < 256 || (kCrossing && was_w < 256))
-                                          ? choose(mem_l, i, &mem_a, &mem_b)
-                                          : 0;
-                    uint32_t p = 0;
-                    for (int c = 0; c < 3; c++) {
-                        // The cast for the colour now there, then what is remembered of the
-                        // background here as far as the live picture still matches it,
-                        // then the pass's own correction as far as it does.
-                        int delta = now_cast[c];
-                        const int remembered =
-                            mem_w > 0 ? (mem_delta[3 * mem_a + c] + mem_delta[3 * mem_b + c]) >> 1 : 0;
-                        if (mem_w > 0)
-                            delta += (remembered - delta) * mem_w >> 8;
-                        if (w > 0)
-                            delta += (((now_delta[3 * now_a + c] + now_delta[3 * now_b + c]) >> 1) -
-                                      delta) *
-                                         w >>
-                                     8;
-                        if (kCrossing) {
-                            // Nothing to come from before the first pass, or after a
-                            // resize: the correction then fades up out of nothing.
-                            int was = 0;
-                            if (kPrevious) {
-                                was = was_cast[(now_cast - cast) + c];
-                                if (mem_w > 0)
-                                    was += (remembered - was) * mem_w >> 8;
-                                if (was_w > 0)
-                                    was += (((was_delta[3 * was_a + c] +
-                                              was_delta[3 * was_b + c]) >>
-                                             1) -
-                                            was) *
-                                               was_w >>
-                                           8;
-                            }
-                            delta = was + ((delta - was) * blend >> 8);
-                        }
-                        const int r = l[c] + delta;
-                        p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << shift[c];
-                    }
-                    d[x] = p;
-                }
-            }
-            };
-            RowPool::Get().Run(height, [&](int y_begin, int y_end) {
-                if (have_previous)
-                    rows(std::true_type{}, std::true_type{}, y_begin, y_end);
-                else if (crossing)
-                    rows(std::true_type{}, std::false_type{}, y_begin, y_end);
-                else
-                    rows(std::false_type{}, std::false_type{}, y_begin, y_end);
-            });
+            ComposeInput ci;
+            ci.width = width;
+            ci.height = height;
+            ci.live = live;
+            ci.dst = dst;
+            ci.outstride = outstride;
+            ci.shift[0] = red_shift;
+            ci.shift[1] = green_shift;
+            ci.shift[2] = blue_shift;
+            ci.cast = cast;
+            ci.was_cast = have_previous ? im.previous_cast.data() : nullptr;
+            // Shifts rather than divisions: at a full weight of 256 they are exact, so a
+            // still picture still gets the pass's own output.
+            ci.now_delta = im.display_delta.data();
+            ci.was_delta = have_previous ? im.previous_delta.data() : nullptr;
+            ci.mem_delta = have_memory ? im.memory_delta.data() : nullptr;
+            ci.now_l = lookup(now_al, scene_weight > 0);
+            ci.was_l = lookup(was_al, scene_weight > 0 && have_previous);
+            ci.mem_l = lookup(mem_al, have_memory);
+            ci.weight = weight.data();
+            ci.scene = scene_weight;
+            ci.blend = blend;
+            ci.crossing = crossing;
+            ci.previous = have_previous;
+            ci.detail = scene_weight > 0;
+            RowPool::Get().Run(height,
+                               [&](int y_begin, int y_end) { ComposeRows(ci, y_begin, y_end); });
             wrote_result = true;
         }
     }
