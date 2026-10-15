@@ -253,6 +253,10 @@ int xmx_half_by_cast(void)
  * fetches A that way, function constant 4 (`XMX_PORTABLE_PACKED=1`; off by default). */
 int xmx_staged_packed(void) { return g.staged_packed; }
 int xmx_portable_packed(void) { return g.portable_packed; }
+/* The vector-matrix path is libd3dmx's (xmx.h); here the matrix path is `simdgroup_matrix`,
+ * `xmx_coopmat()`. */
+int xmx_coopvec(void) { return 0; }
+unsigned xmx_coopvec_calls(void) { return 0; }
 
 /* -- shaders --------------------------------------------------------------- */
 

@@ -276,10 +276,17 @@ Windows gets a **third runtime, on Direct3D 12**: `build/libd3dmx.dll` (`src/gpu
 implements the same `xmx_*` entry points, with the kernels rewritten in HLSL (`src/gpu/d3d12/`)
 and compiled by `dxc` to nine DXIL modules that are embedded in the library.
 `NR_GPU_BACKEND=d3d12` switches every Python tool and the C frame library to it, and
-`ctest -R d3d12_` runs the GPU tests on it. It has no matrix path — HLSL ships no matrix-matrix
-operation, so every GEMM is the multiply-add kernel — and it takes the operands as root UAVs
-with byte offsets, splits dispatches at Direct3D's 65535 groups per axis, and keeps every half
-store on `f32tof16` so the half buffers hold what `half_round` gives. CMake builds it under
+`ctest -R d3d12_` runs the GPU tests on it. Its matrix path is a **vector-matrix** one
+(`notes/phase77`): Shader Model 6.10's linear algebra lets a single thread multiply a matrix
+loaded straight from a buffer by its own vector — Direct3D's cooperative vector — and
+`gemm_coopvec.hlsl` runs a GEMM as one such product per row and 64-column slice of the weight
+matrix, wherever the device reports the feature (through a preview Agility SDK, which libd3dmx
+loads by device factory: `D3D12\D3D12Core.dll` beside the executable, or `XMX_D3D12_SDK_PATH`)
+and the GEMM's slices start 128-byte aligned; `xmx_path()` says whether it runs. Everything
+else, the fused passes included, is the multiply-add kernel, which is also the whole path
+without the feature. It takes the operands as root UAVs with byte offsets, splits dispatches
+at Direct3D's 65535 groups per axis, and keeps every half store on `f32tof16` so the half
+buffers hold what `half_round` gives. CMake builds it under
 `NR_BUILD_D3D12` — on by default for every Windows target but 32-bit x86 (x64 and ARM64) when
 `dxc` is found: the Windows SDK's, the Vulkan SDK's or vcpkg's `directx-dxc` — and wherever it
 `-DNR_DLSSNR_D3D12=ON` builds `libdlssnr` from it (off by default: the archive stays on

@@ -852,19 +852,23 @@ if(NR_BUILD_D3D12)
   # -denorm preserve: float32 subnormals kept, as Mesa and Intel's Windows driver keep them
   # on the Vulkan path (notes/phase71); 16-bit floats keep theirs on Direct3D 12 regardless
   # (the native 16-bit shader ops' contract), which `xmx_preserve16()` reports there.
-  set(NR_DXC_FLAGS -T cs_6_2 -E main -enable-16bit-types -HV 2021 -O3 -Qstrip_reflect -Qstrip_debug
+  set(NR_DXC_COMMON -E main -enable-16bit-types -HV 2021 -O3 -Qstrip_reflect -Qstrip_debug
       -denorm preserve "-I${PROJECT_SOURCE_DIR}/src/gpu/d3d12")
+  set(NR_DXC_FLAGS -T cs_6_2 ${NR_DXC_COMMON})
   set(NR_DXIL)
   set(NR_DXIL_HEADERS)
   set(NR_DXIL_INCLUDES "")
   set(NR_DXIL_ROWS "")
-  function(nr_dxil name source)
+  # One module: `profile` is the shader model (cs_6_2 for the kernels the Windows runtime
+  # takes as shipped; cs_6_10 for the vector-matrix kernel, notes/phase77), then the source
+  # and its -D flags.
+  function(nr_dxil_sm name profile source)
     set(out "${NR_OUTPUT_DIR}/${name}.dxil")
     add_custom_command(OUTPUT "${out}"
-      COMMAND "${NR_DXC}" ${NR_DXC_FLAGS} ${ARGN} -Fo "${out}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}"
+      COMMAND "${NR_DXC}" -T ${profile} ${NR_DXC_COMMON} ${ARGN} -Fo "${out}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}"
       DEPENDS "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/${source}" "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/nr_d3d.hlsli"
               "${PROJECT_SOURCE_DIR}/src/gpu/d3d12/nr_epilogue.hlsli"
-      COMMENT "dxc ${name}.dxil" VERBATIM)
+      COMMENT "dxc ${name}.dxil (${profile})" VERBATIM)
     set(NR_DXIL ${NR_DXIL} "${out}" PARENT_SCOPE)
     set(header "${NR_D3D12_DIR}/dxil_${name}.h")
     add_custom_command(OUTPUT "${header}"
@@ -875,6 +879,22 @@ if(NR_BUILD_D3D12)
     set(NR_DXIL_INCLUDES "${NR_DXIL_INCLUDES}#include \"dxil_${name}.h\"\n" PARENT_SCOPE)
     set(NR_DXIL_ROWS "${NR_DXIL_ROWS}    { \"${name}.dxil\", dxil_${name}, sizeof dxil_${name} },\n" PARENT_SCOPE)
   endfunction()
+  macro(nr_dxil name source)
+    nr_dxil_sm(${name} cs_6_2 ${source} ${ARGN})
+  endmacro()
+  # The vector-matrix kernel is Shader Model 6.10 (dx/linalg.h, a preview as of 2026-10):
+  # built where this dxc knows the profile, and libd3dmx takes it only where the device and
+  # its Agility SDK answer for it (xmx_path() says). -DNR_D3D12_COOPVEC=OFF leaves it out.
+  execute_process(COMMAND "${NR_DXC}" --help OUTPUT_VARIABLE nr_dxc_help ERROR_VARIABLE nr_dxc_help_err)
+  if("${nr_dxc_help}${nr_dxc_help_err}" MATCHES "cs_6_10")
+    set(nr_dxc_sm610 ON)
+  else()
+    set(nr_dxc_sm610 OFF)
+  endif()
+  option(NR_D3D12_COOPVEC "Windows: compile the vector-matrix GEMM (gemm_coopvec.hlsl, Shader Model 6.10) into libd3dmx; needs a dxc with cs_6_10" ${nr_dxc_sm610})
+  if(NR_D3D12_COOPVEC AND NOT nr_dxc_sm610)
+    message(FATAL_ERROR "NR_D3D12_COOPVEC needs a dxc that compiles cs_6_10 (${NR_DXC} does not list it); -DNR_D3D12_COOPVEC=OFF, or -DNR_DXC= a newer one")
+  endif()
 
   nr_dxil(gemm_portable         gemm_portable.hlsl)
   nr_dxil(gemm_portable_tiled   gemm_portable.hlsl -DRM=2 -DRN=2)   # the 16x32 block, the gemm_tiled slot
@@ -895,6 +915,13 @@ if(NR_BUILD_D3D12)
   nr_dxil(global_attention_portable        global_attention_portable.hlsl)
   nr_dxil(gemm_staged_int8_portable        gemm_staged_int8_portable.hlsl)
   nr_dxil(half_probe                       half_probe.hlsl)   # the daemon's start-up probe
+  if(NR_D3D12_COOPVEC)
+    # the vector-matrix GEMM: plain and window-gathered A, with fp32 or fp16 products
+    nr_dxil_sm(gemm_coopvec            cs_6_10 gemm_coopvec.hlsl)
+    nr_dxil_sm(gemm_coopvec_gather     cs_6_10 gemm_coopvec.hlsl -DGATHER)
+    nr_dxil_sm(gemm_coopvec_f16        cs_6_10 gemm_coopvec.hlsl -DRESULT16)
+    nr_dxil_sm(gemm_coopvec_gather_f16 cs_6_10 gemm_coopvec.hlsl -DGATHER -DRESULT16)
+  endif()
   add_custom_target(dxil_shaders ALL DEPENDS ${NR_DXIL})
 
   list(LENGTH NR_DXIL_HEADERS NR_DXIL_COUNT)
@@ -1479,14 +1506,27 @@ if(NR_BUILD_TESTS)
       add_test(NAME metal_test_nr_frame_live COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_live.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(metal_test_nr_frame_live PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=metal;${NR_TEST_ENV}")
     endif()
-    # and on libd3dmx through NR_GPU_BACKEND=d3d12 (Windows; every GEMM there is the
-    # portable kernel already, so the forced-portable run is the same run and is not repeated)
+    # and on libd3dmx through NR_GPU_BACKEND=d3d12 (Windows). On a device with the
+    # vector-matrix path (notes/phase77) the GEMMs run there, and the checks that compare a
+    # fused pass with its unfused passes byte for byte hold only with XMX_PORTABLE=1, which
+    # the d3d12_portable_* runs set; without the path the two runs are the same run.
     if(NR_BUILD_D3D12)
       foreach(script ${NR_RUNTIME_TESTS})
         get_filename_component(name "${script}" NAME_WE)
         add_test(NAME d3d12_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         set_tests_properties(d3d12_${name} PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
       endforeach()
+      foreach(script src/gpu/test_portable.py src/gpu/test_gemm_contract.py src/gpu/test_glue.py
+                     src/gpu/test_ffn_fused.py src/gpu/test_window_block.py src/gpu/test_global_attention.py
+                     src/gpu/test_window_attention.py src/gpu/test_gemm_qkv.py src/gpu/test_gemm_residual.py)
+        get_filename_component(name "${script}" NAME_WE)
+        add_test(NAME d3d12_portable_${name} COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/${script}" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+        set_tests_properties(d3d12_portable_${name} PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;XMX_PORTABLE=1;${NR_TEST_ENV}")
+      endforeach()
+      # the vector-matrix kernel against numpy and against the multiply-add kernels, and its
+      # routing; a skip where the device has no such path
+      add_test(NAME d3d12_test_coopvec COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_coopvec.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
+      set_tests_properties(d3d12_test_coopvec PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;${NR_TEST_ENV}")
       add_test(NAME d3d12_test_graph_staging COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/gpu/test_graph.py" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
       set_tests_properties(d3d12_test_graph_staging PROPERTIES ENVIRONMENT "NR_GPU_BACKEND=d3d12;XMX_STAGING=1;${NR_TEST_ENV}")
       add_test(NAME d3d12_test_nr_frame_py COMMAND "${PY}" "${PROJECT_SOURCE_DIR}/src/ref/test_nr_frame_c.py" --reference "${NR_OUTPUT_DIR}/nr_frame_reference_d3d12.bin" WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")

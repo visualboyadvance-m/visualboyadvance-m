@@ -30,12 +30,24 @@
  *                                 or writes (kinds 1 and 2) are always the WRITE_BACK kind — on
  *                                 a discrete card that is system memory, the trade `libxmx.c`
  *                                 makes for the head's strided readback.
- *   VK_KHR_cooperative_matrix     nothing. HLSL has no shipped matrix-matrix operation: the
- *                                 SM 6.8 WaveMatrix preview was withdrawn before release and
- *                                 SM 6.9's `linalg` is matrix-vector. Every GEMM here runs on
- *                                 the multiply-add kernels (`gemm_portable*.hlsl`); the
- *                                 cooperative-matrix names resolve to them, `xmx_coopmat()` is
- *                                 0 and `xmx_portable()` is 1 (`kernel_alias` below).
+ *   VK_KHR_cooperative_matrix     the vector-matrix path (notes/phase77): Shader Model 6.10's
+ *                                 linear algebra (`dx/linalg.h`) gives a single thread a
+ *                                 matrix times a vector — Direct3D's cooperative vector — and
+ *                                 `gemm_coopvec.hlsl` runs a GEMM as one such product per row
+ *                                 and 64-column slice, straight off the weight buffer. Where
+ *                                 the device answers for it (SM 6.10, linear algebra tier 1,
+ *                                 the fp16 thread-scope multiply: `check_device`) every GEMM
+ *                                 whose slices start 128-byte aligned goes there
+ *                                 (`coopvec_fits`); the rest, and the fused passes, run on
+ *                                 the multiply-add kernels (`gemm_portable*.hlsl`), which is
+ *                                 also the whole path on a device or runtime without it. The
+ *                                 cooperative-matrix names resolve to the multiply-add
+ *                                 kernels, `xmx_coopmat()` is 0 and `xmx_portable()` stays 1
+ *                                 either way — the fused twins a caller names by it are the
+ *                                 portable ones here — and `xmx_coopvec()` says whether the
+ *                                 vector-matrix path runs, `xmx_path()` why or why not.
+ *                                 Shader Model 6.10 is a preview as of 2026-10, carried by the
+ *                                 preview Agility SDK, which `agility_factory` loads.
  *   specialization constant 0     nothing either: DXIL is compiled ahead of time and there is
  *                                 no shader compiler at run time, so the flags always come
  *                                 from the push block. `xmx_specialize` accepts the mask and
@@ -106,6 +118,78 @@ typedef HRESULT (WINAPI *d3dmx_get_debug_fn)(REFIID, void **);
 typedef HRESULT (WINAPI *d3dmx_experimental_fn)(UINT, const IID *, void *, UINT *);
 typedef HRESULT (WINAPI *d3dmx_create_factory_fn)(UINT, REFIID, void **);
 typedef HRESULT (WINAPI *d3dmx_create_factory1_fn)(REFIID, void **);
+typedef HRESULT (WINAPI *d3dmx_get_interface_fn)(REFCLSID, REFIID, void **);
+
+/* -- Shader Model 6.10 linear algebra, and the Agility SDK that carries it ----------------
+ *
+ * The vector-matrix path (gemm_coopvec.hlsl, notes/phase77) needs three things no released
+ * Direct3D 12 header on this tree's toolchains declares: the device's answer whether it has
+ * Shader Model 6.10's linear algebra (feature 77, a tier) and the fp16 thread-scope
+ * vector-matrix multiply in particular (feature 78), and an Agility SDK's device factory,
+ * since the Direct3D 12 runtime Windows ships knows no Shader Model 6.10 and the SDK that
+ * does (1.721-preview and later) is loaded through `ID3D12SDKConfiguration1::
+ * CreateDeviceFactory`. The values and layouts here are the preview SDK's d3d12.h
+ * (DirectX-Headers, branch `preview`, 2026-10), under names of their own so they neither
+ * need nor clash with any SDK header. */
+#define NR_D3D12_FEATURE_LINEAR_ALGEBRA_SUPPORT 77
+#define NR_D3D12_FEATURE_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT 78
+#define NR_D3D_SHADER_MODEL_6_9 0x69
+#define NR_D3D_SHADER_MODEL_6_10 0x6a
+#define NR_D3D12_LINEAR_ALGEBRA_TIER_1_0 0x10
+#define NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT16 7u
+#define NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT32 8u
+#define NR_D3D12_LINEAR_ALGEBRA_OPERATION_TYPE_THREAD_VECTOR_MATRIX_MULTIPLY 3u
+#define NR_D3D12_LINEAR_ALGEBRA_MULTIPLICATION_SUPPORT_FLAG_SUPPORTED 1u
+#define NR_D3D12_LINEAR_ALGEBRA_MULTIPLICATION_SUPPORT_FLAG_EMULATED_INPUTS 2u
+#define NR_D3D12_LINEAR_ALGEBRA_MULTIPLICATION_SUPPORT_FLAG_EMULATED_OUTPUTS 4u
+
+/* D3D12_FEATURE_DATA_LINEAR_ALGEBRA_SUPPORT */
+struct nr_la_support { UINT tier; };
+/* D3D12_FEATURE_DATA_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT: the operation asked about and
+ * a union of the answers. The runtime checks the size (56 bytes on x64 and ARM64), so the
+ * two larger members are spelled out beside the one used. */
+struct nr_la_op_support {
+	UINT op;
+	union {
+		struct { UINT vector, matrix, bias, result, flags; } vm;
+		struct { UINT inputs[4]; UINT flags, shapes; void *shape; } wave;
+		struct { UINT inputs[4]; UINT shape[3]; UINT flags, group[3]; } group;
+	} u;
+};
+_Static_assert(sizeof(struct nr_la_op_support) == 56,
+	       "nr_la_op_support matches D3D12_FEATURE_DATA_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT");
+
+/* ID3D12SDKConfiguration1 and ID3D12DeviceFactory, as the C binding sees them. */
+typedef struct nr_sdk_config1 nr_sdk_config1;
+struct nr_sdk_config1_vtbl {
+	HRESULT (STDMETHODCALLTYPE *QueryInterface)(nr_sdk_config1 *, REFIID, void **);
+	ULONG (STDMETHODCALLTYPE *AddRef)(nr_sdk_config1 *);
+	ULONG (STDMETHODCALLTYPE *Release)(nr_sdk_config1 *);
+	HRESULT (STDMETHODCALLTYPE *SetSDKVersion)(nr_sdk_config1 *, UINT, LPCSTR);
+	HRESULT (STDMETHODCALLTYPE *CreateDeviceFactory)(nr_sdk_config1 *, UINT, LPCSTR, REFIID, void **);
+	void (STDMETHODCALLTYPE *FreeUnusedSDKs)(nr_sdk_config1 *);
+};
+struct nr_sdk_config1 { const struct nr_sdk_config1_vtbl *lpVtbl; };
+typedef struct nr_device_factory nr_device_factory;
+struct nr_device_factory_vtbl {
+	HRESULT (STDMETHODCALLTYPE *QueryInterface)(nr_device_factory *, REFIID, void **);
+	ULONG (STDMETHODCALLTYPE *AddRef)(nr_device_factory *);
+	ULONG (STDMETHODCALLTYPE *Release)(nr_device_factory *);
+	HRESULT (STDMETHODCALLTYPE *InitializeFromGlobalState)(nr_device_factory *);
+	HRESULT (STDMETHODCALLTYPE *ApplyToGlobalState)(nr_device_factory *);
+	HRESULT (STDMETHODCALLTYPE *SetFlags)(nr_device_factory *, UINT);
+	UINT (STDMETHODCALLTYPE *GetFlags)(nr_device_factory *);
+	HRESULT (STDMETHODCALLTYPE *GetConfigurationInterface)(nr_device_factory *, REFCLSID, REFIID, void **);
+	HRESULT (STDMETHODCALLTYPE *EnableExperimentalFeatures)(nr_device_factory *, UINT, const IID *, void *, UINT *);
+	HRESULT (STDMETHODCALLTYPE *CreateDevice)(nr_device_factory *, IUnknown *, D3D_FEATURE_LEVEL, REFIID, void **);
+};
+struct nr_device_factory { const struct nr_device_factory_vtbl *lpVtbl; };
+static const GUID NR_CLSID_D3D12SDKConfiguration =
+	{ 0x7cda6aca, 0xa03e, 0x49c8, { 0x94, 0x58, 0x03, 0x34, 0xd2, 0x0e, 0x07, 0xce } };
+static const GUID NR_IID_ID3D12SDKConfiguration1 =
+	{ 0x8aaf9303, 0xad25, 0x48b9, { 0x9a, 0x57, 0xd9, 0xc3, 0x7e, 0x00, 0x9d, 0x9f } };
+static const GUID NR_IID_ID3D12DeviceFactory =
+	{ 0x61f307d3, 0xd34e, 0x4e7c, { 0x83, 0x74, 0x3b, 0xa4, 0xde, 0x23, 0xcc, 0xcb } };
 
 /* A lost device is recorded as well as described: the one failure after which nothing on
  * this device can succeed again. It stays set. */
@@ -142,6 +226,7 @@ struct push {
 #define PUSH_WORDS ((unsigned)(sizeof(struct push) / 4))
 #define SPARE_WORD ((unsigned)(offsetof(struct push, spare) / 4))
 #define OPERANDS 8                    /* root UAVs u0..u7, root parameters 1..8 */
+#define ROOT_SRV (1 + OPERANDS)       /* root SRV t0, parameter 9: the vector-matrix kernel's B */
 _Static_assert(sizeof(struct push) == 128, "push block matches the HLSL Push");
 _Static_assert(offsetof(struct push, residual_cos) == 96 && offsetof(struct push, qkv_scale) == 120,
 	       "fifth and sixth operand offsets match nr_d3d.hlsli");
@@ -184,6 +269,19 @@ static struct {
 	int syncing;
 	unsigned staging;
 	int portable_packed;      /* flag 0x8000000 on every GEMM: A fetched 16 bytes at a time (off) */
+	/* the vector-matrix path (gemm_coopvec.hlsl, notes/phase77): what the device answered —
+	 * the highest shader model, the linear algebra tier, `coopvec_support` 0 for none, 1 for
+	 * fp16 products, 2 for fp32 products, and the multiply's support flags — the two
+	 * pipelines, whether the path runs, why not, and how many GEMMs it has taken */
+	unsigned sm_highest, la_tier, coopvec_flags;
+	int coopvec_support, coopvec, coopvec_forced_off;
+	ID3D12PipelineState *rcoopvec, *rcoopvec_gather;
+	unsigned coopvec_calls;
+	char coopvec_why[240];
+	/* an Agility SDK's device factory, when one was loaded (agility_factory) */
+	d3dmx_get_interface_fn get_interface;
+	nr_device_factory *devfactory; nr_sdk_config1 *sdkcfg;
+	unsigned sdk_version; char sdk_path[1024]; int factory_experimental_tried;
 	struct cmd cb, rcb, tcb;                       /* plain GEMMs, the recording, transfers */
 	int recording, recorded, rready;
 	/* XMX_D3D12_STEP=1: every recorded pass runs at once on a list of its own, timed and
@@ -302,12 +400,42 @@ int xmx_coopmat(void) { return g.dev ? g.coopmat : -1; }
 int xmx_portable(void) { return g.dev ? g.portable : -1; }
 /* the tiled portable kernel gathers a window-ordered A, and it is the only GEMM here */
 int xmx_window_gather(void) { return g.dev ? 1 : -1; }
+/* One line for a log: which GEMM kernels this device runs, and why. */
 const char *xmx_path(void)
 {
+	static char why[400];
 	if (!g.dev) return "not opened";
-	return "portable multiply-add (Direct3D 12: HLSL has no cooperative matrix, so every GEMM is the "
-	       "multiply-add kernel; the matrix-path names resolve to it)";
+	if (g.coopvec)
+		return g.coopvec_support == 2
+		       ? "vector-matrix (Shader Model 6.10 linear algebra: a thread-scope fp16 matrix times each "
+			 "row's fp16 vector, fp32 products; the fused passes on the multiply-add kernels)"
+		       : "vector-matrix (Shader Model 6.10 linear algebra: a thread-scope fp16 matrix times each "
+			 "row's fp16 vector, fp16 products summed in fp32; the fused passes on the multiply-add "
+			 "kernels)";
+	if (g.coopvec_support && g.coopvec_forced_off)
+		return "portable multiply-add (XMX_PORTABLE=1 or XMX_D3D12_COOPVEC=0; the device has the "
+		       "vector-matrix multiply)";
+	if (g.coopvec_support && g.rready) {
+		snprintf(why, sizeof why, "portable multiply-add (the vector-matrix kernel did not build: %.240s)",
+			 g.coopvec_why);
+		return why;
+	}
+	if (g.coopvec_support)
+		return "portable multiply-add so far (the device has the vector-matrix multiply; the resident "
+		       "runtime is not initialised)";
+	if (g.la_tier >= NR_D3D12_LINEAR_ALGEBRA_TIER_1_0)
+		return "portable multiply-add (the device's linear algebra offers no fp16 thread-scope "
+		       "vector-matrix multiply)";
+	if (g.sm_highest >= NR_D3D_SHADER_MODEL_6_10)
+		return "portable multiply-add (Shader Model 6.10, but no linear algebra tier on this device)";
+	snprintf(why, sizeof why, "portable multiply-add (no Shader Model 6.10 on this device and runtime — "
+		 "the highest is 0x%x; Direct3D 12's matrix operations need it, through an Agility SDK that "
+		 "has it: XMX_D3D12_SDK_PATH, or D3D12\\D3D12Core.dll beside the executable)", g.sm_highest);
+	return why;
 }
+/* Whether the GEMMs run on the vector-matrix kernel (xmx.h), and how many it has recorded. */
+int xmx_coopvec(void) { return g.dev ? g.coopvec : -1; }
+unsigned xmx_coopvec_calls(void) { return g.coopvec_calls; }
 int xmx_staging_mode(void) { return g.unmapped; }
 int xmx_discrete(void) { return g.discrete; }
 
@@ -377,6 +505,13 @@ static const struct { const char *name, *blob; } kernel_alias[] = {
 	{ "gemm_staged_int8_portable", "gemm_staged_int8_portable" },
 	/* the daemon's start-up probe (src/gpu/d3d12/half_probe.hlsl) */
 	{ "half_probe",                "half_probe" },
+	/* the vector-matrix GEMM (gemm_coopvec.hlsl, Shader Model 6.10; notes/phase77): the plain
+	 * and the window-gathered build, each with fp32 or fp16 products; compiled in only by a
+	 * dxc with cs_6_10 */
+	{ "gemm_coopvec",              "gemm_coopvec" },
+	{ "gemm_coopvec_gather",       "gemm_coopvec_gather" },
+	{ "gemm_coopvec_f16",          "gemm_coopvec_f16" },
+	{ "gemm_coopvec_gather_f16",   "gemm_coopvec_gather_f16" },
 };
 
 /* `gemm_coopmat.spv`, `C:\dir\attention_ab.spv`, `resident` -> the kernel's name. */
@@ -827,6 +962,8 @@ static int load_dlls(void)
 	g.experimental = (d3dmx_experimental_fn)(void (*)(void))GetProcAddress(g.d3d12, "D3D12EnableExperimentalFeatures");
 	g.create_factory = (d3dmx_create_factory_fn)(void (*)(void))GetProcAddress(g.dxgi, "CreateDXGIFactory2");
 	g.create_factory1 = (d3dmx_create_factory1_fn)(void (*)(void))GetProcAddress(g.dxgi, "CreateDXGIFactory1");
+	/* the Agility SDK's way in (Windows 10 1909 on); absent, the system runtime alone */
+	g.get_interface = (d3dmx_get_interface_fn)(void (*)(void))GetProcAddress(g.d3d12, "D3D12GetInterface");
 	if (!g.create_device || !g.serialize || !(g.create_factory || g.create_factory1))
 		FAIL("d3d12.dll / dxgi.dll lack D3D12CreateDevice, D3D12SerializeRootSignature or CreateDXGIFactory1/2", 0);
 	return 0;
@@ -843,13 +980,125 @@ static HRESULT make_factory(UINT flags, IDXGIFactory4 **out)
 	return g.create_factory1(&IID_IDXGIFactory4, (void **)out);
 }
 
-/* Unsigned DXIL needs the experimental shader models switched on before the device exists.
- * Asked for when the compiled-in modules are unsigned or XMX_D3D12_UNSIGNED=1; a refusal
- * (no developer mode) is remembered for the pipeline error, not fatal here. */
-static void enable_unsigned_if_needed(void)
+/* -- the Agility SDK ---------------------------------------------------------------- */
+
+/* The directory of the executable (`exe`) or of this library, with its trailing backslash. */
+static int module_dir(int exe, char *out, size_t cap)
 {
-	if (g.experimental_tried) return;
-	g.experimental_tried = 1;
+	HMODULE h = NULL;
+	if (!exe && !GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+					(LPCSTR)(void *)&module_dir, &h))
+		return -1;
+	DWORD n = GetModuleFileNameA(h, out, (DWORD)cap);
+	if (!n || n >= cap) return -1;
+	char *slash = strrchr(out, '\\');
+	char *fwd = strrchr(out, '/');
+	if (fwd && (!slash || fwd > slash)) slash = fwd;
+	if (!slash) return -1;
+	slash[1] = 0;
+	return 0;
+}
+
+/* The version an Agility SDK's D3D12Core.dll in `dir` exports as D3D12SDKVersion, 0 when
+ * there is none. The image is mapped, not run. */
+static unsigned core_version(const char *dir)
+{
+	char path[1200];
+	snprintf(path, sizeof path, "%sD3D12Core.dll", dir);
+	HMODULE h = LoadLibraryExA(path, NULL, DONT_RESOLVE_DLL_REFERENCES);
+	if (!h) return 0;
+	const UINT *v = (const UINT *)(void *)GetProcAddress(h, "D3D12SDKVersion");
+	unsigned version = v ? *v : 0;
+	FreeLibrary(h);
+	return version;
+}
+
+/* An Agility SDK's device factory, when one is to be had. The Direct3D 12 runtime Windows
+ * ships knows no Shader Model 6.10, so the vector-matrix kernel needs the SDK's
+ * D3D12Core.dll, loaded through ID3D12SDKConfiguration1::CreateDeviceFactory — the way a
+ * library can take an SDK without the executable exporting D3D12SDKVersion. Where to look,
+ * in order: XMX_D3D12_SDK_PATH (a directory holding D3D12Core.dll, handed to the runtime as
+ * given; XMX_D3D12_SDK_VERSION its version, else read off the DLL), then `D3D12\` under the
+ * executable's directory — the layout Microsoft documents, which the runtime takes as the
+ * relative path `.\D3D12\` — then `D3D12\` under this library's directory. XMX_D3D12_SDK=0
+ * leaves the system runtime alone. Whatever fails is said on stderr and the system runtime
+ * serves as before; an adopted device is the host's and never goes through here. */
+static void agility_factory(void)
+{
+	if (g.devfactory) return;
+	const char *off = getenv("XMX_D3D12_SDK");
+	if (off && *off && atoi(off) == 0) return;
+	char dir[1200] = "", given_to_runtime[1200] = "", base[1024];
+	const char *given = getenv("XMX_D3D12_SDK_PATH");
+	if (given && *given) {
+		size_t n = strlen(given);
+		int ends = given[n - 1] == '\\' || given[n - 1] == '/';
+		snprintf(dir, sizeof dir, "%s%s", given, ends ? "" : "\\");
+		snprintf(given_to_runtime, sizeof given_to_runtime, "%s", dir);
+	} else {
+		if (!module_dir(1, base, sizeof base)) {
+			snprintf(dir, sizeof dir, "%sD3D12\\", base);
+			if (core_version(dir)) snprintf(given_to_runtime, sizeof given_to_runtime, ".\\D3D12\\");
+			else dir[0] = 0;
+		}
+		if (!dir[0] && !module_dir(0, base, sizeof base)) {
+			snprintf(dir, sizeof dir, "%sD3D12\\", base);
+			if (core_version(dir)) snprintf(given_to_runtime, sizeof given_to_runtime, "%s", dir);
+			else dir[0] = 0;
+		}
+		if (!dir[0]) return;                   /* nothing to load: the system runtime */
+	}
+	if (!g.get_interface) {
+		fprintf(stderr, "libd3dmx: this d3d12.dll has no D3D12GetInterface, so the Agility SDK in %s cannot be "
+			"loaded; using the system Direct3D 12 runtime\n", dir);
+		return;
+	}
+	const char *ver = getenv("XMX_D3D12_SDK_VERSION");
+	unsigned version = ver && *ver ? (unsigned)atoi(ver) : core_version(dir);
+	if (!version) {
+		fprintf(stderr, "libd3dmx: no D3D12Core.dll exporting D3D12SDKVersion in %s; using the system Direct3D 12 "
+			"runtime\n", dir);
+		return;
+	}
+	nr_sdk_config1 *cfg = NULL;
+	HRESULT hr = g.get_interface(&NR_CLSID_D3D12SDKConfiguration, &NR_IID_ID3D12SDKConfiguration1, (void **)&cfg);
+	if (FAILED(hr) || !cfg) {
+		fprintf(stderr, "libd3dmx: D3D12GetInterface(ID3D12SDKConfiguration1) 0x%08lx: this Windows cannot load an "
+			"Agility SDK through a device factory; using the system Direct3D 12 runtime\n", (unsigned long)hr);
+		return;
+	}
+	nr_device_factory *f = NULL;
+	hr = cfg->lpVtbl->CreateDeviceFactory(cfg, version, given_to_runtime, &NR_IID_ID3D12DeviceFactory, (void **)&f);
+	if (FAILED(hr) || !f) {
+		fprintf(stderr, "libd3dmx: CreateDeviceFactory(%u, \"%s\") 0x%08lx; using the system Direct3D 12 runtime\n",
+			version, given_to_runtime, (unsigned long)hr);
+		cfg->lpVtbl->Release(cfg);
+		return;
+	}
+	g.sdkcfg = cfg;
+	g.devfactory = f;
+	g.sdk_version = version;
+	snprintf(g.sdk_path, sizeof g.sdk_path, "%s", given_to_runtime);
+	fprintf(stderr, "libd3dmx: Agility SDK %u from %s (D3D12Core.dll in %s)\n", version, given_to_runtime, dir);
+}
+
+static int coopvec_module_present(void)
+{
+#ifdef NR_EMBEDDED_DXIL
+	return embedded_dxil("gemm_coopvec") != NULL;
+#else
+	return 0;
+#endif
+}
+
+/* Unsigned DXIL needs the experimental shader models switched on before the device exists,
+ * and so does Shader Model 6.10 while it is a preview. Asked for when the compiled-in modules
+ * are unsigned, XMX_D3D12_UNSIGNED=1, or (on an Agility SDK's factory, whose switch is its
+ * own) the vector-matrix module is compiled in; a refusal — no developer mode — is
+ * remembered for the pipeline error, not fatal here. The system runtime's switch is
+ * process-wide and tried once; a factory's goes with the factory. */
+static void enable_experimental_if_needed(void)
+{
 	int need = 0;
 	const char *forced = getenv("XMX_D3D12_UNSIGNED");
 	if (forced && *forced && atoi(forced) != 0) need = 1;
@@ -857,19 +1106,38 @@ static void enable_unsigned_if_needed(void)
 	for (size_t i = 0; i < nr_embedded_dxil_count && !need; i++)
 		if (!dxil_signed(nr_embedded_dxil[i].data, nr_embedded_dxil[i].size)) need = 1;
 #endif
+	if (g.devfactory) {
+		if (g.factory_experimental_tried) return;
+		g.factory_experimental_tried = 1;
+		if (!need && !coopvec_module_present()) return;
+		g.experimental_hr = g.devfactory->lpVtbl->EnableExperimentalFeatures(g.devfactory, 1, &D3D12ExperimentalShaderModels,
+										       NULL, NULL);
+		g.experimental_tried = 1;
+		if (FAILED(g.experimental_hr))
+			fprintf(stderr, "libd3dmx: the Agility SDK's factory refused the experimental shader models (0x%08lx; "
+				"developer mode off?): unsigned modules and Shader Model 6.10 will be refused\n",
+				(unsigned long)g.experimental_hr);
+		return;
+	}
+	if (g.experimental_tried) return;
+	g.experimental_tried = 1;
 	if (!need || !g.experimental) return;
 	g.experimental_hr = g.experimental(1, &D3D12ExperimentalShaderModels, NULL, NULL);
 }
 
 static int check_device(ID3D12Device *dev);
 
-/* Try one adapter: a Direct3D 12 device at feature level 11_0 on it, with Shader Model 6.2
- * and native 16-bit operations. On success the device is handed back; on failure `why`
- * says what was missing and the device, if any, is released. */
+/* Try one adapter: a Direct3D 12 device at feature level 11_0 on it — through the Agility
+ * SDK's factory when one was loaded — with Shader Model 6.2 and native 16-bit operations.
+ * On success the device is handed back; on failure `why` says what was missing and the
+ * device, if any, is released. */
 static int try_adapter(IDXGIAdapter1 *a, ID3D12Device **dev, char *why, size_t cap)
 {
 	*dev = NULL;
-	HRESULT hr = g.create_device((IUnknown *)a, D3D_FEATURE_LEVEL_11_0, &IID_ID3D12Device, (void **)dev);
+	HRESULT hr = g.devfactory
+		     ? g.devfactory->lpVtbl->CreateDevice(g.devfactory, (IUnknown *)a, D3D_FEATURE_LEVEL_11_0,
+							  &IID_ID3D12Device, (void **)dev)
+		     : g.create_device((IUnknown *)a, D3D_FEATURE_LEVEL_11_0, &IID_ID3D12Device, (void **)dev);
 	if (FAILED(hr)) {
 		*dev = NULL;
 		snprintf(why, cap, "D3D12CreateDevice (0x%08lx)", (unsigned long)hr);
@@ -1007,15 +1275,61 @@ static int check_device(ID3D12Device *dev)
 	g.discrete = !g.uma;
 	g.coopmat = 0;
 	g.portable = 1;
+	/* Shader Model 6.10 and its linear algebra, for the vector-matrix path (notes/phase77):
+	 * asked for from the highest model down, since a runtime refuses a model it has no name
+	 * for with E_INVALIDARG rather than answering with what it has; then the tier (feature
+	 * 77), then the fp16 thread-scope multiply with fp32 products, else fp16 ones (feature
+	 * 78). A runtime without the features answers E_INVALIDARG, which is a no. */
+	g.sm_highest = (unsigned)sm.HighestShaderModel;
+	g.la_tier = 0;
+	g.coopvec_support = 0;
+	g.coopvec_flags = 0;
+	{
+		/* 6.10, 6.9, then 6.8 and 6.6 for a truthful answer from a runtime that knows neither */
+		static const unsigned models[] = { NR_D3D_SHADER_MODEL_6_10, NR_D3D_SHADER_MODEL_6_9, 0x68u, 0x66u };
+		for (size_t i = 0; i < sizeof models / sizeof *models; i++) {
+			D3D12_FEATURE_DATA_SHADER_MODEL high = { (D3D_SHADER_MODEL)models[i] };
+			if (SUCCEEDED(ID3D12Device_CheckFeatureSupport(dev, D3D12_FEATURE_SHADER_MODEL, &high, sizeof high))) {
+				if ((unsigned)high.HighestShaderModel > g.sm_highest) g.sm_highest = (unsigned)high.HighestShaderModel;
+				break;
+			}
+		}
+	}
+	if (g.sm_highest >= NR_D3D_SHADER_MODEL_6_10) {
+		struct nr_la_support la;
+		memset(&la, 0, sizeof la);
+		if (SUCCEEDED(ID3D12Device_CheckFeatureSupport(dev, (D3D12_FEATURE)NR_D3D12_FEATURE_LINEAR_ALGEBRA_SUPPORT,
+							       &la, sizeof la)))
+			g.la_tier = la.tier;
+	}
+	if (g.la_tier >= NR_D3D12_LINEAR_ALGEBRA_TIER_1_0) {
+		static const unsigned results[] = { NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT32, NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT16 };
+		for (size_t i = 0; i < 2 && !g.coopvec_support; i++) {
+			struct nr_la_op_support op;
+			memset(&op, 0, sizeof op);
+			op.op = NR_D3D12_LINEAR_ALGEBRA_OPERATION_TYPE_THREAD_VECTOR_MATRIX_MULTIPLY;
+			op.u.vm.vector = NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT16;
+			op.u.vm.matrix = NR_D3D12_LINEAR_ALGEBRA_DATATYPE_FLOAT16;
+			op.u.vm.bias = results[i];
+			op.u.vm.result = results[i];
+			if (SUCCEEDED(ID3D12Device_CheckFeatureSupport(dev,
+					(D3D12_FEATURE)NR_D3D12_FEATURE_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT, &op, sizeof op))
+			    && (op.u.vm.flags & NR_D3D12_LINEAR_ALGEBRA_MULTIPLICATION_SUPPORT_FLAG_SUPPORTED)) {
+				g.coopvec_support = i == 0 ? 2 : 1;
+				g.coopvec_flags = op.u.vm.flags;
+			}
+		}
+	}
 	return 0;
 }
 
 /* The root signature every kernel here is written against: the push block as 32 root
- * constants at b0 and the eight operands as root UAVs u0..u7 — 32 + 8 * 2 = 48 of the 64
- * DWORDs a root signature may take. */
+ * constants at b0, the eight operands as root UAVs u0..u7, and the second operand once more
+ * as a root SRV t0 for the vector-matrix kernel, whose thread-scope matrix loads from a
+ * read-only buffer — 32 + 9 * 2 = 50 of the 64 DWORDs a root signature may take. */
 static int make_root_signature(void)
 {
-	D3D12_ROOT_PARAMETER params[1 + OPERANDS];
+	D3D12_ROOT_PARAMETER params[2 + OPERANDS];
 	memset(params, 0, sizeof params);
 	params[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
 	params[0].Constants.ShaderRegister = 0;
@@ -1028,9 +1342,13 @@ static int make_root_signature(void)
 		params[i].Descriptor.RegisterSpace = 0;
 		params[i].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	}
+	params[ROOT_SRV].ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+	params[ROOT_SRV].Descriptor.ShaderRegister = 0;
+	params[ROOT_SRV].Descriptor.RegisterSpace = 0;
+	params[ROOT_SRV].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 	D3D12_ROOT_SIGNATURE_DESC rsd;
 	memset(&rsd, 0, sizeof rsd);
-	rsd.NumParameters = 1 + OPERANDS;
+	rsd.NumParameters = 2 + OPERANDS;
 	rsd.pParameters = params;
 	rsd.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 	ID3DBlob *blob = NULL, *error = NULL;
@@ -1166,7 +1484,8 @@ int xmx_open(void)
 			RELEASE(dbg);
 		}
 	}
-	enable_unsigned_if_needed();
+	agility_factory();
+	enable_experimental_if_needed();
 	HRESULT hr = make_factory(debugging ? DXGI_CREATE_FACTORY_DEBUG : 0u, &g.factory);
 	if (FAILED(hr)) FAILH("CreateDXGIFactory", hr);
 	const char *warp = getenv("XMX_D3D12_WARP"), *which = getenv("XMX_D3D12_ADAPTER");
@@ -1202,7 +1521,7 @@ void xmx_close(void)
 	free(g.rsteps);
 	ID3D12PipelineState **pipes[] = { &g.rgemm, &g.rtiled, &g.rstaged, &g.runary, &g.rrow, &g.rhistory,
 					  &g.rwindow[0], &g.rwindow[1], &g.rffn, &g.rrows, &g.rblock, &g.rglobal,
-					  &g.rint8, &g.rwide, &g.pipe, &g.pipeb };
+					  &g.rint8, &g.rwide, &g.pipe, &g.pipeb, &g.rcoopvec, &g.rcoopvec_gather };
 	for (size_t i = 0; i < sizeof pipes / sizeof *pipes; i++) RELEASE(*pipes[i]);
 	for (int i = 0; i < 6; i++) free(g.rpaths[i]);
 	cmd_destroy(&g.cb); cmd_destroy(&g.rcb); cmd_destroy(&g.tcb);
@@ -1220,10 +1539,14 @@ void xmx_close(void)
 	}
 	RELEASE(g.adapter);
 	RELEASE(g.factory);
+	/* the Agility SDK's factory goes too: the next open loads it again */
+	if (g.devfactory) g.devfactory->lpVtbl->Release(g.devfactory);
+	if (g.sdkcfg) g.sdkcfg->lpVtbl->Release(g.sdkcfg);
 	HMODULE d3d12 = g.d3d12, dxgi = g.dxgi;
 	d3dmx_create_device_fn cd = g.create_device; d3dmx_serialize_fn se = g.serialize;
 	d3dmx_get_debug_fn gd = g.get_debug; d3dmx_experimental_fn ex = g.experimental;
 	d3dmx_create_factory_fn cf = g.create_factory; d3dmx_create_factory1_fn cf1 = g.create_factory1;
+	d3dmx_get_interface_fn gi = g.get_interface;
 	int tried = g.experimental_tried; HRESULT ehr = g.experimental_hr;
 	if (g.stats) fclose(g.stats);
 	memset(&g, 0, sizeof g);
@@ -1231,7 +1554,7 @@ void xmx_close(void)
 	 * process-wide, so both survive a close */
 	g.d3d12 = d3d12; g.dxgi = dxgi;
 	g.create_device = cd; g.serialize = se; g.get_debug = gd; g.experimental = ex; g.create_factory = cf;
-	g.create_factory1 = cf1;
+	g.create_factory1 = cf1; g.get_interface = gi;
 	g.experimental_tried = tried; g.experimental_hr = ehr;
 	memset(graphs, 0, sizeof graphs);
 	memset(rbufs, 0, sizeof rbufs);
@@ -1309,6 +1632,7 @@ static int run_desc(ID3D12PipelineState *pso, struct desc_push *push, unsigned g
 	ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 3, g.C.addr);
 	for (unsigned i = 4; i <= OPERANDS; i++)
 		ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, i, g.dummy.addr);
+	ID3D12GraphicsCommandList_SetComputeRootShaderResourceView(list, ROOT_SRV, g.dummy.addr);
 	for (unsigned i = 0; i < (iters ? iters : 1); i++) {
 		dispatch_pieces(list, (uint32_t *)push, sizeof *push / 4, 7, gx, gy, gz, 1);
 		if (i + 1 < iters) uav_barrier(list);
@@ -1406,6 +1730,35 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 				g.err[0] = 0;
 			}
 			free(wide);
+		}
+	}
+	/* The vector-matrix kernel (gemm_coopvec.hlsl, notes/phase77): where the device offers
+	 * Shader Model 6.10's fp16 thread-scope vector-matrix multiply, unless XMX_PORTABLE=1 or
+	 * XMX_D3D12_COOPVEC=0 says not — the plain build and the window-gathered one, each for
+	 * the product type the device has. A build that fails — the module not compiled in (a dxc
+	 * without cs_6_10), or the runtime refusing it (no developer mode for the preview shader
+	 * model, a driver that reports the feature and compiles it no further) — is said on
+	 * stderr and the multiply-add kernels serve every GEMM, as before. */
+	g.coopvec = 0;
+	g.coopvec_calls = 0;
+	g.coopvec_why[0] = 0;
+	{
+		const char *portable = getenv("XMX_PORTABLE"), *cv = getenv("XMX_D3D12_COOPVEC");
+		g.coopvec_forced_off = (portable && *portable && atoi(portable) != 0) || (cv && *cv && atoi(cv) == 0);
+	}
+	if (g.coopvec_support && !g.coopvec_forced_off) {
+		const char *plain = g.coopvec_support == 2 ? "gemm_coopvec" : "gemm_coopvec_f16";
+		const char *gather = g.coopvec_support == 2 ? "gemm_coopvec_gather" : "gemm_coopvec_gather_f16";
+		if (build_pipeline(plain, &g.rcoopvec) || build_pipeline(gather, &g.rcoopvec_gather)) {
+			if (g_cancel) return -1;
+			snprintf(g.coopvec_why, sizeof g.coopvec_why, "%.230s", g.err);
+			fprintf(stderr, "libd3dmx: the vector-matrix kernel is not available (%s); the GEMMs run on the "
+				"multiply-add kernels\n", g.err);
+			RELEASE(g.rcoopvec);
+			RELEASE(g.rcoopvec_gather);
+			g.err[0] = 0;
+		} else {
+			g.coopvec = 1;
 		}
 	}
 	if (cmd_create(&g.rcb) || cmd_create(&g.tcb)) return -1;
@@ -1666,17 +2019,24 @@ int xmx_rec_copy(int source, int target, unsigned long long bytes,
 }
 
 /* Record one pass: the operands as root UAVs (brought to the UAV state), the push block,
- * the dispatch in pieces, the barrier and the stamp. */
-static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[OPERANDS],
-		    unsigned gx, unsigned gy, unsigned gz, int split_y, unsigned family, unsigned subkind)
+ * the dispatch in pieces, the barrier and the stamp. With `srv_b` the second operand is
+ * instead bound as the root SRV (ROOT_SRV, t0) in the shader-resource state — the
+ * vector-matrix kernel's weight matrix — and the dummy takes its UAV slot. */
+static int dispatch_srv(ID3D12PipelineState *pso, struct push *p, const int ids[OPERANDS],
+			unsigned gx, unsigned gy, unsigned gz, int split_y, unsigned family, unsigned subkind,
+			int srv_b)
 {
 	ID3D12GraphicsCommandList *list = g.rcb.list;
 	for (unsigned i = 0; i < OPERANDS; i++)
-		if (live(ids[i])) transition(list, &rbufs[ids[i]], D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		if (live(ids[i]))
+			transition(list, &rbufs[ids[i]], srv_b && i == 1u ? D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+									  : D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	ID3D12GraphicsCommandList_SetPipelineState(list, pso);
 	for (unsigned i = 0; i < OPERANDS; i++)
 		ID3D12GraphicsCommandList_SetComputeRootUnorderedAccessView(list, 1 + i,
-			live(ids[i]) ? rbufs[ids[i]].addr : g.dummy.addr);
+			live(ids[i]) && !(srv_b && i == 1u) ? rbufs[ids[i]].addr : g.dummy.addr);
+	ID3D12GraphicsCommandList_SetComputeRootShaderResourceView(list, ROOT_SRV,
+		srv_b && live(ids[1]) ? rbufs[ids[1]].addr : g.dummy.addr);
 	dispatch_pieces(list, (uint32_t *)p, PUSH_WORDS, SPARE_WORD, gx, gy, gz, split_y);
 	barrier();
 	stamp(family, subkind);
@@ -1684,10 +2044,57 @@ static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[OPER
 	if (g.step) {
 		char desc[200];
 		snprintf(desc, sizeof desc, "%s flags 0x%x m=%u n=%u k=%u batch=%u sa=%u sb=%u sc=%u groups %ux%ux%u",
-			 family_name[family], p->flags, p->m, p->n, p->k, p->batch, p->sa, p->sb, p->sc, gx, gy, gz);
+			 srv_b ? "gemm_coopvec" : family_name[family], p->flags, p->m, p->n, p->k, p->batch, p->sa, p->sb,
+			 p->sc, gx, gy, gz);
 		return step_pass(desc);
 	}
 	return 0;
+}
+
+static int dispatch(ID3D12PipelineState *pso, struct push *p, const int ids[OPERANDS],
+		    unsigned gx, unsigned gy, unsigned gz, int split_y, unsigned family, unsigned subkind)
+{
+	return dispatch_srv(pso, p, ids, gx, gy, gz, split_y, family, subkind, 0);
+}
+
+/* -- the vector-matrix kernel's routing (gemm_coopvec.hlsl, notes/phase77) ------------ */
+
+/* The column slices gemm_coopvec takes for N columns: whole 64s, then a 32 if 32 or more
+ * are left, then a 16. (`main` in gemm_coopvec.hlsl walks the same rule.) */
+static unsigned coopvec_slices(unsigned N)
+{
+	unsigned rem = N % 64u;
+	return N / 64u + (rem ? 1u : 0u) + (rem == 48u ? 1u : 0u);
+}
+
+/* Whether gemm_coopvec can take this GEMM: its shape in whole 16s, no pooled window
+ * residual (the 16x32 block's own), and the thread-scope matrix's contract on every slice it
+ * would load — a 16-byte stride and a 128-byte aligned start, for every K chunk (128, then
+ * 64, 32, 16) of every column slice, of every batch item; a gathered A read four halves at
+ * a time. What does not fit takes the multiply-add kernels, right either way. */
+static int coopvec_fits(const struct push *p, unsigned bt, unsigned M, unsigned N, unsigned K,
+			unsigned batch, int gather)
+{
+	if (!M || !N || !K || N % 16u || K % 16u) return 0;
+	if (bt & 0x800000u) return 0;
+	int transposed = (bt & 1u) != 0;
+	unsigned ldb = p->ldb ? p->ldb : (transposed ? K : N);
+	if (ldb % 8u) return 0;
+	if (p->b % 128u) return 0;
+	if (batch > 1u && (((unsigned long long)p->sb * 2u) % 128u)) return 0;
+	if (gather ? (p->a % 8u) != 0 : (p->a % 2u) != 0) return 0;
+	for (unsigned n0 = 0; n0 < N;) {
+		unsigned width = N - n0 >= 64u ? 64u : (N - n0 >= 32u ? 32u : 16u);
+		for (unsigned k0 = 0; k0 < K;) {
+			unsigned depth = K - k0 >= 128u ? 128u : (K - k0 >= 64u ? 64u : (K - k0 >= 32u ? 32u : 16u));
+			unsigned long long start = (transposed ? (unsigned long long)n0 * ldb + k0
+							     : (unsigned long long)k0 * ldb + n0) * 2u;
+			if (start % 128u) return 0;
+			k0 += depth;
+		}
+		n0 += width;
+	}
+	return 1;
 }
 
 /* The QKV epilogue's other operands: K and V targets, the query scale, and the layout the
@@ -1786,6 +2193,14 @@ static int record_gemm(int a, int b, int c, unsigned M, unsigned N, unsigned K,
 	/* after the checks on `bt` above, which name every flag a caller may set: the packed A
 	 * fetch (gemm_portable.hlsl, 0x8000000) is this runtime's own, not a caller's */
 	if (g.portable_packed) p.flags |= 0x8000000u;
+	/* the vector-matrix kernel first, for every GEMM whose matrix slices it can load: 32 rows
+	 * a group on y (in pieces), a column slice on x, the batch on z; stamped as the staged
+	 * family, the slot the staged kernel has on the other runtimes */
+	if (g.coopvec && coopvec_fits(&p, bt, M, N, K, gz, window_a != NULL)) {
+		g.coopvec_calls++;
+		return dispatch_srv(window_a ? g.rcoopvec_gather : g.rcoopvec, &p, ids, coopvec_slices(N),
+				    (M + 31u) / 32u, gz, 1, PK_STAGED, bt, 1);
+	}
 	/* the 16x64 build, for what its generic store takes: not the QKV epilogue or the pool
 	 * (both need a 32-column block) nor the compact head */
 	if (g.rwide && M % 16u == 0 && N % 64u == 0 && K >= g.tiling && !(bt & 0x910000u)) {

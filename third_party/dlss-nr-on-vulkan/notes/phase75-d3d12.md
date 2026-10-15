@@ -1,5 +1,9 @@
 # Phase 75 — libd3dmx: the runtime on Direct3D 12, the kernels in HLSL
 
+> **The "no matrix path" below is superseded by `phase77` (2026-10-15):** Shader Model 6.10's
+> linear algebra gives a thread a matrix times a vector, and `gemm_coopvec.hlsl` is the GEMM
+> written on it, routed per GEMM by libd3dmx. The rest of this note stands.
+
 **2026-09-22, written on the owner's Apple M3 and not yet run anywhere.** The third compute
 runtime. `libxmx` drives Vulkan, `libmetalmx` drives Metal (`phase74`), and now
 **`libd3dmx`** drives Direct3D 12 on Windows: every `xmx_*` entry point of `xmx.h` in

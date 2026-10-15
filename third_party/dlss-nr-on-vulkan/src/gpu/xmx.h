@@ -84,6 +84,16 @@ int xmx_staged_packed(void);
  * measured slower with it, since the compiler already combines the eight-byte fetches, and
  * no Direct3D 12 device has measured it. */
 int xmx_portable_packed(void);
+/* Whether the GEMMs run on Direct3D 12's vector-matrix multiply — Shader Model 6.10's
+ * linear algebra, a thread-scope fp16 matrix times each row's vector (gemm_coopvec.hlsl,
+ * notes/phase77) — and how many GEMMs it has recorded since the resident runtime came up.
+ * libd3dmx answers 1 where the device and its Agility SDK offer it (XMX_PORTABLE=1 or
+ * XMX_D3D12_COOPVEC=0 turn it off), -1 before a device is open; libxmx and libmetalmx
+ * answer 0, their matrix path being `xmx_coopmat()`. Not bit-identical to the multiply-add
+ * kernels, as a matrix path never is; `xmx_portable()` stays 1 on Direct3D 12 either way,
+ * since the fused passes a caller names by it are the multiply-add twins there. */
+int xmx_coopvec(void);
+unsigned xmx_coopvec_calls(void);
 size_t xmx_embedded_shader(const char *name);
 
 /* the plain GEMM path */

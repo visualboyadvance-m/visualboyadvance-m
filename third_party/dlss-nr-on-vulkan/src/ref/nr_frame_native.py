@@ -78,6 +78,9 @@ def library():
             getattr(lib, name).restype = C.c_int
         lib.nr_frame_input_view.argtypes = [C.c_void_p]
         lib.nr_frame_input_view.restype = C.c_int
+        if hasattr(lib, "nr_frame_coopvec"):           # 2026-10-15: the vector-matrix path
+            lib.nr_frame_coopvec.argtypes = []
+            lib.nr_frame_coopvec.restype = C.c_int
         if hasattr(lib, "nr_frame_prepared"):          # 2026-10-10
             lib.nr_frame_prepared.argtypes = [C.c_void_p]
             lib.nr_frame_prepared.restype = C.c_int
@@ -260,6 +263,16 @@ class NativeFrame:
         """Whether the portable GEMM fetches A sixteen bytes at a time (`nr_frame_portable_packed`):
         0 by default, 1 under XMX_PORTABLE_PACKED=1; the same bits either way."""
         return self.lib.nr_frame_portable_packed()
+
+    @property
+    def coopvec(self):
+        """Whether the GEMMs run on Direct3D 12's vector-matrix multiply (`nr_frame_coopvec`):
+        1 on libd3dmx where the device offers Shader Model 6.10's linear algebra and nothing
+        turns it off, 0 otherwise and on Vulkan and Metal; -1 from a library without the answer.
+        Not the multiply-add kernels' bits (notes/phase77)."""
+        if not hasattr(self.lib, "nr_frame_coopvec"):
+            return -1
+        return self.lib.nr_frame_coopvec()
 
     @property
     def prepared(self):

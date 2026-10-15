@@ -264,15 +264,24 @@ int main(int argc, char **argv)
     if (!frame) { fprintf(stderr, "nr_frame_open: %s\n", nr_frame_error()); return 1; }
     printf("C library on %s: %s\n", nr_frame_device(frame), nr_frame_gemm_path(frame));
     printf("  discrete %d, float16 subnormals kept %d, half_round by cast %d, packed staged copies %d, "
-           "packed portable fetch %d, features in the mapped input %d\n",
+           "packed portable fetch %d, vector-matrix GEMMs %d, features in the mapped input %d\n",
            nr_frame_discrete(), nr_frame_preserve16(), nr_frame_half_by_cast(), nr_frame_staged_packed(),
-           nr_frame_portable_packed(), nr_frame_input_view(frame));
-    check("runtime: the five answers about it are a yes or a no once a frame is open",
+           nr_frame_portable_packed(), nr_frame_coopvec(), nr_frame_input_view(frame));
+    check("runtime: the six answers about it are a yes or a no once a frame is open",
           (nr_frame_discrete() == 0 || nr_frame_discrete() == 1)
           && (nr_frame_preserve16() == 0 || nr_frame_preserve16() == 1)
           && (nr_frame_half_by_cast() == 0 || nr_frame_half_by_cast() == 1)
           && (nr_frame_staged_packed() == 0 || nr_frame_staged_packed() == 1)
-          && (nr_frame_portable_packed() == 0 || nr_frame_portable_packed() == 1), NULL);
+          && (nr_frame_portable_packed() == 0 || nr_frame_portable_packed() == 1)
+          && (nr_frame_coopvec() == 0 || nr_frame_coopvec() == 1), NULL);
+    {
+        /* the vector-matrix path is Direct3D 12's alone (notes/phase77), and off there too when
+         * the portable kernels are forced */
+        const char *forced = getenv("XMX_PORTABLE");
+        check("runtime: the vector-matrix path runs on Direct3D 12 alone, and not under XMX_PORTABLE=1",
+              nr_frame_coopvec() == 0
+              || (!strcmp(nr_frame_runtime(), "d3d12") && !(forced && strcmp(forced, "0"))), NULL);
+    }
     {
         /* on by default where there is a staged kernel (Vulkan, Metal), off under the switch
          * and on Direct3D 12, which has none; the portable fetch is off unless asked for */

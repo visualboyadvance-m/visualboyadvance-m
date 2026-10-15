@@ -1520,6 +1520,10 @@ int xmx_staged_packed(void) { return g.staged_packed; }
 /* And whether the portable GEMM fetches A as raw 128-bit vectors, constant 3
  * (`XMX_PORTABLE_PACKED=1`; off by default, see detect_driver_modes). */
 int xmx_portable_packed(void) { return g.portable_packed; }
+/* The vector-matrix path is libd3dmx's (xmx.h); here the matrix path is the cooperative
+ * matrix, `xmx_coopmat()`. */
+int xmx_coopvec(void) { return 0; }
+unsigned xmx_coopvec_calls(void) { return 0; }
 
 /* Whether the device is a card with memory of its own rather than the host's (memtype). */
 int xmx_discrete(void) { return g.discrete; }

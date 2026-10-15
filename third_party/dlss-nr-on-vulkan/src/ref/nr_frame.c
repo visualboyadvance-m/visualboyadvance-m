@@ -70,6 +70,7 @@ struct xmx {
     int (*half_by_cast)(void);
     int (*staged_packed)(void);   /* optional: raw 128-bit operand copies in the staged kernel */
     int (*portable_packed)(void); /* optional: the portable GEMM's 16-byte A fetch */
+    int (*coopvec)(void);         /* optional: Direct3D 12's vector-matrix path (xmx.h) */
     void (*cancel)(int);          /* optional: a runtime without it cannot be cancelled */
     int (*cancelled)(void);
     const char *(*error)(void);
@@ -179,6 +180,7 @@ static int xmx_load(void)
     X.portable = xmx_portable; X.error = xmx_error; X.device = xmx_device; X.path = xmx_path;
     X.discrete = xmx_discrete; X.preserve16 = xmx_preserve16; X.half_by_cast = xmx_half_by_cast;
     X.staged_packed = xmx_staged_packed; X.portable_packed = xmx_portable_packed;
+    X.coopvec = xmx_coopvec;
     X.buf_create_kind = xmx_buf_create_kind; X.buf_host_visible = xmx_buf_host_visible;
     X.buf_ptr = xmx_buf_ptr; X.buf_upload = xmx_buf_upload; X.buf_download = xmx_buf_download;
     X.buf_zero = xmx_buf_zero; X.buf_destroy = xmx_buf_destroy;
@@ -257,6 +259,7 @@ static int xmx_load(void)
     X.half_by_cast = nr_dl_sym(X.handle, "xmx_half_by_cast");
     X.staged_packed = nr_dl_sym(X.handle, "xmx_staged_packed");
     X.portable_packed = nr_dl_sym(X.handle, "xmx_portable_packed");
+    X.coopvec = nr_dl_sym(X.handle, "xmx_coopvec");
     BIND(buf_create_kind, "xmx_buf_create_kind"); BIND(buf_host_visible, "xmx_buf_host_visible");
     BIND(buf_ptr, "xmx_buf_ptr"); BIND(buf_upload, "xmx_buf_upload");
     BIND(buf_download, "xmx_buf_download"); BIND(buf_zero, "xmx_buf_zero");
@@ -3539,6 +3542,7 @@ int nr_frame_preserve16(void) { return X.handle && X.preserve16 ? X.preserve16()
 int nr_frame_half_by_cast(void) { return X.handle && X.half_by_cast ? X.half_by_cast() : -1; }
 int nr_frame_staged_packed(void) { return X.handle && X.staged_packed ? X.staged_packed() : -1; }
 int nr_frame_portable_packed(void) { return X.handle && X.portable_packed ? X.portable_packed() : -1; }
+int nr_frame_coopvec(void) { return X.handle && X.coopvec ? X.coopvec() : -1; }
 int nr_frame_input_view(const nr_frame *f) { return f ? f->opt.input_view : -1; }
 int nr_frame_prepared(const nr_frame *f) { return f ? f->w.prepared : -1; }
 size_t nr_frame_weights_aliased(const nr_frame *f) { return f ? f->w.aliased : 0; }

@@ -111,10 +111,16 @@ def main():
         lib = backend.runtime.lib
         for name, got in (("discrete", native.discrete), ("preserve16", native.preserve16),
                           ("half_by_cast", native.half_by_cast), ("staged_packed", native.staged_packed),
-                          ("portable_packed", native.portable_packed)):
+                          ("portable_packed", native.portable_packed), ("coopvec", native.coopvec)):
             want = int(getattr(lib, "xmx_" + name)())
             check(f"runtime: nr_frame_{name} is the runtime's {want}", got == want and got in (0, 1),
                   f"got {got}")
+        # the vector-matrix path is libd3dmx's alone, and off under XMX_PORTABLE=1 there too
+        check("runtime: the vector-matrix path runs on Direct3D 12 alone, and not when the portable "
+              "kernels are forced",
+              native.coopvec == 0 or (os.environ.get("NR_GPU_BACKEND", "vulkan") == "d3d12"
+                                      and os.environ.get("XMX_PORTABLE", "0") == "0"),
+              f"coopvec {native.coopvec} on {os.environ.get('NR_GPU_BACKEND', 'vulkan')}")
         check("runtime: the features go into the mapped input unless NR_INPUT_VIEW says not",
               native.input_view == (0 if os.environ.get("NR_INPUT_VIEW") == "0" else 1)
               or (sys.platform == "win32" and native.discrete == 1),

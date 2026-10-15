@@ -200,6 +200,12 @@ int nr_frame_half_by_cast(void);
  * 1 under `XMX_PORTABLE_PACKED=1`). The same bits either way. */
 int nr_frame_staged_packed(void);
 int nr_frame_portable_packed(void);
+/* Whether the GEMMs run on Direct3D 12's vector-matrix multiply (`xmx_coopvec`: Shader Model
+ * 6.10's linear algebra on libd3dmx, notes/phase77): 1 where the device and its Agility SDK
+ * offer it and neither XMX_PORTABLE=1 nor XMX_D3D12_COOPVEC=0 is set, 0 otherwise and on the
+ * Vulkan and Metal runtimes, whose matrix path is the cooperative matrix; -1 on a runtime too
+ * old to say. Not bit-identical to the multiply-add kernels, as no matrix path is. */
+int nr_frame_coopvec(void);
 /* Whether this frame builds its half features in the graph's mapped input itself (1) or on
  * the host and copies them in (0): NR_INPUT_VIEW, defaulting to 0 only on a discrete card
  * under Windows, where one driver returned NaN for the mapped path (HANDOFF, 2026-10-02). */
