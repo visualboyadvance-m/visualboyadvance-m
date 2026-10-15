@@ -9,7 +9,24 @@ you need the evidence behind a line in this file, rather than reading them in or
 
 ---
 
-## Latest: AMD RDNA3 on the matrix path, and RADV's rounding (2026-10-12)
+## Latest: libdlssnr stays on Vulkan on Windows; libd3dmx measured on a Radeon 780M (2026-10-15)
+
+VBA-M on a Radeon 780M under AMD's Windows driver (32.0.31041) drew xBRZ 6x with DLSS NR at
+30 fps where Linux drew 60: the Windows archive was libd3dmx's, and libd3dmx has no matrix
+path. `nr_frame_rates`, a fresh frame each time, 8 after 3:
+
+| frame | libd3dmx (portable) | libxmx (`_m16`, AMD's Vulkan driver) |
+|---|---:|---:|
+| 480x320 | 137 ms | 43 ms |
+| 720x480 | 285 ms | 95 ms |
+
+So **`NR_DLSSNR_D3D12` defaults OFF now**; `NR_BUILD_D3D12` still builds libd3dmx.dll for the
+tests and `NR_GPU_BACKEND=d3d12`. No Direct3D 12 matrix route reaches RDNA3 today: the driver
+reports SM 6.9 and WaveMMA tier 0, SM 6.10's LinAlg is preview-only (AMD lists RX 9000), and
+AGS 6.3.1's HLSL intrinsics have no WMMA. This is also the first libd3dmx graph seen to finish:
+the frames above came back on a real device.
+
+## AMD RDNA3 on the matrix path, and RADV's rounding (2026-10-12)
 
 VBA-M on a Radeon 780M (RADV, Mesa 26.2.4) drew DLSS NR as rainbow bands: RADV lists only
 16x16x16 cooperative matrices, libxmx never asked, and the 8x16 kernels returned a head of
@@ -2845,9 +2862,9 @@ implements every `xmx_*` entry point of `xmx.h` on Direct3D 12 in C (COM through
 HLSL under `src/gpu/d3d12/` — nine DXIL modules from five sources, compiled by dxc and embedded
 through bin2c, serving the fourteen names every caller uses. **`NR_GPU_BACKEND=d3d12`** makes
 `nr_build.library("xmx")` and `nr_frame.c` load it; CMake builds it under `NR_BUILD_D3D12` (on by
-default for every Windows target but 32-bit x86, when dxc is found) and `NR_DLSSNR_D3D12`, which
-follows it, builds libdlssnr from it — a Windows x64 or ARM64 host gets the Direct3D 12 archive
-unless it passes `-DNR_DLSSNR_D3D12=OFF` — with `nr_frame_adopt_d3d12` for a host that wants to
+default for every Windows target but 32-bit x86, when dxc is found) and `NR_DLSSNR_D3D12`
+builds libdlssnr from it — off by default since 2026-10-15, so a Windows host gets the Vulkan
+archive unless it passes `-DNR_DLSSNR_D3D12=ON` — with `nr_frame_adopt_d3d12` for a host that wants to
 share its device (VBA-M's filter skips its Vulkan share when `nr_frame_runtime()` is not
 `vulkan`, and says so in `Device()`). Verified on the M3: the nine
 modules compile without a warning, the disassembly carries the `precise` marks and the

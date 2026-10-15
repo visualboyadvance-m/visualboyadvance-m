@@ -282,8 +282,8 @@ with byte offsets, splits dispatches at Direct3D's 65535 groups per axis, and ke
 store on `f32tof16` so the half buffers hold what `half_round` gives. CMake builds it under
 `NR_BUILD_D3D12` — on by default for every Windows target but 32-bit x86 (x64 and ARM64) when
 `dxc` is found: the Windows SDK's, the Vulkan SDK's or vcpkg's `directx-dxc` — and wherever it
-is built `libdlssnr` is built from it (`NR_DLSSNR_D3D12`, following `NR_BUILD_D3D12`;
-`-DNR_DLSSNR_D3D12=OFF` keeps the Vulkan archive), with `nr_frame_adopt_d3d12` for a host that
+`-DNR_DLSSNR_D3D12=ON` builds `libdlssnr` from it (off by default: the archive stays on
+libxmx, whose matrix path libd3dmx lacks), with `nr_frame_adopt_d3d12` for a host that
 shares its `ID3D12Device`. **It is written and
 cross-built from macOS, and has not run anywhere yet** — `notes/phase75` says how to make the
 first run, and that a `dxc` without `dxil.dll` beside it writes unsigned DXIL the runtime takes

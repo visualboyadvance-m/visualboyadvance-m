@@ -22,8 +22,8 @@
 #                   into it by the Metal compiler (NR_BUILD_METAL; NR_GPU_BACKEND=metal at run time)
 #   Windows         libd3dmx, the same runtime on Direct3D 12 with the kernels written in HLSL
 #                   and compiled to DXIL by dxc, embedded (NR_BUILD_D3D12, on for every Windows
-#                   target but 32-bit x86; NR_GPU_BACKEND=d3d12 at run time); wherever it is
-#                   built, libdlssnr is built from it instead of libxmx (NR_DLSSNR_D3D12)
+#                   target but 32-bit x86; NR_GPU_BACKEND=d3d12 at run time); libdlssnr stays
+#                   on libxmx unless NR_DLSSNR_D3D12 builds it from libd3dmx instead
 #   Android         the libraries, libdlssnr and the executables against the NDK's libvulkan.so,
 #                   with the NDK's own toolchain file; the layer stays off (there is no game to
 #                   hook and no daemon), bin2c and slice are built for the build machine
@@ -95,7 +95,11 @@ if(WIN32)
     set(NR_WIN32_X86 ON)
   endif()
 endif()
-option(NR_BUILD_D3D12 "Windows (x64, ARM64): build libd3dmx, the compute runtime on Direct3D 12, with the HLSL compiled to DXIL and embedded" OFF)
+set(NR_D3D12_DEFAULT OFF)
+if(WIN32 AND NOT NR_WIN32_X86)
+  set(NR_D3D12_DEFAULT ON)
+endif()
+option(NR_BUILD_D3D12 "Windows (x64, ARM64): build libd3dmx, the compute runtime on Direct3D 12, with the HLSL compiled to DXIL and embedded" ${NR_D3D12_DEFAULT})
 if(NR_BUILD_D3D12 AND NOT WIN32)
   message(FATAL_ERROR "NR_BUILD_D3D12 is on and this is not a Windows build; libd3dmx exists on Windows only")
 endif()
@@ -115,9 +119,28 @@ if(NR_BUILD_D3D12)
   if(nr_dxc_host_dirs)
     find_program(NR_DXC NAMES dxc.exe dxc PATHS ${nr_dxc_host_dirs} NO_DEFAULT_PATH)
   endif()
-  set(nr_dxc_sdk_dirs "$ENV{VULKAN_SDK}/Bin" "$ENV{VULKAN_SDK}/bin" "$ENV{WindowsSdkVerBinPath}/x64" "$ENV{WindowsSdkVerBinPath}/arm64")
-  file(GLOB nr_windows_kits_bins "C:/Program Files (x86)/Windows Kits/10/bin/10.*/x64" "C:/Program Files (x86)/Windows Kits/10/bin/10.*/arm64")
-  list(APPEND nr_dxc_sdk_dirs ${nr_windows_kits_bins})
+  # The Windows SDK ships a dxc per architecture, and only the build machine's can run: an x64
+  # host cannot start the arm64 one ("not compatible with the version of Windows"). An ARM64
+  # host takes its own first and the x64 one, which it emulates, after it. A dxc of the wrong
+  # architecture cached by an earlier configure is dropped.
+  if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^([aA][rR][mM]64|[aA][aA][rR][cC][hH]64)$")
+    set(nr_dxc_host_archs arm64 x64)
+  else()
+    set(nr_dxc_host_archs x64)
+    if(NR_DXC MATCHES "/arm64/")
+      unset(NR_DXC CACHE)
+    endif()
+  endif()
+  set(nr_dxc_sdk_dirs "$ENV{VULKAN_SDK}/Bin" "$ENV{VULKAN_SDK}/bin")
+  foreach(arch ${nr_dxc_host_archs})
+    list(APPEND nr_dxc_sdk_dirs "$ENV{WindowsSdkVerBinPath}/${arch}")
+  endforeach()
+  foreach(arch ${nr_dxc_host_archs})
+    # newest SDK first
+    file(GLOB nr_windows_kits_bins "C:/Program Files (x86)/Windows Kits/10/bin/10.*/${arch}")
+    list(SORT nr_windows_kits_bins COMPARE NATURAL ORDER DESCENDING)
+    list(APPEND nr_dxc_sdk_dirs ${nr_windows_kits_bins})
+  endforeach()
   find_program(NR_DXC NAMES dxc.exe dxc HINTS ${nr_dxc_sdk_dirs} DOC "the DirectX shader compiler, for the HLSL kernels")
   if(NOT NR_DXC)
     message(WARNING "dxc not found (Windows SDK, Vulkan SDK or vcpkg directx-dxc): libd3dmx is not built and libdlssnr stays the Vulkan archive; -DNR_DXC= names one, -DNR_BUILD_D3D12=OFF silences this")
@@ -126,14 +149,14 @@ if(NR_BUILD_D3D12)
     message(FATAL_ERROR "dxc found only as the target triplet's, ${NR_DXC}, which cannot run on this machine. Install it for the host (vcpkg install directx-dxc --triplet <host triplet>) or name one with -DNR_DXC=")
   endif()
 endif()
-# libdlssnr from libd3dmx rather than libxmx. Follows NR_BUILD_D3D12: wherever the Direct3D 12
-# runtime is built, the static archive a host links carries it — libd3dmx's objects and the
-# DXIL, no Vulkan anywhere in it; nr_frame_adopt_d3d12 is the share, nr_frame_adopt_vulkan is
-# refused and nr_frame_runtime() says "d3d12". -DNR_DLSSNR_D3D12=OFF keeps the Vulkan archive
-# beside libd3dmx.dll, for a host whose renderer lends a Vulkan device. The value is fixed on
-# the first configure, as a cache variable's is: a dxc installed later, or -DNR_BUILD_D3D12
-# changed afterwards, needs -DNR_DLSSNR_D3D12= set to match (or a fresh cache).
-option(NR_DLSSNR_D3D12 "Windows: build libdlssnr, the static archive a host links, from libd3dmx (Direct3D 12) instead of libxmx (Vulkan); follows NR_BUILD_D3D12" ${NR_BUILD_D3D12})
+# libdlssnr from libd3dmx rather than libxmx. Off by default: the archive a host links stays
+# on Vulkan, beside libd3dmx.dll, because libd3dmx has no matrix path (HLSL has no shipped
+# matrix-matrix operation) and libxmx does wherever the driver lists cooperative matrices. On
+# a Radeon 780M under AMD's Windows driver, nr_frame_rates at 720x480 took 285 ms a frame on
+# libd3dmx against 95 on libxmx's 16x16x16 path (2026-10-15). On, the archive carries
+# libd3dmx's objects and the DXIL, no Vulkan anywhere in it; nr_frame_adopt_d3d12 is the
+# share, nr_frame_adopt_vulkan is refused and nr_frame_runtime() says "d3d12".
+option(NR_DLSSNR_D3D12 "Windows: build libdlssnr, the static archive a host links, from libd3dmx (Direct3D 12) instead of libxmx (Vulkan); needs NR_BUILD_D3D12" OFF)
 if(NR_DLSSNR_D3D12 AND NOT NR_BUILD_D3D12)
   message(FATAL_ERROR "NR_DLSSNR_D3D12 needs NR_BUILD_D3D12 (Windows, with dxc found); pass -DNR_DLSSNR_D3D12=OFF as well to build libdlssnr from libxmx")
 endif()

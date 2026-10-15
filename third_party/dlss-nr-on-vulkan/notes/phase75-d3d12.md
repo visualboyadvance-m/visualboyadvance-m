@@ -7,9 +7,9 @@ runtime. `libxmx` drives Vulkan, `libmetalmx` drives Metal (`phase74`), and now
 from five HLSL sources under `src/gpu/d3d12/`, each module embedded through bin2c.
 **`NR_GPU_BACKEND=d3d12`** is the switch, in `src/nr_build.py` for the Python and in
 `nr_frame.c` for the C; CMake builds it under `NR_BUILD_D3D12`, on by default for every Windows
-target but 32-bit x86 when dxc is found and refused anywhere else; `NR_DLSSNR_D3D12` follows it
-and builds the static archive a host links from it instead of from libxmx (`-DNR_DLSSNR_D3D12=OFF`
-for the Vulkan archive beside `libd3dmx.dll`).
+target but 32-bit x86 when dxc is found and refused anywhere else; `-DNR_DLSSNR_D3D12=ON`
+builds the static archive a host links from it instead of from libxmx (off by default since
+2026-10-15: the Vulkan archive beside `libd3dmx.dll`, for its matrix path).
 
 What is verified is what a Mac without Windows can verify, and the last section says what
 is not. Nobody has executed a single kernel on a Direct3D 12 device.
@@ -149,8 +149,8 @@ Six things, two of them in the arithmetic and four in the API.
 - **No specialization**, and `test_specialization.py` will print `0 pipelines` there. It
   checks the results, not the count, so it passes.
 - **VBA-M's Direct3D 12 renderer does not share its device.** `nr_frame_adopt_d3d12` exists
-  for it; nothing calls it yet. The Windows libdlssnr *is* the Direct3D 12 archive by default
-  on x64 and ARM64 (`NR_DLSSNR_D3D12` follows `NR_BUILD_D3D12`; 32-bit x86 keeps Vulkan), so
+  for it; nothing calls it yet. The Windows libdlssnr is the Vulkan archive by default
+  (since 2026-10-15; HANDOFF has the 780M's numbers); built with `-DNR_DLSSNR_D3D12=ON`,
   VBA-M's filter there opens libd3dmx's own device and skips the Vulkan panel's share —
   `nr_frame_runtime()` tells it not to try.
 - **Memory on a discrete card** follows the `phase63` / `phase65` design — DEFAULT heaps,
@@ -166,7 +166,7 @@ ctest --test-dir build -R d3d12_
 set NR_GPU_BACKEND=d3d12                             # then any Python tool or the C command
 python src\ref\nr_frame.py IN.png OUT.png --resident
 build\nr_frame.exe IN.png OUT.png -v
-cmake -S . -B build -DNR_DLSSNR_D3D12=OFF            # the Vulkan libdlssnr beside libd3dmx.dll, for a Vulkan host
+cmake -S . -B build -DNR_DLSSNR_D3D12=ON             # libdlssnr from libd3dmx (the default is the Vulkan one beside libd3dmx.dll)
 ```
 
 `XMX_PORTABLE`, `XMX_STAGING=1`, `XMX_SPECIALIZE` (accepted, no effect), `XMX_TILE_*`,
