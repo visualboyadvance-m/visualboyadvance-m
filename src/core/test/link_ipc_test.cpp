@@ -1,5 +1,6 @@
 // Two-process harness for the same-machine IPC link (POSIX shared memory +
-// named semaphores + flock liveness files).
+// named semaphores + flock liveness files; a file-backed mapping on macOS;
+// named kernel objects on Windows).
 //
 // Usage: link_ipc_test --test <name>
 //   role_assignment   25 rounds of two instances racing InitLink; exactly
@@ -23,13 +24,18 @@
 //                     IRQ, and leaving GP mode doesn't disturb a subsequent
 //                     multiplayer transfer.
 //
-// Every run sets a pid-derived VBAM_LINK_NAMESPACE before touching the link,
-// isolating it from real emulator instances and parallel CI jobs.
+// Each test's other instance is a child function started with StartChild()
+// (link_test_support.h): forked on POSIX, this executable run again on
+// Windows. Every run sets a pid-derived VBAM_LINK_NAMESPACE before touching
+// the link, isolating it from real emulator instances and parallel CI jobs;
+// children share their parent's.
 
 #include "link_test_support.h"
 
+#if !defined(_WIN32)
 #include <fcntl.h>
 #include <sys/mman.h>
+#endif
 
 static char g_namespace[16];
 
@@ -43,15 +49,8 @@ static bool is_slot1() {
 
 // ---- role_assignment --------------------------------------------------------
 
-static int run_role_assignment() {
-    Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-    if (child)
-        g_role = "child";
-
+// Both instances run the same rounds.
+static void role_rounds(Barrier& b) {
     SetLinkTimeout(500);
 
     for (int round = 0; round < 25; round++) {
@@ -67,36 +66,36 @@ static int run_role_assignment() {
         CloseLink();
         b.sync(); // both closed before the next round starts
     }
+}
 
-    if (child)
-        _exit(0);
-    expect_child_success(pid);
+static int run_role_assignment() {
+    Barrier b;
+    Child child = StartChild(b, "role_assignment", role_rounds);
+    role_rounds(b);
+    expect_child_success(child);
     return 0;
 }
 
 // ---- stale_recovery ---------------------------------------------------------
 
+static void stale_creator(Barrier& b) {
+    SetLinkTimeout(500);
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "creator InitLink returned %d", (int)st);
+    CHECK(is_slot0(), "creator did not get slot 0");
+    b.sync();
+    // Die without CloseLink: shm + semaphores stay behind, the flock
+    // liveness lock is dropped by the kernel (on Windows the kernel closes
+    // every handle, and the named objects go with the last one).
+    _exit(0);
+}
+
 static int run_stale_recovery() {
     Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-
-    if (child) {
-        g_role = "child";
-        SetLinkTimeout(500);
-        ConnectionState st = InitLink(LINK_CABLE_IPC);
-        CHECK(st == LINK_OK, "creator InitLink returned %d", (int)st);
-        CHECK(is_slot0(), "creator did not get slot 0");
-        b.sync();
-        // Die without CloseLink: shm + semaphores stay behind, the flock
-        // liveness lock is dropped by the kernel.
-        _exit(0);
-    }
+    Child child = StartChild(b, "stale_recovery", stale_creator);
 
     b.sync();
-    expect_child_success(pid);
+    expect_child_success(child);
 
     // The corpse must be swept: we become the creator of a fresh session,
     // not slave #2 of a dead one (which is how the link used to wedge
@@ -108,47 +107,29 @@ static int run_stale_recovery() {
     CloseLink();
 
     // Last one out must unlink the shm object.
+#if defined(_WIN32)
+    char shm_name[64];
+    snprintf(shm_name, sizeof(shm_name), "VBA link memory%s", g_namespace);
+    HANDLE h = OpenFileMappingA(FILE_MAP_READ, FALSE, shm_name);
+    if (h != NULL)
+        CloseHandle(h);
+    CHECK(h == NULL, "file mapping %s still exists after last CloseLink",
+        shm_name);
+#else
     char shm_name[64];
     snprintf(shm_name, sizeof(shm_name), "/VBA link memory%s", g_namespace);
     int fd = shm_open(shm_name, O_RDWR, 0);
     if (fd >= 0)
         close(fd);
     CHECK(fd < 0, "shm object %s still exists after last CloseLink", shm_name);
+#endif
     return 0;
 }
 
 // ---- gb_exchange ------------------------------------------------------------
 
-static int run_gb_exchange() {
-    Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-    if (child)
-        g_role = "child";
-
+static void gb_slave(Barrier& b) {
     SetLinkTimeout(2000);
-
-    if (!child) {
-        // Creator = master (internal clock).
-        ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
-        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
-        CHECK(is_slot0(), "master did not get slot 0");
-        gbInitLinkIPC();
-        b.sync(); // joiner attached
-        b.sync(); // both initialized, start exchanging
-
-        for (int i = 0; i < 8; i++) {
-            uint8_t dat = gbStartLinkIPC((uint8_t)(0x40 + i));
-            CHECK(dat == (uint8_t)(0x90 + i),
-                "byte %d: master got 0x%02x, want 0x%02x", i, dat, 0x90 + i);
-        }
-        b.sync(); // slave done
-        CloseLink();
-        expect_child_success(pid);
-        return 0;
-    }
 
     b.sync(); // creator attached first
     ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
@@ -175,29 +156,67 @@ static int run_gb_exchange() {
     }
     b.sync();
     CloseLink();
-    _exit(0);
+}
+
+static int run_gb_exchange() {
+    Barrier b;
+    Child child = StartChild(b, "gb_exchange", gb_slave);
+
+    SetLinkTimeout(2000);
+
+    // Creator = master (internal clock).
+    ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
+    CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+    CHECK(is_slot0(), "master did not get slot 0");
+    gbInitLinkIPC();
+    b.sync(); // joiner attached
+    b.sync(); // both initialized, start exchanging
+
+    for (int i = 0; i < 8; i++) {
+        uint8_t dat = gbStartLinkIPC((uint8_t)(0x40 + i));
+        CHECK(dat == (uint8_t)(0x90 + i),
+            "byte %d: master got 0x%02x, want 0x%02x", i, dat, 0x90 + i);
+    }
+    b.sync(); // slave done
+    CloseLink();
+    expect_child_success(child);
+    return 0;
 }
 
 // ---- gb_third_instance ------------------------------------------------------
 
-static int run_gb_third_instance() {
-    Barrier b1; // parent <-> first joiner
-    pid_t pid1 = fork();
-    CHECK(pid1 >= 0, "fork failed");
-    b1.set_child(pid1 == 0);
+static void gb_joiner(Barrier& b1) {
+    SetLinkTimeout(500);
+    b1.sync(); // creator attached
+    ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
+    CHECK(st == LINK_OK, "second instance InitLink returned %d", (int)st);
+    CHECK(is_slot1(), "second instance did not get slot 1");
+    b1.sync(); // attached; parent may start the third instance
+    b1.sync(); // third instance verified; tear down
+    CloseLink();
+}
 
-    if (pid1 == 0) {
-        g_role = "joiner";
-        SetLinkTimeout(500);
-        b1.sync(); // creator attached
-        ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
-        CHECK(st == LINK_OK, "second instance InitLink returned %d", (int)st);
-        CHECK(is_slot1(), "second instance did not get slot 1");
-        b1.sync(); // attached; parent may spawn the third instance
-        b1.sync(); // third instance verified; tear down
-        CloseLink();
-        _exit(0);
-    }
+static void gb_third(Barrier& b2) {
+    SetLinkTimeout(500);
+    b2.sync(); // both others attached
+    ConnectionState st3 = InitLink(LINK_GAMEBOY_IPC);
+    CHECK(st3 == LINK_ERROR,
+        "third GB instance was accepted (returned %d); the GB protocol "
+        "indexes linkcmd/linksync with 1 - linkid and would corrupt "
+        "memory", (int)st3);
+    CHECK(strstr(g_last_system_message, "only 2 players") != nullptr,
+        "third GB instance refused for the wrong reason: %s",
+        g_last_system_message);
+}
+
+static int run_gb_third_instance() {
+    // Both others start before this process connects: a child forked from
+    // a connected process would inherit its connection, and InitLink would
+    // refuse it as "already connected" without ever reaching the check.
+    Barrier b1; // parent <-> first joiner
+    Child joiner = StartChild(b1, "gb_third_instance.joiner", gb_joiner);
+    Barrier b2; // parent <-> third instance
+    Child third = StartChild(b2, "gb_third_instance.third", gb_third);
 
     SetLinkTimeout(500);
     ConnectionState st = InitLink(LINK_GAMEBOY_IPC);
@@ -205,68 +224,18 @@ static int run_gb_third_instance() {
     b1.sync();
     b1.sync(); // joiner attached
 
-    Barrier b2; // parent <-> third instance
-    pid_t pid2 = fork();
-    CHECK(pid2 >= 0, "fork failed");
-    b2.set_child(pid2 == 0);
-
-    if (pid2 == 0) {
-        g_role = "third";
-        SetLinkTimeout(500);
-        ConnectionState st3 = InitLink(LINK_GAMEBOY_IPC);
-        CHECK(st3 == LINK_ERROR,
-            "third GB instance was accepted (returned %d); the GB protocol "
-            "indexes linkcmd/linksync with 1 - linkid and would corrupt "
-            "memory", (int)st3);
-        _exit(0);
-    }
-
-    expect_child_success(pid2);
+    b2.sync(); // let the third instance try
+    expect_child_success(third);
     b1.sync(); // release the joiner
     CloseLink();
-    expect_child_success(pid1);
+    expect_child_success(joiner);
     return 0;
 }
 
 // ---- gba_cable_2p -----------------------------------------------------------
 
-static int run_gba_cable_2p() {
-    Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-    if (child)
-        g_role = "child";
-
+static void cable_slave(Barrier& b) {
     SetLinkTimeout(1000);
-
-    if (!child) {
-        ConnectionState st = InitLink(LINK_CABLE_IPC);
-        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
-        CHECK(is_slot0(), "master did not get slot 0");
-        b.sync(); // slave attached
-        b.sync(); // slave is pumping its update loop
-
-        // Give the slave a head start into its LinkUpdate loop; the
-        // per-transfer handshake waits are bounded by linktimeout.
-        usleep(50 * 1000);
-        io_write16(COMM_SIODATA8, 0x1234);
-        StartLink(0x2080); // MULTIPLAYER, start bit, 9600 baud
-
-        double deadline = now_seconds() + 10.0;
-        while (io_read16(COMM_SIOMULTI0) != 0x1234
-            || io_read16(COMM_SIOMULTI1) != 0x5678) {
-            CHECK(now_seconds() < deadline,
-                "master timed out: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
-                io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
-            LinkUpdate(4096);
-        }
-        b.sync(); // both sides verified
-        CloseLink();
-        expect_child_success(pid);
-        return 0;
-    }
 
     b.sync(); // creator attached first
     ConnectionState st = InitLink(LINK_CABLE_IPC);
@@ -286,7 +255,38 @@ static int run_gba_cable_2p() {
     }
     b.sync();
     CloseLink();
-    _exit(0);
+}
+
+static int run_gba_cable_2p() {
+    Barrier b;
+    Child child = StartChild(b, "gba_cable_2p", cable_slave);
+
+    SetLinkTimeout(1000);
+
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+    CHECK(is_slot0(), "master did not get slot 0");
+    b.sync(); // slave attached
+    b.sync(); // slave is pumping its update loop
+
+    // Give the slave a head start into its LinkUpdate loop; the
+    // per-transfer handshake waits are bounded by linktimeout.
+    sleep_us(50 * 1000);
+    io_write16(COMM_SIODATA8, 0x1234);
+    StartLink(0x2080); // MULTIPLAYER, start bit, 9600 baud
+
+    double deadline = now_seconds() + 10.0;
+    while (io_read16(COMM_SIOMULTI0) != 0x1234
+        || io_read16(COMM_SIOMULTI1) != 0x5678) {
+        CHECK(now_seconds() < deadline,
+            "master timed out: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+            io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+        LinkUpdate(4096);
+    }
+    b.sync(); // both sides verified
+    CloseLink();
+    expect_child_success(child);
+    return 0;
 }
 
 // ---- idle_overflow ----------------------------------------------------------
@@ -298,45 +298,8 @@ static int run_gba_cable_2p() {
 // session's FIRST transfer after a long idle found a dead cable (Pokémon at
 // the Cable Club). Regression: pump > 2^31 idle ticks through both sides,
 // then assert a transfer still completes.
-static int run_idle_overflow() {
-    Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-    if (child)
-        g_role = "child";
-
+static void idle_slave(Barrier& b) {
     SetLinkTimeout(1000);
-
-    if (!child) {
-        ConnectionState st = InitLink(LINK_CABLE_IPC);
-        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
-        b.sync(); // slave attached
-        // 3 * 2^30 ticks of idle: linktime wraps negative after the second.
-        for (int i = 0; i < 3; i++)
-            LinkUpdate(0x40000000);
-        b.sync(); // both sides idled past the overflow
-        b.sync(); // slave is pumping its update loop
-
-        usleep(50 * 1000);
-        io_write16(COMM_SIODATA8, 0x1234);
-        StartLink(0x2080);
-
-        double deadline = now_seconds() + 10.0;
-        while (io_read16(COMM_SIOMULTI0) != 0x1234
-            || io_read16(COMM_SIOMULTI1) != 0x5678) {
-            CHECK(now_seconds() < deadline,
-                "master timed out after idle overflow: "
-                "SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
-                io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
-            LinkUpdate(4096);
-        }
-        b.sync();
-        CloseLink();
-        expect_child_success(pid);
-        return 0;
-    }
 
     b.sync(); // creator attached first
     ConnectionState st = InitLink(LINK_CABLE_IPC);
@@ -360,11 +323,44 @@ static int run_idle_overflow() {
         // ticks ~100x faster than a real emulator and would climb out of
         // the negative-linktime window before the master's wall-clock
         // timeout, hiding the very bug this test guards against.
-        usleep(200);
+        sleep_us(200);
     }
     b.sync();
     CloseLink();
-    _exit(0);
+}
+
+static int run_idle_overflow() {
+    Barrier b;
+    Child child = StartChild(b, "idle_overflow", idle_slave);
+
+    SetLinkTimeout(1000);
+
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+    b.sync(); // slave attached
+    // 3 * 2^30 ticks of idle: linktime wraps negative after the second.
+    for (int i = 0; i < 3; i++)
+        LinkUpdate(0x40000000);
+    b.sync(); // both sides idled past the overflow
+    b.sync(); // slave is pumping its update loop
+
+    sleep_us(50 * 1000);
+    io_write16(COMM_SIODATA8, 0x1234);
+    StartLink(0x2080);
+
+    double deadline = now_seconds() + 10.0;
+    while (io_read16(COMM_SIOMULTI0) != 0x1234
+        || io_read16(COMM_SIOMULTI1) != 0x5678) {
+        CHECK(now_seconds() < deadline,
+            "master timed out after idle overflow: "
+            "SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+            io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+        LinkUpdate(4096);
+    }
+    b.sync();
+    CloseLink();
+    expect_child_success(child);
+    return 0;
 }
 
 // ---- gp_exchange ------------------------------------------------------------
@@ -385,67 +381,8 @@ static void gp_wait_nibble(const char* who, uint16_t want) {
     }
 }
 
-static int run_gp_exchange() {
-    Barrier b;
-    pid_t pid = fork();
-    CHECK(pid >= 0, "fork failed");
-    bool child = (pid == 0);
-    b.set_child(child);
-    if (child)
-        g_role = "child";
-
+static void gp_slave(Barrier& b) {
     SetLinkTimeout(1000);
-
-    if (!child) {
-        ConnectionState st = InitLink(LINK_CABLE_IPC);
-        CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
-        CHECK(is_slot0(), "master did not get slot 0");
-        b.sync(); // slave attached
-
-        // (a) Drive SO low; our own inputs read pull-up 1s (the all-input
-        // slave drives nothing) and our SO output reads back its latch.
-        StartGPLink(0x8080); // GP, SO output, SO = 0
-        gp_wait_nibble("master", 0x7);
-        b.sync(); // slave saw SI = 0 (nibble 0xB)
-
-        // (b) Raise SO; the slave's SI must follow.
-        StartGPLink(0x8088);
-        b.sync(); // slave saw nibble 0xF
-
-        // (c) Swap directions: the slave drives, we read SI = 0.
-        StartGPLink(0x8000); // all inputs
-        b.sync(); // slave now drives SO low
-        gp_wait_nibble("master", 0xB);
-        b.sync(); // direction swap verified
-
-        // (d) SI falling-edge IRQ: the slave re-armed as all-input with the
-        // SI IRQ enabled (its SI reads pull-up 1); driving our SO low is
-        // the falling edge that must raise its serial IRQ.
-        b.sync(); // slave latched SI = 1 with the IRQ enabled
-        StartGPLink(0x8080);
-        b.sync(); // slave observed IF bit 7
-
-        // (e) Leave GP mode and run one multiplayer transfer; GP state must
-        // not leak into it (mirrors gba_cable_2p).
-        StartGPLink(0);
-        b.sync(); // both left GP mode; slave armed its transfer reply
-        usleep(50 * 1000); // slave head start into its LinkUpdate loop
-        io_write16(COMM_SIODATA8, 0x1234);
-        StartLink(0x2080); // MULTIPLAYER, start bit, 9600 baud
-
-        double deadline = now_seconds() + 10.0;
-        while (io_read16(COMM_SIOMULTI0) != 0x1234
-            || io_read16(COMM_SIOMULTI1) != 0x5678) {
-            CHECK(now_seconds() < deadline,
-                "master timed out after GP: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
-                io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
-            LinkUpdate(4096);
-        }
-        b.sync(); // both sides verified
-        CloseLink();
-        expect_child_success(pid);
-        return 0;
-    }
 
     b.sync(); // creator attached first
     ConnectionState st = InitLink(LINK_CABLE_IPC);
@@ -500,31 +437,79 @@ static int run_gp_exchange() {
     }
     b.sync();
     CloseLink();
-    _exit(0);
+}
+
+static int run_gp_exchange() {
+    Barrier b;
+    Child child = StartChild(b, "gp_exchange", gp_slave);
+
+    SetLinkTimeout(1000);
+
+    ConnectionState st = InitLink(LINK_CABLE_IPC);
+    CHECK(st == LINK_OK, "master InitLink returned %d", (int)st);
+    CHECK(is_slot0(), "master did not get slot 0");
+    b.sync(); // slave attached
+
+    // (a) Drive SO low; our own inputs read pull-up 1s (the all-input
+    // slave drives nothing) and our SO output reads back its latch.
+    StartGPLink(0x8080); // GP, SO output, SO = 0
+    gp_wait_nibble("master", 0x7);
+    b.sync(); // slave saw SI = 0 (nibble 0xB)
+
+    // (b) Raise SO; the slave's SI must follow.
+    StartGPLink(0x8088);
+    b.sync(); // slave saw nibble 0xF
+
+    // (c) Swap directions: the slave drives, we read SI = 0.
+    StartGPLink(0x8000); // all inputs
+    b.sync(); // slave now drives SO low
+    gp_wait_nibble("master", 0xB);
+    b.sync(); // direction swap verified
+
+    // (d) SI falling-edge IRQ: the slave re-armed as all-input with the
+    // SI IRQ enabled (its SI reads pull-up 1); driving our SO low is
+    // the falling edge that must raise its serial IRQ.
+    b.sync(); // slave latched SI = 1 with the IRQ enabled
+    StartGPLink(0x8080);
+    b.sync(); // slave observed IF bit 7
+
+    // (e) Leave GP mode and run one multiplayer transfer; GP state must
+    // not leak into it (mirrors gba_cable_2p).
+    StartGPLink(0);
+    b.sync(); // both left GP mode; slave armed its transfer reply
+    sleep_us(50 * 1000); // slave head start into its LinkUpdate loop
+    io_write16(COMM_SIODATA8, 0x1234);
+    StartLink(0x2080); // MULTIPLAYER, start bit, 9600 baud
+
+    double deadline = now_seconds() + 10.0;
+    while (io_read16(COMM_SIOMULTI0) != 0x1234
+        || io_read16(COMM_SIOMULTI1) != 0x5678) {
+        CHECK(now_seconds() < deadline,
+            "master timed out after GP: SIOMULTI0=0x%04x SIOMULTI1=0x%04x",
+            io_read16(COMM_SIOMULTI0), io_read16(COMM_SIOMULTI1));
+        LinkUpdate(4096);
+    }
+    b.sync(); // both sides verified
+    CloseLink();
+    expect_child_success(child);
+    return 0;
 }
 
 // ---- main -------------------------------------------------------------------
 
+// Every child a test starts, by the name StartChild() gives it.
+static const ChildEntry kChildren[] = {
+    { "role_assignment", role_rounds },
+    { "stale_recovery", stale_creator },
+    { "gb_exchange", gb_slave },
+    { "gb_third_instance.joiner", gb_joiner },
+    { "gb_third_instance.third", gb_third },
+    { "gba_cable_2p", cable_slave },
+    { "idle_overflow", idle_slave },
+    { "gp_exchange", gp_slave },
+};
+
 int main(int argc, char** argv) {
-    const char* test = nullptr;
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--test") == 0 && i + 1 < argc)
-            test = argv[++i];
-    }
-    if (!test) {
-        fprintf(stderr,
-            "usage: %s --test <role_assignment|stale_recovery|gb_exchange|"
-            "gb_third_instance|gba_cable_2p|gp_exchange>\n",
-            argv[0]);
-        return 2;
-    }
-
-    // Isolate this run's shm/semaphore/lock-file names from real emulator
-    // instances and from parallel CI jobs. Must happen before the first
-    // link call; the core latches the namespace on first use.
-    snprintf(g_namespace, sizeof(g_namespace), "t%x", (unsigned)getpid());
-    setenv("VBAM_LINK_NAMESPACE", g_namespace, 1);
-
     // Every test needs g_ioMem, not just the ones that read COMM_* directly:
     // the barrier pumps LinkUpdate() while it waits (see Barrier::swap), and
     // the cable update path dereferences g_ioMem for RCNT on the way in. That
@@ -533,6 +518,29 @@ int main(int argc, char** argv) {
     setup_fake_io();
 
     arm_watchdog(90);
+
+    // A child started by StartChild() on Windows runs here and exits; it
+    // takes its parent's link namespace rather than making its own.
+    RunChildIfAsked(argc, argv, kChildren, sizeof(kChildren) / sizeof(kChildren[0]));
+
+    const char* test = nullptr;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--test") == 0 && i + 1 < argc)
+            test = argv[++i];
+    }
+    if (!test) {
+        fprintf(stderr,
+            "usage: %s --test <role_assignment|stale_recovery|gb_exchange|"
+            "gb_third_instance|gba_cable_2p|idle_overflow|gp_exchange>\n",
+            argv[0]);
+        return 2;
+    }
+
+    // Isolate this run's shm/semaphore/lock-file names from real emulator
+    // instances and from parallel CI jobs. Must happen before the first
+    // link call; the core latches the namespace on first use.
+    snprintf(g_namespace, sizeof(g_namespace), "t%x", (unsigned)test_pid());
+    set_env("VBAM_LINK_NAMESPACE", g_namespace);
 
     if (strcmp(test, "role_assignment") == 0)
         return run_role_assignment();

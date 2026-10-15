@@ -458,6 +458,19 @@ typedef struct {
     uint32_t core_clock[4];
 } LINKDATA;
 
+// A fresh IPC session's topology: the creator alone, in slot 0, nothing in
+// flight.
+static void LinkTopologyInit(LINKDATA* d)
+{
+    d->linkflags = 1;
+    d->numgbas = 1;
+    d->numtransfers = 0;
+    for (int i = 0; i < 5; i++)
+        d->linkdata[i] = 0xffff;
+    for (int i = 0; i < 4; i++)
+        d->core_clock[i] = 0;
+}
+
 class RFUServer {
     [[maybe_unused]] int numbytes;
     sf::SocketSelector fdset;
@@ -996,6 +1009,48 @@ private:
 };
 #endif  // POSIX named-object backend
 
+#if (defined __WIN32__ || defined _WIN32)
+// Windows has no lock files to fence InitIPC with, but a named mutex does
+// the same: held for the whole of InitIPC's role selection and object
+// creation, and for CloseIPC's teardown, so a joiner never sees a session
+// whose creator has not yet claimed slot 0 or created the handshake
+// semaphores, nor one whose last member is halfway through closing it (its
+// objects vanish with their last handle). A holder that dies leaves it
+// abandoned, which the next waiter still acquires.
+static std::string LinkInitLockName()
+{
+    return "VBA link init " + LinkNamespaceSuffix();
+}
+
+// RAII holder of the init mutex.
+class LinkInitLock {
+public:
+    explicit LinkInitLock(const std::string& name)
+    {
+        mutex_ = CreateMutexA(NULL, FALSE, name.c_str());
+        if (mutex_ != NULL) {
+            const DWORD r = WaitForSingleObject(mutex_, INFINITE);
+            held_ = (r == WAIT_OBJECT_0 || r == WAIT_ABANDONED);
+        }
+    }
+    ~LinkInitLock()
+    {
+        if (mutex_ != NULL) {
+            if (held_)
+                ReleaseMutex(mutex_);
+            CloseHandle(mutex_);
+        }
+    }
+    bool held() const { return held_; }
+    LinkInitLock(const LinkInitLock&) = delete;
+    LinkInitLock& operator=(const LinkInitLock&) = delete;
+
+private:
+    HANDLE mutex_ = NULL;
+    bool held_ = false;
+};
+#endif  // Windows
+
 #if defined(VBAM_LINK_FILE_SHM)
 // ---------------------------------------------------------------------------
 // File-backed IPC backend (Android, macOS)
@@ -1261,6 +1316,11 @@ static bool LinkFileShmOpen()
                 munmap(map, sizeof(LinkFileShm));
                 map = MAP_FAILED;
             } else {
+                // Claim slot 0 before publishing. The init lock is released
+                // below, before InitIPC() goes on, so a joiner can reach the
+                // slot search while the creator is still in InitIPC(); an
+                // empty topology would hand it slot 0 as well.
+                LinkTopologyInit(&shm->data);
                 shm->layout = (uint32_t)sizeof(LINKDATA);
                 // Publish last: a joiner spins on magic, and this release
                 // store is what makes the initialized semaphores visible.
@@ -4678,6 +4738,11 @@ static ConnectionState InitIPC()
     linkid = 0;
 
 #if (defined __WIN32__ || defined _WIN32)
+    // Serialize the whole of role selection and object creation against
+    // other instances, as the POSIX backend's .init lock does (see
+    // LinkInitLock).
+    LinkInitLock init_lock(LinkInitLockName());
+
     if ((mmf = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(LINKDATA), LinkShmName().c_str())) == NULL) {
         systemMessage(0, N_("Error creating file mapping"));
         return LINK_ERROR;
@@ -4790,13 +4855,12 @@ static ConnectionState InitIPC()
         // the same time cannot claim the same vbaid. (Old FIXME here.)
         LinkMemGuard guard;
         if (firstone) {
-            linkmem->linkflags = 1;
-            linkmem->numgbas = 1;
-            linkmem->numtransfers = 0;
-            for (int i = 0; i < 5; i++)
-                linkmem->linkdata[i] = 0xffff;
-            for (int i = 0; i < 4; i++)
-                linkmem->core_clock[i] = 0;
+#if defined(VBAM_LINK_FILE_SHM)
+            // Done in LinkFileShmOpen(), and a joiner may already have taken
+            // slot 1 since: starting over here would drop it.
+#else
+            LinkTopologyInit(linkmem);
+#endif
         } else {
             int n = linkmem->numgbas;
             int f = linkmem->linkflags;
@@ -6631,6 +6695,12 @@ static void CloseIPC()
     // out from under its members.
     if (linkmem == NULL)
         return;
+
+#if (defined __WIN32__ || defined _WIN32)
+    // The whole teardown, so a starting instance sees the session either
+    // whole or gone (see LinkInitLock).
+    LinkInitLock init_lock(LinkInitLockName());
+#endif
 
     [[maybe_unused]] int f = 0;
     {

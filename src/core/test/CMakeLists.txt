@@ -101,17 +101,21 @@ endif()
 
 # link_ipc_test / link_socket_runner: two-process harnesses for the local
 # IPC link (shared memory + named semaphores + flock liveness) and the LAN
-# TCP link. They fork() and drive both endpoints at the gbaLink API level,
-# so no ROMs are needed; each scenario is its own ctest entry. UNIX-only:
-# the harness relies on fork/pipes/flock, and on Windows the kernel cleans
-# up the named objects itself.
-if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
+# TCP link. They drive both endpoints at the gbaLink API level, so no ROMs
+# are needed; each scenario is its own ctest entry. link_ipc_test also runs
+# on Windows, where its second process is the test run again rather than a
+# fork() (link_test_support.h); the other runners fork() and are UNIX-only.
+if(ENABLE_LINK AND (UNIX OR WIN32) AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
     # emerald_link_runner is a two-process debugging harness that drives a
     # real commercial ROM (Pokémon Emerald) through a link session with
     # scripted input and PNG frame dumps. The target always builds here;
     # ctest registration is gated on the VBAM_TEST_EMERALD_* cache vars
     # further down since the ROM cannot be bundled.
-    foreach(_link_runner link_ipc_test link_socket_runner emerald_link_runner)
+    set(_link_runners link_ipc_test)
+    if(UNIX)
+        list(APPEND _link_runners link_socket_runner emerald_link_runner)
+    endif()
+    foreach(_link_runner ${_link_runners})
         add_executable(${_link_runner} ${_link_runner}.cpp)
         target_link_libraries(${_link_runner} PRIVATE vbam-core)
         if(APPLE)
@@ -140,12 +144,15 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
     set_tests_properties(link.ipc.gp PROPERTIES
         LABELS "link" TIMEOUT 120)
 
-    foreach(_t handshake handshake_retry cable slave_commit idle_overflow gb
-            disconnect disconnect_goodbye bind_conflict gp)
-        add_test(NAME link.socket.${_t} COMMAND link_socket_runner --test ${_t})
-        set_tests_properties(link.socket.${_t} PROPERTIES
-            LABELS "link" TIMEOUT 120)
-    endforeach()
+    if(UNIX)
+        foreach(_t handshake handshake_retry cable slave_commit idle_overflow
+                gb disconnect disconnect_goodbye bind_conflict gp)
+            add_test(NAME link.socket.${_t}
+                COMMAND link_socket_runner --test ${_t})
+            set_tests_properties(link.socket.${_t} PROPERTIES
+                LABELS "link" TIMEOUT 120)
+        endforeach()
+    endif()
     message(STATUS "vbam-core test: link.* two-process tests enabled")
 endif()
 
