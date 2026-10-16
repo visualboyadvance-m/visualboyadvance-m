@@ -8111,16 +8111,7 @@ static bool UploadTexture(
     device->GetCopyableFootprints(&tex_desc, 0, 1, 0,
         &footprint, &num_rows, &row_size_bytes, &total_bytes);
 
-    if (reuse) {
-        // Last frame left it shader-readable.
-        D3D12_RESOURCE_BARRIER to_copy = {};
-        to_copy.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        to_copy.Transition.pResource = tex.Get();
-        to_copy.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-        to_copy.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
-        to_copy.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-        cmd_list->ResourceBarrier(1, &to_copy);
-    } else {
+    if (!reuse) {
         tex.Reset();
         upload_heap.Reset();
 
@@ -8151,12 +8142,31 @@ static bool UploadTexture(
     }
 
     // --- Map upload heap and fill it ---
+    // Before anything is recorded: if Map() fails (device removal) a reused
+    // texture is still shader-readable as the next frame expects, and a new
+    // one, never recorded, is dropped so the next frame starts afresh.
     uint8_t* mapped = nullptr;
     const D3D12_RANGE no_read = { 0, 0 };
-    if (FAILED(upload_heap->Map(0, &no_read, reinterpret_cast<void**>(&mapped))))
+    if (FAILED(upload_heap->Map(0, &no_read, reinterpret_cast<void**>(&mapped)))) {
+        if (!reuse) {
+            tex.Reset();
+            upload_heap.Reset();
+        }
         return false;
+    }
     fill(mapped + footprint.Offset, footprint.Footprint.RowPitch);
     upload_heap->Unmap(0, nullptr);
+
+    if (reuse) {
+        // Last frame left it shader-readable.
+        D3D12_RESOURCE_BARRIER to_copy = {};
+        to_copy.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        to_copy.Transition.pResource = tex.Get();
+        to_copy.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        to_copy.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+        to_copy.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        cmd_list->ResourceBarrier(1, &to_copy);
+    }
 
     // --- Copy command ---
     D3D12_TEXTURE_COPY_LOCATION src_loc = {};
@@ -8923,8 +8933,16 @@ bool DX11DrawingPanel::PresentFrame(wxImage* im)
 
 void DX11DrawingPanel::DrawArea(wxWindowDC& dc)
 {
-    if (swap_chain_ && panel_color_depth_ == 32 && todraw && PresentFrame(nullptr))
+    if (swap_chain_ && panel_color_depth_ == 32 && todraw) {
+        if (PresentFrame(nullptr))
+            return;
+        // PresentFrame() takes 32-bit frames from todraw whatever image it is
+        // given, so it would only fail again: go straight to the wx path.
+        wxImage* im = BuildImage();
+        BasicDrawingPanel::DrawImage(dc, im);
+        delete im;
         return;
+    }
     BasicDrawingPanel::DrawArea(dc);
 }
 
