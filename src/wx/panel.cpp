@@ -8056,9 +8056,12 @@ void DX12DrawingPanel::OnSize(wxSizeEvent& ev)
     ev.Skip();
 }
 
-// Helper: upload pixel data to a D3D12 texture via an upload heap. `tex` and
-// `upload_heap` are reused when `tex` already has this size and format (the
-// caller makes sure the GPU is done with them); otherwise both are replaced.
+// Helper: upload pixel data to a D3D12 texture via an upload heap. `fill`
+// writes the pixels straight into the mapped upload heap, rows `pitch` bytes
+// apart. `tex` and `upload_heap` are reused when `tex` already has this size
+// and format (the caller makes sure the GPU is done with them); otherwise
+// both are replaced.
+template <typename Fill>
 static bool UploadTexture(
     ID3D12Device* device,
     ID3D12GraphicsCommandList* cmd_list,
@@ -8067,8 +8070,7 @@ static bool UploadTexture(
     DXGI_FORMAT                format,
     UINT                       tex_w,
     UINT                       tex_h,
-    const void* src_pixels,
-    UINT                       src_row_bytes)
+    const Fill&                fill)
 {
     // --- Destination texture (DEFAULT heap) ---
     D3D12_HEAP_PROPERTIES default_heap = {};
@@ -8135,14 +8137,12 @@ static bool UploadTexture(
         if (FAILED(hr)) { tex.Reset(); return false; }
     }
 
-    // --- Map upload heap and copy row by row ---
+    // --- Map upload heap and fill it ---
     uint8_t* mapped = nullptr;
-    upload_heap->Map(0, nullptr, reinterpret_cast<void**>(&mapped));
-    for (UINT row = 0; row < (UINT)tex_h; ++row) {
-        memcpy(mapped + row * footprint.Footprint.RowPitch,
-            static_cast<const uint8_t*>(src_pixels) + row * src_row_bytes,
-            src_row_bytes);
-    }
+    const D3D12_RANGE no_read = { 0, 0 };
+    if (FAILED(upload_heap->Map(0, &no_read, reinterpret_cast<void**>(&mapped))))
+        return false;
+    fill(mapped + footprint.Offset, footprint.Footprint.RowPitch);
     upload_heap->Unmap(0, nullptr);
 
     // --- Copy command ---
@@ -8215,10 +8215,6 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
         int scaled_width = (int)std::ceil(width * scale);
         int scaled_height = (int)std::ceil(height * scale);
 
-        // Allocate a staging buffer (RGBA8, 4 bytes/pixel)
-        std::vector<uint8_t> rgba(scaled_width * scaled_height * 4);
-        uint8_t* dst_pixels = rgba.data();
-
         // Border sizes (same logic as original)
         int inrb = out_8 ? 4 : out_16 ? 2 : out_24 ? 0 : 1;
         int scaled_border = (int)std::ceil(inrb * scale);
@@ -8229,108 +8225,113 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
         else if (out_24) src_pitch = scaled_width * 3;
         else             src_pitch = (scaled_width + scaled_border) * 4;
 
-        uint8_t* src = todraw;
-
-        // Texture format for this frame; HDR overrides it to a 10-bit PQ format.
-        DXGI_FORMAT tex_fmt = DXGI_FORMAT_B8G8R8A8_UNORM;
-
         // HDR: encode the corrected RGBA8 image to 10-bit BT.2020 PQ matching
         // the HDR10 swapchain. Only the 32-bit source path feeds the encoder.
         const bool hdr = HdrActive() && hdr_swapchain_ &&
                          !out_8 && !out_16 && !out_24;
-        if (hdr) {
-            const uint8_t* tex_ptr = src + src_pitch;  // skip top border row
-            hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
-                            reinterpret_cast<uint32_t*>(dst_pixels),
-                            scaled_width * 4);
-            tex_fmt = DXGI_FORMAT_R10G10B10A2_UNORM;
-        }
-        else if (out_8) {
-            src += src_pitch; // skip top border row
-            for (int y = 0; y < scaled_height; y++) {
-                uint8_t* sr = src;
-                uint8_t* dr = dst_pixels + y * scaled_width * 4;
-                for (int x = 0; x < scaled_width; x++, sr++) {
-                    uint8_t p = *sr;
-                    if (p == 0xff) {
-                        dr[0] = dr[1] = dr[2] = 0xff;
-                    } else {
-                        dr[0] = (p & 0x3) << 6;        // R <- B
-                        dr[1] = ((p >> 2) & 0x7) << 5; // G
-                        dr[2] = ((p >> 5) & 0x7) << 5; // B <- R
+
+        // Texture format for this frame; HDR overrides it to a 10-bit PQ format.
+        const DXGI_FORMAT tex_fmt =
+            hdr ? DXGI_FORMAT_R10G10B10A2_UNORM : DXGI_FORMAT_B8G8R8A8_UNORM;
+
+        // Converts the frame straight into the mapped upload heap, rows
+        // `dst_pitch` bytes apart.
+        auto fill = [&](uint8_t* dst_pixels, UINT dst_pitch) {
+            uint8_t* src = todraw;
+
+            if (hdr) {
+                const uint8_t* tex_ptr = src + src_pitch;  // skip top border row
+                hdr::EncodePQ10(tex_ptr, src_pitch, scaled_width, scaled_height,
+                                reinterpret_cast<uint32_t*>(dst_pixels),
+                                (int)dst_pitch);
+            }
+            else if (out_8) {
+                src += src_pitch; // skip top border row
+                for (int y = 0; y < scaled_height; y++) {
+                    uint8_t* sr = src;
+                    uint8_t* dr = dst_pixels + (size_t)y * dst_pitch;
+                    for (int x = 0; x < scaled_width; x++, sr++) {
+                        uint8_t p = *sr;
+                        if (p == 0xff) {
+                            dr[0] = dr[1] = dr[2] = 0xff;
+                        } else {
+                            dr[0] = (p & 0x3) << 6;        // R <- B
+                            dr[1] = ((p >> 2) & 0x7) << 5; // G
+                            dr[2] = ((p >> 5) & 0x7) << 5; // B <- R
+                        }
+                        dr[3] = 0xff;
+                        dr += 4;
                     }
-                    dr[3] = 0xff;
-                    dr += 4;
+                    src += src_pitch;
                 }
-                src += src_pitch;
             }
-        }
-        else if (out_16) {
-            // Skip top border and cast to 16-bit source data (typically RGB555)
-            uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
+            else if (out_16) {
+                // Skip top border and cast to 16-bit source data (typically RGB555)
+                uint16_t* src16 = (uint16_t*)src + src_pitch / 2;
 
-            for (int y = 0; y < scaled_height; y++) {
-                uint16_t* sr = src16;
-                uint8_t* dr = dst_pixels + y * scaled_width * 4;
+                for (int y = 0; y < scaled_height; y++) {
+                    uint16_t* sr = src16;
+                    uint8_t* dr = dst_pixels + (size_t)y * dst_pitch;
 
-                for (int x = 0; x < scaled_width; x++, sr++) {
-                    uint16_t p = *sr;
+                    for (int x = 0; x < scaled_width; x++, sr++) {
+                        uint16_t p = *sr;
 
-                    // Handle transparency/white key: map 0x7FFF (High-bit 0, RGB 31,31,31) to solid white
-                    if ((p & 0x7fff) == 0x7fff) {
-                        dr[0] = dr[1] = dr[2] = 0xff;
+                        // Handle transparency/white key: map 0x7FFF (High-bit 0, RGB 31,31,31) to solid white
+                        if ((p & 0x7fff) == 0x7fff) {
+                            dr[0] = dr[1] = dr[2] = 0xff;
+                        }
+                        else {
+                            // Hardcoded 5-5-5 shifts (10/5/0) to avoid race conditions with 
+                            // global 'systemRedShift' overrides during filter transitions.
+                            uint8_t r5 = (p >> 10) & 0x1f;
+                            uint8_t g5 = (p >> 5) & 0x1f;
+                            uint8_t b5 = p & 0x1f;
+
+                            // Expand 5-bit to 8-bit (XRGB/BGRA layout) via bit-duplication
+                            // (e.g., 11111 -> 11111111) for full color range intensity.
+                            // dr[0]=Blue, dr[1]=Green, dr[2]=Red
+                            dr[0] = (b5 << 3) | (b5 >> 2);
+                            dr[1] = (g5 << 3) | (g5 >> 2);
+                            dr[2] = (r5 << 3) | (r5 >> 2);
+                        }
+                        dr[3] = 0xff; // Set Alpha channel to fully opaque
+                        dr += 4;
                     }
-                    else {
-                        // Hardcoded 5-5-5 shifts (10/5/0) to avoid race conditions with 
-                        // global 'systemRedShift' overrides during filter transitions.
-                        uint8_t r5 = (p >> 10) & 0x1f;
-                        uint8_t g5 = (p >> 5) & 0x1f;
-                        uint8_t b5 = p & 0x1f;
-
-                        // Expand 5-bit to 8-bit (XRGB/BGRA layout) via bit-duplication
-                        // (e.g., 11111 -> 11111111) for full color range intensity.
-                        // dr[0]=Blue, dr[1]=Green, dr[2]=Red
-                        dr[0] = (b5 << 3) | (b5 >> 2);
-                        dr[1] = (g5 << 3) | (g5 >> 2);
-                        dr[2] = (r5 << 3) | (r5 >> 2);
+                    src16 += src_pitch / 2; // Advance source pointer by pitch (adjusted for uint16_t)
+                }
+            }
+            else if (out_24) {
+                src += scaled_width * 3; // skip top border row
+                for (int y = 0; y < scaled_height; y++) {
+                    uint8_t* sr = src;
+                    uint8_t* dr = dst_pixels + (size_t)y * dst_pitch;
+                    for (int x = 0; x < scaled_width; x++) {
+                        dr[0] = sr[2]; // R <- B
+                        dr[1] = sr[1]; // G
+                        dr[2] = sr[0]; // B <- R
+                        dr[3] = 0xff;
+                        sr += 3; dr += 4;
                     }
-                    dr[3] = 0xff; // Set Alpha channel to fully opaque
-                    dr += 4;
+                    src += src_pitch;
                 }
-                src16 += src_pitch / 2; // Advance source pointer by pitch (adjusted for uint16_t)
             }
-        }
-        else if (out_24) {
-            src += scaled_width * 3; // skip top border row
-            for (int y = 0; y < scaled_height; y++) {
-                uint8_t* sr = src;
-                uint8_t* dr = dst_pixels + y * scaled_width * 4;
-                for (int x = 0; x < scaled_width; x++) {
-                    dr[0] = sr[2]; // R <- B
-                    dr[1] = sr[1]; // G
-                    dr[2] = sr[0]; // B <- R
-                    dr[3] = 0xff;
-                    sr += 3; dr += 4;
+            else {
+                // 32-bit BGRA -> RGBA
+                src += src_pitch; // skip top border row
+                for (int y = 0; y < scaled_height; y++) {
+                    uint8_t* sr = src;
+                    uint8_t* dr = dst_pixels + (size_t)y * dst_pitch;
+                    for (int x = 0; x < scaled_width; x++) {
+                        dr[0] = sr[2]; // R <- B
+                        dr[1] = sr[1]; // G
+                        dr[2] = sr[0]; // B <- R
+                        dr[3] = sr[3]; // A
+                        sr += 4; dr += 4;
+                    }
+                    src += src_pitch;
                 }
-                src += src_pitch;
             }
-        }
-        else {
-            // 32-bit BGRA -> RGBA
-            src += src_pitch; // skip top border row
-            for (int y = 0; y < scaled_height; y++) {
-                uint8_t* sr = src;
-                uint8_t* dr = dst_pixels + y * scaled_width * 4;
-                for (int x = 0; x < scaled_width; x++) {
-                    dr[0] = sr[2]; // R <- B
-                    dr[1] = sr[1]; // G
-                    dr[2] = sr[0]; // B <- R
-                    dr[3] = sr[3]; // A
-                    sr += 4; dr += 4;
-                }
-                src += src_pitch;
-            }
-        }
+        };
 
         // Upload texture (the slot's upload heap and texture stay alive until
         // the slot's fence passes)
@@ -8338,7 +8339,7 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
                 textures[slot], upload_heaps[slot],
                 tex_fmt,
                 (UINT)scaled_width, (UINT)scaled_height,
-                dst_pixels, (UINT)scaled_width * 4)) {
+                fill)) {
             wxLogError(_("Texture upload failed"));
             goto present;
         }
@@ -8822,6 +8823,32 @@ bool DX11DrawingPanel::PresentFrame(wxImage* im)
                         reinterpret_cast<uint32_t*>(mapped.pData),
                         (int)mapped.RowPitch);
         context_->Unmap(src_tex_.Get(), 0);
+    } else if (panel_color_depth_ == 32 && todraw) {
+        // SDR from the 32-bit todraw (1px filter border, as for HDR above):
+        // straight to BGRA8, with no wxImage in between.
+        const int sw     = (int)std::ceil(width * scale);
+        const int sh     = (int)std::ceil(height * scale);
+        const int rowlen = (int)std::ceil((width + 1) * scale);
+        if (sw < 1 || sh < 1) return false;
+        if (!EnsureSourceTexture(sw, sh, DXGI_FORMAT_B8G8R8A8_UNORM))
+            return false;
+        D3D11_MAPPED_SUBRESOURCE mapped = {};
+        if (FAILED(context_->Map(src_tex_.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0,
+                                 &mapped)))
+            return false;
+        const int rs = systemRedShift - 3, gs = systemGreenShift - 3,
+                  bs = systemBlueShift - 3;
+        const uint32_t* src = reinterpret_cast<const uint32_t*>(todraw) + rowlen;
+        uint8_t* base = static_cast<uint8_t*>(mapped.pData);
+        for (int y = 0; y < sh; ++y, src += rowlen) {
+            uint32_t* drow = reinterpret_cast<uint32_t*>(base + (size_t)y * mapped.RowPitch);
+            for (int x = 0; x < sw; ++x) {
+                const uint32_t p = src[x];
+                drow[x] = 0xff000000u | ((uint32_t)(uint8_t)(p >> rs) << 16) |
+                          ((uint32_t)(uint8_t)(p >> gs) << 8) | (uint8_t)(p >> bs);
+            }
+        }
+        context_->Unmap(src_tex_.Get(), 0);
     } else if (im) {
         // SDR: convert the 24-bit RGB image to BGRA8 (B8G8R8A8_UNORM) at its own
         // size, honoring the mapped row pitch.
@@ -8879,6 +8906,13 @@ bool DX11DrawingPanel::PresentFrame(wxImage* im)
         (allow_tearing_ && !OPTION(kPrefVsync)) ? DXGI_PRESENT_ALLOW_TEARING : 0u;
     swap_chain_->Present(sync, pf);
     return true;
+}
+
+void DX11DrawingPanel::DrawArea(wxWindowDC& dc)
+{
+    if (swap_chain_ && panel_color_depth_ == 32 && todraw && PresentFrame(nullptr))
+        return;
+    BasicDrawingPanel::DrawArea(dc);
 }
 
 void DX11DrawingPanel::DrawImage(wxWindowDC& dc, wxImage* im)

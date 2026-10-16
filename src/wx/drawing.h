@@ -409,6 +409,9 @@ public:
     // image conversion: HDR presents PQ10 from the 32-bit todraw, SDR presents
     // the 24-bit `im`. Falls back to the base wx path if the device is gone.
     void DrawImage(wxWindowDC& dc, wxImage* im) override;
+    // 32-bit frames skip the wxImage: they go straight from todraw into the
+    // texture (PQ10 for HDR, BGRA8 for SDR).
+    void DrawArea(wxWindowDC& dc) override;
 
 protected:
     bool SupportsHdr() const override { return hdr_swapchain_; }
