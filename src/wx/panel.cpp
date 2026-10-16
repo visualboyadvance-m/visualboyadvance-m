@@ -2403,6 +2403,19 @@ void GameArea::OnIdle(wxIdleEvent& event)
     }
 
     if (!panel) {
+        // DLSS NR on with a render method it rules out (SDL on Windows, from
+        // an older configuration): switch the option instead, outside this
+        // handler, since changing it reinitialises the panel, and build
+        // nothing until then. The next idle event creates the replacement.
+        if (OPTION(kDispDlssNr)) {
+            const config::RenderMethod method = OPTION(kDispRenderMethod);
+            const config::RenderMethod replacement = RenderMethodForDlssNr(method);
+            if (replacement != method) {
+                CallAfter([replacement]() { OPTION(kDispRenderMethod) = replacement; });
+                return;
+            }
+        }
+
         panel = NewPanelForRenderMethod(OPTION(kDispRenderMethod));
         if (!panel)
             return;
@@ -9774,6 +9787,15 @@ bool GameArea::IsHdrCapableRenderer(config::RenderMethod m) const {
 
 bool GameArea::HdrEffectivelyAvailable() const {
     return hdr::HdrAvailable() && !hdr_reverted_to_sdr_;
+}
+
+// static
+config::RenderMethod GameArea::RenderMethodForDlssNr(config::RenderMethod method) {
+#if defined(__WXMSW__) && defined(VBAM_ENABLE_DLSS_NR) && !defined(NO_D3D12)
+    if (method == config::RenderMethod::kSDL && VbamWindowsIsWin10OrGreater())
+        return config::RenderMethod::kDirect3d12;
+#endif
+    return method;
 }
 
 bool GameArea::RenderMethodHiddenForHdr(config::RenderMethod m) const {

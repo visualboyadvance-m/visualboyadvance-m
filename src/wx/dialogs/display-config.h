@@ -2,6 +2,7 @@
 #define VBAM_WX_DIALOGS_DISPLAY_CONFIG_H_
 
 #include <cstdint>
+#include <map>
 #include <utility>
 #include <vector>
 
@@ -178,6 +179,16 @@ private:
 
     // Keeps the DLSS-NR settings in step with the enable box.
     void SetDlssNrControlsEnabled(bool enabled);
+
+    // Disables the render-method radios DLSS-NR rules out while it is on
+    // (GameArea::RenderMethodForDlssNr()), moving a selection off one of them
+    // to its replacement, and enables them again when it is off.
+    void ApplyDlssNrToRenderMethods(bool dlss_nr_on);
+    // Whether DLSS-NR is on in the dialog: the enable box once its tab is
+    // built, else the option.
+    bool DlssNrChecked() const;
+    // The tooltips the radios ApplyDlssNrToRenderMethods() disables had before.
+    std::map<const char*, wxString> dlss_nr_radio_tooltips_;
 
     const config::OptionsObserver dlss_nr_observer_;
     const config::OptionsObserver filter_observer_;

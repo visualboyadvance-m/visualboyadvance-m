@@ -562,6 +562,13 @@ public:
         deep_color_failed_renderers_.clear();
     }
 
+    // The render method to use instead of `method` while DLSS NR is on, or
+    // `method` itself. On Windows SDL gives way to Direct3D 12: every SDL
+    // backend allocates fresh upload memory for each frame, and with the model
+    // keeping the GPU busy that costs it 5-10 fps at large filter scales, or
+    // most of the model's GPU time with the adaptive frame rate.
+    static config::RenderMethod RenderMethodForDlssNr(config::RenderMethod method);
+
     // True if the render method should be hidden from the display dialog because
     // HDR is on and effective and this renderer either can't do HDR or has
     // failed to present it.

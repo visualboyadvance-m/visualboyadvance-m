@@ -481,7 +481,10 @@ DisplayConfig::DisplayConfig(wxWindow* parent)
     : BaseDialog(parent, "DisplayConfig"),
       tab_loaded_(kTabCount, false),
       dlss_nr_observer_(config::OptionID::kDispDlssNr,
-                        [this](config::Option* o) { SetDlssNrControlsEnabled(o->GetBool()); }),
+                        [this](config::Option* o) {
+                            SetDlssNrControlsEnabled(o->GetBool());
+                            ApplyDlssNrToRenderMethods(o->GetBool());
+                        }),
       filter_observer_(config::OptionID::kDispFilter,
                        std::bind(&DisplayConfig::OnFilterChanged,
                                  this,
@@ -663,6 +666,9 @@ void DisplayConfig::InitBasicTab() {
     // feature (and re-show them when it is turned off). Recomputed on every
     // HDR/deep-color toggle, so nothing stays hidden once the user unchecks.
     UpdateRenderMethodVisibility();
+
+    // And disable the ones DLSS-NR rules out while it is on.
+    ApplyDlssNrToRenderMethods(DlssNrChecked());
 
     sdlrenderer_label_ = GetValidatedChild<wxControl>("SDLRendererLab");
     sdlrenderer_selector_ = GetValidatedChild<wxChoice>("SDLRenderer");
@@ -1111,6 +1117,10 @@ void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
 
         PopulatePluginOptions();
 
+        // The validators have just set the radios from the options, which can
+        // name a renderer DLSS-NR rules out (an older configuration).
+        ApplyDlssNrToRenderMethods(DlssNrChecked());
+
         // Set initial SDL options visibility based on current selection
         wxRadioButton* sdl_button = wxDynamicCast(GetValidatedChild("OutputSDL"), wxRadioButton);
         if (sdl_button && sdl_button->GetValue()) {
@@ -1477,6 +1487,7 @@ void DisplayConfig::InitDlssNrTab() {
     // Track the checkbox itself for the live case.
     dlss_nr_->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent& ev) {
         SetDlssNrControlsEnabled(ev.IsChecked());
+        ApplyDlssNrToRenderMethods(ev.IsChecked());
         ev.Skip();
     });
     SetDlssNrControlsEnabled(OPTION(kDispDlssNr));
@@ -1487,6 +1498,63 @@ void DisplayConfig::SetDlssNrControlsEnabled(bool enabled) {
     // lazy-loaded, exactly as it can for the filter selectors above.
     for (wxWindow* control : dlss_nr_controls_)
         control->Enable(enabled);
+}
+
+bool DisplayConfig::DlssNrChecked() const {
+    return dlss_nr_ ? dlss_nr_->GetValue() : OPTION(kDispDlssNr).Get();
+}
+
+void DisplayConfig::ApplyDlssNrToRenderMethods(bool dlss_nr_on) {
+    // The Basic tab owns the radios; nothing to do until it is built.
+    if (render_method_radios_.empty())
+        return;
+
+    auto radio_for = [this](config::RenderMethod m) -> wxRadioButton* {
+        for (const auto& radio : render_method_radios_)
+            if (radio.second == m)
+                return wxDynamicCast(GetValidatedChild(radio.first), wxRadioButton);
+        return nullptr;
+    };
+
+    bool moved = false;
+    for (const auto& radio : render_method_radios_) {
+        const config::RenderMethod replacement =
+            GameArea::RenderMethodForDlssNr(radio.second);
+        if (replacement == radio.second)
+            continue;
+        wxRadioButton* rb = wxDynamicCast(GetValidatedChild(radio.first), wxRadioButton);
+        if (!rb)
+            continue;
+
+        if (dlss_nr_on) {
+            if (!dlss_nr_radio_tooltips_.count(radio.first))
+                dlss_nr_radio_tooltips_[radio.first] = rb->GetToolTipText();
+            rb->SetToolTip(_("Not available while DLSS-NR is on."));
+            // Selected: move to the replacement. The render method, like the
+            // DLSS-NR box, is applied on OK, so this only moves the radios;
+            // SetValue() fires no wxEVT_RADIOBUTTON.
+            wxRadioButton* to = radio_for(replacement);
+            if (rb->GetValue() && to) {
+                to->SetValue(true);
+                moved = true;
+            }
+            rb->Enable(false);
+        } else {
+            rb->Enable(true);
+            auto it = dlss_nr_radio_tooltips_.find(radio.first);
+            if (it != dlss_nr_radio_tooltips_.end()) {
+                rb->SetToolTip(it->second);
+                dlss_nr_radio_tooltips_.erase(it);
+            }
+        }
+    }
+
+    // Leaving SDL hides its sub-options, and the dialog gives their room back
+    // as UpdateSDLOptionsVisibility() does.
+    if (moved && sdlrenderer_selector_) {
+        HideSDLOptions();
+        RefitForVisibilityChange(sdlrenderer_selector_);
+    }
 }
 
 void DisplayConfig::OnFilterChanged(config::Option* option) {
