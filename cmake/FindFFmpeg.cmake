@@ -147,7 +147,9 @@ foreach (_component AVCODEC AVDEVICE AVFORMAT AVUTIL POSTPROCESS SWSCALE)
 endforeach ()
 
 # Compile the list of required vars
-set(_FFmpeg_REQUIRED_VARS FFMPEG_LIBRARIES FFMPEG_INCLUDE_DIRS)
+# The first variable is what the "Found FFmpeg" line prints: one path
+# rather than every library.
+set(_FFmpeg_REQUIRED_VARS FFMPEG_INCLUDE_DIRS FFMPEG_LIBRARIES)
 foreach (_component ${FFmpeg_FIND_COMPONENTS})
   list(APPEND _FFmpeg_REQUIRED_VARS ${_component}_LIBRARIES ${_component}_INCLUDE_DIRS)
 endforeach ()

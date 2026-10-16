@@ -45,7 +45,7 @@ if(X86_64 OR ARM64)
 
     # If no pre-built host found, try to build it automatically with MSVC
     if(NOT RPI_HOST_EXE_PATH AND MSVC)
-        message(STATUS "Will build 32-bit RPI Host automatically using MSVC x86 toolchain")
+        message(VERBOSE "Will build 32-bit RPI Host automatically using MSVC x86 toolchain")
 
         # Determine the generator to use for the 32-bit build
         # For Visual Studio generators, we use the same generator with -A Win32
@@ -151,15 +151,28 @@ install(TARGETS vbam-rpi-host RUNTIME DESTINATION .)
             endforeach()
 
             if(VCVARSALL_BAT)
-                message(STATUS "Found vcvarsall.bat: ${VCVARSALL_BAT}")
+                message(VERBOSE "Found vcvarsall.bat: ${VCVARSALL_BAT}")
 
-                # Create a batch script that sets up x86 environment and builds
+                # Create a batch script that sets up x86 environment and builds.
+                # The vcvarsall banner and the inner configure, build and
+                # install go to log files, shown only on failure.  vcvarsall
+                # has a file of its own: a process it leaves running keeps the
+                # handle it inherited open, so the next step could not append.
+                file(TO_NATIVE_PATH "${RPI_HOST_BUILD_DIR}/build-x86.log" RPI_HOST_BUILD_LOG)
+                file(TO_NATIVE_PATH "${RPI_HOST_BUILD_DIR}/vcvarsall-x86.log" RPI_HOST_VCVARS_LOG)
                 set(BUILD_SCRIPT_CONTENT "@echo off
-call \"${VCVARSALL_BAT}\" x86
+set VBAM_RPI_HOST_LOG=\"${RPI_HOST_BUILD_LOG}\"
+set VBAM_RPI_VCVARS_LOG=\"${RPI_HOST_VCVARS_LOG}\"
+call \"${VCVARSALL_BAT}\" x86 > %VBAM_RPI_VCVARS_LOG% 2>&1
+type nul > %VBAM_RPI_HOST_LOG%
 cd /d \"${RPI_HOST_BUILD_DIR}/build\"
-cmake -G \"${RPI_HOST_GENERATOR}\" -DCMAKE_BUILD_TYPE=${RPI_HOST_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=\"${RPI_HOST_BUILD_DIR}/install\" \"${RPI_HOST_BUILD_DIR}\"
-cmake --build . --config ${RPI_HOST_BUILD_TYPE}
-cmake --install . --config ${RPI_HOST_BUILD_TYPE}
+cmake -G \"${RPI_HOST_GENERATOR}\" -DCMAKE_BUILD_TYPE=${RPI_HOST_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=\"${RPI_HOST_BUILD_DIR}/install\" \"${RPI_HOST_BUILD_DIR}\" >> %VBAM_RPI_HOST_LOG% 2>&1 || goto fail
+cmake --build . --config ${RPI_HOST_BUILD_TYPE} >> %VBAM_RPI_HOST_LOG% 2>&1 || goto fail
+cmake --install . --config ${RPI_HOST_BUILD_TYPE} >> %VBAM_RPI_HOST_LOG% 2>&1 || goto fail
+exit /b 0
+:fail
+type %VBAM_RPI_VCVARS_LOG% %VBAM_RPI_HOST_LOG%
+exit /b 1
 ")
                 file(WRITE "${RPI_HOST_BUILD_DIR}/build-x86.bat" "${BUILD_SCRIPT_CONTENT}")
 
@@ -201,7 +214,7 @@ cmake --install . --config ${RPI_HOST_BUILD_TYPE}
     # Configure the proxy based on whether we have a host exe
     if(RPI_HOST_EXE_PATH)
         if(RPI_HOST_AUTO_BUILD)
-            message(STATUS "RPI Host will be built automatically: ${RPI_HOST_EXE_PATH}")
+            message(VERBOSE "RPI Host will be built automatically: ${RPI_HOST_EXE_PATH}")
         else()
             message(STATUS "RPI Host exe found: ${RPI_HOST_EXE_PATH}")
         endif()

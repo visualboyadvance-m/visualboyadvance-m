@@ -162,7 +162,7 @@ if(ENABLE_LINK AND (UNIX OR WIN32) AND NOT ANDROID AND NOT CMAKE_CROSSCOMPILING)
                 LABELS "link" TIMEOUT 120)
         endforeach()
     endif()
-    message(STATUS "vbam-core test: link.* two-process tests enabled")
+    message(VERBOSE "vbam-core test: link.* two-process tests enabled")
 endif()
 
 # The test runners must inherit the global LTO setting rather than force it
@@ -578,7 +578,7 @@ if(VBAM_TEST_GBA_ROM AND EXISTS "${VBAM_TEST_GBA_ROM}")
     message(STATUS "vbam-core test: gba.suite enabled "
         "(rom=${VBAM_TEST_GBA_ROM} floor=${VBAM_TEST_GBA_MIN_PASS})")
 else()
-    message(STATUS
+    message(VERBOSE
         "vbam-core test: gba.suite SKIPPED — set VBAM_TEST_GBA_ROM to enable")
 endif()
 
@@ -600,7 +600,7 @@ if(VBAM_TEST_GB_ROMS AND IS_DIRECTORY "${VBAM_TEST_GB_ROMS}")
     message(STATUS "vbam-core test: gb.blargg enabled "
         "(roms=${VBAM_TEST_GB_ROMS} floor=${VBAM_TEST_GB_MIN_PASS})")
 else()
-    message(STATUS
+    message(VERBOSE
         "vbam-core test: gb.blargg SKIPPED — set VBAM_TEST_GB_ROMS to enable")
 endif()
 
@@ -619,7 +619,7 @@ if(VBAM_TEST_GB_MTS_ROMS AND IS_DIRECTORY "${VBAM_TEST_GB_MTS_ROMS}")
     message(STATUS "vbam-core test: gb.mooneye enabled "
         "(roms=${VBAM_TEST_GB_MTS_ROMS} floor=${VBAM_TEST_GB_MTS_MIN_PASS})")
 else()
-    message(STATUS
+    message(VERBOSE
         "vbam-core test: gb.mooneye SKIPPED — set VBAM_TEST_GB_MTS_ROMS to enable")
 endif()
 
@@ -653,6 +653,6 @@ if(ENABLE_LINK AND UNIX AND NOT ANDROID
     endforeach()
     message(STATUS "vbam-core test: link.emerald.* enabled")
 else()
-    message(STATUS "vbam-core test: link.emerald.* SKIPPED — set "
+    message(VERBOSE "vbam-core test: link.emerald.* SKIPPED — set "
         "VBAM_TEST_EMERALD_ROM/SAV0/SAV1/SCRIPTS to enable")
 endif()

@@ -1330,7 +1330,7 @@ if(WIN32)
             set_source_files_properties(wxvbam.rc PROPERTIES COMPILE_FLAGS
                 "-DVBAM_EMBED_RPI_HOST --include-dir=\"${RPI_HOST_PATH_H_DIR}\"")
         endif()
-        message(STATUS "Resource compiler will embed RPI host (VBAM_EMBED_RPI_HOST defined)")
+        message(VERBOSE "Resource compiler will embed RPI host (VBAM_EMBED_RPI_HOST defined)")
     endif()
     if(NOT COMPILE_ONLY)
         target_link_libraries(visualboyadvance-m
@@ -1338,7 +1338,7 @@ if(WIN32)
 
         # RPI proxy support for 32-bit plugin loading from 64-bit builds
         if(VBAM_HAS_RPI_PROXY)
-            message(STATUS "RPI Proxy enabled - Host exe path: ${RPI_HOST_EXE_PATH}")
+            message(VERBOSE "RPI Proxy enabled - Host exe path: ${RPI_HOST_EXE_PATH}")
             # Explicitly add compile definition (PUBLIC from vbam-wx-widgets may not propagate for OBJECT libraries)
             target_compile_definitions(visualboyadvance-m PRIVATE VBAM_RPI_PROXY_SUPPORT)
             # Ensure the 32-bit host is built before the main exe (needed for resource embedding)

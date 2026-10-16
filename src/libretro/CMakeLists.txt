@@ -166,7 +166,7 @@ if(MSVC)
     set(_lr_msvcrt_lib "${CMAKE_CURRENT_BINARY_DIR}/msvcrt_system.lib")
 
     if(NOT EXISTS "${_lr_msvcrt_lib}")
-        message(STATUS "Libretro: generating import library for system msvcrt.dll ...")
+        message(VERBOSE "Libretro: generating import library for system msvcrt.dll ...")
 
         execute_process(
             COMMAND dumpbin /EXPORTS "C:/Windows/System32/msvcrt.dll"
@@ -206,7 +206,7 @@ if(MSVC)
             message(FATAL_ERROR "Libretro: lib.exe failed to create msvcrt import library")
         endif()
 
-        message(STATUS "Libretro: generated ${_lr_msvcrt_lib}")
+        message(VERBOSE "Libretro: generated ${_lr_msvcrt_lib}")
     endif()
 
     # --- UCRT shim: provide functions that only exist in ucrtbase.dll ---
@@ -535,7 +535,7 @@ if(BUILD_TESTING AND NOT WIN32
     message(STATUS "vbam-core test: gba.suite.libretro enabled "
         "(rom=${VBAM_TEST_GBA_ROM} floor=${VBAM_TEST_GBA_MIN_PASS})")
 elseif(BUILD_TESTING AND NOT WIN32)
-    message(STATUS
+    message(VERBOSE
         "vbam-core test: gba.suite.libretro SKIPPED — set VBAM_TEST_GBA_ROM \
 to enable")
 endif()

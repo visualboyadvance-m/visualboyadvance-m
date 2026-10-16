@@ -1437,9 +1437,9 @@ function(get_binary_packages)
                     set(VCPKG_BINPKG_COMMIT "${vcpkg_binpkg_head}" CACHE INTERNAL
                         "Commit of the extracted vcpkg-binpkg tool")
                     if(vcpkg_binpkg_head)
-                        message(STATUS "Updated vcpkg-binpkg tool to ${vcpkg_binpkg_head}.")
+                        message(VERBOSE "Updated vcpkg-binpkg tool to ${vcpkg_binpkg_head}.")
                     else()
-                        message(STATUS "Updated vcpkg-binpkg tool from master.")
+                        message(VERBOSE "Updated vcpkg-binpkg tool from master.")
                     endif()
                 else()
                     message(WARNING "vcpkg-binpkg archive has no vcpkg-binpkg.psm1.")
@@ -2148,7 +2148,7 @@ function(vcpkg_set_toolchain)
         endforeach()
     endif()
 
-    message(STATUS
+    message(VERBOSE
         "vcpkg ports for the selected frontends (ENABLE_WX=${ENABLE_WX} "
         "ENABLE_SDL=${ENABLE_SDL} ENABLE_LIBRETRO=${ENABLE_LIBRETRO}): "
         "${deps_report}")

@@ -16,6 +16,26 @@ option(ENABLE_WERROR "Treat warnings as errors (enabled in CI)" ${VBAM_CI_DEFAUL
 # here to keep Options.cmake readable on its own.
 include(FrontendOptions)
 
+# find_package() held at the NOTICE message level.  Some packages' own CMake
+# code ignores QUIET: vcpkg's ffmpeg wrapper and SDL3's FindLibUSB.cmake run
+# pkg_check_modules() without it, which prints a "Checking for module" pair
+# per library on every fresh configure.  cmake --log-level still overrides
+# this.  A macro, so the variables the package sets stay in the caller's scope.
+macro(vbam_find_package_notice)
+    set(_vbam_fpn_log_level "${CMAKE_MESSAGE_LOG_LEVEL}")
+    if(NOT _vbam_fpn_log_level)
+        set(CMAKE_MESSAGE_LOG_LEVEL NOTICE)
+    endif()
+
+    find_package(${ARGN})
+
+    if(_vbam_fpn_log_level)
+        set(CMAKE_MESSAGE_LOG_LEVEL "${_vbam_fpn_log_level}")
+    else()
+        unset(CMAKE_MESSAGE_LOG_LEVEL)
+    endif()
+endmacro()
+
 # Wayland is a wx port display backend.
 if(ENABLE_WX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     # Detect whether the installed GDK supports Wayland.
@@ -246,7 +266,7 @@ elseif(ANDROID)
     endif()
 
     if(NOT _vbam_sdl3_lib AND NOT TARGET SDL3::SDL3)
-        find_package(SDL3 QUIET)
+        vbam_find_package_notice(SDL3 QUIET)
     endif()
 
     if(NOT _vbam_sdl3_lib AND NOT TARGET SDL3::SDL3)
@@ -322,7 +342,7 @@ elseif(ANDROID)
 
     set(SDL3_FOUND TRUE)
 else()
-    find_package(SDL3 QUIET)
+    vbam_find_package_notice(SDL3 QUIET)
 endif()
 
 if(VBAM_NEED_SDL)
@@ -537,7 +557,15 @@ set(FFMPEG_COMPONENT_VERSIONS AVFORMAT>=58.12.100 AVCODEC>=58.18.100 SWSCALE>=5.
 if(VBAM_NEED_GUI_DEPS AND NOT TRANSLATIONS_ONLY AND (NOT DEFINED ENABLE_FFMPEG OR ENABLE_FFMPEG))
     set(FFMPEG_DEFAULT ON)
 
-    find_package(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
+    # vcpkg's ffmpeg wrapper checks libavcodec, x264 and x265 out loud; print
+    # the one line that matters instead, once, the way find_package() would.
+    vbam_find_package_notice(FFmpeg COMPONENTS ${FFMPEG_COMPONENTS})
+
+    if(FFmpeg_FOUND)
+        include(FindPackageMessage)
+        find_package_message(vbam_ffmpeg "Found FFmpeg: ${FFMPEG_INCLUDE_DIRS}"
+            "[${FFMPEG_LIBRARIES}][${FFMPEG_INCLUDE_DIRS}]")
+    endif()
 
     # check versions, but only if pkgconfig is available
     if(FFmpeg_FOUND AND PKG_CONFIG_FOUND)

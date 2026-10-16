@@ -264,7 +264,7 @@ include(Set-Toolchain-vcpkg)
 if(NOT CMAKE_CXX_COMPILER_LAUNCHER)
     find_program(CCACHE_EXECUTABLE ccache)
     if(CCACHE_EXECUTABLE)
-        message(STATUS "Enabling ccache")
+        message(VERBOSE "Enabling ccache")
 
         set(CMAKE_C_COMPILER_LAUNCHER        ${CCACHE_EXECUTABLE} CACHE STRING "C compiler launcher"     FORCE)
         set(CMAKE_CXX_COMPILER_LAUNCHER      ${CCACHE_EXECUTABLE} CACHE STRING "C++ compiler launcher"   FORCE)
