@@ -7810,11 +7810,12 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
 
     // --- 6. SRV Descriptor Heap (for texture) ---
     D3D12_DESCRIPTOR_HEAP_DESC srv_heap_desc = {};
-    srv_heap_desc.NumDescriptors = 1;
+    srv_heap_desc.NumDescriptors = FRAME_COUNT;
     srv_heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srv_heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     hr = device->CreateDescriptorHeap(&srv_heap_desc, IID_PPV_ARGS(&srv_heap));
     if (FAILED(hr)) { wxLogError(_("Failed to create SRV heap: 0x%08X"), hr); return; }
+    srv_descriptor_size = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
     // --- 7. Create RTVs for each back buffer ---
     {
@@ -7827,12 +7828,14 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
         }
     }
 
-    // --- 8. Command Allocator & Command List ---
-    hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&command_allocator));
-    if (FAILED(hr)) { wxLogError(_("Failed to create command allocator: 0x%08X"), hr); return; }
+    // --- 8. Command Allocators (one per frame slot) & Command List ---
+    for (UINT i = 0; i < FRAME_COUNT; i++) {
+        hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&command_allocators[i]));
+        if (FAILED(hr)) { wxLogError(_("Failed to create command allocator: 0x%08X"), hr); return; }
+    }
 
     hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT,
-        command_allocator.Get(), nullptr,
+        command_allocators[0].Get(), nullptr,
         IID_PPV_ARGS(&command_list));
     if (FAILED(hr)) { wxLogError(_("Failed to create command list: 0x%08X"), hr); return; }
     command_list->Close(); // Close immediately; re-opened each frame
@@ -7934,7 +7937,7 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
         if (FAILED(hr)) { wxLogError(_("Failed to create PSO: 0x%08X"), hr); return; }
     }
 
-    // --- 11. Vertex Buffer (screen-space quad, updated each frame) ---
+    // --- 11. Vertex Buffers (screen-space quad, updated each frame; one per slot) ---
     {
         // 4 vertices x (float4 pos + float2 uv) = 4 x 24 bytes
         const UINT vb_size = 4 * sizeof(float) * 6;
@@ -7948,14 +7951,16 @@ DX12DrawingPanel::DX12DrawingPanel(wxWindow* parent, int _width, int _height)
         res_desc.MipLevels = 1;
         res_desc.SampleDesc.Count = 1;
         res_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-        hr = device->CreateCommittedResource(&heap_props, D3D12_HEAP_FLAG_NONE,
-            &res_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
-            nullptr, IID_PPV_ARGS(&vertex_buffer));
-        if (FAILED(hr)) { wxLogError(_("Failed to create vertex buffer: 0x%08X"), hr); return; }
+        for (UINT i = 0; i < FRAME_COUNT; i++) {
+            hr = device->CreateCommittedResource(&heap_props, D3D12_HEAP_FLAG_NONE,
+                &res_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
+                nullptr, IID_PPV_ARGS(&vertex_buffers[i]));
+            if (FAILED(hr)) { wxLogError(_("Failed to create vertex buffer: 0x%08X"), hr); return; }
 
-        vertex_buffer_view.BufferLocation = vertex_buffer->GetGPUVirtualAddress();
-        vertex_buffer_view.StrideInBytes = sizeof(float) * 6; // xyzw + uv
-        vertex_buffer_view.SizeInBytes = vb_size;
+            vertex_buffer_views[i].BufferLocation = vertex_buffers[i]->GetGPUVirtualAddress();
+            vertex_buffer_views[i].StrideInBytes = sizeof(float) * 6; // xyzw + uv
+            vertex_buffer_views[i].SizeInBytes = vb_size;
+        }
     }
 
     // --- 12. Fence for CPU/GPU synchronization ---
@@ -7984,6 +7989,17 @@ void DX12DrawingPanel::WaitForGPU()
     fence->SetEventOnCompletion(fence_value, fence_event);
     WaitForSingleObject(fence_event, INFINITE);
     ++fence_value;
+}
+
+// Helper: wait until the GPU is done with the last frame that used `slot`
+void DX12DrawingPanel::WaitForFrame(UINT slot)
+{
+    if (!fence || !fence_event) return;
+    const UINT64 value = frame_fence_values[slot];
+    if (value && fence->GetCompletedValue() < value) {
+        fence->SetEventOnCompletion(value, fence_event);
+        WaitForSingleObject(fence_event, INFINITE);
+    }
 }
 
 void DX12DrawingPanel::DrawingPanelInit()
@@ -8040,10 +8056,13 @@ void DX12DrawingPanel::OnSize(wxSizeEvent& ev)
     ev.Skip();
 }
 
-// Helper: upload pixel data to a D3D12 texture via an upload heap
-static ComPtr<ID3D12Resource> UploadTexture(
+// Helper: upload pixel data to a D3D12 texture via an upload heap. `tex` and
+// `upload_heap` are reused when `tex` already has this size and format (the
+// caller makes sure the GPU is done with them); otherwise both are replaced.
+static bool UploadTexture(
     ID3D12Device* device,
     ID3D12GraphicsCommandList* cmd_list,
+    ComPtr<ID3D12Resource>& tex,
     ComPtr<ID3D12Resource>& upload_heap, // kept alive until GPU finishes
     DXGI_FORMAT                format,
     UINT                       tex_w,
@@ -8065,37 +8084,56 @@ static ComPtr<ID3D12Resource> UploadTexture(
     tex_desc.SampleDesc.Count = 1;
     tex_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
-    ComPtr<ID3D12Resource> tex;
-    HRESULT hr = device->CreateCommittedResource(
-        &default_heap, D3D12_HEAP_FLAG_NONE,
-        &tex_desc, D3D12_RESOURCE_STATE_COPY_DEST,
-        nullptr, IID_PPV_ARGS(&tex));
-    if (FAILED(hr)) return nullptr;
+    bool reuse = false;
+    if (tex && upload_heap) {
+        const D3D12_RESOURCE_DESC have = tex->GetDesc();
+        reuse = have.Width == tex_w && have.Height == tex_h && have.Format == format;
+    }
 
-    // --- Upload heap sized for this subresource ---
     D3D12_PLACED_SUBRESOURCE_FOOTPRINT footprint;
     UINT num_rows;
     UINT64 row_size_bytes, total_bytes;
     device->GetCopyableFootprints(&tex_desc, 0, 1, 0,
         &footprint, &num_rows, &row_size_bytes, &total_bytes);
 
-    D3D12_HEAP_PROPERTIES upload_heap_props = {};
-    upload_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+    if (reuse) {
+        // Last frame left it shader-readable.
+        D3D12_RESOURCE_BARRIER to_copy = {};
+        to_copy.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        to_copy.Transition.pResource = tex.Get();
+        to_copy.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        to_copy.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST;
+        to_copy.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+        cmd_list->ResourceBarrier(1, &to_copy);
+    } else {
+        tex.Reset();
+        upload_heap.Reset();
 
-    D3D12_RESOURCE_DESC upload_desc = {};
-    upload_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    upload_desc.Width = total_bytes;
-    upload_desc.Height = 1;
-    upload_desc.DepthOrArraySize = 1;
-    upload_desc.MipLevels = 1;
-    upload_desc.SampleDesc.Count = 1;
-    upload_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+        HRESULT hr = device->CreateCommittedResource(
+            &default_heap, D3D12_HEAP_FLAG_NONE,
+            &tex_desc, D3D12_RESOURCE_STATE_COPY_DEST,
+            nullptr, IID_PPV_ARGS(&tex));
+        if (FAILED(hr)) return false;
 
-    hr = device->CreateCommittedResource(
-        &upload_heap_props, D3D12_HEAP_FLAG_NONE,
-        &upload_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr, IID_PPV_ARGS(&upload_heap));
-    if (FAILED(hr)) return nullptr;
+        // --- Upload heap sized for this subresource ---
+        D3D12_HEAP_PROPERTIES upload_heap_props = {};
+        upload_heap_props.Type = D3D12_HEAP_TYPE_UPLOAD;
+
+        D3D12_RESOURCE_DESC upload_desc = {};
+        upload_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+        upload_desc.Width = total_bytes;
+        upload_desc.Height = 1;
+        upload_desc.DepthOrArraySize = 1;
+        upload_desc.MipLevels = 1;
+        upload_desc.SampleDesc.Count = 1;
+        upload_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+        hr = device->CreateCommittedResource(
+            &upload_heap_props, D3D12_HEAP_FLAG_NONE,
+            &upload_desc, D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr, IID_PPV_ARGS(&upload_heap));
+        if (FAILED(hr)) { tex.Reset(); return false; }
+    }
 
     // --- Map upload heap and copy row by row ---
     uint8_t* mapped = nullptr;
@@ -8129,7 +8167,7 @@ static ComPtr<ID3D12Resource> UploadTexture(
     barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
     cmd_list->ResourceBarrier(1, &barrier);
 
-    return tex;
+    return true;
 }
 
 void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
@@ -8139,9 +8177,13 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
     if (!device || !command_queue || !swap_chain) return;
     if (!did_init) DrawingPanelInit();
 
+    // --- This frame's slot: wait only for the frame that last used it ---
+    const UINT slot = frame_index;
+    WaitForFrame(slot);
+
     // --- Reset command allocator / list for this frame ---
-    command_allocator->Reset();
-    command_list->Reset(command_allocator.Get(), pipeline_state.Get());
+    command_allocators[slot]->Reset();
+    command_list->Reset(command_allocators[slot].Get(), pipeline_state.Get());
 
     // --- Transition back buffer: PRESENT -> RENDER TARGET ---
     D3D12_RESOURCE_BARRIER barrier = {};
@@ -8290,22 +8332,26 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
             }
         }
 
-        // Upload texture (upload_heap kept alive via member until WaitForGPU)
-        texture = UploadTexture(device.Get(), command_list.Get(),
-            upload_heap,
-            tex_fmt,
-            (UINT)scaled_width, (UINT)scaled_height,
-            dst_pixels, (UINT)scaled_width * 4);
-        if (!texture) { wxLogError(_("Texture upload failed")); goto present; }
+        // Upload texture (the slot's upload heap and texture stay alive until
+        // the slot's fence passes)
+        if (!UploadTexture(device.Get(), command_list.Get(),
+                textures[slot], upload_heaps[slot],
+                tex_fmt,
+                (UINT)scaled_width, (UINT)scaled_height,
+                dst_pixels, (UINT)scaled_width * 4)) {
+            wxLogError(_("Texture upload failed"));
+            goto present;
+        }
 
-        // Create / refresh SRV
+        // Create / refresh the slot's SRV
         D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
         srv_desc.Format = tex_fmt;
         srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
         srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
         srv_desc.Texture2D.MipLevels = 1;
-        device->CreateShaderResourceView(texture.Get(), &srv_desc,
-            srv_heap->GetCPUDescriptorHandleForHeapStart());
+        D3D12_CPU_DESCRIPTOR_HANDLE srv_cpu = srv_heap->GetCPUDescriptorHandleForHeapStart();
+        srv_cpu.ptr += (SIZE_T)slot * srv_descriptor_size;
+        device->CreateShaderResourceView(textures[slot].Get(), &srv_desc, srv_cpu);
 
         // ---- Set pipeline state & root signature ----
         command_list->SetGraphicsRootSignature(root_signature.Get());
@@ -8313,8 +8359,9 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
 
         ID3D12DescriptorHeap* heaps[] = { srv_heap.Get() };
         command_list->SetDescriptorHeaps(1, heaps);
-        command_list->SetGraphicsRootDescriptorTable(0,
-            srv_heap->GetGPUDescriptorHandleForHeapStart());
+        D3D12_GPU_DESCRIPTOR_HANDLE srv_gpu = srv_heap->GetGPUDescriptorHandleForHeapStart();
+        srv_gpu.ptr += (UINT64)slot * srv_descriptor_size;
+        command_list->SetGraphicsRootDescriptorTable(0, srv_gpu);
 
         // ---- Viewport & scissor ----
         wxSize client_size = GetClientSize();
@@ -8363,12 +8410,12 @@ void DX12DrawingPanel::DrawArea(wxWindowDC& dc)
 
         // Copy vertices to upload VB
         void* vb_mapped = nullptr;
-        vertex_buffer->Map(0, nullptr, &vb_mapped);
+        vertex_buffers[slot]->Map(0, nullptr, &vb_mapped);
         memcpy(vb_mapped, verts, sizeof(verts));
-        vertex_buffer->Unmap(0, nullptr);
+        vertex_buffers[slot]->Unmap(0, nullptr);
 
         command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        command_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
+        command_list->IASetVertexBuffers(0, 1, &vertex_buffer_views[slot]);
         command_list->DrawInstanced(4, 1, 0, 0);
     }
 
@@ -8386,7 +8433,10 @@ present:
     UINT present_flags = (!OPTION(kPrefVsync)) ? DXGI_PRESENT_ALLOW_TEARING : 0;
     swap_chain->Present(OPTION(kPrefVsync) ? 1 : 0, present_flags);
 
-    WaitForGPU(); // Simple per-frame sync; could be optimised with double-buffered fences
+    // Mark the slot; the next frame to use it waits for this, not the GPU.
+    command_queue->Signal(fence.Get(), fence_value);
+    frame_fence_values[slot] = fence_value;
+    ++fence_value;
     frame_index = swap_chain->GetCurrentBackBufferIndex();
 }
 #endif

@@ -343,6 +343,7 @@ protected:
 
 private:
     void WaitForGPU();
+    void WaitForFrame(UINT slot);
     bool ResizeSwapChain();
 
     bool        hdr_swapchain_ = false;                       // HDR10 PQ swapchain active
@@ -352,21 +353,27 @@ private:
     ComPtr<ID3D12CommandQueue>          command_queue;
     ComPtr<IDXGISwapChain3>             swap_chain;
     ComPtr<ID3D12DescriptorHeap>        rtv_heap;
-    ComPtr<ID3D12DescriptorHeap>        srv_heap;
+    ComPtr<ID3D12DescriptorHeap>        srv_heap;      // one SRV per frame slot
     ComPtr<ID3D12Resource>              render_targets[FRAME_COUNT];
-    ComPtr<ID3D12CommandAllocator>      command_allocator;
     ComPtr<ID3D12GraphicsCommandList>   command_list;
     ComPtr<ID3D12RootSignature>         root_signature;
     ComPtr<ID3D12PipelineState>         pipeline_state;
-    ComPtr<ID3D12Resource>              vertex_buffer;
-    D3D12_VERTEX_BUFFER_VIEW            vertex_buffer_view;
-    ComPtr<ID3D12Resource>              texture;
-    ComPtr<ID3D12Resource>              upload_heap;   // staging, kept alive per-frame
+    // What a frame's commands use, one set per back buffer, so a frame only
+    // waits for the frame that last used its slot rather than for the GPU to
+    // go idle -- which, with other work on the GPU (the DLSS NR model on a
+    // device of its own), costs most of a frame.
+    ComPtr<ID3D12CommandAllocator>      command_allocators[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              vertex_buffers[FRAME_COUNT];
+    D3D12_VERTEX_BUFFER_VIEW            vertex_buffer_views[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              textures[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              upload_heaps[FRAME_COUNT];  // staging
+    UINT64                              frame_fence_values[FRAME_COUNT] = {};
     ComPtr<ID3D12Fence>                 fence;
     UINT64                              fence_value;
     HANDLE                              fence_event;
     UINT                                frame_index;
     UINT                                rtv_descriptor_size;
+    UINT                                srv_descriptor_size = 0;
     int                                 texture_width;
     int                                 texture_height;
     HMODULE                             hD3DCompiler;
