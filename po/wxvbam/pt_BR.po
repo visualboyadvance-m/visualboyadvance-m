@@ -48,7 +48,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-17 00:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Nelson Kerber Hennemann Filho, 2025\n"
+"Last-Translator: Felipefpl, 2022,2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -726,7 +726,7 @@ msgstr "Máscara do Controle:"
 
 #: dialogs/display-config.cpp:1532
 msgid "Not available while DLSS-NR is on."
-msgstr ""
+msgstr "Não está disponível enquanto o DLSS-NR está ligado."
 
 #: dialogs/display-config.cpp:1593 dialogs/display-config.cpp:1981
 #: xrc/DisplayConfigBasic.xrc:187
