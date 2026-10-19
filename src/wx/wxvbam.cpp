@@ -22,6 +22,15 @@
 #ifdef __WXMSW__
 #include <windows.h>
 #include <versionhelpers.h>
+#else
+#include <csignal>
+#include <signal.h>
+
+#ifdef ENABLE_SDL3
+#include <SDL3/SDL_hints.h>
+#else
+#include <SDL_hints.h>
+#endif
 #endif
 
 #ifdef __WXGTK__
@@ -126,6 +135,25 @@ static void vbam_gdk_event_handler(GdkEvent* event, gpointer data) {
 #endif
 
 namespace {
+
+#ifndef __WXMSW__
+// The signal QuitSignalHandler() caught, 0 for none. wxvbamApp's quit signal
+// timer acts on it.
+volatile std::sig_atomic_t g_quit_signal = 0;
+
+// SIGTERM, SIGINT and SIGHUP close the main window as File > Exit does, so the
+// battery save and the settings are written. A handler may do next to nothing, so
+// this only records the signal for the main thread. A second one before then takes
+// the default action, for a quit that has hung.
+extern "C" void QuitSignalHandler(int sig) {
+    if (g_quit_signal) {
+        std::signal(sig, SIG_DFL);
+        std::raise(sig);
+        return;
+    }
+    g_quit_signal = sig;
+}
+#endif
 
 // Resets the accelerator text for `menu_item` to the best keyboard input.
 void ResetMenuItemAccelerator(wxMenuItem* menu_item) {
@@ -268,6 +296,13 @@ int __stdcall WinMain(HINSTANCE hInstance,
 #else  // __WXMSW__
 
 int main(int argc, char** argv) {
+    // SDL catches SIGINT and SIGTERM to post a quit event to its own event loop,
+    // which an SDL program would act on. This one runs wxWidgets', where nothing
+    // reads that event, so the signals did nothing at all. Before anything starts
+    // SDL -- the app's SdlPoller does, as it is made -- so that OnInit() can
+    // install handlers of ours.
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+
 #if defined(__ANDROID__)
     // On Android SDL defines SDL_MAIN_NEEDED, so SDL_Init() refuses to run
     // until the SDL entry point has marked main() as reached. That entry point
@@ -1318,6 +1353,23 @@ bool wxvbamApp::OnInit() {
 #endif  // !defined(__ANDROID__)
 
     frame->Show(true);
+
+#ifndef __WXMSW__
+    // See QuitSignalHandler(). A timer, as idle events stop while no game runs.
+    for (int sig : {SIGTERM, SIGINT, SIGHUP}) {
+        struct sigaction sa = {};
+        sa.sa_handler = QuitSignalHandler;
+        sigemptyset(&sa.sa_mask);
+        sigaction(sig, &sa, nullptr);
+    }
+    quit_signal_timer_.Bind(wxEVT_TIMER, [this](wxTimerEvent&) {
+        if (g_quit_signal && frame) {
+            quit_signal_timer_.Stop();
+            frame->Close(false);
+        }
+    });
+    quit_signal_timer_.Start(250);
+#endif
 
     // Windows can render the taskbar icon late if this is done in MainFrame
     // It may also not update at all until the Window has been minimized/restored

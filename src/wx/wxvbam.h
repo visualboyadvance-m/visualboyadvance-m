@@ -208,6 +208,10 @@ private:
     widgets::SdlPoller sdl_poller_;
     widgets::KeyboardInputHandler keyboard_input_handler_;
 
+    // Closes the main window when a quit signal came (QuitSignalHandler(),
+    // wxvbam.cpp). Unused on Windows, which has none.
+    wxTimer quit_signal_timer_;
+
     // Main configuration file.
     wxFileName config_file_;
 
