@@ -188,6 +188,21 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
 void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int rows,
                      uint16_t* dst, int dst_stride);
 
+// The transfer EncodePQ10() or EncodeScRGBFp16() applies under the current settings,
+// as numbers, for an encoder on the GPU: the Metal panel's hdrEncodeScRGB kernel
+// (AAPLShaders.metal), which declares the same layout.
+struct GpuTransfer {
+    float lin[256];          // 8-bit code -> linear
+    float m[3][4];           // input -> target primaries by rows; identity for none
+    float luma[4];           // luminance weights in the target primaries
+    float ref, peak, knee, shadow_contrast;
+    float floor_nits;        // the black floor at the pivot; 0 for none
+    float ramp_top;          // the largest channel at which the floor is all in
+    float white;             // the nits that encode as 1.0
+    float pad;
+};
+GpuTransfer GpuTransferParams(Encoding encoding);
+
 }  // namespace hdr
 
 #endif  // VBAM_WX_HDR_H_

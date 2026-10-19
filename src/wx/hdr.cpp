@@ -607,4 +607,39 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
     });
 }
 
+GpuTransfer GpuTransferParams(Encoding encoding) {
+    GpuTransfer t = {};
+    std::memcpy(t.lin, g_lin_lut, sizeof(t.lin));
+
+    // As the encoders pick them.
+    const float (*m)[3] = nullptr;
+    const float* lw = nullptr;
+    if (encoding == Encoding::kPQ10) {
+        if (!g_settings.input_is_rec2020)
+            m = kRec709ToRec2020;
+        lw = kLumaRec2020;
+    } else {
+        if (g_settings.scrgb_target_p3)
+            m = g_settings.input_is_rec2020 ? kRec2020ToDisplayP3 : kRec709ToDisplayP3;
+        else if (g_settings.input_is_rec2020)
+            m = kRec2020ToRec709;
+        lw = g_settings.scrgb_target_p3 ? kLumaP3 : kLumaRec709;
+    }
+    for (int r = 0; r < 3; ++r) {
+        for (int c = 0; c < 3; ++c)
+            t.m[r][c] = m ? m[r][c] : (r == c ? 1.0f : 0.0f);
+        t.luma[r] = lw[r];
+    }
+
+    // As LumScale() derives them.
+    t.ref = g_settings.sdr_reference_nits;
+    t.peak = std::max(t.ref, g_settings.peak_nits);
+    t.knee = std::max(0.0f, std::min(1.0f, g_settings.highlight_knee));
+    t.shadow_contrast = g_settings.shadow_contrast;
+    t.floor_nits = ShadowFloor(t.ref * (t.knee > 0.0f ? t.knee : 1.0f));
+    t.ramp_top = g_lin_lut[8];
+    t.white = g_settings.scrgb_white_nits > 0.0f ? g_settings.scrgb_white_nits : 80.0f;
+    return t;
+}
+
 }  // namespace hdr

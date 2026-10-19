@@ -489,6 +489,10 @@ MetalDrawingPanel::~MetalDrawingPanel()
             [_pipelineState release];
             _pipelineState = nil;
         }
+        if (_hdrEncodePipeline != nil) {
+            [_hdrEncodePipeline release];
+            _hdrEncodePipeline = nil;
+        }
 
         if (_commandQueue != nil) {
             [_commandQueue release];
@@ -641,6 +645,14 @@ void MetalDrawingPanel::CreateMetalView()
             return;
         }
 
+        // Without it HDR is encoded on the CPU.
+        id<MTLFunction> hdrFunction = [defaultLibrary newFunctionWithName:@"hdrEncodeScRGB"];
+        if (hdrFunction != nil) {
+            _hdrEncodePipeline = [_device newComputePipelineStateWithFunction:hdrFunction
+                                                                        error:&error];
+            [hdrFunction release];
+        }
+
         // Release temporary objects
         [pipelineStateDescriptor release];
         [fragmentFunction release];
@@ -712,6 +724,7 @@ void MetalDrawingPanel::DrawingPanelInit()
     _device = nil;
     _commandQueue = nil;
     _pipelineState = nil;
+    _hdrEncodePipeline = nil;
     _texture = nil;
     _vertices = nil;
     _sampler = nil;
@@ -731,11 +744,14 @@ void MetalDrawingPanel::DrawingPanelInit()
 }
 
 
-id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger bytesPerRow)
+id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger bytesPerRow,
+                                                        bool hdr_encode)
 {
     // Create a new texture each frame to avoid GPU synchronization issues
     MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
-    textureDescriptor.pixelFormat = metalView.colorPixelFormat;
+    // The HDR encode takes the 8-bit frame and writes the layer's format itself.
+    textureDescriptor.pixelFormat =
+        hdr_encode ? MTLPixelFormatRGBA8Unorm : metalView.colorPixelFormat;
     textureDescriptor.usage = MTLTextureUsageShaderRead;
     textureDescriptor.width = width * scale;
     textureDescriptor.height = height * scale;
@@ -751,8 +767,11 @@ id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger b
         {(NSUInteger)(width * scale), (NSUInteger)(height * scale), 1} // MTLSize
     };
 
+    id<MTLTexture> texture = nil;
+    id<MTLCommandBuffer> commandBuffer = nil;
+
     if (unified) {
-        id<MTLTexture> texture = [_device newTextureWithDescriptor:textureDescriptor];
+        texture = [_device newTextureWithDescriptor:textureDescriptor];
         [textureDescriptor release];
 
         // Upload pixel data to the new texture
@@ -761,56 +780,89 @@ id<MTLTexture> MetalDrawingPanel::CreateTextureWithData(void *data, NSUInteger b
                       withBytes:data
                     bytesPerRow:bytesPerRow];
 
-        return texture;
-    }
+        if (!hdr_encode)
+            return texture;
+        commandBuffer = [_commandQueue commandBuffer];
+        commandBuffer.label = @"VBAMUpload";
+    } else {
+        // With memory of its own the GPU gets the frame by a blit from a staging buffer.
+        // replaceRegion copied it to video memory while the emulation thread waited: a
+        // 2160x1440 frame (xBRZ 9x) took 7-11 ms over the Thunderbolt link of an eGPU,
+        // and the game ran at 53 fps. The copy into the buffer takes under 2 ms, and the
+        // blit runs ahead of the frame's render on the same queue.
+        textureDescriptor.storageMode = MTLStorageModePrivate;
+        texture = [_device newTextureWithDescriptor:textureDescriptor];
+        [textureDescriptor release];
 
-    // With memory of its own the GPU gets the frame by a blit from a staging buffer.
-    // replaceRegion copied it to video memory while the emulation thread waited: a
-    // 2160x1440 frame (xBRZ 9x) took 7-11 ms over the Thunderbolt link of an eGPU,
-    // and the game ran at 53 fps. The copy into the buffer takes under 2 ms, and the
-    // blit runs ahead of the frame's render on the same queue.
-    textureDescriptor.storageMode = MTLStorageModePrivate;
-    id<MTLTexture> texture = [_device newTextureWithDescriptor:textureDescriptor];
-    [textureDescriptor release];
-
-    const NSUInteger size = bytesPerRow * region.size.height;
-    id<MTLBuffer> staging = nil;
-    {
-        std::lock_guard<std::mutex> lock(staging_->mutex);
-        while (staging == nil && !staging_->free.empty()) {
-            id<MTLBuffer> b = staging_->free.back();
-            staging_->free.pop_back();
-            if (b.length >= size)
-                staging = b;
-            else
-                [b release];         // made for a smaller frame
+        const NSUInteger size = bytesPerRow * region.size.height;
+        id<MTLBuffer> staging = nil;
+        {
+            std::lock_guard<std::mutex> lock(staging_->mutex);
+            while (staging == nil && !staging_->free.empty()) {
+                id<MTLBuffer> b = staging_->free.back();
+                staging_->free.pop_back();
+                if (b.length >= size)
+                    staging = b;
+                else
+                    [b release];         // made for a smaller frame
+            }
         }
+        if (staging == nil)
+            staging = [_device newBufferWithLength:size
+                                           options:MTLResourceStorageModeShared |
+                                                   MTLResourceCPUCacheModeWriteCombined];
+        memcpy(staging.contents, data, size);
+
+        commandBuffer = [_commandQueue commandBuffer];
+        commandBuffer.label = @"VBAMUpload";
+        id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
+        [blit copyFromBuffer:staging
+                sourceOffset:0
+           sourceBytesPerRow:bytesPerRow
+         sourceBytesPerImage:size
+                  sourceSize:region.size
+                   toTexture:texture
+            destinationSlice:0
+            destinationLevel:0
+           destinationOrigin:region.origin];
+        [blit endEncoding];
+
+        std::shared_ptr<StagingPool> pool = staging_;
+        [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer>) {
+            std::lock_guard<std::mutex> lock(pool->mutex);
+            pool->free.push_back(staging);   // the reference passes to the pool
+        }];
     }
-    if (staging == nil)
-        staging = [_device newBufferWithLength:size
-                                       options:MTLResourceStorageModeShared |
-                                               MTLResourceCPUCacheModeWriteCombined];
-    memcpy(staging.contents, data, size);
 
-    id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-    commandBuffer.label = @"VBAMUpload";
-    id<MTLBlitCommandEncoder> blit = [commandBuffer blitCommandEncoder];
-    [blit copyFromBuffer:staging
-            sourceOffset:0
-       sourceBytesPerRow:bytesPerRow
-     sourceBytesPerImage:size
-              sourceSize:region.size
-               toTexture:texture
-        destinationSlice:0
-        destinationLevel:0
-       destinationOrigin:region.origin];
-    [blit endEncoding];
+    if (hdr_encode) {
+        // hdr::EncodeScRGBFp16() on the GPU. The frame crosses to it at 4 bytes a
+        // pixel instead of 8, and the CPU does none of the encode: at xBRZ 9x on an
+        // eGPU that took 13-16 ms of CPU a frame, the fp16 frame 15 ms of the
+        // Thunderbolt link, and the game ran at about 42 fps.
+        MTLTextureDescriptor* encodedDescriptor =
+            [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatRGBA16Float
+                                                               width:region.size.width
+                                                              height:region.size.height
+                                                           mipmapped:NO];
+        encodedDescriptor.storageMode = MTLStorageModePrivate;
+        encodedDescriptor.usage = MTLTextureUsageShaderRead | MTLTextureUsageShaderWrite;
+        id<MTLTexture> encoded = [_device newTextureWithDescriptor:encodedDescriptor];
 
-    std::shared_ptr<StagingPool> pool = staging_;
-    [commandBuffer addCompletedHandler:^(id<MTLCommandBuffer>) {
-        std::lock_guard<std::mutex> lock(pool->mutex);
-        pool->free.push_back(staging);   // the reference passes to the pool
-    }];
+        const hdr::GpuTransfer transfer = hdr::GpuTransferParams(hdr::Encoding::kScRGBFp16);
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setComputePipelineState:_hdrEncodePipeline];
+        [encoder setTexture:texture atIndex:0];
+        [encoder setTexture:encoded atIndex:1];
+        [encoder setBytes:&transfer length:sizeof(transfer) atIndex:0];
+        [encoder dispatchThreadgroups:MTLSizeMake((region.size.width + 15) / 16,
+                                                  (region.size.height + 15) / 16, 1)
+                threadsPerThreadgroup:MTLSizeMake(16, 16, 1)];
+        [encoder endEncoding];
+
+        [texture release];       // the command buffer keeps it until the kernel has run
+        texture = encoded;
+    }
+
     [commandBuffer commit];
 
     return texture;
@@ -1010,6 +1062,12 @@ void MetalDrawingPanel::DrawArea()
                 [_texture release];
             }
             _texture = CreateTextureWithData(_conversion_buffer, (width * scale) * 4);
+        } else if (HdrActive() && metal_is_hdr_ && panel_color_depth_ == 32 &&
+                   _hdrEncodePipeline != nil) {
+            if (_texture != nil) {
+                [_texture release];
+            }
+            _texture = CreateTextureWithData(todraw + srcPitch, srcPitch, true);
         } else if (HdrActive() && metal_is_hdr_ && panel_color_depth_ == 32) {
             // HDR: encode the corrected RGBA8 image to linear scRGB fp16
             // (8 bytes/pixel) matching the RGBA16Float EDR layer.

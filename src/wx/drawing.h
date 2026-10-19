@@ -540,7 +540,8 @@ protected:
 #ifdef __OBJC__
 private:
     void CreateMetalView();
-    id<MTLTexture> CreateTextureWithData(void *data, NSUInteger bytesPerRow);
+    id<MTLTexture> CreateTextureWithData(void *data, NSUInteger bytesPerRow,
+                                         bool hdr_encode = false);
 
     NSView *view;
     MTKView *metalView;
@@ -548,6 +549,7 @@ private:
     id<MTLDevice> _device;
     id<MTLCommandQueue> _commandQueue;
     id<MTLRenderPipelineState> _pipelineState;
+    id<MTLComputePipelineState> _hdrEncodePipeline;   // nil: encode HDR on the CPU
     id<MTLTexture> _texture;
     id<MTLBuffer> _vertices;
     id<MTLSamplerState> _sampler;
