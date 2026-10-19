@@ -689,7 +689,7 @@ msgstr "Керівна маска:"
 
 #: dialogs/display-config.cpp:1532
 msgid "Not available while DLSS-NR is on."
-msgstr ""
+msgstr "Недоступно при увімкненому DLSS NR."
 
 #: dialogs/display-config.cpp:1593 dialogs/display-config.cpp:1981
 #: xrc/DisplayConfigBasic.xrc:187
