@@ -479,8 +479,10 @@ void VbamRemoveSdlMetalViews();
 #include <simd/simd.h>
 #include <condition_variable>
 #include <deque>
+#include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 typedef enum AAPLVertexInputIndex
 {
@@ -554,6 +556,16 @@ private:
     vector_uint2 _contentSize;
     uint32_t *_conversion_buffer;
     size_t _conversion_buffer_size;
+
+    // Buffers a frame is copied into for the GPU to fetch, on a GPU with memory of its
+    // own (CreateTextureWithData). A blit hands one back when it completes; the pool is
+    // shared with those blits, so one completing after the panel is gone still has it.
+    struct StagingPool {
+        std::mutex mutex;
+        std::vector<id<MTLBuffer>> free;     // retained
+        ~StagingPool() { for (id<MTLBuffer> b : free) [b release]; }
+    };
+    std::shared_ptr<StagingPool> staging_;
 
     // A thread of its own presents the frames (PresentLoop), so the emulation thread
     // never waits on a drawable. With vsync off a drawable comes back only when the
