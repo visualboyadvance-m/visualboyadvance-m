@@ -346,6 +346,20 @@ private:
     void WaitForFrame(UINT slot);
     bool ResizeSwapChain();
 
+    // HDR encode on the GPU: hdr::EncodePQ10() as a compute shader
+    // (g_HdrEncodeShaderSrc). The frame goes up as it is, RGBA8, into the slot's
+    // hdr_src_textures; the shader writes PQ into its hdr_out_textures, which the
+    // quad samples. With no pipeline (no typed UAV store of R10G10B10A2) the CPU
+    // encodes, as before.
+    bool PrepareHdrEncode(UINT slot, UINT tex_w, UINT tex_h);
+    ComPtr<ID3D12RootSignature>         hdr_root_signature;
+    ComPtr<ID3D12PipelineState>         hdr_pipeline_state;
+    ComPtr<ID3D12Resource>              hdr_src_textures[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              hdr_src_uploads[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              hdr_out_textures[FRAME_COUNT];
+    ComPtr<ID3D12Resource>              hdr_transfer;     // hdr::GpuTransfer + PQ LUT
+    std::vector<uint8_t>                hdr_transfer_last;  // what hdr_transfer holds
+
     bool        hdr_swapchain_ = false;                       // HDR10 PQ swapchain active
     DXGI_FORMAT rt_format_      = DXGI_FORMAT_B8G8R8A8_UNORM;  // back-buffer / RTV format
 
@@ -353,7 +367,7 @@ private:
     ComPtr<ID3D12CommandQueue>          command_queue;
     ComPtr<IDXGISwapChain3>             swap_chain;
     ComPtr<ID3D12DescriptorHeap>        rtv_heap;
-    ComPtr<ID3D12DescriptorHeap>        srv_heap;      // one SRV per frame slot
+    ComPtr<ID3D12DescriptorHeap>        srv_heap;      // per frame slot: the quad's SRV, then the HDR encode's three
     ComPtr<ID3D12Resource>              render_targets[FRAME_COUNT];
     ComPtr<ID3D12GraphicsCommandList>   command_list;
     ComPtr<ID3D12RootSignature>         root_signature;
@@ -741,6 +755,30 @@ private:
     void DestroyTexture();
     bool CreateDescriptorPoolAndSet();
  
+    // ── HDR encode on the GPU ────────────────────────────────────────────────
+    // hdr::EncodePQ10() / EncodeScRGBFp16() as a compute shader (kHdrEncodeSpv).
+    // The frame goes up as it is, RGBA8, in the staging buffer; the shader writes
+    // the encoded pixels to hdr_out_buffer_, and the texture is copied from that
+    // instead. With no pipeline (a graphics queue without compute) the CPU
+    // encodes, as before.
+    bool CreateHdrEncoder();
+    void DestroyHdrEncoder();
+    // Readies the buffers and the transfer for the encode of the frame in `slot`;
+    // false to encode on the CPU instead.
+    bool PrepareHdrEncode(hdr::Encoding encoding, VkDeviceSize out_size, int slot);
+    // Waits for our queues, for when a buffer the frames in flight use changes.
+    void WaitQueuesIdle();
+    VkDescriptorSetLayout hdr_set_layout_      = VK_NULL_HANDLE;
+    VkPipelineLayout      hdr_pipeline_layout_ = VK_NULL_HANDLE;
+    VkPipeline            hdr_pipeline_        = VK_NULL_HANDLE;
+    VkDescriptorPool      hdr_pool_            = VK_NULL_HANDLE;
+    VkBuffer              hdr_out_buffer_      = VK_NULL_HANDLE;   // device local
+    VkDeviceMemory        hdr_out_memory_      = VK_NULL_HANDLE;
+    VkDeviceSize          hdr_out_size_        = 0;
+    VkBuffer              hdr_transfer_buffer_ = VK_NULL_HANDLE;   // hdr::GpuTransfer + PQ LUT
+    VkDeviceMemory        hdr_transfer_memory_ = VK_NULL_HANDLE;
+    void*                 hdr_transfer_mapped_ = nullptr;
+    std::vector<uint8_t>  hdr_transfer_last_;  // what hdr_transfer_buffer_ holds
     // ── Upload helpers ───────────────────────────────────────────────────────
     bool UploadPixels(const uint8_t* src_pixels,
                       uint32_t      src_pitch_bytes,
@@ -826,10 +864,17 @@ private:
     VkSampler      tex_sampler_      = VK_NULL_HANDLE;
     VkFormat       tex_format_       = VK_FORMAT_UNDEFINED;
  
-    // Staging buffer (CPU-writable, uploaded each frame)
-    VkBuffer       staging_buffer_   = VK_NULL_HANDLE;
-    VkDeviceMemory staging_memory_   = VK_NULL_HANDLE;
+    // Staging buffers (CPU-writable, uploaded each frame), one a frame in flight:
+    // the CPU fills the frame's own while the GPU may still be copying out of the
+    // other's. staging_size_ is each one's.
+    VkBuffer       staging_buffer_[MAX_FRAMES_IN_FLIGHT] = {};
+    VkDeviceMemory staging_memory_[MAX_FRAMES_IN_FLIGHT] = {};
     VkDeviceSize   staging_size_     = 0;
+    // The HDR encoder's descriptor sets, one a frame in flight as its staging
+    // buffer is, and the buffers each one points at.
+    VkDescriptorSet hdr_set_[MAX_FRAMES_IN_FLIGHT] = {};
+    VkBuffer        hdr_bound_staging_[MAX_FRAMES_IN_FLIGHT] = {};
+    VkBuffer        hdr_bound_out_[MAX_FRAMES_IN_FLIGHT] = {};
 
 #if defined(__WXQT__) && defined(__ANDROID__)
     // ── On-screen controller overlay ─────────────────────────────────────────
@@ -892,6 +937,8 @@ private:
     // Stored as static constexpr uint32_t arrays at the bottom of the .cpp.
     static const uint32_t kVertSpv[];
     static const size_t   kVertSpvSize;
+    static const uint32_t kHdrEncodeSpv[];
+    static const size_t   kHdrEncodeSpvSize;
     static const uint32_t kFragSpv[];
     static const size_t   kFragSpvSize;
 };

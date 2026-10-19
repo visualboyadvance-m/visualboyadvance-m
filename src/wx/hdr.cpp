@@ -642,4 +642,10 @@ GpuTransfer GpuTransferParams(Encoding encoding) {
     return t;
 }
 
+static_assert(kPqLutEntries == kPqLutSize + 1, "the PQ LUT's size as hdr.h gives it");
+
+const uint16_t* PqLut() {
+    return g_pq_lut;
+}
+
 }  // namespace hdr

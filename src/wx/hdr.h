@@ -190,7 +190,8 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
 
 // The transfer EncodePQ10() or EncodeScRGBFp16() applies under the current settings,
 // as numbers, for an encoder on the GPU: the Metal panel's hdrEncodeScRGB kernel
-// (AAPLShaders.metal), which declares the same layout.
+// (AAPLShaders.metal) and the Vulkan panel's compute shader (panel.cpp), which
+// declare the same layout.
 struct GpuTransfer {
     float lin[256];          // 8-bit code -> linear
     float m[3][4];           // input -> target primaries by rows; identity for none
@@ -202,6 +203,11 @@ struct GpuTransfer {
     float pad;
 };
 GpuTransfer GpuTransferParams(Encoding encoding);
+
+// EncodePQ10()'s nits -> 10-bit code table: kPqLutEntries codes for 0..10000 nits
+// in even steps, for a GPU encoder to look up as it does.
+constexpr int kPqLutEntries = 4097;
+const uint16_t* PqLut();
 
 }  // namespace hdr
 
