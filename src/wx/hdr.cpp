@@ -32,6 +32,10 @@ bool g_window_on_hdr = true;
 // 8-bit gamma-2.2 input -> linear [0,1].
 float g_lin_lut[256];
 
+// DitherLin() by Bayer threshold, a row of codes for each of the 64: one lookup a
+// channel in the encoders instead of two and the arithmetic. Built by Configure().
+float g_dither_lin[64][256];
+
 // PQ transfer LUT indexed by normalized luminance (nits/10000) in [0,1] ->
 // 10-bit PQ code. Applied per channel after the luminance boost.
 constexpr int kPqLutSize = 4096;
@@ -184,41 +188,48 @@ float LumScale(float L, float top_channel) {
     return out_nits / L;  // L > knee > 0, so safe
 }
 
-// IEEE-754 binary16 encode of a finite float. Handles the small magnitudes and
-// the >1.0 / negative values scRGB produces.
-uint16_t FloatToHalf(float f) {
+// IEEE-754 binary16 encode of a float, truncating. Handles the small magnitudes and
+// the >1.0 / negative values scRGB produces. Without a branch, so the loops that
+// convert a run of values with it vectorize (SSE2, AVX, NEON): at a branch a
+// pixel and channel it was most of the scRGB encode.
+inline uint16_t FloatToHalf(float f) {
     uint32_t x;
     std::memcpy(&x, &f, sizeof(x));
     const uint32_t sign = (x >> 16) & 0x8000u;
-    int32_t exp = static_cast<int32_t>((x >> 23) & 0xff) - 127 + 15;
-    const uint32_t mant = x & 0x7fffffu;
+    const uint32_t ax = x & 0x7fffffffu;
+    const uint32_t e8 = ax >> 23;
+    float af;
+    std::memcpy(&af, &ax, sizeof(af));
 
-    if (((x >> 23) & 0xff) == 0xff) {
-        // Inf / NaN.
-        return static_cast<uint16_t>(sign | 0x7c00u | (mant ? 0x200u : 0u));
-    }
-    if (exp >= 0x1f) {
-        // Overflow -> Inf.
-        return static_cast<uint16_t>(sign | 0x7c00u);
-    }
-    if (exp <= 0) {
-        if (exp < -10)
-            return static_cast<uint16_t>(sign);  // Underflow -> +-0.
-        // Subnormal half.
-        const uint32_t m = (mant | 0x800000u) >> (1 - exp);
-        return static_cast<uint16_t>(sign | (m >> 13));
-    }
-    return static_cast<uint16_t>(sign | (static_cast<uint32_t>(exp) << 10) |
-                                 (mant >> 13));
+    // A normal half: the exponent rebiased from 127 to 15, 13 bits of mantissa
+    // dropped.
+    const uint32_t normal = (ax >> 13) - (112u << 10);
+    // A subnormal half, or zero below it: the magnitude in units of 2^-24, cut
+    // to an integer -- what shifting the mantissa down gives. Kept below 2^24 so
+    // the conversion is defined where the lane is not used.
+    const float sub_f = (af < 1.0f ? af : 1.0f) * 16777216.0f;
+    const uint32_t sub = static_cast<uint32_t>(static_cast<int32_t>(sub_f));
+
+    uint32_t h = e8 <= 112 ? sub : normal;
+    h = e8 >= 143 ? 0x7c00u : h;                                // overflow -> Inf
+    h = e8 == 255 && (ax & 0x7fffffu) ? 0x7e00u : h;            // NaN
+    return static_cast<uint16_t>(sign | h);
 }
 
 }  // namespace
+
+static float DitherLin(int v, float d);
 
 void Configure(const Settings& s) {
     g_settings = s;
     g_generation.fetch_add(1, std::memory_order_relaxed);
     for (int v = 0; v < 256; ++v)
         g_lin_lut[v] = std::pow(v / 255.0f, kSourceGamma);
+    for (int t = 0; t < 64; ++t) {
+        const float d = (kBayer8[t] + 0.5f) * (1.0f / 64.0f);
+        for (int v = 0; v < 256; ++v)
+            g_dither_lin[t][v] = DitherLin(v, d);
+    }
     for (int i = 0; i <= kPqLutSize; ++i) {
         const float code = PqOetf(static_cast<float>(i) / kPqLutSize);
         g_pq_lut[i] = static_cast<uint16_t>(
@@ -273,7 +284,7 @@ static inline uint32_t PackA2B10G10R10(uint32_t r, uint32_t g, uint32_t b) {
 // floor, so a black area came out as a Bayer grid of 0 and floor nits. Code 0
 // stays exactly 0, and the floor starts at code 1. Code 1's half step reaches
 // below 0 too, so the result is clamped there.
-static inline float DitherLin(int v, float d) {
+static float DitherLin(int v, float d) {
     if (v == 0)
         return 0.0f;
     const float lo = g_lin_lut[v];
@@ -318,6 +329,7 @@ public:
             std::memset(keys_.get(), 0, sizeof(uint32_t) * kEntries);
             generation_ = gen;
         }
+        last_key_ = 0;
     }
 
     float Get(const uint8_t* sp, const float (*m)[3], const float* lw) {
@@ -325,12 +337,16 @@ public:
         const uint32_t key =
             (static_cast<uint32_t>(sp[0]) | (static_cast<uint32_t>(sp[1]) << 8) |
              (static_cast<uint32_t>(sp[2]) << 16)) + 1;
+        // A filtered frame has long runs of one colour.
+        if (key == last_key_)
+            return last_scale_;
+        last_key_ = key;
         const uint32_t i = (key * 2654435761u) >> (32 - kBits);
         if (keys_[i] != key) {
             keys_[i] = key;
             scales_[i] = PixelScale(sp, m, lw);
         }
-        return scales_[i];
+        return last_scale_ = scales_[i];
     }
 
 private:
@@ -339,14 +355,18 @@ private:
     std::unique_ptr<uint32_t[]> keys_;
     std::unique_ptr<float[]> scales_;
     unsigned generation_ = 0;
+    uint32_t last_key_ = 0;
+    float last_scale_ = 0.0f;
 };
 
-// nits -> 10-bit PQ code via the precomputed LUT (nits clamped to 0..10000).
-static inline uint32_t PqCode(float nits) {
-    int idx = static_cast<int>(nits * (kPqLutSize / 10000.0f) + 0.5f);
-    if (idx < 0) idx = 0;
-    if (idx > kPqLutSize) idx = kPqLutSize;
-    return g_pq_lut[idx];
+// nits -> the index of its 10-bit PQ code in the precomputed LUT (nits clamped to
+// 0..10000). Clamped before the conversion to int, which has no branch to vectorize
+// around and is defined for any nits.
+static inline int PqIndex(float nits) {
+    float f = nits * (kPqLutSize / 10000.0f) + 0.5f;
+    f = f > 0.0f ? f : 0.0f;
+    f = f < static_cast<float>(kPqLutSize) ? f : static_cast<float>(kPqLutSize);
+    return static_cast<int>(f);
 }
 
 #ifndef __APPLE__
@@ -468,26 +488,51 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
     // Output is BT.2020 PQ. Convert Rec.709/sRGB input to BT.2020 in linear
     // light first; then a luminance-based boost (hue-preserving) and PQ encode.
     const bool convert = !g_settings.input_is_rec2020;
+    const float (*m)[3] = convert ? kRec709ToRec2020 : nullptr;
     ForRowBands(rows, [&](int y_begin, int y_end) {
     thread_local ScaleCache cache;
     cache.Begin();
+    // By blocks, as EncodeScRGBFp16(): the lookups a pixel at a time, the
+    // arithmetic over the block.
+    constexpr int kBlock = 32;
+    float lr[kBlock], lg[kBlock], lb[kBlock], ls[kBlock];
+    int ir[kBlock], ig[kBlock], ib[kBlock];
     for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint32_t* dp = reinterpret_cast<uint32_t*>(
             reinterpret_cast<uint8_t*>(dst) + static_cast<size_t>(y) * dst_stride);
-        for (int x = 0; x < row_pixels; ++x, sp += 4) {
-            const float d = (kBayer8[(y & 7) * 8 + (x & 7)] + 0.5f) * (1.0f / 64.0f);
-            float r = DitherLin(sp[0], d);
-            float g = DitherLin(sp[1], d);
-            float b = DitherLin(sp[2], d);
-            if (convert) {
-                const float nr = kRec709ToRec2020[0][0] * r + kRec709ToRec2020[0][1] * g + kRec709ToRec2020[0][2] * b;
-                const float ng = kRec709ToRec2020[1][0] * r + kRec709ToRec2020[1][1] * g + kRec709ToRec2020[1][2] * b;
-                const float nb = kRec709ToRec2020[2][0] * r + kRec709ToRec2020[2][1] * g + kRec709ToRec2020[2][2] * b;
-                r = nr; g = ng; b = nb;
+        const float (*dither)[256] = g_dither_lin + (y & 7) * 8;
+        for (int x0 = 0; x0 < row_pixels; x0 += kBlock) {
+            const int n = std::min(kBlock, row_pixels - x0);
+
+            for (int i = 0; i < n; ++i, sp += 4) {
+                const float* dl = dither[(x0 + i) & 7];
+                lr[i] = dl[sp[0]];
+                lg[i] = dl[sp[1]];
+                lb[i] = dl[sp[2]];
+                ls[i] = cache.Get(sp, m, kLumaRec2020);
             }
-            const float s = cache.Get(sp, convert ? kRec709ToRec2020 : nullptr, kLumaRec2020);
-            dp[x] = PackA2B10G10R10(PqCode(r * s), PqCode(g * s), PqCode(b * s));
+
+            if (m) {
+                const float m00 = m[0][0], m01 = m[0][1], m02 = m[0][2];
+                const float m10 = m[1][0], m11 = m[1][1], m12 = m[1][2];
+                const float m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
+                for (int i = 0; i < n; ++i) {
+                    const float r = lr[i], g = lg[i], b = lb[i];
+                    lr[i] = m00 * r + m01 * g + m02 * b;
+                    lg[i] = m10 * r + m11 * g + m12 * b;
+                    lb[i] = m20 * r + m21 * g + m22 * b;
+                }
+            }
+
+            for (int i = 0; i < n; ++i) {
+                ir[i] = PqIndex(lr[i] * ls[i]);
+                ig[i] = PqIndex(lg[i] * ls[i]);
+                ib[i] = PqIndex(lb[i] * ls[i]);
+            }
+
+            for (int i = 0; i < n; ++i)
+                dp[x0 + i] = PackA2B10G10R10(g_pq_lut[ir[i]], g_pq_lut[ig[i]], g_pq_lut[ib[i]]);
         }
     }
     });
@@ -510,30 +555,53 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
     ForRowBands(rows, [&](int y_begin, int y_end) {
     thread_local ScaleCache cache;
     cache.Begin();
+    // A block of pixels at a time: the lookups a pixel at a time, then the
+    // arithmetic and the conversion to halves over the whole block, which
+    // vectorize. The same operations in the same order, so the same output.
+    constexpr int kBlock = 32;
+    float lr[kBlock], lg[kBlock], lb[kBlock], ls[kBlock];
+    float px[kBlock * 4];
     for (int y = y_begin; y < y_end; ++y) {
         const uint8_t* sp = src + static_cast<size_t>(y) * src_stride;
         uint16_t* dp = reinterpret_cast<uint16_t*>(
             reinterpret_cast<uint8_t*>(dst) + static_cast<size_t>(y) * dst_stride);
-        for (int x = 0; x < row_pixels; ++x, sp += 4) {
-            // Dithered linearize, then convert to the target primaries.
-            const float d = (kBayer8[(y & 7) * 8 + (x & 7)] + 0.5f) * (1.0f / 64.0f);
-            float r = DitherLin(sp[0], d);
-            float g = DitherLin(sp[1], d);
-            float b = DitherLin(sp[2], d);
+        const float (*dither)[256] = g_dither_lin + (y & 7) * 8;
+        for (int x0 = 0; x0 < row_pixels; x0 += kBlock) {
+            const int n = std::min(kBlock, row_pixels - x0);
+
+            // Dithered linearize, and the scale from the undithered pixel.
+            for (int i = 0; i < n; ++i, sp += 4) {
+                const float* dl = dither[(x0 + i) & 7];
+                lr[i] = dl[sp[0]];
+                lg[i] = dl[sp[1]];
+                lb[i] = dl[sp[2]];
+                ls[i] = cache.Get(sp, m, lw);
+            }
+
+            // Convert to the target primaries.
             if (m) {
-                const float nr = m[0][0] * r + m[0][1] * g + m[0][2] * b;
-                const float ng = m[1][0] * r + m[1][1] * g + m[1][2] * b;
-                const float nb = m[2][0] * r + m[2][1] * g + m[2][2] * b;
-                r = nr; g = ng; b = nb;
+                const float m00 = m[0][0], m01 = m[0][1], m02 = m[0][2];
+                const float m10 = m[1][0], m11 = m[1][1], m12 = m[1][2];
+                const float m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
+                for (int i = 0; i < n; ++i) {
+                    const float r = lr[i], g = lg[i], b = lb[i];
+                    lr[i] = m00 * r + m01 * g + m02 * b;
+                    lg[i] = m10 * r + m11 * g + m12 * b;
+                    lb[i] = m20 * r + m21 * g + m22 * b;
+                }
             }
 
             // Hue-preserving luminance boost -> nits, then scRGB (1.0 == white).
-            const float s = cache.Get(sp, m, lw);
-            uint16_t* px = dp + static_cast<size_t>(x) * 4;
-            px[0] = FloatToHalf(r * s / white);
-            px[1] = FloatToHalf(g * s / white);
-            px[2] = FloatToHalf(b * s / white);
-            px[3] = FloatToHalf(1.0f);
+            for (int i = 0; i < n; ++i) {
+                px[i * 4 + 0] = lr[i] * ls[i] / white;
+                px[i * 4 + 1] = lg[i] * ls[i] / white;
+                px[i * 4 + 2] = lb[i] * ls[i] / white;
+                px[i * 4 + 3] = 1.0f;
+            }
+
+            uint16_t* out = dp + static_cast<size_t>(x0) * 4;
+            for (int i = 0; i < n * 4; ++i)
+                out[i] = FloatToHalf(px[i]);
         }
     }
     });
