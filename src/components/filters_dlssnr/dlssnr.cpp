@@ -1381,6 +1381,13 @@ void ComposePixels(const ComposeInput& in, int y, int x_begin, int x_end) {
         const int mem_w = kDetail && (w < 256 || (kCrossing && was_w < 256))
                               ? Choose(in.mem_l, in.weight, i, &mem_k)
                               : 0;
+        // Crossing over, how far this pixel has come: the frame's blend, and the rest of the
+        // way where the new pass fits the live picture and nothing of the old side does --
+        // there the old side is only its cast, flat, and it showed as a patch where a sprite
+        // had been until the crossing was done. The vector loops work it out eight at a time.
+        int pixel_blend = in.blend;
+        if (kCrossing && kPrevious && kDetail)
+            pixel_blend += (256 - pixel_blend) * (w * (256 - std::max(was_w, mem_w)) >> 8) >> 8;
         const size_t now_a = i + in.now_l.a[now_k], now_b = i + in.now_l.b[now_k];
         const size_t was_a = i + in.was_l.a[was_k], was_b = i + in.was_l.b[was_k];
         const size_t mem_a = i + in.mem_l.a[mem_k], mem_b = i + in.mem_l.b[mem_k];
@@ -1414,7 +1421,7 @@ void ComposePixels(const ComposeInput& in, int y, int x_begin, int x_end) {
                                    was_w >>
                                8;
                 }
-                delta = was + ((delta - was) * in.blend >> 8);
+                delta = was + ((delta - was) * pixel_blend >> 8);
             }
             const int r = l[c] + delta;
             p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << in.shift[c];
@@ -1544,6 +1551,7 @@ int ComposeRowSse2(const ComposeInput& in, int y) {
             }
         }
         __m128i w_now[3], w_was[3], w_mem[3], k_now[3], k_was[3], k_mem[3];
+        __m128i b3[3] = { blend, blend, blend };
         if (kDetail) {
             __m128i kn, kw = zero, km;
             const __m128i wn = Choose8(in.now_l, scene, i, &kn);
@@ -1554,6 +1562,12 @@ int ComposeRowSse2(const ComposeInput& in, int y) {
             if (kCrossing)
                 misfit = _mm_or_si128(misfit, _mm_cmplt_epi16(ww, full));
             const __m128i wm = _mm_and_si128(misfit, Choose8(in.mem_l, scene, i, &km));
+            if (kCrossing && kPrevious) {
+                // ComposePixels()'s pixel_blend
+                const __m128i fast =
+                    MulShift8(wn, _mm_sub_epi16(full, _mm_max_epi16(ww, wm)));
+                Expand3(_mm_add_epi16(blend, MulShift8(_mm_sub_epi16(full, blend), fast)), b3);
+            }
             Expand3(wn, w_now);
             Expand3(ww, w_was);
             Expand3(wm, w_mem);
@@ -1584,7 +1598,7 @@ int ComposeRowSse2(const ComposeInput& in, int y) {
                                            w_was[v]));
                     }
                 }
-                delta = _mm_add_epi16(was, MulShift8(_mm_sub_epi16(delta, was), blend));
+                delta = _mm_add_epi16(was, MulShift8(_mm_sub_epi16(delta, was), b3[v]));
             }
             r[v] = delta;
         }
@@ -1692,7 +1706,7 @@ int ComposeRowNeon(const ComposeInput& in, int y) {
                     cast_was[c][q] = in.was_cast[ci + c];
             }
         }
-        int16x8_t w_now = zero, w_was = zero, w_mem = zero;
+        int16x8_t w_now = zero, w_was = zero, w_mem = zero, pixel_blend = blend;
         int16x8x3_t remembered = { { zero, zero, zero } }, now_mean = remembered,
                     was_mean = remembered;
         if (kDetail) {
@@ -1706,6 +1720,11 @@ int ComposeRowNeon(const ComposeInput& in, int y) {
             if (kCrossing)
                 misfit = vorrq_u16(misfit, vcltq_s16(w_was, full));
             w_mem = vandq_s16(vreinterpretq_s16_u16(misfit), Choose8(in.mem_l, scene, i, &k_mem));
+            if (kCrossing && kPrevious) {
+                // ComposePixels()'s pixel_blend
+                const int16x8_t fast = MulShift8(w_now, vsubq_s16(full, vmaxq_s16(w_was, w_mem)));
+                pixel_blend = vaddq_s16(blend, MulShift8(vsubq_s16(full, blend), fast));
+            }
             remembered = mean(in.mem_l, in.mem_delta, k_mem, i);
             now_mean = mean(in.now_l, in.now_delta, k_now, i);
             if (kPrevious)
@@ -1728,7 +1747,7 @@ int ComposeRowNeon(const ComposeInput& in, int y) {
                         was = vaddq_s16(was, MulShift8(vsubq_s16(was_mean.val[c], was), w_was));
                     }
                 }
-                delta = vaddq_s16(was, MulShift8(vsubq_s16(delta, was), blend));
+                delta = vaddq_s16(was, MulShift8(vsubq_s16(delta, was), pixel_blend));
             }
             // The live channel widened to int16, the delta added, clamped to a byte, and put
             // where the channel goes in the 32-bit pixel.
