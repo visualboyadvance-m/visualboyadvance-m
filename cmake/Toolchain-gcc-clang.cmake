@@ -41,8 +41,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
+# Not for Metal shaders: the AGX compiler in macOS 27.2 never finishes the
+# hdrEncodeScRGB pipeline from AIR built with -fPIC, and the app hangs on
+# startup in newComputePipelineStateWithFunction:.
 if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
-    add_compile_options(-fPIC)
+    add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Metal>>:-fPIC>)
 endif()
 
 if(UPSTREAM_RELEASE)
