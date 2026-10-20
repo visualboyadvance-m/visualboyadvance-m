@@ -1365,6 +1365,30 @@ void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid
 }
 
 
+// Marks a full-size motion mask moved all the way (255) wherever `h` takes the pixel off
+// the frame: MeasureRows()'s edge rule. A mask made on the motion grid (MotionStep()) does
+// not keep it -- the grid rounds the shift, and each block takes its centre's motion -- and
+// the composition reads a pass's correction wherever the mask lets it, so the last rows of
+// a block shifted off the frame read past the end of the buffer.
+void MarkOffFrame(uint8_t* motion, const Hypothesis& h, int width, int height) {
+    const int x0 = std::max(0, std::max(h.ax, h.bx));
+    const int x1 = std::min(width, std::min(h.ax, h.bx) + width);
+    RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+        for (int y = y_begin; y < y_end; y++) {
+            uint8_t* mv = motion + static_cast<size_t>(y) * width;
+            const int ay = y - h.ay, by = y - h.by;
+            if (ay < 0 || ay >= height || by < 0 || by >= height || x1 <= x0) {
+                std::memset(mv, 255, static_cast<size_t>(width));
+                continue;
+            }
+            if (x0 > 0)
+                std::memset(mv, 255, static_cast<size_t>(x0));
+            if (x1 < width)
+                std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
+        }
+    });
+}
+
 // The ways Apply32() tries for one pass, each with its motion mask, one byte a pixel.
 struct Alignment {
     int count = 0;
@@ -3228,11 +3252,13 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 uint8_t* masks[9];
                 uint8_t* across[9];
                 uint8_t* fulls[9];
+                const Hypothesis* shifts[9];
                 int n_masks = 0;
                 for (Alignment* al : { &now_al, &was_al, &mem_al })
                     for (int k = 0; k < al->count; k++) {
                         al->motion[k].resize(px);
                         fulls[n_masks] = al->motion[k].data();
+                        shifts[n_masks] = &al->h[k];
                         masks[n_masks++] = grid_of(al, k).data();
                     }
                 if (im.dilate_scratch.size() < static_cast<size_t>(n_masks))
@@ -3245,8 +3271,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 // less than it would be at full size.
                 DilateAll(masks, across, n_masks, gw, gh,
                           (MotionRadius(height) + step - 1) / step);
-                if (step > 1)
+                if (step > 1) {
                     UndecimateAll(masks, fulls, n_masks, width, height, step);
+                    for (int k = 0; k < n_masks; k++)
+                        MarkOffFrame(fulls[k], *shifts[k], width, height);
+                }
             }
 
             std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
