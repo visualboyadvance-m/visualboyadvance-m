@@ -54,6 +54,13 @@ if(MSVC)
         ${CMAKE_SOURCE_DIR}/win32-deps/msvc/getopt.c
         ${CMAKE_SOURCE_DIR}/win32-deps/msvc/getopt.h
     )
+elseif(DOS)
+    # DJGPP's libc has no getopt_long().
+    target_sources(vbam
+        PRIVATE
+        getopt.c
+        getopt.h
+    )
 endif()
 
 if(ENABLE_LIRC)

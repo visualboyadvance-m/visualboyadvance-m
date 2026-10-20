@@ -315,6 +315,16 @@ if(NOT Threads_FOUND)
     find_package(Threads)
 endif()
 
+# DJGPP: FindThreads fails because GNU Pth's libpthread also needs the
+# socket stub library. libstdc++ itself calls the Pth wrappers (its
+# this_thread::sleep_for and file streams), and the driver adds -lstdc++
+# after every library CMake lists, so the two have to follow an explicit
+# -lstdc++ at the very end of the link line.
+if(DOS AND NOT Threads_FOUND)
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread -lsocket")
+    set(CMAKE_CXX_STANDARD_LIBRARIES "-lstdc++ -lpthread -lsocket")
+endif()
+
 if(APPLE)
     enable_language(OBJC)
     enable_language(OBJCXX)

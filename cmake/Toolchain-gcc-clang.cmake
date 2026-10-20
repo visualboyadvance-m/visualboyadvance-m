@@ -44,8 +44,18 @@ endif()
 # Not for Metal shaders: the AGX compiler in macOS 27.2 never finishes the
 # hdrEncodeScRGB pipeline from AIR built with -fPIC, and the app hangs on
 # startup in newComputePipelineStateWithFunction:.
-if(NOT ENABLE_ASM) # inline asm is not allowed with -fPIC
+# Not for DJGPP either: it ignores -fPIC with a notice on the driver's
+# stdout, and with -pipe that notice is the first line the assembler reads.
+if(NOT ENABLE_ASM AND NOT DOS) # inline asm is not allowed with -fPIC
     add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Metal>>:-fPIC>)
+endif()
+
+# DJGPP's pthread.h (GNU Pth) turns read, write, send, recv and friends into
+# macros for its thread-aware wrappers, which renames every method called
+# write() (SoundDriver::write) in a translation unit that includes <thread>.
+# The header only defaults the switch when it is undefined; turn it off.
+if(DOS)
+    add_compile_definitions(_POSIX_THREAD_SYSCALL_SOFT=0)
 endif()
 
 if(UPSTREAM_RELEASE)

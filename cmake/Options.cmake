@@ -547,6 +547,15 @@ endif()
 # ENABLE_LINK (GBA cable link, built on the bundled SFML) is declared in
 # FrontendOptions.cmake, since libintl is a dependency of the link code as
 # well as of the wx port.
+#
+# It cannot be built for DOS (DJGPP): SFML has no DOS backend, the socket
+# library shipped with DJGPP is a stub, and the IPC link needs a second
+# process with shared memory and POSIX semaphores. The platform is only known
+# after project(), so the override lives here rather than beside the option.
+if(DOS AND ENABLE_LINK)
+    message(WARNING "ENABLE_LINK is not supported on DOS (DJGPP). Disabling it.")
+    set(ENABLE_LINK OFF)
+endif()
 
 # ffmpeg A/V recording is a wx / Qt port feature; the SDL port and the
 # libretro core have no recording UI.

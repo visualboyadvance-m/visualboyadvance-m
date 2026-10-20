@@ -198,7 +198,7 @@ static void set_profile_from_mode() {
 void gbafilter_set_params(int new_color_mode, float new_darken_screen,
                           int new_variant) {
     color_mode = new_color_mode;
-    darken_screen = fmaxf(0.0f, fminf(1.0f, new_darken_screen)); // Clamp to 0.0-1.0
+    darken_screen = std::max(0.0f, std::min(1.0f, new_darken_screen)); // Clamp to 0.0-1.0
     variant = new_variant;
 
     // Call the helper to update the kernel based on the new parameters.
@@ -219,9 +219,9 @@ static inline void apply_filter(float& r, float& g, float& b) {
     b = powf(b, kernel.gamma[2]);
 
     // 2. Apply luminance factor and clamp.
-    r = fmaxf(0.0f, fminf(1.0f, r * kernel.lum));
-    g = fmaxf(0.0f, fminf(1.0f, g * kernel.lum));
-    b = fmaxf(0.0f, fminf(1.0f, b * kernel.lum));
+    r = std::max(0.0f, std::min(1.0f, r * kernel.lum));
+    g = std::max(0.0f, std::min(1.0f, g * kernel.lum));
+    b = std::max(0.0f, std::min(1.0f, b * kernel.lum));
 
     // 3. Apply color profile matrix.
     const float tr = kernel.mat[0][0] * r + kernel.mat[0][1] * g +
@@ -238,9 +238,9 @@ static inline void apply_filter(float& r, float& g, float& b) {
     b = copysignf(powf(fabsf(tb), kernel.out_recip), tb);
 
     // Final clamp: ensure values are within 0.0-1.0 range
-    r = fmaxf(0.0f, fminf(1.0f, r));
-    g = fmaxf(0.0f, fminf(1.0f, g));
-    b = fmaxf(0.0f, fminf(1.0f, b));
+    r = std::max(0.0f, std::min(1.0f, r));
+    g = std::max(0.0f, std::min(1.0f, g));
+    b = std::max(0.0f, std::min(1.0f, b));
 }
 
 void gbafilter_update_colors(bool lcd) {

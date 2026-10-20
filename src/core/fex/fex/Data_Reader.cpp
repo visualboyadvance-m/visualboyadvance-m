@@ -417,7 +417,9 @@ char* blargg_to_utf8( const wchar_t* wpath )
 		return NULL;
 	
 	size_t needed = 0;
-	size_t mmax = wcslen( wpath );
+	size_t mmax = 0;
+	while ( wpath [mmax] )
+		mmax++;
 	if ( mmax <= 0 )
 		return NULL;
 

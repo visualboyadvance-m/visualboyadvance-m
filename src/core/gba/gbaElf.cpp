@@ -3067,3 +3067,14 @@ void elfCleanUp()
     g_elfSections.clear();
     g_elfReader = ELFIO::elfio();
 }
+
+#if defined(__DJGPP__)
+// The DJGPP libstdc++ is built with pthread.h's syscall macros active, which
+// renames basic_istream::read and basic_ostream::write to __pthread_read and
+// __pthread_write inside the library. This build turns those macros off
+// (_POSIX_THREAD_SYSCALL_SOFT=0), so instantiate the two members here.
+#include <istream>
+#include <ostream>
+template std::basic_istream<char>& std::basic_istream<char>::read(char*, std::streamsize);
+template std::basic_ostream<char>& std::basic_ostream<char>::write(const char*, std::streamsize);
+#endif  // defined(__DJGPP__)

@@ -530,7 +530,7 @@ void BIOS_Div()
         reg[1].I = 0;
         reg[3].I = (uint32_t)INT32_MIN;
     } else {
-        div_t result = div(numer, denom);
+        div_t result = div((int)numer, (int)denom);
         reg[0].I = (uint32_t)result.quot;
         reg[1].I = (uint32_t)result.rem;
         reg[3].I = (uint32_t)abs(result.quot);

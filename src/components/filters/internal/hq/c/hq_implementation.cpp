@@ -22,6 +22,8 @@
 */
 
 
+#include <cstdint>
+
 #include "hq_shared.h"
 
 

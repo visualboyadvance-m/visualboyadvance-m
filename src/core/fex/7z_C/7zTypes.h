@@ -58,7 +58,12 @@ typedef int SRes;
   #include <stdalign.h>
   #define MY_ALIGN(n) alignas(n)
   */
-  #define MY_ALIGN(n) __attribute__ ((aligned(n)))
+  #ifdef __DJGPP__
+    /* DJGPP's COFF object format cannot express alignment above 16. */
+    #define MY_ALIGN(n) __attribute__ ((aligned((n) > 16 ? 16 : (n))))
+  #else
+    #define MY_ALIGN(n) __attribute__ ((aligned(n)))
+  #endif
   #define MY_ALIGN_IN_STRUCT(n) MY_ALIGN(n)
 #endif
 

@@ -3180,7 +3180,7 @@ void CPUSoftwareInterrupt(int comment)
             reg[1].I = 0;
             abs_quot = (uint32_t)INT32_MIN;
         } else {
-            div_t result = div(numer, denom);
+            div_t result = div((int)numer, (int)denom);
             reg[0].I = (uint32_t)result.quot;
             reg[1].I = (uint32_t)result.rem;
             abs_quot = (uint32_t)abs(result.quot);
@@ -3234,7 +3234,7 @@ void CPUSoftwareInterrupt(int comment)
             reg[1].I = 0;
             abs_quot = (uint32_t)INT32_MIN;
         } else {
-            div_t result = div(numer, denom);
+            div_t result = div((int)numer, (int)denom);
             reg[0].I = (uint32_t)result.quot;
             reg[1].I = (uint32_t)result.rem;
             abs_quot = (uint32_t)abs(result.quot);

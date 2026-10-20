@@ -14,7 +14,14 @@
 #define write _write
 #define strdup _strdup
 
-#else  // !defined(_WIN32)
+#elif defined(__DJGPP__)
+
+// DOS has no TCP sockets; only the stdin/stdout pipe transport is available.
+#include <unistd.h>
+#define SOCKET int
+#define INVALID_SOCKET (-1)
+
+#else  // !defined(_WIN32) && !defined(__DJGPP__)
 
 #include <netdb.h>
 #include <sys/socket.h>
@@ -812,7 +819,7 @@ void debuggerFillWord(int n, char** args)
         debuggerUsage("fillw");
 }
 
-unsigned int SearchStart = 0xFFFFFFFF;
+uint32_t SearchStart = 0xFFFFFFFF;
 unsigned int SearchMaxMatches = 5;
 uint8_t SearchData[64]; // It actually doesn't make much sense to search for more than 64 bytes, does it?
 unsigned int SearchLength = 0;
@@ -3455,6 +3462,31 @@ void dbgExecute(std::string& cmd)
     delete[] dbgCmd;
 }
 
+#if defined(__DJGPP__)
+
+int remoteTcpSend(char*, int)
+{
+    return -1;
+}
+
+int remoteTcpRecv(char*, int)
+{
+    return -1;
+}
+
+bool remoteTcpInit()
+{
+    fprintf(stderr, "The GDB stub's TCP transport is not available on DOS; "
+                    "use the pipe transport.\n");
+    return false;
+}
+
+void remoteTcpCleanUp()
+{
+}
+
+#else  // !defined(__DJGPP__)
+
 int remoteTcpSend(char* data, int len)
 {
     return send(remoteSocket, data, len, 0);
@@ -3561,6 +3593,8 @@ void remoteTcpCleanUp()
         remoteListenSocket = (SOCKET)(-1);
     }
 }
+
+#endif  // !defined(__DJGPP__)
 
 int remotePipeSend(char* data, int len)
 {

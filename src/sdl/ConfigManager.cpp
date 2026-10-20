@@ -36,7 +36,8 @@
 
 #endif // _WIN32
 
-#ifndef __GNUC__
+// DJGPP's libc has getopt() but no getopt_long(); use the bundled GNU copy.
+#if !defined(__GNUC__) || defined(__DJGPP__)
 
 #define HAVE_DECL_GETOPT 0
 #define __STDC__ 1

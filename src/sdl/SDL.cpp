@@ -52,7 +52,8 @@
 
 #endif // _WIN32
 
-#ifndef __GNUC__
+// DJGPP's libc has getopt() but no getopt_long(); use the bundled GNU copy.
+#if !defined(__GNUC__) || defined(__DJGPP__)
 
 #define HAVE_DECL_GETOPT 0
 #define __STDC__ 1
@@ -221,7 +222,9 @@ int filter_enlarge = 2;
 int cartridgeType = 3;
 
 int textureSize = 256;
+#if !defined(CONFIG_IDF_TARGET) && !defined(NO_OPENGL)
 GLuint screenTexture = 0;
+#endif
 uint8_t* filterPix = 0;
 
 int emulating = 0;

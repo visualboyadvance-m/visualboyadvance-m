@@ -131,7 +131,7 @@ wchar etoupperw(wchar ch)
     return('I');
 #if defined(__APPLE__) || defined(_MSC_VER) || defined(__MINGW32__) || \
     defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
-    defined(__OpenBSD__)
+    defined(__OpenBSD__) || defined(__DJGPP__)
   return(toupper(ch));
 #else
   return(toupperw(ch));
@@ -240,7 +240,7 @@ int wcsicompc(const wchar *Str1,const wchar *Str2)
 {
 #if defined(_UNIX) || defined(_MSC_VER) || defined(__APPLE__) || \
     defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || \
-    defined(__OpenBSD__)
+    defined(__OpenBSD__) || defined(__DJGPP__)
   return my_wcscmp(Str1,Str2);
 #elif defined(__MINGW32__)
   return _wcsicmp(Str1,Str2);
