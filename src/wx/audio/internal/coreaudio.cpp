@@ -1,7 +1,6 @@
 #ifdef __APPLE__
 #include "wx/audio/internal/coreaudio.h"
 #include "wx/audio/internal/macos-io-cycle.h"
-#include "wx/audio/internal/stall-detector.h"
 
 // === LOGALL writes very detailed informations to vba-trace.log ===
 // #define LOGALL
@@ -115,8 +114,12 @@ private:
     AudioDeviceID GetCoreAudioDevice(wxString name);
     void setBuffer(uint16_t* finalWave, int length);
     void primeSilence();
+    bool queueRanAhead();
+    void restartQueue();
     std::vector<uint16_t> silence_;
-    StallDetector stall_;
+    // Frames enqueued since the queue last started: where its clock should be
+    // once they have all played.
+    double queued_frames_ = 0;
 
     bool initialized = false;
 };
@@ -457,6 +460,7 @@ bool CoreAudioAudio::init(long sampleRate) {
         use_default_device ? audio::internal::MacosOutputDevice(wxString()) : device,
         soundBufferLen / description.mBytesPerFrame, static_cast<UInt32>(description.mSampleRate));
 
+    queued_frames_ = 0;
     result = AudioQueueStart(audioQueue, NULL);
 
     if (result != noErr) {
@@ -532,7 +536,10 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
         // Plain FIFO playback is sufficient. Scheduling at a cached AudioTimeStamp
         // from the previous-rate queue can put new buffers seconds into the future.
         const OSStatus status = AudioQueueEnqueueBuffer(audioQueue, this_buf, 0, nullptr);
-        if (status != noErr) {
+        if (status == noErr) {
+            queued_frames_ += static_cast<double>(this_buf->mAudioDataByteSize) /
+                              description.mBytesPerFrame;
+        } else {
             std::lock_guard<std::mutex> lock(buffer_mutex);
             if (buffer_pending[index]) {
                 buffer_pending[index] = false;
@@ -542,6 +549,26 @@ void CoreAudioAudio::setBuffer(uint16_t* finalWave, int length) {
             buffer_ready.notify_one();
         }
     }
+}
+
+// Whether the queue's clock has run on past the sound it was given: more than two
+// buffers further than everything enqueued since it started.
+bool CoreAudioAudio::queueRanAhead() {
+    AudioTimeStamp now = {};
+    if (AudioQueueGetCurrentTime(audioQueue, nullptr, &now, nullptr) != noErr ||
+        !(now.mFlags & kAudioTimeStampSampleTimeValid))
+        return false;
+    const double buffer_frames =
+        static_cast<double>(soundBufferLen) / description.mBytesPerFrame;
+    return now.mSampleTime > queued_frames_ + 2 * buffer_frames;
+}
+
+// Starts the queue's clock over. Only with no buffer enqueued, so no callback can
+// come late for one.
+void CoreAudioAudio::restartQueue() {
+    AudioQueueStop(audioQueue, TRUE);
+    queued_frames_ = 0;
+    AudioQueueStart(audioQueue, nullptr);
 }
 
 // Tops the queue up with silence to one buffer short of full: where write() keeps it.
@@ -567,27 +594,31 @@ void CoreAudioAudio::write(uint16_t* finalWave, int length) {
     if (!initialized) return;
 
     // The queue paces the emulator: write() waits while every buffer is pending. When the
-    // emulator has not run for a while and the queue played on -- a live window resize,
-    // the fullscreen animation, anything that holds the event loop -- it is empty when the
-    // emulator comes back, and refilling it from the game runs the game at full speed
-    // until it is full again: a burst of fast-forward. The gap is in the sound already,
-    // so fill it with silence instead, and the game goes on at its own rate. Only after a
-    // stall, though (StallDetector): a frame or two that ran late is made up by catching
-    // up, as it always was.
+    // emulator has not kept up -- a live window resize, the fullscreen animation, anything
+    // that holds the event loop, or a filter it runs at 30 fps with -- the queue runs dry,
+    // and its clock runs on without it. A buffer enqueued after that is late by all the
+    // time the queue had nothing, and is played short or not at all: it comes back at
+    // once, write() never waits, and the game runs faster than full speed until it has
+    // made up every second it lost. After a minute at 30 fps, switching xBRZ 9x with DLSS
+    // NR down to 6x ran the game at 100 fps for minutes. The gap is in the sound already,
+    // so start the queue's clock over and fill the queue with silence, and the game goes
+    // on at its own rate. Only when the queue has run on past what it was given, though: a
+    // frame or two that ran late is made up by catching up, as it always was.
     //
     // Fast-forward, an unthrottled speed and a GBA joybus link are not paced by the
     // queue, as in the other drivers: write() takes what fits and drops the rest, and
     // the emulator runs on. Waiting here held a fast-forward to the queue's rate, the
     // nine frames in ten it skips included: 5 fps on the screen and no faster.
     const bool paced = !coreOptions.speedup && coreOptions.throttle && !gba_joybus_active;
-    const bool stalled = stall_.Stalled();
     bool drained;
     {
         std::lock_guard<std::mutex> lock(buffer_mutex);
         drained = filled_buffers == 0;
     }
-    if (drained && stalled && paced)
+    if (drained && paced && queueRanAhead()) {
+        restartQueue();
         primeSilence();
+    }
     auto* source = reinterpret_cast<uint8_t*>(finalWave);
     while (length > 0) {
         int chunk = 0;
