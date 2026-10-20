@@ -348,7 +348,8 @@ constexpr int kMotionRadius = 2;
 // fixed 2 pixels were a third of a GBA pixel, so once Link had walked on, the rest of his
 // halo stayed where he had been, laid down at full weight over sand that had never changed,
 // and a faint light outline of him trailed behind him. So it grows with the frame, as
-// kScrollReach does, and is never less than at 2x.
+// kScrollReach does, and is never less than at 2x. On the motion grid (MotionStep()) it
+// is rounded up to whole grid points.
 inline int MotionRadius(int height) {
     return std::max(kMotionRadius, (kMotionRadius * height + 160) / 320);
 }
@@ -916,6 +917,79 @@ void Dilate(std::vector<uint8_t>* image, int width, int height, int r,
     DilateAll(&im, &across, 1, width, height, r);
 }
 
+// The motion is worked out on a grid of every `step`th pixel each way when the frame is at
+// least twice the extent the model works at (Settings::max_height): a frame that large is a
+// filter's output scaled up, its GBA pixels several frame pixels wide, so the grid still
+// sees every edge that moves, and the measuring, counting and spreading cost a step^2th of
+// what they did -- at xBRZ 6x, 1440x960 against 480 tall, a quarter. Only the composition
+// stays at full size. Below twice the extent the grid is the frame.
+inline int MotionStep(int height, int filter_height) {
+    return filter_height > 0 ? std::max(1, height / filter_height) : 1;
+}
+
+// `channels`-byte pixels of a `width` x `height` image at the centre of each `step` x `step`
+// block (the last ones clipped to the image) into `out`, a grid of ceil(width / step) x
+// ceil(height / step).
+void Decimate(const uint8_t* src, int width, int height, int step, int channels,
+              std::vector<uint8_t>* out) {
+    const int gw = (width + step - 1) / step, gh = (height + step - 1) / step;
+    out->resize(static_cast<size_t>(gw) * gh * channels);
+    uint8_t* const o = out->data();
+    RowPool::Get().Run(gh, [&](int ya, int yb) {
+        for (int gy = ya; gy < yb; gy++) {
+            const int y = std::min(gy * step + step / 2, height - 1);
+            const uint8_t* row = src + static_cast<size_t>(y) * width * channels;
+            uint8_t* d = o + static_cast<size_t>(gy) * gw * channels;
+            // every point but the last is a whole block in; the last may be clipped
+            const uint8_t* q = row + static_cast<size_t>(step / 2) * channels;
+            const size_t stride = static_cast<size_t>(step) * channels;
+            if (channels == 3) {
+                for (int gx = 0; gx < gw - 1; gx++, d += 3, q += stride) {
+                    d[0] = q[0];
+                    d[1] = q[1];
+                    d[2] = q[2];
+                }
+            } else {
+                for (int gx = 0; gx < gw - 1; gx++, d += channels, q += stride)
+                    for (int c = 0; c < channels; c++)
+                        d[c] = q[c];
+            }
+            const int last = std::min((gw - 1) * step + step / 2, width - 1);
+            q = row + static_cast<size_t>(last) * channels;
+            for (int c = 0; c < channels; c++)
+                d[c] = q[c];
+        }
+    });
+}
+
+// Back from the grid: each `step` x `step` block of `out` (`width` x `height`) takes the
+// value of the grid point at its centre, for `count` grids at once.
+void UndecimateAll(const uint8_t* const* grids, uint8_t* const* outs, int count, int width,
+                   int height, int step) {
+    const int gw = (width + step - 1) / step;
+    RowPool::Get().Run(height * count, [&](int ya, int yb) {
+        for (int j = ya; j < yb; j++) {
+            const int k = j / height, y = j % height;
+            const uint8_t* g = grids[k] + static_cast<size_t>(y / step) * gw;
+            uint8_t* o = outs[k] + static_cast<size_t>(y) * width;
+            if (y % step != 0) {  // the block's first row is already made
+                std::memcpy(o, outs[k] + static_cast<size_t>(y - y % step) * width,
+                            static_cast<size_t>(width));
+                continue;
+            }
+            if (step == 2) {
+                for (int gx = 0; gx < width / 2; gx++)
+                    o[2 * gx] = o[2 * gx + 1] = g[gx];
+                if (width & 1)
+                    o[width - 1] = g[gw - 1];
+            } else {
+                for (int x = 0; x < width; x++)
+                    o[x] = g[x / step];
+            }
+        }
+    });
+}
+
 // How far the picture may scroll between a pass's input and the frame it is laid over, in
 // GBA pixels -- scaled to the frame -- before Apply32() stops following it. A game's camera
 // follows its hero, so while Link walks the whole background shifts by a pixel or two every
@@ -1236,6 +1310,7 @@ struct Alignment {
     int count = 0;
     std::array<Hypothesis, 3> h;
     std::array<std::vector<uint8_t>, 3> motion;
+    std::array<std::vector<uint8_t>, 3> grid;  // the same on the motion grid (MotionStep())
 };
 
 // One pass's alignment as the composition reads it: each way's motion mask and the pixel
@@ -1987,6 +2062,12 @@ struct Filter::Impl {
     Pyramid live_pyramid;
     std::array<Alignment, 2> alignment;  // the pass on screen, the one before it
     std::vector<std::vector<uint8_t>> dilate_scratch;  // one per motion mask (DilateAll)
+    // The live frame and the passes' inputs on the motion grid (MotionStep()). The passes'
+    // only change when one lands, so they are made once each after that, at `grid_step`.
+    std::vector<uint8_t> live_grid, display_grid, previous_grid, memory_src_grid,
+        memory_valid_grid;
+    bool display_grid_fresh = false, previous_grid_fresh = false, memory_grid_fresh = false;
+    int grid_step = 0;
     // The frame weight actually in use, carried between frames so it can only climb back
     // gradually -- see kSceneRisePerFrame.
     int scene_weight = 256;
@@ -2010,7 +2091,6 @@ struct Filter::Impl {
     int settled_height = 0;
     int settled_filter_width = 0;
     int settled_filter_height = 0;
-    std::vector<uint8_t> incoming;  // Apply32()'s frame, to compare with `settled_src`
 
     Governor governor;  // Apply32()'s, under `mutex`
 
@@ -2707,12 +2787,17 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         // filter's output dst aliases src, and taking the result first would feed the
         // model its own previous output.
         //
-        const auto to_rgb = [&](std::vector<uint8_t>* rgb) {
-            rgb->resize(static_cast<size_t>(width) * height * 3);
-            uint8_t* o = rgb->data();
-            for (int y = 0; y < height; y++) {
+        // The frame as RGB8, once, on the pool: what the model is given, what the settled
+        // check compares and what the composition lays the pass over. Each of the three
+        // used to convert it again, the first two a pixel at a time on this thread -- at
+        // xBRZ 6x a millisecond or more a frame.
+        const size_t px = static_cast<size_t>(width) * height;
+        im.live.resize(px * 3);
+        RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+            for (int y = y_begin; y < y_end; y++) {
                 const uint32_t* s =
                     reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
+                uint8_t* o = im.live.data() + static_cast<size_t>(y) * width * 3;
                 for (int x = 0; x < width; x++, o += 3) {
                     const uint32_t v = s[x];
                     o[0] = static_cast<uint8_t>(v >> red_shift);
@@ -2720,7 +2805,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     o[2] = static_cast<uint8_t>(v >> blue_shift);
                 }
             }
-        };
+        });
 
         // Once the passes have settled (see `settled`), the same frame with the same
         // settings gets no more of them. On a still picture the network ran flat out for
@@ -2734,8 +2819,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             filter_height == im.settled_filter_height &&
             settings.history == im.settled_history && settings.control_mask == im.settled_mask &&
             std::memcmp(&params, &im.settled_params, sizeof params) == 0) {
-            to_rgb(&im.incoming);
-            unchanged = im.incoming == im.settled_src;
+            unchanged = im.live == im.settled_src;
         }
 
         const auto now = std::chrono::steady_clock::now();
@@ -2747,7 +2831,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             im.governor.Started(now);
             Packet* p = im.free_packets.back();
             im.free_packets.pop_back();
-            to_rgb(&p->rgb);
+            p->rgb = im.live;
             p->width = width;
             p->height = height;
             p->filter_width = filter_width;
@@ -2772,6 +2856,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // What is on screen becomes what the new pass crosses over from.
             im.previous_display.swap(im.display);
             im.previous_display_src.swap(im.display_src);
+            im.previous_grid.swap(im.display_grid);
+            im.previous_grid_fresh = im.display_grid_fresh;
+            im.display_grid_fresh = false;
+            im.memory_grid_fresh = false;  // UpdateMemory() takes the new pass below
             im.previous_cast.swap(im.display_cast);
             std::swap(im.previous_pyramid, im.display_pyramid);
             im.previous_delta.swap(im.display_delta);
@@ -2819,7 +2907,6 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         // changed, its cast for the colour now there where it has (see kCastBits). On a
         // still picture every pixel is untouched, the weights are all one, and this
         // reproduces the pass's output exactly.
-        const size_t px = static_cast<size_t>(width) * height;
         if (!im.display.empty() && im.display.size() == im.display_src.size() &&
             im.display_width == width && im.display_height == height &&
             im.display_cast.size() == kCastEntries * 3 &&
@@ -2827,12 +2914,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const uint8_t* const in = im.display_src.data();
             const int16_t* const cast = im.display_cast.data();
 
-            // The live frame, read in full before anything is written: dst may alias src.
-            // And how long each pixel has held still, for the correction memory: each
-            // channel's change sixteen at a time (the mean of the previous frame with itself
-            // is the previous frame), then a pixel is still if none moved. Both a row at a
-            // time on the pool, each row's own.
-            im.live.resize(px * 3);
+            // How long each pixel of the live frame (`im.live`, above) has held still, for
+            // the correction memory: each channel's change sixteen at a time (the mean of
+            // the previous frame with itself is the previous frame), then a pixel is still
+            // if none moved. A row at a time on the pool, each row's own.
             const bool fresh_age = im.age.size() != px || im.live_previous.size() != px * 3;
             if (fresh_age) {
                 im.age.assign(px, 0);
@@ -2841,17 +2926,8 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             im.age_diff.resize(px * 3);
             RowPool::Get().Run(height, [&](int y_begin, int y_end) {
                 for (int y = y_begin; y < y_end; y++) {
-                    const uint32_t* s =
-                        reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
                     const size_t first = static_cast<size_t>(y) * width;
-                    uint8_t* const row = im.live.data() + first * 3;
-                    uint8_t* o = row;
-                    for (int x = 0; x < width; x++, o += 3) {
-                        const uint32_t v = s[x];
-                        o[0] = static_cast<uint8_t>(v >> red_shift);
-                        o[1] = static_cast<uint8_t>(v >> green_shift);
-                        o[2] = static_cast<uint8_t>(v >> blue_shift);
-                    }
+                    const uint8_t* const row = im.live.data() + first * 3;
                     uint8_t* const lp = im.live_previous.data() + first * 3;
                     if (!fresh_age) {
                         uint8_t* const diff = im.age_diff.data() + first * 3;
@@ -2878,10 +2954,43 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             //
             // `valid`, when given, says which of `given`'s pixels hold anything (the
             // correction memory's); a pixel reading one that does not has moved all of it.
+            //
+            // All of it on the motion grid (MotionStep()): `given` and `valid` are on the
+            // grid, and so is `motion`; the hypothesis is in frame pixels, rounded to the grid.
+            const int step = MotionStep(height, filter_height);
+            const int gw = (width + step - 1) / step, gh = (height + step - 1) / step;
+            const size_t gpx = static_cast<size_t>(gw) * gh;
+            const uint8_t* live_grid = live;
+            if (step > 1) {
+                Decimate(live, width, height, step, 3, &im.live_grid);
+                live_grid = im.live_grid.data();
+            }
+            if (step != im.grid_step) {
+                im.grid_step = step;
+                im.display_grid_fresh = im.previous_grid_fresh = im.memory_grid_fresh = false;
+            }
+            const auto on_grid = [&](const uint8_t* full, int channels, std::vector<uint8_t>* buf,
+                                     bool* fresh) -> const uint8_t* {
+                if (step == 1)
+                    return full;
+                if (!*fresh || buf->size() != gpx * channels) {
+                    Decimate(full, width, height, step, channels, buf);
+                    *fresh = true;
+                }
+                return buf->data();
+            };
+            const auto grid_of = [&](Alignment* al, int k) -> std::vector<uint8_t>& {
+                return step > 1 ? al->grid[k] : al->motion[k];
+            };
             const auto measure = [&](const uint8_t* given, const uint8_t* valid,
                                      const Hypothesis& h, uint8_t* motion) {
-                RowPool::Get().Run(height, [&](int y_begin, int y_end) {
-                    MeasureRows(live, given, valid, h, width, height, y_begin, y_end, motion);
+                const auto g = [&](int v) {
+                    return (v >= 0 ? v + step / 2 : v - step / 2) / step;
+                };
+                const Hypothesis hg =
+                    step > 1 ? Hypothesis{ g(h.ax), g(h.ay), g(h.bx), g(h.by) } : h;
+                RowPool::Get().Run(gh, [&](int y_begin, int y_end) {
+                    MeasureRows(live_grid, given, valid, hg, gw, gh, y_begin, y_end, motion);
                 });
             };
             // The ways to take one pass: where it stands, and, when that leaves enough of
@@ -2895,13 +3004,13 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                                    Alignment* al) {
                 al->count = 1;
                 al->h[0] = Hypothesis();
-                std::vector<uint8_t>& still = al->motion[0];
-                still.resize(px);
+                std::vector<uint8_t>& still = grid_of(al, 0);
+                still.resize(gpx);
                 measure(given, nullptr, al->h[0], still.data());
                 // Whether anything is worth lining up at all: any motion counts here.
                 size_t count = 0, mild = 0;
-                CountMotion(still.data(), nullptr, nullptr, px, &count, &mild);
-                if (count * 100 <= px * kScenePercentHold)
+                CountMotion(still.data(), nullptr, nullptr, gpx, &count, &mild);
+                if (count * 100 <= gpx * kScenePercentHold)
                     return count;
                 // What the scene is weighed by: the mild residue (kSceneMildLevels).
                 count = mild;
@@ -2919,23 +3028,25 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 al->h[2] = Hypothesis{ dx - ux, dy - uy, dx + ux, dy + uy };
                 al->count = 3;
                 for (int k = 1; k < al->count; k++) {
-                    al->motion[k].resize(px);
-                    measure(given, nullptr, al->h[k], al->motion[k].data());
+                    grid_of(al, k).resize(gpx);
+                    measure(given, nullptr, al->h[k], grid_of(al, k).data());
                 }
                 size_t moving = 0;
-                CountMotion(al->motion[0].data(), al->motion[1].data(), al->motion[2].data(), px,
-                            &moving, &count);
+                CountMotion(grid_of(al, 0).data(), grid_of(al, 1).data(), grid_of(al, 2).data(),
+                            gpx, &moving, &count);
                 return count;
             };
             Alignment& now_al = im.alignment[0];
             Alignment& was_al = im.alignment[1];
             was_al.count = 0;
-            const size_t moved_pixels = track(in, im.display_pyramid, &now_al);
+            const size_t moved_pixels =
+                track(on_grid(in, 3, &im.display_grid, &im.display_grid_fresh),
+                      im.display_pyramid, &now_al);
 
             // How much of the frame is unmistakably moving, and so how much of the pass's
             // own correction is worth laying down at all beyond the cast. None of it, when
             // the frame is all moving.
-            const int scene = static_cast<int>(moved_pixels * 100 / px);
+            const int scene = static_cast<int>(moved_pixels * 100 / gpx);
             const int target =
                 scene <= kScenePercentHold
                     ? 256
@@ -2977,29 +3088,46 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                                      im.memory_delta.size() == px * 3;
             if (scene_weight > 0) {
                 if (have_previous)
-                    track(im.previous_display_src.data(), im.previous_pyramid, &was_al);
+                    track(on_grid(im.previous_display_src.data(), 3, &im.previous_grid,
+                                  &im.previous_grid_fresh),
+                          im.previous_pyramid, &was_al);
                 if (have_memory) {
+                    // Both of the memory's copies go stale together, when a pass lands.
+                    bool src_fresh = im.memory_grid_fresh, valid_fresh = im.memory_grid_fresh;
+                    const uint8_t* mem_src =
+                        on_grid(im.memory_src.data(), 3, &im.memory_src_grid, &src_fresh);
+                    const uint8_t* mem_valid =
+                        on_grid(im.memory_valid.data(), 1, &im.memory_valid_grid, &valid_fresh);
+                    im.memory_grid_fresh = true;
                     mem_al.count = now_al.count;
                     for (int k = 0; k < now_al.count; k++) {
                         mem_al.h[k] = now_al.h[k];
-                        mem_al.motion[k].resize(px);
-                        measure(im.memory_src.data(), im.memory_valid.data(), mem_al.h[k],
-                                mem_al.motion[k].data());
+                        grid_of(&mem_al, k).resize(gpx);
+                        measure(mem_src, mem_valid, mem_al.h[k], grid_of(&mem_al, k).data());
                     }
                 }
                 uint8_t* masks[9];
                 uint8_t* across[9];
+                uint8_t* fulls[9];
                 int n_masks = 0;
                 for (Alignment* al : { &now_al, &was_al, &mem_al })
-                    for (int k = 0; k < al->count; k++)
-                        masks[n_masks++] = al->motion[k].data();
+                    for (int k = 0; k < al->count; k++) {
+                        al->motion[k].resize(px);
+                        fulls[n_masks] = al->motion[k].data();
+                        masks[n_masks++] = grid_of(al, k).data();
+                    }
                 if (im.dilate_scratch.size() < static_cast<size_t>(n_masks))
                     im.dilate_scratch.resize(static_cast<size_t>(n_masks));
                 for (int k = 0; k < n_masks; k++) {
-                    im.dilate_scratch[k].resize(px);
+                    im.dilate_scratch[k].resize(gpx);
                     across[k] = im.dilate_scratch[k].data();
                 }
-                DilateAll(masks, across, n_masks, width, height, MotionRadius(height));
+                // The radius in frame pixels, on the grid: rounded up, so the spread is never
+                // less than it would be at full size.
+                DilateAll(masks, across, n_masks, gw, gh,
+                          (MotionRadius(height) + step - 1) / step);
+                if (step > 1)
+                    UndecimateAll(masks, fulls, n_masks, width, height, step);
             }
 
             std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
