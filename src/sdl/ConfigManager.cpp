@@ -577,6 +577,11 @@ void LoadConfigFile()
 	{
 		const char* configFile = FindConfigFile("vbam.ini");
 		OpenPreferences(configFile);
+		// Without a config file, every preference read would otherwise
+		// repeat the search above (five stat() calls each). An empty
+		// dictionary answers them with their defaults instead.
+		if (preferences == NULL)
+			preferences = dictionary_new(0);
 	}
 }
 
@@ -741,6 +746,8 @@ int ReadOpts(int argc, char ** argv)
 				log("File not found %s\n", optarg);
 				break;
 			}
+			if (preferences)
+				iniparser_freedict(preferences);
 			preferences = NULL;
 			OpenPreferences(optarg);
 			fclose(f);

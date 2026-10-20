@@ -2076,8 +2076,8 @@ void SetHomeConfigDir()
 {
     snprintf(homeConfigDir, sizeof(homeConfigDir), "%s%s", get_xdg_user_config_home().c_str(), DOT_DIR);
     struct stat s;
-    if (stat(homeDataDir, &s) == -1 || !S_ISDIR(s.st_mode))
-        mkdir(homeDataDir, 0755);
+    if (stat(homeConfigDir, &s) == -1 || !S_ISDIR(s.st_mode))
+        mkdir(homeConfigDir, 0755);
 }
 
 void SetHomeDataDir()
@@ -2090,6 +2090,18 @@ void SetHomeDataDir()
 
 int main(int argc, char** argv)
 {
+#ifdef __DJGPP__
+    // DJGPP's stat() fills in inode numbers, execute bits, directory
+    // sizes and the root time stamp with extra DOS calls per file: an
+    // IOCTL probe (which DOSBox-X logs as an unhandled IOCTL 11:71), a
+    // walk of the directory through the DOS swappable data area and a
+    // read of the file header. Nothing here reads those fields, and the
+    // start-up path searches call stat() over a hundred times, so keep
+    // only the cheap ones (type, size, time).
+    _djstat_flags = _STAT_INODE | _STAT_EXEC_EXT | _STAT_EXEC_MAGIC
+                  | _STAT_DIRSIZE | _STAT_ROOT_TIME | _STAT_WRITEBIT;
+#endif
+
     fprintf(stdout, "%s\n", kVbamNameAndSubversion.c_str());
 
     home = argv[0];
