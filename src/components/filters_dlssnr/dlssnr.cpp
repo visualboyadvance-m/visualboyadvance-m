@@ -664,6 +664,27 @@ inline size_t CastIndex(int r, int g, int b) {
            (static_cast<size_t>(g >> shift) << kCastBits) | static_cast<size_t>(b >> shift);
 }
 
+// keep[i] stays all ones only where a[i] == b[i], over n bytes, sixteen at a time where the
+// vector loop is built.
+inline void KeepEqual(uint8_t* keep, const uint8_t* a, const uint8_t* b, int n) {
+    int i = 0;
+#if defined(VBAM_DLSSNR_SSE2)
+    for (; i + 16 <= n; i += 16) {
+        const __m128i x = _mm_loadu_si128(reinterpret_cast<const __m128i*>(a + i));
+        const __m128i y = _mm_loadu_si128(reinterpret_cast<const __m128i*>(b + i));
+        const __m128i k = _mm_loadu_si128(reinterpret_cast<const __m128i*>(keep + i));
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(keep + i),
+                         _mm_and_si128(k, _mm_cmpeq_epi8(x, y)));
+    }
+#elif defined(VBAM_DLSSNR_NEON)
+    for (; i + 16 <= n; i += 16)
+        vst1q_u8(keep + i,
+                 vandq_u8(vld1q_u8(keep + i), vceqq_u8(vld1q_u8(a + i), vld1q_u8(b + i))));
+#endif
+    for (; i < n; i++)
+        keep[i] &= static_cast<uint8_t>(a[i] == b[i] ? 0xff : 0);
+}
+
 // The cast of a pass that turned `in` into `out` (RGB8, `pixels` long): for each colour the
 // mean change, three values an entry.
 //
@@ -672,23 +693,60 @@ inline size_t CastIndex(int r, int g, int b) {
 // to the pass's colours: a scroll brings in what was off screen, and interframe blending
 // mixes two frames into colours neither had. Leaving those at no change drops the cast
 // exactly where the picture moves, and the correction flickers off with it.
-void BuildCast(const uint8_t* in, const uint8_t* out, size_t pixels, std::vector<int16_t>* cast,
-               std::vector<int64_t>* sums) {
+//
+// Where most of a colour stands clear of any edge -- the same colour all round at twice
+// MotionRadius(), out of reach of the network's halo -- the mean is over those alone.
+// The cast stands in where something has just moved away, and what it uncovers is mostly open
+// ground; but the ground beside every edge in the frame carries the halo of that edge, and
+// counted in, it pulled the sand's cast in the NES Zelda to -11, -7, -4 against the open
+// sand's -7, -6, -1. Wherever Link walked off a spot the pass still had him on, a greyer,
+// darker copy of him stood there until the next pass came. A colour that mostly appears
+// beside edges -- a sprite's -- keeps the mean over all of it, which carries the sharpening of
+// those edges: the cast is also what a sprite takes while it walks, and taking the mean of
+// its few clear pixels instead left him paler than the pass makes him.
+void BuildCast(const uint8_t* in, const uint8_t* out, int width, int height,
+               std::vector<int16_t>* cast, std::vector<int64_t>* sums) {
     const auto coarse_of = [](size_t k) {
         const size_t r = k >> (2 * kCastBits), g = (k >> kCastBits) & ((1u << kCastBits) - 1),
                      b = k & ((1u << kCastBits) - 1);
         constexpr int drop = kCastBits - kCoarseBits;
         return ((r >> drop) << (2 * kCoarseBits)) | ((g >> drop) << kCoarseBits) | (b >> drop);
     };
-    sums->assign((kCastEntries + kCoarseEntries + 1) * 4, 0);
+    sums->assign((2 * kCastEntries + kCoarseEntries + 1) * 4, 0);
     int64_t* const fine = sums->data();
-    int64_t* const coarse = fine + kCastEntries * 4;
+    int64_t* const clear = fine + kCastEntries * 4;
+    int64_t* const coarse = clear + kCastEntries * 4;
     int64_t* const all = coarse + kCoarseEntries * 4;
-    for (size_t i = 0; i < pixels; i++, in += 3, out += 3) {
-        int64_t* e = fine + CastIndex(in[0], in[1], in[2]) * 4;
-        for (int c = 0; c < 3; c++)
-            e[c] += out[c] - in[c];
-        e[3]++;
+    const int r = 2 * MotionRadius(height);
+    const ptrdiff_t across = 3 * static_cast<ptrdiff_t>(r), down = across * width;
+    const ptrdiff_t ring[8] = { -down - across, -down, -down + across, -across,
+                                across,         down - across, down, down + across };
+    // Each row's bytes against the same bytes at each of the eight offsets, a whole row at a
+    // time so the compares run sixteen to a vector; a pixel is clear if all three of its are.
+    thread_local std::vector<uint8_t> same;
+    same.resize(static_cast<size_t>(width) * 3);
+    for (int y = 0; y < height; y++) {
+        const bool inside = y >= r && y < height - r && width > 2 * r;
+        if (inside) {
+            const size_t b0 = static_cast<size_t>(across), b1 = static_cast<size_t>(width - r) * 3;
+            std::fill(same.begin(), same.end(), uint8_t{0});
+            std::fill(same.begin() + b0, same.begin() + b1, uint8_t{0xff});
+            for (const ptrdiff_t o : ring)
+                KeepEqual(same.data() + b0, in + b0, in + b0 + o, static_cast<int>(b1 - b0));
+        }
+        for (int x = 0; x < width; x++, in += 3, out += 3) {
+            const size_t k = CastIndex(in[0], in[1], in[2]);
+            int64_t* e = fine + k * 4;
+            for (int c = 0; c < 3; c++)
+                e[c] += out[c] - in[c];
+            e[3]++;
+            if (inside && same[3 * x] & same[3 * x + 1] & same[3 * x + 2]) {
+                e = clear + k * 4;
+                for (int c = 0; c < 3; c++)
+                    e[c] += out[c] - in[c];
+                e[3]++;
+            }
+        }
     }
     for (size_t k = 0; k < kCastEntries; k++) {
         const int64_t* e = fine + k * 4;
@@ -704,6 +762,8 @@ void BuildCast(const uint8_t* in, const uint8_t* out, size_t pixels, std::vector
     cast->resize(kCastEntries * 3);
     for (size_t k = 0; k < kCastEntries; k++) {
         const int64_t* e = fine + k * 4;
+        if (e[3] && 2 * clear[k * 4 + 3] >= e[3])
+            e = clear + k * 4;
         if (!e[3])
             e = coarse + coarse_of(k) * 4;
         if (!e[3])
@@ -2580,8 +2640,8 @@ void Filter::Impl::ComposeStage() {
         lock.unlock();
         const bool ok = Compose(p);
         if (ok)
-            BuildCast(p->src_rgb.data(), p->rgb.data(), static_cast<size_t>(p->width) * p->height,
-                      &p->cast, &p->cast_sums);
+            BuildCast(p->src_rgb.data(), p->rgb.data(), p->width, p->height, &p->cast,
+                      &p->cast_sums);
         // Only this stage writes the settled copies, so it reads them unlocked.
         const bool same = ok && p->width == settled_width && p->height == settled_height &&
                           p->filter_width == settled_filter_width &&
