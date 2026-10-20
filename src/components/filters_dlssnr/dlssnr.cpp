@@ -1370,7 +1370,13 @@ void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid
 // not keep it -- the grid rounds the shift, and each block takes its centre's motion -- and
 // the composition reads a pass's correction wherever the mask lets it, so the last rows of
 // a block shifted off the frame read past the end of the buffer.
-void MarkOffFrame(uint8_t* motion, const Hypothesis& h, int width, int height) {
+//
+// `valid`, given for the correction memory's masks, is its full-size map of the pixels that
+// hold anything, and is MeasureRows()'s other rule: a pixel reading one that holds nothing
+// has moved all of it. On the grid each block took its centre's say, so near the edge of
+// what the memory holds the composition laid down a correction that was never made.
+void MarkOffFrame(uint8_t* motion, const uint8_t* valid, const Hypothesis& h, int width,
+                  int height) {
     const int x0 = std::max(0, std::max(h.ax, h.bx));
     const int x1 = std::min(width, std::min(h.ax, h.bx) + width);
     RowPool::Get().Run(height, [&](int y_begin, int y_end) {
@@ -1385,6 +1391,15 @@ void MarkOffFrame(uint8_t* motion, const Hypothesis& h, int width, int height) {
                 std::memset(mv, 255, static_cast<size_t>(x0));
             if (x1 < width)
                 std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
+            if (valid) {
+                const size_t n = static_cast<size_t>(x1 - x0);
+                const uint8_t* av = valid + static_cast<size_t>(ay) * width + (x0 - h.ax);
+                const uint8_t* bv = valid + static_cast<size_t>(by) * width + (x0 - h.bx);
+                uint8_t* out = mv + x0;
+                // all ones where either is empty, as a mask, so it vectorises
+                for (size_t i = 0; i < n; i++)
+                    out[i] |= static_cast<uint8_t>(-static_cast<int>((av[i] == 0) | (bv[i] == 0)));
+            }
         }
     });
 }
@@ -3253,12 +3268,14 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 uint8_t* across[9];
                 uint8_t* fulls[9];
                 const Hypothesis* shifts[9];
+                const uint8_t* valids[9];
                 int n_masks = 0;
                 for (Alignment* al : { &now_al, &was_al, &mem_al })
                     for (int k = 0; k < al->count; k++) {
                         al->motion[k].resize(px);
                         fulls[n_masks] = al->motion[k].data();
                         shifts[n_masks] = &al->h[k];
+                        valids[n_masks] = al == &mem_al ? im.memory_valid.data() : nullptr;
                         masks[n_masks++] = grid_of(al, k).data();
                     }
                 if (im.dilate_scratch.size() < static_cast<size_t>(n_masks))
@@ -3274,7 +3291,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 if (step > 1) {
                     UndecimateAll(masks, fulls, n_masks, width, height, step);
                     for (int k = 0; k < n_masks; k++)
-                        MarkOffFrame(fulls[k], *shifts[k], width, height);
+                        MarkOffFrame(fulls[k], valids[k], *shifts[k], width, height);
                 }
             }
 
