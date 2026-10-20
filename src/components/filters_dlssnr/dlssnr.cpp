@@ -393,8 +393,8 @@ constexpr int kSceneMildLevels = 60;
 // the ground does not change at all. Agreement between two consecutive passes was tried
 // first and fails for exactly the sprite that matters, the slow walker -- his flat tunic
 // overlaps itself from one pass to the next, so he became background and his own
-// correction was remembered where he had been. Twelve frames is longer than a pass is
-// old, so what has stood that long is also what the pass was given there.
+// correction was remembered where he had been. The pixel has to have stood since the pass
+// was given its frame as well (UpdateMemory()), so what it shows is what the pass was given.
 constexpr int kMemoryStillFrames = 12;
 
 // The passes' correction of the background, kept from one pass to the next: see
@@ -1975,6 +1975,7 @@ struct Packet {
     uint64_t generation = 0;
     bool new_extent = false;
     std::chrono::steady_clock::time_point start;
+    uint64_t frame = 0;  // Filter::Impl::frames_applied when it was given the frame
 
     std::vector<float> colour;    // (filter_height, filter_width, 3)
     std::vector<float> features;  // (network_height, network_width, 16)
@@ -2043,6 +2044,7 @@ struct Filter::Impl {
     std::vector<int16_t> result_cast;
     int result_width = 0;
     int result_height = 0;
+    uint64_t result_frame = 0;  // Packet::frame
     std::vector<uint8_t> display;
     std::vector<uint8_t> display_src;
     std::vector<int16_t> display_cast;
@@ -2075,6 +2077,13 @@ struct Filter::Impl {
     std::vector<uint8_t> age;
     std::vector<uint8_t> age_diff;  // the channels' change since the last frame, for `age`
     std::vector<uint8_t> live_previous;
+    // Calls to Apply32() so far, and the count when the pass on screen was given its frame:
+    // how many frames old the pass is, for UpdateMemory(). And UpdateMemory()'s mask of
+    // what is near anything that moved since, on the motion grid, with its scratch.
+    uint64_t frames_applied = 0;
+    uint64_t display_frame = 0;
+    std::vector<uint8_t> memory_near;
+    std::vector<uint8_t> memory_near_scratch;
     // Apply32()'s live frame as RGB8 and its pyramid; how it lines up with the pass on
     // screen and the one before it; and the dilation's scratch. Members so the frame does not allocate.
     std::vector<uint8_t> live;
@@ -2154,7 +2163,7 @@ struct Filter::Impl {
     // Brings the correction memory up to date with the pass that just reached the
     // screen (`display_*`), the one before it still in `previous_*`, given the live frame
     // (RGB8, the frame's size) and `age`. Caller holds `mutex`.
-    void UpdateMemory(const uint8_t* liveb);
+    void UpdateMemory(const uint8_t* liveb, int step);
 };
 
 void Filter::Impl::Fail(const std::string& why) {
@@ -2605,6 +2614,7 @@ void Filter::Impl::ComposeStage() {
             result_cast.swap(p->cast);
             result_width = p->width;
             result_height = p->height;
+            result_frame = p->frame;
             result_ready = true;
 
             // This output and input are the next frame's history and previous input.
@@ -2645,7 +2655,18 @@ void Filter::Impl::ComposeStage() {
 // lives in the coordinates of the pass before, and moves with the scroll between the two
 // passes first; `live` is the frame on screen now, screen coordinates, which the pass's
 // are too once nothing has moved for that long.
-void Filter::Impl::UpdateMemory(const uint8_t* liveb) {
+//
+// Nor is a pixel remembered near anything that has moved since the pass was given its
+// frame, within twice MotionRadius(): the pass's correction there carries the network's halo
+// around the sprite, and remembered, the halo is laid back down wherever the memory stands
+// in for the pass. Under a scroll that follows a walking sprite it did so all the time --
+// the sand beside Link holds still on screen while the ground scrolls under him, so it was
+// remembered pass after pass with his halo in it, the memory scrolled on with the ground,
+// and the old pass, which no longer fits where Link had been, gave way to it there: a patch
+// a level lighter than the sand around it trailed him wherever he walked. And the pixel
+// itself has to have held still since the pass was given its frame as well as for
+// kMemoryStillFrames, which at the larger extents a pass is older than.
+void Filter::Impl::UpdateMemory(const uint8_t* liveb, int step) {
     const int w = display_width;
     const int h = display_height;
     const size_t px = static_cast<size_t>(w) * h;
@@ -2694,22 +2715,38 @@ void Filter::Impl::UpdateMemory(const uint8_t* liveb) {
     const uint8_t* const now = display_src.data();
     const int16_t* const delta = display_delta.data();
     const bool have_age = liveb && age.size() == px;
+    // What has moved since the pass's frame, spread by the halo, on the motion grid.
+    const int gw = (w + step - 1) / step, gh = (h + step - 1) / step;
+    const int still = static_cast<int>(
+        std::min<uint64_t>(255, kMemoryStillFrames + (frames_applied - display_frame)));
+    if (have_age) {
+        Decimate(age.data(), w, h, step, 1, &memory_near);
+        for (uint8_t& a : memory_near)
+            a = a < still ? 255 : 0;
+        Dilate(&memory_near, gw, gh, (2 * MotionRadius(h) + step - 1) / step,
+               &memory_near_scratch);
+    }
     RowPool::Get().Run(h, [&](int ya, int yb) {
-        for (size_t i = static_cast<size_t>(ya) * w; i < static_cast<size_t>(yb) * w; i++) {
-            bool take = !memory_valid[i];
-            if (!take && have_age && age[i] >= kMemoryStillFrames) {
-                const uint8_t* a = now + i * 3;
-                const uint8_t* b = liveb + i * 3;
-                take = std::abs(a[0] - b[0]) <= kHoldLevels &&
-                       std::abs(a[1] - b[1]) <= kHoldLevels &&
-                       std::abs(a[2] - b[2]) <= kHoldLevels;
-            }
-            if (take) {
-                std::memcpy(memory_src.data() + i * 3, now + i * 3, 3);
-                memory_delta[3 * i] = delta[3 * i];
-                memory_delta[3 * i + 1] = delta[3 * i + 1];
-                memory_delta[3 * i + 2] = delta[3 * i + 2];
-                memory_valid[i] = 1;
+        for (int y = ya; y < yb; y++) {
+            const uint8_t* const near =
+                have_age ? memory_near.data() + static_cast<size_t>(y / step) * gw : nullptr;
+            for (int x = 0; x < w; x++) {
+                const size_t i = static_cast<size_t>(y) * w + x;
+                bool take = !memory_valid[i];
+                if (!take && near && !near[x / step]) {
+                    const uint8_t* a = now + i * 3;
+                    const uint8_t* b = liveb + i * 3;
+                    take = std::abs(a[0] - b[0]) <= kHoldLevels &&
+                           std::abs(a[1] - b[1]) <= kHoldLevels &&
+                           std::abs(a[2] - b[2]) <= kHoldLevels;
+                }
+                if (take) {
+                    std::memcpy(memory_src.data() + i * 3, now + i * 3, 3);
+                    memory_delta[3 * i] = delta[3 * i];
+                    memory_delta[3 * i + 1] = delta[3 * i + 1];
+                    memory_delta[3 * i + 2] = delta[3 * i + 2];
+                    memory_valid[i] = 1;
+                }
             }
         }
     });
@@ -2843,6 +2880,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
 
         const auto now = std::chrono::steady_clock::now();
         im.governor.Frame(now, settings.target_fps);
+        im.frames_applied++;
 
         // A frame arriving while the pipeline is full is skipped.
         if (!unchanged && im.governor.MayStart(now) && !im.failed.load() && !im.quit.load() &&
@@ -2858,6 +2896,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             p->params = params;
             p->want_history = settings.history;
             p->control_mask = settings.control_mask;
+            p->frame = im.frames_applied;
             im.queued[kStageFeatures] = p;
             notify = true;
         }
@@ -2890,6 +2929,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             im.display_cast.swap(im.result_cast);
             im.display_width = im.result_width;
             im.display_height = im.result_height;
+            im.display_frame = im.result_frame;
             im.result_ready = false;
             if (im.display_src.size() ==
                 static_cast<size_t>(im.display_width) * im.display_height * 3)
@@ -2964,7 +3004,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             });
             const uint8_t* const live = im.live.data();
             if (landed)
-                im.UpdateMemory(live);
+                im.UpdateMemory(live, MotionStep(height, filter_height));
 
             // How far each pixel has moved since the pass was given the frame, if the pass
             // is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
