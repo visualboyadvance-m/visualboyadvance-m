@@ -42,7 +42,12 @@ extern const char *saveDir;
 extern const char *batteryDir;
 
 // Directory within homedir to use for default save location.
+#ifdef __DJGPP__
+// DOS without long file names keeps eight characters of a name.
+#define DOT_DIR "vbam"
+#else
 #define DOT_DIR "visualboyadvance-m"
+#endif
 
 void SetHome(char *_arg0);
 void SaveConfigFile();

@@ -316,14 +316,9 @@ if(NOT Threads_FOUND)
 endif()
 
 # DJGPP: FindThreads fails because GNU Pth's libpthread also needs the
-# socket stub library. libstdc++ itself calls the Pth wrappers (its
-# this_thread::sleep_for and file streams), and the driver adds -lstdc++
-# after every library CMake lists, so the two have to follow an explicit
-# -lstdc++ at the very end of the link line.
-if(DOS AND NOT Threads_FOUND)
-    set(CMAKE_THREAD_LIBS_INIT "-lpthread -lsocket")
-    set(CMAKE_CXX_STANDARD_LIBRARIES "-lstdc++ -lpthread -lsocket")
-endif()
+# socket stub library. That is fine: the port is single-threaded and must not
+# link Pth at all; src/sdl/dos-libstdcxx-shims.c covers what libstdc++ wants
+# from it and explains why linking it crashes at startup.
 
 if(APPLE)
     enable_language(OBJC)

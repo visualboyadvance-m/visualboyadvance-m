@@ -55,9 +55,10 @@ if(MSVC)
         ${CMAKE_SOURCE_DIR}/win32-deps/msvc/getopt.h
     )
 elseif(DOS)
-    # DJGPP's libc has no getopt_long().
+    # DJGPP's libc has no getopt_long(), and its libstdc++ wants Pth wrappers.
     target_sources(vbam
         PRIVATE
+        dos-libstdcxx-shims.c
         getopt.c
         getopt.h
     )
