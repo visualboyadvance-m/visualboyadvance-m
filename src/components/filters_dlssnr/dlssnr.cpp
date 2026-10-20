@@ -334,11 +334,24 @@ constexpr int kFadeLevels = 20;
 // neighbourhood instead of the pixel's own drops those with the edge that made them; a
 // radius of 2 covers the width a sharpened edge occupies.
 //
-// Wider does not help: a pass's correction also carries a halo around a sprite, but that
-// came from the history, and kReleaseRadius keeps it out of the pass in the first place.
-// Spread wider here, the correction is dropped to the cast (kCastBits) over a box around
-// anything that moves, and the box shows.
+// Wider than a GBA pixel does not help: a pass's correction also carries a halo of the
+// history around a sprite, but kReleaseRadius keeps that out of the pass in the first
+// place. Spread wider here, the correction is dropped to the cast (kCastBits) over a box
+// around anything that moves, and the box shows. The radius is for a frame at 2x; see
+// MotionRadius() for larger ones.
 constexpr int kMotionRadius = 2;
+
+// kMotionRadius at a frame `height` tall. It was set on a GBA frame at 2x (320 tall), but
+// the edge it covers is a GBA pixel wide at any scale, and so is the network's own halo
+// around a sprite: measured on the flat sand around Link in the NES Zelda, a pass's
+// correction stands out from the sand's for 2 pixels at xBRZ 2x and for 6 at 6x. At 6x the
+// fixed 2 pixels were a third of a GBA pixel, so once Link had walked on, the rest of his
+// halo stayed where he had been, laid down at full weight over sand that had never changed,
+// and a faint light outline of him trailed behind him. So it grows with the frame, as
+// kScrollReach does, and is never less than at 2x.
+inline int MotionRadius(int height) {
+    return std::max(kMotionRadius, (kMotionRadius * height + 160) / 320);
+}
 
 // When the picture as a whole is moving, how much of it has to be moving before the
 // correction beyond the cast (kCastBits) is wound down everywhere, as a percentage of the
@@ -2986,7 +2999,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     im.dilate_scratch[k].resize(px);
                     across[k] = im.dilate_scratch[k].data();
                 }
-                DilateAll(masks, across, n_masks, width, height, kMotionRadius);
+                DilateAll(masks, across, n_masks, width, height, MotionRadius(height));
             }
 
             std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
