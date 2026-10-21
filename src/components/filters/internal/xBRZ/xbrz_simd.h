@@ -113,6 +113,19 @@ XBRZ_SIMD_INLINE bool maskNone(U32x4 m) { return _mm_movemask_ps(_mm_castsi128_p
 XBRZ_SIMD_INLINE void storeLanes(uint32_t* out, U32x4 a) { _mm_storeu_si128(reinterpret_cast<__m128i*>(out), a.v); }
 XBRZ_SIMD_INLINE void storeLanes(float* out, F32x4 a) { _mm_storeu_ps(out, a.v); }
 
+//lanes i0 .. i3 of a, in that order
+template <int i0, int i1, int i2, int i3> XBRZ_SIMD_INLINE U32x4 lanes(U32x4 a)
+{
+    return {_mm_shuffle_epi32(a.v, _MM_SHUFFLE(i3, i2, i1, i0))};
+}
+
+//the low byte of each lane, lane 0 in the low byte
+XBRZ_SIMD_INLINE uint32_t packLowBytes(U32x4 a)
+{
+    const __m128i w = _mm_packs_epi32(a.v, a.v);
+    return static_cast<uint32_t>(_mm_cvtsi128_si32(_mm_packus_epi16(w, w)));
+}
+
 //one pixel's four channels as 16-bit lanes (upper four lanes unused)
 struct Pix16 { __m128i v; };
 
@@ -168,8 +181,10 @@ XBRZ_SIMD_INLINE void storeu2(uint32_t* p, U32x4 a) { vst1_u32(p, vget_low_u32(a
 XBRZ_SIMD_INLINE U32x4 set1(uint32_t x) { return {vdupq_n_u32(x)}; }
 XBRZ_SIMD_INLINE U32x4 set4(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
 {
-    const uint32_t tmp[4] = {a, b, c, d};
-    return {vld1q_u32(tmp)};
+    //through the general registers; a store to a temporary and a vector load
+    //of it would wait on store forwarding that cannot merge four writes
+    return {vcombine_u32(vcreate_u32(static_cast<uint64_t>(a) | (static_cast<uint64_t>(b) << 32)),
+                         vcreate_u32(static_cast<uint64_t>(c) | (static_cast<uint64_t>(d) << 32)))};
 }
 
 XBRZ_SIMD_INLINE U32x4 bitAnd   (U32x4 a, U32x4 b) { return {vandq_u32(a.v, b.v)}; }
@@ -200,6 +215,22 @@ XBRZ_SIMD_INLINE bool maskNone(U32x4 m) { return vmaxvq_u32(m.v) == 0; }
 
 XBRZ_SIMD_INLINE void storeLanes(uint32_t* out, U32x4 a) { vst1q_u32(out, a.v); }
 XBRZ_SIMD_INLINE void storeLanes(float* out, F32x4 a) { vst1q_f32(out, a.v); }
+
+template <int i0, int i1, int i2, int i3> XBRZ_SIMD_INLINE U32x4 lanes(U32x4 a)
+{
+    //one table lookup; the index vector is a constant the compiler keeps in a register
+    const uint8_t idx[16] = {uint8_t(4 * i0), uint8_t(4 * i0 + 1), uint8_t(4 * i0 + 2), uint8_t(4 * i0 + 3),
+                             uint8_t(4 * i1), uint8_t(4 * i1 + 1), uint8_t(4 * i1 + 2), uint8_t(4 * i1 + 3),
+                             uint8_t(4 * i2), uint8_t(4 * i2 + 1), uint8_t(4 * i2 + 2), uint8_t(4 * i2 + 3),
+                             uint8_t(4 * i3), uint8_t(4 * i3 + 1), uint8_t(4 * i3 + 2), uint8_t(4 * i3 + 3)};
+    return {vreinterpretq_u32_u8(vqtbl1q_u8(vreinterpretq_u8_u32(a.v), vld1q_u8(idx)))};
+}
+
+XBRZ_SIMD_INLINE uint32_t packLowBytes(U32x4 a)
+{
+    const uint16x4_t w = vmovn_u32(a.v);
+    return vget_lane_u32(vreinterpret_u32_u8(vmovn_u16(vcombine_u16(w, w))), 0);
+}
 
 struct Pix16 { uint16x4_t v; };
 
@@ -290,6 +321,16 @@ XBRZ_SIMD_INLINE bool maskNone(U32x4 m) { return !((m.v[0] | m.v[1] | m.v[2] | m
 
 XBRZ_SIMD_INLINE void storeLanes(uint32_t* out, U32x4 a) { storeu(out, a); }
 XBRZ_SIMD_INLINE void storeLanes(float* out, F32x4 a) { std::memcpy(out, a.v, sizeof a.v); }
+
+template <int i0, int i1, int i2, int i3> XBRZ_SIMD_INLINE U32x4 lanes(U32x4 a)
+{
+    return {{a.v[i0], a.v[i1], a.v[i2], a.v[i3]}};
+}
+
+XBRZ_SIMD_INLINE uint32_t packLowBytes(U32x4 a)
+{
+    return (a.v[0] & 0xff) | ((a.v[1] & 0xff) << 8) | ((a.v[2] & 0xff) << 16) | ((a.v[3] & 0xff) << 24);
+}
 
 struct Pix16 { uint16_t v[4]; };
 

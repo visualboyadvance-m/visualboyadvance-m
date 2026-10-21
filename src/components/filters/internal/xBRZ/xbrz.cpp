@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <utility>
 #include <vector>
 #include "xbrz_simd.h"
 #include "xbrz_tools.h"
@@ -174,16 +175,34 @@ constexpr float scale_b = static_cast<float>(0.5 / (1 - k_b_d));
 constexpr float scale_r = static_cast<float>(0.5 / (1 - k_r_d));
 
 
+//a vector of pixels split into float channels
+struct Channels
+{
+    F32x4 r, g, b, a;
+};
+
 template <bool withAlpha> FORCE_INLINE
-F32x4 distYCbCr4(U32x4 pix1, U32x4 pix2)
+Channels unpackChannels(U32x4 pix)
 {
     using namespace simd;
     const U32x4 byteMask = set1(0xff);
+    Channels c;
+    c.r = toFloat(bitAnd(shr<16>(pix), byteMask));
+    c.g = toFloat(bitAnd(shr< 8>(pix), byteMask));
+    c.b = toFloat(bitAnd(        pix,  byteMask));
+    c.a = withAlpha ? toFloat(shr<24>(pix)) : fset1(0); //alpha in [0, 255]
+    return c;
+}
+
+template <bool withAlpha> FORCE_INLINE
+F32x4 distYCbCr4(const Channels& pix1, const Channels& pix2)
+{
+    using namespace simd;
 
     //defer division by 255 to after matrix multiplication
-    const F32x4 r_diff = fsub(toFloat(bitAnd(shr<16>(pix1), byteMask)), toFloat(bitAnd(shr<16>(pix2), byteMask)));
-    const F32x4 g_diff = fsub(toFloat(bitAnd(shr< 8>(pix1), byteMask)), toFloat(bitAnd(shr< 8>(pix2), byteMask)));
-    const F32x4 b_diff = fsub(toFloat(bitAnd(        pix1,  byteMask)), toFloat(bitAnd(        pix2,  byteMask)));
+    const F32x4 r_diff = fsub(pix1.r, pix2.r);
+    const F32x4 g_diff = fsub(pix1.g, pix2.g);
+    const F32x4 b_diff = fsub(pix1.b, pix2.b);
 
     const F32x4 y   = fadd(fadd(fmul(fset1(k_r), r_diff), fmul(fset1(k_g), g_diff)), fmul(fset1(k_b), b_diff)); //[!], analog YCbCr!
     const F32x4 c_b = fmul(fset1(scale_b), fsub(b_diff, y));
@@ -201,13 +220,16 @@ F32x4 distYCbCr4(U32x4 pix1, U32x4 pix2)
             3. if a1 = 1,  ??? maybe: 255 * (1 - a2) + a2 * distYCbCr()
 
             std::min(a1, a2) * distYCbCr(pix1, pix2) + 255 * abs(a1 - a2);   */
-        const F32x4 a1 = toFloat(shr<24>(pix1)); //alpha in [0, 255]
-        const F32x4 a2 = toFloat(shr<24>(pix2));
-        d = fmul(fadd(fmul(fmin(a1, a2), d), fmul(fabs(fsub(a1, a2)), fset1(255.0f))), fset1(1.0f / 255));
+        d = fmul(fadd(fmul(fmin(pix1.a, pix2.a), d), fmul(fabs(fsub(pix1.a, pix2.a)), fset1(255.0f))), fset1(1.0f / 255));
     }
     return d;
 }
 
+template <bool withAlpha> FORCE_INLINE
+F32x4 distYCbCr4(U32x4 pix1, U32x4 pix2)
+{
+    return distYCbCr4<withAlpha>(unpackChannels<withAlpha>(pix1), unpackChannels<withAlpha>(pix2));
+}
 
 //ScalerCfg narrowed to the precision the lanes work in
 struct ScalerCfgF
@@ -248,12 +270,17 @@ enum BlendType
 //distances between the pixels of one source row and their right, lower and two
 //diagonal neighbours, one float per column (see computeDistRow4): every pair the
 //preprocessing sums and most pairs the blend step asks for are loads from these
+enum DistMap
+{
+    MAP_H,  //h[x]  = dist(P(x, y),     P(x + 1, y))
+    MAP_V,  //v[x]  = dist(P(x, y),     P(x, y + 1))
+    MAP_D1, //d1[x] = dist(P(x, y),     P(x + 1, y + 1)), diagonal "\\"
+    MAP_D2, //d2[x] = dist(P(x + 1, y), P(x, y + 1)),     diagonal "/"
+};
+
 struct DistRow
 {
-    float* h;  //h[x]  = dist(P(x, y),     P(x + 1, y))
-    float* v;  //v[x]  = dist(P(x, y),     P(x, y + 1))
-    float* d1; //d1[x] = dist(P(x, y),     P(x + 1, y + 1)), diagonal "\\"
-    float* d2; //d2[x] = dist(P(x + 1, y), P(x, y + 1)),     diagonal "/"
+    float* m[4]; //indexed by DistMap
 };
 
 //fill the distance rows for the four pixels at x0 .. x0 + 3 of the padded pixel rows y (s_0) and y + 1 (s_p1)
@@ -268,20 +295,34 @@ void computeDistRow4(const uint32_t* s_0, const uint32_t* s_p1, int x0, const Di
     const U32x4 d = loadu(s_p1 + x0 + 1); //P(x + 1, y + 1)
 
     //flat area (the common case in pixel art): all four distances are zero
-    if (maskAll(bitAnd(bitAnd(cmpEq(a, b), cmpEq(a, c)), cmpEq(b, d))))
+    const U32x4 eq_ab = cmpEq(a, b);
+    const U32x4 eq_ac = cmpEq(a, c);
+    const U32x4 eq_bd = cmpEq(b, d);
+    if (maskAll(bitAnd(bitAnd(eq_ab, eq_ac), eq_bd)))
     {
         const F32x4 zero = fset1(0);
-        storeLanes(out.h  + x0, zero);
-        storeLanes(out.v  + x0, zero);
-        storeLanes(out.d1 + x0, zero);
-        storeLanes(out.d2 + x0, zero);
+        for (float* map : out.m)
+            storeLanes(map + x0, zero);
         return;
     }
 
-    storeLanes(out.h  + x0, distYCbCr4<withAlpha>(a, b));
-    storeLanes(out.v  + x0, distYCbCr4<withAlpha>(a, c));
-    storeLanes(out.d1 + x0, distYCbCr4<withAlpha>(a, d));
-    storeLanes(out.d2 + x0, distYCbCr4<withAlpha>(b, c));
+    const Channels ca = unpackChannels<withAlpha>(a);
+    const Channels cb = unpackChannels<withAlpha>(b);
+    const Channels cc = unpackChannels<withAlpha>(c);
+    const Channels cd = unpackChannels<withAlpha>(d);
+
+    //along a horizontal or vertical edge one pair is still equal in all four lanes
+    auto pair = [&](float* map, U32x4 eq, const Channels& pix1, const Channels& pix2)
+    {
+        if (maskAll(eq))
+            storeLanes(map + x0, fset1(0));
+        else
+            storeLanes(map + x0, distYCbCr4<withAlpha>(pix1, pix2));
+    };
+    pair(out.m[MAP_H ], eq_ab,       ca, cb);
+    pair(out.m[MAP_V ], eq_ac,       ca, cc);
+    pair(out.m[MAP_D1], cmpEq(a, d), ca, cd);
+    pair(out.m[MAP_D2], cmpEq(b, c), cb, cc);
 }
 
 
@@ -315,11 +356,17 @@ void preProcessCorners4(const uint32_t* s_0, const uint32_t* s_p1,
     const F32x4 bias = fset1(cfg.centerDirectionBias);
 
     //hf: the "/" pairs of the 4x4 kernel: g-e, e-c, k-i, i-o and the centre pair h-f
-    const F32x4 hf = fadd(fadd(fadd(fadd(floadu(d0.d2 + x0 - 1), floadu(dm1.d2 + x0)), floadu(dp1.d2 + x0)), floadu(d0.d2 + x0 + 1)),
-                          fmul(bias, floadu(d0.d2 + x0)));
+    const float* d2_m1 = dm1.m[MAP_D2];
+    const float* d2_0  = d0 .m[MAP_D2];
+    const float* d2_p1 = dp1.m[MAP_D2];
+    const F32x4 hf = fadd(fadd(fadd(fadd(floadu(d2_0 + x0 - 1), floadu(d2_m1 + x0)), floadu(d2_p1 + x0)), floadu(d2_0 + x0 + 1)),
+                          fmul(bias, floadu(d2_0 + x0)));
     //ei: the "\\" pairs: d-h, h-l, b-f, f-n and the centre pair e-i
-    const F32x4 ei = fadd(fadd(fadd(fadd(floadu(d0.d1 + x0 - 1), floadu(dp1.d1 + x0)), floadu(dm1.d1 + x0)), floadu(d0.d1 + x0 + 1)),
-                          fmul(bias, floadu(d0.d1 + x0)));
+    const float* d1_m1 = dm1.m[MAP_D1];
+    const float* d1_0  = d0 .m[MAP_D1];
+    const float* d1_p1 = dp1.m[MAP_D1];
+    const F32x4 ei = fadd(fadd(fadd(fadd(floadu(d1_0 + x0 - 1), floadu(d1_p1 + x0)), floadu(d1_m1 + x0)), floadu(d1_0 + x0 + 1)),
+                          fmul(bias, floadu(d1_0 + x0)));
 
     //test sample: 70% of values max(hf, ei) / min(hf, ei) are between 1.1 and 3.7 with median being 1.8
     const U32x4 hfLess = fcmpLt(hf, ei);
@@ -337,10 +384,9 @@ void preProcessCorners4(const uint32_t* s_0, const uint32_t* s_p1,
 
     const U32x4 packed = bitAndNot(skip, bitOr(bitOr(blend_e, shl<2>(blend_f)), bitOr(shl<4>(blend_h), shl<6>(blend_i))));
 
-    uint32_t lanes[4];
-    storeLanes(lanes, packed);
+    const uint32_t bytes = packLowBytes(packed);
     for (int j = 0; j < 4; ++j)
-        result[j] = static_cast<unsigned char>(lanes[j]);
+        result[j] = static_cast<unsigned char>(bytes >> (8 * j));
 }
 
 
@@ -389,8 +435,8 @@ constexpr KernelPos rotatedPos[4][9] =
 
 //the 24 pixel pairs blendPixel() can ask the distance of, over all four rotations:
 //E against its eight neighbours and the eight adjacent pairs along the ring are
-//in the distance rows; the eight "knight" pairs (F-G, H-C and their rotations)
-//are computed, two vector distances
+//entries of the distance rows, the eight "knight" pairs (F-G, H-C and their
+//rotations) are computed per pixel, two vector distances
 constexpr KernelPos distPairs[24][2] =
 {
     {POS_E, POS_A}, {POS_E, POS_B}, {POS_E, POS_C}, {POS_E, POS_D},
@@ -399,6 +445,33 @@ constexpr KernelPos distPairs[24][2] =
     {POS_I, POS_H}, {POS_H, POS_G}, {POS_G, POS_D}, {POS_D, POS_A},
     {POS_F, POS_G}, {POS_H, POS_C}, {POS_B, POS_I}, {POS_F, POS_A},
     {POS_D, POS_C}, {POS_B, POS_G}, {POS_H, POS_A}, {POS_D, POS_I},
+};
+
+//where the first 16 pairs sit in the distance rows, relative to E at (x, y)
+struct RowPairLoc
+{
+    signed char row; //-1, 0, 1 = y - 1, y, y + 1
+    signed char map; //DistMap
+    signed char dx;
+};
+constexpr RowPairLoc rowPairLoc[16] =
+{
+    {-1, MAP_D1, -1}, //E-A
+    {-1, MAP_V,   0}, //E-B
+    {-1, MAP_D2,  0}, //E-C
+    { 0, MAP_H,  -1}, //E-D
+    { 0, MAP_H,   0}, //E-F
+    { 0, MAP_D2, -1}, //E-G
+    { 0, MAP_V,   0}, //E-H
+    { 0, MAP_D1,  0}, //E-I
+    {-1, MAP_H,  -1}, //A-B
+    {-1, MAP_H,   0}, //B-C
+    {-1, MAP_V,   1}, //C-F
+    { 0, MAP_V,   1}, //F-I
+    { 1, MAP_H,   0}, //I-H
+    { 1, MAP_H,  -1}, //H-G
+    { 0, MAP_V,  -1}, //G-D
+    {-1, MAP_V,  -1}, //D-A
 };
 
 struct DistPairIndex
@@ -418,48 +491,49 @@ struct DistPairIndex
 };
 constexpr DistPairIndex distPairIndex;
 
-struct DistTable
+//the distances blendPixel() can ask for, for the pixel E at (x, y): entries of the
+//distance rows y - 1 .. y + 1 are read when asked (the pair index is a compile-time
+//constant at every call site, so each lookup is one load), the knight pairs are kept
+struct DistSource
 {
-    float d[24];
+    const DistRow* rows[3];
+    int x;
+    float knight[8];
+
+    FORCE_INLINE float get(int pair) const
+    {
+        if (pair < 16)
+        {
+            const RowPairLoc& loc = rowPairLoc[pair];
+            return rows[loc.row + 1]->m[loc.map][x + loc.dx];
+        }
+        return knight[pair - 16];
+    }
 };
 
-//for the pixel E at (x, y): dm1 / d0 / dp1 are the distance rows y - 1 .. y + 1
 template <bool withAlpha> FORCE_INLINE
-DistTable computeDistTable(const Kernel_3x3& ker, const DistRow& dm1, const DistRow& d0, const DistRow& dp1, int x)
+DistSource makeDistSource(const Kernel_3x3& ker, const DistRow& dm1, const DistRow& d0, const DistRow& dp1, int x)
 {
     using namespace simd;
-    DistTable t;
-    t.d[ 0] = dm1.d1[x - 1]; //E-A
-    t.d[ 1] = dm1.v [x];     //E-B
-    t.d[ 2] = dm1.d2[x];     //E-C
-    t.d[ 3] = d0 .h [x - 1]; //E-D
-    t.d[ 4] = d0 .h [x];     //E-F
-    t.d[ 5] = d0 .d2[x - 1]; //E-G
-    t.d[ 6] = d0 .v [x];     //E-H
-    t.d[ 7] = d0 .d1[x];     //E-I
-    t.d[ 8] = dm1.h [x - 1]; //A-B
-    t.d[ 9] = dm1.h [x];     //B-C
-    t.d[10] = dm1.v [x + 1]; //C-F
-    t.d[11] = d0 .v [x + 1]; //F-I
-    t.d[12] = dp1.h [x];     //I-H
-    t.d[13] = dp1.h [x - 1]; //H-G
-    t.d[14] = d0 .v [x - 1]; //G-D
-    t.d[15] = dm1.v [x - 1]; //D-A
-
+    DistSource ds;
+    ds.rows[0] = &dm1;
+    ds.rows[1] = &d0;
+    ds.rows[2] = &dp1;
+    ds.x = x;
     for (int p = 16; p < 24; p += 4)
     {
         const U32x4 pix1 = set4(ker.pix[distPairs[p][0]], ker.pix[distPairs[p + 1][0]], ker.pix[distPairs[p + 2][0]], ker.pix[distPairs[p + 3][0]]);
         const U32x4 pix2 = set4(ker.pix[distPairs[p][1]], ker.pix[distPairs[p + 1][1]], ker.pix[distPairs[p + 2][1]], ker.pix[distPairs[p + 3][1]]);
-        storeLanes(t.d + p, distYCbCr4<withAlpha>(pix1, pix2));
+        storeLanes(ds.knight + p - 16, distYCbCr4<withAlpha>(pix1, pix2));
     }
-    return t;
+    return ds;
 }
 
 
 template <class Scaler, RotationDegree rotDeg>
 FORCE_INLINE //perf: quite worth it!
 void blendPixel(const Kernel_3x3& ker,
-                const DistTable& distTable,
+                const DistSource& ds,
                 uint32_t* target, int trgWidth,
                 unsigned char blendInfo, //result of preprocessing all four corners of pixel "E"
                 const ScalerCfgF& cfg)
@@ -473,10 +547,12 @@ void blendPixel(const Kernel_3x3& ker,
         {
             const int i = distPairIndex.idx[rotatedPos[rotDeg][pos1]][rotatedPos[rotDeg][pos2]];
             assert(i >= 0);
-            return distTable.d[i];
+            return ds.get(i);
         };
         auto eq = [&](KernelPos pos1, KernelPos pos2) { return dist(pos1, pos2) < cfg.equalColorTolerance; };
 
+        //short-circuiting on purpose: evaluating every test unconditionally was measured slower
+        //than the branches, each test being a distance row load
         const bool doLineBlend = [&]  // MSVC workaround: remove -> bool
         {
             if (getBottomR(blend) >= BLEND_DOMINANT)
@@ -586,6 +662,32 @@ void fillBlock(uint32_t* trg, int trgWidth, uint32_t col)
     }
 }
 
+//one output row of the blocks of four consecutive source pixels is 4 * blockSize pixels,
+//blockSize vectors: vector j holds output pixels 4j .. 4j + 3, source lanes (4j + k) / blockSize
+template <int blockSize, int... J> FORCE_INLINE
+void blockRowVectors(U32x4* row, U32x4 pix, std::integer_sequence<int, J...>)
+{
+    ((row[J] = simd::lanes<(4 * J) / blockSize, (4 * J + 1) / blockSize, (4 * J + 2) / blockSize, (4 * J + 3) / blockSize>(pix)), ...);
+}
+
+//fill the blocks of four consecutive source pixels
+template <int blockSize> FORCE_INLINE
+void fillBlock4(uint32_t* trg, int trgWidth, const uint32_t* pix)
+{
+    using namespace simd;
+    U32x4 row[blockSize];
+    blockRowVectors<blockSize>(row, loadu(pix), std::make_integer_sequence<int, blockSize>{});
+    for (int y = 0; y < blockSize; ++y, trg += trgWidth)
+        for (int j = 0; j < blockSize; ++j)
+            storeu(trg + 4 * j, row[j]);
+}
+
+
+inline uint32_t load4(const unsigned char* p) //four bytes, the first in the low byte
+{
+    return static_cast<uint32_t>(p[0]) | (static_cast<uint32_t>(p[1]) << 8) | (static_cast<uint32_t>(p[2]) << 16) | (static_cast<uint32_t>(p[3]) << 24);
+}
+
 
 template <class Scaler, bool withAlpha, class OobReader> //scaler policy: see "Scaler2x" reference implementation
 void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight, int srcPitch, int trgPitch, const xbrz::ScalerCfg& cfgIn, int yFirst, int yLast)
@@ -608,7 +710,7 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
     auto distRow = [&](int r) //r >= -2
     {
         float* base = distBuf.data() + ((r + 8) & 3) * 4 * rowLen + PAD_LEFT;
-        return DistRow{base, base + rowLen, base + 2 * rowLen, base + 3 * rowLen};
+        return DistRow{{base, base + rowLen, base + 2 * rowLen, base + 3 * rowLen}};
     };
     auto computeDistRow = [&](int r)
     {
@@ -668,17 +770,20 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
         const DistRow d0  = distRow(y);
         const DistRow dp1 = distRow(y + 1);
 
-        for (int x = 0; x < srcWidth; ++x, out += Scaler::scale)
+        //the four corners of pixel (x, y): top-left is corner (x - 1, y - 1)'s blend_i, top-right is (x, y - 1)'s blend_h,
+        //bottom-right is (x, y)'s blend_e, bottom-left is (x - 1, y)'s blend_f
+        auto blendInfo = [&](int x)
         {
-            //the four corners of pixel (x, y): top-left is corner (x - 1, y - 1)'s blend_i, top-right is (x, y - 1)'s blend_h,
-            //bottom-right is (x, y)'s blend_e, bottom-left is (x - 1, y)'s blend_f
-            const unsigned char blend_xy = static_cast<unsigned char>((cornersPrev[x] >> 6) |
-                                                                      (((cornersPrev[x + 1] >> 4) & 0x3) << 2) |
-                                                                      ((cornersCur[x + 1] & 0x3) << 4) |
-                                                                      (((cornersCur[x] >> 2) & 0x3) << 6));
+            return static_cast<unsigned char>((cornersPrev[x] >> 6) |
+                                              (((cornersPrev[x + 1] >> 4) & 0x3) << 2) |
+                                              ((cornersCur[x + 1] & 0x3) << 4) |
+                                              (((cornersCur[x] >> 2) & 0x3) << 6));
+        };
 
+        auto scalePixel = [&](int x, uint32_t* outBlock, unsigned char blend_xy)
+        {
             //fill block of size scale * scale with the given color
-            fillBlock<Scaler::scale>(out, trgWidth, s_0[x]);
+            fillBlock<Scaler::scale>(outBlock, trgWidth, s_0[x]);
 
             //blend all four corners of current pixel
             if (blendingNeeded(blend_xy))
@@ -686,14 +791,52 @@ void scaleImage(const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
                 const Kernel_3x3 ker3 = {{s_m1[x - 1], s_m1[x], s_m1[x + 1],
                                           s_0 [x - 1], s_0 [x], s_0 [x + 1],
                                           s_p1[x - 1], s_p1[x], s_p1[x + 1]}};
-                const DistTable distTable = computeDistTable<withAlpha>(ker3, dm1, d0, dp1, x);
+                const DistSource ds = makeDistSource<withAlpha>(ker3, dm1, d0, dp1, x);
 
-                blendPixel<Scaler, ROT_0  >(ker3, distTable, out, trgWidth, blend_xy, cfg);
-                blendPixel<Scaler, ROT_90 >(ker3, distTable, out, trgWidth, blend_xy, cfg);
-                blendPixel<Scaler, ROT_180>(ker3, distTable, out, trgWidth, blend_xy, cfg);
-                blendPixel<Scaler, ROT_270>(ker3, distTable, out, trgWidth, blend_xy, cfg);
+                blendPixel<Scaler, ROT_0  >(ker3, ds, outBlock, trgWidth, blend_xy, cfg);
+                blendPixel<Scaler, ROT_90 >(ker3, ds, outBlock, trgWidth, blend_xy, cfg);
+                blendPixel<Scaler, ROT_180>(ker3, ds, outBlock, trgWidth, blend_xy, cfg);
+                blendPixel<Scaler, ROT_270>(ker3, ds, outBlock, trgWidth, blend_xy, cfg);
             }
+        };
+
+        //pixels are taken four at a time: when none of the four has a corner to blend (the
+        //common case) their blocks are filled in one go, otherwise the four blend bytes are
+        //consumed one pixel per iteration. One call site for scalePixel(), so the (large)
+        //blend code is inlined once
+        uint32_t blend4 = 0; //blend bytes of the pending pixels, the next one in the low byte
+        int pending = 0;
+        for (int x = 0; x < srcWidth; ++x, out += Scaler::scale)
+        {
+            if (pending == 0)
+            {
+                if (x + 4 <= srcWidth)
+                {
+                    //blendInfo() for the pixels x .. x + 3 at once, one per byte
+                    blend4 = ((load4(cornersPrev + x) >> 6) & 0x03030303u) |
+                             (((load4(cornersPrev + x + 1) >> 4) & 0x03030303u) << 2) |
+                             ((load4(cornersCur + x + 1) & 0x03030303u) << 4) |
+                             (((load4(cornersCur + x) >> 2) & 0x03030303u) << 6);
+                    if (blend4 == 0)
+                    {
+                        fillBlock4<Scaler::scale>(out, trgWidth, s_0 + x);
+                        x += 3;
+                        out += 3 * Scaler::scale;
+                        continue;
+                    }
+                    pending = 4;
+                }
+                else
+                {
+                    blend4 = blendInfo(x);
+                    pending = 1;
+                }
+            }
+            scalePixel(x, out, static_cast<unsigned char>(blend4));
+            blend4 >>= 8;
+            --pending;
         }
+
         std::swap(cornersPrev, cornersCur);
     }
 }
