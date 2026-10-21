@@ -1078,6 +1078,47 @@ static void sdlResizeVideo()
     }
 }
 
+#if defined(ENABLE_SDL3) && defined(SDL_PLATFORM_DOS)
+// On DOS a window is a VESA mode, and SDL chooses the mode for a window by
+// aspect ratio before size: for the 10:9 Game Boy screen the closest ratio
+// is 5:4, which is 1280x1024, a mode the card offers in 8-bit indexed colour
+// only, and the picture never shows. A GBA window is 3:2, nearest 16:10,
+// and lands on 640x400 in 32-bit colour by luck. Pick the mode here instead:
+// the richest direct-colour format on offer, and the smallest mode in that
+// format that holds the picture. The renderer's logical presentation centres
+// the picture in it. Returns false when no mode holds the picture, and the
+// window is then requested at its own size as on any other platform.
+static bool sdlDosPickMode(int width, int height, int* mode_width, int* mode_height)
+{
+    int count = 0;
+    SDL_DisplayMode** modes = SDL_GetFullscreenDisplayModes(SDL_GetPrimaryDisplay(), &count);
+    if (!modes)
+        return false;
+
+    const SDL_DisplayMode* best = nullptr;
+    for (int i = 0; i < count; i++) {
+        const SDL_DisplayMode* mode = modes[i];
+        if (mode->w < width || mode->h < height || SDL_ISPIXELFORMAT_INDEXED(mode->format))
+            continue;
+        if (!best) {
+            best = mode;
+            continue;
+        }
+        const int bpp = SDL_BYTESPERPIXEL(mode->format);
+        const int best_bpp = SDL_BYTESPERPIXEL(best->format);
+        if (bpp > best_bpp || (bpp == best_bpp && mode->w * mode->h < best->w * best->h))
+            best = mode;
+    }
+
+    if (best) {
+        *mode_width = best->w;
+        *mode_height = best->h;
+    }
+    SDL_free(modes);
+    return best != nullptr;
+}
+#endif
+
 void sdlInitVideo()
 {
     int flags;
@@ -1112,6 +1153,14 @@ void sdlInitVideo()
 
     screenWidth = destWidth;
     screenHeight = destHeight;
+
+#if defined(ENABLE_SDL3) && defined(SDL_PLATFORM_DOS)
+    int modeWidth, modeHeight;
+    if (sdlDosPickMode(destWidth, destHeight, &modeWidth, &modeHeight)) {
+        screenWidth = modeWidth;
+        screenHeight = modeHeight;
+    }
+#endif
 
     if (window)
         SDL_DestroyWindow(window);
@@ -1171,9 +1220,9 @@ void sdlInitVideo()
 
     if (makes_sense == true)
     {
-        SDL_SetRenderLogicalPresentation(renderer, screenWidth, screenHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
+        SDL_SetRenderLogicalPresentation(renderer, destWidth, destHeight, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
     } else {
-        SDL_SetRenderLogicalPresentation(renderer, screenWidth, screenHeight, SDL_LOGICAL_PRESENTATION_DISABLED);
+        SDL_SetRenderLogicalPresentation(renderer, destWidth, destHeight, SDL_LOGICAL_PRESENTATION_DISABLED);
     }
 
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_LINEAR);
