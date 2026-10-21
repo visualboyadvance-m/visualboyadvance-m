@@ -192,6 +192,9 @@ Description must reference the breaking change in git reference format.
 Tests use Google Test framework:
 - Core tests: `src/core/test/`
 - wxWidgets tests: `src/wx/test/`
+- Filter tests: `src/components/filters/test/` (`xbrz_test`: the SSE2/NEON xBRZ
+  build against a scalar build of the same source, bit for bit;
+  `VBAM_FILTER_BENCH=1` adds timings)
 - Run with: `ctest -j --output-on-failure` from build directory
 
 Tests are only built when `BUILD_TESTING=ON` (default) and in a git checkout.

@@ -35,6 +35,10 @@ namespace xbrz
     - Adjusted steep direction threshold
     - Faster xBRZ tools
 
+    VBA-M changes (see xbrz.cpp):
+    - SSE2 / NEON vectorization, colour distances computed instead of tabulated
+    - 9x scale factor
+
     using a modified approach of xBR: https://forums.libretro.com/t/xbr-algorithm-tutorial/123
     - new rule set preserving small image features
     - highly optimized for performance
@@ -48,10 +52,10 @@ enum class ColorFormat //from high bits -> low bits, 8 bit per channel
 {
     rgb,  //8 bit for each red, green, blue, upper 8 bits unused
     argb, //including alpha channel, BGRA byte order on little-endian machines
-    argbUnbuffered, //like ARGB, but without the one-time buffer creation overhead (ca. 100 - 300 ms) at the expense of a slightly slower scaling time
+    argbUnbuffered, //VBA-M: same as argb; the distance table it used to bypass is gone
 };
 
-const int SCALE_FACTOR_MAX = 6;
+const int SCALE_FACTOR_MAX = 9; //VBA-M: 2 - 6 and 9
 
 /*
 -> map source (srcWidth * srcHeight) to target (scale * width x scale * height) image, optionally processing a half-open slice of rows [yFirst, yLast) only
@@ -64,7 +68,7 @@ const int SCALE_FACTOR_MAX = 6;
 THREAD-SAFETY: - parts of the same image may be scaled by multiple threads as long as the [yFirst, yLast) ranges do not overlap!
                - there is a minor inefficiency for the first row of a slice, so avoid processing single rows only; suggestion: process at least 8-16 rows
 */
-void scale(size_t factor, //valid range: 2 - SCALE_FACTOR_MAX
+void scale(size_t factor, //valid range: 2 - 6 and 9
            const uint32_t* src, uint32_t* trg, int srcWidth, int srcHeight,
            ColorFormat colFmt, int srcPitch, int trgPitch, //VBA-M: pitch support restored
            const ScalerCfg& cfg = ScalerCfg(),
