@@ -313,9 +313,9 @@ inline uint32_t RgbToYuv32(uint32_t c) {
 inline uint32_t RgbToYuv16(uint16_t c, bool rgb555) {
     unsigned char r, g, b;
     if (rgb555) {
-        r = (c & 0x7C00) >> 7;
-        g = (c & 0x03E0) >> 2;
-        b = (c & 0x001F) << 3;
+        r = static_cast<unsigned char>((c & 0x7C00) >> 7);
+        g = static_cast<unsigned char>((c & 0x03E0) >> 2);
+        b = static_cast<unsigned char>((c & 0x001F) << 3);
     } else {
         r = static_cast<unsigned char>((c & 0xF800) >> 8);
         g = static_cast<unsigned char>((c & 0x07E0) >> 3);
