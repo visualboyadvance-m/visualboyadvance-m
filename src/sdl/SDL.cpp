@@ -131,6 +131,7 @@
 #include "core/gb/gbSound.h"
 #include "core/gba/gba.h"
 #include "core/gba/gbaCheats.h"
+#include "core/gba/gbaEeprom.h"
 #include "core/gba/gbaFlash.h"
 #include "core/gba/gbaGlobals.h"
 #include "core/gba/gbaRtc.h"
@@ -2299,6 +2300,16 @@ int main(int argc, char** argv)
                     coreOptions.saveType = coreOptions.cpuSaveType;
 
                 sdlApplyPerImagePreferences();
+
+                // eepromMask starts out zero, and eepromSetSize() is what
+                // gives it a value. Until then every ROM read passes the
+                // EEPROM address test and is answered by the EEPROM state
+                // machine instead of the cartridge, so an EEPROM game
+                // reads zeros and never gets past its first frame. The
+                // size is only a starting point: the first 14-bit
+                // address the game sends switches it to 8K.
+                if (coreOptions.saveType == GBA_SAVE_EEPROM)
+                    eepromSetSize(SIZE_EEPROM_512);
 
                 doMirroring(coreOptions.mirroringEnable);
 
