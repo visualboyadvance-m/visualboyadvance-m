@@ -4,7 +4,7 @@
 
 #include "scalefx.h"
 #include "scalefx_manager.h"
-#include "scalefx_simd.h"
+#include "scalefx_internal.h"
 #include <cstring>
 
 namespace scalefx {

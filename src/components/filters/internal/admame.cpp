@@ -37,200 +37,173 @@
 
 #include <cstdint>
 
-#include "simd_common.h"
+#include "../simd128.h"
 
 #ifdef MMX
 extern "C" bool cpu_mmx;
 #endif
 
+namespace {
+
+using namespace vbam_simd;
+
 // ============================================================================
-// SSE2 Implementations
+// Scale2x row kernel, scalar: dst gets 2 * count pixels from the three source
+// rows (the row above, the row itself, the row below).
 // ============================================================================
 
-#ifdef USE_SSE2
+template <typename Pixel>
+void internal_scale2x_def(Pixel* dst, const Pixel* src0, const Pixel* src1, const Pixel* src2, unsigned count) {
+  /* first pixel */
+  dst[0] = src1[0];
+  if (src1[1] == src0[0] && src2[0] != src0[0])
+    dst[1] = src0[0];
+  else
+    dst[1] = src1[0];
+  ++src0;
+  ++src1;
+  ++src2;
+  dst += 2;
 
-// Scale2x algorithm: Edge-detection based scaling
-// For each pixel, compare with neighbors and select based on edge patterns
-static void internal_scale2x_32_sse2_single(uint32_t* dst,
-                                             const uint32_t* src0,  // row above
-                                             const uint32_t* src1,  // current row
-                                             const uint32_t* src2,  // row below
-                                             unsigned count) {
-    // First pixel (special case - no left neighbor)
+  /* central pixels */
+  count -= 2;
+  while (count) {
+    if (src0[0] != src2[0] && src1[-1] != src1[1]) {
+      dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
+      dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
+    } else {
+      dst[0] = src1[0];
+      dst[1] = src1[0];
+    }
+
+    ++src0;
+    ++src1;
+    ++src2;
+    dst += 2;
+    --count;
+  }
+
+  /* last pixel */
+  if (src1[-1] == src0[0] && src2[0] != src0[0])
+    dst[0] = src0[0];
+  else
     dst[0] = src1[0];
-    if (src1[1] == src0[0] && src2[0] != src0[0])
-        dst[1] = src0[0];
-    else
-        dst[1] = src1[0];
+  dst[1] = src1[0];
+}
 
+// ============================================================================
+// Scale2x row kernel, vector (SSE2 / NEON): the central pixels a lane group at
+// a time, the first and last pixel as in the scalar kernel.
+// ============================================================================
+
+struct Lanes32 {
+  using Pixel = uint32_t;
+  static constexpr int kLanes = 4;
+  static V Eq(V a, V b) { return cmpeq_u32(a, b); }
+  static void Store2(Pixel* p, V a, V b) { store2_u32(p, a, b); }
+};
+
+struct Lanes16 {
+  using Pixel = uint16_t;
+  static constexpr int kLanes = 8;
+  static V Eq(V a, V b) { return cmpeq_u16(a, b); }
+  static void Store2(Pixel* p, V a, V b) { store2_u16(p, a, b); }
+};
+
+template <class L>
+void internal_scale2x_vec(typename L::Pixel* dst, const typename L::Pixel* src0, const typename L::Pixel* src1,
+                          const typename L::Pixel* src2, unsigned count) {
+  using Pixel = typename L::Pixel;
+
+  dst[0] = src1[0];
+  if (src1[1] == src0[0] && src2[0] != src0[0])
+    dst[1] = src0[0];
+  else
+    dst[1] = src1[0];
+  ++src0; ++src1; ++src2;
+  dst += 2;
+  count -= 2;
+
+  // central pixels: the left and right neighbours are unaligned loads at +-1
+  while (count >= L::kLanes) {
+    const V cur = load(src1);
+    const V left = load(src1 - 1);
+    const V right = load(src1 + 1);
+    const V top = load(src0);
+    const V bot = load(src2);
+
+    const V condition = andnot(L::Eq(top, bot), not_(L::Eq(left, right)));  // top != bot && left != right
+    const V leftSel = and_(condition, L::Eq(left, top));
+    const V rightSel = and_(condition, L::Eq(right, top));
+    const V leftOut = vselect(leftSel, top, cur);
+    const V rightOut = vselect(rightSel, top, cur);
+
+    L::Store2(dst, leftOut, rightOut);
+
+    src0 += L::kLanes; src1 += L::kLanes; src2 += L::kLanes;
+    dst += 2 * L::kLanes;
+    count -= L::kLanes;
+  }
+
+  while (count > 0) {
+    if (src0[0] != src2[0] && src1[-1] != src1[1]) {
+      dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
+      dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
+    } else {
+      dst[0] = src1[0];
+      dst[1] = src1[0];
+    }
     ++src0; ++src1; ++src2;
     dst += 2;
-    count -= 2;
-
-    // Central pixels - vectorized
-    unsigned vecCount = count / 4;
-    for (unsigned i = 0; i < vecCount; i++) {
-        // Load current 4 pixels
-        __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1));
-
-        // Load left-shifted (prev pixels): [src1[-1], src1[0], src1[1], src1[2]]
-        __m128i prev_part = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1 - 1));
-        __m128i prev = prev_part;
-
-        // Load right-shifted (next pixels): [src1[1], src1[2], src1[3], src1[4]]
-        __m128i next = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src1 + 1));
-
-        // Load top and bottom
-        __m128i top = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src0));
-        __m128i bot = _mm_loadu_si128(reinterpret_cast<const __m128i*>(src2));
-
-        // Condition: top != bottom && left != right
-        __m128i top_ne_bot = _mm_andnot_si128(_mm_cmpeq_epi32(top, bot),
-                                               _mm_set1_epi32(-1));
-        __m128i prev_ne_next = _mm_andnot_si128(_mm_cmpeq_epi32(prev, next),
-                                                 _mm_set1_epi32(-1));
-        __m128i condition = _mm_and_si128(top_ne_bot, prev_ne_next);
-
-        // Left output: if (left == top) ? top : current
-        __m128i prev_eq_top = _mm_cmpeq_epi32(prev, top);
-        __m128i left_select = _mm_and_si128(condition, prev_eq_top);
-        __m128i left_out = _mm_or_si128(_mm_and_si128(left_select, top),
-                                         _mm_andnot_si128(left_select, curr));
-
-        // Right output: if (right == top) ? top : current
-        __m128i next_eq_top = _mm_cmpeq_epi32(next, top);
-        __m128i right_select = _mm_and_si128(condition, next_eq_top);
-        __m128i right_out = _mm_or_si128(_mm_and_si128(right_select, top),
-                                          _mm_andnot_si128(right_select, curr));
-
-        // Interleave left and right outputs
-        __m128i out_lo = _mm_unpacklo_epi32(left_out, right_out);
-        __m128i out_hi = _mm_unpackhi_epi32(left_out, right_out);
-
-        // Store 8 output pixels
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(dst), out_lo);
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(dst + 4), out_hi);
-
-        src0 += 4; src1 += 4; src2 += 4;
-        dst += 8;
-    }
-
-    // Remaining central pixels (scalar)
-    count -= vecCount * 4;
-    while (count > 0) {
-        if (src0[0] != src2[0] && src1[-1] != src1[1]) {
-            dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
-            dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
-        } else {
-            dst[0] = src1[0];
-            dst[1] = src1[0];
-        }
-        ++src0; ++src1; ++src2;
-        dst += 2;
-        --count;
-    }
-
-    // Last pixel (special case - no right neighbor)
-    if (src1[-1] == src0[0] && src2[0] != src0[0])
-        dst[0] = src0[0];
-    else
-        dst[0] = src1[0];
-    dst[1] = src1[0];
-}
-
-static void internal_scale2x_32_sse2(uint32_t* dst0, uint32_t* dst1,
-                                      const uint32_t* src0,
-                                      const uint32_t* src1,
-                                      const uint32_t* src2,
-                                      unsigned count) {
-    internal_scale2x_32_sse2_single(dst0, src0, src1, src2, count);
-    internal_scale2x_32_sse2_single(dst1, src2, src1, src0, count);
-}
-
-#endif  // USE_SSE2
-
-static void internal_scale2x_16_def(uint16_t *dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
-  /* first pixel */
-  dst[0] = src1[0];
-  if (src1[1] == src0[0] && src2[0] != src0[0])
-    dst[1] = src0[0];
-  else
-    dst[1] = src1[0];
-  ++src0;
-  ++src1;
-  ++src2;
-  dst += 2;
-
-  /* central pixels */
-  count -= 2;
-  while (count) {
-    if (src0[0] != src2[0] && src1[-1] != src1[1]) {
-      dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
-      dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
-    } else {
-      dst[0] = src1[0];
-      dst[1] = src1[0];
-    }
-
-    ++src0;
-    ++src1;
-    ++src2;
-    dst += 2;
     --count;
   }
 
-  /* last pixel */
   if (src1[-1] == src0[0] && src2[0] != src0[0])
     dst[0] = src0[0];
   else
     dst[0] = src1[0];
   dst[1] = src1[0];
+  (void)sizeof(Pixel);
 }
 
-#if !defined(USE_SSE2)
-static void internal_scale2x_32_def(uint32_t* dst,
-                                    const uint32_t* src0,
-                                    const uint32_t* src1,
-                                    const uint32_t* src2,
-                                    unsigned count)
-{
-  /* first pixel */
-  dst[0] = src1[0];
-  if (src1[1] == src0[0] && src2[0] != src0[0])
-    dst[1] = src0[0];
-  else
-    dst[1] = src1[0];
-  ++src0;
-  ++src1;
-  ++src2;
-  dst += 2;
+// Whole frame through a row kernel: the first and last rows use themselves as
+// the missing neighbour row.
+template <typename Pixel, class RowKernel>
+void scale2x_frame(RowKernel row, uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                   int height) {
+  const Pixel* src0 = reinterpret_cast<const Pixel*>(srcPtr);
+  const Pixel* src1 = reinterpret_cast<const Pixel*>(srcPtr + srcPitch);
+  const Pixel* src2 = reinterpret_cast<const Pixel*>(srcPtr + 2 * srcPitch);
+  Pixel* dst0 = reinterpret_cast<Pixel*>(dstPtr);
+  Pixel* dst1 = reinterpret_cast<Pixel*>(dstPtr + dstPitch);
 
-  /* central pixels */
-  count -= 2;
-  while (count) {
-    if (src0[0] != src2[0] && src1[-1] != src1[1]) {
-      dst[0] = src1[-1] == src0[0] ? src0[0] : src1[0];
-      dst[1] = src1[1] == src0[0] ? src0[0] : src1[0];
-    } else {
-      dst[0] = src1[0];
-      dst[1] = src1[0];
-    }
-
-    ++src0;
-    ++src1;
-    ++src2;
-    dst += 2;
-    --count;
+  if (height == 1) {
+    row(dst0, src0, src0, src0, width);
+    row(dst1, src0, src0, src0, width);
+    return;
   }
 
-  /* last pixel */
-  if (src1[-1] == src0[0] && src2[0] != src0[0])
-    dst[0] = src0[0];
-  else
-    dst[0] = src1[0];
-  dst[1] = src1[0];
+  row(dst0, src0, src0, src1, width);
+  row(dst1, src1, src0, src0, width);
+
+  int count = height - 2;
+  while (count) {
+    dst0 = reinterpret_cast<Pixel*>(reinterpret_cast<uint8_t*>(dst0) + 2 * dstPitch);
+    dst1 = reinterpret_cast<Pixel*>(reinterpret_cast<uint8_t*>(dst1) + 2 * dstPitch);
+    row(dst0, src0, src1, src2, width);
+    row(dst1, src2, src1, src0, width);
+    src0 = src1;
+    src1 = src2;
+    src2 = reinterpret_cast<const Pixel*>(reinterpret_cast<const uint8_t*>(src2) + srcPitch);
+    --count;
+  }
+  dst0 = reinterpret_cast<Pixel*>(reinterpret_cast<uint8_t*>(dst0) + 2 * dstPitch);
+  dst1 = reinterpret_cast<Pixel*>(reinterpret_cast<uint8_t*>(dst1) + 2 * dstPitch);
+  row(dst0, src0, src1, src1, width);
+  row(dst1, src1, src1, src0, width);
 }
-#endif  // !USE_SSE2
+
+}  // namespace
 
 #ifdef MMX
 static void internal_scale2x_16_mmx_single(uint16_t* dst, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
@@ -615,7 +588,6 @@ static void internal_scale2x_16_mmx_single(uint16_t* dst, const uint16_t* src0, 
 #endif
 }
 
-#if !defined(USE_SSE2)
 static void internal_scale2x_32_mmx_single(uint32_t* dst, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   /* always do the first and last run */
   count -= 2*2;
@@ -996,7 +968,7 @@ label1:
   }
 #endif
 }
-#endif  // !USE_SSE2
+
 
 static void internal_scale2x_16_mmx(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count) {
   //	assert( count >= 2*4 );
@@ -1004,26 +976,29 @@ static void internal_scale2x_16_mmx(uint16_t* dst0, uint16_t* dst1, const uint16
   internal_scale2x_16_mmx_single(dst1, src2, src1, src0, count);
 }
 
-#if !defined(USE_SSE2)
 static void internal_scale2x_32_mmx(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count) {
   //	assert( count >= 2*2 );
   internal_scale2x_32_mmx_single(dst0, src0, src1, src2, count);
   internal_scale2x_32_mmx_single(dst1, src2, src1, src0, count);
 }
-#endif  // !USE_SSE2
 #endif
 
 void AdMame2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
               uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  uint16_t *dst0 = (uint16_t *)dstPtr;
-  uint16_t *dst1 = dst0 + (dstPitch >> 1);
-
-  uint16_t *src0 = (uint16_t *)srcPtr;
-  uint16_t *src1 = src0 + (srcPitch >> 1);
-  uint16_t *src2 = src1 + (srcPitch >> 1);
+  if (Enabled()) {
+    scale2x_frame<uint16_t>(internal_scale2x_vec<Lanes16>, srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    return;
+  }
 #ifdef MMX
   if(cpu_mmx) {
+    uint16_t *dst0 = (uint16_t *)dstPtr;
+    uint16_t *dst1 = dst0 + (dstPitch >> 1);
+
+    uint16_t *src0 = (uint16_t *)srcPtr;
+    uint16_t *src1 = src0 + (srcPitch >> 1);
+    uint16_t *src2 = src1 + (srcPitch >> 1);
+
     internal_scale2x_16_mmx(dst0, dst1, src0, src0, src1, width);
 
     int count = height;
@@ -1041,64 +1016,28 @@ void AdMame2x(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dst0 += dstPitch;
     dst1 += dstPitch;
     internal_scale2x_16_mmx(dst0, dst1, src0, src1, src1, width);
-  } else {
-#endif
-    internal_scale2x_16_def(dst0, src0, src0, src1, width);
-    internal_scale2x_16_def(dst1, src1, src0, src0, width);
-
-    int count = height;
-
-    count -= 2;
-    while(count) {
-      dst0 += dstPitch;
-      dst1 += dstPitch;
-      internal_scale2x_16_def(dst0, src0, src1, src2, width);
-      internal_scale2x_16_def(dst1, src2, src1, src0, width);
-      src0 = src1;
-      src1 = src2;
-      src2 += srcPitch >> 1;
-      --count;
-    }
-    dst0 += dstPitch;
-    dst1 += dstPitch;
-    internal_scale2x_16_def(dst0, src0, src1, src1, width);
-    internal_scale2x_16_def(dst1, src1, src1, src0, width);
-#ifdef MMX
+    return;
   }
 #endif
+  scale2x_frame<uint16_t>(internal_scale2x_def<uint16_t>, srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
 void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
 {
-  uint32_t *dst0 = (uint32_t *)dstPtr;
-  uint32_t *dst1 = dst0 + (dstPitch >> 2);
-
-  uint32_t *src0 = (uint32_t *)srcPtr;
-  uint32_t *src1 = src0 + (srcPitch >> 2);
-  uint32_t *src2 = src1 + (srcPitch >> 2);
-
-#ifdef USE_SSE2
-  // SSE2 path (64-bit builds and SSE2-capable 32-bit)
-  internal_scale2x_32_sse2(dst0, dst1, src0, src0, src1, width);
-
-  int count = height;
-  count -= 2;
-  while(count) {
-    dst0 += dstPitch >> 1;
-    dst1 += dstPitch >> 1;
-    internal_scale2x_32_sse2(dst0, dst1, src0, src1, src2, width);
-    src0 = src1;
-    src1 = src2;
-    src2 += srcPitch >> 2;
-    --count;
+  if (Enabled()) {
+    scale2x_frame<uint32_t>(internal_scale2x_vec<Lanes32>, srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    return;
   }
-  dst0 += dstPitch >> 1;
-  dst1 += dstPitch >> 1;
-  internal_scale2x_32_sse2(dst0, dst1, src0, src1, src1, width);
-
-#elif defined(MMX)
+#ifdef MMX
   if(cpu_mmx) {
+    uint32_t *dst0 = (uint32_t *)dstPtr;
+    uint32_t *dst1 = dst0 + (dstPitch >> 2);
+
+    uint32_t *src0 = (uint32_t *)srcPtr;
+    uint32_t *src1 = src0 + (srcPitch >> 2);
+    uint32_t *src2 = src1 + (srcPitch >> 2);
+
     internal_scale2x_32_mmx(dst0, dst1, src0, src0, src1, width);
 
     int count = height;
@@ -1116,50 +1055,8 @@ void AdMame2x32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
     dst0 += dstPitch >> 1;
     dst1 += dstPitch >> 1;
     internal_scale2x_32_mmx(dst0, dst1, src0, src1, src1, width);
-  } else {
-    internal_scale2x_32_def(dst0, src0, src0, src1, width);
-    internal_scale2x_32_def(dst1, src1, src0, src0, width);
-
-    int count = height;
-
-    count -= 2;
-    while(count) {
-      dst0 += dstPitch >> 1;
-      dst1 += dstPitch >> 1;
-      internal_scale2x_32_def(dst0, src0, src1, src2, width);
-      internal_scale2x_32_def(dst1, src2, src1, src0, width);
-      src0 = src1;
-      src1 = src2;
-      src2 += srcPitch >> 2;
-      --count;
-    }
-    dst0 += dstPitch >> 1;
-    dst1 += dstPitch >> 1;
-    internal_scale2x_32_def(dst0, src0, src1, src1, width);
-    internal_scale2x_32_def(dst1, src1, src1, src0, width);
+    return;
   }
-
-#else
-  // Scalar fallback
-  internal_scale2x_32_def(dst0, src0, src0, src1, width);
-  internal_scale2x_32_def(dst1, src1, src0, src0, width);
-
-  int count = height;
-
-  count -= 2;
-  while(count) {
-    dst0 += dstPitch >> 1;
-    dst1 += dstPitch >> 1;
-    internal_scale2x_32_def(dst0, src0, src1, src2, width);
-    internal_scale2x_32_def(dst1, src2, src1, src0, width);
-    src0 = src1;
-    src1 = src2;
-    src2 += srcPitch >> 2;
-    --count;
-  }
-  dst0 += dstPitch >> 1;
-  dst1 += dstPitch >> 1;
-  internal_scale2x_32_def(dst0, src0, src1, src1, width);
-  internal_scale2x_32_def(dst1, src1, src1, src0, width);
 #endif
+  scale2x_frame<uint32_t>(internal_scale2x_def<uint32_t>, srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }

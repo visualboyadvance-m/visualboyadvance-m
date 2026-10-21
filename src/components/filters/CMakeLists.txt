@@ -7,6 +7,7 @@ target_sources(vbam-components-filters
     internal/bilinear.cpp
     internal/hq2x.cpp
     internal/hq2x.h
+    internal/hq_masks.h
     internal/interp.h
     internal/lq2x.h
     internal/pixel.cpp
@@ -21,6 +22,7 @@ target_sources(vbam-components-filters
 
     PUBLIC
     filters.h
+    simd128.h
 )
 
 # xBRZ is third-party code; suppress compiler warnings.

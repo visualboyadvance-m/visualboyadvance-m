@@ -359,7 +359,6 @@ unsigned char *pOut, uint32_t dstPitch,
 int Xres, int Yres )
 {
         unsigned int yuv[10] = { 0 }; // yuv[0] not used
-        // yuv[1-9] allows reusage of calculated YUV values
         int x, y;
         unsigned int linePlus, lineMinus;
 
@@ -386,6 +385,16 @@ int Xres, int Yres )
                         linePlus = srcPitch;
                         lineMinus = srcPitch;
                 }
+
+                // the patterns and neighbour YUV of the row, from hq_masks.h
+                const hqmask::YuvRows<COLORTYPE> rows((const COLORTYPE *)(pIn - lineMinus), (const COLORTYPE *)pIn,
+                                                      (const COLORTYPE *)(pIn + linePlus), Xres,
+#ifdef RGB555
+                                                      true);
+#else
+                                                      false);
+#endif
+                const uint8_t* patterns = rows.Masks();
 
                 for (x = 0; x < Xres; x++) {
                         c[2] = *((COLORTYPE *)(pIn - lineMinus));
@@ -420,31 +429,17 @@ int Xres, int Yres )
                                 c[9] = c[8];
                         }
 
-                        unsigned int pattern = 0;
-                        unsigned int flag = 1;
+                        const unsigned int pattern = patterns[x];
 
-                        yuv[5] = RGBtoYUV(c[5]);
-
-                        for (unsigned char k = 1; k <= 9; k++) {
-                                if (k == 5)
-                                        continue;
-
-                                if (c[k] != c[5]) {
-                                        // pre-calculating the YUV-values for every pixel does
-                                        // not speed up the process
-                                        yuv[k] = RGBtoYUV(c[k]);
-
-                                        if ((abs_32((yuv[5] & 0x00FF0000) - (yuv[k] & 0x00FF0000)) >
-                                             0x00300000) ||
-                                            (abs_32((yuv[5] & 0x0000FF00) - (yuv[k] & 0x0000FF00)) >
-                                             0x00000700) ||
-                                            (abs_32((yuv[5] & 0x000000FF) - (yuv[k] & 0x000000FF)) >
-                                             0x00000006)) {
-                                                pattern |= flag;
-                                        }
-                                }
-                                flag <<= 1;
-                        }
+                        yuv[1] = rows.Yuv(0, x - 1);
+                        yuv[2] = rows.Yuv(0, x);
+                        yuv[3] = rows.Yuv(0, x + 1);
+                        yuv[4] = rows.Yuv(1, x - 1);
+                        yuv[5] = rows.Yuv(1, x);
+                        yuv[6] = rows.Yuv(1, x + 1);
+                        yuv[7] = rows.Yuv(2, x - 1);
+                        yuv[8] = rows.Yuv(2, x);
+                        yuv[9] = rows.Yuv(2, x + 1);
 
 #ifdef _HQ3X
 #include "hq3x_pattern.h"

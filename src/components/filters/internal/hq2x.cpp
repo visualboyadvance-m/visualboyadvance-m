@@ -28,7 +28,19 @@
  * do so, delete this exception statement from your version.
  */
 
+#include <vector>
+
+#include "hq_masks.h"
 #include "interp.h"
+
+// the difference masks of one row, from hq_masks.h
+static uint8_t* RowMasks(unsigned count)
+{
+  thread_local std::vector<uint8_t> masks;
+  if (masks.size() < count)
+    masks.resize(count);
+  return masks.data();
+}
 
 /***************************************************************************/
 /* HQ2x C implementation */
@@ -40,6 +52,8 @@
 static void hq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count)
 {
   unsigned i;
+  uint8_t* masks = RowMasks(count);
+  hqmask::InterpDiffMasks16(src0, src1, src2, count, interp_bits_per_pixel == 16, masks);
 
   for(i=0;i<count;++i) {
     unsigned char mask;
@@ -70,24 +84,7 @@ static void hq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, co
       c[8] = c[7];
     }
 
-    mask = 0;
-
-    if (interp_16_diff(c[0], c[4]))
-      mask |= 1 << 0;
-    if (interp_16_diff(c[1], c[4]))
-      mask |= 1 << 1;
-    if (interp_16_diff(c[2], c[4]))
-      mask |= 1 << 2;
-    if (interp_16_diff(c[3], c[4]))
-      mask |= 1 << 3;
-    if (interp_16_diff(c[5], c[4]))
-      mask |= 1 << 4;
-    if (interp_16_diff(c[6], c[4]))
-      mask |= 1 << 5;
-    if (interp_16_diff(c[7], c[4]))
-      mask |= 1 << 6;
-    if (interp_16_diff(c[8], c[4]))
-      mask |= 1 << 7;
+    mask = masks[i];
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -150,6 +147,8 @@ static void hq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, co
 static void hq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count)
 {
   unsigned i;
+  uint8_t* masks = RowMasks(count);
+  hqmask::InterpDiffMasks32(src0, src1, src2, count, masks);
 
   for(i=0;i<count;++i) {
     unsigned char mask;
@@ -180,24 +179,7 @@ static void hq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, co
       c[8] = c[7];
     }
 
-    mask = 0;
-
-    if (interp_32_diff(c[0], c[4]))
-      mask |= 1 << 0;
-    if (interp_32_diff(c[1], c[4]))
-      mask |= 1 << 1;
-    if (interp_32_diff(c[2], c[4]))
-      mask |= 1 << 2;
-    if (interp_32_diff(c[3], c[4]))
-      mask |= 1 << 3;
-    if (interp_32_diff(c[5], c[4]))
-      mask |= 1 << 4;
-    if (interp_32_diff(c[6], c[4]))
-      mask |= 1 << 5;
-    if (interp_32_diff(c[7], c[4]))
-      mask |= 1 << 6;
-    if (interp_32_diff(c[8], c[4]))
-      mask |= 1 << 7;
+    mask = masks[i];
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -267,6 +249,8 @@ static void hq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, co
 static void lq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, const uint16_t* src1, const uint16_t* src2, unsigned count)
 {
   unsigned i;
+  uint8_t* masks = RowMasks(count);
+  hqmask::NotEqualMasks(src0, src1, src2, count, masks);
 
   for(i=0;i<count;++i) {
     unsigned char mask;
@@ -297,24 +281,7 @@ static void lq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, co
       c[8] = c[7];
     }
 
-    mask = 0;
-
-    if (c[0] != c[4])
-      mask |= 1 << 0;
-    if (c[1] != c[4])
-      mask |= 1 << 1;
-    if (c[2] != c[4])
-      mask |= 1 << 2;
-    if (c[3] != c[4])
-      mask |= 1 << 3;
-    if (c[5] != c[4])
-      mask |= 1 << 4;
-    if (c[6] != c[4])
-      mask |= 1 << 5;
-    if (c[7] != c[4])
-      mask |= 1 << 6;
-    if (c[8] != c[4])
-      mask |= 1 << 7;
+    mask = masks[i];
 
 #define P0 dst0[0]
 #define P1 dst0[1]
@@ -377,6 +344,8 @@ static void lq2x_16_def(uint16_t* dst0, uint16_t* dst1, const uint16_t* src0, co
 static void lq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, const uint32_t* src1, const uint32_t* src2, unsigned count)
 {
   unsigned i;
+  uint8_t* masks = RowMasks(count);
+  hqmask::NotEqualMasks(src0, src1, src2, count, masks);
 
   for(i=0;i<count;++i) {
     unsigned char mask;
@@ -407,24 +376,7 @@ static void lq2x_32_def(uint32_t* dst0, uint32_t* dst1, const uint32_t* src0, co
       c[8] = c[7];
     }
 
-    mask = 0;
-
-    if (c[0] != c[4])
-      mask |= 1 << 0;
-    if (c[1] != c[4])
-      mask |= 1 << 1;
-    if (c[2] != c[4])
-      mask |= 1 << 2;
-    if (c[3] != c[4])
-      mask |= 1 << 3;
-    if (c[5] != c[4])
-      mask |= 1 << 4;
-    if (c[6] != c[4])
-      mask |= 1 << 5;
-    if (c[7] != c[4])
-      mask |= 1 << 6;
-    if (c[8] != c[4])
-      mask |= 1 << 7;
+    mask = masks[i];
 
 #define P0 dst0[0]
 #define P1 dst0[1]

@@ -4,511 +4,265 @@
  **	Written: 6/14/00 - JSF
  **/
 
+// 2x bilinear and "bilinear plus", 16 and 32 bits per pixel.
+//
+// Every source pixel a becomes a 2x2 quad from a, its right neighbour b, its
+// lower neighbour c and the diagonal d (the last column and row repeat
+// themselves):
+//
+//     a            (a + b) / 2
+//     (a + c) / 2  (a + b + c + d) / 4
+//
+// "Plus" replaces the top-left pixel with (10a + 2b + 2c) / 16, a slight blur.
+//
+// 16-bit pixels are handled on their 5-bit channels, laid out by the
+// systemRed/Green/BlueShift globals (RGB555 or RGB565). 32-bit pixels are
+// averaged byte by byte, which is independent of the byte order and keeps the
+// full 8-bit precision; the SSE2 path has always done it this way.
+//
+// One vector kernel per depth (SSE2 / NEON, see simd128.h) and a scalar
+// kernel for the other targets; the test suite checks that the two agree.
+
+#include <cstdint>
+
+#include "../simd128.h"
 #include "core/base/system.h"
-#include "simd_common.h"
 
-// ============================================================================
-// SSE2 Implementations
-// ============================================================================
+namespace {
 
-#ifdef USE_SSE2
+using namespace vbam_simd;
 
-// Bilinear32: 2x scale with bilinear interpolation using SSE2
-// Operates directly on packed ARGB pixels using byte-wise averaging
-static void Bilinear32_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
-                             uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
+// ---------------------------------------------------------------------------
+// 32-bit: byte-wise, rounding averages (SSE2 pavgb semantics)
+// ---------------------------------------------------------------------------
+
+VBAM_SIMD_INLINE uint32_t Avg32(uint32_t p, uint32_t q) {
+    const uint32_t rb = ((p & 0x00ff00ffu) + (q & 0x00ff00ffu) + 0x00010001u) >> 1;
+    const uint32_t ga = ((p >> 8 & 0x00ff00ffu) + (q >> 8 & 0x00ff00ffu) + 0x00010001u) >> 1;
+    return (rb & 0x00ff00ffu) | ((ga & 0x00ff00ffu) << 8);
+}
+
+// (10a + 2b + 2c) / 16 per byte
+VBAM_SIMD_INLINE uint32_t Plus32(uint32_t a, uint32_t b, uint32_t c) {
+    uint32_t out = 0;
+    for (int shift = 0; shift < 32; shift += 8) {
+        const uint32_t v = (10 * ((a >> shift) & 0xff) + 2 * ((b >> shift) & 0xff) + 2 * ((c >> shift) & 0xff)) >> 4;
+        out |= v << shift;
+    }
+    return out;
+}
+
+template <bool kPlus>
+void Bilinear32Scalar(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                      int height) {
     for (int y = 0; y < height; y++) {
-        uint32_t *src0 = reinterpret_cast<uint32_t*>(srcPtr + y * srcPitch);
-        uint32_t *src1 = (y + 1 < height) ?
-            reinterpret_cast<uint32_t*>(srcPtr + (y + 1) * srcPitch) : src0;
-        uint32_t *dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
-        uint32_t *dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
+        const uint32_t* src0 = reinterpret_cast<const uint32_t*>(srcPtr + y * srcPitch);
+        const uint32_t* src1 = (y + 1 < height) ? reinterpret_cast<const uint32_t*>(srcPtr + (y + 1) * srcPitch) : src0;
+        uint32_t* dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
+        uint32_t* dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
+        for (int x = 0; x < width; x++) {
+            const uint32_t a = src0[x];
+            const uint32_t b = (x + 1 < width) ? src0[x + 1] : a;
+            const uint32_t c = src1[x];
+            const uint32_t d = (x + 1 < width) ? src1[x + 1] : c;
+            const uint32_t ab = Avg32(a, b);
+            dst0[x * 2] = kPlus ? Plus32(a, b, c) : a;
+            dst0[x * 2 + 1] = ab;
+            dst1[x * 2] = Avg32(a, c);
+            dst1[x * 2 + 1] = Avg32(ab, Avg32(c, d));
+        }
+    }
+}
+
+// (10a + 2b + 2c) / 16 per byte, on 16-bit lanes
+VBAM_SIMD_INLINE V Plus32Vec(V a, V b, V c) {
+    const V z = zero();
+    const V ten = set1_u16(10), two = set1_u16(2);
+    auto half = [&](V al, V bl, V cl) {
+        const V sum = add_u16(add_u16(mullo_u16(al, ten), mullo_u16(bl, two)), mullo_u16(cl, two));
+        return srl_u16<4>(sum);
+    };
+    const V lo = half(unpacklo_u8(a, z), unpacklo_u8(b, z), unpacklo_u8(c, z));
+    const V hi = half(unpackhi_u8(a, z), unpackhi_u8(b, z), unpackhi_u8(c, z));
+    return packus_s16_u8(lo, hi);
+}
+
+template <bool kPlus>
+void Bilinear32Vector(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                      int height) {
+    for (int y = 0; y < height; y++) {
+        const uint32_t* src0 = reinterpret_cast<const uint32_t*>(srcPtr + y * srcPitch);
+        const uint32_t* src1 = (y + 1 < height) ? reinterpret_cast<const uint32_t*>(srcPtr + (y + 1) * srcPitch) : src0;
+        uint32_t* dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
+        uint32_t* dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
 
         int x = 0;
-        // Process 4 source pixels at a time, output 8 destination pixels
         for (; x + 4 <= width; x += 4) {
-            // Load 4 pixels from current row and next row
-            __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src0[x]));
-            __m128i c = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src1[x]));
-
-            // Load shifted pixels (for right neighbors)
-            __m128i b, d;
-            if (x + 5 <= width) {
-                b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src0[x + 1]));
-                d = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src1[x + 1]));
+            const V a = load(src0 + x);
+            const V c = load(src1 + x);
+            V b, d;
+            if (x + 4 < width) {
+                b = load(src0 + x + 1);
+                d = load(src1 + x + 1);
             } else {
-                // Edge handling: shift and replicate last pixel
-                b = _mm_srli_si128(a, 4);
-                b = _mm_or_si128(b, _mm_slli_si128(_mm_shuffle_epi32(a, _MM_SHUFFLE(3, 3, 3, 3)), 12));
-                d = _mm_srli_si128(c, 4);
-                d = _mm_or_si128(d, _mm_slli_si128(_mm_shuffle_epi32(c, _MM_SHUFFLE(3, 3, 3, 3)), 12));
+                // last group: shift down one pixel and repeat the last one
+                b = or_(bsrl<4>(a), bsll<12>(dup_u32<3>(a)));
+                d = or_(bsrl<4>(c), bsll<12>(dup_u32<3>(c)));
             }
-
-            // Compute interpolations using byte-wise averaging
-            // Upper right: (a + b) / 2
-            __m128i ab = _mm_avg_epu8(a, b);
-            // Lower left: (a + c) / 2
-            __m128i ac = _mm_avg_epu8(a, c);
-            // Lower right: (a + b + c + d) / 4 = avg(avg(a,b), avg(c,d))
-            __m128i cd = _mm_avg_epu8(c, d);
-            __m128i abcd = _mm_avg_epu8(ab, cd);
-
-            // Interleave results for output
-            // Row 0: [a0 ab0 a1 ab1 a2 ab2 a3 ab3]
-            __m128i row0_lo = _mm_unpacklo_epi32(a, ab);   // [a0 ab0 a1 ab1]
-            __m128i row0_hi = _mm_unpackhi_epi32(a, ab);   // [a2 ab2 a3 ab3]
-
-            // Row 1: [ac0 abcd0 ac1 abcd1 ac2 abcd2 ac3 abcd3]
-            __m128i row1_lo = _mm_unpacklo_epi32(ac, abcd);
-            __m128i row1_hi = _mm_unpackhi_epi32(ac, abcd);
-
-            // Store row 0
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), row0_lo);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 4]), row0_hi);
-
-            // Store row 1
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), row1_lo);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 4]), row1_hi);
+            const V ab = avg_u8(a, b);
+            const V ac = avg_u8(a, c);
+            const V abcd = avg_u8(ab, avg_u8(c, d));
+            const V tl = kPlus ? Plus32Vec(a, b, c) : a;
+            store2_u32(dst0 + x * 2, tl, ab);
+            store2_u32(dst1 + x * 2, ac, abcd);
         }
-
-        // Scalar tail
         for (; x < width; x++) {
-            uint32_t a_px = src0[x];
-            uint32_t b_px = (x + 1 < width) ? src0[x + 1] : a_px;
-            uint32_t c_px = src1[x];
-            uint32_t d_px = (x + 1 < width) ? src1[x + 1] : c_px;
-
-            // Use byte-wise averaging (matches _mm_avg_epu8 behavior)
-            auto avg2 = [](uint32_t p1, uint32_t p2) -> uint32_t {
-                uint32_t rb = ((p1 & 0xFF00FF) + (p2 & 0xFF00FF) + 0x010001) >> 1;
-                uint32_t g  = ((p1 & 0x00FF00) + (p2 & 0x00FF00) + 0x000100) >> 1;
-                return (rb & 0xFF00FF) | (g & 0x00FF00);
-            };
-
-            uint32_t ab = avg2(a_px, b_px);
-            uint32_t ac = avg2(a_px, c_px);
-            uint32_t cd = avg2(c_px, d_px);
-            uint32_t abcd = avg2(ab, cd);
-
-            dst0[x * 2] = a_px;
+            const uint32_t a = src0[x];
+            const uint32_t b = (x + 1 < width) ? src0[x + 1] : a;
+            const uint32_t c = src1[x];
+            const uint32_t d = (x + 1 < width) ? src1[x + 1] : c;
+            const uint32_t ab = Avg32(a, b);
+            dst0[x * 2] = kPlus ? Plus32(a, b, c) : a;
             dst0[x * 2 + 1] = ab;
-            dst1[x * 2] = ac;
-            dst1[x * 2 + 1] = abcd;
+            dst1[x * 2] = Avg32(a, c);
+            dst1[x * 2 + 1] = Avg32(ab, Avg32(c, d));
         }
     }
 }
 
-#endif  // USE_SSE2
+// ---------------------------------------------------------------------------
+// 16-bit: three 5-bit channels at the system shifts
+// ---------------------------------------------------------------------------
 
-#define RGB(r,g,b) ((r)>>3) << systemRedShift |\
-  ((g) >> 3) << systemGreenShift |\
-  ((b) >> 3) << systemBlueShift\
+struct Channels16 {
+    int r, g, b;
+};
 
-static void fill_rgb_row_16(uint16_t *from, int src_width, uint8_t *row, int width)
-{
-  uint8_t *copy_start = row + src_width*3;
-  uint8_t *all_stop = row + width*3;
-  while (row < copy_start) {
-    uint16_t color = *from++;
-    *row++ = ((color >> systemRedShift) & 0x1f) << 3;
-    *row++ = ((color >> systemGreenShift) & 0x1f) << 3;
-    *row++ = ((color >> systemBlueShift) & 0x1f) << 3;
-  }
-  // any remaining elements to be written to 'row' are a replica of the
-  // preceding pixel
-  uint8_t *p = row-3;
-  while (row < all_stop) {
-    // we're guaranteed three elements per pixel; could unroll the loop
-    // further, especially with a Duff's Device, but the gains would be
-    // probably limited (judging by profiler output)
-    *row++ = *p++;
-    *row++ = *p++;
-    *row++ = *p++;
-  }
+VBAM_SIMD_INLINE Channels16 Unpack16(uint16_t p) {
+    return {(p >> systemRedShift) & 0x1f, (p >> systemGreenShift) & 0x1f, (p >> systemBlueShift) & 0x1f};
 }
 
-static void fill_rgb_row_32(uint32_t *from, int src_width, uint8_t *row, int width)
-{
-  uint8_t *copy_start = row + src_width*3;
-  uint8_t *all_stop = row + width*3;
-  while (row < copy_start) {
-    uint32_t color = *from++;
-    *row++ = ((color >> systemRedShift) & 0x1f) << 3;
-    *row++ = ((color >> systemGreenShift) & 0x1f) << 3;
-    *row++ = ((color >> systemBlueShift) & 0x1f) << 3;
-  }
-  // any remaining elements to be written to 'row' are a replica of the
-  // preceding pixel
-  uint8_t *p = row-3;
-  while (row < all_stop) {
-    // we're guaranteed three elements per pixel; could unroll the loop
-    // further, especially with a Duff's Device, but the gains would be
-    // probably limited (judging by profiler output)
-    *row++ = *p++;
-    *row++ = *p++;
-    *row++ = *p++;
-  }
+VBAM_SIMD_INLINE uint16_t Pack16(int r, int g, int b) {
+    return static_cast<uint16_t>((r << systemRedShift) | (g << systemGreenShift) | (b << systemBlueShift));
 }
 
-void Bilinear(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-              uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-  uint8_t row_cur[3*322];
-  uint8_t row_next[3*322];
-  uint8_t *rgb_row_cur = row_cur;
-  uint8_t *rgb_row_next = row_next;
-
-  uint16_t *to = (uint16_t *)dstPtr;
-  uint16_t *to_odd = (uint16_t *)(dstPtr + dstPitch);
-
-  int from_width = width;
-  uint16_t *from = (uint16_t *)srcPtr;
-  fill_rgb_row_16(from, from_width, rgb_row_cur, width+1);
-
-  for(int y = 0; y < height; y++) {
-    uint16_t *from_orig = from;
-    uint16_t *to_orig = to;
-
-    if (y+1 < height)
-      fill_rgb_row_16(from+width+2, from_width, rgb_row_next,
-                   width+1);
-    else
-      fill_rgb_row_16(from, from_width, rgb_row_next, width+1);
-
-    // every pixel in the src region, is extended to 4 pixels in the
-    // destination, arranged in a square 'quad'; if the current src
-    // pixel is 'a', then in what follows 'b' is the src pixel to the
-    // right, 'c' is the src pixel below, and 'd' is the src pixel to
-    // the right and down
-    uint8_t *cur_row  = rgb_row_cur;
-    uint8_t *next_row = rgb_row_next;
-    uint8_t *ar = cur_row++;
-    uint8_t *ag = cur_row++;
-    uint8_t *ab = cur_row++;
-    uint8_t *cr = next_row++;
-    uint8_t *cg = next_row++;
-    uint8_t *cb = next_row++;
-    for(int x=0; x < width; x++) {
-      uint8_t *br = cur_row++;
-      uint8_t *bg = cur_row++;
-      uint8_t *bb = cur_row++;
-      uint8_t *dr = next_row++;
-      uint8_t *dg = next_row++;
-      uint8_t *db = next_row++;
-
-      // upper left pixel in quad: just copy it in
-      *to++ = RGB(*ar, *ag, *ab);
-
-      // upper right
-      *to++ = RGB((*ar+*br)>>1, (*ag+*bg)>>1, (*ab+*bb)>>1);
-
-      // lower left
-      *to_odd++ = RGB((*ar+*cr)>>1, (*ag+*cg)>>1, (*ab+*cb)>>1);
-
-      // lower right
-      *to_odd++ = RGB((*ar+*br+*cr+*dr)>>2,
-                      (*ag+*bg+*cg+*dg)>>2,
-                      (*ab+*bb+*cb+*db)>>2);
-
-      // 'b' becomes 'a', 'd' becomes 'c'
-      ar = br;
-      ag = bg;
-      ab = bb;
-      cr = dr;
-      cg = dg;
-      cb = db;
+template <bool kPlus>
+void Bilinear16Scalar(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                      int height) {
+    for (int y = 0; y < height; y++) {
+        const uint16_t* src0 = reinterpret_cast<const uint16_t*>(srcPtr + y * srcPitch);
+        const uint16_t* src1 = (y + 1 < height) ? reinterpret_cast<const uint16_t*>(srcPtr + (y + 1) * srcPitch) : src0;
+        uint16_t* dst0 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2) * dstPitch);
+        uint16_t* dst1 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2 + 1) * dstPitch);
+        for (int x = 0; x < width; x++) {
+            const Channels16 a = Unpack16(src0[x]);
+            const Channels16 b = Unpack16((x + 1 < width) ? src0[x + 1] : src0[x]);
+            const Channels16 c = Unpack16(src1[x]);
+            const Channels16 d = Unpack16((x + 1 < width) ? src1[x + 1] : src1[x]);
+            dst0[x * 2] = kPlus ? Pack16((5 * a.r + b.r + c.r) >> 3, (5 * a.g + b.g + c.g) >> 3, (5 * a.b + b.b + c.b) >> 3)
+                                : src0[x];
+            dst0[x * 2 + 1] = Pack16((a.r + b.r) >> 1, (a.g + b.g) >> 1, (a.b + b.b) >> 1);
+            dst1[x * 2] = Pack16((a.r + c.r) >> 1, (a.g + c.g) >> 1, (a.b + c.b) >> 1);
+            dst1[x * 2 + 1] = Pack16((a.r + b.r + c.r + d.r) >> 2, (a.g + b.g + c.g + d.g) >> 2,
+                                     (a.b + b.b + c.b + d.b) >> 2);
+        }
     }
-
-    // the "next" rgb row becomes the current; the old current rgb row is
-    // recycled and serves as the new "next" row
-    uint8_t *temp;
-    temp = rgb_row_cur;
-    rgb_row_cur = rgb_row_next;
-    rgb_row_next = temp;
-
-    // update the pointers for start of next pair of lines
-    from = (uint16_t *)((uint8_t *)from_orig + srcPitch);
-    to = (uint16_t *)((uint8_t *)to_orig + (dstPitch << 1));
-    to_odd = (uint16_t *)((uint8_t *)to + dstPitch);
-  }
 }
 
-void BilinearPlus(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                  uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-  uint8_t row_cur[3*322];
-  uint8_t row_next[3*322];
-  uint8_t *rgb_row_cur = row_cur;
-  uint8_t *rgb_row_next = row_next;
+struct Channels16Vec {
+    V r, g, b;
+};
 
-  uint16_t *to = (uint16_t *)dstPtr;
-  uint16_t *to_odd = (uint16_t *)(dstPtr + dstPitch);
+VBAM_SIMD_INLINE Channels16Vec Unpack16Vec(V p) {
+    const V m = set1_u16(0x1f);
+    return {and_(srl_u16_var(p, systemRedShift), m), and_(srl_u16_var(p, systemGreenShift), m),
+            and_(srl_u16_var(p, systemBlueShift), m)};
+}
 
-  int from_width = width;
-  uint16_t *from = (uint16_t *)srcPtr;
-  fill_rgb_row_16(from, from_width, rgb_row_cur, width+1);
+VBAM_SIMD_INLINE V Pack16Vec(V r, V g, V b) {
+    return or_(or_(sll_u16_var(r, systemRedShift), sll_u16_var(g, systemGreenShift)), sll_u16_var(b, systemBlueShift));
+}
 
-  for(int y = 0; y < height; y++) {
-    uint16_t *from_orig = from;
-    uint16_t *to_orig = to;
+template <bool kPlus>
+void Bilinear16Vector(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                      int height) {
+    const V five = set1_u16(5);
+    for (int y = 0; y < height; y++) {
+        const uint16_t* src0 = reinterpret_cast<const uint16_t*>(srcPtr + y * srcPitch);
+        const uint16_t* src1 = (y + 1 < height) ? reinterpret_cast<const uint16_t*>(srcPtr + (y + 1) * srcPitch) : src0;
+        uint16_t* dst0 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2) * dstPitch);
+        uint16_t* dst1 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2 + 1) * dstPitch);
 
-    if (y+1 < height)
-      fill_rgb_row_16(from+width+2, from_width, rgb_row_next,
-                   width+1);
-    else
-      fill_rgb_row_16(from, from_width, rgb_row_next, width+1);
+        int x = 0;
+        for (; x + 8 <= width; x += 8) {
+            const V pa = load(src0 + x);
+            const V pc = load(src1 + x);
+            V pb, pd;
+            if (x + 8 < width) {
+                pb = load(src0 + x + 1);
+                pd = load(src1 + x + 1);
+            } else {
+                pb = or_(bsrl<2>(pa), bsll<14>(set1_u16(src0[width - 1])));
+                pd = or_(bsrl<2>(pc), bsll<14>(set1_u16(src1[width - 1])));
+            }
+            const Channels16Vec a = Unpack16Vec(pa), b = Unpack16Vec(pb), c = Unpack16Vec(pc), d = Unpack16Vec(pd);
 
-    // every pixel in the src region, is extended to 4 pixels in the
-    // destination, arranged in a square 'quad'; if the current src
-    // pixel is 'a', then in what follows 'b' is the src pixel to the
-    // right, 'c' is the src pixel below, and 'd' is the src pixel to
-    // the right and down
-    uint8_t *cur_row  = rgb_row_cur;
-    uint8_t *next_row = rgb_row_next;
-    uint8_t *ar = cur_row++;
-    uint8_t *ag = cur_row++;
-    uint8_t *ab = cur_row++;
-    uint8_t *cr = next_row++;
-    uint8_t *cg = next_row++;
-    uint8_t *cb = next_row++;
-    for(int x=0; x < width; x++) {
-      uint8_t *br = cur_row++;
-      uint8_t *bg = cur_row++;
-      uint8_t *bb = cur_row++;
-      uint8_t *dr = next_row++;
-      uint8_t *dg = next_row++;
-      uint8_t *db = next_row++;
+            auto avg = [](V p, V q) { return srl_u16<1>(add_u16(p, q)); };
+            auto avg4 = [](V p, V q, V r, V s) { return srl_u16<2>(add_u16(add_u16(p, q), add_u16(r, s))); };
+            auto plus = [&](V p, V q, V r) { return srl_u16<3>(add_u16(add_u16(mullo_u16(p, five), q), r)); };
 
-      // upper left pixel in quad: just copy it in
-      //*to++ = manip.rgb(*ar, *ag, *ab);
-#ifdef USE_ORIGINAL_BILINEAR_PLUS
-      *to++ = RGB(
-                  (((*ar)<<2) +((*ar)) + (*cr+*br+*br) )>> 3,
-                  (((*ag)<<2) +((*ag)) + (*cg+*bg+*bg) )>> 3,
-                  (((*ab)<<2) +((*ab)) + (*cb+*bb+*bb) )>> 3);
-#else
-      *to++ = RGB(
-                  (((*ar)<<3) +((*ar)<<1) + (*cr+*br+*br+*cr) )>> 4,
-                  (((*ag)<<3) +((*ag)<<1) + (*cg+*bg+*bg+*cg) )>> 4,
-                  (((*ab)<<3) +((*ab)<<1) + (*cb+*bb+*bb+*cb) )>> 4);
-#endif
-
-      // upper right
-      *to++ = RGB((*ar+*br)>>1, (*ag+*bg)>>1, (*ab+*bb)>>1);
-
-      // lower left
-      *to_odd++ = RGB((*ar+*cr)>>1, (*ag+*cg)>>1, (*ab+*cb)>>1);
-
-      // lower right
-      *to_odd++ = RGB((*ar+*br+*cr+*dr)>>2,
-                      (*ag+*bg+*cg+*dg)>>2,
-                      (*ab+*bb+*cb+*db)>>2);
-
-      // 'b' becomes 'a', 'd' becomes 'c'
-      ar = br;
-      ag = bg;
-      ab = bb;
-      cr = dr;
-      cg = dg;
-      cb = db;
+            const V tl = kPlus ? Pack16Vec(plus(a.r, b.r, c.r), plus(a.g, b.g, c.g), plus(a.b, b.b, c.b)) : pa;
+            const V ab = Pack16Vec(avg(a.r, b.r), avg(a.g, b.g), avg(a.b, b.b));
+            const V ac = Pack16Vec(avg(a.r, c.r), avg(a.g, c.g), avg(a.b, c.b));
+            const V abcd = Pack16Vec(avg4(a.r, b.r, c.r, d.r), avg4(a.g, b.g, c.g, d.g), avg4(a.b, b.b, c.b, d.b));
+            store2_u16(dst0 + x * 2, tl, ab);
+            store2_u16(dst1 + x * 2, ac, abcd);
+        }
+        for (; x < width; x++) {
+            const Channels16 a = Unpack16(src0[x]);
+            const Channels16 b = Unpack16((x + 1 < width) ? src0[x + 1] : src0[x]);
+            const Channels16 c = Unpack16(src1[x]);
+            const Channels16 d = Unpack16((x + 1 < width) ? src1[x + 1] : src1[x]);
+            dst0[x * 2] = kPlus ? Pack16((5 * a.r + b.r + c.r) >> 3, (5 * a.g + b.g + c.g) >> 3, (5 * a.b + b.b + c.b) >> 3)
+                                : src0[x];
+            dst0[x * 2 + 1] = Pack16((a.r + b.r) >> 1, (a.g + b.g) >> 1, (a.b + b.b) >> 1);
+            dst1[x * 2] = Pack16((a.r + c.r) >> 1, (a.g + c.g) >> 1, (a.b + c.b) >> 1);
+            dst1[x * 2 + 1] = Pack16((a.r + b.r + c.r + d.r) >> 2, (a.g + b.g + c.g + d.g) >> 2,
+                                     (a.b + b.b + c.b + d.b) >> 2);
+        }
     }
-
-    // the "next" rgb row becomes the current; the old current rgb row is
-    // recycled and serves as the new "next" row
-    uint8_t *temp;
-    temp = rgb_row_cur;
-    rgb_row_cur = rgb_row_next;
-    rgb_row_next = temp;
-
-    // update the pointers for start of next pair of lines
-    from = (uint16_t *)((uint8_t *)from_orig + srcPitch);
-    to = (uint16_t *)((uint8_t *)to_orig + (dstPitch << 1));
-    to_odd = (uint16_t *)((uint8_t *)to + dstPitch);
-  }
 }
 
-void Bilinear32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-#ifdef USE_SSE2
-  Bilinear32_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
-#else
-  uint8_t row_cur[3*322];
-  uint8_t row_next[3*322];
-  uint8_t *rgb_row_cur = row_cur;
-  uint8_t *rgb_row_next = row_next;
+}  // namespace
 
-  uint32_t *to = (uint32_t *)dstPtr;
-  uint32_t *to_odd = (uint32_t *)(dstPtr + dstPitch);
-
-  int from_width = width;
-
-  uint32_t *from = (uint32_t *)srcPtr;
-  uint32_t Nextline = srcPitch >> 2;  // srcPitch in bytes / 4 = stride in uint32_t elements
-  fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
-
-  for(int y = 0; y < height; y++) {
-    uint32_t *from_orig = from;
-    uint32_t *to_orig = to;
-
-    if (y+1 < height)
-      fill_rgb_row_32(from+Nextline, from_width, rgb_row_next,
-                   width+1);
+void Bilinear(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+              int width, int height) {
+    if (Enabled())
+        Bilinear16Vector<false>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
     else
-      fill_rgb_row_32(from, from_width, rgb_row_next, width+1);
-
-    // every pixel in the src region, is extended to 4 pixels in the
-    // destination, arranged in a square 'quad'; if the current src
-    // pixel is 'a', then in what follows 'b' is the src pixel to the
-    // right, 'c' is the src pixel below, and 'd' is the src pixel to
-    // the right and down
-    uint8_t *cur_row  = rgb_row_cur;
-    uint8_t *next_row = rgb_row_next;
-    uint8_t *ar = cur_row++;
-    uint8_t *ag = cur_row++;
-    uint8_t *ab = cur_row++;
-    uint8_t *cr = next_row++;
-    uint8_t *cg = next_row++;
-    uint8_t *cb = next_row++;
-    for(int x=0; x < width; x++) {
-      uint8_t *br = cur_row++;
-      uint8_t *bg = cur_row++;
-      uint8_t *bb = cur_row++;
-      uint8_t *dr = next_row++;
-      uint8_t *dg = next_row++;
-      uint8_t *db = next_row++;
-
-      // upper left pixel in quad: just copy it in
-      *to++ = RGB(*ar, *ag, *ab);
-
-      // upper right
-      *to++ = RGB((*ar+*br)>>1, (*ag+*bg)>>1, (*ab+*bb)>>1);
-
-      // lower left
-      *to_odd++ = RGB((*ar+*cr)>>1, (*ag+*cg)>>1, (*ab+*cb)>>1);
-
-      // lower right
-      *to_odd++ = RGB((*ar+*br+*cr+*dr)>>2,
-                      (*ag+*bg+*cg+*dg)>>2,
-                      (*ab+*bb+*cb+*db)>>2);
-
-      // 'b' becomes 'a', 'd' becomes 'c'
-      ar = br;
-      ag = bg;
-      ab = bb;
-      cr = dr;
-      cg = dg;
-      cb = db;
-    }
-
-    // the "next" rgb row becomes the current; the old current rgb row is
-    // recycled and serves as the new "next" row
-    uint8_t *temp;
-    temp = rgb_row_cur;
-    rgb_row_cur = rgb_row_next;
-    rgb_row_next = temp;
-
-    // update the pointers for start of next pair of lines
-    from = (uint32_t *)((uint8_t *)from_orig + srcPitch);
-    to = (uint32_t *)((uint8_t *)to_orig + (dstPitch << 1));
-    to_odd = (uint32_t *)((uint8_t *)to + dstPitch);
-  }
-#endif
+        Bilinear16Scalar<false>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
-void BilinearPlus32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                    uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-  uint8_t row_cur[3*322];
-  uint8_t row_next[3*322];
-  uint8_t *rgb_row_cur = row_cur;
-  uint8_t *rgb_row_next = row_next;
-
-  uint32_t *to = (uint32_t *)dstPtr;
-  uint32_t *to_odd = (uint32_t *)(dstPtr + dstPitch);
-
-  int from_width = width;
-
-  uint32_t *from = (uint32_t *)srcPtr;
-  uint32_t Nextline = srcPitch >> 2;  // srcPitch in bytes / 4 = stride in uint32_t elements
-  fill_rgb_row_32(from, from_width, rgb_row_cur, width+1);
-
-  for(int y = 0; y < height; y++) {
-    uint32_t *from_orig = from;
-    uint32_t *to_orig = to;
-
-    if (y+1 < height)
-      fill_rgb_row_32(from+Nextline, from_width, rgb_row_next,
-                   width+1);
+void BilinearPlus(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                  int width, int height) {
+    if (Enabled())
+        Bilinear16Vector<true>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
     else
-      fill_rgb_row_32(from, from_width, rgb_row_next, width+1);
-
-    // every pixel in the src region, is extended to 4 pixels in the
-    // destination, arranged in a square 'quad'; if the current src
-    // pixel is 'a', then in what follows 'b' is the src pixel to the
-    // right, 'c' is the src pixel below, and 'd' is the src pixel to
-    // the right and down
-    uint8_t *cur_row  = rgb_row_cur;
-    uint8_t *next_row = rgb_row_next;
-    uint8_t *ar = cur_row++;
-    uint8_t *ag = cur_row++;
-    uint8_t *ab = cur_row++;
-    uint8_t *cr = next_row++;
-    uint8_t *cg = next_row++;
-    uint8_t *cb = next_row++;
-    for(int x=0; x < width; x++) {
-      uint8_t *br = cur_row++;
-      uint8_t *bg = cur_row++;
-      uint8_t *bb = cur_row++;
-      uint8_t *dr = next_row++;
-      uint8_t *dg = next_row++;
-      uint8_t *db = next_row++;
-
-      // upper left pixel in quad: just copy it in
-      //*to++ = manip.rgb(*ar, *ag, *ab);
-#ifdef USE_ORIGINAL_BILINEAR_PLUS
-      *to++ = RGB(
-                  (((*ar)<<2) +((*ar)) + (*cr+*br+*br) )>> 3,
-                  (((*ag)<<2) +((*ag)) + (*cg+*bg+*bg) )>> 3,
-                  (((*ab)<<2) +((*ab)) + (*cb+*bb+*bb) )>> 3);
-#else
-      *to++ = RGB(
-                  (((*ar)<<3) +((*ar)<<1) + (*cr+*br+*br+*cr) )>> 4,
-                  (((*ag)<<3) +((*ag)<<1) + (*cg+*bg+*bg+*cg) )>> 4,
-                  (((*ab)<<3) +((*ab)<<1) + (*cb+*bb+*bb+*cb) )>> 4);
-#endif
-
-      // upper right
-      *to++ = RGB((*ar+*br)>>1, (*ag+*bg)>>1, (*ab+*bb)>>1);
-
-      // lower left
-      *to_odd++ = RGB((*ar+*cr)>>1, (*ag+*cg)>>1, (*ab+*cb)>>1);
-
-      // lower right
-      *to_odd++ = RGB((*ar+*br+*cr+*dr)>>2,
-                      (*ag+*bg+*cg+*dg)>>2,
-                      (*ab+*bb+*cb+*db)>>2);
-
-      // 'b' becomes 'a', 'd' becomes 'c'
-      ar = br;
-      ag = bg;
-      ab = bb;
-      cr = dr;
-      cg = dg;
-      cb = db;
-    }
-
-    // the "next" rgb row becomes the current; the old current rgb row is
-    // recycled and serves as the new "next" row
-    uint8_t *temp;
-    temp = rgb_row_cur;
-    rgb_row_cur = rgb_row_next;
-    rgb_row_next = temp;
-
-    // update the pointers for start of next pair of lines
-    from = (uint32_t *)((uint8_t *)from_orig + srcPitch);
-    to = (uint32_t *)((uint8_t *)to_orig + (dstPitch << 1));
-    to_odd = (uint32_t *)((uint8_t *)to + dstPitch);
-  }
+        Bilinear16Scalar<true>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
+void Bilinear32(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                int width, int height) {
+    if (Enabled())
+        Bilinear32Vector<false>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        Bilinear32Scalar<false>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+}
+
+void BilinearPlus32(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                    int width, int height) {
+    if (Enabled())
+        Bilinear32Vector<true>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        Bilinear32Scalar<true>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+}

@@ -23,7 +23,9 @@
 
 
 #include <cstdint>
+#include <vector>
 
+#include "../../hq_masks.h"
 #include "hq_shared.h"
 
 

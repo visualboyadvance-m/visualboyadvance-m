@@ -22,3 +22,19 @@ target_link_libraries(xbrz_test PRIVATE xbrz-scalar-ref GTest::gtest_main)
 if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     vbam_gtest_discover_tests(xbrz_test)
 endif()
+
+# filters_test: every other display filter and the interframe blenders, the
+# SIMD kernels against the scalar kernels through the public entry points
+# (vbam_simd::ForceScalar() switches them at run time).
+add_executable(filters_test filters_test.cpp)
+target_include_directories(filters_test PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(filters_test PRIVATE
+    vbam-components-filters
+    vbam-components-filters-interframe
+    vbam-components-filters-scalefx
+    GTest::gtest_main
+)
+
+if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+    vbam_gtest_discover_tests(filters_test)
+endif()

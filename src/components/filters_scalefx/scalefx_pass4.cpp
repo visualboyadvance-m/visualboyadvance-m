@@ -6,10 +6,11 @@
 // Based on ScaleFX by Sp00kyFox, 2017-03-01
 // CPU implementation
 
-#include "scalefx_simd.h"
-#include <cstdint>
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
+
+#include "scalefx_internal.h"
 
 namespace scalefx {
 
@@ -142,14 +143,16 @@ static inline uint32_t Blend50(uint32_t p0, uint32_t p1) {
     return (((p0 ^ p1) & 0xFEFEFEFE) >> 1) + (p0 & p1);
 }
 
-#ifdef SCALEFX_USE_MMX
-
-// MMX-optimized Pass4 for 9x output
+// Pass 4 for 9x output: every source pixel becomes a 9x9 block built from the
+// 3x3 key samples of the 3x output, the samples two pixels wide and blended at
+// the seams. The key samples are a gather (scalar); the block rows are built
+// once each and written with vector stores (SSE2 / NEON), or scalar.
 void Pass4_9x(const uint32_t* src, int srcPitch, const float* pass3,
               uint32_t* dst, int dstPitch, int width, int height,
               float /*sfx_raa*/, bool /*hybrid_mode*/) {
     uint8_t* dstBytes = reinterpret_cast<uint8_t*>(dst);
     const int srcPitchPixels = srcPitch / 4;
+    const bool vec = Enabled();
 
     for (int y = 0; y < height; y++) {
         // Get source row pointers with clamping
@@ -160,219 +163,7 @@ void Pass4_9x(const uint32_t* src, int srcPitch, const float* pass3,
         const uint32_t* srcRowH2 = src + ((y < height - 2) ? y + 2 : height - 1) * srcPitchPixels;
 
         // Pass3 row pointer
-        const float* pass3Row = pass3 + y * width * 4;
-
-        // Destination row pointers for this source row's 9x9 block
-        int dy = y * 9;
-        uint32_t* dstRows[9];
-        for (int i = 0; i < 9; i++) {
-            dstRows[i] = reinterpret_cast<uint32_t*>(dstBytes + (dy + i) * dstPitch);
-        }
-
-        for (int x = 0; x < width; x++) {
-            // Read Pass 3 data
-            int pass3Idx = x * 4;
-            float E0 = pass3Row[pass3Idx + 0];
-            float E1 = pass3Row[pass3Idx + 1];
-            float E2 = pass3Row[pass3Idx + 2];
-            float E3 = pass3Row[pass3Idx + 3];
-
-            // Unpack corner and mid indices
-            int crn_tl, mid_l, crn_tr, mid_t, crn_br, mid_r, crn_bl, mid_b;
-            UnpackPass3(E0, crn_tl, mid_l);
-            UnpackPass3(E1, crn_tr, mid_t);
-            UnpackPass3(E2, crn_br, mid_r);
-            UnpackPass3(E3, crn_bl, mid_b);
-
-            // Precompute x coordinates for neighbors
-            int xD2 = (x > 1) ? x - 2 : 0;
-            int xD  = (x > 0) ? x - 1 : 0;
-            int xF  = (x < width - 1) ? x + 1 : width - 1;
-            int xF2 = (x < width - 2) ? x + 2 : width - 1;
-
-            // Get the 9 key sample pixels
-            auto getPixel = [&](int idx) -> uint32_t {
-                switch (idx) {
-                    case 0: return srcRowE[x];
-                    case 1: return srcRowE[xD];
-                    case 2: return srcRowE[xD2];
-                    case 3: return srcRowE[xF];
-                    case 4: return srcRowE[xF2];
-                    case 5: return srcRowB[x];
-                    case 6: return srcRowB2[x];
-                    case 7: return srcRowH[x];
-                    case 8: return srcRowH2[x];
-                    default: return srcRowE[x];
-                }
-            };
-
-            // 3x3 key samples
-            uint32_t k00 = getPixel(crn_tl), k10 = getPixel(mid_t),  k20 = getPixel(crn_tr);
-            uint32_t k01 = getPixel(mid_l),  k11 = srcRowE[x],       k21 = getPixel(mid_r);
-            uint32_t k02 = getPixel(crn_bl), k12 = getPixel(mid_b),  k22 = getPixel(crn_br);
-
-            // Use MMX for blending - pack pairs of pixels
-            __m64 mk00k10 = _mm_set_pi32(k10, k00);
-            __m64 mk10k20 = _mm_set_pi32(k20, k10);
-            __m64 mk01k11 = _mm_set_pi32(k11, k01);
-            __m64 mk11k21 = _mm_set_pi32(k21, k11);
-            __m64 mk02k12 = _mm_set_pi32(k12, k02);
-            __m64 mk12k22 = _mm_set_pi32(k22, k12);
-
-            __m64 mk00k01 = _mm_set_pi32(k01, k00);
-            __m64 mk01k02 = _mm_set_pi32(k02, k01);
-            __m64 mk10k11 = _mm_set_pi32(k11, k10);
-            __m64 mk11k12 = _mm_set_pi32(k12, k11);
-            __m64 mk20k21 = _mm_set_pi32(k21, k20);
-            __m64 mk21k22 = _mm_set_pi32(k22, k21);
-
-            // Horizontal blends using MMX
-            __m64 mb01_0_b12_0 = MMXBlend50(mk00k10, mk10k20);  // b01_0, b12_0
-            __m64 mb01_1_b12_1 = MMXBlend50(mk01k11, mk11k21);  // b01_1, b12_1
-            __m64 mb01_2_b12_2 = MMXBlend50(mk02k12, mk12k22);  // b01_2, b12_2
-
-            // Vertical blends using MMX
-            __m64 mb0_01_b0_12 = MMXBlend50(mk00k01, mk01k02);  // b0_01, b0_12
-            __m64 mb1_01_b1_12 = MMXBlend50(mk10k11, mk11k12);  // b1_01, b1_12
-            __m64 mb2_01_b2_12 = MMXBlend50(mk20k21, mk21k22);  // b2_01, b2_12
-
-            // Extract blended values
-            uint32_t b01_0 = _mm_cvtsi64_si32(mb01_0_b12_0);
-            uint32_t b12_0 = _mm_cvtsi64_si32(_mm_srli_si64(mb01_0_b12_0, 32));
-            uint32_t b01_1 = _mm_cvtsi64_si32(mb01_1_b12_1);
-            uint32_t b12_1 = _mm_cvtsi64_si32(_mm_srli_si64(mb01_1_b12_1, 32));
-            uint32_t b01_2 = _mm_cvtsi64_si32(mb01_2_b12_2);
-            uint32_t b12_2 = _mm_cvtsi64_si32(_mm_srli_si64(mb01_2_b12_2, 32));
-
-            uint32_t b0_01 = _mm_cvtsi64_si32(mb0_01_b0_12);
-            uint32_t b0_12 = _mm_cvtsi64_si32(_mm_srli_si64(mb0_01_b0_12, 32));
-            uint32_t b1_01 = _mm_cvtsi64_si32(mb1_01_b1_12);
-            uint32_t b1_12 = _mm_cvtsi64_si32(_mm_srli_si64(mb1_01_b1_12, 32));
-            uint32_t b2_01 = _mm_cvtsi64_si32(mb2_01_b2_12);
-            uint32_t b2_12 = _mm_cvtsi64_si32(_mm_srli_si64(mb2_01_b2_12, 32));
-
-            // Corner blends (4-way) - use scalar for simplicity
-            uint32_t c_01_01 = Blend50(b01_0, b01_1);
-            uint32_t c_12_01 = Blend50(b12_0, b12_1);
-            uint32_t c_01_12 = Blend50(b01_1, b01_2);
-            uint32_t c_12_12 = Blend50(b12_1, b12_2);
-
-            int dx = x * 9;
-
-            // Write using MMX where we have pairs of identical pixels
-            __m64 mk00k00 = _mm_set1_pi32(k00);
-            __m64 mk10k10 = _mm_set1_pi32(k10);
-            __m64 mk20k20 = _mm_set1_pi32(k20);
-            __m64 mk01k01 = _mm_set1_pi32(k01);
-            __m64 mk11k11 = _mm_set1_pi32(k11);
-            __m64 mk21k21 = _mm_set1_pi32(k21);
-            __m64 mk02k02 = _mm_set1_pi32(k02);
-            __m64 mk12k12 = _mm_set1_pi32(k12);
-            __m64 mk22k22 = _mm_set1_pi32(k22);
-
-            __m64 mb0_01x2 = _mm_set1_pi32(b0_01);
-            __m64 mb1_01x2 = _mm_set1_pi32(b1_01);
-            __m64 mb2_01x2 = _mm_set1_pi32(b2_01);
-            __m64 mb0_12x2 = _mm_set1_pi32(b0_12);
-            __m64 mb1_12x2 = _mm_set1_pi32(b1_12);
-            __m64 mb2_12x2 = _mm_set1_pi32(b2_12);
-
-            // Row 0
-            MMXStore2(&dstRows[0][dx+0], mk00k00);
-            dstRows[0][dx+2] = b01_0;
-            MMXStore2(&dstRows[0][dx+3], mk10k10);
-            dstRows[0][dx+5] = b12_0;
-            MMXStore2(&dstRows[0][dx+6], mk20k20);
-            dstRows[0][dx+8] = k20;
-
-            // Row 1 (same as row 0)
-            MMXStore2(&dstRows[1][dx+0], mk00k00);
-            dstRows[1][dx+2] = b01_0;
-            MMXStore2(&dstRows[1][dx+3], mk10k10);
-            dstRows[1][dx+5] = b12_0;
-            MMXStore2(&dstRows[1][dx+6], mk20k20);
-            dstRows[1][dx+8] = k20;
-
-            // Row 2: blend row
-            MMXStore2(&dstRows[2][dx+0], mb0_01x2);
-            dstRows[2][dx+2] = c_01_01;
-            MMXStore2(&dstRows[2][dx+3], mb1_01x2);
-            dstRows[2][dx+5] = c_12_01;
-            MMXStore2(&dstRows[2][dx+6], mb2_01x2);
-            dstRows[2][dx+8] = b2_01;
-
-            // Row 3
-            MMXStore2(&dstRows[3][dx+0], mk01k01);
-            dstRows[3][dx+2] = b01_1;
-            MMXStore2(&dstRows[3][dx+3], mk11k11);
-            dstRows[3][dx+5] = b12_1;
-            MMXStore2(&dstRows[3][dx+6], mk21k21);
-            dstRows[3][dx+8] = k21;
-
-            // Row 4 (same as row 3)
-            MMXStore2(&dstRows[4][dx+0], mk01k01);
-            dstRows[4][dx+2] = b01_1;
-            MMXStore2(&dstRows[4][dx+3], mk11k11);
-            dstRows[4][dx+5] = b12_1;
-            MMXStore2(&dstRows[4][dx+6], mk21k21);
-            dstRows[4][dx+8] = k21;
-
-            // Row 5: blend row
-            MMXStore2(&dstRows[5][dx+0], mb0_12x2);
-            dstRows[5][dx+2] = c_01_12;
-            MMXStore2(&dstRows[5][dx+3], mb1_12x2);
-            dstRows[5][dx+5] = c_12_12;
-            MMXStore2(&dstRows[5][dx+6], mb2_12x2);
-            dstRows[5][dx+8] = b2_12;
-
-            // Row 6
-            MMXStore2(&dstRows[6][dx+0], mk02k02);
-            dstRows[6][dx+2] = b01_2;
-            MMXStore2(&dstRows[6][dx+3], mk12k12);
-            dstRows[6][dx+5] = b12_2;
-            MMXStore2(&dstRows[6][dx+6], mk22k22);
-            dstRows[6][dx+8] = k22;
-
-            // Row 7 (same as row 6)
-            MMXStore2(&dstRows[7][dx+0], mk02k02);
-            dstRows[7][dx+2] = b01_2;
-            MMXStore2(&dstRows[7][dx+3], mk12k12);
-            dstRows[7][dx+5] = b12_2;
-            MMXStore2(&dstRows[7][dx+6], mk22k22);
-            dstRows[7][dx+8] = k22;
-
-            // Row 8 (same as row 6)
-            MMXStore2(&dstRows[8][dx+0], mk02k02);
-            dstRows[8][dx+2] = b01_2;
-            MMXStore2(&dstRows[8][dx+3], mk12k12);
-            dstRows[8][dx+5] = b12_2;
-            MMXStore2(&dstRows[8][dx+6], mk22k22);
-            dstRows[8][dx+8] = k22;
-        }
-    }
-    MMXEnd();
-}
-
-#else // !SCALEFX_USE_MMX
-
-// Scalar Pass4 for 9x output - fast version with minimal blending
-// Uses nearest-neighbor for most pixels, blends only at block boundaries
-void Pass4_9x(const uint32_t* src, int srcPitch, const float* pass3,
-              uint32_t* dst, int dstPitch, int width, int height,
-              float /*sfx_raa*/, bool /*hybrid_mode*/) {
-    uint8_t* dstBytes = reinterpret_cast<uint8_t*>(dst);
-    const int srcPitchPixels = srcPitch / 4;
-
-    for (int y = 0; y < height; y++) {
-        // Get source row pointers with clamping
-        const uint32_t* srcRowB2 = src + ((y > 1) ? y - 2 : 0) * srcPitchPixels;
-        const uint32_t* srcRowB  = src + ((y > 0) ? y - 1 : 0) * srcPitchPixels;
-        const uint32_t* srcRowE  = src + y * srcPitchPixels;
-        const uint32_t* srcRowH  = src + ((y < height - 1) ? y + 1 : height - 1) * srcPitchPixels;
-        const uint32_t* srcRowH2 = src + ((y < height - 2) ? y + 2 : height - 1) * srcPitchPixels;
-
-        // Pass3 row pointer
-        const float* pass3Row = pass3 + y * width * 4;
+        const float* pass3Row = pass3 + static_cast<size_t>(y) * width * 4;
 
         // Destination row pointers for this source row's 9x9 block
         int dy = y * 9;
@@ -441,6 +232,37 @@ void Pass4_9x(const uint32_t* src, int srcPitch, const float* pass3,
 
             int dx = x * 9;
 
+            // The five distinct block rows: top key row (output rows 0, 1), the
+            // top/middle seam (2), middle key row (3, 4), middle/bottom seam (5),
+            // bottom key row (6, 7, 8). Each is [a a ab b | b bc c c | c].
+            if (vec) {
+                auto rowVectors = [](uint32_t a, uint32_t ab, uint32_t b, uint32_t bc, uint32_t c, V& lo, V& hi) {
+                    lo = set_u32(a, a, ab, b);
+                    hi = set_u32(b, bc, c, c);
+                };
+                V t0, t1, s0, s1, m0, m1, u0, u1, b0, b1;
+                rowVectors(k00, b01_0, k10, b12_0, k20, t0, t1);
+                rowVectors(b0_01, c_01_01, b1_01, c_12_01, b2_01, s0, s1);
+                rowVectors(k01, b01_1, k11, b12_1, k21, m0, m1);
+                rowVectors(b0_12, c_01_12, b1_12, c_12_12, b2_12, u0, u1);
+                rowVectors(k02, b01_2, k12, b12_2, k22, b0, b1);
+                auto put = [&](int r, V lo, V hi, uint32_t last) {
+                    store(dstRows[r] + dx, lo);
+                    store(dstRows[r] + dx + 4, hi);
+                    dstRows[r][dx + 8] = last;
+                };
+                put(0, t0, t1, k20);
+                put(1, t0, t1, k20);
+                put(2, s0, s1, b2_01);
+                put(3, m0, m1, k21);
+                put(4, m0, m1, k21);
+                put(5, u0, u1, b2_12);
+                put(6, b0, b1, k22);
+                put(7, b0, b1, k22);
+                put(8, b0, b1, k22);
+                continue;
+            }
+
             // Row 0-2: top key row (k00, k10, k20) region
             // Row 0: pure top
             dstRows[0][dx+0] = k00; dstRows[0][dx+1] = k00; dstRows[0][dx+2] = b01_0;
@@ -491,7 +313,5 @@ void Pass4_9x(const uint32_t* src, int srcPitch, const float* pass3,
         }
     }
 }
-
-#endif // SCALEFX_USE_MMX
 
 } // namespace scalefx

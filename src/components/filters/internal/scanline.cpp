@@ -1,484 +1,194 @@
+// Scanlines (every other output row black) and TV mode (every other output
+// row and column darkened to 3/4), 16 and 32 bits per pixel.
+//
+// One vector kernel per filter and depth (SSE2 / NEON, see simd128.h) and a
+// scalar kernel for the other targets; the test suite checks that the two agree.
+
 #include <cstdint>
 
-#include "simd_common.h"
+#include "../simd128.h"
 
 extern int RGB_LOW_BITS_MASK;
 
-// ============================================================================
-// SSE2 Implementations
-// ============================================================================
+namespace {
 
-#ifdef USE_SSE2
+using namespace vbam_simd;
 
-// Scanlines32: 2x scale with black scanlines (alternate rows = 0)
-static void Scanlines32_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
-                              uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
-    const __m128i zero = _mm_setzero_si128();
+// Pixel traits: lane width and the scalar operations of each depth
+struct Depth32 {
+    using Pixel = uint32_t;
+    static constexpr int kLanes = 4;
+    static void Store2(Pixel* p, V a, V b) { store2_u32(p, a, b); }
+    static V Halve(V a, V mask) { return srl_u32<1>(and_(a, mask)); }
+    static V Add(V a, V b) { return add_u32(a, b); }
+    template <int N> static V ByteShift(V a) { return bsrl<4 * N>(a); }
+    template <int N> static V ByteShiftLeft(V a) { return bsll<4 * N>(a); }
+    static V Set1(Pixel p) { return set1_u32(p); }
+};
 
+struct Depth16 {
+    using Pixel = uint16_t;
+    static constexpr int kLanes = 8;
+    static void Store2(Pixel* p, V a, V b) { store2_u16(p, a, b); }
+    static V Halve(V a, V mask) { return srl_u16<1>(and_(a, mask)); }
+    static V Add(V a, V b) { return add_u16(a, b); }
+    template <int N> static V ByteShift(V a) { return bsrl<2 * N>(a); }
+    template <int N> static V ByteShiftLeft(V a) { return bsll<2 * N>(a); }
+    static V Set1(Pixel p) { return set1_u16(p); }
+};
+
+// mask that clears the low bit of every channel, as a lane constant
+template <class D>
+VBAM_SIMD_INLINE typename D::Pixel ColorMask() {
+    return static_cast<typename D::Pixel>(~RGB_LOW_BITS_MASK);
+}
+
+// ---------------------------------------------------------------------------
+// Scanlines: row 0 = pixel doubled, row 1 = black
+// ---------------------------------------------------------------------------
+
+template <class D>
+void ScanlinesScalar(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                     int height) {
+    using Pixel = typename D::Pixel;
     for (int y = 0; y < height; y++) {
-        uint32_t *src = reinterpret_cast<uint32_t*>(srcPtr + y * srcPitch);
-        uint32_t *dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
-        uint32_t *dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
-
-        int x = 0;
-        // Process 4 pixels at a time
-        for (; x + 4 <= width; x += 4) {
-            __m128i pixels = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
-
-            // Duplicate each pixel: [A B C D] -> [A A B B] [C C D D]
-            __m128i lo = _mm_unpacklo_epi32(pixels, pixels);
-            __m128i hi = _mm_unpackhi_epi32(pixels, pixels);
-
-            // Store duplicated pixels to row 0
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), lo);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 4]), hi);
-
-            // Store zeros to row 1 (scanline)
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), zero);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 4]), zero);
-        }
-
-        // Scalar tail
-        for (; x < width; x++) {
-            uint32_t color = src[x];
-            dst0[x * 2] = color;
-            dst0[x * 2 + 1] = color;
-            dst1[x * 2] = 0;
-            dst1[x * 2 + 1] = 0;
+        const Pixel* src = reinterpret_cast<const Pixel*>(srcPtr + y * srcPitch);
+        Pixel* dst0 = reinterpret_cast<Pixel*>(dstPtr + (y * 2) * dstPitch);
+        Pixel* dst1 = reinterpret_cast<Pixel*>(dstPtr + (y * 2 + 1) * dstPitch);
+        for (int x = 0; x < width; x++) {
+            dst0[x * 2] = dst0[x * 2 + 1] = src[x];
+            dst1[x * 2] = dst1[x * 2 + 1] = 0;
         }
     }
 }
 
-// Scanlines (16-bit): 2x scale with black scanlines
-static void Scanlines_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
-                            uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
-    const __m128i zero = _mm_setzero_si128();
-
+template <class D>
+void ScanlinesVector(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                     int height) {
+    using Pixel = typename D::Pixel;
+    const V z = zero();
     for (int y = 0; y < height; y++) {
-        uint16_t *src = reinterpret_cast<uint16_t*>(srcPtr + y * srcPitch);
-        uint16_t *dst0 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2) * dstPitch);
-        uint16_t *dst1 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2 + 1) * dstPitch);
-
+        const Pixel* src = reinterpret_cast<const Pixel*>(srcPtr + y * srcPitch);
+        Pixel* dst0 = reinterpret_cast<Pixel*>(dstPtr + (y * 2) * dstPitch);
+        Pixel* dst1 = reinterpret_cast<Pixel*>(dstPtr + (y * 2 + 1) * dstPitch);
         int x = 0;
-        // Process 8 pixels at a time
-        for (; x + 8 <= width; x += 8) {
-            __m128i pixels = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
-
-            // Duplicate each 16-bit pixel
-            __m128i lo = _mm_unpacklo_epi16(pixels, pixels);
-            __m128i hi = _mm_unpackhi_epi16(pixels, pixels);
-
-            // Store duplicated pixels to row 0
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), lo);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 8]), hi);
-
-            // Store zeros to row 1 (scanline)
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), zero);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 8]), zero);
+        for (; x + D::kLanes <= width; x += D::kLanes) {
+            const V p = load(src + x);
+            D::Store2(dst0 + x * 2, p, p);
+            store(dst1 + x * 2, z);
+            store(dst1 + x * 2 + D::kLanes, z);
         }
-
-        // Scalar tail
         for (; x < width; x++) {
-            uint16_t color = src[x];
-            dst0[x * 2] = color;
-            dst0[x * 2 + 1] = color;
-            dst1[x * 2] = 0;
-            dst1[x * 2 + 1] = 0;
+            dst0[x * 2] = dst0[x * 2 + 1] = src[x];
+            dst1[x * 2] = dst1[x * 2 + 1] = 0;
         }
     }
 }
 
-// ScanlinesTV32: 2x scale with interpolation and darkened scanlines
-// Row 0: [original, interpolated with next]
-// Row 1: [darkened original, darkened interpolated]
-static void ScanlinesTV32_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
-                                uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
-    const __m128i mask = _mm_set1_epi32(0x00FEFEFE);
+// ---------------------------------------------------------------------------
+// TV mode: row 0 = [pixel, average with the right neighbour], row 1 = row 0 at 3/4
+// ---------------------------------------------------------------------------
+
+template <typename Pixel>
+VBAM_SIMD_INLINE Pixel Darken(Pixel c, Pixel mask) {
+    const Pixel half = static_cast<Pixel>((c & mask) >> 1);
+    return static_cast<Pixel>(half + ((half & mask) >> 1));
+}
+
+template <class D>
+void ScanlinesTVScalar(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                       int height) {
+    using Pixel = typename D::Pixel;
+    const Pixel mask = ColorMask<D>();
+    for (int y = 0; y < height; y++) {
+        const Pixel* src = reinterpret_cast<const Pixel*>(srcPtr + y * srcPitch);
+        Pixel* dst0 = reinterpret_cast<Pixel*>(dstPtr + (y * 2) * dstPitch);
+        Pixel* dst1 = reinterpret_cast<Pixel*>(dstPtr + (y * 2 + 1) * dstPitch);
+        for (int x = 0; x < width; x++) {
+            const Pixel a = src[x];
+            const Pixel b = (x + 1 < width) ? src[x + 1] : a;
+            const Pixel ab = static_cast<Pixel>(((a & mask) >> 1) + ((b & mask) >> 1));
+            dst0[x * 2] = a;
+            dst0[x * 2 + 1] = ab;
+            dst1[x * 2] = Darken(a, mask);
+            dst1[x * 2 + 1] = Darken(ab, mask);
+        }
+    }
+}
+
+template <class D>
+void ScanlinesTVVector(const uint8_t* srcPtr, uint32_t srcPitch, uint8_t* dstPtr, uint32_t dstPitch, int width,
+                       int height) {
+    using Pixel = typename D::Pixel;
+    constexpr int L = D::kLanes;
+    const Pixel maskPixel = ColorMask<D>();
+    const V mask = D::Set1(maskPixel);
+
+    auto darken = [&](V c) {
+        const V half = D::Halve(c, mask);
+        return D::Add(half, D::Halve(half, mask));  // channels never carry into each other: their low bits are clear
+    };
 
     for (int y = 0; y < height; y++) {
-        uint32_t *src = reinterpret_cast<uint32_t*>(srcPtr + y * srcPitch);
-        uint32_t *dst0 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2) * dstPitch);
-        uint32_t *dst1 = reinterpret_cast<uint32_t*>(dstPtr + (y * 2 + 1) * dstPitch);
-
+        const Pixel* src = reinterpret_cast<const Pixel*>(srcPtr + y * srcPitch);
+        Pixel* dst0 = reinterpret_cast<Pixel*>(dstPtr + (y * 2) * dstPitch);
+        Pixel* dst1 = reinterpret_cast<Pixel*>(dstPtr + (y * 2 + 1) * dstPitch);
         int x = 0;
-        // Process 4 pixels at a time, output 8 pixels
-        for (; x + 4 <= width; x += 4) {
-            // Load current 4 pixels and next 4 (shifted by 1)
-            __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
-
-            // Create shifted version for interpolation: [B C D E] where curr = [A B C D]
-            __m128i next;
-            if (x + 5 <= width) {
-                // Load next group and blend
-                __m128i nextGroup = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x + 1]));
-                next = nextGroup;
+        for (; x + L <= width; x += L) {
+            const V a = load(src + x);
+            V b;
+            if (x + L < width) {
+                b = load(src + x + 1);
             } else {
-                // Near edge - shift within current register and replicate last
-                next = _mm_srli_si128(curr, 4);  // Shift right by 4 bytes
-                // Insert last pixel at end
-                uint32_t lastPixel = src[width - 1];
-                __m128i lastVec = _mm_set1_epi32(lastPixel);
-                // Combine: next has [B C D 0], we want [B C D last]
-                next = _mm_or_si128(next, _mm_slli_si128(lastVec, 12));
+                // last group: shift down one pixel and repeat the last one
+                b = or_(D::template ByteShift<1>(a), D::template ByteShiftLeft<L - 1>(D::Set1(src[width - 1])));
             }
-
-            // Interpolate: (curr + next) / 2
-            __m128i curr_masked = _mm_and_si128(curr, mask);
-            __m128i next_masked = _mm_and_si128(next, mask);
-            __m128i interp = _mm_add_epi32(_mm_srli_epi32(curr_masked, 1),
-                                           _mm_srli_epi32(next_masked, 1));
-
-            // Interleave original and interpolated: [A interp(A,B) B interp(B,C) ...]
-            __m128i out0 = _mm_unpacklo_epi32(curr, interp);  // [A interp0 B interp1]
-            __m128i out1 = _mm_unpackhi_epi32(curr, interp);  // [C interp2 D interp3]
-
-            // Store row 0 (original + interpolated)
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), out0);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 4]), out1);
-
-            // Darken for row 1: color' = (color >> 1) + (color >> 2) = color * 0.75
-            // For out0
-            __m128i out0_masked = _mm_and_si128(out0, mask);
-            __m128i out0_half = _mm_srli_epi32(out0_masked, 1);
-            __m128i out0_half_masked = _mm_and_si128(out0_half, mask);
-            __m128i out0_quarter = _mm_srli_epi32(out0_half_masked, 1);
-            __m128i dark0 = _mm_add_epi32(out0_half, out0_quarter);
-
-            // For out1
-            __m128i out1_masked = _mm_and_si128(out1, mask);
-            __m128i out1_half = _mm_srli_epi32(out1_masked, 1);
-            __m128i out1_half_masked = _mm_and_si128(out1_half, mask);
-            __m128i out1_quarter = _mm_srli_epi32(out1_half_masked, 1);
-            __m128i dark1 = _mm_add_epi32(out1_half, out1_quarter);
-
-            // Store row 1 (darkened)
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), dark0);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 4]), dark1);
+            const V ab = D::Add(D::Halve(a, mask), D::Halve(b, mask));
+            D::Store2(dst0 + x * 2, a, ab);
+            D::Store2(dst1 + x * 2, darken(a), darken(ab));
         }
-
-        // Scalar tail
-        uint32_t colorMask = ~RGB_LOW_BITS_MASK;
         for (; x < width; x++) {
-            uint32_t colorA = src[x];
-            uint32_t colorB = (x + 1 < width) ? src[x + 1] : colorA;
-            uint32_t temp = ((colorA & colorMask) >> 1) + ((colorB & colorMask) >> 1);
-
-            dst0[x * 2] = colorA;
-            dst0[x * 2 + 1] = temp;
-
-            uint32_t darkA = ((colorA & colorMask) >> 1);
-            darkA += ((darkA & colorMask) >> 1);
-            uint32_t darkTemp = ((temp & colorMask) >> 1);
-            darkTemp += ((darkTemp & colorMask) >> 1);
-
-            dst1[x * 2] = darkA;
-            dst1[x * 2 + 1] = darkTemp;
+            const Pixel a = src[x];
+            const Pixel b = (x + 1 < width) ? src[x + 1] : a;
+            const Pixel ab = static_cast<Pixel>(((a & maskPixel) >> 1) + ((b & maskPixel) >> 1));
+            dst0[x * 2] = a;
+            dst0[x * 2 + 1] = ab;
+            dst1[x * 2] = Darken(a, maskPixel);
+            dst1[x * 2 + 1] = Darken(ab, maskPixel);
         }
     }
 }
 
-// ScanlinesTV (16-bit): 2x scale with interpolation and darkened scanlines
-static void ScanlinesTV_SSE2(uint8_t *srcPtr, uint32_t srcPitch,
-                              uint8_t *dstPtr, uint32_t dstPitch, int width, int height) {
-    const __m128i mask = _mm_set1_epi16(static_cast<int16_t>(~RGB_LOW_BITS_MASK));
+}  // namespace
 
-    for (int y = 0; y < height; y++) {
-        uint16_t *src = reinterpret_cast<uint16_t*>(srcPtr + y * srcPitch);
-        uint16_t *dst0 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2) * dstPitch);
-        uint16_t *dst1 = reinterpret_cast<uint16_t*>(dstPtr + (y * 2 + 1) * dstPitch);
-
-        int x = 0;
-        // Process 8 pixels at a time
-        for (; x + 8 <= width; x += 8) {
-            __m128i curr = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x]));
-
-            // Create shifted version for interpolation
-            __m128i next;
-            if (x + 9 <= width) {
-                next = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&src[x + 1]));
-            } else {
-                next = _mm_srli_si128(curr, 2);  // Shift right by 2 bytes (1 pixel)
-                uint16_t lastPixel = src[width - 1];
-                __m128i lastVec = _mm_set1_epi16(lastPixel);
-                next = _mm_or_si128(next, _mm_slli_si128(lastVec, 14));
-            }
-
-            // Interpolate: (curr + next) / 2
-            __m128i curr_masked = _mm_and_si128(curr, mask);
-            __m128i next_masked = _mm_and_si128(next, mask);
-            __m128i interp = _mm_add_epi16(_mm_srli_epi16(curr_masked, 1),
-                                           _mm_srli_epi16(next_masked, 1));
-
-            // Interleave original and interpolated
-            __m128i out0 = _mm_unpacklo_epi16(curr, interp);
-            __m128i out1 = _mm_unpackhi_epi16(curr, interp);
-
-            // Store row 0
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2]), out0);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst0[x * 2 + 8]), out1);
-
-            // Darken for row 1
-            __m128i out0_masked = _mm_and_si128(out0, mask);
-            __m128i out0_half = _mm_srli_epi16(out0_masked, 1);
-            __m128i out0_half_masked = _mm_and_si128(out0_half, mask);
-            __m128i out0_quarter = _mm_srli_epi16(out0_half_masked, 1);
-            __m128i dark0 = _mm_add_epi16(out0_half, out0_quarter);
-
-            __m128i out1_masked = _mm_and_si128(out1, mask);
-            __m128i out1_half = _mm_srli_epi16(out1_masked, 1);
-            __m128i out1_half_masked = _mm_and_si128(out1_half, mask);
-            __m128i out1_quarter = _mm_srli_epi16(out1_half_masked, 1);
-            __m128i dark1 = _mm_add_epi16(out1_half, out1_quarter);
-
-            // Store row 1
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2]), dark0);
-            _mm_storeu_si128(reinterpret_cast<__m128i*>(&dst1[x * 2 + 8]), dark1);
-        }
-
-        // Scalar tail - use original algorithm
-        for (; x < width; x++) {
-            uint16_t colorA = src[x];
-            uint16_t colorB = (x + 1 < width) ? src[x + 1] : colorA;
-            uint16_t interp = static_cast<uint16_t>(
-                ((colorA & ~RGB_LOW_BITS_MASK) >> 1) + ((colorB & ~RGB_LOW_BITS_MASK) >> 1));
-
-            dst0[x * 2] = colorA;
-            dst0[x * 2 + 1] = interp;
-
-            uint16_t darkA = static_cast<uint16_t>((colorA & ~RGB_LOW_BITS_MASK) >> 1);
-            darkA = static_cast<uint16_t>(darkA + ((darkA & ~RGB_LOW_BITS_MASK) >> 1));
-            uint16_t darkInterp = static_cast<uint16_t>((interp & ~RGB_LOW_BITS_MASK) >> 1);
-            darkInterp = static_cast<uint16_t>(darkInterp + ((darkInterp & ~RGB_LOW_BITS_MASK) >> 1));
-
-            dst1[x * 2] = darkA;
-            dst1[x * 2 + 1] = darkInterp;
-        }
-    }
+void Scanlines(uint8_t* srcPtr, uint32_t srcPitch, uint8_t*, uint8_t* dstPtr, uint32_t dstPitch, int width,
+               int height) {
+    if (Enabled())
+        ScanlinesVector<Depth16>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        ScanlinesScalar<Depth16>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
-#endif  // USE_SSE2
-
-void Scanlines (uint8_t *srcPtr, uint32_t srcPitch, uint8_t *,
-                uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-#ifdef USE_SSE2
-  Scanlines_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
-#else
-  uint8_t *nextLine, *finish;
-
-  nextLine = dstPtr + dstPitch;
-
-  do {
-    uint32_t *bP = (uint32_t *) srcPtr;
-    uint32_t *dP = (uint32_t *) dstPtr;
-    uint32_t *nL = (uint32_t *) nextLine;
-    uint32_t currentPixel;
-    uint32_t nextPixel;
-
-    finish = (uint8_t *) bP + ((width+2) << 1);
-    nextPixel = *bP++;
-
-    do {
-      currentPixel = nextPixel;
-      nextPixel = *bP++;
-      uint32_t colorA, colorB;
-
-#ifdef WORDS_BIGENDIAN
-      colorA = currentPixel >> 16;
-      colorB = currentPixel & 0xffff;
-#else
-      colorA = currentPixel & 0xffff;
-      colorB = currentPixel >> 16;
-#endif
-
-      *(dP) = colorA | colorA<<16;
-      *(nL) = 0;
-
-#ifdef WORDS_BIGENDIAN
-      colorA = nextPixel >> 16;
-#else
-      colorA = nextPixel & 0xffff;
-#endif
-
-      *(dP + 1) = colorB | (colorB << 16);
-      *(nL + 1) = 0;
-
-      dP += 2;
-      nL += 2;
-    } while ((uint8_t *) bP < finish);
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    nextLine += dstPitch << 1;
-  }
-  while (--height);
-#endif
+void Scanlines32(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                 int width, int height) {
+    if (Enabled())
+        ScanlinesVector<Depth32>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        ScanlinesScalar<Depth32>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
-void Scanlines32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-#ifdef USE_SSE2
-  Scanlines32_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
-#else
-  uint8_t *nextLine, *finish;
-
-  nextLine = dstPtr + dstPitch;
-
-  do {
-    uint32_t *bP = (uint32_t *) srcPtr;
-    uint32_t *dP = (uint32_t *) dstPtr;
-    uint32_t *nL = (uint32_t *) nextLine;
-    uint32_t currentPixel;
-    uint32_t nextPixel;
-
-    finish = (uint8_t *) bP + ((width+1) << 2);
-    nextPixel = *bP++;
-
-    do {
-      currentPixel = nextPixel;
-      nextPixel = *bP++;
-
-      uint32_t colorA, colorB;
-
-      colorA = currentPixel;
-      colorB = nextPixel;
-
-      *(dP) = colorA;
-      *(dP+1) = colorA;
-      *(nL) = 0;
-      *(nL+1) = 0;
-
-      *(dP + 2) = colorB;
-      *(dP + 3) = colorB;
-      *(nL+2) = 0;
-      *(nL+3) = 0;
-
-      nextPixel = *bP++;
-
-      dP += 4;
-      nL += 4;
-    } while ((uint8_t *) bP < finish);
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    nextLine += dstPitch << 1;
-  }
-  while (--height);
-#endif
+void ScanlinesTV(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                 int width, int height) {
+    if (Enabled())
+        ScanlinesTVVector<Depth16>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        ScanlinesTVScalar<Depth16>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }
 
-void ScanlinesTV(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                 uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-#ifdef USE_SSE2
-  ScanlinesTV_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
-#else
-  uint8_t *nextLine, *finish;
-  uint32_t colorMask = ~(RGB_LOW_BITS_MASK | (RGB_LOW_BITS_MASK << 16));
-
-  nextLine = dstPtr + dstPitch;
-
-  do {
-    uint32_t *bP = (uint32_t *) srcPtr;
-    uint32_t *dP = (uint32_t *) dstPtr;
-    uint32_t *nL = (uint32_t *) nextLine;
-    uint32_t currentPixel;
-    uint32_t nextPixel;
-
-    finish = (uint8_t *) bP + ((width+2) << 1);
-    nextPixel = *bP++;
-
-    do {
-      currentPixel = nextPixel;
-      nextPixel = *bP++;
-
-      uint32_t colorA, colorB;
-
-#ifdef WORDS_BIGENDIAN
-      colorA = currentPixel >> 16;
-      colorB = currentPixel & 0xFFFF;
-#else
-      colorA = currentPixel & 0xFFFF;
-      colorB = currentPixel >> 16;
-#endif
-
-      *(dP) = colorA = colorA | ((((colorA & colorMask) >> 1) +
-                                  ((colorB & colorMask) >> 1))) << 16;
-      colorA = ((colorA & colorMask) >> 1);
-      colorA += ((colorA & colorMask) >> 1);
-      *(nL) = colorA;
-
-      colorA = nextPixel & 0xFFFF;
-
-      *(dP + 1) = colorB = colorB | ((((colorA & colorMask) >> 1) +
-                                      ((colorB & colorMask) >> 1))) << 16;
-      colorB = ((colorB & colorMask) >> 1);
-      colorB += ((colorB & colorMask) >> 1);
-
-      *(nL + 1) = colorB;
-
-      dP += 2;
-      nL += 2;
-    } while ((uint8_t *) bP < finish);
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    nextLine += dstPitch << 1;
-  }
-  while (--height);
-#endif
-}
-
-void ScanlinesTV32(uint8_t *srcPtr, uint32_t srcPitch, uint8_t * /* deltaPtr */,
-                   uint8_t *dstPtr, uint32_t dstPitch, int width, int height)
-{
-#ifdef USE_SSE2
-  ScanlinesTV32_SSE2(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
-#else
-  uint8_t *nextLine, *finish;
-  uint32_t colorMask = ~RGB_LOW_BITS_MASK;
-
-  nextLine = dstPtr + dstPitch;
-
-  do {
-    uint32_t *bP = (uint32_t *) srcPtr;
-    uint32_t *dP = (uint32_t *) dstPtr;
-    uint32_t *nL = (uint32_t *) nextLine;
-    uint32_t currentPixel;
-    uint32_t nextPixel;
-
-    finish = (uint8_t *) bP + ((width+1) << 2);
-    nextPixel = *bP++;
-
-    do {
-      currentPixel = nextPixel;
-      nextPixel = *bP++;
-
-      uint32_t colorA, colorB, temp;
-
-      colorA = currentPixel;
-      colorB = nextPixel;
-
-      *(dP) = colorA;
-      *(dP+1) = temp = ((colorA & colorMask) >> 1) +
-        ((colorB & colorMask) >> 1);
-      temp = ((temp & colorMask) >> 1);
-      temp += ((temp & colorMask) >> 1);
-      colorA = ((colorA & colorMask) >> 1);
-      colorA += ((colorA & colorMask) >> 1);
-
-      *(nL) = colorA;
-      *(nL+1) = temp;
-
-      dP += 2;
-      nL += 2;
-    } while ((uint8_t *) bP < finish);
-
-    srcPtr += srcPitch;
-    dstPtr += dstPitch << 1;
-    nextLine += dstPitch << 1;
-  }
-  while (--height);
-#endif
+void ScanlinesTV32(uint8_t* srcPtr, uint32_t srcPitch, uint8_t* /* deltaPtr */, uint8_t* dstPtr, uint32_t dstPitch,
+                   int width, int height) {
+    if (Enabled())
+        ScanlinesTVVector<Depth32>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
+    else
+        ScanlinesTVScalar<Depth32>(srcPtr, srcPitch, dstPtr, dstPitch, width, height);
 }

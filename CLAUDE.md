@@ -96,6 +96,11 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - Independent build system (Makefile)
 
 **src/components/** - Reusable components
+- `filters/simd128.h` - the 128-bit vector layer every display filter kernel is
+  written against: SSE2 on x86, NEON on AArch64, lane-by-lane scalar emulation
+  elsewhere (`VBAM_SIMD_FORCE_SCALAR`), all with SSE2 semantics so a kernel
+  gives the same bytes on every backend; `vbam_simd::Enabled()` picks the
+  vector or the scalar kernel at run time (tests flip it with `ForceScalar()`)
 - `filters_dlssnr/` - the DLSS NR neural-rendering display filter
   (`config::Filter::kDlssNr`, INI value `dlssnr`, scale 1x) on top of
   `libdlssnr` from `third_party/dlss-nr-on-vulkan` (one static archive: libxmx,
@@ -193,8 +198,9 @@ Tests use Google Test framework:
 - Core tests: `src/core/test/`
 - wxWidgets tests: `src/wx/test/`
 - Filter tests: `src/components/filters/test/` (`xbrz_test`: the SSE2/NEON xBRZ
-  build against a scalar build of the same source, bit for bit;
-  `VBAM_FILTER_BENCH=1` adds timings)
+  build against a scalar build of the same source, bit for bit; `filters_test`:
+  every other display filter, ScaleFX and the interframe blenders, SIMD against
+  scalar via `vbam_simd::ForceScalar()`; `VBAM_FILTER_BENCH=1` adds timings)
 - Run with: `ctest -j --output-on-failure` from build directory
 
 Tests are only built when `BUILD_TESTING=ON` (default) and in a git checkout.
