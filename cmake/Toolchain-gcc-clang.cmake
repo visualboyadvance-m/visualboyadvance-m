@@ -58,6 +58,18 @@ if(DOS)
     add_compile_definitions(_POSIX_THREAD_SYSCALL_SOFT=0)
 endif()
 
+# DJGPP's GCC targets the Pentium Pro by default and so compares floats with
+# fcomi. The Pentium is the natural floor for a DOS build, and the emulator
+# most people run one in, DOSBox-X, gets fcomi wrong in its dynamic core
+# (the flags come out inverted or stale): SDL's resampler setup, a float
+# convergence loop, then never ends and the port hangs before the first
+# frame. Built for the 586, GCC compares through fnstsw, which every core
+# runs correctly. The SDL3 the port links against must be built the same
+# way, since the loop in question is SDL's.
+if(DOS)
+    add_compile_options(-march=i586 -mtune=generic)
+endif()
+
 if(UPSTREAM_RELEASE)
     if(X86_64)
         if(APPLE)

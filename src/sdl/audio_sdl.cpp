@@ -80,6 +80,16 @@ void SoundSDL::read(uint16_t* stream, int length) {
         return;
 
     if (!buffer_size()) {
+#ifdef SDL_PLATFORM_DOS
+        // SDL's DOS threads are cooperative, and the audio thread calls
+        // this with the device lock held. Parking here until write()
+        // delivers samples deadlocks the port: write() first asks SDL
+        // whether the device is paused, which takes that same lock, so
+        // the two threads yield to each other forever. Play silence for
+        // this chunk instead. write() still waits for data_read, so the
+        // emulation stays paced to the sound card's DMA rate.
+        return;
+#else
         if (should_wait())
 #ifndef ENABLE_SDL3
             SDL_SemWait(data_available);
@@ -88,6 +98,7 @@ void SoundSDL::read(uint16_t* stream, int length) {
 #endif
         else
             return;
+#endif
     }
 
     SDL_LockMutex(mutex);
