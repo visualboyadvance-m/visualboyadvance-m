@@ -183,6 +183,25 @@ void main() {
     subgroupMemoryBarrierShared();
     subgroupBarrier();
     {
+#ifdef TM16
+        /* Two named accumulators, not an array filled in a loop: AMD's Windows driver 26.10.1
+         * crashes compiling a module with more than one loop that multiplies into an array of
+         * cooperative matrices (the QK^T above is the other), and aborts with the indices
+         * written out. The same products in the same order; the 8-row build is untouched. */
+        coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc0 =
+            coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
+        coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc1 = acc0;
+        for (uint c = 0u; c < 64u; c += 16u) {
+            coopmat<float16_t, gl_ScopeSubgroup, QR, 16, gl_MatrixUseA> p;
+            coopMatLoad(p, h16, scratch * 2u + c, 64u, gl_CooperativeMatrixLayoutRowMajor);
+            coopmat<float16_t, gl_ScopeSubgroup, 16, 16, gl_MatrixUseB> v0, v1;
+            coopMatLoad(v0, h16, VALUES + c * 32u, 32u, gl_CooperativeMatrixLayoutRowMajor);
+            coopMatLoad(v1, h16, VALUES + c * 32u + 16u, 32u, gl_CooperativeMatrixLayoutRowMajor);
+            acc0 = coopMatMulAdd(p, v0, acc0);
+            acc1 = coopMatMulAdd(p, v1, acc1);
+        }
+        coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc[2] = { acc0, acc1 };
+#else
         coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator> acc[2];
         for (uint j = 0u; j < 2u; j++)
             acc[j] = coopmat<float, gl_ScopeSubgroup, QR, 16, gl_MatrixUseAccumulator>(0.0);
@@ -196,6 +215,7 @@ void main() {
                 acc[j] = coopMatMulAdd(p, v, acc[j]);
             }
         }
+#endif
         /* the probabilities and the output stage are the same bytes */
         subgroupMemoryBarrierShared();
         subgroupBarrier();

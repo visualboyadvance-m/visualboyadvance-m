@@ -157,9 +157,19 @@ void main() {
     uint stage = 4096u + 256u * sub;           // the same kilobyte, in floats
 
     coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result[RI][2];
+#ifdef TM16
+    /* One tile row (RI is 1), its two accumulators named rather than an array the chunks
+     * multiply into: AMD's Windows driver 26.10.1 crashes compiling this module with the
+     * array (window_attention.comp has the details). The same products in the same order;
+     * the 8-row build is untouched. */
+    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result0 =
+        coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
+    coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator> result1 = result0;
+#else
     for (uint i = 0; i < RI; i++)
         for (uint j = 0; j < 2u; j++)
             result[i][j] = coopmat<float, gl_ScopeSubgroup, TM, TN, gl_MatrixUseAccumulator>(0.0);
+#endif
 
     // an input made here: its sixteen rows, rounded to half, through the kilobyte into
     // the registers every chunk reads them from
@@ -265,9 +275,14 @@ void main() {
                     coopMatLoad(p[j], projection.v, project_base + (chunk + kk * TK) * OUT + j * TN,
                                 OUT, gl_CooperativeMatrixLayoutRowMajor);
             }
+#ifdef TM16
+            result0 = coopMatMulAdd(g[0], p[0], result0);
+            result1 = coopMatMulAdd(g[0], p[1], result1);
+#else
             for (uint i = 0; i < RI; i++)
                 for (uint j = 0; j < 2u; j++)
                     result[i][j] = coopMatMulAdd(g[i], p[j], result[i][j]);
+#endif
         }
         subgroupMemoryBarrierShared();          // the next chunk overwrites the hidden chunk
         subgroupBarrier();
@@ -275,6 +290,10 @@ void main() {
 
     // The residual and the publish, 16 columns at a time through the same kilobyte, exactly
     // as the projection GEMM's residual epilogue finishes each element.
+#ifdef TM16
+    result[0][0] = result0;
+    result[0][1] = result1;
+#endif
     uint epilogue = (operation_flags() >> 8) & 0xFu;
     bool narrow_out = (operation_flags() & 0x1000u) != 0u;
     for (uint j = 0; j < 2u; j++) {
