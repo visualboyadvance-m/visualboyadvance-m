@@ -218,7 +218,9 @@ TEST(Filters, Backend) {
 #elif defined(__aarch64__) || defined(_M_ARM64)
     EXPECT_TRUE(VBAM_SIMD_NEON) << "AArch64 build should use NEON";
 #endif
-    EXPECT_TRUE(vbam_simd::Enabled());
+    // Scalar builds (32-bit Windows, which targets pre-SSE2 CPUs; DJGPP;
+    // VBAM_SIMD_FORCE_SCALAR) have no vector kernels to enable.
+    EXPECT_EQ(vbam_simd::Enabled(), vbam_simd::kHaveSimd);
 }
 
 TEST(Filters, SimdMatchesScalar32) {
