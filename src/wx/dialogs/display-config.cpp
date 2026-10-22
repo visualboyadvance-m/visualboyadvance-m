@@ -1369,7 +1369,7 @@ void DisplayConfig::InitDlssNrTab() {
     post->SetValidator(widgets::OptionSelectedValidator(config::OptionID::kDispDlssNrStage,
                                                         dlssnr::kAfterFilter));
     wxRadioButton* at_display = new wxRadioButton(box, wxID_ANY, _("At display si&ze"));
-    at_display->SetToolTip(_("Scale the display filter's output up to the size it is shown at and run DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds the cost."));
+    at_display->SetToolTip(_("Scale the display filter's output up to the size it is shown at and run DLSS-NR over that, as over a screenshot of the game. Scaled Height bounds the cost."));
     at_display->SetValidator(widgets::OptionSelectedValidator(config::OptionID::kDispDlssNrStage,
                                                               dlssnr::kAtDisplay));
     wxStaticText* apply_label = label(_("Apply:"));
@@ -1384,7 +1384,7 @@ void DisplayConfig::InitDlssNrTab() {
     apply->Add(at_display, 0, wxALIGN_CENTER_VERTICAL);
     group->Add(apply, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, gap);
 
-    // Profile, Intensity, Maximum Height.
+    // Profile, Intensity, Scaled Height.
     wxChoice* profile = new wxChoice(box, wxID_ANY);
     profile->Append(_("Standard"));
     profile->Append(_("Natural"));
@@ -1405,7 +1405,7 @@ void DisplayConfig::InitDlssNrTab() {
     top->Add(spin(0, 400, 1, 0, wxT("%"), wxEmptyString, config::OptionID::kDispDlssNrIntensity, 0,
                   _("Blend of the model's picture against the game's. Above 100% extrapolates.")),
              0, wxEXPAND | wxALIGN_CENTER_VERTICAL);
-    top->Add(label(_("Maximum Height:")), 0, wxALIGN_CENTER_VERTICAL);
+    top->Add(label(_("Scaled Height:")), 0, wxALIGN_CENTER_VERTICAL);
     top->Add(spin(128, 2160, 1, 0, _("px"), wxEmptyString, config::OptionID::kDispDlssNrMaxHeight, 0,
                   _("Frames taller than this are scaled down before the model runs, and back up after. Lower is faster.")),
              0, wxEXPAND | wxALIGN_CENTER_VERTICAL);

@@ -278,7 +278,7 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
     auto* at_display = new QRadioButton(tr("At display si&ze"), apply_row);
     at_display->setToolTip(tr("Scale the display filter's output up to the size it is shown at "
                               "and run DLSS-NR over that, as over a screenshot of the game. "
-                              "Maximum Height bounds the cost."));
+                              "Scaled Height bounds the cost."));
     apply_layout->addWidget(new QLabel(tr("Apply:"), apply_row));
     apply_layout->addWidget(pre);
     apply_layout->addWidget(post);
@@ -288,7 +288,7 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
     bindings().BindRadioButtons({pre, post, at_display}, config::OptionID::kDispDlssNrStage);
     grid->addWidget(apply_row, 1, 0, 1, 6);
 
-    // Profile, Intensity, Maximum Height.
+    // Profile, Intensity, Scaled Height.
     auto* profile = new QComboBox(group);
     profile->addItems({tr("Standard"), tr("Natural"), tr("Cinematic"), tr("Neutral"), tr("Vendor")});
     profile->setToolTip(tr("The style, local tone and local structure the model is conditioned "
@@ -307,7 +307,7 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
     top->addWidget(profile, 1);
     top->addWidget(new QLabel(tr("Intensity:"), group));
     top->addWidget(intensity, 1);
-    top->addWidget(new QLabel(tr("Maximum Height:"), group));
+    top->addWidget(new QLabel(tr("Scaled Height:"), group));
     top->addWidget(max_height, 1);
     grid->addLayout(top, 2, 0, 1, 6);
 
