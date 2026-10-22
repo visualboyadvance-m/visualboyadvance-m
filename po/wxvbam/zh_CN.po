@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-17 00:00+0000\n"
+"POT-Creation-Date: 2026-10-22 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
 "Last-Translator: yeo siang yu, 2026\n"
 "Language-Team: Chinese (China) (http://app.transifex.com/bgk/vba-m/language/zh_CN/)\n"
@@ -35,8 +35,8 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: audio/audio.cpp:70 audio/internal/coreaudio.cpp:372
-#: audio/internal/coreaudio.cpp:623 audio/internal/macos-io-cycle.cpp:55
+#: audio/audio.cpp:70 audio/internal/coreaudio.cpp:375
+#: audio/internal/coreaudio.cpp:654 audio/internal/macos-io-cycle.cpp:55
 #: audio/internal/sdl.cpp:216 audio/internal/sdl.cpp:234
 #: audio/internal/sdl.cpp:428 audio/internal/sdl.cpp:439
 #: audio/internal/sdl.cpp:459 audio/internal/faudio.cpp:506
@@ -44,21 +44,21 @@ msgstr ""
 msgid "Default device"
 msgstr "默认设备"
 
-#: audio/internal/coreaudio.cpp:378
+#: audio/internal/coreaudio.cpp:381
 msgid "Could not get CoreAudio device"
 msgstr "无法获取核心音频设备"
 
-#: audio/internal/coreaudio.cpp:446
+#: audio/internal/coreaudio.cpp:449
 #, c-format
 msgid "Failed to allocate CoreAudio buffer %d: error %d"
 msgstr "分配核心音频缓冲区失败%d: 错误 %d"
 
-#: audio/internal/coreaudio.cpp:463
+#: audio/internal/coreaudio.cpp:467
 #, c-format
 msgid "Failed to start CoreAudio queue: error %d"
 msgstr "启动核心音频队列失败: 错误 %d"
 
-#: cmdevents.cpp:76 wxvbam.cpp:1260
+#: cmdevents.cpp:76 wxvbam.cpp:1295
 msgid "Could not create main window"
 msgstr "无法创建主窗口"
 
@@ -523,7 +523,7 @@ msgstr ""
 #: dialogs/display-config.cpp:1372
 msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
-"DLSS-NR over that, as over a screenshot of the game. Maximum Height bounds "
+"DLSS-NR over that, as over a screenshot of the game. Scaled Height bounds "
 "the cost."
 msgstr ""
 
@@ -572,7 +572,7 @@ msgid ""
 msgstr ""
 
 #: dialogs/display-config.cpp:1408
-msgid "Maximum Height:"
+msgid "Scaled Height:"
 msgstr ""
 
 #: dialogs/display-config.cpp:1409 dialogs/display-config.cpp:1449
@@ -1199,7 +1199,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建原生存档目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: panel.cpp:1375 panel.cpp:1396 wxvbam.cpp:2032
+#: panel.cpp:1375 panel.cpp:1396 wxvbam.cpp:2084
 msgid "Directory Error"
 msgstr "目录错误"
 
@@ -1443,543 +1443,543 @@ msgstr "垂直同步在该平台上不可用 "
 msgid "HDR: failed to create BT.2020 PQ surface; falling back to SDR."
 msgstr "HDR：无法创建 BT.2020 PQ 表面；回退至 SDR。"
 
-#: panel.cpp:7688
+#: panel.cpp:7795
 msgid "Failed to load D3D12 or D3DCompiler DLLs"
 msgstr "加载 D3D12 或 D3DCompiler DLL 失败"
 
-#: panel.cpp:7714
+#: panel.cpp:7821
 msgid "Failed to get D3D12 function pointers"
 msgstr "获取 D3D12 函数指针失败"
 
-#: panel.cpp:7719
+#: panel.cpp:7826
 #, c-format
 msgid "Failed to create DXGI factory: 0x%08X"
 msgstr "创建 DXGI 工厂失败：0x%08X"
 
-#: panel.cpp:7733
+#: panel.cpp:7840
 msgid "No hardware adapter found, falling back to WARP"
 msgstr "未找到硬件适配器，回退到 WARP"
 
-#: panel.cpp:7740
+#: panel.cpp:7847
 #, c-format
 msgid "Failed to create D3D12 device: 0x%08X"
 msgstr "创建 D3D12 设备失败：0x%08X"
 
-#: panel.cpp:7741
+#: panel.cpp:7848
 #, c-format
 msgid "D3D12 device created (%s)"
 msgstr "D3D12 设备已创建 (%s)"
 
-#: panel.cpp:7748
+#: panel.cpp:7855
 #, c-format
 msgid "Failed to create command queue: 0x%08X"
 msgstr "创建命令队列失败：0x%08X"
 
-#: panel.cpp:7774
+#: panel.cpp:7881
 #, c-format
 msgid "Failed to create swap chain: 0x%08X"
 msgstr "创建交换链失败：0x%08X"
 
-#: panel.cpp:7780
+#: panel.cpp:7887
 #, c-format
 msgid "Failed to get IDXGISwapChain3: 0x%08X"
 msgstr "获取 IDXGISwapChain3 失败：0x%08X"
 
-#: panel.cpp:7811
+#: panel.cpp:7918
 msgid ""
 "HDR: display/swapchain does not support BT.2020 PQ; output will be SDR."
 msgstr "HDR：显示设备/交换链不支持 BT.2020 PQ；输出将为 SDR。"
 
-#: panel.cpp:7821
+#: panel.cpp:7928
 #, c-format
 msgid "Failed to create RTV heap: 0x%08X"
 msgstr "创建 RTV 堆失败：0x%08X"
 
-#: panel.cpp:7830
+#: panel.cpp:7937
 #, c-format
 msgid "Failed to create SRV heap: 0x%08X"
 msgstr "创建 SRV 堆失败：0x%08X"
 
-#: panel.cpp:7838
+#: panel.cpp:7945
 #, c-format
 msgid "Failed to get back buffer %u: 0x%08X"
 msgstr "无法获取缓冲区 %u: 0x%08X"
 
-#: panel.cpp:7847
+#: panel.cpp:7954
 #, c-format
 msgid "Failed to create command allocator: 0x%08X"
 msgstr "创建命令分配器失败：0x%08X"
 
-#: panel.cpp:7853
+#: panel.cpp:7960
 #, c-format
 msgid "Failed to create command list: 0x%08X"
 msgstr "创建命令列表失败：0x%08X"
 
-#: panel.cpp:7892
+#: panel.cpp:7999
 #, c-format
 msgid "Failed to serialize root signature: %s"
 msgstr "序列化根签名失败：%s"
 
-#: panel.cpp:7899
+#: panel.cpp:8006
 #, c-format
 msgid "Failed to create root signature: 0x%08X"
 msgstr "创建根签名失败：0x%08X"
 
-#: panel.cpp:7913
+#: panel.cpp:8020
 #, c-format
 msgid "VS compile failed: %s"
 msgstr "VS 编译失败：%s"
 
-#: panel.cpp:7921
+#: panel.cpp:8028
 #, c-format
 msgid "PS compile failed: %s"
 msgstr "PS 编译失败： %s"
 
-#: panel.cpp:7950
+#: panel.cpp:8057
 #, c-format
 msgid "Failed to create PSO: 0x%08X"
 msgstr "创建 PSO 失败：0x%08X"
 
-#: panel.cpp:7971
+#: panel.cpp:8152
 #, c-format
 msgid "Failed to create vertex buffer: 0x%08X"
 msgstr "创建顶点缓冲区失败：0x%08X"
 
-#: panel.cpp:7981
+#: panel.cpp:8162
 #, c-format
 msgid "Failed to create fence: 0x%08X"
 msgstr "创建围栏失败：0x%08X"
 
-#: panel.cpp:7984
+#: panel.cpp:8165
 msgid "Failed to create fence event"
 msgstr "创建围栏事件失败"
 
-#: panel.cpp:7986
+#: panel.cpp:8167
 msgid "D3D12 pipeline fully initialized"
 msgstr "D3D12 流水线已完全初始化"
 
-#: panel.cpp:8029
+#: panel.cpp:8210
 #, c-format
 msgid "DX12DrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DX12DrawingPanel 已初始化：%dx%d (缩放：%f)"
 
-#: panel.cpp:8051
+#: panel.cpp:8232
 #, c-format
 msgid "ResizeBuffers failed: 0x%08X"
 msgstr "调整缓冲区大小失败：0x%08X"
 
-#: panel.cpp:8062
+#: panel.cpp:8243
 #, c-format
 msgid "Swap chain resized to %dx%d"
 msgstr "交换链已调整大小为 %dx%d"
 
-#: panel.cpp:8366
+#: panel.cpp:8612 panel.cpp:8693
 msgid "Texture upload failed"
 msgstr "纹理上传失败"
 
-#: panel.cpp:8527
+#: panel.cpp:8856
 msgid ""
 "D3D11: failed to create device; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11：创建设备失败；简单渲染器将使用软件 (wx) 路径。"
 
-#: panel.cpp:8579
+#: panel.cpp:8908
 #, c-format
 msgid "D3D11: failed to create swap chain: 0x%08X"
 msgstr "D3D11：创建交换链失败：0x%08X"
 
-#: panel.cpp:8645
+#: panel.cpp:8974
 msgid ""
 "D3D11: d3dcompiler_47.dll not found; Simple renderer will use the software "
 "(wx) path."
 msgstr "D3D11：未找到 d3dcompiler_47.dll；简单渲染器将使用软件 (wx) 路径。"
 
-#: panel.cpp:8697
+#: panel.cpp:9026
 msgid ""
 "D3D11: blit shader setup failed; Simple renderer will use the software (wx) "
 "path."
 msgstr "D3D11：Blit 着色器设置失败；简单渲染器将使用软件 (wx) 路径。"
 
-#: panel.cpp:9023
+#: panel.cpp:9352
 msgid "Using Direct3D 9Ex (dynamically loaded)"
 msgstr "使用 Direct3D 9Ex (动态加载)"
 
-#: panel.cpp:9027
+#: panel.cpp:9356
 msgid "Failed to load d3d9.dll"
 msgstr "加载 d3d9.dll 失败"
 
-#: panel.cpp:9036
+#: panel.cpp:9365
 msgid "Failed to create Direct3D 9 interface"
 msgstr "创建 Direct3D 9 接口失败"
 
-#: panel.cpp:9039
+#: panel.cpp:9368
 msgid "Using Direct3D 9"
 msgstr "使用 Direct3D 9"
 
-#: panel.cpp:9046
+#: panel.cpp:9375
 #, c-format
 msgid "Failed to get adapter display mode: 0x%08X"
 msgstr "获取适配器显示模式失败: 0x%08X"
 
-#: panel.cpp:9070
+#: panel.cpp:9399
 msgid "FlipEx not supported, falling back to Discard swap effect"
 msgstr "FlipEx 功能不支持，回退到弃用 SwapEffect"
 
-#: panel.cpp:9086
+#: panel.cpp:9415
 msgid "Hardware vertex processing not available, falling back to software"
 msgstr "硬件顶点处理不可用，回退到软件顶点处理"
 
-#: panel.cpp:9110
+#: panel.cpp:9439
 #, c-format
 msgid "Failed to create Direct3D device: 0x%08X"
 msgstr "创建 Direct3D 设备失败: 0x%08X"
 
-#: panel.cpp:9115
+#: panel.cpp:9444
 #, c-format
 msgid "Direct3D 9%s device created successfully (SwapEffect: %s)"
 msgstr "Direct3D 9%s 设备创建成功 (SwapEffect: %s)"
 
-#: panel.cpp:9151
+#: panel.cpp:9480
 #, c-format
 msgid "DXDrawingPanel initialized: %dx%d (scale: %f)"
 msgstr "DXDrawingPanel 已初始化: %dx%d(缩放: %f)"
 
-#: panel.cpp:9173
+#: panel.cpp:9502
 #, c-format
 msgid "Failed to get adapter display mode for reset: 0x%08X"
 msgstr "获取适配器显示模式进行重置失败: 0x%08X"
 
-#: panel.cpp:9205
+#: panel.cpp:9534
 #, c-format
 msgid "Attempting Direct3D device reset (SwapEffect: %s)"
 msgstr "尝试重置 Direct3D 设备 (SwapEffect: %s)"
 
-#: panel.cpp:9212
+#: panel.cpp:9541
 msgid "Reset with FlipEx failed, retrying with Discard swap effect"
 msgstr "使用 FlipEx 重置失败，正在尝试弃用 SwapEffect"
 
-#: panel.cpp:9224
+#: panel.cpp:9553
 #, c-format
 msgid "Failed to reset Direct3D device: 0x%08X"
 msgstr "重置 Direct3D 设备失败: 0x%08X"
 
-#: panel.cpp:9229
+#: panel.cpp:9558
 #, c-format
 msgid "Direct3D device reset successfully (Final SwapEffect: %s)"
 msgstr "Direct3D 设备重置成功 (最终 SwapEffect: %s)"
 
-#: panel.cpp:9297
+#: panel.cpp:9626
 #, c-format
 msgid "Failed to create texture: 0x%08X"
 msgstr "创建纹理失败: 0x%08X"
 
-#: panel.cpp:9309
+#: panel.cpp:9638
 #, c-format
 msgid "Failed to lock texture: 0x%08X"
 msgstr "锁定纹理失败: 0x%08X"
 
-#: panel.cpp:9501
+#: panel.cpp:9830
 msgid "Memory allocation error"
 msgstr "内存分配错误"
 
-#: panel.cpp:9504
+#: panel.cpp:9833
 msgid "Error initializing codec"
 msgstr "初始化代码错误"
 
-#: panel.cpp:9507 panel.cpp:9572 panel.cpp:9620
+#: panel.cpp:9836 panel.cpp:9901 panel.cpp:9949
 msgid "Error writing to output file"
 msgstr "写入输出文件错误"
 
-#: panel.cpp:9510
+#: panel.cpp:9839
 msgid "Can't guess output format from file name"
 msgstr "无法从文件名猜测输出格式"
 
-#: panel.cpp:9515
+#: panel.cpp:9844
 msgid "Programming error; aborting!"
 msgstr "程序错误；正在中止！"
 
-#: panel.cpp:9533 panel.cpp:9584
+#: panel.cpp:9862 panel.cpp:9913
 #, c-format
 msgid "Unable to begin recording to %s (%s)"
 msgstr "不能开始录制到 %s (%s)"
 
-#: panel.cpp:9628
+#: panel.cpp:9957
 #, c-format
 msgid "Error in audio / video recording (%s); aborting"
 msgstr "录制音频/视频时错误 (%s); 正在中止"
 
-#: panel.cpp:9634
+#: panel.cpp:9963
 #, c-format
 msgid "Error in audio recording (%s); aborting"
 msgstr "录制音频时错误 (%s); 正在中止"
 
-#: panel.cpp:9644
+#: panel.cpp:9973
 #, c-format
 msgid "Error in video recording (%s); aborting"
 msgstr "录制视频时错误 (%s); 正在中止"
 
-#: panel.cpp:10006
+#: panel.cpp:10335
 msgid "Renderer failed to initialize; trying the next available renderer."
 msgstr "渲染器初始化失败；正在尝试下一个可用渲染器。"
 
-#: panel.cpp:10014
+#: panel.cpp:10343
 msgid "No renderer could be initialized."
 msgstr "无法初始化任何渲染器。"
 
-#: panel.cpp:10108
+#: panel.cpp:10437
 msgid ""
 "No renderer could present 10-bit deep color; using 8-bit for this session."
 msgstr "没有渲染器能够呈现 10-bit 深度色彩；本次会话将使用 8-bit。"
 
-#: panel.cpp:10197
+#: panel.cpp:10526
 msgid "Metal is unavailable, defaulting to OpenGL"
 msgstr "Metal 后端不可用，默认使用 OpenGL"
 
-#: panel.cpp:10210
+#: panel.cpp:10539
 msgid "OpenGL is unavailable on Wayland without EGL, using Vulkan"
 msgstr "在没有 EGL 的情况下，Wayland 上无法使用 OpenGL，将改用 Vulkan。"
 
-#: panel.cpp:10234
+#: panel.cpp:10563
 msgid "Vulkan is unavailable, defaulting to OpenGL"
 msgstr "Vulkan 不可用，默认使用 OpenGL。"
 
-#: panel.cpp:10547
+#: panel.cpp:10876
 #, c-format
 msgid "Volume: %d %%"
 msgstr "音量: %d %%"
 
-#: panel.cpp:11327
+#: panel.cpp:12219
 msgid "Vulkan device created successfully"
 msgstr "Vulkan 设备创建成功"
 
-#: panel.cpp:11497
+#: panel.cpp:12390
 msgid ""
 "Neither VK_KHR_wayland_surface nor VK_KHR_xlib_surface is available — cannot"
 " create Vulkan surface on this system"
 msgstr "VK_KHR_wayland_surface 和 VK_KHR_xlib_surface 均不可用 — 无法在此系统上创建 Vulkan 表面。"
 
-#: panel.cpp:11542
+#: panel.cpp:12435
 #, c-format
 msgid "Failed to create Vulkan instance: %d"
 msgstr "创建 Vulkan 实例失败：%d"
 
-#: panel.cpp:11545
+#: panel.cpp:12438
 msgid "Vulkan instance created"
 msgstr "创建 Vulkan 实例"
 
-#: panel.cpp:11564
+#: panel.cpp:12457
 #, c-format
 msgid "Failed to create Vulkan Win32 surface: %d"
 msgstr "创建 Vulkan Win32 表面失败：%d"
 
-#: panel.cpp:11587
+#: panel.cpp:12480
 msgid "Failed to obtain NSView handle for Vulkan surface"
 msgstr "无法获取 Vulkan 表面的 NSView 句柄"
 
-#: panel.cpp:11598
+#: panel.cpp:12491
 #, c-format
 msgid "Failed to create Vulkan Metal surface: %d"
 msgstr "创建 Vulkan Metal 表面失败：%d"
 
-#: panel.cpp:11623
+#: panel.cpp:12516
 msgid "Failed to obtain QWidget handle for Vulkan surface"
 msgstr "Failed to obtain QWidget handle for Vulkan surface"
 
-#: panel.cpp:11633
+#: panel.cpp:12526
 msgid "Failed to obtain ANativeWindow for the panel"
 msgstr "Failed to obtain ANativeWindow for the panel"
 
-#: panel.cpp:11643
+#: panel.cpp:12536
 #, c-format
 msgid "Failed to create Vulkan Android surface: %d"
 msgstr "Failed to create Vulkan Android surface: %d"
 
-#: panel.cpp:11660
+#: panel.cpp:12553
 #, c-format
 msgid "Failed to create Vulkan Xlib surface: %d"
 msgstr "创建 Vulkan Xlib 表面失败：%d"
 
-#: panel.cpp:11716
+#: panel.cpp:12609
 msgid ""
 "Wayland: wl_compositor/wl_subcompositor unavailable; cannot create Vulkan "
 "subsurface"
 msgstr "Wayland：wl_compositor/wl_subcompositor 不可用；无法创建 Vulkan 子表面"
 
-#: panel.cpp:11725
+#: panel.cpp:12618
 msgid "Wayland: failed to create Vulkan subsurface"
 msgstr "Wayland：无法创建 Vulkan 子表面"
 
-#: panel.cpp:11771
+#: panel.cpp:12664
 #, c-format
 msgid "Failed to create Vulkan Wayland surface: %d"
 msgstr "创建 Vulkan Wayland 表面失败：%d"
 
-#: panel.cpp:11810
+#: panel.cpp:12703
 msgid "Failed to obtain Wayland display/surface handles"
 msgstr "获取 Wayland 显示/表面句柄失败"
 
-#: panel.cpp:11828
+#: panel.cpp:12721
 msgid "No supported Vulkan surface extension available"
 msgstr "暂无支持的 Vulkan 表面扩展可用"
 
-#: panel.cpp:11839
+#: panel.cpp:12732
 msgid "No Vulkan physical devices found"
 msgstr "未找到 Vulkan 物理设备"
 
-#: panel.cpp:11898
+#: panel.cpp:12791
 #, c-format
 msgid "Selected Vulkan device: %s"
 msgstr "已选择 Vulkan 设备：%s"
 
-#: panel.cpp:11902
+#: panel.cpp:12795
 msgid "No suitable Vulkan physical device found"
 msgstr "未找到合适的 Vulkan 物理设备"
 
-#: panel.cpp:12110
+#: panel.cpp:13003
 #, c-format
 msgid "Failed to create Vulkan logical device: %d"
 msgstr "创建 Vulkan 逻辑设备失败：%d"
 
-#: panel.cpp:12365
+#: panel.cpp:13258
 #, c-format
 msgid "Failed to create Vulkan swapchain: %d"
 msgstr "创建 Vulkan 交换链失败：%d"
 
-#: panel.cpp:12412
+#: panel.cpp:13305
 #, c-format
 msgid "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 msgstr "Swapchain created: %ux%u, %u images, vsync=%s, pre-transform=0x%x"
 
-#: panel.cpp:12517
+#: panel.cpp:13410
 #, c-format
 msgid "Failed to create swapchain image view %zu: %d"
 msgstr "创建交换链图像视图 %zu 失败：%d"
 
-#: panel.cpp:12563
+#: panel.cpp:13456
 #, c-format
 msgid "Failed to create render pass: %d"
 msgstr "创建渲染通道失败：%d"
 
-#: panel.cpp:12585
+#: panel.cpp:13478
 #, c-format
 msgid "Failed to create framebuffer %zu: %d"
 msgstr "创建帧缓冲区 %zu 失败：%d"
 
-#: panel.cpp:12608
+#: panel.cpp:13501
 #, c-format
 msgid "Failed to create descriptor set layout: %d"
 msgstr "创建描述符集布局失败：%d"
 
-#: panel.cpp:12631
+#: panel.cpp:13524
 msgid "Failed to create shader modules"
 msgstr "创建着色器模块失败"
 
-#: panel.cpp:12708
+#: panel.cpp:13601
 #, c-format
 msgid "Failed to create pipeline layout: %d"
 msgstr "创建管道布局失败：%d"
 
-#: panel.cpp:12745
+#: panel.cpp:13638
 msgid "Failed to create overlay pipeline"
 msgstr "Failed to create overlay pipeline"
 
-#: panel.cpp:12755
+#: panel.cpp:13648
 #, c-format
 msgid "Failed to create graphics pipeline: %d"
 msgstr "创建图形管线失败：%d"
 
-#: panel.cpp:12771
+#: panel.cpp:13664
 #, c-format
 msgid "Failed to create command pool: %d"
 msgstr "创建命令池失败：%d"
 
-#: panel.cpp:12789
+#: panel.cpp:13682
 #, c-format
 msgid "Failed to allocate command buffers: %d"
 msgstr "分配命令缓冲区失败：%d"
 
-#: panel.cpp:12809
+#: panel.cpp:13702
 #, c-format
 msgid "Failed to create sync objects for frame %d"
 msgstr "创建帧 %d 的同步对象失败"
 
-#: panel.cpp:12833
+#: panel.cpp:13726
 #, c-format
 msgid "Failed to create descriptor pool: %d"
 msgstr "创建描述符池失败：%d"
 
-#: panel.cpp:12845
+#: panel.cpp:13738
 #, c-format
 msgid "Failed to allocate descriptor set: %d"
 msgstr "分配描述符集失败：%d"
 
-#: panel.cpp:12853
+#: panel.cpp:13746
 #, c-format
 msgid "Failed to allocate overlay descriptor set: %d"
 msgstr "Failed to allocate overlay descriptor set: %d"
 
-#: panel.cpp:12892
+#: panel.cpp:13788
 #, c-format
 msgid "Failed to create texture image: %d"
 msgstr "创建纹理图像失败：%d"
 
-#: panel.cpp:12906
+#: panel.cpp:13802
 msgid "Failed to allocate texture memory"
 msgstr "分配纹理内存失败"
 
-#: panel.cpp:12922
+#: panel.cpp:13818
 #, c-format
 msgid "Failed to create texture image view: %d"
 msgstr "创建纹理图像视图失败：%d"
 
-#: panel.cpp:12940
+#: panel.cpp:13836
 #, c-format
 msgid "Failed to create texture sampler: %d"
 msgstr "创建纹理采样器失败：%d"
 
-#: panel.cpp:12975
+#: panel.cpp:13876
 msgid "Failed to create staging buffer"
 msgstr "创建暂存缓冲区失败"
 
-#: panel.cpp:12990
+#: panel.cpp:13891
 msgid "Failed to allocate staging memory"
 msgstr "分配暂存内存失败"
 
-#: panel.cpp:13104
+#: panel.cpp:14228
 msgid "Failed to create overlay image"
 msgstr "Failed to create overlay image"
 
-#: panel.cpp:13118
+#: panel.cpp:14242
 msgid "Failed to allocate overlay image memory"
 msgstr "Failed to allocate overlay image memory"
 
-#: panel.cpp:13133
+#: panel.cpp:14257
 msgid "Failed to create overlay image view"
 msgstr "Failed to create overlay image view"
 
-#: panel.cpp:13150
+#: panel.cpp:14274
 msgid "Failed to create overlay sampler"
 msgstr "Failed to create overlay sampler"
 
-#: panel.cpp:13187
+#: panel.cpp:14318
 msgid "Failed to create overlay staging buffer"
 msgstr "Failed to create overlay staging buffer"
 
-#: panel.cpp:13201
+#: panel.cpp:14332
 msgid "Failed to allocate overlay staging memory"
 msgstr "Failed to allocate overlay staging memory"
 
-#: panel.cpp:13279
+#: panel.cpp:14412
 #, c-format
 msgid "VKDrawingPanel initialized: %ux%u (scale: %f)"
 msgstr "VKDrawingPanel 已初始化：%ux%u (缩放：%f)"
 
-#: panel.cpp:13375
+#: panel.cpp:14508
 #, c-format
 msgid "Failed to acquire swapchain image: %d"
 msgstr "获取交换链镜像失败：%d"
 
-#: panel.cpp:13735
+#: panel.cpp:14920
 #, c-format
 msgid "Failed to present swapchain image: %d"
 msgstr "交换链镜像呈现失败：%d"
@@ -2088,80 +2088,80 @@ msgstr "Blue:"
 msgid "Unable to load dialog %s from resources"
 msgstr "无法从源加载对话框 %s "
 
-#: wxvbam.cpp:894 wxvbam.cpp:911
+#: wxvbam.cpp:929 wxvbam.cpp:946
 #, c-format
 msgid "Invalid configuration file provided: %s"
 msgstr "提供的配置文件无效: %s"
 
-#: wxvbam.cpp:1429
+#: wxvbam.cpp:1481
 msgid "Save built-in XRC file and exit"
 msgstr "保存内置 XRC 文件并退出"
 
-#: wxvbam.cpp:1432
+#: wxvbam.cpp:1484
 msgid "Save built-in vba-over.ini and exit"
 msgstr "保存内置 vba-over.ini 文件并退出"
 
-#: wxvbam.cpp:1435
+#: wxvbam.cpp:1487
 msgid "Print configuration path and exit"
 msgstr "打印配置路径并退出"
 
-#: wxvbam.cpp:1438
+#: wxvbam.cpp:1490
 msgid "Start in full-screen mode"
 msgstr "以全屏模式启动"
 
-#: wxvbam.cpp:1441
+#: wxvbam.cpp:1493
 msgid "Mute the audio for this session, without saving to the config"
 msgstr "将此会话的音频静音，且不保存至配置。"
 
-#: wxvbam.cpp:1444
+#: wxvbam.cpp:1496
 msgid "Set a configuration file"
 msgstr "设置配置文件"
 
-#: wxvbam.cpp:1448
+#: wxvbam.cpp:1500
 msgid "Delete shared link state first, if it exists"
 msgstr "请先删除共享联机状态，如果存在的话"
 
-#: wxvbam.cpp:1455
+#: wxvbam.cpp:1507
 msgid "List all settable options and exit"
 msgstr "列出所有可设置的选项并退出"
 
-#: wxvbam.cpp:1458
+#: wxvbam.cpp:1510
 msgid "ROM file"
 msgstr "ROM 文件"
 
-#: wxvbam.cpp:1460
+#: wxvbam.cpp:1512
 msgid "<config>=<value>"
 msgstr "<config>=<value>"
 
-#: wxvbam.cpp:1491
+#: wxvbam.cpp:1543
 msgid "Configuration / build error: can't find built-in xrc"
 msgstr "配置/建构错误：无法找到内置 xrc 文件"
 
-#: wxvbam.cpp:1499
+#: wxvbam.cpp:1551
 #, c-format
 msgid ""
 "Wrote built-in configuration to %s.\n"
 "To override, remove all but changed root node(s). First found root node of correct name in any .xrc or .xrs files in following search path overrides built-in:"
 msgstr "将内置配置写入到 %s。\n如要覆盖，请删除所有未更改的根节点。首先在以下搜索覆盖内置路径里找到任意 .xrc 或 .xrs 文件中正确名称的根节点："
 
-#: wxvbam.cpp:1513
+#: wxvbam.cpp:1565
 msgid "Configuration is read from, in order:"
 msgstr "配置按顺序从中读取："
 
-#: wxvbam.cpp:1527
+#: wxvbam.cpp:1579
 #, c-format
 msgid ""
 "Wrote built-in override file to %s\n"
 "To override, delete all but changed section. First found section is used from search path:"
 msgstr "将内置覆盖文件写入到 %s\n 如要覆盖，请删除所有未更改的部分。首个找到的部分从以下搜索路径使用："
 
-#: wxvbam.cpp:1533
+#: wxvbam.cpp:1585
 msgid ""
 "\n"
 "\tbuilt-in"
 msgstr "\n\t内置"
 
-#: wxvbam.cpp:1557
+#: wxvbam.cpp:1609
 msgid ""
 "Options set from the command line are saved if any configuration changes are made in the user interface.\n"
 "\n"
@@ -2169,21 +2169,21 @@ msgid ""
 "\n"
 msgstr "如果在用户界面中进行了任何配置更改，则保存从命令行设置的选项。\n\n对于标志选项，true 和 false 分别指定为 1 和 0。\n\n"
 
-#: wxvbam.cpp:1573
+#: wxvbam.cpp:1625
 msgid ""
 "The commands available for the Keyboard/* option are:\n"
 "\n"
 msgstr "可用于键盘 /* 选项的命令是:\n\n"
 
-#: wxvbam.cpp:1591
+#: wxvbam.cpp:1643
 msgid "Configuration file not found."
 msgstr "未找到配置文件。"
 
-#: wxvbam.cpp:1626
+#: wxvbam.cpp:1678
 msgid "Bad configuration option or multiple ROM files given:\n"
 msgstr "错误的配置选项或多个 ROM 文件被指定:\n"
 
-#: wxvbam.cpp:2031
+#: wxvbam.cpp:2083
 #, c-format
 msgid ""
 "Could not create directory:\n"
@@ -2192,7 +2192,7 @@ msgid ""
 "Please check your configured path in Options > Directories."
 msgstr "无法创建目录：\n%s\n\n请检查您在“选项”>“目录”中配置的路径。"
 
-#: wxvbam.cpp:2350
+#: wxvbam.cpp:2402
 msgid "Failed to load dialog"
 msgstr "加载对话框失败"
 
