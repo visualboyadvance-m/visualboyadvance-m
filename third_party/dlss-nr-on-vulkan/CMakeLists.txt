@@ -783,14 +783,34 @@ if(NR_BUILD_METAL)
     DEPENDS "${NR_METALLIB}" ${NR_BIN2C} COMMENT "bin2c nr_metallib.h" VERBATIM)
   add_custom_target(metal_shaders ALL DEPENDS "${NR_METALLIB}")
 
-  # The same sources as Metal 4 (NR_METAL4: the GEMMs' K loop on Metal Performance
-  # Primitives' matmul2d), a second library libmetalmx loads on a device and OS in
+  # The same sources as Metal 4 (NR_METAL4: the GEMMs' K loop and the fused kernels' products
+  # on Metal Performance Primitives' matmul2d, which an M5 and later run on their matrix
+  # units), a second library libmetalmx loads on a device and OS in
   # MTLGPUFamilyMetal4 and keeps the Metal 3.1 one for everything else. Built only when this
   # SDK's compiler takes -std=metal4.0 (Xcode 26 and later); an older SDK builds the Metal 3
   # library alone, and the runtime then has nothing else to choose.
+  #
+  # And only for a build that runs on Apple silicon: arm64, or universal. Metal 4 is Apple
+  # silicon's -- no Intel Mac's GPU is in MTLGPUFamilyMetal4 -- so an x86_64 build would carry
+  # a library it can never load, and would need Xcode 26 to build it.
   set(NR_METAL4_HEADER)
   set(NR_METAL4_DEFINES)
-  option(NR_METAL4 "libmetalmx: also embed a Metal 4 metallib, used where the device and OS have Metal 4" ON)
+  if(CMAKE_OSX_ARCHITECTURES)
+    if(CMAKE_OSX_ARCHITECTURES MATCHES "[aA][rR][mM]64")
+      set(nr_metal4_arch ON)
+    else()
+      set(nr_metal4_arch OFF)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^([aA][rR][mM]64|aarch64)$")
+    set(nr_metal4_arch ON)
+  else()
+    set(nr_metal4_arch OFF)
+  endif()
+  option(NR_METAL4 "libmetalmx: also embed a Metal 4 metallib, used where the device and OS have Metal 4" ${nr_metal4_arch})
+  if(NR_METAL4 AND NOT nr_metal4_arch)
+    message(${NR_STATUS} "libmetalmx: an x86_64 build, which no Metal 4 GPU runs; the Metal 3.1 library alone")
+    set(NR_METAL4 OFF)
+  endif()
   if(NR_METAL4)
     set(probe_dir "${CMAKE_CURRENT_BINARY_DIR}/metal4_probe")
     file(MAKE_DIRECTORY "${probe_dir}")

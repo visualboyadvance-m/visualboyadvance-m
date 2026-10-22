@@ -91,12 +91,24 @@ kernel void global_attention(constant Push &pc [[buffer(0)]],
     uint plane = head * rows * 32u;
     uint blocks = (rows + 63u) / 64u;            /* the tokens' 64-blocks too */
 
+    float total = 0.0f;                          /* lane r < 8: row r's sum */
+#ifdef NR_METAL4
+    /* QK^T a half of the keys at a time into the stage, and PV accumulating over every block
+     * in registers, sixteen keys a step (a block is a multiple of sixteen) */
+    device half *Q = half_out(pc.a) + plane + row * 32u;
+    using namespace mpp::tensor_ops;
+    matmul2d<nr_mm_desc<8, 16, 32, false, true>(), execution_simdgroups<1>> pv;
+    auto context = pv.template get_destination_cooperative_tensor<
+        decltype(nr_view<16, 8>(weights, 64)), decltype(nr_view<32, 16>(vals, 32)), float>();
+    for (uint16_t i = 0; i < context.get_capacity(); ++i)
+        if (context.is_valid_element(i)) context[i] = 0.0f;
+#else
     simdgroup_half8x8 query[4];
     if (busy)
         for (uint c = 0u; c < 4u; c++) simdgroup_load(query[c], half_ptr(pc.a) + plane + row * 32u + c * 8u, 32);
-    float total = 0.0f;                          /* lane r < 8: row r's sum */
     simdgroup_float8x8 context[4];
     for (uint j = 0u; j < 4u; j++) context[j] = simdgroup_float8x8(0.0f);
+#endif
 
     for (uint block = 0u; block < blocks; block++) {
         uint first = block * 64u, count = min(64u, rows - first);
@@ -107,6 +119,12 @@ kernel void global_attention(constant Push &pc [[buffer(0)]],
         for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
             /* keys past the rows are zero, and past the tokens their weight is the
              * padding's whatever the logit, so both halves are always made */
+#ifdef NR_METAL4
+            if (half_keys * 32u < count)
+                nr_mm<8, 32, 32, true>(Q, 32, keys + half_keys * 32u * 32u, 32, stage, 32);
+            else
+                for (uint t = 0u; t < 8u; t++) stage[sl + t * 32u] = 0.0f;
+#else
             simdgroup_float8x8 logits[4];
             for (uint j = 0u; j < 4u; j++) logits[j] = simdgroup_float8x8(0.0f);
             if (half_keys * 32u < count)
@@ -117,6 +135,7 @@ kernel void global_attention(constant Push &pc [[buffer(0)]],
                         simdgroup_multiply_accumulate(logits[j], query[c], k, logits[j]);
                     }
             for (uint j = 0u; j < 4u; j++) simdgroup_store(logits[j], stage + j * 8u, 32);
+#endif
             simdgroup_barrier(mem_flags::mem_threadgroup);
             for (uint t = 0u; t < 8u; t++) {
                 uint at = sl + t * 32u, rr = at / 32u, key = half_keys * 32u + at % 32u;
@@ -132,6 +151,13 @@ kernel void global_attention(constant Push &pc [[buffer(0)]],
             weights[at] = first + at % 64u < tokens ? half(e4m3(float(weights[at]))) : 0.0h;
         }
         simdgroup_barrier(mem_flags::mem_threadgroup);
+#ifdef NR_METAL4
+        for (uint c = 0u; c < count; c += 16u) {
+            auto tW = nr_view<16, 8>(weights + c, 64);
+            auto tV = nr_view<32, 16>(vals + c * 32u, 32);
+            pv.run(tW, tV, context);
+        }
+#else
         for (uint c = 0u; c < count; c += 8u) {
             simdgroup_half8x8 p;
             simdgroup_load(p, weights + c, 64);
@@ -141,11 +167,17 @@ kernel void global_attention(constant Push &pc [[buffer(0)]],
                 simdgroup_multiply_accumulate(context[j], p, v, context[j]);
             }
         }
+#endif
         simdgroup_barrier(mem_flags::mem_threadgroup);
     }
     if (!busy) return;
     if (sl < 8u) reciprocal[sg * 8u + sl] = ga_reciprocal(total, blocks, tokens);
+#ifdef NR_METAL4
+    auto tStage = nr_view<32, 8>(stage, 32);
+    context.store(tStage);
+#else
     for (uint j = 0u; j < 4u; j++) simdgroup_store(context[j], stage + j * 8u, 32);
+#endif
     simdgroup_barrier(mem_flags::mem_threadgroup);
     /* the head merge's store: the value sum rounded to half times its row's reciprocal,
      * published */

@@ -97,6 +97,7 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
     uint head_bias = (batch % pc.n) * 4096u + row * 64u;
     device const half *Q = half_ptr(pc.a) + offset;
 
+#ifndef NR_METAL4
     simdgroup_float8x8 acc[8];
     for (int j = 0; j < 8; j++) acc[j] = simdgroup_float8x8(0.0f);
     for (uint c = 0u; c < 32u; c += 8u) {
@@ -108,11 +109,19 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
             simdgroup_multiply_accumulate(acc[j], q, k, acc[j]);
         }
     }
+#endif
     /* keys 0-31, then 32-63, through the same kilobyte, each pair of adjacent keys becoming
      * its weight in registers; the pairs never straddle the halves */
     uint kept[8];
     for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
+#ifdef NR_METAL4
+        /* the half's logits straight into the stage; Q is in device memory, so nothing a
+         * half writes is read by the next */
+        nr_mm<8, 32, 32>(const_cast<device half *>(Q) + row * 32u, 32,
+                         const_cast<threadgroup half *>(K) + half_keys * 32u, 64, stage, 32);
+#else
         for (uint j = 0u; j < 4u; j++) simdgroup_store(acc[half_keys * 4u + j], stage + j * 8u, 32);
+#endif
         /* A threadgroup barrier, where a simdgroup one would do: on an M1 (Apple7) the
          * simdgroup barrier left some lanes reading the stage before the matrix store was in
          * it, and the output changed from run to run — every one of twenty runs of 64 windows
@@ -152,6 +161,26 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
     }
     simdgroup_barrier(mem_flags::mem_threadgroup);
 
+#ifdef NR_METAL4
+    if (!merged_output) {
+        nr_mm<8, 64, 32>(probs, 64, const_cast<threadgroup half *>(V), 32,
+                         float_out(pc.c) + offset + row * 32u, 32);
+        return;
+    }
+    {
+        /* the probabilities and the output stage are the same bytes: the product into
+         * registers, and staged once nothing reads them */
+        using namespace mpp::tensor_ops;
+        matmul2d<nr_mm_desc<8, 64, 32, false>(), execution_simdgroups<1>> pv;
+        auto tP = nr_view<64, 8>(probs, 64);
+        auto tV = nr_view<32, 64>(const_cast<threadgroup half *>(V), 32);
+        auto context = pv.template get_destination_cooperative_tensor<decltype(tP), decltype(tV), float>();
+        pv.run(tP, tV, context);
+        simdgroup_barrier(mem_flags::mem_threadgroup);
+        auto tStage = nr_view<32, 8>(stage, 32);
+        context.store(tStage);
+    }
+#else
     simdgroup_float8x8 out[4];
     for (int j = 0; j < 4; j++) out[j] = simdgroup_float8x8(0.0f);
     for (uint c = 0u; c < 64u; c += 8u) {
@@ -171,6 +200,7 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
     /* the probabilities and the output stage are the same bytes */
     simdgroup_barrier(mem_flags::mem_threadgroup);
     for (uint j = 0u; j < 4u; j++) simdgroup_store(out[j], stage + j * 8u, 32);
+#endif
     simdgroup_barrier(mem_flags::mem_threadgroup);
     for (uint at = sl * 4u; at < 8u * 32u; at += 128u) {
         float4 values;

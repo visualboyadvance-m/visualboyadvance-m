@@ -115,14 +115,20 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
         reinterpret_cast<threadgroup half4 *>(mine_h + t * 32u + c0)[1] = hi;
     }
     simdgroup_barrier(mem_flags::mem_threadgroup);
+#ifndef NR_METAL4
     simdgroup_half8x8 a[4];
     for (uint s = 0u; s < 4u; s++) simdgroup_load(a[s], mine_h + s * 8u, 32);
+#endif
 
     /* Q, K and V, 32 columns each, then the QKV epilogue on the part's stage: Q and K a lane
      * a row through the fragment tree, every value published */
     device const half *W = half_ptr(pc.b);
     float scale = half_round(float_ptr(pc.qkv_scale)[0]);
     for (uint part = 0u; part < 3u; part++) {
+#ifdef NR_METAL4
+        /* the row (the first kilobyte) times the part's 32 columns, into the second */
+        nr_mm<8, 32, 32>(mine_h, 32, const_cast<device half *>(W) + part * 32u, 96, upper, 32);
+#else
         simdgroup_float8x8 acc[4];
         for (uint j = 0u; j < 4u; j++) acc[j] = simdgroup_float8x8(0.0f);
         for (uint s = 0u; s < 4u; s++)
@@ -132,6 +138,7 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
                 simdgroup_multiply_accumulate(acc[j], a[s], w, acc[j]);
             }
         for (uint j = 0u; j < 4u; j++) simdgroup_store(acc[j], upper + j * 8u, 32);
+#endif
         simdgroup_barrier(mem_flags::mem_threadgroup);
         if (part < 2u) {
             /* Four lanes a row, eight channels a lane — 2l and 2l + 1 of each group of
@@ -184,6 +191,21 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
     threadgroup_barrier(mem_flags::mem_threadgroup);  /* every row's K and V in place */
 
     /* QK^T as window_attention.metal takes it: the key's transposed load, c ascending */
+#ifdef NR_METAL4
+    /* Both halves of the keys into registers before either is staged: the first half's
+     * weights overwrite Q (the first kilobyte's second half), which the second half reads. */
+    using namespace mpp::tensor_ops;
+    constexpr auto qk_desc = nr_mm_desc<8, 32, 32, false>();
+    matmul2d<qk_desc, execution_simdgroups<1>> qk;
+    auto tQ = nr_view<32, 8>(mine_h + 256u, 32);
+    auto tK0 = nr_view<32, 32>(K, (int)KT_STRIDE);
+    auto tK1 = nr_view<32, 32>(K + 32u, (int)KT_STRIDE);
+    auto tUpper = nr_view<32, 8>(upper, 32);
+    auto keys_lo = qk.template get_destination_cooperative_tensor<decltype(tQ), decltype(tK0), float>();
+    auto keys_hi = qk.template get_destination_cooperative_tensor<decltype(tQ), decltype(tK1), float>();
+    qk.run(tQ, tK0, keys_lo);
+    qk.run(tQ, tK1, keys_hi);
+#else
     simdgroup_float8x8 logits[8];
     for (uint j = 0u; j < 8u; j++) logits[j] = simdgroup_float8x8(0.0f);
     for (uint c = 0u; c < 32u; c += 8u) {
@@ -195,11 +217,17 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
             simdgroup_multiply_accumulate(logits[j], q, k, logits[j]);
         }
     }
+#endif
     /* the logits through the second kilobyte, half the keys at a time, each pair's weight
      * with its bias (one head: the bias row is the query's) into the first as halves */
     device const float *bias = float_ptr(pc.d);
     for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
+#ifdef NR_METAL4
+        if (half_keys == 0u) keys_lo.store(tUpper);
+        else                 keys_hi.store(tUpper);
+#else
         for (uint j = 0u; j < 4u; j++) simdgroup_store(logits[half_keys * 4u + j], upper + j * 8u, 32);
+#endif
         simdgroup_barrier(mem_flags::mem_threadgroup);
         for (uint t = 0u; t < 4u; t++) {
             uint at = sl * 2u + t * 64u, rr = at / 32u, key = half_keys * 32u + at % 32u;
@@ -229,6 +257,9 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
     }
     simdgroup_barrier(mem_flags::mem_threadgroup);
     /* PV, the probability slices ascending */
+#ifdef NR_METAL4
+    nr_mm<8, 64, 32>(mine_h, 64, V, 32, upper, 32);
+#else
     simdgroup_float8x8 context[4];
     for (uint j = 0u; j < 4u; j++) context[j] = simdgroup_float8x8(0.0f);
     for (uint c = 0u; c < 64u; c += 8u) {
@@ -241,15 +272,19 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
         }
     }
     for (uint j = 0u; j < 4u; j++) simdgroup_store(context[j], upper + j * 8u, 32);
+#endif
     simdgroup_barrier(mem_flags::mem_threadgroup);
     /* the merged store's publish, into the first kilobyte as the projection's A */
     for (uint e = sl; e < 256u; e += 32u) mine_h[e] = half(e4m3(upper[e]));
     simdgroup_barrier(mem_flags::mem_threadgroup);
 
     /* the output projection as the tiled GEMM takes it */
+    device const half *P = half_ptr(push_address(pc.p0));
+#ifdef NR_METAL4
+    nr_mm<8, 32, 32>(mine_h, 32, const_cast<device half *>(P), 32, upper, 32);
+#else
     simdgroup_half8x8 attended[4];
     for (uint s = 0u; s < 4u; s++) simdgroup_load(attended[s], mine_h + s * 8u, 32);
-    device const half *P = half_ptr(push_address(pc.p0));
     simdgroup_float8x8 projected[4];
     for (uint j = 0u; j < 4u; j++) projected[j] = simdgroup_float8x8(0.0f);
     for (uint s = 0u; s < 4u; s++)
@@ -259,6 +294,7 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
             simdgroup_multiply_accumulate(projected[j], attended[s], w, projected[j]);
         }
     for (uint j = 0u; j < 4u; j++) simdgroup_store(projected[j], upper + j * 8u, 32);
+#endif
     simdgroup_barrier(mem_flags::mem_threadgroup);
 
     /* the window residual's epilogue and the block's publish */
@@ -289,9 +325,12 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
     if (head) {
         /* block 70's head as the base GEMM takes it: 32 -> 16 columns, K slices ascending */
         simdgroup_barrier(mem_flags::mem_threadgroup);
+        device const half *H = half_ptr(push_address(pc.p2));
+#ifdef NR_METAL4
+        nr_mm<8, 32, 16>(mine_h, 32, const_cast<device half *>(H), 16, upper, 16);
+#else
         simdgroup_half8x8 block_out[4];
         for (uint s = 0u; s < 4u; s++) simdgroup_load(block_out[s], mine_h + s * 8u, 32);
-        device const half *H = half_ptr(push_address(pc.p2));
         simdgroup_float8x8 acc[2];
         for (uint j = 0u; j < 2u; j++) acc[j] = simdgroup_float8x8(0.0f);
         for (uint s = 0u; s < 4u; s++)
@@ -302,6 +341,7 @@ kernel void window_block(constant Push &pc [[buffer(0)]],
             }
         simdgroup_barrier(mem_flags::mem_threadgroup);
         for (uint j = 0u; j < 2u; j++) simdgroup_store(acc[j], upper + j * 8u, 16);
+#endif
         simdgroup_barrier(mem_flags::mem_threadgroup);
         if ((flags & WB_HEAD16) == 0u) {
             uint t = sl / 4u, c = sl % 4u;

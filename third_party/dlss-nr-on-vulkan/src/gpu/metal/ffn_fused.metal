@@ -86,6 +86,9 @@ inline float4 ffn_stem4(constant Push &pc, uint pixel, uint c) {
 /* The stem's 16 x 32 block at `row` as the simdgroup 16x32 GEMM makes it: each 8x8 tile
  * from zero, the K slices 0-7 then 8-15, into `stage` (row-major, 32 wide). */
 inline void ffn_stem_tiles(constant Push &pc, uint row, threadgroup float *stage) {
+#ifdef NR_METAL4
+    nr_mm<16, 16, 32>(half_out(pc.a) + row * 16u, 16, half_out(ffn_aux(pc)), 32, stage, (int)F_OUT);
+#else
     simdgroup_half8x8 feat[2][2], ad[2][4];
     for (uint i = 0u; i < 2u; i++)
         for (uint s = 0u; s < 2u; s++) simdgroup_load(feat[i][s], half_ptr(pc.a) + (row + i * 8u) * 16u + s * 8u, 16);
@@ -97,6 +100,7 @@ inline void ffn_stem_tiles(constant Push &pc, uint row, threadgroup float *stage
             for (uint s = 0u; s < 2u; s++) simdgroup_multiply_accumulate(acc, feat[i][s], ad[s][j], acc);
             simdgroup_store(acc, stage + i * 8u * F_OUT + j * 8u, F_OUT);
         }
+#endif
 }
 
 inline void ffn_load_weights(constant Push &pc, uint group, threadgroup uint4 *w, uint lid) {

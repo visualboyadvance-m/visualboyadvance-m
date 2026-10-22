@@ -59,11 +59,14 @@
 #include "nr_metallib.h"                      /* const unsigned char nr_metallib[]; bin2c */
 #endif
 /* The same kernels compiled as Metal 4 (`-std=metal4.0 -DNR_METAL4`, metal/gemm_simd.metal):
- * the GEMMs' K loop on Metal Performance Primitives' matmul2d. Loaded instead of the Metal
- * 3.1 library on a device and OS in MTLGPUFamilyMetal4 on the simdgroup path, unless
- * XMX_METAL4=0; everything else — an older macOS (the deployment target is 11), another
- * GPU, the portable path, an SDK too old to build it — keeps the Metal 3.1 library. The two
- * give the same bytes: matmul2d sums in the order the hand-written loops do (measured). */
+ * the GEMMs' K loop and the fused kernels' products (window_block, window_attention,
+ * global_attention, ffn_fused) on Metal Performance Primitives' matmul2d, which is what
+ * reaches the matrix units of an M5 and later. Loaded instead of the Metal 3.1 library on a
+ * device and OS in MTLGPUFamilyMetal4 on the simdgroup path, unless XMX_METAL4=0;
+ * everything else — an older macOS (the deployment target is 11), another GPU, the
+ * portable path, an SDK too old to build it, an x86_64 build — keeps the Metal 3.1 library.
+ * The two give the same bytes: matmul2d sums in the order the hand-written loops do
+ * (measured on an M3 and an M1). */
 #ifdef NR_EMBEDDED_METALLIB4
 #include "nr_metallib4.h"                     /* const unsigned char nr_metallib4[]; bin2c */
 #endif

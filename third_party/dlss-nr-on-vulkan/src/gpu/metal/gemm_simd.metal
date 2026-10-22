@@ -39,9 +39,9 @@ constant uint TM = 8, TN = 16, TK = 16;
  * keep everything around it: the block geometry, the dispatch, the stage and every fused
  * epilogue. Measured on the M3, matmul2d in multiply mode with the K extent dynamic sums
  * each output in the order the loops below do, eight K at a time from zero, so the two
- * libraries give the same bytes and every fused kernel (which keeps its own simdgroup
- * loops) still equals its unfused passes. The window-gathered A (0x400000) has no tensor
- * form and keeps the hand-written loop. */
+ * libraries give the same bytes; the fused kernels take their products on matmul2d too
+ * (nr_epilogue.h's nr_mm), so each still equals its unfused passes. The window-gathered A
+ * (0x400000) has no tensor form and keeps the hand-written loop. */
 #ifdef NR_METAL4
 #include <metal_tensor>
 #include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>

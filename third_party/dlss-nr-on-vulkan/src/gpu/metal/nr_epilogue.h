@@ -211,4 +211,55 @@ inline float window_load(constant Push &pc, uint flags, int base, uint k) {
     return (flags & 0x4000u) != 0u ? e4m3(v) : half_round(v);
 }
 
+
+/* -- the Metal 4 build: one simdgroup's matrix products on matmul2d ---------------------
+ *
+ * The fused kernels (window_block, window_attention, global_attention, ffn_fused) give each
+ * simdgroup a few rows and take their products eight rows (or sixteen) at a time on 8x8
+ * simdgroup matrices. In the Metal 4 build those products are Metal Performance Primitives'
+ * matmul2d on the same operands, where they already are — device or threadgroup memory —
+ * which is what reaches the matrix units of an M5 and later. matmul2d sums each output in
+ * the order the 8x8 loops do, eight K at a time from zero: on an M1 every product shape the
+ * kernels use (8 x 32 x 32, x 64, 64 x 32, 32 x 16, 32 x 96) gave the same bits over 4 to 25
+ * million outputs, at 0.9-1.45x the loops' speed, as gemm_simd.metal measured on an M3. */
+#ifdef NR_METAL4
+#include <metal_tensor>
+#include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>
+
+/* A W x H view, row stride `stride` elements, of `p` in whatever address space it is in
+ * (the element type carries it: `device half`, `threadgroup float`). */
+template <int W, int H, typename P>
+inline tensor<remove_pointer_t<P>, extents<int32_t, W, H>, tensor_inline> nr_view(P p, int stride) {
+    return tensor<remove_pointer_t<P>, extents<int32_t, W, H>, tensor_inline>(
+        p, extents<int32_t, W, H>(), array<int32_t, 2>({1, stride}));
+}
+
+/* The descriptor of an M x K by K x N product (B stored (N, K) when TRANS), multiplying or,
+ * into a register tensor, accumulating. */
+template <int M, int K, int N, bool TRANS, bool ACCUMULATE = false>
+constexpr mpp::tensor_ops::matmul2d_descriptor nr_mm_desc() {
+    return mpp::tensor_ops::matmul2d_descriptor(
+        M, N, K, false, TRANS, false,
+        ACCUMULATE ? mpp::tensor_ops::matmul2d_descriptor::mode::multiply_accumulate
+                   : mpp::tensor_ops::matmul2d_descriptor::mode::multiply);
+}
+
+/* C (M x N, row stride ldc) = A (M x K, lda) * B (K x N, ldb; or (N, K) with TRANS), on this
+ * simdgroup, every operand a plain pointer. */
+template <int M, int K, int N, bool TRANS = false, typename PA, typename PB, typename PC>
+inline void nr_mm(PA A, int lda, PB B, int ldb, PC C, int ldc) {
+    using namespace mpp::tensor_ops;
+    matmul2d<nr_mm_desc<M, K, N, TRANS>(), execution_simdgroups<1>> op;
+    auto tA = nr_view<K, M>(A, lda);
+    auto tC = nr_view<N, M>(C, ldc);
+    if constexpr (TRANS) {
+        auto tB = nr_view<K, N>(B, ldb);
+        op.run(tA, tB, tC);
+    } else {
+        auto tB = nr_view<N, K>(B, ldb);
+        op.run(tA, tB, tC);
+    }
+}
+#endif
+
 #endif
