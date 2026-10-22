@@ -27,3 +27,7 @@ target_include_directories(vbam-components-filters-dlssnr
 target_compile_definitions(vbam-components-filters-dlssnr PUBLIC VBAM_ENABLE_DLSS_NR)
 
 target_link_libraries(vbam-components-filters-dlssnr PUBLIC dlssnr)
+
+if(BUILD_TESTING AND NOT COMPILE_ONLY)
+    add_subdirectory(test)
+endif()

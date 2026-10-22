@@ -2917,6 +2917,55 @@ Filter::~Filter() {
     impl_.reset();
 }
 
+namespace {
+
+// What each sweep of the frame in Apply32() costs, printed at exit when
+// NR_APPLY_MS is set to anything but 0. The composition is what sets the frame
+// rate with this filter -- the network runs on its own threads -- so when it is
+// too slow the question is always which sweep is paying for it, and that cannot
+// be answered from outside. NR_CHUNK_DIV above is here for the same reason: so
+// a choice can be measured. Unset, nothing is timed and nothing is counted.
+// test/apply_bench.cpp replays real frames through this.
+//
+// One tally for the process: two panels filtering at once would add their
+// frames together, which is a measurement aid's business and not a
+// correctness one.
+const bool g_apply_ms = [] {
+    const char* e = getenv("NR_APPLY_MS");
+    return e && *e && *e != '0';
+}();
+
+struct ApplyPhases {
+    double live = 0, age = 0, pyramid = 0, masks = 0, compose = 0;
+    long frames = 0, landed = 0, mask_count = 0;
+    ~ApplyPhases() {
+        if (!g_apply_ms || frames == 0)
+            return;
+        const double n = static_cast<double>(frames);
+        fprintf(stderr,
+                "NR_APPLY_MS: %ld frames, %ld with a pass landing; ms a frame -- live %.2f, "
+                "age %.2f, pyramid %.2f, masks %.2f (%.1f of them), compose %.2f\n",
+                frames, landed, live / n, age / n, pyramid / n, masks / n,
+                static_cast<double>(mask_count) / n, compose / n);
+    }
+};
+ApplyPhases g_phases;
+
+// The clock only where it was asked for: reading it is not free, and these sit
+// in the path every drawn frame takes.
+inline std::chrono::steady_clock::time_point PhaseStart() {
+    return g_apply_ms ? std::chrono::steady_clock::now()
+                      : std::chrono::steady_clock::time_point();
+}
+inline void PhaseAdd(double* into, std::chrono::steady_clock::time_point from) {
+    if (g_apply_ms)
+        *into += std::chrono::duration<double, std::milli>(
+                     std::chrono::steady_clock::now() - from)
+                     .count();
+}
+
+}  // namespace
+
 void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstride, int width,
                      int height, int red_shift, int green_shift, int blue_shift,
                      const Settings& settings) {
@@ -2948,6 +2997,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         // xBRZ 6x a millisecond or more a frame.
         const size_t px = static_cast<size_t>(width) * height;
         im.live.resize(px * 3);
+        const auto t_live = PhaseStart();
         RowPool::Get().Run(height, [&](int y_begin, int y_end) {
             for (int y = y_begin; y < y_end; y++) {
                 const uint32_t* s =
@@ -2961,6 +3011,8 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 }
             }
         });
+
+        PhaseAdd(&g_phases.live, t_live);
 
         // Once the passes have settled (see `settled`), the same frame with the same
         // settings gets no more of them. On a still picture the network ran flat out for
@@ -3082,6 +3134,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 im.live_previous.resize(px * 3);
             }
             im.age_diff.resize(px * 3);
+            const auto t_age = PhaseStart();
             RowPool::Get().Run(height, [&](int y_begin, int y_end) {
                 for (int y = y_begin; y < y_end; y++) {
                     const size_t first = static_cast<size_t>(y) * width;
@@ -3101,6 +3154,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     std::memcpy(lp, row, static_cast<size_t>(width) * 3);
                 }
             });
+            PhaseAdd(&g_phases.age, t_age);
             const uint8_t* const live = im.live.data();
             if (landed)
                 im.UpdateMemory(live, MotionStep(height, filter_height));
@@ -3173,8 +3227,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 // What the scene is weighed by: the mild residue (kSceneMildLevels).
                 count = mild;
                 if (!have_live_pyramid) {
+                    const auto t_pyr = PhaseStart();
                     BuildPyramid(live, width, height, PyramidLevels(width, height),
                                  &im.live_pyramid);
+                    PhaseAdd(&g_phases.pyramid, t_pyr);
                     have_live_pyramid = true;
                 }
                 int dx = 0, dy = 0;
@@ -3289,9 +3345,13 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 DilateAll(masks, across, n_masks, gw, gh,
                           (MotionRadius(height) + step - 1) / step);
                 if (step > 1) {
+                    const auto t_masks = PhaseStart();
                     UndecimateAll(masks, fulls, n_masks, width, height, step);
                     for (int k = 0; k < n_masks; k++)
                         MarkOffFrame(fulls[k], valids[k], *shifts[k], width, height);
+                    PhaseAdd(&g_phases.masks, t_masks);
+                    if (g_apply_ms)
+                        g_phases.mask_count += n_masks;
                 }
             }
 
@@ -3333,8 +3393,14 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             ci.crossing = crossing;
             ci.previous = have_previous;
             ci.detail = scene_weight > 0;
+            const auto t_compose = PhaseStart();
             RowPool::Get().Run(height,
                                [&](int y_begin, int y_end) { ComposeRows(ci, y_begin, y_end); });
+            PhaseAdd(&g_phases.compose, t_compose);
+            if (g_apply_ms) {
+                g_phases.frames++;
+                g_phases.landed += landed;
+            }
             wrote_result = true;
         }
     }
