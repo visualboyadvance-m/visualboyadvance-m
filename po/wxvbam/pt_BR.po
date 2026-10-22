@@ -42,13 +42,14 @@
 # Nelson Kerber Hennemann Filho, 2025
 # Nelson Kerber Hennemann Filho, 2025
 # Vovo Mueda, 2026
+# Vovo Mueda, 2026
 msgid ""
 msgstr ""
 "Project-Id-Version: VBA-M\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-22 13:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Felipefpl, 2022,2026\n"
+"Last-Translator: Vovo Mueda, 2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -546,7 +547,7 @@ msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
 "DLSS-NR over that, as over a screenshot of the game. Scaled Height bounds "
 "the cost."
-msgstr ""
+msgstr "Amplia a saída do filtro de exibição para o tamanho em que ele é mostrado e executa o DLSS-NR sobre isso, como numa screenshot do jogo. A altura ampliada limita o custo."
 
 #: dialogs/display-config.cpp:1375
 msgid "Apply:"
@@ -594,7 +595,7 @@ msgstr "Mistura da imagem do modelo contra a imagem do jogo. Acima de 100% extra
 
 #: dialogs/display-config.cpp:1408
 msgid "Scaled Height:"
-msgstr ""
+msgstr "Altura Ampliada"
 
 #: dialogs/display-config.cpp:1409 dialogs/display-config.cpp:1449
 msgid "px"
