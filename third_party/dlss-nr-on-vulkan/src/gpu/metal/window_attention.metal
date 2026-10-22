@@ -113,7 +113,13 @@ kernel void window_attention(constant Push &pc [[buffer(0)]],
     uint kept[8];
     for (uint half_keys = 0u; half_keys < 2u; half_keys++) {
         for (uint j = 0u; j < 4u; j++) simdgroup_store(acc[half_keys * 4u + j], stage + j * 8u, 32);
-        simdgroup_barrier(mem_flags::mem_threadgroup);
+        /* A threadgroup barrier, where a simdgroup one would do: on an M1 (Apple7) the
+         * simdgroup barrier left some lanes reading the stage before the matrix store was in
+         * it, and the output changed from run to run — every one of twenty runs of 64 windows
+         * different, one window often enough. Only this barrier needed it (each of the
+         * kernel's five tried alone), and with it every run is the same. An M3 never showed
+         * it; window_block and global_attention, which stage the same way, did not either. */
+        threadgroup_barrier(mem_flags::mem_threadgroup);
         for (uint t = 0u; t < 4u; t++) {
             uint at = sl * 2u + t * 64u, rr = at / 32u, key = half_keys * 32u + at % 32u;
             float2 w = wa_weights(pc, float2(stage[at], stage[at + 1u]), head_bias + rr * 64u + key);
