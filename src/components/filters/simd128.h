@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <cstring>
 
-#if !defined(VBAM_SIMD_FORCE_SCALAR) && !defined(WINXP) && \
+#if !defined(VBAM_SIMD_FORCE_SCALAR) && !defined(__DJGPP__) && !defined(WINXP) && \
     (defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
      (defined(_M_IX86_FP) && _M_IX86_FP >= 2))
 #define VBAM_SIMD_SSE2 1
