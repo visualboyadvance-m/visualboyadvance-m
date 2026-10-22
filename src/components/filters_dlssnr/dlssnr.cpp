@@ -2174,7 +2174,6 @@ struct Filter::Impl {
     // How long each live pixel has held still (kMemoryStillFrames), and the live frame
     // before this one to tell; screen coordinates, reset wherever the picture changes.
     std::vector<uint8_t> age;
-    std::vector<uint8_t> age_diff;  // the channels' change since the last frame, for `age`
     std::vector<uint8_t> live_previous;
     // Calls to Apply32() so far, and the count when the pass on screen was given its frame:
     // how many frames old the pass is, for UpdateMemory(). And UpdateMemory()'s mask of
@@ -3133,15 +3132,22 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 im.age.assign(px, 0);
                 im.live_previous.resize(px * 3);
             }
-            im.age_diff.resize(px * 3);
             const auto t_age = PhaseStart();
             RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                // The difference is made and read inside one row, so it needs a
+                // row, not a frame: as a frame it was another px * 3 written and
+                // read again every call -- 9 MB each way at xBRZ 9x, none of it
+                // live past the loop below. One buffer a worker, kept between
+                // calls, stays in its own cache.
+                thread_local std::vector<uint8_t> diff_row;
+                if (diff_row.size() < static_cast<size_t>(width) * 3)
+                    diff_row.resize(static_cast<size_t>(width) * 3);
                 for (int y = y_begin; y < y_end; y++) {
                     const size_t first = static_cast<size_t>(y) * width;
                     const uint8_t* const row = im.live.data() + first * 3;
                     uint8_t* const lp = im.live_previous.data() + first * 3;
                     if (!fresh_age) {
-                        uint8_t* const diff = im.age_diff.data() + first * 3;
+                        uint8_t* const diff = diff_row.data();
                         AbsDiffMean(row, lp, lp, diff, static_cast<size_t>(width) * 3);
                         const uint8_t* d = diff;
                         uint8_t* age = im.age.data() + first;
@@ -3151,7 +3157,6 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                             age[x] = still ? static_cast<uint8_t>(age[x] + (age[x] < 255)) : 0;
                         }
                     }
-                    std::memcpy(lp, row, static_cast<size_t>(width) * 3);
                 }
             });
             PhaseAdd(&g_phases.age, t_age);
@@ -3397,6 +3402,13 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             RowPool::Get().Run(height,
                                [&](int y_begin, int y_end) { ComposeRows(ci, y_begin, y_end); });
             PhaseAdd(&g_phases.compose, t_compose);
+            // This frame becomes the one the next compares against by changing
+            // hands, not by being copied into it: `live` is built from the
+            // source again every call, so the buffer behind `live_previous` is
+            // free to be written over. The copy it replaces was another px * 3
+            // read and written a frame -- 9 MB each way at xBRZ 9x. Nothing
+            // below reads either one.
+            im.live.swap(im.live_previous);
             if (g_apply_ms) {
                 g_phases.frames++;
                 g_phases.landed += landed;
