@@ -3007,12 +3007,18 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
         const size_t px = static_cast<size_t>(width) * height;
         im.live.resize(px * 3);
         const auto t_live = PhaseStart();
+        const bool packed = red_shift == 0 && green_shift == 8 && blue_shift == 16;
         RowPool::Get().Run(height, [&](int y_begin, int y_end) {
             for (int y = y_begin; y < y_end; y++) {
                 const uint32_t* s =
                     reinterpret_cast<const uint32_t*>(src + static_cast<size_t>(y) * instride);
                 uint8_t* o = im.live.data() + static_cast<size_t>(y) * width * 3;
-                for (int x = 0; x < width; x++, o += 3) {
+                int x = 0;
+                if (packed) {
+                    for (; x < width - 1; x++, o += 3)
+                        std::memcpy(o, &s[x], 4);
+                }
+                for (; x < width; x++, o += 3) {
                     const uint32_t v = s[x];
                     o[0] = static_cast<uint8_t>(v >> red_shift);
                     o[1] = static_cast<uint8_t>(v >> green_shift);
