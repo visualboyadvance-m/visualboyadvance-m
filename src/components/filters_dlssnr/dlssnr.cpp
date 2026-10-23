@@ -1022,34 +1022,6 @@ void Decimate(const uint8_t* src, int width, int height, int step, int channels,
     });
 }
 
-// Back from the grid: each `step` x `step` block of `out` (`width` x `height`) takes the
-// value of the grid point at its centre, for `count` grids at once.
-void UndecimateAll(const uint8_t* const* grids, uint8_t* const* outs, int count, int width,
-                   int height, int step) {
-    const int gw = (width + step - 1) / step;
-    RowPool::Get().Run(height * count, [&](int ya, int yb) {
-        for (int j = ya; j < yb; j++) {
-            const int k = j / height, y = j % height;
-            const uint8_t* g = grids[k] + static_cast<size_t>(y / step) * gw;
-            uint8_t* o = outs[k] + static_cast<size_t>(y) * width;
-            if (y % step != 0) {  // the block's first row is already made
-                std::memcpy(o, outs[k] + static_cast<size_t>(y - y % step) * width,
-                            static_cast<size_t>(width));
-                continue;
-            }
-            if (step == 2) {
-                for (int gx = 0; gx < width / 2; gx++)
-                    o[2 * gx] = o[2 * gx + 1] = g[gx];
-                if (width & 1)
-                    o[width - 1] = g[gw - 1];
-            } else {
-                for (int x = 0; x < width; x++)
-                    o[x] = g[x / step];
-            }
-        }
-    });
-}
-
 // How far the picture may scroll between a pass's input and the frame it is laid over, in
 // GBA pixels -- scaled to the frame -- before Apply32() stops following it. A game's camera
 // follows its hero, so while Link walks the whole background shifts by a pixel or two every
@@ -1365,43 +1337,75 @@ void MeasureRows(const uint8_t* live, const uint8_t* given, const uint8_t* valid
 }
 
 
-// Marks a full-size motion mask moved all the way (255) wherever `h` takes the pixel off
-// the frame: MeasureRows()'s edge rule. A mask made on the motion grid (MotionStep()) does
-// not keep it -- the grid rounds the shift, and each block takes its centre's motion -- and
-// the composition reads a pass's correction wherever the mask lets it, so the last rows of
-// a block shifted off the frame read past the end of the buffer.
+// Rows [y_begin, y_end) of one motion mask at frame size, from the mask on the motion grid
+// (MotionStep()): each pixel takes its block's, and then the edges are marked.
+//
+// Made a band at a time, by the composition, next to the rows that read them. As whole
+// frames they were the largest thing Apply32() moved: nine masks of a byte a pixel written
+// out and read back every frame, 28 MB each way at xBRZ 9x, to carry what the grid already
+// held in a ninth of the space. A band's worth is 875 KB, which stays in the core's own
+// cache from the row that makes it to the row that reads it.
+//
+// Marked moved all the way (255) wherever `h` takes the pixel off the frame: MeasureRows()'s
+// edge rule. A mask made on the grid does not keep it -- the grid rounds the shift, and each
+// block takes its centre's motion -- and the composition reads a pass's correction wherever
+// the mask lets it, so the last rows of a block shifted off the frame read past the end of
+// the buffer.
 //
 // `valid`, given for the correction memory's masks, is its full-size map of the pixels that
 // hold anything, and is MeasureRows()'s other rule: a pixel reading one that holds nothing
 // has moved all of it. On the grid each block took its centre's say, so near the edge of
 // what the memory holds the composition laid down a correction that was never made.
-void MarkOffFrame(uint8_t* motion, const uint8_t* valid, const Hypothesis& h, int width,
-                  int height) {
-    const int x0 = std::max(0, std::max(h.ax, h.bx));
-    const int x1 = std::min(width, std::min(h.ax, h.bx) + width);
-    RowPool::Get().Run(height, [&](int y_begin, int y_end) {
-        for (int y = y_begin; y < y_end; y++) {
-            uint8_t* mv = motion + static_cast<size_t>(y) * width;
-            const int ay = y - h.ay, by = y - h.by;
-            if (ay < 0 || ay >= height || by < 0 || by >= height || x1 <= x0) {
-                std::memset(mv, 255, static_cast<size_t>(width));
-                continue;
-            }
-            if (x0 > 0)
-                std::memset(mv, 255, static_cast<size_t>(x0));
-            if (x1 < width)
-                std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
-            if (valid) {
-                const size_t n = static_cast<size_t>(x1 - x0);
-                const uint8_t* av = valid + static_cast<size_t>(ay) * width + (x0 - h.ax);
-                const uint8_t* bv = valid + static_cast<size_t>(by) * width + (x0 - h.bx);
-                uint8_t* out = mv + x0;
-                // all ones where either is empty, as a mask, so it vectorises
-                for (size_t i = 0; i < n; i++)
-                    out[i] |= static_cast<uint8_t>(-static_cast<int>((av[i] == 0) | (bv[i] == 0)));
+void MaskRows(const uint8_t* grid, int gw, uint8_t* out, int width, int height, int step,
+              int y_begin, int y_end, const Hypothesis& h, const uint8_t* valid) {
+    // From the grid first, every row, then the edges: the marking leaves 255s
+    // behind, so a row of the same block copied after it would carry them.
+    for (int y = y_begin; y < y_end; y++) {
+        uint8_t* const mv = out + static_cast<size_t>(y - y_begin) * width;
+        // Only a block's first row is laid out; the rest of it are that row again.
+        if (y > y_begin && y / step == (y - 1) / step) {
+            std::memcpy(mv, mv - width, static_cast<size_t>(width));
+            continue;
+        }
+        const uint8_t* const g = grid + static_cast<size_t>(y / step) * gw;
+        if (step == 2) {
+            for (int gx = 0; gx < width / 2; gx++)
+                mv[2 * gx] = mv[2 * gx + 1] = g[gx];
+            if (width & 1)
+                mv[width - 1] = g[gw - 1];
+        } else {
+            for (int gx = 0, x = 0; x < width; gx++) {
+                const uint8_t v = g[gx];
+                const int end = std::min(width, x + step);
+                while (x < end)
+                    mv[x++] = v;
             }
         }
-    });
+    }
+
+    const int x0 = std::max(0, std::max(h.ax, h.bx));
+    const int x1 = std::min(width, std::min(h.ax, h.bx) + width);
+    for (int y = y_begin; y < y_end; y++) {
+        uint8_t* const mv = out + static_cast<size_t>(y - y_begin) * width;
+        const int ay = y - h.ay, by = y - h.by;
+        if (ay < 0 || ay >= height || by < 0 || by >= height || x1 <= x0) {
+            std::memset(mv, 255, static_cast<size_t>(width));
+            continue;
+        }
+        if (x0 > 0)
+            std::memset(mv, 255, static_cast<size_t>(x0));
+        if (x1 < width)
+            std::memset(mv + x1, 255, static_cast<size_t>(width - x1));
+        if (valid) {
+            const size_t n = static_cast<size_t>(x1 - x0);
+            const uint8_t* const av = valid + static_cast<size_t>(ay) * width + (x0 - h.ax);
+            const uint8_t* const bv = valid + static_cast<size_t>(by) * width + (x0 - h.bx);
+            uint8_t* const o = mv + x0;
+            // all ones where either is empty, as a mask, so it vectorises
+            for (size_t i = 0; i < n; i++)
+                o[i] |= static_cast<uint8_t>(-static_cast<int>((av[i] == 0) | (bv[i] == 0)));
+        }
+    }
 }
 
 // The ways Apply32() tries for one pass, each with its motion mask, one byte a pixel.
@@ -1418,6 +1422,9 @@ struct Lookup {
     int count = 0;
     const uint8_t* motion[3] = {};
     ptrdiff_t a[3] = {}, b[3] = {};
+    // The frame pixel `motion` starts at. The masks are made a band at a time,
+    // next to the rows that read them, so each band's are its own rows only.
+    size_t base = 0;
 };
 
 // Everything ComposeRows() reads, for the frame on screen (`width` x `height`, RGB8 `live`)
@@ -1452,10 +1459,11 @@ inline int Choose(const Lookup& l, const int* weight, size_t i, int* best) {
     *best = 0;
     if (l.count == 0)
         return 0;
-    uint8_t m = l.motion[0][i];
+    const size_t mi = i - l.base;
+    uint8_t m = l.motion[0][mi];
     for (int k = 1; k < l.count; k++)
-        if (l.motion[k][i] < m) {
-            m = l.motion[k][i];
+        if (l.motion[k][mi] < m) {
+            m = l.motion[k][mi];
             *best = k;
         }
     return weight[m];
@@ -1591,10 +1599,11 @@ inline __m128i Choose8(const Lookup& l, __m128i scene, size_t i, __m128i* k) {
     *k = zero;
     if (l.count == 0)
         return zero;
-    __m128i m = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[0] + i));
+    const size_t mi = i - l.base;
+    __m128i m = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[0] + mi));
     __m128i best = zero;
     for (int q = 1; q < l.count; q++) {
-        const __m128i mq = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[q] + i));
+        const __m128i mq = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l.motion[q] + mi));
         // mq < m: the smaller of the two is mq, and they differ
         const __m128i less =
             _mm_andnot_si128(_mm_cmpeq_epi8(mq, m), _mm_cmpeq_epi8(_mm_min_epu8(mq, m), mq));
@@ -1749,10 +1758,11 @@ inline int16x8_t Choose8(const Lookup& l, uint16x8_t scene, size_t i, uint16x8_t
     *k = vdupq_n_u16(0);
     if (l.count == 0)
         return vdupq_n_s16(0);
-    uint8x8_t m = vld1_u8(l.motion[0] + i);
+    const size_t mi = i - l.base;
+    uint8x8_t m = vld1_u8(l.motion[0] + mi);
     uint8x8_t best = vdup_n_u8(0);
     for (int q = 1; q < l.count; q++) {
-        const uint8x8_t mq = vld1_u8(l.motion[q] + i);
+        const uint8x8_t mq = vld1_u8(l.motion[q] + mi);
         best = vbsl_u8(vclt_u8(mq, m), vdup_n_u8(static_cast<uint8_t>(q)), best);
         m = vmin_u8(m, mq);
     }
@@ -3301,6 +3311,15 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             // remembers what the picture was when each correction was made.
             Alignment& mem_al = im.memory_alignment;
             mem_al.count = 0;
+            // The ways the composition reads, in the order the lookups take them:
+            // this pass's, the one before's, then the memory's. Above step 1 these
+            // are the masks on the motion grid and the composition makes each band's
+            // frame-sized rows itself (MaskRows); at step 1 they are already the
+            // frame's.
+            uint8_t* masks[9];
+            const Hypothesis* shifts[9];
+            const uint8_t* valids[9];
+            int n_masks = 0;
             const bool have_memory = scene_weight > 0 && im.memory_width == width &&
                                      im.memory_height == height && im.memory_valid.size() == px &&
                                      im.memory_src.size() == px * 3 &&
@@ -3325,16 +3344,13 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                         measure(mem_src, mem_valid, mem_al.h[k], grid_of(&mem_al, k).data());
                     }
                 }
-                uint8_t* masks[9];
                 uint8_t* across[9];
-                uint8_t* fulls[9];
-                const Hypothesis* shifts[9];
-                const uint8_t* valids[9];
-                int n_masks = 0;
                 for (Alignment* al : { &now_al, &was_al, &mem_al })
                     for (int k = 0; k < al->count; k++) {
-                        al->motion[k].resize(px);
-                        fulls[n_masks] = al->motion[k].data();
+                        // At step 1 the mask is already the frame's, and the
+                        // composition reads it where it lies.
+                        if (step == 1)
+                            al->motion[k].resize(px);
                         shifts[n_masks] = &al->h[k];
                         valids[n_masks] = al == &mem_al ? im.memory_valid.data() : nullptr;
                         masks[n_masks++] = grid_of(al, k).data();
@@ -3349,15 +3365,8 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 // less than it would be at full size.
                 DilateAll(masks, across, n_masks, gw, gh,
                           (MotionRadius(height) + step - 1) / step);
-                if (step > 1) {
-                    const auto t_masks = PhaseStart();
-                    UndecimateAll(masks, fulls, n_masks, width, height, step);
-                    for (int k = 0; k < n_masks; k++)
-                        MarkOffFrame(fulls[k], valids[k], *shifts[k], width, height);
-                    PhaseAdd(&g_phases.masks, t_masks);
-                    if (g_apply_ms)
-                        g_phases.mask_count += n_masks;
-                }
+                if (g_apply_ms)
+                    g_phases.mask_count += n_masks;
             }
 
             std::array<int, 256> weight;  // MotionWeight() times the scene's, by motion
@@ -3399,8 +3408,36 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             ci.previous = have_previous;
             ci.detail = scene_weight > 0;
             const auto t_compose = PhaseStart();
-            RowPool::Get().Run(height,
-                               [&](int y_begin, int y_end) { ComposeRows(ci, y_begin, y_end); });
+            const int n_band = ci.now_l.count + ci.was_l.count + ci.mem_l.count;
+            if (step > 1 && n_band > 0) {
+                // Each band makes its own masks and reads them straight back, so
+                // what the grid holds is never written out at frame size.
+                RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                    const size_t stride = static_cast<size_t>(y_end - y_begin) * width;
+                    thread_local std::vector<uint8_t> band;  // one a worker, kept between bands
+                    if (band.size() < stride * n_band)
+                        band.resize(stride * n_band);
+                    ComposeInput bci = ci;
+                    bci.now_l.base = bci.was_l.base = bci.mem_l.base =
+                        static_cast<size_t>(y_begin) * width;
+                    uint8_t* at = band.data();
+                    int m = 0;
+                    const auto rows_for = [&](Lookup* l) {
+                        for (int k = 0; k < l->count; k++, m++, at += stride) {
+                            MaskRows(masks[m], gw, at, width, height, step, y_begin, y_end,
+                                     *shifts[m], valids[m]);
+                            l->motion[k] = at;
+                        }
+                    };
+                    rows_for(&bci.now_l);
+                    rows_for(&bci.was_l);
+                    rows_for(&bci.mem_l);
+                    ComposeRows(bci, y_begin, y_end);
+                });
+            } else {
+                RowPool::Get().Run(
+                    height, [&](int y_begin, int y_end) { ComposeRows(ci, y_begin, y_end); });
+            }
             PhaseAdd(&g_phases.compose, t_compose);
             // This frame becomes the one the next compares against by changing
             // hands, not by being copied into it: `live` is built from the

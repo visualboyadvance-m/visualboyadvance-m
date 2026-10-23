@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
         else if (a == "--no-history") history = false;
         else { Usage(); return 2; }
     }
-    if (raw_path.empty() || (scale != 6 && scale != 9)) {
+    if (raw_path.empty() || scale < 2 || scale > 9 || scale == 7 || scale == 8) {
         Usage();
         return 2;
     }
@@ -148,10 +148,14 @@ int main(int argc, char** argv) {
 
         uint8_t* const sfirst = src.data() + src_stride;
         uint8_t* const ofirst = out.data() + out_stride;
-        if (scale == 6)
-            xbrz6x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH);
-        else
-            xbrz9x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH);
+        switch (scale) {
+            case 2: xbrz2x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+            case 3: xbrz3x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+            case 4: xbrz4x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+            case 5: xbrz5x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+            case 6: xbrz6x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+            default: xbrz9x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
+        }
 
         // In place over the filter's output, as the post-filter stage does.
         const auto t0 = std::chrono::steady_clock::now();
