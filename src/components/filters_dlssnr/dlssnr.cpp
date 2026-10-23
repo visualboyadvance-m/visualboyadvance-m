@@ -1053,6 +1053,50 @@ int PyramidLevels(int width, int height) {
     return levels;
 }
 
+// One row of a pyramid level from the two rows under it: (a + b + c + d + 2) >> 2 of each
+// 2x2 block, sixteen bytes of each row at a time where the vector loop is built.
+//
+// These levels are a third of the pixels of the full-size one but were all of them on one
+// thread, and at xBRZ 9x that made them more of the frame than the level above. They cannot
+// go on the pool: a level reads the one under it, so each needs a barrier, and the waking
+// that costs is paid back by whatever runs next -- measured here as 2.5 ms the *composition*
+// lost, against the 1.5 the pyramid itself saved. So the rows get faster instead.
+//
+// `_mm_madd_epi16` sums the adjacent pairs exactly, and the rounding is the scalar's: the
+// mean of the four, not the mean of two means, which rounds differently.
+inline void HalveRow(const uint8_t* r0, int uw, uint8_t* d, int w) {
+    const uint8_t* const r1 = r0 + uw;
+    int x = 0;
+#if defined(VBAM_DLSSNR_SSE2)
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i ones = _mm_set1_epi16(1);
+    const __m128i two = _mm_set1_epi32(2);
+    for (; x + 8 <= w; x += 8) {
+        const __m128i a = _mm_loadu_si128(reinterpret_cast<const __m128i*>(r0 + 2 * x));
+        const __m128i b = _mm_loadu_si128(reinterpret_cast<const __m128i*>(r1 + 2 * x));
+        const __m128i lo = _mm_add_epi16(_mm_unpacklo_epi8(a, zero), _mm_unpacklo_epi8(b, zero));
+        const __m128i hi = _mm_add_epi16(_mm_unpackhi_epi8(a, zero), _mm_unpackhi_epi8(b, zero));
+        const __m128i plo = _mm_srli_epi32(_mm_add_epi32(_mm_madd_epi16(lo, ones), two), 2);
+        const __m128i phi = _mm_srli_epi32(_mm_add_epi32(_mm_madd_epi16(hi, ones), two), 2);
+        const __m128i packed = _mm_packs_epi32(plo, phi);
+        _mm_storel_epi64(reinterpret_cast<__m128i*>(d + x), _mm_packus_epi16(packed, packed));
+    }
+#elif defined(VBAM_DLSSNR_NEON)
+    for (; x + 16 <= w; x += 16) {
+        const uint8x16x2_t a = vld2q_u8(r0 + 2 * x);
+        const uint8x16x2_t b = vld2q_u8(r1 + 2 * x);
+        const uint16x8_t l = vaddq_u16(vaddl_u8(vget_low_u8(a.val[0]), vget_low_u8(a.val[1])),
+                                       vaddl_u8(vget_low_u8(b.val[0]), vget_low_u8(b.val[1])));
+        const uint16x8_t hgh = vaddq_u16(vaddl_u8(vget_high_u8(a.val[0]), vget_high_u8(a.val[1])),
+                                         vaddl_u8(vget_high_u8(b.val[0]), vget_high_u8(b.val[1])));
+        vst1q_u8(d + x, vcombine_u8(vrshrn_n_u16(l, 2), vrshrn_n_u16(hgh, 2)));
+    }
+#endif
+    for (; x < w; x++)
+        d[x] = static_cast<uint8_t>((r0[2 * x] + r0[2 * x + 1] + r1[2 * x] + r1[2 * x + 1] + 2) >>
+                                    2);
+}
+
 void BuildPyramid(const uint8_t* rgb, int width, int height, int levels, Pyramid* p) {
     p->levels = levels;
     p->width[0] = width;
@@ -1075,13 +1119,9 @@ void BuildPyramid(const uint8_t* rgb, int width, int height, int levels, Pyramid
         const uint8_t* up = p->level[l - 1].data();
         std::vector<uint8_t>& out = p->level[l];
         out.resize(static_cast<size_t>(w) * h);
-        for (int y = 0; y < h; y++) {
-            const uint8_t* r0 = up + static_cast<size_t>(2 * y) * uw;
-            const uint8_t* r1 = r0 + uw;
-            for (int x = 0; x < w; x++)
-                out[static_cast<size_t>(y) * w + x] = static_cast<uint8_t>(
-                    (r0[2 * x] + r0[2 * x + 1] + r1[2 * x] + r1[2 * x + 1] + 2) >> 2);
-        }
+        uint8_t* const o = out.data();
+        for (int y = 0; y < h; y++)
+            HalveRow(up + static_cast<size_t>(2 * y) * uw, uw, o + static_cast<size_t>(y) * w, w);
     }
 }
 
