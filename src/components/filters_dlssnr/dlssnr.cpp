@@ -2985,17 +2985,23 @@ const bool g_apply_ms = [] {
 }();
 
 struct ApplyPhases {
-    double live = 0, age = 0, pyramid = 0, masks = 0, compose = 0;
+    // The sweeps of the frame, and then the ones of the motion grid.
+    double live = 0, age = 0, pyramid = 0, compose = 0;
+    double settled = 0, decimate = 0, measure = 0, scroll = 0, dilate = 0, landed_ms = 0;
     long frames = 0, landed = 0, mask_count = 0;
     ~ApplyPhases() {
         if (!g_apply_ms || frames == 0)
             return;
         const double n = static_cast<double>(frames);
         fprintf(stderr,
-                "NR_APPLY_MS: %ld frames, %ld with a pass landing; ms a frame -- live %.2f, "
-                "age %.2f, pyramid %.2f, masks %.2f (%.1f of them), compose %.2f\n",
-                frames, landed, live / n, age / n, pyramid / n, masks / n,
-                static_cast<double>(mask_count) / n, compose / n);
+                "NR_APPLY_MS: %ld frames, %ld with a pass landing, %.1f ways a frame; "
+                "ms a frame\n"
+                "  frame: live %.2f, age %.2f, pyramid %.2f, compose %.2f\n"
+                "  grid:  decimate %.2f, measure %.2f, scroll %.2f, dilate %.2f, "
+                "settled %.2f, landed %.2f\n",
+                frames, landed, static_cast<double>(mask_count) / n, live / n, age / n,
+                pyramid / n, compose / n, decimate / n, measure / n, scroll / n, dilate / n,
+                settled / n, landed_ms / n);
     }
 };
 ApplyPhases g_phases;
@@ -3081,7 +3087,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             filter_height == im.settled_filter_height &&
             settings.history == im.settled_history && settings.control_mask == im.settled_mask &&
             std::memcmp(&params, &im.settled_params, sizeof params) == 0) {
-            unchanged = im.live == im.settled_src;
+            {
+                const auto t = PhaseStart();
+                unchanged = im.live == im.settled_src;
+                PhaseAdd(&g_phases.settled, t);
+            }
         }
 
         const auto now = std::chrono::steady_clock::now();
@@ -3140,6 +3150,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             if (im.display_src.size() ==
                 static_cast<size_t>(im.display_width) * im.display_height * 3)
             {
+                const auto t_landed = PhaseStart();
                 BuildPyramid(im.display_src.data(), im.display_width, im.display_height,
                              PyramidLevels(im.display_width, im.display_height),
                              &im.display_pyramid);
@@ -3151,6 +3162,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                             static_cast<int16_t>(im.display[i] - im.display_src[i]);
                 });
                 landed = true;
+                PhaseAdd(&g_phases.landed_ms, t_landed);
             }
         }
 
@@ -3235,7 +3247,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const size_t gpx = static_cast<size_t>(gw) * gh;
             const uint8_t* live_grid = live;
             if (step > 1) {
+                const auto t_dec = PhaseStart();
                 Decimate(live, width, height, step, 3, &im.live_grid);
+                PhaseAdd(&g_phases.decimate, t_dec);
                 live_grid = im.live_grid.data();
             }
             if (step != im.grid_step) {
@@ -3262,9 +3276,11 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 };
                 const Hypothesis hg =
                     step > 1 ? Hypothesis{ g(h.ax), g(h.ay), g(h.bx), g(h.by) } : h;
+                const auto t_m = PhaseStart();
                 RowPool::Get().Run(gh, [&](int y_begin, int y_end) {
                     MeasureRows(live_grid, given, valid, hg, gw, gh, y_begin, y_end, motion);
                 });
+                PhaseAdd(&g_phases.measure, t_m);
             };
             // The ways to take one pass: where it stands, and, when that leaves enough of
             // the frame moving to be worth asking, where the scroll took it -- and the mean
@@ -3295,7 +3311,9 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                     have_live_pyramid = true;
                 }
                 int dx = 0, dy = 0;
+                const auto t_s = PhaseStart();
                 EstimateScroll(im.live_pyramid, pyramid, &dx, &dy);
+                PhaseAdd(&g_phases.scroll, t_s);
                 if (dx == 0 && dy == 0)
                     return count;
                 const int ux = (dx > 0) - (dx < 0), uy = (dy > 0) - (dy < 0);
@@ -3409,8 +3427,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 }
                 // The radius in frame pixels, on the grid: rounded up, so the spread is never
                 // less than it would be at full size.
+                const auto t_d = PhaseStart();
                 DilateAll(masks, across, n_masks, gw, gh,
                           (MotionRadius(height) + step - 1) / step);
+                PhaseAdd(&g_phases.dilate, t_d);
                 if (g_apply_ms)
                     g_phases.mask_count += n_masks;
             }
