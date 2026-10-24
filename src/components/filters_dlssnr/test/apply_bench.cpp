@@ -62,6 +62,7 @@ void Usage() {
     fprintf(stderr,
             "usage: apply_bench --raw FILE [--scale 6|9] [--frames N] [--warmup N]\n"
             "                   [--max-height N] [--no-history] [--csv FILE]\n"
+            "                   [--dump PREFIX --dump-frame N] [--scaled]\n"
             "  --raw     a frame_dump stream of 240x160 RGBA frames\n"
             "  --scale   the xBRZ factor the pass runs behind (default 9)\n");
 }
@@ -69,10 +70,11 @@ void Usage() {
 }  // namespace
 
 int main(int argc, char** argv) {
-    std::string raw_path, csv_path;
+    std::string raw_path, csv_path, dump_path;
     int scale = 9, want_frames = 0, max_height = 480, loops = 1;
+    int dump_frame = -1;
     double fps = 60.0;
-    bool history = true;
+    bool history = true, scaled = false;
 
     for (int i = 1; i < argc; i++) {
         const std::string a = argv[i];
@@ -84,7 +86,10 @@ int main(int argc, char** argv) {
         else if (a == "--loops") { const char* v = next(); if (v) loops = atoi(v); }
         else if (a == "--max-height") { const char* v = next(); if (v) max_height = atoi(v); }
         else if (a == "--csv") { const char* v = next(); if (v) csv_path = v; }
+        else if (a == "--dump") { const char* v = next(); if (v) dump_path = v; }
+        else if (a == "--dump-frame") { const char* v = next(); if (v) dump_frame = atoi(v); }
         else if (a == "--no-history") history = false;
+        else if (a == "--scaled") scaled = true;
         else { Usage(); return 2; }
     }
     if (raw_path.empty() || scale < 2 || scale > 9 || scale == 7 || scale == 8) {
@@ -126,6 +131,7 @@ int main(int argc, char** argv) {
     dlssnr::Settings settings;
     settings.max_height = max_height;
     settings.history = history;
+    settings.compose_scaled = scaled;
     settings.target_fps = 0.0;  // the governor off: measure the work, not the spacing
 
     dlssnr::Filter filter;
@@ -157,6 +163,17 @@ int main(int argc, char** argv) {
             default: xbrz9x32(sfirst, src_stride, nullptr, ofirst, out_stride, kW, kH); break;
         }
 
+        // What xBRZ made, before the layer touches it: the pair is what says whether
+        // the composition keeps the filter's own detail or replaces it.
+        std::vector<uint8_t> before;
+        if (!dump_path.empty() && n == dump_frame) {
+            before.resize(static_cast<size_t>(ow) * oh * 4);
+            for (int y = 0; y < oh; y++)
+                memcpy(before.data() + static_cast<size_t>(y) * ow * 4,
+                       ofirst + static_cast<size_t>(y) * out_stride,
+                       static_cast<size_t>(ow) * 4);
+        }
+
         // In place over the filter's output, as the post-filter stage does.
         const auto t0 = std::chrono::steady_clock::now();
         filter.Apply32(ofirst, out_stride, ofirst, out_stride, ow, oh, kRedShift, kGreenShift,
@@ -164,6 +181,25 @@ int main(int argc, char** argv) {
         const auto t1 = std::chrono::steady_clock::now();
         const double ms = std::chrono::duration<double, std::milli>(t1 - t0).count();
         all.push_back(ms);
+
+        if (!before.empty()) {
+            const auto dump = [&](const char* suffix, const uint8_t* p, int stride) {
+                const std::string path = dump_path + suffix;
+                FILE* o = fopen(path.c_str(), "wb");
+                if (!o) {
+                    fprintf(stderr, "apply_bench: cannot write %s\n", path.c_str());
+                    return;
+                }
+                for (int y = 0; y < oh; y++)
+                    fwrite(p + static_cast<size_t>(y) * stride, 1, static_cast<size_t>(ow) * 4,
+                           o);
+                fclose(o);
+            };
+            dump(".xbrz.raw", before.data(), ow * 4);
+            dump(".nr.raw", ofirst, out_stride);
+            printf("apply_bench: frame %d dumped to %s.{xbrz,nr}.raw, %dx%d RGBA\n", n,
+                   dump_path.c_str(), ow, oh);
+        }
     }
 
     // What a copy costs here: the opening frames, before any pass can have
@@ -197,8 +233,10 @@ int main(int argc, char** argv) {
         }
     }
 
-    printf("apply_bench: xBRZ %dx -> %dx%d, %d frames, scaled height %d, history %s\n", scale, ow,
-           oh, frames, max_height, history ? "on" : "off");
+    printf("apply_bench: xBRZ %dx -> %dx%d, %d frames, scaled height %d, history %s, "
+           "composed at %s\n",
+           scale, ow, oh, frames, max_height, history ? "on" : "off",
+           scaled ? "the scaled height" : "frame size");
     printf("  composing   %6zu frames   median %8.2f ms   mean %8.2f ms   min %8.2f   max %8.2f\n",
            composed.size(), Median(composed),
            composed.empty() ? 0.0

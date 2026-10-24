@@ -4540,6 +4540,7 @@ dlssnr::Settings DlssNrSettings() {
     s.control_mask = std::string(OPTION(kDispDlssNrControlMask).Get().utf8_str());
     s.history = OPTION(kDispDlssNrHistory).Get();
     s.max_height = static_cast<int>(OPTION(kDispDlssNrMaxHeight).Get());
+    s.compose_scaled = OPTION(kDispDlssNrComposeScaled).Get();
     s.target_fps = DlssNrTargetFps();
     return s;
 }

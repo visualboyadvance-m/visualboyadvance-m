@@ -22,6 +22,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kDispDlssNrMaxHeight*/ Option::Type::kUnsigned,
     /*kDispDlssNrHistory*/ Option::Type::kBool,
     /*kDispDlssNrAdaptiveFrameRate*/ Option::Type::kBool,
+    /*kDispDlssNrComposeScaled*/ Option::Type::kBool,
     /*kDispDlssNrStyleIndex*/ Option::Type::kInt,
     /*kDispDlssNrLocalTone*/ Option::Type::kDouble,
     /*kDispDlssNrLocalStructure*/ Option::Type::kDouble,

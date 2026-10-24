@@ -261,9 +261,22 @@ QWidget* DisplayConfig::CreateDlssNrTab() {
                             "the game at speed. The picture keeps its frame rate; the filtering "
                             "refreshes less often."));
     bindings().BindCheckBox(adaptive, config::OptionID::kDispDlssNrAdaptiveFrameRate);
-    grid->addWidget(dlss_nr_, 0, 0, 1, 2);
-    grid->addWidget(history, 0, 2, 1, 2);
-    grid->addWidget(adaptive, 0, 4, 1, 2);
+    auto* compose_scaled = new QCheckBox(tr("Compose at S&caled Height"), group);
+    compose_scaled->setToolTip(tr("Works the correction out at Scaled Height and spreads it "
+                                  "over the frame, rather than at the frame's own size. Much "
+                                  "faster at the large scale factors, and it leaves the display "
+                                  "filter's own detail on screen -- composed at full size the "
+                                  "correction replaces it with the model's scaled-up output. "
+                                  "The picture is sharper, and no longer the model's exactly."));
+    bindings().BindCheckBox(compose_scaled, config::OptionID::kDispDlssNrComposeScaled);
+    // One row of checkboxes however many there are, as the Apply row below does it.
+    auto* checks_row = new QWidget(group);
+    auto* checks_layout = new QHBoxLayout(checks_row);
+    checks_layout->setContentsMargins(0, 0, 0, 0);
+    for (QCheckBox* c : { dlss_nr_, history, adaptive, compose_scaled })
+        checks_layout->addWidget(c);
+    checks_layout->addStretch(1);
+    grid->addWidget(checks_row, 0, 0, 1, 6);
 
     // Apply: Pre-filter / Post-filter / At display size -- which side of the
     // display filter the pass runs on (VBA-M's own; PCSX2 has one place).

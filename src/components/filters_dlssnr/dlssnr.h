@@ -92,6 +92,22 @@ struct Settings {
     std::string control_mask;        // --control-mask, a PNG, resized to the frame
     bool history = true;             // not nr_frame's: feed the previous output back in
     int max_height = 480;            // frames taller than this are filtered scaled down; 0 never
+    // Whether the composition works out the correction at the extent the model ran at
+    // (max_height) and spreads it over the frame, rather than at the frame's own extent.
+    //
+    // What the pass changed carries nothing finer than the model's extent, so working the
+    // correction out per frame pixel is spending the largest sweep of the frame on detail
+    // that is not there. It costs, and it costs most at the large scale factors the filter
+    // is worth having at.
+    //
+    // It changes the picture. Today the correction is the pass's output minus the
+    // full-size frame it was given, so on a still picture the two cancel and the screen
+    // shows the pass itself -- the display filter's own detail is replaced by the model's
+    // scaled-up output. Worked out scaled down, the correction is the pass's output minus
+    // the scaled-down frame, which leaves the display filter's detail on screen with the
+    // model's correction laid over it. Sharper, and no longer the model's picture exactly.
+    // Nothing changes where the frame is not taller than max_height.
+    bool compose_scaled = false;
     // The adaptive frame rate: the frames a second the host means to draw, which the filter
     // holds by spacing its passes out while the calls to Apply32() come slower; 0 off.
     double target_fps = 0.0;

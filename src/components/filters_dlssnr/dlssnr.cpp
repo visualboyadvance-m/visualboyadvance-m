@@ -773,6 +773,27 @@ void BuildCast(const uint8_t* in, const uint8_t* out, int width, int height,
     }
 }
 
+// The compositions' scalar loops only. Every vector kernel below has a scalar loop beside
+// it that it is written to agree with byte for byte -- the vectors are a speed, never a
+// different answer -- and nothing else exercises the scalar ones on a machine that has
+// SSE2 or NEON, which is every machine this is built for. NR_COMPOSE_SCALAR is how the
+// two are held against each other, by composing the same stream twice and comparing what
+// comes out; see test/apply_bench.cpp. NR_CHUNK_DIV and NR_APPLY_MS are here for the same
+// kind of reason: so a question can be answered from outside.
+const bool g_compose_scalar = [] {
+    const char* e = getenv("NR_COMPOSE_SCALAR");
+    return e && *e && *e != '0';
+}();
+
+// And NR_COMPOSE_CHECK composes every frame both ways and compares the two, which is the
+// claim above tested rather than asserted: the same state, the same frame, so unlike
+// running the stream twice it does not depend on when a pass happened to land. It roughly
+// doubles what the composition costs; NR_APPLY_MS reports what it found.
+const bool g_compose_check = [] {
+    const char* e = getenv("NR_COMPOSE_CHECK");
+    return e && *e && *e != '0';
+}();
+
 // How much of a pass's own correction a pixel keeps, out of 256, once the picture has moved
 // by `moved` levels there since the pass was given it.
 inline int MotionWeight(int moved) {
@@ -1936,7 +1957,7 @@ void ComposeRowsAs(const ComposeInput& in, int y_begin, int y_end, bool simd) {
 // the others' work. `previous` is only ever set while crossing. With the scene's weight at
 // nothing (the whole frame moving), no pixel keeps any of a pass's own correction or the
 // memory's -- every weight is 0 -- and the cast is all there is to lay down.
-void ComposeRows(const ComposeInput& in, int y_begin, int y_end, bool simd = true) {
+void ComposeRows(const ComposeInput& in, int y_begin, int y_end, bool simd = !g_compose_scalar) {
     const auto by_detail = [&](auto crossing_c, auto previous_c) {
         constexpr bool kCrossing = decltype(crossing_c)::value;
         constexpr bool kPrevious = decltype(previous_c)::value;
@@ -1951,6 +1972,569 @@ void ComposeRows(const ComposeInput& in, int y_begin, int y_end, bool simd = tru
         by_detail(std::true_type{}, std::false_type{});
     else
         by_detail(std::false_type{}, std::false_type{});
+}
+
+// ---------------------------------------------------------------------------
+// The composition at the model's extent (Settings::compose_scaled).
+//
+// ComposeRows() above works the correction out for every pixel of the frame, and at xBRZ
+// 9x that is three million pixels of weighing, choosing and reading a pass's correction at
+// two offsets -- for a correction that, worked out against the frame scaled down, holds
+// nothing finer than the motion grid. So here it is worked out on the grid instead, a
+// ninth or a quarter as many times, and spread over the frame afterwards.
+//
+// What makes that possible is that the whole of ComposePixels()'s arithmetic is linear in
+// the two casts. Writing A for the memory's weight, B for the pass's, Bw for the previous
+// pass's and P for the pixel's blend, all of which come from the motion masks alone:
+//
+//   delta = cast * (1-A)(1-B)P + was_cast * (1-A)(1-Bw)(1-P)
+//           + remembered * [A(1-B)P + A(1-Bw)(1-P)] + pass * BP + previous * Bw(1-P)
+//
+// The casts are the only part that cannot be known before the pixel is reached -- they are
+// looked up by the colour the live pixel actually is -- and everything else collapses into
+// the three numbers Correction holds. So the grid carries `kn`, `kw` and `g`, and the
+// frame pass is one table lookup and a multiply-add a channel.
+//
+// The five numbers are interpolated between the grid cells on the way out, not repeated
+// across each cell's block. Repeated, the weight steps at every block boundary and the
+// steps show: on a still frame of Advance Wars at 9x, a 0.23-level edge every third pixel
+// against nothing inside the blocks. Interpolated there is no edge at all.
+
+// A pass's correction on the motion grid: what it gave less the frame it was given, both
+// averaged over each cell's block.
+//
+// Averaged, not sampled. The frame the pass was given is the display filter's own output
+// and carries detail many times finer than a cell, so a sampled correction would hold a
+// negative copy of whichever pixel the sample fell on and lay that over every pixel of the
+// block -- the filter's edges, aliased, back to front. Averaged, what is left is the part
+// of the correction the model's extent can actually carry, which is all of it: the pass's
+// output is a scaled-up render of that extent.
+void BuildGridDelta(const uint8_t* out, const uint8_t* src, int width, int height, int step,
+                    int gw, int gh, std::vector<int16_t>* grid) {
+    grid->resize(static_cast<size_t>(gw) * gh * 3);
+    int16_t* const to = grid->data();
+    RowPool::Get().Run(gh, [&](int gy_begin, int gy_end) {
+        for (int gy = gy_begin; gy < gy_end; gy++) {
+            const int y0 = gy * step, y1 = std::min(height, y0 + step);
+            int16_t* const o = to + static_cast<size_t>(gy) * gw * 3;
+            for (int gx = 0; gx < gw; gx++) {
+                const int x0 = gx * step, x1 = std::min(width, x0 + step);
+                int sum[3] = { 0, 0, 0 };
+                for (int y = y0; y < y1; y++) {
+                    const uint8_t* a = out + (static_cast<size_t>(y) * width + x0) * 3;
+                    const uint8_t* b = src + (static_cast<size_t>(y) * width + x0) * 3;
+                    for (int x = x0; x < x1; x++, a += 3, b += 3) {
+                        sum[0] += a[0] - b[0];
+                        sum[1] += a[1] - b[1];
+                        sum[2] += a[2] - b[2];
+                    }
+                }
+                const int n = std::max(1, (y1 - y0) * (x1 - x0));
+                for (int c = 0; c < 3; c++)
+                    o[3 * gx + c] = static_cast<int16_t>(sum[c] / n);
+            }
+        }
+    });
+}
+
+// The correction over the whole grid: `kn` and `kw` are Q8 weights on the two passes'
+// casts, `g` is what the pass, the pass before and the memory contribute, in levels and
+// interleaved RGB. Planes rather than five numbers a cell, because the build below writes
+// eight cells of a plane with one store and the spread reads each plane in order; as five
+// numbers a cell both would have to shuffle.
+struct CorrectionField {
+    std::vector<int16_t> kn, kw, g;
+    void Resize(size_t cells) {
+        kn.resize(cells);
+        kw.resize(cells);
+        g.resize(cells * 3);
+    }
+};
+
+// Everything BuildCorrectionRows() reads: the grid's extent, the three passes' corrections
+// on it, and their motion masks with the offsets rounded to the grid. The frame-sized
+// members of ComposeInput have no place here -- the live frame is only reached in the pass
+// that lays the result down.
+struct ScaledInput {
+    int gw = 0, gh = 0;
+    const int16_t* now_delta = nullptr;
+    const int16_t* was_delta = nullptr;
+    const int16_t* mem_delta = nullptr;
+    Lookup now_l, was_l, mem_l;
+    const int* weight = nullptr;  // the scalar path's table; `scene` is the vector path's
+    int scene = 256;
+    int blend = 256;
+    bool crossing = false;
+    bool previous = false;
+    bool detail = false;
+};
+
+// Cells [i, i_end) of the correction, a cell at a time. ComposePixels()'s arithmetic in
+// the same integer steps, up to the point where it would have needed the pixel: every
+// shift is by 8 and taken on each term of a sum rather than the sum, so that the vector
+// kernel below -- which has no room in an int16 lane for a product of two weights --
+// gives the same bytes.
+void BuildCorrectionCells(const ScaledInput& in, size_t i, size_t i_end, CorrectionField* out) {
+    const bool old_side = in.crossing && in.previous;
+    for (; i < i_end; i++) {
+        int now_k = 0, was_k = 0, mem_k = 0;
+        const int w = in.detail ? Choose(in.now_l, in.weight, i, &now_k) : 0;
+        const int was_w =
+            in.detail && in.previous ? Choose(in.was_l, in.weight, i, &was_k) : 0;
+        const int mem_w = in.detail && (w < 256 || (in.crossing && was_w < 256))
+                              ? Choose(in.mem_l, in.weight, i, &mem_k)
+                              : 0;
+        // Crossing over, how far this cell has come -- ComposePixels()'s pixel_blend.
+        // Not crossing, it is all the way across and the pass before counts for nothing.
+        int p = 256;
+        if (in.crossing) {
+            p = in.blend;
+            if (old_side && in.detail)
+                p += (256 - p) * (w * (256 - std::max(was_w, mem_w)) >> 8) >> 8;
+        }
+        const int q = 256 - p;
+        // Each side's split between the cast, the memory and the pass itself, then the
+        // two sides weighed against each other by the blend.
+        const int na = 256 - mem_w;
+        const int wn = (na * (256 - w)) >> 8;
+        const int mn = (mem_w * (256 - w)) >> 8;
+        const int ww = old_side ? (na * (256 - was_w)) >> 8 : 0;
+        const int mw = old_side ? (mem_w * (256 - was_w)) >> 8 : 0;
+        const int g_mem = ((mn * p) >> 8) + ((mw * q) >> 8);
+        const int g_now = (w * p) >> 8;
+        const int g_was = old_side ? (was_w * q) >> 8 : 0;
+        out->kn[i] = static_cast<int16_t>((wn * p) >> 8);
+        out->kw[i] = static_cast<int16_t>((ww * q) >> 8);
+        // A share of 0 reads nothing, so an offset that took the cell off the grid needs
+        // no check here: that motion is 255 and its weight 0.
+        const size_t now_a = i + in.now_l.a[now_k], now_b = i + in.now_l.b[now_k];
+        const size_t was_a = i + in.was_l.a[was_k], was_b = i + in.was_l.b[was_k];
+        const size_t mem_a = i + in.mem_l.a[mem_k], mem_b = i + in.mem_l.b[mem_k];
+        for (int c = 0; c < 3; c++) {
+            int g = 0;
+            if (g_mem > 0)
+                g += (((in.mem_delta[3 * mem_a + c] + in.mem_delta[3 * mem_b + c]) >> 1) *
+                      g_mem) >>
+                     8;
+            if (g_now > 0)
+                g += (((in.now_delta[3 * now_a + c] + in.now_delta[3 * now_b + c]) >> 1) *
+                      g_now) >>
+                     8;
+            if (g_was > 0)
+                g += (((in.was_delta[3 * was_a + c] + in.was_delta[3 * was_b + c]) >> 1) *
+                      g_was) >>
+                     8;
+            out->g[3 * i + c] = static_cast<int16_t>(g);
+        }
+    }
+}
+
+#if defined(VBAM_DLSSNR_SSE2) || defined(VBAM_DLSSNR_NEON)
+// Whether every way the correction may read reaches only cells of the grid from row `gy`
+// -- the eight-at-a-time loads read a way's cells whether or not a cell takes it.
+// RowInBounds() for the grid; the rows a scroll takes off it go a cell at a time.
+inline bool GridRowInBounds(const ScaledInput& in, int gy) {
+    const ptrdiff_t row = static_cast<ptrdiff_t>(gy) * in.gw;
+    const ptrdiff_t cells = static_cast<ptrdiff_t>(in.gw) * in.gh;
+    for (const Lookup* l : { &in.now_l, &in.was_l, &in.mem_l })
+        for (int k = 0; k < l->count; k++)
+            for (const ptrdiff_t o : { l->a[k], l->b[k] })
+                if (row + o < 0 || row + o + in.gw > cells)
+                    return false;
+    return true;
+}
+
+// BuildCorrectionCells() eight cells at a time; returns how far it got from `i`, a
+// multiple of eight. The same shape as ComposeRowSse2(), which is the arithmetic this
+// replaces, and with the same helpers.
+size_t BuildCorrection8(const ScaledInput& in, size_t i, int count, CorrectionField* out) {
+    const int end = count & ~7;
+    const bool old_side = in.crossing && in.previous;
+#if defined(VBAM_DLSSNR_SSE2)
+    using Vec = __m128i;
+    const Vec zero = _mm_setzero_si128();
+    const Vec full = _mm_set1_epi16(256);
+    const Vec blend = _mm_set1_epi16(static_cast<int16_t>(in.blend));
+    const Vec scene = _mm_set1_epi16(static_cast<int16_t>(in.scene));
+    const auto add = [](Vec a, Vec b) { return _mm_add_epi16(a, b); };
+    const auto sub = [](Vec a, Vec b) { return _mm_sub_epi16(a, b); };
+    const auto store = [](int16_t* to, Vec v) {
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(to), v);
+    };
+#else
+    using Vec = int16x8_t;
+    const Vec zero = vdupq_n_s16(0);
+    const Vec full = vdupq_n_s16(256);
+    const Vec blend = vdupq_n_s16(static_cast<int16_t>(in.blend));
+    const Vec scene = vdupq_n_s16(static_cast<int16_t>(in.scene));
+    const auto add = [](Vec a, Vec b) { return vaddq_s16(a, b); };
+    const auto sub = [](Vec a, Vec b) { return vsubq_s16(a, b); };
+    const auto store = [](int16_t* to, Vec v) { vst1q_s16(to, v); };
+#endif
+    // The mean of a pass's cells at the way each lane takes; ComposeRowSse2()'s.
+    const auto mean = [&](const Lookup& l, const int16_t* delta, Vec ks, size_t j) {
+        Vec r = zero;
+        for (int k = 0; k < l.count; k++) {
+#if defined(VBAM_DLSSNR_SSE2)
+            const Vec a =
+                _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.a[k]));
+            const Vec b =
+                _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.b[k]));
+            const Vec m = _mm_srai_epi16(_mm_add_epi16(a, b), 1);
+            r = _mm_or_si128(r, _mm_and_si128(_mm_cmpeq_epi16(ks, _mm_set1_epi16(
+                                                                      static_cast<int16_t>(k))),
+                                              m));
+#else
+            const Vec m = vshrq_n_s16(
+                vaddq_s16(vld1q_s16(delta + j + 3 * l.a[k]), vld1q_s16(delta + j + 3 * l.b[k])),
+                1);
+            r = vbslq_s16(vceqq_s16(ks, vdupq_n_s16(static_cast<int16_t>(k))), m, r);
+#endif
+        }
+        return r;
+    };
+    for (int n = 0; n < end; n += 8, i += 8) {
+        Vec now_k = zero, was_k = zero, mem_k = zero;
+        const Vec w = in.detail ? Choose8(in.now_l, scene, i, &now_k) : zero;
+        const Vec was_w =
+            in.detail && in.previous ? Choose8(in.was_l, scene, i, &was_k) : zero;
+        Vec mem_w = zero;
+        if (in.detail) {
+            // The memory only where the pass (or the one before, while crossing) does
+            // not fit the live picture itself.
+#if defined(VBAM_DLSSNR_SSE2)
+            Vec misfit = _mm_cmplt_epi16(w, full);
+            if (in.crossing)
+                misfit = _mm_or_si128(misfit, _mm_cmplt_epi16(was_w, full));
+            mem_w = _mm_and_si128(misfit, Choose8(in.mem_l, scene, i, &mem_k));
+#else
+            uint16x8_t misfit = vcltq_s16(w, full);
+            if (in.crossing)
+                misfit = vorrq_u16(misfit, vcltq_s16(was_w, full));
+            mem_w = vbslq_s16(misfit, Choose8(in.mem_l, scene, i, &mem_k), zero);
+#endif
+        }
+        Vec p = full;
+        if (in.crossing) {
+            p = blend;
+            if (old_side && in.detail) {
+#if defined(VBAM_DLSSNR_SSE2)
+                const Vec fast = MulShift8(w, sub(full, _mm_max_epi16(was_w, mem_w)));
+#else
+                const Vec fast = MulShift8(w, sub(full, vmaxq_s16(was_w, mem_w)));
+#endif
+                p = add(blend, MulShift8(sub(full, blend), fast));
+            }
+        }
+        const Vec q = sub(full, p);
+        const Vec na = sub(full, mem_w);
+        const Vec wn = MulShift8(na, sub(full, w));
+        const Vec mn = MulShift8(mem_w, sub(full, w));
+        const Vec ww = old_side ? MulShift8(na, sub(full, was_w)) : zero;
+        const Vec mw = old_side ? MulShift8(mem_w, sub(full, was_w)) : zero;
+        const Vec g_mem = add(MulShift8(mn, p), MulShift8(mw, q));
+        const Vec g_now = MulShift8(w, p);
+        const Vec g_was = old_side ? MulShift8(was_w, q) : zero;
+        store(out->kn.data() + i, MulShift8(wn, p));
+        store(out->kw.data() + i, MulShift8(ww, q));
+        Vec gm3[3], gn3[3], gw3[3], mk3[3], nk3[3], wk3[3];
+        Expand3(g_mem, gm3);
+        Expand3(g_now, gn3);
+        Expand3(mem_k, mk3);
+        Expand3(now_k, nk3);
+        if (old_side) {
+            Expand3(g_was, gw3);
+            Expand3(was_k, wk3);
+        }
+        for (int v = 0; v < 3; v++) {
+            const size_t j = i * 3 + 8 * v;
+            Vec g = MulShift8(mean(in.mem_l, in.mem_delta, mk3[v], j), gm3[v]);
+            g = add(g, MulShift8(mean(in.now_l, in.now_delta, nk3[v], j), gn3[v]));
+            if (old_side)
+                g = add(g, MulShift8(mean(in.was_l, in.was_delta, wk3[v], j), gw3[v]));
+            store(out->g.data() + j, g);
+        }
+    }
+    return static_cast<size_t>(end);
+}
+#endif
+
+// Grid rows [gy_begin, gy_end) of the correction.
+void BuildCorrectionRows(const ScaledInput& in, int gy_begin, int gy_end, CorrectionField* out,
+                         bool simd) {
+    for (int gy = gy_begin; gy < gy_end; gy++) {
+        const size_t row = static_cast<size_t>(gy) * in.gw;
+        size_t done = 0;
+#if defined(VBAM_DLSSNR_SSE2) || defined(VBAM_DLSSNR_NEON)
+        if (simd && GridRowInBounds(in, gy))
+            done = BuildCorrection8(in, row, in.gw, out);
+#endif
+        BuildCorrectionCells(in, row + done, row + in.gw, out);
+    }
+}
+
+// Where a frame pixel sits among the grid cells, in Q8. A cell covers `step` pixels and
+// stands at the middle of them, so pixel `v` is (2v - (step - 1)) / 2step of the way along
+// the cells; past the outermost cell's middle there is nothing to interpolate with, and
+// the cell is taken as it is.
+inline void GridLerp(int v, int step, int n, int* i0, int* i1, int* frac) {
+    const int t = ((2 * v - (step - 1)) << 7) / step;
+    int a = t >> 8;  // floor, and `t & 255` is the fraction above it
+    int f = t & 255;
+    if (a < 0) {
+        a = 0;
+        f = 0;
+    } else if (a >= n - 1) {
+        a = n - 1;
+        f = 0;
+    }
+    *i0 = a;
+    *i1 = a + 1 < n ? a + 1 : a;
+    *frac = f;
+}
+
+// Walks a frame row across the grid without a division a pixel. The position is
+// t = (2x - (step - 1)) / 2step in Q8, which climbs by 256/step a pixel -- not a whole
+// number at step 3 -- so it is carried as a whole part and a remainder over `step`, and
+// the division is done once for the row rather than three million times for the frame.
+// That division, left in the inner loop, cost more than everything this path saves.
+class GridWalk {
+public:
+    GridWalk(int step, int n) : step_(step), n_(n), dq_(256 / step), dr_(256 % step) {
+        const int t0 = -((step - 1) * 128);
+        whole_ = t0 / step;
+        rem_ = t0 - whole_ * step;
+        if (rem_ < 0) {
+            rem_ += step;
+            whole_--;
+        }
+    }
+    // The cell at or before this pixel, and how far past it the pixel is (Q8). Past the
+    // outermost cell's middle there is nothing to interpolate with, so it is taken whole.
+    int cell() const { return whole_ >= 0 ? std::min(whole_ >> 8, n_ - 1) : 0; }
+    int frac() const {
+        const int c = whole_ >= 0 ? whole_ >> 8 : -1;
+        return c < 0 || c >= n_ - 1 ? 0 : whole_ & 255;
+    }
+    void operator++() {
+        whole_ += dq_;
+        rem_ += dr_;
+        if (rem_ >= step_) {
+            rem_ -= step_;
+            whole_++;
+        }
+    }
+
+private:
+    int step_, n_, dq_, dr_;
+    int whole_ = 0, rem_ = 0;
+};
+
+// One grid row of the correction spread across the frame's width: the interpolation that
+// needs the grid walked, done once for each row of the grid rather than once for each of
+// the `step` frame rows that read it.
+//
+// That split is what makes the spread vectorise. Across the width the cells have to be
+// walked, and which cell a pixel falls between is a pattern SSE2 cannot gather without a
+// shuffle per step. Down the frame they do not: the two grid rows either side of a frame
+// row, already spread, line up with it pixel for pixel, so the vertical half is a load, a
+// subtract, a multiply and an add on contiguous lanes. The horizontal half is left scalar
+// and costs a third of what it would per pixel.
+//
+// `g` is interleaved RGB so that eight pixels of it are the three vectors of channels the
+// kernels below want, with no shuffling.
+struct SpreadRow {
+    int gy = -1;
+    std::vector<int16_t> kn, kw, g;
+};
+
+void SpreadGridRow(const CorrectionField& f, int gy, int gw, int step, int width, bool want_kw,
+                   SpreadRow* o) {
+    o->kn.resize(static_cast<size_t>(width));
+    o->kw.resize(static_cast<size_t>(width));
+    o->g.resize(static_cast<size_t>(width) * 3);
+    const size_t row = static_cast<size_t>(gy) * gw;
+    GridWalk walk(step, gw);
+    int held = -1;
+    int kn_at = 0, kn_rise = 0, kw_at = 0, kw_rise = 0, g_at[3] = {}, g_rise[3] = {};
+    for (int x = 0; x < width; x++, ++walk) {
+        const int gx = walk.cell();
+        if (gx != held) {
+            held = gx;
+            const size_t a = row + gx, b = row + (gx + 1 < gw ? gx + 1 : gx);
+            kn_at = f.kn[a];
+            kn_rise = f.kn[b] - f.kn[a];
+            if (want_kw) {
+                kw_at = f.kw[a];
+                kw_rise = f.kw[b] - f.kw[a];
+            }
+            for (int c = 0; c < 3; c++) {
+                g_at[c] = f.g[3 * a + c];
+                g_rise[c] = f.g[3 * b + c] - f.g[3 * a + c];
+            }
+        }
+        const int frac = walk.frac();
+        o->kn[x] = static_cast<int16_t>(kn_at + (kn_rise * frac >> 8));
+        if (want_kw)
+            o->kw[x] = static_cast<int16_t>(kw_at + (kw_rise * frac >> 8));
+        for (int c = 0; c < 3; c++)
+            o->g[3 * x + c] = static_cast<int16_t>(g_at[c] + (g_rise[c] * frac >> 8));
+    }
+}
+
+// Pixels [x_begin, x_end) of frame row y from the two spread grid rows either side of it.
+// The vector kernels below are this, eight pixels at a time; this is what runs at the end
+// of a row and where there are no vectors.
+void ScaledPixels(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRow& b, int fy,
+                  int x_begin, int x_end) {
+    const int width = in.width;
+    uint32_t* const d =
+        reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const uint8_t* l = in.live + (static_cast<size_t>(y) * width + x_begin) * 3;
+    const auto lerp = [fy](const int16_t* pa, const int16_t* pb, size_t i) {
+        return pa[i] + ((pb[i] - pa[i]) * fy >> 8);
+    };
+    for (int x = x_begin; x < x_end; x++, l += 3) {
+        const size_t ci = CastIndex(l[0], l[1], l[2]) * 3;
+        const int kn = lerp(a.kn.data(), b.kn.data(), static_cast<size_t>(x));
+        const int kw =
+            in.was_cast ? lerp(a.kw.data(), b.kw.data(), static_cast<size_t>(x)) : 0;
+        uint32_t p = 0;
+        for (int c = 0; c < 3; c++) {
+            int delta = (in.cast[ci + c] * kn >> 8) +
+                        lerp(a.g.data(), b.g.data(), static_cast<size_t>(x) * 3 + c);
+            if (in.was_cast)
+                delta += in.was_cast[ci + c] * kw >> 8;
+            const int r = l[c] + delta;
+            p |= static_cast<uint32_t>(r < 0 ? 0 : r > 255 ? 255 : r) << in.shift[c];
+        }
+        d[x] = p;
+    }
+}
+
+#if defined(VBAM_DLSSNR_SSE2) || defined(VBAM_DLSSNR_NEON)
+// ScaledPixels() eight pixels at a time; returns how far it got, a multiple of eight. The
+// cast is a table lookup by colour and stays a pixel at a time, as it is in ComposeRowSse2().
+int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRow& b, int fy) {
+    const int width = in.width;
+    const int end = width & ~7;
+    uint32_t* const d =
+        reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const uint8_t* const live = in.live + static_cast<size_t>(y) * width * 3;
+    const bool previous = in.was_cast != nullptr;
+    alignas(16) int16_t cast_now[24], cast_was[24];
+    alignas(16) uint8_t out[32];
+#if defined(VBAM_DLSSNR_SSE2)
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i f = _mm_set1_epi16(static_cast<int16_t>(fy));
+    const auto lerp = [&](const int16_t* pa, const int16_t* pb) {
+        const __m128i va = _mm_loadu_si128(reinterpret_cast<const __m128i*>(pa));
+        const __m128i vb = _mm_loadu_si128(reinterpret_cast<const __m128i*>(pb));
+        return _mm_add_epi16(va, MulShift8(_mm_sub_epi16(vb, va), f));
+    };
+#else
+    const int16x8_t f = vdupq_n_s16(static_cast<int16_t>(fy));
+    const auto lerp = [&](const int16_t* pa, const int16_t* pb) {
+        const int16x8_t va = vld1q_s16(pa);
+        return vaddq_s16(va, MulShift8(vsubq_s16(vld1q_s16(pb), va), f));
+    };
+#endif
+    for (int x = 0; x < end; x += 8) {
+        const uint8_t* const l = live + static_cast<size_t>(x) * 3;
+        for (int q = 0; q < 8; q++) {
+            const size_t ci = CastIndex(l[3 * q], l[3 * q + 1], l[3 * q + 2]) * 3;
+            for (int c = 0; c < 3; c++) {
+                cast_now[3 * q + c] = in.cast[ci + c];
+                if (previous)
+                    cast_was[3 * q + c] = in.was_cast[ci + c];
+            }
+        }
+        const size_t j = static_cast<size_t>(x) * 3;
+#if defined(VBAM_DLSSNR_SSE2)
+        __m128i k3[3], kw3[3], r[3];
+        Expand3(lerp(a.kn.data() + x, b.kn.data() + x), k3);
+        if (previous)
+            Expand3(lerp(a.kw.data() + x, b.kw.data() + x), kw3);
+        for (int v = 0; v < 3; v++) {
+            r[v] = _mm_add_epi16(
+                MulShift8(_mm_load_si128(reinterpret_cast<const __m128i*>(cast_now + 8 * v)),
+                          k3[v]),
+                lerp(a.g.data() + j + 8 * v, b.g.data() + j + 8 * v));
+            if (previous)
+                r[v] = _mm_add_epi16(
+                    r[v],
+                    MulShift8(_mm_load_si128(reinterpret_cast<const __m128i*>(cast_was + 8 * v)),
+                              kw3[v]));
+        }
+        const __m128i lo = _mm_loadu_si128(reinterpret_cast<const __m128i*>(l));
+        const __m128i hi = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l + 16));
+        _mm_store_si128(reinterpret_cast<__m128i*>(out),
+                        _mm_packus_epi16(_mm_add_epi16(_mm_unpacklo_epi8(lo, zero), r[0]),
+                                         _mm_add_epi16(_mm_unpackhi_epi8(lo, zero), r[1])));
+        _mm_store_si128(reinterpret_cast<__m128i*>(out + 16),
+                        _mm_packus_epi16(_mm_add_epi16(_mm_unpacklo_epi8(hi, zero), r[2]), zero));
+#else
+        int16x8_t k3[3], kw3[3], r[3];
+        Expand3(lerp(a.kn.data() + x, b.kn.data() + x), k3);
+        if (previous)
+            Expand3(lerp(a.kw.data() + x, b.kw.data() + x), kw3);
+        for (int v = 0; v < 3; v++) {
+            r[v] = vaddq_s16(MulShift8(vld1q_s16(cast_now + 8 * v), k3[v]),
+                             lerp(a.g.data() + j + 8 * v, b.g.data() + j + 8 * v));
+            if (previous)
+                r[v] = vaddq_s16(r[v], MulShift8(vld1q_s16(cast_was + 8 * v), kw3[v]));
+        }
+        const uint8x16_t lo = vld1q_u8(l);
+        const uint8x8_t hi = vld1_u8(l + 16);
+        vst1q_u8(out, vcombine_u8(vqmovun_s16(vaddq_s16(
+                                      vreinterpretq_s16_u16(vmovl_u8(vget_low_u8(lo))), r[0])),
+                                  vqmovun_s16(vaddq_s16(
+                                      vreinterpretq_s16_u16(vmovl_u8(vget_high_u8(lo))), r[1]))));
+        vst1_u8(out + 16,
+                vqmovun_s16(vaddq_s16(vreinterpretq_s16_u16(vmovl_u8(hi)), r[2])));
+#endif
+        for (int q = 0; q < 8; q++)
+            d[x + q] = static_cast<uint32_t>(out[3 * q]) << in.shift[0] |
+                       static_cast<uint32_t>(out[3 * q + 1]) << in.shift[1] |
+                       static_cast<uint32_t>(out[3 * q + 2]) << in.shift[2];
+    }
+    return end;
+}
+#endif
+
+// Frame rows [y_begin, y_end) composed from the correction on the grid. Each grid row the
+// band needs is spread across the width once, into one of two slots a worker keeps: as y
+// advances the row below becomes the row above, so a band spreads each of its grid rows
+// once and one over. The slots are stale between calls -- the correction is a new one
+// every frame -- so the band starts by forgetting them.
+void ComposeScaledRows(const ComposeInput& in, const CorrectionField& field, int gw, int gh,
+                       int step, int y_begin, int y_end, bool simd) {
+    const int width = in.width;
+    const bool previous = in.was_cast != nullptr;
+    thread_local SpreadRow rows[2];
+    rows[0].gy = rows[1].gy = -1;
+    for (int y = y_begin; y < y_end; y++) {
+        int gy0 = 0, gy1 = 0, fy = 0;
+        GridLerp(y, step, gh, &gy0, &gy1, &fy);
+        if (rows[0].gy != gy0 && rows[1].gy == gy0)
+            std::swap(rows[0], rows[1]);
+        if (rows[0].gy != gy0) {
+            SpreadGridRow(field, gy0, gw, step, width, previous, &rows[0]);
+            rows[0].gy = gy0;
+        }
+        if (gy1 != gy0 && rows[1].gy != gy1) {
+            SpreadGridRow(field, gy1, gw, step, width, previous, &rows[1]);
+            rows[1].gy = gy1;
+        }
+        const SpreadRow& a = rows[0];
+        const SpreadRow& b = gy1 == gy0 ? rows[0] : rows[1];
+        int x = 0;
+#if defined(VBAM_DLSSNR_SSE2) || defined(VBAM_DLSSNR_NEON)
+        if (simd)
+            x = ScaledRow8(in, y, a, b, fy);
+#endif
+        ScaledPixels(in, y, a, b, fy, x, width);
+    }
 }
 
 // The temporal gate's knobs, nr_frame_live's defaults (nr_frame_live_defaults(), which are
@@ -2244,6 +2828,23 @@ struct Filter::Impl {
         memory_valid_grid;
     bool display_grid_fresh = false, previous_grid_fresh = false, memory_grid_fresh = false;
     int grid_step = 0;
+    // Settings::compose_scaled's own set, on the motion grid, parallel to the frame-sized
+    // ones above: what each pass changed, and a correction memory of its own. A grid
+    // correction is the pass's output less the frame it was given *scaled down*, so unlike
+    // the frame-sized one it holds nothing finer than the grid and can be read at it.
+    // Kept apart rather than replacing them so the two paths can be measured against each
+    // other and so turning the option off mid-game costs only the next pass.
+    std::vector<int16_t> display_delta_grid, previous_delta_grid;
+    CorrectionField correction;  // and the correction itself, worked out a frame at a time
+    CorrectionField check_field;        // NR_COMPOSE_CHECK's second opinion
+    std::vector<uint32_t> check_frame;  // and the frame it composes
+    std::vector<uint8_t> memory_src_g;
+    std::vector<int16_t> memory_delta_g;
+    std::vector<uint8_t> memory_valid_g;
+    std::vector<uint8_t> memory_src_g_scratch;
+    std::vector<int16_t> memory_delta_g_scratch;
+    std::vector<uint8_t> memory_valid_g_scratch;
+    int memory_g_width = 0, memory_g_height = 0;
     // The frame weight actually in use, carried between frames so it can only climb back
     // gradually -- see kSceneRisePerFrame.
     int scene_weight = 256;
@@ -2311,7 +2912,11 @@ struct Filter::Impl {
     // Brings the correction memory up to date with the pass that just reached the
     // screen (`display_*`), the one before it still in `previous_*`, given the live frame
     // (RGB8, the frame's size) and `age`. Caller holds `mutex`.
-    void UpdateMemory(const uint8_t* liveb, int step);
+    // `live_g` and `display_g` are the live frame and the pass's own, decimated to the
+    // motion grid; given, the grid's correction memory is kept as well, for the scaled
+    // composition. Null when it is off, and then only the frame-sized one is kept.
+    void UpdateMemory(const uint8_t* liveb, int step, const uint8_t* live_g = nullptr,
+                      const uint8_t* display_g = nullptr);
 };
 
 void Filter::Impl::Fail(const std::string& why) {
@@ -2814,7 +3419,8 @@ void Filter::Impl::ComposeStage() {
 // a level lighter than the sand around it trailed him wherever he walked. And the pixel
 // itself has to have held still since the pass was given its frame as well as for
 // kMemoryStillFrames, which at the larger extents a pass is older than.
-void Filter::Impl::UpdateMemory(const uint8_t* liveb, int step) {
+void Filter::Impl::UpdateMemory(const uint8_t* liveb, int step, const uint8_t* live_g,
+                                const uint8_t* display_g) {
     const int w = display_width;
     const int h = display_height;
     const size_t px = static_cast<size_t>(w) * h;
@@ -2898,6 +3504,72 @@ void Filter::Impl::UpdateMemory(const uint8_t* liveb, int step) {
             }
         }
     });
+
+    // The same memory again on the motion grid, for the scaled composition
+    // (Settings::compose_scaled). It cannot be decimated from the one above: that one
+    // remembers the frame-sized correction, which carries the display filter's own detail
+    // negated, and a cell of it is not what the scaled composition wants to lay down. So
+    // it is kept in its own right, off the grid's own correction and the decimated
+    // frames, by the same rule a pixel follows.
+    const size_t gpx = static_cast<size_t>(gw) * gh;
+    if (!live_g || !display_g || display_delta_grid.size() != gpx * 3)
+        return;
+    const bool fresh_g = memory_g_width != gw || memory_g_height != gh ||
+                         memory_valid_g.size() != gpx || memory_src_g.size() != gpx * 3 ||
+                         memory_delta_g.size() != gpx * 3;
+    if (fresh_g) {
+        memory_g_width = gw;
+        memory_g_height = gh;
+        memory_src_g.assign(gpx * 3, 0);
+        memory_delta_g.assign(gpx * 3, 0);
+        memory_valid_g.assign(gpx, 0);
+    }
+    // The same scroll as above, rounded to the grid the way the motion masks round it.
+    const auto to_grid = [step](int v) {
+        return (v >= 0 ? v + step / 2 : v - step / 2) / step;
+    };
+    const int gdx = to_grid(dx), gdy = to_grid(dy);
+    if (!fresh_g && have_prev && (gdx || gdy)) {
+        memory_src_g_scratch.resize(gpx * 3);
+        memory_delta_g_scratch.resize(gpx * 3);
+        memory_valid_g_scratch.assign(gpx, 0);
+        for (int y = 0; y < gh; y++) {
+            const int sy = y - gdy;
+            if (sy < 0 || sy >= gh)
+                continue;
+            const int x0 = std::max(0, gdx), x1 = std::min(gw, gw + gdx);
+            if (x1 <= x0)
+                continue;
+            const size_t to = static_cast<size_t>(y) * gw + x0;
+            const size_t from = static_cast<size_t>(sy) * gw + (x0 - gdx);
+            const size_t n = static_cast<size_t>(x1 - x0);
+            std::memcpy(memory_src_g_scratch.data() + to * 3, memory_src_g.data() + from * 3,
+                        n * 3);
+            std::memcpy(memory_delta_g_scratch.data() + to * 3,
+                        memory_delta_g.data() + from * 3, n * 3 * sizeof(int16_t));
+            std::memcpy(memory_valid_g_scratch.data() + to, memory_valid_g.data() + from, n);
+        }
+        memory_src_g.swap(memory_src_g_scratch);
+        memory_delta_g.swap(memory_delta_g_scratch);
+        memory_valid_g.swap(memory_valid_g_scratch);
+    }
+    const int16_t* const delta_g = display_delta_grid.data();
+    for (size_t i = 0; i < gpx; i++) {
+        bool take = !memory_valid_g[i];
+        if (!take && have_age && !memory_near[i]) {
+            const uint8_t* a = display_g + i * 3;
+            const uint8_t* b = live_g + i * 3;
+            take = std::abs(a[0] - b[0]) <= kHoldLevels &&
+                   std::abs(a[1] - b[1]) <= kHoldLevels && std::abs(a[2] - b[2]) <= kHoldLevels;
+        }
+        if (take) {
+            std::memcpy(memory_src_g.data() + i * 3, display_g + i * 3, 3);
+            memory_delta_g[3 * i] = delta_g[3 * i];
+            memory_delta_g[3 * i + 1] = delta_g[3 * i + 1];
+            memory_delta_g[3 * i + 2] = delta_g[3 * i + 2];
+            memory_valid_g[i] = 1;
+        }
+    }
 }
 
 Filter::Filter() : impl_(std::make_shared<Impl>()) {
@@ -2984,11 +3656,28 @@ const bool g_apply_ms = [] {
     return e && *e && *e != '0';
 }();
 
+// Measurement only: the composition with nothing of any pass in it -- the live frame, its
+// colour cast and the store -- so the floor every composition has to pay can be told apart
+// from the weighted correction laid on top. The picture it makes is wrong.
+const bool g_compose_floor = [] {
+    const char* e = getenv("NR_COMPOSE_FLOOR");
+    return e && *e && *e != '0';
+}();
+
 struct ApplyPhases {
     // The sweeps of the frame, and then the ones of the motion grid.
     double live = 0, age = 0, pyramid = 0, compose = 0;
     double settled = 0, decimate = 0, measure = 0, scroll = 0, dilate = 0, landed_ms = 0;
+    // The scaled composition's two halves: the correction worked out on the grid, and it
+    // spread over the frame. Both are part of `compose`.
+    double field = 0, spread = 0;
     long frames = 0, landed = 0, mask_count = 0;
+    // NR_COMPOSE_CHECK: frames composed both ways, and where the two disagreed.
+    long checked = 0, bad_cells = 0, bad_pixels = 0;
+    // Inside the composition, so added from the pool's workers: the part of it
+    // that is the grid masks spread out to the frame's rows, summed across the
+    // bands running at once and so larger than the wall clock it took.
+    std::atomic<long long> maskrows_ns{0};
     ~ApplyPhases() {
         if (!g_apply_ms || frames == 0)
             return;
@@ -2998,10 +3687,18 @@ struct ApplyPhases {
                 "ms a frame\n"
                 "  frame: live %.2f, age %.2f, pyramid %.2f, compose %.2f\n"
                 "  grid:  decimate %.2f, measure %.2f, scroll %.2f, dilate %.2f, "
-                "settled %.2f, landed %.2f\n",
+                "settled %.2f, landed %.2f\n"
+                "  of the composition: mask rows %.2f (summed over the bands), "
+                "grid correction %.2f, spread %.2f\n",
                 frames, landed, static_cast<double>(mask_count) / n, live / n, age / n,
                 pyramid / n, compose / n, decimate / n, measure / n, scroll / n, dilate / n,
-                settled / n, landed_ms / n);
+                settled / n, landed_ms / n,
+                static_cast<double>(maskrows_ns.load()) / 1e6 / n, field / n, spread / n);
+        if (checked)
+            fprintf(stderr,
+                    "NR_COMPOSE_CHECK: %ld frames composed both ways, %ld cells and %ld "
+                    "pixels differ\n",
+                    checked, bad_cells, bad_pixels);
     }
 };
 ApplyPhases g_phases;
@@ -3137,6 +3834,7 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             im.previous_cast.swap(im.display_cast);
             std::swap(im.previous_pyramid, im.display_pyramid);
             im.previous_delta.swap(im.display_delta);
+            im.previous_delta_grid.swap(im.display_delta_grid);
             im.previous_width = im.display_width;
             im.previous_height = im.display_height;
             im.blend = 0;
@@ -3161,6 +3859,18 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                         im.display_delta[i] =
                             static_cast<int16_t>(im.display[i] - im.display_src[i]);
                 });
+                // And on the motion grid, for the scaled composition. Both are made:
+                // the option can be turned on or off between two passes, and a pass
+                // lands seldom enough that the second one is not worth a branch.
+                const int land_step = MotionStep(im.display_height, filter_height);
+                if (land_step > 1)
+                    BuildGridDelta(im.display.data(), im.display_src.data(), im.display_width,
+                                   im.display_height, land_step,
+                                   (im.display_width + land_step - 1) / land_step,
+                                   (im.display_height + land_step - 1) / land_step,
+                                   &im.display_delta_grid);
+                else
+                    im.display_delta_grid.clear();
                 landed = true;
                 PhaseAdd(&g_phases.landed_ms, t_landed);
             }
@@ -3229,8 +3939,6 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             });
             PhaseAdd(&g_phases.age, t_age);
             const uint8_t* const live = im.live.data();
-            if (landed)
-                im.UpdateMemory(live, MotionStep(height, filter_height));
 
             // How far each pixel has moved since the pass was given the frame, if the pass
             // is taken as the mean of itself shifted by `h.a` and by `h.b` -- one shift
@@ -3282,6 +3990,21 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                 });
                 PhaseAdd(&g_phases.measure, t_m);
             };
+
+            // The correction memory takes the new pass. After the decimations above, not
+            // before them: the scaled composition's memory is kept on the grid, off the
+            // live frame and the pass's own decimated to it, and `track()` below wants
+            // the pass's decimation anyway -- this is where it is made rather than extra
+            // work.
+            const bool scaled = settings.compose_scaled && step > 1 && !g_compose_floor &&
+                                im.display_delta_grid.size() == gpx * 3;
+            if (landed) {
+                const uint8_t* display_grid = nullptr;
+                if (scaled)
+                    display_grid = on_grid(im.display_src.data(), 3, &im.display_grid,
+                                           &im.display_grid_fresh);
+                im.UpdateMemory(live, step, scaled ? live_grid : nullptr, display_grid);
+            }
             // The ways to take one pass: where it stands, and, when that leaves enough of
             // the frame moving to be worth asking, where the scroll took it -- and the mean
             // of the two shifts either side of that, which is what interframe blending makes
@@ -3361,9 +4084,10 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const bool have_previous =
                 crossing && im.previous_display.size() == im.display.size() &&
                 im.previous_display_src.size() == im.display.size() &&
-                im.previous_cast.size() == kCastEntries * 3 &&
-                im.previous_delta.size() == im.display.size() && im.previous_width == width &&
-                im.previous_height == height;
+                im.previous_cast.size() == kCastEntries * 3 && im.previous_width == width &&
+                im.previous_height == height &&
+                (scaled ? im.previous_delta_grid.size() == gpx * 3
+                        : im.previous_delta.size() == im.display.size());
 
             // Spread the motion (kMotionRadius), and weigh the pass before by the same rule
             // against the frame it was given. Passes land faster than they cross over, so
@@ -3384,10 +4108,15 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             const Hypothesis* shifts[9];
             const uint8_t* valids[9];
             int n_masks = 0;
-            const bool have_memory = scene_weight > 0 && im.memory_width == width &&
-                                     im.memory_height == height && im.memory_valid.size() == px &&
-                                     im.memory_src.size() == px * 3 &&
-                                     im.memory_delta.size() == px * 3;
+            const bool have_memory =
+                scene_weight > 0 &&
+                (scaled ? im.memory_g_width == gw && im.memory_g_height == gh &&
+                              im.memory_valid_g.size() == gpx &&
+                              im.memory_src_g.size() == gpx * 3 &&
+                              im.memory_delta_g.size() == gpx * 3
+                        : im.memory_width == width && im.memory_height == height &&
+                              im.memory_valid.size() == px && im.memory_src.size() == px * 3 &&
+                              im.memory_delta.size() == px * 3);
             if (scene_weight > 0) {
                 if (have_previous)
                     track(on_grid(im.previous_display_src.data(), 3, &im.previous_grid,
@@ -3395,12 +4124,19 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                           im.previous_pyramid, &was_al);
                 if (have_memory) {
                     // Both of the memory's copies go stale together, when a pass lands.
-                    bool src_fresh = im.memory_grid_fresh, valid_fresh = im.memory_grid_fresh;
-                    const uint8_t* mem_src =
-                        on_grid(im.memory_src.data(), 3, &im.memory_src_grid, &src_fresh);
-                    const uint8_t* mem_valid =
-                        on_grid(im.memory_valid.data(), 1, &im.memory_valid_grid, &valid_fresh);
-                    im.memory_grid_fresh = true;
+                    // The scaled composition's memory is already the grid's and needs
+                    // neither the decimation nor the cache.
+                    const uint8_t* mem_src = im.memory_src_g.data();
+                    const uint8_t* mem_valid = im.memory_valid_g.data();
+                    if (!scaled) {
+                        bool src_fresh = im.memory_grid_fresh;
+                        bool valid_fresh = im.memory_grid_fresh;
+                        mem_src =
+                            on_grid(im.memory_src.data(), 3, &im.memory_src_grid, &src_fresh);
+                        mem_valid = on_grid(im.memory_valid.data(), 1, &im.memory_valid_grid,
+                                            &valid_fresh);
+                        im.memory_grid_fresh = true;
+                    }
                     mem_al.count = now_al.count;
                     for (int k = 0; k < now_al.count; k++) {
                         mem_al.h[k] = now_al.h[k];
@@ -3473,9 +4209,93 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
             ci.crossing = crossing;
             ci.previous = have_previous;
             ci.detail = scene_weight > 0;
+            if (g_compose_floor) {
+                ci.detail = ci.crossing = ci.previous = false;
+                ci.now_l.count = ci.was_l.count = ci.mem_l.count = 0;
+            }
             const auto t_compose = PhaseStart();
             const int n_band = ci.now_l.count + ci.was_l.count + ci.mem_l.count;
-            if (step > 1 && n_band > 0) {
+            if (scaled) {
+                // The correction worked out once for every cell of the motion grid, then
+                // spread over the frame. The masks are the grid's already -- they are
+                // measured and dilated on it -- so nothing here is at frame size but the
+                // pass that lays the result down.
+                const auto to_grid = [step](int v) {
+                    return (v >= 0 ? v + step / 2 : v - step / 2) / step;
+                };
+                const auto lookup_g = [&](Alignment& al, bool use) {
+                    Lookup l;
+                    l.count = use ? al.count : 0;
+                    for (int k = 0; k < l.count; k++) {
+                        l.motion[k] = grid_of(&al, k).data();
+                        l.a[k] = -(static_cast<ptrdiff_t>(to_grid(al.h[k].ay)) * gw +
+                                   to_grid(al.h[k].ax));
+                        l.b[k] = -(static_cast<ptrdiff_t>(to_grid(al.h[k].by)) * gw +
+                                   to_grid(al.h[k].bx));
+                    }
+                    return l;
+                };
+                ScaledInput si;
+                si.gw = gw;
+                si.gh = gh;
+                si.now_delta = im.display_delta_grid.data();
+                si.was_delta = have_previous ? im.previous_delta_grid.data() : nullptr;
+                si.mem_delta = have_memory ? im.memory_delta_g.data() : nullptr;
+                si.now_l = lookup_g(now_al, scene_weight > 0);
+                si.was_l = lookup_g(was_al, scene_weight > 0 && have_previous);
+                si.mem_l = lookup_g(mem_al, have_memory);
+                si.weight = weight.data();
+                si.scene = scene_weight;
+                si.blend = blend;
+                si.crossing = crossing;
+                si.previous = have_previous;
+                si.detail = scene_weight > 0;
+                im.correction.Resize(gpx);
+                CorrectionField* const field = &im.correction;
+                const auto t_field = PhaseStart();
+                RowPool::Get().Run(gh, [&](int gy_begin, int gy_end) {
+                    BuildCorrectionRows(si, gy_begin, gy_end, field, !g_compose_scalar);
+                });
+                PhaseAdd(&g_phases.field, t_field);
+                const auto t_spread = PhaseStart();
+                RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                    ComposeScaledRows(ci, *field, gw, gh, step, y_begin, y_end,
+                                      !g_compose_scalar);
+                });
+                PhaseAdd(&g_phases.spread, t_spread);
+                if (g_compose_check) {
+                    // The same state through the other kernels, into a frame of its own.
+                    im.check_field.Resize(gpx);
+                    im.check_frame.resize(px);
+                    ComposeInput cc = ci;
+                    cc.dst = reinterpret_cast<uint8_t*>(im.check_frame.data());
+                    cc.outstride = width * 4;
+                    RowPool::Get().Run(gh, [&](int gy_begin, int gy_end) {
+                        BuildCorrectionRows(si, gy_begin, gy_end, &im.check_field,
+                                            g_compose_scalar);
+                    });
+                    RowPool::Get().Run(height, [&](int y_begin, int y_end) {
+                        ComposeScaledRows(cc, im.check_field, gw, gh, step, y_begin, y_end,
+                                          g_compose_scalar);
+                    });
+                    for (size_t c = 0; c < gpx; c++)
+                        g_phases.bad_cells +=
+                            im.correction.kn[c] != im.check_field.kn[c] ||
+                            im.correction.kw[c] != im.check_field.kw[c] ||
+                            im.correction.g[3 * c] != im.check_field.g[3 * c] ||
+                            im.correction.g[3 * c + 1] != im.check_field.g[3 * c + 1] ||
+                            im.correction.g[3 * c + 2] != im.check_field.g[3 * c + 2];
+                    for (int y = 0; y < height; y++) {
+                        const uint32_t* const a = reinterpret_cast<const uint32_t*>(
+                            dst + static_cast<size_t>(y) * outstride);
+                        const uint32_t* const b =
+                            im.check_frame.data() + static_cast<size_t>(y) * width;
+                        for (int x = 0; x < width; x++)
+                            g_phases.bad_pixels += a[x] != b[x];
+                    }
+                    g_phases.checked++;
+                }
+            } else if (step > 1 && n_band > 0) {
                 // Each band makes its own masks and reads them straight back, so
                 // what the grid holds is never written out at frame size.
                 RowPool::Get().Run(height, [&](int y_begin, int y_end) {
@@ -3495,9 +4315,16 @@ void Filter::Apply32(const uint8_t* src, int instride, uint8_t* dst, int outstri
                             l->motion[k] = at;
                         }
                     };
+                    const auto t_rows = PhaseStart();
                     rows_for(&bci.now_l);
                     rows_for(&bci.was_l);
                     rows_for(&bci.mem_l);
+                    if (g_apply_ms)
+                        g_phases.maskrows_ns.fetch_add(
+                            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::steady_clock::now() - t_rows)
+                                .count(),
+                            std::memory_order_relaxed);
                     ComposeRows(bci, y_begin, y_end);
                 });
             } else {

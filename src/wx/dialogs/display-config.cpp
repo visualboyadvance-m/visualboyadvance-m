@@ -1350,10 +1350,16 @@ void DisplayConfig::InitDlssNrTab() {
     adaptive->SetToolTip(_("Runs the model less often while the game falls short of its full frame rate at the current throttle, so a laptop that heats up keeps the game at speed. The picture keeps its frame rate; the filtering refreshes less often."));
     adaptive->SetValidator(widgets::OptionBoolValidator(config::OptionID::kDispDlssNrAdaptiveFrameRate));
     dlss_nr_controls_.push_back(adaptive);
+    wxCheckBox* compose_scaled = new wxCheckBox(box, wxID_ANY, _("Compose at S&caled Height"));
+    compose_scaled->SetToolTip(_("Works the correction out at Scaled Height and spreads it over the frame, rather than at the frame's own size. Much faster at the large scale factors, and it leaves the display filter's own detail on screen -- composed at full size the correction replaces it with the model's scaled-up output. The picture is sharper, and no longer the model's exactly."));
+    compose_scaled->SetValidator(
+        widgets::OptionBoolValidator(config::OptionID::kDispDlssNrComposeScaled));
+    dlss_nr_controls_.push_back(compose_scaled);
     wxGridSizer* checks = new wxGridSizer(3, 0, gap * 2);
     checks->Add(dlss_nr_, 0, wxALIGN_CENTER_VERTICAL);
     checks->Add(history, 0, wxALIGN_CENTER_VERTICAL);
     checks->Add(adaptive, 0, wxALIGN_CENTER_VERTICAL);
+    checks->Add(compose_scaled, 0, wxALIGN_CENTER_VERTICAL);
     group->Add(checks, 0, wxEXPAND | wxALL, gap);
 
     // Apply: Pre-filter / Post-filter / At display size -- which side of the
