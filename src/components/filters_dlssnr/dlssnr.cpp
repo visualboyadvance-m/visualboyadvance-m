@@ -2143,101 +2143,68 @@ inline bool GridRowInBounds(const ScaledInput& in, int gy) {
                     return false;
     return true;
 }
+#endif
 
-// BuildCorrectionCells() eight cells at a time; returns how far it got from `i`, a
-// multiple of eight. The same shape as ComposeRowSse2(), which is the arithmetic this
-// replaces, and with the same helpers.
+#if defined(VBAM_DLSSNR_SSE2)
+// BuildCorrectionCells() eight cells at a time; returns how far it got, a multiple of
+// eight. ComposeRowSse2()'s shape and its helpers, stopping where that one would have
+// needed the pixel: the weights go to the grid instead of onto a cast.
 size_t BuildCorrection8(const ScaledInput& in, size_t i, int count, CorrectionField* out) {
     const int end = count & ~7;
     const bool old_side = in.crossing && in.previous;
-#if defined(VBAM_DLSSNR_SSE2)
-    using Vec = __m128i;
-    const Vec zero = _mm_setzero_si128();
-    const Vec full = _mm_set1_epi16(256);
-    const Vec blend = _mm_set1_epi16(static_cast<int16_t>(in.blend));
-    const Vec scene = _mm_set1_epi16(static_cast<int16_t>(in.scene));
-    const auto add = [](Vec a, Vec b) { return _mm_add_epi16(a, b); };
-    const auto sub = [](Vec a, Vec b) { return _mm_sub_epi16(a, b); };
-    const auto store = [](int16_t* to, Vec v) {
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(to), v);
-    };
-#else
-    using Vec = int16x8_t;
-    const Vec zero = vdupq_n_s16(0);
-    const Vec full = vdupq_n_s16(256);
-    const Vec blend = vdupq_n_s16(static_cast<int16_t>(in.blend));
-    const Vec scene = vdupq_n_s16(static_cast<int16_t>(in.scene));
-    const auto add = [](Vec a, Vec b) { return vaddq_s16(a, b); };
-    const auto sub = [](Vec a, Vec b) { return vsubq_s16(a, b); };
-    const auto store = [](int16_t* to, Vec v) { vst1q_s16(to, v); };
-#endif
-    // The mean of a pass's cells at the way each lane takes; ComposeRowSse2()'s.
-    const auto mean = [&](const Lookup& l, const int16_t* delta, Vec ks, size_t j) {
-        Vec r = zero;
+    const __m128i zero = _mm_setzero_si128();
+    const __m128i full = _mm_set1_epi16(256);
+    const __m128i blend = _mm_set1_epi16(static_cast<int16_t>(in.blend));
+    const __m128i scene = _mm_set1_epi16(static_cast<int16_t>(in.scene));
+    const auto mean = [&](const Lookup& l, const int16_t* delta, __m128i ks, size_t j) {
+        __m128i r = zero;
         for (int k = 0; k < l.count; k++) {
-#if defined(VBAM_DLSSNR_SSE2)
-            const Vec a =
+            const __m128i a =
                 _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.a[k]));
-            const Vec b =
+            const __m128i b =
                 _mm_loadu_si128(reinterpret_cast<const __m128i*>(delta + j + 3 * l.b[k]));
-            const Vec m = _mm_srai_epi16(_mm_add_epi16(a, b), 1);
-            r = _mm_or_si128(r, _mm_and_si128(_mm_cmpeq_epi16(ks, _mm_set1_epi16(
-                                                                      static_cast<int16_t>(k))),
-                                              m));
-#else
-            const Vec m = vshrq_n_s16(
-                vaddq_s16(vld1q_s16(delta + j + 3 * l.a[k]), vld1q_s16(delta + j + 3 * l.b[k])),
-                1);
-            r = vbslq_s16(vceqq_s16(ks, vdupq_n_s16(static_cast<int16_t>(k))), m, r);
-#endif
+            const __m128i m = _mm_srai_epi16(_mm_add_epi16(a, b), 1);
+            r = _mm_or_si128(
+                r, _mm_and_si128(_mm_cmpeq_epi16(ks, _mm_set1_epi16(static_cast<int16_t>(k))),
+                                 m));
         }
         return r;
     };
     for (int n = 0; n < end; n += 8, i += 8) {
-        Vec now_k = zero, was_k = zero, mem_k = zero;
-        const Vec w = in.detail ? Choose8(in.now_l, scene, i, &now_k) : zero;
-        const Vec was_w =
-            in.detail && in.previous ? Choose8(in.was_l, scene, i, &was_k) : zero;
-        Vec mem_w = zero;
+        __m128i now_k = zero, was_k = zero, mem_k = zero;
+        __m128i w = zero, was_w = zero, mem_w = zero;
         if (in.detail) {
-            // The memory only where the pass (or the one before, while crossing) does
-            // not fit the live picture itself.
-#if defined(VBAM_DLSSNR_SSE2)
-            Vec misfit = _mm_cmplt_epi16(w, full);
+            w = Choose8(in.now_l, scene, i, &now_k);
+            if (in.previous)
+                was_w = Choose8(in.was_l, scene, i, &was_k);
+            // The memory only where the pass (or the one before, while crossing) does not
+            // fit the live picture itself.
+            __m128i misfit = _mm_cmplt_epi16(w, full);
             if (in.crossing)
                 misfit = _mm_or_si128(misfit, _mm_cmplt_epi16(was_w, full));
             mem_w = _mm_and_si128(misfit, Choose8(in.mem_l, scene, i, &mem_k));
-#else
-            uint16x8_t misfit = vcltq_s16(w, full);
-            if (in.crossing)
-                misfit = vorrq_u16(misfit, vcltq_s16(was_w, full));
-            mem_w = vbslq_s16(misfit, Choose8(in.mem_l, scene, i, &mem_k), zero);
-#endif
         }
-        Vec p = full;
+        __m128i p = full;
         if (in.crossing) {
             p = blend;
             if (old_side && in.detail) {
-#if defined(VBAM_DLSSNR_SSE2)
-                const Vec fast = MulShift8(w, sub(full, _mm_max_epi16(was_w, mem_w)));
-#else
-                const Vec fast = MulShift8(w, sub(full, vmaxq_s16(was_w, mem_w)));
-#endif
-                p = add(blend, MulShift8(sub(full, blend), fast));
+                const __m128i fast =
+                    MulShift8(w, _mm_sub_epi16(full, _mm_max_epi16(was_w, mem_w)));
+                p = _mm_add_epi16(blend, MulShift8(_mm_sub_epi16(full, blend), fast));
             }
         }
-        const Vec q = sub(full, p);
-        const Vec na = sub(full, mem_w);
-        const Vec wn = MulShift8(na, sub(full, w));
-        const Vec mn = MulShift8(mem_w, sub(full, w));
-        const Vec ww = old_side ? MulShift8(na, sub(full, was_w)) : zero;
-        const Vec mw = old_side ? MulShift8(mem_w, sub(full, was_w)) : zero;
-        const Vec g_mem = add(MulShift8(mn, p), MulShift8(mw, q));
-        const Vec g_now = MulShift8(w, p);
-        const Vec g_was = old_side ? MulShift8(was_w, q) : zero;
-        store(out->kn.data() + i, MulShift8(wn, p));
-        store(out->kw.data() + i, MulShift8(ww, q));
-        Vec gm3[3], gn3[3], gw3[3], mk3[3], nk3[3], wk3[3];
+        const __m128i q = _mm_sub_epi16(full, p);
+        const __m128i na = _mm_sub_epi16(full, mem_w);
+        const __m128i wn = MulShift8(na, _mm_sub_epi16(full, w));
+        const __m128i mn = MulShift8(mem_w, _mm_sub_epi16(full, w));
+        const __m128i ww = old_side ? MulShift8(na, _mm_sub_epi16(full, was_w)) : zero;
+        const __m128i mw = old_side ? MulShift8(mem_w, _mm_sub_epi16(full, was_w)) : zero;
+        const __m128i g_mem = _mm_add_epi16(MulShift8(mn, p), MulShift8(mw, q));
+        const __m128i g_now = MulShift8(w, p);
+        const __m128i g_was = old_side ? MulShift8(was_w, q) : zero;
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(out->kn.data() + i), MulShift8(wn, p));
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(out->kw.data() + i), MulShift8(ww, q));
+        __m128i gm3[3], gn3[3], gw3[3], mk3[3], nk3[3], wk3[3];
         Expand3(g_mem, gm3);
         Expand3(g_now, gn3);
         Expand3(mem_k, mk3);
@@ -2248,12 +2215,81 @@ size_t BuildCorrection8(const ScaledInput& in, size_t i, int count, CorrectionFi
         }
         for (int v = 0; v < 3; v++) {
             const size_t j = i * 3 + 8 * v;
-            Vec g = MulShift8(mean(in.mem_l, in.mem_delta, mk3[v], j), gm3[v]);
-            g = add(g, MulShift8(mean(in.now_l, in.now_delta, nk3[v], j), gn3[v]));
+            __m128i g = MulShift8(mean(in.mem_l, in.mem_delta, mk3[v], j), gm3[v]);
+            g = _mm_add_epi16(g, MulShift8(mean(in.now_l, in.now_delta, nk3[v], j), gn3[v]));
             if (old_side)
-                g = add(g, MulShift8(mean(in.was_l, in.was_delta, wk3[v], j), gw3[v]));
-            store(out->g.data() + j, g);
+                g = _mm_add_epi16(g, MulShift8(mean(in.was_l, in.was_delta, wk3[v], j), gw3[v]));
+            _mm_storeu_si128(reinterpret_cast<__m128i*>(out->g.data() + j), g);
         }
+    }
+    return static_cast<size_t>(end);
+}
+#elif defined(VBAM_DLSSNR_NEON)
+// The same, in ComposeRowNeon()'s shape: a vector is one channel of eight cells, so the
+// weights -- one a cell -- apply to all three as they are, and the three go out
+// interleaved as the spread wants them.
+size_t BuildCorrection8(const ScaledInput& in, size_t i, int count, CorrectionField* out) {
+    const int end = count & ~7;
+    const bool old_side = in.crossing && in.previous;
+    const int16x8_t zero = vdupq_n_s16(0);
+    const int16x8_t full = vdupq_n_s16(256);
+    const int16x8_t blend = vdupq_n_s16(static_cast<int16_t>(in.blend));
+    const uint16x8_t scene = vdupq_n_u16(static_cast<uint16_t>(in.scene));
+    const auto mean = [&](const Lookup& l, const int16_t* delta, uint16x8_t ks, size_t j) {
+        int16x8x3_t r = { { zero, zero, zero } };
+        for (int k = 0; k < l.count; k++) {
+            const int16_t* const p = delta + 3 * j;
+            const int16x8x3_t a = vld3q_s16(p + 3 * l.a[k]);
+            const int16x8x3_t b = vld3q_s16(p + 3 * l.b[k]);
+            const uint16x8_t sel = vceqq_u16(ks, vdupq_n_u16(static_cast<uint16_t>(k)));
+            for (int c = 0; c < 3; c++)
+                r.val[c] = vbslq_s16(sel, vhaddq_s16(a.val[c], b.val[c]), r.val[c]);
+        }
+        return r;
+    };
+    for (int n = 0; n < end; n += 8, i += 8) {
+        uint16x8_t now_k = vdupq_n_u16(0), was_k = now_k, mem_k = now_k;
+        int16x8_t w = zero, was_w = zero, mem_w = zero;
+        if (in.detail) {
+            w = Choose8(in.now_l, scene, i, &now_k);
+            if (in.previous)
+                was_w = Choose8(in.was_l, scene, i, &was_k);
+            uint16x8_t misfit = vcltq_s16(w, full);
+            if (in.crossing)
+                misfit = vorrq_u16(misfit, vcltq_s16(was_w, full));
+            mem_w = vandq_s16(vreinterpretq_s16_u16(misfit), Choose8(in.mem_l, scene, i, &mem_k));
+        }
+        int16x8_t p = full;
+        if (in.crossing) {
+            p = blend;
+            if (old_side && in.detail) {
+                const int16x8_t fast = MulShift8(w, vsubq_s16(full, vmaxq_s16(was_w, mem_w)));
+                p = vaddq_s16(blend, MulShift8(vsubq_s16(full, blend), fast));
+            }
+        }
+        const int16x8_t q = vsubq_s16(full, p);
+        const int16x8_t na = vsubq_s16(full, mem_w);
+        const int16x8_t wn = MulShift8(na, vsubq_s16(full, w));
+        const int16x8_t mn = MulShift8(mem_w, vsubq_s16(full, w));
+        const int16x8_t ww = old_side ? MulShift8(na, vsubq_s16(full, was_w)) : zero;
+        const int16x8_t mw = old_side ? MulShift8(mem_w, vsubq_s16(full, was_w)) : zero;
+        const int16x8_t g_mem = vaddq_s16(MulShift8(mn, p), MulShift8(mw, q));
+        const int16x8_t g_now = MulShift8(w, p);
+        const int16x8_t g_was = old_side ? MulShift8(was_w, q) : zero;
+        vst1q_s16(out->kn.data() + i, MulShift8(wn, p));
+        vst1q_s16(out->kw.data() + i, MulShift8(ww, q));
+        const int16x8x3_t rem = mean(in.mem_l, in.mem_delta, mem_k, i);
+        const int16x8x3_t now = mean(in.now_l, in.now_delta, now_k, i);
+        int16x8x3_t was = { { zero, zero, zero } };
+        if (old_side)
+            was = mean(in.was_l, in.was_delta, was_k, i);
+        int16x8x3_t g;
+        for (int c = 0; c < 3; c++) {
+            g.val[c] = vaddq_s16(MulShift8(rem.val[c], g_mem), MulShift8(now.val[c], g_now));
+            if (old_side)
+                g.val[c] = vaddq_s16(g.val[c], MulShift8(was.val[c], g_was));
+        }
+        vst3q_s16(out->g.data() + 3 * i, g);
     }
     return static_cast<size_t>(end);
 }
@@ -2412,9 +2448,10 @@ void ScaledPixels(const ComposeInput& in, int y, const SpreadRow& a, const Sprea
     }
 }
 
-#if defined(VBAM_DLSSNR_SSE2) || defined(VBAM_DLSSNR_NEON)
+#if defined(VBAM_DLSSNR_SSE2)
 // ScaledPixels() eight pixels at a time; returns how far it got, a multiple of eight. The
-// cast is a table lookup by colour and stays a pixel at a time, as it is in ComposeRowSse2().
+// cast is a table lookup by colour and stays a pixel at a time, as it is in
+// ComposeRowSse2(), whose shape and store this follows.
 int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRow& b, int fy) {
     const int width = in.width;
     const int end = width & ~7;
@@ -2422,23 +2459,16 @@ int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRo
         reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
     const uint8_t* const live = in.live + static_cast<size_t>(y) * width * 3;
     const bool previous = in.was_cast != nullptr;
-    alignas(16) int16_t cast_now[24], cast_was[24];
-    alignas(16) uint8_t out[32];
-#if defined(VBAM_DLSSNR_SSE2)
     const __m128i zero = _mm_setzero_si128();
     const __m128i f = _mm_set1_epi16(static_cast<int16_t>(fy));
+    alignas(16) int16_t cast_now[24], cast_was[24];
+    alignas(16) uint8_t out[32];
+    // Between the grid rows either side of this one: contiguous lanes, no shuffling.
     const auto lerp = [&](const int16_t* pa, const int16_t* pb) {
         const __m128i va = _mm_loadu_si128(reinterpret_cast<const __m128i*>(pa));
         const __m128i vb = _mm_loadu_si128(reinterpret_cast<const __m128i*>(pb));
         return _mm_add_epi16(va, MulShift8(_mm_sub_epi16(vb, va), f));
     };
-#else
-    const int16x8_t f = vdupq_n_s16(static_cast<int16_t>(fy));
-    const auto lerp = [&](const int16_t* pa, const int16_t* pb) {
-        const int16x8_t va = vld1q_s16(pa);
-        return vaddq_s16(va, MulShift8(vsubq_s16(vld1q_s16(pb), va), f));
-    };
-#endif
     for (int x = 0; x < end; x += 8) {
         const uint8_t* const l = live + static_cast<size_t>(x) * 3;
         for (int q = 0; q < 8; q++) {
@@ -2449,23 +2479,23 @@ int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRo
                     cast_was[3 * q + c] = in.was_cast[ci + c];
             }
         }
-        const size_t j = static_cast<size_t>(x) * 3;
-#if defined(VBAM_DLSSNR_SSE2)
         __m128i k3[3], kw3[3], r[3];
         Expand3(lerp(a.kn.data() + x, b.kn.data() + x), k3);
         if (previous)
             Expand3(lerp(a.kw.data() + x, b.kw.data() + x), kw3);
         for (int v = 0; v < 3; v++) {
+            const size_t j = static_cast<size_t>(x) * 3 + 8 * v;
             r[v] = _mm_add_epi16(
                 MulShift8(_mm_load_si128(reinterpret_cast<const __m128i*>(cast_now + 8 * v)),
                           k3[v]),
-                lerp(a.g.data() + j + 8 * v, b.g.data() + j + 8 * v));
+                lerp(a.g.data() + j, b.g.data() + j));
             if (previous)
                 r[v] = _mm_add_epi16(
                     r[v],
                     MulShift8(_mm_load_si128(reinterpret_cast<const __m128i*>(cast_was + 8 * v)),
                               kw3[v]));
         }
+        // The live channels widened to int16, the correction added, clamped by the pack.
         const __m128i lo = _mm_loadu_si128(reinterpret_cast<const __m128i*>(l));
         const __m128i hi = _mm_loadl_epi64(reinterpret_cast<const __m128i*>(l + 16));
         _mm_store_si128(reinterpret_cast<__m128i*>(out),
@@ -2473,30 +2503,63 @@ int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRo
                                          _mm_add_epi16(_mm_unpackhi_epi8(lo, zero), r[1])));
         _mm_store_si128(reinterpret_cast<__m128i*>(out + 16),
                         _mm_packus_epi16(_mm_add_epi16(_mm_unpacklo_epi8(hi, zero), r[2]), zero));
-#else
-        int16x8_t k3[3], kw3[3], r[3];
-        Expand3(lerp(a.kn.data() + x, b.kn.data() + x), k3);
-        if (previous)
-            Expand3(lerp(a.kw.data() + x, b.kw.data() + x), kw3);
-        for (int v = 0; v < 3; v++) {
-            r[v] = vaddq_s16(MulShift8(vld1q_s16(cast_now + 8 * v), k3[v]),
-                             lerp(a.g.data() + j + 8 * v, b.g.data() + j + 8 * v));
-            if (previous)
-                r[v] = vaddq_s16(r[v], MulShift8(vld1q_s16(cast_was + 8 * v), kw3[v]));
-        }
-        const uint8x16_t lo = vld1q_u8(l);
-        const uint8x8_t hi = vld1_u8(l + 16);
-        vst1q_u8(out, vcombine_u8(vqmovun_s16(vaddq_s16(
-                                      vreinterpretq_s16_u16(vmovl_u8(vget_low_u8(lo))), r[0])),
-                                  vqmovun_s16(vaddq_s16(
-                                      vreinterpretq_s16_u16(vmovl_u8(vget_high_u8(lo))), r[1]))));
-        vst1_u8(out + 16,
-                vqmovun_s16(vaddq_s16(vreinterpretq_s16_u16(vmovl_u8(hi)), r[2])));
-#endif
         for (int q = 0; q < 8; q++)
             d[x + q] = static_cast<uint32_t>(out[3 * q]) << in.shift[0] |
                        static_cast<uint32_t>(out[3 * q + 1]) << in.shift[1] |
                        static_cast<uint32_t>(out[3 * q + 2]) << in.shift[2];
+    }
+    return end;
+}
+#elif defined(VBAM_DLSSNR_NEON)
+// The same, in ComposeRowNeon()'s shape: the structured loads split the pixels into their
+// channels, so each vector holds one channel of eight pixels and the two cast weights,
+// one a pixel, apply to all three as they are.
+int ScaledRow8(const ComposeInput& in, int y, const SpreadRow& a, const SpreadRow& b, int fy) {
+    const int width = in.width;
+    const int end = width & ~7;
+    uint32_t* const d =
+        reinterpret_cast<uint32_t*>(in.dst + static_cast<size_t>(y) * in.outstride);
+    const uint8_t* const live = in.live + static_cast<size_t>(y) * width * 3;
+    const bool previous = in.was_cast != nullptr;
+    const int16x8_t zero = vdupq_n_s16(0);
+    const int16x8_t f = vdupq_n_s16(static_cast<int16_t>(fy));
+    const int32x4_t shift[3] = { vdupq_n_s32(in.shift[0]), vdupq_n_s32(in.shift[1]),
+                                 vdupq_n_s32(in.shift[2]) };
+    alignas(16) int16_t cast_now[3][8], cast_was[3][8];
+    const auto lerp = [&](int16x8_t va, int16x8_t vb) {
+        return vaddq_s16(va, MulShift8(vsubq_s16(vb, va), f));
+    };
+    for (int x = 0; x < end; x += 8) {
+        const uint8_t* const l = live + static_cast<size_t>(x) * 3;
+        for (int q = 0; q < 8; q++) {
+            const size_t ci = CastIndex(l[3 * q], l[3 * q + 1], l[3 * q + 2]) * 3;
+            for (int c = 0; c < 3; c++) {
+                cast_now[c][q] = in.cast[ci + c];
+                if (previous)
+                    cast_was[c][q] = in.was_cast[ci + c];
+            }
+        }
+        const int16x8_t kn = lerp(vld1q_s16(a.kn.data() + x), vld1q_s16(b.kn.data() + x));
+        const int16x8_t kw =
+            previous ? lerp(vld1q_s16(a.kw.data() + x), vld1q_s16(b.kw.data() + x)) : zero;
+        const int16x8x3_t ga = vld3q_s16(a.g.data() + 3 * static_cast<size_t>(x));
+        const int16x8x3_t gb = vld3q_s16(b.g.data() + 3 * static_cast<size_t>(x));
+        const uint8x8x3_t lv = vld3_u8(l);
+        uint32x4_t lo = vdupq_n_u32(0), hi = vdupq_n_u32(0);
+        for (int c = 0; c < 3; c++) {
+            int16x8_t delta =
+                vaddq_s16(MulShift8(vld1q_s16(cast_now[c]), kn), lerp(ga.val[c], gb.val[c]));
+            if (previous)
+                delta = vaddq_s16(delta, MulShift8(vld1q_s16(cast_was[c]), kw));
+            // The live channel widened to int16, the correction added, clamped to a byte,
+            // and put where the channel goes in the 32-bit pixel.
+            const uint16x8_t v = vmovl_u8(
+                vqmovun_s16(vaddq_s16(vreinterpretq_s16_u16(vmovl_u8(lv.val[c])), delta)));
+            lo = vorrq_u32(lo, vshlq_u32(vmovl_u16(vget_low_u16(v)), shift[c]));
+            hi = vorrq_u32(hi, vshlq_u32(vmovl_u16(vget_high_u16(v)), shift[c]));
+        }
+        vst1q_u32(d + x, lo);
+        vst1q_u32(d + x + 4, hi);
     }
     return end;
 }
