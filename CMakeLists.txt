@@ -19,6 +19,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 # still reports, and the find_package summaries are unaffected.
 set(CMAKE_REQUIRED_QUIET TRUE)
 
+# find_program() caches what it found, and hands that back on every later
+# configure whether or not it is still there. PowerShell installed from the
+# Store lives under a WindowsApps directory stamped with its version, so an
+# update moves the executable and leaves the cache naming a path that no
+# longer exists -- and every execute_process() that runs it then fails to
+# start, with "no such file or directory" in place of an exit code. The vcpkg
+# binary package code reads that as the tool having answered, so each port
+# looks uninstalled and is downloaded again, and nothing is ever unpacked.
+# Drop a cached path that has stopped existing and let the search run again.
+if(POWERSHELL AND NOT EXISTS "${POWERSHELL}")
+    message(STATUS "PowerShell has moved from ${POWERSHELL}; looking for it again.")
+    unset(POWERSHELL CACHE)
+endif()
+
 if(WIN32)
     include(RemoveStrawberryPerlFromPATH)
 
