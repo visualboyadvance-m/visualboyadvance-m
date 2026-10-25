@@ -1442,9 +1442,9 @@ void mapperTAMA5RAM(uint16_t address, uint8_t value)
                 if ((value & 0x0e) == 0x0c) {
                     gbDataTAMA5.mapperRamByteSelect = gbDataTAMA5.mapperCommands[6] | (gbDataTAMA5.mapperCommands[7] << 4);
 
-                    uint8_t byte = gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect];
+                    uint8_t b = gbTAMA5ram[gbDataTAMA5.mapperRamByteSelect];
 
-                    gbMemoryMap[0xa][0] = (value & 1) ? byte >> 4 : byte & 0x0f;
+                    gbMemoryMap[0xa][0] = (value & 1) ? b >> 4 : b & 0x0f;
 
                     gbDataTAMA5.mapperCommands[0x0f] = 0;
                 }

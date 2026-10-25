@@ -7,6 +7,8 @@
 #
 # Usage:
 #   make PUMPKIN=/path/to/PumpkinOS        (default below)
+#   make UNAME_S=msdosdjgpp                 (MS-DOS: VBAM.dlib is a DXE3
+#                                            module, see the link rule)
 
 PUMPKIN ?= ${HOME}/Downloads/PumpkinOS
 VBAM_SRC := $(abspath ..)
@@ -21,7 +23,16 @@ UNAME_M := $(shell uname -m)
 # The SYS_* triple must match the one baked into $(PUMPKIN)/bin/libpumpkin:
 # at runtime the app's native code is loaded from the PRC resource
 # 'dlib' id = SYS_OS*64 + SYS_CPU*8 + SYS_SIZE.
+ifeq ($(UNAME_S),msdosdjgpp)
+SYS_OS ?= 7
+else
+ifeq ($(UNAME_S),msys2)
+SYS_OS ?= 2
+else
 SYS_OS ?= 1
+endif
+endif
+
 ifeq ($(findstring arm,$(UNAME_M)),arm)
 SYS_CPU ?= 1
 else ifeq ($(UNAME_M),aarch64)
@@ -29,8 +40,17 @@ SYS_CPU ?= 1
 else
 SYS_CPU ?= 2
 endif
+
+ifeq ($(UNAME_M),i686)
+SYS_SIZE ?= 1
+else ifeq ($(findstring arm,$(UNAME_M)),arm)
+SYS_SIZE ?= 1
+else
 SYS_SIZE ?= 2
+endif
+
 SYS_ENDIAN ?= 1
+
 DLIBID := $(shell expr $(SYS_OS) \* 64 + $(SYS_CPU) \* 8 + $(SYS_SIZE))
 DLIB := $(shell printf "dlib%04x.bin" $(DLIBID))
 
@@ -40,11 +60,29 @@ PRCBUILD = $(PUMPKIN)/tools/prcbuild
 ifeq ($(UNAME_S),Darwin)
 CXX = clang++ -arch x86_64 -arch arm64 -mmacosx-version-min=10.15
 LINKFLAGS = -dynamiclib
+PICFLAG = -fPIC
 OSDEFS = -DDARWIN -Wno-invalid-pp-token -Wno-string-plus-int -Wno-typedef-redefinition
+else
+ifeq ($(UNAME_S),msdosdjgpp)
+CXX = i686-pc-msdosdjgpp-g++
+# DJGPP has no position-independent code (-fPIC is "ignored" with a notice)
+PICFLAG =
+OSDEFS = -DDOS -DW32_HAVE_STRUCT_TIMESPEC=1 -D__pthread_write=write -march=i586 -mtune=i586
+# The module is linked by dxe3gen. Invoked as "dxegen" the same program runs
+# in DXE1 mode (one exported symbol, no unresolved symbols), so it has to be
+# called under its own name: when only dxegen is installed, obj/dxe3gen is a
+# link to it.
+DXE3GEN := $(shell command -v i686-pc-msdosdjgpp-dxe3gen dxe3gen 2>/dev/null | head -n 1)
+ifeq ($(DXE3GEN),)
+DXE3GEN = $(OBJDIR)/dxe3gen
+DXE3GEN_DEP = $(OBJDIR)/dxe3gen
+endif
 else
 CXX = g++
 LINKFLAGS = -shared
+PICFLAG = -fPIC
 OSDEFS = -DLINUX
+endif
 endif
 
 # Core defines, mirroring src/libretro/CMakeLists.txt. __LIBRETRO__ is
@@ -64,7 +102,7 @@ INCLUDES = -I. -I$(VBAM_SRC) \
            -I$(PALMOS)/Core/Hardware -I$(PALMOS)/Extensions/ExpansionMgr
 
 OPT ?= -O2
-CXXFLAGS = -std=gnu++17 -Wall -Wno-unknown-pragmas -Wno-multichar -fsigned-char -fPIC \
+CXXFLAGS = -std=gnu++17 -Wall -Wno-unknown-pragmas -Wno-multichar -fsigned-char $(PICFLAG) \
            $(OPT) $(COREDEFS) $(PUMPDEFS) $(OSDEFS) $(INCLUDES)
 
 GLUE_SRCS = vbam_pumpkin.cpp sound_pumpkin.cpp
@@ -119,18 +157,55 @@ OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(GLUE_SRCS) $(CORE_SRCS)))
 vpath %.cpp . $(sort $(dir $(addprefix $(VBAM_SRC)/,$(CORE_SRCS))))
 
 all: $(PROGRAM).prc
+ifeq ($(UNAME_S),msdosdjgpp)
+all: dxesyms.c
+endif
 
 $(OBJDIR)/%.o: %.cpp
 	@mkdir -p $(OBJDIR)
 	@echo Compiling $<
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(PROGRAM).dlib: $(OBJS)
+# MS-DOS: the dlib is a DXE3 module holding the emulator objects only. It
+# exports PilotMain and imports (-U) everything else: the PalmOS API, libpit,
+# libc, libgcc and libstdc++ come from pumpkin.exe at load time, which must
+# export them with dlregsym() (dxesyms.c below is that table). Linking the
+# PumpkinOS libraries into the module would give it a second copy of the OS
+# state, and Watt-32's assembly objects (CODE/DATA sections, which dxe.ld
+# does not fold into .text) are what made dxe3gen refuse the output as
+# having more than one section.
+$(OBJDIR)/dxe3gen:
+	@mkdir -p $(OBJDIR)
+	@test -n "$$(command -v dxegen)" || { echo "dxe3gen (or dxegen) not found"; exit 1; }
+	@ln -sf "$$(command -v dxegen)" $@
+
+$(PROGRAM).dlib: $(OBJS) $(DXE3GEN_DEP)
 	@echo Linking $(PROGRAM).dlib
+ifeq ($(UNAME_S),msdosdjgpp)
+	@$(DXE3GEN) -o $@ -U -E _PilotMain -D "VBA-M" $(OBJS)
+	@test -f $@ || { echo "$(DXE3GEN) failed (it exits 0 when its link step fails)"; exit 1; }
+else
 	@$(CXX) $(LINKFLAGS) -o $@ $(OBJS) -L$(PUMPKIN)/bin -lpumpkin -lpit
+endif
 ifeq ($(UNAME_S),Darwin)
 	@codesign -f -s "Developer ID Application" $@ 2>/dev/null || codesign -f -s - $@
 endif
+
+# the symbols pumpkin.exe has to export for the module (see dxe3res.py). The
+# table and the libstdc++ Pth shims (the host's <thread> objects, pulled in
+# by the table's std::this_thread::sleep_for import, reference
+# __pthread_sleep/usleep/detach; see src/sdl/dos-libstdcxx-shims.c) are
+# installed into $(PUMPKIN)/src/msdos, whose GNUmakefile compiles whatever
+# dxe*.c it finds there into pumpkin.exe. Relink pumpkin.exe after this
+# (make OSNAME=msdosdjgpp MACHINE=i686 -f GNUMakefile -C $(PUMPKIN)/src/msdos),
+# or dlopen fails with "unresolved symbol" on the module's first import.
+dxesyms.c: $(PROGRAM).dlib dxe3res.py
+	@echo Generating $@
+	@python3 dxe3res.py -o $@ $<
+	@echo Installing $@ and dxeshims.c into $(PUMPKIN)/src/msdos
+	@mkdir -p $(PUMPKIN)/src/msdos
+	@cp $@ $(PUMPKIN)/src/msdos/dxesyms.c
+	@cp $(VBAM_SRC)/sdl/dos-libstdcxx-shims.c $(PUMPKIN)/src/msdos/dxeshims.c
 
 res.flag: resource.rcp resource.h vbam.bmp
 	@echo Compiling resources
@@ -148,6 +223,6 @@ $(PROGRAM).prc: $(PROGRAM).dlib res.flag
 	@cp $(PROGRAM).prc $(PUMPKIN)/vfs/app_install/
 
 clean:
-	rm -rf $(OBJDIR) resources res.flag $(PROGRAM).dlib $(PROGRAM).prc $(DLIB)
+	rm -rf $(OBJDIR) resources res.flag $(PROGRAM).dlib $(PROGRAM).prc $(DLIB) dxesyms.c
 
 .PHONY: all clean

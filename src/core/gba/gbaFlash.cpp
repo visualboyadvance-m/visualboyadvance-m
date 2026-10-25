@@ -151,7 +151,7 @@ uint8_t flashRead(uint32_t address)
     return 0;
 }
 
-void flashSaveDecide(uint32_t address, uint8_t byte)
+void flashSaveDecide(uint32_t address, uint8_t b)
 {
     if (coreOptions.saveType == GBA_SAVE_EEPROM)
         return;
@@ -168,51 +168,51 @@ void flashSaveDecide(uint32_t address, uint8_t byte)
         }
 
         log("%s emulation is enabled by writing to:  $%08x : %02x\n",
-            cpuSramEnabled ? "SRAM" : "FLASH", address, byte);
+            cpuSramEnabled ? "SRAM" : "FLASH", address, b);
     }
 
     if (coreOptions.saveType == GBA_SAVE_NONE)
         return;
 
-    (*cpuSaveGameFunc)(address, byte);
+    (*cpuSaveGameFunc)(address, b);
 }
 
-void flashDelayedWrite(uint32_t address, uint8_t byte)
+void flashDelayedWrite(uint32_t address, uint8_t b)
 {
     coreOptions.saveType = GBA_SAVE_FLASH;
     cpuSaveGameFunc = flashWrite;
-    flashWrite(address, byte);
+    flashWrite(address, b);
 }
 
-void flashWrite(uint32_t address, uint8_t byte)
+void flashWrite(uint32_t address, uint8_t b)
 {
-    //  log("Writing %02x at %08x\n", byte, address);
+    //  log("Writing %02x at %08x\n", b, address);
     //  log("Current state is %d\n", flashState);
     address &= 0xFFFF;
     switch (flashState) {
     case FLASH_READ_ARRAY:
-        if (address == 0x5555 && byte == 0xAA)
+        if (address == 0x5555 && b == 0xAA)
             flashState = FLASH_CMD_1;
         break;
     case FLASH_CMD_1:
-        if (address == 0x2AAA && byte == 0x55)
+        if (address == 0x2AAA && b == 0x55)
             flashState = FLASH_CMD_2;
         else
             flashState = FLASH_READ_ARRAY;
         break;
     case FLASH_CMD_2:
         if (address == 0x5555) {
-            if (byte == 0x90) {
+            if (b == 0x90) {
                 flashState = FLASH_AUTOSELECT;
                 flashReadState = FLASH_AUTOSELECT;
-            } else if (byte == 0x80) {
+            } else if (b == 0x80) {
                 flashState = FLASH_CMD_3;
-            } else if (byte == 0xF0) {
+            } else if (b == 0xF0) {
                 flashState = FLASH_READ_ARRAY;
                 flashReadState = FLASH_READ_ARRAY;
-            } else if (byte == 0xA0) {
+            } else if (b == 0xA0) {
                 flashState = FLASH_PROGRAM;
-            } else if (byte == 0xB0 && g_flashSize == SIZE_FLASH1M) {
+            } else if (b == 0xB0 && g_flashSize == SIZE_FLASH1M) {
                 flashState = FLASH_SETBANK;
             } else {
                 flashState = FLASH_READ_ARRAY;
@@ -224,7 +224,7 @@ void flashWrite(uint32_t address, uint8_t byte)
         }
         break;
     case FLASH_CMD_3:
-        if (address == 0x5555 && byte == 0xAA) {
+        if (address == 0x5555 && b == 0xAA) {
             flashState = FLASH_CMD_4;
         } else {
             flashState = FLASH_READ_ARRAY;
@@ -232,7 +232,7 @@ void flashWrite(uint32_t address, uint8_t byte)
         }
         break;
     case FLASH_CMD_4:
-        if (address == 0x2AAA && byte == 0x55) {
+        if (address == 0x2AAA && b == 0x55) {
             flashState = FLASH_CMD_5;
         } else {
             flashState = FLASH_READ_ARRAY;
@@ -240,14 +240,14 @@ void flashWrite(uint32_t address, uint8_t byte)
         }
         break;
     case FLASH_CMD_5:
-        if (byte == 0x30) {
+        if (b == 0x30) {
             // SECTOR ERASE
             memset(&flashSaveMemory[(flashBank << 16) + (address & 0xF000)],
                 0xff,
                 0x1000);
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
             flashReadState = FLASH_ERASE_COMPLETE;
-        } else if (byte == 0x10) {
+        } else if (b == 0x10) {
             // CHIP ERASE
             memset(flashSaveMemory, 0xff, g_flashSize);
             systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
@@ -258,10 +258,10 @@ void flashWrite(uint32_t address, uint8_t byte)
         }
         break;
     case FLASH_AUTOSELECT:
-        if (byte == 0xF0) {
+        if (b == 0xF0) {
             flashState = FLASH_READ_ARRAY;
             flashReadState = FLASH_READ_ARRAY;
-        } else if (address == 0x5555 && byte == 0xAA)
+        } else if (address == 0x5555 && b == 0xAA)
             flashState = FLASH_CMD_1;
         else {
             flashState = FLASH_READ_ARRAY;
@@ -269,14 +269,14 @@ void flashWrite(uint32_t address, uint8_t byte)
         }
         break;
     case FLASH_PROGRAM:
-        flashSaveMemory[(flashBank << 16) + address] = byte;
+        flashSaveMemory[(flashBank << 16) + address] = b;
         systemSaveUpdateCounter = SYSTEM_SAVE_UPDATED;
         flashState = FLASH_READ_ARRAY;
         flashReadState = FLASH_READ_ARRAY;
         break;
     case FLASH_SETBANK:
         if (address == 0) {
-            flashBank = (byte & 1);
+            flashBank = (b & 1);
         }
         flashState = FLASH_READ_ARRAY;
         flashReadState = FLASH_READ_ARRAY;

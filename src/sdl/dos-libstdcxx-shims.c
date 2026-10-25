@@ -9,9 +9,20 @@
 // been set up yet: a page fault before main() with CWSDPMI's register dump
 // instead of a traceback. Satisfy the references from libc so that no Pth
 // object is linked and the program stays single-threaded.
+//
+// No <sys/uio.h>: Watt-32 installs a dummy one over DJGPP's, so writev() and
+// struct iovec come from libc by hand (the layout is Pth's, which libstdc++
+// was built against: base pointer, size_t length).
 #include <errno.h>
-#include <sys/uio.h>
+#include <stddef.h>
 #include <unistd.h>
+
+struct vbam_dos_iovec {
+    void* iov_base;
+    size_t iov_len;
+};
+
+extern ssize_t writev(int fd, const struct vbam_dos_iovec* iov, int iovcnt);
 
 ssize_t __pthread_read(int fd, void* buf, size_t count)
 {
@@ -23,9 +34,9 @@ ssize_t __pthread_write(int fd, const void* buf, size_t count)
     return write(fd, buf, count);
 }
 
-ssize_t __pthread_writev(int fd, const struct iovec* iov, int iovcnt)
+ssize_t __pthread_writev(int fd, const void* iov, int iovcnt)
 {
-    return writev(fd, iov, iovcnt);
+    return writev(fd, (const struct vbam_dos_iovec*)iov, iovcnt);
 }
 
 unsigned int __pthread_sleep(unsigned int seconds)

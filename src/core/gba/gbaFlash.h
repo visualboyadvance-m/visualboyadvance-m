@@ -21,9 +21,9 @@ extern void flashReadGameSkip(gzFile _gzFile, int version);
 #endif  // defined(__LIBRETRO__)
 extern uint8_t flashSaveMemory[FLASH_128K_SZ];
 extern uint8_t flashRead(uint32_t address);
-extern void flashWrite(uint32_t address, uint8_t byte);
-extern void flashDelayedWrite(uint32_t address, uint8_t byte);
-extern void flashSaveDecide(uint32_t address, uint8_t byte);
+extern void flashWrite(uint32_t address, uint8_t b);
+extern void flashDelayedWrite(uint32_t address, uint8_t b);
+extern void flashSaveDecide(uint32_t address, uint8_t b);
 extern void flashReset();
 extern void flashSetSize(int size);
 extern void flashInit();
