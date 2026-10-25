@@ -49,7 +49,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-25 00:00+0000\n"
 "PO-Revision-Date: 2011-12-03 19:42+0000\n"
-"Last-Translator: Vovo Mueda, 2026\n"
+"Last-Translator: Felipefpl, 2022,2026\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/bgk/vba-m/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -522,7 +522,7 @@ msgstr "Executa o modelo menos frequentemente enquanto o jogo fica abaixo da tax
 
 #: dialogs/display-config.cpp:1353
 msgid "Compose at S&caled Height"
-msgstr ""
+msgstr "Compor na A&ltura Ampliada"
 
 #: dialogs/display-config.cpp:1354
 msgid ""
@@ -531,7 +531,7 @@ msgid ""
 " and it leaves the display filter's own detail on screen -- composed at full"
 " size the correction replaces it with the model's scaled-up output. The "
 "picture is sharper, and no longer the model's exactly."
-msgstr ""
+msgstr "Trabalha a correção na Altura Ampliada e a espalha sobre o frame ao invés do próprio tamanho do frame. Muito mais rápido nos fatores maiores de ampliação e deixa o próprio detalhe do filtro de exibição na tela - composto no tamanho total a correção substitui ele com a saída ampliada do modelo. O quadro é mais nítido e não mais igual ao modelo."
 
 #: dialogs/display-config.cpp:1368
 msgid "&Pre-filter"
@@ -2386,7 +2386,7 @@ msgstr "Executa o DLSS NR menos frequentemente enquanto a taxa de frames ficar a
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid ""
 "Lay DLSS NR's correction down at the scaled height rather than the frame's"
-msgstr ""
+msgstr "Colocar a correção do DLSS NR na altura ampliada ao invés da do frame."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "DLSS NR style index; -1 keeps the profile's"
