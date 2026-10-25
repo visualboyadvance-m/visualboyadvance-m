@@ -585,14 +585,60 @@ function(vcpkg_binary_package_dir triplet outvar)
     set(${outvar} "${pkg_dir}" PARENT_SCOPE)
 endfunction()
 
+# How long a downloaded package listing stays good, in seconds. The host
+# rebuilds nightly, so this is a few hours: long enough that the configure a
+# build runs on its way past does not go to the network every time, short
+# enough that a listing is never far behind what the host actually has. Set it
+# to 0 to fetch a fresh listing on every configure.
+if(NOT DEFINED VCPKG_PACKAGE_LIST_MAX_AGE)
+    set(VCPKG_PACKAGE_LIST_MAX_AGE 14400)
+endif()
+
 function(get_triplet_package_list triplet)
-    if(EXISTS "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
-        return()
+    set(pkg_list_file "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
+
+    # A listing is a snapshot of what the host had when it was fetched, and the
+    # host rebuilds. Once a port's version moves, the zip the old listing names
+    # is gone and the download of it 404s -- which reads here as a package that
+    # failed rather than a listing that expired, and every port it happens to
+    # gets built from source instead. Kept for the life of the build directory,
+    # as it was, that is where a listing ends up. So it expires.
+    set(pkg_list_stale_copy "")
+
+    if(EXISTS "${pkg_list_file}")
+        file(TIMESTAMP "${pkg_list_file}" pkg_list_mtime "%s" UTC)
+        string(TIMESTAMP pkg_list_now "%s" UTC)
+
+        # Neither should come back empty, but a timestamp that could not be
+        # read is no reason to throw away a listing that would otherwise have
+        # been kept.
+        if(NOT pkg_list_mtime OR NOT pkg_list_now)
+            return()
+        endif()
+
+        math(EXPR pkg_list_age "${pkg_list_now} - ${pkg_list_mtime}")
+
+        if(pkg_list_age LESS "${VCPKG_PACKAGE_LIST_MAX_AGE}")
+            return()
+        endif()
+
+        # Held onto until a fresh one is in hand. The fetch below removes what
+        # a failed download left behind, and with the host unreachable the
+        # listing from last time still names most of what is there: going from
+        # a stale listing to none would turn a configure that is merely behind
+        # into one that builds every port from source.
+        set(pkg_list_stale_copy "${pkg_list_file}.stale")
+        file(REMOVE "${pkg_list_stale_copy}")
+        file(RENAME "${pkg_list_file}" "${pkg_list_stale_copy}")
+
+        math(EXPR pkg_list_age_hours "${pkg_list_age} / 3600")
+
+        message(STATUS
+            "The vcpkg binary package list for '${triplet}' is "
+            "${pkg_list_age_hours}h old; fetching it again.")
     endif()
 
     vcpkg_binary_package_dir("${triplet}" pkg_dir)
-
-    set(pkg_list_file "${CMAKE_BINARY_DIR}/binary_package_list_${triplet}.html")
 
     # A file(DOWNLOAD) with no timeout waits for the other end forever, and a
     # configure that has reached this point has already said what it is doing,
@@ -625,6 +671,10 @@ function(get_triplet_package_list triplet)
         list(GET pkg_list_status 0 pkg_list_code)
 
         if(pkg_list_code EQUAL 0)
+            if(pkg_list_stale_copy)
+                file(REMOVE "${pkg_list_stale_copy}")
+            endif()
+
             return()
         endif()
 
@@ -639,6 +689,19 @@ function(get_triplet_package_list triplet)
                 "${pkg_list_attempts}; trying again.")
         endif()
     endforeach()
+
+    # Put back the one that was here. Its mtime comes back with it, so the
+    # next configure is due another go rather than settling for this.
+    if(pkg_list_stale_copy)
+        file(RENAME "${pkg_list_stale_copy}" "${pkg_list_file}")
+
+        message(STATUS
+            "Failed to refresh the vcpkg binary package list "
+            "(${pkg_list_code} - ${pkg_list_error}); going on with the "
+            "${pkg_list_age_hours}h-old one already here.")
+
+        return()
+    endif()
 
     message(STATUS
         "Failed to download vcpkg binary package list: "
