@@ -107,7 +107,7 @@ struct Settings {
     // the scaled-down frame, which leaves the display filter's detail on screen with the
     // model's correction laid over it. Sharper, and no longer the model's picture exactly.
     // Nothing changes where the frame is not taller than max_height.
-    bool compose_scaled = false;
+    bool compose_scaled = true;
     // The adaptive frame rate: the frames a second the host means to draw, which the filter
     // holds by spacing its passes out while the calls to Apply32() come slower; 0 off.
     double target_fps = 0.0;

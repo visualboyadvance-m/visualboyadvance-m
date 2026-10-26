@@ -243,7 +243,7 @@ std::array<Option, kNbOptions>& Option::All() {
         uint32_t dlss_nr_max_height = 480;
         bool dlss_nr_history = true;
         bool dlss_nr_adaptive_frame_rate = true;
-        bool dlss_nr_compose_scaled = false;
+        bool dlss_nr_compose_scaled = true;
         int32_t dlss_nr_style_index = -1;  // negative keeps the profile's
         double dlss_nr_local_tone = -1.0;  // negative keeps the profile's
         double dlss_nr_local_structure = -1.0;  // negative keeps the profile's

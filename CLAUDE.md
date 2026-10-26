@@ -120,11 +120,12 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   the passes out while the drawn frame rate falls short of 60 x the throttle,
   and stands down for a while when a test shows the spacing does not raise it
 - `Apply32()` lays the pass down every frame and is what sets the frame rate,
-  not the GPU. By default it works the correction out for every pixel of the
-  frame; with `Display/DlssNrComposeScaled` (default off) it works it out on
-  the motion grid, at the maximum height, and spreads it over the frame -- 40%
-  off the composition at xBRZ 9x, and it leaves the display filter's own detail
-  on screen instead of replacing it with the model's scaled-up output.
+  not the GPU. By default (`Display/DlssNrComposeScaled`) it works the
+  correction out on the motion grid, at the maximum height, and spreads it over
+  the frame -- 40% off the composition at xBRZ 9x, and it leaves the display
+  filter's own detail on screen instead of replacing it with the model's
+  scaled-up output; turned off it works the correction out for every pixel of
+  the frame, which is the model's picture exactly and much slower.
   `NR_APPLY_MS` breaks the per-frame cost down, `NR_COMPOSE_SCALAR` takes the
   scalar loops and `NR_COMPOSE_CHECK` composes both ways and compares;
   `test/apply_bench.cpp` replays a frame dump through xBRZ and times it
