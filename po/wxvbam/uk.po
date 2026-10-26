@@ -484,7 +484,7 @@ msgstr "Рідше оновлення моделі при недосягенні
 
 #: dialogs/display-config.cpp:1353
 msgid "Compose at S&caled Height"
-msgstr ""
+msgstr "Створювати при &масштабованій висоті"
 
 #: dialogs/display-config.cpp:1354
 msgid ""
@@ -493,7 +493,7 @@ msgid ""
 " and it leaves the display filter's own detail on screen -- composed at full"
 " size the correction replaces it with the model's scaled-up output. The "
 "picture is sharper, and no longer the model's exactly."
-msgstr ""
+msgstr "Виправлення масштабованої висоти та розподілення в усьому кадрі без виходу з його власного розміру. Значно швидше за великих значень масштабування та залишення на екрані уточнення фільтру відображення, яке буде замінено на масштабоване виведення моделі сформованим виправленням у повному розмірі. Зображення чіткіше, але не сама модель."
 
 #: dialogs/display-config.cpp:1368
 msgid "&Pre-filter"
@@ -522,7 +522,7 @@ msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
 "DLSS-NR over that, as over a screenshot of the game. Scaled Height bounds "
 "the cost."
-msgstr ""
+msgstr "Масштабування показу фільтра відображення до вказаного розміру та застосування DLSS-NR, як до екранного кадру гри. Масштабована висота покращує продуктивність."
 
 #: dialogs/display-config.cpp:1381
 msgid "Apply:"
@@ -570,7 +570,7 @@ msgstr "Суміш зображення моделі з зображенням �
 
 #: dialogs/display-config.cpp:1414
 msgid "Scaled Height:"
-msgstr ""
+msgstr "Масштабована висота:"
 
 #: dialogs/display-config.cpp:1415 dialogs/display-config.cpp:1455
 msgid "px"
@@ -2348,7 +2348,7 @@ msgstr "Рідший запуск DLSS NR при недосягненні час
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid ""
 "Lay DLSS NR's correction down at the scaled height rather than the frame's"
-msgstr ""
+msgstr "Розміщення виправлення DLSS NR на масштабованій, а не кадровій висоті."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "DLSS NR style index; -1 keeps the profile's"
