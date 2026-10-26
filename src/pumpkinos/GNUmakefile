@@ -29,7 +29,11 @@ else
 ifeq ($(UNAME_S),msys2)
 SYS_OS ?= 2
 else
+ifeq ($(UNAME_S),Android)
+SYS_OS=4
+else
 SYS_OS ?= 1
+endif
 endif
 endif
 
@@ -37,6 +41,8 @@ ifeq ($(findstring arm,$(UNAME_M)),arm)
 SYS_CPU ?= 1
 else ifeq ($(UNAME_M),aarch64)
 SYS_CPU ?= 1
+else ifeq ($(UNAME_M),riscv64)
+SYS_CPU ?= 3
 else
 SYS_CPU ?= 2
 endif
@@ -62,8 +68,34 @@ CXX = clang++ -arch x86_64 -arch arm64 -mmacosx-version-min=10.15
 LINKFLAGS = -dynamiclib
 PICFLAG = -fPIC
 OSDEFS = -DDARWIN -Wno-invalid-pp-token -Wno-string-plus-int -Wno-typedef-redefinition
+else ifeq ($(UNAME_S),Android)
+ifeq ($(NDK),)
+$(error You must define the NDK environment variable)
+endif
+ifeq ($(UNAME_M),i686)
+ANDROID_ARCH=--target=i686-none-linux-androideabi26
+else ifeq ($(UNAME_M),x86_64)
+ANDROID_ARCH=--target=x86_64-none-linux-android26
+else ifeq ($(UNAME_M),riscv64)
+ANDROID_ARCH=--target=riscv64-none-linux-android35
 else
-ifeq ($(UNAME_S),msdosdjgpp)
+ifeq ($(BITS),32)
+ANDROID_ARCH=--target=armv7-none-linux-androideabi26 -march=armv7-a -mthumb
+else
+ANDROID_ARCH=--target=aarch64-none-linux-android26
+endif
+endif
+OSLDEFS=$(ANDROID_ARCH) --gcc-toolchain=$(NDK) --sysroot=$(NDK)/sysroot -fPIC -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--fatal-warnings -Wl,--exclude-libs,libunwind.a -Wl,--no-undefined -Qunused-arguments
+EXTLIBS=-llog -latomic
+SOEXT=.so
+LUAPLAT=linux
+OS=Android
+OSDEFS=$(ANDROID_ARCH) --gcc-toolchain=$(NDK) --sysroot=$(NDK)/sysroot -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -DANDROID -DSOEXT=\"$(SOEXT)\"
+CC=$(NDK)/bin/clang
+CXX = $(NDK)/bin/clang++
+LINKFLAGS = -shared $(OSLDEFS)
+PICFLAG = -fPIC
+else ifeq ($(UNAME_S),msdosdjgpp)
 CXX = i686-pc-msdosdjgpp-g++
 # DJGPP has no position-independent code (-fPIC is "ignored" with a notice)
 PICFLAG =
@@ -82,7 +114,6 @@ CXX = g++
 LINKFLAGS = -shared
 PICFLAG = -fPIC
 OSDEFS = -DLINUX
-endif
 endif
 
 # Core defines, mirroring src/libretro/CMakeLists.txt. __LIBRETRO__ is
@@ -197,7 +228,7 @@ endif
 # __pthread_sleep/usleep/detach; see src/sdl/dos-libstdcxx-shims.c) are
 # installed into $(PUMPKIN)/src/msdos, whose GNUmakefile compiles whatever
 # dxe*.c it finds there into pumpkin.exe. Relink pumpkin.exe after this
-# (make OSNAME=msdosdjgpp MACHINE=i686 -f GNUMakefile -C $(PUMPKIN)/src/msdos),
+# (make OSNAME=msdosdjgpp UNAME_M=i686 -f GNUMakefile -C $(PUMPKIN)/src/msdos),
 # or dlopen fails with "unresolved symbol" on the module's first import.
 dxesyms.c: $(PROGRAM).dlib dxe3res.py
 	@echo Generating $@
