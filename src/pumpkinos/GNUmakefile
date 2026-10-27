@@ -26,7 +26,7 @@ UNAME_M := $(shell uname -m)
 ifeq ($(UNAME_S),msdosdjgpp)
 SYS_OS ?= 7
 else
-ifeq ($(UNAME_S),msys2)
+ifeq ($(UNAME_S),Msys)
 SYS_OS ?= 2
 else
 ifeq ($(UNAME_S),Android)
