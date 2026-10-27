@@ -123,9 +123,10 @@ On the M1, `test_gemm_residual`, `test_staged32`, `test_staged_partial`,
 
 - Only an M6 was measured. The M5 is assumed to behave the same because it is in the
   same family and has the same matrix units, but it has not been run.
-- The window-gathered A (0x400000) still runs the hand-written loop in the Metal 4
-  library, so on an M6 it sums in the loops' order while the other GEMMs use
-  matmul2d's. `test_window_residual` and `test_staged_partial` pass on the M6, but
-  any new fused pass that must equal a window-gathered GEMM has to sum the same way.
+- A window-gathered A (0x400000) always goes to the staged kernel, which in the Metal 4
+  library gathers each K step's rows into threadgroup memory and runs matmul2d on them,
+  accumulating in registers. So it sums in matmul2d's order like every other GEMM. Only
+  the direct kernel keeps the hand-written loop for a gathered A, and nothing routes one
+  there.
 - 16 x 128 on two simdgroups was as good as 16 x 64 on one. It was not built, because
   the 16 x 64 needed only a template instance of the kernel that was already there.

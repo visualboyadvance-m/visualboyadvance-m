@@ -44,7 +44,9 @@ constant uint TM = 8, TN = 16, TK = 16;
  * (notes/phase79), so the two libraries differ in the last bit on an M5 and later. The
  * fused kernels take their products on matmul2d too (nr_epilogue.h's nr_mm), so each
  * still equals its unfused passes everywhere. The window-gathered A (0x400000) has no
- * tensor form and keeps the hand-written loop. */
+ * tensor form: these direct kernels keep the hand-written loop for it, and the staged
+ * kernel, which libmetalmx always routes it to, gathers each K step into threadgroup
+ * memory for matmul2d. */
 #ifdef NR_METAL4
 #include <metal_tensor>
 #include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>
