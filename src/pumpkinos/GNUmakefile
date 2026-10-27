@@ -7,7 +7,7 @@
 #
 # Usage:
 #   make PUMPKIN=/path/to/PumpkinOS        (default below)
-#   make UNAME_S=msdosdjgpp                 (MS-DOS: VBAM.dlib is a DXE3
+#   make OSNAME=msdosdjgpp                 (MS-DOS: VBAM.dlib is a DXE3
 #                                            module, see the link rule)
 
 PUMPKIN ?= ${HOME}/Downloads/PumpkinOS
@@ -17,19 +17,20 @@ PROGRAM = VBAM
 APPNAME = VBAM
 APPID   = VBAM
 
-UNAME_S := $(shell uname -s)
-UNAME_M := $(shell uname -m)
+OSNAME := $(shell uname -s)
+REAL_OSNAME := $(shell uname -o)
+MACHINE := $(shell uname -m)
 
 # The SYS_* triple must match the one baked into $(PUMPKIN)/bin/libpumpkin:
 # at runtime the app's native code is loaded from the PRC resource
 # 'dlib' id = SYS_OS*64 + SYS_CPU*8 + SYS_SIZE.
-ifeq ($(UNAME_S),msdosdjgpp)
+ifeq ($(OSNAME),msdosdjgpp)
 SYS_OS ?= 7
 else
-ifeq ($(UNAME_S),Msys)
+ifeq ($(OSNAME),Msys)
 SYS_OS ?= 2
 else
-ifeq ($(UNAME_S),Android)
+ifeq ($(OSNAME),Android)
 SYS_OS=4
 else
 SYS_OS ?= 1
@@ -37,19 +38,19 @@ endif
 endif
 endif
 
-ifeq ($(findstring arm,$(UNAME_M)),arm)
+ifeq ($(findstring arm,$(MACHINE)),arm)
 SYS_CPU ?= 1
-else ifeq ($(UNAME_M),aarch64)
+else ifeq ($(MACHINE),aarch64)
 SYS_CPU ?= 1
-else ifeq ($(UNAME_M),riscv64)
+else ifeq ($(MACHINE),riscv64)
 SYS_CPU ?= 3
 else
 SYS_CPU ?= 2
 endif
 
-ifeq ($(UNAME_M),i686)
+ifeq ($(MACHINE),i686)
 SYS_SIZE ?= 1
-else ifeq ($(findstring arm,$(UNAME_M)),arm)
+else ifeq ($(findstring arm,$(MACHINE)),arm)
 SYS_SIZE ?= 1
 else
 SYS_SIZE ?= 2
@@ -63,20 +64,20 @@ DLIB := $(shell printf "dlib%04x.bin" $(DLIBID))
 PILRC = $(PUMPKIN)/tools/pilrc -q -allowLargeRes
 PRCBUILD = $(PUMPKIN)/tools/prcbuild
 
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(OSNAME),Darwin)
 CXX = clang++ -arch x86_64 -arch arm64 -mmacosx-version-min=10.15
 LINKFLAGS = -dynamiclib
 PICFLAG = -fPIC
 OSDEFS = -DDARWIN -Wno-invalid-pp-token -Wno-string-plus-int -Wno-typedef-redefinition
-else ifeq ($(UNAME_S),Android)
+else ifeq ($(OSNAME),Android)
 ifeq ($(NDK),)
 $(error You must define the NDK environment variable)
 endif
-ifeq ($(UNAME_M),i686)
+ifeq ($(MACHINE),i686)
 ANDROID_ARCH=--target=i686-none-linux-androideabi26
-else ifeq ($(UNAME_M),x86_64)
+else ifeq ($(MACHINE),x86_64)
 ANDROID_ARCH=--target=x86_64-none-linux-android26
-else ifeq ($(UNAME_M),riscv64)
+else ifeq ($(MACHINE),riscv64)
 ANDROID_ARCH=--target=riscv64-none-linux-android35
 else
 ifeq ($(BITS),32)
@@ -95,7 +96,7 @@ CC=$(NDK)/bin/clang
 CXX = $(NDK)/bin/clang++
 LINKFLAGS = -shared $(OSLDEFS)
 PICFLAG = -fPIC
-else ifeq ($(UNAME_S),msdosdjgpp)
+else ifeq ($(OSNAME),msdosdjgpp)
 CXX = i686-pc-msdosdjgpp-g++
 # DJGPP has no position-independent code (-fPIC is "ignored" with a notice)
 PICFLAG =
@@ -109,6 +110,17 @@ ifeq ($(DXE3GEN),)
 DXE3GEN = $(OBJDIR)/dxe3gen
 DXE3GEN_DEP = $(OBJDIR)/dxe3gen
 endif
+else ifeq ($(OSNAME),Msys)
+CC=$(MACHINE)-pc-mingw32-gcc
+CXX=$(MACHINE)-pc-mingw32-g++
+WINDRES=$(MACHINE)-pc-mingw32-windres
+LINKFLAGS = -shared
+PICFLAG = -fPIC
+EXTLIBS=-lws2_32
+SOEXT=.dll
+LUAPLAT=mingw
+OS=Windows
+OSDEFS=$(MBITS) -DWINDOWS -DWINDOWS$(BITS) -DSOEXT=\"$(SOEXT)\"
 else
 CXX = g++
 LINKFLAGS = -shared
@@ -188,7 +200,7 @@ OBJS = $(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(GLUE_SRCS) $(CORE_SRCS)))
 vpath %.cpp . $(sort $(dir $(addprefix $(VBAM_SRC)/,$(CORE_SRCS))))
 
 all: $(PROGRAM).prc
-ifeq ($(UNAME_S),msdosdjgpp)
+ifeq ($(OSNAME),msdosdjgpp)
 all: dxesyms.c
 endif
 
@@ -212,13 +224,13 @@ $(OBJDIR)/dxe3gen:
 
 $(PROGRAM).dlib: $(OBJS) $(DXE3GEN_DEP)
 	@echo Linking $(PROGRAM).dlib
-ifeq ($(UNAME_S),msdosdjgpp)
+ifeq ($(OSNAME),msdosdjgpp)
 	@$(DXE3GEN) -o $@ -U -E _PilotMain -D "VBA-M" $(OBJS)
 	@test -f $@ || { echo "$(DXE3GEN) failed (it exits 0 when its link step fails)"; exit 1; }
 else
 	@$(CXX) $(LINKFLAGS) -o $@ $(OBJS) -L$(PUMPKIN)/bin -lpumpkin -lpit
 endif
-ifeq ($(UNAME_S),Darwin)
+ifeq ($(OSNAME),Darwin)
 	@codesign -f -s "Developer ID Application" $@ 2>/dev/null || codesign -f -s - $@
 endif
 
@@ -228,7 +240,7 @@ endif
 # __pthread_sleep/usleep/detach; see src/sdl/dos-libstdcxx-shims.c) are
 # installed into $(PUMPKIN)/src/msdos, whose GNUmakefile compiles whatever
 # dxe*.c it finds there into pumpkin.exe. Relink pumpkin.exe after this
-# (make OSNAME=msdosdjgpp UNAME_M=i686 -f GNUMakefile -C $(PUMPKIN)/src/msdos),
+# (make OSNAME=msdosdjgpp MACHINE=i686 -f GNUMakefile -C $(PUMPKIN)/src/msdos),
 # or dlopen fails with "unresolved symbol" on the module's first import.
 dxesyms.c: $(PROGRAM).dlib dxe3res.py
 	@echo Generating $@
