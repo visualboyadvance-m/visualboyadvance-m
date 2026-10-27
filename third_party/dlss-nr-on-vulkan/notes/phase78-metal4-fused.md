@@ -1,5 +1,9 @@
 # Phase 78 — the fused kernels' products on matmul2d, and a race on the M1
 
+> **Corrected by `phase79-m6-tiles.md`:** "Same bytes" below holds on the M1-M4 only. An
+> M6's matrix units sum in an order of their own, so there the two libraries differ in the
+> last bit; each still equals its own unfused passes.
+
 **2026-10-22, on an Apple M1 (macOS 27.2) over ssh; no M5 to hand.** Apple's M5 adds
 matrix units to every GPU core, and the way a Metal kernel reaches them is Metal 4's
 Metal Performance Primitives: `mpp::tensor_ops::matmul2d`. libmetalmx already carried a

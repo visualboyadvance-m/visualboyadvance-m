@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <time.h>
 #include <unistd.h>
 #include "xmx.h"
@@ -65,8 +66,10 @@
  * device and OS in MTLGPUFamilyMetal4 on the simdgroup path, unless XMX_METAL4=0;
  * everything else — an older macOS (the deployment target is 11), another GPU, the
  * portable path, an SDK too old to build it, an x86_64 build — keeps the Metal 3.1 library.
- * The two give the same bytes: matmul2d sums in the order the hand-written loops do
- * (measured on an M3 and an M1). */
+ * On an M1-M4 the two give the same bytes: matmul2d sums in the order the hand-written
+ * loops do (measured on an M3 and an M1). An M5 and later's matrix units sum in an order of
+ * their own, so there the two libraries differ in the last bit; each still equals itself,
+ * fused kernel against its unfused passes (notes/phase79). */
 #ifdef NR_EMBEDDED_METALLIB4
 #include "nr_metallib4.h"                     /* const unsigned char nr_metallib4[]; bin2c */
 #endif
@@ -127,7 +130,7 @@ static struct {
 	void *rint8;              /* the integer GEMM, built on first use */
 	void *rblock;             /* a 32-channel window block's attention half, likewise */
 	void *rglobal;            /* a bottleneck block's attention in one pass, likewise */
-	void *rwide;              /* the portable 16x64 build (family 12), portable path only */
+	void *rwide;              /* a 16x64 build (family 12): the portable one, or on matrix units the simdgroup one */
 	unsigned wide_calls;      /* how many GEMMs it has recorded */
 	unsigned portable_tiled;  /* XMX_PORTABLE_TILED=1: the 16x32 build takes every shape again */
 	char *rpaths[13];
@@ -143,6 +146,7 @@ static struct {
 	char name[256]; char err[512]; char memory[256];
 	int ready, lost, discrete, unmapped, coopmat, portable;
 	int metal4;               /* the Metal 4 library is the one loaded (or to be loaded) */
+	int matrix_units;         /* and the GPU has matrix units for its matmul2d: an M5 and later */
 	int half_bits;            /* half_round on the bits (function constant 2): the cast does not round */
 	int staged_packed;        /* the staged kernel's raw 128-bit operand copies (function constant 3) */
 	int portable_packed;      /* the portable GEMM's 16-byte A fetch (function constant 4), off */
@@ -265,7 +269,7 @@ unsigned xmx_coopvec_calls(void) { return 0; }
 
 /* The kernels the metallib carries, under the SPIR-V names every caller uses. */
 static const char *const kernel_names[] = {
-	"gemm_resident", "gemm_tiled", "gemm_staged", "resident", "attention", "attention_ab",
+	"gemm_resident", "gemm_tiled", "gemm_wide", "gemm_staged", "resident", "attention", "attention_ab",
 	"history", "gemm_coopmat", "gemm_batched", "gemm_f16acc", "gemm_portable",
 	"gemm_portable_tiled", "gemm_portable_wide", "gemm_portable_desc", "gemm_portable_batched",
 	"window_attention", "window_attention_portable", "ffn_fused", "ffn_fused_portable",
@@ -598,6 +602,10 @@ int xmx_open(void)
 		const char *forced = getenv("XMX_PORTABLE");
 		g.portable = !g.coopmat || (forced && *forced && atoi(forced) != 0);
 		g.metal4 = metal4_wanted();
+		/* MTLGPUFamilyApple10, by its value: the M5 and later, whose GPU cores carry matrix
+		 * units for matmul2d. The GEMMs route differently there (xmx_res_init). */
+		if (@available(macOS 26.0, iOS 26.0, *))
+			g.matrix_units = g.metal4 && [dev supportsFamily:(MTLGPUFamily)1010];
 		/* The recording orders its passes with memory barriers inside a concurrent encoder,
 		 * as the Vulkan one does with pipeline barriers. AMD's driver (a Vega 64 on macOS 15)
 		 * does not honour them for buffers reached through their GPU addresses -- neither the
@@ -914,6 +922,13 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	 * library, K >= 32 is the same bytes and 1.5 % slower (399-403 against 405-406 ms),
 	 * so the stem and the shallow GEMMs stay tiled here. XMX_STAGE_K=32 to compare. */
 	g.staging = sk ? (unsigned)atoi(sk) : 128;
+	/* On matrix units nothing is staged by default: matmul2d does better fetching its own
+	 * operands from device memory than from a copy in threadgroup memory. On an M6 the staged
+	 * kernel's 64x32 block ran the frame's deep GEMMs at 0.37-0.51 of the best direct block,
+	 * and a 720x480 frame went from 31.2 to 28.2 ms with them on the direct kernels, the same
+	 * bytes. On an M1 the same routing was neither faster nor slower (192-197 ms either way),
+	 * so the M1-M4 keep theirs. (The pool still takes the staged kernel, as it must.) */
+	if (!sk && g.matrix_units) g.staging = UINT_MAX;
 	/* As in libxmx: the staged kernel takes a partial last 64-row block itself, so the
 	 * deeper levels' 144- or 400-row GEMMs need not drop to the tiled kernel. 0 is the
 	 * comparison. */
@@ -934,6 +949,18 @@ int xmx_res_init(const char *gemm_spv, const char *unary_spv, const char *row_sp
 	const char *wide_env = getenv("XMX_PORTABLE_WIDE");
 	if (g.portable && wide_env && atoi(wide_env) != 0) {
 		g.rpaths[12] = strdup("gemm_portable_wide.spv");
+		@autoreleasepool {
+			if (!g.rpaths[12] || build_pipeline(g.rpaths[12], &g.rwide)) g.rwide = NULL;
+		}
+	}
+	/* And on matrix units the simdgroup 16x64 build, for N a multiple of 64, where matmul2d
+	 * ran the deep shapes at 0.99 of its best block against the 16x32's 0.87-0.93 (an M6,
+	 * notes/phase79). XMX_METAL_WIDE=0 keeps the 16x32 everywhere, =1 asks for the 16x64 on
+	 * any simdgroup path. */
+	const char *metal_wide = getenv("XMX_METAL_WIDE");
+	int want_wide = metal_wide && *metal_wide ? atoi(metal_wide) != 0 : g.matrix_units;
+	if (!g.portable && want_wide) {
+		g.rpaths[12] = strdup("gemm_wide.spv");
 		@autoreleasepool {
 			if (!g.rpaths[12] || build_pipeline(g.rpaths[12], &g.rwide)) g.rwide = NULL;
 		}

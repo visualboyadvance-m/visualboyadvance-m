@@ -7,6 +7,8 @@ the tiled or 8x16 kernel on identical inputs the output must match byte for byte
 published, a transposed B, a batch, the fused residual with a float32 and a half skip — and
 nothing past M rows may be written. The profiler's per-kernel counts show which kernel ran.
 """
+import os
+
 import numpy as np
 import xmxres as X
 
@@ -30,6 +32,11 @@ def staged_count(lib):
 
 
 def main():
+    # This tests the staged kernel, so it asks for it where libmetalmx's own routing would
+    # not use it: on an M5 and later nothing is staged by default (notes/phase79). 128 is the
+    # threshold libmetalmx stages at everywhere else, so on any other Mac this changes nothing.
+    if os.environ.get('NR_GPU_BACKEND') == 'metal':
+        os.environ.setdefault('XMX_STAGE_K', '128')
     rt = X.Runtime()
     # No staged kernel to route to: without matrix units (MoltenVK, a phone, XMX_PORTABLE=1,
     # Direct3D 12) every runtime skips the staged shape, and a matrix device without

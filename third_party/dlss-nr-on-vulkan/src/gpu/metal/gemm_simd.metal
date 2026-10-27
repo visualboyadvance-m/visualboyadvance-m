@@ -37,11 +37,14 @@ constant uint TM = 8, TN = 16, TK = 16;
  * tensors made in place from the operand addresses — its own operand pipeline, which on
  * an M3 runs the large shapes at up to twice the hand-written staged loop's speed — and
  * keep everything around it: the block geometry, the dispatch, the stage and every fused
- * epilogue. Measured on the M3, matmul2d in multiply mode with the K extent dynamic sums
- * each output in the order the loops below do, eight K at a time from zero, so the two
- * libraries give the same bytes; the fused kernels take their products on matmul2d too
- * (nr_epilogue.h's nr_mm), so each still equals its unfused passes. The window-gathered A
- * (0x400000) has no tensor form and keeps the hand-written loop. */
+ * epilogue. Measured on the M3 and the M1, matmul2d in multiply mode with the K extent
+ * dynamic sums each output in the order the loops below do, eight K at a time from zero,
+ * so there the two libraries give the same bytes. On an M6's matrix units it does not: no
+ * shape matched the loops, though every matmul2d block and K step matched every other
+ * (notes/phase79), so the two libraries differ in the last bit on an M5 and later. The
+ * fused kernels take their products on matmul2d too (nr_epilogue.h's nr_mm), so each
+ * still equals its unfused passes everywhere. The window-gathered A (0x400000) has no
+ * tensor form and keeps the hand-written loop. */
 #ifdef NR_METAL4
 #include <metal_tensor>
 #include <MetalPerformancePrimitives/MetalPerformancePrimitives.h>
@@ -265,6 +268,10 @@ kernel void gemm_resident_t(constant Push &pc [[buffer(0)]],
 
 template [[host_name("gemm_resident")]] kernel void gemm_resident_t<1, 1>(constant Push &, uint3, uint);
 template [[host_name("gemm_tiled")]]    kernel void gemm_resident_t<2, 2>(constant Push &, uint3, uint);
+/* A 16x64 block, for an M5 and later (libmetalmx routes it there, notes/phase79): on an
+ * M6's matrix units matmul2d ran the frame's deep shapes at 0.99 of its best this way
+ * against 0.87-0.93 for the 16x32 block. */
+template [[host_name("gemm_wide")]]     kernel void gemm_resident_t<2, 4>(constant Push &, uint3, uint);
 
 /* -- the staged GEMM: a 64x32 block, both operands through threadgroup memory ---------- */
 
