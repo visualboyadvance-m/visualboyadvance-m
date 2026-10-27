@@ -1327,11 +1327,15 @@ foreach(candidate "${PROJECT_SOURCE_DIR}/dlssnr-logical.safetensors" "${NR_WORK_
     set(nr_prepare_source --weights "${candidate}")
   endif()
 endforeach()
-add_custom_target(prepare_weights
-  COMMAND "${CMAKE_COMMAND}" -E make_directory "${NR_WORK_DIR}/mlxw"
-  COMMAND $<TARGET_FILE:nr_frame_cli> --prepare "${NR_PREPARED_FILE}" ${nr_prepare_source}
-  DEPENDS nr_frame_cli
-  COMMENT "nr_frame --prepare ${NR_PREPARED_FILE} ${nr_prepare_source}" VERBATIM)
+# Only with the command, which needs libpng: a cross build without one for its target failed
+# to configure here.
+if(TARGET nr_frame_cli)
+  add_custom_target(prepare_weights
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${NR_WORK_DIR}/mlxw"
+    COMMAND $<TARGET_FILE:nr_frame_cli> --prepare "${NR_PREPARED_FILE}" ${nr_prepare_source}
+    DEPENDS nr_frame_cli
+    COMMENT "nr_frame --prepare ${NR_PREPARED_FILE} ${nr_prepare_source}" VERBATIM)
+endif()
 
 add_executable(test_nr_frame src/ref/test_nr_frame.c)
 target_include_directories(test_nr_frame PRIVATE src/ref)

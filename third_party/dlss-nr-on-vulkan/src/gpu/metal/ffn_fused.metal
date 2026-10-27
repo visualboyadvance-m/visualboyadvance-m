@@ -7,6 +7,7 @@
  * the branched blocks' two grouped GEMMs): each accumulator takes the same terms in the
  * same order the GEMM kernel of the same path gives it — ascending 8-wide K slices on
  * the simdgroup path (every simdgroup GEMM here, tiled or staged, goes up K that way),
+ * matmul2d's order in the Metal 4 library (its own on an M5 and later, notes/phase79),
  * one term at a time on the portable path — and the publishes and the residual are
  * nr_epilogue.h's.
  *
@@ -228,6 +229,49 @@ kernel void ffn_fused(constant Push &pc [[buffer(0)]],
             ffn_store(pc, flags, stage, row, group, ldc, sl);
             return;
         }
+    } else if (!made) {
+        /* The other shapes — the weights from device memory, the widths the push's — on
+         * matmul2d as well. The unfused passes this must equal take their products on it in
+         * the Metal 4 library, and on an M6 its matrix units sum in an order of their own:
+         * left on the loops below, this path disagreed with them there (on the M1 and the
+         * M3 the two orders are one). A made input comes only with the staged shape. */
+        using namespace mpp::tensor_ops;
+        constexpr auto ed = matmul2d_descriptor(16, 32, static_cast<int>(dynamic_extent), false, false, false);
+        matmul2d<ed, execution_simdgroups<1>> expand;
+        constexpr auto pd = matmul2d_descriptor(16, 32, 32, false, false, false,
+                                                matmul2d_descriptor::mode::multiply_accumulate);
+        matmul2d<pd, execution_simdgroups<1>> project;
+        tensor<device half, dextents<int32_t, 2>, tensor_inline> tA(
+            const_cast<device half *>(A) + row * cin, dextents<int32_t, 2>(cin, 16), array<int32_t, 2>({1, (int)cin}));
+        tensor<device half, dextents<int32_t, 2>, tensor_inline> tE(
+            const_cast<device half *>(E), dextents<int32_t, 2>(width, cin), array<int32_t, 2>({1, (int)width}));
+        tensor<device half, dextents<int32_t, 2>, tensor_inline> tP(
+            const_cast<device half *>(P), dextents<int32_t, 2>(32, width), array<int32_t, 2>({1, 32}));
+        auto tS = nr_view<32, 16>(stage, 32);
+        auto tH = nr_view<32, 16>(hidden, 32);
+        auto mP0 = tP.template slice<32, 32>(0, 0);
+        auto acc = project.template get_destination_cooperative_tensor<decltype(tH), decltype(mP0), float>();
+        for (uint16_t i = 0; i < acc.get_capacity(); ++i)
+            if (acc.is_valid_element(i)) acc[i] = 0.0f;
+        for (uint chunk = 0u; chunk < width; chunk += F_CHUNK) {
+            auto mE = tE.slice((int)chunk, 0);
+            expand.run(tA, mE, tS);
+            simdgroup_barrier(mem_flags::mem_threadgroup);
+            /* the gate and publish, every value into registers before the halves overwrite
+             * the stage's first kilobyte */
+            half gated[F_ROWS * F_CHUNK / 32u];
+            for (uint t = 0u; t < F_ROWS * F_CHUNK / 32u; t++) gated[t] = half(publish(3u, stage[sl + t * 32u]));
+            simdgroup_barrier(mem_flags::mem_threadgroup);
+            for (uint t = 0u; t < F_ROWS * F_CHUNK / 32u; t++) hidden[sl + t * 32u] = gated[t];
+            simdgroup_barrier(mem_flags::mem_threadgroup);
+            auto mP = tP.template slice<32, 32>(0, (int)chunk);
+            project.run(tH, mP, acc);
+            simdgroup_barrier(mem_flags::mem_threadgroup);  /* the next chunk overwrites it */
+        }
+        acc.store(tS);
+        simdgroup_barrier(mem_flags::mem_threadgroup);
+        ffn_store(pc, flags, stage, row, group, ldc, sl);
+        return;
     } else
 #endif
     {
