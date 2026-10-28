@@ -25,7 +25,7 @@ MACHINE := $(shell uname -m)
 # at runtime the app's native code is loaded from the PRC resource
 # 'dlib' id = SYS_OS*64 + SYS_CPU*8 + SYS_SIZE.
 ifeq ($(OSNAME),msdosdjgpp)
-SYS_OS ?= 7
+SYS_OS ?= 8
 else
 ifeq ($(OSNAME),Msys)
 SYS_OS ?= 2
