@@ -116,7 +116,7 @@ CXX=$(MACHINE)-pc-mingw32-g++
 WINDRES=$(MACHINE)-pc-mingw32-windres
 LINKFLAGS = -shared
 PICFLAG = -fPIC
-EXTLIBS=-lws2_32
+EXTLIBS=-lws2_32 -lwinpthread
 SOEXT=.dll
 LUAPLAT=mingw
 OS=Windows
@@ -228,7 +228,7 @@ ifeq ($(OSNAME),msdosdjgpp)
 	@$(DXE3GEN) -o $@ -U -E _PilotMain -D "VBA-M" $(OBJS)
 	@test -f $@ || { echo "$(DXE3GEN) failed (it exits 0 when its link step fails)"; exit 1; }
 else
-	@$(CXX) $(LINKFLAGS) -o $@ $(OBJS) -L$(PUMPKIN)/bin -lpumpkin -lpit
+	@$(CXX) $(LINKFLAGS) -o $@ $(OBJS) -L$(PUMPKIN)/bin -lpumpkin -lpit $(EXTLIBS)
 endif
 ifeq ($(OSNAME),Darwin)
 	@codesign -f -s "Developer ID Application" $@ 2>/dev/null || codesign -f -s - $@
