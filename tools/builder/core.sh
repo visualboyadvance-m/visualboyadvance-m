@@ -147,39 +147,39 @@ ORIG_PATH=$PATH
 #PRE_BUILD_DISTS="$PRE_BUILD_DISTS bzip2 xz 7zip"
 
 DISTS=$DISTS'
-    xz              https://tukaani.org/xz/xz-5.8.3.tar.gz                                                      lib/liblzma.a
-    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.19.tar.gz                                   lib/libiconv.a
+    xz              https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz              lib/liblzma.a
+    libiconv        https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.19.1.tar.gz                                 lib/libiconv.a
     zlib-ng         https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.3.3.tar.gz                           lib/libz.a
-    libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.4.2.tar.xz                              lib/libunistring.a
+    libunistring    https://ftp.gnu.org/gnu/libunistring/libunistring-1.5.tar.xz                                lib/libunistring.a
     zstd            https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz                 lib/libzstd.a
     libdeflate      https://github.com/ebiggers/libdeflate/releases/download/v1.26/libdeflate-1.26.tar.gz       lib/libdeflate.a
     gettext         http://ftp.gnu.org/pub/gnu/gettext/gettext-1.0.tar.xz                                       lib/libintl.a
-    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2     lib/libpcre2-posix.a
+    pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.49/pcre2-10.49.tar.bz2     lib/libpcre2-posix.a
     libffi          https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz               lib/libffi.a
-    expat           https://github.com/libexpat/libexpat/releases/download/R_2_8_4/expat-2.8.4.tar.xz           lib/libexpat.a
-    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.3/libxml2-v2.15.3.tar.bz2            lib/libxml2.a
-    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.xz          lib/libpng.a
-    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.2.0.tar.gz                         lib/libjpeg.a
+    expat           https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz           lib/libexpat.a
+    libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.4/libxml2-v2.15.4.tar.bz2            lib/libxml2.a
+    libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.59/libpng-1.6.59.tar.xz          lib/libpng.a
+    libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.2.1.tar.gz                         lib/libjpeg.a
     libtiff         https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz                                        lib/libtiff.a
     libuuid         https://downloads.sourceforge.net/project/libuuid/libuuid-1.0.3.tar.gz                      lib/libuuid.a
-    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-14-3/freetype-VER-2-14-3.tar.bz2 lib/libfreetype.a
+    freetype        https://gitlab.freedesktop.org/freetype/freetype/-/archive/VER-2-15-0/freetype-VER-2-15-0.tar.bz2 lib/libfreetype.a
     fontconfig      https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.3/fontconfig-2.18.3.tar.bz2 lib/libfontconfig.a
-    glib            https://download.gnome.org/sources/glib/2.88/glib-2.88.3.tar.xz                             lib/libglib-2.0.a
-    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.3.tar.bz2                             lib/libgcrypt.a
-    libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.7/libsecret-0.21.7.tar.bz2          lib/libsecret-1.a
-    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.14/SDL3-3.4.14.tar.gz       lib/libSDL3.a
-    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.08.tar.gz                            lib/libFAudio.a
-    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/14.4.0/harfbuzz-14.4.0.tar.xz        lib/libharfbuzz.a
+    glib            https://download.gnome.org/sources/glib/2.90/glib-2.90.1.tar.xz                             lib/libglib-2.0.a
+    libgcrypt       https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.12.4.tar.bz2                             lib/libgcrypt.a
+    libsecret       https://gitlab.gnome.org/GNOME/libsecret/-/archive/0.21.8.2/libsecret-0.21.8.2.tar.bz2      lib/libsecret-1.a
+    sdl3            https://github.com/libsdl-org/SDL/releases/download/release-3.4.18/SDL3-3.4.18.tar.gz       lib/libSDL3.a
+    faudio          https://github.com/FNA-XNA/FAudio/archive/refs/tags/26.10.tar.gz                            lib/libFAudio.a
+    harfbuzz        https://github.com/harfbuzz/harfbuzz/releases/download/15.0.0/harfbuzz-15.0.0.tar.xz        lib/libharfbuzz.a
     libmspack       https://github.com/kyz/libmspack/archive/refs/tags/v1.11.tar.gz                             lib/libmspack.a
     giflib          https://sourceforge.net/projects/giflib/files/giflib-6.1.3.tar.gz/download                  lib/libgif.a
     libwebp         https://github.com/webmproject/libwebp/archive/refs/tags/v1.6.0.tar.gz                      lib/libwebp.a
     fmt             https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip                       lib/libfmt.a
     lua             https://www.lua.org/ftp/lua-5.5.1.tar.gz                                                    lib/liblua.a
-    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.3/wxWidgets-3.3.3.tar.bz2     lib/libwx_baseu-3.*.a
+    wxwidgets       https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.4/wxWidgets-3.3.4.tar.bz2     lib/libwx_baseu-3.*.a
     libx264         https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.bz2                lib/libx264.a
     libx265         https://github.com/Multicorewareinc/x265/releases/download/4.3/x265_4.3.tar.gz              lib/libx265.a
-    ffmpeg          http://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz                                              lib/libavformat.a
-    VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.357.tar.gz            include/vulkan/vulkan.h
+    ffmpeg          http://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz                                              lib/libavformat.a
+    VulkanHeaders   https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.367.tar.gz            include/vulkan/vulkan.h
     MoltenVK        https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.2/MoltenVK-macos.tar        lib/libMoltenVK.a
 '
 
