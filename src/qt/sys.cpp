@@ -1522,7 +1522,7 @@ bool debugStartListen(int port)
     remoteRecvFnc = debugReadSock;
     remoteCleanUpFnc = debugCloseSock;
 
-    if (debug_server->listen(QHostAddress::Any, static_cast<quint16>(port)))
+    if (debug_server->listen(QHostAddress::LocalHost, static_cast<quint16>(port)))
         return true;
 
     vbam::LogError(TR("Error setting up GDB server socket on port %1").arg(port));

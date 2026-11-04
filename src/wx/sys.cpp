@@ -1579,10 +1579,13 @@ bool debugStartListen(int port)
     delete debug_remote;
     debug_remote = NULL;
     wxIPV4address addr;
-    // Service() must be called *after* AnyAddress(), because AnyAddress()
+    // Service() must be called *after* LocalHost(), because address setters
     // can reset the port on some wx builds. Without this the server binds
     // to port 0 and is effectively unreachable.
-    addr.AnyAddress();
+    if (!addr.LocalHost()) {
+        wxLogError(_("Error setting up GDB server loopback address"));
+        return false;
+    }
     if (!addr.Service(port)) {
         wxLogError(_("Invalid GDB server port %d"), port);
         return false;
