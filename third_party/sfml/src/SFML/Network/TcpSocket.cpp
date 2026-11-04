@@ -50,6 +50,10 @@ constexpr int flags = MSG_NOSIGNAL;
 #else
 constexpr int flags = 0;
 #endif
+
+// The largest VBA-M link packet is below 1 MiB, even when all four RFU
+// players have every queue entry filled with the maximum payload.
+constexpr std::uint32_t maxPacketSize = 1024 * 1024;
 } // namespace
 
 namespace sf
@@ -373,6 +377,12 @@ Socket::Status TcpSocket::receive(Packet& packet)
     {
         // The packet size has already been received in a previous call
         packetSize = ntohl(m_pendingPacket.size);
+    }
+
+    if (packetSize > maxPacketSize)
+    {
+        m_pendingPacket = PendingPacket();
+        return Status::Error;
     }
 
     // Loop until we receive all the packet data
