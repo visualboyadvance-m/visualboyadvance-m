@@ -458,6 +458,27 @@ typedef struct {
     uint32_t core_clock[4];
 } LINKDATA;
 
+static constexpr int kRfuMaxGbas = 5;
+static constexpr uint16_t kRfuStationIdBase = 0x61f1;
+
+static bool IsValidRfuGbaId(int id, int num_gbas)
+{
+    return id >= 0 && id < num_gbas && id < kRfuMaxGbas;
+}
+
+static bool RfuStationIdToGbaId(uint16_t station_id, int num_gbas, int* id)
+{
+    if (station_id < kRfuStationIdBase)
+        return false;
+
+    const int candidate = (station_id - kRfuStationIdBase) >> 3;
+    if (!IsValidRfuGbaId(candidate, num_gbas))
+        return false;
+
+    *id = candidate;
+    return true;
+}
+
 // A fresh IPC session's topology: the creator alone, in slot 0, nothing in
 // flight.
 static void LinkTopologyInit(LINKDATA* d)
@@ -483,7 +504,7 @@ public:
     sf::IpAddress udpaddr[5] = { sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0}, sf::IpAddress{0} };
     RFUServer(void);
     sf::Packet& Serialize(sf::Packet& packet, int slave);
-    void DeSerialize(sf::Packet& packet, int slave);
+    bool DeSerialize(sf::Packet& packet, int slave);
     void Send(void);
     void Recv(void);
 };
@@ -500,7 +521,7 @@ public:
     void Send(void);
     void Recv(void);
     sf::Packet& Serialize(sf::Packet& packet);
-    void DeSerialize(sf::Packet& packet);
+    bool DeSerialize(sf::Packet& packet);
     void CheckConn(void);
 };
 
@@ -3440,8 +3461,12 @@ sf::Packet& RFUServer::Serialize(sf::Packet& packet, int slave)
     return packet;
 }
 
-void RFUServer::DeSerialize(sf::Packet& packet, int slave)
+bool RFUServer::DeSerialize(sf::Packet& packet, int slave)
 {
+    const int max_clients = std::min<int>(MAX_CLIENTS, kRfuMaxGbas);
+    if (!IsValidRfuGbaId(slave, max_clients))
+        return false;
+
     bool slave_is_host = false;
     packet >> slave_is_host;
     packet >> rfu_data.rfu_reqid[slave];
@@ -3451,25 +3476,43 @@ void RFUServer::DeSerialize(sf::Packet& packet, int slave)
             packet >> rfu_data.rfu_broadcastdata[slave][j];
     }
 
-    for (int i = 0; i < MAX_CLIENTS; i++) {
+    for (int i = 0; i < max_clients; i++) {
         if (i != slave) {
+            uint16_t client_index = 0;
+            uint8_t is_host = 0;
             uint8_t num_data_sent = 0;
-            packet >> rfu_data.rfu_clientidx[i];
-            packet >> rfu_data.rfu_is_host[i];
+            packet >> client_index;
+            packet >> is_host;
             packet >> num_data_sent;
 
+            if (!packet || client_index >= max_clients)
+                return false;
+
+            rfu_data.rfu_clientidx[i] = client_index;
+            rfu_data.rfu_is_host[i] = is_host;
+
             for (int j = rfu_data.rfu_listback[i]; j <= (rfu_data.rfu_listback[i] + num_data_sent); j++) {
-                packet >> rfu_data.rfu_datalist[i][j & 0xff].len;
+                rfu_datarec record{};
+                packet >> record.len;
 
-                for (int k = 0; k < rfu_data.rfu_datalist[i][j & 0xff].len; k++)
-                    packet >> rfu_data.rfu_datalist[i][j & 0xff].data[k];
+                for (int k = 0; k < record.len; k++)
+                    packet >> record.data[k];
 
-                packet >> rfu_data.rfu_datalist[i][j & 0xff].gbaid;
+                packet >> record.gbaid;
+                if (!packet || !IsValidRfuGbaId(record.gbaid, max_clients))
+                    return false;
+
+                rfu_datarec& destination = rfu_data.rfu_datalist[i][j & 0xff];
+                destination.len = record.len;
+                memcpy(destination.data, record.data, record.len * sizeof(record.data[0]));
+                destination.gbaid = record.gbaid;
             }
 
             rfu_data.rfu_listback[i] = (rfu_data.rfu_listback[i] + num_data_sent) & 0xff;
         }
     }
+
+    return static_cast<bool>(packet);
 }
 
 void RFUServer::Send(void)
@@ -3523,7 +3566,11 @@ void RFUServer::Recv(void)
             // over rfu_data for that slave.
             if (status != sf::Socket::Status::Done)
                 continue;
-            DeSerialize(packet, i + 1);
+            if (!DeSerialize(packet, i + 1)) {
+                systemScreenMessage(_("Invalid data from link peer."));
+                RequestLinkClose();
+                return;
+            }
         }
     }
 }
@@ -3568,10 +3615,14 @@ sf::Packet& RFUClient::Serialize(sf::Packet& packet)
     return packet;
 }
 
-void RFUClient::DeSerialize(sf::Packet& packet)
+bool RFUClient::DeSerialize(sf::Packet& packet)
 {
+    const int max_clients = std::min<int>(MAX_CLIENTS, kRfuMaxGbas);
+    if (!IsValidRfuGbaId(linkid, max_clients))
+        return false;
+
     bool is_current_host = false;
-    for (int i = 0; i < MAX_CLIENTS; i++) {
+    for (int i = 0; i < max_clients; i++) {
         if (i != linkid) {
             packet >> is_current_host;
             packet >> rfu_data.rfu_reqid[i];
@@ -3582,18 +3633,34 @@ void RFUClient::DeSerialize(sf::Packet& packet)
         }
 
         if (i == linkid) {
+            uint16_t client_index = 0;
+            uint8_t is_host = 0;
             uint8_t num_data_sent = 0;
-            packet >> rfu_data.rfu_clientidx[i];
-            packet >> rfu_data.rfu_is_host[i];
+            packet >> client_index;
+            packet >> is_host;
             packet >> num_data_sent;
 
+            if (!packet || client_index >= max_clients)
+                return false;
+
+            rfu_data.rfu_clientidx[i] = client_index;
+            rfu_data.rfu_is_host[i] = is_host;
+
             for (int j = rfu_data.rfu_listback[i]; j <= (rfu_data.rfu_listback[i] + num_data_sent); j++) {
-                packet >> rfu_data.rfu_datalist[i][j & 0xff].len;
+                rfu_datarec record{};
+                packet >> record.len;
 
-                for (int k = 0; k < rfu_data.rfu_datalist[i][j & 0xff].len; k++)
-                    packet >> rfu_data.rfu_datalist[i][j & 0xff].data[k];
+                for (int k = 0; k < record.len; k++)
+                    packet >> record.data[k];
 
-                packet >> rfu_data.rfu_datalist[i][j & 0xff].gbaid;
+                packet >> record.gbaid;
+                if (!packet || !IsValidRfuGbaId(record.gbaid, max_clients))
+                    return false;
+
+                rfu_datarec& destination = rfu_data.rfu_datalist[i][j & 0xff];
+                destination.len = record.len;
+                memcpy(destination.data, record.data, record.len * sizeof(record.data[0]));
+                destination.gbaid = record.gbaid;
             }
 
             rfu_data.rfu_listback[i] = (rfu_data.rfu_listback[i] + num_data_sent) & 0xff;
@@ -3601,6 +3668,7 @@ void RFUClient::DeSerialize(sf::Packet& packet)
     }
 
     packet >> linktime; // Synchronise clocks by setting slave clock to master clock
+    return static_cast<bool>(packet);
 }
 
 void RFUClient::Send()
@@ -3638,7 +3706,10 @@ void RFUClient::Recv(void)
     }
     if (status != sf::Socket::Status::Done)
         return; // partial / not ready: nothing to deserialize yet
-    DeSerialize(packet);
+    if (!DeSerialize(packet)) {
+        systemScreenMessage(_("Invalid data from link peer."));
+        RequestLinkClose();
+    }
 }
 
 static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
@@ -3921,7 +3992,13 @@ static void StartRFUSocket(uint16_t value)
                             // TODO: to fix infinte send&recv w/o giving much cance to update the screen when both side acting as client
                             // on MarioGolfAdv lobby(might be due to leftover data when switching from host to join mode at the same time?)
                             rfu_id = (uint16_t)rfu_masterdata[0];
-                            gbaid = (rfu_id - 0x61f1) >> 3;
+                            if (!RfuStationIdToGbaId(rfu_id, rfu_data.numgbas, &gbaid)) {
+                                gbaid = linkid;
+                                rfu_id = (uint16_t)((linkid << 3) + kRfuStationIdBase);
+                                rfu_idx = rfu_id;
+                                rfu_cmd ^= 0x80;
+                                break;
+                            }
                             rfu_idx = rfu_id;
                             gbaidx = gbaid;
                             rfu_lastcmd2 = 0;
@@ -4158,14 +4235,17 @@ static void StartRFUSocket(uint16_t value)
                                         }
 
                                         if (qdata_len >= rfu_qrecv_broadcast_data_len) {
-                                            rfu_masterq = rfu_qrecv_broadcast_data_len = qdata_len;
-                                            gbaid = rfu_data.rfu_datalist[linkid][rfu_data.rfu_listfront[linkid]].gbaid;
-                                            rfu_id = (uint16_t)((gbaid << 3) + 0x61f1);
-                                            if (rfu_ishost) {
-                                                rfu_curclient = (uint8_t)rfu_data.rfu_clientidx[gbaid];
-                                            }
-                                            if (rfu_qrecv_broadcast_data_len != 0) { //data size > 0
-                                                memcpy(rfu_masterdata, rfu_data.rfu_datalist[linkid][rfu_data.rfu_listfront[linkid]].data, std::min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
+                                            const int source_id = rfu_data.rfu_datalist[linkid][rfu_data.rfu_listfront[linkid]].gbaid;
+                                            if (IsValidRfuGbaId(source_id, rfu_data.numgbas)) {
+                                                rfu_masterq = rfu_qrecv_broadcast_data_len = qdata_len;
+                                                gbaid = source_id;
+                                                rfu_id = (uint16_t)((gbaid << 3) + kRfuStationIdBase);
+                                                if (rfu_ishost && rfu_data.rfu_clientidx[gbaid] < kRfuMaxGbas) {
+                                                    rfu_curclient = (uint8_t)rfu_data.rfu_clientidx[gbaid];
+                                                }
+                                                if (rfu_qrecv_broadcast_data_len != 0) { //data size > 0
+                                                    memcpy(rfu_masterdata, rfu_data.rfu_datalist[linkid][rfu_data.rfu_listfront[linkid]].data, std::min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
+                                                }
                                             }
                                         }
                                     }
@@ -5750,7 +5830,13 @@ static void StartRFU(uint16_t value)
                             // TODO: to fix infinte send&recv w/o giving much cance to update the screen when both side acting as client
                             // on MarioGolfAdv lobby(might be due to leftover data when switching from host to join mode at the same time?)
                             rfu_id = (uint16_t)rfu_masterdata[0];
-                            gbaid = (rfu_id - 0x61f1) >> 3;
+                            if (!RfuStationIdToGbaId(rfu_id, linkmem->numgbas, &gbaid)) {
+                                gbaid = vbaid;
+                                rfu_id = (uint16_t)((vbaid << 3) + kRfuStationIdBase);
+                                rfu_idx = rfu_id;
+                                rfu_cmd ^= 0x80;
+                                break;
+                            }
                             rfu_idx = rfu_id;
                             gbaidx = gbaid;
                             rfu_lastcmd2 = 0;
@@ -6117,13 +6203,16 @@ static void StartRFU(uint16_t value)
                                             }
 
                                             if (tmpq >= rfu_qrecv_broadcast_data_len) {
-                                                rfu_masterq = rfu_qrecv_broadcast_data_len = tmpq;
-                                                gbaid = linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].gbaid;
-                                                rfu_id = (uint16_t)((gbaid << 3) + 0x61f1);
-                                                if (rfu_ishost)
-                                                    rfu_curclient = (uint8_t)linkmem->rfu_clientidx[gbaid];
-                                                if (rfu_qrecv_broadcast_data_len != 0) { //data size > 0
-                                                    memcpy(rfu_masterdata, linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].data, std::min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
+                                                const int source_id = linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].gbaid;
+                                                if (IsValidRfuGbaId(source_id, linkmem->numgbas)) {
+                                                    rfu_masterq = rfu_qrecv_broadcast_data_len = tmpq;
+                                                    gbaid = source_id;
+                                                    rfu_id = (uint16_t)((gbaid << 3) + kRfuStationIdBase);
+                                                    if (rfu_ishost && linkmem->rfu_clientidx[gbaid] < kRfuMaxGbas)
+                                                        rfu_curclient = (uint8_t)linkmem->rfu_clientidx[gbaid];
+                                                    if (rfu_qrecv_broadcast_data_len != 0) { //data size > 0
+                                                        memcpy(rfu_masterdata, linkmem->rfu_datalist[vbaid][linkmem->rfu_listfront[vbaid]].data, std::min(rfu_masterq << 2, (int)sizeof(rfu_masterdata)));
+                                                    }
                                                 }
                                             }
                                         } //else log("%08X  CMD26 Skip: %d %d %d\n",GetTickCount(),rfu_qrecv,linkmem->rfu_q[gbaid],tmpq);
