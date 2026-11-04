@@ -2734,6 +2734,24 @@ static void elfBuildSectionTable()
     }
 }
 
+static bool elfCopyProgramData(uint8_t* destination,
+    unsigned capacity,
+    unsigned base_address,
+    unsigned address,
+    const char* source,
+    unsigned data_size)
+{
+    if (source == nullptr || data_size == 0 || address < base_address)
+        return false;
+
+    const unsigned offset = address - base_address;
+    if (data_size > capacity || offset > capacity - data_size)
+        return false;
+
+    memcpy(destination + offset, source, data_size);
+    return true;
+}
+
 bool elfReadProgram(int& size, bool parseDebug)
 {
     size = 0;
@@ -2750,21 +2768,14 @@ bool elfReadProgram(int& size, bool parseDebug)
         const unsigned section_size = static_cast<unsigned>(seg->get_file_size());
         const char*    source       = seg->get_data();
 
-        if (section_size == 0 || source == nullptr)
-            continue;
-
         if (coreOptions.cpuIsMultiBoot) {
-            const unsigned effective_address = address - 0x2000000;
-            if (effective_address < SIZE_WRAM
-                && effective_address + section_size < SIZE_WRAM) {
-                memcpy(&g_workRAM[effective_address], source, section_size);
+            if (elfCopyProgramData(g_workRAM, SIZE_WRAM, 0x2000000,
+                    address, source, section_size)) {
                 size += section_size;
             }
         } else {
-            const unsigned effective_address = address - 0x8000000;
-            if (effective_address < SIZE_ROM
-                && effective_address + section_size < SIZE_ROM) {
-                memcpy(&g_rom[effective_address], source, section_size);
+            if (elfCopyProgramData(g_rom, SIZE_ROM, 0x8000000,
+                    address, source, section_size)) {
                 size += section_size;
             }
         }
@@ -2782,17 +2793,14 @@ bool elfReadProgram(int& size, bool parseDebug)
         const unsigned section_size = static_cast<unsigned>(sec->get_size());
         const char*    source       = sec->get_data();
 
-        if (section_size == 0 || source == nullptr)
-            continue;
-
         if (coreOptions.cpuIsMultiBoot) {
-            if (address >= 0x2000000 && address <= 0x203ffff) {
-                memcpy(&g_workRAM[address & 0x3ffff], source, section_size);
+            if (elfCopyProgramData(g_workRAM, SIZE_WRAM, 0x2000000,
+                    address, source, section_size)) {
                 size += section_size;
             }
         } else {
-            if (address >= 0x8000000 && address <= 0x9ffffff) {
-                memcpy(&g_rom[address & 0x1ffffff], source, section_size);
+            if (elfCopyProgramData(g_rom, SIZE_ROM, 0x8000000,
+                    address, source, section_size)) {
                 size += section_size;
             }
         }
