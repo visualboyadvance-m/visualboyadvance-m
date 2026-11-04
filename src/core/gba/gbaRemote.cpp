@@ -130,7 +130,7 @@ std::string HexToString(char* p);
 void debuggerUsage(const char* cmd);
 void debuggerHelp(int n, char** args);
 void printFlagHelp();
-void dbgExecute(std::string& cmd);
+void dbgExecute(std::string& cmd, bool allow_host_file_access = true);
 
 extern bool debuggerBreakOnWrite(uint32_t, uint32_t, int);
 extern bool debuggerBreakOnRegisterCondition(uint8_t, uint32_t, uint32_t, uint8_t);
@@ -3392,7 +3392,7 @@ char* strqtok(char* string, const char* ctrl)
     };
 };
 
-void dbgExecute(char* toRun)
+void dbgExecute(char* toRun, bool allow_host_file_access)
 {
     char* commands[40];
     int commandCount = 0;
@@ -3426,6 +3426,15 @@ void dbgExecute(char* toRun)
 
     commands[0] = (char*)replaceAlias(commands[0], cmdAliasTable);
 
+    if (!allow_host_file_access
+        && (!strcmp(commands[0], "dload")
+            || !strcmp(commands[0], "dsave")
+            || !strcmp(commands[0], "execute")
+            || !strcmp(commands[0], "tbl"))) {
+        monprintf("Command is not available through remote GDB.\n");
+        return;
+    }
+
     if (commands[0][0] == 'b') {
         executeBreakCommands(commandCount, commands);
         if (commands[0][0] == '!')
@@ -3450,7 +3459,7 @@ void dbgExecute(char* toRun)
     }
 }
 
-void dbgExecute(std::string& cmd)
+void dbgExecute(std::string& cmd, bool allow_host_file_access)
 {
     char* dbgCmd = new char[cmd.length() + 1];
 #if __STDC_WANT_SECURE_LIB__
@@ -3458,7 +3467,7 @@ void dbgExecute(std::string& cmd)
 #else
     strcpy(dbgCmd, cmd.c_str());
 #endif
-    dbgExecute(dbgCmd);
+    dbgExecute(dbgCmd, allow_host_file_access);
     delete[] dbgCmd;
 }
 
@@ -3529,7 +3538,7 @@ bool remoteTcpInit()
         sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_port = htons((unsigned short)remotePort);
-        addr.sin_addr.s_addr = htonl(0);
+        addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         int count = 0;
         while (count < 3) {
             if (bind(s, (sockaddr*)&addr, sizeof(addr))) {
@@ -3853,7 +3862,7 @@ void remoteQuery(char* p)
     } else if (!strncmp(p, "Rcmd,", 5)) {
         p += 5;
         std::string cmd = HexToString(p);
-        dbgExecute(cmd);
+        dbgExecute(cmd, false);
         remotePutPacket("OK");
     } else {
         fprintf(stderr, "Unknown packet %s\n", --p);
