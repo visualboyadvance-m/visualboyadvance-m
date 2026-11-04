@@ -25,7 +25,7 @@ extern void remoteOutput(const char*, uint32_t);
 extern bool debugOpenPty();
 extern const QString& debugGetSlavePty();
 extern bool debugWaitPty();
-extern bool debugStartListen(int port);
+extern bool debugStartListen(int port, const QString& bind_address);
 extern bool debugWaitSocket();
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 

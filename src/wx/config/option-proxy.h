@@ -119,6 +119,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kPrefGBPaletteOption*/ Option::Type::kUnsigned,
     /*kPrefGBPrinter*/ Option::Type::kInt,
     /*kPrefGDBBreakOnLoad*/ Option::Type::kBool,
+    /*kPrefGDBBindAddress*/ Option::Type::kString,
     /*kPrefGDBPort*/ Option::Type::kInt,
 #ifndef NO_LINK
     /*kPrefLinkNumPlayers*/ Option::Type::kInt,

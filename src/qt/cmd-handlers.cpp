@@ -1019,10 +1019,12 @@ void MainWindow::GDBBreak() {
             } else
 #endif
             {
-                if (!debugStartListen(gopts.gdb_port))
+                if (!debugStartListen(gopts.gdb_port, gopts.gdb_bind_address))
                     return;
 
-                msg = tr("Waiting for connection on port %1").arg(gopts.gdb_port);
+                msg = tr("Waiting for connection on %1:%2")
+                          .arg(gopts.gdb_bind_address)
+                          .arg(gopts.gdb_port);
             }
 
             // Poll for the connection while showing a cancellable progress

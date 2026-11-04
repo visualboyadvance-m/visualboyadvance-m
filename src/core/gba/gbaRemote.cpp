@@ -49,6 +49,7 @@
 #include <iosfwd>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "core/gba/gba.h"
 #include "core/gba/gbaCpu.h"
@@ -67,6 +68,7 @@ extern int emulating;
 extern void CPUUpdateCPSR();
 
 int remotePort = 0;
+static std::string remoteBindAddress = "127.0.0.1";
 int remoteSignal = 5;
 SOCKET remoteSocket = (SOCKET)(-1);
 SOCKET remoteListenSocket = (SOCKET)(-1);
@@ -124,6 +126,7 @@ struct DebuggerCommand {
 };
 
 char monbuf[1000];
+static bool remoteCommandActive = false;
 void monprintf(std::string line);
 std::string StringToHex(std::string& cmd);
 std::string HexToString(char* p);
@@ -387,6 +390,11 @@ void debuggerDontBreakClear(int n, char** args)
 
 void debuggerDumpLoad(int n, char** args)
 {
+    if (remoteCommandActive) {
+        monprintf("Command is not available through remote GDB.\n");
+        return;
+    }
+
     uint32_t address;
     char* file;
     FILE* f;
@@ -435,6 +443,11 @@ void debuggerDumpLoad(int n, char** args)
 
 void debuggerDumpSave(int n, char** args)
 {
+    if (remoteCommandActive) {
+        monprintf("Command is not available through remote GDB.\n");
+        return;
+    }
+
     uint32_t address;
     uint32_t size;
     char* file;
@@ -1560,6 +1573,11 @@ void freeWordSymbol()
 
 void debuggerReadCharTable(int n, char** args)
 {
+    if (remoteCommandActive) {
+        monprintf("Command is not available through remote GDB.\n");
+        return;
+    }
+
     if (n == 2) {
         if (!canUseTbl) {
             {
@@ -1855,6 +1873,11 @@ void debuggerRegisters(int, char**)
 
 void debuggerExecuteCommands(int n, char** args)
 {
+    if (remoteCommandActive) {
+        monprintf("Command is not available through remote GDB.\n");
+        return;
+    }
+
     if (n == 1) {
         {
             snprintf(monbuf, sizeof(monbuf), "%s requires at least one pathname to execute.", args[0]);
@@ -3529,7 +3552,15 @@ bool remoteTcpInit()
         sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_port = htons((unsigned short)remotePort);
-        addr.sin_addr.s_addr = htonl(0);
+        if (remoteBindAddress == "*") {
+            addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        } else {
+            addr.sin_addr.s_addr = inet_addr(remoteBindAddress.c_str());
+            if (addr.sin_addr.s_addr == INADDR_NONE) {
+                fprintf(stderr, "Invalid GDB bind address %s\n", remoteBindAddress.c_str());
+                return false;
+            }
+        }
         int count = 0;
         while (count < 3) {
             if (bind(s, (sockaddr*)&addr, sizeof(addr))) {
@@ -3629,6 +3660,11 @@ void remotePipeCleanUp()
 void remoteSetPort(int port)
 {
     remotePort = port;
+}
+
+void remoteSetBindAddress(const char* address)
+{
+    remoteBindAddress = address ? address : "127.0.0.1";
 }
 
 void remoteSetProtocol(int p)
@@ -3853,7 +3889,10 @@ void remoteQuery(char* p)
     } else if (!strncmp(p, "Rcmd,", 5)) {
         p += 5;
         std::string cmd = HexToString(p);
+        const bool previousRemoteCommand = remoteCommandActive;
+        remoteCommandActive = true;
         dbgExecute(cmd);
+        remoteCommandActive = previousRemoteCommand;
         remotePutPacket("OK");
     } else {
         fprintf(stderr, "Unknown packet %s\n", --p);
