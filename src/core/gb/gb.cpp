@@ -5295,6 +5295,12 @@ void gbEmulate(int ticksToStop)
 
             opcode2 = opcode1 = opcode = gbReadMemoryAt(PC.W++, -1);
 
+            // Lua memory.registerexec hooks — one branch per
+            // instruction unless a script armed them. oldPCW is the
+            // address of the instruction just fetched.
+            if (g_vbam_script_has_exec_hooks && g_vbam_script_mem_exec)
+                g_vbam_script_mem_exec(oldPCW);
+
             // If HALT state was launched while IME = 0 and (register_IF & register_IE & 0x1F),
             // PC.W is not incremented for the first byte of the next instruction.
             if (IFF & 2) {

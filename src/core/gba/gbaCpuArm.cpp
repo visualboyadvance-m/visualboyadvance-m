@@ -3046,6 +3046,13 @@ int armExecute()
         reg[15].I += 4;
         ARM_PREFETCH_NEXT;
 
+        // Lua memory.registerexec hooks — one branch per instruction
+        // when no script armed them (armNextPC is the address of the
+        // instruction about to execute; same value the debugger's
+        // execution breakpoint below checks).
+        if (g_vbam_script_has_exec_hooks && g_vbam_script_mem_exec)
+            g_vbam_script_mem_exec(armNextPC);
+
 #ifdef VBAM_ENABLE_DEBUGGER
         uint32_t memAddr = armNextPC;
         memoryMap* m = &map[memAddr >> 24];
