@@ -13,6 +13,14 @@
 //   emu.registerafter(f)  — fires after each emulated frame
 //   emu.registerexit(f)   — fires once when the script is unloaded
 //   emu.getsystem()       — "GBA" or "GB" or "SGB", best-effort
+//   emu.screenshot([p])   — write the last composed frame as a PNG
+//                           (defined in lua_screenshot.cpp)
+//   emu.loadrom(path)     — ask the frontend to load a ROM; async,
+//                           returns true when queued (defined in
+//                           lua_api_loadrom.cpp)
+//   emu.romgeneration()   — bumped once per successful ROM load; lets
+//                           a script detect that its loadrom() landed
+//                           (also works when reloading the same ROM)
 //
 // emu.frameadvance is a yield point; the wx loop pumps the script
 // once per frame, so a `while true do emu.frameadvance() end` loop
@@ -57,7 +65,13 @@ namespace lua_internal {
 bool g_frame_yield_pending = false;
 int  g_frame_count = 0;
 std::string g_rom_name;
+int  g_rom_generation = 0;  // bumped by GameArea::LoadGame (panel.cpp)
 }  // namespace lua_internal
+
+// Defined in lua_screenshot.cpp (next to the frame cache it reads).
+int l_screenshot(lua_State* L);
+// Defined in lua_api_loadrom.cpp (next to the backend pointer it reads).
+int l_loadrom(lua_State* L);
 
 namespace {
 
@@ -118,6 +132,11 @@ int l_romname(lua_State* L) {
     return 1;
 }
 
+int l_romgeneration(lua_State* L) {
+    lua_pushinteger(L, lua_internal::g_rom_generation);
+    return 1;
+}
+
 int l_getsystem(lua_State* L) {
     const char* sys = "GBA";
     if (gbRom) sys = gbCgbMode ? "GBC" : (gbSgbMode ? "SGB" : "GB");
@@ -158,7 +177,10 @@ const luaL_Reg kEmuFns[] = {
     {"print",        l_print},
     {"framecount",   l_framecount},
     {"romname",      l_romname},
+    {"romgeneration", l_romgeneration},
     {"getsystem",    l_getsystem},
+    {"screenshot",   l_screenshot},
+    {"loadrom",      l_loadrom},
     {"registerbefore", l_registerbefore},
     {"registerafter",  l_registerafter},
     {"registerexit",   l_registerexit},

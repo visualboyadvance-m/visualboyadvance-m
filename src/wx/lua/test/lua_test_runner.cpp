@@ -50,6 +50,51 @@ int main(int argc, char** argv) {
     // emu.frameadvance(), so it runs to completion in a single resume.
     eng.ResumeScriptCoroutine();
 
+    // --- memory-hook dispatch smoke test --------------------------------
+    // The scripted part above only registers hooks — nothing fires
+    // them without emulation. Fire them directly through the engine to
+    // regression-test the dispatcher: registry entries are
+    // {start, end, fn} sub-tables, and dispatch must range-filter and
+    // call .fn (an earlier bug pcall'd the entry table itself).
+    {
+        eng.EvalRepl(
+            "memfire = {} "
+            "memory.registerread(0x03004000, 4, function(a, s, v) "
+            "  memfire[#memfire + 1] = string.format('%x/%d/%x', a, s, v) "
+            "end) "
+            "memory.registerwrite(0x03004010, function(a, s, v) "
+            "  memfire[#memfire + 1] = 'W' .. string.format('%x/%d/%x', a, s, v) "
+            "end) "
+            "memory.registerexec(0x08000000, function(a) "
+            "  memfire[#memfire + 1] = 'X' .. string.format('%x', a) "
+            "end)");
+        eng.DispatchMemRead (0x03004000, 4, 0xABCD);  // in range
+        eng.DispatchMemRead (0x03004003, 1, 0);        // in range
+        eng.DispatchMemRead (0x03004004, 1, 0);        // out of range
+        eng.DispatchMemWrite(0x03004010, 1, 0x5A);     // in range
+        eng.DispatchMemExec (0x08000000);              // in range
+        const std::string n = eng.EvalRepl("return #memfire");
+        const std::string r = eng.EvalRepl("return table.concat(memfire, ',')");
+        const bool dispatch_ok =
+            n == "4" &&
+            r == "3004000/4/abcd,3004003/1/0,W3004010/1/5a,X8000000";
+        std::printf("%s memory hook dispatch (%s)\n",
+                    dispatch_ok ? "[ok]  " : "[FAIL]", r.c_str());
+        if (!dispatch_ok) any_failure = true;
+
+        // Unregister everything again; the engine must then report no
+        // hooks armed (the core-side fast gate turns back off).
+        eng.EvalRepl(
+            "memory.registerread (0x03004000, 4, nil) "
+            "memory.registerwrite(0x03004010, nil) "
+            "memory.registerexec (0x08000000, nil)");
+        const bool unregistered = !eng.HasReadHooks() && !eng.HasWriteHooks() &&
+                                  !eng.HasExecHooks();
+        std::printf("%s memory hook unregister disarms gates\n",
+                    unregistered ? "[ok]  " : "[FAIL]");
+        if (!unregistered) any_failure = true;
+    }
+
     // Drive the registerexit hook so it can print summary info.
     eng.Stop();
 
