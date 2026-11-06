@@ -478,13 +478,18 @@ struct DistPairIndex
 {
     constexpr DistPairIndex() : idx()
     {
-        for (auto& row : idx)
-            for (int& v : row)
-                v = -1;
+        // MSVC's constexpr evaluator rejects the nested range-for with
+        // references here (C2131, "unevaluatable pointer value"); plain
+        // index loops produce the identical table on every compiler.
+        for (int i = 0; i < 9; ++i)
+            for (int j = 0; j < 9; ++j)
+                idx[i][j] = -1;
         for (int p = 0; p < 24; ++p)
         {
-            idx[distPairs[p][0]][distPairs[p][1]] = p;
-            idx[distPairs[p][1]][distPairs[p][0]] = p;
+            const int a = distPairs[p][0];
+            const int b = distPairs[p][1];
+            idx[a][b] = p;
+            idx[b][a] = p;
         }
     }
     int idx[9][9];

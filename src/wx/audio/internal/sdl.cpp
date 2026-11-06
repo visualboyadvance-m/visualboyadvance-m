@@ -139,7 +139,7 @@ SDLAudio::~SDLAudio() {
 
 bool SDLAudio::init(long sampleRate) {
 #ifdef ENABLE_SDL3
-    int current_device = SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK;
+    int current_device = -1;
     sdl_devices = SDL_GetAudioPlaybackDevices(&sdl_devices_count);
     const char *devs = NULL;
 #endif
@@ -213,7 +213,9 @@ bool SDLAudio::init(long sampleRate) {
         }
     }
 
-    if (OPTION(kSoundAudioDevice) == _("Default device")) {
+    // No configured device matched (or none were enumerated): fall back to
+    // the default instead of indexing sdl_devices with the sentinel.
+    if (current_device < 0) {
         sound_stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio, NULL, NULL);
     } else {
         sound_stream = SDL_OpenAudioDeviceStream(sdl_devices[current_device], &audio, NULL, NULL);
