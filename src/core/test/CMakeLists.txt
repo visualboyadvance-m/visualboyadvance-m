@@ -56,7 +56,9 @@ target_link_libraries(suite_runner PRIVATE vbam-core)
 # Emerald box-name ACE equivalence check. Needs no ROM; always registered.
 add_executable(pc_semantics_test pc_semantics_test.cpp)
 target_link_libraries(pc_semantics_test PRIVATE vbam-core)
-add_test(NAME pc_semantics COMMAND pc_semantics_test)
+if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+    add_test(NAME pc_semantics COMMAND pc_semantics_test)
+endif()
 if(APPLE)
     # Link iconv by its resolved path (the SDK .tbd) rather than a bare
     # `-liconv`. Non-Apple toolchains (e.g. a Nix/Homebrew Clang) do not
