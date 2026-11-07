@@ -34,10 +34,13 @@ extern int thumbExecute();
         WRITE16LE(((uint16_t*)&g_ioMem[address]), value); \
     }
 
-#define ARM_PREFETCH                                        \
-    {                                                       \
-        cpuPrefetch[0] = CPUReadMemoryQuick(armNextPC);     \
-        cpuPrefetch[1] = CPUReadMemoryQuick(armNextPC + 4); \
+// ARM-state R15 may carry bit 1: a PC write with bit 1 set leaves it
+// there on ARM7TDMI, so PC-relative reads see +2, while instruction
+// fetch always comes from the word-aligned address.
+#define ARM_PREFETCH                                                       \
+    {                                                                      \
+        cpuPrefetch[0] = CPUReadMemoryQuick(armNextPC & 0xFFFFFFFC);       \
+        cpuPrefetch[1] = CPUReadMemoryQuick((armNextPC & 0xFFFFFFFC) + 4); \
     }
 
 #define THUMB_PREFETCH                                        \
@@ -46,7 +49,7 @@ extern int thumbExecute();
         cpuPrefetch[1] = CPUReadHalfWordQuick(armNextPC + 2); \
     }
 
-#define ARM_PREFETCH_NEXT cpuPrefetch[1] = CPUReadMemoryQuick(armNextPC + 4);
+#define ARM_PREFETCH_NEXT cpuPrefetch[1] = CPUReadMemoryQuick((armNextPC & 0xFFFFFFFC) + 4);
 
 #define THUMB_PREFETCH_NEXT cpuPrefetch[1] = CPUReadHalfWordQuick(armNextPC + 2);
 

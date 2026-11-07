@@ -1129,7 +1129,7 @@ static void count(uint32_t opcode, int cond_res)
     } else {                                                     \
         MODECHANGE;                                              \
         if (armState) {                                          \
-            reg[15].I &= 0xFFFFFFFC;                             \
+            reg[15].I &= 0xFFFFFFFE;                             \
             armNextPC = reg[15].I;                               \
             reg[15].I += 4;                                      \
             ARM_PREFETCH;                                        \
@@ -1567,7 +1567,7 @@ static INSN_REGPARM void arm121(uint32_t opcode)
         busPrefetchFrac = 0;
         armState = reg[base].I & 1 ? false : true;
         if (armState) {
-            reg[15].I = reg[base].I & 0xFFFFFFFC;
+            reg[15].I = reg[base].I & 0xFFFFFFFE;
             armNextPC = reg[15].I;
             reg[15].I += 4;
             ARM_PREFETCH;
@@ -1654,7 +1654,13 @@ static INSN_REGPARM void arm121(uint32_t opcode)
         bool _strPrefetchActive = busPrefetch;                                   \
         int _strDataTicks = dataTicksAccess##SIZE(address);                      \
         clockTicks = 2 + _strDataTicks + codeTicksAccess32(armNextPC);           \
-        if (_strPrefetchActive) clockTicks += 1;                                 \
+        /* The store pays one cycle waiting out the in-flight prefetch   */     \
+        /* halfword. The prefetcher is only in flight while the CPU      */     \
+        /* executes from the cart region; a store issued from WRAM       */     \
+        /* has nothing to wait for.                                      */     \
+        if (_strPrefetchActive                                                   \
+            && ((armNextPC >> 24) & 15) >= 0x08                                  \
+            && ((armNextPC >> 24) & 15) <= 0x0D) clockTicks += 1;                \
     }
 #define LDR(CALC_OFFSET, CALC_ADDRESS, LOAD_DATA, WRITEBACK, SIZE) \
     LDRSTR_INIT(CALC_OFFSET, CALC_ADDRESS);                        \
@@ -1664,7 +1670,7 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     }                                                              \
     clockTicks = 0;                                                \
     if (dest == 15) {                                              \
-        reg[15].I &= 0xFFFFFFFC;                                   \
+        reg[15].I &= 0xFFFFFFFE;                                   \
         armNextPC = reg[15].I;                                     \
         reg[15].I += 4;                                            \
         ARM_PREFETCH;                                              \
@@ -2206,7 +2212,9 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
     LDM_HIGH;                                                              \
     if (opcode & (1U << 15)) {                                             \
         uint32_t _ldmPCAddr = address;                                     \
-        reg[15].I = CPUReadMemory(_ldmPCAddr);                             \
+        /* ARMv4: a value loaded into PC keeps bit 1 (fetch is word-   */ \
+        /* aligned); bit 0 is ignored, no state exchange.              */ \
+        reg[15].I = CPUReadMemory(_ldmPCAddr) & 0xFFFFFFFE;                \
         if (!count) {                                                      \
             clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
         } else if ((_ldmPCAddr >> 24) != ((_ldmPCAddr - 4) >> 24)) {       \
@@ -2235,7 +2243,9 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
     if (opcode & (1U << 15)) {                                             \
         LDM_HIGH;                                                          \
         uint32_t _ldmPCAddr = address;                                     \
-        reg[15].I = CPUReadMemory(_ldmPCAddr);                             \
+        /* ARMv4: a value loaded into PC keeps bit 1 (fetch is word-   */ \
+        /* aligned); bit 0 is ignored, no state exchange.              */ \
+        reg[15].I = CPUReadMemory(_ldmPCAddr) & 0xFFFFFFFE;                \
         if (!count) {                                                      \
             clockTicks += 1 + dataTicksAccess32(_ldmPCAddr);               \
         } else if ((_ldmPCAddr >> 24) != ((_ldmPCAddr - 4) >> 24)) {       \
@@ -2251,7 +2261,7 @@ static INSN_REGPARM void arm7F6(uint32_t opcode) { LDR_PREINC_WB(OFFSET_ROR, OP_
     if (opcode & (1U << 15)) {                             \
         CPUSwitchMode(reg[17].I & 0x1F, false);            \
         if (armState) {                                    \
-            armNextPC = reg[15].I & 0xFFFFFFFC;            \
+            armNextPC = reg[15].I & 0xFFFFFFFE;            \
             reg[15].I = armNextPC + 4;                     \
             ARM_PREFETCH;                                  \
         } else {                                           \

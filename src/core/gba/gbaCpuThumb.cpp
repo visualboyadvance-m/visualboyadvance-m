@@ -1325,7 +1325,7 @@ static INSN_REGPARM void thumb47(uint32_t opcode)
         clockTicks = codeTicksAccessSeq16(armNextPC) * 2 + codeTicksAccess16(armNextPC) + 3;
     } else {
         armState = true;
-        reg[15].I &= 0xFFFFFFFC;
+        reg[15].I &= 0xFFFFFFFE;
         armNextPC = reg[15].I;
         reg[15].I += 4;
         ARM_PREFETCH;

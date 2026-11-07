@@ -50,6 +50,13 @@ endif()
 # suite_runner: headless driver for mGBA's suite.gba accuracy tests.
 add_executable(suite_runner suite_runner.cpp)
 target_link_libraries(suite_runner PRIVATE vbam-core)
+
+# pc_semantics_test: ARM7TDMI PC-write semantics (bit-1 retention on
+# ARM-state PC writes, BX state select, Thumb PC writes) plus the
+# Emerald box-name ACE equivalence check. Needs no ROM; always registered.
+add_executable(pc_semantics_test pc_semantics_test.cpp)
+target_link_libraries(pc_semantics_test PRIVATE vbam-core)
+add_test(NAME pc_semantics COMMAND pc_semantics_test)
 if(APPLE)
     # Link iconv by its resolved path (the SDK .tbd) rather than a bare
     # `-liconv`. Non-Apple toolchains (e.g. a Nix/Homebrew Clang) do not
