@@ -524,6 +524,13 @@ foreach(DEF ${wxWidgets_DEFINITIONS})
     list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D${DEF}")
 endforeach()
 
+# The vcpkg prebuilt wxWidgets and openal-soft libraries reference MSVC STL
+# vectorized-algorithm helpers that older toolsets' static runtime lacks;
+# msvc-stl-shim.cpp provides them for every target that links wxWidgets.
+if(MSVC)
+    add_library(vbam-msvc-stl-shim STATIC msvc-stl-shim.cpp)
+endif()
+
 # Configure common settings for wx-based targets, like linking, include
 # directories, compile options, and definitions.
 function(configure_wx_target target)
@@ -580,6 +587,10 @@ function(configure_wx_target target)
 
     # wxWidgets.
     _add_link_libraries(${wxWidgets_LIBRARIES})
+
+    if(MSVC)
+        _add_link_libraries(vbam-msvc-stl-shim)
+    endif()
     # Prepend the wxWidgets include directories so that a wx/setup.h from an
     # unrelated dependency prefix (e.g. a vcpkg tree used for other
     # dependencies) cannot shadow the one matching ${wxWidgets_LIBRARIES}.
