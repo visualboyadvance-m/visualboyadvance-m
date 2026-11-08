@@ -607,21 +607,14 @@ if(NOT ZIP_PROGRAM)
         if(NOT EXISTS "${ZIP_EXE}")
             file(MAKE_DIRECTORY "${ZIP_EXE_DIR}")
 
-            # ps12exe compiles for the .NET Framework by default, which needs
-            # Windows PowerShell 5.1 (it hands off to powershell.exe when run
-            # under pwsh). Hosts without it, such as the GitHub Windows 11 Arm
-            # images, get a PowerShell Core target instead; the resulting
-            # zip.exe then runs under the pwsh that built it.
-            find_program(WINDOWS_POWERSHELL powershell.exe)
-            if(WINDOWS_POWERSHELL)
-                set(PS12EXE_BUILD "@{Platform='x86'}")
-            else()
-                set(PS12EXE_BUILD "@{Platform='x86'; Target='Core'}")
-            endif()
-
+            # ps12exe compiles for the .NET Framework, which needs Windows
+            # PowerShell 5.1 (under pwsh it hands off to powershell.exe). A
+            # host without it, such as the GitHub Windows 11 Arm images, must
+            # provide a real zip program on PATH instead; the vendored ps12exe
+            # does not carry its PowerShell Core compiler.
             execute_process(
                 COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
-                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -Build ${PS12EXE_BUILD} -Locale 'en' -NoUpdateCheck; exit $LASTEXITCODE"
+                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -Build @{Platform='x86'} -Locale 'en' -NoUpdateCheck; exit $LASTEXITCODE"
                 RESULT_VARIABLE PS12EXE_BUILD_RESULT
             )
 

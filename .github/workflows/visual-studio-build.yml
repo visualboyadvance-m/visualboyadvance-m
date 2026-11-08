@@ -55,6 +55,14 @@ jobs:
         with:
           arch: ${{ matrix.msvc_arch }}
 
+      # The Windows 11 Arm image has no Windows PowerShell 5.1, which the
+      # fallback that compiles zip.exe from zip.ps1 (ps12exe) relies on. A
+      # real Info-ZIP zip on PATH is found first and that fallback is never
+      # reached; it also lets wxrc find zip.
+      - if: matrix.msvc_arch == 'arm64'
+        name: Install zip
+        run: choco install zip -y --no-progress
+
       - name: Configure
         run: >-
           cmake -B build -G ${{ matrix.cmake_generator }} -DVCPKG_TARGET_TRIPLET=${{ matrix.cmake_vcpkg_triplet }} ${{ matrix.cmake_build }} ${{ matrix.cmake_options }}
