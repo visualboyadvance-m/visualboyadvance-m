@@ -19,9 +19,6 @@
 #include <cstdint>
 #include <cstring>
 #include <cstdlib>
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include "core/gba/gba.h"
 #include "core/gba/gbaGlobals.h"
@@ -150,16 +147,6 @@ static void clearRegs() { reg[6].I = reg[7].I = reg[8].I = 0; }
 
 int main(int argc, char** argv) {
     (void)argc; (void)argv;
-    // Unbuffered stdout: ctest captures through a pipe, so a hang or crash
-    // after a full buffer would otherwise lose every line already decided.
-    setvbuf(stdout, nullptr, _IONBF, 0);
-#ifdef _WIN32
-    // A crash or assert in a console process on Windows raises a modal
-    // error dialog and waits for a click; on a CI runner that reads as a
-    // hang until ctest's timeout. Fail fast with an exit code instead.
-    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
-#endif
     // Synthetic ROM: 64 KiB of `b .` -- the core only needs a mapped image
     // and a reset; every case force-jumps into EWRAM afterwards.
     static uint32_t synth[0x10000 / 4];
@@ -168,19 +155,11 @@ int main(int argc, char** argv) {
         fprintf(stderr, "pc_semantics_test: synthetic ROM load failed\n");
         return 2;
     }
-    fprintf(stderr, "[init] rom loaded\n");
     CPUInit("", false);
-    fprintf(stderr, "[init] CPUInit done\n");
     soundInit();
-    fprintf(stderr, "[init] soundInit done\n");
     CPUReset();
-    fprintf(stderr, "[init] CPUReset done\n");
     emulating = 1;
-    // Let reset/HLE settle; the image just spins. Stepped rather than
-    // CPULoop(): step() is bounded by construction, so the test can never
-    // wait on the scheduler to declare the budget spent.
-    step(20000);
-    fprintf(stderr, "[init] settle done, running cases\n");
+    CPULoop(280896 * 2);   // let reset/HLE settle; the image just spins
 
     // ARM probe: mov r7,pc ; mov r8,#0xAB ; b .
     uint32_t armProbe[] = { 0xE1A0700F, 0xE3A080AB, 0xEAFFFFFE };

@@ -61,18 +61,13 @@ if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     # the toolchain's bin directory first on PATH. Otherwise the runtime DLLs
     # (libwinpthread-1.dll) come from whatever is first on PATH -- another
     # architecture's on CI -- and the loader's error dialog holds the test
-    # until it times out, before the program has run a single instruction.
+    # until it times out.
     set(_pc_semantics_test pc_semantics_test)
     if(MINGW AND MINGW_TEST_WRAPPER)
         set(_pc_semantics_test "${MINGW_TEST_WRAPPER}" $<TARGET_FILE:pc_semantics_test>)
     endif()
     add_test(NAME pc_semantics COMMAND ${_pc_semantics_test})
-    # Starts and exits without touching the core: separates a launch or CRT
-    # start-up failure from anything in the emulator.
-    add_test(NAME pc_semantics_smoke COMMAND ${_pc_semantics_test} --smoke)
-    # Both run in well under a second; a regression should cost a minute of
-    # CI, not ctest's default twenty-five.
-    set_tests_properties(pc_semantics pc_semantics_smoke PROPERTIES TIMEOUT 60)
+    set_tests_properties(pc_semantics PROPERTIES TIMEOUT 60)
 endif()
 if(APPLE)
     # Link iconv by its resolved path (the SDK .tbd) rather than a bare
