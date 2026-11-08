@@ -2178,10 +2178,20 @@ function(vcpkg_set_toolchain)
     # build latest vcpkg, if needed
     if(NOT git_up_to_date)
         if(WIN32)
+            # Not bootstrap-vcpkg.bat: it is a one-liner that invokes
+            # powershell.exe by name, and Windows PowerShell 5.1 is absent on
+            # some hosts (the GitHub Windows 11 Arm images ship only pwsh 7).
+            # scripts/bootstrap.ps1 is what the .bat runs anyway, and it
+            # already picks the arm64 vcpkg build on arm64 hosts.
             execute_process(
-                COMMAND bootstrap-vcpkg.bat
+                COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass
+                    -File "${VCPKG_ROOT}/scripts/bootstrap.ps1" -disableMetrics
                 WORKING_DIRECTORY ${VCPKG_ROOT}
+                RESULT_VARIABLE vcpkg_bootstrap_status
             )
+            if(NOT vcpkg_bootstrap_status EQUAL 0 OR NOT EXISTS "${VCPKG_ROOT}/vcpkg.exe")
+                message(FATAL_ERROR "Bootstrapping vcpkg failed: no vcpkg.exe in ${VCPKG_ROOT}")
+            endif()
         else()
             execute_process(
                 COMMAND ./bootstrap-vcpkg.sh
@@ -2359,7 +2369,13 @@ function(vcpkg_set_toolchain)
             execute_process(
                 COMMAND ${VCPKG_PROGRAM_EXECUTABLE} --triplet ${VCPKG_HOST_TRIPLET} install ${host_deps_wanted} --allow-unsupported --recurse --keep-going
                 WORKING_DIRECTORY ${VCPKG_ROOT}
+                RESULT_VARIABLE host_deps_status
             )
+            # Unchecked, a missing vcpkg.exe or a failed port build only
+            # surfaces much later as "glslangValidator not found".
+            if(NOT host_deps_status EQUAL 0)
+                message(FATAL_ERROR "Installing the host tools (${host_deps_wanted}) for ${VCPKG_HOST_TRIPLET} failed")
+            endif()
 
             # The cached listing predates this install.
             unset(VCPKG_INSTALLED       CACHE)
