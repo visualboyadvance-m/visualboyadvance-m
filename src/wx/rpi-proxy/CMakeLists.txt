@@ -90,6 +90,15 @@ target_link_libraries(vbam-rpi-host
 # The host hides its console window programmatically with FreeConsole()
 
 install(TARGETS vbam-rpi-host RUNTIME DESTINATION .)
+# 32-bit plugin the proxy test loads through the host.
+add_library(vbam-rpi-test-plugin MODULE
+    ${SOURCE_DIR}/src/wx/rpi-proxy/test/rpi-test-plugin.cpp
+)
+target_include_directories(vbam-rpi-test-plugin PRIVATE
+    ${SOURCE_DIR}/src
+)
+set_target_properties(vbam-rpi-test-plugin PROPERTIES PREFIX "" SUFFIX ".rpi")
+install(TARGETS vbam-rpi-test-plugin LIBRARY DESTINATION .)
 ]=])
 
         # Write the CMakeLists.txt for the external project
@@ -116,7 +125,9 @@ install(TARGETS vbam-rpi-host RUNTIME DESTINATION .)
                     -DCMAKE_INSTALL_PREFIX=${RPI_HOST_BUILD_DIR}/install
                 BUILD_COMMAND ${CMAKE_COMMAND} --build . --config ${RPI_HOST_BUILD_TYPE}
                 INSTALL_COMMAND ${CMAKE_COMMAND} --install . --config ${RPI_HOST_BUILD_TYPE}
-                BUILD_BYPRODUCTS "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-host.exe"
+                BUILD_BYPRODUCTS
+                    "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-host.exe"
+                    "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-test-plugin.rpi"
                 DOWNLOAD_COMMAND ""
                 UPDATE_COMMAND ""
             )
@@ -181,10 +192,12 @@ exit /b 1
 
                 add_custom_command(
                     OUTPUT "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-host.exe"
+                    BYPRODUCTS "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-test-plugin.rpi"
                     COMMAND cmd /c "${RPI_HOST_BUILD_DIR}/build-x86.bat"
                     DEPENDS
                         "${CMAKE_CURRENT_SOURCE_DIR}/host/rpi-host-main.cpp"
                         "${CMAKE_CURRENT_SOURCE_DIR}/SharedFilterBuffer.h"
+                        "${CMAKE_CURRENT_SOURCE_DIR}/test/rpi-test-plugin.cpp"
                     WORKING_DIRECTORY "${RPI_HOST_BUILD_DIR}"
                     COMMENT "Building 32-bit RPI Host with MSVC x86 toolchain"
                     VERBATIM
@@ -234,6 +247,31 @@ exit /b 1
             @ONLY
         )
         set(RPI_HOST_PATH_H_DIR "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)
+
+        # Launch the 32-bit host from a 64-bit process, complete a command
+        # round trip over its shared memory, and -- when the host was built
+        # here, so its test plugin was too -- load that plugin and run pixels
+        # through it. Proves the host builds, starts (under x86 emulation on
+        # arm64), signals ready, answers, and that a plugin's output makes it
+        # back across the boundary. Only where the binary can run here.
+        if(BUILD_TESTING AND (NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR))
+            set(_rpi_proxy_test_args "${RPI_HOST_EXE_PATH}")
+            if(RPI_HOST_AUTO_BUILD)
+                list(APPEND _rpi_proxy_test_args "${RPI_HOST_BUILD_DIR}/install/vbam-rpi-test-plugin.rpi")
+            endif()
+            add_executable(rpi_proxy_test test/rpi_proxy_test.cpp)
+            target_link_libraries(rpi_proxy_test PRIVATE vbam-rpi-proxy)
+            target_compile_definitions(rpi_proxy_test PRIVATE ${wxWidgets_DEFINITIONS})
+            if(TARGET vbam-rpi-host-build)
+                add_dependencies(rpi_proxy_test vbam-rpi-host-build)
+            endif()
+            set(_rpi_proxy_test rpi_proxy_test)
+            if(MINGW AND MINGW_TEST_WRAPPER)
+                set(_rpi_proxy_test "${MINGW_TEST_WRAPPER}" $<TARGET_FILE:rpi_proxy_test>)
+            endif()
+            add_test(NAME rpi.proxy.host COMMAND ${_rpi_proxy_test} ${_rpi_proxy_test_args})
+            set_tests_properties(rpi.proxy.host PROPERTIES TIMEOUT 60)
+        endif()
     else()
         message(STATUS "RPI Host exe not found - 32-bit plugin support disabled")
         message(STATUS "To enable: build vbam-rpi-host.exe with 32-bit toolchain")

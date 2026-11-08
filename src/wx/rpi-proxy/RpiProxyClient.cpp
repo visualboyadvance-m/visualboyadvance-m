@@ -198,6 +198,10 @@ bool RpiProxyClient::NeedsProxy(const wxString& pluginPath) {
     return IsProcess64Bit() && Is32BitDll(pluginPath);
 }
 
+void RpiProxyClient::SetHostExePath(const wxString& path) {
+    host_exe_path_ = path;
+}
+
 bool RpiProxyClient::ExtractHostExe() {
     if (!host_exe_path_.empty()) {
         // Already extracted

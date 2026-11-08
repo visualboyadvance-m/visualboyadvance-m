@@ -55,12 +55,12 @@ jobs:
         with:
           arch: ${{ matrix.msvc_arch }}
 
-      # The Windows 11 Arm image has no Windows PowerShell 5.1, which the
-      # fallback that compiles zip.exe from zip.ps1 (ps12exe) relies on. A
-      # real Info-ZIP zip on PATH is found first and that fallback is never
-      # reached; it also lets wxrc find zip.
-      - if: matrix.msvc_arch == 'arm64'
-        name: Install zip
+      # Every job uses a real Info-ZIP zip, found before the fallback that
+      # compiles zip.exe from zip.ps1 (ps12exe) is considered, so the three
+      # arches are set up identically. The Windows 11 Arm image has no
+      # Windows PowerShell 5.1, which that fallback relies on; a zip on PATH
+      # also lets wxrc find it.
+      - name: Install zip
         run: choco install zip -y --no-progress
 
       - name: Configure

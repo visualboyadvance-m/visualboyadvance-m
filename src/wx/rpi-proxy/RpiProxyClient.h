@@ -136,6 +136,11 @@ public:
     // Release the shared instance (called on application shutdown)
     static void ReleaseSharedInstance();
 
+    // Use this host executable instead of the one embedded in the main
+    // program (which test binaries don't carry). The client treats it as
+    // its own extracted copy and deletes it on destruction, so pass a copy.
+    void SetHostExePath(const wxString& path);
+
 private:
     // Extract the embedded host exe to temp directory
     bool ExtractHostExe();
