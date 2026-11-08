@@ -18,7 +18,8 @@ const uint64_t TICKS_PER_SECOND = 16777216;
 #define SAVE_GAME_VERSION_9 9
 #define SAVE_GAME_VERSION_10 10
 #define SAVE_GAME_VERSION_11 11
-#define SAVE_GAME_VERSION SAVE_GAME_VERSION_11
+#define SAVE_GAME_VERSION_12 12  // DMA3 video-capture latch
+#define SAVE_GAME_VERSION SAVE_GAME_VERSION_12
 
 #define gbaWidth  240
 #define gbaHeight 160

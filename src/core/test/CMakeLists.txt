@@ -69,6 +69,19 @@ if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     add_test(NAME pc_semantics COMMAND ${_pc_semantics_test})
     set_tests_properties(pc_semantics PROPERTIES TIMEOUT 60)
 endif()
+
+# video_capture_test: DMA3 video-capture mode (start timing 3). Builds its
+# own ROM in memory; always registered.
+add_executable(video_capture_test video_capture_test.cpp)
+target_link_libraries(video_capture_test PRIVATE vbam-core)
+if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+    set(_video_capture_test video_capture_test)
+    if(MINGW AND MINGW_TEST_WRAPPER)
+        set(_video_capture_test "${MINGW_TEST_WRAPPER}" $<TARGET_FILE:video_capture_test>)
+    endif()
+    add_test(NAME gba.dma.video_capture COMMAND ${_video_capture_test})
+    set_tests_properties(gba.dma.video_capture PROPERTIES TIMEOUT 60)
+endif()
 if(APPLE)
     # Link iconv by its resolved path (the SDK .tbd) rather than a bare
     # `-liconv`. Non-Apple toolchains (e.g. a Nix/Homebrew Clang) do not

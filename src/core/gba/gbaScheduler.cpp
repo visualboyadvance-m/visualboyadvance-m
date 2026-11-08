@@ -71,14 +71,15 @@ int32_t NextDelta() {
 }
 
 int32_t NextDeltaClamping() {
-    // Like NextDelta() but excludes lazy event types: kSchedHdma must
+    // Like NextDelta() but excludes lazy event types: kSchedHdma and
+    // kSchedVideoDma must
     // not end CPU batches at its due time -- hardware's DMA bus grant
     // does not quantize the instruction stream to itself; the transfer
     // is applied at the next natural boundary (bounded lateness) and
     // open-bus visibility is computed from true times.
     int64_t best = INT64_MAX;
     for (uint32_t i = 0; i < kSchedCount; ++i) {
-        if (i == (uint32_t)kSchedHdma) continue;
+        if (i == (uint32_t)kSchedHdma || i == (uint32_t)kSchedVideoDma) continue;
         if (g_slots[i].active && g_slots[i].when < best) best = g_slots[i].when;
     }
     if (best == INT64_MAX) return INT32_MAX;

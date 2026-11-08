@@ -225,6 +225,10 @@ int g_dmaEventAttrib = 0;
 // Absolute-time (cpuAbsCycle-domain) stamp of the pending HBlank-DMA
 // activation, for the open-bus visibility window.
 int64_t g_hdmaActAbs = -1;
+// DMA3 video capture (start timing 3) is latched at the end of line 162.
+// While latched, lines 2..161 each trigger one transfer and line 162 clears
+// DMA3's enable bit; a capture armed mid-frame starts with the next frame.
+bool g_dma3VideoRunning = false;
 // Event-batch bookkeeping for the DMA bus-release window: g_eventBatchId
 // increments at each event service; a DMA that ran during event processing
 // tags the batch, and an open-bus read early in that batch (within the
@@ -1336,6 +1340,7 @@ unsigned int CPUWriteState(uint8_t* data)
     utilWriteIntMem(data, cpuDmaCount);
     utilWriteIntMem(data, cpuDmaBusValue);
     utilWriteMem(data, cpuDmaLatchData, sizeof(uint32_t) * 4);
+    utilWriteIntMem(data, g_dma3VideoRunning);
 
     utilWriteMem(data, g_internalRAM, SIZE_IRAM);
     utilWriteMem(data, g_paletteRAM, SIZE_PRAM);
@@ -1398,6 +1403,10 @@ bool CPUReadState(const uint8_t* data)
         cpuDmaBusValue = utilReadIntMem(data);
         utilReadMem(cpuDmaLatchData, data, sizeof(uint32_t) * 4);
     }
+    // Older states have no latch: an armed capture starts with the next frame.
+    g_dma3VideoRunning = (version >= SAVE_GAME_VERSION_12)
+        ? (utilReadIntMem(data) != 0)
+        : false;
 
     utilReadMem(g_internalRAM, data, SIZE_IRAM);
     utilReadMem(g_paletteRAM, data, SIZE_PRAM);
@@ -1497,6 +1506,7 @@ static bool CPUWriteState(gzFile gzFile)
     utilWriteInt(gzFile, cpuDmaCount);
     utilWriteInt(gzFile, cpuDmaBusValue);
     utilGzWrite(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
+    utilWriteInt(gzFile, g_dma3VideoRunning);
 
     utilGzWrite(gzFile, g_internalRAM, SIZE_IRAM);
     utilGzWrite(gzFile, g_paletteRAM, SIZE_PRAM);
@@ -1629,6 +1639,9 @@ static bool CPUReadState(gzFile gzFile)
         cpuDmaBusValue = utilReadInt(gzFile);
         utilGzRead(gzFile, cpuDmaLatchData, sizeof(uint32_t) * 4);
     }
+    g_dma3VideoRunning = (version >= SAVE_GAME_VERSION_12)
+        ? (utilReadInt(gzFile) != 0)
+        : false;
 
     utilGzRead(gzFile, g_internalRAM, SIZE_IRAM);
     utilGzRead(gzFile, g_paletteRAM, SIZE_PRAM);
@@ -3909,9 +3922,37 @@ void doDMA(int ch, uint32_t& s, uint32_t& d, uint32_t si, uint32_t di, uint32_t 
     cpuDmaRunning = false;
 }
 
+// Called at the start of every scanline, after VCOUNT has advanced.
+static void videoCaptureLineStart()
+{
+    if (!g_dma3VideoRunning)
+        return;
+    if (VCOUNT == 162) {
+        // Line 162 ends the capture.
+        if (DM3CNT_H & 0x8000) {
+            DM3CNT_H &= 0x7FFF;
+            UPDATE_REG(IO_REG_DMA3CTL, DM3CNT_H);
+        }
+    } else if (VCOUNT >= 2 && VCOUNT < 162) {
+        // Same start latency as HBlank DMA, measured from the line start.
+        static const int captureDelay = 2;
+        int d = captureDelay - (int)g_eventBatchOvershoot;
+        if (d < 0)
+            d = 0;
+        gbaScheduler::Schedule(kSchedVideoDma, d);
+    }
+}
+
+// Called at the start of every scanline, before VCOUNT advances.
+static void videoCaptureLatch()
+{
+    if (VCOUNT == 162)
+        g_dma3VideoRunning = (DM3CNT_H & 0xB000) == 0xB000;
+}
+
 void CPUCheckDMA(int reason, int dmamask)
 {
-    g_dmaEventTriggered = (reason == 1 || reason == 2);
+    g_dmaEventTriggered = (reason == 1 || reason == 2 || (reason == 3 && dmamask == 8));
     // DMA 0
     if ((DM0CNT_H & 0x8000) && (dmamask & 1)) {
         if (((DM0CNT_H >> 12) & 3) == reason) {
@@ -4384,10 +4425,22 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
         }
         break;
     }
-    case IO_REG_DISPSTAT:
-        DISPSTAT = (value & 0xFF38) | (DISPSTAT & 7);
+    case IO_REG_DISPSTAT: {
+        // The VCount match is re-evaluated against the new setting. A write
+        // that makes the current line match raises the VCount IRQ (edge
+        // only: not if the flag was already set).
+        const bool wasMatch = (DISPSTAT & 4) != 0;
+        DISPSTAT = (value & 0xFF38) | (DISPSTAT & 3);
+        if (VCOUNT == (DISPSTAT >> 8)) {
+            DISPSTAT |= 4;
+            if ((DISPSTAT & 0x20) && !wasMatch) {
+                IF |= 4;
+                UPDATE_REG(IO_REG_IF, IF);
+                CPUTestIRQ();
+            }
+        }
         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
-        break;
+    } break;
     case IO_REG_VCOUNT:
         // not writable
         break;
@@ -5316,6 +5369,7 @@ void CPUReset()
     rtcReset();
     gbaMgbaLog::Reset();
     gbaScheduler::Reset();
+    g_dma3VideoRunning = false;
     cpuAbsCycle = 0;
     // clean registers
     memset(&reg[0], 0, sizeof(reg));
@@ -5670,6 +5724,9 @@ void CPULoop(int ticks)
                 case kSchedHdma:
                     CPUCheckDMA(2, 0x0f);
                     break;
+                case kSchedVideoDma:
+                    CPUCheckDMA(3, 0x08);
+                    break;
                 case kSchedHblankIrqDelay: {
                     // (See comment block below.) IF.HBlank set 1 cycle
                     // after DISPSTAT.HBlank bit toggle.
@@ -5818,12 +5875,15 @@ void CPULoop(int ticks)
                     if (DISPSTAT & 2) {
                         lcdTicks += lcdHDrawLen();
                         lcdNextEventAbsCycle += lcdHDrawLen();
+                        videoCaptureLatch();
                         VCOUNT++;
                         UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         gfxUpdateWindowY();
                         DISPSTAT &= 0xFFFD;
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);
                         CPUCompareVCOUNT();
+                        if (VCOUNT <= 227)
+                            videoCaptureLineStart();
                     } else {
                         // GBATEK: HBlank phase is exactly 224 cycles
                         // (scanline = 1008 HDraw + 224 HBlank = 1232).
@@ -5856,6 +5916,7 @@ void CPULoop(int ticks)
                         gfxUpdateWindowY();
                         CPUCompareVCOUNT();
                         gfxNewFrame();
+                        videoCaptureLineStart();
                     }
                 } else {
                     int framesToSkip = systemFrameSkip;
@@ -5908,6 +5969,7 @@ void CPULoop(int ticks)
                         VCOUNT++;
                         UPDATE_REG(IO_REG_VCOUNT, VCOUNT);
                         gfxUpdateWindowY();
+                        videoCaptureLineStart();
 
                         lcdTicks += lcdHDrawLen();
                         lcdNextEventAbsCycle += lcdHDrawLen();

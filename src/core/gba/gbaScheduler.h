@@ -53,6 +53,8 @@ enum SchedulerEventType : uint32_t {
                                // at the HBlank event
                                // put the transfer -- and its open-bus
                                // side effects -- 3 cycles early.
+    kSchedVideoDma       = 4,  // DMA3 video-capture trigger, lines 2..161.
+                               // Lazy, like kSchedHdma.
     // Reserved for later phases:
     // kSchedLcdHdraw, kSchedLcdHblank, kSchedLcdVblank,
     // kSchedTimer0..Timer3, kSchedSwi,
@@ -95,7 +97,7 @@ int32_t NextDelta();
 // landing inside the current instruction's span.
 int32_t DeltaOf(SchedulerEventType type);
 
-// NextDelta() excluding lazy event types (kSchedHdma): used for the CPU
+// NextDelta() excluding lazy event types (kSchedHdma, kSchedVideoDma): used for the CPU
 // batch ceiling so the DMA bus grant does not quantize the instruction
 // stream to itself.
 int32_t NextDeltaClamping();
