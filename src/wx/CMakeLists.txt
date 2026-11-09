@@ -80,23 +80,63 @@ if(CMAKE_HOST_WIN32 AND (NOT XGETTEXT OR NOT MSGINIT))
     # Install gettext tools from nuget.
 
     # First fetch the nuget binary.
+    #
+    # Removed again if the download fails: file(DOWNLOAD) leaves a truncated
+    # file behind, and the guard above would then take it for a good one on
+    # every later configure and never fetch it again.
     if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+        file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+            ${CMAKE_BINARY_DIR}/nuget.exe
+            STATUS nuget_download
+        )
+
+        list(GET nuget_download 0 nuget_download_code)
+
+        if(NOT nuget_download_code EQUAL 0)
+            list(GET nuget_download 1 nuget_download_message)
+            file(REMOVE ${CMAKE_BINARY_DIR}/nuget.exe)
+            message(FATAL_ERROR "downloading nuget.exe failed: ${nuget_download_message}")
+        endif()
     endif()
 
-    # Add nuget package source.
+    # Both calls name it by full path. execute_process() resolves a command
+    # against PATH and not against WORKING_DIRECTORY, so a bare "nuget.exe"
+    # never finds the one just downloaded here -- it finds only a nuget that
+    # happens to be installed on the machine, which is why this worked on the
+    # nightly builder and failed anywhere else with "Could NOT find Gettext"
+    # twenty lines further down.
+
+    # Add nuget package source. Left unchecked on purpose: every configure
+    # after the first fails it with "the source specified has already been
+    # added to the list of available package sources", which is not a problem.
     execute_process(
-        COMMAND nuget sources add -Name "NuGet official package source" -Source "https://api.nuget.org/v3/index.json"
+        COMMAND ${CMAKE_BINARY_DIR}/nuget.exe sources add
+                -Name "NuGet official package source"
+                -Source "https://api.nuget.org/v3/index.json"
         OUTPUT_QUIET
+        ERROR_QUIET
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
     # Install the Gettext.Tools package.
+    #
+    # Checked, because the glob below finds nothing when this fails and the
+    # only symptom left is find_package(Gettext REQUIRED) failing for what
+    # looks like an unrelated reason.
     execute_process(
-        COMMAND nuget.exe install Gettext.Tools -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
-        OUTPUT_QUIET
+        COMMAND ${CMAKE_BINARY_DIR}/nuget.exe install Gettext.Tools
+                -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+        RESULT_VARIABLE nuget_result
+        OUTPUT_VARIABLE nuget_output
+        ERROR_VARIABLE  nuget_output
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
+    if(NOT nuget_result EQUAL 0)
+        message(FATAL_ERROR
+            "installing the Gettext.Tools nuget package failed (${nuget_result}):
+${nuget_output}")
+    endif()
 
     # Find the path to the binaries in the package and add them to find path.
     file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/Gettext.Tools*)

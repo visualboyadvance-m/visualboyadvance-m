@@ -107,14 +107,39 @@ endif()
 # Assembler flags.
 if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
     if(WIN32 AND X86)
+        # See the longer note in src/wx/CMakeLists.txt: the download is checked
+        # and removed on failure so a truncated file is not mistaken for a good
+        # one, and nuget is named by full path because execute_process()
+        # resolves a command against PATH rather than WORKING_DIRECTORY.
         if(NOT EXISTS ${CMAKE_BINARY_DIR}/nuget.exe)
-            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" ${CMAKE_BINARY_DIR}/nuget.exe)
+            file(DOWNLOAD "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+                ${CMAKE_BINARY_DIR}/nuget.exe
+                STATUS nuget_download
+            )
+
+            list(GET nuget_download 0 nuget_download_code)
+
+            if(NOT nuget_download_code EQUAL 0)
+                list(GET nuget_download 1 nuget_download_message)
+                file(REMOVE ${CMAKE_BINARY_DIR}/nuget.exe)
+                message(FATAL_ERROR "downloading nuget.exe failed: ${nuget_download_message}")
+            endif()
         endif()
 
         execute_process(
-            COMMAND nuget.exe install nasm2 -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            COMMAND ${CMAKE_BINARY_DIR}/nuget.exe install nasm2
+                    -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
+            RESULT_VARIABLE nuget_result
+            OUTPUT_VARIABLE nuget_output
+            ERROR_VARIABLE  nuget_output
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         )
+
+        if(NOT nuget_result EQUAL 0)
+            message(FATAL_ERROR
+                "installing the nasm2 nuget package failed (${nuget_result}):
+${nuget_output}")
+        endif()
 
         file(GLOB pkg ${CMAKE_BINARY_DIR}/nuget/nasm2*)
 
