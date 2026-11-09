@@ -478,9 +478,15 @@ struct DistPairIndex
 {
     constexpr DistPairIndex() : idx()
     {
-        for (auto& row : idx)
-            for (int& v : row)
-                v = -1;
+        // Indices rather than a range-for over idx: the v143 toolset cannot
+        // constant-evaluate a reference bound into a member array that is still
+        // being constructed, and rejects the whole object with "expression did
+        // not evaluate to a constant ... failure was caused by unevaluable
+        // pointer value". 14.51 takes it, which is why only the x64 nightly saw
+        // this -- that one builds under v143.
+        for (int a = 0; a < 9; ++a)
+            for (int b = 0; b < 9; ++b)
+                idx[a][b] = -1;
         for (int p = 0; p < 24; ++p)
         {
             idx[distPairs[p][0]][distPairs[p][1]] = p;
