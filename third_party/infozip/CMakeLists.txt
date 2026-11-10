@@ -90,6 +90,14 @@ if(WIN32)
 
     target_compile_definitions(infozip-zip PRIVATE WIN32_LEAN_AND_MEAN=)
 
+    # win32/osdep.h supplies its own MB_CUR_MAX on MinGW when <stdlib.h> has
+    # not been seen yet, through __p___mb_cur_max, which not every msvcrt
+    # import library exports (the Windows XP toolchain's does not). Seeing
+    # <stdlib.h> first gives every source the toolchain's own definition.
+    if(MINGW)
+        target_compile_options(infozip-zip PRIVATE -include stdlib.h)
+    endif()
+
     set_source_files_properties(${INFOZIP_WINDOWS_FIRST}
         TARGET_DIRECTORY infozip-zip
         PROPERTIES COMPILE_OPTIONS "${INFOZIP_FORCE_INCLUDE}"
