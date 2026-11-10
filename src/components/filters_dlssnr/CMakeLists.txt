@@ -26,6 +26,20 @@ target_include_directories(vbam-components-filters-dlssnr
 
 target_compile_definitions(vbam-components-filters-dlssnr PUBLIC VBAM_ENABLE_DLSS_NR)
 
+# The composition kernels are templates on bool, and an instantiation that
+# does not use a weight initializes it to a constant 0, so conditions like
+# `w > 0` fold to a constant there. MSVC 14.4x (the v143 toolset) reports
+# those as C4127, which /WX makes fatal; 14.5x, the toolset this project's
+# warning baseline was set with, does not report them at all. Only two of the
+# six sites have a condition made of template parameters alone and could be
+# written `if constexpr` -- in the rest a weight is a real runtime value in
+# the instantiations that read it, so there is nothing else to write.
+if(MSVC)
+    target_compile_options(vbam-components-filters-dlssnr PRIVATE
+        /wd4127 # conditional expression is constant
+    )
+endif()
+
 target_link_libraries(vbam-components-filters-dlssnr PUBLIC dlssnr)
 
 if(BUILD_TESTING AND NOT COMPILE_ONLY)
