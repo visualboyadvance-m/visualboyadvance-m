@@ -592,46 +592,35 @@ endif()
 set(LOCALEDIR share/locale)
 
 # Set up the zip compressor program (used for release zips and translations).
+#
+# Info-ZIP zip is vendored under third_party/infozip and built when the
+# machine has none of its own, so that a checkout is all a build needs. The
+# target has to be added on every configure, not only the one that first
+# failed to find a zip, hence the ZIP_PROGRAM_TARGET flag rather than a test
+# of the cache entry.
+set(ZIP_PROGRAM_TARGET "")
+
 if(NOT ZIP_PROGRAM)
     find_program(ZIP_PROGRAM zip DOC "zip compressor executable")
-    if(WIN32 AND NOT ZIP_PROGRAM)
-        if(NOT DEFINED POWERSHELL)
-            message(FATAL_ERROR "Powershell is required for zip file support when the `zip` program is not available.")
-        endif()
+endif()
 
-        # Build zip.exe from zip.ps1 using ps12exe
-        set(ZIP_EXE_DIR "${CMAKE_BINARY_DIR}/zip-bin")
-        set(ZIP_EXE "${ZIP_EXE_DIR}/zip.exe")
-        set(PS12EXE_DIR "${CMAKE_SOURCE_DIR}/third_party/ps12exe")
-
-        if(NOT EXISTS "${ZIP_EXE}")
-            file(MAKE_DIRECTORY "${ZIP_EXE_DIR}")
-
-            # ps12exe compiles for the .NET Framework, which needs Windows
-            # PowerShell 5.1 (under pwsh it hands off to powershell.exe). A
-            # host without it, such as the GitHub Windows 11 Arm images, must
-            # provide a real zip program on PATH instead; the vendored ps12exe
-            # does not carry its PowerShell Core compiler.
-            execute_process(
-                COMMAND ${POWERSHELL} -NoProfile -ExecutionPolicy Bypass -Command
-                    "& '${PS12EXE_DIR}/ps12exe.ps1' -inputFile '${CMAKE_SOURCE_DIR}/src/wx/zip.ps1' -outputFile '${ZIP_EXE}' -Build @{Platform='x86'} -Locale 'en' -NoUpdateCheck; exit $LASTEXITCODE"
-                RESULT_VARIABLE PS12EXE_BUILD_RESULT
-            )
-
-            # ps12exe reports some failures only via $LastExitCode (propagated
-            # by the exit above) and some only by not producing the file.
-            if(NOT PS12EXE_BUILD_RESULT EQUAL 0 OR NOT EXISTS "${ZIP_EXE}")
-                message(FATAL_ERROR "Failed to build zip.exe with ps12exe. The zip program is required for building.")
-            endif()
-        endif()
-
-        set(ZIP_PROGRAM "${ZIP_EXE}")
+if(NOT ZIP_PROGRAM)
+    # The build runs this program, so it has to be built for the machine
+    # doing the building, which a cross toolchain cannot do.
+    if(CMAKE_CROSSCOMPILING)
+        message(FATAL_ERROR
+            "No zip program was found. This is a cross build, so the vendored "
+            "Info-ZIP zip cannot stand in for one: it would be built for the "
+            "target and the build has to run it here. Install zip, or pass "
+            "-DZIP_PROGRAM=<path to a zip that runs on this machine>.")
     endif()
-    if(ZIP_PROGRAM)
-        set(ZIP_PROGRAM "${ZIP_PROGRAM}" CACHE STRING "zip compressor executable" FORCE)
-    else()
-        message(FATAL_ERROR "The zip compressor program is required for building.")
-    endif()
+
+    add_subdirectory(third_party/infozip)
+
+    # Consumers name this in a DEPENDS list or add_dependencies() so that the
+    # program is built before the first command that runs it.
+    set(ZIP_PROGRAM_TARGET infozip-zip)
+    set(ZIP_PROGRAM "${CMAKE_BINARY_DIR}/zip${CMAKE_EXECUTABLE_SUFFIX}")
 endif()
 
 # When ZIP_PROGRAM is cached, ENV{PATH} must be set every time.

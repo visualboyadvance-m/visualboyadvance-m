@@ -559,6 +559,10 @@ if(UPSTREAM_RELEASE)
         set(_lr_zip vbam-libretro-${_lr_os}-${ARCH_NAME}.zip)
     endif()
 
+    if(ZIP_PROGRAM_TARGET)
+        add_dependencies(vbam_libretro ${ZIP_PROGRAM_TARGET})
+    endif()
+
     add_custom_command(
         TARGET vbam_libretro
         POST_BUILD

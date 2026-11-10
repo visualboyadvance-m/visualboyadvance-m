@@ -160,7 +160,7 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/translations.zip
     COMMAND ${CMAKE_COMMAND} -D "ZIP_PROGRAM=${ZIP_PROGRAM}" -D "SRC_DIR=${CMAKE_SOURCE_DIR}" -P ${CMAKE_CURRENT_SOURCE_DIR}/make-translations-zip.cmake
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS translations make-translations-zip.cmake
+    DEPENDS translations make-translations-zip.cmake ${ZIP_PROGRAM_TARGET}
 )
 add_custom_target(
     translations-zip
@@ -849,6 +849,12 @@ else()
         WIN32
         MACOSX_BUNDLE
     )
+endif()
+
+# The release archives are made POST_BUILD on this target, so the zip program
+# has to be ready before it finishes.
+if(ZIP_PROGRAM_TARGET)
+    add_dependencies(visualboyadvance-m ${ZIP_PROGRAM_TARGET})
 endif()
 
 if(APPLE AND NOT COMPILE_ONLY)
@@ -1836,7 +1842,7 @@ add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
     COMMAND  ${CMAKE_COMMAND} -E env "PATH=${path_escaped}" ${WXRC} ${VBAM_XRC_FILES} -o ${CMAKE_CURRENT_BINARY_DIR}/wxvbam.xrs
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${VBAM_XRC_FILES}
+    DEPENDS ${VBAM_XRC_FILES} ${ZIP_PROGRAM_TARGET}
 )
 
 add_custom_command(
