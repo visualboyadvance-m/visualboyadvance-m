@@ -66,3 +66,43 @@ jobs:
       - if: matrix.build_options == 'default'
         name: Run tests
         run: cd build && ctest -j --output-on-failure
+
+  # The VS 2026 images still carry the v143 toolset as a side-by-side
+  # component (MSVC 14.44, what VS 2022 17.14 shipped), and the nightly
+  # server has vcpkg packages built with it, which
+  # cmake/Set-Toolchain-vcpkg.cmake selects from VCToolsVersion. Keep that
+  # combination building, since it is what anyone on VS 2022 gets.
+  #
+  # x64 only: there are no v143 packages for arm64-windows-static, and x86
+  # exercises the same toolset and the same vcpkg layout as x64 does.
+  build-v143:
+    strategy:
+      matrix:
+        build_type: [release, debug]
+        include:
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Release'
+            build_type: release
+          - cmake_build: '-DCMAKE_BUILD_TYPE=Debug'
+            build_type: debug
+    runs-on: windows-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Prepare Visual Studio environment
+        uses: ilammy/msvc-dev-cmd@v1.13.0
+        with:
+          arch: x64
+          toolset: '14.44'
+
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DVCPKG_TARGET_TRIPLET=x64-windows-static ${{ matrix.cmake_build }} -DENABLE_SDL=ON -DENABLE_LIBRETRO=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Run tests
+        run: cd build && ctest -j --output-on-failure
