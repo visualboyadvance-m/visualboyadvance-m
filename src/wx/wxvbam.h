@@ -149,6 +149,8 @@ public:
     wxString pending_load;
     // list of options to set after config file loaded
     wxArrayString pending_optset;
+    // Lua script to start once the frame is up (empty = none)
+    wxString pending_lua_script;
     // set fullscreen mode after init
     bool pending_fullscreen;
     // mute audio for this session without persisting to the config

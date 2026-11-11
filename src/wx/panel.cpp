@@ -788,6 +788,15 @@ static wxString gbaGetOverrideId() {
     return wxString::Format(wxT("CRC_%08X"), romcrc);
 }
 
+#ifdef ENABLE_LUA
+// Lua-facing ROM identity, owned by the Lua bindings (lua_api_emu.cpp)
+// and updated at the end of LoadGame below.
+namespace vbam { namespace wx { namespace lua_internal {
+extern std::string g_rom_name;
+extern int g_rom_generation;
+}}}
+#endif
+
 void GameArea::LoadGame(const wxString& load_path)
 {
     // The Android file picker hands back Storage-Access-Framework content://
@@ -1127,6 +1136,15 @@ void GameArea::LoadGame(const wxString& load_path)
     }
 
     loaded = t;
+#ifdef ENABLE_LUA
+    // Lua-facing ROM identity (emu.romname / emu.romgeneration): set
+    // once the load committed, so scripts — and the bridge's `loadrom`
+    // wait loop — can see that a queued emu.loadrom() landed. The
+    // externs are declared just above GameArea::LoadGame.
+    vbam::wx::lua_internal::g_rom_name =
+        std::string(loaded_game.GetName().mb_str(wxConvUTF8));
+    ++vbam::wx::lua_internal::g_rom_generation;
+#endif
     SetFrameTitle();
     SetFocus();
     // Use custom geometry
