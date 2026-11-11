@@ -106,11 +106,14 @@ typedef sem_t link_sem_t;
 
 #endif  // defined(_WIN32)
 
+#include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <vector>
 
 #include "../../../third_party/sfml/include/SFML/Network.hpp"
 
@@ -471,6 +474,68 @@ static void LinkTopologyInit(LINKDATA* d)
         d->core_clock[i] = 0;
 }
 
+// SFML's packet receiver allocates according to the peer-supplied framing
+// length before the link code can inspect it. Keep RFU framing state here so
+// the length can be bounded before any payload allocation takes place.
+class BoundedPacketReceiver {
+public:
+    sf::Socket::Status Receive(sf::TcpSocket& socket, sf::Packet& packet,
+        size_t max_packet_size)
+    {
+        packet.clear();
+
+        std::size_t received = 0;
+        while (size_received_ < sizeof(size_)) {
+            char* destination = reinterpret_cast<char*>(&size_) + size_received_;
+            const sf::Socket::Status status = socket.receive(
+                destination, sizeof(size_) - size_received_, received);
+            size_received_ += received;
+            if (status != sf::Socket::Status::Done) {
+                if (status != sf::Socket::Status::NotReady)
+                    Reset();
+                return status;
+            }
+        }
+
+        const std::size_t packet_size = ntohl(size_);
+        if (packet_size > max_packet_size) {
+            Reset();
+            return sf::Socket::Status::Error;
+        }
+
+        std::array<uint8_t, 1024> buffer{};
+        while (data_.size() < packet_size) {
+            const std::size_t amount = std::min(packet_size - data_.size(),
+                buffer.size());
+            const sf::Socket::Status status = socket.receive(
+                buffer.data(), amount, received);
+            if (status != sf::Socket::Status::Done) {
+                if (status != sf::Socket::Status::NotReady)
+                    Reset();
+                return status;
+            }
+            data_.insert(data_.end(), buffer.begin(), buffer.begin() + received);
+        }
+
+        if (!data_.empty())
+            packet.append(data_.data(), data_.size());
+        Reset();
+        return sf::Socket::Status::Done;
+    }
+
+    void Reset()
+    {
+        size_ = 0;
+        size_received_ = 0;
+        data_.clear();
+    }
+
+private:
+    uint32_t size_ = 0;
+    std::size_t size_received_ = 0;
+    std::vector<uint8_t> data_;
+};
+
 class RFUServer {
     [[maybe_unused]] int numbytes;
     sf::SocketSelector fdset;
@@ -538,6 +603,8 @@ uint32_t rfu_clientlist[5];
 
 static RFUServer rfu_server;
 static RFUClient rfu_client;
+static BoundedPacketReceiver rfu_server_receivers[5];
+static BoundedPacketReceiver rfu_client_receiver;
 
 uint8_t gbSIO_SC = 0;
 bool EmuReseted = true;
@@ -3218,13 +3285,16 @@ static void CloseSocket()
         }
     }
     lanlink.tcpsocket.disconnect();
+    rfu_client_receiver.Reset();
 
     // Free the listening port and any RFU per-slave sockets. These used to
     // leak: the listener kept the link port bound for the whole process
     // lifetime, and RFU server sessions leaked their slave sockets.
     lanlink.tcplistener.close();
-    for (int i = 1; i <= 4; i++)
+    for (int i = 1; i <= 4; i++) {
         rfu_server.tcpsocket[i].disconnect();
+        rfu_server_receivers[i].Reset();
+    }
     lanlink.connectedSlaves = 0;
     GpResetState();
 }
@@ -3395,6 +3465,24 @@ static void JoyBusShutdown()
 
 #define MAX_CLIENTS (lanlink.numslaves + 1)
 
+static size_t MaxRfuPacketSize()
+{
+    constexpr size_t kRecordsPerQueue =
+        sizeof(((LINKDATA*)nullptr)->rfu_datalist[0]) / sizeof(rfu_datarec);
+    constexpr size_t kRecordBytes = sizeof(uint8_t)
+        + sizeof(((rfu_datarec*)nullptr)->data) + sizeof(uint8_t);
+    constexpr size_t kQueueHeaderBytes = sizeof(uint16_t)
+        + sizeof(uint8_t) + sizeof(uint8_t);
+    constexpr size_t kFixedBytes = sizeof(uint8_t) + sizeof(uint16_t)
+        + 7 * sizeof(uint32_t) + sizeof(int32_t);
+
+    // A client serializes a queue for every other player. Counting one queue
+    // for every player leaves conservative room for fixed metadata while
+    // keeping the cap tied to the negotiated topology.
+    return kFixedBytes + static_cast<size_t>(MAX_CLIENTS)
+        * (kQueueHeaderBytes + kRecordsPerQueue * kRecordBytes);
+}
+
 // Server
 RFUServer::RFUServer(void)
 {
@@ -3510,7 +3598,8 @@ void RFUServer::Recv(void)
         for (int i = 0; i < lanlink.numslaves; i++) {
             sf::Packet packet;
             tcpsocket[i + 1].setBlocking(false);
-            sf::Socket::Status status = tcpsocket[i + 1].receive(packet);
+            sf::Socket::Status status = rfu_server_receivers[i + 1].Receive(
+                tcpsocket[i + 1], packet, MaxRfuPacketSize());
             if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
                 char message[30];
                 snprintf(message, sizeof(message), _("Player %d disconnected."), i + 1);
@@ -3630,7 +3719,8 @@ void RFUClient::Recv(void)
         return;
     }
     sf::Packet packet;
-    sf::Socket::Status status = lanlink.tcpsocket.receive(packet);
+    sf::Socket::Status status = rfu_client_receiver.Receive(
+        lanlink.tcpsocket, packet, MaxRfuPacketSize());
     if (status == sf::Socket::Status::Disconnected || status == sf::Socket::Status::Error) {
         systemScreenMessage(_("Server disconnected."));
         RequestLinkClose();
@@ -3660,6 +3750,7 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
             // Anything but a completed accept just means "no new client
             // this tick".
             if (st == sf::Socket::Status::Done) {
+                rfu_server_receivers[nextSlave].Reset();
                 LinkSetNoDelay(rfu_server.tcpsocket[nextSlave]);
                 sf::Packet packet;
                 packet << nextSlave << lanlink.numslaves;
@@ -3720,6 +3811,7 @@ static ConnectionState ConnectUpdateRFUSocket(char* const message, size_t size)
                 packet >> gameReady;
 
                 if (packet && gameReady) {
+                    rfu_client_receiver.Reset();
                     newState = LINK_OK;
                     snprintf(message, size, N_("All players joined."));
                 }
