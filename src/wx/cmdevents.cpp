@@ -2081,10 +2081,11 @@ void MainFrame::GDBBreak()
             } else
 #endif
             {
-                if (!debugStartListen(gopts.gdb_port))
+                if (!debugStartListen(gopts.gdb_port, gopts.gdb_bind_address))
                     return;
 
-                msg.Printf(_("Waiting for connection on port %d"), gopts.gdb_port);
+                msg.Printf(_("Waiting for connection on %s:%d"),
+                    gopts.gdb_bind_address.wc_str(), gopts.gdb_port);
             }
 
             bool connected = false;

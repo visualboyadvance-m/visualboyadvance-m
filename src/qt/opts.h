@@ -49,6 +49,7 @@ extern struct opts_t {
     int autofire_rate = 1;
 
     /// Core
+    QString gdb_bind_address = "127.0.0.1";
     int gdb_port = 55555;
     int link_num_players = 2;
     int max_scale = 0;

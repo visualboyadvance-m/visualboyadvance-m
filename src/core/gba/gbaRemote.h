@@ -77,5 +77,6 @@ void remoteStubSignal(int sig, int number);
 void remoteOutput(const char* s, uint32_t addr);
 void remoteSetProtocol(int p);
 void remoteSetPort(int port);
+void remoteSetBindAddress(const char* address);
 
 #endif // VBAM_CORE_GBA_GBAREMOTE_H_

@@ -1573,16 +1573,22 @@ static void debugCloseSock()
     debug_server = NULL;
 }
 
-bool debugStartListen(int port)
+bool debugStartListen(int port, const wxString& bind_address)
 {
     delete debug_server; // should never be necessary
     delete debug_remote;
     debug_remote = NULL;
     wxIPV4address addr;
-    // Service() must be called *after* AnyAddress(), because AnyAddress()
+    // Service() must be called after the address setter, because address setters
     // can reset the port on some wx builds. Without this the server binds
     // to port 0 and is effectively unreachable.
-    addr.AnyAddress();
+    const bool address_ok = bind_address == "*"
+        ? addr.AnyAddress()
+        : addr.Hostname(bind_address);
+    if (!address_ok) {
+        wxLogError(_("Invalid GDB server bind address %s"), bind_address.wc_str());
+        return false;
+    }
     if (!addr.Service(port)) {
         wxLogError(_("Invalid GDB server port %d"), port);
         return false;
@@ -1597,7 +1603,8 @@ bool debugStartListen(int port)
 
     // Do not call debug_server->LastError() here: when IsOk() is false the
     // internal impl pointer may be null and LastError() dereferences it.
-    wxLogError(_("Error setting up GDB server socket on port %d"), port);
+    wxLogError(_("Error setting up GDB server socket on %s:%d"),
+        bind_address.wc_str(), port);
     delete debug_server;
     debug_server = NULL;
     return false;

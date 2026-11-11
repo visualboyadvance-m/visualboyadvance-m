@@ -432,6 +432,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
         Option(OptionID::kPrefGBPrinter, &coreOptions.gbPrinterEnabled, 0, 1),
         Option(OptionID::kPrefGDBBreakOnLoad, &g_owned_opts.gdb_break_on_load),
+        Option(OptionID::kPrefGDBBindAddress, &gopts.gdb_bind_address),
         Option(OptionID::kPrefGDBPort, &gopts.gdb_port, 0, 65535),
 #ifndef NO_LINK
         Option(OptionID::kPrefLinkNumPlayers, &gopts.link_num_players, 2, 4),
@@ -675,6 +676,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/gbPrinter", "Printer", H("Enable printer emulation")},
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",
                H("Break into GDB after loading the game.")},
+    OptionData{"preferences/gdbBindAddress", "",
+               H("Address for the GDB server to listen on (* for all interfaces)")},
     OptionData{"preferences/gdbPort", "DebugGDBPort", H("Port to connect GDB to")},
 #ifndef NO_LINK
     OptionData{"preferences/LinkNumPlayers", "", H("Number of players in network")},

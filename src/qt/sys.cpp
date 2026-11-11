@@ -1505,7 +1505,7 @@ static void debugCloseSock()
     debug_server = nullptr;
 }
 
-bool debugStartListen(int port)
+bool debugStartListen(int port, const QString& bind_address)
 {
     delete debug_server; // should never be necessary
     debug_server = nullptr;
@@ -1517,15 +1517,25 @@ bool debugStartListen(int port)
         return false;
     }
 
+    QHostAddress address;
+    if (bind_address == QStringLiteral("*")) {
+        address = QHostAddress::AnyIPv4;
+    } else if (!address.setAddress(bind_address)) {
+        vbam::LogError(TR("Invalid GDB server bind address %1").arg(bind_address));
+        return false;
+    }
+
     debug_server = new QTcpServer();
     remoteSendFnc = debugWriteSock;
     remoteRecvFnc = debugReadSock;
     remoteCleanUpFnc = debugCloseSock;
 
-    if (debug_server->listen(QHostAddress::Any, static_cast<quint16>(port)))
+    if (debug_server->listen(address, static_cast<quint16>(port)))
         return true;
 
-    vbam::LogError(TR("Error setting up GDB server socket on port %1").arg(port));
+    vbam::LogError(TR("Error setting up GDB server socket on %1:%2")
+                       .arg(bind_address)
+                       .arg(port));
     delete debug_server;
     debug_server = nullptr;
     return false;

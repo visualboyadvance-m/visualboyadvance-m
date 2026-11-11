@@ -115,6 +115,7 @@ enum class OptionID {
     kPrefGBPaletteOption,
     kPrefGBPrinter,
     kPrefGDBBreakOnLoad,
+    kPrefGDBBindAddress,
     kPrefGDBPort,
 #ifndef NO_LINK
     kPrefLinkNumPlayers,

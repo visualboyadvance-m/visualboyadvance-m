@@ -1154,7 +1154,7 @@ extern void remoteOutput(const char*, uint32_t);
 extern bool debugOpenPty();
 extern const wxString& debugGetSlavePty();
 extern bool debugWaitPty();
-extern bool debugStartListen(int port);
+extern bool debugStartListen(int port, const wxString& bind_address);
 extern bool debugWaitSocket();
 #endif  // defined(VBAM_ENABLE_DEBUGGER)
 
