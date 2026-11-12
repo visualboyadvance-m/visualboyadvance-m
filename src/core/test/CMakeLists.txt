@@ -82,6 +82,22 @@ if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
     add_test(NAME gba.dma.video_capture COMMAND ${_video_capture_test})
     set_tests_properties(gba.dma.video_capture PROPERTIES TIMEOUT 60)
 endif()
+
+# gbp_sio_test: Game Boy Player serial transfers through the core's kSchedSio
+# completion -- timing, handshake replies, serial IRQ and rumble decoding.
+# The GBP code is part of the link support, so only with ENABLE_LINK.
+if(ENABLE_LINK)
+    add_executable(gbp_sio_test gbp_sio_test.cpp)
+    target_link_libraries(gbp_sio_test PRIVATE vbam-core)
+    if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+        set(_gbp_sio_test gbp_sio_test)
+        if(MINGW AND MINGW_TEST_WRAPPER)
+            set(_gbp_sio_test "${MINGW_TEST_WRAPPER}" $<TARGET_FILE:gbp_sio_test>)
+        endif()
+        add_test(NAME gba.sio.gbp COMMAND ${_gbp_sio_test})
+        set_tests_properties(gba.sio.gbp PROPERTIES TIMEOUT 60)
+    endif()
+endif()
 if(APPLE)
     # Link iconv by its resolved path (the SDK .tbd) rather than a bare
     # `-liconv`. Non-Apple toolchains (e.g. a Nix/Homebrew Clang) do not

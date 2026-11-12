@@ -429,6 +429,7 @@ std::array<Option, kNbOptions>& Option::All() {
         Option(OptionID::kPrefEmulatorType, &gbEmulatorType, 0, 5),
         Option(OptionID::kPrefFlashSize, &g_owned_opts.flash_size, 0, 1),
         Option(OptionID::kPrefFrameSkip, &g_owned_opts.frame_skip, -1, 9),
+        Option(OptionID::kPrefGBPEnabled, &coreOptions.gbpEnabled, 0, 1),
         Option(OptionID::kPrefGBPaletteOption, &gbPaletteOption, 0, 2),
         Option(OptionID::kPrefGBPrinter, &coreOptions.gbPrinterEnabled, 0, 1),
         Option(OptionID::kPrefGDBBreakOnLoad, &g_owned_opts.gdb_break_on_load),
@@ -671,6 +672,8 @@ const std::array<OptionData, kNbOptions + 1> kAllOptionsData = {
     OptionData{"preferences/frameSkip", "FrameSkip",
                H("Skip frames. Values are 0-9 or -1 to skip automatically "
                  "based on time.")},
+    OptionData{"preferences/gbpEnabled", "GBPEnabled",
+               H("Emulate the Game Boy Player SIO handshake and rumble")},
     OptionData{"preferences/gbPaletteOption", "", H("The palette to use")},
     OptionData{"preferences/gbPrinter", "Printer", H("Enable printer emulation")},
     OptionData{"preferences/gdbBreakOnLoad", "DebugGDBBreakOnLoad",

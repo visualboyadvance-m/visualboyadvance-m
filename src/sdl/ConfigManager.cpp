@@ -201,6 +201,7 @@ struct option argOptions[] = {
 	{ "gb-frame-skip", required_argument, 0, OPT_GB_FRAME_SKIP },
 	{ "gb-palette-option", required_argument, 0, OPT_GB_PALETTE_OPTION },
 	{ "gb-printer", no_argument, &coreOptions.gbPrinterEnabled, 1 },
+	{ "gbp", no_argument, &coreOptions.gbpEnabled, 1 },
 	{ "gdb", required_argument, 0, 'G' },
 	{ "help", no_argument, &optPrintUsage, 1 },
 	{ "ifb-filter", required_argument, 0, 'I' },
@@ -208,6 +209,7 @@ struct option argOptions[] = {
 	{ "no-agb-print", no_argument, &agbPrint, 0 },
 	{ "no-auto-frameskip", no_argument, &autoFrameSkip, 0 },
 	{ "no-debug", no_argument, 0, 'N' },
+	{ "no-gbp", no_argument, &coreOptions.gbpEnabled, 0 },
 	{ "no-opengl", no_argument, &openGL, 0 },
 	{ "no-patch", no_argument, &autoPatch, 0 },
 	{ "no-pause-when-inactive", no_argument, &pauseWhenInactive, 0 },
@@ -368,6 +370,7 @@ void LoadConfig()
 	coreOptions.speedup_mute = ReadPref("speedupMute", 1);
 	coreOptions.useBios = ReadPrefHex("useBiosGBA");
 	coreOptions.gbPrinterEnabled = ReadPref("gbPrinter", 0);
+	coreOptions.gbpEnabled = ReadPref("gbpEnabled", 1);
 
 	int soundQuality = (ReadPrefHex("soundQuality", 1));
 	switch (soundQuality) {

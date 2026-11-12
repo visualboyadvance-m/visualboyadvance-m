@@ -295,6 +295,7 @@ void MainWindow::BuildMenus() {
         check(gba, cmd::kBootRomEn, tr("_Use BIOS file"));
         check(gba, cmd::kAGBPrinter, tr("_Debug print"));
         check(gba, cmd::kGBALcdFilter, tr("_LCD Filter"));
+        check(gba, cmd::kGBPEnabled, tr("Enable Game _Boy Player"));
 
         QMenu* gb = submenu(options, "_Game Boy");
         item(gb, cmd::kGameBoyConfigure, tr("Configure..."));

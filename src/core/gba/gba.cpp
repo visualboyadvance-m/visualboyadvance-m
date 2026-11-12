@@ -35,6 +35,7 @@
 
 #if !defined(NO_LINK)
 #include "core/gba/gbaLink.h"
+#include "core/gba/gbpSio.h"
 #endif  // !defined(NOLINK)
 
 #if !defined(__LIBRETRO__)
@@ -1119,6 +1120,10 @@ static inline void CPUTestIRQ(bool software_unmask = false, int delay_bias = 0,
 // toggle it mid-transfer -- the same behavior as the real SIO hardware.
 static inline void gbaScheduler_OnSioComplete() {
     if (!g_ioMem) return;
+#ifndef NO_LINK
+    // A Game Boy Player transfer gets the GBP's reply before it completes.
+    GbpOnSioComplete();
+#endif
     uint16_t siocnt = READ16LE(&g_ioMem[COMM_SIOCNT]);
     if (!(siocnt & 0x80)) return; // CPU already cleared it
     // [SIO] sio-complete extra layout:
@@ -1168,6 +1173,26 @@ void CPURaiseSioIRQ()
 void CPUScheduleSioCompletion(int cycles)
 {
     gbaScheduler::Schedule(kSchedSio, cycles);
+}
+
+// Serial clock time of a Normal-mode transfer of `bits` bits: 256 kHz (64
+// cycles a bit), or 2 MHz (8 cycles a bit) for the fast internal clock.
+int CPUSioNormalTransferCycles(int bits, bool fast)
+{
+    return bits * (fast ? 8 : 64);
+}
+
+// As CPUScheduleSioCompletion(), but `cycles` counts from the instruction
+// being executed rather than from the start of the current event block (the
+// scheduler's clock only advances at block boundaries), and the block is cut
+// short if the completion falls inside it -- the same treatment CPUTestIRQ()
+// gives kSchedIrq. For a peripheral that clocks the transfer itself.
+void CPUScheduleSioCompletionFromNow(int cycles)
+{
+    const int when = cpuTotalTicks + cycles;
+    gbaScheduler::Schedule(kSchedSio, when);
+    if (cpuNextEvent > when)
+        cpuNextEvent = when;
 }
 
 inline int CPUUpdateTicks()
@@ -4932,7 +4957,6 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
 #endif
         if (cycle_accurate_path && !link_owns) {
             const int bits    = (mode == 1) ? 32 : 8;
-            const int per_bit = (value & 0x02) ? 8 : 64;
             // The scheduled delay is the serial-clock time for the
             // transfer plus a fixed startup residual covering the SIO
             // unit's start latency and the completion IRQ's delivery
@@ -4941,7 +4965,8 @@ void CPUUpdateRegister(uint32_t address, uint16_t value)
             // halted-wake entry discount (the wait for this IRQ is
             // always a halt).
             const int sio_startup = coreOptions.useBios ? 16 : 37;
-            const int sio_delay = bits * per_bit + sio_startup - irqEntryCost();
+            const int sio_delay = CPUSioNormalTransferCycles(bits, (value & 0x02) != 0) +
+                                  sio_startup - irqEntryCost();
             // [SIO] sio-sched extra = the absolute scheduled delay in
             // cycles, so the trace can be diffed against [SIO]
             // sio-complete (cyc) and against the CPU's own
@@ -5379,6 +5404,12 @@ void CPUReset()
     rtcReset();
     gbaMgbaLog::Reset();
     gbaScheduler::Reset();
+#ifndef NO_LINK
+    // CloseLink() only runs on a link-mode change or on shutdown, so without
+    // this a Game Boy Player session left gbp_active set -- and rumble on --
+    // for whatever ROM was loaded next.
+    GbpReset();
+#endif
     g_dma3VideoRunning = false;
     cpuAbsCycle = 0;
     // clean registers
@@ -6023,6 +6054,10 @@ void CPULoop(int ticks)
                                 CPUTestIRQ();
                             }
                             CPUCheckDMA(1, 0x0f);
+
+#ifndef NO_LINK
+                            GbpUpdate();
+#endif
                         }
 
                         UPDATE_REG(IO_REG_DISPSTAT, DISPSTAT);

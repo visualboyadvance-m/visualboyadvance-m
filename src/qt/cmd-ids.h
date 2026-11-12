@@ -172,6 +172,7 @@ enum Id : int {
     kGBSurround,
     kAGBPrinter,
     kGBALcdFilter,
+    kGBPEnabled,
     kGBLcdFilter,
     kApplyPatches,
     kKeepOnTop,
