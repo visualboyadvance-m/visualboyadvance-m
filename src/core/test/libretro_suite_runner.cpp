@@ -4,7 +4,7 @@
 // dlopens the vbam_libretro core and drives it exclusively through the
 // libretro API — the same code path RetroArch uses. The libretro build
 // compiles its own copy of the emulator sources with libretro-specific
-// defines (__LIBRETRO__, NO_LINK, TILED_RENDERING, ...), so accuracy
+// defines (__LIBRETRO__, NO_LINK, C_CORE, ...), so accuracy
 // regressions can hide there even when the desktop core passes.
 //
 // Suite state is read through the RETRO_ENVIRONMENT_SET_MEMORY_MAPS

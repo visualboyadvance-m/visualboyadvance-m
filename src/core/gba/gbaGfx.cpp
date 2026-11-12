@@ -1,8 +1,6 @@
 #include "core/gba/gbaGfx.h"
 
-#if defined(TILED_RENDERING)
 #include <cstring>
-#endif  // defined(TILED_RENDERING)
 
 int g_coeff[32] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
@@ -24,8 +22,6 @@ int gfxBG2X = 0;
 int gfxBG2Y = 0;
 int gfxBG3X = 0;
 int gfxBG3Y = 0;
-
-#ifdef TILED_RENDERING
 
 typedef struct TileEntry {
     uint16_t tileNum;
@@ -62,14 +58,14 @@ struct TileLine {
     uint32_t pixels[8];
 };
 
-typedef const TileLine (*TileReader)(const uint16_t*, const int, const uint8_t*, uint16_t*, const uint32_t);
+typedef const TileLine (*TileReader)(const uint16_t*, const int, const size_t, uint16_t*, const uint32_t);
 
 static inline void gfxDrawPixel(uint32_t* dest, const uint8_t color, const uint16_t* palette, const uint32_t prio)
 {
     *dest = color ? (READ16LE(&palette[color]) | prio) : 0x80000000;
 }
 
-inline const TileLine gfxReadTile(const uint16_t* screenSource, const int yyy, const uint8_t* charBase, uint16_t* palette, const uint32_t prio)
+inline const TileLine gfxReadTile(const uint16_t* screenSource, const int yyy, const size_t charBankBaseOffset, uint16_t* palette, const uint32_t prio)
 {
     TileEntry tile;
 
@@ -80,7 +76,23 @@ inline const TileLine gfxReadTile(const uint16_t* screenSource, const int yyy, c
         tileY = 7 - tileY;
     TileLine tileLine;
 
-    const uint8_t* tileBase = &charBase[tile.tileNum * 64 + tileY * 8];
+    const size_t charBankTotalOffset =
+        charBankBaseOffset + tile.tileNum * 64 + tileY * 8;
+    if (charBankTotalOffset >= 0x10000) {
+        // Adapted from https://github.com/mgba-emu/mgba/commit/4ce9b83362ad66b1421afea7372adfc753bce97c
+        // Real hardware PPU uses the most recently read from background
+        // VRAM. This can't be easily emulated in vba-m, so we simply
+        // use 0 here.
+        //
+        // A tile row starts on an 8-byte boundary and 0x10000 is a multiple
+        // of 8, so the row can never straddle the limit: testing its first
+        // byte settles all 8.
+        for (uint32_t& pixel : tileLine.pixels)
+            pixel = 0x80000000;
+        return tileLine;
+    }
+
+    const uint8_t* tileBase = &g_vram[charBankTotalOffset];
 
     if (!tile.hFlip) {
         gfxDrawPixel(&tileLine.pixels[0], tileBase[0], palette, prio);
@@ -105,7 +117,7 @@ inline const TileLine gfxReadTile(const uint16_t* screenSource, const int yyy, c
     return tileLine;
 }
 
-inline const TileLine gfxReadTilePal(const uint16_t* screenSource, const int yyy, const uint8_t* charBase, uint16_t* palette, const uint32_t prio)
+inline const TileLine gfxReadTilePal(const uint16_t* screenSource, const int yyy, const size_t charBankBaseOffset, uint16_t* palette, const uint32_t prio)
 {
     TileEntry tile;
 
@@ -117,7 +129,23 @@ inline const TileLine gfxReadTilePal(const uint16_t* screenSource, const int yyy
     palette += tile.palette * 16;
     TileLine tileLine;
 
-    const uint8_t* tileBase = &charBase[tile.tileNum * 32 + tileY * 4];
+    const size_t charBankTotalOffset =
+        charBankBaseOffset + tile.tileNum * 32 + tileY * 4;
+    if (charBankTotalOffset >= 0x10000) {
+        // Adapted from https://github.com/mgba-emu/mgba/commit/4ce9b83362ad66b1421afea7372adfc753bce97c
+        // Real hardware PPU uses the most recently read from background
+        // VRAM. This can't be easily emulated in vba-m, so we simply
+        // use 0 here.
+        //
+        // A tile row starts on a 4-byte boundary and 0x10000 is a multiple
+        // of 4, so the row can never straddle the limit: testing its first
+        // byte settles all 4.
+        for (uint32_t& pixel : tileLine.pixels)
+            pixel = 0x80000000;
+        return tileLine;
+    }
+
+    const uint8_t* tileBase = &g_vram[charBankTotalOffset];
 
     if (!tile.hFlip) {
         gfxDrawPixel(&tileLine.pixels[0], u8_lower_half(tileBase[0]), palette, prio);
@@ -157,7 +185,7 @@ static void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs,
     uint32_t* line)
 {
     uint16_t* palette = (uint16_t*)g_paletteRAM;
-    uint8_t* charBase = &g_vram[((control >> 2) & 0x03) * 0x4000];
+    const size_t charBankBaseOffset = ((control >> 2) & 0x03) * 0x4000;
     uint16_t* screenBase = (uint16_t*)&g_vram[((control >> 8) & 0x1f) * 0x800];
     uint32_t prio = ((control & 3) << 25) + 0x1000000;
     int sizeX = 256;
@@ -209,7 +237,7 @@ static void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs,
 
     // First tile, if clipped
     if (firstTileX) {
-        gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], firstTileX, 8 - firstTileX);
+        gfxDrawTileClipped(readTile(screenSource, yyy, charBankBaseOffset, palette, prio), &line[x], firstTileX, 8 - firstTileX);
         screenSource++;
         x += 8 - firstTileX;
         xxx += 8 - firstTileX;
@@ -224,7 +252,7 @@ static void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs,
 
     // Middle tiles, full
     while (x < 240 - firstTileX) {
-        gfxDrawTile(readTile(screenSource, yyy, charBase, palette, prio), &line[x]);
+        gfxDrawTile(readTile(screenSource, yyy, charBankBaseOffset, palette, prio), &line[x]);
         screenSource++;
         xxx += 8;
         x += 8;
@@ -239,7 +267,7 @@ static void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs,
 
     // Last tile, if clipped
     if (firstTileX) {
-        gfxDrawTileClipped(readTile(screenSource, yyy, charBase, palette, prio), &line[x], 0, firstTileX);
+        gfxDrawTileClipped(readTile(screenSource, yyy, charBankBaseOffset, palette, prio), &line[x], 0, firstTileX);
     }
 
     if (mosaicOn) {
@@ -264,4 +292,4 @@ void gfxDrawTextScreen(uint16_t control, uint16_t hofs, uint16_t vofs, uint32_t*
     else // 16 pal / 16 col
         gfxDrawTextScreen<gfxReadTilePal>(control, hofs, vofs, line);
 }
-#endif // TILED_RENDERING
+

@@ -95,7 +95,6 @@ target_compile_definitions(vbam_libretro PRIVATE
     C_CORE
     NO_DEBUGGER
     NO_PNG
-    TILED_RENDERING
     NO_LINK
     AFFINE_BG_UNIFIED
     FRONTEND_SUPPORTS_RGB565
@@ -503,7 +502,7 @@ endif()
 # --- Accuracy test: run mGBA's suite.gba through the libretro core ---
 #
 # The libretro core compiles its own copy of the emulator sources with
-# libretro-specific defines (__LIBRETRO__, NO_LINK, TILED_RENDERING, ...),
+# libretro-specific defines (__LIBRETRO__, NO_LINK, C_CORE, ...),
 # so accuracy regressions can hide here even when the desktop vbam-core
 # passes gba.suite. The harness dlopens the built core and drives it purely
 # through the libretro API (the same path RetroArch uses).

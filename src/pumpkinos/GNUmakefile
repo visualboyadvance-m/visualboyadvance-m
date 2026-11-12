@@ -132,7 +132,7 @@ endif
 # load-bearing: it selects the in-memory savestate API and the packed
 # g_pix scanline stride this frontend relies on.
 COREDEFS = -D__LIBRETRO__ -DFINAL_VERSION -DC_CORE -DNO_LINK -DNO_DEBUGGER \
-           -DNO_PNG -DTILED_RENDERING -DAFFINE_BG_UNIFIED -DFRONTEND_SUPPORTS_RGB565
+           -DNO_PNG -DAFFINE_BG_UNIFIED -DFRONTEND_SUPPORTS_RGB565
 
 PUMPDEFS = -DSYS_CPU=$(SYS_CPU) -DSYS_SIZE=$(SYS_SIZE) -DSYS_OS=$(SYS_OS) \
            -DSYS_ENDIAN=$(SYS_ENDIAN) -DUNIX
