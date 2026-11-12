@@ -455,43 +455,43 @@ msgstr "Inga användbara rpi plugins funna i %s"
 
 #: dialogs/display-config.cpp:1323
 msgid "DLSS-NR (Experimental)"
-msgstr ""
+msgstr "DLSS-NR (experimentell)"
 
 #: dialogs/display-config.cpp:1342
 msgid "Enable &DLSS-NR"
-msgstr ""
+msgstr "Aktivera &DLSS-NR"
 
 #: dialogs/display-config.cpp:1343
 msgid ""
 "Runs every frame through the DLSS-NR neural rendering model. Very slow and "
 "experimental."
-msgstr ""
+msgstr "Kör varje bildruta genom DLSS-NR:s neurala renderingsmodell. Mycket långsam och experimentell."
 
 #: dialogs/display-config.cpp:1345
 msgid "Use Frame &History"
-msgstr ""
+msgstr "Använd bildrute&historik"
 
 #: dialogs/display-config.cpp:1346
 msgid ""
 "Feeds the previous filtered frame back into the model, for steadier motion. "
 "Unchecked, every frame is filtered on its own exactly as the nr_frame "
 "command filters a picture, and the filter runs faster."
-msgstr ""
+msgstr "Skickar tillbaka föregående filtrerade bildruta till modellen för jämnare rörelser. När alternativet inte är markerat filtreras varje bildruta självständigt, precis som kommandot nr_frame filtrerar en bild, och filtret körs snabbare."
 
 #: dialogs/display-config.cpp:1349
 msgid "Adaptive &Frame Rate"
-msgstr ""
+msgstr "Adaptiv &bildfrekvens"
 
 #: dialogs/display-config.cpp:1350
 msgid ""
 "Runs the model less often while the game falls short of its full frame rate "
 "at the current throttle, so a laptop that heats up keeps the game at speed. "
 "The picture keeps its frame rate; the filtering refreshes less often."
-msgstr ""
+msgstr "Kör modellen mer sällan när spelet inte når sin fulla bildfrekvens vid den aktuella begränsningen, så att en varm bärbar dator ändå håller spelet i rätt hastighet. Bilden behåller sin bildfrekvens, men filtreringen uppdateras mer sällan."
 
 #: dialogs/display-config.cpp:1353
 msgid "Compose at S&caled Height"
-msgstr ""
+msgstr "Beräkna vid skale&rad höjd"
 
 #: dialogs/display-config.cpp:1354
 msgid ""
@@ -500,40 +500,40 @@ msgid ""
 " and it leaves the display filter's own detail on screen -- composed at full"
 " size the correction replaces it with the model's scaled-up output. The "
 "picture is sharper, and no longer the model's exactly."
-msgstr ""
+msgstr "Beräknar korrigeringen vid den skalade höjden och sprider ut den över bildrutan i stället för vid bildrutans egen storlek. Det går mycket snabbare vid stora skalningsfaktorer och bevarar skärmfiltrets egna detaljer. Om korrigeringen komponerades i full storlek skulle de ersättas av modellens uppskalade utdata. Bilden blir skarpare, men inte längre exakt modellens."
 
 #: dialogs/display-config.cpp:1368
 msgid "&Pre-filter"
-msgstr ""
+msgstr "&Förfilter"
 
 #: dialogs/display-config.cpp:1370
 msgid ""
 "Run DLSS-NR on the emulated image, then let the display filter scale the "
 "result. The cheapest: the model sees the unscaled frame."
-msgstr ""
+msgstr "Kör DLSS-NR på den emulerade bilden och låter sedan skärmfiltret skala resultatet. Billigast: modellen ser den oskalade bildrutan."
 
 #: dialogs/display-config.cpp:1373
 msgid "P&ost-filter"
-msgstr ""
+msgstr "Efter&filter"
 
 #: dialogs/display-config.cpp:1374
 msgid "Run DLSS-NR over the display filter's output, at the filtered size."
-msgstr ""
+msgstr "Kör DLSS-NR på skärmfiltrets utdata i den filtrerade storleken."
 
 #: dialogs/display-config.cpp:1377
 msgid "At display si&ze"
-msgstr ""
+msgstr "Vid skärmstorle&k"
 
 #: dialogs/display-config.cpp:1378
 msgid ""
 "Scale the display filter's output up to the size it is shown at and run "
 "DLSS-NR over that, as over a screenshot of the game. Scaled Height bounds "
 "the cost."
-msgstr ""
+msgstr "Skalar upp skärmfiltrets utdata till den visade storleken och kör DLSS-NR på den, som på en skärmbild av spelet. Skalad höjd begränsar kostnaden."
 
 #: dialogs/display-config.cpp:1381
 msgid "Apply:"
-msgstr ""
+msgstr "Tillämpa:"
 
 #: dialogs/display-config.cpp:1395 dialogs/joypad-config.cpp:195
 #: xrc/GBColorPrefPanel.xrc:10
@@ -542,25 +542,25 @@ msgstr "Standard"
 
 #: dialogs/display-config.cpp:1396
 msgid "Natural"
-msgstr ""
+msgstr "Naturlig"
 
 #: dialogs/display-config.cpp:1397
 msgid "Cinematic"
-msgstr ""
+msgstr "Filmisk"
 
 #: dialogs/display-config.cpp:1398
 msgid "Neutral"
-msgstr ""
+msgstr "Neutral"
 
 #: dialogs/display-config.cpp:1399
 msgid "Vendor"
-msgstr ""
+msgstr "Leverantör"
 
 #: dialogs/display-config.cpp:1400
 msgid ""
 "The style, local tone and local structure the model is conditioned on. "
 "Neutral turns local tone and structure off, Vendor raises structure."
-msgstr ""
+msgstr "Den stil, lokala ton och lokala struktur som modellen utgår från. Neutral stänger av lokal ton och struktur, medan Leverantör förstärker strukturen."
 
 #: dialogs/display-config.cpp:1408 xrc/DisplayConfigColorCorrection.xrc:11
 msgid "Profile:"
@@ -568,148 +568,148 @@ msgstr "Profil:"
 
 #: dialogs/display-config.cpp:1410
 msgid "Intensity:"
-msgstr ""
+msgstr "Intensitet:"
 
 #: dialogs/display-config.cpp:1412
 msgid ""
 "Blend of the model's picture against the game's. Above 100% extrapolates."
-msgstr ""
+msgstr "Blandning mellan modellens bild och spelets. Över 100 % extrapoleras."
 
 #: dialogs/display-config.cpp:1414
 msgid "Scaled Height:"
-msgstr ""
+msgstr "Skalad höjd:"
 
 #: dialogs/display-config.cpp:1415 dialogs/display-config.cpp:1455
 msgid "px"
-msgstr ""
+msgstr "px"
 
 #: dialogs/display-config.cpp:1416
 msgid ""
 "Frames taller than this are scaled down before the model runs, and back up "
 "after. Lower is faster."
-msgstr ""
+msgstr "Bildrutor högre än detta skalas ned innan modellen körs och upp igen efteråt. Lägre värde är snabbare."
 
 #: dialogs/display-config.cpp:1421
 msgid "Profile"
-msgstr ""
+msgstr "Profil"
 
 #: dialogs/display-config.cpp:1422
 msgid "Off"
-msgstr ""
+msgstr "Av"
 
 #: dialogs/display-config.cpp:1430
 msgid "Style Index:"
-msgstr ""
+msgstr "Stilindex:"
 
 #: dialogs/display-config.cpp:1432
 msgid ""
 "The vendor style index the model is conditioned on (nr_frame --style-index)."
 " Profile keeps the profile's."
-msgstr ""
+msgstr "Index för den leverantörsstil som modellen utgår från (nr_frame --style-index). Profil behåller profilens värde."
 
 #: dialogs/display-config.cpp:1433
 msgid "Local Tone:"
-msgstr ""
+msgstr "Lokal ton:"
 
 #: dialogs/display-config.cpp:1435
 msgid ""
 "Local tone the model is conditioned on (nr_frame --local-tone). Profile "
 "keeps the profile's."
-msgstr ""
+msgstr "Lokal ton som modellen utgår från (nr_frame --local-tone). Profil behåller profilens värde."
 
 #: dialogs/display-config.cpp:1436
 msgid "Local Structure:"
-msgstr ""
+msgstr "Lokal struktur:"
 
 #: dialogs/display-config.cpp:1438
 msgid ""
 "Local structure the model is conditioned on (nr_frame --local-structure). "
 "Profile keeps the profile's."
-msgstr ""
+msgstr "Lokal struktur som modellen utgår från (nr_frame --local-structure). Profil behåller profilens värde."
 
 #: dialogs/display-config.cpp:1439
 msgid "Skin Structure:"
-msgstr ""
+msgstr "Hudstruktur:"
 
 #: dialogs/display-config.cpp:1441
 msgid ""
 "Structure on skin, through the automatic mask (nr_frame --skin-structure). "
 "Setting this or Automatic Mask turns the automatic mask on."
-msgstr ""
+msgstr "Struktur på hud via den automatiska masken (nr_frame --skin-structure). Om du ställer in detta eller Automatisk mask aktiveras den automatiska masken."
 
 #: dialogs/display-config.cpp:1442
 msgid "Automatic Mask:"
-msgstr ""
+msgstr "Automatisk mask:"
 
 #: dialogs/display-config.cpp:1444
 msgid ""
 "Structure through the automatic mask outside skin (nr_frame --auto-mask)."
-msgstr ""
+msgstr "Struktur via den automatiska masken utanför hud (nr_frame --auto-mask)."
 
 #: dialogs/display-config.cpp:1445
 msgid "Frame Index:"
-msgstr ""
+msgstr "Bildruteindex:"
 
 #: dialogs/display-config.cpp:1447
 msgid "Seeds the model's noise channels (nr_frame --frame-index)."
-msgstr ""
+msgstr "Initierar modellens bruskanaler (nr_frame --frame-index)."
 
 #: dialogs/display-config.cpp:1448
 msgid "Detail Strength:"
-msgstr ""
+msgstr "Detaljstyrka:"
 
 #: dialogs/display-config.cpp:1450
 msgid ""
 "High-frequency weight of the model's change (nr_frame --detail-strength)."
-msgstr ""
+msgstr "Högfrekvensvikt för modellens ändring (nr_frame --detail-strength)."
 
 #: dialogs/display-config.cpp:1451
 msgid "Colour Strength:"
-msgstr ""
+msgstr "Färgstyrka:"
 
 #: dialogs/display-config.cpp:1453
 msgid ""
 "Low-frequency weight of the model's change (nr_frame --colour-strength)."
-msgstr ""
+msgstr "Lågfrekvensvikt för modellens ändring (nr_frame --colour-strength)."
 
 #: dialogs/display-config.cpp:1454
 msgid "Detail Radius:"
-msgstr ""
+msgstr "Detaljradie:"
 
 #: dialogs/display-config.cpp:1456
 msgid ""
 "Radius of the split between detail and colour (nr_frame --detail-radius)."
-msgstr ""
+msgstr "Radien för gränsen mellan detalj och färg (nr_frame --detail-radius)."
 
 #: dialogs/display-config.cpp:1462
 msgid ""
 "A PNG control mask (nr_frame --control-mask): red scales the blend, green "
 "the tone and blue the structure. It is resized to the filtered frame."
-msgstr ""
+msgstr "En PNG-styrmask (nr_frame --control-mask): rött skalar blandningen, grönt tonen och blått strukturen. Den ändrar storlek till den filtrerade bildrutan."
 
 #: dialogs/display-config.cpp:1464
 msgid "Browse..."
-msgstr ""
+msgstr "Bläddra..."
 
 #: dialogs/display-config.cpp:1465
 msgid "Clear"
-msgstr ""
+msgstr "Rensa"
 
 #: dialogs/display-config.cpp:1467
 msgid "Select a DLSS-NR control mask"
-msgstr ""
+msgstr "Välj en DLSS-NR-styrmask"
 
 #: dialogs/display-config.cpp:1468
 msgid "PNG Images (*.png)|*.png;*.PNG"
-msgstr ""
+msgstr "PNG-bilder (*.png)|*.png;*.PNG"
 
 #: dialogs/display-config.cpp:1481
 msgid "Control Mask:"
-msgstr ""
+msgstr "Styrmask:"
 
 #: dialogs/display-config.cpp:1538
 msgid "Not available while DLSS-NR is on."
-msgstr ""
+msgstr "Inte tillgängligt när DLSS-NR är aktiverat."
 
 #: dialogs/display-config.cpp:1599 dialogs/display-config.cpp:1987
 #: xrc/DisplayConfigBasic.xrc:187
@@ -1148,11 +1148,11 @@ msgstr "Okänt alternativ %s med värdet %s"
 msgid ""
 "VisualBoyAdvance-M needs your permission to open \"%s\". Allow this folder "
 "to open it and any other ROM in it from now on, or choose the file alone."
-msgstr ""
+msgstr "VisualBoyAdvance-M behöver ditt tillstånd för att öppna \"%s\". Tillåt att den här mappen öppnas och att alla andra ROM-filer i den öppnas framöver, eller välj endast filen."
 
 #: panel.cpp:804
 msgid "Allow"
-msgstr ""
+msgstr "Tillåt"
 
 #: panel.cpp:845
 #, c-format
@@ -1322,24 +1322,24 @@ msgstr "Avsluta"
 
 #: panel.cpp:3046
 msgid "DLSS NR is not available in this build; turning it off."
-msgstr ""
+msgstr "DLSS NR är inte tillgängligt i denna version; stängs av."
 
 #: panel.cpp:4725
 msgid "DLSS NR: loading model..."
-msgstr ""
+msgstr "DLSS NR: läser in modell..."
 
 #: panel.cpp:4747
 #, c-format
 msgid "DLSS NR filter failed: %s"
-msgstr ""
+msgstr "DLSS NR-filter misslyckades: %s"
 
 #: panel.cpp:4748
 msgid "DLSS NR unavailable, filter disabled"
-msgstr ""
+msgstr "DLSS NR är inte tillgängligt, filtret har inaktiverats"
 
 #: panel.cpp:4758
 msgid "DLSS NR ready"
-msgstr ""
+msgstr "DLSS NR är klart"
 
 #: panel.cpp:5109
 msgid "Failed to set wayland display"
@@ -2319,86 +2319,86 @@ msgstr "Bibliotek för filtertillägg"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:562
 msgid "Run the DLSS NR neural filter alongside the display filter"
-msgstr ""
+msgstr "Kör det neurala DLSS NR-filtret tillsammans med skärmfiltret"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:564
 msgid ""
 "Whether DLSS NR runs before or after the display filter, or at display size"
-msgstr ""
+msgstr "Om DLSS NR körs före eller efter skärmfiltret, eller i skärmstorlek"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:566
 msgid ""
 "Blend of the DLSS NR picture against the source, in percent; above 100 "
 "extrapolates"
-msgstr ""
+msgstr "Blandning av DLSS NR-bilden och källan, i procent; över 100 extrapoleras"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:568
 msgid ""
 "DLSS NR profile: 0 standard, 1 natural, 2 cinematic, 3 neutral, 4 vendor"
-msgstr ""
+msgstr "DLSS NR-profil: 0 standard, 1 naturlig, 2 filmisk, 3 neutral, 4 leverantör"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:570
 msgid ""
 "Frames taller than this are scaled down before DLSS NR runs, and back up "
 "after"
-msgstr ""
+msgstr "Bildrutor högre än detta skalas ned innan DLSS NR körs och upp igen efteråt"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:572
 msgid "Feed the previous DLSS NR output back into the model"
-msgstr ""
+msgstr "Mata in föregående DLSS NR-utdata i modellen igen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:574
 msgid ""
 "Run DLSS NR less often while the frame rate falls short of the throttle's"
-msgstr ""
+msgstr "Kör DLSS NR mer sällan när bildfrekvensen understiger begränsningen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:576
 msgid ""
 "Lay DLSS NR's correction down at the scaled height rather than the frame's"
-msgstr ""
+msgstr "Lägg DLSS NR:s korrigering vid den skalade höjden i stället för bildrutans"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:578
 msgid "DLSS NR style index; -1 keeps the profile's"
-msgstr ""
+msgstr "DLSS NR-stilindex; -1 behåller profilens värde"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:580
 msgid "DLSS NR local tone; negative keeps the profile's"
-msgstr ""
+msgstr "DLSS NR lokal ton; negativt värde behåller profilens"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:582
 msgid "DLSS NR local structure; negative keeps the profile's"
-msgstr ""
+msgstr "DLSS NR lokal struktur; negativt värde behåller profilens"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:584
 msgid "DLSS NR structure on skin through the automatic mask; negative is off"
-msgstr ""
+msgstr "DLSS NR-struktur på hud via den automatiska masken; negativt värde stänger av"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:586
 msgid ""
 "DLSS NR structure through the automatic mask outside skin; negative is off"
-msgstr ""
+msgstr "DLSS NR-struktur via den automatiska masken utanför hud; negativt värde stänger av"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:588
 msgid "High-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Högfrekvensvikt för DLSS NR-ändringen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:590
 msgid "Low-frequency weight of the DLSS NR change"
-msgstr ""
+msgstr "Lågfrekvensvikt för DLSS NR-ändringen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:592
 msgid "Radius of the DLSS NR split between detail and colour, in pixels"
-msgstr ""
+msgstr "Radie för DLSS NR-gränsen mellan detalj och färg, i pixlar"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:594
 msgid "Seeds the DLSS NR model's noise channels"
-msgstr ""
+msgstr "Initierar DLSS NR-modellens bruskanaler"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:596
 msgid ""
 "PNG control mask for DLSS NR: red scales the blend, green the tone, blue the"
 " structure"
-msgstr ""
+msgstr "PNG-styrmask för DLSS NR: rött skalar blandningen, grönt tonen, blått strukturen"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:597
 msgid "Directory containing RPI filter plugins"
@@ -3421,7 +3421,7 @@ msgstr "Nätverksfel."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2819
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3708
 msgid "Invalid link server response."
-msgstr ""
+msgstr "Ogiltigt svar från länkningsservern."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2827
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3716
