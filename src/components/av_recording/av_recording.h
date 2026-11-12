@@ -122,6 +122,12 @@ class MediaRecorder
         int posInAudioBuffer;
         int samplesInAudioBuffer;
         int audioBufferSize;
+        // audioBuffer capacity in uint16_t elements, which is two per
+        // stereo frame. posInAudioBuffer counts the same unit.
+        int audioBufferCapacity() const
+        {
+                return audioBufferSize / (int)sizeof *audioBuffer;
+        }
 
         MediaRet setup_common(const char *fname);
         MediaRet setup_video_stream_info(int width, int height, int depth);

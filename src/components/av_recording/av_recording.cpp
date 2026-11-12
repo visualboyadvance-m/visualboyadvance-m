@@ -188,12 +188,14 @@ recording::MediaRet recording::MediaRecorder::setup_audio_stream()
         return MRET_ERR_NOCODEC;
     if (avcodec_parameters_from_context(ast->codecpar, aenc) < 0)
         return MRET_ERR_BUFSIZE;
-    // number of samples per frame
+    // Number of samples per frame. AddFrame() accumulates two sound driver
+    // callbacks before it encodes, and the core hands us soundBufferLen =
+    // (sampleRate / 60) * 4 bytes, that is sampleRate / 60 stereo frames,
+    // per callback. So the buffer has to hold twice that. Derive it from
+    // the input rate, which is what audioBuffer actually holds; the 1470
+    // this replaces was 2 * (44100 / 60) and correct at 44.1 kHz only.
     if (aenc->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE)
-    {
-        //nb_samples = 10000; // can be any value, but we use our aud buffer size
-        nb_samples = 1470;
-    }
+        nb_samples = (sampleRate / STREAM_FRAME_RATE) * 2;
     else
         nb_samples = aenc->frame_size;
     // audio frame for input
@@ -700,19 +702,10 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
 
     if (c->frame_size == 0) // no compression/limit for audio frames
     {
-        int maxCopy = realLength;
-        memcpy(audioBuffer + posInAudioBuffer, aud, maxCopy * 2);
-        posInAudioBuffer += maxCopy;
-        samplesInAudioBuffer += (maxCopy / 2);
-        aud += maxCopy;
-    }
-
-    if (samplesInAudioBuffer < c->frame_size)
-    {
-        int missingSamples = (c->frame_size - samplesInAudioBuffer);
-        // 2 * missingSamples =: for 2 channels
-        // realLength =: entire samples (1470 ~ 735 samples per channel)
-        int maxCopy = MIN(2 * missingSamples, realLength);
+        // Never write past audioBuffer, whatever length the sound driver
+        // hands us; anything that does not fit is carried to the next call
+        // the same way the frame_size > 0 path below carries its remainder.
+        int maxCopy = MIN(realLength, audioBufferCapacity() - posInAudioBuffer);
         memcpy(audioBuffer + posInAudioBuffer, aud, maxCopy * 2);
         posInAudioBuffer += maxCopy;
         samplesInAudioBuffer += (maxCopy / 2);
@@ -723,7 +716,31 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
             cp = realLength - maxCopy;
         }
     }
-    if (samplesInAudioBuffer != c->frame_size && (c->frame_size > 0 || samplesInAudioBuffer != realLength)) // not enough samples
+
+    if (samplesInAudioBuffer < c->frame_size)
+    {
+        int missingSamples = (c->frame_size - samplesInAudioBuffer);
+        // 2 * missingSamples =: for 2 channels
+        // realLength =: entire samples (1470 ~ 735 samples per channel)
+        int maxCopy = MIN(2 * missingSamples, realLength);
+        maxCopy = MIN(maxCopy, audioBufferCapacity() - posInAudioBuffer);
+        memcpy(audioBuffer + posInAudioBuffer, aud, maxCopy * 2);
+        posInAudioBuffer += maxCopy;
+        samplesInAudioBuffer += (maxCopy / 2);
+        aud += maxCopy;
+        if (maxCopy < realLength)
+        {
+            isMissing = true;
+            cp = realLength - maxCopy;
+        }
+    }
+    // Not enough samples yet. A codec with a fixed frame size wants exactly
+    // frame_size of them; a variable one wants audioBuffer full, since that
+    // is what gets encoded. Testing the latter against this one callback's
+    // realLength only held while a callback was exactly half the buffer.
+    const int wantedSamples = (c->frame_size > 0) ? c->frame_size
+                                                  : audioframeTmp->nb_samples;
+    if (samplesInAudioBuffer != wantedSamples)
     {
         return MRET_OK;
     }
@@ -769,6 +786,7 @@ recording::MediaRet recording::MediaRecorder::AddFrame(const uint16_t *aud, int 
     memset(audioBuffer, 0, audioBufferSize);
     if (isMissing)
     {
+        cp = MIN(cp, audioBufferCapacity());
         memcpy(audioBuffer, aud, cp * 2);
         posInAudioBuffer = cp;
         samplesInAudioBuffer = (cp / 2);
