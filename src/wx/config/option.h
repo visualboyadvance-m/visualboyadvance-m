@@ -72,6 +72,9 @@ enum class RenderMethod {
 #if defined(__WXMSW__) && !defined(NO_D3D)
     kDirect3d,
 #endif
+#elif defined(__WXRETRO68__)
+    // Classic Mac OS: CopyBits from an offscreen GWorld (QuickDrawDrawingPanel).
+    kQuickDraw,
 #elif defined(__WXMAC__)
     kQuartz2d,
 #ifndef NO_METAL

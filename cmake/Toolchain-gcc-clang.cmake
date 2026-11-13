@@ -46,7 +46,9 @@ endif()
 # startup in newComputePipelineStateWithFunction:.
 # Not for DJGPP either: it ignores -fPIC with a notice on the driver's
 # stdout, and with -pipe that notice is the first line the assembler reads.
-if(NOT ENABLE_ASM AND NOT DOS) # inline asm is not allowed with -fPIC
+# Not for Retro68: classic Mac code is relocated by Elf2Mac/MakePEF, and on
+# 68k -fPIC stops gas relaxing out-of-range branches into absolute jumps.
+if(NOT ENABLE_ASM AND NOT DOS AND NOT RETRO68) # inline asm is not allowed with -fPIC
     add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Metal>>:-fPIC>)
 endif()
 
@@ -70,6 +72,32 @@ if(DOS)
     add_compile_options(-march=i586 -mtune=generic)
 endif()
 
+# Classic 68k Macs. The wx and SDL3 libraries in the Retro68 sysroot are
+# built for the default 68000 soft-float ABI; a 68020 soft-float build calls
+# them the same way (doubles in d0/d1, no 68881 registers), gets 32-bit
+# multiply/divide and long branches, and still runs on the FPU-less 68LC040.
+# The GBA cannot fit in a 68000 Mac's 4 MB anyway.
+if(RETRO68 AND M68K)
+    set(RETRO68_M68K_FLAGS "-m68020;-msoft-float" CACHE STRING
+        "Code generation flags for the Retro68 68k build")
+    add_compile_options(${RETRO68_M68K_FLAGS})
+    add_link_options(${RETRO68_M68K_FLAGS})
+endif()
+
+# A classic Mac application is one code resource (68k) or fragment (PEF), so
+# leave out what nothing calls, as Retro68 and wxRetro68 recommend.
+if(RETRO68)
+    add_compile_options(-ffunction-sections -fdata-sections)
+    add_link_options(-Wl,--gc-sections)
+endif()
+
+# Workarounds every Retro68 source file needs, above all single-threaded
+# std::mutex and friends for a libstdc++ without gthreads; see the header.
+if(RETRO68)
+    add_compile_options(
+        "$<$<COMPILE_LANGUAGE:C,CXX>:SHELL:-include ${CMAKE_SOURCE_DIR}/src/core/base/retro68/prefix.h>")
+endif()
+
 if(UPSTREAM_RELEASE)
     if(X86_64)
         if(APPLE)
@@ -90,6 +118,13 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-ggdb3 -fno-omit-frame-pointer -Wall -Wextra)
+elseif(RETRO68 AND M68K)
+    # A 68k application's code and data are resources, and a resource fork
+    # cannot be over 16 MB; at -O3 the 68k build is 18 MB, at -Os 13 MB. The
+    # 68020-68040's instruction caches (256 bytes to 4 KB) favour small code
+    # anyway. PowerPC code is a PEF in the data fork, which has no such limit.
+    set(RETRO68_M68K_OPT "-Os" CACHE STRING "Optimization flags for the Retro68 68k build")
+    add_compile_options(${RETRO68_M68K_OPT} -ffast-math -fomit-frame-pointer)
 else()
     if(NOT WINXP)
         add_compile_options(-O3 -ffast-math -fomit-frame-pointer)
@@ -126,7 +161,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     include_directories(/usr/local/include)
 endif()
 
-if(VBAM_STATIC)
+# Retro68 has only static libraries and no libpthread.
+if(VBAM_STATIC AND NOT RETRO68)
     if(APPLE)
         add_link_options($<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
     else()

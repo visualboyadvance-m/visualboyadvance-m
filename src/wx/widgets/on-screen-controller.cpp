@@ -7,7 +7,9 @@
 #include <wx/bitmap.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
+#if wxUSE_GRAPHICS_CONTEXT
 #include <wx/graphics.h>
+#endif
 #include <wx/image.h>
 
 #include "wx/config/emulated-gamepad.h"
@@ -17,6 +19,49 @@
 #include <QtGui/QTouchEvent>
 #include <QtWidgets/QWidget>
 #endif
+
+#if !wxUSE_GRAPHICS_CONTEXT
+namespace widgets {
+namespace internal {
+
+// The parts of wxGraphicsContext's interface DrawContent() uses, on a wxDC.
+class OscPainter {
+public:
+    explicit OscPainter(wxDC& dc) : dc_(dc) {}
+
+    void SetPen(const wxPen& pen) { dc_.SetPen(pen); }
+    void SetBrush(const wxBrush& brush) { dc_.SetBrush(brush); }
+    void SetFont(const wxFont& font, const wxColour& colour) {
+        dc_.SetFont(font);
+        dc_.SetTextForeground(colour);
+    }
+    void GetTextExtent(const wxString& text, double* width, double* height) const {
+        wxCoord w = 0;
+        wxCoord h = 0;
+        dc_.GetTextExtent(text, &w, &h);
+        *width = w;
+        *height = h;
+    }
+    void DrawText(const wxString& text, double x, double y) {
+        dc_.DrawText(text, wxRound(x), wxRound(y));
+    }
+    void DrawRectangle(double x, double y, double w, double h) {
+        dc_.DrawRectangle(wxRound(x), wxRound(y), wxRound(w), wxRound(h));
+    }
+    void DrawRoundedRectangle(double x, double y, double w, double h, double radius) {
+        dc_.DrawRoundedRectangle(wxRound(x), wxRound(y), wxRound(w), wxRound(h), radius);
+    }
+    void DrawEllipse(double x, double y, double w, double h) {
+        dc_.DrawEllipse(wxRound(x), wxRound(y), wxRound(w), wxRound(h));
+    }
+
+private:
+    wxDC& dc_;
+};
+
+}  // namespace internal
+}  // namespace widgets
+#endif  // !wxUSE_GRAPHICS_CONTEXT
 
 namespace widgets {
 
@@ -375,11 +420,16 @@ void OnScreenController::OnEraseBackground(wxEraseEvent&) {
 
 void OnScreenController::OnPaint(wxPaintEvent&) {
     wxPaintDC dc(this);
+#if wxUSE_GRAPHICS_CONTEXT
     std::unique_ptr<wxGraphicsContext> gc(wxGraphicsContext::Create(dc));
     if (!gc) {
         return;
     }
     DrawContent(*gc);
+#else
+    internal::OscPainter painter(dc);
+    DrawContent(painter);
+#endif
 }
 
 bool OnScreenController::RenderRgba(std::vector<uint8_t>* rgba, int* out_width,
@@ -391,6 +441,14 @@ bool OnScreenController::RenderRgba(std::vector<uint8_t>* rgba, int* out_width,
     if (scale <= 0.0) {
         scale = 1.0;
     }
+#if !wxUSE_GRAPHICS_CONTEXT
+    // Only the compositing renderers ask for the overlay as an image, and a
+    // wx without a graphics context has none of them.
+    (void)rgba;
+    (void)out_width;
+    (void)out_height;
+    return false;
+#else
     const int bitmap_w = std::max(1, static_cast<int>(sz.GetWidth() * scale));
     const int bitmap_h = std::max(1, static_cast<int>(sz.GetHeight() * scale));
 
@@ -441,10 +499,11 @@ bool OnScreenController::RenderRgba(std::vector<uint8_t>* rgba, int* out_width,
     *out_width = w;
     *out_height = h;
     return true;
+#endif  // wxUSE_GRAPHICS_CONTEXT
 }
 
-void OnScreenController::DrawContent(wxGraphicsContext& context) {
-    wxGraphicsContext* const gc = &context;
+void OnScreenController::DrawContent(internal::OscPainter& context) {
+    internal::OscPainter* const gc = &context;
 
     const auto draw_shape = [&](const wxRect& rect, bool round, bool pressed) {
         gc->SetPen(wxPen(kBorder, 2));

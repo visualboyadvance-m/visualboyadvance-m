@@ -16,6 +16,35 @@ protected:
     wxImage* BuildImage();
 };
 
+#if defined(__WXRETRO68__)
+#include <memory>
+
+namespace qdblit {
+class Surface;
+}
+
+// Classic Mac OS: the frame is converted into an offscreen 32-bit GWorld kept
+// for the life of the panel and copied to the window with CopyBits(), which
+// also stretches it, instead of making a wxBitmap of a wxImage every frame
+// (BasicDrawingPanel). Falls back to the Simple path when QuickDraw has no
+// 32-bit GWorld to give (see retro68/quickdraw-panel.cpp).
+class QuickDrawDrawingPanel : public BasicDrawingPanel {
+public:
+    QuickDrawDrawingPanel(wxWindow* parent, int _width, int _height);
+    ~QuickDrawDrawingPanel() override;
+
+protected:
+    void DrawArea(wxWindowDC& dc) override;
+
+private:
+    // Writes the frame in `todraw` to `dst` as xRGB, `stride` pixels a row.
+    void ConvertFrame(uint32_t* dst, int stride, int frame_width, int frame_height);
+
+    std::unique_ptr<qdblit::Surface> surface_;
+    bool fallback_logged_ = false;
+};
+#endif  // defined(__WXRETRO68__)
+
 #if defined(HAVE_WAYLAND_SUPPORT)
 // Native Wayland software driver backing the Simple renderer on Wayland. When
 // HDR is on and the compositor supports BT.2020 PQ color management, it presents

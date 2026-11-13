@@ -121,7 +121,8 @@ private:
             }
         }
 
-        choice->SetSelection(0);
+        // There may be no devices at all (classic Mac OS has none to list).
+        choice->SetSelection(choice->GetCount() == 0 ? wxNOT_FOUND : 0);
         return true;
     }
 
@@ -394,7 +395,7 @@ void SoundConfig::OnAudioApiChanged(wxCommandEvent& event, config::AudioApi audi
         }
     }
 
-    if (!audio_device_found) {
+    if (!audio_device_found && audio_device_selector_->GetCount() > 0) {
         audio_device_selector_->SetSelection(0);
     }
 

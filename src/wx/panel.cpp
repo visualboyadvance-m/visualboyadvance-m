@@ -156,6 +156,10 @@ double GetFilterScale() {
 // Maximum number of filter threads, capped at 6 to avoid diminishing returns
 // and potential issues with filter state sharing.
 int GetMaxFilterThreads() {
+#if !wxUSE_THREADS
+    // No threads to filter bands on (wxRetro68); the filter runs inline.
+    return 1;
+#endif
     unsigned int hw_threads = std::thread::hardware_concurrency();
     if (hw_threads == 0)
         hw_threads = 1;  // Fallback if hardware_concurrency fails
@@ -295,17 +299,10 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
         const int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
 
         // Set shift values for 32bpp format that filters expect
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
         systemRedShift = 19;
         systemGreenShift = 11;
         systemBlueShift = 3;
         RGB_LOW_BITS_MASK = 0x00010101;
-#else
-        systemRedShift = 27;
-        systemGreenShift = 19;
-        systemBlueShift = 11;
-        RGB_LOW_BITS_MASK = 0x01010100;
-#endif
 
         // For 32bpp conversion: filters need left+right borders of 1 each
         const int total_width32 = width + 2;
@@ -329,11 +326,7 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                     const uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
                     const uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
                     const uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                     src32[pos++] = b8 | (g8 << 8) | (r8 << 16);
-#else
-                    src32[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
-#endif
                 }
                 src32[left_border_pos] = src32[left_border_pos + 1];
                 src32[pos] = src32[pos - 1];
@@ -352,11 +345,7 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                     const uint8_t r8 = (r5 << 3) | (r5 >> 2);
                     const uint8_t g8 = (g5 << 3) | (g5 >> 2);
                     const uint8_t b8 = (b5 << 3) | (b5 >> 2);
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                     src32[pos++] = b8 | (g8 << 8) | (r8 << 16);
-#else
-                    src32[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
-#endif
                 }
                 src32[left_border_pos] = src32[left_border_pos + 1];
                 src32[pos] = src32[pos - 1];
@@ -368,11 +357,7 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                 const int left_border_pos = pos++;
                 for (int x = 0; x < width; x++) {
                     const int src_pos = x * 3;
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                     src32[pos++] = bandSrcRow[src_pos] | (bandSrcRow[src_pos+1] << 8) | (bandSrcRow[src_pos+2] << 16);
-#else
-                    src32[pos++] = (bandSrcRow[src_pos] << 24) | (bandSrcRow[src_pos+1] << 16) | (bandSrcRow[src_pos+2] << 8);
-#endif
                 }
                 src32[left_border_pos] = src32[left_border_pos + 1];
                 src32[pos] = src32[pos - 1];
@@ -410,15 +395,9 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                 for (int y = 0; y < copyRows; y++) {
                     for (int x = 0; x < scaled_width; x++) {
                         const uint32_t color = src32_row[x];
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                         const uint8_t r8 = (color >> 16) & 0xff;
                         const uint8_t g8 = (color >> 8) & 0xff;
                         const uint8_t b8 = color & 0xff;
-#else
-                        const uint8_t r8 = (color >> 24) & 0xff;
-                        const uint8_t g8 = (color >> 16) & 0xff;
-                        const uint8_t b8 = (color >> 8) & 0xff;
-#endif
                         dstRow[x] = ((r8 >> 5) << 5) | ((g8 >> 5) << 2) | (b8 >> 6);
                     }
                     dstRow += dstPitch;
@@ -430,15 +409,9 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                 for (int y = 0; y < copyRows; y++) {
                     for (int x = 0; x < scaled_width; x++) {
                         const uint32_t color = src32_row[x];
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                         const uint8_t r8 = (color >> 16) & 0xff;
                         const uint8_t g8 = (color >> 8) & 0xff;
                         const uint8_t b8 = color & 0xff;
-#else
-                        const uint8_t r8 = (color >> 24) & 0xff;
-                        const uint8_t g8 = (color >> 16) & 0xff;
-                        const uint8_t b8 = (color >> 8) & 0xff;
-#endif
                         dstRow[x] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
                     }
                     dstRow += dst16Pitch;
@@ -448,10 +421,13 @@ void ProcessSeamBand(uint8_t* src, int srcPitch, uint8_t* dst, int dstPitch,
                 uint8_t* dstRow = dst + dstPitch * dstStartY;
                 for (int y = 0; y < copyRows; y++) {
                     for (int x = 0; x < scaled_width; x++) {
-                        const uint8_t* src_pixel = reinterpret_cast<const uint8_t*>(&src32_row[x]);
-                        dstRow[x * 3] = src_pixel[0];
-                        dstRow[x * 3 + 1] = src_pixel[1];
-                        dstRow[x * 3 + 2] = src_pixel[2];
+                        // The low three bytes of the value, lowest first, as
+                        // the cores write 24-bit pixels (not the first three
+                        // in memory, which are the high ones on big-endian).
+                        const uint32_t v = src32_row[x];
+                        dstRow[x * 3] = v & 0xff;
+                        dstRow[x * 3 + 1] = (v >> 8) & 0xff;
+                        dstRow[x * 3 + 2] = (v >> 16) & 0xff;
                     }
                     dstRow += dstPitch;
                     src32_row += scaled_width;
@@ -817,19 +793,19 @@ void GameArea::LoadGame(const wxString& load_path)
         // can't really decide which dir to use, so try GBA first, then GB
         const wxString gba_rom_dir = OPTION(kGBAROMDir);
         if (!wxGetApp().GetAbsolutePath(gba_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gba_rom_dir) + '/' + rp);
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gba_rom_dir) + wxFileName::GetPathSeparator() + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
         const wxString gb_rom_dir = OPTION(kGBROMDir);
         if (badfile && !wxGetApp().GetAbsolutePath(gb_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gb_rom_dir) + '/' + rp);
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gb_rom_dir) + wxFileName::GetPathSeparator() + rp);
             badfile = !fnfn.IsFileReadable();
         }
 
         const wxString gbc_rom_dir = OPTION(kGBGBCROMDir);
         if (badfile && !wxGetApp().GetAbsolutePath(gbc_rom_dir).empty()) {
-            fnfn.SetPath(wxGetApp().GetAbsolutePath(gbc_rom_dir) + '/' + rp);
+            fnfn.SetPath(wxGetApp().GetAbsolutePath(gbc_rom_dir) + wxFileName::GetPathSeparator() + rp);
             badfile = !fnfn.IsFileReadable();
         }
     }
@@ -1628,6 +1604,37 @@ void GameArea::DelBorder()
     ReinitPanel();
 }
 
+namespace {
+
+// The display scale to size the window by. On classic Mac OS (wxRetro68) the
+// screen is often 640x480 or smaller, where the default 3x does not fit and
+// the window would hang off the screen with its title and menu bars out of
+// reach; there the scale comes down until the window fits.
+double FittingDisplayScale(int basic_width, int basic_height) {
+    double scale = OPTION(kDispScale);
+#if defined(__WXRETRO68__)
+    wxWindow* frame = wxGetApp().frame;
+    if (!frame)
+        return scale;
+    int display = wxDisplay::GetFromWindow(frame);
+    if (display == wxNOT_FOUND)
+        display = 0;
+    const wxRect area = wxDisplay(static_cast<unsigned>(display)).GetClientArea();
+    const wxSize chrome = frame->GetSize() - frame->GetClientSize();
+    while (scale > 1 &&
+           (std::ceil(basic_width * scale) + chrome.x > area.width ||
+            std::ceil(basic_height * scale) + chrome.y > area.height)) {
+        scale = std::max(1.0, scale - 1);
+    }
+#else
+    (void)basic_width;
+    (void)basic_height;
+#endif
+    return scale;
+}
+
+}  // namespace
+
 void GameArea::AdjustMinSize()
 {
     wxWindow* frame           = wxGetApp().frame;
@@ -1642,7 +1649,7 @@ void GameArea::AdjustMinSize()
     return;
 #endif
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    const double display_scale = OPTION(kDispScale);
+    const double display_scale = FittingDisplayScale(basic_width, basic_height);
 
     // note: could safely set min size to 1x or less regardless of video_scale
     // but setting it to scaled size makes resizing to default easier
@@ -1684,7 +1691,7 @@ void GameArea::AdjustSize(bool force)
 #endif
 
     double dpi_scale_factor = widgets::DPIScaleFactorForWindow(this);
-    const double display_scale = OPTION(kDispScale);
+    const double display_scale = FittingDisplayScale(basic_width, basic_height);
 
     const wxSize newsz(
         (std::ceil(basic_width * display_scale) * dpi_scale_factor),
@@ -2366,17 +2373,11 @@ void GameArea::OnIdle(wxIdleEvent& event)
             systemColorDepth = newColorDepth;
             // Update color shift values for new depth
             if (systemColorDepth == 24 || systemColorDepth == 32) {
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+                // The same pixel values on every host (see DrawingPanelInit()).
                 systemRedShift = 3;
                 systemGreenShift = 11;
                 systemBlueShift = 19;
                 RGB_LOW_BITS_MASK = 0x00010101;
-#else
-                systemRedShift = 27;
-                systemGreenShift = 19;
-                systemBlueShift = 11;
-                RGB_LOW_BITS_MASK = 0x01010100;
-#endif
             } else {
                 // 8-bit or 16-bit
                 systemRedShift = 10;
@@ -3080,30 +3081,19 @@ DrawingPanelBase::DrawingPanelBase(int _width, int _height)
     }
 
     // Intialize color tables based on panel's color depth
-    if (panel_color_depth_ == 24) {
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
+    if (panel_color_depth_ == 24 || panel_color_depth_ == 32) {
+        // Red in the low byte and the top byte unused, as pixel values, on
+        // every host, big-endian ones included. The cores write a 24-bit pixel
+        // as the low three bytes of the value, lowest first, and the 24-bit
+        // readers (BuildImage(), the filter staging, screenshots) take them as
+        // R G B; and the filters (xBRZ, hq, interframe blending...) take the
+        // top byte of a 32-bit pixel for padding -- with red there, as an
+        // earlier big-endian layout had it, they dropped red wherever they
+        // blended. Code that reads a pixel's bytes in memory must go by value.
         systemRedShift = 3;
         systemGreenShift = 11;
         systemBlueShift = 19;
         RGB_LOW_BITS_MASK = 0x00010101;
-#else
-        systemRedShift = 27;
-        systemGreenShift = 19;
-        systemBlueShift = 11;
-        RGB_LOW_BITS_MASK = 0x01010100;
-#endif
-    } else if (panel_color_depth_ == 32) {
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-        systemRedShift = 3;
-        systemGreenShift = 11;
-        systemBlueShift = 19;
-        RGB_LOW_BITS_MASK = 0x00010101;
-#else
-        systemRedShift = 27;
-        systemGreenShift = 19;
-        systemBlueShift = 11;
-        RGB_LOW_BITS_MASK = 0x01010100;
-#endif
     } else {
         // 16-bit mode: RGB555 or RGB565
         if (rpi_ && rpi_using_rgb565_) {
@@ -3609,17 +3599,10 @@ public:
                 const int saved_rgb_low_bits_mask = RGB_LOW_BITS_MASK;
 
                 // Set shift values for 32bpp format that filters expect
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                 systemRedShift = 19;
                 systemGreenShift = 11;
                 systemBlueShift = 3;
                 RGB_LOW_BITS_MASK = 0x00010101;
-#else
-                systemRedShift = 27;
-                systemGreenShift = 19;
-                systemBlueShift = 11;
-                RGB_LOW_BITS_MASK = 0x01010100;
-#endif
 
                 // Convert input to 32bpp (buffers pre-allocated above)
                 int pos = total_width32;  // Start at row 1 (skip row 0 for top border)
@@ -3637,11 +3620,7 @@ public:
                             const uint8_t r8 = (r3 << 5) | (r3 << 2) | (r3 >> 1);
                             const uint8_t g8 = (g3 << 5) | (g3 << 2) | (g3 >> 1);
                             const uint8_t b8 = (b2 << 6) | (b2 << 4) | (b2 << 2) | b2;
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             src2_[pos++] = b8 | (g8 << 8) | (r8 << 16);
-#else
-                            src2_[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
-#endif
                         }
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
                         src2_[pos] = src2_[pos - 1];
@@ -3662,11 +3641,7 @@ public:
                             const uint8_t r8 = (r5 << 3) | (r5 >> 2);
                             const uint8_t g8 = (g5 << 3) | (g5 >> 2);
                             const uint8_t b8 = (b5 << 3) | (b5 >> 2);
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             src2_[pos++] = b8 | (g8 << 8) | (r8 << 16);
-#else
-                            src2_[pos++] = (r8 << 24) | (g8 << 16) | (b8 << 8);
-#endif
                         }
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
                         src2_[pos] = src2_[pos - 1];
@@ -3678,11 +3653,7 @@ public:
                     for (int y = 0; y < height_; y++) {
                         const int left_border_pos = pos++;
                         for (int x = 0; x < width_; x++) {
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             src2_[pos++] = src_[src_pos] | (src_[src_pos+1] << 8) | (src_[src_pos+2] << 16);
-#else
-                            src2_[pos++] = (src_[src_pos] << 24) | (src_[src_pos+1] << 16) | (src_[src_pos+2] << 8);
-#endif
                             src_pos += 3;
                         }
                         src2_[left_border_pos] = src2_[left_border_pos + 1];
@@ -3751,15 +3722,9 @@ public:
                     for (int y = 0; y < scaled_height; y++) {
                         for (int x = 0; x < scaled_width; x++) {
                             const uint32_t color = dst32[dst_pos++];
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             const uint8_t r8 = (color >> 16) & 0xff;
                             const uint8_t g8 = (color >> 8) & 0xff;
                             const uint8_t b8 = color & 0xff;
-#else
-                            const uint8_t r8 = (color >> 24) & 0xff;
-                            const uint8_t g8 = (color >> 16) & 0xff;
-                            const uint8_t b8 = (color >> 8) & 0xff;
-#endif
                             dest[pos++] = ((r8 >> 5) << 5) | ((g8 >> 5) << 2) | (b8 >> 6);
                         }
                         pos += scaled_border_dest;
@@ -3771,15 +3736,9 @@ public:
                     for (int y = 0; y < scaled_height; y++) {
                         for (int x = 0; x < scaled_width; x++) {
                             const uint32_t color = dst32[dst_pos++];
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
                             const uint8_t r8 = (color >> 16) & 0xff;
                             const uint8_t g8 = (color >> 8) & 0xff;
                             const uint8_t b8 = color & 0xff;
-#else
-                            const uint8_t r8 = (color >> 24) & 0xff;
-                            const uint8_t g8 = (color >> 16) & 0xff;
-                            const uint8_t b8 = (color >> 8) & 0xff;
-#endif
                             dest16[pos++] = ((r8 >> 3) << 10) | ((g8 >> 3) << 5) | (b8 >> 3);
                         }
                         pos += scaled_border_dest;
@@ -3789,10 +3748,12 @@ public:
                     pos = 0;
                     for (int y = 0; y < scaled_height; y++) {
                         for (int x = 0; x < scaled_width; x++) {
-                            const uint8_t* src_pixel = reinterpret_cast<const uint8_t*>(&dst32[dst_pos++]);
-                            dest[pos] = src_pixel[0];
-                            dest[pos+1] = src_pixel[1];
-                            dest[pos+2] = src_pixel[2];
+                            // The low three bytes of the value (see the filter
+                            // threads' 24-bit copy-out).
+                            const uint32_t v = dst32[dst_pos++];
+                            dest[pos] = v & 0xff;
+                            dest[pos+1] = (v >> 8) & 0xff;
+                            dest[pos+2] = (v >> 16) & 0xff;
                             pos += 3;
                         }
                     }
@@ -5235,7 +5196,8 @@ void SDLDrawingPanel::DrawingPanelInit()
         // SDL_SetAndroidExternalWindow(); no per-window handle property needed.
         if (false)
 #else
-        if (SDL_SetPointerProperty(props, "sdl2-compat.external_window", GetWindow()->GetHandle()) == false)
+        if (SDL_SetPointerProperty(props, "sdl2-compat.external_window",
+                                   const_cast<void*>(static_cast<const void*>(GetWindow()->GetHandle()))) == false)
 #endif
         {
             wxLogError(_("Failed to set parent window"));
@@ -10459,6 +10421,15 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
     // renderer as the only output module.
     return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif  // defined(__ANDROID__)
+#if defined(__WXRETRO68__)
+    // Classic Mac OS: no GL, Vulkan or Metal, and the Retro68 SDL draws only
+    // into windows of its own. Simple when asked for; QuickDraw for anything
+    // else (a method saved on another platform included). The QuickDraw panel
+    // falls back to the Simple path itself when it cannot get a GWorld.
+    if (method == config::RenderMethod::kSimple)
+        return new BasicDrawingPanel(this, basic_width, basic_height);
+    return new QuickDrawDrawingPanel(this, basic_width, basic_height);
+#endif
 #if defined(__WXMSW__)
     // Last-line defense against render methods that cannot work on this machine,
     // regardless of how `method` was chosen (saved option, dialog pick, or a

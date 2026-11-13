@@ -26,6 +26,9 @@
 
 #include <wx/wx.h>
 
+// wxThread and friends for a wx without threads (wxRetro68).
+#include "wx/wx-nothreads.h"
+
 // The following are not pulled in by wx.h
 
 // for some reason, mingw32 wx.h doesn't pull in listctrl by default
@@ -95,7 +98,14 @@ using std::int32_t;
 // Use this function whenever we want to get
 static inline const wxCharBuffer UTF8(wxString str)
 {
+#ifdef __WXRETRO68__
+    // What goes through here is almost all file names for the core, and on
+    // classic Mac OS its fopen() takes them in the system encoding, Mac OS
+    // Roman, not in UTF-8.
+    return str.mb_str(wxConvFile);
+#else
     return str.mb_str(wxConvUTF8);
+#endif
 }
 
 #endif // VBAM_WX_WXHEAD_H_

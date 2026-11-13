@@ -37,7 +37,7 @@ macro(vbam_find_package_notice)
 endmacro()
 
 # Wayland is a wx port display backend.
-if(ENABLE_WX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+if(ENABLE_WX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID AND NOT VBAM_TARGET_RETRO68)
     # Detect whether the installed GDK supports Wayland.
     #
     # We try, in order:
@@ -121,8 +121,9 @@ endif()
 set(VBAM_STATIC_DEFAULT OFF)
 if(VCPKG_TARGET_TRIPLET MATCHES -static OR CMAKE_TOOLCHAIN_FILE MATCHES "mxe|-static")
     set(VBAM_STATIC_DEFAULT ON)
-elseif(MINGW OR MSYS2)
-    # Default to static builds on MinGW and all MSYS2 envs.
+elseif(MINGW OR MSYS2 OR VBAM_TARGET_RETRO68)
+    # Default to static builds on MinGW and all MSYS2 envs, and on Retro68,
+    # which only makes static libraries.
     set(VBAM_STATIC_DEFAULT ON)
 endif()
 
@@ -407,15 +408,22 @@ option(DISABLE_OPENGL "Disable OpenGL" OFF)
 # the vcpkg wxwidgets port configures it out. tools/android/build-android.sh
 # passes -DENABLE_DEBUGGER=OFF for the same reason; make that the default so a
 # plain Android configure works, while leaving it overridable.
+# The wxRetro68 (classic Mac OS) build has no sockets either.
 set(ENABLE_DEBUGGER_DEFAULT ON)
-if(ANDROID)
+if(ANDROID OR VBAM_TARGET_RETRO68)
     set(ENABLE_DEBUGGER_DEFAULT OFF)
 endif()
 
 option(ENABLE_DEBUGGER "Enable the debugger" ${ENABLE_DEBUGGER_DEFAULT})
 option(ENABLE_ASAN "Enable -fsanitize=address by default. Requires debug build with GCC/Clang" OFF)
-option(ENABLE_BZ2 "Enable BZ2 archive support" ON)
-option(ENABLE_LZMA "Enable LZMA archive support" ON)
+# Retro68 sysroots carry zlib (and wx's own private copies) but neither
+# libbz2 nor liblzma.
+set(ENABLE_ARCHIVES_DEFAULT ON)
+if(VBAM_TARGET_RETRO68)
+    set(ENABLE_ARCHIVES_DEFAULT OFF)
+endif()
+option(ENABLE_BZ2 "Enable BZ2 archive support" ${ENABLE_ARCHIVES_DEFAULT})
+option(ENABLE_LZMA "Enable LZMA archive support" ${ENABLE_ARCHIVES_DEFAULT})
 
 # Vulkan is a wx / Qt port renderer backend.
 #
@@ -446,7 +454,7 @@ if(VBAM_NEED_GUI_DEPS AND ANDROID)
         message(WARNING "ENABLE_VULKAN=ON but the NDK sysroot has no vulkan/vulkan.h. Disabling Vulkan.")
         set(ENABLE_VULKAN OFF CACHE BOOL "Enable Vulkan" FORCE)
     endif()
-elseif(VBAM_NEED_GUI_DEPS AND NOT (X86 AND WIN32))
+elseif(VBAM_NEED_GUI_DEPS AND NOT (X86 AND WIN32) AND NOT VBAM_TARGET_RETRO68)
     find_package(Vulkan)
 
     option(ENABLE_VULKAN "Enable Vulkan" ${Vulkan_FOUND})
@@ -557,6 +565,13 @@ if(DOS AND ENABLE_LINK)
     set(ENABLE_LINK OFF)
 endif()
 
+# Classic Mac OS (Retro68) has neither the sockets nor the second process
+# with shared memory the link transports are built on.
+if(VBAM_TARGET_RETRO68 AND ENABLE_LINK)
+    message(WARNING "ENABLE_LINK is not supported on classic Mac OS (Retro68). Disabling it.")
+    set(ENABLE_LINK OFF)
+endif()
+
 # ffmpeg A/V recording is a wx / Qt port feature; the SDL port and the
 # libretro core have no recording UI.
 set(FFMPEG_DEFAULT OFF)
@@ -662,8 +677,9 @@ else()
 endif()
 option(HTTPS "Use https URL for winsparkle" ON)
 
-# We generally don't want LTO when debugging because it makes linking slow
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# We generally don't want LTO when debugging because it makes linking slow.
+# Retro68's 68k and PEF back ends are not LTO-tested; keep it off there.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR VBAM_TARGET_RETRO68)
     set(LTO_DEFAULT OFF)
 else()
     set(LTO_DEFAULT ON)

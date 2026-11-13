@@ -2,13 +2,14 @@
 
 #include "scalefx_manager.h"
 #include <cstring>
+#include "core/base/thread_local.h"
 
 namespace scalefx {
 
 ScaleFXManager& ScaleFXManager::Instance() {
     // Thread-local instance ensures each thread has its own buffers
     // This enables safe parallel processing without data races
-    thread_local ScaleFXManager instance;
+    VBAM_THREAD_LOCAL ScaleFXManager instance;
     return instance;
 }
 

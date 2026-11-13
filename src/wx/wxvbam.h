@@ -74,6 +74,10 @@ bool VbamWindowsHasHardwareGpu();
 bool VbamWindowsIsWin10OrGreater();
 #endif  // defined(__WXMSW__)
 
+// Registers the XRC handlers the resources need, and the image handlers.
+// Defined in wxvbam.cpp.
+void InitXmlResourceHandlers(wxXmlResource* xr);
+
 // Set when the app fell back to XWayland (GDK_BACKEND=x11) because no native
 // Wayland renderer was available (SDL2 + no wx EGL canvas + no usable Vulkan).
 // In that state neither HDR nor 10-bit SDR can be presented. Defined in
@@ -153,8 +157,9 @@ public:
     bool pending_fullscreen;
     // mute audio for this session without persisting to the config
     bool mute;
-#if __WXMAC__
-    // I suppose making this work will require tweaking the bundle
+#if defined(__WXMAC__) || defined(__WXRETRO68__)
+    // A ROM opened from the Finder (on classic Mac OS: dropped on the
+    // application, or opened with it), by an 'odoc' Apple event.
     void MacOpenFile(const wxString& f) override
     {
         pending_load = f;
@@ -279,7 +284,16 @@ public:
     void MenuOptionBool(const wxString& menuName, bool field);
     void GetMenuOptionConfig(const wxString& menu_name,
                              const config::OptionID& option_id);
-    void GetMenuOptionInt(const wxString& menuName, int* field, int mask);
+    // `field` is an int or an int32_t, which differ where int32_t is a long
+    // (Retro68).
+    template <typename T>
+    void GetMenuOptionInt(const wxString& menuName, T* field, int mask) {
+        const bool is_checked = IsMenuOptionChecked(menuName, ((*field) & mask) != mask);
+        *field = ((*field) & ~mask) | (is_checked ? mask : 0);
+    }
+    // Whether the checkable menu item for `menuName` is checked, `fallback` if
+    // there is no such item.
+    bool IsMenuOptionChecked(const wxString& menuName, bool fallback) const;
     void GetMenuOptionBool(const wxString& menuName, bool* field);
     void SetMenuOption(const wxString& menuName, bool value);
 

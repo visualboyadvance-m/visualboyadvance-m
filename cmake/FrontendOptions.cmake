@@ -33,6 +33,16 @@ set(VBAM_TARGET_WIN32   ${WIN32})
 set(VBAM_TARGET_APPLE   ${APPLE})
 set(VBAM_TARGET_WINXP   OFF)
 
+# Classic Mac OS (System 7 to Mac OS 9) through the Retro68 toolchain: 68k
+# (Retro68) or PowerPC CFM/PEF (RetroPPC). There are no preemptive threads,
+# no OpenGL, no sockets and no clipboard there; the wx port is the frontend,
+# on the wxRetro68 (wxUniversal + QuickDraw) port, with SDL3 for sound.
+set(VBAM_TARGET_RETRO68 OFF)
+if(CMAKE_SYSTEM_NAME MATCHES "^Retro(68|PPC)$"
+        OR CMAKE_TOOLCHAIN_FILE MATCHES "retro(68|ppc)\\.toolchain\\.cmake$")
+    set(VBAM_TARGET_RETRO68 ON)
+endif()
+
 if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android"
         OR VCPKG_TARGET_TRIPLET MATCHES "-android$")
     set(VBAM_TARGET_ANDROID ON)
@@ -61,13 +71,20 @@ endif()
 # the deliverable, and on Android it is the wxQt app.
 set(ENABLE_SDL_DEFAULT ${VBAM_BUILD_DEFAULT})
 
-if(VBAM_TARGET_WIN32 OR VBAM_TARGET_APPLE OR VBAM_TARGET_ANDROID)
+if(VBAM_TARGET_WIN32 OR VBAM_TARGET_APPLE OR VBAM_TARGET_ANDROID
+        OR VBAM_TARGET_RETRO68)
     set(ENABLE_SDL_DEFAULT OFF)
+endif()
+
+# A libretro core is a shared library, which Retro68 cannot make.
+set(ENABLE_LIBRETRO_DEFAULT ${VBAM_BUILD_DEFAULT})
+if(VBAM_TARGET_RETRO68)
+    set(ENABLE_LIBRETRO_DEFAULT OFF)
 endif()
 
 option(ENABLE_WX       "Build the wxWidgets port" ${VBAM_BUILD_DEFAULT})
 option(ENABLE_SDL      "Build the SDL port"       ${ENABLE_SDL_DEFAULT})
-option(ENABLE_LIBRETRO "Build the libretro core"  ${VBAM_BUILD_DEFAULT})
+option(ENABLE_LIBRETRO "Build the libretro core"  ${ENABLE_LIBRETRO_DEFAULT})
 
 # The Qt port (src/qt) is a separate desktop frontend with the same feature
 # set as the wx port, built on Qt 6 Widgets. Off by default; it is an
@@ -80,7 +97,7 @@ option(ENABLE_QT       "Build the Qt port"        OFF)
 #
 # The bundled SFML it builds on has no Android backend vendored here (and cable
 # link is not meaningful on a phone), so it is off by default there.
-if(TRANSLATIONS_ONLY OR VBAM_TARGET_ANDROID)
+if(TRANSLATIONS_ONLY OR VBAM_TARGET_ANDROID OR VBAM_TARGET_RETRO68)
     set(ENABLE_LINK_DEFAULT OFF)
 else()
     set(ENABLE_LINK_DEFAULT ON)
@@ -106,7 +123,7 @@ endif()
 
 # OpenGL is a renderer backend in every desktop frontend.
 set(VBAM_NEED_OPENGL OFF)
-if(ENABLE_WX OR ENABLE_SDL OR ENABLE_QT)
+if((ENABLE_WX OR ENABLE_SDL OR ENABLE_QT) AND NOT VBAM_TARGET_RETRO68)
     set(VBAM_NEED_OPENGL ON)
 endif()
 

@@ -397,6 +397,11 @@ SdlPoller::SdlPoller(EventHandlerProvider* const handler_provider)
     SDL_JoystickEventState(SDL_ENABLE);
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 #else
+    // Events on their own first: an SDL without joystick support (the Retro68
+    // one for classic Mac OS) fails to start the joystick and gamepad
+    // subsystems, and SDL undoes everything a failed call started. There the
+    // events are still wanted, as pumping them is what keeps SDL's audio fed.
+    SDL_InitSubSystem(SDL_INIT_EVENTS);
     SDL_InitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
     SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS);
     SDL_SetGamepadEventsEnabled(true);

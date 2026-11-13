@@ -5,6 +5,7 @@
 #include <cstring>
 #include <functional>
 #include <atomic>
+#include "core/base/thread_local.h"
 #include <memory>
 #ifdef __APPLE__
 #include <dispatch/dispatch.h>
@@ -414,8 +415,13 @@ private:
         // As many bands as GCD runs on macOS, at most: past that, waking the
         // threads costs more than a 480x320 frame's rows save.
         workers_ = std::min(hw ? static_cast<int>(hw) : 1, 16) - 1;
+#ifdef VBAM_SINGLE_THREADED
+        // No threads to start (Retro68); Run() draws every band itself.
+        workers_ = 0;
+#else
         for (int i = 0; i < workers_; ++i)
             std::thread([this] { Work(); }).detach();
+#endif
     }
 
     void Take() {
@@ -490,7 +496,7 @@ void EncodePQ10(const uint8_t* src, int src_stride, int row_pixels, int rows,
     const bool convert = !g_settings.input_is_rec2020;
     const float (*m)[3] = convert ? kRec709ToRec2020 : nullptr;
     ForRowBands(rows, [&](int y_begin, int y_end) {
-    thread_local ScaleCache cache;
+    VBAM_THREAD_LOCAL ScaleCache cache;
     cache.Begin();
     // By blocks, as EncodeScRGBFp16(): the lookups a pixel at a time, the
     // arithmetic over the block.
@@ -553,7 +559,7 @@ void EncodeScRGBFp16(const uint8_t* src, int src_stride, int row_pixels, int row
     const float* lw = g_settings.scrgb_target_p3 ? kLumaP3 : kLumaRec709;
 
     ForRowBands(rows, [&](int y_begin, int y_end) {
-    thread_local ScaleCache cache;
+    VBAM_THREAD_LOCAL ScaleCache cache;
     cache.Begin();
     // A block of pixels at a time: the lookups a pixel at a time, then the
     // arithmetic and the conversion to halves over the whole block, which

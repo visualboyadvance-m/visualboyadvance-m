@@ -181,6 +181,16 @@ int IRQRecentTicks = 0;
 // HBlank DMA trigger, IRQ-raise chain, scanline render) fires. Hardware
 // sets the HBlank flag at cycle 1006 of the 1232-cycle line (960 visible
 // + 46 fetch tail); the legacy grid used 1008.
+// The ROM buffer: four times the 32 MB a cartridge can address, for the GBA
+// Matrix dumps (GBA Video) that are larger. Classic Mac OS (Retro68) cannot
+// give 128 MB of an application partition to it, so there the buffer is the
+// cartridge's 32 MB and Matrix dumps do not load.
+#ifdef macintosh
+static constexpr int kRomBufferSize = SIZE_ROM;
+#else
+static constexpr int kRomBufferSize = SIZE_ROM * 4;
+#endif
+
 static int lcdHDrawLen()
 {
     return 1008;
@@ -950,7 +960,7 @@ static void _remapMatrix(GBAMatrix_t *matrix)
         return;
     }
 
-    const uint32_t romAllocationSize = SIZE_ROM * 4;
+    const uint32_t romAllocationSize = kRomBufferSize;
     if (matrix->paddr > romAllocationSize ||
         matrix->size > romAllocationSize - matrix->paddr) {
         log("Invalid Matrix physical range: %08X+%08X", matrix->paddr,
@@ -2420,14 +2430,14 @@ void GBAMatrixWrite16(GBAMatrix_t *matrix, uint32_t address, uint16_t value)
 
 int CPULoadRom(const char* szFile)
 {
-    romSize = SIZE_ROM * 4;
+    romSize = kRomBufferSize;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
+    g_rom = (uint8_t*)malloc(kRomBufferSize);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");
@@ -2572,19 +2582,19 @@ int CPULoadRom(const char* szFile)
 
 int CPULoadRomData(const char* data, int size)
 {
-    const int maxSize = coreOptions.cpuIsMultiBoot ? SIZE_WRAM : SIZE_ROM * 4;
+    const int maxSize = coreOptions.cpuIsMultiBoot ? SIZE_WRAM : kRomBufferSize;
     if (data == NULL || size <= 0 || size > maxSize) {
         return 0;
     }
 
-    romSize = SIZE_ROM * 4;
+    romSize = kRomBufferSize;
     if (g_rom != NULL) {
         CPUCleanUp();
     }
 
     systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-    g_rom = (uint8_t*)malloc(SIZE_ROM * 4);
+    g_rom = (uint8_t*)malloc(kRomBufferSize);
     if (g_rom == NULL) {
         systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
             "ROM");

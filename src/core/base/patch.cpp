@@ -39,7 +39,7 @@
 #include "core/base/file_util.h"
 
 #ifdef __GNUC__
-#if defined(__MUSL__) || defined(__APPLE__) || defined(BSD)
+#if defined(__MUSL__) || defined(__APPLE__) || defined(BSD) || defined(macintosh)
 typedef off_t __off64_t; /* off_t is 64 bits on BSD. */
 #define fseeko64 fseeko
 #define ftello64 ftello

@@ -29,6 +29,7 @@
  */
 
 #include <vector>
+#include "core/base/thread_local.h"
 
 #include "hq_masks.h"
 #include "interp.h"
@@ -36,7 +37,7 @@
 // the difference masks of one row, from hq_masks.h
 static uint8_t* RowMasks(unsigned count)
 {
-  thread_local std::vector<uint8_t> masks;
+  VBAM_THREAD_LOCAL std::vector<uint8_t> masks;
   if (masks.size() < count)
     masks.resize(count);
   return masks.data();

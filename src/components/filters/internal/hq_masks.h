@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include "core/base/thread_local.h"
 
 #include "../simd128.h"
 
@@ -35,7 +36,7 @@ using namespace vbam_simd;
 // many times per frame; allocating per row showed in the profile).
 template <typename T, int kSlot>
 inline std::vector<T>& Scratch(size_t n) {
-    thread_local std::vector<T> buf;
+    VBAM_THREAD_LOCAL std::vector<T> buf;
     if (buf.size() < n)
         buf.resize(n);
     return buf;

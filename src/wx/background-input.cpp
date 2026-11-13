@@ -14,7 +14,7 @@
 
 #include <windows.h>
 
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 #else  // defined(__WXGTK__)
 
 #include <X11/Xlib.h>
@@ -267,7 +267,7 @@ int VKToWX(WXWORD vk, WXLPARAM lParam, wchar_t *uc)
     return wxk;
 }
 
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 
 #else // defined(__WXGTK__)
 
@@ -500,7 +500,7 @@ private:
     [[maybe_unused]] wxEvtHandler *handler;
 #if defined(__WXMSW__)
     SHORT previousState[0xFF];
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 #else // defined(__WXGTK__)
     Display *x11display = NULL;
     char previousState[32];
@@ -521,7 +521,7 @@ wxThread::ExitCode BackgroundInput::Setup()
     for (int i = 0x08; i < 0xFF; ++i) {
         previousState[i] = GetAsyncKeyState(i);
     }
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
     wxLogError(wxT("Yet to be implemented!"));
     return ANY_ERROR;
 #else // defined(__WXGTK__)
@@ -613,7 +613,7 @@ void SetModifierStateFromHardware(wxKeyEvent* event) {
     event->SetAltDown((GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
 }
 }  // namespace
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 // No polling on these, so nothing to synthesise.
 #else  // defined(__WXGTK__)
 namespace {
@@ -710,7 +710,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
         }
         previousState[i] = bits;
     }
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 #else // defined(__WXGTK__)
     XQueryKeymap(x11display, currentState);
     for (int i = 0; i < 32; ++i) {
@@ -788,7 +788,7 @@ wxThread::ExitCode BackgroundInput::CheckKeyboard()
 void BackgroundInput::Cleanup()
 {
 #if defined(__WXMSW__)
-#elif defined(__WXMAC__) || defined(__WXQT__)
+#elif defined(__WXMAC__) || defined(__WXQT__) || defined(__WXRETRO68__)
 #else // defined(__WXGTK__)
     if (x11display) {
         XCloseDisplay(x11display);
@@ -815,6 +815,11 @@ BackgroundInput *input = NULL;
 
 void enableKeyboardBackgroundInput(wxEvtHandler* handler)
 {
+#if !wxUSE_THREADS
+    // Polled from a thread, and there are none (wxRetro68).
+    (void)handler;
+    return;
+#endif
     if (input) return;
     input = new BackgroundInput(handler);
     if (input->Run() != wxTHREAD_NO_ERROR)

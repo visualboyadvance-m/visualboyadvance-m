@@ -401,6 +401,21 @@ if(ANDROID)
 
     set(wxWidgets_FOUND TRUE)
     set(ENABLE_OPENGL FALSE)
+elseif(RETRO68)
+    # wxRetro68: classic Mac OS, wxUniversal on QuickDraw. Use the sysroot's
+    # wx-config, never one found on the host PATH, and ask only for what the
+    # port builds: no net (wxUSE_SOCKETS=0), gl or stc.
+    find_program(wxWidgets_CONFIG_EXECUTABLE wx-config
+        PATHS "${CMAKE_SYSTEM_PREFIX_PATH}/bin"
+        NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+
+    if(NOT wxWidgets_CONFIG_EXECUTABLE)
+        message(FATAL_ERROR "No wx-config in ${CMAKE_SYSTEM_PREFIX_PATH}/bin; build and install wxWidgets for Retro68 first")
+    endif()
+
+    find_package(wxWidgets COMPONENTS xrc xml html adv core base REQUIRED)
+    set(VBAM_HAVE_WXSTC FALSE)
+    set(ENABLE_OPENGL FALSE)
 else()
     find_package(wxWidgets COMPONENTS xrc xml html adv net core base gl stc ${wx_find_extra})
     set(VBAM_HAVE_WXSTC ${wxWidgets_FOUND})
@@ -1219,7 +1234,8 @@ if(NOT COMPILE_ONLY)
 endif()
 
 # adjust link command when making a static binary for gcc
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND VBAM_STATIC)
+# (Retro68 links nothing but static libraries, and has no libpthread.)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND VBAM_STATIC AND NOT RETRO68)
     if(MSYS2)
         add_custom_command(
             TARGET visualboyadvance-m PRE_LINK
@@ -1240,7 +1256,7 @@ add_dependencies(visualboyadvance-m translations-zip)
 # on unix we have to check for X11 before we overwrite all the compile/link
 # (Android is UNIX-like in CMake but uses the wxQt backend, so skip X11/Wayland)
 # flags with the wx tests
-if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID AND NOT RETRO68)
     # QUIET: FindX11 probes a dozen functions and overrides
     # CMAKE_REQUIRED_QUIET with X11_FIND_QUIETLY, so this is the only way to
     # keep its progress lines out. X11_X11_LIB below is the actual result.
@@ -1436,7 +1452,7 @@ endif()
 
 # link libgcc/libstdc++ statically on mingw
 # and adjust link command when making a static binary
-if(CMAKE_COMPILER_IS_GNUCXX AND VBAM_STATIC)
+if(CMAKE_COMPILER_IS_GNUCXX AND VBAM_STATIC AND NOT RETRO68)
     # some dists don't have a static libpthread
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread")
 
@@ -1483,7 +1499,7 @@ endif()
 
 # we make some direct gtk/gdk calls on linux and such
 # so need to link the gtk that wx was built with
-if(NOT WIN32 AND NOT APPLE AND NOT ANDROID)
+if(NOT WIN32 AND NOT APPLE AND NOT ANDROID AND NOT RETRO68)
     find_package(PkgConfig REQUIRED)
 
     find_path(WX_SETUP_H NAMES wx/setup.h PATHS ${wxWidgets_INCLUDE_DIRS})
@@ -2051,7 +2067,9 @@ endif()
 # our own code -- a MinGW cross build against Fedora's wxWidgets is ~250MB
 # unstripped and ~23MB stripped.
 function(vbam_strip_release_binary path)
-    if(MSVC OR NOT CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
+    # Retro68's linker output is Mac code resources (68k) or XCOFF on its way
+    # to PEF, which the Rez/MakePEF steps package, not a binary to strip.
+    if(MSVC OR RETRO68 OR NOT CMAKE_BUILD_TYPE MATCHES "^(Release|MinSizeRel)$")
         return()
     endif()
 
@@ -2320,6 +2338,65 @@ if(APPLE AND UPSTREAM_RELEASE)
     endif()
 endif()
 
+# Classic Mac OS (Retro68): the linked code becomes a Mac application with
+# the VBA-M icon and the Finder and Process Manager resources, as
+# VisualBoyAdvance-M.bin (MacBinary), .APPL and .dsk (an HFS disk image).
+if(RETRO68 AND NOT COMPILE_ONLY)
+    target_sources(visualboyadvance-m PRIVATE
+        retro68/posix-compat.cpp
+        retro68/malloc.c
+        retro68/printf-c99.cpp
+        retro68/open-retry.cpp
+        retro68/quickdraw-blit.cpp
+        retro68/quickdraw-panel.cpp
+    )
+
+    # newlib's printf workers go through retro68/printf-c99.cpp, which gives
+    # them the C99 length modifiers (%zu) this newlib was built without. On the
+    # PowerPC (XCOFF) calls go to the dotted code symbols, so those are wrapped.
+    if(PPC32)
+        set(_printf_prefix ".")
+    else()
+        set(_printf_prefix "")
+    endif()
+    # retro68/open-retry.cpp retries creating a file once (_open_r).
+    foreach(_printf_fn _svfprintf_r _vfprintf_r _svfwprintf_r _vfwprintf_r vfprintf vfwprintf _open_r)
+        target_link_options(visualboyadvance-m PRIVATE "-Wl,--wrap=${_printf_prefix}${_printf_fn}")
+    endforeach()
+
+    # The 'vers' resources. A version's major number is one BCD byte, its
+    # minor and bug-fix numbers a nibble each.
+    string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.?([0-9]*)" _vbam_vers "${VBAM_VERSION}")
+    set(_vbam_major "${CMAKE_MATCH_1}")
+    set(_vbam_minor "${CMAKE_MATCH_2}")
+    set(_vbam_bugfix "${CMAKE_MATCH_3}")
+    if(NOT _vbam_bugfix)
+        set(_vbam_bugfix 0)
+    endif()
+    math(EXPR _vbam_major_bcd "((${_vbam_major} / 10) % 10) * 16 + ${_vbam_major} % 10")
+    math(EXPR _vbam_minor_nibbles "(${_vbam_minor} % 16) * 16 + ${_vbam_bugfix} % 16")
+    math(EXPR VBAM_VERS_MAJOR "${_vbam_major_bcd}" OUTPUT_FORMAT HEXADECIMAL)
+    math(EXPR VBAM_VERS_MINOR "${_vbam_minor_nibbles}" OUTPUT_FORMAT HEXADECIMAL)
+    if(VBAM_VERSION_RELEASE)
+        set(VBAM_VERS_STAGE release)
+    else()
+        set(VBAM_VERS_STAGE development)
+    endif()
+    set(VBAM_VERS_SHORT "${VBAM_VERSION}")
+    configure_file(retro68/vbam-version.r.in
+        "${CMAKE_CURRENT_BINARY_DIR}/retro68/vbam-version.r" @ONLY)
+
+    include(Retro68Application)
+    vbam_retro68_application(visualboyadvance-m
+        NAME "VisualBoyAdvance-M"
+        CREATOR VBAM
+        RESOURCES retro68/visualboyadvance-m.r
+        REZ_INCLUDES
+            "${CMAKE_CURRENT_SOURCE_DIR}/retro68"
+            "${CMAKE_CURRENT_BINARY_DIR}/retro68"
+    )
+endif()
+
 if(NOT WIN32 AND NOT APPLE)
     # $<TARGET_FILE:...> rather than a bare name: on Android the target is a
     # MODULE library under src/wx/ (libvisualboyadvance-m_<abi>.so), not an
@@ -2329,8 +2406,9 @@ endif()
 
 # On Android the deliverable is an APK produced by androiddeployqt (the target
 # is a MODULE library, not an installable executable/bundle), so skip the
-# desktop install rules entirely.
-if(NOT ANDROID)
+# desktop install rules entirely. The Retro68 application is packaged above,
+# and its install prefix is the toolchain's sysroot.
+if(NOT ANDROID AND NOT RETRO68)
     install(
         TARGETS visualboyadvance-m
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

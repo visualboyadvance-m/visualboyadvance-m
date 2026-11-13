@@ -485,8 +485,9 @@ endif()
 # something that cannot be run. They also link wx directly, without the
 # wxQt/Android shims in src/wx/android-compat.cpp that the app target pulls in,
 # so they do not even link. tools/android/build-android.sh passes
-# -DBUILD_TESTING=OFF for this reason.
-if(ANDROID)
+# -DBUILD_TESTING=OFF for this reason. The same goes for a classic Mac OS
+# (Retro68) build, whose newlib does not have what googletest needs either.
+if(ANDROID OR RETRO68)
     set(BUILD_TESTING OFF)
 endif()
 

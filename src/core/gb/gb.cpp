@@ -180,6 +180,13 @@ bool ReadBatteryFile(const char* file_name) {
         const int sizeToRead = (int)vec.length;
         const int sizeToReadWithLeeway = sizeToRead + vec.leeway;
         const int read = gzread(gzFile, vec.data, sizeToRead);
+        if (read == 0 && total_read == 0) {
+            // An empty file: nothing was ever saved in it (a write that
+            // failed after creating it), so there is no save yet rather than
+            // one that does not fit, and saving stays on.
+            gzclose(gzFile);
+            return false;
+        }
         total_read += read;
         if (read < 0 || (read != sizeToRead && read != sizeToReadWithLeeway)) {
             if (vec.action_on_failure) {

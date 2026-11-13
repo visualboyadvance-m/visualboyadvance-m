@@ -123,3 +123,43 @@ endif()
 if(X86_64 AND (ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS OR ENABLE_MMX))
     message(FATAL_ERROR "The options ASM_CORE, ASM_SCALERS and MMX are not supported on X86_64 yet.")
 endif()
+
+# Classic Mac OS through Retro68: Retro68 (68k) or RetroPPC (PowerPC CFM/PEF).
+if(CMAKE_SYSTEM_NAME MATCHES "^Retro(68|PPC)$")
+    set(RETRO68 ON)
+
+    # Retro68's toolchain files name the sysroot as the system prefix but set
+    # no find root, so packages, libraries and headers installed on the host
+    # (an SDL3 or wx in /usr/local) would be found and used. Look for them in
+    # the sysroot only; programs (wxrc, gettext) are still host ones.
+    set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSTEM_PREFIX_PATH}")
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+    set(ENV{PKG_CONFIG_LIBDIR} "${CMAKE_SYSTEM_PREFIX_PATH}/lib/pkgconfig")
+    set(ENV{PKG_CONFIG_PATH} "")
+
+    # newlib's <strings.h>, which the sysroot has lost to the Toolbox's
+    # <Strings.h> on a case-insensitive file system; see the header.
+    include_directories(BEFORE "${CMAKE_SOURCE_DIR}/src/core/base/retro68/include")
+
+    if(CMAKE_SYSTEM_NAME STREQUAL "Retro68")
+        set(M68K ON)
+        set(ARCH_NAME m68k)
+    else()
+        set(PPC32 ON)
+        set(ARCH_NAME ppc)
+    endif()
+endif()
+
+# The cores and the frontends key their byte order handling on WORDS_BIGENDIAN
+# (READ16LE() and friends in core/base/port.h, the I/O register views in
+# gba.h, the colour maps). Big-endian targets: PowerPC, 68k. CMake does not
+# work the byte order out for every compiler -- Retro68's 68k one leaves
+# CMAKE_C_BYTE_ORDER empty -- so a 68k or 32-bit PowerPC target without an
+# answer is big-endian.
+if(CMAKE_C_BYTE_ORDER STREQUAL "BIG_ENDIAN"
+   OR (NOT CMAKE_C_BYTE_ORDER AND (M68K OR PPC32)))
+    add_compile_definitions(WORDS_BIGENDIAN)
+endif()

@@ -246,6 +246,69 @@ static const wxString  val_unsdigits_s[] = {
 const wxArrayString val_unsdigits(sizeof(val_unsdigits_s) / sizeof(val_unsdigits_s[0]),
     val_unsdigits_s);
 
+bool wxLongValidator::TransferToWindow()
+{
+    if (!long_val)
+        return false;
+
+    wxWindow* win = GetWindow();
+    if (wxSpinCtrl* spin = wxDynamicCast(win, wxSpinCtrl)) {
+        spin->SetValue(static_cast<int>(*long_val));
+        return true;
+    }
+    if (wxChoice* choice = wxDynamicCast(win, wxChoice)) {
+        choice->SetSelection(static_cast<int>(*long_val));
+        return true;
+    }
+    if (wxRadioBox* radio = wxDynamicCast(win, wxRadioBox)) {
+        radio->SetSelection(static_cast<int>(*long_val));
+        return true;
+    }
+    if (wxSlider* slider = wxDynamicCast(win, wxSlider)) {
+        slider->SetValue(static_cast<int>(*long_val));
+        return true;
+    }
+    if (wxTextCtrl* txt = wxDynamicCast(win, wxTextCtrl)) {
+        txt->SetValue(wxString::Format(wxT("%ld"), *long_val));
+        return true;
+    }
+
+    return false;
+}
+
+bool wxLongValidator::TransferFromWindow()
+{
+    if (!long_val)
+        return false;
+
+    wxWindow* win = GetWindow();
+    if (wxSpinCtrl* spin = wxDynamicCast(win, wxSpinCtrl)) {
+        *long_val = spin->GetValue();
+        return true;
+    }
+    if (wxChoice* choice = wxDynamicCast(win, wxChoice)) {
+        *long_val = choice->GetSelection();
+        return true;
+    }
+    if (wxRadioBox* radio = wxDynamicCast(win, wxRadioBox)) {
+        *long_val = radio->GetSelection();
+        return true;
+    }
+    if (wxSlider* slider = wxDynamicCast(win, wxSlider)) {
+        *long_val = slider->GetValue();
+        return true;
+    }
+    if (wxTextCtrl* txt = wxDynamicCast(win, wxTextCtrl)) {
+        long value = 0;
+        if (!txt->GetValue().ToLong(&value))
+            return false;
+        *long_val = value;
+        return true;
+    }
+
+    return false;
+}
+
 wxUIntValidator::wxUIntValidator(uint32_t* _val)
     : uint_val(_val)
 {

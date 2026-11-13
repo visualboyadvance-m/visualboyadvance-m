@@ -4,7 +4,7 @@
 
 #include "core/gb/gbGfx.h"
 
-#include <memory.h>
+#include <cstring>
 
 #include "core/base/system.h"
 #include "core/gb/gbGlobals.h"

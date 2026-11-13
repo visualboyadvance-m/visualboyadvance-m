@@ -1553,7 +1553,7 @@ public:
     void DoSetThrottleSel(uint32_t val)
     {
         if (val <= kMaxThrottlePercent)
-            thrsel->SetSelection(std::round((double)val / 25));
+            thrsel->SetSelection(static_cast<int>(std::lround((double)val / 25)));
         else
             thrsel->SetSelection(100 / 25);
     }
@@ -2065,7 +2065,7 @@ bool MainFrame::BindControls()
     }
 
 // activate OnDropFile event handler
-#if !defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10)
+#if wxUSE_DRAG_AND_DROP && (!defined(__WXGTK__) || wxCHECK_VERSION(2, 8, 10))
     // may not actually do anything, but verfied to work w/ Linux/Nautilus
     DragAcceptFiles(true);
 #endif
@@ -2210,7 +2210,7 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
 #define getsc(n, o)                               \
     do {                                          \
         sc = SafeXRCCTRL<wxSpinCtrl>(d, n);       \
-        sc->SetValidator(wxGenericValidator(&o)); \
+        sc->SetValidator(MakeIntValidator(&o));   \
     } while (0)
 #define getsc_uint(n, o)                          \
     do {                                          \
@@ -2238,7 +2238,7 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
             if (!wxDynamicCast(prev->GetParent(), wxScrolledWindow))
                 throw std::runtime_error("Unable to load a dialog control from the builtin xrc file: Preview");
 
-            SafeXRCCTRL<wxControlWithItems>(d, "Magnification");
+            SafeXRCCTRL<wxChoice>(d, "Magnification");
             d->Fit();
         }
         else if (name == "GBAROMInfo") {
@@ -2516,9 +2516,9 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                 {"GameBoyAdvanceConfigSaveTypePanel", _("Save type"),
                  [d](wxPanel*) {
                      wxChoice* save_type =
-                         GetValidatedChild<wxChoice, wxGenericValidator>(
+                         GetValidatedChild<wxChoice>(
                              d, "SaveType",
-                             wxGenericValidator(&coreOptions.cpuSaveType));
+                             MakeIntValidator(&coreOptions.cpuSaveType));
                      BatConfigHandler.type = save_type;
                      wxChoice* flash_size = GetValidatedChild<
                          wxChoice, widgets::OptionChoiceValidator>(

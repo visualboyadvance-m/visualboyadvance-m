@@ -2,8 +2,10 @@
 
 #include <wx/ffile.h>
 #include <wx/generic/prntdlgg.h>
+#if wxUSE_PRINTING_ARCHITECTURE
 #include <wx/print.h>
 #include <wx/printdlg.h>
+#endif
 #include <wx/socket.h>
 #include <wx/statusbr.h>
 
@@ -953,7 +955,13 @@ int systemGetSensorZ()
     return sensorz[OPTION(kJoyDefault) - 1] / 10;
 }
 
-class PrintDialog : public wxEvtHandler, public wxPrintout {
+// Shows (and saves) what the emulated GB Printer printed, and prints it on a
+// real printer where wx has a printing architecture (not wxRetro68).
+class PrintDialog : public wxEvtHandler
+#if wxUSE_PRINTING_ARCHITECTURE
+    , public wxPrintout
+#endif
+{
 public:
     PrintDialog(const uint16_t* data, int lines, bool cont);
     ~PrintDialog();
@@ -972,9 +980,10 @@ public:
 
 private:
     void DoSave(wxCommandEvent&);
-    void DoPrint(wxCommandEvent&);
     void ChangeMag(wxCommandEvent&);
     void ShowImg(wxPaintEvent&);
+#if wxUSE_PRINTING_ARCHITECTURE
+    void DoPrint(wxCommandEvent&);
     bool OnPrintPage(int pno);
     void OnPreparePrinting();
     bool HasPage(int pno) { return pno <= npw * nph; }
@@ -985,17 +994,20 @@ private:
         *pfrom = 1;
         *pto = 1;
     }
+#endif
 
     wxDialog* dlg;
     wxPanel* p;
     wxImage img;
     wxBitmap* bmp;
-    wxControlWithItems* mag;
+    wxChoice* mag;
 
+#if wxUSE_PRINTING_ARCHITECTURE
     static wxPrintData* printdata;
     static wxPageSetupDialogData* pagedata;
     wxRect margins;
     int npw, nph;
+#endif
 
     DECLARE_CLASS(PrintDialog)
 };
@@ -1003,10 +1015,14 @@ private:
 IMPLEMENT_CLASS(PrintDialog, wxEvtHandler)
 
 PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont):
+#if wxUSE_PRINTING_ARCHITECTURE
     wxPrintout(wxGetApp().frame->GetPanel()->game_name() + wxT(" Printout")),
     img(160, lines),
     npw(1),
     nph(1)
+#else
+    img(160, lines)
+#endif
 {
     dlg = wxStaticCast(wxGetApp().frame->FindWindowByName("GBPrinter"), wxDialog);
     p = XRCCTRL(*dlg, "Preview", wxPanel);
@@ -1046,11 +1062,16 @@ PrintDialog::PrintDialog(const uint16_t* data, int lines, bool cont):
         NULL, this);
     dlg->Connect(wxID_SAVE, wxEVT_COMMAND_BUTTON_CLICKED,
         wxCommandEventHandler(PrintDialog::DoSave), NULL, this);
+#if wxUSE_PRINTING_ARCHITECTURE
     dlg->Connect(wxID_PRINT, wxEVT_COMMAND_BUTTON_CLICKED,
         wxCommandEventHandler(PrintDialog::DoPrint), NULL, this);
+#else
+    if (wxWindow* print_button = dlg->FindWindow(wxID_PRINT))
+        print_button->Hide();
+#endif
     dlg->Connect(XRCID("Magnification"), wxEVT_COMMAND_CHOICE_SELECTED,
         wxCommandEventHandler(PrintDialog::ChangeMag), NULL, this);
-    mag = XRCCTRL(*dlg, "Magnification", wxControlWithItems);
+    mag = XRCCTRL(*dlg, "Magnification", wxChoice);
     mag->SetSelection(1);
     wxWindow* w = dlg->FindWindow(cont ? wxID_OK : wxID_SAVE);
 
@@ -1131,6 +1152,7 @@ void PrintDialog::DoSave(wxCommandEvent&)
     }
 }
 
+#if wxUSE_PRINTING_ARCHITECTURE
 wxPrintData* PrintDialog::printdata = NULL;
 wxPageSetupDialogData* PrintDialog::pagedata = NULL;
 
@@ -1203,6 +1225,7 @@ void PrintDialog::DoPrint(wxCommandEvent&)
         *printdata = printer.GetPrintDialogData().GetPrintData();
     }
 }
+#endif  // wxUSE_PRINTING_ARCHITECTURE
 
 void systemGbPrint(uint8_t* data, int len, int pages, int feed, int pal, int cont)
 {

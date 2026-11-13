@@ -1,8 +1,42 @@
 #ifndef VBAM_WX_WIDGETS_RENDER_PLUGIN_H_
 #define VBAM_WX_WIDGETS_RENDER_PLUGIN_H_
 
-#include <wx/dynlib.h>
+#include <wx/defs.h>
 #include <wx/string.h>
+
+#if wxUSE_DYNLIB_CLASS
+#include <wx/dynlib.h>
+#else
+// wx built without dynamic library support (wxRetro68: classic Mac OS, where
+// render plugins, which are Windows DLLs, could not be loaded anyway). A
+// library that never loads, so the plugin filter finds no plugin and the
+// code around it needs no conditionals.
+enum {
+    wxDL_LAZY = 0x00000001,
+    wxDL_NOW = 0x00000002,
+    wxDL_GLOBAL = 0x00000004,
+    wxDL_VERBATIM = 0x00000008,
+    wxDL_NOSHARE = 0x00000010,
+    wxDL_QUIET = 0x00000020,
+    wxDL_DEFAULT = wxDL_NOW,
+};
+
+class wxDynamicLibrary {
+public:
+    wxDynamicLibrary() = default;
+    wxDynamicLibrary(const wxString&, int = wxDL_DEFAULT) {}
+
+    bool Load(const wxString&, int = wxDL_DEFAULT) { return false; }
+    bool IsLoaded() const { return false; }
+    void Unload() {}
+    bool HasSymbol(const wxString&) const { return false; }
+    void* GetSymbol(const wxString&, bool* success = nullptr) const {
+        if (success)
+            *success = false;
+        return nullptr;
+    }
+};
+#endif
 
 #include "wx/rpi.h"
 

@@ -56,7 +56,12 @@ uint8_t gbSgbScreenBuffer[4160];
 
 inline void gbSgbDraw24Bit(uint8_t* p, uint16_t v)
 {
-    memcpy(p, &systemColorMap32[v], 3);
+    // The low three bytes, lowest first, as the other 24-bit writers do; a
+    // memcpy() of the first three would take the high ones on big-endian.
+    const uint32_t color = systemColorMap32[v];
+    p[0] = (uint8_t)(color & 0xFF);
+    p[1] = (uint8_t)((color >> 8) & 0xFF);
+    p[2] = (uint8_t)((color >> 16) & 0xFF);
 }
 
 inline void gbSgbDraw32Bit(uint32_t* p, uint16_t v)

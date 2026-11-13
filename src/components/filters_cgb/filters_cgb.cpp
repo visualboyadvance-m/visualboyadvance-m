@@ -22,6 +22,29 @@ extern uint8_t  systemColorMap8[0x10000];
 extern uint16_t systemColorMap16[0x10000];
 extern uint32_t systemColorMap32[0x10000];
 
+namespace {
+
+// Where the top five bits of each 8-bit channel go in a 24- or 32-bit colour
+// map entry (systemRedShift & co.), fixed here rather than read from the
+// globals, which the filter threads override for a moment. Red is the low byte
+// and the top byte is unused, as values, on every host: the cores write a
+// 24-bit pixel as the low three bytes of the value, and the display filters
+// take the top byte of a 32-bit one for padding (the frontends set the same).
+void PackedShifts(int depth, int& r, int& g, int& b) {
+    (void)depth;
+    r = 3;
+    g = 11;
+    b = 19;
+}
+
+// The bits of a packed pixel that hold no colour: the alpha byte, whichever
+// end it is at.
+uint32_t UnusedBits(int r_shift, int g_shift, int b_shift) {
+    return ~((0xFFu << (r_shift - 3)) | (0xFFu << (g_shift - 3)) | (0xFFu << (b_shift - 3)));
+}
+
+}  // namespace
+
 // --- Global Constants and Variables for GBC Color Correction ---
 // One profile per (panel variant, color mode), taken from the matching shader.
 // Matrices use the column-major order of GLSL mat4.
@@ -203,16 +226,10 @@ void gbcfilter_update_colors(bool lcd) {
     } break;
     case 24:
     case 32: {
-        // Hardcode shifts for 24/32-bit to avoid a race with filter threads
-        // temporarily overriding the globals to 32-bit values (19/11/3).
-        // 32-bit is unaffected in practice (never goes through the non-32bpp
-        // filter conversion path), but 24-bit suffers the same concurrency
-        // issue as 16-bit did with systemRedShift etc.
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-        const int rShift = 3, gShift = 11, bShift = 19;
-#else
-        const int rShift = 27, gShift = 19, bShift = 11;
-#endif
+        // Fixed shifts, not the globals: the filter threads override those
+        // for a moment (see PackedShifts()).
+        int rShift, gShift, bShift;
+        PackedShifts(systemColorDepth, rShift, gShift, bShift);
         for (int i = 0; i < 0x10000; i++) {
             uint8_t r5 = static_cast<uint8_t>(i & 0x1f);
             uint8_t g5 = static_cast<uint8_t>((i & 0x3e0) >> 5);
@@ -314,12 +331,11 @@ void gbcfilter_pal(uint16_t* buf, int count)
 
 void gbcfilter_pal32(uint32_t* buf, int count)
 {
-    // Hardcode shifts to avoid race with filter threads temporarily overriding globals.
-#if wxBYTE_ORDER == wxLITTLE_ENDIAN
-    const int rShift = 3, gShift = 11, bShift = 19;
-#else
-    const int rShift = 27, gShift = 19, bShift = 11;
-#endif
+    // Fixed shifts, not the globals: the filter threads override those for a
+    // moment (see PackedShifts()).
+    int rShift, gShift, bShift;
+    PackedShifts(systemColorDepth, rShift, gShift, bShift);
+    const uint32_t unused_bits = UnusedBits(rShift, gShift, bShift);
 
     while (count--) {
         uint32_t pix = *buf;
@@ -368,9 +384,9 @@ void gbcfilter_pal32(uint32_t* buf, int count)
         final_pix |= ((final_blue_8bit >> 3) & 0x1f) << bShift;
         final_pix |= (final_blue_8bit & 0x07)        << (bShift - 3);
 
-        // Preserve existing alpha if present (assuming it's at bits 24-31 for 32-bit depth)
+        // Keep whatever the pixel had in the bits that hold no colour (alpha).
         if (systemColorDepth == 32) {
-            final_pix |= (pix & (0xFF << 24));
+            final_pix |= (pix & unused_bits);
         }
 
         *buf++ = final_pix;
@@ -534,9 +550,9 @@ void gbcfilter_pal_888(uint32_t* buf, int count)
         // 3 LSBs for the 'base' position (systemBlueShift - 3)
         final_pix |= (final_blue_8bit & 0x07) << (systemBlueShift - 3);
 
-        // Preserve existing alpha if present (assuming it's at bits 24-31 for 32-bit depth)
+        // Keep whatever the pixel had in the bits that hold no colour (alpha).
         if (systemColorDepth == 32) {
-            final_pix |= (pix & (0xFF << 24));
+            final_pix |= (pix & UnusedBits(systemRedShift, systemGreenShift, systemBlueShift));
         }
 
         *buf++ = final_pix;

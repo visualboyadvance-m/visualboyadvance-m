@@ -24,6 +24,11 @@
                 </object>
               </object>
               <object class="sizeritem">
+                <object class="wxRadioButton" name="OutputQuickDraw">
+                  <label translate="0">QuickDraw</label>
+                </object>
+              </object>
+              <object class="sizeritem">
                 <object class="wxRadioButton" name="OutputMetal">
                   <label translate="0">Metal</label>
                 </object>

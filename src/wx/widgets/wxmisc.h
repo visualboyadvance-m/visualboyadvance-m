@@ -52,6 +52,31 @@ protected:
     uint32_t* uint_val;
 };
 
+// wxGenericValidator for a long, which it does not take: the int32_t options
+// are longs where int32_t is one (Retro68). Handles the controls int32_t
+// options are shown in: spin controls, choices, radio boxes, sliders and text
+// controls.
+class wxLongValidator : public wxValidator {
+public:
+    explicit wxLongValidator(long* val) : long_val(val) {}
+    wxLongValidator(const wxLongValidator& v) : wxValidator(), long_val(v.long_val) {}
+    bool TransferToWindow() override;
+    bool TransferFromWindow() override;
+    bool Validate(wxWindow*) override { return true; }
+    wxObject* Clone() const override { return new wxLongValidator(long_val); }
+
+protected:
+    long* long_val;
+};
+
+// The validator for an int or an int32_t field, whichever int32_t is.
+inline wxGenericValidator MakeIntValidator(int* val) {
+    return wxGenericValidator(val);
+}
+inline wxLongValidator MakeIntValidator(long* val) {
+    return wxLongValidator(val);
+}
+
 // boolean copy-only validator with reversed value
 // may be attached to radio button or checkbox
 class wxBoolRevValidator : public wxValidator {

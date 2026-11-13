@@ -44,6 +44,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <map>
 
 #include <wx/cmdline.h>
 #include <wx/display.h>
@@ -54,7 +55,6 @@
 #include <wx/menu.h>
 #include <wx/mstream.h>
 #include <wx/protocol/http.h>
-#include <wx/regex.h>
 #include <wx/socket.h>
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
@@ -68,6 +68,9 @@
 #include <wx/wfstream.h>
 #include <wx/wxcrtvararg.h>
 #include <wx/zipstrm.h>
+#ifdef __WXRETRO68__
+#include <wx/xrc/xh_all.h>
+#endif
 
 #include "components/user_config/user_config.h"
 #include "core/base/system.h"
@@ -134,9 +137,93 @@ static void vbam_gdk_event_handler(GdkEvent* event, gpointer data) {
 
 #endif
 
+void InitXmlResourceHandlers(wxXmlResource* xr) {
+#ifdef __WXRETRO68__
+    // A 68k Mac application has 16 MB for all its code and data (it is all
+    // resources), and InitAllHandlers() and wxInitAllImageHandlers() link in
+    // every control and image format wx has. Only what the resources in
+    // xrc/ use, and the PNG and BMP files the frontend reads and writes.
+    xr->AddHandler(new wxSizerXmlHandler);
+    xr->AddHandler(new wxStdDialogButtonSizerXmlHandler);
+    xr->AddHandler(new wxFrameXmlHandler);
+    xr->AddHandler(new wxDialogXmlHandler);
+    xr->AddHandler(new wxPanelXmlHandler);
+    xr->AddHandler(new wxScrolledWindowXmlHandler);
+    xr->AddHandler(new wxNotebookXmlHandler);
+    xr->AddHandler(new wxMenuXmlHandler);
+    xr->AddHandler(new wxMenuBarXmlHandler);
+    xr->AddHandler(new wxToolBarXmlHandler);
+    xr->AddHandler(new wxStatusBarXmlHandler);
+    xr->AddHandler(new wxStaticTextXmlHandler);
+    xr->AddHandler(new wxStaticBoxXmlHandler);
+    xr->AddHandler(new wxButtonXmlHandler);
+    xr->AddHandler(new wxCheckBoxXmlHandler);
+    xr->AddHandler(new wxRadioButtonXmlHandler);
+    xr->AddHandler(new wxChoiceXmlHandler);
+    xr->AddHandler(new wxTextCtrlXmlHandler);
+    xr->AddHandler(new wxSliderXmlHandler);
+    xr->AddHandler(new wxSpinCtrlXmlHandler);
+    xr->AddHandler(new wxListBoxXmlHandler);
+    xr->AddHandler(new wxListCtrlXmlHandler);
+    xr->AddHandler(new wxTreeCtrlXmlHandler);
+    xr->AddHandler(new wxDirPickerCtrlXmlHandler);
+    xr->AddHandler(new wxFilePickerCtrlXmlHandler);
+    xr->AddHandler(new wxColourPickerCtrlXmlHandler);
+    xr->AddHandler(new wxIconXmlHandler);
+    xr->AddHandler(new wxUnknownWidgetXmlHandler);
+    wxImage::AddHandler(new wxPNGHandler);
+    wxImage::AddHandler(new wxXPMHandler);
+#else
+    // note: if linking statically, these pull in a lot of unused code
+    xr->InitAllHandlers();
+    wxInitAllImageHandlers();
+#endif
+    xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
+    xr->AddHandler(new widgets::UserInputCtrlXmlHandler());
+}
+
 namespace {
 
-#ifndef __WXMSW__
+// The comment of each group in an overrides file (vba-over.ini): the line
+// right above the group's "[name]" line, when it starts with '#' (one space
+// after the '#' is dropped). Lines may end in \n, \r\n or a lone \r. One
+// pass over the text; a regular expression per group took 18 seconds for the
+// built-in file on a 68040.
+std::map<wxString, wxString> ParseOverrideComments(const wxString& text) {
+    std::map<wxString, wxString> comments;
+    wxString prev;
+    size_t pos = 0;
+    const size_t len = text.length();
+
+    while (pos < len) {
+        size_t end = text.find_first_of(wxT("\r\n"), pos);
+        if (end == wxString::npos)
+            end = len;
+        const wxString line = text.substr(pos, end - pos);
+
+        if (line.StartsWith(wxT("["))) {
+            const size_t close = line.find(wxT(']'));
+            if (close != wxString::npos && prev.StartsWith(wxT("#"))) {
+                wxString cmt = prev.Mid(1);
+                if (cmt.StartsWith(wxT(" ")))
+                    cmt.Remove(0, 1);
+                comments.emplace(line.substr(1, close - 1), cmt);
+            }
+        }
+        prev = line;
+
+        // Step over the line ending: \r\n counts as one.
+        if (end < len && text[end] == wxT('\r') && end + 1 < len && text[end + 1] == wxT('\n'))
+            ++end;
+        pos = end + 1;
+    }
+
+    return comments;
+}
+
+// Classic Mac OS (wxRetro68) has no signals; Quit comes as an Apple event,
+// which wx turns into closing the windows.
+#if !defined(__WXMSW__) && !defined(__WXRETRO68__)
 // The signal QuitSignalHandler() caught, 0 for none. wxvbamApp's quit signal
 // timer acts on it.
 volatile std::sig_atomic_t g_quit_signal = 0;
@@ -476,6 +563,16 @@ static void get_config_path(wxPathList& path, bool exists = true)
     }
 #endif
 
+#if defined(__WXRETRO68__)
+    // Classic Mac OS: the settings live in a folder of their own,
+    // GetUserDataDir() -- in Application Support, or in Preferences where
+    // there is none -- which OnInit() creates. The checks
+    // below find a parent directory by appending "//..", which is no path on
+    // a Mac volume, so they would add nothing at all.
+    path.Add(stdp.GetUserDataDir());
+    return;
+#endif
+
     // macOS App Sandbox: the settings file lives in the container's own
     // Application Support directory (GetUserDataDir() resolves through the
     // redirected $HOME) and nowhere else. Bundle-relative and system-wide
@@ -736,6 +833,12 @@ wxString wxvbamApp::GetConfigurationPath() {
         }
     }
 
+#if defined(__WXRETRO68__)
+    // The one candidate (see get_config_path()), which OnInit() creates.
+    if (data_path.empty() && !config_path.empty())
+        data_path = config_path[0];
+#endif
+
     // if no config file was not found, search for writable config
     // dir or parent to create it in in OnInit in normal order
     // (from user paths to system paths.)
@@ -876,12 +979,7 @@ bool wxvbamApp::OnInit() {
 
     // prepare for loading xrc files
     wxXmlResource* xr = wxXmlResource::Get();
-    // note: if linking statically, next 2 pull in lot of unused code
-    // maybe in future if not wxSHARED, load only builtin-needed handlers
-    xr->InitAllHandlers();
-    xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
-    xr->AddHandler(new widgets::UserInputCtrlXmlHandler());
-    wxInitAllImageHandlers();
+    InitXmlResourceHandlers(xr);
     get_config_path(config_path);
     // first, load override xrcs
     // this can only override entire root nodes
@@ -889,15 +987,19 @@ bool wxvbamApp::OnInit() {
     wxString cwd = wxGetCwd();
 
     for (size_t i = 0; i < config_path.size(); i++)
-        if (wxDirExists(config_path[i]) && wxSetWorkingDirectory(config_path[i])) {
+        if (wxDirExists(config_path[i])) {
             // *.xr[cs] doesn't work (double the number of scans)
             // 2.9 gives errors for no files found, so manual precheck needed
             // (yet another double the number of scans)
-            if (!wxFindFirstFile(wxT("*.xrc")).empty())
-                xr->Load(wxT("*.xrc"));
+            // Full paths: a bare "*.xrc" is looked for in ".", which is not a
+            // directory on classic Mac OS (wxRetro68), where it is ":".
+            const wxString xrcs = wxFileName(config_path[i], wxT("*.xrc")).GetFullPath();
+            if (!wxFindFirstFile(xrcs).empty())
+                xr->Load(xrcs);
 
-            if (!wxFindFirstFile(wxT("*.xrs")).empty())
-                xr->Load(wxT("*.xrs"));
+            const wxString xrss = wxFileName(config_path[i], wxT("*.xrs")).GetFullPath();
+            if (!wxFindFirstFile(xrss).empty())
+                xr->Load(xrss);
         }
 
     wxFileName xrcDir(GetConfigurationPath() + wxT("//xrc"), wxEmptyString);
@@ -938,6 +1040,20 @@ bool wxvbamApp::OnInit() {
             wxRenameFile(old_conf_file, new_conf_file, false);
         }
         // /END_MIGRATION
+
+#if defined(__WXRETRO68__)
+        // Earlier builds found no configuration directory and wxFileConfig
+        // put vbam.ini straight into the Preferences folder; move it into
+        // the settings folder.
+        const wxString loose_conf_file(
+            wxFileName(wxStandardPaths::Get().GetUserConfigDir(), knewConfigFileName)
+                .GetFullPath());
+        if (!wxFileExists(new_conf_file) && wxFileExists(loose_conf_file) &&
+            loose_conf_file != new_conf_file &&
+            wxFileName::Mkdir(GetConfigurationPath(), wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL)) {
+            wxRenameFile(loose_conf_file, new_conf_file, false);
+        }
+#endif
 
         config_file_ = new_conf_file;
     }
@@ -1202,6 +1318,8 @@ bool wxvbamApp::OnInit() {
         } else if (wxFileName(f).IsFileReadable()) {
             rom_database = f;
             break;
+        } else {
+            f = wxFindNextFile();
         }
     }
 
@@ -1216,27 +1334,19 @@ bool wxvbamApp::OnInit() {
     // add the file from which the group came
     wxMemoryInputStream mis(builtin_over, sizeof(builtin_over));
     overrides_ = std::make_unique<wxFileConfig>(mis);
-    wxRegEx cmtre;
     // not the most efficient thing to do: read entire file into a string
     // just to parse the comments out
-    wxString bovs((const char*)builtin_over, wxConvUTF8, sizeof(builtin_over));
+    const std::map<wxString, wxString> builtin_comments = ParseOverrideComments(
+        wxString((const char*)builtin_over, wxConvUTF8, sizeof(builtin_over)));
     bool cont;
     wxString s;
     long grp_idx;
-#define CMT_RE_START wxT("(^|[\n\r])# ?([^\n\r]*)(\r?\n|\r)\\[")
 
     for (cont = overrides_->GetFirstGroup(s, grp_idx); cont;
          cont = overrides_->GetNextGroup(s, grp_idx)) {
-        // apparently even MacOSX sometimes uses the old \r by itself
-        wxString cmt(CMT_RE_START);
-        cmt += s + wxT("\\]");
-
-        if (cmtre.Compile(cmt) && cmtre.Matches(bovs))
-            cmt = cmtre.GetMatch(bovs, 2);
-        else
-            cmt = wxEmptyString;
-
-        overrides_->Write(s + wxT("/comment"), cmt);
+        const auto cmt = builtin_comments.find(s);
+        overrides_->Write(s + wxT("/comment"),
+                          cmt != builtin_comments.end() ? cmt->second : wxString());
     }
 
     if (vba_over.FileExists()) {
@@ -1249,6 +1359,7 @@ bool wxvbamApp::OnInit() {
         // read as an input stream
         wxStringInputStream sis(sos.GetString());
         wxFileConfig ov(sis);
+        const std::map<wxString, wxString> comments = ParseOverrideComments(sos.GetString());
 
         for (cont = ov.GetFirstGroup(s, grp_idx); cont;
              cont = ov.GetNextGroup(s, grp_idx)) {
@@ -1256,16 +1367,9 @@ bool wxvbamApp::OnInit() {
             overrides_->SetPath(s);
             ov.SetPath(s);
             overrides_->Write(wxT("path"), GetConfigurationPath());
-            // apparently even MacOSX sometimes uses \r by itself
-            wxString cmt(CMT_RE_START);
-            cmt += s + wxT("\\]");
-
-            if (cmtre.Compile(cmt) && cmtre.Matches(sos.GetString()))
-                cmt = cmtre.GetMatch(sos.GetString(), 2);
-            else
-                cmt = wxEmptyString;
-
-            overrides_->Write(wxT("comment"), cmt);
+            const auto cmt = comments.find(s);
+            overrides_->Write(wxT("comment"),
+                              cmt != comments.end() ? cmt->second : wxString());
             long ent_idx;
 
             for (cont = ov.GetFirstEntry(s, ent_idx); cont;
@@ -1354,7 +1458,7 @@ bool wxvbamApp::OnInit() {
 
     frame->Show(true);
 
-#ifndef __WXMSW__
+#if !defined(__WXMSW__) && !defined(__WXRETRO68__)
     // See QuitSignalHandler(). A timer, as idle events stop while no game runs.
     for (int sig : {SIGTERM, SIGINT, SIGHUP}) {
         struct sigaction sa = {};

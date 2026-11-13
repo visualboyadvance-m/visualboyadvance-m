@@ -273,11 +273,12 @@ if(VBAM_NEED_NLS)
     include(CheckFunctionExists)
     check_function_exists(gettext GETTEXT_FN)
     if(NOT (LIBINTL_INC OR GETTEXT_FN))
-        if(ANDROID OR DOS)
-            # The NDK has no gettext/libintl. wxWidgets supplies its own _()
-            # (wxGetTranslation), so the wx frontend still localizes; only the
-            # core's gettext-based strings fall back to English.
-            message(STATUS "gettext/libintl not available in the NDK; building without NLS")
+        if(ANDROID OR DOS OR RETRO68)
+            # The NDK, DJGPP and Retro68 have no gettext/libintl. wxWidgets
+            # supplies its own _() (wxGetTranslation), so the wx frontend still
+            # localizes; only the core's gettext-based strings fall back to
+            # English.
+            message(STATUS "gettext/libintl not available; building without NLS")
         else()
             message(FATAL_ERROR "NLS requires libintl/gettext")
         endif()

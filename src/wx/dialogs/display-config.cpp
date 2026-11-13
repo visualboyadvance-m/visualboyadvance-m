@@ -97,7 +97,8 @@ private:
             }
         }
 
-        choice->SetSelection(0);
+        // There may be no devices at all (classic Mac OS has none to list).
+        choice->SetSelection(choice->GetCount() == 0 ? wxNOT_FOUND : 0);
         return true;
     }
 
@@ -593,11 +594,18 @@ void DisplayConfig::InitBasicTab() {
 
     add_radio("OutputSimple", config::RenderMethod::kSimple);
 
+#if defined(__WXRETRO68__)
+    add_radio("OutputQuickDraw", config::RenderMethod::kQuickDraw);
+#else
+    GetValidatedChild("OutputQuickDraw")->Hide();
+#endif
+
     // Android has no working SDL video or desktop-OpenGL output (see
     // NewPanelForRenderMethod); the accelerated choice there is GLES, which is
     // offered only when it was compiled in (ENABLE_GLES). Everywhere else the
     // GLES radio does not apply.
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(__WXRETRO68__)
+    // Nor has classic Mac OS: the Retro68 SDL cannot draw into a wx window.
     GetValidatedChild("OutputSDL")->Hide();
 #else
     add_radio("OutputSDL", config::RenderMethod::kSDL);
@@ -683,7 +691,11 @@ void DisplayConfig::InitBasicTab() {
     // Bind event handlers to all output module radio buttons.
     GetValidatedChild("OutputSimple")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
-#if !defined(__ANDROID__)
+#if defined(__WXRETRO68__)
+    GetValidatedChild("OutputQuickDraw")->Bind(wxEVT_RADIOBUTTON,
+        &DisplayConfig::UpdateSDLOptionsVisibility, this);
+#endif
+#if !defined(__ANDROID__) && !defined(__WXRETRO68__)
     GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
@@ -1105,7 +1117,7 @@ void DisplayConfig::InitOSDTab() {
 void DisplayConfig::InitZoomTab() {
     GetValidatedChild("DefaultScale")->SetValidator(ScaleValidator());
     GetValidatedChild("MaxScale")
-        ->SetValidator(wxGenericValidator(&gopts.max_scale));
+        ->SetValidator(MakeIntValidator(&gopts.max_scale));
 }
 
 void DisplayConfig::OnDialogShowEvent(wxShowEvent& event) {
@@ -1534,7 +1546,11 @@ void DisplayConfig::ApplyDlssNrToRenderMethods(bool dlss_nr_on) {
 
         if (dlss_nr_on) {
             if (!dlss_nr_radio_tooltips_.count(radio.first))
+#if wxUSE_TOOLTIPS
                 dlss_nr_radio_tooltips_[radio.first] = rb->GetToolTipText();
+#else
+                dlss_nr_radio_tooltips_[radio.first] = wxString();
+#endif
             rb->SetToolTip(_("Not available while DLSS-NR is on."));
             // Selected: move to the replacement. The render method, like the
             // DLSS-NR box, is applied on OK, so this only moves the radios;
@@ -1675,6 +1691,9 @@ void DisplayConfig::UpdateRenderMethodVisibility() {
 #endif
 #if defined(VBAM_ENABLE_GLES)
             config::RenderMethod::kGLES,
+#endif
+#if defined(__WXRETRO68__)
+            config::RenderMethod::kQuickDraw,
 #endif
             config::RenderMethod::kOpenGL,
             config::RenderMethod::kSimple,

@@ -80,6 +80,8 @@ static const std::array<wxString, kNbRenderMethods> kRenderMethodStrings = {
 #if defined(__WXMSW__) && !defined(NO_D3D)
     "direct3d",
 #endif
+#elif defined(__WXRETRO68__)
+    "quickdraw",
 #elif defined(__WXMAC__)
     "quartz2d",
 #ifndef NO_METAL
@@ -192,6 +194,10 @@ std::array<Option, kNbOptions>& Option::All() {
         // (GLESDrawingPanel). Desktop OpenGL and SDL video don't work there, so
         // GLES is the only accelerated choice; Simple is the fallback.
         RenderMethod render_method = RenderMethod::kGLES;
+#elif defined(__WXRETRO68__)
+        // Classic Mac OS: straight to QuickDraw, Simple (through wx) the
+        // fallback.
+        RenderMethod render_method = RenderMethod::kQuickDraw;
 #elif defined(__ANDROID__)
         // GLES compiled out: the software Simple renderer is all that is left.
         RenderMethod render_method = RenderMethod::kSimple;
@@ -364,7 +370,7 @@ std::array<Option, kNbOptions>& Option::All() {
         int32_t volume = 100;
         uint32_t bitdepth = 3;
         wxString sdlrenderer = wxString("default");
-        int locale = wxLANGUAGE_DEFAULT;
+        int32_t locale = wxLANGUAGE_DEFAULT;
         bool exttrans = false;
     };
     static OwnedOptions g_owned_opts;

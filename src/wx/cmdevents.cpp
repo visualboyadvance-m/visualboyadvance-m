@@ -59,12 +59,7 @@ void RefreshFrame(void)
     const bool is_fullscreen = OPTION(kGeomFullScreen);
     const bool is_maximized = OPTION(kGeomIsMaximized);
 
-    // note: if linking statically, next 2 pull in lot of unused code
-    // maybe in future if not wxSHARED, load only builtin-needed handlers
-    xr->InitAllHandlers();
-    xr->AddHandler(new widgets::GroupCheckBoxXmlHandler());
-    xr->AddHandler(new widgets::UserInputCtrlXmlHandler());
-    wxInitAllImageHandlers();
+    InitXmlResourceHandlers(xr);
 
     wxGetApp().SetExitOnFrameDelete(false);
 
@@ -153,22 +148,18 @@ void MainFrame::GetMenuOptionConfig(const wxString& menu_name,
     }
 }
 
-void MainFrame::GetMenuOptionInt(const wxString& menuName, int* field, int mask)
+bool MainFrame::IsMenuOptionChecked(const wxString& menuName, bool fallback) const
 {
-    VBAM_CHECK(field);
-    int value = mask;
-    bool is_checked = ((*field) & (mask)) != (value);
     int id = wxXmlResource::GetXRCID(menuName);
 
     for (size_t i = 0; i < checkable_mi.size(); i++) {
         if (checkable_mi[i].cmd != id)
             continue;
 
-        is_checked = checkable_mi[i].mi->IsChecked();
-        break;
+        return checkable_mi[i].mi->IsChecked();
     }
 
-    *field = ((*field) & ~(mask)) | (is_checked ? (value) : 0);
+    return fallback;
 }
 
 void MainFrame::SetMenuOption(const wxString& menuName, bool value)
@@ -192,7 +183,10 @@ static void toggleBooleanVar(bool *menuValue, bool *globalVar)
         *globalVar = *menuValue;
 }
 
-static void toggleBitVar(bool *menuValue, int *globalVar, int mask)
+// `globalVar` is an int or an int32_t, which differ where int32_t is a long
+// (Retro68).
+template <typename T>
+static void toggleBitVar(bool *menuValue, T *globalVar, int mask)
 {
     bool isEnabled = ((*globalVar) & (mask)) != (mask);
     if (*menuValue == isEnabled)

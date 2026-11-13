@@ -25,18 +25,18 @@ extern struct opts_t {
     int gba_link_type;
 
     /// General
-    int rewind_interval = 0;
+    int32_t rewind_interval = 0;
 
     /// Joypad
-    int autofire_rate = 1;
+    int32_t autofire_rate = 1;
 
     /// Core
-    int gdb_port = 55555;
+    int32_t gdb_port = 55555;
     int link_num_players = 2;
-    int max_scale = 0;
+    int32_t max_scale = 0;
 
     /// Sound
-    int sound_en = 0x30f; // soundSetEnable()
+    int32_t sound_en = 0x30f; // soundSetEnable()
 
     /// Recent
     wxFileHistory* recent = NULL;

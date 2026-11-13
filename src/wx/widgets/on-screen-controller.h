@@ -19,6 +19,18 @@ class EmulatedGamepad;
 
 class wxEraseEvent;
 class wxGraphicsContext;
+
+namespace widgets {
+namespace internal {
+// What DrawContent() draws through: a wxGraphicsContext, or, where wx has no
+// graphics context (wxRetro68), a wxDC behind the same few calls.
+#if wxUSE_GRAPHICS_CONTEXT
+using OscPainter = wxGraphicsContext;
+#else
+class OscPainter;
+#endif
+}  // namespace internal
+}  // namespace widgets
 class wxMouseEvent;
 class wxPaintEvent;
 class wxSizeEvent;
@@ -122,7 +134,7 @@ private:
     void OnEraseBackground(wxEraseEvent& event);
 
     // Draws the controls; shared by OnPaint() and RenderRgba().
-    void DrawContent(wxGraphicsContext& context);
+    void DrawContent(internal::OscPainter& context);
 
     // Single-pointer mouse fallback (desktop).
     void OnMouseDown(wxMouseEvent& event);
