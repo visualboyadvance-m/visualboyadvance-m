@@ -202,22 +202,35 @@ set(VCPKG_HOST_DEPS glslang[tools])
 # were built, because asking for a port whose defaults are not installed is
 # asking for a rebuild of it from source.
 if(ENABLE_WX)
-    list(APPEND VCPKG_DEPS "wxwidgets[core]" nanosvg lua)
+    list(APPEND VCPKG_DEPS "wxwidgets[core]" nanosvg)
 
     if(VBAM_TARGET_ANDROID)
         list(APPEND VCPKG_DEPS qtbase qttools)
-    endif()
-
-    # The Vulkan renderer. On Apple platforms it goes through MoltenVK, which
-    # is not a vcpkg port here.
-    if(NOT VBAM_TARGET_APPLE)
-        list(APPEND VCPKG_DEPS vulkan)
     endif()
 endif()
 
 # The Qt frontend. qttools supplies lrelease/lupdate for its translations.
 if(ENABLE_QT)
     list(APPEND VCPKG_DEPS qtbase qttools)
+endif()
+
+# Lua scripting and the Vulkan renderer belong to whichever GUI is built: both
+# ports have them (src/wx/lua and src/qt/lua, the wx and Qt Vulkan panels).
+# ENABLE_LUA and ENABLE_VULKAN each default to whether the package was found,
+# so a build that never asked for it is not an error -- the feature is just
+# absent from the binary, and a Qt-only build came out without either and said
+# nothing about it.
+if(ENABLE_WX OR ENABLE_QT)
+    list(APPEND VCPKG_DEPS lua)
+
+    # Vulkan is headers plus a loader resolved at run time, and only some
+    # targets take them from vcpkg. Apple goes through MoltenVK, which is not a
+    # vcpkg port here, and Android takes the headers and libvulkan.so from the
+    # NDK sysroot (see the ANDROID branch in cmake/Options.cmake), so asking for
+    # the port there builds it for a target that never looks at it.
+    if(NOT VBAM_TARGET_APPLE AND NOT VBAM_TARGET_ANDROID)
+        list(APPEND VCPKG_DEPS vulkan)
+    endif()
 endif()
 
 if(VBAM_NEED_NLS)
