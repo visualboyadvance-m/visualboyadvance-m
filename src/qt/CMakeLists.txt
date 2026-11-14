@@ -16,6 +16,14 @@ set(CMAKE_AUTORCC ON)
 set(vbam_qt_components Core Gui Widgets OpenGL OpenGLWidgets Network PrintSupport)
 find_package(Qt6 REQUIRED COMPONENTS ${vbam_qt_components} OPTIONAL_COMPONENTS LinguistTools)
 
+# Every binary this project builds lands at the top of the build tree
+# (EXECUTABLE_OUTPUT_PATH, cmake/Toolchain.cmake). qt_standard_project_setup()
+# would otherwise put the Windows ones in this directory instead, so that the
+# non-plugin Qt DLLs can sit beside the executable -- it takes a value the
+# project has already chosen, so choose first. Elsewhere it sets no runtime
+# output directory at all and this just restates where the binary already went.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+
 qt_standard_project_setup()
 
 # ---------------------------------------------------------------------------
@@ -483,6 +491,82 @@ endif()
 
 if(WIN32 AND NOT COMPILE_ONLY)
     target_sources(visualboyadvance-m-qt PRIVATE visualboyadvance-m-qt.rc)
+
+    # Qt plugins are not linked, they are loaded by name at run time, so vcpkg's
+    # app-local deployment -- which walks the executable's imports -- never sees
+    # them. Qt looks for them under each of its library paths, which include the
+    # directory the executable is in; nothing else here puts them within reach,
+    # because the Qt6Core.dll deployed next to the executable works its install
+    # prefix out from its own location and lands outside the vcpkg tree. Without
+    # the platform plugin the app dies at startup with "no Qt platform plugin
+    # could be initialized", so copy the ones it needs into place beside it.
+    #
+    # The plugin targets carry a per-configuration location, so a debug build
+    # stages the debug plugins. Taken from the Qt modules this links rather than
+    # named one by one, and then narrowed to the types that matter:
+    #
+    #   platforms     the windows (and offscreen, for --check-dialogs) QPA
+    #                 plugin: without one the app cannot start at all
+    #   styles        the native Windows 11 style; without it Qt falls back to
+    #                 Fusion and the app looks nothing like the wx port
+    #   imageformats  anything beyond the PNG/BMP readers built into QtGui
+    #   tls           the Schannel backend, for any https QtNetwork does
+    set(vbam_qt_plugin_types platforms styles imageformats tls)
+
+    set(vbam_qt_plugins)
+    foreach(qt_module IN LISTS vbam_qt_components)
+        foreach(plugins_property _qt_plugins QT_PLUGINS)
+            get_target_property(vbam_qt_module_plugins Qt6::${qt_module} ${plugins_property})
+            if(vbam_qt_module_plugins)
+                list(APPEND vbam_qt_plugins ${vbam_qt_module_plugins})
+            endif()
+        endforeach()
+    endforeach()
+    list(REMOVE_DUPLICATES vbam_qt_plugins)
+
+    set(vbam_qt_plugin_dirs)
+    set(vbam_qt_plugin_copies)
+
+    # The module property holds plain plugin names, not namespaced targets.
+    foreach(vbam_qt_plugin IN LISTS vbam_qt_plugins)
+        set(vbam_qt_plugin_target "Qt6::${vbam_qt_plugin}")
+
+        if(NOT TARGET ${vbam_qt_plugin_target})
+            continue()
+        endif()
+
+        get_target_property(vbam_qt_plugin_type ${vbam_qt_plugin_target} QT_PLUGIN_TYPE)
+
+        if(NOT vbam_qt_plugin_type IN_LIST vbam_qt_plugin_types)
+            continue()
+        endif()
+
+        list(APPEND vbam_qt_plugin_dirs ${vbam_qt_plugin_type})
+        list(APPEND vbam_qt_plugin_copies COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:${vbam_qt_plugin_target}>"
+            "$<TARGET_FILE_DIR:visualboyadvance-m-qt>/${vbam_qt_plugin_type}/")
+    endforeach()
+
+    if(NOT "platforms" IN_LIST vbam_qt_plugin_dirs)
+        message(WARNING "No Qt platform plugin target was found; the Qt port will not start from the build directory.")
+    endif()
+
+    if(vbam_qt_plugin_dirs)
+        list(REMOVE_DUPLICATES vbam_qt_plugin_dirs)
+
+        set(vbam_qt_plugin_mkdirs)
+
+        foreach(vbam_qt_plugin_dir IN LISTS vbam_qt_plugin_dirs)
+            list(APPEND vbam_qt_plugin_mkdirs COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:visualboyadvance-m-qt>/${vbam_qt_plugin_dir}")
+        endforeach()
+
+        add_custom_command(TARGET visualboyadvance-m-qt POST_BUILD
+            ${vbam_qt_plugin_mkdirs}
+            ${vbam_qt_plugin_copies}
+            COMMENT "Staging Qt plugins (${vbam_qt_plugin_dirs}) next to visualboyadvance-m-qt"
+            VERBATIM)
+    endif()
 endif()
 
 if(ANDROID AND NOT COMPILE_ONLY)
