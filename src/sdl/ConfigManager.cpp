@@ -957,7 +957,9 @@ int ReadOpts(int argc, char ** argv)
 		case OPT_SOUND_FILTERING:
 			// --sound-filtering
 			if (optarg) {
-				soundFiltering = (float)(atoi(optarg));
+				// A percentage, as the gbaSoundFiltering preference is:
+				// soundFiltering itself runs 0.0 to 1.0.
+				soundFiltering = (float)(atoi(optarg)) / 100.0f;
 			}
 			break;
 
