@@ -155,15 +155,33 @@ if(ENABLE_FFMPEG)
     endif()
 
     if(RETRO68)
-        # The Retro68 sysroot's static ffmpeg is built with its TIFF decoder's
-        # LZMA support (libavcodec/tiff.c calls lzma_stream_decoder & co.),
-        # and static archives carry no dependency list: link liblzma after
-        # the ffmpeg libraries ourselves.
+        # FindFFmpeg links the Retro68 sysroot's static ffmpeg archives by
+        # path and drops the -l dependencies of their .pc files, and static
+        # archives carry no dependency list of their own, so link them here,
+        # after the ffmpeg libraries:
+        #  - liblzma: the TIFF decoder (libavcodec/tiff.c, lzma_stream_decoder)
+        #  - libbz2:  the Matroska demuxer's bzip2 track compression, when
+        #             ffmpeg's configure found libbz2 in the sysroot
+        #  - ThreadsLib (PowerPC): x265's Thread Manager threads
+        #    (NewThread, YieldToAnyThread); on 68k these are traps.
         find_library(VBAM_RETRO68_LZMA_LIBRARY lzma)
         if(NOT VBAM_RETRO68_LZMA_LIBRARY)
             message(FATAL_ERROR "ENABLE_FFMPEG on Retro68 needs liblzma in the sysroot, which was not found")
         endif()
         list(APPEND FFMPEG_LIBRARIES ${VBAM_RETRO68_LZMA_LIBRARY})
+
+        find_library(VBAM_RETRO68_BZ2_LIBRARY bz2)
+        if(VBAM_RETRO68_BZ2_LIBRARY)
+            list(APPEND FFMPEG_LIBRARIES ${VBAM_RETRO68_BZ2_LIBRARY})
+        endif()
+
+        if(NOT M68K)
+            find_library(VBAM_RETRO68_THREADSLIB ThreadsLib)
+            if(NOT VBAM_RETRO68_THREADSLIB)
+                message(FATAL_ERROR "ENABLE_FFMPEG on Retro68 PowerPC needs ThreadsLib (for x265), which was not found")
+            endif()
+            list(APPEND FFMPEG_LIBRARIES ${VBAM_RETRO68_THREADSLIB})
+        endif()
     endif()
 
     if(APPLE)
