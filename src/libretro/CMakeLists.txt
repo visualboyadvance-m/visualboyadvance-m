@@ -216,8 +216,22 @@ if(MSVC)
  * Shim for UCRT-only symbols when linking against msvcrt.dll.
  *
  * MSVC's STL and CRT startup code reference functions that only exist in
- * ucrtbase.dll.  We provide minimal implementations here so the DLL loads
- * with just msvcrt.dll + vcruntime140.dll + msvcp140.dll.
+ * ucrtbase.dll.  Minimal implementations here answer the ones that would
+ * otherwise go unresolved, so the core links against msvcrt.dll for its C
+ * library.
+ *
+ * It does not get the built DLL down to msvcrt.dll, vcruntime140.dll and
+ * msvcp140.dll alone, and cannot: what is defined here satisfies a
+ * reference to a plain symbol name, and a translation unit compiled with
+ * the stock UCRT headers asks for the __imp_ form instead -- an indirect
+ * call through the import address table, which only an import library can
+ * fill.  (Compiling one with the dllimport suppression below is what makes
+ * it ask for the plain name; that is why this file does it.)  So the core
+ * still imports __acrt_iob_func from api-ms-win-crt-stdio-l1-1-0.dll and
+ * _initterm_e from api-ms-win-crt-runtime-l1-1-0.dll, and getting rid of
+ * those would mean building every translation unit, the C++ standard
+ * library among them, that same way.  Both are part of Windows, so the
+ * core loads regardless.
  */
 
 /* Override the dllimport marker for __acrt_iob_func so we can define it
