@@ -2020,7 +2020,7 @@ Options:\n\
       --no-opengl       0 - Disable OpenGL\n\
       --opengl-nearest  1 - No filtering\n\
       --opengl-bilinear   2 - Bilinear filtering\n\
-  -F, --fullscreen   Full screen\n\
+  -F, --full-screen            Full screen\n\
   -G, --gdb=PROTOCOL           GNU Remote Stub mode:\n\
                                 tcp   - use TCP at port 55555\n\
                                 tcp:PORT - use TCP at port PORT\n\
@@ -2034,7 +2034,8 @@ Options:\n\
   -S, --flash-size=SIZE  Set the Flash size\n\
       --flash-64k       0 -  64K Flash\n\
       --flash-128k  1 - 128K Flash\n\
-  -T, --throttle=THROTTLE   Set the desired throttle (5...1000)\n\
+  -T, --throttle=THROTTLE      Set the throttle, as a percentage\n\
+                                 (5...1000, or 0 for unlimited)\n\
   -b, --bios=BIOS       Use given bios file\n\
   -c, --config=FILE   Read the given configuration file\n\
   -f, --filter=FILTER     Select filter:\n\
@@ -2066,21 +2067,66 @@ Options:\n\
                                 512 - AGBPrint messages\n\
 \n\
 Long options only:\n\
-      --agb-print       Enable AGBPrint support\n\
-      --auto-frameskip   Enable auto frameskipping\n\
+      --agb-print              Enable AGBPrint support\n\
       --no-agb-print           Disable AGBPrint support\n\
-      --no-auto-frameskip   Disable auto frameskipping\n\
-      --color-depth   Set color depth (8, 16, 24 or 32)\n\
+      --auto-frame-skip=N      Auto frame skipping on (non-zero) or off (0)\n\
+      --no-auto-frameskip      Disable auto frameskipping\n\
+      --auto-patch             Automatically apply patch\n\
       --no-patch               Do not automatically apply patch\n\
+      --autofire=FRAMES        Autofire toggle period, in frames (1 or more)\n\
+      --battery-dir=DIR        Directory to keep battery saves in\n\
+      --bios-file-name-gb=FILE   Game Boy BIOS file\n\
+      --bios-file-name-gba=FILE  Game Boy Advance BIOS file\n\
+      --bios-file-name-gbc=FILE  Game Boy Color BIOS file\n\
+      --use-bios               Use the BIOS file\n\
+      --skip-bios              Skip the BIOS intro\n\
+      --border-on              Show the Super Game Boy border\n\
+      --gb-border-on           Same as --border-on\n\
+      --border-automatic       Show the border only when the game has one\n\
+      --gb-border-automatic    Same as --border-automatic\n\
+      --capture-format=N       Screen capture format (0 - PNG, 1 - BMP)\n\
+      --cheat 'CHEAT'          Add a cheat\n\
+      --cheats-enabled         Enable cheats\n\
+      --color-depth=N          Set color depth (8, 16, 24 or 32)\n\
+      --cpu-disable-sfx        Disable CPU special effects\n\
+      --disable-sfx            Same as --cpu-disable-sfx\n\
+      --cpu-save-type=TYPE     Save type by number, as for --save-type\n\
+      --debug                  Start the debugger\n\
+      --disable-status-messages  Do not show status messages\n\
+      --dotcode-file-name-load=FILE  e-Reader dot code to load\n\
+      --dotcode-file-name-save=FILE  e-Reader dot code to save\n\
+      --full-screen            Full screen\n\
+      --gb-emulator-type=N     Game Boy system to emulate (0...5)\n\
+      --gb-frame-skip=N        Game Boy frame skip\n\
+      --gb-palette-option=N    Game Boy palette to use\n\
+      --gb-printer             Enable the Game Boy printer\n\
+      --win-gb-printer-enabled   Same as --gb-printer\n\
+      --ifb-type=N             Interframe blending by number, as for -I\n\
+      --null-sound             Produce no sound output\n\
+      --opt-flash-size=N       Flash size (0 - 64K, 1 - 128K)\n\
+      --pause-when-inactive    Pause when inactive\n\
       --no-pause-when-inactive Don't pause when inactive\n\
-      --no-rtc   Disable RTC support\n\
-      --no-show-speed     Don't show emulation speed\n\
-      --no-throttle   Disable throttle\n\
-      --pause-when-inactive Pause when inactive\n\
-      --rtc  Enable RTC support\n\
-      --show-speed-normal   Show emulation speed\n\
-      --show-speed-detailed Show detailed speed data\n\
-      --cheat 'CHEAT'     Add a cheat\n\
+      --rewind-timer=N         Keep a rewind state every N frames\n\
+                                 (0...600, 0 disables rewind)\n\
+      --rtc                    Enable RTC support\n\
+      --no-rtc                 Disable RTC support\n\
+      --rtc-enabled=N          RTC support on (non-zero) or off (0)\n\
+      --save-dir=DIR           Directory to keep save states in\n\
+      --screen-shot-dir=DIR    Directory to keep screenshots in\n\
+      --show-speed=N           Speed display (0 - off, 1 - normal,\n\
+                                 2 - detailed)\n\
+      --show-speed-normal      Show emulation speed\n\
+      --show-speed-detailed    Show detailed speed data\n\
+      --no-show-speed          Don't show emulation speed\n\
+      --show-speed-transparent=N  Draw the speed display transparent\n\
+                                 (0 or 1)\n\
+      --skip-save-game-battery   Leave the battery out of save states\n\
+      --skip-save-game-cheats    Leave cheats out of save states\n\
+      --sound-filtering=N      GBA sound filtering (0...100)\n\
+      --speedup-throttle=N     Throttle while speeding up, as a percentage\n\
+      --speedup-frame-skip=N   Frame skip while speeding up\n\
+      --no-speedup-throttle-frame-skip  Do not frame skip while speeding up\n\
+      --no-speedup-mute        Do not mute while speeding up\n\
 ");
 }
 
