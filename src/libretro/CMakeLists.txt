@@ -286,13 +286,20 @@ int __cdecl __stdio_common_vsprintf_s(
  * function not declared".  <math.h> would declare them too, but it also
  * declares _copysign, which this file declares itself just below.
  *
- * An older toolset, where these are ordinary functions, takes the pragma
- * without complaint. */
+ * On a toolset older than that, where the three are ordinary functions,
+ * the pragma has nothing to turn off and says so with C4163, "not
+ * available as an intrinsic function". This builds with /WX, so that has
+ * to be silenced rather than tolerated: the pragma is still wanted for the
+ * newer toolsets, and the definitions below are what the older ones use
+ * either way. */
 float __cdecl copysignf(float x, float y);
 float __cdecl fmaxf(float a, float b);
 float __cdecl fminf(float a, float b);
 
+#pragma warning(push)
+#pragma warning(disable : 4163)
 #pragma function(copysignf, fmaxf, fminf)
+#pragma warning(pop)
 
 extern __declspec(dllimport) double _copysign(double, double);
 
