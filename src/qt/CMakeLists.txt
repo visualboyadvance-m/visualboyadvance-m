@@ -307,6 +307,16 @@ function(configure_qt_target target)
     # Direct3D (d3d9.dll, d3d12.dll and dxgi.dll are loaded at run time; the
     # import libraries only supply the interface GUIDs).
     if(WIN32)
+        # moc has no compiler predefines of its own: it sees the target's
+        # compile definitions and whatever AUTOMOC adds, which on Windows is
+        # -DWIN32 and nothing else. _WIN32 is one the compiler supplies, so a
+        # Q_OBJECT class behind #if defined(_WIN32) -- the D3D panels in
+        # renderers/d3d-panel.h are the ones here -- is invisible to moc, which
+        # writes an empty moc_*.cpp and leaves the meta-object out. The class
+        # still compiles, and the build fails at link with its qt_metacall,
+        # qt_metacast and metaObject unresolved. Hand moc the macro.
+        set_property(TARGET ${target} APPEND PROPERTY AUTOMOC_MOC_OPTIONS -D_WIN32)
+
         if(NOT ENABLE_DIRECT3D)
             target_compile_definitions(${target} PRIVATE NO_D3D)
         endif()

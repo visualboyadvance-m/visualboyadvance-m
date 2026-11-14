@@ -117,7 +117,7 @@ QString gbaGetOverrideId() {
     }
     if (valid)
         return QString::fromLatin1(reinterpret_cast<const char*>(&g_rom[0xac]), 4);
-    uint32_t romcrc = crc32(0L, g_rom, gbaGetRomSize());
+    uint32_t romcrc = crc32(0L, g_rom, static_cast<uInt>(gbaGetRomSize()));
     return QStringLiteral("CRC_%1").arg(romcrc, 8, 16, QLatin1Char('0')).toUpper();
 }
 
@@ -2163,26 +2163,26 @@ void GameArea::StopSoundRecording()
     mf->enable_menus();
 }
 
-void GameArea::AddFrame(const uint16_t* data, int length)
+void GameArea::AddFrame(const uint16_t* audio_samples, int length)
 {
     recording::MediaRet ret;
 
-    if ((ret = vid_rec.AddFrame(data, length)) != recording::MRET_OK) {
+    if ((ret = vid_rec.AddFrame(audio_samples, length)) != recording::MRET_OK) {
         vbam::LogError(TR("Error in audio / video recording (%1); aborting").arg(media_err(ret)));
         StopVidRecording();
     }
 
-    if ((ret = snd_rec.AddFrame(data, length)) != recording::MRET_OK) {
+    if ((ret = snd_rec.AddFrame(audio_samples, length)) != recording::MRET_OK) {
         vbam::LogError(TR("Error in audio recording (%1); aborting").arg(media_err(ret)));
         StopSoundRecording();
     }
 }
 
-void GameArea::AddFrame(const uint8_t* data)
+void GameArea::AddFrame(const uint8_t* video_frame)
 {
     recording::MediaRet ret;
 
-    if ((ret = vid_rec.AddFrame(data)) != recording::MRET_OK) {
+    if ((ret = vid_rec.AddFrame(video_frame)) != recording::MRET_OK) {
         vbam::LogError(TR("Error in video recording (%1); aborting").arg(media_err(ret)));
         StopVidRecording();
     }

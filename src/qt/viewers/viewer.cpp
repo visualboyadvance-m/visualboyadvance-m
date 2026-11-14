@@ -1010,29 +1010,29 @@ bool PixView::InitBMP(int w, int h, ColorView* cv) {
     return true;
 }
 
-void PixView::SetData(const unsigned char* data, int stride, int x, int y) {
+void PixView::SetData(const unsigned char* pixels, int stride, int x, int y) {
     if (!inited)
         return;
 
     ox = x;
     oy = y;
 
-    if (!data) {
+    if (!pixels) {
         im.fill(Qt::black);
         selx = sely = -1;
     } else {
-        data += (y * stride + x) * 3;
+        pixels += (y * stride + x) * 3;
 
         for (y = 0; y < im.height(); y++) {
             uint8_t* row = im.scanLine(y);
             for (x = 0; x < im.width(); x++) {
-                row[x * 3] = data[0];
-                row[x * 3 + 1] = data[1];
-                row[x * 3 + 2] = data[2];
-                data += 3;
+                row[x * 3] = pixels[0];
+                row[x * 3 + 1] = pixels[1];
+                row[x * 3 + 2] = pixels[2];
+                pixels += 3;
             }
 
-            data += 3 * (stride - x);
+            pixels += 3 * (stride - x);
         }
     }
 
@@ -1142,8 +1142,8 @@ void PixView::SelPoint(QMouseEvent* ev) {
     }
 }
 
-void PixViewEvt::SetData(const unsigned char* data, int stride, int x, int y) {
-    PixView::SetData(data, stride, x, y);
+void PixViewEvt::SetData(const unsigned char* pixels, int stride, int x, int y) {
+    PixView::SetData(pixels, stride, x, y);
 
     if (selx >= 0 && sely >= 0)
         click();

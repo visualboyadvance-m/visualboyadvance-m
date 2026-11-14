@@ -345,11 +345,11 @@ void MainWindow::OnInputBatch(const widgets::UserInputBatch& batch) {
         return;
     }
 
-    for (const auto& data : batch.data) {
-        if (!data.pressed) {
+    for (const auto& input_event : batch.data) {
+        if (!input_event.pressed) {
             continue;
         }
-        if (HandleShortcutInput(data.input)) {
+        if (HandleShortcutInput(input_event.input)) {
             break;
         }
     }

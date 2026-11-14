@@ -472,7 +472,7 @@ void CheatSearch::ResetSearch() {
                 block->data = &gbMemory[0xa000];
 
             block->saved = (uint8_t*)malloc(g_gbCartData.ram_size());
-            block->size = g_gbCartData.ram_size();
+            block->size = static_cast<int>(g_gbCartData.ram_size());
             block->bits = (uint8_t*)malloc(g_gbCartData.ram_size() >> 3);
 
             if (gbCgbMode) {

@@ -140,8 +140,8 @@ public:
     void StopSoundRecording();
     void StartVidRecording(const QString& fname);
     void StopVidRecording();
-    void AddFrame(const uint8_t* data); // video
-    void AddFrame(const uint16_t* data, int length); // audio
+    void AddFrame(const uint8_t* video_frame); // video
+    void AddFrame(const uint16_t* audio_samples, int length); // audio
     bool IsRecording() { return snd_rec.IsRecording() || vid_rec.IsRecording(); }
 #endif
 

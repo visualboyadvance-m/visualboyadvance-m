@@ -470,15 +470,15 @@ private:
                 uint16_t* screenSource = screenBase + ((yy >> 3) * 32);
 
                 for (int x = 0; x < sizeX; x++) {
-                    uint16_t data = *screenSource;
-                    int tile = data & 0x3FF;
+                    uint16_t entry = *screenSource;
+                    int tile = entry & 0x3FF;
                     int tileX = (x & 7);
                     int tileY = y & 7;
 
-                    if (data & 0x0400)
+                    if (entry & 0x0400)
                         tileX = 7 - tileX;
 
-                    if (data & 0x0800)
+                    if (entry & 0x0800)
                         tileY = 7 - tileY;
 
                     uint8_t c = charBase[tile * 64 + tileY * 8 + tileX];
@@ -487,7 +487,7 @@ private:
                     *bmp++ = ((color >> 5) & 0x1f) << 3;
                     *bmp++ = ((color >> 10) & 0x1f) << 3;
 
-                    if (data & 0x0400) {
+                    if (entry & 0x0400) {
                         if (tileX == 0)
                             screenSource++;
                     } else if (tileX == 7)
@@ -514,15 +514,15 @@ private:
                 uint16_t* screenSource = screenBase + ((yy >> 3) * 32);
 
                 for (int x = 0; x < sizeX; x++) {
-                    uint16_t data = *screenSource;
-                    int tile = data & 0x3FF;
+                    uint16_t entry = *screenSource;
+                    int tile = entry & 0x3FF;
                     int tileX = (x & 7);
                     int tileY = y & 7;
 
-                    if (data & 0x0400)
+                    if (entry & 0x0400)
                         tileX = 7 - tileX;
 
-                    if (data & 0x0800)
+                    if (entry & 0x0800)
                         tileY = 7 - tileY;
 
                     uint8_t color = charBase[tile * 32 + tileY * 4 + (tileX >> 1)];
@@ -539,7 +539,7 @@ private:
                     *bmp++ = ((color2 >> 5) & 0x1f) << 3;
                     *bmp++ = ((color2 >> 10) & 0x1f) << 3;
 
-                    if (data & 0x0400) {
+                    if (entry & 0x0400) {
                         if (tileX == 0)
                             screenSource++;
                     } else if (tileX == 7)
@@ -605,10 +605,10 @@ private:
 
         for (int y = 0; y < 160; y++) {
             for (int x = 0; x < 240; x++) {
-                uint16_t data = *src++;
-                *bmp++ = (data & 0x1f) << 3;
-                *bmp++ = ((data >> 5) & 0x1f) << 3;
-                *bmp++ = ((data >> 10) & 0x1f) << 3;
+                uint16_t color = *src++;
+                *bmp++ = (color & 0x1f) << 3;
+                *bmp++ = ((color >> 5) & 0x1f) << 3;
+                *bmp++ = ((color >> 10) & 0x1f) << 3;
             }
 
             bmp += 3 * (1024 - 240);
@@ -624,10 +624,10 @@ private:
         for (int y = 0; y < 160; y++) {
             for (int x = 0; x < 240; x++) {
                 uint8_t c = *src++;
-                uint16_t data = pal[c];
-                *bmp++ = (data & 0x1f) << 3;
-                *bmp++ = ((data >> 5) & 0x1f) << 3;
-                *bmp++ = ((data >> 10) & 0x1f) << 3;
+                uint16_t color = pal[c];
+                *bmp++ = (color & 0x1f) << 3;
+                *bmp++ = ((color >> 5) & 0x1f) << 3;
+                *bmp++ = ((color >> 10) & 0x1f) << 3;
             }
 
             bmp += 3 * (1024 - 240);
@@ -641,10 +641,10 @@ private:
 
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 160; x++) {
-                uint16_t data = *src++;
-                *bmp++ = (data & 0x1f) << 3;
-                *bmp++ = ((data >> 5) & 0x1f) << 3;
-                *bmp++ = ((data >> 10) & 0x1f) << 3;
+                uint16_t color = *src++;
+                *bmp++ = (color & 0x1f) << 3;
+                *bmp++ = ((color >> 5) & 0x1f) << 3;
+                *bmp++ = ((color >> 10) & 0x1f) << 3;
             }
 
             bmp += 3 * (1024 - 160);

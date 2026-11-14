@@ -253,7 +253,7 @@ public:
     // format is rgb24
     // x/y is added to data and returned coords
     // if data == NULL, bitmap will be reset to default (all-black)
-    virtual void SetData(const unsigned char* data, int stride, int x = 0, int y = 0);
+    virtual void SetData(const unsigned char* pixels, int stride, int x = 0, int y = 0);
     // desel if out of displayed range
     void SetSel(int x, int y, bool dsel_cview_update = true);
     // -1, -1 = no sel
@@ -285,7 +285,7 @@ class PixViewEvt : public PixView {
 public:
     explicit PixViewEvt(QWidget* parent = nullptr) : PixView(parent) {}
     // generates a gfxClick if a point is selected
-    void SetData(const unsigned char* data, int stride, int x = 0, int y = 0) override;
+    void SetData(const unsigned char* pixels, int stride, int x = 0, int y = 0) override;
 
 protected:
     // always generates a gfxClick
