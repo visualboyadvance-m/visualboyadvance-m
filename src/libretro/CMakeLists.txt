@@ -263,6 +263,23 @@ int __cdecl __stdio_common_vsprintf_s(
 
 /* --- C99 math (not in msvcrt.dll) ----------------------------------- */
 
+/* MSVC 14.52 made these three intrinsics, and an intrinsic cannot be
+ * defined: the build stopped with C2169 on each of them.  #pragma function
+ * asks for the function form so the symbol is emitted here, which is the
+ * whole point of the shim -- msvcrt.dll has no C99 float math, and the
+ * intrinsic only covers the calls the compiler can see.  The declarations
+ * above it are what the pragma wants; without them it is C4164, "intrinsic
+ * function not declared".  <math.h> would declare them too, but it also
+ * declares _copysign, which this file declares itself just below.
+ *
+ * An older toolset, where these are ordinary functions, takes the pragma
+ * without complaint. */
+float __cdecl copysignf(float x, float y);
+float __cdecl fmaxf(float a, float b);
+float __cdecl fminf(float a, float b);
+
+#pragma function(copysignf, fmaxf, fminf)
+
 extern __declspec(dllimport) double _copysign(double, double);
 
 float __cdecl copysignf(float x, float y)
