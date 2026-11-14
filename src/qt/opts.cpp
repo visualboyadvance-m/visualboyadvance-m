@@ -29,7 +29,12 @@ QSettings* Config() {
     return vbamApp().config();
 }
 
-void SaveOption(config::Option* option) {
+// Writes one option into the QSettings object without flushing it. Separate
+// from SaveOption() because QSettings::sync() rewrites the whole INI file, and
+// doing that once per option turns a save of every option into hundreds of
+// rewrites: update_opts() took about 1.8 seconds that way, which is how long
+// the window took to go away after the close button was pressed.
+void WriteOption(config::Option* option) {
     QSettings* cfg = Config();
 
     switch (option->type()) {
@@ -63,7 +68,13 @@ void SaveOption(config::Option* option) {
             cfg->setValue(option->config_name(), option->GetGbPaletteString());
             break;
     }
-    cfg->sync();
+}
+
+// The option observer: one option changed, so write it and flush, which is
+// what keeps a setting from being lost if the emulator does not exit cleanly.
+void SaveOption(config::Option* option) {
+    WriteOption(option);
+    Config()->sync();
 }
 
 // Intitialize global observers to overwrite the configuration option when the
@@ -424,8 +435,9 @@ void load_opts(bool first_time_launch) {
 // Note: run load_opts() first to guarantee all config opts exist
 void update_opts() {
     for (config::Option& opt : config::Option::All()) {
-        SaveOption(&opt);
+        WriteOption(&opt);
     }
+    Config()->sync();
 }
 
 void update_shortcut_opts() {

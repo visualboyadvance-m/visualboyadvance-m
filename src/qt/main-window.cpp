@@ -146,6 +146,22 @@ bool MainWindow::BindControls() {
     panel->SetMainFrame(this);
     setCentralWidget(panel);
 
+    // Realize the central widget's own native window now, while this window is
+    // still unshown.
+    //
+    // Qt settles what kind of native window a top level needs when it creates
+    // it, and a QOpenGLWidget appearing underneath it later is not something it
+    // can take back: the window is destroyed and created again, and on Windows
+    // that is visible as the whole window vanishing and returning. The OpenGL
+    // drawing panel is this port's default renderer and is built on the first
+    // idle tick after a ROM loads, so starting with a ROM on the command line
+    // showed the window, lost it, and brought it back a moment later, and
+    // opening the first ROM of a session from the menu did the same. Asking for
+    // a native child here makes that decision before the window is on screen,
+    // where nothing can be seen of it.
+    panel->setAttribute(Qt::WA_NativeWindow, true);
+    (void)panel->winId();
+
     // Status bar: two fields like the wx frame.
     QStatusBar* sb = statusBar();
     status_field1_ = new QLabel(sb);
