@@ -1,6 +1,22 @@
-# Link the C++ and VS runtimes statically (/MT for release, /MTd for debug).
-# FORCE overrides the vcpkg toolchain, which sets this based on VCPKG_CRT_LINKAGE.
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>" CACHE STRING "" FORCE)
+# Link the C++ and VS runtimes the way the packages this build links were
+# built: statically (/MT, /MTd) against a static-CRT vcpkg triplet, dynamically
+# (/MD, /MDd) against a dynamic one.
+#
+# Both halves of a mismatch here link without a word and then misbehave, because
+# each C runtime has its own heap, FILE table and errno: an x64-windows build
+# with /MT forced hands libpng a FILE* from a CRT libpng16.dll does not share.
+# VBAM_VCPKG_CRT_LINKAGE is read out of the triplet file by
+# Set-Toolchain-vcpkg.cmake, vcpkg.cmake itself settling nothing about the
+# runtime library. A build with no vcpkg triplet has nothing to follow and keeps
+# the static runtime this has always defaulted to.
+#
+# FORCE because CMake's own default is the dynamic runtime, and the cache entry
+# it writes would win on the next configure.
+if(VBAM_VCPKG_CRT_LINKAGE STREQUAL "dynamic")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>DLL" CACHE STRING "" FORCE)
+else()
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:DEBUG>:Debug>"    CACHE STRING "" FORCE)
+endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     # MSVC-specific flags (not supported by clang-cl).

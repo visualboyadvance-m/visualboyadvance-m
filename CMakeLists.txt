@@ -343,24 +343,6 @@ if(APPLE)
     add_link_options(-Wl,-w)
 endif()
 
-# VCPKG_TOOLCHAIN is set by vcpkg.cmake itself. Testing CMAKE_TOOLCHAIN_FILE
-# would miss the case where vcpkg is loaded alongside another toolchain file
-# (see VBAM_OUTER_TOOLCHAIN_FILE in Set-Toolchain-vcpkg.cmake).
-if(VCPKG_TOOLCHAIN)
-    add_compile_definitions(-DVCPKG)
-    if(MSVC)
-        set(CMAKE_C_FLAGS      "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_C_FLAGS}")
-        set(CMAKE_CXX_FLAGS    "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
-        set(CMAKE_OBJC_FLAGS   "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJC_FLAGS}")
-        set(CMAKE_OBJCXX_FLAGS "/I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJCXX_FLAGS}")
-    else()
-        set(CMAKE_C_FLAGS      "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_C_FLAGS}")
-        set(CMAKE_CXX_FLAGS    "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_CXX_FLAGS}")
-        set(CMAKE_OBJC_FLAGS   "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJC_FLAGS}")
-        set(CMAKE_OBJCXX_FLAGS "-I\"${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/include\" ${CMAKE_OBJCXX_FLAGS}")
-    endif()
-endif()
-
 # When VS environment was auto-loaded by Set-Toolchain-vcpkg.cmake, embed the
 # MSVC standard include and lib paths as explicit flags. ninja runs in a separate
 # process that does not inherit cmake's environment, so INCLUDE/LIB would be unset.
@@ -384,16 +366,6 @@ if(MSVC AND DEFINED VBAM_VS_LIB_DIRS)
     set(CMAKE_SHARED_LINKER_FLAGS "${VBAM_MSVC_LIB_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS}")
     set(CMAKE_MODULE_LINKER_FLAGS "${VBAM_MSVC_LIB_FLAGS} ${CMAKE_MODULE_LINKER_FLAGS}")
     unset(VBAM_MSVC_LIB_FLAGS)
-endif()
-
-# With a static vcpkg triplet there are no DLL dependencies to stage next to the
-# executables -- everything is linked statically, and the Vulkan loader is loaded
-# dynamically (delay-loaded), not as a normal import. So vcpkg's app-local
-# deployment has nothing to copy; turn it off to skip its per-target post-build
-# step and the "deploying dependencies" message it prints. Dynamic triplets still
-# need it, so this is gated on a static triplet.
-if(VCPKG_TARGET_TRIPLET MATCHES "static")
-    set(VCPKG_APPLOCAL_DEPS OFF)
 endif()
 
 # When VS environment was auto-loaded, generate wrappers that prepend VS tool

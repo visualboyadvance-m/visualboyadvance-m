@@ -2462,3 +2462,202 @@ if(DEFINED VCPKG_TARGET_TRIPLET AND NOT VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET
 
     unset(vbam_target_tools)
 endif()
+
+# ---------------------------------------------------------------------------
+# The rest of the vcpkg integration
+#
+# Everything from here down runs at file scope rather than inside
+# vcpkg_set_toolchain(), so what it sets is visible to the top-level
+# CMakeLists.txt and to the toolchain modules included from it much later. It
+# also runs only when vcpkg is actually in play: a build with no triplet to
+# infer leaves this file at one of the returns near the top, before vcpkg.cmake
+# is included at all.
+# ---------------------------------------------------------------------------
+
+# The installed tree this build consumes, picked the way the tools block above
+# picks it: VCPKG_INSTALLED_DIR is vcpkg.cmake's own and is the one that moves
+# in manifest mode, and the tree under VCPKG_ROOT is where it sits otherwise.
+if(DEFINED VCPKG_INSTALLED_DIR)
+    set(vbam_vcpkg_tree "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+else()
+    set(vbam_vcpkg_tree "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}")
+endif()
+
+# The triplet's CRT linkage, for Toolchain-msvc.cmake to build against.
+#
+# vcpkg.cmake does not settle this for its consumer -- neither VCPKG_CRT_LINKAGE
+# nor CMAKE_MSVC_RUNTIME_LIBRARY occurs anywhere in the file -- so a build that
+# wants to match the packages it links has to read the triplet itself. Getting
+# it wrong is not a warning: a /MT program calling /MD packages carries two C
+# runtimes, with a heap, a FILE table and an errno each, and the first pointer
+# that crosses between them is a crash a long way from the cause.
+#
+# The triplet file is included rather than scanned, because the value is often
+# not in the file that bears the name: the overlay's triplets are a line of
+# their own plus an include() of the stock one -- triplets-v143 sets the
+# toolset that way -- and a regex over the named file would see neither the
+# linkage nor the include. VCPKG_ROOT_DIR is how those includes spell the root.
+function(vbam_vcpkg_crt_linkage out_var)
+    set(VCPKG_ROOT_DIR "${VCPKG_ROOT}")
+
+    foreach(triplet_dir IN LISTS vbam_triplet_dirs)
+        set(triplet_file "${triplet_dir}/${VCPKG_TARGET_TRIPLET}.cmake")
+
+        if(NOT EXISTS "${triplet_file}")
+            continue()
+        endif()
+
+        include("${triplet_file}")
+
+        if(DEFINED VCPKG_CRT_LINKAGE)
+            set(${out_var} "${VCPKG_CRT_LINKAGE}" PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
+
+    # No triplet file, or one that leaves it to vcpkg's own default. Fall back
+    # to the name: of the stock triplets only the -static-md pair sets the two
+    # linkages apart, and that one is the dynamic CRT, so a plain -static tail
+    # is the whole of the static case.
+    if(VCPKG_TARGET_TRIPLET MATCHES "-static$")
+        set(${out_var} "static"  PARENT_SCOPE)
+    else()
+        set(${out_var} "dynamic" PARENT_SCOPE)
+    endif()
+endfunction()
+
+# Overlay triplets first, the way vcpkg resolves them: the overlay is what
+# VCPKG_OVERLAY_TRIPLETS points at, and on Windows setup_build_env points it at
+# a per-toolkit directory. It is a native path list, so ';' separated here.
+set(vbam_triplet_dirs)
+
+if(NOT "$ENV{VCPKG_OVERLAY_TRIPLETS}" STREQUAL "")
+    file(TO_CMAKE_PATH "$ENV{VCPKG_OVERLAY_TRIPLETS}" vbam_overlay_triplet_dirs)
+    list(APPEND vbam_triplet_dirs ${vbam_overlay_triplet_dirs})
+    unset(vbam_overlay_triplet_dirs)
+endif()
+
+list(APPEND vbam_triplet_dirs "${VCPKG_ROOT}/triplets" "${VCPKG_ROOT}/triplets/community")
+
+vbam_vcpkg_crt_linkage(VBAM_VCPKG_CRT_LINKAGE)
+
+unset(vbam_triplet_dirs)
+
+# VCPKG_TOOLCHAIN is set by vcpkg.cmake itself. Testing CMAKE_TOOLCHAIN_FILE
+# would miss the case where vcpkg is loaded alongside another toolchain file
+# (see VBAM_OUTER_TOOLCHAIN_FILE above).
+#
+# This lived in the top-level CMakeLists.txt, where it ran after project() and
+# could therefore test MSVC. MSVC is not set until a compiler has been
+# detected, so the triplet picks the flag spelling instead; every -windows
+# triplet is cl or clang-cl, and both take /I.
+#
+# A normal variable and not CMAKE_<LANG>_FLAGS_INIT, which is the usual way to
+# seed flags from before project(). Toolchain-msvc.cmake clears the
+# CMAKE_<LANG>_FLAGS *cache* entries to take the flags off CMake's own
+# defaults, so an _INIT-seeded value would be wiped halfway through the
+# configure. CMP0126 is NEW here -- cmake_policy(VERSION 3.19...3.28.3), at the
+# top of the top-level file -- so a normal variable shadows the cache entry for
+# the rest of the run and that clear cannot reach it.
+#
+# What the cache carries, and this therefore hides, is MSVC's own
+# "/DWIN32 /D_WINDOWS" out of CMAKE_<LANG>_FLAGS_INIT. Toolchain-msvc.cmake
+# defines WIN32 and _WINDOWS itself, so nothing goes missing with it.
+if(VCPKG_TOOLCHAIN)
+    add_compile_definitions(-DVCPKG)
+
+    if(VCPKG_TARGET_TRIPLET MATCHES "-windows")
+        set(vbam_vcpkg_include_flag "/I\"${vbam_vcpkg_tree}/include\"")
+    else()
+        set(vbam_vcpkg_include_flag "-I\"${vbam_vcpkg_tree}/include\"")
+    endif()
+
+    foreach(lang C CXX OBJC OBJCXX)
+        set(CMAKE_${lang}_FLAGS "${vbam_vcpkg_include_flag} ${CMAKE_${lang}_FLAGS}")
+    endforeach()
+
+    unset(vbam_vcpkg_include_flag)
+endif()
+
+# With a static vcpkg triplet there are no DLL dependencies to stage next to the
+# executables -- everything is linked statically, and the Vulkan loader is loaded
+# dynamically (delay-loaded), not as a normal import. So vcpkg's app-local
+# deployment has nothing to copy; turn it off to skip its per-target post-build
+# step and the "deploying dependencies" message it prints. Dynamic triplets still
+# need it, so this is gated on a static triplet.
+if(VCPKG_TARGET_TRIPLET MATCHES "static")
+    set(VCPKG_APPLOCAL_DEPS OFF)
+endif()
+
+# The triplet's bin/ on PATH for the rest of the configure.
+#
+# A dynamic triplet keeps its DLLs there, and nothing otherwise puts that
+# directory in front of a process CMake starts. A try_run probe --
+# check_c_source_runs() and the rest -- links against the import library,
+# compiles, links, and then cannot start, which CMake reports as a plain false
+# with no way to tell it from an honest negative. That is how the DLSS NR
+# libpng check came to report the header and the library as different libpngs:
+# they are one package, and the probe exited 0xc0000135, STATUS_DLL_NOT_FOUND.
+#
+# The debug tree goes first on a debug configure, since those are the DLLs such
+# a probe will have linked against, and second otherwise so it is still there
+# for a package that ships only a debug build of something.
+#
+# ninja does not inherit any of this, so the build-time half is done separately
+# below, through the wrapper that already exists for the VS tools.
+if(CMAKE_HOST_WIN32)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(vbam_vcpkg_bin_dirs "${vbam_vcpkg_tree}/debug/bin" "${vbam_vcpkg_tree}/bin")
+    else()
+        set(vbam_vcpkg_bin_dirs "${vbam_vcpkg_tree}/bin" "${vbam_vcpkg_tree}/debug/bin")
+    endif()
+
+    set(vbam_vcpkg_bin_native)
+
+    foreach(bin_dir IN LISTS vbam_vcpkg_bin_dirs)
+        if(IS_DIRECTORY "${bin_dir}")
+            file(TO_NATIVE_PATH "${bin_dir}" bin_dir_native)
+            list(APPEND vbam_vcpkg_bin_native "${bin_dir_native}")
+            unset(bin_dir_native)
+        endif()
+    endforeach()
+
+    if(vbam_vcpkg_bin_native)
+        string(JOIN ";" vbam_vcpkg_bin_path ${vbam_vcpkg_bin_native})
+        set(ENV{PATH} "${vbam_vcpkg_bin_path};$ENV{PATH}")
+        unset(vbam_vcpkg_bin_path)
+
+        # And at build time, where PATH comes from the wrapper the top-level
+        # CMakeLists.txt writes out of VBAM_VS_TOOL_PATHS -- for ninja and for
+        # the powershell that runs vcpkg's post-build scripts. A dynamic
+        # triplet's tools are linked against the DLLs in bin/: wxrc, msgfmt and
+        # lrelease all are, and the build runs them. Nothing else puts that
+        # directory in front of a build-time process.
+        #
+        # Guarded against repeating itself. The variable is cached, and the
+        # block that writes it runs only when the VS environment had to be
+        # loaded, so a plain append would add another copy per configure.
+        #
+        # Only reaches a build whose VS environment was auto-loaded, since that
+        # is the only one the wrapper is written for. One started from a VS
+        # prompt takes PATH from the shell, as it always has.
+        if(DEFINED VBAM_VS_TOOL_PATHS)
+            set(vbam_vs_tool_paths "${VBAM_VS_TOOL_PATHS}")
+
+            foreach(bin_dir_native IN LISTS vbam_vcpkg_bin_native)
+                if(NOT bin_dir_native IN_LIST vbam_vs_tool_paths)
+                    list(APPEND vbam_vs_tool_paths "${bin_dir_native}")
+                endif()
+            endforeach()
+
+            set(VBAM_VS_TOOL_PATHS "${vbam_vs_tool_paths}" CACHE STRING "" FORCE)
+
+            unset(vbam_vs_tool_paths)
+        endif()
+    endif()
+
+    unset(vbam_vcpkg_bin_native)
+    unset(vbam_vcpkg_bin_dirs)
+endif()
+
+unset(vbam_vcpkg_tree)
