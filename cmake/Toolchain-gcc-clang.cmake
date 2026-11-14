@@ -91,6 +91,13 @@ if(RETRO68)
     add_link_options(-Wl,--gc-sections)
 endif()
 
+# PowerPC (XCOFF, then PEF) addresses globals through a table of contents
+# capped at 64 KB, and wx with ffmpeg overflows it ("TOC overflow"). With
+# -mminimal-toc each object takes one TOC slot and keeps its own table.
+if(RETRO68 AND NOT M68K)
+    add_compile_options(-mminimal-toc)
+endif()
+
 # Workarounds every Retro68 source file needs, above all single-threaded
 # std::mutex and friends for a libstdc++ without gthreads; see the header.
 if(RETRO68)

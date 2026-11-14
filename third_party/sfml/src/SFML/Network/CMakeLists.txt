@@ -35,6 +35,17 @@ if(WIN32)
         ${SRC}
         ${SRCROOT}/Win32/SocketImpl.cpp
     )
+elseif(RETRO68)
+    # Classic Mac OS has no sockets: MacTCP/ provides the BSD calls SFML is
+    # written against, over the MacTCP driver and its name resolver.
+    set(SRC
+        ${SRC}
+        ${SRCROOT}/MacTCP/include/mactcp-sockets.h
+        ${SRCROOT}/MacTCP/Resolver.cpp
+        ${SRCROOT}/MacTCP/Resolver.hpp
+        ${SRCROOT}/MacTCP/SocketImpl.cpp
+        ${SRCROOT}/MacTCP/Sockets.cpp
+    )
 else()
     set(SRC
         ${SRC}
@@ -50,11 +61,23 @@ add_library(sfml-network ${SRC})
 target_include_directories(sfml-network SYSTEM BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 target_include_directories(sfml-network PRIVATE              ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
+if(RETRO68)
+    # <sys/socket.h>, <netinet/in.h> & co. for SFML and for its users (the
+    # GBA link code includes them too).
+    target_include_directories(sfml-network SYSTEM BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/MacTCP/include)
+    target_include_directories(sfml-network PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/MacTCP)
+endif()
+
 target_compile_definitions(sfml-network PRIVATE   SFML_STATIC)
 target_compile_definitions(sfml-network INTERFACE SFML_STATIC)
 
 # setup dependencies
-target_link_libraries(sfml-network PUBLIC sfml-system nonstd-lib ghc-filesystem)
+if(RETRO68)
+    # sfml-system brings the classic Mac OS filesystem.hpp.
+    target_link_libraries(sfml-network PUBLIC sfml-system nonstd-lib)
+else()
+    target_link_libraries(sfml-network PUBLIC sfml-system nonstd-lib ghc-filesystem)
+endif()
 if(WIN32)
     target_link_libraries(sfml-network PRIVATE ws2_32)
 endif()

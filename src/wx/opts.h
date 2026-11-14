@@ -21,8 +21,8 @@ extern struct opts_t {
     wxString link_host = "127.0.0.1";
     wxString server_ip = "*";
     uint32_t link_port = 5738;
-    int link_timeout = 500;
-    int gba_link_type;
+    int32_t link_timeout = 500;
+    int32_t gba_link_type;
 
     /// General
     int32_t rewind_interval = 0;
@@ -32,7 +32,7 @@ extern struct opts_t {
 
     /// Core
     int32_t gdb_port = 55555;
-    int link_num_players = 2;
+    int32_t link_num_players = 2;
     int32_t max_scale = 0;
 
     /// Sound

@@ -271,6 +271,17 @@ if (LUA_LIBRARY)
       list(APPEND LUA_LIBRARIES ${CMAKE_DL_LIBS})
     endif()
 
+  # Classic Mac OS (Retro68): newlib keeps floor/fmod/pow in a separate libm,
+  # which a static liblua needs and the toolchain does not link by default.
+  elseif (RETRO68 OR CMAKE_SYSTEM_NAME MATCHES "^Retro(68|PPC)$")
+    find_library(LUA_MATH_LIBRARY m)
+    mark_as_advanced(LUA_MATH_LIBRARY)
+    if (LUA_MATH_LIBRARY)
+      set(LUA_LIBRARIES "${LUA_LIBRARY};${LUA_MATH_LIBRARY}")
+    else ()
+      set(LUA_LIBRARIES "${LUA_LIBRARY};m")
+    endif ()
+
   # For Windows and Mac, don't need to explicitly include the math library
   else ()
     set(LUA_LIBRARIES "${LUA_LIBRARY}")

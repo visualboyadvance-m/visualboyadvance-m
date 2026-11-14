@@ -7,6 +7,16 @@
 #error "This file should not be compiled with NO_LINK."
 #endif  // defined(NO_LINK)
 
+// Classic Mac OS (Retro68): one emulator per machine in practice, no shared
+// memory, process-shared semaphores or lock files between applications, and
+// a single thread. There is no IPC (same-machine) link there; the network
+// link runs on SFML's sockets, which sit on MacTCP on that platform. The
+// IPC code still compiles (the GB/RFU paths reference its semaphores) on a
+// process-local stand-in, but InitIPC() refuses to start a session.
+#if defined(macintosh)
+#define VBAM_LINK_NO_IPC 1
+#endif
+
 #if defined(_WIN32)
 
 #include <winsock2.h>
@@ -15,7 +25,74 @@
 // WIN32_LEAN_AND_MEAN (which the MSVC toolchain file defines globally).
 #include <mmsystem.h>
 
-#else  // !defined(_WIN32)
+#elif defined(VBAM_LINK_NO_IPC)
+
+#include <errno.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <sys/socket.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <stdint.h>
+
+#include "../../../third_party/sfml/include/SFML/System/Clock.hpp"
+#include "../../../third_party/sfml/include/SFML/System/Sleep.hpp"
+#include "../../../third_party/sfml/include/SFML/System/Time.hpp"
+
+// newlib there has neither clock_gettime() nor nanosleep(); the link's
+// waits and timestamps only need a monotonic clock and a nap, which SFML
+// provides on top of the Time Manager.
+#ifndef CLOCK_MONOTONIC
+#define CLOCK_MONOTONIC 4
+#endif
+#ifndef CLOCK_REALTIME
+#define CLOCK_REALTIME 1
+#endif
+
+static int clock_gettime(int, struct timespec* ts)
+{
+    static const sf::Clock epoch;
+    const int64_t us = epoch.getElapsedTime().asMicroseconds();
+    ts->tv_sec = (time_t)(us / 1000000);
+    ts->tv_nsec = (long)((us % 1000000) * 1000);
+    return 0;
+}
+
+static int nanosleep(const struct timespec* req, struct timespec* rem)
+{
+    sf::sleep(sf::microseconds((int64_t)req->tv_sec * 1000000 + req->tv_nsec / 1000));
+    if (rem) {
+        rem->tv_sec = 0;
+        rem->tv_nsec = 0;
+    }
+    return 0;
+}
+
+// The link semaphores, process-local (single-threaded: no atomics needed).
+struct link_sem_t {
+    int32_t count;
+};
+
+#define LINK_SEM_FAILED ((link_sem_t*)-1)
+
+static inline int link_sem_trywait(link_sem_t* s)
+{
+    if (s->count > 0) {
+        s->count--;
+        return 0;
+    }
+    errno = EAGAIN;
+    return -1;
+}
+
+static inline int link_sem_post(link_sem_t* s)
+{
+    s->count++;
+    return 0;
+}
+
+#else  // !defined(_WIN32) && !defined(VBAM_LINK_NO_IPC)
 
 #include <errno.h>
 #include <fcntl.h>
@@ -114,7 +191,20 @@ typedef sem_t link_sem_t;
 
 #include "../../../third_party/sfml/include/SFML/Network.hpp"
 
+#if defined(__has_include)
+#if __has_include(<libintl.h>)
+#define VBAM_LINK_HAVE_LIBINTL 1
+#endif
+#else
+#define VBAM_LINK_HAVE_LIBINTL 1
+#endif
+
+#if defined(VBAM_LINK_HAVE_LIBINTL)
 #include <libintl.h>
+#else
+// No gettext (Retro68): the link's messages stay in English.
+#define gettext(x) (x)
+#endif
 #define _(x) gettext(x)
 
 #include "core/base/message.h"
@@ -947,7 +1037,7 @@ static std::string LinkLockSemName()
 }
 #endif  // !defined(VBAM_LINK_FILE_SHM)
 
-#if !(defined __WIN32__ || defined _WIN32) && !defined(VBAM_LINK_FILE_SHM)
+#if !(defined __WIN32__ || defined _WIN32) && !defined(VBAM_LINK_FILE_SHM) && !defined(VBAM_LINK_NO_IPC)
 // The POSIX backend pairs the named objects above with two flock(2)-based
 // lock files (never unlinked -- unlink+recreate would split the lock across
 // two inodes and let two probes both "succeed"):
@@ -1420,6 +1510,22 @@ static bool LinkPeerAlive(int slot)
         return true;
     }
     return false;
+}
+
+#elif defined(VBAM_LINK_NO_IPC)
+
+// No IPC session can exist, so there is never a peer to probe.
+static void LinkAliveAcquire(int)
+{
+}
+
+static void LinkAliveRelease()
+{
+}
+
+[[maybe_unused]] static bool LinkPeerAlive(int)
+{
+    return true;
 }
 
 #else  // POSIX (including Android)
@@ -3247,7 +3353,7 @@ void CleanLocalLink()
     if (flock(fd, LOCK_EX | LOCK_NB) == 0)
         LinkFileShmUnlinkFiles();
     close(fd);
-#elif !(defined __WIN32__ || defined _WIN32)
+#elif !(defined __WIN32__ || defined _WIN32) && !defined(VBAM_LINK_NO_IPC)
     // Crash recovery is automatic these days -- InitIPC sweeps a dead
     // session's leftovers once nobody holds the liveness lock -- so this
     // manual escape hatch only sweeps when it can prove no instance is
@@ -3436,7 +3542,9 @@ sf::Packet& RFUServer::Serialize(sf::Packet& packet, int slave)
         }
     }
 
-    packet << linktime; // Synchronise clocks by setting slave clock to master clock
+    // Synchronise clocks by setting slave clock to master clock. Sent as
+    // int32_t: int is not one of Packet's types where int32_t is long.
+    packet << static_cast<int32_t>(linktime);
     return packet;
 }
 
@@ -3600,7 +3708,10 @@ void RFUClient::DeSerialize(sf::Packet& packet)
         }
     }
 
-    packet >> linktime; // Synchronise clocks by setting slave clock to master clock
+    // Synchronise clocks by setting slave clock to master clock
+    int32_t master_linktime = 0;
+    packet >> master_linktime;
+    linktime = master_linktime;
 }
 
 void RFUClient::Send()
@@ -4691,6 +4802,15 @@ static void AbortIPCInit([[maybe_unused]] bool firstone, bool release_slot)
         linkmem = NULL;
         LinkFileShmClose();
     }
+#elif defined(VBAM_LINK_NO_IPC)
+    // InitIPC() never opens anything here.
+    for (int i = 0; i < 4; i++) {
+        linksync[i] = NULL;
+        link_doorbell[i] = NULL;
+    }
+    link_doorbell_self = -1;
+    linkmem_lock = LINK_SEM_FAILED;
+    linkmem = NULL;
 #else
     for (int i = 0; i < 4; i++) {
         if (linksync[i] != NULL && linksync[i] != LINK_SEM_FAILED) {
@@ -4736,6 +4856,11 @@ static ConnectionState InitIPC()
 {
     vbaid = 0;
     linkid = 0;
+
+#if defined(VBAM_LINK_NO_IPC)
+    systemMessage(0, N_("The same-machine (IPC) link is not available on this system. Use a network link instead."));
+    return LINK_ERROR;
+#else
 
 #if (defined __WIN32__ || defined _WIN32)
     // Serialize the whole of role selection and object creation against
@@ -4975,6 +5100,7 @@ static ConnectionState InitIPC()
 #endif
 
     return LINK_OK;
+#endif  // defined(VBAM_LINK_NO_IPC)
 }
 
 static void StartCableIPC(uint16_t value)
@@ -6739,6 +6865,8 @@ static void CloseIPC()
             // session, and a stray token there reads as a completed
             // transfer. Peers notice us leaving via linkflags, and every
             // wait on these is bounded by linktimeout anyway.
+#elif defined(VBAM_LINK_NO_IPC)
+            // Never opened (InitIPC() refuses to start a session).
 #else
             // Wake a peer blocked on this semaphore now rather than after
             // its full linktimeout (mirrors the Win32 branch); the master's
@@ -6757,8 +6885,8 @@ static void CloseIPC()
         CloseHandle(linkmem_lock);
         linkmem_lock = NULL;
     }
-#elif defined(VBAM_LINK_FILE_SHM)
-    // Part of the shared mapping; just forget it.
+#elif defined(VBAM_LINK_FILE_SHM) || defined(VBAM_LINK_NO_IPC)
+    // Part of the shared mapping (or never opened); just forget it.
     linkmem_lock = LINK_SEM_FAILED;
 #else
     if (linkmem_lock != LINK_SEM_FAILED) {
@@ -6779,6 +6907,8 @@ static void CloseIPC()
     // without clearing their flags still gets cleaned up.
     linkmem = NULL;
     LinkFileShmClose();
+#elif defined(VBAM_LINK_NO_IPC)
+    linkmem = NULL;
 #else
     munmap(linkmem, sizeof(LINKDATA));
     linkmem = NULL;

@@ -560,8 +560,8 @@ Packet& Packet::operator<<(const String& data)
     // Then insert characters
     if (length > 0)
     {
-        for (const unsigned int datum : data)
-            *this << datum;
+        for (const char32_t datum : data)
+            *this << static_cast<std::uint32_t>(datum); // uint32_t is not unsigned int everywhere
     }
 
     return *this;

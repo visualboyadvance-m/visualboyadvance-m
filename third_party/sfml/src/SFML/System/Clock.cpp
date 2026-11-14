@@ -28,9 +28,21 @@
 #include "../../../include/SFML/System/Clock.hpp"
 #include "../../../include/SFML/System/Time.hpp"
 
+#if defined(SFML_SYSTEM_MACOS_CLASSIC)
+#include "MacOS/Microseconds.hpp"
+#endif
+
 
 namespace sf
 {
+#if defined(SFML_SYSTEM_MACOS_CLASSIC)
+////////////////////////////////////////////////////////////
+MacMicrosecondsClock::time_point MacMicrosecondsClock::now() noexcept
+{
+    return time_point(duration(static_cast<rep>(priv::macMicroseconds())));
+}
+#endif
+
 ////////////////////////////////////////////////////////////
 Time Clock::getElapsedTime() const
 {

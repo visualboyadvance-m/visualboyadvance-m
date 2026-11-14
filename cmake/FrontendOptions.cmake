@@ -96,8 +96,10 @@ option(ENABLE_QT       "Build the Qt port"        OFF)
 # to decide whether libintl is a dependency at all.
 #
 # The bundled SFML it builds on has no Android backend vendored here (and cable
-# link is not meaningful on a phone), so it is off by default there.
-if(TRANSLATIONS_ONLY OR VBAM_TARGET_ANDROID OR VBAM_TARGET_RETRO68)
+# link is not meaningful on a phone), so it is off by default there. Classic
+# Mac OS (Retro68) has it: SFML's sockets run on MacTCP there, so the network
+# link works; the same-machine (IPC) link does not exist on that platform.
+if(TRANSLATIONS_ONLY OR VBAM_TARGET_ANDROID)
     set(ENABLE_LINK_DEFAULT OFF)
 else()
     set(ENABLE_LINK_DEFAULT ON)

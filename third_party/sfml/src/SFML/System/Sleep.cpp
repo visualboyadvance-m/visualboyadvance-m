@@ -30,6 +30,8 @@
 
 #if defined(SFML_SYSTEM_WINDOWS)
 #include "Win32/SleepImpl.hpp"
+#elif defined(SFML_SYSTEM_MACOS_CLASSIC)
+#include "MacOS/SleepImpl.hpp"
 #else
 #include "Unix/SleepImpl.hpp"
 #endif

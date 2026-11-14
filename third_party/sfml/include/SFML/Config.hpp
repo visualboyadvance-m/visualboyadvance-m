@@ -68,6 +68,12 @@
 
 #endif
 
+#elif defined(macintosh)
+
+// Classic Mac OS (System 7 to Mac OS 9) through the Retro68 toolchain:
+// networking is MacTCP (src/SFML/Network/MacTCP), time is Microseconds().
+#define SFML_SYSTEM_MACOS_CLASSIC
+
 #elif defined(__unix__)
 
 // UNIX system, see which one it is

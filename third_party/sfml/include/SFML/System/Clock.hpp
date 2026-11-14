@@ -68,6 +68,28 @@ namespace sf
 ////////////////////////////////////////////////////////////
 #if defined(SFML_SYSTEM_ANDROID) && defined(SFML_ANDROID_USE_SUSPEND_AWARE_CLOCK)
 using ClockImpl = SuspendAwareClock;
+#elif defined(SFML_SYSTEM_MACOS_CLASSIC)
+////////////////////////////////////////////////////////////
+/// \brief Classic Mac OS monotonic clock
+///
+/// newlib on Retro68 has no clock_gettime(), so the standard
+/// clocks are gettimeofday() underneath: wall time, stepped by
+/// the user's date changes, at the Time Manager's resolution at
+/// best. The Time Manager's Microseconds() counts from startup.
+///
+////////////////////////////////////////////////////////////
+struct SFML_SYSTEM_API MacMicrosecondsClock
+{
+    using duration                  = std::chrono::microseconds;
+    using rep                       = duration::rep;
+    using period                    = duration::period;
+    using time_point                = std::chrono::time_point<MacMicrosecondsClock, duration>;
+    static constexpr bool is_steady = true;
+
+    static time_point now() noexcept;
+};
+
+using ClockImpl = MacMicrosecondsClock;
 #else
 using ClockImpl = std::conditional_t<std::chrono::high_resolution_clock::is_steady, std::chrono::high_resolution_clock, std::chrono::steady_clock>;
 #endif

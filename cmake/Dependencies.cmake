@@ -154,6 +154,18 @@ if(ENABLE_FFMPEG)
         unset(vbam_ffmpeg_iface)
     endif()
 
+    if(RETRO68)
+        # The Retro68 sysroot's static ffmpeg is built with its TIFF decoder's
+        # LZMA support (libavcodec/tiff.c calls lzma_stream_decoder & co.),
+        # and static archives carry no dependency list: link liblzma after
+        # the ffmpeg libraries ourselves.
+        find_library(VBAM_RETRO68_LZMA_LIBRARY lzma)
+        if(NOT VBAM_RETRO68_LZMA_LIBRARY)
+            message(FATAL_ERROR "ENABLE_FFMPEG on Retro68 needs liblzma in the sysroot, which was not found")
+        endif()
+        list(APPEND FFMPEG_LIBRARIES ${VBAM_RETRO68_LZMA_LIBRARY})
+    endif()
+
     if(APPLE)
         list(APPEND FFMPEG_LDFLAGS "SHELL:-framework CoreText" "SHELL:-framework ApplicationServices")
 
@@ -227,8 +239,9 @@ else()
 endif()
 
 if(ENABLE_LINK)
-    # IPC linking code needs sem_timedwait which can be either in librt or pthreads
-    if(NOT WIN32)
+    # IPC linking code needs sem_timedwait which can be either in librt or
+    # pthreads. Classic Mac OS (Retro68) has no IPC link and neither library.
+    if(NOT WIN32 AND NOT RETRO68)
         find_library(RT_LIB rt)
         if(RT_LIB)
            set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${RT_LIB})
@@ -236,10 +249,12 @@ if(ENABLE_LINK)
         endif()
     endif()
 
-    include(CheckFunctionExists)
-    check_function_exists(sem_timedwait SEM_TIMEDWAIT)
-    if(SEM_TIMEDWAIT)
-        add_compile_definitions(HAVE_SEM_TIMEDWAIT)
+    if(NOT RETRO68)
+        include(CheckFunctionExists)
+        check_function_exists(sem_timedwait SEM_TIMEDWAIT)
+        if(SEM_TIMEDWAIT)
+            add_compile_definitions(HAVE_SEM_TIMEDWAIT)
+        endif()
     endif()
 else()
     add_compile_definitions(NO_LINK)

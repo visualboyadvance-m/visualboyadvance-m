@@ -50,6 +50,14 @@ if(WIN32)
         ${SRCROOT}/Win32/WindowsHeader.hpp
     )
     source_group("windows" FILES ${PLATFORM_SRC})
+elseif(RETRO68)
+    set(PLATFORM_SRC
+        ${SRCROOT}/MacOS/include/filesystem.hpp
+        ${SRCROOT}/MacOS/Microseconds.hpp
+        ${SRCROOT}/MacOS/SleepImpl.cpp
+        ${SRCROOT}/MacOS/SleepImpl.hpp
+    )
+    source_group("macos" FILES ${PLATFORM_SRC})
 else()
     set(PLATFORM_SRC
         ${SRCROOT}/Unix/SleepImpl.cpp
@@ -85,10 +93,12 @@ target_compile_definitions(sfml-system INTERFACE SFML_STATIC)
 #endif()
 
 # setup dependencies
-if((UNIX OR APPLE) AND NOT ANDROID)
+if((UNIX OR APPLE) AND NOT ANDROID AND NOT RETRO68)
     target_link_libraries(sfml-system PRIVATE pthread)
 endif()
-if(UNIX AND NOT ANDROID AND NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+if(RETRO68)
+    # Toolbox calls only; nothing to link.
+elseif(UNIX AND NOT ANDROID AND NOT APPLE AND NOT CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
     target_link_libraries(sfml-system PRIVATE rt)
 elseif(WIN32)
     target_link_libraries(sfml-system PRIVATE winmm)
@@ -96,4 +106,11 @@ elseif(ANDROID)
     target_link_libraries(sfml-system PRIVATE android log)
 endif()
 
-target_link_libraries(sfml-system PRIVATE nonstd-lib ghc-filesystem)
+if(RETRO68)
+    # ghc::filesystem has no classic Mac OS backend; MacOS/include has the
+    # path type SFML needs (filesystem.hpp).
+    target_include_directories(sfml-system BEFORE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/MacOS/include)
+    target_link_libraries(sfml-system PRIVATE nonstd-lib)
+else()
+    target_link_libraries(sfml-system PRIVATE nonstd-lib ghc-filesystem)
+endif()

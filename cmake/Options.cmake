@@ -565,13 +565,6 @@ if(DOS AND ENABLE_LINK)
     set(ENABLE_LINK OFF)
 endif()
 
-# Classic Mac OS (Retro68) has neither the sockets nor the second process
-# with shared memory the link transports are built on.
-if(VBAM_TARGET_RETRO68 AND ENABLE_LINK)
-    message(WARNING "ENABLE_LINK is not supported on classic Mac OS (Retro68). Disabling it.")
-    set(ENABLE_LINK OFF)
-endif()
-
 # ffmpeg A/V recording is a wx / Qt port feature; the SDL port and the
 # libretro core have no recording UI.
 set(FFMPEG_DEFAULT OFF)

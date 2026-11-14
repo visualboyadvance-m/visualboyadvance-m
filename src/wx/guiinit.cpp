@@ -2325,7 +2325,7 @@ wxDialog* MainFrame::LoadDialog(const wxString& name)
                 lab = SafeXRCCTRL<wxControl>(d2, "LinkTimeoutLab");
                 addbe(lab);
                 sc = SafeXRCCTRL<wxSpinCtrl>(d2, "LinkTimeout");
-                sc->SetValidator(wxGenericValidator(&gopts.link_timeout));
+                sc->SetValidator(MakeIntValidator(&gopts.link_timeout));
                 addbe(sc);
                 d2->Fit();
                 dialogs_initialized_.insert("LinkConfig");

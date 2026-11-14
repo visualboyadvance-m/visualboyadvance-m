@@ -276,9 +276,22 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   `cmake/Retro68FinishApplication.cmake` sets hasBundle
   (`tools/retro68/macbinary-set-flags.c`) and makes the image with hfsutils.
 - `RETRO68` / `VBAM_TARGET_RETRO68` in CMake, `__WXRETRO68__` / `macintosh` in
-  code. Link, debugger, libretro, GL/Vulkan, LTO and bz2/lzma are off; the
-  Simple renderer is the only one. `src/core/base/retro68/prefix.h` is
-  force-included: single-threaded `std::mutex` & co. (`nothreads.h`, defines
+  code. Debugger, libretro, GL/Vulkan, LTO and bz2/lzma are off; the
+  Simple renderer is the only one (the wx port adds QuickDraw).
+- Link (`ENABLE_LINK`, on) is the network link only: the bundled SFML runs on
+  MacTCP (also answered by Open Transport). `third_party/sfml/src/SFML/Network/MacTCP/`
+  is a BSD-socket layer over the `.IPP` driver (`Sockets.cpp`: async
+  TCPActiveOpen/TCPSend, TCPStatus+TCPRcv, SOMAXCONN=4 passive-open streams
+  per listener, UDP streams; descriptors 32-47, close with `mactcp_close()`)
+  and the DNR `'dnrp'` resolver (`Resolver.cpp`, Mixed Mode on PPC), with
+  `<sys/socket.h>` & co. in `MacTCP/include` exported by `sfml-network`.
+  `SFML_SYSTEM_MACOS_CLASSIC`: `sf::Clock` is `Microseconds()`
+  (`System/MacOS/Microseconds.hpp`), `sf::sleep` is the app's `usleep()`,
+  and `System/MacOS/include/filesystem.hpp` replaces ghc::filesystem (HFS
+  paths). `gbaLink.cpp` defines `VBAM_LINK_NO_IPC` (`macintosh`): IPC objects
+  are process-local stand-ins and `InitIPC()` refuses; `clock_gettime`/
+  `nanosleep` are shimmed on SFML there.
+- `src/core/base/retro68/prefix.h` is force-included: single-threaded `std::mutex` & co. (`nothreads.h`, defines
   `VBAM_SINGLE_THREADED`; use `VBAM_THREAD_LOCAL` for block-scope
   thread_locals), and undoes the Retro68 SDL3's `DrawText`/`Palette` renames.
   `src/wx/wx-nothreads.h` stands in for `wxThread`/`wxMutex`/`wxSemaphore`.

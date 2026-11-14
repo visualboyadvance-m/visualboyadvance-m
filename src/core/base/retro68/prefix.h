@@ -17,4 +17,19 @@
 // std::mutex and friends, for a C++ library without gthreads.
 #include "../nothreads.h"
 
+// GCC's and newlib's <limits.h> only define the long long limits for C99
+// (__STDC_VERSION__ / __ISO_C_VISIBLE), so C++ sources here never see them.
+// Lua's luaconf.h takes a missing LLONG_MAX to mean "no long long" and
+// stops with #error; give C++ the C99 values.
+#include <limits.h>
+#ifndef LLONG_MAX
+#define LLONG_MAX __LONG_LONG_MAX__
+#endif
+#ifndef LLONG_MIN
+#define LLONG_MIN (-LLONG_MAX - 1LL)
+#endif
+#ifndef ULLONG_MAX
+#define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+#endif
+
 #endif  // VBAM_CORE_BASE_RETRO68_PREFIX_H_
