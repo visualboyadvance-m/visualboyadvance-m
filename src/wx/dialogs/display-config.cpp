@@ -604,8 +604,7 @@ void DisplayConfig::InitBasicTab() {
     // NewPanelForRenderMethod); the accelerated choice there is GLES, which is
     // offered only when it was compiled in (ENABLE_GLES). Everywhere else the
     // GLES radio does not apply.
-#if defined(__ANDROID__) || defined(__WXRETRO68__)
-    // Nor has classic Mac OS: the Retro68 SDL cannot draw into a wx window.
+#if defined(__ANDROID__)
     GetValidatedChild("OutputSDL")->Hide();
 #else
     add_radio("OutputSDL", config::RenderMethod::kSDL);
@@ -695,7 +694,7 @@ void DisplayConfig::InitBasicTab() {
     GetValidatedChild("OutputQuickDraw")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif
-#if !defined(__ANDROID__) && !defined(__WXRETRO68__)
+#if !defined(__ANDROID__)
     GetValidatedChild("OutputSDL")->Bind(wxEVT_RADIOBUTTON,
         &DisplayConfig::UpdateSDLOptionsVisibility, this);
 #endif

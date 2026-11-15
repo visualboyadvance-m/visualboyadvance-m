@@ -4868,9 +4868,15 @@ void SDLDrawingPanel::PaintEv(wxPaintEvent& ev)
         // would also starve emulation so todraw never arrives. SDL_RenderClear is
         // the right way to blank an SDL surface on every platform anyway.
         if (renderer) {
+#if defined(__WXRETRO68__)
+            sdlmac::Sync(GetWindow(), sdlwindow, &sdl_mac_area_);
+#endif
             SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
             SDL_RenderClear(renderer);
             SDL_RenderPresent(renderer);
+#if defined(__WXRETRO68__)
+            sdlmac::AfterPresent();
+#endif
         }
         return;
     }
@@ -5119,6 +5125,12 @@ void SDLDrawingPanel::DrawingPanelInit()
     }
 #endif
 
+#if defined(__WXRETRO68__)
+    // wx runs the Toolbox event loop; SDL must not take its events.
+    sdlmac::PrepareVideo();
+    sdl_mac_area_ = sdlmac::AreaOf(GetWindow());
+#endif
+
 #ifdef ENABLE_SDL3
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) == false) {
 #else
@@ -5191,6 +5203,9 @@ void SDLDrawingPanel::DrawingPanelInit()
                 sdl_cocoa_view_) == false)
 #elif defined(__WXMSW__)
         if (SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, GetHandle()) == false)
+#elif defined(__WXRETRO68__)
+        // The frame's Mac window, drawn into at this panel's client area.
+        if (sdlmac::SetCreateProps(GetWindow(), sdl_mac_area_, props) == false)
 #elif defined(__ANDROID__)
         // The external native window is bound globally via
         // SDL_SetAndroidExternalWindow(); no per-window handle property needed.
@@ -5211,9 +5226,12 @@ void SDLDrawingPanel::DrawingPanelInit()
 #endif
 #endif
 
+#if !defined(__WXRETRO68__)
+    // (The Retro68 SDL has no OpenGL and would refuse to make the window.)
     if (SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true) == false) {
         wxLogError(_("Failed to set OpenGL properties"));
     }
+#endif
 
     // This is necessary for joysticks to work at all with SDL video.
     // We control this ourselves so it does not affect the GUI option.
@@ -5622,6 +5640,10 @@ void SDLDrawingPanel::OnSize(wxSizeEvent& ev)
         }
     }
 #endif
+#if defined(__WXRETRO68__)
+    // Follow the panel around the frame's port.
+    sdlmac::Sync(GetWindow(), sdlwindow, &sdl_mac_area_);
+#endif
     if (todraw) {
         DrawArea();
     }
@@ -5654,6 +5676,11 @@ void SDLDrawingPanel::DrawArea()
     } else {
         srcPitch = std::ceil((width + inrb) * scale * 4);
     }
+
+#if defined(__WXRETRO68__)
+    // The panel may have moved in the port (or been resized) since.
+    sdlmac::Sync(GetWindow(), sdlwindow, &sdl_mac_area_);
+#endif
 
     SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0x00);
     SDL_RenderClear(renderer);
@@ -5727,6 +5754,9 @@ void SDLDrawingPanel::DrawArea()
 #endif
     
     SDL_RenderPresent(renderer);
+#if defined(__WXRETRO68__)
+    sdlmac::AfterPresent();
+#endif
 }
         
 void SDLDrawingPanel::DrawArea(uint8_t** data)
@@ -10422,12 +10452,15 @@ DrawingPanelBase* GameArea::NewPanelForRenderMethod(config::RenderMethod method)
     return new BasicDrawingPanel(this, basic_width, basic_height);
 #endif  // defined(__ANDROID__)
 #if defined(__WXRETRO68__)
-    // Classic Mac OS: no GL, Vulkan or Metal, and the Retro68 SDL draws only
-    // into windows of its own. Simple when asked for; QuickDraw for anything
-    // else (a method saved on another platform included). The QuickDraw panel
-    // falls back to the Simple path itself when it cannot get a GWorld.
+    // Classic Mac OS: no GL, Vulkan or Metal. Simple and SDL when asked for
+    // (the Retro68 SDL draws into the frame's Mac window, at this panel; see
+    // retro68/sdl-panel.h); QuickDraw for anything else (a method saved on
+    // another platform included). The QuickDraw panel falls back to the
+    // Simple path itself when it cannot get a GWorld.
     if (method == config::RenderMethod::kSimple)
         return new BasicDrawingPanel(this, basic_width, basic_height);
+    if (method == config::RenderMethod::kSDL)
+        return new SDLDrawingPanel(this, basic_width, basic_height);
     return new QuickDrawDrawingPanel(this, basic_width, basic_height);
 #endif
 #if defined(__WXMSW__)

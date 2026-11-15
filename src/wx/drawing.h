@@ -19,6 +19,8 @@ protected:
 #if defined(__WXRETRO68__)
 #include <memory>
 
+#include "wx/retro68/sdl-panel.h"
+
 namespace qdblit {
 class Surface;
 }
@@ -292,6 +294,11 @@ private:
     bool sdl_deep_color_ = false;      // 10-bit SDR texture active (X11 deep color)
 #ifdef ENABLE_SDL3
     SDL_PixelFormat sdl_deep_color_fmt_ = SDL_PIXELFORMAT_UNKNOWN; // chosen 10-bit format
+#endif
+#if defined(__WXRETRO68__)
+    // Where SDL draws in the frame's Mac window: this panel's client area, as
+    // last handed to SDL (see retro68/sdl-panel.h).
+    sdlmac::Area sdl_mac_area_;
 #endif
     std::vector<uint8_t> sdl_deep_color_buf_; // 2101010 scratch for deep-color upload
 

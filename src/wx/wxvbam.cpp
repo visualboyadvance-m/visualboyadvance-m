@@ -100,6 +100,9 @@
 #include <wx/dir.h>
 #include <wx/dynlib.h>
 #include "wx/widgets/render-plugin.h"
+#if defined(__WXRETRO68__)
+#include "wx/retro68/sdl-panel.h"
+#endif
 #ifdef VBAM_RPI_PROXY_SUPPORT
 #include "wx/rpi-proxy/RpiProxyClient.h"
 #endif
@@ -906,6 +909,12 @@ bool wxvbamApp::OnInit() {
 
 #if defined(__WXQT__) && defined(__ANDROID__)
     VbamInstallAndroidArtFallback();
+#endif
+
+#if defined(__WXRETRO68__)
+    // Before anything brings SDL video up (the SDL renderer, or the display
+    // dialog listing its backends): wx runs the Toolbox event loop.
+    sdlmac::PrepareVideo();
 #endif
 
 #if ((wxMAJOR_VERSION == 3) && (wxMINOR_VERSION >= 3)) || (wxMAJOR_VERSION > 3)

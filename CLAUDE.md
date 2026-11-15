@@ -277,7 +277,7 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   (`tools/retro68/macbinary-set-flags.c`) and makes the image with hfsutils.
 - `RETRO68` / `VBAM_TARGET_RETRO68` in CMake, `__WXRETRO68__` / `macintosh` in
   code. Debugger, libretro, GL/Vulkan, LTO and bz2/lzma are off; the
-  Simple renderer is the only one (the wx port adds QuickDraw).
+  renderers are Simple, QuickDraw and SDL.
 - Link (`ENABLE_LINK`, on) is the network link only: the bundled SFML runs on
   MacTCP (also answered by Open Transport). `third_party/sfml/src/SFML/Network/MacTCP/`
   is a BSD-socket layer over the `.IPP` driver (`Sockets.cpp`: async
@@ -319,6 +319,15 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   converts the frame into a persistent 32-bit GWorld and `CopyBits()` it to
   the window port (`wxRetro68DCImpl::GetPort()`/`SelectPort()`), falling back
   to the Simple path without a GWorld; `Simple` is the wx path.
+  `SDL` (`retro68/sdl-panel.*`) runs SDL's software renderer on the Retro68
+  SDL3 (`~/Downloads/SDL3-3.4.20-retro68`), whose `macosclassic` video driver
+  adopts the frame's `WindowPtr` (`SDL_PROP_WINDOW_CREATE_MACCLASSIC_WINDOW_POINTER`)
+  and draws at the panel's client area in that port (`..._MACCLASSIC_ORIGIN_X/Y`,
+  re-read every update; `sdlmac::Sync()` keeps them and the size current). wx
+  child windows are areas of their TLW's port, not Mac windows, hence the
+  origin. `SDL_HINT_MACCLASSIC_EXTERNAL_EVENT_LOOP` (set in `OnInit()`, before
+  any SDL video init, the display dialog's renderer list included) keeps SDL
+  off WaitNextEvent, the menu bar, the cursor, Apple Events and the event mask.
 - 24- and 32-bit pixels have the same values on every host (red at shift 3,
   top byte unused): the cores write 24-bit pixels as the value's low three
   bytes and the filters take the top byte of a 32-bit pixel for padding (a

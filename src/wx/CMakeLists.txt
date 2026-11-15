@@ -2349,6 +2349,7 @@ if(RETRO68 AND NOT COMPILE_ONLY)
         retro68/open-retry.cpp
         retro68/quickdraw-blit.cpp
         retro68/quickdraw-panel.cpp
+        retro68/sdl-panel.cpp
     )
 
     # newlib's printf workers go through retro68/printf-c99.cpp, which gives
