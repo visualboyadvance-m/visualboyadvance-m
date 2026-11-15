@@ -122,6 +122,9 @@ enum class AudioApi {
 #if defined(VBAM_ENABLE_AAUDIO)
     kAAudio,
 #endif  // VBAM_ENABLE_AAUDIO
+#if defined(__WXRETRO68__)
+    kSoundManager,
+#endif  // __WXRETRO68__
     // Outputs no audio; paces emulation with a timer. Always available, and
     // used as the fallback when the selected driver fails to initialize.
     kNull,

@@ -17,6 +17,8 @@ set(VBAM_WX_COMMON
     audio/internal/macos-io-cycle.h
     audio/internal/sdl.cpp
     audio/internal/sdl.h
+    audio/internal/soundmanager.cpp
+    audio/internal/soundmanager.h
     background-input.cpp
     background-input.h
     cmdevents.cpp

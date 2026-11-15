@@ -57,6 +57,13 @@
                 <border>5</border>
               </object>
               <object class="sizeritem">
+                <object class="wxRadioButton" name="SoundManager">
+                  <label translate="0">Sound Manager</label>
+                </object>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <object class="sizeritem">
                 <object class="wxRadioButton" name="Null">
                   <label>No sound (timer paced)</label>
                 </object>

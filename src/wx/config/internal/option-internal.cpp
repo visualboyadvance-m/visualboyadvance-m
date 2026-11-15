@@ -125,6 +125,9 @@ static const std::array<wxString, kNbAudioApis> kAudioApiStrings = {
 #if defined(VBAM_ENABLE_AAUDIO)
     "aaudio",
 #endif
+#if defined(__WXRETRO68__)
+    "soundmanager",
+#endif
     "null",
 };
 
@@ -340,6 +343,8 @@ std::array<Option, kNbOptions>& Option::All() {
         /// Sound
 #if defined(VBAM_ENABLE_AAUDIO)
         AudioApi audio_api = AudioApi::kAAudio;
+#elif defined(__WXRETRO68__)
+        AudioApi audio_api = AudioApi::kSoundManager;
 #elif defined(__WXMAC__) && !defined(NO_COREAUDIO_DEFAULT)
         AudioApi audio_api = AudioApi::kCoreAudio;
 #elif defined(__WXMSW__) && !defined(NO_DIRECTAUDIO_DEFAULT)

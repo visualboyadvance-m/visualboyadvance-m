@@ -32,6 +32,10 @@
 #include "wx/audio/internal/aaudio.h"
 #endif
 
+#if defined(__WXRETRO68__)
+#include "wx/audio/internal/soundmanager.h"
+#endif
+
 namespace audio {
  
 std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api) {
@@ -67,6 +71,12 @@ std::vector<AudioDevice> EnumerateAudioDevices(const config::AudioApi& audio_api
 #if defined(VBAM_ENABLE_AAUDIO)
         case config::AudioApi::kAAudio:
             // AAudio plays to the default output; no device selection.
+            return std::vector<AudioDevice>({{_("Default device"), wxEmptyString}});
+#endif
+
+#if defined(__WXRETRO68__)
+        case config::AudioApi::kSoundManager:
+            // The Sound Manager plays to the default output; no device selection.
             return std::vector<AudioDevice>({{_("Default device"), wxEmptyString}});
 #endif
 
@@ -113,6 +123,11 @@ std::unique_ptr<SoundDriver> CreateSoundDriver(const config::AudioApi& api) {
 #if defined(VBAM_ENABLE_AAUDIO)
         case config::AudioApi::kAAudio:
             return audio::internal::CreateAAudioDriver();
+#endif
+
+#if defined(__WXRETRO68__)
+        case config::AudioApi::kSoundManager:
+            return audio::internal::CreateSoundManagerDriver();
 #endif
 
         case config::AudioApi::kNull:

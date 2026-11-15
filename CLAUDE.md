@@ -328,6 +328,14 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   origin. `SDL_HINT_MACCLASSIC_EXTERNAL_EVENT_LOOP` (set in `OnInit()`, before
   any SDL video init, the display dialog's renderer list included) keeps SDL
   off WaitNextEvent, the menu bar, the cursor, Apple Events and the event mask.
+- Sound: `Sound Manager` (`config::AudioApi::kSoundManager`, INI
+  `soundmanager`, the Retro68 default; `audio/internal/soundmanager.cpp`)
+  plays `SndPlayDoubleBuffer()` on a sampledSynth channel, refilled at
+  interrupt time from an SPSC ring of volatile 32-bit indices (no RMW, no
+  libatomic, no FP or Toolbox calls in the callback; A5 restored on 68k);
+  16-bit stereo, or 8-bit where Gestalt reports no 16-bit sound. Pascal
+  functions get upper-cased C-linkage names regardless of namespace, so give
+  callbacks unique names (OpenAL's `SoundManagerDoubleBack` clashed).
 - 24- and 32-bit pixels have the same values on every host (red at shift 3,
   top byte unused): the cores write 24-bit pixels as the value's low three
   bytes and the filters take the top byte of a 32-bit pixel for padding (a
