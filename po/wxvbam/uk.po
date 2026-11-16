@@ -381,7 +381,7 @@ msgstr "Розпочато локальний зв'язок як гравець 
 
 #: cmdevents.cpp:2980
 msgid "Link stopped: restart it to apply the new settings"
-msgstr "Зв'язок зупинено: Перезапусти його для встановлення нових налаштувань."
+msgstr "Зв'язок зупинено: перезапусти його для встановлення нових налаштувань."
 
 #: cmdevents.cpp:3012
 msgid "Link stopped"
@@ -2164,7 +2164,7 @@ msgid ""
 "\n"
 "For flag options, true and false are specified as 1 and 0, respectively.\n"
 "\n"
-msgstr "Опції, встановлені з командного рядка, буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
+msgstr "Встановлені опції з командного рядка буде збережено при зміні конфігурації інтерфейсу користувача.\n\nДля позначення значення \"істина\" та \"хиба\" вказуються як 1 і 0 відповідно.\n\n"
 
 #: wxvbam.cpp:1729
 msgid ""
@@ -2578,7 +2578,7 @@ msgstr "Каталог зберігання збережень гри (відн�
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:692
 msgid "Freeze recent load list"
-msgstr "Зупинити перелік останніх завантажень"
+msgstr "Затримати перелік останніх завантажень"
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/wx/config/internal/option-internal.cpp:694
 msgid ""
@@ -3414,7 +3414,7 @@ msgstr "Помилка мережі."
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2925
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3819
 msgid "Invalid link server response."
-msgstr "Недійсна відповідь посилання сервера."
+msgstr "Недійсна відповідь сервера зв'язку."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:2933
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:3827
@@ -3435,7 +3435,7 @@ msgstr "Час очікування сервера минув."
 msgid ""
 "The same-machine (IPC) link is not available on this system. Use a network "
 "link instead."
-msgstr ""
+msgstr "Зв'язок у межах однієї машини (IPC) недоступний у системі. Натомість використовуй мережеве з'єднання."
 
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4872
 #: /home/rkitover/source/repos/vbam-tx-pulls/src/core/gba/gbaLink.cpp:4889
@@ -4528,7 +4528,7 @@ msgstr "&Очистити перелік останніх файлів"
 
 #: xrc/MainMenu.xrc:21
 msgid "&Freeze recent list"
-msgstr "&Блокувати перелік останніх файлів"
+msgstr "За&тримати перелік останніх файлів"
 
 #: xrc/MainMenu.xrc:26
 msgid "ROM in&formation..."
