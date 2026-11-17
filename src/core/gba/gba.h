@@ -164,6 +164,10 @@ extern void CPURaiseSioIRQ();
 // link layer for transfers that must complete after a realistic delay
 // (an IRQ raised synchronously races the game's IntrWait entry).
 extern void CPUScheduleSioCompletion(int cycles);
+// As above, but `cycles` counts from the current instruction.
+extern void CPUScheduleSioCompletionFromNow(int cycles);
+// Serial clock time of a Normal-mode transfer: 256 kHz, or 2 MHz if `fast`.
+extern int CPUSioNormalTransferCycles(int bits, bool fast);
 extern void applyTimer();
 extern void CPUInit(const char*, bool);
 void SetSaveType(int st);

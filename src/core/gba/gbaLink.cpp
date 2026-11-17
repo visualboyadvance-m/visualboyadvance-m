@@ -211,6 +211,8 @@ typedef sem_t link_sem_t;
 #include "core/base/port.h"
 #include "core/gba/gba.h"
 #include "core/gba/gbaCpu.h"
+#include "core/gba/gbaGlobals.h"
+#include "core/gba/gbpSio.h"
 #include "core/gba/internal/gbaSockClient.h"
 
 #ifdef _MSC_VER
@@ -1997,6 +1999,14 @@ ConnectionState InitLink(LinkMode mode)
 
 bool LinkOwnsNormalSio(uint16_t siocnt)
 {
+    // The Game Boy Player schedules its own NORMAL32 transfers through
+    // kSchedSio, at the GBP's clock (GbpHandleSioStart), so the generic
+    // internal-clock schedule must not be laid on top of it. Only for NORMAL32: a
+    // Normal-8 start is swallowed by GbpHandleSioStart without a reply, so
+    // it still needs kSchedSio to clear the Start bit or the game hangs.
+    if (GbpWillHandleSio())
+        return GetSIOMode(siocnt, READ16LE(&g_ioMem[COMM_RCNT])) == NORMAL32;
+
     if (!linkDriver || !linkDriver->start || gba_connection_state != LINK_OK)
         return false;
     if (linkDriver->mode != LINK_RFU_IPC && linkDriver->mode != LINK_RFU_SOCKET)
@@ -2006,6 +2016,15 @@ bool LinkOwnsNormalSio(uint16_t siocnt)
 
 void StartLink(uint16_t siocnt)
 {
+    if (GbpHandleSioStart(siocnt)) {
+        // Commit the write through the same helper the stand-alone path
+        // below uses, rather than raw: it strips the bits hardware owns
+        // (15, and the R/O status bits 4-6) and preserves Start/Busy, which
+        // is what the kSchedSio completion clears when the transfer ends.
+        SioStandaloneSiocntWrite(siocnt);
+        return;
+    }
+
     // Only drive a real transfer once the connection is fully established.
     // The socket connect handshake runs inside a modal dialog that pumps
     // the wx event loop, so emuMain (hence StartLink) can fire while the
@@ -2191,6 +2210,8 @@ void CloseLink(void)
     // it is safe ahead of the driver check below.
     LinkRestoreTimerResolution();
 #endif
+    // Reset GBP state unconditionally so rumble doesn't get stuck on.
+    GbpReset();
 
     if (!linkDriver || !linkDriver->close) {
         return; // Nothing to do

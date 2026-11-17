@@ -248,6 +248,7 @@ void OnGBDeclicking();
 void OnGBEnhanceSound();
 void OnGBSurround();
 void OnAGBPrinter();
+void OnGBPEnabled();
 void OnGBALcdFilter();
 void DoGBALcdFilter();
 void OnGBLcdFilter();

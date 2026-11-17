@@ -112,6 +112,7 @@ enum class OptionID {
     kPrefEmulatorType,
     kPrefFlashSize,
     kPrefFrameSkip,
+    kPrefGBPEnabled,
     kPrefGBPaletteOption,
     kPrefGBPrinter,
     kPrefGDBBreakOnLoad,
