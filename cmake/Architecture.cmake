@@ -64,6 +64,14 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
         set(WINARCH x64)
         set(ARCH_NAME x86_64)
     endif()
+
+    # An x86_64 build on an Apple silicon Mac differs from the host only in
+    # CMAKE_OSX_ARCHITECTURES, which CMake does not count as cross-compiling.
+    # Tools the build runs, such as bin2c, must then be built for the host;
+    # Rosetta may not be there to run x86_64 ones.
+    if(APPLE AND NOT CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "[xX]86|i[3-9]86|[aA][mM][dD]64")
+        set(CMAKE_CROSSCOMPILING TRUE)
+    endif()
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "[aA][aA][rR][cC][hH]|[aA][rR][mM]")
     if(CMAKE_C_SIZEOF_DATA_PTR EQUAL 4) # 32 bit
         set(ARM32 ON)

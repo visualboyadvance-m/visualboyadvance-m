@@ -579,7 +579,7 @@ setup() {
 
     DISTS_NUM=$(table_rows DISTS)
 
-    NUM_CPUS=$(num_cpus)
+    : ${NUM_CPUS:=$(num_cpus)}
 
     BUILD_ENV="$BUILD_ENV
 export MAKEFLAGS=-j$NUM_CPUS
@@ -931,11 +931,33 @@ mac_macports_install_core_deps() {
     # machine to compile the DLSS NR shaders.  vcpkg keeps the binaries behind
     # that feature, while the port here builds them with GLSLANG_ENABLE_INSTALL
     # and installs glslangValidator as a symlink to glslang.
-    sudo "$MACPORTS_PREFIX"/bin/port -N install bzip2 xz 7zip autoconf \
-        autoconf-archive automake libtool util-linux bison flex m4 gperf \
-        pkgconfig nasm "$mp_python_port" "$mp_python_pip" perl5 p5-xml-parser \
-        meson ninja cmake ccache swig swig-python gettext wxWidgets-3.2 \
-        glslang shaderc
+    #
+    # Only ports that are not installed and active go to 'sudo port', so a
+    # machine that already has them all is never asked for a password.
+    mp_ports="bzip2 xz 7zip autoconf autoconf-archive automake libtool
+        util-linux bison flex m4 gperf pkgconfig nasm $mp_python_port
+        $mp_python_pip perl5 p5-xml-parser meson ninja cmake ccache swig
+        swig-python gettext wxWidgets-3.2 glslang shaderc"
+
+    mp_active=" $("$MACPORTS_PREFIX"/bin/port -q installed active 2>/dev/null | awk '{ print $1 }' | tr '\n' ' ') "
+
+    mp_missing=
+
+    # A p5-* port is a stub that installs the p5.NN-* port for the default
+    # perl, which is the name 'port installed' lists.
+    for mp_port_name in $mp_ports; do
+        case "$mp_active" in
+            *" $mp_port_name "*|*" p5."[0-9]*"-${mp_port_name#p5-} "*)
+                ;;
+            *)
+                mp_missing="$mp_missing $mp_port_name"
+                ;;
+        esac
+    done
+
+    if [ -n "$mp_missing" ]; then
+        sudo "$MACPORTS_PREFIX"/bin/port -N install $mp_missing
+    fi
 
     # wxWidgets-3.2 is in that list only for its wxrc: a cross build compiles a
     # target-architecture wxrc into the build root that this machine cannot
@@ -2103,9 +2125,23 @@ install_dist() {
                 continue
                 ;;
             */bin/*)
-                if ! dist_flags "$current_dist" no_install_bin; then
-                    putsln "$f" >> "$file_list"
+                if dist_flags "$current_dist" no_install_bin; then
+                    continue
                 fi
+
+                # A cross build's executables are for the target, and the
+                # build root's bin comes first on PATH: a later configure
+                # that finds xz or iconv there cannot run it.  Leave thin
+                # Mach-O executables out and keep scripts such as wx-config.
+                if [ -n "$CROSS_SKIP_TARGET_EXECUTABLES" ] && [ -f "$f" ]; then
+                    case "$(od -An -tx1 -N4 "$f" 2>/dev/null | tr -d ' \n')" in
+                        cffaedfe|cefaedfe)
+                            continue
+                            ;;
+                    esac
+                fi
+
+                putsln "$f" >> "$file_list"
                 ;;
             *)
                 putsln "$f" >> "$file_list"

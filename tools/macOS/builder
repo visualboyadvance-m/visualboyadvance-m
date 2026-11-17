@@ -211,11 +211,29 @@ if [ "$target_cpu" = i386 ]; then
 elif [ -n "$arm64_host" ] && [ -n "$intel_target" ]; then
     cross_build=1
     export CONFIGURE_REQUIRED_ARGS='--host=x86_64-apple-darwin --build=aarch64-apple-darwin'
-    export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=x86_64"
+    export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_OSX_ARCHITECTURES=x86_64"
+    arch_cross_build=1
 elif [ -n "$intel_host" ] && [ -n "$arm64_target" ]; then
     cross_build=1
     export CONFIGURE_REQUIRED_ARGS='--host=aarch64-apple-darwin --build=x86_64-apple-darwin'
-    export CMAKE_BASE_ARGS="-DCMAKE_OSX_ARCHITECTURES=arm64"
+    export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_OSX_ARCHITECTURES=arm64"
+    arch_cross_build=1
+fi
+
+# An x86_64 build on ARM64 must not lean on Rosetta, which Apple is winding
+# down and which may not be installed at all, any more than an ARM64 build on
+# Intel can run what it compiles.  Nothing built for the target may be run
+# during the build, so keep its executables out of the build root's bin.
+#
+# Homebrew's and MacPorts' libraries are built for the host only, so CMake must
+# not settle on one of them -- /opt/local/lib/libbz2.a, say, which it finds
+# through PATH and the prefix cmake itself lives in, and which the linker then
+# skips as the wrong architecture.  The SDK's own libraries cover every
+# architecture; search them before anything outside the build root.
+if [ -n "$arch_cross_build" ]; then
+    export CROSS_SKIP_TARGET_EXECUTABLES=1
+
+    export CMAKE_BASE_ARGS="$CMAKE_BASE_ARGS -DCMAKE_LIBRARY_PATH=$sdk_path/usr/lib"
 fi
 
 . "$(dirname "$0")/../builder/core.sh"
@@ -287,17 +305,19 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 
 #table_line_append DIST_PATCHES ffmpeg "-p0 https://gist.githubusercontent.com/rkitover/db75d083b74617b186eec11965c1da74/raw/20da2f8c6d8c02ce284096c5e805ae671351cc6e/ffmpeg-macos10-7.patch"
 
-if [ -n "$arm64_host" ] && [ -z "$arm64_target" ]; then
-    table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg '--disable-asm'
-fi
+# Set up cross-compiles between ARM64 and x86_64, in either direction.
+if [ -n "$arch_cross_build" ]; then
+    if [ -n "$arm64_target" ]; then
+        ffmpeg_arch=aarch64
+    else
+        ffmpeg_arch=x86_64
+    fi
 
-# Set up cross-compile for ARM64 on Intel.
-if [ -n "$arm64_target" ] && [ -z "$arm64_host" ]; then
     table_line_remove DIST_FLAGS               libpng
 
     table_line_append DIST_FLAGS               gettext       no_install_bin
 
-    table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg        "--enable-cross-compile --arch=aarch64"
+    table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg        "--enable-cross-compile --arch=$ffmpeg_arch"
 fi
 
 builder "$@"
