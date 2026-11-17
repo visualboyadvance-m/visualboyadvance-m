@@ -1,5 +1,6 @@
 #include "core/gba/gbaCheats.h"
 
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 
@@ -1285,6 +1286,20 @@ int cheatsCheckKeys(uint32_t keys, uint32_t extended)
     return ticks;
 }
 
+template <std::size_t Size>
+static void cheatsCopyString(char (&destination)[Size], const char* source)
+{
+    if (!source) {
+        destination[0] = '\0';
+        return;
+    }
+
+    const std::size_t source_length = std::strlen(source);
+    const std::size_t copy_length = source_length < Size - 1 ? source_length : Size - 1;
+    std::memcpy(destination, source, copy_length);
+    destination[copy_length] = '\0';
+}
+
 void cheatsAdd(const char* codeStr,
     const char* desc,
     uint32_t rawaddress,
@@ -1300,13 +1315,8 @@ void cheatsAdd(const char* codeStr,
         cheatsList[x].rawaddress = rawaddress;
         cheatsList[x].address = address;
         cheatsList[x].value = value;
-#if __STDC_WANT_SECURE_LIB__
-        strcpy_s(cheatsList[x].codestring, sizeof(cheatsList[x].codestring), codeStr);
-        strcpy_s(cheatsList[x].desc, sizeof(cheatsList[x].desc), desc);
-#else
-        strcpy(cheatsList[x].codestring, codeStr);
-        strcpy(cheatsList[x].desc, desc);
-#endif
+        cheatsCopyString(cheatsList[x].codestring, codeStr);
+        cheatsCopyString(cheatsList[x].desc, desc);
         cheatsList[x].enabled = true;
         cheatsList[x].status = 0;
 
