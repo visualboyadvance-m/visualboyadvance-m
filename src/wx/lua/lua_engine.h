@@ -30,6 +30,14 @@
 //   savestate.create() / save(s) / load(s)
 //   savestate.registerload(f) / registersave(f)
 //
+//   emu.screenshot([path])  → path (writes the composed framebuffer
+//                             of the last frame as a PNG; needs a
+//                             running ROM, see lua_screenshot.cpp)
+//
+//   bridge.listen([port=8765]) — TCP server for external control:
+//   bridge.receive() → line|nil   programs; see lua_api_bridge.cpp
+//   bridge.send(s) / connected() / close()
+//
 //   rom.readbyte/readword/readdword(addr)
 //
 //   bit.band, bor, bxor, bshl, bshr, bnot — like FCEUX's bit lib.
@@ -132,6 +140,18 @@ public:
     // Calling this with bpp ∉ {16, 32} is a no-op.
     void RenderOverlay(uint8_t* pix, int width, int height, int pitch_bytes,
                        int bpp, int r_shift, int g_shift, int b_shift);
+
+    // Cache the composed framebuffer for emu.screenshot(). Same
+    // geometry contract as RenderOverlay; called right after it so a
+    // screenshot includes the gui.* overlay. Cheap: one padded-buffer
+    // copy per frame.
+    void CaptureFrame(const uint8_t* pix, int width, int height,
+                      int pitch_bytes, int bpp,
+                      int r_shift, int g_shift, int b_shift);
+
+    // Write the cached frame out as a PNG (utilWritePNGFile under the
+    // captured depth/shifts). False + *err when no frame was captured.
+    bool SaveScreenshot(const std::string& path, std::string* err);
 
     // Memory access hooks. `MemReadHook(addr, sz)` fires whenever the
     // emulated CPU reads `sz` bytes starting at `addr` *in an address

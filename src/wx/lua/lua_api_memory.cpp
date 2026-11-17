@@ -132,8 +132,9 @@ int l_writedword (lua_State* L) {
 //
 // Stores entries in the registry table "vbam.memread" as a list of
 // {start, end, fn} sub-tables; the dispatcher in lua_engine.cpp calls
-// every entry whose [start..end) covers the access. Setting `f` to
-// nil removes the most recent matching range.
+// every entry whose [start..end] covers the access (end inclusive,
+// start = addr, end = addr + size - 1). Passing nil instead of a
+// function removes the most recent matching range.
 int l_register_mem(lua_State* L, const char* key, bool exec) {
     auto* e = EngineFromState(L);
     if (!e) return 0;
@@ -154,16 +155,58 @@ int l_register_mem(lua_State* L, const char* key, bool exec) {
     }
     int t = lua_gettop(L);
     int n = (int)lua_rawlen(L, t);
-    lua_newtable(L);
-    lua_pushinteger(L, addr);             lua_setfield(L, -2, "start");
-    lua_pushinteger(L, addr + size - 1);  lua_setfield(L, -2, "end");
-    lua_pushvalue(L, fn_index);           lua_setfield(L, -2, "fn");
-    lua_rawseti(L, t, n + 1);
+
+    if (lua_isnil(L, fn_index)) {
+        // Unregister: drop the most recent entry whose [start..end]
+        // equals [addr, addr+size-1]. Iterating backward keeps "most
+        // recent" meaningful when ranges overlap. The tail is shifted
+        // down so the list stays dense — the dispatcher indexes it
+        // positionally.
+        uint32_t lo = addr, hi = addr + size - 1;
+        for (int i = n; i >= 1; --i) {
+            lua_rawgeti(L, t, i);
+            if (!lua_istable(L, -1)) { lua_pop(L, 1); continue; }
+            lua_getfield(L, -1, "start"); uint32_t s = (uint32_t)lua_tointeger(L, -1); lua_pop(L, 1);
+            lua_getfield(L, -1, "end");   uint32_t x = (uint32_t)lua_tointeger(L, -1); lua_pop(L, 1);
+            lua_pop(L, 1);
+            if (s == lo && x == hi) {
+                for (int j = i; j < n; ++j) {
+                    lua_rawgeti(L, t, j + 1);
+                    lua_rawseti(L, t, j);
+                }
+                lua_pushnil(L);
+                lua_rawseti(L, t, n);
+                break;
+            }
+        }
+    } else {
+        lua_newtable(L);
+        lua_pushinteger(L, addr);             lua_setfield(L, -2, "start");
+        lua_pushinteger(L, addr + size - 1);  lua_setfield(L, -2, "end");
+        lua_pushvalue(L, fn_index);           lua_setfield(L, -2, "fn");
+        lua_rawseti(L, t, n + 1);
+    }
+
+    // Recompute the fast "any hooks?" flag from the surviving entries
+    // so an unregister that empties the list turns the core-side gate
+    // back off. Done before the pop below — the scan indexes the list
+    // table at `t`.
+    bool any = false;
+    int len = (int)lua_rawlen(L, t);
+    for (int i = 1; i <= len && !any; ++i) {
+        lua_rawgeti(L, t, i);
+        if (lua_istable(L, -1)) {
+            lua_getfield(L, -1, "fn");
+            any = lua_isfunction(L, -1);
+            lua_pop(L, 1);
+        }
+        lua_pop(L, 1);
+    }
     lua_pop(L, 1);  // pop list
 
-    if      (key == std::string("vbam.memread"))  e->SetHasReadHooks(true);
-    else if (key == std::string("vbam.memwrite")) e->SetHasWriteHooks(true);
-    else if (key == std::string("vbam.memexec"))  e->SetHasExecHooks(true);
+    if      (key == std::string("vbam.memread"))  e->SetHasReadHooks(any);
+    else if (key == std::string("vbam.memwrite")) e->SetHasWriteHooks(any);
+    else if (key == std::string("vbam.memexec"))  e->SetHasExecHooks(any);
     return 0;
 }
 int l_registerread (lua_State* L) { return l_register_mem(L, "vbam.memread",  false); }
