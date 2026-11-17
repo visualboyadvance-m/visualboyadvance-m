@@ -54,6 +54,25 @@ constexpr LONGINT kInitStereo = 0x00C0;
 // counts in samples (frames * 2).
 constexpr uint32_t kCoreChannels = 2;
 
+// Every Toolbox call in this file goes through Toolbox(). Retro68's PowerPC
+// linker builds the import glue for this object (an @FIX0 csect) against a
+// stale TOC anchor -- 0x4A2C below the real one -- so a direct call such as
+// Gestalt() loaded a garbage transition vector and jumped into nowhere, which
+// crashed the PowerPC build as soon as a ROM loaded and opened this driver.
+// Taking the function's address is an ordinary TOC load, which the linker gets
+// right, and a call through a pointer it cannot see through is made inline
+// (load the transition vector, set r2, bctrl) instead of through that glue.
+// On 68k there is no glue and the call stays direct.
+template <typename F>
+F* Toolbox(F* fn) {
+#if defined(__m68k__)
+    return fn;
+#else
+    F* volatile indirect = fn;
+    return indirect;
+#endif
+}
+
 inline void Barrier() {
     __asm__ __volatile__("" ::: "memory");
 }
@@ -249,7 +268,7 @@ bool SoundManagerDriver::Open() {
     LONGINT attrs = 0;
     bool stereo = false;
     sixteen_bit_ = false;
-    if (Gestalt(gestaltSoundAttr, &attrs) == noErr) {
+    if (Toolbox(&Gestalt)(gestaltSoundAttr, &attrs) == noErr) {
         sixteen_bit_ =
             (attrs & ((1L << kGestalt16BitSoundIO) | (1L << kGestalt16BitAudioSupport))) != 0;
         stereo = (attrs & (1L << kGestaltStereoCapability)) != 0;
@@ -285,7 +304,14 @@ bool SoundManagerDriver::Open() {
     prime_ = buffer_samples;
 
     if (double_back_ == nullptr) {
+#if defined(__m68k__)
         double_back_ = NewSndDoubleBackUPP(&VbamSndMgrDoubleBack);
+#else
+        // NewSndDoubleBackUPP(), spelled out to keep the call off the glue.
+        double_back_ = reinterpret_cast<SndDoubleBackUPP>(Toolbox(&NewRoutineDescriptor)(
+            reinterpret_cast<ProcPtr>(&VbamSndMgrDoubleBack), uppSndDoubleBackProcInfo,
+            GetCurrentArchitecture()));
+#endif
         if (double_back_ == nullptr) {
             wxLogDebug(wxT("Sound Manager: no memory for the double-buffer callback"));
             return false;
@@ -307,8 +333,8 @@ bool SoundManagerDriver::Open() {
 
     channel_ = nullptr;
     const OSErr err =
-        SndNewChannel(&channel_, sampledSynth, out_channels_ == 2 ? kInitStereo : kInitMono,
-                      nullptr);
+        Toolbox(&SndNewChannel)(&channel_, sampledSynth,
+                                out_channels_ == 2 ? kInitStereo : kInitMono, nullptr);
     if (err != noErr) {
         wxLogDebug(wxT("Sound Manager: SndNewChannel failed (%d)"), static_cast<int>(err));
         channel_ = nullptr;
@@ -330,7 +356,7 @@ bool SoundManagerDriver::Open() {
     FillBuffer(header_.dbhBufferPtr[1]);
 
     initialized_ = true;
-    const OSErr play = SndPlayDoubleBuffer(channel_, &header_);
+    const OSErr play = Toolbox(&SndPlayDoubleBuffer)(channel_, &header_);
     if (play != noErr) {
         wxLogDebug(wxT("Sound Manager: SndPlayDoubleBuffer failed (%d)"), static_cast<int>(play));
         Close();
@@ -349,13 +375,18 @@ void SoundManagerDriver::Close() {
     if (channel_ != nullptr) {
         // quitNow: stops at once, and the callback is not called again once
         // this returns, so the buffers and the ring are ours.
-        SndDisposeChannel(channel_, true);
+        Toolbox(&SndDisposeChannel)(channel_, true);
         channel_ = nullptr;
     }
     buffer_storage_[0].reset();
     buffer_storage_[1].reset();
     if (double_back_ != nullptr) {
+#if defined(__m68k__)
         DisposeSndDoubleBackUPP(double_back_);
+#else
+        // DisposeSndDoubleBackUPP(), spelled out to keep the call off the glue.
+        Toolbox(&DisposeRoutineDescriptor)(reinterpret_cast<UniversalProcPtr>(double_back_));
+#endif
         double_back_ = nullptr;
     }
 }
@@ -397,8 +428,8 @@ void SoundManagerDriver::write(uint16_t* finalWave, int length) {
         // Pace the emulator on the queue depth. With no threads this is a spin,
         // and the interrupt that drains the queue is what ends it; the deadline
         // (four ticks, 67 ms) keeps a stopped channel from wedging emulation.
-        const unsigned long deadline = TickCount() + 4;
-        while (Queued() > target_ && TickCount() < deadline) {
+        const unsigned long deadline = Toolbox(&TickCount)() + 4;
+        while (Queued() > target_ && Toolbox(&TickCount)() < deadline) {
         }
     }
 
