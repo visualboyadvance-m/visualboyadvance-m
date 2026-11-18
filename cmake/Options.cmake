@@ -425,6 +425,14 @@ endif()
 option(ENABLE_BZ2 "Enable BZ2 archive support" ${ENABLE_ARCHIVES_DEFAULT})
 option(ENABLE_LZMA "Enable LZMA archive support" ${ENABLE_ARCHIVES_DEFAULT})
 
+# Classic Mac OS: POSIX threads from pthreads-retro68 (cooperative Thread
+# Manager threads) back std::mutex and friends, which the Retro68 libstdc++
+# leaves out; see src/core/base/pthread_std.h. Used when the sysroot has the
+# library, single-threaded stand-ins (src/core/base/nothreads.h) otherwise.
+if(VBAM_TARGET_RETRO68)
+    option(ENABLE_RETRO68_PTHREADS "Use pthreads-retro68 for the C++ locking types" ON)
+endif()
+
 # Vulkan is a wx / Qt port renderer backend.
 #
 # Supports SDK installs (via VULKAN_SDK) and vcpkg (vulkan-headers + vulkan-loader).

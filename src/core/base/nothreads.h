@@ -16,7 +16,8 @@
 // VBAM_SINGLE_THREADED), so a wait whose condition is false is a bug and
 // aborts rather than hanging the machine.
 //
-// The Retro68 build force-includes it through retro68/prefix.h.
+// The Retro68 build force-includes it through retro68/prefix.h when it is
+// built without pthreads-retro68; with it, pthread_std.h has the real thing.
 
 #ifdef __cplusplus
 #include <cstddef>  // for the library's configuration macros
@@ -32,6 +33,10 @@
 #include <shared_mutex>
 
 #define VBAM_SINGLE_THREADED 1
+// std::thread cannot start a thread.
+#define VBAM_NO_STD_THREAD 1
+// The compiler's thread_local has no runtime there (see thread_local.h).
+#define VBAM_NO_THREAD_LOCAL 1
 
 namespace std {
 

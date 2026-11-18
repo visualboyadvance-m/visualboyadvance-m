@@ -12,6 +12,27 @@ endif()
 # vbam-core is built for every frontend selection.
 find_package(ZLIB REQUIRED)
 
+# Classic Mac OS (Retro68): pthreads-retro68. Every C++ source force-includes
+# src/core/base/retro68/prefix.h, which picks the pthread-backed std::mutex
+# & co. on VBAM_RETRO68_PTHREADS, so the definition and the include path are
+# global; vbam-core-base links the library for everything built on the core.
+# The PowerPC target brings ThreadsLib with it.
+set(VBAM_RETRO68_PTHREADS FALSE)
+if(RETRO68 AND ENABLE_RETRO68_PTHREADS)
+    find_package(pthreads-retro68 CONFIG QUIET)
+
+    if(TARGET pthreads-retro68::pthread)
+        set(VBAM_RETRO68_PTHREADS TRUE)
+        add_compile_definitions(VBAM_RETRO68_PTHREADS)
+        get_target_property(_vbam_pthread_inc pthreads-retro68::pthread INTERFACE_INCLUDE_DIRECTORIES)
+        include_directories(SYSTEM ${_vbam_pthread_inc})
+        unset(_vbam_pthread_inc)
+        message(STATUS "Using pthreads-retro68 ${pthreads-retro68_VERSION}")
+    else()
+        message(WARNING "pthreads-retro68 not found for ${CMAKE_SYSTEM_NAME}; building single-threaded (install it into the Retro68 sysroot or pass -DENABLE_RETRO68_PTHREADS=OFF)")
+    endif()
+endif()
+
 # OpenGL is a renderer backend in the wx and SDL ports.
 if(VBAM_NEED_OPENGL)
     set(OpenGL_GL_PREFERENCE GLVND)

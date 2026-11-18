@@ -156,8 +156,10 @@ double GetFilterScale() {
 // Maximum number of filter threads, capped at 6 to avoid diminishing returns
 // and potential issues with filter state sharing.
 int GetMaxFilterThreads() {
-#if !wxUSE_THREADS
-    // No threads to filter bands on (wxRetro68); the filter runs inline.
+#if !wxUSE_THREADS || defined(__WXRETRO68__)
+    // No threads to filter bands on (wxRetro68 without pthreads-retro68), or
+    // only cooperative ones on a single CPU (with it), where bands would add
+    // thread switches and seams and save nothing; the filter runs inline.
     return 1;
 #endif
     unsigned int hw_threads = std::thread::hardware_concurrency();

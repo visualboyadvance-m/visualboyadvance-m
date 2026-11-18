@@ -16,8 +16,10 @@
 // keeps many more small blocks alive at once than it starts with; the large
 // blocks that hold ROMs, save states and pictures are returned when freed.
 //
-// There are no threads, and nothing calls malloc() at interrupt time (the
-// Memory Manager could not be called there either), so there is no locking.
+// Threads, where there are any (pthreads-retro68), are cooperative ones that
+// only switch where one blocks or yields, which nothing here does, and
+// nothing calls malloc() at interrupt time (the Memory Manager could not be
+// called there either), so there is no locking.
 // Defining the whole family keeps libretrocrt's malloc.c out of the link.
 
 #include <errno.h>

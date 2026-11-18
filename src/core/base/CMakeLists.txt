@@ -65,6 +65,10 @@ target_link_libraries(vbam-core-base
     PUBLIC ${ZLIB_LIBRARY}
 )
 
+if(VBAM_RETRO68_PTHREADS)
+    target_link_libraries(vbam-core-base PUBLIC pthreads-retro68::pthread)
+endif()
+
 # Accelerometer/gyro support built on SDL, used by the wx and SDL ports. The
 # libretro core gets motion state from the frontend instead, so this target is
 # skipped (along with the SDL dependency) when neither port is being built.

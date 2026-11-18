@@ -15,6 +15,10 @@
 #include <MacTypes.h>
 #include <Sound.h>
 
+#ifdef VBAM_RETRO68_PTHREADS
+#include <sched.h>
+#endif
+
 #include "core/base/sound_driver.h"
 #include "core/gba/gbaSound.h"
 #include "wx/audio/internal/stall-detector.h"
@@ -30,11 +34,12 @@ namespace {
 // for each buffer that has finished playing; the callback refills it from a
 // ring that write() fills on the emulator's thread.
 //
-// There are no threads, only that interrupt, so the ring is a single-producer,
-// single-consumer queue whose indices are aligned 32-bit words, each written by
-// one side only: a plain load or store of one is atomic on 68k and PowerPC, and
-// a uniprocessor sees its own stores in program order once the compiler is kept
-// from reordering them (Barrier()). No read-modify-write is needed -- a flush is
+// Only the emulator's thread writes and only that interrupt reads (any other
+// threads are cooperative ones and never touch it), so the ring is a
+// single-producer, single-consumer queue whose indices are aligned 32-bit
+// words, each written by one side only: a plain load or store of one is atomic
+// on 68k and PowerPC, and a uniprocessor sees its own stores in program order
+// once the compiler is kept from reordering them (Barrier()). No read-modify-write is needed -- a flush is
 // a request counter the producer bumps and the consumer acknowledges -- which
 // also keeps libatomic out of the 68k link.
 //
@@ -425,11 +430,15 @@ void SoundManagerDriver::write(uint16_t* finalWave, int length) {
 
     const bool pace = throttle_ == 100;
     if (pace) {
-        // Pace the emulator on the queue depth. With no threads this is a spin,
-        // and the interrupt that drains the queue is what ends it; the deadline
-        // (four ticks, 67 ms) keeps a stopped channel from wedging emulation.
+        // Pace the emulator on the queue depth. This is a spin, and the
+        // interrupt that drains the queue is what ends it; the deadline (four
+        // ticks, 67 ms) keeps a stopped channel from wedging emulation. The
+        // pthreads-retro68 threads are cooperative, so give them the time.
         const unsigned long deadline = Toolbox(&TickCount)() + 4;
         while (Queued() > target_ && Toolbox(&TickCount)() < deadline) {
+#ifdef VBAM_RETRO68_PTHREADS
+            sched_yield();
+#endif
         }
     }
 

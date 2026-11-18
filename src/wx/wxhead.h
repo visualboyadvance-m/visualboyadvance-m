@@ -26,7 +26,8 @@
 
 #include <wx/wx.h>
 
-// wxThread and friends for a wx without threads (wxRetro68).
+// wxThread and friends for a wx without threads (wxRetro68 built without
+// pthreads-retro68; with it, wx has its own).
 #include "wx/wx-nothreads.h"
 
 // The following are not pulled in by wx.h

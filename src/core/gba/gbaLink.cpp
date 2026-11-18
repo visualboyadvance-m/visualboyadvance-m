@@ -8,11 +8,11 @@
 #endif  // defined(NO_LINK)
 
 // Classic Mac OS (Retro68): one emulator per machine in practice, no shared
-// memory, process-shared semaphores or lock files between applications, and
-// a single thread. There is no IPC (same-machine) link there; the network
-// link runs on SFML's sockets, which sit on MacTCP on that platform. The
-// IPC code still compiles (the GB/RFU paths reference its semaphores) on a
-// process-local stand-in, but InitIPC() refuses to start a session.
+// memory, process-shared semaphores or lock files between applications.
+// There is no IPC (same-machine) link there; the network link runs on SFML's
+// sockets, which sit on MacTCP on that platform. The IPC code still compiles
+// (the GB/RFU paths reference its semaphores) on a process-local stand-in,
+// but InitIPC() refuses to start a session.
 #if defined(macintosh)
 #define VBAM_LINK_NO_IPC 1
 #endif
@@ -35,6 +35,15 @@
 #include <unistd.h>
 
 #include <stdint.h>
+
+#if defined(VBAM_RETRO68_PTHREADS)
+
+// newlib there has neither clock_gettime() nor nanosleep(); pthreads-retro68
+// has both, CLOCK_MONOTONIC on Microseconds() and a nap that lets its other
+// threads run.
+#include <pthread.h>
+
+#else  // !defined(VBAM_RETRO68_PTHREADS)
 
 #include "../../../third_party/sfml/include/SFML/System/Clock.hpp"
 #include "../../../third_party/sfml/include/SFML/System/Sleep.hpp"
@@ -69,7 +78,10 @@ static int nanosleep(const struct timespec* req, struct timespec* rem)
     return 0;
 }
 
-// The link semaphores, process-local (single-threaded: no atomics needed).
+#endif  // defined(VBAM_RETRO68_PTHREADS)
+
+// The link semaphores, process-local (one emulator thread uses them: no
+// atomics needed).
 struct link_sem_t {
     int32_t count;
 };

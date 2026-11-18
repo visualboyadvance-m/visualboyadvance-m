@@ -14,8 +14,14 @@
 #define MeasureTextSDL MeasureText
 #define PaletteSDL Palette
 
-// std::mutex and friends, for a C++ library without gthreads.
+// std::mutex and friends, for a C++ library without gthreads: on the
+// pthreads-retro68 Thread Manager threads where the build has them
+// (ENABLE_RETRO68_PTHREADS), single-threaded stand-ins otherwise.
+#ifdef VBAM_RETRO68_PTHREADS
+#include "../pthread_std.h"
+#else
 #include "../nothreads.h"
+#endif
 
 // GCC's and newlib's <limits.h> only define the long long limits for C99
 // (__STDC_VERSION__ / __ISO_C_VISIBLE), so C++ sources here never see them.

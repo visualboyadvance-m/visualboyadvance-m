@@ -2,8 +2,10 @@
 #define VBAM_WX_WX_NOTHREADS_H_
 
 // Single-threaded stand-ins for wx's thread classes, for a wx built with
-// wxUSE_THREADS=0 (wxRetro68: classic Mac OS has no preemptive threads), where
-// <wx/thread.h> declares none of them.
+// wxUSE_THREADS=0 (wxRetro68 without pthreads-retro68: classic Mac OS has no
+// preemptive threads), where <wx/thread.h> declares none of them. A wxRetro68
+// built with pthreads-retro68 has wxUSE_THREADS=1 and the real classes, and
+// this header then defines nothing.
 //
 // The frontend only starts threads to run filters in bands and for background
 // input, and the filter code already runs everything on the calling thread

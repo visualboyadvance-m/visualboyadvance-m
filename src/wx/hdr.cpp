@@ -415,8 +415,9 @@ private:
         // As many bands as GCD runs on macOS, at most: past that, waking the
         // threads costs more than a 480x320 frame's rows save.
         workers_ = std::min(hw ? static_cast<int>(hw) : 1, 16) - 1;
-#ifdef VBAM_SINGLE_THREADED
-        // No threads to start (Retro68); Run() draws every band itself.
+#ifdef VBAM_NO_STD_THREAD
+        // std::thread cannot start one (Retro68, where the threads would be
+        // cooperative on one CPU anyway); Run() draws every band itself.
         workers_ = 0;
 #else
         for (int i = 0; i < workers_; ++i)

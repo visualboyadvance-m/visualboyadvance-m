@@ -290,11 +290,27 @@ Debug output requires `-DCMAKE_BUILD_TYPE=Debug`.
   and `System/MacOS/include/filesystem.hpp` replaces ghc::filesystem (HFS
   paths). `gbaLink.cpp` defines `VBAM_LINK_NO_IPC` (`macintosh`): IPC objects
   are process-local stand-ins and `InitIPC()` refuses; `clock_gettime`/
-  `nanosleep` are shimmed on SFML there.
-- `src/core/base/retro68/prefix.h` is force-included: single-threaded `std::mutex` & co. (`nothreads.h`, defines
-  `VBAM_SINGLE_THREADED`; use `VBAM_THREAD_LOCAL` for block-scope
-  thread_locals), and undoes the Retro68 SDL3's `DrawText`/`Palette` renames.
-  `src/wx/wx-nothreads.h` stands in for `wxThread`/`wxMutex`/`wxSemaphore`.
+  `nanosleep` come from pthreads-retro68, or are shimmed on SFML without it.
+- Threads: pthreads-retro68 (`~/Downloads/pthreads-retro68`, installed into
+  both sysroots; cooperative Thread Manager threads) when found
+  (`ENABLE_RETRO68_PTHREADS`, default ON; defines `VBAM_RETRO68_PTHREADS`
+  globally, `vbam-core-base` links `pthreads-retro68::pthread`, which brings
+  `ThreadsLib` on PPC). wxRetro68 built against it has `wxUSE_THREADS=1` and
+  wx's own `wxThread` (`threadpsx.cpp`; its event loop yields to threads,
+  `GetCPUCount()` is 1); without it `src/wx/wx-nothreads.h` stands in for
+  `wxThread`/`wxMutex`/`wxSemaphore`. libstdc++ has no gthreads either way, so
+  `std::thread` cannot start threads (`VBAM_NO_STD_THREAD`) and
+  `std::this_thread::yield()` is a no-op: use `sched_yield()`. Filters run
+  unbanded and background keyboard input stays off on Retro68 regardless.
+  `posix-compat.cpp`'s `sleep`/`usleep` replace the library's weak ones: the
+  main thread waits through SDL in 1 ms slices with `sched_yield()` between,
+  other threads `nanosleep()`.
+- `src/core/base/retro68/prefix.h` is force-included: `std::mutex` & co. on
+  pthreads (`pthread_std.h`, defines `VBAM_COOPERATIVE_THREADS`) or
+  single-threaded (`nothreads.h`, defines `VBAM_SINGLE_THREADED`); both define
+  `VBAM_NO_THREAD_LOCAL` (use `VBAM_THREAD_LOCAL` for block-scope
+  thread_locals: plain `static`, shared by the cooperative threads), and it
+  undoes the Retro68 SDL3's `DrawText`/`Palette` renames.
 - 68k: `-m68020 -msoft-float -Os`, because the whole application (code and
   data) is resources and a resource fork is limited to 16 MB (13 MB now); keep
   an eye on it when adding wx dependencies. PowerPC's PEF is in the data fork.

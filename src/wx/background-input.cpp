@@ -815,8 +815,10 @@ BackgroundInput *input = NULL;
 
 void enableKeyboardBackgroundInput(wxEvtHandler* handler)
 {
-#if !wxUSE_THREADS
-    // Polled from a thread, and there are none (wxRetro68).
+#if !wxUSE_THREADS || defined(__WXRETRO68__)
+    // Polled from a thread, and wxRetro68 has none without pthreads-retro68;
+    // with it, there is no global keyboard poll for classic Mac OS yet (Setup()
+    // would only report so from the thread), so stay quiet as before.
     (void)handler;
     return;
 #endif
