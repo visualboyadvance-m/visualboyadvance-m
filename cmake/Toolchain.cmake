@@ -126,6 +126,26 @@ if(ENABLE_ASM_CORE OR ENABLE_ASM_SCALERS)
             endif()
         endif()
 
+        # Add the nuget package source, as the Gettext.Tools install in
+        # src/wx/CMakeLists.txt does. It cannot be left to that one: this runs
+        # first, from the include() in the top-level CMakeLists.txt, and that
+        # block only runs at all when xgettext or msginit is missing, so on a
+        # machine that has gettext the source would never be added. nuget then
+        # has no feed to search and the install fails with "Unable to find
+        # package 'nasm2'" and an empty "Feeds used:" list.
+        #
+        # Left unchecked on purpose: every configure after the first fails it
+        # with "the source specified has already been added to the list of
+        # available package sources", which is not a problem.
+        execute_process(
+            COMMAND ${CMAKE_BINARY_DIR}/nuget.exe sources add
+                    -Name "NuGet official package source"
+                    -Source "https://api.nuget.org/v3/index.json"
+            OUTPUT_QUIET
+            ERROR_QUIET
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
         execute_process(
             COMMAND ${CMAKE_BINARY_DIR}/nuget.exe install nasm2
                     -OutputDirectory ${CMAKE_BINARY_DIR}/nuget
