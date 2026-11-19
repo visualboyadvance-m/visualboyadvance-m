@@ -239,10 +239,25 @@ endif()
 
 # wxSparkle, the online updater (ENABLE_ONLINEUPDATES is only a cache entry
 # yet, so go by what the command line asked for).
+#
+# libcurl no longer builds for Windows XP, so the 32 bit Windows build has
+# ENABLE_WXSPARKLE off by default (WXSPARKLE_DEFAULT in cmake/Options.cmake).
+# That runs long after this, and project() has not been called yet either, so
+# the triplet is all there is to go by here. Without this, installing the
+# dependencies fails before the option is ever read.
+set(vbam_wxsparkle_wanted TRUE)
+if(DEFINED ENABLE_WXSPARKLE)
+    set(vbam_wxsparkle_wanted ${ENABLE_WXSPARKLE})
+elseif(VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
+    set(vbam_wxsparkle_wanted FALSE)
+endif()
+
 if(ENABLE_WX AND (ENABLE_ONLINEUPDATES OR UPSTREAM_RELEASE)
-   AND (NOT DEFINED ENABLE_WXSPARKLE OR ENABLE_WXSPARKLE) AND NOT VBAM_TARGET_ANDROID)
+   AND vbam_wxsparkle_wanted AND NOT VBAM_TARGET_ANDROID)
     list(APPEND VCPKG_DEPS curl expat)
 endif()
+
+unset(vbam_wxsparkle_wanted)
 
 unset(VCPKG_DEPS_OPTIONAL)
 

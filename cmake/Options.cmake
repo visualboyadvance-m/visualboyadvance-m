@@ -677,9 +677,20 @@ set(ONLINEUPDATES_DEFAULT OFF)
 if(UPSTREAM_RELEASE AND NOT (VBAM_TARGET_RETRO68 AND ENABLE_LINK))
     set(ONLINEUPDATES_DEFAULT ON)
 endif()
+# wxSparkle needs libcurl, and libcurl stopped building for Windows XP in 8.x:
+#
+#   CMake Error at CMakeLists.txt:1515 (message):
+#     Building for Windows Vista or newer is required.
+#
+# so the 32 bit Windows build, which targets XP (_WIN32_WINNT=0x0501), keeps
+# the WinSparkle DLL backend instead.
+set(WXSPARKLE_DEFAULT ON)
+if(WINXP)
+    set(WXSPARKLE_DEFAULT OFF)
+endif()
 if(ENABLE_WX AND NOT VBAM_TARGET_ANDROID)
     option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
-    option(ENABLE_WXSPARKLE "Use wxSparkle for online updates (OFF: WinSparkle DLL / Sparkle.framework)" ON)
+    option(ENABLE_WXSPARKLE "Use wxSparkle for online updates (OFF: WinSparkle DLL / Sparkle.framework)" ${WXSPARKLE_DEFAULT})
 else()
     set(ENABLE_ONLINEUPDATES OFF)
     set(ENABLE_WXSPARKLE OFF)
