@@ -2518,3 +2518,27 @@ if(NOT ANDROID AND NOT RETRO68)
         install(FILES ${CMAKE_CURRENT_LIST_DIR}/visualboyadvance-m.6 DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
     endif()
 endif()
+
+# PowerPC branches (bl) reach +-32 MB, and the RetroPPC application's code is
+# bigger than that (over 40 MB with FFmpeg and the online updater). For a
+# call that is out of reach Retro68's linker makes an @FIX stub, which it
+# builds against the wrong TOC offset: the call then jumps through a garbage
+# transition vector (SheepShaver: "EMUL_OP called with bogus selector").
+# -mlongcall makes every call to another function an inline load of its
+# transition vector from the TOC and a bctrl, which reaches anywhere and
+# needs no stub. It is for the code that has such calls -- the GUI, near the
+# start, calls the Toolbox import glue the linker puts at the very end; SFML
+# and wxSparkle, linked late, call template code placed near the start --
+# and costs a few cycles a call, so the emulator core and the filters keep
+# direct calls. cmake/Retro68CheckFixStubs.cmake fails the build if an @FIX
+# stub turns up anyway.
+if(RETRO68 AND PPC32)
+    foreach(_vbam_longcall_target
+            visualboyadvance-m vbam-wx-config vbam-wx-widgets
+            sfml-network sfml-system wxsparkle)
+        if(TARGET ${_vbam_longcall_target})
+            target_compile_options(${_vbam_longcall_target} PRIVATE -mlongcall)
+        endif()
+    endforeach()
+    unset(_vbam_longcall_target)
+endif()

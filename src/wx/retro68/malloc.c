@@ -29,6 +29,26 @@
 
 #include <MacMemory.h>
 
+// Every Memory Manager call here goes through TOOLBOX(). On PowerPC the
+// linker puts the Toolbox import glue at the very end of the code, and with
+// FFmpeg and the online updater the code is over 40 MB, so this object (near
+// the start) is out of a branch's 32 MB reach of it; the linker then calls
+// through an @FIX stub of its own, which it builds against the wrong TOC
+// offset, so NewPtr() jumped into nowhere at startup (SheepShaver: "EMUL_OP
+// called with bogus selector"). Taking the function's address is an ordinary
+// TOC load, and a call through a pointer the compiler cannot see through is
+// made inline (load the transition vector, set r2, bctrl), without glue. On
+// 68k the call stays direct. (soundmanager.cpp's Toolbox() is the same.)
+#if defined(__m68k__)
+#define TOOLBOX(fn) (fn)
+#else
+#define TOOLBOX(fn)                                    \
+    (__extension__({                                   \
+        __typeof__(&(fn)) volatile toolbox_fn_ = &(fn); \
+        toolbox_fn_;                                   \
+    }))
+#endif
+
 // Blocks are 8-byte aligned: the PowerPC wants doubles there. Each small
 // block has a 4-byte header just before the pointer handed out, holding the
 // block's size (header included, a multiple of 8). A large block's header has
@@ -75,7 +95,7 @@ static int new_chunk(void) {
         push_free(chunk_next, rest);
     }
 
-    char* c = (char*)NewPtr(kChunkSize);
+    char* c = (char*)TOOLBOX(NewPtr)(kChunkSize);
     if (!c)
         return 0;
 
@@ -94,7 +114,7 @@ static void* alloc_large(size_t size, size_t align) {
     if (size > 0x7FFFFFF0u - kLargeHeader - align)
         return NULL;
 
-    char* base = (char*)NewPtr((Size)(size + kLargeHeader + align));
+    char* base = (char*)TOOLBOX(NewPtr)((Size)(size + kLargeHeader + align));
     if (!base)
         return NULL;
 
@@ -142,7 +162,7 @@ static void do_free(void* p) {
 
     uint32_t h = *header_of(p);
     if (h & kLargeFlag) {
-        DisposePtr((Ptr)((char**)p)[-2]);
+        TOOLBOX(DisposePtr)((Ptr)((char**)p)[-2]);
         return;
     }
 
@@ -170,7 +190,7 @@ static void* do_realloc(void* p, size_t size) {
         char* base = ((char**)p)[-2];
         size_t even = (size + 1) & ~(size_t)1;
         size_t offset = (size_t)((char*)p - base);
-        SetPtrSize((Ptr)base, (Size)(even + offset));
+        TOOLBOX(SetPtrSize)((Ptr)base, (Size)(even + offset));
         if (MemError() == noErr) {
             *header_of(p) = (uint32_t)even | kLargeFlag;
             return p;

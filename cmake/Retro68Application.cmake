@@ -139,8 +139,12 @@ function(vbam_retro68_application target)
         set_target_properties(${target} PROPERTIES OUTPUT_NAME "${target}.xcoff")
         set(pef "${CMAKE_CURRENT_BINARY_DIR}/${target}.pef")
 
+        # Out-of-reach calls the linker could not make right (see the script).
         add_custom_command(
             OUTPUT "${pef}"
+            COMMAND "${CMAKE_COMMAND}" -DNM=${CMAKE_NM} -DOBJDUMP=${CMAKE_OBJDUMP}
+                    "-DXCOFF=$<TARGET_FILE:${target}>"
+                    -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/Retro68CheckFixStubs.cmake"
             COMMAND "${MAKE_PEF}" "$<TARGET_FILE:${target}>" -o "${pef}"
             DEPENDS ${target}
             COMMENT "Making the PEF code fragment of ${ARG_NAME}"
