@@ -16,9 +16,24 @@ if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT LTO_SUPPORTED)
 
-    # MSYS2 toolchains and MinGW do not currently support LTO.
-    if(MSYS2 OR CMAKE_CXX_COMPILER MATCHES "[Mm][Ss][Yy][Ss]"
-            OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+    # MSYS2 toolchains and MinGW do not currently support LTO, with one
+    # exception: the hand-built i686-w64-mingw32 GCC used for the Windows XP
+    # release. It is configured with --enable-lto and does support it, so the
+    # release build of that triplet is allowed to use it. The gate is kept
+    # this narrow because it is the only combination that has been tested;
+    # every other MinGW or MSYS2 toolchain keeps the blanket disable.
+    set(MINGW_LTO_SUPPORTED FALSE)
+
+    if(UPSTREAM_RELEASE
+            AND VCPKG_TARGET_TRIPLET STREQUAL "x86-mingw-static"
+            AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+            AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.2.0)
+        set(MINGW_LTO_SUPPORTED TRUE)
+    endif()
+
+    if(NOT MINGW_LTO_SUPPORTED
+            AND (MSYS2 OR CMAKE_CXX_COMPILER MATCHES "[Mm][Ss][Yy][Ss]"
+                 OR (WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")))
         set(LTO_SUPPORTED FALSE)
     endif()
 
