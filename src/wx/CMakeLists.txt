@@ -1581,12 +1581,38 @@ endif()
 
 # FFMPeg.
 if(ENABLE_FFMPEG AND NOT COMPILE_ONLY)
+    # PowerPC branches (bl) reach +-32 MB, and with FFmpeg (and wxSparkle's
+    # libcurl and OpenSSL) the code is over 40 MB. The compiler driver adds
+    # the runtime (libstdc++, libgcc, libc) last, so operator new/delete and
+    # _Unwind_Resume ended up more than 32 MB away from the application's
+    # own objects at the start ("relocation truncated to fit: 0x0a").
+    # Naming the runtime here, between the GUI libraries and FFmpeg, makes
+    # the linker take the members needed so far from it at this point,
+    # around the middle of the code, within reach of everything; the
+    # driver's own copies at the end still serve what comes after. (By full
+    # path: a -lc there takes nothing from libc.a.)
+    if(RETRO68 AND PPC32)
+        find_library(VBAM_RETRO68_LIBSTDCXX stdc++)
+        find_library(VBAM_RETRO68_LIBC c)
+        execute_process(
+            COMMAND ${CMAKE_CXX_COMPILER} -print-libgcc-file-name
+            OUTPUT_VARIABLE _vbam_ppc_libgcc
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(NOT VBAM_RETRO68_LIBSTDCXX OR NOT VBAM_RETRO68_LIBC OR NOT EXISTS "${_vbam_ppc_libgcc}")
+            message(FATAL_ERROR "libstdc++.a, libgcc.a or libc.a of the RetroPPC toolchain not found")
+        endif()
+        set(_vbam_ppc_mid_stdcxx ${VBAM_RETRO68_LIBSTDCXX} ${_vbam_ppc_libgcc} ${VBAM_RETRO68_LIBC})
+        unset(_vbam_ppc_libgcc)
+    endif()
     target_link_libraries(
         visualboyadvance-m
         ${VBAM_WX_TLL_SCOPE}
         vbam-components-av-recording
+        ${_vbam_ppc_mid_stdcxx}
         ${FFMPEG_LIBRARIES}
     )
+    unset(_vbam_ppc_mid_stdcxx)
 
     if(ANDROID)
         target_link_libraries(
@@ -1922,9 +1948,12 @@ endif()
 if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
     if(RETRO68 AND ENABLE_LINK)
         # Retro68's libcurl networks through libmactcp, whose BSD socket
-        # functions (socket, connect, select, ...) are also defined by the
-        # bundled SFML's MacTCP layer that the link uses.
-        message(FATAL_ERROR "On classic Mac OS, wxSparkle (ENABLE_ONLINEUPDATES) and ENABLE_LINK both define the BSD socket API over MacTCP; turn one of them off.")
+        # functions (socket, connect, select, ...) the bundled SFML's MacTCP
+        # layer that the link uses defines too. That layer is a drop-in
+        # replacement for libmactcp (third_party/sfml/src/SFML/Network/
+        # MacTCP/include/mactcp-sockets.h), so libcurl networks through it
+        # and libmactcp stays out of the link.
+        set(WXSPARKLE_MACTCP_TARGET sfml-network)
     endif()
 
     # wxSparkle takes this instead of looking for wxWidgets itself.
@@ -1952,7 +1981,7 @@ if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
     set(WXSPARKLE_WITH_DSA       OFF)
     add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/wxSparkle
                      ${CMAKE_BINARY_DIR}/third_party/wxSparkle EXCLUDE_FROM_ALL)
-    foreach(_wxsparkle_var WXSPARKLE_WX_TARGET BUILD_SHARED_LIBS WXSPARKLE_INSTALL
+    foreach(_wxsparkle_var WXSPARKLE_WX_TARGET WXSPARKLE_MACTCP_TARGET BUILD_SHARED_LIBS WXSPARKLE_INSTALL
             WXSPARKLE_BUILD_EXAMPLE WXSPARKLE_BUILD_TOOL WXSPARKLE_BUILD_TESTS WXSPARKLE_WITH_DSA)
         unset(${_wxsparkle_var})
     endforeach()

@@ -45,4 +45,13 @@ int resolveName(const char* name, std::uint32_t& address);
 ////////////////////////////////////////////////////////////
 void closeResolver();
 
+////////////////////////////////////////////////////////////
+/// \brief Nap between polls of the network (Sockets.cpp)
+///
+/// \return false when the idle function (mactcp_set_idle_func)
+///         cancels the wait
+///
+////////////////////////////////////////////////////////////
+bool idleNap();
+
 } // namespace sf::priv

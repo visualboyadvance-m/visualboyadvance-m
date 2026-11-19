@@ -72,8 +72,15 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - Online updater (`ENABLE_ONLINEUPDATES`): wxSparkle, the wxWidgets port of
   WinSparkle, vendored in `third_party/wxSparkle` (from
   github.com/andyvand/wxSparkle) and linked statically on every platform,
-  Retro68 included (not together with `ENABLE_LINK` there: both define the
-  BSD socket API over MacTCP; on PPC the sysroot's libcurl/OpenSSL, built
+  Retro68 included (with `ENABLE_LINK` there, libcurl gets its sockets from
+  SFML's MacTCP layer instead of libmactcp -- both define the BSD socket
+  API -- through `WXSPARKLE_MACTCP_TARGET=sfml-network`; the layer keeps
+  libmactcp's ABI: 16-bit `sa_family`, no `sa_len`, `closesocket()`,
+  `ioctlsocket()`, `gethostbyname()`, `mactcp_set_idle_func()`; the PPC code
+  is over 40 MB with FFmpeg and the updater, past `bl`'s +-32 MB reach, so
+  `src/wx/CMakeLists.txt` names libstdc++/libgcc/libc (full paths: `-lc`
+  there takes nothing) before the FFmpeg libraries, putting the runtime
+  mid-image; on PPC the sysroot's libcurl/OpenSSL, built
   without `-mminimal-toc`, overflow the 64 KB TOC by ~1.5 KB, so they must be
   rebuilt with it first). `src/wx/CMakeLists.txt` hands it the app's own
   wxWidgets as `WXSPARKLE_WX_TARGET` and turns off its install, example, tool

@@ -40,7 +40,6 @@ namespace sf
 sockaddr_in SocketImpl::createAddress(std::uint32_t address, unsigned short port)
 {
     auto addr            = sockaddr_in();
-    addr.sin_len         = sizeof(addr);
     addr.sin_addr.s_addr = htonl(address);
     addr.sin_family      = AF_INET;
     addr.sin_port        = htons(port);

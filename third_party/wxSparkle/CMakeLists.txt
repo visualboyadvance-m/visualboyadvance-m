@@ -112,6 +112,17 @@ if(NOT DEFINED WXSPARKLE_WX_TARGET)
     set(WXSPARKLE_WX_TARGET "")
 endif()
 
+# Classic Mac OS: Retro68's libcurl gets its BSD sockets from libmactcp. A
+# host application that has its own libmactcp-compatible socket layer (the
+# same calls, structure layouts and constants, mactcp_set_idle_func()
+# included) can set WXSPARKLE_MACTCP_TARGET to a target that provides it,
+# with the <sys/socket.h> & co. declaring it as its public include
+# directories; libcurl is then linked against that target and libmactcp is
+# left out, as the two would define the same functions.
+if(NOT DEFINED WXSPARKLE_MACTCP_TARGET)
+    set(WXSPARKLE_MACTCP_TARGET "")
+endif()
+
 #---------------------------------------------------------------------------
 # Dependencies
 #---------------------------------------------------------------------------
@@ -226,15 +237,24 @@ if(WXSPARKLE_RETRO68)
     # provides BSD sockets) for networking.
     find_package(OpenSSL REQUIRED)
     find_package(ZLIB REQUIRED)
-    find_library(WXSPARKLE_MACTCP_LIBRARY NAMES mactcp)
-    # (its BSD sockets headers are in <include>/mactcp)
-    find_path(WXSPARKLE_MACTCP_INCLUDE_PARENT NAMES mactcp/sys/socket.h)
-    if(NOT WXSPARKLE_MACTCP_LIBRARY OR NOT WXSPARKLE_MACTCP_INCLUDE_PARENT)
-        message(FATAL_ERROR "libmactcp (needed by Retro68's libcurl) not found")
+    if(WXSPARKLE_MACTCP_TARGET)
+        if(NOT TARGET ${WXSPARKLE_MACTCP_TARGET})
+            message(FATAL_ERROR "WXSPARKLE_MACTCP_TARGET (${WXSPARKLE_MACTCP_TARGET}) is not a target")
+        endif()
+        set(_wxsparkle_mactcp ${WXSPARKLE_MACTCP_TARGET})
+        message(STATUS "wxSparkle: libcurl's sockets from ${WXSPARKLE_MACTCP_TARGET}")
+    else()
+        find_library(WXSPARKLE_MACTCP_LIBRARY NAMES mactcp)
+        # (its BSD sockets headers are in <include>/mactcp)
+        find_path(WXSPARKLE_MACTCP_INCLUDE_PARENT NAMES mactcp/sys/socket.h)
+        if(NOT WXSPARKLE_MACTCP_LIBRARY OR NOT WXSPARKLE_MACTCP_INCLUDE_PARENT)
+            message(FATAL_ERROR "libmactcp (needed by Retro68's libcurl) not found")
+        endif()
+        set(WXSPARKLE_MACTCP_INCLUDE_DIR "${WXSPARKLE_MACTCP_INCLUDE_PARENT}/mactcp")
+        set(_wxsparkle_mactcp "${WXSPARKLE_MACTCP_LIBRARY}")
     endif()
-    set(WXSPARKLE_MACTCP_INCLUDE_DIR "${WXSPARKLE_MACTCP_INCLUDE_PARENT}/mactcp")
     target_link_libraries(wxsparkle_curl INTERFACE
-        OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB "${WXSPARKLE_MACTCP_LIBRARY}")
+        OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB ${_wxsparkle_mactcp})
 elseif(_curl_type STREQUAL "STATIC_LIBRARY" AND WXSPARKLE_CURL_PKGCONFIG_STATIC AND NOT MSVC)
     find_package(PkgConfig QUIET)
     if(PKG_CONFIG_FOUND)
@@ -508,8 +528,11 @@ if(WXSPARKLE_HAVE_OPENSSL)
 endif()
 
 if(WXSPARKLE_RETRO68)
-    # mactcp.h, for letting other threads run while waiting for the network
-    target_include_directories(wxsparkle PRIVATE "${WXSPARKLE_MACTCP_INCLUDE_DIR}")
+    # <sys/socket.h>, for letting other threads run while waiting for the
+    # network (WXSPARKLE_MACTCP_TARGET brings its own through wxsparkle_curl)
+    if(NOT WXSPARKLE_MACTCP_TARGET)
+        target_include_directories(wxsparkle PRIVATE "${WXSPARKLE_MACTCP_INCLUDE_DIR}")
+    endif()
     if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "wxSparkle can only be built as a static library for classic Mac OS")
     endif()

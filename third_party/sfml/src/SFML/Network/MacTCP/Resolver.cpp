@@ -284,6 +284,21 @@ int resolveName(const char* name, std::uint32_t& address)
     if (openResolver() != noErr)
         return EAI_FAIL;
 
+    // One lookup at a time: the link and the updater's libcurl may ask from
+    // different (cooperative) threads, and the state below is shared.
+    static bool busy = false;
+    while (busy)
+        if (!idleNap())
+            return EAI_AGAIN;
+    busy = true;
+    struct Release
+    {
+        ~Release()
+        {
+            busy = false;
+        }
+    } release;
+
     // The resolver keeps using these until it calls back, so they must not
     // live on the stack: a lookup given up on below may still finish later.
     static char        hostName[256];
@@ -296,7 +311,8 @@ int resolveName(const char* name, std::uint32_t& address)
         // An earlier lookup timed out; let it finish before reusing its state.
         const std::uint64_t start = macMicroseconds();
         while (!wait.done && macMicroseconds() - start < 5'000'000)
-            usleep(1000);
+            if (!idleNap())
+                return EAI_AGAIN;
         if (!wait.done)
             return EAI_AGAIN;
         pending = false;
@@ -314,9 +330,14 @@ int resolveName(const char* name, std::uint32_t& address)
         // retries, so this bound only guards against a callback never
         // coming.
         const std::uint64_t start = macMicroseconds();
+        bool cancelled = false;
         while (!wait.done && macMicroseconds() - start < 60'000'000)
-            usleep(1000);
-        if (!wait.done)
+            if (!idleNap())
+            {
+                cancelled = true;
+                break;
+            }
+        if (!wait.done || cancelled)
         {
             pending = true;
             return EAI_AGAIN;
@@ -367,7 +388,32 @@ void closeResolver()
 } // namespace sf::priv
 
 
+namespace
+{
+////////////////////////////////////////////////////////////
+// A host name or dotted address to an address in host byte order; 0 or an
+// EAI_* code.
+int lookupHost(const char* node, uint32_t& address)
+{
+    if (parseDotted(node, address))
+        return 0;
+    if (strcasecmp(node, "localhost") == 0)
+    {
+        // MacTCP has no loopback interface: this machine is its own address.
+        address = ntohl(mactcp_local_address());
+        if (address == 0)
+            address = INADDR_LOOPBACK;
+        return 0;
+    }
+    return sf::priv::resolveName(node, address);
+}
+
+} // namespace
+
+
 extern "C" {
+
+int h_errno = 0;
 
 ////////////////////////////////////////////////////////////
 int inet_pton(int af, const char* src, void* dst)
@@ -418,6 +464,13 @@ in_addr_t inet_addr(const char* cp)
     return parseDotted(cp, address) ? htonl(address) : INADDR_NONE;
 }
 
+char* inet_ntoa(struct in_addr in)
+{
+    static char text[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &in, text, sizeof(text));
+    return text;
+}
+
 int inet_aton(const char* cp, struct in_addr* addr)
 {
     uint32_t address = 0;
@@ -455,21 +508,11 @@ int getaddrinfo(const char* node, const char* service, const struct addrinfo* hi
     {
         address = (flags & AI_PASSIVE) ? INADDR_ANY : INADDR_LOOPBACK;
     }
-    else if (parseDotted(node, address))
-    {
-    }
-    else if (flags & AI_NUMERICHOST)
+    else if ((flags & AI_NUMERICHOST) && !parseDotted(node, address))
     {
         return EAI_NONAME;
     }
-    else if (strcasecmp(node, "localhost") == 0)
-    {
-        // MacTCP has no loopback interface: this machine is its own address.
-        address = ntohl(mactcp_local_address());
-        if (address == 0)
-            address = INADDR_LOOPBACK;
-    }
-    else if (const int err = sf::priv::resolveName(node, address))
+    else if (const int err = lookupHost(node, address))
     {
         return err;
     }
@@ -482,7 +525,6 @@ int getaddrinfo(const char* node, const char* service, const struct addrinfo* hi
     auto* block = static_cast<Block*>(std::calloc(1, sizeof(Block)));
     if (!block)
         return EAI_MEMORY;
-    block->addr.sin_len         = sizeof(sockaddr_in);
     block->addr.sin_family      = AF_INET;
     block->addr.sin_port        = htons(port);
     block->addr.sin_addr.s_addr = htonl(address);
@@ -493,6 +535,50 @@ int getaddrinfo(const char* node, const char* service, const struct addrinfo* hi
     block->info.ai_addr         = reinterpret_cast<sockaddr*>(&block->addr);
     *res                        = &block->info;
     return 0;
+}
+
+struct hostent* gethostbyname(const char* name)
+{
+    static uint32_t address; // network byte order
+    static char     hostName[256];
+    static char*    addrList[2];
+    static char*    aliases[1];
+    static hostent  host;
+
+    uint32_t found = 0;
+    if (!name)
+    {
+        h_errno = HOST_NOT_FOUND;
+        return nullptr;
+    }
+    switch (lookupHost(name, found))
+    {
+        case 0:
+            break;
+        case EAI_AGAIN:
+            h_errno = TRY_AGAIN;
+            return nullptr;
+        case EAI_NONAME:
+            h_errno = HOST_NOT_FOUND;
+            return nullptr;
+        default:
+            h_errno = NO_RECOVERY;
+            return nullptr;
+    }
+
+    address = htonl(found);
+    std::strncpy(hostName, name, sizeof(hostName) - 1);
+    hostName[sizeof(hostName) - 1] = '\0';
+    addrList[0]                    = reinterpret_cast<char*>(&address);
+    addrList[1]                    = nullptr;
+    aliases[0]                     = nullptr;
+    host.h_name                    = hostName;
+    host.h_aliases                 = aliases;
+    host.h_addrtype                = AF_INET;
+    host.h_length                  = sizeof(address);
+    host.h_addr_list               = addrList;
+    h_errno                        = 0;
+    return &host;
 }
 
 void freeaddrinfo(struct addrinfo* res)

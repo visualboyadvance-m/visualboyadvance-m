@@ -23,7 +23,17 @@
  * Everything runs on the caller's thread: a blocking call polls the
  * driver, napping through usleep() between polls (the wx port's usleep()
  * waits through SDL, which keeps the sound going and lets other
- * applications run).
+ * applications run), and calls the idle function set with
+ * mactcp_set_idle_func() after every nap.
+ *
+ * The layer is also a drop-in replacement for Retro68's libmactcp, which
+ * the sysroot's libcurl is built against (wxSparkle, the wx port's online
+ * updater, uses that libcurl): the structures, constants and calls libcurl
+ * and wxSparkle use have libmactcp's layout and meaning -- a struct sockaddr
+ * starts with a 16-bit family and has no BSD length byte; closesocket(),
+ * ioctlsocket(FIONBIO/FIONREAD), gethostbyname() and mactcp_set_idle_func()
+ * are here -- so with the link built in, libcurl links against this layer
+ * and libmactcp is left out (both define socket(), connect(), select() ...).
  */
 
 #ifndef SFML_MACTCP_SOCKETS_H
@@ -46,7 +56,9 @@ extern "C" {
 /* ---- <sys/socket.h> ---------------------------------------------------- */
 
 typedef __socklen_t socklen_t;
-typedef __sa_family_t sa_family_t;
+/* 16 bits, as in libmactcp (newlib's __sa_family_t is 8 bits, for BSD's
+   sa_len/sa_family pair, which libmactcp and libcurl do not have). */
+typedef unsigned short sa_family_t;
 
 #define AF_UNSPEC 0
 #define AF_INET 2
@@ -80,16 +92,25 @@ typedef __sa_family_t sa_family_t;
 #define SHUT_RDWR 2
 
 struct sockaddr {
-    uint8_t sa_len;
     sa_family_t sa_family;
     char sa_data[14];
 };
 
 struct sockaddr_storage {
-    uint8_t ss_len;
     sa_family_t ss_family;
-    char ss_data[126];
+    char __ss_pad1[2];
+    uint32_t __ss_align;
+    char __ss_pad2[120];
 };
+
+struct linger {
+    int l_onoff;
+    int l_linger;
+};
+
+/* ioctlsocket() requests */
+#define FIONREAD 0x4004667fL
+#define FIONBIO 0x8004667eL
 
 int socket(int domain, int type, int protocol);
 int bind(int fd, const struct sockaddr* addr, socklen_t len);
@@ -111,6 +132,18 @@ int shutdown(int fd, int how);
 /* close() and fcntl() for socket descriptors. */
 int mactcp_close(int fd);
 int mactcp_set_nonblocking(int fd, int nonblocking);
+
+/* The same under their Winsock/libmactcp names: closesocket() is
+   mactcp_close(), ioctlsocket() takes FIONBIO (*argp non-zero: do not
+   block) and FIONREAD (*argp: bytes waiting). */
+int closesocket(int fd);
+int ioctlsocket(int fd, long cmd, unsigned long* argp);
+
+/* Called after every nap while a call waits for the network (none by
+   default). Returning non-zero cancels the wait: the call fails with EINTR.
+   Returns the function installed before. */
+typedef int (*mactcp_idle_func)(void);
+mactcp_idle_func mactcp_set_idle_func(mactcp_idle_func func);
 
 /* True when fd is a live socket descriptor of this layer. */
 int mactcp_is_socket(int fd);
@@ -145,7 +178,6 @@ struct in_addr {
 };
 
 struct sockaddr_in {
-    uint8_t sin_len;
     sa_family_t sin_family;
     in_port_t sin_port;
     struct in_addr sin_addr;
@@ -171,6 +203,7 @@ int inet_pton(int af, const char* src, void* dst);
 const char* inet_ntop(int af, const void* src, char* dst, socklen_t size);
 in_addr_t inet_addr(const char* cp);
 int inet_aton(const char* cp, struct in_addr* addr);
+char* inet_ntoa(struct in_addr in);
 
 /* ---- <netdb.h> --------------------------------------------------------- */
 
@@ -188,6 +221,7 @@ struct addrinfo {
 #define AI_PASSIVE 0x0001
 #define AI_CANONNAME 0x0002
 #define AI_NUMERICHOST 0x0004
+#define AI_NUMERICSERV 0x0400
 
 #define EAI_AGAIN 2
 #define EAI_BADFLAGS 3
@@ -205,6 +239,26 @@ int getaddrinfo(const char* node, const char* service,
                 const struct addrinfo* hints, struct addrinfo** res);
 void freeaddrinfo(struct addrinfo* res);
 const char* gai_strerror(int error);
+
+struct hostent {
+    char* h_name;
+    char** h_aliases;
+    int h_addrtype;
+    int h_length;
+    char** h_addr_list;
+};
+#define h_addr h_addr_list[0]
+
+#define HOST_NOT_FOUND 1
+#define TRY_AGAIN 2
+#define NO_RECOVERY 3
+#define NO_DATA 4
+#define NO_ADDRESS NO_DATA
+
+extern int h_errno;
+
+/* IPv4 only; the result is static, overwritten by the next call. */
+struct hostent* gethostbyname(const char* name);
 
 /* Fills name with the host's dotted address (MacTCP knows no host name). */
 int gethostname(char* name, size_t len);

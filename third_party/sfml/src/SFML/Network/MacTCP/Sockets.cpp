@@ -222,9 +222,13 @@ inline bool pbBusy(const OSErr& ioResult)
     return pbResult(ioResult) > 0;
 }
 
-void nap()
+mactcp_idle_func g_idle = nullptr;
+
+// Sleeps between polls; false when the idle function cancels the wait.
+bool nap()
 {
     usleep(kNapMicros);
+    return !(g_idle && g_idle());
 }
 
 std::uint64_t nowMicros()
@@ -657,7 +661,6 @@ void fillAddress(struct sockaddr* addr, socklen_t* len, uint32_t host, uint16_t 
     if (!addr || !len)
         return;
     sockaddr_in in{};
-    in.sin_len         = sizeof(in);
     in.sin_family      = AF_INET;
     in.sin_port        = htons(port);
     in.sin_addr.s_addr = htonl(host);
@@ -707,7 +710,8 @@ void closeSocket(Sock& s, bool graceful)
             // Let queued data go out, then send our FIN.
             const std::uint64_t start = nowMicros();
             while (sendsPending(s) && s.sendError == 0 && nowMicros() - start < 2'000'000)
-                nap();
+                if (!nap())
+                    break;
             if (!s.closeQueued && s.sendError == 0)
             {
                 s.closePb                              = TCPiopb{};
@@ -738,6 +742,15 @@ void closeSocket(Sock& s, bool graceful)
 }
 
 } // namespace
+
+
+namespace sf::priv
+{
+bool idleNap()
+{
+    return nap();
+}
+} // namespace sf::priv
 
 
 extern "C" {
@@ -802,6 +815,53 @@ int mactcp_set_nonblocking(int fd, int nonblocking)
         return fail(EBADF);
     s->nonBlocking = nonblocking != 0;
     return 0;
+}
+
+int closesocket(int fd)
+{
+    return mactcp_close(fd);
+}
+
+int ioctlsocket(int fd, long cmd, unsigned long* argp)
+{
+    Sock* s = lookup(fd);
+    if (!s)
+        return fail(EBADF);
+    if (!argp)
+        return fail(EFAULT);
+
+    if (cmd == FIONBIO)
+    {
+        s->nonBlocking = *argp != 0;
+        return 0;
+    }
+    if (cmd == FIONREAD)
+    {
+        unsigned long waiting = 0;
+        if (s->kind == Kind::Udp)
+        {
+            if (udpReadable(*s))
+                waiting = s->readPb.csParam.receive.rcvBuffLen;
+        }
+        else
+        {
+            settleConnect(*s);
+            TCPiopb pb{};
+            if (s->state == TcpState::Connected && s->stream.ptr &&
+                tcpCall(pb, TCPStatus, s->stream.ptr, false) == noErr)
+                waiting = pb.csParam.status.amtUnreadData;
+        }
+        *argp = waiting;
+        return 0;
+    }
+    return fail(EINVAL);
+}
+
+mactcp_idle_func mactcp_set_idle_func(mactcp_idle_func func)
+{
+    const mactcp_idle_func previous = g_idle;
+    g_idle                          = func;
+    return previous;
 }
 
 ////////////////////////////////////////////////////////////
@@ -909,7 +969,8 @@ int accept(int fd, struct sockaddr* addr, socklen_t* len)
             return fail(s->pendingError ? s->pendingError : ECONNABORTED);
         if (s->nonBlocking)
             return fail(EWOULDBLOCK);
-        nap();
+        if (!nap())
+            return fail(EINTR);
     }
 }
 
@@ -991,7 +1052,8 @@ int connect(int fd, const struct sockaddr* addr, socklen_t len)
         return fail(EINPROGRESS);
 
     while (pbBusy(s->openPb.ioResult))
-        nap();
+        if (!nap())
+            return fail(EINTR); // the open goes on, as after EINPROGRESS
     settleConnect(*s);
     if (s->state == TcpState::Connected)
         return 0;
@@ -1015,7 +1077,6 @@ ssize_t send(int fd, const void* buf, size_t len, int flags)
         if (!s->udpConnected)
             return fail(EDESTADDRREQ);
         sockaddr_in to{};
-        to.sin_len         = sizeof(to);
         to.sin_family      = AF_INET;
         to.sin_port        = htons(s->remotePort);
         to.sin_addr.s_addr = htonl(s->remoteAddr);
@@ -1027,7 +1088,8 @@ ssize_t send(int fd, const void* buf, size_t len, int flags)
     settleConnect(*s);
     while (s->state == TcpState::Connecting && wait)
     {
-        nap();
+        if (!nap())
+            return fail(EINTR);
         settleConnect(*s);
     }
     if (s->state == TcpState::Connecting)
@@ -1042,7 +1104,8 @@ ssize_t send(int fd, const void* buf, size_t len, int flags)
     SendSlot* slot = freeSendSlot(*s);
     while (!slot && s->sendError == 0 && wait)
     {
-        nap();
+        if (!nap())
+            return fail(EINTR);
         slot = freeSendSlot(*s);
     }
     if (s->sendError)
@@ -1092,7 +1155,8 @@ ssize_t recv(int fd, void* buf, size_t len, int flags)
     settleConnect(*s);
     while (s->state == TcpState::Connecting && wait)
     {
-        nap();
+        if (!nap())
+            return fail(EINTR);
         settleConnect(*s);
     }
     if (s->state == TcpState::Connecting)
@@ -1137,7 +1201,8 @@ ssize_t recv(int fd, void* buf, size_t len, int flags)
 
         if (!wait)
             return fail(EWOULDBLOCK);
-        nap();
+        if (!nap())
+            return fail(EINTR);
     }
 }
 
@@ -1203,7 +1268,8 @@ ssize_t recvfrom(int fd, void* buf, size_t len, int flags, struct sockaddr* from
     {
         if (!wait)
             return fail(EWOULDBLOCK);
-        nap();
+        if (!nap())
+            return fail(EINTR);
     }
 
     UdpReceivePB& r   = s->readPb.csParam.receive;
@@ -1282,7 +1348,8 @@ int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, struc
                 *writefds = gotWrite;
             return count;
         }
-        nap();
+        if (!nap())
+            return fail(EINTR);
     }
 }
 
