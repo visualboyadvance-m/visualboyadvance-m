@@ -1,0 +1,66 @@
+/*
+ *  This file is part of wxSparkle, a wxWidgets port of WinSparkle
+ *  (https://winsparkle.org)
+ *
+ *  Copyright (C) 2009-2026 Vaclav Slavik
+ *  SPDX-License-Identifier: MIT (see COPYING)
+ */
+
+// Only used when building wxSparkle as a Windows DLL. Translations and
+// dialog icons are embedded via generated headers, not resources.
+
+/*--------------------------------------------------------------------------*
+                                 Resources
+ *--------------------------------------------------------------------------*/
+
+UpdateAvailable ICON "../artwork/WinSparkle.ico"
+
+
+
+/*--------------------------------------------------------------------------*
+                              Version information
+ *--------------------------------------------------------------------------*/
+
+#include <winver.h>
+#include "winsparkle-version.h"
+
+#define VER_NUM     WIN_SPARKLE_VERSION_MAJOR,WIN_SPARKLE_VERSION_MINOR,WIN_SPARKLE_VERSION_MICRO,0
+#define VER_STR     WIN_SPARKLE_VERSION_STRING
+
+#ifdef DEBUG
+#define VER_DEBUG    VS_FF_DEBUG
+#else
+#define VER_DEBUG    0
+#endif
+
+1 VERSIONINFO
+ FILEVERSION     VER_NUM
+ PRODUCTVERSION  VER_NUM
+ FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+ FILEFLAGS       VER_DEBUG
+ FILEOS          VOS_NT_WINDOWS32
+ FILETYPE        VFT_DLL
+ FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0" // US English, Unicode
+        BEGIN
+            VALUE "Comments", "wxSparkle updates checking library, a wxWidgets port of WinSparkle (https://winsparkle.org)."
+            VALUE "CompanyName", "winsparkle.org\0"
+            VALUE "FileDescription", "wxSparkle updater\0"
+            VALUE "FileVersion", VER_STR "\0"
+            VALUE "InternalName", "wxSparkle\0"
+            VALUE "OriginalFilename", "wxsparkle.dll\0"
+            VALUE "LegalCopyright", "Copyright (C) 2009-2026 Vaclav Slavik\0"
+            VALUE "ProductName", "wxSparkle\0"
+            VALUE "ProductVersion", VER_STR "\0"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 0x04B0
+    END
+END
+

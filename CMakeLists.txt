@@ -237,6 +237,13 @@ if(VBAM_NEED_NLS)
     list(APPEND VCPKG_DEPS gettext-libintl)
 endif()
 
+# wxSparkle, the online updater (ENABLE_ONLINEUPDATES is only a cache entry
+# yet, so go by what the command line asked for).
+if(ENABLE_WX AND (ENABLE_ONLINEUPDATES OR UPSTREAM_RELEASE)
+   AND (NOT DEFINED ENABLE_WXSPARKLE OR ENABLE_WXSPARKLE) AND NOT VBAM_TARGET_ANDROID)
+    list(APPEND VCPKG_DEPS curl expat)
+endif()
+
 unset(VCPKG_DEPS_OPTIONAL)
 
 # SDL is the SDL port's toolkit and the wx port's audio/game controller

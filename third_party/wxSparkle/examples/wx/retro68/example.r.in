@@ -1,0 +1,52 @@
+/*
+ *  This file is part of wxSparkle, a wxWidgets port of WinSparkle
+ *  (https://winsparkle.org)
+ *
+ *  Copyright (C) 2009-2026 Vaclav Slavik
+ *  SPDX-License-Identifier: MIT (see COPYING)
+ */
+
+/*
+ * Resources of the example application for classic Mac OS (Retro68).
+ *
+ * This file is passed to Rez after the standard Retro68 application template
+ * (Retro68APPL.r or RetroPPCAPPL.r), so its SIZE resource replaces the
+ * template's one: wxWidgets applications, with libcurl and OpenSSL linked in,
+ * need much more memory than the default 1MB, and must handle suspend/resume
+ * and high level (Apple) events.
+ *
+ * On 68k, the code (about 13MB) is loaded into the partition; on PowerPC,
+ * with virtual memory off, the whole code fragment (about 20MB) is. The sizes
+ * are set by CMakeLists.txt, which generates the .r file from this one.
+ */
+
+#include "Processes.r"
+#include "MacTypes.r"
+
+resource 'SIZE' (-1) {
+    reserved,
+    acceptSuspendResumeEvents,
+    reserved,
+    canBackground,
+    doesActivateOnFGSwitch,
+    backgroundAndForeground,
+    dontGetFrontClicks,
+    ignoreChildDiedEvents,
+    is32BitCompatible,
+    isHighLevelEventAware,
+    onlyLocalHLEvents,
+    notStationeryAware,
+    dontUseTextEditServices,
+    reserved,
+    reserved,
+    reserved,
+    @WXSPARKLE_EXAMPLE_PREFERRED_SIZE@ * 1024 * 1024,   /* preferred size */
+    @WXSPARKLE_EXAMPLE_MINIMUM_SIZE@ * 1024 * 1024    /* minimum size */
+};
+
+resource 'vers' (1) {
+    0x01, 0x00, release, 0x00,
+    verUS,
+    "1.0",
+    "1.0, wxSparkle Example"
+};

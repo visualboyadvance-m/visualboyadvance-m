@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: winsparkle\n"
+"POT-Creation-Date: 2019-10-06 14:19+0200\n"
+"PO-Revision-Date: 2025-06-24 15:52\n"
+"Last-Translator: Václav Slavík <vaclav@slavik.io>\n"
+"Language-Team: Uzbek\n"
+"Language: uz_UZ\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: src\n"
+"X-Crowdin-Project: winsparkle\n"
+"X-Crowdin-Project-ID: 82678\n"
+"X-Crowdin-Language: uz\n"
+"X-Crowdin-File: winsparkle.pot\n"
+"X-Crowdin-File-ID: 57\n"
+
+#: src/ui.cpp:325 src/ui.cpp:668 src/ui.cpp:684
+msgid "Software Update"
+msgstr "Dasturni yangilash"
+
+#: src/ui.cpp:513
+msgid "Release notes:"
+msgstr "Nima yangi:"
+
+#: src/ui.cpp:539
+msgid "Skip this version"
+msgstr "Bu versiyani oʻtkazib yuborish"
+
+#: src/ui.cpp:545
+msgid "Remind me later"
+msgstr "Keyinroq eslat"
+
+#: src/ui.cpp:550 src/ui.cpp:563
+msgid "Install update"
+msgstr "Yangilanishni oʻrnatish"
+
+#: src/ui.cpp:667
+#, c-format
+msgid "%s cannot be restarted."
+msgstr "%sʼni qayta ishga tushirish mumkin emas."
+
+#: src/ui.cpp:670
+msgid "Make sure that you don't have any unsaved documents and try again."
+msgstr "Saqlanmagan hujjatlaringiz yoʻqligiga ishonch hosil qiling va qayta urinib koʻring."
+
+#: src/ui.cpp:677
+msgid "Launching the installer..."
+msgstr "Oʻrnatuvchi ishga tushirilmoqda..."
+
+#: src/ui.cpp:683
+msgid "Failed to launch the installer."
+msgstr "Oʻrnatuvchini ishga tushirib boʻlmadi."
+
+#: src/ui.cpp:726
+msgid "Checking for updates..."
+msgstr "Yangilanishlar tekshirilmoqda..."
+
+#: src/ui.cpp:728 src/ui.cpp:809 src/ui.cpp:897
+msgid "Cancel"
+msgstr "Bekor qilish"
+
+#: src/ui.cpp:754
+msgid "You're up to date!"
+msgstr "Sizniki eng yangisi!"
+
+#: src/ui.cpp:761
+#, c-format
+msgid "%s %s is currently the newest version available."
+msgstr "%s %s hozirda mavjud eng yangi versiya."
+
+#: src/ui.cpp:774
+msgid "Close"
+msgstr "Yopish"
+
+#: src/ui.cpp:795
+msgid "Update Error!"
+msgstr "Yangilanishda xatolik yuz berdi!"
+
+#: src/ui.cpp:801
+msgid "An error occurred in retrieving update information; are you connected to the internet? Please try again later."
+msgstr "Yangilanish maʻlumotlarini olishda xatolik yuz berdi; internetga ulanganmisiz? Keyinroq qayta urinib koʻring."
+
+#: src/ui.cpp:804
+msgid "The update is improperly signed."
+msgstr "Yangilanish notoʻgʻri imzolangan."
+
+#: src/ui.cpp:855
+#, c-format
+msgid "A new version of %s is available!"
+msgstr "%s`ni yangi versiyasi mavjud!"
+
+#: src/ui.cpp:858
+msgid "Get update"
+msgstr "Yangilanishni olish"
+
+#: src/ui.cpp:864
+#, c-format
+msgid "%s %s is now available (you have %s). Would you like to download it now?"
+msgstr "%s %s oʻrnatsa boʻladi (sizda %s). Hozir yuklab olmoqchimisiz?"
+
+#: src/ui.cpp:895
+msgid "Downloading update..."
+msgstr "Yangilash yuklanmoqda..."
+
+#. TRANSLATORS: This is the progress of a download, e.g. "3 MB of 12 MB".
+#: src/ui.cpp:923
+#, c-format
+msgid "%s of %s"
+msgstr "%s / %s"
+
+#: src/ui.cpp:960
+msgid "Ready to install."
+msgstr "Oʻrnatishga tayyor."
+
+#: src/ui.cpp:1105
+msgid "Check for updates automatically?"
+msgstr "Yangilanishlar avtomatik tekshirilsinmi?"
+
+#: src/ui.cpp:1115
+#, c-format
+msgid "Should %s automatically check for updates? You can always check for updates manually from the menu."
+msgstr "%s avtomatik tarzda yangilanishlarni tekshirsinmi? Yangilanishlarni oʻzingiz har doim menyudan tekshirisha olasiz."
+
+#: src/ui.cpp:1129
+msgid "Check automatically"
+msgstr "Avtomatik tekshirilsin"
+
+#: src/ui.cpp:1134
+msgid "Don't check"
+msgstr "Tekshirilmasin"
+

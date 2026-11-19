@@ -1,0 +1,216 @@
+Version 0.9.4
+-------------
+
+- Fixed regression where release notes URLs opened in the default browser
+  instead of loading inline in the embedded web view on systems with only
+  legacy MSIE.
+- Added support for Visual Studio 2026.
+
+
+Version 0.9.3
+-------------
+
+- Custom HTTP headers are now also sent when downloading updates (#292).
+- Fixed release notes display when the release notes URL redirects (#294).
+- Fixed winsparkle-tool signing example to use --private-key-file (#290).
+- Updated Croatian translation.
+
+
+Version 0.9.2
+-------------
+
+- Fix incorrect layout with Chinese and Japanese (#261).
+- New and updated translations.
+
+
+Version 0.9.1
+-------------
+
+- Correctly validate public key passed to win_sparkle_set_eddsa_public_key().
+
+
+Version 0.9.0
+-------------
+
+- Added support for EdDSA signatures.
+- Added winsparkle-tool for performing signing operations.
+- Deprecated DSA signatures. They are still supported, but will be removed in
+  a future release and migrating to EdDSA a.s.a.p. is strongly recommended.
+  DSA signing scripts are still included in the repository, but were renamed to
+  legacy_*.bat to indicate their status.
+- WinSparkle has a new updater icon.
+
+
+Version 0.8.3
+-------------
+
+- Fixed <sparkle:minimumSystemVersion> parsing breakage introduced in 0.8.2.
+- Also understand major.minor-build for <sparkle:minimumSystemVersion>.
+
+
+Version 0.8.2
+-------------
+
+- Support major.minor.build versioning scheme in <sparkle:minimumSystemVersion>;
+  previously only much less useful major.minor.servicepack was used.
+- Added support for gzip/deflate-compressed appcasts.
+- Added support for ARM-specific enclosures.
+- Fixed handling of multiple enclosures to correctly pick the most-specific
+  binary available, and to use the latest available app version.
+- Fixed feed parsing to ignore appcast order of items and instead find the
+  highest compatible version.
+- Call cancelled/dismissed callbacks when user closes WinSparkle's window.
+- New and updated translations.
+
+
+Version 0.8.1
+-------------
+
+- Fixed release notes not shown if <sparkle:releaseNotesLink> is malformed
+  and has whitespace around the URL.
+
+
+Version 0.8.0
+-------------
+
+- Added support for modern Edge/WebView2 browser for release notes.
+- Added win_sparkle_set_update_dismissed_callback() and
+  win_sparkle_set_update_postponed_callback() callbacks.
+- Added partiaul support for <sparkle:criticalUpdate> tag.
+- Links in release notes now open in user's default browser as they should.
+- Added support for Visual Studio 2019 and 2022.
+- Added official NuGet package.
+- Added support for ARM64 architecture.
+- This version drops official support for Windows XP. It may still be possible
+  to target it with vs*_xp toolsets, but would probably require at least
+  disabling WebView2. Prebuilt binaries and NuGet package don't support XP.
+
+
+Version 0.7.0
+-------------
+
+- Added support for providing custom HTTP headers when fetch appcast feeds.
+- Added support for overriding WinSparkle config functions.
+- Reduced size of WinSparkle.dll.
+
+
+Version 0.6.0
+-------------
+
+- Added support for validating DSA signatures.
+- Fixes to window placement.
+- Fixed regression in win_sparkle_check_update_without_ui() not checking
+  immediately.
+
+
+Version 0.5.7
+-------------
+
+- Fixed issue with downloads from servers without keep-alive support.
+
+
+Version 0.5.6
+-------------
+
+- Includes security fixes for Expat XML parser (CVE-2017-11742).
+
+
+Version 0.5.5
+-------------
+
+- Fixed regression in initial update checking introduced in 0.5.4.
+
+
+Version 0.5.4
+-------------
+
+- Updates are now checked in background periodically even in applications that
+  are running for a long time.
+- HTTP caching is now disabled more aggressively.
+- Fixed handling of downloads from URLs with query parameters.
+- Includes security fixes for Expat XML parser.
+
+
+Version 0.5.3
+-------------
+
+- Downloads are now cancellable.
+- Fixed an issue with parsing some appcasts (#123).
+- Verify UpdateTempDir's validity before deleting it.
+
+
+Version 0.5.2
+-------------
+
+- Includes security fixes for Expat XML parser.
+
+
+Version 0.5.1
+-------------
+
+- Includes fix for the CVE-2016-0718 vulnerability in Expat XML parser.
+- Added Pascal bindings.
+- Fixes for RTL languages, added Arabic and Hebrew translations.
+
+
+Version 0.5
+-----------
+
+- Added translations support (32 languages are included at the moment).
+- HiDPI support.
+- Updated Expat XML parser to 2.1.1 (security fixes, CVE-2015-1283).
+- Support for minimumSystemVersion and for specifying 32/64 versions.
+- Added win_sparkle_check_update_with_ui_and_install() for forcefully
+  installing available updates.
+- Added more callbacks for various events during updating.
+- Misc cosmetic fixes.
+
+
+Version 0.4
+-----------
+
+- Added API for gracefully shutting down the host app.
+- Added the ability to disable automatic checks.
+- Added the ability to change the update checks interval.
+- Added x64 support.
+- Added Visual Studio 201x project files.
+- Release notes included in appcast's <description> element are now recognized.
+- Added support for build numbers and shortVersionString.
+- Added support for sparkle:os="windows" attribute on appcast items.
+- Fixed appcasts over HTTPS.
+- Use application icon in the UI.
+- In-app downloads.
+
+
+Version 0.3
+-----------
+
+- Added win_sparkle_set_app_details() for setting app metadata from code,
+  as an alternative to their extraction from resources.
+- It is no longer necessary to call win_sparkle_set_appcast_url(), the
+  feed can be specified in FeedURL resource with type set to APPCAST.
+- Added win_sparkle_set_registry_path().
+
+
+Version 0.2
+-----------
+
+- Display error if update info couldn't be retrieved while manually checking
+  for updates.
+- WinSparkle window is now resizable only when showing release notes.
+- Bypass cache and proxies in manual checks.
+
+
+Version 0.1.1
+-------------
+
+- Fixed Sparkle namespace in appcast parser; it now looks for the correct
+  `http://www.andymatuschak.org/xml-namespaces/sparkle` value. Appcasts
+  using the incorrect `http://www.andymatuschak.org/xml-namespaces`
+  URI must be updated.
+
+
+Version 0.1
+-----------
+
+- Initial release.

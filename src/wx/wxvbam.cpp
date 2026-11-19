@@ -1554,6 +1554,12 @@ int wxvbamApp::OnExit()
     // the proxy is destroyed.
     rpi_proxy::RpiProxyClient::ReleaseSharedInstance();
 #endif
+
+#ifndef NO_ONLINEUPDATES
+    // While wxWidgets is still up: wxSparkle's UI and threads use it.
+    shutdownAutoupdater();
+#endif
+
     return wxApp::OnExit();
 }
 
@@ -1819,10 +1825,6 @@ wxvbamApp::~wxvbamApp() {
         free(home);
         home = NULL;
     }
-
-#ifndef NO_ONLINEUPDATES
-    shutdownAutoupdater();
-#endif
 }
 
 wxEvtHandler* wxvbamApp::event_handler() {

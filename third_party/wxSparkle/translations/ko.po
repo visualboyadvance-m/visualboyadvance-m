@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: winsparkle\n"
+"POT-Creation-Date: 2019-10-06 14:19+0200\n"
+"PO-Revision-Date: 2024-12-02 18:00\n"
+"Last-Translator: Václav Slavík <vaclav@slavik.io>\n"
+"Language-Team: Korean\n"
+"Language: ko_KR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: src\n"
+"X-Crowdin-Project: winsparkle\n"
+"X-Crowdin-Project-ID: 82678\n"
+"X-Crowdin-Language: ko\n"
+"X-Crowdin-File: winsparkle.pot\n"
+"X-Crowdin-File-ID: 57\n"
+
+#: src/ui.cpp:325 src/ui.cpp:668 src/ui.cpp:684
+msgid "Software Update"
+msgstr "소프트웨어 업데이트"
+
+#: src/ui.cpp:513
+msgid "Release notes:"
+msgstr "릴리즈 정보:"
+
+#: src/ui.cpp:539
+msgid "Skip this version"
+msgstr "이 버전 건너뛰기"
+
+#: src/ui.cpp:545
+msgid "Remind me later"
+msgstr "나중에 알림"
+
+#: src/ui.cpp:550 src/ui.cpp:563
+msgid "Install update"
+msgstr "업데이트 설치"
+
+#: src/ui.cpp:667
+#, c-format
+msgid "%s cannot be restarted."
+msgstr "%s을(를) 다시 시작할 수 없습니다."
+
+#: src/ui.cpp:670
+msgid "Make sure that you don't have any unsaved documents and try again."
+msgstr "저장하지 않은 문서가 있는지 확인하시고 다시 시도하십시오."
+
+#: src/ui.cpp:677
+msgid "Launching the installer..."
+msgstr "설치 프로그램 시작 중..."
+
+#: src/ui.cpp:683
+msgid "Failed to launch the installer."
+msgstr "설치 프로그램 실행에 실패했습니다."
+
+#: src/ui.cpp:726
+msgid "Checking for updates..."
+msgstr "업데이트 확인 중..."
+
+#: src/ui.cpp:728 src/ui.cpp:809 src/ui.cpp:897
+msgid "Cancel"
+msgstr "취소"
+
+#: src/ui.cpp:754
+msgid "You're up to date!"
+msgstr "최신 버전을 사용 중입니다!"
+
+#: src/ui.cpp:761
+#, c-format
+msgid "%s %s is currently the newest version available."
+msgstr "%s %s은(는) 이미 사용중인 최신 버전입니다."
+
+#: src/ui.cpp:774
+msgid "Close"
+msgstr "닫기"
+
+#: src/ui.cpp:795
+msgid "Update Error!"
+msgstr "업데이트 오류!"
+
+#: src/ui.cpp:801
+msgid "An error occurred in retrieving update information; are you connected to the internet? Please try again later."
+msgstr "업데이트 정보를 가져오는 동안 오류가 발생했습니다. 인터넷에 연결하셨습니까? 나중에 다시 시도하십시오."
+
+#: src/ui.cpp:804
+msgid "The update is improperly signed."
+msgstr "업데이트 서명이 올바르지 않습니다."
+
+#: src/ui.cpp:855
+#, c-format
+msgid "A new version of %s is available!"
+msgstr "%s 새 버전이 있습니다!"
+
+#: src/ui.cpp:858
+msgid "Get update"
+msgstr "업데이트 받기"
+
+#: src/ui.cpp:864
+#, c-format
+msgid "%s %s is now available (you have %s). Would you like to download it now?"
+msgstr "%s %s을(를) 사용할 수 있습니다(%s를 사용중). 지금 다운로드하시겠습니까?"
+
+#: src/ui.cpp:895
+msgid "Downloading update..."
+msgstr "업데이트 다운로드 중..."
+
+#. TRANSLATORS: This is the progress of a download, e.g. "3 MB of 12 MB".
+#: src/ui.cpp:923
+#, c-format
+msgid "%s of %s"
+msgstr "%2$s중 %1$s"
+
+#: src/ui.cpp:960
+msgid "Ready to install."
+msgstr "설치 준비가 끝났습니다."
+
+#: src/ui.cpp:1105
+msgid "Check for updates automatically?"
+msgstr "업데이트를 자동으로 확인할까요?"
+
+#: src/ui.cpp:1115
+#, c-format
+msgid "Should %s automatically check for updates? You can always check for updates manually from the menu."
+msgstr "%s에서 자동으로 업데이트를 확인할까요? 메뉴에서 언제든지 직접 업데이트를 확인할 수 있습니다."
+
+#: src/ui.cpp:1129
+msgid "Check automatically"
+msgstr "자동으로 확인"
+
+#: src/ui.cpp:1134
+msgid "Don't check"
+msgstr "확인하지 않음"
+

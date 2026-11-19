@@ -1,0 +1,8 @@
+/* ELF version script: only export the public API from the shared library,
+   not symbols of statically linked dependencies (wxWidgets, OpenSSL, ...). */
+{
+    global:
+        win_sparkle_*;
+    local:
+        *;
+};

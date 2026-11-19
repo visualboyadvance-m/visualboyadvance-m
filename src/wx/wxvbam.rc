@@ -15,8 +15,9 @@ AAAAA_MAINICON ICON "icons/visualboyadvance-m.ico"
 #define VER_PRODUCTVERSION	VER_FILEVERSION
 #define VER_PRODUCTVERSION_STR	VER_FILEVERSION_STR
 
-#ifndef NO_ONLINEUPDATES
+#if !defined(NO_ONLINEUPDATES) && !defined(VBAM_WXSPARKLE)
 
+/* The WinSparkle DLL, with ENABLE_WXSPARKLE=OFF (wxSparkle is linked in). */
 #include "autoupdater/wxmsw/winsparkle-rc.h"
 
 #ifdef __i386__

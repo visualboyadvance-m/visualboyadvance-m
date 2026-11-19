@@ -43,6 +43,10 @@ make -j$(nproc)
 - `ENABLE_DEBUGGER`: Enable the debugger (default: ON)
 - `ENABLE_LINK`: Enable GBA linking functionality (default: AUTO)
 - `ENABLE_FFMPEG`: Enable ffmpeg A/V recording (default: AUTO)
+- `ENABLE_ONLINEUPDATES`: "Check for updates" in the wx port (default: OFF,
+  ON with `UPSTREAM_RELEASE`; never on Android)
+- `ENABLE_WXSPARKLE`: use wxSparkle for it (default: ON); OFF falls back to
+  the WinSparkle DLL (Windows) / Sparkle.framework (macOS)
 - `BUILD_TESTING`: Build tests and enable ctest support (default: ON)
 - `ENABLE_ASAN`: Enable libasan sanitizers (debug mode only, default: OFF)
 
@@ -65,6 +69,20 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
 - Main GUI application with cross-platform support
 - Platform-specific renderers (OpenGL, Metal on macOS, etc.)
 - Handles configuration, input, and display
+- Online updater (`ENABLE_ONLINEUPDATES`): wxSparkle, the wxWidgets port of
+  WinSparkle, vendored in `third_party/wxSparkle` (from
+  github.com/andyvand/wxSparkle) and linked statically on every platform,
+  Retro68 included (not together with `ENABLE_LINK` there: both define the
+  BSD socket API over MacTCP; on PPC the sysroot's libcurl/OpenSSL, built
+  without `-mminimal-toc`, overflow the 64 KB TOC by ~1.5 KB, so they must be
+  rebuilt with it first). `src/wx/CMakeLists.txt` hands it the app's own
+  wxWidgets as `WXSPARKLE_WX_TARGET` and turns off its install, example, tool
+  and tests; it needs libcurl >= 7.77 and expat. Glue in
+  `src/wx/autoupdater/wxsparkle/autoupdater.cpp` (feed
+  `data.visualboyadvance-m.org/appcast.xml`, company/app
+  `visualboyadvance-m`/`VisualBoyAdvance-M`, so WinSparkle's registry
+  settings carry over; `VBAM_UPDATER_EDDSA_PUBLIC_KEY` turns on signature
+  checks); `shutdownAutoupdater()` runs in `OnExit()` while wx is still up
 
 **src/sdl/** - SDL-based frontend (command-line/minimal GUI)
 - Lightweight alternative to wxWidgets

@@ -1,0 +1,54 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# dependencies of the static library
+if(NOT @BUILD_SHARED_LIBS@)
+    if(@WXSPARKLE_RETRO68@)
+        # Retro68's toolchain files don't confine find_*() to the sysroot, so
+        # the host's packages (e.g. libcurl in /usr/local) could be found
+        # instead of the sysroot's ones: do it while looking for them.
+        set(_wxsparkle_saved_root_path "${CMAKE_FIND_ROOT_PATH}")
+        foreach(_wxsparkle_mode LIBRARY INCLUDE PACKAGE)
+            set(_wxsparkle_saved_mode_${_wxsparkle_mode} "${CMAKE_FIND_ROOT_PATH_MODE_${_wxsparkle_mode}}")
+            set(CMAKE_FIND_ROOT_PATH_MODE_${_wxsparkle_mode} ONLY)
+        endforeach()
+        list(APPEND CMAKE_FIND_ROOT_PATH "@WXSPARKLE_RETRO68_SYSROOT@")
+        # same for pkg-config (used by FindCURL)
+        set(_wxsparkle_saved_pc_libdir "$ENV{PKG_CONFIG_LIBDIR}")
+        set(ENV{PKG_CONFIG_LIBDIR} "@WXSPARKLE_RETRO68_SYSROOT@/lib/pkgconfig:@WXSPARKLE_RETRO68_SYSROOT@/share/pkgconfig")
+    endif()
+
+    find_dependency(Threads)
+    find_dependency(CURL)
+    if(@WXSPARKLE_RETRO68@)
+        # Retro68's libcurl dependencies
+        find_dependency(OpenSSL)
+        find_dependency(ZLIB)
+    endif()
+    find_dependency(EXPAT)
+    if(@WXSPARKLE_HAVE_OPENSSL@)
+        find_dependency(OpenSSL)
+    endif()
+    if(@WXSPARKLE_WX_CMAKE_PACKAGE@)
+        # wxWidgets was found using its CMake package (otherwise, its flags are
+        # in the exported wxSparkle::wxsparkle_wx target)
+        find_dependency(wxWidgets CONFIG)
+    endif()
+
+    if(@WXSPARKLE_RETRO68@)
+        set(CMAKE_FIND_ROOT_PATH "${_wxsparkle_saved_root_path}")
+        set(ENV{PKG_CONFIG_LIBDIR} "${_wxsparkle_saved_pc_libdir}")
+        unset(_wxsparkle_saved_pc_libdir)
+        foreach(_wxsparkle_mode LIBRARY INCLUDE PACKAGE)
+            set(CMAKE_FIND_ROOT_PATH_MODE_${_wxsparkle_mode} "${_wxsparkle_saved_mode_${_wxsparkle_mode}}")
+            unset(_wxsparkle_saved_mode_${_wxsparkle_mode})
+        endforeach()
+        unset(_wxsparkle_saved_root_path)
+        unset(_wxsparkle_mode)
+    endif()
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/wxSparkleTargets.cmake")
+
+check_required_components(wxSparkle)

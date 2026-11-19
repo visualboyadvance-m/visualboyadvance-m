@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: winsparkle\n"
+"POT-Creation-Date: 2019-10-06 14:19+0200\n"
+"PO-Revision-Date: 2024-12-02 18:00\n"
+"Last-Translator: Václav Slavík <vaclav@slavik.io>\n"
+"Language-Team: Dutch\n"
+"Language: nl_NL\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: src\n"
+"X-Crowdin-Project: winsparkle\n"
+"X-Crowdin-Project-ID: 82678\n"
+"X-Crowdin-Language: nl\n"
+"X-Crowdin-File: winsparkle.pot\n"
+"X-Crowdin-File-ID: 57\n"
+
+#: src/ui.cpp:325 src/ui.cpp:668 src/ui.cpp:684
+msgid "Software Update"
+msgstr "Software-update"
+
+#: src/ui.cpp:513
+msgid "Release notes:"
+msgstr "Versie-opmerkingen:"
+
+#: src/ui.cpp:539
+msgid "Skip this version"
+msgstr "Deze versie overslaan"
+
+#: src/ui.cpp:545
+msgid "Remind me later"
+msgstr "Herinner mij later"
+
+#: src/ui.cpp:550 src/ui.cpp:563
+msgid "Install update"
+msgstr "Update installeren"
+
+#: src/ui.cpp:667
+#, c-format
+msgid "%s cannot be restarted."
+msgstr "%s kan niet opnieuw worden gestart."
+
+#: src/ui.cpp:670
+msgid "Make sure that you don't have any unsaved documents and try again."
+msgstr "Zorg ervoor dat u geen niet-opgeslagen documenten hebt en probeer opnieuw."
+
+#: src/ui.cpp:677
+msgid "Launching the installer..."
+msgstr "Het installatieprogramma starten..."
+
+#: src/ui.cpp:683
+msgid "Failed to launch the installer."
+msgstr "Het starten van het installatieprogramma is mislukt."
+
+#: src/ui.cpp:726
+msgid "Checking for updates..."
+msgstr "Controleren op updates..."
+
+#: src/ui.cpp:728 src/ui.cpp:809 src/ui.cpp:897
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: src/ui.cpp:754
+msgid "You're up to date!"
+msgstr "De versie is up-to-date!"
+
+#: src/ui.cpp:761
+#, c-format
+msgid "%s %s is currently the newest version available."
+msgstr "%s %s is momenteel de nieuwste beschikbare versie."
+
+#: src/ui.cpp:774
+msgid "Close"
+msgstr "Sluiten"
+
+#: src/ui.cpp:795
+msgid "Update Error!"
+msgstr "Updatefout!"
+
+#: src/ui.cpp:801
+msgid "An error occurred in retrieving update information; are you connected to the internet? Please try again later."
+msgstr "Er is een fout opgetreden bij het ophalen van updategegevens; bent u verbonden met het internet? Probeer het later nog eens."
+
+#: src/ui.cpp:804
+msgid "The update is improperly signed."
+msgstr "De digitale handtekening van de update is onjuist."
+
+#: src/ui.cpp:855
+#, c-format
+msgid "A new version of %s is available!"
+msgstr "Er is een nieuwe versie van %s beschikbaar!"
+
+#: src/ui.cpp:858
+msgid "Get update"
+msgstr "Update ophalen"
+
+#: src/ui.cpp:864
+#, c-format
+msgid "%s %s is now available (you have %s). Would you like to download it now?"
+msgstr "%s %s is nu beschikbaar (u hebt %s). Wilt u deze update nu downloaden?"
+
+#: src/ui.cpp:895
+msgid "Downloading update..."
+msgstr "Update downloaden..."
+
+#. TRANSLATORS: This is the progress of a download, e.g. "3 MB of 12 MB".
+#: src/ui.cpp:923
+#, c-format
+msgid "%s of %s"
+msgstr "%s van %s"
+
+#: src/ui.cpp:960
+msgid "Ready to install."
+msgstr "Klaar om te installeren."
+
+#: src/ui.cpp:1105
+msgid "Check for updates automatically?"
+msgstr "Automatisch controleren op updates?"
+
+#: src/ui.cpp:1115
+#, c-format
+msgid "Should %s automatically check for updates? You can always check for updates manually from the menu."
+msgstr "Moet %s automatisch controleren op updates? U kunt altijd handmatig vanuit het menu controleren op updates."
+
+#: src/ui.cpp:1129
+msgid "Check automatically"
+msgstr "Automatisch controleren"
+
+#: src/ui.cpp:1134
+msgid "Don't check"
+msgstr "Niet controleren"
+

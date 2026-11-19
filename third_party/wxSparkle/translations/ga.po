@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: winsparkle\n"
+"POT-Creation-Date: 2019-10-06 14:19+0200\n"
+"PO-Revision-Date: 2024-12-02 18:00\n"
+"Last-Translator: Václav Slavík <vaclav@slavik.io>\n"
+"Language-Team: Irish\n"
+"Language: ga_IE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2.4\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: src\n"
+"X-Crowdin-Project: winsparkle\n"
+"X-Crowdin-Project-ID: 82678\n"
+"X-Crowdin-Language: ga-IE\n"
+"X-Crowdin-File: winsparkle.pot\n"
+"X-Crowdin-File-ID: 57\n"
+
+#: src/ui.cpp:325 src/ui.cpp:668 src/ui.cpp:684
+msgid "Software Update"
+msgstr "Nuashonrú bogearraí"
+
+#: src/ui.cpp:513
+msgid "Release notes:"
+msgstr "Nótaí eisiúna:"
+
+#: src/ui.cpp:539
+msgid "Skip this version"
+msgstr "Ná bac leis an leagan seo"
+
+#: src/ui.cpp:545
+msgid "Remind me later"
+msgstr "Meabhraigh dom níos déanaí"
+
+#: src/ui.cpp:550 src/ui.cpp:563
+msgid "Install update"
+msgstr "Suiteáil an nuashonrú"
+
+#: src/ui.cpp:667
+#, c-format
+msgid "%s cannot be restarted."
+msgstr "Ní féidir %s a atosú."
+
+#: src/ui.cpp:670
+msgid "Make sure that you don't have any unsaved documents and try again."
+msgstr "Deimhnigh nach bhfuil aon cháipéisí gan sábháil agat agus bain triail eile as."
+
+#: src/ui.cpp:677
+msgid "Launching the installer..."
+msgstr "Suiteálaí á thosú..."
+
+#: src/ui.cpp:683
+msgid "Failed to launch the installer."
+msgstr "Níorbh fhéidir an suiteálaí a thosú."
+
+#: src/ui.cpp:726
+msgid "Checking for updates..."
+msgstr "Nuashonruithe á lorg..."
+
+#: src/ui.cpp:728 src/ui.cpp:809 src/ui.cpp:897
+msgid "Cancel"
+msgstr "Cealaigh"
+
+#: src/ui.cpp:754
+msgid "You're up to date!"
+msgstr "Tá tú cothrom le dáta!"
+
+#: src/ui.cpp:761
+#, c-format
+msgid "%s %s is currently the newest version available."
+msgstr "Is é %s %s an leagan is déanaí atá ar fáil faoi láthair."
+
+#: src/ui.cpp:774
+msgid "Close"
+msgstr "Dún"
+
+#: src/ui.cpp:795
+msgid "Update Error!"
+msgstr "Earráid leis an nuashonrú!"
+
+#: src/ui.cpp:801
+msgid "An error occurred in retrieving update information; are you connected to the internet? Please try again later."
+msgstr "Tharla earráid agus faisnéis nuashonraithe á fáil; an bhfuil tú ceangailte leis an Idirlíon? Bain triail eile as ar ball."
+
+#: src/ui.cpp:804
+msgid "The update is improperly signed."
+msgstr "Síniú mícheart ar an nuashonrú seo."
+
+#: src/ui.cpp:855
+#, c-format
+msgid "A new version of %s is available!"
+msgstr "Tá leagan nua de %s ar fáil!"
+
+#: src/ui.cpp:858
+msgid "Get update"
+msgstr "Faigh an leagan nua"
+
+#: src/ui.cpp:864
+#, c-format
+msgid "%s %s is now available (you have %s). Would you like to download it now?"
+msgstr "Tá %s %s ar fáil anois (tá %s agat). An bhfuil fonn ort é a íoslódáil anois?"
+
+#: src/ui.cpp:895
+msgid "Downloading update..."
+msgstr "Nuashonrú á íoslódáil..."
+
+#. TRANSLATORS: This is the progress of a download, e.g. "3 MB of 12 MB".
+#: src/ui.cpp:923
+#, c-format
+msgid "%s of %s"
+msgstr "%s as %s"
+
+#: src/ui.cpp:960
+msgid "Ready to install."
+msgstr "Réidh le suiteáil."
+
+#: src/ui.cpp:1105
+msgid "Check for updates automatically?"
+msgstr "Lorg nuashonruithe go huathoibríoch?"
+
+#: src/ui.cpp:1115
+#, c-format
+msgid "Should %s automatically check for updates? You can always check for updates manually from the menu."
+msgstr "Ar mhaith leat go lorgódh %s nuashonruithe go huathoibríoch? Cuimhnigh gur féidir leatsa nuashonruithe a lorg de láimh sa roghchlár."
+
+#: src/ui.cpp:1129
+msgid "Check automatically"
+msgstr "Lorg go huathoibríoch"
+
+#: src/ui.cpp:1134
+msgid "Don't check"
+msgstr "Ná lorg"
+

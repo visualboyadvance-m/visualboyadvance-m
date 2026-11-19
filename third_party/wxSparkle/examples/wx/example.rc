@@ -1,0 +1,38 @@
+// Windows resources of the example application. wxSparkle reads the
+// application name, version and vendor from VERSIONINFO if they aren't set
+// with win_sparkle_set_app_details(), and the feed URL from the "FeedURL"
+// APPCAST resource if win_sparkle_set_appcast_url() isn't called.
+
+#include <winver.h>
+
+AppIcon ICON "../../artwork/WinSparkle.ico"
+
+#include "wx/msw/wx.rc"
+
+FeedURL APPCAST {"https://winsparkle.org/example/appcast.xml"}
+
+1 VERSIONINFO
+ FILEVERSION     1,0,0,0
+ PRODUCTVERSION  1,0,0,0
+ FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+ FILEFLAGS       0
+ FILEOS          VOS_NT_WINDOWS32
+ FILETYPE        VFT_APP
+ FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "wxSparkle\0"
+            VALUE "FileDescription", "wxSparkle Example\0"
+            VALUE "FileVersion", "1.0\0"
+            VALUE "ProductName", "wxSparkle Example\0"
+            VALUE "ProductVersion", "1.0\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 0x04B0
+    END
+END

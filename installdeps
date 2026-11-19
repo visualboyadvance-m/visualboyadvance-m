@@ -234,7 +234,7 @@ freebsd_installdeps() {
     # wayland-protocols carries the color-management XML that wayland-scanner
     # turns into the HDR client glue, and wayland carries the scanner itself
     # and libwayland-client.  Without them Wayland HDR is configured out.
-    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja glslang shaderc wayland wayland-protocols vulkan-headers vulkan-loader"
+    pkgs="llvm-devel cmake ccache nasm FAudio-sdl3 gettext-tools gettext pkgconf sdl3 $wx_pkg iconv zip ninja curl expat glslang shaderc wayland wayland-protocols vulkan-headers vulkan-loader"
 
     [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal-soft"
@@ -399,7 +399,7 @@ debian_installdeps() {
         # XML.  Debian keeps wayland-scanner out of the headers package, in
         # libwayland-bin, but libwayland-dev depends on it, so naming the -dev
         # package brings the scanner along.
-        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib glslang-tools glslc libwayland-dev wayland-protocols libvulkan-dev"
+        pkgs="build-essential g++ nasm cmake ccache gettext zlib1g-dev libgl1-mesa-dev libgettextpo-dev $sdl_lib libglu1-mesa-dev libglu1-mesa libgles2-mesa-dev $glew_lib $wx_libs libcurl4-openssl-dev libexpat1-dev libgtk2.0-dev libgtk-3-dev ccache zip ninja-build $faudio_lib glslang-tools glslc libwayland-dev wayland-protocols libvulkan-dev"
 
         [ -n "$ENABLE_FFMPEG" ] && pkgs="$pkgs libavcodec-dev libavformat-dev libswscale-dev libavutil-dev $libswresample_dev libx264-dev libx265-dev"
         [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs libopenal-dev"
@@ -762,7 +762,7 @@ fedora_installdeps() {
     if [ -z "$target" -o "$target" = m32 ]; then
         # try to install both 64 bit and 32 bit versions on 64 bit hosts (see below)
         for pkg in "$zlib" mesa-libGL-devel "$ffmpeg" $ffmpeg_codecs lua-devel \
-                   vulkan-loader-devel gettext-devel SDL3-devel "$openal" \
+                   vulkan-loader-devel gettext-devel SDL3-devel "$openal" libcurl-devel expat-devel \
                    "$wx" gtk3-devel; do
             # $ffmpeg is empty when ffmpeg is disabled or unavailable, $openal
             # when --no-openal was passed
@@ -899,7 +899,7 @@ suse_installdeps() {
     # itself and libwayland-client.  Without them Wayland HDR is configured out.
     tools="make cmake ccache nasm gettext-tools pkg-config ccache zip ninja glslang-devel shaderc wayland-devel wayland-protocols-devel"
 
-    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel vulkan-headers vulkan-devel"
+    libs="gcc gcc-c++ SDL3-devel wxGTK3-3_2-devel vulkan-headers vulkan-devel libcurl-devel libexpat-devel"
 
     # See build_vcpkg_deps().  openSUSE differs from Fedora in three names: GLU
     # is glu-devel, EGL is Mesa-libEGL-devel (capital M), and IPC::Cmd, FindBin
@@ -991,7 +991,7 @@ archlinux_installdeps() {
 
     $pacman -Q gtk3-classic >/dev/null 2>&1 && gtk=gtk3-classic
 
-    libs="zlib mesa gettext sdl3 wxgtk3 $gtk vulkan-headers vulkan-icd-loader"
+    libs="zlib mesa gettext sdl3 wxgtk3 $gtk vulkan-headers vulkan-icd-loader curl expat"
 
     [ -n "$ENABLE_FFMPEG" ] && libs="$libs ffmpeg"
     [ -n "$ENABLE_OPENAL" ] && libs="$libs openal"
@@ -1195,6 +1195,8 @@ gentoo_installdeps() {
       sys-devel/binutils \
       media-libs/libsdl3 \
       x11-libs/wxGTK:$wx_slot \
+      net-misc/curl \
+      dev-libs/expat \
       sys-libs/zlib \
       dev-util/pkgconf \
       dev-lang/nasm \
@@ -1252,7 +1254,7 @@ windows_installdeps() {
             ;;
     esac
 
-    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache glslang shaderc vulkan-headers vulkan-loader"
+    pkgs="$pkgs sdl3 wxwidgets3.2-msw wxwidgets3.2-msw-libs wxwidgets3.2-common zlib curl expat binutils cmake crt-git headers-git make pkgconf tools-git windows-default-manifest libmangle-git ninja gdb ccache glslang shaderc vulkan-headers vulkan-loader"
 
     [ -n "$ENABLE_OPENAL" ] && pkgs="$pkgs openal"
 

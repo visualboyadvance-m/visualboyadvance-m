@@ -1906,6 +1906,7 @@ list(APPEND VBAM_LOCALIZABLE_FILES
     autoupdater/wxmsw/winsparkle-rc.h
     autoupdater/wxmsw/winsparkle-wrapper.cpp
     autoupdater/wxmsw/winsparkle-wrapper.h
+    autoupdater/wxsparkle/autoupdater.cpp
     widgets/dpi-support.cpp
     widgets/dpi-support-mac.mm
     ${CMAKE_SOURCE_DIR}/src/core/gba/gbaLink.cpp
@@ -1916,7 +1917,63 @@ if(APPLE)
     set(CMAKE_INSTALL_RPATH "@loader_path/../Frameworks")
 endif()
 
-if(WIN32 AND (X86_64 OR ARM64 OR X86) AND ENABLE_ONLINEUPDATES)
+# The online updater: wxSparkle (third_party/wxSparkle) on every platform,
+# statically linked and built against the same wxWidgets as the application.
+if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
+    if(RETRO68 AND ENABLE_LINK)
+        # Retro68's libcurl networks through libmactcp, whose BSD socket
+        # functions (socket, connect, select, ...) are also defined by the
+        # bundled SFML's MacTCP layer that the link uses.
+        message(FATAL_ERROR "On classic Mac OS, wxSparkle (ENABLE_ONLINEUPDATES) and ENABLE_LINK both define the BSD socket API over MacTCP; turn one of them off.")
+    endif()
+
+    # wxSparkle takes this instead of looking for wxWidgets itself.
+    add_library(vbam-wxsparkle-wx INTERFACE)
+    target_include_directories(vbam-wxsparkle-wx BEFORE INTERFACE ${wxWidgets_INCLUDE_DIRS})
+    target_compile_definitions(vbam-wxsparkle-wx INTERFACE ${wxWidgets_DEFINITIONS})
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_definitions(vbam-wxsparkle-wx INTERFACE ${wxWidgets_DEFINITIONS_DEBUG})
+    endif()
+    if(wxWidgets_CXX_FLAGS)
+        set(_wxsparkle_wx_flags ${wxWidgets_CXX_FLAGS})
+        list(FILTER _wxsparkle_wx_flags EXCLUDE REGEX "^-[ID]")
+        target_compile_options(vbam-wxsparkle-wx INTERFACE ${_wxsparkle_wx_flags})
+        unset(_wxsparkle_wx_flags)
+    endif()
+    target_link_libraries(vbam-wxsparkle-wx INTERFACE ${wxWidgets_LIBRARIES})
+
+    set(WXSPARKLE_WX_TARGET      vbam-wxsparkle-wx)
+    set(BUILD_SHARED_LIBS        OFF)
+    set(WXSPARKLE_INSTALL        OFF)
+    set(WXSPARKLE_BUILD_EXAMPLE  OFF)
+    set(WXSPARKLE_BUILD_TOOL     OFF)
+    set(WXSPARKLE_BUILD_TESTS    OFF)
+    # The feed has EdDSA signatures or none; legacy DSA would need OpenSSL.
+    set(WXSPARKLE_WITH_DSA       OFF)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/wxSparkle
+                     ${CMAKE_BINARY_DIR}/third_party/wxSparkle EXCLUDE_FROM_ALL)
+    foreach(_wxsparkle_var WXSPARKLE_WX_TARGET BUILD_SHARED_LIBS WXSPARKLE_INSTALL
+            WXSPARKLE_BUILD_EXAMPLE WXSPARKLE_BUILD_TOOL WXSPARKLE_BUILD_TESTS WXSPARKLE_WITH_DSA)
+        unset(${_wxsparkle_var})
+    endforeach()
+    unset(_wxsparkle_var)
+
+    target_sources(visualboyadvance-m PRIVATE
+        autoupdater/autoupdater.h
+        autoupdater/wxsparkle/autoupdater.cpp)
+    target_link_libraries(visualboyadvance-m wxSparkle::wxsparkle)
+    target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WXSPARKLE)
+
+    # Base64 EdDSA public key (winsparkle-tool generate-key) that the update
+    # files must be signed with; empty accepts unsigned feeds, as before.
+    set(VBAM_UPDATER_EDDSA_PUBLIC_KEY "" CACHE STRING "EdDSA public key for verifying online updates")
+    if(VBAM_UPDATER_EDDSA_PUBLIC_KEY)
+        target_compile_definitions(visualboyadvance-m PRIVATE
+            "VBAM_UPDATER_EDDSA_PUBLIC_KEY=\"${VBAM_UPDATER_EDDSA_PUBLIC_KEY}\"")
+    endif()
+endif()
+
+if(WIN32 AND (X86_64 OR ARM64 OR X86) AND ENABLE_ONLINEUPDATES AND NOT ENABLE_WXSPARKLE)
     if(NOT DEFINED WINSPARKLE_BIN_RELEASE_DIR)
         set(WINSPARKLE_BIN_RELEASE_DIR ${CMAKE_SOURCE_DIR}/win32-deps/WinSparkle-0.9.1)
     endif()
@@ -1947,7 +2004,7 @@ if(WIN32 AND (X86_64 OR ARM64 OR X86) AND ENABLE_ONLINEUPDATES)
     configure_file(autoupdater/wxmsw/winsparkle-path.h.in ${CMAKE_SOURCE_DIR}/src/wx/winsparkle-path.h)
 endif()
 
-if(APPLE AND ENABLE_ONLINEUPDATES)
+if(APPLE AND ENABLE_ONLINEUPDATES AND NOT ENABLE_WXSPARKLE)
     include(FetchContent)
     FetchContent_Declare(Sparkle
         URL "https://github.com/andyvand/Sparkle/releases/download/Release/Sparkle-2.7.1-MacOSX10.10.tar.xz"

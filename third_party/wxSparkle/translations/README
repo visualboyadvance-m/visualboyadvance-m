@@ -1,0 +1,8 @@
+
+WinSparkle translations are managed at Crowdin and the best way to contribute
+translations is to do it over there:
+
+    https://crowdin.com/project/winsparkle
+
+(Note that you can download the PO file, edit it in Poedit and upload back; you
+don't have to use the web interface.)

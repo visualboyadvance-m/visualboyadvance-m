@@ -666,17 +666,29 @@ else()
     vbam_disable_option_without_gui(ENABLE_FFMPEG)
 endif()
 
-# Online Updates (WinSparkle/Sparkle), a wx port feature.
+# Online Updates, a wx port feature. The updater is wxSparkle
+# (third_party/wxSparkle, the wxWidgets port of WinSparkle, linked statically
+# on every platform: libcurl with an embedded CA bundle, and expat). With
+# ENABLE_WXSPARKLE=OFF the older backends are used instead: the WinSparkle DLL
+# from win32-deps on Windows and Sparkle.framework on macOS; other platforms
+# have none. Not on Android, whose APK is updated by its store.
 set(ONLINEUPDATES_DEFAULT OFF)
-if(DEFINED(UPSTREAM_RELEASE) AND UPSTREAM_RELEASE)
+# (On classic Mac OS only without the link: see src/wx/CMakeLists.txt.)
+if(UPSTREAM_RELEASE AND NOT (VBAM_TARGET_RETRO68 AND ENABLE_LINK))
     set(ONLINEUPDATES_DEFAULT ON)
 endif()
-if(ENABLE_WX)
+if(ENABLE_WX AND NOT VBAM_TARGET_ANDROID)
     option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
+    option(ENABLE_WXSPARKLE "Use wxSparkle for online updates (OFF: WinSparkle DLL / Sparkle.framework)" ON)
 else()
     set(ENABLE_ONLINEUPDATES OFF)
+    set(ENABLE_WXSPARKLE OFF)
 endif()
-option(HTTPS "Use https URL for winsparkle" ON)
+if(ENABLE_ONLINEUPDATES AND NOT ENABLE_WXSPARKLE AND NOT (WIN32 OR APPLE))
+    message(WARNING "Online updates without wxSparkle are only available on Windows and macOS. Disabling them.")
+    set(ENABLE_ONLINEUPDATES OFF)
+endif()
+option(HTTPS "Use https URL for the update feed" ON)
 
 # We generally don't want LTO when debugging because it makes linking slow.
 # Retro68's 68k and PEF back ends are not LTO-tested; keep it off there.

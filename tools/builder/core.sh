@@ -157,6 +157,8 @@ DISTS=$DISTS'
     pcre2           https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.49/pcre2-10.49.tar.bz2     lib/libpcre2-posix.a
     libffi          https://github.com/libffi/libffi/releases/download/v3.8.0/libffi-3.8.0.tar.gz               lib/libffi.a
     expat           https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz           lib/libexpat.a
+    openssl         https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz     lib/libssl.a
+    curl            https://curl.se/download/curl-8.17.0.tar.xz                                                 lib/libcurl.a
     libxml2         https://gitlab.gnome.org/GNOME/libxml2/-/archive/v2.15.4/libxml2-v2.15.4.tar.bz2            lib/libxml2.a
     libpng          https://sourceforge.net/projects/libpng/files/libpng16/1.6.59/libpng-1.6.59.tar.xz          lib/libpng.a
     libjpeg-turbo   https://github.com/libjpeg-turbo/libjpeg-turbo/archive/3.2.1.tar.gz                         lib/libjpeg.a
@@ -358,7 +360,7 @@ DIST_ARGS="$DIST_ARGS
     pkgconf     --disable-tests
     libdeflate  -DLIBDEFLATE_BUILD_STATIC_LIB=TRUE -DLIBDEFLATE_BUILD_SHARED_LIB=FALSE
     libpsl      -Druntime=no -Dtests=false
-    curl        --with-openssl --without-nghttp2 --without-libidn2 --without-librtmp --without-brotli
+    curl        --with-openssl --without-nghttp2 --without-libidn2 --without-librtmp --without-brotli --without-libpsl --disable-ldap --disable-ldaps
     libffi      --enable-static
     libicu      --enable-static --disable-extras --disable-tools --disable-tests --disable-samples --with-library-bits=64 CXXFLAGS=\"\$CXXFLAGS\"
     gettext     --with-included-gettext --with-included-glib --with-included-libcroco --with-included-libunistring --with-included-libxml --disable-curses CPPFLAGS=\"\$CPPFLAGS -DLIBXML_STATIC\"
