@@ -175,6 +175,65 @@ if(ENABLE_FFMPEG)
         unset(vbam_ffmpeg_iface)
     endif()
 
+    # x265 names the C++ runtime in its pkg-config Libs, and every ffmpeg
+    # module that depends on it repeats the names:
+    #
+    #   Libs: "-L${libdir}" -lx265 -lstdc++ -lgcc_s -lgcc_s -ladvapi32
+    #
+    # pkg_check_modules keeps the ones it cannot resolve to a file as plain
+    # names in the imported target's interface, so they reach the link line as
+    # -lstdc++ -lgcc_s. An explicit -lgcc_s wins over -static-libgcc, which is
+    # a driver option and not a linker one, and MinGW's libgcc_s.a is the
+    # import library for libgcc_s_sjlj-1.dll: the static build then needs a
+    # MinGW runtime DLL beside it and dies on startup without one, which is
+    # the whole thing -static-libgcc exists to prevent.
+    #
+    # Choosing the C++ runtime belongs to the link driver, which
+    # Toolchain-gcc-clang.cmake has already told to link both halves
+    # statically. Drop the names, from the list and from the interfaces of the
+    # imported targets that carry them.
+    if(VBAM_STATIC AND NOT RETRO68
+            AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+                 OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+        macro(vbam_strip_cxx_runtime list_var context)
+            set(vbam_kept_libs "")
+
+            foreach(vbam_lib_item IN LISTS ${list_var})
+                if(vbam_lib_item MATCHES "^-?l?(gcc_s|gcc_eh|stdc\\+\\+|c\\+\\+)$")
+                    message(STATUS
+                        "ffmpeg: dropping C++ runtime link item from ${context}: ${vbam_lib_item}")
+                else()
+                    list(APPEND vbam_kept_libs "${vbam_lib_item}")
+                endif()
+            endforeach()
+
+            set(${list_var} "${vbam_kept_libs}")
+        endmacro()
+
+        vbam_strip_cxx_runtime(FFMPEG_LIBRARIES "FFMPEG_LIBRARIES")
+
+        foreach(vbam_ffmpeg_lib IN LISTS FFMPEG_LIBRARIES)
+            if(NOT TARGET "${vbam_ffmpeg_lib}")
+                continue()
+            endif()
+
+            get_target_property(vbam_ffmpeg_iface "${vbam_ffmpeg_lib}" INTERFACE_LINK_LIBRARIES)
+
+            if(NOT vbam_ffmpeg_iface)
+                continue()
+            endif()
+
+            vbam_strip_cxx_runtime(vbam_ffmpeg_iface "${vbam_ffmpeg_lib}")
+            set_target_properties("${vbam_ffmpeg_lib}" PROPERTIES
+                INTERFACE_LINK_LIBRARIES "${vbam_ffmpeg_iface}")
+        endforeach()
+
+        unset(vbam_kept_libs)
+        unset(vbam_lib_item)
+        unset(vbam_ffmpeg_lib)
+        unset(vbam_ffmpeg_iface)
+    endif()
+
     if(RETRO68)
         # FindFFmpeg links the Retro68 sysroot's static ffmpeg archives by
         # path and drops the -l dependencies of their .pc files, and static
