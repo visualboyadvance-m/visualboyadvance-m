@@ -45,6 +45,11 @@
 #include <wx/uilocale.h>
 #include <wx/utils.h>
 
+#include <algorithm>
+#include <functional>
+#include <initializer_list>
+#include <vector>
+
 #if WXSPARKLE_USE_WEBVIEW && wxUSE_WEBVIEW
     #include <wx/webview.h>
     #if defined(__WXMSW__) && wxUSE_WEBVIEW_IE
@@ -57,6 +62,18 @@
 
 #if wxUSE_HTML
     #include <wx/html/htmlwin.h>
+#endif
+
+// On a phone or tablet there is no room for a window beside the app's: the
+// dialogs take the app's whole part of the screen, as dialogs do there, and fit
+// their text and buttons to its width instead of to fixed widths. (Can be set
+// from the command line to try that layout out on a computer.)
+#ifndef WXSPARKLE_FILL_SCREEN
+    #if defined(__ANDROID__)
+        #define WXSPARKLE_FILL_SCREEN 1
+    #else
+        #define WXSPARKLE_FILL_SCREEN 0
+    #endif
 #endif
 
 // Generated at build time by cmake/bin2c.cmake:
@@ -345,7 +362,8 @@ HICON LoadNamedHICON(HMODULE module, const wchar_t *iconName, int size);
 #endif
 
 // Returns the largest embedded WinSparkle icon
-wxImage GetLargestEmbeddedIcon()
+// (unused where the dialogs fill the screen)
+[[maybe_unused]] wxImage GetLargestEmbeddedIcon()
 {
     wxImage best;
     for ( const wxsparkle_blob *b = wxsparkle_icons; b->name; ++b )
@@ -376,7 +394,8 @@ wxImage GetLargestEmbeddedIcon()
 
 // Creates a bundle of logical size dipSize x dipSize for all common DPI
 // scale factors, using exact-size embedded images where available.
-wxBitmapBundle MakeIconBundle(const wxImage& source, int dipSize, bool preferEmbedded)
+// (unused where the dialogs fill the screen)
+[[maybe_unused]] wxBitmapBundle MakeIconBundle(const wxImage& source, int dipSize, bool preferEmbedded)
 {
     wxVector<wxBitmap> bitmaps;
     if ( !source.IsOk() )
@@ -509,7 +528,8 @@ wxTopLevelWindow *GetHostApplicationMainWindow()
     return best;
 }
 
-wxImage GetHostApplicationIcon()
+// (unused where the dialogs fill the screen)
+[[maybe_unused]] wxImage GetHostApplicationIcon()
 {
 #ifdef __WXOSX__
     // bundle's icon (only used if the app has one, to avoid generic icon)
@@ -600,7 +620,8 @@ wxRect GetHostApplicationScreenArea()
 #endif // __WXMSW__
 
 
-wxPoint GetWindowOriginSoThatItFits(int display, const wxRect& windowRect)
+// (unused where the dialogs fill the screen)
+[[maybe_unused]] wxPoint GetWindowOriginSoThatItFits(int display, const wxRect& windowRect)
 {
     wxPoint pos = windowRect.GetTopLeft();
     wxRect desktop = wxDisplay(display).GetClientArea();
@@ -619,8 +640,30 @@ wxPoint GetWindowOriginSoThatItFits(int display, const wxRect& windowRect)
     return pos;
 }
 
+#if WXSPARKLE_FILL_SCREEN
+// The area the dialogs take: the host application's main window, which the
+// system sizes to the app's part of the screen -- unlike the display's client
+// area, that leaves out the status, navigation and action bars -- limited to
+// the display.
+wxRect GetFillScreenArea(const wxWindow *win)
+{
+    int display = win ? wxDisplay::GetFromWindow(win) : wxNOT_FOUND;
+    if ( display == wxNOT_FOUND )
+        display = 0;
+
+    wxRect area = wxDisplay(unsigned(display)).GetClientArea();
+    const wxRect host = GetHostApplicationScreenArea();
+    if ( !host.IsEmpty() && area.Intersects(host) )
+        area.Intersect(host);
+    return area;
+}
+#endif // WXSPARKLE_FILL_SCREEN
+
 void CenterWindowOnHostApplication(wxTopLevelWindow *win)
 {
+#if WXSPARKLE_FILL_SCREEN
+    win->SetSize(GetFillScreenArea(win));
+#else
     // find application's biggest window:
     const wxRect host = GetHostApplicationScreenArea();
 
@@ -645,16 +688,22 @@ void CenterWindowOnHostApplication(wxTopLevelWindow *win)
     }
 
     win->Move(pos);
+#endif // !WXSPARKLE_FILL_SCREEN
 }
 
 void EnsureWindowIsFullyVisible(wxTopLevelWindow *win)
 {
+#if WXSPARKLE_FILL_SCREEN
+    // already sized to the area, it only has to be at its origin
+    win->Move(GetFillScreenArea(win).GetTopLeft());
+#else
     int display = wxDisplay::GetFromWindow(win);
     if (display == wxNOT_FOUND)
         return;
 
     wxPoint pos = GetWindowOriginSoThatItFits(display, win->GetRect());
     win->Move(pos);
+#endif
 }
 
 
@@ -761,6 +810,27 @@ public:
     void FinishLayoutChange();
 
 protected:
+    // The width, in pixels, for text and controls of the main area that
+    // should be `width` DIPs wide: that, or less where the screen is narrower.
+    int FitWidth(int width) const;
+
+    // Sets the text of a label wrapped at FitWidth(width), and gives it the
+    // size of the wrapped text as its minimum. The text is kept, so that it
+    // can be wrapped again when the dialog's width changes.
+    void SetWrappedLabel(wxStaticText *label, const wxString& text, int width);
+
+    // Called by FinishLayoutChange() with the width of the main area where
+    // the dialog fills the screen, to rearrange what doesn't fit in it.
+    virtual void ArrangeForWidth(int WXUNUSED(width)) {}
+
+    // Lays `buttons` out as a row in `sizer` (by calling `addRow`), or, when
+    // the row would be wider than `width`, one per line, full width, in the
+    // order given. Returns true if they are stacked.
+    bool ArrangeButtons(wxBoxSizer *sizer,
+                        std::initializer_list<wxButton*> buttons,
+                        int rowGaps, int width,
+                        const std::function<void()>& addRow);
+
     // sizer for the main area of the dialog (to the right of the icon)
     wxSizer      *m_mainAreaSizer;
 
@@ -771,6 +841,28 @@ protected:
     #define PX(x) FromDIP(x)
 
     static const int MESSAGE_AREA_WIDTH = 300;
+    // the border around the main area, on either side
+    static const int MAIN_AREA_BORDER = 10;
+
+private:
+    struct WrappedLabel
+    {
+        wxStaticText *label;
+        wxString      text;
+        int           width;
+    };
+
+    void WrapLabel(const WrappedLabel& w);
+
+    std::vector<WrappedLabel> m_wrappedLabels;
+
+#if WXSPARKLE_FILL_SCREEN
+    // lays the dialog out again when the screen area changes (rotation)
+    void OnIdleCheckScreenArea(wxIdleEvent& event);
+
+    // the area the dialog was last laid out for
+    wxRect        m_screenArea;
+#endif
 };
 
 
@@ -810,6 +902,10 @@ WinSparkleDialog::WinSparkleDialog()
 
     wxSizer *topSizer = new wxBoxSizer(wxHORIZONTAL);
 
+#if !WXSPARKLE_FILL_SCREEN
+    // (No icon where the dialog fills the screen: the app is the only thing
+    // on it already, and the icon's column is wanted for the text.)
+
     // Load the dialog box icon: the application icon will be used, if
     // available, otherwise, the standard WinSparkle icon will be used.
     wxBitmapBundle bigIcon = MakeIconBundle(GetHostApplicationIcon(), 48, false);
@@ -821,14 +917,118 @@ WinSparkleDialog::WinSparkleDialog()
                   new wxStaticBitmap(this, wxID_ANY, bigIcon),
                   wxSizerFlags(0).Border(wxALL, PX(10))
               );
+#endif // !WXSPARKLE_FILL_SCREEN
 
     m_mainAreaSizer = new wxBoxSizer(wxVERTICAL);
-    topSizer->Add(m_mainAreaSizer, wxSizerFlags(1).Expand().Border(wxALL, PX(10)));
+    topSizer->Add(m_mainAreaSizer, wxSizerFlags(1).Expand().Border(wxALL, PX(MAIN_AREA_BORDER)));
 
     SetSizer(topSizer);
 
     MakeResizable(false);
+
+#if WXSPARKLE_FILL_SCREEN
+    Bind(wxEVT_IDLE, &WinSparkleDialog::OnIdleCheckScreenArea, this);
+#endif
 }
+
+
+int WinSparkleDialog::FitWidth(int width) const
+{
+    width = PX(width);
+#if WXSPARKLE_FILL_SCREEN
+    const int avail = GetFillScreenArea(this).width - 2 * PX(MAIN_AREA_BORDER);
+    if ( avail > 0 && avail < width )
+        width = avail;
+#endif
+    return width;
+}
+
+
+void WinSparkleDialog::SetWrappedLabel(wxStaticText *label, const wxString& text, int width)
+{
+    for ( auto& w : m_wrappedLabels )
+    {
+        if ( w.label == label )
+        {
+            w.text = text;
+            w.width = width;
+            WrapLabel(w);
+            return;
+        }
+    }
+
+    m_wrappedLabels.push_back({label, text, width});
+    WrapLabel(m_wrappedLabels.back());
+}
+
+
+void WinSparkleDialog::WrapLabel(const WrappedLabel& w)
+{
+    w.label->SetLabel(w.text);
+    // Wrap() does nothing if called with the same width as the last time,
+    // even though the label changed: reset it first, so that the new label
+    // is wrapped too. (This matters for ports that only show the label as
+    // given, e.g. wxUniversal used on classic Mac OS.)
+    w.label->Wrap(-1);
+    w.label->Wrap(FitWidth(w.width));
+
+    // Wrapping at requested width may fail, e.g. for languages that don't use
+    // spaces (Chinese, Japanese etc.). In that case, we want the window to grow
+    // wider than 'width' and avoid truncating text:
+    w.label->InvalidateBestSize();
+    w.label->SetMinSize(wxDefaultSize);
+    w.label->SetMinSize(w.label->GetBestSize());
+}
+
+
+bool WinSparkleDialog::ArrangeButtons(wxBoxSizer *sizer,
+                                      std::initializer_list<wxButton*> buttons,
+                                      int rowGaps, int width,
+                                      const std::function<void()>& addRow)
+{
+    int rowWidth = rowGaps;
+    for ( wxButton *b : buttons )
+    {
+        if ( b->IsShown() )
+            rowWidth += b->GetBestSize().x;
+    }
+
+    const bool stack = rowWidth > width;
+
+    // detach, without destroying, the buttons; spacers go
+    sizer->Clear(false);
+
+    if ( stack )
+    {
+        sizer->SetOrientation(wxVERTICAL);
+        bool first = true;
+        for ( wxButton *b : buttons )
+        {
+            sizer->Add(b, wxSizerFlags().Expand().Border(wxTOP, first ? 0 : PX(10)));
+            first = false;
+        }
+    }
+    else
+    {
+        sizer->SetOrientation(wxHORIZONTAL);
+        addRow();
+    }
+
+    return stack;
+}
+
+
+#if WXSPARKLE_FILL_SCREEN
+void WinSparkleDialog::OnIdleCheckScreenArea(wxIdleEvent& event)
+{
+    event.Skip();
+
+    if ( IsShown() && GetFillScreenArea(this) != m_screenArea )
+    {
+        LayoutChangesGuard guard(this);
+    }
+}
+#endif
 
 
 void WinSparkleDialog::MakeResizable(bool resizable)
@@ -850,6 +1050,16 @@ void WinSparkleDialog::FinishLayoutChange()
     SetMaxSize(wxDefaultSize);
     SetMinSize(wxDefaultSize);
 
+#if WXSPARKLE_FILL_SCREEN
+    m_screenArea = GetFillScreenArea(this);
+
+    for ( const auto& w : m_wrappedLabels )
+        WrapLabel(w);
+    ArrangeForWidth(m_screenArea.width - 2 * PX(MAIN_AREA_BORDER));
+
+    SetSize(m_screenArea);
+    Layout();
+#else
     Layout();
     GetSizer()->SetSizeHints(this);
 
@@ -857,6 +1067,7 @@ void WinSparkleDialog::FinishLayoutChange()
     // so also prevent resizing using size hints:
     if ( !m_resizable )
         SetMaxSize(GetSize());
+#endif
 }
 
 
@@ -958,8 +1169,16 @@ private:
     void StopDownloader();
 
     void SetMessage(const wxString& text, int width = MESSAGE_AREA_WIDTH);
+    void SetHeading(const wxString& text);
     void ShowReleaseNotes(const Appcast& info);
     void ShowReleaseNotesFallback(const Appcast& info);
+
+    // the size of the release notes area, also its minimum size
+    wxSize GetReleaseNotesSize() const;
+
+    void ArrangeForWidth(int width) override;
+    // lays the update buttons out in a row, as on a computer's screen
+    void AddUpdateButtonsRow();
 
 private:
     wxTimer       m_timer;
@@ -975,7 +1194,7 @@ private:
     wxButton     *m_runInstallerButton;
     wxSizer      *m_runInstallerButtonSizer;
     wxButton     *m_installButton;
-    wxSizer      *m_updateButtonsSizer;
+    wxBoxSizer   *m_updateButtonsSizer;
     wxSizer      *m_releaseNotesSizer;
     wxPanel      *m_browserParent;
 #if HAVE_WEBVIEW
@@ -1020,11 +1239,11 @@ UpdateDialog::UpdateDialog()
     m_mainAreaSizer->Add(m_heading, wxSizerFlags(0).Expand().Border(wxBOTTOM, PX(10)));
 
     m_message = new wxStaticText(this, wxID_ANY, "",
-                                 wxDefaultPosition, wxSize(PX(MESSAGE_AREA_WIDTH), -1));
+                                 wxDefaultPosition, wxSize(FitWidth(MESSAGE_AREA_WIDTH), -1));
     m_mainAreaSizer->Add(m_message, wxSizerFlags(0).Expand());
 
     m_progress = new wxGauge(this, wxID_ANY, 100,
-                             wxDefaultPosition, wxSize(PX(MESSAGE_AREA_WIDTH), PX(16)));
+                             wxDefaultPosition, wxSize(FitWidth(MESSAGE_AREA_WIDTH), PX(16)));
     m_progressLabel = new wxStaticText(this, wxID_ANY, "");
     m_mainAreaSizer->Add(m_progress, wxSizerFlags(0).Expand().Border(wxTOP|wxBOTTOM, PX(10)));
     m_mainAreaSizer->Add(m_progressLabel, wxSizerFlags(0).Expand());
@@ -1038,7 +1257,7 @@ UpdateDialog::UpdateDialog()
 
     m_browserParent = new wxPanel(this, wxID_ANY,
                                   wxDefaultPosition,
-                                  wxSize(PX(RELNOTES_WIDTH), PX(RELNOTES_HEIGHT)));
+                                  GetReleaseNotesSize());
 #if HAVE_WEBVIEW
     m_webBrowser = NULL;
 #endif
@@ -1063,10 +1282,7 @@ UpdateDialog::UpdateDialog()
     m_installButton = new wxButton(this, ID_INSTALL, _("Install update"));
 
     m_updateButtonsSizer = new wxBoxSizer(wxHORIZONTAL);
-    m_updateButtonsSizer->Add(m_skipVersionButton, wxSizerFlags().Border(wxRIGHT, PX(20)));
-    m_updateButtonsSizer->AddStretchSpacer(1);
-    m_updateButtonsSizer->Add(m_remindLaterButton, wxSizerFlags().Border(wxRIGHT, PX(10)));
-    m_updateButtonsSizer->Add(m_installButton, wxSizerFlags());
+    AddUpdateButtonsRow();
     m_buttonSizer->Add(m_updateButtonsSizer, wxSizerFlags(1));
 
     m_closeButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1097,6 +1313,39 @@ UpdateDialog::UpdateDialog()
     Bind(wxEVT_BUTTON, &UpdateDialog::OnRemindLater, this, ID_REMIND_LATER);
     Bind(wxEVT_BUTTON, &UpdateDialog::OnInstall, this, ID_INSTALL);
     Bind(wxEVT_BUTTON, &UpdateDialog::OnRunInstaller, this, ID_RUN_INSTALLER);
+}
+
+
+void UpdateDialog::AddUpdateButtonsRow()
+{
+    m_updateButtonsSizer->Add(m_skipVersionButton, wxSizerFlags().Border(wxRIGHT, PX(20)));
+    m_updateButtonsSizer->AddStretchSpacer(1);
+    m_updateButtonsSizer->Add(m_remindLaterButton, wxSizerFlags().Border(wxRIGHT, PX(10)));
+    m_updateButtonsSizer->Add(m_installButton, wxSizerFlags());
+}
+
+
+void UpdateDialog::ArrangeForWidth(int width)
+{
+    // Stacked, the default action comes first, the way stacked buttons are
+    // ordered on phones.
+    ArrangeButtons(m_updateButtonsSizer,
+                   { m_installButton, m_remindLaterButton, m_skipVersionButton },
+                   PX(30), width,
+                   [this] { AddUpdateButtonsRow(); });
+}
+
+
+wxSize UpdateDialog::GetReleaseNotesSize() const
+{
+#if WXSPARKLE_FILL_SCREEN
+    // The release notes take what the rest of the dialog leaves of the screen:
+    // just keep a few lines of them where that's little (a phone held
+    // sideways).
+    return wxSize(FitWidth(RELNOTES_WIDTH), PX(RELNOTES_HEIGHT / 2));
+#else
+    return wxSize(PX(RELNOTES_WIDTH), PX(RELNOTES_HEIGHT));
+#endif
 }
 
 
@@ -1298,20 +1547,18 @@ bool UpdateDialog::RunInstaller()
 
 void UpdateDialog::SetMessage(const wxString& text, int width)
 {
-    m_message->SetLabel(text);
-    // Wrap() does nothing if called with the same width as the last time,
-    // even though the label changed: reset it first, so that the new label
-    // is wrapped too. (This matters for ports that only show the label as
-    // given, e.g. wxUniversal used on classic Mac OS.)
-    m_message->Wrap(-1);
-    m_message->Wrap(PX(width));
+    SetWrappedLabel(m_message, text, width);
+}
 
-    // Wrapping at requested width may fail, e.g. for languages that don't use
-    // spaces (Chinese, Japanese etc.). In that case, we want the window to grow
-    // wider than 'width' and avoid truncating text:
-    m_message->InvalidateBestSize();
-    m_message->SetMinSize(wxDefaultSize);
-    m_message->SetMinSize(m_message->GetBestSize());
+
+void UpdateDialog::SetHeading(const wxString& text)
+{
+#if WXSPARKLE_FILL_SCREEN
+    // the heading is as wide as the screen allows, and no wider
+    SetWrappedLabel(m_heading, text, RELNOTES_WIDTH);
+#else
+    m_heading->SetLabel(text);
+#endif
 }
 
 
@@ -1348,7 +1595,7 @@ void UpdateDialog::StateNoUpdateFound(bool installAutomatically)
 
     LayoutChangesGuard guard(this);
 
-    m_heading->SetLabel(_("You're up to date!"));
+    SetHeading(_("You're up to date!"));
 
     wxString msg;
     try
@@ -1389,7 +1636,7 @@ void UpdateDialog::StateUpdateError(ErrorCode err)
 
     LayoutChangesGuard guard(this);
 
-    m_heading->SetLabel(_("Update Error!"));
+    SetHeading(_("Update Error!"));
 
     wxString msg;
     switch (err)
@@ -1448,7 +1695,7 @@ void UpdateDialog::StateUpdateAvailable(const Appcast& info, bool installAutomat
             ver_new = wxString::Format("%s (%s)", ver_new, wxString::FromUTF8(info.Version));
         }
 
-        m_heading->SetLabel(
+        SetHeading(
             wxString::Format(_("A new version of %s is available!"), appname));
 
         if ( !info.HasDownload() )
@@ -1605,7 +1852,7 @@ void UpdateDialog::ShowReleaseNotes(const Appcast& info)
         // MSIE. See https://github.com/vslavik/winsparkle/issues/155 and
         // https://github.com/wxWidgets/wxWidgets/issues/14768
         m_webBrowser = wxWebView::New(m_browserParent, wxID_ANY, "about:blank",
-                                      wxDefaultPosition, wxSize(PX(RELNOTES_WIDTH), PX(RELNOTES_HEIGHT)));
+                                      wxDefaultPosition, GetReleaseNotesSize());
         if ( m_webBrowser )
         {
             auto sizer = new wxBoxSizer(wxVERTICAL);
@@ -1718,14 +1965,18 @@ void UpdateDialog::ShowReleaseNotesFallback(const Appcast& info)
     {
         const wxString url = wxString::FromUTF8(info.ReleaseNotesURL);
 #if wxUSE_HYPERLINKCTRL
-        sizer->Add(new wxHyperlinkCtrl(m_browserParent, wxID_ANY, url, url),
-                   wxSizerFlags().Border(wxALL, PX(5)));
+        wxWindow *link = new wxHyperlinkCtrl(m_browserParent, wxID_ANY, url, url);
 #else
-        wxButton *button = new wxButton(m_browserParent, wxID_ANY, url,
-                                        wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
-        button->Bind(wxEVT_BUTTON, [url](wxCommandEvent&) { wxLaunchDefaultBrowser(url); });
-        sizer->Add(button, wxSizerFlags().Border(wxALL, PX(5)));
+        wxButton *link = new wxButton(m_browserParent, wxID_ANY, url,
+                                      wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
+        link->Bind(wxEVT_BUTTON, [url](wxCommandEvent&) { wxLaunchDefaultBrowser(url); });
 #endif
+#if WXSPARKLE_FILL_SCREEN
+        // a long URL is cut off rather than make the dialog wider than the screen
+        link->SetMinSize(wxSize(std::min(link->GetBestSize().x,
+                                         FitWidth(RELNOTES_WIDTH) - PX(10)), -1));
+#endif
+        sizer->Add(link, wxSizerFlags().Border(wxALL, PX(5)));
     }
     else
     {
@@ -1759,6 +2010,14 @@ class AskPermissionDialog : public WinSparkleDialog
 {
 public:
     AskPermissionDialog();
+
+private:
+    void ArrangeForWidth(int width) override;
+    void AddButtonsRow();
+
+    wxBoxSizer *m_buttonSizer;
+    wxButton   *m_okButton;
+    wxButton   *m_cancelButton;
 };
 
 
@@ -1777,41 +2036,57 @@ AskPermissionDialog::AskPermissionDialog()
     }
     CATCH_ALL_EXCEPTIONS
 
+    const wxString text = wxString::Format
+                          (
+                              _("Should %s automatically check for updates? You can always check for updates manually from the menu."),
+                              appname
+                          );
+#if WXSPARKLE_FILL_SCREEN
+    wxStaticText *message = new wxStaticText(this, wxID_ANY, "");
+    SetWrappedLabel(message, text, MESSAGE_AREA_WIDTH);
+#else
     wxStaticText *message =
             new wxStaticText
                 (
-                    this, wxID_ANY,
-                    wxString::Format
-                    (
-                        _("Should %s automatically check for updates? You can always check for updates manually from the menu."),
-                        appname
-                    ),
+                    this, wxID_ANY, text,
                     wxDefaultPosition, wxSize(PX(MESSAGE_AREA_WIDTH), -1)
                 );
     message->Wrap(PX(MESSAGE_AREA_WIDTH));
+#endif
     m_mainAreaSizer->Add(message, wxSizerFlags(0).Expand());
 
     m_mainAreaSizer->AddStretchSpacer(1);
 
-    wxBoxSizer *buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+    m_okButton = new wxButton(this, wxID_OK, _("Check automatically"));
+    m_cancelButton = new wxButton(this, wxID_CANCEL, _("Don't check"));
 
-    buttonSizer->Add
-                 (
-                     new wxButton(this, wxID_OK, _("Check automatically")),
-                     wxSizerFlags().Border(wxRIGHT)
-                 );
-    buttonSizer->Add
-                 (
-                     new wxButton(this, wxID_CANCEL, _("Don't check"))
-                 );
+    m_buttonSizer = new wxBoxSizer(wxHORIZONTAL);
+    AddButtonsRow();
 
     m_mainAreaSizer->Add
                  (
-                     buttonSizer,
-                     wxSizerFlags(0).Right().Border(wxTOP, PX(10))
+                     m_buttonSizer,
+                     wxSizerFlags(0).Expand().Border(wxTOP, PX(10))
                  );
 
     UpdateLayout();
+}
+
+
+void AskPermissionDialog::AddButtonsRow()
+{
+    // right-aligned
+    m_buttonSizer->AddStretchSpacer(1);
+    m_buttonSizer->Add(m_okButton, wxSizerFlags().Border(wxRIGHT));
+    m_buttonSizer->Add(m_cancelButton);
+}
+
+
+void AskPermissionDialog::ArrangeForWidth(int width)
+{
+    ArrangeButtons(m_buttonSizer, { m_okButton, m_cancelButton },
+                   wxSizerFlags::GetDefaultBorder(), width,
+                   [this] { AddButtonsRow(); });
 }
 
 
