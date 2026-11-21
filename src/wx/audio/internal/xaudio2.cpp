@@ -1,3 +1,5 @@
+#include <wx/wx.h>
+
 #if !defined(__WXMSW__)
 #error "This file should only be included on Windows"
 #endif
