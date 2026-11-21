@@ -187,6 +187,23 @@ include(FrontendOptions)
 # frontend selection.
 set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
 
+# libcurl, for every target. Named bare so the port's own defaults pick the TLS
+# backend: curl's default feature is ssl, which resolves to sspi -- schannel --
+# on Windows and to OpenSSL everywhere else.
+#
+# XP is the one target that cannot have the default. Its schannel negotiates
+# TLS 1.0 at best and validates SHA-1 chains, which no server still accepts, so
+# a curl built against it connects to nothing. OpenSSL carries its own TLS and
+# its own trust store and does not ask the system for either, so it is what the
+# XP build links. VBAM_TARGET_WINXP comes from cmake/FrontendOptions.cmake,
+# included just above, which derives it from the triplet -- project() has not
+# run here and there is no compiler to ask.
+if(VBAM_TARGET_WINXP)
+    list(APPEND VCPKG_DEPS "curl[openssl]")
+else()
+    list(APPEND VCPKG_DEPS curl)
+endif()
+
 # Ports the build *runs* rather than links: glslangValidator compiles the DLSS NR
 # shaders. In a cross build the target triplet's copy is an executable for the
 # target, so these are installed for the host triplet as well.
@@ -252,9 +269,10 @@ elseif(VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
     set(vbam_wxsparkle_wanted FALSE)
 endif()
 
+# curl is in the core list above, for every target; expat is wanted only here.
 if(ENABLE_WX AND (ENABLE_ONLINEUPDATES OR UPSTREAM_RELEASE)
    AND vbam_wxsparkle_wanted AND NOT VBAM_TARGET_ANDROID)
-    list(APPEND VCPKG_DEPS curl expat)
+    list(APPEND VCPKG_DEPS expat)
 endif()
 
 unset(vbam_wxsparkle_wanted)
