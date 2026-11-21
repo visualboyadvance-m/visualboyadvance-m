@@ -347,7 +347,7 @@ From a shell as described in the previous section, run:
 ```bash
 mkdir build-winxp
 cd build-winxp
-cmake .. -DVCPKG_TARGET_TRIPLET=x32-mingw-static -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
+cmake .. -DVCPKG_TARGET_TRIPLET=x86-mingw-static -DCMAKE_BUILD_TYPE=Release -DUPSTREAM_RELEASE=TRUE -G Ninja
 ninja
 ```
 . Collect these files for the release:

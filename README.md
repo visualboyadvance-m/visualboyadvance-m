@@ -100,7 +100,7 @@ If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
 `-DVCPKG_TARGET_TRIPLET=**<MSYS2-ENVIRONMENT>** which is one of:
 
 - x64-mingw-static (for MINGW64, UCRT64 or CLANG64),
-- x32-mingw-static (for Windows XP builds using a MINGW32 toolchain.)
+- x86-mingw-static (for Windows XP builds using a MINGW32 toolchain.)
 
 You can download a MINGW32 toolchain for XP
 [here](https://cachemiss.com/files/MinGW32-GCC-16.2.0-XP.7z) and extract it to
