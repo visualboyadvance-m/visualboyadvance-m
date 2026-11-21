@@ -43,7 +43,7 @@ namespace
     // (not "macos", whose binaries can't run on classic Mac OS)
     #define OS_MARKER_GENERIC "macos-classic"
 #elif defined(__ANDROID__) || defined(ANDROID)
-    #define OS_MARKER_GENERIC "Android"
+    #define OS_MARKER_GENERIC "android"
 #elif defined(__linux__)
     #define OS_MARKER_GENERIC "linux"
 #elif defined(__FreeBSD__)
