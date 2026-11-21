@@ -2207,6 +2207,14 @@ if(WINXP)
     )
 endif()
 
+# Before the signing and zipping below: stripping invalidates a signature, and
+# the zip is what gets published. POST_BUILD commands run in the order they are
+# added, and with the strip last the published archive held the unstripped
+# binary -- 199,765,188 bytes rather than 79,368,704 in the XP nightly.
+if(WIN32)
+    vbam_strip_release_binary(visualboyadvance-m.exe)
+endif()
+
 if(UPSTREAM_RELEASE AND WIN32)
     set(home "$ENV{HOME}")
 
@@ -2287,10 +2295,6 @@ if(UPSTREAM_RELEASE AND WIN32)
         )
     endif()
 
-endif()
-
-if(WIN32)
-    vbam_strip_release_binary(visualboyadvance-m.exe)
 endif()
 
 
