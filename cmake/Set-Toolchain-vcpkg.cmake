@@ -1787,6 +1787,16 @@ function(get_binary_packages)
         file(REMOVE_RECURSE ${bin_pkgs_dir})
     endif()
 
+    # Everything above changed what is installed, and the listing that
+    # vcpkg_is_installed() caches was read before any of it. The call below asks
+    # which of the target packages made it in and gives up when the answer is
+    # none, so in a vcpkg tree that started out empty it gives up every time:
+    # the stale listing still says nothing is installed. What that costs is the
+    # host tools, and above all the one no port declares -- a glslang[tools]
+    # whose package is on the server is built from source instead.
+    unset(VCPKG_INSTALLED       CACHE)
+    unset(VCPKG_INSTALLED_COUNT CACHE)
+
     get_host_binary_packages("${wanted_ports}" host_packages_installed)
 
     if(NOT host_packages_installed)
