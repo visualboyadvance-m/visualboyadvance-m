@@ -187,9 +187,19 @@ include(FrontendOptions)
 # frontend selection.
 set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
 
-# libcurl, for every target. Named bare so the port's own defaults pick the TLS
-# backend: curl's default feature is ssl, which resolves to sspi -- schannel --
-# on Windows and to OpenSSL everywhere else.
+# The online updater's two libraries, for every target: libcurl is its
+# transport and expat parses the appcast.
+#
+# They used to be named under a condition that tried to work out, before
+# project() and before the options are read, whether this build would have
+# wxSparkle in it -- from the command line if ENABLE_WXSPARKLE was given,
+# otherwise from the triplet. Asking a question that early got it wrong in both
+# directions and is not worth the two ports it saves: they are small, and a
+# build that ends up without the updater has lost nothing by having them.
+#
+# curl is named bare, so the port's own defaults pick the TLS backend: its
+# default feature is ssl, which resolves to sspi -- schannel -- on Windows and
+# to OpenSSL everywhere else.
 #
 # XP is the one target that cannot have the default. Its schannel negotiates
 # TLS 1.0 at best and validates SHA-1 chains, which no server still accepts, so
@@ -203,6 +213,8 @@ if(VBAM_TARGET_WINXP)
 else()
     list(APPEND VCPKG_DEPS curl)
 endif()
+
+list(APPEND VCPKG_DEPS expat)
 
 # Ports the build *runs* rather than links: glslangValidator compiles the DLSS NR
 # shaders. In a cross build the target triplet's copy is an executable for the
@@ -253,29 +265,6 @@ endif()
 if(VBAM_NEED_NLS)
     list(APPEND VCPKG_DEPS gettext-libintl)
 endif()
-
-# wxSparkle, the online updater (ENABLE_ONLINEUPDATES is only a cache entry
-# yet, so go by what the command line asked for).
-#
-# libcurl no longer builds for Windows XP, so the 32 bit Windows build has
-# ENABLE_WXSPARKLE off by default (WXSPARKLE_DEFAULT in cmake/Options.cmake).
-# That runs long after this, and project() has not been called yet either, so
-# the triplet is all there is to go by here. Without this, installing the
-# dependencies fails before the option is ever read.
-set(vbam_wxsparkle_wanted TRUE)
-if(DEFINED ENABLE_WXSPARKLE)
-    set(vbam_wxsparkle_wanted ${ENABLE_WXSPARKLE})
-elseif(VCPKG_TARGET_TRIPLET MATCHES "^x86-mingw")
-    set(vbam_wxsparkle_wanted FALSE)
-endif()
-
-# curl is in the core list above, for every target; expat is wanted only here.
-if(ENABLE_WX AND (ENABLE_ONLINEUPDATES OR UPSTREAM_RELEASE)
-   AND vbam_wxsparkle_wanted AND NOT VBAM_TARGET_ANDROID)
-    list(APPEND VCPKG_DEPS expat)
-endif()
-
-unset(vbam_wxsparkle_wanted)
 
 unset(VCPKG_DEPS_OPTIONAL)
 
