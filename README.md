@@ -103,7 +103,7 @@ If you are in an MSYS2 shell, the MSYS2 package dependencies installed via
 - x32-mingw-static (for Windows XP builds using a MINGW32 toolchain.)
 
 You can download a MINGW32 toolchain for XP
-[here](https://cachemiss.com/files/winxp-mingw32.7z) and extract it to
+[here](https://cachemiss.com/files/MinGW32-GCC-16.2.0-XP.7z) and extract it to
 `C:\msys64`.
 
 A `VCPKG_ROOT` is automatically created as a sibling of the project directory,

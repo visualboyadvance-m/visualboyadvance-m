@@ -340,7 +340,7 @@ Collect the following files for the release:
 
 The 32-bit build is a legacy build for Windows XP compatibility. You will need a
 special MinGW toolchain to build it. Install MSYS2 and extract
-[this](https://cachemiss.com/files/winxp-mingw32.7z) archive into `C:\msys64`.
+[this](https://cachemiss.com/files/MinGW32-GCC-16.2.0-XP.7z) archive into `C:\msys64`.
 
 From a shell as described in the previous section, run:
 
