@@ -66,6 +66,8 @@ namespace
     #define OS_MARKER_ARCH_SUFFIX "-riscv32"
 #elif defined(__m68k__)
     #define OS_MARKER_ARCH_SUFFIX "-m68k"
+#elif defined(__powerpc64__)
+    #define OS_MARKER_ARCH_SUFFIX "-ppc64"
 #elif (defined(__powerpc__) || defined(__ppc__)) && !defined(__powerpc64__)
     #define OS_MARKER_ARCH_SUFFIX "-ppc"
 #else
