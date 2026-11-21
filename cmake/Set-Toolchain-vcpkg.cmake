@@ -2589,6 +2589,69 @@ if(VCPKG_TARGET_TRIPLET MATCHES "static")
     set(VCPKG_APPLOCAL_DEPS OFF)
 endif()
 
+# The two MinGW triplets take their LIB and INCLUDE from the vcpkg tree.
+#
+# These are MSVC variables, and windows-dev-guide's profile.ps1 runs
+# vcvarsall.bat and imports its environment, so every shell here has them
+# pointing at MSVC and the Windows SDK -- at the x64 directories, for the
+# prompt the profile loads. CMake searches $ENV{LIB} in find_library() and
+# $ENV{INCLUDE} in find_path() before anything else, ahead of HINTS and ahead
+# of any toolchain or system path, and CMAKE_FIND_LIBRARY_SUFFIXES for MinGW
+# ends in .lib, so an SDK import library matches:
+#
+#   find_library(... advapi32)
+#     -> .../Windows Kits/10/Lib/10.0.28000.0/um/x64/AdvAPI32.Lib
+#
+# which is what pkg_check_modules(... IMPORTED_TARGET ...) resolves the
+# -ladvapi32 in x265's pkg-config Libs to, and it reaches the link line of
+# everything that links ffmpeg. binutils refuses the archive -- "recognised
+# but unhandled machine type (0x8664) in Import Library Format archive" -- so
+# nothing has come of it so far, but an x86_64 import library has no business
+# in a MinGW link, and the same goes for the Gdi32, Ole32, OleAut32, ShLwApi,
+# User32, Uuid and Vfw32 the ffmpeg .pc files name.
+#
+# Point both at the triplet's own directories instead. A name vcpkg does not
+# ship is then simply not found, which is the right answer: pkg-config keeps
+# it as a plain name, the link line gets -ladvapi32, and gcc takes it from its
+# own sysroot.
+#
+# The two blocks that put the MinGW compiler on PATH run far above this, long
+# before vcpkg_set_toolchain() has worked out where the installed tree is, so
+# this half of the triplet handling has to live down here.
+if(CMAKE_HOST_WIN32 AND VCPKG_TARGET_TRIPLET MATCHES "^(x86|x64)-mingw")
+    # Same ordering as the bin/ directories below: the configuration's own
+    # tree first, the other one after it for a package that ships only one.
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(vbam_vcpkg_lib_dirs "${vbam_vcpkg_tree}/debug/lib" "${vbam_vcpkg_tree}/lib")
+    else()
+        set(vbam_vcpkg_lib_dirs "${vbam_vcpkg_tree}/lib" "${vbam_vcpkg_tree}/debug/lib")
+    endif()
+
+    set(vbam_vcpkg_lib_native)
+
+    foreach(lib_dir IN LISTS vbam_vcpkg_lib_dirs)
+        if(IS_DIRECTORY "${lib_dir}")
+            file(TO_NATIVE_PATH "${lib_dir}" lib_dir_native)
+            list(APPEND vbam_vcpkg_lib_native "${lib_dir_native}")
+            unset(lib_dir_native)
+        endif()
+    endforeach()
+
+    string(JOIN ";" vbam_vcpkg_lib_path ${vbam_vcpkg_lib_native})
+    set(ENV{LIB} "${vbam_vcpkg_lib_path}")
+
+    file(TO_NATIVE_PATH "${vbam_vcpkg_tree}/include" vbam_vcpkg_include_native)
+    set(ENV{INCLUDE} "${vbam_vcpkg_include_native}")
+
+    message(STATUS "MinGW triplet ${VCPKG_TARGET_TRIPLET}: LIB=$ENV{LIB}")
+    message(STATUS "MinGW triplet ${VCPKG_TARGET_TRIPLET}: INCLUDE=$ENV{INCLUDE}")
+
+    unset(vbam_vcpkg_include_native)
+    unset(vbam_vcpkg_lib_path)
+    unset(vbam_vcpkg_lib_native)
+    unset(vbam_vcpkg_lib_dirs)
+endif()
+
 # The triplet's bin/ on PATH for the rest of the configure.
 #
 # A dynamic triplet keeps its DLLs there, and nothing otherwise puts that
