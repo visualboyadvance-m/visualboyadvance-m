@@ -1165,52 +1165,57 @@ endfunction()
 function(get_host_binary_packages wanted_ports outvar)
     set(${outvar} TRUE PARENT_SCOPE)
 
-    if(VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET)
-        return()
-    endif()
+    set(host_deps "")
 
-    # Ask only about ports that actually made it in; listhostdeps errors out on
-    # a package that is not installed.
-    set(qualified "")
+    # A native build has no host dependencies to work out: a port declares
+    # them for a host that is not the target, and when the two are the same
+    # triplet vcpkg has installed them already. The tools the build runs are
+    # wanted all the same, and are still nobody's declared dependency, so the
+    # rest of this runs with the target triplet standing in as the host one.
+    if(NOT VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET)
+        # Ask only about ports that actually made it in; listhostdeps errors out on
+        # a package that is not installed.
+        set(qualified "")
 
-    foreach(port ${wanted_ports})
-        vcpkg_is_installed(${port} 0 ${VCPKG_TARGET_TRIPLET} ${POWERSHELL} port_installed)
+        foreach(port ${wanted_ports})
+            vcpkg_is_installed(${port} 0 ${VCPKG_TARGET_TRIPLET} ${POWERSHELL} port_installed)
 
-        if(port_installed)
-            list(APPEND qualified "${port}:${VCPKG_TARGET_TRIPLET}")
+            if(port_installed)
+                list(APPEND qualified "${port}:${VCPKG_TARGET_TRIPLET}")
+            endif()
+        endforeach()
+
+        if(NOT qualified)
+            return()
         endif()
-    endforeach()
 
-    if(NOT qualified)
-        return()
+        string(REPLACE ";" " " qualified_args "${qualified}")
+
+        if(VCPKG_TARGET_TRIPLET MATCHES "-android$")
+            set(host_deps_scope "-Direct ")
+        else()
+            set(host_deps_scope "")
+        endif()
+
+        execute_process(
+            COMMAND ${POWERSHELL}
+                -executionpolicy bypass -noprofile
+                -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-listhostdeps ${host_deps_scope}${qualified_args}"
+            OUTPUT_VARIABLE host_deps
+            RESULT_VARIABLE host_deps_status
+            ERROR_VARIABLE  host_deps_error
+        )
+
+        if(NOT host_deps_status EQUAL 0)
+            string(STRIP "${host_deps_error}" host_deps_error)
+            message(STATUS "Could not list host dependencies (${host_deps_error}); vcpkg will build any that are missing.")
+            set(${outvar} FALSE PARENT_SCOPE)
+            return()
+        endif()
+
+        string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
+        list(FILTER host_deps EXCLUDE REGEX "^ *$")
     endif()
-
-    string(REPLACE ";" " " qualified_args "${qualified}")
-
-    if(VCPKG_TARGET_TRIPLET MATCHES "-android$")
-        set(host_deps_scope "-Direct ")
-    else()
-        set(host_deps_scope "")
-    endif()
-
-    execute_process(
-        COMMAND ${POWERSHELL}
-            -executionpolicy bypass -noprofile
-            -command "import-module '${CMAKE_BINARY_DIR}/vcpkg-binpkg/vcpkg-binpkg.psm1'; vcpkg-listhostdeps ${host_deps_scope}${qualified_args}"
-        OUTPUT_VARIABLE host_deps
-        RESULT_VARIABLE host_deps_status
-        ERROR_VARIABLE  host_deps_error
-    )
-
-    if(NOT host_deps_status EQUAL 0)
-        string(STRIP "${host_deps_error}" host_deps_error)
-        message(STATUS "Could not list host dependencies (${host_deps_error}); vcpkg will build any that are missing.")
-        set(${outvar} FALSE PARENT_SCOPE)
-        return()
-    endif()
-
-    string(REGEX REPLACE "\r?\n" ";" host_deps "${host_deps}")
-    list(FILTER host_deps EXCLUDE REGEX "^ *$")
 
     # The tools the build runs itself are nobody's declared host dependency, so
     # listhostdeps never names them; they are wanted for the host all the same.
@@ -2343,12 +2348,18 @@ function(vcpkg_set_toolchain)
     endif()
 
     # Tools the build runs on this machine -- glslangValidator compiles the DLSS
-    # NR shaders -- have to exist for the host triplet in a cross build. vcpkg
-    # installs a port's *declared* host dependencies by itself, but a tool the
-    # build invokes directly is nobody's dependency, so it is asked for by name.
-    # Only what is still missing after the binary packages, by port and by
-    # feature: a glslang without [tools] has no glslangValidator in it.
-    if(VCPKG_HOST_DEPS AND NOT VCPKG_HOST_TRIPLET STREQUAL VCPKG_TARGET_TRIPLET AND NOT NO_VCPKG_UPDATES)
+    # NR shaders -- have to exist for the host triplet. vcpkg installs a port's
+    # *declared* host dependencies by itself, but a tool the build invokes
+    # directly is nobody's dependency, so it is asked for by name. Only what is
+    # still missing after the binary packages, by port and by feature: a
+    # glslang without [tools] has no glslangValidator in it.
+    #
+    # A native build needs it every bit as much as a cross build does. Skipping
+    # this when the two triplets match left the one case where nothing installs
+    # the tools at all -- not vcpkg, which no port asks, and not the line below,
+    # which was not reached -- and the shader step failed much later, looking
+    # for a glslangValidator that nothing had ever been asked to provide.
+    if(VCPKG_HOST_DEPS AND NOT NO_VCPKG_UPDATES)
         set(host_deps_wanted "")
 
         foreach(dep ${VCPKG_HOST_DEPS})
