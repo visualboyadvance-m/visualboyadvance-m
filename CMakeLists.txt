@@ -197,24 +197,19 @@ set(VCPKG_DEPS zlib bzip2 "liblzma[tools]" pthreads)
 # directions and is not worth the two ports it saves: they are small, and a
 # build that ends up without the updater has lost nothing by having them.
 #
-# curl is named bare, so the port's own defaults pick the TLS backend: its
-# default feature is ssl, which resolves to sspi -- schannel -- on Windows and
-# to OpenSSL everywhere else.
+# curl asks for [core,openssl]: one TLS backend, rather than a backend added
+# to whatever the port already defaults to. Naming a feature does not displace
+# the defaults, and curl's default feature is ssl, which resolves to sspi --
+# schannel -- on Windows, so curl[openssl] had compiled both backends into
+# every Windows target and left curl's own ordering to pick between them at
+# run time. core turns the defaults off and leaves openssl alone.
 #
-# XP is the one target that cannot have the default. Its schannel negotiates
-# TLS 1.0 at best and validates SHA-1 chains, which no server still accepts, so
-# a curl built against it connects to nothing. OpenSSL carries its own TLS and
-# its own trust store and does not ask the system for either, so it is what the
-# XP build links. VBAM_TARGET_WINXP comes from cmake/FrontendOptions.cmake,
-# included just above, which derives it from the triplet -- project() has not
-# run here and there is no compiler to ask.
-if(VBAM_TARGET_WINXP)
-    list(APPEND VCPKG_DEPS "curl[openssl]")
-else()
-    list(APPEND VCPKG_DEPS curl)
-endif()
-
-list(APPEND VCPKG_DEPS expat)
+# One backend everywhere also settles the XP target, which is the one that
+# cannot use schannel at all: XP's negotiates TLS 1.0 at best and validates
+# SHA-1 chains, which no server still accepts, so a curl built on it connects
+# to nothing. OpenSSL carries its own TLS and its own trust store and asks the
+# system for neither.
+list(APPEND VCPKG_DEPS "curl[core,openssl]" expat)
 
 # Ports the build *runs* rather than links: glslangValidator compiles the DLSS NR
 # shaders. In a cross build the target triplet's copy is an executable for the
