@@ -1990,8 +1990,19 @@ if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
     target_sources(visualboyadvance-m PRIVATE
         autoupdater/autoupdater.h
         autoupdater/wxsparkle/autoupdater.cpp)
-    target_link_libraries(visualboyadvance-m wxSparkle::wxsparkle)
+    target_link_libraries(visualboyadvance-m ${VBAM_WX_TLL_SCOPE} wxSparkle::wxsparkle)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WXSPARKLE)
+
+    if(ANDROID)
+        # wxSparkle opens the downloaded APK with wxLaunchDefaultApplication(),
+        # which on wxQt is QDesktopServices::openUrl(): Qt turns the file in
+        # its TMPDIR (the cache directory, added to the qtprovider paths in
+        # android/res/xml/qtprovider_paths.xml) into a content:// URI and sends
+        # ACTION_VIEW, and the package installer only takes that from an app
+        # holding this permission. INTERNET comes with Qt Core.
+        qt_add_android_permission(visualboyadvance-m
+            NAME android.permission.REQUEST_INSTALL_PACKAGES)
+    endif()
 
     # Base64 EdDSA public key (winsparkle-tool generate-key) that the update
     # files must be signed with; empty accepts unsigned feeds, as before.

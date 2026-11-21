@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Replaces Qt's template file of the same name: the paths the qtprovider
+    FileProvider in AndroidManifest.xml may hand out content:// URIs for, which
+    is how QDesktopServices::openUrl() (wxLaunchDefaultApplication()) passes a
+    local file to another app. Qt's entries, plus the cache directory, which is
+    Qt's TMPDIR: the online updater (wxSparkle) downloads the new APK there and
+    opens it with the package installer.
+-->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- For getFilesDirectory() -->
+    <files-path name="files_path" path="/"/>
+    <!-- For getCacheDir() (TMPDIR) -->
+    <cache-path name="cache_path" path="/"/>
+    <!-- For getExternalStorageDirectory() -->
+    <external-path name="external_path" path="/"/>
+    <!-- For getExternalFilesDir() -->
+    <external-files-path name="external_files_path" path="/"/>
+    <!-- For getExternalCacheDir() -->
+    <external-cache-path name="external_cache_path" path="/"/>
+</paths>

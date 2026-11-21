@@ -17,6 +17,10 @@
 # by the ~290 MB of weights. Pass -DENABLE_VULKAN=OFF as an extra argument to
 # leave both out.
 #
+# -DENABLE_ONLINEUPDATES=ON adds the wxSparkle online updater (Help > Check for
+# updates); it needs the triplet's curl and expat, and the APK then asks for
+# REQUEST_INSTALL_PACKAGES so it can hand the downloaded APK to the installer.
+#
 # This is the wx counterpart of build-android-qt.sh; override any of the paths
 # below via the environment before running, and pass further -D options as
 # arguments.
@@ -98,7 +102,6 @@ cmake -S "$SRC_DIR" -B "$BUILD_DIR" -G Ninja \
     -DENABLE_GLES=ON \
     -DENABLE_VULKAN=ON \
     -DENABLE_AAUDIO=ON \
-    -DENABLE_ONLINEUPDATES=OFF \
     -DENABLE_DEBUGGER=OFF \
     -DENABLE_LINK=ON \
     -DBUILD_TESTING=OFF \

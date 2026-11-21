@@ -44,7 +44,8 @@ make -j$(nproc)
 - `ENABLE_LINK`: Enable GBA linking functionality (default: AUTO)
 - `ENABLE_FFMPEG`: Enable ffmpeg A/V recording (default: AUTO)
 - `ENABLE_ONLINEUPDATES`: "Check for updates" in the wx port (default: OFF,
-  ON with `UPSTREAM_RELEASE`; never on Android)
+  ON with `UPSTREAM_RELEASE` except on Android; Linux and Android have only
+  wxSparkle, and the Android APK then asks for `REQUEST_INSTALL_PACKAGES`)
 - `ENABLE_WXSPARKLE`: use wxSparkle for it (default: ON); OFF falls back to
   the WinSparkle DLL (Windows) / Sparkle.framework (macOS)
 - `BUILD_TESTING`: Build tests and enable ctest support (default: ON)
