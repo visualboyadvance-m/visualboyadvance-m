@@ -56,6 +56,8 @@ namespace
     #define UA_OS "macOS"
 #elif WXSPARKLE_CLASSIC_MAC
     #define UA_OS "Mac OS"
+#elif defined(__ANDROID__) || defined(ANDROID)
+    #define UA_OS "Android"
 #elif defined(__linux__)
     #define UA_OS "Linux"
 #elif defined(__FreeBSD__)
@@ -72,6 +74,8 @@ namespace
     #define UA_ARCH "x86"
 #elif defined(__arm__) || defined(_M_ARM)
     #define UA_ARCH "arm"
+#elif defined(__riscv) && (__riscv_xlen == 64)
+    #define UA_ARCH "riscv64"
 #elif defined(__riscv)
     #define UA_ARCH "riscv"
 #elif defined(__powerpc64__)

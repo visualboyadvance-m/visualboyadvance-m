@@ -52,7 +52,7 @@ void SetCurrentThreadName(const std::string& name)
     pthread_setname_np(name.c_str());
 #elif defined(WXSPARKLE_PTHREADS)
     pthread_setname_np(pthread_self(), name.c_str());
-#elif defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+#elif defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__ANDROID__) || defined(ANDROID)
     // Linux limits thread names to 15 characters + NUL
     pthread_setname_np(pthread_self(), name.substr(0, 15).c_str());
 #else

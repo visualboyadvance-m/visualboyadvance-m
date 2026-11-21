@@ -42,6 +42,8 @@ namespace
 #elif WXSPARKLE_CLASSIC_MAC
     // (not "macos", whose binaries can't run on classic Mac OS)
     #define OS_MARKER_GENERIC "macos-classic"
+#elif defined(__ANDROID__) || defined(ANDROID)
+    #define OS_MARKER_GENERIC "Android"
 #elif defined(__linux__)
     #define OS_MARKER_GENERIC "linux"
 #elif defined(__FreeBSD__)
@@ -60,6 +62,8 @@ namespace
     #define OS_MARKER_ARCH_SUFFIX "-arm"
 #elif defined(__riscv) && (__riscv_xlen == 64)
     #define OS_MARKER_ARCH_SUFFIX "-riscv64"
+#elif defined(__riscv)
+    #define OS_MARKER_ARCH_SUFFIX "-riscv32"
 #elif defined(__m68k__)
     #define OS_MARKER_ARCH_SUFFIX "-m68k"
 #elif (defined(__powerpc__) || defined(__ppc__)) && !defined(__powerpc64__)
