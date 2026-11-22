@@ -1993,6 +1993,38 @@ if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
     target_link_libraries(visualboyadvance-m ${VBAM_WX_TLL_SCOPE} wxSparkle::wxsparkle)
     target_compile_definitions(visualboyadvance-m PRIVATE VBAM_WXSPARKLE)
 
+    # In-place updates (autoupdater/wxsparkle/inplace-update.h): the update
+    # replaces this installation and restarts it instead of opening the zip.
+    if(WIN32)
+        target_sources(visualboyadvance-m PRIVATE
+            autoupdater/wxsparkle/inplace-update.h
+            autoupdater/wxsparkle/inplace-update-win.cpp)
+        target_compile_definitions(visualboyadvance-m PRIVATE VBAM_INPLACE_UPDATE)
+    elseif(APPLE AND NOT RETRO68)
+        target_sources(visualboyadvance-m PRIVATE
+            autoupdater/wxsparkle/inplace-update.h
+            autoupdater/wxsparkle/inplace-update-mac.mm)
+        target_compile_definitions(visualboyadvance-m PRIVATE VBAM_INPLACE_UPDATE)
+
+        # The sandboxed app cannot write its own bundle: this unsandboxed
+        # helper does, from Contents/Helpers (codesign_app signs it without
+        # the app's entitlements).
+        add_executable(vbam-updater MACOSX_BUNDLE autoupdater/wxsparkle/vbam-updater.m)
+        set_target_properties(vbam-updater PROPERTIES
+            MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/autoupdater/wxsparkle/vbam-updater-Info.plist.in
+            MACOSX_BUNDLE_SHORT_VERSION_STRING "${VBAM_VERSION}"
+            MACOSX_BUNDLE_BUNDLE_VERSION "${VBAM_VERSION}"
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/helpers)
+        target_compile_options(vbam-updater PRIVATE -fobjc-arc)
+        target_link_libraries(vbam-updater PRIVATE "-framework Foundation" "-framework CoreServices")
+        add_dependencies(visualboyadvance-m vbam-updater)
+        add_custom_command(TARGET visualboyadvance-m POST_BUILD
+            COMMAND rm -rf ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Helpers/vbam-updater.app
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Helpers
+            COMMAND cp -R $<TARGET_BUNDLE_DIR:vbam-updater> ${CMAKE_BINARY_DIR}/visualboyadvance-m.app/Contents/Helpers/
+            VERBATIM)
+    endif()
+
     if(ANDROID)
         # wxSparkle opens the downloaded APK with wxLaunchDefaultApplication(),
         # which on wxQt is QDesktopServices::openUrl(): Qt turns the file in

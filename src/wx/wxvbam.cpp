@@ -505,6 +505,10 @@ IMPLEMENT_DYNAMIC_CLASS(MainFrame, wxFrame)
 #include "autoupdater/autoupdater.h"
 #endif // NO_ONLINEUPDATES
 
+#ifdef VBAM_INPLACE_UPDATE
+#include "wx/autoupdater/wxsparkle/inplace-update.h"
+#endif
+
 // generate config file path
 static void get_config_path(wxPathList& path, bool exists = true)
 {
@@ -903,6 +907,12 @@ void VbamInstallAndroidArtFallback();
 #endif
 
 bool wxvbamApp::OnInit() {
+#ifdef VBAM_INPLACE_UPDATE
+    // After an in-place update: let the instance that installed it finish
+    // writing the configuration before this one reads it.
+    InPlaceUpdateStartup();
+#endif
+
 #ifndef NO_WAYLAND
     using_wayland = IsWayland();
 #endif

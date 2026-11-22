@@ -100,7 +100,21 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   this build came from (recorded when the updater installs one and a build
   with another build time then runs) or the configure-time build time plus
   `VBAM_UPDATER_NIGHTLY_GRACE_HOURS` (12); nightlies are unsigned, so the
-  EdDSA key is only used on stable
+  EdDSA key is only used on stable.
+  On Windows and macOS updates install in place
+  (`autoupdater/wxsparkle/inplace-update*`, wxSparkle's run-installer
+  callback; 0 from it falls back to opening the zip): Windows renames the
+  running exe to `<exe>.old`, puts the zip's exe in its place and starts it
+  with `VBAM_UPDATER_WAIT_PID` (`InPlaceUpdateStartup()` at the top of
+  `OnInit()` waits for the old process, then deletes `.old`); macOS hands it
+  to the unsandboxed `Contents/Helpers/vbam-updater.app`, started through
+  Launch Services, which strips a sandboxed caller's arguments, so the
+  request is a plist in `<home>/Library/Caches/<bundle id>/` (the container's
+  when sandboxed) that the helper deletes on reading -- the app's success
+  signal, since LS's completion handler waits for the helper to exit; the
+  helper `ditto`s the zip beside the bundle, sets +x on `MacOS/` files and
+  Mach-O files, clears quarantine, swaps with `RENAME_SWAP` and relaunches,
+  or unpacks to ~/Downloads and reveals it when the location is not writable.
 
 **src/sdl/** - SDL-based frontend (command-line/minimal GUI)
 - Lightweight alternative to wxWidgets

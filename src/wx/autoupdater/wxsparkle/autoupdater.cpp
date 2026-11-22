@@ -23,6 +23,10 @@
 #include "core/base/version.h"
 #include "wx/android-compat.h"
 
+#ifdef VBAM_INPLACE_UPDATE
+#include "wx/autoupdater/wxsparkle/inplace-update.h"
+#endif
+
 #ifndef VBAM_UPDATER_EDDSA_PUBLIC_KEY
 #define VBAM_UPDATER_EDDSA_PUBLIC_KEY ""
 #endif
@@ -158,6 +162,12 @@ void initAutoupdater() {
 
     win_sparkle_set_can_shutdown_callback(CanShutdown);
     win_sparkle_set_shutdown_request_callback(RequestShutdown);
+#ifdef VBAM_INPLACE_UPDATE
+    // Windows and macOS: replace this installation and restart instead of
+    // opening the downloaded zip (inplace-update.h); 0 from it falls back to
+    // opening the zip.
+    win_sparkle_set_user_run_installer_callback(InPlaceUpdateRunInstaller);
+#endif
 #if defined(__WXQT__) && defined(__ANDROID__)
     win_sparkle_set_screen_area_callback(ScreenArea);
 #endif
