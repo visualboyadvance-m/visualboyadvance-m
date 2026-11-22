@@ -92,11 +92,12 @@ public:
     //   - 1-word (4-byte / 4-sample) playing buffer fed one word at
     //     a time from the ring.
     //   - At each timer overflow:
-    //       (1) If main_words <= 3, request a DMA refill. One DMA
-    //           per overflow.
+    //       (1) Sample whether main_words <= 3 (a DMA refill request).
+    //           One DMA per overflow.
     //       (2) If the playing buffer is empty and the ring has data,
     //           move one word from ring to playing.
     //       (3) Output one sample from the playing buffer.
+    //       (4) Run the requested refill. It lands after (2) and (3).
     //   - If both ring and playing are empty, the last sample is held.
     //   - CPU writes advance the write pointer by one word regardless
     //     of write size (8/16/32-bit). Sub-word writes leave stale ring
@@ -211,21 +212,12 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
     // as master is on.
     if (!(g_ioMem[NR52] & 0x80)) return;
 
-    // Step 1: request a DMA refill if main ring has >=4 empty words.
-    // Hardware fires at most one DMA per overflow.
-    if (main_words <= 3) {
-        CPUCheckDMA(3, which ? 4 : 2);
-        // Fallback: if no DMA is configured to service this FIFO and
-        // both ring and playing are empty, write 16 bytes of silence
-        // so `count` stays consistent with the visible FIFO state.
-        if (main_words == 0 && playing_samples == 0) {
-            const int io_reg = which ? FIFOB_L : FIFOA_L;
-            for (int n = 8; n--;) {
-                soundEvent16(io_reg, (uint16_t)0);
-                soundEvent16(io_reg + 2, (uint16_t)0);
-            }
-        }
-    }
+    // Step 1: sample the request condition: the main ring has >= 4 empty
+    // words. Hardware fires at most one DMA per overflow. The request only
+    // makes the DMA pending; its transfer runs after DMA activation, so the
+    // refill can't reach the ring before steps 2 and 3 of this overflow.
+    const bool request = main_words <= 3;
+    const bool empty = main_words == 0 && playing_samples == 0;
 
     // Step 2: refill playing buffer from ring if playing is empty.
     if (playing_samples == 0 && main_words > 0) {
@@ -246,6 +238,21 @@ void Gba_Pcm_Fifo::timer_overflowed(int which_timer)
         playing_samples--;
         if (enabled) {
             pcm.update(dac);
+        }
+    }
+
+    // Step 4: run the requested refill.
+    if (request) {
+        CPUCheckDMA(3, which ? 4 : 2);
+        // Fallback: if no DMA is configured to service this FIFO and
+        // both ring and playing were empty, write 16 bytes of silence
+        // so `count` stays consistent with the visible FIFO state.
+        if (empty && main_words == 0) {
+            const int io_reg = which ? FIFOB_L : FIFOA_L;
+            for (int n = 8; n--;) {
+                soundEvent16(io_reg, (uint16_t)0);
+                soundEvent16(io_reg + 2, (uint16_t)0);
+            }
         }
     }
 }

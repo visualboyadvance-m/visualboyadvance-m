@@ -1668,18 +1668,25 @@ static INSN_REGPARM void arm121(uint32_t opcode)
     if (dest != base) {                                            \
         WRITEBACK;                                                 \
     }                                                              \
-    clockTicks = 0;                                                \
+    {                                                              \
+        /* Code fetch, data read, internal cycle. The fetch after  */ \
+        /* a data access is nonsequential; that cost is charged    */ \
+        /* here. A load into PC follows with the refill instead,   */ \
+        /* whose first fetch is nonsequential at the loaded PC, so */ \
+        /* this instruction's own fetch stays sequential.          */ \
+        int _ldrDataTicks = dataTicksAccess##SIZE(address);        \
+        clockTicks = 3 + _ldrDataTicks + (dest == 15               \
+            ? codeTicksAccessSeq32(armNextPC)                      \
+            : codeTicksAccess32(armNextPC));                       \
+    }                                                              \
     if (dest == 15) {                                              \
         reg[15].I &= 0xFFFFFFFE;                                   \
         armNextPC = reg[15].I;                                     \
         reg[15].I += 4;                                            \
         ARM_PREFETCH;                                              \
-        clockTicks += 2 + dataTicksAccessSeq32(address)            \
-            + dataTicksAccessSeq32(address);                       \
-    }                                                              \
-    {                                                              \
-        int _ldrDataTicks = dataTicksAccess##SIZE(address);        \
-        clockTicks += 3 + _ldrDataTicks + codeTicksAccess32(armNextPC); \
+        /* Pipeline refill: N then S fetch at the loaded PC.       */ \
+        clockTicks += 2 + codeTicksAccess32(armNextPC)             \
+            + codeTicksAccessSeq32(armNextPC);                     \
     }
 #define STR_POSTDEC(CALC_OFFSET, STORE_DATA, SIZE) \
     STR(CALC_OFFSET, ADDRESS_POST, STORE_DATA, WRITEBACK_NONE, WRITEBACK_POSTDEC, SIZE)
