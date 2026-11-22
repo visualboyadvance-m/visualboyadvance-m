@@ -29,9 +29,14 @@ extern VbamScriptMemExecFn  g_vbam_script_mem_exec;
 // Quick "anyone listening?" gates — the core checks these first to
 // skip a function-pointer call when no script has any hooks
 // installed. They're set by the engine at register time.
+//
+// The exec hook is the exception: it fires once per instruction in the
+// hottest loop in the program, so the core tests the function pointer
+// itself (null when disarmed) instead of a flag, to keep that to a
+// single load. g_vbam_script_mem_exec is therefore managed by the
+// engine, not installed once at startup like the read/write pointers.
 extern int g_vbam_script_has_read_hooks;
 extern int g_vbam_script_has_write_hooks;
-extern int g_vbam_script_has_exec_hooks;
 
 #ifdef __cplusplus
 }  // extern "C"
