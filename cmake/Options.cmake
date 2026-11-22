@@ -667,19 +667,9 @@ else()
 endif()
 
 # Online Updates, a wx port feature. The updater is wxSparkle
-# (third_party/wxSparkle, the wxWidgets port of WinSparkle, linked statically
-# on every platform: libcurl with an embedded CA bundle, and expat). With
-# ENABLE_WXSPARKLE=OFF the older backends are used instead: the WinSparkle DLL
-# from win32-deps on Windows and Sparkle.framework on macOS; other platforms
-# (Linux, Android, ...) have only wxSparkle. On Android it is off unless asked
-# for, even in a release: an APK from a store is updated by the store, and one
-# installed by hand downloads the new APK and hands it to the package
-# installer (REQUEST_INSTALL_PACKAGES, see src/wx/CMakeLists.txt).
-set(ONLINEUPDATES_DEFAULT OFF)
-# (On classic Mac OS only without the link: see src/wx/CMakeLists.txt.)
-if(UPSTREAM_RELEASE AND NOT (VBAM_TARGET_RETRO68 AND ENABLE_LINK) AND NOT VBAM_TARGET_ANDROID)
-    set(ONLINEUPDATES_DEFAULT ON)
-endif()
+# Defaults to ON now since it auto checks the nightly updater
+# It is available on Android, Windows and macOS.
+set(ONLINEUPDATES_DEFAULT ON)
 # wxSparkle needs libcurl, and libcurl stopped building for Windows XP in 8.x:
 #
 #   CMake Error at CMakeLists.txt:1515 (message):
@@ -688,9 +678,6 @@ endif()
 # so the 32 bit Windows build, which targets XP (_WIN32_WINNT=0x0501), keeps
 # the WinSparkle DLL backend instead.
 set(WXSPARKLE_DEFAULT ON)
-if(WINXP)
-    set(WXSPARKLE_DEFAULT OFF)
-endif()
 if(ENABLE_WX)
     option(ENABLE_ONLINEUPDATES "Enable online update checks" ${ONLINEUPDATES_DEFAULT})
     option(ENABLE_WXSPARKLE "Use wxSparkle for online updates (OFF: WinSparkle DLL / Sparkle.framework)" ${WXSPARKLE_DEFAULT})
