@@ -9,6 +9,7 @@
 #include <wx/socket.h>
 #include <wx/statusbr.h>
 
+#include "core/base/file_util.h"
 #include "core/base/image_util.h"
 #include "core/base/sdl_motion.h"
 #include "core/gb/gbGlobals.h"
@@ -24,8 +25,48 @@
 
 #ifdef ENABLE_LUA
 #include "wx/lua/lua_engine.h"
+#include "wx/lua/lua_internal.h"
 namespace vbam { namespace wx { namespace lua_internal {
 extern int g_frame_count;
+
+// emu.loadrom backend. Always invoked on the GUI thread (the Lua pump
+// runs inside systemDrawScreen); validates first so LoadGame's modal
+// error dialogs stay out of the automation path — under a headless
+// run nobody could dismiss them.
+static bool WxLoadRom(const std::string& path, std::string* err) {
+    const wxString wxpath(path.c_str(), wxConvUTF8);
+    wxFileName fn(wxpath);
+    if (!fn.IsFileReadable()) {
+        if (err) *err = "file not found or unreadable: " + path;
+        return false;
+    }
+    // Same predicates the GUI's ROM open path uses, so emu.loadrom
+    // accepts exactly what the emulator loads (including .elf, .mb
+    // multiboot, and .tar) instead of a hand-maintained extension
+    // list that drifts from them.
+    if (!utilIsGBAImage(path.c_str()) && !utilIsGBImage(path.c_str()) &&
+        !utilIsTARAchive(path.c_str())) {
+        if (err) *err = "not a ROM file: " + path;
+        return false;
+    }
+    // Defer out of the current draw callback: LoadGame unloads (and
+    // may re-create) the very panel whose systemDrawScreen call is on
+    // the stack right now. The load lands on the next event-loop
+    // pass; scripts observe it via emu.romgeneration().
+    const std::string p(path);
+    wxTheApp->CallAfter([p]() {
+        MainFrame* mf = wxGetApp().frame;
+        if (!mf) return;
+        GameArea* ga = mf->GetPanel();
+        if (ga) ga->LoadGame(wxString(p.c_str(), wxConvUTF8));
+    });
+    return true;
+}
+struct LoadRomInstaller {
+    LoadRomInstaller() { g_loadrom_fn = &WxLoadRom; }
+};
+static LoadRomInstaller s_loadrom_installer;
+
 }}}
 #endif
 
@@ -146,6 +187,14 @@ void systemDrawScreen()
         vbam::wx::LuaInstance().RenderOverlay(
             g_pix, width, height, pitch,
             systemColorDepth, systemRedShift, systemGreenShift, systemBlueShift);
+
+        // Keep a copy of the frame for emu.screenshot(). Armed lazily on
+        // first use (see LuaEngine::ArmFrameCapture) so a script that
+        // never takes a screenshot pays nothing per frame.
+        if (vbam::wx::LuaInstance().FrameCaptureArmed())
+            vbam::wx::LuaInstance().CaptureFrame(
+                g_pix, width, height, pitch,
+                systemColorDepth, systemRedShift, systemGreenShift, systemBlueShift);
     }
 #endif
 

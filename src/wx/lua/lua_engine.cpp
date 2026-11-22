@@ -21,7 +21,9 @@ extern "C" {
 #include <lualib.h>
 }
 
+#include "core/base/image_util.h"
 #include "core/base/script_hooks.h"
+#include "core/base/system.h"
 #include "wx/lua/lua_internal.h"
 
 namespace vbam {
@@ -38,6 +40,17 @@ void LuaApi_InstallGui       (lua_State* L, LuaEngine* engine);
 void LuaApi_InstallSavestate (lua_State* L, LuaEngine* engine);
 void LuaApi_InstallRom       (lua_State* L, LuaEngine* engine);
 void LuaApi_InstallBit       (lua_State* L, LuaEngine* engine);
+void LuaApi_InstallBridge    (lua_State* L, LuaEngine* engine);
+
+// emu.screenshot lives in lua_screenshot.cpp (with the frame cache it
+// reads); the emu table in lua_api_emu.cpp picks it up through this
+// declaration.
+int  l_screenshot           (lua_State* L);
+
+// Drop the bridge's server thread + sockets. Called from Stop() so a
+// reloaded script can't leak a listening port. Defined in
+// lua_api_bridge.cpp.
+void LuaApi_ShutdownBridge   ();
 
 namespace {
 
@@ -76,6 +89,21 @@ struct LuaEngine::Impl {
     // this contract).
     bool         in_mem_dispatch = false;
     std::map<int, uint32_t> joypad_overrides;  // port → button mask, FCEUX bits
+
+    // Cached composed framebuffer for emu.screenshot() (see
+    // lua_screenshot.cpp). frame_pix keeps the padded layout the
+    // core's PNG writer expects, so the depth/shift snapshot travels
+    // with it.
+    bool               has_frame = false;
+    std::vector<uint8_t> frame_pix;
+    int                frame_w = 0, frame_h = 0;
+    int                frame_bpp = 0;
+    int                frame_rs = 0, frame_gs = 0, frame_bs = 0;
+    // Per-frame capture is armed lazily: systemDrawScreen only calls
+    // CaptureFrame() after a script has called emu.screenshot() at
+    // least once, so scripts that never take a screenshot pay nothing
+    // on the per-frame path.
+    bool               frame_capture_armed = false;
 };
 
 LuaEngine& LuaInstance() {
@@ -225,7 +253,11 @@ void LuaEngine::Stop() {
     ::g_vbam_script_has_write_hooks = 0;
     ::g_vbam_script_mem_exec        = nullptr;
     impl_->joypad_overrides.clear();
+    impl_->has_frame = false;
+    impl_->frame_pix.clear();
+    impl_->frame_capture_armed = false;
     ClearGui();
+    LuaApi_ShutdownBridge();
     script_path_.clear();
 }
 
@@ -249,6 +281,7 @@ bool LuaEngine::LoadFile(const std::string& path) {
     LuaApi_InstallSavestate (impl_->L, this);
     LuaApi_InstallRom       (impl_->L, this);
     LuaApi_InstallBit       (impl_->L, this);
+    LuaApi_InstallBridge    (impl_->L, this);
 
     if (luaL_loadfile(impl_->L, path.c_str()) != LUA_OK) {
         Log(std::string("[lua load] ") + lua_tostring(impl_->L, -1));
@@ -285,6 +318,7 @@ bool LuaEngine::LoadString(const std::string& chunk, const std::string& name) {
     LuaApi_InstallSavestate (impl_->L, this);
     LuaApi_InstallRom       (impl_->L, this);
     LuaApi_InstallBit       (impl_->L, this);
+    LuaApi_InstallBridge    (impl_->L, this);
 
     if (luaL_loadbuffer(impl_->L, chunk.data(), chunk.size(), name.c_str())
         != LUA_OK) {
@@ -379,6 +413,61 @@ void LuaEngine::DispatchMemExec(uint32_t addr) {
     CallMemRegistryList(this, impl_->L, kRegMemExec, addr, 1, 0, true);
     impl_->in_mem_dispatch = false;
 }
+// Frame cache for emu.screenshot() (binding in lua_screenshot.cpp).
+// CaptureFrame copies the raw padded framebuffer plus its geometry
+// every frame; SaveScreenshot replays it through utilWritePNGFile
+// under the captured depth/shift globals, the same way
+// systemGbPrint's capture path swaps them in.
+void LuaEngine::CaptureFrame(const uint8_t* pix, int width, int height,
+                             int pitch_bytes, int bpp,
+                             int r_shift, int g_shift, int b_shift) {
+    if (!impl_ || !pix || width <= 0 || height <= 0) return;
+    // The core's g_pix layout keeps one guard row before the visible
+    // frame (the renderer writes at row VCOUNT+1) plus one padding
+    // column per row, and utilWritePNGFile reads the guard row back —
+    // so copy height+1 rows, not height, or the writer would read one
+    // row past the cached vector.
+    impl_->frame_pix.assign(pix, pix + (size_t)pitch_bytes * (height + 1));
+    impl_->frame_w   = width;
+    impl_->frame_h   = height;
+    impl_->frame_bpp = bpp;
+    impl_->frame_rs  = r_shift;
+    impl_->frame_gs  = g_shift;
+    impl_->frame_bs  = b_shift;
+    impl_->has_frame = true;
+}
+
+bool LuaEngine::SaveScreenshot(const std::string& path, std::string* err) {
+    if (!impl_ || !impl_->has_frame) {
+        if (err) *err = "no frame captured yet (is a ROM running?)";
+        return false;
+    }
+
+    const int old_depth = systemColorDepth;
+    const int old_rs = systemRedShift, old_gs = systemGreenShift,
+              old_bs = systemBlueShift;
+    systemColorDepth = impl_->frame_bpp;
+    systemRedShift   = impl_->frame_rs;
+    systemGreenShift = impl_->frame_gs;
+    systemBlueShift  = impl_->frame_bs;
+    const bool ok = utilWritePNGFile(path.c_str(), impl_->frame_w,
+                                     impl_->frame_h, impl_->frame_pix.data());
+    systemColorDepth = old_depth;
+    systemRedShift   = old_rs;
+    systemGreenShift = old_gs;
+    systemBlueShift  = old_bs;
+
+    if (!ok && err) *err = "PNG write failed for " + path;
+    return ok;
+}
+
+void LuaEngine::ArmFrameCapture() {
+    impl_->frame_capture_armed = true;
+}
+bool LuaEngine::FrameCaptureArmed() const {
+    return impl_->frame_capture_armed;
+}
+
 bool LuaEngine::HasReadHooks()  const { return impl_->has_read_hooks; }
 bool LuaEngine::HasWriteHooks() const { return impl_->has_write_hooks; }
 bool LuaEngine::HasExecHooks()  const { return impl_->has_exec_hooks; }

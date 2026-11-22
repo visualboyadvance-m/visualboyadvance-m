@@ -1124,10 +1124,11 @@ if(ENABLE_SDL3)
 endif()
 
 if(ENABLE_LUA)
-    target_sources(visualboyadvance-m PRIVATE
+    # The engine plus every FCEUX-style binding. Shared by the main
+    # app and the two standalone test runners below — the next
+    # lua_api_*.cpp goes in this list once, not in three places.
+    set(VBAM_LUA_RUNNER_SOURCES
         lua/lua_engine.cpp
-        lua/lua_engine.h
-        lua/lua_internal.h
         lua/lua_api_emu.cpp
         lua/lua_api_memory.cpp
         lua/lua_api_joypad.cpp
@@ -1135,11 +1136,19 @@ if(ENABLE_LUA)
         lua/lua_api_savestate.cpp
         lua/lua_api_rom.cpp
         lua/lua_api_bit.cpp
+        lua/lua_api_bridge.cpp
+        lua/lua_api_loadrom.cpp
+        lua/lua_screenshot.cpp
+        lua/lua_overlay.cpp
+    )
+    target_sources(visualboyadvance-m PRIVATE
+        ${VBAM_LUA_RUNNER_SOURCES}
+        lua/lua_engine.h
+        lua/lua_internal.h
         lua/lua_console.cpp
         lua/lua_console.h
         lua/lua_editor.cpp
         lua/lua_editor.h
-        lua/lua_overlay.cpp
     )
     target_link_libraries(     visualboyadvance-m ${vbam-sdl-motion} ${VBAM_WX_TLL_SCOPE} ${LUA_LIBRARIES})
     target_include_directories(visualboyadvance-m PRIVATE ${LUA_INCLUDE_DIR})
@@ -1153,19 +1162,15 @@ if(ENABLE_LUA)
     if(BUILD_TESTING)
         add_executable(lua_test_runner
             lua/test/lua_test_runner.cpp
-            lua/lua_engine.cpp
-            lua/lua_api_emu.cpp
-            lua/lua_api_memory.cpp
-            lua/lua_api_joypad.cpp
-            lua/lua_api_gui.cpp
-            lua/lua_api_savestate.cpp
-            lua/lua_api_rom.cpp
-            lua/lua_api_bit.cpp
-            lua/lua_overlay.cpp
+            ${VBAM_LUA_RUNNER_SOURCES}
         )
         target_link_libraries(     lua_test_runner PRIVATE ${LUA_LIBRARIES})
         target_include_directories(lua_test_runner PRIVATE ${LUA_INCLUDE_DIR} "${CMAKE_SOURCE_DIR}/src")
         target_link_libraries(lua_test_runner PRIVATE vbam-core vbam-core-fake)
+        if(WIN32)
+            # lua_api_bridge.cpp uses winsock2.
+            target_link_libraries(lua_test_runner PRIVATE ws2_32)
+        endif()
         if(APPLE)
             # Link iconv by its resolved path (the SDK .tbd) rather than a
             # bare `-liconv`; non-Apple toolchains do not implicitly search
@@ -1188,6 +1193,31 @@ if(ENABLE_LUA)
             add_test(NAME wx.lua.api
                      COMMAND lua_test_runner
                          "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_api_test.lua")
+        endif()
+
+        # Bridge integration test: same engine + bindings, but the
+        # runner also plays the external TCP client – connect, send
+        # commands, verify the joypad override and a PNG screenshot
+        # round-trip. The runner's socket half is portable (winsock on
+        # Windows, BSD sockets elsewhere). No fixed port or output
+        # path here: the runner binds port 0 at run time and writes
+        # its PNG under a PID-unique name in the ctest working
+        # directory, so concurrent ctest runs cannot collide.
+        if(NOT CMAKE_CROSSCOMPILING)
+            add_executable(lua_bridge_test
+                lua/test/lua_bridge_runner.cpp
+                ${VBAM_LUA_RUNNER_SOURCES}
+            )
+            target_link_libraries(     lua_bridge_test PRIVATE ${LUA_LIBRARIES})
+            target_include_directories(lua_bridge_test PRIVATE ${LUA_INCLUDE_DIR} "${CMAKE_SOURCE_DIR}/src")
+            target_link_libraries(lua_bridge_test PRIVATE vbam-core vbam-core-fake)
+            if(WIN32)
+                # lua_api_bridge.cpp + the runner use winsock2.
+                target_link_libraries(lua_bridge_test PRIVATE ws2_32)
+            endif()
+            add_test(NAME wx.lua.bridge
+                     COMMAND lua_bridge_test
+                         "${CMAKE_CURRENT_SOURCE_DIR}/lua/test/lua_bridge_test.lua")
         endif()
     endif()
 endif()
