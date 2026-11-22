@@ -613,6 +613,28 @@ typedef int(WIN_SPARKLE_CALL* win_sparkle_user_run_installer_callback_t)(const w
 */
 WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_user_run_installer_callback(win_sparkle_user_run_installer_callback_t callback);
 
+
+/// Callback type for win_sparkle_set_screen_area_callback()
+typedef int(WIN_SPARKLE_CALL* win_sparkle_screen_area_callback_t)(int *x, int *y, int *width, int *height);
+
+/**
+    Sets a callback that tells WinSparkle the part of the screen its windows
+    may take, in the same coordinates as the windows' screen positions.
+
+    It is only used where the dialogs fill the screen (Android), where the
+    system's idea of the screen's client area can be larger than what the
+    application actually gets: e.g. Qt for Android does not leave out the
+    activity's action bar, so a dialog sized to it hangs off the bottom of
+    the screen, buttons and all.
+
+    The callback is called on the UI thread and returns:
+    - 1 if it filled in the area, which then limits the dialogs' size
+    - 0 if it doesn't know it (yet), in which case the default is used
+
+    @since wxSparkle
+*/
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_screen_area_callback(win_sparkle_screen_area_callback_t callback);
+
 //@}
 
 

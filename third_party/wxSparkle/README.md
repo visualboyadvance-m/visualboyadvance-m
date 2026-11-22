@@ -169,6 +169,15 @@ As before, `win_sparkle_set_user_run_installer_callback()` lets the
 application handle the file itself. The application is then asked to shut
 down, using the can-shutdown/shutdown-request callbacks.
 
+### Phones and tablets
+
+On Android (`WXSPARKLE_FILL_SCREEN`) the dialogs fill the application's part
+of the screen, with text and buttons fitted to its width. Qt for Android
+reports a screen area that includes the activity's action bar, which would
+push the dialogs' buttons off the bottom of the screen, so the application
+should report the area it really has with
+`win_sparkle_set_screen_area_callback()`.
+
 ### Signing updates
 
 `winsparkle-tool` now builds on all platforms:

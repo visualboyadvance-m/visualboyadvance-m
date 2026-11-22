@@ -46,6 +46,7 @@
 #include <wx/utils.h>
 
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <initializer_list>
 #include <vector>
@@ -131,6 +132,8 @@ namespace
 {
 
 std::unique_ptr<wxMsgCatalog> g_catalog;
+// the host's idea of the screen area the dialogs may take, if it has one
+std::atomic<win_sparkle_screen_area_callback_t> g_screenAreaCallback{nullptr};
 wxLayoutDirection             g_layoutDirection = wxLayout_Default;
 bool                          g_translationsInitialized = false;
 
@@ -655,6 +658,22 @@ wxRect GetFillScreenArea(const wxWindow *win)
     const wxRect host = GetHostApplicationScreenArea();
     if ( !host.IsEmpty() && area.Intersects(host) )
         area.Intersect(host);
+
+    // Neither of those need be what the app really has: Qt for Android counts
+    // the action bar above the app in both, and a dialog that tall has its
+    // bottom -- the buttons -- off the screen. The host knows better.
+    if ( win_sparkle_screen_area_callback_t cb = g_screenAreaCallback )
+    {
+        int x = 0, y = 0, w = 0, h = 0;
+        if ( cb(&x, &y, &w, &h) && w > 0 && h > 0 )
+        {
+            const wxRect usable(x, y, w, h);
+            if ( area.Intersects(usable) )
+                area.Intersect(usable);
+            else
+                area = usable;
+        }
+    }
     return area;
 }
 #endif // WXSPARKLE_FILL_SCREEN
@@ -936,8 +955,11 @@ int WinSparkleDialog::FitWidth(int width) const
 {
     width = PX(width);
 #if WXSPARKLE_FILL_SCREEN
+    // The dialog is as wide as the screen: text and controls take all of it,
+    // rather than leave most of a wide (landscape) screen empty and wrap the
+    // text into more lines than the height has room for.
     const int avail = GetFillScreenArea(this).width - 2 * PX(MAIN_AREA_BORDER);
-    if ( avail > 0 && avail < width )
+    if ( avail > 0 )
         width = avail;
 #endif
     return width;
@@ -2382,6 +2404,13 @@ void UIDispatcher::ShutDown()
 /*--------------------------------------------------------------------------*
                              winsparkle::UI class
  *--------------------------------------------------------------------------*/
+
+/*static*/
+void UI::SetScreenAreaCallback(win_sparkle_screen_area_callback_t cb)
+{
+    g_screenAreaCallback = cb;
+}
+
 
 /*static*/
 void UI::ShutDown()

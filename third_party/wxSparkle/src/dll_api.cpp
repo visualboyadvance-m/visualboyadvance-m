@@ -310,6 +310,15 @@ WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_can_shutdown_callback(win_
     CATCH_ALL_EXCEPTIONS
 }
 
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_screen_area_callback(win_sparkle_screen_area_callback_t callback)
+{
+    try
+    {
+        UI::SetScreenAreaCallback(callback);
+    }
+    CATCH_ALL_EXCEPTIONS
+}
+
 WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_shutdown_request_callback(win_sparkle_shutdown_request_callback_t callback)
 {
     try

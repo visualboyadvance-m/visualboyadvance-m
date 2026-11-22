@@ -10,6 +10,7 @@
 #define _ui_h_
 
 #include "threads.h"
+#include "winsparkle.h"
 #include "appcast.h"
 
 namespace winsparkle
@@ -91,6 +92,9 @@ public:
         Shows the dialog asking user for permission to check for updates.
      */
     static void AskForPermission();
+
+    /// Sets the callback giving the screen area the dialogs may take.
+    static void SetScreenAreaCallback(win_sparkle_screen_area_callback_t cb);
 
 #ifdef _WIN32
     /**
