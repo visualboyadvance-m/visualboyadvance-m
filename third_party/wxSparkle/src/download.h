@@ -11,6 +11,7 @@
 
 #include <string>
 #include <cstddef>
+#include <ctime>
 
 namespace winsparkle
 {
@@ -41,6 +42,14 @@ struct IDownloadSink
 
     /// Add chunk of downloaded data
     virtual void Add(const void *data, size_t len) = 0;
+
+    /**
+       Inform the sink of the resource's modification time (Last-Modified),
+       once the transfer is done.
+
+       Only called if the server reported it.
+     */
+    virtual void SetFileTime(time_t) {}
 };
 
 /**
@@ -57,8 +66,13 @@ struct StringDownloadSink : public IDownloadSink
         this->data.append(reinterpret_cast<const char*>(data), len);
     }
 
+    virtual void SetFileTime(time_t t) { fileTime = t; }
+
     /// Downloaded data, as a string.
     std::string data;
+
+    /// The resource's Last-Modified time, or -1 if the server didn't say.
+    time_t fileTime = time_t(-1);
 };
 
 
@@ -66,7 +80,10 @@ struct StringDownloadSink : public IDownloadSink
 enum DownloadFlag
 {
     /// Instruct proxies to pass the request upstream
-    Download_BypassProxies = 1
+    Download_BypassProxies = 1,
+
+    /// Only ask for the headers (HEAD request), e.g. for SetFileTime()
+    Download_HeadOnly = 2
 };
 
 /**

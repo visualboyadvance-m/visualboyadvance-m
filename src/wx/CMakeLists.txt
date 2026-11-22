@@ -2004,6 +2004,41 @@ if(ENABLE_ONLINEUPDATES AND ENABLE_WXSPARKLE)
             NAME android.permission.REQUEST_INSTALL_PACKAGES)
     endif()
 
+    # Which builds the updater offers: "stable" (appcast.xml) or "nightly"
+    # (this platform's newest file on nightly.visualboyadvance-m.org, where
+    # there is one: Windows, macOS, Android). Empty: nightly unless this is a
+    # tagged release.
+    set(VBAM_UPDATER_CHANNEL "" CACHE STRING "Online update channel: stable, nightly or empty (by version)")
+    set(VBAM_UPDATER_NIGHTLY_GRACE_HOURS 12 CACHE STRING
+        "Hours after its build time a nightly's own file may appear on the nightly server")
+    set(_updater_channel "${VBAM_UPDATER_CHANNEL}")
+    if(NOT _updater_channel)
+        if(VBAM_VERSION_RELEASE)
+            set(_updater_channel stable)
+        else()
+            set(_updater_channel nightly)
+        endif()
+    endif()
+    if(_updater_channel STREQUAL "nightly")
+        # The nightly server's listing has no versions, only dates: the build
+        # time (UTC; SOURCE_DATE_EPOCH if set) stands for this build's file
+        # until the updater installs one. It is taken at configure time,
+        # which a new commit triggers, and only this file is rebuilt when it
+        # changes.
+        string(TIMESTAMP _updater_build_time "%s" UTC)
+        math(EXPR _updater_grace "${VBAM_UPDATER_NIGHTLY_GRACE_HOURS} * 3600")
+        set_property(SOURCE autoupdater/wxsparkle/autoupdater.cpp APPEND PROPERTY COMPILE_DEFINITIONS
+            VBAM_UPDATER_NIGHTLY
+            VBAM_UPDATER_BUILD_TIME=${_updater_build_time}
+            VBAM_UPDATER_NIGHTLY_GRACE=${_updater_grace})
+        unset(_updater_build_time)
+        unset(_updater_grace)
+    elseif(NOT _updater_channel STREQUAL "stable")
+        message(FATAL_ERROR "VBAM_UPDATER_CHANNEL must be stable, nightly or empty, not '${VBAM_UPDATER_CHANNEL}'")
+    endif()
+    message(STATUS "Online updater channel: ${_updater_channel}")
+    unset(_updater_channel)
+
     # Base64 EdDSA public key (winsparkle-tool generate-key) that the update
     # files must be signed with; empty accepts unsigned feeds, as before.
     set(VBAM_UPDATER_EDDSA_PUBLIC_KEY "" CACHE STRING "EdDSA public key for verifying online updates")

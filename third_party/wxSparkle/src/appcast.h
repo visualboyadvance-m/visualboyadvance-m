@@ -26,6 +26,7 @@
 #ifndef _appcast_h_
 #define _appcast_h_
 
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -59,6 +60,10 @@ struct Appcast
 
     // CriticalUpdate?
     bool CriticalUpdate = false;
+
+    /// For an update found in a directory listing (LoadDirectoryListing()):
+    /// the file's date in the listing (UTC); 0 for appcast items.
+    time_t ListingTime = 0;
 
     struct Enclosure
     {
@@ -99,6 +104,26 @@ struct Appcast
      */
     static std::vector<Appcast> Load(const std::string& xml);
 
+    /**
+        Finds a file in a web server's directory listing (an autoindex page:
+        Apache's, nginx's or nginx's fancyindex) and makes an update of it.
+
+        The update is identified by the file's date in the listing, which is
+        taken as UTC (what these listings show) and becomes ListingTime;
+        Version is the date as "YYYY.MM.DD.HHMM", ShortVersionString as
+        "YYYY-MM-DD HH:MM UTC".
+
+        Returns one item for every row naming @a fileName with a date in it,
+        in the order of the listing; an empty list if there is none.
+
+        @param html      The listing page.
+        @param indexURL  Its URL, which relative links resolve against.
+        @param fileName  The file's name (the last component of its link).
+     */
+    static std::vector<Appcast> LoadDirectoryListing(const std::string& html,
+                                                     const std::string& indexURL,
+                                                     const std::string& fileName);
+
     /// Returns true if the struct constains valid data.
     bool IsValid() const { return !Version.empty() && (HasDownload() || !WebBrowserURL.empty()); }
 
@@ -106,6 +131,22 @@ struct Appcast
     /// If false, launch a web browser to WebBrowserURL.
     bool HasDownload() const { return enclosure.IsValid(); }
 };
+
+
+/// Helpers exposed for unit testing.
+namespace detail
+{
+
+/// Seconds since the epoch of the given UTC date and time.
+time_t MakeUTCTime(int year, int month, int day, int hour, int minute, int second);
+
+/// Formats a time as "YYYY-MM-DD HH:MM" (UTC).
+std::string FormatUTCTime(time_t t);
+
+/// Resolves a link in the page at @a base to an absolute URL.
+std::string ResolveURL(const std::string& base, const std::string& href);
+
+} // namespace detail
 
 } // namespace winsparkle
 

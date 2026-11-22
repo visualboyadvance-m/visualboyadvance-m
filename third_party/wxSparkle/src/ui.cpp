@@ -1523,6 +1523,12 @@ void UpdateDialog::OnRunInstaller(wxCommandEvent&)
     }
     else
     {
+        try
+        {
+            UpdateChecker::RecordDirectoryFeedInstall(m_appcast);
+        }
+        CATCH_ALL_EXCEPTIONS
+
         m_closeInitiatedByUpdater = true;
         Close();
         ApplicationController::RequestShutdown();

@@ -459,6 +459,86 @@ static void TestThreads()
 }
 
 
+static void TestDirectoryListing()
+{
+    // UTC date arithmetic
+    CHECK(detail::MakeUTCTime(1970, 1, 1, 0, 0, 0) == 0);
+    CHECK(detail::MakeUTCTime(2026, 11, 12, 23, 24, 57) == time_t(1794525897));
+    CHECK(detail::MakeUTCTime(2024, 2, 29, 12, 0, 0) == time_t(1709208000));
+    CHECK(detail::FormatUTCTime(time_t(1794525897)) == "2026-11-12 23:24");
+    CHECK(detail::FormatUTCTime(time_t(1709208000)) == "2024-02-29 12:00");
+
+    // relative links
+    CHECK(detail::ResolveURL("https://example.org", "a.zip") == "https://example.org/a.zip");
+    CHECK(detail::ResolveURL("https://example.org/", "./a.zip") == "https://example.org/a.zip");
+    CHECK(detail::ResolveURL("https://example.org/n/index.html?C=M", "a.zip") == "https://example.org/n/a.zip");
+    CHECK(detail::ResolveURL("https://example.org/n/", "/x/a.zip") == "https://example.org/x/a.zip");
+    CHECK(detail::ResolveURL("https://example.org/n/", "//cdn.example.org/a.zip") == "https://cdn.example.org/a.zip");
+    CHECK(detail::ResolveURL("https://example.org/n/", "https://other.org/a.zip") == "https://other.org/a.zip");
+
+    // nginx fancyindex, as on nightly.visualboyadvance-m.org
+    const std::string fancy =
+        "<table><thead><tr><th><a href=\"?C=N&amp;O=A\">File Name</a></th>"
+        "<th><a href=\"?C=M&amp;O=A\">Date</a></th></tr></thead><tbody>\n"
+        "<tr><td colspan=\"2\" class=\"link\"><a href=\"vcpkg/\" title=\"vcpkg\">vcpkg/</a></td>"
+        "<td class=\"size\">-</td><td class=\"date\">2026-Sep-27 01:46</td></tr>\n"
+        "<tr><td colspan=\"2\" class=\"link\"><a href=\"visualboyadvance-m-Mac-ARM64.zip\" "
+        "title=\"visualboyadvance-m-Mac-ARM64.zip\">visualboyadvance-m-Mac-ARM64.zip</a></td>"
+        "<td class=\"size\">149.8 MiB</td><td class=\"date\">2026-Nov-12 23:24</td></tr>\n"
+        "<tr><td colspan=\"2\" class=\"link\"><a href=\"visualboyadvance-m-x86_64.apk\" "
+        "title=\"visualboyadvance-m-x86_64.apk\">visualboyadvance-m-x86_64.apk</a></td>"
+        "<td class=\"size\">372.3 MiB</td><td class=\"date\">2026-Nov-22 01:56</td></tr>\n"
+        "</tbody></table>";
+    {
+        auto items = Appcast::LoadDirectoryListing(fancy, "https://nightly.example.org/",
+                                                   "visualboyadvance-m-Mac-ARM64.zip");
+        CHECK(items.size() == 1);
+        if ( items.size() == 1 )
+        {
+            const Appcast& a = items[0];
+            CHECK(a.ListingTime == detail::MakeUTCTime(2026, 11, 12, 23, 24, 0));
+            CHECK(a.Version == "2026.11.12.2324");
+            CHECK(a.ShortVersionString == "2026-11-12 23:24 UTC");
+            CHECK(a.enclosure.DownloadURL == "https://nightly.example.org/visualboyadvance-m-Mac-ARM64.zip");
+            CHECK(a.IsValid());
+        }
+
+        // the date of its own row, not the next one's
+        items = Appcast::LoadDirectoryListing(fancy, "https://nightly.example.org/",
+                                              "visualboyadvance-m-x86_64.apk");
+        CHECK(items.size() == 1 && items[0].Version == "2026.11.22.0156");
+
+        CHECK(Appcast::LoadDirectoryListing(fancy, "https://nightly.example.org/", "missing.zip").empty());
+        CHECK(Appcast::LoadDirectoryListing(fancy, "https://nightly.example.org/", "").empty());
+        // "vcpkg/" ends in a slash: its file name is empty, never a match
+        CHECK(Appcast::LoadDirectoryListing(fancy, "https://nightly.example.org/", "vcpkg").empty());
+    }
+
+    // Apache autoindex
+    {
+        const std::string apache =
+            "<tr><td valign=\"top\"><img src=\"/icons/compressed.gif\" alt=\"[   ]\"></td>"
+            "<td><a href=\"app%20x.zip\">app x.zip</a></td><td align=\"right\">2026-11-21 03:33  </td>"
+            "<td align=\"right\"> 30M</td></tr>";
+        auto items = Appcast::LoadDirectoryListing(apache, "https://example.org/nightly/", "app x.zip");
+        CHECK(items.size() == 1 && items[0].Version == "2026.11.21.0333");
+        CHECK(items.size() == 1 && items[0].enclosure.DownloadURL == "https://example.org/nightly/app%20x.zip");
+    }
+
+    // nginx autoindex, with seconds
+    {
+        const std::string nginx =
+            "<pre><a href=\"../\">../</a>\n"
+            "<a href=\"app.zip\">app.zip</a>                21-Nov-2026 03:33:07     31457280\n</pre>";
+        auto items = Appcast::LoadDirectoryListing(nginx, "https://example.org/", "app.zip");
+        CHECK(items.size() == 1 && items[0].ListingTime == detail::MakeUTCTime(2026, 11, 21, 3, 33, 7));
+    }
+
+    // version order follows the date
+    CHECK(UpdateChecker::CompareVersions("2026.11.22.0156", "2026.11.12.2324") > 0);
+    CHECK(UpdateChecker::CompareVersions("2026.11.12.0959", "2026.11.12.1000") < 0);
+}
+
 static void TestNetwork()
 {
     // valid certificate, verified using the embedded CA bundle
@@ -466,6 +546,13 @@ static void TestNetwork()
         StringDownloadSink sink;
         CHECK_NOTHROW(DownloadFile("https://curl.se/", &sink, NULL));
         CHECK(sink.data.find("curl") != std::string::npos);
+    }
+    // HEAD request: no body, but the Last-Modified time
+    {
+        StringDownloadSink sink;
+        CHECK_NOTHROW(DownloadFile("https://curl.se/ca/cacert.pem", &sink, NULL, "", Download_HeadOnly));
+        CHECK(sink.data.empty());
+        CHECK(sink.fileTime > detail::MakeUTCTime(2020, 1, 1, 0, 0, 0));
     }
     // HTTP error
     {
@@ -515,6 +602,7 @@ int main(int argc, char **argv)
         { "utf8", TestUtf8 },
         { "version compare", TestVersionCompare },
         { "appcast", TestAppcast },
+        { "directory listing", TestDirectoryListing },
         { "download helpers", TestDownloadHelpers },
         { "embedded CA bundle", TestEmbeddedCABundle },
         { "EdDSA", TestEdDSA },

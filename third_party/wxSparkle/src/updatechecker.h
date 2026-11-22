@@ -59,6 +59,14 @@ public:
      */
     static int CompareVersions(const std::string& a, const std::string& b);
 
+    /**
+        Records that the user was given @a appcast, an update from a
+        directory feed, to install: once a build with another build time
+        runs, it is taken to be that file (see win_sparkle_set_directory_feed()).
+        Does nothing for appcast items.
+     */
+    static void RecordDirectoryFeedInstall(const Appcast& appcast);
+
 protected:
     /// Should give version be ignored?
     virtual bool ShouldSkipUpdate(const Appcast& appcast) const;

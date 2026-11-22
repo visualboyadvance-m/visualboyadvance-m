@@ -200,19 +200,112 @@ UpdateChecker::UpdateChecker(): Thread("WinSparkle updates check")
 {
 }
 
+namespace
+{
+
+// Config values for directory feeds (see win_sparkle_set_directory_feed()):
+// the listing time of the file the user was given to install, and the build
+// time of the application that gave it; once a build with another build
+// time runs, the install happened and these become the listing time of the
+// file the running build came from, and that build's time.
+const char *const kPendingTime      = "DirectoryFeedPendingTime";
+const char *const kPendingFromBuild = "DirectoryFeedPendingFromBuild";
+const char *const kInstalledTime    = "DirectoryFeedInstalledTime";
+const char *const kInstalledBuild   = "DirectoryFeedInstalledBuild";
+
+// The listing time of the file the running build came from, or the latest
+// it can have been put on the server; listed files after it are newer.
+time_t GetInstalledListingTime()
+{
+    const time_t buildTime = Settings::GetAppBuildTime();
+    if ( buildTime == time_t(-1) )
+        return 0; // unknown: every listed file is newer
+
+    time_t pending = 0, pendingFrom = 0;
+    if ( Settings::ReadConfigValue(kPendingTime, pending) &&
+         Settings::ReadConfigValue(kPendingFromBuild, pendingFrom) &&
+         pendingFrom != buildTime )
+    {
+        Settings::WriteConfigValue(kInstalledTime, pending);
+        Settings::WriteConfigValue(kInstalledBuild, buildTime);
+        Settings::DeleteConfigValue(kPendingTime);
+        Settings::DeleteConfigValue(kPendingFromBuild);
+    }
+
+    time_t installed = 0, installedBuild = 0;
+    if ( Settings::ReadConfigValue(kInstalledTime, installed) &&
+         Settings::ReadConfigValue(kInstalledBuild, installedBuild) &&
+         installedBuild == buildTime )
+    {
+        return installed;
+    }
+
+    return buildTime + Settings::GetAppBuildTimeGrace();
+}
+
+// Throws unless the server's Last-Modified of the update file is in the
+// minute (or second) its listing shows.
+void VerifyListingTime(const Appcast& appcast, Thread *thread)
+{
+    const std::string& url = appcast.enclosure.DownloadURL;
+
+    StringDownloadSink head;
+    DownloadFile(url, &head, thread, Settings::GetHttpHeadersString(),
+                 Download_BypassProxies | Download_HeadOnly);
+
+    if ( head.fileTime == time_t(-1) )
+    {
+        throw std::runtime_error("The server did not give the date of " + url +
+                                 ", so the update could not be verified.");
+    }
+
+    if ( head.fileTime < appcast.ListingTime || head.fileTime >= appcast.ListingTime + 60 )
+    {
+        throw std::runtime_error("The date of " + url + " on the server (" +
+                                 detail::FormatUTCTime(head.fileTime) +
+                                 " UTC) does not match its date in the listing (" +
+                                 appcast.ShortVersionString + ").");
+    }
+}
+
+} // anonymous namespace
+
+
+void UpdateChecker::RecordDirectoryFeedInstall(const Appcast& appcast)
+{
+    if ( appcast.ListingTime == 0 )
+        return;
+
+    Settings::WriteConfigValue(kPendingTime, appcast.ListingTime);
+    Settings::WriteConfigValue(kPendingFromBuild, Settings::GetAppBuildTime());
+}
+
+
 void UpdateChecker::PerformUpdateCheck()
 {
     try
     {
-        const std::string url = Settings::GetAppcastURL();
+        const std::string dirURL = Settings::GetDirectoryFeedURL();
+        const std::string url = dirURL.empty() ? Settings::GetAppcastURL() : dirURL;
         if ( url.empty() )
             throw std::runtime_error("Appcast URL not specified.");
-        CheckForInsecureURL(url, "appcast feed");
+        CheckForInsecureURL(url, dirURL.empty() ? "appcast feed" : "directory feed");
 
-        StringDownloadSink appcast_xml;
-        DownloadFile(url, &appcast_xml, this, Settings::GetHttpHeadersString(), Download_BypassProxies);
+        StringDownloadSink feed;
+        DownloadFile(url, &feed, this, Settings::GetHttpHeadersString(), Download_BypassProxies);
 
-        auto all = Appcast::Load(appcast_xml.data);
+        std::vector<Appcast> all;
+        if ( dirURL.empty() )
+        {
+            all = Appcast::Load(feed.data);
+        }
+        else
+        {
+            const std::string fileName = Settings::GetDirectoryFeedFileName();
+            all = Appcast::LoadDirectoryListing(feed.data, dirURL, fileName);
+            if ( all.empty() )
+                LogError(("Directory feed: " + fileName + " is not in the listing.").c_str());
+        }
 
         if (all.empty())
         {
@@ -221,7 +314,7 @@ void UpdateChecker::PerformUpdateCheck()
             return;
         }
 
-        // Sort by version number and pick the latest:
+        // Sort by version number (listing date) and pick the latest:
 		std::stable_sort
         (
             all.begin(), all.end(),
@@ -237,11 +330,20 @@ void UpdateChecker::PerformUpdateCheck()
 
         Settings::WriteConfigValue("LastCheckTime", time(NULL));
 
-        const std::string currentVersion =
-                ToUtf8(Settings::GetAppBuildVersion());
-
         // Check if our version is out of date.
-        if ( !appcast.IsValid() || CompareVersions(currentVersion, appcast.Version) >= 0 )
+        bool isNewer;
+        if ( appcast.ListingTime != 0 )
+        {
+            isNewer = appcast.ListingTime > GetInstalledListingTime();
+        }
+        else
+        {
+            const std::string currentVersion =
+                    ToUtf8(Settings::GetAppBuildVersion());
+            isNewer = CompareVersions(currentVersion, appcast.Version) < 0;
+        }
+
+        if ( !appcast.IsValid() || !isNewer )
         {
             // The same or newer version is already installed.
             UI::NotifyNoUpdates(ShouldAutomaticallyInstall());
@@ -254,6 +356,10 @@ void UpdateChecker::PerformUpdateCheck()
             UI::NotifyNoUpdates(ShouldAutomaticallyInstall());
             return;
         }
+
+        // A listed file is only offered if the server agrees on its date.
+        if ( appcast.ListingTime != 0 )
+            VerifyListingTime(appcast, this);
 
         UI::NotifyUpdateAvailable(appcast, ShouldAutomaticallyInstall());
     }

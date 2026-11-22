@@ -734,6 +734,11 @@ void DownloadFile(const std::string& url, IDownloadSink* sink, Thread* onThread,
     SET_CURL_OPT(c, CURLOPT_XFERINFODATA, &ctx);
     SET_CURL_OPT(c, CURLOPT_NOPROGRESS, 0L);
 
+    // the server's Last-Modified, for IDownloadSink::SetFileTime()
+    SET_CURL_OPT(c, CURLOPT_FILETIME, 1L);
+    if ( flags & Download_HeadOnly )
+        SET_CURL_OPT(c, CURLOPT_NOBODY, 1L);
+
     const CURLcode rc = curl_easy_perform(c);
 
     // errors thrown from our callbacks (including thread termination) take
@@ -764,6 +769,10 @@ void DownloadFile(const std::string& url, IDownloadSink* sink, Thread* onThread,
     // empty response body: the write callback was never called
     if ( !ctx.headersProcessed )
         ProcessResponseHeaders(ctx);
+
+    curl_off_t fileTime = -1;
+    if ( curl_easy_getinfo(c, CURLINFO_FILETIME_T, &fileTime) == CURLE_OK && fileTime >= 0 )
+        sink->SetFileTime(time_t(fileTime));
 }
 
 } // namespace winsparkle

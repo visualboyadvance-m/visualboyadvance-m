@@ -201,6 +201,51 @@ WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_langid(unsigned short lang
 WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_appcast_url(const char *url);
 
 /**
+    Looks for updates in a web server's directory listing instead of an
+    appcast feed.
+
+    For builds that are published as plain files without a feed, e.g.
+    nightly builds: the page at @a index_url is an autoindex listing
+    (Apache's, nginx's or nginx's fancyindex), the update is the file named
+    @a file_name in it, and the file's date in the listing (taken as UTC) is
+    its version. Before an update is offered, its date is verified against
+    the server: the file's Last-Modified must be in the minute the listing
+    shows, otherwise the check fails with an error.
+
+    A listed file is newer if its date is after the one of the file this
+    application was installed from (recorded when the update was installed
+    with WinSparkle and this build was started afterwards) or, if there is
+    none, after the build time plus the grace period given to
+    win_sparkle_set_app_build_time(), which the application must call too.
+
+    The listing's entries have no signatures, so the EdDSA/DSA checks don't
+    apply to them; use HTTPS.
+
+    @param index_url  URL of the listing, ending with '/'; relative links
+                      resolve against it.
+    @param file_name  Name of this platform's update file in the listing.
+
+    @since wxSparkle
+
+    @see win_sparkle_set_app_build_time()
+ */
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_directory_feed(const char *index_url,
+                                                            const char *file_name);
+
+/**
+    Sets the application's build time, for win_sparkle_set_directory_feed().
+
+    @param build_time     When this build was made (seconds since the epoch, UTC).
+    @param grace_seconds  How long after that its own file may have been put
+                          on the server: files listed up to then are taken
+                          to be this build.
+
+    @since wxSparkle
+ */
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_app_build_time(time_t build_time,
+                                                            int grace_seconds);
+
+/**
     Sets DSA public key.
 
     Only PEM format is supported.

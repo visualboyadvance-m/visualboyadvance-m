@@ -13,6 +13,7 @@
 #include "threads.h"
 #include "utils.h"
 
+#include <ctime>
 #include <map>
 #include <string>
 #include <sstream>
@@ -46,6 +47,36 @@ public:
         if ( ms_appcastURL.empty() )
             ms_appcastURL = GetCustomResource("FeedURL", "APPCAST");
         return ms_appcastURL;
+    }
+
+    /// Get the directory listing to look for updates in instead of the
+    /// appcast (empty if not set), see win_sparkle_set_directory_feed()
+    static std::string GetDirectoryFeedURL()
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        return ms_directoryFeedURL;
+    }
+
+    /// Get the name of the update file in the directory listing
+    static std::string GetDirectoryFeedFileName()
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        return ms_directoryFeedFileName;
+    }
+
+    /// Get the application's build time (UTC), or -1 if not set
+    static time_t GetAppBuildTime()
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        return ms_appBuildTime;
+    }
+
+    /// Get how long after its build time the application's own file may
+    /// appear in the directory listing, in seconds
+    static long GetAppBuildTimeGrace()
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        return ms_appBuildTimeGrace;
     }
 
     /// Return application name
@@ -197,6 +228,22 @@ public:
     {
         CriticalSectionLocker lock(ms_csVars);
         ms_appcastURL = url;
+    }
+
+    /// Set the directory listing feed
+    static void SetDirectoryFeed(const char *url, const char *fileName)
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        ms_directoryFeedURL = url ? url : "";
+        ms_directoryFeedFileName = fileName ? fileName : "";
+    }
+
+    /// Set the application's build time
+    static void SetAppBuildTime(time_t buildTime, long grace)
+    {
+        CriticalSectionLocker lock(ms_csVars);
+        ms_appBuildTime = buildTime;
+        ms_appBuildTimeGrace = grace;
     }
 
     /// Set application name
@@ -390,6 +437,10 @@ private:
 
     static Lang         ms_lang;
     static std::string  ms_appcastURL;
+    static std::string  ms_directoryFeedURL;
+    static std::string  ms_directoryFeedFileName;
+    static time_t       ms_appBuildTime;
+    static long         ms_appBuildTimeGrace;
     static std::string  ms_registryPath;
     static std::wstring ms_companyName;
     static std::wstring ms_appName;

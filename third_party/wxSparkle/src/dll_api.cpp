@@ -140,6 +140,28 @@ WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_appcast_url(const char *ur
     CATCH_ALL_EXCEPTIONS
 }
 
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_directory_feed(const char *index_url,
+                                                            const char *file_name)
+{
+    try
+    {
+        if ( index_url && *index_url )
+            CheckForInsecureURL(index_url, "directory feed");
+        Settings::SetDirectoryFeed(index_url, file_name);
+    }
+    CATCH_ALL_EXCEPTIONS
+}
+
+WIN_SPARKLE_API void WIN_SPARKLE_CALL win_sparkle_set_app_build_time(time_t build_time,
+                                                            int grace_seconds)
+{
+    try
+    {
+        Settings::SetAppBuildTime(build_time, grace_seconds);
+    }
+    CATCH_ALL_EXCEPTIONS
+}
+
 WIN_SPARKLE_API int WIN_SPARKLE_CALL win_sparkle_set_dsa_pub_pem(const char *dsa_pub_pem)
 {
     try

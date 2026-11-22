@@ -21,6 +21,10 @@ namespace winsparkle
 CriticalSection Settings::ms_csVars;
 Settings::Lang Settings::ms_lang;
 std::string  Settings::ms_appcastURL;
+std::string  Settings::ms_directoryFeedURL;
+std::string  Settings::ms_directoryFeedFileName;
+time_t       Settings::ms_appBuildTime = time_t(-1);
+long         Settings::ms_appBuildTimeGrace = 0;
 std::string  Settings::ms_registryPath;
 std::wstring Settings::ms_companyName;
 std::wstring Settings::ms_appName;

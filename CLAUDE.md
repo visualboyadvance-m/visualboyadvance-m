@@ -90,7 +90,17 @@ The `vbam-core` library contains both GB and GBA emulators. These are tightly co
   `data.visualboyadvance-m.org/appcast.xml`, company/app
   `visualboyadvance-m`/`VisualBoyAdvance-M`, so WinSparkle's registry
   settings carry over; `VBAM_UPDATER_EDDSA_PUBLIC_KEY` turns on signature
-  checks); `shutdownAutoupdater()` runs in `OnExit()` while wx is still up
+  checks); `shutdownAutoupdater()` runs in `OnExit()` while wx is still up.
+  `VBAM_UPDATER_CHANNEL` (empty: `nightly` unless a tagged release) picks
+  `stable` (appcast) or `nightly`: wxSparkle's directory feed
+  (`win_sparkle_set_directory_feed()`, our addition) reads the autoindex at
+  `nightly.visualboyadvance-m.org` for this platform's file (Windows, macOS,
+  Android), its listed date (UTC) is the version and must match the file's
+  Last-Modified to the minute, and it is compared with the date of the file
+  this build came from (recorded when the updater installs one and a build
+  with another build time then runs) or the configure-time build time plus
+  `VBAM_UPDATER_NIGHTLY_GRACE_HOURS` (12); nightlies are unsigned, so the
+  EdDSA key is only used on stable
 
 **src/sdl/** - SDL-based frontend (command-line/minimal GUI)
 - Lightweight alternative to wxWidgets

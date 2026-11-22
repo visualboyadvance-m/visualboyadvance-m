@@ -7,6 +7,7 @@
  */
 
 #include "appcast.h"
+#include "download.h"
 #include "error.h"
 
 #include "platform.h"
@@ -555,6 +556,315 @@ std::vector<Appcast> Appcast::Load(const std::string& xml)
     // the items were already filtered to only include those compatible with the current OS + arch
     // and meeting minimum OS version requirements, so we can just return the first one
     return std::move(ctxt.all_items);
+}
+
+
+/*--------------------------------------------------------------------------*
+                             directory listings
+ *--------------------------------------------------------------------------*/
+
+namespace
+{
+
+bool IsDigit(char c)
+{
+    return c >= '0' && c <= '9';
+}
+
+char LowerAscii(char c)
+{
+    return (c >= 'A' && c <= 'Z') ? char(c - 'A' + 'a') : c;
+}
+
+bool StartsWithNoCaseAt(const std::string& s, size_t pos, const char *prefix)
+{
+    for ( ; *prefix; ++prefix, ++pos )
+    {
+        if ( pos >= s.size() || LowerAscii(s[pos]) != LowerAscii(*prefix) )
+            return false;
+    }
+    return true;
+}
+
+size_t FindNoCase(const std::string& s, const char *what, size_t from)
+{
+    for ( size_t i = from; i < s.size(); ++i )
+    {
+        if ( StartsWithNoCaseAt(s, i, what) )
+            return i;
+    }
+    return std::string::npos;
+}
+
+bool ReadDigits(const std::string& s, size_t& i, int count, int& out)
+{
+    if ( i + count > s.size() )
+        return false;
+    int v = 0;
+    for ( int k = 0; k < count; ++k )
+    {
+        const char c = s[i + k];
+        if ( !IsDigit(c) )
+            return false;
+        v = v * 10 + (c - '0');
+    }
+    out = v;
+    i += count;
+    return true;
+}
+
+bool ReadChar(const std::string& s, size_t& i, char c)
+{
+    if ( i >= s.size() || s[i] != c )
+        return false;
+    ++i;
+    return true;
+}
+
+bool ReadMonthName(const std::string& s, size_t& i, int& month)
+{
+    static const char *const names[] =
+    {
+        "jan", "feb", "mar", "apr", "may", "jun",
+        "jul", "aug", "sep", "oct", "nov", "dec"
+    };
+    for ( int m = 0; m < 12; ++m )
+    {
+        if ( StartsWithNoCaseAt(s, i, names[m]) )
+        {
+            month = m + 1;
+            i += 3;
+            return true;
+        }
+    }
+    return false;
+}
+
+// Reads a listing's date at s[pos]: "2026-Nov-21 03:33" (fancyindex),
+// "2026-11-21 03:33" (Apache) or "21-Nov-2026 03:33" (nginx), each optionally
+// with ":SS".
+bool ParseListingTimeAt(const std::string& s, size_t pos, time_t& out)
+{
+    if ( pos > 0 && IsDigit(s[pos - 1]) )
+        return false;
+
+    int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
+
+    size_t i = pos;
+    if ( ReadDigits(s, i, 4, year) && ReadChar(s, i, '-') )
+    {
+        if ( !ReadMonthName(s, i, month) && !ReadDigits(s, i, 2, month) )
+            return false;
+        if ( !ReadChar(s, i, '-') || !ReadDigits(s, i, 2, day) )
+            return false;
+    }
+    else
+    {
+        i = pos;
+        if ( !ReadDigits(s, i, 2, day) || !ReadChar(s, i, '-') ||
+             !ReadMonthName(s, i, month) || !ReadChar(s, i, '-') ||
+             !ReadDigits(s, i, 4, year) )
+            return false;
+    }
+
+    if ( !ReadChar(s, i, ' ') )
+        return false;
+    while ( i < s.size() && s[i] == ' ' )
+        ++i;
+
+    if ( !ReadDigits(s, i, 2, hour) || !ReadChar(s, i, ':') || !ReadDigits(s, i, 2, minute) )
+        return false;
+    {
+        size_t j = i;
+        if ( ReadChar(s, j, ':') && ReadDigits(s, j, 2, second) )
+            i = j;
+    }
+    if ( i < s.size() && IsDigit(s[i]) )
+        return false;
+
+    if ( year < 1970 || month < 1 || month > 12 || day < 1 || day > 31 ||
+         hour > 23 || minute > 59 || second > 60 )
+        return false;
+
+    out = detail::MakeUTCTime(year, month, day, hour, minute, second);
+    return true;
+}
+
+// The value of the href attribute starting at s[pos] (just past "href="),
+// with &amp; decoded; npos in @a end if it is malformed.
+std::string ReadAttributeValue(const std::string& s, size_t pos, size_t& end)
+{
+    end = std::string::npos;
+    if ( pos >= s.size() )
+        return std::string();
+
+    std::string value;
+    const char quote = s[pos];
+    if ( quote == '"' || quote == '\'' )
+    {
+        const size_t close = s.find(quote, pos + 1);
+        if ( close == std::string::npos )
+            return std::string();
+        value = s.substr(pos + 1, close - pos - 1);
+        end = close + 1;
+    }
+    else
+    {
+        size_t close = pos;
+        while ( close < s.size() && s[close] != ' ' && s[close] != '>' &&
+                s[close] != '\t' && s[close] != '\r' && s[close] != '\n' )
+            ++close;
+        value = s.substr(pos, close - pos);
+        end = close;
+    }
+
+    for ( size_t amp = value.find("&amp;"); amp != std::string::npos; amp = value.find("&amp;", amp + 1) )
+        value.erase(amp + 1, 4);
+
+    return value;
+}
+
+std::string MakeVersion(time_t t)
+{
+    // "YYYY-MM-DD HH:MM" -> "YYYY.MM.DD.HHMM"
+    std::string v = detail::FormatUTCTime(t);
+    v[4] = '.';
+    v[7] = '.';
+    v[10] = '.';
+    v.erase(13, 1);
+    return v;
+}
+
+} // anonymous namespace
+
+
+namespace detail
+{
+
+time_t MakeUTCTime(int year, int month, int day, int hour, int minute, int second)
+{
+    // days from civil, H. Hinnant's algorithm
+    const int y = year - (month <= 2 ? 1 : 0);
+    const long long era = (y >= 0 ? y : y - 399) / 400;
+    const unsigned yoe = unsigned(y - era * 400);
+    const unsigned mp = unsigned(month > 2 ? month - 3 : month + 9);
+    const unsigned doy = (153 * mp + 2) / 5 + unsigned(day) - 1;
+    const unsigned doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    const long long days = era * 146097 + (long long)doe - 719468;
+
+    return time_t(days * 86400 + hour * 3600 + minute * 60 + second);
+}
+
+std::string FormatUTCTime(time_t t)
+{
+    long long secs = (long long)t;
+    long long days = secs / 86400;
+    long long rem = secs % 86400;
+    if ( rem < 0 )
+    {
+        rem += 86400;
+        --days;
+    }
+
+    // civil from days, H. Hinnant's algorithm
+    days += 719468;
+    const long long era = (days >= 0 ? days : days - 146096) / 146097;
+    const unsigned doe = unsigned(days - era * 146097);
+    const unsigned yoe = (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365;
+    const unsigned doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    const unsigned mp = (5 * doy + 2) / 153;
+    const unsigned day = doy - (153 * mp + 2) / 5 + 1;
+    const unsigned month = mp < 10 ? mp + 3 : mp - 9;
+    const long long year = (long long)yoe + era * 400 + (month <= 2 ? 1 : 0);
+
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%04lld-%02u-%02u %02d:%02d",
+             year, month, day, int(rem / 3600), int(rem / 60 % 60));
+    return buf;
+}
+
+std::string ResolveURL(const std::string& base, const std::string& href)
+{
+    if ( StartsWithNoCaseAt(href, 0, "http://") || StartsWithNoCaseAt(href, 0, "https://") )
+        return href;
+
+    const size_t schemeEnd = base.find("://");
+    if ( schemeEnd == std::string::npos )
+        return href;
+
+    if ( href.compare(0, 2, "//") == 0 )
+        return base.substr(0, schemeEnd + 1) + href;
+
+    const std::string path = base.substr(0, base.find_first_of("?#"));
+    const size_t hostEnd = path.find('/', schemeEnd + 3);
+
+    if ( !href.empty() && href[0] == '/' )
+        return path.substr(0, hostEnd) + href;
+
+    std::string dir;
+    if ( hostEnd == std::string::npos )
+        dir = path + "/";
+    else
+        dir = path.substr(0, path.rfind('/') + 1);
+
+    std::string rel = href;
+    while ( rel.compare(0, 2, "./") == 0 )
+        rel.erase(0, 2);
+
+    return dir + rel;
+}
+
+} // namespace detail
+
+
+std::vector<Appcast> Appcast::LoadDirectoryListing(const std::string& html,
+                                                   const std::string& indexURL,
+                                                   const std::string& fileName)
+{
+    std::vector<Appcast> items;
+    if ( fileName.empty() )
+        return items;
+
+    size_t pos = FindNoCase(html, "href=", 0);
+    while ( pos != std::string::npos )
+    {
+        size_t valueEnd;
+        const std::string href = ReadAttributeValue(html, pos + 5, valueEnd);
+        const size_t next = valueEnd == std::string::npos
+                            ? std::string::npos
+                            : FindNoCase(html, "href=", valueEnd);
+        if ( valueEnd == std::string::npos || href.empty() || href[0] == '?' || href[0] == '#' )
+        {
+            pos = next;
+            continue;
+        }
+
+        const std::string url = detail::ResolveURL(indexURL, href);
+        if ( detail::GetURLFileName(url) == fileName )
+        {
+            // The date is in the same row: after the link, before the next one.
+            const size_t rowEnd = next == std::string::npos ? html.size() : next;
+            for ( size_t i = valueEnd; i < rowEnd; ++i )
+            {
+                time_t t;
+                if ( !IsDigit(html[i]) || !ParseListingTimeAt(html, i, t) )
+                    continue;
+
+                Appcast item;
+                item.ListingTime = t;
+                item.Version = MakeVersion(t);
+                item.ShortVersionString = detail::FormatUTCTime(t) + " UTC";
+                item.Title = item.ShortVersionString;
+                item.enclosure.DownloadURL = url;
+                items.push_back(item);
+                break;
+            }
+        }
+
+        pos = next;
+    }
+
+    return items;
 }
 
 } // namespace winsparkle
