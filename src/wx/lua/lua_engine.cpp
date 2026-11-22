@@ -68,6 +68,13 @@ struct LuaEngine::Impl {
     bool         has_read_hooks  = false;
     bool         has_write_hooks = false;
     bool         has_exec_hooks  = false;
+    // Re-entrancy guard for memory hooks: a hook that calls
+    // memory.readbyte() / writebyte() on the hooked range would
+    // re-enter DispatchMem* through the core trampoline and recurse
+    // until the C stack dies. While dispatching, further trampoline
+    // dispatches are dropped (the gb.cpp hook site comment documents
+    // this contract).
+    bool         in_mem_dispatch = false;
     std::map<int, uint32_t> joypad_overrides;  // port → button mask, FCEUX bits
 };
 
@@ -113,6 +120,51 @@ void CallRegistryList(LuaEngine* engine, lua_State* L, const char* key, int narg
         }
     }
     lua_pop(L, 1 + nargs);  // pop list table + original args
+}
+
+// Memory-hook lists store {start, end, fn} sub-tables (see
+// l_register_mem in lua_api_memory.cpp), unlike the plain function
+// lists above. Dispatch walks the entries, and for each whose
+// [start..end] covers `addr` calls its fn with (addr, size, value)
+// for read/write hooks or (addr) for exec hooks. Entries with fn ==
+// nil are dead markers (left by a failed unregister) and skipped.
+// lua_rawlen is re-read every iteration so a hook that (un)registers
+// mid-dispatch cannot walk past the end of a grown list.
+void CallMemRegistryList(LuaEngine* engine, lua_State* L, const char* key,
+                         uint32_t addr, int size, uint32_t value, bool exec) {
+    if (!L) return;
+    PushOrCreateRegistryList(L, key);
+    int t = lua_gettop(L);
+    for (int i = 1; i <= (int)lua_rawlen(L, t); ++i) {
+        lua_rawgeti(L, t, i);              // entry
+        if (!lua_istable(L, -1)) { lua_pop(L, 1); continue; }
+        lua_getfield(L, -1, "start");
+        uint32_t s = (uint32_t)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        lua_getfield(L, -1, "end");
+        uint32_t e = (uint32_t)lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        if (s <= addr && addr <= e) {
+            lua_getfield(L, -1, "fn");      // fn (or nil marker); -1 is the entry
+            if (lua_isfunction(L, -1)) {
+                lua_pushinteger(L, (lua_Integer)addr);
+                if (!exec) {
+                    lua_pushinteger(L, (lua_Integer)size);
+                    lua_pushinteger(L, (lua_Integer)value);
+                }
+                if (lua_pcall(L, exec ? 1 : 3, 0, 0) != LUA_OK) {
+                    const char* err = lua_tostring(L, -1);
+                    engine->Log(std::string("[lua error] ") +
+                                (err ? err : "(nil)"));
+                    lua_pop(L, 1);
+                }
+            } else {
+                lua_pop(L, 1);             // nil fn — dead entry, skip
+            }
+        }
+        lua_pop(L, 1);                     // entry
+    }
+    lua_pop(L, 1);                         // list table
 }
 
 }  // namespace
@@ -310,23 +362,22 @@ void LuaEngine::DispatchAfterFrame() {
 }
 
 void LuaEngine::DispatchMemRead(uint32_t addr, int size, uint32_t value) {
-    if (!impl_->L || !impl_->has_read_hooks) return;
-    lua_pushinteger(impl_->L, (lua_Integer)addr);
-    lua_pushinteger(impl_->L, (lua_Integer)size);
-    lua_pushinteger(impl_->L, (lua_Integer)value);
-    CallRegistryList(this, impl_->L, kRegMemRead, 3);
+    if (!impl_->L || !impl_->has_read_hooks || impl_->in_mem_dispatch) return;
+    impl_->in_mem_dispatch = true;
+    CallMemRegistryList(this, impl_->L, kRegMemRead, addr, size, value, false);
+    impl_->in_mem_dispatch = false;
 }
 void LuaEngine::DispatchMemWrite(uint32_t addr, int size, uint32_t value) {
-    if (!impl_->L || !impl_->has_write_hooks) return;
-    lua_pushinteger(impl_->L, (lua_Integer)addr);
-    lua_pushinteger(impl_->L, (lua_Integer)size);
-    lua_pushinteger(impl_->L, (lua_Integer)value);
-    CallRegistryList(this, impl_->L, kRegMemWrite, 3);
+    if (!impl_->L || !impl_->has_write_hooks || impl_->in_mem_dispatch) return;
+    impl_->in_mem_dispatch = true;
+    CallMemRegistryList(this, impl_->L, kRegMemWrite, addr, size, value, false);
+    impl_->in_mem_dispatch = false;
 }
 void LuaEngine::DispatchMemExec(uint32_t addr) {
-    if (!impl_->L || !impl_->has_exec_hooks) return;
-    lua_pushinteger(impl_->L, (lua_Integer)addr);
-    CallRegistryList(this, impl_->L, kRegMemExec, 1);
+    if (!impl_->L || !impl_->has_exec_hooks || impl_->in_mem_dispatch) return;
+    impl_->in_mem_dispatch = true;
+    CallMemRegistryList(this, impl_->L, kRegMemExec, addr, 1, 0, true);
+    impl_->in_mem_dispatch = false;
 }
 bool LuaEngine::HasReadHooks()  const { return impl_->has_read_hooks; }
 bool LuaEngine::HasWriteHooks() const { return impl_->has_write_hooks; }

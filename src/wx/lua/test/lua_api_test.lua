@@ -182,6 +182,9 @@ check_pcall(function() memory.registerread(0x02000000, 4, function() end) end,
             "memory.registerread(addr, size, fn)")
 check_pcall(function() memory.registerread(0x02000000, nil) end,
             "memory.registerread clear")
+-- Also drop the size-4 entry above, or it keeps the core-side hook
+-- gate armed for the rest of the process.
+memory.registerread(0x02000000, 4, nil)
 
 emu.print("=== rom namespace ===")
 
