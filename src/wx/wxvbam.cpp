@@ -492,6 +492,14 @@ int main(int argc, char** argv) {
     }
 #endif
 
+    // Startup errors before the main window exists would go to wx's GUI
+    // logger, which shows them in a modal dialog a headless X server can
+    // never create (assert + exit 255), hiding the message. Log to stderr
+    // instead so unattended runs report why they died. This is only for the
+    // startup window: OnInit restores the GUI log target once the main window
+    // is up, so runtime errors still reach the user as dialogs.
+    delete wxLog::SetActiveTarget(new wxLogStderr);
+
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
 
@@ -1481,6 +1489,11 @@ bool wxvbamApp::OnInit() {
 #endif  // !defined(__ANDROID__)
 
     frame->Show(true);
+
+    // The main window is up, so runtime errors can be shown as dialogs again.
+    // main() pointed the log target at stderr for the startup window (before
+    // this window existed); hand it back to the GUI logger now.
+    delete wxLog::SetActiveTarget(new wxLogGui());
 
 #if !defined(__WXMSW__) && !defined(__WXRETRO68__)
     // See QuitSignalHandler(). A timer, as idle events stop while no game runs.
