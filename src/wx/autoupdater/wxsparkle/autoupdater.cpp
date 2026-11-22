@@ -12,6 +12,7 @@
 #include <winsparkle.h>
 
 #include "core/base/version.h"
+#include "wx/android-compat.h"
 
 #ifndef VBAM_UPDATER_EDDSA_PUBLIC_KEY
 #define VBAM_UPDATER_EDDSA_PUBLIC_KEY ""
@@ -43,6 +44,31 @@ void WIN_SPARKLE_CALL RequestShutdown() {
     });
 }
 
+#if defined(__WXQT__) && defined(__ANDROID__)
+// The part of the screen the updater's dialogs may fill: from the main window's
+// origin, as large as the activity's content view. wxSparkle would otherwise go
+// by the screen's client area and the main window, which Qt makes taller than
+// what is on screen by the action bar, leaving the dialogs' buttons off the
+// bottom of the screen.
+int WIN_SPARKLE_CALL ScreenArea(int* x, int* y, int* width, int* height) {
+    int w = 0, h = 0;
+    if (!VbamAndroidScreenClientSize(&w, &h))
+        return 0;
+
+    wxPoint origin;
+    if (wxTheApp) {
+        if (const wxWindow* top = wxTheApp->GetTopWindow())
+            origin = top->GetScreenPosition();
+    }
+
+    *x = origin.x;
+    *y = origin.y;
+    *width = w;
+    *height = h;
+    return 1;
+}
+#endif
+
 }  // namespace
 
 void initAutoupdater() {
@@ -62,6 +88,9 @@ void initAutoupdater() {
 
     win_sparkle_set_can_shutdown_callback(CanShutdown);
     win_sparkle_set_shutdown_request_callback(RequestShutdown);
+#if defined(__WXQT__) && defined(__ANDROID__)
+    win_sparkle_set_screen_area_callback(ScreenArea);
+#endif
 
     win_sparkle_init();
 }
