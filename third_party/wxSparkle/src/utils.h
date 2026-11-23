@@ -10,9 +10,9 @@
 #define _utils_h_
 
 #include "error.h"
+#include "fs.h"
 
 #include <cstdint>
-#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -178,23 +178,23 @@ inline std::wstring FromUtf8(const std::string& s)
 
 // Conversion between wide strings (used by the public API) and native paths.
 
-inline std::filesystem::path PathFromWide(const std::wstring& s)
+inline fs::path PathFromWide(const std::wstring& s)
 {
 #ifdef _WIN32
-    return std::filesystem::path(s);
+    return fs::path(s);
 #elif WXSPARKLE_CLASSIC_MAC
     // HFS path in the file system encoding (e.g. Mac Roman), as understood
     // by the C library
     const wxCharBuffer buf = wxString(s).fn_str();
     if ( !buf.data() )
         throw std::runtime_error("Invalid file name");
-    return std::filesystem::path(std::string(buf.data()));
+    return fs::path(std::string(buf.data()));
 #else
-    return std::filesystem::path(ToUtf8(s));
+    return fs::path(ToUtf8(s));
 #endif
 }
 
-inline std::wstring PathToWide(const std::filesystem::path& p)
+inline std::wstring PathToWide(const fs::path& p)
 {
 #ifdef _WIN32
     return p.wstring();

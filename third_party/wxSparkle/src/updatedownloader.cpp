@@ -27,8 +27,6 @@
 #include <random>
 #include <system_error>
 
-namespace fs = std::filesystem;
-
 namespace winsparkle
 {
 

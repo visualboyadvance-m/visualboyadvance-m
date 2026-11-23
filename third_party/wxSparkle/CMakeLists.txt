@@ -230,6 +230,19 @@ if(_curl_aliased)
     set(_curl_real_target ${_curl_aliased})
 endif()
 get_target_property(_curl_type ${_curl_real_target} TYPE)
+# FindCURL's target is an UNKNOWN library, static or not: go by the file.
+if(_curl_type STREQUAL "UNKNOWN_LIBRARY")
+    foreach(_curl_location_prop IMPORTED_LOCATION IMPORTED_LOCATION_RELEASE IMPORTED_LOCATION_DEBUG)
+        get_target_property(_curl_location ${_curl_real_target} ${_curl_location_prop})
+        if(_curl_location)
+            if(_curl_location MATCHES "\\${CMAKE_STATIC_LIBRARY_SUFFIX}$"
+               AND NOT _curl_location MATCHES "\\.dll\\.a$")
+                set(_curl_type STATIC_LIBRARY)
+            endif()
+            break()
+        endif()
+    endforeach()
+endif()
 option(WXSPARKLE_CURL_PKGCONFIG_STATIC "Use pkg-config to find static libcurl's dependencies" ON)
 if(WXSPARKLE_RETRO68)
     # Retro68's libcurl comes without pkg-config or CMake files. It uses
@@ -437,6 +450,7 @@ set(WXSPARKLE_SOURCES
     src/appcontroller.h
     src/download.h
     src/error.h
+    src/fs.h
     src/platform.h
     src/settings.h
     src/signatureverifier.h
@@ -536,6 +550,12 @@ if(WXSPARKLE_RETRO68)
     if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "wxSparkle can only be built as a static library for classic Mac OS")
     endif()
+endif()
+
+# For macOS deployment targets before 10.15, which have no std::filesystem
+# (src/fs.h): a parent project's ghc::filesystem target.
+if(TARGET ghc-filesystem)
+    target_link_libraries(wxsparkle PRIVATE ghc-filesystem)
 endif()
 
 find_package(Threads REQUIRED)

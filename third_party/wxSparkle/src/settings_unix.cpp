@@ -56,8 +56,6 @@
     #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-namespace fs = std::filesystem;
-
 namespace winsparkle
 {
 
