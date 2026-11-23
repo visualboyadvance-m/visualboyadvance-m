@@ -256,7 +256,7 @@ if [ -n "$cross_build" ]; then
     done
 fi
 
-for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libgpg-error libsecret m4 ninja openssl python2 shared-mime-info swig xorg-macros flac; do
+for dist in XML-Parser c2man cmake cmake ccache flex getopt glib graphviz libffi libgcrypt libgpg-error libsecret m4 ninja python2 shared-mime-info swig xorg-macros flac; do
     table_line_remove DISTS $dist
 done
 
@@ -309,8 +309,10 @@ table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg "--disable-videotoolbox --extr
 if [ -n "$arch_cross_build" ]; then
     if [ -n "$arm64_target" ]; then
         ffmpeg_arch=aarch64
+        openssl_target=darwin64-arm64-cc
     else
         ffmpeg_arch=x86_64
+        openssl_target=darwin64-x86_64-cc
     fi
 
     table_line_remove DIST_FLAGS               libpng
@@ -318,6 +320,10 @@ if [ -n "$arch_cross_build" ]; then
     table_line_append DIST_FLAGS               gettext       no_install_bin
 
     table_line_append DIST_CONFIGURE_OVERRIDES ffmpeg        "--enable-cross-compile --arch=$ffmpeg_arch"
+
+    # OpenSSL's ./config picks its target from uname, which names the host;
+    # name the target to ./Configure instead.
+    table_line_replace DIST_CONFIGURE_OVERRIDES openssl      "perl ./Configure $openssl_target no-shared no-unit-test no-docs --prefix=/usr --openssldir=/etc/ssl"
 fi
 
 builder "$@"
