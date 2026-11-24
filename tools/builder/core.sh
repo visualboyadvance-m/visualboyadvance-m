@@ -262,7 +262,7 @@ DIST_PRE_BUILD="$DIST_PRE_BUILD
     libpsl          rm -rf list; git clone --depth 1 https://github.com/publicsuffix/list; sed -E -i.bak -e '/subdir[(].tools.[)]/d' meson.build
     libicu          cd source;
     libmspack       cd libmspack;
-    gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4;
+    gettext         sed -i.bak 's/-Wl,--disable-auto-import//' m4/woe32-dll.m4; touch -r m4/woe32-dll.m4.bak m4/woe32-dll.m4;
     expat           sed -i.bak '/doc\\/Makefile/d' configure.ac; \
                     sed -i.bak '/SUBDIRS/{; s/ doc//; }' Makefile.am;
     graphviz        sed -i.bak 's/ -export-symbols/ -Wl,-export-symbols/g' \$(find . -name Makefile.am); \
