@@ -39,6 +39,18 @@ if(ENABLE_LTO)
 
     if(LTO_SUPPORTED)
         set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+
+        # CMake gives Clang ThinLTO; use full LTO instead. Measured on the
+        # macOS x86_64 release build, the app used ~5% less CPU (with and
+        # without xBRZ 9x) and its code was slightly smaller, for a ~17%
+        # longer link. Languages enabled later get CMake's default.
+        get_property(_lto_langs GLOBAL PROPERTY ENABLED_LANGUAGES)
+        foreach(_lang IN LISTS _lto_langs)
+            if(CMAKE_${_lang}_COMPILER_ID MATCHES "Clang"
+                    AND CMAKE_${_lang}_COMPILE_OPTIONS_IPO STREQUAL "-flto=thin")
+                set(CMAKE_${_lang}_COMPILE_OPTIONS_IPO "-flto=full")
+            endif()
+        endforeach()
     else()
         set(ENABLE_LTO OFF)
     endif()
