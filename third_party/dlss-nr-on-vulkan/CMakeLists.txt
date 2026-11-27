@@ -482,7 +482,9 @@ endif()
 # ("unrecognized file format in 'libxmx.c.obj, 0'"). A host that builds with
 # CMAKE_INTERPROCEDURAL_OPTIMIZATION (VBA-M's ENABLE_LTO, on in Release) would hand those
 # objects over, so the exported DLLs and the object libraries that feed them opt out of it
-# on the MSVC toolchains; the rest of the build keeps whatever the host asked for.
+# on the MSVC toolchains; the rest of the build keeps whatever the host asked for. Nothing
+# writes a .def file for libdlssnr, so the archive is not among them -- see nr_image.c, the
+# one piece of CPU-bound code this function covers.
 function(nr_no_ipo target)
   if(MSVC OR CMAKE_C_SIMULATE_ID MATCHES "MSVC")
     set_target_properties(${target} PROPERTIES INTERPROCEDURAL_OPTIMIZATION OFF)
@@ -985,21 +987,49 @@ endif()
 # the host passes and the frame library
 # ---------------------------------------------------------------------------------------
 
-# nr_image.c is one object in two libraries: its own, for the Python, and the frame's.
-add_library(nr_image_objects OBJECT src/ref/nr_image.c)
-target_include_directories(nr_image_objects PRIVATE src/ref)
-target_compile_options(nr_image_objects PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
-# the CPU floor above: `-march=x86-64-v3` on x86-64, NR_F16C under MSVC (the F16C intrinsics)
-target_compile_options(nr_image_objects PRIVATE ${NR_IMAGE_ARCH_FLAGS})
-target_compile_definitions(nr_image_objects PRIVATE ${NR_IMAGE_ARCH_DEFINES})
-# `-fno-trapping-math` changes no value, only whether a comparison may raise an exception
-# flag nobody reads; it lets GCC turn the fused composition's clamps into selects and
-# vectorise its pixels (`compose_encode_row`).
-if(NOT MSVC)
-  target_compile_options(nr_image_objects PRIVATE -fno-trapping-math)
-endif()
-set_target_properties(nr_image_objects PROPERTIES POSITION_INDEPENDENT_CODE ON)
+# nr_image.c is one object in three libraries: its own, for the Python, the frame's, and
+# the archive's. The archive's is built separately below, so this is a function.
+function(nr_image_library name)
+  add_library(${name} OBJECT src/ref/nr_image.c)
+  target_include_directories(${name} PRIVATE src/ref)
+  target_compile_options(${name} PRIVATE ${NR_NATIVE_FLAGS} ${NR_EXACT_FLAGS} ${NR_WARN_FLAGS})
+  # the CPU floor above: `-march=x86-64-v3` on x86-64, NR_F16C under MSVC (the F16C intrinsics)
+  target_compile_options(${name} PRIVATE ${NR_IMAGE_ARCH_FLAGS})
+  target_compile_definitions(${name} PRIVATE ${NR_IMAGE_ARCH_DEFINES})
+  # `-fno-trapping-math` changes no value, only whether a comparison may raise an exception
+  # flag nobody reads; it lets GCC turn the fused composition's clamps into selects and
+  # vectorise its pixels (`compose_encode_row`).
+  if(NOT MSVC)
+    target_compile_options(${name} PRIVATE -fno-trapping-math)
+  endif()
+  set_target_properties(${name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endfunction()
+
+nr_image_library(nr_image_objects)
 nr_no_ipo(nr_image_objects)
+
+# These are the host passes, the CPU-bound part of a frame and the only code nr_no_ipo
+# covers -- the blobs beside it are byte arrays, which gain nothing from IPO anyway.
+# Dropping it costs the DLLs their cross-module inlining into libnr_frame and libnr_image,
+# and that is the price of their export tables. libdlssnr pays no such price: it is an
+# archive, nothing reads its objects to write a .def, and the host that links it (VBA-M,
+# ENABLE_LTO) asked for IPO in everything else it builds. So where the two differ the file
+# is compiled a second time, as the host asked, and the archive takes that copy -- not
+# where nr_no_ipo is a no-op, and not where the host wants no IPO, since the second copy
+# would then be the same object twice.
+set(NR_IMAGE_ARCHIVE_OBJECTS $<TARGET_OBJECTS:nr_image_objects>)
+set(nr_want_ipo "${CMAKE_INTERPROCEDURAL_OPTIMIZATION}")
+foreach(cfg IN LISTS CMAKE_CONFIGURATION_TYPES CMAKE_BUILD_TYPE)
+  string(TOUPPER "${cfg}" nr_cfg)
+  if(CMAKE_INTERPROCEDURAL_OPTIMIZATION_${nr_cfg})
+    set(nr_want_ipo ON)
+  endif()
+endforeach()
+if(nr_want_ipo AND (MSVC OR CMAKE_C_SIMULATE_ID MATCHES "MSVC"))
+  nr_image_library(nr_image_ipo_objects)
+  set(NR_IMAGE_ARCHIVE_OBJECTS $<TARGET_OBJECTS:nr_image_ipo_objects>)
+  message(${NR_STATUS} "libdlssnr takes its own copy of the host passes with IPO; the exported DLLs keep theirs without it")
+endif()
 
 add_library(nr_image SHARED $<TARGET_OBJECTS:nr_image_objects>)
 nr_place(nr_image)
@@ -1215,7 +1245,7 @@ nr_place(nr_frame)
 # archive on Apple as before.
 if(NR_BUILD_METAL)
   add_library(dlssnr STATIC src/gpu/libmetalmx.m "${NR_METAL_DIR}/nr_metallib.h" ${NR_METAL4_HEADER}
-    src/ref/nr_frame.c $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS})
+    src/ref/nr_frame.c ${NR_IMAGE_ARCHIVE_OBJECTS} ${NR_EMBED_OBJECTS})
   target_include_directories(dlssnr
     PRIVATE src/gpu "${NR_METAL_DIR}" "${NR_METAL4_DIR}"
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
@@ -1230,7 +1260,7 @@ elseif(NR_DLSSNR_D3D12)
   # library (d3d12.dll and dxgi.dll are loaded at run time); a host shares its device
   # through nr_frame_adopt_d3d12, and nr_frame_adopt_vulkan is refused
   add_library(dlssnr STATIC src/gpu/libd3dmx.c src/ref/nr_frame.c
-    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_DXIL_OBJECTS})
+    ${NR_IMAGE_ARCHIVE_OBJECTS} ${NR_EMBED_OBJECTS} ${NR_DXIL_OBJECTS})
   target_include_directories(dlssnr
     PRIVATE src/gpu
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
@@ -1239,7 +1269,7 @@ elseif(NR_DLSSNR_D3D12)
   message(${NR_STATUS} "libdlssnr carries libd3dmx (Direct3D 12); -DNR_DLSSNR_D3D12=OFF for the Vulkan archive")
 else()
   add_library(dlssnr STATIC src/gpu/libxmx.c src/ref/nr_frame.c
-    $<TARGET_OBJECTS:nr_image_objects> ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
+    ${NR_IMAGE_ARCHIVE_OBJECTS} ${NR_EMBED_OBJECTS} ${NR_SHADER_OBJECTS})
   target_include_directories(dlssnr
     PRIVATE ${Vulkan_INCLUDE_DIRS} src/gpu
     PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/ref>)
