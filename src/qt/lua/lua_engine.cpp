@@ -172,7 +172,7 @@ void LuaEngine::Stop() {
     impl_->has_read_hooks = impl_->has_write_hooks = impl_->has_exec_hooks = false;
     ::g_vbam_script_has_read_hooks  = 0;
     ::g_vbam_script_has_write_hooks = 0;
-    ::g_vbam_script_has_exec_hooks  = 0;
+    ::g_vbam_script_mem_exec        = nullptr;
     impl_->joypad_overrides.clear();
     ClearGui();
     script_path_.clear();
@@ -349,9 +349,12 @@ void TrampolineMemExec (uint32_t addr) {
 }
 struct HookTrampolineInstaller {
     HookTrampolineInstaller() {
+        // The read/write pointers are installed once and gated by their
+        // has_* flags. The exec pointer is the gate itself (it fires per
+        // instruction), so it stays null here and is managed by
+        // SetHasExecHooks.
         ::g_vbam_script_mem_read  = &TrampolineMemRead;
         ::g_vbam_script_mem_write = &TrampolineMemWrite;
-        ::g_vbam_script_mem_exec  = &TrampolineMemExec;
     }
 };
 HookTrampolineInstaller s_install;
@@ -367,7 +370,7 @@ void LuaEngine::SetHasWriteHooks(bool v) {
 }
 void LuaEngine::SetHasExecHooks(bool v) {
     impl_->has_exec_hooks = v;
-    ::g_vbam_script_has_exec_hooks = v ? 1 : 0;
+    ::g_vbam_script_mem_exec = v ? &TrampolineMemExec : nullptr;
 }
 void LuaEngine::SetJoypadOverride(int port, uint32_t mask) {
     impl_->joypad_overrides[port] = mask;

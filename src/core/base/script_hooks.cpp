@@ -12,7 +12,6 @@ VbamScriptMemExecFn  g_vbam_script_mem_exec  = nullptr;
 
 int g_vbam_script_has_read_hooks  = 0;
 int g_vbam_script_has_write_hooks = 0;
-int g_vbam_script_has_exec_hooks  = 0;
 
 #ifdef __cplusplus
 }

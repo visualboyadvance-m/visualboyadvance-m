@@ -46,6 +46,11 @@
 #include <cstring>
 #include <map>
 
+#ifdef ENABLE_LUA
+#include "wx/lua/lua_console.h"
+#include "wx/lua/lua_engine.h"
+#endif
+
 #include <wx/cmdline.h>
 #include <wx/display.h>
 #include <wx/file.h>
@@ -486,6 +491,14 @@ int main(int argc, char** argv) {
         argv = relaunch_argv.data();
     }
 #endif
+
+    // Startup errors before the main window exists would go to wx's GUI
+    // logger, which shows them in a modal dialog a headless X server can
+    // never create (assert + exit 255), hiding the message. Log to stderr
+    // instead so unattended runs report why they died. This is only for the
+    // startup window: OnInit restores the GUI log target once the main window
+    // is up, so runtime errors still reach the user as dialogs.
+    delete wxLog::SetActiveTarget(new wxLogStderr);
 
     // This will be freed on wxEntry exit.
     wxApp::SetInstance(new wxvbamApp());
@@ -1477,6 +1490,11 @@ bool wxvbamApp::OnInit() {
 
     frame->Show(true);
 
+    // The main window is up, so runtime errors can be shown as dialogs again.
+    // main() pointed the log target at stderr for the startup window (before
+    // this window existed); hand it back to the GUI logger now.
+    delete wxLog::SetActiveTarget(new wxLogGui());
+
 #if !defined(__WXMSW__) && !defined(__WXRETRO68__)
     // See QuitSignalHandler(). A timer, as idle events stop while no game runs.
     for (int sig : {SIGTERM, SIGINT, SIGHUP}) {
@@ -1526,6 +1544,20 @@ bool wxvbamApp::OnInit() {
     // Pre-enumerate plugins so hotkey cycling and display config are instant.
     // Use CallAfter so the main window paints first.
     CallAfter([this] { EnumeratePlugins(); });
+
+#ifdef ENABLE_LUA
+    // Start the --lua-script the same way the Lua Run Script menu does,
+    // after the window is up and (usually) right as the ROM starts.
+    if (!pending_lua_script.empty())
+        CallAfter([this] {
+            auto* console = vbam::wx::LuaConsoleEnsure(frame);
+            console->Show();
+            vbam::wx::LuaConsoleHookLog();
+            if (!vbam::wx::LuaInstance().LoadFile(
+                    std::string(pending_lua_script.mb_str())))
+                wxLogError(_("Lua script failed to load — see console"));
+        });
+#endif
 
     // Confirm HDR / 10-bit availability by actually bringing the real renderer
     // up once and seeing whether it presents the feature, so the display dialog
@@ -1621,6 +1653,11 @@ void wxvbamApp::OnInitCmdLine(wxCmdLineParser& cl)
         { wxCMD_LINE_SWITCH, NULL, t("mute"),
             N_("Mute the audio for this session, without saving to the config"),
             wxCMD_LINE_VAL_NONE, 0 },
+#ifdef ENABLE_LUA
+        { wxCMD_LINE_OPTION, NULL, t("lua-script"),
+            N_("Run a Lua script at startup"),
+            wxCMD_LINE_VAL_STRING, 0 },
+#endif
         { wxCMD_LINE_OPTION, t("c"), t("config"),
             N_("Set a configuration file"),
             wxCMD_LINE_VAL_STRING, 0 },
@@ -1724,6 +1761,12 @@ bool wxvbamApp::OnCmdLineParsed(wxCmdLineParser& cl)
     if (cl.Found(wxT("mute"))) {
         mute = true;
     }
+
+#ifdef ENABLE_LUA
+    if (cl.Found(wxT("lua-script"), &s)) {
+        pending_lua_script = s;
+    }
+#endif
 
     if (cl.Found(wxT("o"))) {
         // This was most likely done on a command line, so use

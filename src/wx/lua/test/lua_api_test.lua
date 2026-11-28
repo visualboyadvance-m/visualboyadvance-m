@@ -109,6 +109,36 @@ check(type(emu.softreset)     == "function", "emu.softreset exists")
 check(type(emu.registerbefore) == "function", "emu.registerbefore exists")
 check(type(emu.registerafter)  == "function", "emu.registerafter exists")
 check(type(emu.registerexit)   == "function", "emu.registerexit exists")
+check(type(emu.screenshot)    == "function", "emu.screenshot exists")
+check(type(emu.loadrom)       == "function", "emu.loadrom exists")
+check(type(emu.romgeneration) == "function", "emu.romgeneration exists")
+
+-- No frame was captured in this runner (no ROM, no systemDrawScreen),
+-- so screenshot must fail cleanly rather than crash or write a file.
+local shot, serr = emu.screenshot("api_test_shot.png")
+check(shot == nil and type(serr) == "string",
+      "emu.screenshot without a frame returns nil, err (got " ..
+      tostring(serr) .. ")")
+
+-- No wx frontend in this runner, so the loadrom backend is not
+-- installed: it must refuse cleanly (nil + reason) rather than crash
+-- or pretend to succeed.
+local lr_ok, lr_err = emu.loadrom("/nonexistent/nope.gba")
+check(lr_ok == nil and type(lr_err) == "string",
+      "emu.loadrom headless returns nil, err (got " .. tostring(lr_err) .. ")")
+
+local gen = emu.romgeneration()
+check(type(gen) == "number", "emu.romgeneration() returns number")
+
+emu.print("=== bridge namespace ===")
+
+check(type(bridge.listen)    == "function", "bridge.listen exists")
+check(type(bridge.close)     == "function", "bridge.close exists")
+check(type(bridge.connected) == "function", "bridge.connected exists")
+check(type(bridge.receive)   == "function", "bridge.receive exists")
+check(type(bridge.send)      == "function", "bridge.send exists")
+check(bridge.connected() == false, "bridge not connected before listen")
+check(bridge.receive() == nil,     "bridge.receive() nil when idle")
 
 local fc = emu.framecount()
 check(type(fc) == "number", "emu.framecount() returns number, got " .. type(fc))
@@ -182,6 +212,9 @@ check_pcall(function() memory.registerread(0x02000000, 4, function() end) end,
             "memory.registerread(addr, size, fn)")
 check_pcall(function() memory.registerread(0x02000000, nil) end,
             "memory.registerread clear")
+-- Also drop the size-4 entry above, or it keeps the core-side hook
+-- gate armed for the rest of the process.
+memory.registerread(0x02000000, 4, nil)
 
 emu.print("=== rom namespace ===")
 

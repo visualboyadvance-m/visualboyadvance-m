@@ -93,6 +93,10 @@
 #include "wx/config/option.h"
 #include "wx/drawing.h"
 
+#ifdef ENABLE_LUA
+#include "wx/lua/lua_internal.h"
+#endif
+
 #if !defined(NO_VULKAN) && defined(VBAM_VULKAN_DYNAMIC_LOADER)
 #include <wx/dynlib.h>  // wxDynamicLibrary, for run-time Vulkan loader resolution
 #endif
@@ -1105,6 +1109,14 @@ void GameArea::LoadGame(const wxString& load_path)
     }
 
     loaded = t;
+#ifdef ENABLE_LUA
+    // Lua-facing ROM identity (emu.romname / emu.romgeneration): set
+    // once the load committed, so scripts — and the bridge's `loadrom`
+    // wait loop — can see that a queued emu.loadrom() landed.
+    vbam::wx::lua_internal::g_rom_name =
+        std::string(loaded_game.GetName().mb_str(wxConvUTF8));
+    ++vbam::wx::lua_internal::g_rom_generation;
+#endif
     SetFrameTitle();
     SetFocus();
     // Use custom geometry
