@@ -1431,6 +1431,10 @@ void MainWindow::OnAGBPrinter() {
     GetMenuOptionConfig(cmd::kAGBPrinter, config::OptionID::kPrefAgbPrint);
 }
 
+void MainWindow::OnGBPEnabled() {
+    GetMenuOptionConfig(cmd::kGBPEnabled, config::OptionID::kPrefGBPEnabled);
+}
+
 void MainWindow::DoGBALcdFilter() {
     GetMenuOptionConfig(cmd::kGBALcdFilter, config::OptionID::kGBALCDFilter);
 }
@@ -2602,6 +2606,9 @@ bool MainWindow::DispatchCommand(int cmd_id) {
             return true;
         case cmd::kAGBPrinter:
             OnAGBPrinter();
+            return true;
+        case cmd::kGBPEnabled:
+            OnGBPEnabled();
             return true;
         case cmd::kGBALcdFilter:
             OnGBALcdFilter();

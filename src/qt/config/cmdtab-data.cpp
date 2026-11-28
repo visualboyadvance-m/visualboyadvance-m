@@ -168,6 +168,7 @@ std::vector<cmditem> cmdtab = {
     {QStringLiteral("GBSurround"), "GB surround sound effect (%)", cmd::kGBSurround, 0, nullptr},
     {QStringLiteral("AGBPrinter"), "Enable AGB printer", cmd::kAGBPrinter, 0, nullptr},
     {QStringLiteral("GBALcdFilter"), "Enable LCD filter", cmd::kGBALcdFilter, CMDEN_GBA, nullptr},
+    {QStringLiteral("GBPEnabled"), "Enable Game Boy Player", cmd::kGBPEnabled, CMDEN_GBA, nullptr},
     {QStringLiteral("GBLcdFilter"), "Enable LCD filter", cmd::kGBLcdFilter, CMDEN_GB, nullptr},
     {QStringLiteral("ApplyPatches"), "Apply IPS/UPS/IPF patches if found", cmd::kApplyPatches, 0, nullptr},
     {QStringLiteral("KeepOnTop"), "Keep window on top", cmd::kKeepOnTop, 0, nullptr},

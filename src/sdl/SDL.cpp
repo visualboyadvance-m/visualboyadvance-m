@@ -2101,6 +2101,8 @@ Long options only:\n\
       --gb-palette-option=N    Game Boy palette to use\n\
       --gb-printer             Enable the Game Boy printer\n\
       --win-gb-printer-enabled   Same as --gb-printer\n\
+      --gbp                    Enable Game Boy Player rumble support\n\
+      --no-gbp                 Disable Game Boy Player rumble support\n\
       --ifb-type=N             Interframe blending by number, as for -I\n\
       --null-sound             Produce no sound output\n\
       --opt-flash-size=N       Flash size (0 - 64K, 1 - 128K)\n\

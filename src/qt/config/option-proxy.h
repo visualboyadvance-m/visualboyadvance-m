@@ -116,6 +116,7 @@ static constexpr std::array<Option::Type, kNbOptions> kOptionsTypes = {
     /*kPrefEmulatorType*/ Option::Type::kUnsigned,
     /*kPrefFlashSize*/ Option::Type::kUnsigned,
     /*kPrefFrameSkip*/ Option::Type::kInt,
+    /*kPrefGBPEnabled*/ Option::Type::kInt,
     /*kPrefGBPaletteOption*/ Option::Type::kUnsigned,
     /*kPrefGBPrinter*/ Option::Type::kInt,
     /*kPrefGDBBreakOnLoad*/ Option::Type::kBool,
